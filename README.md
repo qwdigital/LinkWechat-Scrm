@@ -2,7 +2,9 @@
 
 #### 平台介绍
 基于企业微信的开源私域流量SCRM系统
-![输入图片说明](https://images.gitee.com/uploads/images/2020/0825/144910_68578056_409467.png "屏幕截图.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2020/0825/144910_68578056_409467.png "屏幕截图.png")】
+
+感谢[ruoyi-vue](https://gitee.com/y_project/RuoYi-Vue)提供后台框架框架
 #### 软件架构
 软件架构说明
 
@@ -11,11 +13,10 @@
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/0825/145413_3a0cab42_409467.png "屏幕截图.png")
 
-#### 使用说明
+#### 在线体验
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+演示演示：https://www.xxxx.com/
+微信群：
 
 #### 参与贡献
 
