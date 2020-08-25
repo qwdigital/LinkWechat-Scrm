@@ -7,11 +7,9 @@
 软件架构说明
 
 
-#### 安装教程
+#### 内置功能
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+![输入图片说明](https://images.gitee.com/uploads/images/2020/0825/145413_3a0cab42_409467.png "屏幕截图.png")
 
 #### 使用说明
 
