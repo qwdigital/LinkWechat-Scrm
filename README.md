@@ -24,8 +24,9 @@ LinkWeChat，是一款基于企业微信的开源SCRM系统，为企业构建私
 
 
 1. 演示演示：http://www.topitclub.cn/
-2. 微信群
-![输入图片说明](https://images.gitee.com/uploads/images/2020/0825/153043_37daf9cb_409467.png "屏幕截图.png")
+2. 交流群
+
+![输入图片说明](https://images.gitee.com/uploads/images/2020/0825/153224_48dfab0e_409467.jpeg "WechatIMG69.jpeg")
 
 #### 演示图
 
