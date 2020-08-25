@@ -1,8 +1,8 @@
 # LinkWeChat
 
-#### 介绍
+#### 平台介绍
 基于企业微信的开源私域流量SCRM系统
-
+![输入图片说明](https://images.gitee.com/uploads/images/2020/0825/144910_68578056_409467.png "屏幕截图.png")
 #### 软件架构
 软件架构说明
 
