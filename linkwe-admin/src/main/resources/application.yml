@@ -117,3 +117,7 @@ xss:
   excludes: /system/notice/*
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
+
+# forest配置
+forest:
+  interceptors: com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor

@@ -1,5 +1,6 @@
 package com.linkwechat;
 
+import com.thebeastshop.forest.springboot.annotation.ForestScan;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,6 +13,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
  */
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 @MapperScan("com.linkwechat.*.mapper")
+@ForestScan(basePackages = "com.linkwechat.wecom.client")
 public class RuoYiApplication
 {
     public static void main(String[] args)

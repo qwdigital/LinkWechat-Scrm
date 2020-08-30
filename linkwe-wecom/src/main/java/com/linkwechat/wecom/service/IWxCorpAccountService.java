@@ -1,7 +1,7 @@
 package com.linkwechat.wecom.service;
 
 import java.util.List;
-import com.linkwechat.wecom.domain.WxCorpAccount;
+import com.linkwechat.wecom.domain.WeCorpAccount;
 
 /**
  * 企业id相关配置Service接口
@@ -17,7 +17,7 @@ public interface IWxCorpAccountService
      * @param id 企业id相关配置ID
      * @return 企业id相关配置
      */
-    public WxCorpAccount selectWxCorpAccountById(Long id);
+    public WeCorpAccount selectWxCorpAccountById(Long id);
 
     /**
      * 查询企业id相关配置列表
@@ -25,7 +25,7 @@ public interface IWxCorpAccountService
      * @param wxCorpAccount 企业id相关配置
      * @return 企业id相关配置集合
      */
-    public List<WxCorpAccount> selectWxCorpAccountList(WxCorpAccount wxCorpAccount);
+    public List<WeCorpAccount> selectWxCorpAccountList(WeCorpAccount wxCorpAccount);
 
     /**
      * 新增企业id相关配置
@@ -33,7 +33,7 @@ public interface IWxCorpAccountService
      * @param wxCorpAccount 企业id相关配置
      * @return 结果
      */
-    public int insertWxCorpAccount(WxCorpAccount wxCorpAccount);
+    public int insertWxCorpAccount(WeCorpAccount wxCorpAccount);
 
     /**
      * 修改企业id相关配置
@@ -41,7 +41,7 @@ public interface IWxCorpAccountService
      * @param wxCorpAccount 企业id相关配置
      * @return 结果
      */
-    public int updateWxCorpAccount(WxCorpAccount wxCorpAccount);
+    public int updateWxCorpAccount(WeCorpAccount wxCorpAccount);
 
     /**
      * 批量删除企业id相关配置
@@ -58,4 +58,13 @@ public interface IWxCorpAccountService
      * @return 结果
      */
     public int deleteWxCorpAccountById(Long id);
+
+
+    /**
+     * 获取有效的企业id
+     *
+     * @return 结果
+     */
+    public WeCorpAccount findValidWxCorpAccount();
+
 }

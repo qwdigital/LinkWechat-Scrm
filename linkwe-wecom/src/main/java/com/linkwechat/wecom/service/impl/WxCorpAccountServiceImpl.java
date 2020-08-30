@@ -6,7 +6,7 @@ import com.linkwechat.wecom.service.IWxCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.linkwechat.wecom.mapper.WxCorpAccountMapper;
-import com.linkwechat.wecom.domain.WxCorpAccount;
+import com.linkwechat.wecom.domain.WeCorpAccount;
 
 /**
  * 企业id相关配置Service业务层处理
@@ -27,7 +27,7 @@ public class WxCorpAccountServiceImpl implements IWxCorpAccountService
      * @return 企业id相关配置
      */
     @Override
-    public WxCorpAccount selectWxCorpAccountById(Long id)
+    public WeCorpAccount selectWxCorpAccountById(Long id)
     {
         return wxCorpAccountMapper.selectWxCorpAccountById(id);
     }
@@ -39,7 +39,7 @@ public class WxCorpAccountServiceImpl implements IWxCorpAccountService
      * @return 企业id相关配置
      */
     @Override
-    public List<WxCorpAccount> selectWxCorpAccountList(WxCorpAccount wxCorpAccount)
+    public List<WeCorpAccount> selectWxCorpAccountList(WeCorpAccount wxCorpAccount)
     {
         return wxCorpAccountMapper.selectWxCorpAccountList(wxCorpAccount);
     }
@@ -51,7 +51,7 @@ public class WxCorpAccountServiceImpl implements IWxCorpAccountService
      * @return 结果
      */
     @Override
-    public int insertWxCorpAccount(WxCorpAccount wxCorpAccount)
+    public int insertWxCorpAccount(WeCorpAccount wxCorpAccount)
     {
         wxCorpAccount.setCreateTime(DateUtils.getNowDate());
         return wxCorpAccountMapper.insertWxCorpAccount(wxCorpAccount);
@@ -64,7 +64,7 @@ public class WxCorpAccountServiceImpl implements IWxCorpAccountService
      * @return 结果
      */
     @Override
-    public int updateWxCorpAccount(WxCorpAccount wxCorpAccount)
+    public int updateWxCorpAccount(WeCorpAccount wxCorpAccount)
     {
         wxCorpAccount.setUpdateTime(DateUtils.getNowDate());
         return wxCorpAccountMapper.updateWxCorpAccount(wxCorpAccount);
@@ -92,5 +92,16 @@ public class WxCorpAccountServiceImpl implements IWxCorpAccountService
     public int deleteWxCorpAccountById(Long id)
     {
         return wxCorpAccountMapper.deleteWxCorpAccountById(id);
+    }
+
+
+    /**
+     * 获取有效的企业id
+     *
+     * @return 结果
+     */
+    @Override
+    public WeCorpAccount findValidWxCorpAccount() {
+        return null;
     }
 }

@@ -11,7 +11,7 @@ import com.linkwechat.common.core.domain.BaseEntity;
  * @author ruoyi
  * @date 2020-08-24
  */
-public class WxCorpAccount extends BaseEntity
+public class WeCorpAccount extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 

@@ -30,6 +30,7 @@
         <poi.version>3.17</poi.version>
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.0</jwt.version>
+        <forest.version>1.4.0</forest.version>
     </properties>
 	
     <!-- 依赖声明 -->
@@ -187,6 +188,13 @@
                 <groupId>com.linkwechat</groupId>
                 <artifactId>linkwe-wecom</artifactId>
                 <version>${linkwe.version}</version>
+            </dependency>
+
+            <!--forset-->
+            <dependency>
+                <groupId>com.dtflys.forest</groupId>
+                <artifactId>spring-boot-starter-forest</artifactId>
+                <version>${forest.version}</version>
             </dependency>
 
 
