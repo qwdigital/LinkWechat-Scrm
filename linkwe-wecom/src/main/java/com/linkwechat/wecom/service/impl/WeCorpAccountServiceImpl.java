@@ -2,10 +2,10 @@ package com.linkwechat.wecom.service.impl;
 
 import java.util.List;
 import com.linkwechat.common.utils.DateUtils;
-import com.linkwechat.wecom.service.IWxCorpAccountService;
+import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.linkwechat.wecom.mapper.WxCorpAccountMapper;
+import com.linkwechat.wecom.mapper.WeCorpAccountMapper;
 import com.linkwechat.wecom.domain.WeCorpAccount;
 
 /**
@@ -15,10 +15,10 @@ import com.linkwechat.wecom.domain.WeCorpAccount;
  * @date 2020-08-24
  */
 @Service
-public class WxCorpAccountServiceImpl implements IWxCorpAccountService
-{
+public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
+
     @Autowired
-    private WxCorpAccountMapper wxCorpAccountMapper;
+    private WeCorpAccountMapper weCorpAccountMapper;
 
     /**
      * 查询企业id相关配置
@@ -27,9 +27,9 @@ public class WxCorpAccountServiceImpl implements IWxCorpAccountService
      * @return 企业id相关配置
      */
     @Override
-    public WeCorpAccount selectWxCorpAccountById(Long id)
+    public WeCorpAccount selectWeCorpAccountById(Long id)
     {
-        return wxCorpAccountMapper.selectWxCorpAccountById(id);
+        return weCorpAccountMapper.selectWeCorpAccountById(id);
     }
 
     /**
@@ -39,9 +39,9 @@ public class WxCorpAccountServiceImpl implements IWxCorpAccountService
      * @return 企业id相关配置
      */
     @Override
-    public List<WeCorpAccount> selectWxCorpAccountList(WeCorpAccount wxCorpAccount)
+    public List<WeCorpAccount> selectWeCorpAccountList(WeCorpAccount wxCorpAccount)
     {
-        return wxCorpAccountMapper.selectWxCorpAccountList(wxCorpAccount);
+        return weCorpAccountMapper.selectWeCorpAccountList(wxCorpAccount);
     }
 
     /**
@@ -51,10 +51,10 @@ public class WxCorpAccountServiceImpl implements IWxCorpAccountService
      * @return 结果
      */
     @Override
-    public int insertWxCorpAccount(WeCorpAccount wxCorpAccount)
+    public int insertWeCorpAccount(WeCorpAccount wxCorpAccount)
     {
         wxCorpAccount.setCreateTime(DateUtils.getNowDate());
-        return wxCorpAccountMapper.insertWxCorpAccount(wxCorpAccount);
+        return weCorpAccountMapper.insertWeCorpAccount(wxCorpAccount);
     }
 
     /**
@@ -64,10 +64,10 @@ public class WxCorpAccountServiceImpl implements IWxCorpAccountService
      * @return 结果
      */
     @Override
-    public int updateWxCorpAccount(WeCorpAccount wxCorpAccount)
+    public int updateWeCorpAccount(WeCorpAccount wxCorpAccount)
     {
         wxCorpAccount.setUpdateTime(DateUtils.getNowDate());
-        return wxCorpAccountMapper.updateWxCorpAccount(wxCorpAccount);
+        return weCorpAccountMapper.updateWeCorpAccount(wxCorpAccount);
     }
 
     /**
@@ -77,9 +77,9 @@ public class WxCorpAccountServiceImpl implements IWxCorpAccountService
      * @return 结果
      */
     @Override
-    public int deleteWxCorpAccountByIds(Long[] ids)
+    public int deleteWeCorpAccountByIds(Long[] ids)
     {
-        return wxCorpAccountMapper.deleteWxCorpAccountByIds(ids);
+        return weCorpAccountMapper.deleteWeCorpAccountByIds(ids);
     }
 
     /**
@@ -89,19 +89,19 @@ public class WxCorpAccountServiceImpl implements IWxCorpAccountService
      * @return 结果
      */
     @Override
-    public int deleteWxCorpAccountById(Long id)
+    public int deleteWeCorpAccountById(Long id)
     {
-        return wxCorpAccountMapper.deleteWxCorpAccountById(id);
+        return weCorpAccountMapper.deleteWeCorpAccountById(id);
     }
 
 
-    /**
-     * 获取有效的企业id
-     *
-     * @return 结果
-     */
-    @Override
-    public WeCorpAccount findValidWxCorpAccount() {
-        return null;
-    }
+//    /**
+//     * 获取有效的企业id
+//     *
+//     * @return 结果
+//     */
+//    @Override
+//    public WeCorpAccount findValidWeCorpAccount() {
+//        return null;
+//    }
 }

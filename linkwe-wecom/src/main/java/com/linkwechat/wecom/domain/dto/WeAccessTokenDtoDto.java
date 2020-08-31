@@ -1,11 +1,14 @@
-package com.linkwechat.wecom.domain;
+package com.linkwechat.wecom.domain.dto;
+
+import lombok.Data;
 
 /**
  * @description: accessToken相关
  * @author: HaoN
  * @create: 2020-08-27 15:54
  **/
-public class WeAccessToken extends  WeResult{
+@Data
+public class WeAccessTokenDtoDto extends WeResultDto {
    private String access_token;
    private Long expires_in;
 }

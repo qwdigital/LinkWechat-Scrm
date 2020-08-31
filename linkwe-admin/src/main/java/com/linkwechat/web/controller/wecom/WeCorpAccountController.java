@@ -6,7 +6,7 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.wecom.domain.WeCorpAccount;
-import com.linkwechat.wecom.service.IWxCorpAccountService;
+import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,20 +21,20 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/wecom/corp")
-public class WxCorpAccountController extends BaseController
+public class WeCorpAccountController extends BaseController
 {
     @Autowired
-    private IWxCorpAccountService wxCorpAccountService;
+    private IWeCorpAccountService weCorpAccountService;
 
     /**
      * 查询企业id相关配置列表
      */
     @PreAuthorize("@ss.hasPermi('wechat:corp:list')")
     @GetMapping("/list")
-    public TableDataInfo list(WeCorpAccount wxCorpAccount)
+    public TableDataInfo list(WeCorpAccount weCorpAccount)
     {
         startPage();
-        List<WeCorpAccount> list = wxCorpAccountService.selectWxCorpAccountList(wxCorpAccount);
+        List<WeCorpAccount> list = weCorpAccountService.selectWeCorpAccountList(weCorpAccount);
         return getDataTable(list);
     }
 
@@ -58,7 +58,7 @@ public class WxCorpAccountController extends BaseController
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
-        return AjaxResult.success(wxCorpAccountService.selectWxCorpAccountById(id));
+        return AjaxResult.success(weCorpAccountService.selectWeCorpAccountById(id));
     }
 
     /**
@@ -67,9 +67,9 @@ public class WxCorpAccountController extends BaseController
     @PreAuthorize("@ss.hasPermi('wechat:corp:add')")
     @Log(title = "企业id相关配置", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody WeCorpAccount wxCorpAccount)
+    public AjaxResult add(@RequestBody WeCorpAccount weCorpAccount)
     {
-        return toAjax(wxCorpAccountService.insertWxCorpAccount(wxCorpAccount));
+        return toAjax(weCorpAccountService.insertWeCorpAccount(weCorpAccount));
     }
 
     /**
@@ -78,9 +78,9 @@ public class WxCorpAccountController extends BaseController
     @PreAuthorize("@ss.hasPermi('wechat:corp:edit')")
     @Log(title = "企业id相关配置", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody WeCorpAccount wxCorpAccount)
+    public AjaxResult edit(@RequestBody WeCorpAccount weCorpAccount)
     {
-        return toAjax(wxCorpAccountService.updateWxCorpAccount(wxCorpAccount));
+        return toAjax(weCorpAccountService.updateWeCorpAccount(weCorpAccount));
     }
 
     /**
@@ -91,7 +91,7 @@ public class WxCorpAccountController extends BaseController
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)
     {
-        return toAjax(wxCorpAccountService.deleteWxCorpAccountByIds(ids));
+        return toAjax(weCorpAccountService.deleteWeCorpAccountByIds(ids));
     }
 
 }

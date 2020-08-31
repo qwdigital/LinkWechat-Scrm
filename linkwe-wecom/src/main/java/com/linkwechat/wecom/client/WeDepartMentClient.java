@@ -3,8 +3,8 @@ package com.linkwechat.wecom.client;
 import com.dtflys.forest.annotation.DataObject;
 import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
-import com.linkwechat.wecom.domain.WeDepartMent;
-import com.linkwechat.wecom.domain.WeResult;
+import com.linkwechat.wecom.domain.dto.WeDepartMentDtoDto;
+import com.linkwechat.wecom.domain.dto.WeResultDto;
 
 /**
  * @description: 企业微信部门相关客户端
@@ -21,7 +21,7 @@ public interface WeDepartMentClient {
      @Request(url="https://qyapi.weixin.qq.com/cgi-bin/department/create",
              type = "POST"
      )
-     WeResult createWeDepartMent(@DataObject WeDepartMent weDepartMent);
+     WeResultDto createWeDepartMent(@DataObject WeDepartMentDtoDto weDepartMent);
 
 
 
@@ -33,7 +33,7 @@ public interface WeDepartMentClient {
     @Request(url="https://qyapi.weixin.qq.com/cgi-bin/department/update",
             type = "POST"
     )
-     WeResult updateWeDepartMent(@DataObject WeDepartMent weDepartMent);
+    WeResultDto updateWeDepartMent(@DataObject WeDepartMentDtoDto weDepartMent);
 
 
     /**
@@ -42,7 +42,7 @@ public interface WeDepartMentClient {
      * @return
      */
     @Request(url = "https://qyapi.weixin.qq.com/cgi-bin/department/delete")
-    WeResult deleteWeDepartMent(@Query("id") String departMnentId);
+    WeResultDto deleteWeDepartMent(@Query("id") String departMnentId);
 
 
     /**
@@ -50,7 +50,7 @@ public interface WeDepartMentClient {
      * @return
      */
     @Request(url = "https://qyapi.weixin.qq.com/cgi-bin/department/list")
-    WeDepartMent weDepartMents();
+    WeDepartMentDtoDto weDepartMents();
 
 
 }

@@ -2,7 +2,7 @@ package com.linkwechat.wecom.client;
 
 import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
-import com.linkwechat.wecom.domain.WeAccessToken;
+import com.linkwechat.wecom.domain.dto.WeAccessTokenDtoDto;
 
 /**
  * @description: 获取企业微信Token相关
@@ -20,6 +20,6 @@ public interface WeAccessTokenClient {
      * @return
      */
     @Request(url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken")
-    WeAccessToken getToken(@Query("corpid")String corpId, @Query("corpsecret") String corpSecret);
+    WeAccessTokenDtoDto getToken(@Query("corpid")String corpId, @Query("corpsecret") String corpSecret);
 
 }

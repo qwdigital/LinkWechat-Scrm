@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeDepartmentMapper">
+    
+    <resultMap type="WeDepartment" id="WeDepartmentResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="nameEn"    column="name_en"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="isActivate"    column="is_activate"    />
+        <result property="order"    column="order"    />
+    </resultMap>
+
+    <sql id="selectWeDepartmentVo">
+        select id, name, name_en, parent_id, is_activate, order from we_department
+    </sql>
+
+    <select id="selectWeDepartmentList" parameterType="WeDepartment" resultMap="WeDepartmentResult">
+        <include refid="selectWeDepartmentVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="nameEn != null  and nameEn != ''"> and name_en = #{nameEn}</if>
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
+            <if test="isActivate != null "> and is_activate = #{isActivate}</if>
+            <if test="order != null "> and order = #{order}</if>
+        </where>
+    </select>
+    
+    <select id="selectWeDepartmentById" parameterType="Long" resultMap="WeDepartmentResult">
+        <include refid="selectWeDepartmentVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWeDepartment" parameterType="WeDepartment">
+        insert into we_department
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="nameEn != null">name_en,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="isActivate != null">is_activate,</if>
+            <if test="order != null">order,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="nameEn != null">#{nameEn},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="isActivate != null">#{isActivate},</if>
+            <if test="order != null">#{order},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWeDepartment" parameterType="WeDepartment">
+        update we_department
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="nameEn != null">name_en = #{nameEn},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="isActivate != null">is_activate = #{isActivate},</if>
+            <if test="order != null">order = #{order},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeDepartmentById" parameterType="Long">
+        delete from we_department where id = #{id}
+    </delete>
+
+    <delete id="deleteWeDepartmentByIds" parameterType="String">
+        delete from we_department where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

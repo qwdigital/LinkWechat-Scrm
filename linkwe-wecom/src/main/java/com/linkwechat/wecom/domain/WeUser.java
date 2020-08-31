@@ -1,53 +1,102 @@
 package com.linkwechat.wecom.domain;
 
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.linkwechat.common.annotation.Excel;
+import com.linkwechat.common.core.domain.BaseEntity;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+
 /**
- * @description: 通讯录用户
- * @author: HaoN
- * @create: 2020-08-28 10:45
- **/
-public class WeUser {
+ * 通讯录相关客户对象 we_user
+ * 
+ * @author ruoyi
+ * @date 2020-08-31
+ */
+public class WeUser extends BaseEntity
+{
+    private static final long serialVersionUID = 1L;
 
-    //成员头像的mediaid，通过素材管理接口上传图片获得的mediaid
-    private String avatar_mediaid;
+    /** $column.columnComment */
+    private Long id;
 
-    //姓名
-    private String name;
-    //昵称
+    /** 头像地址 */
+    @Excel(name = "头像地址")
+    private String headImageUrl;
+
+    /** 用户名称 */
+    @Excel(name = "用户名称")
+    private String userName;
+
+    /** 用户昵称 */
+    @Excel(name = "用户昵称")
     private String alias;
-    //账号
-    private String userid;
 
-    //性别。1表示男性，2表示女性
-    private String gender;
+    /** 账号 */
+    @Excel(name = "账号")
+    private String userId;
 
-    //手机号码。企业内必须唯一，mobile/email二者不能同时为空
+    /** 性别。1表示男性，2表示女性 */
+    @Excel(name = "性别。1表示男性，2表示女性")
+    private Integer gender;
+
+    /** 手机号 */
+    @Excel(name = "手机号")
     private String mobile;
 
-    //邮箱
+    /** 邮箱 */
+    @Excel(name = "邮箱")
     private String email;
 
-    //成员所属部门id列表,不超过100个
-    private Long[] department;
+    /** 个人微信号 */
+    @Excel(name = "个人微信号")
+    private String wxAccount;
 
-    //职位
+    /** 用户所属部门,使用逗号隔开,字符串格式存储 */
+    @Excel(name = "用户所属部门,使用逗号隔开,字符串格式存储")
+    private String department;
+
+    /** 职务 */
+    @Excel(name = "职务")
     private String position;
 
-    //身份:表示在所在的部门内是否为上级。1表示为上级，0表示非上级。
-    private Long[] is_leader_in_dept;
+    /** 1表示为上级,0表示普通成员(非上级)。 */
+    @Excel(name = "1表示为上级,0表示普通成员(非上级)。")
+    private Long isLeaderInDept;
 
-    //启用/禁用成员。1表示启用成员，0表示禁用成员
-    private Integer enable;
+    /** 入职时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @Excel(name = "入职时间", width = 30, dateFormat = "yyyy-MM-dd")
+    private Date joinTime;
 
-    //座机。32字节以内，由纯数字或’-‘号组成。
+    /** 是否启用(1表示启用成员，0表示禁用成员) */
+    @Excel(name = "是否启用(1表示启用成员，0表示禁用成员)")
+    private Long enable;
+
+    /** 身份证号 */
+    @Excel(name = "身份证号")
+    private String idCard;
+
+    /** QQ号 */
+    @Excel(name = "QQ号")
+    private String qqAccount;
+
+    /** 座机 */
+    @Excel(name = "座机")
     private String telephone;
 
-    //地址
+    /** 地址 */
+    @Excel(name = "地址")
     private String address;
 
+    /** 生日 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @Excel(name = "生日", width = 30, dateFormat = "yyyy-MM-dd")
+    private Date birthday;
 
-//
-//    private Long main_department;
-//    private boolean to_invite;
-//    private String external_position;
+    /** 是否激活（1:是；2:否）该字段主要表示当前信息是否同步微信 */
+    @Excel(name = "是否激活", readConverterExp = "1=:是；2:否")
+    private Long isActivate;
 
 }

@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.linkwechat.wecom.mapper.WxCorpAccountMapper">
+<mapper namespace="com.linkwechat.wecom.mapper.WeCorpAccountMapper">
     
-    <resultMap type="WxCorpAccount" id="WxCorpAccountResult">
+    <resultMap type="WeCorpAccount" id="WeCorpAccountResult">
         <result property="id"    column="id"    />
         <result property="companyName"    column="company_name"    />
         <result property="corpId"    column="corp_id"    />
@@ -17,12 +17,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateTime"    column="update_time"    />
     </resultMap>
 
-    <sql id="selectWxCorpAccountVo">
+    <sql id="selectWeCorpAccountVo">
         select id, company_name, corp_id, corp_secret, status, del_flag, create_by, create_time, update_by, update_time from wx_corp_account
     </sql>
 
-    <select id="selectWxCorpAccountList" parameterType="WxCorpAccount" resultMap="WxCorpAccountResult">
-        <include refid="selectWxCorpAccountVo"/>
+    <select id="selectWeCorpAccountList" parameterType="WeCorpAccount" resultMap="WeCorpAccountResult">
+        <include refid="selectWeCorpAccountVo"/>
         <where>  
             <if test="companyName != null  and companyName != ''"> and company_name like concat('%', #{companyName}, '%')</if>
             <if test="corpId != null  and corpId != ''"> and corp_id = #{corpId}</if>
@@ -31,12 +31,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
     
-    <select id="selectWxCorpAccountById" parameterType="Long" resultMap="WxCorpAccountResult">
-        <include refid="selectWxCorpAccountVo"/>
+    <select id="selectWeCorpAccountById" parameterType="Long" resultMap="WeCorpAccountResult">
+        <include refid="selectWeCorpAccountVo"/>
         where id = #{id}
     </select>
         
-    <insert id="insertWxCorpAccount" parameterType="WxCorpAccount" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertWeCorpAccount" parameterType="WeCorpAccount" useGeneratedKeys="true" keyProperty="id">
         insert into wx_corp_account
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="companyName != null">company_name,</if>
@@ -62,7 +62,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-    <update id="updateWxCorpAccount" parameterType="WxCorpAccount">
+    <update id="updateWeCorpAccount" parameterType="WeCorpAccount">
         update wx_corp_account
         <trim prefix="SET" suffixOverrides=",">
             <if test="companyName != null">company_name = #{companyName},</if>
@@ -78,11 +78,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
 
-    <delete id="deleteWxCorpAccountById" parameterType="Long">
+    <delete id="deleteWeCorpAccountById" parameterType="Long">
         delete from wx_corp_account where id = #{id}
     </delete>
 
-    <delete id="deleteWxCorpAccountByIds" parameterType="String">
+    <delete id="deleteWeCorpAccountByIds" parameterType="String">
         delete from wx_corp_account where id in 
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}

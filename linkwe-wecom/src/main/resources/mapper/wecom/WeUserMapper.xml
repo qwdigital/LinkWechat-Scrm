@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeUserMapper">
+    
+    <resultMap type="WeUser" id="WeUserResult">
+        <result property="id"    column="id"    />
+        <result property="headImageUrl"    column="head_image_url"    />
+        <result property="userName"    column="user_name"    />
+        <result property="alias"    column="alias"    />
+        <result property="userId"    column="user_id"    />
+        <result property="gender"    column="gender"    />
+        <result property="mobile"    column="mobile"    />
+        <result property="email"    column="email"    />
+        <result property="wxAccount"    column="wx_account"    />
+        <result property="department"    column="department"    />
+        <result property="position"    column="position"    />
+        <result property="isLeaderInDept"    column="is_leader_in_dept"    />
+        <result property="joinTime"    column="join_time"    />
+        <result property="enable"    column="enable"    />
+        <result property="idCard"    column="id_card"    />
+        <result property="qqAccount"    column="qq_account"    />
+        <result property="telephone"    column="telephone"    />
+        <result property="address"    column="address"    />
+        <result property="birthday"    column="birthday"    />
+        <result property="remark"    column="remark"    />
+        <result property="isActivate"    column="is_activate"    />
+    </resultMap>
+
+    <sql id="selectWeUserVo">
+        select id, head_image_url, user_name, alias, user_id, gender, mobile, email, wx_account, department, position, is_leader_in_dept, join_time, enable, id_card, qq_account, telephone, address, birthday, remark, is_activate from we_user
+    </sql>
+
+    <select id="selectWeUserList" parameterType="WeUser" resultMap="WeUserResult">
+        <include refid="selectWeUserVo"/>
+        <where>  
+            <if test="headImageUrl != null  and headImageUrl != ''"> and head_image_url = #{headImageUrl}</if>
+            <if test="userName != null  and userName != ''"> and user_name like concat('%', #{userName}, '%')</if>
+            <if test="alias != null  and alias != ''"> and alias = #{alias}</if>
+            <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
+            <if test="gender != null "> and gender = #{gender}</if>
+            <if test="mobile != null  and mobile != ''"> and mobile = #{mobile}</if>
+            <if test="email != null  and email != ''"> and email = #{email}</if>
+            <if test="wxAccount != null  and wxAccount != ''"> and wx_account = #{wxAccount}</if>
+            <if test="department != null  and department != ''"> and department = #{department}</if>
+            <if test="position != null  and position != ''"> and position = #{position}</if>
+            <if test="isLeaderInDept != null "> and is_leader_in_dept = #{isLeaderInDept}</if>
+            <if test="joinTime != null "> and join_time = #{joinTime}</if>
+            <if test="enable != null "> and enable = #{enable}</if>
+            <if test="idCard != null  and idCard != ''"> and id_card = #{idCard}</if>
+            <if test="qqAccount != null  and qqAccount != ''"> and qq_account = #{qqAccount}</if>
+            <if test="telephone != null  and telephone != ''"> and telephone = #{telephone}</if>
+            <if test="address != null  and address != ''"> and address = #{address}</if>
+            <if test="birthday != null "> and birthday = #{birthday}</if>
+            <if test="isActivate != null "> and is_activate = #{isActivate}</if>
+        </where>
+    </select>
+    
+    <select id="selectWeUserById" parameterType="Long" resultMap="WeUserResult">
+        <include refid="selectWeUserVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWeUser" parameterType="WeUser">
+        insert into we_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="headImageUrl != null">head_image_url,</if>
+            <if test="userName != null">user_name,</if>
+            <if test="alias != null">alias,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="gender != null">gender,</if>
+            <if test="mobile != null and mobile != ''">mobile,</if>
+            <if test="email != null">email,</if>
+            <if test="wxAccount != null">wx_account,</if>
+            <if test="department != null">department,</if>
+            <if test="position != null">position,</if>
+            <if test="isLeaderInDept != null">is_leader_in_dept,</if>
+            <if test="joinTime != null">join_time,</if>
+            <if test="enable != null">enable,</if>
+            <if test="idCard != null">id_card,</if>
+            <if test="qqAccount != null">qq_account,</if>
+            <if test="telephone != null">telephone,</if>
+            <if test="address != null">address,</if>
+            <if test="birthday != null">birthday,</if>
+            <if test="remark != null">remark,</if>
+            <if test="isActivate != null">is_activate,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="headImageUrl != null">#{headImageUrl},</if>
+            <if test="userName != null">#{userName},</if>
+            <if test="alias != null">#{alias},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="gender != null">#{gender},</if>
+            <if test="mobile != null and mobile != ''">#{mobile},</if>
+            <if test="email != null">#{email},</if>
+            <if test="wxAccount != null">#{wxAccount},</if>
+            <if test="department != null">#{department},</if>
+            <if test="position != null">#{position},</if>
+            <if test="isLeaderInDept != null">#{isLeaderInDept},</if>
+            <if test="joinTime != null">#{joinTime},</if>
+            <if test="enable != null">#{enable},</if>
+            <if test="idCard != null">#{idCard},</if>
+            <if test="qqAccount != null">#{qqAccount},</if>
+            <if test="telephone != null">#{telephone},</if>
+            <if test="address != null">#{address},</if>
+            <if test="birthday != null">#{birthday},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="isActivate != null">#{isActivate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWeUser" parameterType="WeUser">
+        update we_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="headImageUrl != null">head_image_url = #{headImageUrl},</if>
+            <if test="userName != null">user_name = #{userName},</if>
+            <if test="alias != null">alias = #{alias},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="mobile != null and mobile != ''">mobile = #{mobile},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="wxAccount != null">wx_account = #{wxAccount},</if>
+            <if test="department != null">department = #{department},</if>
+            <if test="position != null">position = #{position},</if>
+            <if test="isLeaderInDept != null">is_leader_in_dept = #{isLeaderInDept},</if>
+            <if test="joinTime != null">join_time = #{joinTime},</if>
+            <if test="enable != null">enable = #{enable},</if>
+            <if test="idCard != null">id_card = #{idCard},</if>
+            <if test="qqAccount != null">qq_account = #{qqAccount},</if>
+            <if test="telephone != null">telephone = #{telephone},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="birthday != null">birthday = #{birthday},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="isActivate != null">is_activate = #{isActivate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeUserById" parameterType="Long">
+        delete from we_user where id = #{id}
+    </delete>
+
+    <delete id="deleteWeUserByIds" parameterType="String">
+        delete from we_user where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

@@ -31,6 +31,7 @@
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.0</jwt.version>
         <forest.version>1.4.0</forest.version>
+        <lombok.version>1.16.18</lombok.version>
     </properties>
 	
     <!-- 依赖声明 -->
@@ -196,6 +197,14 @@
                 <artifactId>spring-boot-starter-forest</artifactId>
                 <version>${forest.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+
+
 
 
         </dependencies>

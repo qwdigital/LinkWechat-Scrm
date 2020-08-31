@@ -1,10 +1,10 @@
 package com.linkwechat.wecom.service.impl;
 
 import com.linkwechat.wecom.client.WeAccessTokenClient;
-import com.linkwechat.wecom.domain.WeAccessToken;
+import com.linkwechat.wecom.domain.dto.WeAccessTokenDtoDto;
 import com.linkwechat.wecom.domain.WeCorpAccount;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
-import com.linkwechat.wecom.service.IWxCorpAccountService;
+import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
     private WeAccessTokenClient accessTokenClient;
 
     @Autowired
-    private IWxCorpAccountService iWxCorpAccountService;
+    private IWeCorpAccountService iWxCorpAccountService;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -32,19 +32,19 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
      */
     @Override
     public void findToken() {
-        WeCorpAccount wxCorpAccount
-                = iWxCorpAccountService.findValidWxCorpAccount();
-        if(null == wxCorpAccount){
-             //返回错误异常，让用户绑定企业id相关信息
-        }
-        WeAccessToken accessToken
-                = accessTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getCorpSecret());
-        if(null != accessToken){
-            //token存入redis中(清空原有的token)
-//            redisTemplate.opsForValue().set();
-
-
-        }
+//        WeCorpAccount wxCorpAccount
+//                = iWxCorpAccountService.findValidWxCorpAccount();
+//        if(null == wxCorpAccount){
+//             //返回错误异常，让用户绑定企业id相关信息
+//        }
+//        WeAccessTokenDtoDto accessToken
+//                = accessTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getCorpSecret());
+//        if(null != accessToken){
+//            //token存入redis中(清空原有的token)
+////            redisTemplate.opsForValue().set();
+//
+//
+//        }
 
 
     }

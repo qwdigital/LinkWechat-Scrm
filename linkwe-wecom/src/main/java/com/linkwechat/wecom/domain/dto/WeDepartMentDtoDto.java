@@ -1,4 +1,6 @@
-package com.linkwechat.wecom.domain;
+package com.linkwechat.wecom.domain.dto;
+
+import lombok.Data;
 
 import java.util.List;
 
@@ -7,14 +9,16 @@ import java.util.List;
  * @author: HaoN
  * @create: 2020-08-27 15:54
  **/
-public class WeDepartMent extends WeResult {
+@Data
+public class WeDepartMentDtoDto extends WeResultDto {
 
 
 
-    private List<DeartMent> deartMents;
+    private List<DeartMentDto> deartMents;
 
 
-    class DeartMent{
+    @Data
+    class DeartMentDto{
 
         private String name;
 
