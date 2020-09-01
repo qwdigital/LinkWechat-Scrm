@@ -5,6 +5,7 @@ import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
 import com.linkwechat.wecom.domain.dto.WeDepartMentDtoDto;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
+import com.linkwechat.wecom.domain.dto.WeUserQrcodeDto;
 
 /**
  * @description: 企业微信部门相关客户端
@@ -51,6 +52,15 @@ public interface WeDepartMentClient {
      */
     @Request(url = "https://qyapi.weixin.qq.com/cgi-bin/department/list")
     WeDepartMentDtoDto weDepartMents();
+
+
+    /**
+     * 获取加入企业二维码
+     * @param sizeType qrcode尺寸类型，1: 171 x 171; 2: 399 x 399; 3: 741 x 741; 4: 2052 x 2052
+     * @return
+     */
+    @Request(url = " https://qyapi.weixin.qq.com/cgi-bin/corp/get_join_qrcode")
+    WeUserQrcodeDto getJoinQrcode(@Query("size_type") Integer sizeType);
 
 
 }
