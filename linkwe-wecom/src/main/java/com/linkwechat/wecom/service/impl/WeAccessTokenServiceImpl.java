@@ -1,13 +1,17 @@
 package com.linkwechat.wecom.service.impl;
 
+import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.redis.RedisCache;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeAccessTokenClient;
-import com.linkwechat.wecom.domain.dto.WeAccessTokenDtoDto;
 import com.linkwechat.wecom.domain.WeCorpAccount;
+import com.linkwechat.wecom.domain.dto.WeAccessTokenDtoDto;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @description: 微信token相关接口
@@ -24,29 +28,38 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
     @Autowired
     private IWeCorpAccountService iWxCorpAccountService;
 
+
     @Autowired
-    private RedisTemplate redisTemplate;
+    private   RedisCache redisCache;
+
+
 
     /**
      * 获取accessToken
      */
     @Override
-    public void findToken() {
-//        WeCorpAccount wxCorpAccount
-//                = iWxCorpAccountService.findValidWxCorpAccount();
-//        if(null == wxCorpAccount){
-//             //返回错误异常，让用户绑定企业id相关信息
-//        }
-//        WeAccessTokenDtoDto accessToken
-//                = accessTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getCorpSecret());
-//        if(null != accessToken){
-//            //token存入redis中(清空原有的token)
-////            redisTemplate.opsForValue().set();
-//
-//
-//        }
+    public String findToken() {
+        WeCorpAccount wxCorpAccount
+                = iWxCorpAccountService.findValidWeCorpAccount();
+        if(null == wxCorpAccount){
+             //返回错误异常，让用户绑定企业id相关信息
+        }
+
+        String  weAccessToken = (String) redisCache.getCacheObject(WeConstans.WE_ACCESS_TOKEN);
+
+        //为空,请求微信服务器同时缓存到redis中
+        if(StringUtils.isEmpty(weAccessToken)){
+            WeAccessTokenDtoDto accessToken
+                = accessTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getCorpSecret());
+            if(accessToken.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
+                redisCache.setCacheObject(WeConstans.WE_ACCESS_TOKEN,accessToken.getAccess_token(),accessToken.getExpires_in().intValue(), TimeUnit.SECONDS);
+                weAccessToken=accessToken.getAccess_token();
+            }
+
+        }
 
 
+        return  weAccessToken;
     }
 
 

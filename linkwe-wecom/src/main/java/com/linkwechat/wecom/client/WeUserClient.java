@@ -18,7 +18,7 @@ public interface WeUserClient {
      * @param weUserDto
      * @return
      */
-    @Request(url="https://qyapi.weixin.qq.com/cgi-bin/user/create",
+    @Request(url="/user/create",
             type = "POST"
     )
     WeResultDto createUser(@DataObject WeUserDto weUserDto);
@@ -29,7 +29,7 @@ public interface WeUserClient {
      * @param userid
      * @return
      */
-    @Request(url = "https://qyapi.weixin.qq.com/cgi-bin/user/get")
+    @Request(url = "/user/get")
     WeUserDto getUserByUserId(@Query("userid") String userid);
 
 
@@ -38,7 +38,7 @@ public interface WeUserClient {
      * @param weUserDto
      * @return
      */
-    @Request(url="https://qyapi.weixin.qq.com/cgi-bin/user/update",
+    @Request(url="/user/update",
             type = "POST"
     )
     WeResultDto updateUser(@DataObject WeUserDto weUserDto);
@@ -49,6 +49,6 @@ public interface WeUserClient {
      * @param userid
      * @return
      */
-    @Request(url = "https://qyapi.weixin.qq.com/cgi-bin/user/delete")
+    @Request(url = "/user/delete")
     WeResultDto deleteUserByUserId(@Query("userid")String userid);
 }

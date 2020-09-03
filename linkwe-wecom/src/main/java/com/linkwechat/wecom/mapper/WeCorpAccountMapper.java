@@ -58,4 +58,11 @@ public interface WeCorpAccountMapper
      * @return 结果
      */
     public int deleteWeCorpAccountByIds(Long[] ids);
+
+
+    /**
+     * 获取有效cropid
+     * @return
+     */
+    public WeCorpAccount findValidWeCorpAccount();
 }

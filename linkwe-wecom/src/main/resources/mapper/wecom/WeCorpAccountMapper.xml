@@ -88,5 +88,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
+
+    <select id="findValidWeCorpAccount" resultMap="WeCorpAccountResult">
+        <include refid="selectWeCorpAccountVo"/>
+        WHERE
+            del_flag = 0
+        AND STATUS = 0
+    </select>
+
+
+
     
 </mapper>
