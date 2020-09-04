@@ -7,6 +7,8 @@ import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.wecom.domain.WeCorpAccount;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,7 @@ import java.util.List;
  * @author ruoyi
  * @date 2020-08-24
  */
+@Api("企业id配置")
 @RestController
 @RequestMapping("/wecom/corp")
 public class WeCorpAccountController extends BaseController
@@ -64,9 +67,10 @@ public class WeCorpAccountController extends BaseController
     /**
      * 新增企业id相关配置
      */
-    @PreAuthorize("@ss.hasPermi('wechat:corp:add')")
-    @Log(title = "企业id相关配置", businessType = BusinessType.INSERT)
+//    @PreAuthorize("@ss.hasPermi('wechat:corp:add')")
+//    @Log(title = "企业id相关配置", businessType = BusinessType.INSERT)
     @PostMapping
+    @ApiOperation("新增")
     public AjaxResult add(@RequestBody WeCorpAccount weCorpAccount)
     {
         return toAjax(weCorpAccountService.insertWeCorpAccount(weCorpAccount));
