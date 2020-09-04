@@ -19,7 +19,7 @@ public interface WeAccessTokenClient {
      * @param corpSecret 应用的凭证密钥
      * @return
      */
-    @Request(url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken")
+    @Request(url = "/gettoken")
     WeAccessTokenDtoDto getToken(@Query("corpid")String corpId, @Query("corpsecret") String corpSecret);
 
 }

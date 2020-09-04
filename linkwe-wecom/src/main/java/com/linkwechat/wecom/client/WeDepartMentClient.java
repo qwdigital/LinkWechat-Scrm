@@ -19,7 +19,7 @@ public interface WeDepartMentClient {
      * @param weDepartMent
      * @return
      */
-     @Request(url="https://qyapi.weixin.qq.com/cgi-bin/department/create",
+     @Request(url="/department/create",
              type = "POST"
      )
      WeResultDto createWeDepartMent(@DataObject WeDepartMentDtoDto weDepartMent);
@@ -31,7 +31,7 @@ public interface WeDepartMentClient {
      * @param weDepartMent
      * @return
      */
-    @Request(url="https://qyapi.weixin.qq.com/cgi-bin/department/update",
+    @Request(url="/department/update",
             type = "POST"
     )
     WeResultDto updateWeDepartMent(@DataObject WeDepartMentDtoDto weDepartMent);
@@ -42,7 +42,7 @@ public interface WeDepartMentClient {
      * @param departMnentId
      * @return
      */
-    @Request(url = "https://qyapi.weixin.qq.com/cgi-bin/department/delete")
+    @Request(url = "/department/delete")
     WeResultDto deleteWeDepartMent(@Query("id") String departMnentId);
 
 
@@ -50,7 +50,7 @@ public interface WeDepartMentClient {
      * 获取部门列表
      * @return
      */
-    @Request(url = "https://qyapi.weixin.qq.com/cgi-bin/department/list")
+    @Request(url = "/department/list")
     WeDepartMentDtoDto weDepartMents();
 
 
@@ -59,7 +59,7 @@ public interface WeDepartMentClient {
      * @param sizeType qrcode尺寸类型，1: 171 x 171; 2: 399 x 399; 3: 741 x 741; 4: 2052 x 2052
      * @return
      */
-    @Request(url = " https://qyapi.weixin.qq.com/cgi-bin/corp/get_join_qrcode")
+    @Request(url = " /corp/get_join_qrcode")
     WeUserQrcodeDto getJoinQrcode(@Query("size_type") Integer sizeType);
 
 

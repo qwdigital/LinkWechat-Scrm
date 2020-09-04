@@ -95,13 +95,16 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     }
 
 
-//    /**
-//     * 获取有效的企业id
-//     *
-//     * @return 结果
-//     */
-//    @Override
-//    public WeCorpAccount findValidWeCorpAccount() {
-//        return null;
-//    }
+
+    /**
+     * 获取有效的企业id
+     *
+     * @return 结果
+     */
+    @Override
+    public WeCorpAccount findValidWeCorpAccount() {
+        return weCorpAccountMapper.findValidWeCorpAccount();
+    }
+
+
 }

@@ -121,3 +121,8 @@ xss:
 # forest配置
 forest:
   interceptors: com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor
+
+
+wecome:
+  serverUrl: https://qyapi.weixin.qq.com/
+  weComePrefix: cgi-bin

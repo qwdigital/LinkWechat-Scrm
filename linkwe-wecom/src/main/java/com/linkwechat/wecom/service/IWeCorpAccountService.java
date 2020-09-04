@@ -60,11 +60,11 @@ public interface IWeCorpAccountService
     public int deleteWeCorpAccountById(Long id);
 
 
-//    /**
-//     * 获取有效的企业id
-//     *
-//     * @return 结果
-//     */
-//    public WeCorpAccount findValidWeCorpAccount();
+    /**
+     * 获取有效的企业id
+     *
+     * @return 结果
+     */
+    public WeCorpAccount findValidWeCorpAccount();
 
 }
