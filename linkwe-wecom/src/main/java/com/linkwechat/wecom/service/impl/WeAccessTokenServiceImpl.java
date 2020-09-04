@@ -1,17 +1,22 @@
 package com.linkwechat.wecom.service.impl;
 
+import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.redis.RedisCache;
+import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeAccessTokenClient;
-import com.linkwechat.wecom.domain.dto.WeAccessTokenDtoDto;
 import com.linkwechat.wecom.domain.WeCorpAccount;
+import com.linkwechat.wecom.domain.dto.WeAccessTokenDtoDto;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @description: 微信token相关接口
- * @author: My
+ * @author: HaoN
  * @create: 2020-08-26 14:43
  **/
 @Service
@@ -26,7 +31,7 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
 
 
     @Autowired
-    private   RedisCache redisCache;
+    private RedisCache redisCache;
 
 
 
@@ -39,9 +44,10 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
                 = iWxCorpAccountService.findValidWeCorpAccount();
         if(null == wxCorpAccount){
              //返回错误异常，让用户绑定企业id相关信息
+            throw new WeComException("无可用的corpid和secret");
         }
 
-        String  weAccessToken = (String) redisCache.getCacheObject(WeConstans.WE_ACCESS_TOKEN);
+        String  weAccessToken =redisCache.getCacheObject(WeConstans.WE_ACCESS_TOKEN);
 
         //为空,请求微信服务器同时缓存到redis中
         if(StringUtils.isEmpty(weAccessToken)){
@@ -51,9 +57,7 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
                 redisCache.setCacheObject(WeConstans.WE_ACCESS_TOKEN,accessToken.getAccess_token(),accessToken.getExpires_in().intValue(), TimeUnit.SECONDS);
                 weAccessToken=accessToken.getAccess_token();
             }
-
         }
-
 
         return  weAccessToken;
     }

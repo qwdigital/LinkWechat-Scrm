@@ -2,7 +2,10 @@ package com.linkwechat.wecom.domain;
 
 import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.core.domain.BaseEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 企业id相关配置对象 wx_corp_account
@@ -11,6 +14,9 @@ import lombok.Data;
  * @date 2020-08-24
  */
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeCorpAccount extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
