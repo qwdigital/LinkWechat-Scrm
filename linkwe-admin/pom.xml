@@ -74,11 +74,14 @@
         </dependency>
 
 
-        <!--企业微信模块-->
-<!--        <dependency>-->
-<!--            <groupId>com.linkwechat</groupId>-->
-<!--            <artifactId>linkwe-wecom</artifactId>-->
-<!--        </dependency>-->
+        <!-- 企业微信模块-->
+        <dependency>
+            <groupId>com.linkwechat</groupId>
+            <artifactId>linkwe-wecom</artifactId>
+        </dependency>
+
+
+
     </dependencies>
 
     <build>

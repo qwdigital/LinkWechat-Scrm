@@ -1,8 +1,6 @@
 package com.linkwechat.wecom.service.impl;
 
 import com.linkwechat.wecom.client.WeAccessTokenClient;
-import com.linkwechat.wecom.domain.dto.WeAccessTokenDtoDto;
-import com.linkwechat.wecom.domain.WeCorpAccount;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +21,7 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
 
     @Autowired
     private IWeCorpAccountService iWxCorpAccountService;
+
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -45,6 +44,8 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
 //
 //
 //        }
+
+
 
 
     }

@@ -24,7 +24,11 @@ import java.util.List;
 public class WeCorpAccountController extends BaseController
 {
     @Autowired
+<<<<<<< Updated upstream:linkwe-admin/src/main/java/com/linkwechat/web/controller/wecom/WeCorpAccountController.java
     private IWeCorpAccountService weCorpAccountService;
+=======
+    private IWeCorpAccountService wxCorpAccountService;
+>>>>>>> Stashed changes:linkwe-admin/src/main/java/com/linkwechat/web/controller/wecom/WxCorpAccountController.java
 
     /**
      * 查询企业id相关配置列表
