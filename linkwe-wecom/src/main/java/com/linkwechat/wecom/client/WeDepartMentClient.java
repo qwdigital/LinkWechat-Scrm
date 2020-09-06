@@ -3,7 +3,7 @@ package com.linkwechat.wecom.client;
 import com.dtflys.forest.annotation.DataObject;
 import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
-import com.linkwechat.wecom.domain.dto.WeDepartMentDtoDto;
+import com.linkwechat.wecom.domain.dto.WeDepartMentDto;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.domain.dto.WeUserQrcodeDto;
 
@@ -16,25 +16,25 @@ public interface WeDepartMentClient {
 
     /**
      * 创建部门
-     * @param weDepartMent
+     * @param deartMentDto
      * @return
      */
      @Request(url="/department/create",
              type = "POST"
      )
-     WeResultDto createWeDepartMent(@DataObject WeDepartMentDtoDto weDepartMent);
+     WeResultDto createWeDepartMent(@DataObject WeDepartMentDto.DeartMentDto deartMentDto);
 
 
 
     /**
      * 更新部门
-     * @param weDepartMent
+     * @param deartMentDto
      * @return
      */
     @Request(url="/department/update",
             type = "POST"
     )
-    WeResultDto updateWeDepartMent(@DataObject WeDepartMentDtoDto weDepartMent);
+    WeResultDto updateWeDepartMent(@DataObject  WeDepartMentDto.DeartMentDto deartMentDto);
 
 
     /**
@@ -51,7 +51,7 @@ public interface WeDepartMentClient {
      * @return
      */
     @Request(url = "/department/list")
-    WeDepartMentDtoDto weDepartMents();
+    String weDepartMents(@Query("id") Long id);
 
 
     /**

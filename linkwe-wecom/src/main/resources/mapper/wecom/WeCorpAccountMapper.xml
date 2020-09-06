@@ -18,7 +18,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectWeCorpAccountVo">
-        select id, company_name, corp_id, corp_secret, status, del_flag, create_by, create_time, update_by, update_time from wx_corp_account
+        select id, company_name, corp_id, corp_secret, status, del_flag, create_by, create_time, update_by, update_time from we_corp_account
     </sql>
 
     <select id="selectWeCorpAccountList" parameterType="WeCorpAccount" resultMap="WeCorpAccountResult">
@@ -37,7 +37,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
         
     <insert id="insertWeCorpAccount" parameterType="WeCorpAccount" useGeneratedKeys="true" keyProperty="id">
-        insert into wx_corp_account
+        insert into we_corp_account
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="companyName != null">company_name,</if>
             <if test="corpId != null">corp_id,</if>
@@ -63,7 +63,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </insert>
 
     <update id="updateWeCorpAccount" parameterType="WeCorpAccount">
-        update wx_corp_account
+        update we_corp_account
         <trim prefix="SET" suffixOverrides=",">
             <if test="companyName != null">company_name = #{companyName},</if>
             <if test="corpId != null">corp_id = #{corpId},</if>
@@ -79,11 +79,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <delete id="deleteWeCorpAccountById" parameterType="Long">
-        delete from wx_corp_account where id = #{id}
+        delete from we_corp_account where id = #{id}
     </delete>
 
     <delete id="deleteWeCorpAccountByIds" parameterType="String">
-        delete from wx_corp_account where id in 
+        delete from we_corp_account where id in 
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>

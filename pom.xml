@@ -33,6 +33,8 @@
         <jwt.version>0.9.0</jwt.version>
         <forest.version>1.4.0</forest.version>
         <lombok.version>1.16.18</lombok.version>
+        <reflectasm.version>1.11.9</reflectasm.version>
+        <hutool.version>5.4.1</hutool.version>
     </properties>
 	
     <!-- 依赖声明 -->
@@ -205,6 +207,19 @@
                 <version>${lombok.version}</version>
             </dependency>
 
+            <!-- https://mvnrepository.com/artifact/com.esotericsoftware/reflectasm -->
+            <dependency>
+                <groupId>com.esotericsoftware</groupId>
+                <artifactId>reflectasm</artifactId>
+                <version>${reflectasm.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
 
 
 

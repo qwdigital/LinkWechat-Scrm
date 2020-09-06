@@ -4,15 +4,18 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
+import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.config.WeComeConfig;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * @description: 微信token拦截器
  * @author: HaoN
  * @create: 2020-08-27 22:36
  **/
+@Component
 public class WeAccessTokenInterceptor implements Interceptor {
 
 
@@ -31,10 +34,18 @@ public class WeAccessTokenInterceptor implements Interceptor {
     @Override
     public boolean beforeExecute(ForestRequest request) {
 
-        //添加服务器统一请求地址
-        request.setUrl(weComeConfig.getServerUrl()+weComeConfig.getWeComePrefix()+request.getUrl());
+        request.setContentType("application/json");
+        String uri=request.getUrl().replace("http://","");
+
         // 添加请求参数access_token
-        request.addQuery("access_token", iWeAccessTokenService.findToken());
+        if(!weComeConfig.getNoAccessTokenUrl().equals(uri)){
+            request.addQuery("access_token", iWeAccessTokenService.findToken());
+        }
+
+        //添加服务器统一请求地址
+        request.setUrl(weComeConfig.getServerUrl()+weComeConfig.getWeComePrefix()+uri);
+
+
         return true;
     }
 

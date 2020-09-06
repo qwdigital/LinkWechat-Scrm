@@ -1,8 +1,10 @@
 package com.linkwechat.wecom.domain;
 
 
-import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.common.utils.SnowFlakeUtil;
+import com.linkwechat.common.utils.bean.BeanUtils;
+import com.linkwechat.wecom.domain.dto.WeDepartMentDto;
 import lombok.Data;
 
 /**
@@ -17,27 +19,36 @@ public class WeDepartment extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
-    private Long id;
+    private Long id= SnowFlakeUtil.nextId();
+
 
     /** 部门名称 */
-    @Excel(name = "部门名称")
     private String name;
 
-    /** 部门英文名称 */
-    @Excel(name = "部门英文名称")
-    private String nameEn;
 
-    /** $column.columnComment */
-    @Excel(name = "部门英文名称")
+    /** 父节点的id */
     private Long parentId;
 
-    /** 是否激活（1:是；2:否）该字段主要表示当前信息是否同步微信 */
-    @Excel(name = "是否激活", readConverterExp = "1=:是；2:否")
-    private Long isActivate;
 
-    /** 在父部门中的次序值。order值大的排序靠前。 */
-    @Excel(name = "在父部门中的次序值。order值大的排序靠前。")
-    private Long order;
+
+    /** 系统通讯录部门转化为企业微信通讯录部门的dto对象 */
+    public WeDepartMentDto.DeartMentDto transformDeartMentDto(WeDepartment weDepartment){
+
+        WeDepartMentDto.DeartMentDto deartMentDto=new WeDepartMentDto().new DeartMentDto();
+        BeanUtils.copyPropertiesignoreOther(weDepartment,deartMentDto);
+
+        return deartMentDto;
+
+    }
+
+    /** 企业微信通讯录部门的dto对象转化为系统通讯录部门对象 */
+    public WeDepartment transformWeDepartment(WeDepartMentDto.DeartMentDto deartMentDto){
+
+        WeDepartment weDepartment=new WeDepartment();
+        BeanUtils.copyPropertiesignoreOther(deartMentDto,weDepartment);
+
+        return weDepartment;
+    }
 
 
 }

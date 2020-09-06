@@ -1,11 +1,23 @@
 package com.linkwechat.wecom.service.impl;
 
-import java.util.List;
+import cn.hutool.core.collection.ListUtil;
+import com.linkwechat.common.constant.HttpStatus;
+import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.bean.BeanUtils;
+import com.linkwechat.wecom.client.WeDepartMentClient;
+import com.linkwechat.wecom.domain.WeDepartment;
+import com.linkwechat.wecom.domain.dto.WeDepartMentDto;
+import com.linkwechat.wecom.domain.dto.WeResultDto;
+import com.linkwechat.wecom.mapper.WeDepartmentMapper;
+import com.linkwechat.wecom.service.IWeDepartmentService;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.linkwechat.wecom.mapper.WeDepartmentMapper;
-import com.linkwechat.wecom.domain.WeDepartment;
-import com.linkwechat.wecom.service.IWeDepartmentService;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 企业微信组织架构相关Service业务层处理
@@ -18,6 +30,12 @@ public class WeDepartmentServiceImpl implements IWeDepartmentService
 {
     @Autowired
     private WeDepartmentMapper weDepartmentMapper;
+
+
+    @Autowired
+    private WeDepartMentClient weDepartMentClient;
+
+
 
     /**
      * 查询企业微信组织架构相关
@@ -34,13 +52,28 @@ public class WeDepartmentServiceImpl implements IWeDepartmentService
     /**
      * 查询企业微信组织架构相关列表
      * 
-     * @param weDepartment 企业微信组织架构相关
      * @return 企业微信组织架构相关
      */
     @Override
-    public List<WeDepartment> selectWeDepartmentList(WeDepartment weDepartment)
+    public List<WeDepartment> selectWeDepartmentList()
     {
-        return weDepartmentMapper.selectWeDepartmentList(weDepartment);
+
+        //校验数据中中是否存在根节点,如果不存在,从微信端获取,同时入库
+//        WeDepartment weDepartment=weDepartmentMapper.selectWeDepartmentById(WeConstans.WE_ROOT_DEPARMENT_ID);
+//        if(null == weDepartment){
+//            String weDepartMentDto=weDepartMentClient.weDepartMents(WeConstans.WE_ROOT_DEPARMENT_ID);
+//            System.out.println(weDepartMentDto);
+//            if(WeConstans.WE_SUCCESS_CODE.equals(weDepartMentDto.getErrcode())
+//            && CollectionUtils.isNotEmpty(weDepartMentDto.getDeartMents())){
+//
+//                weDepartmentMapper.insertWeDepartment(
+//                        weDepartment.transformWeDepartment(weDepartMentDto.getDeartMents().get(0))
+//                );
+//
+//            }
+//        }
+
+        return weDepartmentMapper.selectWeDepartmentList();
     }
 
     /**
@@ -52,7 +85,24 @@ public class WeDepartmentServiceImpl implements IWeDepartmentService
     @Override
     public int insertWeDepartment(WeDepartment weDepartment)
     {
-        return weDepartmentMapper.insertWeDepartment(weDepartment);
+
+         int returnCode=weDepartmentMapper.insertWeDepartment(weDepartment);
+
+         if(returnCode>0){
+
+
+             WeResultDto weResultDto=weDepartMentClient.createWeDepartMent(
+                     weDepartment.transformDeartMentDto(weDepartment)
+             );
+
+             //微信端调用不成功
+             if(!WeConstans.WE_SUCCESS_CODE.equals(weResultDto.getErrcode())){
+                 throw new WeComException(weResultDto.getErrmsg());
+             }
+
+         }
+
+        return  returnCode;
     }
 
     /**
@@ -64,7 +114,22 @@ public class WeDepartmentServiceImpl implements IWeDepartmentService
     @Override
     public int updateWeDepartment(WeDepartment weDepartment)
     {
-        return weDepartmentMapper.updateWeDepartment(weDepartment);
+
+        int returnCode=weDepartmentMapper.updateWeDepartment(weDepartment);
+        if(returnCode>0){
+
+            WeResultDto weResultDto=weDepartMentClient.updateWeDepartMent(
+                    weDepartment.transformDeartMentDto(weDepartment)
+            );
+
+            //微信端调用不成功
+            if(!WeConstans.WE_SUCCESS_CODE.equals(weResultDto.getErrcode())){
+                throw new WeComException(weResultDto.getErrmsg());
+            }
+
+        }
+
+        return returnCode;
     }
 
     /**

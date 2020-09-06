@@ -18,4 +18,7 @@ public class WeComeConfig {
 
     /** 企业微信后台地址前缀 */
     private String weComePrefix;
+
+    /** 企业微信端无需token的url */
+    private String noAccessTokenUrl;
 }

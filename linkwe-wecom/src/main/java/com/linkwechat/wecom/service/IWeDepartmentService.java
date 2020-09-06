@@ -22,10 +22,9 @@ public interface IWeDepartmentService
     /**
      * 查询企业微信组织架构相关列表
      * 
-     * @param weDepartment 企业微信组织架构相关
      * @return 企业微信组织架构相关集合
      */
-    public List<WeDepartment> selectWeDepartmentList(WeDepartment weDepartment);
+    public List<WeDepartment> selectWeDepartmentList();
 
     /**
      * 新增企业微信组织架构相关

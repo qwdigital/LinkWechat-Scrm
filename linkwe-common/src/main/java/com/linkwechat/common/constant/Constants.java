@@ -126,4 +126,8 @@ public class Constants
      * 资源映射路径 前缀
      */
     public static final String RESOURCE_PREFIX = "/profile";
+
+
+    /** 是否为系统默认（是） */
+    public static final int SERVICE_STATUS_ERROR = -1;
 }

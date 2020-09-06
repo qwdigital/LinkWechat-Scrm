@@ -40,17 +40,18 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
      */
     @Override
     public String findToken() {
-        WeCorpAccount wxCorpAccount
-                = iWxCorpAccountService.findValidWeCorpAccount();
-        if(null == wxCorpAccount){
-             //返回错误异常，让用户绑定企业id相关信息
-            throw new WeComException("无可用的corpid和secret");
-        }
 
         String  weAccessToken =redisCache.getCacheObject(WeConstans.WE_ACCESS_TOKEN);
 
         //为空,请求微信服务器同时缓存到redis中
         if(StringUtils.isEmpty(weAccessToken)){
+            WeCorpAccount wxCorpAccount
+                    = iWxCorpAccountService.findValidWeCorpAccount();
+            if(null == wxCorpAccount){
+                //返回错误异常，让用户绑定企业id相关信息
+                throw new WeComException("无可用的corpid和secret");
+            }
+
             WeAccessTokenDtoDto accessToken
                 = accessTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getCorpSecret());
             if(accessToken.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
