@@ -22,5 +22,5 @@ public class WeConstans {
     /**
      * 企业微信端根部门id
      */
-    public static final Long WE_ROOT_DEPARMENT_ID = new Long(1);
+    public static final Long WE_ROOT_DEPARMENT_ID = 1L;
 }

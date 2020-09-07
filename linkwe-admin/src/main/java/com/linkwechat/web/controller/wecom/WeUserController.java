@@ -35,17 +35,17 @@ public class WeUserController extends BaseController
     @Autowired
     private IWeUserService weUserService;
 
-    /**
-     * 查询通讯录相关客户列表
-     */
-    @PreAuthorize("@ss.hasPermi('wecom:user:list')")
-    @GetMapping("/list")
-    public TableDataInfo list(WeUser weUser)
-    {
-        startPage();
-        List<WeUser> list = weUserService.selectWeUserList(weUser);
-        return getDataTable(list);
-    }
+//    /**
+//     * 查询通讯录相关客户列表
+//     */
+//    @PreAuthorize("@ss.hasPermi('wecom:user:list')")
+//    @GetMapping("/list")
+//    public TableDataInfo list(WeUser weUser)
+//    {
+//        startPage();
+//        List<WeUser> list = weUserService.selectWeUserList(weUser);
+//        return getDataTable(list);
+//    }
 
     /**
      * 导出通讯录相关客户列表

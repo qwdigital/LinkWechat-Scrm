@@ -59,19 +59,19 @@ public class WeDepartmentServiceImpl implements IWeDepartmentService
     {
 
         //校验数据中中是否存在根节点,如果不存在,从微信端获取,同时入库
-//        WeDepartment weDepartment=weDepartmentMapper.selectWeDepartmentById(WeConstans.WE_ROOT_DEPARMENT_ID);
-//        if(null == weDepartment){
-//            String weDepartMentDto=weDepartMentClient.weDepartMents(WeConstans.WE_ROOT_DEPARMENT_ID);
-//            System.out.println(weDepartMentDto);
-//            if(WeConstans.WE_SUCCESS_CODE.equals(weDepartMentDto.getErrcode())
-//            && CollectionUtils.isNotEmpty(weDepartMentDto.getDeartMents())){
-//
-//                weDepartmentMapper.insertWeDepartment(
-//                        weDepartment.transformWeDepartment(weDepartMentDto.getDeartMents().get(0))
-//                );
-//
-//            }
-//        }
+        WeDepartment weDepartment=weDepartmentMapper.selectWeDepartmentById(WeConstans.WE_ROOT_DEPARMENT_ID);
+        if(null == weDepartment){
+            WeDepartMentDto weDepartMentDto=weDepartMentClient.weDepartMents(WeConstans.WE_ROOT_DEPARMENT_ID);
+            if(WeConstans.WE_SUCCESS_CODE.equals(weDepartMentDto.getErrcode())
+            && CollectionUtils.isNotEmpty(weDepartMentDto.getDepartment())){
+                weDepartmentMapper.insertWeDepartment(
+                        WeDepartment.transformWeDepartment(
+                                weDepartMentDto.getDepartment().stream().filter(item->item.getId().equals(WeConstans.WE_ROOT_DEPARMENT_ID)).findFirst().get()
+                        )
+                );
+
+            }
+        }
 
         return weDepartmentMapper.selectWeDepartmentList();
     }

@@ -17,7 +17,7 @@ public class WeDepartMentDto extends WeResultDto {
 
 
 
-    private List<DeartMentDto> deartMents=new ArrayList<>();
+    private List<DeartMentDto> department=new ArrayList<>();
 
     public WeDepartMentDto(){
 
@@ -28,7 +28,7 @@ public class WeDepartMentDto extends WeResultDto {
 
         WeDepartMentDto.DeartMentDto deartMentDto=new WeDepartMentDto().new DeartMentDto();
         BeanUtils.copyPropertiesignoreOther(weDepartment,deartMentDto);
-        deartMents.add(deartMentDto);
+        department.add(deartMentDto);
     }
 
 

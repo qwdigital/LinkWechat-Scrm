@@ -48,10 +48,11 @@ public interface WeDepartMentClient {
 
     /**
      * 获取部门列表
-     * @return
+     * @return  @Query("id") Long id
      */
-    @Request(url = "/department/list")
-    String weDepartMents(@Query("id") Long id);
+    @Request(url = "/department/list",
+            dataType = "json")
+    WeDepartMentDto weDepartMents(@Query("id")Long id);
 
 
     /**
@@ -59,7 +60,7 @@ public interface WeDepartMentClient {
      * @param sizeType qrcode尺寸类型，1: 171 x 171; 2: 399 x 399; 3: 741 x 741; 4: 2052 x 2052
      * @return
      */
-    @Request(url = " /corp/get_join_qrcode")
+    @Request(url = "/corp/get_join_qrcode")
     WeUserQrcodeDto getJoinQrcode(@Query("size_type") Integer sizeType);
 
 

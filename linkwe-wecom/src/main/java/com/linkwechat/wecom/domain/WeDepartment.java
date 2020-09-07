@@ -42,7 +42,7 @@ public class WeDepartment extends BaseEntity
     }
 
     /** 企业微信通讯录部门的dto对象转化为系统通讯录部门对象 */
-    public WeDepartment transformWeDepartment(WeDepartMentDto.DeartMentDto deartMentDto){
+    public  static  WeDepartment transformWeDepartment(WeDepartMentDto.DeartMentDto deartMentDto){
 
         WeDepartment weDepartment=new WeDepartment();
         BeanUtils.copyPropertiesignoreOther(deartMentDto,weDepartment);

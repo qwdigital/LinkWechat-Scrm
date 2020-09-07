@@ -121,6 +121,7 @@ xss:
 # forest配置
 forest:
   interceptors: com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor
+  backend: httpclient
 
 
 wecome:

@@ -22,81 +22,62 @@ public class WeUser extends BaseEntity
     private Long id;
 
     /** 头像地址 */
-    @Excel(name = "头像地址")
     private String headImageUrl;
 
     /** 用户名称 */
-    @Excel(name = "用户名称")
     private String userName;
 
     /** 用户昵称 */
-    @Excel(name = "用户昵称")
     private String alias;
 
     /** 账号 */
-    @Excel(name = "账号")
     private String userId;
 
     /** 性别。1表示男性，2表示女性 */
-    @Excel(name = "性别。1表示男性，2表示女性")
     private Integer gender;
 
     /** 手机号 */
-    @Excel(name = "手机号")
     private String mobile;
 
     /** 邮箱 */
-    @Excel(name = "邮箱")
     private String email;
 
     /** 个人微信号 */
-    @Excel(name = "个人微信号")
     private String wxAccount;
 
     /** 用户所属部门,使用逗号隔开,字符串格式存储 */
-    @Excel(name = "用户所属部门,使用逗号隔开,字符串格式存储")
     private String department;
 
     /** 职务 */
-    @Excel(name = "职务")
     private String position;
 
     /** 1表示为上级,0表示普通成员(非上级)。 */
-    @Excel(name = "1表示为上级,0表示普通成员(非上级)。")
     private Long isLeaderInDept;
 
     /** 入职时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "入职时间", width = 30, dateFormat = "yyyy-MM-dd")
     private Date joinTime;
 
     /** 是否启用(1表示启用成员，0表示禁用成员) */
-    @Excel(name = "是否启用(1表示启用成员，0表示禁用成员)")
     private Long enable;
 
     /** 身份证号 */
-    @Excel(name = "身份证号")
     private String idCard;
 
     /** QQ号 */
-    @Excel(name = "QQ号")
     private String qqAccount;
 
     /** 座机 */
-    @Excel(name = "座机")
     private String telephone;
 
     /** 地址 */
-    @Excel(name = "地址")
     private String address;
 
     /** 生日 */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "生日", width = 30, dateFormat = "yyyy-MM-dd")
     private Date birthday;
 
     /** 是否激活（1:是；2:否）该字段主要表示当前信息是否同步微信 */
-    @Excel(name = "是否激活", readConverterExp = "1=:是；2:否")
     private Long isActivate;
 
 }
