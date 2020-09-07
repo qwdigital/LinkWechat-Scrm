@@ -47,28 +47,17 @@ public class WeUserController extends BaseController
 //        return getDataTable(list);
 //    }
 
-    /**
-     * 导出通讯录相关客户列表
-     */
-    @PreAuthorize("@ss.hasPermi('wecom:user:export')")
-    @Log(title = "通讯录相关客户", businessType = BusinessType.EXPORT)
-    @GetMapping("/export")
-    public AjaxResult export(WeUser weUser)
-    {
-        List<WeUser> list = weUserService.selectWeUserList(weUser);
-        ExcelUtil<WeUser> util = new ExcelUtil<WeUser>(WeUser.class);
-        return util.exportExcel(list, "user");
-    }
 
-    /**
-     * 获取通讯录相关客户详细信息
-     */
-    @PreAuthorize("@ss.hasPermi('wecom:user:query')")
-    @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("id") Long id)
-    {
-        return AjaxResult.success(weUserService.selectWeUserById(id));
-    }
+
+//    /**
+//     * 获取通讯录相关客户详细信息
+//     */
+//    @PreAuthorize("@ss.hasPermi('wecom:user:query')")
+//    @GetMapping(value = "/{id}")
+//    public AjaxResult getInfo(@PathVariable("id") Long id)
+//    {
+//        return AjaxResult.success(weUserService.selectWeUserById(id));
+//    }
 
     /**
      * 新增通讯录相关客户
@@ -92,14 +81,14 @@ public class WeUserController extends BaseController
         return toAjax(weUserService.updateWeUser(weUser));
     }
 
-    /**
-     * 删除通讯录相关客户
-     */
-    @PreAuthorize("@ss.hasPermi('wecom:user:remove')")
-    @Log(title = "通讯录相关客户", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable Long[] ids)
-    {
-        return toAjax(weUserService.deleteWeUserByIds(ids));
-    }
+//    /**
+//     * 删除通讯录相关客户
+//     */
+//    @PreAuthorize("@ss.hasPermi('wecom:user:remove')")
+//    @Log(title = "通讯录相关客户", businessType = BusinessType.DELETE)
+//	@DeleteMapping("/{ids}")
+//    public AjaxResult remove(@PathVariable Long[] ids)
+//    {
+//        return toAjax(weUserService.deleteWeUserByIds(ids));
+//    }
 }
