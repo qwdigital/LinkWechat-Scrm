@@ -1,6 +1,12 @@
 package com.linkwechat.wecom.service.impl;
 
 import java.util.List;
+
+import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.wecom.client.WeUserClient;
+import com.linkwechat.wecom.domain.dto.WeResultDto;
+import com.linkwechat.wecom.domain.dto.WeUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.linkwechat.wecom.mapper.WeUserMapper;
@@ -18,6 +24,10 @@ public class WeUserServiceImpl implements IWeUserService
 {
     @Autowired
     private WeUserMapper weUserMapper;
+
+
+    @Autowired
+    private WeUserClient weUserClient;
 
     /**
      * 查询通讯录相关客户
@@ -52,7 +62,21 @@ public class WeUserServiceImpl implements IWeUserService
     @Override
     public int insertWeUser(WeUser weUser)
     {
-        return weUserMapper.insertWeUser(weUser);
+
+        int returnCode = weUserMapper.insertWeUser(weUser);
+
+        if(returnCode>0){
+
+            WeResultDto weResultDto = weUserClient.createUser(
+                    weUser.transformWeUserDto()
+            );
+
+            if(!WeConstans.WE_SUCCESS_CODE.equals(weResultDto.getErrcode())){
+                throw new WeComException(weResultDto.getErrmsg());
+            }
+        }
+
+        return returnCode;
     }
 
     /**
@@ -64,7 +88,20 @@ public class WeUserServiceImpl implements IWeUserService
     @Override
     public int updateWeUser(WeUser weUser)
     {
-        return weUserMapper.updateWeUser(weUser);
+        int returnCode = weUserMapper.updateWeUser(weUser);
+
+        if(returnCode >0){
+            WeResultDto weResultDto = weUserClient.updateUser(
+                    weUser.transformWeUserDto()
+            );
+
+            if(!WeConstans.WE_SUCCESS_CODE.equals(weResultDto.getErrcode())){
+                throw new WeComException(weResultDto.getErrmsg());
+            }
+        }
+
+        return returnCode;
+
     }
 
     /**
@@ -90,4 +127,31 @@ public class WeUserServiceImpl implements IWeUserService
     {
         return weUserMapper.deleteWeUserById(id);
     }
+
+
+
+    /**
+     *  启用或禁用用户
+     * @param id
+     * @param enable
+     * @return
+     */
+    @Override
+    public int startOrStop(Long id, Integer enable) {
+
+         int returnCode = -1;
+
+         WeUser weUser = this.selectWeUserById(id);
+
+         if(null != weUser){
+
+             weUser.setEnable(enable);
+
+            returnCode=updateWeUser(weUser);
+        }
+
+
+        return returnCode;
+    }
+
 }

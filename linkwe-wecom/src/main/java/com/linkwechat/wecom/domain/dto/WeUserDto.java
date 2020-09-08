@@ -21,7 +21,7 @@ public class WeUserDto {
     private String userid;
 
     //性别。1表示男性，2表示女性
-    private String gender;
+    private Integer gender;
 
     //手机号码。企业内必须唯一，mobile/email二者不能同时为空
     private String mobile;

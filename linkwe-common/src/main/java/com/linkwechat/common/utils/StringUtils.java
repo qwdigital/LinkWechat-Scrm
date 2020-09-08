@@ -456,4 +456,43 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils
     {
         return (T) obj;
     }
+
+    /**
+     * 将数组使用分隔符变为字符串
+     *
+     * @param array
+     * @param separator
+     * @return
+     */
+    public static String join(Object[] array, String separator) {
+        return join(array, 0, array.length, separator);
+    }
+
+    private static String join(Object[] array, int startIndex, int endIndex, String separator) {
+        if (separator == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = startIndex; i < endIndex; i++) {
+            /**
+             * 在前面加，就不会出瑞最后多一个分隔符的现象同时判断不是第一个才加分隔符
+             */
+            if (i > startIndex) {
+                sb.append(separator);
+            }
+
+            if (array[i] != null) {
+                sb.append(array[i]);
+            }
+        }
+        return sb.toString();
+
+    }
+
+    public static void main(String[] args) {
+        Integer[] arrays = { 1,2,3,4,5,6,7 };
+        String join = join(arrays, ",");
+        System.out.println(join);// 1,2,3,4,5,6,7
+    }
 }

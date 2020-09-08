@@ -58,4 +58,13 @@ public interface IWeUserService
      * @return 结果
      */
     public int deleteWeUserById(Long id);
+
+
+    /**
+     *  启用或禁用用户
+     * @param id
+     * @param enable
+     * @return
+     */
+    public int startOrStop(Long id,Integer enable);
 }

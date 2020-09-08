@@ -58,4 +58,12 @@ public interface WeUserMapper
      * @return 结果
      */
     public int deleteWeUserByIds(Long[] ids);
+
+
+    /**
+     * 根据部门id获取员工
+     * @param departmentId
+     * @return
+     */
+    public List<WeUser> findWeUsersByDepartmentId(Long departmentId);
 }

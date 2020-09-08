@@ -90,15 +90,16 @@ public class WeDepartmentServiceImpl implements IWeDepartmentService
 
          if(returnCode>0){
 
+             WeDepartMentDto.DeartMentDto deartMentDto = weDepartment.transformDeartMentDto(weDepartment);
 
-             WeResultDto weResultDto=weDepartMentClient.createWeDepartMent(
-                     weDepartment.transformDeartMentDto(weDepartment)
-             );
-
-             //微信端调用不成功
-             if(!WeConstans.WE_SUCCESS_CODE.equals(weResultDto.getErrcode())){
-                 throw new WeComException(weResultDto.getErrmsg());
-             }
+//             WeResultDto weResultDto=weDepartMentClient.createWeDepartMent(
+//                     weDepartment.transformDeartMentDto(weDepartment)
+//             );
+//
+//             //微信端调用不成功
+//             if(!WeConstans.WE_SUCCESS_CODE.equals(weResultDto.getErrcode())){
+//                 throw new WeComException(weResultDto.getErrmsg());
+//             }
 
          }
 

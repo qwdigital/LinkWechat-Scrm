@@ -6,17 +6,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <resultMap type="WeUser" id="WeUserResult">
         <result property="id"    column="id"    />
-        <result property="headImageUrl"    column="head_image_url"    />
-        <result property="userName"    column="user_name"    />
+        <result property="avatarMediaid"    column="head_image_url"    />
+        <result property="name"    column="user_name"    />
         <result property="alias"    column="alias"    />
         <result property="userId"    column="user_id"    />
         <result property="gender"    column="gender"    />
         <result property="mobile"    column="mobile"    />
         <result property="email"    column="email"    />
         <result property="wxAccount"    column="wx_account"    />
-        <result property="department"    column="department"    />
+        <result property="department"    column="department"   typeHandler="com.linkwechat.framework.handler.IntArrayJoinTypeHandler" />
         <result property="position"    column="position"    />
-        <result property="isLeaderInDept"    column="is_leader_in_dept"    />
+        <result property="isLeaderInDept"    column="is_leader_in_dept"  typeHandler="com.linkwechat.framework.handler.IntArrayJoinTypeHandler"  />
         <result property="joinTime"    column="join_time"    />
         <result property="enable"    column="enable"    />
         <result property="idCard"    column="id_card"    />
@@ -29,14 +29,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectWeUserVo">
-        select id, head_image_url, user_name, alias, user_id, gender, mobile, email, wx_account, department, position, is_leader_in_dept, join_time, enable, id_card, qq_account, telephone, address, birthday, remark, is_activate from we_user
+        select id, head_image_url as avatarMediaid, user_name as name, alias, user_id, gender, mobile, email, wx_account, department, position, is_leader_in_dept, join_time, enable, id_card, qq_account, telephone, address, birthday, remark, is_activate from we_user
     </sql>
 
     <select id="selectWeUserList" parameterType="WeUser" resultMap="WeUserResult">
         <include refid="selectWeUserVo"/>
         <where>  
-            <if test="headImageUrl != null  and headImageUrl != ''"> and head_image_url = #{headImageUrl}</if>
-            <if test="userName != null  and userName != ''"> and user_name like concat('%', #{userName}, '%')</if>
+            <if test="avatarMediaid != null  and avatarMediaid != ''"> and head_image_url = #{avatarMediaid}</if>
+            <if test="name != null  and name != ''"> and user_name like concat('%', #{name}, '%')</if>
             <if test="alias != null  and alias != ''"> and alias = #{alias}</if>
             <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
             <if test="gender != null "> and gender = #{gender}</if>
@@ -66,8 +66,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         insert into we_user
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
-            <if test="headImageUrl != null">head_image_url,</if>
-            <if test="userName != null">user_name,</if>
+            <if test="avatarMediaid != null">head_image_url,</if>
+            <if test="name != null">user_name,</if>
             <if test="alias != null">alias,</if>
             <if test="userId != null">user_id,</if>
             <if test="gender != null">gender,</if>
@@ -89,8 +89,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
-            <if test="headImageUrl != null">#{headImageUrl},</if>
-            <if test="userName != null">#{userName},</if>
+            <if test="avatarMediaid != null">#{avatarMediaid},</if>
+            <if test="name != null">#{name},</if>
             <if test="alias != null">#{alias},</if>
             <if test="userId != null">#{userId},</if>
             <if test="gender != null">#{gender},</if>
@@ -115,8 +115,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateWeUser" parameterType="WeUser">
         update we_user
         <trim prefix="SET" suffixOverrides=",">
-            <if test="headImageUrl != null">head_image_url = #{headImageUrl},</if>
-            <if test="userName != null">user_name = #{userName},</if>
+            <if test="avatarMediaid != null">head_image_url = #{avatarMediaid},</if>
+            <if test="name != null">user_name = #{name},</if>
             <if test="alias != null">alias = #{alias},</if>
             <if test="userId != null">user_id = #{userId},</if>
             <if test="gender != null">gender = #{gender},</if>
@@ -149,5 +149,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
+    <select id="findWeUsersByDepartmentId" parameterType="Long" resultMap="WeUserResult">
+        <include refid="selectWeUserVo"/>
+        where FIND_IN_SET(#{departmentId},department)
+    </select>
+
     
 </mapper>
