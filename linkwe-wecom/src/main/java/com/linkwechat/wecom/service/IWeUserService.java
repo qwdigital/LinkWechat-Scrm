@@ -1,7 +1,8 @@
 package com.linkwechat.wecom.service;
 
-import java.util.List;
 import com.linkwechat.wecom.domain.WeUser;
+
+import java.util.List;
 
 /**
  * 通讯录相关客户Service接口
@@ -66,5 +67,8 @@ public interface IWeUserService
      * @param enable
      * @return
      */
-    public int startOrStop(Long id,Integer enable);
+    public int startOrStop(Long id,Boolean enable);
+
+
+
 }

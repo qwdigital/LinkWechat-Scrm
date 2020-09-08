@@ -1,17 +1,17 @@
 package com.linkwechat.wecom.service.impl;
 
-import java.util.List;
-
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.wecom.client.WeUserClient;
+import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
-import com.linkwechat.wecom.domain.dto.WeUserDto;
+import com.linkwechat.wecom.mapper.WeUserMapper;
+import com.linkwechat.wecom.service.IWeUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.linkwechat.wecom.mapper.WeUserMapper;
-import com.linkwechat.wecom.domain.WeUser;
-import com.linkwechat.wecom.service.IWeUserService;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 通讯录相关客户Service业务层处理
@@ -60,6 +60,7 @@ public class WeUserServiceImpl implements IWeUserService
      * @return 结果
      */
     @Override
+    @Transactional
     public int insertWeUser(WeUser weUser)
     {
 
@@ -86,6 +87,7 @@ public class WeUserServiceImpl implements IWeUserService
      * @return 结果
      */
     @Override
+    @Transactional
     public int updateWeUser(WeUser weUser)
     {
         int returnCode = weUserMapper.updateWeUser(weUser);
@@ -137,7 +139,8 @@ public class WeUserServiceImpl implements IWeUserService
      * @return
      */
     @Override
-    public int startOrStop(Long id, Integer enable) {
+    @Transactional
+    public int startOrStop(Long id, Boolean enable) {
 
          int returnCode = -1;
 
@@ -145,7 +148,7 @@ public class WeUserServiceImpl implements IWeUserService
 
          if(null != weUser){
 
-             weUser.setEnable(enable);
+             weUser.setEnable(enable?WeConstans.WE_USER_START:WeConstans.WE_USER_STOP);
 
             returnCode=updateWeUser(weUser);
         }
@@ -153,5 +156,8 @@ public class WeUserServiceImpl implements IWeUserService
 
         return returnCode;
     }
+
+
+
 
 }

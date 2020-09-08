@@ -1,27 +1,19 @@
 package com.linkwechat.web.controller.wecom;
 
-import java.util.List;
-
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
-import com.linkwechat.common.utils.poi.ExcelUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.service.IWeUserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 /**
@@ -78,30 +70,32 @@ public class WeUserController extends BaseController {
      * 修改通讯录相关客户
      */
     @PreAuthorize("@ss.hasPermi('wecom:user:edit')")
-    @Log(title = "通讯录相关客户", businessType = BusinessType.UPDATE)
+    @Log(title = "更新通讯录客户", businessType = BusinessType.UPDATE)
     @PutMapping
+    @ApiOperation("更新通讯录客户")
     public AjaxResult edit(@RequestBody WeUser weUser)
     {
         return toAjax(weUserService.updateWeUser(weUser));
     }
 
+
+    /**
+     * 启用或者禁止
+     * @param id
+     * @param enable
+     * @return
+     */
     @PreAuthorize("@ss.hasPermi('wecom:user:startOrStop')")
     @Log(title = "启用禁用用户", businessType = BusinessType.UPDATE)
     @PutMapping("/startOrStop")
-    public AjaxResult startOrStop(Long id,Integer enable){
+    @ApiOperation("启用禁用用户 true：启用 false：禁用")
+    public AjaxResult startOrStop(Long id,Boolean enable){
 
 
         return toAjax(weUserService.startOrStop(id,enable));
     }
 
-//    /**
-//     * 删除通讯录相关客户
-//     */
-//    @PreAuthorize("@ss.hasPermi('wecom:user:remove')")
-//    @Log(title = "通讯录相关客户", businessType = BusinessType.DELETE)
-//	@DeleteMapping("/{ids}")
-//    public AjaxResult remove(@PathVariable Long[] ids)
-//    {
-//        return toAjax(weUserService.deleteWeUserByIds(ids));
-//    }
+
+
+
 }

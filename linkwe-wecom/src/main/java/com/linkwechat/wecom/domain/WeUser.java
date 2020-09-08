@@ -103,7 +103,7 @@ public class WeUser extends BaseEntity
 
     /** 是否激活（1:是；2:否）该字段主要表示当前信息是否同步微信 */
     @ApiModelProperty("是否激活（1:是；2:否）该字段主要表示当前信息是否同步微信 ")
-    private Integer isActivate=new Integer(1);
+    private Integer isActivate=new Integer(2);
 
 
     /** 转化成企业微信需要的dto对象 */

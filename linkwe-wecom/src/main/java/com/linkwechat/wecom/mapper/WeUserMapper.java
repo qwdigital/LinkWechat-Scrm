@@ -1,7 +1,8 @@
 package com.linkwechat.wecom.mapper;
 
-import java.util.List;
 import com.linkwechat.wecom.domain.WeUser;
+
+import java.util.List;
 
 /**
  * 通讯录相关客户Mapper接口
@@ -60,10 +61,4 @@ public interface WeUserMapper
     public int deleteWeUserByIds(Long[] ids);
 
 
-    /**
-     * 根据部门id获取员工
-     * @param departmentId
-     * @return
-     */
-    public List<WeUser> findWeUsersByDepartmentId(Long departmentId);
 }

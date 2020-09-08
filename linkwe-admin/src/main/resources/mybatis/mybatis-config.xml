@@ -11,5 +11,10 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 		<setting name="logImpl"                  value="SLF4J" /> <!-- 指定 MyBatis 所用日志的具体实现 -->
 		<!-- <setting name="mapUnderscoreToCamelCase" value="true"/>  驼峰式命名 -->
 	</settings>
+
+	<typeHandlers>
+		  <typeHandler handler="com.linkwechat.framework.handler.LongArrayJoinTypeHandler"/>
+
+	</typeHandlers>
 	
 </configuration>

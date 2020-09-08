@@ -14,9 +14,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="mobile"    column="mobile"    />
         <result property="email"    column="email"    />
         <result property="wxAccount"    column="wx_account"    />
-        <result property="department"    column="department"   typeHandler="com.linkwechat.framework.handler.IntArrayJoinTypeHandler" />
+        <result property="department"    column="department"  typeHandler="com.linkwechat.framework.handler.LongArrayJoinTypeHandler" />
         <result property="position"    column="position"    />
-        <result property="isLeaderInDept"    column="is_leader_in_dept"  typeHandler="com.linkwechat.framework.handler.IntArrayJoinTypeHandler"  />
+        <result property="isLeaderInDept"    column="is_leader_in_dept"  typeHandler="com.linkwechat.framework.handler.LongArrayJoinTypeHandler"  />
         <result property="joinTime"    column="join_time"    />
         <result property="enable"    column="enable"    />
         <result property="idCard"    column="id_card"    />
@@ -43,7 +43,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mobile != null  and mobile != ''"> and mobile = #{mobile}</if>
             <if test="email != null  and email != ''"> and email = #{email}</if>
             <if test="wxAccount != null  and wxAccount != ''"> and wx_account = #{wxAccount}</if>
-            <if test="department != null  and department != ''"> and department = #{department}</if>
+            <if test="department != null  and department != ''"> and FIND_IN_SET(#{department},department)</if>
             <if test="position != null  and position != ''"> and position = #{position}</if>
             <if test="isLeaderInDept != null "> and is_leader_in_dept = #{isLeaderInDept}</if>
             <if test="joinTime != null "> and join_time = #{joinTime}</if>
@@ -97,9 +97,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mobile != null and mobile != ''">#{mobile},</if>
             <if test="email != null">#{email},</if>
             <if test="wxAccount != null">#{wxAccount},</if>
-            <if test="department != null">#{department},</if>
+            <if test="department != null" >#{department,jdbcType=OTHER,typeHandler=com.linkwechat.framework.handler.LongArrayJoinTypeHandler},</if>
             <if test="position != null">#{position},</if>
-            <if test="isLeaderInDept != null">#{isLeaderInDept},</if>
+            <if test="isLeaderInDept != null">#{isLeaderInDept,jdbcType=OTHER,typeHandler=com.linkwechat.framework.handler.LongArrayJoinTypeHandler},</if>
             <if test="joinTime != null">#{joinTime},</if>
             <if test="enable != null">#{enable},</if>
             <if test="idCard != null">#{idCard},</if>
@@ -150,10 +150,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </delete>
 
-    <select id="findWeUsersByDepartmentId" parameterType="Long" resultMap="WeUserResult">
-        <include refid="selectWeUserVo"/>
-        where FIND_IN_SET(#{departmentId},department)
-    </select>
 
     
 </mapper>
