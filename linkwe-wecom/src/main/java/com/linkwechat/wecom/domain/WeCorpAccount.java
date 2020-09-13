@@ -28,24 +28,27 @@ public class WeCorpAccount extends BaseEntity
     private Long id;
 
     /** 企业名称 */
-    @ApiModelProperty(name = "企业名称")
+    @ApiModelProperty("企业名称")
     private String companyName;
 
     /** 企业ID */
-    @ApiModelProperty(name = "企业ID")
+    @ApiModelProperty("企业ID")
     private String corpId;
 
     /** 应用的密钥凭证 */
-    @ApiModelProperty(name = "应用的密钥凭证")
+    @ApiModelProperty("应用的密钥凭证")
     private String corpSecret;
 
     /** 帐号状态（0正常 1停用) */
-    @ApiModelProperty(name = "帐号状态（0正常 1停用)")
+    @ApiModelProperty("帐号状态（0正常 1停用)")
     private String status;
 
     /** 删除标志（0代表存在 2代表删除） */
-    @ApiModelProperty(name = "删除标志（0代表存在 2代表删除)")
+    @ApiModelProperty("删除标志（0代表存在 2代表删除)")
     private String delFlag;
+
+
+    private String contactSecret;
 
 
 }
