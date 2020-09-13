@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeCustomerMapper">
+    
+    <resultMap type="WeCustomer" id="WeCustomerResult">
+        <result property="id"    column="id"    />
+        <result property="externalUserid"    column="external_userid"    />
+        <result property="name"    column="name"    />
+        <result property="avatar"    column="avatar"    />
+        <result property="type"    column="type"    />
+        <result property="gender"    column="gender"    />
+        <result property="unionid"    column="unionid"    />
+        <result property="birthday"    column="birthday"    />
+        <result property="userId"    column="user_id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="departmentName"    column="department_name"    />
+        <result property="description"    column="description"    />
+        <result property="remarkMobiles"    column="remark_mobiles"    />
+        <result property="remarkCorpName"    column="remark_corp_name"    />
+    </resultMap>
+
+    <sql id="selectWeCustomerVo">
+        select id, external_userid, name, avatar, type, gender, unionid, birthday, user_id, user_name, create_time, department_name, description, remark_mobiles, remark_corp_name from we_customer
+    </sql>
+
+    <select id="selectWeCustomerList" parameterType="WeCustomer" resultMap="WeCustomerResult">
+        <include refid="selectWeCustomerVo"/>
+        <where>  
+            <if test="externalUserid != null  and externalUserid != ''"> and external_userid = #{externalUserid}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="avatar != null  and avatar != ''"> and avatar = #{avatar}</if>
+            <if test="type != null "> and type = #{type}</if>
+            <if test="gender != null "> and gender = #{gender}</if>
+            <if test="unionid != null  and unionid != ''"> and unionid = #{unionid}</if>
+            <if test="birthday != null "> and birthday = #{birthday}</if>
+            <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
+            <if test="userName != null  and userName != ''"> and user_name like concat('%', #{userName}, '%')</if>
+            <if test="departmentName != null  and departmentName != ''"> and department_name like concat('%', #{departmentName}, '%')</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="remarkMobiles != null  and remarkMobiles != ''"> and remark_mobiles = #{remarkMobiles}</if>
+            <if test="remarkCorpName != null  and remarkCorpName != ''"> and remark_corp_name like concat('%', #{remarkCorpName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectWeCustomerById" parameterType="Long" resultMap="WeCustomerResult">
+        <include refid="selectWeCustomerVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWeCustomer" parameterType="WeCustomer">
+        insert into we_customer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="externalUserid != null">external_userid,</if>
+            <if test="name != null">name,</if>
+            <if test="avatar != null">avatar,</if>
+            <if test="type != null">type,</if>
+            <if test="gender != null">gender,</if>
+            <if test="unionid != null">unionid,</if>
+            <if test="birthday != null">birthday,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="userName != null">user_name,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="departmentName != null">department_name,</if>
+            <if test="description != null">description,</if>
+            <if test="remarkMobiles != null">remark_mobiles,</if>
+            <if test="remarkCorpName != null">remark_corp_name,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="externalUserid != null">#{externalUserid},</if>
+            <if test="name != null">#{name},</if>
+            <if test="avatar != null">#{avatar},</if>
+            <if test="type != null">#{type},</if>
+            <if test="gender != null">#{gender},</if>
+            <if test="unionid != null">#{unionid},</if>
+            <if test="birthday != null">#{birthday},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="userName != null">#{userName},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="departmentName != null">#{departmentName},</if>
+            <if test="description != null">#{description},</if>
+            <if test="remarkMobiles != null">#{remarkMobiles},</if>
+            <if test="remarkCorpName != null">#{remarkCorpName},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWeCustomer" parameterType="WeCustomer">
+        update we_customer
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="externalUserid != null">external_userid = #{externalUserid},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="unionid != null">unionid = #{unionid},</if>
+            <if test="birthday != null">birthday = #{birthday},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="userName != null">user_name = #{userName},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="departmentName != null">department_name = #{departmentName},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="remarkMobiles != null">remark_mobiles = #{remarkMobiles},</if>
+            <if test="remarkCorpName != null">remark_corp_name = #{remarkCorpName},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeCustomerById" parameterType="Long">
+        delete from we_customer where id = #{id}
+    </delete>
+
+    <delete id="deleteWeCustomerByIds" parameterType="String">
+        delete from we_customer where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

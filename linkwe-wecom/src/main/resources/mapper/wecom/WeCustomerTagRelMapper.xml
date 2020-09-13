@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeCustomerTagRelMapper">
+    
+    <resultMap type="WeCustomerTagRel" id="WeCustomerTagRelResult">
+        <result property="id"    column="id"    />
+        <result property="customerId"    column="customer_id"    />
+        <result property="tagId"    column="tag_id"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectWeCustomerTagRelVo">
+        select id, customer_id, tag_id, create_time from we_customer_tag_rel
+    </sql>
+
+    <select id="selectWeCustomerTagRelList" parameterType="WeCustomerTagRel" resultMap="WeCustomerTagRelResult">
+        <include refid="selectWeCustomerTagRelVo"/>
+        <where>  
+            <if test="customerId != null "> and customer_id = #{customerId}</if>
+            <if test="tagId != null "> and tag_id = #{tagId}</if>
+        </where>
+    </select>
+    
+    <select id="selectWeCustomerTagRelById" parameterType="Long" resultMap="WeCustomerTagRelResult">
+        <include refid="selectWeCustomerTagRelVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWeCustomerTagRel" parameterType="WeCustomerTagRel">
+        insert into we_customer_tag_rel
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="customerId != null">customer_id,</if>
+            <if test="tagId != null">tag_id,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="customerId != null">#{customerId},</if>
+            <if test="tagId != null">#{tagId},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWeCustomerTagRel" parameterType="WeCustomerTagRel">
+        update we_customer_tag_rel
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="customerId != null">customer_id = #{customerId},</if>
+            <if test="tagId != null">tag_id = #{tagId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeCustomerTagRelById" parameterType="Long">
+        delete from we_customer_tag_rel where id = #{id}
+    </delete>
+
+    <delete id="deleteWeCustomerTagRelByIds" parameterType="String">
+        delete from we_customer_tag_rel where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>
