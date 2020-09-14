@@ -145,7 +145,7 @@ public class BeanUtils extends org.springframework.beans.BeanUtils
 
     /**
      *  模仿Spring中 BeanUtils.copyProperties(source,target)
-     *类型不同不可以转换
+     *类 型不同不可以转换
      *  但是
      * 大小写可以忽略
      * 下划线 _ 被忽略

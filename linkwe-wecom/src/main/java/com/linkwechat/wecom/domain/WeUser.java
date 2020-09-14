@@ -1,6 +1,10 @@
 package com.linkwechat.wecom.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.linkwechat.common.config.jackson.IntegerArrayDeseralize;
+import com.linkwechat.common.config.jackson.StringArrayDeserialize;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.bean.BeanUtils;
@@ -61,7 +65,7 @@ public class WeUser extends BaseEntity
 
     /** 用户所属部门,使用逗号隔开,字符串格式存储 */
     @ApiModelProperty("用户所属部门,使用逗号隔开,字符串格式存储")
-    private Long[] department;
+    private String[] department;
 
     /** 职务 */
     @ApiModelProperty("职务")
@@ -69,7 +73,7 @@ public class WeUser extends BaseEntity
 
     /** 1表示为上级,0表示普通成员(非上级)。 */
     @ApiModelProperty("1表示为上级,0表示普通成员(非上级)")
-    private Long[] isLeaderInDept;
+    private Integer[] isLeaderInDept;
 
     /** 入职时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -110,10 +114,18 @@ public class WeUser extends BaseEntity
     public  WeUserDto transformWeUserDto(){
         WeUserDto weUserDto=new WeUserDto();
 
-        BeanUtils.copyPropertiesignoreOther(this,weUserDto);
+        BeanUtils.copyPropertiesASM(this,weUserDto);
 
         return weUserDto;
     }
 
+    @JsonDeserialize(using = StringArrayDeserialize.class)
+    public void setDepartment(String[] department) {
+        this.department = department;
+    }
 
+    @JsonDeserialize(using = IntegerArrayDeseralize.class)
+    public void setIsLeaderInDept(Integer[] isLeaderInDept) {
+        this.isLeaderInDept = isLeaderInDept;
+    }
 }
