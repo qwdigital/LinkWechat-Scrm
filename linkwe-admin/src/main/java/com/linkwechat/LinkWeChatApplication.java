@@ -14,11 +14,11 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 @MapperScan("com.linkwechat.*.mapper")
 @ForestScan(basePackages = "com.linkwechat.wecom.client")
-public class RuoYiApplication
+public class LinkWeChatApplication
 {
     public static void main(String[] args)
     {
-        SpringApplication.run(RuoYiApplication.class, args);
+        SpringApplication.run(LinkWeChatApplication.class, args);
         System.out.println("(♥◠‿◠)ﾉﾞ  LinkWeChat启动成功   ლ(´ڡ`ლ)ﾞ  \n" +
                 " .-------.       ____     __        \n" +
                 " |  _ _   \\      \\   \\   /  /    \n" +
