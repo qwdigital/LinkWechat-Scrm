@@ -39,9 +39,28 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
      * 获取accessToken
      */
     @Override
-    public String findToken() {
+    public String findCommonAccessToken() {
 
-        String  weAccessToken =redisCache.getCacheObject(WeConstans.WE_ACCESS_TOKEN);
+
+        return findAccessToken(WeConstans.WE_COMMON_ACCESS_TOKEN);
+    }
+
+
+    /**
+     * 获取外部联系人相关accesstoken
+     * @return
+     */
+    @Override
+    public String findContactAccessToken() {
+
+
+        return findAccessToken(WeConstans.WE_CONTACT_ACCESS_TOKEN);
+    }
+
+
+    private String findAccessToken(String accessTokenKey){
+
+        String  weAccessToken =redisCache.getCacheObject(accessTokenKey);
 
         //为空,请求微信服务器同时缓存到redis中
         if(StringUtils.isEmpty(weAccessToken)){
@@ -53,18 +72,17 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
             }
 
             WeAccessTokenDtoDto accessToken
-                = accessTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getCorpSecret());
+                    = accessTokenClient.getToken(wxCorpAccount.getCorpId(),
+                    WeConstans.WE_COMMON_ACCESS_TOKEN.equals(accessTokenKey)? wxCorpAccount.getCorpSecret():wxCorpAccount.getContactSecret());
+
             if(accessToken.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
-                redisCache.setCacheObject(WeConstans.WE_ACCESS_TOKEN,accessToken.getAccess_token(),accessToken.getExpires_in().intValue(), TimeUnit.SECONDS);
+                redisCache.setCacheObject(accessTokenKey,accessToken.getAccess_token(),accessToken.getExpires_in().intValue(), TimeUnit.SECONDS);
                 weAccessToken=accessToken.getAccess_token();
             }
         }
 
-        return  weAccessToken;
+        return weAccessToken;
     }
-
-
-
 
 
 }

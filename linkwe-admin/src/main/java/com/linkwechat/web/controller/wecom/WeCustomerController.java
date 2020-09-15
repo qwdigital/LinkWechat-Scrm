@@ -101,4 +101,20 @@ public class WeCustomerController extends BaseController
     {
         return toAjax(weCustomerService.deleteWeCustomerByIds(ids));
     }
+
+
+    /**
+     * 客户同步接口
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:customer:synchWeCustomer')")
+    @Log(title = "企业微信客户同步接口", businessType = BusinessType.DELETE)
+    @GetMapping("/synchWeCustomer")
+    public AjaxResult synchWeCustomer(){
+
+        weCustomerService.synchWeCustomer();
+
+        return null;
+    }
+
 }

@@ -10,7 +10,13 @@ public class WeConstans {
     /**
      * 企业微信相关token
      */
-    public static final String WE_ACCESS_TOKEN = "we_access_token";
+    public static final String WE_COMMON_ACCESS_TOKEN = "we_common_access_token";
+
+
+    /**
+     * 获取外部联系人相关 token
+     */
+    public static final String WE_CONTACT_ACCESS_TOKEN="we_contact_access_token";
 
 
     /**

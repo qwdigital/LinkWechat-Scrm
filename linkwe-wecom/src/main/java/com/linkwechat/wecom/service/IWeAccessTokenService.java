@@ -7,5 +7,8 @@ package com.linkwechat.wecom.service;
  **/
 public interface IWeAccessTokenService {
 
-   public String  findToken();
+   public String  findCommonAccessToken();
+
+
+   public String findContactAccessToken();
 }

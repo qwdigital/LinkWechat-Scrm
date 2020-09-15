@@ -3,6 +3,8 @@ package com.linkwechat.wecom.service.impl;
 import java.util.List;
 
 import com.linkwechat.common.utils.DateUtils;
+import com.linkwechat.wecom.client.WeCustomerClient;
+import com.linkwechat.wecom.domain.dto.WeFollowUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.linkwechat.wecom.mapper.WeCustomerMapper;
@@ -20,6 +22,10 @@ public class WeCustomerServiceImpl implements IWeCustomerService
 {
     @Autowired
     private WeCustomerMapper weCustomerMapper;
+
+
+    @Autowired
+    private WeCustomerClient weFollowUserClient;
 
     /**
      * 查询企业微信客户
@@ -92,5 +98,18 @@ public class WeCustomerServiceImpl implements IWeCustomerService
     public int deleteWeCustomerById(Long id)
     {
         return weCustomerMapper.deleteWeCustomerById(id);
+    }
+
+
+    /**
+     * 客户同步接口
+     * @return
+     */
+    @Override
+    public int synchWeCustomer() {
+
+        WeFollowUserDto followUserList = weFollowUserClient.getFollowUserList();
+        System.out.println(followUserList.getErrmsg());
+        return 0;
     }
 }

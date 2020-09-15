@@ -15,10 +15,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
+        <result property="contactSecret" column="contact_secret" />
     </resultMap>
 
     <sql id="selectWeCorpAccountVo">
-        select id, company_name, corp_id, corp_secret, status, del_flag, create_by, create_time, update_by, update_time from we_corp_account
+        select id, company_name, corp_id, corp_secret, status, del_flag, create_by, create_time, update_by, update_time,contact_secret from we_corp_account
     </sql>
 
     <select id="selectWeCorpAccountList" parameterType="WeCorpAccount" resultMap="WeCorpAccountResult">
@@ -48,6 +49,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
+            <if test="contact_secret != null ">contact_secret,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="companyName != null">#{companyName},</if>
@@ -59,6 +61,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
+            <if test="contactSecret != null ">#{contactSecret},</if>
          </trim>
     </insert>
 
@@ -74,6 +77,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="contactSecret != null ">contact_secret = #{contactSecret},</if>
         </trim>
         where id = #{id}
     </update>

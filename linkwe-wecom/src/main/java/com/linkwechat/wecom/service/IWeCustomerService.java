@@ -58,4 +58,11 @@ public interface IWeCustomerService
      * @return 结果
      */
     public int deleteWeCustomerById(Long id);
+
+
+    /**
+     * 同步客户接口
+     * @return
+     */
+    public int synchWeCustomer();
 }

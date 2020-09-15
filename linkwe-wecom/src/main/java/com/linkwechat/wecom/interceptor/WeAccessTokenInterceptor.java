@@ -12,6 +12,8 @@ import com.linkwechat.wecom.service.IWeAccessTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 /**
  * @description: 微信token拦截器
  * @author: HaoN
@@ -40,12 +42,14 @@ public class WeAccessTokenInterceptor implements Interceptor{
         String uri=request.getUrl().replace("http://","");
         // 添加请求参数access_token
         if(!weComeConfig.getNoAccessTokenUrl().equals(uri)){
-            request.addQuery("access_token", iWeAccessTokenService.findToken());
+            request.addQuery("access_token",
+                    Arrays.asList(weComeConfig.getNeedContactTokenUrl()).contains(uri)?
+                            iWeAccessTokenService.findContactAccessToken():
+                            iWeAccessTokenService.findCommonAccessToken());
         }
 
         //添加服务器统一请求地址
         request.setUrl(weComeConfig.getServerUrl()+weComeConfig.getWeComePrefix()+uri);
-
 
         return true;
     }

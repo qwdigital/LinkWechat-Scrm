@@ -21,4 +21,7 @@ public class WeComeConfig {
 
     /** 企业微信端无需token的url */
     private String noAccessTokenUrl;
+
+    /** 需要使用外部联系人token的url*/
+    private String[] needContactTokenUrl;
 }
