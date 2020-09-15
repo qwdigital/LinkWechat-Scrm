@@ -21,6 +21,6 @@ public class StringArrayDeserialize extends JsonDeserializer<String[]> {
                return jsonParser.getText().split(",");
         }
 
-        return null;
+        return new String[0];
     }
 }

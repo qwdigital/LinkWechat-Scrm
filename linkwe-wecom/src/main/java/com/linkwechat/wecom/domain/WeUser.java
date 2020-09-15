@@ -1,9 +1,7 @@
 package com.linkwechat.wecom.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.linkwechat.common.config.jackson.IntegerArrayDeseralize;
 import com.linkwechat.common.config.jackson.StringArrayDeserialize;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -73,7 +71,7 @@ public class WeUser extends BaseEntity
 
     /** 1表示为上级,0表示普通成员(非上级)。 */
     @ApiModelProperty("1表示为上级,0表示普通成员(非上级)")
-    private Integer[] isLeaderInDept;
+    private String[] isLeaderInDept;
 
     /** 入职时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -124,8 +122,8 @@ public class WeUser extends BaseEntity
         this.department = department;
     }
 
-    @JsonDeserialize(using = IntegerArrayDeseralize.class)
-    public void setIsLeaderInDept(Integer[] isLeaderInDept) {
+    @JsonDeserialize(using = StringArrayDeserialize.class)
+    public void setIsLeaderInDept(String[] isLeaderInDept) {
         this.isLeaderInDept = isLeaderInDept;
     }
 }

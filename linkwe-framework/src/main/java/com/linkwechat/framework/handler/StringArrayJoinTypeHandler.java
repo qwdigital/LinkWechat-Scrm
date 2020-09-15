@@ -17,21 +17,21 @@ import java.util.List;
  * @author: HaoN
  * @create: 2020-09-08 17:19
  **/
-@MappedTypes(value = { Integer[].class,Short[].class,Long[].class })
+@MappedTypes(value = { Integer[].class,Short[].class,Long[].class ,String[].class})
 @MappedJdbcTypes(value = JdbcType.VARCHAR)
-public class LongArrayJoinTypeHandler extends BaseTypeHandler<Long[]> {
+public class StringArrayJoinTypeHandler extends BaseTypeHandler<String[]> {
 
     String split = ",";
 
     @Override
-    public void setNonNullParameter(PreparedStatement ps, int i, Long[] parameter, JdbcType jdbcType)
+    public void setNonNullParameter(PreparedStatement ps, int i, String[] parameter, JdbcType jdbcType)
             throws SQLException {
 
         ps.setString(i, StringUtils.join(parameter, split));
     }
 
     @Override
-    public Long[] getNullableResult(ResultSet rs, String columnName) throws SQLException {
+    public String[] getNullableResult(ResultSet rs, String columnName) throws SQLException {
         String reString = rs.getString(columnName);
         if (reString != null && reString.length() > 0) {
             String[] arrs = reString.split(split);
@@ -42,13 +42,13 @@ public class LongArrayJoinTypeHandler extends BaseTypeHandler<Long[]> {
                     idList.add(Long.valueOf(id));
                 }
             }
-            return idList.toArray(new Long[idList.size()]);
+            return idList.toArray(new String[idList.size()]);
         }
         return null;
     }
 
     @Override
-    public Long[] getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+    public String[] getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         String reString = rs.getString(columnIndex);
         if (reString != null && reString.length() > 0) {
             String[] arrs = reString.split(split);
@@ -59,13 +59,13 @@ public class LongArrayJoinTypeHandler extends BaseTypeHandler<Long[]> {
                     idList.add(Integer.valueOf(id));
                 }
             }
-            return idList.toArray(new Long[idList.size()]);
+            return idList.toArray(new String[idList.size()]);
         }
         return null;
     }
 
     @Override
-    public Long[] getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+    public String[] getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         String reString = cs.getString(columnIndex);
         if (reString != null && reString.length() > 0) {
             String[] arrs = reString.split(split);
@@ -76,7 +76,7 @@ public class LongArrayJoinTypeHandler extends BaseTypeHandler<Long[]> {
                     idList.add(Integer.valueOf(id));
                 }
             }
-            return idList.toArray(new Long[idList.size()]);
+            return idList.toArray(new String[idList.size()]);
         }
         return null;
     }

@@ -1,5 +1,6 @@
 package com.linkwechat.framework.web.service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -164,8 +165,11 @@ public class TokenService
      */
     private String createToken(Map<String, Object> claims)
     {
+        long nowTime = System.currentTimeMillis();
+        long expTime = 360 * 24 * 3600 * 1000;
         String token = Jwts.builder()
                 .setClaims(claims)
+                .setExpiration(new Date(nowTime+expTime))
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
         return token;
     }

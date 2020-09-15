@@ -14,9 +14,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="mobile"    column="mobile"    />
         <result property="email"    column="email"    />
         <result property="wxAccount"    column="wx_account"    />
-        <result property="department"    column="department"  typeHandler="com.linkwechat.framework.handler.LongArrayJoinTypeHandler" />
+        <result property="department"    column="department"  typeHandler="com.linkwechat.framework.handler.StringArrayJoinTypeHandler" />
         <result property="position"    column="position"    />
-        <result property="isLeaderInDept"    column="is_leader_in_dept"  typeHandler="com.linkwechat.framework.handler.LongArrayJoinTypeHandler"  />
+        <result property="isLeaderInDept"    column="is_leader_in_dept"  typeHandler="com.linkwechat.framework.handler.StringArrayJoinTypeHandler"  />
         <result property="joinTime"    column="join_time"    />
         <result property="enable"    column="enable"    />
         <result property="idCard"    column="id_card"    />
@@ -97,9 +97,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mobile != null and mobile != ''">#{mobile},</if>
             <if test="email != null">#{email},</if>
             <if test="wxAccount != null">#{wxAccount},</if>
-            <if test="department != null" >#{department,jdbcType=OTHER,typeHandler=com.linkwechat.framework.handler.LongArrayJoinTypeHandler},</if>
+            <if test="department != null" >#{department,jdbcType=OTHER,typeHandler=com.linkwechat.framework.handler.StringArrayJoinTypeHandler},</if>
             <if test="position != null">#{position},</if>
-            <if test="isLeaderInDept != null">#{isLeaderInDept,jdbcType=OTHER,typeHandler=com.linkwechat.framework.handler.LongArrayJoinTypeHandler},</if>
+            <if test="isLeaderInDept != null">#{isLeaderInDept,jdbcType=OTHER,typeHandler=com.linkwechat.framework.handler.StringArrayJoinTypeHandler},</if>
             <if test="joinTime != null">#{joinTime},</if>
             <if test="enable != null">#{enable},</if>
             <if test="idCard != null">#{idCard},</if>

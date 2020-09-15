@@ -13,7 +13,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 	</settings>
 
 	<typeHandlers>
-		  <typeHandler handler="com.linkwechat.framework.handler.LongArrayJoinTypeHandler"/>
+		  <typeHandler handler="com.linkwechat.framework.handler.StringArrayJoinTypeHandler"/>
 
 	</typeHandlers>
 	

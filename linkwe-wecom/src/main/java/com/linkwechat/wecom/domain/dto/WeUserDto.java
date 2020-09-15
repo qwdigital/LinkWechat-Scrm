@@ -36,7 +36,7 @@ public class WeUserDto {
     private String position;
 
     //身份:表示在所在的部门内是否为上级。1表示为上级，0表示非上级。
-    private Integer[] is_leader_in_dept;
+    private String[] is_leader_in_dept;
 
     //启用/禁用成员。1表示启用成员，0表示禁用成员
     private Integer enable;

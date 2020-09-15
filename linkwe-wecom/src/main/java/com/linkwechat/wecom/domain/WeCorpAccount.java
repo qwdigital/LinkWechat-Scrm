@@ -48,6 +48,7 @@ public class WeCorpAccount extends BaseEntity
     private String delFlag;
 
 
+    @ApiModelProperty("外部联系人密钥")
     private String contactSecret;
 
 
