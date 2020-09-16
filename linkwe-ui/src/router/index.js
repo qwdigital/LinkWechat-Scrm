@@ -1,0 +1,376 @@
+import Vue from 'vue'
+import Router from 'vue-router'
+
+Vue.use(Router)
+
+/* Layout */
+import Layout from '@/layout'
+
+/**
+ * Note: 路由配置项
+ *
+ * hidden: true                   // 当设置 true 的时候该路由不会再侧边栏出现 如401，login等页面，或者如一些编辑页面/edit/1
+ * alwaysShow: true               // 当你一个路由下面的 children 声明的路由大于1个时，自动会变成嵌套的模式--如组件页面
+ *                                // 只有一个时，会将那个子路由当做根路由显示在侧边栏--如引导页面
+ *                                // 若你想不管路由下面的 children 声明的个数都显示你的根路由
+ *                                // 你可以设置 alwaysShow: true，这样它就会忽略之前定义的规则，一直显示根路由
+ * redirect: noRedirect           // 当设置 noRedirect 的时候该路由在面包屑导航中不可被点击
+ * name:'router-name'             // 设定路由的名字，一定要填写不然使用<keep-alive>时会出现各种问题
+ * meta : {
+    roles: ['admin','editor']    // 设置该路由进入的权限，支持多个权限叠加
+    title: 'title'               // 设置该路由在侧边栏和面包屑中展示的名字
+    icon: 'svg-name'             // 设置该路由的图标，对应路径src/icons/svg
+    breadcrumb: false            // 如果设置为false，则不会在breadcrumb面包屑中显示
+  }
+ */
+
+// 公共路由
+export const constantRoutes = [
+  {
+    path: '/redirect',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/redirect/:path(.*)',
+        component: (resolve) => require(['@/views/redirect'], resolve)
+      }
+    ]
+  },
+  {
+    path: '',
+    component: Layout,
+    redirect: '/index',
+    children: [
+      {
+        path: '/index',
+        component: (resolve) => require(['@/views/index'], resolve),
+        name: '首页',
+        meta: { title: '首页', icon: 'dashboard', noCache: true, affix: true }
+      }
+    ]
+  },
+  {
+    path: '/login',
+    component: (resolve) => require(['@/views/login'], resolve),
+    hidden: true
+  },
+  {
+    path: '/customerManage',
+    component: Layout,
+    redirect: '/customerManage/customer',
+    meta: { title: '客户管理', icon: 'user' },
+    children: [
+      {
+        path: 'customer',
+        name: 'Customer',
+        component: (resolve) => require(['@/views/customerManage/customer'], resolve),
+        meta: { title: '客户', icon: '' }
+      },
+      {
+        path: 'group',
+        name: 'CustomerGroup',
+        component: (resolve) => require(['@/views/customerManage/group'], resolve),
+        meta: { title: '客户群', icon: '' }
+      },
+      {
+        path: 'groupDetail',
+        hidden: true,
+        component: (resolve) => require(['@/views/customerManage/groupDetail'], resolve),
+        meta: { hidden: true, title: '客户群', icon: '' }
+      },
+      {
+        path: 'tag',
+        name: 'CustomerTag',
+        component: (resolve) => require(['@/views/customerManage/tag'], resolve),
+        meta: { title: '客户标签', icon: '' }
+      },
+      {
+        path: 'dimission',
+        name: 'Dimission',
+        component: (resolve) => require(['@/views/customerManage/dimission'], resolve),
+        meta: { title: '离职继承', icon: '' }
+      },
+    ]
+  },
+  // {
+  //   path: '/groupMessage',
+  //   component: Layout,
+  //   redirect: '/groupMessage/add',
+  //   meta: { title: '群发消息', icon: 'guide' },
+  //   children: [
+  //     {
+  //       path: 'add',
+  //       name: 'GroupMessageAdd',
+  //       component: (resolve) => require(['@/views/groupMessage/add'], resolve),
+  //       meta: { title: '新增群发', icon: '' }
+  //     },
+  //     {
+  //       path: 'record',
+  //       name: 'GroupMessageRecord',
+  //       component: (resolve) => require(['@/views/groupMessage/record'], resolve),
+  //       meta: { title: '群发记录', icon: '' }
+  //     },
+  //   ]
+  // },
+  // {
+  //   path: '/drainageCode',
+  //   component: Layout,
+  //   redirect: '/drainageCode/staff',
+  //   meta: { title: '引流码', icon: 'qrcode' },
+  //   children: [
+  //     {
+  //       path: 'staff',
+  //       name: 'CodeStaff',
+  //       component: (resolve) => require(['@/views/drainageCode/staff/list'], resolve),
+  //       meta: { title: '员工活码', icon: '' }
+  //     },
+  //     {
+  //       path: 'staffAdd',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/drainageCode/staff/add'], resolve),
+  //       meta: { title: '新建员工活码', icon: '' }
+  //     },
+  //     {
+  //       path: 'staffDetail',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/drainageCode/staff/detail'], resolve),
+  //       meta: { title: '员工活码详情', icon: '' }
+  //     },
+  //     {
+  //       path: 'group',
+  //       name: 'CodeGroup',
+  //       component: (resolve) => require(['@/views/drainageCode/group/list'], resolve),
+  //       meta: { title: '客户群活码', icon: '' }
+  //     },
+  //     {
+  //       path: 'groupAdd',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/drainageCode/group/add'], resolve),
+  //       meta: { title: '新增客户群活码', icon: '' }
+  //     },
+  //     {
+  //       path: 'groupDetail',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/drainageCode/group/detail'], resolve),
+  //       meta: { title: '客户群活码信息', icon: '' }
+  //     },
+  //     {
+  //       path: 'groupBaseInfo',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/drainageCode/group/baseInfo'], resolve),
+  //       meta: { title: '客户群活码', icon: '' }
+  //     },
+  //     {
+  //       path: 'welcome',
+  //       name: 'Welcome',
+  //       component: (resolve) => require(['@/views/drainageCode/welcome/list'], resolve),
+  //       meta: { title: '欢迎语', icon: '' }
+  //     },
+  //     {
+  //       path: 'welcomeAdd',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/drainageCode/welcome/add'], resolve),
+  //       meta: { title: '新建欢迎语', icon: '' }
+  //     },
+  //   ]
+  // },
+  // {
+  //   path: '/material',
+  //   component: Layout,
+  //   redirect: '/material/text',
+  //   meta: { title: '素材中心', icon: 'material' },
+  //   children: [
+  //     {
+  //       path: 'text',
+  //       name: 'MaterialText',
+  //       component: (resolve) => require(['@/views/material/text'], resolve),
+  //       meta: { title: '文本', icon: '' }
+  //     },
+  //     {
+  //       path: 'image',
+  //       name: 'MaterialImage',
+  //       component: (resolve) => require(['@/views/material/image'], resolve),
+  //       meta: { title: '图片', icon: '' }
+  //     },
+  //     {
+  //       path: 'web',
+  //       name: 'MaterialWeb',
+  //       component: (resolve) => require(['@/views/material/web'], resolve),
+  //       meta: { title: '网页', icon: '' }
+  //     },
+  //     {
+  //       path: 'audio',
+  //       name: 'MaterialAudio',
+  //       component: (resolve) => require(['@/views/material/audio'], resolve),
+  //       meta: { title: '语音', icon: '' }
+  //     },
+  //     {
+  //       path: 'video',
+  //       name: 'MaterialVideo',
+  //       component: (resolve) => require(['@/views/material/video'], resolve),
+  //       meta: { title: '视频', icon: '' }
+  //     },
+  //     {
+  //       path: 'file',
+  //       name: 'MaterialFile',
+  //       component: (resolve) => require(['@/views/material/file'], resolve),
+  //       meta: { title: '文件', icon: '' }
+  //     },
+  //     {
+  //       path: 'applet',
+  //       name: 'MaterialApplet',
+  //       component: (resolve) => require(['@/views/material/applet'], resolve),
+  //       meta: { title: '小程序', icon: '' }
+  //     },
+  //   ]
+  // },
+  // {
+  //   path: '/appTool',
+  //   component: Layout,
+  //   redirect: '/appTool/text',
+  //   meta: { title: '应用工具', icon: 'app' },
+  //   children: [
+  //     {
+  //       path: 'chatToolbar',
+  //       name: 'ChatToolbar',
+  //       component: (resolve) => require(['@/views/appTool/chatToolbar/list'], resolve),
+  //       meta: { title: '聊天工具栏', icon: '' }
+  //     },
+  //     {
+  //       path: 'explain',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/appTool/chatToolbar/explain'], resolve),
+  //       meta: { title: '图文详解', icon: '' }
+  //     },
+  //     {
+  //       path: 'config',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/appTool/chatToolbar/config'], resolve),
+  //       meta: { title: '查看已配置信息', icon: '' }
+  //     },
+  //     {
+  //       path: 'friendCircle',
+  //       name: 'FriendCircle',
+  //       component: (resolve) => require(['@/views/appTool/friendCircle/list'], resolve),
+  //       meta: { title: '朋友圈', icon: '' }
+  //     },
+  //     {
+  //       path: 'friendIntroduce',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/appTool/friendCircle/introduce'], resolve),
+  //       meta: { title: '功能介绍', icon: '' }
+  //     },
+  //     {
+  //       path: 'friendPublish',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/appTool/friendCircle/publish'], resolve),
+  //       meta: { title: '发布动态', icon: '' }
+  //     },
+  //     {
+  //       path: 'friendBackground',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/appTool/friendCircle/background'], resolve),
+  //       meta: { title: '设置顶部背景', icon: '' }
+  //     },
+  //   ]
+  // },
+  {
+    path: '/contacts',
+    component: Layout,
+    redirect: '/contacts/organization',
+    meta: { title: '', icon: 'users' },
+    children: [
+      {
+        path: 'organization',
+        name: 'Organization',
+        component: (resolve) => require(['@/views/contacts/organization'], resolve),
+        meta: { title: '组织架构', icon: 'tree' }
+      },
+    ]
+  },
+  {
+    path: '/_enterpriseWechat',
+    component: Layout,
+    redirect: '/enterpriseWechat',
+    meta: { title: '', icon: 'wechat' },
+    children: [
+      {
+        path: '/enterpriseWechat',
+        name: 'EnterpriseWechat',
+        component: (resolve) => require(['@/views/enterpriseWechat/list'], resolve),
+        meta: { title: '企业微信管理', icon: '' }
+      },
+    ]
+  },
+
+  {
+    path: '/user',
+    component: Layout,
+    hidden: true,
+    redirect: 'noredirect',
+    children: [
+      {
+        path: 'profile',
+        component: (resolve) => require(['@/views/system/user/profile/index'], resolve),
+        name: 'Profile',
+        meta: { title: '个人中心', icon: 'user' }
+      }
+    ]
+  },
+  {
+    path: '/dict',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'type/data/:dictId(\\d+)',
+        component: (resolve) => require(['@/views/system/dict/data'], resolve),
+        name: 'Data',
+        meta: { title: '字典数据', icon: '' }
+      }
+    ]
+  },
+  {
+    path: '/job',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'log',
+        component: (resolve) => require(['@/views/monitor/job/log'], resolve),
+        name: 'JobLog',
+        meta: { title: '调度日志' }
+      }
+    ]
+  },
+  {
+    path: '/gen',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'edit/:tableId(\\d+)',
+        component: (resolve) => require(['@/views/tool/gen/editTable'], resolve),
+        name: 'GenEdit',
+        meta: { title: '修改生成配置' }
+      }
+    ]
+  },
+  {
+    path: '/404',
+    component: (resolve) => require(['@/views/error/404'], resolve),
+    hidden: true
+  },
+  {
+    path: '/401',
+    component: (resolve) => require(['@/views/error/401'], resolve),
+    hidden: true
+  }
+]
+
+export default new Router({
+  // mode: 'history',
+  scrollBehavior: () => ({ y: 0 }),
+  routes: constantRoutes
+})
