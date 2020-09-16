@@ -1,9 +1,14 @@
 package com.linkwechat.wecom.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ArrayUtil;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.wecom.client.WeCustomerClient;
+import com.linkwechat.wecom.domain.dto.WeCustomerDto;
 import com.linkwechat.wecom.domain.dto.WeFollowUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -106,10 +111,48 @@ public class WeCustomerServiceImpl implements IWeCustomerService
      * @return
      */
     @Override
-    public int synchWeCustomer() {
+    public void synchWeCustomer() {
 
-        WeFollowUserDto followUserList = weFollowUserClient.getFollowUserList();
-        System.out.println(followUserList.getErrmsg());
-        return 0;
+        WeFollowUserDto weFollowUserDto = weFollowUserClient.getFollowUserList();
+
+        if(WeConstans.WE_SUCCESS_CODE.equals(weFollowUserDto.getErrcode())
+        && ArrayUtil.isNotEmpty(weFollowUserDto.getFollow_user())){
+
+            Arrays.asList(weFollowUserDto.getFollow_user())
+                    .stream().forEach(k->{
+
+                //获取指定联系人对应的客户
+                WeCustomerDto externalUserid
+                        = weFollowUserClient.list(k);
+                if(WeConstans.WE_SUCCESS_CODE.equals(externalUserid.getErrcode())
+                && ArrayUtil.isNotEmpty(externalUserid.getExternal_userid())){
+
+                    Arrays.asList(externalUserid.getExternal_userid()).forEach(v->{
+
+                        //获取指定客户的详情
+                        WeCustomerDto externalContact = weFollowUserClient.get(v);
+
+                        if(WeConstans.WE_SUCCESS_CODE.equals(externalContact.getErrcode())
+                        && null != externalContact.getExternal_contact()){
+
+                            //分装成需要入库的数据格式
+
+
+
+
+                        }
+                    });
+
+                }
+
+            });
+
+
+        }
+
     }
+
+
+
+
 }

@@ -41,4 +41,10 @@ public class WeConstans {
      * 企业微信通讯录用户停用
      */
     public static  final Integer WE_USER_STOP= 0;
+
+
+    /**
+     * 同步功能提示语
+     */
+    public static final String SYNCH_TIP="后台开始同步数据，请稍后关注进度";
 }
