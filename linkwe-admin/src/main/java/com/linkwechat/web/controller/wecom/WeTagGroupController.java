@@ -39,11 +39,12 @@ public class WeTagGroupController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('wecom:group:list')")
     @GetMapping("/list")
-    public TableDataInfo list(WeTagGroup weTagGroup)
+    public AjaxResult list()
     {
-        startPage();
-        List<WeTagGroup> list = weTagGroupService.selectWeTagGroupList(weTagGroup);
-        return getDataTable(list);
+
+        return AjaxResult.success(
+                weTagGroupService.selectWeTagGroupList(new WeTagGroup())
+        );
     }
 
     /**
