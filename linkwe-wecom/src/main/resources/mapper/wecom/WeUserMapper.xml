@@ -123,9 +123,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mobile != null and mobile != ''">mobile = #{mobile},</if>
             <if test="email != null">email = #{email},</if>
             <if test="wxAccount != null">wx_account = #{wxAccount},</if>
-            <if test="department != null">department = #{department},</if>
+            <if test="department != null">department = #{department,jdbcType=OTHER,typeHandler=com.linkwechat.framework.handler.StringArrayJoinTypeHandler},</if>
             <if test="position != null">position = #{position},</if>
-            <if test="isLeaderInDept != null">is_leader_in_dept = #{isLeaderInDept},</if>
+            <if test="isLeaderInDept != null">is_leader_in_dept = #{isLeaderInDept,jdbcType=OTHER,typeHandler=com.linkwechat.framework.handler.StringArrayJoinTypeHandler},</if>
             <if test="joinTime != null">join_time = #{joinTime},</if>
             <if test="enable != null">enable = #{enable},</if>
             <if test="idCard != null">id_card = #{idCard},</if>

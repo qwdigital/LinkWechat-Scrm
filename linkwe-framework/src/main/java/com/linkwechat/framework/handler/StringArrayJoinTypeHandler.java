@@ -34,15 +34,16 @@ public class StringArrayJoinTypeHandler extends BaseTypeHandler<String[]> {
     public String[] getNullableResult(ResultSet rs, String columnName) throws SQLException {
         String reString = rs.getString(columnName);
         if (reString != null && reString.length() > 0) {
-            String[] arrs = reString.split(split);
+//            String[] arrs = reString.split(split);
 
-            List<Long> idList = new ArrayList<>(arrs.length);
-            for (String id : arrs) {
-                if (id != null && id.length() > 0) {
-                    idList.add(Long.valueOf(id));
-                }
-            }
-            return idList.toArray(new String[idList.size()]);
+//            List<Long> idList = new ArrayList<>(arrs.length);
+//            for (String id : arrs) {
+//                if (id != null && id.length() > 0) {
+//                    idList.add(Long.valueOf(id));
+//                }
+//            }
+//            return idList.toArray(new String[idList.size()]);
+            return reString.split(split);
         }
         return null;
     }
@@ -51,15 +52,15 @@ public class StringArrayJoinTypeHandler extends BaseTypeHandler<String[]> {
     public String[] getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         String reString = rs.getString(columnIndex);
         if (reString != null && reString.length() > 0) {
-            String[] arrs = reString.split(split);
+//            String[] arrs = reString.split(split);
 
-            List<Integer> idList = new ArrayList<>(arrs.length);
-            for (String id : arrs) {
-                if (id != null && id.length() > 0) {
-                    idList.add(Integer.valueOf(id));
-                }
-            }
-            return idList.toArray(new String[idList.size()]);
+//            List<Integer> idList = new ArrayList<>(arrs.length);
+//            for (String id : arrs) {
+//                if (id != null && id.length() > 0) {
+//                    idList.add(Integer.valueOf(id));
+//                }
+//            }
+            return reString.split(split);
         }
         return null;
     }
@@ -68,15 +69,16 @@ public class StringArrayJoinTypeHandler extends BaseTypeHandler<String[]> {
     public String[] getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         String reString = cs.getString(columnIndex);
         if (reString != null && reString.length() > 0) {
-            String[] arrs = reString.split(split);
-
-            List<Integer> idList = new ArrayList<>(arrs.length);
-            for (String id : arrs) {
-                if (id != null && id.length() > 0) {
-                    idList.add(Integer.valueOf(id));
-                }
-            }
-            return idList.toArray(new String[idList.size()]);
+//            String[] arrs = reString.split(split);
+//
+//            List<Integer> idList = new ArrayList<>(arrs.length);
+//            for (String id : arrs) {
+//                if (id != null && id.length() > 0) {
+//                    idList.add(Integer.valueOf(id));
+//                }
+//            }
+//            return idList.toArray(new String[idList.size()]);
+            return reString.split(split);
         }
         return null;
     }

@@ -12,25 +12,36 @@ import java.util.List;
 @Data
 public class WeCustomerDto extends WeResultDto{
 
+
+    /** 客户id集合 */
     private String[] external_userid;
 
-
+    /** 客户详情 */
     private ExternalContact external_contact;
 
-
+    /** 客户联系人 */
     private List<WeFollowUserDto> follow_user;
 
 
     @Data
     class ExternalContact{
+        /** 外部联系人userId */
         private String external_userid;
+        /** 外部联系人名称 */
         private String name;
+        /** 外部联系人职位 */
         private String position;
+        /** 外部联系人头像 */
         private String avatar;
+        /** 外部联系人所在企业简称 */
         private String corp_name;
+        /** 外部联系人所在企业全称 */
         private String corp_full_name;
+        /** 外部联系人的类型，1表示该外部联系人是微信用户，2表示该外部联系人是企业微信用户 */
         private Integer type;
+        /** 外部联系人性别 0-未知 1-男性 2-女性 */
         private Integer gender;
+        /** 外部联系人在微信开放平台的唯一身份标识（微信unionid），通过此字段企业可将外部联系人与公众号/小程序用户关联起来。 */
         private String unionid;
 
     }

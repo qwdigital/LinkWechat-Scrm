@@ -64,5 +64,5 @@ public interface IWeCustomerService
      * 同步客户接口
      * @return
      */
-    public int synchWeCustomer();
+    public void synchWeCustomer();
 }

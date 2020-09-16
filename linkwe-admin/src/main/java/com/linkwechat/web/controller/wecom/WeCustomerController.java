@@ -3,6 +3,7 @@ package com.linkwechat.web.controller.wecom;
 import java.util.List;
 
 import com.linkwechat.common.annotation.Log;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
@@ -69,16 +70,7 @@ public class WeCustomerController extends BaseController
         return AjaxResult.success(weCustomerService.selectWeCustomerById(id));
     }
 
-    /**
-     * 新增企业微信客户
-     */
-    @PreAuthorize("@ss.hasPermi('wecom:customer:add')")
-    @Log(title = "企业微信客户", businessType = BusinessType.INSERT)
-    @PostMapping
-    public AjaxResult add(@RequestBody WeCustomer weCustomer)
-    {
-        return toAjax(weCustomerService.insertWeCustomer(weCustomer));
-    }
+
 
     /**
      * 修改企业微信客户
@@ -89,17 +81,6 @@ public class WeCustomerController extends BaseController
     public AjaxResult edit(@RequestBody WeCustomer weCustomer)
     {
         return toAjax(weCustomerService.updateWeCustomer(weCustomer));
-    }
-
-    /**
-     * 删除企业微信客户
-     */
-    @PreAuthorize("@ss.hasPermi('wecom:customer:remove')")
-    @Log(title = "企业微信客户", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable Long[] ids)
-    {
-        return toAjax(weCustomerService.deleteWeCustomerByIds(ids));
     }
 
 
@@ -114,7 +95,8 @@ public class WeCustomerController extends BaseController
 
         weCustomerService.synchWeCustomer();
 
-        return null;
+        return AjaxResult.success(WeConstans.SYNCH_TIP);
+
     }
 
 }
