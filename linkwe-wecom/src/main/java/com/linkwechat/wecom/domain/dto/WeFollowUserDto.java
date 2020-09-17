@@ -33,7 +33,7 @@ public class WeFollowUserDto extends WeResultDto{
     private String remark_corp_name;
 
     /** 客户备注的手机号码 */
-    private String remark_mobiles;
+    private String[] remark_mobiles;
 
     /** 该成员添加此客户的来源 */
     private Integer add_way;

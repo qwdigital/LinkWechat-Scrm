@@ -8,8 +8,10 @@ import cn.hutool.core.util.ArrayUtil;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.wecom.client.WeCustomerClient;
+import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.domain.dto.WeCustomerDto;
 import com.linkwechat.wecom.domain.dto.WeFollowUserDto;
+import com.linkwechat.wecom.domain.dto.WeUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.linkwechat.wecom.mapper.WeCustomerMapper;
@@ -31,6 +33,10 @@ public class WeCustomerServiceImpl implements IWeCustomerService
 
     @Autowired
     private WeCustomerClient weFollowUserClient;
+
+
+    @Autowired
+    private WeUserClient weUserClient;
 
     /**
      * 查询企业微信客户
@@ -132,10 +138,53 @@ public class WeCustomerServiceImpl implements IWeCustomerService
                         //获取指定客户的详情
                         WeCustomerDto externalContact = weFollowUserClient.get(v);
 
-                        if(WeConstans.WE_SUCCESS_CODE.equals(externalContact.getErrcode())
-                        && null != externalContact.getExternal_contact()){
+                        if(WeConstans.WE_SUCCESS_CODE.equals(externalContact.getErrcode())){
 
                             //分装成需要入库的数据格式
+                            WeCustomerDto.ExternalContact
+                                    weExternalContact = externalContact.getExternal_contact();
+                            if(null != weExternalContact){
+
+
+                                WeCustomer.builder()
+                                         .externalUserid(weExternalContact.getExternal_userid())
+                                         .name(weExternalContact.getName())
+                                         .avatar(weExternalContact.getAvatar())
+                                         .type(weExternalContact.getType())
+                                         .gender(weExternalContact.getGender())
+                                         .unionid(weExternalContact.getUnionid())
+//               自定义                   .birthday()
+//                添加人的id              .userId(weExternalContact.getExternal_userid())
+//                 添加人的名称            .userName()
+//                添加人所在部门           .departmentName()
+//                 添加人员描述           .description()
+//                       备注号码                 .remarkMobiles()
+                                        .corpName(weExternalContact.getCorp_name())
+                                        .corpFullName(weExternalContact.getCorp_full_name())
+                                        .position(weExternalContact.getPosition());
+//              客户来源                 .addWay()
+
+                                List<WeFollowUserDto> followUsers = externalContact.getFollow_user();
+                                if(CollectionUtil.isNotEmpty(followUsers)){
+                                    WeFollowUserDto followUser = followUsers.get(0);
+                                    followUser.getUserid();
+                                    followUser.getDescription();
+                                    followUser.getRemark_mobiles();
+                                    followUser.getAdd_way();
+
+                                    WeUserDto weUserDto
+                                            = weUserClient.getUserByUserId(followUser.getUserid());
+                                    if(WeConstans.WE_SUCCESS_CODE.equals(weUserDto.getErrcode())){
+                                        weUserDto.getName();
+
+                                    }
+
+
+
+                                }
+
+
+                            }
 
 
 
