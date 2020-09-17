@@ -140,53 +140,14 @@ public class WeCustomerServiceImpl implements IWeCustomerService
 
                         if(WeConstans.WE_SUCCESS_CODE.equals(externalContact.getErrcode())){
 
-                            //分装成需要入库的数据格式
-                            WeCustomerDto.ExternalContact
-                                    weExternalContact = externalContact.getExternal_contact();
-                            if(null != weExternalContact){
+                            WeCustomer weCustomer
+                                    = externalContact.transformWeCustomer();
 
-
-                                WeCustomer.builder()
-                                         .externalUserid(weExternalContact.getExternal_userid())
-                                         .name(weExternalContact.getName())
-                                         .avatar(weExternalContact.getAvatar())
-                                         .type(weExternalContact.getType())
-                                         .gender(weExternalContact.getGender())
-                                         .unionid(weExternalContact.getUnionid())
-//               自定义                   .birthday()
-//                添加人的id              .userId(weExternalContact.getExternal_userid())
-//                 添加人的名称            .userName()
-//                添加人所在部门           .departmentName()
-//                 添加人员描述           .description()
-//                       备注号码                 .remarkMobiles()
-                                        .corpName(weExternalContact.getCorp_name())
-                                        .corpFullName(weExternalContact.getCorp_full_name())
-                                        .position(weExternalContact.getPosition());
-//              客户来源                 .addWay()
-
-                                List<WeFollowUserDto> followUsers = externalContact.getFollow_user();
-                                if(CollectionUtil.isNotEmpty(followUsers)){
-                                    WeFollowUserDto followUser = followUsers.get(0);
-                                    followUser.getUserid();
-                                    followUser.getDescription();
-                                    followUser.getRemark_mobiles();
-                                    followUser.getAdd_way();
-
-                                    WeUserDto weUserDto
-                                            = weUserClient.getUserByUserId(followUser.getUserid());
-                                    if(WeConstans.WE_SUCCESS_CODE.equals(weUserDto.getErrcode())){
-                                        weUserDto.getName();
-
-                                    }
-
-
-
-                                }
-
-
+                            WeUserDto weUserDto
+                                    = weUserClient.getUserByUserId(weCustomer.getUserId());
+                            if(WeConstans.WE_SUCCESS_CODE.equals(weUserDto.getErrcode())){
+                                weCustomer.setName(weUserDto.getName());
                             }
-
-
 
 
                         }

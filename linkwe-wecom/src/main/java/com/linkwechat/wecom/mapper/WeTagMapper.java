@@ -2,6 +2,7 @@ package com.linkwechat.wecom.mapper;
 
 import java.util.List;
 import com.linkwechat.wecom.domain.WeTag;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 企业微信标签Mapper接口
@@ -58,4 +59,12 @@ public interface WeTagMapper
      * @return 结果
      */
     public int deleteWeTagByIds(Long[] ids);
+
+
+    /**
+     * 批量插入标签
+     * @param weTags
+     * @return
+     */
+    public int batchInsetWeTag(@Param("weTags") List<WeTag> weTags);
 }

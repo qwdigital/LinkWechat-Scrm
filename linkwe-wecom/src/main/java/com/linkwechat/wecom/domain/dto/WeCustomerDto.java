@@ -72,17 +72,11 @@ public class WeCustomerDto extends WeResultDto{
         if(CollectionUtil.isNotEmpty(follow_user)){
             WeFollowUserDto weFollowUserDto = follow_user.get(0);
 
-                    weCustomer.setUserId(weFollowUserDto.getUserid());
-                    weCustomer.setDescription(weFollowUserDto.getDescription());
-                    weCustomer.setRemarkMobiles(StringUtils.join(weFollowUserDto.getRemark_mobiles(),","));
-//                    weCustomer.setAddWay();
-//
-//            weFollowUserDto.getAdd_way();
+           weCustomer.setUserId(weFollowUserDto.getUserid());
+           weCustomer.setDescription(weFollowUserDto.getDescription());
+           weCustomer.setRemarkMobiles(StringUtils.join(weFollowUserDto.getRemark_mobiles(),","));
+//           weCustomer.setAddWay();
 
-//                            followUser.getUserid();
-//            followUser.getDescription();
-//            followUser.getRemark_mobiles();
-//            followUser.getAdd_way();
 
         }
 

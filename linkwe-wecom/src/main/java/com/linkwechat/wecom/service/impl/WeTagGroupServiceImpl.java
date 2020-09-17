@@ -1,13 +1,18 @@
 package com.linkwechat.wecom.service.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.linkwechat.common.utils.DateUtils;
+import com.linkwechat.wecom.domain.WeTag;
+import com.linkwechat.wecom.mapper.WeTagMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.linkwechat.wecom.mapper.WeTagGroupMapper;
 import com.linkwechat.wecom.domain.WeTagGroup;
 import com.linkwechat.wecom.service.IWeTagGroupService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 标签组Service业务层处理
@@ -20,6 +25,9 @@ public class WeTagGroupServiceImpl implements IWeTagGroupService
 {
     @Autowired
     private WeTagGroupMapper weTagGroupMapper;
+
+    @Autowired
+    private WeTagMapper weTagMapper;
 
     /**
      * 查询标签组
@@ -52,10 +60,20 @@ public class WeTagGroupServiceImpl implements IWeTagGroupService
      * @return 结果
      */
     @Override
+    @Transactional
     public int insertWeTagGroup(WeTagGroup weTagGroup)
     {
-        weTagGroup.setCreateTime(DateUtils.getNowDate());
-        return weTagGroupMapper.insertWeTagGroup(weTagGroup);
+        int returnCode = weTagGroupMapper.insertWeTagGroup(weTagGroup);
+
+        if(returnCode>0){
+            List<WeTag> weTags = weTagGroup.getWeTags();
+            if(CollectionUtil.isNotEmpty(weTags)){
+                weTags.stream().forEach(k->k.setGroupId(weTagGroup.getId()));
+                weTagMapper.batchInsetWeTag(weTags);
+
+            }
+        }
+        return returnCode;
     }
 
     /**

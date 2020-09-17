@@ -1,10 +1,10 @@
 package com.linkwechat.wecom.domain;
 
-import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import lombok.Data;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+
+import java.util.List;
 
 /**
  * 标签组对象 we_tag_group
@@ -17,49 +17,14 @@ public class WeTagGroup extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** $column.columnComment */
-    @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
+    private Long id= SnowFlakeUtil.nextId();
+
+    /** 分组名称 */
     private String gourpName;
 
-//    /** 标签组排序的次序值，order值大的排序靠前 */
-//    @Excel(name = "标签组排序的次序值，order值大的排序靠前")
-//    private Long order;
+    /** 标签 */
+    private List<WeTag> weTags;
 
-//    public void setId(Long id)
-//    {
-//        this.id = id;
-//    }
-//
-//    public Long getId()
-//    {
-//        return id;
-//    }
-//    public void setGourpName(String gourpName)
-//    {
-//        this.gourpName = gourpName;
-//    }
-//
-//    public String getGourpName()
-//    {
-//        return gourpName;
-//    }
-//    public void setOrder(Long order)
-//    {
-//        this.order = order;
-//    }
-//
-//    public Long getOrder()
-//    {
-//        return order;
-//    }
-//
-//    @Override
-//    public String toString() {
-//        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-//            .append("id", getId())
-//            .append("gourpName", getGourpName())
-//            .append("createTime", getCreateTime())
-//            .append("order", getOrder())
-//            .toString();
-//    }
+    /** 帐号状态（0正常 1删除） */
+    private String status;
 }
