@@ -2,7 +2,6 @@ package com.linkwechat.wecom.mapper;
 
 import java.util.List;
 import com.linkwechat.wecom.domain.WeTag;
-import org.apache.ibatis.annotations.Param;
 
 /**
  * 企业微信标签Mapper接口
@@ -66,5 +65,13 @@ public interface WeTagMapper
      * @param weTags
      * @return
      */
-    public int batchInsetWeTag(@Param("weTags") List<WeTag> weTags);
+    public int batchInsetWeTag(List<WeTag> weTags);
+
+
+    /**
+     * 标签批量更新
+     * @param weTags
+     * @return
+     */
+    public int batchUpdateWeTag(List<WeTag> weTags);
 }

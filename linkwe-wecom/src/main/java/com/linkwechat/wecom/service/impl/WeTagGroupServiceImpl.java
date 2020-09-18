@@ -83,9 +83,18 @@ public class WeTagGroupServiceImpl implements IWeTagGroupService
      * @return 结果
      */
     @Override
+    @Transactional
     public int updateWeTagGroup(WeTagGroup weTagGroup)
     {
-        return weTagGroupMapper.updateWeTagGroup(weTagGroup);
+        int returnCode = weTagGroupMapper.updateWeTagGroup(weTagGroup);
+
+        if(returnCode>0){
+            List<WeTag> weTags = weTagGroup.getWeTags();
+            if(CollectionUtil.isNotEmpty(weTags)){
+                weTagMapper.batchUpdateWeTag(weTags);
+            }
+        }
+        return returnCode;
     }
 
     /**

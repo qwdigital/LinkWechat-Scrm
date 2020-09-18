@@ -67,11 +67,32 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 
     <insert id="batchInsetWeTag" >
-        insert into person (id, group_id, name, create_time)
+        insert into we_tag (id, group_id, name, create_time)
         values
-        <foreach collection="tags" item="tag" index="index" separator=",">
+        <foreach collection="list" item="tag" index="index" separator=",">
             (#{tag.id},#{tag.groupId},#{tag.name},#{tag.createTime})
         </foreach>
     </insert>
+
+
+    <update id="batchUpdateWeTag">
+        update we_tag  set
+        name=
+        <foreach collection="list" item="tag" index="index"
+                 separator=" " open="case id" close="end">
+          when #{tag.id} then #{tag.name}
+        </foreach>
+
+        ,status=
+        <foreach collection="list" item="tag" index="index"
+                 separator=" " open="case id" close="end">
+            when #{tag.id} then #{tag.status}
+        </foreach>
+        where id in
+        <foreach collection="list" item="tag" index="index"
+                 separator="," open="(" close=")">
+            #{tag.id}
+        </foreach>
+    </update>
     
 </mapper>
