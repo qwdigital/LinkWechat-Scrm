@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.linkwechat.common.utils.DateUtils;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
@@ -25,7 +26,7 @@ public class BaseEntity implements Serializable
 
     /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
+    private Date createTime=new Date();
 
     /** 更新者 */
     private String updateBy;
@@ -75,7 +76,12 @@ public class BaseEntity implements Serializable
 
     public void setCreateTime(Date createTime)
     {
-        this.createTime = createTime;
+        if(createTime==null){
+            this.createTime= DateUtils.getNowDate();
+        }else{
+            this.createTime = createTime;
+        }
+
     }
 
     public String getUpdateBy()

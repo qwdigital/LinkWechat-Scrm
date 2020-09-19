@@ -8,7 +8,7 @@ import lombok.Data;
  * @create: 2020-08-28 10:45
  **/
 @Data
-public class WeUserDto {
+public class WeUserDto extends WeResultDto{
 
     //成员头像的mediaid，通过素材管理接口上传图片获得的mediaid
     private String avatar_mediaid;

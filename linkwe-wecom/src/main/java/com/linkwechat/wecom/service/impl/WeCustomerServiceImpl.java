@@ -8,8 +8,10 @@ import cn.hutool.core.util.ArrayUtil;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.wecom.client.WeCustomerClient;
+import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.domain.dto.WeCustomerDto;
 import com.linkwechat.wecom.domain.dto.WeFollowUserDto;
+import com.linkwechat.wecom.domain.dto.WeUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.linkwechat.wecom.mapper.WeCustomerMapper;
@@ -31,6 +33,10 @@ public class WeCustomerServiceImpl implements IWeCustomerService
 
     @Autowired
     private WeCustomerClient weFollowUserClient;
+
+
+    @Autowired
+    private WeUserClient weUserClient;
 
     /**
      * 查询企业微信客户
@@ -132,12 +138,16 @@ public class WeCustomerServiceImpl implements IWeCustomerService
                         //获取指定客户的详情
                         WeCustomerDto externalContact = weFollowUserClient.get(v);
 
-                        if(WeConstans.WE_SUCCESS_CODE.equals(externalContact.getErrcode())
-                        && null != externalContact.getExternal_contact()){
+                        if(WeConstans.WE_SUCCESS_CODE.equals(externalContact.getErrcode())){
 
-                            //分装成需要入库的数据格式
+                            WeCustomer weCustomer
+                                    = externalContact.transformWeCustomer();
 
-
+                            WeUserDto weUserDto
+                                    = weUserClient.getUserByUserId(weCustomer.getUserId());
+                            if(WeConstans.WE_SUCCESS_CODE.equals(weUserDto.getErrcode())){
+                                weCustomer.setName(weUserDto.getName());
+                            }
 
 
                         }

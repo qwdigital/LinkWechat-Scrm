@@ -58,4 +58,20 @@ public interface WeTagMapper
      * @return 结果
      */
     public int deleteWeTagByIds(Long[] ids);
+
+
+    /**
+     * 批量插入标签
+     * @param weTags
+     * @return
+     */
+    public int batchInsetWeTag(List<WeTag> weTags);
+
+
+    /**
+     * 标签批量更新
+     * @param weTags
+     * @return
+     */
+    public int batchUpdateWeTag(List<WeTag> weTags);
 }

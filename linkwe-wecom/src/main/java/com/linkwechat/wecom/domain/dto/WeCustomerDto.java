@@ -1,5 +1,9 @@
 package com.linkwechat.wecom.domain.dto;
 
+import cn.hutool.core.collection.CollectionUtil;
+import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.bean.BeanUtils;
+import com.linkwechat.wecom.domain.WeCustomer;
 import lombok.Data;
 
 import java.util.List;
@@ -24,7 +28,7 @@ public class WeCustomerDto extends WeResultDto{
 
 
     @Data
-    class ExternalContact{
+    public class ExternalContact{
         /** 外部联系人userId */
         private String external_userid;
         /** 外部联系人名称 */
@@ -55,6 +59,32 @@ public class WeCustomerDto extends WeResultDto{
         private String remark_company;
         private String[] remark_mobiles;
         private String remark_pic_mediaid;
+    }
+
+
+    public WeCustomer transformWeCustomer(){
+        WeCustomer weCustomer=new WeCustomer();
+
+        if(null != external_contact){
+            BeanUtils.copyPropertiesignoreOther(external_contact,weCustomer);
+        }
+
+        if(CollectionUtil.isNotEmpty(follow_user)){
+            WeFollowUserDto weFollowUserDto = follow_user.get(0);
+
+           weCustomer.setUserId(weFollowUserDto.getUserid());
+           weCustomer.setDescription(weFollowUserDto.getDescription());
+           weCustomer.setRemarkMobiles(StringUtils.join(weFollowUserDto.getRemark_mobiles(),","));
+//           weCustomer.setAddWay();
+
+
+        }
+
+
+
+
+
+        return weCustomer;
     }
 
 

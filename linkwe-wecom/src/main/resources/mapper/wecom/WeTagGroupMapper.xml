@@ -8,24 +8,34 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="id"    column="id"    />
         <result property="gourpName"    column="gourp_name"    />
         <result property="createTime"    column="create_time"    />
-        <result property="order"    column="order"    />
+        <collection property="weTags" column="weTags.id" ofType="com.linkwechat.wecom.domain.WeTag">
+            <id property="id" column="tagId"/>
+            <result property="groupId"    column="group_id"    />
+            <result property="name"    column="name"    />
+        </collection>
     </resultMap>
 
     <sql id="selectWeTagGroupVo">
-        select id, gourp_name, create_time, order from we_tag_group
+        select id, gourp_name, create_time from we_tag_group
     </sql>
 
     <select id="selectWeTagGroupList" parameterType="WeTagGroup" resultMap="WeTagGroupResult">
-        <include refid="selectWeTagGroupVo"/>
-        <where>  
-            <if test="gourpName != null  and gourpName != ''"> and gourp_name like concat('%', #{gourpName}, '%')</if>
-            <if test="order != null "> and order = #{order}</if>
-        </where>
+        SELECT
+           wtg.*,
+           wt.id as tagId,
+           wt.group_id,
+           wt.name
+        FROM
+          we_tag_group wtg
+        INNER JOIN we_tag wt ON wtg.id = wt.group_id
+        where
+          wtg.status=0 and wt.status=0
+        <if test="gourpName != null  and gourpName != ''"> and gourp_name like concat('%', #{gourpName}, '%')</if>
     </select>
     
     <select id="selectWeTagGroupById" parameterType="Long" resultMap="WeTagGroupResult">
         <include refid="selectWeTagGroupVo"/>
-        where id = #{id}
+        where id = #{id} and status=0
     </select>
         
     <insert id="insertWeTagGroup" parameterType="WeTagGroup">
@@ -34,13 +44,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="id != null">id,</if>
             <if test="gourpName != null">gourp_name,</if>
             <if test="createTime != null">create_time,</if>
-            <if test="order != null">order,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
             <if test="gourpName != null">#{gourpName},</if>
             <if test="createTime != null">#{createTime},</if>
-            <if test="order != null">#{order},</if>
          </trim>
     </insert>
 
@@ -49,7 +57,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <trim prefix="SET" suffixOverrides=",">
             <if test="gourpName != null">gourp_name = #{gourpName},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
-            <if test="order != null">order = #{order},</if>
         </trim>
         where id = #{id}
     </update>
@@ -58,11 +65,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         delete from we_tag_group where id = #{id}
     </delete>
 
-    <delete id="deleteWeTagGroupByIds" parameterType="String">
-        delete from we_tag_group where id in 
+    <update id="deleteWeTagGroupByIds" parameterType="String">
+        update we_tag_group set status=1
+        where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
-    </delete>
+    </update>
+
     
 </mapper>
