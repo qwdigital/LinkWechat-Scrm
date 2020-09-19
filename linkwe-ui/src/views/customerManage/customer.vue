@@ -68,14 +68,14 @@
           @click="dialogVisible = true"
         >打标签</el-button>
         <el-button type="primary" size="mini" icon="el-icon-brush">移除标签</el-button>
-        <el-button type="primary" size="mini" icon="el-icon-refresh">同步客户</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-refresh" @click="sync">同步客户</el-button>
         <el-button type="primary" size="mini" icon="el-icon-view">查看重复客户</el-button>
       </div>
     </div>
 
     <el-table
       ref="multipleTable"
-      :data="tableData"
+      :data="list"
       tooltip-effect="dark"
       style="width: 100%"
       @selection-change="handleSelectionChange"
@@ -149,19 +149,26 @@
 </template>
 
 <script>
+import * as api from "@/api/customer";
+
 export default {
   name: "Customer",
   components: {},
   props: {},
   data() {
     return {
+      query: {
+        pageNum: 1,
+        pageSize: 10,
+      },
+      loading: false,
       isMoreFilter: false,
       total: 0,
       form: {
         user: "",
         region: "",
       },
-      tableData: [],
+      list: [],
       multipleSelection: [],
       dialogVisible: false,
       labelSelect: [],
@@ -192,10 +199,32 @@ export default {
   watch: {},
   computed: {},
   created() {},
-  mounted() {
-    this.$nextTick;
-  },
+  mounted() {},
   methods: {
+    getList(page) {
+      // console.log(this.dateRange);
+      if (this.dateRange[0]) {
+        this.query.beginTime = this.dateRange[0];
+        this.query.endTime = this.dateRange[1];
+      }
+      page && (this.query.pageNum = page);
+      this.loading = true;
+      api
+        .getList(this.query)
+        .then(({ rows, total }) => {
+          this.list = rows;
+          this.total = +total;
+          this.loading = false;
+        })
+        .catch(() => {
+          this.loading = false;
+        });
+    },
+    sync() {
+      api.sync().then(() => {
+        this.msgSuccess("操作成功");
+      });
+    },
     submitForm(formName) {
       this.$refs["form"].validate((valid) => {
         if (valid) {

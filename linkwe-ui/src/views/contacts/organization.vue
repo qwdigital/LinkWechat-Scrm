@@ -128,7 +128,7 @@
                 v-if="scope.row.userId !== 1"
                 size="mini"
                 type="text"
-                icon="el-icon-delete"
+                icon="el-icon-close-notification"
                 @click="startOrStop(scope.row)"
                 v-hasPermi="['system:user:remove']"
               >{{scope.row.enable == 1 ? '禁用' : '启用'}}</el-button>
@@ -207,8 +207,7 @@
                 v-model="form.department"
                 :options="treeData"
                 :show-all-levels="false"
-                :props="{ expandTrigger: 'hover', checkStrictly: true, multiple: true, emitPath: false, value: 'id', label: 'name' }"
-                @change="handleChange"
+                :props="{ expandTrigger: 'hover', checkStrictly: true,/** multiple: true,*/ emitPath: false, value: 'id', label: 'name' }"
               ></el-cascader>
             </el-form-item>
             <el-form-item label="职位">
@@ -326,8 +325,12 @@ export default {
       },
       form: {},
       dialogVisible: false,
+      disabled: false,
       loading: false,
       pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        },
         shortcuts: [
           {
             text: "最近一周",
@@ -368,7 +371,7 @@ export default {
       },
       totalImg: 0,
       // 表单校验
-      rules: {
+      rules: Object.freeze({
         name: [{ required: true, message: "必填项", trigger: "blur" }],
         userId: [{ required: true, message: "必填项", trigger: "blur" }],
         department: [{ required: true, message: "必填项", trigger: "blur" }],
@@ -390,7 +393,7 @@ export default {
             trigger: "blur",
           },
         ],
-      },
+      }),
     };
   },
   watch: {},
@@ -407,7 +410,7 @@ export default {
       });
     },
     getList(page) {
-      console.log(this.dateRange);
+      // console.log(this.dateRange);
       if (this.dateRange[0]) {
         this.query.beginTime = this.dateRange[0];
         this.query.endTime = this.dateRange[1];
@@ -418,7 +421,7 @@ export default {
         .getList(this.query)
         .then(({ rows, total }) => {
           this.userList = rows;
-          this.total = total;
+          this.total = +total;
           this.loading = false;
         })
         .catch(() => {

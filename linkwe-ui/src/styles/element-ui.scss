@@ -1,5 +1,6 @@
 // cover some element-ui styles
 .top-search {
+
   .el-input,
   .el-select {
     width: 220px;
@@ -10,14 +11,8 @@
   }
 }
 
-.el-button {
-  &:first-of-type {
-    margin-left: 10px;
-  }
-
-  &:first-child {
-    margin-left: 0;
-  }
+.el-tag+.el-tag {
+  margin-left: 10px;
 }
 
 .el-breadcrumb__inner,
@@ -33,12 +28,6 @@
 
 .el-upload__input {
   display: none;
-}
-
-.cell {
-  .el-tag {
-    margin-right: 0px;
-  }
 }
 
 .small-padding {
