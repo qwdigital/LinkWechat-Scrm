@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service;
 
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
 
 import java.util.List;
 
@@ -70,5 +71,11 @@ public interface IWeUserService
     public int startOrStop(Long id,Boolean enable);
 
 
+    /**
+     * 离职员工
+     * @param weLeaveUserVo
+     * @return
+     */
+    List<WeLeaveUserVo> leaveUserList(WeLeaveUserVo weLeaveUserVo);
 
 }

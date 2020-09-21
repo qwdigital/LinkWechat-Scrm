@@ -151,5 +151,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
 
+    <select id="leaveUserList" parameterType="leaveUser" resultType="com.linkwechat.wecom.domain.vo.WeLeaveUserVo">
+        SELECT
+        we.user_name,
+        we.department,
+        we.dimission_time,
+        count(case WHEN we.user_id=wfcr.user_id THEN 1 ELSE 0 END) as allocateCustomerNum,
+        count(case WHEN wg.group_leader_user_id=we.user_id THEN 1 ELSE 0 END) as allocateGroupNum
+        FROM
+        we_user we
+        INNER JOIN we_flower_customer_rel wfcr on we.user_id=wfcr.user_id
+        INNER JOIN we_group wg on wg.group_leader_user_id=we.user_id
+        <where>
+            <if test="userName != null and userName !=''">and wc.user_name=#{userName}</if>
+            <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
+                DATE_FORMAT(we.dimission_time,'%Y-%m-%d') BETWEEN #{beginTime}  AND #{endTime}
+            </if>
+            <if test="isActivate null ">and is_activate = #{isActivate}</if>
+        </where>
+    </select>
+
+
     
 </mapper>

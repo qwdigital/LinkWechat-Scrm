@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.mapper;
 
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
 
 import java.util.List;
 
@@ -61,4 +62,10 @@ public interface WeUserMapper
     public int deleteWeUserByIds(Long[] ids);
 
 
+    /**
+     * 离职员工
+     * @param weLeaveUserVo
+     * @return
+     */
+    List<WeLeaveUserVo> leaveUserList(WeLeaveUserVo weLeaveUserVo);
 }

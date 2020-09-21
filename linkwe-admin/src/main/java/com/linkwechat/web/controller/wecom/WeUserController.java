@@ -1,11 +1,14 @@
 package com.linkwechat.web.controller.wecom;
 
 import com.linkwechat.common.annotation.Log;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
+import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
 import com.linkwechat.wecom.service.IWeUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -93,6 +96,49 @@ public class WeUserController extends BaseController {
 
 
         return toAjax(weUserService.startOrStop(id,enable));
+    }
+
+
+    /**
+     * 离职等待分配
+     * @param weLeaveUserVo
+     * @return
+     */
+     @PreAuthorize("@ss.hasPermi('wecom:user:leaveUserAllocateList')")
+     @GetMapping({"/leaveUserAllocateList"})
+     public TableDataInfo leaveUserAllocateList(WeLeaveUserVo weLeaveUserVo) {
+       startPage();
+       weLeaveUserVo.setIsActivate(WeConstans.LEAVE_ALLOCATE_STATE);
+       List<WeLeaveUserVo> list = this.weUserService.leaveUserList(weLeaveUserVo);
+       return getDataTable(list);
+     }
+
+
+    /**
+     * 离职已分配
+     * @param weLeaveUserVo
+     * @return
+     */
+     @PreAuthorize("@ss.hasPermi('wecom:user:leaveUserNoAllocateList')")
+     @GetMapping({"/leaveUserNoAllocateList"})
+     public TableDataInfo leaveUserNoAllocateList(WeLeaveUserVo weLeaveUserVo) {
+        startPage();
+        weLeaveUserVo.setIsActivate(WeConstans.LEAVE_NO_ALLOCATE_STATE);
+        List<WeLeaveUserVo> list = this.weUserService.leaveUserList(weLeaveUserVo);
+        return getDataTable(list);
+     }
+
+
+    /**
+     * 离职分配
+     * @param weLeaveUserInfoAllocateVo
+     * @return
+     */
+     @PreAuthorize("@ss.hasPermi('wecom:user:allocateLeaveUserAboutData')")
+     @PutMapping({"/allocateLeaveUserAboutData"})
+     public AjaxResult allocateLeaveUserAboutData(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
+
+            return AjaxResult.success("离职分配成功");
     }
 
 

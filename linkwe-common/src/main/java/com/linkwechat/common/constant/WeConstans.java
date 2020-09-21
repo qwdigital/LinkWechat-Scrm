@@ -47,4 +47,15 @@ public class WeConstans {
      * 同步功能提示语
      */
     public static final String SYNCH_TIP="后台开始同步数据，请稍后关注进度";
+
+
+    /**
+     * 离职未分配
+     */
+    public static final Integer LEAVE_NO_ALLOCATE_STATE = 5;
+
+    /**
+     * 离职已分配分配
+     */
+    public static final Integer LEAVE_ALLOCATE_STATE = 6;
 }

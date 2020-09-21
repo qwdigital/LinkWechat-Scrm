@@ -5,6 +5,7 @@ import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
+import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
 import com.linkwechat.wecom.mapper.WeUserMapper;
 import com.linkwechat.wecom.service.IWeUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,6 +159,15 @@ public class WeUserServiceImpl implements IWeUserService
     }
 
 
+    /**
+     * 离职分配员工
+     * @param weLeaveUserVo
+     * @return
+     */
+    @Override
+    public List<WeLeaveUserVo> leaveUserList(WeLeaveUserVo weLeaveUserVo) {
+        return this.weUserMapper.leaveUserList(weLeaveUserVo);
+    }
 
 
 }
