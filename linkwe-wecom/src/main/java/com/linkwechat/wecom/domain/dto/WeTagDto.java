@@ -12,4 +12,5 @@ public class WeTagDto extends WeResultDto{
     private String group_name;
     private String tag_name;
     private Integer type;
+    private Long flower_customer_rel_id;
 }

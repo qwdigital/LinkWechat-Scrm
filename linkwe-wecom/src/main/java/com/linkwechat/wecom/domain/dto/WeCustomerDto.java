@@ -4,8 +4,10 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.wecom.domain.WeCustomer;
+import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -70,19 +72,19 @@ public class WeCustomerDto extends WeResultDto{
         }
 
         if(CollectionUtil.isNotEmpty(follow_user)){
-            WeFollowUserDto weFollowUserDto = follow_user.get(0);
-
-           weCustomer.setUserId(weFollowUserDto.getUserid());
-           weCustomer.setDescription(weFollowUserDto.getDescription());
-           weCustomer.setRemarkMobiles(StringUtils.join(weFollowUserDto.getRemark_mobiles(),","));
-//           weCustomer.setAddWay();
-
+            List<WeFlowerCustomerRel> weFlowerCustomerRels=new ArrayList<>();
+            List<WeTagDto> weTagDtos=new ArrayList<>();
+            follow_user.stream().forEach(k->{
+                WeFlowerCustomerRel weFlowerCustomerRel=new WeFlowerCustomerRel();
+                BeanUtils.copyPropertiesignoreOther(k,weFlowerCustomerRel);
+                weFlowerCustomerRels.add(weFlowerCustomerRel);
+                if(CollectionUtil.isNotEmpty(k.getTags())){
+                    k.getTags().stream().forEach(v->v.setFlower_customer_rel_id(k.getId()));
+                    weTagDtos.addAll(k.getTags());
+                }
+            });
 
         }
-
-
-
-
 
         return weCustomer;
     }

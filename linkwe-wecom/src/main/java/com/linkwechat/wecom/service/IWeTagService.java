@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service;
 
 import java.util.List;
 import com.linkwechat.wecom.domain.WeTag;
+import com.linkwechat.wecom.domain.dto.WeTagDto;
 
 /**
  * 企业微信标签Service接口
@@ -58,4 +59,13 @@ public interface IWeTagService
      * @return 结果
      */
     public int deleteWeTagById(Long id);
+
+
+    /**
+     * 来自企业微信传输实体添加标签
+     * @param weTagDto
+     * @return
+     */
+    public int insertWeTagFromWeTagDto(WeTagDto weTagDto);
+
 }

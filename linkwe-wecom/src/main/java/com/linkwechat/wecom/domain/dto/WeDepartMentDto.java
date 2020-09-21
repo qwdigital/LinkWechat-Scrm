@@ -26,7 +26,7 @@ public class WeDepartMentDto extends WeResultDto {
 
     public WeDepartMentDto(WeDepartment weDepartment){
 
-        WeDepartMentDto.DeartMentDto deartMentDto=new WeDepartMentDto().new DeartMentDto();
+        DeartMentDto deartMentDto=new WeDepartMentDto().new DeartMentDto();
         BeanUtils.copyPropertiesignoreOther(weDepartment,deartMentDto);
         department.add(deartMentDto);
     }

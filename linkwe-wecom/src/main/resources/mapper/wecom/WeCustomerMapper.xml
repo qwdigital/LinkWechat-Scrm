@@ -13,36 +13,82 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="gender"    column="gender"    />
         <result property="unionid"    column="unionid"    />
         <result property="birthday"    column="birthday"    />
-        <result property="userId"    column="user_id"    />
-        <result property="userName"    column="user_name"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="departmentName"    column="department_name"    />
-        <result property="description"    column="description"    />
-        <result property="remarkMobiles"    column="remark_mobiles"    />
-        <result property="remarkCorpName"    column="remark_corp_name"    />
+        <result property="corpName"    column="corp_name"    />
+        <result property="corpFullName"    column="corp_full_name"    />
+        <result property="position"    column="position"    />
+        <collection property="weFlowerCustomerRels" ofType="com.linkwechat.wecom.domain.WeFlowerCustomerRel">
+            <result property="id"    column="wfcrId"    />
+            <result property="userId"    column="user_id"    />
+            <result property="remark"    column="remark"    />
+            <result property="description"    column="description"    />
+            <result property="createTime"    column="create_time"    />
+            <result property="remarkCorpName"    column="remark_corp_name"    />
+            <result property="remarkMobiles"    column="remark_mobiles"    />
+            <result property="operUserid"    column="oper_userid"    />
+            <result property="addWay"    column="add_way"    />
+            <result property="state"    column="state"    />
+            <result property="customerId"    column="customer_id"    />
+            <collection property="weFlowerCustomerTagRels" ofType="com.linkwechat.wecom.domain.WeFlowerCustomerTagRel">
+                <result property="id"    column="tagRelid"    />
+                <result property="flowerCustomerRelId"    column="flower_customer_rel_id"    />
+                <result property="tagId"    column="tag_id"    />
+                <result property="createTime"    column="create_time"    />
+                <result property="tagName" column="tagName"/>
+            </collection>
+        </collection>
     </resultMap>
 
     <sql id="selectWeCustomerVo">
-        select id, external_userid, name, avatar, type, gender, unionid, birthday, user_id, user_name, create_time, department_name, description, remark_mobiles, remark_corp_name from we_customer
+        select id, external_userid, name, avatar, type, gender, unionid, birthday, corp_name, corp_full_name, position from we_customer
     </sql>
 
     <select id="selectWeCustomerList" parameterType="WeCustomer" resultMap="WeCustomerResult">
-        <include refid="selectWeCustomerVo"/>
-        <where>  
-            <if test="externalUserid != null  and externalUserid != ''"> and external_userid = #{externalUserid}</if>
-            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
-            <if test="avatar != null  and avatar != ''"> and avatar = #{avatar}</if>
-            <if test="type != null "> and type = #{type}</if>
-            <if test="gender != null "> and gender = #{gender}</if>
-            <if test="unionid != null  and unionid != ''"> and unionid = #{unionid}</if>
-            <if test="birthday != null "> and birthday = #{birthday}</if>
-            <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
-            <if test="userName != null  and userName != ''"> and user_name like concat('%', #{userName}, '%')</if>
-            <if test="departmentName != null  and departmentName != ''"> and department_name like concat('%', #{departmentName}, '%')</if>
-            <if test="description != null  and description != ''"> and description = #{description}</if>
-            <if test="remarkMobiles != null  and remarkMobiles != ''"> and remark_mobiles = #{remarkMobiles}</if>
-            <if test="remarkCorpName != null  and remarkCorpName != ''"> and remark_corp_name like concat('%', #{remarkCorpName}, '%')</if>
-        </where>
+        SELECT
+                wc.id,
+                wc.external_userid,
+                wc.`name`,
+                wc.avatar,
+                wc.type,
+                wc.gender,
+                wc.unionid,
+                wc.birthday,
+                wc.position,
+                wc.corp_name,
+                wc.corp_full_name,
+                wfcr.id as wfcrId,
+                wfcr.user_id,
+                wfcr.remark,
+                wfcr.description,
+                wfcr.create_time,
+                wfcr.remark_corp_name,
+                wfcr.remark_mobiles,
+                wfcr.oper_userid,
+                wfcr.add_way,
+                wfcr.state,
+                wfcr.customer_id,
+                wfcrf.id as tagRelid,
+                wfcrf.flower_customer_rel_id,
+                wfcrf.tag_id,
+                wfcrf.create_time,
+                wt.`name` as tagName
+        FROM
+        we_customer wc
+        INNER JOIN we_flower_customer_rel wfcr ON wc.id = wfcr.customer_id
+        INNER JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.flower_customer_rel_id = wfcr.id
+        INNER JOIN we_tag wt ON wt.id = wfcrf.tag_id
+<!--        <include refid="selectWeCustomerVo"/>-->
+<!--        <where>  -->
+<!--            <if test="externalUserid != null  and externalUserid != ''"> and external_userid = #{externalUserid}</if>-->
+<!--            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>-->
+<!--            <if test="avatar != null  and avatar != ''"> and avatar = #{avatar}</if>-->
+<!--            <if test="type != null "> and type = #{type}</if>-->
+<!--            <if test="gender != null "> and gender = #{gender}</if>-->
+<!--            <if test="unionid != null  and unionid != ''"> and unionid = #{unionid}</if>-->
+<!--            <if test="birthday != null "> and birthday = #{birthday}</if>-->
+<!--            <if test="corpName != null  and corpName != ''"> and corp_name like concat('%', #{corpName}, '%')</if>-->
+<!--            <if test="corpFullName != null  and corpFullName != ''"> and corp_full_name like concat('%', #{corpFullName}, '%')</if>-->
+<!--            <if test="position != null  and position != ''"> and position = #{position}</if>-->
+<!--        </where>-->
     </select>
     
     <select id="selectWeCustomerById" parameterType="Long" resultMap="WeCustomerResult">
@@ -61,13 +107,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="gender != null">gender,</if>
             <if test="unionid != null">unionid,</if>
             <if test="birthday != null">birthday,</if>
-            <if test="userId != null">user_id,</if>
-            <if test="userName != null">user_name,</if>
-            <if test="createTime != null">create_time,</if>
-            <if test="departmentName != null">department_name,</if>
-            <if test="description != null">description,</if>
-            <if test="remarkMobiles != null">remark_mobiles,</if>
-            <if test="remarkCorpName != null">remark_corp_name,</if>
+            <if test="corpName != null">corp_name,</if>
+            <if test="corpFullName != null">corp_full_name,</if>
+            <if test="position != null">position,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -78,13 +120,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="gender != null">#{gender},</if>
             <if test="unionid != null">#{unionid},</if>
             <if test="birthday != null">#{birthday},</if>
-            <if test="userId != null">#{userId},</if>
-            <if test="userName != null">#{userName},</if>
-            <if test="createTime != null">#{createTime},</if>
-            <if test="departmentName != null">#{departmentName},</if>
-            <if test="description != null">#{description},</if>
-            <if test="remarkMobiles != null">#{remarkMobiles},</if>
-            <if test="remarkCorpName != null">#{remarkCorpName},</if>
+            <if test="corpName != null">#{corpName},</if>
+            <if test="corpFullName != null">#{corpFullName},</if>
+            <if test="position != null">#{position},</if>
          </trim>
     </insert>
 
@@ -98,13 +136,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="gender != null">gender = #{gender},</if>
             <if test="unionid != null">unionid = #{unionid},</if>
             <if test="birthday != null">birthday = #{birthday},</if>
-            <if test="userId != null">user_id = #{userId},</if>
-            <if test="userName != null">user_name = #{userName},</if>
-            <if test="createTime != null">create_time = #{createTime},</if>
-            <if test="departmentName != null">department_name = #{departmentName},</if>
-            <if test="description != null">description = #{description},</if>
-            <if test="remarkMobiles != null">remark_mobiles = #{remarkMobiles},</if>
-            <if test="remarkCorpName != null">remark_corp_name = #{remarkCorpName},</if>
+            <if test="corpName != null">corp_name = #{corpName},</if>
+            <if test="corpFullName != null">corp_full_name = #{corpFullName},</if>
+            <if test="position != null">position = #{position},</if>
         </trim>
         where id = #{id}
     </update>

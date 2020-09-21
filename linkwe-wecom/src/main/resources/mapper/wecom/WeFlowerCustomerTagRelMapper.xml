@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeFlowerCustomerTagRelMapper">
+    
+    <resultMap type="WeFlowerCustomerTagRel" id="WeFlowerCustomerTagRelResult">
+        <result property="id"    column="id"    />
+        <result property="flowerCustomerRelId"    column="flower_customer_rel_id"    />
+        <result property="tagId"    column="tag_id"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectWeFlowerCustomerTagRelVo">
+        select id, flower_customer_rel_id, tag_id, create_time from we_flower_customer_tag_rel
+    </sql>
+
+    <select id="selectWeFlowerCustomerTagRelList" parameterType="WeFlowerCustomerTagRel" resultMap="WeFlowerCustomerTagRelResult">
+        <include refid="selectWeFlowerCustomerTagRelVo"/>
+        <where>  
+            <if test="flowerCustomerRelId != null "> and flower_customer_rel_id = #{flowerCustomerRelId}</if>
+            <if test="tagId != null "> and tag_id = #{tagId}</if>
+        </where>
+    </select>
+    
+    <select id="selectWeFlowerCustomerTagRelById" parameterType="Long" resultMap="WeFlowerCustomerTagRelResult">
+        <include refid="selectWeFlowerCustomerTagRelVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWeFlowerCustomerTagRel" parameterType="WeFlowerCustomerTagRel">
+        insert into we_flower_customer_tag_rel
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="flowerCustomerRelId != null">flower_customer_rel_id,</if>
+            <if test="tagId != null">tag_id,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="flowerCustomerRelId != null">#{flowerCustomerRelId},</if>
+            <if test="tagId != null">#{tagId},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWeFlowerCustomerTagRel" parameterType="WeFlowerCustomerTagRel">
+        update we_flower_customer_tag_rel
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="flowerCustomerRelId != null">flower_customer_rel_id = #{flowerCustomerRelId},</if>
+            <if test="tagId != null">tag_id = #{tagId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeFlowerCustomerTagRelById" parameterType="Long">
+        delete from we_flower_customer_tag_rel where id = #{id}
+    </delete>
+
+    <delete id="deleteWeFlowerCustomerTagRelByIds" parameterType="String">
+        delete from we_flower_customer_tag_rel where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+    <insert id="batchInsetWeFlowerCustomerTagRel" >
+        insert into we_flower_customer_tag_rel (id, flower_customer_rel_id, tag_id, create_time)
+        values
+        <foreach collection="list" item="tag" index="index" separator=",">
+            (#{tag.id},#{tag.flowerCustomerRelId},#{tag.tagId},#{tag.createTime})
+        </foreach>
+    </insert>
+    
+</mapper>

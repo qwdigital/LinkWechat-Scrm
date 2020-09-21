@@ -1,6 +1,8 @@
 package com.linkwechat.wecom.domain;
 
 import java.util.Date;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -50,20 +52,6 @@ public class WeCustomer extends BaseEntity
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthday;
 
-    /** 添加人员id */
-    private String userId;
-
-    /** 添加人员名称 */
-    private String userName;
-
-    /** 所在部门名称 */
-    private String departmentName;
-
-    /** 描述 */
-    private String description;
-
-    /** 客户备注的手机号码 */
-    private String remarkMobiles;
 
     /** 客户企业简称 */
     private String corpName;
@@ -74,9 +62,9 @@ public class WeCustomer extends BaseEntity
     /** 职位 */
     private String  position;
 
+    /** 添加人员 */
+    List<WeFlowerCustomerRel> weFlowerCustomerRels;
 
-    /** 客户来源 */
-    private String addWay;
 
 
 

@@ -9,9 +9,12 @@ import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.wecom.client.WeCustomerClient;
 import com.linkwechat.wecom.client.WeUserClient;
+import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
 import com.linkwechat.wecom.domain.dto.WeCustomerDto;
 import com.linkwechat.wecom.domain.dto.WeFollowUserDto;
 import com.linkwechat.wecom.domain.dto.WeUserDto;
+import com.linkwechat.wecom.service.IWeFlowerCustomerRelService;
+import com.linkwechat.wecom.service.IWeFlowerCustomerTagRelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.linkwechat.wecom.mapper.WeCustomerMapper;
@@ -37,6 +40,14 @@ public class WeCustomerServiceImpl implements IWeCustomerService
 
     @Autowired
     private WeUserClient weUserClient;
+
+
+    @Autowired
+    private IWeFlowerCustomerTagRelService iWeFlowerCustomerTagRelService;
+
+
+    @Autowired
+    private IWeFlowerCustomerRelService iWeFlowerCustomerRelService;
 
     /**
      * 查询企业微信客户
@@ -143,10 +154,18 @@ public class WeCustomerServiceImpl implements IWeCustomerService
                             WeCustomer weCustomer
                                     = externalContact.transformWeCustomer();
 
-                            WeUserDto weUserDto
-                                    = weUserClient.getUserByUserId(weCustomer.getUserId());
-                            if(WeConstans.WE_SUCCESS_CODE.equals(weUserDto.getErrcode())){
-                                weCustomer.setName(weUserDto.getName());
+                            if(null != weCustomer){
+
+                                this.insertWeCustomer(weCustomer);
+
+                                if(CollectionUtil.isNotEmpty(weCustomer.getWeFlowerCustomerRels())){
+
+                                    iWeFlowerCustomerRelService.batchInsetWeFlowerCustomerRel(weCustomer.getWeFlowerCustomerRels());
+
+                                    
+
+                                }
+
                             }
 
 

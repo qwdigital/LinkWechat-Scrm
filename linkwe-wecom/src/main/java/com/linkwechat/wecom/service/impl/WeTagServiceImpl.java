@@ -3,6 +3,7 @@ package com.linkwechat.wecom.service.impl;
 import java.util.List;
 
 import com.linkwechat.common.utils.DateUtils;
+import com.linkwechat.wecom.domain.dto.WeTagDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.linkwechat.wecom.mapper.WeTagMapper;
@@ -92,5 +93,25 @@ public class WeTagServiceImpl implements IWeTagService
     public int deleteWeTagById(Long id)
     {
         return weTagMapper.deleteWeTagById(id);
+    }
+
+
+    /**
+     * 来自weTagDto实体添加标签（该实体为获取客户时相关联系人下的实体）
+     * @param weTagDto
+     * @return
+     */
+    @Override
+    public int insertWeTagFromWeTagDto(WeTagDto weTagDto) {
+        //查询有无当前标签组，没有则创建一个标签组，同时创建该标签
+
+        //查询当前标签组+标签名校验查询当前标签，没有，则创建标签
+
+        //之后将标签体转化为关系入库
+
+
+
+
+        return 0;
     }
 }
