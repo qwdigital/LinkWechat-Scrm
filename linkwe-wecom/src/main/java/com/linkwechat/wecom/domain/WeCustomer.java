@@ -28,7 +28,7 @@ public class WeCustomer extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
-    private Long id= SnowFlakeUtil.nextId();;
+    private Long id= SnowFlakeUtil.nextId();
 
     /** 外部联系人的userid */
     private String externalUserid;

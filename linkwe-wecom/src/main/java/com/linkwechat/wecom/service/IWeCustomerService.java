@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service;
 
 import java.util.List;
 import com.linkwechat.wecom.domain.WeCustomer;
+import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 
 /**
  * 企业微信客户Service接口
@@ -65,4 +66,11 @@ public interface IWeCustomerService
      * @return
      */
     public void synchWeCustomer();
+
+
+    /**
+     * 分配离职员工客户
+     * @param weLeaveUserInfoAllocateVo
+     */
+    public void allocateWeCustomer(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo);
 }

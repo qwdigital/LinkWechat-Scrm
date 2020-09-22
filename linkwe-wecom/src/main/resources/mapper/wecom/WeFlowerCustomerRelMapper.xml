@@ -108,5 +108,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             (#{tag.id},#{tag.userId},#{tag.remark},#{tag.description},#{tag.createTime},#{tag.remarkCorpName},#{tag.remarkMobiles},#{tag.operUserid},#{tag.addWay},#{tag.state},#{tag.customerId})
         </foreach>
     </insert>
-    
+
+
+        <update id="batchLogicDeleteByIds" parameterType="String">
+            update we_flower_customer_rel set del_flag=2
+            where id in
+            <foreach item="id" collection="ids" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </update>
+
 </mapper>

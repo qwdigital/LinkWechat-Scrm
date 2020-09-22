@@ -103,4 +103,15 @@ public class WeFlowerCustomerRelServiceImpl implements IWeFlowerCustomerRelServi
     public int batchInsetWeFlowerCustomerRel(List<WeFlowerCustomerRel> WeFlowerCustomerRels) {
         return weFlowerCustomerRelMapper.batchInsetWeFlowerCustomerRel(WeFlowerCustomerRels);
     }
+
+
+    /**
+     * 批量逻辑删除
+     * @param ids
+     * @return
+     */
+    @Override
+    public int batchLogicDeleteByIds(List<Long> ids) {
+        return weFlowerCustomerRelMapper.batchLogicDeleteByIds(ids);
+    }
 }

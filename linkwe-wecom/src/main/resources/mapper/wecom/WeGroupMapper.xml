@@ -80,4 +80,20 @@
         </foreach>
     </delete>
 
+    <update id="batchLogicDeleteByIds" parameterType="String">
+        update we_group set del_flag=2
+        where id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <insert id="batchInsetWeGroup" >
+        insert into we_group (id, group_name, member_num, group_leader, create_time, notice, group_leader_user_id)
+        values
+        <foreach collection="weGroups" item="weGroup" index="index" separator=",">
+            (#{weGroup.id},#{weGroup.groupName},#{weGroup.memberNum},#{weGroup.groupLeader},#{weGroup.createTime},#{weGroup.notice},#{weGroup.groupLeaderUserId})
+        </foreach>
+    </insert>
+
 </mapper>

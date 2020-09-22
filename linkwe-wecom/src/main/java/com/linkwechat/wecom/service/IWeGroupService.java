@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service;
 
 import com.linkwechat.wecom.domain.WeGroup;
+import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 
 import java.util.List;
 
@@ -21,4 +22,10 @@ public interface IWeGroupService {
     int deleteWeGroupByIds(Long[] paramArrayOfLong);
 
     int deleteWeGroupById(Long paramLong);
+
+    int batchLogicDeleteByIds(List<Long> ids);
+
+    int batchInsetWeGroup(List<WeGroup> weGroups);
+
+    void allocateWeGroup(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo);
 }

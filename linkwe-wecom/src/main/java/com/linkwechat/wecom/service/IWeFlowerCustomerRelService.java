@@ -67,4 +67,13 @@ public interface IWeFlowerCustomerRelService
      * @return
      */
     public int batchInsetWeFlowerCustomerRel(List<WeFlowerCustomerRel> WeFlowerCustomerRels);
+
+
+
+    /**
+     * 批量逻辑删除
+     * @param ids
+     * @return
+     */
+    public int batchLogicDeleteByIds(List<Long> ids);
 }

@@ -6,18 +6,24 @@ import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
+import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
 import com.linkwechat.wecom.mapper.WeUserMapper;
+import com.linkwechat.wecom.service.IWeCustomerService;
 import com.linkwechat.wecom.service.IWeFlowerCustomerRelService;
+import com.linkwechat.wecom.service.IWeGroupService;
 import com.linkwechat.wecom.service.IWeUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 通讯录相关客户Service业务层处理
@@ -36,8 +42,13 @@ public class WeUserServiceImpl implements IWeUserService
     private WeUserClient weUserClient;
 
 
+
     @Autowired
-    private IWeFlowerCustomerRelService iWeFlowerCustomerRelService;
+    private IWeCustomerService iWeCustomerService;
+
+
+    @Autowired
+    private IWeGroupService iWeGroupService;
 
     /**
      * 查询通讯录相关客户
@@ -178,23 +189,23 @@ public class WeUserServiceImpl implements IWeUserService
         return this.weUserMapper.leaveUserList(weLeaveUserVo);
     }
 
+
+    /**
+     * 分配离职员工相关数据
+     * @param weLeaveUserInfoAllocateVo
+     */
     @Override
+    @Transactional(isolation= Isolation.DEFAULT,propagation= Propagation.REQUIRED,rollbackFor = Exception.class)
     public void allocateLeaveUserAboutData(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
 
-        List<WeFlowerCustomerRel> weFlowerCustomerRels = iWeFlowerCustomerRelService.selectWeFlowerCustomerRelList(WeFlowerCustomerRel.builder()
-                .userId(weLeaveUserInfoAllocateVo.getHandoverUserid())
-                .build());
-        if(CollectionUtil.isNotEmpty(weFlowerCustomerRels)){
-            //删除原有的
+        try {
+            //分配客户
+            iWeCustomerService.allocateWeCustomer(weLeaveUserInfoAllocateVo);
 
-            //保存新的
-            weFlowerCustomerRels.stream().forEach(k->{
-                k.setId(SnowFlakeUtil.nextId());
-                k.setUserId(weLeaveUserInfoAllocateVo.getTakeoverUserid());
-            });
-
-            //保存新
-
+            //分配群组
+            iWeGroupService.allocateWeGroup(weLeaveUserInfoAllocateVo);
+        }catch (Exception e){
+            throw new WeComException(e.getMessage());
         }
 
     }

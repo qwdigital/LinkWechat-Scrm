@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.domain;
 
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ public class WeCorpAccount extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
-    private Long id;
+    private Long id= SnowFlakeUtil.nextId();
 
     /** 企业名称 */
     @ApiModelProperty("企业名称")

@@ -2,17 +2,20 @@ package com.linkwechat.wecom.service.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.DateUtils;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.wecom.client.WeCustomerClient;
 import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
 import com.linkwechat.wecom.domain.dto.WeCustomerDto;
 import com.linkwechat.wecom.domain.dto.WeFollowUserDto;
 import com.linkwechat.wecom.domain.dto.WeUserDto;
+import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.service.IWeFlowerCustomerRelService;
 import com.linkwechat.wecom.service.IWeFlowerCustomerTagRelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service;
 import com.linkwechat.wecom.mapper.WeCustomerMapper;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.service.IWeCustomerService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 企业微信客户Service业务层处理
@@ -42,8 +46,7 @@ public class WeCustomerServiceImpl implements IWeCustomerService
     private WeUserClient weUserClient;
 
 
-    @Autowired
-    private IWeFlowerCustomerTagRelService iWeFlowerCustomerTagRelService;
+
 
 
     @Autowired
@@ -182,6 +185,31 @@ public class WeCustomerServiceImpl implements IWeCustomerService
     }
 
 
+    /**
+     * 分配离职员工客户
+     * @param weLeaveUserInfoAllocateVo
+     */
+    @Override
+    @Transactional
+    public void allocateWeCustomer(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
+
+        //分配客户
+        List<WeFlowerCustomerRel> weFlowerCustomerRels = iWeFlowerCustomerRelService.selectWeFlowerCustomerRelList(WeFlowerCustomerRel.builder()
+                .userId(weLeaveUserInfoAllocateVo.getHandoverUserid())
+                .build());
+        if(CollectionUtil.isNotEmpty(weFlowerCustomerRels)){
+            //删除原有的
+            iWeFlowerCustomerRelService.batchLogicDeleteByIds(weFlowerCustomerRels.stream().map(WeFlowerCustomerRel::getId).collect(Collectors.toList()));
+            //保存新的
+            weFlowerCustomerRels.stream().forEach(k->{
+                k.setId(SnowFlakeUtil.nextId());
+                k.setUserId(weLeaveUserInfoAllocateVo.getTakeoverUserid());
+            });
+            //保存新
+            iWeFlowerCustomerRelService.batchInsetWeFlowerCustomerRel(weFlowerCustomerRels);
+        }
+
+    }
 
 
 }

@@ -21,4 +21,8 @@ public interface WeGroupMapper {
     int deleteWeGroupById(Long paramLong);
 
     int deleteWeGroupByIds(Long[] paramArrayOfLong);
+
+    int batchLogicDeleteByIds(List<Long> ids);
+
+    int batchInsetWeGroup(List<WeGroup> weGroups);
 }
