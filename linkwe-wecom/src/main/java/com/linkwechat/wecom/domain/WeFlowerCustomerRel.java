@@ -2,7 +2,10 @@ package com.linkwechat.wecom.domain;
 
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -13,6 +16,9 @@ import java.util.List;
  * @date 2020-09-19
  */
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeFlowerCustomerRel extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
@@ -22,6 +28,9 @@ public class WeFlowerCustomerRel extends BaseEntity
 
     /** 添加了此外部联系人的企业成员userid */
     private String userId;
+
+    /** 外部联系人名称 */
+    private String userName;
 
 
     /** 该成员对此外部联系人的描述 */

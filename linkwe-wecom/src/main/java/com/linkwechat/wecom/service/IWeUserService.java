@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service;
 
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
 
 import java.util.List;
@@ -77,5 +78,12 @@ public interface IWeUserService
      * @return
      */
     List<WeLeaveUserVo> leaveUserList(WeLeaveUserVo weLeaveUserVo);
+
+
+    /**
+     * 离职分配
+     * @param weLeaveUserInfoAllocateVo
+     */
+    void allocateLeaveUserAboutData(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo);
 
 }

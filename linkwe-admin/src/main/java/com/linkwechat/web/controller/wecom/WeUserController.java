@@ -138,6 +138,8 @@ public class WeUserController extends BaseController {
      @PutMapping({"/allocateLeaveUserAboutData"})
      public AjaxResult allocateLeaveUserAboutData(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
 
+
+
             return AjaxResult.success("离职分配成功");
     }
 

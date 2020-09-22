@@ -1,12 +1,17 @@
 package com.linkwechat.wecom.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.wecom.client.WeUserClient;
+import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
+import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
 import com.linkwechat.wecom.mapper.WeUserMapper;
+import com.linkwechat.wecom.service.IWeFlowerCustomerRelService;
 import com.linkwechat.wecom.service.IWeUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +34,10 @@ public class WeUserServiceImpl implements IWeUserService
 
     @Autowired
     private WeUserClient weUserClient;
+
+
+    @Autowired
+    private IWeFlowerCustomerRelService iWeFlowerCustomerRelService;
 
     /**
      * 查询通讯录相关客户
@@ -167,6 +176,27 @@ public class WeUserServiceImpl implements IWeUserService
     @Override
     public List<WeLeaveUserVo> leaveUserList(WeLeaveUserVo weLeaveUserVo) {
         return this.weUserMapper.leaveUserList(weLeaveUserVo);
+    }
+
+    @Override
+    public void allocateLeaveUserAboutData(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
+
+        List<WeFlowerCustomerRel> weFlowerCustomerRels = iWeFlowerCustomerRelService.selectWeFlowerCustomerRelList(WeFlowerCustomerRel.builder()
+                .userId(weLeaveUserInfoAllocateVo.getHandoverUserid())
+                .build());
+        if(CollectionUtil.isNotEmpty(weFlowerCustomerRels)){
+            //删除原有的
+
+            //保存新的
+            weFlowerCustomerRels.stream().forEach(k->{
+                k.setId(SnowFlakeUtil.nextId());
+                k.setUserId(weLeaveUserInfoAllocateVo.getTakeoverUserid());
+            });
+
+            //保存新
+
+        }
+
     }
 
 

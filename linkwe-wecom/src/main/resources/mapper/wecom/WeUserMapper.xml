@@ -151,7 +151,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
 
-    <select id="leaveUserList" parameterType="leaveUser" resultType="com.linkwechat.wecom.domain.vo.WeLeaveUserVo">
+    <select id="leaveUserList" parameterType="WeLeaveUserVo" resultType="com.linkwechat.wecom.domain.vo.WeLeaveUserVo">
         SELECT
         we.user_name,
         we.department,
