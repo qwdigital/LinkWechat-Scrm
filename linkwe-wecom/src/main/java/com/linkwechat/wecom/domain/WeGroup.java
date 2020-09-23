@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.domain;
 
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

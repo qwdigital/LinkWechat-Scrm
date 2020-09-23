@@ -24,4 +24,7 @@ public class WeComeConfig {
 
     /** 需要使用外部联系人token的url*/
     private String[] needContactTokenUrl;
+
+    /** 文件上传url*/
+    private String[] fileUplodUrl;
 }

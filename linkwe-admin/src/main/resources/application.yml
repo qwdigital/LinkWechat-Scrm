@@ -129,3 +129,4 @@ wecome:
   weComePrefix: cgi-bin
   noAccessTokenUrl: /gettoken
   needContactTokenUrl: /externalcontact/get_follow_user_list
+  fileUplodUrl:  /media/upload,/media/uploadimg

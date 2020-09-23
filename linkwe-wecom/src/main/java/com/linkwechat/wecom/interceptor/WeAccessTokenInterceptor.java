@@ -38,8 +38,17 @@ public class WeAccessTokenInterceptor implements Interceptor{
     @Override
     public boolean beforeExecute(ForestRequest request) {
         request.setDataType(ForestDataType.JSON);
-        request.setContentType("application/json");
+
         String uri=request.getUrl().replace("http://","");
+
+        if(Arrays.asList(weComeConfig.getFileUplodUrl()).contains(uri)){
+            request.setContentType("application/json");
+        }else{
+            request.setContentType("multipart/form-data");
+        }
+
+
+
         // 添加请求参数access_token
         if(!weComeConfig.getNoAccessTokenUrl().equals(uri)){
             request.addQuery("access_token",
