@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.mapper;
 
 import com.linkwechat.wecom.domain.WeGroup;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public interface WeGroupMapper {
 
     int deleteWeGroupByIds(Long[] paramArrayOfLong);
 
-    int batchLogicDeleteByIds(List<Long> ids);
+    int batchLogicDeleteByIds(@Param("ids") List<Long> ids);
 
-    int batchInsetWeGroup(List<WeGroup> weGroups);
+    int batchInsetWeGroup(@Param("weGroups") List<WeGroup> weGroups);
 }

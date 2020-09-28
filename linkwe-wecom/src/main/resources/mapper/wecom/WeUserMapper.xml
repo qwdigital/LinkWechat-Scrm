@@ -153,21 +153,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="leaveUserList" parameterType="WeLeaveUserVo" resultType="com.linkwechat.wecom.domain.vo.WeLeaveUserVo">
         SELECT
-        we.user_name,
-        we.department,
-        we.dimission_time,
-        count(case WHEN we.user_id=wfcr.user_id THEN 1 ELSE 0 END) as allocateCustomerNum,
-        count(case WHEN wg.group_leader_user_id=we.user_id THEN 1 ELSE 0 END) as allocateGroupNum
+            we.user_name as userName,
+            we.department,
+            we.dimission_time as dimissionTime,
+            (SELECT count(wfcr.id) FROM we_flower_customer_rel wfcr WHERE wfcr.user_id=we.user_id) allocateCustomerNum,
+            (SELECT count(wg.id) FROM we_group wg WHERE wg.group_leader_user_id=we.user_id) allocateGroupNum
         FROM
         we_user we
-        INNER JOIN we_flower_customer_rel wfcr on we.user_id=wfcr.user_id
-        INNER JOIN we_group wg on wg.group_leader_user_id=we.user_id
         <where>
-            <if test="userName != null and userName !=''">and wc.user_name=#{userName}</if>
+            <if test="userName != null and userName !=''">and we.user_name=#{userName}</if>
             <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
                 DATE_FORMAT(we.dimission_time,'%Y-%m-%d') BETWEEN #{beginTime}  AND #{endTime}
             </if>
-            <if test="isActivate null ">and is_activate = #{isActivate}</if>
+            <if test="isActivate != null ">and we.is_activate = #{isActivate}</if>
         </where>
     </select>
 

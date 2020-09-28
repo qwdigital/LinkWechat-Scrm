@@ -2,6 +2,7 @@ package com.linkwechat.wecom.mapper;
 
 import java.util.List;
 import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 具有外部联系人功能企业员工也客户的关系Mapper接口
@@ -62,10 +63,10 @@ public interface WeFlowerCustomerRelMapper
 
     /**
      * 批量插入
-     * @param WeFlowerCustomerRels
+     * @param weFlowerCustomerRels
      * @return
      */
-    public int batchInsetWeFlowerCustomerRel(List<WeFlowerCustomerRel> WeFlowerCustomerRels);
+    public int batchInsetWeFlowerCustomerRel(@Param("weFlowerCustomerRels") List<WeFlowerCustomerRel> weFlowerCustomerRels);
 
 
     /**
@@ -73,5 +74,5 @@ public interface WeFlowerCustomerRelMapper
      * @param ids
      * @return
      */
-    public int batchLogicDeleteByIds(List<Long> ids);
+    public int batchLogicDeleteByIds(@Param("ids") List<Long> ids);
 }

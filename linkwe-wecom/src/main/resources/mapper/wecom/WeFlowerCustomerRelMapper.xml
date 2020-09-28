@@ -104,7 +104,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <insert id="batchInsetWeFlowerCustomerRel" >
         insert into we_flower_customer_rel (id, user_id, remark, description, create_time, remark_corp_name, remark_mobiles, oper_userid, add_way, state, customer_id)
         values
-        <foreach collection="list" item="tag" index="index" separator=",">
+        <foreach collection="weFlowerCustomerRels" item="tag" index="index" separator=",">
             (#{tag.id},#{tag.userId},#{tag.remark},#{tag.description},#{tag.createTime},#{tag.remarkCorpName},#{tag.remarkMobiles},#{tag.operUserid},#{tag.addWay},#{tag.state},#{tag.customerId})
         </foreach>
     </insert>

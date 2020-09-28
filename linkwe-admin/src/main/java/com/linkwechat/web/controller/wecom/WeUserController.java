@@ -100,7 +100,7 @@ public class WeUserController extends BaseController {
 
 
     /**
-     * 离职等待分配
+     * 离职已分配
      * @param weLeaveUserVo
      * @return
      */
@@ -115,7 +115,7 @@ public class WeUserController extends BaseController {
 
 
     /**
-     * 离职已分配
+     * 离职等待分配
      * @param weLeaveUserVo
      * @return
      */
@@ -136,9 +136,9 @@ public class WeUserController extends BaseController {
      */
      @PreAuthorize("@ss.hasPermi('wecom:user:allocateLeaveUserAboutData')")
      @PutMapping({"/allocateLeaveUserAboutData"})
-     public AjaxResult allocateLeaveUserAboutData(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
+     public AjaxResult allocateLeaveUserAboutData(@RequestBody WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
 
-
+         weUserService.allocateLeaveUserAboutData(weLeaveUserInfoAllocateVo);
 
             return AjaxResult.success("离职分配成功");
     }
