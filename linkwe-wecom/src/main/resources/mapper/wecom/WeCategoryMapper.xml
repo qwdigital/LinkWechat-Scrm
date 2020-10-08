@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeCategoryMapper">
+    <resultMap id="categoryMap" type="com.linkwechat.wecom.domain.WeCategory">
+        <id property="id" column="id"/>
+        <result property="mediaType" column="media_type"/>
+        <result property="name" column="name"/>
+        <result property="parentId" column="parent_id"/>
+    </resultMap>
+    <insert id="insertWeCategory">
+        INSERT INTO we_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="mediaType != null">media_type,</if>
+            <if test="name != null">name,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="mediaType != null">#{mediaType},</if>
+            <if test="name != null">#{name},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+    <update id="updateWeCategory">
+        UPDATE we_category
+        <trim prefix="set" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="mediaType != null">media_type,</if>
+            <if test="name != null">name,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <where>
+            id=#{id}
+        </where>
+    </update>
+    <delete id="deleteWeCategoryById">
+        UPDATE we_category
+        set del_flag=1
+        <where>
+            id=#{id}
+        </where>
+    </delete>
+    <delete id="deleteWeCategoryByIds">
+        UPDATE we_category
+        set del_flag=1
+        <where>
+            id in
+            <foreach collection="array" open="(" close=")" item="item" separator=",">
+                #{item}
+            </foreach>
+        </where>
+    </delete>
+    <select id="findWeCategoryByMediaType" resultType="com.linkwechat.wecom.domain.WeCategory">
+        SELECT
+        <include refid="categoryVo"/>
+        FROM we_category
+        <where>
+            media_type=#{mediaType} and del_flag=0
+        </where>
+    </select>
+    <select id="findWeCategoryById" resultType="com.linkwechat.wecom.domain.WeCategory">
+        SELECT
+        <include refid="categoryVo"/>
+        FROM we_category
+        <where>
+            id=#{id} and del_flag=0
+        </where>
+    </select>
+    <select id="findWeCategoryByMediaTypeAndName" resultType="com.linkwechat.wecom.domain.WeCategory">
+        SELECT
+        <include refid="categoryVo"/>
+        FROM we_category
+        <where>
+            media_type=#{mediaType} and del_flag=0 and `name`=#{name}
+        </where>
+    </select>
+    <sql id="categoryVo">
+        id,media_type,parent_id,`name`
+    </sql>
+</mapper>

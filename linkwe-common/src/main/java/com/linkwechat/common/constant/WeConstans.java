@@ -16,7 +16,7 @@ public class WeConstans {
     /**
      * 获取外部联系人相关 token
      */
-    public static final String WE_CONTACT_ACCESS_TOKEN="we_contact_access_token";
+    public static final String WE_CONTACT_ACCESS_TOKEN = "we_contact_access_token";
 
 
     /**
@@ -34,19 +34,19 @@ public class WeConstans {
     /**
      * 企业微信通讯录用户启用
      */
-    public static  final Integer WE_USER_START= 1;
+    public static final Integer WE_USER_START = 1;
 
 
     /**
      * 企业微信通讯录用户停用
      */
-    public static  final Integer WE_USER_STOP= 0;
+    public static final Integer WE_USER_STOP = 0;
 
 
     /**
      * 同步功能提示语
      */
-    public static final String SYNCH_TIP="后台开始同步数据，请稍后关注进度";
+    public static final String SYNCH_TIP = "后台开始同步数据，请稍后关注进度";
 
 
     /**
@@ -58,4 +58,11 @@ public class WeConstans {
      * 离职已分配分配
      */
     public static final Integer LEAVE_ALLOCATE_STATE = 6;
+
+
+    /**
+     * 企业微信素材目录根id
+     */
+    public static final Integer WE_ROOT_CATEGORY_ID = 0;
+
 }
