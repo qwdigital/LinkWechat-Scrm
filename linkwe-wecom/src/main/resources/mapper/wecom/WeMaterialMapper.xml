@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeMaterialMapper">
+
+    <resultMap id="materialMap" type="com.linkwechat.wecom.domain.WeMaterial">
+        <id property="id" column="id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="materialUrl" column="material_url"/>
+        <result property="content" column="content"/>
+        <result property="materialName" column="material_name"/>
+        <result property="digest" column="digest"/>
+        <result property="materialMediaId" column="material_media_id"/>
+        <result property="materialCreatedAt" column="material_created_at"/>
+        <result property="coverMediaId" column="cover_media_id"/>
+        <result property="coverCreatedAt" column="cover_created_at"/>
+        <result property="coverUrl" column="cover_url"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <insert id="insertWeMaterial">
+        INSERT INTO
+        we_material
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">
+                id,
+            </if>
+            <if test="categoryId!=null">
+                category_id,
+            </if>
+            <if test="materialUrl!=null">
+                material_url,
+            </if>
+            <if test="content!=null">
+                content,
+            </if>
+            <if test="materialName!=null">
+                material_name,
+            </if>
+            <if test="digest!=null">
+                digest,
+            </if>
+            <if test="materialMediaId!=null">
+                material_media_id,
+            </if>
+            <if test="materialCreatedAt!=null">
+                material_created_at,
+            </if>
+            <if test="coverMediaId!=null">
+                cover_media_id,
+            </if>
+            <if test="coverCreatedAt!=null">
+                cover_created_at,
+            </if>
+            <if test="coverUrl!=null">
+                cover_url,
+            </if>
+            <if test="createBy!=null">
+                create_by,
+            </if>
+            <if test="createTime!=null">
+                create_time,
+            </if>
+            <if test="updateBy!=null">
+                update_by,
+            </if>
+            <if test="updateTime!=null">
+                update_time
+            </if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">
+                #{id},
+            </if>
+            <if test="categoryId!=null">
+                #{categoryId},
+            </if>
+            <if test="materialUrl!=null">
+                #{materialUrl},
+            </if>
+            <if test="content!=null">
+                #{content},
+            </if>
+            <if test="materialName!=null">
+                #{materialName},
+            </if>
+            <if test="digest!=null">
+                #{digest},
+            </if>
+            <if test="materialMediaId!=null">
+                #{materialMediaId},
+            </if>
+            <if test="materialCreatedAt!=null">
+                #{materialCreatedAt},
+            </if>
+            <if test="coverMediaId!=null">
+                #{coverMediaId},
+            </if>
+            <if test="coverCreatedAt!=null">
+                #{coverCreatedAt},
+            </if>
+            <if test="coverUrl!=null">
+                #{coverUrl},
+            </if>
+            <if test="createBy!=null">
+                #{createBy},
+            </if>
+            <if test="createTime!=null">
+                #{createTime},
+            </if>
+            <if test="updateBy!=null">
+                #{updateBy},
+            </if>
+            <if test="updateTime!=null">
+                #{updateTime}
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateWeMaterial">
+        update we_material set
+        <if test="id!=null">
+            id=#{id},
+        </if>
+        <if test="categoryId!=null">
+            category_id=#{categoryId},
+        </if>
+        <if test="materialUrl!=null">
+            material_url=#{materialUrl},
+        </if>
+        <if test="content!=null">
+            content=#{content},
+        </if>
+        <if test="materialName!=null">
+            material_name=#{materialName},
+        </if>
+        <if test="digest!=null">
+            digest=#{digest},
+        </if>
+        <if test="materialMediaId!=null">
+            material_media_id=#{materialMediaId},
+        </if>
+        <if test="materialCreatedAt!=null">
+            material_created_at=#{materialCreatedAt},
+        </if>
+        <if test="coverMediaId!=null">
+            cover_media_id=#{coverMediaId},
+        </if>
+        <if test="coverCreatedAt!=null">
+            cover_created_at=#{coverCreatedAt},
+        </if>
+        <if test="coverUrl!=null">
+            cover_url=#{coverUrl},
+        </if>
+        <if test="createBy!=null">
+            create_by=#{createBy},
+        </if>
+        <if test="createTime!=null">
+            create_time=#{createTime},
+        </if>
+        <if test="updateBy!=null">
+            update_by=#{updateBy},
+        </if>
+        <if test="updateTime!=null">
+            update_time=#{updateTime}
+        </if>
+    </update>
+
+    <delete id="deleteWeMaterialById">
+        UPDATE we_material
+        set del_flag=1
+        <where>
+            id=#{id}
+        </where>
+    </delete>
+
+    <delete id="deleteWeMaterialByIds">
+        UPDATE we_material
+        set del_flag=1
+        <where>
+            id in
+            <foreach collection="array" open="(" close=")" item="item" separator=",">
+                #{item}
+            </foreach>
+        </where>
+    </delete>
+
+    <select id="findWeMaterialById" resultMap="materialMap">
+        SELECT
+        <include refid="material"/>
+        FROM we_material
+        <where>
+            del_flag=0 and id=#{id}
+        </where>
+    </select>
+
+    <select id="findWeMaterials" resultMap="materialMap">
+        SELECT
+        <include refid="material"/>
+        FROM we_material
+        <where>
+            del_flag=0
+            <if test="categoryId!=null and categoryId!=''">
+                AND category_id=#{categoryId}
+            </if>
+            <if test="search!=null and search!=''">
+                AND (material_name LIKE CONCAT('%',#{search},'%') OR content LIKE CONCAT('%',#{search},'%'))
+            </if>
+        </where>
+    </select>
+
+    <sql id="material">
+        id,category_id,material_url,content,material_name,digest,material_media_id,material_created_at,cover_media_id,cover_created_at,cover_url,create_by,create_time,update_by,update_time
+    </sql>
+
+</mapper>
