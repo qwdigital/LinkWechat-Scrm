@@ -77,7 +77,7 @@ export const constantRoutes = [
         path: 'groupDetail',
         hidden: true,
         component: (resolve) => require(['@/views/customerManage/groupDetail'], resolve),
-        meta: { hidden: true, title: '客户群', icon: '' }
+        meta: { hidden: true, title: '客户群', icon: '', activeMenu: '/customerManage/group' }
       },
       {
         path: 'tag',
@@ -113,68 +113,68 @@ export const constantRoutes = [
   //     },
   //   ]
   // },
-  // {
-  //   path: '/drainageCode',
-  //   component: Layout,
-  //   redirect: '/drainageCode/staff',
-  //   meta: { title: '引流码', icon: 'qrcode' },
-  //   children: [
-  //     {
-  //       path: 'staff',
-  //       name: 'CodeStaff',
-  //       component: (resolve) => require(['@/views/drainageCode/staff/list'], resolve),
-  //       meta: { title: '员工活码', icon: '' }
-  //     },
-  //     {
-  //       path: 'staffAdd',
-  //       hidden: true,
-  //       component: (resolve) => require(['@/views/drainageCode/staff/add'], resolve),
-  //       meta: { title: '新建员工活码', icon: '' }
-  //     },
-  //     {
-  //       path: 'staffDetail',
-  //       hidden: true,
-  //       component: (resolve) => require(['@/views/drainageCode/staff/detail'], resolve),
-  //       meta: { title: '员工活码详情', icon: '' }
-  //     },
-  //     {
-  //       path: 'group',
-  //       name: 'CodeGroup',
-  //       component: (resolve) => require(['@/views/drainageCode/group/list'], resolve),
-  //       meta: { title: '客户群活码', icon: '' }
-  //     },
-  //     {
-  //       path: 'groupAdd',
-  //       hidden: true,
-  //       component: (resolve) => require(['@/views/drainageCode/group/add'], resolve),
-  //       meta: { title: '新增客户群活码', icon: '' }
-  //     },
-  //     {
-  //       path: 'groupDetail',
-  //       hidden: true,
-  //       component: (resolve) => require(['@/views/drainageCode/group/detail'], resolve),
-  //       meta: { title: '客户群活码信息', icon: '' }
-  //     },
-  //     {
-  //       path: 'groupBaseInfo',
-  //       hidden: true,
-  //       component: (resolve) => require(['@/views/drainageCode/group/baseInfo'], resolve),
-  //       meta: { title: '客户群活码', icon: '' }
-  //     },
-  //     {
-  //       path: 'welcome',
-  //       name: 'Welcome',
-  //       component: (resolve) => require(['@/views/drainageCode/welcome/list'], resolve),
-  //       meta: { title: '欢迎语', icon: '' }
-  //     },
-  //     {
-  //       path: 'welcomeAdd',
-  //       hidden: true,
-  //       component: (resolve) => require(['@/views/drainageCode/welcome/add'], resolve),
-  //       meta: { title: '新建欢迎语', icon: '' }
-  //     },
-  //   ]
-  // },
+  {
+    path: '/drainageCode',
+    component: Layout,
+    redirect: '/drainageCode/staff',
+    meta: { title: '引流码', icon: 'qrcode' },
+    children: [
+      {
+        path: 'staff',
+        name: 'CodeStaff',
+        component: (resolve) => require(['@/views/drainageCode/staff/list'], resolve),
+        meta: { title: '员工活码', icon: '' }
+      },
+      {
+        path: 'staffAdd',
+        hidden: true,
+        component: (resolve) => require(['@/views/drainageCode/staff/add'], resolve),
+        meta: { title: '新建员工活码', icon: '', activeMenu: '/drainageCode/staff' }
+      },
+      {
+        path: 'staffDetail',
+        hidden: true,
+        component: (resolve) => require(['@/views/drainageCode/staff/detail'], resolve),
+        meta: { title: '员工活码详情', icon: '', activeMenu: '/drainageCode/staff' }
+      },
+      {
+        path: 'group',
+        name: 'CodeGroup',
+        component: (resolve) => require(['@/views/drainageCode/group/list'], resolve),
+        meta: { title: '客户群活码', icon: '' }
+      },
+      {
+        path: 'groupAdd',
+        hidden: true,
+        component: (resolve) => require(['@/views/drainageCode/group/add'], resolve),
+        meta: { title: '新增客户群活码', icon: '', activeMenu: '/drainageCode/group' }
+      },
+      {
+        path: 'groupDetail',
+        hidden: true,
+        component: (resolve) => require(['@/views/drainageCode/group/detail'], resolve),
+        meta: { title: '客户群活码信息', icon: '', activeMenu: '/drainageCode/group' }
+      },
+      {
+        path: 'groupBaseInfo',
+        hidden: true,
+        component: (resolve) => require(['@/views/drainageCode/group/baseInfo'], resolve),
+        meta: { title: '客户群活码', icon: '', activeMenu: '/drainageCode/group' }
+      },
+      {
+        path: 'welcome',
+        name: 'Welcome',
+        component: (resolve) => require(['@/views/drainageCode/welcome/list'], resolve),
+        meta: { title: '欢迎语', icon: '' }
+      },
+      {
+        path: 'welcomeAdd',
+        hidden: true,
+        component: (resolve) => require(['@/views/drainageCode/welcome/add'], resolve),
+        meta: { title: '新建欢迎语', icon: '', activeMenu: '/drainageCode/welcome' }
+      },
+    ]
+  },
   // {
   //   path: '/material',
   //   component: Layout,

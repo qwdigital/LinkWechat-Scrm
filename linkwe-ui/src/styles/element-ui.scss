@@ -1,13 +1,20 @@
 // cover some element-ui styles
+
+.el-button {
+  [class^="el-icon-"], [class*=" el-icon-"] {
+    vertical-align: top;
+  }
+}
+
 .top-search {
 
   .el-input,
   .el-select {
-    width: 220px;
+    width: 240px;
   }
 
   .el-date-editor--daterange.el-input__inner {
-    width: 260px;
+    width: 240px;
   }
 }
 

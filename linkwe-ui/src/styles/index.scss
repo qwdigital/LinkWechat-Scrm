@@ -4,6 +4,34 @@
 @import './element-ui.scss';
 @import './sidebar.scss';
 
+::-webkit-scrollbar {
+  /*滚动条整体样式*/
+  width: 10px;
+  /*高宽分别对应横竖滚动条的尺寸*/
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  /*滚动条里面小方块*/
+  border-radius: 10px;
+  /*深色模式*/
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  background: #eee;
+
+  /*浅色模式*/
+  /*-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+  background: rgb(245, 245, 245);
+  border: 1px solid #333;
+  border-bottom-width: 2px;*/
+}
+
+// ::-webkit-scrollbar-track {
+//   /*滚动条里面轨道*/
+//   -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+//   border-radius: 10px;
+//   background: #eee;
+// }
+
 #app {
   height: 100%;
 }

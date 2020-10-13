@@ -1,8 +1,10 @@
 <script>
 import * as api from "@/api/customer/tag";
+import AddTag from "./components/AddTag";
 
 export default {
   name: "CustomerTag",
+  components: { AddTag },
   data() {
     return {
       query: {
@@ -64,48 +66,12 @@ export default {
         });
     },
     edit(data, type) {
-      this.form = Object.assign({ weTags: [] }, data || {});
+      this.form = JSON.parse(
+        JSON.stringify(Object.assign({ weTags: [] }, data || {}))
+      );
       this.dialogVisible = true;
     },
-    closeTag(tag, index) {
-      if (tag.id) {
-        tag.status = 1;
-      } else {
-        this.form.weTags.splice(index, 1);
-      }
-    },
 
-    showInput() {
-      this.newInputVisible = true;
-      this.$nextTick((_) => {
-        this.$refs.saveTagInput.$refs.input.focus();
-      });
-    },
-
-    newInputConfirm() {
-      let name = this.newInput;
-      if (name) {
-        this.form.weTags.push({ name });
-      }
-      this.newInputVisible = false;
-      this.newInput = "";
-    },
-    submit() {
-      this.$refs["form"].validate((valid) => {
-        if (this.form.weTags.length) {
-        }
-        let form = JSON.parse(JSON.stringify(this.form));
-        api[form.id ? "update" : "add"](form)
-          .then(() => {
-            this.msgSuccess("操作成功");
-            this.dialogVisible = false;
-            this.getList(!this.form.id && 1);
-          })
-          .catch(() => {
-            this.dialogVisible = false;
-          });
-      });
-    },
     sync() {},
     // 操作日志状态字典翻译
     statusFormat(row, column) {
@@ -225,53 +191,7 @@ export default {
     </el-table>
 
     <!-- 弹窗 -->
-    <el-dialog
-      :title="(form.id ? '修改' : '添加') + '标签'"
-      :visible.sync="dialogVisible"
-      width="500px"
-      append-to-body
-    >
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="标签组名称" prop="gourpName">
-          <el-input v-model="form.gourpName" maxlength="15" show-word-limit placeholder="请输入" />
-        </el-form-item>
-        <el-form-item label="标签">
-          <template v-for="(item, index) in form.weTags">
-            <el-tag
-              v-if="item.status !== 1"
-              type="primary"
-              closable
-              size="medium"
-              :key="index"
-              @close="closeTag(item, index)"
-            >{{item.name}}</el-tag>
-          </template>
-          <el-input
-            class="input-new-tag"
-            v-if="newInputVisible"
-            v-model="newInput"
-            ref="saveTagInput"
-            size="mini"
-            maxlength="10"
-            show-word-limit
-            @keyup.enter.native="newInputConfirm"
-            @blur="newInputConfirm"
-          ></el-input>
-          <el-button
-            v-else
-            type="primary"
-            plain
-            class="button-new-tag"
-            size="mini"
-            @click="showInput"
-          >+ 添加标签</el-button>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submit">确 定</el-button>
-        <el-button @click="dialogVisible = false">取 消</el-button>
-      </div>
-    </el-dialog>
+    <AddTag :visible.sync="dialogVisible" :form="form" @success="getList(!form.id && 1)" />
   </div>
 </template>
 <style lang="scss" scoped>
@@ -283,13 +203,5 @@ export default {
   .num {
     color: #00f;
   }
-}
-.input-new-tag {
-  width: 90px;
-  margin-left: 10px;
-  vertical-align: bottom;
-}
-.button-new-tag {
-  margin-left: 10px;
 }
 </style>

@@ -1,39 +1,204 @@
-<style lang="scss" scoped>
-.custom-tree-node {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 14px;
-  padding-right: 8px;
-}
-.avatar-wrap {
-  height: 200px;
-  border: 1px solid #eee;
-  border-radius: 5px;
-  position: relative;
-  overflow: hidden;
-}
-.avatar {
-  height: 100%;
-}
-.avatar-uploader-icon {
-  font-size: 58px;
-  color: #ddd;
-}
-.img-wrap {
-  height: 340px;
-  overflow: auto;
-  /deep/.el-radio__input {
-    position: absolute;
-    right: 0;
-  }
-}
-.img-li {
-  width: 115px;
-  height: 160px;
-}
-</style>
+<script>
+import * as api from "@/api/organization";
+
+export default {
+  name: "Organization",
+  components: {},
+  props: {},
+  data() {
+    return {
+      query: {
+        pageNum: 1,
+        pageSize: 10,
+        isActivate: "",
+        department: "",
+      },
+      dateRange: [],
+      treeData: [],
+      userList: [],
+      total: 0,
+      defaultProps: {
+        label: "name",
+        children: "children",
+      },
+      form: {},
+      dialogVisible: false,
+      disabled: false,
+      loading: false,
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        },
+        shortcuts: [
+          {
+            text: "最近一周",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "最近一个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "最近三个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+        ],
+      },
+      multipleSelection: [],
+      formDepart: {},
+      dialogVisibleDepart: false,
+      dialogVisibleAvatar: false,
+      queryImg: {
+        pageNum: 1,
+        pageSize: 20,
+      },
+      totalImg: 0,
+      // 表单校验
+      rules: Object.freeze({
+        name: [{ required: true, message: "必填项", trigger: "blur" }],
+        userId: [{ required: true, message: "必填项", trigger: "blur" }],
+        department: [{ required: true, message: "必填项", trigger: "blur" }],
+        joinTime: [{ required: true, message: "必填项", trigger: "blur" }],
+        wxAccount: [{ required: true, message: "必填项", trigger: "blur" }],
+        email: [
+          { required: true, message: "必填项", trigger: "blur" },
+          {
+            type: "email",
+            message: "'请输入正确的邮箱地址",
+            trigger: ["blur", "change"],
+          },
+        ],
+        mobile: [
+          { required: true, message: "必填项", trigger: "blur" },
+          {
+            pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
+            message: "请输入正确的手机号码",
+            trigger: "blur",
+          },
+        ],
+      }),
+    };
+  },
+  watch: {},
+  computed: {},
+  created() {
+    this.getTree();
+    this.getList();
+  },
+  mounted() {},
+  methods: {
+    getTree() {
+      api.getTree().then(({ data }) => {
+        this.treeData = this.handleTree(data);
+      });
+    },
+    getList(page) {
+      // console.log(this.dateRange);
+      if (this.dateRange[0]) {
+        this.query.beginTime = this.dateRange[0];
+        this.query.endTime = this.dateRange[1];
+      }
+      page && (this.query.pageNum = page);
+      this.loading = true;
+      api
+        .getList(this.query)
+        .then(({ rows, total }) => {
+          this.userList = rows;
+          this.total = +total;
+          this.loading = false;
+        })
+        .catch(() => {
+          this.loading = false;
+        });
+    },
+    handleNodeClick(data) {
+      this.query.department = data.id;
+      this.getList(1);
+    },
+    edit(data, type) {
+      this.form = Object.assign({}, data || {});
+      this.dialogVisible = true;
+      type || !data ? (this.disabled = false) : (this.disabled = true);
+    },
+    submit() {
+      this.$refs["form"].validate((valid) => {
+        if (valid) {
+          let form = JSON.parse(JSON.stringify(this.form));
+          form.department += "";
+          form.isLeaderInDept += "";
+          api[form.id ? "updateUser" : "addUser"](form)
+            .then(() => {
+              this.msgSuccess("操作成功");
+              this.dialogVisible = false;
+              this.getList(!this.form.id && 1);
+            })
+            .catch(() => {
+              this.dialogVisible = false;
+            });
+        }
+      });
+    },
+    startOrStop(data) {
+      let params = {
+        id: data.id,
+        enable: data.enable == 1 ? false : true,
+      };
+      api.startOrStop(params).then(() => {
+        this.msgSuccess("操作成功");
+        this.getList();
+      });
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
+    sync() {},
+    batchImport() {},
+    departEdit(data, type) {
+      this.formDepart = Object.assign(
+        {},
+        type ? data : { parentId: data.id, pName: data.name }
+      );
+      this.dialogVisibleDepart = true;
+    },
+    submitDepart() {
+      api[this.formDepart.id ? "updateDepart" : "addDepart"](this.formDepart)
+        .then(() => {
+          this.msgSuccess("操作成功");
+          this.dialogVisibleDepart = false;
+          this.getTree();
+        })
+        .catch(() => {
+          this.dialogVisibleDepart = false;
+        });
+    },
+    showAvatarDialog() {
+      this.dialogVisibleAvatar = true;
+      this.getImgList(1);
+    },
+    getImgList() {
+      // todo get imgage list
+    },
+    submitAvatar() {
+      this.form.avatarMediaid = g;
+    },
+  },
+};
+</script>
 
 <template>
   <div>
@@ -301,203 +466,39 @@
   </div>
 </template>
 
-<script>
-import * as api from "@/api/organization";
-
-export default {
-  name: "Organization",
-  components: {},
-  props: {},
-  data() {
-    return {
-      query: {
-        pageNum: 1,
-        pageSize: 10,
-        isActivate: "",
-      },
-      dateRange: [],
-      treeData: [],
-      userList: [],
-      total: 0,
-      defaultProps: {
-        label: "name",
-        children: "children",
-      },
-      form: {},
-      dialogVisible: false,
-      disabled: false,
-      loading: false,
-      pickerOptions: {
-        disabledDate(time) {
-          return time.getTime() > Date.now();
-        },
-        shortcuts: [
-          {
-            text: "最近一周",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit("pick", [start, end]);
-            },
-          },
-          {
-            text: "最近一个月",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit("pick", [start, end]);
-            },
-          },
-          {
-            text: "最近三个月",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-              picker.$emit("pick", [start, end]);
-            },
-          },
-        ],
-      },
-      multipleSelection: [],
-      formDepart: {},
-      dialogVisibleDepart: false,
-      dialogVisibleAvatar: false,
-      queryImg: {
-        pageNum: 1,
-        pageSize: 20,
-      },
-      totalImg: 0,
-      // 表单校验
-      rules: Object.freeze({
-        name: [{ required: true, message: "必填项", trigger: "blur" }],
-        userId: [{ required: true, message: "必填项", trigger: "blur" }],
-        department: [{ required: true, message: "必填项", trigger: "blur" }],
-        joinTime: [{ required: true, message: "必填项", trigger: "blur" }],
-        wxAccount: [{ required: true, message: "必填项", trigger: "blur" }],
-        email: [
-          { required: true, message: "必填项", trigger: "blur" },
-          {
-            type: "email",
-            message: "'请输入正确的邮箱地址",
-            trigger: ["blur", "change"],
-          },
-        ],
-        mobile: [
-          { required: true, message: "必填项", trigger: "blur" },
-          {
-            pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
-            message: "请输入正确的手机号码",
-            trigger: "blur",
-          },
-        ],
-      }),
-    };
-  },
-  watch: {},
-  computed: {},
-  created() {
-    this.getTree();
-    this.getList();
-  },
-  mounted() {},
-  methods: {
-    getTree() {
-      api.getTree().then(({ data }) => {
-        this.treeData = this.handleTree(data);
-      });
-    },
-    getList(page) {
-      // console.log(this.dateRange);
-      if (this.dateRange[0]) {
-        this.query.beginTime = this.dateRange[0];
-        this.query.endTime = this.dateRange[1];
-      }
-      page && (this.query.pageNum = page);
-      this.loading = true;
-      api
-        .getList(this.query)
-        .then(({ rows, total }) => {
-          this.userList = rows;
-          this.total = +total;
-          this.loading = false;
-        })
-        .catch(() => {
-          this.loading = false;
-        });
-    },
-    handleNodeClick(data) {
-      this.query.department = data.id;
-      this.getList(1);
-    },
-    edit(data, type) {
-      this.form = Object.assign({}, data || {});
-      this.dialogVisible = true;
-      type || !data ? (this.disabled = false) : (this.disabled = true);
-    },
-    submit() {
-      this.$refs["form"].validate((valid) => {
-        if (valid) {
-          let form = JSON.parse(JSON.stringify(this.form));
-          form.department += "";
-          form.isLeaderInDept += "";
-          api[form.id ? "updateUser" : "addUser"](form)
-            .then(() => {
-              this.msgSuccess("操作成功");
-              this.dialogVisible = false;
-              this.getList(!this.form.id && 1);
-            })
-            .catch(() => {
-              this.dialogVisible = false;
-            });
-        }
-      });
-    },
-    startOrStop(data) {
-      let params = {
-        id: data.id,
-        enable: data.enable == 1 ? false : true,
-      };
-      api.startOrStop(params).then(() => {
-        this.msgSuccess("操作成功");
-        this.getList();
-      });
-    },
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-    sync() {},
-    batchImport() {},
-    departEdit(data, type) {
-      this.formDepart = Object.assign(
-        {},
-        type ? data : { parentId: data.id, pName: data.name }
-      );
-      this.dialogVisibleDepart = true;
-    },
-    submitDepart() {
-      api[this.formDepart.id ? "updateDepart" : "addDepart"](this.formDepart)
-        .then(() => {
-          this.msgSuccess("操作成功");
-          this.dialogVisibleDepart = false;
-          this.getTree();
-        })
-        .catch(() => {
-          this.dialogVisibleDepart = false;
-        });
-    },
-    showAvatarDialog() {
-      this.dialogVisibleAvatar = true;
-      this.getImgList(1);
-    },
-    getImgList() {
-      // todo get imgage list
-    },
-    submitAvatar() {
-      this.form.avatarMediaid = g;
-    },
-  },
-};
-</script>
+<style lang="scss" scoped>
+.custom-tree-node {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
+}
+.avatar-wrap {
+  height: 200px;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  position: relative;
+  overflow: hidden;
+}
+.avatar {
+  height: 100%;
+}
+.avatar-uploader-icon {
+  font-size: 58px;
+  color: #ddd;
+}
+.img-wrap {
+  height: 340px;
+  overflow: auto;
+  /deep/.el-radio__input {
+    position: absolute;
+    right: 0;
+  }
+}
+.img-li {
+  width: 115px;
+  height: 160px;
+}
+</style>

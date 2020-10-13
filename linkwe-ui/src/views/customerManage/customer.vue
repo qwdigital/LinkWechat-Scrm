@@ -1,204 +1,93 @@
-<style lang="scss" scoped>
-.mid-action {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  align-items: center;
-  background: #fff;
-  .total {
-    font-size: 14px;
-  }
-  .num {
-    color: #00f;
-  }
-}
-</style>
-
-<template>
-  <div>
-    <el-form
-      ref="form"
-      :inline="true"
-      :model="form"
-      label-width="100px"
-      class="top-search"
-      size="small"
-    >
-      <el-form-item label="客户名称">
-        <el-input v-model="form.user" placeholder="请输入"></el-input>
-      </el-form-item>
-      <el-form-item label="添加人">
-        <el-select v-model="form.region" placeholder="请选择">
-          <el-option label="区域一" value="shanghai"></el-option>
-          <el-option label="区域二" value="beijing"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="添加日期">
-        <el-date-picker
-          v-model="value2"
-          type="daterange"
-          :picker-options="pickerOptions"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          align="right"
-        ></el-date-picker>
-      </el-form-item>
-      <el-form-item label="标签">
-        <el-input v-model="form.user" placeholder="请输入"></el-input>
-      </el-form-item>
-      <el-form-item label=" ">
-        <el-button type="primary" @click="submitForm">查询</el-button>
-        <el-button type="info" @click="resetForm('ruleForm')">重置</el-button>
-        <el-button type="cyan" @click="isMoreFilter = !isMoreFilter">导出列表</el-button>
-      </el-form-item>
-    </el-form>
-
-    <div class="mid-action">
-      <div class="total">
-        共
-        <span class="num">{{total}}</span> 位客户，实际客户
-        <span class="num">{{total}}</span> 位。
-      </div>
-      <div>
-        <el-button
-          type="primary"
-          size="mini"
-          icon="el-icon-s-flag"
-          @click="dialogVisible = true"
-        >打标签</el-button>
-        <el-button type="primary" size="mini" icon="el-icon-brush">移除标签</el-button>
-        <el-button type="primary" size="mini" icon="el-icon-refresh" @click="sync">同步客户</el-button>
-        <el-button type="primary" size="mini" icon="el-icon-view">查看重复客户</el-button>
-      </div>
-    </div>
-
-    <el-table
-      ref="multipleTable"
-      :data="list"
-      tooltip-effect="dark"
-      style="width: 100%"
-      @selection-change="handleSelectionChange"
-    >
-      <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column label="客户" width>
-        <template slot-scope="scope">{{ scope.row.date }}</template>
-      </el-table-column>
-      <el-table-column prop="name" label="公司名称"></el-table-column>
-      <el-table-column prop="address" label="添加人" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="address" label="添加时间" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="address" label="标签" show-overflow-tooltip></el-table-column>
-      <!-- <el-table-column label="操作" width="100">
-        <template slot-scope="scope">
-          <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
-          <el-button type="text" size="small">编辑</el-button>
-        </template>
-      </el-table-column>-->
-    </el-table>
-
-    <el-pagination
-      background
-      hide-on-single-page
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="currentPage4"
-      :page-sizes="[10, 20, 30, 40]"
-      :page-size="10"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
-    ></el-pagination>
-
-    <el-dialog
-      title="为客户增加标签"
-      :visible.sync="dialogVisible"
-      width="width"
-      :before-close="dialogBeforeClose"
-    >
-      <div>
-        <span class="mr20">选择分组</span>
-        <el-select v-model="group" placeholder="请选择">
-          <el-option label="区域一" value="shanghai"></el-option>
-          <el-option label="区域二" value="beijing"></el-option>
-          <el-option label="区域二" value="beijing"></el-option>
-          <el-option label="区域二" value="beijing"></el-option>
-        </el-select>
-        <div class="mt20">
-          <el-checkbox-group v-model="labelSelect">
-            <el-checkbox
-              :label="item.label"
-              v-for="(item, index) in labelList"
-              :key="index"
-            >{{item.value}}</el-checkbox>
-          </el-checkbox-group>
-        </div>
-        <div>
-          <el-button type="primary" @click="isAddTag = true">添加标签</el-button>
-          <template v-if="isAddTag">
-            <el-input v-model="tagAdd" placeholder="每个标签名称最多15个字。同时新建多个标签时，请用“空格”隔开"></el-input>
-            <el-button type="primary" @click="addTag">添加</el-button>
-            <el-button type="primary" @click="isAddTag = false">取消</el-button>
-          </template>
-        </div>
-      </div>
-      <div slot="footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-      </div>
-    </el-dialog>
-  </div>
-</template>
-
 <script>
 import * as api from "@/api/customer";
+import { getList as getListTag } from "@/api/customer/tag";
+import { getList as getListOrganization } from "@/api/organization";
+import AddTag from "./components/AddTag";
+import SelectUser from "./components/SelectUser";
 
 export default {
   name: "Customer",
-  components: {},
+  components: { AddTag, SelectUser },
   props: {},
   data() {
     return {
       query: {
         pageNum: 1,
         pageSize: 10,
+        name: "", // "客户名称",
+        userId: "", // "添加人id",
+        tagIds: "", // "标签id,多个标签，id使用逗号隔开",
+        beginTime: "", // "开始时间",
+        endTime: "", // "结束时间"
+      },
+      queryTag: [], // 搜索框选择的标签
+      queryUser: [], // 搜索框选择的添加人
+      dateRange: [], // 添加日期
+      // 日期快捷选项
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        },
+        shortcuts: [
+          {
+            text: "最近一周",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "最近一个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "最近三个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+        ],
       },
       loading: false,
       isMoreFilter: false,
       total: 0,
+      // 添加标签表单
       form: {
-        user: "",
-        region: "",
+        gourpName: "",
+        weTags: [],
       },
-      list: [],
-      multipleSelection: [],
-      dialogVisible: false,
-      labelSelect: [],
-      labelList: [
-        {
-          value: "选项1",
-          label: "黄金糕",
-        },
-        {
-          value: "选项2",
-          label: "双皮奶",
-        },
-        {
-          value: "选项3",
-          label: "蚵仔煎",
-        },
-        {
-          value: "选项4",
-          label: "龙须面",
-        },
-        {
-          value: "选项5",
-          label: "北京烤鸭",
-        },
-      ],
+      list: [], // 客户列表
+      listTag: [], // 标签列表
+      listOrganization: [], // 组织架构列表
+      multipleSelection: [], // 多选数组
+      dialogVisible: false, // 选择标签弹窗显隐
+      dialogVisibleSelectUser: false, // 选择添加人弹窗显隐
+      dialogVisibleAddTag: false, // 添加标签弹窗显隐
+      selectedGroup: "", // 选择的标签分组
+      selectedTag: [], // 选择的标签
+      tagDialogType: {
+        title: "", // 选择标签弹窗标题
+        type: "", // 弹窗类型
+      },
     };
   },
   watch: {},
   computed: {},
-  created() {},
+  created() {
+    this.getList();
+    this.getListTag();
+    this.getListOrganization();
+  },
   mounted() {},
   methods: {
     getList(page) {
@@ -215,28 +104,87 @@ export default {
           this.list = rows;
           this.total = +total;
           this.loading = false;
+          this.multipleSelection = [];
         })
         .catch(() => {
           this.loading = false;
         });
+    },
+    getListTag() {
+      getListTag().then(({ rows }) => {
+        this.listTag = Object.freeze(rows);
+      });
+    },
+    getListOrganization() {
+      getListOrganization().then(({ rows }) => {
+        this.listOrganization = Object.freeze(rows);
+      });
+    },
+    showTagDialog() {
+      this.selectedTag = this.queryTag;
+      this.tagDialogType = {
+        title: "选择标签",
+        type: "query",
+      };
+      this.dialogVisible = true;
+    },
+    makeTag() {
+      this.selectedTag = [];
+      if (!this.multipleSelection.length) {
+        this.msgInfo("请选择一位客户");
+        return;
+      }
+      if (this.multipleSelection.length > 1) {
+        this.msgInfo("同时只能选择一位客户");
+        return;
+      }
+      this.tagDialogType = {
+        title: "为客户增加标签",
+        type: "customer",
+      };
+      this.multipleSelection.forEach((element) => {
+        // debugger;
+        element.weFlowerCustomerRels.forEach((child) => {
+          child.weFlowerCustomerTagRels.forEach((grandchild) => {
+            this.selectedTag.push({
+              id: grandchild.tagId,
+              name: grandchild.tagName,
+            });
+          });
+        });
+      });
+
+      this.dialogVisible = true;
     },
     sync() {
       api.sync().then(() => {
         this.msgSuccess("操作成功");
       });
     },
-    submitForm(formName) {
-      this.$refs["form"].validate((valid) => {
-        if (valid) {
-          alert("submit!");
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
+    selectedUser(list) {
+      this.queryUser = list;
+      this.query.userId = list.map((d) => d.id) + "";
+    },
+    submitSelectTag(formName) {
+      if (this.tagDialogType.type === "query") {
+        this.query.tagIds = this.selectedTag.map((d) => d.id) + "";
+        // debugger;
+        this.queryTag = this.selectedTag;
+        this.dialogVisible = false;
+      } else if (this.tagDialogType.type === "customer") {
+        let data = {
+          userid: this.multipleSelection[0].externalUserid,
+          externalUserid: this.multipleSelection[0].externalUserid,
+        };
+        api.makeLabel(this.selectedTag).then(() => {
+          this.msgSuccess("操作成功");
+          this.dialogVisible = false;
+        });
+      }
     },
     resetForm(formName) {
-      this.$refs["form"].resetFields();
+      this.dateRange = [];
+      this.$refs["queryForm"].resetFields();
     },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
@@ -244,6 +192,213 @@ export default {
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`);
     },
+    // 多选框选中数据
+    handleSelectionChange(selection) {
+      this.multipleSelection = selection;
+    },
   },
 };
 </script>
+
+<template>
+  <div>
+    <el-form
+      ref="queryForm"
+      :inline="true"
+      :model="query"
+      label-width="100px"
+      class="top-search"
+      size="small"
+    >
+      <el-form-item label="客户名称">
+        <el-input v-model="query.name" placeholder="请输入"></el-input>
+      </el-form-item>
+      <el-form-item label="添加人">
+        <div class="tag-input" @click="dialogVisibleSelectUser = true">
+          <span class="tag-place" v-if="!queryUser.length">请选择</span>
+          <template v-else>
+            <el-tag type="info" v-for="(unit, unique) in queryUser" :key="unique">{{unit.name}}</el-tag>
+          </template>
+        </div>
+      </el-form-item>
+      <el-form-item label="添加日期">
+        <el-date-picker
+          v-model="dateRange"
+          type="daterange"
+          :picker-options="pickerOptions"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          align="right"
+        ></el-date-picker>
+      </el-form-item>
+      <el-form-item label="标签">
+        <div class="tag-input" @click="showTagDialog">
+          <span class="tag-place" v-if="!queryTag.length">请选择</span>
+          <template v-else>
+            <el-tag type="info" v-for="(unit, unique) in queryTag" :key="unique">{{unit.name}}</el-tag>
+          </template>
+        </div>
+      </el-form-item>
+      <el-form-item label=" ">
+        <el-button type="primary" @click="getList(1)">查询</el-button>
+        <el-button type="info" @click="resetForm()">重置</el-button>
+        <el-button type="cyan" @click="isMoreFilter = !isMoreFilter">导出列表</el-button>
+      </el-form-item>
+    </el-form>
+
+    <div class="mid-action">
+      <div class="total">
+        共
+        <span class="num">{{total}}</span> 位客户，实际客户
+        <span class="num">{{total}}</span> 位。
+      </div>
+      <div>
+        <el-button type="primary" size="mini" icon="el-icon-s-flag" @click="makeTag">打标签</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-brush">移除标签</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-refresh" @click="sync">同步客户</el-button>
+        <el-button type="primary" size="mini" icon="el-icon-view">查看重复客户</el-button>
+      </div>
+    </div>
+
+    <el-table
+      ref="multipleTable"
+      :data="list"
+      tooltip-effect="dark"
+      style="width: 100%"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column type="selection" align="center" width="55"></el-table-column>
+      <el-table-column label="客户" prop="name" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.name }}
+          <span
+            :style="{color: scope.row.type === 1 ? '#4bde03' : '#f9a90b'}"
+          >{{ ({1: '@微信', 2: '@企业微信'})[scope.row.type] }}</span>
+          <i :class="['el-icon-s-custom', ({1: 'man', 2: 'woman'})[scope.row.gender]]"></i>
+        </template>
+      </el-table-column>
+      <el-table-column prop="corpName" label="公司名称" align="center"></el-table-column>
+      <el-table-column prop="address" label="添加人（首位）" align="center">
+        <template slot-scope="scope">{{ scope.row.weFlowerCustomerRels[0].userName }}</template>
+      </el-table-column>
+      <el-table-column prop="createTime" label="添加时间" align="center"></el-table-column>
+      <el-table-column prop="address" label="标签" align="center">
+        <template slot-scope="scope">
+          <div v-for="(item, index) in scope.row.weFlowerCustomerRels" :key="index">
+            <el-tag
+              type="info"
+              v-for="(unit, unique) in item.weFlowerCustomerTagRels"
+              :key="unique"
+            >{{unit.tagName}}</el-tag>
+          </div>
+        </template>
+      </el-table-column>
+      <!-- <el-table-column label="操作" width="100">
+        <template slot-scope="scope">
+          <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
+          <el-button type="text" size="small">编辑</el-button>
+        </template>
+      </el-table-column>-->
+    </el-table>
+
+    <pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="query.pageNum"
+      :limit.sync="query.pageSize"
+      @pagination="getList"
+    />
+
+    <!-- 选择标签弹窗 -->
+    <el-dialog key="1" :title="tagDialogType.title" :visible.sync="dialogVisible">
+      <div>
+        <span class="mr20">选择分组</span>
+        <el-select v-model="selectedGroup" placeholder="请选择">
+          <el-option label="所有标签" value></el-option>
+          <el-option
+            v-for="(item, index) in listTag"
+            :key="index"
+            :label="item.gourpName"
+            :value="item.id"
+          ></el-option>
+        </el-select>
+        <div class="mt20">
+          <el-checkbox-group v-model="selectedTag">
+            <template v-for="(item, index) in listTag">
+              <div class="bfc-d" v-show="item.id === selectedGroup || !selectedGroup" :key="index">
+                <el-checkbox
+                  :label="unit"
+                  value-key="id"
+                  v-for="(unit, unique) in item.weTags"
+                  :key="index + unique"
+                >{{unit.name}}</el-checkbox>
+              </div>
+            </template>
+          </el-checkbox-group>
+        </div>
+        <div class="mt20" v-show="tagDialogType.type === 'customer'">
+          <el-button type="primary" @click="dialogVisibleAddTag = true">添加标签</el-button>
+        </div>
+      </div>
+      <div slot="footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitSelectTag">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 选择添加人弹窗 -->
+    <SelectUser :visible.sync="dialogVisibleSelectUser" title="选择添加人" @success="selectedUser"></SelectUser>
+
+    <!-- 添加标签弹窗 -->
+    <AddTag :visible.sync="dialogVisibleAddTag" :form="form" @success="getListTag()" />
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.tag-input {
+  width: 240px;
+  display: flex;
+  border-radius: 4px;
+  border: 1px solid #dcdfe6;
+  align-items: center;
+  padding: 0 15px;
+  overflow: hidden;
+  height: 32px;
+  .tag-place {
+    color: #bbb;
+    font-size: 14px;
+  }
+}
+.mid-action {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  align-items: center;
+  background: #fff;
+  .total {
+    background-color: rgba(65, 133, 244, 0.1);
+    border: 1px solid rgba(65, 133, 244, 0.2);
+    border-radius: 3px;
+    font-size: 14px;
+    min-height: 32px;
+    line-height: 32px;
+    padding: 0 12px;
+    color: #606266;
+  }
+  .num {
+    color: #00f;
+  }
+}
+.el-icon-s-custom {
+  font-size: 16px;
+  margin-left: 4px;
+  color: #999;
+  &.man {
+    color: #13a2e8;
+  }
+  &.woman {
+    color: #f753b2;
+  }
+}
+</style>
