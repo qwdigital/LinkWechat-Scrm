@@ -128,5 +128,5 @@ wecome:
   serverUrl: https://qyapi.weixin.qq.com/
   weComePrefix: cgi-bin
   noAccessTokenUrl: /gettoken
-  needContactTokenUrl: /externalcontact/get_follow_user_list
+  needContactTokenUrl: /externalcontact/get_follow_user_list,/externalcontact/add_contact_way
   fileUplodUrl:  /media/upload,/media/uploadimg

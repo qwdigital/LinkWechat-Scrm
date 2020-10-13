@@ -100,18 +100,19 @@ public class WeEmpleCodeServiceImpl implements IWeEmpleCodeService
                 iWeEmpleCodeUseScopService.batchInsetWeEmpleCodeUseScop(weEmpleCodeUseScops);
 
 
-                List<WeEmpleCodeTag> weEmpleCodeTags = weEmpleCode.getWeEmpleCodeTags().stream().filter(v->v.getTagId()!=null).collect(Collectors.toList());
-                if(CollectionUtil.isNotEmpty(weEmpleCodeTags)){
-                    //批量保存标签
-                    weEmpleCodeTags.stream().forEach(v->v.setEmpleCodeId(weEmpleCode.getId()));
-                    weEmpleCodeTagService.batchInsetWeEmpleCodeTag(weEmpleCodeTags);
-                }
+//                List<WeEmpleCodeTag> weEmpleCodeTags = weEmpleCode.getWeEmpleCodeTags().stream().filter(v->v.getTagId()!=null).collect(Collectors.toList());
+//                if(CollectionUtil.isNotEmpty(weEmpleCodeTags)){
+//                    //批量保存标签
+//                    weEmpleCodeTags.stream().forEach(v->v.setEmpleCodeId(weEmpleCode.getId()));
+//                    weEmpleCodeTagService.batchInsetWeEmpleCodeTag(weEmpleCodeTags);
+//                }
 
 
 
                 if(!weEmpleCode.getCodeType().equals(WeConstans.BATCH_SINGLE_EMPLE_CODE_TYPE)){
 
-                    WeExternalContactDto.WeContactWay weContactWay = new WeExternalContactDto.WeContactWay(weEmpleCode.getCodeType(),
+//
+                    WeExternalContactDto.WeContactWay weContactWay = new WeExternalContactDto.WeContactWay( weEmpleCode.getCodeType(),
                             WeConstans.QR_CODE_EMPLE_CODE_SCENE,weEmpleCode.getIsJoinConfirmFriends());
 
 

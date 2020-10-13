@@ -41,7 +41,7 @@ public class WeExternalContactDto extends WeResultDto {
 
 
         //企业自定义的state参数，用于区分不同的添加渠道，在调用“获取外部联系人详情”时会返回该参数值，不超过30个字符
-        private String state;
+//        private String state;
 
         public WeContactWay() {
         }
