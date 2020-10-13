@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeGroupCodeActualMapper">
+    
+    <resultMap type="WeGroupCodeActual" id="WeGroupCodeActualResult">
+        <result property="id"    column="id"    />
+        <result property="actualGroupQrCode"    column="actual_group_qr_code"    />
+        <result property="groupName"    column="group_name"    />
+        <result property="effectTime"    column="effect_time"    />
+        <result property="scanCodeTimesLimit"    column="scan_code_times_limit"    />
+        <result property="groupCodeId"    column="group_code_id"    />
+        <result property="scanCodeTimes"    column="scan_code_times"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectWeGroupCodeActualVo">
+        select id, actual_group_qr_code, group_name, effect_time, scan_code_times_limit, group_code_id, scan_code_times, del_flag, status from we_group_code_actual
+    </sql>
+
+    <select id="selectWeGroupCodeActualList" parameterType="WeGroupCodeActual" resultMap="WeGroupCodeActualResult">
+        <include refid="selectWeGroupCodeActualVo"/>
+        <where>  
+            <if test="actualGroupQrCode != null  and actualGroupQrCode != ''"> and actual_group_qr_code = #{actualGroupQrCode}</if>
+            <if test="groupName != null  and groupName != ''"> and group_name like concat('%', #{groupName}, '%')</if>
+            <if test="effectTime != null "> and effect_time = #{effectTime}</if>
+            <if test="scanCodeTimesLimit != null "> and scan_code_times_limit = #{scanCodeTimesLimit}</if>
+            <if test="groupCodeId != null "> and group_code_id = #{groupCodeId}</if>
+            <if test="scanCodeTimes != null "> and scan_code_times = #{scanCodeTimes}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectWeGroupCodeActualById" parameterType="Long" resultMap="WeGroupCodeActualResult">
+        <include refid="selectWeGroupCodeActualVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWeGroupCodeActual" parameterType="WeGroupCodeActual">
+        insert into we_group_code_actual
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="actualGroupQrCode != null">actual_group_qr_code,</if>
+            <if test="groupName != null">group_name,</if>
+            <if test="effectTime != null">effect_time,</if>
+            <if test="scanCodeTimesLimit != null">scan_code_times_limit,</if>
+            <if test="groupCodeId != null">group_code_id,</if>
+            <if test="scanCodeTimes != null">scan_code_times,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="status != null">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="actualGroupQrCode != null">#{actualGroupQrCode},</if>
+            <if test="groupName != null">#{groupName},</if>
+            <if test="effectTime != null">#{effectTime},</if>
+            <if test="scanCodeTimesLimit != null">#{scanCodeTimesLimit},</if>
+            <if test="groupCodeId != null">#{groupCodeId},</if>
+            <if test="scanCodeTimes != null">#{scanCodeTimes},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="status != null">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWeGroupCodeActual" parameterType="WeGroupCodeActual">
+        update we_group_code_actual
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="actualGroupQrCode != null">actual_group_qr_code = #{actualGroupQrCode},</if>
+            <if test="groupName != null">group_name = #{groupName},</if>
+            <if test="effectTime != null">effect_time = #{effectTime},</if>
+            <if test="scanCodeTimesLimit != null">scan_code_times_limit = #{scanCodeTimesLimit},</if>
+            <if test="groupCodeId != null">group_code_id = #{groupCodeId},</if>
+            <if test="scanCodeTimes != null">scan_code_times = #{scanCodeTimes},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeGroupCodeActualById" parameterType="Long">
+        delete from we_group_code_actual where id = #{id}
+    </delete>
+
+    <delete id="deleteWeGroupCodeActualByIds" parameterType="String">
+        delete from we_group_code_actual where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

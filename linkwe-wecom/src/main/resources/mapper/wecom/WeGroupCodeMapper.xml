@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeGroupCodeMapper">
+    
+    <resultMap type="WeGroupCode" id="WeGroupCodeResult">
+        <result property="id"    column="id"    />
+        <result property="activityHeadUrl"    column="activity_head_url"    />
+        <result property="activityName"    column="activity_name"    />
+        <result property="activityScene"    column="activity_scene"    />
+        <result property="guide"    column="guide"    />
+        <result property="joinGroupIsTip"    column="join_group_is_tip"    />
+        <result property="tipMsg"    column="tip_msg"    />
+        <result property="customerServerQrCode"    column="customer_server_qr_code"    />
+        <result property="delFlag"    column="del_flag"    />
+    </resultMap>
+
+    <sql id="selectWeGroupCodeVo">
+        select id, activity_head_url, activity_name, activity_scene, guide, join_group_is_tip, tip_msg, customer_server_qr_code, del_flag from we_group_code
+    </sql>
+
+    <select id="selectWeGroupCodeList" parameterType="WeGroupCode" resultMap="WeGroupCodeResult">
+        <include refid="selectWeGroupCodeVo"/>
+        <where>  
+            <if test="activityHeadUrl != null  and activityHeadUrl != ''"> and activity_head_url = #{activityHeadUrl}</if>
+            <if test="activityName != null  and activityName != ''"> and activity_name like concat('%', #{activityName}, '%')</if>
+            <if test="activityScene != null  and activityScene != ''"> and activity_scene = #{activityScene}</if>
+            <if test="guide != null  and guide != ''"> and guide = #{guide}</if>
+            <if test="joinGroupIsTip != null "> and join_group_is_tip = #{joinGroupIsTip}</if>
+            <if test="tipMsg != null  and tipMsg != ''"> and tip_msg = #{tipMsg}</if>
+            <if test="customerServerQrCode != null  and customerServerQrCode != ''"> and customer_server_qr_code = #{customerServerQrCode}</if>
+        </where>
+    </select>
+    
+    <select id="selectWeGroupCodeById" parameterType="Long" resultMap="WeGroupCodeResult">
+        <include refid="selectWeGroupCodeVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWeGroupCode" parameterType="WeGroupCode">
+        insert into we_group_code
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="activityHeadUrl != null">activity_head_url,</if>
+            <if test="activityName != null">activity_name,</if>
+            <if test="activityScene != null">activity_scene,</if>
+            <if test="guide != null">guide,</if>
+            <if test="joinGroupIsTip != null">join_group_is_tip,</if>
+            <if test="tipMsg != null">tip_msg,</if>
+            <if test="customerServerQrCode != null">customer_server_qr_code,</if>
+            <if test="delFlag != null">del_flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="activityHeadUrl != null">#{activityHeadUrl},</if>
+            <if test="activityName != null">#{activityName},</if>
+            <if test="activityScene != null">#{activityScene},</if>
+            <if test="guide != null">#{guide},</if>
+            <if test="joinGroupIsTip != null">#{joinGroupIsTip},</if>
+            <if test="tipMsg != null">#{tipMsg},</if>
+            <if test="customerServerQrCode != null">#{customerServerQrCode},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWeGroupCode" parameterType="WeGroupCode">
+        update we_group_code
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="activityHeadUrl != null">activity_head_url = #{activityHeadUrl},</if>
+            <if test="activityName != null">activity_name = #{activityName},</if>
+            <if test="activityScene != null">activity_scene = #{activityScene},</if>
+            <if test="guide != null">guide = #{guide},</if>
+            <if test="joinGroupIsTip != null">join_group_is_tip = #{joinGroupIsTip},</if>
+            <if test="tipMsg != null">tip_msg = #{tipMsg},</if>
+            <if test="customerServerQrCode != null">customer_server_qr_code = #{customerServerQrCode},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeGroupCodeById" parameterType="Long">
+        delete from we_group_code where id = #{id}
+    </delete>
+
+    <delete id="deleteWeGroupCodeByIds" parameterType="String">
+        delete from we_group_code where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

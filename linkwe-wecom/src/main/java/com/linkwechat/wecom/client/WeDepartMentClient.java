@@ -33,7 +33,7 @@ public interface WeDepartMentClient {
     @Request(url="/department/update",
             type = "POST"
     )
-    WeResultDto updateWeDepartMent(@DataObject  WeDepartMentDto.DeartMentDto deartMentDto);
+    WeResultDto updateWeDepartMent(@DataObject WeDepartMentDto.DeartMentDto deartMentDto);
 
 
     /**
@@ -51,7 +51,7 @@ public interface WeDepartMentClient {
      */
     @Request(url = "/department/list",
             dataType = "json")
-    WeDepartMentDto weDepartMents(@Query("id")Long id);
+    WeDepartMentDto weDepartMents(@Query("id") Long id);
 
 
 

@@ -94,7 +94,7 @@ public class WeUserServiceImpl implements IWeUserService
             );
 
             if(!WeConstans.WE_SUCCESS_CODE.equals(weResultDto.getErrcode())){
-                throw new WeComException(weResultDto.getErrmsg());
+                throw new WeComException(weResultDto.getErrcode(),weResultDto.getErrmsg());
             }
         }
 
@@ -119,7 +119,7 @@ public class WeUserServiceImpl implements IWeUserService
             );
 
             if(!WeConstans.WE_SUCCESS_CODE.equals(weResultDto.getErrcode())){
-                throw new WeComException(weResultDto.getErrmsg());
+                throw new WeComException(weResultDto.getErrcode(),weResultDto.getErrmsg());
             }
         }
 

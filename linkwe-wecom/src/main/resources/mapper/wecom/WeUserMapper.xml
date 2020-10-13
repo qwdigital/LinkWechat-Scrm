@@ -29,7 +29,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectWeUserVo">
-        select id, head_image_url as avatarMediaid, user_name as name, alias, user_id, gender, mobile, email, wx_account, department, position, is_leader_in_dept, join_time, enable, id_card, qq_account, telephone, address, birthday, remark, is_activate from we_user
+        select id, head_image_url as avatarMediaid, user_name, alias, user_id, gender, mobile, email, wx_account, department, position, is_leader_in_dept, join_time, enable, id_card, qq_account, telephone, address, birthday, remark, is_activate from we_user
     </sql>
 
     <select id="selectWeUserList" parameterType="WeUser" resultMap="WeUserResult">

@@ -37,7 +37,7 @@ public interface WeCustomerClient {
      * @return
      */
     @Request(url = "/externalcontact/get")
-    WeCustomerDto get(@Query("external_userid")String externalUserid);
+    WeCustomerDto get(@Query("external_userid") String externalUserid);
 
 
     /**

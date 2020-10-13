@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeEmpleCodeMapper">
+    
+    <resultMap type="WeEmpleCode" id="WeEmpleCodeResult">
+        <result property="id"    column="id"    />
+        <result property="codeType"    column="code_type"    />
+        <result property="isJoinConfirmFriends"    column="is_join_confirm_friends"    />
+        <result property="activityScene"    column="activity_scene"    />
+        <result property="welcomeMsg"    column="welcome_msg"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="delFlag"    column="del_flag"    />
+    </resultMap>
+
+    <sql id="selectWeEmpleCodeVo">
+        select id, code_type, is_join_confirm_friends, activity_scene, welcome_msg, create_by, create_time, del_flag from we_emple_code
+    </sql>
+
+    <select id="selectWeEmpleCodeList" parameterType="WeEmpleCode" resultMap="WeEmpleCodeResult">
+        <include refid="selectWeEmpleCodeVo"/>
+        <where>  
+            <if test="codeType != null "> and code_type = #{codeType}</if>
+            <if test="isJoinConfirmFriends != null "> and is_join_confirm_friends = #{isJoinConfirmFriends}</if>
+            <if test="activityScene != null  and activityScene != ''"> and activity_scene = #{activityScene}</if>
+            <if test="welcomeMsg != null "> and welcome_msg = #{welcomeMsg}</if>
+        </where>
+    </select>
+    
+    <select id="selectWeEmpleCodeById" parameterType="Long" resultMap="WeEmpleCodeResult">
+        <include refid="selectWeEmpleCodeVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWeEmpleCode" parameterType="WeEmpleCode">
+        insert into we_emple_code
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="codeType != null">code_type,</if>
+            <if test="isJoinConfirmFriends != null">is_join_confirm_friends,</if>
+            <if test="activityScene != null">activity_scene,</if>
+            <if test="welcomeMsg != null">welcome_msg,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="codeType != null">#{codeType},</if>
+            <if test="isJoinConfirmFriends != null">#{isJoinConfirmFriends},</if>
+            <if test="activityScene != null">#{activityScene},</if>
+            <if test="welcomeMsg != null">#{welcomeMsg},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWeEmpleCode" parameterType="WeEmpleCode">
+        update we_emple_code
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="codeType != null">code_type = #{codeType},</if>
+            <if test="isJoinConfirmFriends != null">is_join_confirm_friends = #{isJoinConfirmFriends},</if>
+            <if test="activityScene != null">activity_scene = #{activityScene},</if>
+            <if test="welcomeMsg != null">welcome_msg = #{welcomeMsg},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeEmpleCodeById" parameterType="Long">
+        delete from we_emple_code where id = #{id}
+    </delete>
+
+    <delete id="deleteWeEmpleCodeByIds" parameterType="String">
+        delete from we_emple_code where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+    <update id="batchRemoveWeEmpleCodeIds">
+        update we_emple_code  set
+        del_flag = 2
+        where id in
+        <foreach collection="ids" item="id" index="index"
+                 separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+
+
+    
+</mapper>

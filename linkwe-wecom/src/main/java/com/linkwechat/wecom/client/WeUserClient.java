@@ -50,5 +50,5 @@ public interface WeUserClient {
      * @return
      */
     @Request(url = "/user/delete")
-    WeResultDto deleteUserByUserId(@Query("userid")String userid);
+    WeResultDto deleteUserByUserId(@Query("userid") String userid);
 }

@@ -35,6 +35,7 @@
         <lombok.version>1.16.18</lombok.version>
         <reflectasm.version>1.11.9</reflectasm.version>
         <hutool.version>5.4.1</hutool.version>
+        <zxing.version>3.3.3</zxing.version>
     </properties>
 	
     <!-- 依赖声明 -->
@@ -220,6 +221,13 @@
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.google.zxing</groupId>
+                <artifactId>core</artifactId>
+                <version>${zxing.version}</version>
+            </dependency>
+
 
 
 

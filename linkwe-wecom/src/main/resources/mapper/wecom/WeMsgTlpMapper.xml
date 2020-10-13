@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeMsgTlpMapper">
+    
+    <resultMap type="WeMsgTlp" id="WeMsgTlpResult">
+        <result property="id"    column="id"    />
+        <result property="welcomeMsg"    column="welcome_msg"    />
+        <result property="mediaId"    column="media_id"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="welcomeMsgTplType"    column="welcome_msg_tpl_type"    />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+    </resultMap>
+
+    <sql id="selectWeMsgTlpVo">
+        select id, welcome_msg, media_id, del_flag, welcome_msg_tpl_type,create_by,create_time from we_msg_tlp
+    </sql>
+
+    <select id="selectWeMsgTlpList" parameterType="WeMsgTlp" resultMap="WeMsgTlpResult">
+        <include refid="selectWeMsgTlpVo"/>
+        <where>  
+            <if test="welcomeMsg != null  and welcomeMsg != ''"> and welcome_msg like CONCAT('%',#{welcomeMsg,jdbcType=VARCHAR},'%') </if>
+            <if test="mediaId != null "> and media_id = #{mediaId}</if>
+            <if test="welcomeMsgTplType != null "> and welcome_msg_tpl_type = #{welcomeMsgTplType}</if>
+            <if test="delFlag != null ">and del_flag = #{delFlag}</if>
+        </where>
+    </select>
+    
+    <select id="selectWeMsgTlpById" parameterType="Long" resultMap="WeMsgTlpResult">
+        <include refid="selectWeMsgTlpVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWeMsgTlp" parameterType="WeMsgTlp">
+        insert into we_msg_tlp
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="welcomeMsg != null">welcome_msg,</if>
+            <if test="mediaId != null">media_id,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="welcomeMsgTplType != null">welcome_msg_tpl_type,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="welcomeMsg != null">#{welcomeMsg},</if>
+            <if test="mediaId != null">#{mediaId},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="welcomeMsgTplType != null">#{welcomeMsgTplType},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWeMsgTlp" parameterType="WeMsgTlp">
+        update we_msg_tlp
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="welcomeMsg != null">welcome_msg = #{welcomeMsg},</if>
+            <if test="mediaId != null">media_id = #{mediaId},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="welcomeMsgTplType != null">welcome_msg_tpl_type = #{welcomeMsgTplType},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeMsgTlpById" parameterType="Long">
+        delete from we_msg_tlp where id = #{id}
+    </delete>
+
+    <delete id="deleteWeMsgTlpByIds" parameterType="String">
+        delete from we_msg_tlp where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+    <update id="batchRemoveByids">
+        update we_msg_tlp  set
+        del_flag = 2
+        where id  in
+        <foreach collection="msgTlpIds" item="msgTlpId" index="index"
+                 separator="," open="(" close=")">
+            #{msgTlpId}
+        </foreach>
+
+    </update>
+    
+</mapper>

@@ -65,4 +65,34 @@ public class WeConstans {
      */
     public static final Integer WE_ROOT_CATEGORY_ID = 0;
 
+
+    /**
+     * 单人活码
+     */
+    public static final Integer SINGLE_EMPLE_CODE_TYPE = 1;
+
+
+    /**
+     * 多人活码
+     */
+    public static final Integer MANY_EMPLE_CODE_TYPE = 2;
+
+
+    /**
+     * 批量单人活码
+     */
+    public static final Integer BATCH_SINGLE_EMPLE_CODE_TYPE = 3;
+
+
+    /**
+     * 在小程序中联系场景
+     */
+    public static final Integer SMALL_ROUTINE_EMPLE_CODE_SCENE=1;
+
+
+    /**
+     * 通过二维码联系场景
+     */
+    public static final Integer QR_CODE_EMPLE_CODE_SCENE=2;
+
 }

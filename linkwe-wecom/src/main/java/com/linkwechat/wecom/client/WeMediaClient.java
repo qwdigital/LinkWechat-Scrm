@@ -21,7 +21,7 @@ public interface WeMediaClient {
      * @return
      */
     @Post(url="/media/upload")
-    WeMediaDto upload(@DataFile(value = "file") MultipartFile multipartFile,@Query("type") String type);
+    WeMediaDto upload(@DataFile(value = "file") MultipartFile multipartFile, @Query("type") String type);
 
     /**
      * 上传图片

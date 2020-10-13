@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeEmpleCodeUseScopMapper">
+    
+    <resultMap type="WeEmpleCodeUseScop" id="WeEmpleCodeUseScopResult">
+        <result property="id"    column="id"    />
+        <result property="empleCodeId"    column="emple_code_id"    />
+        <result property="useUserId"    column="use_user_id"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="userUserName" column="user_name"/>
+    </resultMap>
+
+    <sql id="selectWeEmpleCodeUseScopVo">
+        select id, emple_code_id, use_user_id, del_flag from we_emple_code_use_scop
+    </sql>
+
+    <select id="selectWeEmpleCodeUseScopListById" parameterType="Long" resultMap="WeEmpleCodeUseScopResult">
+        SELECT
+             wecus.id, wecus.emple_code_id,wecus.use_user_id,wu.user_name
+        FROM
+        we_emple_code_use_scop wecus
+        LEFT JOIN we_user wu ON wu.id = wecus.use_user_id
+        WHERE
+           wecus.del_flag = 0
+           AND wecus.emple_code_id=#{empleCodeId}
+    </select>
+    
+    <select id="selectWeEmpleCodeUseScopById" parameterType="Long" resultMap="WeEmpleCodeUseScopResult">
+        <include refid="selectWeEmpleCodeUseScopVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWeEmpleCodeUseScop" parameterType="WeEmpleCodeUseScop">
+        insert into we_emple_code_use_scop
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="empleCodeId != null">emple_code_id,</if>
+            <if test="useUserId != null">use_user_id,</if>
+            <if test="delFlag != null">del_flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="empleCodeId != null">#{empleCodeId},</if>
+            <if test="useUserId != null">#{useUserId},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWeEmpleCodeUseScop" parameterType="WeEmpleCodeUseScop">
+        update we_emple_code_use_scop
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="empleCodeId != null">emple_code_id = #{empleCodeId},</if>
+            <if test="useUserId != null">use_user_id = #{useUserId},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeEmpleCodeUseScopById" parameterType="Long">
+        delete from we_emple_code_use_scop where id = #{id}
+    </delete>
+
+    <delete id="deleteWeEmpleCodeUseScopByIds" parameterType="String">
+        delete from we_emple_code_use_scop where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id="batchInsetWeEmpleCodeUseScop">
+        insert into we_emple_code_use_scop (id,emple_code_id,use_user_id,del_flag)
+        values
+        <foreach collection="weEmpleCodeUseScops" item="scop" index="index" separator=",">
+            (#{scop.id},#{scop.empleCodeId},#{scop.useUserId},#{scop.delFlag})
+        </foreach>
+    </insert>
+
+    <update id="batchRemoveWeEmpleCodeUseScopIds">
+        update we_emple_code_use_scop  set
+        del_flag = 2
+        where emple_code_id in
+        <foreach collection="array" item="id" index="index"
+                 separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+    
+</mapper>

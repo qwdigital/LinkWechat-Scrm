@@ -69,7 +69,7 @@ public interface IWeUserService
      * @param enable
      * @return
      */
-    public int startOrStop(Long id,Boolean enable);
+    public int startOrStop(Long id, Boolean enable);
 
 
     /**

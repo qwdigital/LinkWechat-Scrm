@@ -20,6 +20,6 @@ public interface WeAccessTokenClient {
      * @return
      */
     @Request(url = "/gettoken")
-    WeAccessTokenDtoDto getToken(@Query("corpid")String corpId, @Query("corpsecret") String corpSecret);
+    WeAccessTokenDtoDto getToken(@Query("corpid") String corpId, @Query("corpsecret") String corpSecret);
 
 }
