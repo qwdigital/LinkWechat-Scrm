@@ -22,6 +22,8 @@ import java.util.List;
  * @author KEWEN
  * @date 2020-10-08
  */
+@RestController
+@RequestMapping("/wecom/material")
 public class WeMaterialController extends BaseController {
 
 
