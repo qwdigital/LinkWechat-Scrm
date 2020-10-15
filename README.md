@@ -28,6 +28,9 @@ LinkWeChat，是一款基于企业微信的开源SCRM系统，为企业构建私
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/0924/140420_fb631f6a_409467.png "屏幕截图.png")
 
+### 开发进度
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1015/095236_c808865f_409467.png "屏幕截图.png")
+
 #### 部分演示图，持续更新
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1014/092211_447d288e_409467.png "屏幕截图.png")
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1014/092227_74c199cf_409467.png "屏幕截图.png")
