@@ -69,20 +69,18 @@ npm run dev
 - context-path: 部署路径
 
 #### 部署系统
-#####后端部署
+##### 后端部署
 
 
 - bin/package.bat 在项目的目录下执行
 - 然后会在项目下生成 target文件夹包含 war 或jar （多模块生成在linkwe-admin）
-- 
 - 1、jar部署方式
 - 使用命令行执行：java –jar ruoyi.jar 或者执行脚本：bin/run.bat
-- 
 - 2、war部署方式
 - pom.xml packaging修改为war 放入tomcat服务器webapps
 
 
-#####前端部署
+##### 前端部署
 
 
 ### 项目介绍
