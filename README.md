@@ -120,10 +120,11 @@ com.linkwechat
 │       └── manager                       // 异步处理
 │       └── security                      // 权限控制
 │       └── web                           // 前端控制
-├── linkwe-generator   // 代码生成（可移除）
-├── linkwe-quartz      // 定时任务（可移除）
+├── linkwe-generator   // 代码生成
+├── linkwe-quartz      // 定时任务
 ├── linkwe-system      // 系统代码
 ├── linkwe-admin       // 后台服务
+├── linkwe-ui          // 页面前端代码
 ├── linkwe--wecom      // 企业微信功能
 
 ```
