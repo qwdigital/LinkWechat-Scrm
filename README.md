@@ -179,13 +179,19 @@ com.linkwechat
 
 #### 在线体验
 
-1. 演示演示（暂未开放）：http://www.topitclub.cn/
-2. 交流群
-![输入图片说明](https://images.gitee.com/uploads/images/2020/0924/140420_fb631f6a_409467.png "屏幕截图.png")
+ 演示演示（暂未开放）：http://www.topitclub.cn/
 
 #### 开发进度
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1015/095236_c808865f_409467.png "屏幕截图.png")
+
+### 联系作者
+
+![输入图片说明](https://images.gitee.com/uploads/images/2020/0924/140420_fb631f6a_409467.png "屏幕截图.png")
+
+### 特别鸣谢
+  
+感谢[RuoYi-Vue](https://gitee.com/y_project/RuoYi-Vue?_from=gitee_search)提供框架代码。
 
 ### 部分演示图，持续更新
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1014/092211_447d288e_409467.png "屏幕截图.png")
