@@ -1,6 +1,6 @@
 # LinkWeChat
 
-#### 平台介绍
+### 平台介绍
 
 LinkWeChat，是一款基于企业微信的开源SCRM系统，为企业构建私域流量系统的综合解决方案，显著提升企业社交运营效率！
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/0825/144910_68578056_409467.png "屏幕截图.png")
@@ -12,7 +12,20 @@ LinkWeChat，是一款基于企业微信的开源SCRM系统，为企业构建私
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/0825/145413_3a0cab42_409467.png "屏幕截图.png")
 
 
-#### 软件架构
+### 环境部署
+
+
+### 项目介绍
+
+#### 文件结构
+
+##### 后端结构
+
+##### 前端结构
+
+#### 配置文件 
+
+#### 核心技术
 
 
 - 前端采用Vue、Element UI。
@@ -23,7 +36,7 @@ LinkWeChat，是一款基于企业微信的开源SCRM系统，为企业构建私
 
 
 
-#### 在线体验
+### 在线体验
 
 
 1. 演示演示（暂未开放）：http://www.topitclub.cn/
@@ -31,11 +44,11 @@ LinkWeChat，是一款基于企业微信的开源SCRM系统，为企业构建私
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/0924/140420_fb631f6a_409467.png "屏幕截图.png")
 
-#### 开发进度
+### 开发进度
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1015/095236_c808865f_409467.png "屏幕截图.png")
 
-#### 部分演示图，持续更新
+### 部分演示图，持续更新
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1014/092211_447d288e_409467.png "屏幕截图.png")
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1014/092227_74c199cf_409467.png "屏幕截图.png")
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1014/092322_df5e338b_409467.png "屏幕截图.png")
