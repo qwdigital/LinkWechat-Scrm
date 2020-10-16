@@ -89,7 +89,7 @@ public class WeMaterialController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('wechat:material:upload')")
     @Log(title = "上传素材信息", businessType = BusinessType.OTHER)
-    @PostMapping
+    @PostMapping("/upload")
     @ApiOperation("上传素材信息")
     public AjaxResult upload(@RequestParam(value = "file") MultipartFile file, @RequestParam(value = "type") String type) {
         WeMaterialFileVO weMaterialFileVO = materialService.uploadWeMaterialFile(file, type);

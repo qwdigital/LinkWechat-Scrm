@@ -569,57 +569,52 @@ public enum WeExceptionTip {
     WE_EXCEPTION_TIP_640029(640029, "只支持下载普通文件，不支持下载文件夹等其他非文件实体类型", "检查fileid对应的文件是否为普通文件"),
     ;
 
-    //    CUSTOMER_SOURCE_WZLY(0,""),
-//    CUSTOMER_SOURCE_SMEWM(1,),
-//    CUSTOMER_SOURCE_SSSJH(2,),
-//    CUSTOMER_SOURCE_MPFX(3,),
-//    CUSTOMER_SOURCE_QL(4,),
-//    CUSTOMER_SOURCE_SJTXL(5,),
-//    CUSTOMER_SOURCE_WXLXR(6,),
-//    CUSTOMER_SOURCE_TJHYSQ(7,),
-//    CUSTOMER_SOURCE_DSFRJTJ(8,),
-//    CUSTOMER_SOURCE_YXSS(9,),
-//    CUSTOMER_SOURCE_NBCYGX(201,),
-//    CUSTOMER_SOURCE_GLRYFP(202,)
-//    ;
-//
     private Integer code;
 
     private String tipMsg;
 
     private String solveTipMsg;
 
-    private WeExceptionTip(Integer code, String tipMsg, String solveTipMsg) {
+     WeExceptionTip(Integer code, String tipMsg, String solveTipMsg) {
         this.code = code;
         this.tipMsg = tipMsg;
         this.solveTipMsg = solveTipMsg;
     }
-//
-//    public Integer getCode() {
-//        return code;
-//    }
-//
-//    public OrderType setCode(Integer code) {
-//        this.code = code;
-//        return this;
-//    }
-//
-//    public String getLabel() {
-//        return label;
-//    }
-//
-//    public OrderType setLabel(String label) {
-//        this.label = label;
-//        return this;
-//    }
-//
-//    public OrderType getOrderTypeByCode(Integer code){
-//        OrderType[] orderTypes = OrderType.values();
-//        for(OrderType orderType:orderTypes){
-//            if(orderType.getCode().equals(code)){
-//                return orderType;
-//            }
-//        }
-//        throw new RuntimeException("未知的订单类型");
-//    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    public String getTipMsg() {
+        return tipMsg;
+    }
+
+    public void setTipMsg(String tipMsg) {
+        this.tipMsg = tipMsg;
+    }
+
+    public String getSolveTipMsg() {
+        return solveTipMsg;
+    }
+
+    public void setSolveTipMsg(String solveTipMsg) {
+        this.solveTipMsg = solveTipMsg;
+    }
+
+
+
+    public static String getTipMsg(Integer code){
+        WeExceptionTip[] values = WeExceptionTip.values();
+
+        for(WeExceptionTip weExceptionTip:values){
+            if(weExceptionTip.getCode().equals(code)){
+                return weExceptionTip.getTipMsg();
+            }
+        }
+        throw new RuntimeException("企业微信端位置错误类型,请联系管理员工");
+    }
 }

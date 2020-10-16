@@ -95,4 +95,10 @@ public class WeConstans {
      */
     public static final Integer QR_CODE_EMPLE_CODE_SCENE=2;
 
+
+    /**
+     * 微信接口相应端错误字段
+     */
+    public static  final String WE_ERROR_FIELD="errcode";
+
 }

@@ -1,19 +1,13 @@
 package com.linkwechat.wecom.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.exception.wecom.WeComException;
-import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.wecom.client.WeUserClient;
-import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
-import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeUser;
-import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
 import com.linkwechat.wecom.mapper.WeUserMapper;
 import com.linkwechat.wecom.service.IWeCustomerService;
-import com.linkwechat.wecom.service.IWeFlowerCustomerRelService;
 import com.linkwechat.wecom.service.IWeGroupService;
 import com.linkwechat.wecom.service.IWeUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +17,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 通讯录相关客户Service业务层处理
@@ -88,14 +81,9 @@ public class WeUserServiceImpl implements IWeUserService
         int returnCode = weUserMapper.insertWeUser(weUser);
 
         if(returnCode>0){
-
-            WeResultDto weResultDto = weUserClient.createUser(
+            weUserClient.createUser(
                     weUser.transformWeUserDto()
             );
-
-            if(!WeConstans.WE_SUCCESS_CODE.equals(weResultDto.getErrcode())){
-                throw new WeComException(weResultDto.getErrcode(),weResultDto.getErrmsg());
-            }
         }
 
         return returnCode;
@@ -114,13 +102,9 @@ public class WeUserServiceImpl implements IWeUserService
         int returnCode = weUserMapper.updateWeUser(weUser);
 
         if(returnCode >0){
-            WeResultDto weResultDto = weUserClient.updateUser(
+            weUserClient.updateUser(
                     weUser.transformWeUserDto()
             );
-
-            if(!WeConstans.WE_SUCCESS_CODE.equals(weResultDto.getErrcode())){
-                throw new WeComException(weResultDto.getErrcode(),weResultDto.getErrmsg());
-            }
         }
 
         return returnCode;

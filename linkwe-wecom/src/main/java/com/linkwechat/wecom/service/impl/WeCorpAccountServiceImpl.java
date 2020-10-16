@@ -1,12 +1,15 @@
 package com.linkwechat.wecom.service.impl;
 
 import java.util.List;
+
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.linkwechat.wecom.mapper.WeCorpAccountMapper;
 import com.linkwechat.wecom.domain.WeCorpAccount;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 企业id相关配置Service业务层处理
@@ -53,7 +56,7 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     @Override
     public int insertWeCorpAccount(WeCorpAccount wxCorpAccount)
     {
-        wxCorpAccount.setCreateTime(DateUtils.getNowDate());
+
         return weCorpAccountMapper.insertWeCorpAccount(wxCorpAccount);
     }
 
@@ -66,32 +69,8 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     @Override
     public int updateWeCorpAccount(WeCorpAccount wxCorpAccount)
     {
-        wxCorpAccount.setUpdateTime(DateUtils.getNowDate());
+
         return weCorpAccountMapper.updateWeCorpAccount(wxCorpAccount);
-    }
-
-    /**
-     * 批量删除企业id相关配置
-     * 
-     * @param ids 需要删除的企业id相关配置ID
-     * @return 结果
-     */
-    @Override
-    public int deleteWeCorpAccountByIds(Long[] ids)
-    {
-        return weCorpAccountMapper.deleteWeCorpAccountByIds(ids);
-    }
-
-    /**
-     * 删除企业id相关配置信息
-     * 
-     * @param id 企业id相关配置ID
-     * @return 结果
-     */
-    @Override
-    public int deleteWeCorpAccountById(Long id)
-    {
-        return weCorpAccountMapper.deleteWeCorpAccountById(id);
     }
 
 
@@ -105,6 +84,18 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     public WeCorpAccount findValidWeCorpAccount() {
         return weCorpAccountMapper.findValidWeCorpAccount();
     }
+
+
+    /**
+     * 启用有效的企业微信账号
+     * @param corpId
+     */
+    @Override
+    public int startVailWeCorpAccount(Long corpId) {
+        return weCorpAccountMapper.startVailWeCorpAccount(corpId);
+    }
+
+
 
 
 }

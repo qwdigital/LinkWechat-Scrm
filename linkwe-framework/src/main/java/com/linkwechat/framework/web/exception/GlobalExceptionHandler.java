@@ -1,5 +1,10 @@
 package com.linkwechat.framework.web.exception;
 
+import cn.hutool.json.JSONUtil;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.enums.WeExceptionTip;
+import com.linkwechat.common.exception.wecom.WeComException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
@@ -114,4 +119,27 @@ public class GlobalExceptionHandler
     {
         return AjaxResult.error("演示模式，不允许操作");
     }
+
+
+    /**
+     * 企业微信异常统一处理
+     */
+    @ExceptionHandler(ForestRuntimeException.class)
+    public AjaxResult weComException(ForestRuntimeException forestExcetion)
+    {
+
+        String errorMsg = forestExcetion.getMessage();
+
+        if(StringUtils.isNotEmpty(errorMsg)){
+
+            Integer errCode = JSONUtil.parseObj(errorMsg).getInt( WeConstans.WE_ERROR_FIELD);
+
+            return AjaxResult.error(errCode, WeExceptionTip.getTipMsg(errCode));
+        }
+
+
+        return AjaxResult.error("企业微信端未知异常,请联系管理员");
+    }
+
+
 }

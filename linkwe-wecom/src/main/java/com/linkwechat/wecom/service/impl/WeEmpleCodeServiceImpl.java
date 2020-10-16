@@ -113,7 +113,7 @@ public class WeEmpleCodeServiceImpl implements IWeEmpleCodeService
 
 //
                     WeExternalContactDto.WeContactWay weContactWay = new WeExternalContactDto.WeContactWay( weEmpleCode.getCodeType(),
-                            WeConstans.QR_CODE_EMPLE_CODE_SCENE,weEmpleCode.getIsJoinConfirmFriends());
+                            WeConstans.SMALL_ROUTINE_EMPLE_CODE_SCENE,weEmpleCode.getIsJoinConfirmFriends());
 
 
 

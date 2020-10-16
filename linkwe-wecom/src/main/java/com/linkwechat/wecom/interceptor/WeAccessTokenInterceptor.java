@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.interceptor;
 
+import cn.hutool.json.JSONUtil;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestRequest;
@@ -8,6 +9,9 @@ import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.utils.ForestDataType;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.config.WeComeConfig;
+import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.framework.web.domain.server.Sys;
+import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -74,11 +78,13 @@ public class WeAccessTokenInterceptor implements Interceptor{
     @Override
     public void onError(ForestRuntimeException e, ForestRequest forestRequest, ForestResponse forestResponse) {
 
+        System.out.println("nihao");
+
     }
 
 
     /**
-     *  请求成功调用
+     *  请求成功调用(微信端错误异常统一处理)
      * @param o
      * @param forestRequest
      * @param forestResponse
@@ -86,5 +92,15 @@ public class WeAccessTokenInterceptor implements Interceptor{
     @Override
     public void onSuccess(Object o, ForestRequest forestRequest, ForestResponse forestResponse) {
 
+        WeResultDto weResultDto = JSONUtil.toBean(forestResponse.getContent(), WeResultDto.class);
+
+        if(null != weResultDto.getErrcode() && weResultDto.getErrcode() != 0){
+
+            throw new ForestRuntimeException(forestResponse.getContent());
+
+        }
+
     }
+
+
 }

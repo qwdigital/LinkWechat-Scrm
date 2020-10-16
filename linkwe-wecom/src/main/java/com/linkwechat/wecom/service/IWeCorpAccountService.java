@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service;
 
 import java.util.List;
 import com.linkwechat.wecom.domain.WeCorpAccount;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 企业id相关配置Service接口
@@ -43,21 +44,6 @@ public interface IWeCorpAccountService
      */
     public int updateWeCorpAccount(WeCorpAccount wxCorpAccount);
 
-    /**
-     * 批量删除企业id相关配置
-     * 
-     * @param ids 需要删除的企业id相关配置ID
-     * @return 结果
-     */
-    public int deleteWeCorpAccountByIds(Long[] ids);
-
-    /**
-     * 删除企业id相关配置信息
-     * 
-     * @param id 企业id相关配置ID
-     * @return 结果
-     */
-    public int deleteWeCorpAccountById(Long id);
 
 
     /**
@@ -66,5 +52,12 @@ public interface IWeCorpAccountService
      * @return 结果
      */
     public WeCorpAccount findValidWeCorpAccount();
+
+
+    /**
+     * 启用有效的企业微信账号
+     * @param corpId
+     */
+    public int startVailWeCorpAccount(Long corpId);
 
 }

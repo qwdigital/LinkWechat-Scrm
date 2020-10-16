@@ -12,7 +12,7 @@ public class WeComException extends RuntimeException {
     protected String message;
 
     private Integer code;
-    
+
     public WeComException(String message)
     {
         this.message = message;

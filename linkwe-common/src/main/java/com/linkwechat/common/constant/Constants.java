@@ -130,4 +130,12 @@ public class Constants
 
     /** 是否为系统默认（是） */
     public static final int SERVICE_STATUS_ERROR = -1;
+
+
+    /** 启用状态 */
+    public static final String NORMAL_CODE=new String("0");
+
+
+    /** 删除状态 */
+    public static final String DELETE_CODE=new String("2");
 }

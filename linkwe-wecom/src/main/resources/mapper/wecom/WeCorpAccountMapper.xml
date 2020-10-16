@@ -49,7 +49,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
-            <if test="contact_secret != null ">contact_secret,</if>
+            <if test="contactSecret != null ">contact_secret,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="companyName != null">#{companyName},</if>
@@ -82,16 +82,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
 
-    <delete id="deleteWeCorpAccountById" parameterType="Long">
-        delete from we_corp_account where id = #{id}
-    </delete>
-
-    <delete id="deleteWeCorpAccountByIds" parameterType="String">
-        delete from we_corp_account where id in 
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
 
 
     <select id="findValidWeCorpAccount" resultMap="WeCorpAccountResult">
@@ -100,6 +90,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             del_flag = 0
         AND STATUS = 0
     </select>
+
+
+    <update id="startVailWeCorpAccount">
+          UPDATE we_corp_account
+          SET `status` = (CASE WHEN id = #{corpId} THEN 0 ELSE 1 END)
+    </update>
+
+
 
 
 
