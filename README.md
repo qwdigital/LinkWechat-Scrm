@@ -185,7 +185,7 @@ com.linkwechat
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1015/095236_c808865f_409467.png "屏幕截图.png")
 
-### 联系作者
+### 联系作者加入交流群
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/0924/140420_fb631f6a_409467.png "屏幕截图.png")
 
