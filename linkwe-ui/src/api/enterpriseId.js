@@ -59,3 +59,14 @@ export function update(data) {
     data
   })
 }
+
+/**
+ * 启用有效企业微信账号
+ * @param {*} corpId 
+ */
+export function start(corpId) {
+  return request({
+    url: service + '/startVailWeCorpAccount/' + corpId,
+    method: 'put',
+  })
+}

@@ -30,10 +30,14 @@
       <el-table-column label="企业ID" align="center" prop="corpId" :show-overflow-tooltip="true" />
       <el-table-column label="应用秘钥" align="center" prop="corpSecret" :show-overflow-tooltip="true" />
       <el-table-column label="绑定时间" align="center" prop="createTime" width="160"></el-table-column>
+      <el-table-column label="状态" align="center" prop="status" width="160">
+        <template slot-scope="scope">{{status[scope.row.status]}}</template>
+      </el-table-column>
       <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-view" @click="edit(scope.row, 0)">查看</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="edit(scope.row, 1)">编辑</el-button>
+          <el-button size="mini" type="text" icon="el-icon-key" @click="start(scope.row.corpId)">启用</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -47,7 +51,14 @@
     />
 
     <el-dialog title="查看企业微信号" :visible.sync="dialogVisible">
-      <el-form label-position="right" :model="form" label-width="150px" :disabled="disabled">
+      <el-form
+        ref="form"
+        label-position="right"
+        :model="form"
+        rules="rules"
+        label-width="150px"
+        :disabled="disabled"
+      >
         <el-form-item label="企业名称">
           <el-input v-model="form.companyName" :disabled="form.id"></el-input>
         </el-form-item>
@@ -118,6 +129,13 @@ export default {
       dialogVisible: false,
       disabled: false,
       loading: false,
+      rules: Object.freeze({
+        companyName: [{ required: true, message: "必填项", trigger: "blur" }],
+        corpId: [{ required: true, message: "必填项", trigger: "blur" }],
+        corpSecret: [{ required: true, message: "必填项", trigger: "blur" }],
+        contactSecret: [{ required: true, message: "必填项", trigger: "blur" }],
+      }),
+      status: ["正常", "停用"],
     };
   },
   watch: {},
@@ -136,7 +154,7 @@ export default {
         .getList(this.query)
         .then(({ rows, total }) => {
           this.list = rows;
-          this.total = total;
+          this.total = +total;
           this.loading = false;
         })
         .catch(() => {
@@ -149,15 +167,25 @@ export default {
       type || !data ? (this.disabled = false) : (this.disabled = true);
     },
     submit() {
-      api[this.form.id ? "update" : "add"](this.form)
-        .then(() => {
-          this.msgSuccess("操作成功");
-          this.dialogVisible = false;
-          this.getList(!this.form.id && 1);
-        })
-        .catch(() => {
-          this.dialogVisible = false;
-        });
+      this.$refs["form"].validate((valid) => {
+        if (valid) {
+          api[this.form.id ? "update" : "add"](this.form)
+            .then(() => {
+              this.msgSuccess("操作成功");
+              this.dialogVisible = false;
+              this.getList(!this.form.id && 1);
+            })
+            .catch(() => {
+              this.dialogVisible = false;
+            });
+        }
+      });
+    },
+    start(corpId) {
+      api.start(corpId).then(({ rows, total }) => {
+        this.msgSuccess("操作成功");
+        this.getList();
+      });
     },
   },
 };
