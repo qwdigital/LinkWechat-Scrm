@@ -138,4 +138,11 @@ public class Constants
 
     /** 删除状态 */
     public static final String DELETE_CODE=new String("2");
+
+    /** 业务判断成功状态 */
+    public static final Integer SERVICE_RETURN_SUCCESS_CODE=0;
+
+
+
+
 }

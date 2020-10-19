@@ -5,6 +5,7 @@ import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.domain.dto.WeUserDto;
+import com.linkwechat.wecom.domain.dto.WeUserListDto;
 
 /**
  * @description: 企业微信通讯录成员
@@ -51,4 +52,14 @@ public interface WeUserClient {
      */
     @Request(url = "/user/delete")
     WeResultDto deleteUserByUserId(@Query("userid") String userid);
+
+
+    /**
+     *  获取部门成员
+     * @param departmentId
+     * @param fetchChild
+     * @return
+     */
+    @Request(url="/user/list")
+    WeUserListDto  list(@Query("department_id") Long departmentId,@Query("fetch_child") Integer fetchChild);
 }

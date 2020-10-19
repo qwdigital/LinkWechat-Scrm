@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain.dto;
 
+import com.linkwechat.wecom.domain.WeUser;
 import lombok.Data;
 
 /**
@@ -46,6 +47,9 @@ public class WeUserDto extends WeResultDto{
 
     //地址
     private String address;
+
+    //全局唯一。对于同一个服务商，不同应用获取到企业内同一个成员的open_userid是相同的，最多64个字节。仅第三方应用可获取
+    private String open_userid;
 
 
 

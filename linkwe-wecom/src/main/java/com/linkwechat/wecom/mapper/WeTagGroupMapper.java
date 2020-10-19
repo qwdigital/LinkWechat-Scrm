@@ -1,7 +1,10 @@
 package com.linkwechat.wecom.mapper;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeTagGroup;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 标签组Mapper接口
@@ -9,15 +12,15 @@ import com.linkwechat.wecom.domain.WeTagGroup;
  * @author ruoyi
  * @date 2020-09-07
  */
-public interface WeTagGroupMapper 
+public interface WeTagGroupMapper  extends BaseMapper<WeTagGroup>
 {
     /**
-     * 查询标签组
+     * 查询标签组ID集合查询标签
      * 
-     * @param id 标签组ID
+     * @param ids 标签组ID集合
      * @return 标签组
      */
-    public WeTagGroup selectWeTagGroupById(Long id);
+    public List<WeTagGroup> getWeTagGroupByIds(Long[] ids);
 
     /**
      * 查询标签组列表
@@ -43,19 +46,20 @@ public interface WeTagGroupMapper
      */
     public int updateWeTagGroup(WeTagGroup weTagGroup);
 
-    /**
-     * 删除标签组
-     * 
-     * @param id 标签组ID
-     * @return 结果
-     */
-    public int deleteWeTagGroupById(Long id);
 
     /**
-     * 批量删除标签组
+     * 批量逻辑删除标签组
      * 
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    public int deleteWeTagGroupByIds(Long[] ids);
+    public int deleteWeTagGroupByIds(String[] ids);
+
+
+    /**
+     * 批量保存标签组
+     * @param weTagGroups
+     * @return
+     */
+    public int batchInsetWeTagGroup(@Param("weTagGroups") List<WeTagGroup> weTagGroups);
 }

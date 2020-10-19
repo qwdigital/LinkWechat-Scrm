@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.impl;
 
 import java.util.List;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.wecom.domain.dto.WeTagDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import com.linkwechat.wecom.service.IWeTagService;
  * @date 2020-09-07
  */
 @Service
-public class WeTagServiceImpl implements IWeTagService 
+public class WeTagServiceImpl extends ServiceImpl<WeTagMapper,WeTag> implements IWeTagService
 {
     @Autowired
     private WeTagMapper weTagMapper;

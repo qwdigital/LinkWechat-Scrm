@@ -55,5 +55,14 @@ public interface WeDepartMentClient {
 
 
 
+    /**
+     * 获取所有部门列表
+     * @return
+     */
+    @Request(url = "/department/list")
+    WeDepartMentDto weAllDepartMents();
+
+
+
 
 }

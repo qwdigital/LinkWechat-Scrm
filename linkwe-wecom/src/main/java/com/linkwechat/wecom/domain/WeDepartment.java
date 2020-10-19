@@ -5,7 +5,13 @@ import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.wecom.domain.dto.WeDepartMentDto;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * 企业微信组织架构相关对象 we_department
@@ -14,6 +20,9 @@ import lombok.Data;
  * @date 2020-09-01
  */
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeDepartment extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
@@ -23,10 +32,12 @@ public class WeDepartment extends BaseEntity
 
 
     /** 部门名称 */
+    @NotBlank(message = "部门名称不可为空")
     private String name;
 
 
     /** 父节点的id */
+    @NotNull(message = "父节点的id不可为空")
     private Long parentId;
 
 

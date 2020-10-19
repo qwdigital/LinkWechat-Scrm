@@ -67,10 +67,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 
     <insert id="batchInsetWeTag" >
-        insert into we_tag (id, group_id, name, create_time)
+        insert into we_tag (id, group_id, name, create_time,tag_id)
         values
         <foreach collection="list" item="tag" index="index" separator=",">
-            (#{tag.id},#{tag.groupId},#{tag.name},#{tag.createTime})
+            (#{tag.id},#{tag.groupId},#{tag.name},#{tag.createTime},#{tag.tagId})
         </foreach>
     </insert>
 

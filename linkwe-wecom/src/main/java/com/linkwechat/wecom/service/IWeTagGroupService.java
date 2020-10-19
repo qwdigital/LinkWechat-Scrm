@@ -1,7 +1,10 @@
 package com.linkwechat.wecom.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeTagGroup;
+import com.linkwechat.wecom.domain.dto.tag.WeCropGroupTagDto;
 
 /**
  * 标签组Service接口
@@ -9,15 +12,9 @@ import com.linkwechat.wecom.domain.WeTagGroup;
  * @author ruoyi
  * @date 2020-09-07
  */
-public interface IWeTagGroupService 
+public interface IWeTagGroupService  extends IService<WeTagGroup>
 {
-    /**
-     * 查询标签组
-     * 
-     * @param id 标签组ID
-     * @return 标签组
-     */
-    public WeTagGroup selectWeTagGroupById(Long id);
+
 
     /**
      * 查询标签组列表
@@ -33,7 +30,7 @@ public interface IWeTagGroupService
      * @param weTagGroup 标签组
      * @return 结果
      */
-    public int insertWeTagGroup(WeTagGroup weTagGroup);
+    public void insertWeTagGroup(WeTagGroup weTagGroup);
 
     /**
      * 修改标签组
@@ -41,7 +38,7 @@ public interface IWeTagGroupService
      * @param weTagGroup 标签组
      * @return 结果
      */
-    public int updateWeTagGroup(WeTagGroup weTagGroup);
+    public void updateWeTagGroup(WeTagGroup weTagGroup);
 
     /**
      * 批量删除标签组
@@ -49,13 +46,20 @@ public interface IWeTagGroupService
      * @param ids 需要删除的标签组ID
      * @return 结果
      */
-    public int deleteWeTagGroupByIds(Long[] ids);
+    public int deleteWeTagGroupByIds(String[] ids);
+
+
 
     /**
-     * 删除标签组信息
-     * 
-     * @param id 标签组ID
-     * @return 结果
+     * 同步标签
+     * @return
      */
-    public int deleteWeTagGroupById(Long id);
+    public void synchWeTags();
+
+
+    /**
+     * 来自微信端批量保存或者更新标签组和标签
+     * @param tagGroup
+     */
+    public void batchSaveOrUpdateTagGroupAndTag(List<WeCropGroupTagDto> tagGroup);
 }

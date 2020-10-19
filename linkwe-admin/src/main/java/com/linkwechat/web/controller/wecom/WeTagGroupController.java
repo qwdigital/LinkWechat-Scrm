@@ -2,6 +2,7 @@ package com.linkwechat.web.controller.wecom;
 
 
 import com.linkwechat.common.annotation.Log;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
@@ -55,7 +56,9 @@ public class WeTagGroupController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody WeTagGroup weTagGroup)
     {
-        return toAjax(weTagGroupService.insertWeTagGroup(weTagGroup));
+        weTagGroupService.insertWeTagGroup(weTagGroup);
+
+        return AjaxResult.success();
     }
 
     /**
@@ -66,7 +69,8 @@ public class WeTagGroupController extends BaseController
     @PutMapping
     public AjaxResult edit(@RequestBody WeTagGroup weTagGroup)
     {
-        return toAjax(weTagGroupService.updateWeTagGroup(weTagGroup));
+        weTagGroupService.updateWeTagGroup(weTagGroup);
+        return AjaxResult.success();
     }
 
     /**
@@ -75,8 +79,22 @@ public class WeTagGroupController extends BaseController
     @PreAuthorize("@ss.hasPermi('wecom:group:remove')")
     @Log(title = "标签组", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable Long[] ids)
+    public AjaxResult remove(@PathVariable String[] ids)
     {
         return toAjax(weTagGroupService.deleteWeTagGroupByIds(ids));
+    }
+
+
+    /**
+     * 同步标签
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:group:synchWeTags')")
+    @GetMapping("/synchWeTags")
+    public AjaxResult synchWeTags(){
+
+        weTagGroupService.synchWeTags();
+
+        return  AjaxResult.success(WeConstans.SYNCH_TIP);
     }
 }

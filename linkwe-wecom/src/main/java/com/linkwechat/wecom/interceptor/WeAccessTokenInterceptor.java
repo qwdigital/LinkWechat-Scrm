@@ -45,11 +45,12 @@ public class WeAccessTokenInterceptor implements Interceptor{
 
         String uri=request.getUrl().replace("http://","");
 
-        if(Arrays.asList(weComeConfig.getFileUplodUrl()).contains(uri)){
-            request.setContentType("application/json");
-        }else{
-            request.setContentType("multipart/form-data");
-        }
+        request.setContentType("application/json");
+//        if(Arrays.asList(weComeConfig.getFileUplodUrl()).contains(uri)){
+//            request.setContentType("application/json");
+//        }else{
+//            request.setContentType("multipart/form-data");
+//        }
 
 
 
@@ -78,7 +79,6 @@ public class WeAccessTokenInterceptor implements Interceptor{
     @Override
     public void onError(ForestRuntimeException e, ForestRequest forestRequest, ForestResponse forestResponse) {
 
-        System.out.println("nihao");
 
     }
 

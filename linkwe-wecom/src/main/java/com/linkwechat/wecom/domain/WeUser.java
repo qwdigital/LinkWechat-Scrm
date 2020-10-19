@@ -3,6 +3,7 @@ package com.linkwechat.wecom.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.linkwechat.common.config.jackson.StringArrayDeserialize;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.bean.BeanUtils;
@@ -11,6 +12,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
 
@@ -35,6 +37,7 @@ public class WeUser extends BaseEntity
 
     /** 用户名称 */
     @ApiModelProperty("姓名")
+    @NotBlank(message = "姓名不可为空")
     private String name;
 
     /** 用户昵称 */
@@ -43,6 +46,7 @@ public class WeUser extends BaseEntity
 
     /** 账号 */
     @ApiModelProperty("账号")
+    @NotBlank(message = "账号不可为空")
     private String userId;
 
     /** 性别。1表示男性，2表示女性 */
@@ -51,6 +55,7 @@ public class WeUser extends BaseEntity
 
     /** 手机号 */
     @ApiModelProperty("手机号")
+    @NotBlank(message = "手机号不可为空")
     private String mobile;
 
     /** 邮箱 */
@@ -106,6 +111,7 @@ public class WeUser extends BaseEntity
     /** 是否激活（1:是；2:否）该字段主要表示当前信息是否同步微信 */
     @ApiModelProperty("是否激活（1:是；2:否）该字段主要表示当前信息是否同步微信 ")
     private Integer isActivate=new Integer(2);
+
 
 
     /** 转化成企业微信需要的dto对象 */

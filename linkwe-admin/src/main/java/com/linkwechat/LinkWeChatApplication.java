@@ -1,17 +1,20 @@
 package com.linkwechat;
 
+import com.github.pagehelper.autoconfigure.PageHelperAutoConfiguration;
 import com.thebeastshop.forest.springboot.annotation.ForestScan;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 
 /**
  * 启动程序
  * 
  * @author ruoyi
  */
-@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
+@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class, PageHelperAutoConfiguration.class })
 @MapperScan("com.linkwechat.*.mapper")
 @ForestScan(basePackages = "com.linkwechat.wecom.client")
 public class LinkWeChatApplication

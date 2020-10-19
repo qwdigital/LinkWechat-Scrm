@@ -139,16 +139,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
 
-    <delete id="deleteWeUserById" parameterType="Long">
-        delete from we_user where id = #{id}
-    </delete>
 
-    <delete id="deleteWeUserByIds" parameterType="String">
-        delete from we_user where id in 
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
 
 
     <select id="leaveUserList" parameterType="WeLeaveUserVo" resultType="com.linkwechat.wecom.domain.vo.WeLeaveUserVo">
@@ -170,8 +161,45 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
 
+    <delete id="deleteWeUser">
+        delete from we_user
+    </delete>
+
+
+    <insert id="batchInsertWeUser" >
+        insert into we_user (id, head_image_url, user_name, alias,
+                             user_id, gender, mobile, email, wx_account,
+                             department, position, is_leader_in_dept,
+                             join_time, enable, id_card,
+                             qq_account, telephone, address,
+                             birthday, remark, is_activate)
+        values
+        <foreach collection="weUsers" item="weUser" index="index" separator=",">
+            (   #{weUser.id},#{weUser.avatarMediaid},#{weUser.name},#{weUser.alias},
+                #{weUser.userId},#{weUser.gender},#{weUser.mobile},#{weUser.email},#{weUser.wxAccount},
+                #{weUser.department},#{weUser.position},#{weUser.isLeaderInDept},
+                #{weUser.joinTime},#{weUser.enable},#{weUser.idCard},
+                #{weUser.qqAccount},#{weUser.telephone},#{weUser.address},
+                #{weUser.birthday},#{weUser.remark},#{weUser.isActivate}
+            )
+        </foreach>
+        on duplicate key update head_image_url= values(head_image_url),
+        id=values(id),
+        user_name= values(user_name),alias= values(alias),
+        mobile= values(mobile),email= values(email),
+        wx_account= values(wx_account),department= values(department),
+        position= values(position),is_leader_in_dept= values(is_leader_in_dept),
+        join_time= values(join_time),enable= values(enable),
+        id_card= values(id_card),qq_account= values(qq_account),
+        telephone= values(telephone),address= values(address),
+        birthday= values(birthday),remark= values(remark),
+        is_activate= values(is_activate)
+    </insert>
 
 
 
-    
+
+
+
+
 </mapper>

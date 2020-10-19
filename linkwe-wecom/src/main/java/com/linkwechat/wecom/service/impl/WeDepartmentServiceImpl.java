@@ -1,9 +1,11 @@
 package com.linkwechat.wecom.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.wecom.client.WeDepartMentClient;
 import com.linkwechat.wecom.domain.WeDepartment;
@@ -83,23 +85,19 @@ public class WeDepartmentServiceImpl implements IWeDepartmentService
      * @return 结果
      */
     @Override
+    @Transactional
     public int insertWeDepartment(WeDepartment weDepartment)
     {
-
+         weDepartment.setId(SnowFlakeUtil.nextId());
          int returnCode=weDepartmentMapper.insertWeDepartment(weDepartment);
 
          if(returnCode>0){
 
-             WeDepartMentDto.DeartMentDto deartMentDto = weDepartment.transformDeartMentDto(weDepartment);
 
-//             WeResultDto weResultDto=weDepartMentClient.createWeDepartMent(
-//                     weDepartment.transformDeartMentDto(weDepartment)
-//             );
-//
-//             //微信端调用不成功
-//             if(!WeConstans.WE_SUCCESS_CODE.equals(weResultDto.getErrcode())){
-//                 throw new WeComException(weResultDto.getErrmsg());
-//             }
+              weDepartMentClient.createWeDepartMent(
+                     weDepartment.transformDeartMentDto(weDepartment)
+             );
+
 
          }
 
@@ -119,41 +117,53 @@ public class WeDepartmentServiceImpl implements IWeDepartmentService
         int returnCode=weDepartmentMapper.updateWeDepartment(weDepartment);
         if(returnCode>0){
 
-            WeResultDto weResultDto=weDepartMentClient.updateWeDepartMent(
+            weDepartMentClient.updateWeDepartMent(
                     weDepartment.transformDeartMentDto(weDepartment)
             );
 
-            //微信端调用不成功
-            if(!WeConstans.WE_SUCCESS_CODE.equals(weResultDto.getErrcode())){
-                throw new WeComException(weResultDto.getErrmsg());
-            }
 
         }
 
         return returnCode;
     }
 
-    /**
-     * 批量删除企业微信组织架构相关
-     * 
-     * @param ids 需要删除的企业微信组织架构相关ID
-     * @return 结果
-     */
-    @Override
-    public int deleteWeDepartmentByIds(Long[] ids)
-    {
-        return weDepartmentMapper.deleteWeDepartmentByIds(ids);
-    }
 
     /**
-     * 删除企业微信组织架构相关信息
-     * 
-     * @param id 企业微信组织架构相关ID
-     * @return 结果
+     * 批量保存
+     * @param weDepartments
+     * @return
      */
     @Override
-    public int deleteWeDepartmentById(Long id)
-    {
-        return weDepartmentMapper.deleteWeDepartmentById(id);
+    public int batchInsertWeDepartment(List<WeDepartment> weDepartments) {
+        return weDepartmentMapper.batchInsertWeDepartment(weDepartments);
     }
+
+
+    /**
+     *  删除部门表所有数据
+     * @return
+     */
+    @Override
+    public int deleteAllWeDepartment() {
+        return weDepartmentMapper.deleteAllWeDepartment();
+    }
+
+
+
+    /**
+     * 同步部门
+     */
+    @Override
+    @Transactional
+    public List<WeDepartment> synchWeDepartment() {
+        List<WeDepartment> weDepartments = weDepartMentClient.weAllDepartMents().findWeDepartments();
+        if(CollectionUtil.isNotEmpty(weDepartments)){
+            this.deleteAllWeDepartment();
+            this.batchInsertWeDepartment(weDepartments);
+        }
+
+        return weDepartments;
+    }
+
+
 }

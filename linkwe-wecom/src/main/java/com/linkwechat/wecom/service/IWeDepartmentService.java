@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service;
 
 import java.util.List;
 import com.linkwechat.wecom.domain.WeDepartment;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 企业微信组织架构相关Service接口
@@ -42,19 +43,25 @@ public interface IWeDepartmentService
      */
     public int updateWeDepartment(WeDepartment weDepartment);
 
-    /**
-     * 批量删除企业微信组织架构相关
-     * 
-     * @param ids 需要删除的企业微信组织架构相关ID
-     * @return 结果
-     */
-    public int deleteWeDepartmentByIds(Long[] ids);
+
 
     /**
-     * 删除企业微信组织架构相关信息
-     * 
-     * @param id 企业微信组织架构相关ID
-     * @return 结果
+     *  批量保存
+     * @param weDepartments
+     * @return
      */
-    public int deleteWeDepartmentById(Long id);
+    public int batchInsertWeDepartment(List<WeDepartment> weDepartments);
+
+
+    /**
+     * 删除部门表所有数据
+     * @return
+     */
+    public int deleteAllWeDepartment();
+
+
+    /**
+     * 同步部门
+     */
+    public List<WeDepartment> synchWeDepartment();
 }

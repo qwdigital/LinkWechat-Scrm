@@ -10,6 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -50,7 +51,7 @@ public class WeDepartmentController extends BaseController
     @Log(title = "企业微信组织架构相关", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("添加部门")
-    public AjaxResult add(@RequestBody WeDepartment weDepartment)
+    public AjaxResult add(@Validated @RequestBody WeDepartment weDepartment)
     {
         return toAjax(weDepartmentService.insertWeDepartment(weDepartment));
     }

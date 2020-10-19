@@ -1,13 +1,21 @@
 package com.linkwechat.wecom.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.framework.web.domain.server.Sys;
+import com.linkwechat.wecom.client.WeDepartMentClient;
 import com.linkwechat.wecom.client.WeUserClient;
+import com.linkwechat.wecom.domain.WeDepartment;
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.dto.WeDepartMentDto;
+import com.linkwechat.wecom.domain.dto.WeUserDto;
+import com.linkwechat.wecom.domain.dto.WeUserListDto;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
 import com.linkwechat.wecom.mapper.WeUserMapper;
 import com.linkwechat.wecom.service.IWeCustomerService;
+import com.linkwechat.wecom.service.IWeDepartmentService;
 import com.linkwechat.wecom.service.IWeGroupService;
 import com.linkwechat.wecom.service.IWeUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +44,7 @@ public class WeUserServiceImpl implements IWeUserService
 
 
 
+
     @Autowired
     private IWeCustomerService iWeCustomerService;
 
@@ -43,9 +52,13 @@ public class WeUserServiceImpl implements IWeUserService
     @Autowired
     private IWeGroupService iWeGroupService;
 
+
+    @Autowired
+    private IWeDepartmentService iWeDepartmentService;
+
     /**
      * 查询通讯录相关客户
-     * 
+     *
      * @param id 通讯录相关客户ID
      * @return 通讯录相关客户
      */
@@ -111,29 +124,6 @@ public class WeUserServiceImpl implements IWeUserService
 
     }
 
-    /**
-     * 批量删除通讯录相关客户
-     * 
-     * @param ids 需要删除的通讯录相关客户ID
-     * @return 结果
-     */
-    @Override
-    public int deleteWeUserByIds(Long[] ids)
-    {
-        return weUserMapper.deleteWeUserByIds(ids);
-    }
-
-    /**
-     * 删除通讯录相关客户信息
-     * 
-     * @param id 通讯录相关客户ID
-     * @return 结果
-     */
-    @Override
-    public int deleteWeUserById(Long id)
-    {
-        return weUserMapper.deleteWeUserById(id);
-    }
 
 
 
@@ -190,6 +180,29 @@ public class WeUserServiceImpl implements IWeUserService
             iWeGroupService.allocateWeGroup(weLeaveUserInfoAllocateVo);
         }catch (Exception e){
             throw new WeComException(e.getMessage());
+        }
+
+    }
+
+
+    /**
+     * 同步成员
+     */
+    @Override
+    @Transactional
+    public void synchWeUser(){
+
+        //同步部门
+        iWeDepartmentService.synchWeDepartment();
+
+        List<WeUser> weUsers
+                = weUserClient.list(WeConstans.WE_ROOT_DEPARMENT_ID, WeConstans.DEPARTMENT_SUB_WEUSER).getWeUsers();
+        if(CollectionUtil.isNotEmpty(weUsers)){
+
+            //删除当前员工表员工
+            weUserMapper.deleteWeUser();
+            //重新插入员工
+            weUserMapper.batchInsertWeUser(weUsers);
         }
 
     }

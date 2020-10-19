@@ -101,4 +101,37 @@ public class WeConstans {
      */
     public static  final String WE_ERROR_FIELD="errcode";
 
+
+    /**
+     * 递归
+     */
+    public static final Integer  YES_IS_RECURSION=0;
+
+
+    /**
+     * 获取所有子部门数据
+     */
+    public static final Integer  DEPARTMENT_SUB_WEUSER=1;
+
+
+    /**
+     * 获取当前部门
+     */
+    public static final Integer  DEPARTMENT_CURRENT_WEUSER=0;
+
+
+    /**
+     * 通讯录用户激活
+     */
+    public static final Integer YES_IS_ACTIVATE=1;
+
+
+    /**
+     * 通讯录用户未激活
+     */
+    public static final Integer NO_IS_ACTIVATE=2;
+
+
+
+
 }

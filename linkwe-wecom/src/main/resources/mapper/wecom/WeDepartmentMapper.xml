@@ -46,15 +46,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
 
-    <delete id="deleteWeDepartmentById" parameterType="Long">
-        delete from we_department where id = #{id}
+
+
+    <delete id="deleteAllWeDepartment" >
+        delete from we_department
     </delete>
 
-    <delete id="deleteWeDepartmentByIds" parameterType="String">
-        delete from we_department where id in 
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
+
+    <insert id="batchInsertWeDepartment" >
+        insert into we_department (id, name, parent_id)
+        values
+        <foreach collection="weDepartments" item="weDepartment" index="index" separator=",">
+            (#{weDepartment.id},#{weDepartment.name},#{weDepartment.parentId})
         </foreach>
-    </delete>
-    
+    </insert>
+
+
 </mapper>

@@ -130,6 +130,7 @@ public class GlobalExceptionHandler
 
         String errorMsg = forestExcetion.getMessage();
 
+
         if(StringUtils.isNotEmpty(errorMsg)){
 
             Integer errCode = JSONUtil.parseObj(errorMsg).getInt( WeConstans.WE_ERROR_FIELD);

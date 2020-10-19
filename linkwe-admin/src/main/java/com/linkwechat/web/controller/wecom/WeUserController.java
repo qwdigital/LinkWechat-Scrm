@@ -14,6 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,7 +65,7 @@ public class WeUserController extends BaseController {
     @Log(title = "通讯录相关客户", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增通讯录客户")
-    public AjaxResult add(@RequestBody WeUser weUser)
+    public AjaxResult add(@Validated @RequestBody WeUser weUser)
     {
         return toAjax(weUserService.insertWeUser(weUser));
     }
@@ -142,6 +143,25 @@ public class WeUserController extends BaseController {
 
             return AjaxResult.success("离职分配成功");
     }
+
+
+    /**
+     *  同步成员
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:user:synchWeUser')")
+    @GetMapping({"/synchWeUser"})
+    public AjaxResult synchWeUser(){
+
+
+        weUserService.synchWeUser();
+
+        return  AjaxResult.success(WeConstans.SYNCH_TIP);
+    }
+
+
+
+
 
 
 

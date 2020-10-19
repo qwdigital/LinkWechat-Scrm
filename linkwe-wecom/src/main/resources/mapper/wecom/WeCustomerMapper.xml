@@ -23,7 +23,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <result property="description"    column="description"    />
             <result property="createTime"    column="create_time"    />
             <result property="remarkCorpName"    column="remark_corp_name"    />
-            <result property="remarkMobiles"    column="remark_mobiles"    />
+<!--            <result property="remarkMobiles"    column="remark_mobiles"    />-->
             <result property="operUserid"    column="oper_userid"    />
             <result property="addWay"    column="add_way"    />
             <result property="state"    column="state"    />

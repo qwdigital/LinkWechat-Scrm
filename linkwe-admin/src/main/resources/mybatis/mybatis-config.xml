@@ -14,7 +14,6 @@
 
     <typeHandlers>
         <typeHandler handler="com.linkwechat.framework.handler.StringArrayJoinTypeHandler"/>
-
     </typeHandlers>
 
 </configuration>

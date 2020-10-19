@@ -1,6 +1,8 @@
 package com.linkwechat.wecom.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeTag;
 import com.linkwechat.wecom.domain.dto.WeTagDto;
 
@@ -10,7 +12,7 @@ import com.linkwechat.wecom.domain.dto.WeTagDto;
  * @author ruoyi
  * @date 2020-09-07
  */
-public interface IWeTagService 
+public interface IWeTagService  extends IService<WeTag>
 {
     /**
      * 查询企业微信标签

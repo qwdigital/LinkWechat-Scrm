@@ -11,7 +11,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="description"    column="description"    />
         <result property="createTime"    column="create_time"    />
         <result property="remarkCorpName"    column="remark_corp_name"    />
-        <result property="remarkMobiles"    column="remark_mobiles"    />
+<!--        <result property="remarkMobiles"    column="remark_mobiles"    />-->
         <result property="operUserid"    column="oper_userid"    />
         <result property="addWay"    column="add_way"    />
         <result property="state"    column="state"    />
@@ -50,7 +50,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="description != null">description,</if>
             <if test="createTime != null">create_time,</if>
             <if test="remarkCorpName != null">remark_corp_name,</if>
-            <if test="remarkMobiles != null">remark_mobiles,</if>
+<!--            <if test="remarkMobiles != null">remark_mobiles,</if>-->
             <if test="operUserid != null">oper_userid,</if>
             <if test="addWay != null">add_way,</if>
             <if test="state != null">state,</if>
@@ -63,7 +63,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="description != null">#{description},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="remarkCorpName != null">#{remarkCorpName},</if>
-            <if test="remarkMobiles != null">#{remarkMobiles},</if>
+<!--            <if test="remarkMobiles != null">#{remarkMobiles},</if>-->
             <if test="operUserid != null">#{operUserid},</if>
             <if test="addWay != null">#{addWay},</if>
             <if test="state != null">#{state},</if>
@@ -79,7 +79,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="description != null">description = #{description},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="remarkCorpName != null">remark_corp_name = #{remarkCorpName},</if>
-            <if test="remarkMobiles != null">remark_mobiles = #{remarkMobiles},</if>
+<!--            <if test="remarkMobiles != null">remark_mobiles = #{remarkMobiles},</if>-->
             <if test="operUserid != null">oper_userid = #{operUserid},</if>
             <if test="addWay != null">add_way = #{addWay},</if>
             <if test="state != null">state = #{state},</if>

@@ -2,6 +2,7 @@ package com.linkwechat.wecom.mapper;
 
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface WeUserMapper
 {
     /**
      * 查询通讯录相关客户
-     * 
+     *
      * @param id 通讯录相关客户ID
      * @return 通讯录相关客户
      */
@@ -45,27 +46,26 @@ public interface WeUserMapper
      */
     public int updateWeUser(WeUser weUser);
 
-    /**
-     * 删除通讯录相关客户
-     * 
-     * @param id 通讯录相关客户ID
-     * @return 结果
-     */
-    public int deleteWeUserById(Long id);
-
-    /**
-     * 批量删除通讯录相关客户
-     * 
-     * @param ids 需要删除的数据ID
-     * @return 结果
-     */
-    public int deleteWeUserByIds(Long[] ids);
-
 
     /**
      * 离职员工
      * @param weLeaveUserVo
      * @return
      */
-    List<WeLeaveUserVo> leaveUserList(WeLeaveUserVo weLeaveUserVo);
+   public List<WeLeaveUserVo> leaveUserList(WeLeaveUserVo weLeaveUserVo);
+
+
+    /**
+     * 删除当前表的员工
+     * @return
+     */
+    public int  deleteWeUser();
+
+
+    /**
+     * 批量插入员工
+     * @param weUsers
+     * @return
+     */
+    public int batchInsertWeUser(@Param("weUsers") List<WeUser> weUsers);
 }

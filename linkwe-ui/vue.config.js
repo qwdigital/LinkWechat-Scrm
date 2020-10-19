@@ -6,7 +6,7 @@ function resolve(dir) {
 }
 
 process.env.VUE_APP_TITLE = require('./package.json').description
-process.env.VUE_APP_BASE_API = process.env.NODE_ENV === 'development' ? 'http://106.13.201.219:8080' : 'http://106.13.201.219:8080'
+process.env.VUE_APP_BASE_API = process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:8080' : 'http://127.0.0.1:8080'
 // vue.config.js 配置说明
 //官方vue.config.js 参考文档 https://cli.vuejs.org/zh/config/#css-loaderoptions
 // 这里只列一部分，具体配置参考文档
