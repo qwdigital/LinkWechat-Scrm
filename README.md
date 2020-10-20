@@ -51,7 +51,7 @@ npm install
 npm install --registry=https://registry.npm.taobao.org
 
 # 本地开发 启动项目
-npm run dev
+npm  run serve
 ```
 4、打开浏览器，输入：http://localhost:80 （默认账户 admin/admin123）
 若能正确展示登录页面，并能成功登录，菜单及页面展示正常，则表明环境搭建成功
@@ -173,7 +173,7 @@ com.linkwechat
 
 - 前端技术栈 ES6、vue、vuex、vue-router、vue-cli、axios、element-ui
 
-- 后端技术栈 SpringBoot、MyBatis、Spring Security、Jwt
+- 后端技术栈 SpringBoot、MyBatis-plus、Spring Security、Jwt
 
 #### 最终业务架构
 
