@@ -126,7 +126,7 @@ export default {
           this.loading = false;
         });
     },
-    handleNodeClick(data) {
+    handleNodeClick(data, node) {
       this.query.department = data.id;
       this.getList(1);
     },
@@ -166,7 +166,19 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-    sync() {},
+    syncUser() {
+      const loading = this.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
+      api.syncUser().then(() => {
+        loading.close();
+        this.msgSuccess("操作成功");
+        this.getList();
+      });
+    },
     batchImport() {},
     departEdit(data, type) {
       this.formDepart = Object.assign(
@@ -229,7 +241,7 @@ export default {
     </el-form>
 
     <div class="ar mb15">
-      <el-button type="primary" icon="el-icon-refresh" size="mini" @click="sync">同步成员</el-button>
+      <el-button type="primary" icon="el-icon-refresh" size="mini" @click="syncUser">同步成员</el-button>
       <el-button type="primary" icon="el-icon-plus" size="mini" @click="batchImport">批量导入</el-button>
       <el-button type="primary" icon="el-icon-plus" size="mini" @click="edit()">添加成员</el-button>
     </div>
@@ -249,7 +261,7 @@ export default {
           >
             <div class="custom-tree-node" slot-scope="{ node, data }">
               <span>{{ node.label }}</span>
-              <span class="fr">
+              <span class="fr" v-if="node.level !== 1">
                 <i class="el-icon-edit" @click.stop="departEdit(data, 1)"></i>
                 <i class="el-icon-plus" @click.stop="departEdit(data, 0)"></i>
               </span>

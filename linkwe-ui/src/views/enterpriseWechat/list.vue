@@ -55,14 +55,14 @@
         ref="form"
         label-position="right"
         :model="form"
-        rules="rules"
-        label-width="150px"
+        :rules="rules"
+        label-width="160px"
         :disabled="disabled"
       >
-        <el-form-item label="企业名称">
+        <el-form-item label="企业名称" prop="companyName">
           <el-input v-model="form.companyName" :disabled="form.id"></el-input>
         </el-form-item>
-        <el-form-item label="企业ID（CorpID）">
+        <el-form-item label="企业ID（CorpID）" prop="corpId">
           <el-input
             :disabled="form.id"
             v-model="form.corpId"
@@ -79,7 +79,7 @@
           <el-input disabled id="copy-input1" v-model="form.companyName"></el-input>
           <el-button type="primary" class="copy-btn" data-clipboard-target="#copy-input1">复制</el-button>
         </el-form-item>-->
-        <el-form-item label="通讯录管理secret">
+        <el-form-item label="通讯录管理secret" prop="corpSecret">
           <el-input v-model="form.corpSecret" style="width: 80%"></el-input>
           <el-link class="fr" type="primary">如何获取？</el-link>
         </el-form-item>
@@ -90,7 +90,7 @@
           </el-radio-group>
           <div>开启后，可以将成员、部门的增删改以及成员的标签变更实时的同步到塬微SCRM，无需手动更新同步。</div>
         </el-form-item>-->
-        <el-form-item label="外部联系人管理secret">
+        <el-form-item label="外部联系人管理secret" prop="contactSecret">
           <el-input v-model="form.contactSecret"></el-input>
         </el-form-item>
         <!-- <el-form-item label="通讯录事件服务">
