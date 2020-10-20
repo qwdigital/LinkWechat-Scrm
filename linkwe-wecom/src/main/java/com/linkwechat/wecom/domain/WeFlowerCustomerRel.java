@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -28,9 +29,11 @@ public class WeFlowerCustomerRel
 {
     private static final long serialVersionUID = 1L;
 
+    @TableId
+    private Long id= SnowFlakeUtil.nextId();
+
 
     /** 添加了此外部联系人的企业成员userid */
-    @TableId
     private String userId;
 
     /** 外部联系人名称 */
@@ -57,13 +60,15 @@ public class WeFlowerCustomerRel
     private String state;
 
     /** 客户id */
-    private Long customerId;
+    private String externalUserid;
 
     /** 状态（0正常 1删除） */
     private String status;
 
     /** 创建时间 */
     private Date createTime;
+
+
 
 
     /** 微信用户添加的标签 */

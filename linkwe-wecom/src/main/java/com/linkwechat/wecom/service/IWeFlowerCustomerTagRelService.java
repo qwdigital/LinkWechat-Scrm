@@ -1,6 +1,8 @@
 package com.linkwechat.wecom.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeFlowerCustomerTagRel;
 
 /**
@@ -9,7 +11,7 @@ import com.linkwechat.wecom.domain.WeFlowerCustomerTagRel;
  * @author ruoyi
  * @date 2020-09-19
  */
-public interface IWeFlowerCustomerTagRelService 
+public interface IWeFlowerCustomerTagRelService extends IService<WeFlowerCustomerTagRel>
 {
     /**
      * 查询客户标签关系

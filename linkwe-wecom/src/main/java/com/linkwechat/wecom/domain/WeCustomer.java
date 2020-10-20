@@ -67,7 +67,7 @@ public class WeCustomer
 
     /** 添加人员 */
     @TableField(exist = false)
-   private List<WeFlowerCustomerRel> weFlowerCustomerRels;
+    private List<WeFlowerCustomerRel> weFlowerCustomerRels;
 
 
 

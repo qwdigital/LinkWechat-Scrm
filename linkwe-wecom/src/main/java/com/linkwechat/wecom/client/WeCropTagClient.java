@@ -28,9 +28,19 @@ public interface WeCropTagClient {
      * @return
      */
     @Request(url = "/externalcontact/get_corp_tag_list",
-             type = "POST"
+            type = "POST"
     )
     WeCropGroupTagListDto getAllCorpTagList();
+
+
+    /**
+     * 根据指定标签的id,获取标签详情
+     * @return
+     */
+    @Request(url = "/externalcontact/get_corp_tag_list",
+            type = "POST"
+    )
+    WeCropGroupTagListDto getCorpTagListByTagIds(@DataObject WeFindCropTagParam weFindCropTagParam);
 
 
     /**

@@ -1,7 +1,17 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.common.utils.SnowFlakeUtil;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 
 /**
@@ -11,21 +21,30 @@ import lombok.Data;
  * @date 2020-09-19
  */
 @Data
-public class WeFlowerCustomerTagRel extends BaseEntity
+@TableName("we_flower_customer_tag_rel")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class WeFlowerCustomerTagRel
 {
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
-    private Long id;
+    @TableId
+    private Long id= SnowFlakeUtil.nextId();
 
     /** 添加客户的企业微信用户 */
     private Long flowerCustomerRelId;
 
     /** 标签id */
-    private Long tagId;
+    private String tagId;
 
     /** 标签名 */
+    @TableField(exist = false)
     private String tagName;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createTime;
 
 
 }

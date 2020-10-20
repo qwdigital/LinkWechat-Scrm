@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.impl;
 
 import java.util.List;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ import com.linkwechat.wecom.service.IWeFlowerCustomerTagRelService;
  * @date 2020-09-19
  */
 @Service
-public class WeFlowerCustomerTagRelServiceImpl implements IWeFlowerCustomerTagRelService 
+public class WeFlowerCustomerTagRelServiceImpl extends ServiceImpl<WeFlowerCustomerTagRelMapper,WeFlowerCustomerTagRel> implements IWeFlowerCustomerTagRelService
 {
     @Autowired
     private WeFlowerCustomerTagRelMapper weFlowerCustomerTagRelMapper;
