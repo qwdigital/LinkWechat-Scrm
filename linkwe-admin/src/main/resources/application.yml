@@ -85,15 +85,20 @@ token:
     secret: abcdefghijklmnopqrstuvwxyz
     # 令牌有效期（默认30分钟）
     expireTime: 30
-  
-# MyBatis配置
-mybatis:
-    # 搜索指定包别名
-    typeAliasesPackage: com.linkwechat.**.domain
-    # 配置mapper的扫描，找到所有的mapper.xml映射文件
-    mapperLocations: classpath*:mapper/**/*Mapper.xml
-    # 加载全局的配置文件
-    configLocation: classpath:mybatis/mybatis-config.xml
+
+mybatis-plus:
+   mapper-locations: classpath*:mapper/**/*Mapper.xml
+   type-aliases-package: com.linkwechat.**.domain
+   type-handlers-package: com.linkwechat.framework.handler.**
+
+## MyBatis配置
+#mybatis:
+#    # 搜索指定包别名
+#    typeAliasesPackage: com.linkwechat.**.domain
+#    # 配置mapper的扫描，找到所有的mapper.xml映射文件
+#    mapperLocations: classpath*:mapper/**/*Mapper.xml
+#    # 加载全局的配置文件
+#    configLocation: classpath:mybatis/mybatis-config.xml
 
 # PageHelper分页插件
 pagehelper: 
@@ -128,5 +133,5 @@ wecome:
   serverUrl: https://qyapi.weixin.qq.com/
   weComePrefix: cgi-bin
   noAccessTokenUrl: /gettoken
-  needContactTokenUrl: /externalcontact/get_follow_user_list,/externalcontact/add_contact_way
+  needContactTokenUrl: /externalcontact/get_follow_user_list,/externalcontact/add_contact_way,/externalcontact/add_corp_tag,/externalcontact/get_corp_tag_list,/externalcontact/del_corp_tag,/externalcontact/edit_corp_tag,/externalcontact/list,/externalcontact/get
   fileUplodUrl:  /media/upload,/media/uploadimg
