@@ -25,8 +25,8 @@ public class WeCustomerDto extends WeResultDto{
     /** 客户详情 */
     private ExternalContact external_contact;
 
-    /** 客户联系人 */
-    private List<WeFollowUserDto> follow_user;
+//    /** 客户联系人 */
+//    private List<WeFollowUserDto> follow_user;
 
 
     @Data
@@ -64,30 +64,30 @@ public class WeCustomerDto extends WeResultDto{
     }
 
 
-    public WeCustomer transformWeCustomer(){
-        WeCustomer weCustomer=new WeCustomer();
-
-        if(null != external_contact){
-            BeanUtils.copyPropertiesignoreOther(external_contact,weCustomer);
-        }
-
-        if(CollectionUtil.isNotEmpty(follow_user)){
-            List<WeFlowerCustomerRel> weFlowerCustomerRels=new ArrayList<>();
-            List<WeTagDto> weTagDtos=new ArrayList<>();
-            follow_user.stream().forEach(k->{
-                WeFlowerCustomerRel weFlowerCustomerRel=new WeFlowerCustomerRel();
-                BeanUtils.copyPropertiesignoreOther(k,weFlowerCustomerRel);
-                weFlowerCustomerRels.add(weFlowerCustomerRel);
-                if(CollectionUtil.isNotEmpty(k.getTags())){
-                    k.getTags().stream().forEach(v->v.setFlower_customer_rel_id(k.getId()));
-                    weTagDtos.addAll(k.getTags());
-                }
-            });
-
-        }
-
-        return weCustomer;
-    }
+//    public WeCustomer transformWeCustomer(){
+//        WeCustomer weCustomer=new WeCustomer();
+//
+//        if(null != external_contact){
+//            BeanUtils.copyPropertiesignoreOther(external_contact,weCustomer);
+//        }
+//
+//        if(CollectionUtil.isNotEmpty(follow_user)){
+//            List<WeFlowerCustomerRel> weFlowerCustomerRels=new ArrayList<>();
+//            List<WeTagDto> weTagDtos=new ArrayList<>();
+//            follow_user.stream().forEach(k->{
+//                WeFlowerCustomerRel weFlowerCustomerRel=new WeFlowerCustomerRel();
+//                BeanUtils.copyPropertiesignoreOther(k,weFlowerCustomerRel);
+//                weFlowerCustomerRels.add(weFlowerCustomerRel);
+//                if(CollectionUtil.isNotEmpty(k.getTags())){
+//                    k.getTags().stream().forEach(v->v.setFlower_customer_rel_id(k.getId()));
+//                    weTagDtos.addAll(k.getTags());
+//                }
+//            });
+//
+//        }
+//
+//        return weCustomer;
+//    }
 
 
 }

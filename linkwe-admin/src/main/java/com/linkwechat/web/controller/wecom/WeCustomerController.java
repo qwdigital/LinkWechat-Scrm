@@ -72,16 +72,16 @@ public class WeCustomerController extends BaseController
 
 
 
-    /**
-     * 修改企业微信客户
-     */
-    @PreAuthorize("@ss.hasPermi('wecom:customer:edit')")
-    @Log(title = "企业微信客户", businessType = BusinessType.UPDATE)
-    @PutMapping
-    public AjaxResult edit(@RequestBody WeCustomer weCustomer)
-    {
-        return toAjax(weCustomerService.updateWeCustomer(weCustomer));
-    }
+//    /**
+//     * 修改企业微信客户
+//     */
+//    @PreAuthorize("@ss.hasPermi('wecom:customer:edit')")
+//    @Log(title = "企业微信客户", businessType = BusinessType.UPDATE)
+//    @PutMapping
+//    public AjaxResult edit(@RequestBody WeCustomer weCustomer)
+//    {
+//        return toAjax(weCustomerService.updateWeCustomer(weCustomer));
+//    }
 
 
     /**

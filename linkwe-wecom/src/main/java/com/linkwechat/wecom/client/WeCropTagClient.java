@@ -2,7 +2,6 @@ package com.linkwechat.wecom.client;
 
 import com.dtflys.forest.annotation.DataObject;
 import com.dtflys.forest.annotation.Request;
-import com.linkwechat.wecom.domain.dto.WeCropGroupTagDto111;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.domain.dto.tag.*;
 

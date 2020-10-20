@@ -132,6 +132,12 @@ public class WeConstans {
     public static final Integer NO_IS_ACTIVATE=2;
 
 
+    /**
+     *  不存在外部联系人的关系
+     */
+    public static final Integer NOT_EXIST_CONTACT=84061;
+
+
 
 
 }

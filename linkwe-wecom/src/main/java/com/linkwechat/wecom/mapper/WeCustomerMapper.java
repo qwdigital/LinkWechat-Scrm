@@ -1,6 +1,8 @@
 package com.linkwechat.wecom.mapper;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeCustomer;
 
 /**
@@ -9,7 +11,7 @@ import com.linkwechat.wecom.domain.WeCustomer;
  * @author ruoyi
  * @date 2020-09-13
  */
-public interface WeCustomerMapper 
+public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
 {
     /**
      * 查询企业微信客户

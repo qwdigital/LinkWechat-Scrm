@@ -78,7 +78,7 @@ public class WeCorpAccountController extends BaseController
     @PreAuthorize("@ss.hasPermi('wechat:corp:startVailWeCorpAccount')")
     @Log(title = "启用有效企业微信账号", businessType = BusinessType.DELETE)
 	@PutMapping("/startVailWeCorpAccount/{corpId}")
-    public AjaxResult startWeCorpAccount(@PathVariable Long corpId)
+    public AjaxResult startWeCorpAccount(@PathVariable String corpId)
     {
         return toAjax(weCorpAccountService.startVailWeCorpAccount(corpId));
     }

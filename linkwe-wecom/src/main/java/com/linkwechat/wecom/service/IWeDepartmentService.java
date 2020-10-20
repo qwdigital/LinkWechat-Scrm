@@ -1,6 +1,8 @@
 package com.linkwechat.wecom.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeDepartment;
 import org.apache.ibatis.annotations.Param;
 
@@ -10,7 +12,7 @@ import org.apache.ibatis.annotations.Param;
  * @author ruoyi
  * @date 2020-09-01
  */
-public interface IWeDepartmentService 
+public interface IWeDepartmentService extends IService<WeDepartment>
 {
     /**
      * 查询企业微信组织架构相关

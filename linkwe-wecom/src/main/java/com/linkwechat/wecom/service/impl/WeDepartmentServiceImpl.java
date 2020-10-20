@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.exception.wecom.WeComException;
@@ -28,7 +29,7 @@ import java.util.List;
  * @date 2020-09-01
  */
 @Service
-public class WeDepartmentServiceImpl implements IWeDepartmentService 
+public class WeDepartmentServiceImpl extends ServiceImpl<WeDepartmentMapper,WeDepartment> implements IWeDepartmentService
 {
     @Autowired
     private WeDepartmentMapper weDepartmentMapper;

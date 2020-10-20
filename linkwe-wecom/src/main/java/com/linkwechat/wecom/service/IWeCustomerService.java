@@ -1,6 +1,8 @@
 package com.linkwechat.wecom.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 
@@ -10,7 +12,7 @@ import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
  * @author ruoyi
  * @date 2020-09-13
  */
-public interface IWeCustomerService 
+public interface IWeCustomerService extends IService<WeCustomer>
 {
     /**
      * 查询企业微信客户
@@ -28,37 +30,37 @@ public interface IWeCustomerService
      */
     public List<WeCustomer> selectWeCustomerList(WeCustomer weCustomer);
 
-    /**
-     * 新增企业微信客户
-     * 
-     * @param weCustomer 企业微信客户
-     * @return 结果
-     */
-    public int insertWeCustomer(WeCustomer weCustomer);
-
-    /**
-     * 修改企业微信客户
-     * 
-     * @param weCustomer 企业微信客户
-     * @return 结果
-     */
-    public int updateWeCustomer(WeCustomer weCustomer);
-
-    /**
-     * 批量删除企业微信客户
-     * 
-     * @param ids 需要删除的企业微信客户ID
-     * @return 结果
-     */
-    public int deleteWeCustomerByIds(Long[] ids);
-
-    /**
-     * 删除企业微信客户信息
-     * 
-     * @param id 企业微信客户ID
-     * @return 结果
-     */
-    public int deleteWeCustomerById(Long id);
+//    /**
+//     * 新增企业微信客户
+//     *
+//     * @param weCustomer 企业微信客户
+//     * @return 结果
+//     */
+//    public int insertWeCustomer(WeCustomer weCustomer);
+//
+//    /**
+//     * 修改企业微信客户
+//     *
+//     * @param weCustomer 企业微信客户
+//     * @return 结果
+//     */
+//    public int updateWeCustomer(WeCustomer weCustomer);
+//
+//    /**
+//     * 批量删除企业微信客户
+//     *
+//     * @param ids 需要删除的企业微信客户ID
+//     * @return 结果
+//     */
+//    public int deleteWeCustomerByIds(Long[] ids);
+//
+//    /**
+//     * 删除企业微信客户信息
+//     *
+//     * @param id 企业微信客户ID
+//     * @return 结果
+//     */
+//    public int deleteWeCustomerById(Long id);
 
 
     /**

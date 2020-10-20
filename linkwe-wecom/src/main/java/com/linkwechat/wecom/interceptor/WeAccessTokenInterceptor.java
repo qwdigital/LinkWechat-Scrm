@@ -9,6 +9,7 @@ import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.utils.ForestDataType;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.config.WeComeConfig;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.framework.web.domain.server.Sys;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
@@ -94,7 +95,7 @@ public class WeAccessTokenInterceptor implements Interceptor{
 
         WeResultDto weResultDto = JSONUtil.toBean(forestResponse.getContent(), WeResultDto.class);
 
-        if(null != weResultDto.getErrcode() && weResultDto.getErrcode() != 0){
+        if(null != weResultDto.getErrcode() && !weResultDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)&& !weResultDto.getErrcode().equals(WeConstans.NOT_EXIST_CONTACT) ){
 
             throw new ForestRuntimeException(forestResponse.getContent());
 

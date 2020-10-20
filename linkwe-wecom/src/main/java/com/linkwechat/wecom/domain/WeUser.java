@@ -1,5 +1,7 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.linkwechat.common.config.jackson.StringArrayDeserialize;
@@ -24,6 +26,7 @@ import java.util.Date;
  */
 @Data
 @ApiModel("通讯录用户")
+@TableName("we_user")
 public class WeUser extends BaseEntity
 {
     private static final long serialVersionUID = 1L;

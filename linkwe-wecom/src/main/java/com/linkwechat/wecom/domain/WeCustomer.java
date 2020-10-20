@@ -3,6 +3,9 @@ package com.linkwechat.wecom.domain;
 import java.util.Date;
 import java.util.List;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -23,14 +26,14 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WeCustomer extends BaseEntity
+@TableName("we_customer")
+public class WeCustomer
 {
     private static final long serialVersionUID = 1L;
 
-    /** $column.columnComment */
-    private Long id= SnowFlakeUtil.nextId();
 
     /** 外部联系人的userid */
+    @TableId
     private String externalUserid;
 
     /** 外部联系人名称 */
@@ -63,7 +66,8 @@ public class WeCustomer extends BaseEntity
     private String  position;
 
     /** 添加人员 */
-    List<WeFlowerCustomerRel> weFlowerCustomerRels;
+    @TableField(exist = false)
+   private List<WeFlowerCustomerRel> weFlowerCustomerRels;
 
 
 

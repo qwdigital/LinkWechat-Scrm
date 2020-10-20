@@ -91,7 +91,7 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
      * @param corpId
      */
     @Override
-    public int startVailWeCorpAccount(Long corpId) {
+    public int startVailWeCorpAccount(String corpId) {
         return weCorpAccountMapper.startVailWeCorpAccount(corpId);
     }
 

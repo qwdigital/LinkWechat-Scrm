@@ -1,6 +1,8 @@
 package com.linkwechat.wecom.mapper;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
 import org.apache.ibatis.annotations.Param;
 
@@ -10,7 +12,7 @@ import org.apache.ibatis.annotations.Param;
  * @author ruoyi
  * @date 2020-09-19
  */
-public interface WeFlowerCustomerRelMapper 
+public interface WeFlowerCustomerRelMapper extends BaseMapper<WeFlowerCustomerRel>
 {
     /**
      * 查询具有外部联系人功能企业员工也客户的关系

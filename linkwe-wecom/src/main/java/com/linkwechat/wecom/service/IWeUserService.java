@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
@@ -12,7 +13,7 @@ import java.util.List;
  * @author ruoyi
  * @date 2020-08-31
  */
-public interface IWeUserService 
+public interface IWeUserService extends IService<WeUser>
 {
     /**
      * 查询通讯录相关客户

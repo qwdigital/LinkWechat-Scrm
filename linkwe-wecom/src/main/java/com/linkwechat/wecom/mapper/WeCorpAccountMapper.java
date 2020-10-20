@@ -58,5 +58,5 @@ public interface WeCorpAccountMapper
      * @param corpId
      * @return
      */
-    public int startVailWeCorpAccount(@Param("corpId") Long corpId);
+    public int startVailWeCorpAccount(@Param("corpId") String corpId);
 }

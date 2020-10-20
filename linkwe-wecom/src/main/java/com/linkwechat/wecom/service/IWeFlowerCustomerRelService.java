@@ -1,6 +1,8 @@
 package com.linkwechat.wecom.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
 
 /**
@@ -9,7 +11,7 @@ import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
  * @author ruoyi
  * @date 2020-09-19
  */
-public interface IWeFlowerCustomerRelService 
+public interface IWeFlowerCustomerRelService extends IService<WeFlowerCustomerRel>
 {
     /**
      * 查询具有外部联系人功能企业员工也客户的关系

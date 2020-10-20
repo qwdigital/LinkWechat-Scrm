@@ -58,6 +58,6 @@ public interface IWeCorpAccountService
      * 启用有效的企业微信账号
      * @param corpId
      */
-    public int startVailWeCorpAccount(Long corpId);
+    public int startVailWeCorpAccount(String corpId);
 
 }

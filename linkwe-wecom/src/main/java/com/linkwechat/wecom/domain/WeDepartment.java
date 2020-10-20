@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.domain;
 
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.bean.BeanUtils;
@@ -23,6 +24,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@TableName("we_department")
 public class WeDepartment extends BaseEntity
 {
     private static final long serialVersionUID = 1L;

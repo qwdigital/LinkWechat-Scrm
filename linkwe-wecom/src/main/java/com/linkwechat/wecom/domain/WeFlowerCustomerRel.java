@@ -1,5 +1,8 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import lombok.AllArgsConstructor;
@@ -7,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,17 +23,18 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WeFlowerCustomerRel extends BaseEntity
+@TableName("we_flower_customer_rel")
+public class WeFlowerCustomerRel
 {
     private static final long serialVersionUID = 1L;
 
-    /** $column.columnComment */
-    private Long id= SnowFlakeUtil.nextId();
 
     /** 添加了此外部联系人的企业成员userid */
+    @TableId
     private String userId;
 
     /** 外部联系人名称 */
+    @TableField(exist = false)
     private String userName;
 
 
@@ -46,7 +51,7 @@ public class WeFlowerCustomerRel extends BaseEntity
     private String operUserid;
 
     /** 该成员添加此客户的来源， */
-    private String addWay;
+    private Integer addWay;
 
     /** 企业自定义的state参数，用于区分客户具体是通过哪个「联系我」添加，由企业通过创建「联系我」方式指定 */
     private String state;
@@ -54,8 +59,15 @@ public class WeFlowerCustomerRel extends BaseEntity
     /** 客户id */
     private Long customerId;
 
+    /** 状态（0正常 1删除） */
+    private String status;
+
+    /** 创建时间 */
+    private Date createTime;
+
 
     /** 微信用户添加的标签 */
+    @TableField(exist = false)
     private List<WeFlowerCustomerTagRel>  weFlowerCustomerTagRels;
 
 }

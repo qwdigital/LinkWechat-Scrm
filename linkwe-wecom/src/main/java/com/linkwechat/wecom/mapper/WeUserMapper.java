@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
 import org.apache.ibatis.annotations.Param;
@@ -12,7 +13,7 @@ import java.util.List;
  * @author ruoyi
  * @date 2020-08-31
  */
-public interface WeUserMapper 
+public interface WeUserMapper extends BaseMapper<WeUser>
 {
     /**
      * 查询通讯录相关客户

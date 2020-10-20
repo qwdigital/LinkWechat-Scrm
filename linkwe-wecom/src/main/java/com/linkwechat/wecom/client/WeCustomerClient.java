@@ -4,8 +4,10 @@ import com.dtflys.forest.annotation.DataObject;
 import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
 import com.linkwechat.wecom.domain.dto.WeCustomerDto;
-import com.linkwechat.wecom.domain.dto.WeFollowUserDto;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
+import com.linkwechat.wecom.domain.dto.customer.ExternalUserDetail;
+import com.linkwechat.wecom.domain.dto.customer.ExternalUserList;
+import com.linkwechat.wecom.domain.dto.customer.FollowUserList;
 
 /**
  * @description: 获取配置客户联系人功能的成员
@@ -19,7 +21,7 @@ public interface WeCustomerClient {
      * @return
      */
     @Request(url = "/externalcontact/get_follow_user_list")
-    WeFollowUserDto getFollowUserList();
+    FollowUserList getFollowUserList();
 
 
     /**
@@ -28,7 +30,7 @@ public interface WeCustomerClient {
      * @return
      */
     @Request(url = "/externalcontact/list")
-    WeCustomerDto list(@Query("userid") String userId);
+    ExternalUserList list(@Query("userid") String userId);
 
 
     /**
@@ -37,7 +39,7 @@ public interface WeCustomerClient {
      * @return
      */
     @Request(url = "/externalcontact/get")
-    WeCustomerDto get(@Query("external_userid") String externalUserid);
+    ExternalUserDetail get(@Query("external_userid") String externalUserid);
 
 
     /**
