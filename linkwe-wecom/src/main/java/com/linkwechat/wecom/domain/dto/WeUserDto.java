@@ -1,6 +1,5 @@
 package com.linkwechat.wecom.domain.dto;
 
-import com.linkwechat.wecom.domain.WeUser;
 import lombok.Data;
 
 /**

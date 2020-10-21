@@ -4,96 +4,89 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeGroupMapper">
 
-    <resultMap type="WeGroup" id="WeGroupResult">
-        <result property="id"    column="id"    />
-        <result property="groupName"    column="group_name"    />
-        <result property="memberNum"    column="member_num"    />
-        <result property="groupLeader"    column="group_leader"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="notice"    column="notice"    />
-        <result property="groupLeaderUserId" column="group_leader_user_id"/>
-    </resultMap>
 
-    <sql id="selectWeGroupVo">
-        select id, group_name, member_num, group_leader, create_time, notice, group_leader_user_id from we_group
-    </sql>
-
-    <select id="selectWeGroupList" parameterType="WeGroup" resultMap="WeGroupResult">
-        <include refid="selectWeGroupVo"/>
+    <select id="selectWeGroupList" parameterType="WeGroup" resultType="com.linkwechat.wecom.domain.WeGroup">
+        SELECT
+            wg.chat_id,
+            wg.group_name,
+            wg.create_time,
+            wg.notice,
+            wu.user_name as groupLeaderName,
+            (SELECT COUNT(*) FROM we_group_member wgm WHERE wgm.chat_id=wg.chat_id) as memberNum
+        FROM
+        we_group wg
+        INNER JOIN  we_user wu ON wg.`owner`=wu.user_id
         <where>
-            <if test="groupName != null  and groupName != ''"> and group_name like concat('%', #{groupName}, '%')</if>
-            <if test="memberNum != null "> and member_num = #{memberNum}</if>
-            <if test="groupLeader != null  and groupLeader != ''"> and group_leader = #{groupLeader}</if>
-            <if test="notice != null  and notice != ''"> and notice = #{notice}</if>
-            <if test="groupLeaderUserId != null and groupLeaderUserId !=''">and group_leader_user_id =#{groupLeaderUserId}</if>
+            <if test="groupName != null  and groupName != ''"> and wg.group_name like concat('%', #{groupName}, '%')</if>
+            <if test="owner != null  and owner != ''"> and owner = #{owner}</if>
         </where>
     </select>
 
-    <select id="selectWeGroupById" parameterType="Long" resultMap="WeGroupResult">
-        <include refid="selectWeGroupVo"/>
-        where id = #{id}
-    </select>
+<!--    <select id="selectWeGroupById" parameterType="Long" resultMap="WeGroupResult">-->
+<!--        <include refid="selectWeGroupVo"/>-->
+<!--        where id = #{id}-->
+<!--    </select>-->
 
-    <insert id="insertWeGroup" parameterType="WeGroup">
-        insert into we_group
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">id,</if>
-            <if test="groupName != null">group_name,</if>
-            <if test="memberNum != null">member_num,</if>
-            <if test="groupLeader != null">group_leader,</if>
-            <if test="createTime != null">create_time,</if>
-            <if test="notice != null">notice,</if>
-            <if test="groupLeaderUserId != null and groupLeaderUserId !=''">group_leader_user_id,</if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">#{id},</if>
-            <if test="groupName != null">#{groupName},</if>
-            <if test="memberNum != null">#{memberNum},</if>
-            <if test="groupLeader != null">#{groupLeader},</if>
-            <if test="createTime != null">#{createTime},</if>
-            <if test="notice != null">#{notice},</if>
-            <if test="groupLeaderUserId != null and groupLeaderUserId !=''">#{groupLeaderUserId},</if>
-        </trim>
-    </insert>
+<!--    <insert id="insertWeGroup" parameterType="WeGroup">-->
+<!--        insert into we_group-->
+<!--        <trim prefix="(" suffix=")" suffixOverrides=",">-->
+<!--            <if test="id != null">id,</if>-->
+<!--            <if test="groupName != null">group_name,</if>-->
+<!--            <if test="memberNum != null">member_num,</if>-->
+<!--            <if test="groupLeader != null">group_leader,</if>-->
+<!--            <if test="createTime != null">create_time,</if>-->
+<!--            <if test="notice != null">notice,</if>-->
+<!--            <if test="groupLeaderUserId != null and groupLeaderUserId !=''">group_leader_user_id,</if>-->
+<!--        </trim>-->
+<!--        <trim prefix="values (" suffix=")" suffixOverrides=",">-->
+<!--            <if test="id != null">#{id},</if>-->
+<!--            <if test="groupName != null">#{groupName},</if>-->
+<!--            <if test="memberNum != null">#{memberNum},</if>-->
+<!--            <if test="groupLeader != null">#{groupLeader},</if>-->
+<!--            <if test="createTime != null">#{createTime},</if>-->
+<!--            <if test="notice != null">#{notice},</if>-->
+<!--            <if test="groupLeaderUserId != null and groupLeaderUserId !=''">#{groupLeaderUserId},</if>-->
+<!--        </trim>-->
+<!--    </insert>-->
 
-    <update id="updateWeGroup" parameterType="WeGroup">
-        update we_group
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="groupName != null">group_name = #{groupName},</if>
-            <if test="memberNum != null">member_num = #{memberNum},</if>
-            <if test="groupLeader != null">group_leader = #{groupLeader},</if>
-            <if test="createTime != null">create_time = #{createTime},</if>
-            <if test="notice != null">notice = #{notice},</if>
-            <if test="groupLeaderUserId != null and groupLeaderUserId !=''">group_leader_user_id =#{groupLeaderUserId},</if>
-        </trim>
-        where id = #{id}
-    </update>
+<!--    <update id="updateWeGroup" parameterType="WeGroup">-->
+<!--        update we_group-->
+<!--        <trim prefix="SET" suffixOverrides=",">-->
+<!--            <if test="groupName != null">group_name = #{groupName},</if>-->
+<!--            <if test="memberNum != null">member_num = #{memberNum},</if>-->
+<!--            <if test="groupLeader != null">group_leader = #{groupLeader},</if>-->
+<!--            <if test="createTime != null">create_time = #{createTime},</if>-->
+<!--            <if test="notice != null">notice = #{notice},</if>-->
+<!--            <if test="groupLeaderUserId != null and groupLeaderUserId !=''">group_leader_user_id =#{groupLeaderUserId},</if>-->
+<!--        </trim>-->
+<!--        where id = #{id}-->
+<!--    </update>-->
 
-    <delete id="deleteWeGroupById" parameterType="Long">
-        delete from we_group where id = #{id}
-    </delete>
+<!--    <delete id="deleteWeGroupById" parameterType="Long">-->
+<!--        delete from we_group where id = #{id}-->
+<!--    </delete>-->
 
-    <delete id="deleteWeGroupByIds" parameterType="String">
-        delete from we_group where id in
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
+<!--    <delete id="deleteWeGroupByIds" parameterType="String">-->
+<!--        delete from we_group where id in-->
+<!--        <foreach item="id" collection="array" open="(" separator="," close=")">-->
+<!--            #{id}-->
+<!--        </foreach>-->
+<!--    </delete>-->
 
-    <update id="batchLogicDeleteByIds" parameterType="String">
-        update we_group set del_flag=2
-        where id in
-        <foreach item="id" collection="ids" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </update>
+<!--    <update id="batchLogicDeleteByIds" parameterType="String">-->
+<!--        update we_group set del_flag=2-->
+<!--        where id in-->
+<!--        <foreach item="id" collection="ids" open="(" separator="," close=")">-->
+<!--            #{id}-->
+<!--        </foreach>-->
+<!--    </update>-->
 
-    <insert id="batchInsetWeGroup" >
-        insert into we_group (id, group_name, member_num, group_leader, create_time, notice, group_leader_user_id)
-        values
-        <foreach collection="weGroups" item="weGroup" index="index" separator=",">
-            (#{weGroup.id},#{weGroup.groupName},#{weGroup.memberNum},#{weGroup.groupLeader},#{weGroup.createTime},#{weGroup.notice},#{weGroup.groupLeaderUserId})
-        </foreach>
-    </insert>
+<!--    <insert id="batchInsetWeGroup" >-->
+<!--        insert into we_group (id, group_name, member_num, group_leader, create_time, notice, group_leader_user_id)-->
+<!--        values-->
+<!--        <foreach collection="weGroups" item="weGroup" index="index" separator=",">-->
+<!--            (#{weGroup.id},#{weGroup.groupName},#{weGroup.memberNum},#{weGroup.groupLeader},#{weGroup.createTime},#{weGroup.notice},#{weGroup.groupLeaderUserId})-->
+<!--        </foreach>-->
+<!--    </insert>-->
 
 </mapper>

@@ -9,6 +9,7 @@ import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
+import com.linkwechat.wecom.service.IWeCustomerService;
 import com.linkwechat.wecom.service.IWeUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,8 +31,11 @@ import java.util.List;
 @RequestMapping("/wecom/user")
 @Api("通讯录人员接口")
 public class WeUserController extends BaseController {
+
     @Autowired
     private IWeUserService weUserService;
+
+
 
     /**
      * 查询通讯录相关客户列表

@@ -133,5 +133,15 @@ wecome:
   serverUrl: https://qyapi.weixin.qq.com/
   weComePrefix: cgi-bin
   noAccessTokenUrl: /gettoken
-  needContactTokenUrl: /externalcontact/get_follow_user_list,/externalcontact/add_contact_way,/externalcontact/add_corp_tag,/externalcontact/get_corp_tag_list,/externalcontact/del_corp_tag,/externalcontact/edit_corp_tag,/externalcontact/list,/externalcontact/get
+  needContactTokenUrl:
+          - /externalcontact/get_follow_user_list
+          - /externalcontact/add_contact_way
+          - /externalcontact/add_corp_tag
+          - /externalcontact/get_corp_tag_list
+          - /externalcontact/del_corp_tag
+          - /externalcontact/edit_corp_tag
+          - /externalcontact/list
+          - /externalcontact/get
+          - /externalcontact/groupchat/list
+          - /externalcontact/groupchat/get
   fileUplodUrl:  /media/upload,/media/uploadimg

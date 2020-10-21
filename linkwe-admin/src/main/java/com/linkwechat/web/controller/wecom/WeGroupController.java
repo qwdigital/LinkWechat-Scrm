@@ -1,6 +1,8 @@
 package com.linkwechat.web.controller.wecom;
 
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
+import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeGroupMember;
@@ -44,5 +46,19 @@ public class WeGroupController extends BaseController {
         startPage();
         List<WeGroupMember> list = this.weGroupMemberService.selectWeGroupMemberList(weGroupMember);
         return getDataTable(list);
+    }
+
+    /**
+     *  同步客户群
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:group:synchWeGroup')")
+    @GetMapping({"/synchWeGroup"})
+    public AjaxResult synchWeGroup(){
+
+
+        weGroupService.synchWeGroup();
+
+        return  AjaxResult.success(WeConstans.SYNCH_TIP);
     }
 }
