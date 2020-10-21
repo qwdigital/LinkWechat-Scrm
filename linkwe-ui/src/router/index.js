@@ -55,44 +55,50 @@ export const constantRoutes = [
     component: (resolve) => require(['@/views/login'], resolve),
     hidden: true
   },
-  {
-    path: '/customerManage',
-    component: Layout,
-    redirect: '/customerManage/customer',
-    meta: { title: '客户管理', icon: 'user' },
-    children: [
-      {
-        path: 'customer',
-        name: 'Customer',
-        component: (resolve) => require(['@/views/customerManage/customer'], resolve),
-        meta: { title: '客户', icon: '' }
-      },
-      {
-        path: 'group',
-        name: 'CustomerGroup',
-        component: (resolve) => require(['@/views/customerManage/group'], resolve),
-        meta: { title: '客户群', icon: '' }
-      },
-      {
-        path: 'groupDetail',
-        hidden: true,
-        component: (resolve) => require(['@/views/customerManage/groupDetail'], resolve),
-        meta: { hidden: true, title: '客户群', icon: '', activeMenu: '/customerManage/group' }
-      },
-      {
-        path: 'tag',
-        name: 'CustomerTag',
-        component: (resolve) => require(['@/views/customerManage/tag'], resolve),
-        meta: { title: '客户标签', icon: '' }
-      },
-      {
-        path: 'dimission',
-        name: 'Dimission',
-        component: (resolve) => require(['@/views/customerManage/dimission'], resolve),
-        meta: { title: '离职继承', icon: '' }
-      },
-    ]
-  },
+  // {
+  //   path: '/customerManage',
+  //   component: Layout,
+  //   redirect: '/customerManage/customer',
+  //   meta: { title: '客户管理', icon: 'user' },
+  //   children: [
+  //     {
+  //       path: 'customer',
+  //       name: 'Customer',
+  //       component: (resolve) => require(['@/views/customerManage/customer'], resolve),
+  //       meta: { title: '客户', icon: '' }
+  //     },
+  //     {
+  //       path: 'customerDetail',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/customerManage/customerDetail'], resolve),
+  //       meta: { hidden: true, title: '客户', icon: '', activeMenu: '/customerManage/customer' }
+  //     },
+  //     {
+  //       path: 'group',
+  //       name: 'CustomerGroup',
+  //       component: (resolve) => require(['@/views/customerManage/group'], resolve),
+  //       meta: { title: '客户群', icon: '' }
+  //     },
+  //     {
+  //       path: 'groupDetail',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/customerManage/groupDetail'], resolve),
+  //       meta: { hidden: true, title: '客户群', icon: '', activeMenu: '/customerManage/group' }
+  //     },
+  //     {
+  //       path: 'tag',
+  //       name: 'CustomerTag',
+  //       component: (resolve) => require(['@/views/customerManage/tag'], resolve),
+  //       meta: { title: '客户标签', icon: '' }
+  //     },
+  //     {
+  //       path: 'dimission',
+  //       name: 'Dimission',
+  //       component: (resolve) => require(['@/views/customerManage/dimission'], resolve),
+  //       meta: { title: '离职继承', icon: '' }
+  //     },
+  //   ]
+  // },
   // {
   //   path: '/groupMessage',
   //   component: Layout,
@@ -113,68 +119,68 @@ export const constantRoutes = [
   //     },
   //   ]
   // },
-  {
-    path: '/drainageCode',
-    component: Layout,
-    redirect: '/drainageCode/staff',
-    meta: { title: '引流码', icon: 'qrcode' },
-    children: [
-      {
-        path: 'staff',
-        name: 'CodeStaff',
-        component: (resolve) => require(['@/views/drainageCode/staff/list'], resolve),
-        meta: { title: '员工活码', icon: '' }
-      },
-      {
-        path: 'staffAdd',
-        hidden: true,
-        component: (resolve) => require(['@/views/drainageCode/staff/add'], resolve),
-        meta: { title: '新建员工活码', icon: '', activeMenu: '/drainageCode/staff' }
-      },
-      {
-        path: 'staffDetail',
-        hidden: true,
-        component: (resolve) => require(['@/views/drainageCode/staff/detail'], resolve),
-        meta: { title: '员工活码详情', icon: '', activeMenu: '/drainageCode/staff' }
-      },
-      {
-        path: 'group',
-        name: 'CodeGroup',
-        component: (resolve) => require(['@/views/drainageCode/group/list'], resolve),
-        meta: { title: '客户群活码', icon: '' }
-      },
-      {
-        path: 'groupAdd',
-        hidden: true,
-        component: (resolve) => require(['@/views/drainageCode/group/add'], resolve),
-        meta: { title: '新增客户群活码', icon: '', activeMenu: '/drainageCode/group' }
-      },
-      {
-        path: 'groupDetail',
-        hidden: true,
-        component: (resolve) => require(['@/views/drainageCode/group/detail'], resolve),
-        meta: { title: '客户群活码信息', icon: '', activeMenu: '/drainageCode/group' }
-      },
-      {
-        path: 'groupBaseInfo',
-        hidden: true,
-        component: (resolve) => require(['@/views/drainageCode/group/baseInfo'], resolve),
-        meta: { title: '客户群活码', icon: '', activeMenu: '/drainageCode/group' }
-      },
-      {
-        path: 'welcome',
-        name: 'Welcome',
-        component: (resolve) => require(['@/views/drainageCode/welcome/list'], resolve),
-        meta: { title: '欢迎语', icon: '' }
-      },
-      {
-        path: 'welcomeAdd',
-        hidden: true,
-        component: (resolve) => require(['@/views/drainageCode/welcome/add'], resolve),
-        meta: { title: '新建欢迎语', icon: '', activeMenu: '/drainageCode/welcome' }
-      },
-    ]
-  },
+  // {
+  //   path: '/drainageCode',
+  //   component: Layout,
+  //   redirect: '/drainageCode/staff',
+  //   meta: { title: '引流码', icon: 'qrcode' },
+  //   children: [
+  //     {
+  //       path: 'staff',
+  //       name: 'CodeStaff',
+  //       component: (resolve) => require(['@/views/drainageCode/staff/list'], resolve),
+  //       meta: { title: '员工活码', icon: '' }
+  //     },
+  //     {
+  //       path: 'staffAdd',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/drainageCode/staff/add'], resolve),
+  //       meta: { title: '新建员工活码', icon: '', activeMenu: '/drainageCode/staff' }
+  //     },
+  //     {
+  //       path: 'staffDetail',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/drainageCode/staff/detail'], resolve),
+  //       meta: { title: '员工活码详情', icon: '', activeMenu: '/drainageCode/staff' }
+  //     },
+  //     {
+  //       path: 'group',
+  //       name: 'CodeGroup',
+  //       component: (resolve) => require(['@/views/drainageCode/group/list'], resolve),
+  //       meta: { title: '客户群活码', icon: '' }
+  //     },
+  //     {
+  //       path: 'groupAdd',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/drainageCode/group/add'], resolve),
+  //       meta: { title: '新增客户群活码', icon: '', activeMenu: '/drainageCode/group' }
+  //     },
+  //     {
+  //       path: 'groupDetail',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/drainageCode/group/detail'], resolve),
+  //       meta: { title: '客户群活码信息', icon: '', activeMenu: '/drainageCode/group' }
+  //     },
+  //     {
+  //       path: 'groupBaseInfo',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/drainageCode/group/baseInfo'], resolve),
+  //       meta: { title: '客户群活码', icon: '', activeMenu: '/drainageCode/group' }
+  //     },
+  //     {
+  //       path: 'welcome',
+  //       name: 'Welcome',
+  //       component: (resolve) => require(['@/views/drainageCode/welcome/list'], resolve),
+  //       meta: { title: '欢迎语', icon: '' }
+  //     },
+  //     {
+  //       path: 'welcomeAdd',
+  //       hidden: true,
+  //       component: (resolve) => require(['@/views/drainageCode/welcome/add'], resolve),
+  //       meta: { title: '新建欢迎语', icon: '', activeMenu: '/drainageCode/welcome' }
+  //     },
+  //   ]
+  // },
   // {
   //   path: '/material',
   //   component: Layout,
@@ -275,34 +281,33 @@ export const constantRoutes = [
   //     },
   //   ]
   // },
-  {
-    path: '/contacts',
-    component: Layout,
-    redirect: '/contacts/organization',
-    meta: { title: '', icon: 'users' },
-    children: [
-      {
-        path: 'organization',
-        name: 'Organization',
-        component: (resolve) => require(['@/views/contacts/organization'], resolve),
-        meta: { title: '组织架构', icon: 'tree' }
-      },
-    ]
-  },
-  {
-    path: '/_enterpriseWechat',
-    component: Layout,
-    redirect: '/enterpriseWechat',
-    meta: { title: '', icon: 'wechat' },
-    children: [
-      {
-        path: '/enterpriseWechat',
-        name: 'EnterpriseWechat',
-        component: (resolve) => require(['@/views/enterpriseWechat/list'], resolve),
-        meta: { title: '企业微信管理', icon: '' }
-      },
-    ]
-  },
+  // {
+  //   path: '/contacts',
+  //   component: Layout,
+  //   redirect: '/contacts/organization',
+  //   meta: { title: '通讯录', icon: 'users' },
+  //   children: [
+  //     {
+  //       path: 'organization',
+  //       name: 'Organization',
+  //       component: (resolve) => require(['@/views/contacts/organization'], resolve),
+  //       meta: { title: '组织架构', icon: 'tree' }
+  //     },
+  //   ]
+  // },
+  // {
+  //   path: '/enterpriseWechat',
+  //   component: Layout,
+  //   meta: { title: '', icon: 'wechat' },
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       name: 'EnterpriseWechat',
+  //       component: (resolve) => require(['@/views/enterpriseWechat/list'], resolve),
+  //       meta: { title: '企业微信管理', icon: '' }
+  //     },
+  //   ]
+  // },
 
   {
     path: '/user',
@@ -357,6 +362,11 @@ export const constantRoutes = [
       }
     ]
   },
+  // {
+  //   path: '/test',
+  //   component: (resolve) => require(['@/views/test'], resolve),
+  //   hidden: true
+  // },
   {
     path: '/404',
     component: (resolve) => require(['@/views/error/404'], resolve),

@@ -11,7 +11,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         isActivate: "",
-        department: "",
+        department: "1",
       },
       dateRange: [],
       treeData: [],
@@ -261,8 +261,8 @@ export default {
           >
             <div class="custom-tree-node" slot-scope="{ node, data }">
               <span>{{ node.label }}</span>
-              <span class="fr" v-if="node.level !== 1">
-                <i class="el-icon-edit" @click.stop="departEdit(data, 1)"></i>
+              <span class="fr">
+                <i class="el-icon-edit" v-if="node.level !== 1" @click.stop="departEdit(data, 1)"></i>
                 <i class="el-icon-plus" @click.stop="departEdit(data, 0)"></i>
               </span>
             </div>
