@@ -68,3 +68,12 @@ export function remove(ids) {
     method: 'DELETE',
   })
 }
+
+/**
+ * 同步标签
+ */
+export function syncTag() {
+  return request({
+    url: service + '/synchWeTags',
+  })
+}

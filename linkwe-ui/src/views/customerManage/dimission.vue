@@ -91,16 +91,33 @@ export default {
         <el-date-picker v-model="query.beginTime" type="date" placeholder="离职日期" align="right"></el-date-picker>
       </el-form-item>
       <el-form-item label>
-        <el-button type="primary" @click="getList(1)">查询</el-button>
-        <el-button type="info" @click="resetForm('queryForm')">重置</el-button>
+        <el-button
+          v-hasPermi="['customerManage:dimission:query']"
+          type="primary"
+          @click="getList(1)"
+        >查询</el-button>
+        <el-button
+          v-hasPermi="['customerManage:dimission:query']"
+          type="info"
+          @click="resetForm('queryForm')"
+        >重置</el-button>
       </el-form-item>
     </el-form>
 
     <div class="mid-action">
       <div class="total">从通讯录将离职员工删除后，可以分配他的客户及客户群给其他员工继续跟进</div>
       <div>
-        <el-button type="primary" size="mini">已分配的离职员工</el-button>
-        <el-button type="primary" size="mini" @click="dialogVisibleSelectUser = true">分配给其他员工</el-button>
+        <el-button
+          v-hasPermi="['customerManage:dimission:filter']"
+          type="primary"
+          size="mini"
+        >已分配的离职员工</el-button>
+        <el-button
+          v-hasPermi="['customerManage:dimission:allocate']"
+          type="primary"
+          size="mini"
+          @click="dialogVisibleSelectUser = true"
+        >分配给其他员工</el-button>
       </div>
     </div>
 
@@ -121,8 +138,13 @@ export default {
       </el-table-column>
       <el-table-column label="操作" width="100">
         <template slot-scope="scope">
-          <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
-          <el-button type="text" size="small">编辑</el-button>
+          <!-- <el-button
+            v-hasPermi="['customerManage:dimission:edit']"
+            @click="handleClick(scope.row)"
+            type="text"
+            size="small"
+          >查看</el-button>-->
+          <el-button v-hasPermi="['customerManage:dimission:edit']" type="text" size="small">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -132,7 +154,7 @@ export default {
       :total="total"
       :page.sync="query.pageNum"
       :limit.sync="query.pageSize"
-      @pagination="getList"
+      @pagination="getList()"
     />
 
     <!-- 选择添加人弹窗 -->

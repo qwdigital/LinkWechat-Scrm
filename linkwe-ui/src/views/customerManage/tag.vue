@@ -71,8 +71,19 @@ export default {
       );
       this.dialogVisible = true;
     },
-
-    sync() {},
+    syncTag() {
+      const loading = this.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
+      api.syncTag().then(() => {
+        loading.close();
+        this.msgSuccess("操作成功");
+        this.getList();
+      });
+    },
     // 操作日志状态字典翻译
     statusFormat(row, column) {
       return this.selectDictLabel(this.statusOptions, row.status);
@@ -94,7 +105,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map((item) => item.id);
+      this.ids = selection.map((item) => item.groupId);
       this.multiple = !selection.length;
     },
     /** 详细按钮操作 */
@@ -156,9 +167,22 @@ export default {
     <div class="mid-action">
       <div class="total"></div>
       <div>
-        <el-button type="primary" size="mini" icon="el-icon-plus" @click="edit()">新建标签组</el-button>
-        <el-button type="primary" size="mini" icon="el-icon-refresh" @click="sync">同步标签组</el-button>
         <el-button
+          v-hasPermi="['customerManage:tag:add']"
+          type="primary"
+          size="mini"
+          icon="el-icon-plus"
+          @click="edit()"
+        >新建标签组</el-button>
+        <el-button
+          v-hasPermi="['customerManage:tag:sync']"
+          type="primary"
+          size="mini"
+          icon="el-icon-refresh"
+          @click="syncTag"
+        >同步标签组</el-button>
+        <el-button
+          v-hasPermi="['customerManage:tag:remove']"
           v-if="ids.length"
           type="primary"
           size="mini"
@@ -176,7 +200,7 @@ export default {
           <el-tag type="info" v-for="(item, index) in scope.row.weTags" :key="index">{{item.name}}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="创建人" align="center" prop="businessType" :formatter="typeFormat" />
+      <el-table-column label="创建人" align="center" prop="createBy" />
       <!-- <el-table-column label="创建时间" align="center" prop="operTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.operTime) }}</span>
@@ -184,14 +208,22 @@ export default {
       </el-table-column>-->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="text" @click="edit(scope.row,scope.index)">编辑</el-button>
-          <el-button @click="remove(scope.row.id)" type="text">删除</el-button>
+          <el-button
+            v-hasPermi="['customerManage:tag:edit']"
+            type="text"
+            @click="edit(scope.row,scope.index)"
+          >编辑</el-button>
+          <el-button
+            v-hasPermi="['customerManage:tag:remove']"
+            @click="remove(scope.row.groupId)"
+            type="text"
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <!-- 弹窗 -->
-    <AddTag :visible.sync="dialogVisible" :form="form" @success="getList(!form.id && 1)" />
+    <AddTag :visible.sync="dialogVisible" :form="form" @success="getList(!form.groupId && 1)" />
   </div>
 </template>
 <style lang="scss" scoped>

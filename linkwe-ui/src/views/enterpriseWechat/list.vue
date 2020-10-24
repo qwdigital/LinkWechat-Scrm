@@ -10,11 +10,23 @@
             <el-input v-model="query.companyName" placeholder="请输入"></el-input>
           </el-form-item>
           <el-form-item label>
-            <el-button type="cyan" icon="el-icon-search" size="mini" @click="getList(1)">查询</el-button>
+            <el-button
+              v-hasPermi="['enterpriseWechat:query']"
+              type="cyan"
+              icon="el-icon-search"
+              size="mini"
+              @click="getList(1)"
+            >查询</el-button>
           </el-form-item>
         </el-form>
       </div>
-      <el-button type="primary" icon="el-icon-plus" size="mini" @click="edit()">添加</el-button>
+      <el-button
+        v-hasPermi="['enterpriseWechat:add']"
+        type="primary"
+        icon="el-icon-plus"
+        size="mini"
+        @click="edit()"
+      >添加</el-button>
     </div>
     <!-- <el-card shadow="never" :body-style="{padding: '20px 0 0'}">
     </el-card>-->
@@ -35,9 +47,27 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button size="mini" type="text" icon="el-icon-view" @click="edit(scope.row, 0)">查看</el-button>
-          <el-button size="mini" type="text" icon="el-icon-edit" @click="edit(scope.row, 1)">编辑</el-button>
-          <el-button size="mini" type="text" icon="el-icon-key" @click="start(scope.row.corpId)">启用</el-button>
+          <el-button
+            v-hasPermi="['enterpriseWechat:view']"
+            size="mini"
+            type="text"
+            icon="el-icon-view"
+            @click="edit(scope.row, 0)"
+          >查看</el-button>
+          <el-button
+            v-hasPermi="['enterpriseWechat:edit']"
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            @click="edit(scope.row, 1)"
+          >编辑</el-button>
+          <el-button
+            v-hasPermi="['enterpriseWechat:forbidden']"
+            size="mini"
+            type="text"
+            icon="el-icon-key"
+            @click="start(scope.row.corpId)"
+          >启用</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -47,7 +77,7 @@
       :total="total"
       :page.sync="query.pageNum"
       :limit.sync="query.pageSize"
-      @pagination="getList"
+      @pagination="getList()"
     />
 
     <el-dialog title="查看企业微信号" :visible.sync="dialogVisible">
