@@ -2,6 +2,7 @@ package com.linkwechat.wecom.domain;
 
 
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -16,7 +17,7 @@ public class WeCustomerTagRel extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
-    private Long id;
+    private Long id= SnowFlakeUtil.nextId();;
 
     /** 客户id */
     private Long customerId;

@@ -128,7 +128,8 @@ public class WeUserController extends BaseController {
      @GetMapping({"/leaveUserNoAllocateList"})
      public TableDataInfo leaveUserNoAllocateList(WeLeaveUserVo weLeaveUserVo) {
         startPage();
-        weLeaveUserVo.setIsActivate(WeConstans.LEAVE_NO_ALLOCATE_STATE);
+        weLeaveUserVo.setIsActivate(WeConstans.WE_USER_IS_LEAVE);
+        weLeaveUserVo.setIsAllocate(WeConstans.LEAVE_NO_ALLOCATE_STATE);
         List<WeLeaveUserVo> list = this.weUserService.leaveUserList(weLeaveUserVo);
         return getDataTable(list);
      }

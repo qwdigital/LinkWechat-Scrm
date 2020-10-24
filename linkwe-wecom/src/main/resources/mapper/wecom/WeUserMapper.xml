@@ -144,19 +144,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="leaveUserList" parameterType="WeLeaveUserVo" resultType="com.linkwechat.wecom.domain.vo.WeLeaveUserVo">
         SELECT
-            we.user_name as userName,
-            we.department,
-            we.dimission_time as dimissionTime,
-            (SELECT count(wfcr.id) FROM we_flower_customer_rel wfcr WHERE wfcr.user_id=we.user_id) allocateCustomerNum,
-            (SELECT count(wg.id) FROM we_group wg WHERE wg.group_leader_user_id=we.user_id) allocateGroupNum
+            wu.user_id,
+            wu.user_name,
+            wu.dimission_time,
+            (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department,
+            (SELECT COUNT(*) FROM we_flower_customer_rel  wfcr WHERE wfcr.user_id=wu.user_id) as allocateCustomerNum,
+            (SELECT COUNT(*) FROM we_group wg WHERE wg.`owner`=wu.user_id) as allocateGroupNum
         FROM
-        we_user we
+        we_user wu
         <where>
-            <if test="userName != null and userName !=''">and we.user_name=#{userName}</if>
+            <if test="userName != null and userName !=''">and wu.user_name=#{userName}</if>
             <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
-                DATE_FORMAT(we.dimission_time,'%Y-%m-%d') BETWEEN #{beginTime}  AND #{endTime}
+                DATE_FORMAT(wu.dimission_time,'%Y-%m-%d') BETWEEN #{beginTime}  AND #{endTime}
             </if>
-            <if test="isActivate != null ">and we.is_activate = #{isActivate}</if>
+            <if test="isActivate != null ">and wu.is_activate = #{isActivate}</if>
+            <if test="isAllocate != null ">and  wu.is_allocate = #{isAllocate}</if>
         </where>
     </select>
 

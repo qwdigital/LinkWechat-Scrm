@@ -170,7 +170,7 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
      * @param weLeaveUserInfoAllocateVo
      */
     @Override
-    @Transactional(isolation= Isolation.DEFAULT,propagation= Propagation.REQUIRED,rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void allocateLeaveUserAboutData(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
 
         try {

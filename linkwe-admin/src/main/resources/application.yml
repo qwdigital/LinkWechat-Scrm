@@ -144,4 +144,7 @@ wecome:
           - /externalcontact/get
           - /externalcontact/groupchat/list
           - /externalcontact/groupchat/get
+          - /externalcontact/mark_tag
+          - /externalcontact/transfer
+          - /externalcontact/groupchat/transfer
   fileUplodUrl:  /media/upload,/media/uploadimg

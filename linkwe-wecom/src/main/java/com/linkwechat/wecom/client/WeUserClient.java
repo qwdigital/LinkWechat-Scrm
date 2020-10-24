@@ -3,9 +3,7 @@ package com.linkwechat.wecom.client;
 import com.dtflys.forest.annotation.DataObject;
 import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
-import com.linkwechat.wecom.domain.dto.WeResultDto;
-import com.linkwechat.wecom.domain.dto.WeUserDto;
-import com.linkwechat.wecom.domain.dto.WeUserListDto;
+import com.linkwechat.wecom.domain.dto.*;
 
 /**
  * @description: 企业微信通讯录成员
@@ -62,4 +60,24 @@ public interface WeUserClient {
      */
     @Request(url="/user/list")
     WeUserListDto  list(@Query("department_id") Long departmentId,@Query("fetch_child") Integer fetchChild);
+
+
+    /**
+     * 分配客户
+     * @return
+     */
+    @Request(url="/externalcontact/transfer",
+            type = "POST"
+    )
+    WeResultDto allocateCustomer(@DataObject AllocateWeCustomerDto allocateWeCustomerDto);
+
+
+    /**
+     * 分配成员群
+     * @return
+     */
+    @Request(url="/externalcontact/groupchat/transfer",
+            type = "POST"
+    )
+    WeResultDto allocateGroup(@DataObject AllocateWeGroupDto allocateWeGroupDto);
 }

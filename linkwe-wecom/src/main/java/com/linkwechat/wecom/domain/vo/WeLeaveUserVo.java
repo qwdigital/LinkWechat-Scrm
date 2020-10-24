@@ -24,4 +24,8 @@ public class WeLeaveUserVo extends BaseEntity {
 
     private Integer isActivate;
 
+    private String userId;
+
+    private Integer isAllocate;
+
 }
