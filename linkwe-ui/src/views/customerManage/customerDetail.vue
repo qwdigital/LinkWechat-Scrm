@@ -5,7 +5,10 @@ export default {
   name: "CustomerDetail",
   data() {
     return {
-      customer: {},
+      datePickerVisible: false,
+      customer: {
+        weFlowerCustomerRels: [],
+      },
     };
   },
   created() {
@@ -29,22 +32,28 @@ export default {
   <div>
     <!-- <el-button slot="append" circle icon="el-icon-back" @click="$router.back()"></el-button>返回 -->
     <div class="flex aic">
-      <el-avatar
-        :size="100"
-        src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
-      ></el-avatar>
+      <el-avatar :size="100" :src="customer.avatar"></el-avatar>
       <div class="info-wrap">
-        <div style="margin-bottom: 20px;">
-          {{customer.groupName}}
+        <div class="mb10">
+          {{customer.name}}
           <span
             :style="{color: customer.type === 1 ? '#4bde03' : '#f9a90b'}"
           >{{ ({1: '@微信', 2: '@企业微信'})[customer.type] }}</span>
           <i :class="['el-icon-s-custom', ({1: 'man', 2: 'woman'})[customer.gender]]"></i>
         </div>
         <div class="info">
-          出生日期：{{customer.createTime || '--'}}
-          <i class="el-icon-edit"></i>
-          <el-date-picker v-model="customer.createTime" type="date" placeholder="选择日期"></el-date-picker>
+          出生日期：{{customer.birthday || '--'}}
+          <div class="ml20" style="position: absolute;">
+            <el-date-picker
+              v-if="datePickerVisible"
+              v-model="customer.birthday"
+              type="date"
+              value-format="yyyy-MM-dd"
+              placeholder="选择日期便于以后客情维护"
+              @blur="datePickerVisible = false"
+            ></el-date-picker>
+            <i v-else class="el-icon-edit" @click="datePickerVisible = true"></i>
+          </div>
         </div>
       </div>
     </div>
@@ -53,28 +62,36 @@ export default {
       <div>
         <el-row :gutter="10">
           <el-col :span="10">备注名：</el-col>
-          <el-col :span="12">Dora</el-col>
+          <el-col :span="12">{{customer.name}}</el-col>
         </el-row>
         <el-row :gutter="10">
           <el-col :span="10">标签：</el-col>
-          <el-col :span="12">Dora</el-col>
+          <el-col :span="12">
+            <div v-for="(item, index) in customer.weFlowerCustomerRels" :key="index">
+              <el-tag
+                type="info"
+                v-for="(unit, unique) in item.weFlowerCustomerTagRels"
+                :key="unique"
+              >{{unit.tagName}}</el-tag>
+            </div>
+          </el-col>
         </el-row>
         <el-row :gutter="10">
           <el-col :span="10">个人标签：</el-col>
-          <el-col :span="12">Dora</el-col>
+          <el-col :span="12">{{"--"}}</el-col>
         </el-row>
         <el-divider></el-divider>
         <el-row :gutter="10">
           <el-col :span="10">添加人：</el-col>
-          <el-col :span="12">Dora</el-col>
+          <el-col :span="12">{{customer.weFlowerCustomerRels[0].userName}}</el-col>
         </el-row>
         <el-row :gutter="10">
           <el-col :span="10">所在部门：</el-col>
-          <el-col :span="12">Dora</el-col>
+          <el-col :span="12">{{"--"}}</el-col>
         </el-row>
         <el-row :gutter="10">
           <el-col :span="10">添加时间：</el-col>
-          <el-col :span="12">Dora</el-col>
+          <el-col :span="12">{{customer.weFlowerCustomerRels[0].createTime}}</el-col>
         </el-row>
       </div>
     </el-card>
@@ -106,6 +123,7 @@ export default {
   margin-left: 20px;
   .info {
     color: #aaa;
+    line-height: 32px;
   }
 }
 

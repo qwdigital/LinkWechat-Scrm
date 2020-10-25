@@ -34,14 +34,8 @@ export function sync() {
  * 编辑客户标签
  * @param {*} data 
  * {
-    "userid": "添加此客户添加人的id",
     "externalUserid": "外部联系人userid",
     "addTag": [{
-        "id": "标签id",
-        "groupId": "标签组id",
-        "name": "标签名"
-    }],
-    "removeTag": [{
         "id": "标签id",
         "groupId": "标签组id",
         "name": "标签名"
@@ -52,6 +46,26 @@ export function makeLabel(data) {
   return request({
     url: service + '/makeLabel',
     method: 'post',
+    data
+  })
+}
+
+/**
+ * 移除客户标签
+ * @param {*} data 
+ * {
+    "externalUserid": "外部联系人userid",
+    "addTag": [{
+        "id": "标签id",
+        "groupId": "标签组id",
+        "name": "标签名"
+    }]
+}
+ */
+export function removeLabel(data) {
+  return request({
+    url: service + '/removeLabel',
+    method: 'DELETE',
     data
   })
 }

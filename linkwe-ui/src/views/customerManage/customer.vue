@@ -75,6 +75,7 @@ export default {
       dialogVisibleAddTag: false, // 添加标签弹窗显隐
       selectedGroup: "", // 选择的标签分组
       selectedTag: [], // 选择的标签
+      removeTag: [], // 可移除的标签
       tagDialogType: {
         title: "", // 选择标签弹窗标题
         type: "", // 弹窗类型
@@ -113,6 +114,12 @@ export default {
     getListTag() {
       getListTag().then(({ rows }) => {
         this.listTag = Object.freeze(rows);
+        this.listTagOneArray = [];
+        this.listTag.forEach((element) => {
+          element.weTags.forEach((d) => {
+            this.listTagOneArray.push(d);
+          });
+        });
       });
     },
     getListOrganization() {
@@ -128,7 +135,7 @@ export default {
       };
       this.dialogVisible = true;
     },
-    makeTag() {
+    makeTag(type) {
       this.selectedTag = [];
       if (!this.multipleSelection.length) {
         this.msgInfo("请选择一位客户");
@@ -139,21 +146,21 @@ export default {
         return;
       }
       this.tagDialogType = {
-        title: "为客户增加标签",
-        type: "customer",
+        title: type === "add" ? "增加标签" : "移出标签",
+        type: type,
       };
       this.multipleSelection.forEach((element) => {
         // debugger;
         element.weFlowerCustomerRels.forEach((child) => {
           child.weFlowerCustomerTagRels.forEach((grandchild) => {
-            this.selectedTag.push({
-              id: grandchild.tagId,
-              name: grandchild.tagName,
+            let filter = this.listTagOneArray.find((d) => {
+              return d.tagId === grandchild.tagId;
             });
+            this.selectedTag.push(filter);
           });
         });
       });
-
+      this.removeTag = this.selectedTag.slice();
       this.dialogVisible = true;
     },
     sync() {
@@ -174,18 +181,23 @@ export default {
     },
     submitSelectTag(formName) {
       if (this.tagDialogType.type === "query") {
-        this.query.tagIds = this.selectedTag.map((d) => d.id) + "";
+        this.query.tagIds = this.selectedTag.map((d) => d.tagId) + "";
         // debugger;
         this.queryTag = this.selectedTag;
         this.dialogVisible = false;
-      } else if (this.tagDialogType.type === "customer") {
+      } else {
         let data = {
-          userid: this.multipleSelection[0].externalUserid,
           externalUserid: this.multipleSelection[0].externalUserid,
+          addTag: this.selectedTag,
         };
-        api.makeLabel(this.selectedTag).then(() => {
+        let apiType = {
+          add: "makeLabel",
+          remove: "removeLabel",
+        };
+        api[apiType[this.tagDialogType.type]](data).then(() => {
           this.msgSuccess("操作成功");
           this.dialogVisible = false;
+          this.getList();
         });
       }
     },
@@ -278,13 +290,14 @@ export default {
           type="primary"
           size="mini"
           icon="el-icon-s-flag"
-          @click="makeTag"
+          @click="makeTag('add')"
         >打标签</el-button>
         <el-button
           v-hasPermi="['customerManage:customer:removeTag']"
           type="primary"
           size="mini"
           icon="el-icon-brush"
+          @click="makeTag('remove')"
         >移除标签</el-button>
         <el-button
           v-hasPermi="['customerManage:customer:sync']"
@@ -320,10 +333,12 @@ export default {
         </template>
       </el-table-column>
       <el-table-column prop="corpName" label="公司名称" align="center"></el-table-column>
-      <el-table-column prop="address" label="添加人（首位）" align="center">
+      <el-table-column prop="userName" label="添加人（首位）" align="center">
         <template slot-scope="scope">{{ scope.row.weFlowerCustomerRels[0].userName }}</template>
       </el-table-column>
-      <el-table-column prop="createTime" label="添加时间" align="center"></el-table-column>
+      <el-table-column prop="createTime" label="添加时间" align="center">
+        <template slot-scope="scope">{{ scope.row.weFlowerCustomerRels[0].createTime }}</template>
+      </el-table-column>
       <el-table-column prop="address" label="标签" align="center">
         <template slot-scope="scope">
           <div v-for="(item, index) in scope.row.weFlowerCustomerRels" :key="index">
@@ -366,24 +381,36 @@ export default {
             v-for="(item, index) in listTag"
             :key="index"
             :label="item.gourpName"
-            :value="item.id"
+            :value="item.groupId"
           ></el-option>
         </el-select>
         <div class="mt20">
-          <el-checkbox-group v-model="selectedTag">
+          <el-checkbox-group v-model="selectedTag" v-if="tagDialogType.type !== 'remove'">
             <template v-for="(item, index) in listTag">
-              <div class="bfc-d" v-show="item.id === selectedGroup || !selectedGroup" :key="index">
+              <div
+                class="bfc-d"
+                v-show="item.groupId === selectedGroup || !selectedGroup"
+                :key="index"
+              >
                 <el-checkbox
                   :label="unit"
-                  value-key="id"
                   v-for="(unit, unique) in item.weTags"
                   :key="index + unique"
                 >{{unit.name}}</el-checkbox>
               </div>
             </template>
           </el-checkbox-group>
+          <el-checkbox-group v-else v-model="selectedTag">
+            <template v-for="(item, index) in removeTag">
+              <el-checkbox
+                v-if="item.groupId === selectedGroup || !selectedGroup"
+                :label="item"
+                :key="index"
+              >{{item.name}}</el-checkbox>
+            </template>
+          </el-checkbox-group>
         </div>
-        <div class="mt20" v-show="tagDialogType.type === 'customer'">
+        <div class="mt20" v-show="tagDialogType.type === 'add'">
           <el-button type="primary" @click="dialogVisibleAddTag = true">添加标签</el-button>
         </div>
       </div>
@@ -446,5 +473,8 @@ export default {
   &.woman {
     color: #f753b2;
   }
+}
+.bfc-d + .bfc-d .el-checkbox:first-child {
+  margin-left: 10px;
 }
 </style>

@@ -146,6 +146,17 @@ export function startOrStop(data) {
 }
 
 /**
+ * 用户删除接口
+ * @param {*} userId
+ */
+export function remove(userId) {
+  return request({
+    url: serviceUser + '/' + userId,
+    method: 'DELETE',
+  })
+}
+
+/**
  * 同步成员
  */
 export function syncUser() {

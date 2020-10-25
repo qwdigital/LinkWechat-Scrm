@@ -16,10 +16,22 @@ export default {
       dateRange: [],
       treeData: [],
       userList: [],
+      status: {
+        0: "启用",
+        1: "禁用",
+        6: "离职",
+      },
+      statusActivate: {
+        1: "已激活",
+        2: "已禁用",
+        4: "未激活",
+        5: "退出企业",
+        6: "删除",
+      },
       total: 0,
       defaultProps: {
         label: "name",
-        children: "children",
+        childr启用en: "children",
       },
       form: {},
       dialogVisible: false,
@@ -141,7 +153,7 @@ export default {
           let form = JSON.parse(JSON.stringify(this.form));
           form.department += "";
           form.isLeaderInDept += "";
-          api[form.id ? "updateUser" : "addUser"](form)
+          api[form.userId ? "updateUser" : "addUser"](form)
             .then(() => {
               this.msgSuccess("操作成功");
               this.dialogVisible = false;
@@ -154,14 +166,29 @@ export default {
       });
     },
     startOrStop(data) {
+      // 0: 启用，1：禁用
       let params = {
-        id: data.id,
-        enable: data.enable == 1 ? false : true,
+        userId: data.userId,
+        enable: data.enable == 1 ? 0 : 1,
       };
       api.startOrStop(params).then(() => {
         this.msgSuccess("操作成功");
         this.getList();
       });
+    },
+    /** 删除按钮操作 */
+    remove(id) {
+      // const operIds = id || this.ids + "";
+      this.$confirm("是否确认删除吗?", "警告", {
+        type: "warning",
+      })
+        .then(function () {
+          return api.remove(id);
+        })
+        .then(() => {
+          this.getList();
+          this.msgSuccess("删除成功");
+        });
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
@@ -318,7 +345,7 @@ export default {
             </template>-->
           </el-table-column>
           <el-table-column label="状态" align="center" prop="isActivate">
-            <template slot-scope="scope">{{scope.row.isActivate == 1 ? '已激活' : '未激活'}}</template>
+            <template slot-scope="scope">{{statusActivate[scope.row.isActivate]}}</template>
           </el-table-column>
           <el-table-column
             label="操作"
@@ -329,26 +356,27 @@ export default {
             <template slot-scope="scope">
               <el-button
                 v-hasPermi="['contacts:organization:view']"
-                size="mini"
                 type="text"
-                icon="el-icon-view"
                 @click="edit(scope.row, 0)"
               >查看</el-button>
               <el-button
                 v-hasPermi="['contacts:organization:forbidden']"
-                v-if="scope.row.userId !== 1"
-                size="mini"
+                v-if="scope.row.userId !== 1 && scope.row.enable < 2"
                 type="text"
-                icon="el-icon-close-notification"
                 @click="startOrStop(scope.row)"
-              >{{scope.row.enable == 1 ? '禁用' : '启用'}}</el-button>
+              >{{status[scope.row.enable]}}</el-button>
               <el-button
+                v-if="scope.row.enable < 2"
                 v-hasPermi="['contacts:organization:edit']"
-                size="mini"
                 type="text"
-                icon="el-icon-edit"
                 @click="edit(scope.row, 1)"
               >编辑</el-button>
+              <el-button
+                v-if="scope.row.enable < 2"
+                v-hasPermi="['customerManage:tag:remove']"
+                @click="remove(scope.row.userId)"
+                type="text"
+              >删除</el-button>
             </template>
           </el-table-column>
         </el-table>
