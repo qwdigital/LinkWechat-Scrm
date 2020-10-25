@@ -157,7 +157,14 @@ export default {
       this.dialogVisible = true;
     },
     sync() {
+      const loading = this.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
       api.sync().then(() => {
+        loading.close();
         this.msgSuccess("操作成功");
       });
     },
@@ -241,9 +248,21 @@ export default {
         </div>
       </el-form-item>
       <el-form-item label=" ">
-        <el-button type="primary" @click="getList(1)">查询</el-button>
-        <el-button type="info" @click="resetForm()">重置</el-button>
-        <el-button type="cyan" @click="isMoreFilter = !isMoreFilter">导出列表</el-button>
+        <el-button
+          v-hasPermi="['customerManage:customer:query']"
+          type="primary"
+          @click="getList(1)"
+        >查询</el-button>
+        <el-button
+          v-hasPermi="['customerManage:customer:query']"
+          type="info"
+          @click="resetForm()"
+        >重置</el-button>
+        <el-button
+          v-hasPermi="['customerManage:customer:export']"
+          type="cyan"
+          @click="isMoreFilter = !isMoreFilter"
+        >导出列表</el-button>
       </el-form-item>
     </el-form>
 
@@ -254,10 +273,32 @@ export default {
         <span class="num">{{total}}</span> 位。
       </div>
       <div>
-        <el-button type="primary" size="mini" icon="el-icon-s-flag" @click="makeTag">打标签</el-button>
-        <el-button type="primary" size="mini" icon="el-icon-brush">移除标签</el-button>
-        <el-button type="primary" size="mini" icon="el-icon-refresh" @click="sync">同步客户</el-button>
-        <el-button type="primary" size="mini" icon="el-icon-view">查看重复客户</el-button>
+        <el-button
+          v-hasPermi="['customerManage/customer:makeTag']"
+          type="primary"
+          size="mini"
+          icon="el-icon-s-flag"
+          @click="makeTag"
+        >打标签</el-button>
+        <el-button
+          v-hasPermi="['customerManage:customer:removeTag']"
+          type="primary"
+          size="mini"
+          icon="el-icon-brush"
+        >移除标签</el-button>
+        <el-button
+          v-hasPermi="['customerManage:customer:sync']"
+          type="primary"
+          size="mini"
+          icon="el-icon-refresh"
+          @click="sync"
+        >同步客户</el-button>
+        <el-button
+          v-hasPermi="['customerManage:customer:checkRepeat']"
+          type="primary"
+          size="mini"
+          icon="el-icon-view"
+        >查看重复客户</el-button>
       </div>
     </div>
 
@@ -294,12 +335,17 @@ export default {
           </div>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="操作" width="100">
+      <el-table-column label="操作" width="100">
         <template slot-scope="scope">
-          <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
-          <el-button type="text" size="small">编辑</el-button>
+          <el-button
+            v-hasPermi="['customerManage:customer:view']"
+            @click="$router.push({ path: '/customerManage/customerDetail', query: scope.row })"
+            type="text"
+            size="small"
+          >查看</el-button>
+          <!-- <el-button type="text" size="small">编辑</el-button> -->
         </template>
-      </el-table-column>-->
+      </el-table-column>
     </el-table>
 
     <pagination
@@ -307,7 +353,7 @@ export default {
       :total="total"
       :page.sync="query.pageNum"
       :limit.sync="query.pageSize"
-      @pagination="getList"
+      @pagination="getList()"
     />
 
     <!-- 选择标签弹窗 -->

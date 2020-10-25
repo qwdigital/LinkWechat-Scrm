@@ -26,6 +26,7 @@ export default {
       // 表单验证规则
       rules: Object.freeze({
         gourpName: [{ required: true, message: "必填项", trigger: "blur" }],
+        weTags: [{ required: true, message: "必填项", trigger: "blur" }],
       }),
       // 添加便签按钮显隐
       visibleAdd: false,
@@ -35,6 +36,11 @@ export default {
   computed: {
     Pvisible: {
       get() {
+        if (this.visible) {
+          this.$nextTick(() => {
+            this.$refs["form"].clearValidate();
+          });
+        }
         return this.visible;
       },
       set(val) {
@@ -71,7 +77,11 @@ export default {
     submit() {
       this.$refs["form"].validate((valid) => {
         let form = JSON.parse(JSON.stringify(this.form));
-        api[form.id ? "update" : "add"](form).then(() => {
+        if (!form.weTags.length) {
+          return;
+        }
+        debugger;
+        api[form.groupId ? "update" : "add"](form).then(() => {
           this.msgSuccess("操作成功");
           this.Pvisible = false;
           this.$emit("success");
@@ -84,16 +94,22 @@ export default {
 
 <template>
   <el-dialog
-    :title="(form.id ? '修改' : '添加') + '标签'"
+    :title="(form.groupId ? '修改' : '添加') + '标签'"
     :visible.sync="Pvisible"
     width="500px"
     append-to-body
   >
     <el-form ref="form" :model="form" :rules="rules" label-width="100px">
       <el-form-item label="标签组名称" prop="gourpName">
-        <el-input v-model="form.gourpName" maxlength="15" show-word-limit placeholder="请输入" />
+        <el-input
+          v-model="form.gourpName"
+          maxlength="15"
+          show-word-limit
+          placeholder="请输入标签组名称，该名称不支持再次修改"
+          :disabled="!!form.groupId"
+        />
       </el-form-item>
-      <el-form-item label="标签">
+      <el-form-item label="标签" prop="weTags">
         <template v-for="(item, index) in form.weTags">
           <el-tag
             v-if="item.status !== 1"

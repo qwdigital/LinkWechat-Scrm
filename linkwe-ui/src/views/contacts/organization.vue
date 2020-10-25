@@ -236,14 +236,38 @@ export default {
         </el-select>
       </el-form-item>
       <el-form-item label>
-        <el-button type="cyan" icon="el-icon-search" size="mini" @click="getList(1)">查询</el-button>
+        <el-button
+          v-hasPermi="['contacts:organization:query']"
+          type="cyan"
+          icon="el-icon-search"
+          size="mini"
+          @click="getList(1)"
+        >查询</el-button>
       </el-form-item>
     </el-form>
 
     <div class="ar mb15">
-      <el-button type="primary" icon="el-icon-refresh" size="mini" @click="syncUser">同步成员</el-button>
-      <el-button type="primary" icon="el-icon-plus" size="mini" @click="batchImport">批量导入</el-button>
-      <el-button type="primary" icon="el-icon-plus" size="mini" @click="edit()">添加成员</el-button>
+      <el-button
+        v-hasPermi="['contacts:organization:sync']"
+        type="primary"
+        icon="el-icon-refresh"
+        size="mini"
+        @click="syncUser"
+      >同步成员</el-button>
+      <el-button
+        v-hasPermi="['contacts:organization:import']"
+        type="primary"
+        icon="el-icon-plus"
+        size="mini"
+        @click="batchImport"
+      >批量导入</el-button>
+      <el-button
+        v-hasPermi="['contacts:organization:addMember']"
+        type="primary"
+        icon="el-icon-plus"
+        size="mini"
+        @click="edit()"
+      >添加成员</el-button>
     </div>
     <el-row :gutter="20">
       <!--部门数据-->
@@ -262,8 +286,17 @@ export default {
             <div class="custom-tree-node" slot-scope="{ node, data }">
               <span>{{ node.label }}</span>
               <span class="fr">
-                <i class="el-icon-edit" v-if="node.level !== 1" @click.stop="departEdit(data, 1)"></i>
-                <i class="el-icon-plus" @click.stop="departEdit(data, 0)"></i>
+                <i
+                  class="el-icon-edit"
+                  v-hasPermi="['contacts:organization:editDep']"
+                  v-if="node.level !== 1"
+                  @click.stop="departEdit(data, 1)"
+                ></i>
+                <i
+                  class="el-icon-plus"
+                  v-hasPermi="['contacts:organization:addDep']"
+                  @click.stop="departEdit(data, 0)"
+                ></i>
               </span>
             </div>
           </el-tree>
@@ -295,26 +328,26 @@ export default {
           >
             <template slot-scope="scope">
               <el-button
+                v-hasPermi="['contacts:organization:view']"
                 size="mini"
                 type="text"
                 icon="el-icon-view"
                 @click="edit(scope.row, 0)"
-                v-hasPermi="['system:user:edit']"
               >查看</el-button>
               <el-button
+                v-hasPermi="['contacts:organization:forbidden']"
                 v-if="scope.row.userId !== 1"
                 size="mini"
                 type="text"
                 icon="el-icon-close-notification"
                 @click="startOrStop(scope.row)"
-                v-hasPermi="['system:user:remove']"
               >{{scope.row.enable == 1 ? '禁用' : '启用'}}</el-button>
               <el-button
+                v-hasPermi="['contacts:organization:edit']"
                 size="mini"
                 type="text"
                 icon="el-icon-edit"
                 @click="edit(scope.row, 1)"
-                v-hasPermi="['system:user:resetPwd']"
               >编辑</el-button>
             </template>
           </el-table-column>
@@ -325,7 +358,7 @@ export default {
           :total="total"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
-          @pagination="getList"
+          @pagination="getList()"
         />
       </el-col>
     </el-row>

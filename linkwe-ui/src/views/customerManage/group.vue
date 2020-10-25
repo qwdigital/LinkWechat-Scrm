@@ -154,9 +154,13 @@ export default {
         ></el-date-picker>
       </el-form-item>
       <el-form-item label=" ">
-        <el-button type="primary" @click="getList(1)">查询</el-button>
-        <el-button type="info" @click="resetQuery">重置</el-button>
-        <el-button type="cyan" @click="handleExport">导出列表</el-button>
+        <el-button v-hasPermi="['customerManage:group:query']" type="primary" @click="getList(1)">查询</el-button>
+        <el-button v-hasPermi="['customerManage:group:query']" type="info" @click="resetQuery">重置</el-button>
+        <el-button
+          v-hasPermi="['customerManage:group:export']"
+          type="cyan"
+          @click="handleExport"
+        >导出列表</el-button>
       </el-form-item>
     </el-form>
 
@@ -171,7 +175,12 @@ export default {
         </span>
       </div>
       <div>
-        <el-button type="primary" size="mini" icon="el-icon-refresh">同步客户群</el-button>
+        <el-button
+          v-hasPermi="['customerManage:group:sync']"
+          type="primary"
+          size="mini"
+          icon="el-icon-refresh"
+        >同步客户群</el-button>
       </div>
     </div>
 
@@ -188,7 +197,7 @@ export default {
             type="text"
             icon="el-icon-view"
             @click="$router.push({ path: '/customerManage/groupDetail', query: scope.row })"
-            v-hasPermi="['monitor:operlog:query']"
+            v-hasPermi="['customerManage:group:view']"
           >查看详情</el-button>
         </template>
       </el-table-column>
@@ -199,7 +208,7 @@ export default {
       :total="total"
       :page.sync="query.pageNum"
       :limit.sync="query.pageSize"
-      @pagination="getList"
+      @pagination="getList()"
     />
   </div>
 </template>

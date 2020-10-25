@@ -6,9 +6,9 @@ const serviceUser = config.services.wecom + '/user'
  * 获取所有部门
  * @param {*} params 
  * {
-	"id": "部门id ",
-	"name": "部门名称",
-	"parentId": "父节点id "
+  "id": "部门id ",
+  "name": "部门名称",
+  "parentId": "父节点id "
 }
  */
 export function getTree(params) {
@@ -22,9 +22,9 @@ export function getTree(params) {
  * 更新部门
  * @param {*} params
  * {
-	"id": "部门id ",
-	"name": "部门名称",
-	"parentId": "父节点id "
+  "id": "部门id ",
+  "name": "部门名称",
+  "parentId": "父节点id "
 }
 */
 export function updateDepart(data) {
@@ -39,8 +39,8 @@ export function updateDepart(data) {
  * 新增部门
  * @param {Object} data 
  *  * {
-	"name": "部门名称",
-	"parentId": "父节点id "
+  "name": "部门名称",
+  "parentId": "父节点id "
 }
  */
 export function addDepart(data) {
@@ -142,5 +142,14 @@ export function startOrStop(data) {
     url: serviceUser + '/startOrStop',
     method: 'put',
     data
+  })
+}
+
+/**
+ * 同步成员
+ */
+export function syncUser() {
+  return request({
+    url: serviceUser + '/synchWeUser',
   })
 }
