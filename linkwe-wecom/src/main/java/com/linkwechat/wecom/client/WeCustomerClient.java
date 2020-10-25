@@ -5,6 +5,7 @@ import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
 import com.linkwechat.wecom.domain.dto.WeCustomerDto;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
+import com.linkwechat.wecom.domain.dto.customer.CutomerTagEdit;
 import com.linkwechat.wecom.domain.dto.customer.ExternalUserDetail;
 import com.linkwechat.wecom.domain.dto.customer.ExternalUserList;
 import com.linkwechat.wecom.domain.dto.customer.FollowUserList;
@@ -51,6 +52,16 @@ public interface WeCustomerClient {
             type = "POST"
     )
     WeResultDto remark(@DataObject WeCustomerDto.WeCustomerRemark weCustomerRemark);
+
+
+    /**
+     * 编辑客户标签
+     * @return
+     */
+    @Request(url = "/externalcontact/mark_tag",
+             type = "POST"
+    )
+    WeResultDto makeCustomerLabel(@DataObject CutomerTagEdit cutomerTagEdit);
 
 
 }

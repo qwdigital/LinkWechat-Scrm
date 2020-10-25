@@ -16,10 +16,6 @@ public interface IWeGroupService extends IService<WeGroup> {
     List<WeGroup> selectWeGroupList(WeGroup paramWeGroup);
 
 
-//    int batchLogicDeleteByIds(List<Long> ids);
-//
-//    int batchInsetWeGroup(List<WeGroup> weGroups);
-
     void allocateWeGroup(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo);
 
 

@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
 import lombok.Data;
 
@@ -16,6 +17,7 @@ public class WeLeaveUserVo extends BaseEntity {
 
     private String department;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date dimissionTime;
 
     private Integer allocateCustomerNum;
@@ -23,5 +25,9 @@ public class WeLeaveUserVo extends BaseEntity {
     private Integer allocateGroupNum;
 
     private Integer isActivate;
+
+    private String userId;
+
+    private Integer isAllocate;
 
 }

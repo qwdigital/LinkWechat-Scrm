@@ -68,7 +68,7 @@ public interface IWeEmpleCodeService
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    public int batchRemoveWeEmpleCodeIds(List<Long> ids);
+    public int batchRemoveWeEmpleCodeIds(List<String> ids);
 
 
 

@@ -28,7 +28,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -109,28 +111,24 @@ public class WeTagGroupServiceImpl  extends ServiceImpl<WeTagGroupMapper,WeTagGr
     public void updateWeTagGroup(WeTagGroup weTagGroup)
     {
 
-        if(this.updateById(weTagGroup)){
             List<WeTag> weTags = weTagGroup.getWeTags();
             //获取新增的集合
             if(CollectionUtil.isNotEmpty(weTags)) {
-
+                List<WeTag> filterWeTags = weTags.stream().filter(v -> StringUtils.isEmpty(v.getTagId())).collect(Collectors.toList());
                 //同步新增标签到微信端
                 if(CollectionUtil.isNotEmpty(WeCropGroupTagDto.transformAddTag(weTagGroup).getTag())){
-
                     WeCropGropTagDtlDto
                             weCropGropTagDtlDto = weCropTagClient.addCorpTag( WeCropGroupTagDto.transformAddTag(weTagGroup));
                      if(weCropGropTagDtlDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
-
-                           //微信端返回的标签主键,设置到weTags中
-
-
+                         //微信端返回的标签主键,设置到weTags中
+                         Map<String, String> weCropTagMap = weCropGropTagDtlDto.getTag_group().getTag().stream()
+                                 .collect(Collectors.toMap(weCropTagDto -> weCropTagDto.getName(), weCropTagDto -> weCropTagDto.getId()));
+                         filterWeTags.stream().forEach(tag->{
+                             tag.setTagId(weCropTagMap.get(tag.getName()));
+                             tag.setCreateTime(new Date());
+                         });
                      }
                 }
-
-                //同步更新微信端标签名称
-                WeCropTagDto.transFormto(weTags).stream().forEach(k->{
-                    weCropTagClient.editCorpTag(k);
-                });
 
 
 
@@ -150,23 +148,12 @@ public class WeTagGroupServiceImpl  extends ServiceImpl<WeTagGroupMapper,WeTagGr
                     //移除本地
                     removeWeTags.stream().forEach(v -> v.setStatus(Constants.DELETE_CODE));
                     iWeTagService.updateBatchById(removeWeTags);
-
-
-
                 }
 
 
-
-
-
-
-
-
                 //保存或更新wetag
-                weTags.stream().forEach(v->v.setGroupId(weTagGroup.getGroupId()));
-                iWeTagService.saveOrUpdateBatch(weTags);
-
-            }
+                filterWeTags.stream().forEach(v->v.setGroupId(weTagGroup.getGroupId()));
+                iWeTagService.saveOrUpdateBatch(filterWeTags);
 
             }
 
@@ -213,7 +200,7 @@ public class WeTagGroupServiceImpl  extends ServiceImpl<WeTagGroupMapper,WeTagGr
      * 同步标签
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void synchWeTags() {
 
 
@@ -231,6 +218,7 @@ public class WeTagGroupServiceImpl  extends ServiceImpl<WeTagGroupMapper,WeTagGr
      * @param tagGroup
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void batchSaveOrUpdateTagGroupAndTag(List<WeCropGroupTagDto> tagGroup) {
 
         List<WeTagGroup> weTagGroups=new ArrayList<>();

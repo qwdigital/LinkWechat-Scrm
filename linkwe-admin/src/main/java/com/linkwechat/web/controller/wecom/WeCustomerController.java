@@ -9,6 +9,7 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.poi.ExcelUtil;
+import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -96,6 +97,38 @@ public class WeCustomerController extends BaseController
         weCustomerService.synchWeCustomer();
 
         return AjaxResult.success(WeConstans.SYNCH_TIP);
+
+    }
+
+
+    /**
+     * 客户打标签
+     * @param weMakeCustomerTag
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:customer:makeLabel')")
+    @Log(title = "客户打标签", businessType = BusinessType.UPDATE)
+    @PostMapping("/makeLabel")
+    public AjaxResult makeLabel(@RequestBody WeMakeCustomerTag weMakeCustomerTag){
+
+        weCustomerService.makeLabel(weMakeCustomerTag);
+
+        return AjaxResult.success();
+    }
+
+
+    /**
+     * 移除客户标签
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:customer:removeLabel')")
+    @Log(title = "移除客户标签", businessType = BusinessType.DELETE)
+    @DeleteMapping("/removeLabel")
+    public AjaxResult removeLabel(@RequestBody WeMakeCustomerTag weMakeCustomerTag){
+
+        weCustomerService.removeLabel(weMakeCustomerTag);
+
+        return AjaxResult.success();
 
     }
 

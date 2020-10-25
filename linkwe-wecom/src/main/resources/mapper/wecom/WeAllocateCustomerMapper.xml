@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeAllocateCustomerMapper">
+
+
+<!--    <select id="getAllocateCustomers" resultType="com.linkwechat.wecom.domain.vo.WeAllocateCustomer">-->
+<!--         -->
+<!--         SELECT-->
+<!--            wc.`name` as customerName,-->
+<!--            wu.user_name as userName,-->
+<!--           (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department,-->
+<!--           wac.allocate_time-->
+<!--    FROM-->
+<!--        we_allocate_customer wac-->
+<!--    INNER JOIN we_customer wc ON wc.external_userid=wac.external_userid-->
+<!--    INNER JOIN we_user wu ON wu.user_id=wac.takeover_userid-->
+<!--    WHERE wac.handover_userid=1232-->
+<!--    AND -->
+
+<!--        -->
+<!--    </select>-->
+    
+
+    
+</mapper>

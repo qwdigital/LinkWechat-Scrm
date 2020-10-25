@@ -67,5 +67,5 @@ public interface WeEmpleCodeMapper
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    public int batchRemoveWeEmpleCodeIds(@Param("ids") List<Long> ids);
+    public int batchRemoveWeEmpleCodeIds(@Param("ids") List<String> ids);
 }

@@ -77,7 +77,7 @@ public class WeEmpleCodeController extends BaseController
     @PreAuthorize("@ss.hasPermi('wecom:code:remove')")
     @Log(title = "员工活码", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable Long[] ids)
+    public AjaxResult remove(@PathVariable String[] ids)
     {
         return toAjax(weEmpleCodeService.batchRemoveWeEmpleCodeIds(ListUtil.toList(ids)));
     }

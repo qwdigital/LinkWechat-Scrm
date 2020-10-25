@@ -1,26 +1,28 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.wecom.client.WeCustomerGroupClient;
+import com.linkwechat.wecom.client.WeUserClient;
+import com.linkwechat.wecom.domain.WeAllocateGroup;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeGroupMember;
+import com.linkwechat.wecom.domain.dto.AllocateWeGroupDto;
 import com.linkwechat.wecom.domain.dto.customer.CustomerGroupDetail;
 import com.linkwechat.wecom.domain.dto.customer.CustomerGroupList;
 import com.linkwechat.wecom.domain.dto.customer.CustomerGroupMember;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.mapper.WeGroupMapper;
-import com.linkwechat.wecom.service.IWeCustomerService;
-import com.linkwechat.wecom.service.IWeGroupMemberService;
-import com.linkwechat.wecom.service.IWeGroupService;
-import com.linkwechat.wecom.service.IWeUserService;
+import com.linkwechat.wecom.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +50,14 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper,WeGroup> imple
     private IWeCustomerService weCustomerService;
 
 
+    @Autowired
+    private IWeAllocateGroupService iWeAllocateGroupService;
+
+
+    @Autowired
+    private WeUserClient weUserClient;
+
+
     public List<WeGroup> selectWeGroupList(WeGroup weGroup) {
         return this.baseMapper.selectWeGroupList(weGroup);
     }
@@ -60,23 +70,38 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper,WeGroup> imple
     @Override
     @Transactional
     public void allocateWeGroup(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
-//        //分配群
-//        List<WeGroup> weGroups = this.selectWeGroupList(WeGroup.builder()
-//                .groupLeaderUserId(weLeaveUserInfoAllocateVo.getHandoverUserid())
-//                .build());
-//        if(CollectionUtil.isNotEmpty(weGroups)){
-//
-//            this.batchLogicDeleteByIds(
-//                    weGroups.stream().map(WeGroup::getId).collect(Collectors.toList())
-//            );
-//
-//            weGroups.stream().forEach(k->{
-//                k.setId(SnowFlakeUtil.nextId());
-//                k.setGroupLeaderUserId(weLeaveUserInfoAllocateVo.getTakeoverUserid());
-//            });
-//
-//            this.batchInsetWeGroup(weGroups);
-//        }
+
+        List<WeGroup> weGroups
+                = this.list(new LambdaQueryWrapper<WeGroup>().eq(WeGroup::getOwner, weLeaveUserInfoAllocateVo.getHandoverUserid()));
+        if(CollectionUtil.isNotEmpty(weGroups)){
+            List<WeAllocateGroup> weAllocateGroups=new ArrayList<>();
+            //更改本地群主
+            weGroups.stream().forEach(k->{
+                k.setOwner(weLeaveUserInfoAllocateVo.getTakeoverUserid());
+                weAllocateGroups.add(WeAllocateGroup.builder()
+                        .allocateTime(new Date())
+                        .chatId(k.getChatId())
+                        .newOwner(weLeaveUserInfoAllocateVo.getTakeoverUserid())
+                        .oldOwner(weLeaveUserInfoAllocateVo.getHandoverUserid())
+                        .build());
+            });
+            this.saveOrUpdateBatch(weGroups);
+            //分配记录保存
+            if(CollectionUtil.isNotEmpty(weAllocateGroups)){
+                if(iWeAllocateGroupService.saveOrUpdateBatch(weAllocateGroups)){
+
+                    //同步企业微信端
+                    weUserClient.allocateGroup(
+                            AllocateWeGroupDto.builder()
+                                    .chat_id_list(ArrayUtil.toArray(weAllocateGroups.stream().map(WeAllocateGroup::getChatId).collect(Collectors.toList()),String.class))
+                                    .new_owner(weLeaveUserInfoAllocateVo.getTakeoverUserid())
+                                    .build()
+                    );
+
+                }
+            }
+
+        }
     }
 
 

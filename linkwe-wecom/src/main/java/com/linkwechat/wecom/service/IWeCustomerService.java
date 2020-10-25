@@ -5,6 +5,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
+import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 
 /**
  * 企业微信客户Service接口
@@ -30,38 +31,6 @@ public interface IWeCustomerService extends IService<WeCustomer>
      */
     public List<WeCustomer> selectWeCustomerList(WeCustomer weCustomer);
 
-//    /**
-//     * 新增企业微信客户
-//     *
-//     * @param weCustomer 企业微信客户
-//     * @return 结果
-//     */
-//    public int insertWeCustomer(WeCustomer weCustomer);
-//
-//    /**
-//     * 修改企业微信客户
-//     *
-//     * @param weCustomer 企业微信客户
-//     * @return 结果
-//     */
-//    public int updateWeCustomer(WeCustomer weCustomer);
-//
-//    /**
-//     * 批量删除企业微信客户
-//     *
-//     * @param ids 需要删除的企业微信客户ID
-//     * @return 结果
-//     */
-//    public int deleteWeCustomerByIds(Long[] ids);
-//
-//    /**
-//     * 删除企业微信客户信息
-//     *
-//     * @param id 企业微信客户ID
-//     * @return 结果
-//     */
-//    public int deleteWeCustomerById(Long id);
-
 
     /**
      * 同步客户接口
@@ -75,4 +44,18 @@ public interface IWeCustomerService extends IService<WeCustomer>
      * @param weLeaveUserInfoAllocateVo
      */
     public void allocateWeCustomer(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo);
+
+
+    /**
+     * 客户打标签
+     * @param weMakeCustomerTag
+     */
+    public void makeLabel(WeMakeCustomerTag weMakeCustomerTag);
+
+
+    /**
+     * 移除客户标签
+     * @param weMakeCustomerTag
+     */
+    public void removeLabel(WeMakeCustomerTag weMakeCustomerTag);
 }

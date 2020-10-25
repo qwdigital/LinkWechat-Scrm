@@ -36,7 +36,6 @@ public class WeUserController extends BaseController {
     private IWeUserService weUserService;
 
 
-
     /**
      * 查询通讯录相关客户列表
      */
@@ -71,7 +70,8 @@ public class WeUserController extends BaseController {
     @ApiOperation("新增通讯录客户")
     public AjaxResult add(@Validated @RequestBody WeUser weUser)
     {
-        return toAjax(weUserService.insertWeUser(weUser));
+        weUserService.insertWeUser(weUser);
+        return AjaxResult.success();
     }
 
     /**
@@ -83,24 +83,25 @@ public class WeUserController extends BaseController {
     @ApiOperation("更新通讯录客户")
     public AjaxResult edit(@RequestBody WeUser weUser)
     {
-        return toAjax(weUserService.updateWeUser(weUser));
+        weUserService.updateWeUser(weUser);
+        return AjaxResult.success();
     }
 
 
     /**
      * 启用或者禁止
-     * @param id
-     * @param enable
+     * @param weUser
      * @return
      */
     @PreAuthorize("@ss.hasPermi('wecom:user:startOrStop')")
     @Log(title = "启用禁用用户", businessType = BusinessType.UPDATE)
     @PutMapping("/startOrStop")
-    @ApiOperation("启用禁用用户 true：启用 false：禁用")
-    public AjaxResult startOrStop(Long id,Boolean enable){
+    @ApiOperation("是否启用(1表示启用成员，0表示禁用成员)")
+    public AjaxResult startOrStop(@RequestBody WeUser weUser){
 
+        weUserService.startOrStop(weUser);
 
-        return toAjax(weUserService.startOrStop(id,enable));
+        return AjaxResult.success();
     }
 
 
@@ -113,14 +114,15 @@ public class WeUserController extends BaseController {
      @GetMapping({"/leaveUserAllocateList"})
      public TableDataInfo leaveUserAllocateList(WeLeaveUserVo weLeaveUserVo) {
        startPage();
-       weLeaveUserVo.setIsActivate(WeConstans.LEAVE_ALLOCATE_STATE);
-       List<WeLeaveUserVo> list = this.weUserService.leaveUserList(weLeaveUserVo);
+       weLeaveUserVo.setIsActivate(WeConstans.WE_USER_IS_LEAVE);
+         weLeaveUserVo.setIsAllocate(WeConstans.LEAVE_ALLOCATE_STATE);
+       List<WeLeaveUserVo> list = this.weUserService.leaveNoAllocateUserList(weLeaveUserVo);
        return getDataTable(list);
      }
 
 
     /**
-     * 离职等待分配
+     * 离职未分配
      * @param weLeaveUserVo
      * @return
      */
@@ -128,8 +130,9 @@ public class WeUserController extends BaseController {
      @GetMapping({"/leaveUserNoAllocateList"})
      public TableDataInfo leaveUserNoAllocateList(WeLeaveUserVo weLeaveUserVo) {
         startPage();
-        weLeaveUserVo.setIsActivate(WeConstans.LEAVE_NO_ALLOCATE_STATE);
-        List<WeLeaveUserVo> list = this.weUserService.leaveUserList(weLeaveUserVo);
+        weLeaveUserVo.setIsActivate(WeConstans.WE_USER_IS_LEAVE);
+        weLeaveUserVo.setIsAllocate(WeConstans.LEAVE_NO_ALLOCATE_STATE);
+        List<WeLeaveUserVo> list = weUserService.leaveNoAllocateUserList(weLeaveUserVo);
         return getDataTable(list);
      }
 
@@ -161,6 +164,22 @@ public class WeUserController extends BaseController {
         weUserService.synchWeUser();
 
         return  AjaxResult.success(WeConstans.SYNCH_TIP);
+    }
+
+
+    /**
+     * 删除用户
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:user:deleteUser')")
+    @DeleteMapping({"/{ids}"})
+    public AjaxResult deleteUser(@PathVariable String[] ids){
+
+
+        weUserService.deleteUser(ids);
+
+
+        return AjaxResult.success();
     }
 
 

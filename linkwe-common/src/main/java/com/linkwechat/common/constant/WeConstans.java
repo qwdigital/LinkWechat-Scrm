@@ -52,12 +52,42 @@ public class WeConstans {
     /**
      * 离职未分配
      */
-    public static final Integer LEAVE_NO_ALLOCATE_STATE = 5;
+    public static final Integer LEAVE_NO_ALLOCATE_STATE = 0;
+
+
+
 
     /**
      * 离职已分配分配
      */
-    public static final Integer LEAVE_ALLOCATE_STATE = 6;
+    public static final Integer LEAVE_ALLOCATE_STATE = 1;
+
+
+    /**
+     * 已激活
+     */
+    public static final Integer WE_USER_IS_ACTIVATE=1;
+
+
+    /**
+     * 已禁用
+     */
+    public static final Integer WE_USER_IS_FORBIDDEN=2;
+
+
+    /**
+     * 已离职
+     */
+    public static  final  Integer WE_USER_IS_LEAVE=6;
+
+
+    /**
+     * 未激活
+     */
+    public static final Integer WE_USER_IS_NO_ACTIVATE=4;
+
+
+
 
 
     /**
