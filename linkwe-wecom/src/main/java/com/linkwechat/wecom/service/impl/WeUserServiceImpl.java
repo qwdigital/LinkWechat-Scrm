@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.framework.web.domain.server.Sys;
@@ -9,6 +10,7 @@ import com.linkwechat.wecom.client.WeDepartMentClient;
 import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.domain.WeDepartment;
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.dto.LeaveWeUserListsDto;
 import com.linkwechat.wecom.domain.dto.WeDepartMentDto;
 import com.linkwechat.wecom.domain.dto.WeUserDto;
 import com.linkwechat.wecom.domain.dto.WeUserListDto;
@@ -25,6 +27,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -42,8 +46,6 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
 
     @Autowired
     private WeUserClient weUserClient;
-
-
 
 
     @Autowired
@@ -89,18 +91,16 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
      */
     @Override
     @Transactional
-    public int insertWeUser(WeUser weUser)
+    public void insertWeUser(WeUser weUser)
     {
 
-        int returnCode = weUserMapper.insertWeUser(weUser);
 
-        if(returnCode>0){
+        if(this.save(weUser)){
             weUserClient.createUser(
                     weUser.transformWeUserDto()
             );
         }
 
-        return returnCode;
     }
 
     /**
@@ -111,18 +111,14 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
      */
     @Override
     @Transactional
-    public int updateWeUser(WeUser weUser)
+    public void updateWeUser(WeUser weUser)
     {
-        int returnCode = weUserMapper.updateWeUser(weUser);
 
-        if(returnCode >0){
+        if(this.updateById(weUser)){
             weUserClient.updateUser(
                     weUser.transformWeUserDto()
             );
         }
-
-        return returnCode;
-
     }
 
 
@@ -130,38 +126,34 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
 
     /**
      *  启用或禁用用户
-     * @param id
-     * @param enable
+     * @param weUser
      * @return
      */
     @Override
-    @Transactional
-    public int startOrStop(Long id, Boolean enable) {
-
-         int returnCode = -1;
-
-         WeUser weUser = this.selectWeUserById(id);
-
-         if(null != weUser){
-
-             weUser.setEnable(enable?WeConstans.WE_USER_START:WeConstans.WE_USER_STOP);
-
-            returnCode=updateWeUser(weUser);
-        }
-
-
-        return returnCode;
+    public void startOrStop(WeUser weUser) {
+        this.updateWeUser(weUser);
     }
 
 
     /**
-     * 离职分配员工
+     * 离职未分配员工
      * @param weLeaveUserVo
      * @return
      */
     @Override
-    public List<WeLeaveUserVo> leaveUserList(WeLeaveUserVo weLeaveUserVo) {
-        return this.weUserMapper.leaveUserList(weLeaveUserVo);
+    public List<WeLeaveUserVo> leaveNoAllocateUserList(WeLeaveUserVo weLeaveUserVo) {
+        return this.weUserMapper.leaveNoAllocateUserList(weLeaveUserVo);
+    }
+
+
+    /**
+     * 离职已分配员工
+     * @param weLeaveUserVo
+     * @return
+     */
+    @Override
+    public List<WeLeaveUserVo> leaveAllocateUserList(WeLeaveUserVo weLeaveUserVo) {
+        return null;
     }
 
 
@@ -200,10 +192,35 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
                 = weUserClient.list(WeConstans.WE_ROOT_DEPARMENT_ID, WeConstans.DEPARTMENT_SUB_WEUSER).getWeUsers();
         if(CollectionUtil.isNotEmpty(weUsers)){
 
-            //删除当前员工表员工
-            weUserMapper.deleteWeUser();
-            //重新插入员工
-            weUserMapper.batchInsertWeUser(weUsers);
+            this.saveOrUpdateBatch(weUsers);
+        }
+
+    }
+
+
+    /**
+     * 删除用户
+     * @param ids
+     */
+    @Override
+    @Transactional
+    public void deleteUser(String[] ids) {
+
+        List<WeUser> weUsers=new ArrayList<>();
+        CollectionUtil.newArrayList(ids).stream().forEach(k->{
+            weUsers.add(
+                    WeUser.builder()
+                            .userId(k)
+                            .enable(WeConstans.WE_USER_IS_LEAVE)
+                            .dimissionTime(new Date())
+                            .build()
+            );
+        });
+
+        if(this.updateBatchById(weUsers)){
+            weUsers.stream().forEach(k->{
+                weUserClient.deleteUserByUserId(k.getUserId());
+            });
         }
 
     }

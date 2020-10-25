@@ -147,4 +147,5 @@ wecome:
           - /externalcontact/mark_tag
           - /externalcontact/transfer
           - /externalcontact/groupchat/transfer
+          - /externalcontact/get_unassigned_list
   fileUplodUrl:  /media/upload,/media/uploadimg

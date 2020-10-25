@@ -25,6 +25,7 @@ public class WeUserListDto extends WeResultDto{
             userlist.stream().forEach(k->{
                 WeUser weUser=new WeUser();
                 BeanUtils.copyPropertiesASM(k,weUser);
+                weUser.setIsActivate(k.getStatus());
                 weUsers.add(weUser);
             });
         }

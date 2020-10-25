@@ -223,7 +223,7 @@ public class WeEmpleCodeServiceImpl implements IWeEmpleCodeService
      * @return 结果
      */
     @Override
-    public int batchRemoveWeEmpleCodeIds(List<Long> ids) {
+    public int batchRemoveWeEmpleCodeIds(List<String> ids) {
 
         return weEmpleCodeMapper.batchRemoveWeEmpleCodeIds(ids);
     }

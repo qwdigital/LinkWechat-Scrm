@@ -37,6 +37,7 @@ public class WeCropGroupTagDto {
      */
     public static WeCropGroupTagDto transformAddTag(WeTagGroup weTagGroup){
         WeCropGroupTagDto weCropGroupTagDto=WeCropGroupTagDto.builder()
+                .group_id(weTagGroup.getGroupId())
                 .group_name(weTagGroup.getGourpName())
                 .build();
         List<WeTag> weTags = weTagGroup.getWeTags();
@@ -45,9 +46,23 @@ public class WeCropGroupTagDto {
             List<WeTag> newAddWeTag
                     = weTags.stream().filter(v -> StringUtils.isEmpty(v.getTagId())).collect(Collectors.toList());
 
-            List<WeCropTagDto> weTagDtos=new ArrayList<>();
-            BeanUtils.copyPropertiesignoreOther(newAddWeTag,weTagDtos);
-            weCropGroupTagDto.setTag(weTagDtos);
+
+            if(CollectionUtil.isNotEmpty(newAddWeTag)){
+                List<WeCropTagDto> weTagDtos=new ArrayList<>();
+
+                newAddWeTag.stream().forEach(weTag -> {
+
+                    weTagDtos.add(WeCropTagDto.builder()
+                            .id(weTag.getTagId())
+                            .name(weTag.getName())
+                            .build());
+                });
+
+                weCropGroupTagDto.setTag(weTagDtos);
+            }
+
+
+
         }
 
 

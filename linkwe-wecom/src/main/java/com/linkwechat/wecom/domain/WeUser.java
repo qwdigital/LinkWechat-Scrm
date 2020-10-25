@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -12,7 +13,10 @@ import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.wecom.domain.dto.WeUserDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
@@ -26,18 +30,21 @@ import java.util.Date;
  */
 @Data
 @TableName("we_user")
-public class WeUser extends BaseEntity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class WeUser
 {
     private static final long serialVersionUID = 1L;
 
-    /** $column.columnComment */
-    private Long id= SnowFlakeUtil.nextId();
 
     /** 用户头像 */
+    @TableField(value = "head_image_url")
     private String avatarMediaid;
 
     /** 用户名称 */
     @NotBlank(message = "姓名不可为空")
+    @TableField(value = "user_name")
     private String name;
 
     /** 用户昵称 */
@@ -45,6 +52,7 @@ public class WeUser extends BaseEntity
 
     /** 账号 */
     @NotBlank(message = "账号不可为空")
+    @TableId
     private String userId;
 
     /** 性别。1表示男性，2表示女性 */
@@ -74,7 +82,7 @@ public class WeUser extends BaseEntity
     private Date joinTime;
 
     /** 是否启用(1表示启用成员，0表示禁用成员) */
-    private Integer enable=new Integer(1);
+    private Integer enable;
 
     /** 身份证号 */
     private String idCard;
@@ -97,6 +105,11 @@ public class WeUser extends BaseEntity
 
     /** 离职是否分配(1:已分配;0:未分配;) */
     private Integer isAllocate;
+
+    /** 离职时间 */
+    private Date dimissionTime;
+
+
 
 
 

@@ -80,4 +80,15 @@ public interface WeUserClient {
             type = "POST"
     )
     WeResultDto allocateGroup(@DataObject AllocateWeGroupDto allocateWeGroupDto);
+
+
+    /**
+     * 获取离职员工列表
+     * @return
+     */
+    @Request(
+            url = "/externalcontact/get_unassigned_list",
+            type = "POST"
+    )
+    LeaveWeUserListsDto  leaveWeUsers();
 }

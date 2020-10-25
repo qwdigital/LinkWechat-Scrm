@@ -25,9 +25,6 @@ import java.util.Date;
 @TableName("we_tag")
 public class WeTag
 {
-    private static final long serialVersionUID = 1L;
-
-
 
     /** 标签组id */
     private String groupId;

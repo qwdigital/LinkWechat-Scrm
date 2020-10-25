@@ -50,6 +50,9 @@ public class WeUserDto extends WeResultDto{
     //全局唯一。对于同一个服务商，不同应用获取到企业内同一个成员的open_userid是相同的，最多64个字节。仅第三方应用可获取
     private String open_userid;
 
+   //激活状态: 1=已激活，2=已禁用，4=未激活，5=退出企业。
+    private Integer status;
+
 
 
 }

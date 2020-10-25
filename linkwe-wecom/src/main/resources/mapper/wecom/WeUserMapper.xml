@@ -18,18 +18,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="position"    column="position"    />
         <result property="isLeaderInDept"    column="is_leader_in_dept"  typeHandler="com.linkwechat.framework.handler.StringArrayJoinTypeHandler"  />
         <result property="joinTime"    column="join_time"    />
-        <result property="enable"    column="enable"    />
         <result property="idCard"    column="id_card"    />
         <result property="qqAccount"    column="qq_account"    />
         <result property="telephone"    column="telephone"    />
         <result property="address"    column="address"    />
         <result property="birthday"    column="birthday"    />
         <result property="remark"    column="remark"    />
-        <result property="isActivate"    column="is_activate"    />
+        <result property="isActivate" column="is_activate"/>
     </resultMap>
 
     <sql id="selectWeUserVo">
-        select id, head_image_url as avatarMediaid, user_name, alias, user_id, gender, mobile, email, wx_account, department, position, is_leader_in_dept, join_time, enable, id_card, qq_account, telephone, address, birthday, remark, is_activate from we_user
+        select head_image_url as avatarMediaid, user_name, alias, user_id, gender, mobile, email, wx_account, department, position, is_leader_in_dept, join_time, enable, id_card, qq_account, telephone, address, birthday, remark from we_user
     </sql>
 
     <select id="selectWeUserList" parameterType="WeUser" resultMap="WeUserResult">
@@ -47,13 +46,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="position != null  and position != ''"> and position = #{position}</if>
             <if test="isLeaderInDept != null "> and is_leader_in_dept = #{isLeaderInDept}</if>
             <if test="joinTime != null "> and join_time = #{joinTime}</if>
-            <if test="enable != null "> and enable = #{enable}</if>
             <if test="idCard != null  and idCard != ''"> and id_card = #{idCard}</if>
             <if test="qqAccount != null  and qqAccount != ''"> and qq_account = #{qqAccount}</if>
             <if test="telephone != null  and telephone != ''"> and telephone = #{telephone}</if>
             <if test="address != null  and address != ''"> and address = #{address}</if>
             <if test="birthday != null "> and birthday = #{birthday}</if>
-            <if test="isActivate != null "> and is_activate = #{isActivate}</if>
         </where>
     </select>
     
@@ -142,7 +139,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 
 
-    <select id="leaveUserList" parameterType="WeLeaveUserVo" resultType="com.linkwechat.wecom.domain.vo.WeLeaveUserVo">
+    <select id="leaveNoAllocateUserList" parameterType="WeLeaveUserVo" resultType="com.linkwechat.wecom.domain.vo.WeLeaveUserVo">
         SELECT
             wu.user_id,
             wu.user_name,
@@ -150,6 +147,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department,
             (SELECT COUNT(*) FROM we_flower_customer_rel  wfcr WHERE wfcr.user_id=wu.user_id) as allocateCustomerNum,
             (SELECT COUNT(*) FROM we_group wg WHERE wg.`owner`=wu.user_id) as allocateGroupNum
+        FROM
+        we_user wu
+        <where>
+            <if test="userName != null and userName !=''">and wu.user_name=#{userName}</if>
+            <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
+                DATE_FORMAT(wu.dimission_time,'%Y-%m-%d') BETWEEN #{beginTime}  AND #{endTime}
+            </if>
+            <if test="isActivate != null ">and wu.is_activate = #{isActivate}</if>
+            <if test="isAllocate != null ">and  wu.is_allocate = #{isAllocate}</if>
+        </where>
+    </select>
+
+
+    <select id="leaveAllocateUserList" parameterType="WeLeaveUserVo" resultType="com.linkwechat.wecom.domain.vo.WeLeaveUserVo">
+        SELECT
+            wu.user_id,
+            wu.user_name,
+            (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department,
+            (SELECT COUNT(*) FROM we_allocate_customer wac WHERE wac.handover_userid=wu.user_id) as allocateCustomerNum,
+            (SELECT COUNT(*) FROM we_allocate_group wag WHERE wag.old_owner=wu.user_id) as allocateGroupNum,
+            wu.dimission_time
         FROM
         we_user wu
         <where>
@@ -197,6 +215,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         birthday= values(birthday),remark= values(remark),
         is_activate= values(is_activate)
     </insert>
+
+
+
+
+
+
+
 
 
 

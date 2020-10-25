@@ -37,7 +37,7 @@ public interface IWeUserService extends IService<WeUser>
      * @param weUser 通讯录相关客户
      * @return 结果
      */
-    public int insertWeUser(WeUser weUser);
+    public void insertWeUser(WeUser weUser);
 
     /**
      * 修改通讯录相关客户
@@ -45,24 +45,30 @@ public interface IWeUserService extends IService<WeUser>
      * @param weUser 通讯录相关客户
      * @return 结果
      */
-    public int updateWeUser(WeUser weUser);
+    public void updateWeUser(WeUser weUser);
 
 
     /**
      *  启用或禁用用户
-     * @param id
-     * @param enable
      * @return
      */
-    public int startOrStop(Long id, Boolean enable);
+    public void startOrStop(WeUser weUser);
 
 
     /**
-     * 离职员工
+     * 离职未分配员工
      * @param weLeaveUserVo
      * @return
      */
-    List<WeLeaveUserVo> leaveUserList(WeLeaveUserVo weLeaveUserVo);
+    List<WeLeaveUserVo> leaveNoAllocateUserList(WeLeaveUserVo weLeaveUserVo);
+
+
+    /**
+     * 离职已分配员工
+     * @param weLeaveUserVo
+     * @return
+     */
+    List<WeLeaveUserVo> leaveAllocateUserList(WeLeaveUserVo weLeaveUserVo);
 
 
     /**
@@ -76,5 +82,12 @@ public interface IWeUserService extends IService<WeUser>
      * 同步成员
      */
     void synchWeUser();
+
+
+    /**
+     * 删除用户
+     * @param ids
+     */
+    void deleteUser(String[] ids);
 
 }

@@ -49,11 +49,20 @@ public interface WeUserMapper extends BaseMapper<WeUser>
 
 
     /**
-     * 离职员工
+     * 离职未分配员工
      * @param weLeaveUserVo
      * @return
      */
-   public List<WeLeaveUserVo> leaveUserList(WeLeaveUserVo weLeaveUserVo);
+   public List<WeLeaveUserVo> leaveNoAllocateUserList(WeLeaveUserVo weLeaveUserVo);
+
+
+    /**
+     * 离职已分配员工
+     * @param weLeaveUserVo
+     * @return
+     */
+    public List<WeLeaveUserVo> leaveAllocateUserList(WeLeaveUserVo weLeaveUserVo);
+
 
 
     /**
