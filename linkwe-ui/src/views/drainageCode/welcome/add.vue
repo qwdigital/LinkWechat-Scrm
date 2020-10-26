@@ -9,6 +9,7 @@ export default {
       dialogVisible: false,
       dialogVisible1: false,
       form: { id: "", welcomeMsgTplType: "", welcomeMsg: "" },
+      imageUrl: "",
     };
   },
   watch: {},
@@ -24,6 +25,23 @@ export default {
     },
     insertName() {
       this.form.welcomeMsg += "#客户昵称#";
+    },
+    uploadSuccess(res, file) {
+      debugger;
+      this.imageUrl = URL.createObjectURL(file.raw);
+    },
+    beforeUpload(file) {
+      debugger;
+      const isJPG = file.type === "image/jpeg";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error("上传头像图片只能是 JPG 格式!");
+      }
+      if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 2MB!");
+      }
+      return isJPG && isLt2M;
     },
   },
 };
@@ -54,17 +72,18 @@ export default {
             >插入客户昵称</el-button>
           </div>
           <el-divider></el-divider>
+          <img v-if="imageUrl" :src="imageUrl" />
+
           <el-popover placement="top-start" trigger="hover">
             <div class="flex">
               <el-upload
                 class="mr10"
                 action
                 :show-file-list="false"
-                :on-success="on-success"
-                :before-upload="before-upload"
+                :on-success="uploadSuccess"
+                :before-upload="beforeUpload"
               >
-                <img v-if="imageUrl" :src="imageUrl" />
-                <el-button v-else>
+                <el-button>
                   <i class="el-icon-picture-outline"></i>
                   <p>图片</p>
                 </el-button>
@@ -79,7 +98,7 @@ export default {
                 <p>小程序</p>
               </el-button>-->
             </div>
-            <el-button slot="reference" icon="el-icon-plus" size="mini" @click="resetQuery">添加图片/网页</el-button>
+            <el-button slot="reference" icon="el-icon-plus" size="mini">添加图片/网页</el-button>
           </el-popover>
         </el-card>
       </el-form-item>
@@ -99,12 +118,7 @@ export default {
       </div>
     </div>
 
-    <el-dialog
-      title="添加网页消息"
-      :visible.sync="dialogVisible"
-      width="width"
-      :before-close="dialogBeforeClose"
-    >
+    <el-dialog title="添加网页消息" :visible.sync="dialogVisible" width="width">
       <el-form :model="form" inline>
         <el-form-item label="添加网页消息" label-width="200">
           <el-input style="width: 400px;" v-model="j" placeholder="以http或https开头"></el-input>
@@ -116,11 +130,10 @@ export default {
       </div>
     </el-dialog>
 
-    <el-dialog
+    <!-- <el-dialog
       title="添加小程序消息"
       :visible.sync="dialogVisible1"
       width="width"
-      :before-close="dialogBeforeClose"
     >
       <div class="flex filter-wrap">
         <el-select v-model="model" placeholder="请选择分组">
@@ -152,7 +165,7 @@ export default {
         <el-button @click="dialogVisible1 = false">取 消</el-button>
         <el-button type="primary" @click="dialogVisible1 = false">确 定</el-button>
       </div>
-    </el-dialog>
+    </el-dialog>-->
   </div>
 </template>
 
