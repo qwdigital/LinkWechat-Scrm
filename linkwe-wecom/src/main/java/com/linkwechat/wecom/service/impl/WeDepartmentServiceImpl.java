@@ -86,23 +86,20 @@ public class WeDepartmentServiceImpl extends ServiceImpl<WeDepartmentMapper,WeDe
      * @return 结果
      */
     @Override
-    @Transactional
-    public int insertWeDepartment(WeDepartment weDepartment)
+    public void insertWeDepartment(WeDepartment weDepartment)
     {
-         weDepartment.setId(SnowFlakeUtil.nextId());
-         int returnCode=weDepartmentMapper.insertWeDepartment(weDepartment);
 
-         if(returnCode>0){
+        WeResultDto weDepartMent = weDepartMentClient.createWeDepartMent(
+                weDepartment.transformDeartMentDto(weDepartment)
+        );
 
+        if(weDepartMent.getErrcode().equals(WeConstans.WE_SUCCESS_CODE) && weDepartMent.getId() != null){
 
-              weDepartMentClient.createWeDepartMent(
-                     weDepartment.transformDeartMentDto(weDepartment)
-             );
+            weDepartment.setId(weDepartMent.getId());
 
+            this.save(weDepartment);
+        }
 
-         }
-
-        return  returnCode;
     }
 
     /**
@@ -112,20 +109,29 @@ public class WeDepartmentServiceImpl extends ServiceImpl<WeDepartmentMapper,WeDe
      * @return 结果
      */
     @Override
-    public int updateWeDepartment(WeDepartment weDepartment)
+    public void updateWeDepartment(WeDepartment weDepartment)
     {
 
-        int returnCode=weDepartmentMapper.updateWeDepartment(weDepartment);
-        if(returnCode>0){
-
-            weDepartMentClient.updateWeDepartMent(
-                    weDepartment.transformDeartMentDto(weDepartment)
-            );
+        WeResultDto weDepartMent =  weDepartMentClient.updateWeDepartMent(
+                weDepartment.transformDeartMentDto(weDepartment)
+        );
 
 
+        if(weDepartMent.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
+               this.updateById(weDepartment);
         }
 
-        return returnCode;
+//        int returnCode=weDepartmentMapper.updateWeDepartment(weDepartment);
+//        if(returnCode>0){
+//
+//            weDepartMentClient.updateWeDepartMent(
+//                    weDepartment.transformDeartMentDto(weDepartment)
+//            );
+//
+//
+//        }
+//
+//        return returnCode;
     }
 
 
@@ -159,8 +165,7 @@ public class WeDepartmentServiceImpl extends ServiceImpl<WeDepartmentMapper,WeDe
     public List<WeDepartment> synchWeDepartment() {
         List<WeDepartment> weDepartments = weDepartMentClient.weAllDepartMents().findWeDepartments();
         if(CollectionUtil.isNotEmpty(weDepartments)){
-            this.deleteAllWeDepartment();
-            this.batchInsertWeDepartment(weDepartments);
+            this.saveOrUpdateBatch(weDepartments);
         }
 
         return weDepartments;

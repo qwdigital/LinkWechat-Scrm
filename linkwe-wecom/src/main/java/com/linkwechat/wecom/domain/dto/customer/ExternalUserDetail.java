@@ -55,7 +55,7 @@ public class ExternalUserDetail extends WeResultDto {
         /**该成员对此外部联系人的描述*/
         private String description;
         /**该成员添加此外部联系人的时间*/
-        private Date createtime;
+        private long createtime;
         /**该成员对此客户备注的企业名称*/
         private String remark_company;
         /**该成员对此客户备注的手机号码*/

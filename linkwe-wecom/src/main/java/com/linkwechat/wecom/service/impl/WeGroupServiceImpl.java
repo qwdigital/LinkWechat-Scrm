@@ -136,7 +136,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper,WeGroup> imple
                                         .groupName(kk.getName())
                                         .notice(kk.getNotice())
                                         .owner(kk.getOwner())
-                                        .createTime(kk.getCreate_time())
+                                        .createTime(new Date(kk.getCreate_time() * 1000L))
                                         .status(k.getStatus())
                                         .build()
                         );
@@ -148,7 +148,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper,WeGroup> imple
                                         WeGroupMember.builder()
                                                 .chatId(kk.getChat_id())
                                                 .userId(member.getUserid())
-                                                .joinTime(member.getJoin_time())
+                                                .joinTime(new Date(member.getJoin_time() * 1000L))
                                                 .joinScene(member.getJoin_scene())
                                                 .joinType(member.getType())
                                                 .unionId(member.getUnionid())

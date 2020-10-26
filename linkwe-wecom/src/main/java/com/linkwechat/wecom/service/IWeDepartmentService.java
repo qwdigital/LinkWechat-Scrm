@@ -35,7 +35,7 @@ public interface IWeDepartmentService extends IService<WeDepartment>
      * @param weDepartment 企业微信组织架构相关
      * @return 结果
      */
-    public int insertWeDepartment(WeDepartment weDepartment);
+    public void insertWeDepartment(WeDepartment weDepartment);
 
     /**
      * 修改企业微信组织架构相关
@@ -43,7 +43,7 @@ public interface IWeDepartmentService extends IService<WeDepartment>
      * @param weDepartment 企业微信组织架构相关
      * @return 结果
      */
-    public int updateWeDepartment(WeDepartment weDepartment);
+    public void updateWeDepartment(WeDepartment weDepartment);
 
 
 

@@ -53,7 +53,8 @@ public class WeDepartmentController extends BaseController
     @ApiOperation("添加部门")
     public AjaxResult add(@Validated @RequestBody WeDepartment weDepartment)
     {
-        return toAjax(weDepartmentService.insertWeDepartment(weDepartment));
+        weDepartmentService.insertWeDepartment(weDepartment);
+        return AjaxResult.success();
     }
 
     /**
@@ -65,7 +66,8 @@ public class WeDepartmentController extends BaseController
     @ApiOperation("更新部门")
     public AjaxResult edit(@RequestBody WeDepartment weDepartment)
     {
-        return toAjax(weDepartmentService.updateWeDepartment(weDepartment));
+        weDepartmentService.updateWeDepartment(weDepartment);
+        return AjaxResult.success();
     }
 //
 //    /**

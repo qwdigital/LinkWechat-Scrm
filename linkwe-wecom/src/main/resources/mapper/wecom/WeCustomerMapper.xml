@@ -26,6 +26,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <result property="addWay"    column="add_way"    />
             <result property="state"    column="state"    />
             <result property="userName" column="user_name"/>
+            <result property="department" column="department"/>
             <collection property="weFlowerCustomerTagRels" ofType="com.linkwechat.wecom.domain.WeFlowerCustomerTagRel">
                 <result property="flowerCustomerRelId"    column="flower_customer_rel_id"    />
                 <result property="tagId"    column="tag_id"    />
@@ -64,7 +65,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                   wfcrf.flower_customer_rel_id,
                   wt.tag_id,
                   wt.create_time,
-                  wt.`name` as tagName
+                  wt.`name` as tagName,
+                  (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department
         FROM
             we_customer wc
         LEFT JOIN we_flower_customer_rel wfcr ON wc.external_userid=wfcr.external_userid
