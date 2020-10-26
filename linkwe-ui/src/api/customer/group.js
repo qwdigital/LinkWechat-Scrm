@@ -35,3 +35,13 @@ export function getMembers(params) {
     params
   })
 }
+
+
+/**
+ * 客户群同步接口
+ */
+export function sync() {
+  return request({
+    url: service + '/chat/synchWeGroup',
+  })
+}

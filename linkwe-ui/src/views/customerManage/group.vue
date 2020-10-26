@@ -65,6 +65,18 @@ export default {
       this.dateRange = [];
       this.$refs["queryForm"].resetFields();
     },
+    sync() {
+      const loading = this.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
+      api.sync().then((r) => {
+        loading.close();
+        this.msgSuccess("后台开始同步数据，请稍后关注进度");
+      });
+    },
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map((item) => item.id);
@@ -166,11 +178,12 @@ export default {
 
     <div class="mid-action">
       <div class="total">
-        己选
-        <span class="num">{{total}}</span> 个客户群
+        <!-- 己选
+        <span class="num">{{total}}</span> 个客户群-->
         <span>
-          最近更新：2020-08-25 06:35:00，同步
-          <span class="num">{{total}}</span> 条信息 ，共
+          <!-- 最近更新：2020-08-25 06:35:00，同步
+          <span class="num">{{total}}</span> 条信息 ，-->
+          共
           <span class="num">{{total}}</span> 个客户群
         </span>
       </div>
@@ -180,6 +193,7 @@ export default {
           type="primary"
           size="mini"
           icon="el-icon-refresh"
+          @click="sync"
         >同步客户群</el-button>
       </div>
     </div>
@@ -188,7 +202,7 @@ export default {
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="群名" align="center" prop="groupName" />
       <el-table-column label="群人数" align="center" prop="memberNum" />
-      <el-table-column label="群主" align="center" prop="groupLeader" />
+      <el-table-column label="群主" align="center" prop="groupLeaderName" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180"></el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
