@@ -5,12 +5,32 @@ const service = config.services.wecom + '/user'
  * 获取离职未分配员工列表
  * @param {*} params 
  * {
- * pageNum:
+pageNum:
 pageSize:
-userName:离职人员名称
-beginTime:}
+beginTime:
+endTime:
+userName:
+}
  */
 export function getList(params) {
+  return request({
+    url: service + '/leaveUserAllocateList',
+    params
+  })
+}
+
+/**
+ * 获取离职已分配员工列表
+ * @param {*} params 
+ * {
+pageNum:
+pageSize:
+beginTime:
+endTime:
+userName:
+}
+ */
+export function getListNo(params) {
   return request({
     url: service + '/leaveUserNoAllocateList',
     params

@@ -4,75 +4,31 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeGroupMemberMapper">
 
-<!--    <resultMap type="WeGroupMember" id="WeGroupMemberResult">-->
-<!--        <result property="id"    column="id"    />-->
-<!--        <result property="groupId"    column="group_id"    />-->
-<!--        <result property="memberName"    column="member_name"    />-->
-<!--        <result property="joinTime"    column="join_time"    />-->
-<!--        <result property="joinType"    column="join_type"    />-->
-<!--    </resultMap>-->
 
-<!--    <sql id="selectWeGroupMemberVo">-->
-<!--        select id, group_id, member_name, join_time, join_type from we_group_member-->
-<!--    </sql>-->
 
     <select id="selectWeGroupMemberList" parameterType="WeGroupMember" resultType="com.linkwechat.wecom.domain.WeGroupMember">
         SELECT
-            wc.`name` AS memberName,
             wgm.join_time,
-            wgm.type
+            wgm.type,
+            wgm.join_scene,
+            CASE
+            WHEN wgm.type=1 THEN
+            (
+                    SELECT wu.user_name FROM  we_user wu
+                    WHERE wu.user_id=wgm.user_id
+            )
+            WHEN wgm.type = 2 THEN
+            (
+                    SELECT wc.name FROM we_customer wc
+                    WHERE wc.external_userid=wgm.user_id
+            )
+            END memberName
         FROM
         we_group_member wgm
-        LEFT JOIN we_customer wc ON wgm.user_id=wc.external_userid
         <where>
             <if test="chatId != null "> and wgm.chat_id = #{chatId}</if>
-            <if test="memberName != null  and memberName != ''"> and wc.`name` like concat('%', #{memberName}, '%')</if>
+            <if test="memberName != null  and memberName != ''"> and HAVING wc.`name` like concat('%', #{memberName}, '%')</if>
         </where>
     </select>
-
-<!--    <select id="selectWeGroupMemberById" parameterType="Long" resultMap="WeGroupMemberResult">-->
-<!--        <include refid="selectWeGroupMemberVo"/>-->
-<!--        where id = #{id}-->
-<!--    </select>-->
-
-<!--    <insert id="insertWeGroupMember" parameterType="WeGroupMember">-->
-<!--        insert into we_group_member-->
-<!--        <trim prefix="(" suffix=")" suffixOverrides=",">-->
-<!--            <if test="id != null">id,</if>-->
-<!--            <if test="groupId != null">group_id,</if>-->
-<!--            <if test="memberName != null">member_name,</if>-->
-<!--            <if test="joinTime != null">join_time,</if>-->
-<!--            <if test="joinType != null">join_type,</if>-->
-<!--        </trim>-->
-<!--        <trim prefix="values (" suffix=")" suffixOverrides=",">-->
-<!--            <if test="id != null">#{id},</if>-->
-<!--            <if test="groupId != null">#{groupId},</if>-->
-<!--            <if test="memberName != null">#{memberName},</if>-->
-<!--            <if test="joinTime != null">#{joinTime},</if>-->
-<!--            <if test="joinType != null">#{joinType},</if>-->
-<!--        </trim>-->
-<!--    </insert>-->
-
-<!--    <update id="updateWeGroupMember" parameterType="WeGroupMember">-->
-<!--        update we_group_member-->
-<!--        <trim prefix="SET" suffixOverrides=",">-->
-<!--            <if test="groupId != null">group_id = #{groupId},</if>-->
-<!--            <if test="memberName != null">member_name = #{memberName},</if>-->
-<!--            <if test="joinTime != null">join_time = #{joinTime},</if>-->
-<!--            <if test="joinType != null">join_type = #{joinType},</if>-->
-<!--        </trim>-->
-<!--        where id = #{id}-->
-<!--    </update>-->
-
-<!--    <delete id="deleteWeGroupMemberById" parameterType="Long">-->
-<!--        delete from we_group_member where id = #{id}-->
-<!--    </delete>-->
-
-<!--    <delete id="deleteWeGroupMemberByIds" parameterType="String">-->
-<!--        delete from we_group_member where id in-->
-<!--        <foreach item="id" collection="array" open="(" separator="," close=")">-->
-<!--            #{id}-->
-<!--        </foreach>-->
-<!--    </delete>-->
 
 </mapper>

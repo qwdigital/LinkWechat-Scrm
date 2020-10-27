@@ -43,7 +43,7 @@ export default {
         </div>
         <div class="info">
           出生日期：{{customer.birthday || '--'}}
-          <div class="ml20" style="position: absolute;">
+          <div class="bfc-d ml20">
             <el-date-picker
               v-if="datePickerVisible"
               v-model="customer.birthday"
@@ -87,7 +87,7 @@ export default {
         </el-row>
         <el-row :gutter="10">
           <el-col :span="10">所在部门：</el-col>
-          <el-col :span="12">{{"--"}}</el-col>
+          <el-col :span="12">{{customer.weFlowerCustomerRels[0].department}}</el-col>
         </el-row>
         <el-row :gutter="10">
           <el-col :span="10">添加时间：</el-col>

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.bean.BeanUtils;
@@ -69,11 +70,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper,WeCustom
 
     @Autowired
     private IWeAllocateCustomerService iWeAllocateCustomerService;
-
-
-
-
-
 
 
     @Autowired
@@ -149,12 +145,24 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper,WeCustom
                             List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels=new ArrayList<>();
                             List<WeFlowerCustomerRel> weFlowerCustomerRel=new ArrayList<>();
                             externalUserDetail.getFollow_user().stream().forEach(kk->{
-                                WeFlowerCustomerRel weFlowerCustomerRelOne=new WeFlowerCustomerRel();
-                                BeanUtils.copyPropertiesignoreOther(kk,weFlowerCustomerRelOne);
+//                                WeFlowerCustomerRel weFlowerCustomerRelOne=new WeFlowerCustomerRel();
+//                                BeanUtils.copyPropertiesignoreOther(kk,weFlowerCustomerRelOne);
+
                                 Long weFlowerCustomerRelId=SnowFlakeUtil.nextId();
-                                weFlowerCustomerRelOne.setId(weFlowerCustomerRelId);
-                                weFlowerCustomerRelOne.setExternalUserid(weCustomer.getExternalUserid());
-                                weFlowerCustomerRel.add(weFlowerCustomerRelOne);
+//                                weFlowerCustomerRelOne.setId(weFlowerCustomerRelId);
+//                                weFlowerCustomerRelOne.setExternalUserid(weCustomer.getExternalUserid());
+                                weFlowerCustomerRel.add(WeFlowerCustomerRel.builder()
+                                        .id(weFlowerCustomerRelId)
+                                         .userId(kk.getUserid())
+                                        .description(kk.getDescription())
+                                        .remarkCorpName(kk.getRemark_company())
+                                        .remarkMobiles(kk.getRemark_mobiles())
+                                        .operUserid(kk.getOper_userid())
+                                        .addWay(kk.getAdd_way())
+                                        .externalUserid(weCustomer.getExternalUserid())
+                                        .createTime(new Date(kk.getCreatetime() * 1000L))
+                                        .build());
+
                                 List<ExternalUserTag> tags = kk.getTags();
                                 if(CollectionUtil.isNotEmpty(tags)){
 
@@ -339,7 +347,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper,WeCustom
             List<WeTag> addTags = weMakeCustomerTag.getAddTag();
 
 
+
             if(CollectionUtil.isNotEmpty(addTags)){
+                addTags.removeAll(Collections.singleton(null));
                 List<WeFlowerCustomerTagRel> tagRels=new ArrayList<>();
 
                 List<CutomerTagEdit> cutomerTagEdits=new ArrayList<>();
@@ -393,15 +403,24 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper,WeCustom
 
         if(CollectionUtil.isNotEmpty(addTags)){
 
+            //获取当前客户需要移除的标签
+            List<WeFlowerCustomerTagRel> removeTag = iWeFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                    .in(WeFlowerCustomerTagRel::getFlowerCustomerRelId, iWeFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>().eq(WeFlowerCustomerRel::getExternalUserid
+                            , weMakeCustomerTag.getExternalUserid())).stream().map(WeFlowerCustomerRel::getId).collect(Collectors.toList()))
+                    .notIn(WeFlowerCustomerTagRel::getTagId, addTags.stream().map(WeTag::getTagId).collect(Collectors.toList()))
+            );
+
+
             //查询出当前用户对应的
             List<WeFlowerCustomerRel> flowerCustomerRels = iWeFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
                     .eq(WeFlowerCustomerRel::getExternalUserid, weMakeCustomerTag.getExternalUserid()));
+
             if(CollectionUtil.isNotEmpty(flowerCustomerRels) ){
 
                 if(iWeFlowerCustomerTagRelService.remove(
                         new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
                                 .in(WeFlowerCustomerTagRel::getFlowerCustomerRelId, flowerCustomerRels.stream().map(WeFlowerCustomerRel::getId).collect(Collectors.toList()))
-                                .in(WeFlowerCustomerTagRel::getTagId, addTags.stream().map(WeTag::getTagId).collect(Collectors.toList()))
+                                .in(WeFlowerCustomerTagRel::getTagId, removeTag.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList()))
                 )){
 
                     flowerCustomerRels.stream().forEach(k->{
@@ -409,7 +428,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper,WeCustom
                                 CutomerTagEdit.builder()
                                         .external_userid(k.getExternalUserid())
                                         .userid(k.getUserId())
-                                        .remove_tag(ArrayUtil.toArray(addTags.stream().map(WeTag::getTagId).collect(Collectors.toList()), String.class))
+                                        .remove_tag(ArrayUtil.toArray(removeTag.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList()), String.class))
                                         .build()
                         );
 

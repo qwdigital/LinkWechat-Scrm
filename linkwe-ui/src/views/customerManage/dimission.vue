@@ -39,7 +39,7 @@ export default {
       page && (this.query.pageNum = page);
       this.loading = true;
       api
-        .getList(this.query)
+        .getListNo(this.query)
         .then(({ rows, total }) => {
           this.list = rows;
           this.total = +total;
@@ -111,6 +111,7 @@ export default {
           v-hasPermi="['customerManage:dimission:filter']"
           type="primary"
           size="mini"
+          @click="getList(1)"
         >已分配的离职员工</el-button>
         <el-button
           v-hasPermi="['customerManage:dimission:allocate']"

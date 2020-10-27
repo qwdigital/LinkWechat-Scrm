@@ -34,6 +34,11 @@ export default {
         groupId: undefined,
         memberName: undefined,
       },
+      joinScene: {
+        1: "由成员邀请入群（直接邀请入群）",
+        2: "由成员邀请入群（通过邀请链接入群）",
+        3: "通过扫描群二维码入群",
+      },
     };
   },
   created() {
@@ -130,14 +135,14 @@ export default {
         <div style="margin-bottom: 20px;">{{group.groupName}}</div>
         <div
           class="info"
-        >群主：{{group.groupLeader}} | 创建时间：{{group.createTime}} | 群公告：{{group.notice || '未设置'}}</div>
+        >群主：{{group.groupLeaderName}} | 创建时间：{{group.createTime}} | 群公告：{{group.notice || '未设置'}}</div>
       </div>
     </div>
     <el-input placeholder="请输入群成员" v-model="query.memberName" class>
       <el-button slot="append" @click="getList(1)">查询</el-button>
     </el-input>
     <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
+      <!-- <el-table-column type="selection" width="55" align="center" /> -->
       <el-table-column label="群成员" align="center" prop="operId">
         <template slot-scope="scope">
           {{ scope.row.memberName }}
@@ -147,12 +152,12 @@ export default {
           <!-- <i :class="['el-icon-s-custom', ({1: 'man', 2: 'woman'})[scope.row.gender]]"></i> -->
         </template>
       </el-table-column>
-      <el-table-column label="进群时间" align="center" prop="joinTime" width="180">
+      <el-table-column label="进群时间" align="center" prop="joinTime" width="180"></el-table-column>
+      <el-table-column label="进群方式" align="center" prop="joinScene">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.joinTime) }}</span>
+          <span>{{ joinScene[scope.row.joinScene] }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="进群方式" align="center" prop="joinType" />
     </el-table>
 
     <pagination
@@ -160,7 +165,7 @@ export default {
       :total="total"
       :page.sync="query.pageNum"
       :limit.sync="query.pageSize"
-      @pagination="getList"
+      @pagination="getList()"
     />
   </div>
 </template>

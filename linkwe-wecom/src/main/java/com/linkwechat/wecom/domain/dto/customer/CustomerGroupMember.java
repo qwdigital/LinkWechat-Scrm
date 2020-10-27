@@ -18,7 +18,7 @@ public class CustomerGroupMember {
     private Integer type;
 
     /**入群时间*/
-    private Date join_time;
+    private long join_time;
 
     /**1 - 由成员邀请入群（直接邀请入群）;2 - 由成员邀请入群（通过邀请链接入群）;3 - 通过扫描群二维码入群*/
     private Integer join_scene;

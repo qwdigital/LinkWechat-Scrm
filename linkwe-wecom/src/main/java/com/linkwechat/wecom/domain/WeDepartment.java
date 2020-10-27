@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.domain;
 
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -25,12 +26,13 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName("we_department")
-public class WeDepartment extends BaseEntity
+public class WeDepartment
 {
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
-    private Long id= SnowFlakeUtil.nextId();
+    @TableId
+    private Long id;
 
 
     /** 部门名称 */

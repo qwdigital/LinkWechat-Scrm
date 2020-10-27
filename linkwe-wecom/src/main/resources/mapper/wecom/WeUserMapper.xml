@@ -28,12 +28,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectWeUserVo">
-        select head_image_url as avatarMediaid, user_name, alias, user_id, gender, mobile, email, wx_account, department, position, is_leader_in_dept, join_time, enable, id_card, qq_account, telephone, address, birthday, remark from we_user
+        select is_activate,head_image_url as avatarMediaid, user_name, alias, user_id, gender, mobile, email, wx_account, department, position, is_leader_in_dept, join_time, enable, id_card, qq_account, telephone, address, birthday, remark from we_user
     </sql>
 
     <select id="selectWeUserList" parameterType="WeUser" resultMap="WeUserResult">
         <include refid="selectWeUserVo"/>
-        <where>  
+        WHERE
+            is_activate !=6
             <if test="avatarMediaid != null  and avatarMediaid != ''"> and head_image_url = #{avatarMediaid}</if>
             <if test="name != null  and name != ''"> and user_name like concat('%', #{name}, '%')</if>
             <if test="alias != null  and alias != ''"> and alias = #{alias}</if>
@@ -42,7 +43,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mobile != null  and mobile != ''"> and mobile = #{mobile}</if>
             <if test="email != null  and email != ''"> and email = #{email}</if>
             <if test="wxAccount != null  and wxAccount != ''"> and wx_account = #{wxAccount}</if>
-            <if test="department != null  and department != ''"> and FIND_IN_SET(#{department},department)</if>
+            <if test="department != null  and department != '' and department != '1' "> and FIND_IN_SET(#{department},department)</if>
             <if test="position != null  and position != ''"> and position = #{position}</if>
             <if test="isLeaderInDept != null "> and is_leader_in_dept = #{isLeaderInDept}</if>
             <if test="joinTime != null "> and join_time = #{joinTime}</if>
@@ -51,7 +52,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="telephone != null  and telephone != ''"> and telephone = #{telephone}</if>
             <if test="address != null  and address != ''"> and address = #{address}</if>
             <if test="birthday != null "> and birthday = #{birthday}</if>
-        </where>
     </select>
     
     <select id="selectWeUserById" parameterType="Long" resultMap="WeUserResult">

@@ -172,7 +172,7 @@ export default {
       });
       api.sync().then(() => {
         loading.close();
-        this.msgSuccess("操作成功");
+        this.msgSuccess("后台开始同步数据，请稍后关注进度");
       });
     },
     selectedUser(list) {

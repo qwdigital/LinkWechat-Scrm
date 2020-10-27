@@ -31,7 +31,7 @@ public class CustomerGroupDetail extends WeResultDto {
         private String owner;
 
         /**群的创建时间*/
-        private Date create_time;
+        private long create_time;
 
         /**群公告*/
         private String notice;

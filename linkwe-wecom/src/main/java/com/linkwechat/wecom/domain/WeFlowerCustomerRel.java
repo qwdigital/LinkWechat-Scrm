@@ -77,4 +77,9 @@ public class WeFlowerCustomerRel
     @TableField(exist = false)
     private List<WeFlowerCustomerTagRel>  weFlowerCustomerTagRels;
 
+
+    @TableField(exist = false)
+    private String department;
+
+
 }

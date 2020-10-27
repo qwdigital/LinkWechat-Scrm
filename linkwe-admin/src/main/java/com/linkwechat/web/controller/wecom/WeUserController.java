@@ -45,6 +45,7 @@ public class WeUserController extends BaseController {
     public TableDataInfo list(WeUser weUser)
     {
         startPage();
+
         List<WeUser> list = weUserService.selectWeUserList(weUser);
         return getDataTable(list);
     }

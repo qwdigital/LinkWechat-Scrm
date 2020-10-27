@@ -11,7 +11,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         isActivate: "",
-        department: "1",
+        department: "",
       },
       dateRange: [],
       treeData: [],
@@ -31,7 +31,7 @@ export default {
       total: 0,
       defaultProps: {
         label: "name",
-        childr启用en: "children",
+        children: "children",
       },
       form: {},
       dialogVisible: false,
