@@ -2,6 +2,8 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ArrayUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.constant.WeConstans;
@@ -10,10 +12,12 @@ import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.wecom.client.WeDepartMentClient;
 import com.linkwechat.wecom.domain.WeDepartment;
+import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.dto.WeDepartMentDto;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.mapper.WeDepartmentMapper;
 import com.linkwechat.wecom.service.IWeDepartmentService;
+import com.linkwechat.wecom.service.IWeUserService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,18 +43,11 @@ public class WeDepartmentServiceImpl extends ServiceImpl<WeDepartmentMapper,WeDe
     private WeDepartMentClient weDepartMentClient;
 
 
+    @Autowired
+    private IWeUserService weUserService;
 
-    /**
-     * 查询企业微信组织架构相关
-     * 
-     * @param id 企业微信组织架构相关ID
-     * @return 企业微信组织架构相关
-     */
-    @Override
-    public WeDepartment selectWeDepartmentById(Long id)
-    {
-        return weDepartmentMapper.selectWeDepartmentById(id);
-    }
+
+
 
     /**
      * 查询企业微信组织架构相关列表
@@ -121,38 +118,6 @@ public class WeDepartmentServiceImpl extends ServiceImpl<WeDepartmentMapper,WeDe
                this.updateById(weDepartment);
         }
 
-//        int returnCode=weDepartmentMapper.updateWeDepartment(weDepartment);
-//        if(returnCode>0){
-//
-//            weDepartMentClient.updateWeDepartMent(
-//                    weDepartment.transformDeartMentDto(weDepartment)
-//            );
-//
-//
-//        }
-//
-//        return returnCode;
-    }
-
-
-    /**
-     * 批量保存
-     * @param weDepartments
-     * @return
-     */
-    @Override
-    public int batchInsertWeDepartment(List<WeDepartment> weDepartments) {
-        return weDepartmentMapper.batchInsertWeDepartment(weDepartments);
-    }
-
-
-    /**
-     *  删除部门表所有数据
-     * @return
-     */
-    @Override
-    public int deleteAllWeDepartment() {
-        return weDepartmentMapper.deleteAllWeDepartment();
     }
 
 
@@ -170,6 +135,35 @@ public class WeDepartmentServiceImpl extends ServiceImpl<WeDepartmentMapper,WeDe
 
         return weDepartments;
     }
+
+
+//    /**
+//     * 根据部门id删除部门
+//     * @param ids
+//     */
+//    @Override
+//    public void deleteWeDepartmentByIds(String[] ids) {
+//
+//        //查询当前部门下所有的子部门,如果存在,则不可以删除
+//        List<WeDepartment> weDepartments = this.list(new LambdaQueryWrapper<WeDepartment>()
+//                .in(WeDepartment::getParentId, ids));
+//        if(CollectionUtil.isNotEmpty(weDepartments)) {
+//            //抛出异常，请删除此部门下的成员或子部门后，再删除此部门
+//
+//        }
+//
+//
+//        List<WeUser> weUsers = weUserService.selectWeUserList(WeUser.builder()
+//                .department(ids)
+//                .build());
+//        if(CollectionUtil.isNotEmpty(weUsers)){
+//            //该部门存在子部门或成员无法删除
+//
+//        }
+//
+//
+//
+//    }
 
 
 }

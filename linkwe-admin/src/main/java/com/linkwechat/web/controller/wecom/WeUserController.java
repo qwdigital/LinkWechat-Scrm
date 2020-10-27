@@ -116,8 +116,8 @@ public class WeUserController extends BaseController {
      public TableDataInfo leaveUserAllocateList(WeLeaveUserVo weLeaveUserVo) {
        startPage();
        weLeaveUserVo.setIsActivate(WeConstans.WE_USER_IS_LEAVE);
-         weLeaveUserVo.setIsAllocate(WeConstans.LEAVE_ALLOCATE_STATE);
-       List<WeLeaveUserVo> list = this.weUserService.leaveNoAllocateUserList(weLeaveUserVo);
+       weLeaveUserVo.setIsAllocate(WeConstans.LEAVE_ALLOCATE_STATE);
+       List<WeLeaveUserVo> list = this.weUserService.leaveAllocateUserList(weLeaveUserVo);
        return getDataTable(list);
      }
 
@@ -147,7 +147,7 @@ public class WeUserController extends BaseController {
      @PutMapping({"/allocateLeaveUserAboutData"})
      public AjaxResult allocateLeaveUserAboutData(@RequestBody WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
 
-         weUserService.allocateLeaveUserAboutData(weLeaveUserInfoAllocateVo);
+            weUserService.allocateLeaveUserAboutData(weLeaveUserInfoAllocateVo);
 
             return AjaxResult.success("离职分配成功");
     }

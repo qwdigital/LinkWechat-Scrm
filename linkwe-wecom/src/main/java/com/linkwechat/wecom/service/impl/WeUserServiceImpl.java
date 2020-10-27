@@ -153,7 +153,7 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
      */
     @Override
     public List<WeLeaveUserVo> leaveAllocateUserList(WeLeaveUserVo weLeaveUserVo) {
-        return null;
+        return this.baseMapper.leaveAllocateUserList(weLeaveUserVo);
     }
 
 
@@ -171,6 +171,12 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
 
             //分配群组
             iWeGroupService.allocateWeGroup(weLeaveUserInfoAllocateVo);
+
+            //更新员工状态为已分配
+            this.updateById(WeUser.builder()
+                    .userId(weLeaveUserInfoAllocateVo.getHandoverUserid())
+                    .isAllocate(WeConstans.LEAVE_ALLOCATE_STATE)
+                    .build());
         }catch (Exception e){
             throw new WeComException(e.getMessage());
         }
@@ -211,7 +217,7 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
             weUsers.add(
                     WeUser.builder()
                             .userId(k)
-                            .enable(WeConstans.WE_USER_IS_LEAVE)
+                            .isActivate(WeConstans.WE_USER_IS_LEAVE)
                             .dimissionTime(new Date())
                             .build()
             );

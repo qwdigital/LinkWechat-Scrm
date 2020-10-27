@@ -14,13 +14,6 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface IWeDepartmentService extends IService<WeDepartment>
 {
-    /**
-     * 查询企业微信组织架构相关
-     * 
-     * @param id 企业微信组织架构相关ID
-     * @return 企业微信组织架构相关
-     */
-    public WeDepartment selectWeDepartmentById(Long id);
 
     /**
      * 查询企业微信组织架构相关列表
@@ -47,23 +40,16 @@ public interface IWeDepartmentService extends IService<WeDepartment>
 
 
 
-    /**
-     *  批量保存
-     * @param weDepartments
-     * @return
-     */
-    public int batchInsertWeDepartment(List<WeDepartment> weDepartments);
-
-
-    /**
-     * 删除部门表所有数据
-     * @return
-     */
-    public int deleteAllWeDepartment();
-
 
     /**
      * 同步部门
      */
     public List<WeDepartment> synchWeDepartment();
+
+
+//    /**
+//     * 根据部门id删除部门
+//     * @param ids
+//     */
+//    public void deleteWeDepartmentByIds(String[] ids);
 }

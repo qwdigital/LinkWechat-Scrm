@@ -69,15 +69,16 @@ public class WeDepartmentController extends BaseController
         weDepartmentService.updateWeDepartment(weDepartment);
         return AjaxResult.success();
     }
-//
+
 //    /**
 //     * 删除企业微信组织架构相关
 //     */
 //    @PreAuthorize("@ss.hasPermi('wecom:department:remove')")
 //    @Log(title = "企业微信组织架构相关", businessType = BusinessType.DELETE)
 //	@DeleteMapping("/{ids}")
-//    public AjaxResult remove(@PathVariable Long[] ids)
+//    public AjaxResult remove(@PathVariable String[] ids)
 //    {
 //        return toAjax(weDepartmentService.deleteWeDepartmentByIds(ids));
 //    }
+
 }

@@ -43,7 +43,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mobile != null  and mobile != ''"> and mobile = #{mobile}</if>
             <if test="email != null  and email != ''"> and email = #{email}</if>
             <if test="wxAccount != null  and wxAccount != ''"> and wx_account = #{wxAccount}</if>
-            <if test="department != null  and department != '' and department != '1' "> and FIND_IN_SET(#{department},department)</if>
+            <if test="department != null  and department.length > 0  "> and FIND_IN_SET(#{department},department)</if>
             <if test="position != null  and position != ''"> and position = #{position}</if>
             <if test="isLeaderInDept != null "> and is_leader_in_dept = #{isLeaderInDept}</if>
             <if test="joinTime != null "> and join_time = #{joinTime}</if>
@@ -164,12 +164,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT
             wu.user_id,
             wu.user_name,
+            wu.dimission_time,
             (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department,
             (SELECT COUNT(*) FROM we_allocate_customer wac WHERE wac.handover_userid=wu.user_id) as allocateCustomerNum,
-            (SELECT COUNT(*) FROM we_allocate_group wag WHERE wag.old_owner=wu.user_id) as allocateGroupNum,
-            wu.dimission_time
-        FROM
-        we_user wu
+            (SELECT COUNT(*) FROM we_allocate_group wag WHERE wag.old_owner=wu.user_id) as allocateGroupNum
+        FROM we_user wu
         <where>
             <if test="userName != null and userName !=''">and wu.user_name=#{userName}</if>
             <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
@@ -215,6 +214,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         birthday= values(birthday),remark= values(remark),
         is_activate= values(is_activate)
     </insert>
+
+
+
+<!--    <select id="getAllocateCustomers">-->
+<!--         SELECT-->
+<!--	wc.`name`,-->
+<!--  wu.user_name,-->
+<!--  wac.allocate_time,-->
+<!--  (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department-->
+<!--FROM-->
+<!--	we_allocate_customer wac-->
+<!--LEFT JOIN we_customer wc ON wac.external_userid=wc.external_userid-->
+<!--LEFT JOIN we_user wu ON wu.user_id=wac.takeover_userid-->
+<!--        -->
+<!--    </select>-->
 
 
 
