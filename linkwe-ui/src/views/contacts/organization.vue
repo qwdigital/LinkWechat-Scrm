@@ -138,8 +138,8 @@ export default {
           this.loading = false;
         });
     },
-    handleNodeClick(data, node) {
-      this.query.department = data.id;
+    handleNodeClick(data) {
+      data.id != 1 && (this.query.department = data.id);
       this.getList(1);
     },
     edit(data, type) {

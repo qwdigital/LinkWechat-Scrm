@@ -42,9 +42,9 @@ export default {
     };
   },
   created() {
-    this.getList();
     this.group = this.$route.query;
-    this.query.groupId = this.group.id;
+    this.query.chatId = this.group.chatId;
+    this.getList();
   },
   methods: {
     getList(page) {
@@ -143,7 +143,7 @@ export default {
     </el-input>
     <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
       <!-- <el-table-column type="selection" width="55" align="center" /> -->
-      <el-table-column label="群成员" align="center" prop="operId">
+      <el-table-column label="群成员" align="center" prop="memberName">
         <template slot-scope="scope">
           {{ scope.row.memberName }}
           <!-- <span
