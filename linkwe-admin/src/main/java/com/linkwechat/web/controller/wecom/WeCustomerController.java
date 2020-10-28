@@ -48,6 +48,19 @@ public class WeCustomerController extends BaseController
         return getDataTable(list);
     }
 
+
+    /**
+     * 根据员工ID获取客户
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('customerManage:customer:list')")
+    @GetMapping("/getCustomersByUserId/{userId}")
+    public AjaxResult getCustomersByUserId(@PathVariable String userId){
+
+
+         return AjaxResult.success(weCustomerService.getCustomersByUserId(userId));
+    }
+
 //    /**
 //     * 导出企业微信客户列表
 //     */

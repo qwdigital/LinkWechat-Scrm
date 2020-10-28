@@ -1,11 +1,12 @@
 package com.linkwechat.wecom.service;
 
-import java.util.List;
-
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeCustomer;
+import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
+
+import java.util.List;
 
 /**
  * 企业微信客户Service接口
@@ -58,4 +59,12 @@ public interface IWeCustomerService extends IService<WeCustomer>
      * @param weMakeCustomerTag
      */
     public void removeLabel(WeMakeCustomerTag weMakeCustomerTag);
+
+
+    /**
+     * 根据员工ID获取客户
+     * @param userId
+     * @return
+     */
+    public List<WeUser> getCustomersByUserId(String userId);
 }

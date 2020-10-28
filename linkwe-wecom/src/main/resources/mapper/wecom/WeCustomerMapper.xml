@@ -137,5 +137,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
+
+    <select id="getCustomersByUserId" resultType="com.linkwechat.wecom.domain.WeUser">
+            SELECT
+	              wc.external_userid,
+                  wc.`name`,
+                  wc.avatar,
+                  wc.type,
+                  wc.gender,
+                  wc.unionid,
+                  wc.birthday,
+                  wc.corp_name,
+                  wc.corp_full_name,
+                  wc.position
+            FROM
+                `we_flower_customer_rel` wfcr
+            LEFT JOIN we_customer wc ON wc.external_userid = wfcr.external_userid
+            WHERE
+                wfcr.user_id = #{userId}
+    </select>
     
 </mapper>
