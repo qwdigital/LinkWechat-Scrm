@@ -14,6 +14,8 @@ import com.linkwechat.wecom.domain.dto.LeaveWeUserListsDto;
 import com.linkwechat.wecom.domain.dto.WeDepartMentDto;
 import com.linkwechat.wecom.domain.dto.WeUserDto;
 import com.linkwechat.wecom.domain.dto.WeUserListDto;
+import com.linkwechat.wecom.domain.vo.WeAllocateCustomersVo;
+import com.linkwechat.wecom.domain.vo.WeAllocateGroupsVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
 import com.linkwechat.wecom.mapper.WeUserMapper;
@@ -229,6 +231,28 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
             });
         }
 
+    }
+
+
+    /**
+     * 获取历史分配记录的成员
+     * @param weAllocateCustomersVo
+     * @return
+     */
+    @Override
+    public List<WeAllocateCustomersVo> getAllocateCustomers(WeAllocateCustomersVo weAllocateCustomersVo) {
+        return this.baseMapper.getAllocateCustomers(weAllocateCustomersVo);
+    }
+
+
+    /**
+     * 获取历史分配群
+     * @param weAllocateGroupsVo
+     * @return
+     */
+    @Override
+    public List<WeAllocateGroupsVo> getAllocateGroups(WeAllocateGroupsVo weAllocateGroupsVo) {
+        return this.baseMapper.getAllocateGroups(weAllocateGroupsVo);
     }
 
 

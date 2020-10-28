@@ -7,6 +7,8 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.vo.WeAllocateCustomersVo;
+import com.linkwechat.wecom.domain.vo.WeAllocateGroupsVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
 import com.linkwechat.wecom.service.IWeCustomerService;
@@ -184,6 +186,33 @@ public class WeUserController extends BaseController {
     }
 
 
+    /**
+     * 获取历史分配记录的成员
+     * @param weAllocateCustomersVo
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:user:getAllocateCustomers')")
+    @GetMapping({"/getAllocateCustomers"})
+    public TableDataInfo getAllocateCustomers(WeAllocateCustomersVo weAllocateCustomersVo){
+        startPage();
+        List<WeAllocateCustomersVo> list = weUserService.getAllocateCustomers(weAllocateCustomersVo);
+        return getDataTable(list);
+    }
+
+
+
+    /**
+     * 获取历史分配记录的群
+     * @param weAllocateGroupsVo
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:user:getAllocateGroups')")
+    @GetMapping({"/getAllocateGroups"})
+    public TableDataInfo getAllocateGroups(WeAllocateGroupsVo weAllocateGroupsVo){
+        startPage();
+        List<WeAllocateGroupsVo> list = weUserService.getAllocateGroups(weAllocateGroupsVo);
+        return getDataTable(list);
+    }
 
 
 
