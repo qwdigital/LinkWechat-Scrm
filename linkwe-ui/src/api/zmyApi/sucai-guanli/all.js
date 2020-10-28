@@ -1,13 +1,13 @@
 import request from '@/utils/request'
 import axios from 'axios'
 export function getList(data) {
-    return request({url: '/wagesApi/listWages', method: 'post',data})
+    return request({url: '/wagesApi/listWages', method: 'get',data})
 }
 export function info(data) {
-    return request({url: '/wagesApi/infoWages', method: 'post',data})
+    return request({url: '/wecom/material', method: 'get',data})
 }
 export function add(data) {
-    return request({url: '/wagesApi/addWages', method: 'post',data})
+    return request({url: '/wecom/material', method: 'post',data})
 }
 export function edit(data) {
     return request({url: '/wagesApi/editWages', method: 'post',data})
