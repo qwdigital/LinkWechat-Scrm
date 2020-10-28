@@ -31,9 +31,6 @@ import java.util.Optional;
 public class WeMaterialServiceImpl implements IWeMaterialService {
 
     @Autowired
-    private WeMediaClient weMediaClient;
-
-    @Autowired
     private WeMaterialMapper weMaterialMapper;
     @Autowired
     private ServerConfig serverConfig;
@@ -56,15 +53,8 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
             if (!mediaType.isPresent()) {
                 throw new WeComException("媒体类型出错！");
             }
-            WeMediaDto mediaDto = weMediaClient.upload(file, mediaType.get().getMediaType());
-            if (!WeConstans.WE_SUCCESS_CODE.equals(mediaDto.getErrcode())) {
-                throw new WeComException("临时素材上传失败！");
-            }
             //构造返回结果
-            WeMaterialFileVO weMaterialFileVO
-                    = WeMaterialFileVO.builder().materialUrl(url).materialMediaId(mediaDto.getMedia_id())
-                    .materialCreatedAt(mediaDto.getCreated_at()).materialName(file.getOriginalFilename()).build();
-            return weMaterialFileVO;
+            return WeMaterialFileVO.builder().materialUrl(url).materialName(file.getOriginalFilename()).build();
         } catch (Exception e) {
             throw new WeComException("临时素材上传失败！");
         }

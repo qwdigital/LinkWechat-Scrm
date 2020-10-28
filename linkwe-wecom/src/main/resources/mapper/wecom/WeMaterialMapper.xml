@@ -11,10 +11,6 @@
         <result property="content" column="content"/>
         <result property="materialName" column="material_name"/>
         <result property="digest" column="digest"/>
-        <result property="materialMediaId" column="material_media_id"/>
-        <result property="materialCreatedAt" column="material_created_at"/>
-        <result property="coverMediaId" column="cover_media_id"/>
-        <result property="coverCreatedAt" column="cover_created_at"/>
         <result property="coverUrl" column="cover_url"/>
         <result property="createBy" column="create_by"/>
         <result property="createTime" column="create_time"/>
@@ -43,18 +39,6 @@
             </if>
             <if test="digest!=null">
                 digest,
-            </if>
-            <if test="materialMediaId!=null">
-                material_media_id,
-            </if>
-            <if test="materialCreatedAt!=null">
-                material_created_at,
-            </if>
-            <if test="coverMediaId!=null">
-                cover_media_id,
-            </if>
-            <if test="coverCreatedAt!=null">
-                cover_created_at,
             </if>
             <if test="coverUrl!=null">
                 cover_url,
@@ -91,18 +75,6 @@
             </if>
             <if test="digest!=null">
                 #{digest},
-            </if>
-            <if test="materialMediaId!=null">
-                #{materialMediaId},
-            </if>
-            <if test="materialCreatedAt!=null">
-                #{materialCreatedAt},
-            </if>
-            <if test="coverMediaId!=null">
-                #{coverMediaId},
-            </if>
-            <if test="coverCreatedAt!=null">
-                #{coverCreatedAt},
             </if>
             <if test="coverUrl!=null">
                 #{coverUrl},
@@ -141,18 +113,6 @@
         </if>
         <if test="digest!=null">
             digest=#{digest},
-        </if>
-        <if test="materialMediaId!=null">
-            material_media_id=#{materialMediaId},
-        </if>
-        <if test="materialCreatedAt!=null">
-            material_created_at=#{materialCreatedAt},
-        </if>
-        <if test="coverMediaId!=null">
-            cover_media_id=#{coverMediaId},
-        </if>
-        <if test="coverCreatedAt!=null">
-            cover_created_at=#{coverCreatedAt},
         </if>
         <if test="coverUrl!=null">
             cover_url=#{coverUrl},
@@ -215,7 +175,7 @@
     </select>
 
     <sql id="material">
-        id,category_id,material_url,content,material_name,digest,material_media_id,material_created_at,cover_media_id,cover_created_at,cover_url,create_by,create_time,update_by,update_time
+        id,category_id,material_url,content,material_name,digest,cover_url,create_by,create_time,update_by,update_time
     </sql>
 
 </mapper>

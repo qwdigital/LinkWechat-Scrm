@@ -20,14 +20,4 @@ public class WeMaterialFileVO {
      */
     private String materialUrl;
 
-    /**
-     * 媒体id
-     */
-    private String materialMediaId;
-
-    /**
-     * 媒体文件上传时间戳
-     */
-    private Long materialCreatedAt;
-
 }

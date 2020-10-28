@@ -42,26 +42,6 @@ public class WeMaterial extends BaseEntity {
     private String digest;
 
     /**
-     * 媒体id
-     */
-    private String materialMediaId;
-
-    /**
-     * 媒体文件上传时间戳
-     */
-    private String materialCreatedAt;
-
-    /**
-     * 视频封面媒体id
-     */
-    private String coverMediaId;
-
-    /**
-     * 视频封面媒体文件上传时间戳
-     */
-    private String coverCreatedAt;
-
-    /**
      * 封面本地资源文件
      */
     private String coverUrl;
