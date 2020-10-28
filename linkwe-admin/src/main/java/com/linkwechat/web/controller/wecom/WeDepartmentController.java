@@ -33,7 +33,7 @@ public class WeDepartmentController extends BaseController
     /**
      * 查询企业微信组织架构相关列表
      */
-    @PreAuthorize("@ss.hasPermi('wecom:department:list')")
+    @PreAuthorize("@ss.hasPermi('contacts:organization:list')")
     @GetMapping("/list")
     @ApiOperation("获取部门列表")
     public AjaxResult list()
@@ -47,7 +47,7 @@ public class WeDepartmentController extends BaseController
     /**
      * 新增企业微信组织架构相关
      */
-    @PreAuthorize("@ss.hasPermi('wecom:department:add')")
+    @PreAuthorize("@ss.hasPermi('contacts:organization:addMember')")
     @Log(title = "企业微信组织架构相关", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("添加部门")
@@ -60,7 +60,7 @@ public class WeDepartmentController extends BaseController
     /**
      * 修改企业微信组织架构相关
      */
-    @PreAuthorize("@ss.hasPermi('wecom:department:edit')")
+    @PreAuthorize("@ss.hasPermi('contacts:organization:editDep')")
     @Log(title = "企业微信组织架构相关", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("更新部门")

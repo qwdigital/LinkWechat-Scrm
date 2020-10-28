@@ -32,7 +32,7 @@ public class WeGroupController extends BaseController {
     @Autowired
     private IWeGroupMemberService weGroupMemberService;
 
-    @PreAuthorize("@ss.hasPermi('wecom:group:list')")
+    @PreAuthorize("@ss.hasPermi('customerManage:group:list')")
     @GetMapping({"/list"})
     public TableDataInfo list(WeGroup weGroup) {
         startPage();
@@ -40,7 +40,7 @@ public class WeGroupController extends BaseController {
         return getDataTable(list);
     }
 
-    @PreAuthorize("@ss.hasPermi('wecom:member:list')")
+    @PreAuthorize("@ss.hasPermi('customerManage:group:view')")
     @GetMapping({"/members"})
     public TableDataInfo list(WeGroupMember weGroupMember) {
         startPage();
@@ -52,7 +52,7 @@ public class WeGroupController extends BaseController {
      *  同步客户群
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('wecom:group:synchWeGroup')")
+    @PreAuthorize("@ss.hasPermi('customerManage:group:sync')")
     @GetMapping({"/synchWeGroup"})
     public AjaxResult synchWeGroup(){
 

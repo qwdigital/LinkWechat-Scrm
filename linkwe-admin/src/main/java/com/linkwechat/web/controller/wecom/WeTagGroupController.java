@@ -36,7 +36,7 @@ public class WeTagGroupController extends BaseController
     /**
      * 查询标签组列表
      */
-    @PreAuthorize("@ss.hasPermi('wecom:group:list')")
+    @PreAuthorize("@ss.hasPermi('customerManage:tag:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeTagGroup weTagGroup)
     {
@@ -51,7 +51,7 @@ public class WeTagGroupController extends BaseController
     /**
      * 新增标签组
      */
-    @PreAuthorize("@ss.hasPermi('wecom:group:add')")
+    @PreAuthorize("@ss.hasPermi('customerManage:tag:add')")
     @Log(title = "标签组", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody WeTagGroup weTagGroup)
@@ -64,7 +64,7 @@ public class WeTagGroupController extends BaseController
     /**
      * 修改标签组
      */
-    @PreAuthorize("@ss.hasPermi('wecom:group:edit')")
+    @PreAuthorize("@ss.hasPermi('customerManage:tag:edit')")
     @Log(title = "标签组", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody WeTagGroup weTagGroup)
@@ -76,7 +76,7 @@ public class WeTagGroupController extends BaseController
     /**
      * 删除标签组
      */
-    @PreAuthorize("@ss.hasPermi('wecom:group:remove')")
+    @PreAuthorize("@ss.hasPermi('customerManage:tag:remove')")
     @Log(title = "标签组", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable String[] ids)
@@ -89,7 +89,7 @@ public class WeTagGroupController extends BaseController
      * 同步标签
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('wecom:group:synchWeTags')")
+    @PreAuthorize("@ss.hasPermi('customerManage:tag:sync')")
     @GetMapping("/synchWeTags")
     public AjaxResult synchWeTags(){
 
