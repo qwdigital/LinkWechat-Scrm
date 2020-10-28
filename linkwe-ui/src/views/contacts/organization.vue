@@ -139,11 +139,11 @@ export default {
         });
     },
     handleNodeClick(data) {
-      data.id != 1 && (this.query.department = data.id);
+      this.query.department = data.id == 1 ? "" : data.id;
       this.getList(1);
     },
     edit(data, type) {
-      this.form = Object.assign({}, data || {});
+      this.form = Object.assign({}, data || { _new: true });
       this.dialogVisible = true;
       type || !data ? (this.disabled = false) : (this.disabled = true);
     },
@@ -153,7 +153,7 @@ export default {
           let form = JSON.parse(JSON.stringify(this.form));
           form.department += "";
           form.isLeaderInDept += "";
-          api[form.userId ? "updateUser" : "addUser"](form)
+          api[form._new ? "addUser" : "updateUser"](form)
             .then(() => {
               this.msgSuccess("操作成功");
               this.dialogVisible = false;
@@ -360,7 +360,7 @@ export default {
                 @click="edit(scope.row, 0)"
               >查看</el-button>
               <el-button
-                v-hasPermi="['contacts:organization:forbidden']"
+                v-hasPermi="['contacts:organization:setStatus']"
                 v-if="scope.row.userId !== 1 && scope.row.enable < 2"
                 type="text"
                 @click="startOrStop(scope.row)"
@@ -373,7 +373,7 @@ export default {
               >编辑</el-button>
               <el-button
                 v-if="scope.row.enable < 2"
-                v-hasPermi="['customerManage:tag:remove']"
+                v-hasPermi="['contacts:organization:remove']"
                 @click="remove(scope.row.userId)"
                 type="text"
               >删除</el-button>
