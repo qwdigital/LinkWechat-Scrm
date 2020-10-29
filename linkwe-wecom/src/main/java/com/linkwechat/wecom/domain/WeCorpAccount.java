@@ -51,7 +51,7 @@ public class WeCorpAccount extends BaseEntity
 
     /** 删除标志（0代表存在 2代表删除） */
     @ApiModelProperty("删除标志（0代表存在 2代表删除)")
-    private String delFlag=new String("2");
+    private String delFlag=new String("0");
 
 
     @ApiModelProperty("外部联系人密钥")
