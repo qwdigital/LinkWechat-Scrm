@@ -67,7 +67,7 @@
         <el-form-item class="dialog-footer">
             <el-button v-for="btnItem in dialogBtns" :key="btnItem.label"
                 :type="btnItem.type || 'primary'"
-                style="background-color:#2EA39D;border-color:#fff"
+                style="border-color:#fff"
                 :size="btnItem.size || 'medium'"
                 @click="btnItem.handle(dialogData)">{{btnItem.label}}
             </el-button>
@@ -171,12 +171,13 @@ export default {
     width: 100%!important;
 }
 /deep/.el-dialog__header{
-    background-color: #2EA39D;
+    // background-color: #2EA39D;
+   
     text-align: center;
 }
 /deep/.el-dialog__title{
-    color: #fff!important;
-    font-weight: 550;
+     color:#000;
+    // font-weight: 550;
     font-size: 22px;
 }
  /deep/.el-select{

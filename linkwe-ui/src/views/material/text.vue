@@ -37,6 +37,11 @@
             :dialogForm="dialogForms" :rules="dialog.rules" :dialogBtns="dialogBtns" :dialogWidth="dialog.dialogWidth">
             </zmy-dialog>
         </div>
+         <div class='ces-dialog'>
+            <zmy-dialog :title="dialog2.title" :dialogFormVisible="dialog2.visible" :dialogData="dialog2.dialogData"
+            :dialogForm="dialogForms2" :rules="dialog2.rules" :dialogBtns="dialogBtns2" :dialogWidth="dialog2.dialogWidth">
+            </zmy-dialog>
+        </div>
     </div>
   </div>
 </template>
@@ -48,7 +53,7 @@ const modules = {}
 const path = require('path')
 const files = require.context('@/components/zmyComponents', false, /\.vue$/)
 files.keys().forEach(key => { const name = path.basename(key, '.vue'); modules[name] = files(key).default || files(key)})
-import {getList,info,add,edit,del,doExport,doImport,getTemplate} from '@/api/zmyApi/sucai-guanli/all.js'
+import {getList,info,add,edit,del,getTreeList,infoTree,addTree,editTree,delTree} from '@/api/zmyApi/sucai-guanli/all.js'
 import {isEmpty,objCopy,initObj} from '@/utils/zmyUtils'
 export default {
   components: modules,
@@ -100,17 +105,23 @@ export default {
         dialogtip:'add',
         selectArr:[],
         tableData : [],
-        searchValue:{categoryId:'', total:0, pageNum: 1, pageSize: 10,},
+        searchValue:{categoryId:4,search:'', pageNum: 1, pageSize: 10,},
         options:{},
         dialog:{
             title:'',
-            dialogWidth:'60%',
+            dialogWidth:'50%',
             dialogRef:'form1',
             visible:false,
-            dialogData:{},
-            rules:{
-                class_name:[{ required: true, message: "请输入", trigger: "blur" }], 
-            }
+            dialogData:{id:'',parentId:'',name:'',mediaType:4},
+            rules:{}
+        },
+        dialog2:{
+            title:'',
+            dialogWidth:'60%',
+            dialogRef:'form2',
+            visible:false,
+            dialogData:{categoryId:'',id:'',content:'',mediaType:4},
+            rules:{}
         },
     };
   },
@@ -118,7 +129,11 @@ export default {
     // 树事件
     treeEvent(){
       return {
-        addParent:()=>{this.$message.error('123')},
+        addParent:()=>{
+              this.dialogtip = 'add';this.dialog.title='新增父节点';
+              this.dialog.dialogData ={parentId:'',id:'',name:'',mediaType:4};
+              this.dialog.visible = true;
+        },
         edit:(node,data)=>{this.$message.error('123')},
         append:(node,data)=>{this.$message.error('123')},
         remove:(node,data)=>{this.$message.error('123')},
@@ -128,19 +143,19 @@ export default {
     // 搜索框
     searchForm(){
       return [
-          {type:'Input',label:'文本素材',prop:'name'},
+          {type:'Input',label:'文本素材',prop:'search'},
           {type:'search',handle:(that,row)=>{this.fetchData(); }},
       ]
     },
     searchBtns(){
            return  [
-               {label:'移动分组',type:'danger',handle:()=>{
+                {label:'移动分组',type:'danger',handle:()=>{
                       
                 }},
                 {label:'添加文本',type:'danger',handle:()=>{
-                       this.dialogtip = 'add';this.dialog.title = '新增';
-                       this.dialog.dialogData=initObj(this.dialog.dialogData,['school_id']);
-                       this.dialog.visible = true;
+                       this.dialogtip = 'add';this.dialog2.title = '新增';
+                       this.dialog2.dialogData=initObj(this.dialog2.dialogData,[]);
+                       this.dialog2.visible = true;
                 }},
                 {label:'删除',type:'danger',handle:()=>{
                     let that  = this;
@@ -154,12 +169,13 @@ export default {
       },
     tableCols(){
             return [
-                {label:'届次',prop:'grade_name'}, 
+                {label:'文本名称',prop:'grade_name'}, 
+                {label:'时间',prop:'grade_name'}, 
                 {label:'操作',type:'Button',width:'240px',btnList:[
                     {type:"primary",label:'编辑',class:'el-icon-edit',handle:(that,row)=>{
-                        this.dialogtip = 'edit';this.dialog.title = '编辑';
-                        this.dialog.dialogData = objCopy(this.dialog.dialogData,row);
-                        this.dialog.visible = true;
+                        this.dialogtip = 'edit';this.dialog2.title = '编辑';
+                        this.dialog2.dialogData = objCopy(this.dialog2.dialogData,row);
+                        this.dialog2.visible = true;
                     }},
                   
                 ]},
@@ -167,17 +183,28 @@ export default {
       },
        dialogForms(){
           return [ 
-                {type:'Select',label:'届次',prop:'grade_id',options:this.options.nianjiOption,props:{label:'label',value:'value'},placeholder:'请选择',change:row=>{
-                }},
+                {type:'Input',label:'节点名称',prop:'name',placeholder:'请输入'},
+                ] 
+      },
+       dialogForms2(){
+          return [ 
+                {type:'Input',label:'文本分类',prop:'name',placeholder:'请输入'},
+                {type:'TextArea',label:'文本内容',prop:'content',placeholder:'请输入',width:'100%'},
+
                 ] 
       },
       dialogBtns(){
           return  [
                 {label:'保存',type:'primary',handle:(value)=>{
                     console.log(this.dialog.dialogData)
-                       if(!isEmpty(this.dialog.dialogData,['class_id'])){ this.$message.error('请先填写所有信息再进行保存！'); return; }
+                       if(!isEmpty(this.dialog.dialogData,['parentId','id'])){ this.$message.error('请先填写所有信息再进行保存！'); return; }
                        if(this.dialogtip == 'add'){
-                            add(this.dialog.dialogData).then(res=>{ 
+                         let params = {
+                           mediaType:this.dialog.dialogData.mediaType,
+                           name:this.dialog.dialogData.name,
+                           parentId:''
+                         }
+                            addTree(params).then(res=>{ 
                                 if(res.data.code==1){
                                     this.$message.success('新增成功'); 
                                     this.dialog.dialogData = initObj(this.dialog.dialogData,['school_id']);
@@ -200,19 +227,63 @@ export default {
                 }}
             ]
       },
+      dialogBtns2(){
+        return  [
+                {label:'保存',type:'primary',handle:(value)=>{
+                    console.log(this.dialog.dialogData)
+                       if(!isEmpty(this.dialog.dialogData,['parentId','id'])){ this.$message.error('请先填写所有信息再进行保存！'); return; }
+                       if(this.dialogtip == 'add'){
+                         let params = {
+                           mediaType:this.dialog.dialogData.mediaType,
+                           name:this.dialog.dialogData.name,
+                           parentId:''
+                         }
+                            addTree(params).then(res=>{ 
+                                if(res.data.code==1){
+                                    this.$message.success('新增成功'); 
+                                    this.dialog.dialogData = initObj(this.dialog.dialogData,['school_id']);
+                                    this.dialog.visible  = false;this.fetchData(); 
+                                } 
+                            }) 
+                       }else{
+                            edit(this.dialog.dialogData).then(res=>{  
+                                if(res.data.code==1){
+                                 this.$message.success('编辑成功'); 
+                                 this.dialog.dialogData = initObj(this.dialog.dialogData,['school_id']);
+                                 this.dialog.visible  = false;this.fetchData();
+                                }
+                             })     
+                       }
+                }},
+                {label:'返回',type:'info',handle:(value)=>{
+                    this.dialog.dialogData = initObj(this.dialog.dialogData,['school_id']);
+                    this.dialog.visible  = false;
+                }}
+            ]
+      }
     
   },
   methods: {
     fetchData(){
           this.loading = true;
           this.tableData = [];
+         
           getList(this.searchValue).then(res=>{
-              if(res.data.code == 1){
-                this.searchValue.total = res.data.data.total;
-                this.tableData = res.data.data.data;
+            console.log(res)
+              if(res.code == 200){
+                this.searchValue.total =parseInt(res.total) ;
+                this.tableData = res.rows;
                 setTimeout(()=>{  this.loading = false;},500)
               }
           })
+      },
+      getTreeDate(){
+        let params ={
+          mediaType:2
+        }
+         getTreeList(params).then(res=>{
+           
+         })
       },
       select(all,current){ this.selectArr =[];  all.forEach(item=>{ this.selectArr.push(item) }) },
       selectAll(all){  this.selectArr =[];  all.forEach(item=>{ this.selectArr.push(item) }) },
@@ -224,7 +295,8 @@ export default {
     },
   },
   created() {
-  
+    this.getTreeDate()
+    this.fetchData();
   },
   
 };
