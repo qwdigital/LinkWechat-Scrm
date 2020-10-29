@@ -72,7 +72,7 @@ export default {
     },
     submit() {
       this.Pvisible = false;
-      this.$emit("success", this.userList.splice(0));
+      this.$emit("success", this.userList);
     },
   },
 };

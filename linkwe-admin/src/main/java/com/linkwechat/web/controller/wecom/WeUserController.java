@@ -7,6 +7,8 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.vo.WeAllocateCustomersVo;
+import com.linkwechat.wecom.domain.vo.WeAllocateGroupsVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
 import com.linkwechat.wecom.service.IWeCustomerService;
@@ -39,7 +41,7 @@ public class WeUserController extends BaseController {
     /**
      * 查询通讯录相关客户列表
      */
-    @PreAuthorize("@ss.hasPermi('wecom:user:list')")
+    @PreAuthorize("@ss.hasPermi('contacts:organization:query')")
     @GetMapping("/list")
     @ApiOperation("获取通讯录人员列表")
     public TableDataInfo list(WeUser weUser)
@@ -55,7 +57,7 @@ public class WeUserController extends BaseController {
     /**
      * 获取通讯录相关客户详细信息
      */
-    @PreAuthorize("@ss.hasPermi('wecom:user:query')")
+    @PreAuthorize("@ss.hasPermi('contacts:organization:view')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
@@ -65,7 +67,7 @@ public class WeUserController extends BaseController {
     /**
      * 新增通讯录相关客户
      */
-    @PreAuthorize("@ss.hasPermi('wecom:user:add')")
+    @PreAuthorize("@ss.hasPermi('contacts:organization:addMember')")
     @Log(title = "通讯录相关客户", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增通讯录客户")
@@ -78,7 +80,7 @@ public class WeUserController extends BaseController {
     /**
      * 修改通讯录相关客户
      */
-    @PreAuthorize("@ss.hasPermi('wecom:user:edit')")
+    @PreAuthorize("@ss.hasPermi('contacts:organization:edit')")
     @Log(title = "更新通讯录客户", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("更新通讯录客户")
@@ -94,7 +96,7 @@ public class WeUserController extends BaseController {
      * @param weUser
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('wecom:user:startOrStop')")
+    @PreAuthorize("@ss.hasPermi('contacts:organization:forbidden')")
     @Log(title = "启用禁用用户", businessType = BusinessType.UPDATE)
     @PutMapping("/startOrStop")
     @ApiOperation("是否启用(1表示启用成员，0表示禁用成员)")
@@ -111,7 +113,7 @@ public class WeUserController extends BaseController {
      * @param weLeaveUserVo
      * @return
      */
-     @PreAuthorize("@ss.hasPermi('wecom:user:leaveUserAllocateList')")
+     @PreAuthorize("@ss.hasPermi('customerManage:dimission:filter')")
      @GetMapping({"/leaveUserAllocateList"})
      public TableDataInfo leaveUserAllocateList(WeLeaveUserVo weLeaveUserVo) {
        startPage();
@@ -127,7 +129,7 @@ public class WeUserController extends BaseController {
      * @param weLeaveUserVo
      * @return
      */
-     @PreAuthorize("@ss.hasPermi('wecom:user:leaveUserNoAllocateList')")
+     @PreAuthorize("@ss.hasPermi('customerManage:dimission:query')")
      @GetMapping({"/leaveUserNoAllocateList"})
      public TableDataInfo leaveUserNoAllocateList(WeLeaveUserVo weLeaveUserVo) {
         startPage();
@@ -143,7 +145,7 @@ public class WeUserController extends BaseController {
      * @param weLeaveUserInfoAllocateVo
      * @return
      */
-     @PreAuthorize("@ss.hasPermi('wecom:user:allocateLeaveUserAboutData')")
+     @PreAuthorize("@ss.hasPermi('customerManage:dimission:allocate')")
      @PutMapping({"/allocateLeaveUserAboutData"})
      public AjaxResult allocateLeaveUserAboutData(@RequestBody WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
 
@@ -157,7 +159,7 @@ public class WeUserController extends BaseController {
      *  同步成员
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('wecom:user:synchWeUser')")
+    @PreAuthorize("@ss.hasPermi('contacts:organization:sync')")
     @GetMapping({"/synchWeUser"})
     public AjaxResult synchWeUser(){
 
@@ -172,7 +174,7 @@ public class WeUserController extends BaseController {
      * 删除用户
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('wecom:user:deleteUser')")
+    @PreAuthorize("@ss.hasPermi('contacts:organization:removeMember')")
     @DeleteMapping({"/{ids}"})
     public AjaxResult deleteUser(@PathVariable String[] ids){
 
@@ -184,6 +186,33 @@ public class WeUserController extends BaseController {
     }
 
 
+    /**
+     * 获取历史分配记录的成员
+     * @param weAllocateCustomersVo
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:user:getAllocateCustomers')")
+    @GetMapping({"/getAllocateCustomers"})
+    public TableDataInfo getAllocateCustomers(WeAllocateCustomersVo weAllocateCustomersVo){
+        startPage();
+        List<WeAllocateCustomersVo> list = weUserService.getAllocateCustomers(weAllocateCustomersVo);
+        return getDataTable(list);
+    }
+
+
+
+    /**
+     * 获取历史分配记录的群
+     * @param weAllocateGroupsVo
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:user:getAllocateGroups')")
+    @GetMapping({"/getAllocateGroups"})
+    public TableDataInfo getAllocateGroups(WeAllocateGroupsVo weAllocateGroupsVo){
+        startPage();
+        List<WeAllocateGroupsVo> list = weUserService.getAllocateGroups(weAllocateGroupsVo);
+        return getDataTable(list);
+    }
 
 
 

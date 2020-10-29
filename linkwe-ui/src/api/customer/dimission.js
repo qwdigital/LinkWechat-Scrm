@@ -2,7 +2,7 @@ import request from '@/utils/request'
 const service = config.services.wecom + '/user'
 
 /**
- * 获取离职未分配员工列表
+ * 获取离职已分配员工列表
  * @param {*} params 
  * {
 pageNum:
@@ -20,7 +20,7 @@ export function getList(params) {
 }
 
 /**
- * 获取离职已分配员工列表
+ * 获取离职未分配员工列表
  * @param {*} params 
  * {
 pageNum:
@@ -50,5 +50,23 @@ export function allocate(data) {
     url: service + '/allocateLeaveUserAboutData',
     method: 'put',
     data
+  })
+}
+
+/**
+ * 离职已分配客户
+ * @param {*} params
+ {
+  "pageNum": 0,
+  "pageSize": 0,
+  "beginTime": "",
+  "endTime": "",
+  "handoverUserId": ""
+}
+ */
+export function getAllocateCustomers(params) {
+  return request({
+    url: service + '/getAllocateCustomers',
+    params
   })
 }

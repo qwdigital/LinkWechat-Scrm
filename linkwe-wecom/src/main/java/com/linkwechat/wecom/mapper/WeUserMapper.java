@@ -2,6 +2,8 @@ package com.linkwechat.wecom.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.vo.WeAllocateCustomersVo;
+import com.linkwechat.wecom.domain.vo.WeAllocateGroupsVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -78,4 +80,21 @@ public interface WeUserMapper extends BaseMapper<WeUser>
      * @return
      */
     public int batchInsertWeUser(@Param("weUsers") List<WeUser> weUsers);
+
+
+    /**
+     * 获取历史分配记录的成员
+     * @param weAllocateCustomersVo
+     * @return
+     */
+    public List<WeAllocateCustomersVo> getAllocateCustomers(WeAllocateCustomersVo weAllocateCustomersVo);
+
+
+
+    /**
+     * 获取历史分配群
+     * @param weAllocateGroupsVo
+     * @return
+     */
+    public List<WeAllocateGroupsVo>  getAllocateGroups(WeAllocateGroupsVo weAllocateGroupsVo);
 }

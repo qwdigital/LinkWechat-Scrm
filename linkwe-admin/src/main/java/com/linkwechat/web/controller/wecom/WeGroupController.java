@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.wecom;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -11,6 +12,7 @@ import com.linkwechat.wecom.service.IWeGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,7 +34,7 @@ public class WeGroupController extends BaseController {
     @Autowired
     private IWeGroupMemberService weGroupMemberService;
 
-    @PreAuthorize("@ss.hasPermi('wecom:group:list')")
+    @PreAuthorize("@ss.hasPermi('customerManage:group:list')")
     @GetMapping({"/list"})
     public TableDataInfo list(WeGroup weGroup) {
         startPage();
@@ -40,7 +42,9 @@ public class WeGroupController extends BaseController {
         return getDataTable(list);
     }
 
-    @PreAuthorize("@ss.hasPermi('wecom:member:list')")
+
+
+    @PreAuthorize("@ss.hasPermi('customerManage:group:view')")
     @GetMapping({"/members"})
     public TableDataInfo list(WeGroupMember weGroupMember) {
         startPage();
@@ -52,7 +56,7 @@ public class WeGroupController extends BaseController {
      *  同步客户群
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('wecom:group:synchWeGroup')")
+    @PreAuthorize("@ss.hasPermi('customerManage:group:sync')")
     @GetMapping({"/synchWeGroup"})
     public AjaxResult synchWeGroup(){
 
@@ -60,5 +64,20 @@ public class WeGroupController extends BaseController {
         weGroupService.synchWeGroup();
 
         return  AjaxResult.success(WeConstans.SYNCH_TIP);
+    }
+
+
+    /**
+     * 根据员工id获取员工相关群
+     * @param userId
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('customerManage:group:sync')")
+    @GetMapping({"/getGroupsByUserId/{userId}"})
+    public AjaxResult  getGroupsByUserId(@PathVariable String userId){
+
+
+        return AjaxResult.success(weGroupService
+                .list(new LambdaQueryWrapper<WeGroup>().eq(WeGroup::getOwner,userId)));
     }
 }

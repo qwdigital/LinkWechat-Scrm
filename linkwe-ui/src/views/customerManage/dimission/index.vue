@@ -1,6 +1,6 @@
 <script>
 import * as api from "@/api/customer/dimission";
-import SelectUser from "./components/SelectUser";
+import SelectUser from "../components/SelectUser";
 
 export default {
   name: "Dimission",
@@ -14,6 +14,7 @@ export default {
         pageSize: 10,
         userName: undefined,
         beginTime: undefined,
+        endTime: undefined,
       },
       loading: false,
       isMoreFilter: false,
@@ -23,8 +24,44 @@ export default {
         region: "",
       },
       list: [],
-      multipleSelection: [],
+      currentRow: {},
       dialogVisibleSelectUser: false,
+      dateRange: [], // 离职日期
+      // 日期快捷选项
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        },
+        shortcuts: [
+          {
+            text: "最近一周",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "最近一个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "最近三个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+        ],
+      },
     };
   },
   watch: {},
@@ -36,6 +73,10 @@ export default {
   methods: {
     /** 查询 */
     getList(page) {
+      if (this.dateRange[0]) {
+        this.query.beginTime = this.dateRange[0];
+        this.query.endTime = this.dateRange[1];
+      }
       page && (this.query.pageNum = page);
       this.loading = true;
       api
@@ -60,21 +101,33 @@ export default {
       });
     },
     resetForm(formName) {
+      this.dateRange = [];
       this.$refs["queryForm"].resetFields();
     },
+    showSelectDialog() {
+      if (this.currentRow.userId) {
+        this.dialogVisibleSelectUser = true;
+      } else {
+        this.$message.warning("请先选择一位员工");
+      }
+    },
     allocate(userlist) {
+      if (userlist.length > 1) {
+        this.dialogVisibleSelectUser = true;
+        return;
+      }
       api
         .allocate({
-          handoverUserid: this.multipleSelection[0].id,
-          takeoverUserid: userlist[0].id,
+          handoverUserid: this.currentRow.userId,
+          takeoverUserid: userlist[0].userId,
         })
         .then(() => {
           this.msgSuccess("操作成功");
         });
     },
-    // 多选框选中数据
-    handleSelectionChange(selection) {
-      this.multipleSelection = selection;
+    // 选中数据
+    handleCurrentChange(val) {
+      this.currentRow = val;
     },
   },
 };
@@ -85,6 +138,17 @@ export default {
     <el-form ref="queryForm" :inline="true" :model="query" label-width="100px" class="top-search">
       <el-form-item label="已离职员工">
         <el-input v-model="query.userName" placeholder="请输入"></el-input>
+      </el-form-item>
+      <el-form-item label="离职日期">
+        <el-date-picker
+          v-model="dateRange"
+          type="daterange"
+          :picker-options="pickerOptions"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          align="right"
+        ></el-date-picker>
       </el-form-item>
 
       <el-form-item label="离职日期">
@@ -111,13 +175,13 @@ export default {
           v-hasPermi="['customerManage:dimission:filter']"
           type="primary"
           size="mini"
-          @click="getList(1)"
+          @click="$router.push({path: '/customerManage/allocatedStaffList'})"
         >已分配的离职员工</el-button>
         <el-button
           v-hasPermi="['customerManage:dimission:allocate']"
           type="primary"
           size="mini"
-          @click="dialogVisibleSelectUser = true"
+          @click="showSelectDialog"
         >分配给其他员工</el-button>
       </div>
     </div>
@@ -127,27 +191,22 @@ export default {
       :data="list"
       tooltip-effect="dark"
       style="width: 100%"
-      @selection-change="handleSelectionChange"
+      highlight-current-row
+      @current-change="handleCurrentChange"
     >
-      <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="userName" label="已离职员工" width="120"></el-table-column>
-      <el-table-column prop="department" label="所属部门" width="120"></el-table-column>
+      <el-table-column type="index" label="序号" width="55"></el-table-column>
+      <el-table-column prop="userName" label="已离职员工"></el-table-column>
+      <el-table-column prop="department" label="所属部门"></el-table-column>
       <el-table-column prop="allocateCustomerNum" label="待分配客户数" show-overflow-tooltip></el-table-column>
       <el-table-column prop="allocateGroupNum" label="待分配群聊数" show-overflow-tooltip></el-table-column>
       <el-table-column prop="dimissionTime" label="离职时间" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.dimissionTime }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="100">
+      <!-- <el-table-column label="操作" width="100">
         <template slot-scope="scope">
-          <!-- <el-button
-            v-hasPermi="['customerManage:dimission:edit']"
-            @click="handleClick(scope.row)"
-            type="text"
-            size="small"
-          >查看</el-button>-->
           <el-button v-hasPermi="['customerManage:dimission:edit']" type="text" size="small">编辑</el-button>
         </template>
-      </el-table-column>
+      </el-table-column>-->
     </el-table>
 
     <pagination

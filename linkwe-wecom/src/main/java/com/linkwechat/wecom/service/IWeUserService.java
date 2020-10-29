@@ -2,6 +2,8 @@ package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.vo.WeAllocateCustomersVo;
+import com.linkwechat.wecom.domain.vo.WeAllocateGroupsVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
 
@@ -89,5 +91,21 @@ public interface IWeUserService extends IService<WeUser>
      * @param ids
      */
     void deleteUser(String[] ids);
+
+
+    /**
+     * 获取历史分配记录的成员
+     * @param weAllocateCustomersVo
+     * @return
+     */
+     List<WeAllocateCustomersVo> getAllocateCustomers(WeAllocateCustomersVo weAllocateCustomersVo);
+
+
+    /**
+     * 获取历史分配群
+     * @param weAllocateGroupsVo
+     * @return
+     */
+     List<WeAllocateGroupsVo>  getAllocateGroups(WeAllocateGroupsVo weAllocateGroupsVo);
 
 }

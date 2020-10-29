@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeCustomer;
+import com.linkwechat.wecom.domain.WeUser;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 企业微信客户Mapper接口
@@ -60,4 +62,12 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
      * @return 结果
      */
     public int deleteWeCustomerByIds(Long[] ids);
+
+
+    /**
+     * 根据员工ID获取客户
+     * @param userId
+     * @return
+     */
+    public List<WeUser> getCustomersByUserId(@Param("userId") String userId);
 }
