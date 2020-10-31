@@ -90,16 +90,6 @@ export default {
           this.loading = false;
         });
     },
-    submitForm(formName) {
-      this.$refs["form"].validate((valid) => {
-        if (valid) {
-          alert("submit!");
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
-    },
     resetForm(formName) {
       this.dateRange = [];
       this.$refs["queryForm"].resetFields();

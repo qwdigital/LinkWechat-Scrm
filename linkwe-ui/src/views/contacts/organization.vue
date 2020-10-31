@@ -214,7 +214,8 @@ export default {
       );
       this.dialogVisibleDepart = true;
     },
-    submitDepart() {
+    departRemove() {},
+    departSubmit() {
       api[this.formDepart.id ? "updateDepart" : "addDepart"](this.formDepart)
         .then(() => {
           this.msgSuccess("操作成功");
@@ -323,6 +324,12 @@ export default {
                   class="el-icon-plus"
                   v-hasPermi="['contacts:organization:addDep']"
                   @click.stop="departEdit(data, 0)"
+                ></i>
+                <i
+                  class="el-icon-delete"
+                  v-hasPermi="['contacts:organization:removeDep']"
+                  v-if="node.level !== 1"
+                  @click.stop="departRemove(data)"
                 ></i>
               </span>
             </div>
@@ -509,7 +516,7 @@ export default {
       </el-form>
       <div slot="footer">
         <el-button @click="dialogVisibleDepart = false">取 消</el-button>
-        <el-button type="primary" @click="submitDepart">确 定</el-button>
+        <el-button type="primary" @click="departSubmit">确 定</el-button>
       </div>
     </el-dialog>
 

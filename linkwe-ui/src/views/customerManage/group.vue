@@ -21,20 +21,10 @@ export default {
       ids: [],
       // 非多个禁用
       multiple: true,
-      // 显示搜索条件
-      showSearch: true,
       // 总条数
       total: 0,
       // 表格数据
       list: [],
-      // 是否显示弹出层
-      open: false,
-      // 类型数据字典
-      typeOptions: [],
-      // 类型数据字典
-      statusOptions: [],
-      // 表单参数
-      form: {},
     };
   },
   created() {
@@ -82,58 +72,21 @@ export default {
       this.ids = selection.map((item) => item.id);
       this.multiple = !selection.length;
     },
-    /** 删除按钮操作 */
-    handleDelete(row) {
-      const operIds = row.operId || this.ids;
-      this.$confirm(
-        '是否确认删除日志编号为"' + operIds + '"的数据项?',
-        "警告",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-        }
-      )
-        .then(function () {
-          return delOperlog(operIds);
-        })
-        .then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        })
-        .catch(function () {});
-    },
-    /** 清空按钮操作 */
-    handleClean() {
-      this.$confirm("是否确认清空所有操作日志数据项?", "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(function () {
-          return cleanOperlog();
-        })
-        .then(() => {
-          this.getList();
-          this.msgSuccess("清空成功");
-        })
-        .catch(function () {});
-    },
     /** 导出按钮操作 */
     handleExport() {
-      const query = this.query;
-      this.$confirm("是否确认导出所有数据项?", "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(function () {
-          return exportOperlog(query);
-        })
-        .then((response) => {
-          this.download(response.msg);
-        })
-        .catch(function () {});
+      // const query = this.query;
+      // this.$confirm("是否确认导出所有数据项?", "警告", {
+      //   confirmButtonText: "确定",
+      //   cancelButtonText: "取消",
+      //   type: "warning",
+      // })
+      //   .then(function () {
+      //     return exportOperlog(query);
+      //   })
+      //   .then((response) => {
+      //     this.download(response.msg);
+      //   })
+      //   .catch(function () {});
     },
   },
 };
@@ -141,14 +94,7 @@ export default {
 
 <template>
   <div class="app-container">
-    <el-form
-      :model="query"
-      ref="queryForm"
-      :inline="true"
-      v-show="showSearch"
-      class="top-search"
-      label-width="80px"
-    >
+    <el-form :model="query" ref="queryForm" :inline="true" class="top-search" label-width="80px">
       <el-form-item label="群名">
         <el-input v-model="query.groupName" placeholder="请输入群名" clearable />
       </el-form-item>

@@ -205,12 +205,6 @@ export default {
       this.dateRange = [];
       this.$refs["queryForm"].resetFields();
     },
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-    },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-    },
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.multipleSelection = selection;

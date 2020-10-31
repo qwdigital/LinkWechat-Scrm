@@ -31,20 +31,10 @@ export default {
       ids: [],
       // 非多个禁用
       multiple: true,
-      // 显示搜索条件
-      showSearch: true,
       // 总条数
       total: 0,
       // 表格数据
       list: [],
-      // 是否显示弹出层
-      open: false,
-      // 类型数据字典
-      typeOptions: [],
-      // 类型数据字典
-      statusOptions: [],
-      // 日期范围
-      dateRange: [],
     };
   },
   created() {
@@ -84,34 +74,10 @@ export default {
         this.getList();
       });
     },
-    // 操作日志状态字典翻译
-    statusFormat(row, column) {
-      return this.selectDictLabel(this.statusOptions, row.status);
-    },
-    // 操作日志类型字典翻译
-    typeFormat(row, column) {
-      return this.selectDictLabel(this.typeOptions, row.businessType);
-    },
-    /** 搜索按钮操作 */
-    handleQuery() {
-      this.query.pageNum = 1;
-      this.getList();
-    },
-    /** 重置按钮操作 */
-    resetQuery() {
-      this.dateRange = [];
-      this.resetForm("queryForm");
-      this.handleQuery();
-    },
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map((item) => item.groupId);
       this.multiple = !selection.length;
-    },
-    /** 详细按钮操作 */
-    handleView(row) {
-      this.open = true;
-      this.form = row;
     },
     /** 删除按钮操作 */
     remove(id) {
@@ -126,38 +92,6 @@ export default {
           this.getList();
           this.msgSuccess("删除成功");
         });
-    },
-    /** 清空按钮操作 */
-    handleClean() {
-      this.$confirm("是否确认清空所有操作日志数据项?", "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(function () {
-          return cleanOperlog();
-        })
-        .then(() => {
-          this.getList();
-          this.msgSuccess("清空成功");
-        })
-        .catch(function () {});
-    },
-    /** 导出按钮操作 */
-    handleExport() {
-      const query = this.query;
-      this.$confirm("是否确认导出所有操作日志数据项?", "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(function () {
-          return exportOperlog(query);
-        })
-        .then((response) => {
-          this.download(response.msg);
-        })
-        .catch(function () {});
     },
   },
 };
