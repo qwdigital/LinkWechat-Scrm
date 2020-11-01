@@ -45,15 +45,43 @@
           <span v-else>登 录 中...</span>
         </el-button>
       </el-form-item>
+      <el-form-item class="ac">
+        <a :href="authLink">
+          <img
+            src="//wwcdn.weixin.qq.com/node/wwopen/wwopenmng/style/images/independent/brand/300x40_white$4dab5411.png"
+            srcset="//wwcdn.weixin.qq.com/node/wwopen/wwopenmng/style/images/independent/brand/300x40_white_2x$6a1f5234.png 2x"
+            alt="企业微信登录"
+          />
+        </a>
+      </el-form-item>
     </el-form>
     <!--  底部  -->
     <div class="el-login-footer">
       <span>Copyright © 2018-2019 LinkWechat All Rights Reserved.</span>
     </div>
+
+    <el-dialog title="开源软件评选" :visible.sync="dialogVisible" width="400px" class="c">
+      <div>
+        <p>2020年度最佳人气项目开源软件评选。</p>
+        <p>
+          请为
+          <strong style="color: #FF0036;" class="cp" @click="goVote">LinkWeChat</strong> 投票，谢谢支持。
+        </p>
+        <div class="ac">
+          <img src="@/assets/image/vote-code.png" alt />
+          <p style="color: #FF0036;">☛☛微信扫码投票☚☚</p>
+        </div>
+      </div>
+      <div slot="footer">
+        <el-button @click="goVote">朕要支持</el-button>
+        <el-button type="primary" @click="dialogVisible = false">残忍拒绝</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import axios from "axios";
 import { getCodeImg } from "@/api/login";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from "@/utils/jsencrypt";
@@ -65,8 +93,8 @@ export default {
       codeUrl: "",
       cookiePassword: "",
       loginForm: {
-        username: "admin",
-        password: "admin123",
+        username: "",
+        password: "",
         rememberMe: false,
         code: "",
         uuid: "",
@@ -84,6 +112,8 @@ export default {
       },
       loading: false,
       redirect: undefined,
+      authLink: "",
+      dialogVisible: true,
     };
   },
   watch: {
@@ -94,7 +124,57 @@ export default {
       immediate: true,
     },
   },
+  beforeCreate() {
+    // http://106.13.201.219/#/login?auth_code=xxx
+    console.log("routerbeforeCreate", this.$route);
+    // let hash = location.hash;
+    // let arr = hash.slice(hash.indexOf("?")).split("=");
+    if (!this.$route.auth_code) {
+      return;
+    }
+    getUserInfo.call(this);
+
+    async function getUserInfo(params) {
+      // 如果授权回调
+      // 1、获取access_token
+      let res = await axios({
+        url: "https://qyapi.weixin.qq.com/cgi-bin/service/get_provider_token",
+        method: "post",
+        data: {
+          corpid: "ww24262ce93851488f",
+          provider_secret:
+            "a9DS2sqQRks46VEl6qgz1Z-U_HPwyHUuBAkp_6II9lIH5g1vO6L4VMPUGLeVT5G_",
+        },
+      });
+
+      // 2、获取用户信息
+      if (res.provider_access_token) {
+        let resUserInfo = axios({
+          url:
+            "https://qyapi.weixin.qq.com/cgi-bin/service/get_login_info?access_token=" +
+            res.provider_access_token,
+          method: "post",
+          data: {
+            auth_code: this.$route.auth_code,
+          },
+        });
+        if (resUserInfo.errcode == 0 && resUserInfo.errmsg === "ok") {
+          console.log(resUserInfo);
+        }
+      } else {
+      }
+    }
+  },
   created() {
+    // console.log("routerCreated", this.$route);
+    let authParams = {
+      appid: "ww24262ce93851488f", // * 服务商的CorpID
+      redirect_uri: encodeURI("http://106.13.201.219/#/login"), // * 授权登录之后目的跳转网址，需要做urlencode处理。所在域名需要与授权完成回调域名一致
+      state: "", // ? 用于企业或服务商自行校验session，防止跨域攻击
+      usertype: "admin", // ? 支持登录的类型。admin代表管理员登录（使用微信扫码）,member代表成员登录（使用企业微信扫码），默认为admin
+    };
+    this.authLink = `https://open.work.weixin.qq.com/wwopen/sso/3rd_qrConnect?appid=${authParams.appid}&redirect_uri=${authParams.redirect_uri}&state=${authParams.state}&usertype=${authParams.usertype}`;
+
     this.getCode();
     this.getCookie();
   },
@@ -144,6 +224,9 @@ export default {
             });
         }
       });
+    },
+    goVote() {
+      window.open("https://www.oschina.net/p/linkwechat");
     },
   },
 };
@@ -209,5 +292,15 @@ export default {
 }
 .login-code-img {
   height: 38px;
+}
+.login /deep/.el-dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin-top: 0vh !important;
+}
+.el-dialog__body {
+  padding: 0px 20px;
 }
 </style>

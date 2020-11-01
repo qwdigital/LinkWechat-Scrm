@@ -51,6 +51,13 @@ export function addDepart(data) {
   })
 }
 
+export function removeDepart(ids) {
+  return request({
+    url: service + '/' + ids,
+    method: 'DELETE',
+  })
+}
+
 /**
  * 获取通讯录人员列表
  * @param {*} params 

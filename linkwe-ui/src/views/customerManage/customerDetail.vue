@@ -1,5 +1,5 @@
 <script>
-import * as api from "@/api/customer/group";
+import * as api from "@/api/customer";
 
 export default {
   name: "CustomerDetail",
@@ -15,13 +15,11 @@ export default {
     this.customer = this.$route.query;
   },
   methods: {
-    getList(page) {
-      page && (this.query.pageNum = page);
-      this.loading = false;
-      api.getMembers(this.query).then((response) => {
-        this.list = response.rows;
-        this.total = +response.total;
-        this.loading = false;
+    updateBirthday() {
+      let { externalUserid, birthday } = this.customer;
+      api.updateBirthday({ externalUserid, birthday }).then((response) => {
+        this.msgSuccess("操作成功");
+        this.datePickerVisible = false;
       });
     },
   },
@@ -37,7 +35,7 @@ export default {
         <div class="mb10">
           {{customer.name}}
           <span
-            :style="{color: customer.type === 1 ? '#4bde03' : '#f9a90b'}"
+            :style="{color: customer.type == 1 ? '#4bde03' : '#f9a90b'}"
           >{{ ({1: '@微信', 2: '@企业微信'})[customer.type] }}</span>
           <i :class="['el-icon-s-custom', ({1: 'man', 2: 'woman'})[customer.gender]]"></i>
         </div>
@@ -50,7 +48,7 @@ export default {
               type="date"
               value-format="yyyy-MM-dd"
               placeholder="选择日期便于以后客情维护"
-              @blur="datePickerVisible = false"
+              @blur="updateBirthday"
             ></el-date-picker>
             <i v-else class="el-icon-edit" @click="datePickerVisible = true"></i>
           </div>
@@ -137,6 +135,17 @@ export default {
   .el-col-10 {
     width: 100px;
     text-align: right;
+  }
+}
+.el-icon-s-custom {
+  font-size: 16px;
+  margin-left: 4px;
+  color: #999;
+  &.man {
+    color: #13a2e8;
+  }
+  &.woman {
+    color: #f753b2;
   }
 }
 </style>

@@ -69,3 +69,19 @@ export function removeLabel(data) {
     data
   })
 }
+
+/**
+ * 客户生日编辑
+ * @param {*} data 
+ * {
+  "externalUserid": "",
+  "birthday": ""
+}
+ */
+export function updateBirthday(data) {
+  return request({
+    url: service,
+    method: 'PUT',
+    data
+  })
+}

@@ -214,7 +214,18 @@ export default {
       );
       this.dialogVisibleDepart = true;
     },
-    departRemove() {},
+    departRemove(id) {
+      this.$confirm("是否确认删除吗?", "警告", {
+        type: "warning",
+      })
+        .then(function () {
+          return api.removeDepart(id);
+        })
+        .then(() => {
+          this.getTree();
+          this.msgSuccess("删除成功");
+        });
+    },
     departSubmit() {
       api[this.formDepart.id ? "updateDepart" : "addDepart"](this.formDepart)
         .then(() => {
@@ -316,20 +327,23 @@ export default {
               <span class="fr">
                 <i
                   class="el-icon-edit"
+                  title="编辑"
                   v-hasPermi="['contacts:organization:editDep']"
                   v-if="node.level !== 1"
                   @click.stop="departEdit(data, 1)"
                 ></i>
                 <i
                   class="el-icon-plus"
+                  title="添加"
                   v-hasPermi="['contacts:organization:addDep']"
                   @click.stop="departEdit(data, 0)"
                 ></i>
                 <i
-                  class="el-icon-delete"
+                  class="el-icon-minus"
+                  title="删除"
                   v-hasPermi="['contacts:organization:removeDep']"
                   v-if="node.level !== 1"
-                  @click.stop="departRemove(data)"
+                  @click.stop="departRemove(data.id)"
                 ></i>
               </span>
             </div>
