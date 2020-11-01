@@ -7,7 +7,7 @@ import { getToken } from '@/utils/auth'
 
 // NProgress.configure({ showSpinner: false })
 
-const whiteList = ['/login', '/auth-redirect', '/bind', '/register']
+const whiteList = ['/login', '/auth-redirect', '/bind', '/register', '/test']
 
 router.beforeEach((to, from, next) => {
   // NProgress.start()
@@ -27,7 +27,24 @@ router.beforeEach((to, from, next) => {
             // store.dispatch('permission/generateRoutes', { roles }).then(accessRoutes => {
             // 根据roles权限生成可访问的路由表
             router.addRoutes(accessRoutes) // 动态添加可访问路由表
-            next({ ...to, replace: true }) // hack方法 确保addRoutes已完成
+            // 判断是否有设置企业微信id
+            if (res.user && res.user.validCropId) {
+              // 设置了企业微信，正常跳转
+              next({ ...to, replace: true }) // hack方法 确保addRoutes已完成
+            } else {
+              // 没有设置企业微信的
+              let isEnterpriseWechat = accessRoutes.findIndex(element => {
+                element.path === '/_enterpriseWechat'
+              });
+              // 若有设置企业微信的页面权限，默认跳转到设置企业微信页面
+              if (isEnterpriseWechat > -1) {
+                next({ path: '/enterpriseWechat', replace: true })
+              } else {
+                // 没有权限的给予提示，并退回登录页面
+                Message.error('没有设置企业微信的权限，请联系系统管理员')
+                next({ path: '/login', replace: true })
+              }
+            }
           })
         })
           .catch(err => {
