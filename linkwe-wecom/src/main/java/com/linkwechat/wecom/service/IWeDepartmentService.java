@@ -47,9 +47,9 @@ public interface IWeDepartmentService extends IService<WeDepartment>
     public List<WeDepartment> synchWeDepartment();
 
 
-//    /**
-//     * 根据部门id删除部门
-//     * @param ids
-//     */
-//    public void deleteWeDepartmentByIds(String[] ids);
+    /**
+     * 根据部门id删除部门
+     * @param ids
+     */
+    public void deleteWeDepartmentByIds(String[] ids);
 }

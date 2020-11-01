@@ -38,7 +38,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			AND r.status = #{status}
 		</if>
 		<if test="roleKey != null and roleKey != ''">
-			AND r.role_key like concat('%', #{roleKey}, '%')
+			AND r.role_key = #{roleKey}
 		</if>
 		<if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
 			and date_format(r.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')

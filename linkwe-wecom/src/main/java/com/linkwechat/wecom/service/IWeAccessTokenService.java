@@ -11,4 +11,7 @@ public interface IWeAccessTokenService {
 
 
    public String findContactAccessToken();
+
+
+   public String findProviderAccessToken();
 }

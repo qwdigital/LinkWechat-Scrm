@@ -58,6 +58,16 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
     }
 
 
+    /**
+     * 获取服务商相关token
+     * @return
+     */
+    @Override
+    public String findProviderAccessToken() {
+        return findAccessToken(WeConstans.WE_PROVIDER_ACCESS_TOKEN);
+    }
+
+
     private String findAccessToken(String accessTokenKey){
 
         String  weAccessToken =redisCache.getCacheObject(accessTokenKey);
@@ -70,15 +80,24 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
                 //返回错误异常，让用户绑定企业id相关信息
                 throw new WeComException("无可用的corpid和secret");
             }
+            String token="";
+            Long expires_in=null;
+            if(WeConstans.WE_COMMON_ACCESS_TOKEN.equals(accessTokenKey) || WeConstans.WE_CONTACT_ACCESS_TOKEN.equals(accessTokenKey)){
+                WeAccessTokenDtoDto weAccessTokenDtoDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),
+                        WeConstans.WE_COMMON_ACCESS_TOKEN.equals(accessTokenKey) ? wxCorpAccount.getCorpSecret() : wxCorpAccount.getContactSecret());
+                token=weAccessTokenDtoDto.getAccess_token();
+                expires_in=weAccessTokenDtoDto.getExpires_in();
 
-            WeAccessTokenDtoDto accessToken
-                    = accessTokenClient.getToken(wxCorpAccount.getCorpId(),
-                    WeConstans.WE_COMMON_ACCESS_TOKEN.equals(accessTokenKey)? wxCorpAccount.getCorpSecret():wxCorpAccount.getContactSecret());
-
-            if(accessToken.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
-                redisCache.setCacheObject(accessTokenKey,accessToken.getAccess_token(),accessToken.getExpires_in().intValue(), TimeUnit.SECONDS);
-                weAccessToken=accessToken.getAccess_token();
+            }else  if(WeConstans.WE_PROVIDER_ACCESS_TOKEN.equals(accessTokenKey)){
+                WeAccessTokenDtoDto providerToken = accessTokenClient.getProviderToken(wxCorpAccount.getCorpId(), wxCorpAccount.getProviderSecret());
+                token=providerToken.getProvider_access_token();
+                expires_in=providerToken.getExpires_in();
             }
+
+            if(StringUtils.isNotEmpty(token)){
+                redisCache.setCacheObject(accessTokenKey,token,expires_in.intValue(), TimeUnit.SECONDS);
+            }
+
         }
 
         return weAccessToken;

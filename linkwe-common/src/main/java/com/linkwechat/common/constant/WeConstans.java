@@ -20,6 +20,12 @@ public class WeConstans {
 
 
     /**
+     * 供应商相关token
+     */
+    public static  final String WE_PROVIDER_ACCESS_TOKEN = "we_provider_access_token";
+
+
+    /**
      * 企业微信接口返回成功code
      */
     public static final Integer WE_SUCCESS_CODE = 0;

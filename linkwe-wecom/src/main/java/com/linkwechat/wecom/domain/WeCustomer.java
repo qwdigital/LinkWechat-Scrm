@@ -16,6 +16,8 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * 企业微信客户对象 we_customer
  * 
@@ -34,6 +36,7 @@ public class WeCustomer
 
     /** 外部联系人的userid */
     @TableId
+    @NotBlank(message = "外部联系人的id不可为空")
     private String externalUserid;
 
     /** 外部联系人名称 */

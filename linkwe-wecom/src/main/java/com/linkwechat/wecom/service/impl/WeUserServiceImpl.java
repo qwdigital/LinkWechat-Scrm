@@ -2,18 +2,10 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.exception.wecom.WeComException;
-import com.linkwechat.framework.web.domain.server.Sys;
-import com.linkwechat.wecom.client.WeDepartMentClient;
 import com.linkwechat.wecom.client.WeUserClient;
-import com.linkwechat.wecom.domain.WeDepartment;
 import com.linkwechat.wecom.domain.WeUser;
-import com.linkwechat.wecom.domain.dto.LeaveWeUserListsDto;
-import com.linkwechat.wecom.domain.dto.WeDepartMentDto;
-import com.linkwechat.wecom.domain.dto.WeUserDto;
-import com.linkwechat.wecom.domain.dto.WeUserListDto;
 import com.linkwechat.wecom.domain.vo.WeAllocateCustomersVo;
 import com.linkwechat.wecom.domain.vo.WeAllocateGroupsVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
@@ -25,8 +17,6 @@ import com.linkwechat.wecom.service.IWeGroupService;
 import com.linkwechat.wecom.service.IWeUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;

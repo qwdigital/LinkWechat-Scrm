@@ -87,6 +87,7 @@ public class Constants
      */
     public static final String LOGIN_USER_KEY = "login_user_key";
 
+
     /**
      * 用户ID
      */
@@ -142,6 +143,16 @@ public class Constants
     /** 业务判断成功状态 */
     public static final Integer SERVICE_RETURN_SUCCESS_CODE=0;
 
+
+    /** 系统用户 */
+    public static final String USER_TYPE_SYS="00";
+
+    /** 企业微信用户 */
+    public static final  String USER_TYPE_WECOME="11";
+
+
+    /** 企业微信用户系统中默认用户 */
+    public static final String DEFAULT_WECOME_ROLE_KEY="WeCome";
 
 
 

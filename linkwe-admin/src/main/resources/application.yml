@@ -14,6 +14,8 @@ ruoyi:
   addressEnabled: false
   # 验证码类型 math 数组计算 char 字符验证
   captchaType: math
+  # 企业微信用户首次登录系统默认密码
+  weUserDefaultPwd: 123456
 
 # 开发环境配置
 server:
@@ -90,6 +92,8 @@ mybatis-plus:
    mapper-locations: classpath*:mapper/**/*Mapper.xml
    type-aliases-package: com.linkwechat.**.domain
    type-handlers-package: com.linkwechat.framework.handler.**
+   configuration:
+     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 ## MyBatis配置
 #mybatis:
@@ -132,7 +136,9 @@ forest:
 wecome:
   serverUrl: https://qyapi.weixin.qq.com/
   weComePrefix: cgi-bin
-  noAccessTokenUrl: /gettoken
+  noAccessTokenUrl:
+          - /gettoken
+          - /service/get_provider_token
   needContactTokenUrl:
           - /externalcontact/get_follow_user_list
           - /externalcontact/add_contact_way
@@ -149,3 +155,6 @@ wecome:
           - /externalcontact/groupchat/transfer
           - /externalcontact/get_unassigned_list
   fileUplodUrl:  /media/upload,/media/uploadimg
+  needProviderTokenUrl:
+          - /service/get_login_info
+

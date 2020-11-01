@@ -16,10 +16,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
         <result property="contactSecret" column="contact_secret" />
+        <result property="agentId" column="agent_id" />
+        <result property="providerSecret" column="provider_secret" />
     </resultMap>
 
     <sql id="selectWeCorpAccountVo">
-        select id, company_name, corp_id, corp_secret, status, del_flag, create_by, create_time, update_by, update_time,contact_secret from we_corp_account
+        select id,provider_secret,company_name, corp_id, corp_secret,agent_id ,status, del_flag, create_by, create_time, update_by, update_time,contact_secret from we_corp_account
     </sql>
 
     <select id="selectWeCorpAccountList" parameterType="WeCorpAccount" resultMap="WeCorpAccountResult">

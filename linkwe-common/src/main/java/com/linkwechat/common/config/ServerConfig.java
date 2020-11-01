@@ -1,12 +1,9 @@
-package com.linkwechat.framework.config;
+package com.linkwechat.common.config;
+
+import com.linkwechat.common.utils.ServletUtils;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-
-import com.google.common.collect.Lists;
-import org.springframework.stereotype.Component;
-import com.linkwechat.common.utils.ServletUtils;
-
-import java.util.List;
 
 /**
  * 服务相关配置

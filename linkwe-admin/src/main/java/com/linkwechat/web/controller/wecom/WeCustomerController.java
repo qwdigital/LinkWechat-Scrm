@@ -12,6 +12,7 @@ import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -86,16 +87,17 @@ public class WeCustomerController extends BaseController
 
 
 
-//    /**
-//     * 修改企业微信客户
-//     */
-//    @PreAuthorize("@ss.hasPermi('wecom:customer:edit')")
-//    @Log(title = "企业微信客户", businessType = BusinessType.UPDATE)
-//    @PutMapping
-//    public AjaxResult edit(@RequestBody WeCustomer weCustomer)
-//    {
-//        return toAjax(weCustomerService.updateWeCustomer(weCustomer));
-//    }
+    /**
+     * 修改企业微信客户
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:customer:edit')")
+    @Log(title = "企业微信客户", businessType = BusinessType.UPDATE)
+    @PutMapping
+    public AjaxResult edit(@Validated @RequestBody WeCustomer weCustomer)
+    {
+        weCustomerService.saveOrUpdate(weCustomer);
+        return AjaxResult.success();
+    }
 
 
     /**
