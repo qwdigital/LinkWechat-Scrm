@@ -11,4 +11,5 @@ import lombok.Data;
 public class WeAccessTokenDtoDto extends WeResultDto {
    private String access_token;
    private Long expires_in;
+   private String provider_access_token;
 }

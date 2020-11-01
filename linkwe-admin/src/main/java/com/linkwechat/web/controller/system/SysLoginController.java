@@ -2,6 +2,12 @@ package com.linkwechat.web.controller.system;
 
 import java.util.List;
 import java.util.Set;
+
+import com.linkwechat.wecom.client.WeAccessTokenClient;
+import com.linkwechat.wecom.domain.WeCorpAccount;
+import com.linkwechat.wecom.domain.dto.WeLoginUserInfoDto;
+import com.linkwechat.wecom.service.IWeAccessTokenService;
+import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,6 +45,14 @@ public class SysLoginController
     @Autowired
     private TokenService tokenService;
 
+
+    @Autowired
+    private IWeCorpAccountService iWxCorpAccountService;
+
+
+    @Autowired
+    private WeAccessTokenClient weAccessTokenClient;
+
     /**
      * 登录方法
      * 
@@ -56,6 +70,8 @@ public class SysLoginController
         return ajax;
     }
 
+
+
     /**
      * 获取用户信息
      * 
@@ -70,6 +86,12 @@ public class SysLoginController
         Set<String> roles = permissionService.getRolePermission(user);
         // 权限集合
         Set<String> permissions = permissionService.getMenuPermission(user);
+        //校验用户是否拥有可用corpid
+        WeCorpAccount wxCorpAccount
+                = iWxCorpAccountService.findValidWeCorpAccount();
+        if(null != wxCorpAccount){
+            user.setValidCropId(true);
+        }
         AjaxResult ajax = AjaxResult.success();
         ajax.put("user", user);
         ajax.put("roles", roles);
@@ -90,5 +112,40 @@ public class SysLoginController
         SysUser user = loginUser.getUser();
         List<SysMenu> menus = menuService.selectMenuTreeByUserId(user.getUserId());
         return AjaxResult.success(menuService.buildMenus(menus));
+    }
+
+    /**
+     * 获取企业扫码登录相关参数
+     * @return
+     */
+    @GetMapping("/findQrLoginParm")
+    public AjaxResult findQrLoginParm(){
+
+        WeCorpAccount validWeCorpAccount
+                = iWxCorpAccountService.findValidWeCorpAccount();
+        if(null != validWeCorpAccount){
+            validWeCorpAccount.setContactSecret(null);
+            validWeCorpAccount.setCorpSecret(null);
+            validWeCorpAccount.setProviderSecret(null);
+        }
+
+        return AjaxResult.success(validWeCorpAccount);
+    }
+
+
+
+    /**
+     * 扫码登录微信端回调
+     * @param auth_code
+     * @return
+     */
+    @GetMapping("/wxQrLogin")
+    public AjaxResult wxQrLogin(String auth_code){
+
+        WeLoginUserInfoDto loginInfo = weAccessTokenClient.getLoginInfo(auth_code);
+
+        System.out.println(auth_code);
+
+        return AjaxResult.success();
     }
 }

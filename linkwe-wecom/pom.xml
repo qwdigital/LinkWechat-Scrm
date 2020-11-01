@@ -22,10 +22,6 @@
             <groupId>com.linkwechat</groupId>
             <artifactId>linkwe-common</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.linkwechat</groupId>
-            <artifactId>linkwe-framework</artifactId>
-        </dependency>
 
 
     </dependencies>

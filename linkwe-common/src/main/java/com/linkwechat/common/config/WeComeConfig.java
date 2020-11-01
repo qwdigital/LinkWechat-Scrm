@@ -20,11 +20,14 @@ public class WeComeConfig {
     private String weComePrefix;
 
     /** 企业微信端无需token的url */
-    private String noAccessTokenUrl;
+    private String[] noAccessTokenUrl;
 
     /** 需要使用外部联系人token的url*/
     private String[] needContactTokenUrl;
 
     /** 文件上传url*/
     private String[] fileUplodUrl;
+
+    /** 需要供应商token的url*/
+    private String[] needProviderTokenUrl;
 }

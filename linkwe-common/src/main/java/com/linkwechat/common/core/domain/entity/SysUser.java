@@ -1,12 +1,5 @@
 package com.linkwechat.common.core.domain.entity;
 
-import java.util.Date;
-import java.util.List;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.linkwechat.common.annotation.Excel;
@@ -14,12 +7,26 @@ import com.linkwechat.common.annotation.Excel.ColumnType;
 import com.linkwechat.common.annotation.Excel.Type;
 import com.linkwechat.common.annotation.Excels;
 import com.linkwechat.common.core.domain.BaseEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 用户对象 sys_user
  * 
  * @author ruoyi
  */
+@Data
+@Builder
+@AllArgsConstructor
 public class SysUser extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
@@ -39,6 +46,9 @@ public class SysUser extends BaseEntity
     /** 用户昵称 */
     @Excel(name = "用户名称")
     private String nickName;
+
+    /** 用户类型（00系统用户）(11:企业微信用户) */
+    private String userType;
 
     /** 用户邮箱 */
     @Excel(name = "用户邮箱")
@@ -91,6 +101,9 @@ public class SysUser extends BaseEntity
 
     /** 岗位组 */
     private Long[] postIds;
+
+    /** 是否具有有效得cropId */
+    private boolean validCropId=false;
 
     public SysUser()
     {

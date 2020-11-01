@@ -2,16 +2,12 @@ package com.linkwechat.wecom.interceptor;
 
 import cn.hutool.json.JSONUtil;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.utils.ForestDataType;
-import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.config.WeComeConfig;
 import com.linkwechat.common.constant.WeConstans;
-import com.linkwechat.common.exception.wecom.WeComException;
-import com.linkwechat.framework.web.domain.server.Sys;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,12 +52,20 @@ public class WeAccessTokenInterceptor implements Interceptor{
 
 
         // 添加请求参数access_token
-        if(!weComeConfig.getNoAccessTokenUrl().equals(uri)){
-            request.addQuery("access_token",
-                    Arrays.asList(weComeConfig.getNeedContactTokenUrl()).contains(uri)?
-                            iWeAccessTokenService.findContactAccessToken():
-                            iWeAccessTokenService.findCommonAccessToken());
+        if(!Arrays.asList(weComeConfig.getNoAccessTokenUrl()).contains(uri)){
+            String token="";
+
+            if(Arrays.asList(weComeConfig.getNeedContactTokenUrl()).contains(uri)){ //需要联系人token
+                token=iWeAccessTokenService.findContactAccessToken();
+            }else if(Arrays.asList(weComeConfig.getNeedProviderTokenUrl()).contains(uri)){ //需要供应商token
+                token=iWeAccessTokenService.findProviderAccessToken();
+            }else{
+                token=iWeAccessTokenService.findCommonAccessToken();
+            }
+
+            request.addQuery("access_token",token);
         }
+
 
         //添加服务器统一请求地址
         request.setUrl(weComeConfig.getServerUrl()+weComeConfig.getWeComePrefix()+uri);

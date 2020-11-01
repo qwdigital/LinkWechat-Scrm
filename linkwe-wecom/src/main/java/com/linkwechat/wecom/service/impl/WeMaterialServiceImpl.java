@@ -1,14 +1,11 @@
 package com.linkwechat.wecom.service.impl;
 
 import com.linkwechat.common.config.RuoYiConfig;
-import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.config.ServerConfig;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.file.FileUploadUtils;
-import com.linkwechat.framework.config.ServerConfig;
-import com.linkwechat.wecom.client.WeMediaClient;
 import com.linkwechat.wecom.domain.WeMaterial;
-import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.vo.WeMaterialFileVO;
 import com.linkwechat.wecom.mapper.WeMaterialMapper;
 import com.linkwechat.wecom.service.IWeMaterialService;

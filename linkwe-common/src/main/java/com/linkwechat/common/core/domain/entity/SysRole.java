@@ -1,18 +1,23 @@
 package com.linkwechat.common.core.domain.entity;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.annotation.Excel.ColumnType;
 import com.linkwechat.common.core.domain.BaseEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * 角色表 sys_role
  * 
  * @author ruoyi
  */
+@Builder
+@AllArgsConstructor
 public class SysRole extends BaseEntity
 {
     private static final long serialVersionUID = 1L;

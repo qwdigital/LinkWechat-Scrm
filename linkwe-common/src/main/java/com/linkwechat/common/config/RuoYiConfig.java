@@ -30,6 +30,9 @@ public class RuoYiConfig
     /** 获取地址开关 */
     private static boolean addressEnabled;
 
+    /** 企业微信账号登录系统默认密码 */
+    private static String weUserDefaultPwd="123456";
+
     public String getName()
     {
         return name;
@@ -112,5 +115,13 @@ public class RuoYiConfig
     public static String getUploadPath()
     {
         return getProfile() + "/upload";
+    }
+
+    public  String getWeUserDefaultPwd() {
+        return weUserDefaultPwd;
+    }
+
+    public  void setWeUserDefaultPwd(String weUserDefaultPwd) {
+        RuoYiConfig.weUserDefaultPwd = weUserDefaultPwd;
     }
 }

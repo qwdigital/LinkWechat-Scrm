@@ -58,5 +58,12 @@ public class WeCorpAccount extends BaseEntity
     @NotBlank(message = "外部联系人密钥凭证不能为空")
     private String contactSecret;
 
+    @ApiModelProperty("应用id")
+    private String agentId;
+
+
+    @ApiModelProperty("服务商密钥")
+    private String providerSecret;
+
 
 }

@@ -1,8 +1,12 @@
 package com.linkwechat.web.controller.common;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.linkwechat.common.config.RuoYiConfig;
+import com.linkwechat.common.config.ServerConfig;
+import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.file.FileUploadUtils;
+import com.linkwechat.common.utils.file.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,16 +14,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import com.linkwechat.common.config.RuoYiConfig;
-import com.linkwechat.common.constant.Constants;
-import com.linkwechat.common.core.domain.AjaxResult;
-import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.common.utils.file.FileUploadUtils;
-import com.linkwechat.common.utils.file.FileUtils;
-import com.linkwechat.framework.config.ServerConfig;
 
-import java.io.*;
-import java.util.stream.Stream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 通用请求处理
