@@ -61,8 +61,6 @@ public class WeConstans {
     public static final Integer LEAVE_NO_ALLOCATE_STATE = 0;
 
 
-
-
     /**
      * 离职已分配分配
      */
@@ -72,28 +70,25 @@ public class WeConstans {
     /**
      * 已激活
      */
-    public static final Integer WE_USER_IS_ACTIVATE=1;
+    public static final Integer WE_USER_IS_ACTIVATE = 1;
 
 
     /**
      * 已禁用
      */
-    public static final Integer WE_USER_IS_FORBIDDEN=2;
+    public static final Integer WE_USER_IS_FORBIDDEN = 2;
 
 
     /**
      * 已离职
      */
-    public static  final  Integer WE_USER_IS_LEAVE=6;
+    public static final Integer WE_USER_IS_LEAVE = 6;
 
 
     /**
      * 未激活
      */
-    public static final Integer WE_USER_IS_NO_ACTIVATE=4;
-
-
-
+    public static final Integer WE_USER_IS_NO_ACTIVATE = 4;
 
 
     /**
@@ -123,57 +118,57 @@ public class WeConstans {
     /**
      * 在小程序中联系场景
      */
-    public static final Integer SMALL_ROUTINE_EMPLE_CODE_SCENE=1;
+    public static final Integer SMALL_ROUTINE_EMPLE_CODE_SCENE = 1;
 
 
     /**
      * 通过二维码联系场景
      */
-    public static final Integer QR_CODE_EMPLE_CODE_SCENE=2;
+    public static final Integer QR_CODE_EMPLE_CODE_SCENE = 2;
 
 
     /**
      * 微信接口相应端错误字段
      */
-    public static  final String WE_ERROR_FIELD="errcode";
+    public static final String WE_ERROR_FIELD = "errcode";
 
 
     /**
      * 递归
      */
-    public static final Integer  YES_IS_RECURSION=0;
+    public static final Integer YES_IS_RECURSION = 0;
 
 
     /**
      * 获取所有子部门数据
      */
-    public static final Integer  DEPARTMENT_SUB_WEUSER=1;
+    public static final Integer DEPARTMENT_SUB_WEUSER = 1;
 
 
     /**
      * 获取当前部门
      */
-    public static final Integer  DEPARTMENT_CURRENT_WEUSER=0;
+    public static final Integer DEPARTMENT_CURRENT_WEUSER = 0;
 
 
     /**
      * 通讯录用户激活
      */
-    public static final Integer YES_IS_ACTIVATE=1;
+    public static final Integer YES_IS_ACTIVATE = 1;
 
 
     /**
      * 通讯录用户未激活
      */
-    public static final Integer NO_IS_ACTIVATE=2;
+    public static final Integer NO_IS_ACTIVATE = 2;
 
 
     /**
-     *  不存在外部联系人的关系
+     * 不存在外部联系人的关系
      */
-    public static final Integer NOT_EXIST_CONTACT=84061;
+    public static final Integer NOT_EXIST_CONTACT = 84061;
 
-
+    public static final String COMMA = ",";
 
 
 }
