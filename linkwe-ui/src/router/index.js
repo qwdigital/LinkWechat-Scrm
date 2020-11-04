@@ -1,10 +1,10 @@
-import Vue from 'vue';
-import Router from 'vue-router';
+import Vue from 'vue'
+import Router from 'vue-router'
 
-Vue.use(Router);
+Vue.use(Router)
 
 /* Layout */
-import Layout from '@/layout';
+import Layout from '@/layout'
 
 /**
  * Note: 路由配置项
@@ -374,11 +374,11 @@ export const constantRoutes = [
       },
     ],
   },
-  {
-    path: '/test',
-    component: (resolve) => require(['@/views/test'], resolve),
-    hidden: true,
-  },
+  // {
+  //   path: '/test',
+  //   component: (resolve) => require(['@/views/test'], resolve),
+  //   hidden: true,
+  // },
   {
     path: '/404',
     component: (resolve) => require(['@/views/error/404'], resolve),
@@ -389,10 +389,10 @@ export const constantRoutes = [
     component: (resolve) => require(['@/views/error/401'], resolve),
     hidden: true,
   },
-];
+]
 
 export default new Router({
   // mode: 'history',
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes,
-});
+})
