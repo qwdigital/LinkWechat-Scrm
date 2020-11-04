@@ -9,16 +9,25 @@ export default {
       customer: {
         weFlowerCustomerRels: [],
       },
+      birthday: "",
     };
   },
   created() {
     this.customer = this.$route.query;
+    this.birthday = this.customer.birthday;
   },
   methods: {
     updateBirthday() {
-      let { externalUserid, birthday } = this.customer;
-      api.updateBirthday({ externalUserid, birthday }).then((response) => {
+      if (!this.birthday) {
+        return;
+      }
+      let data = {
+        externalUserid: this.customer.externalUserid,
+        birthday: this.birthday,
+      };
+      api.updateBirthday(data).then((response) => {
         this.msgSuccess("操作成功");
+        // todo get info
         this.datePickerVisible = false;
       });
     },
@@ -44,11 +53,12 @@ export default {
           <div class="bfc-d ml20">
             <el-date-picker
               v-if="datePickerVisible"
-              v-model="customer.birthday"
+              v-model="birthday"
               type="date"
               value-format="yyyy-MM-dd"
               placeholder="选择日期便于以后客情维护"
-              @blur="updateBirthday"
+              @blur="datePickerVisible = false"
+              @change="updateBirthday"
             ></el-date-picker>
             <i v-else class="el-icon-edit" @click="datePickerVisible = true"></i>
           </div>

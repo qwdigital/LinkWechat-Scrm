@@ -1,10 +1,24 @@
 <template>
   <div class="login">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
+    <el-form
+      ref="loginForm"
+      :model="loginForm"
+      :rules="loginRules"
+      class="login-form"
+    >
       <h3 class="title">塬微后台管理系统</h3>
       <el-form-item prop="username">
-        <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
-          <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
+        <el-input
+          v-model="loginForm.username"
+          type="text"
+          auto-complete="off"
+          placeholder="账号"
+        >
+          <svg-icon
+            slot="prefix"
+            icon-class="user"
+            class="el-input__icon input-icon"
+          />
         </el-input>
       </el-form-item>
       <el-form-item prop="password">
@@ -15,7 +29,11 @@
           placeholder="密码"
           @keyup.enter.native="handleLogin"
         >
-          <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
+          <svg-icon
+            slot="prefix"
+            icon-class="password"
+            class="el-input__icon input-icon"
+          />
         </el-input>
       </el-form-item>
       <el-form-item prop="code">
@@ -26,13 +44,21 @@
           style="width: 63%"
           @keyup.enter.native="handleLogin"
         >
-          <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon" />
+          <svg-icon
+            slot="prefix"
+            icon-class="validCode"
+            class="el-input__icon input-icon"
+          />
         </el-input>
         <div class="login-code">
           <img :src="codeUrl" @click="getCode" class="login-code-img" />
         </div>
       </el-form-item>
-      <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
+      <el-checkbox
+        v-model="loginForm.rememberMe"
+        style="margin:0px 0px 25px 0px;"
+        >记住密码</el-checkbox
+      >
       <el-form-item style="width:100%;">
         <el-button
           :loading="loading"
@@ -49,7 +75,9 @@
         <a :href="authLink">
           <img
             src="//wwcdn.weixin.qq.com/node/wwopen/wwopenmng/style/images/independent/brand/300x40_white$4dab5411.png"
-            srcset="//wwcdn.weixin.qq.com/node/wwopen/wwopenmng/style/images/independent/brand/300x40_white_2x$6a1f5234.png 2x"
+            srcset="
+              //wwcdn.weixin.qq.com/node/wwopen/wwopenmng/style/images/independent/brand/300x40_white_2x$6a1f5234.png 2x
+            "
             alt="企业微信登录"
           />
         </a>
@@ -60,12 +88,20 @@
       <span>Copyright © 2018-2019 LinkWechat All Rights Reserved.</span>
     </div>
 
-    <el-dialog title="开源软件评选" :visible.sync="dialogVisible" width="400px" class="c">
+    <el-dialog
+      title="开源软件评选"
+      :visible.sync="dialogVisible"
+      width="400px"
+      class="c"
+    >
       <div>
         <p>2020年度最佳人气项目开源软件评选。</p>
         <p>
           请为
-          <strong style="color: #FF0036;" class="cp" @click="goVote">LinkWeChat</strong> 投票，谢谢支持。
+          <strong style="color: #FF0036;" class="cp" @click="goVote"
+            >LinkWeChat</strong
+          >
+          投票，谢谢支持。
         </p>
         <div class="ac">
           <img src="@/assets/image/vote-code.png" alt />
@@ -74,104 +110,66 @@
       </div>
       <div slot="footer">
         <el-button @click="goVote">朕要支持</el-button>
-        <el-button type="primary" @click="dialogVisible = false">残忍拒绝</el-button>
+        <el-button type="primary" @click="dialogVisible = false"
+          >残忍拒绝</el-button
+        >
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import { getCodeImg } from "@/api/login";
-import Cookies from "js-cookie";
-import { encrypt, decrypt } from "@/utils/jsencrypt";
+import axios from 'axios';
+import { getCodeImg } from '@/api/login';
+import Cookies from 'js-cookie';
+import { encrypt, decrypt } from '@/utils/jsencrypt';
 
 export default {
-  name: "Login",
+  name: 'Login',
   data() {
     return {
-      codeUrl: "",
-      cookiePassword: "",
+      codeUrl: '',
+      cookiePassword: '',
       loginForm: {
-        username: "",
-        password: "",
+        username: '',
+        password: '',
         rememberMe: false,
-        code: "",
-        uuid: "",
+        code: '',
+        uuid: '',
       },
       loginRules: {
         username: [
-          { required: true, trigger: "blur", message: "用户名不能为空" },
+          { required: true, trigger: 'blur', message: '用户名不能为空' },
         ],
         password: [
-          { required: true, trigger: "blur", message: "密码不能为空" },
+          { required: true, trigger: 'blur', message: '密码不能为空' },
         ],
         code: [
-          { required: true, trigger: "change", message: "验证码不能为空" },
+          { required: true, trigger: 'change', message: '验证码不能为空' },
         ],
       },
       loading: false,
       redirect: undefined,
-      authLink: "",
+      authLink: '',
       dialogVisible: true,
     };
   },
   watch: {
     $route: {
-      handler: function (route) {
+      handler: function(route) {
         this.redirect = route.query && route.query.redirect;
       },
       immediate: true,
     },
   },
-  beforeCreate() {
-    // http://106.13.201.219/#/login?auth_code=xxx
-    console.log("routerbeforeCreate", this.$route);
-    // let hash = location.hash;
-    // let arr = hash.slice(hash.indexOf("?")).split("=");
-    if (!this.$route.auth_code) {
-      return;
-    }
-    getUserInfo.call(this);
-
-    async function getUserInfo(params) {
-      // 如果授权回调
-      // 1、获取access_token
-      let res = await axios({
-        url: "https://qyapi.weixin.qq.com/cgi-bin/service/get_provider_token",
-        method: "post",
-        data: {
-          corpid: "ww24262ce93851488f",
-          provider_secret:
-            "a9DS2sqQRks46VEl6qgz1Z-U_HPwyHUuBAkp_6II9lIH5g1vO6L4VMPUGLeVT5G_",
-        },
-      });
-
-      // 2、获取用户信息
-      if (res.provider_access_token) {
-        let resUserInfo = axios({
-          url:
-            "https://qyapi.weixin.qq.com/cgi-bin/service/get_login_info?access_token=" +
-            res.provider_access_token,
-          method: "post",
-          data: {
-            auth_code: this.$route.auth_code,
-          },
-        });
-        if (resUserInfo.errcode == 0 && resUserInfo.errmsg === "ok") {
-          console.log(resUserInfo);
-        }
-      } else {
-      }
-    }
-  },
   created() {
-    // console.log("routerCreated", this.$route);
     let authParams = {
-      appid: "ww24262ce93851488f", // * 服务商的CorpID
-      redirect_uri: encodeURI("http://106.13.201.219/#/login"), // * 授权登录之后目的跳转网址，需要做urlencode处理。所在域名需要与授权完成回调域名一致
-      state: "", // ? 用于企业或服务商自行校验session，防止跨域攻击
-      usertype: "admin", // ? 支持登录的类型。admin代表管理员登录（使用微信扫码）,member代表成员登录（使用企业微信扫码），默认为admin
+      appid: 'ww24262ce93851488f', // * 服务商的CorpID
+      redirect_uri: encodeURIComponent(
+        process.env.VUE_APP_BASE_API + '/#/authCallback'
+      ), // * 授权登录之后目的跳转网址，需要做urlencode处理。所在域名需要与授权完成回调域名一致
+      state: '', // ? 用于企业或服务商自行校验session，防止跨域攻击
+      usertype: 'admin', // ? 支持登录的类型。admin代表管理员登录（使用微信扫码）,member代表成员登录（使用企业微信扫码），默认为admin
     };
     this.authLink = `https://open.work.weixin.qq.com/wwopen/sso/3rd_qrConnect?appid=${authParams.appid}&redirect_uri=${authParams.redirect_uri}&state=${authParams.state}&usertype=${authParams.usertype}`;
 
@@ -181,14 +179,14 @@ export default {
   methods: {
     getCode() {
       getCodeImg().then((res) => {
-        this.codeUrl = "data:image/gif;base64," + res.img;
+        this.codeUrl = 'data:image/gif;base64,' + res.img;
         this.loginForm.uuid = res.uuid;
       });
     },
     getCookie() {
-      const username = Cookies.get("username");
-      const password = Cookies.get("password");
-      const rememberMe = Cookies.get("rememberMe");
+      const username = Cookies.get('username');
+      const password = Cookies.get('password');
+      const rememberMe = Cookies.get('rememberMe');
       this.loginForm = {
         username: username === undefined ? this.loginForm.username : username,
         password:
@@ -201,22 +199,22 @@ export default {
         if (valid) {
           this.loading = true;
           if (this.loginForm.rememberMe) {
-            Cookies.set("username", this.loginForm.username, { expires: 30 });
-            Cookies.set("password", encrypt(this.loginForm.password), {
+            Cookies.set('username', this.loginForm.username, { expires: 30 });
+            Cookies.set('password', encrypt(this.loginForm.password), {
               expires: 30,
             });
-            Cookies.set("rememberMe", this.loginForm.rememberMe, {
+            Cookies.set('rememberMe', this.loginForm.rememberMe, {
               expires: 30,
             });
           } else {
-            Cookies.remove("username");
-            Cookies.remove("password");
-            Cookies.remove("rememberMe");
+            Cookies.remove('username');
+            Cookies.remove('password');
+            Cookies.remove('rememberMe');
           }
           this.$store
-            .dispatch("Login", this.loginForm)
+            .dispatch('Login', this.loginForm)
             .then(() => {
-              this.$router.push({ path: this.redirect || "/" });
+              this.$router.push({ path: this.redirect || '/' });
             })
             .catch(() => {
               this.loading = false;
@@ -226,7 +224,7 @@ export default {
       });
     },
     goVote() {
-      window.open("https://www.oschina.net/p/linkwechat");
+      window.open('https://www.oschina.net/p/linkwechat');
     },
   },
 };
@@ -238,7 +236,7 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100%;
-  background-image: url("../assets/image/login-background.jpg");
+  background-image: url('../assets/image/login-background.jpg');
   background-size: cover;
 }
 .title {

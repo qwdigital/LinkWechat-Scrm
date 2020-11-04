@@ -1,158 +1,4 @@
-<style lang="scss" scoped>
-.img-wrap {
-  position: relative;
-  &:hover .el-upload-list__item-actions {
-    opacity: 1;
-  }
-}
-.el-upload-list__item-actions {
-  position: absolute;
-  width: 100%;
-  height: 50px;
-  left: 0;
-  top: 0;
-  cursor: default;
-  text-align: center;
-  color: #fff;
-  opacity: 0;
-  font-size: 20px;
-  background-color: rgba(0, 0, 0, 0.5);
-  transition: opacity 0.3s;
-}
-</style>
-<template>
-  <div class="app-container">
-    <el-row :gutter="20">
-      <!--部门数据-->
-      <el-col :span="4" :xs="24">
-        <div class="head-container">
-          <el-input
-            v-model="deptName"
-            placeholder="请输入素材"
-            clearable
-            size="small"
-            prefix-icon="el-icon-search"
-            style="margin-bottom: 20px"
-          />
-          <el-popover placement="top" width="160" v-model="visible">
-            <div>添加一级分类</div>
-            <el-select v-model="model" size="small" placeholder>
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              ></el-option>
-            </el-select>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="visible = false">取消</el-button>
-              <el-button type="primary" size="mini" @click="visible = false">确定</el-button>
-            </div>
-            <el-button
-              slot="reference"
-              type="primary"
-              icon="el-icon-plus"
-              size="mini"
-              @click="handleAdd"
-            >添加分类</el-button>
-          </el-popover>
-        </div>
-        <div class="head-container">
-          <el-tree
-            :data="deptOptions"
-            :props="defaultProps"
-            :expand-on-click-node="false"
-            :filter-node-method="filterNode"
-            ref="tree"
-            default-expand-all
-            @node-click="handleNodeClick"
-          />
-        </div>
-      </el-col>
-      <!--用户数据-->
-      <el-col :span="20" :xs="24">
-        <el-checkbox
-          :indeterminate="isIndeterminate"
-          v-model="checkAll"
-          @change="handleCheckAllChange"
-        >全选</el-checkbox>
-        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">添加图片</el-button>
-        <el-popover placement="top" width="160" v-model="visible">
-          <div>选择分组</div>
-          <el-select v-model="model" size="small" placeholder>
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
-          </el-select>
-          <div style="text-align: right; margin: 0">
-            <el-button size="mini" type="text" @click="visible = false">取消</el-button>
-            <el-button type="primary" size="mini" @click="visible = false">确定</el-button>
-          </div>
-          <el-button slot="reference">移动分组</el-button>
-        </el-popover>
-        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">删除</el-button>
-
-        <el-row :gutter="20">
-          <el-col :span="6" style="margin-top: 24px;" v-for="(item, index) in 10" :key="index">
-            <el-card shadow="hover" body-style="padding: 0px;">
-              <div class="img-wrap">
-                <el-image :src="require('@/assets/image/profile.jpg')" :preview-src-list="srcList"></el-image>
-                <div class="el-upload-list__item-actions">
-                  <span class="el-upload-list__item-preview" @click="edit(file)">
-                    <i class="el-icon-edit"></i>
-                  </span>
-                  <span class="el-upload-list__item-" @click="handleRemove(file)">
-                    <i class="el-icon-delete"></i>
-                  </span>
-                </div>
-              </div>
-              <div style="padding: 14px;">
-                <el-checkbox v-model="kl">16545awfe.jpg</el-checkbox>
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-
-        <pagination
-          v-show="total>0"
-          :total="total"
-          :page.sync="queryParams.pageNum"
-          :limit.sync="queryParams.pageSize"
-          @pagination="getList"
-        />
-      </el-col>
-    </el-row>
-
-    <!-- 添加或修改参数配置对话框 -->
-    <el-dialog title="编辑图片" :visible.sync="open" width="600px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="120px">
-        <el-form-item label="图片名称">
-          <el-input v-model="sd" placeholder></el-input>
-        </el-form-item>
-        <el-form-item label="图片文案">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"></el-input>
-        </el-form-item>
-        <el-form-item label="图片">
-          <el-upload action :show-file-list="false" :on-success="d" :before-upload="d">
-            <img v-if="imageUrl" :src="imageUrl" />
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-          </el-upload>
-          <div>支持JPG,PNG格式，图片大小不超过2M，建议上传宽高1:1的图片</div>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
-      </div>
-    </el-dialog>
-  </div>
-</template>
-
 <script>
-
 export default {
   components: {},
   data() {
@@ -504,3 +350,157 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div class="app-container">
+    <el-row :gutter="20">
+      <!--部门数据-->
+      <el-col :span="4" :xs="24">
+        <div class="head-container">
+          <el-input
+            v-model="deptName"
+            placeholder="请输入素材"
+            clearable
+            size="small"
+            prefix-icon="el-icon-search"
+            style="margin-bottom: 20px"
+          />
+          <el-popover placement="top" width="160" v-model="visible">
+            <div>添加一级分类</div>
+            <el-select v-model="model" size="small" placeholder>
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="visible = false">取消</el-button>
+              <el-button type="primary" size="mini" @click="visible = false">确定</el-button>
+            </div>
+            <el-button
+              slot="reference"
+              type="primary"
+              icon="el-icon-plus"
+              size="mini"
+              @click="handleAdd"
+            >添加分类</el-button>
+          </el-popover>
+        </div>
+        <div class="head-container">
+          <el-tree
+            :data="deptOptions"
+            :props="defaultProps"
+            :expand-on-click-node="false"
+            :filter-node-method="filterNode"
+            ref="tree"
+            default-expand-all
+            @node-click="handleNodeClick"
+          />
+        </div>
+      </el-col>
+      <!--用户数据-->
+      <el-col :span="20" :xs="24">
+        <el-checkbox
+          :indeterminate="isIndeterminate"
+          v-model="checkAll"
+          @change="handleCheckAllChange"
+        >全选</el-checkbox>
+        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">添加图片</el-button>
+        <el-popover placement="top" width="160" v-model="visible">
+          <div>选择分组</div>
+          <el-select v-model="model" size="small" placeholder>
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+          <div style="text-align: right; margin: 0">
+            <el-button size="mini" type="text" @click="visible = false">取消</el-button>
+            <el-button type="primary" size="mini" @click="visible = false">确定</el-button>
+          </div>
+          <el-button slot="reference">移动分组</el-button>
+        </el-popover>
+        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">删除</el-button>
+
+        <el-row :gutter="20">
+          <el-col :span="6" style="margin-top: 24px;" v-for="(item, index) in 10" :key="index">
+            <el-card shadow="hover" body-style="padding: 0px;">
+              <div class="img-wrap">
+                <el-image :src="require('@/assets/image/profile.jpg')" :preview-src-list="srcList"></el-image>
+                <div class="el-upload-list__item-actions">
+                  <span class="el-upload-list__item-preview" @click="edit(file)">
+                    <i class="el-icon-edit"></i>
+                  </span>
+                  <span class="el-upload-list__item-" @click="handleRemove(file)">
+                    <i class="el-icon-delete"></i>
+                  </span>
+                </div>
+              </div>
+              <div style="padding: 14px;">
+                <el-checkbox v-model="kl">16545awfe.jpg</el-checkbox>
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+
+        <pagination
+          v-show="total>0"
+          :total="total"
+          :page.sync="queryParams.pageNum"
+          :limit.sync="queryParams.pageSize"
+          @pagination="getList"
+        />
+      </el-col>
+    </el-row>
+
+    <!-- 添加或修改参数配置对话框 -->
+    <el-dialog title="编辑图片" :visible.sync="open" width="600px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="120px">
+        <el-form-item label="图片名称">
+          <el-input v-model="sd" placeholder></el-input>
+        </el-form-item>
+        <el-form-item label="图片文案">
+          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"></el-input>
+        </el-form-item>
+        <el-form-item label="图片">
+          <el-upload action :show-file-list="false" :on-success="d" :before-upload="d">
+            <img v-if="imageUrl" :src="imageUrl" />
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+          <div>支持JPG,PNG格式，图片大小不超过2M，建议上传宽高1:1的图片</div>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.img-wrap {
+  position: relative;
+  &:hover .el-upload-list__item-actions {
+    opacity: 1;
+  }
+}
+.el-upload-list__item-actions {
+  position: absolute;
+  width: 100%;
+  height: 50px;
+  left: 0;
+  top: 0;
+  cursor: default;
+  text-align: center;
+  color: #fff;
+  opacity: 0;
+  font-size: 20px;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: opacity 0.3s;
+}
+</style>
