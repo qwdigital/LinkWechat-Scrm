@@ -1,5 +1,84 @@
-<style lang="scss" scoped>
-</style>
+<script>
+import * as api from '@/api/enterpriseId'
+// import clipboard from "clipboard";
+
+export default {
+  components: {},
+  props: {},
+  data() {
+    return {
+      query: {
+        pageNum: 1,
+        pageSize: 10,
+        companyName: '',
+      },
+      total: 0,
+      form: {},
+      list: [],
+      dialogVisible: false,
+      disabled: false,
+      loading: false,
+      rules: Object.freeze({
+        companyName: [{ required: true, message: '必填项', trigger: 'blur' }],
+        corpId: [{ required: true, message: '必填项', trigger: 'blur' }],
+        corpSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
+        contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
+      }),
+      status: ['正常', '停用'],
+    }
+  },
+  watch: {},
+  computed: {},
+  created() {
+    this.getList()
+  },
+  mounted() {
+    // new clipboard(".copy-btn");
+  },
+  methods: {
+    getList(page) {
+      page && (this.query.pageNum = page)
+      this.loading = true
+      api
+        .getList(this.query)
+        .then(({ rows, total }) => {
+          this.list = rows
+          this.total = +total
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
+    },
+    edit(data, type) {
+      this.form = Object.assign({}, data || {})
+      this.dialogVisible = true
+      type || !data ? (this.disabled = false) : (this.disabled = true)
+    },
+    submit() {
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          api[this.form.id ? 'update' : 'add'](this.form)
+            .then(() => {
+              this.msgSuccess('操作成功')
+              this.dialogVisible = false
+              this.getList(!this.form.id && 1)
+            })
+            .catch(() => {
+              this.dialogVisible = false
+            })
+        }
+      })
+    },
+    start(corpId) {
+      api.start(corpId).then(({ rows, total }) => {
+        this.msgSuccess('操作成功')
+        this.getList()
+      })
+    },
+  },
+}
+</script>
 
 <template>
   <div>
@@ -7,7 +86,10 @@
       <div class="top-search">
         <el-form inline label-position="right" :model="form" label-width="80px">
           <el-form-item label="企业名称">
-            <el-input v-model="query.companyName" placeholder="请输入"></el-input>
+            <el-input
+              v-model="query.companyName"
+              placeholder="请输入"
+            ></el-input>
           </el-form-item>
           <el-form-item label>
             <el-button
@@ -16,7 +98,8 @@
               icon="el-icon-search"
               size="mini"
               @click="getList(1)"
-            >查询</el-button>
+              >查询</el-button
+            >
           </el-form-item>
         </el-form>
       </div>
@@ -26,7 +109,8 @@
         icon="el-icon-plus"
         size="mini"
         @click="edit()"
-      >添加</el-button>
+        >添加</el-button
+      >
     </div>
     <!-- <el-card shadow="never" :body-style="{padding: '20px 0 0'}">
     </el-card>-->
@@ -39,13 +123,33 @@
         prop="companyName"
         :show-overflow-tooltip="true"
       />
-      <el-table-column label="企业ID" align="center" prop="corpId" :show-overflow-tooltip="true" />
-      <el-table-column label="应用秘钥" align="center" prop="corpSecret" :show-overflow-tooltip="true" />
-      <el-table-column label="绑定时间" align="center" prop="createTime" width="160"></el-table-column>
+      <el-table-column
+        label="企业ID"
+        align="center"
+        prop="corpId"
+        :show-overflow-tooltip="true"
+      />
+      <el-table-column
+        label="应用秘钥"
+        align="center"
+        prop="corpSecret"
+        :show-overflow-tooltip="true"
+      />
+      <el-table-column
+        label="绑定时间"
+        align="center"
+        prop="createTime"
+        width="160"
+      ></el-table-column>
       <el-table-column label="状态" align="center" prop="status" width="160">
-        <template slot-scope="scope">{{status[scope.row.status]}}</template>
+        <template slot-scope="scope">{{ status[scope.row.status] }}</template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
+      <el-table-column
+        label="操作"
+        align="center"
+        width="180"
+        class-name="small-padding fixed-width"
+      >
         <template slot-scope="scope">
           <el-button
             v-hasPermi="['enterpriseWechat:view']"
@@ -53,27 +157,30 @@
             type="text"
             icon="el-icon-view"
             @click="edit(scope.row, 0)"
-          >查看</el-button>
+            >查看</el-button
+          >
           <el-button
             v-hasPermi="['enterpriseWechat:edit']"
             size="mini"
             type="text"
             icon="el-icon-edit"
             @click="edit(scope.row, 1)"
-          >编辑</el-button>
+            >编辑</el-button
+          >
           <el-button
             v-hasPermi="['enterpriseWechat:forbidden']"
             size="mini"
             type="text"
             icon="el-icon-key"
             @click="start(scope.row.corpId)"
-          >启用</el-button>
+            >启用</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
 
     <pagination
-      v-show="total>0"
+      v-show="total > 0"
       :total="total"
       :page.sync="query.pageNum"
       :limit.sync="query.pageSize"
@@ -109,6 +216,10 @@
           <el-input disabled id="copy-input1" v-model="form.companyName"></el-input>
           <el-button type="primary" class="copy-btn" data-clipboard-target="#copy-input1">复制</el-button>
         </el-form-item>-->
+        <el-form-item label="服务商secret" prop="providerSecret">
+          <el-input v-model="form.providerSecret" style="width: 80%"></el-input>
+          <el-link class="fr" type="primary">如何获取？</el-link>
+        </el-form-item>
         <el-form-item label="通讯录管理secret" prop="corpSecret">
           <el-input v-model="form.corpSecret" style="width: 80%"></el-input>
           <el-link class="fr" type="primary">如何获取？</el-link>
@@ -130,93 +241,19 @@
           </el-radio-group>
           <div>开启后，可以将企业客户的添加、编辑以及主动删除客户和被动被客户删除实时的同步到塬微SCRM，无需手动更新同步。</div>
         </el-form-item>-->
+        <el-form-item
+          label="企业微信扫码登陆回调地址"
+          prop="wxQrLoginRedirectUri"
+        >
+          <el-input v-model="form.wxQrLoginRedirectUri"></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submit" v-show="!disabled">确 定</el-button>
+        <el-button type="primary" @click="submit" v-show="!disabled"
+          >确 定</el-button
+        >
       </div>
     </el-dialog>
   </div>
 </template>
-
-<script>
-import * as api from "@/api/enterpriseId";
-// import clipboard from "clipboard";
-
-export default {
-  components: {},
-  props: {},
-  data() {
-    return {
-      query: {
-        pageNum: 1,
-        pageSize: 10,
-        companyName: "",
-      },
-      total: 0,
-      form: {},
-      list: [],
-      dialogVisible: false,
-      disabled: false,
-      loading: false,
-      rules: Object.freeze({
-        companyName: [{ required: true, message: "必填项", trigger: "blur" }],
-        corpId: [{ required: true, message: "必填项", trigger: "blur" }],
-        corpSecret: [{ required: true, message: "必填项", trigger: "blur" }],
-        contactSecret: [{ required: true, message: "必填项", trigger: "blur" }],
-      }),
-      status: ["正常", "停用"],
-    };
-  },
-  watch: {},
-  computed: {},
-  created() {
-    this.getList();
-  },
-  mounted() {
-    // new clipboard(".copy-btn");
-  },
-  methods: {
-    getList(page) {
-      page && (this.query.pageNum = page);
-      this.loading = true;
-      api
-        .getList(this.query)
-        .then(({ rows, total }) => {
-          this.list = rows;
-          this.total = +total;
-          this.loading = false;
-        })
-        .catch(() => {
-          this.loading = false;
-        });
-    },
-    edit(data, type) {
-      this.form = Object.assign({}, data || {});
-      this.dialogVisible = true;
-      type || !data ? (this.disabled = false) : (this.disabled = true);
-    },
-    submit() {
-      this.$refs["form"].validate((valid) => {
-        if (valid) {
-          api[this.form.id ? "update" : "add"](this.form)
-            .then(() => {
-              this.msgSuccess("操作成功");
-              this.dialogVisible = false;
-              this.getList(!this.form.id && 1);
-            })
-            .catch(() => {
-              this.dialogVisible = false;
-            });
-        }
-      });
-    },
-    start(corpId) {
-      api.start(corpId).then(({ rows, total }) => {
-        this.msgSuccess("操作成功");
-        this.getList();
-      });
-    },
-  },
-};
-</script>

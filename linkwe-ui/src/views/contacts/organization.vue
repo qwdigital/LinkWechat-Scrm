@@ -1,8 +1,8 @@
 <script>
-import * as api from "@/api/organization";
+import * as api from '@/api/organization'
 
 export default {
-  name: "Organization",
+  name: 'Organization',
   components: {},
   props: {},
   data() {
@@ -10,28 +10,28 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        isActivate: "",
-        department: "",
+        isActivate: '',
+        department: '',
       },
       dateRange: [],
       treeData: [],
       userList: [],
       status: {
-        0: "启用",
-        1: "禁用",
-        6: "离职",
+        0: '启用',
+        1: '禁用',
+        6: '离职',
       },
       statusActivate: {
-        1: "已激活",
-        2: "已禁用",
-        4: "未激活",
-        5: "退出企业",
-        6: "删除",
+        1: '已激活',
+        2: '已禁用',
+        4: '未激活',
+        5: '退出企业',
+        6: '删除',
       },
       total: 0,
       defaultProps: {
-        label: "name",
-        children: "children",
+        label: 'name',
+        children: 'children',
       },
       form: {},
       dialogVisible: false,
@@ -39,34 +39,34 @@ export default {
       loading: false,
       pickerOptions: {
         disabledDate(time) {
-          return time.getTime() > Date.now();
+          return time.getTime() > Date.now()
         },
         shortcuts: [
           {
-            text: "最近一周",
+            text: '最近一周',
             onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit("pick", [start, end]);
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+              picker.$emit('pick', [start, end])
             },
           },
           {
-            text: "最近一个月",
+            text: '最近一个月',
             onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit("pick", [start, end]);
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+              picker.$emit('pick', [start, end])
             },
           },
           {
-            text: "最近三个月",
+            text: '最近三个月',
             onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-              picker.$emit("pick", [start, end]);
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+              picker.$emit('pick', [start, end])
             },
           },
         ],
@@ -82,178 +82,184 @@ export default {
       totalImg: 0,
       // 表单校验
       rules: Object.freeze({
-        name: [{ required: true, message: "必填项", trigger: "blur" }],
-        userId: [{ required: true, message: "必填项", trigger: "blur" }],
-        department: [{ required: true, message: "必填项", trigger: "blur" }],
-        joinTime: [{ required: true, message: "必填项", trigger: "blur" }],
-        wxAccount: [{ required: true, message: "必填项", trigger: "blur" }],
+        name: [{ required: true, message: '必填项', trigger: 'blur' }],
+        userId: [{ required: true, message: '必填项', trigger: 'blur' }],
+        department: [{ required: true, message: '必填项', trigger: 'blur' }],
+        joinTime: [{ required: true, message: '必填项', trigger: 'blur' }],
+        wxAccount: [{ required: true, message: '必填项', trigger: 'blur' }],
         email: [
-          { required: true, message: "必填项", trigger: "blur" },
+          { required: true, message: '必填项', trigger: 'blur' },
           {
-            type: "email",
+            type: 'email',
             message: "'请输入正确的邮箱地址",
-            trigger: ["blur", "change"],
+            trigger: ['blur', 'change'],
           },
         ],
         mobile: [
-          { required: true, message: "必填项", trigger: "blur" },
+          { required: true, message: '必填项', trigger: 'blur' },
           {
             pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
-            message: "请输入正确的手机号码",
-            trigger: "blur",
+            message: '请输入正确的手机号码',
+            trigger: 'blur',
           },
         ],
       }),
-    };
+    }
   },
   watch: {},
   computed: {},
   created() {
-    this.getTree();
-    this.getList();
+    this.getTree()
+    this.getList()
   },
   mounted() {},
   methods: {
     getTree() {
       api.getTree().then(({ data }) => {
-        this.treeData = this.handleTree(data);
-      });
+        this.treeData = this.handleTree(data)
+      })
     },
     getList(page) {
       // console.log(this.dateRange);
       if (this.dateRange[0]) {
-        this.query.beginTime = this.dateRange[0];
-        this.query.endTime = this.dateRange[1];
+        this.query.beginTime = this.dateRange[0]
+        this.query.endTime = this.dateRange[1]
       }
-      page && (this.query.pageNum = page);
-      this.loading = true;
+      page && (this.query.pageNum = page)
+      this.loading = true
       api
         .getList(this.query)
         .then(({ rows, total }) => {
-          this.userList = rows;
-          this.total = +total;
-          this.loading = false;
+          this.userList = rows
+          this.total = +total
+          this.loading = false
         })
         .catch(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
     handleNodeClick(data) {
-      this.query.department = data.id == 1 ? "" : data.id;
-      this.getList(1);
+      this.query.department = data.id == 1 ? '' : data.id
+      this.getList(1)
     },
     edit(data, type) {
-      this.form = Object.assign({}, data || { _new: true });
-      this.dialogVisible = true;
-      type || !data ? (this.disabled = false) : (this.disabled = true);
+      this.form = Object.assign({}, data || { _new: true })
+      this.dialogVisible = true
+      type || !data ? (this.disabled = false) : (this.disabled = true)
     },
     submit() {
-      this.$refs["form"].validate((valid) => {
+      this.$refs['form'].validate((valid) => {
         if (valid) {
-          let form = JSON.parse(JSON.stringify(this.form));
-          form.department += "";
-          form.isLeaderInDept += "";
-          api[form._new ? "addUser" : "updateUser"](form)
+          let form = JSON.parse(JSON.stringify(this.form))
+          form.department += ''
+          form.isLeaderInDept += ''
+          api[form._new ? 'addUser' : 'updateUser'](form)
             .then(() => {
-              this.msgSuccess("操作成功");
-              this.dialogVisible = false;
-              this.getList(!this.form.id && 1);
+              this.msgSuccess('操作成功')
+              this.dialogVisible = false
+              this.getList(!this.form.id && 1)
             })
             .catch(() => {
-              this.dialogVisible = false;
-            });
+              this.dialogVisible = false
+            })
         }
-      });
+      })
     },
     startOrStop(data) {
       // 0: 启用，1：禁用
       let params = {
         userId: data.userId,
         enable: data.enable == 1 ? 0 : 1,
-      };
+      }
       api.startOrStop(params).then(() => {
-        this.msgSuccess("操作成功");
-        this.getList();
-      });
+        this.msgSuccess('操作成功')
+        this.getList()
+      })
     },
     /** 删除按钮操作 */
     remove(id) {
       // const operIds = id || this.ids + "";
-      this.$confirm("是否确认删除吗?", "警告", {
-        type: "warning",
+      this.$confirm('是否确认删除吗?', '警告', {
+        type: 'warning',
       })
-        .then(function () {
-          return api.remove(id);
+        .then(function() {
+          return api.remove(id)
         })
         .then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        });
+          this.getList()
+          this.msgSuccess('删除成功')
+        })
     },
     handleSelectionChange(val) {
-      this.multipleSelection = val;
+      this.multipleSelection = val
     },
     syncUser() {
       const loading = this.$loading({
         lock: true,
-        text: "Loading",
-        spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 0.7)",
-      });
+        text: 'Loading',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)',
+      })
       api.syncUser().then(() => {
-        loading.close();
-        this.msgSuccess("操作成功");
-        this.getList();
-      });
+        loading.close()
+        this.msgSuccess('操作成功')
+        this.getList()
+      })
     },
     batchImport() {},
     departEdit(data, type) {
       this.formDepart = Object.assign(
         {},
         type ? data : { parentId: data.id, pName: data.name }
-      );
-      this.dialogVisibleDepart = true;
+      )
+      this.dialogVisibleDepart = true
     },
     departRemove(id) {
-      this.$confirm("是否确认删除吗?", "警告", {
-        type: "warning",
+      this.$confirm('是否确认删除吗?', '警告', {
+        type: 'warning',
       })
-        .then(function () {
-          return api.removeDepart(id);
+        .then(function() {
+          return api.removeDepart(id)
         })
         .then(() => {
-          this.getTree();
-          this.msgSuccess("删除成功");
-        });
+          this.getTree()
+          this.msgSuccess('删除成功')
+        })
     },
     departSubmit() {
-      api[this.formDepart.id ? "updateDepart" : "addDepart"](this.formDepart)
+      api[this.formDepart.id ? 'updateDepart' : 'addDepart'](this.formDepart)
         .then(() => {
-          this.msgSuccess("操作成功");
-          this.dialogVisibleDepart = false;
-          this.getTree();
+          this.msgSuccess('操作成功')
+          this.dialogVisibleDepart = false
+          this.getTree()
         })
         .catch(() => {
-          this.dialogVisibleDepart = false;
-        });
+          this.dialogVisibleDepart = false
+        })
     },
     showAvatarDialog() {
-      this.dialogVisibleAvatar = true;
-      this.getImgList(1);
+      this.dialogVisibleAvatar = true
+      this.getImgList(1)
     },
     getImgList() {
       // todo get imgage list
     },
     submitAvatar() {
-      this.form.avatarMediaid = g;
+      this.form.avatarMediaid = g
     },
   },
-};
+}
 </script>
 
 <template>
   <div>
-    <el-form class="top-search" :model="query" ref="queryForm" :inline="true" label-width="100px">
+    <el-form
+      class="top-search"
+      :model="query"
+      ref="queryForm"
+      :inline="true"
+      label-width="100px"
+    >
       <el-form-item label="账号/姓名/手机号" label-width="120px" prop="title">
         <el-input v-model="query.name" placeholder="请输入" clearable />
       </el-form-item>
@@ -281,7 +287,8 @@ export default {
           icon="el-icon-search"
           size="mini"
           @click="getList(1)"
-        >查询</el-button>
+          >查询</el-button
+        >
       </el-form-item>
     </el-form>
 
@@ -292,21 +299,24 @@ export default {
         icon="el-icon-refresh"
         size="mini"
         @click="syncUser"
-      >同步成员</el-button>
+        >同步成员</el-button
+      >
       <el-button
         v-hasPermi="['contacts:organization:import']"
         type="primary"
         icon="el-icon-plus"
         size="mini"
         @click="batchImport"
-      >批量导入</el-button>
+        >批量导入</el-button
+      >
       <el-button
         v-hasPermi="['contacts:organization:addMember']"
         type="primary"
         icon="el-icon-plus"
         size="mini"
         @click="edit()"
-      >添加成员</el-button>
+        >添加成员</el-button
+      >
     </div>
     <el-row :gutter="20">
       <!--部门数据-->
@@ -352,21 +362,39 @@ export default {
       </el-col>
       <!--用户数据-->
       <el-col :span="18" :xs="24">
-        <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
+        <el-table
+          v-loading="loading"
+          :data="userList"
+          @selection-change="handleSelectionChange"
+        >
           <el-table-column type="selection" width="50" align="center" />
-          <el-table-column label="姓名" align="center" prop="name" :show-overflow-tooltip="true" />
+          <el-table-column
+            label="姓名"
+            align="center"
+            prop="name"
+            :show-overflow-tooltip="true"
+          />
           <el-table-column label="性别" align="center" prop="gender">
-            <template slot-scope="scope">{{scope.row.gender === 1 ? '男' : '女'}}</template>
+            <template slot-scope="scope">{{
+              scope.row.gender === 1 ? '男' : '女'
+            }}</template>
           </el-table-column>
           <el-table-column label="职务" align="center" prop="position" />
           <el-table-column label="手机号" align="center" prop="mobile" />
-          <el-table-column label="入职时间" align="center" prop="joinTime" width="160">
+          <el-table-column
+            label="入职时间"
+            align="center"
+            prop="joinTime"
+            width="160"
+          >
             <!-- <template slot-scope="scope">
               <span>{{ parseTime(scope.row.createTime) }}</span>
             </template>-->
           </el-table-column>
           <el-table-column label="状态" align="center" prop="isActivate">
-            <template slot-scope="scope">{{statusActivate[scope.row.isActivate]}}</template>
+            <template slot-scope="scope">{{
+              statusActivate[scope.row.isActivate]
+            }}</template>
           </el-table-column>
           <el-table-column
             label="操作"
@@ -379,31 +407,35 @@ export default {
                 v-hasPermi="['contacts:organization:view']"
                 type="text"
                 @click="edit(scope.row, 0)"
-              >查看</el-button>
+                >查看</el-button
+              >
               <el-button
                 v-hasPermi="['contacts:organization:setStatus']"
                 v-if="scope.row.userId !== 1 && scope.row.enable < 2"
                 type="text"
                 @click="startOrStop(scope.row)"
-              >{{status[scope.row.enable]}}</el-button>
+                >{{ status[scope.row.enable] }}</el-button
+              >
               <el-button
                 v-if="scope.row.enable < 2"
                 v-hasPermi="['contacts:organization:edit']"
                 type="text"
                 @click="edit(scope.row, 1)"
-              >编辑</el-button>
+                >编辑</el-button
+              >
               <el-button
                 v-if="scope.row.enable < 2"
                 v-hasPermi="['contacts:organization:remove']"
                 @click="remove(scope.row.userId)"
                 type="text"
-              >删除</el-button>
+                >删除</el-button
+              >
             </template>
           </el-table-column>
         </el-table>
 
         <pagination
-          v-show="total>0"
+          v-show="total > 0"
           :total="total"
           :page.sync="query.pageNum"
           :limit.sync="query.pageSize"
@@ -414,7 +446,7 @@ export default {
 
     <!-- 人员弹窗 -->
     <el-dialog
-      :title="(form.id ? disabled ? '查看' : '修改' : '添加') + '成员'"
+      :title="(form.id ? (disabled ? '查看' : '修改') : '添加') + '成员'"
       :visible.sync="dialogVisible"
     >
       <el-row :gutter="10">
@@ -424,7 +456,11 @@ export default {
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>-->
           <div class="avatar-wrap ac" @click="showAvatarDialog">
-            <img class="avatar" v-if="form.avatarMediaid" :src="form.avatarMediaid" />
+            <img
+              class="avatar"
+              v-if="form.avatarMediaid"
+              :src="form.avatarMediaid"
+            />
             <i v-else class="el-icon-plus avatar-uploader-icon cc"></i>
           </div>
         </el-col>
@@ -441,10 +477,17 @@ export default {
               <el-input v-model="form.name"></el-input>
             </el-form-item>
             <el-form-item label="昵称">
-              <el-input v-model="form.alias" placeholder="可在新闻公告应用的生日祝福等场景使用"></el-input>
+              <el-input
+                v-model="form.alias"
+                placeholder="可在新闻公告应用的生日祝福等场景使用"
+              ></el-input>
             </el-form-item>
             <el-form-item label="账号" prop="userId">
-              <el-input :disabled="form.id" v-model="form.userId" placeholder="成员唯一标识，不支持更改，不支持中文"></el-input>
+              <el-input
+                :disabled="form.id"
+                v-model="form.userId"
+                placeholder="成员唯一标识，不支持更改，不支持中文"
+              ></el-input>
             </el-form-item>
             <el-form-item label="性别">
               <el-radio-group v-model="form.gender">
@@ -466,7 +509,13 @@ export default {
                 v-model="form.department"
                 :options="treeData"
                 :show-all-levels="false"
-                :props="{ expandTrigger: 'hover', checkStrictly: true,/** multiple: true,*/ emitPath: false, value: 'id', label: 'name' }"
+                :props="{
+                  expandTrigger: 'hover',
+                  checkStrictly: true,
+                  /** multiple: true,*/ emitPath: false,
+                  value: 'id',
+                  label: 'name',
+                }"
               ></el-cascader>
             </el-form-item>
             <el-form-item label="职位">
@@ -519,7 +568,10 @@ export default {
     </el-dialog>
 
     <!-- 部门弹窗 -->
-    <el-dialog :title="(formDepart.id ? '修改' : '添加') + '部门'" :visible.sync="dialogVisibleDepart">
+    <el-dialog
+      :title="(formDepart.id ? '修改' : '添加') + '部门'"
+      :visible.sync="dialogVisibleDepart"
+    >
       <el-form :model="formDepart" :label-width="80">
         <el-form-item label="部门名称">
           <el-input v-model="formDepart.name"></el-input>
@@ -549,7 +601,7 @@ export default {
       </div>
       <el-radio-group class="img-wrap" v-model="form.avatarMediaid">
         <el-radio :label="3" v-for="(item, index) in 20" :key="index">
-          <img class="img-li" src="~@/assets/image/login-background.jpg" alt />
+          <img class="img-li" src="~@/assets/image/login-background.png" alt />
         </el-radio>
       </el-radio-group>
       <div slot="footer">

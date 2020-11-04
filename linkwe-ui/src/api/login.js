@@ -52,3 +52,13 @@ export function wxQrLogin(auth_code) {
     },
   });
 }
+
+/**
+ * 获取扫码登陆相关参数
+ */
+export function findWxQrLoginInfo() {
+  return request({
+    url: '/findWxQrLoginInfo',
+    method: 'get',
+  });
+}

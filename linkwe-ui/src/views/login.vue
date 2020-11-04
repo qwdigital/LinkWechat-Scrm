@@ -71,7 +71,7 @@
           <span v-else>登 录 中...</span>
         </el-button>
       </el-form-item>
-      <el-form-item class="ac">
+      <el-form-item class="ac" v-if="authLink">
         <a :href="authLink">
           <img
             src="//wwcdn.weixin.qq.com/node/wwopen/wwopenmng/style/images/independent/brand/300x40_white$4dab5411.png"
@@ -119,10 +119,10 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { getCodeImg } from '@/api/login';
-import Cookies from 'js-cookie';
-import { encrypt, decrypt } from '@/utils/jsencrypt';
+import axios from 'axios'
+import { getCodeImg, findWxQrLoginInfo } from '@/api/login'
+import Cookies from 'js-cookie'
+import { encrypt, decrypt } from '@/utils/jsencrypt'
 
 export default {
   name: 'Login',
@@ -152,82 +152,83 @@ export default {
       redirect: undefined,
       authLink: '',
       dialogVisible: true,
-    };
+    }
   },
   watch: {
     $route: {
       handler: function(route) {
-        this.redirect = route.query && route.query.redirect;
+        this.redirect = route.query && route.query.redirect
       },
       immediate: true,
     },
   },
   created() {
-    let authParams = {
-      appid: 'ww24262ce93851488f', // * 服务商的CorpID
-      redirect_uri: encodeURIComponent(
-        process.env.VUE_APP_BASE_API + '/#/authCallback'
-      ), // * 授权登录之后目的跳转网址，需要做urlencode处理。所在域名需要与授权完成回调域名一致
-      state: '', // ? 用于企业或服务商自行校验session，防止跨域攻击
-      usertype: 'admin', // ? 支持登录的类型。admin代表管理员登录（使用微信扫码）,member代表成员登录（使用企业微信扫码），默认为admin
-    };
-    this.authLink = `https://open.work.weixin.qq.com/wwopen/sso/3rd_qrConnect?appid=${authParams.appid}&redirect_uri=${authParams.redirect_uri}&state=${authParams.state}&usertype=${authParams.usertype}`;
+    // data.wxQrLoginRedirectUri http://192.168.0.101/#/authCallback
+    findWxQrLoginInfo().then(({ data }) => {
+      let authParams = {
+        appid: data.corpId, // * 服务商的CorpID
+        redirect_uri: encodeURIComponent(data.wxQrLoginRedirectUri), // * 授权登录之后目的跳转网址，需要做urlencode处理。所在域名需要与授权完成回调域名一致
+        state: '', // ? 用于企业或服务商自行校验session，防止跨域攻击
+        usertype: 'admin', // ? 支持登录的类型。admin代表管理员登录（使用微信扫码）,member代表成员登录（使用企业微信扫码），默认为admin
+      }
+      this.authLink = `https://open.work.weixin.qq.com/wwopen/sso/3rd_qrConnect?appid=${authParams.appid}&redirect_uri=${authParams.redirect_uri}&state=${authParams.state}&usertype=${authParams.usertype}`
+    })
 
-    this.getCode();
-    this.getCookie();
+    this.getCode()
+    this.getCookie()
   },
   methods: {
     getCode() {
       getCodeImg().then((res) => {
-        this.codeUrl = 'data:image/gif;base64,' + res.img;
-        this.loginForm.uuid = res.uuid;
-      });
+        this.codeUrl = 'data:image/gif;base64,' + res.img
+        this.loginForm.uuid = res.uuid
+      })
     },
     getCookie() {
-      const username = Cookies.get('username');
-      const password = Cookies.get('password');
-      const rememberMe = Cookies.get('rememberMe');
+      const username = Cookies.get('username')
+      const password = Cookies.get('password')
+      const rememberMe = Cookies.get('rememberMe')
       this.loginForm = {
         username: username === undefined ? this.loginForm.username : username,
         password:
           password === undefined ? this.loginForm.password : decrypt(password),
         rememberMe: rememberMe === undefined ? false : Boolean(rememberMe),
-      };
+      }
     },
     handleLogin() {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
-          this.loading = true;
+          this.loading = true
           if (this.loginForm.rememberMe) {
-            Cookies.set('username', this.loginForm.username, { expires: 30 });
+            Cookies.set('username', this.loginForm.username, { expires: 30 })
             Cookies.set('password', encrypt(this.loginForm.password), {
               expires: 30,
-            });
+            })
             Cookies.set('rememberMe', this.loginForm.rememberMe, {
               expires: 30,
-            });
+            })
           } else {
-            Cookies.remove('username');
-            Cookies.remove('password');
-            Cookies.remove('rememberMe');
+            Cookies.remove('username')
+            Cookies.remove('password')
+            Cookies.remove('rememberMe')
           }
           this.$store
             .dispatch('Login', this.loginForm)
             .then(() => {
-              this.$router.push({ path: this.redirect || '/' });
+              this.$router.push({ path: this.redirect || '/' })
             })
             .catch(() => {
-              this.loading = false;
-              this.getCode();
-            });
+              this.loading = false
+              this.getCode()
+            })
         }
-      });
+      })
     },
     goVote() {
-      window.open('https://www.oschina.net/p/linkwechat');
+      window.open('https://www.oschina.net/p/linkwechat')
     },
   },
-};
+}
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
@@ -236,7 +237,7 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100%;
-  background-image: url('../assets/image/login-background.jpg');
+  background-image: url('../assets/image/login-background.png');
   background-size: cover;
 }
 .title {
