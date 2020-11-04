@@ -1,18 +1,5 @@
 package com.linkwechat.web.controller.system;
 
-import java.util.List;
-import java.util.Set;
-
-import com.linkwechat.wecom.client.WeAccessTokenClient;
-import com.linkwechat.wecom.domain.WeCorpAccount;
-import com.linkwechat.wecom.domain.dto.WeLoginUserInfoDto;
-import com.linkwechat.wecom.service.IWeAccessTokenService;
-import com.linkwechat.wecom.service.IWeCorpAccountService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysMenu;
@@ -24,6 +11,18 @@ import com.linkwechat.framework.web.service.SysLoginService;
 import com.linkwechat.framework.web.service.SysPermissionService;
 import com.linkwechat.framework.web.service.TokenService;
 import com.linkwechat.system.service.ISysMenuService;
+import com.linkwechat.wecom.client.WeAccessTokenClient;
+import com.linkwechat.wecom.domain.WeCorpAccount;
+import com.linkwechat.wecom.domain.dto.WeLoginUserInfoDto;
+import com.linkwechat.wecom.service.IWeCorpAccountService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * 登录验证
@@ -52,6 +51,8 @@ public class SysLoginController
 
     @Autowired
     private WeAccessTokenClient weAccessTokenClient;
+
+
 
     /**
      * 登录方法
@@ -118,7 +119,7 @@ public class SysLoginController
      * 获取企业扫码登录相关参数
      * @return
      */
-    @GetMapping("/findQrLoginParm")
+    @GetMapping("/findWxQrLoginInfo")
     public AjaxResult findQrLoginParm(){
 
         WeCorpAccount validWeCorpAccount
@@ -142,10 +143,19 @@ public class SysLoginController
     @GetMapping("/wxQrLogin")
     public AjaxResult wxQrLogin(String auth_code){
 
+        AjaxResult ajax = AjaxResult.success();
+
         WeLoginUserInfoDto loginInfo = weAccessTokenClient.getLoginInfo(auth_code);
+        if( null != loginInfo.getUser_info()){
 
-        System.out.println(auth_code);
+                String token = loginService.noPwdLogin(loginInfo.getUser_info().getUserid());
+                ajax.put(Constants.TOKEN, token);
 
-        return AjaxResult.success();
+        }
+
+        return ajax;
+
     }
+
+
 }
