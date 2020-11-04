@@ -1,7 +1,9 @@
 package com.linkwechat.wecom.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.linkwechat.common.core.domain.Tree;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.TreeUtil;
 import com.linkwechat.wecom.domain.WeCategory;
 import com.linkwechat.wecom.domain.vo.WeCategoryVo;
@@ -28,6 +30,8 @@ public class WeCategoryServiceImpl implements IWeCategoryService {
         if (null != weCategory) {
             throw new WeComException("名称已存在！");
         }
+        category.setCreateTime(DateUtil.date());
+        category.setId(SnowFlakeUtil.nextId());
         return weCategoryMapper.insertWeCategory(category);
     }
 
@@ -38,6 +42,7 @@ public class WeCategoryServiceImpl implements IWeCategoryService {
         if (null != weCategory) {
             throw new WeComException("名称已存在！");
         }
+        category.setUpdateTime(DateUtil.date());
         return weCategoryMapper.updateWeCategory(category);
     }
 

@@ -66,4 +66,8 @@ public class WeCorpAccount extends BaseEntity
     private String providerSecret;
 
 
+    @ApiModelProperty("企业微信扫码登陆回调地址")
+    private String wxQrLoginRedirectUri;
+
+
 }

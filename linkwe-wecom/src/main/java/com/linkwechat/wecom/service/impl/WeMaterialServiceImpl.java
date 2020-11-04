@@ -1,9 +1,11 @@
 package com.linkwechat.wecom.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.config.ServerConfig;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.wecom.domain.WeMaterial;
 import com.linkwechat.wecom.domain.vo.WeMaterialFileVO;
@@ -60,6 +62,8 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
 
     @Override
     public int insertWeMaterial(WeMaterial weMaterial) {
+        weMaterial.setCreateTime(DateUtil.date());
+        weMaterial.setId(SnowFlakeUtil.nextId());
         return weMaterialMapper.insertWeMaterial(weMaterial);
     }
 
@@ -75,6 +79,7 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
 
     @Override
     public int updateWeMaterial(WeMaterial weMaterial) {
+        weMaterial.setCreateTime(DateUtil.date());
         return weMaterialMapper.updateWeMaterial(weMaterial);
     }
 

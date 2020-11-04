@@ -6,6 +6,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.domain.model.LoginUser;
@@ -35,6 +37,9 @@ public class SysLoginService
     @Autowired
     private RedisCache redisCache;
 
+    @Autowired
+    private UserDetailsService userDetailsService;
+
     /**
      * 登录验证
      * 
@@ -46,6 +51,7 @@ public class SysLoginService
      */
     public String login(String username, String password, String code, String uuid)
     {
+
         String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;
         String captcha = redisCache.getCacheObject(verifyKey);
         redisCache.deleteObject(verifyKey);
@@ -59,6 +65,7 @@ public class SysLoginService
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error")));
             throw new CaptchaException();
         }
+
         // 用户验证
         Authentication authentication = null;
         try
@@ -85,4 +92,20 @@ public class SysLoginService
         // 生成token
         return tokenService.createToken(loginUser);
     }
+
+
+    /**
+     * 无密码登录
+     * @param userName
+     * @return
+     */
+    public String noPwdLogin(String userName){
+
+        LoginUser loginUser
+                = (LoginUser)userDetailsService.loadUserByUsername(userName);
+
+        return tokenService.createToken(loginUser);
+    }
+
+
 }

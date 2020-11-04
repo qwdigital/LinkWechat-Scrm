@@ -32,7 +32,7 @@ public enum MediaType {
         this.mediaType = mediaType;
     }
 
-    public static Optional<MediaType> of(String type){
-        return Stream.of(values()).filter(s->s.type.equals(type)).findFirst();
+    public static Optional<MediaType> of(String type) {
+        return Stream.of(values()).filter(s -> s.type.equals(type)).findFirst();
     }
 }

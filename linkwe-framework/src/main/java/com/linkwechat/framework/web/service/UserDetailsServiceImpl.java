@@ -4,12 +4,15 @@ import cn.hutool.core.util.ArrayUtil;
 import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.domain.entity.SysRole;
+import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.core.domain.model.LoginUser;
+import com.linkwechat.common.enums.UserStatus;
+import com.linkwechat.common.exception.BaseException;
 import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.system.mapper.SysRoleMapper;
-import com.linkwechat.system.service.ISysRoleService;
-import com.linkwechat.wecom.domain.WeCorpAccount;
+import com.linkwechat.system.service.ISysUserService;
 import com.linkwechat.wecom.domain.WeUser;
-import com.linkwechat.wecom.service.IWeCorpAccountService;
 import com.linkwechat.wecom.service.IWeUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,14 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import com.linkwechat.common.core.domain.entity.SysUser;
-import com.linkwechat.common.core.domain.model.LoginUser;
-import com.linkwechat.common.enums.UserStatus;
-import com.linkwechat.common.exception.BaseException;
-import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.system.service.ISysUserService;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -70,7 +66,7 @@ public class UserDetailsServiceImpl implements UserDetailsService
             }
 
             //注册到we_user表中
-             user=SysUser.builder()
+            user=SysUser.builder()
                     .userName(weUser.getUserId())
                     .nickName(weUser.getName())
                     .userType(Constants.USER_TYPE_WECOME)
@@ -78,15 +74,15 @@ public class UserDetailsServiceImpl implements UserDetailsService
                     .phonenumber(weUser.getMobile())
                     .sex(weUser.getGender().toString())
                     .avatar(weUser.getAvatarMediaid())
-                     .roleIds(ArrayUtil.toArray(roleMapper.selectRoleList(SysRole.builder()
-                             .roleKey(Constants.DEFAULT_WECOME_ROLE_KEY)
-                             .build()).stream().map(SysRole::getRoleId).collect(Collectors.toList()), Long.class))
+                    .roleIds(ArrayUtil.toArray(roleMapper.selectRoleList(SysRole.builder()
+                            .roleKey(Constants.DEFAULT_WECOME_ROLE_KEY)
+                            .build()).stream().map(SysRole::getRoleId).collect(Collectors.toList()), Long.class))
                     .password(SecurityUtils.encryptPassword(ruoYiConfig.getWeUserDefaultPwd()))
                     .build();
 
-                userService.insertUser(
-                        user
-                );
+            userService.insertUser(
+                    user
+            );
         }
         else if (UserStatus.DELETED.getCode().equals(user.getDelFlag()))
         {
@@ -100,10 +96,11 @@ public class UserDetailsServiceImpl implements UserDetailsService
         }
 
 
-
-
         return createLoginUser(user);
     }
+
+
+
 
     public UserDetails createLoginUser(SysUser user)
     {
