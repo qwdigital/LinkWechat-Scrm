@@ -1,6 +1,6 @@
-import request from '@/utils/request';
-const service = config.services.wecom + '/material';
-const serviceCategory = config.services.wecom + '/category';
+import request from '@/utils/request'
+const service = config.services.wecom + '/material'
+const serviceCategory = config.services.wecom + '/category'
 
 /**
  * 查询素材列表
@@ -10,7 +10,7 @@ search:搜索的值
  }
  */
 export function getList(params) {
-  return request({ url: service + '/list', params });
+  return request({ url: service + '/list', params })
 }
 
 /**
@@ -18,7 +18,7 @@ export function getList(params) {
  * @param {*} id 素材id
  */
 export function getDetail(id) {
-  return request({ url: service + '/' + id });
+  return request({ url: service + '/' + id })
 }
 /**
  * 添加素材信息
@@ -33,7 +33,7 @@ coverUrl:封面本地资源文件
 }
  */
 export function add(data) {
-  return request({ url: service, method: 'post', params: data });
+  return request({ url: service, method: 'post', params: data })
 }
 
 /**
@@ -50,7 +50,7 @@ coverUrl:封面本地资源文件
 }
  */
 export function update(data) {
-  return request({ url: service, method: 'put', data });
+  return request({ url: service, method: 'put', data })
 }
 
 /**
@@ -58,7 +58,7 @@ export function update(data) {
  * @param {*} id
  */
 export function remove(id) {
-  return request({ url: service + '/' + id, method: 'DELETE' });
+  return request({ url: service + '/' + id, method: 'DELETE' })
 }
 
 /**
@@ -66,7 +66,7 @@ export function remove(id) {
  * @param {*} data 
  * {
  * file:文件
-type:0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file)
+type:0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file), 4 文本
 }
  */
 export function upload(data) {
@@ -74,7 +74,7 @@ export function upload(data) {
     url: config.services.wecom + '/upload',
     method: 'post',
     params: data,
-  });
+  })
 }
 
 /**
@@ -82,7 +82,7 @@ export function upload(data) {
  * @param {*} mediaType 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file), 4 文本
  */
 export function getTree(mediaType) {
-  return request({ url: serviceCategory + '/list', params: { mediaType } });
+  return request({ url: serviceCategory + '/list', params: { mediaType } })
 }
 
 /**
@@ -90,7 +90,7 @@ export function getTree(mediaType) {
  * @param {*} id
  */
 export function getTreeDetail(id) {
-  return request({ url: serviceCategory + '/' + id });
+  return request({ url: serviceCategory + '/' + id })
 }
 
 /**
@@ -103,7 +103,7 @@ export function getTreeDetail(id) {
 }
  */
 export function addTree(data) {
-  return request({ url: serviceCategory, method: 'post', data });
+  return request({ url: serviceCategory, method: 'post', data })
 }
 
 /**
@@ -116,7 +116,7 @@ export function addTree(data) {
 }
  */
 export function updateTree(data) {
-  return request({ url: serviceCategory, method: 'put', data });
+  return request({ url: serviceCategory, method: 'put', data })
 }
 
 /**
@@ -127,5 +127,5 @@ export function removeTree(ids) {
   return request({
     url: serviceCategory + '/' + ids,
     method: 'DELETE',
-  });
+  })
 }
