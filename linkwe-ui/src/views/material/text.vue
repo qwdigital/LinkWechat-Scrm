@@ -1,6 +1,5 @@
 <script>
 import MaPage from '@/views/material/components/MaPage'
-import {} from '@/api/material'
 
 export default {
   components: { MaPage },
@@ -19,16 +18,14 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map((item) => item.userId)
-      this.single = selection.length != 1
-      this.multiple = !selection.length
+      this.ids = selection.map((item) => item.id) + ''
     },
   },
 }
 </script>
 
 <template>
-  <MaPage ref="page" type="4" @listChange="listChange">
+  <MaPage ref="page" type="4" @listChange="listChange" :selected="ids">
     <el-table
       class="mt20"
       :data="list"
@@ -38,15 +35,10 @@ export default {
       <el-table-column
         label="文本内容"
         align="center"
-        prop="userName"
+        prop="content"
         :show-overflow-tooltip="true"
       />
-      <el-table-column
-        label="创建时间"
-        align="center"
-        prop="createTime"
-        width="160"
-      >
+      <el-table-column label="创建时间" align="center" prop="createTime">
         <!-- <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template> -->

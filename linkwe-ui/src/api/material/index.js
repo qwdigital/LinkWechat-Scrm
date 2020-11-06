@@ -33,7 +33,7 @@ coverUrl:封面本地资源文件
 }
  */
 export function add(data) {
-  return request({ url: service, method: 'post', params: data })
+  return request({ url: service, method: 'post', data })
 }
 
 /**
@@ -73,7 +73,26 @@ export function upload(data) {
   return request({
     url: config.services.wecom + '/upload',
     method: 'post',
-    params: data,
+    data,
+  })
+}
+
+/**
+ * 素材移动分组
+ * @param {*} data
+ * {
+ * categoryId 选择移动的分组类目id
+ * materials // 移动的素材ids，逗号分隔
+ * }
+ */
+export function moveGroup(categoryId, materials) {
+  return request({
+    url: service + '/resetCategory',
+    method: 'post',
+    data: {
+      categoryId,
+      materials,
+    },
   })
 }
 

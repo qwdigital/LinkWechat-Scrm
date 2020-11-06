@@ -6,6 +6,11 @@ import {
   updateTree,
   addTree,
   removeTree,
+  getDetail,
+  add,
+  update,
+  remove,
+  moveGroup,
 } from '@/api/material'
 export default {
   name: 'MaPage',
@@ -15,6 +20,11 @@ export default {
     type: {
       type: String,
       default: '0',
+    },
+    // 选中的素材ids
+    selected: {
+      type: [Array, String],
+      default: '',
     },
   },
   data() {
@@ -33,18 +43,20 @@ export default {
       // 树props
       treeProps: {
         children: 'children',
-        label: 'label',
+        label: 'name',
       },
       treeForm: {}, // 树表格
       treeDialogVisible: false, // 树表格对话框显隐
-      group: [], // 选择的分组
+
+      group: '', // 选择的分组
       groupDialogVisible: false, // 移动分组对话框
       // 分组props
       groupProps: {
-        expandTrigger: 'hover',
+        // expandTrigger: 'hover',
         checkStrictly: true,
         children: 'children',
-        label: 'label',
+        label: 'name',
+        value: 'id',
         emitPath: false,
       },
 
@@ -52,7 +64,7 @@ export default {
       form: {}, // 素材表单
       dialogVisible: false, // 素材表格对话框显隐
       // 表单校验
-      rules: {
+      rules: Object.freeze({
         content: [{ required: true, message: '不能为空', trigger: 'blur' }],
         materialUrl: [{ required: true, message: '不能为空', trigger: 'blur' }],
         materialName: [
@@ -60,7 +72,7 @@ export default {
         ],
         digest: [{ required: true, message: '不能为空', trigger: 'blur' }],
         coverUrl: [{ required: true, message: '不能为空', trigger: 'blur' }],
-      },
+      }),
     }
   },
   watch: {},
@@ -83,7 +95,7 @@ export default {
       this.loading = true
       getList(this.query)
         .then(({ rows, total }) => {
-          this.userList = rows
+          this.list = rows
           this.total = +total
           this.loading = false
           this.$emit('listChange', this.list)
@@ -106,23 +118,21 @@ export default {
     treeEdit(data, type) {
       this.treeForm = Object.assign(
         {},
-        type ? data : { parentId: data.id || '0' }
+        type ? data : { parentId: data.id || '0', mediaType: this.type }
       )
       this.treeDialogVisible = true
     },
     // 类目树节点提交
     treeSubmit() {
-      this.treeForm.id
-        ? 'updateTree'
-        : 'addTree'(this.treeForm)
-            .then(() => {
-              this.msgSuccess('操作成功')
-              this.treeDialogVisible = false
-              this.getTree()
-            })
-            .catch(() => {
-              this.treeDialogVisible = false
-            })
+      ;(this.treeForm.id ? updateTree : addTree)(this.treeForm)
+        .then(() => {
+          this.msgSuccess('操作成功')
+          this.treeDialogVisible = false
+          this.getTree()
+        })
+        .catch(() => {
+          this.treeDialogVisible = false
+        })
     },
     // 类目树节点删除
     treeRemove(id) {
@@ -139,7 +149,10 @@ export default {
     },
     // 素材添加/编辑
     edit(data, type) {
-      this.form = Object.assign({}, data || { _new: true })
+      this.form = Object.assign(
+        {},
+        data || { categoryId: this.query.categoryId, _new: true }
+      )
       this.dialogVisible = true
       // type || !data ? (this.disabled = false) : (this.disabled = true)
     },
@@ -148,13 +161,11 @@ export default {
       this.$refs['form'].validate((valid) => {
         if (valid) {
           let form = JSON.parse(JSON.stringify(this.form))
-          form.department += ''
-          form.isLeaderInDept += ''
-          api[form._new ? 'addUser' : 'updateUser'](form)
+          ;(form.id ? update : add)(form)
             .then(() => {
               this.msgSuccess('操作成功')
               this.dialogVisible = false
-              this.getList(!this.form.id && 1)
+              this.getList()
             })
             .catch(() => {
               this.dialogVisible = false
@@ -164,17 +175,24 @@ export default {
     },
     // 素材删除
     remove(id) {
-      // const operIds = id || this.ids + "";
+      const Ids = id || this.selected
       this.$confirm('是否确认删除吗?', '警告', {
         type: 'warning',
       })
         .then(function() {
-          return remove(id)
+          return remove(Ids)
         })
         .then(() => {
           this.getList()
           this.msgSuccess('删除成功')
         })
+    },
+    moveGroup() {
+      moveGroup(this.group, this.selected).then(() => {
+        this.getList()
+        this.msgSuccess('操作成功')
+        this.groupDialogVisible = false
+      })
     },
   },
 }
@@ -184,46 +202,45 @@ export default {
   <div class="page">
     <el-row :gutter="20">
       <el-col :span="6" :xs="24">
-        <div class="head-container">
+        <div>
           <el-button slot="reference" type="primary" @click="treeEdit({}, 0)"
             >添加分类</el-button
           >
         </div>
-        <div class="head-container">
+        <div class="mt20">
           <!-- :filter-node-method="filterNode" -->
           <el-tree
+            ref="tree"
             :data="treeData"
             :props="treeProps"
             :expand-on-click-node="false"
-            ref="tree"
+            highlight-current
             default-expand-all
             @node-click="handleNodeClick"
-          />
-          <div class="custom-tree-node" slot-scope="{ node, data }">
-            <span>{{ node.label }}</span>
-            <span class="fr">
-              <i
-                class="el-icon-edit"
-                title="编辑"
-                v-hasPermi="['contacts:organization:editDep']"
-                v-if="node.level !== 1"
-                @click.stop="treeEdit(data, 1)"
-              ></i>
-              <i
-                class="el-icon-plus"
-                title="添加子分类"
-                v-hasPermi="['contacts:organization:addDep']"
-                @click.stop="treeEdit(data, 0)"
-              ></i>
-              <i
-                class="el-icon-minus"
-                title="删除"
-                v-hasPermi="['contacts:organization:removeDep']"
-                v-if="node.level !== 1"
-                @click.stop="treeRemove(data.id)"
-              ></i>
-            </span>
-          </div>
+          >
+            <div class="custom-tree-node" slot-scope="{ node, data }">
+              <span>{{ node.label }}</span>
+              <span class="fr">
+                <i
+                  class="el-icon-edit"
+                  title="编辑"
+                  @click.stop="treeEdit(data, 1)"
+                ></i>
+                <i
+                  class="el-icon-plus"
+                  title="添加子分类"
+                  v-hasPermi="['contacts:organization:addDep']"
+                  @click.stop="treeEdit(data, 0)"
+                ></i>
+                <i
+                  class="el-icon-minus"
+                  title="删除"
+                  v-hasPermi="['contacts:organization:removeDep']"
+                  @click.stop="treeRemove(data.id)"
+                ></i>
+              </span>
+            </div>
+          </el-tree>
         </div>
       </el-col>
 
@@ -243,7 +260,9 @@ export default {
             style="width: 300px;"
           />
           <el-button class="ml10" @click="getList(1)">搜索</el-button>
-          <el-button @click="remove">删除</el-button>
+          <el-button @click="remove" :disabled="selected.length"
+            >删除</el-button
+          >
           <el-popover placement="top" width="260" v-model="groupDialogVisible">
             <div>选择分组</div>
             <div style="position: relative; margin: 10px 0;">
@@ -257,14 +276,13 @@ export default {
               <el-button size="mini" @click="groupDialogVisible = false"
                 >取消</el-button
               >
-              <el-button
-                type="primary"
-                size="mini"
-                @click="groupDialogVisible = false"
+              <el-button type="primary" size="mini" @click="moveGroup"
                 >确定</el-button
               >
             </div>
-            <el-button slot="reference" class="ml10">移动分组</el-button>
+            <el-button slot="reference" class="ml10" :disabled="selected.length"
+              >移动分组</el-button
+            >
           </el-popover>
 
           <div class="fr">
@@ -424,4 +442,13 @@ export default {
   </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.custom-tree-node {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
+}
+</style>
