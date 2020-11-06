@@ -15,7 +15,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         name: "", // "客户名称",
-        userId: "", // "添加人id",
+        userIds: "", // "添加人id",
         tagIds: "", // "标签id,多个标签，id使用逗号隔开",
         beginTime: "", // "开始时间",
         endTime: "", // "结束时间"
@@ -96,6 +96,9 @@ export default {
       if (this.dateRange[0]) {
         this.query.beginTime = this.dateRange[0];
         this.query.endTime = this.dateRange[1];
+      }else {
+        this.query.beginTime = "";
+        this.query.endTime = "";
       }
       page && (this.query.pageNum = page);
       this.loading = true;
@@ -173,11 +176,30 @@ export default {
       api.sync().then(() => {
         loading.close();
         this.msgSuccess("后台开始同步数据，请稍后关注进度");
-      });
+      }).catch(fail => {
+        loading.close();
+        console.log(fail)
+      });;
+    },
+    /** 导出按钮操作 */
+    exportCustomer() {
+      const queryParams = this.query;
+      this.$confirm("是否确认导出所有客户数据项?", "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+              .then(function () {
+                return api.exportCustomer(queryParams);
+              })
+              .then((response) => {
+                this.download(response.msg);
+              })
+              .catch(function () {});
     },
     selectedUser(list) {
       this.queryUser = list;
-      this.query.userId = list.map((d) => d.id) + "";
+      this.query.userIds = list.map((d) => d.userId) + "";
     },
     submitSelectTag(formName) {
       if (this.tagDialogType.type === "query") {
@@ -267,7 +289,7 @@ export default {
         <el-button
           v-hasPermi="['customerManage:customer:export']"
           type="cyan"
-          @click="isMoreFilter = !isMoreFilter"
+          @click="exportCustomer"
         >导出列表</el-button>
       </el-form-item>
     </el-form>

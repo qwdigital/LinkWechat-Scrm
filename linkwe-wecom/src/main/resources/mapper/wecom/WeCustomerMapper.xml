@@ -37,7 +37,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectWeCustomerVo">
-        select id, external_userid, name, avatar, type, gender, unionid, birthday, corp_name, corp_full_name, position from we_customer
+        select external_userid, name, avatar, type, gender, unionid, birthday, corp_name, corp_full_name, position from we_customer
     </sql>
 
     <select id="selectWeCustomerList" parameterType="WeCustomer" resultMap="WeCustomerResult">
@@ -73,17 +73,50 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         LEFT JOIN we_user wu ON wu.user_id=wfcr.user_id
          LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.flower_customer_rel_id = wfcr.id
         LEFT JOIN we_tag wt ON wt.tag_id = wfcrf.tag_id
+        <where>
+            <if test="name != null and name !=''">
+                AND wc.name like concat('%', #{name}, '%')
+            </if>
+            <if test="userIds != null and userIds !=''">
+                <if test="userIds.indexOf(',') != -1">
+                    and  wfcr.user_id in
+                    <foreach item="item" index="index" collection="userIds.split(',')" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="userIds.indexOf(',') == -1">
+                    and  wfcr.user_id=#{userIds}
+                </if>
+            </if>
+
+            <if test="tagIds != null and tagIds !=''">
+                <if test="tagIds.indexOf(',') != -1">
+                    and  wt.tag_id in
+                    <foreach item="item" index="index" collection="tagIds.split(',')" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="tagIds.indexOf(',') == -1">
+                    and  wt.tag_id=#{tagIds}
+                </if>
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(wfcr.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(wfcr.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+        </where>
     </select>
     
-    <select id="selectWeCustomerById" parameterType="Long" resultMap="WeCustomerResult">
+    <select id="selectWeCustomerById" parameterType="String" resultMap="WeCustomerResult">
         <include refid="selectWeCustomerVo"/>
-        where id = #{id}
+        where external_userid = #{externalUserId}
     </select>
         
     <insert id="insertWeCustomer" parameterType="WeCustomer">
         insert into we_customer
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">id,</if>
             <if test="externalUserid != null">external_userid,</if>
             <if test="name != null">name,</if>
             <if test="avatar != null">avatar,</if>
@@ -96,7 +129,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="position != null">position,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">#{id},</if>
             <if test="externalUserid != null">#{externalUserid},</if>
             <if test="name != null">#{name},</if>
             <if test="avatar != null">#{avatar},</if>
@@ -124,17 +156,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="corpFullName != null">corp_full_name = #{corpFullName},</if>
             <if test="position != null">position = #{position},</if>
         </trim>
-        where id = #{id}
+        where external_userid = #{externalUserid}
     </update>
 
-    <delete id="deleteWeCustomerById" parameterType="Long">
-        delete from we_customer where id = #{id}
+    <delete id="deleteWeCustomerById" parameterType="String">
+        delete from we_customer where external_userid = #{externalUserId}
     </delete>
 
-    <delete id="deleteWeCustomerByIds" parameterType="String">
-        delete from we_customer where id in 
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
+    <delete id="deleteWeCustomerByIds">
+        delete from we_customer where external_userid in
+        <foreach item="item" collection="array" open="(" separator="," close=")">
+            #{item}
         </foreach>
     </delete>
 

@@ -17,6 +17,7 @@ const service = config.services.wecom + '/customer'
 export function getList(params) {
   return request({
     url: service + '/list',
+    method: 'get',
     params
   })
 }
@@ -83,5 +84,14 @@ export function updateBirthday(data) {
     url: service,
     method: 'PUT',
     data
+  })
+}
+
+// 导出用户
+export function exportCustomer(query) {
+  return request({
+    url: service + '/export',
+    method: 'get',
+    params: query
   })
 }

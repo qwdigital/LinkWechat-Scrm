@@ -1,5 +1,6 @@
 package com.linkwechat.framework.manager;
 
+import com.linkwechat.common.utils.Threads;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -30,6 +31,8 @@ public class ShutdownManager
         {
             logger.info("====关闭后台任务任务线程池====");
             AsyncManager.me().shutdown();
+            logger.info("====关闭后台线程池====");
+            Threads.shutdownAndAwaitTermination(Threads.SINGLE_THREAD_POOL);
         }
         catch (Exception e)
         {

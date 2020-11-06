@@ -1,10 +1,8 @@
 package com.linkwechat.common.utils;
 
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +14,17 @@ import org.slf4j.LoggerFactory;
 public class Threads
 {
     private static final Logger logger = LoggerFactory.getLogger(Threads.class);
+
+    private static final int CORE_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+
+    private static final ThreadFactory NAMED_THREAD_FACTORY = new ThreadFactoryBuilder().setNameFormat("common-pool-%d").build();
+    /**
+     * 创建线程池
+     */
+    public static final ThreadPoolExecutor SINGLE_THREAD_POOL = new ThreadPoolExecutor(CORE_POOL_SIZE, CORE_POOL_SIZE+1, 10l, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(1024),NAMED_THREAD_FACTORY);
+
+
 
     /**
      * sleep等待,单位为毫秒

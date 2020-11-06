@@ -21,6 +21,7 @@ public class ExternalUserDetail extends WeResultDto {
     /** 客户联系人 */
     private List<FollowUser> follow_user;
 
+    private List<FollowInfo> follow_info;
 
 
     @Data
@@ -66,6 +67,26 @@ public class ExternalUserDetail extends WeResultDto {
         private String oper_userid;
         /**标签**/
         private List<ExternalUserTag> tags;
+    }
+
+    @Data
+    public class FollowInfo{
+        /**该成员对此外部联系人的备注*/
+        private String remark;
+        /**该成员对此外部联系人的描述*/
+        private String description;
+        /**该成员添加此外部联系人的时间*/
+        private long createtime;
+        /**该成员对此客户备注的企业名称*/
+        private String remark_company;
+        /**该成员对此客户备注的手机号码*/
+        private String[] remark_mobiles;
+        /**该成员添加此客户的来源*/
+        private Integer add_way;
+        /**发起添加的userid，如果成员主动添加，为成员的userid；如果是客户主动添加，则为客户的外部联系人userid；如果是内部成员共享/管理员分配，则为对应的成员/管理员userid*/
+        private String oper_userid;
+        /**标签**/
+        private String[] tag_id;
     }
 
 }

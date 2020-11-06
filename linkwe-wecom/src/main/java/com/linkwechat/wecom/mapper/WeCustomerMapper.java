@@ -18,10 +18,10 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
     /**
      * 查询企业微信客户
      * 
-     * @param id 企业微信客户ID
+     * @param externalUserId 企业微信客户ID
      * @return 企业微信客户
      */
-    public WeCustomer selectWeCustomerById(Long id);
+    public WeCustomer selectWeCustomerById(String externalUserId);
 
     /**
      * 查询企业微信客户列表
@@ -50,18 +50,18 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
     /**
      * 删除企业微信客户
      * 
-     * @param id 企业微信客户ID
+     * @param externalUserId 企业微信客户ID
      * @return 结果
      */
-    public int deleteWeCustomerById(Long id);
+    public int deleteWeCustomerById(String externalUserId);
 
     /**
      * 批量删除企业微信客户
      * 
-     * @param ids 需要删除的数据ID
+     * @param externalUserIds 需要删除的数据ID
      * @return 结果
      */
-    public int deleteWeCustomerByIds(Long[] ids);
+    public int deleteWeCustomerByIds(String[] externalUserIds);
 
 
     /**

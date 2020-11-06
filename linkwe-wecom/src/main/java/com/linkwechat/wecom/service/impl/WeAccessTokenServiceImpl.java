@@ -96,6 +96,7 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
 
             if(StringUtils.isNotEmpty(token)){
                 redisCache.setCacheObject(accessTokenKey,token,expires_in.intValue(), TimeUnit.SECONDS);
+                weAccessToken = token;
             }
 
         }

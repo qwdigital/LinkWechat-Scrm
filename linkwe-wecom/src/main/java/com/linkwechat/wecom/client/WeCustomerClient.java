@@ -10,6 +10,8 @@ import com.linkwechat.wecom.domain.dto.customer.ExternalUserDetail;
 import com.linkwechat.wecom.domain.dto.customer.ExternalUserList;
 import com.linkwechat.wecom.domain.dto.customer.FollowUserList;
 
+import java.util.Map;
+
 /**
  * @description: 获取配置客户联系人功能的成员
  * @author: HaoN
@@ -41,6 +43,14 @@ public interface WeCustomerClient {
      */
     @Request(url = "/externalcontact/get")
     ExternalUserDetail get(@Query("external_userid") String externalUserid);
+
+    /**
+     * 根据企业成员id批量获取客户详情
+     * @param query
+     * @return
+     */
+    @Request(url = "/externalcontact/batch/get_by_user", type = "POST")
+    ExternalUserList getByUser(@DataObject Map<String,Object> query);
 
 
     /**

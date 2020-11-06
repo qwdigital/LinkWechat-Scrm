@@ -8,10 +8,13 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.utils.Threads;
 import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -62,27 +65,27 @@ public class WeCustomerController extends BaseController
          return AjaxResult.success(weCustomerService.getCustomersByUserId(userId));
     }
 
-//    /**
-//     * 导出企业微信客户列表
-//     */
-//    @PreAuthorize("@ss.hasPermi('wecom:customer:export')")
-//    @Log(title = "企业微信客户", businessType = BusinessType.EXPORT)
-//    @GetMapping("/export")
-//    public AjaxResult export(WeCustomer weCustomer)
-//    {
-//        List<WeCustomer> list = weCustomerService.selectWeCustomerList(weCustomer);
-//        ExcelUtil<WeCustomer> util = new ExcelUtil<WeCustomer>(WeCustomer.class);
-//        return util.exportExcel(list, "customer");
-//    }
+    /**
+     * 导出企业微信客户列表
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:customer:export')")
+    @Log(title = "企业微信客户", businessType = BusinessType.EXPORT)
+    @GetMapping("/export")
+    public AjaxResult export(WeCustomer weCustomer)
+    {
+        List<WeCustomer> list = weCustomerService.selectWeCustomerList(weCustomer);
+        ExcelUtil<WeCustomer> util = new ExcelUtil<WeCustomer>(WeCustomer.class);
+        return util.exportExcel(list, "customer");
+    }
 
     /**
      * 获取企业微信客户详细信息
      */
     @PreAuthorize("@ss.hasPermi('customerManage:customer:view')")
-    @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("id") Long id)
+    @GetMapping(value = "/{externalUserId}")
+    public AjaxResult getInfo(@PathVariable("externalUserId") String externalUserId)
     {
-        return AjaxResult.success(weCustomerService.selectWeCustomerById(id));
+        return AjaxResult.success(weCustomerService.selectWeCustomerById(externalUserId));
     }
 
 
@@ -108,9 +111,18 @@ public class WeCustomerController extends BaseController
     @Log(title = "企业微信客户同步接口", businessType = BusinessType.DELETE)
     @GetMapping("/synchWeCustomer")
     public AjaxResult synchWeCustomer(){
-
-        weCustomerService.synchWeCustomer();
-
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        try {
+            Threads.SINGLE_THREAD_POOL.execute(new Runnable() {
+                @Override
+                public void run() {
+                    SecurityContextHolder.setContext(securityContext);
+                    weCustomerService.synchWeCustomer();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return AjaxResult.success(WeConstans.SYNCH_TIP);
 
     }
