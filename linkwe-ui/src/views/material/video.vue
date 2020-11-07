@@ -31,31 +31,40 @@ export default {
       <el-col
         :span="6"
         style="margin-top: 24px;"
-        v-for="(item, index) in 10"
+        v-for="(item, index) in list"
         :key="index"
       >
         <el-card shadow="hover" body-style="padding: 0px;">
           <div class="img-wrap">
             <el-image
-              :src="require('@/assets/image/profile.jpg')"
+              :src="item.coverUrl"
               :preview-src-list="srcList"
             ></el-image>
             <div class="el-upload-list__item-actions">
-              <span class="el-upload-list__item-preview" @click="edit(file)">
+              <span
+                class="el-upload-list__item-preview"
+                @click="$refs.page.download(item)"
+              >
                 <i class="el-icon-download"></i>
               </span>
-              <span class="el-upload-list__item-preview" @click="edit(file)">
+              <span
+                class="el-upload-list__item-preview"
+                @click="$refs.page.edit(item)"
+              >
                 <i class="el-icon-edit"></i>
               </span>
-              <span class="el-upload-list__item-" @click="handleRemove(file)">
+              <span
+                class="el-upload-list__item-"
+                @click="$refs.page.remove(item)"
+              >
                 <i class="el-icon-delete"></i>
               </span>
             </div>
           </div>
           <div style="padding: 14px;">
-            <el-checkbox v-model="kl">2020-02-02</el-checkbox>
-            <div>sdghwery阿瑟他五色土</div>
-            <div>sdghwery阿瑟他五色土</div>
+            <el-checkbox v-model="kl">{{ item.createTime }}</el-checkbox>
+            <div>{{ item.digest }}</div>
+            <div>{{ item.digest }}</div>
           </div>
         </el-card>
       </el-col>

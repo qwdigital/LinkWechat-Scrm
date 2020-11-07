@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-const service = config.services.wecom + '/customer'
+const service = window.CONFIG.services.wecom + '/customer'
 
 /**
  * 客户列表
@@ -18,7 +18,7 @@ export function getList(params) {
   return request({
     url: service + '/list',
     method: 'get',
-    params
+    params,
   })
 }
 
@@ -47,7 +47,7 @@ export function makeLabel(data) {
   return request({
     url: service + '/makeLabel',
     method: 'post',
-    data
+    data,
   })
 }
 
@@ -67,7 +67,7 @@ export function removeLabel(data) {
   return request({
     url: service + '/removeLabel',
     method: 'DELETE',
-    data
+    data,
   })
 }
 
@@ -83,7 +83,7 @@ export function updateBirthday(data) {
   return request({
     url: service,
     method: 'PUT',
-    data
+    data,
   })
 }
 
@@ -92,6 +92,6 @@ export function exportCustomer(query) {
   return request({
     url: service + '/export',
     method: 'get',
-    params: query
+    params: query,
   })
 }

@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-const service = config.services.wecom + '/group'
+const service = window.CONFIG.CONFIG.services.wecom + '/group'
 
 // 客户标签
 
@@ -14,7 +14,7 @@ const service = config.services.wecom + '/group'
 export function getList(params) {
   return request({
     url: service + '/list',
-    params
+    params,
   })
 }
 
@@ -54,13 +54,13 @@ export function update(data) {
   return request({
     url: service,
     method: 'put',
-    data
+    data,
   })
 }
 
 /**
  * 标签批量删除接口
- * @param {*} ids 
+ * @param {*} ids
  */
 export function remove(ids) {
   return request({

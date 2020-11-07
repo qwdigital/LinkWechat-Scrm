@@ -1,12 +1,13 @@
 import request from '@/utils/request'
-const service = config.services.wecom + '/material'
-const serviceCategory = config.services.wecom + '/category'
+const service = window.CONFIG.services.wecom + '/material'
+const serviceCategory = window.CONFIG.services.wecom + '/category'
 
 /**
  * 查询素材列表
  * @param {*} params 
  * { categoryId:类目id
 search:搜索的值
+mediaType: '' 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file), 4 文本
  }
  */
 export function getList(params) {
@@ -66,12 +67,12 @@ export function remove(id) {
  * @param {*} data 
  * {
  * file:文件
-type:0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file), 4 文本
+type:0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file)
 }
  */
 export function upload(data) {
   return request({
-    url: config.services.wecom + '/upload',
+    url: window.CONFIG.services.wecom + '/upload',
     method: 'post',
     data,
   })
@@ -88,7 +89,7 @@ export function upload(data) {
 export function moveGroup(categoryId, materials) {
   return request({
     url: service + '/resetCategory',
-    method: 'post',
+    method: 'put',
     data: {
       categoryId,
       materials,

@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-const service = config.services.wecom + '/tlp'
+const service = window.CONFIG.services.wecom + '/tlp'
 
 /**
  * 获取欢迎语列表
@@ -14,13 +14,13 @@ const service = config.services.wecom + '/tlp'
 export function getList(params) {
   return request({
     url: service + '/list',
-    params
+    params,
   })
 }
 
 /**
  * 根据欢迎语模板id获取模板使用范围
- * @param {*} id 
+ * @param {*} id
  */
 export function getScop(id) {
   return request({
@@ -46,7 +46,7 @@ export function edit(data) {
   return request({
     url: service,
     method: 'put',
-    data
+    data,
   })
 }
 
@@ -66,13 +66,13 @@ export function add(data) {
   return request({
     url: service,
     method: 'POST',
-    data
+    data,
   })
 }
 
 /**
  * 删除欢迎语
- * @param {*} ids 
+ * @param {*} ids
  */
 export function remove(ids) {
   return request({

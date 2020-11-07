@@ -1,6 +1,6 @@
 import request from '@/utils/request'
-const service = config.services.wecom + '/department'
-const serviceUser = config.services.wecom + '/user'
+const service = window.CONFIG.services.wecom + '/department'
+const serviceUser = window.CONFIG.services.wecom + '/user'
 
 /**
  * 获取所有部门
@@ -14,7 +14,7 @@ const serviceUser = config.services.wecom + '/user'
 export function getTree(params) {
   return request({
     url: service + '/list',
-    params
+    params,
   })
 }
 
@@ -31,7 +31,7 @@ export function updateDepart(data) {
   return request({
     url: service,
     method: 'put',
-    data
+    data,
   })
 }
 
@@ -76,13 +76,13 @@ export function removeDepart(ids) {
 export function getList(params) {
   return request({
     url: serviceUser + '/list',
-    params
+    params,
   })
 }
 
 /**
  * 根据ID获取通讯录人员详情
- * @param {String} id 
+ * @param {String} id
  */
 export function getUserDetail(id) {
   return request({
@@ -92,7 +92,7 @@ export function getUserDetail(id) {
 
 /**
  * 新增用户
- * @param {Object} data 
+ * @param {Object} data
  */
 export function addUser(data) {
   return request({
@@ -132,7 +132,7 @@ export function updateUser(data) {
   return request({
     url: serviceUser,
     method: 'put',
-    data
+    data,
   })
 }
 
@@ -148,7 +148,7 @@ export function startOrStop(data) {
   return request({
     url: serviceUser + '/startOrStop',
     method: 'put',
-    data
+    data,
   })
 }
 

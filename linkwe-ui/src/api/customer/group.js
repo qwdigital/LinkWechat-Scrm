@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-const service = config.services.wecom + '/group'
+const service = window.CONFIG.services.wecom + '/group'
 
 /**
  * 客户群列表
@@ -15,7 +15,7 @@ export function getList(params) {
   return request({
     url: service + '/chat/list',
     method: 'get',
-    params
+    params,
   })
 }
 
@@ -32,10 +32,9 @@ export function getList(params) {
 export function getMembers(params) {
   return request({
     url: service + '/chat/members',
-    params
+    params,
   })
 }
-
 
 /**
  * 客户群同步接口

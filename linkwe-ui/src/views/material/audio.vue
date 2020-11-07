@@ -17,9 +17,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map((item) => item.userId)
-      this.single = selection.length != 1
-      this.multiple = !selection.length
+      this.ids = selection.map((item) => item.id) + ''
     },
   },
 }
@@ -27,13 +25,9 @@ export default {
 
 <template>
   <MaPage ref="page" type="1" @listChange="listChange">
-    <el-table
-      v-loading="loading"
-      :data="userList"
-      @selection-change="handleSelectionChange"
-    >
+    <el-table :data="list" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" align="center" />
-      <el-table-column label="语音" align="center" prop="userName" />
+      <el-table-column label="语音" align="center" prop="materialUrl" />
       <el-table-column
         label="时长"
         align="center"
@@ -61,7 +55,7 @@ export default {
             size="mini"
             type="text"
             icon="el-icon-key"
-            @click="handleResetPwd(scope.row)"
+            @click="$refs.page.download(scope.row)"
             v-hasPermi="['system:user:resetPwd']"
             >下载</el-button
           >
@@ -69,7 +63,7 @@ export default {
             size="mini"
             type="text"
             icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
+            @click="$refs.page.edit(scope.row)"
             v-hasPermi="['system:user:edit']"
             >修改</el-button
           >
@@ -78,7 +72,7 @@ export default {
             size="mini"
             type="text"
             icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
+            @click="$refs.page.remove(scope.row)"
             v-hasPermi="['system:user:remove']"
             >删除</el-button
           >

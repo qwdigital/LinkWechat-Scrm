@@ -1,4 +1,6 @@
-module.exports = {
+import { getToken } from '@/utils/auth'
+
+window.CONFIG = {
   /**
    * 是否系统布局配置
    */
@@ -28,10 +30,12 @@ module.exports = {
   errorLog: 'production',
 
   services: {
-    wecom: "wecom",
-    wecom: "wecom",
-    wecom: "wecom",
-    wecom: "wecom",
-    wecom: "wecom",
-  }
+    wecom: '/wecom',
+  },
+
+  get headers() {
+    return { Authorization: 'Bearer ' + getToken() }
+  },
 }
+
+module.exports = window.CONFIG

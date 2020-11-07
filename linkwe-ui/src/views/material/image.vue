@@ -22,8 +22,6 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map((item) => item.userId)
-      this.single = selection.length != 1
-      this.multiple = !selection.length
     },
   },
 }
@@ -34,8 +32,8 @@ export default {
     <el-row :gutter="20">
       <el-col
         :span="6"
-        style="margin-top: 24px;"
-        v-for="(item, index) in 10"
+        style="margin-bottom: 24px;"
+        v-for="(item, index) in list"
         :key="index"
       >
         <el-card shadow="hover" body-style="padding: 0px;">
@@ -45,16 +43,22 @@ export default {
               :preview-src-list="srcList"
             ></el-image>
             <div class="el-upload-list__item-actions">
-              <span class="el-upload-list__item-preview" @click="edit(file)">
+              <span
+                class="el-upload-list__item-preview"
+                @click="$refs.page.edit(item)"
+              >
                 <i class="el-icon-edit"></i>
               </span>
-              <span class="el-upload-list__item-" @click="handleRemove(file)">
+              <span
+                class="el-upload-list__item-"
+                @click="$refs.page.remove(item)"
+              >
                 <i class="el-icon-delete"></i>
               </span>
             </div>
           </div>
           <div style="padding: 14px;">
-            <el-checkbox v-model="kl">16545awfe.jpg</el-checkbox>
+            <el-checkbox v-model="ids">{{ item.name }}</el-checkbox>
           </div>
         </el-card>
       </el-col>

@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-const service = config.services.wecom + '/user'
+const service = window.CONFIG.services.wecom + '/user'
 
 /**
  * 获取离职未分配员工列表
@@ -13,7 +13,7 @@ beginTime:}
 export function getList(params) {
   return request({
     url: service + '/leaveUserNoAllocateList',
-    params
+    params,
   })
 }
 
@@ -29,6 +29,6 @@ export function allocate(data) {
   return request({
     url: service + '/allocateLeaveUserAboutData',
     method: 'put',
-    data
+    data,
   })
 }

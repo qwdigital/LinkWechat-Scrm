@@ -12,6 +12,7 @@ import {
   remove,
   moveGroup,
 } from '@/api/material'
+
 export default {
   name: 'MaPage',
   components: {},
@@ -36,6 +37,7 @@ export default {
         pageSize: 10,
         categoryId: '',
         search: '',
+        mediaType: '4',
       },
       list: [], // 列表
       total: 0, // 总条数
@@ -62,6 +64,7 @@ export default {
 
       typeTitle: ['图片', '语音', '视频', '普通文件', '文本'],
       form: {}, // 素材表单
+      fileUrl: '',
       dialogVisible: false, // 素材表格对话框显隐
       // 表单校验
       rules: Object.freeze({
@@ -78,6 +81,7 @@ export default {
   watch: {},
   computed: {},
   created() {
+    this.query.mediaType = this.type
     this.getTree()
     this.getList()
   },
@@ -260,7 +264,7 @@ export default {
             style="width: 300px;"
           />
           <el-button class="ml10" @click="getList(1)">搜索</el-button>
-          <el-button @click="remove" :disabled="selected.length"
+          <el-button @click="remove" :disabled="selected.length === 0"
             >删除</el-button
           >
           <el-popover placement="top" width="260" v-model="groupDialogVisible">
@@ -280,7 +284,10 @@ export default {
                 >确定</el-button
               >
             </div>
-            <el-button slot="reference" class="ml10" :disabled="selected.length"
+            <el-button
+              slot="reference"
+              class="ml10"
+              :disabled="selected.length === 0"
               >移动分组</el-button
             >
           </el-popover>
@@ -292,7 +299,7 @@ export default {
           </div>
         </div>
 
-        <div v-loading="loading">
+        <div v-loading="loading" class="mt20">
           <slot></slot>
         </div>
 
@@ -319,6 +326,7 @@ export default {
             maxlength="20"
             show-word-limit
             placeholder="分类名称"
+            @keyup.enter.native="treeSubmit"
           ></el-input>
         </el-form-item>
         <!-- <el-form-item label="所属分类" v-if="treeForm.pName">
@@ -346,6 +354,7 @@ export default {
             :props="groupProps"
           ></el-cascader>
         </el-form-item>
+
         <el-form-item label="文本内容" prop="content" v-if="type === '4'">
           <el-input
             v-model="form.content"
@@ -356,63 +365,39 @@ export default {
         </el-form-item>
 
         <el-form-item label="图片" prop="materialUrl" v-else-if="type === '0'">
-          <el-upload
-            action
-            :show-file-list="false"
-            :on-success="d"
-            :before-upload="d"
-          >
-            <img v-if="imageUrl" :src="imageUrl" />
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-          </el-upload>
-          <div>支持JPG,PNG格式，图片大小不超过2M，建议上传宽高1:1的图片</div>
+          <upload :fileUrl.sync="form.fileUrl" :mediaType="type">
+            <div slot="tip">
+              支持JPG,PNG格式，图片大小不超过2M，建议上传宽高1:1的图片
+            </div>
+          </upload>
         </el-form-item>
 
         <el-form-item label="语音" prop="materialUrl" v-else-if="type === '1'">
-          <el-upload
-            action=""
-            :on-remove="d"
-            :before-remove="d"
-            multiple
-            :limit="3"
-            :on-exceed="d"
-            :file-list="[{ name: 'name', url: 'url' }]"
-          >
-            <el-button size="small" type="primary">点击上传</el-button>
-            <div slot="tip" class="el-upload__tip">
+          <upload :fileUrl.sync="form.fileUrl" :mediaType="type">
+            <div slot="tip">
               只能上传amr格式的语音文件。单个文件大小不超过2M，时长不超过1分钟
             </div>
-          </el-upload>
+          </upload>
         </el-form-item>
 
         <template v-else-if="type === '2'">
           <el-form-item label="视频" prop="materialUrl">
-            <el-upload
-              action
-              :show-file-list="false"
-              :on-success="d"
-              :before-upload="d"
-            >
-              <img v-if="imageUrl" :src="imageUrl" />
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-            </el-upload>
-            <div>不超过10M, 文件格式: mp4</div>
+            <upload :fileUrl.sync="form.fileUrl" :mediaType="type">
+              <div slot="tip">
+                不超过10M, 文件格式: mp4
+              </div>
+            </upload>
           </el-form-item>
           <el-form-item label="封面">
-            <el-upload
-              action
-              :show-file-list="false"
-              :on-success="d"
-              :before-upload="d"
-            >
-              <img v-if="imageUrl" :src="imageUrl" />
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-            </el-upload>
-            <div>建议尺寸：1068*455</div>
+            <upload :fileUrl.sync="form.coverUrl" mediaType="0">
+              <div slot="tip">
+                建议尺寸：1068*455
+              </div>
+            </upload>
           </el-form-item>
           <el-form-item label="摘要">
             <el-input
-              v-model="form.remark"
+              v-model="form.digest"
               type="textarea"
               placeholder="非必填,限120字,如不填会自动抓取正文前54个字"
             ></el-input>
@@ -420,18 +405,11 @@ export default {
         </template>
 
         <el-form-item label="文件" prop="materialUrl" v-else-if="type === '3'">
-          <el-upload
-            action=""
-            :on-remove="d"
-            :before-remove="d"
-            multiple
-            :limit="3"
-            :on-exceed="d"
-            :file-list="[{ name: 'name', url: 'url' }]"
-          >
-            <el-button size="small" type="primary">点击上传</el-button>
-            <div slot="tip" class="el-upload__tip">单个文件大小不超过20M</div>
-          </el-upload>
+          <upload :fileUrl.sync="form.coverUrl" :mediaType="type">
+            <div slot="tip">
+              单个文件大小不超过20M
+            </div>
+          </upload>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

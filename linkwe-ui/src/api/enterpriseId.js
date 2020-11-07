@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-const service = config.services.wecom + '/corp'
+const service = window.CONFIG.services.wecom + '/corp'
 // 企业id
 
 /**
@@ -8,13 +8,13 @@ const service = config.services.wecom + '/corp'
 export function getList(params) {
   return request({
     url: service + '/list',
-    params
+    params,
   })
 }
 
 /**
  * 获取企业id相关详情
- * @param {String} id 
+ * @param {String} id
  */
 export function getDetail(id) {
   return request({
@@ -24,7 +24,7 @@ export function getDetail(id) {
 
 /**
  * 新增企业id
- * @param {Object} data 
+ * @param {Object} data
  */
 export function add(data) {
   return request({
@@ -56,13 +56,13 @@ export function update(data) {
   return request({
     url: service,
     method: 'put',
-    data
+    data,
   })
 }
 
 /**
  * 启用有效企业微信账号
- * @param {*} corpId 
+ * @param {*} corpId
  */
 export function start(corpId) {
   return request({

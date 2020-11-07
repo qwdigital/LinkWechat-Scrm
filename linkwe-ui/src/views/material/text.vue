@@ -26,11 +26,7 @@ export default {
 
 <template>
   <MaPage ref="page" type="4" @listChange="listChange" :selected="ids">
-    <el-table
-      class="mt20"
-      :data="list"
-      @selection-change="handleSelectionChange"
-    >
+    <el-table :data="list" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" align="center" />
       <el-table-column
         label="文本内容"

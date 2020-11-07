@@ -31,7 +31,7 @@ export default {
       <el-table-column
         label="文件名"
         align="center"
-        prop="userName"
+        prop="materialUrl"
         :show-overflow-tooltip="true"
       />
       <el-table-column label="大小" align="center" prop="userName" />
@@ -57,7 +57,7 @@ export default {
             size="mini"
             type="text"
             icon="el-icon-key"
-            @click="handleResetPwd(scope.row)"
+            @click="$refs.page.download(scope.row)"
             v-hasPermi="['system:user:resetPwd']"
             >下载</el-button
           >
@@ -65,7 +65,7 @@ export default {
             size="mini"
             type="text"
             icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
+            @click="$refs.page.edit(scope.row)"
             v-hasPermi="['system:user:edit']"
             >修改</el-button
           >
@@ -74,7 +74,7 @@ export default {
             size="mini"
             type="text"
             icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
+            @click="$refs.page.remove(scope.row)"
             v-hasPermi="['system:user:remove']"
             >删除</el-button
           >
