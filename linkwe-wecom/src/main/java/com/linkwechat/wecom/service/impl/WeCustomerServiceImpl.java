@@ -463,12 +463,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     /**
      * 根据员工ID获取客户
      *
-     * @param userId
+     * @param externalUserid
      * @return
      */
     @Override
-    public List<WeUser> getCustomersByUserId(String userId) {
-        return this.baseMapper.getCustomersByUserId(userId);
+    public List<WeUser> getCustomersByUserId(String externalUserid) {
+        return this.baseMapper.getCustomersByUserId(externalUserid);
     }
 
 

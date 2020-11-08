@@ -1,5 +1,7 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import lombok.Data;
@@ -14,7 +16,8 @@ import java.util.List;
  * @date 2020-10-04
  */
 @Data
-public class WeEmpleCode extends BaseEntity
+@TableName("we_emple_code")
+public class WeEmpleCode
 {
     private static final long serialVersionUID = 1L;
 
@@ -34,6 +37,7 @@ public class WeEmpleCode extends BaseEntity
     private String welcomeMsg;
 
     /** 素材的id */
+    @TableField(exist = false)
     private Long mediaId;
 
     /** 0:正常;1:删除; */
@@ -41,10 +45,12 @@ public class WeEmpleCode extends BaseEntity
 
 
     /** 使用员工 */
+    @TableField(exist = false)
     private List<WeEmpleCodeUseScop> weEmpleCodeUseScops;
 
 
     /** 扫码标签 */
+    @TableField(exist = false)
     private List<WeEmpleCodeTag> weEmpleCodeTags;
 
 

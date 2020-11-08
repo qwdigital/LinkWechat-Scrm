@@ -58,11 +58,11 @@ public class WeCustomerController extends BaseController
      * @return
      */
     @PreAuthorize("@ss.hasPermi('customerManage:customer:list')")
-    @GetMapping("/getCustomersByUserId/{userId}")
-    public AjaxResult getCustomersByUserId(@PathVariable String userId){
+    @GetMapping("/getCustomersByUserId/{externalUserid}")
+    public AjaxResult getCustomersByUserId(@PathVariable String externalUserid){
 
 
-         return AjaxResult.success(weCustomerService.getCustomersByUserId(userId));
+         return AjaxResult.success(weCustomerService.getCustomersByUserId(externalUserid));
     }
 
     /**

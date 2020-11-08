@@ -1,6 +1,8 @@
 package com.linkwechat.wecom.mapper;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeGroupCode;
 
 /**
@@ -9,7 +11,7 @@ import com.linkwechat.wecom.domain.WeGroupCode;
  * @author ruoyi
  * @date 2020-10-07
  */
-public interface WeGroupCodeMapper 
+public interface WeGroupCodeMapper  extends BaseMapper<WeGroupCode>
 {
     /**
      * 查询客户群活码

@@ -1,5 +1,8 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import lombok.Data;
@@ -12,11 +15,13 @@ import lombok.Data;
  * @date 2020-10-04
  */
 @Data
-public class WeEmpleCodeTag extends BaseEntity
+@TableName("we_emple_code_tag")
+public class WeEmpleCodeTag
 {
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
+    @TableId
     private Long id= SnowFlakeUtil.nextId();
 
     /** 标签id */
@@ -29,6 +34,7 @@ public class WeEmpleCodeTag extends BaseEntity
     private Integer delFlag=new Integer(0);
 
     /** 标签名 */
+    @TableField(exist = false)
     private String tagName;
 
 

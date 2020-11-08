@@ -1,6 +1,8 @@
 package com.linkwechat.wecom.mapper;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeEmpleCodeTag;
 import org.apache.ibatis.annotations.Param;
 
@@ -10,7 +12,7 @@ import org.apache.ibatis.annotations.Param;
  * @author ruoyi
  * @date 2020-10-04
  */
-public interface WeEmpleCodeTagMapper 
+public interface WeEmpleCodeTagMapper extends BaseMapper<WeEmpleCodeTag>
 {
     /**
      * 查询员工活码标签

@@ -1,6 +1,8 @@
 package com.linkwechat.wecom.mapper;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeGroupCodeActual;
 
 /**
@@ -9,7 +11,7 @@ import com.linkwechat.wecom.domain.WeGroupCodeActual;
  * @author ruoyi
  * @date 2020-10-07
  */
-public interface WeGroupCodeActualMapper 
+public interface WeGroupCodeActualMapper extends BaseMapper<WeGroupCodeActual>
 {
     /**
      * 查询实际群码

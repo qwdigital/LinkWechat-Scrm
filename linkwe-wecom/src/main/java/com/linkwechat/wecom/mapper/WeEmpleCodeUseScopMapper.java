@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeEmpleCodeUseScop;
 import org.apache.ibatis.annotations.Param;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * @author ruoyi
  * @date 2020-10-04
  */
-public interface WeEmpleCodeUseScopMapper 
+public interface WeEmpleCodeUseScopMapper extends BaseMapper<WeEmpleCodeUseScop>
 {
     /**
      * 查询员工活码使用人

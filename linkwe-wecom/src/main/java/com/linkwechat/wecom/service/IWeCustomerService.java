@@ -72,8 +72,8 @@ public interface IWeCustomerService extends IService<WeCustomer>
 
     /**
      * 根据员工ID获取客户
-     * @param userId
+     * @param externalUserid
      * @return
      */
-    public List<WeUser> getCustomersByUserId(String userId);
+    public List<WeUser> getCustomersByUserId(String externalUserid);
 }
