@@ -1,8 +1,13 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import lombok.Data;
 
+import java.util.List;
 
 
 /**
@@ -12,12 +17,14 @@ import lombok.Data;
  * @date 2020-10-07
  */
 @Data
-public class WeGroupCode extends BaseEntity
+@TableName("we_group_code")
+public class WeGroupCode
 {
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
-    private Long id;
+    @TableId
+    private Long id= SnowFlakeUtil.nextId();
 
     /** 活动头像 */
     private String activityHeadUrl;
@@ -42,5 +49,9 @@ public class WeGroupCode extends BaseEntity
 
     /** 0:正常;2:删除; */
     private Long delFlag;
+
+
+    @TableField(exist = false)
+    private List<WeGroupCodeActual> actualList;
 
 }

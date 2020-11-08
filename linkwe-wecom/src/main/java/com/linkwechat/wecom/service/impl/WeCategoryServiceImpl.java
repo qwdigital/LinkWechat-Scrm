@@ -63,7 +63,7 @@ public class WeCategoryServiceImpl implements IWeCategoryService {
         weCategories.forEach(c -> {
             WeCategoryVo weCategoryVo = new WeCategoryVo();
             weCategoryVo.setId(c.getId());
-            weCategoryVo.setLabel(c.getName());
+            weCategoryVo.setName(c.getName());
             weCategoryVo.setParentId(c.getParentId());
             weCategoryVos.add(weCategoryVo);
         });

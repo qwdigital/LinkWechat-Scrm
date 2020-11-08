@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ArrayUtil;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.wecom.client.WeExternalContactClient;
@@ -29,10 +30,10 @@ import org.springframework.transaction.annotation.Transactional;
  * @date 2020-10-04
  */
 @Service
-public class WeEmpleCodeServiceImpl implements IWeEmpleCodeService 
+public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper,WeEmpleCode> implements IWeEmpleCodeService
 {
-    @Autowired
-    private WeEmpleCodeMapper weEmpleCodeMapper;
+//    @Autowired
+//    private WeEmpleCodeMapper weEmpleCodeMapper;
 
 
     @Autowired
@@ -43,41 +44,41 @@ public class WeEmpleCodeServiceImpl implements IWeEmpleCodeService
     private IWeEmpleCodeUseScopService iWeEmpleCodeUseScopService;
 
 
-    @Autowired
-    private WeExternalContactClient weExternalContactClient;
+//    @Autowired
+//    private WeExternalContactClient weExternalContactClient;
 
-    /**
-     * 查询员工活码
-     * 
-     * @param id 员工活码ID
-     * @return 员工活码
-     */
-    @Override
-    public WeEmpleCode selectWeEmpleCodeById(Long id)
-    {
-        WeEmpleCode weEmpleCode = weEmpleCodeMapper.selectWeEmpleCodeById(id);
-        if(null != weEmpleCode){
-            weEmpleCode.setWeEmpleCodeTags(
-                    weEmpleCodeTagService.selectWeEmpleCodeTagListById(id)
-            );
-            weEmpleCode.setWeEmpleCodeUseScops(
-                    iWeEmpleCodeUseScopService.selectWeEmpleCodeUseScopListById(id)
-            );
-
-        }
-        return weEmpleCode;
-    }
+//    /**
+//     * 查询员工活码
+//     *
+//     * @param id 员工活码ID
+//     * @return 员工活码
+//     */
+//    @Override
+//    public WeEmpleCode selectWeEmpleCodeById(Long id)
+//    {
+////        WeEmpleCode weEmpleCode = weEmpleCodeMapper.selectWeEmpleCodeById(id);
+////        if(null != weEmpleCode){
+////            weEmpleCode.setWeEmpleCodeTags(
+////                    weEmpleCodeTagService.selectWeEmpleCodeTagListById(id)
+////            );
+////            weEmpleCode.setWeEmpleCodeUseScops(
+////                    iWeEmpleCodeUseScopService.selectWeEmpleCodeUseScopListById(id)
+////            );
+//
+////        }
+////        return weEmpleCode;
+//    }
 
     /**
      * 查询员工活码列表
-     * 
+     *
      * @param weEmpleCode 员工活码
      * @return 员工活码
      */
     @Override
     public List<WeEmpleCode> selectWeEmpleCodeList(WeEmpleCode weEmpleCode)
     {
-        return weEmpleCodeMapper.selectWeEmpleCodeList(weEmpleCode);
+        return this.baseMapper.selectWeEmpleCodeList(weEmpleCode);
     }
 
     /**
@@ -87,72 +88,22 @@ public class WeEmpleCodeServiceImpl implements IWeEmpleCodeService
      * @return 结果
      */
     @Override
-    @Transactional
-    public int insertWeEmpleCode(WeEmpleCode weEmpleCode)
+    @Transactional(rollbackFor = Exception.class)
+    public void insertWeEmpleCode(WeEmpleCode weEmpleCode)
     {
-        int returnCode = weEmpleCodeMapper.insertWeEmpleCode(weEmpleCode);
 
-        if(returnCode>0){
-            List<WeEmpleCodeUseScop> weEmpleCodeUseScops = weEmpleCode.getWeEmpleCodeUseScops();
-            if(CollectionUtil.isNotEmpty(weEmpleCodeUseScops)){
-                weEmpleCodeUseScops.stream().forEach(v->v.setEmpleCodeId(weEmpleCode.getId()));
-                //批量保存使用员工
-                iWeEmpleCodeUseScopService.batchInsetWeEmpleCodeUseScop(weEmpleCodeUseScops);
+         if(this.save(weEmpleCode)){
+             List<WeEmpleCodeUseScop> weEmpleCodeUseScops = weEmpleCode.getWeEmpleCodeUseScops();
+             if(CollectionUtil.isNotEmpty(weEmpleCodeUseScops)){
+                 iWeEmpleCodeUseScopService.saveBatch(weEmpleCodeUseScops);
 
+                 //根据类型生成相应的活码农
+             }
+             weEmpleCodeTagService.saveBatch(weEmpleCode.getWeEmpleCodeTags());
 
-//                List<WeEmpleCodeTag> weEmpleCodeTags = weEmpleCode.getWeEmpleCodeTags().stream().filter(v->v.getTagId()!=null).collect(Collectors.toList());
-//                if(CollectionUtil.isNotEmpty(weEmpleCodeTags)){
-//                    //批量保存标签
-//                    weEmpleCodeTags.stream().forEach(v->v.setEmpleCodeId(weEmpleCode.getId()));
-//                    weEmpleCodeTagService.batchInsetWeEmpleCodeTag(weEmpleCodeTags);
-//                }
+         }
 
 
-
-                if(!weEmpleCode.getCodeType().equals(WeConstans.BATCH_SINGLE_EMPLE_CODE_TYPE)){
-
-//
-                    WeExternalContactDto.WeContactWay weContactWay = new WeExternalContactDto.WeContactWay( weEmpleCode.getCodeType(),
-                            WeConstans.SMALL_ROUTINE_EMPLE_CODE_SCENE,weEmpleCode.getIsJoinConfirmFriends());
-
-
-
-                    if(weEmpleCode.getCodeType().equals(WeConstans.SINGLE_EMPLE_CODE_TYPE)){
-                              weContactWay.setUser(
-                                      ArrayUtil.toArray(weEmpleCodeUseScops.stream().map(WeEmpleCodeUseScop::getUseUserId)
-                                              .map(x -> String.valueOf(x))
-                                              .collect(Collectors.toList()), String.class)
-                              );//设置员工id
-                    }else if(weEmpleCode.getCodeType().equals(WeConstans.SINGLE_EMPLE_CODE_TYPE)){
-                        weContactWay.setParty(ArrayUtil.toArray(weEmpleCodeUseScops.stream().map(WeEmpleCodeUseScop::getUseUserId)
-                                .collect(Collectors.toList()), Long.class)); //设置部门id
-                    }
-
-                    //生成员工活码
-                    WeExternalContactDto weExternalContactDto = weExternalContactClient.addContactWay(
-                            weContactWay
-                    );
-
-                    System.out.println(weExternalContactDto.toString());
-
-//                    if(weExternalContactDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
-//                        //二维码等数据入库
-//
-//                    }
-
-                }
-
-
-
-
-            }
-
-
-
-
-
-        }
-        return returnCode;
     }
 
     /**
@@ -162,69 +113,55 @@ public class WeEmpleCodeServiceImpl implements IWeEmpleCodeService
      * @return 结果
      */
     @Override
-    public int updateWeEmpleCode(WeEmpleCode weEmpleCode)
+    public void updateWeEmpleCode(WeEmpleCode weEmpleCode)
     {
-        int returnCode = weEmpleCodeMapper.updateWeEmpleCode(weEmpleCode);
 
-        if(returnCode>0){
-            List<WeEmpleCodeTag> weEmpleCodeTags = weEmpleCode.getWeEmpleCodeTags();
-            if(CollectionUtil.isNotEmpty(weEmpleCodeTags)){
-                //删除原有的
-                weEmpleCodeTagService.batchRemoveWeEmpleCodeTagIds(ListUtil.toList(weEmpleCode.getId()));
-                //保存新的
-                weEmpleCodeTagService.batchInsetWeEmpleCodeTag(weEmpleCodeTags);
-
-
-            }
+        if(this.updateById(weEmpleCode)){
             List<WeEmpleCodeUseScop> weEmpleCodeUseScops = weEmpleCode.getWeEmpleCodeUseScops();
             if(CollectionUtil.isNotEmpty(weEmpleCodeUseScops)){
-                //删除原有的
-                iWeEmpleCodeUseScopService.batchRemoveWeEmpleCodeUseScopIds(ListUtil.toList(weEmpleCode.getId()));
-                //保存新的
-                iWeEmpleCodeUseScopService.batchInsetWeEmpleCodeUseScop(weEmpleCodeUseScops);
+                iWeEmpleCodeUseScopService.updateBatchById(weEmpleCodeUseScops);
 
+                //根据类型生成相应的活码农
             }
-
+            weEmpleCodeTagService.updateBatchById(weEmpleCode.getWeEmpleCodeTags());
 
         }
-
-        return returnCode;
     }
 
-    /**
-     * 批量删除员工活码
-     * 
-     * @param ids 需要删除的员工活码ID
-     * @return 结果
-     */
-    @Override
-    public int deleteWeEmpleCodeByIds(Long[] ids)
-    {
-        return weEmpleCodeMapper.deleteWeEmpleCodeByIds(ids);
-    }
-
-    /**
-     * 删除员工活码信息
-     * 
-     * @param id 员工活码ID
-     * @return 结果
-     */
-    @Override
-    public int deleteWeEmpleCodeById(Long id)
-    {
-        return weEmpleCodeMapper.deleteWeEmpleCodeById(id);
-    }
-
-
-    /**
-     * 批量逻辑删除员工活码
-     *
-     * @param ids 需要删除的数据ID
-     * @return 结果
-     */
-    @Override
-    public int batchRemoveWeEmpleCodeIds(List<String> ids) {
-
-        return weEmpleCodeMapper.batchRemoveWeEmpleCodeIds(ids);
-    }
+//    /**
+//     * 批量删除员工活码
+//     *
+//     * @param ids 需要删除的员工活码ID
+//     * @return 结果
+//     */
+//    @Override
+//    public int deleteWeEmpleCodeByIds(Long[] ids)
+//    {
+//        return weEmpleCodeMapper.deleteWeEmpleCodeByIds(ids);
+//    }
+//
+//    /**
+//     * 删除员工活码信息
+//     *
+//     * @param id 员工活码ID
+//     * @return 结果
+//     */
+//    @Override
+//    public int deleteWeEmpleCodeById(Long id)
+//    {
+//        return weEmpleCodeMapper.deleteWeEmpleCodeById(id);
+//    }
+//
+//
+//    /**
+//     * 批量逻辑删除员工活码
+//     *
+//     * @param ids 需要删除的数据ID
+//     * @return 结果
+//     */
+//    @Override
+//    public int batchRemoveWeEmpleCodeIds(List<String> ids) {
+//
+//        return weEmpleCodeMapper.batchRemoveWeEmpleCodeIds(ids);
+//    }
 }

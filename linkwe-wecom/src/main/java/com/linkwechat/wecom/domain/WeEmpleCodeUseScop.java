@@ -1,8 +1,13 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import lombok.Data;
+
+import java.util.Date;
 
 
 /**
@@ -12,23 +17,27 @@ import lombok.Data;
  * @date 2020-10-04
  */
 @Data
-public class WeEmpleCodeUseScop extends BaseEntity
+@TableName("we_emple_code_use_scop")
+public class WeEmpleCodeUseScop
 {
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
+    @TableId
     private Long id = SnowFlakeUtil.nextId();
 
     /** 员工活码id */
     private Long empleCodeId;
 
     /** 活码类型下业务使用人的id */
-    private Long useUserId;
+    private Long businessId;
 
     /** 0:正常;2:删除; */
     private Integer delFlag=new Integer(0);
 
     /** 活码使用人员名称 */
+    @TableField(exist = false)
     private String userUserName;
+
 
 }

@@ -6,9 +6,11 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.wecom.domain.WeMaterial;
+import com.linkwechat.wecom.domain.dto.ResetCategoryDto;
 import com.linkwechat.wecom.domain.vo.WeMaterialFileVO;
 import com.linkwechat.wecom.service.IWeMaterialService;
 import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -35,9 +37,10 @@ public class WeMaterialController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('wecom:material:list')")
     @GetMapping("/list")
-    public TableDataInfo list(@RequestParam(value = "categoryId", required = false) String categoryId, @RequestParam(value = "search", required = false) String search) {
+    public TableDataInfo list(@RequestParam(value = "categoryId", required = false) String categoryId
+            , @RequestParam(value = "search", required = false) String search,@RequestParam(value = "mediaType") String mediaType) {
         startPage();
-        List<WeMaterial> list = materialService.findWeMaterials(categoryId, search);
+        List<WeMaterial> list = materialService.findWeMaterials(categoryId, search,mediaType);
         return getDataTable(list);
     }
 
@@ -91,9 +94,22 @@ public class WeMaterialController extends BaseController {
     @Log(title = "上传素材信息", businessType = BusinessType.OTHER)
     @PostMapping("/upload")
     @ApiOperation("上传素材信息")
-    public AjaxResult upload(@RequestParam(value = "file") MultipartFile file, @RequestParam(value = "type") String type) {
-        WeMaterialFileVO weMaterialFileVO = materialService.uploadWeMaterialFile(file, type);
+    public AjaxResult upload(@RequestParam(value = "file") MultipartFile file, @RequestParam(value = "mediaType") String mediaType) {
+        WeMaterialFileVO weMaterialFileVO = materialService.uploadWeMaterialFile(file, mediaType);
         return AjaxResult.success(weMaterialFileVO);
     }
+
+    /**
+     * 更换分组
+     */
+    @PreAuthorize("@ss.hasPermi('wechat:material:resetCategory')")
+    @Log(title = "更换分组", businessType = BusinessType.OTHER)
+    @PutMapping("/resetCategory")
+    @ApiOperation("更换分组")
+    public AjaxResult resetCategory(@RequestBody ResetCategoryDto resetCategoryDto) {
+        materialService.resetCategory(resetCategoryDto.getCategoryId(), resetCategoryDto.getMaterials());
+        return AjaxResult.success();
+    }
+
 
 }

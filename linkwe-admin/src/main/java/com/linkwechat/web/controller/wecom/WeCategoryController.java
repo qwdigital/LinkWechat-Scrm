@@ -33,8 +33,8 @@ public class WeCategoryController extends BaseController {
     @PreAuthorize("@ss.hasPermi('wechat:category:list')")
     @GetMapping("/list")
     @ApiOperation("类目树")
-    public List<? extends Tree<?>> list(@RequestParam("mediaType") String mediaType) {
-        return weCategoryService.findWeCategoryByMediaType(mediaType);
+    public AjaxResult list(@RequestParam("mediaType") String mediaType) {
+        return AjaxResult.success(weCategoryService.findWeCategoryByMediaType(mediaType));
     }
 
     /**

@@ -1,8 +1,13 @@
 package com.linkwechat.wecom.domain;
 
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.common.utils.SnowFlakeUtil;
+import lombok.Data;
 
 
 /**
@@ -11,12 +16,15 @@ import com.linkwechat.common.core.domain.BaseEntity;
  * @author ruoyi
  * @date 2020-10-07
  */
-public class WeGroupCodeActual extends BaseEntity
+@Data
+@TableName("we_group_code_actual")
+public class WeGroupCodeActual
 {
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
-    private Long id;
+    @TableId
+    private Long id=SnowFlakeUtil.nextId();
 
     /** 实际群码 */
     private String actualGroupQrCode;
