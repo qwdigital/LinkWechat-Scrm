@@ -1,12 +1,12 @@
 <script>
-import * as api from "@/api/customer";
-import { getList as getListTag } from "@/api/customer/tag";
-import { getList as getListOrganization } from "@/api/organization";
-import AddTag from "./components/AddTag";
-import SelectUser from "./components/SelectUser";
+import * as api from '@/api/customer'
+import { getList as getListTag } from '@/api/customer/tag'
+import { getList as getListOrganization } from '@/api/organization'
+import AddTag from './components/AddTag'
+import SelectUser from './components/SelectUser'
 
 export default {
-  name: "Customer",
+  name: 'Customer',
   components: { AddTag, SelectUser },
   props: {},
   data() {
@@ -14,11 +14,11 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        name: "", // "客户名称",
-        userIds: "", // "添加人id",
-        tagIds: "", // "标签id,多个标签，id使用逗号隔开",
-        beginTime: "", // "开始时间",
-        endTime: "", // "结束时间"
+        name: '', // "客户名称",
+        userIds: '', // "添加人id",
+        tagIds: '', // "标签id,多个标签，id使用逗号隔开",
+        beginTime: '', // "开始时间",
+        endTime: '', // "结束时间"
       },
       queryTag: [], // 搜索框选择的标签
       queryUser: [], // 搜索框选择的添加人
@@ -26,34 +26,34 @@ export default {
       // 日期快捷选项
       pickerOptions: {
         disabledDate(time) {
-          return time.getTime() > Date.now();
+          return time.getTime() > Date.now()
         },
         shortcuts: [
           {
-            text: "最近一周",
+            text: '最近一周',
             onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit("pick", [start, end]);
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+              picker.$emit('pick', [start, end])
             },
           },
           {
-            text: "最近一个月",
+            text: '最近一个月',
             onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit("pick", [start, end]);
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+              picker.$emit('pick', [start, end])
             },
           },
           {
-            text: "最近三个月",
+            text: '最近三个月',
             onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-              picker.$emit("pick", [start, end]);
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+              picker.$emit('pick', [start, end])
             },
           },
         ],
@@ -63,7 +63,7 @@ export default {
       total: 0,
       // 添加标签表单
       form: {
-        gourpName: "",
+        gourpName: '',
         weTags: [],
       },
       list: [], // 客户列表
@@ -73,166 +73,169 @@ export default {
       dialogVisible: false, // 选择标签弹窗显隐
       dialogVisibleSelectUser: false, // 选择添加人弹窗显隐
       dialogVisibleAddTag: false, // 添加标签弹窗显隐
-      selectedGroup: "", // 选择的标签分组
+      selectedGroup: '', // 选择的标签分组
       selectedTag: [], // 选择的标签
       removeTag: [], // 可移除的标签
       tagDialogType: {
-        title: "", // 选择标签弹窗标题
-        type: "", // 弹窗类型
+        title: '', // 选择标签弹窗标题
+        type: '', // 弹窗类型
       },
-    };
+    }
   },
   watch: {},
   computed: {},
   created() {
-    this.getList();
-    this.getListTag();
-    this.getListOrganization();
+    this.getList()
+    this.getListTag()
+    this.getListOrganization()
   },
   mounted() {},
   methods: {
     getList(page) {
       // console.log(this.dateRange);
       if (this.dateRange[0]) {
-        this.query.beginTime = this.dateRange[0];
-        this.query.endTime = this.dateRange[1];
-      }else {
-        this.query.beginTime = "";
-        this.query.endTime = "";
+        this.query.beginTime = this.dateRange[0]
+        this.query.endTime = this.dateRange[1]
+      } else {
+        this.query.beginTime = ''
+        this.query.endTime = ''
       }
-      page && (this.query.pageNum = page);
-      this.loading = true;
+      page && (this.query.pageNum = page)
+      this.loading = true
       api
         .getList(this.query)
         .then(({ rows, total }) => {
-          this.list = rows;
-          this.total = +total;
-          this.loading = false;
-          this.multipleSelection = [];
+          this.list = rows
+          this.total = +total
+          this.loading = false
+          this.multipleSelection = []
         })
         .catch(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
     getListTag() {
       getListTag().then(({ rows }) => {
-        this.listTag = Object.freeze(rows);
-        this.listTagOneArray = [];
+        this.listTag = Object.freeze(rows)
+        this.listTagOneArray = []
         this.listTag.forEach((element) => {
           element.weTags.forEach((d) => {
-            this.listTagOneArray.push(d);
-          });
-        });
-      });
+            this.listTagOneArray.push(d)
+          })
+        })
+      })
     },
     getListOrganization() {
       getListOrganization().then(({ rows }) => {
-        this.listOrganization = Object.freeze(rows);
-      });
+        this.listOrganization = Object.freeze(rows)
+      })
     },
     showTagDialog() {
-      this.selectedTag = this.queryTag;
+      this.selectedTag = this.queryTag
       this.tagDialogType = {
-        title: "选择标签",
-        type: "query",
-      };
-      this.dialogVisible = true;
+        title: '选择标签',
+        type: 'query',
+      }
+      this.dialogVisible = true
     },
     makeTag(type) {
-      this.selectedTag = [];
+      this.selectedTag = []
       if (!this.multipleSelection.length) {
-        this.msgInfo("请选择一位客户");
-        return;
+        this.msgInfo('请选择一位客户')
+        return
       }
       if (this.multipleSelection.length > 1) {
-        this.msgInfo("同时只能选择一位客户");
-        return;
+        this.msgInfo('同时只能选择一位客户')
+        return
       }
       this.tagDialogType = {
-        title: type === "add" ? "增加标签" : "移出标签",
+        title: type === 'add' ? '增加标签' : '移出标签',
         type: type,
-      };
+      }
       this.multipleSelection.forEach((element) => {
         // debugger;
         element.weFlowerCustomerRels.forEach((child) => {
           child.weFlowerCustomerTagRels.forEach((grandchild) => {
             let filter = this.listTagOneArray.find((d) => {
-              return d.tagId === grandchild.tagId;
-            });
-            this.selectedTag.push(filter);
-          });
-        });
-      });
-      this.removeTag = this.selectedTag.slice();
-      this.dialogVisible = true;
+              return d.tagId === grandchild.tagId
+            })
+            this.selectedTag.push(filter)
+          })
+        })
+      })
+      this.removeTag = this.selectedTag.slice()
+      this.dialogVisible = true
     },
     sync() {
       const loading = this.$loading({
         lock: true,
-        text: "Loading",
-        spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 0.7)",
-      });
-      api.sync().then(() => {
-        loading.close();
-        this.msgSuccess("后台开始同步数据，请稍后关注进度");
-      }).catch(fail => {
-        loading.close();
-        console.log(fail)
-      });;
+        text: 'Loading',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)',
+      })
+      api
+        .sync()
+        .then(() => {
+          loading.close()
+          this.msgSuccess('后台开始同步数据，请稍后关注进度')
+        })
+        .catch((fail) => {
+          loading.close()
+          console.log(fail)
+        })
     },
     /** 导出按钮操作 */
     exportCustomer() {
-      const queryParams = this.query;
-      this.$confirm("是否确认导出所有客户数据项?", "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      const queryParams = this.query
+      this.$confirm('是否确认导出所有客户数据项?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       })
-              .then(function () {
-                return api.exportCustomer(queryParams);
-              })
-              .then((response) => {
-                this.download(response.msg);
-              })
-              .catch(function () {});
+        .then(function() {
+          return api.exportCustomer(queryParams)
+        })
+        .then((response) => {
+          this.download(response.msg)
+        })
+        .catch(function() {})
     },
     selectedUser(list) {
-      this.queryUser = list;
-      this.query.userIds = list.map((d) => d.userId) + "";
+      this.queryUser = list
+      this.query.userIds = list.map((d) => d.userId) + ''
     },
     submitSelectTag(formName) {
-      if (this.tagDialogType.type === "query") {
-        this.query.tagIds = this.selectedTag.map((d) => d.tagId) + "";
+      if (this.tagDialogType.type === 'query') {
+        this.query.tagIds = this.selectedTag.map((d) => d.tagId) + ''
         // debugger;
-        this.queryTag = this.selectedTag;
-        this.dialogVisible = false;
+        this.queryTag = this.selectedTag
+        this.dialogVisible = false
       } else {
         let data = {
           externalUserid: this.multipleSelection[0].externalUserid,
           addTag: this.selectedTag,
-        };
+        }
         let apiType = {
-          add: "makeLabel",
-          remove: "removeLabel",
-        };
+          add: 'makeLabel',
+          remove: 'removeLabel',
+        }
         api[apiType[this.tagDialogType.type]](data).then(() => {
-          this.msgSuccess("操作成功");
-          this.dialogVisible = false;
-          this.getList();
-        });
+          this.msgSuccess('操作成功')
+          this.dialogVisible = false
+          this.getList()
+        })
       }
     },
     resetForm(formName) {
-      this.dateRange = [];
-      this.$refs["queryForm"].resetFields();
+      this.dateRange = []
+      this.$refs['queryForm'].resetFields()
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.multipleSelection = selection;
+      this.multipleSelection = selection
     },
   },
-};
+}
 </script>
 
 <template>
@@ -252,7 +255,12 @@ export default {
         <div class="tag-input" @click="dialogVisibleSelectUser = true">
           <span class="tag-place" v-if="!queryUser.length">请选择</span>
           <template v-else>
-            <el-tag type="info" v-for="(unit, unique) in queryUser" :key="unique">{{unit.name}}</el-tag>
+            <el-tag
+              type="info"
+              v-for="(unit, unique) in queryUser"
+              :key="unique"
+              >{{ unit.name }}</el-tag
+            >
           </template>
         </div>
       </el-form-item>
@@ -271,7 +279,12 @@ export default {
         <div class="tag-input" @click="showTagDialog">
           <span class="tag-place" v-if="!queryTag.length">请选择</span>
           <template v-else>
-            <el-tag type="info" v-for="(unit, unique) in queryTag" :key="unique">{{unit.name}}</el-tag>
+            <el-tag
+              type="info"
+              v-for="(unit, unique) in queryTag"
+              :key="unique"
+              >{{ unit.name }}</el-tag
+            >
           </template>
         </div>
       </el-form-item>
@@ -280,25 +293,28 @@ export default {
           v-hasPermi="['customerManage:customer:query']"
           type="primary"
           @click="getList(1)"
-        >查询</el-button>
+          >查询</el-button
+        >
         <el-button
           v-hasPermi="['customerManage:customer:query']"
           type="info"
           @click="resetForm()"
-        >重置</el-button>
+          >重置</el-button
+        >
         <el-button
           v-hasPermi="['customerManage:customer:export']"
           type="cyan"
           @click="exportCustomer"
-        >导出列表</el-button>
+          >导出列表</el-button
+        >
       </el-form-item>
     </el-form>
 
     <div class="mid-action">
       <div class="total">
         共
-        <span class="num">{{total}}</span> 位客户，实际客户
-        <span class="num">{{total}}</span> 位。
+        <span class="num">{{ total }}</span> 位客户，实际客户
+        <span class="num">{{ total }}</span> 位。
       </div>
       <div>
         <el-button
@@ -307,27 +323,31 @@ export default {
           size="mini"
           icon="el-icon-s-flag"
           @click="makeTag('add')"
-        >打标签</el-button>
+          >打标签</el-button
+        >
         <el-button
           v-hasPermi="['customerManage:customer:removeTag']"
           type="primary"
           size="mini"
           icon="el-icon-brush"
           @click="makeTag('remove')"
-        >移除标签</el-button>
+          >移除标签</el-button
+        >
         <el-button
           v-hasPermi="['customerManage:customer:sync']"
           type="primary"
           size="mini"
           icon="el-icon-refresh"
           @click="sync"
-        >同步客户</el-button>
+          >同步客户</el-button
+        >
         <el-button
           v-hasPermi="['customerManage:customer:checkRepeat']"
           type="primary"
           size="mini"
           icon="el-icon-view"
-        >查看重复客户</el-button>
+          >查看重复客户</el-button
+        >
       </div>
     </div>
 
@@ -338,31 +358,53 @@ export default {
       style="width: 100%"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" align="center" width="55"></el-table-column>
+      <el-table-column
+        type="selection"
+        align="center"
+        width="55"
+      ></el-table-column>
       <el-table-column label="客户" prop="name" align="center">
         <template slot-scope="scope">
           {{ scope.row.name }}
           <span
-            :style="{color: scope.row.type === 1 ? '#4bde03' : '#f9a90b'}"
-          >{{ ({1: '@微信', 2: '@企业微信'})[scope.row.type] }}</span>
-          <i :class="['el-icon-s-custom', ({1: 'man', 2: 'woman'})[scope.row.gender]]"></i>
+            :style="{ color: scope.row.type === 1 ? '#4bde03' : '#f9a90b' }"
+            >{{ { 1: '@微信', 2: '@企业微信' }[scope.row.type] }}</span
+          >
+          <i
+            :class="[
+              'el-icon-s-custom',
+              { 1: 'man', 2: 'woman' }[scope.row.gender],
+            ]"
+          ></i>
         </template>
       </el-table-column>
-      <el-table-column prop="corpName" label="公司名称" align="center"></el-table-column>
+      <el-table-column
+        prop="corpName"
+        label="公司名称"
+        align="center"
+      ></el-table-column>
       <el-table-column prop="userName" label="添加人（首位）" align="center">
-        <template slot-scope="scope">{{ scope.row.weFlowerCustomerRels[0].userName }}</template>
+        <template slot-scope="scope">{{
+          scope.row.weFlowerCustomerRels[0].userName
+        }}</template>
       </el-table-column>
       <el-table-column prop="createTime" label="添加时间" align="center">
-        <template slot-scope="scope">{{ scope.row.weFlowerCustomerRels[0].createTime }}</template>
+        <template slot-scope="scope">{{
+          scope.row.weFlowerCustomerRels[0].createTime
+        }}</template>
       </el-table-column>
       <el-table-column prop="address" label="标签" align="center">
         <template slot-scope="scope">
-          <div v-for="(item, index) in scope.row.weFlowerCustomerRels" :key="index">
+          <div
+            v-for="(item, index) in scope.row.weFlowerCustomerRels"
+            :key="index"
+          >
             <el-tag
               type="info"
               v-for="(unit, unique) in item.weFlowerCustomerTagRels"
               :key="unique"
-            >{{unit.tagName}}</el-tag>
+              >{{ unit.tagName }}</el-tag
+            >
           </div>
         </template>
       </el-table-column>
@@ -370,17 +412,23 @@ export default {
         <template slot-scope="scope">
           <el-button
             v-hasPermi="['customerManage:customer:view']"
-            @click="$router.push({ path: '/customerManage/customerDetail', query: scope.row })"
+            @click="
+              $router.push({
+                path: '/customerManage/customerDetail',
+                query: { id: scope.row.externalUserid },
+              })
+            "
             type="text"
             size="small"
-          >查看</el-button>
+            >查看</el-button
+          >
           <!-- <el-button type="text" size="small">编辑</el-button> -->
         </template>
       </el-table-column>
     </el-table>
 
     <pagination
-      v-show="total>0"
+      v-show="total > 0"
       :total="total"
       :page.sync="query.pageNum"
       :limit.sync="query.pageSize"
@@ -388,7 +436,11 @@ export default {
     />
 
     <!-- 选择标签弹窗 -->
-    <el-dialog key="1" :title="tagDialogType.title" :visible.sync="dialogVisible">
+    <el-dialog
+      key="1"
+      :title="tagDialogType.title"
+      :visible.sync="dialogVisible"
+    >
       <div>
         <span class="mr20">选择分组</span>
         <el-select v-model="selectedGroup" placeholder="请选择">
@@ -401,7 +453,10 @@ export default {
           ></el-option>
         </el-select>
         <div class="mt20">
-          <el-checkbox-group v-model="selectedTag" v-if="tagDialogType.type !== 'remove'">
+          <el-checkbox-group
+            v-model="selectedTag"
+            v-if="tagDialogType.type !== 'remove'"
+          >
             <template v-for="(item, index) in listTag">
               <div
                 class="bfc-d"
@@ -412,7 +467,8 @@ export default {
                   :label="unit"
                   v-for="(unit, unique) in item.weTags"
                   :key="index + unique"
-                >{{unit.name}}</el-checkbox>
+                  >{{ unit.name }}</el-checkbox
+                >
               </div>
             </template>
           </el-checkbox-group>
@@ -422,12 +478,15 @@ export default {
                 v-if="item.groupId === selectedGroup || !selectedGroup"
                 :label="item"
                 :key="index"
-              >{{item.name}}</el-checkbox>
+                >{{ item.name }}</el-checkbox
+              >
             </template>
           </el-checkbox-group>
         </div>
         <div class="mt20" v-show="tagDialogType.type === 'add'">
-          <el-button type="primary" @click="dialogVisibleAddTag = true">添加标签</el-button>
+          <el-button type="primary" @click="dialogVisibleAddTag = true"
+            >添加标签</el-button
+          >
         </div>
       </div>
       <div slot="footer">
@@ -437,10 +496,18 @@ export default {
     </el-dialog>
 
     <!-- 选择添加人弹窗 -->
-    <SelectUser :visible.sync="dialogVisibleSelectUser" title="选择添加人" @success="selectedUser"></SelectUser>
+    <SelectUser
+      :visible.sync="dialogVisibleSelectUser"
+      title="选择添加人"
+      @success="selectedUser"
+    ></SelectUser>
 
     <!-- 添加标签弹窗 -->
-    <AddTag :visible.sync="dialogVisibleAddTag" :form="form" @success="getListTag()" />
+    <AddTag
+      :visible.sync="dialogVisibleAddTag"
+      :form="form"
+      @success="getListTag()"
+    />
   </div>
 </template>
 

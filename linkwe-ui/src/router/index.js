@@ -138,109 +138,142 @@ export const constantRoutes = [
   //     {
   //       path: 'staff',
   //       name: 'CodeStaff',
-  //       component: (resolve) => require(['@/views/drainageCode/staff/list'], resolve),
-  //       meta: { title: '员工活码', icon: '' }
+  //       component: (resolve) =>
+  //         require(['@/views/drainageCode/staff/list'], resolve),
+  //       meta: { title: '员工活码', icon: '' },
   //     },
   //     {
   //       path: 'staffAdd',
   //       hidden: true,
-  //       component: (resolve) => require(['@/views/drainageCode/staff/add'], resolve),
-  //       meta: { title: '新建员工活码', icon: '', activeMenu: '/drainageCode/staff' }
+  //       component: (resolve) =>
+  //         require(['@/views/drainageCode/staff/add'], resolve),
+  //       meta: {
+  //         title: '新建员工活码',
+  //         icon: '',
+  //         activeMenu: '/drainageCode/staff',
+  //       },
   //     },
   //     {
   //       path: 'staffDetail',
   //       hidden: true,
-  //       component: (resolve) => require(['@/views/drainageCode/staff/detail'], resolve),
-  //       meta: { title: '员工活码详情', icon: '', activeMenu: '/drainageCode/staff' }
+  //       component: (resolve) =>
+  //         require(['@/views/drainageCode/staff/detail'], resolve),
+  //       meta: {
+  //         title: '员工活码详情',
+  //         icon: '',
+  //         activeMenu: '/drainageCode/staff',
+  //       },
   //     },
   //     {
   //       path: 'group',
   //       name: 'CodeGroup',
-  //       component: (resolve) => require(['@/views/drainageCode/group/list'], resolve),
-  //       meta: { title: '客户群活码', icon: '' }
+  //       component: (resolve) =>
+  //         require(['@/views/drainageCode/group/list'], resolve),
+  //       meta: { title: '客户群活码', icon: '' },
   //     },
   //     {
   //       path: 'groupAdd',
   //       hidden: true,
-  //       component: (resolve) => require(['@/views/drainageCode/group/add'], resolve),
-  //       meta: { title: '新增客户群活码', icon: '', activeMenu: '/drainageCode/group' }
+  //       component: (resolve) =>
+  //         require(['@/views/drainageCode/group/add'], resolve),
+  //       meta: {
+  //         title: '新增客户群活码',
+  //         icon: '',
+  //         activeMenu: '/drainageCode/group',
+  //       },
   //     },
   //     {
   //       path: 'groupDetail',
   //       hidden: true,
-  //       component: (resolve) => require(['@/views/drainageCode/group/detail'], resolve),
-  //       meta: { title: '客户群活码信息', icon: '', activeMenu: '/drainageCode/group' }
+  //       component: (resolve) =>
+  //         require(['@/views/drainageCode/group/detail'], resolve),
+  //       meta: {
+  //         title: '客户群活码信息',
+  //         icon: '',
+  //         activeMenu: '/drainageCode/group',
+  //       },
   //     },
   //     {
   //       path: 'groupBaseInfo',
   //       hidden: true,
-  //       component: (resolve) => require(['@/views/drainageCode/group/baseInfo'], resolve),
-  //       meta: { title: '客户群活码', icon: '', activeMenu: '/drainageCode/group' }
+  //       component: (resolve) =>
+  //         require(['@/views/drainageCode/group/baseInfo'], resolve),
+  //       meta: {
+  //         title: '客户群活码',
+  //         icon: '',
+  //         activeMenu: '/drainageCode/group',
+  //       },
   //     },
   //     {
   //       path: 'welcome',
   //       name: 'Welcome',
-  //       component: (resolve) => require(['@/views/drainageCode/welcome/list'], resolve),
-  //       meta: { title: '欢迎语', icon: '' }
+  //       component: (resolve) =>
+  //         require(['@/views/drainageCode/welcome/list'], resolve),
+  //       meta: { title: '欢迎语', icon: '' },
   //     },
   //     {
   //       path: 'welcomeAdd',
   //       hidden: true,
-  //       component: (resolve) => require(['@/views/drainageCode/welcome/add'], resolve),
-  //       meta: { title: '新建欢迎语', icon: '', activeMenu: '/drainageCode/welcome' }
+  //       component: (resolve) =>
+  //         require(['@/views/drainageCode/welcome/add'], resolve),
+  //       meta: {
+  //         title: '新建欢迎语',
+  //         icon: '',
+  //         activeMenu: '/drainageCode/welcome',
+  //       },
   //     },
-  //   ]
+  //   ],
   // },
-  {
-    path: '/material',
-    component: Layout,
-    redirect: '/material/text',
-    meta: { title: '素材中心', icon: 'material' },
-    children: [
-      {
-        path: 'text',
-        name: 'MaterialText',
-        component: (resolve) => require(['@/views/material/text'], resolve),
-        meta: { title: '文本', icon: '' },
-      },
-      {
-        path: 'image',
-        name: 'MaterialImage',
-        component: (resolve) => require(['@/views/material/image'], resolve),
-        meta: { title: '图片', icon: '' },
-      },
-      {
-        path: 'web',
-        name: 'MaterialWeb',
-        component: (resolve) => require(['@/views/material/web'], resolve),
-        meta: { title: '网页', icon: '' },
-      },
-      {
-        path: 'audio',
-        name: 'MaterialAudio',
-        component: (resolve) => require(['@/views/material/audio'], resolve),
-        meta: { title: '语音', icon: '' },
-      },
-      {
-        path: 'video',
-        name: 'MaterialVideo',
-        component: (resolve) => require(['@/views/material/video'], resolve),
-        meta: { title: '视频', icon: '' },
-      },
-      {
-        path: 'file',
-        name: 'MaterialFile',
-        component: (resolve) => require(['@/views/material/file'], resolve),
-        meta: { title: '文件', icon: '' },
-      },
-      {
-        path: 'applet',
-        name: 'MaterialApplet',
-        component: (resolve) => require(['@/views/material/applet'], resolve),
-        meta: { title: '小程序', icon: '' },
-      },
-    ],
-  },
+  // {
+  //   path: '/material',
+  //   component: Layout,
+  //   redirect: '/material/text',
+  //   meta: { title: '素材中心', icon: 'material' },
+  //   children: [
+  //     {
+  //       path: 'text',
+  //       name: 'MaterialText',
+  //       component: (resolve) => require(['@/views/material/text'], resolve),
+  //       meta: { title: '文本', icon: '' },
+  //     },
+  //     {
+  //       path: 'image',
+  //       name: 'MaterialImage',
+  //       component: (resolve) => require(['@/views/material/image'], resolve),
+  //       meta: { title: '图片', icon: '' },
+  //     },
+  //     {
+  //       path: 'web',
+  //       name: 'MaterialWeb',
+  //       component: (resolve) => require(['@/views/material/web'], resolve),
+  //       meta: { title: '网页', icon: '' },
+  //     },
+  //     {
+  //       path: 'audio',
+  //       name: 'MaterialAudio',
+  //       component: (resolve) => require(['@/views/material/audio'], resolve),
+  //       meta: { title: '语音', icon: '' },
+  //     },
+  //     {
+  //       path: 'video',
+  //       name: 'MaterialVideo',
+  //       component: (resolve) => require(['@/views/material/video'], resolve),
+  //       meta: { title: '视频', icon: '' },
+  //     },
+  //     {
+  //       path: 'file',
+  //       name: 'MaterialFile',
+  //       component: (resolve) => require(['@/views/material/file'], resolve),
+  //       meta: { title: '文件', icon: '' },
+  //     },
+  //     {
+  //       path: 'applet',
+  //       name: 'MaterialApplet',
+  //       component: (resolve) => require(['@/views/material/applet'], resolve),
+  //       meta: { title: '小程序', icon: '' },
+  //     },
+  //   ],
+  // },
   // {
   //   path: '/appTool',
   //   component: Layout,

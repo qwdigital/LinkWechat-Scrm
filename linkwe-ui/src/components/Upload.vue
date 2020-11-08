@@ -1,9 +1,14 @@
 <script>
 import { upload } from '@/api/material'
+import Video from 'video.js'
 export default {
   components: {},
   props: {
     fileUrl: {
+      type: String,
+      default: '',
+    },
+    fileName: {
       type: String,
       default: '',
     },
@@ -12,34 +17,40 @@ export default {
       type: String,
       default: '0',
     },
-    beforeUpload: {
-      type: Function,
-      default: () => () => {},
-    },
+    // beforeUpload: {
+    //   type: Function,
+    //   default: function() {
+    //     return function() {}
+    //   },
+    // },
   },
   data() {
     return {
+      loading: false,
       action:
-        process.env.VUE_APP_BASE_API + window.CONFIG.services.wecom + '/upload',
+        process.env.VUE_APP_BASE_API +
+        window.CONFIG.services.wecom +
+        '/material/upload',
       headers: window.CONFIG.headers,
     }
   },
   watch: {},
   computed: {
     accept() {
-      return ['image/*', 'audio/*', 'video/*', '*'][this.type]
+      return ['image/*', '*', 'video/*', '*'][this.type]
     },
   },
-  created() {
-    upload()
-  },
+  created() {},
   mounted() {},
   methods: {
     handleBeforeUpload(file) {
+      this.loading = true
+      let isFormat = true,
+        isSize = true
       if (this.type === '0') {
         // 图片
-        const isFormat = file.type === 'image/jpeg'
-        const isSize = file.size / 1024 / 1024 < 2
+        isFormat = file.type === 'image/jpeg'
+        isSize = file.size / 1024 / 1024 < 2
 
         if (!isFormat) {
           this.$message.error('上传文件只能是 JPG 格式!')
@@ -47,11 +58,10 @@ export default {
         if (!isSize) {
           this.$message.error('上传文件大小不能超过 2MB!')
         }
-        return isFormat && isSize
       } else if (this.type === '1') {
         // 语音
-        const isFormat = file.type === 'audio/amr'
-        const isSize = file.size / 1024 / 1024 < 2
+        isFormat = /.amr$/gi.test(file.name)
+        isSize = file.size / 1024 / 1024 < 2
 
         if (!isFormat) {
           this.$message.error('上传文件只能是 amr 格式!')
@@ -59,11 +69,10 @@ export default {
         if (!isSize) {
           this.$message.error('上传文件大小不能超过 2MB!')
         }
-        return isFormat && isSize
       } else if (this.type === '2') {
         // 视频
-        const isFormat = file.type === 'video/mp4'
-        const isSize = file.size / 1024 / 1024 < 10
+        isFormat = file.type === 'video/mp4'
+        isSize = file.size / 1024 / 1024 < 10
 
         if (!isFormat) {
           this.$message.error('上传文件只能是 mp4 格式!')
@@ -71,20 +80,30 @@ export default {
         if (!isSize) {
           this.$message.error('上传文件大小不能超过 10MB!')
         }
-        return isFormat && isSize
       } else if (this.type === '3') {
         // 普通文件
-        const isSize = file.size / 1024 / 1024 < 20
+        isSize = file.size / 1024 / 1024 < 20
 
         if (!isSize) {
           this.$message.error('上传文件大小不能超过 20MB!')
         }
-        return isSize
       }
-      return beforeUpload(file)
+      if (!isFormat || !isSize) {
+        this.loading = false
+      }
+
+      // if (beforeUpload) {
+      //   return beforeUpload(file)
+      // }
+      return isFormat && isSize
     },
     onSuccess(res, file) {
-      this.fileUrl = URL.createObjectURL(file.raw)
+      if (res.code === 200) {
+        this.loading = false
+        this.$emit('update:fileUrl', res.data.materialUrl)
+        this.$emit('update:fileName', res.data.materialName)
+        // this.fileUrl = URL.createObjectURL(file.raw)
+      }
     },
   },
 }
@@ -93,16 +112,35 @@ export default {
 <template>
   <div>
     <el-upload
+      v-loading="loading"
       class="uploader"
       :accept="accept"
       :action="action"
       :headers="headers"
-      :data="{ type: type }"
+      :data="{ mediaType: type }"
       :show-file-list="false"
       :on-success="onSuccess"
       :before-upload="handleBeforeUpload"
     >
-      <img v-if="fileUrl" :src="fileUrl" class="upload-img" />
+      <template v-if="fileUrl">
+        <img v-if="type === '0'" :src="fileUrl" class="upload-img" />
+        <div v-else-if="type === '2'">
+          <video
+            id="myVideo"
+            class="video-js vjs-default-skin
+            vjs-big-play-centered"
+            width="100%"
+            controls
+            webkit-playsinline="true"
+            playsinline="true"
+            autoplay="none"
+            preload="auto"
+          >
+            <source :src="fileUrl" type="video/mp4" />
+          </video>
+        </div>
+        <div v-else>{{ fileName }}</div>
+      </template>
       <i v-else class="el-icon-plus uploader-icon"></i>
     </el-upload>
     <div class="tip">
@@ -113,7 +151,6 @@ export default {
 
 <style lang="scss" scoped>
 /deep/.uploader .el-upload {
-  border: 1px dashed #d9d9d9;
   border-radius: 6px;
   cursor: pointer;
   position: relative;
@@ -129,6 +166,8 @@ export default {
   height: 178px;
   line-height: 178px;
   text-align: center;
+  border-radius: 6px;
+  border: 1px dashed #d9d9d9;
 }
 .upload-img {
   width: 178px;

@@ -72,7 +72,7 @@ type:0 图片（image）、1 语音（voice）、2 视频（video），3 普通�
  */
 export function upload(data) {
   return request({
-    url: window.CONFIG.services.wecom + '/upload',
+    url: service + '/upload',
     method: 'post',
     data,
   })

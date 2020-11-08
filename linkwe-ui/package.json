@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build:prod": "vue-cli-service build",
+    "build": "vue-cli-service build",
     "preview": "node build/index.js --preview",
     "lint": "eslint --ext .js,.vue src",
     "test:unit": "jest --clearCache && vue-cli-service test:unit",
@@ -35,7 +35,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/y_project/RuoYi-Vue.git"
+    "url": "https://gitee.com/LinkWeChat/link-wechat.git"
   },
   "dependencies": {
     "@riophae/vue-treeselect": "0.4.0",
@@ -55,6 +55,7 @@
     "promise.prototype.finally": "^3.1.2",
     "screenfull": "4.2.0",
     "sortablejs": "1.8.4",
+    "video.js": "^7.10.2",
     "vue": "2.6.10",
     "vue-count-to": "1.0.13",
     "vue-cropper": "0.4.9",

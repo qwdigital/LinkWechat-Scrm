@@ -62,14 +62,18 @@ export default {
         emitPath: false,
       },
 
-      typeTitle: ['图片', '语音', '视频', '普通文件', '文本'],
+      typeTitle: ['图片', '语音', '视频', '文件', '文本'],
       form: {}, // 素材表单
-      fileUrl: '',
       dialogVisible: false, // 素材表格对话框显隐
       // 表单校验
       rules: Object.freeze({
+        categoryId: [
+          { required: true, message: '不能为空', trigger: 'change' },
+        ],
         content: [{ required: true, message: '不能为空', trigger: 'blur' }],
-        materialUrl: [{ required: true, message: '不能为空', trigger: 'blur' }],
+        materialUrl: [
+          { required: true, message: '不能为空', trigger: 'change' },
+        ],
         materialName: [
           { required: true, message: '不能为空', trigger: 'blur' },
         ],
@@ -162,6 +166,7 @@ export default {
     },
     // 素材提交
     submit() {
+      // this.$refs['form'].validateField
       this.$refs['form'].validate((valid) => {
         if (valid) {
           let form = JSON.parse(JSON.stringify(this.form))
@@ -179,7 +184,7 @@ export default {
     },
     // 素材删除
     remove(id) {
-      const Ids = id || this.selected
+      const Ids = id || this.selected + ''
       this.$confirm('是否确认删除吗?', '警告', {
         type: 'warning',
       })
@@ -191,12 +196,17 @@ export default {
           this.msgSuccess('删除成功')
         })
     },
+    // 移动分组
     moveGroup() {
-      moveGroup(this.group, this.selected).then(() => {
+      moveGroup(this.group, this.selected + '').then(() => {
         this.getList()
         this.msgSuccess('操作成功')
         this.groupDialogVisible = false
       })
+    },
+    // 下载
+    download(data) {
+      window.open(data.materialUrl)
     },
   },
 }
@@ -207,7 +217,11 @@ export default {
     <el-row :gutter="20">
       <el-col :span="6" :xs="24">
         <div>
-          <el-button slot="reference" type="primary" @click="treeEdit({}, 0)"
+          <el-button
+            v-hasPermi="['material:addType']"
+            slot="reference"
+            type="primary"
+            @click="treeEdit({}, 0)"
             >添加分类</el-button
           >
         </div>
@@ -226,20 +240,21 @@ export default {
               <span>{{ node.label }}</span>
               <span class="fr">
                 <i
+                  v-hasPermi="['material:editType']"
                   class="el-icon-edit"
                   title="编辑"
                   @click.stop="treeEdit(data, 1)"
                 ></i>
                 <i
+                  v-hasPermi="['material:addType']"
                   class="el-icon-plus"
                   title="添加子分类"
-                  v-hasPermi="['contacts:organization:addDep']"
                   @click.stop="treeEdit(data, 0)"
                 ></i>
                 <i
+                  v-hasPermi="['material:removeType']"
                   class="el-icon-minus"
                   title="删除"
-                  v-hasPermi="['contacts:organization:removeDep']"
                   @click.stop="treeRemove(data.id)"
                 ></i>
               </span>
@@ -264,7 +279,10 @@ export default {
             style="width: 300px;"
           />
           <el-button class="ml10" @click="getList(1)">搜索</el-button>
-          <el-button @click="remove" :disabled="selected.length === 0"
+          <el-button
+            v-hasPermi="['material:remove']"
+            @click="remove"
+            :disabled="selected.length === 0"
             >删除</el-button
           >
           <el-popover placement="top" width="260" v-model="groupDialogVisible">
@@ -285,6 +303,7 @@ export default {
               >
             </div>
             <el-button
+              v-hasPermi="['material:edit']"
               slot="reference"
               class="ml10"
               :disabled="selected.length === 0"
@@ -293,7 +312,10 @@ export default {
           </el-popover>
 
           <div class="fr">
-            <el-button type="primary" @click="edit(1)"
+            <el-button
+              v-hasPermi="['material:add']"
+              type="primary"
+              @click="edit(1)"
               >添加{{ typeTitle[type] }}</el-button
             >
           </div>
@@ -347,7 +369,7 @@ export default {
       append-to-body
     >
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item :label="typeTitle[type] + '分类'">
+        <el-form-item label="分类" prop="categoryId">
           <el-cascader
             v-model="form.categoryId"
             :options="treeData"
@@ -364,32 +386,74 @@ export default {
           ></el-input>
         </el-form-item>
 
-        <el-form-item label="图片" prop="materialUrl" v-else-if="type === '0'">
-          <upload :fileUrl.sync="form.fileUrl" :mediaType="type">
-            <div slot="tip">
-              支持JPG,PNG格式，图片大小不超过2M，建议上传宽高1:1的图片
-            </div>
-          </upload>
-        </el-form-item>
+        <template v-else-if="type === '0'">
+          <el-form-item label="文案" prop="content">
+            <el-input
+              v-model="form.content"
+              type="textarea"
+              :autosize="{ minRows: 2, maxRows: 50 }"
+              placeholder="请输入"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="图片" prop="materialUrl">
+            <upload
+              :fileUrl.sync="form.materialUrl"
+              :fileName.sync="form.materialName"
+              :type="type"
+            >
+              <div slot="tip">
+                支持JPG,PNG格式，图片大小不超过2M，建议上传宽高1:1的图片
+              </div>
+            </upload>
+          </el-form-item>
+          <el-form-item label="名称" prop="materialName">
+            <el-input
+              v-model="form.materialName"
+              placeholder="请输入"
+            ></el-input>
+          </el-form-item>
+        </template>
 
-        <el-form-item label="语音" prop="materialUrl" v-else-if="type === '1'">
-          <upload :fileUrl.sync="form.fileUrl" :mediaType="type">
-            <div slot="tip">
-              只能上传amr格式的语音文件。单个文件大小不超过2M，时长不超过1分钟
-            </div>
-          </upload>
-        </el-form-item>
+        <template v-else-if="type === '1'">
+          <el-form-item label="语音" prop="materialUrl">
+            <upload
+              :fileUrl.sync="form.materialUrl"
+              :fileName.sync="form.materialName"
+              :type="type"
+            >
+              <div slot="tip">
+                只能上传amr格式的语音文件。单个文件大小不超过2M，时长不超过1分钟
+              </div>
+            </upload>
+          </el-form-item>
+          <el-form-item label="名称" prop="materialName">
+            <el-input
+              v-model="form.materialName"
+              placeholder="请输入"
+            ></el-input>
+          </el-form-item>
+        </template>
 
         <template v-else-if="type === '2'">
           <el-form-item label="视频" prop="materialUrl">
-            <upload :fileUrl.sync="form.fileUrl" :mediaType="type">
+            <upload
+              :fileUrl.sync="form.materialUrl"
+              :fileName.sync="form.materialName"
+              :type="type"
+            >
               <div slot="tip">
                 不超过10M, 文件格式: mp4
               </div>
             </upload>
           </el-form-item>
+          <el-form-item label="名称" prop="materialName">
+            <el-input
+              v-model="form.materialName"
+              placeholder="请输入"
+            ></el-input>
+          </el-form-item>
           <el-form-item label="封面">
-            <upload :fileUrl.sync="form.coverUrl" mediaType="0">
+            <upload :fileUrl.sync="form.coverUrl" type="0">
               <div slot="tip">
                 建议尺寸：1068*455
               </div>
@@ -404,13 +468,25 @@ export default {
           </el-form-item>
         </template>
 
-        <el-form-item label="文件" prop="materialUrl" v-else-if="type === '3'">
-          <upload :fileUrl.sync="form.coverUrl" :mediaType="type">
-            <div slot="tip">
-              单个文件大小不超过20M
-            </div>
-          </upload>
-        </el-form-item>
+        <template v-else-if="type === '3'">
+          <el-form-item label="文件" prop="materialUrl">
+            <upload
+              :fileUrl.sync="form.materialUrl"
+              :fileName.sync="form.materialName"
+              :type="type"
+            >
+              <div slot="tip">
+                单个文件大小不超过20M
+              </div>
+            </upload>
+          </el-form-item>
+          <el-form-item label="名称" prop="materialName">
+            <el-input
+              v-model="form.materialName"
+              placeholder="请输入"
+            ></el-input>
+          </el-form-item>
+        </template>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submit">确 定</el-button>

@@ -14,6 +14,7 @@ Vue.use(Element, {
 
 import '@/styles/common.scss' // common css
 import '@/styles/index.scss' // global css
+import 'video.js/dist/video-js.css'
 
 import config from '@/config'
 import App from './App'

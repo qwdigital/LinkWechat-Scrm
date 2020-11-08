@@ -1,8 +1,8 @@
 <script>
-import * as api from "@/api/customer/group";
+import * as api from '@/api/customer/group'
 
 export default {
-  name: "GroupDetail",
+  name: 'GroupDetail',
   data() {
     return {
       // 遮罩层
@@ -25,34 +25,34 @@ export default {
         memberName: undefined,
       },
       joinScene: {
-        1: "由成员邀请入群（直接邀请入群）",
-        2: "由成员邀请入群（通过邀请链接入群）",
-        3: "通过扫描群二维码入群",
+        1: '由成员邀请入群（直接邀请入群）',
+        2: '由成员邀请入群（通过邀请链接入群）',
+        3: '通过扫描群二维码入群',
       },
-    };
+    }
   },
   created() {
-    this.group = this.$route.query;
-    this.query.chatId = this.group.chatId;
-    this.getList();
+    this.group = this.$route.query
+    this.query.chatId = this.group.chatId
+    this.getList()
   },
   methods: {
     getList(page) {
-      page && (this.query.pageNum = page);
-      this.loading = false;
+      page && (this.query.pageNum = page)
+      this.loading = false
       api.getMembers(this.query).then((response) => {
-        this.list = response.rows;
-        this.total = +response.total;
-        this.loading = false;
-      });
+        this.list = response.rows
+        this.total = +response.total
+        this.loading = false
+      })
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map((item) => item.operId);
-      this.multiple = !selection.length;
+      this.ids = selection.map((item) => item.operId)
+      this.multiple = !selection.length
     },
   },
-};
+}
 </script>
 
 <template>
@@ -64,16 +64,21 @@ export default {
         src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
       ></el-avatar>
       <div class="info-wrap">
-        <div style="margin-bottom: 20px;">{{group.groupName}}</div>
-        <div
-          class="info"
-        >群主：{{group.groupLeaderName}} | 创建时间：{{group.createTime}} | 群公告：{{group.notice || '未设置'}}</div>
+        <div style="margin-bottom: 20px;">{{ group.groupName }}</div>
+        <div class="info">
+          群主：{{ group.groupLeaderName }} | 创建时间：{{ group.createTime }} |
+          群公告：{{ group.notice || '未设置' }}
+        </div>
       </div>
     </div>
     <el-input placeholder="请输入群成员" v-model="query.memberName" class>
       <el-button slot="append" @click="getList(1)">查询</el-button>
     </el-input>
-    <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
+    <el-table
+      v-loading="loading"
+      :data="list"
+      @selection-change="handleSelectionChange"
+    >
       <!-- <el-table-column type="selection" width="55" align="center" /> -->
       <el-table-column label="群成员" align="center" prop="memberName">
         <template slot-scope="scope">
@@ -84,7 +89,12 @@ export default {
           <!-- <i :class="['el-icon-s-custom', ({1: 'man', 2: 'woman'})[scope.row.gender]]"></i> -->
         </template>
       </el-table-column>
-      <el-table-column label="进群时间" align="center" prop="joinTime" width="180"></el-table-column>
+      <el-table-column
+        label="进群时间"
+        align="center"
+        prop="joinTime"
+        width="180"
+      ></el-table-column>
       <el-table-column label="进群方式" align="center" prop="joinScene">
         <template slot-scope="scope">
           <span>{{ joinScene[scope.row.joinScene] }}</span>
@@ -93,7 +103,7 @@ export default {
     </el-table>
 
     <pagination
-      v-show="total>0"
+      v-show="total > 0"
       :total="total"
       :page.sync="query.pageNum"
       :limit.sync="query.pageSize"

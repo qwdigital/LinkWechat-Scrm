@@ -95,3 +95,13 @@ export function exportCustomer(query) {
     params: query,
   })
 }
+
+/**
+ *客户详情
+ * @param {*} externalUserid
+ */
+export function getDetail(externalUserid) {
+  return request({
+    url: service + '/getCustomersByUserId/' + externalUserid,
+  })
+}

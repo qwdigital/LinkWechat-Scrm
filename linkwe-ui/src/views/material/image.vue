@@ -19,16 +19,12 @@ export default {
     listChange(data) {
       this.list = data
     },
-    // 多选框选中数据
-    handleSelectionChange(selection) {
-      this.ids = selection.map((item) => item.userId)
-    },
   },
 }
 </script>
 
 <template>
-  <MaPage ref="page" type="0" @listChange="listChange">
+  <MaPage ref="page" type="0" @listChange="listChange" :selected="ids">
     <el-row :gutter="20">
       <el-col
         :span="6"
@@ -58,7 +54,9 @@ export default {
             </div>
           </div>
           <div style="padding: 14px;">
-            <el-checkbox v-model="ids">{{ item.name }}</el-checkbox>
+            <el-checkbox v-model="ids" :label="item.id">{{
+              item.materialName
+            }}</el-checkbox>
           </div>
         </el-card>
       </el-col>

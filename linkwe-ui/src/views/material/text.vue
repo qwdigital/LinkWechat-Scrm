@@ -18,7 +18,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map((item) => item.id) + ''
+      this.ids = selection.map((item) => item.id)
     },
   },
 }

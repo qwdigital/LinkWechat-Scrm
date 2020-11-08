@@ -1,5 +1,6 @@
 <script>
 import MaPage from '@/views/material/components/MaPage'
+import Video from 'video.js'
 
 export default {
   components: {
@@ -7,10 +8,6 @@ export default {
   },
   data() {
     return {
-      srcList: [
-        'https://fuss10.elemecdn.com/8/27/f01c15bb73e1ef3793e64e6b7bbccjpeg.jpeg',
-        'https://fuss10.elemecdn.com/1/8e/aeffeb4de74e2fde4bd74fc7b4486jpeg.jpeg',
-      ],
       list: [], // 列表
       ids: [], // 选中数组
     }
@@ -26,20 +23,29 @@ export default {
 </script>
 
 <template>
-  <MaPage ref="page" type="2" @listChange="listChange">
+  <MaPage ref="page" type="2" @listChange="listChange" :selected="ids">
     <el-row :gutter="20">
       <el-col
         :span="6"
-        style="margin-top: 24px;"
+        style="margin-top: 24px;min-width: 280px;"
         v-for="(item, index) in list"
         :key="index"
       >
         <el-card shadow="hover" body-style="padding: 0px;">
           <div class="img-wrap">
-            <el-image
-              :src="item.coverUrl"
-              :preview-src-list="srcList"
-            ></el-image>
+            <video
+              id="video"
+              class="video-js vjs-default-skin
+            vjs-big-play-centered"
+              controls
+              webkit-playsinline="true"
+              playsinline="true"
+              autoplay="none"
+              preload="auto"
+              :poster="item.coverUrl"
+            >
+              <source :src="item.materialUrl" type="video/mp4" />
+            </video>
             <div class="el-upload-list__item-actions">
               <span
                 class="el-upload-list__item-preview"
@@ -62,9 +68,11 @@ export default {
             </div>
           </div>
           <div style="padding: 14px;">
-            <el-checkbox v-model="kl">{{ item.createTime }}</el-checkbox>
+            <el-checkbox v-model="ids" :label="item.id">{{
+              item.createTime
+            }}</el-checkbox>
             <div>{{ item.digest }}</div>
-            <div>{{ item.digest }}</div>
+            <!-- <div>{{ item.digest }}</div> -->
           </div>
         </el-card>
       </el-col>
@@ -82,7 +90,7 @@ export default {
 .el-upload-list__item-actions {
   position: absolute;
   width: 100%;
-  height: 50px;
+  height: 40px;
   left: 0;
   top: 0;
   cursor: default;
@@ -92,5 +100,9 @@ export default {
   font-size: 20px;
   background-color: rgba(0, 0, 0, 0.5);
   transition: opacity 0.3s;
+}
+#video {
+  width: 100%;
+  height: 100%;
 }
 </style>

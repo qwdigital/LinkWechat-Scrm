@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-const service = window.CONFIG.CONFIG.services.wecom + '/group'
+const service = window.CONFIG.services.wecom + '/group'
 
 // 客户标签
 

@@ -16,35 +16,25 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map((item) => item.userId)
-      this.single = selection.length != 1
-      this.multiple = !selection.length
+      this.ids = selection.map((item) => item.id)
     },
   },
 }
 </script>
 
 <template>
-  <MaPage ref="page" type="4" @listChange="listChange">
-    <el-table :data="userList" @selection-change="handleSelectionChange">
+  <MaPage ref="page" type="3" @listChange="listChange" :selected="ids">
+    <el-table :data="list" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" align="center" />
       <el-table-column
         label="文件名"
         align="center"
-        prop="materialUrl"
+        prop="materialName"
         :show-overflow-tooltip="true"
       />
       <el-table-column label="大小" align="center" prop="userName" />
 
-      <el-table-column
-        label="创建时间"
-        align="center"
-        prop="createTime"
-        width="160"
-      >
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
-        </template>
+      <el-table-column label="创建时间" align="center" prop="createTime">
       </el-table-column>
       <el-table-column
         label="操作"
