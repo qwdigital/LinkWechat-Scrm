@@ -17,7 +17,7 @@ public class Tree<T> {
      * 名称
      */
     @ApiModelProperty(name = "label", value = "名称")
-    private String label;
+    private String name;
 
     /**
      * 父的叶子信息
