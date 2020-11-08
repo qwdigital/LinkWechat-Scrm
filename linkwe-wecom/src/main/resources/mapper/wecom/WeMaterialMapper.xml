@@ -129,6 +129,20 @@
         <if test="updateTime!=null">
             update_time=#{updateTime}
         </if>
+        <where>
+            <if test="id!=null">
+                id=#{id}
+            </if>
+        </where>
+    </update>
+    <update id="resetCategory">
+        UPDATE we_material
+        <set>
+            category_id=#{categoryId}
+        </set>
+        <where>
+            id=#{material}
+        </where>
     </update>
 
     <delete id="deleteWeMaterialById">
@@ -161,15 +175,18 @@
 
     <select id="findWeMaterials" resultMap="materialMap">
         SELECT
-        <include refid="material"/>
-        FROM we_material
+        wm.id,wm.category_id,wm.material_url,wm.content,wm.material_name,wm.digest,wm.cover_url,wm.create_by,wm.create_time,wm.update_by,wm.update_time
+        FROM we_material wm LEFT JOIN we_category wc ON wm.category_id=wc.id
         <where>
-            del_flag=0
+            wm.del_flag=0
             <if test="categoryId!=null and categoryId!=''">
-                AND category_id=#{categoryId}
+                AND wm.category_id=#{categoryId}
             </if>
             <if test="search!=null and search!=''">
-                AND (material_name LIKE CONCAT('%',#{search},'%') OR content LIKE CONCAT('%',#{search},'%'))
+                AND (wm.material_name LIKE CONCAT('%',#{search},'%') OR wm.content LIKE CONCAT('%',#{search},'%'))
+            </if>
+            <if test="mediaType!=null">
+                AND wc.media_type=#{mediaType}
             </if>
         </where>
     </select>

@@ -59,8 +59,19 @@ public interface WeMaterialMapper {
      *
      * @param categoryId 类目id
      * @param search     搜索值
+     * @param mediaType  0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本
      * @return {@link WeMaterial}s
      */
-    List<WeMaterial> findWeMaterials(@Param("categoryId") String categoryId, @Param("search") String search);
+    List<WeMaterial> findWeMaterials(@Param("categoryId") String categoryId, @Param("search") String search, @Param("mediaType") String mediaType);
+
+    /**
+     * 更换分组
+     *
+     * @param categoryId 类目id
+     * @param material   素材id
+     * @return int
+     */
+    int resetCategory(@Param("categoryId") String categoryId, @Param("material") String material);
+
 
 }

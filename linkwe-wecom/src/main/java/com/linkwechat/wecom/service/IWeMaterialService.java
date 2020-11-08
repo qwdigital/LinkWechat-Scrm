@@ -2,6 +2,8 @@ package com.linkwechat.wecom.service;
 
 import com.linkwechat.wecom.domain.WeMaterial;
 import com.linkwechat.wecom.domain.vo.WeMaterialFileVO;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -70,6 +72,15 @@ public interface IWeMaterialService {
      * @param search     搜索值
      * @return {@link WeMaterial}s
      */
-    List<WeMaterial> findWeMaterials(String categoryId, String search);
+    List<WeMaterial> findWeMaterials(String categoryId, String search,String mediaType);
+
+    /**
+     * 更换分组
+     *
+     * @param categoryId 类目id
+     * @param materials  素材id
+     * @return int
+     */
+    void resetCategory(String categoryId, String materials);
 
 }
