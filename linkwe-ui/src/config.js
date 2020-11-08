@@ -37,5 +37,4 @@ window.CONFIG = {
     return { Authorization: 'Bearer ' + getToken() }
   },
 }
-
-module.exports = window.CONFIG
+export default window.CONFIG
