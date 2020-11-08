@@ -46,4 +46,9 @@ public class WeMaterial extends BaseEntity {
      */
     private String coverUrl;
 
+    /**
+     * 音频时长
+     */
+    private String audioTime;
+
 }
