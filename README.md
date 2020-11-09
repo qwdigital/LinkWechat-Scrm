@@ -192,7 +192,7 @@ com.linkwechat
 
 
 ### 加入企业微信
- ![输入图片说明](https://images.gitee.com/uploads/images/2020/1109/225742_7c676199_1204355.jpeg "微信图片_20201109225740.jpg")
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1109/225742_7c676199_1204355.jpeg "微信图片_20201109225740.jpg")
 
 ### 特别鸣谢
   
