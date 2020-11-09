@@ -37,7 +37,7 @@ export default {
   watch: {},
   computed: {
     accept() {
-      return ['image/*', '*', 'video/*', '*'][this.type]
+      return ['image/*', 'amr/*', 'video/*', '*'][this.type]
     },
   },
   created() {},
@@ -49,7 +49,7 @@ export default {
         isSize = true
       if (this.type === '0') {
         // 图片
-        isFormat = file.type === 'image/jpeg'
+        isFormat = file.type === 'image/jpeg' || file.type === 'image/png'
         isSize = file.size / 1024 / 1024 < 2
 
         if (!isFormat) {
@@ -113,6 +113,7 @@ export default {
   <div>
     <el-upload
       v-loading="loading"
+      element-loading-text="正在上传..."
       class="uploader"
       :accept="accept"
       :action="action"
@@ -133,7 +134,7 @@ export default {
             controls
             webkit-playsinline="true"
             playsinline="true"
-            autoplay="none"
+            autoplay="false"
             preload="auto"
           >
             <source :src="fileUrl" type="video/mp4" />
@@ -150,15 +151,19 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-/deep/.uploader .el-upload {
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
+/deep/.uploader {
+  display: inline-block;
+  .el-upload {
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    &:hover {
+      border-color: #409eff;
+    }
+  }
 }
-/deep/.uploader .el-upload:hover {
-  border-color: #409eff;
-}
+
 .uploader-icon {
   font-size: 28px;
   color: #8c939d;

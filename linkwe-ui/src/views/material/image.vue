@@ -5,10 +5,7 @@ export default {
   components: { MaPage },
   data() {
     return {
-      srcList: [
-        'https://fuss10.elemecdn.com/8/27/f01c15bb73e1ef3793e64e6b7bbccjpeg.jpeg',
-        'https://fuss10.elemecdn.com/1/8e/aeffeb4de74e2fde4bd74fc7b4486jpeg.jpeg',
-      ],
+      srcList: [],
       list: [], // 列表
       ids: [], // 选中数组
     }
@@ -18,6 +15,7 @@ export default {
   methods: {
     listChange(data) {
       this.list = data
+      this.srcList = data.map((item) => item.materialUrl)
     },
   },
 }
@@ -28,29 +26,28 @@ export default {
     <el-row :gutter="20">
       <el-col
         :span="6"
-        style="margin-bottom: 24px;"
+        style="margin-bottom: 24px;min-width: 220px;"
         v-for="(item, index) in list"
         :key="index"
       >
         <el-card shadow="hover" body-style="padding: 0px;">
           <div class="img-wrap">
             <el-image
-              :src="require('@/assets/image/profile.jpg')"
+              :src="item.materialUrl"
               :preview-src-list="srcList"
+              fit="contain"
             ></el-image>
-            <div class="el-upload-list__item-actions">
-              <span
-                class="el-upload-list__item-preview"
+            <div class="actions">
+              <i
+                v-hasPermi="['material:edit']"
+                class="el-icon-edit cp"
                 @click="$refs.page.edit(item)"
-              >
-                <i class="el-icon-edit"></i>
-              </span>
-              <span
-                class="el-upload-list__item-"
-                @click="$refs.page.remove(item)"
-              >
-                <i class="el-icon-delete"></i>
-              </span>
+              ></i>
+              <i
+                v-hasPermi="['material:remove']"
+                class="el-icon-delete cp"
+                @click="$refs.page.remove(item.id)"
+              ></i>
             </div>
           </div>
           <div style="padding: 14px;">
@@ -67,22 +64,33 @@ export default {
 <style lang="scss" scoped>
 .img-wrap {
   position: relative;
-  &:hover .el-upload-list__item-actions {
+  height: 0;
+  padding: 70% 0 0 0;
+  border-bottom: 1px solid #e6ebf5;
+  &:hover .actions {
     opacity: 1;
   }
 }
-.el-upload-list__item-actions {
+.actions {
   position: absolute;
   width: 100%;
   height: 50px;
   left: 0;
   top: 0;
-  cursor: default;
   text-align: center;
   color: #fff;
   opacity: 0;
   font-size: 20px;
   background-color: rgba(0, 0, 0, 0.5);
   transition: opacity 0.3s;
+  .el-icon-edit {
+    margin-right: 20px;
+  }
+}
+.el-image {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
 }
 </style>
