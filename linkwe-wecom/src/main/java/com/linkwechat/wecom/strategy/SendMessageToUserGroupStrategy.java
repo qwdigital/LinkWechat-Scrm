@@ -19,6 +19,7 @@ import com.linkwechat.wecom.domain.dto.WeMessagePushResultDto;
 import com.linkwechat.wecom.mapper.WeMessagePushMapper;
 import com.linkwechat.wecom.service.IWeGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import java.util.Optional;
 /**
  * 应用推送消息
  */
+@Service
 public class SendMessageToUserGroupStrategy implements Strategy {
 
     @Autowired
