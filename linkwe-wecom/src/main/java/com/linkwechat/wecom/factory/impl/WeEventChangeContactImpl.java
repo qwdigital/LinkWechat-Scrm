@@ -76,8 +76,16 @@ public class WeEventChangeContactImpl implements WeCallBackEventFactory {
     protected void createParty(WxCpXmlMessageVO message) {
         try {
             WeDepartment weDepartment = new WeDepartment();
-            BeanUtils.copyPropertiesASM(message, weDepartment);
-            weDepartmentService.insertWeDepartment(weDepartment);
+            if (message.getId() !=null){
+                weDepartment.setId(message.getId());
+            }
+            if (message.getName() !=null){
+                weDepartment.setName(message.getName());
+            }
+            if (message.getParentId() !=null){
+                weDepartment.setParentId(Long.valueOf(message.getParentId()));
+            }
+            weDepartmentService.save(weDepartment);
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
@@ -88,8 +96,7 @@ public class WeEventChangeContactImpl implements WeCallBackEventFactory {
     protected void deleteParty(WxCpXmlMessageVO message) {
         try {
             if (message.getId() != null) {
-                String[] idArr = message.getId().toString().split("");
-                weDepartmentService.deleteWeDepartmentByIds(idArr);
+                weDepartmentService.removeById(message.getId());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -101,8 +108,16 @@ public class WeEventChangeContactImpl implements WeCallBackEventFactory {
     protected void updateParty(WxCpXmlMessageVO message) {
         try {
             WeDepartment weDepartment = new WeDepartment();
-            BeanUtils.copyPropertiesASM(message, weDepartment);
-            weDepartmentService.updateWeDepartment(weDepartment);
+            if (message.getId() !=null){
+                weDepartment.setId(message.getId());
+            }
+            if (message.getName() !=null){
+                weDepartment.setName(message.getName());
+            }
+            if (message.getParentId() !=null){
+                weDepartment.setParentId(Long.valueOf(message.getParentId()));
+            }
+            weDepartmentService.saveOrUpdate(weDepartment);
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
