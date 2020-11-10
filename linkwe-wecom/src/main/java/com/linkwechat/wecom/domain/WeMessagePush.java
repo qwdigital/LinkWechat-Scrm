@@ -82,4 +82,9 @@ public class WeMessagePush extends BaseEntity {
      */
     private String chatId;
 
+    /**
+     * 设置时间(格式为： 2020-11-17 09:00:00 ) 为空时立即发送
+     */
+    private String settingTime;
+
 }
