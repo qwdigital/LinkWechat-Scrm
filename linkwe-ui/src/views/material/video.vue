@@ -35,36 +35,32 @@ export default {
           <div class="img-wrap">
             <video
               id="video"
-              class="video-js vjs-default-skin
-            vjs-big-play-centered"
+              class="video-js vjs-default-skin vjs-big-play-centered"
               controls
               webkit-playsinline="true"
               playsinline="true"
-              autoplay="none"
+              autoplay="false"
               preload="auto"
               :poster="item.coverUrl"
             >
               <source :src="item.materialUrl" type="video/mp4" />
             </video>
-            <div class="el-upload-list__item-actions">
-              <span
-                class="el-upload-list__item-preview"
+            <div class="actions">
+              <i
+                v-hasPermi="['material:download']"
+                class="el-icon-download"
                 @click="$refs.page.download(item)"
-              >
-                <i class="el-icon-download"></i>
-              </span>
-              <span
-                class="el-upload-list__item-preview"
+              ></i>
+              <i
+                v-hasPermi="['material:edit']"
+                class="el-icon-edit cp"
                 @click="$refs.page.edit(item)"
-              >
-                <i class="el-icon-edit"></i>
-              </span>
-              <span
-                class="el-upload-list__item-"
-                @click="$refs.page.remove(item)"
-              >
-                <i class="el-icon-delete"></i>
-              </span>
+              ></i>
+              <i
+                v-hasPermi="['material:remove']"
+                class="el-icon-delete cp"
+                @click="$refs.page.remove(item.id)"
+              ></i>
             </div>
           </div>
           <div style="padding: 14px;">
@@ -83,11 +79,11 @@ export default {
 <style lang="scss" scoped>
 .img-wrap {
   position: relative;
-  &:hover .el-upload-list__item-actions {
+  &:hover .actions {
     opacity: 1;
   }
 }
-.el-upload-list__item-actions {
+.actions {
   position: absolute;
   width: 100%;
   height: 40px;
@@ -100,6 +96,9 @@ export default {
   font-size: 20px;
   background-color: rgba(0, 0, 0, 0.5);
   transition: opacity 0.3s;
+  .el-icon-edit {
+    margin: 0 20px;
+  }
 }
 #video {
   width: 100%;

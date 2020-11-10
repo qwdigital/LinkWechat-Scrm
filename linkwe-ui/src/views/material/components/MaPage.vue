@@ -159,9 +159,12 @@ export default {
     edit(data, type) {
       this.form = Object.assign(
         {},
-        data || { categoryId: this.query.categoryId, _new: true }
+        data || { categoryId: this.query.categoryId }
       )
       this.dialogVisible = true
+      this.$nextTick(() => {
+        this.$refs['form'].clearValidate()
+      })
       // type || !data ? (this.disabled = false) : (this.disabled = true)
     },
     // 素材提交
@@ -175,6 +178,7 @@ export default {
               this.msgSuccess('操作成功')
               this.dialogVisible = false
               this.getList()
+              this.$refs['form'].resetFields()
             })
             .catch(() => {
               this.dialogVisible = false
@@ -281,7 +285,7 @@ export default {
           <el-button class="ml10" @click="getList(1)">搜索</el-button>
           <el-button
             v-hasPermi="['material:remove']"
-            @click="remove"
+            @click="remove()"
             :disabled="selected.length === 0"
             >删除</el-button
           >

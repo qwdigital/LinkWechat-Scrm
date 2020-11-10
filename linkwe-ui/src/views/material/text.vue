@@ -49,13 +49,13 @@ export default {
           <el-button
             type="text"
             @click="$refs.page.edit(scope.row)"
-            v-hasPermi="['system:user:edit']"
+            v-hasPermi="['material:edit']"
             >修改</el-button
           >
           <el-button
             type="text"
             @click="$refs.page.remove(scope.row.id)"
-            v-hasPermi="['system:user:remove']"
+            v-hasPermi="['material:remove']"
             >删除</el-button
           >
         </template>

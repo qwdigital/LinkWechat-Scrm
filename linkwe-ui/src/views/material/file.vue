@@ -44,28 +44,21 @@ export default {
       >
         <template slot-scope="scope">
           <el-button
-            size="mini"
             type="text"
-            icon="el-icon-key"
             @click="$refs.page.download(scope.row)"
-            v-hasPermi="['system:user:resetPwd']"
+            v-hasPermi="['material:download']"
             >下载</el-button
           >
           <el-button
-            size="mini"
             type="text"
-            icon="el-icon-edit"
             @click="$refs.page.edit(scope.row)"
-            v-hasPermi="['system:user:edit']"
+            v-hasPermi="['material:edit']"
             >修改</el-button
           >
           <el-button
-            v-if="scope.row.userId !== 1"
-            size="mini"
             type="text"
-            icon="el-icon-delete"
-            @click="$refs.page.remove(scope.row)"
-            v-hasPermi="['system:user:remove']"
+            @click="$refs.page.remove(scope.row.id)"
+            v-hasPermi="['material:remove']"
             >删除</el-button
           >
         </template>
