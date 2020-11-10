@@ -1,29 +1,12 @@
 package com.linkwechat.wecom.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.json.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.linkwechat.common.constant.WeConstans;
-import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.enums.PushType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
-import com.linkwechat.common.utils.ReflectUtil;
-import com.linkwechat.common.utils.SnowFlakeUtil;
-import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.wecom.client.WeMessagePushClient;
-import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeMessagePush;
-import com.linkwechat.wecom.domain.dto.WeMessagePushDto;
-import com.linkwechat.wecom.domain.dto.WeMessagePushGroupDto;
-import com.linkwechat.wecom.domain.dto.WeMessagePushResultDto;
 import com.linkwechat.wecom.mapper.WeMessagePushMapper;
-import com.linkwechat.wecom.service.IWeGroupService;
 import com.linkwechat.wecom.service.IWeMessagePushService;
 import com.linkwechat.wecom.strategy.MessageContext;
 import com.linkwechat.wecom.strategy.SendMessageToUserGroupStrategy;
@@ -32,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 消息发送的Service接口
