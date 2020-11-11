@@ -66,7 +66,8 @@ public class WeMessagePushController extends BaseController {
     @Log(title = "消息发送的", businessType = BusinessType.INSERT)
     @PostMapping(value = "add")
     public AjaxResult add(@RequestBody WeMessagePush weMessagePush) {
-        return toAjax(weMessagePushService.insertWeMessagePush(weMessagePush));
+        weMessagePushService.insertWeMessagePush(weMessagePush);
+        return AjaxResult.success();
     }
 
     /**

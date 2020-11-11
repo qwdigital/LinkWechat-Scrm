@@ -1,35 +1,20 @@
 package com.linkwechat.wecom.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.json.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.linkwechat.common.constant.WeConstans;
-import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.enums.PushType;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
-import com.linkwechat.common.utils.ReflectUtil;
-import com.linkwechat.common.utils.SnowFlakeUtil;
-import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.wecom.client.WeMessagePushClient;
-import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeMessagePush;
-import com.linkwechat.wecom.domain.dto.WeMessagePushDto;
-import com.linkwechat.wecom.domain.dto.WeMessagePushGroupDto;
-import com.linkwechat.wecom.domain.dto.WeMessagePushResultDto;
 import com.linkwechat.wecom.mapper.WeMessagePushMapper;
-import com.linkwechat.wecom.service.IWeGroupService;
 import com.linkwechat.wecom.service.IWeMessagePushService;
+import com.linkwechat.wecom.strategy.MessageContext;
+import com.linkwechat.wecom.strategy.SendMessageToUserGroupStrategy;
+import com.linkwechat.wecom.strategy.SendMessageToUserStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * 消息发送的Service接口
@@ -44,10 +29,10 @@ public class WeMessagePushServiceImpl implements IWeMessagePushService {
     private WeMessagePushMapper weMessagePushMapper;
 
     @Autowired
-    private WeMessagePushClient weMessagePushClient;
+    private SendMessageToUserGroupStrategy sendMessageToUserGroupStrategy;
 
     @Autowired
-    private IWeGroupService weGroupService;
+    private SendMessageToUserStrategy sendMessageToUserStrategy;
 
     @Override
     public WeMessagePush selectWeMessagePushById(Long messagePushId) {
@@ -60,88 +45,49 @@ public class WeMessagePushServiceImpl implements IWeMessagePushService {
     }
 
     @Override
-    public int insertWeMessagePush(WeMessagePush weMessagePush) {
+    public void insertWeMessagePush(WeMessagePush weMessagePush) {
 
+        //立即发送
+        if (null == weMessagePush.getSettingTime()) {
+            sendMessgae(weMessagePush);
+        } else {
 
-        HashMap<String, Object> map = Maps.newHashMap();
-        JSONObject jsonObject = new JSONObject(weMessagePush.getMessageJson());
-        Optional<MessageType> of = MessageType.of(weMessagePush.getMessageType());
-        of.ifPresent(messageType -> map.put(messageType.getMessageType(), jsonObject));
-
-        if (weMessagePush.getPushType() != null && weMessagePush.getPushType().equals(PushType.SEND_TO_USER.getType())) {
-
-            //发送消息
-            WeMessagePushDto weMessagePushDto = new WeMessagePushDto();
-            weMessagePushDto.setTouser(weMessagePush.getToUser());
-            weMessagePushDto.setToparty(weMessagePush.getToParty());
-            weMessagePushDto.setTotag(weMessagePush.getToTag());
-            weMessagePushDto.setMsgtype(weMessagePush.getMessageType());
-
-            //这个先写在配置文件中
-            weMessagePushDto.setAgentid(1000003);
-            weMessagePushDto.setSafe(0);
-            weMessagePushDto.setEnable_id_trans(0);
-            weMessagePushDto.setEnable_duplicate_check(0);
-            weMessagePushDto.setDuplicate_check_interval(1800L);
-
-
-            //动态添加微信消息体属性和属性值信息
-            WeMessagePushDto target = (WeMessagePushDto) ReflectUtil.getTarget(weMessagePushDto, map);
-            WeMessagePushResultDto weMessagePushResultDto = weMessagePushClient.sendMessageToUser(target);
-
-            if (weMessagePushResultDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)) {
-                weMessagePush.setCreateTime(DateUtils.getNowDate());
-                weMessagePush.setDelFlag(0);
-                weMessagePush.setMessagePushId(SnowFlakeUtil.nextId());
-
-                //存储返回结果信息
-                weMessagePush.setInvaliduser(weMessagePushResultDto.getInvaliduser());
-                weMessagePush.setInvalidparty(weMessagePushResultDto.getInvalidparty());
-                weMessagePush.setInvalidtag(weMessagePushResultDto.getInvalidtag());
+            //发送时间不能小于当前时间
+            //定时发送消息(异步执行)
+            //保存消息体到数据库，增加一个发送状态(0 已发送 1 未发送)
+            //定义一个任务执行队列
+            //把任务放入执行队列
+            //任务执行 sendMessgae(WeMessagePush weMessagePush) 方法
+            if (DateUtils.diffTime(new Date(), DateUtil.parse(weMessagePush.getSettingTime(), "yyyy-MM-dd HH:mm:ss")) < 0) {
+                throw new WeComException("发送时间不能小于当前时间");
             }
 
-        }
-
-        if (weMessagePush.getPushType() != null
-                && weMessagePush.getPushType().equals(PushType.SENT_TO_USER_GROUP.getType())) {
-
-            //根据员工id列表查询所有的群信息
-            List<String> strings = Arrays.asList(StringUtils.splitByWholeSeparatorPreserveAllTokens(weMessagePush.getToUser(), WeConstans.COMMA));
-            List<String> chatIds = Lists.newArrayList();
-            strings.forEach(s -> {
-                List<WeGroup> groups = weGroupService
-                        .list(new LambdaQueryWrapper<WeGroup>().eq(WeGroup::getOwner, s));
-                //发送消息到群聊
-                if (CollectionUtil.isNotEmpty(groups)) {
-                    groups.forEach(d -> {
-                        WeMessagePushGroupDto weMessagePushGroupDto = new WeMessagePushGroupDto();
-                        weMessagePushGroupDto.setChatid(d.getChatId());
-                        weMessagePushGroupDto.setMsgtype(weMessagePush.getMessageType());
-                        weMessagePushGroupDto.setSafe(0);
-                        //动态添加微信消息体属性和属性值信息
-                        WeMessagePushGroupDto target = (WeMessagePushGroupDto) ReflectUtil.getTarget(weMessagePushGroupDto, map);
-                        WeMessagePushResultDto weMessagePushResultDto = weMessagePushClient.sendMessageToUserGroup(target);
-
-                        if (weMessagePushResultDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)) {
-                            //保存发送的群消息
-                            chatIds.add(d.getChatId());
-                        }
-
-                    });
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    sendMessgae(weMessagePush);
                 }
-
-            });
-
-            weMessagePush.setCreateTime(DateUtils.getNowDate());
-            weMessagePush.setDelFlag(0);
-            weMessagePush.setMessagePushId(SnowFlakeUtil.nextId());
-            weMessagePush.setChatId(CollectionUtil.isNotEmpty(chatIds) ? String.join(",", chatIds) : null);
+            }, DateUtil.parse(weMessagePush.getSettingTime(), "yyyy-MM-dd HH:mm:ss"));
 
         }
 
-        return weMessagePushMapper.insert(weMessagePush);
     }
 
+    /**
+     * 发送消息
+     *
+     * @param weMessagePush
+     */
+    public void sendMessgae(WeMessagePush weMessagePush) {
+        if (weMessagePush.getPushType() != null && weMessagePush.getPushType().equals(PushType.SEND_TO_USER.getType())) {
+            new MessageContext(sendMessageToUserStrategy).sendMessage(weMessagePush);
+        }
+        if (weMessagePush.getPushType() != null
+                && weMessagePush.getPushType().equals(PushType.SENT_TO_USER_GROUP.getType())) {
+            new MessageContext(sendMessageToUserGroupStrategy).sendMessage(weMessagePush);
+        }
+    }
 
     @Override
     public int deleteWeMessagePushByIds(Long[] messagePushIds) {
@@ -152,6 +98,5 @@ public class WeMessagePushServiceImpl implements IWeMessagePushService {
     public int deleteWeMessagePushById(Long messagePushId) {
         return weMessagePushMapper.deleteById(messagePushId);
     }
-
 
 }

@@ -33,7 +33,7 @@ public interface IWeMessagePushService {
      * @param weMessagePush 消息发送的
      * @return 结果
      */
-    public int insertWeMessagePush(WeMessagePush weMessagePush);
+    public void insertWeMessagePush(WeMessagePush weMessagePush);
 
     /**
      * 批量删除消息发送的

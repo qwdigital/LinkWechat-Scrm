@@ -1,5 +1,8 @@
 package com.linkwechat.common.constant;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @description: 企业微信相关常量
  * @author: HaoN
@@ -22,7 +25,7 @@ public class WeConstans {
     /**
      * 供应商相关token
      */
-    public static  final String WE_PROVIDER_ACCESS_TOKEN = "we_provider_access_token";
+    public static final String WE_PROVIDER_ACCESS_TOKEN = "we_provider_access_token";
 
 
     /**
@@ -171,5 +174,70 @@ public class WeConstans {
     public static final String COMMA = ",";
 
     public static final String USER_ID = "userid";
+
     public static final String CURSOR = "cursor";
+
+    public static final String CORPID = "CORP_ID";
+
+    /**
+     * 企微回调事件类型路由
+     */
+    public final static Map<String, String> eventRoute = new HashMap<String, String>() {
+        {
+            //成员事件
+            put("change_contact", "weEventChangeContactImpl");
+            //异步任务完成通知
+            put("batch_job_result", "weEventBatchJobResultImpl");
+            //外部联系人事件
+            put("change_external_contact", "weEventChangeExternalContactImpl");
+        }
+    };
+
+    //性别，1表示男性，2表示女性
+    //表示所在部门是否为上级，0-否，1-是，顺序与Department字段的部门逐一对应
+    //激活状态：1=已激活 2=已禁用 4=未激活 已激活代表已激活企业微信或已关注微工作台（原企业号） 5=成员退出
+    public static enum corpUserEnum {
+
+        User_SEX_TYPE_MAN(1, "男性"),
+        User_SEX_TYPE_WEMAN(2, "女性"),
+
+        IS_DEPARTMENT_SUPERIOR_YES(1, "是"),
+        IS_DEPARTMENT_SUPERIOR_NO(0, "否"),
+
+        ACTIVE_STATE_ONE(1, "已激活"),
+        ACTIVE_STATE_TWO(2, "已禁用"),
+        ACTIVE_STATE_FOUR(4, "未激活"),
+        ACTIVE_STATE_FIVE(5, "成员退出");
+
+        private int key;
+        private String value;
+
+        /**
+         * 构造方法
+         *
+         * @param key
+         * @param value
+         */
+        corpUserEnum(int key, String value) {
+            this.setKey(key);
+            this.setValue(value);
+        }
+
+        public int getKey() {
+            return key;
+        }
+
+        public void setKey(int key) {
+            this.key = key;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+    }
 }
