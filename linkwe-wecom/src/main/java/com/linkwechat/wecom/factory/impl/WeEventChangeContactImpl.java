@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.factory.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.wecom.domain.WeDepartment;
@@ -76,13 +77,13 @@ public class WeEventChangeContactImpl implements WeCallBackEventFactory {
     protected void createParty(WxCpXmlMessageVO message) {
         try {
             WeDepartment weDepartment = new WeDepartment();
-            if (message.getId() !=null){
+            if (message.getId() != null) {
                 weDepartment.setId(message.getId());
             }
-            if (message.getName() !=null){
+            if (message.getName() != null) {
                 weDepartment.setName(message.getName());
             }
-            if (message.getParentId() !=null){
+            if (message.getParentId() != null) {
                 weDepartment.setParentId(Long.valueOf(message.getParentId()));
             }
             weDepartmentService.save(weDepartment);
@@ -108,13 +109,13 @@ public class WeEventChangeContactImpl implements WeCallBackEventFactory {
     protected void updateParty(WxCpXmlMessageVO message) {
         try {
             WeDepartment weDepartment = new WeDepartment();
-            if (message.getId() !=null){
+            if (message.getId() != null) {
                 weDepartment.setId(message.getId());
             }
-            if (message.getName() !=null){
+            if (message.getName() != null) {
                 weDepartment.setName(message.getName());
             }
-            if (message.getParentId() !=null){
+            if (message.getParentId() != null) {
                 weDepartment.setParentId(Long.valueOf(message.getParentId()));
             }
             weDepartmentService.saveOrUpdate(weDepartment);
@@ -138,11 +139,11 @@ public class WeEventChangeContactImpl implements WeCallBackEventFactory {
             //标签中新增的成员userid列表，建立关联
             List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
             LambdaQueryWrapper<WeFlowerCustomerRel> relLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            relLambdaQueryWrapper.in(WeFlowerCustomerRel::getUserId,addUserItemsList);
+            relLambdaQueryWrapper.in(WeFlowerCustomerRel::getUserId, addUserItemsList);
             List<WeFlowerCustomerRel> flowerCustomerRelList = weFlowerCustomerRelService.list(relLambdaQueryWrapper);
             List<Long> idList = Optional.ofNullable(flowerCustomerRelList).orElseGet(ArrayList::new)
                     .stream().map(WeFlowerCustomerRel::getId).collect(Collectors.toList());
-            idList.forEach(id ->{
+            idList.forEach(id -> {
                 weFlowerCustomerTagRels.add(WeFlowerCustomerTagRel.builder().flowerCustomerRelId(id)
                         .tagId(tagId)
                         .build());
@@ -151,22 +152,22 @@ public class WeEventChangeContactImpl implements WeCallBackEventFactory {
 
             //当前标签对应成员列表
             LambdaQueryWrapper<WeFlowerCustomerTagRel> tagRelLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            tagRelLambdaQueryWrapper.eq(WeFlowerCustomerTagRel::getTagId,tagId);
+            tagRelLambdaQueryWrapper.eq(WeFlowerCustomerTagRel::getTagId, tagId);
             List<WeFlowerCustomerTagRel> tagRelList = weFlowerCustomerTagRelService.list(tagRelLambdaQueryWrapper);
 
             List<Long> flowerCustomerRelIdList = Optional.ofNullable(tagRelList).orElseGet(ArrayList::new)
                     .stream().map(WeFlowerCustomerTagRel::getFlowerCustomerRelId).collect(Collectors.toList());
 
-            if (!flowerCustomerRelIdList.isEmpty()){
+            if (!flowerCustomerRelIdList.isEmpty()) {
                 LambdaQueryWrapper<WeFlowerCustomerRel> queryWrapper = new LambdaQueryWrapper<>();
-                queryWrapper.in(WeFlowerCustomerRel::getId,flowerCustomerRelIdList)
-                        .in(WeFlowerCustomerRel::getUserId,delUserItemsList);
+                queryWrapper.in(WeFlowerCustomerRel::getId, flowerCustomerRelIdList)
+                        .in(WeFlowerCustomerRel::getUserId, delUserItemsList);
                 List<WeFlowerCustomerRel> relList = weFlowerCustomerRelService.list(queryWrapper);
-                List<Long>  relIdList = Optional.ofNullable(relList).orElseGet(ArrayList::new)
+                List<Long> relIdList = Optional.ofNullable(relList).orElseGet(ArrayList::new)
                         .stream().map(WeFlowerCustomerRel::getId).collect(Collectors.toList());
                 //标签中删除的成员userid列表
                 LambdaQueryWrapper<WeFlowerCustomerTagRel> tagRelQueryWrapper = new LambdaQueryWrapper<>();
-                tagRelQueryWrapper.in(WeFlowerCustomerTagRel::getFlowerCustomerRelId,relIdList);
+                tagRelQueryWrapper.in(WeFlowerCustomerTagRel::getFlowerCustomerRelId, relIdList);
                 weFlowerCustomerTagRelService.remove(tagRelQueryWrapper);
             }
         } catch (Exception e) {
@@ -195,20 +196,7 @@ public class WeEventChangeContactImpl implements WeCallBackEventFactory {
                     .position(message.getPosition())
                     .joinTime(new Date())
                     .build();
-            if (message.getStatus()!=null){
-                weUser.setIsActivate(Integer.valueOf(message.getStatus()));
-            }
-            if (message.getIsLeaderInDept()!=null){
-                String[] isLeaderInDeptArr = Arrays.stream(message.getIsLeaderInDept())
-                        .collect(Collectors.toList()).toArray(new String[message.getIsLeaderInDept().length]);
-                weUser.setIsLeaderInDept(isLeaderInDeptArr);
-            }
-
-            if (message.getDepartments()!=null){
-                String[] departmentsArr = Arrays.stream(message.getDepartments())
-                        .collect(Collectors.toList()).toArray(new String[message.getDepartments().length]);
-                weUser.setDepartment(departmentsArr);
-            }
+            setWeUserData(message, weUser);
             weUserService.insertWeUser(weUser);
         } catch (Exception e) {
             e.printStackTrace();
@@ -254,20 +242,7 @@ public class WeEventChangeContactImpl implements WeCallBackEventFactory {
                     .avatarMediaid(message.getAvatar())
                     .position(message.getPosition())
                     .build();
-            if (message.getStatus()!=null){
-                weUser.setIsActivate(Integer.valueOf(message.getStatus()));
-            }
-            if (message.getIsLeaderInDept()!=null){
-                String[] isLeaderInDeptArr = Arrays.stream(message.getIsLeaderInDept())
-                        .collect(Collectors.toList()).toArray(new String[message.getIsLeaderInDept().length]);
-                weUser.setIsLeaderInDept(isLeaderInDeptArr);
-            }
-
-            if (message.getDepartments()!=null){
-                String[] departmentsArr = Arrays.stream(message.getDepartments())
-                        .collect(Collectors.toList()).toArray(new String[message.getDepartments().length]);
-                weUser.setDepartment(departmentsArr);
-            }
+            setWeUserData(message, weUser);
             weUserService.updateWeUser(weUser);
         } catch (Exception e) {
             e.printStackTrace();
@@ -275,4 +250,20 @@ public class WeEventChangeContactImpl implements WeCallBackEventFactory {
         }
     }
 
+    private void setWeUserData(WxCpXmlMessageVO message, WeUser weUser) {
+        if (message.getStatus() != null) {
+            weUser.setIsActivate(Integer.valueOf(message.getStatus()));
+        }
+        if (message.getIsLeaderInDept() != null) {
+            String[] isLeaderInDeptArr = Arrays.stream(message.getIsLeaderInDept())
+                    .map(String::valueOf).toArray(String[]::new);
+            weUser.setIsLeaderInDept(isLeaderInDeptArr);
+        }
+
+        if (message.getDepartments() != null) {
+            String[] departmentsArr = Arrays.stream(message.getDepartments())
+                    .map(String::valueOf).toArray(String[]::new);
+            weUser.setDepartment(departmentsArr);
+        }
+    }
 }
