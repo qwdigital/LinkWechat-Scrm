@@ -1,5 +1,5 @@
 <script>
-import * as api from "@/api/drainageCode/welcome";
+import { edit } from '@/api/drainageCode/welcome'
 
 export default {
   components: {},
@@ -8,43 +8,43 @@ export default {
     return {
       dialogVisible: false,
       dialogVisible1: false,
-      form: { id: "", welcomeMsgTplType: "", welcomeMsg: "" },
-      imageUrl: "",
-    };
+      form: { id: '', welcomeMsgTplType: '', welcomeMsg: '' },
+      imageUrl: '',
+    }
   },
   watch: {},
   computed: {},
   created() {
-    this.form = this.$route.query;
+    this.form = this.$route.query
   },
   mounted() {},
   methods: {
     getData() {},
     submit() {
-      api.edit(this.form);
+      edit(this.form)
     },
     insertName() {
-      this.form.welcomeMsg += "#客户昵称#";
+      this.form.welcomeMsg += '#客户昵称#'
     },
     uploadSuccess(res, file) {
-      debugger;
-      this.imageUrl = URL.createObjectURL(file.raw);
+      debugger
+      this.imageUrl = URL.createObjectURL(file.raw)
     },
     beforeUpload(file) {
-      debugger;
-      const isJPG = file.type === "image/jpeg";
-      const isLt2M = file.size / 1024 / 1024 < 2;
+      debugger
+      const isJPG = file.type === 'image/jpeg'
+      const isLt2M = file.size / 1024 / 1024 < 2
 
       if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG 格式!");
+        this.$message.error('上传头像图片只能是 JPG 格式!')
       }
       if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 2MB!");
+        this.$message.error('上传头像图片大小不能超过 2MB!')
       }
-      return isJPG && isLt2M;
+      return isJPG && isLt2M
     },
   },
-};
+}
 </script>
 
 <template>
@@ -69,7 +69,8 @@ export default {
               round
               icon="el-icon-user-solid"
               @click="insertName()"
-            >插入客户昵称</el-button>
+              >插入客户昵称</el-button
+            >
           </div>
           <el-divider></el-divider>
           <img v-if="imageUrl" :src="imageUrl" />
@@ -98,13 +99,19 @@ export default {
                 <p>小程序</p>
               </el-button>-->
             </div>
-            <el-button slot="reference" icon="el-icon-plus" size="mini">添加图片/网页</el-button>
+            <el-button slot="reference" icon="el-icon-plus" size="mini"
+              >添加图片/网页</el-button
+            >
           </el-popover>
         </el-card>
       </el-form-item>
       <el-form-item label=" ">
-        <el-button type="cyan" icon="el-icon-search" size="mini" @click="submit">保存</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="$router.back()">取消</el-button>
+        <el-button type="cyan" icon="el-icon-search" size="mini" @click="submit"
+          >保存</el-button
+        >
+        <el-button icon="el-icon-refresh" size="mini" @click="$router.back()"
+          >取消</el-button
+        >
       </el-form-item>
     </el-form>
 
@@ -113,20 +120,30 @@ export default {
       <div class="small">塬微科技-企微</div>
       <div class="time">凌晨2:20</div>
       <div class="flex">
-        <el-avatar shape="square" size="small" :src="require('@/assets/image/profile.jpg')"></el-avatar>
-        <div class="msg">{{form.welcomeMsg}}</div>
+        <el-avatar
+          shape="square"
+          size="small"
+          :src="require('@/assets/image/profile.jpg')"
+        ></el-avatar>
+        <div class="msg">{{ form.welcomeMsg }}</div>
       </div>
     </div>
 
     <el-dialog title="添加网页消息" :visible.sync="dialogVisible" width="width">
       <el-form :model="form" inline>
         <el-form-item label="添加网页消息" label-width="200">
-          <el-input style="width: 400px;" v-model="j" placeholder="以http或https开头"></el-input>
+          <el-input
+            style="width: 400px;"
+            v-model="j"
+            placeholder="以http或https开头"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="dialogVisible = false"
+          >确 定</el-button
+        >
       </div>
     </el-dialog>
 
@@ -216,7 +233,7 @@ export default {
     white-space: pre-line;
     margin-left: 10px;
     &:before {
-      content: " ";
+      content: ' ';
       display: block;
       position: absolute;
       left: -6px;

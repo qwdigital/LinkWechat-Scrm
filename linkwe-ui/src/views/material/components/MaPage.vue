@@ -326,7 +326,7 @@ export default {
         </div>
 
         <div v-loading="loading" class="mt20">
-          <slot></slot>
+          <slot v-bind:list="list"></slot>
         </div>
 
         <pagination
