@@ -22,7 +22,8 @@ public class WeFlowerCustomerRelServiceImpl extends ServiceImpl<WeFlowerCustomer
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean deleteFollowUser(String userId, String externalUserid) {
-        return this.remove(new LambdaQueryWrapper<WeFlowerCustomerRel>()
+        return this.update(WeFlowerCustomerRel.builder().status("1").build()
+                ,new LambdaQueryWrapper<WeFlowerCustomerRel>()
                 .eq(WeFlowerCustomerRel::getUserId,userId)
                 .eq(WeFlowerCustomerRel::getExternalUserid,externalUserid));
     }
