@@ -13,5 +13,10 @@ import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
  */
 public interface IWeFlowerCustomerRelService extends IService<WeFlowerCustomerRel>
 {
-
+    /**
+     * 删除服务跟进人
+     * @param userId 企业成员id
+     * @param externalUserid 用户id
+     */
+    public Boolean deleteFollowUser(String userId, String externalUserid);
 }
