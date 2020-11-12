@@ -76,4 +76,17 @@ public interface IWeCustomerService extends IService<WeCustomer>
      * @return
      */
     public List<WeUser> getCustomersByUserId(String externalUserid);
+
+    /**
+     * 获取客户详情并同步客户数据
+     * @param externalUserid
+     */
+    public void getCustomersInfoAndSynchWeCustomer(String externalUserid);
+
+    /**
+     * 删除客户
+     * @param externalUserid
+     */
+    public void deleteCustomersByEid(String externalUserid);
+
 }

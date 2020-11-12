@@ -3,7 +3,10 @@ package com.linkwechat.wecom.factory.impl;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 import com.linkwechat.wecom.factory.WeCallBackEventFactory;
+import com.linkwechat.wecom.service.IWeCustomerService;
+import com.linkwechat.wecom.service.IWeFlowerCustomerRelService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -14,11 +17,15 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class WeEventChangeExternalContactImpl implements WeCallBackEventFactory {
+    @Autowired
+    private IWeCustomerService weCustomerService;
+    @Autowired
+    private IWeFlowerCustomerRelService weFlowerCustomerRelService;
 
     @Override
     public void eventHandle(WxCpXmlMessageVO message) {
         String changeType = message.getChangeType();
-        switch (changeType){
+        switch (changeType) {
             case "add_external_contact"://添加企业客户事件
                 addExternalContact(message);
                 break;
@@ -41,7 +48,7 @@ public class WeEventChangeExternalContactImpl implements WeCallBackEventFactory 
                 break;
         }
         String chatId = message.getChatId();
-        if (StringUtils.isNotEmpty(chatId)){
+        if (StringUtils.isNotEmpty(chatId)) {
             //客户群变更事件
             weChatChangeEvent(message);
         }
@@ -54,18 +61,32 @@ public class WeEventChangeExternalContactImpl implements WeCallBackEventFactory 
     }
 
     private void delFollowUser(WxCpXmlMessageVO message) {
+        if (message.getUserId() != null && message.getExternalUserId() != null) {
+            weFlowerCustomerRelService.deleteFollowUser(message.getUserId(),message.getExternalUserId());
+        }
     }
 
     private void delExternalContact(WxCpXmlMessageVO message) {
+        if (message.getExternalUserId() != null) {
+            weCustomerService.deleteCustomersByEid(message.getExternalUserId());
+        }
     }
 
     private void addHalfExternalContact(WxCpXmlMessageVO message) {
+        if (message.getExternalUserId() != null) {
+            weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId());
+        }
     }
 
     private void editExternalContact(WxCpXmlMessageVO message) {
+        if (message.getExternalUserId() != null) {
+            weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId());
+        }
     }
 
     private void addExternalContact(WxCpXmlMessageVO message) {
-
+        if (message.getExternalUserId() != null) {
+            weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId());
+        }
     }
 }
