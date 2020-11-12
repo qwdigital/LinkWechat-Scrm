@@ -2,7 +2,7 @@
 import * as api from '@/api/customer/group'
 
 export default {
-  name: 'GroupDetail',
+  // name: 'GroupDetail',
   data() {
     return {
       // 遮罩层

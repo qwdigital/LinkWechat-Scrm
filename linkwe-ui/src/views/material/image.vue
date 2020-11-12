@@ -2,11 +2,11 @@
 import MaPage from '@/views/material/components/MaPage'
 
 export default {
+  name: 'Image',
   components: { MaPage },
   data() {
     return {
       srcList: [],
-      list: [], // 列表
       ids: [], // 选中数组
     }
   },
@@ -14,7 +14,6 @@ export default {
   created() {},
   methods: {
     listChange(data) {
-      this.list = data
       this.srcList = data.map((item) => item.materialUrl)
     },
   },
@@ -22,7 +21,13 @@ export default {
 </script>
 
 <template>
-  <MaPage ref="page" type="0" @listChange="listChange" :selected="ids">
+  <MaPage
+    ref="page"
+    type="0"
+    @listChange="listChange"
+    :selected="ids"
+    v-slot="{ list }"
+  >
     <el-row :gutter="20">
       <el-col
         :span="6"

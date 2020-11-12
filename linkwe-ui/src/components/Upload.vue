@@ -2,6 +2,7 @@
 import { upload } from '@/api/material'
 import Video from 'video.js'
 export default {
+  name: 'Upload',
   components: {},
   props: {
     fileUrl: {
@@ -134,7 +135,7 @@ export default {
             controls
             webkit-playsinline="true"
             playsinline="true"
-            autoplay="false"
+            :autoplay="false"
             preload="auto"
           >
             <source :src="fileUrl" type="video/mp4" />

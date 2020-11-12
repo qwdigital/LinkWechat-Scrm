@@ -1,13 +1,12 @@
 <script>
-import * as api from "@/api/drainageCode/welcome";
+import * as api from '@/api/drainageCode/welcome'
 export default {
-  name: "Tab",
+  name: 'Tab',
   components: {},
   props: {
-    // 添加标签显隐
     type: {
       type: Number | String,
-      default: "1",
+      default: '1',
     },
   },
   data() {
@@ -23,61 +22,62 @@ export default {
       total: 0,
       list: [],
       wel: {
-        1: "员工",
-        2: "部门员工",
-        3: "客户",
+        1: '员工',
+        2: '部门员工',
+        3: '客户',
       },
-    };
+    }
   },
   watch: {},
   computed: {},
   created() {
-    this.query.welcomeMsgTplType = +this.type;
-    this.getList();
+    this.query.welcomeMsgTplType = +this.type
+    this.getList()
   },
   mounted() {},
   methods: {
     /** 查询 */
     getList(page) {
-      page && (this.query.pageNum = page);
-      this.loading = true;
+      page && (this.query.pageNum = page)
+      this.loading = true
       api
         .getList(this.query)
         .then(({ rows, total }) => {
-          this.list = rows;
-          this.total = +total;
-          this.loading = false;
+          this.list = rows
+          this.total = +total
+          this.loading = false
+          this.$emit('total', [this.type, this.total])
         })
         .catch(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
     /** 删除按钮操作 */
     remove(id) {
       // const operIds = id || this.ids + "";
-      this.$confirm("是否确认删除吗?", "警告", {
-        type: "warning",
+      this.$confirm('是否确认删除吗?', '警告', {
+        type: 'warning',
       })
-        .then(function () {
-          return api.remove(id);
+        .then(function() {
+          return api.remove(id)
         })
         .then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        });
+          this.getList()
+          this.msgSuccess('删除成功')
+        })
     },
     goRoute(data) {
-      let query = {};
+      let query = {}
       if (data) {
-        let { id, welcomeMsgTplType, welcomeMsg } = data;
-        query = { id, welcomeMsgTplType, welcomeMsg };
+        let { id, welcomeMsgTplType, welcomeMsg } = data
+        query = { id, welcomeMsgTplType, welcomeMsg }
       } else {
-        query.welcomeMsgTplType = this.type;
+        query.welcomeMsgTplType = this.type
       }
-      this.$router.push({ path: "welcomeAdd", query: query });
+      this.$router.push({ path: 'welcomeAdd', query: query })
     },
   },
-};
+}
 </script>
 
 <template>
@@ -90,7 +90,8 @@ export default {
           size="mini"
           icon="el-icon-plus"
           @click="goRoute()"
-        >新建{{wel[type]}}欢迎语</el-button>
+          >新建{{ wel[type] }}欢迎语</el-button
+        >
         <el-input
           placeholder="请输入内容"
           prefix-icon="el-icon-search"
@@ -105,20 +106,26 @@ export default {
       <el-table-column label="欢迎语" align="center" prop="welcomeMsg" />
       <el-table-column label="创建人" align="center" prop="createBy" />
       <el-table-column label="创建时间" align="center" prop="createTime" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column
+        label="操作"
+        align="center"
+        class-name="small-padding fixed-width"
+      >
         <template slot-scope="scope">
           <el-button
             size="mini"
             type="text"
             @click="goRoute(scope.row)"
             v-hasPermi="['monitor:operlog:query']"
-          >编辑</el-button>
+            >编辑</el-button
+          >
           <el-button
             size="mini"
             type="text"
             @click="remove(scope.row.id)"
             v-hasPermi="['monitor:operlog:query']"
-          >删除</el-button>
+            >删除</el-button
+          >
         </template>
       </el-table-column>
     </el-table>

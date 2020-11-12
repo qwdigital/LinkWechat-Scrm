@@ -2,7 +2,7 @@
 import { updateBirthday, getDetail } from '@/api/customer'
 
 export default {
-  name: 'CustomerDetail',
+  // name: 'CustomerDetail',
   data() {
     return {
       datePickerVisible: false,

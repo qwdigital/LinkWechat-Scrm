@@ -3,27 +3,23 @@ import MaPage from '@/views/material/components/MaPage'
 import Video from 'video.js'
 
 export default {
+  name: 'Video',
   components: {
     MaPage,
   },
   data() {
     return {
-      list: [], // 列表
       ids: [], // 选中数组
     }
   },
   watch: {},
   created() {},
-  methods: {
-    listChange(data) {
-      this.list = data
-    },
-  },
+  methods: {},
 }
 </script>
 
 <template>
-  <MaPage ref="page" type="2" @listChange="listChange" :selected="ids">
+  <MaPage ref="page" type="2" :selected="ids" v-slot="{ list }">
     <el-row :gutter="20">
       <el-col
         :span="6"
@@ -39,7 +35,7 @@ export default {
               controls
               webkit-playsinline="true"
               playsinline="true"
-              autoplay="false"
+              :autoplay="false"
               preload="auto"
               :poster="item.coverUrl"
             >

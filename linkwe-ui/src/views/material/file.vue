@@ -1,19 +1,17 @@
 <script>
 import MaPage from '@/views/material/components/MaPage'
+
 export default {
+  name: 'File',
   components: { MaPage },
   data() {
     return {
-      list: [], // 列表
       ids: [], // 选中数组
     }
   },
   watch: {},
   created() {},
   methods: {
-    listChange(data) {
-      this.list = data
-    },
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map((item) => item.id)
@@ -23,7 +21,7 @@ export default {
 </script>
 
 <template>
-  <MaPage ref="page" type="3" @listChange="listChange" :selected="ids">
+  <MaPage ref="page" type="3" :selected="ids" v-slot="{ list }">
     <el-table :data="list" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" align="center" />
       <el-table-column
