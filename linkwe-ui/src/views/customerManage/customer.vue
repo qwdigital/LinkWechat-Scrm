@@ -2,12 +2,13 @@
 import * as api from '@/api/customer'
 import { getList as getListTag } from '@/api/customer/tag'
 import { getList as getListOrganization } from '@/api/organization'
-import AddTag from './components/AddTag'
-import SelectUser from './components/SelectUser'
+import AddTag from '@/components/AddTag'
+import SelectUser from '@/components/SelectUser'
+import SelectTag from '@/components/SelectTag'
 
 export default {
   name: 'Customer',
-  components: { AddTag, SelectUser },
+  components: { AddTag, SelectUser, SelectTag },
   props: {},
   data() {
     return {
@@ -67,7 +68,6 @@ export default {
         weTags: [],
       },
       list: [], // 客户列表
-      listTag: [], // 标签列表
       listOrganization: [], // 组织架构列表
       multipleSelection: [], // 多选数组
       dialogVisible: false, // 选择标签弹窗显隐
@@ -116,9 +116,8 @@ export default {
     },
     getListTag() {
       getListTag().then(({ rows }) => {
-        this.listTag = Object.freeze(rows)
         this.listTagOneArray = []
-        this.listTag.forEach((element) => {
+        rows.forEach((element) => {
           element.weTags.forEach((d) => {
             this.listTagOneArray.push(d)
           })
@@ -148,21 +147,30 @@ export default {
         this.msgInfo('同时只能选择一位客户')
         return
       }
-      this.tagDialogType = {
-        title: type === 'add' ? '增加标签' : '移出标签',
-        type: type,
-      }
+      let isError = false
       this.multipleSelection.forEach((element) => {
-        // debugger;
         element.weFlowerCustomerRels.forEach((child) => {
           child.weFlowerCustomerTagRels.forEach((grandchild) => {
             let filter = this.listTagOneArray.find((d) => {
               return d.tagId === grandchild.tagId
             })
+            // 如果没有匹配到，则说明该便签处于异常状态，可能已被删除或破坏
+            if (!filter) {
+              isError = true
+              return
+            }
             this.selectedTag.push(filter)
           })
         })
       })
+      if (isError) {
+        this.msgError('已有标签不在便签库中，或存在异常')
+        return
+      }
+      this.tagDialogType = {
+        title: type === 'add' ? '增加标签' : '移出标签',
+        type: type,
+      }
       this.removeTag = this.selectedTag.slice()
       this.dialogVisible = true
     },
@@ -204,16 +212,16 @@ export default {
       this.queryUser = list
       this.query.userIds = list.map((d) => d.userId) + ''
     },
-    submitSelectTag(formName) {
+    submitSelectTag(selected) {
       if (this.tagDialogType.type === 'query') {
-        this.query.tagIds = this.selectedTag.map((d) => d.tagId) + ''
+        this.query.tagIds = selected.map((d) => d.tagId) + ''
         // debugger;
-        this.queryTag = this.selectedTag
+        this.queryTag = selected
         this.dialogVisible = false
       } else {
         let data = {
           externalUserid: this.multipleSelection[0].externalUserid,
-          addTag: this.selectedTag,
+          addTag: selected,
         }
         let apiType = {
           add: 'makeLabel',
@@ -228,6 +236,8 @@ export default {
     },
     resetForm(formName) {
       this.dateRange = []
+      this.queryTag = []
+      this.queryUser = []
       this.$refs['queryForm'].resetFields()
     },
     // 多选框选中数据
@@ -436,7 +446,20 @@ export default {
     />
 
     <!-- 选择标签弹窗 -->
-    <el-dialog
+    <SelectTag
+      :visible.sync="dialogVisible"
+      :title="tagDialogType.title"
+      :selected="selectedTag"
+      :type="tagDialogType.type"
+      @success="submitSelectTag"
+    >
+      <div class="mt20" v-show="tagDialogType.type === 'add'">
+        <el-button type="primary" @click="dialogVisibleAddTag = true"
+          >添加标签</el-button
+        >
+      </div>
+    </SelectTag>
+    <!-- <el-dialog
       key="1"
       :title="tagDialogType.title"
       :visible.sync="dialogVisible"
@@ -493,7 +516,7 @@ export default {
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="submitSelectTag">确 定</el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
 
     <!-- 选择添加人弹窗 -->
     <SelectUser

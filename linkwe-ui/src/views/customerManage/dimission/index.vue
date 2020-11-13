@@ -1,9 +1,9 @@
 <script>
-import * as api from "@/api/customer/dimission";
-import SelectUser from "../components/SelectUser";
+import * as api from '@/api/customer/dimission'
+import SelectUser from '@/components/SelectUser'
 
 export default {
-  name: "Dimission",
+  name: 'Dimission',
   components: { SelectUser },
   props: {},
   data() {
@@ -20,8 +20,8 @@ export default {
       isMoreFilter: false,
       total: 0,
       form: {
-        user: "",
-        region: "",
+        user: '',
+        region: '',
       },
       list: [],
       currentRow: {},
@@ -30,81 +30,81 @@ export default {
       // 日期快捷选项
       pickerOptions: {
         disabledDate(time) {
-          return time.getTime() > Date.now();
+          return time.getTime() > Date.now()
         },
         shortcuts: [
           {
-            text: "最近一周",
+            text: '最近一周',
             onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit("pick", [start, end]);
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+              picker.$emit('pick', [start, end])
             },
           },
           {
-            text: "最近一个月",
+            text: '最近一个月',
             onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit("pick", [start, end]);
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+              picker.$emit('pick', [start, end])
             },
           },
           {
-            text: "最近三个月",
+            text: '最近三个月',
             onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-              picker.$emit("pick", [start, end]);
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+              picker.$emit('pick', [start, end])
             },
           },
         ],
       },
-    };
+    }
   },
   watch: {},
   computed: {},
   created() {
-    this.getList();
+    this.getList()
   },
   mounted() {},
   methods: {
     /** 查询 */
     getList(page) {
       if (this.dateRange[0]) {
-        this.query.beginTime = this.dateRange[0];
-        this.query.endTime = this.dateRange[1];
+        this.query.beginTime = this.dateRange[0]
+        this.query.endTime = this.dateRange[1]
       }
-      page && (this.query.pageNum = page);
-      this.loading = true;
+      page && (this.query.pageNum = page)
+      this.loading = true
       api
         .getListNo(this.query)
         .then(({ rows, total }) => {
-          this.list = rows;
-          this.total = +total;
-          this.loading = false;
+          this.list = rows
+          this.total = +total
+          this.loading = false
         })
         .catch(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
     resetForm(formName) {
-      this.dateRange = [];
-      this.$refs["queryForm"].resetFields();
+      this.dateRange = []
+      this.$refs['queryForm'].resetFields()
     },
     showSelectDialog() {
       if (this.currentRow.userId) {
-        this.dialogVisibleSelectUser = true;
+        this.dialogVisibleSelectUser = true
       } else {
-        this.$message.warning("请先选择一位员工");
+        this.$message.warning('请先选择一位员工')
       }
     },
     allocate(userlist) {
       if (userlist.length > 1) {
-        this.dialogVisibleSelectUser = true;
-        return;
+        this.dialogVisibleSelectUser = true
+        return
       }
       api
         .allocate({
@@ -112,20 +112,26 @@ export default {
           takeoverUserid: userlist[0].userId,
         })
         .then(() => {
-          this.msgSuccess("操作成功");
-        });
+          this.msgSuccess('操作成功')
+        })
     },
     // 选中数据
     handleCurrentChange(val) {
-      this.currentRow = val;
+      this.currentRow = val
     },
   },
-};
+}
 </script>
 
 <template>
   <div class="page">
-    <el-form ref="queryForm" :inline="true" :model="query" label-width="100px" class="top-search">
+    <el-form
+      ref="queryForm"
+      :inline="true"
+      :model="query"
+      label-width="100px"
+      class="top-search"
+    >
       <el-form-item label="已离职员工">
         <el-input v-model="query.userName" placeholder="请输入"></el-input>
       </el-form-item>
@@ -142,37 +148,48 @@ export default {
       </el-form-item>
 
       <el-form-item label="离职日期">
-        <el-date-picker v-model="query.beginTime" type="date" placeholder="离职日期" align="right"></el-date-picker>
+        <el-date-picker
+          v-model="query.beginTime"
+          type="date"
+          placeholder="离职日期"
+          align="right"
+        ></el-date-picker>
       </el-form-item>
       <el-form-item label>
         <el-button
           v-hasPermi="['customerManage:dimission:query']"
           type="primary"
           @click="getList(1)"
-        >查询</el-button>
+          >查询</el-button
+        >
         <el-button
           v-hasPermi="['customerManage:dimission:query']"
           type="info"
           @click="resetForm('queryForm')"
-        >重置</el-button>
+          >重置</el-button
+        >
       </el-form-item>
     </el-form>
 
     <div class="mid-action">
-      <div class="total">从通讯录将离职员工删除后，可以分配他的客户及客户群给其他员工继续跟进</div>
+      <div class="total">
+        从通讯录将离职员工删除后，可以分配他的客户及客户群给其他员工继续跟进
+      </div>
       <div>
         <el-button
           v-hasPermi="['customerManage:dimission:filter']"
           type="primary"
           size="mini"
-          @click="$router.push({path: '/customerManage/allocatedStaffList'})"
-        >已分配的离职员工</el-button>
+          @click="$router.push({ path: '/customerManage/allocatedStaffList' })"
+          >已分配的离职员工</el-button
+        >
         <el-button
           v-hasPermi="['customerManage:dimission:allocate']"
           type="primary"
           size="mini"
           @click="showSelectDialog"
-        >分配给其他员工</el-button>
+          >分配给其他员工</el-button
+        >
       </div>
     </div>
 
@@ -187,9 +204,21 @@ export default {
       <el-table-column type="index" label="序号" width="55"></el-table-column>
       <el-table-column prop="userName" label="已离职员工"></el-table-column>
       <el-table-column prop="department" label="所属部门"></el-table-column>
-      <el-table-column prop="allocateCustomerNum" label="待分配客户数" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="allocateGroupNum" label="待分配群聊数" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="dimissionTime" label="离职时间" show-overflow-tooltip>
+      <el-table-column
+        prop="allocateCustomerNum"
+        label="待分配客户数"
+        show-overflow-tooltip
+      ></el-table-column>
+      <el-table-column
+        prop="allocateGroupNum"
+        label="待分配群聊数"
+        show-overflow-tooltip
+      ></el-table-column>
+      <el-table-column
+        prop="dimissionTime"
+        label="离职时间"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ scope.row.dimissionTime }}</template>
       </el-table-column>
       <!-- <el-table-column label="操作" width="100">
@@ -200,7 +229,7 @@ export default {
     </el-table>
 
     <pagination
-      v-show="total>0"
+      v-show="total > 0"
       :total="total"
       :page.sync="query.pageNum"
       :limit.sync="query.pageSize"
@@ -208,7 +237,11 @@ export default {
     />
 
     <!-- 选择添加人弹窗 -->
-    <SelectUser :visible.sync="dialogVisibleSelectUser" title="选择分配人" @success="allocate"></SelectUser>
+    <SelectUser
+      :visible.sync="dialogVisibleSelectUser"
+      title="选择分配人"
+      @success="allocate"
+    ></SelectUser>
   </div>
 </template>
 
