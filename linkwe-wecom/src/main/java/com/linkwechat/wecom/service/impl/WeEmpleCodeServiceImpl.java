@@ -44,8 +44,8 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper,WeEmpl
     private IWeEmpleCodeUseScopService iWeEmpleCodeUseScopService;
 
 
-//    @Autowired
-//    private WeExternalContactClient weExternalContactClient;
+    @Autowired
+    private WeExternalContactClient weExternalContactClient;
 
 //    /**
 //     * 查询员工活码
