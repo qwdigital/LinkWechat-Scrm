@@ -90,7 +90,7 @@ export default {
         <el-checkbox-group v-model="Pselected" v-if="type !== 'remove'">
           <template v-for="(item, index) in list">
             <div
-              class="bfc-d"
+              class="bfc-d mr30"
               v-show="item.groupId === selectedGroup || !selectedGroup"
               :key="index"
             >
@@ -128,5 +128,8 @@ export default {
   .el-row {
     line-height: 26px;
   }
+}
+.mr30 {
+  margin-right: 30px;
 }
 </style>
