@@ -10,10 +10,11 @@ export default {
       type: Boolean,
       default: false,
     },
-    title: {
-      type: String,
-      default: '',
-    },
+    // title: {
+    //   type: String,
+    //   default: '',
+    // },
+    // 素材类型  0:'文本', 1：'图片'
     type: {
       type: String,
       default: '0',
@@ -21,18 +22,14 @@ export default {
   },
   data() {
     return {
-      typeText: ['文本', '图片'],
+      text: '',
+      image: '',
     }
   },
-  watch: {
-    type(val) {
-      val === 'remove' && (this.removeTag = this.selected.slice())
-    },
-  },
+  watch: {},
   computed: {
     Pvisible: {
       get() {
-        // this.getTree();
         return this.visible
       },
       set(val) {
@@ -41,7 +38,6 @@ export default {
     },
     Ptype: {
       get() {
-        // this.getTree();
         return this.type
       },
       set(val) {
@@ -54,27 +50,29 @@ export default {
   methods: {
     submit() {
       this.Pvisible = false
-      this.$emit('success', this.Pselected)
+      this.$emit('success', this.text, this.image, this.file)
+    },
+    changeText(data) {
+      this.text = data
+    },
+    changeImage(data) {
+      this.image = data
     },
   },
 }
 </script>
 
 <template>
-  <el-dialog
-    :title="`选择${typeText[Ptype]}素材`"
-    :visible.sync="Pvisible"
-    width="650px"
-  >
+  <el-dialog title="选择素材" :visible.sync="Pvisible" width="650px">
     <div>
       <el-tabs v-model="Ptype">
         <el-tab-pane name="0">
           <span slot="label"> <i class="el-icon-date"></i> 文本 </span>
-          <list type="4"> </list>
+          <list type="4" @change="changeText"> </list>
         </el-tab-pane>
         <el-tab-pane name="1">
           <span slot="label"> <i class="el-icon-date"></i> 图片 </span>
-          <list type="0"> </list>
+          <list type="0" @change="changeImage"> </list>
         </el-tab-pane>
         <!-- <el-tab-pane name="2">
           <span slot="label"> <i class="el-icon-date"></i> 文件 </span>

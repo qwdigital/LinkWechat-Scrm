@@ -33,13 +33,20 @@ export default {
   },
   watch: {},
   computed: {
+    // 是否显示选择的客户标签
+    isOnlyTag() {
+      return this.form.toTag[0] && this.form.pushType == 0
+    },
+    // 是否显示选择范围后的文字说明
+    isSelectedText() {
+      return this.userParty[0] || this.isOnlyTag
+    },
+    // 选择范围后的文字说明
     selectedText() {
       return `将发送消息给${
-        this.userParty[0] ? this.userParty[0] + '等部门或成员' : ''
-      }的${
-        this.form.toTag[0] && this.form.pushType == 0
-          ? '满足' + this.form.toTag[0] + '等标签的'
-          : ''
+        this.userParty[0] ? this.userParty[0] + '等部门或成员的' : ''
+      }${this.userParty[0] && this.isOnlyTag ? '，且' : ''}${
+        this.isOnlyTag ? '满足' + this.form.toTag[0] + '等标签的' : ''
       }${this.form.pushType == 0 ? '客户' : '客户群'}`
     },
   },
@@ -68,7 +75,7 @@ export default {
       window.open('#/material/' + contentType[this.activeName])
     },
     // 选择素材确认按钮
-    submitSelectMaterial() {},
+    submitSelectMaterial(text, image, file) {},
   },
 }
 </script>
@@ -87,10 +94,19 @@ export default {
         </el-radio-group>
       </el-form-item>
       <el-form-item label="发送范围" prop="pushRange">
-        <el-button type="text" @click="showRangeDialog()">{{
-          form.pushType == 0 ? '选择发送客户' : '按群主选择客户群'
-        }}</el-button>
-        <span v-show="userParty[0] || form.toTag[0]">{{ selectedText }}</span>
+        <el-button
+          v-show="!isSelectedText"
+          type="text"
+          @click="showRangeDialog()"
+          >{{
+            isSelectedText
+              ? '修改'
+              : form.pushType == 0
+              ? '选择发送客户'
+              : '按群主选择客户群'
+          }}</el-button
+        >
+        <span v-show="isSelectedText">{{ selectedText }}</span>
       </el-form-item>
       <el-form-item label="发送时间" prop="settingTime">
         <el-date-picker
@@ -224,7 +240,7 @@ export default {
 
     <SelectMaterial
       :visible.sync="dialogVisibleSelectMaterial"
-      :type="activeName"
+      :type.sync="activeName"
       @success="submitSelectMaterial"
     ></SelectMaterial>
   </div>

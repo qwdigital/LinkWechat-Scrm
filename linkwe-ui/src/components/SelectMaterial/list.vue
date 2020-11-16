@@ -39,7 +39,11 @@ export default {
       radio: '',
     }
   },
-  watch: {},
+  watch: {
+    radio(val) {
+      this.$emit('change', val)
+    },
+  },
   computed: {},
   created() {
     this.query.mediaType = this.type
@@ -121,22 +125,25 @@ export default {
     <el-radio-group v-if="type == 0" class="img-wrap" v-model="radio">
       <el-radio v-for="(item, index) in list" :label="item.id" :key="index">
         <img class="img-li" :src="item.materialUrl" alt />
+        <div class="ac mt5">{{ item.materialName }}</div>
       </el-radio>
     </el-radio-group>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.img-wrap {
-  /deep/.el-radio__input {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
-}
-// .img-li {
-//   width: 115px;
-//   height: 160px;
+// .img-wrap {
+//   /deep/.el-radio__input {
+//     position: absolute;
+//     left: 50%;
+//     top: 50%;
+//     transform: translate(-50%, -50%);
+//   }
 // }
+.img-li {
+  width: 160px;
+  height: 160px;
+  border-radius: 8px;
+  border: 1px solid #e6ebf5;
+}
 </style>
