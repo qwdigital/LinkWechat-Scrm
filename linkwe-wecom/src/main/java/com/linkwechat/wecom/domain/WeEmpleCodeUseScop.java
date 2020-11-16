@@ -29,8 +29,11 @@ public class WeEmpleCodeUseScop
     /** 员工活码id */
     private Long empleCodeId;
 
+    /** 业务id类型1:组织机构id,2:成员id */
+    private Integer businessIdType;
+
     /** 活码类型下业务使用人的id */
-    private Long businessId;
+    private String businessId;
 
     /** 0:正常;2:删除; */
     private Integer delFlag=new Integer(0);

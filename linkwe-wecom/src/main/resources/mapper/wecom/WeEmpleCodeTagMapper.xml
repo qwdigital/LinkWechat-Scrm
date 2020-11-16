@@ -25,7 +25,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wt.`name`
         FROM
         we_emple_code_tag wect
-        LEFT JOIN we_tag wt ON wt.id=wect.tag_id
+        LEFT JOIN we_tag wt ON wt.tag_id=wect.tag_id
         WHERE wect.del_flag=0 and wect.emple_code_id=#{empleCodeId}
     </select>
     

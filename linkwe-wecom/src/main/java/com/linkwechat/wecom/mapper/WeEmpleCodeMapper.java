@@ -23,6 +23,13 @@ public interface WeEmpleCodeMapper extends BaseMapper<WeEmpleCode>
     public WeEmpleCode selectWeEmpleCodeById(Long id);
 
     /**
+     * 批量查询员工活码根据id
+     * @param ids
+     * @return
+     */
+    public List<WeEmpleCode> selectWeEmpleCodeByIds(@Param("ids") List<String> ids);
+
+    /**
      * 查询员工活码列表
      * 
      * @param weEmpleCode 员工活码

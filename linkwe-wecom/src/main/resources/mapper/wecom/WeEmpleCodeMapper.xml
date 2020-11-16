@@ -13,14 +13,65 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="delFlag"    column="del_flag"    />
+        <result property="configId"    column="config_id"    />
+        <result property="qrCode"    column="qr_code"    />
+        <collection property="weEmpleCodeUseScops" ofType="com.linkwechat.wecom.domain.WeEmpleCodeUseScop">
+            <result property="businessId"    column="business_id"    />
+            <result property="userUserName"    column="user_name"    />
+        </collection>
+        <collection property="weEmpleCodeTags" ofType="com.linkwechat.wecom.domain.WeEmpleCodeTag">
+            <result property="tagId"   column="tag_id"    />
+            <result property="tagName"    column="tag_name"    />
+        </collection>
     </resultMap>
 
     <sql id="selectWeEmpleCodeVo">
-        select id, code_type, is_join_confirm_friends, activity_scene, welcome_msg, create_by, create_time, del_flag from we_emple_code
+        select id, code_type, is_join_confirm_friends, activity_scene, welcome_msg, create_by, create_time, del_flag, config_id,qr_code from we_emple_code
     </sql>
 
+    <sql id="selectWeEmpleCodeLsit">
+        select
+	wecode.id,
+	wecode.code_type,
+	wecode.is_join_confirm_friends,
+	wecode.activity_scene,
+	wecode.welcome_msg,
+	wecode.create_by,
+	wecode.create_time,
+	wecode.del_flag,
+	wecode.config_id,
+	wecode.qr_code,
+	wecusn.business_id,
+	wecusn.user_name,
+	wectn.tag_id,
+	wectn.tag_name
+from
+	we_emple_code wecode
+left join (
+	SELECT
+		wecus.emple_code_id, wecus.business_id, wu.user_name
+	FROM
+		we_emple_code_use_scop wecus
+	LEFT JOIN we_user wu ON
+		wu.user_id = wecus.business_id
+	WHERE
+		wecus.del_flag = 0
+		) as wecusn on
+	wecode.id = wecusn.emple_code_id
+left join (
+	SELECT
+		wect.tag_id, wect.emple_code_id, wt.`name` as tag_name
+	FROM
+		we_emple_code_tag wect
+	LEFT JOIN we_tag wt ON
+		wt.tag_id = wect.tag_id
+	WHERE
+		wect.del_flag = 0) as wectn on
+	wecode.id = wectn.emple_code_id
+	</sql>
+
     <select id="selectWeEmpleCodeList" parameterType="WeEmpleCode" resultMap="WeEmpleCodeResult">
-        <include refid="selectWeEmpleCodeVo"/>
+        <include refid="selectWeEmpleCodeLsit"/>
         <where>  
             <if test="codeType != null "> and code_type = #{codeType}</if>
             <if test="isJoinConfirmFriends != null "> and is_join_confirm_friends = #{isJoinConfirmFriends}</if>
@@ -32,6 +83,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectWeEmpleCodeById" parameterType="Long" resultMap="WeEmpleCodeResult">
         <include refid="selectWeEmpleCodeVo"/>
         where id = #{id}
+    </select>
+
+    <select id="selectWeEmpleCodeByIds" parameterType="java.util.ArrayList" resultMap="WeEmpleCodeResult">
+        <include refid="selectWeEmpleCodeVo"/>
+        <where>
+            <if test="ids != null">
+                id in
+                <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
     </select>
         
     <insert id="insertWeEmpleCode" parameterType="WeEmpleCode">
@@ -45,6 +108,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="delFlag != null">del_flag,</if>
+            <if test="configId != null">config_id,</if>
+            <if test="qrCode != null">qr_code,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -55,6 +120,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="delFlag != null">#{delFlag},</if>
+            <if test="configId != null">#{configId},</if>
+            <if test="qrCode != null">#{qrCode},</if>
          </trim>
     </insert>
 
@@ -68,6 +135,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="configId != null">config_id = #{configId},</if>
+            <if test="qrCode != null">qr_code = #{qrCode},</if>
         </trim>
         where id = #{id}
     </update>
@@ -86,7 +155,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <update id="batchRemoveWeEmpleCodeIds">
         update we_emple_code  set
-        del_flag = 2
+        del_flag = 1
         where id in
         <foreach collection="ids" item="id" index="index"
                  separator="," open="(" close=")">

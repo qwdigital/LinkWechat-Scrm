@@ -25,7 +25,7 @@ public class WeEmpleCodeTag
     private Long id= SnowFlakeUtil.nextId();
 
     /** 标签id */
-    private Long tagId;
+    private String tagId;
 
     /** 员工活码id */
     private Long empleCodeId;
