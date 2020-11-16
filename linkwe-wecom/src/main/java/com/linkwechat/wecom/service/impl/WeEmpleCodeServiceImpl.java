@@ -81,11 +81,11 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         }
         if (this.baseMapper.insertWeEmpleCode(weEmpleCode) == 1) {
             if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
-                weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setId(weEmpleCode.getId()));
+                weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
                 iWeEmpleCodeUseScopService.saveBatch(weEmpleCode.getWeEmpleCodeUseScops());
             }
             if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeTags())) {
-                weEmpleCode.getWeEmpleCodeTags().forEach(item -> item.setId(weEmpleCode.getId()));
+                weEmpleCode.getWeEmpleCodeTags().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
                 weEmpleCodeTagService.saveBatch(weEmpleCode.getWeEmpleCodeTags());
             }
         }
@@ -107,11 +107,11 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         }
         if (this.baseMapper.updateWeEmpleCode(weEmpleCode) == 1) {
             if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
-                weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setId(weEmpleCode.getId()));
+                weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
                 iWeEmpleCodeUseScopService.updateBatchById(weEmpleCode.getWeEmpleCodeUseScops());
             }
             if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeTags())) {
-                weEmpleCode.getWeEmpleCodeTags().forEach(item -> item.setId(weEmpleCode.getId()));
+                weEmpleCode.getWeEmpleCodeTags().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
                 weEmpleCodeTagService.updateBatchById(weEmpleCode.getWeEmpleCodeTags());
             }
         }
