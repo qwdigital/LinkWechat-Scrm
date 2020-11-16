@@ -124,26 +124,28 @@ export default {
       :on-success="onSuccess"
       :before-upload="handleBeforeUpload"
     >
-      <template v-if="fileUrl">
-        <img v-if="type === '0'" :src="fileUrl" class="upload-img" />
-        <div v-else-if="type === '2'">
-          <video
-            id="myVideo"
-            class="video-js vjs-default-skin
+      <slot>
+        <template v-if="fileUrl">
+          <img v-if="type === '0'" :src="fileUrl" class="upload-img" />
+          <div v-else-if="type === '2'">
+            <video
+              id="myVideo"
+              class="video-js vjs-default-skin
             vjs-big-play-centered"
-            width="100%"
-            controls
-            webkit-playsinline="true"
-            playsinline="true"
-            :autoplay="false"
-            preload="auto"
-          >
-            <source :src="fileUrl" type="video/mp4" />
-          </video>
-        </div>
-        <div v-else>{{ fileName }}</div>
-      </template>
-      <i v-else class="el-icon-plus uploader-icon"></i>
+              width="100%"
+              controls
+              webkit-playsinline="true"
+              playsinline="true"
+              :autoplay="false"
+              preload="auto"
+            >
+              <source :src="fileUrl" type="video/mp4" />
+            </video>
+          </div>
+          <div v-else>{{ fileName }}</div>
+        </template>
+        <i v-else class="el-icon-plus uploader-icon"></i>
+      </slot>
     </el-upload>
     <div class="tip">
       <slot name="tip"></slot>

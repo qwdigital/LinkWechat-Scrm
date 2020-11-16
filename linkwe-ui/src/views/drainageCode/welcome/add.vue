@@ -59,8 +59,8 @@ export default {
               :rows="5"
               maxlength="100"
               show-word-limit
+              placeholder="请输入欢迎语"
               v-model="form.welcomeMsg"
-              placeholder
             ></el-input>
           </div>
           <div class="bfc-o">
@@ -77,48 +77,38 @@ export default {
           <img v-if="imageUrl" :src="imageUrl" />
 
           <el-popover placement="top-start" trigger="hover">
-            <div class="flex">
-              <el-upload
-                class="mr10"
-                action
-                :show-file-list="false"
-                :on-success="uploadSuccess"
-                :before-upload="beforeUpload"
-              >
-                <el-button>
+            <div class="ac">
+              <Upload
+                ><el-button>
                   <i class="el-icon-picture-outline"></i>
                   <p>图片</p>
-                </el-button>
-              </el-upload>
+                </el-button></Upload
+              >
 
-              <el-button @click="dialogVisible = true">
+              <!-- <el-button @click="dialogVisible = true">
                 <i class="el-icon-link"></i>
                 <p>网页</p>
               </el-button>
-              <!-- <el-button @click="dialogVisible1 = true">
+              <el-button @click="dialogVisible1 = true">
                 <i class="el-icon-link"></i>
                 <p>小程序</p>
-              </el-button>-->
+              </el-button> -->
             </div>
             <el-button slot="reference" icon="el-icon-plus" size="mini"
-              >添加图片/网页</el-button
+              >添加图片</el-button
             >
           </el-popover>
         </el-card>
       </el-form-item>
       <el-form-item label=" ">
-        <el-button type="cyan" icon="el-icon-search" size="mini" @click="submit"
-          >保存</el-button
-        >
-        <el-button icon="el-icon-refresh" size="mini" @click="$router.back()"
-          >取消</el-button
-        >
+        <el-button type="primary" @click="submit">保存</el-button>
+        <el-button @click="$router.back()">取消</el-button>
       </el-form-item>
     </el-form>
 
-    <PhoneDialog :message="form.welcomeMsg"></PhoneDialog>
+    <PhoneDialog :message="form.welcomeMsg || '请输入欢迎语'"></PhoneDialog>
 
-    <el-dialog title="添加网页消息" :visible.sync="dialogVisible" width="width">
+    <!-- <el-dialog title="添加网页消息" :visible.sync="dialogVisible" width="width">
       <el-form :model="form" inline>
         <el-form-item label="添加网页消息" label-width="200">
           <el-input
@@ -134,7 +124,7 @@ export default {
           >确 定</el-button
         >
       </div>
-    </el-dialog>
+    </el-dialog> -->
 
     <!-- <el-dialog
       title="添加小程序消息"
