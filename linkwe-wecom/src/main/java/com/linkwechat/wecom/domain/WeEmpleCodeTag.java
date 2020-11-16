@@ -34,7 +34,6 @@ public class WeEmpleCodeTag
     private Integer delFlag=new Integer(0);
 
     /** 标签名 */
-    @TableField(exist = false)
     private String tagName;
 
 

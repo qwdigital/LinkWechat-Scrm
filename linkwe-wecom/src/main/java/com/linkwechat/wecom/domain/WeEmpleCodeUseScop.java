@@ -42,5 +42,9 @@ public class WeEmpleCodeUseScop
     @TableField(exist = false)
     private String userUserName;
 
+    /** 活码使用人员手机号 */
+    @TableField(exist = false)
+    private String mobile;
+
 
 }

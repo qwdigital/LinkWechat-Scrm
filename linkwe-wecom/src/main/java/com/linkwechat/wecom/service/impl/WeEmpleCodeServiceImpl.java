@@ -24,9 +24,6 @@ import java.util.List;
  */
 @Service
 public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmpleCode> implements IWeEmpleCodeService {
-    @Autowired
-    private WeEmpleCodeMapper weEmpleCodeMapper;
-
 
     @Autowired
     private IWeEmpleCodeTagService weEmpleCodeTagService;
@@ -47,17 +44,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
      */
     @Override
     public WeEmpleCode selectWeEmpleCodeById(Long id) {
-        WeEmpleCode weEmpleCode = weEmpleCodeMapper.selectWeEmpleCodeById(id);
-        if (null != weEmpleCode) {
-            weEmpleCode.setWeEmpleCodeTags(
-                    weEmpleCodeTagService.selectWeEmpleCodeTagListById(id)
-            );
-            weEmpleCode.setWeEmpleCodeUseScops(
-                    iWeEmpleCodeUseScopService.selectWeEmpleCodeUseScopListById(id)
-            );
-
-        }
-        return weEmpleCode;
+        return this.baseMapper.selectWeEmpleCodeById(id);
     }
 
     /**
@@ -92,7 +79,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (weEmpleCodeMapper.insertWeEmpleCode(weEmpleCode) == 1) {
+        if (this.baseMapper.insertWeEmpleCode(weEmpleCode) == 1) {
             if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
                 weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setId(weEmpleCode.getId()));
                 iWeEmpleCodeUseScopService.saveBatch(weEmpleCode.getWeEmpleCodeUseScops());
@@ -118,7 +105,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (weEmpleCodeMapper.updateWeEmpleCode(weEmpleCode) == 1) {
+        if (this.baseMapper.updateWeEmpleCode(weEmpleCode) == 1) {
             if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
                 weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setId(weEmpleCode.getId()));
                 iWeEmpleCodeUseScopService.updateBatchById(weEmpleCode.getWeEmpleCodeUseScops());
@@ -155,7 +142,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         if (weEmpleCode != null && weEmpleCode.getConfigId() != null) {
             weExternalContactClient.delContactWay(weEmpleCode.getConfigId());
         }
-        return weEmpleCodeMapper.deleteWeEmpleCodeById(id);
+        return this.baseMapper.deleteWeEmpleCodeById(id);
     }
 
 
@@ -167,7 +154,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
      */
     @Override
     public int batchRemoveWeEmpleCodeIds(List<String> ids) {
-        return weEmpleCodeMapper.batchRemoveWeEmpleCodeIds(ids);
+        return this.baseMapper.batchRemoveWeEmpleCodeIds(ids);
     }
 
     private WeExternalContactDto.WeContactWay getWeContactWay(WeEmpleCode weEmpleCode) {

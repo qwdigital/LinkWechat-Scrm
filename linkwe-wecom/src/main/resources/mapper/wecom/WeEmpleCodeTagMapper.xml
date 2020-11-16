@@ -9,11 +9,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="tagId"    column="tag_id"    />
         <result property="empleCodeId"    column="emple_code_id"    />
         <result property="delFlag"    column="del_flag"    />
-        <result property="tagName" column="name" />
+        <result property="tagName" column="tag_name" />
     </resultMap>
 
     <sql id="selectWeEmpleCodeTagVo">
-        select id, tag_id, emple_code_id, del_flag from we_emple_code_tag
+        select id, tag_id, tag_name, emple_code_id, del_flag from we_emple_code_tag
     </sql>
 
     <select id="selectWeEmpleCodeTagListById" parameterType="Long" resultMap="WeEmpleCodeTagResult">
@@ -22,10 +22,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wect.tag_id,
             wect.emple_code_id,
             wect.del_flag,
-            wt.`name`
+            wect.tag_name
         FROM
         we_emple_code_tag wect
-        LEFT JOIN we_tag wt ON wt.tag_id=wect.tag_id
         WHERE wect.del_flag=0 and wect.emple_code_id=#{empleCodeId}
     </select>
     
@@ -39,12 +38,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="tagId != null">tag_id,</if>
+            <if test="tagName != null">tag_name,</if>
             <if test="empleCodeId != null">emple_code_id,</if>
             <if test="delFlag != null">del_flag,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
             <if test="tagId != null">#{tagId},</if>
+            <if test="tagName != null">#{tagName},</if>
             <if test="empleCodeId != null">#{empleCodeId},</if>
             <if test="delFlag != null">#{delFlag},</if>
          </trim>
@@ -54,6 +55,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         update we_emple_code_tag
         <trim prefix="SET" suffixOverrides=",">
             <if test="tagId != null">tag_id = #{tagId},</if>
+            <if test="tagName != null">tag_name = #{tagName},</if>
             <if test="empleCodeId != null">emple_code_id = #{empleCodeId},</if>
             <if test="delFlag != null">del_flag = #{delFlag},</if>
         </trim>
@@ -72,10 +74,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <insert id="batchInsetWeEmpleCodeTag">
-        insert into we_emple_code_tag (id,tag_id,emple_code_id,del_flag)
+        insert into we_emple_code_tag (id,tag_id,tag_name,emple_code_id,del_flag)
         values
         <foreach collection="weEmpleCodeTags" item="scop" index="index" separator=",">
-            (#{scop.id},#{scop.tagId},#{scop.empleCodeId},#{scop.delFlag})
+            (#{scop.id},#{scop.tagId},#{scop.tagName},#{scop.empleCodeId},#{scop.delFlag})
         </foreach>
     </insert>
 
