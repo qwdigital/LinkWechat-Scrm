@@ -21,7 +21,8 @@ public class WeExternalContactDto extends WeResultDto {
 
     @Data
     public static class WeContactWay{
-
+        //系我二维码链接，仅在scene为2时返回
+        private String config_id;
        // 联系方式类型,1-单人, 2-多人
         private Integer type;
 
@@ -41,7 +42,10 @@ public class WeExternalContactDto extends WeResultDto {
 
 
         //企业自定义的state参数，用于区分不同的添加渠道，在调用“获取外部联系人详情”时会返回该参数值，不超过30个字符
-        private String state="teststate";
+        private String state;
+
+        //样式
+        private Integer style = 1;
 
         public WeContactWay() {
         }

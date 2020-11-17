@@ -142,6 +142,7 @@ wecome:
   needContactTokenUrl:
           - /externalcontact/get_follow_user_list
           - /externalcontact/add_contact_way
+          - /externalcontact/update_contact_way
           - /externalcontact/add_corp_tag
           - /externalcontact/get_corp_tag_list
           - /externalcontact/del_corp_tag

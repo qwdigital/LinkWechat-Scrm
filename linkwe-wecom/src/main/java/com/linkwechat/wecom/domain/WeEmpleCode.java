@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Data
 @TableName("we_emple_code")
-public class WeEmpleCode
+public class WeEmpleCode extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
@@ -53,8 +53,17 @@ public class WeEmpleCode
     @TableField(exist = false)
     private List<WeEmpleCodeTag> weEmpleCodeTags;
 
+    /** 新增联系方式的配置id */
+    private String configId;
 
+    /** 二维码链接 */
+    private String qrCode;
 
+    /** 使用员工姓名 */
+    @TableField(exist = false)
+    private String useUserName;
 
-
+    /** 使用员工手机号 */
+    @TableField(exist = false)
+    private String mobile;
 }

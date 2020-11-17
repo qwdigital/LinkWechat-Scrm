@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.client;
 
 import com.dtflys.forest.annotation.DataObject;
+import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
 import com.linkwechat.wecom.domain.dto.WeExternalContactDto;
 
@@ -14,5 +15,11 @@ public interface WeExternalContactClient {
     @Request(url="/externalcontact/add_contact_way",
             type = "POST"
     )
-    WeExternalContactDto   addContactWay(@DataObject WeExternalContactDto.WeContactWay weContactWay);
+    WeExternalContactDto addContactWay(@DataObject WeExternalContactDto.WeContactWay weContactWay);
+
+    @Request(url="/externalcontact/update_contact_way", type = "POST")
+    WeExternalContactDto updateContactWay(@DataObject WeExternalContactDto.WeContactWay weContactWay);
+
+    @Request(url = "/externalcontact/del_contact_way", type = "POST")
+    WeExternalContactDto delContactWay(@Query("configId") String configId);
 }

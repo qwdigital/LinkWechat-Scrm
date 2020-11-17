@@ -25,7 +25,7 @@ public class WeEmpleCodeTag
     private Long id= SnowFlakeUtil.nextId();
 
     /** 标签id */
-    private Long tagId;
+    private String tagId;
 
     /** 员工活码id */
     private Long empleCodeId;
@@ -34,7 +34,6 @@ public class WeEmpleCodeTag
     private Integer delFlag=new Integer(0);
 
     /** 标签名 */
-    @TableField(exist = false)
     private String tagName;
 
 
