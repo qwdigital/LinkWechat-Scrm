@@ -12,7 +12,7 @@ export default {
     },
     title: {
       type: String,
-      default: '选择成员',
+      default: '组织架构',
     },
     // 是否 只选择叶子节点（人员节点）/禁止选择父节点（部门节点）
     isOnlyLeaf: {
