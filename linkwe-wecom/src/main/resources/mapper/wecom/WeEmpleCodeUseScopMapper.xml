@@ -9,7 +9,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="empleCodeId"    column="emple_code_id"    />
         <result property="businessId"    column="business_id"    />
         <result property="delFlag"    column="del_flag"    />
-        <result property="userUserName" column="user_name"/>
+        <result property="businessName" column="business_name"/>
+        <result property="mobile" column="mobile"/>
     </resultMap>
 
     <sql id="selectWeEmpleCodeUseScopVo">
@@ -18,7 +19,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectWeEmpleCodeUseScopListById" parameterType="Long" resultMap="WeEmpleCodeUseScopResult">
         SELECT
-             wecus.id, wecus.emple_code_id,wecus.business_id,wu.user_name
+             wecus.id, wecus.emple_code_id,wecus.business_id,wecus.business_name,wu.mobile
         FROM
         we_emple_code_use_scop wecus
         LEFT JOIN we_user wu ON wu.user_id = wecus.business_id
@@ -38,12 +39,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="id != null">id,</if>
             <if test="empleCodeId != null">emple_code_id,</if>
             <if test="businessId != null">business_id,</if>
+            <if test="businessName != null">business_name,</if>
             <if test="delFlag != null">del_flag,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
             <if test="empleCodeId != null">#{empleCodeId},</if>
             <if test="businessId != null">#{businessId},</if>
+            <if test="businessName != null">#{businessName},</if>
             <if test="delFlag != null">#{delFlag},</if>
          </trim>
     </insert>
@@ -53,6 +56,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <trim prefix="SET" suffixOverrides=",">
             <if test="empleCodeId != null">emple_code_id = #{empleCodeId},</if>
             <if test="businessId != null">business_id = #{businessId},</if>
+            <if test="businessName != null">business_name = #{businessName},</if>
             <if test="delFlag != null">del_flag = #{delFlag},</if>
         </trim>
         where id = #{id}
@@ -70,10 +74,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <insert id="batchInsetWeEmpleCodeUseScop">
-        insert into we_emple_code_use_scop (id,emple_code_id,business_id,del_flag)
+        insert into we_emple_code_use_scop (id,emple_code_id,business_id,business_name,del_flag)
         values
         <foreach collection="weEmpleCodeUseScops" item="scop" index="index" separator=",">
-            (#{scop.id},#{scop.empleCodeId},#{scop.businessId},#{scop.delFlag})
+            (#{scop.id},#{scop.empleCodeId},#{scop.businessId},#{scop.businessName},#{scop.delFlag})
         </foreach>
     </insert>
 

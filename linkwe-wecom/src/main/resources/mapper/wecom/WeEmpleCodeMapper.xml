@@ -17,7 +17,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="qrCode"    column="qr_code"    />
         <collection property="weEmpleCodeUseScops" ofType="com.linkwechat.wecom.domain.WeEmpleCodeUseScop">
             <result property="businessId"    column="business_id"    />
-            <result property="userUserName"    column="user_name"    />
+            <result property="businessName"    column="business_ame"    />
             <result property="mobile"    column="mobile"    />
         </collection>
         <collection property="weEmpleCodeTags" ofType="com.linkwechat.wecom.domain.WeEmpleCodeTag">
@@ -43,7 +43,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wecode.config_id,
             wecode.qr_code,
             wecusn.business_id,
-            wecusn.user_name,
+            wecusn.business_name,
             wecusn.mobile,
             wect.tag_id,
             wect.tag_name
@@ -51,7 +51,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             we_emple_code wecode
         left join (
             SELECT
-                wecus.emple_code_id, wecus.business_id, wu.user_name,wu.mobile
+                wecus.emple_code_id, wecus.business_id, wecus.business_name,wu.mobile
             FROM
                 we_emple_code_use_scop wecus
             LEFT JOIN we_user wu ON
@@ -66,11 +66,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectWeEmpleCodeList" parameterType="WeEmpleCode" resultMap="WeEmpleCodeResult">
         <include refid="selectWeEmpleCodeLsit"/>
-        <where>  
-            <if test="codeType != null "> and code_type = #{codeType}</if>
-            <if test="isJoinConfirmFriends != null "> and is_join_confirm_friends = #{isJoinConfirmFriends}</if>
-            <if test="activityScene != null  and activityScene != ''"> and activity_scene = #{activityScene}</if>
-            <if test="welcomeMsg != null "> and welcome_msg = #{welcomeMsg}</if>
+        <where>
+            <if test="codeType != null "> and wecode.code_type = #{codeType}</if>
+            <if test="isJoinConfirmFriends != null "> and wecode.is_join_confirm_friends = #{isJoinConfirmFriends}</if>
+            <if test="activityScene != null  and activityScene != ''">
+             and wecode.activity_scene like concat('%', #{activityScene}, '%')
+            </if>
+            <if test="welcomeMsg != null "> and wecode.welcome_msg = #{welcomeMsg}</if>
+            <if test="createBy != null and createBy !=''">
+                AND wecode.create_by like concat('%', #{createBy}, '%')
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(wecode.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(wecode.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+            <if test="mobile != null and mobile !=''">
+                AND wecusn.mobile like concat('%', #{mobile}, '%')
+            </if>
+            <if test="useUserName != null and useUserName !=''">
+                AND wecusn.business_name like concat('%', #{useUserName}, '%')
+            </if>
         </where>
     </select>
     

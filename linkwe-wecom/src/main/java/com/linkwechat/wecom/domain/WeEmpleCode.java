@@ -59,5 +59,11 @@ public class WeEmpleCode extends BaseEntity
     /** 二维码链接 */
     private String qrCode;
 
+    /** 使用员工姓名 */
+    @TableField(exist = false)
+    private String useUserName;
 
+    /** 使用员工手机号 */
+    @TableField(exist = false)
+    private String mobile;
 }

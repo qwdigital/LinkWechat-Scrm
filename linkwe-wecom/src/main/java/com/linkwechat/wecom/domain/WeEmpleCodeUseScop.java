@@ -39,8 +39,7 @@ public class WeEmpleCodeUseScop
     private Integer delFlag=new Integer(0);
 
     /** 活码使用人员名称 */
-    @TableField(exist = false)
-    private String userUserName;
+    private String businessName;
 
     /** 活码使用人员手机号 */
     @TableField(exist = false)

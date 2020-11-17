@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 员工活码Service业务层处理
@@ -55,7 +56,21 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
      */
     @Override
     public List<WeEmpleCode> selectWeEmpleCodeList(WeEmpleCode weEmpleCode) {
-        return this.baseMapper.selectWeEmpleCodeList(weEmpleCode);
+        List<WeEmpleCode> weEmpleCodeList = this.baseMapper.selectWeEmpleCodeList(weEmpleCode);
+        if (weEmpleCodeList !=null){
+            weEmpleCodeList.forEach(empleCode ->{
+                List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = empleCode.getWeEmpleCodeUseScops();
+                if (CollectionUtil.isNotEmpty(weEmpleCodeUseScopList)){
+                    String useUserName = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getBusinessName)
+                            .collect(Collectors.joining(","));
+                    empleCode.setUseUserName(useUserName);
+                    String mobile = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getMobile)
+                            .collect(Collectors.joining(","));
+                    empleCode.setMobile(mobile);
+                }
+            });
+        }
+        return weEmpleCodeList;
     }
 
     /**
