@@ -15,6 +15,7 @@ import com.linkwechat.wecom.client.WeCustomerClient;
 import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.AllocateWeCustomerDto;
+import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
 import com.linkwechat.wecom.domain.dto.customer.*;
 import com.linkwechat.wecom.domain.dto.tag.WeCropGroupTagDto;
 import com.linkwechat.wecom.domain.dto.tag.WeCropGroupTagListDto;
@@ -24,6 +25,7 @@ import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.mapper.WeCustomerMapper;
 import com.linkwechat.wecom.service.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -603,6 +605,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Transactional(rollbackFor = Exception.class)
     public void deleteCustomersByEid(String externalUserid) {
         this.removeById(externalUserid);
+    }
+
+    @Override
+    public void sendWelcomeMsg(WeWelcomeMsg weWelcomeMsg) {
+        weCustomerClient.sendWelcomeMsg(weWelcomeMsg);
     }
 
 

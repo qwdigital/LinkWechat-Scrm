@@ -17,7 +17,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="qrCode"    column="qr_code"    />
         <collection property="weEmpleCodeUseScops" ofType="com.linkwechat.wecom.domain.WeEmpleCodeUseScop">
             <result property="businessId"    column="business_id"    />
-            <result property="businessName"    column="business_ame"    />
+            <result property="businessName"    column="business_name"    />
             <result property="mobile"    column="mobile"    />
         </collection>
         <collection property="weEmpleCodeTags" ofType="com.linkwechat.wecom.domain.WeEmpleCodeTag">
@@ -177,6 +177,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
 
-
+    <select id="selectWelcomeMsgByActivityScene" parameterType="String" resultType="com.linkwechat.wecom.domain.dto.WeEmpleCodeDto">
+        select
+        wmt.welcome_msg ,
+        wmt.welcome_msg_tpl_type,
+        wm.category_id,
+        wm.material_url,
+        wm.content,
+        wm.material_name,
+        wm.digest,
+        wm.cover_url
+        from
+        we_emple_code wecode
+        left join
+        we_msg_tlp_scope wmts on wecode.welcome_msg = wmts .msg_tlp_id
+        left join we_msg_tlp wmt on wmt.id = wmts .msg_tlp_id
+        left join we_material wm on wm .id = wmt.media_id
+        where wmt.del_flag =0
+        <if test="activityScene != null and activityScene != ''">
+            and wecode.activity_scene = #{activityScene}
+        </if>
+    </select>
     
 </mapper>

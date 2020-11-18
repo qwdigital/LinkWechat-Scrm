@@ -2,9 +2,12 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeExternalContactClient;
 import com.linkwechat.wecom.domain.WeEmpleCode;
 import com.linkwechat.wecom.domain.WeEmpleCodeUseScop;
+import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
 import com.linkwechat.wecom.domain.dto.WeExternalContactDto;
 import com.linkwechat.wecom.mapper.WeEmpleCodeMapper;
 import com.linkwechat.wecom.service.IWeEmpleCodeService;
@@ -14,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -62,10 +67,10 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
                 List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = empleCode.getWeEmpleCodeUseScops();
                 if (CollectionUtil.isNotEmpty(weEmpleCodeUseScopList)){
                     String useUserName = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getBusinessName)
-                            .collect(Collectors.joining(","));
+                            .filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
                     empleCode.setUseUserName(useUserName);
                     String mobile = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getMobile)
-                            .collect(Collectors.joining(","));
+                            .filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
                     empleCode.setMobile(mobile);
                 }
             });
@@ -82,6 +87,8 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void insertWeEmpleCode(WeEmpleCode weEmpleCode) {
+        weEmpleCode.setCreateTime(new Date());
+        weEmpleCode.setCreateBy(SecurityUtils.getUsername());
         WeExternalContactDto.WeContactWay weContactWay = getWeContactWay(weEmpleCode);
         try {
             WeExternalContactDto weExternalContactDto = weExternalContactClient.addContactWay(weContactWay);
@@ -170,6 +177,11 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
     @Override
     public int batchRemoveWeEmpleCodeIds(List<String> ids) {
         return this.baseMapper.batchRemoveWeEmpleCodeIds(ids);
+    }
+
+    @Override
+    public WeEmpleCodeDto selectWelcomeMsgByActivityScene(String activityScene) {
+        return this.baseMapper.selectWelcomeMsgByActivityScene(activityScene);
     }
 
     private WeExternalContactDto.WeContactWay getWeContactWay(WeEmpleCode weEmpleCode) {
