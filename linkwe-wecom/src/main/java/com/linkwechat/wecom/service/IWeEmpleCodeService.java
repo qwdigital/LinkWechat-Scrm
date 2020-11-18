@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeEmpleCode;
+import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
 
 import java.util.List;
 
@@ -71,6 +72,10 @@ public interface IWeEmpleCodeService  extends IService<WeEmpleCode>
      */
     public int batchRemoveWeEmpleCodeIds(List<String> ids);
 
-
-
+    /**
+     * 通过活动场景获取客户欢迎语
+     * @param activityScene 活动场景
+     * @return
+     */
+    public WeEmpleCodeDto selectWelcomeMsgByActivityScene(String activityScene);
 }

@@ -1,10 +1,11 @@
 package com.linkwechat.wecom.mapper;
 
-import java.util.List;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeEmpleCode;
+import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 员工活码Mapper接口
@@ -77,4 +78,11 @@ public interface WeEmpleCodeMapper extends BaseMapper<WeEmpleCode>
      * @return 结果
      */
     public int batchRemoveWeEmpleCodeIds(@Param("ids") List<String> ids);
+
+    /**
+     * 通过活动场景获取客户欢迎语
+     * @param activityScene 活动场景
+     * @return
+     */
+    public WeEmpleCodeDto selectWelcomeMsgByActivityScene(@Param("activityScene") String activityScene);
 }

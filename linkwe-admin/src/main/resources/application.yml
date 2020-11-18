@@ -156,6 +156,7 @@ wecome:
           - /externalcontact/transfer
           - /externalcontact/groupchat/transfer
           - /externalcontact/get_unassigned_list
+          - /externalcontact/send_welcome_msg
   fileUplodUrl:  /media/upload,/media/uploadimg
   needProviderTokenUrl:
           - /service/get_login_info

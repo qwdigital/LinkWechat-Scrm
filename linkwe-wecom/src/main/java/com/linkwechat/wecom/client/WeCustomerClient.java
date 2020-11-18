@@ -5,10 +5,12 @@ import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
 import com.linkwechat.wecom.domain.dto.WeCustomerDto;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
+import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
 import com.linkwechat.wecom.domain.dto.customer.CutomerTagEdit;
 import com.linkwechat.wecom.domain.dto.customer.ExternalUserDetail;
 import com.linkwechat.wecom.domain.dto.customer.ExternalUserList;
 import com.linkwechat.wecom.domain.dto.customer.FollowUserList;
+
 
 import java.util.Map;
 
@@ -73,5 +75,12 @@ public interface WeCustomerClient {
     )
     WeResultDto makeCustomerLabel(@DataObject CutomerTagEdit cutomerTagEdit);
 
+
+    /**
+     * 客户发送欢迎语
+     */
+    @Request(url = "/externalcontact/send_welcome_msg",
+            type = "POST")
+    WeResultDto sendWelcomeMsg(@DataObject WeWelcomeMsg wxCpWelcomeMsg);
 
 }
