@@ -12,7 +12,7 @@ export default {
     },
     title: {
       type: String,
-      default: '选择成员',
+      default: '选择标签',
     },
     selected: {
       type: Array,
