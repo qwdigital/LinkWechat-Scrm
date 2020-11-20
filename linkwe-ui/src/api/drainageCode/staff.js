@@ -96,7 +96,7 @@ export function add(data) {
  */
 export function remove(id) {
   return request({
-    url: service + '/delete' + id,
+    url: service + '/delete/' + id,
     method: 'delete',
   })
 }

@@ -1,5 +1,5 @@
 <script>
-import { getDetail } from '@/api/drainageCode/staff'
+import { getDetail, add, update } from '@/api/drainageCode/staff'
 import PhoneDialog from '@/components/PhoneDialog'
 import SelectUser from '@/components/SelectUser'
 import SelectTag from '@/components/SelectTag'
@@ -44,8 +44,9 @@ export default {
     }
   },
   created() {
-    let id = this.$router.query.id
-    // id && this.getData(id)
+    debugger
+    let id = this.$route.query.id
+    id && this.getData(id)
   },
   methods: {
     selectedUser(data) {
@@ -59,105 +60,30 @@ export default {
     },
     submitSelectTag(data) {
       this.form.weEmpleCodeTags = data.map((d) => ({
-        tagId: d.id,
+        tagId: d.tagId,
         tagName: d.name,
       }))
     },
     /** 获取详情 */
     getData(id) {
-      this.loading = false
+      this.loading = true
       getDetail(id).then(({ data }) => {
         this.form = data
         this.loading = false
       })
     },
-    // 操作日志状态字典翻译
-    statusFormat(row, column) {
-      return this.selectDictLabel(this.statusOptions, row.status)
-    },
-    // 操作日志类型字典翻译
-    typeFormat(row, column) {
-      return this.selectDictLabel(this.typeOptions, row.businessType)
-    },
-    /** 搜索按钮操作 */
-    handleQuery() {
-      this.queryParams.pageNum = 1
-      this.getList()
-    },
-    /** 重置按钮操作 */
-    resetQuery() {
-      this.dateRange = []
-      this.resetForm('queryForm')
-      this.handleQuery()
-    },
-    // 多选框选中数据
-    handleSelectionChange(selection) {
-      this.ids = selection.map((item) => item.operId)
-      this.multiple = !selection.length
-    },
-    /** 详细按钮操作 */
-    handleView(row) {
-      this.open = true
-      this.form = row
-    },
-    /** 删除按钮操作 */
-    handleDelete(row) {
-      const operIds = row.operId || this.ids
-      this.$confirm(
-        '是否确认删除日志编号为"' + operIds + '"的数据项?',
-        '警告',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
-        }
-      )
-        .then(function() {
-          return delOperlog(operIds)
-        })
-        .then(() => {
-          this.getList()
-          this.msgSuccess('删除成功')
-        })
-        .catch(function() {})
-    },
-    /** 清空按钮操作 */
-    handleClean() {
-      this.$confirm('是否确认清空所有操作日志数据项?', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
+    submit() {
+      this.loading = true
+      add(this.form).then(({ data }) => {
+        this.loading = false
+        this.$router.back()
       })
-        .then(function() {
-          return cleanOperlog()
-        })
-        .then(() => {
-          this.getList()
-          this.msgSuccess('清空成功')
-        })
-        .catch(function() {})
-    },
-    /** 导出按钮操作 */
-    handleExport() {
-      const queryParams = this.queryParams
-      this.$confirm('是否确认导出所有操作日志数据项?', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      })
-        .then(function() {
-          return exportOperlog(queryParams)
-        })
-        .then((response) => {
-          this.download(response.msg)
-        })
-        .catch(function() {})
     },
   },
 }
 </script>
 <template>
-  <div class="wrap">
+  <div class="wrap" v-loading="loading">
     <el-form :model="form" ref="form" label-width="100px">
       <el-form-item label="类型" prop="codeType">
         <el-radio-group v-model="form.codeType">
@@ -183,7 +109,10 @@ export default {
         >
       </el-form-item>
       <el-form-item label="添加设置" prop="isJoinConfirmFriends">
-        <el-checkbox v-model="form.isJoinConfirmFriends"
+        <el-checkbox
+          :true-label="1"
+          :false-label="0"
+          v-model="form.isJoinConfirmFriends"
           >客户添加时无需经过确认自动成为好友</el-checkbox
         >
       </el-form-item>
@@ -227,11 +156,11 @@ export default {
             clearable
           />
           <el-divider></el-divider>
-          <el-popover placement="top-start" width="200" trigger="hover">
+          <!-- <el-popover placement="top-start" width="200" trigger="hover">
             <div class="flex">
               <div>图片</div>
-              <!-- <div>网页</div> -->
-              <!-- <div>小程序</div> -->
+              <div>网页</div>
+              <div>小程序</div>
             </div>
             <el-button
               slot="reference"
@@ -240,7 +169,8 @@ export default {
               @click="resetQuery"
               >添加图片</el-button
             >
-          </el-popover>
+          </el-popover> -->
+          <el-button icon="el-icon-plus" size="mini">添加图片</el-button>
         </el-card>
         <el-button
           icon="el-icon-plus"
@@ -254,7 +184,7 @@ export default {
         </div>
       </el-form-item>
       <el-form-item label=" ">
-        <el-button type="primary" @click="handleQuery">保存</el-button>
+        <el-button type="primary" @click="submit">保存</el-button>
         <el-button @click="$router.back()">取消</el-button>
       </el-form-item>
     </el-form>
