@@ -2,24 +2,29 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeExternalContactClient;
 import com.linkwechat.wecom.domain.WeEmpleCode;
 import com.linkwechat.wecom.domain.WeEmpleCodeUseScop;
+import com.linkwechat.wecom.domain.WeMaterial;
 import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
 import com.linkwechat.wecom.domain.dto.WeExternalContactDto;
 import com.linkwechat.wecom.mapper.WeEmpleCodeMapper;
 import com.linkwechat.wecom.service.IWeEmpleCodeService;
 import com.linkwechat.wecom.service.IWeEmpleCodeTagService;
 import com.linkwechat.wecom.service.IWeEmpleCodeUseScopService;
+import com.linkwechat.wecom.service.IWeMaterialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -42,6 +47,9 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
     @Autowired
     private WeExternalContactClient weExternalContactClient;
 
+    @Autowired
+    private IWeMaterialService materialService;
+
     /**
      * 查询员工活码
      *
@@ -50,7 +58,15 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
      */
     @Override
     public WeEmpleCode selectWeEmpleCodeById(Long id) {
-        return this.baseMapper.selectWeEmpleCodeById(id);
+        WeEmpleCode weEmpleCode = this.baseMapper.selectWeEmpleCodeById(id);
+        //查询活码详情中素材信息
+        Optional.ofNullable(weEmpleCode).map(WeEmpleCode::getMediaId).ifPresent(mediaId -> {
+            WeMaterial weMaterialInfo = materialService.findWeMaterialById(mediaId);
+            if (weMaterialInfo != null) {
+                weEmpleCode.setWeMaterial(weMaterialInfo);
+            }
+        });
+        return weEmpleCode;
     }
 
     /**
@@ -62,10 +78,10 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
     @Override
     public List<WeEmpleCode> selectWeEmpleCodeList(WeEmpleCode weEmpleCode) {
         List<WeEmpleCode> weEmpleCodeList = this.baseMapper.selectWeEmpleCodeList(weEmpleCode);
-        if (weEmpleCodeList !=null){
-            weEmpleCodeList.forEach(empleCode ->{
+        if (weEmpleCodeList != null) {
+            weEmpleCodeList.forEach(empleCode -> {
                 List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = empleCode.getWeEmpleCodeUseScops();
-                if (CollectionUtil.isNotEmpty(weEmpleCodeUseScopList)){
+                if (CollectionUtil.isNotEmpty(weEmpleCodeUseScopList)) {
                     String useUserName = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getBusinessName)
                             .filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
                     empleCode.setUseUserName(useUserName);
@@ -86,31 +102,10 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void insertWeEmpleCode(WeEmpleCode weEmpleCode) {
+    public void insertWeEmpleCode(WeEmpleCode weEmpleCode){
         weEmpleCode.setCreateTime(new Date());
         weEmpleCode.setCreateBy(SecurityUtils.getUsername());
-        WeExternalContactDto.WeContactWay weContactWay = getWeContactWay(weEmpleCode);
-        try {
-            WeExternalContactDto weExternalContactDto = weExternalContactClient.addContactWay(weContactWay);
-            //新增联系方式的配置id
-            String configId = weExternalContactDto.getConfig_id();
-            //联系我二维码链接
-            String qrCode = weExternalContactDto.getQr_code();
-            weEmpleCode.setConfigId(configId);
-            weEmpleCode.setQrCode(qrCode);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (this.baseMapper.insertWeEmpleCode(weEmpleCode) == 1) {
-            if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
-                weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
-                iWeEmpleCodeUseScopService.saveBatch(weEmpleCode.getWeEmpleCodeUseScops());
-            }
-            if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeTags())) {
-                weEmpleCode.getWeEmpleCodeTags().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
-                weEmpleCodeTagService.saveBatch(weEmpleCode.getWeEmpleCodeTags());
-            }
-        }
+        addWeEmplCode(weEmpleCode);
     }
 
     /**
@@ -120,6 +115,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
      * @return 结果
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateWeEmpleCode(WeEmpleCode weEmpleCode) {
         WeExternalContactDto.WeContactWay weContactWay = getWeContactWay(weEmpleCode);
         try {
@@ -159,6 +155,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
      * @return 结果
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int deleteWeEmpleCodeById(Long id) {
         WeEmpleCode weEmpleCode = getById(id);
         if (weEmpleCode != null && weEmpleCode.getConfigId() != null) {
@@ -175,13 +172,73 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
      * @return 结果
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int batchRemoveWeEmpleCodeIds(List<String> ids) {
         return this.baseMapper.batchRemoveWeEmpleCodeIds(ids);
     }
 
     @Override
-    public WeEmpleCodeDto selectWelcomeMsgByActivityScene(String activityScene) {
-        return this.baseMapper.selectWelcomeMsgByActivityScene(activityScene);
+    public WeEmpleCodeDto selectWelcomeMsgByActivityScene(String activityScene, String userId) {
+        return this.baseMapper.selectWelcomeMsgByActivityScene(activityScene, userId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void insertWeEmpleCodeBatch(List<WeEmpleCodeUseScop> weEmpleCodeUseScops){
+        Optional.ofNullable(weEmpleCodeUseScops).orElseGet(ArrayList::new).forEach(useScops -> {
+            //机构类型数据返回不执行生成二维码业务
+            if (WeConstans.USE_SCOP_BUSINESSID_TYPE_ORG.equals(useScops.getBusinessIdType())) {
+                return;
+            }
+            List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = new ArrayList<>();
+            weEmpleCodeUseScopList.add(useScops);
+            WeEmpleCode weEmpleCode = new WeEmpleCode();
+            weEmpleCode.setCreateTime(new Date());
+            weEmpleCode.setCreateBy(SecurityUtils.getUsername());
+            weEmpleCode.setCodeType(WeConstans.SINGLE_EMPLE_CODE_TYPE);
+            weEmpleCode.setIsJoinConfirmFriends(WeConstans.IS_JOIN_CONFIR_MFRIENDS);
+            weEmpleCode.setActivityScene(WeConstans.ONE_PERSON_CODE_GENERATED_BATCH);
+            weEmpleCode.setWeEmpleCodeUseScops(weEmpleCodeUseScopList);
+            addWeEmplCode(weEmpleCode);
+        });
+    }
+
+    /**
+     * 新增员工活码
+     *
+     * @param weEmpleCode
+     */
+    private void addWeEmplCode(WeEmpleCode weEmpleCode){
+        List<WeEmpleCodeUseScop> weEmpleCodeUseScops = weEmpleCode.getWeEmpleCodeUseScops();
+        List<String> businessIdList = Optional.ofNullable(weEmpleCodeUseScops).orElseGet(ArrayList::new)
+                .stream().map(WeEmpleCodeUseScop::getBusinessId)
+                .collect(Collectors.toList());
+        List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = iWeEmpleCodeUseScopService.listByIds(businessIdList);
+        if (weEmpleCodeUseScopList != null) {
+            throw new WeComException("该员工或部门已经创建，无法重复创建");
+        }
+        WeExternalContactDto.WeContactWay weContactWay = getWeContactWay(weEmpleCode);
+        try {
+            WeExternalContactDto weExternalContactDto = weExternalContactClient.addContactWay(weContactWay);
+            //新增联系方式的配置id
+            String configId = weExternalContactDto.getConfig_id();
+            //联系我二维码链接
+            String qrCode = weExternalContactDto.getQr_code();
+            weEmpleCode.setConfigId(configId);
+            weEmpleCode.setQrCode(qrCode);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (this.baseMapper.insertWeEmpleCode(weEmpleCode) == 1) {
+            if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
+                weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
+                iWeEmpleCodeUseScopService.saveBatch(weEmpleCode.getWeEmpleCodeUseScops());
+            }
+            if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeTags())) {
+                weEmpleCode.getWeEmpleCodeTags().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
+                weEmpleCodeTagService.saveBatch(weEmpleCode.getWeEmpleCodeTags());
+            }
+        }
     }
 
     private WeExternalContactDto.WeContactWay getWeContactWay(WeEmpleCode weEmpleCode) {
@@ -194,12 +251,15 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         weContactWay.setSkip_verify(weEmpleCode.getIsJoinConfirmFriends());
         weContactWay.setState(weEmpleCode.getActivityScene());
         if (CollectionUtil.isNotEmpty(weEmpleCodeUseScops)) {
-            String[] userIdArr = weEmpleCodeUseScops.stream().filter(itme -> 2 == itme.getBusinessIdType())
+            String[] userIdArr = weEmpleCodeUseScops.stream().filter(itme -> 2 == itme.getBusinessIdType() && itme.getBusinessId() != null)
                     .map(WeEmpleCodeUseScop::getBusinessId).toArray(String[]::new);
             weContactWay.setUser(userIdArr);
-            Long[] partyArr = weEmpleCodeUseScops.stream().filter(itme -> 1 == itme.getBusinessIdType())
-                    .map(WeEmpleCodeUseScop::getBusinessId).toArray(Long[]::new);
-            weContactWay.setParty(partyArr);
+            if (!WeConstans.SINGLE_EMPLE_CODE_TYPE.equals(weEmpleCode.getCodeType())) {
+                Long[] partyArr = weEmpleCodeUseScops.stream().filter(itme -> 1 == itme.getBusinessIdType() && itme.getBusinessId() != null)
+                        .map(item -> Long.valueOf(item.getBusinessId())).collect(Collectors.toList()).toArray(new Long[]{});
+                weContactWay.setParty(partyArr);
+            }
+
         }
         return weContactWay;
     }

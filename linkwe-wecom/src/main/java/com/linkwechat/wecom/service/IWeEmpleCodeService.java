@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeEmpleCode;
+import com.linkwechat.wecom.domain.WeEmpleCodeUseScop;
 import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
 
 import java.util.List;
@@ -75,7 +76,16 @@ public interface IWeEmpleCodeService  extends IService<WeEmpleCode>
     /**
      * 通过活动场景获取客户欢迎语
      * @param activityScene 活动场景
+     * @param userId 成员id
      * @return
      */
-    public WeEmpleCodeDto selectWelcomeMsgByActivityScene(String activityScene);
+    public WeEmpleCodeDto selectWelcomeMsgByActivityScene(String activityScene, String userId);
+
+    /**
+     * 批量新增员工活码
+     *
+     * @param weEmpleCodeUseScops 员工信息
+     * @return 结果
+     */
+    public void insertWeEmpleCodeBatch(List<WeEmpleCodeUseScop> weEmpleCodeUseScops);
 }

@@ -108,7 +108,7 @@ public class WeEventChangeExternalContactImpl implements WeCallBackEventFactory 
                     if (message.getState() != null && message.getWelcomeCode() != null) {
                         log.info("执行发送欢迎语>>>>>>>>>>>>>>>");
                         WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(message.getWelcomeCode());
-                        WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByActivityScene(message.getState());
+                        WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByActivityScene(message.getState(),message.getUserId());
                         if (messageMap != null) {
                             if (StringUtils.isNotEmpty(messageMap.getWelcomeMsg())){
                                 Text text = new Text();

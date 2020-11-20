@@ -15,6 +15,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="delFlag"    column="del_flag"    />
         <result property="configId"    column="config_id"    />
         <result property="qrCode"    column="qr_code"    />
+        <result property="mediaId"    column="media_id"    />
         <collection property="weEmpleCodeUseScops" ofType="com.linkwechat.wecom.domain.WeEmpleCodeUseScop">
             <result property="businessId"    column="business_id"    />
             <result property="businessName"    column="business_name"    />
@@ -34,6 +35,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 select
             wecode.id,
             wecode.code_type,
+            wecode.media_id,
             wecode.is_join_confirm_friends,
             wecode.activity_scene,
             wecode.welcome_msg,
@@ -123,6 +125,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="delFlag != null">del_flag,</if>
             <if test="configId != null">config_id,</if>
             <if test="qrCode != null">qr_code,</if>
+            <if test="mediaId != null">media_id,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -135,6 +138,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="delFlag != null">#{delFlag},</if>
             <if test="configId != null">#{configId},</if>
             <if test="qrCode != null">#{qrCode},</if>
+            <if test="mediaId != null">#{mediaId},</if>
          </trim>
     </insert>
 
@@ -150,6 +154,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="delFlag != null">del_flag = #{delFlag},</if>
             <if test="configId != null">config_id = #{configId},</if>
             <if test="qrCode != null">qr_code = #{qrCode},</if>
+            <if test="mediaId != null">media_id = #{mediaId},</if>
         </trim>
         where id = #{id}
     </update>
@@ -179,8 +184,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectWelcomeMsgByActivityScene" parameterType="String" resultType="com.linkwechat.wecom.domain.dto.WeEmpleCodeDto">
         select
-        wmt.welcome_msg ,
-        wmt.welcome_msg_tpl_type,
+        wecode.welcome_msg ,
         wm.category_id,
         wm.material_url,
         wm.content,
@@ -189,13 +193,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         wm.cover_url
         from
         we_emple_code wecode
-        left join
-        we_msg_tlp_scope wmts on wecode.welcome_msg = wmts .msg_tlp_id
-        left join we_msg_tlp wmt on wmt.id = wmts .msg_tlp_id
-        left join we_material wm on wm .id = wmt.media_id
-        where wmt.del_flag =0
+        left join we_emple_code_use_scop wecus on
+        wecode.id = wecus.emple_code_id
+        left join we_material wm on
+        wm .id = wecode.media_id
+        where
+        wecode.del_flag = 0
         <if test="activityScene != null and activityScene != ''">
             and wecode.activity_scene = #{activityScene}
+        </if>
+        <if test="userId != null and userId != ''">
+            and wecus.business_id = #{userId}
         </if>
     </select>
     

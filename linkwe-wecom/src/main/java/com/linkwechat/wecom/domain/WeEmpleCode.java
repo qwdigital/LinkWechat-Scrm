@@ -53,6 +53,10 @@ public class WeEmpleCode extends BaseEntity
     @TableField(exist = false)
     private List<WeEmpleCodeTag> weEmpleCodeTags;
 
+    /** 扫码标签 */
+    @TableField(exist = false)
+    private WeMaterial weMaterial;
+
     /** 新增联系方式的配置id */
     private String configId;
 

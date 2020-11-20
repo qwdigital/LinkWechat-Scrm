@@ -84,5 +84,5 @@ public interface WeEmpleCodeMapper extends BaseMapper<WeEmpleCode>
      * @param activityScene 活动场景
      * @return
      */
-    public WeEmpleCodeDto selectWelcomeMsgByActivityScene(@Param("activityScene") String activityScene);
+    public WeEmpleCodeDto selectWelcomeMsgByActivityScene(@Param("activityScene") String activityScene, @Param("userId") String userId);
 }

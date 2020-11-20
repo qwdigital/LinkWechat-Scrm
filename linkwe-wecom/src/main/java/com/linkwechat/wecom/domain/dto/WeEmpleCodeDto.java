@@ -9,10 +9,6 @@ public class WeEmpleCodeDto {
      */
     private String welcomeMsg;
     /**
-     * 欢迎语模板类型:1:员工欢迎语;2:部门员工欢迎语;3:客户群欢迎语
-     */
-    private Integer welcomeMsgTplType;
-    /**
      * 分类id
      */
     private String categoryId;

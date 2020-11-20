@@ -129,6 +129,20 @@ public class WeConstans {
      */
     public static final Integer QR_CODE_EMPLE_CODE_SCENE = 2;
 
+    /**
+     * 客户添加时无需经过确认自动成为好友,是
+     */
+    public static final Boolean IS_JOIN_CONFIR_MFRIENDS = true;
+
+    /**
+     * 客户添加时无需经过确认自动成为好友,否
+     */
+    public static final Boolean NOT_IS_JOIN_CONFIR_MFRIENDS = false;
+
+    /**
+     * 批量生成的单人码 活动场景
+     */
+    public static final String ONE_PERSON_CODE_GENERATED_BATCH="批量生成的单人码";
 
     /**
      * 微信接口相应端错误字段
@@ -178,6 +192,12 @@ public class WeConstans {
     public static final String CURSOR = "cursor";
 
     public static final String CORPID = "CORP_ID";
+
+    /**
+     * 业务id类型1:组织机构id,2:成员id
+     */
+    public static final Integer USE_SCOP_BUSINESSID_TYPE_USER = 2;
+    public static final Integer USE_SCOP_BUSINESSID_TYPE_ORG = 1;
 
     /**
      * 企微回调事件类型路由
