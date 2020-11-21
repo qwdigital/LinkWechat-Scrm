@@ -79,7 +79,8 @@ export function update(data) {
     "weEmpleCodeTags": [{
         "tagId": "标签id",
         "tagName": "标签"
-    }]
+    }],
+    mediaId: ''
 }
  */
 export function add(data) {
@@ -91,12 +92,39 @@ export function add(data) {
 }
 
 /**
- * 根据id获取员工活码详情
- * @param {*} params
+ * 批量新增员工活码
+ * @param {*} data
+ */
+export function batchAdd(data) {
+  return request({
+    url: service + '/batchAdd',
+    method: 'post',
+    data,
+  })
+}
+
+/**
+ * 删除员工活码
+ * @param {*} id
  */
 export function remove(id) {
   return request({
     url: service + '/delete/' + id,
     method: 'delete',
+  })
+}
+
+/**
+ *获取员工二维码
+ * @param {*} params
+{
+  userIds=员工id,多个逗号隔离&
+  departmentIds=部门id,多个逗号隔离
+}
+ */
+export function getDetail(params) {
+  return request({
+    url: service + '/getQrcode',
+    params,
   })
 }

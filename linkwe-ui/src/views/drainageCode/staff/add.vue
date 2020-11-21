@@ -1,14 +1,17 @@
 <script>
 import { getDetail, add, update } from '@/api/drainageCode/staff'
+import { getList } from '@/api/drainageCode/welcome'
 import PhoneDialog from '@/components/PhoneDialog'
 import SelectUser from '@/components/SelectUser'
 import SelectTag from '@/components/SelectTag'
+import SelectMaterial from '@/components/SelectMaterial'
 export default {
-  components: { PhoneDialog, SelectTag, SelectUser },
+  components: { PhoneDialog, SelectTag, SelectUser, SelectMaterial },
   data() {
     return {
       dialogVisibleSelectUser: false,
       dialogVisibleSelectTag: false,
+      dialogVisibleSelectMaterial: false,
       dialogVisibleSelectWel: false,
       // 遮罩层
       loading: false,
@@ -19,32 +22,13 @@ export default {
         weEmpleCodeTags: [],
         weEmpleCodeUseScops: [],
       },
-      tableData: [
-        {
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        },
-        {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1517 弄',
-        },
-        {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1519 弄',
-        },
-        {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1516 弄',
-        },
-      ],
+      welQuery: { welcomeMsg: '' },
+      welLoading: false,
+      welList: [],
+      welSelected: {},
     }
   },
   created() {
-    debugger
     let id = this.$route.query.id
     id && this.getData(id)
   },
@@ -64,6 +48,8 @@ export default {
         tagName: d.name,
       }))
     },
+    // 选择素材确认按钮
+    submitSelectMaterial(text, image, file) {},
     /** 获取详情 */
     getData(id) {
       this.loading = true
@@ -71,6 +57,20 @@ export default {
         this.form = data
         this.loading = false
       })
+    },
+    /** 获取欢迎语列表 */
+    getWelList() {
+      this.welLoading = true
+      getList(this.welQuery).then(({ rows }) => {
+        this.welList = rows
+        this.welLoading = false
+      })
+    },
+    // 欢迎语确认按钮
+    selectWelcome() {
+      this.form.welcomeMsg = this.welSelected.welcomeMsg
+      this.form.mediaId = this.welSelected.mediaId
+      this.dialogVisibleSelectWel = false
     },
     submit() {
       this.loading = true
@@ -170,13 +170,18 @@ export default {
               >添加图片</el-button
             >
           </el-popover> -->
-          <el-button icon="el-icon-plus" size="mini">添加图片</el-button>
+          <el-button
+            icon="el-icon-plus"
+            size="mini"
+            @click="dialogVisibleSelectMaterial = true"
+            >添加图片</el-button
+          >
         </el-card>
         <el-button
           icon="el-icon-plus"
           type="primary"
           size="mini"
-          @click="dialogVisibleSelectWel = true"
+          @click="getWelList(), (dialogVisibleSelectWel = true)"
           >从欢迎语模板选取</el-button
         >
         <div class="tip">
@@ -217,9 +222,11 @@ export default {
 
     <!-- 选择使用员工弹窗 -->
     <SelectUser
+      :key="form.codeType"
       :visible.sync="dialogVisibleSelectUser"
       title="选择使用员工"
       :isOnlyLeaf="false"
+      :isSigleSelect="form.codeType == 1"
       @success="selectedUser"
     ></SelectUser>
 
@@ -231,6 +238,15 @@ export default {
     >
     </SelectTag>
 
+    <!-- 选择素材弹窗 -->
+    <SelectMaterial
+      :visible.sync="dialogVisibleSelectMaterial"
+      type="1"
+      :showArr="[1]"
+      @success="submitSelectMaterial"
+    >
+    </SelectMaterial>
+
     <el-dialog
       title="选择欢迎语"
       :visible.sync="dialogVisibleSelectWel"
@@ -240,24 +256,26 @@ export default {
         <el-input
           class="welcome-input"
           placeholder="请输入关键字"
-          v-model="input3"
+          v-model="welQuery.welcomeMsg"
         >
-          <el-button slot="append">查询</el-button>
+          <el-button slot="append" @click="getWelList">查询</el-button>
         </el-input>
         <el-table
-          ref="singleTable"
-          :data="tableData"
+          v-loading="welLoading"
+          :data="welList"
           :max-height="300"
           :show-header="false"
           highlight-current-row
-          @current-change="handleCurrentChange"
-          style="width: 100%"
+          @current-change="(val) => (welSelected = val)"
         >
-          <el-table-column property="date"></el-table-column>
-          <el-table-column width="60" show-overflow-tooltip>
+          <el-table-column
+            property="welcomeMsg"
+            show-overflow-tooltip
+          ></el-table-column>
+          <el-table-column width="60">
             <template slot-scope="{ row }">
               <i
-                v-if="row.checked"
+                v-if="welSelected.id === row.id"
                 class="el-icon-check"
                 style="color: rgb(65, 133, 244); font-size: 25px;"
               ></i>
@@ -267,9 +285,7 @@ export default {
       </div>
       <div slot="footer">
         <el-button @click="dialogVisibleSelectWel = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisibleSelectWel = false"
-          >确 定</el-button
-        >
+        <el-button type="primary" @click="selectWelcome">确 定</el-button>
       </div>
     </el-dialog>
   </div>

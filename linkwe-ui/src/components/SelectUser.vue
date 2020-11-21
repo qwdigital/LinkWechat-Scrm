@@ -19,6 +19,11 @@ export default {
       type: Boolean,
       default: true,
     },
+    // 是否单选
+    isSigleSelect: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     let isOnlyLeaf = this.isOnlyLeaf
@@ -60,7 +65,7 @@ export default {
             element.key = createUniqueString()
           })
           let _data = this.handleTree(data)
-          console.log('d', data)
+          // console.log('d', data)
           resolve(_data)
           // api.getList({ department: _data[0].id }).then(({ rows, total }) => {
           //   _data && rows.unshift(..._data);
@@ -77,16 +82,26 @@ export default {
         })
       }
     },
+    // 选择变化
     handleCheckChange(data, checked, indeterminate) {
-      checked
-        ? this.userList.push(data)
-        : this.userList.splice(this.userList.indexOf(data), 1)
+      debugger
+      if (checked) {
+        if (this.isSigleSelect) {
+          // 单选清空
+          let userList = []
+        }
+        this.userList.push(data)
+      } else {
+        this.userList.splice(this.userList.indexOf(data), 1)
+      }
       // console.log(data, checked, indeterminate);
     },
+    // 确 定
     submit() {
       this.Pvisible = false
       this.$emit('success', this.userList)
     },
+    // 取消选择
     cancle(key) {
       this.$refs.tree.setChecked(key, false)
     },
@@ -108,7 +123,7 @@ setChecked
             lazy
             accordion
             show-checkbox
-            check-on-click-node
+            :check-on-click-node="false"
             :expand-on-click-node="true"
             :load="loadNode"
             :props="defaultProps"

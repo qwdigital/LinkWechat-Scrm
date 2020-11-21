@@ -19,6 +19,11 @@ export default {
       type: String,
       default: '0',
     },
+    // 显示哪些素材类型标签
+    showArr: {
+      type: Array,
+      default: () => [0, 1],
+    },
   },
   data() {
     return {
@@ -66,11 +71,11 @@ export default {
   <el-dialog title="选择素材" :visible.sync="Pvisible" width="650px">
     <div>
       <el-tabs v-model="Ptype">
-        <el-tab-pane name="0">
+        <el-tab-pane name="0" v-if="showArr.includes(0)">
           <span slot="label"> <i class="el-icon-date"></i> 文本 </span>
           <list type="4" @change="changeText"> </list>
         </el-tab-pane>
-        <el-tab-pane name="1">
+        <el-tab-pane name="1" v-if="showArr.includes(1)">
           <span slot="label"> <i class="el-icon-date"></i> 图片 </span>
           <list type="0" @change="changeImage"> </list>
         </el-tab-pane>
