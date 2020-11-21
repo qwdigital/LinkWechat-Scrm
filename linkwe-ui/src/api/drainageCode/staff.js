@@ -122,7 +122,7 @@ export function remove(id) {
   departmentIds=部门id,多个逗号隔离
 }
  */
-export function getDetail(params) {
+export function getQrcode(params) {
   return request({
     url: service + '/getQrcode',
     params,
