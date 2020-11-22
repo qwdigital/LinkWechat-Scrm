@@ -1,5 +1,5 @@
 <script>
-import { getDetail, add, update } from '@/api/drainageCode/staff'
+import { getDetail, add, update, getQrcode } from '@/api/drainageCode/staff'
 import { getList } from '@/api/drainageCode/welcome'
 import PhoneDialog from '@/components/PhoneDialog'
 import SelectUser from '@/components/SelectUser'
@@ -18,40 +18,26 @@ export default {
       // 表单参数
       form: {
         codeType: 1,
+        qrcode: '',
         isJoinConfirmFriends: 0,
         weEmpleCodeTags: [],
         weEmpleCodeUseScops: [],
       },
+      materialSelected: '',
       welQuery: { welcomeMsg: '' },
       welLoading: false,
       welList: [],
       welSelected: {},
+      type: { 1: '单人', 2: '多人', 3: '批量单人' },
     }
   },
   created() {
     let id = this.$route.query.id
-    id && this.getData(id)
+    id && this.getDetail(id)
   },
   methods: {
-    selectedUser(data) {
-      this.form.weEmpleCodeUseScops = data.map((d) => {
-        return {
-          businessId: d.id || d.userId,
-          businessName: d.name,
-          businessIdType: d.userId ? 2 : 1,
-        }
-      })
-    },
-    submitSelectTag(data) {
-      this.form.weEmpleCodeTags = data.map((d) => ({
-        tagId: d.tagId,
-        tagName: d.name,
-      }))
-    },
-    // 选择素材确认按钮
-    submitSelectMaterial(text, image, file) {},
     /** 获取详情 */
-    getData(id) {
+    getDetail(id) {
       this.loading = true
       getDetail(id).then(({ data }) => {
         this.form = data
@@ -63,8 +49,47 @@ export default {
       this.welLoading = true
       getList(this.welQuery).then(({ rows }) => {
         this.welList = rows
+        this.$refs.table.$forceUpdate()
         this.welLoading = false
       })
+    },
+    codeTypeChange() {
+      this.form.weEmpleCodeUseScops = []
+      this.form.qrcode = ''
+    },
+    // 选择人员变化事件
+    selectedUser(users) {
+      let params = { userIds: [], departmentIds: [] }
+      this.form.weEmpleCodeUseScops = users.map((d) => {
+        d.userId && params.userIds.push(d.userId)
+        d.id && params.departmentIds.push(d.id)
+        return {
+          businessId: d.id || d.userId,
+          businessName: d.name,
+          businessIdType: d.userId ? 2 : 1,
+        }
+      })
+      params.userIds += ''
+      params.departmentIds += ''
+      getQrcode(params).then(({ data }) => {
+        this.form.qrcode = data.qr_code
+      })
+    },
+    submitSelectTag(data) {
+      this.form.weEmpleCodeTags = data.map((d) => ({
+        tagId: d.tagId,
+        tagName: d.name,
+      }))
+    },
+    // 选择素材确认按钮
+    submitSelectMaterial(text, image, file) {
+      this.form.mediaId = image.id
+      this.materialSelected = image.materialUrl
+      this.dialogVisibleSelectMaterial = false
+    },
+    removeMaterial() {
+      this.form.mediaId = ''
+      this.materialSelected = ''
     },
     // 欢迎语确认按钮
     selectWelcome() {
@@ -75,6 +100,7 @@ export default {
     submit() {
       this.loading = true
       add(this.form).then(({ data }) => {
+        this.msgSuccess('操作成功')
         this.loading = false
         this.$router.back()
       })
@@ -86,15 +112,19 @@ export default {
   <div class="wrap" v-loading="loading">
     <el-form :model="form" ref="form" label-width="100px">
       <el-form-item label="类型" prop="codeType">
-        <el-radio-group v-model="form.codeType">
-          <el-radio :label="1">单人</el-radio>
-          <el-radio :label="2">多人</el-radio>
-          <el-radio :label="3">批量</el-radio>
+        <el-radio-group v-model="form.codeType" @change="codeTypeChange">
+          <el-radio
+            v-for="(value, key, index) in type"
+            :key="index"
+            :label="+key"
+            >{{ value }}</el-radio
+          >
         </el-radio-group>
       </el-form-item>
       <el-form-item label="使用员工">
+        <!-- closable -->
         <el-tag
-          closable
+          size="medium"
           v-for="(item, index) in form.weEmpleCodeUseScops"
           :key="index"
           >{{ item.businessName }}</el-tag
@@ -102,6 +132,7 @@ export default {
         <el-button
           type="primary"
           plain
+          class="ml10"
           icon="el-icon-plus"
           size="mini"
           @click="dialogVisibleSelectUser = true"
@@ -126,14 +157,16 @@ export default {
         />
       </el-form-item>
       <el-form-item label="扫码标签" prop="weEmpleCodeTags">
+        <!-- closable -->
         <el-tag
-          closable
+          size="medium"
           v-for="(item, index) in form.weEmpleCodeTags"
           :key="index"
           >{{ item.tagName }}</el-tag
         >
         <el-button
           type="primary"
+          class="ml10"
           plain
           icon="el-icon-plus"
           size="mini"
@@ -170,7 +203,17 @@ export default {
               >添加图片</el-button
             >
           </el-popover> -->
+          <el-image
+            v-if="materialSelected"
+            style="width: 100px; height: 100px"
+            :src="materialSelected"
+            :fit="fit"
+            @click="dialogVisibleSelectMaterial = true"
+          >
+            <i class="el-icon-error" @click="removeMaterial"></i>
+          </el-image>
           <el-button
+            v-else
             icon="el-icon-plus"
             size="mini"
             @click="dialogVisibleSelectMaterial = true"
@@ -197,7 +240,7 @@ export default {
     <div class="preview-wrap">
       <el-image
         style="width: 180px; height: 180px"
-        src="@/assets/image/profile.jpg"
+        :src="form.qrcode || require('@/assets/image/user-code-example.jpg')"
         fit="fit"
       ></el-image>
       <div class="tip mb20">二维码预览</div>
@@ -209,8 +252,9 @@ export default {
         <div>设置：备注和描述</div>
         <div>
           标签：
-          <el-tag>试用版1重要（1w以上）</el-tag>
-          <el-tag>试用版1</el-tag>
+          <el-tag v-for="(item, index) in form.weEmpleCodeTags" :key="index">{{
+            item.tagName
+          }}</el-tag>
         </div>
       </el-card>
       <div class="tip mb20">扫码标签样式</div>
@@ -225,7 +269,7 @@ export default {
       :key="form.codeType"
       :visible.sync="dialogVisibleSelectUser"
       title="选择使用员工"
-      :isOnlyLeaf="false"
+      :isOnlyLeaf="form.codeType !== 2"
       :isSigleSelect="form.codeType == 1"
       @success="selectedUser"
     ></SelectUser>
@@ -248,6 +292,7 @@ export default {
     </SelectMaterial>
 
     <el-dialog
+      key="a"
       title="选择欢迎语"
       :visible.sync="dialogVisibleSelectWel"
       width="500"
@@ -261,6 +306,7 @@ export default {
           <el-button slot="append" @click="getWelList">查询</el-button>
         </el-input>
         <el-table
+          ref="table"
           v-loading="welLoading"
           :data="welList"
           :max-height="300"
@@ -308,5 +354,7 @@ export default {
   display: table;
   width: 80%;
   margin: 0 auto 20px;
+}
+.el-icon-error {
 }
 </style>

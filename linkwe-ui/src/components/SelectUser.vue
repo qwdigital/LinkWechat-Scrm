@@ -84,11 +84,10 @@ export default {
     },
     // 选择变化
     handleCheckChange(data, checked, indeterminate) {
-      debugger
       if (checked) {
         if (this.isSigleSelect) {
-          // 单选清空
-          let userList = []
+          // 单选情况
+          this.$refs.tree.setCheckedKeys([data.key])
         }
         this.userList.push(data)
       } else {

@@ -1,8 +1,11 @@
 <script>
-import { getList, remove } from '@/api/drainageCode/staff'
-
+import { getList, remove, batchAdd } from '@/api/drainageCode/staff'
+import { download, downloadBatch } from '@/api/common'
+import SelectUser from '@/components/SelectUser'
+import ClipboardJS from 'clipboard'
 export default {
   name: 'CodeStaff',
+  components: { SelectUser },
   data() {
     return {
       // 查询参数
@@ -18,67 +21,6 @@ export default {
       },
       // 日期范围
       dateRange: [],
-      treeData: [
-        {
-          label: '一级 1',
-          children: [
-            {
-              label: '二级 1-1',
-              children: [
-                {
-                  label: '三级 1-1-1',
-                },
-              ],
-            },
-          ],
-        },
-        {
-          label: '一级 2',
-          children: [
-            {
-              label: '二级 2-1',
-              children: [
-                {
-                  label: '三级 2-1-1',
-                },
-              ],
-            },
-            {
-              label: '二级 2-2',
-              children: [
-                {
-                  label: '三级 2-2-1',
-                },
-              ],
-            },
-          ],
-        },
-        {
-          label: '一级 3',
-          children: [
-            {
-              label: '二级 3-1',
-              children: [
-                {
-                  label: '三级 3-1-1',
-                },
-              ],
-            },
-            {
-              label: '二级 3-2',
-              children: [
-                {
-                  label: '三级 3-2-1',
-                },
-              ],
-            },
-          ],
-        },
-      ],
-      defaultProps: {
-        children: 'children',
-        label: 'label',
-      },
       dialogVisible: false,
       // 遮罩层
       loading: false,
@@ -89,11 +31,30 @@ export default {
       // 表格数据
       list: [],
       // 表单参数
-      form: {},
+      form: {
+        codeType: 3,
+        qrcode: '',
+        isJoinConfirmFriends: 0,
+        weEmpleCodeTags: [],
+        weEmpleCodeUseScops: [],
+      },
     }
   },
   created() {
     this.getList()
+  },
+  mounted() {
+    var clipboard = new ClipboardJS('.copy-btn')
+    clipboard.on('success', (e) => {
+      this.$notify({
+        title: '成功',
+        message: '链接已复制到剪切板，可粘贴。',
+        type: 'success',
+      })
+    })
+    clipboard.on('error', (e) => {
+      this.$message.error('链接复制失败')
+    })
   },
   methods: {
     getList(page) {
@@ -128,13 +89,9 @@ export default {
       this.$router.push({ path: '/drainageCode/' + path, query: { id } })
     },
 
-    download(row) {
-      window.open(row.qrCode)
-    },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map((item) => item.operId)
-      this.multiple = !selection.length
+      this.ids = selection.map((item) => item.id)
     },
     /** 删除按钮操作 */
     remove(id) {
@@ -153,21 +110,35 @@ export default {
         })
         .catch(function() {})
     },
-    /** 导出按钮操作 */
-    handleExport() {
-      const query = this.query
-      this.$confirm('是否确认导出所有操作数据项?', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
+    // 选择人员变化事件
+    selectedUser(users) {
+      this.form.weEmpleCodeUseScops = users.map((d) => {
+        return {
+          businessId: d.id || d.userId,
+          businessName: d.name,
+          businessIdType: d.userId ? 2 : 1,
+        }
       })
-        .then(function() {
-          return exportOperlog(query)
+      batchAdd(this.form).then(({ data }) => {
+        this.msgSuccess('操作成功')
+        this.getList(1)
+      })
+    },
+    /** 下载 */
+    downloadBatch(id) {
+      const ids = id || this.ids
+      // window.open(download(row.qrCode, row.createBy.split(',')[0] + '.png'))
+      id && window.open(row.qrCode)
+      id ||
+        this.$confirm('是否确认下载所有图片吗?', '警告', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
         })
-        .then((response) => {
-          this.download(response.msg)
-        })
-        .catch(function() {})
+          .then(function() {
+            return window.open(downloadBatch(ids))
+          })
+          .catch(function() {})
     },
   },
 }
@@ -253,8 +224,10 @@ export default {
         <el-button type="primary" size="mini" @click="dialogVisible = true"
           >批量新建</el-button
         >
-        <el-button type="primary" size="mini">删除</el-button>
-        <el-button type="primary" size="mini">下载</el-button>
+        <el-button type="primary" size="mini" @click="remove">删除</el-button>
+        <el-button type="primary" size="mini" @click="downloadBatch"
+          >批量下载</el-button
+        >
       </div>
     </div>
 
@@ -265,8 +238,13 @@ export default {
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="样式" align="center" prop="qrCode">
-        <!-- style="width: 100px; height: 100px" -->
-        <el-image :src="qrCode" :fit="fit"></el-image>
+        <template slot-scope="{ row }">
+          <el-image
+            :src="row.qrCode"
+            fit="fit"
+            style="width: 100px; height: 100px"
+          ></el-image>
+        </template>
       </el-table-column>
       <!-- <el-table-column label="使用员工" align="center" prop="useUserName" /> -->
       <el-table-column
@@ -300,34 +278,35 @@ export default {
         align="center"
         class-name="small-padding fixed-width"
       >
-        <template slot-scope="scope">
+        <template slot-scope="{ row }">
           <el-button
             type="text"
-            @click="download(scope.row)"
+            @click="downloadBatch(row.id)"
             v-hasPermi="['monitor:operlog:query']"
             >下载</el-button
           >
           <el-button
             type="text"
-            @click="handleView(scope.row)"
+            class="copy-btn"
+            :data-clipboard-text="row.qrCode"
             v-hasPermi="['monitor:operlog:query']"
             >复制链接</el-button
           >
           <el-button
             type="text"
-            @click="goRoute('staffDetail', scope.row.id)"
+            @click="goRoute('staffDetail', row.id)"
             v-hasPermi="['monitor:operlog:query']"
             >查看详情</el-button
           >
           <el-button
             type="text"
-            @click="goRoute('staffAdd', scope.row.id)"
+            @click="goRoute('staffAdd', row.id)"
             v-hasPermi="['monitor:operlog:query']"
             >编辑</el-button
           >
           <el-button
             type="text"
-            @click="remove(scope.row.id)"
+            @click="remove(row.id)"
             v-hasPermi="['monitor:operlog:query']"
             >删除</el-button
           >
@@ -340,39 +319,15 @@ export default {
       :total="total"
       :page.sync="query.pageNum"
       :limit.sync="query.pageSize"
-      @pagination="getList"
+      @pagination="getList()"
     />
 
     <!-- 批量新建弹窗 -->
-    <el-dialog
-      title="组织架构"
+    <SelectUser
       :visible.sync="dialogVisible"
-      width="width"
-      :before-close="dialogBeforeClose"
-    >
-      <el-row :gutter="20">
-        <el-col :span="12">
-          <el-input placeholder="请输入关键字" v-model="input3" class>
-            <el-button slot="append">查询</el-button>
-          </el-input>
-          <el-tree
-            :data="treeData"
-            :props="defaultProps"
-            accordion
-            @node-click="handleNodeClick"
-          ></el-tree>
-        </el-col>
-        <el-col :span="12">
-          <div class="grid-content bg-purple"></div>
-        </el-col>
-      </el-row>
-      <div slot="footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false"
-          >确 定</el-button
-        >
-      </div>
-    </el-dialog>
+      title="组织架构"
+      @success="selectedUser"
+    ></SelectUser>
   </div>
 </template>
 
