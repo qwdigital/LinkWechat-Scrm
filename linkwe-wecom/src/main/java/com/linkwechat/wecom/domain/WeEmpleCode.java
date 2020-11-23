@@ -37,7 +37,6 @@ public class WeEmpleCode extends BaseEntity
     private String welcomeMsg;
 
     /** 素材的id */
-    @TableField(exist = false)
     private Long mediaId;
 
     /** 0:正常;1:删除; */

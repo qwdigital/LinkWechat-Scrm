@@ -96,4 +96,16 @@ public class CommonController {
         FileUtils.writeBytes(downloadPath, response.getOutputStream());
     }
 
+
+    /**
+     * 网络资源通用下载
+     */
+    @GetMapping("/common/download/url")
+    public void webResourceDownload(String url, String name, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        response.setCharacterEncoding("utf-8");
+        response.setContentType("multipart/form-data");
+        response.setHeader("Content-Disposition",
+                "attachment;fileName=" + FileUtils.setFileDownloadHeader(request, name));
+        FileUtils.downloadFile(url, response.getOutputStream());
+    }
 }

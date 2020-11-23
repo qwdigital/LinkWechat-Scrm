@@ -97,13 +97,13 @@ public class WeEventChangeExternalContactImpl implements WeCallBackEventFactory 
     }
 
     private void addExternalContact(WxCpXmlMessageVO message) {
-        if (message.getExternalUserId() != null) {
-            weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId());
-        }
         try {
             Threads.SINGLE_THREAD_POOL.submit(new Runnable() {
                 @Override
                 public void run() {
+                    if (message.getExternalUserId() != null) {
+                        weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId());
+                    }
                     //向扫码客户发送欢迎语
                     if (message.getState() != null && message.getWelcomeCode() != null) {
                         log.info("执行发送欢迎语>>>>>>>>>>>>>>>");
