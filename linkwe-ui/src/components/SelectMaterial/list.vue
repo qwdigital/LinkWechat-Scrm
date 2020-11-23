@@ -112,18 +112,28 @@ export default {
 
     <!-- <slot :list="list"></slot> -->
     <!-- 文本 -->
-    <el-table v-if="type == 4" :data="list" :show-header="false">
+    <el-table
+      v-if="type == 4"
+      v-loading="loading"
+      :data="list"
+      :show-header="false"
+    >
       <el-table-column width="30">
         <template slot-scope="scope">
-          <el-radio v-model="radio" :label="scope.row.id">'</el-radio>
+          <el-radio v-model="radio" :label="scope.row">'</el-radio>
         </template>
       </el-table-column>
       <el-table-column prop="content"> </el-table-column>
     </el-table>
 
     <!-- 图片 -->
-    <el-radio-group v-if="type == 0" class="img-wrap" v-model="radio">
-      <el-radio v-for="(item, index) in list" :label="item.id" :key="index">
+    <el-radio-group
+      v-if="type == 0"
+      v-loading="loading"
+      class="img-wrap"
+      v-model="radio"
+    >
+      <el-radio v-for="(item, index) in list" :label="item" :key="index">
         <img class="img-li" :src="item.materialUrl" alt />
         <div class="ac mt5">{{ item.materialName }}</div>
       </el-radio>

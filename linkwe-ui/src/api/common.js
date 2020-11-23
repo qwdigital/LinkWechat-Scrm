@@ -8,9 +8,6 @@ import request from '@/utils/request'
   name=文件名称，带后缀
 }
  */
-export function download(params) {
-  return request({
-    url: '/common/download/url',
-    params,
-  })
+export function download(url, name) {
+  return `/common/download/url?url=${url}&name=${name}`
 }

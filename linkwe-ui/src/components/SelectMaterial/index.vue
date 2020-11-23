@@ -27,8 +27,9 @@ export default {
   },
   data() {
     return {
-      text: '',
-      image: '',
+      text: {},
+      image: {},
+      file: {},
     }
   },
   watch: {},

@@ -128,3 +128,11 @@ export function getQrcode(params) {
     params,
   })
 }
+
+/**
+ * 员工活码批量下载
+ * @param {*} 	员工活码ids,多个逗号隔开
+ */
+export function downloadBatch(ids) {
+  return service + '/downloadBatch/' + ids
+}
