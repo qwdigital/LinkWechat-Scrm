@@ -10,11 +10,11 @@ import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.wecom.domain.WeEmpleCode;
-import com.linkwechat.wecom.domain.WeEmpleCodeUseScop;
+import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
 import com.linkwechat.wecom.service.IWeEmpleCodeService;
+import com.linkwechat.wecom.service.IWeFlowerCustomerRelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,6 +40,8 @@ import java.util.zip.ZipOutputStream;
 public class WeEmpleCodeController extends BaseController {
     @Autowired
     private IWeEmpleCodeService weEmpleCodeService;
+    @Autowired
+    private IWeFlowerCustomerRelService weFlowerCustomerRelService;
 
     /**
      * 查询员工活码列表
@@ -191,5 +193,17 @@ public class WeEmpleCodeController extends BaseController {
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+
+    /**
+     * 成员添加客户统计
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:code:getUserAddCustomerStat')")
+    @Log(title = "成员添加客户统计", businessType = BusinessType.OTHER)
+    @GetMapping("/getUserAddCustomerStat")
+    public AjaxResult getUserAddCustomerStat(WeFlowerCustomerRel weFlowerCustomerRel){
+        return AjaxResult.success(weFlowerCustomerRelService.getUserAddCustomerStat(weFlowerCustomerRel));
     }
 }
