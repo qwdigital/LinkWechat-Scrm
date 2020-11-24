@@ -1,7 +1,9 @@
 package com.linkwechat.wecom.mapper;
 
 import java.util.List;
+import java.util.Map;
 
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
 import org.apache.ibatis.annotations.Param;
@@ -77,4 +79,11 @@ public interface WeFlowerCustomerRelMapper extends BaseMapper<WeFlowerCustomerRe
      * @return
      */
     public int batchLogicDeleteByIds(@Param("ids") List<Long> ids);
+
+    /**
+     * 成员添加客户统计
+     * @param weFlowerCustomerRel
+     * @return
+     */
+    public List<Map<String,Object>> getUserAddCustomerStat(WeFlowerCustomerRel weFlowerCustomerRel);
 }

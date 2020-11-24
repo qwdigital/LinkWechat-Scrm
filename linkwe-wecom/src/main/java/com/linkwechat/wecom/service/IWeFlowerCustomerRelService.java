@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
@@ -19,4 +20,12 @@ public interface IWeFlowerCustomerRelService extends IService<WeFlowerCustomerRe
      * @param externalUserid 用户id
      */
     public Boolean deleteFollowUser(String userId, String externalUserid);
+
+    /**
+     * 成员添加客户统计
+     * @param weFlowerCustomerRel
+     * @return Map
+     */
+    public Map<String,Object> getUserAddCustomerStat(WeFlowerCustomerRel weFlowerCustomerRel);
+
 }

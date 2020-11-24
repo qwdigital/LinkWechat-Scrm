@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeEmpleCode;
 import com.linkwechat.wecom.domain.WeEmpleCodeUseScop;
 import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
+import com.linkwechat.wecom.domain.dto.WeExternalContactDto;
 
 import java.util.List;
 
@@ -22,6 +23,13 @@ public interface IWeEmpleCodeService  extends IService<WeEmpleCode>
      * @return 员工活码
      */
     public WeEmpleCode selectWeEmpleCodeById(Long id);
+
+    /**
+     * 批量查询员工活码
+     * @param ids 员工活码ID
+     * @return
+     */
+    public List<WeEmpleCode> selectWeEmpleCodeByIds(List<String> ids);
 
     /**
      * 查询员工活码列表
@@ -84,8 +92,21 @@ public interface IWeEmpleCodeService  extends IService<WeEmpleCode>
     /**
      * 批量新增员工活码
      *
-     * @param weEmpleCodeUseScops 员工信息
+     * @param weEmpleCode 员工活码
      * @return 结果
      */
-    public void insertWeEmpleCodeBatch(List<WeEmpleCodeUseScop> weEmpleCodeUseScops);
+    public void insertWeEmpleCodeBatch(WeEmpleCode weEmpleCode);
+
+    /**
+     * 获取员工二维码
+     * @param userIds 员工id
+     * @param departmentIds 部门id
+     */
+    public WeExternalContactDto getQrcode(String userIds, String departmentIds);
+    /**
+     * 获取员工二维码
+     * @param userIdArr 员工id
+     * @param departmentIdArr 部门id
+     */
+    public WeExternalContactDto getQrcode(String[] userIdArr, Long[] departmentIdArr);
 }

@@ -1,21 +1,30 @@
 package com.linkwechat.wecom.factory.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.Threads;
+import com.linkwechat.wecom.domain.WeEmpleCodeTag;
+import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
+import com.linkwechat.wecom.domain.WeFlowerCustomerTagRel;
 import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
 import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
 import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 import com.linkwechat.wecom.factory.WeCallBackEventFactory;
-import com.linkwechat.wecom.service.IWeCustomerService;
-import com.linkwechat.wecom.service.IWeEmpleCodeService;
-import com.linkwechat.wecom.service.IWeFlowerCustomerRelService;
-import com.linkwechat.wecom.service.IWeMsgTlpScopeService;
+import com.linkwechat.wecom.service.*;
 import lombok.extern.slf4j.Slf4j;
 
 import me.chanjar.weixin.cp.bean.external.msg.Image;
 import me.chanjar.weixin.cp.bean.external.msg.Text;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author sxw
@@ -28,11 +37,13 @@ public class WeEventChangeExternalContactImpl implements WeCallBackEventFactory 
     @Autowired
     private IWeEmpleCodeService weEmpleCodeService;
     @Autowired
-    private IWeMsgTlpScopeService weMsgTlpScopeService;
+    private IWeEmpleCodeTagService weEmpleCodeTagService;
     @Autowired
     private IWeCustomerService weCustomerService;
     @Autowired
     private IWeFlowerCustomerRelService weFlowerCustomerRelService;
+    @Autowired
+    private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
 
     @Override
     public void eventHandle(WxCpXmlMessageVO message) {
@@ -97,29 +108,51 @@ public class WeEventChangeExternalContactImpl implements WeCallBackEventFactory 
     }
 
     private void addExternalContact(WxCpXmlMessageVO message) {
-        if (message.getExternalUserId() != null) {
-            weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId());
-        }
+
         try {
             Threads.SINGLE_THREAD_POOL.submit(new Runnable() {
                 @Override
                 public void run() {
+                    if (message.getExternalUserId() != null) {
+                        weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId());
+                    }
+
                     //向扫码客户发送欢迎语
                     if (message.getState() != null && message.getWelcomeCode() != null) {
                         log.info("执行发送欢迎语>>>>>>>>>>>>>>>");
                         WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(message.getWelcomeCode());
                         WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByActivityScene(message.getState(),message.getUserId());
+                        String empleCodeId = messageMap.getEmpleCodeId();
+                        //查询活码对应标签
+                        List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.list(new LambdaQueryWrapper<WeEmpleCodeTag>()
+                                .eq(WeEmpleCodeTag::getEmpleCodeId, empleCodeId));
+                        //查询外部联系人与通讯录关系数据
+                        WeFlowerCustomerRel weFlowerCustomerRel = weFlowerCustomerRelService.getOne(new LambdaQueryWrapper<WeFlowerCustomerRel>()
+                                .eq(WeFlowerCustomerRel::getUserId, message.getUserId())
+                                .eq(WeFlowerCustomerRel::getExternalUserid, message.getExternalUserId()));
+                        //为外部联系人添加员工活码标签
+                        List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
+                        Optional.ofNullable(weFlowerCustomerRel).ifPresent(weFlowerCustomerRel1 -> {
+                            Optional.ofNullable(tagList).orElseGet(ArrayList::new).forEach(tag ->{
+                                weFlowerCustomerTagRels.add(
+                                        WeFlowerCustomerTagRel.builder()
+                                                .flowerCustomerRelId(weFlowerCustomerRel.getId())
+                                                .tagId(tag.getTagId())
+                                                .createTime(new Date())
+                                                .build()
+                                );
+                            });
+                            weFlowerCustomerTagRelService.saveOrUpdateBatch(weFlowerCustomerTagRels);
+                        });
+                        log.debug(">>>>>>>>>欢迎语查询结果：{}", JSONObject.toJSONString(messageMap));
                         if (messageMap != null) {
                             if (StringUtils.isNotEmpty(messageMap.getWelcomeMsg())){
-                                Text text = new Text();
-                                text.setContent(messageMap.getWelcomeMsg());
-                                weWelcomeMsgBuilder.text(text);
+                                weWelcomeMsgBuilder.text(WeWelcomeMsg.Text.builder()
+                                        .content(messageMap.getWelcomeMsg()).build());
                             }
                             if(StringUtils.isNotEmpty(messageMap.getCategoryId())){
-                                Image image = new Image();
-                                image.setMediaId(messageMap.getCategoryId());
-                                image.setPicUrl(messageMap.getMaterialUrl());
-                                weWelcomeMsgBuilder.image(image);
+                                weWelcomeMsgBuilder.image(WeWelcomeMsg.Image.builder().media_id(messageMap.getCategoryId())
+                                        .pic_url(messageMap.getMaterialUrl()).build());
                             }
                             weCustomerService.sendWelcomeMsg(weWelcomeMsgBuilder.build());
                         }

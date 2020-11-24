@@ -3,8 +3,8 @@ package com.linkwechat.wecom.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
-import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeExternalContactClient;
 import com.linkwechat.wecom.domain.WeEmpleCode;
@@ -21,10 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -69,6 +66,25 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         return weEmpleCode;
     }
 
+    @Override
+    public List<WeEmpleCode> selectWeEmpleCodeByIds(List<String> ids) {
+        List<WeEmpleCode> weEmpleCodeList = this.baseMapper.selectWeEmpleCodeByIds(ids);
+        if (weEmpleCodeList != null) {
+            weEmpleCodeList.forEach(empleCode -> {
+                List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = empleCode.getWeEmpleCodeUseScops();
+                if (CollectionUtil.isNotEmpty(weEmpleCodeUseScopList)) {
+                    String useUserName = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getBusinessName)
+                            .filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
+                    empleCode.setUseUserName(useUserName);
+                    String mobile = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getMobile)
+                            .filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
+                    empleCode.setMobile(mobile);
+                }
+            });
+        }
+        return weEmpleCodeList;
+    }
+
     /**
      * 查询员工活码列表
      *
@@ -102,7 +118,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void insertWeEmpleCode(WeEmpleCode weEmpleCode){
+    public void insertWeEmpleCode(WeEmpleCode weEmpleCode) {
         weEmpleCode.setCreateTime(new Date());
         weEmpleCode.setCreateBy(SecurityUtils.getUsername());
         addWeEmplCode(weEmpleCode);
@@ -182,25 +198,61 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         return this.baseMapper.selectWelcomeMsgByActivityScene(activityScene, userId);
     }
 
+    /**
+     * 批量新增员工活码
+     *
+     * @param weEmpleCode 员工信息
+     * @return 结果
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void insertWeEmpleCodeBatch(List<WeEmpleCodeUseScop> weEmpleCodeUseScops){
-        Optional.ofNullable(weEmpleCodeUseScops).orElseGet(ArrayList::new).forEach(useScops -> {
+    public void insertWeEmpleCodeBatch(WeEmpleCode weEmpleCode) {
+        weEmpleCode.setCreateTime(new Date());
+        weEmpleCode.setCreateBy(SecurityUtils.getUsername());
+        weEmpleCode.setCodeType(WeConstans.SINGLE_EMPLE_CODE_TYPE);
+        weEmpleCode.setIsJoinConfirmFriends(Optional.ofNullable(weEmpleCode.getIsJoinConfirmFriends())
+                .orElse(WeConstans.IS_JOIN_CONFIR_MFRIENDS));
+
+        weEmpleCode.setActivityScene(Optional.ofNullable(weEmpleCode.getActivityScene())
+                .orElse(WeConstans.ONE_PERSON_CODE_GENERATED_BATCH));
+
+        Optional.ofNullable(weEmpleCode).map(WeEmpleCode::getWeEmpleCodeUseScops)
+                .orElseGet(ArrayList::new).forEach(useScops -> {
             //机构类型数据返回不执行生成二维码业务
             if (WeConstans.USE_SCOP_BUSINESSID_TYPE_ORG.equals(useScops.getBusinessIdType())) {
                 return;
             }
+            weEmpleCode.setId(SnowFlakeUtil.nextId());
             List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = new ArrayList<>();
             weEmpleCodeUseScopList.add(useScops);
-            WeEmpleCode weEmpleCode = new WeEmpleCode();
-            weEmpleCode.setCreateTime(new Date());
-            weEmpleCode.setCreateBy(SecurityUtils.getUsername());
-            weEmpleCode.setCodeType(WeConstans.SINGLE_EMPLE_CODE_TYPE);
-            weEmpleCode.setIsJoinConfirmFriends(WeConstans.IS_JOIN_CONFIR_MFRIENDS);
-            weEmpleCode.setActivityScene(WeConstans.ONE_PERSON_CODE_GENERATED_BATCH);
             weEmpleCode.setWeEmpleCodeUseScops(weEmpleCodeUseScopList);
             addWeEmplCode(weEmpleCode);
         });
+    }
+
+    @Override
+    public WeExternalContactDto getQrcode(String userIds, String departmentIds) {
+        String[] userIdArr = Arrays.stream(userIds.split(","))
+                .filter(StringUtils::isNotEmpty).toArray(String[]::new);
+        Long[] departmentIdArr = Arrays.stream(departmentIds.split(","))
+                .filter(StringUtils::isNotEmpty)
+                .map(Long::new).toArray(Long[]::new);
+        return getQrcode(userIdArr,departmentIdArr);
+    }
+
+    @Override
+    public WeExternalContactDto getQrcode(String[] userIdArr, Long[] departmentIdArr) {
+        WeExternalContactDto.WeContactWay weContactWay = new WeExternalContactDto.WeContactWay();
+        //当存在部门id或者用户id大于一个的情况为多人二维码
+        if (departmentIdArr.length > 0 || userIdArr.length > 1) {
+            weContactWay.setType(WeConstans.MANY_EMPLE_CODE_TYPE);
+        } else {
+            weContactWay.setType(WeConstans.SINGLE_EMPLE_CODE_TYPE);
+        }
+        weContactWay.setScene(WeConstans.QR_CODE_EMPLE_CODE_SCENE);
+        weContactWay.setUser(userIdArr);
+        weContactWay.setParty(departmentIdArr);
+        return getQrCode(weContactWay);
     }
 
     /**
@@ -208,26 +260,21 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
      *
      * @param weEmpleCode
      */
-    private void addWeEmplCode(WeEmpleCode weEmpleCode){
-        List<WeEmpleCodeUseScop> weEmpleCodeUseScops = weEmpleCode.getWeEmpleCodeUseScops();
+    private void addWeEmplCode(WeEmpleCode weEmpleCode) {
+        /*List<WeEmpleCodeUseScop> weEmpleCodeUseScops = weEmpleCode.getWeEmpleCodeUseScops();
         List<String> businessIdList = Optional.ofNullable(weEmpleCodeUseScops).orElseGet(ArrayList::new)
                 .stream().map(WeEmpleCodeUseScop::getBusinessId)
                 .collect(Collectors.toList());
+
         List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = iWeEmpleCodeUseScopService.listByIds(businessIdList);
-        if (weEmpleCodeUseScopList != null) {
+        if (CollectionUtil.isNotEmpty(weEmpleCodeUseScopList)) {
             throw new WeComException("该员工或部门已经创建，无法重复创建");
-        }
+        }*/
         WeExternalContactDto.WeContactWay weContactWay = getWeContactWay(weEmpleCode);
-        try {
-            WeExternalContactDto weExternalContactDto = weExternalContactClient.addContactWay(weContactWay);
-            //新增联系方式的配置id
-            String configId = weExternalContactDto.getConfig_id();
-            //联系我二维码链接
-            String qrCode = weExternalContactDto.getQr_code();
-            weEmpleCode.setConfigId(configId);
-            weEmpleCode.setQrCode(qrCode);
-        } catch (Exception e) {
-            e.printStackTrace();
+        WeExternalContactDto qrCode = getQrCode(weContactWay);
+        if (qrCode != null) {
+            weEmpleCode.setConfigId(qrCode.getConfig_id());
+            weEmpleCode.setQrCode(qrCode.getQr_code());
         }
         if (this.baseMapper.insertWeEmpleCode(weEmpleCode) == 1) {
             if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
@@ -241,21 +288,47 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         }
     }
 
+    /**
+     * 获取二维码
+     *
+     * @param weContactWay
+     * @return
+     */
+    private WeExternalContactDto getQrCode(WeExternalContactDto.WeContactWay weContactWay) {
+        try {
+            return weExternalContactClient.addContactWay(weContactWay);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 企微接口参数生成方法
+     * @param weEmpleCode 员工活码实体类
+     * @return 企微接口参数实体类
+     */
     private WeExternalContactDto.WeContactWay getWeContactWay(WeEmpleCode weEmpleCode) {
         WeExternalContactDto.WeContactWay weContactWay = new WeExternalContactDto.WeContactWay();
         List<WeEmpleCodeUseScop> weEmpleCodeUseScops = weEmpleCode.getWeEmpleCodeUseScops();
-        //根据类型生成相应的活码农
+        //根据类型生成相应的活码
         weContactWay.setConfig_id(weEmpleCode.getConfigId());
         weContactWay.setType(weEmpleCode.getCodeType());
-        weContactWay.setScene(2);
+        weContactWay.setScene(WeConstans.QR_CODE_EMPLE_CODE_SCENE);
         weContactWay.setSkip_verify(weEmpleCode.getIsJoinConfirmFriends());
         weContactWay.setState(weEmpleCode.getActivityScene());
         if (CollectionUtil.isNotEmpty(weEmpleCodeUseScops)) {
-            String[] userIdArr = weEmpleCodeUseScops.stream().filter(itme -> 2 == itme.getBusinessIdType() && itme.getBusinessId() != null)
+            //员工列表
+            String[] userIdArr = weEmpleCodeUseScops.stream().filter(itme ->
+                    WeConstans.USE_SCOP_BUSINESSID_TYPE_USER.equals(itme.getBusinessIdType())
+                            && StringUtils.isNotEmpty(itme.getBusinessId()))
                     .map(WeEmpleCodeUseScop::getBusinessId).toArray(String[]::new);
             weContactWay.setUser(userIdArr);
+            //部门列表
             if (!WeConstans.SINGLE_EMPLE_CODE_TYPE.equals(weEmpleCode.getCodeType())) {
-                Long[] partyArr = weEmpleCodeUseScops.stream().filter(itme -> 1 == itme.getBusinessIdType() && itme.getBusinessId() != null)
+                Long[] partyArr = weEmpleCodeUseScops.stream().filter(itme ->
+                        WeConstans.USE_SCOP_BUSINESSID_TYPE_ORG.equals(itme.getBusinessIdType())
+                                && StringUtils.isNotEmpty(itme.getBusinessId()))
                         .map(item -> Long.valueOf(item.getBusinessId())).collect(Collectors.toList()).toArray(new Long[]{});
                 weContactWay.setParty(partyArr);
             }

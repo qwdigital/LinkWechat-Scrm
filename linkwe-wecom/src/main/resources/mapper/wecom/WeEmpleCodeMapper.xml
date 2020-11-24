@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeEmpleCodeMapper">
-    
+
     <resultMap type="WeEmpleCode" id="WeEmpleCodeResult">
-        <result property="id"    column="id"    />
-        <result property="codeType"    column="code_type"    />
-        <result property="isJoinConfirmFriends"    column="is_join_confirm_friends"    />
-        <result property="activityScene"    column="activity_scene"    />
-        <result property="welcomeMsg"    column="welcome_msg"    />
-        <result property="createBy"    column="create_by"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="delFlag"    column="del_flag"    />
-        <result property="configId"    column="config_id"    />
-        <result property="qrCode"    column="qr_code"    />
-        <result property="mediaId"    column="media_id"    />
+        <result property="id" column="id"/>
+        <result property="codeType" column="code_type"/>
+        <result property="isJoinConfirmFriends" column="is_join_confirm_friends"/>
+        <result property="activityScene" column="activity_scene"/>
+        <result property="welcomeMsg" column="welcome_msg"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="configId" column="config_id"/>
+        <result property="qrCode" column="qr_code"/>
+        <result property="mediaId" column="media_id"/>
         <collection property="weEmpleCodeUseScops" ofType="com.linkwechat.wecom.domain.WeEmpleCodeUseScop">
-            <result property="businessId"    column="business_id"    />
-            <result property="businessName"    column="business_name"    />
-            <result property="mobile"    column="mobile"    />
+            <result property="businessId" column="business_id"/>
+            <result property="businessName" column="business_name"/>
+            <result property="mobile" column="mobile"/>
         </collection>
         <collection property="weEmpleCodeTags" ofType="com.linkwechat.wecom.domain.WeEmpleCodeTag">
-            <result property="tagId"   column="tag_id"    />
-            <result property="tagName"    column="tag_name"    />
+            <result property="tagId" column="tag_id"/>
+            <result property="tagName" column="tag_name"/>
         </collection>
     </resultMap>
 
@@ -64,54 +64,51 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wecode.id = wecusn.emple_code_id
         left join we_emple_code_tag wect on
             wecode.id = wect.emple_code_id
+        where 1=1 and wecode.del_flag = 0
 	</sql>
 
     <select id="selectWeEmpleCodeList" parameterType="WeEmpleCode" resultMap="WeEmpleCodeResult">
         <include refid="selectWeEmpleCodeLsit"/>
-        <where>
-            <if test="codeType != null "> and wecode.code_type = #{codeType}</if>
-            <if test="isJoinConfirmFriends != null "> and wecode.is_join_confirm_friends = #{isJoinConfirmFriends}</if>
-            <if test="activityScene != null  and activityScene != ''">
-             and wecode.activity_scene like concat('%', #{activityScene}, '%')
-            </if>
-            <if test="welcomeMsg != null "> and wecode.welcome_msg = #{welcomeMsg}</if>
-            <if test="createBy != null and createBy !=''">
-                AND wecode.create_by like concat('%', #{createBy}, '%')
-            </if>
-            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
-                AND date_format(wecode.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
-            </if>
-            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
-                AND date_format(wecode.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
-            </if>
-            <if test="mobile != null and mobile !=''">
-                AND wecusn.mobile like concat('%', #{mobile}, '%')
-            </if>
-            <if test="useUserName != null and useUserName !=''">
-                AND wecusn.business_name like concat('%', #{useUserName}, '%')
-            </if>
-        </where>
+        <if test="codeType != null ">and wecode.code_type = #{codeType}</if>
+        <if test="isJoinConfirmFriends != null ">and wecode.is_join_confirm_friends = #{isJoinConfirmFriends}</if>
+        <if test="activityScene != null  and activityScene != ''">
+            and wecode.activity_scene like concat('%', #{activityScene}, '%')
+        </if>
+        <if test="welcomeMsg != null ">and wecode.welcome_msg = #{welcomeMsg}</if>
+        <if test="createBy != null and createBy !=''">
+            AND wecode.create_by like concat('%', #{createBy}, '%')
+        </if>
+        <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(wecode.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+        </if>
+        <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(wecode.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+        </if>
+        <if test="mobile != null and mobile !=''">
+            AND wecusn.mobile like concat('%', #{mobile}, '%')
+        </if>
+        <if test="useUserName != null and useUserName !=''">
+            AND wecusn.business_name like concat('%', #{useUserName}, '%')
+        </if>
     </select>
-    
+
     <select id="selectWeEmpleCodeById" parameterType="Long" resultMap="WeEmpleCodeResult">
         <include refid="selectWeEmpleCodeLsit"/>
-        <where>
-            wecode.id = #{id}
-        </where>
+        <if test="id != null and id !=''">
+            and wecode.id = #{id}
+        </if>
     </select>
 
     <select id="selectWeEmpleCodeByIds" parameterType="java.util.ArrayList" resultMap="WeEmpleCodeResult">
         <include refid="selectWeEmpleCodeLsit"/>
-        <where>
-            <if test="ids != null">
-                wecode.id in
-                <foreach collection="ids" item="id" open="(" close=")" separator=",">
-                    #{id}
-                </foreach>
-            </if>
-        </where>
+        <if test="ids != null and ids.size > 0">
+            wecode.id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
     </select>
-        
+
     <insert id="insertWeEmpleCode" parameterType="WeEmpleCode">
         insert into we_emple_code
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -126,7 +123,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="configId != null">config_id,</if>
             <if test="qrCode != null">qr_code,</if>
             <if test="mediaId != null">media_id,</if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
             <if test="codeType != null">#{codeType},</if>
@@ -139,7 +136,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="configId != null">#{configId},</if>
             <if test="qrCode != null">#{qrCode},</if>
             <if test="mediaId != null">#{mediaId},</if>
-         </trim>
+        </trim>
     </insert>
 
     <update id="updateWeEmpleCode" parameterType="WeEmpleCode">
@@ -164,7 +161,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteWeEmpleCodeByIds" parameterType="String">
-        delete from we_emple_code where id in 
+        delete from we_emple_code where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
@@ -172,7 +169,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 
     <update id="batchRemoveWeEmpleCodeIds">
-        update we_emple_code  set
+        update we_emple_code set
         del_flag = 1
         where id in
         <foreach collection="ids" item="id" index="index"
@@ -182,8 +179,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
 
-    <select id="selectWelcomeMsgByActivityScene" parameterType="String" resultType="com.linkwechat.wecom.domain.dto.WeEmpleCodeDto">
+    <select id="selectWelcomeMsgByActivityScene" parameterType="String"
+            resultType="com.linkwechat.wecom.domain.dto.WeEmpleCodeDto">
         select
+        wecode.id as emple_code_id,
         wecode.welcome_msg ,
         wm.category_id,
         wm.material_url,
@@ -206,5 +205,5 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             and wecus.business_id = #{userId}
         </if>
     </select>
-    
+
 </mapper>

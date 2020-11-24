@@ -11,19 +11,18 @@ import lombok.Data;
 @Data
 public class WeExternalContactDto extends WeResultDto {
 
-    //新增联系方式的配置id
+    //系我二维码链接，仅在scene为2时返回
     private String qr_code;
 
-    //系我二维码链接，仅在scene为2时返回
+    //新增联系方式的配置id
     private String config_id;
 
 
-
     @Data
-    public static class WeContactWay{
+    public static class WeContactWay {
         //系我二维码链接，仅在scene为2时返回
         private String config_id;
-       // 联系方式类型,1-单人, 2-多人
+        // 联系方式类型,1-单人, 2-多人
         private Integer type;
 
         //场景，1-在小程序中联系，2-通过二维码联系
