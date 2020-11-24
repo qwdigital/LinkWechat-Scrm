@@ -5,6 +5,10 @@ import lombok.Data;
 @Data
 public class WeEmpleCodeDto {
     /**
+     * 活码id
+     */
+    private String empleCodeId;
+    /**
      * 欢迎语
      */
     private String welcomeMsg;

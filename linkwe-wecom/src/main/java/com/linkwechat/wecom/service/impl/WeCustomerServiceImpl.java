@@ -489,12 +489,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
             List<WeFlowerCustomerRel> weFlowerCustomerRel = new ArrayList<>();
             externalUserDetail.getFollow_user().stream().forEach(kk -> {
-//                                WeFlowerCustomerRel weFlowerCustomerRelOne=new WeFlowerCustomerRel();
-//                                BeanUtils.copyPropertiesignoreOther(kk,weFlowerCustomerRelOne);
 
                 Long weFlowerCustomerRelId = SnowFlakeUtil.nextId();
-//                                weFlowerCustomerRelOne.setId(weFlowerCustomerRelId);
-//                                weFlowerCustomerRelOne.setExternalUserid(weCustomer.getExternalUserid());
                 weFlowerCustomerRel.add(WeFlowerCustomerRel.builder()
                         .id(weFlowerCustomerRelId)
                         .userId(kk.getUserid())
@@ -503,6 +499,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                         .remarkMobiles(kk.getRemark_mobiles())
                         .operUserid(kk.getOper_userid())
                         .addWay(kk.getAdd_way())
+                        .state("0")
                         .externalUserid(weCustomer.getExternalUserid())
                         .createTime(new Date(kk.getCreatetime() * 1000L))
                         .build());
@@ -523,7 +520,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                         WeTagGroup.builder()
                                                 .groupId(tagGroup.getGroup_id())
                                                 .gourpName(tagGroup.getGroup_name())
-                                                .createBy(SecurityUtils.getUsername())
+                                                .createBy(kk.getUserid())
                                                 .build()
                                 );
 

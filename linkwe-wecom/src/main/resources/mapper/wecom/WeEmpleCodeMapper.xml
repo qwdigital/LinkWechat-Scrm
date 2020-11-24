@@ -182,6 +182,7 @@
     <select id="selectWelcomeMsgByActivityScene" parameterType="String"
             resultType="com.linkwechat.wecom.domain.dto.WeEmpleCodeDto">
         select
+        wecode.id as emple_code_id,
         wecode.welcome_msg ,
         wm.category_id,
         wm.material_url,
