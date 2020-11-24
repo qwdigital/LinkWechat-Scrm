@@ -1,6 +1,11 @@
 <script>
-import { getList, remove, batchAdd } from '@/api/drainageCode/staff'
-import { download, downloadBatch } from '@/api/common'
+import {
+  getList,
+  remove,
+  batchAdd,
+  downloadBatch,
+} from '@/api/drainageCode/staff'
+import { download } from '@/api/common'
 import SelectUser from '@/components/SelectUser'
 import ClipboardJS from 'clipboard'
 export default {
@@ -125,18 +130,18 @@ export default {
       })
     },
     /** 下载 */
-    downloadBatch(id) {
-      const ids = id || this.ids
+    downloadBatch(qrCode) {
       // window.open(download(row.qrCode, row.createBy.split(',')[0] + '.png'))
-      id && window.open(row.qrCode)
-      id ||
+      qrCode && window.open(qrCode)
+      qrCode ||
         this.$confirm('是否确认下载所有图片吗?', '警告', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning',
         })
-          .then(function() {
-            return window.open(downloadBatch(ids))
+          .then(() => {
+            downloadBatch(this.ids + '')
+            // window.open(downloadBatch(this.ids))
           })
           .catch(function() {})
     },
@@ -225,7 +230,7 @@ export default {
           >批量新建</el-button
         >
         <el-button type="primary" size="mini" @click="remove">删除</el-button>
-        <el-button type="primary" size="mini" @click="downloadBatch"
+        <el-button type="primary" size="mini" @click="downloadBatch()"
           >批量下载</el-button
         >
       </div>
@@ -242,6 +247,7 @@ export default {
           <el-image
             :src="row.qrCode"
             fit="fit"
+            :preview-src-list="[row.qrCode]"
             style="width: 100px; height: 100px"
           ></el-image>
         </template>
@@ -281,7 +287,7 @@ export default {
         <template slot-scope="{ row }">
           <el-button
             type="text"
-            @click="downloadBatch(row.id)"
+            @click="downloadBatch(row.qrCode)"
             v-hasPermi="['monitor:operlog:query']"
             >下载</el-button
           >

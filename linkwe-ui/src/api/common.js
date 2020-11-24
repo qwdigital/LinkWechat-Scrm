@@ -9,5 +9,8 @@ import request from '@/utils/request'
 }
  */
 export function download(url, name) {
-  return `/common/download/url?url=${url}&name=${name}`
+  return (
+    process.env.VUE_APP_BASE_API +
+    `/common/download/url?url=${url}&name=${name}`
+  )
 }

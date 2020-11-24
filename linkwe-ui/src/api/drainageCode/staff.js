@@ -134,5 +134,23 @@ export function getQrcode(params) {
  * @param {*} 	员工活码ids,多个逗号隔开
  */
 export function downloadBatch(ids) {
-  return service + '/downloadBatch/' + ids
+  return request({
+    url: service + '/downloadBatch',
+    params: {
+      ids,
+    },
+  })
+  return process.env.VUE_APP_BASE_API + service + '/downloadBatch/?ids=' + ids
+}
+
+/**
+ * 成员添加客户统计
+ * @param {*} params
+ * userId=成员id&addWay=添加类型，二维码：1&beginTime=开始时间&endTime=结束时间
+ */
+export function getUserAddCustomerStat(params) {
+  return request({
+    url: service + '/getUserAddCustomerStat',
+    params,
+  })
 }
