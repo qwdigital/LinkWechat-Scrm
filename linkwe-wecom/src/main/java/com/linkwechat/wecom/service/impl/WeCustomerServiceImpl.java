@@ -165,31 +165,25 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             List<WeTagGroup> weGroups = new ArrayList<>();
             List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
             List<WeFlowerCustomerRel> weFlowerCustomerRel = new ArrayList<>();
-            userDetail.getFollow_info().stream().forEach(kk -> {
-//                                WeFlowerCustomerRel weFlowerCustomerRelOne=new WeFlowerCustomerRel();
-//                                BeanUtils.copyPropertiesignoreOther(kk,weFlowerCustomerRelOne);
-
+            Optional.ofNullable(userDetail.getFollow_info()).ifPresent(followInfo -> {
                 Long weFlowerCustomerRelId = SnowFlakeUtil.nextId();
-//                                weFlowerCustomerRelOne.setId(weFlowerCustomerRelId);
-//                                weFlowerCustomerRelOne.setExternalUserid(weCustomer.getExternalUserid());
                 weFlowerCustomerRel.add(WeFlowerCustomerRel.builder()
                         .id(weFlowerCustomerRelId)
                         .userId(userId)
-                        .description(kk.getDescription())
-                        .remarkCorpName(kk.getRemark_company())
-                        .remarkMobiles(kk.getRemark_mobiles())
-                        .operUserid(kk.getOper_userid())
-                        .addWay(kk.getAdd_way())
+                        .description(followInfo.getDescription())
+                        .remarkCorpName(followInfo.getRemark_company())
+                        .remarkMobiles(followInfo.getRemark_mobiles())
+                        .operUserid(followInfo.getOper_userid())
+                        .addWay(followInfo.getAdd_way())
                         .externalUserid(weCustomer.getExternalUserid())
-                        .createTime(new Date(kk.getCreatetime() * 1000L))
+                        .createTime(new Date(followInfo.getCreatetime() * 1000L))
                         .build());
 
-                List<String> tags = Stream.of(kk.getTag_id()).collect(Collectors.toList());
+                List<String> tags = Stream.of(followInfo.getTag_id()).collect(Collectors.toList());
                 if (CollectionUtil.isNotEmpty(tags)) {
-
                     //获取相关标签组
                     WeCropGroupTagListDto weCropGroupTagListDto = weCropTagClient.getCorpTagListByTagIds(WeFindCropTagParam.builder()
-                            .tag_id(kk.getTag_id())
+                            .tag_id(followInfo.getTag_id())
                             .build());
 
                     if (weCropGroupTagListDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)) {
@@ -234,10 +228,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
                         }
                     }
-
-
                 }
             });
+
             List<WeFlowerCustomerRel> weFlowerCustomerRels = iWeFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
                     .eq(WeFlowerCustomerRel::getExternalUserid, weCustomer.getExternalUserid()));
 

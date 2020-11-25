@@ -21,7 +21,7 @@ public class ExternalUserDetail extends WeResultDto {
     /** 客户联系人 */
     private List<FollowUser> follow_user;
 
-    private List<FollowInfo> follow_info;
+    private FollowInfo follow_info;
 
 
     @Data
