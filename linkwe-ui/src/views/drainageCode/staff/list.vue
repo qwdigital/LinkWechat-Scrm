@@ -140,10 +140,19 @@ export default {
           type: 'warning',
         })
           .then(() => {
-            downloadBatch(this.ids + '')
+            return downloadBatch(this.ids + '')
             // window.open(downloadBatch(this.ids))
-          })
-          .catch(function() {})
+          }).then((res) =>{
+          if (res!=null) {
+            let blob = new Blob([res], {type: 'application/zip'});
+            let url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a'); // 创建a标签
+            link.href = url;
+            link.download = '批量员工活码.zip'; // 重命名文件
+            link.click();
+            URL.revokeObjectURL(url); // 释放内存
+          }
+        }).catch(function() {})
     },
   },
 }

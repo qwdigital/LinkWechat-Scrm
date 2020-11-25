@@ -139,8 +139,9 @@ export function downloadBatch(ids) {
     params: {
       ids,
     },
+    responseType: 'blob'
   })
-  return process.env.VUE_APP_BASE_API + service + '/downloadBatch/?ids=' + ids
+  //return process.env.VUE_APP_BASE_API + service + '/downloadBatch/?ids=' + ids
 }
 
 /**
