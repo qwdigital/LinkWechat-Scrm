@@ -158,12 +158,6 @@ public class WeEmpleCodeController extends BaseController {
         try {
             //通过员工活码id查询活码数据
             List<WeEmpleCode> weEmpleCodeLsit = weEmpleCodeService.selectWeEmpleCodeByIds(idList);
-            //下载文件名称
-            String downloadFilename = "批量员工活码.zip";
-            response.setCharacterEncoding("utf-8");
-            response.setContentType("multipart/form-data");
-            response.setHeader("Content-Disposition",
-                    "attachment;fileName=" + FileUtils.setFileDownloadHeader(request, downloadFilename));
             //zip输出流
             ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
             if (CollectionUtil.isNotEmpty(weEmpleCodeLsit)){

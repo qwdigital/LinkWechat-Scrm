@@ -101,11 +101,7 @@ public class CommonController {
      * 网络资源通用下载
      */
     @GetMapping("/common/download/url")
-    public void webResourceDownload(String url, String name, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        response.setCharacterEncoding("utf-8");
-        response.setContentType("multipart/form-data");
-        response.setHeader("Content-Disposition",
-                "attachment;fileName=" + FileUtils.setFileDownloadHeader(request, name));
+    public void webResourceDownload(String url, HttpServletRequest request, HttpServletResponse response) throws Exception {
         FileUtils.downloadFile(url, response.getOutputStream());
     }
 }

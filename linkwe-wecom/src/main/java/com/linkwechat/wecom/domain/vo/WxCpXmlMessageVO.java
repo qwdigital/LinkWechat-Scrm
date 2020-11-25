@@ -14,7 +14,7 @@ import java.io.Serializable;
 /**
  * 微信推送过来的消息，也是同步回复给用户的消息，xml格式
  *
- * @author sxw
+ * @author danmo
  * @description
  * @date 2020/11/10 10:29
  **/

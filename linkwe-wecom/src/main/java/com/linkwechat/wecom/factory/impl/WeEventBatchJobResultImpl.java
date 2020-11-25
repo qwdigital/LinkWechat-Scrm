@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 异步任务完成通知
  * @date 2020/11/9 14:40
  **/

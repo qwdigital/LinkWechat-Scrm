@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 企微回调通知接口
  * @date 2020/11/6 17:31
  **/

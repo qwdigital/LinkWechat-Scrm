@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 企微变更事件通知处理类
  * @date 2020/11/9 17:17
  **/
