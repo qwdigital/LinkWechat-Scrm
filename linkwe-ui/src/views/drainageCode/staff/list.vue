@@ -4,8 +4,8 @@ import {
   remove,
   batchAdd,
   downloadBatch,
+  download,
 } from '@/api/drainageCode/staff'
-import { download } from '@/api/common'
 import SelectUser from '@/components/SelectUser'
 import ClipboardJS from 'clipboard'
 export default {
@@ -129,12 +129,23 @@ export default {
         this.getList(1)
       })
     },
+    download(id,userName,activityScene){
+      let name = userName+"-"+activityScene+".png"
+      download(id).then((res) =>{
+        if (res!=null) {
+          let blob = new Blob([res], {type: 'application/zip'});
+          let url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a'); // 创建a标签
+          link.href = url;
+          link.download = name; // 重命名文件
+          link.click();
+          URL.revokeObjectURL(url); // 释放内存
+        }
+      })
+    },
     /** 下载 */
     downloadBatch(qrCode) {
-      // window.open(download(row.qrCode, row.createBy.split(',')[0] + '.png'))
-      qrCode && window.open(qrCode)
-      qrCode ||
-        this.$confirm('是否确认下载所有图片吗?', '警告', {
+      this.$confirm('是否确认下载所有图片吗?', '警告', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning',
@@ -296,7 +307,7 @@ export default {
         <template slot-scope="{ row }">
           <el-button
             type="text"
-            @click="downloadBatch(row.qrCode)"
+            @click="download(row.id,row.useUserName,row.activityScene)"
             v-hasPermi="['monitor:operlog:query']"
             >下载</el-button
           >

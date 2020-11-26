@@ -1,6 +1,5 @@
 <script>
-import { getDetail, getUserAddCustomerStat } from '@/api/drainageCode/staff'
-import { download, downloadBatch } from '@/api/common'
+import { getDetail, getUserAddCustomerStat, download } from '@/api/drainageCode/staff'
 import ClipboardJS from 'clipboard'
 import echarts from 'echarts'
 export default {
@@ -105,7 +104,22 @@ export default {
       return year + '-' + month + '-' + date
     },
     download() {
-      window.open(this.form.qrCode)
+      let userName ="";
+      this.form.weEmpleCodeUseScops.forEach((item) =>{
+        userName+=item.businessName+",";
+      })
+      let name = userName.substr(0,userName.length-1) +"-"+this.form.activityScene+".png"
+      download(this.form.id).then((res) =>{
+        if (res!=null) {
+          let blob = new Blob([res], {type: 'application/zip'});
+          let url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a'); // 创建a标签
+          link.href = url;
+          link.download = name; // 重命名文件
+          link.click();
+          URL.revokeObjectURL(url); // 释放内存
+        }
+      })
     },
   },
 }

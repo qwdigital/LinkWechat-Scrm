@@ -189,6 +189,22 @@ public class WeEmpleCodeController extends BaseController {
         }
     }
 
+    @PreAuthorize("@ss.hasPermi('wecom:code:download')")
+    @Log(title = "员工活码下载", businessType = BusinessType.OTHER)
+    @GetMapping("/download")
+    public void download(String id, HttpServletRequest request, HttpServletResponse response){
+        WeEmpleCode weEmpleCode = weEmpleCodeService.selectWeEmpleCodeById(Long.valueOf(id));
+        if (StringUtils.isEmpty(weEmpleCode.getQrCode())){
+            return;
+        }else {
+            try {
+                FileUtils.downloadFile(weEmpleCode.getQrCode(), response.getOutputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     /**
      * 成员添加客户统计

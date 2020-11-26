@@ -141,7 +141,16 @@ export function downloadBatch(ids) {
     },
     responseType: 'blob'
   })
-  //return process.env.VUE_APP_BASE_API + service + '/downloadBatch/?ids=' + ids
+}
+
+export function download(id) {
+  return request({
+    url: service + '/download',
+    params: {
+      id,
+    },
+    responseType: 'blob'
+  })
 }
 
 /**
