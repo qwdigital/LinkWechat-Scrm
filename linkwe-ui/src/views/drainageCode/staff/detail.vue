@@ -104,11 +104,10 @@ export default {
       return year + '-' + month + '-' + date
     },
     download() {
-      let userName ="";
-      this.form.weEmpleCodeUseScops.forEach((item) =>{
-        userName+=item.businessName+",";
-      })
-      let name = userName.substr(0,userName.length-1) +"-"+this.form.activityScene+".png"
+      let userName = this.form.weEmpleCodeUseScops.map((item) =>{
+        return item.businessName
+      }).join(",");
+      let name = userName +"-"+this.form.activityScene+".png"
       download(this.form.id).then((res) =>{
         if (res!=null) {
           let blob = new Blob([res], {type: 'application/zip'});
