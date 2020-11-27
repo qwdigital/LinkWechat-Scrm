@@ -21,7 +21,7 @@ import java.util.List;
  * @date 2020-10-28
  */
 @RestController
-@RequestMapping("/system/push")
+@RequestMapping("/wecom/push")
 public class WeMessagePushController extends BaseController {
 
     @Autowired
