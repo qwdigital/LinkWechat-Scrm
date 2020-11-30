@@ -105,7 +105,7 @@ npm run build:stage
 
 ##### 后端结构
 
-```js
+```java
 com.linkwechat     
 ├── common            // 工具类
 │       └── annotation                    // 自定义注解
@@ -136,7 +136,7 @@ com.linkwechat
 ##### 前端结构
 
 
-```js
+```java
 ├── build                      // 构建相关  
 ├── bin                        // 执行脚本
 ├── public                     // 公共文件
