@@ -1,4 +1,24 @@
-# LinkWeChat —— 简单、好用的企业微信 SCRM
+<p></p>
+<p></p>
+
+<p align="center">
+  <img alt="logo" src="https://images.gitee.com/uploads/images/2020/1130/234126_cae7c30b_1480777.png" width="120" style="margin-bottom: 10px;">
+</p>
+<h2 align="center">LinkWeChat —— 让企业微信更强大的 SCRM </h2>
+
+<div align="center">
+
+![GVP Stars](http://img.shields.io/badge/GPV%20Forks-408-yellow)
+![GVP Forks](http://img.shields.io/badge/GPV%20Stars-143-yellow)
+![license](http://img.shields.io/badge/license-GPL%203.0-green)
+
+</div>
+
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+
 
 ### 平台简介
 
