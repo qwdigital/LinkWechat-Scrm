@@ -8,8 +8,8 @@
 
 <div align="center">
 
-![GVP Stars](http://img.shields.io/badge/GPV%20Forks-408-yellow)
-![GVP Forks](http://img.shields.io/badge/GPV%20Stars-143-yellow)
+![GVP Stars](http://img.shields.io/badge/GPV%20Stars-408-yellow)
+![GVP Forks](http://img.shields.io/badge/GPV%20Forks-143-yellow)
 ![license](http://img.shields.io/badge/license-GPL%203.0-green)
 
 </div>
