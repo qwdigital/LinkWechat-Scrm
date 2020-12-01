@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service;
 
 import com.linkwechat.wecom.domain.WeMaterial;
+import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.vo.WeMaterialFileVO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -82,5 +83,13 @@ public interface IWeMaterialService {
      * @return int
      */
     void resetCategory(String categoryId, String materials);
+
+    /**
+     * 上传企微临时素材
+     * @param url 素材路径
+     * @param type 素材类型
+     * @return
+     */
+    public WeMediaDto uploadTemporaryMaterial(String url, String type);
 
 }
