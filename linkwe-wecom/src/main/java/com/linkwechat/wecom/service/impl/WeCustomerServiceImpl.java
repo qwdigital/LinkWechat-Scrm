@@ -26,6 +26,7 @@ import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.mapper.WeCustomerMapper;
 import com.linkwechat.wecom.service.*;
 
+import com.tencent.wework.Finance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -111,6 +112,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
      */
     @Override
     public List<WeCustomer> selectWeCustomerList(WeCustomer weCustomer) {
+        long sdk = Finance.NewSdk();
         return weCustomerMapper.selectWeCustomerList(weCustomer);
     }
 
