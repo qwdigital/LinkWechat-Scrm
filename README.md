@@ -2,14 +2,14 @@
 <p></p>
 
 <p align="center">
-  <img alt="logo" src="https://images.gitee.com/uploads/images/2020/1130/234126_cae7c30b_1480777.png" width="120" style="margin-bottom: 10px;">
+  <img alt="logo" src="https://images.gitee.com/uploads/images/2020/1203/142903_f84f7f3b_1480777.png" width="120" style="margin-bottom: 0px;">
 </p>
-<h2 align="center">LinkWeChat —— 让企业微信更强大的 SCRM </h2>
+<h2 align="center">让每个企业都是私域流量营销专家</h2>
 
 <div align="center">
 
-![GVP Stars](http://img.shields.io/badge/GPV%20Stars-408-yellow)
-![GVP Forks](http://img.shields.io/badge/GPV%20Forks-143-yellow)
+![GVP Stars](http://img.shields.io/badge/GPV%20Stars-400+-yellow)
+![GVP Forks](http://img.shields.io/badge/GPV%20Forks-150+-yellow)
 ![license](http://img.shields.io/badge/license-GPL%203.0-green)
 
 </div>
