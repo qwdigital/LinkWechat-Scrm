@@ -10,15 +10,25 @@ import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUploadUtils;
+import com.linkwechat.wecom.client.WeMediaClient;
 import com.linkwechat.wecom.domain.WeMaterial;
+import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.vo.WeMaterialFileVO;
 import com.linkwechat.wecom.mapper.WeMaterialMapper;
 import com.linkwechat.wecom.service.IWeMaterialService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +47,8 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
     private WeMaterialMapper weMaterialMapper;
     @Autowired
     private ServerConfig serverConfig;
+    @Autowired
+    private WeMediaClient weMediaClient;
 
     @Override
     public WeMaterialFileVO uploadWeMaterialFile(MultipartFile file, String type) {
@@ -113,6 +125,22 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
                 weMaterialMapper.resetCategory(categoryId, s);
             });
         }
+    }
+
+    @Override
+    public WeMediaDto uploadTemporaryMaterial(String url, String type) {
+        try {
+            File file = new File(url);
+            FileItemFactory factory = new DiskFileItemFactory(16, null);
+            FileItem item=factory.createItem(file.getName(),"text/plain",true,file.getName());
+            MultipartFile multipartFile = new CommonsMultipartFile(item);
+            return weMediaClient.upload(multipartFile, type);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("上传临时文件失败......url:{},type:{},ex:{},st:{}",url,type,e.getMessage(),e.getStackTrace());
+        }
+        return null;
+
     }
 
 

@@ -2,12 +2,14 @@ package com.linkwechat.wecom.factory.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.Threads;
 import com.linkwechat.wecom.domain.WeEmpleCodeTag;
 import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
 import com.linkwechat.wecom.domain.WeFlowerCustomerTagRel;
 import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
+import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
 import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 import com.linkwechat.wecom.factory.WeCallBackEventFactory;
@@ -44,6 +46,8 @@ public class WeEventChangeExternalContactImpl implements WeCallBackEventFactory 
     private IWeFlowerCustomerRelService weFlowerCustomerRelService;
     @Autowired
     private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
+    @Autowired
+    private IWeMaterialService weMaterialService;
 
     @Override
     public void eventHandle(WxCpXmlMessageVO message) {
@@ -151,8 +155,13 @@ public class WeEventChangeExternalContactImpl implements WeCallBackEventFactory 
                                         .content(messageMap.getWelcomeMsg()).build());
                             }
                             if(StringUtils.isNotEmpty(messageMap.getCategoryId())){
-                                weWelcomeMsgBuilder.image(WeWelcomeMsg.Image.builder().media_id(messageMap.getCategoryId())
-                                        .pic_url(messageMap.getMaterialUrl()).build());
+                                WeMediaDto weMediaDto = weMaterialService
+                                        .uploadTemporaryMaterial(messageMap.getMaterialUrl(), MediaType.IMAGE.getMediaType());
+                                Optional.ofNullable(weMediaDto).ifPresent(media ->{
+                                    weWelcomeMsgBuilder.image(WeWelcomeMsg.Image.builder().media_id(media.getMedia_id())
+                                            .pic_url(media.getUrl()).build());
+                                });
+
                             }
                             weCustomerService.sendWelcomeMsg(weWelcomeMsgBuilder.build());
                         }
