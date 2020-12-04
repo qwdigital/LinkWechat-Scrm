@@ -88,7 +88,7 @@
       <span>Copyright © 2018-2019 LinkWechat All Rights Reserved.</span>
     </div>
 
-    <el-dialog
+    <!-- <el-dialog
       title="开源软件评选"
       :visible.sync="dialogVisible"
       width="400px"
@@ -114,7 +114,7 @@
           >残忍拒绝</el-button
         >
       </div>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 
