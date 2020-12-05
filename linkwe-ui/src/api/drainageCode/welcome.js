@@ -43,7 +43,7 @@ export function getScop(id) {
   ]
 }
  */
-export function edit(data) {
+export function update(data) {
   return request({
     url: service,
     method: 'put',

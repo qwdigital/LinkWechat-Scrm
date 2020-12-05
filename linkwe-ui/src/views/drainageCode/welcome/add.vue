@@ -1,5 +1,5 @@
 <script>
-import { edit } from '@/api/drainageCode/welcome'
+import { update, add } from '@/api/drainageCode/welcome'
 import PhoneDialog from '@/components/PhoneDialog'
 import SelectMaterial from '@/components/SelectMaterial'
 
@@ -24,7 +24,7 @@ export default {
   methods: {
     getData() {},
     submit() {
-      edit(this.form)
+      ;(this.form.id ? update : add)(this.form)
     },
     insertName() {
       this.form.welcomeMsg += '#客户昵称#'
