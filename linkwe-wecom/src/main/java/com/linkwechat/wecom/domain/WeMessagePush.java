@@ -83,8 +83,10 @@ public class WeMessagePush extends BaseEntity {
     private String chatId;
 
     /**
-     * 设置时间(格式为： 2020-11-17 09:00:00 ) 为空时立即发送
+     * 企业应用的id，整型。企业内部开发，可在应用的设置页面查看；第三方服务商，可通过接口
+     * <a href="https://work.weixin.qq.com/api/doc/10975#%E8%8E%B7%E5%8F%96%E4%BC%81%E4%B8%9A%E6%8E%88%E6%9D%83%E4%BF%A1%E6%81%AF">获取企业授权信息</a> 获取该参数值
      */
-    private String settingTime;
+    private Integer agentid;
+
 
 }
