@@ -31,7 +31,7 @@ public class WeFlowerCustomerTagRel
 
     /** $column.columnComment */
     @TableId
-    private Long id= SnowFlakeUtil.nextId();
+    private Long id;
 
     /** 添加客户的企业微信用户 */
     private Long flowerCustomerRelId;
@@ -45,9 +45,4 @@ public class WeFlowerCustomerTagRel
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
-
-
-
-
-
 }
