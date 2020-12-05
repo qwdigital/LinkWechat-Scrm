@@ -45,7 +45,7 @@ public class SendMessageToUserStrategy implements Strategy {
         weMessagePushDto.setMsgtype(weMessagePush.getMessageType());
 
         //这个先写在配置文件中
-        weMessagePushDto.setAgentid(1000003);
+        weMessagePushDto.setAgentid(weMessagePush.getAgentid());
         weMessagePushDto.setSafe(0);
         weMessagePushDto.setEnable_id_trans(0);
         weMessagePushDto.setEnable_duplicate_check(0);
