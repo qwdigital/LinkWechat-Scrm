@@ -33,6 +33,7 @@ export function getScop(id) {
  * @param {*} data
 {
   "id": "主键",
+  "mediaId": "素材的id",
   "welcomeMsg": "欢迎语",
   "welcomeMsgTplType": "欢迎语模板类型:1:员工欢迎语;2:部门员工欢迎语;3:客户群欢迎语",
   "weMsgTlpScopes": [

@@ -1,16 +1,18 @@
 <script>
 import { edit } from '@/api/drainageCode/welcome'
 import PhoneDialog from '@/components/PhoneDialog'
+import SelectMaterial from '@/components/SelectMaterial'
 
 export default {
-  components: { PhoneDialog },
+  components: { PhoneDialog, SelectMaterial },
   props: {},
   data() {
     return {
       dialogVisible: false,
-      dialogVisible1: false,
-      form: { id: '', welcomeMsgTplType: '', welcomeMsg: '' },
-      imageUrl: '',
+      // dialogVisible1: false,
+      dialogVisibleSelectMaterial: false,
+      form: { id: '', mediaId: '', welcomeMsgTplType: '', welcomeMsg: '' },
+      materialSelected: '',
     }
   },
   watch: {},
@@ -27,22 +29,15 @@ export default {
     insertName() {
       this.form.welcomeMsg += '#客户昵称#'
     },
-    uploadSuccess(res, file) {
-      debugger
-      this.imageUrl = URL.createObjectURL(file.raw)
+    // 选择素材确认按钮
+    submitSelectMaterial(text, image, file) {
+      this.form.mediaId = image.id
+      this.materialSelected = image.materialUrl
+      this.dialogVisibleSelectMaterial = false
     },
-    beforeUpload(file) {
-      debugger
-      const isJPG = file.type === 'image/jpeg'
-      const isLt2M = file.size / 1024 / 1024 < 2
-
-      if (!isJPG) {
-        this.$message.error('上传头像图片只能是 JPG 格式!')
-      }
-      if (!isLt2M) {
-        this.$message.error('上传头像图片大小不能超过 2MB!')
-      }
-      return isJPG && isLt2M
+    removeMaterial() {
+      this.form.mediaId = ''
+      this.materialSelected = ''
     },
   },
 }
@@ -74,9 +69,17 @@ export default {
             >
           </div>
           <el-divider></el-divider>
-          <img v-if="imageUrl" :src="imageUrl" />
+          <div v-if="materialSelected">
+            <el-image
+              style="width: 100px; height: 100px; cursor: pointer;border-radius: 6px;"
+              :src="materialSelected"
+              fit="fit"
+            >
+            </el-image>
+            <i class="el-icon-error" @click="removeMaterial"></i>
+          </div>
 
-          <el-popover placement="top-start" trigger="hover">
+          <!-- <el-popover placement="top-start" trigger="hover">
             <div class="ac">
               <Upload
                 ><el-button>
@@ -85,19 +88,26 @@ export default {
                 </el-button></Upload
               >
 
-              <!-- <el-button @click="dialogVisible = true">
+              <el-button @click="dialogVisible = true">
                 <i class="el-icon-link"></i>
                 <p>网页</p>
               </el-button>
               <el-button @click="dialogVisible1 = true">
                 <i class="el-icon-link"></i>
                 <p>小程序</p>
-              </el-button> -->
+              </el-button>
             </div>
             <el-button slot="reference" icon="el-icon-plus" size="mini"
               >添加图片</el-button
             >
-          </el-popover>
+          </el-popover> -->
+
+          <el-button
+            icon="el-icon-plus"
+            size="mini"
+            @click="dialogVisibleSelectMaterial = true"
+            >添加图片</el-button
+          >
         </el-card>
       </el-form-item>
       <el-form-item label=" ">
@@ -106,7 +116,27 @@ export default {
       </el-form-item>
     </el-form>
 
-    <PhoneDialog :message="form.welcomeMsg || '请输入欢迎语'"></PhoneDialog>
+    <PhoneDialog
+      style="margin-left: 10%;"
+      :message="form.welcomeMsg || '请输入欢迎语'"
+      :isOther="!!materialSelected"
+    >
+      <el-image
+        style="width: 100px; height: 100px; cursor: pointer;border-radius: 6px;"
+        :src="materialSelected"
+        fit="fit"
+      >
+      </el-image
+    ></PhoneDialog>
+
+    <!-- 选择素材弹窗 -->
+    <SelectMaterial
+      :visible.sync="dialogVisibleSelectMaterial"
+      type="1"
+      :showArr="[1]"
+      @success="submitSelectMaterial"
+    >
+    </SelectMaterial>
 
     <!-- <el-dialog title="添加网页消息" :visible.sync="dialogVisible" width="width">
       <el-form :model="form" inline>
