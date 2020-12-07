@@ -19,7 +19,14 @@
         LEFT JOIN  we_user wu ON wg.`owner`=wu.user_id
         <where>
             <if test="groupName != null  and groupName != ''"> and wg.group_name like concat('%', #{groupName}, '%')</if>
-            <if test="owner != null  and owner != ''"> and owner = #{owner}</if>
+            <if test="groupLeader != null  and groupLeader != ''"> and wu.user_name like concat('%', #{groupLeader}, '%')</if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(wg.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(wg.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
         </where>
     </select>
 
