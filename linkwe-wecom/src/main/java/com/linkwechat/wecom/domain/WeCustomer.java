@@ -3,6 +3,7 @@ package com.linkwechat.wecom.domain;
 import java.util.Date;
 import java.util.List;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -85,5 +86,9 @@ public class WeCustomer extends BaseEntity
     /** 标签 */
     @TableField(exist = false)
     private String tagIds;
+
+    @TableField(exist = false)
+    @JSONField(defaultValue = "0")
+    private Integer status;
 
 }

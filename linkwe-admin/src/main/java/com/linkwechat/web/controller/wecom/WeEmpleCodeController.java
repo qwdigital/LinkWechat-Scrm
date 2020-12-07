@@ -15,6 +15,7 @@ import com.linkwechat.wecom.service.IWeEmpleCodeService;
 import com.linkwechat.wecom.service.IWeFlowerCustomerRelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,7 +71,7 @@ public class WeEmpleCodeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('wecom:code:add')")
     @Log(title = "员工活码", businessType = BusinessType.INSERT)
     @PostMapping("/add")
-    public AjaxResult add(@RequestBody WeEmpleCode weEmpleCode) {
+    public AjaxResult add(@RequestBody @Validated WeEmpleCode weEmpleCode) {
         try {
             weEmpleCodeService.insertWeEmpleCode(weEmpleCode);
             return AjaxResult.success();
@@ -91,7 +92,7 @@ public class WeEmpleCodeController extends BaseController {
     @PreAuthorize("@ss.hasPermi('wecom:code:batchAdd')")
     @Log(title = "批量新增员工活码", businessType = BusinessType.INSERT)
     @PostMapping("/batchAdd")
-    public AjaxResult batchAdd(@RequestBody WeEmpleCode weEmpleCode) {
+    public AjaxResult batchAdd(@RequestBody @Validated WeEmpleCode weEmpleCode) {
         try {
             weEmpleCodeService.insertWeEmpleCodeBatch(weEmpleCode);
             return AjaxResult.success();
