@@ -23,9 +23,11 @@ public class ExternalUserDetail extends WeResultDto {
 
     private FollowInfo follow_info;
 
+    private String external_userid;
+
 
     @Data
-    public class ExternalContact{
+    public static class ExternalContact{
         /** 外部联系人userId */
         private String external_userid;
         /** 外部联系人名称 */

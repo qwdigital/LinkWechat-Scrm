@@ -2,18 +2,19 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.wecom.client.WeCustomerClient;
 import com.linkwechat.wecom.client.WeCustomerGroupClient;
 import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.domain.WeAllocateGroup;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeGroupMember;
 import com.linkwechat.wecom.domain.dto.AllocateWeGroupDto;
-import com.linkwechat.wecom.domain.dto.customer.CustomerGroupDetail;
-import com.linkwechat.wecom.domain.dto.customer.CustomerGroupList;
-import com.linkwechat.wecom.domain.dto.customer.CustomerGroupMember;
+import com.linkwechat.wecom.domain.dto.customer.*;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.mapper.WeGroupMapper;
 import com.linkwechat.wecom.service.*;
@@ -56,6 +57,10 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper,WeGroup> imple
 
     @Autowired
     private WeUserClient weUserClient;
+
+
+    @Autowired
+    private WeCustomerClient weCustomerClient;
 
 
     public List<WeGroup> selectWeGroupList(WeGroup weGroup) {
@@ -143,6 +148,30 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper,WeGroup> imple
                         List<CustomerGroupMember> memberLists = kk.getMember_list();
                         if(CollectionUtil.isNotEmpty(memberLists)){
                             memberLists.stream().forEach(member->{
+
+
+                                //unionid不为空，获取非好友客户相关消息
+//                                if(StrUtil.isNotBlank(member.getUnionid())){
+//                                    ExternalUserDetail.ExternalContact externalContact1 = new ExternalUserDetail.ExternalContact();
+//                                    externalContact1.setUnionid(member.getUnionid());
+//
+//                                    ExternalUserDetail externalContact
+//                                            = weCustomerClient.unionidToExternalUserid(externalContact1);
+//
+//                                    if(externalContact.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)
+//                                    && StrUtil.isNotBlank(externalContact.getExternal_userid())){
+//
+//
+//
+//                                        ExternalUserDetail externalUserDetail = weCustomerClient.get(member.getUnionid());
+//                                        System.out.println("===========START====================");
+//                                        System.out.println(JSONUtil.toJsonStr(externalUserDetail));
+//                                        System.out.println("===========END====================");
+//
+//                                    }
+//
+//                                }
+
 
                                 weGroupMembers.add(
                                         WeGroupMember.builder()

@@ -83,4 +83,15 @@ public interface WeCustomerClient {
             type = "POST")
     WeResultDto sendWelcomeMsg(@DataObject WeWelcomeMsg wxCpWelcomeMsg);
 
+
+    /**
+     * unionid转换external_userid
+     * @return
+     */
+    @Request(url = "/externalcontact/unionid_to_external_userid",
+            type = "POST")
+    ExternalUserDetail unionidToExternalUserid(@DataObject ExternalUserDetail.ExternalContact  unionid);
+
+
+
 }
