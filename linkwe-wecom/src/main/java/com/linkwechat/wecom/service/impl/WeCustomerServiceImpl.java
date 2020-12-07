@@ -492,7 +492,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                         .remarkMobiles(kk.getRemark_mobiles())
                         .operUserid(kk.getOper_userid())
                         .addWay(kk.getAdd_way())
-                        .state("0")
+                        .state(kk.getState())
+                        .status("0")
                         .externalUserid(weCustomer.getExternalUserid())
                         .createTime(new Date(kk.getCreatetime() * 1000L))
                         .build());
