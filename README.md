@@ -2,14 +2,14 @@
 <p></p>
 
 <p align="center">
-  <img alt="logo" src="https://images.gitee.com/uploads/images/2020/1130/234126_cae7c30b_1480777.png" width="120" style="margin-bottom: 10px;">
+  <img alt="logo" src="https://images.gitee.com/uploads/images/2020/1203/143430_03205b51_1480777.png" width="120" style="margin-bottom: 0px;">
 </p>
-<h2 align="center">LinkWeChat —— 让企业微信更强大的 SCRM </h2>
+<h2 align="center">LinkWeChat —— 让每个企业都是私域流量营销专家</h2>
 
 <div align="center">
 
-![GVP Stars](http://img.shields.io/badge/GPV%20Stars-408-yellow)
-![GVP Forks](http://img.shields.io/badge/GPV%20Forks-143-yellow)
+![GVP Stars](http://img.shields.io/badge/GPV%20Stars-400+-yellow)
+![GVP Forks](http://img.shields.io/badge/GPV%20Forks-150+-yellow)
 ![license](http://img.shields.io/badge/license-GPL%203.0-green)
 
 </div>
@@ -18,7 +18,6 @@
 <p></p>
 <p></p>
 <p></p>
-
 
 ### 平台简介
 
@@ -73,7 +72,7 @@ npm install --registry=https://registry.npm.taobao.org
 npm  run serve
 ```
 
-打开浏览器，输入 `http://localhost:80  `，默认账密为：`admin/admin123` 。
+打开浏览器，输入 `http://localhost:80  `，默认账密为：`admin/123admin123` 。
 
 若能正确展示登录页面，并能成功登录，菜单及页面展示正常，则表明环境搭建成功。
 

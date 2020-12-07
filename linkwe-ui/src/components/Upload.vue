@@ -106,6 +106,10 @@ export default {
         // this.fileUrl = URL.createObjectURL(file.raw)
       }
     },
+    onError(err, file, fileList) {
+      this.loading = false
+      this.$message.error('上传文件失败')
+    },
   },
 }
 </script>
@@ -122,6 +126,7 @@ export default {
       :data="{ mediaType: type }"
       :show-file-list="false"
       :on-success="onSuccess"
+      :on-error="onError"
       :before-upload="handleBeforeUpload"
     >
       <slot>

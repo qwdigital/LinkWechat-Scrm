@@ -18,7 +18,7 @@ export default {
       // 表单参数
       form: {
         codeType: 1,
-        qrcode: '',
+        qrCode: '',
         isJoinConfirmFriends: 0,
         weEmpleCodeTags: [],
         weEmpleCodeUseScops: [],
@@ -41,6 +41,7 @@ export default {
       this.loading = true
       getDetail(id).then(({ data }) => {
         this.form = data
+        this.materialSelected = data.weMaterial.materialUrl
         this.loading = false
       })
     },
@@ -55,7 +56,7 @@ export default {
     },
     codeTypeChange() {
       this.form.weEmpleCodeUseScops = []
-      this.form.qrcode = ''
+      this.form.qrCode = ''
     },
     // 选择人员变化事件
     selectedUser(users) {
@@ -72,7 +73,7 @@ export default {
       params.userIds += ''
       params.departmentIds += ''
       getQrcode(params).then(({ data }) => {
-        this.form.qrcode = data.qr_code
+        this.$set(this.form, 'qrCode', data.qr_code)
       })
     },
     submitSelectTag(data) {
@@ -98,12 +99,20 @@ export default {
       this.dialogVisibleSelectWel = false
     },
     submit() {
+      if (!this.form.weEmpleCodeUseScops.length) {
+        this.msgError('请至少选择一名使用员工')
+        return
+      }
       this.loading = true
-      add(this.form).then(({ data }) => {
-        this.msgSuccess('操作成功')
-        this.loading = false
-        this.$router.back()
-      })
+      ;(this.form.id ? update : add)(this.form)
+        .then(({ data }) => {
+          this.msgSuccess('操作成功')
+          this.loading = false
+          this.$router.back()
+        })
+        .catch(() => {
+          this.loading = false
+        })
     },
   },
 }
@@ -203,15 +212,15 @@ export default {
               >添加图片</el-button
             >
           </el-popover> -->
-          <el-image
-            v-if="materialSelected"
-            style="width: 100px; height: 100px"
-            :src="materialSelected"
-            :fit="fit"
-            @click="dialogVisibleSelectMaterial = true"
-          >
+          <div v-if="materialSelected">
+            <el-image
+              style="width: 100px; height: 100px; cursor: pointer;border-radius: 6px;"
+              :src="materialSelected"
+              fit="fit"
+            >
+            </el-image>
             <i class="el-icon-error" @click="removeMaterial"></i>
-          </el-image>
+          </div>
           <el-button
             v-else
             icon="el-icon-plus"
@@ -240,14 +249,14 @@ export default {
     <div class="preview-wrap">
       <el-image
         style="width: 180px; height: 180px"
-        :src="form.qrcode || require('@/assets/image/user-code-example.jpg')"
+        :src="form.qrCode || require('@/assets/image/user-code-example.jpg')"
         fit="fit"
       ></el-image>
       <div class="tip mb20">二维码预览</div>
 
       <el-card shadow="never" :body-style="{ padding: '10px 10px 20px' }">
-        <i class="el-icon-user-solid" style="font-size: 20px;"></i> 63136
-        <el-divider></el-divider>
+        <i class="el-icon-user-solid" style="font-size: 20px;"></i> 昵称
+        <div style="margin: 10px 0; border-bottom: 1px solid #ddd;"></div>
         <div>性别：男</div>
         <div>设置：备注和描述</div>
         <div>
@@ -260,7 +269,17 @@ export default {
       <div class="tip mb20">扫码标签样式</div>
 
       <!-- 预览 -->
-      <PhoneDialog :message="form.welcomeMsg || '请输入欢迎语'"></PhoneDialog>
+      <PhoneDialog
+        :message="form.welcomeMsg || '请输入欢迎语'"
+        :isOther="!!materialSelected"
+      >
+        <el-image
+          style="width: 100px; height: 100px; cursor: pointer;border-radius: 6px;"
+          :src="materialSelected"
+          fit="fit"
+        >
+        </el-image>
+      </PhoneDialog>
       <div class="tip">欢迎语样式</div>
     </div>
 

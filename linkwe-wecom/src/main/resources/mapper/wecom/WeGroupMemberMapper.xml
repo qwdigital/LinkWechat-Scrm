@@ -16,18 +16,24 @@
             (
                     SELECT wu.user_name FROM  we_user wu
                     WHERE wu.user_id=wgm.user_id
+                    <if test="memberName != null  and memberName != ''">
+                     AND wu.user_name like concat('%', #{memberName}, '%')
+                   </if>
             )
             WHEN wgm.type = 2 THEN
             (
                     SELECT wc.name FROM we_customer wc
                     WHERE wc.external_userid=wgm.user_id
+                    <if test="memberName != null  and memberName != ''">
+                        AND wc.name like concat('%', #{memberName}, '%')
+                    </if>
             )
             END memberName
         FROM
         we_group_member wgm
         <where>
             <if test="chatId != null "> and wgm.chat_id = #{chatId}</if>
-            <if test="memberName != null  and memberName != ''"> and HAVING wc.`name` like concat('%', #{memberName}, '%')</if>
+            <if test="memberName != null  and memberName != ''">HAVING memberName  IS NOT NULL</if>
         </where>
     </select>
 

@@ -47,30 +47,7 @@ public class WeMessagePushServiceImpl implements IWeMessagePushService {
     @Override
     public void insertWeMessagePush(WeMessagePush weMessagePush) {
 
-        //立即发送
-        if (null == weMessagePush.getSettingTime()) {
-            sendMessgae(weMessagePush);
-        } else {
-
-            //发送时间不能小于当前时间
-            //定时发送消息(异步执行)
-            //保存消息体到数据库，增加一个发送状态(0 已发送 1 未发送)
-            //定义一个任务执行队列
-            //把任务放入执行队列
-            //任务执行 sendMessgae(WeMessagePush weMessagePush) 方法
-            if (DateUtils.diffTime(new Date(), DateUtil.parse(weMessagePush.getSettingTime(), "yyyy-MM-dd HH:mm:ss")) < 0) {
-                throw new WeComException("发送时间不能小于当前时间");
-            }
-
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    sendMessgae(weMessagePush);
-                }
-            }, DateUtil.parse(weMessagePush.getSettingTime(), "yyyy-MM-dd HH:mm:ss"));
-
-        }
+        sendMessgae(weMessagePush);
 
     }
 

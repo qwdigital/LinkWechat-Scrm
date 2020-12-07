@@ -8,7 +8,7 @@ import com.linkwechat.wecom.domain.dto.message.SendMessageResultDto;
 import com.linkwechat.wecom.domain.dto.message.WeCustomerMessagePushDto;
 
 /**
- * @description: 消息推送
+ * @description: 群发消息
  * @author: KeWen
  * @create: 2020-10-25 21:34
  **/

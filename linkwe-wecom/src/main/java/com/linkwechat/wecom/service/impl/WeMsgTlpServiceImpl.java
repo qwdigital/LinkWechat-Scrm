@@ -68,17 +68,23 @@ public class WeMsgTlpServiceImpl implements IWeMsgTlpService
         int returnCode = weMsgTlpMapper.insertWeMsgTlp(weMsgTlp);
 
         if(returnCode>0){
+            List<WeMsgTlpScope> weMsgTlpScopess = weMsgTlp.getWeMsgTlpScopes();
+            if(CollectionUtil.isNotEmpty(weMsgTlpScopess)){
 
-            List<WeMsgTlpScope> weMsgTlpScopes=weMsgTlp.getWeMsgTlpScopes().stream().filter(c -> c.getUseUserId() != null).collect(Collectors.toList());
-            if(CollectionUtil.isNotEmpty(weMsgTlpScopes)){
+                List<WeMsgTlpScope> weMsgTlpScopes=weMsgTlp.getWeMsgTlpScopes().stream().filter(c -> c.getUseUserId() != null).collect(Collectors.toList());
+                if(CollectionUtil.isNotEmpty(weMsgTlpScopes)){
 
-                weMsgTlpScopes.forEach(v->{
-                    v.setMsgTlpId(weMsgTlp.getId());
-                    v.setId(SnowFlakeUtil.nextId());
-                });
+                    weMsgTlpScopes.forEach(v->{
+                        v.setMsgTlpId(weMsgTlp.getId());
+                        v.setId(SnowFlakeUtil.nextId());
+                    });
 
-                iWeMsgTlpScopeService.batchInsetWeMsgTlpScope(weMsgTlpScopes);
+                    iWeMsgTlpScopeService.batchInsetWeMsgTlpScope(weMsgTlpScopes);
+                }
+
             }
+
+
 
         }
         return returnCode;

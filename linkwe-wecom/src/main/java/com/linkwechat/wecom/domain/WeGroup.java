@@ -49,4 +49,18 @@ public class WeGroup {
 
     @TableField(exist = false)
     private String groupLeaderName;
+
+
+    @TableField(exist = false)
+    private String groupLeader;
+
+    @TableField(exist = false)
+    @JsonFormat( pattern = "yyyy-MM-dd")
+    private String beginTime;
+
+    @TableField(exist = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private String endTime;
+
+
 }
