@@ -12,9 +12,12 @@ import com.linkwechat.wecom.domain.WeMessagePush;
 import com.linkwechat.wecom.domain.dto.WeMessagePushDto;
 import com.linkwechat.wecom.domain.dto.WeMessagePushResultDto;
 import com.linkwechat.wecom.mapper.WeMessagePushMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -39,9 +42,9 @@ public class SendMessageToUserStrategy implements Strategy {
         of.ifPresent(messageType -> map.put(messageType.getMessageType(), jsonObject));
         //发送消息
         WeMessagePushDto weMessagePushDto = new WeMessagePushDto();
-        weMessagePushDto.setTouser(weMessagePush.getToUser());
-        weMessagePushDto.setToparty(weMessagePush.getToParty());
-        weMessagePushDto.setTotag(weMessagePush.getToTag());
+        weMessagePushDto.setTouser(StringUtils.isNotBlank(weMessagePush.getToUser()) ? Arrays.asList(weMessagePush.getToUser().split(",")) : new ArrayList<>());
+        weMessagePushDto.setToparty(StringUtils.isNotBlank(weMessagePush.getToUser()) ? Arrays.asList(weMessagePush.getToParty().split(",")) : new ArrayList<>());
+        weMessagePushDto.setTotag(StringUtils.isNotBlank(weMessagePush.getToUser()) ? Arrays.asList(weMessagePush.getToTag().split(",")) : new ArrayList<>());
         weMessagePushDto.setMsgtype(weMessagePush.getMessageType());
 
         //这个先写在配置文件中
