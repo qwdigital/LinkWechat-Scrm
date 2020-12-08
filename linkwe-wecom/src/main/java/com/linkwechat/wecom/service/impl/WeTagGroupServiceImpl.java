@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.constant.UserConstants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -203,7 +204,6 @@ public class WeTagGroupServiceImpl  extends ServiceImpl<WeTagGroupMapper,WeTagGr
     @Transactional
     public void synchWeTags() {
 
-
         WeCropGroupTagListDto weCropGroupTagListDto = weCropTagClient.getAllCorpTagList();
 
         if(weCropGroupTagListDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
@@ -248,15 +248,41 @@ public class WeTagGroupServiceImpl  extends ServiceImpl<WeTagGroupMapper,WeTagGr
 
         }
 
-        this.saveOrUpdateBatch(weTagGroups);
 
-        List<WeTag> weTags =
-                weTagGroups.stream().map(WeTagGroup::getWeTags).collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
-        if(CollectionUtil.isNotEmpty(weTags)){
+        //先逻辑删除不存在得组
+        if(CollectionUtil.isNotEmpty(weTagGroups)){
 
-            iWeTagService.saveOrUpdateBatch(weTags);
+            List<WeTagGroup> noExist
+                    = this.list(new LambdaQueryWrapper<WeTagGroup>().notIn(WeTagGroup::getGroupId, weTagGroups.stream().map(WeTagGroup::getGroupId).collect(Collectors.toList())));
+           //企业微信端删除得标签
+            if(CollectionUtil.isNotEmpty(noExist)){
+                noExist.stream().forEach(k->k.setStatus(Constants.DELETE_CODE));
+                this.updateBatchById(noExist);
+            }
+
+            this.saveOrUpdateBatch(weTagGroups);
+
+            List<WeTag> weTags =
+                    weTagGroups.stream().map(WeTagGroup::getWeTags).collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
+
+            if(CollectionUtil.isNotEmpty(weTags)){
+
+                List<WeTag> noExistWeTags
+                        = iWeTagService.list(new LambdaQueryWrapper<WeTag>().notIn(WeTag::getTagId, weTags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
+                if(CollectionUtil.isNotEmpty(noExistWeTags)){
+                    noExistWeTags.stream().forEach(k->k.setStatus(Constants.DELETE_CODE));
+                    iWeTagService.updateBatchById(noExistWeTags);
+                }
+
+                iWeTagService.saveOrUpdateBatch(weTags);
+
+            }
+
 
         }
+
+
+
 
 
     }

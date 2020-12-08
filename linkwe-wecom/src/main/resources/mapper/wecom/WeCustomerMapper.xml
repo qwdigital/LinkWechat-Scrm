@@ -28,92 +28,190 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <result property="status"    column="status"    />
             <result property="userName" column="user_name"/>
             <result property="department" column="department"/>
-            <collection property="weFlowerCustomerTagRels" ofType="com.linkwechat.wecom.domain.WeFlowerCustomerTagRel">
-                <result property="flowerCustomerRelId"    column="flower_customer_rel_id"    />
-                <result property="tagId"    column="tag_id"    />
-                <result property="createTime"    column="create_time"    />
-                <result property="tagName" column="tagName"/>
+            <collection property="weFlowerCustomerTagRels" javaType="ArrayList"
+                        column="{id = wfcrId}" select="selectWeCustomerTags">
             </collection>
         </collection>
     </resultMap>
+    
+    
+    <resultMap id="weFlowerCustomerRelsMapper" type="com.linkwechat.wecom.domain.WeFlowerCustomerTagRel">
+        <result property="flowerCustomerRelId"    column="flower_customer_rel_id"    />
+        <result property="tagId"    column="tag_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="tagName" column="tagName"/>
+    </resultMap>
+
 
     <sql id="selectWeCustomerVo">
         select external_userid, name, avatar, type, gender, unionid, birthday, corp_name, corp_full_name, position from we_customer
     </sql>
 
     <select id="selectWeCustomerList" parameterType="WeCustomer" resultMap="WeCustomerResult">
-          SELECT
-                  wc.external_userid,
-                  wc.`name`,
-                  wc.avatar,
-                  wc.type,
-                  wc.gender,
-                  wc.unionid,
-                  wc.birthday,
-                  wc.corp_name,
-                  wc.corp_full_name,
-                  wc.position,
-                  wfcr.id as wfcrId,
-                  wfcr.user_id,
-                  wfcr.remark,
-                  wfcr.description,
-                  wfcr.create_time,
-                  wfcr.remark_corp_name,
-                  wfcr.oper_userid,
-                  wfcr.add_way,
-                  wfcr.state,
-                  wfcr.status,
-                  wu.user_name,
-                  wfcrf.flower_customer_rel_id,
-                  wt.tag_id,
-                  wt.`name` as tagName,
-                  (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department
-        FROM
+        SELECT
+             DISTINCT wc.external_userid,
+            wc.`name`,
+            wc.avatar,
+            wc.type,
+            wc.gender,
+            wc.unionid,
+            wc.birthday,
+            wc.corp_name,
+            wc.corp_full_name,
+            wc.position,
+            wfcr.id as wfcrId,
+            wfcr.user_id,
+            wfcr.remark,
+            wfcr.description,
+            wfcr.create_time,
+            wfcr.remark_corp_name,
+            wfcr.oper_userid,
+            wfcr.add_way,
+            wfcr.state,
+            wfcr.status,
+            wu.user_name,
+            (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department
+            FROM
             we_customer wc
         LEFT JOIN we_flower_customer_rel wfcr ON wc.external_userid=wfcr.external_userid
         LEFT JOIN we_user wu ON wu.user_id=wfcr.user_id
         LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.flower_customer_rel_id = wfcr.id
-        INNER JOIN we_tag wt ON wt.tag_id = wfcrf.tag_id
+        LEFT JOIN we_tag wt ON wt.tag_id = wfcrf.tag_id
         <where>
             <if test="name != null and name !=''">
-                AND wc.name like concat('%', #{name}, '%')
+               AND wc.name like concat('%', #{name}, '%')
             </if>
             <if test="userIds != null and userIds !=''">
                 <if test="userIds.indexOf(',') != -1">
-                    and  wfcr.user_id in
+                    AND  wfcr.user_id in
                     <foreach item="item" index="index" collection="userIds.split(',')" open="(" separator="," close=")">
                         #{item}
                     </foreach>
                 </if>
                 <if test="userIds.indexOf(',') == -1">
-                    and  wfcr.user_id=#{userIds}
+                    AND  wfcr.user_id=#{userIds}
                 </if>
             </if>
-
-            <if test="tagIds != null and tagIds !=''">
-                <if test="tagIds.indexOf(',') != -1">
-                    and  wt.tag_id in
-                    <foreach item="item" index="index" collection="tagIds.split(',')" open="(" separator="," close=")">
-                        #{item}
-                    </foreach>
-                </if>
-                <if test="tagIds.indexOf(',') == -1">
-                    and  wt.tag_id=#{tagIds}
-                </if>
-            </if>
-
             <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
-                AND date_format(wfcr.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
-            </if>
-            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
-                AND date_format(wfcr.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+                    AND date_format(wfcr.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
             </if>
 
-            <if test="status != null and status !=''">
-                AND wfcr.status = #{status}
-            </if>
+             <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                   AND date_format(wfcr.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+             </if>
+
+
+             <if test="tagIds != null and tagIds !=''">
+                   <if test="tagIds.indexOf(',') != -1">
+                       AND  wt.tag_id in
+                                <foreach item="item" index="index" collection="tagIds.split(',')" open="(" separator="," close=")">
+                                    #{item}
+                                </foreach>
+                            </if>
+                            <if test="tagIds.indexOf(',') == -1">
+                       AND  wt.tag_id=#{tagIds}
+                   </if>
+             </if>
+
         </where>
+        ORDER BY wfcr.create_time DESC
+<!--          SELECT-->
+<!--                  wc.external_userid,-->
+<!--                  wc.`name`,-->
+<!--                  wc.avatar,-->
+<!--                  wc.type,-->
+<!--                  wc.gender,-->
+<!--                  wc.unionid,-->
+<!--                  wc.birthday,-->
+<!--                  wc.corp_name,-->
+<!--                  wc.corp_full_name,-->
+<!--                  wc.position,-->
+<!--                  wfcr.id as wfcrId,-->
+<!--                  wfcr.user_id,-->
+<!--                  wfcr.remark,-->
+<!--                  wfcr.description,-->
+<!--                  wfcr.create_time,-->
+<!--                  wfcr.remark_corp_name,-->
+<!--                  wfcr.oper_userid,-->
+<!--                  wfcr.add_way,-->
+<!--                  wfcr.state,-->
+<!--                  wfcr.status,-->
+<!--                  wu.user_name,-->
+<!--                  wfcrf.flower_customer_rel_id,-->
+<!--                  wt.tag_id,-->
+<!--                  wt.`name` as tagName,-->
+<!--                  (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department-->
+<!--        FROM-->
+<!--            we_customer wc-->
+<!--        LEFT JOIN we_flower_customer_rel wfcr ON wc.external_userid=wfcr.external_userid-->
+<!--        LEFT JOIN we_user wu ON wu.user_id=wfcr.user_id-->
+<!--        LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.flower_customer_rel_id = wfcr.id-->
+<!--        INNER JOIN we_tag wt ON wt.tag_id = wfcrf.tag_id-->
+<!--        <where>-->
+<!--            <if test="name != null and name !=''">-->
+<!--                AND wc.name like concat('%', #{name}, '%')-->
+<!--            </if>-->
+<!--            <if test="userIds != null and userIds !=''">-->
+<!--                <if test="userIds.indexOf(',') != -1">-->
+<!--                    and  wfcr.user_id in-->
+<!--                    <foreach item="item" index="index" collection="userIds.split(',')" open="(" separator="," close=")">-->
+<!--                        #{item}-->
+<!--                    </foreach>-->
+<!--                </if>-->
+<!--                <if test="userIds.indexOf(',') == -1">-->
+<!--                    and  wfcr.user_id=#{userIds}-->
+<!--                </if>-->
+<!--            </if>-->
+
+<!--            <if test="tagIds != null and tagIds !=''">-->
+<!--                <if test="tagIds.indexOf(',') != -1">-->
+<!--                    and  wt.tag_id in-->
+<!--                    <foreach item="item" index="index" collection="tagIds.split(',')" open="(" separator="," close=")">-->
+<!--                        #{item}-->
+<!--                    </foreach>-->
+<!--                </if>-->
+<!--                <if test="tagIds.indexOf(',') == -1">-->
+<!--                    and  wt.tag_id=#{tagIds}-->
+<!--                </if>-->
+<!--            </if>-->
+
+<!--            <if test="beginTime != null and beginTime != ''">&lt;!&ndash; 开始时间检索 &ndash;&gt;-->
+<!--                AND date_format(wfcr.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')-->
+<!--            </if>-->
+<!--            <if test="endTime != null and endTime != ''">&lt;!&ndash; 结束时间检索 &ndash;&gt;-->
+<!--                AND date_format(wfcr.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')-->
+<!--            </if>-->
+
+<!--            <if test="status != null and status !=''">-->
+<!--                AND wfcr.status = #{status}-->
+<!--            </if>-->
+<!--        </where>-->
     </select>
+
+
+    <select id="selectWeCustomerTags" resultMap="weFlowerCustomerRelsMapper">
+        SELECT
+                wfcrf.flower_customer_rel_id,
+                wt.tag_id,
+               wt.`name` as tagName
+        FROM
+            we_flower_customer_tag_rel wfcrf
+        LEFT JOIN we_tag wt ON wt.tag_id = wfcrf.tag_id
+        where wfcrf.flower_customer_rel_id=#{id}
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     <select id="selectWeCustomerById" parameterType="String" resultMap="WeCustomerResult">
         <include refid="selectWeCustomerVo"/>
