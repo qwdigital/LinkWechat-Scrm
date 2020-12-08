@@ -33,6 +33,8 @@ public class WeCustomerController extends BaseController
     @Autowired
     private IWeCustomerService weCustomerService;
 
+
+
     /**
      * 查询企业微信客户列表
      */
@@ -41,6 +43,7 @@ public class WeCustomerController extends BaseController
     public TableDataInfo list(WeCustomer weCustomer)
     {
         startPage();
+
         List<WeCustomer> list = weCustomerService.selectWeCustomerList(weCustomer);
         return getDataTable(list);
     }
