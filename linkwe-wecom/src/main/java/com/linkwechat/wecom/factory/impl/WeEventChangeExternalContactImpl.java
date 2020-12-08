@@ -2,31 +2,27 @@ package com.linkwechat.wecom.factory.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.MediaType;
+import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.Threads;
-import com.linkwechat.wecom.domain.WeEmpleCodeTag;
-import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
-import com.linkwechat.wecom.domain.WeFlowerCustomerTagRel;
+import com.linkwechat.wecom.client.WeMessagePushClient;
+import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
+import com.linkwechat.wecom.domain.dto.WeMessagePushDto;
 import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
+import com.linkwechat.wecom.domain.dto.message.TextMessageDto;
 import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 import com.linkwechat.wecom.factory.WeCallBackEventFactory;
 import com.linkwechat.wecom.service.*;
 import lombok.extern.slf4j.Slf4j;
-
-import me.chanjar.weixin.cp.bean.external.msg.Image;
-import me.chanjar.weixin.cp.bean.external.msg.Text;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author danmo
@@ -48,6 +44,11 @@ public class WeEventChangeExternalContactImpl implements WeCallBackEventFactory 
     private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
     @Autowired
     private IWeMaterialService weMaterialService;
+    @Autowired
+    private WeMessagePushClient weMessagePushClient;
+    @Autowired
+    private IWeCorpAccountService weCorpAccountService;
+
 
     @Override
     public void eventHandle(WxCpXmlMessageVO message) {
@@ -88,9 +89,33 @@ public class WeEventChangeExternalContactImpl implements WeCallBackEventFactory 
     }
 
     private void delFollowUser(WxCpXmlMessageVO message) {
-        if (message.getUserId() != null && message.getExternalUserId() != null) {
-            weFlowerCustomerRelService.deleteFollowUser(message.getUserId(), message.getExternalUserId());
-        }
+        Threads.SINGLE_THREAD_POOL.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (message.getUserId() != null && message.getExternalUserId() != null) {
+                    weFlowerCustomerRelService.deleteFollowUser(message.getUserId(), message.getExternalUserId());
+                    WeCorpAccount validWeCorpAccount = weCorpAccountService.findValidWeCorpAccount();
+                    Optional.ofNullable(validWeCorpAccount).ifPresent(weCorpAccount -> {
+                        String customerChurnNoticeSwitch = weCorpAccount.getCustomerChurnNoticeSwitch();
+                        if (WeConstans.DEL_FOLLOW_USER_SWITCH_OPEN.equals(customerChurnNoticeSwitch)){
+                            WeCustomer weCustomer = weCustomerService.getById(message.getExternalUserId());
+                            String content = "您已经被客户@"+weCustomer.getName()+"删除!" ;
+                            TextMessageDto textMessageDto = new TextMessageDto();
+                            textMessageDto.setContent(content);
+                            List<String> userIdList = Arrays.stream(message.getUserId().split(",")).collect(Collectors.toList());
+                            WeMessagePushDto weMessagePushDto = new WeMessagePushDto();
+                            weMessagePushDto.setMsgtype(MessageType.TEXT.getMessageType());
+                            weMessagePushDto.setTouser(userIdList);
+                            weMessagePushDto.setText(textMessageDto);
+                            Optional.ofNullable(validWeCorpAccount).map(WeCorpAccount::getAgentId).ifPresent(agentId -> {
+                                weMessagePushDto.setAgentid(Integer.valueOf(agentId));
+                            });
+                            weMessagePushClient.sendMessageToUser(weMessagePushDto);
+                        }
+                    });
+                }
+            }
+        });
     }
 
     private void delExternalContact(WxCpXmlMessageVO message) {

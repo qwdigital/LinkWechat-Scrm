@@ -69,5 +69,6 @@ public class WeCorpAccount extends BaseEntity
     @ApiModelProperty("企业微信扫码登陆回调地址")
     private String wxQrLoginRedirectUri;
 
-
+    @ApiModelProperty("客户流失通知开关 0:关闭 1:开启")
+    private String customerChurnNoticeSwitch = new String("0");
 }

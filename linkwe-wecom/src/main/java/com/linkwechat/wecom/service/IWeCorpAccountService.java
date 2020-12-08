@@ -60,4 +60,10 @@ public interface IWeCorpAccountService
      */
     public int startVailWeCorpAccount(String corpId);
 
+    /**
+     * 客户流失通知开关
+     * @param status 开关状态
+     * @return
+     */
+    public int startCustomerChurnNoticeSwitch(String status);
 }

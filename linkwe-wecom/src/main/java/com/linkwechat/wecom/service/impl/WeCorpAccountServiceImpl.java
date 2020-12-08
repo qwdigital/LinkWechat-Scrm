@@ -95,7 +95,12 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
         return weCorpAccountMapper.startVailWeCorpAccount(corpId);
     }
 
-
+    @Override
+    public int startCustomerChurnNoticeSwitch(String status) {
+        WeCorpAccount validWeCorpAccount = findValidWeCorpAccount();
+        validWeCorpAccount.setCustomerChurnNoticeSwitch(status);
+        return weCorpAccountMapper.updateWeCorpAccount(validWeCorpAccount);
+    }
 
 
 }

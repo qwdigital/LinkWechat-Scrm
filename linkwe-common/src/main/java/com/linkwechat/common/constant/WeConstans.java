@@ -1,5 +1,9 @@
 package com.linkwechat.common.constant;
 
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -200,6 +204,11 @@ public class WeConstans {
     public static final Integer USE_SCOP_BUSINESSID_TYPE_ORG = 1;
 
     /**
+     * 客户流失通知开关 0:关闭 1:开启
+     */
+    public static final String DEL_FOLLOW_USER_SWITCH_CLOSE = "0";
+    public static final String DEL_FOLLOW_USER_SWITCH_OPEN = "1";
+    /**
      * 企微回调事件类型路由
      */
     public final static Map<String, String> eventRoute = new HashMap<String, String>() {
@@ -259,5 +268,39 @@ public class WeConstans {
             this.value = value;
         }
 
+    }
+
+    public static XContentBuilder getFinanceTextMapping() throws IOException {
+        // 创建 会话文本Mapping
+        XContentBuilder xContentBuilder = XContentFactory.jsonBuilder()
+                .startObject()
+                .startObject("properties")
+                .startObject("msgid")
+                .field("type", "keyword")
+                .endObject()
+                .startObject("action")
+                .field("type", "keyword")
+                .endObject()
+                .startObject("from")
+                .field("type", "keyword")
+                .endObject()
+                .startObject("tolist")
+                .field("type", "text")
+                .endObject()
+                .startObject("roomid")
+                .field("type", "keyword")
+                .endObject()
+                .startObject("msgtime")
+                .field("type", "long")
+                .endObject()
+                .startObject("msgtype")
+                .field("type", "keyword")
+                .endObject()
+                .startObject("content")
+                .field("type", "text")
+                .endObject()
+                .endObject()
+                .endObject();
+        return xContentBuilder;
     }
 }

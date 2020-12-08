@@ -1,5 +1,9 @@
 package com.linkwechat.wecom.domain.dto;
 
+import com.linkwechat.wecom.domain.dto.message.ImageMessageDto;
+import com.linkwechat.wecom.domain.dto.message.LinkMessageDto;
+import com.linkwechat.wecom.domain.dto.message.MiniprogramMessageDto;
+import com.linkwechat.wecom.domain.dto.message.TextMessageDto;
 import lombok.Data;
 
 import java.util.List;
@@ -9,19 +13,19 @@ import java.util.List;
 public class WeMessagePushDto {
 
     /**
-     * 指定接收消息的成员，成员ID列表（多个接收者用‘|’分隔，最多支持1000个）。
+     * 指定接收消息的成员，成员ID列表（多个接收者用‘,’分隔，最多支持1000个）。
      * 特殊情况：指定为”@all”，则向该企业应用的全部成员发送
      */
     private List<String> touser;
 
     /**
-     * 指定接收消息的部门，部门ID列表，多个接收者用‘|’分隔，最多支持100个。
+     * 指定接收消息的部门，部门ID列表，多个接收者用‘,’分隔，最多支持100个。
      * 当touser为”@all”时忽略本参数
      */
     private List<String> toparty;
 
     /**
-     * 指定接收消息的标签，标签ID列表，多个接收者用‘|’分隔，最多支持100个。
+     * 指定接收消息的标签，标签ID列表，多个接收者用‘,’分隔，最多支持100个。
      * 当touser为”@all”时忽略本参数
      */
     private List<String> totag;
@@ -61,5 +65,24 @@ public class WeMessagePushDto {
      *  根据msgtype的值不同添加一个属性和对应的属性值
      */
 
+    /**
+     *文本消息
+     */
+    private TextMessageDto text;
+
+    /**
+     * 图片消息
+     */
+    private ImageMessageDto image;
+
+    /**
+     * 链接消息
+     */
+    private LinkMessageDto link;
+
+    /**
+     * 小程序消息
+     */
+    private MiniprogramMessageDto miniprogram;
 
 }
