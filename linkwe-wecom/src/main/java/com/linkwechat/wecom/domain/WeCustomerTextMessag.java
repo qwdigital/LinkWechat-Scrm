@@ -23,7 +23,7 @@ public class WeCustomerTextMessag extends BaseEntity {
     /**
      * 主键id
      */
-    private Long textMessage;
+    private Long textMessageId;
 
     /**
      * 微信消息表id
