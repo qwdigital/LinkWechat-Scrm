@@ -11,8 +11,15 @@ export default {
       dialogVisible: false,
       // dialogVisible1: false,
       dialogVisibleSelectMaterial: false,
-      form: { id: '', mediaId: '', welcomeMsgTplType: '', welcomeMsg: '' },
-      materialSelected: '',
+      form: {
+        id: '',
+        mediaId: '',
+        welcomeMsgTplType: '',
+        welcomeMsg: '',
+        materialUrl: '',
+      },
+      // 遮罩层
+      loading: false,
     }
   },
   watch: {},
@@ -25,6 +32,14 @@ export default {
     getData() {},
     submit() {
       ;(this.form.id ? update : add)(this.form)
+        .then(({ data }) => {
+          this.msgSuccess('操作成功')
+          this.loading = false
+          this.$router.back()
+        })
+        .catch(() => {
+          this.loading = false
+        })
     },
     insertName() {
       this.form.welcomeMsg += '#客户昵称#'
@@ -32,19 +47,19 @@ export default {
     // 选择素材确认按钮
     submitSelectMaterial(text, image, file) {
       this.form.mediaId = image.id
-      this.materialSelected = image.materialUrl
+      this.form.materialUrl = image.materialUrl
       this.dialogVisibleSelectMaterial = false
     },
     removeMaterial() {
       this.form.mediaId = ''
-      this.materialSelected = ''
+      this.form.materialUrl = ''
     },
   },
 }
 </script>
 
 <template>
-  <div class="flex page">
+  <div class="flex page" v-loading="loading">
     <el-form ref="form" :model="form" label-width="80px" class="form">
       <el-form-item label="欢迎语">
         <el-card shadow="never" class="card">
@@ -69,10 +84,10 @@ export default {
             >
           </div>
           <el-divider></el-divider>
-          <div v-if="materialSelected">
+          <div v-if="form.materialUrl">
             <el-image
               style="width: 100px; height: 100px; cursor: pointer;border-radius: 6px;"
-              :src="materialSelected"
+              :src="form.materialUrl"
               fit="fit"
             >
             </el-image>
@@ -119,11 +134,11 @@ export default {
     <PhoneDialog
       style="margin-left: 10%;"
       :message="form.welcomeMsg || '请输入欢迎语'"
-      :isOther="!!materialSelected"
+      :isOther="!!form.materialUrl"
     >
       <el-image
         style="width: 100px; height: 100px; cursor: pointer;border-radius: 6px;"
-        :src="materialSelected"
+        :src="form.materialUrl"
         fit="fit"
       >
       </el-image

@@ -69,8 +69,8 @@ export default {
     goRoute(data) {
       let query = {}
       if (data) {
-        let { id, welcomeMsgTplType, welcomeMsg } = data
-        query = { id, welcomeMsgTplType, welcomeMsg }
+        let { id, welcomeMsgTplType, welcomeMsg, materialUrl } = data
+        query = { id, welcomeMsgTplType, welcomeMsg, materialUrl }
       } else {
         query.welcomeMsgTplType = this.type
       }
