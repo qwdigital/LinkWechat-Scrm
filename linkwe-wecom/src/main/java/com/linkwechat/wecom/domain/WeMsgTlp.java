@@ -37,6 +37,8 @@ public class WeMsgTlp extends BaseEntity
     /** 欢迎语模板使用范围 */
     private List<WeMsgTlpScope> weMsgTlpScopes;
 
+    private String materialUrl;
+
 
 
 }

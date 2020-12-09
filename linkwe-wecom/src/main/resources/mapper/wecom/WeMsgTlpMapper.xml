@@ -12,6 +12,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="welcomeMsgTplType"    column="welcome_msg_tpl_type"    />
         <result property="createBy" column="create_by" />
         <result property="createTime" column="create_time" />
+        <result property="materialUrl" column="material_url"/>
     </resultMap>
 
     <sql id="selectWeMsgTlpVo">
@@ -19,14 +20,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </sql>
 
     <select id="selectWeMsgTlpList" parameterType="WeMsgTlp" resultMap="WeMsgTlpResult">
-        <include refid="selectWeMsgTlpVo"/>
+        SELECT
+            wmt.id,
+            wmt.welcome_msg,
+            wmt.media_id,
+            wmt.del_flag,
+            wmt.welcome_msg_tpl_type,
+            wmt.create_by,
+            wmt.create_time,
+            wm.material_url
+        FROM
+        we_msg_tlp wmt
+        INNER JOIN we_material wm ON wmt.media_id=wm.id
         <where>  
-            <if test="welcomeMsg != null  and welcomeMsg != ''"> and welcome_msg like CONCAT('%',#{welcomeMsg,jdbcType=VARCHAR},'%') </if>
-            <if test="mediaId != null "> and media_id = #{mediaId}</if>
-            <if test="welcomeMsgTplType != null "> and welcome_msg_tpl_type = #{welcomeMsgTplType}</if>
-            <if test="delFlag != null ">and del_flag = #{delFlag}</if>
+            <if test="welcomeMsg != null  and welcomeMsg != ''"> and wmt.welcome_msg like CONCAT('%',#{welcomeMsg,jdbcType=VARCHAR},'%') </if>
         </where>
     </select>
+
     
     <select id="selectWeMsgTlpById" parameterType="Long" resultMap="WeMsgTlpResult">
         <include refid="selectWeMsgTlpVo"/>
@@ -41,6 +51,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mediaId != null">media_id,</if>
             <if test="delFlag != null">del_flag,</if>
             <if test="welcomeMsgTplType != null">welcome_msg_tpl_type,</if>
+            <if test="createBy != null ">create_by,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -48,6 +59,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mediaId != null">#{mediaId},</if>
             <if test="delFlag != null">#{delFlag},</if>
             <if test="welcomeMsgTplType != null">#{welcomeMsgTplType},</if>
+            <if test="createBy != null ">#{createBy},</if>
          </trim>
     </insert>
 

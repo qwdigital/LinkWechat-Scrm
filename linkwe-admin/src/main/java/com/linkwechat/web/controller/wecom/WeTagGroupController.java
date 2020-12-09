@@ -44,19 +44,7 @@ public class WeTagGroupController extends BaseController
     public TableDataInfo list(WeTagGroup weTagGroup)
     {
         startPage();
-
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-
-        //异步同步一下标签库,解决标签不同步问题
-        Threads.SINGLE_THREAD_POOL.execute(new Runnable() {
-            @Override
-            public void run() {
-                SecurityContextHolder.setContext(securityContext);
-                weTagGroupService.synchWeTags();
-            }
-        });
-
-
+        synchWeTags();
         return getDataTable(
                 weTagGroupService.selectWeTagGroupList(weTagGroup)
         );
@@ -109,7 +97,16 @@ public class WeTagGroupController extends BaseController
     @GetMapping("/synchWeTags")
     public AjaxResult synchWeTags(){
 
-        weTagGroupService.synchWeTags();
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        //异步同步一下标签库,解决标签不同步问题
+        Threads.SINGLE_THREAD_POOL.execute(new Runnable() {
+            @Override
+            public void run() {
+                SecurityContextHolder.setContext(securityContext);
+                weTagGroupService.synchWeTags();
+            }
+        });
 
         return  AjaxResult.success(WeConstans.SYNCH_TIP);
     }

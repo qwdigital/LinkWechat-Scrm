@@ -60,6 +60,7 @@ public interface IWeTagGroupService  extends IService<WeTagGroup>
     /**
      * 来自微信端批量保存或者更新标签组和标签
      * @param tagGroup
+     * @param isSync
      */
-    public void batchSaveOrUpdateTagGroupAndTag(List<WeCropGroupTagDto> tagGroup);
+    public void batchSaveOrUpdateTagGroupAndTag(List<WeCropGroupTagDto> tagGroup,Boolean isSync);
 }

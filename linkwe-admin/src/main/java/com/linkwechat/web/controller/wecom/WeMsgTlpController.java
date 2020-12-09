@@ -63,7 +63,7 @@ public class WeMsgTlpController extends BaseController
      * 新增欢迎语模板
      */
     @PreAuthorize("@ss.hasPermi('wecom:tlp:add')")
-    @Log(title = "欢迎语模板", businessType = BusinessType.INSERT)
+    @Log(title = "新增欢迎语模板", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody WeMsgTlp weMsgTlp)
     {
@@ -74,7 +74,7 @@ public class WeMsgTlpController extends BaseController
      * 修改欢迎语模板
      */
     @PreAuthorize("@ss.hasPermi('wecom:tlp:edit')")
-    @Log(title = "欢迎语模板", businessType = BusinessType.UPDATE)
+    @Log(title = "修改欢迎语模板", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody WeMsgTlp weMsgTlp)
     {
@@ -85,7 +85,7 @@ public class WeMsgTlpController extends BaseController
      * 删除欢迎语模板
      */
     @PreAuthorize("@ss.hasPermi('wecom:tlp:remove')")
-    @Log(title = "欢迎语模板", businessType = BusinessType.DELETE)
+    @Log(title = "删除欢迎语模板", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)
     {

@@ -4,24 +4,16 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.api.R;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
-import com.linkwechat.common.constant.UserConstants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.wecom.client.WeCropTagClient;
-import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeTag;
 import com.linkwechat.wecom.domain.WeTagGroup;
 import com.linkwechat.wecom.domain.dto.tag.*;
 import com.linkwechat.wecom.mapper.WeTagGroupMapper;
-import com.linkwechat.wecom.mapper.WeTagMapper;
 import com.linkwechat.wecom.service.IWeTagGroupService;
 import com.linkwechat.wecom.service.IWeTagService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 标签组Service业务层处理
@@ -92,7 +82,7 @@ public class WeTagGroupServiceImpl  extends ServiceImpl<WeTagGroupMapper,WeTagGr
             WeCropGropTagDtlDto weCropGropTagDtlDto = weCropTagClient.addCorpTag(WeCropGroupTagDto.transformAddTag(weTagGroup));
 
             if(weCropGropTagDtlDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
-                this.batchSaveOrUpdateTagGroupAndTag(ListUtil.toList(weCropGropTagDtlDto.getTag_group()));
+                this.batchSaveOrUpdateTagGroupAndTag(ListUtil.toList(weCropGropTagDtlDto.getTag_group()),false);
             }
 
         }
@@ -116,6 +106,7 @@ public class WeTagGroupServiceImpl  extends ServiceImpl<WeTagGroupMapper,WeTagGr
             //获取新增的集合
             if(CollectionUtil.isNotEmpty(weTags)) {
                 List<WeTag> filterWeTags = weTags.stream().filter(v -> StringUtils.isEmpty(v.getTagId())).collect(Collectors.toList());
+
                 //同步新增标签到微信端
                 if(CollectionUtil.isNotEmpty(WeCropGroupTagDto.transformAddTag(weTagGroup).getTag())){
                     WeCropGropTagDtlDto
@@ -134,7 +125,7 @@ public class WeTagGroupServiceImpl  extends ServiceImpl<WeTagGroupMapper,WeTagGr
 
 
                 //获取需要删除的数据
-                List<WeTag> removeWeTags = iWeTagService.list( new LambdaQueryWrapper<WeTag>().notIn(WeTag::getTagId,
+                List<WeTag> removeWeTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>().notIn(WeTag::getTagId,
                         weTags.stream().map(WeTag::getTagId).collect(Collectors.toList())).eq(WeTag::getGroupId,weTagGroup.getGroupId())
                 .eq(WeTag::getStatus,Constants.NORMAL_CODE));
 
@@ -207,7 +198,7 @@ public class WeTagGroupServiceImpl  extends ServiceImpl<WeTagGroupMapper,WeTagGr
         WeCropGroupTagListDto weCropGroupTagListDto = weCropTagClient.getAllCorpTagList();
 
         if(weCropGroupTagListDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
-            this.batchSaveOrUpdateTagGroupAndTag(weCropGroupTagListDto.getTag_group());
+            this.batchSaveOrUpdateTagGroupAndTag(weCropGroupTagListDto.getTag_group(),true);
         }
 
     }
@@ -216,10 +207,11 @@ public class WeTagGroupServiceImpl  extends ServiceImpl<WeTagGroupMapper,WeTagGr
     /**
      * 来自微信端批量保存或者更新标签组和标签
      * @param tagGroup
+     * @param isSync 是否同步
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void batchSaveOrUpdateTagGroupAndTag(List<WeCropGroupTagDto> tagGroup) {
+    public void batchSaveOrUpdateTagGroupAndTag(List<WeCropGroupTagDto> tagGroup,Boolean isSync) {
 
         List<WeTagGroup> weTagGroups=new ArrayList<>();
 
@@ -252,13 +244,16 @@ public class WeTagGroupServiceImpl  extends ServiceImpl<WeTagGroupMapper,WeTagGr
         //先逻辑删除不存在得组
         if(CollectionUtil.isNotEmpty(weTagGroups)){
 
-            List<WeTagGroup> noExist
-                    = this.list(new LambdaQueryWrapper<WeTagGroup>().notIn(WeTagGroup::getGroupId, weTagGroups.stream().map(WeTagGroup::getGroupId).collect(Collectors.toList())));
-           //企业微信端删除得标签
-            if(CollectionUtil.isNotEmpty(noExist)){
-                noExist.stream().forEach(k->k.setStatus(Constants.DELETE_CODE));
-                this.updateBatchById(noExist);
+            if(isSync){
+                List<WeTagGroup> noExist
+                        = this.list(new LambdaQueryWrapper<WeTagGroup>().notIn(WeTagGroup::getGroupId, weTagGroups.stream().map(WeTagGroup::getGroupId).collect(Collectors.toList())));
+                //企业微信端删除得标签
+                if(CollectionUtil.isNotEmpty(noExist)){
+                    noExist.stream().forEach(k->k.setStatus(Constants.DELETE_CODE));
+                    this.updateBatchById(noExist);
+                }
             }
+
 
             this.saveOrUpdateBatch(weTagGroups);
 
@@ -267,15 +262,39 @@ public class WeTagGroupServiceImpl  extends ServiceImpl<WeTagGroupMapper,WeTagGr
 
             if(CollectionUtil.isNotEmpty(weTags)){
 
-                List<WeTag> noExistWeTags
-                        = iWeTagService.list(new LambdaQueryWrapper<WeTag>().notIn(WeTag::getTagId, weTags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
-                if(CollectionUtil.isNotEmpty(noExistWeTags)){
-                    noExistWeTags.stream().forEach(k->k.setStatus(Constants.DELETE_CODE));
-                    iWeTagService.updateBatchById(noExistWeTags);
+                if(isSync){
+
+                    List<WeTag> noExistWeTags
+                            = iWeTagService.list(new LambdaQueryWrapper<WeTag>().notIn(WeTag::getTagId, weTags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
+                    if(CollectionUtil.isNotEmpty(noExistWeTags)){
+                        noExistWeTags.stream().forEach(k->k.setStatus(Constants.DELETE_CODE));
+                        iWeTagService.updateBatchById(noExistWeTags);
+                    }
+
                 }
+
 
                 iWeTagService.saveOrUpdateBatch(weTags);
 
+            }
+
+
+        }else{//不存在删除所有标签组,以标签
+
+            if(isSync){
+                List<WeTagGroup> weTagGroupList
+                        = this.list(new LambdaQueryWrapper<WeTagGroup>().eq(WeTagGroup::getStatus, Constants.NORMAL_CODE));
+
+                if(CollectionUtil.isNotEmpty(weTagGroupList)){
+                    weTagGroupList.stream().forEach(k->k.setStatus(Constants.DELETE_CODE));
+                    this.updateBatchById(weTagGroupList);
+                }
+                List<WeTag> weTags
+                        = iWeTagService.list(new LambdaQueryWrapper<WeTag>().eq(WeTag::getStatus, Constants.NORMAL_CODE));
+                if(CollectionUtil.isNotEmpty(weTags)){
+                    weTags.stream().forEach(k->k.setStatus(Constants.DELETE_CODE));
+                    iWeTagService.updateBatchById(weTags);
+                }
             }
 
 

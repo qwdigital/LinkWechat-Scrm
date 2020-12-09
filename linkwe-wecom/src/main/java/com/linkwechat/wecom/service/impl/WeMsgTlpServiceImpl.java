@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.wecom.domain.WeMsgTlpScope;
 import com.linkwechat.wecom.service.IWeMsgTlpScopeService;
@@ -61,33 +62,32 @@ public class WeMsgTlpServiceImpl implements IWeMsgTlpService
      * @return 结果
      */
     @Override
-    @Transactional
     public int insertWeMsgTlp(WeMsgTlp weMsgTlp)
     {
-        
-        int returnCode = weMsgTlpMapper.insertWeMsgTlp(weMsgTlp);
-
-        if(returnCode>0){
-            List<WeMsgTlpScope> weMsgTlpScopess = weMsgTlp.getWeMsgTlpScopes();
-            if(CollectionUtil.isNotEmpty(weMsgTlpScopess)){
-
-                List<WeMsgTlpScope> weMsgTlpScopes=weMsgTlp.getWeMsgTlpScopes().stream().filter(c -> c.getUseUserId() != null).collect(Collectors.toList());
-                if(CollectionUtil.isNotEmpty(weMsgTlpScopes)){
-
-                    weMsgTlpScopes.forEach(v->{
-                        v.setMsgTlpId(weMsgTlp.getId());
-                        v.setId(SnowFlakeUtil.nextId());
-                    });
-
-                    iWeMsgTlpScopeService.batchInsetWeMsgTlpScope(weMsgTlpScopes);
-                }
-
-            }
+        weMsgTlp.setCreateBy(SecurityUtils.getUsername());
 
 
+        return weMsgTlpMapper.insertWeMsgTlp(weMsgTlp);
 
-        }
-        return returnCode;
+//        if(returnCode>0){
+//            List<WeMsgTlpScope> weMsgTlpScopess = weMsgTlp.getWeMsgTlpScopes();
+//            if(CollectionUtil.isNotEmpty(weMsgTlpScopess)){
+//
+//                List<WeMsgTlpScope> weMsgTlpScopes=weMsgTlp.getWeMsgTlpScopes().stream().filter(c -> c.getUseUserId() != null).collect(Collectors.toList());
+//                if(CollectionUtil.isNotEmpty(weMsgTlpScopes)){
+//
+//                    weMsgTlpScopes.forEach(v->{
+//                        v.setMsgTlpId(weMsgTlp.getId());
+//                        v.setId(SnowFlakeUtil.nextId());
+//                    });
+//
+//                    iWeMsgTlpScopeService.batchInsetWeMsgTlpScope(weMsgTlpScopes);
+//                }
+//
+//            }
+//        }
+
+//        return returnCode;
     }
 
     /**
@@ -97,22 +97,21 @@ public class WeMsgTlpServiceImpl implements IWeMsgTlpService
      * @return 结果
      */
     @Override
-    @Transactional
     public int updateWeMsgTlp(WeMsgTlp weMsgTlp)
     {
 
-        int returnCode = weMsgTlpMapper.updateWeMsgTlp(weMsgTlp);
-
-        if(returnCode>0){
-            iWeMsgTlpScopeService.batchRemoveWeMsgTlpScopesByMsgTlpIds(ListUtil.toList(weMsgTlp.getId()));
-            List<WeMsgTlpScope> weMsgTlpScopes = weMsgTlp.getWeMsgTlpScopes().stream().filter(c -> c.getUseUserId() != null).collect(Collectors.toList());
-
-            if(CollectionUtil.isNotEmpty(weMsgTlpScopes)){
-                weMsgTlpScopes.stream().forEach(v->v.setMsgTlpId(weMsgTlp.getId()));
-                iWeMsgTlpScopeService.batchInsetWeMsgTlpScope(weMsgTlpScopes);
-            }
-
-        }
+//        int returnCode = weMsgTlpMapper.updateWeMsgTlp(weMsgTlp);
+//
+//        if(returnCode>0){
+//            iWeMsgTlpScopeService.batchRemoveWeMsgTlpScopesByMsgTlpIds(ListUtil.toList(weMsgTlp.getId()));
+//            List<WeMsgTlpScope> weMsgTlpScopes = weMsgTlp.getWeMsgTlpScopes().stream().filter(c -> c.getUseUserId() != null).collect(Collectors.toList());
+//
+//            if(CollectionUtil.isNotEmpty(weMsgTlpScopes)){
+//                weMsgTlpScopes.stream().forEach(v->v.setMsgTlpId(weMsgTlp.getId()));
+//                iWeMsgTlpScopeService.batchInsetWeMsgTlpScope(weMsgTlpScopes);
+//            }
+//
+//        }
 
         return weMsgTlpMapper.updateWeMsgTlp(weMsgTlp);
     }
