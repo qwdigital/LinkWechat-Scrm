@@ -70,5 +70,5 @@ public interface IWeCorpAccountService
     /**
      * 客户流失通知开关查询
      */
-    public Boolean getCustomerChurnNoticeSwitch();
+    public String getCustomerChurnNoticeSwitch();
 }

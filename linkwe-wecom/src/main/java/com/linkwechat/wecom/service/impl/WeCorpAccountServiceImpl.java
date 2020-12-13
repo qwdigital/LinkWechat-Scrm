@@ -105,22 +105,11 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     }
 
     @Override
-    public Boolean getCustomerChurnNoticeSwitch() {
-        boolean flag = false;
+    public String getCustomerChurnNoticeSwitch() {
         WeCorpAccount validWeCorpAccount = weCorpAccountMapper.findValidWeCorpAccount();
         String noticeSwitch = Optional.ofNullable(validWeCorpAccount).map(WeCorpAccount::getCustomerChurnNoticeSwitch)
                 .orElse(WeConstans.DEL_FOLLOW_USER_SWITCH_CLOSE);
-        switch (noticeSwitch){
-            case WeConstans.DEL_FOLLOW_USER_SWITCH_CLOSE:
-                flag =  false;
-                break;
-            case WeConstans.DEL_FOLLOW_USER_SWITCH_OPEN:
-                flag =true;
-                break;
-            default:
-                break;
-        }
-        return flag;
+        return noticeSwitch;
     }
 
 
