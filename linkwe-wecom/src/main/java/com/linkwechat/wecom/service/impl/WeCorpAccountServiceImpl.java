@@ -1,8 +1,10 @@
 package com.linkwechat.wecom.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +102,25 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
         WeCorpAccount validWeCorpAccount = findValidWeCorpAccount();
         validWeCorpAccount.setCustomerChurnNoticeSwitch(status);
         return weCorpAccountMapper.updateWeCorpAccount(validWeCorpAccount);
+    }
+
+    @Override
+    public Boolean getCustomerChurnNoticeSwitch() {
+        boolean flag = false;
+        WeCorpAccount validWeCorpAccount = weCorpAccountMapper.findValidWeCorpAccount();
+        String noticeSwitch = Optional.ofNullable(validWeCorpAccount).map(WeCorpAccount::getCustomerChurnNoticeSwitch)
+                .orElse(WeConstans.DEL_FOLLOW_USER_SWITCH_CLOSE);
+        switch (noticeSwitch){
+            case WeConstans.DEL_FOLLOW_USER_SWITCH_CLOSE:
+                flag =  false;
+                break;
+            case WeConstans.DEL_FOLLOW_USER_SWITCH_OPEN:
+                flag =true;
+                break;
+            default:
+                break;
+        }
+        return flag;
     }
 
 
