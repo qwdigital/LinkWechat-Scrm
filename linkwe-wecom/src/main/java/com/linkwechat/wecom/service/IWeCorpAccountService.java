@@ -66,4 +66,9 @@ public interface IWeCorpAccountService
      * @return
      */
     public int startCustomerChurnNoticeSwitch(String status);
+
+    /**
+     * 客户流失通知开关查询
+     */
+    public String getCustomerChurnNoticeSwitch();
 }

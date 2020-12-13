@@ -94,4 +94,15 @@ public class WeCorpAccountController extends BaseController
         return toAjax(weCorpAccountService.startCustomerChurnNoticeSwitch(status));
     }
 
+    /**
+     * 客户流失通知开关查询
+     */
+    @PreAuthorize("@ss.hasPermi('wechat:corp:getCustomerChurnNoticeSwitch')")
+    @Log(title = "客户流失通知开关查询", businessType = BusinessType.OTHER)
+    @GetMapping("/getCustomerChurnNoticeSwitch")
+    public AjaxResult getCustomerChurnNoticeSwitch()
+    {
+        return AjaxResult.success(weCorpAccountService.getCustomerChurnNoticeSwitch());
+    }
+
 }
