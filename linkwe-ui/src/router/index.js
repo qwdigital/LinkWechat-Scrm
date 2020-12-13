@@ -107,6 +107,13 @@ export const constantRoutes = [
   //       component: (resolve) => require(['@/views/customerManage/dimission'], resolve),
   //       meta: { title: '离职继承', icon: '' }
   //     },
+  //     {
+  //       path: 'lossRemind',
+  //       name: 'lossRemind',
+  //       component: (resolve) =>
+  //         require(['@/views/customerManage/lossRemind'], resolve),
+  //       meta: { title: '流失提醒', icon: '' },
+  //     },
   //   ]
   // },
   // {
