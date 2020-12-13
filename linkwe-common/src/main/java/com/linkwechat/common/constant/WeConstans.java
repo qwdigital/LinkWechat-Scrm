@@ -267,38 +267,6 @@ public class WeConstans {
         }
 
     }
-//
-//    public static XContentBuilder getFinanceTextMapping() throws IOException {
-//        // 创建 会话文本Mapping
-//        XContentBuilder xContentBuilder = XContentFactory.jsonBuilder()
-//                .startObject()
-//                .startObject("properties")
-//                .startObject("msgid")
-//                .field("type", "keyword")
-//                .endObject()
-//                .startObject("action")
-//                .field("type", "keyword")
-//                .endObject()
-//                .startObject("from")
-//                .field("type", "keyword")
-//                .endObject()
-//                .startObject("tolist")
-//                .field("type", "text")
-//                .endObject()
-//                .startObject("roomid")
-//                .field("type", "keyword")
-//                .endObject()
-//                .startObject("msgtime")
-//                .field("type", "long")
-//                .endObject()
-//                .startObject("msgtype")
-//                .field("type", "keyword")
-//                .endObject()
-//                .startObject("content")
-//                .field("type", "text")
-//                .endObject()
-//                .endObject()
-//                .endObject();
-//        return xContentBuilder;
-//    }
+
+    public static final String WECOM_FINANCE_INDEX = "finance";
 }

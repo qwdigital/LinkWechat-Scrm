@@ -79,6 +79,8 @@ spring:
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
 
+
+
 # token配置
 token:
     # 令牌自定义标识
@@ -127,6 +129,16 @@ xss:
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
 
+# elasticsearch配置
+elasticsearch:
+  schema: http
+  address: 129.211.173.127:9200
+  connectTimeout: 10000
+  socketTimeout: 10000
+  connectionRequestTimeout: 10000
+  maxConnectNum: 100
+  maxConnectPerRoute: 100
+
 # forest配置
 forest:
   interceptors: com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor
@@ -157,6 +169,7 @@ wecome:
           - /externalcontact/groupchat/transfer
           - /externalcontact/get_unassigned_list
           - /externalcontact/send_welcome_msg
+          - /msgaudit/get_permit_user_list
   fileUplodUrl:  /media/upload,/media/uploadimg
   needProviderTokenUrl:
           - /service/get_login_info

@@ -13,7 +13,7 @@
     <description>若依管理系统</description>
     
     <properties>
-        <springboot.vaerion>2.1.1.RELEASE</springboot.vaerion>
+        <springboot.vaerion>2.2.1.RELEASE</springboot.vaerion>
         <linkwe.version>3.1.0</linkwe.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
