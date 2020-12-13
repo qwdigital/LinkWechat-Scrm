@@ -1,14 +1,18 @@
 <script>
-import * as api from '@/api/customer'
+import {
+  getList,
+  exportCustomer,
+  lossRemind,
+  getLossRemindStatus,
+} from '@/api/customer'
 import { getList as getListTag } from '@/api/customer/tag'
 import { getList as getListOrganization } from '@/api/organization'
-import AddTag from '@/components/AddTag'
 import SelectUser from '@/components/SelectUser'
 import SelectTag from '@/components/SelectTag'
 
 export default {
-  name: 'Customer',
-  components: { AddTag, SelectUser, SelectTag },
+  name: 'LossRemind',
+  components: { SelectUser, SelectTag },
   props: {},
   data() {
     return {
@@ -20,6 +24,7 @@ export default {
         tagIds: '', // "标签id,多个标签，id使用逗号隔开",
         beginTime: '', // "开始时间",
         endTime: '', // "结束时间"
+        status: 1,
       },
       queryTag: [], // 搜索框选择的标签
       queryUser: [], // 搜索框选择的添加人
@@ -72,7 +77,6 @@ export default {
       multipleSelection: [], // 多选数组
       dialogVisible: false, // 选择标签弹窗显隐
       dialogVisibleSelectUser: false, // 选择添加人弹窗显隐
-      dialogVisibleAddTag: false, // 添加标签弹窗显隐
       selectedGroup: '', // 选择的标签分组
       selectedTag: [], // 选择的标签
       removeTag: [], // 可移除的标签
@@ -80,6 +84,7 @@ export default {
         title: '', // 选择标签弹窗标题
         type: '', // 弹窗类型
       },
+      isNotice: false,
     }
   },
   watch: {},
@@ -88,6 +93,7 @@ export default {
     this.getList()
     this.getListTag()
     this.getListOrganization()
+    this.getLossRemindStatus()
   },
   mounted() {},
   methods: {
@@ -102,8 +108,7 @@ export default {
       }
       page && (this.query.pageNum = page)
       this.loading = true
-      api
-        .getList(this.query)
+      getList(this.query)
         .then(({ rows, total }) => {
           this.list = rows
           this.total = +total
@@ -129,6 +134,11 @@ export default {
         this.listOrganization = Object.freeze(rows)
       })
     },
+    getLossRemindStatus() {
+      getLossRemindStatus().then(({ data }) => {
+        this.isNotice = data
+      })
+    },
     showTagDialog() {
       this.selectedTag = this.queryTag
       this.tagDialogType = {
@@ -136,64 +146,6 @@ export default {
         type: 'query',
       }
       this.dialogVisible = true
-      this.$refs.selectTag.$forceUpdate()
-    },
-    makeTag(type) {
-      debugger
-      this.selectedTag = []
-      if (!this.multipleSelection.length) {
-        this.msgInfo('请选择一位客户')
-        return
-      }
-      if (this.multipleSelection.length > 1) {
-        this.msgInfo('同时只能选择一位客户')
-        return
-      }
-      let isError = false
-      this.multipleSelection.forEach((element) => {
-        element.weFlowerCustomerRels.forEach((child) => {
-          child.weFlowerCustomerTagRels.forEach((grandchild) => {
-            let filter = this.listTagOneArray.find((d) => {
-              return d.tagId === grandchild.tagId
-            })
-            // 如果没有匹配到，则说明该便签处于异常状态，可能已被删除或破坏
-            if (!filter) {
-              isError = true
-              return
-            }
-            this.selectedTag.push(filter)
-          })
-        })
-      })
-      if (isError) {
-        this.msgError('已有标签不在便签库中，或存在异常')
-        return
-      }
-      this.tagDialogType = {
-        title: type === 'add' ? '增加标签' : '移出标签',
-        type: type,
-      }
-      this.removeTag = this.selectedTag.slice()
-      this.dialogVisible = true
-      this.$refs.selectTag.$forceUpdate()
-    },
-    sync() {
-      const loading = this.$loading({
-        lock: true,
-        text: 'Loading',
-        spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.7)',
-      })
-      api
-        .sync()
-        .then(() => {
-          loading.close()
-          this.msgSuccess('后台开始同步数据，请稍后关注进度')
-        })
-        .catch((fail) => {
-          loading.close()
-          console.log(fail)
-        })
     },
     /** 导出按钮操作 */
     exportCustomer() {
@@ -204,7 +156,7 @@ export default {
         type: 'warning',
       })
         .then(function() {
-          return api.exportCustomer(queryParams)
+          return exportCustomer(queryParams)
         })
         .then((response) => {
           this.download(response.msg)
@@ -221,20 +173,6 @@ export default {
         // debugger;
         this.queryTag = selected
         this.dialogVisible = false
-      } else {
-        let data = {
-          externalUserid: this.multipleSelection[0].externalUserid,
-          addTag: selected,
-        }
-        let apiType = {
-          add: 'makeLabel',
-          remove: 'removeLabel',
-        }
-        api[apiType[this.tagDialogType.type]](data).then(() => {
-          this.msgSuccess('操作成功')
-          this.dialogVisible = false
-          this.getList()
-        })
       }
     },
     resetForm(formName) {
@@ -246,6 +184,12 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.multipleSelection = selection
+    },
+    // 流失提醒开关事件
+    remindSwitch(val) {
+      lossRemind(val).then(() => {
+        this.msgSuccess('操作成功')
+      })
     },
   },
 }
@@ -324,43 +268,26 @@ export default {
     </el-form>
 
     <div class="mid-action">
-      <div class="total">
-        共
-        <span class="num">{{ total }}</span> 位客户，实际客户
-        <span class="num">{{ total }}</span> 位。
-      </div>
+      <div class=""></div>
       <div>
-        <el-button
+        通知提醒<el-switch
+          class="ml10 mr10"
           v-hasPermi="['customerManage/customer:makeTag']"
-          type="primary"
-          size="mini"
-          icon="el-icon-s-flag"
-          @click="makeTag('add')"
-          >打标签</el-button
+          v-model="isNotice"
+          :active-value="1"
+          :inactive-value="0"
+          active-color="#1890ff"
+          inactive-color="#ff4949"
+          @change="remindSwitch"
+        ></el-switch>
+        <el-tooltip
+          class="item"
+          effect="dark"
+          content="开启后，当员工被客户删除时，被删除的员工将收到一条消息提醒"
+          placement="top-end"
         >
-        <el-button
-          v-hasPermi="['customerManage:customer:removeTag']"
-          type="primary"
-          size="mini"
-          icon="el-icon-brush"
-          @click="makeTag('remove')"
-          >移除标签</el-button
-        >
-        <el-button
-          v-hasPermi="['customerManage:customer:sync']"
-          type="primary"
-          size="mini"
-          icon="el-icon-refresh"
-          @click="sync"
-          >同步客户</el-button
-        >
-        <el-button
-          v-hasPermi="['customerManage:customer:checkRepeat']"
-          type="primary"
-          size="mini"
-          icon="el-icon-view"
-          >查看重复客户</el-button
-        >
+          <i class="el-icon-warning-outline"></i>
+        </el-tooltip>
       </div>
     </div>
 
@@ -450,77 +377,13 @@ export default {
 
     <!-- 选择标签弹窗 -->
     <SelectTag
-      ref="selectTag"
       :visible.sync="dialogVisible"
       :title="tagDialogType.title"
       :selected="selectedTag"
       :type="tagDialogType.type"
       @success="submitSelectTag"
     >
-      <div class="mt20" v-show="tagDialogType.type === 'add'">
-        <el-button type="primary" @click="dialogVisibleAddTag = true"
-          >添加标签</el-button
-        >
-      </div>
     </SelectTag>
-    <!-- <el-dialog
-      key="1"
-      :title="tagDialogType.title"
-      :visible.sync="dialogVisible"
-    >
-      <div>
-        <span class="mr20">选择分组</span>
-        <el-select v-model="selectedGroup" placeholder="请选择">
-          <el-option label="所有标签" value></el-option>
-          <el-option
-            v-for="(item, index) in listTag"
-            :key="index"
-            :label="item.gourpName"
-            :value="item.groupId"
-          ></el-option>
-        </el-select>
-        <div class="mt20">
-          <el-checkbox-group
-            v-model="selectedTag"
-            v-if="tagDialogType.type !== 'remove'"
-          >
-            <template v-for="(item, index) in listTag">
-              <div
-                class="bfc-d"
-                v-show="item.groupId === selectedGroup || !selectedGroup"
-                :key="index"
-              >
-                <el-checkbox
-                  :label="unit"
-                  v-for="(unit, unique) in item.weTags"
-                  :key="index + unique"
-                  >{{ unit.name }}</el-checkbox
-                >
-              </div>
-            </template>
-          </el-checkbox-group>
-          <el-checkbox-group v-else v-model="selectedTag">
-            <template v-for="(item, index) in removeTag">
-              <el-checkbox
-                v-if="item.groupId === selectedGroup || !selectedGroup"
-                :label="item"
-                :key="index"
-                >{{ item.name }}</el-checkbox
-              >
-            </template>
-          </el-checkbox-group>
-        </div>
-        <div class="mt20" v-show="tagDialogType.type === 'add'">
-          <el-button type="primary" @click="dialogVisibleAddTag = true"
-            >添加标签</el-button
-          >
-        </div>
-      </div>
-      <div slot="footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitSelectTag">确 定</el-button>
-      </div>
-    </el-dialog> -->
 
     <!-- 选择添加人弹窗 -->
     <SelectUser
@@ -528,13 +391,6 @@ export default {
       title="选择添加人"
       @success="selectedUser"
     ></SelectUser>
-
-    <!-- 添加标签弹窗 -->
-    <AddTag
-      :visible.sync="dialogVisibleAddTag"
-      :form="form"
-      @success="getListTag()"
-    />
   </div>
 </template>
 

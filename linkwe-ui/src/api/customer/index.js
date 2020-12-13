@@ -12,6 +12,7 @@ const service = window.CONFIG.services.wecom + '/customer'
     "tagIds": "标签id,多个标签，id使用逗号隔开",
     "beginTime": "开始时间",
     "endTime": "结束时间"
+    status: 0 客户状态 0正常 1删除
 }
  */
 export function getList(params) {
@@ -103,5 +104,25 @@ export function exportCustomer(query) {
 export function getDetail(externalUserid) {
   return request({
     url: service + '/getCustomersByUserId/' + externalUserid,
+  })
+}
+
+/**
+ * 客户流失通知开关
+ * @param {*} status [string]	是	客户流失通知开关 0:关闭 1:开启
+ */
+export function lossRemind(status) {
+  return request({
+    url:
+      window.CONFIG.services.wecom +
+      '/corp/startCustomerChurnNoticeSwitch/' +
+      status,
+    method: 'PUT',
+  })
+}
+
+export function getLossRemindStatus(status) {
+  return request({
+    url: window.CONFIG.services.wecom + '/corp/getCustomerChurnNoticeSwitch/',
   })
 }
