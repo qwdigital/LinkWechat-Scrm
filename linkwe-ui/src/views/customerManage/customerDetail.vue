@@ -7,7 +7,7 @@ export default {
     return {
       datePickerVisible: false,
       customer: {
-        weFlowerCustomerRels: [],
+        weFlowerCustomerRels: [{}],
       },
       birthday: '',
     }
@@ -84,9 +84,21 @@ export default {
 
     <el-card shadow="never" :body-style="{ width: '400px' }">
       <div>
+        <!-- <el-button class="fr" type="danger" plain size="mini"
+          >该员工已被客户删除</el-button
+        > -->
         <el-row :gutter="10">
           <el-col :span="10">备注名：</el-col>
-          <el-col :span="12">{{ customer.name }}</el-col>
+          <el-col :span="10">
+            <el-tooltip
+              class="item"
+              effect="dark"
+              :content="customer.name"
+              placement="top-start"
+            >
+              <div class="toe">{{ customer.name }}</div>
+            </el-tooltip>
+          </el-col>
         </el-row>
         <el-row :gutter="10">
           <el-col :span="10">标签：</el-col>

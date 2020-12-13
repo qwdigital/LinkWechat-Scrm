@@ -104,4 +104,7 @@ export default {
     }
   }
 }
+.el-avatar {
+  flex: none;
+}
 </style>

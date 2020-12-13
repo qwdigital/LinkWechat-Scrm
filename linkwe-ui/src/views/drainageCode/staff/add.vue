@@ -273,11 +273,7 @@ export default {
         :message="form.welcomeMsg || '请输入欢迎语'"
         :isOther="!!materialSelected"
       >
-        <el-image
-          style="width: 100px; height: 100px; cursor: pointer;border-radius: 6px;"
-          :src="materialSelected"
-          fit="fit"
-        >
+        <el-image style="border-radius: 6px;" :src="materialSelected" fit="fit">
         </el-image>
       </PhoneDialog>
       <div class="tip">欢迎语样式</div>

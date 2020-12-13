@@ -136,11 +136,7 @@ export default {
       :message="form.welcomeMsg || '请输入欢迎语'"
       :isOther="!!form.materialUrl"
     >
-      <el-image
-        style="width: 100px; height: 100px; cursor: pointer;border-radius: 6px;"
-        :src="form.materialUrl"
-        fit="fit"
-      >
+      <el-image style="border-radius: 6px;" :src="form.materialUrl" fit="fit">
       </el-image
     ></PhoneDialog>
 
