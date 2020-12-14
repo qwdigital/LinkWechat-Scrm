@@ -84,7 +84,7 @@ export default {
         title: '', // 选择标签弹窗标题
         type: '', // 弹窗类型
       },
-      isNotice: 0,
+      isNotice: '0',
     }
   },
   watch: {},
