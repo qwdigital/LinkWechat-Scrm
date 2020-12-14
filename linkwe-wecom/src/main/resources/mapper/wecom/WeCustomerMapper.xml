@@ -100,7 +100,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                    AND date_format(wfcr.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
              </if>
 
-
+            <if test="status != null and status !=''">
+                AND wfcr.status = #{status}
+            </if>
              <if test="tagIds != null and tagIds !=''">
                    <if test="tagIds.indexOf(',') != -1">
                        AND  wt.tag_id in
