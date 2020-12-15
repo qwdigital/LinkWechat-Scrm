@@ -112,6 +112,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                        AND  wt.tag_id=#{tagIds}
                    </if>
              </if>
+
+             <if test="status !=null and status !=''">
+                  AND wfcr.status=#{status}
+             </if>
+
         </where>
         ORDER BY wfcr.create_time DESC
     </select>
