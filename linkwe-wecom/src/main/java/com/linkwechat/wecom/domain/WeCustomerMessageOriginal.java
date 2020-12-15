@@ -47,11 +47,6 @@ public class WeCustomerMessageOriginal extends BaseEntity {
     private String tag;
 
     /**
-     * 群组名称id
-     */
-    private String group;
-
-    /**
      * 部门id
      */
     private String department;

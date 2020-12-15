@@ -114,6 +114,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                        AND  wt.tag_id=#{tagIds}
                    </if>
              </if>
+            <if test="departmentIds != null and departmentIds !=''">
+                <if test="departmentIds.indexOf(',') != -1">
+                    AND wu.department in
+                    <foreach item="item" index="index" collection="departmentIds.split(',')" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="departmentIds.indexOf(',') == -1">
+                    AND wu.department=#{departmentIds}
+                </if>
+            </if>
 
              <if test="status !=null and status !=''">
                   AND wfcr.status=#{status}
@@ -236,8 +247,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                   wt.tag_id,
                   wt.create_time,
                   wt.`name` as tagName,
-                  (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department,
-                  wfcr.status
+                  (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department
         FROM
             we_customer wc
         LEFT JOIN we_flower_customer_rel wfcr ON wc.external_userid=wfcr.external_userid
