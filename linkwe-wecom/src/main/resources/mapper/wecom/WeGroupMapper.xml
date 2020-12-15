@@ -27,6 +27,17 @@
             <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
                 AND date_format(wg.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
             </if>
+            <if test="userIds != null and userIds !=''">
+                <if test="userIds.indexOf(',') != -1">
+                    AND wg.`owner` in
+                    <foreach item="item" index="index" collection="userIds.split(',')" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="userIds.indexOf(',') == -1">
+                    AND wg.`owner`=#{userIds}
+                </if>
+            </if>
         </where>
     </select>
 

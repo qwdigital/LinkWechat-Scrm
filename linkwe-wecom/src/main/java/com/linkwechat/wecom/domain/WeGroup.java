@@ -62,5 +62,8 @@ public class WeGroup {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private String endTime;
 
+    /**员工id*/
+    private String userIds;
+
 
 }
