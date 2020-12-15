@@ -3,13 +3,22 @@ package com.tencent.wework;
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.core.domain.elastic.ElasticSearchEntity;
+import com.linkwechat.common.utils.DateUtils;
+import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.uuid.IdUtils;
 import com.linkwechat.common.utils.wecom.RSAUtil;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author sxw
@@ -19,7 +28,7 @@ import java.util.List;
 @Slf4j
 public class FinanceUtils {
     /**
-     *  NewSdk返回的sdk指针
+     * NewSdk返回的sdk指针
      */
     private static volatile long sdk = 0;
     /**
@@ -27,19 +36,22 @@ public class FinanceUtils {
      */
     private final static long timeout = 5 * 60;
     /**
-     *一次拉取的消息条数，最大值1000条，超过1000条会返回错误
+     * 一次拉取的消息条数，最大值1000条，超过1000条会返回错误
      */
     private final static long LIMIT = 1000;
 
+    private static String downloadWeWorkPath = RuoYiConfig.getDownloadWeWorkPath();
+
     /**
      * 初始化
+     *
      * @param corpId 企业id
      * @param secret 会话存档密钥
      */
-    public static void initSDK (String corpId, String secret) {
+    public static void initSDK(String corpId, String secret) {
         if (sdk == 0) {
             sdk = Finance.NewSdk();
-            Finance.Init(sdk,corpId,secret);
+            Finance.Init(sdk, corpId, secret);
         }
     }
 
@@ -72,12 +84,13 @@ public class FinanceUtils {
             "-----END RSA PRIVATE KEY-----";
 
     /**
-     *  拉取聊天记录
-     * @param seq 消息的seq值，标识消息的序号
-     * @param proxy 代理
+     * 拉取聊天记录
+     *
+     * @param seq    消息的seq值，标识消息的序号
+     * @param proxy  代理
      * @param passwd 密码
      */
-    public static List<ElasticSearchEntity> getChatData(long seq, String proxy, String passwd){
+    public static List<ElasticSearchEntity> getChatData(long seq, String proxy, String passwd) {
         List<ElasticSearchEntity> resList = new ArrayList<>();
         long slice = Finance.NewSlice();
         int ret = Finance.GetChatData(sdk, seq, LIMIT, proxy, passwd, timeout, slice);
@@ -87,14 +100,14 @@ public class FinanceUtils {
         }
         String content = Finance.GetContentFromSlice(slice);
         JSONArray chatdataArr = JSONObject.parseObject(content).getJSONArray("chatdata");
-        if (CollectionUtil.isNotEmpty(chatdataArr)){
-            chatdataArr.stream().map(data -> (JSONObject) data).forEach(data ->{
+        if (CollectionUtil.isNotEmpty(chatdataArr)) {
+            chatdataArr.stream().map(data -> (JSONObject) data).forEach(data -> {
                 try {
                     ElasticSearchEntity elasticSearchEntity = new ElasticSearchEntity();
                     long LocalSEQ = data.getLong("seq");
                     JSONObject jsonObject = decryptChatRecord(sdk, data.getString("encrypt_random_key"),
                             data.getString("encrypt_chat_msg"), privateKey);
-                    jsonObject.put("seq",LocalSEQ);
+                    jsonObject.put("seq", LocalSEQ);
                     elasticSearchEntity.setData(jsonObject);
                     elasticSearchEntity.setId(jsonObject.getString("msgid"));
                     resList.add(elasticSearchEntity);
@@ -110,25 +123,27 @@ public class FinanceUtils {
 
     public static void main(String[] args) {
         String secret = "_Ruv_TD_GzE4wJLvhMv4MeYkjM81_IJFDPcsUiss9fw";
-        initSDK("ww24262ce93851488f",secret);
-        getChatData(0,"","");
+        initSDK("ww24262ce93851488f", secret);
+        //getChatData(0,"","");
+        getMediaData("CiBkZDk3ZmJjMTlhYjU1YWJiNDQ4MjI3NWRlMzk1NmMzYxI4TkRkZk56ZzRNVE13TURVNU5Ua3lOVFEyTlY4NU5ERTBOekUwTWpaZk1UWXdOemt4TkRrMU1BPT0aIDBiMzY3YjkyNzE5ZDE3ZWU4NjkyNTVlYzJkNTlmNjI3",
+                "", "", "");
     }
 
 
     /**
-     * @param sdk 初始化时候获取到的值
+     * @param sdk               初始化时候获取到的值
      * @param ncrypt_random_key 企业微信返回的随机密钥
-     * @param encrypt_chat_msg 企业微信返回的单条记录的密文消息
-     * @param privateKey 企业微信管理后台设置的私钥,!!!版本记得对应上!!!
+     * @param encrypt_chat_msg  企业微信返回的单条记录的密文消息
+     * @param privateKey        企业微信管理后台设置的私钥,!!!版本记得对应上!!!
      * @return JSONObject 返回不同格式的聊天数据,格式有二十来种
      * 详情请看官网 https://open.work.weixin.qq.com/api/doc/90000/90135/91774#%E6%B6%88%E6%81%AF%E6%A0%BC%E5%BC%8F
      */
-    private static JSONObject decryptChatRecord(Long sdk, String ncrypt_random_key, String encrypt_chat_msg, String privateKey){
+    private static JSONObject decryptChatRecord(Long sdk, String ncrypt_random_key, String encrypt_chat_msg, String privateKey) {
         Long msg = null;
         try {
             //获取私钥
-            PrivateKey privateKeyObj  = RSAUtil.getPrivateKey(privateKey);
-            String str  = RSAUtil.decryptRSA(ncrypt_random_key, privateKeyObj);
+            PrivateKey privateKeyObj = RSAUtil.getPrivateKey(privateKey);
+            String str = RSAUtil.decryptRSA(ncrypt_random_key, privateKeyObj);
             //初始化参数slice
             msg = Finance.NewSlice();
 
@@ -137,17 +152,151 @@ public class FinanceUtils {
             String jsonDataStr = Finance.GetContentFromSlice(msg);
 
             log.info("解析数据:------------" + jsonDataStr);
-            JSONObject realJsonData = (JSONObject) JSONObject.parseObject(jsonDataStr);
-
+            JSONObject realJsonData = JSONObject.parseObject(jsonDataStr);
+            String msgType = realJsonData.getString("msgtype");
+            getSwitchType(realJsonData, msgType);
             return realJsonData;
         } catch (Exception e) {
             log.error("解析密文失败");
             return null;
         } finally {
-            if(msg != null){
+            if (msg != null) {
                 //释放参数slice
                 Finance.FreeSlice(msg);
             }
         }
     }
+
+    private static void getSwitchType(JSONObject realJsonData, String msgType) {
+        switch (msgType) {
+            case "image":
+                setMediaImageData(realJsonData, msgType);
+                break;
+            case "voice":
+                setMediaVoiceData(realJsonData, msgType);
+                break;
+            case "video":
+                setMediaVideoData(realJsonData, msgType);
+                break;
+            case "emotion":
+                setMediaEmotionData(realJsonData, msgType);
+                break;
+            case "file":
+                setMediaFileData(realJsonData, msgType);
+                break;
+            case "mixed":
+                setMediaMixedData(realJsonData, msgType);
+                break;
+            case "meeting_voice_call":case "voip_doc_share":
+                setMediaMeetingVoiceCallData(realJsonData, msgType);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private static void setMediaMeetingVoiceCallData(JSONObject realJsonData, String msgType) {
+        JSONObject meetingVoiceCall  = Optional.ofNullable(realJsonData.getJSONObject(msgType))
+                .orElse(realJsonData.getJSONObject("content"));
+        String fileName = meetingVoiceCall.getString("filename");
+        getPath(realJsonData, msgType, fileName);
+    }
+
+    private static void setMediaMixedData(JSONObject realJsonData, String msgType) {
+        JSONObject mixedData = realJsonData.getJSONObject(msgType);
+        JSONArray items = mixedData.getJSONArray("item");
+        items.stream().map(item ->(JSONObject) item).forEach(item ->{
+            getSwitchType(item,item.getString("type"));
+        });
+    }
+
+    private static void setMediaFileData(JSONObject realJsonData, String msgType) {
+        JSONObject emotionData  = Optional.ofNullable(realJsonData.getJSONObject(msgType))
+                .orElse(realJsonData.getJSONObject("content"));
+        String filename = emotionData.getString("filename");
+        String fileext = emotionData.getString("fileext");
+        String fileName = filename+"."+fileext;
+        getPath(realJsonData, msgType, fileName);
+    }
+
+
+    private static void setMediaImageData(JSONObject realJsonData,String msgType) {
+        String fileName = IdUtils.simpleUUID()+".jpg";
+        getPath(realJsonData, msgType, fileName);
+    }
+
+    private static void setMediaVoiceData(JSONObject realJsonData, String msgType) {
+        String fileName = IdUtils.simpleUUID()+".mp3";
+        getPath(realJsonData, msgType, fileName);
+    }
+
+    private static void setMediaVideoData(JSONObject realJsonData, String msgType) {
+        String fileName = IdUtils.simpleUUID()+".mp4";
+        getPath(realJsonData, msgType, fileName);
+    }
+    private static void setMediaEmotionData(JSONObject realJsonData, String msgType) {
+        String fileName = "";
+        JSONObject emotionData = realJsonData.getJSONObject(msgType);
+        Integer type = emotionData.getInteger("type");
+        switch (type){
+            case 1:
+                fileName = IdUtils.simpleUUID() +".gif";
+                break;
+            case 2:
+                fileName = IdUtils.simpleUUID() +".png";
+                break;
+            default:
+                break;
+        }
+        getPath(realJsonData, msgType, fileName);
+    }
+
+    private static void getPath(JSONObject realJsonData, String msgType, String fileName) {
+        String filePath = getFilePath(msgType, fileName);
+        JSONObject data  = Optional.ofNullable(realJsonData.getJSONObject(msgType))
+                .orElse(realJsonData.getJSONObject("content"));
+        String sdkfileid = data.getString("sdkfileid");
+        try {
+            getMediaData(sdkfileid,"","",filePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        realJsonData.put("attachment",filePath);
+    }
+
+    private static String getFilePath(String msgType, String fileName) {
+        return StringUtils.format(downloadWeWorkPath, msgType, DateUtils.getDate(), fileName);
+    }
+
+    private static void getMediaData(String sdkFileid, String proxy, String passwd, String filePath) {
+        String indexbuf = "";
+        while (true) {
+            long media_data = Finance.NewMediaData();
+            int ret = Finance.GetMediaData(sdk, indexbuf, sdkFileid, proxy, passwd, timeout, media_data);
+            log.info("getMediaData ret:" + ret);
+            if (ret != 0) {
+                return;
+            }
+         /*   int indexLen = Finance.GetIndexLen(media_data);
+            int dataLen = Finance.GetDataLen(media_data);
+            int isMediaDataFinish = Finance.IsMediaDataFinish(media_data);*/
+            try {
+                FileOutputStream outputStream = new FileOutputStream(new File(filePath), true);
+                //File file = new File("D:\\浏览器下载\\media_data\\"+ IdUtils.simpleUUID()+".jpg");
+                //FileOutputStream outputStream = new FileOutputStream(file, true);
+                outputStream.write(Finance.GetData(media_data));
+                outputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (Finance.IsMediaDataFinish(media_data) == 1) {
+                Finance.FreeMediaData(media_data);
+                break;
+            } else {
+                indexbuf = Finance.GetOutIndexBuf(media_data);
+                Finance.FreeMediaData(media_data);
+            }
+        }
+    }
+
 }

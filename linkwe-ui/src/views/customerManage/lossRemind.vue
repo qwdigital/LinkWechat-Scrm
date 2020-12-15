@@ -84,7 +84,7 @@ export default {
         title: '', // 选择标签弹窗标题
         type: '', // 弹窗类型
       },
-      isNotice: false,
+      isNotice: '0',
     }
   },
   watch: {},
@@ -274,8 +274,8 @@ export default {
           class="ml10 mr10"
           v-hasPermi="['customerManage/customer:makeTag']"
           v-model="isNotice"
-          :active-value="1"
-          :inactive-value="0"
+          active-value="1"
+          inactive-value="0"
           active-color="#1890ff"
           inactive-color="#ff4949"
           @change="remindSwitch"

@@ -1,6 +1,7 @@
 package com.linkwechat.web.controller.wecom;
 
 import com.linkwechat.common.annotation.Log;
+import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
@@ -102,7 +103,7 @@ public class WeCorpAccountController extends BaseController
     @GetMapping("/getCustomerChurnNoticeSwitch")
     public AjaxResult getCustomerChurnNoticeSwitch()
     {
-        return AjaxResult.success(weCorpAccountService.getCustomerChurnNoticeSwitch());
+        return AjaxResult.success("操作成功",weCorpAccountService.getCustomerChurnNoticeSwitch());
     }
 
 }

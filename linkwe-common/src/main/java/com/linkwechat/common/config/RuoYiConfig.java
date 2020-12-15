@@ -110,6 +110,14 @@ public class RuoYiConfig
     }
 
     /**
+     * 获取会话存档素材下载路径
+     */
+    public static String getDownloadWeWorkPath()
+    {
+        return getProfile() + "/download/media_data/{type}/{date}/{fileName}";
+    }
+
+    /**
      * 获取上传路径
      */
     public static String getUploadPath()
