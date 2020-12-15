@@ -39,10 +39,10 @@ public class CustomerMessagePushDto {
     /**
      * 发送时间 为空表示立即发送 ，不为空为指定时间发送
      */
-    private String sendTime;
+    private String settingTime;
 
     /**
-     * 消息类型 0 文本消息  1 图片消息 2 语音消息  3 视频消息    4 文件消息 5 文本卡片消息 6 图文消息\r\n7 图文消息（mpnews） 8 markdown消息 9 小程序通知消息 10 任务卡片消息
+     * 消息类型 0 文本消息  1 图片消息 2 链接消息   3 小程序消息
      */
     private String messageType;
 
