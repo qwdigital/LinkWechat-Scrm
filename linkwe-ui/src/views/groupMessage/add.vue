@@ -14,9 +14,30 @@ export default {
       form: {
         pushType: '0',
         pushRange: '0',
-        toUser: [],
-        toParty: [],
-        toTag: [],
+        tag: [],
+        department: [],
+        staffId: [],
+        settingTime: '',
+        messageType: '',
+        imageMessage: {
+          media_id: '', // '图片的media_id',
+          pic_url: '', // '图片的链接',
+        },
+        linkMessage: {
+          title: '', // '图文消息标题',
+          picurl: '', // '图文消息封面的url',
+          desc: '', // '图文消息的描述，最多512个字节',
+          url: '', // '图文消息的链接',
+        },
+        textMessage: {
+          content: '', //'消息文本内容，最多4000个字节',
+        },
+        miniprogramMessage: {
+          title: '', // '小程序消息标题，最多64个字节',
+          pic_media_id: '', // '小程序消息封面的mediaid，封面图建议尺寸为520*416',
+          appid: '', // '小程序appid，必须是关联到企业的小程序应用',
+          page: '', // '小程序page路径',
+        },
       },
       userParty: [],
       rules: {},
@@ -35,7 +56,7 @@ export default {
   computed: {
     // 是否显示选择的客户标签
     isOnlyTag() {
-      return this.form.toTag[0] && this.form.pushType == 0
+      return this.form.tag[0] && this.form.pushType == 0
     },
     // 是否显示选择范围后的文字说明
     isSelectedText() {
@@ -44,9 +65,9 @@ export default {
     // 选择范围后的文字说明
     selectedText() {
       return `将发送消息给${
-        this.userParty[0] ? this.userParty[0] + '等部门或成员的' : ''
+        this.userParty[0] ? this.userParty[0].name + '等部门或成员的' : ''
       }${this.userParty[0] && this.isOnlyTag ? '，且' : ''}${
-        this.isOnlyTag ? '满足' + this.form.toTag[0] + '等标签的' : ''
+        this.isOnlyTag ? '满足' + this.form.tag[0].name + '等标签的' : ''
       }${this.form.pushType == 0 ? '客户' : '客户群'}`
     },
   },
@@ -67,7 +88,7 @@ export default {
     },
     // 选择标签确认按钮
     submitSelectTag(data) {
-      this.form.toTag = data
+      this.form.tag = data
     },
     // 新建素材按钮
     goRoute() {
@@ -75,13 +96,29 @@ export default {
       window.open('#/material/' + contentType[this.activeName])
     },
     // 选择素材确认按钮
-    submitSelectMaterial(text, image, file) {},
+    submitSelectMaterial(text, image, file) {
+      debugger
+      this.form.textMessage.content = text.content
+      this.form.imageMessage.media_id = image.categoryId
+      this.form.textMessage.pic_url = image.materialUrl
+    },
+    submit() {
+      add(this.form)
+        .then(({ data }) => {
+          this.msgSuccess('操作成功')
+          this.loading = false
+          this.$router.back()
+        })
+        .catch(() => {
+          this.loading = false
+        })
+    },
   },
 }
 </script>
 
 <template>
-  <div>
+  <div v-loading="loading">
     <el-form ref="form" :model="form" :rules="rules" label-width="80px">
       <el-form-item label="群发类型" prop="pushType">
         <el-radio-group v-model="form.pushType">
@@ -94,19 +131,14 @@ export default {
         </el-radio-group>
       </el-form-item>
       <el-form-item label="发送范围" prop="pushRange">
-        <el-button
-          v-show="!isSelectedText"
-          type="text"
-          @click="showRangeDialog()"
-          >{{
-            isSelectedText
-              ? '修改'
-              : form.pushType == 0
-              ? '选择发送客户'
-              : '按群主选择客户群'
-          }}</el-button
-        >
         <span v-show="isSelectedText">{{ selectedText }}</span>
+        <el-button type="text" size="medium" @click="showRangeDialog()">{{
+          isSelectedText
+            ? '修改'
+            : form.pushType == 0
+            ? '选择发送客户'
+            : '按群主选择客户群'
+        }}</el-button>
       </el-form-item>
       <el-form-item label="发送时间" prop="settingTime">
         <el-date-picker
@@ -126,7 +158,7 @@ export default {
               <el-tab-pane name="0">
                 <span slot="label"> <i class="el-icon-date"></i> 文本 </span>
                 <el-input
-                  v-model="form.messageJson"
+                  v-model="form.textMessage.content"
                   type="textarea"
                   maxlength="220"
                   show-word-limit
@@ -136,10 +168,16 @@ export default {
               </el-tab-pane>
               <el-tab-pane name="1">
                 <span slot="label"> <i class="el-icon-date"></i> 图片 </span>
+                <el-image
+                  v-if="form.imageMessage.pic_url"
+                  style="width: 200px;"
+                  :src="form.imageMessage.pic_url"
+                  fit="fit"
+                ></el-image>
               </el-tab-pane>
-              <el-tab-pane name="2">
+              <!-- <el-tab-pane name="2">
                 <span slot="label"> <i class="el-icon-date"></i> 文件 </span>
-              </el-tab-pane>
+              </el-tab-pane> -->
               <el-button
                 type="primary"
                 class="mt20"
@@ -157,17 +195,56 @@ export default {
               </el-tab-pane> -->
             </el-tabs>
             <div class="mt15">
-              <el-button type="primary">通知成员发送</el-button>
+              <el-button type="primary" @click="submit">通知成员发送</el-button>
               <span class="small-tip"
                 >通知成员，向选中的客户发送以上企业消息</span
               >
-              <i class="el-icon-edit"></i>
+              <el-popover
+                placement="top-start"
+                title="群发助手介绍"
+                width="500"
+                trigger="hover"
+              >
+                <div>
+                  <h5>一、什么是群发助手？</h5>
+                  <p>
+                    成员可把通知、祝福、活动等消息批量发送给不同的客户，并进行后续的服务；管理员或负责人也可创建企业服务消息，由成员发送并进行后续的服务。
+                  </p>
+                  <h5>二、谁可以使用群发助手？</h5>
+                  <p>
+                    具有客户联系使用权限的成员，都可以使用群发助手给自己的客户发送消息；超级管理员和业务负责人还可向管理范围内成员的客户创建企业服务消息。
+                  </p>
+                  <h5>三、群发是否有频率限制？</h5>
+                  <p>
+                    每个自然月最多接收来自同一企业的管理员或业务负责人的4条群发消息。
+                  </p>
+                  <h5>四、群发助手其他注意事项</h5>
+                  <p>
+                    1、群发消息不得出现违反法律法规或侵犯他人合法权益的内容，企业应对其制作、发送和传播的群发消息内容承担全部法律责任。
+                  </p>
+                  <p>
+                    2、不得以任何方式滥用群发助手实施恶意骚扰用户、开展过度营销等行为。
+                  </p>
+                  <p>
+                    3、如企业微信帐号存在异常，则可能导致群发消息发送失败或异常等情况。
+                  </p>
+                </div>
+                <i slot="reference" class="el-icon-warning-outline"></i>
+              </el-popover>
             </div>
           </div>
 
           <!-- 预览 -->
           <PhoneDialog
-            :message="form.messageJson || '请输入欢迎语'"
+            :message="form.textMessage.content || '请输入欢迎语'"
+            :isOther="!!form.imageMessage.pic_url"
+          >
+            <el-image
+              style="border-radius: 6px;"
+              :src="form.imageMessage.pic_url"
+              fit="fit"
+            >
+            </el-image
           ></PhoneDialog>
         </div>
       </el-form-item>
@@ -198,11 +275,11 @@ export default {
           </el-form-item>
           <el-form-item label="标签">
             <div class="input-wrap" @click="dialogVisibleSelectTag = true">
-              <span class="placeholder" v-if="!form.toTag.length">请选择</span>
+              <span class="placeholder" v-if="!form.tag.length">请选择</span>
               <template v-else>
                 <el-tag
                   type="info"
-                  v-for="(unit, unique) in form.toTag"
+                  v-for="(unit, unique) in form.tag"
                   :key="unique"
                   >{{ unit.name }}</el-tag
                 >
@@ -233,7 +310,7 @@ export default {
     <SelectTag
       :visible.sync="dialogVisibleSelectTag"
       title="选择标签"
-      :selected="form.toTag"
+      :selected="form.tag"
       @success="submitSelectTag"
     >
     </SelectTag>
