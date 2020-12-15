@@ -409,38 +409,46 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
         if (CollectionUtil.isNotEmpty(addTags)) {
 
-            //获取当前客户需要移除的标签
-            List<WeFlowerCustomerTagRel> removeTag = iWeFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
-                    .in(WeFlowerCustomerTagRel::getFlowerCustomerRelId, iWeFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>().eq(WeFlowerCustomerRel::getExternalUserid
-                            , weMakeCustomerTag.getExternalUserid())).stream().map(WeFlowerCustomerRel::getId).collect(Collectors.toList()))
-                    .notIn(WeFlowerCustomerTagRel::getTagId, addTags.stream().map(WeTag::getTagId).collect(Collectors.toList()))
-            );
 
 
             //查询出当前用户对应的
             List<WeFlowerCustomerRel> flowerCustomerRels = iWeFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
                     .eq(WeFlowerCustomerRel::getExternalUserid, weMakeCustomerTag.getExternalUserid()));
 
+
+
             if (CollectionUtil.isNotEmpty(flowerCustomerRels)) {
 
-                if (iWeFlowerCustomerTagRelService.remove(
-                        new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
-                                .in(WeFlowerCustomerTagRel::getFlowerCustomerRelId, flowerCustomerRels.stream().map(WeFlowerCustomerRel::getId).collect(Collectors.toList()))
-                                .in(WeFlowerCustomerTagRel::getTagId, removeTag.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList()))
-                )) {
+                List<WeFlowerCustomerTagRel> removeTag = iWeFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                        .in(WeFlowerCustomerTagRel::getFlowerCustomerRelId,flowerCustomerRels.stream().map(WeFlowerCustomerRel::getId).collect(Collectors.toList()))
+                        .in(WeFlowerCustomerTagRel::getTagId, addTags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
 
-                    flowerCustomerRels.stream().forEach(k -> {
-                        weCustomerClient.makeCustomerLabel(
-                                CutomerTagEdit.builder()
-                                        .external_userid(k.getExternalUserid())
-                                        .userid(k.getUserId())
-                                        .remove_tag(ArrayUtil.toArray(removeTag.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList()), String.class))
-                                        .build()
-                        );
+                if(CollectionUtil.isNotEmpty(removeTag)){
+                    if (iWeFlowerCustomerTagRelService.remove(
+                            new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                                    .in(WeFlowerCustomerTagRel::getFlowerCustomerRelId, flowerCustomerRels.stream().map(WeFlowerCustomerRel::getId).collect(Collectors.toList()))
+                                    .in(WeFlowerCustomerTagRel::getTagId, removeTag.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList()))
+                    )) {
 
-                    });
+                        flowerCustomerRels.stream().forEach(k -> {
+                            weCustomerClient.makeCustomerLabel(
+                                    CutomerTagEdit.builder()
+                                            .external_userid(k.getExternalUserid())
+                                            .userid(k.getUserId())
+                                            .remove_tag(ArrayUtil.toArray(removeTag.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList()), String.class))
+                                            .build()
+                            );
 
+                        });
+
+                    }
                 }
+
+
+
+
+
+
 
 
             }

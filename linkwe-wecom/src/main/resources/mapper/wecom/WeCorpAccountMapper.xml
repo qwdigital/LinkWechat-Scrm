@@ -19,10 +19,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="agentId" column="agent_id" />
         <result property="providerSecret" column="provider_secret" />
         <result property="customerChurnNoticeSwitch" column="customer_churn_notice_switch" />
+        <result property="wxQrLoginRedirectUri" column="wx_qr_login_redirect_uri"/>
     </resultMap>
 
     <sql id="selectWeCorpAccountVo">
-        select id,provider_secret,company_name, corp_id, corp_secret,agent_id ,status, del_flag, create_by, create_time, update_by, update_time,contact_secret, customer_churn_notice_switch from we_corp_account
+        select id,provider_secret,company_name, corp_id, corp_secret,agent_id ,status, del_flag, create_by, create_time, update_by, update_time,contact_secret, customer_churn_notice_switch,wx_qr_login_redirect_uri from we_corp_account
     </sql>
 
     <select id="selectWeCorpAccountList" parameterType="WeCorpAccount" resultMap="WeCorpAccountResult">

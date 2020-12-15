@@ -91,4 +91,7 @@ public class WeCustomer extends BaseEntity
     @JSONField(defaultValue = "0")
     private Integer status;
 
+    /** 部门 */
+    private String departmentIds;
+
 }
