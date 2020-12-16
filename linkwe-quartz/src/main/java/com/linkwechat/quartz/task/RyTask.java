@@ -44,6 +44,9 @@ public class RyTask {
 
 
     public void FinanceTask(String corpId, String secret) throws IOException {
+        log.info("执行有参方法: params:{},{}", corpId, secret);
+        //创建索引
+        elasticSearch.createIndex2(WeConstans.WECOM_FINANCE_INDEX,elasticSearch.getFinanceMapping());
         AtomicLong index = new AtomicLong(0);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         SortBuilder<?> sortBuilderPrice = SortBuilders.fieldSort("seq").order( SortOrder.DESC);
@@ -52,11 +55,7 @@ public class RyTask {
         searchResultList.stream().findFirst().ifPresent(result ->{
             index.set(result.getLong("seq")+1);
         });
-        if (index.get() == 0) {
-            elasticSearch.createIndex2(WeConstans.WECOM_FINANCE_INDEX,elasticSearch.getFinanceMapping());
-        }
-        log.info("执行有参方法: params:{},{}", corpId, secret);
-
+        log.info(">>>>>>>seq:{}",index.get());
         FinanceUtils.initSDK(corpId, secret);
         List<ElasticSearchEntity> chatDataList = FinanceUtils.getChatData(index.get(), "", "");
 

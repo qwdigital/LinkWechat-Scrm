@@ -125,8 +125,8 @@ public class FinanceUtils {
         String secret = "_Ruv_TD_GzE4wJLvhMv4MeYkjM81_IJFDPcsUiss9fw";
         initSDK("ww24262ce93851488f", secret);
         //getChatData(0,"","");
-        getMediaData("CiBkZDk3ZmJjMTlhYjU1YWJiNDQ4MjI3NWRlMzk1NmMzYxI4TkRkZk56ZzRNVE13TURVNU5Ua3lOVFEyTlY4NU5ERTBOekUwTWpaZk1UWXdOemt4TkRrMU1BPT0aIDBiMzY3YjkyNzE5ZDE3ZWU4NjkyNTVlYzJkNTlmNjI3",
-                "", "", "");
+//        getMediaData("CiBkZDk3ZmJjMTlhYjU1YWJiNDQ4MjI3NWRlMzk1NmMzYxI4TkRkZk56ZzRNVE13TURVNU5Ua3lOVFEyTlY4NU5ERTBOekUwTWpaZk1UWXdOemt4TkRrMU1BPT0aIDBiMzY3YjkyNzE5ZDE3ZWU4NjkyNTVlYzJkNTlmNjI3",
+//                "", "", "");
     }
 
 
@@ -214,9 +214,9 @@ public class FinanceUtils {
         JSONObject emotionData  = Optional.ofNullable(realJsonData.getJSONObject(msgType))
                 .orElse(realJsonData.getJSONObject("content"));
         String filename = emotionData.getString("filename");
-        String fileext = emotionData.getString("fileext");
-        String fileName = filename+"."+fileext;
-        getPath(realJsonData, msgType, fileName);
+        //String fileext = emotionData.getString("fileext");
+        //String fileName = filename+"."+fileext;
+        getPath(realJsonData, msgType, filename);
     }
 
 
@@ -252,23 +252,29 @@ public class FinanceUtils {
     }
 
     private static void getPath(JSONObject realJsonData, String msgType, String fileName) {
-        String filePath = getFilePath(msgType, fileName);
+        String filePath = getFilePath(msgType);
         JSONObject data  = Optional.ofNullable(realJsonData.getJSONObject(msgType))
                 .orElse(realJsonData.getJSONObject("content"));
         String sdkfileid = data.getString("sdkfileid");
         try {
-            getMediaData(sdkfileid,"","",filePath);
+            getMediaData(sdkfileid,"","",filePath,fileName);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        realJsonData.put("attachment",filePath);
+        data.put("attachment",filePath+"/"+fileName);
+        if(realJsonData.containsKey("content")){
+            realJsonData.put("content",data);
+        }else {
+            realJsonData.put("msgType",data);
+        }
+
     }
 
-    private static String getFilePath(String msgType, String fileName) {
-        return StringUtils.format(downloadWeWorkPath, msgType, DateUtils.getDate(), fileName);
+    private static String getFilePath(String msgType) {
+        return StringUtils.format(downloadWeWorkPath, msgType, DateUtils.getDate());
     }
 
-    private static void getMediaData(String sdkFileid, String proxy, String passwd, String filePath) {
+    private static void getMediaData(String sdkFileid, String proxy, String passwd, String filePath, String fileName) {
         String indexbuf = "";
         while (true) {
             long media_data = Finance.NewMediaData();
@@ -281,7 +287,15 @@ public class FinanceUtils {
             int dataLen = Finance.GetDataLen(media_data);
             int isMediaDataFinish = Finance.IsMediaDataFinish(media_data);*/
             try {
-                FileOutputStream outputStream = new FileOutputStream(new File(filePath), true);
+                File f = new File(filePath);
+                if(!f.exists()){
+                    f.mkdirs();
+                }
+                File file = new File(filePath,fileName);
+                if (!file.isDirectory()){
+                    file.createNewFile();
+                }
+                FileOutputStream outputStream = new FileOutputStream(file, true);
                 //File file = new File("D:\\浏览器下载\\media_data\\"+ IdUtils.simpleUUID()+".jpg");
                 //FileOutputStream outputStream = new FileOutputStream(file, true);
                 outputStream.write(Finance.GetData(media_data));
