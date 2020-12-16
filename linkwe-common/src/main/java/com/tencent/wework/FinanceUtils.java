@@ -154,7 +154,9 @@ public class FinanceUtils {
             log.info("解析数据:------------" + jsonDataStr);
             JSONObject realJsonData = JSONObject.parseObject(jsonDataStr);
             String msgType = realJsonData.getString("msgtype");
-            getSwitchType(realJsonData, msgType);
+            if (StringUtils.isNotEmpty(msgType)){
+                getSwitchType(realJsonData, msgType);
+            }
             return realJsonData;
         } catch (Exception e) {
             log.error("解析密文失败");
