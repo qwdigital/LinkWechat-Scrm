@@ -84,7 +84,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
             //定义一个任务执行队列
             //把任务放入执行队列
             //任务执行 sendMessgae(WeMessagePush weMessagePush) 方法
-            if (DateUtils.diffTime(new Date(), DateUtil.parse(customerMessagePushDto.getSettingTime(), "yyyy-MM-dd HH:mm:ss")) < 0) {
+            if (DateUtils.diffTime(new Date(), DateUtil.parse(customerMessagePushDto.getSettingTime(), "yyyy-MM-dd HH:mm:ss")) > 0) {
                 throw new WeComException("发送时间不能小于当前时间");
             }
 
@@ -265,7 +265,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
         List<String> customers= Lists.newArrayList();
         if(pushRange.equals("0")){
             //查询系统所有客户
-            List<WeCustomer> weCustomers = weCustomerService.list();
+            List<WeCustomer> weCustomers = weCustomerService.selectWeCustomerList(null);
             if(CollectionUtils.isNotEmpty(weCustomers)){
                 customers=weCustomers.stream().map(WeCustomer::getExternalUserid).distinct().collect(Collectors.toList());
             }

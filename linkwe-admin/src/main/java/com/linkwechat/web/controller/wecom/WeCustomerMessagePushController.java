@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,7 +35,7 @@ public class WeCustomerMessagePushController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:push:add')")
     @Log(title = "新增群发消息发送", businessType = BusinessType.INSERT)
     @PostMapping(value = "add")
-    public AjaxResult add(CustomerMessagePushDto customerMessagePushDto)  {
+    public AjaxResult add(@RequestBody CustomerMessagePushDto customerMessagePushDto)  {
         try {
             weCustomerMessagePushService.addWeCustomerMessagePush(customerMessagePushDto);
         } catch (JsonProcessingException e) {
