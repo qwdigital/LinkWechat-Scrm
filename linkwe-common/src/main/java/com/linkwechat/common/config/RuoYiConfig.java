@@ -114,7 +114,7 @@ public class RuoYiConfig
      */
     public static String getDownloadWeWorkPath()
     {
-        return getProfile() + "/download/media_data/{type}/{date}/{fileName}";
+        return getProfile() + "/download/media_data/{}/{}";
     }
 
     /**
