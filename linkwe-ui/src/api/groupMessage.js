@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-const service = window.CONFIG.services.wecom + '/push'
+const service = window.CONFIG.services.wecom + '/customerMessagePush'
 
 /**
  * 新增企业id

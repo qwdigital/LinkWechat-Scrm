@@ -10,6 +10,7 @@ export default {
   props: {},
   data() {
     return {
+      loading: false,
       // 表单参数
       form: {
         pushType: '0',
@@ -18,7 +19,7 @@ export default {
         department: [],
         staffId: [],
         settingTime: '',
-        messageType: '',
+        messageType: '0',
         imageMessage: {
           media_id: '', // '图片的media_id',
           pic_url: '', // '图片的链接',
@@ -97,13 +98,16 @@ export default {
     },
     // 选择素材确认按钮
     submitSelectMaterial(text, image, file) {
-      debugger
       this.form.textMessage.content = text.content
       this.form.imageMessage.media_id = image.categoryId
-      this.form.textMessage.pic_url = image.materialUrl
+      this.form.imageMessage.pic_url = image.materialUrl
     },
     submit() {
-      add(this.form)
+      let form = JSON.parse(JSON.stringify(this.form))
+      form.tag += ''
+      form.department += ''
+      form.staffId += ''
+      add(form)
         .then(({ data }) => {
           this.msgSuccess('操作成功')
           this.loading = false
@@ -144,7 +148,7 @@ export default {
         <el-date-picker
           v-model="form.settingTime"
           style="width: 240px"
-          value-format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd HH:mm:ss"
           type="datetime"
           placeholder="选择日期时间"
         ></el-date-picker>
