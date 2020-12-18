@@ -5,11 +5,13 @@ import io.netty.buffer.Unpooled;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.web.client.WebClient;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.*;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +27,14 @@ public class NetFileUtils {
 
     public static void main(String[] args) {
         FileCallable fileCallable = getNetFile("https://pc-index-skin.cdn.bcebos.com/hiphoto/51631423522.jpg?x-bce-process=image/crop,x_0,y_13,w_1999,h_1250");
-        getByteArrayOutputStream(fileCallable,true);
+        ByteArrayOutputStream byteArrayOutputStream = getByteArrayOutputStream(fileCallable,true);
+        StreamMultipartFile file = new StreamMultipartFile("你好啊.jpg",byteArrayOutputStream.toByteArray());
+        File f = new File("D:/网页/2.jpg");
+        try {
+            file.transferTo(f);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -109,5 +118,62 @@ public class NetFileUtils {
         }
     }
 
+    public static class StreamMultipartFile implements MultipartFile{
+
+        private final String filename;
+
+        private final byte[] bytes;
+
+        public StreamMultipartFile(String filename,byte[] bytes){
+            this.filename = filename;
+            this.bytes = bytes;
+        }
+
+        @Override
+        public String getName() {
+            return filename;
+        }
+
+        @Override
+        public String getOriginalFilename() {
+            return filename;
+        }
+
+        @Override
+        public String getContentType() {
+            return null;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return bytes==null || bytes.length == 0;
+        }
+
+        @Override
+        public long getSize() {
+            return bytes.length;
+        }
+
+        @Override
+        public byte[] getBytes() throws IOException {
+            return this.bytes;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return new ByteArrayInputStream(bytes);
+        }
+
+        @Override
+        public void transferTo(File file) throws IOException, IllegalStateException {
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            FileChannel fileChannel = fileOutputStream.getChannel();
+            ReadableByteChannel channel = Channels.newChannel(new ByteArrayInputStream(bytes));
+            fileChannel.transferFrom(channel,0,bytes.length);
+            fileChannel.close();
+            channel.close();
+            fileOutputStream.close();
+        }
+    }
 
 }

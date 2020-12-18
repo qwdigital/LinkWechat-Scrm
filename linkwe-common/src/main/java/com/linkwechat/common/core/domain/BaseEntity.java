@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
+import io.swagger.annotations.ApiModelProperty;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
@@ -23,38 +24,47 @@ public class BaseEntity implements Serializable
 
     /** 搜索值 */
     @TableField(exist = false)
+    @ApiModelProperty(hidden = true)
     private String searchValue;
 
     /** 创建者 */
+    @ApiModelProperty(hidden = true)
     private String createBy;
 
     /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty(hidden = true)
     private Date createTime=new Date();
 
     /** 更新者 */
+    @ApiModelProperty(hidden = true)
     private String updateBy;
 
     /** 更新时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty(hidden = true)
     private Date updateTime=new Date();
 
     /** 备注 */
     @TableField(exist = false)
+    @ApiModelProperty(hidden = true)
     private String remark;
 
     /** 开始时间 */
     @JsonIgnore
     @TableField(exist = false)
+    @ApiModelProperty(hidden = true)
     private String beginTime;
 
     /** 结束时间 */
     @JsonIgnore
     @TableField(exist = false)
+    @ApiModelProperty(hidden = true)
     private String endTime;
 
     /** 请求参数 */
     @TableField(exist = false)
+    @ApiModelProperty(hidden = true)
     private Map<String, Object> params;
 
     public String getSearchValue()

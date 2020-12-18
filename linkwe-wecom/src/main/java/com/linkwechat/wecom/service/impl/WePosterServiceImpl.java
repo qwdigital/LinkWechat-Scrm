@@ -12,9 +12,14 @@ import com.linkwechat.wecom.mapper.WePosterMapper;
 import com.linkwechat.wecom.service.IWePosterFontService;
 import com.linkwechat.wecom.service.IWePosterService;
 import com.linkwechat.wecom.service.IWePosterSubassemblyService;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -58,7 +63,7 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
         WePoster poster = this.lambdaQuery()
                 .eq(WePoster::getId, id)
                 .eq(WePoster::getDelFlag, 1)
-                .getEntity();
+                .list().get(0);
         if (poster == null) {
             return null;
         }
@@ -110,6 +115,8 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
             }
         }));
         BufferedImage backgroundImg = bufferedImageMap.get(poster.getBackgroundImgPath());
+        poster.setWidth(backgroundImg.getWidth());
+        poster.setHeight(backgroundImg.getHeight());
         poster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {
             if (wePosterSubassembly.getFontId() != null) {
                 Font font = fontMap.get(wePosterSubassembly.getFontId());
@@ -136,7 +143,10 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try {
             ImageIO.write(backgroundImg, "jpg", byteArrayOutputStream);
-            ImageUtils.byteToFile(byteArrayOutputStream.toByteArray(),"测试"+System.currentTimeMillis(),"jpg","D:/网页/");
+            NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(System.currentTimeMillis()+".jpg",byteArrayOutputStream.toByteArray());
+            byteArrayOutputStream.close();
+            String path = FileUploadUtils.uploadFile(streamMultipartFile);
+            poster.setSampleImgPath(path);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("图片生成错误");

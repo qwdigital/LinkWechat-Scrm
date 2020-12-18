@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -18,42 +21,51 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @TableName(value = "we_poster")
+@ApiModel(value = "海报")
 public class WePoster extends BaseEntity {
 
     @TableId
+    @ApiModelProperty(value = "id")
     private Long id;
 
     /**
      * 海报标题
      */
     @TableField
+    @ApiModelProperty(value = "海报标题")
     private String title;
 
     /**
      * 背景图片
      */
     @TableField
+    @ApiModelProperty(value = "背景图片")
     private String backgroundImgPath;
 
     /**
      * 示例图片
      */
     @TableField
+    @ApiModelProperty(value = "示例图片")
     private String sampleImgPath;
 
     /**
      * 海报类型 1 通用海报
      */
     @TableField
+    @ApiModelProperty(value = "海报类型 1 通用海报（默认）")
     private Long type;
 
     @TableField
+    @ApiModelProperty(value = "海报状态 1 启用 0 关闭")
     private Integer delFlag;
 
     @TableField
+    @ApiModelProperty(value = "海报背景宽度")
     private Integer width;
 
     @TableField
+    @ApiModelProperty(value = "海报背景高度")
     private Integer height;
 
     /**
@@ -61,28 +73,6 @@ public class WePoster extends BaseEntity {
      */
     @TableField(exist = false)
     private List<WePosterSubassembly> posterSubassemblyList;
-
-    public static void main(String[] args) {
-        WePoster wePoster = new WePoster();
-        wePoster.setDelFlag(1);
-        wePoster.setTitle("你好世界");
-        wePoster.setHeight(1000);
-        wePoster.setWidth(1000);
-        wePoster.setType(1L);
-        wePoster.setBackgroundImgPath("1");
-        wePoster.setPosterSubassemblyList(new ArrayList<>());
-        for(int i = 0; i < 1; i++){
-            WePosterSubassembly subassembly = new WePosterSubassembly();
-            subassembly.setFontColor("#544875");
-            subassembly.setFontId(1L);
-            subassembly.setHeight(100);
-            subassembly.setWidth(100);
-            subassembly.setDelFlag(1);
-            subassembly.setLeft(1);
-            subassembly.setTop(1);
-            subassembly.setFontTextAlign(1);
-            wePoster.getPosterSubassemblyList().add(subassembly);
-        }
-        System.out.println(JSON.toJSONString(wePoster));
-    }
+    
+    
 }

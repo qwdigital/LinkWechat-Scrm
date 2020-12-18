@@ -47,6 +47,9 @@ public class WePosterFontServiceImpl extends ServiceImpl<WePosterFontMapper,WePo
         if(posterFont == null){
             throw new RuntimeException("字体id为："+id+"的字体不存在");
         }
+        if(StringUtils.isBlank(posterFont.getFontUrl())){
+            posterFont.setFontUrl("http://img.kometl.com/1.ttf");
+        }
         Font font;
         if((font=FONT_MAP.get(posterFont.getId())) != null){
             return font.deriveFont((float)size);
