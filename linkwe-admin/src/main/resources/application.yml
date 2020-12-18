@@ -176,6 +176,6 @@ wecome:
           - /service/get_login_info
   #企微回调通知配置
   callBack:
-    appIdOrCorpId: ww24262ce93851488f
-    token: jtQ1aGHgSmH2UHNBIndUtUe6B6EwfR
-    encodingAesKey: Vga4HWv7nFbRDYK8iAaQbxmkuecpo2BAfmXAyWwcXMO
+    appIdOrCorpId: 
+    token: 
+    encodingAesKey: 
