@@ -1,6 +1,7 @@
 package com.linkwechat.common.core.elasticsearch;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.core.domain.elastic.ElasticSearchEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -24,6 +25,9 @@ import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -163,7 +167,7 @@ public class ElasticSearch {
      * @since
      */
     public void insertOrUpdateOne(String idxName, ElasticSearchEntity entity) {
-        IndexRequest request = new IndexRequest(idxName,"_doc");
+        IndexRequest request = new IndexRequest(idxName, "_doc");
         log.error("Data : id={},entity={}", entity.getId(), JSON.toJSONString(entity.getData()));
         request.id(entity.getId());
         request.source(entity.getData(), XContentType.JSON);
@@ -190,7 +194,7 @@ public class ElasticSearch {
      */
     public void insertBatch(String idxName, List<ElasticSearchEntity> list) {
         BulkRequest request = new BulkRequest();
-        list.forEach(item -> request.add(new IndexRequest(idxName,"_doc").id(item.getId())
+        list.forEach(item -> request.add(new IndexRequest(idxName, "_doc").id(item.getId())
                 .source(item.getData(), XContentType.JSON)));
         try {
             restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
@@ -213,7 +217,7 @@ public class ElasticSearch {
      */
     public <T> void deleteBatch(String idxName, Collection<T> idList) {
         BulkRequest request = new BulkRequest();
-        idList.forEach(item -> request.add(new DeleteRequest(idxName,"_doc", item.toString())));
+        idList.forEach(item -> request.add(new DeleteRequest(idxName, "_doc", item.toString())));
         try {
             restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
         } catch (Exception e) {
@@ -237,6 +241,7 @@ public class ElasticSearch {
         request.source(builder);
         try {
             SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+            long totalHits = response.getHits().getTotalHits().value;
             SearchHit[] hits = response.getHits().getHits();
             List<T> res = new ArrayList<>(hits.length);
             for (SearchHit hit : hits) {
@@ -247,6 +252,32 @@ public class ElasticSearch {
             throw new RuntimeException(e);
         }
     }
+
+    public <T> PageInfo<T> searchPage(String idxName, SearchSourceBuilder builder, int pageNum, int pageSize, Class<T> c) {
+        SearchRequest request = new SearchRequest(idxName);
+        request.source(builder);
+        try {
+            SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+            int totalHits =(int) response.getHits().getTotalHits().value;
+            SearchHit[] hits = response.getHits().getHits();
+            List<T> res = new ArrayList<>(hits.length);
+            for (SearchHit hit : hits) {
+                res.add(JSON.parseObject(hit.getSourceAsString(), c));
+            }
+            // 封装分页
+            PageInfo<T> page = new PageInfo<>();
+            page.setList(res);
+            page.setPageNum(pageNum);
+            page.setPageSize(pageSize);
+            page.setTotal(totalHits);
+            page.setPages(totalHits == 0 ? 0 : (totalHits % pageNum == 0 ? totalHits / pageNum : (totalHits / pageNum) + 1));
+            page.setHasNextPage(page.getPageNum() < page.getPages());
+            return page;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * 删除index
      *

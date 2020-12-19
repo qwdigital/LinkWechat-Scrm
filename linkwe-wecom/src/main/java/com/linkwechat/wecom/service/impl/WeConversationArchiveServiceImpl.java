@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.elasticsearch.ElasticSearch;
 import com.linkwechat.wecom.service.IWeConversationArchiveService;
@@ -11,8 +12,6 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * @author sxw
@@ -32,16 +31,16 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
      * @return
      */
     @Override
-    public List<JSONObject> getInternalContactList(String userId,int pageSize, int pageNum) {
+    public PageInfo<JSONObject> getInternalContactList(String userId, int pageSize, int pageNum) {
         SearchSourceBuilder builder = new SearchSourceBuilder();
-        builder.size(pageSize);
-        builder.from(pageNum);
-        builder.sort("msgtime",SortOrder.ASC);
+        int from = (pageSize - 1) * pageNum;
+        builder.size(pageNum);
+        builder.from(from);
+        builder.sort("msgtime", SortOrder.ASC);
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
-                .must(QueryBuilders.termsQuery("tolist.keyword",userId))
-                .must(QueryBuilders.termQuery("roomid",""));
+                .must(QueryBuilders.termsQuery("tolist.keyword", userId))
+                .must(QueryBuilders.termQuery("roomid", ""));
         builder.query(boolQueryBuilder);
-        List<JSONObject> search = elasticSearch.search(WeConstans.WECOM_FINANCE_INDEX, builder, JSONObject.class);
-        return search;
+        return elasticSearch.searchPage(WeConstans.WECOM_FINANCE_INDEX, builder, pageNum, pageSize, JSONObject.class);
     }
 }
