@@ -6,6 +6,7 @@ import java.util.Optional;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.DateUtils;
+import com.linkwechat.wecom.service.IWeAccessTokenService;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,10 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
 
     @Autowired
     private WeCorpAccountMapper weCorpAccountMapper;
+
+
+    @Autowired
+    private IWeAccessTokenService iWeAccessTokenService;
 
     /**
      * 查询企业id相关配置
@@ -72,7 +77,15 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     public int updateWeCorpAccount(WeCorpAccount wxCorpAccount)
     {
 
-        return weCorpAccountMapper.updateWeCorpAccount(wxCorpAccount);
+        int returnCode = weCorpAccountMapper.updateWeCorpAccount(wxCorpAccount);
+        if(Constants.SERVICE_RETURN_SUCCESS_CODE<returnCode){
+
+
+            iWeAccessTokenService.removeToken();
+
+        }
+
+        return returnCode;
     }
 
 
@@ -94,7 +107,18 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
      */
     @Override
     public int startVailWeCorpAccount(String corpId) {
-        return weCorpAccountMapper.startVailWeCorpAccount(corpId);
+
+        int returnCode = weCorpAccountMapper.startVailWeCorpAccount(corpId);
+
+        if(Constants.SERVICE_RETURN_SUCCESS_CODE<returnCode){
+
+
+            iWeAccessTokenService.removeToken();
+
+        }
+
+
+        return returnCode;
     }
 
     @Override

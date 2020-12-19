@@ -1,11 +1,14 @@
 package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 /**
  * 群发消息 原始数据信息表 we_customer_messageOriginal
@@ -62,6 +65,5 @@ public class WeCustomerMessageOriginal extends BaseEntity {
      * 删除标识位 0 未删除  1 已删除
      */
     private int delFlag;
-
 
 }

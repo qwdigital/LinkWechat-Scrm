@@ -68,6 +68,8 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
     }
 
 
+
+
     private String findAccessToken(String accessTokenKey){
 
         String  weAccessToken =redisCache.getCacheObject(accessTokenKey);
@@ -102,6 +104,17 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
         }
 
         return weAccessToken;
+    }
+
+
+    /**
+     * 清空redis中的相关token
+     */
+    @Override
+    public void removeToken() {
+        redisCache.deleteObject(WeConstans.WE_COMMON_ACCESS_TOKEN);
+        redisCache.deleteObject(WeConstans.WE_CONTACT_ACCESS_TOKEN);
+        redisCache.deleteObject(WeConstans.WE_PROVIDER_ACCESS_TOKEN);
     }
 
 

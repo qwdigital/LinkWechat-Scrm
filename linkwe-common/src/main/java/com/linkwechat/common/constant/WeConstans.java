@@ -269,4 +269,7 @@ public class WeConstans {
     }
 
     public static final String WECOM_FINANCE_INDEX = "finance";
+
+    /** 开启会话存档成员列表 **/
+    public static final String weMsgAuditKey = "wecom_msg_audit:user:ids";
 }

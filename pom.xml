@@ -37,12 +37,22 @@
         <hutool.version>5.4.1</hutool.version>
         <zxing.version>3.3.3</zxing.version>
         <mybatis-plus.version>3.4.0</mybatis-plus.version>
+        <vertx.version>4.0.0</vertx.version>
+        <netty-version>4.1.49.Final</netty-version>
     </properties>
 	
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
-        
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>${netty-version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <!-- SpringBoot的依赖配置-->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -235,8 +245,17 @@
                 <version>${mybatis-plus.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-core</artifactId>
+                <version>${vertx.version}</version>
+            </dependency>
 
-
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-web-client</artifactId>
+                <version>${vertx.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -292,7 +311,7 @@
                 <enabled>true</enabled>
             </releases>
             <snapshots>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
     </pluginRepositories>

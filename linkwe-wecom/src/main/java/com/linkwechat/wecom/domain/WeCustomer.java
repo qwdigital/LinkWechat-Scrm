@@ -92,6 +92,8 @@ public class WeCustomer extends BaseEntity
     private Integer status;
 
     /** 部门 */
+    @TableField(exist = false)
     private String departmentIds;
+
 
 }

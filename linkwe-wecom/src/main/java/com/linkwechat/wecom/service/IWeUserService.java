@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.dto.msgaudit.WeMsgAuditDto;
 import com.linkwechat.wecom.domain.vo.WeAllocateCustomersVo;
 import com.linkwechat.wecom.domain.vo.WeAllocateGroupsVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
@@ -108,4 +109,11 @@ public interface IWeUserService extends IService<WeUser>
      */
      List<WeAllocateGroupsVo>  getAllocateGroups(WeAllocateGroupsVo weAllocateGroupsVo);
 
+
+    /**
+     * 获取会话内容存档开启成员列表
+     * @param msgAuditDto
+     * @return
+     */
+    List<WeUser> getPermitUserList(WeMsgAuditDto msgAuditDto);
 }

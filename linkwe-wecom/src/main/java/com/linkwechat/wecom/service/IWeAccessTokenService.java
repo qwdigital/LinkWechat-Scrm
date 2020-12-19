@@ -14,4 +14,6 @@ public interface IWeAccessTokenService {
 
 
    public String findProviderAccessToken();
+
+   public void removeToken();
 }

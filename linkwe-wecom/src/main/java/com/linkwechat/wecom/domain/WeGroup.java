@@ -63,6 +63,7 @@ public class WeGroup {
     private String endTime;
 
     /**员工id*/
+    @TableField(exist = false)
     private String userIds;
 
 
