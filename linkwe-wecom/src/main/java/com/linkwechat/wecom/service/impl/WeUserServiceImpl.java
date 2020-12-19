@@ -3,9 +3,12 @@ package com.linkwechat.wecom.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.wecom.client.WeMsgAuditClient;
 import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.dto.msgaudit.WeMsgAuditDto;
 import com.linkwechat.wecom.domain.vo.WeAllocateCustomersVo;
 import com.linkwechat.wecom.domain.vo.WeAllocateGroupsVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
@@ -22,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 通讯录相关客户Service业务层处理
@@ -35,9 +40,14 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
     @Autowired
     private WeUserMapper weUserMapper;
 
+    @Autowired
+    private RedisCache redisCache;
 
     @Autowired
     private WeUserClient weUserClient;
+
+    @Autowired
+    private WeMsgAuditClient weMsgAuditClient;
 
 
     @Autowired
@@ -243,6 +253,18 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
     @Override
     public List<WeAllocateGroupsVo> getAllocateGroups(WeAllocateGroupsVo weAllocateGroupsVo) {
         return this.baseMapper.getAllocateGroups(weAllocateGroupsVo);
+    }
+
+    @Override
+    public List<WeUser> getPermitUserList(WeMsgAuditDto msgAuditDto) {
+        List<String> userIds = redisCache.getCacheList(WeConstans.weMsgAuditKey);
+        if (CollectionUtil.isNotEmpty(userIds)){
+            WeMsgAuditDto permitUserList = weMsgAuditClient.getPermitUserList(msgAuditDto);
+            userIds = Optional.ofNullable(userIds).orElse(permitUserList.getIds());
+            redisCache.setCacheList(WeConstans.weMsgAuditKey,userIds);
+            redisCache.expire(WeConstans.weMsgAuditKey,10,TimeUnit.MILLISECONDS);
+        }
+        return weUserMapper.selectBatchIds(userIds);
     }
 
 
