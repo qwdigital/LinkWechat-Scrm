@@ -84,8 +84,12 @@ export default {
       ] = true
     },
     // 选择添加人确认按钮
-    selectedUser(data) {
-      this.userParty = data
+    selectedUser(users) {
+      users.map((d) => {
+        d.userId && this.form.staffId.push(d.userId)
+        d.id && this.form.department.push(d.id)
+      })
+      this.userParty = users
     },
     // 选择标签确认按钮
     submitSelectTag(data) {
@@ -104,7 +108,7 @@ export default {
     },
     submit() {
       let form = JSON.parse(JSON.stringify(this.form))
-      form.tag += ''
+      form.tag = form.tag.map((d) => d.tagId) + ''
       form.department += ''
       form.staffId += ''
       add(form)
