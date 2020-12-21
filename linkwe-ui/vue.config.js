@@ -75,6 +75,18 @@ module.exports = {
       })
       .end()
 
+    config.plugin('preload').tap(() => [
+      {
+        rel: 'preload',
+        // to ignore runtime.js
+        fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
+        include: 'initial',
+      },
+    ])
+
+    // when there are many pages, it will cause too many meaningless requests
+    config.plugins.delete('prefetch')
+
     config.when(process.env.NODE_ENV !== 'development', (config) => {
       config
         .plugin('ScriptExtHtmlWebpackPlugin')
@@ -86,6 +98,13 @@ module.exports = {
           },
         ])
         .end()
+
+      config.optimization.minimizer('terser').tap((options) => {
+        options[0].terserOptions.compress.drop_console = true
+        options[0].terserOptions.compress.drop_debugger = true
+        return options
+      })
+
       config.optimization.splitChunks({
         chunks: 'all',
         cacheGroups: {
