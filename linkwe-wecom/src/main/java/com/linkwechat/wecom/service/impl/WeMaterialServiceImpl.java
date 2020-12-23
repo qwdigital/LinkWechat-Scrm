@@ -155,10 +155,9 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
             URL materialUrl = new URL(url);
             conn = (HttpURLConnection) materialUrl.openConnection();
             conn.setRequestMethod("GET");
-            conn.setConnectTimeout(20 * 1000);
+           // conn.setConnectTimeout(20 * 1000);
             InputStream inputStream = conn.getInputStream();
-            MultipartFile multipartFile = new MockMultipartFile(name,name, MediaType.APPLICATION_OCTET_STREAM_VALUE, inputStream);
-            return weMediaClient.upload(multipartFile, type);
+            return weMediaClient.upload(inputStream, name,type);
         }catch (Exception e){
             e.printStackTrace();
             log.error("上传临时文件失败......url:{},type:{},name:{},ex:{},st:{}",url,type,name,e.getMessage(),e.getStackTrace());
