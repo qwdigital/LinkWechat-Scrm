@@ -5,7 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.config.ServerConfig;
 import com.linkwechat.common.constant.WeConstans;
-import com.linkwechat.common.enums.MediaType;
+//import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
@@ -20,15 +20,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +65,7 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
             // 上传文件路径
             String filePath = RuoYiConfig.getUploadPath();
             String fileName = "";
-            if (MediaType.FILE.getType().equals(type)) {
+            if (com.linkwechat.common.enums.MediaType .FILE.getType().equals(type)) {
                 fileName = FileUploadUtils.uploadFile(file);
             } else {
                 // 上传并返回新文件名称
@@ -69,7 +73,7 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
             }
             String url = serverConfig.getUrl() + fileName;
             //上传临时素材
-            Optional<MediaType> mediaType = MediaType.of(type);
+            Optional<com.linkwechat.common.enums.MediaType > mediaType = com.linkwechat.common.enums.MediaType .of(type);
             if (!mediaType.isPresent()) {
                 throw new WeComException("媒体类型出错！");
             }
@@ -143,5 +147,23 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
 
     }
 
+    @Override
+    public WeMediaDto uploadTemporaryMaterial(String url, String type, String name) {
+
+        HttpURLConnection conn = null;
+        try{
+            URL materialUrl = new URL(url);
+            conn = (HttpURLConnection) materialUrl.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(20 * 1000);
+            InputStream inputStream = conn.getInputStream();
+            MultipartFile multipartFile = new MockMultipartFile(name,name, MediaType.APPLICATION_OCTET_STREAM_VALUE, inputStream);
+            return weMediaClient.upload(multipartFile, type);
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("上传临时文件失败......url:{},type:{},name:{},ex:{},st:{}",url,type,name,e.getMessage(),e.getStackTrace());
+        }
+        return null;
+    }
 
 }
