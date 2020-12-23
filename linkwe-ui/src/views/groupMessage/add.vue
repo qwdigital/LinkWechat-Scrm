@@ -102,7 +102,6 @@ export default {
     },
     // 选择素材确认按钮
     submitSelectMaterial(text, image, file) {
-      debugger
       this.form.textMessage.content = text.content
       this.form.imageMessage.media_id = image.id
       this.form.imageMessage.pic_url = image.materialUrl
