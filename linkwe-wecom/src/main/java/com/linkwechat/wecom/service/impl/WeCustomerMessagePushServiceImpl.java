@@ -72,13 +72,14 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
     @Transactional
     public void addWeCustomerMessagePush(CustomerMessagePushDto customerMessagePushDto) throws JsonProcessingException {
         //立即发送
-        if (null == customerMessagePushDto.getSettingTime()) {
+        if (null == customerMessagePushDto.getSettingTime() || customerMessagePushDto.getSettingTime().equals("")) {
 
+            customerMessagePushDto.setMessageType("1");
             sendMessgae(customerMessagePushDto);
 
         } else {
 
-            //发送时间不能小于当前时间
+            //发送时间不能小于当前时间 
             //定时发送消息(异步执行)
             //保存消息体到数据库，增加一个发送状态(0 已发送 1 未发送)
             //定义一个任务执行队列
@@ -130,14 +131,12 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
         //发给客户
         if(customerMessagePushDto.getPushType().equals("0")){
             WeCustomerMessagePushDto messagePushDto=new WeCustomerMessagePushDto();
-            messagePushDto.setChat_type(ChatType.of(customerMessagePushDto.getPushType()).getType());
+            messagePushDto.setChat_type(ChatType.of(customerMessagePushDto.getPushType()).getName());
             externalUserIds = externalUserIds(customerMessagePushDto.getPushRange(), customerMessagePushDto.getStaffId()
                     , customerMessagePushDto.getDepartment(), customerMessagePushDto.getTag());
             messagePushDto.setExternal_userid(externalUserIds);
-            messagePushDto.setImage(customerMessagePushDto.getImageMessage());
-            messagePushDto.setLink(customerMessagePushDto.getLinkMessage());
-            messagePushDto.setMiniprogram(customerMessagePushDto.getMiniprogramMessage());
-            messagePushDto.setText(customerMessagePushDto.getTextMessage());
+
+            seedMessage(messagePushDto,customerMessagePushDto);
             SendMessageResultDto sendMessageResultDto = weCustomerMessagePushClient.sendCustomerMessageToUser(messagePushDto);
             if(WeConstans.WE_SUCCESS_CODE.equals(sendMessageResultDto.getErrcode())){
                 msgIds.add(sendMessageResultDto.getMsgid());
@@ -147,28 +146,28 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
 
         //发给客户群
         if(customerMessagePushDto.getPushType().equals("1")){
+            if(customerMessagePushDto.getStaffId()==null || customerMessagePushDto.getStaffId().equals("")){
+                throw new WeComException("参数异常！");
+            }
             //通过员工id查询群列表
             WeGroup weGroup=new WeGroup();
             weGroup.setUserIds(customerMessagePushDto.getStaffId());
             List<WeGroup> groups = weGroupService.selectWeGroupList(weGroup);
             if(CollectionUtils.isNotEmpty(groups)){
                 List<String> owners = groups.stream().map(WeGroup::getOwner).collect(Collectors.toList());
-                owners.forEach(s->{
+                for (String owner:owners) {
                     WeCustomerMessagePushDto messagePushDto=new WeCustomerMessagePushDto();
                     messagePushDto.setChat_type(ChatType.of(customerMessagePushDto.getPushType()).getType());
                     //客户群的员工id
-                    messagePushDto.setSender(s);
-                    messagePushDto.setImage(customerMessagePushDto.getImageMessage());
-                    messagePushDto.setLink(customerMessagePushDto.getLinkMessage());
-                    messagePushDto.setMiniprogram(customerMessagePushDto.getMiniprogramMessage());
-                    messagePushDto.setText(customerMessagePushDto.getTextMessage());
+                    messagePushDto.setSender(owner);
+                    seedMessage(messagePushDto,customerMessagePushDto);
                     SendMessageResultDto sendMessageResultDto = weCustomerMessagePushClient.sendCustomerMessageToUser(messagePushDto);
                     if(WeConstans.WE_SUCCESS_CODE.equals(sendMessageResultDto.getErrcode())){
                         //发送的msgId
                         msgIds.add(sendMessageResultDto.getMsgid());
-                        senders.add(s);
+                        senders.add(owner);
                     }
-                });
+                }
             }
         }
 
@@ -194,6 +193,43 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
         saveSeedMessage(customerMessagePushDto,messageId);
 
     }
+
+    /**
+     * 子消息体
+     *
+     * @param weCustomerMessagePushDto 群发消息体
+     * @param customerMessagePushDto 群发消息
+     */
+    public void seedMessage(WeCustomerMessagePushDto weCustomerMessagePushDto,CustomerMessagePushDto customerMessagePushDto){
+        // 消息类型 0 文本消息  1 图片消息 2 链接消息   3 小程序消息
+        if(customerMessagePushDto.getMessageType().equals("0")){
+            weCustomerMessagePushDto.setImage(null);
+            weCustomerMessagePushDto.setLink(null);
+            weCustomerMessagePushDto.setMiniprogram(null);
+            weCustomerMessagePushDto.setText(customerMessagePushDto.getTextMessage());
+        }
+        if(customerMessagePushDto.getMessageType().equals("1")){
+            weCustomerMessagePushDto.setImage(customerMessagePushDto.getImageMessage());
+            weCustomerMessagePushDto.setLink(null);
+            weCustomerMessagePushDto.setMiniprogram(null);
+            weCustomerMessagePushDto.setText(null);
+        }
+
+        if(customerMessagePushDto.getMessageType().equals("2")){
+            weCustomerMessagePushDto.setImage(null);
+            weCustomerMessagePushDto.setLink(customerMessagePushDto.getLinkMessage());
+            weCustomerMessagePushDto.setMiniprogram(null);
+            weCustomerMessagePushDto.setText(null);
+        }
+
+        if(customerMessagePushDto.getMessageType().equals("3")){
+            weCustomerMessagePushDto.setImage(customerMessagePushDto.getImageMessage());
+            weCustomerMessagePushDto.setLink(customerMessagePushDto.getLinkMessage());
+            weCustomerMessagePushDto.setMiniprogram(customerMessagePushDto.getMiniprogramMessage());
+            weCustomerMessagePushDto.setText(customerMessagePushDto.getTextMessage());
+        }
+    }
+
     /**
      * 各分类消息表
      * @param customerMessagePushDto 群发消息
