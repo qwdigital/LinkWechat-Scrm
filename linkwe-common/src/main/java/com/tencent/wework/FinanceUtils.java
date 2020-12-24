@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author sxw
@@ -82,6 +83,27 @@ public class FinanceUtils {
                     JSONObject jsonObject = decryptChatRecord(sdk, data.getString("encrypt_random_key"),
                             data.getString("encrypt_chat_msg"), privateKey);
                     jsonObject.put("seq", LocalSEQ);
+                    jsonObject.put("totype","0");
+                    if (StringUtils.isEmpty(jsonObject.getString("roomid"))){
+                        JSONArray tolist = jsonObject.getJSONArray("tolist");
+                        Optional.ofNullable(tolist).ifPresent(itemList ->{
+                            List<String> isEType = itemList.stream().map(item -> (String) item).filter(item ->
+                                    StringUtils.isNotEmpty(item) &&
+                                            ("wo".equals(item.substring(0, 2)) || "wm".equals(item.substring(0, 2))))
+                                    .collect(Collectors.toList());
+                            List<String> isExtype = itemList.stream().map(item -> (String) item).filter(item ->
+                                    StringUtils.isNotEmpty(item) && "wb".equals(item.substring(0, 2)))
+                                    .collect(Collectors.toList());
+                            if (CollectionUtil.isNotEmpty(isEType)){
+                                jsonObject.put("totype","1");
+                                return;
+                            }
+                            if (CollectionUtil.isNotEmpty(isExtype)){
+                                jsonObject.put("totype","2");
+                                return;
+                            }
+                        });
+                    }
                     elasticSearchEntity.setData(jsonObject);
                     elasticSearchEntity.setId(jsonObject.getString("msgid"));
                     resList.add(elasticSearchEntity);
