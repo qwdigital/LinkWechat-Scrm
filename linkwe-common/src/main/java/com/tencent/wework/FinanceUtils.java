@@ -116,16 +116,6 @@ public class FinanceUtils {
         return resList;
     }
 
-
-    public static void main(String[] args) {
-        String secret = "_Ruv_TD_GzE4wJLvhMv4MeYkjM81_IJFDPcsUiss9fw";
-        initSDK("ww24262ce93851488f", secret);
-        //getChatData(0,"","");
-//        getMediaData("CiBkZDk3ZmJjMTlhYjU1YWJiNDQ4MjI3NWRlMzk1NmMzYxI4TkRkZk56ZzRNVE13TURVNU5Ua3lOVFEyTlY4NU5ERTBOekUwTWpaZk1UWXdOemt4TkRrMU1BPT0aIDBiMzY3YjkyNzE5ZDE3ZWU4NjkyNTVlYzJkNTlmNjI3",
-//                "", "", "");
-    }
-
-
     /**
      * @param sdk               初始化时候获取到的值
      * @param ncrypt_random_key 企业微信返回的随机密钥
