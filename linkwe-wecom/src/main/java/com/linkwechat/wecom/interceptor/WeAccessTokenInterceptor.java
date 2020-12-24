@@ -5,6 +5,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
+import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.ForestDataType;
 import com.linkwechat.common.config.WeComeConfig;
 import com.linkwechat.common.constant.WeConstans;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @description: 微信token拦截器
@@ -38,16 +40,15 @@ public class WeAccessTokenInterceptor implements Interceptor{
      */
     @Override
     public boolean beforeExecute(ForestRequest request) {
-        request.setDataType(ForestDataType.JSON);
+
 
         String uri=request.getUrl().replace("http://","");
 
-        request.setContentType("application/json");
-//        if(Arrays.asList(weComeConfig.getFileUplodUrl()).contains(uri)){
-//            request.setContentType("application/json");
-//        }else{
-//            request.setContentType("multipart/form-data");
-//        }
+        //request.setContentType("application/json");
+        if(!Arrays.asList(weComeConfig.getFileUplodUrl()).contains(uri)){
+            request.setDataType(ForestDataType.JSON);
+            request.setContentType("application/json");
+        }
 
 
 

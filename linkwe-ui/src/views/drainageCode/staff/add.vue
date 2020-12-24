@@ -41,7 +41,7 @@ export default {
       this.loading = true
       getDetail(id).then(({ data }) => {
         this.form = data
-        this.materialSelected = data.weMaterial.materialUrl
+        this.materialSelected = data.weMaterial ==null?"":data.weMaterial.materialUrl
         this.loading = false
       })
     },

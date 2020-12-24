@@ -181,7 +181,7 @@ public class WeEventChangeExternalContactImpl implements WeCallBackEventFactory 
                             }
                             if(StringUtils.isNotEmpty(messageMap.getCategoryId())){
                                 WeMediaDto weMediaDto = weMaterialService
-                                        .uploadTemporaryMaterial(messageMap.getMaterialUrl(), MediaType.IMAGE.getMediaType());
+                                        .uploadTemporaryMaterial(messageMap.getMaterialUrl(),messageMap.getMaterialName(), MediaType.IMAGE.getMediaType());
                                 Optional.ofNullable(weMediaDto).ifPresent(media ->{
                                     weWelcomeMsgBuilder.image(WeWelcomeMsg.Image.builder().media_id(media.getMedia_id())
                                             .pic_url(media.getUrl()).build());
