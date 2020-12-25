@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
 import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.config.ServerConfig;
 import com.linkwechat.common.constant.WeConstans;
@@ -17,9 +18,19 @@ import com.linkwechat.wecom.domain.vo.WeMaterialFileVO;
 import com.linkwechat.wecom.mapper.WeMaterialMapper;
 import com.linkwechat.wecom.service.IWeMaterialService;
 import lombok.extern.slf4j.Slf4j;
+import me.chanjar.weixin.common.error.WxError;
+import me.chanjar.weixin.common.util.http.apache.Utf8ResponseHandler;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -135,32 +146,30 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
     public WeMediaDto uploadTemporaryMaterial(String url, String type) {
         try {
             File file = new File(url);
-            FileItemFactory factory = new DiskFileItemFactory(16, null);
-            FileItem item=factory.createItem(file.getName(),"text/plain",true,file.getName());
-            MultipartFile multipartFile = new CommonsMultipartFile(item);
-            return weMediaClient.upload(multipartFile, type);
+            return weMediaClient.upload(file, type);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("上传临时文件失败......url:{},type:{},ex:{},st:{}",url,type,e.getMessage(),e.getStackTrace());
         }
         return null;
-
     }
 
     @Override
     public WeMediaDto uploadTemporaryMaterial(String url, String type, String name) {
-
         HttpURLConnection conn = null;
         try{
             URL materialUrl = new URL(url);
             conn = (HttpURLConnection) materialUrl.openConnection();
             conn.setRequestMethod("GET");
-           // conn.setConnectTimeout(20 * 1000);
-            InputStream inputStream = conn.getInputStream();
-            return weMediaClient.upload(inputStream, name,type);
+            conn.setConnectTimeout(20 * 1000);
+            return weMediaClient.upload(conn.getInputStream(), name, type);
         }catch (Exception e){
             e.printStackTrace();
             log.error("上传临时文件失败......url:{},type:{},name:{},ex:{},st:{}",url,type,name,e.getMessage(),e.getStackTrace());
+        }finally {
+            if (conn !=null){
+                conn = null;
+            }
         }
         return null;
     }
