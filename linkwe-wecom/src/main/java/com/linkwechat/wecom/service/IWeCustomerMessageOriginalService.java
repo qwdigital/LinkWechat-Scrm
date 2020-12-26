@@ -2,6 +2,10 @@ package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeCustomerMessageOriginal;
+import com.linkwechat.wecom.domain.vo.CustomerMessagePushVo;
+
+import java.util.List;
+
 /**
  * 群发消息 原始数据信息表 we_customer_messageOriginal
  *
@@ -15,4 +19,17 @@ public interface IWeCustomerMessageOriginalService extends IService<WeCustomerMe
      * @return
      */
     int saveWeCustomerMessageOriginal(WeCustomerMessageOriginal weCustomerMessageOriginal);
+
+    /**
+     * 群发消息列表
+     *
+     * @param sender 创建人
+     * @param content 内容
+     * @param pushType 群发类型
+     * @param beginTime 开始时间
+     * @param endTime 结束时间
+     * @return {@link CustomerMessagePushVo}s
+     */
+    List<CustomerMessagePushVo> customerMessagePushs(String sender,String content,String pushType,String beginTime,String endTime);
+
 }

@@ -92,4 +92,14 @@ public interface IWeMaterialService {
      */
     public WeMediaDto uploadTemporaryMaterial(String url, String type);
 
+
+    /**
+     * 上传企微临时素材
+     * @param url 素材路径
+     * @param type 素材类型
+     * @param name 素材名称
+     * @return
+     */
+    public WeMediaDto uploadTemporaryMaterial(String url, String type,String name);
+
 }

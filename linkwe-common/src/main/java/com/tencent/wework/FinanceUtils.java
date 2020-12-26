@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author sxw
@@ -82,6 +83,27 @@ public class FinanceUtils {
                     JSONObject jsonObject = decryptChatRecord(sdk, data.getString("encrypt_random_key"),
                             data.getString("encrypt_chat_msg"), privateKey);
                     jsonObject.put("seq", LocalSEQ);
+                    jsonObject.put("totype","0");
+                    if (StringUtils.isEmpty(jsonObject.getString("roomid"))){
+                        JSONArray tolist = jsonObject.getJSONArray("tolist");
+                        Optional.ofNullable(tolist).ifPresent(itemList ->{
+                            List<String> isEType = itemList.stream().map(item -> (String) item).filter(item ->
+                                    StringUtils.isNotEmpty(item) &&
+                                            ("wo".equals(item.substring(0, 2)) || "wm".equals(item.substring(0, 2))))
+                                    .collect(Collectors.toList());
+                            List<String> isExtype = itemList.stream().map(item -> (String) item).filter(item ->
+                                    StringUtils.isNotEmpty(item) && "wb".equals(item.substring(0, 2)))
+                                    .collect(Collectors.toList());
+                            if (CollectionUtil.isNotEmpty(isEType)){
+                                jsonObject.put("totype","1");
+                                return;
+                            }
+                            if (CollectionUtil.isNotEmpty(isExtype)){
+                                jsonObject.put("totype","2");
+                                return;
+                            }
+                        });
+                    }
                     elasticSearchEntity.setData(jsonObject);
                     elasticSearchEntity.setId(jsonObject.getString("msgid"));
                     resList.add(elasticSearchEntity);
@@ -93,16 +115,6 @@ public class FinanceUtils {
         Finance.FreeSlice(slice);
         return resList;
     }
-
-
-    public static void main(String[] args) {
-        String secret = "_Ruv_TD_GzE4wJLvhMv4MeYkjM81_IJFDPcsUiss9fw";
-        initSDK("ww24262ce93851488f", secret);
-        //getChatData(0,"","");
-//        getMediaData("CiBkZDk3ZmJjMTlhYjU1YWJiNDQ4MjI3NWRlMzk1NmMzYxI4TkRkZk56ZzRNVE13TURVNU5Ua3lOVFEyTlY4NU5ERTBOekUwTWpaZk1UWXdOemt4TkRrMU1BPT0aIDBiMzY3YjkyNzE5ZDE3ZWU4NjkyNTVlYzJkNTlmNjI3",
-//                "", "", "");
-    }
-
 
     /**
      * @param sdk               初始化时候获取到的值

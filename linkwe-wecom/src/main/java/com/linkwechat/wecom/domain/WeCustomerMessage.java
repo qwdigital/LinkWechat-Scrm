@@ -57,6 +57,22 @@ public class WeCustomerMessage extends BaseEntity {
     private String msgid;
 
     /**
+     * 发送情况
+     * ps:显示样式
+     *
+     * 1）定时任务 发送时间:2020-12-25 10:00:00
+     * 2) 预计发送3190人，已成功发送0人
+     * 3）预计发送2个群，已成功发送0个群
+     *
+     */
+    private String sendInfo;
+
+    /**
+     * 消息内容
+     */
+    private String content;
+
+    /**
      * 0 未删除 1 已删除
      */
     private int delFlag;

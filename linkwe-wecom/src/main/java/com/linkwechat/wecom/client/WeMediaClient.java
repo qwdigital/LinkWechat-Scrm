@@ -6,6 +6,9 @@ import com.dtflys.forest.annotation.Query;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.InputStream;
+
 /**
  * 素材管理
  * @Author: Robin
@@ -16,12 +19,12 @@ public interface WeMediaClient {
 
     /**
      * 上传临时素材
-     * @param multipartFile
+     * @param file
      * @param type
      * @return
      */
     @Post(url="/media/upload")
-    WeMediaDto upload(@DataFile(value = "file") MultipartFile multipartFile, @Query("type") String type);
+    WeMediaDto upload(@DataFile(value = "media") File file, @Query("type") String type);
 
     /**
      * 上传图片
@@ -30,4 +33,14 @@ public interface WeMediaClient {
      */
     @Post(url="/media/uploadimg")
     WeMediaDto  uploadimg(@DataFile(value = "file") MultipartFile multipartFile);
+
+
+    /**
+     * 上传临时素材
+     * Inputstream 对象
+     * 使用byte数组和Inputstream对象时一定要定义fileName属性
+     */
+    @Post(url = "/media/upload")
+    WeMediaDto upload(@DataFile(value = "media", fileName = "${1}") InputStream file, String filename, @Query("type") String type);
+
 }
