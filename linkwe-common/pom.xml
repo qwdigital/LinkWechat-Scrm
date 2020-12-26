@@ -138,6 +138,7 @@
         <dependency>
             <groupId>com.dtflys.forest</groupId>
             <artifactId>spring-boot-starter-forest</artifactId>
+            <version>1.5.0-RC1</version>
         </dependency>
 
         <dependency>
