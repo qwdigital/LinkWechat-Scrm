@@ -1,5 +1,6 @@
 <script>
 import { add } from '@/api/groupMessage'
+import { getMaterialMediaId } from '@/api/material'
 import PhoneDialog from '@/components/PhoneDialog'
 import SelectUser from '@/components/SelectUser'
 import SelectTag from '@/components/SelectTag'
@@ -103,19 +104,36 @@ export default {
     // 选择素材确认按钮
     submitSelectMaterial(text, image, file) {
       this.form.textMessage.content = text.content
-      this.form.imageMessage.media_id = image.id
+      // this.form.imageMessage.media_id = image.id
       this.form.imageMessage.pic_url = image.materialUrl
+      this.form.imageMessage._materialName = image.materialName
     },
     submit() {
       let form = JSON.parse(JSON.stringify(this.form))
-      form.tag = form.tag.map((d) => d.tagId) + ''
-      form.department += ''
-      form.staffId += ''
-      add(form)
+      Promise.resolve(() => {
+        if (form.messageType == 1) {
+          // debugger
+          let dataMediaId = {
+            url: form.imageMessage.pic_url,
+            type: '0',
+            name: form.imageMessage._materialName,
+          }
+          return getMaterialMediaId(dataMediaId).then((res) => {
+            form.imageMessage.media_id = res.data
+          })
+        }
+      })
+        .then(() => {
+          form.messageType = this.activeName
+          form.tag = form.tag.map((d) => d.tagId) + ''
+          form.department += ''
+          form.staffId += ''
+          return add(form)
+        })
         .then(({ data }) => {
           this.msgSuccess('操作成功')
           this.loading = false
-          this.$router.back()
+          this.$router.push('/groupMessage/record')
         })
         .catch(() => {
           this.loading = false
