@@ -210,7 +210,7 @@ com.linkwechat
 
 ### 联系作者加入群
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1217/152441_79fbd2f6_409467.png "屏幕截图.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1226/183631_251ea80c_409467.png "屏幕截图.png")
 
 ### 特别鸣谢
 

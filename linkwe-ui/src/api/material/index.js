@@ -149,3 +149,18 @@ export function removeTree(ids) {
     method: 'DELETE',
   })
 }
+
+/**
+ * 获取素材media_id
+ * @param {*} data
+ * url [string] 是	素材路径		
+type [string] 是	素材类型		
+name [string] 是	文件名称
+ */
+export function getMaterialMediaId(data) {
+  return request({
+    url: service + '/temporaryMaterialMediaId',
+    method: 'POST',
+    data,
+  })
+}
