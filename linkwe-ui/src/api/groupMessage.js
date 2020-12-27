@@ -40,3 +40,21 @@ export function add(data) {
     data,
   })
 }
+
+/**
+ * 
+ * @param {*} data 
+ * {
+ * sender:创建人
+content:内容
+pushType:群发类型 0 发给客户 1 发给客户群
+beginTime:开始时间 
+endTime:结束时间}
+ */
+export function getList(data) {
+  return request({
+    url: service + '/list',
+    method: 'get',
+    data,
+  })
+}
