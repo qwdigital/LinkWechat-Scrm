@@ -146,11 +146,11 @@ export default {
             </el-form-item>
             <el-form-item label="海报类型">
               <el-radio-group v-model="posterForm.type">
-                <el-radio label="1">名片海报</el-radio>
-                <el-radio label="2">专属海报</el-radio>
+                <!-- <el-radio label="1">名片海报</el-radio>
+                <el-radio label="2">专属海报</el-radio> -->
                 <el-radio label="3">通用海报</el-radio>
-                <el-radio label="4">案例海报</el-radio>
-                <el-radio label="5">产品海报</el-radio>
+                <!-- <el-radio label="4">案例海报</el-radio>
+                <el-radio label="5">产品海报</el-radio> -->
               </el-radio-group>
             </el-form-item>
             <el-form-item

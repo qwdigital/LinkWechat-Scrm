@@ -231,18 +231,18 @@ export const constantRoutes = [
   //     },
   //   ],
   // },
-  {
-    path: '/material',
-    component: Layout,
-    redirect: '/material/poster',
-    meta: { title: '素材中心', icon: 'material' },
-    children: [
-      {
-        path: 'poster',
-        name: 'MaterialPoster',
-        component: (resolve) => require(['@/views/material/poster'], resolve),
-        meta: { title: '海报', icon: '' },
-      },
+  // {
+  //   path: '/material',
+  //   component: Layout,
+  //   redirect: '/material/poster',
+  //   meta: { title: '素材中心', icon: 'material' },
+  //   children: [
+  //     {
+  //       path: 'poster',
+  //       name: 'MaterialPoster',
+  //       component: (resolve) => require(['@/views/material/poster'], resolve),
+  //       meta: { title: '海报', icon: '' },
+  //     },
       // {
       //   path: 'text',
       //   name: 'MaterialText',
@@ -285,8 +285,8 @@ export const constantRoutes = [
       //   component: (resolve) => require(['@/views/material/applet'], resolve),
       //   meta: { title: '小程序', icon: '' },
       // },
-    ],
-  },
+  //   ],
+  // },
   // {
   //   path: '/appTool',
   //   component: Layout,

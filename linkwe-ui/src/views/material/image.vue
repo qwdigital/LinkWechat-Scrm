@@ -4,16 +4,16 @@ import MaPage from '@/views/material/components/MaPage'
 export default {
   name: 'Image',
   components: { MaPage },
-  data() {
+  data () {
     return {
       srcList: [],
       ids: [], // 选中数组
     }
   },
   watch: {},
-  created() {},
+  created () { },
   methods: {
-    listChange(data) {
+    listChange (data) {
       this.srcList = data.map((item) => item.materialUrl)
     },
   },
