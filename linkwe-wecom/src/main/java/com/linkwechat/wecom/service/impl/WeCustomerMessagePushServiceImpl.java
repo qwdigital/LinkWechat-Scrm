@@ -8,6 +8,7 @@ import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.ChatType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
 import com.linkwechat.wecom.domain.*;
@@ -73,8 +74,6 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
     public void addWeCustomerMessagePush(CustomerMessagePushDto customerMessagePushDto) throws JsonProcessingException {
         //立即发送
         if (null == customerMessagePushDto.getSettingTime() || customerMessagePushDto.getSettingTime().equals("")) {
-
-            customerMessagePushDto.setMessageType("1");
             sendMessgae(customerMessagePushDto);
 
         } else {
@@ -199,6 +198,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
         customerMessage.setDelFlag(0);
         customerMessage.setContent(content(customerMessagePushDto));
         customerMessage.setSendInfo(sendInfo.toString());
+        customerMessage.setCreateBy(SecurityUtils.getUsername());
         weCustomerMessageService.save(customerMessage);
 
         //保存分类消息信息

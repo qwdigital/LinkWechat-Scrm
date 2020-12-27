@@ -5,7 +5,7 @@
 <mapper namespace="com.linkwechat.wecom.mapper.WeCustomerMessageOriginalMapper">
     <select id="selectCustomerMessagePushs" resultType="com.linkwechat.wecom.domain.vo.CustomerMessagePushVo">
         SELECT
-        wcmo.push_type,wcmo.message_type,wcmo.push_range,wcmo.create_by sender,wcmo.create_time
+        wcmo.push_type,wcmo.message_type,wcmo.push_range,wcm.create_by sender,wcmo.create_time
         sendTime,wcm.message_id,wcm.content,wcm.send_info
         FROM we_customer_messageOriginal wcmo LEFT JOIN we_customer_message wcm ON
         wcmo.message_original_Id=wcm.original_id
