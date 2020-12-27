@@ -3,6 +3,8 @@ package com.linkwechat.wecom.service;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 
+import java.util.List;
+
 /**
  * @author sxw
  * @description 会话存档业务接口
@@ -15,5 +17,5 @@ public interface IWeConversationArchiveService {
      * @param userId
      * @return
      */
-    PageInfo<JSONObject> getInternalContactList(String userId, int pageSize, int pageNum);
+    List<JSONObject> getInternalContactList(String userId);
 }

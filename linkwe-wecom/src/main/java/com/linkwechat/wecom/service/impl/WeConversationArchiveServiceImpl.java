@@ -13,6 +13,12 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 /**
  * @author sxw
  * @description 会话存档业务实现类
@@ -31,16 +37,21 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
      * @return
      */
     @Override
-    public PageInfo<JSONObject> getInternalContactList(String userId, int pageSize, int pageNum) {
+    public List<JSONObject> getInternalContactList(String userId) {
         SearchSourceBuilder builder = new SearchSourceBuilder();
-        int from = (pageSize - 1) * pageNum;
-        builder.size(pageNum);
-        builder.from(from);
+        builder.size(1000);
         builder.sort("msgtime", SortOrder.ASC);
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
-                .must(QueryBuilders.termsQuery("tolist.keyword", userId))
+                .should(QueryBuilders.termQuery("tolist.keyword", userId))
+                .should(QueryBuilders.termQuery("from",userId))
+                .minimumShouldMatch(1)
+                .must(QueryBuilders.termQuery("type",1))
                 .must(QueryBuilders.termQuery("roomid", ""));
         builder.query(boolQueryBuilder);
-        return elasticSearch.searchPage(WeConstans.WECOM_FINANCE_INDEX, builder, pageNum, pageSize, JSONObject.class);
+        List<JSONObject> searchList = elasticSearch.search(WeConstans.WECOM_FINANCE_INDEX, builder, JSONObject.class);
+        Map<String, List<JSONObject>> from = Optional.ofNullable(searchList)
+                .orElseGet(ArrayList::new).stream()
+                .collect(Collectors.groupingBy(item -> item.getString("from")));
+        return null;
     }
 }

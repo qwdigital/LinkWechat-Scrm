@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * @author sxw
  * @description 会话存档controller
@@ -30,7 +32,7 @@ public class WeConversationArchiveController {
      */
     @PreAuthorize("@ss.hasPermi('conversationArchive:InternalContact:list')")
     @GetMapping("/getInternalContactList")
-    public R<PageInfo<JSONObject>> getInternalContactList(String userId, int pageSize, int pageNum) {
-        return R.ok(weConversationArchiveService.getInternalContactList(userId, pageSize, pageNum));
+    public R<List<JSONObject>> getInternalContactList(String userId) {
+        return R.ok(weConversationArchiveService.getInternalContactList(userId));
     }
 }

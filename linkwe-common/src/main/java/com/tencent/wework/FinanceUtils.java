@@ -17,8 +17,7 @@ import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -75,6 +74,7 @@ public class FinanceUtils {
         }
         String content = Finance.GetContentFromSlice(slice);
         JSONArray chatdataArr = JSONObject.parseObject(content).getJSONArray("chatdata");
+        log.info("开始执行数据解析:------------" + chatdataArr.toJSONString());
         if (CollectionUtil.isNotEmpty(chatdataArr)) {
             chatdataArr.stream().map(data -> (JSONObject) data).forEach(data -> {
                 try {
@@ -83,27 +83,6 @@ public class FinanceUtils {
                     JSONObject jsonObject = decryptChatRecord(sdk, data.getString("encrypt_random_key"),
                             data.getString("encrypt_chat_msg"), privateKey);
                     jsonObject.put("seq", LocalSEQ);
-                    jsonObject.put("totype","0");
-                    if (StringUtils.isEmpty(jsonObject.getString("roomid"))){
-                        JSONArray tolist = jsonObject.getJSONArray("tolist");
-                        Optional.ofNullable(tolist).ifPresent(itemList ->{
-                            List<String> isEType = itemList.stream().map(item -> (String) item).filter(item ->
-                                    StringUtils.isNotEmpty(item) &&
-                                            ("wo".equals(item.substring(0, 2)) || "wm".equals(item.substring(0, 2))))
-                                    .collect(Collectors.toList());
-                            List<String> isExtype = itemList.stream().map(item -> (String) item).filter(item ->
-                                    StringUtils.isNotEmpty(item) && "wb".equals(item.substring(0, 2)))
-                                    .collect(Collectors.toList());
-                            if (CollectionUtil.isNotEmpty(isEType)){
-                                jsonObject.put("totype","1");
-                                return;
-                            }
-                            if (CollectionUtil.isNotEmpty(isExtype)){
-                                jsonObject.put("totype","2");
-                                return;
-                            }
-                        });
-                    }
                     elasticSearchEntity.setData(jsonObject);
                     elasticSearchEntity.setId(jsonObject.getString("msgid"));
                     resList.add(elasticSearchEntity);
@@ -111,6 +90,7 @@ public class FinanceUtils {
                     e.printStackTrace();
                 }
             });
+            log.info("数据解析完成:------------" + chatdataArr.toJSONString());
         }
         Finance.FreeSlice(slice);
         return resList;
@@ -136,11 +116,9 @@ public class FinanceUtils {
             //解密
             Finance.DecryptData(sdk, str, encrypt_chat_msg, msg);
             String jsonDataStr = Finance.GetContentFromSlice(msg);
-
-            log.info("解析数据:------------" + jsonDataStr);
             JSONObject realJsonData = JSONObject.parseObject(jsonDataStr);
             String msgType = realJsonData.getString("msgtype");
-            if (StringUtils.isNotEmpty(msgType)){
+            if (StringUtils.isNotEmpty(msgType)) {
                 getSwitchType(realJsonData, msgType);
             }
             return realJsonData;
@@ -175,7 +153,8 @@ public class FinanceUtils {
             case "mixed":
                 setMediaMixedData(realJsonData, msgType);
                 break;
-            case "meeting_voice_call":case "voip_doc_share":
+            case "meeting_voice_call":
+            case "voip_doc_share":
                 setMediaMeetingVoiceCallData(realJsonData, msgType);
                 break;
             default:
@@ -184,7 +163,7 @@ public class FinanceUtils {
     }
 
     private static void setMediaMeetingVoiceCallData(JSONObject realJsonData, String msgType) {
-        JSONObject meetingVoiceCall  = Optional.ofNullable(realJsonData.getJSONObject(msgType))
+        JSONObject meetingVoiceCall = Optional.ofNullable(realJsonData.getJSONObject(msgType))
                 .orElse(realJsonData.getJSONObject("content"));
         String fileName = meetingVoiceCall.getString("filename");
         getPath(realJsonData, msgType, fileName);
@@ -193,13 +172,13 @@ public class FinanceUtils {
     private static void setMediaMixedData(JSONObject realJsonData, String msgType) {
         JSONObject mixedData = realJsonData.getJSONObject(msgType);
         JSONArray items = mixedData.getJSONArray("item");
-        items.stream().map(item ->(JSONObject) item).forEach(item ->{
-            getSwitchType(item,item.getString("type"));
+        items.stream().map(item -> (JSONObject) item).forEach(item -> {
+            getSwitchType(item, item.getString("type"));
         });
     }
 
     private static void setMediaFileData(JSONObject realJsonData, String msgType) {
-        JSONObject emotionData  = Optional.ofNullable(realJsonData.getJSONObject(msgType))
+        JSONObject emotionData = Optional.ofNullable(realJsonData.getJSONObject(msgType))
                 .orElse(realJsonData.getJSONObject("content"));
         String filename = emotionData.getString("filename");
         //String fileext = emotionData.getString("fileext");
@@ -208,30 +187,31 @@ public class FinanceUtils {
     }
 
 
-    private static void setMediaImageData(JSONObject realJsonData,String msgType) {
-        String fileName = IdUtils.simpleUUID()+".jpg";
+    private static void setMediaImageData(JSONObject realJsonData, String msgType) {
+        String fileName = IdUtils.simpleUUID() + ".jpg";
         getPath(realJsonData, msgType, fileName);
     }
 
     private static void setMediaVoiceData(JSONObject realJsonData, String msgType) {
-        String fileName = IdUtils.simpleUUID()+".mp3";
+        String fileName = IdUtils.simpleUUID() + ".mp3";
         getPath(realJsonData, msgType, fileName);
     }
 
     private static void setMediaVideoData(JSONObject realJsonData, String msgType) {
-        String fileName = IdUtils.simpleUUID()+".mp4";
+        String fileName = IdUtils.simpleUUID() + ".mp4";
         getPath(realJsonData, msgType, fileName);
     }
+
     private static void setMediaEmotionData(JSONObject realJsonData, String msgType) {
         String fileName = "";
         JSONObject emotionData = realJsonData.getJSONObject(msgType);
         Integer type = emotionData.getInteger("type");
-        switch (type){
+        switch (type) {
             case 1:
-                fileName = IdUtils.simpleUUID() +".gif";
+                fileName = IdUtils.simpleUUID() + ".gif";
                 break;
             case 2:
-                fileName = IdUtils.simpleUUID() +".png";
+                fileName = IdUtils.simpleUUID() + ".png";
                 break;
             default:
                 break;
@@ -241,19 +221,19 @@ public class FinanceUtils {
 
     private static void getPath(JSONObject realJsonData, String msgType, String fileName) {
         String filePath = getFilePath(msgType);
-        JSONObject data  = Optional.ofNullable(realJsonData.getJSONObject(msgType))
+        JSONObject data = Optional.ofNullable(realJsonData.getJSONObject(msgType))
                 .orElse(realJsonData.getJSONObject("content"));
         String sdkfileid = data.getString("sdkfileid");
         try {
-            getMediaData(sdkfileid,"","",filePath,fileName);
+            getMediaData(sdkfileid, "", "", filePath, fileName);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        data.put("attachment",filePath+"/"+fileName);
-        if(realJsonData.containsKey("content")){
-            realJsonData.put("content",data);
-        }else {
-            realJsonData.put("msgType",data);
+        data.put("attachment", filePath + "/" + fileName);
+        if (realJsonData.containsKey("content")) {
+            realJsonData.put("content", data);
+        } else {
+            realJsonData.put("msgType", data);
         }
 
     }
@@ -271,21 +251,16 @@ public class FinanceUtils {
             if (ret != 0) {
                 return;
             }
-         /*   int indexLen = Finance.GetIndexLen(media_data);
-            int dataLen = Finance.GetDataLen(media_data);
-            int isMediaDataFinish = Finance.IsMediaDataFinish(media_data);*/
             try {
                 File f = new File(filePath);
-                if(!f.exists()){
+                if (!f.exists()) {
                     f.mkdirs();
                 }
-                File file = new File(filePath,fileName);
-                if (!file.isDirectory()){
+                File file = new File(filePath, fileName);
+                if (!file.isDirectory()) {
                     file.createNewFile();
                 }
                 FileOutputStream outputStream = new FileOutputStream(file, true);
-                //File file = new File("D:\\浏览器下载\\media_data\\"+ IdUtils.simpleUUID()+".jpg");
-                //FileOutputStream outputStream = new FileOutputStream(file, true);
                 outputStream.write(Finance.GetData(media_data));
                 outputStream.close();
             } catch (Exception e) {

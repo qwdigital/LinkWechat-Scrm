@@ -206,6 +206,16 @@ public class WeConstans {
      */
     public static final String DEL_FOLLOW_USER_SWITCH_CLOSE = "0";
     public static final String DEL_FOLLOW_USER_SWITCH_OPEN = "1";
+
+    public static final String CONTACT_SEQ_KEY = "seq";
+
+    /**
+     * id类型 0:成员 1:客户,2:机器
+     */
+    public static final Integer ID_TYPE_USER = 0;
+    public static final Integer ID_TYPE_EX = 1;
+    public static final Integer ID_TYPE_MACHINE = 2;
+
     /**
      * 企微回调事件类型路由
      */

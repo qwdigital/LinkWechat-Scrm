@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeChatContactMappingMapper">
+    
+    <resultMap type="WeChatContactMapping" id="WeChatContactMappingResult">
+        <result property="id"    column="id"    />
+        <result property="fromId"    column="from_id"    />
+        <result property="fromAvatar"    column="from_avatar"    />
+        <result property="fromName"    column="from_name"    />
+        <result property="fromGender"    column="from_gender"    />
+        <result property="reviceAvatar"    column="revice_avatar"    />
+        <result property="reviceName"    column="revice_name"    />
+        <result property="reviceGender"    column="revice_gender"    />
+        <result property="reviceId"    column="revice_id"    />
+        <result property="roomId"    column="room_id"    />
+        <result property="isCustom"    column="is_custom"    />
+    </resultMap>
+
+    <sql id="selectWeChatContactMappingVo">
+        select id, from_id, from_avatar, from_name, from_gender, revice_avatar, revice_name, revice_gender, revice_id, room_id, is_custom from we_chat_contact_mapping
+    </sql>
+
+    <select id="selectWeChatContactMappingList" parameterType="WeChatContactMapping" resultMap="WeChatContactMappingResult">
+        <include refid="selectWeChatContactMappingVo"/>
+        <where>  
+            <if test="fromId != null  and fromId != ''"> and from_id = #{fromId}</if>
+            <if test="fromAvatar != null  and fromAvatar != ''"> and from_avatar = #{fromAvatar}</if>
+            <if test="fromName != null  and fromName != ''"> and from_name like concat('%', #{fromName}, '%')</if>
+            <if test="fromGender != null "> and from_gender = #{fromGender}</if>
+            <if test="reviceAvatar != null  and reviceAvatar != ''"> and revice_avatar = #{reviceAvatar}</if>
+            <if test="reviceName != null  and reviceName != ''"> and revice_name like concat('%', #{reviceName}, '%')</if>
+            <if test="reviceGender != null "> and revice_gender = #{reviceGender}</if>
+            <if test="reviceId != null  and reviceId != ''"> and revice_id = #{reviceId}</if>
+            <if test="roomId != null  and roomId != ''"> and room_id = #{roomId}</if>
+            <if test="isCustom != null "> and is_custom = #{isCustom}</if>
+        </where>
+    </select>
+    
+    <select id="selectWeChatContactMappingById" parameterType="Long" resultMap="WeChatContactMappingResult">
+        <include refid="selectWeChatContactMappingVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWeChatContactMapping" parameterType="WeChatContactMapping" useGeneratedKeys="true" keyProperty="id">
+        insert into we_chat_contact_mapping
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fromId != null and fromId != ''">from_id,</if>
+            <if test="fromAvatar != null">from_avatar,</if>
+            <if test="fromName != null">from_name,</if>
+            <if test="fromGender != null">from_gender,</if>
+            <if test="reviceAvatar != null">revice_avatar,</if>
+            <if test="reviceName != null">revice_name,</if>
+            <if test="reviceGender != null">revice_gender,</if>
+            <if test="reviceId != null and reviceId != ''">revice_id,</if>
+            <if test="roomId != null">room_id,</if>
+            <if test="isCustom != null">is_custom,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fromId != null and fromId != ''">#{fromId},</if>
+            <if test="fromAvatar != null">#{fromAvatar},</if>
+            <if test="fromName != null">#{fromName},</if>
+            <if test="fromGender != null">#{fromGender},</if>
+            <if test="reviceAvatar != null">#{reviceAvatar},</if>
+            <if test="reviceName != null">#{reviceName},</if>
+            <if test="reviceGender != null">#{reviceGender},</if>
+            <if test="reviceId != null and reviceId != ''">#{reviceId},</if>
+            <if test="roomId != null">#{roomId},</if>
+            <if test="isCustom != null">#{isCustom},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWeChatContactMapping" parameterType="WeChatContactMapping">
+        update we_chat_contact_mapping
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="fromId != null and fromId != ''">from_id = #{fromId},</if>
+            <if test="fromAvatar != null">from_avatar = #{fromAvatar},</if>
+            <if test="fromName != null">from_name = #{fromName},</if>
+            <if test="fromGender != null">from_gender = #{fromGender},</if>
+            <if test="reviceAvatar != null">revice_avatar = #{reviceAvatar},</if>
+            <if test="reviceName != null">revice_name = #{reviceName},</if>
+            <if test="reviceGender != null">revice_gender = #{reviceGender},</if>
+            <if test="reviceId != null and reviceId != ''">revice_id = #{reviceId},</if>
+            <if test="roomId != null">room_id = #{roomId},</if>
+            <if test="isCustom != null">is_custom = #{isCustom},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeChatContactMappingById" parameterType="Long">
+        delete from we_chat_contact_mapping where id = #{id}
+    </delete>
+
+    <delete id="deleteWeChatContactMappingByIds" parameterType="String">
+        delete from we_chat_contact_mapping where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>
