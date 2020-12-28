@@ -67,7 +67,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
             <if test="contactSecret != null ">#{contactSecret},</if>
-            <if test="customerChurnNoticeSwitch != null ">#{customer_churn_notice_switch},</if>
+            <if test="customerChurnNoticeSwitch != null ">#{customerChurnNoticeSwitch},</if>
          </trim>
     </insert>
 
