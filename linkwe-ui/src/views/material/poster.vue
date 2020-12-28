@@ -34,17 +34,22 @@ export default {
   created () { },
   methods: {
     listChange (data) {
+      console.log('listChange', JSON.stringify(data))
       this.srcList = data.map((item) => item.materialUrl)
     },
     preview (url) {
+      console.log('preview', url)
       this.previewImg = url || ''
       this.dialog.preview = true
     },
     edit (item) {
+      console.log('edit', JSON.stringify(item))
       this.posterEdit.step = 0
       this.dialog.edit = true
     },
-    ready () { }
+    ready () {
+      console.log('ready')
+    }
   },
 }
 </script>
@@ -52,7 +57,7 @@ export default {
 <template>
   <MaPage
     ref="page"
-    type="0"
+    type="5"
     @listChange="listChange"
     :selected="ids"
     v-slot="{ list }"
