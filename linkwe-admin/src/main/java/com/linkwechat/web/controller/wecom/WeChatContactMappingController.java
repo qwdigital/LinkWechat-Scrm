@@ -28,7 +28,7 @@ import java.util.List;
  * @date 2020-12-27
  */
 @RestController
-@RequestMapping("/system/mapping")
+@RequestMapping("/chat/mapping")
 public class WeChatContactMappingController extends BaseController
 {
     @Autowired
@@ -37,7 +37,7 @@ public class WeChatContactMappingController extends BaseController
     /**
      * 查询聊天关系映射列表
      */
-    @PreAuthorize("@ss.hasPermi('system:mapping:list')")
+    @PreAuthorize("@ss.hasPermi('chat:mapping:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeChatContactMapping weChatContactMapping)
     {
@@ -49,7 +49,7 @@ public class WeChatContactMappingController extends BaseController
     /**
      * 导出聊天关系映射列表
      */
-    @PreAuthorize("@ss.hasPermi('system:mapping:export')")
+    @PreAuthorize("@ss.hasPermi('chat:mapping:export')")
     @Log(title = "聊天关系映射", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public AjaxResult export(WeChatContactMapping weChatContactMapping)
@@ -62,7 +62,7 @@ public class WeChatContactMappingController extends BaseController
     /**
      * 获取聊天关系映射详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:mapping:query')")
+    @PreAuthorize("@ss.hasPermi('chat:mapping:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
@@ -72,7 +72,7 @@ public class WeChatContactMappingController extends BaseController
     /**
      * 新增聊天关系映射
      */
-    @PreAuthorize("@ss.hasPermi('system:mapping:add')")
+    @PreAuthorize("@ss.hasPermi('chat:mapping:add')")
     @Log(title = "聊天关系映射", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody WeChatContactMapping weChatContactMapping)
@@ -83,7 +83,7 @@ public class WeChatContactMappingController extends BaseController
     /**
      * 修改聊天关系映射
      */
-    @PreAuthorize("@ss.hasPermi('system:mapping:edit')")
+    @PreAuthorize("@ss.hasPermi('chat:mapping:edit')")
     @Log(title = "聊天关系映射", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody WeChatContactMapping weChatContactMapping)
@@ -94,7 +94,7 @@ public class WeChatContactMappingController extends BaseController
     /**
      * 删除聊天关系映射
      */
-    @PreAuthorize("@ss.hasPermi('system:mapping:remove')")
+    @PreAuthorize("@ss.hasPermi('chat:mapping:remove')")
     @Log(title = "聊天关系映射", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)

@@ -7,9 +7,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.elastic.ElasticSearchEntity;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.wecom.client.WeCustomerClient;
+import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.domain.WeChatContactMapping;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.dto.WeUserDto;
+import com.linkwechat.wecom.domain.dto.customer.ExternalUserDetail;
 import com.linkwechat.wecom.mapper.WeChatContactMappingMapper;
 import com.linkwechat.wecom.mapper.WeCustomerMapper;
 import com.linkwechat.wecom.mapper.WeUserMapper;
@@ -18,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,6 +39,10 @@ public class WeChatContactMappingServiceImpl implements IWeChatContactMappingSer
     private WeUserMapper weUserMapper;
     @Autowired
     private WeCustomerMapper weCustomerMapper;
+    @Autowired
+    private WeUserClient weUserClient;
+    @Autowired
+    private WeCustomerClient weCustomerClient;
 
     /**
      * 查询聊天关系映射
@@ -67,7 +74,11 @@ public class WeChatContactMappingServiceImpl implements IWeChatContactMappingSer
      */
     @Override
     public int insertWeChatContactMapping(WeChatContactMapping weChatContactMapping) {
-        return weChatContactMappingMapper.insertWeChatContactMapping(weChatContactMapping);
+        List<WeChatContactMapping> list = selectWeChatContactMappingList(weChatContactMapping);
+        if (CollectionUtil.isEmpty(list)) {
+            return weChatContactMappingMapper.insertWeChatContactMapping(weChatContactMapping);
+        }
+        return 0;
     }
 
     /**
@@ -103,85 +114,113 @@ public class WeChatContactMappingServiceImpl implements IWeChatContactMappingSer
         return weChatContactMappingMapper.deleteWeChatContactMappingById(id);
     }
 
+    /**
+     * 需后期优化
+     *
+     * @param query
+     */
     @Override
     public void saveWeChatContactMapping(List<ElasticSearchEntity> query) {
-        /*List<String> toListIds = query.stream().map(chatData -> JSONObject.parseObject(JSONObject.toJSONString(chatData.getData())))
-                .filter(chatData -> CollectionUtil.isNotEmpty(chatData.getJSONArray("tolist")))
-                .map(chatData -> chatData.getJSONArray("tolist"))
-                .map(item -> JSONArray.parseArray(item.toJSONString(), String.class))
-                .flatMap(Collection::stream)
-                .distinct()
-                .collect(Collectors.toCollection(ArrayList::new));*/
         query.stream().forEach(elasticSearchEntity -> {
             //发送人映射数据
             WeChatContactMapping fromWeChatContactMapping = new WeChatContactMapping();
-            //接收人映射数据
-            WeChatContactMapping reveiceWeChatContactMapping = new WeChatContactMapping();
             JSONObject chatData = JSONObject.parseObject(JSONObject.toJSONString(elasticSearchEntity.getData()));
-            int fromType = StringUtils.weCustomTypeJudgment(chatData.getString("from"));
-            fromWeChatContactMapping.setFromId(chatData.getString("from"));
-            getFromUserOrCustomInfo(fromWeChatContactMapping, chatData.getString("from"), fromType);
-            getReveiceUserOrCustomInfo(reveiceWeChatContactMapping, chatData.getString("from"), fromType);
+            String fromId = chatData.getString("from");
+            int fromType = StringUtils.weCustomTypeJudgment(fromId);
+
+            JSONObject fromData = getUserOrCustomInfo(fromId, fromType);
+
+            fromWeChatContactMapping.setFromId(fromId);
+            fromWeChatContactMapping.setFromAvatar(fromData.getString("avatar"));
+            fromWeChatContactMapping.setFromName(fromData.getString("name"));
+            fromWeChatContactMapping.setFromGender(fromData.getInteger("gender"));
+
             JSONArray tolist = chatData.getJSONArray("tolist");
             if (CollectionUtil.isNotEmpty(tolist)) {
                 //如果是单聊，tolist唯一，只有一个接收人，并判断接收人的类型
                 if (StringUtils.isEmpty(chatData.getString("roomid"))) {
-                    String idStr = (String) tolist.get(0);
+                    String idStr = String.valueOf(tolist.get(0));
                     int reveiceType = StringUtils.weCustomTypeJudgment(idStr);
-                    getFromUserOrCustomInfo(reveiceWeChatContactMapping, idStr, reveiceType);
-                    getReveiceUserOrCustomInfo(fromWeChatContactMapping, idStr, fromType);
-                }else {
+                    JSONObject reveiceData = getUserOrCustomInfo(idStr, reveiceType);
+                    fromWeChatContactMapping.setReviceId(idStr);
+                    fromWeChatContactMapping.setReviceAvatar(reveiceData.getString("avatar"));
+                    fromWeChatContactMapping.setReviceName(reveiceData.getString("name"));
+                    fromWeChatContactMapping.setReviceGender(reveiceData.getInteger("gender"));
+                    fromWeChatContactMapping.setIsCustom(reveiceType);
+                } else {
                     fromWeChatContactMapping.setRoomId(chatData.getString("roomid"));
                 }
             }
-
+            //接收人映射数据
+            WeChatContactMapping reveiceWeChatContactMapping = from2ReveiceData(fromType, fromWeChatContactMapping);
+            insertWeChatContactMapping(fromWeChatContactMapping);
+            insertWeChatContactMapping(reveiceWeChatContactMapping);
         });
     }
 
+
     /**
-     * 获取发送人成员或者客户详情
+     * 发送人转接收人
      *
-     * @param id
+     * @param fromType
+     * @param fromWeChatContactMapping
      * @return
      */
-    private WeChatContactMapping getFromUserOrCustomInfo(WeChatContactMapping weChatContactMapping, String id, int type) {
-        if (WeConstans.ID_TYPE_USER.equals(type)) {
-            WeUser weUser = weUserMapper.selectOne(new LambdaQueryWrapper<WeUser>().eq(WeUser::getUserId, id));
-            weChatContactMapping.setFromAvatar(weUser.getAvatarMediaid());
-            weChatContactMapping.setFromName(weUser.getName());
-            weChatContactMapping.setFromGender(weUser.getGender());
-        } else if (WeConstans.ID_TYPE_EX.equals(type)) {
-            WeCustomer weCustomer = weCustomerMapper.selectWeCustomerById(id);
-            weChatContactMapping.setFromAvatar(weCustomer.getAvatar());
-            weChatContactMapping.setFromName(weCustomer.getName());
-            weChatContactMapping.setFromGender(weCustomer.getGender());
-        } else if (WeConstans.ID_TYPE_MACHINE.equals(type)) {
-
+    private WeChatContactMapping from2ReveiceData(int fromType, WeChatContactMapping fromWeChatContactMapping) {
+        //接收人映射数据
+        WeChatContactMapping reveiceWeChatContactMapping = new WeChatContactMapping();
+        if (StringUtils.isNotEmpty(fromWeChatContactMapping.getRoomId())) {
+            reveiceWeChatContactMapping.setFromId(fromWeChatContactMapping.getRoomId());
+        } else {
+            reveiceWeChatContactMapping.setFromId(fromWeChatContactMapping.getReviceId());
+            reveiceWeChatContactMapping.setFromAvatar(fromWeChatContactMapping.getReviceAvatar());
+            reveiceWeChatContactMapping.setFromName(fromWeChatContactMapping.getReviceName());
+            reveiceWeChatContactMapping.setFromGender(fromWeChatContactMapping.getReviceGender());
         }
-        return weChatContactMapping;
+        reveiceWeChatContactMapping.setReviceId(fromWeChatContactMapping.getFromId());
+        reveiceWeChatContactMapping.setReviceAvatar(fromWeChatContactMapping.getFromAvatar());
+        reveiceWeChatContactMapping.setReviceName(fromWeChatContactMapping.getFromName());
+        reveiceWeChatContactMapping.setReviceGender(fromWeChatContactMapping.getFromGender());
+        reveiceWeChatContactMapping.setIsCustom(fromType);
+        return reveiceWeChatContactMapping;
     }
 
     /**
-     * 获取接收人成员或者客户详情
+     * 获取成员或者客户详情
      *
-     * @param id
+     * @param id   用户id
+     * @param type
      * @return
      */
-    private WeChatContactMapping getReveiceUserOrCustomInfo(WeChatContactMapping weChatContactMapping, String id, int type) {
+    private JSONObject getUserOrCustomInfo(String id, int type) {
+        JSONObject tempData = new JSONObject();
         if (WeConstans.ID_TYPE_USER.equals(type)) {
             WeUser weUser = weUserMapper.selectOne(new LambdaQueryWrapper<WeUser>().eq(WeUser::getUserId, id));
-            weChatContactMapping.setReviceAvatar(weUser.getAvatarMediaid());
-            weChatContactMapping.setReviceName(weUser.getName());
-            weChatContactMapping.setReviceGender(weUser.getGender());
+            if (weUser == null) {
+                WeUserDto userDto = weUserClient.getUserByUserId(id);
+                tempData.put("avatar", userDto.getAvatar());
+                tempData.put("name", userDto.getName());
+                tempData.put("gender", userDto.getGender());
+            } else {
+                tempData.put("avatar", weUser.getAvatarMediaid());
+                tempData.put("name", weUser.getName());
+                tempData.put("gender", weUser.getGender());
+            }
         } else if (WeConstans.ID_TYPE_EX.equals(type)) {
             WeCustomer weCustomer = weCustomerMapper.selectWeCustomerById(id);
-            weChatContactMapping.setReviceAvatar(weCustomer.getAvatar());
-            weChatContactMapping.setReviceName(weCustomer.getName());
-            weChatContactMapping.setReviceGender(weCustomer.getGender());
+            if (weCustomer == null) {
+                ExternalUserDetail externalUserDetail = weCustomerClient.get(id);
+                tempData.put("avatar", externalUserDetail.getExternal_contact().getAvatar());
+                tempData.put("name", externalUserDetail.getExternal_contact().getName());
+                tempData.put("gender", externalUserDetail.getExternal_contact().getGender());
+            } else {
+                tempData.put("avatar", weCustomer.getAvatar());
+                tempData.put("name", weCustomer.getName());
+                tempData.put("gender", weCustomer.getGender());
+            }
         } else if (WeConstans.ID_TYPE_MACHINE.equals(type)) {
 
         }
-        return weChatContactMapping;
+        return tempData;
     }
-
 }

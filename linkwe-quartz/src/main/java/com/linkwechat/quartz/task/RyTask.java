@@ -76,8 +76,8 @@ public class RyTask {
                 "");
         if (CollectionUtil.isNotEmpty(chatDataList)){
             try {
-                weChatContactMappingService.saveWeChatContactMapping(chatDataList);
                 elasticSearch.insertBatch(WeConstans.WECOM_FINANCE_INDEX, chatDataList);
+                weChatContactMappingService.saveWeChatContactMapping(chatDataList);
             } catch (Exception e) {
                 log.error("消息处理异常：ex:{}", e);
                 e.printStackTrace();

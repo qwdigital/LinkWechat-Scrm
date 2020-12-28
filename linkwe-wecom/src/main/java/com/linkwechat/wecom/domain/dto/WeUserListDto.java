@@ -26,6 +26,7 @@ public class WeUserListDto extends WeResultDto{
                 WeUser weUser=new WeUser();
                 BeanUtils.copyPropertiesASM(k,weUser);
                 weUser.setIsActivate(k.getStatus());
+                weUser.setAvatarMediaid(k.getAvatar());
                 weUsers.add(weUser);
             });
         }

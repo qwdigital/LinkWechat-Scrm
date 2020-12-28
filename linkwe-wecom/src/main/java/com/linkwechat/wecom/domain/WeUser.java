@@ -42,6 +42,7 @@ public class WeUser
     @TableField(value = "head_image_url")
     private String avatarMediaid;
 
+
     /** 用户名称 */
     @NotBlank(message = "姓名不可为空")
     @TableField(value = "user_name")
