@@ -95,5 +95,17 @@ public class WeCustomer extends BaseEntity
     @TableField(exist = false)
     private String departmentIds;
 
+    /**
+     * 添加人名称
+     */
+    @TableField(exist = false)
+    private String userName;
+
+    /**
+     * 员工id
+     */
+    @TableField(exist = false)
+    private String userId;
+
 
 }
