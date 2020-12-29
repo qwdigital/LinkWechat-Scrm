@@ -6,9 +6,9 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
-import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
 import com.linkwechat.wecom.domain.vo.CustomerMessagePushVo;
+import com.linkwechat.wecom.service.IWeCustomerMessageOriginalService;
 import com.linkwechat.wecom.service.IWeCustomerMessagePushService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +31,15 @@ public class WeCustomerMessagePushController extends BaseController {
     @Autowired
     private IWeCustomerMessagePushService weCustomerMessagePushService;
 
+    @Autowired
+    private IWeCustomerMessageOriginalService weCustomerMessageOriginalService;
     /**
      * 新增群发消息发送
      */
-    @PreAuthorize("@ss.hasPermi('system:push:add')")
+    @PreAuthorize("@ss.hasPermi('customerMessagePush:push:add')")
     @Log(title = "新增群发消息发送", businessType = BusinessType.INSERT)
     @PostMapping(value = "add")
-    public AjaxResult add(@RequestBody CustomerMessagePushDto customerMessagePushDto)  {
+    public AjaxResult add(@RequestBody CustomerMessagePushDto customerMessagePushDto) {
         try {
             weCustomerMessagePushService.addWeCustomerMessagePush(customerMessagePushDto);
         } catch (JsonProcessingException e) {
@@ -51,16 +53,26 @@ public class WeCustomerMessagePushController extends BaseController {
     /**
      * 群发消息列表
      */
-    @PreAuthorize("@ss.hasPermi('system:push:list')")
+    @PreAuthorize("@ss.hasPermi('customerMessagePush:push:list')")
     @GetMapping(value = "/list")
-    public TableDataInfo list(@RequestParam(value = "sender",required = false) String sender
-            ,@RequestParam(value = "content",required = false) String content
-            ,@RequestParam(value = "pushType",required = false) String pushType
-            ,@RequestParam(value = "beginTime",required = false) String beginTime
-            ,@RequestParam(value = "endTime",required = false) String endTime)  {
+    public TableDataInfo list(@RequestParam(value = "sender", required = false) String sender
+            , @RequestParam(value = "content", required = false) String content
+            , @RequestParam(value = "pushType", required = false) String pushType
+            , @RequestParam(value = "beginTime", required = false) String beginTime
+            , @RequestParam(value = "endTime", required = false) String endTime) {
         startPage();
-        List<CustomerMessagePushVo> list = weCustomerMessagePushService.customerMessagePushs(sender,content,pushType,beginTime,endTime);
+        List<CustomerMessagePushVo> list = weCustomerMessagePushService.customerMessagePushs(sender, content, pushType, beginTime, endTime);
         return getDataTable(list);
+    }
+
+    /**
+     * 群发消息详情
+     */
+    @PreAuthorize("@ss.hasPermi('customerMessagePush:push:view')")
+    @GetMapping(value = "/getInfo")
+    public AjaxResult getInfo(@RequestParam(value = "messageId") Long messageId) {
+        CustomerMessagePushVo customerMessagePushVo = weCustomerMessageOriginalService.CustomerMessagePushDetail(messageId);
+        return AjaxResult.success(customerMessagePushVo);
     }
 
 }

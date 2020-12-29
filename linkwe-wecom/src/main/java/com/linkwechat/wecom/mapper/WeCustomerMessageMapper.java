@@ -10,4 +10,5 @@ import com.linkwechat.wecom.domain.WeCustomerMessage;
  * @date 2020-12-08
  */
 public interface WeCustomerMessageMapper extends BaseMapper<WeCustomerMessage> {
+    int updateWeCustomerMessageMsgIdById(WeCustomerMessage customerMessage);
 }
