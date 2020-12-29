@@ -10,4 +10,12 @@ import com.linkwechat.wecom.domain.WeCustomerMessage;
  * @date 2020-12-12
  */
 public interface IWeCustomerMessageService extends IService<WeCustomerMessage> {
+
+    /**
+     *
+     * @param customerMessage
+     * @return
+     */
+    int updateWeCustomerMessageMsgId(WeCustomerMessage customerMessage);
+
 }
