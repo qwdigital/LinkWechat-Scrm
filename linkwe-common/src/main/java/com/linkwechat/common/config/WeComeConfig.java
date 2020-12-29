@@ -30,4 +30,7 @@ public class WeComeConfig {
 
     /** 需要供应商token的url*/
     private String[] needProviderTokenUrl;
+
+    /** 会话存档所需token 的url */
+    private String[] needChatTokenUrl;
 }

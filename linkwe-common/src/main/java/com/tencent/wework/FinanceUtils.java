@@ -74,7 +74,7 @@ public class FinanceUtils {
         }
         String content = Finance.GetContentFromSlice(slice);
         JSONArray chatdataArr = JSONObject.parseObject(content).getJSONArray("chatdata");
-        log.info("开始执行数据解析:------------" + chatdataArr.toJSONString());
+        log.info("开始执行数据解析:------------");
         if (CollectionUtil.isNotEmpty(chatdataArr)) {
             chatdataArr.stream().map(data -> (JSONObject) data).forEach(data -> {
                 try {
@@ -82,6 +82,9 @@ public class FinanceUtils {
                     long LocalSEQ = data.getLong("seq");
                     JSONObject jsonObject = decryptChatRecord(sdk, data.getString("encrypt_random_key"),
                             data.getString("encrypt_chat_msg"), privateKey);
+                    if (jsonObject ==null){
+                       return;
+                    }
                     jsonObject.put("seq", LocalSEQ);
                     elasticSearchEntity.setData(jsonObject);
                     elasticSearchEntity.setId(jsonObject.getString("msgid"));
