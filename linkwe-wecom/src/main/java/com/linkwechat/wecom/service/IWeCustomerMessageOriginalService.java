@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.linkwechat.wecom.domain.WeCustomerMessageOriginal;
 import com.linkwechat.wecom.domain.vo.CustomerMessagePushVo;
 
@@ -31,5 +32,12 @@ public interface IWeCustomerMessageOriginalService extends IService<WeCustomerMe
      * @return {@link CustomerMessagePushVo}s
      */
     List<CustomerMessagePushVo> customerMessagePushs(String sender,String content,String pushType,String beginTime,String endTime);
+
+    /**
+     * 群发详情
+     * @param messageId 微信群发id
+     * @return {@link CustomerMessagePushVo} 群发详情
+     */
+    CustomerMessagePushVo CustomerMessagePushDetail(Long messageId);
 
 }
