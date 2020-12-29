@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeCustomerMessgaeResultMapper">
+    <update id="updateWeCustomerMessgaeResult">
+        UPDATE we_customer_messgaeResult
+        <set>
+            <if test="chatId!=null and chatId!=''">
+                chat_id=#{chatId},
+            </if>
+            <if test="externalUserid!=null and externalUserid!=''">
+                external_userid=#{externalUserid},
+            </if>
+            <if test="sendTime!=null and sendTime!=''">
+                send_time=#{sendTime},
+            </if>
+            <if test="status!=null and status!=''">
+                status=#{status}
+            </if>
+        </set>
+        WHERE message_id=#{messageId}
+    </update>
+</mapper>
