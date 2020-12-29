@@ -1,8 +1,10 @@
 package com.linkwechat.wecom.client;
 
+import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.DataObject;
 import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
+import com.linkwechat.wecom.domain.dto.message.QueryCustomerMessageStatusResultDataObjectDto;
 import com.linkwechat.wecom.domain.dto.message.QueryCustomerMessageStatusResultDto;
 import com.linkwechat.wecom.domain.dto.message.SendMessageResultDto;
 import com.linkwechat.wecom.domain.dto.message.WeCustomerMessagePushDto;
@@ -22,7 +24,7 @@ public interface WeCustomerMessagePushClient {
     @Request(url = "/externalcontact/add_msg_template",
             type = "POST"
     )
-    SendMessageResultDto sendCustomerMessageToUser(@DataObject WeCustomerMessagePushDto customerMessagePushDto);
+    SendMessageResultDto sendCustomerMessageToUser(@Body WeCustomerMessagePushDto customerMessagePushDto);
 
     /**
      * 获取企业群发消息发送结果
@@ -33,7 +35,7 @@ public interface WeCustomerMessagePushClient {
     @Request(url = "/externalcontact/get_group_msg_result",
             type = "POST"
     )
-    QueryCustomerMessageStatusResultDto queryCustomerMessageStatus(@Query(value = "msgid") String msgid);
+    QueryCustomerMessageStatusResultDto queryCustomerMessageStatus(@Body QueryCustomerMessageStatusResultDataObjectDto queryCustomerMessageStatusResultDataObjectDto);
 
 
 }
