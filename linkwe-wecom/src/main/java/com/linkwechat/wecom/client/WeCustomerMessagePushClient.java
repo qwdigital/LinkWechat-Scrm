@@ -30,7 +30,7 @@ public interface WeCustomerMessagePushClient {
      * 获取企业群发消息发送结果
      * <a href="https://work.weixin.qq.com/api/doc/90000/90135/92136">API文档地址</a>
      *
-     * @param msgid <a href="https://work.weixin.qq.com/api/doc/90000/90135/92135">添加企业群发消息任务返回的msgid</a>
+     * @param queryCustomerMessageStatusResultDataObjectDto{msgid} <a href="https://work.weixin.qq.com/api/doc/90000/90135/92135">添加企业群发消息任务返回的msgid</a>
      */
     @Request(url = "/externalcontact/get_group_msg_result",
             type = "POST"
