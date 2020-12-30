@@ -28,4 +28,27 @@
             </if>
         </where>
     </select>
+    <select id="findCustomerMessagePushDetail"
+            resultType="com.linkwechat.wecom.domain.vo.CustomerMessagePushVo">
+        SELECT
+        wcmo.push_type,
+        wcmo.message_type,
+        wcmo.push_range,
+        wcm.create_by sender,
+        wcmo.create_time sendTime,
+        wcm.message_id,
+        wcm.content,
+        wcm.msgid,
+        wcm.chat_type,
+        wcm.setting_time,
+        wcm.expect_send,
+        wcm.actual_send,
+        wcm.timed_task
+        FROM
+        we_customer_messageOriginal wcmo
+        LEFT JOIN we_customer_message wcm ON wcmo.message_original_Id = wcm.original_id
+        <where>
+            wcm.message_id=#{messageId}
+        </where>
+    </select>
 </mapper>

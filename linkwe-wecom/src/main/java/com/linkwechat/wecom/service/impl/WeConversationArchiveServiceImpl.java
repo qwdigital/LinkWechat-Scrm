@@ -1,9 +1,13 @@
 package com.linkwechat.wecom.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.domain.ConversationArchiveQuery;
 import com.linkwechat.common.core.elasticsearch.ElasticSearch;
+import com.linkwechat.common.utils.DateUtils;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.service.IWeConversationArchiveService;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -13,11 +17,8 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author sxw
@@ -33,25 +34,122 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
     /**
      * 根据用户ID 获取对应内部联系人列表
      *
-     * @param userId
+     * @param query 入参
      * @return
      */
     @Override
-    public List<JSONObject> getInternalContactList(String userId) {
+    public PageInfo<JSONObject> getChatContactList(ConversationArchiveQuery query) {
         SearchSourceBuilder builder = new SearchSourceBuilder();
-        builder.size(1000);
+        int from = (query.getPageSize() - 1) * query.getPageNum();
+        builder.size(query.getPageNum());
+        builder.from(from);
         builder.sort("msgtime", SortOrder.ASC);
+        BoolQueryBuilder fromBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", ""))
+                .must(QueryBuilders.matchQuery("from", query.getFromId()))
+                .must(QueryBuilders.matchQuery("tolist.keyword", query.getReceiveId()));
+
+        BoolQueryBuilder toLsitBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", ""))
+                .must(QueryBuilders.matchQuery("from", query.getReceiveId()))
+                .must(QueryBuilders.matchQuery("tolist.keyword", query.getFromId()));
+        //查询聊天类型
+        if (StringUtils.isNotEmpty(query.getMsgType())) {
+            fromBuilder.must(QueryBuilders.termQuery("msgtype", query.getMsgType()));
+            toLsitBuilder.must(QueryBuilders.termQuery("msgtype", query.getMsgType()));
+        }
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
-                .should(QueryBuilders.termQuery("tolist.keyword", userId))
-                .should(QueryBuilders.termQuery("from",userId))
-                .minimumShouldMatch(1)
-                .must(QueryBuilders.termQuery("type",1))
-                .must(QueryBuilders.termQuery("roomid", ""));
+                .should(fromBuilder)
+                .should(toLsitBuilder)
+                .minimumShouldMatch(1);
+        //时间范围查询
+        if (StringUtils.isNotEmpty(query.getBeginTime()) && StringUtils.isNotEmpty(query.getEndTime())) {
+            Date beginTime = DateUtils.dateTime(query.getBeginTime(), DateUtils.YYYY_MM_DD);
+            Date endTime = DateUtils.dateTime(query.getEndTime(), DateUtils.YYYY_MM_DD);
+            boolQueryBuilder.filter(QueryBuilders.rangeQuery("msgtime").gte(beginTime).lte(endTime));
+        }
         builder.query(boolQueryBuilder);
-        List<JSONObject> searchList = elasticSearch.search(WeConstans.WECOM_FINANCE_INDEX, builder, JSONObject.class);
-        Map<String, List<JSONObject>> from = Optional.ofNullable(searchList)
-                .orElseGet(ArrayList::new).stream()
-                .collect(Collectors.groupingBy(item -> item.getString("from")));
-        return null;
+        return elasticSearch.searchPage(WeConstans.WECOM_FINANCE_INDEX, builder, query.getPageNum(), query.getPageSize(), JSONObject.class);
+    }
+
+    @Override
+    public PageInfo<JSONObject> getChatRoomContactList(ConversationArchiveQuery query) {
+        SearchSourceBuilder builder = new SearchSourceBuilder();
+        int from = (query.getPageSize() - 1) * query.getPageNum();
+        builder.size(query.getPageNum());
+        builder.from(from);
+        builder.sort("msgtime", SortOrder.ASC);
+
+        BoolQueryBuilder fromBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", query.getRoomId()))
+                .must(QueryBuilders.matchQuery("from", query.getFromId()));
+
+        BoolQueryBuilder roomidBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", query.getRoomId()))
+                .must(QueryBuilders.matchQuery("tolist.keyword", query.getFromId()));
+
+        //查询聊天类型
+        if (StringUtils.isNotEmpty(query.getMsgType())) {
+            fromBuilder.must(QueryBuilders.termQuery("msgtype", query.getMsgType()));
+            roomidBuilder.must(QueryBuilders.termQuery("msgtype", query.getMsgType()));
+        }
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
+                .should(fromBuilder)
+                .should(roomidBuilder);
+
+        //时间范围查询
+        if (StringUtils.isNotEmpty(query.getBeginTime()) && StringUtils.isNotEmpty(query.getEndTime())) {
+            Date beginTime = DateUtils.dateTime(query.getBeginTime(), DateUtils.YYYY_MM_DD);
+            Date endTime = DateUtils.dateTime(query.getEndTime(), DateUtils.YYYY_MM_DD);
+            boolQueryBuilder.filter(QueryBuilders.rangeQuery("msgtime").gte(beginTime).lte(endTime));
+        }
+
+        builder.query(boolQueryBuilder);
+        return elasticSearch.searchPage(WeConstans.WECOM_FINANCE_INDEX, builder, query.getPageNum(), query.getPageSize(), JSONObject.class);
+    }
+
+
+    @Override
+    public JSONObject getFinalChatContactInfo(String fromId, String receiveId) {
+        SearchSourceBuilder builder = new SearchSourceBuilder();
+        builder.sort("msgtime", SortOrder.ASC);
+        builder.size(1);
+        BoolQueryBuilder fromBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", ""))
+                .must(QueryBuilders.matchQuery("from", fromId))
+                .must(QueryBuilders.matchQuery("tolist.keyword", receiveId));
+
+        BoolQueryBuilder toLsitBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", ""))
+                .must(QueryBuilders.matchQuery("from", receiveId))
+                .must(QueryBuilders.matchQuery("tolist.keyword", fromId));
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
+                .should(fromBuilder)
+                .should(toLsitBuilder)
+                .minimumShouldMatch(1);
+        builder.query(boolQueryBuilder);
+        List<JSONObject> resultList = elasticSearch.search(WeConstans.WECOM_FINANCE_INDEX, builder, JSONObject.class);
+        if (CollectionUtil.isNotEmpty(resultList)) {
+            return resultList.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public JSONObject getFinalChatRoomContactInfo(String fromId, String roomId) {
+        SearchSourceBuilder builder = new SearchSourceBuilder();
+        builder.sort("msgtime", SortOrder.ASC);
+        builder.size(1);
+        BoolQueryBuilder fromBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", roomId))
+                .must(QueryBuilders.matchQuery("from", fromId));
+
+        BoolQueryBuilder roomidBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", roomId))
+                .must(QueryBuilders.matchQuery("tolist.keyword", fromId));
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
+                .should(fromBuilder)
+                .should(roomidBuilder);
+        builder.query(boolQueryBuilder);
+        List<JSONObject> resultList = elasticSearch.search(WeConstans.WECOM_FINANCE_INDEX, builder, JSONObject.class);
+        if (CollectionUtil.isNotEmpty(resultList)) {
+            return resultList.get(0);
+        } else {
+            return null;
+        }
     }
 }

@@ -132,7 +132,7 @@ xss:
 # elasticsearch配置
 elasticsearch:
   schema: http
-  address: 129.211.173.127:9200
+  address: localhost
   connectTimeout: 10000
   socketTimeout: 10000
   connectionRequestTimeout: 10000
@@ -169,11 +169,15 @@ wecome:
           - /externalcontact/groupchat/transfer
           - /externalcontact/get_unassigned_list
           - /externalcontact/send_welcome_msg
-          - /msgaudit/get_permit_user_list
           - /externalcontact/unionid_to_external_userid
   fileUplodUrl:  /media/upload,/media/uploadimg
   needProviderTokenUrl:
           - /service/get_login_info
+  needChatTokenUrl:
+          - /msgaudit/get_permit_user_list
+          - /msgaudit/check_single_agree
+          - /msgaudit/check_room_agree
+          - /msgaudit/groupchat/get
   #企微回调通知配置
   callBack:
     appIdOrCorpId: 

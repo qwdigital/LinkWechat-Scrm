@@ -67,7 +67,10 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
         return findAccessToken(WeConstans.WE_PROVIDER_ACCESS_TOKEN);
     }
 
-
+    @Override
+    public String findChatAccessToken() {
+        return findAccessToken(WeConstans.WE_CHAT_ACCESS_TOKEN);
+    }
 
 
     private String findAccessToken(String accessTokenKey){
@@ -94,6 +97,10 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
                 WeAccessTokenDtoDto providerToken = accessTokenClient.getProviderToken(wxCorpAccount.getCorpId(), wxCorpAccount.getProviderSecret());
                 token=providerToken.getProvider_access_token();
                 expires_in=providerToken.getExpires_in();
+            }else if (WeConstans.WE_CHAT_ACCESS_TOKEN.equals(accessTokenKey)){
+                WeAccessTokenDtoDto weAccessTokenDtoDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),wxCorpAccount.getChatSecret());
+                token=weAccessTokenDtoDto.getAccess_token();
+                expires_in=weAccessTokenDtoDto.getExpires_in();
             }
 
             if(StringUtils.isNotEmpty(token)){

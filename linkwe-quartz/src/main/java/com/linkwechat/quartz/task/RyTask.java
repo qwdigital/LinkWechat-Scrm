@@ -57,16 +57,12 @@ public class RyTask {
         //创建索引
         elasticSearch.createIndex2(WeConstans.WECOM_FINANCE_INDEX,elasticSearch.getFinanceMapping());
         //从缓存中获取消息标识
-        AtomicLong index = new AtomicLong((Long) Optional.ofNullable(redisCache.getCacheObject(WeConstans.CONTACT_SEQ_KEY)).orElse(0L));
+
+        Object seqObject = Optional.ofNullable(redisCache.getCacheObject(WeConstans.CONTACT_SEQ_KEY)).orElse(0L);
+        Long seqLong = Long.valueOf(String.valueOf(seqObject));
+        AtomicLong index = new AtomicLong(seqLong);
         if (index.get() == 0){
-            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-            SortBuilder<?> sortBuilderPrice = SortBuilders.fieldSort(WeConstans.CONTACT_SEQ_KEY).order( SortOrder.DESC);
-            searchSourceBuilder.sort(sortBuilderPrice);
-            List<JSONObject> searchResultList = elasticSearch.search(WeConstans.WECOM_FINANCE_INDEX, searchSourceBuilder, JSONObject.class);
-            searchResultList.stream().findFirst().ifPresent(result ->{
-                index.set(result.getLong(WeConstans.CONTACT_SEQ_KEY) + 1);
-            });
-            redisCache.setCacheObject(WeConstans.CONTACT_SEQ_KEY,index);
+            setRedisCacheSeqValue(index);
         }
 
         log.info(">>>>>>>seq:{}",index.get());
@@ -81,8 +77,21 @@ public class RyTask {
             } catch (Exception e) {
                 log.error("消息处理异常：ex:{}", e);
                 e.printStackTrace();
+            }finally {
+                setRedisCacheSeqValue(index);
             }
-            index.incrementAndGet();
         }
+    }
+
+    private void setRedisCacheSeqValue(AtomicLong index){
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        SortBuilder<?> sortBuilderPrice = SortBuilders.fieldSort(WeConstans.CONTACT_SEQ_KEY).order( SortOrder.DESC);
+        searchSourceBuilder.sort(sortBuilderPrice);
+        searchSourceBuilder.size(1);
+        List<JSONObject> searchResultList = elasticSearch.search(WeConstans.WECOM_FINANCE_INDEX, searchSourceBuilder, JSONObject.class);
+        searchResultList.stream().findFirst().ifPresent(result ->{
+            index.set(result.getLong(WeConstans.CONTACT_SEQ_KEY) + 1);
+        });
+        redisCache.setCacheObject(WeConstans.CONTACT_SEQ_KEY,index);
     }
 }

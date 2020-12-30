@@ -29,6 +29,11 @@ public class WeConstans {
      */
     public static final String WE_PROVIDER_ACCESS_TOKEN = "we_provider_access_token";
 
+    /**
+     * 会话存档相关token
+     */
+    public static final String WE_CHAT_ACCESS_TOKEN = "we_chat_access_token";
+
 
     /**
      * 企业微信接口返回成功code

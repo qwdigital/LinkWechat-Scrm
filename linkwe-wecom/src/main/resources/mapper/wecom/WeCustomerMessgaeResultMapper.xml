@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeCustomerMessgaeResultMapper">
+    <update id="updateWeCustomerMessgaeResult">
+        UPDATE we_customer_messgaeResult
+        <set>
+            <if test="sendTime!=null and sendTime!=''">
+                send_time=#{sendTime},
+            </if>
+            <if test="status!=null and status!=''">
+                status=#{status}
+            </if>
+        </set>
+        <where>
+            message_id=#{messageId}
+            <if test="chatId!=null and chatId!=''">
+                AND chat_id=#{chatId}
+            </if>
+            <if test="externalUserid!=null and externalUserid!=''">
+                AND external_userid=#{externalUserid}
+            </if>
+        </where>
+
+    </update>
+    <select id="customerMessagePushs" resultType="com.linkwechat.wecom.domain.vo.WeCustomerMessageResultVo">
+        SELECT
+        user_name,
+        GROUP_CONCAT(external_name SEPARATOR '、') customers
+        FROM
+        we_customer_messgaeResult
+        <where>
+            message_id=#{messageId}
+            <if test="status!=null">
+                AND `status`=#{status}
+            </if>
+        </where>
+        GROUP BY user_name
+    </select>
+</mapper>

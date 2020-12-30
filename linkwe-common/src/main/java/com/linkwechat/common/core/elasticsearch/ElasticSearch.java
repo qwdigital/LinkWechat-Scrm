@@ -1,6 +1,7 @@
 package com.linkwechat.common.core.elasticsearch;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.core.domain.elastic.ElasticSearchEntity;
 import lombok.extern.slf4j.Slf4j;
@@ -89,7 +90,7 @@ public class ElasticSearch {
     public void createIndex2(String idxName, XContentBuilder builder) {
         try {
             if (!this.indexExist(idxName)) {
-                log.error(" idxName={} 已经存在,idxSql={}", idxName, builder);
+                //log.error(" idxName={} 已经存在,idxSql={}", idxName, builder);
                 return;
             }
             CreateIndexRequest request = new CreateIndexRequest(idxName);
@@ -265,6 +266,8 @@ public class ElasticSearch {
                 res.add(JSON.parseObject(hit.getSourceAsString(), c));
             }
             // 封装分页
+            PageHelper.startPage(1,2);
+
             PageInfo<T> page = new PageInfo<>();
             page.setList(res);
             page.setPageNum(pageNum);
