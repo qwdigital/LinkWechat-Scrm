@@ -72,7 +72,7 @@ npm install --registry=https://registry.npm.taobao.org
 npm  run serve
 ```
 
-打开浏览器，输入 `http://localhost:80  `，默认账密为：`admin/123admin123` 。
+打开浏览器，输入 `http://localhost:80  `，默认账密为：`admin/admin123` 。
 
 若能正确展示登录页面，并能成功登录，菜单及页面展示正常，则表明环境搭建成功。
 

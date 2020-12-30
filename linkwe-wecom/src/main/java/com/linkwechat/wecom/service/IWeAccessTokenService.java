@@ -15,5 +15,7 @@ public interface IWeAccessTokenService {
 
    public String findProviderAccessToken();
 
+   public String findChatAccessToken();
+
    public void removeToken();
 }

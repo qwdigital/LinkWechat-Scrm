@@ -139,7 +139,6 @@ export default {
       this.$refs.selectTag.$forceUpdate()
     },
     makeTag(type) {
-      debugger
       this.selectedTag = []
       if (!this.multipleSelection.length) {
         this.msgInfo('请选择一位客户')

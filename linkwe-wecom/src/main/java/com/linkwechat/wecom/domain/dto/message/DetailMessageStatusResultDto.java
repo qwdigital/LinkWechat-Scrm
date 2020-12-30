@@ -5,12 +5,12 @@ import lombok.Data;
 @Data
 public class DetailMessageStatusResultDto {
     /**
-     * 外部联系人userid
+     *  外部联系人userid，群发消息到企业的客户群不吐出该字段
      */
     private String external_userid;
 
     /**
-     * 外部客户群id
+     * 外部客户群id，群发消息到客户不吐出该字段
      */
     private String chat_id;
 

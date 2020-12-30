@@ -59,5 +59,10 @@ public class CustomerMessagePushVo {
      */
     private String sendInfo;
 
+    /**
+     * msgid 可以用于获取发送结果
+     */
+    private String msgid;
+
 
 }
