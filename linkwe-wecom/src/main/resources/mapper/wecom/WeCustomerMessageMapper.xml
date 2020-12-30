@@ -12,4 +12,14 @@
             message_id=#{messageId}
         </where>
     </update>
+    <update id="updateWeCustomerMessageActualSend">
+        UPDATE we_customer_message
+        <set>
+            actual_send=#{actualSend}
+        </set>
+        <where>
+            message_id=#{messageId}
+        </where>
+    </update>
+
 </mapper>
