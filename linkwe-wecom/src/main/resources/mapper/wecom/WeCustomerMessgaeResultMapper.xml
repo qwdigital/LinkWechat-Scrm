@@ -6,12 +6,6 @@
     <update id="updateWeCustomerMessgaeResult">
         UPDATE we_customer_messgaeResult
         <set>
-            <if test="chatId!=null and chatId!=''">
-                chat_id=#{chatId},
-            </if>
-            <if test="externalUserid!=null and externalUserid!=''">
-                external_userid=#{externalUserid},
-            </if>
             <if test="sendTime!=null and sendTime!=''">
                 send_time=#{sendTime},
             </if>
@@ -19,6 +13,29 @@
                 status=#{status}
             </if>
         </set>
-        WHERE message_id=#{messageId}
+        <where>
+            message_id=#{messageId}
+            <if test="chatId!=null and chatId!=''">
+                AND chat_id=#{chatId}
+            </if>
+            <if test="externalUserid!=null and externalUserid!=''">
+                AND external_userid=#{externalUserid}
+            </if>
+        </where>
+
     </update>
+    <select id="customerMessagePushs" resultType="com.linkwechat.wecom.domain.vo.WeCustomerMessageResultVo">
+        SELECT
+        user_name,
+        GROUP_CONCAT(external_name SEPARATOR '、') customers
+        FROM
+        we_customer_messgaeResult
+        <where>
+            message_id=#{messageId}
+            <if test="status!=null">
+                AND `status`=#{status}
+            </if>
+        </where>
+        GROUP BY user_name
+    </select>
 </mapper>

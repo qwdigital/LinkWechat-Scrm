@@ -377,8 +377,6 @@ export default {
     border-radius: 8px;
     padding: 10px;
   }
-  .select {
-  }
 }
 .input-wrap {
   width: 240px;

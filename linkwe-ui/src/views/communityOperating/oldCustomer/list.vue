@@ -1,5 +1,5 @@
 <script>
-import * as api from "@/api/enterpriseId";
+import * as api from "@/api/customer";
 // import clipboard from "clipboard";
 
 export default {
@@ -10,8 +10,9 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        companyName: ""
+        name: ""
       },
+      dateRange: [], // 添加日期
       total: 0,
       form: {},
       list: [],
@@ -19,7 +20,7 @@ export default {
       disabled: false,
       loading: false,
       rules: Object.freeze({
-        companyName: [{ required: true, message: "必填项", trigger: "blur" }],
+        name: [{ required: true, message: "必填项", trigger: "blur" }],
         corpId: [{ required: true, message: "必填项", trigger: "blur" }],
         corpSecret: [{ required: true, message: "必填项", trigger: "blur" }],
         contactSecret: [{ required: true, message: "必填项", trigger: "blur" }]
@@ -37,6 +38,13 @@ export default {
   },
   methods: {
     getList(page) {
+      if (this.dateRange[0]) {
+        this.query.beginTime = this.dateRange[0];
+        this.query.endTime = this.dateRange[1];
+      } else {
+        this.query.beginTime = "";
+        this.query.endTime = "";
+      }
       page && (this.query.pageNum = page);
       this.loading = true;
       api
@@ -69,12 +77,6 @@ export default {
             });
         }
       });
-    },
-    start(corpId) {
-      api.start(corpId).then(({ rows, total }) => {
-        this.msgSuccess("操作成功");
-        this.getList();
-      });
     }
   }
 };
@@ -82,32 +84,34 @@ export default {
 
 <template>
   <div>
-    <div class="fxbw">
-      <div class="top-search">
-        <el-form inline label-position="right" :model="form" label-width="80px">
-          <el-form-item label="企业名称">
-            <el-input
-              v-model="query.companyName"
-              placeholder="请输入"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label>
-            <el-button
-              v-hasPermi="['enterpriseWechat:query']"
-              type="primary"
-              @click="getList(1)"
-              >查询</el-button
-            >
-          </el-form-item>
-        </el-form>
-      </div>
+    <div class="top-search">
+      <el-form inline label-position="right" :model="form" label-width="80px">
+        <el-form-item label="发送方式">
+          <el-select v-model="query.pushType" placeholder="请选择" size="small">
+            <el-option
+              v-for="(value, key, index) in pushType"
+              :label="value"
+              :value="key"
+              :key="index"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="任务名称">
+          <el-input v-model="query.name" placeholder="请输入"></el-input>
+        </el-form-item>
+        <el-form-item label>
+          <el-button type="primary" @click="getList(1)">查询</el-button>
+          <el-button @click="resetQuery">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+    <div class="ar mb10">
       <el-button
         v-hasPermi="['enterpriseWechat:add']"
         type="primary"
         icon="el-icon-plus"
-        size="mini"
         @click="edit()"
-        >添加</el-button
+        >新建任务</el-button
       >
     </div>
     <!-- <el-card shadow="never" :body-style="{padding: '20px 0 0'}">
@@ -116,32 +120,25 @@ export default {
     <el-table v-loading="loading" :data="list">
       <!-- <el-table-column type="selection" width="50" align="center" /> -->
       <el-table-column
-        label="企业名称"
+        label="任务活动名称"
         align="center"
-        prop="companyName"
+        prop="name"
         :show-overflow-tooltip="true"
       />
+      <el-table-column prop="createTime" label="裂变客户数量" align="center">
+        <template slot-scope="scope">{{
+          Math.floor(Math.random() * 10000)
+        }}</template>
+      </el-table-column>
+      <el-table-column prop="createTime" label="活动状态" align="center">
+        已结束
+      </el-table-column>
       <el-table-column
-        label="企业ID"
-        align="center"
-        prop="corpId"
-        :show-overflow-tooltip="true"
-      />
-      <el-table-column
-        label="应用秘钥"
-        align="center"
-        prop="corpSecret"
-        :show-overflow-tooltip="true"
-      />
-      <el-table-column
-        label="绑定时间"
+        label="活动时间"
         align="center"
         prop="createTime"
         width="160"
       ></el-table-column>
-      <el-table-column label="状态" align="center" prop="status" width="160">
-        <template slot-scope="scope">{{ status[scope.row.status] }}</template>
-      </el-table-column>
       <el-table-column
         label="操作"
         align="center"
@@ -165,14 +162,6 @@ export default {
             @click="edit(scope.row, 1)"
             >编辑</el-button
           >
-          <el-button
-            v-hasPermi="['enterpriseWechat:forbidden']"
-            size="mini"
-            type="text"
-            icon="el-icon-key"
-            @click="start(scope.row.corpId)"
-            >启用</el-button
-          >
         </template>
       </el-table-column>
     </el-table>
@@ -194,8 +183,8 @@ export default {
         label-width="160px"
         :disabled="disabled"
       >
-        <el-form-item label="企业名称" prop="companyName">
-          <el-input v-model="form.companyName" :disabled="form.id"></el-input>
+        <el-form-item label="企业名称" prop="name">
+          <el-input v-model="form.name" :disabled="form.id"></el-input>
         </el-form-item>
         <el-form-item label="企业ID（CorpID）" prop="corpId">
           <el-input
@@ -207,11 +196,11 @@ export default {
           <el-link class="fr" type="primary">如何获取？</el-link>
         </el-form-item>
         <!-- <el-form-item label="Token">
-          <el-input disabled id="copy-input" v-model="form.companyName" placeholder="成员唯一标识，不支持更改，不支持中文"></el-input>
+          <el-input disabled id="copy-input" v-model="form.name" placeholder="成员唯一标识，不支持更改，不支持中文"></el-input>
           <el-button type="primary" class="copy-btn" data-clipboard-target="#copy-input">复制</el-button>
         </el-form-item>
         <el-form-item label="EncodingAESKey">
-          <el-input disabled id="copy-input1" v-model="form.companyName"></el-input>
+          <el-input disabled id="copy-input1" v-model="form.name"></el-input>
           <el-button type="primary" class="copy-btn" data-clipboard-target="#copy-input1">复制</el-button>
         </el-form-item>-->
         <el-form-item label="服务商secret" prop="providerSecret">

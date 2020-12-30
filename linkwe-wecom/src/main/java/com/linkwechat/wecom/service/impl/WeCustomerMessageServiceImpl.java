@@ -1,8 +1,6 @@
 package com.linkwechat.wecom.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.linkwechat.common.utils.SecurityUtils;
-import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.wecom.domain.WeCustomerMessage;
 import com.linkwechat.wecom.mapper.WeCustomerMessageMapper;
 import com.linkwechat.wecom.service.IWeCustomerMessageService;
@@ -23,6 +21,11 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
     @Override
     public int updateWeCustomerMessageMsgId(WeCustomerMessage customerMessage) {
         return weCustomerMessageMapper.updateWeCustomerMessageMsgIdById(customerMessage);
+    }
+
+    @Override
+    public int updateWeCustomerMessageActualSend(Long messageId, Integer actualSend) {
+        return weCustomerMessageMapper.updateWeCustomerMessageActualSend(messageId, actualSend);
     }
 
 }

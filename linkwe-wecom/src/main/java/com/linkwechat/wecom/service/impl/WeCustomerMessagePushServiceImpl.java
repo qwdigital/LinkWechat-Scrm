@@ -10,6 +10,7 @@ import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
 import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.message.*;
@@ -68,11 +69,6 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
             throw new WeComException("发送时间不能小于当前时间");
         }
 
-        //查询员id
-        List<String> senders = Lists.newArrayList();
-
-        StringBuffer sendInfo = new StringBuffer();
-
         //保存原始数据信息表
         long messageOriginalId = saveWeCustomerMessageOriginal(customerMessagePushDto);
 
@@ -81,10 +77,8 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
         //保存映射信息
         int size = workerMappingCustomer(customerMessagePushDto, messageId);
 
-        sendInfo(customerMessagePushDto, sendInfo, size);
-
         //保存微信消息
-        saveWeCustomerMessage(messageId, messageOriginalId, customerMessagePushDto, sendInfo);
+        saveWeCustomerMessage(messageId, messageOriginalId, customerMessagePushDto, size);
 
         //保存分类消息信息
         weCustomerSeedMessageService.saveSeedMessage(customerMessagePushDto, messageId);
@@ -136,7 +130,8 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
                     WeCustomerMessgaeResult customerMessgaeResult = new WeCustomerMessgaeResult();
                     customerMessgaeResult.setMessgaeResultId(SnowFlakeUtil.nextId());
                     customerMessgaeResult.setMessageId(messageId);
-                    customerMessgaeResult.setSendTime(customerMessagePushDto.getSettingTime());
+                    //这个是实际发送时间
+                    customerMessgaeResult.setSendTime(null);
                     customerMessgaeResult.setSendType(customerMessgaeResult.getSettingTime() == null ? customerMessagePushDto.getPushType() : "2");
                     customerMessgaeResult.setExternalUserid(customer.getExternalUserid());
                     customerMessgaeResult.setExternalName(customer.getName());
@@ -214,31 +209,8 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
     }
 
 
-    private void sendInfo(CustomerMessagePushDto customerMessagePushDto, StringBuffer sendInfo, int size) {
-        if (null != customerMessagePushDto.getSettingTime() && !customerMessagePushDto.getSettingTime().equals("")) {
-            sendInfo.append("定时任务");
-            sendInfo.append("发送时间:");
-            sendInfo.append(customerMessagePushDto.getSettingTime());
-        } else {
-            if (customerMessagePushDto.getPushType().equals("0")) {
-                //预计发送3190人，已成功发送0人
-                sendInfo.append("预计发送");
-                sendInfo.append(size);
-                sendInfo.append("人,");
-                sendInfo.append("已成功发送0人");
-            }
-            if (customerMessagePushDto.getPushType().equals("1")) {
-                //预计发送2个群，已成功发送0个群
-                sendInfo.append("预计发送");
-                sendInfo.append(size);
-                sendInfo.append("个群，");
-                sendInfo.append("已成功发送0个群");
-            }
-        }
-    }
-
     //保存微信消息  WeCustomerMessage
-    public void saveWeCustomerMessage(long messageId, long messageOriginalId, CustomerMessagePushDto customerMessagePushDto, StringBuffer sendInfo) {
+    public void saveWeCustomerMessage(long messageId, long messageOriginalId, CustomerMessagePushDto customerMessagePushDto, int size) {
         //保存微信消息
         //微信群发消息表 WeCustomerMessage
         WeCustomerMessage customerMessage = new WeCustomerMessage();
@@ -250,9 +222,16 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
         customerMessage.setCheckStatus("0");
         customerMessage.setDelFlag(0);
         customerMessage.setContent(content(customerMessagePushDto));
-        customerMessage.setSendInfo(sendInfo.toString());
         customerMessage.setCreateBy(SecurityUtils.getUsername());
         customerMessage.setMsgid("");
+        if(StringUtils.isNotEmpty(customerMessagePushDto.getSettingTime())){
+            customerMessage.setSettingTime(customerMessagePushDto.getSettingTime());
+            customerMessage.setTimedTask(1);
+        }else {
+            customerMessage.setTimedTask(0);
+        }
+        customerMessage.setExpectSend(size);
+        customerMessage.setActualSend(0);
         weCustomerMessageService.save(customerMessage);
     }
 

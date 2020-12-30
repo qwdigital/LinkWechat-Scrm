@@ -8,8 +8,10 @@ import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
 import com.linkwechat.wecom.domain.vo.CustomerMessagePushVo;
+import com.linkwechat.wecom.domain.vo.WeCustomerMessageResultVo;
 import com.linkwechat.wecom.service.IWeCustomerMessageOriginalService;
 import com.linkwechat.wecom.service.IWeCustomerMessagePushService;
+import com.linkwechat.wecom.service.IWeCustomerMessgaeResultService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,6 +35,11 @@ public class WeCustomerMessagePushController extends BaseController {
 
     @Autowired
     private IWeCustomerMessageOriginalService weCustomerMessageOriginalService;
+
+    @Autowired
+    private IWeCustomerMessgaeResultService weCustomerMessgaeResultService;
+
+
     /**
      * 新增群发消息发送
      */
@@ -73,6 +80,17 @@ public class WeCustomerMessagePushController extends BaseController {
     public AjaxResult getInfo(@RequestParam(value = "messageId") Long messageId) {
         CustomerMessagePushVo customerMessagePushVo = weCustomerMessageOriginalService.CustomerMessagePushDetail(messageId);
         return AjaxResult.success(customerMessagePushVo);
+    }
+
+    /**
+     * 群发消息结果列表
+     */
+    @PreAuthorize("@ss.hasPermi('customerMessagePush:push:pushResults')")
+    @GetMapping(value = "/pushResults")
+    public TableDataInfo customerMessagePushResult(@RequestParam(value = "messageId") Long messageId,@RequestParam(value = "status") String status){
+        startPage();
+        List<WeCustomerMessageResultVo> weCustomerMessageResuls = weCustomerMessgaeResultService.customerMessagePushs(messageId, status);
+        return getDataTable(weCustomerMessageResuls);
     }
 
 }
