@@ -2,7 +2,10 @@ package com.linkwechat.wecom.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeCustomerMessgaeResult;
+import com.linkwechat.wecom.domain.vo.WeCustomerMessageResultVo;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 群发消息  微信消息发送结果表 Mapper接口
@@ -25,5 +28,14 @@ public interface WeCustomerMessgaeResultMapper extends BaseMapper<WeCustomerMess
      */
     int updateWeCustomerMessgaeResult(@Param("messageId") Long messageId,@Param("chatId") String chatId,@Param("externalUserid") String externalUserid
             ,@Param("status") String status,@Param("sendTime") String sendTime);
+
+    /**
+     * 查询微信消息发送情况
+     *
+     * @param messageId  微信消息表id
+     * @param status 发送状态 0-未发送 1-已发送 2-因客户不是好友导致发送失败 3-因客户已经收到其他群发消息导致发送失败
+     * @return {@link WeCustomerMessageResultVo}s
+     */
+    List<WeCustomerMessageResultVo> customerMessagePushs(@Param("messageId") Long messageId,@Param("status") String status);
 
 }
