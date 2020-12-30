@@ -21,10 +21,4 @@ public class ConversationArchiveQuery extends BaseEntity {
 
     /** 类型 */
     private String msgType;
-
-    @JSONField(defaultValue = "1")
-    private Integer pageSize;
-
-    @JSONField(defaultValue = "10")
-    private Integer pageNum;
 }

@@ -6,6 +6,8 @@ import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.ConversationArchiveQuery;
 import com.linkwechat.common.core.elasticsearch.ElasticSearch;
+import com.linkwechat.common.core.page.PageDomain;
+import com.linkwechat.common.core.page.TableSupport;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.service.IWeConversationArchiveService;
@@ -39,11 +41,14 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
      */
     @Override
     public PageInfo<JSONObject> getChatContactList(ConversationArchiveQuery query) {
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        Integer pageNum = pageDomain.getPageNum() == null ? 1 : pageDomain.getPageNum();
+        Integer pageSize = pageDomain.getPageSize() == null ? 10 : pageDomain.getPageSize();
         SearchSourceBuilder builder = new SearchSourceBuilder();
-        int from = (query.getPageSize() - 1) * query.getPageNum();
-        builder.size(query.getPageNum());
+        int from = (pageNum - 1) * pageSize;
+        builder.size(pageSize);
         builder.from(from);
-        builder.sort("msgtime", SortOrder.ASC);
+        builder.sort("msgtime", SortOrder.DESC);
         BoolQueryBuilder fromBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", ""))
                 .must(QueryBuilders.matchQuery("from", query.getFromId()))
                 .must(QueryBuilders.matchQuery("tolist.keyword", query.getReceiveId()));
@@ -67,16 +72,19 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
             boolQueryBuilder.filter(QueryBuilders.rangeQuery("msgtime").gte(beginTime).lte(endTime));
         }
         builder.query(boolQueryBuilder);
-        return elasticSearch.searchPage(WeConstans.WECOM_FINANCE_INDEX, builder, query.getPageNum(), query.getPageSize(), JSONObject.class);
+        return elasticSearch.searchPage(WeConstans.WECOM_FINANCE_INDEX, builder, pageNum, pageSize, JSONObject.class);
     }
 
     @Override
     public PageInfo<JSONObject> getChatRoomContactList(ConversationArchiveQuery query) {
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        Integer pageNum = pageDomain.getPageNum() == null ? 1 : pageDomain.getPageNum();
+        Integer pageSize = pageDomain.getPageSize() == null ? 10 : pageDomain.getPageSize();
         SearchSourceBuilder builder = new SearchSourceBuilder();
-        int from = (query.getPageSize() - 1) * query.getPageNum();
-        builder.size(query.getPageNum());
+        int from = (pageNum - 1) * pageSize;
+        builder.size(pageSize);
         builder.from(from);
-        builder.sort("msgtime", SortOrder.ASC);
+        builder.sort("msgtime", SortOrder.DESC);
 
         BoolQueryBuilder fromBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", query.getRoomId()))
                 .must(QueryBuilders.matchQuery("from", query.getFromId()));
@@ -102,14 +110,14 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
         }
 
         builder.query(boolQueryBuilder);
-        return elasticSearch.searchPage(WeConstans.WECOM_FINANCE_INDEX, builder, query.getPageNum(), query.getPageSize(), JSONObject.class);
+        return elasticSearch.searchPage(WeConstans.WECOM_FINANCE_INDEX, builder, pageNum, pageSize, JSONObject.class);
     }
 
 
     @Override
     public JSONObject getFinalChatContactInfo(String fromId, String receiveId) {
         SearchSourceBuilder builder = new SearchSourceBuilder();
-        builder.sort("msgtime", SortOrder.ASC);
+        builder.sort("msgtime", SortOrder.DESC);
         builder.size(1);
         BoolQueryBuilder fromBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", ""))
                 .must(QueryBuilders.matchQuery("from", fromId))
@@ -134,7 +142,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
     @Override
     public JSONObject getFinalChatRoomContactInfo(String fromId, String roomId) {
         SearchSourceBuilder builder = new SearchSourceBuilder();
-        builder.sort("msgtime", SortOrder.ASC);
+        builder.sort("msgtime", SortOrder.DESC);
         builder.size(1);
         BoolQueryBuilder fromBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", roomId))
                 .must(QueryBuilders.matchQuery("from", fromId));

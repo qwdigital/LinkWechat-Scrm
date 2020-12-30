@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.wecom;
 
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -7,6 +8,7 @@ import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.wecom.domain.WeChatContactMapping;
+import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.service.IWeChatContactMappingService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +46,18 @@ public class WeChatContactMappingController extends BaseController
         startPage();
         List<WeChatContactMapping> list = weChatContactMappingService.selectWeChatContactMappingList(weChatContactMapping);
         return getDataTable(list);
+    }
+
+    /**
+     * 按客户查询关系映射列表
+     */
+    @PreAuthorize("@ss.hasPermi('chat:mapping:listByCustomer')")
+    @GetMapping("/listByCustomer")
+    public TableDataInfo listByCustomer()
+    {
+        startPage();
+        PageInfo<WeCustomer> weCustomerPageInfo = weChatContactMappingService.listByCustomer();
+        return getDataTable(weCustomerPageInfo);
     }
 
     /**

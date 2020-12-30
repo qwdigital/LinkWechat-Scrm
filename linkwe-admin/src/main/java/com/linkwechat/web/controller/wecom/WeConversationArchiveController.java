@@ -1,9 +1,8 @@
 package com.linkwechat.web.controller.wecom;
 
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.extension.api.R;
-import com.github.pagehelper.PageInfo;
+import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.ConversationArchiveQuery;
+import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.wecom.service.IWeConversationArchiveService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/wecom/finance")
-public class WeConversationArchiveController {
+public class WeConversationArchiveController extends BaseController {
     @Autowired
     private IWeConversationArchiveService weConversationArchiveService;
 
@@ -34,8 +33,8 @@ public class WeConversationArchiveController {
      */
     @PreAuthorize("@ss.hasPermi('conversationArchive:chatContact:list')")
     @GetMapping("/getChatContactList")
-    public R<PageInfo<JSONObject>> getChatContactList(ConversationArchiveQuery query) {
-        return R.ok(weConversationArchiveService.getChatContactList(query));
+    public TableDataInfo getChatContactList(ConversationArchiveQuery query) {
+        return getDataTable(weConversationArchiveService.getChatContactList(query));
     }
 
 
@@ -49,8 +48,8 @@ public class WeConversationArchiveController {
      */
     @PreAuthorize("@ss.hasPermi('conversationArchive:chatRoomContact:list')")
     @GetMapping("/getChatRoomContactList")
-    public R<PageInfo<JSONObject>> getChatRoomContactList(ConversationArchiveQuery query) {
-        return R.ok(weConversationArchiveService.getChatRoomContactList(query));
+    public TableDataInfo getChatRoomContactList(ConversationArchiveQuery query) {
+        return getDataTable(weConversationArchiveService.getChatRoomContactList(query));
     }
 
 

@@ -3,57 +3,88 @@ package com.linkwechat.wecom.domain;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.linkwechat.common.annotation.Excel;
-import com.linkwechat.wecom.domain.dto.msgaudit.WeMsgAuditDto;
+import com.linkwechat.wecom.domain.dto.msgaudit.GroupChatVo;
 import lombok.Data;
 
 
 /**
  * 聊天关系映射对象 we_chat_contact_mapping
- * 
+ *
  * @author ruoyi
  * @date 2020-12-27
  */
 @Data
-public class WeChatContactMapping
-{
+public class WeChatContactMapping {
     private static final long serialVersionUID = 1L;
 
-    /** 主键id */
+    /**
+     * 主键id
+     */
     private Long id;
 
-    /** 发送人id */
+    /**
+     * 发送人id
+     */
     @Excel(name = "发送人id")
     private String fromId;
 
-    /** 接收人id */
+    /**
+     * 接收人id
+     */
     @Excel(name = "接收人id")
     private String receiveId;
 
-    /** 群聊id */
+    /**
+     * 群聊id
+     */
     @Excel(name = "群聊id")
     private String roomId;
 
-    /** 是否为客户 0-成员 1-客户 2-机器人*/
+    /**
+     * 是否为客户 0-成员 1-客户 2-机器人
+     */
     @Excel(name = "是否为客户 0-成员 1-客户 2-机器人")
     private Integer isCustom;
 
-    /** 是否为客户 0-内部 1-外部 2-群聊*/
+    /**
+     * 是否为客户 0-内部 1-外部 2-群聊
+     */
     @TableField(exist = false)
     private Integer searchType;
 
-    /** 内部接收人信息 */
+    /**
+     * 内部接收人信息
+     */
     @TableField(exist = false)
-    private WeUser weUser;
+    private WeUser fromWeUser;
 
-    /** 外部接收人信息 */
+    /**
+     * 外部接收人信息
+     */
     @TableField(exist = false)
-    private WeCustomer weCustomer;
+    private WeCustomer fromWeCustomer;
 
-    /** 群信息 */
+    /**
+     * 内部接收人信息
+     */
     @TableField(exist = false)
-    private WeMsgAuditDto roomInfo;
+    private WeUser receiveWeUser;
 
-    /** 最后一条聊天数据 */
+    /**
+     * 外部接收人信息
+     */
+    @TableField(exist = false)
+    private WeCustomer receiveWeCustomer;
+
+    /**
+     * 群信息
+     */
+    @TableField(exist = false)
+    private GroupChatVo roomInfo;
+
+    /**
+     * 最后一条聊天数据
+     */
     @TableField(exist = false)
     private JSONObject finalChatContext;
 }

@@ -19,7 +19,7 @@ public interface WeMsgAuditClient {
     @Request(url = "/msgaudit/get_permit_user_list",
             type = "POST"
     )
-    WeMsgAuditDto getPermitUserList(@DataVariable WeMsgAuditDto msgAuditDto);
+    WeMsgAuditDto getPermitUserList(@DataObject WeMsgAuditDto msgAuditDto);
 
     /**
      * 单聊 获取会话中外部成员的同意情况
@@ -29,17 +29,17 @@ public interface WeMsgAuditClient {
     @Request(url = "/msgaudit/check_single_agree",
             type = "POST"
     )
-    WeMsgAuditDto checkSingleAgree(@DataVariable WeMsgAuditDto msgAuditDto);
+    WeMsgAuditDto checkSingleAgree(@DataObject WeMsgAuditDto msgAuditDto);
 
     /**
      * 群聊 获取群会话中外部成员的同意情况
-     * @param msgAuditDto
+     * @param weMsgAuditVo
      * @return
      */
     @Request(url = "/msgaudit/check_room_agree",
             type = "POST"
     )
-    WeMsgAuditDto checkRoomAgree(@DataVariable WeMsgAuditDto msgAuditDto);
+    WeMsgAuditDto checkRoomAgree(@DataObject WeMsgAuditVo weMsgAuditVo);
 
     /**
      * 获取会话内容存档内部群信息
@@ -49,5 +49,5 @@ public interface WeMsgAuditClient {
     @Request(url = "/msgaudit/groupchat/get",
             type = "POST"
     )
-    WeMsgAuditDto getGroupChat(@DataVariable WeMsgAuditVo weMsgAuditVo);
+    WeMsgAuditDto getGroupChat(@DataObject WeMsgAuditVo weMsgAuditVo);
 }

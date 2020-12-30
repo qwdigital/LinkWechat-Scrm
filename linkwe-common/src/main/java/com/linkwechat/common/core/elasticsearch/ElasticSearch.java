@@ -61,7 +61,7 @@ public class ElasticSearch {
     public void createIndex(String idxName, String idxSQL) {
         try {
             if (!this.indexExist(idxName)) {
-                log.error(" idxName={} 已经存在,idxSql={}", idxName, idxSQL);
+                //log.error(" idxName={} 已经存在,idxSql={}", idxName, idxSQL);
                 return;
             }
             CreateIndexRequest request = new CreateIndexRequest(idxName);
@@ -295,7 +295,7 @@ public class ElasticSearch {
     public void deleteIndex(String idxName) {
         try {
             if (!this.indexExist(idxName)) {
-                log.error(" idxName={} 已经存在", idxName);
+                //log.error(" idxName={} 已经存在", idxName);
                 return;
             }
             restHighLevelClient.indices().delete(new DeleteIndexRequest(idxName), RequestOptions.DEFAULT);

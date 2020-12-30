@@ -17,8 +17,6 @@ import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * @author sxw
@@ -93,7 +91,7 @@ public class FinanceUtils {
                     e.printStackTrace();
                 }
             });
-            log.info("数据解析完成:------------" + chatdataArr.toJSONString());
+            log.info("数据解析完成:------------");
         }
         Finance.FreeSlice(slice);
         return resList;
@@ -124,6 +122,7 @@ public class FinanceUtils {
             if (StringUtils.isNotEmpty(msgType)) {
                 getSwitchType(realJsonData, msgType);
             }
+            log.info("数据解析:------------"+ realJsonData.toJSONString());
             return realJsonData;
         } catch (Exception e) {
             log.error("解析密文失败");
@@ -236,7 +235,7 @@ public class FinanceUtils {
         if (realJsonData.containsKey("content")) {
             realJsonData.put("content", data);
         } else {
-            realJsonData.put("msgType", data);
+            realJsonData.put(msgType, data);
         }
 
     }

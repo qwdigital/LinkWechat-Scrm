@@ -1,18 +1,25 @@
 package com.linkwechat.wecom.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.elastic.ElasticSearchEntity;
+import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeCustomerClient;
+import com.linkwechat.wecom.client.WeCustomerGroupClient;
 import com.linkwechat.wecom.client.WeMsgAuditClient;
 import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.domain.WeChatContactMapping;
+import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeUser;
-import com.linkwechat.wecom.domain.vo.WeMsgAuditVo;
+import com.linkwechat.wecom.domain.dto.customer.CustomerGroupDetail;
+import com.linkwechat.wecom.domain.dto.msgaudit.GroupChatVo;
 import com.linkwechat.wecom.mapper.WeChatContactMappingMapper;
 import com.linkwechat.wecom.mapper.WeCustomerMapper;
 import com.linkwechat.wecom.mapper.WeUserMapper;
@@ -22,8 +29,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 聊天关系映射Service业务层处理
@@ -33,7 +42,7 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
-public class WeChatContactMappingServiceImpl implements IWeChatContactMappingService {
+public class WeChatContactMappingServiceImpl extends ServiceImpl<WeChatContactMappingMapper, WeChatContactMapping> implements IWeChatContactMappingService {
     @Autowired
     private WeChatContactMappingMapper weChatContactMappingMapper;
     @Autowired
@@ -44,6 +53,8 @@ public class WeChatContactMappingServiceImpl implements IWeChatContactMappingSer
     private WeUserClient weUserClient;
     @Autowired
     private WeCustomerClient weCustomerClient;
+    @Autowired
+    private WeCustomerGroupClient weCustomerGroupClient;
     @Autowired
     private WeMsgAuditClient weMsgAuditClient;
     @Autowired
@@ -74,19 +85,20 @@ public class WeChatContactMappingServiceImpl implements IWeChatContactMappingSer
                 if (StringUtils.isNotEmpty(item.getReceiveId())) {
                     if (WeConstans.ID_TYPE_USER.equals(item.getIsCustom())) {
                         //成员信息
-                        item.setWeUser(weUserMapper.selectOne(new LambdaQueryWrapper<WeUser>().eq(WeUser::getUserId, item.getReceiveId())));
+                        item.setReceiveWeUser(weUserMapper.selectOne(new LambdaQueryWrapper<WeUser>().eq(WeUser::getUserId, item.getReceiveId())));
                     } else if (WeConstans.ID_TYPE_EX.equals(item.getIsCustom())) {
                         //获取外部联系人信息
-                        item.setWeCustomer(weCustomerMapper.selectWeCustomerById(item.getReceiveId()));
+                        item.setReceiveWeCustomer(weCustomerMapper.selectWeCustomerById(item.getReceiveId()));
                     } else if (WeConstans.ID_TYPE_MACHINE.equals(item.getIsCustom())) {
                         //拉去机器人信息暂不处理
                     }
                     item.setFinalChatContext(weConversationArchiveService.getFinalChatContactInfo(item.getFromId(), item.getReceiveId()));
                 } else if (StringUtils.isNotEmpty(item.getRoomId())) {
                     //获取群信息
-                    WeMsgAuditVo weMsgAuditVo = new WeMsgAuditVo();
-                    weMsgAuditVo.setRoomid(item.getRoomId());
-                    item.setRoomInfo(weMsgAuditClient.getGroupChat(weMsgAuditVo));
+                    CustomerGroupDetail customerGroupDetail = weCustomerGroupClient.groupChatDetail(new CustomerGroupDetail().new Params(item.getRoomId()));
+                    GroupChatVo groupChatVo = new GroupChatVo();
+                    BeanUtil.copyProperties(customerGroupDetail.getGroup_chat().get(0), groupChatVo);
+                    item.setRoomInfo(groupChatVo);
                     item.setFinalChatContext(weConversationArchiveService.getFinalChatRoomContactInfo(item.getFromId(), item.getRoomId()));
                 }
             });
@@ -175,6 +187,19 @@ public class WeChatContactMappingServiceImpl implements IWeChatContactMappingSer
             insertWeChatContactMapping(fromWeChatContactMapping);
             insertWeChatContactMapping(reveiceWeChatContactMapping);
         });
+    }
+
+    @Override
+    public PageInfo<WeCustomer> listByCustomer() {
+
+        LambdaQueryWrapper<WeChatContactMapping> lambdaQueryWrapper = new LambdaQueryWrapper<WeChatContactMapping>()
+                .eq(WeChatContactMapping::getIsCustom, WeConstans.ID_TYPE_EX);
+        List<WeChatContactMapping> weChatContactMappingList = this.baseMapper.selectList(lambdaQueryWrapper);
+        List<WeCustomer> resultList = Optional.ofNullable(weChatContactMappingList).orElseGet(ArrayList::new)
+                .stream().map(item -> weCustomerMapper.selectWeCustomerById(item.getReceiveId())).collect(Collectors.toList());
+        PageInfo<WeCustomer> weCustomerPageInfo = new PageInfo<>(resultList);
+        weCustomerPageInfo.setTotal(new PageInfo<>(weChatContactMappingList).getTotal());
+        return weCustomerPageInfo;
     }
 
 
