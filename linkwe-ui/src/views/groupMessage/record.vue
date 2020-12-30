@@ -2,6 +2,16 @@
 import { getList } from "@/api/groupMessage";
 export default {
   name: "Operlog",
+  filters: {
+    sendInfo(data) {
+      if (data.timedTask == 1) {
+        return "定时任务 发送时间:" + data.settingTime;
+      } else {
+        let unit = data.expectSend == 1 ? "个群" : "人";
+        return `预计发送${data.expectSend}${unit}，已成功发送${data.actualSend}${unit}`;
+      }
+    }
+  },
   data() {
     return {
       // 遮罩层
@@ -88,6 +98,9 @@ export default {
           this.msgSuccess("删除成功");
         })
         .catch(function() {});
+    },
+    goRoute(id, path) {
+      this.$router.push({ path: "/groupMessage/" + path, query: { id } });
     }
   }
 };
@@ -165,6 +178,30 @@ export default {
       >
       </el-table-column>
       <el-table-column label="发送情况" align="center" prop="sendInfo">
+        <template slot-scope="scope">
+          {{ scope.row | sendInfo }}
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" width="180">
+        <template slot-scope="scope">
+          <el-button
+            v-hasPermi="['enterpriseWechat:view']"
+            size="mini"
+            type="text"
+            icon="el-icon-view"
+            @click="goRoute(scope.row.messageId, 'detail')"
+            >查看</el-button
+          >
+          <el-button
+            v-hasPermi="['enterpriseWechat:edit']"
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            disabled=""
+            @click="goRoute(scope.row, 1)"
+            >编辑</el-button
+          >
+        </template>
       </el-table-column>
     </el-table>
 
