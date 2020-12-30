@@ -16,7 +16,7 @@
         <where>
             message_id=#{messageId}
             <if test="chatId!=null and chatId!=''">
-               AND chat_id=#{chatId}
+                AND chat_id=#{chatId}
             </if>
             <if test="externalUserid!=null and externalUserid!=''">
                 AND external_userid=#{externalUserid}
@@ -24,4 +24,18 @@
         </where>
 
     </update>
+    <select id="customerMessagePushs" resultType="com.linkwechat.wecom.domain.vo.WeCustomerMessageResultVo">
+        SELECT
+        user_name,
+        GROUP_CONCAT(external_name SEPARATOR '、') customers
+        FROM
+        we_customer_messgaeResult
+        <where>
+            message_id=#{messageId}
+            <if test="status!=null">
+                AND `status`=#{status}
+            </if>
+        </where>
+        GROUP BY user_name
+    </select>
 </mapper>
