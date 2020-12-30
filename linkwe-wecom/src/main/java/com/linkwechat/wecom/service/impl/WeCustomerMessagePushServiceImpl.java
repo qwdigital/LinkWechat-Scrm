@@ -130,7 +130,8 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
                     WeCustomerMessgaeResult customerMessgaeResult = new WeCustomerMessgaeResult();
                     customerMessgaeResult.setMessgaeResultId(SnowFlakeUtil.nextId());
                     customerMessgaeResult.setMessageId(messageId);
-                    customerMessgaeResult.setSendTime(customerMessagePushDto.getSettingTime());
+                    //这个是实际发送时间
+                    customerMessgaeResult.setSendTime(null);
                     customerMessgaeResult.setSendType(customerMessgaeResult.getSettingTime() == null ? customerMessagePushDto.getPushType() : "2");
                     customerMessgaeResult.setExternalUserid(customer.getExternalUserid());
                     customerMessgaeResult.setExternalName(customer.getName());
