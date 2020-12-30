@@ -60,7 +60,7 @@ public class WeCustomerMessageOriginalServiceImpl extends ServiceImpl<WeCustomer
         CustomerMessagePushVo customerMessagePushDetail = weCustomerMessageOriginalMapper.findCustomerMessagePushDetail(messageId);
 
         //拉取消息发送结果
-       // CompletableFuture.runAsync(()->{
+       CompletableFuture.runAsync(()->{
 
             String msgid = customerMessagePushDetail.getMsgid();
 
@@ -96,7 +96,7 @@ public class WeCustomerMessageOriginalServiceImpl extends ServiceImpl<WeCustomer
 
             }
 
-      //  });
+        });
 
 
         return weCustomerMessageOriginalMapper.findCustomerMessagePushDetail(messageId);
