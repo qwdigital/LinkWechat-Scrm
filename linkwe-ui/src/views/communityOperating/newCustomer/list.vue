@@ -80,6 +80,12 @@ export default {
             });
         }
       });
+    },
+    goRoute(id, path) {
+      this.$router.push({
+        path: "/communityOperating/newCustomerAev",
+        query: { id }
+      });
     }
   }
 };

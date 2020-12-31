@@ -130,11 +130,25 @@ export const constantRoutes = [
   //       meta: { title: "新客自动拉群", icon: "" }
   //     },
   //     {
+  //       path: "newCustomerAev",
+  //       name: "newCustomerAev",
+  //       component: resolve =>
+  //         require(["@/views/communityOperating/newCustomer/aev"], resolve),
+  //       meta: { title: "新客自动拉群", icon: "" }
+  //     },
+  //     {
   //       path: "oldCustomer",
   //       name: "oldCustomer",
   //       component: resolve =>
   //         require(["@/views/communityOperating/oldCustomer/list"], resolve),
   //       meta: { title: "老客标签建群", icon: "" }
+  //     },
+  //     {
+  //       path: "oldCustomerAev",
+  //       name: "oldCustomerAev",
+  //       component: resolve =>
+  //         require(["@/views/communityOperating/oldCustomer/aev"], resolve),
+  //       meta: { title: "新客自动拉群", icon: "" }
   //     },
   //     {
   //       path: "keywords",
@@ -144,12 +158,26 @@ export const constantRoutes = [
   //       meta: { title: "关键词拉群", icon: "" }
   //     },
   //     {
+  //       path: "keywordsAev",
+  //       name: "keywordsAev",
+  //       component: resolve =>
+  //         require(["@/views/communityOperating/keywords/aev"], resolve),
+  //       meta: { title: "新客自动拉群", icon: "" }
+  //     },
+  //     {
   //       path: "groupSOP",
   //       name: "groupSOP",
   //       component: resolve =>
   //         require(["@/views/communityOperating/groupSOP/list"], resolve),
   //       meta: { title: "群SOP", icon: "" }
-  //     }
+  //     },
+  //     {
+  //       path: "groupSOPAev",
+  //       name: "groupSOPAev",
+  //       component: resolve =>
+  //         require(["@/views/communityOperating/groupSOP/aev"], resolve),
+  //       meta: { title: "新客自动拉群", icon: "" }
+  //     },
   //   ]
   // },
   // {
@@ -385,12 +413,25 @@ export const constantRoutes = [
   //       component: resolve => require(["@/views/appTool/task/list"], resolve),
   //       meta: { title: "任务宝", icon: "" }
   //     },
+  //     {
+  //       path: "taskAev",
+  //       name: "Task",
+  //       component: resolve => require(["@/views/appTool/task/aev"], resolve),
+  //       meta: { title: "任务宝", icon: "" }
+  //     },
 
   //     {
   //       path: "groupFission",
   //       name: "groupFission",
   //       component: resolve =>
   //         require(["@/views/appTool/groupFission/list"], resolve),
+  //       meta: { title: "群裂变", icon: "" }
+  //     },
+  //     {
+  //       path: "groupFissionAev",
+  //       name: "groupFission",
+  //       component: resolve =>
+  //         require(["@/views/appTool/groupFission/aev"], resolve),
   //       meta: { title: "群裂变", icon: "" }
   //     }
   //   ]

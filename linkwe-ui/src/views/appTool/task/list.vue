@@ -77,6 +77,12 @@ export default {
             });
         }
       });
+    },
+    goRoute(id, path) {
+      this.$router.push({
+        path: "/appTool/taskAev",
+        query: { id }
+      });
     }
   }
 };
@@ -110,7 +116,7 @@ export default {
         v-hasPermi="['enterpriseWechat:add']"
         type="primary"
         icon="el-icon-plus"
-        @click="edit()"
+        @click="goRoute()"
         >新建任务</el-button
       >
     </div>

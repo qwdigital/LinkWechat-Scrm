@@ -77,6 +77,12 @@ export default {
             });
         }
       });
+    },
+    goRoute(id, path) {
+      this.$router.push({
+        path: "/communityOperating/oldCustomerAev",
+        query: { id }
+      });
     }
   }
 };
@@ -110,8 +116,8 @@ export default {
         v-hasPermi="['enterpriseWechat:add']"
         type="primary"
         icon="el-icon-plus"
-        @click="edit()"
-        >新建任务</el-button
+        @click="goRoute()"
+        >新建标签建群</el-button
       >
     </div>
     <!-- <el-card shadow="never" :body-style="{padding: '20px 0 0'}">

@@ -39,17 +39,11 @@
             ></el-date-picker>
           </el-form-item>
           <el-form-item label>
-            <el-button
-              type="cyan"
-              icon="el-icon-search"
-              size="mini"
-              @click="handleQuery"
-              >查询</el-button
-            >
+            <el-button type="primary" @click="handleQuery">查询</el-button>
           </el-form-item>
         </el-form>
 
-        <div class="ar">
+        <div class="ar mb15">
           <el-button type="primary">发布动态</el-button>
         </div>
         <el-table
@@ -169,14 +163,16 @@
         </el-dialog>
       </el-tab-pane>
       <el-tab-pane label="设置" name="2">
-        <div class="ar">
+        <div class="ar mb15">
           <el-input
             placeholder="请输入内容"
             prefix-icon="el-icon-search"
             style="width: 240px;"
             v-model="input2"
           ></el-input>
-          <el-button @click="$router.push('/appTool/friendBackground')"
+          <el-button
+            class="ml10"
+            @click="$router.push('/appTool/friendBackground')"
             >设置默认背景图片</el-button
           >
           <el-button type="primary">一键设置朋友圈地址</el-button>

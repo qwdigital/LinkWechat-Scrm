@@ -4,7 +4,14 @@ export default {
   props: {},
   data() {
     return {
-      dialogVisible: false
+      dialogVisible: false,
+      list: [
+        { type: "文本类型", name: "企业资料", number: 105, isStart: 1 },
+        { type: "图片类型", name: "图片类型", number: 86, isStart: 1 },
+        { type: "网页类型", name: "网页类型", number: 55, isStart: 1 },
+        { type: "文件类型", name: "文件类型", number: 667, isStart: 1 },
+        { type: "视频类型", name: "视频类型", number: 29, isStart: 1 }
+      ]
     };
   },
   watch: {},
@@ -35,22 +42,22 @@ export default {
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" align="center" />
-        <el-table-column label="素材类型" align="center" prop="operId" />
-        <el-table-column label="聊天工具栏名称" align="center" prop="title" />
-        <el-table-column
-          label="已抓取素材数量"
-          align="center"
-          prop="businessType"
-          :formatter="typeFormat"
-        />
+        <el-table-column label="素材类型" align="center" prop="type" />
+        <el-table-column label="聊天工具栏名称" align="center" prop="name" />
+        <el-table-column label="已抓取素材数量" align="center" prop="number" />
         <el-table-column
           label="是否启用"
           align="center"
-          prop="operTime"
+          prop="isStart"
           width="180"
         >
           <template slot-scope="scope">
-            <span>{{ parseTime(scope.row.operTime) }}</span>
+            <el-switch
+              v-model="scope.row.isStart"
+              :active-value="1"
+              :inactive-value="0"
+              inactive-color="#ff4949"
+            ></el-switch>
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center" prop="operId">
@@ -58,7 +65,6 @@ export default {
             <el-button
               size="mini"
               type="text"
-              icon="el-icon-view"
               @click="handleView(scope.row, scope.index)"
               >抓取素材</el-button
             >
