@@ -57,7 +57,7 @@ public class WePoster extends BaseEntity {
     private Long type;
 
     @TableField
-    @ApiModelProperty(value = "海报状态 1 启用 0 关闭")
+    @ApiModelProperty(value = "海报状态 0 启用 1 关闭")
     private Integer delFlag;
 
     @TableField
@@ -67,6 +67,14 @@ public class WePoster extends BaseEntity {
     @TableField
     @ApiModelProperty(value = "海报背景高度")
     private Integer height;
+
+    @TableField
+    @ApiModelProperty("资源类型")
+    private String mediaType;
+
+    @TableField
+    @ApiModelProperty("分类id")
+    private Long categoryId;
 
     /**
      * 海报组件数组

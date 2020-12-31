@@ -1,7 +1,10 @@
 package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.wecom.domain.WePoster;
+
+import java.util.List;
 
 /**
  * 海报
@@ -15,6 +18,14 @@ public interface IWePosterService extends IService<WePoster> {
      * @return
      */
     public WePoster selectOne(Long id);
+
+    /**
+     * 列表查询海报
+     * @param categoryId
+     * @param name
+     * @return
+     */
+    public List<WePoster> list(Long categoryId, String name);
 
 
     /**
