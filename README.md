@@ -27,7 +27,7 @@
 
 LinkWeChat 是一款基于人工智能的企业微信 SCRM 系统，为企业构建私域流量营销系统的综合解决方案，助力企业提高社交客户运营效率。
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1130/232011_57bea01c_1480777.png "1.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/234154_394dea33_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_12.png")
 
 #### 应用场景
 
