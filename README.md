@@ -8,8 +8,8 @@
 
 <div align="center">
 
-![GVP Stars](http://img.shields.io/badge/GPV%20Stars-500+-yellow)
-![GVP Forks](http://img.shields.io/badge/GPV%20Forks-190+-yellow)
+![GVP Stars](http://img.shields.io/badge/GPV%20Stars-550+-yellow)
+![GVP Forks](http://img.shields.io/badge/GPV%20Forks-200+-yellow)
 ![license](http://img.shields.io/badge/license-GPL%203.0-green)
 
 </div>
@@ -19,9 +19,13 @@
 <p></p>
 <p></p>
 
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/233450_65d03349_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_00.png")
+
 ### 平台简介
 
-LinkWeChat，是一款基于企业微信的开源 SCRM 系统，为企业构建私域流量系统的综合解决方案，能显著提升企业社交运营效率。
+> LinkWeChat, Link to WeChat
+
+LinkWeChat是一款基于人工智能的企业微信 SCRM 系统，为企业构建私域流量营销系统的综合解决方案，助力企业提高社交客户运营效率。
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1130/232011_57bea01c_1480777.png "1.png")
 
@@ -215,7 +219,7 @@ com.linkwechat
 
 #### 开发进度
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1109/094949_d2490571_409467.png "屏幕截图.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/233603_09dc4ac4_1480777.png "LinkWeChat 1.0.png")
 
 ### 联系作者加入群
 
