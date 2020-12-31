@@ -27,11 +27,18 @@ LinkWeChat，是一款基于企业微信的开源 SCRM 系统，为企业构建�
 
 #### 应用场景
 
-泛零售、电商行业企业微信用户，提供多种工具、多渠道、多方式添加客户到企业微信好友，通过营销互动与客户标签管理等建立强连接。
+主要应用与泛零售、电商、金融等行业企业微信用户，提供多种工具、多渠道、多方式添加客户为企业微信好友，并通过营销互动与客户标签管理等建立强连接。
 
 #### 功能特性
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1130/232033_41bc0f37_1480777.png "2.png")
+四大模块助力企业营销能力升级：
+
+* 客户管理：搭建私域流量池，高效运营客户
+* 引流获客：多渠道引流，实现精准获客
+* 会话存档：会话合规存档，提供多重服务保障
+* 营销中心：多类型营销工具，实现场景化营销
+
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/232207_6a0f4a67_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_13.png")
 
 ### 环境部署
 
@@ -196,7 +203,9 @@ com.linkwechat
 
 #### 业务架构
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1130/232051_b320bf37_1480777.png "3.png")
+利用 NLP 技术对聊天记录进行智能语义分析，实现敏感词自动告警及自动打标签功能。
+
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/232301_2dcf24b2_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_22.png")
 
 #### 在线体验
 
@@ -214,7 +223,7 @@ com.linkwechat
 
 ### 特别鸣谢
 
- 感谢[RuoYi-Vue](https://gitee.com/y_project/RuoYi-Vue?_from=gitee_search)提供框架代码。
+感谢[RuoYi-Vue](https://gitee.com/y_project/RuoYi-Vue?_from=gitee_search)提供框架代码。
 
 
 ### 部分演示图，持续更新
