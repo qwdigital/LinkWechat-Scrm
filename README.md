@@ -25,7 +25,7 @@
 
 > LinkWeChat, Link to WeChat
 
-LinkWeChat是一款基于人工智能的企业微信 SCRM 系统，为企业构建私域流量营销系统的综合解决方案，助力企业提高社交客户运营效率。
+LinkWeChat 是一款基于人工智能的企业微信 SCRM 系统，为企业构建私域流量营销系统的综合解决方案，助力企业提高社交客户运营效率。
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1130/232011_57bea01c_1480777.png "1.png")
 
@@ -223,12 +223,11 @@ com.linkwechat
 
 ### 联系作者加入群
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1226/183631_251ea80c_409467.png "屏幕截图.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/234016_20fdd151_1480777.png "江总微信.png")
 
 ### 特别鸣谢
 
 感谢[RuoYi-Vue](https://gitee.com/y_project/RuoYi-Vue?_from=gitee_search)提供框架代码。
-
 
 ### 部分演示图，持续更新
 
@@ -241,6 +240,10 @@ com.linkwechat
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1109/094122_dfd73b9e_409467.png "屏幕截图.png")
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1109/094154_e5052872_409467.png "屏幕截图.png")
 
+### 合作伙伴
+
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/234054_ede1ef54_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_33.png")
+
 ### 版权声明
 
-LinkWeChat开源版遵循[GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)开源协议发布，并提供免费使用，但不允许修改后和衍生的代码做为闭源的商业软件发布和销售！
+LinkWeChat 开源版遵循 [GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE) 开源协议发布，并提供免费使用，但 **绝不允许修改后和衍生的代码做为闭源的商业软件发布和销售！** 
