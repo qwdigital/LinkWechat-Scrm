@@ -84,8 +84,15 @@ public class WePosterSubassembly extends BaseEntity {
      * 字体对齐方式 0 左对齐 1居中 2右对齐
      */
     @TableField
-    @ApiModelProperty(value = "字体对齐方式 0 左对齐 1居中 2右对齐")
-    private Integer fontTextAlign;
+    @ApiModelProperty(value = "字体对齐方式 1 左对齐 2 居中 3右对齐")
+    private Integer fontTextAlign = 2;
+
+    /**
+     * 字体垂直对齐方式 0 上对齐 1居中 2下对齐
+     */
+    @TableField
+    @ApiModelProperty(value = "字体垂直对齐方式 1 上对齐 2 居中 3 下对齐")
+    private Integer verticalType = 2;
 
     /**
      * 图片网络地址
@@ -95,7 +102,7 @@ public class WePosterSubassembly extends BaseEntity {
     private String imgPath;
 
     @TableField
-    @ApiModelProperty(value = "1 启用 0 删除")
+    @ApiModelProperty(value = "0 启用 1 删除")
     private Integer delFlag;
 
     /**
@@ -105,6 +112,29 @@ public class WePosterSubassembly extends BaseEntity {
     @ApiModelProperty(value = "文本内容")
     private String content;
 
+    @TableField
+    @ApiModelProperty("字间距")
+    private Integer wordSpace = 0;
+
+    @TableField
+    @ApiModelProperty("行间距")
+    private Integer lineSpace = 0;
+
+    @TableField
+    @ApiModelProperty("透明度[0,255]")
+    private Integer alpha;
+
+    @TableField
+    @ApiModelProperty("旋转角度（顺时针）")
+    private Integer rotate;
+
+    @TableField
+    @ApiModelProperty("字体类型 0 通常 1 粗体 2 斜体")
+    private Integer fontStyle = 0;
+
+    @TableField(value = "`order`")
+    @ApiModelProperty("顺序排序")
+    private Integer order;
     /**
      * 字体实体
      */

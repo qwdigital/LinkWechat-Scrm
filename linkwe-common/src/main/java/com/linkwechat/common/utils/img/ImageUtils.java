@@ -3,74 +3,22 @@ package com.linkwechat.common.utils.img;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Stream;
 
 public class ImageUtils {
 
     private final static JLabel J_LABEL = new JLabel();
-
-    public static void main(String[] args) throws Exception{
-
-
-
-        /*File file = WsFileUtils.createFile("D:\\网页\\-1.jpg");
-        try {
-            BufferedImage bufferedImage = ImageIO.read(file);
-            BufferedImage newBufferedImage = copyBufferedImage(bufferedImage,BufferedImage.TYPE_INT_RGB);
-            Graphics2D graphics2D = newBufferedImage.createGraphics();
-            System.out.println("图片宽度"+newBufferedImage.getWidth());
-            System.out.println("图片长度"+newBufferedImage.getHeight());
-            //Font font = new Font("微软雅黑",Font.PLAIN,96);
-            //Font font1 = new Font("宋体",Font.PLAIN,120);
-            Color color = getColor("#7FFF00");
-            Stream.iterate(0,i->i+1).limit(100).forEach(j->{
-                Font font = null;
-                try {
-                    font = Font.createFont(Font.TRUETYPE_FONT, WsFileUtils.createFile("D:\\网页\\SourceHanSansCN-Normal.ttf"));
-                } catch (FontFormatException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                font = font.deriveFont(Font.PLAIN,96);
-                System.out.println(font.getSize());
-                String context = "u易语言突然人fgsd豆腐干豆腐干地方合同已经同意就过分";
-                long startTime = System.currentTimeMillis();
-                FontMetrics fontMetrics = J_LABEL.getFontMetrics(font);
-                fontMetrics = J_LABEL.getFontMetrics(font);
-                List<LineText> list = splitContext(context,fontMetrics,50,0,bufferedImage.getWidth()-100,bufferedImage.getHeight(),3);
-                long endTime = System.currentTimeMillis();
-                System.out.println("拆解成行：" + (endTime - startTime));
-                startTime = System.currentTimeMillis();
-                for(int i = 0; i < list.size(); i++) {
-                    LineText lineText = list.get(i);
-                    writeFontBufferedImage(newBufferedImage, lineText.getText(), lineText.getPointX(), lineText.getPointY(), font, color);
-                    BufferedImage image = enlargementBufferedImage(bufferedImage,0.2,BufferedImage.TYPE_3BYTE_BGR);
-                    mergeBufferedImage(newBufferedImage,image,200,500);
-
-                }
-                endTime = System.currentTimeMillis();
-                System.out.println(endTime - startTime);
-                try {
-                    ImageIO.write(newBufferedImage,"jpg",WsFileUtils.createFile("D:\\网页\\"+j+".jpg"));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
-    }
 
 
 
@@ -90,7 +38,7 @@ public class ImageUtils {
                 newWidth = oldWidth / size;
                 newHeight = oldHeight / size;
             }
-            BufferedImage newBufferedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+            BufferedImage newBufferedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
             Graphics2D newGraphics2D = newBufferedImage.createGraphics();
             newGraphics2D.setBackground(Color.WHITE);
             newGraphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -184,12 +132,12 @@ public class ImageUtils {
                 }
                 int i = 0;
                 for (i = 0; i < directionNum; i++) {
-                    byte bytes[] = cropImage(bufferedImage, 0, i * directionValue, width, directionValue);
+                    byte[] bytes = cropImage(bufferedImage, 0, i * directionValue, width, directionValue);
                     byteToFile(bytes, fileName + "-" + i, "jpg", path);
                 }
                 int directionSurplus = height % directionValue;
                 if (directionSurplus > 0) {
-                    byte bytes[] = cropImage(bufferedImage, 0, height - directionSurplus, width, directionSurplus);
+                    byte[] bytes = cropImage(bufferedImage, 0, height - directionSurplus, width, directionSurplus);
                     byteToFile(bytes, fileName + "-" + (i + 1), "jpg", path);
                 }
             } else if (direction == 2) {
@@ -199,12 +147,12 @@ public class ImageUtils {
                 }
                 int i = 0;
                 for (; i < directionNum; i++) {
-                    byte bytes[] = cropImage(bufferedImage, i * directionValue, 0, directionValue, height);
+                    byte[] bytes = cropImage(bufferedImage, i * directionValue, 0, directionValue, height);
                     byteToFile(bytes, fileName + "-" + i, "jpg", path);
                 }
                 int directionSurplus = width % directionValue;
                 if (directionSurplus > 0) {
-                    byte bytes[] = cropImage(bufferedImage, height - directionSurplus, 0, directionSurplus, height);
+                    byte[]  bytes = cropImage(bufferedImage, height - directionSurplus, 0, directionSurplus, height);
                     byteToFile(bytes, fileName + "-" + (i + 1), "jpg", path);
                 }
             }
@@ -241,10 +189,40 @@ public class ImageUtils {
         return newBufferedImage;
     }
 
+    /**
+     * 设置透明度
+     * @param bufferedImage
+     * @param alpha
+     * @param bufferedImageType
+     * @return
+     */
+    public static BufferedImage setBufferedImageAlpha(BufferedImage bufferedImage,Integer alpha,Integer bufferedImageType){
+        if(alpha < 0 || alpha > 255){
+            throw new RuntimeException("范围错误[0,255]");
+        }
+        int width = bufferedImage.getWidth();
+        int height = bufferedImage.getHeight();
+        BufferedImage newBufferedImage = new BufferedImage(width,height, bufferedImageType);
+        int argb;
+        int oa;
+        int a;
+        int rgb;
+        for(int y = 0; y < height; y++){
+            for(int x = 0; x < width; x++){
+                argb = bufferedImage.getRGB(x,y);
+                rgb = argb & 0x00FFFFFF;
+                oa = argb >>> 24;
+                a = oa == 0?0:alpha<<24;
+                argb = a^rgb;
+                newBufferedImage.setRGB(x,y,argb);
+            }
+        }
+        return newBufferedImage;
+    }
+
 
     /**
      * 放大缩小
-     *
      * @param bufferedImage
      * @param enlargementTimes
      * @return
@@ -369,14 +347,23 @@ public class ImageUtils {
 
     }
 
-
+    /**
+     * 为图片打马赛克
+     * @param bufferedImage
+     * @param pointX
+     * @param pointY
+     * @param width
+     * @param height
+     * @param level
+     * @return
+     */
     public static BufferedImage createMosaic(BufferedImage bufferedImage, Integer pointX, Integer pointY, Integer width, Integer height, Integer level) {
-        Integer bufferImageWidth = bufferedImage.getWidth();
-        Integer bufferImageHeight = bufferedImage.getHeight();
+        int bufferImageWidth = bufferedImage.getWidth();
+        int bufferImageHeight = bufferedImage.getHeight();
         Integer x = pointX;
         Integer y = pointY;
-        Integer chunkWidth = width / level;
-        Integer chunkHeight = height / level;
+        int chunkWidth = width / level;
+        int chunkHeight = height / level;
         chunkWidth = chunkWidth == 0 ? 1 : chunkWidth;
         chunkHeight = chunkHeight == 0 ? 1 : chunkHeight;
 
@@ -392,8 +379,8 @@ public class ImageUtils {
                 y += chunkHeight;
                 Integer randomX = random.nextInt(chunkWidth);
                 Integer randomY = random.nextInt(chunkWidth);
-                Integer modificationX = 0;
-                Integer modificationY = 0;
+                int modificationX = 0;
+                int modificationY = 0;
                 if (x + randomX >= bufferImageWidth) {
                     modificationX = (x + randomX) - bufferImageWidth + 1;
                 }
@@ -451,52 +438,127 @@ public class ImageUtils {
 
     /**
      * 把字符串拆成行
-     * @param context
+     * @param context 文本内容
      * @param fontMetrics
-     * @param width
-     * @param height
-     * @param type 1 右对齐 2 居中 3 左对齐
+     * @param pointX 开始点的x轴坐标
+     * @param pointY 开始点的y轴坐标
+     * @param width 文本域宽度
+     * @param height 文本域高度
+     * @param wordSpace 字间距
+     * @param lineSpace 行间距
+     * @param horizontalType 1 右对齐 2 居中 3 左对齐
      * @return
      */
-    public static List<LineText> splitContext(String context,FontMetrics fontMetrics,int pointX,int pointY,int width,int height,Integer type){
+    public static List<LineText> splitContext(String context,FontMetrics fontMetrics,int pointX,int pointY,int width,int height,int wordSpace,int lineSpace,Integer horizontalType,Integer verticalType){
         context = new String(context.getBytes(StandardCharsets.UTF_8));
         Font font = fontMetrics.getFont();
         char[] chars = context.toCharArray();
         List<LineText> returnLineList = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        int size = 0;
-        int nowHeight = font.getSize();
+        //当前的行宽度
+        int currentLineWidth = 0;
+        //当前的高度
+        int currentHeight = font.getSize();
+        //字体宽度
         int charSize = 0;
+        List<CharText> charTextList = new ArrayList<>();
         for(char c:chars){
             charSize = fontMetrics.charWidth(c);
-            size += charSize;
-            if(size >= width){
-
-                returnLineList.add(new LineText(pointX,width,pointY + nowHeight,sb.toString(),size - charSize,type));
+            currentLineWidth += charSize;
+            if(currentLineWidth >= width){
+                returnLineList.add(new LineText(pointX,width,currentHeight,sb.toString(),currentLineWidth - charSize - wordSpace,charTextList,horizontalType));
+                currentHeight += font.getSize();
+                currentHeight += lineSpace;
+                currentLineWidth = charSize;
+                charTextList = new ArrayList<>();
                 sb = new StringBuilder();
-                sb.append(c);
-                nowHeight += font.getSize();
-                size = charSize;
-            }else {
-                sb.append(c);
             }
-            if(nowHeight > height){
+            charTextList.add(new CharText(currentLineWidth - charSize,currentHeight,c));
+            currentLineWidth += wordSpace;
+            sb.append(c);
+            if(currentHeight > height){
                 sb = new StringBuilder();
                 break;
             }
         }
         if(sb.length() > 0){
-            returnLineList.add(new LineText(pointX,width,pointY + nowHeight,sb.toString(),size,type));
+            returnLineList.add(new LineText(pointX,width,currentHeight,sb.toString(),currentLineWidth - wordSpace,charTextList,horizontalType));
         }
+        if(verticalType.equals(2)){
+            int allHeight = returnLineList.size()* font.getSize() + lineSpace * returnLineList.size() - 1;
+            pointY = (height - allHeight)/2 + pointY;
+        }else if (verticalType.equals(3)){
+            int allHeight = returnLineList.size()* font.getSize() + lineSpace * returnLineList.size() - 1;
+            pointY = pointY + height - allHeight;
+        }
+        int finalPointY = pointY;
+        returnLineList.forEach(lineText -> {
+            lineText.setPointY(finalPointY + lineText.getPointY());
+            lineText.getCharTextList().forEach(charText -> {
+                charText.setPointY(lineText.getPointY());
+            });
+        });
         return returnLineList;
 
     }
 
+    /**
+     * 旋转图片
+     * @param bufferedImage
+     * @param angle
+     * @return
+     */
+    public static BufferedImage rotateImage(BufferedImage bufferedImage,double angle){
+        Rectangle rectangle = getRotateRectangle(bufferedImage.getWidth(),bufferedImage.getHeight(),angle);
+        BufferedImage image = new BufferedImage((int) rectangle.getWidth(),(int) rectangle.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+        Graphics2D graphics2D = image.createGraphics();
+        graphics2D.translate((rectangle.getWidth() - bufferedImage.getWidth()) / 2,(rectangle.getHeight() - bufferedImage.getHeight()) / 2);
+        graphics2D.rotate(Math.toRadians(angle), BigDecimal.valueOf(bufferedImage.getWidth()/2).doubleValue(),BigDecimal.valueOf(bufferedImage.getHeight()/2).doubleValue());
+        graphics2D.drawImage(bufferedImage,null,0,0);
+        return image;
+    }
+
+
+    public static Rectangle getRotateRectangle(double width,double height,double angle){
+        if (angle >= 90) {
+            if((int) angle / 90 % 2 == 1){
+                double temp = height;
+                height = width;
+                width = temp;
+            }
+            angle = angle % 90;
+        }
+        double j1Angle = Math.atan(height / width);
+        angle = Math.toRadians(angle);
+        double r = Math.sqrt(Math.pow(width,2)+Math.pow(height,2)) / 2;
+        double newWidth = Math.cos(j1Angle - angle) * r * 2;
+        double newHeight = Math.sin(j1Angle + angle) * r * 2;
+        newHeight = Math.abs(newHeight);
+        newWidth = Math.abs(newWidth);
+        return new Rectangle(0,0,(int) newWidth,(int) newHeight);
+    }
+
+
+    /**
+     * 解析16进制颜色
+     * @param value
+     * @return
+     */
     public static Color getColor(String value){
         if(!value.startsWith("#")){
             throw new RuntimeException("格式错误");
         }
         return new Color(Integer.parseInt(value.substring(1,3),16),Integer.parseInt(value.substring(3,5),16),Integer.parseInt(value.substring(5,7),16));
+    }
+
+    public static Color getColor(String value,Integer alpha){
+        if(alpha == null){
+            return getColor(value);
+        }
+        if(!value.startsWith("#")){
+            throw new RuntimeException("格式错误");
+        }
+        return new Color(Integer.parseInt(value.substring(1,3),16),Integer.parseInt(value.substring(3,5),16),Integer.parseInt(value.substring(5,7),16),alpha);
     }
 
 
@@ -506,36 +568,88 @@ public class ImageUtils {
 
     public static class LineText{
 
-        private final Integer pointX;
+        private Integer pointX;
 
-        private final Integer pointY;
+        private Integer pointY;
 
-        private final String text;
+        private String text;
 
-        private final Integer length;
+        private Integer length;
 
-        public LineText(Integer pointX,Integer width,Integer height,String text,Integer length,Integer type){
+        private List<CharText> charTextList;
+
+        public LineText(Integer pointX,Integer width,Integer pointY,String text,Integer length,List<CharText> charTextList,Integer type){
             this.text = text;
             this.length = length;
-            this.pointY = height;
+            this.pointY = pointY;
             if(type.equals(1)){
                 this.pointX = pointX;
             }else if(type.equals(2)){
-                this.pointX = (pointX+width - length)/2;
+                this.pointX = pointX+(width - length)/2;
             }else if(type.equals(3)){
-                this.pointX = pointX+width - length;
+                this.pointX = pointX + width - length;
             }else {
                 throw new RuntimeException("不支持的类型");
             }
+            charTextList.forEach(charText -> {
+                charText.setPointX(this.pointX + charText.getPointX());
+            });
+            this.charTextList = charTextList;
+        }
+
+        public Integer getPointX() {
+            return pointX;
+        }
+
+        public void setPointX(Integer pointX) {
+            this.pointX = pointX;
+        }
+
+        public Integer getPointY() {
+            return pointY;
+        }
+
+        public void setPointY(Integer pointY) {
+            this.pointY = pointY;
         }
 
         public String getText() {
             return text;
         }
 
+        public void setText(String text) {
+            this.text = text;
+        }
 
         public Integer getLength() {
             return length;
+        }
+
+        public void setLength(Integer length) {
+            this.length = length;
+        }
+
+        public List<CharText> getCharTextList() {
+            return charTextList;
+        }
+
+        public void setCharTextList(List<CharText> charTextList) {
+            this.charTextList = charTextList;
+        }
+    }
+
+    public static class CharText{
+
+        private Integer pointX;
+
+        private Integer pointY;
+
+        private Character value;
+
+        public CharText(Integer pointX,Integer pointY,Character value){
+            this.pointX = pointX;
+            this.pointY = pointY;
+            this.value = value;
         }
 
 
@@ -543,8 +657,24 @@ public class ImageUtils {
             return pointX;
         }
 
+        public void setPointX(Integer pointX) {
+            this.pointX = pointX;
+        }
+
         public Integer getPointY() {
             return pointY;
+        }
+
+        public void setPointY(Integer pointY) {
+            this.pointY = pointY;
+        }
+
+        public Character getValue() {
+            return value;
+        }
+
+        public void setValue(Character value) {
+            this.value = value;
         }
     }
 }
