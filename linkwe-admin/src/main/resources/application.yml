@@ -37,6 +37,9 @@ logging:
   level:
     com.ruoyi: debug
     org.springframework: warn
+  path: ./logs
+path:
+  log: ./logs
 
 # Spring配置
 spring:

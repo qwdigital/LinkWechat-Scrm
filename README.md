@@ -8,8 +8,8 @@
 
 <div align="center">
 
-![GVP Stars](http://img.shields.io/badge/GPV%20Stars-500+-yellow)
-![GVP Forks](http://img.shields.io/badge/GPV%20Forks-190+-yellow)
+![GVP Stars](http://img.shields.io/badge/GPV%20Stars-550+-yellow)
+![GVP Forks](http://img.shields.io/badge/GPV%20Forks-200+-yellow)
 ![license](http://img.shields.io/badge/license-GPL%203.0-green)
 
 </div>
@@ -19,19 +19,30 @@
 <p></p>
 <p></p>
 
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/233450_65d03349_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_00.png")
+
 ### 平台简介
 
-LinkWeChat，是一款基于企业微信的开源 SCRM 系统，为企业构建私域流量系统的综合解决方案，能显著提升企业社交运营效率。
+> LinkWeChat, Link to WeChat
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1130/232011_57bea01c_1480777.png "1.png")
+LinkWeChat 是一款基于人工智能的企业微信 SCRM 系统，为企业构建私域流量营销系统的综合解决方案，助力企业提高社交客户运营效率。
+
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/234154_394dea33_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_12.png")
 
 #### 应用场景
 
-泛零售、电商行业企业微信用户，提供多种工具、多渠道、多方式添加客户到企业微信好友，通过营销互动与客户标签管理等建立强连接。
+主要应用与泛零售、电商、金融等行业企业微信用户，提供多种工具、多渠道、多方式添加客户为企业微信好友，并通过营销互动与客户标签管理等建立强连接。
 
 #### 功能特性
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1130/232033_41bc0f37_1480777.png "2.png")
+四大模块助力企业营销能力升级：
+
+* 客户管理：搭建私域流量池，高效运营客户
+* 引流获客：多渠道引流，实现精准获客
+* 会话存档：会话合规存档，提供多重服务保障
+* 营销中心：多类型营销工具，实现场景化营销
+
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/232207_6a0f4a67_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_13.png")
 
 ### 环境部署
 
@@ -196,7 +207,9 @@ com.linkwechat
 
 #### 业务架构
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1130/232051_b320bf37_1480777.png "3.png")
+利用 NLP 技术对聊天记录进行智能语义分析，实现敏感词自动告警及自动打标签功能。
+
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/232301_2dcf24b2_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_22.png")
 
 #### 在线体验
 
@@ -206,16 +219,15 @@ com.linkwechat
 
 #### 开发进度
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1109/094949_d2490571_409467.png "屏幕截图.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/233603_09dc4ac4_1480777.png "LinkWeChat 1.0.png")
 
 ### 联系作者加入群
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1226/183631_251ea80c_409467.png "屏幕截图.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/234016_20fdd151_1480777.png "江总微信.png")
 
 ### 特别鸣谢
 
- 感谢[RuoYi-Vue](https://gitee.com/y_project/RuoYi-Vue?_from=gitee_search)提供框架代码。
-
+感谢[RuoYi-Vue](https://gitee.com/y_project/RuoYi-Vue?_from=gitee_search)提供框架代码。
 
 ### 部分演示图，持续更新
 
@@ -228,6 +240,10 @@ com.linkwechat
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1109/094122_dfd73b9e_409467.png "屏幕截图.png")
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1109/094154_e5052872_409467.png "屏幕截图.png")
 
+### 合作伙伴
+
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/234054_ede1ef54_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_33.png")
+
 ### 版权声明
 
-LinkWeChat开源版遵循[GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)开源协议发布，并提供免费使用，但不允许修改后和衍生的代码做为闭源的商业软件发布和销售！
+LinkWeChat 开源版遵循 [GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE) 开源协议发布，并提供免费使用，但 **绝不允许修改后和衍生的代码做为闭源的商业软件发布和销售！** 
