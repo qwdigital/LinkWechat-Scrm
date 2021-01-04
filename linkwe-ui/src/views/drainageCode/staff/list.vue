@@ -87,7 +87,7 @@ export default {
     /** 重置按钮操作 */
     resetQuery() {
       this.dateRange = []
-      this.resetForm('queryForm')
+      this.$refs['queryForm'].resetFields()
       this.getList(1)
     },
     goRoute(path, id) {
@@ -180,7 +180,7 @@ export default {
       label-width="100px"
       class="top-search"
     >
-      <el-form-item label="使用员工">
+      <el-form-item label="使用员工" prop="useUserName">
         <el-input
           v-model="query.useUserName"
           placeholder="请输入"
@@ -196,7 +196,7 @@ export default {
           @keyup.enter.native="getList(1)"
         />
       </el-form-item> -->
-      <el-form-item label="手机号">
+      <el-form-item label="手机号" prop="mobile">
         <el-input
           v-model="query.mobile"
           placeholder="请输入"
@@ -204,7 +204,7 @@ export default {
           @keyup.enter.native="getList(1)"
         />
       </el-form-item>
-      <el-form-item label="活动场景">
+      <el-form-item label="活动场景" prop="activityScene">
         <el-input
           v-model="query.activityScene"
           placeholder="请输入"
@@ -212,7 +212,7 @@ export default {
           @keyup.enter.native="getList(1)"
         />
       </el-form-item>
-      <el-form-item label="创建人">
+      <el-form-item label="创建人" prop="createBy">
         <el-input
           v-model="query.createBy"
           placeholder="请输入"

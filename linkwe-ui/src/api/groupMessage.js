@@ -51,11 +51,10 @@ pushType:群发类型 0 发给客户 1 发给客户群
 beginTime:开始时间
 endTime:结束时间}
  */
-export function getList(data) {
+export function getList(params) {
   return request({
     url: service + "/list",
-    method: "get",
-    data
+    params
   });
 }
 

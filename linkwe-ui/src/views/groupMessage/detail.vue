@@ -1,30 +1,40 @@
 <script>
-import TabContent from "./TabContent";
+import { getDetail } from '@/api/groupMessage'
+import TabContent from './TabContent'
 
 export default {
   components: {
-    TabContent
+    TabContent,
   },
   props: {},
   data() {
     return {
-      activeName: "0",
+      data: {},
+      activeName: '0',
       total1: 0,
-      total0: 0
-    };
+      total0: 0,
+    }
   },
   watch: {},
   computed: {},
-  created() {},
+  created() {
+    getDetail(this.$route.query.id).then(({ data }) => {
+      this.data = data
+    })
+  },
   mounted() {},
   methods: {
-    notice() {}
-  }
-};
+    notice() {},
+  },
+}
 </script>
 
 <template>
   <div>
+    <div>
+      创建人：{{ data.sender }}
+      <div>消息内容：{{ data.content }}</div>
+    </div>
     <!-- <el-button class="notice" type="primary" @click="notice"
       >通知员工发送</el-button
     > -->

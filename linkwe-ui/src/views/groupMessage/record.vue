@@ -73,7 +73,7 @@ export default {
     /** 重置按钮操作 */
     resetQuery() {
       this.dateRange = [];
-      this.resetForm("queryForm");
+      this.$refs["queryForm"].resetFields();
       this.getList(1);
     },
     // 多选框选中数据
@@ -114,7 +114,7 @@ export default {
       class="top-search"
       label-width="100px"
     >
-      <el-form-item label="创建人">
+      <el-form-item label="创建人" prop="sender">
         <el-input
           v-model="query.sender"
           placeholder="请输入"
@@ -122,7 +122,7 @@ export default {
           @keyup.enter.native="getList(1)"
         />
       </el-form-item>
-      <el-form-item label="内容消息">
+      <el-form-item label="内容消息" prop="content">
         <el-input
           v-model="query.content"
           placeholder="请输入"
@@ -130,7 +130,7 @@ export default {
           @keyup.enter.native="getList(1)"
         />
       </el-form-item>
-      <el-form-item label="群发类型">
+      <el-form-item label="群发类型" prop="pushType">
         <el-select v-model="query.pushType" placeholder="请选择" size="small">
           <el-option
             v-for="(value, key, index) in pushType"
