@@ -4,7 +4,8 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.config.RuoYiConfig;
-import com.linkwechat.common.core.domain.elastic.ElasticSearchEntity;
+import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.uuid.IdUtils;
@@ -17,6 +18,7 @@ import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author sxw
@@ -62,8 +64,8 @@ public class FinanceUtils {
      * @param proxy  代理
      * @param passwd 密码
      */
-    public static List<ElasticSearchEntity> getChatData(long seq, String proxy, String passwd) {
-        List<ElasticSearchEntity> resList = new ArrayList<>();
+    public static List<JSONObject> getChatData(long seq, String proxy, String passwd, RedisCache redisCache) {
+        List<JSONObject> resList = new ArrayList<>();
         long slice = Finance.NewSlice();
         int ret = Finance.GetChatData(sdk, seq, LIMIT, proxy, passwd, timeout, slice);
         if (ret != 0) {
@@ -73,20 +75,18 @@ public class FinanceUtils {
         String content = Finance.GetContentFromSlice(slice);
         JSONArray chatdataArr = JSONObject.parseObject(content).getJSONArray("chatdata");
         log.info("开始执行数据解析:------------");
+        AtomicLong LocalSEQ = new AtomicLong();
         if (CollectionUtil.isNotEmpty(chatdataArr)) {
             chatdataArr.stream().map(data -> (JSONObject) data).forEach(data -> {
                 try {
-                    ElasticSearchEntity elasticSearchEntity = new ElasticSearchEntity();
-                    long LocalSEQ = data.getLong("seq");
+                    LocalSEQ.set(data.getLong("seq"));
                     JSONObject jsonObject = decryptChatRecord(sdk, data.getString("encrypt_random_key"),
                             data.getString("encrypt_chat_msg"), privateKey);
                     if (jsonObject ==null){
                        return;
                     }
-                    jsonObject.put("seq", LocalSEQ);
-                    elasticSearchEntity.setData(jsonObject);
-                    elasticSearchEntity.setId(jsonObject.getString("msgid"));
-                    resList.add(elasticSearchEntity);
+                    jsonObject.put("seq", LocalSEQ.get());
+                    resList.add(jsonObject);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -94,6 +94,7 @@ public class FinanceUtils {
             log.info("数据解析完成:------------");
         }
         Finance.FreeSlice(slice);
+        redisCache.setCacheObject(WeConstans.CONTACT_SEQ_KEY,LocalSEQ.get());
         return resList;
     }
 

@@ -99,7 +99,7 @@ public class ElasticSearch {
 //            request.settings() 手工指定Setting
             CreateIndexResponse res = restHighLevelClient.indices().create(request, RequestOptions.DEFAULT);
             if (!res.isAcknowledged()) {
-                throw new RuntimeException("初始化失败");
+                log.info("初始化失败");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -169,7 +169,7 @@ public class ElasticSearch {
      */
     public void insertOrUpdateOne(String idxName, ElasticSearchEntity entity) {
         IndexRequest request = new IndexRequest(idxName, "_doc");
-        log.error("Data : id={},entity={}", entity.getId(), JSON.toJSONString(entity.getData()));
+        log.info("Data : id={},entity={}", entity.getId(), JSON.toJSONString(entity.getData()));
         request.id(entity.getId());
         request.source(entity.getData(), XContentType.JSON);
 //        request.source(JSON.toJSONString(entity.getData()), XContentType.JSON);

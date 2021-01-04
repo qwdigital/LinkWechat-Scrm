@@ -67,18 +67,16 @@ public class RyTask {
 
         log.info(">>>>>>>seq:{}",index.get());
         FinanceUtils.initSDK(corpId, secret);
-        List<ElasticSearchEntity> chatDataList = FinanceUtils.getChatData(index.get(),
+        List<JSONObject> chatDataList = FinanceUtils.getChatData(index.get(),
                 "",
-                "");
+                "", redisCache);
         if (CollectionUtil.isNotEmpty(chatDataList)){
             try {
-                elasticSearch.insertBatch(WeConstans.WECOM_FINANCE_INDEX, chatDataList);
-                weChatContactMappingService.saveWeChatContactMapping(chatDataList);
+                List<ElasticSearchEntity> elasticSearchEntities = weChatContactMappingService.saveWeChatContactMapping(chatDataList);
+                elasticSearch.insertBatch(WeConstans.WECOM_FINANCE_INDEX, elasticSearchEntities);
             } catch (Exception e) {
                 log.error("消息处理异常：ex:{}", e);
                 e.printStackTrace();
-            }finally {
-                setRedisCacheSeqValue(index);
             }
         }
     }
@@ -90,7 +88,7 @@ public class RyTask {
         searchSourceBuilder.size(1);
         List<JSONObject> searchResultList = elasticSearch.search(WeConstans.WECOM_FINANCE_INDEX, searchSourceBuilder, JSONObject.class);
         searchResultList.stream().findFirst().ifPresent(result ->{
-            index.set(result.getLong(WeConstans.CONTACT_SEQ_KEY) + 1);
+            index.set(result.getLong(WeConstans.CONTACT_SEQ_KEY));
         });
         redisCache.setCacheObject(WeConstans.CONTACT_SEQ_KEY,index);
     }
