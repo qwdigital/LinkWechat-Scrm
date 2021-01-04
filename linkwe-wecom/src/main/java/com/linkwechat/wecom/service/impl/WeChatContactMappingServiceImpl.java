@@ -2,7 +2,6 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.json.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -10,7 +9,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.elastic.ElasticSearchEntity;
-import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeCustomerClient;
 import com.linkwechat.wecom.client.WeCustomerGroupClient;
@@ -18,15 +16,15 @@ import com.linkwechat.wecom.client.WeMsgAuditClient;
 import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.domain.WeChatContactMapping;
 import com.linkwechat.wecom.domain.WeCustomer;
+import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeUser;
-import com.linkwechat.wecom.domain.dto.WeUserDto;
 import com.linkwechat.wecom.domain.dto.customer.CustomerGroupDetail;
-import com.linkwechat.wecom.domain.dto.msgaudit.GroupChatVo;
 import com.linkwechat.wecom.mapper.WeChatContactMappingMapper;
 import com.linkwechat.wecom.mapper.WeCustomerMapper;
 import com.linkwechat.wecom.mapper.WeUserMapper;
 import com.linkwechat.wecom.service.IWeChatContactMappingService;
 import com.linkwechat.wecom.service.IWeConversationArchiveService;
+import com.linkwechat.wecom.service.IWeGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,6 +59,8 @@ public class WeChatContactMappingServiceImpl extends ServiceImpl<WeChatContactMa
     private WeMsgAuditClient weMsgAuditClient;
     @Autowired
     private IWeConversationArchiveService weConversationArchiveService;
+    @Autowired
+    private IWeGroupService weGroupService;
 
     /**
      * 查询聊天关系映射
@@ -97,10 +97,8 @@ public class WeChatContactMappingServiceImpl extends ServiceImpl<WeChatContactMa
                     item.setFinalChatContext(weConversationArchiveService.getFinalChatContactInfo(item.getFromId(), item.getReceiveId()));
                 } else if (StringUtils.isNotEmpty(item.getRoomId())) {
                     //获取群信息
-                    CustomerGroupDetail customerGroupDetail = weCustomerGroupClient.groupChatDetail(new CustomerGroupDetail().new Params(item.getRoomId()));
-                    GroupChatVo groupChatVo = new GroupChatVo();
-                    BeanUtil.copyProperties(customerGroupDetail.getGroup_chat().get(0), groupChatVo);
-                    item.setRoomInfo(groupChatVo);
+                    WeGroup weGroup = weGroupService.getOne(new LambdaQueryWrapper<WeGroup>().eq(WeGroup::getChatId, item.getRoomId()));
+                    item.setRoomInfo(weGroup);
                     item.setFinalChatContext(weConversationArchiveService.getFinalChatRoomContactInfo(item.getFromId(), item.getRoomId()));
                 }
             });
@@ -188,11 +186,8 @@ public class WeChatContactMappingServiceImpl extends ServiceImpl<WeChatContactMa
                     fromWeChatContactMapping.setIsCustom(reveiceType);
                 } else {
                     fromWeChatContactMapping.setRoomId(chatData.getString("roomid"));
-                    CustomerGroupDetail customerGroupDetail = weCustomerGroupClient
-                            .groupChatDetail(new CustomerGroupDetail().new Params(chatData.getString("roomid")));
-                    GroupChatVo groupChatVo = new GroupChatVo();
-                    BeanUtil.copyProperties(customerGroupDetail.getGroup_chat().get(0), groupChatVo);
-                    chatData.put("roomInfo",JSONObject.parse(JSONObject.toJSONString(groupChatVo)));
+                    WeGroup weGroup = weGroupService.getOne(new LambdaQueryWrapper<WeGroup>().eq(WeGroup::getChatId, chatData.getString("roomid")));
+                    chatData.put("roomInfo",JSONObject.parse(JSONObject.toJSONString(weGroup)));
                 }
             }
             //接收人映射数据
