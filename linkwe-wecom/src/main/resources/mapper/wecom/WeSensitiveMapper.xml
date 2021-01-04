@@ -42,11 +42,12 @@
             <if test="patternWords != null  and patternWords != ''">and a.pattern_words like concat('%',
                 #{patternWords}, '%')
             </if>
-            <if test="auditUserId != null ">and a.audit_user_id = #{auditUserId}</if>
+            <if test="auditUserId != null and auditUserId != ''">and a.audit_user_id = #{auditUserId}</if>
             <if test="auditUserName != null and auditUserName != ''">and a.audit_user_name like concat('%',
                 #{auditUserName}, '%')
             </if>
         </where>
+        order by a.update_time desc, a.create_time desc
     </select>
 
     <select id="selectWeSensitiveById" parameterType="Long" resultMap="WeSensitiveResult">
@@ -60,6 +61,7 @@
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
+        order by a.update_time desc, a.create_time desc
     </select>
 
     <insert id="insertWeSensitive" parameterType="WeSensitive" useGeneratedKeys="true" keyProperty="id">
@@ -67,7 +69,7 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="strategyName != null and strategyName != ''">strategy_name,</if>
             <if test="patternWords != null and patternWords != ''">pattern_words,</if>
-            <if test="auditUserId != null">audit_user_id,</if>
+            <if test="auditUserId != null and auditUserId != ''">audit_user_id,</if>
             <if test="auditUserName != null and auditUserName != ''">audit_user_name,</if>
             <if test="alertFlag != null">alert_flag,</if>
             <if test="delFlag != null">del_flag,</if>
@@ -79,7 +81,7 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="strategyName != null and strategyName != ''">#{strategyName},</if>
             <if test="patternWords != null and patternWords != ''">#{patternWords},</if>
-            <if test="auditUserId != null">#{auditUserId},</if>
+            <if test="auditUserId != null and auditUserId != ''">#{auditUserId},</if>
             <if test="auditUserName != null and auditUserName != ''">#{auditUserName},</if>
             <if test="alertFlag != null">#{alertFlag},</if>
             <if test="delFlag != null">#{delFlag},</if>
@@ -95,7 +97,7 @@
         <trim prefix="SET" suffixOverrides=",">
             <if test="strategyName != null and strategyName != ''">strategy_name = #{strategyName},</if>
             <if test="patternWords != null and patternWords != ''">pattern_words = #{patternWords},</if>
-            <if test="auditUserId != null">audit_user_id = #{auditUserId},</if>
+            <if test="auditUserId != null and auditUserId != ''">audit_user_id = #{auditUserId},</if>
             <if test="auditUserName != null">audit_user_name = #{auditUserName},</if>
             <if test="alertFlag != null">alert_flag = #{alertFlag},</if>
             <if test="delFlag != null">del_flag = #{delFlag},</if>
@@ -126,7 +128,7 @@
             </trim>
             <trim prefix="audit_user_id = case" suffix="end,">
                 <foreach collection="list" item="item" index="index">
-                    <if test="item.auditUserId != null">
+                    <if test="item.auditUserId != null and auditUserId != ''">
                         when id = #{item.id} then #{item.auditUserId}
                     </if>
                 </foreach>

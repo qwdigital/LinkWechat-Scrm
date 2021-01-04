@@ -1,6 +1,9 @@
 package com.linkwechat.wecom.service;
 
+import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.wecom.domain.WeSensitive;
+import com.linkwechat.wecom.domain.query.WeSensitiveHitQuery;
 
 import java.util.List;
 
@@ -58,4 +61,13 @@ public interface IWeSensitiveService {
      * @return 结果
      */
     public int destroyWeSensitiveByIds(Long[] ids);
+
+    /**
+     * 敏感词命中
+     *
+     * @param entityList
+     */
+    public void hitSensitive(List<JSONObject> entityList);
+
+    public PageInfo<JSONObject> getHitSensitiveList(WeSensitiveHitQuery weSensitiveHitQuery);
 }

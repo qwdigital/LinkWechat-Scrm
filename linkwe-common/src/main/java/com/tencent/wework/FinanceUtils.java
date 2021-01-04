@@ -35,10 +35,6 @@ public class FinanceUtils {
      * 超时时间，单位秒
      */
     private final static long timeout = 5 * 60;
-    /**
-     * 一次拉取的消息条数，最大值1000条，超过1000条会返回错误
-     */
-    private final static long LIMIT = 1000;
 
     private static String downloadWeWorkPath = RuoYiConfig.getDownloadWeWorkPath();
 
@@ -67,7 +63,7 @@ public class FinanceUtils {
     public static List<JSONObject> getChatData(long seq, String proxy, String passwd, RedisCache redisCache) {
         List<JSONObject> resList = new ArrayList<>();
         long slice = Finance.NewSlice();
-        int ret = Finance.GetChatData(sdk, seq, LIMIT, proxy, passwd, timeout, slice);
+        int ret = Finance.GetChatData(sdk, seq, WeConstans.LIMIT, proxy, passwd, timeout, slice);
         if (ret != 0) {
             log.info("getChatData ret " + ret);
             return null;
@@ -82,8 +78,8 @@ public class FinanceUtils {
                     LocalSEQ.set(data.getLong("seq"));
                     JSONObject jsonObject = decryptChatRecord(sdk, data.getString("encrypt_random_key"),
                             data.getString("encrypt_chat_msg"), privateKey);
-                    if (jsonObject ==null){
-                       return;
+                    if (jsonObject == null) {
+                        return;
                     }
                     jsonObject.put("seq", LocalSEQ.get());
                     resList.add(jsonObject);
@@ -94,7 +90,7 @@ public class FinanceUtils {
             log.info("数据解析完成:------------");
         }
         Finance.FreeSlice(slice);
-        redisCache.setCacheObject(WeConstans.CONTACT_SEQ_KEY,LocalSEQ.get());
+        redisCache.setCacheObject(WeConstans.CONTACT_SEQ_KEY, LocalSEQ.get());
         return resList;
     }
 
@@ -123,7 +119,7 @@ public class FinanceUtils {
             if (StringUtils.isNotEmpty(msgType)) {
                 getSwitchType(realJsonData, msgType);
             }
-            log.info("数据解析:------------"+ realJsonData.toJSONString());
+            log.info("数据解析:------------" + realJsonData.toJSONString());
             return realJsonData;
         } catch (Exception e) {
             log.error("解析密文失败");
@@ -278,5 +274,4 @@ public class FinanceUtils {
             }
         }
     }
-
 }

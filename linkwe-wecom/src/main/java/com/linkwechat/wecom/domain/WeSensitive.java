@@ -14,7 +14,6 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -66,8 +65,8 @@ public class WeSensitive extends BaseEntity {
      */
     @TableField(value = "audit_user_id")
     @ApiModelProperty(value = "审计人id")
-    @NotNull(message = "审计人id不能为空")
-    private Long auditUserId;
+    @NotBlank(message = "审计人id不能为空")
+    private String auditUserId;
 
     /**
      * 审计人姓名
