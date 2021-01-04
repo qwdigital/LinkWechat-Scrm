@@ -53,4 +53,16 @@ public class WeConversationArchiveController extends BaseController {
     }
 
 
+    /**
+     * 获取全局会话数据接口
+     *
+     * @param query      入参
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('conversationArchive:chatAllContact:list')")
+    @GetMapping("/getChatAllList")
+    public TableDataInfo getChatAllList(ConversationArchiveQuery query) {
+        return getDataTable(weConversationArchiveService.getChatAllList(query));
+    }
+
 }

@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.elastic.ElasticSearchEntity;
-import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeCustomerClient;
 import com.linkwechat.wecom.client.WeCustomerGroupClient;
@@ -17,14 +16,15 @@ import com.linkwechat.wecom.client.WeMsgAuditClient;
 import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.domain.WeChatContactMapping;
 import com.linkwechat.wecom.domain.WeCustomer;
+import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.dto.customer.CustomerGroupDetail;
-import com.linkwechat.wecom.domain.dto.msgaudit.GroupChatVo;
 import com.linkwechat.wecom.mapper.WeChatContactMappingMapper;
 import com.linkwechat.wecom.mapper.WeCustomerMapper;
 import com.linkwechat.wecom.mapper.WeUserMapper;
 import com.linkwechat.wecom.service.IWeChatContactMappingService;
 import com.linkwechat.wecom.service.IWeConversationArchiveService;
+import com.linkwechat.wecom.service.IWeGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,6 +59,8 @@ public class WeChatContactMappingServiceImpl extends ServiceImpl<WeChatContactMa
     private WeMsgAuditClient weMsgAuditClient;
     @Autowired
     private IWeConversationArchiveService weConversationArchiveService;
+    @Autowired
+    private IWeGroupService weGroupService;
 
     /**
      * 查询聊天关系映射
@@ -95,10 +97,8 @@ public class WeChatContactMappingServiceImpl extends ServiceImpl<WeChatContactMa
                     item.setFinalChatContext(weConversationArchiveService.getFinalChatContactInfo(item.getFromId(), item.getReceiveId()));
                 } else if (StringUtils.isNotEmpty(item.getRoomId())) {
                     //获取群信息
-                    CustomerGroupDetail customerGroupDetail = weCustomerGroupClient.groupChatDetail(new CustomerGroupDetail().new Params(item.getRoomId()));
-                    GroupChatVo groupChatVo = new GroupChatVo();
-                    BeanUtil.copyProperties(customerGroupDetail.getGroup_chat().get(0), groupChatVo);
-                    item.setRoomInfo(groupChatVo);
+                    WeGroup weGroup = weGroupService.getOne(new LambdaQueryWrapper<WeGroup>().eq(WeGroup::getChatId, item.getRoomId()));
+                    item.setRoomInfo(weGroup);
                     item.setFinalChatContext(weConversationArchiveService.getFinalChatRoomContactInfo(item.getFromId(), item.getRoomId()));
                 }
             });
@@ -160,33 +160,59 @@ public class WeChatContactMappingServiceImpl extends ServiceImpl<WeChatContactMa
      * @param query
      */
     @Override
-    public void saveWeChatContactMapping(List<ElasticSearchEntity> query) {
-        query.stream().forEach(elasticSearchEntity -> {
+    public List<ElasticSearchEntity> saveWeChatContactMapping(List<JSONObject> query) {
+        List<ElasticSearchEntity> resultList = new ArrayList<>();
+        query.stream().filter(chatData -> StringUtils.isNotEmpty(chatData.getString("from"))).forEach(chatData -> {
+            ElasticSearchEntity elasticSearchEntity = new ElasticSearchEntity();
+            elasticSearchEntity.setId(chatData.getString("msgid"));
             //发送人映射数据
             WeChatContactMapping fromWeChatContactMapping = new WeChatContactMapping();
-            JSONObject chatData = JSONObject.parseObject(JSONObject.toJSONString(elasticSearchEntity.getData()));
             String fromId = chatData.getString("from");
+            //发送人类型
             int fromType = StringUtils.weCustomTypeJudgment(fromId);
-
             fromWeChatContactMapping.setFromId(fromId);
+            getUserOrCustomerInfo(chatData, fromId, fromType, "fromInfo");
 
             JSONArray tolist = chatData.getJSONArray("tolist");
             if (CollectionUtil.isNotEmpty(tolist)) {
                 //如果是单聊，tolist唯一，只有一个接收人，并判断接收人的类型
                 if (StringUtils.isEmpty(chatData.getString("roomid"))) {
                     String idStr = String.valueOf(tolist.get(0));
+                    //接收人类型
                     int reveiceType = StringUtils.weCustomTypeJudgment(idStr);
                     fromWeChatContactMapping.setReceiveId(idStr);
+                    //获取接收人信息
+                    getUserOrCustomerInfo(chatData, idStr, reveiceType, "toListInfo");
                     fromWeChatContactMapping.setIsCustom(reveiceType);
                 } else {
                     fromWeChatContactMapping.setRoomId(chatData.getString("roomid"));
+                    WeGroup weGroup = weGroupService.getOne(new LambdaQueryWrapper<WeGroup>().eq(WeGroup::getChatId, chatData.getString("roomid")));
+                    chatData.put("roomInfo",JSONObject.parse(JSONObject.toJSONString(weGroup)));
                 }
             }
             //接收人映射数据
             WeChatContactMapping reveiceWeChatContactMapping = from2ReveiceData(fromType, fromWeChatContactMapping);
             insertWeChatContactMapping(fromWeChatContactMapping);
             insertWeChatContactMapping(reveiceWeChatContactMapping);
+            elasticSearchEntity.setData(chatData);
+            resultList.add(elasticSearchEntity);
         });
+        return resultList;
+    }
+
+    private void getUserOrCustomerInfo(JSONObject chatData, String fromId, int fromType, String key) {
+        //获取发送人信息
+        if (WeConstans.ID_TYPE_USER.equals(fromType)) {
+            //成员信息
+            WeUser weUser = weUserMapper.selectOne(new LambdaQueryWrapper<WeUser>().eq(WeUser::getUserId, fromId));
+            chatData.put(key, JSONObject.parse(JSONObject.toJSONString(weUser)));
+        } else if (WeConstans.ID_TYPE_EX.equals(fromType)) {
+            //获取外部联系人信息
+            WeCustomer weCustomer = weCustomerMapper.selectWeCustomerById(fromId);
+            chatData.put(key,JSONObject.parse(JSONObject.toJSONString(weCustomer)));
+        } else if (WeConstans.ID_TYPE_MACHINE.equals(fromType)) {
+            //拉去机器人信息暂不处理
+        }
     }
 
     @Override

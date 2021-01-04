@@ -3,7 +3,6 @@ package com.linkwechat.wecom.domain;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.linkwechat.common.annotation.Excel;
-import com.linkwechat.wecom.domain.dto.msgaudit.GroupChatVo;
 import lombok.Data;
 
 
@@ -80,7 +79,7 @@ public class WeChatContactMapping {
      * 群信息
      */
     @TableField(exist = false)
-    private GroupChatVo roomInfo;
+    private WeGroup roomInfo;
 
     /**
      * 最后一条聊天数据

@@ -7,10 +7,10 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.wecom.domain.WeSensitive;
+import com.linkwechat.wecom.domain.query.WeSensitiveHitQuery;
 import com.linkwechat.wecom.service.IWeSensitiveService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 敏感词设置Controller
+ * 敏感词Controller
  *
  * @author ruoyi
  * @date 2020-12-29
@@ -86,5 +86,14 @@ public class WeSensitiveController extends BaseController {
         Long[] idArray = new Long[id.length];
         Arrays.stream(id).map(Long::parseLong).collect(Collectors.toList()).toArray(idArray);
         return toAjax(weSensitiveService.destroyWeSensitiveByIds(idArray));
+    }
+
+    /**
+     * 敏感词命中查询
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:sensitivehit:list')")
+    @GetMapping("/hit/list")
+    public TableDataInfo hitList(WeSensitiveHitQuery query) {
+        return getDataTable(weSensitiveService.getHitSensitiveList(query));
     }
 }

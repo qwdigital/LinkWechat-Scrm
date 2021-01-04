@@ -38,5 +38,13 @@ public interface IWeConversationArchiveService {
      * @return
      */
     JSONObject getFinalChatRoomContactInfo(String fromId, String roomId);
+
+    /**
+     * 获取全局会话数据接口
+     *
+     * @param query 参
+     * @return
+     */
+    PageInfo<JSONObject> getChatAllList(ConversationArchiveQuery query);
 }
 

@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -159,5 +160,46 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
         } else {
             return null;
         }
+    }
+
+    @Override
+    public PageInfo<JSONObject> getChatAllList(ConversationArchiveQuery query) {
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        Integer pageNum = pageDomain.getPageNum() == null ? 1 : pageDomain.getPageNum();
+        Integer pageSize = pageDomain.getPageSize() == null ? 10 : pageDomain.getPageSize();
+        SearchSourceBuilder builder = new SearchSourceBuilder();
+        int from = (pageNum - 1) * pageSize;
+        builder.size(pageSize);
+        builder.from(from);
+        builder.sort("msgtime", SortOrder.DESC);
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+        //成员姓名查询
+        if(StringUtils.isNotEmpty(query.getUserName())){
+            boolQueryBuilder.must(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("fromInfo.name",query.getUserName()))
+                    .mustNot(QueryBuilders.existsQuery("fromInfo.externalUserid")));
+       }
+        //客户姓名查询
+        if(StringUtils.isNotEmpty(query.getCustomerName())){
+            boolQueryBuilder.must(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("fromInfo.name",query.getCustomerName()))
+                    .must(QueryBuilders.existsQuery("fromInfo.externalUserid")));
+        }
+
+        //关键词查询并高亮显示
+        if (StringUtils.isNotEmpty(query.getKeyWord())){
+            boolQueryBuilder.must(QueryBuilders.multiMatchQuery(query.getKeyWord(),"text.content"));
+            builder.highlighter(new HighlightBuilder().field("text.content"));
+        }
+
+        //时间范围查询
+        if (StringUtils.isNotEmpty(query.getBeginTime()) && StringUtils.isNotEmpty(query.getEndTime())) {
+            Date beginTime = DateUtils.dateTime(query.getBeginTime(), DateUtils.YYYY_MM_DD);
+            Date endTime = DateUtils.dateTime(query.getEndTime(), DateUtils.YYYY_MM_DD);
+            boolQueryBuilder.filter(QueryBuilders.rangeQuery("msgtime").gte(beginTime).lte(endTime));
+        }
+        builder.query(boolQueryBuilder);
+        PageInfo<JSONObject> pageInfo = elasticSearch.searchPage(WeConstans.WECOM_FINANCE_INDEX, builder, pageNum, pageSize, JSONObject.class);
+        return pageInfo;
     }
 }

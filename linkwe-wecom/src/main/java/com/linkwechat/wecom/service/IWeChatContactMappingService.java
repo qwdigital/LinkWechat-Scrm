@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.core.domain.elastic.ElasticSearchEntity;
@@ -69,7 +70,7 @@ public interface IWeChatContactMappingService extends IService<WeChatContactMapp
      *
      * @param query
      */
-    public void saveWeChatContactMapping(List<ElasticSearchEntity> query);
+    public List<ElasticSearchEntity> saveWeChatContactMapping(List<JSONObject> query);
 
     /**
      * 按客户查询关系映射列表

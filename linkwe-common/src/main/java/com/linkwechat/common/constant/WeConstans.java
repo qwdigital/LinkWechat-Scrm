@@ -1,7 +1,6 @@
 package com.linkwechat.common.constant;
 
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -149,7 +148,7 @@ public class WeConstans {
     /**
      * 批量生成的单人码 活动场景
      */
-    public static final String ONE_PERSON_CODE_GENERATED_BATCH="批量生成的单人码";
+    public static final String ONE_PERSON_CODE_GENERATED_BATCH = "批量生成的单人码";
 
     /**
      * 微信接口相应端错误字段
@@ -222,6 +221,11 @@ public class WeConstans {
     public static final Integer ID_TYPE_MACHINE = 2;
 
     /**
+     * 一次拉取的消息条数，最大值1000条，超过1000条会返回错误
+     */
+    public static final long LIMIT = 1_000L;
+
+    /**
      * 企微回调事件类型路由
      */
     public final static Map<String, String> eventRoute = new HashMap<String, String>() {
@@ -285,6 +289,10 @@ public class WeConstans {
 
     public static final String WECOM_FINANCE_INDEX = "finance";
 
-    /** 开启会话存档成员列表 **/
+    public static final String WECOM_SENSITIVE_HIT_INDEX = "sensitive";
+
+    /**
+     * 开启会话存档成员列表
+     **/
     public static final String weMsgAuditKey = "wecom_msg_audit:user:ids";
 }

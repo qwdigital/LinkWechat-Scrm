@@ -2,12 +2,14 @@ package com.linkwechat.quartz.task;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.elastic.ElasticSearchEntity;
 import com.linkwechat.common.core.elasticsearch.ElasticSearch;
 import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.service.IWeChatContactMappingService;
+import com.linkwechat.wecom.service.IWeSensitiveService;
 import com.tencent.wework.FinanceUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.formula.functions.T;
@@ -38,6 +40,8 @@ public class RyTask {
     private RedisCache redisCache;
     @Autowired
     private IWeChatContactMappingService weChatContactMappingService;
+    @Autowired
+    private IWeSensitiveService weSensitiveService;
 
     public void ryMultipleParams(String s, Boolean b, Long l, Double d, Integer i) {
         System.out.println(StringUtils.format("执行多参方法： 字符串类型{}，布尔类型{}，长整型{}，浮点型{}，整形{}", s, b, l, d, i));
@@ -67,18 +71,18 @@ public class RyTask {
 
         log.info(">>>>>>>seq:{}",index.get());
         FinanceUtils.initSDK(corpId, secret);
-        List<ElasticSearchEntity> chatDataList = FinanceUtils.getChatData(index.get(),
+        List<JSONObject> chatDataList = FinanceUtils.getChatData(index.get(),
                 "",
-                "");
+                "", redisCache);
         if (CollectionUtil.isNotEmpty(chatDataList)){
             try {
-                elasticSearch.insertBatch(WeConstans.WECOM_FINANCE_INDEX, chatDataList);
-                weChatContactMappingService.saveWeChatContactMapping(chatDataList);
+                List<Consumer<List<JSONObject>>> consumerList = Lists.newArrayList();
+                consumerList.add(weChatContactMappingService::saveWeChatContactMapping);
+                consumerList.add(weSensitiveService::hitSensitive);
+                elasticSearch.insertBatchAsync(WeConstans.WECOM_FINANCE_INDEX, chatDataList, consumerList);
             } catch (Exception e) {
                 log.error("消息处理异常：ex:{}", e);
                 e.printStackTrace();
-            }finally {
-                setRedisCacheSeqValue(index);
             }
         }
     }

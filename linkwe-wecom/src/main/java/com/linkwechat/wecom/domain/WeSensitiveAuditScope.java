@@ -42,7 +42,7 @@ public class WeSensitiveAuditScope implements Serializable {
      */
     @TableField(value = "audit_scope_id")
     @ApiModelProperty(value = "审计对象id")
-    private Long auditScopeId;
+    private String auditScopeId;
 
     /**
      * 审计对象名称
