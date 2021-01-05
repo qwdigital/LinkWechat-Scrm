@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * 企业微信客户Controller
- * 
+ *
  * @author ruoyi
  * @date 2020-09-13
  */
@@ -106,16 +106,12 @@ public class WeCustomerController extends BaseController
     @PreAuthorize("@ss.hasPermi('customerManage:customer:sync')")
     @Log(title = "企业微信客户同步接口", businessType = BusinessType.DELETE)
     @GetMapping("/synchWeCustomer")
-    public AjaxResult synchWeCustomer(){
-        SecurityContext securityContext = SecurityContextHolder.getContext();
+    public AjaxResult synchWeCustomer() {
         try {
-            Threads.SINGLE_THREAD_POOL.execute(new Runnable() {
-                @Override
-                public void run() {
-                    SecurityContextHolder.setContext(securityContext);
-                    weCustomerService.synchWeCustomer();
-                }
-            });
+            SecurityContext context = SecurityContextHolder.getContext();
+            SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+            SecurityContextHolder.setContext(context);
+            weCustomerService.synchWeCustomer();
         } catch (Exception e) {
             e.printStackTrace();
         }
