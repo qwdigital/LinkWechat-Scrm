@@ -1,10 +1,10 @@
 <script>
 import MaPage from '@/views/material/components/MaPage'
 
-import "tui-image-editor/dist/svg/icon-a.svg";
-import "tui-image-editor/dist/svg/icon-b.svg";
-import "tui-image-editor/dist/svg/icon-c.svg";
-import "tui-image-editor/dist/svg/icon-d.svg";
+// import "tui-image-editor/dist/svg/icon-a.svg";
+// import "tui-image-editor/dist/svg/icon-b.svg";
+// import "tui-image-editor/dist/svg/icon-c.svg";
+// import "tui-image-editor/dist/svg/icon-d.svg";
 
 // Load Style Code
 import "tui-image-editor/dist/tui-image-editor.css";
@@ -13,10 +13,10 @@ import "tui-color-picker/dist/tui-color-picker.css";
 // import $ from "jquery";
 import PosterPage from "./components/PosterPage.vue";
 import bgpng from "@/assets/poster/img/bg.png";
-import iconA from "@/assets/poster/icon-a.svg";
-import iconB from "@/assets/poster/icon-b.svg";
-import iconC from "@/assets/poster/icon-c.svg";
-import iconD from "@/assets/poster/icon-d.svg";
+// import iconA from "@/assets/poster/icon-a.svg";
+// import iconB from "@/assets/poster/icon-b.svg";
+// import iconC from "@/assets/poster/icon-c.svg";
+// import iconD from "@/assets/poster/icon-d.svg";
 
 var locale_ru_RU = {
   "Text": "文本",
@@ -56,10 +56,10 @@ export default {
       useDefaultUI: true,
       options: {
         includeUI: {
-          initMenu: "Text",
-           locale: locale_ru_RU,
+          // initMenu: "text",
+          locale: locale_ru_RU,
           loadImage: {
-            path: 'https://pics1.baidu.com/feed/b151f8198618367a934321a0a7275bd3b21ce565.jpeg?token=2e8af569910896950d7bb7f518460a94&s=592087194F2170054E4055DA030010B4',
+            path: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F171%2F106%2F1472%2F95744001.jpg&refer=http%3A%2F%2Fimg1.gtimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1612444990&t=6589254fe9669cc6a45fd3688f269612',
             name: "posterImage"
           },
           usageStatistics: false,
@@ -93,14 +93,14 @@ export default {
             "downloadButton.fontSize": "12px",
 
             // main icons
-            "menu.normalIcon.path": iconD,
-            "menu.normalIcon.name": "icon-d",
-            "menu.activeIcon.path": iconB,
-            "menu.activeIcon.name": "icon-b",
-            "menu.disabledIcon.path": iconA,
-            "menu.disabledIcon.name": "icon-a",
-            "menu.hoverIcon.path": iconC,
-            "menu.hoverIcon.name": "icon-c",
+            // "menu.normalIcon.path": iconD,
+            // "menu.normalIcon.name": "icon-d",
+            // "menu.activeIcon.path": iconB,
+            // "menu.activeIcon.name": "icon-b",
+            // "menu.disabledIcon.path": iconA,
+            // "menu.disabledIcon.name": "icon-a",
+            // "menu.hoverIcon.path": iconC,
+            // "menu.hoverIcon.name": "icon-c",
             "menu.iconSize.width": "24px",
             "menu.iconSize.height": "24px",
 
@@ -109,10 +109,10 @@ export default {
             "submenu.partition.color": "#e5e5e5",
 
             // submenu icons
-            "submenu.normalIcon.path": iconD,
-            "submenu.normalIcon.name": "icon-d",
-            "submenu.activeIcon.path": iconB,
-            "submenu.activeIcon.name": "icon-b",
+            // "submenu.normalIcon.path": iconD,
+            // "submenu.normalIcon.name": "icon-d",
+            // "submenu.activeIcon.path": iconB,
+            // "submenu.activeIcon.name": "icon-b",
             "submenu.iconSize.width": "32px",
             "submenu.iconSize.height": "32px",
 
