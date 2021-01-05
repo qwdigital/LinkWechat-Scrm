@@ -103,6 +103,7 @@ export default {
     },
     // 获取素材列表
     getList(page) {
+      console.log('getList', page, JSON.stringify(this.query))
       page && (this.query.pageNum = page)
       this.loading = true
       getList(this.query)
@@ -161,14 +162,22 @@ export default {
     },
     // 素材添加/编辑
     edit(data, type) {
-      this.form = Object.assign(
-        {},
-        data || { categoryId: this.query.categoryId }
-      )
-      this.dialogVisible = true
-      this.$nextTick(() => {
-        this.$refs['form'].clearValidate()
-      })
+      switch (type) {
+        case 5:
+          this.$parent.posterEdit.step = 0
+          this.$parent.dialog.edit = true
+        break
+        default:
+          this.form = Object.assign(
+            {},
+            data || { categoryId: this.query.categoryId }
+          )
+          this.dialogVisible = true
+          this.$nextTick(() => {
+            this.$refs['form'].clearValidate()
+          })
+        break;
+      }
       // type || !data ? (this.disabled = false) : (this.disabled = true)
     },
     // 素材提交
@@ -323,7 +332,7 @@ export default {
             <el-button
               v-hasPermi="['material:add']"
               type="primary"
-              @click="edit(1)"
+              @click="edit(1, ~~type)"
               >添加{{ typeTitle[type] }}</el-button
             >
           </div>
