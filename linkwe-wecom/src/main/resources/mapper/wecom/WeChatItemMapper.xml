@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeChatItemMapper">
+    <insert id="addItem">
+        INSERT INTO
+            we_chat_item(item_id,side_id,material_id,create_by,create_time,update_by,update_time)
+        VALUES
+        <if test="items!=null and items.size()>0">
+            <foreach collection="items" open="(" separator="," item="item" close=")">
+                #{item.itemId},#{item.sideId},#{item.materialId},#{item.createBy},#{item.createTime},#{item.updateBy},#{item.updateTime}
+            </foreach>
+        </if>
+    </insert>
+    <delete id="dropItem">
+         DELETE FROM
+           we_chat_item
+         <where>
+             side_id=#{sideId}
+         </where>
+    </delete>
+</mapper>
