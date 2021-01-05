@@ -132,12 +132,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             Arrays.asList(followUserList.getFollow_user())
                     .stream().forEach(k -> {
                 try {
-                    Threads.SINGLE_THREAD_POOL.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            SecurityContextHolder.setContext(securityContext);
-                            weFlowerCustomerHandle(k);
-                        }
+                    Threads.SINGLE_THREAD_POOL.execute(() -> {
+                        SecurityContextHolder.setContext(securityContext);
+                        weFlowerCustomerHandle(k);
                     });
                 } catch (Exception e) {
                     e.printStackTrace();
