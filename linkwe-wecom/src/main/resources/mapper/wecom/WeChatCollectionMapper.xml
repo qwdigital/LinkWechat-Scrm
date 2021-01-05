@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeChatCollectionMapper">
+
+    <insert id="addCollection">
+        INSERT INTO
+            we_chat_collection(collection_id,material_id,user_id,create_by,create_time,update_by,update_time)
+        VALUES(#{collectionId},#{materialId},#{userId},#{createBy},#{createTime},#{updateBy},#{updateTime})
+    </insert>
+
+    <delete id="dropCollection">
+        DELETE FROM
+            we_chat_collection
+        <where>
+            material_id=#{materialId} AND user_id=#{userId}
+        </where>
+    </delete>
+    <select id="countCollectionByMaterialIdAndUserId" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM we_chat_collection
+        <where>
+            material_id=#{materialId} AND user_id=#{userId}
+        </where>
+    </select>
+
+</mapper>
