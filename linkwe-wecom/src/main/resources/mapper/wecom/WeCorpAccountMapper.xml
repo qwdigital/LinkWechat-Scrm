@@ -57,6 +57,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="contactSecret != null ">contact_secret,</if>
             <if test="chatSecret != null ">chat_secret,</if>
             <if test="customerChurnNoticeSwitch != null ">customer_churn_notice_switch,</if>
+            <if test="providerSecret != null ">provider_secret,</if>
+            <if test="wxQrLoginRedirectUri != null ">wx_qr_login_redirect_uri,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="companyName != null">#{companyName},</if>
@@ -71,6 +73,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="contactSecret != null ">#{contactSecret},</if>
             <if test="chatSecret != null ">#{chatSecret},</if>
             <if test="customerChurnNoticeSwitch != null ">#{customerChurnNoticeSwitch},</if>
+            <if test="providerSecret != null ">#{providerSecret},</if>
+            <if test="wxQrLoginRedirectUri != null ">#{wxQrLoginRedirectUri},</if>
          </trim>
     </insert>
 
@@ -89,6 +93,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="contactSecret != null ">contact_secret = #{contactSecret},</if>
             <if test="chatSecret != null ">chat_secret = #{chatSecret},</if>
             <if test="customerChurnNoticeSwitch != null ">customer_churn_notice_switch = #{customerChurnNoticeSwitch},</if>
+
+            <if test="providerSecret != null ">provider_secret = #{providerSecret},</if>
+            <if test="wxQrLoginRedirectUri != null ">wx_qr_login_redirect_uri = #{wxQrLoginRedirectUri},</if>
+
+
         </trim>
         where id = #{id}
     </update>
