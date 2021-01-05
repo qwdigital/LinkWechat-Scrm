@@ -1,22 +1,12 @@
 <script>
 import MaPage from '@/views/material/components/MaPage'
 
-// import "tui-image-editor/dist/svg/icon-a.svg";
-// import "tui-image-editor/dist/svg/icon-b.svg";
-// import "tui-image-editor/dist/svg/icon-c.svg";
-// import "tui-image-editor/dist/svg/icon-d.svg";
-
 // Load Style Code
 import "tui-image-editor/dist/tui-image-editor.css";
 import "tui-color-picker/dist/tui-color-picker.css";
 
-// import $ from "jquery";
 import PosterPage from "./components/PosterPage.vue";
 import bgpng from "@/assets/poster/img/bg.png";
-// import iconA from "@/assets/poster/icon-a.svg";
-// import iconB from "@/assets/poster/icon-b.svg";
-// import iconC from "@/assets/poster/icon-c.svg";
-// import iconD from "@/assets/poster/icon-d.svg";
 
 var locale_ru_RU = {
   "Text": "文本",
@@ -78,41 +68,15 @@ export default {
             "header.backgroundColor": "transparent",
             "header.border": "0px",
 
-            // load button
-            "loadButton.backgroundColor": "#fff",
-            "loadButton.border": "1px solid #ddd",
-            "loadButton.color": "#222",
-            "loadButton.fontFamily": "'Noto Sans', sans-serif",
-            "loadButton.fontSize": "12px",
-
-            // download button
-            "downloadButton.backgroundColor": "#fdba3b",
-            "downloadButton.border": "1px solid #fdba3b",
-            "downloadButton.color": "#fff",
-            "downloadButton.fontFamily": "'Noto Sans', sans-serif",
-            "downloadButton.fontSize": "12px",
-
             // main icons
-            // "menu.normalIcon.path": iconD,
-            // "menu.normalIcon.name": "icon-d",
-            // "menu.activeIcon.path": iconB,
-            // "menu.activeIcon.name": "icon-b",
-            // "menu.disabledIcon.path": iconA,
-            // "menu.disabledIcon.name": "icon-a",
-            // "menu.hoverIcon.path": iconC,
-            // "menu.hoverIcon.name": "icon-c",
             "menu.iconSize.width": "24px",
             "menu.iconSize.height": "24px",
 
             // submenu primary color
-            "submenu.backgroundColor": "transparent",
-            "submenu.partition.color": "#e5e5e5",
+            "submenu.backgroundColor": "#ffffffCC",
+            "submenu.partition.color": "#858585",
 
             // submenu icons
-            // "submenu.normalIcon.path": iconD,
-            // "submenu.normalIcon.name": "icon-d",
-            // "submenu.activeIcon.path": iconB,
-            // "submenu.activeIcon.name": "icon-b",
             "submenu.iconSize.width": "32px",
             "submenu.iconSize.height": "32px",
 
@@ -148,8 +112,8 @@ export default {
             "colorpicker.title.color": "#000"
           }
         },
-        cssMaxWidth: 640,
-        cssMaxHeight: 1136
+        // cssMaxWidth: 640,
+        // cssMaxHeight: 1136
       }
     }
   },
