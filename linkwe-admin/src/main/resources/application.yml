@@ -56,6 +56,11 @@ spring:
        max-file-size:  10MB
        # 设置总上传的文件大小
        max-request-size:  20MB
+  task:
+    execution:
+      pool:
+        keep-alive: 10s
+      thread-name-prefix: common-pool-
   # 服务模块
   devtools:
     restart:

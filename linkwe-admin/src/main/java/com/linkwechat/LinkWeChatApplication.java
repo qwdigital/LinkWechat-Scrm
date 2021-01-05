@@ -6,6 +6,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * 启动程序
@@ -15,6 +16,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class, PageHelperAutoConfiguration.class })
 @MapperScan("com.linkwechat.*.mapper")
 @ForestScan(basePackages = "com.linkwechat.wecom.client")
+@EnableAsync
 public class LinkWeChatApplication
 {
     public static void main(String[] args)
