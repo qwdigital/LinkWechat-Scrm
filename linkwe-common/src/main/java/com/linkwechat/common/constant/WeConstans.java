@@ -225,6 +225,10 @@ public class WeConstans {
      */
     public static final long LIMIT = 1_000L;
 
+
+    public static final String AppTicketKey = "ticket:AppGet";
+    public static final String AgentTicketKey = "ticket:AgentGet";
+
     /**
      * 企微回调事件类型路由
      */
