@@ -5,19 +5,24 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.wecom.domain.WeMaterial;
 import com.linkwechat.wecom.domain.dto.ResetCategoryDto;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.vo.WeMaterialFileVO;
 import com.linkwechat.wecom.service.IWeMaterialService;
+import com.linkwechat.wecom.service.IWePosterService;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 企业微信素材Controller
@@ -33,6 +38,9 @@ public class WeMaterialController extends BaseController {
     @Autowired
     private IWeMaterialService materialService;
 
+    @Resource
+    private IWePosterService wePosterService;
+
     /**
      * 查询素材列表
      */
@@ -41,7 +49,19 @@ public class WeMaterialController extends BaseController {
     public TableDataInfo list(@RequestParam(value = "categoryId", required = false) String categoryId
             , @RequestParam(value = "search", required = false) String search,@RequestParam(value = "mediaType") String mediaType) {
         startPage();
-        List<WeMaterial> list = materialService.findWeMaterials(categoryId, search,mediaType);
+        List<WeMaterial> list;
+        if(StringUtils.isNotBlank(mediaType) && mediaType.equals(MediaType.POSTER.getType())){
+            list = wePosterService.list(Long.valueOf(categoryId),search).stream().map(wePoster -> {
+                WeMaterial weMaterial = new WeMaterial();
+                weMaterial.setMaterialName(wePoster.getTitle());
+                weMaterial.setMaterialUrl(wePoster.getSampleImgPath());
+                weMaterial.setId(wePoster.getId());
+                return weMaterial;
+            }).collect(Collectors.toList());
+        }else {
+            list = materialService.findWeMaterials(categoryId, search,mediaType);
+        }
+
         return getDataTable(list);
     }
 
@@ -114,7 +134,7 @@ public class WeMaterialController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('wechat:material:temporaryMaterialMediaId')")
     @Log(title = "获取素材media_id", businessType = BusinessType.OTHER)
-    @PutMapping("/temporaryMaterialMediaId")
+    @PostMapping("/temporaryMaterialMediaId")
     @ApiOperation("获取素材media_id")
     public AjaxResult temporaryMaterialMediaId(@RequestParam(value = "url") String url, @RequestParam(value = "type") String type,@RequestParam(value = "name") String name){
         WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(url, type,name);

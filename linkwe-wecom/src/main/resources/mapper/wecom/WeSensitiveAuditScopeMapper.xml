@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeSensitiveAuditScopeMapper">
+
+    <resultMap type="WeSensitiveAuditScope" id="WeSensitiveAuditScopeResult">
+        <result property="id" column="id"/>
+        <result property="sensitiveId" column="sensitive_id"/>
+        <result property="scopeType" column="scope_type"/>
+        <result property="auditScopeId" column="audit_scope_id"/>
+        <result property="auditScopeName" column="audit_scope_name"/>
+    </resultMap>
+
+    <sql id="selectWeSensitiveAuditScopeVo">
+        select id, sensitive_id, scope_type, audit_scope_id, audit_scope_name from we_sensitive_audit_scope
+    </sql>
+
+    <select id="selectWeSensitiveAuditScopeList" parameterType="WeSensitiveAuditScope"
+            resultMap="WeSensitiveAuditScopeResult">
+        <include refid="selectWeSensitiveAuditScopeVo"/>
+        <where>
+            <if test="sensitiveId != null ">and sensitive_id = #{sensitiveId}</if>
+            <if test="scopeType != null ">and scope_type = #{scopeType}</if>
+            <if test="auditScopeId != null ">and audit_scope_id = #{auditScopeId}</if>
+            <if test="auditScopeName != null  and auditScopeName != ''">and audit_scope_name like concat('%',
+                #{auditScopeName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectWeSensitiveAuditScopeById" parameterType="Long" resultMap="WeSensitiveAuditScopeResult">
+        <include refid="selectWeSensitiveAuditScopeVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertWeSensitiveAuditScope" parameterType="WeSensitiveAuditScope" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into we_sensitive_audit_scope
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sensitiveId != null ">sensitive_id,</if>
+            <if test="scopeType != null">scope_type,</if>
+            <if test="auditScopeId != null">audit_scope_id,</if>
+            <if test="auditScopeName != null and auditScopeName != ''">audit_scope_name,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sensitiveId != null ">#{sensitiveId},</if>
+            <if test="scopeType != null">#{scopeType},</if>
+            <if test="auditScopeId != null">#{auditScopeId},</if>
+            <if test="auditScopeName != null and auditScopeName != ''">#{auditScopeName},</if>
+        </trim>
+    </insert>
+
+    <insert id="insertWeSensitiveAuditScopeList" parameterType="java.util.List" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into we_sensitive_audit_scope(sensitive_id,scope_type,audit_scope_id,audit_scope_name)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.sensitiveId},#{item.scopeType},#{item.auditScopeId},#{item.auditScopeName})
+        </foreach>
+    </insert>
+
+    <update id="updateWeSensitiveAuditScope" parameterType="WeSensitiveAuditScope">
+        update we_sensitive_audit_scope
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sensitiveId != null ">sensitive_id = #{sensitiveId},</if>
+            <if test="scopeType != null">scope_type = #{scopeType},</if>
+            <if test="auditScopeId != null">audit_scope_id = #{auditScopeId},</if>
+            <if test="auditScopeName != null and auditScopeName != ''">audit_scope_name = #{auditScopeName},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeSensitiveAuditScopeById" parameterType="Long">
+        delete from we_sensitive_audit_scope where id = #{id}
+    </delete>
+
+    <delete id="deleteAuditScopeBySensitiveId" parameterType="Long">
+        delete from we_sensitive_audit_scope where sensitive_id = #{sensitiveId}
+    </delete>
+
+    <delete id="deleteWeSensitiveAuditScopeByIds">
+        delete from we_sensitive_audit_scope where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteAuditScopeBySensitiveIds">
+        delete from we_sensitive_audit_scope where sensitive_id in
+        <foreach item="sensitiveId" collection="array" open="(" separator="," close=")">
+            #{sensitiveId}
+        </foreach>
+    </delete>
+
+</mapper>

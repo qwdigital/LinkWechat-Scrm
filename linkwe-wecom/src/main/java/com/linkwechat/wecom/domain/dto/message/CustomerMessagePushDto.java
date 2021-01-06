@@ -68,4 +68,39 @@ public class CustomerMessagePushDto {
      */
     private MiniprogramMessageDto miniprogramMessage;
 
+
+    /**
+     * 消息内容
+     *
+     * @param customerMessagePushDto
+     * @return
+     */
+    public String content() {
+
+        if (this.getMessageType()!=null) {
+            // 消息类型 0 文本消息  1 图片消息 2 链接消息   3 小程序消息
+            if ( this.getMessageType().equals("0")) {
+                return this.getTextMessage().getContent();
+            }
+            if (this.getMessageType().equals("1")) {
+
+                return this.getImageMessage().getPic_url();
+            }
+
+            if (this.getMessageType().equals("2")) {
+
+                return this.getLinkMessage().getTitle() + ":" + this.getLinkMessage().getPicurl()
+                        + ":" + this.getLinkMessage().getUrl() + "" + this.getLinkMessage().getDesc();
+            }
+
+            if (this.getMessageType().equals("3")) {
+
+                return this.getMiniprogramMessage().getTitle() + ":" + this.getMiniprogramMessage().getPage();
+            }
+        }
+
+        return null;
+    }
+
+
 }

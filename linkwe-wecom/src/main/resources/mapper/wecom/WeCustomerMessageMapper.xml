@@ -3,4 +3,23 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeCustomerMessageMapper">
+    <update id="updateWeCustomerMessageMsgIdById">
+        UPDATE we_customer_message
+        <set>
+            msgid=#{msgid}
+        </set>
+        <where>
+            message_id=#{messageId}
+        </where>
+    </update>
+    <update id="updateWeCustomerMessageActualSend">
+        UPDATE we_customer_message
+        <set>
+            actual_send=#{actualSend}
+        </set>
+        <where>
+            message_id=#{messageId}
+        </where>
+    </update>
+
 </mapper>

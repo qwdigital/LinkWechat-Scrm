@@ -15,6 +15,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="corpName"    column="corp_name"    />
         <result property="corpFullName"    column="corp_full_name"    />
         <result property="position"    column="position"    />
+        <result property="userName"    column="user_name"    />
+        <result property="userId"    column="user_id"    />
         <collection property="weFlowerCustomerRels" ofType="com.linkwechat.wecom.domain.WeFlowerCustomerRel">
             <result property="id"    column="wfcrId"    />
             <result property="userId"    column="user_id"    />
@@ -159,7 +161,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 
     
-    <select id="selectWeCustomerById" parameterType="String" resultMap="WeCustomerResult">
+    <select id="selectWeCustomerById" parameterType="String" resultType="WeCustomer">
         <include refid="selectWeCustomerVo"/>
         where external_userid = #{externalUserId}
     </select>

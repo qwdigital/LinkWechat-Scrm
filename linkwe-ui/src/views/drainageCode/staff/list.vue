@@ -78,7 +78,7 @@ export default {
           this.list = rows
           this.total = +total
           this.loading = false
-          this.multipleSelection = []
+          this.ids = []
         })
         .catch(() => {
           this.loading = false
@@ -87,7 +87,7 @@ export default {
     /** 重置按钮操作 */
     resetQuery() {
       this.dateRange = []
-      this.resetForm('queryForm')
+      this.$refs['queryForm'].resetFields()
       this.getList(1)
     },
     goRoute(path, id) {
@@ -129,41 +129,43 @@ export default {
         this.getList(1)
       })
     },
-    download(id,userName,activityScene){
-      let name = userName+"-"+activityScene+".png"
-      download(id).then((res) =>{
-        if (res!=null) {
-          let blob = new Blob([res], {type: 'application/zip'});
-          let url = window.URL.createObjectURL(blob);
-          const link = document.createElement('a'); // 创建a标签
-          link.href = url;
-          link.download = name; // 重命名文件
-          link.click();
-          URL.revokeObjectURL(url); // 释放内存
+    download(id, userName, activityScene) {
+      let name = userName + '-' + activityScene + '.png'
+      download(id).then((res) => {
+        if (res != null) {
+          let blob = new Blob([res], { type: 'application/zip' })
+          let url = window.URL.createObjectURL(blob)
+          const link = document.createElement('a') // 创建a标签
+          link.href = url
+          link.download = name // 重命名文件
+          link.click()
+          URL.revokeObjectURL(url) // 释放内存
         }
       })
     },
     /** 下载 */
     downloadBatch(qrCode) {
       this.$confirm('是否确认下载所有图片吗?', '警告', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(() => {
+          return downloadBatch(this.ids + '')
+          // window.open(downloadBatch(this.ids))
         })
-          .then(() => {
-            return downloadBatch(this.ids + '')
-            // window.open(downloadBatch(this.ids))
-          }).then((res) =>{
-          if (res!=null) {
-            let blob = new Blob([res], {type: 'application/zip'});
-            let url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a'); // 创建a标签
-            link.href = url;
-            link.download = '批量员工活码.zip'; // 重命名文件
-            link.click();
-            URL.revokeObjectURL(url); // 释放内存
+        .then((res) => {
+          if (res != null) {
+            let blob = new Blob([res], { type: 'application/zip' })
+            let url = window.URL.createObjectURL(blob)
+            const link = document.createElement('a') // 创建a标签
+            link.href = url
+            link.download = '批量员工活码.zip' // 重命名文件
+            link.click()
+            URL.revokeObjectURL(url) // 释放内存
           }
-        }).catch(function() {})
+        })
+        .catch(function() {})
     },
   },
 }
@@ -171,14 +173,19 @@ export default {
 
 <template>
   <div>
-    <el-form :model="query" ref="queryForm" :inline="true" label-width="100px">
-      <el-form-item label="使用员工">
+    <el-form
+      :model="query"
+      ref="queryForm"
+      :inline="true"
+      label-width="100px"
+      class="top-search"
+    >
+      <el-form-item label="使用员工" prop="useUserName">
         <el-input
           v-model="query.useUserName"
           placeholder="请输入"
           clearable
-          style="width: 240px;"
-          @keyup.enter.native="handleQuery"
+          @keyup.enter.native="getList(1)"
         />
       </el-form-item>
       <!-- <el-form-item label="姓名">
@@ -186,41 +193,36 @@ export default {
           v-model="query.operName"
           placeholder="请输入"
           clearable
-          style="width: 240px;"
-          @keyup.enter.native="handleQuery"
+          @keyup.enter.native="getList(1)"
         />
       </el-form-item> -->
-      <el-form-item label="手机号">
+      <el-form-item label="手机号" prop="mobile">
         <el-input
           v-model="query.mobile"
           placeholder="请输入"
           clearable
-          style="width: 240px;"
-          @keyup.enter.native="handleQuery"
+          @keyup.enter.native="getList(1)"
         />
       </el-form-item>
-      <el-form-item label="活动场景">
+      <el-form-item label="活动场景" prop="activityScene">
         <el-input
           v-model="query.activityScene"
           placeholder="请输入"
           clearable
-          style="width: 240px;"
-          @keyup.enter.native="handleQuery"
+          @keyup.enter.native="getList(1)"
         />
       </el-form-item>
-      <el-form-item label="创建人">
+      <el-form-item label="创建人" prop="createBy">
         <el-input
           v-model="query.createBy"
           placeholder="请输入"
           clearable
-          style="width: 240px;"
-          @keyup.enter.native="handleQuery"
+          @keyup.enter.native="getList(1)"
         />
       </el-form-item>
       <el-form-item label="创建日期">
         <el-date-picker
           v-model="dateRange"
-          style="width: 240px"
           value-format="yyyy-MM-dd"
           type="daterange"
           range-separator="-"
@@ -307,7 +309,7 @@ export default {
         <template slot-scope="{ row }">
           <el-button
             type="text"
-            @click="download(row.id,row.useUserName,row.activityScene)"
+            @click="download(row.id, row.useUserName, row.activityScene)"
             v-hasPermi="['monitor:operlog:query']"
             >下载</el-button
           >

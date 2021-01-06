@@ -28,4 +28,11 @@ public interface WeCustomerMessageOriginalMapper extends BaseMapper<WeCustomerMe
     public List<CustomerMessagePushVo> selectCustomerMessagePushs(@Param("sender") String sender,@Param("content") String content
             ,@Param("pushType") String pushType, @Param("beginTime") String beginTime,@Param("endTime") String endTime);
 
+    /**
+     * 群发详情
+     * @param messageId 微信群发id
+     * @return {@link CustomerMessagePushVo} 群发详情
+     */
+    public CustomerMessagePushVo findCustomerMessagePushDetail(@Param("messageId") Long messageId);
+
 }

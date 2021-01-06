@@ -1,3 +1,220 @@
+<script>
+import { getList } from "@/api/groupMessage";
+export default {
+  name: "Operlog",
+  filters: {
+    sendInfo(data) {
+      if (data.timedTask == 1) {
+        return "定时任务 发送时间:" + data.settingTime;
+      } else {
+        let unit = data.expectSend == 1 ? "个群" : "人";
+        return `预计发送${data.expectSend}${unit}，已成功发送${data.actualSend}${unit}`;
+      }
+    }
+  },
+  data() {
+    return {
+      // 遮罩层
+      loading: false,
+      // 选中数组
+      ids: [],
+      // 总条数
+      total: 0,
+      // 表格数据
+      list: [],
+      // 日期范围
+      dateRange: [],
+      // 查询参数
+      query: {
+        pageNum: 1,
+        pageSize: 10,
+        sender: undefined,
+        content: undefined,
+        pushType: undefined,
+        beginTime: undefined,
+        endTime: undefined
+      },
+      pushType: {
+        0: "发给客户",
+        1: "发给客户群"
+      },
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now(); // 选当前时间之前的时间
+        }
+      }
+    };
+  },
+  created() {
+    this.getList();
+  },
+  methods: {
+    getList(page) {
+      if (this.dateRange[0]) {
+        this.query.beginTime = this.dateRange[0];
+        this.query.endTime = this.dateRange[1];
+      } else {
+        this.query.beginTime = "";
+        this.query.endTime = "";
+      }
+      page && (this.query.pageNum = page);
+      this.loading = true;
+      getList(this.query)
+        .then(({ rows, total }) => {
+          this.list = rows;
+          this.total = +total;
+          this.loading = false;
+          this.ids = [];
+        })
+        .catch(() => {
+          this.loading = false;
+        });
+    },
+    /** 重置按钮操作 */
+    resetQuery() {
+      this.dateRange = [];
+      this.$refs["queryForm"].resetFields();
+      this.getList(1);
+    },
+    // 多选框选中数据
+    handleSelectionChange(selection) {
+      this.ids = selection.map(item => item.id);
+    },
+    /** 删除按钮操作 */
+    handleDelete(row) {
+      const operIds = row.operId || this.ids;
+      this.$confirm(
+        '是否确认删除日志编号为"' + operIds + '"的数据项?',
+        "警告",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      )
+        .then(function() {})
+        .then(() => {
+          this.getList();
+          this.msgSuccess("删除成功");
+        })
+        .catch(function() {});
+    },
+    goRoute(id, path) {
+      this.$router.push({ path: "/groupMessage/" + path, query: { id } });
+    }
+  }
+};
+</script>
+<template>
+  <div>
+    <el-form
+      :model="query"
+      ref="queryForm"
+      :inline="true"
+      class="top-search"
+      label-width="100px"
+    >
+      <el-form-item label="创建人" prop="sender">
+        <el-input
+          v-model="query.sender"
+          placeholder="请输入"
+          clearable
+          @keyup.enter.native="getList(1)"
+        />
+      </el-form-item>
+      <el-form-item label="内容消息" prop="content">
+        <el-input
+          v-model="query.content"
+          placeholder="请输入"
+          clearable
+          @keyup.enter.native="getList(1)"
+        />
+      </el-form-item>
+      <el-form-item label="群发类型" prop="pushType">
+        <el-select v-model="query.pushType" placeholder="请选择" size="small">
+          <el-option
+            v-for="(value, key, index) in pushType"
+            :label="value"
+            :value="key"
+            :key="index"
+          ></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="创建日期">
+        <el-date-picker
+          :picker-options="pickerOptions"
+          v-model="dateRange"
+          value-format="yyyy-MM-dd"
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        ></el-date-picker>
+      </el-form-item>
+      <el-form-item label=" ">
+        <el-button type="primary" @click="getList(1)">查询</el-button>
+        <el-button @click="resetQuery">重置</el-button>
+      </el-form-item>
+    </el-form>
+
+    <el-table
+      v-loading="loading"
+      :data="list"
+      @selection-change="handleSelectionChange"
+    >
+      <!-- <el-table-column type="selection" width="55" align="center" /> -->
+      <el-table-column label="消息内容" align="center" prop="content" />
+      <el-table-column label="群发类型" align="center">
+        <template slot-scope="scope">
+          {{ pushType[scope.row.pushType] }}
+        </template>
+      </el-table-column>
+      <el-table-column label="创建人" align="center" prop="sender" />
+      <el-table-column
+        label="创建时间"
+        align="center"
+        prop="sendTime"
+        width="180"
+      >
+      </el-table-column>
+      <el-table-column label="发送情况" align="center" prop="sendInfo">
+        <template slot-scope="scope">
+          {{ scope.row | sendInfo }}
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" width="180">
+        <template slot-scope="scope">
+          <el-button
+            v-hasPermi="['enterpriseWechat:view']"
+            size="mini"
+            type="text"
+            icon="el-icon-view"
+            @click="goRoute(scope.row.messageId, 'detail')"
+            >查看</el-button
+          >
+          <el-button
+            v-hasPermi="['enterpriseWechat:edit']"
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            disabled=""
+            @click="goRoute(scope.row, 1)"
+            >编辑</el-button
+          >
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <pagination
+      v-show="total > 0"
+      :total="total"
+      :page.sync="query.pageNum"
+      :limit.sync="query.pageSize"
+      @pagination="getList()"
+    />
+  </div>
+</template>
+
 <style lang="scss" scoped>
 .mid-action {
   display: flex;
@@ -19,227 +236,3 @@
   }
 }
 </style>
-<template>
-  <div class="app-container">
-    <el-card shadow="never" :body-style="{padding: '20px 0 0'}">
-      <el-form
-        :model="queryParams"
-        ref="queryForm"
-        :inline="true"
-        v-show="showSearch"
-        label-width="100px"
-      >
-        <el-form-item label="创建人" prop="title">
-          <el-input
-            v-model="queryParams.title"
-            placeholder="请输入"
-            clearable
-            style="width: 240px;"
-            size="small"
-            @keyup.enter.native="handleQuery"
-          />
-        </el-form-item>
-        <el-form-item label="内容消息" prop="operName">
-          <el-input
-            v-model="queryParams.operName"
-            placeholder="请输入"
-            clearable
-            style="width: 240px;"
-            size="small"
-            @keyup.enter.native="handleQuery"
-          />
-        </el-form-item>
-        <el-form-item label="群发类型">
-            <el-select v-model="form.region" placeholder="请选择" size="small" style="width: 240px;">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
-            </el-select>
-          </el-form-item>
-        <el-form-item label="创建日期">
-          <el-date-picker
-            v-model="dateRange"
-            size="small"
-            style="width: 240px"
-            value-format="yyyy-MM-dd"
-            type="daterange"
-            range-separator="-"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-          ></el-date-picker>
-        </el-form-item>
-        <el-form-item label=" ">
-          <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">查询</el-button>
-          <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
-
-    <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="消息内容" align="center" prop="operId" />
-      <el-table-column label="群发类型" align="center" prop="title" />
-      <el-table-column label="创建人" align="center" prop="businessType" :formatter="typeFormat" />
-      <el-table-column label="创建时间" align="center" prop="operTime" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.operTime) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="发送情况" align="center" prop="operId">
-      </el-table-column>
-    </el-table>
-
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
-    
-  </div>
-</template>
-
-<script>
-export default {
-  name: "Operlog",
-  data() {
-    return {
-      // 遮罩层
-      loading: false,
-      // 选中数组
-      ids: [],
-      // 非多个禁用
-      multiple: true,
-      // 显示搜索条件
-      showSearch: true,
-      // 总条数
-      total: 0,
-      // 表格数据
-      list: [],
-      // 是否显示弹出层
-      open: false,
-      // 类型数据字典
-      typeOptions: [],
-      // 类型数据字典
-      statusOptions: [],
-      // 日期范围
-      dateRange: [],
-      // 表单参数
-      form: {},
-      // 查询参数
-      queryParams: {
-        pageNum: 1,
-        pageSize: 10,
-        title: undefined,
-        operName: undefined,
-        businessType: undefined,
-        status: undefined,
-      },
-    };
-  },
-  created() {
-    this.getList();
-    this.getDicts("sys_oper_type").then((response) => {
-      this.typeOptions = response.data;
-    });
-    this.getDicts("sys_common_status").then((response) => {
-      this.statusOptions = response.data;
-    });
-  },
-  methods: {
-    /** 查询登录日志 */
-    getList() {
-      this.loading = false;
-      list(this.addDateRange(this.queryParams, this.dateRange)).then(
-        (response) => {
-          this.list = response.rows;
-          this.total = response.total;
-          this.loading = false;
-        }
-      );
-    },
-    // 操作日志状态字典翻译
-    statusFormat(row, column) {
-      return this.selectDictLabel(this.statusOptions, row.status);
-    },
-    // 操作日志类型字典翻译
-    typeFormat(row, column) {
-      return this.selectDictLabel(this.typeOptions, row.businessType);
-    },
-    /** 搜索按钮操作 */
-    handleQuery() {
-      this.queryParams.pageNum = 1;
-      this.getList();
-    },
-    /** 重置按钮操作 */
-    resetQuery() {
-      this.dateRange = [];
-      this.resetForm("queryForm");
-      this.handleQuery();
-    },
-    // 多选框选中数据
-    handleSelectionChange(selection) {
-      this.ids = selection.map((item) => item.operId);
-      this.multiple = !selection.length;
-    },
-    /** 详细按钮操作 */
-    handleView(row) {
-      this.open = true;
-      this.form = row;
-    },
-    /** 删除按钮操作 */
-    handleDelete(row) {
-      const operIds = row.operId || this.ids;
-      this.$confirm(
-        '是否确认删除日志编号为"' + operIds + '"的数据项?',
-        "警告",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-        }
-      )
-        .then(function () {
-          return delOperlog(operIds);
-        })
-        .then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        })
-        .catch(function () {});
-    },
-    /** 清空按钮操作 */
-    handleClean() {
-      this.$confirm("是否确认清空所有操作日志数据项?", "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(function () {
-          return cleanOperlog();
-        })
-        .then(() => {
-          this.getList();
-          this.msgSuccess("清空成功");
-        })
-        .catch(function () {});
-    },
-    /** 导出按钮操作 */
-    handleExport() {
-      const queryParams = this.queryParams;
-      this.$confirm("是否确认导出所有操作日志数据项?", "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(function () {
-          return exportOperlog(queryParams);
-        })
-        .then((response) => {
-          this.download(response.msg);
-        })
-        .catch(function () {});
-    },
-  },
-};
-</script>

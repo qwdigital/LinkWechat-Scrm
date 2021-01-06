@@ -1,10 +1,13 @@
 package com.linkwechat.wecom.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.utils.html.EscapeUtil;
 import com.linkwechat.common.utils.img.NetFileUtils;
 import com.linkwechat.wecom.domain.WePosterFont;
 import com.linkwechat.wecom.mapper.WePosterFontMapper;
 import com.linkwechat.wecom.service.IWePosterFontService;
+import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +25,23 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author ws
  */
 @Service
+@Log
 public class WePosterFontServiceImpl extends ServiceImpl<WePosterFontMapper,WePosterFont> implements IWePosterFontService {
+
+    private static Font DEFAULT_FONT;
+
+    static {
+        try {
+            DEFAULT_FONT = Font.createFont(Font.TRUETYPE_FONT,WePosterFontServiceImpl.class.getResourceAsStream("/font/default.ttf"));
+            log.info("字体文件读取成功");
+        } catch (FontFormatException e) {
+            e.printStackTrace();
+            log.info("字体加载失败");
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.info("字体文件读取失败");
+        }
+    }
 
 
     @Resource
@@ -34,15 +53,16 @@ public class WePosterFontServiceImpl extends ServiceImpl<WePosterFontMapper,WePo
     private final Map<Long, Font> FONT_MAP = new ConcurrentHashMap<>();
 
 
-    /**
-     * 获取字体
-     *
-     * @param id
-     * @param size
-     * @return
-     */
     @Override
-    public Font getFont(Long id, Integer size) {
+    public Font getFont(Long id, Integer size,Integer fontStyle) {
+        if(id == null || id.equals(0L)){
+            if(fontStyle > 0){
+                return DEFAULT_FONT.deriveFont(fontStyle.equals(1)?Font.BOLD:Font.ITALIC,(float)size);
+            }else {
+                return DEFAULT_FONT.deriveFont((float)size);
+            }
+
+        }
         WePosterFont posterFont = this.getById(id);
         if(posterFont == null){
             throw new RuntimeException("字体id为："+id+"的字体不存在");

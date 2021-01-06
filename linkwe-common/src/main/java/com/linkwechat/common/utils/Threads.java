@@ -21,8 +21,14 @@ public class Threads
     /**
      * 创建线程池
      */
-    public static final ThreadPoolExecutor SINGLE_THREAD_POOL = new ThreadPoolExecutor(CORE_POOL_SIZE, CORE_POOL_SIZE+1, 10l, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<>(1024),NAMED_THREAD_FACTORY);
+    public static final ThreadPoolExecutor SINGLE_THREAD_POOL = new ThreadPoolExecutor(CORE_POOL_SIZE, CORE_POOL_SIZE + 1, 10l, TimeUnit.SECONDS,
+            new SynchronousQueue<>(), NAMED_THREAD_FACTORY, (r, executor) -> {
+                try {
+                    executor.getQueue().put(r);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
 
 
 
