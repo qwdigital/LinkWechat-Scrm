@@ -7,10 +7,7 @@ import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.wecom.service.IWeChatCollectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 聊天工具 侧边栏栏 素材收藏
@@ -31,8 +28,8 @@ public class WeChatCollectionController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('chat:collection:add')")
     @Log(title = "添加收藏", businessType = BusinessType.INSERT)
-    @PutMapping
-    public AjaxResult addCollection(@RequestParam(value = "materialId") Long materialId,@RequestParam(value = "userId") Long userId) {
+    @PostMapping
+    public AjaxResult addCollection(@RequestParam(value = "materialId") Long materialId, @RequestParam(value = "userId") Long userId) {
         return toAjax(weChatCollectionService.addCollection(materialId, userId));
     }
 
@@ -43,7 +40,7 @@ public class WeChatCollectionController extends BaseController {
     @PreAuthorize("@ss.hasPermi('chat:collection:delete')")
     @Log(title = "取消收藏", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult cancleCollection(@RequestParam(value = "materialId") Long materialId,@RequestParam(value = "userId") Long userId) {
+    public AjaxResult cancleCollection(@RequestParam(value = "materialId") Long materialId, @RequestParam(value = "userId") Long userId) {
         return toAjax(weChatCollectionService.cancleCollection(materialId, userId));
     }
 
