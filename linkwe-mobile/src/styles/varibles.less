@@ -1,0 +1,44 @@
+@color: #42b9fd;
+@colorSub: #4ee699;
+@colorSubDeep: #34b071;
+@borderColor: #106ed2;
+@inputBgColor: #14344b;
+@fontColor: #999;
+
+
+// 画三角形
+.triangle(@_, @wwww, @ccccc) {
+  width: 0px;
+  height: 0px;
+  overflow: hidden;
+}
+.triangle(L, @w, @c) {
+  border-width: @w;
+  border-style: dashed solid dashed dashed;
+  border-color: transparent @c transparent transparent;
+}
+.triangle(R, @w, @c) {
+  border-width: @w;
+  border-style: dashed dashed dashed solid;
+  border-color: transparent transparent transparent @c;
+}
+.triangle(T, @w, @c) {
+  border-width: @w;
+  border-style: dashed dashed solid dashed;
+  border-color: transparent transparent @c transparent;
+}
+.triangle(B, @w, @c) {
+  border-width: @w;
+  border-style: solid dashed dashed dashed;
+  border-color: @c transparent transparent transparent;
+}
+
+// 单边框
+.border(single, @position: bottom, @color, @width: 1px) {
+  border-@{position}: @width solid @color;
+}
+
+// 全边框
+.border(@color, @width: 1px) when (default()) {
+  border: @width solid @color;
+}

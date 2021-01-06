@@ -56,6 +56,11 @@ spring:
        max-file-size:  10MB
        # 设置总上传的文件大小
        max-request-size:  20MB
+  task:
+    execution:
+      pool:
+        keep-alive: 10s
+      thread-name-prefix: common-pool-
   # 服务模块
   devtools:
     restart:
@@ -173,6 +178,8 @@ wecome:
           - /externalcontact/get_unassigned_list
           - /externalcontact/send_welcome_msg
           - /externalcontact/unionid_to_external_userid
+          - /get_jsapi_ticket
+          - /ticket/get
   fileUplodUrl:  /media/upload,/media/uploadimg
   needProviderTokenUrl:
           - /service/get_login_info
