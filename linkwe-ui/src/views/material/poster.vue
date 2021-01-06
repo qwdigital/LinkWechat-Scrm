@@ -73,7 +73,7 @@ export default {
             "menu.iconSize.height": "24px",
 
             // submenu primary color
-            "submenu.backgroundColor": "#ffffffCC",
+            "submenu.backgroundColor": "#ffffffE5",
             "submenu.partition.color": "#858585",
 
             // submenu icons
