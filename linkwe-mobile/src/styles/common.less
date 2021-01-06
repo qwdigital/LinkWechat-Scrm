@@ -1,0 +1,40 @@
+// 全屏转场动画
+.slide-left-enter-active,
+.slide-right-enter-active {
+  transition: all 0.2s ease;
+}
+
+.slide-left-leave-active,
+.slide-right-leave-active {
+  transition: all 0.2s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-left-enter,
+.slide-right-leave-to {
+  transform: translateX(10px);
+  opacity: 0;
+}
+.slide-left-leave-to,
+.slide-right-enter {
+  transform: translateX(-10px);
+  opacity: 0;
+}
+
+// 内页转场动画
+.slide-inside-enter-active {
+  transition: all 0.3s ease;
+}
+
+.slide-inside-leave-active {
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-inside-enter,
+.slide-inside-leave-to
+
+/* .slide-down-leave-active for below version 2.1.8 */
+ {
+  // position: absolute;
+  transform: translateY(-10px);
+  opacity: 0;
+}
