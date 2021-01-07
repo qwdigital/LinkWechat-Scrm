@@ -1,8 +1,8 @@
 {
   "name": "linkwechat",
   "version": "0.1.0",
-  "description": "塬微管理系统",
-  "license": "MIT",
+  "description": "LinkWeChat",
+  "license": "GPL-3.0",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
