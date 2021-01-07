@@ -18,7 +18,7 @@ public class WeChatSide extends BaseEntity {
     /**
      *  0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本 5 海报
      */
-    private Long mediaType;
+    private String mediaType;
 
     /**
      * 聊天工具栏名称
