@@ -178,6 +178,8 @@ wecome:
           - /externalcontact/get_unassigned_list
           - /externalcontact/send_welcome_msg
           - /externalcontact/unionid_to_external_userid
+          - /externalcontact/add_msg_template
+          - /externalcontact/get_group_msg_result
           - /get_jsapi_ticket
           - /ticket/get
   fileUplodUrl:  /media/upload,/media/uploadimg

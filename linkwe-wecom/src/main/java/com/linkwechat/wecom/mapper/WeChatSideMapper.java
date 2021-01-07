@@ -2,6 +2,8 @@ package com.linkwechat.wecom.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeChatSide;
+import com.linkwechat.wecom.domain.vo.WeChatSideVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -26,5 +28,7 @@ public interface WeChatSideMapper extends BaseMapper<WeChatSide> {
      * @return 结果
      */
     public int updateWeChatSideById(WeChatSide weChatSide);
+
+
 
 }
