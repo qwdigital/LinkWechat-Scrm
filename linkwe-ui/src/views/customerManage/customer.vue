@@ -398,6 +398,7 @@ export default {
       ></el-table-column>
       <el-table-column prop="userName" label="添加人（首位）" align="center">
         <template slot-scope="scope">{{
+
           scope.row.weFlowerCustomerRels[0]?scope.row.weFlowerCustomerRels[0].userName:""
         }}</template>
       </el-table-column>
