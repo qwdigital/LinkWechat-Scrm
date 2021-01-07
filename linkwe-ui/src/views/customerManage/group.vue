@@ -28,7 +28,6 @@ export default {
     }
   },
   created() {
-    console.log('caread', 1)
     this.getList()
   },
   methods: {

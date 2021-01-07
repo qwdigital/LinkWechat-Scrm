@@ -1,25 +1,72 @@
 <script>
+import { getList, update, getMaterial } from '@/api/appTool/chatBar'
+
 export default {
   components: {},
   props: {},
   data() {
     return {
       dialogVisible: false,
-      list: [
-        { type: "文本类型", name: "企业资料", number: 105, isStart: 1 },
-        { type: "图片类型", name: "图片类型", number: 86, isStart: 1 },
-        { type: "网页类型", name: "网页类型", number: 55, isStart: 1 },
-        { type: "文件类型", name: "文件类型", number: 667, isStart: 1 },
-        { type: "视频类型", name: "视频类型", number: 29, isStart: 1 }
-      ]
-    };
+      loading: false,
+      list: [],
+      mediaType: Object.freeze({
+        0: '图片',
+        1: '语音',
+        2: '视频',
+        3: '普通文件',
+        4: '文本',
+        5: '海报',
+      }),
+    }
   },
   watch: {},
   computed: {},
-  created() {},
+  created() {
+    this.getList()
+  },
   mounted() {},
-  methods: {}
-};
+  methods: {
+    getList() {
+      this.loading = true
+      getList()
+        .then(({ rows, total }) => {
+          this.list = rows
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
+    },
+    getMaterial(data) {
+      const loading = this.$loading({
+        lock: true,
+        text: 'Loading',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)',
+      })
+      // this.loading = true
+      getMaterial(data)
+        .then(({ rows, total }) => {
+          this.list = rows
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
+    },
+    update(data) {
+      // this.loading = true
+      update(data)
+        .then(() => {
+          this.msgSuccess('操作成功')
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
+    },
+  },
+}
 </script>
 <template>
   <div>
@@ -36,36 +83,37 @@ export default {
       <div slot="header">
         <span>抓取快捷回复素材</span> 素材抓取后，即可在聊天工具栏使用
       </div>
-      <el-table
-        v-loading="loading"
-        :data="list"
-        @selection-change="handleSelectionChange"
-      >
-        <el-table-column type="selection" width="55" align="center" />
-        <el-table-column label="素材类型" align="center" prop="type" />
-        <el-table-column label="聊天工具栏名称" align="center" prop="name" />
-        <el-table-column label="已抓取素材数量" align="center" prop="number" />
+      <el-table v-loading="loading" :data="list">
+        <el-table-column label="素材类型" align="center" prop="mediaType">
+          <template slot-scope="scope">
+            {{ mediaType[scope.row.mediaType] }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="聊天工具栏名称"
+          align="center"
+          prop="sideName"
+        />
+        <el-table-column label="已抓取素材数量" align="center" prop="total" />
         <el-table-column
           label="是否启用"
           align="center"
-          prop="isStart"
+          prop="using"
           width="180"
         >
           <template slot-scope="scope">
             <el-switch
-              v-model="scope.row.isStart"
-              :active-value="1"
-              :inactive-value="0"
-              inactive-color="#ff4949"
+              v-model="scope.row.using"
+              :active-value="0"
+              :inactive-value="1"
+              inactive-color="#ddd"
+              @change="update(scope.row)"
             ></el-switch>
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center" prop="operId">
           <template slot-scope="scope">
-            <el-button
-              size="mini"
-              type="text"
-              @click="handleView(scope.row, scope.index)"
+            <el-button type="text" @click="handleView(scope.row, scope.index)"
               >抓取素材</el-button
             >
           </template>
