@@ -37,6 +37,9 @@ export default {
       if (this.dateRange[0]) {
         this.query.beginTime = this.dateRange[0]
         this.query.endTime = this.dateRange[1]
+      } else {
+        this.query.beginTime = ''
+        this.query.endTime = ''
       }
       page && (this.query.pageNum = page)
       this.loading = true
@@ -102,14 +105,14 @@ export default {
       class="top-search"
       label-width="80px"
     >
-      <el-form-item label="群名">
+      <el-form-item label="群名" prop="groupName">
         <el-input
           v-model="query.groupName"
           placeholder="请输入群名"
           clearable
         />
       </el-form-item>
-      <el-form-item label="群主">
+      <el-form-item label="群主" prop="groupLeader">
         <el-input
           v-model="query.groupLeader"
           placeholder="请输入群主"
