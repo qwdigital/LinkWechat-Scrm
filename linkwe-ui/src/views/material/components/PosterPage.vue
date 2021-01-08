@@ -34,7 +34,7 @@ export default {
             options = Object.assign(includeUIOptions, this.options);
         }
         this.editorInstance = new ImageEditor(this.$refs.tuiImageEditor, options);
-
+        document.getElementsByClassName('tui-image-editor-header')[0].innerHTML = '';
         setTimeout(()=>{
             if(window.localStorage.getItem('record')){
                 var list = JSON.parse(window.localStorage.getItem('record'));
