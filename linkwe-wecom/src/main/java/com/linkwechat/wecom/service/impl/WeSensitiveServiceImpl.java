@@ -165,6 +165,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
 
     @Override
     public void hitSensitive(List<JSONObject> entityList) {
+        log.info("执行敏感词命中过滤,time=[{}]", System.currentTimeMillis());
         //获取所有的敏感词规则
         List<WeSensitive> allSensitiveRules = weSensitiveMapper.selectWeSensitiveList(new WeSensitive());
         //根据规则过滤命中
