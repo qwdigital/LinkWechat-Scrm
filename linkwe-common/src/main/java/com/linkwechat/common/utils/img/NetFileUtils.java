@@ -25,19 +25,6 @@ public class NetFileUtils {
 
     private static final WebClient webClient = WebClient.create(vertx);
 
-    public static void main(String[] args) {
-        FileCallable fileCallable = getNetFile("https://pc-index-skin.cdn.bcebos.com/hiphoto/51631423522.jpg?x-bce-process=image/crop,x_0,y_13,w_1999,h_1250");
-        ByteArrayOutputStream byteArrayOutputStream = getByteArrayOutputStream(fileCallable,true);
-        StreamMultipartFile file = new StreamMultipartFile("你好啊.jpg",byteArrayOutputStream.toByteArray());
-        File f = new File("D:/网页/2.jpg");
-        try {
-            file.transferTo(f);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
     public static FileCallable getNetFile(String urlPath){
         FileCallable fileCallable = new FileCallable();
 

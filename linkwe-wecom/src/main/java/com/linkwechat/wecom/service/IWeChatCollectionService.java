@@ -2,6 +2,9 @@ package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeChatCollection;
+import com.linkwechat.wecom.domain.vo.WeChatSideVo;
+
+import java.util.List;
 
 /**
  * 聊天工具 侧边栏栏 素材收藏
@@ -27,5 +30,13 @@ public interface IWeChatCollectionService extends IService<WeChatCollection> {
      * @return 结果
      */
     public int cancleCollection( Long materialId, Long userId);
+
+    /**
+     * 收藏列表
+     *
+     * @param userId 用户id
+     * @return {@link WeChatSideVo}s
+     */
+    public List<WeChatSideVo> collections(Long userId);
 
 }

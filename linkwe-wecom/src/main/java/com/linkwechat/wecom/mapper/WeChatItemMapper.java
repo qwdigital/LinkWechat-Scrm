@@ -3,6 +3,7 @@ package com.linkwechat.wecom.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeChatItem;
 import com.linkwechat.wecom.domain.dto.WeChatItemDto;
+import com.linkwechat.wecom.domain.vo.WeChatSideVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -27,4 +28,12 @@ public interface WeChatItemMapper extends BaseMapper<WeChatItem> {
      */
     public int dropItem(@Param("sideId") Long sideId);
 
+
+    /**
+     * h5素材列表
+     *
+     * @param sideId 侧边栏id
+     * @return
+     */
+    public List<WeChatSideVo> findChatItems(@Param("sideId") Long sideId);
 }
