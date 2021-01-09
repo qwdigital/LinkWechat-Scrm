@@ -22,6 +22,8 @@ import com.linkwechat.wecom.service.IWeUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -30,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -176,18 +177,14 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
                 List<String> users = getScopeUsers(weSensitive.getAuditUserScope());
                 jsonList.addAll(hitSensitiveInES(patternWords, users));
                 //将命中结果插入es
-                try {
-                    addHitSensitiveList(jsonList, weSensitive);
-                } catch (IOException e) {
-                    log.warn("添加敏感词命中信息失败, jsonList={}, auditUserId={}, exception={}",
-                            jsonList, weSensitive.getAuditUserId(), ExceptionUtils.getStackTrace(e));
-                }
+                addHitSensitiveList(jsonList, weSensitive);
             });
         }
     }
 
     @Override
     public PageInfo<JSONObject> getHitSensitiveList(WeSensitiveHitQuery weSensitiveHitQuery) {
+        elasticSearch.createIndex2(WeConstans.WECOM_SENSITIVE_HIT_INDEX, getSensitiveHitMapping());
         List<String> userIds = Lists.newArrayList();
         if (weSensitiveHitQuery.getScopeType().equals(WeConstans.USE_SCOP_BUSINESSID_TYPE_USER)) {
             userIds.add(weSensitiveHitQuery.getAuditScopeId());
@@ -219,9 +216,8 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
         return elasticSearch.searchPage(WeConstans.WECOM_SENSITIVE_HIT_INDEX, builder, pageNum, pageSize, JSONObject.class);
     }
 
-    private void addHitSensitiveList(List<JSONObject> json, WeSensitive weSensitive) throws IOException {
-        //创建索引
-        elasticSearch.createIndex2(WeConstans.WECOM_SENSITIVE_HIT_INDEX, elasticSearch.getFinanceMapping());
+    private void addHitSensitiveList(List<JSONObject> json, WeSensitive weSensitive) {
+        elasticSearch.createIndex2(WeConstans.WECOM_SENSITIVE_HIT_INDEX, getSensitiveHitMapping());
         if (weSensitive.getAlertFlag().equals(1)) {
             //针对每一条命中信息发送消息通知给相应的审计人 TODO
         }
@@ -270,5 +266,44 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
         BoolQueryBuilder searchBuilder = QueryBuilders.boolQuery().must(patterWordsBuilder).must(userBuilder);
         builder.query(searchBuilder);
         return elasticSearch.search(WeConstans.WECOM_FINANCE_INDEX, builder, JSONObject.class);
+    }
+
+    private XContentBuilder getSensitiveHitMapping() {
+        try {
+            //创建索引
+            XContentBuilder mapping = XContentFactory.jsonBuilder()
+                    .startObject()
+                    .startObject("properties")
+                    .startObject("msgid")
+                    .field("type", "keyword")
+                    .endObject()
+                    .startObject("seq")
+                    .field("type", "long")
+                    .endObject()
+                    .startObject("action")
+                    .field("type", "keyword")
+                    .endObject()
+                    .startObject("from")
+                    .field("type", "keyword")
+                    .endObject()
+                    .startObject("roomid")
+                    .field("type", "keyword")
+                    .endObject()
+                    .startObject("msgtime")
+                    .field("type", "long")
+                    .endObject()
+                    .startObject("msgtype")
+                    .field("type", "keyword")
+                    .endObject()
+                    .startObject("alerted")
+                    .field("type", "keyword")
+                    .endObject()
+                    .endObject()
+                    .endObject();
+            return mapping;
+        } catch (Exception e) {
+            log.warn("create sensitive-hit mapping failed, exception={}", ExceptionUtils.getStackTrace(e));
+        }
+        return null;
     }
 }
