@@ -1,4 +1,9 @@
 <script>
+import {
+  getList,
+  getPosterInfo,
+  removePoster,
+} from '@/api/material/poster.js'
 import MaPage from '@/views/material/components/MaPage'
 
 // Load Style Code
@@ -30,15 +35,15 @@ export default {
         step: 0
       },
       posterForm: {
-        name: '', // 海报名称
+        title: '', // 海报名称
         classifyFirst: '', // 所属分类
         classifySecond: '', // 所属二级分类
-        type: '', // 海报类型
+        type: '3', // 海报类型
         content: '', // 内容
         count: '', // 虚拟次数
         sort: '', // 海报排序
         jump: [], // 跳转页面
-        switch: '0' // 是否启用
+        delFlag: 0 // 是否启用
       },
       srcList: [],
       ids: [], // 选中数组
@@ -131,10 +136,16 @@ export default {
       this.previewImg = url || ''
       this.dialog.preview = true
     },
-    edit (item) {
-      console.log('edit', JSON.stringify(item))
-      this.posterEdit.step = 0
-      this.dialog.edit = true
+    async edit (item) {
+      try {
+        const res = await getPosterInfo(item.id)
+        console.log(res)
+        console.log('edit', item)
+        this.posterEdit.step = 0
+        this.dialog.edit = true
+      } catch (error) {
+        console.log(error)
+      }
     },
     ready () {
       console.log('ready')
@@ -166,6 +177,18 @@ export default {
       if(res == 0){
         this.records = []
       }
+    },
+    remove (id) {
+      this.$confirm('是否确认删除吗?', '警告', {
+        type: 'warning',
+      })
+        .then(function() {
+          return removePoster(id)
+        })
+        .then(() => {
+          this.$refs.page.getList(1)
+          this.msgSuccess('删除成功')
+        })
     },
     getRecord(res){
     var flag = false;
@@ -277,7 +300,7 @@ export default {
                 type="success"
                 size="mini"
                 effect="dark"
-                @click="$refs.page.remove(item.id)"
+                @click="remove(item.id)"
                 >删除</el-tag
               >
             </div>
@@ -305,7 +328,7 @@ export default {
           <el-form ref="form" :model="posterForm" label-width="120px">
             <el-form-item label="海报名称">
               <el-input
-                v-model="posterForm.name"
+                v-model="posterForm.title"
                 maxlength="10"
                 show-word-limit
               ></el-input>
@@ -356,9 +379,9 @@ export default {
               </el-checkbox-group>
             </el-form-item>
             <el-form-item label="是否启用">
-              <el-radio-group v-model="posterForm.switch">
-                <el-radio label="名片海报" value="1">是</el-radio>
-                <el-radio label="专属海报" value="0">否</el-radio>
+              <el-radio-group v-model="posterForm.delFlag">
+                <el-radio :label="1">名片海报</el-radio>
+                <el-radio :label="0">专属海报</el-radio>
               </el-radio-group>
             </el-form-item>
             <el-form-item>
