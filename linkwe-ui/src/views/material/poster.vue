@@ -27,6 +27,7 @@ export default {
   },
   data () {
     return {
+      bgPath: "'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F171%2F106%2F1472%2F95744001.jpg&refer=http%3A%2F%2Fimg1.gtimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1612444990&t=6589254fe9669cc6a45fd3688f269612'",
       dialog: {
         preview: false, // 预览弹出显示隐藏
         edit: false // 编辑弹出显示隐藏
@@ -54,12 +55,12 @@ export default {
           // initMenu: "text",
           locale: locale_ru_RU,
           loadImage: {
-            path: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F171%2F106%2F1472%2F95744001.jpg&refer=http%3A%2F%2Fimg1.gtimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1612444990&t=6589254fe9669cc6a45fd3688f269612',
+            path: bgPath,
             name: "posterImage"
           },
           usageStatistics: false,
-          menuBarPosition: "top",
-          menu: ["text", "mask"],
+          menuBarPosition: "right",
+          menu: [],
           theme: {
             "common.bi.image": "",
             "common.bisize.width": "251px",
@@ -74,8 +75,8 @@ export default {
             "header.border": "0px",
 
             // main icons
-            "menu.iconSize.width": "24px",
-            "menu.iconSize.height": "24px",
+            "menu.iconSize.width": "34px",
+            "menu.iconSize.height": "34px",
 
             // submenu primary color
             "submenu.backgroundColor": "#ffffffE5",
@@ -150,9 +151,8 @@ export default {
     ready () {
       console.log('ready')
     },
-
     onAddText(res) {
-      console.log("RES : ", res);
+      console.log("RES : ", res)
     },
     //移动
     onObjectMoved(res) {
@@ -217,6 +217,7 @@ export default {
     },
     //
     save() {
+      console.log('save')
       let res = {};
       var list =[];
       this.$refs.tuiImageEditor.editorInstance._invoker._undoStack.forEach(element => {
@@ -453,7 +454,7 @@ export default {
   width: 100%;
 }
 .imageEditorApp {
-  width: 1000px;
+  // width: 1000px;
   height: 800px;
 }
 .tui-image-editor-header-logo {

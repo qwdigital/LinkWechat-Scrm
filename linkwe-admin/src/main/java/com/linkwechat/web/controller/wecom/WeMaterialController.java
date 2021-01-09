@@ -51,7 +51,7 @@ public class WeMaterialController extends BaseController {
         startPage();
         List<WeMaterial> list;
         if(StringUtils.isNotBlank(mediaType) && mediaType.equals(MediaType.POSTER.getType())){
-            list = wePosterService.list(Long.valueOf(categoryId),search).stream().map(wePoster -> {
+            list = wePosterService.list(StringUtils.isBlank(categoryId)?null:Long.valueOf(categoryId),search).stream().map(wePoster -> {
                 WeMaterial weMaterial = new WeMaterial();
                 weMaterial.setMaterialName(wePoster.getTitle());
                 weMaterial.setMaterialUrl(wePoster.getSampleImgPath());
