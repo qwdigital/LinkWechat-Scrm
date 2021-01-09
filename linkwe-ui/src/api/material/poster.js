@@ -14,7 +14,7 @@ export function getList(params) {
  * 更新海报
  * @param {*} params
  */
-export function updateTree(data) {
+export function updatePoster(data) {
  return request({ url: service + '/update', method: 'put', data })
 }
 

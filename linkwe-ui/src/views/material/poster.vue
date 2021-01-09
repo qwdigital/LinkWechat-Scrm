@@ -2,6 +2,8 @@
 import {
   getList,
   getPosterInfo,
+  addPoster,
+  updatePoster,
   removePoster,
 } from '@/api/material/poster.js'
 import MaPage from '@/views/material/components/MaPage'
@@ -26,8 +28,9 @@ export default {
     "tui-image-editor": PosterPage
   },
   data () {
+    const bgPath = "'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F171%2F106%2F1472%2F95744001.jpg&refer=http%3A%2F%2Fimg1.gtimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1612444990&t=6589254fe9669cc6a45fd3688f269612'"
+
     return {
-      bgPath: "'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F171%2F106%2F1472%2F95744001.jpg&refer=http%3A%2F%2Fimg1.gtimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1612444990&t=6589254fe9669cc6a45fd3688f269612'",
       dialog: {
         preview: false, // 预览弹出显示隐藏
         edit: false // 编辑弹出显示隐藏
@@ -37,14 +40,32 @@ export default {
       },
       posterForm: {
         title: '', // 海报名称
-        classifyFirst: '', // 所属分类
-        classifySecond: '', // 所属二级分类
-        type: '3', // 海报类型
-        content: '', // 内容
-        count: '', // 虚拟次数
-        sort: '', // 海报排序
-        jump: [], // 跳转页面
+        categoryId: '', // 所属分类
+        type: '1', // 海报类型
+        // content: '', // 内容
+        // count: '', // 虚拟次数
+        // sort: '', // 海报排序
+        // jump: [], // 跳转页面
         delFlag: 0 // 是否启用
+      },
+      rules: {
+        title: {
+          required: true,
+          message: '请输入海报名称',
+          trigger: 'blur'
+        },
+        categoryId: {
+          required: true,
+          message: '请选择分类'
+        },
+        type: {
+          required: true,
+          message: '请选择海报类型'
+        },
+        delFlag: {
+          required: true,
+          message: '请选择是否启用'
+        }
       },
       srcList: [],
       ids: [], // 选中数组
@@ -140,8 +161,15 @@ export default {
     async edit (item) {
       try {
         const res = await getPosterInfo(item.id)
-        console.log(res)
-        console.log('edit', item)
+        const data = res.data || {}
+        console.log(data)
+        this.posterForm = {
+          id: data.id,
+          title: data.title,
+          categoryId: data.categoryId,
+          type: data.type,
+          delFlag: data.delFlag
+        }
         this.posterEdit.step = 0
         this.dialog.edit = true
       } catch (error) {
@@ -177,6 +205,23 @@ export default {
       if(res == 0){
         this.records = []
       }
+    },
+    toNextStep () {
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          this.posterEdit.step = 1
+        } else {
+          return false;
+        }
+      })
+    },
+    toPrevStep () {
+      this.posterEdit.step = 0
+    },
+    beforeCloseDialog () {
+      this.$refs.form.resetFields()
+      this.posterForm.id = undefined
+      this.dialog.edit = false
     },
     remove (id) {
       this.$confirm('是否确认删除吗?', '警告', {
@@ -216,42 +261,54 @@ export default {
       }
     },
     //
-    save() {
-      console.log('save')
-      let res = {};
-      var list =[];
-      this.$refs.tuiImageEditor.editorInstance._invoker._undoStack.forEach(element => {
-        this.records.forEach(item => {
-          if(element.name =='addIcon' && element.undoData.object.__fe_id && item.id == element.undoData.object.__fe_id){
-            item.type = element.args[1]
-          }
-        });
-      });
-      var deleteId = [];
-      this.$refs.tuiImageEditor.editorInstance._invoker._undoStack.forEach(element => {
-        if(element.name == "removeObject"){
-            deleteId.push(element.args[1])
+    async save() {
+      try {
+        const posterForm = this.posterForm
+        console.log('save', posterForm.id)
+        if (posterForm.id) {
+          // 编辑海报
+          const res = await updatePoster(Object.assign({}, {}, this.posterForm))
+        } else {
+          // 新建海报
+          const res = await addPoster(Object.assign({}, {}, this.posterForm))
         }
-      })
-      this.records.forEach(item => {
-        if(deleteId.indexOf((item.id).toString())>=0){
-            console.log(" ")
-        }else{
-          list.push(item)
-        }
-      });
-      //全清除
-      this.$refs.tuiImageEditor.editorInstance._invoker._undoStack.forEach(element => {
-        if(element.name == "loadImage" || element.name ==  "clearObjects"){
-          list = []
-        }
-      })
-      const image = this.$refs.tuiImageEditor.editorInstance.toDataURL();
-      res.url = image;
-      res.records = list;
-      console.log("最后结果：")
-      console.log(res)
-      window.localStorage.setItem('record',JSON.stringify(list))
+        // let res = {};
+        // var list =[];
+        // this.$refs.tuiImageEditor.editorInstance._invoker._undoStack.forEach(element => {
+        //   this.records.forEach(item => {
+        //     if(element.name =='addIcon' && element.undoData.object.__fe_id && item.id == element.undoData.object.__fe_id){
+        //       item.type = element.args[1]
+        //     }
+        //   });
+        // });
+        // var deleteId = [];
+        // this.$refs.tuiImageEditor.editorInstance._invoker._undoStack.forEach(element => {
+        //   if(element.name == "removeObject"){
+        //       deleteId.push(element.args[1])
+        //   }
+        // })
+        // this.records.forEach(item => {
+        //   if(deleteId.indexOf((item.id).toString())>=0){
+        //       console.log(" ")
+        //   }else{
+        //     list.push(item)
+        //   }
+        // });
+        // //全清除
+        // this.$refs.tuiImageEditor.editorInstance._invoker._undoStack.forEach(element => {
+        //   if(element.name == "loadImage" || element.name ==  "clearObjects"){
+        //     list = []
+        //   }
+        // })
+        // const image = this.$refs.tuiImageEditor.editorInstance.toDataURL();
+        // res.url = image;
+        // res.records = list;
+        // console.log("最后结果：")
+        // console.log(res)
+        // window.localStorage.setItem('record',JSON.stringify(list))
+      } catch (error) {
+        console.log(error)
+      }
     }
   },
 }
@@ -318,32 +375,32 @@ export default {
     <el-dialog title="海报预览" width="30%" :visible.sync="dialog.preview">
       <el-image class="preview-img" :src="previewImg" fit="contain"></el-image>
     </el-dialog>
-    <el-dialog title="海报编辑" width="80%" :visible.sync="dialog.edit">
+    <el-dialog title="海报编辑" width="80%" :visible.sync="dialog.edit" :before-close="beforeCloseDialog">
       <div class="poster-edit-dialog">
         <el-steps :active="posterEdit.step" simple finish-status="success">
           <el-step title="基本信息编辑"></el-step>
           <el-step title="界面元素及内容编辑"></el-step>
         </el-steps>
         <br />
-        <div v-if="posterEdit.step === 0">
-          <el-form ref="form" :model="posterForm" label-width="120px">
-            <el-form-item label="海报名称">
+        <div v-show="posterEdit.step === 0">
+          <el-form ref="form" :rules="rules" :model="posterForm" label-width="120px">
+            <el-form-item label="海报名称" prop="title">
               <el-input
                 v-model="posterForm.title"
                 maxlength="10"
                 show-word-limit
               ></el-input>
             </el-form-item>
-            <el-form-item label="所属分类">
+            <el-form-item label="所属分类" prop="categoryId">
               <el-select
-                v-model="posterForm.classifyFirst"
+                v-model="posterForm.categoryId"
                 placeholder="请选择分类"
               >
-                <el-option label="海报一" value="poster1"></el-option>
-                <el-option label="海报二" value="poster2"></el-option>
+                <el-option label="海报一" value="1"></el-option>
+                <el-option label="海报二" value="2"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="所属二级分类">
+            <!-- <el-form-item label="所属二级分类">
               <el-select
                 v-model="posterForm.classifySecond"
                 placeholder="请选择分类"
@@ -351,23 +408,23 @@ export default {
                 <el-option label="海报一" value="poster1"></el-option>
                 <el-option label="海报二" value="poster2"></el-option>
               </el-select>
-            </el-form-item>
-            <el-form-item label="海报类型">
+            </el-form-item> -->
+            <el-form-item label="海报类型" prop="type">
               <el-radio-group v-model="posterForm.type">
+                <el-radio label="1">通用海报</el-radio>
                 <!-- <el-radio label="1">名片海报</el-radio>
                 <el-radio label="2">专属海报</el-radio> -->
-                <el-radio label="3">通用海报</el-radio>
                 <!-- <el-radio label="4">案例海报</el-radio>
                 <el-radio label="5">产品海报</el-radio> -->
               </el-radio-group>
             </el-form-item>
-            <el-form-item
+            <!-- <el-form-item
               :label="`${posterForm.type === '4' ? '案例' : '产品'}内容`"
               v-if="posterForm.type === '4' || posterForm.type === '5'"
             >
               <el-input v-model="posterForm.content"></el-input>
-            </el-form-item>
-            <el-form-item label="虚拟次数">
+            </el-form-item> -->
+            <!-- <el-form-item label="虚拟次数">
               <el-input v-model="posterForm.count" type="number"></el-input>
             </el-form-item>
             <el-form-item label="海报排序">
@@ -378,22 +435,21 @@ export default {
                 <el-checkbox label="首页" value="1"></el-checkbox>
                 <el-checkbox label="名片" value="2"></el-checkbox>
               </el-checkbox-group>
-            </el-form-item>
-            <el-form-item label="是否启用">
+            </el-form-item> -->
+            <el-form-item label="是否启用" prop="delFlag">
               <el-radio-group v-model="posterForm.delFlag">
-                <el-radio :label="1">名片海报</el-radio>
-                <el-radio :label="0">专属海报</el-radio>
+                <el-radio :label="1">是</el-radio>
+                <el-radio :label="0">否</el-radio>
               </el-radio-group>
             </el-form-item>
             <el-form-item>
-              <el-button type="success" @click="posterEdit.step = 1"
+              <el-button type="success" @click="toNextStep"
                 >前往设计海报</el-button
               >
-              <el-button>返回</el-button>
             </el-form-item>
           </el-form>
         </div>
-        <div v-else>
+        <div v-show="posterEdit.step === 1">
           <div class="imageEditorApp">
             <tui-image-editor
               ref="tuiImageEditor"
@@ -407,6 +463,9 @@ export default {
               @objectActivated="objectActivated"
             ></tui-image-editor>
           </div>
+          <el-button type="success" @click="save"
+            >保存</el-button>
+          <el-button @click="toPrevStep">返回上一步</el-button>
         </div>
       </div>
     </el-dialog>
