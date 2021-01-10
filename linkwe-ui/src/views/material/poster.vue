@@ -407,7 +407,7 @@ export default {
             <el-form-item label="所属分类" prop="categoryId">
               <el-cascader
                 v-model="posterForm.categoryId"
-                :options="$refs.page.treeData"
+                :options="$refs.page.treeData[0].children"
                 :props="$refs.page.groupProps"
               ></el-cascader>
               <!-- <el-select

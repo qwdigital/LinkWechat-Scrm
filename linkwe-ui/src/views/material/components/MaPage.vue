@@ -314,7 +314,7 @@ export default {
             <div style="position: relative; margin: 10px 0;">
               <el-cascader
                 v-model="group"
-                :options="treeData"
+                :options="treeData[0].children"
                 :props="groupProps"
               ></el-cascader>
             </div>
@@ -396,7 +396,7 @@ export default {
         <el-form-item label="分类" prop="categoryId">
           <el-cascader
             v-model="form.categoryId"
-            :options="treeData"
+            :options="treeData[0].children"
             :props="groupProps"
           ></el-cascader>
         </el-form-item>
