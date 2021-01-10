@@ -405,13 +405,18 @@ export default {
               ></el-input>
             </el-form-item>
             <el-form-item label="所属分类" prop="categoryId">
-              <el-select
+              <el-cascader
+                v-model="posterForm.categoryId"
+                :options="$refs.page.treeData"
+                :props="$refs.page.groupProps"
+              ></el-cascader>
+              <!-- <el-select
                 v-model="posterForm.categoryId"
                 placeholder="请选择分类"
               >
                 <el-option label="海报一" value="1"></el-option>
                 <el-option label="海报二" value="2"></el-option>
-              </el-select>
+              </el-select> -->
             </el-form-item>
             <!-- <el-form-item label="所属二级分类">
               <el-select

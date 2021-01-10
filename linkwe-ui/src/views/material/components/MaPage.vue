@@ -98,7 +98,14 @@ export default {
     // 获取类目树
     getTree() {
       getTree(this.type).then(({ data }) => {
-        this.treeData = data
+        this.treeData = [{
+          id: "",
+          name: "全部",
+          parentId: "0",
+          hasParent: false,
+          hasChildren: true,
+          children: data || []
+        }]
       })
     },
     // 获取素材列表
@@ -255,7 +262,7 @@ export default {
           >
             <div class="custom-tree-node" slot-scope="{ node, data }">
               <span>{{ node.label }}</span>
-              <span class="fr">
+              <span class="fr" v-if="data.id">
                 <i
                   v-hasPermi="['material:editType']"
                   class="el-icon-edit"
