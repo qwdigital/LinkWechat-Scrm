@@ -154,6 +154,7 @@ export default {
       this.srcList = data.map((item) => item.materialUrl)
     },
     preview (url) {
+      console.log(url)
       console.log('preview', url)
       this.previewImg = url || ''
       this.dialog.preview = true
@@ -265,18 +266,24 @@ export default {
       try {
         const posterForm = this.posterForm
         console.log('save', posterForm.id)
+        let res = {}
         if (posterForm.id) {
           // 编辑海报
-          const res = await updatePoster(Object.assign({}, {
-            backgroundImgPath: '',
+          res = await updatePoster(Object.assign({}, {
+            backgroundImgPath: 'http://106.13.236.58:8080/profile/2020/12/31/5ca3fa0b-55d7-433c-ba02-61d4502e45e1.jpg',
             posterSubassemblyList: []
           }, this.posterForm))
         } else {
           // 新建海报
-          const res = await addPoster(Object.assign({}, {
-            backgroundImgPath: '',
+          res = await addPoster(Object.assign({}, {
+            backgroundImgPath: 'http://106.13.236.58:8080/profile/2020/12/31/5ca3fa0b-55d7-433c-ba02-61d4502e45e1.jpg',
             posterSubassemblyList: []
           }, this.posterForm))
+        }
+        if (res.code === 200) {
+          this.msgSuccess(res.msg)
+          this.$refs.page.getList(1)
+          this.beforeCloseDialog()
         }
         // let res = {};
         // var list =[];
@@ -379,7 +386,7 @@ export default {
     </el-row>
 
     <el-dialog title="海报预览" width="30%" :visible.sync="dialog.preview">
-      <el-image class="preview-img" :src="previewImg" fit="contain"></el-image>
+      <img class="preview-img" :src="previewImg" />
     </el-dialog>
     <el-dialog title="海报编辑" width="80%" :visible.sync="dialog.edit" :before-close="beforeCloseDialog">
       <div class="poster-edit-dialog">
