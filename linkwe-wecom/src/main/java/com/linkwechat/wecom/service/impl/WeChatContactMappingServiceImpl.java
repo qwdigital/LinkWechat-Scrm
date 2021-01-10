@@ -160,11 +160,9 @@ public class WeChatContactMappingServiceImpl extends ServiceImpl<WeChatContactMa
      * @param query
      */
     @Override
-    public List<ElasticSearchEntity> saveWeChatContactMapping(List<JSONObject> query) {
-        List<ElasticSearchEntity> resultList = new ArrayList<>();
+    public List<JSONObject> saveWeChatContactMapping(List<JSONObject> query) {
+        List<JSONObject> resultList = new ArrayList<>();
         query.stream().filter(chatData -> StringUtils.isNotEmpty(chatData.getString("from"))).forEach(chatData -> {
-            ElasticSearchEntity elasticSearchEntity = new ElasticSearchEntity();
-            elasticSearchEntity.setId(chatData.getString("msgid"));
             //发送人映射数据
             WeChatContactMapping fromWeChatContactMapping = new WeChatContactMapping();
             String fromId = chatData.getString("from");
@@ -194,8 +192,7 @@ public class WeChatContactMappingServiceImpl extends ServiceImpl<WeChatContactMa
             WeChatContactMapping reveiceWeChatContactMapping = from2ReveiceData(fromType, fromWeChatContactMapping);
             insertWeChatContactMapping(fromWeChatContactMapping);
             insertWeChatContactMapping(reveiceWeChatContactMapping);
-            elasticSearchEntity.setData(chatData);
-            resultList.add(elasticSearchEntity);
+            resultList.add(chatData);
         });
         return resultList;
     }

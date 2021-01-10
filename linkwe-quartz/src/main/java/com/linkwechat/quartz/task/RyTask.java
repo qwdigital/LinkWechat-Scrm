@@ -76,10 +76,10 @@ public class RyTask {
                 "", redisCache);
         if (CollectionUtil.isNotEmpty(chatDataList)){
             try {
+                List<JSONObject> elasticSearchEntities = weChatContactMappingService.saveWeChatContactMapping(chatDataList);
                 List<Consumer<List<JSONObject>>> consumerList = Lists.newArrayList();
-                consumerList.add(weChatContactMappingService::saveWeChatContactMapping);
                 consumerList.add(weSensitiveService::hitSensitive);
-                elasticSearch.insertBatchAsync(WeConstans.WECOM_FINANCE_INDEX, chatDataList, consumerList);
+                elasticSearch.insertBatchAsync(WeConstans.WECOM_FINANCE_INDEX, elasticSearchEntities, consumerList);
             } catch (Exception e) {
                 log.error("消息处理异常：ex:{}", e);
                 e.printStackTrace();

@@ -15,10 +15,10 @@ public interface WeChatSideMapper extends BaseMapper<WeChatSide> {
 
     /**
      * 查询侧边栏列表
-     *
+     * @param h5 0 pc 1 h5
      * @return {@link WeChatSide}s
      */
-    public List<WeChatSide> selectWeChatSides();
+    public List<WeChatSide> selectWeChatSides(@Param("h5") String h5);
 
 
     /**
