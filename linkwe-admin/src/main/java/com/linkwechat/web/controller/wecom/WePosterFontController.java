@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.wecom;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.enums.MediaType;
@@ -78,7 +79,8 @@ public class WePosterFontController extends BaseController {
     @Transactional(rollbackFor = RuntimeException.class)
     public AjaxResult deletePosterFont(@PathVariable Long id) {
         wePosterFontService.update(
-                wePosterFontService.lambdaUpdate().set(WePosterFont::getDelFlag, 1).eq(WePosterFont::getId, id));
+                Wrappers.lambdaUpdate(WePosterFont.class).set(WePosterFont::getDelFlag, 1).eq(WePosterFont::getId, id)
+        );
         return AjaxResult.success("删除成功");
     }
 

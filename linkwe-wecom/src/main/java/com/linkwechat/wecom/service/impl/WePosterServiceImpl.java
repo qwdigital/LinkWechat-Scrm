@@ -119,6 +119,9 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
      */
     @Override
     public String generateSimpleImg(WePoster poster) {
+        if(CollectionUtils.isEmpty(poster.getPosterSubassemblyList())){
+            return poster.getBackgroundImgPath();
+        }
         Map<Long, Font> fontMap = poster.getPosterSubassemblyList().stream().filter(wePosterSubassembly -> wePosterSubassembly.getType().equals(1))
                 .peek(wePosterSubassembly -> {
                     if(wePosterSubassembly.getFontId() == null){
