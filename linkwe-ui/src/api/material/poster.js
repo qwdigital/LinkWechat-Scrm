@@ -15,7 +15,7 @@ export function getList(params) {
  * @param {*} params
  */
 export function updatePoster(data) {
- return request({ url: service + '/update', method: 'put', data })
+ return request({ url: serviceCategory + '/update', method: 'put', data })
 }
 
 /**

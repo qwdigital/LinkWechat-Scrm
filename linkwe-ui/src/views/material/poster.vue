@@ -267,10 +267,16 @@ export default {
         console.log('save', posterForm.id)
         if (posterForm.id) {
           // 编辑海报
-          const res = await updatePoster(Object.assign({}, {}, this.posterForm))
+          const res = await updatePoster(Object.assign({}, {
+            backgroundImgPath: '',
+            posterSubassemblyList: []
+          }, this.posterForm))
         } else {
           // 新建海报
-          const res = await addPoster(Object.assign({}, {}, this.posterForm))
+          const res = await addPoster(Object.assign({}, {
+            backgroundImgPath: '',
+            posterSubassemblyList: []
+          }, this.posterForm))
         }
         // let res = {};
         // var list =[];
