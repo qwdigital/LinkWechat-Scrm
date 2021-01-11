@@ -1,8 +1,9 @@
 <script>
 import { getList, update, getMaterial } from '@/api/appTool/chatBar'
+import SelectMaterialMult from '@/components/SelectMaterialMult/list'
 
 export default {
-  components: {},
+  components: { SelectMaterialMult },
   props: {},
   data() {
     return {
@@ -17,6 +18,14 @@ export default {
         4: '文本',
         5: '海报',
       }),
+
+      metarialParams: {
+        sideId: '',
+        materialIds: [], // '素材id列表',
+        mediaType: '', //  '素材类型 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本 5 海报',
+        checkAll: '1', // '是否全选 0 全选 1 非全选',
+      },
+      selectedMaterial: [],
     }
   },
   watch: {},
@@ -37,21 +46,33 @@ export default {
           this.loading = false
         })
     },
-    getMaterial(data) {
+    openDialog(data) {
+      this.dialogVisible = true
+      this.metarialParams.sideId = data.sideId
+      this.metarialParams.mediaType = data.mediaType
+    },
+    // 抓取素材
+    getMaterial() {
       const loading = this.$loading({
         lock: true,
         text: 'Loading',
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)',
       })
-      // this.loading = true
-      getMaterial(data)
+      this.metarialParams.materialIds = this.selectedMaterial.map((d) => d.id)
+      if (metarialParams.checkAll == 0) {
+        this.metarialParams.materialIds = []
+      }
+      getMaterial(this.metarialParams)
         .then(({ rows, total }) => {
-          this.list = rows
-          this.loading = false
+          // this.list = rows
+          loading.close()
+          this.msgSuccess('操作成功')
+          this.dialogVisible = false
+          this.getList()
         })
         .catch(() => {
-          this.loading = false
+          loading.close()
         })
     },
     update(data) {
@@ -113,7 +134,7 @@ export default {
         </el-table-column>
         <el-table-column label="操作" align="center" prop="operId">
           <template slot-scope="scope">
-            <el-button type="text" @click="handleView(scope.row, scope.index)"
+            <el-button type="text" @click="openDialog(scope.row)"
               >抓取素材</el-button
             >
           </template>
@@ -121,8 +142,7 @@ export default {
       </el-table>
     </el-card>
 
-    <el-card class="mt20" shadow="never" header="红包工具栏">
-      <!-- <div slot="header"></div> -->
+    <!-- <el-card class="mt20" shadow="never" header="红包工具栏">
       <el-row :gutter="10">
         <el-col :span="10">
           <div>
@@ -168,52 +188,25 @@ export default {
           >
             <div class="el-image logo" style>
               <div class="el-image__error">加载失败</div>
-              <!---->
             </div>
-            <el-image class="logo" :src="url" :fit="fit"></el-image>
+            <el-image class="logo" :src="url" fit="fit"></el-image>
             <div class="company-name">脑白金</div>
           </div>
         </el-col>
       </el-row>
-    </el-card>
+    </el-card> -->
 
     <el-dialog
-      title="抓取文本类型素材库"
+      :title="`抓取${mediaType[metarialParams.mediaType]}类型素材库`"
       :visible.sync="dialogVisible"
-      :before-close="dialogBeforeClose"
     >
-      <el-row :gutter="10">
-        <el-col :span="6">
-          <el-tree :data="d" :props="d" @node-click="d"></el-tree>
-        </el-col>
-        <el-col :span="18">
-          <div class="fxbw">
-            素材库更新本分类素材后，自动同步到聊天工具栏
-            <div class="filter-right">
-              <i class="el-icon-arrow-left"></i> 1/1
-              <i class="el-icon-arrow-right"></i>
-            </div>
-          </div>
-          <el-table :data="data" style="width: 100%">
-            <el-table-column type="selection" width="55" align="center" />
-            <el-table-column
-              prop="prop"
-              label="文本内容"
-              width="width"
-            ></el-table-column>
-            <el-table-column
-              prop="prop"
-              label="时间"
-              width="width"
-            ></el-table-column>
-          </el-table>
-        </el-col>
-      </el-row>
+      <SelectMaterialMult
+        :selected.sync="selectedMaterial"
+        :type="metarialParams.mediaType"
+      ></SelectMaterialMult>
       <div slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false"
-          >确 定</el-button
-        >
+        <el-button type="primary" @click="getMaterial">确 定</el-button>
       </div>
     </el-dialog>
   </div>

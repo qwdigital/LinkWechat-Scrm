@@ -46,7 +46,7 @@ export function update(data) {
 export function getMaterial(data) {
   return request({
     url: service + '/item',
-    method: 'POST',
+    method: 'put',
     data,
   })
 }
