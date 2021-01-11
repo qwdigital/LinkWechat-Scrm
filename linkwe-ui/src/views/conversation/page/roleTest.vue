@@ -112,7 +112,6 @@
         background: #efefef;
         padding: 18px 10px 0 10px;
     }
-
     .content {
         margin-top: 15px;
         padding: 10px;
