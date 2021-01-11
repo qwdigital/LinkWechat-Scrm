@@ -606,5 +606,13 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         weCustomerClient.sendWelcomeMsg(weWelcomeMsg);
     }
 
+    @Override
+    public boolean updateCustomerChatStatus(String externalUserId) {
+        WeCustomer weCustomer = new WeCustomer();
+        weCustomer.setExternalUserid(externalUserId);
+        weCustomer.setIsOpenChat(1);
+        return weCustomerMapper.updateWeCustomer(weCustomer) == 1;
+    }
+
 
 }

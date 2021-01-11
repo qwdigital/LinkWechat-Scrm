@@ -17,6 +17,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="position"    column="position"    />
         <result property="userName"    column="user_name"    />
         <result property="userId"    column="user_id"    />
+        <result property="isOpenChat"    column="is_open_chat"    />
         <collection property="weFlowerCustomerRels" ofType="com.linkwechat.wecom.domain.WeFlowerCustomerRel">
             <result property="id"    column="wfcrId"    />
             <result property="userId"    column="user_id"    />
@@ -46,7 +47,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 
     <sql id="selectWeCustomerVo">
-        select external_userid, name, avatar, type, gender, unionid, birthday, corp_name, corp_full_name, position from we_customer
+        select external_userid, name, avatar, type, gender, unionid, birthday, corp_name, corp_full_name, position, is_open_chat from we_customer
     </sql>
 
     <select id="selectWeCustomerList" parameterType="WeCustomer" resultMap="WeCustomerResult">
@@ -61,6 +62,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wc.corp_name,
             wc.corp_full_name,
             wc.position,
+            wc.is_open_chat,
             wfcr.id as wfcrId,
             wfcr.user_id,
             wfcr.remark,
@@ -131,7 +133,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
              <if test="status !=null and status !=''">
                   AND wfcr.status=#{status}
              </if>
-
+            <if test="isOpenChat !=null">
+                AND wc.is_open_chat=#{isOpenChat}
+            </if>
         </where>
         ORDER BY wfcr.create_time DESC
     </select>
@@ -179,6 +183,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="corpName != null">corp_name,</if>
             <if test="corpFullName != null">corp_full_name,</if>
             <if test="position != null">position,</if>
+            <if test="isOpenChat != null">is_open_chat</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="externalUserid != null">#{externalUserid},</if>
@@ -191,6 +196,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="corpName != null">#{corpName},</if>
             <if test="corpFullName != null">#{corpFullName},</if>
             <if test="position != null">#{position},</if>
+            <if test="isOpenChat != null">#{isOpenChat}</if>
          </trim>
     </insert>
 
@@ -207,6 +213,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="corpName != null">corp_name = #{corpName},</if>
             <if test="corpFullName != null">corp_full_name = #{corpFullName},</if>
             <if test="position != null">position = #{position},</if>
+            <if test="isOpenChat != null">is_open_chat = #{isOpenChat}</if>
         </trim>
         where external_userid = #{externalUserid}
     </update>
@@ -235,6 +242,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                   wc.corp_name,
                   wc.corp_full_name,
                   wc.position,
+                  wc.is_open_chat,
                   wfcr.id as wfcrId,
                   wfcr.user_id,
                   wfcr.remark,

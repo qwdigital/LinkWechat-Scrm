@@ -100,6 +100,8 @@ public class WeEventChangeExternalContactImpl implements WeCallBackEventFactory 
         receiveMapping.setReceiveId(userId);
         receiveMapping.setIsCustom(WeConstans.ID_TYPE_USER);
         weChatContactMappingService.insertWeChatContactMapping(receiveMapping);
+
+        weCustomerService.updateCustomerChatStatus(externalUserId);
     }
 
     private void weChatChangeEvent(WxCpXmlMessageVO message) {
