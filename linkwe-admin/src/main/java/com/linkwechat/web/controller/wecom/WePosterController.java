@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.wecom;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.enums.MediaType;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -54,12 +56,14 @@ public class WePosterController extends BaseController {
             return AjaxResult.error("请选择海报分类");
         }*/
         wePosterService.saveOrUpdate(poster);
-        poster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {
-            wePosterSubassembly.setDelFlag(0);
-            wePosterSubassembly.setId(SnowFlakeUtil.nextId());
-            wePosterSubassembly.setPosterId(poster.getId());
-        });
-        wePosterSubassemblyService.saveBatch(poster.getPosterSubassemblyList());
+        if(!CollectionUtils.isEmpty(poster.getPosterSubassemblyList())) {
+            poster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {
+                wePosterSubassembly.setDelFlag(0);
+                wePosterSubassembly.setId(SnowFlakeUtil.nextId());
+                wePosterSubassembly.setPosterId(poster.getId());
+            });
+            wePosterSubassemblyService.saveBatch(poster.getPosterSubassemblyList());
+        }
         return AjaxResult.success("创建成功");
     }
 
@@ -77,24 +81,26 @@ public class WePosterController extends BaseController {
         wePosterService.saveOrUpdate(poster);
         List<WePosterSubassembly> posterSubassemblyList = wePosterSubassemblyService.lambdaQuery().eq(WePosterSubassembly::getPosterId, poster.getId()).eq(WePosterSubassembly::getDelFlag, 1).list();
         Map<Long, WePosterSubassembly> posterSubassemblyMap = posterSubassemblyList.stream().collect(Collectors.toMap(WePosterSubassembly::getId, p -> p));
-        List<WePosterSubassembly> insertList = new ArrayList<>();
-        List<WePosterSubassembly> updateList = new ArrayList<>();
-        poster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {
-            if (wePosterSubassembly.getId() == null) {
-                wePosterSubassembly.setId(SnowFlakeUtil.nextId());
-                wePosterSubassembly.setPosterId(poster.getId());
-                wePosterSubassembly.setDelFlag(0);
-                insertList.add(wePosterSubassembly);
-            } else {
-                posterSubassemblyMap.remove(wePosterSubassembly.getId());
-                updateList.add(wePosterSubassembly);
+        if(!CollectionUtils.isEmpty(poster.getPosterSubassemblyList())) {
+            List<WePosterSubassembly> insertList = new ArrayList<>();
+            List<WePosterSubassembly> updateList = new ArrayList<>();
+            poster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {
+                if (wePosterSubassembly.getId() == null) {
+                    wePosterSubassembly.setId(SnowFlakeUtil.nextId());
+                    wePosterSubassembly.setPosterId(poster.getId());
+                    wePosterSubassembly.setDelFlag(0);
+                    insertList.add(wePosterSubassembly);
+                } else {
+                    posterSubassemblyMap.remove(wePosterSubassembly.getId());
+                    updateList.add(wePosterSubassembly);
+                }
+            });
+            if (!CollectionUtils.isEmpty(insertList)) {
+                wePosterSubassemblyService.saveBatch(insertList);
             }
-        });
-        if (!CollectionUtils.isEmpty(insertList)) {
-            wePosterSubassemblyService.saveBatch(insertList);
-        }
-        if (!CollectionUtils.isEmpty(updateList)) {
-            wePosterSubassemblyService.updateBatchById(updateList);
+            if (!CollectionUtils.isEmpty(updateList)) {
+                wePosterSubassemblyService.updateBatchById(updateList);
+            }
         }
         List<WePosterSubassembly> deleteList = new ArrayList<>(posterSubassemblyMap.values());
         if (!CollectionUtils.isEmpty(deleteList)) {
@@ -143,9 +149,10 @@ public class WePosterController extends BaseController {
     @Transactional(rollbackFor = RuntimeException.class)
     public AjaxResult deletePosterFont(@PathVariable Long id) {
         wePosterService.update(
-                wePosterService.lambdaUpdate().set(WePoster::getDelFlag, 1).eq(WePoster::getId, id));
+                Wrappers.lambdaUpdate(WePoster.class).set(WePoster::getDelFlag, 1).eq(WePoster::getId, id));
         wePosterSubassemblyService.update(
-                wePosterSubassemblyService.lambdaUpdate().set(WePosterSubassembly::getDelFlag, 1).eq(WePosterSubassembly::getPosterId, id));
+                Wrappers.lambdaUpdate(WePosterSubassembly.class).set(WePosterSubassembly::getDelFlag, 1).eq(WePosterSubassembly::getPosterId, id)
+        );
         return AjaxResult.success("删除成功");
     }
 

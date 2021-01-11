@@ -55,6 +55,7 @@ public class WeMaterialController extends BaseController {
                 WeMaterial weMaterial = new WeMaterial();
                 weMaterial.setMaterialName(wePoster.getTitle());
                 weMaterial.setMaterialUrl(wePoster.getSampleImgPath());
+                weMaterial.setCategoryId(wePoster.getCategoryId());
                 weMaterial.setId(wePoster.getId());
                 return weMaterial;
             }).collect(Collectors.toList());
