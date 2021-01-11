@@ -16,9 +16,11 @@ import PosterPage from "./components/PosterPage.vue";
 import bgpng from "@/assets/poster/img/bg.png";
 
 var locale_ru_RU = {
-  "Text": "文本",
-  "Mask": "遮罩",
-  "Delete-all": "全部清空"
+  "DeleteAll": "全部清空",
+  "Delete": "删除元素",
+  "Undo": "后退",
+  "Redo": "前进",
+  "Reset": "重置"
 };
 
 export default {
@@ -75,10 +77,10 @@ export default {
         includeUI: {
           // initMenu: "text",
           locale: locale_ru_RU,
-          loadImage: {
-            path: bgPath,
-            name: "posterImage"
-          },
+          // loadImage: {
+          //   path: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F171%2F106%2F1472%2F95744001.jpg&refer=http%3A%2F%2Fimg1.gtimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1612444990&t=6589254fe9669cc6a45fd3688f269612',
+          //   name: "posterImage"
+          // },
           usageStatistics: false,
           menuBarPosition: "right",
           menu: [],
@@ -98,45 +100,6 @@ export default {
             // main icons
             "menu.iconSize.width": "34px",
             "menu.iconSize.height": "34px",
-
-            // submenu primary color
-            "submenu.backgroundColor": "#ffffffE5",
-            "submenu.partition.color": "#858585",
-
-            // submenu icons
-            "submenu.iconSize.width": "32px",
-            "submenu.iconSize.height": "32px",
-
-            // submenu labels
-            "submenu.normalLabel.color": "#858585",
-            "submenu.normalLabel.fontWeight": "normal",
-            "submenu.activeLabel.color": "#000",
-            "submenu.activeLabel.fontWeight": "normal",
-
-            // checkbox style
-            "checkbox.border": "1px solid #ccc",
-            "checkbox.backgroundColor": "#fff",
-
-            // rango style
-            "range.pointer.color": "#333",
-            "range.bar.color": "#ccc",
-            "range.subbar.color": "#606060",
-
-            "range.disabledPointer.color": "#d3d3d3",
-            "range.disabledBar.color": "rgba(85,85,85,0.06)",
-            "range.disabledSubbar.color": "rgba(51,51,51,0.2)",
-
-            "range.value.color": "#000",
-            "range.value.fontWeight": "normal",
-            "range.value.fontSize": "11px",
-            "range.value.border": "0",
-            "range.value.backgroundColor": "#f5f5f5",
-            "range.title.color": "#000",
-            "range.title.fontWeight": "lighter",
-
-            // colorpicker style
-            "colorpicker.button.border": "0px",
-            "colorpicker.title.color": "#000"
           }
         },
         // cssMaxWidth: 640,
@@ -180,32 +143,36 @@ export default {
     ready () {
       console.log('ready')
     },
-    onAddText(res) {
-      console.log("RES : ", res)
-    },
-    //移动
-    onObjectMoved(res) {
-      console.log('onObjectMoved')
-      this.getRecord(res)
-    },
-    //新增/选中
-    objectActivated(res) {
-      console.log('objectActivated')
-      this.getRecord(res)
-    },
-    //缩放
-    onObjectScaled(res) {
-      console.log('onObjectScaled')
-      this.getRecord(res)
-    },
-    //重做
-    onRedoStackChanged(res) {
-      console.log("RES : ", res);
-    },
-    onUndoStackChanged(res) {
-      if(res == 0){
-        this.records = []
+    checkState (obj) {
+      switch (obj.type) {
+        case 'text':
+          this.showSubMenu('text');
+          this.activateTextMode();
+        break;
+        default:
+          this.activateImageMode();
+        break;
       }
+    },
+    showSubMenu (type) {
+      switch (type) {
+        case 'text':
+          document.getElementsByClassName('tui-image-editor-submenu')[0].display = 'block';
+          break;
+        default:
+          document.getElementsByClassName('tui-image-editor-submenu')[0].display = 'none';
+      }
+    },
+    activateTextMode () {
+      let imageEditor = this.$refs.tuiImageEditor.editorInstance;
+      if (imageEditor.getDrawingMode() !== 'TEXT') {
+        imageEditor.stopDrawingMode();
+        imageEditor.startDrawingMode('TEXT');
+      }
+    },
+    activateImageMode () {
+      let imageEditor = this.$refs.tuiImageEditor.editorInstance;
+      imageEditor.stopDrawingMode();
     },
     toNextStep () {
       this.$refs.form.validate((valid) => {
@@ -236,30 +203,8 @@ export default {
           this.msgSuccess('删除成功')
         })
     },
-    getRecord(res){
-    var flag = false;
-      for (let index = 0; index < this.records.length; index++) {
-        const element ={
-          fill: this.records[index].fill,
-          height: this.records[index].height,
-          id: this.records[index].id,
-          left: this.records[index].left,
-          opacity: this.records[index].opacity,
-          stroke: this.records[index].stroke,
-          strokeWidth: this.records[index].strokeWidth,
-          top: this.records[index].top,
-          type: this.records[index].type,
-          width: this.records[index].width,
-        };
-        if(element.id == res.id){
-          // console.log(element)
-          this.records[index] = res;
-          flag = true;
-        }
-      }
-      if(!flag){
-        this.records.push(res)
-      }
+    inputFontSizeRangeChange () {
+      this.$refs.tuiImageEditor.inputFontSizeRangeChange();
     },
     //
     async save() {
@@ -386,7 +331,7 @@ export default {
     </el-row>
 
     <el-dialog title="海报预览" width="30%" :visible.sync="dialog.preview">
-      <img class="preview-img" :src="previewImg" />
+       <img class="preview-img" :src="previewImg" />
     </el-dialog>
     <el-dialog title="海报编辑" width="80%" :visible.sync="dialog.edit" :before-close="beforeCloseDialog">
       <div class="poster-edit-dialog">
@@ -473,13 +418,40 @@ export default {
               ref="tuiImageEditor"
               :include-ui="useDefaultUI"
               :options="options"
-              @addText="onAddText"
-              @objectMoved="onObjectMoved"
-              @objectScaled="onObjectScaled"
-              @redoStackChanged="onRedoStackChanged"
-              @undoStackChanged="onUndoStackChanged"
-              @objectActivated="objectActivated"
             ></tui-image-editor>
+          </div>
+          <div id="tbody-containerui-image-editor-controls">
+            <ul class="menu">
+              <li class="menu-item" id="btn-text">添加自定义文本</li>
+              <li class="menu-item" id="btn-image">添加图片</li>
+              <li class="menu-item" id="btn-qrCode">添加二维码</li>
+              <li class="menu-item" id="btn-nickName">添加客户昵称</li>
+            </ul>
+            <div class="sub-menu-container" id="text-sub-menu">
+              <ul class="menu">
+                <li class="menu-item">
+                  <div>
+                    <button class="btn-text-style" data-style-type="b">Bold</button>
+                    <button class="btn-text-style" data-style-type="i">Italic</button>
+                    <button class="btn-text-style" data-style-type="u">Underline</button>
+                  </div>
+                  <div>
+                    <button class="btn-text-style" data-style-type="l">Left</button>
+                    <button class="btn-text-style" data-style-type="c">Center</button>
+                    <button class="btn-text-style" data-style-type="r">Right</button>
+                  </div>
+                </li>
+                <li class="menu-item">
+                  <label class="no-pointer">
+                    <input id="input-font-size-range" @change="inputFontSizeRangeChange" type="range" min="10" max="100" value="10" />
+                  </label>
+                </li>
+                <li class="menu-item">
+                  <div id="tui-text-color-picker">Text color</div>
+                </li>
+                <li class="menu-item close">Close</li>
+              </ul>
+            </div>
           </div>
           <el-button type="success" @click="save"
             >保存</el-button>
@@ -531,8 +503,16 @@ export default {
   width: 100%;
 }
 .imageEditorApp {
-  // width: 1000px;
-  height: 800px;
+  width: 50%;
+  height: 700px;
+  // float: left;
+  position: relative;
+}
+#tbody-containerui-image-editor-controls {
+  float: right;
+  width: 50%;
+  position: relative;
+  margin-top: -700px;
 }
 .tui-image-editor-header-logo {
   display: none !important;
@@ -540,5 +520,119 @@ export default {
 }
 .tui-image-editor-download-btn {
   display: none !important;
+}
+
+.border {
+  border: 1px solid black;
+}
+.body-container {
+  width: 1000px;
+}
+.tui-image-editor-controls {
+  min-height: 250px;
+}
+.menu {
+  padding: 0;
+  margin-bottom: 5px;
+  text-align: center;
+  color: #544b61;
+  font-weight: 400;
+  list-style-type: none;
+  user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+}
+.menu-item {
+  padding: 10px;
+  display: inline-block;
+  cursor: pointer;
+  vertical-align: middle;
+}
+.menu-item a {
+  text-decoration: none;
+}
+.menu-item.no-pointer {
+  cursor: default;
+}
+.menu-item.active,
+.menu-item:hover {
+  background-color: #f3f3f3;
+}
+.menu-item.disabled {
+  cursor: default;
+  color: #bfbebe;
+}
+.align-left-top {
+  text-align: left;
+  vertical-align: top;
+}
+.range-narrow {
+  width: 80px;
+}
+.sub-menu-container {
+  font-size: 14px;
+  margin-bottom: 1em;
+  display: none;
+}
+/* .tui-image-editor {
+  height: 500px;
+}
+.tui-image-editor-canvas-container {
+  margin: 0 auto;
+  top: 50%;
+  transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+  border: 1px dashed black;
+  overflow: hidden;
+}
+.tui-colorpicker-container {
+  margin: 5px auto 0;
+}
+.tui-colorpicker-palette-toggle-slider {
+  display: none;
+} */
+.input-wrapper {
+  position: relative;
+}
+.input-wrapper input {
+  cursor: pointer;
+  position: absolute;
+  font-size: 999px;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.btn-text-style {
+  padding: 5px;
+  margin: 3px 1px;
+  border: 1px dashed #bfbebe;
+  outline: 0;
+  background-color: #eee;
+  cursor: pointer;
+}
+.icon-text {
+  font-size: 20px;
+}
+.select-line-type {
+  outline: 0;
+  vertical-align: middle;
+}
+#tui-color-picker {
+  display: inline-block;
+  vertical-align: middle;
+}
+#tui-text-palette {
+  display: none;
+  position: absolute;
+  padding: 10px;
+  border: 1px solid #bfbebe;
+  background-color: #fff;
+  z-index: 9999;
 }
 </style>
