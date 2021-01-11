@@ -129,7 +129,7 @@ public class WePosterSubassembly extends BaseEntity {
     private Integer rotate;
 
     @TableField
-    @ApiModelProperty("字体类型 0 通常 1 粗体 2 斜体")
+    @ApiModelProperty("字体类型 0 通常 1 粗体 2 斜体 3 粗体+斜体")
     private Integer fontStyle = 0;
 
     @TableField(value = "`order`")
