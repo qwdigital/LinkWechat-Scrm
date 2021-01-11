@@ -19,8 +19,7 @@ var locale_ru_RU = {
   "DeleteAll": "全部清空",
   "Delete": "删除元素",
   "Undo": "后退",
-  "Redo": "前进",
-  "Reset": "重置"
+  "Redo": "前进"
 };
 
 export default {
@@ -30,7 +29,7 @@ export default {
     "tui-image-editor": PosterPage
   },
   data () {
-    const bgPath = "'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F171%2F106%2F1472%2F95744001.jpg&refer=http%3A%2F%2Fimg1.gtimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1612444990&t=6589254fe9669cc6a45fd3688f269612'"
+    const bgPath = ""
 
     return {
       dialog: {
@@ -72,7 +71,7 @@ export default {
       srcList: [],
       ids: [], // 选中数组
       previewImg: '', // 预览图片地址
-      useDefaultUI: false,
+      useDefaultUI: true,
       options: {
         includeUI: {
           // initMenu: "text",
@@ -83,7 +82,7 @@ export default {
           // },
           usageStatistics: false,
           menuBarPosition: "right",
-          menu: [],  // FIXME 因为借用了CANVAS的UI  所以需要使用TEXT，需要额外注释,后面创建自己的UI在去掉
+          menu: ['text'],  // FIXME 因为借用了CANVAS的UI  所以需要使用TEXT，需要额外注释,后面创建自己的UI在去掉
           theme: {
             "common.bi.image": "",
             "common.bisize.width": "251px",
@@ -93,14 +92,53 @@ export default {
             "common.border": "1px solid #c1c1c1",
 
             // header
-            "header.backgroundImage": "none",
-            "header.backgroundColor": "transparent",
-            "header.border": "0px",
+            'header.backgroundImage': 'none',
+            'header.backgroundColor': 'transparent',
+            'header.border': '0px',
+
+            // load button
+            'loadButton.backgroundColor': '#fff',
+            'loadButton.border': '1px solid #ddd',
+            'loadButton.color': '#222',
+            'loadButton.fontFamily': "'Noto Sans', sans-serif",
+            'loadButton.fontSize': '12px',
+
+            // download button
+            'downloadButton.backgroundColor': '#fdba3b',
+            'downloadButton.border': '1px solid #fdba3b',
+            'downloadButton.color': '#fff',
+            'downloadButton.fontFamily': "'Noto Sans', sans-serif",
+            'downloadButton.fontSize': '12px',
 
             // main icons
-            "menu.iconSize.width": "34px",
-            "menu.iconSize.height": "34px",
+            'menu.normalIcon.color': '#8a8a8a',
+            'menu.activeIcon.color': '#555555',
+            'menu.disabledIcon.color': '#434343',
+            'menu.hoverIcon.color': '#e9e9e9',
+            'menu.iconSize.width': '24px',
+            'menu.iconSize.height': '24px',
+
+            // colorpicker style
+            'colorpicker.button.border': '1px solid #1e1e1e',
+            'colorpicker.title.color': '#fff',
           }
+          // {
+          //   "common.bi.image": "",
+          //   "common.bisize.width": "251px",
+          //   "common.bisize.height": "21px",
+          //   "common.backgroundImage": bgpng,
+          //   "common.backgroundColor": "#fff",
+          //   "common.border": "1px solid #c1c1c1",
+
+          //   // header
+          //   "header.backgroundImage": "none",
+          //   "header.backgroundColor": "transparent",
+          //   "header.border": "0px",
+
+          //   // main icons
+          //   "menu.iconSize.width": "34px",
+          //   "menu.iconSize.height": "34px",
+          // }
         }
       }
     }
@@ -207,61 +245,48 @@ export default {
     //
     async save() {
       try {
-        const posterForm = this.posterForm
-        console.log('save', posterForm.id)
-        let res = {}
-        if (posterForm.id) {
-          // 编辑海报
-          res = await updatePoster(Object.assign({}, {
-            backgroundImgPath: 'http://106.13.236.58:8080/profile/2020/12/31/5ca3fa0b-55d7-433c-ba02-61d4502e45e1.jpg',
-            posterSubassemblyList: []
-          }, this.posterForm))
-        } else {
-          // 新建海报
-          res = await addPoster(Object.assign({}, {
-            backgroundImgPath: 'http://106.13.236.58:8080/profile/2020/12/31/5ca3fa0b-55d7-433c-ba02-61d4502e45e1.jpg',
-            posterSubassemblyList: []
-          }, this.posterForm))
-        }
-        if (res.code === 200) {
-          this.msgSuccess(res.msg)
-          this.$refs.page.getList(1)
-          this.beforeCloseDialog()
-        }
-        // let res = {};
-        // var list =[];
-        // this.$refs.tuiImageEditor.editorInstance._invoker._undoStack.forEach(element => {
-        //   this.records.forEach(item => {
-        //     if(element.name =='addIcon' && element.undoData.object.__fe_id && item.id == element.undoData.object.__fe_id){
-        //       item.type = element.args[1]
-        //     }
-        //   });
-        // });
-        // var deleteId = [];
-        // this.$refs.tuiImageEditor.editorInstance._invoker._undoStack.forEach(element => {
-        //   if(element.name == "removeObject"){
-        //       deleteId.push(element.args[1])
-        //   }
-        // })
-        // this.records.forEach(item => {
-        //   if(deleteId.indexOf((item.id).toString())>=0){
-        //       console.log(" ")
-        //   }else{
-        //     list.push(item)
-        //   }
-        // });
-        // //全清除
-        // this.$refs.tuiImageEditor.editorInstance._invoker._undoStack.forEach(element => {
-        //   if(element.name == "loadImage" || element.name ==  "clearObjects"){
-        //     list = []
-        //   }
-        // })
+        // const posterForm = this.posterForm
+        // console.log('save', posterForm.id)
+        // let res = {}
+        // if (posterForm.id) {
+        //   // 编辑海报
+        //   res = await updatePoster(Object.assign({}, {
+        //     backgroundImgPath: 'http://106.13.236.58:8080/profile/2020/12/31/5ca3fa0b-55d7-433c-ba02-61d4502e45e1.jpg',
+        //     posterSubassemblyList: []
+        //   }, this.posterForm))
+        // } else {
+        //   // 新建海报
+        //   res = await addPoster(Object.assign({}, {
+        //     backgroundImgPath: 'http://106.13.236.58:8080/profile/2020/12/31/5ca3fa0b-55d7-433c-ba02-61d4502e45e1.jpg',
+        //     posterSubassemblyList: []
+        //   }, this.posterForm))
+        // }
+        // if (res.code === 200) {
+        //   this.msgSuccess(res.msg)
+        //   this.$refs.page.getList(1)
+        //   this.beforeCloseDialog()
+        // }
+
+        let imageEditor = this.$refs.tuiImageEditor;
+        let res = {};
+        let list =[];
+        let deleteId = [];
+        imageEditor.editorInstance._invoker._undoStack.forEach(element => {
+          if(element.name == "removeObject"){
+              deleteId.push(element.args[1])
+          }
+        })
+        Object.values(imageEditor.records).forEach(item => {
+          if(deleteId.indexOf((item.id).toString())>=0){
+              console.log(" ")
+          }else{
+            list.push(item)
+          }
+        });
+      
         // const image = this.$refs.tuiImageEditor.editorInstance.toDataURL();
         // res.url = image;
-        // res.records = list;
-        // console.log("最后结果：")
-        // console.log(res)
-        // window.localStorage.setItem('record',JSON.stringify(list))
+        res.records = list;
       } catch (error) {
         console.log(error)
       }
@@ -423,7 +448,7 @@ export default {
               <li class="menu-item" id="btn-text">添加自定义文本</li>
               <li class="menu-item" id="btn-image">添加图片</li>
               <li class="menu-item" id="btn-qrCode">添加二维码</li>
-              <li class="menu-item" id="btn-nickName">添加客户昵称</li>
+              <!-- <li class="menu-item" id="btn-nickName">添加客户昵称</li> -->
             </ul>
             <div class="sub-menu-container" id="text-sub-menu">
               <ul class="menu">

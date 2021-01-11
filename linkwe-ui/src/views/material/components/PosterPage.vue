@@ -5,6 +5,7 @@
 import ImageEditor from 'tui-image-editor';
 import { setTimeout } from 'timers';
 import colorPicker from 'tui-color-picker';
+import qrCodeImage from "@/assets/poster/img/qrCodeImage.png";
 
 const includeUIOptions = {
     includeUI: {
@@ -18,7 +19,6 @@ const editorDefaultOptions = {
 export default {
     name: 'PosterPage',
     props: {
-        btnContainer: null, // �Դ���ť����
         includeUi: {
             type: Boolean,
             default: true
@@ -36,7 +36,7 @@ export default {
             options = Object.assign(includeUIOptions, this.options);
         }
         this.editorInstance = new ImageEditor(this.$refs.tuiImageEditor, options);
-        // document.getElementsByClassName('tui-image-editor-header')[0].innerHTML = '';
+        document.getElementsByClassName('tui-image-editor-header')[0].innerHTML = '';
        
         if(window.localStorage.getItem('record')){
             let list = JSON.parse(window.localStorage.getItem('record'));
@@ -55,6 +55,13 @@ export default {
             // await this.addText('aloha');
         });
 
+        // hack UI
+        this.editorInstance.events.addText = []
+        this.editorInstance._handlers.addText = null;
+        this.editorInstance.ui._actions.text.modeChange = function () {}
+        document.getElementsByClassName('tui-image-editor-submenu')[0].style.display = 'none';
+        document.getElementsByClassName('tie-btn-text')[0].style.display = 'none';
+
         this.initBtn();
         this.addEventListener();
     },
@@ -71,22 +78,24 @@ export default {
             this.activeObjectId = null;
 
             // btns leftBtn
-            // this.btn_deleteAll = document.getElementsByClassName('tie-btn-deleteAll')[0];
-            // this.btn_deleteAll.name = 'deleteAll';
-            // this.btn_delete = document.getElementsByClassName('tie-btn-delete')[0];
-            // this.btn_delete.name = 'delete';
-            // this.btn_reset = document.getElementsByClassName('tie-btn-reset')[0];
-            // this.btn_reset.style.display = 'none'
-            // this.btn_redo = document.getElementsByClassName('tie-btn-redo')[0];
-            // this.btn_redo.name = 'redo';
-            // this.btn_undo = document.getElementsByClassName('tie-btn-undo')[0];
-            // this.btn_undo.name = 'undo';
+            this.btn_deleteAll = document.getElementsByClassName('tie-btn-deleteAll')[0];
+            this.btn_deleteAll.name = 'deleteAll';
+            this.btn_delete = document.getElementsByClassName('tie-btn-delete')[0];
+            this.btn_delete.name = 'delete';
+            this.btn_reset = document.getElementsByClassName('tie-btn-reset')[0];
+            this.btn_reset.style.display = 'none'
+            this.btn_redo = document.getElementsByClassName('tie-btn-redo')[0];
+            this.btn_redo.name = 'redo';
+            this.btn_undo = document.getElementsByClassName('tie-btn-undo')[0];
+            this.btn_undo.name = 'undo';
 
             // btns rightBtn
             this.btnText = document.getElementById('btn-text');
             this.btnText.name = 'btnText';
             this.btnImage = document.getElementById('btn-image');
             this.btnImage.name = 'btnImage';
+            this.btnQrCode = document.getElementById('btn-qrCode');
+            this.btnQrCode.name = 'btnQrCode';
 
             // Sub menus
             this.displayingSubMenu = null;
@@ -99,8 +108,6 @@ export default {
 
             // input etc
             this.inputFontSizeRange = document.getElementById('input-font-size-range');
-            // this.inputBrushWidthRange = document.getElementById('input-brush-width-range');
-            // this.inputBrushWidthRange.name = 'inputBrushWidthRange';
             this.inputStrokeWidthRange = document.getElementById('input-stroke-width-range');
             this.inputCheckTransparent = document.getElementById('input-check-transparent');
             this.inputCheckGrayscale = document.getElementById('input-check-grayscale');
@@ -125,22 +132,22 @@ export default {
             }.bind(this));
         },
         addEventListener() {
-            // this.btn_deleteAll.addEventListener('click', this.mouseClickHandler.bind(this))
-            // this.btn_delete.addEventListener('click', this.mouseClickHandler.bind(this))
-            // this.btn_redo.addEventListener('click', this.mouseClickHandler.bind(this))
-            // this.btn_undo.addEventListener('click', this.mouseClickHandler.bind(this))
+            this.btn_deleteAll.addEventListener('click', this.mouseClickHandler.bind(this));
+            this.btn_delete.addEventListener('click', this.mouseClickHandler.bind(this));
+            this.btn_redo.addEventListener('click', this.mouseClickHandler.bind(this));
+            this.btn_undo.addEventListener('click', this.mouseClickHandler.bind(this));
 
-            this.btnText.addEventListener('click', this.mouseClickHandler.bind(this))
-            this.btnImage.addEventListener('click', this.mouseClickHandler.bind(this))
+            this.btnText.addEventListener('click', this.mouseClickHandler.bind(this));
+            this.btnImage.addEventListener('click', this.mouseClickHandler.bind(this));
+            this.btnQrCode.addEventListener('click', this.mouseClickHandler.bind(this));
 
             // text
-            this.btnClose.addEventListener('click', this.mouseClickHandler.bind(this))
-            // this.inputBrushWidthRange.addEventListener('onchange', this.mouseClickHandler.bind(this))
+            this.btnClose.addEventListener('click', this.mouseClickHandler.bind(this));
             let i = 0,len = this.btnTextStyle.length;
             while (i < len) {
-                this.btnTextStyle[i].name = 'textStyle'
-                this.btnTextStyle[i].addEventListener('click', this.mouseClickHandler.bind(this))
-                i++
+                this.btnTextStyle[i].name = 'textStyle';
+                this.btnTextStyle[i].addEventListener('click', this.mouseClickHandler.bind(this));
+                i++;
             }
             
             this.editorInstance.on({
@@ -157,27 +164,28 @@ export default {
         },
         onAddText(pos) {
             this.editorInstance
-            .addText('双击输入文字', {
+            .addText('请输入文字', {
                 position: pos.originPosition,
             })
             .then(function (objectProps) {
                 console.log(objectProps);
-            });
+                this.records(objectProps)
+            }.bind(this));
         },
         //移动
         onObjectMoved(obj) {
-            console.log('onObjectMoved')
-            this.getRecord(obj)
+            console.log('onObjectMoved');
+            this.getRecord(obj);
         },
         //新增/选中
         objectActivated(obj) {
-            console.log('objectActivated')
-            var imageEditor = this.$refs.tuiImageEditor;
-            imageEditor.activeObjectId = obj.id;
-            if (obj.type === 'text') {
-                imageEditor.showSubMenu('text');
-                imageEditor.setTextToolbar(obj);
-                imageEditor.activateTextMode();
+            console.log('objectActivated');
+            this.activeObjectId = obj.id;
+            this.getRecord(obj);
+            if (obj.type === 'text' || obj.type === 'i-text') {
+                this.showSubMenu('text');
+                this.setTextToolbar(obj);
+                this.activateTextMode();
             } else {
                 // 目前就一个TEXT SUB
                 this.displayingSubMenu && (this.displayingSubMenu.style.display = 'none');
@@ -186,25 +194,26 @@ export default {
         //缩放
         onObjectScaled(obj) {
             console.log('onObjectScaled')
-            if (obj.type === 'text') {
+            this.getRecord(obj);
+            if (obj.type === 'text' || obj.type === 'i-text') {
                 this.inputFontSizeRange.setAttribute('value',obj.fontSize);        
             }
         },
         onRedoStackChanged(length) {
-            // if (length) {
-            //     this.btn_redo.classList.remove('disabled');
-            // } else {
-            //     this.btn_redo.classList.add('disabled');
-            // }
-            // this.resizeEditor();
+            if (length) {
+                this.btn_redo.classList.remove('disabled');
+            } else {
+                this.btn_redo.classList.add('disabled');
+            }
+            this.resizeEditor();
         },
         onUndoStackChanged(length) {
-            // if (length) {
-            //     this.btn_undo.classList.remove('disabled')
-            // } else {
-            //     this.btn_undo.classList.add('disabled')
-            // }
-            // this.resizeEditor();
+            if (length) {
+                this.btn_undo.classList.remove('disabled')
+            } else {
+                this.btn_undo.classList.add('disabled')
+            }
+            this.resizeEditor();
         },
         mouseClickHandler (event) {
             let name = event.currentTarget.name;
@@ -235,10 +244,15 @@ export default {
                 case 'btnClose':
                     this.closeHandler();            
                 break;
-                // case 'inputBrushWidthRange':
-                //     this.editorInstance.setBrush({ width: parseInt(this.value, 10) });
-                // break;
+                case 'btnQrCode':
+                    this.qrCodeHandler();
+                break;  
             }
+        },
+        qrCodeHandler () {
+            // let codeUrl = 'https://images.gitee.com/uploads/images/2020/1231/234016_20fdd151_1480777.png';
+            this.activateImageMode();
+            this.addImage(qrCodeImage);
         },
         clearObjects () {
             this.displayingSubMenu && (this.displayingSubMenu.style.display = 'none');
@@ -319,7 +333,7 @@ export default {
         inputFontSizeRangeChange () {
             let value = this.inputFontSizeRange.getAttribute('value');
             this.activeObjectId && this.editorInstance.changeTextStyle(this.activeObjectId, {
-                fontSize: parseInt(value, 10),
+                fontSize: parseInt(value, 10)
             });
         },
         activateTextMode() {
@@ -433,32 +447,27 @@ export default {
             editor.style.height = window.getComputedStyle(container).maxHeight;
         },
         getRecord(obj){
-            var flag = false;
-            if (this.records && this.records.length) {
-                for (let index = 0; index < this.records.length; index++) {
-                const element ={
-                    fill: this.records[index].fill,
-                    height: this.records[index].height,
-                    id: this.records[index].id,
-                    left: this.records[index].left,
-                    opacity: this.records[index].opacity,
-                    stroke: this.records[index].stroke,
-                    strokeWidth: this.records[index].strokeWidth,
-                    top: this.records[index].top,
-                    type: this.records[index].type,
-                    width: this.records[index].width,
-                };
-                if(element.id == obj.id){
-                    this.records[index] = obj;
-                    flag = true;
-                }
-                }
-            } else {
-                this.records = [];
-            }
-            if(!flag){
-                this.records.push(obj)
-            }
+            // {
+            //     "id":1,
+            //     "type":"i-text",
+            //     "left":172.90222908850143,
+            //     "top":39.920166015625,
+            //     "width":200,
+            //     "height":45.199999999999996,
+            //     "fill":"#000000",
+            //     "stroke":null,
+            //     "strokeWidth":1,
+            //     "opacity":1,
+            //     "angle":0,
+            //     "text":"请输入文字",
+            //     "fontFamily":"Times New Roman",
+            //     "fontSize":40,
+            //     "fontStyle":"normal",
+            //     "textAlign":"left",
+            //     "fontWeight":"normal"
+            // }
+            if (!this.records) this.records = {};
+            this.records[obj.id] = obj;
         }
     }
 };
