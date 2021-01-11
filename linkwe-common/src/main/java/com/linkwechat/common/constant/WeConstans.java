@@ -1,7 +1,6 @@
 package com.linkwechat.common.constant;
 
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +27,11 @@ public class WeConstans {
      * 供应商相关token
      */
     public static final String WE_PROVIDER_ACCESS_TOKEN = "we_provider_access_token";
+
+    /**
+     * 会话存档相关token
+     */
+    public static final String WE_CHAT_ACCESS_TOKEN = "we_chat_access_token";
 
 
     /**
@@ -144,7 +148,7 @@ public class WeConstans {
     /**
      * 批量生成的单人码 活动场景
      */
-    public static final String ONE_PERSON_CODE_GENERATED_BATCH="批量生成的单人码";
+    public static final String ONE_PERSON_CODE_GENERATED_BATCH = "批量生成的单人码";
 
     /**
      * 微信接口相应端错误字段
@@ -206,6 +210,25 @@ public class WeConstans {
      */
     public static final String DEL_FOLLOW_USER_SWITCH_CLOSE = "0";
     public static final String DEL_FOLLOW_USER_SWITCH_OPEN = "1";
+
+    public static final String CONTACT_SEQ_KEY = "seq";
+
+    /**
+     * id类型 0:成员 1:客户,2:机器
+     */
+    public static final Integer ID_TYPE_USER = 0;
+    public static final Integer ID_TYPE_EX = 1;
+    public static final Integer ID_TYPE_MACHINE = 2;
+
+    /**
+     * 一次拉取的消息条数，最大值1000条，超过1000条会返回错误
+     */
+    public static final long LIMIT = 1_000L;
+
+
+    public static final String AppTicketKey = "ticket:AppGet";
+    public static final String AgentTicketKey = "ticket:AgentGet";
+
     /**
      * 企微回调事件类型路由
      */
@@ -270,6 +293,10 @@ public class WeConstans {
 
     public static final String WECOM_FINANCE_INDEX = "finance";
 
-    /** 开启会话存档成员列表 **/
+    public static final String WECOM_SENSITIVE_HIT_INDEX = "sensitive";
+
+    /**
+     * 开启会话存档成员列表
+     **/
     public static final String weMsgAuditKey = "wecom_msg_audit:user:ids";
 }

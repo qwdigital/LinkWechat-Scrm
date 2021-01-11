@@ -34,6 +34,10 @@
             <groupId>com.linkwechat</groupId>
             <artifactId>linkwe-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.linkwechat</groupId>
+            <artifactId>linkwe-wecom</artifactId>
+        </dependency>
 
     </dependencies>
 

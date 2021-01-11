@@ -13,11 +13,15 @@ import {
   moveGroup,
 } from '@/api/material'
 
+// import {
+//   getList
+// } from '@/api/material/poster'
+
 export default {
   name: 'MaPage',
   components: {},
   props: {
-    // "0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本",
+    // "0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本 5 海报 6 海报字体",
     type: {
       type: String,
       default: '0',
@@ -37,7 +41,7 @@ export default {
         pageSize: 10,
         categoryId: '',
         search: '',
-        mediaType: '4',
+        mediaType: '0',
       },
       list: [], // 列表
       total: 0, // 总条数
@@ -62,7 +66,7 @@ export default {
         emitPath: false,
       },
 
-      typeTitle: ['图片', '语音', '视频', '文件', '文本'],
+      typeTitle: ['图片', '语音', '视频', '文件', '文本', '海报', '海报字体'],
       form: {}, // 素材表单
       dialogVisible: false, // 素材表格对话框显隐
       // 表单校验

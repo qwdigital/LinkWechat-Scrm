@@ -2,19 +2,20 @@ package com.linkwechat.web.controller.wecom;
 
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.utils.SnowFlakeUtil;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.WePoster;
-import com.linkwechat.wecom.domain.WePosterFont;
 import com.linkwechat.wecom.domain.WePosterSubassembly;
 import com.linkwechat.wecom.service.IWePosterFontService;
 import com.linkwechat.wecom.service.IWePosterService;
 import com.linkwechat.wecom.service.IWePosterSubassemblyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -22,6 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * @author ws
+ */
 @RestController
 @RequestMapping(value = "wecom/poster/")
 @Api(description = "海报")
@@ -39,14 +43,19 @@ public class WePosterController extends BaseController {
 
     @PostMapping(value = "insert")
     @ApiOperation("创建海报")
+    @PreAuthorize("@ss.hasAnyPermi('wecom:poster:insert')")
     @Transactional(rollbackFor = RuntimeException.class)
-    public AjaxResult insert(@RequestBody WePoster poster){
+    public AjaxResult insert(@RequestBody WePoster poster) {
         wePosterService.generateSimpleImg(poster);
         poster.setId(SnowFlakeUtil.nextId());
-        poster.setDelFlag(1);
+        poster.setDelFlag(0);
+        poster.setMediaType(MediaType.POSTER.getType());
+        /*if(poster.getCategoryId() == null){
+            return AjaxResult.error("请选择海报分类");
+        }*/
         wePosterService.saveOrUpdate(poster);
         poster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {
-            wePosterSubassembly.setDelFlag(1);
+            wePosterSubassembly.setDelFlag(0);
             wePosterSubassembly.setId(SnowFlakeUtil.nextId());
             wePosterSubassembly.setPosterId(poster.getId());
         });
@@ -57,64 +66,72 @@ public class WePosterController extends BaseController {
 
     @PutMapping(value = "update")
     @ApiOperation("修改海报")
+    @PreAuthorize("@ss.hasAnyPermi('wecom:poster:update')")
     @Transactional(rollbackFor = RuntimeException.class)
-    public AjaxResult update(@RequestBody WePoster poster){
-        if(poster.getId() == null){
+    public AjaxResult update(@RequestBody WePoster poster) {
+        if (poster.getId() == null) {
             return AjaxResult.error("id为空");
         }
+        poster.setMediaType(null);
         wePosterService.generateSimpleImg(poster);
         wePosterService.saveOrUpdate(poster);
-        List<WePosterSubassembly> posterSubassemblyList = wePosterSubassemblyService.lambdaQuery().eq(WePosterSubassembly::getPosterId,poster.getId()).eq(WePosterSubassembly::getDelFlag,1).list();
-        Map<Long,WePosterSubassembly> posterSubassemblyMap = posterSubassemblyList.stream().collect(Collectors.toMap(WePosterSubassembly::getId,p->p));
+        List<WePosterSubassembly> posterSubassemblyList = wePosterSubassemblyService.lambdaQuery().eq(WePosterSubassembly::getPosterId, poster.getId()).eq(WePosterSubassembly::getDelFlag, 1).list();
+        Map<Long, WePosterSubassembly> posterSubassemblyMap = posterSubassemblyList.stream().collect(Collectors.toMap(WePosterSubassembly::getId, p -> p));
         List<WePosterSubassembly> insertList = new ArrayList<>();
         List<WePosterSubassembly> updateList = new ArrayList<>();
         poster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {
-            if(wePosterSubassembly.getId() == null){
+            if (wePosterSubassembly.getId() == null) {
                 wePosterSubassembly.setId(SnowFlakeUtil.nextId());
                 wePosterSubassembly.setPosterId(poster.getId());
-                wePosterSubassembly.setDelFlag(1);
+                wePosterSubassembly.setDelFlag(0);
                 insertList.add(wePosterSubassembly);
-            }else {
+            } else {
                 posterSubassemblyMap.remove(wePosterSubassembly.getId());
                 updateList.add(wePosterSubassembly);
             }
         });
-        if(!CollectionUtils.isEmpty(insertList)) {
+        if (!CollectionUtils.isEmpty(insertList)) {
             wePosterSubassemblyService.saveBatch(insertList);
         }
-        if(!CollectionUtils.isEmpty(updateList)) {
+        if (!CollectionUtils.isEmpty(updateList)) {
             wePosterSubassemblyService.updateBatchById(updateList);
         }
         List<WePosterSubassembly> deleteList = new ArrayList<>(posterSubassemblyMap.values());
-        if(!CollectionUtils.isEmpty(deleteList)){
-            deleteList.forEach(wePosterSubassembly -> wePosterSubassembly.setDelFlag(0));
+        if (!CollectionUtils.isEmpty(deleteList)) {
+            deleteList.forEach(wePosterSubassembly -> wePosterSubassembly.setDelFlag(1));
             wePosterSubassemblyService.updateBatchById(deleteList);
         }
         return AjaxResult.success("修改成功");
     }
 
-    @GetMapping(value = "list")
+    /*@GetMapping(value = "list")
     @ApiOperation("列表查询海报")
-    public AjaxResult list(){
+    public AjaxResult list(Long categoryId,String name){
         List<WePoster> fontList = wePosterService.lambdaQuery()
-                .eq(WePoster::getDelFlag,1)
+                .eq(WePoster::getDelFlag,0)
+                .eq(categoryId != null,WePoster::getCategoryId,categoryId)
+                .like(StringUtils.isNotBlank(name),WePoster::getTitle,name)
                 .orderByDesc(WePoster::getCreateTime)
                 .list();
         return AjaxResult.success(fontList);
-    }
+    }*/
 
     @GetMapping(value = "entity/{id}")
+    @PreAuthorize("@ss.hasAnyPermi('wecom:poster:entity')")
     @ApiOperation("查询海报详情")
-    public AjaxResult entity(@PathVariable Long id){
+    public AjaxResult entity(@PathVariable Long id) {
         return AjaxResult.success(wePosterService.selectOne(id));
     }
 
     @GetMapping(value = "page")
     @ApiOperation("分页查询海报")
-    public AjaxResult page(){
+    @PreAuthorize("@ss.hasAnyPermi('wecom:poster:page')")
+    public AjaxResult page(Long categoryId, String name) {
         startPage();
         List<WePoster> fontList = wePosterService.lambdaQuery()
-                .eq(WePoster::getDelFlag,1)
+                .eq(WePoster::getDelFlag, 0)
+                .eq(categoryId != null, WePoster::getCategoryId, categoryId)
+                .like(StringUtils.isNotBlank(name), WePoster::getTitle, name)
                 .orderByDesc(WePoster::getCreateTime)
                 .list();
         return AjaxResult.success(getDataTable(fontList));
@@ -122,13 +139,15 @@ public class WePosterController extends BaseController {
 
     @DeleteMapping(value = "delete/{id}")
     @ApiOperation(value = "删除海报")
+    @PreAuthorize("@ss.hasAnyPermi('wecom:poster:delete')")
     @Transactional(rollbackFor = RuntimeException.class)
-    public AjaxResult deletePosterFont(@PathVariable Long id){
-        wePosterService.lambdaUpdate().set(WePoster::getDelFlag,0).eq(WePoster::getId,id);
-        wePosterSubassemblyService.lambdaUpdate().set(WePosterSubassembly::getDelFlag,0).eq(WePosterSubassembly::getPosterId,id).eq(WePosterSubassembly::getFontId,1);
+    public AjaxResult deletePosterFont(@PathVariable Long id) {
+        wePosterService.update(
+                wePosterService.lambdaUpdate().set(WePoster::getDelFlag, 1).eq(WePoster::getId, id));
+        wePosterSubassemblyService.update(
+                wePosterSubassemblyService.lambdaUpdate().set(WePosterSubassembly::getDelFlag, 1).eq(WePosterSubassembly::getPosterId, id));
         return AjaxResult.success("删除成功");
     }
-
 
 
 }

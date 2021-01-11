@@ -490,6 +490,23 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils
 
     }
 
+    /**
+     * 企微用户客户机器判断
+     * @param str
+     * @return
+     */
+    public static int weCustomTypeJudgment(String str){
+        if (isNotEmpty(str)){
+            if (str.startsWith("wo") || str.startsWith("wm")){
+                return 1;
+            }
+            if (str.startsWith("wb")){
+                return 2;
+            }
+        }
+        return 0;
+    }
+
     public static void main(String[] args) {
         Integer[] arrays = { 1,2,3,4,5,6,7 };
         String join = join(arrays, ",");

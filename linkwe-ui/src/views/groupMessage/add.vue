@@ -109,22 +109,26 @@ export default {
       this.form.imageMessage._materialName = image.materialName
     },
     submit() {
+      this.loading = true
       let form = JSON.parse(JSON.stringify(this.form))
-      Promise.resolve(() => {
-        if (form.messageType == 1) {
-          // debugger
-          let dataMediaId = {
-            url: form.imageMessage.pic_url,
-            type: '0',
-            name: form.imageMessage._materialName,
-          }
-          return getMaterialMediaId(dataMediaId).then((res) => {
-            form.imageMessage.media_id = res.data
-          })
-        }
-      })
+      form.messageType = this.activeName
+      Promise.resolve()
         .then(() => {
-          form.messageType = this.activeName
+          if (form.messageType == 1) {
+            // debugger
+            let dataMediaId = {
+              url: form.imageMessage.pic_url,
+              type: '0',
+              name: form.imageMessage._materialName,
+            }
+            return getMaterialMediaId(dataMediaId).then((res) => {
+              // debugger
+              form.imageMessage.media_id = res.data
+            })
+          }
+        })
+        .then(() => {
+          // debugger
           form.tag = form.tag.map((d) => d.tagId) + ''
           form.department += ''
           form.staffId += ''
@@ -376,8 +380,6 @@ export default {
     background: #eee;
     border-radius: 8px;
     padding: 10px;
-  }
-  .select {
   }
 }
 .input-wrap {

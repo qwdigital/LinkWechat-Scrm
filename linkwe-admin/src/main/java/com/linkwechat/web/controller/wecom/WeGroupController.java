@@ -11,6 +11,8 @@ import com.linkwechat.wecom.service.IWeGroupMemberService;
 import com.linkwechat.wecom.service.IWeGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,10 +61,14 @@ public class WeGroupController extends BaseController {
     @PreAuthorize("@ss.hasPermi('customerManage:group:sync')")
     @GetMapping({"/synchWeGroup"})
     public AjaxResult synchWeGroup(){
-
-
-        weGroupService.synchWeGroup();
-
+        try {
+            SecurityContext context = SecurityContextHolder.getContext();
+            SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+            SecurityContextHolder.setContext(context);
+            weGroupService.synchWeGroup();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return  AjaxResult.success(WeConstans.SYNCH_TIP);
     }
 

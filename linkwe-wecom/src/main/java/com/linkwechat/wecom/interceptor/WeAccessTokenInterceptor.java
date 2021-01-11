@@ -60,6 +60,8 @@ public class WeAccessTokenInterceptor implements Interceptor{
                 token=iWeAccessTokenService.findContactAccessToken();
             }else if(Arrays.asList(weComeConfig.getNeedProviderTokenUrl()).contains(uri)){ //需要供应商token
                 token=iWeAccessTokenService.findProviderAccessToken();
+            }else if(Arrays.asList(weComeConfig.getNeedChatTokenUrl()).contains(uri)){ //需要会话存档token
+                token=iWeAccessTokenService.findChatAccessToken();
             }else{
                 token=iWeAccessTokenService.findCommonAccessToken();
             }

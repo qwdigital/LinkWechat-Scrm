@@ -1,5 +1,5 @@
 <script>
-import * as api from '@/api/enterpriseId'
+import * as api from "@/api/enterpriseId";
 // import clipboard from "clipboard";
 
 export default {
@@ -10,7 +10,7 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        companyName: '',
+        companyName: ""
       },
       total: 0,
       form: {},
@@ -19,65 +19,65 @@ export default {
       disabled: false,
       loading: false,
       rules: Object.freeze({
-        companyName: [{ required: true, message: '必填项', trigger: 'blur' }],
-        corpId: [{ required: true, message: '必填项', trigger: 'blur' }],
-        corpSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
-        contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
+        companyName: [{ required: true, message: "必填项", trigger: "blur" }],
+        corpId: [{ required: true, message: "必填项", trigger: "blur" }],
+        corpSecret: [{ required: true, message: "必填项", trigger: "blur" }],
+        contactSecret: [{ required: true, message: "必填项", trigger: "blur" }]
       }),
-      status: ['正常', '停用'],
-    }
+      status: ["正常", "停用"]
+    };
   },
   watch: {},
   computed: {},
   created() {
-    this.getList()
+    this.getList();
   },
   mounted() {
     // new clipboard(".copy-btn");
   },
   methods: {
     getList(page) {
-      page && (this.query.pageNum = page)
-      this.loading = true
+      page && (this.query.pageNum = page);
+      this.loading = true;
       api
         .getList(this.query)
         .then(({ rows, total }) => {
-          this.list = rows
-          this.total = +total
-          this.loading = false
+          this.list = rows;
+          this.total = +total;
+          this.loading = false;
         })
         .catch(() => {
-          this.loading = false
-        })
+          this.loading = false;
+        });
     },
     edit(data, type) {
-      this.form = Object.assign({}, data || {})
-      this.dialogVisible = true
-      type || !data ? (this.disabled = false) : (this.disabled = true)
+      this.form = Object.assign({}, data || {});
+      this.dialogVisible = true;
+      type || !data ? (this.disabled = false) : (this.disabled = true);
     },
     submit() {
-      this.$refs['form'].validate((valid) => {
+      this.$refs["form"].validate(valid => {
         if (valid) {
-          api[this.form.id ? 'update' : 'add'](this.form)
+          api[this.form.id ? "update" : "add"](this.form)
             .then(() => {
-              this.msgSuccess('操作成功')
-              this.dialogVisible = false
-              this.getList(!this.form.id && 1)
+              this.msgSuccess("操作成功");
+              this.dialogVisible = false;
+              this.getList(!this.form.id && 1);
             })
             .catch(() => {
-              this.dialogVisible = false
-            })
+              this.dialogVisible = false;
+            });
         }
-      })
+      });
     },
     start(corpId) {
       api.start(corpId).then(({ rows, total }) => {
-        this.msgSuccess('操作成功')
-        this.getList()
-      })
-    },
-  },
-}
+        this.msgSuccess("操作成功");
+        this.getList();
+      });
+    }
+  }
+};
 </script>
 
 <template>
@@ -94,9 +94,7 @@ export default {
           <el-form-item label>
             <el-button
               v-hasPermi="['enterpriseWechat:query']"
-              type="cyan"
-              icon="el-icon-search"
-              size="mini"
+              type="primary"
               @click="getList(1)"
               >查询</el-button
             >

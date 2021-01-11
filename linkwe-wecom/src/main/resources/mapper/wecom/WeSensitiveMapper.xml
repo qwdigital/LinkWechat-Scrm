@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeSensitiveMapper">
+
+    <resultMap type="WeSensitive" id="WeSensitiveResult">
+        <result property="id" column="id"/>
+        <result property="strategyName" column="strategy_name"/>
+        <result property="patternWords" column="pattern_words"/>
+        <result property="auditUserId" column="audit_user_id"/>
+        <result property="auditUserName" column="audit_user_name"/>
+        <result property="alertFlag" column="alert_flag"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <collection property="auditUserScope" ofType="com.linkwechat.wecom.domain.WeSensitiveAuditScope">
+            <result property="scopeType" column="scope_type"/>
+            <result property="auditScopeId" column="audit_scope_id"/>
+            <result property="auditScopeName" column="audit_scope_name"/>
+        </collection>
+    </resultMap>
+
+    <sql id="selectWeSensitiveVo">
+        select id, strategy_name, pattern_words, audit_user_id, audit_user_name, alert_flag, del_flag, create_by,
+        create_time, update_by, update_time from we_sensitive
+    </sql>
+
+    <sql id="selectWeSensitiveList">
+        select a.*,b.audit_scope_id,b.audit_scope_name,b.scope_type from we_sensitive a left join we_sensitive_audit_scope b on a.id
+        = b.sensitive_id
+    </sql>
+
+    <select id="selectWeSensitiveList" parameterType="WeSensitive" resultMap="WeSensitiveResult">
+        <include refid="selectWeSensitiveList"/>
+        <where>
+            <if test="strategyName != null  and strategyName != ''">and a.strategy_name like concat('%',
+                #{strategyName}, '%')
+            </if>
+            <if test="patternWords != null  and patternWords != ''">and a.pattern_words like concat('%',
+                #{patternWords}, '%')
+            </if>
+            <if test="auditUserId != null and auditUserId != ''">and a.audit_user_id = #{auditUserId}</if>
+            <if test="auditUserName != null and auditUserName != ''">and a.audit_user_name like concat('%',
+                #{auditUserName}, '%')
+            </if>
+        </where>
+        order by a.update_time desc, a.create_time desc
+    </select>
+
+    <select id="selectWeSensitiveById" parameterType="Long" resultMap="WeSensitiveResult">
+        <include refid="selectWeSensitiveList"/>
+        where a.id = #{id}
+    </select>
+
+    <select id="selectWeSensitiveByIds" parameterType="String" resultMap="WeSensitiveResult">
+        <include refid="selectWeSensitiveList"/>
+        where a.id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        order by a.update_time desc, a.create_time desc
+    </select>
+
+    <insert id="insertWeSensitive" parameterType="WeSensitive" useGeneratedKeys="true" keyProperty="id">
+        insert into we_sensitive
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="strategyName != null and strategyName != ''">strategy_name,</if>
+            <if test="patternWords != null and patternWords != ''">pattern_words,</if>
+            <if test="auditUserId != null and auditUserId != ''">audit_user_id,</if>
+            <if test="auditUserName != null and auditUserName != ''">audit_user_name,</if>
+            <if test="alertFlag != null">alert_flag,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="strategyName != null and strategyName != ''">#{strategyName},</if>
+            <if test="patternWords != null and patternWords != ''">#{patternWords},</if>
+            <if test="auditUserId != null and auditUserId != ''">#{auditUserId},</if>
+            <if test="auditUserName != null and auditUserName != ''">#{auditUserName},</if>
+            <if test="alertFlag != null">#{alertFlag},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateWeSensitive" parameterType="WeSensitive">
+        update we_sensitive
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="strategyName != null and strategyName != ''">strategy_name = #{strategyName},</if>
+            <if test="patternWords != null and patternWords != ''">pattern_words = #{patternWords},</if>
+            <if test="auditUserId != null and auditUserId != ''">audit_user_id = #{auditUserId},</if>
+            <if test="auditUserName != null">audit_user_name = #{auditUserName},</if>
+            <if test="alertFlag != null">alert_flag = #{alertFlag},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="batchUpdateWeSensitive" parameterType="java.util.List">
+        update we_sensitive
+        <trim prefix="SET" suffixOverrides=",">
+            <trim prefix="strategy_name = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.strategyName != null and item.strategyName != ''">
+                        when id = #{item.id} then #{item.strategyName}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="pattern_words = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.patternWords != null and item.patternWords != ''">
+                        when id = #{item.id} then #{item.patternWords}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="audit_user_id = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.auditUserId != null and auditUserId != ''">
+                        when id = #{item.id} then #{item.auditUserId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="audit_user_name = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.auditUserName != null and item.auditUserName != ''">
+                        when id = #{item.id} then #{item.auditUserName}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="alert_flag = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.alertFlag != null">
+                        when id = #{item.id} then #{item.alertFlag}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="del_flag = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.delFlag != null">
+                        when id = #{item.id} then #{item.delFlag}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="create_by = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.createBy != null and item.createBy != ''">
+                        when id = #{item.id} then #{item.createBy}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="create_time = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.createTime != null">
+                        when id = #{item.id} then #{item.createTime}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="update_by = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.updateBy != null and item.updateBy != ''">
+                        when id = #{item.id} then #{item.updateBy}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="update_time = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.updateTime != null">
+                        when id = #{item.id} then #{item.updateTime}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        WHERE id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item.id}
+        </foreach>
+    </update>
+
+    <delete id="deleteWeSensitiveById" parameterType="Long">
+        delete from we_sensitive where id = #{id}
+    </delete>
+
+    <delete id="deleteWeSensitiveByIds">
+        delete from we_sensitive where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

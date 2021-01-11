@@ -1,8 +1,10 @@
 package com.linkwechat.wecom.client;
 
 import com.dtflys.forest.annotation.DataObject;
+import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
 import com.linkwechat.wecom.domain.dto.msgaudit.WeMsgAuditDto;
+import com.linkwechat.wecom.domain.vo.WeMsgAuditVo;
 
 /**
  * @author sxw
@@ -31,21 +33,21 @@ public interface WeMsgAuditClient {
 
     /**
      * 群聊 获取群会话中外部成员的同意情况
-     * @param msgAuditDto
+     * @param weMsgAuditVo
      * @return
      */
     @Request(url = "/msgaudit/check_room_agree",
             type = "POST"
     )
-    WeMsgAuditDto checkRoomAgree(@DataObject WeMsgAuditDto msgAuditDto);
+    WeMsgAuditDto checkRoomAgree(@DataObject WeMsgAuditVo weMsgAuditVo);
 
     /**
      * 获取会话内容存档内部群信息
-     * @param msgAuditDto
+     * @param weMsgAuditVo
      * @return
      */
     @Request(url = "/msgaudit/groupchat/get",
             type = "POST"
     )
-    WeMsgAuditDto getGroupChat(@DataObject WeMsgAuditDto msgAuditDto);
+    WeMsgAuditDto getGroupChat(@DataObject WeMsgAuditVo weMsgAuditVo);
 }

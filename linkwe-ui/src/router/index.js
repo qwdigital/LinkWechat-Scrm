@@ -1,10 +1,10 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import Vue from "vue";
+import Router from "vue-router";
 
-Vue.use(Router)
+Vue.use(Router);
 
 /* Layout */
-import Layout from '@/layout'
+import Layout from "@/layout";
 
 /**
  * Note: 路由配置项
@@ -27,43 +27,43 @@ import Layout from '@/layout'
 // 公共路由
 export const constantRoutes = [
   {
-    path: '/redirect',
+    path: "/redirect",
     component: Layout,
     hidden: true,
     children: [
       {
-        path: '/redirect/:path(.*)',
-        component: (resolve) => require(['@/views/redirect'], resolve),
-      },
-    ],
+        path: "/redirect/:path(.*)",
+        component: resolve => require(["@/views/redirect"], resolve)
+      }
+    ]
   },
   {
-    path: '',
+    path: "",
     component: Layout,
-    redirect: '/index',
+    redirect: "/index",
     children: [
       {
-        path: '/index',
-        component: (resolve) => require(['@/views/index'], resolve),
-        name: '首页',
+        path: "/index",
+        component: resolve => require(["@/views/index"], resolve),
+        name: "首页",
         meta: {
-          title: '首页',
-          icon: 'dashboard',
+          title: "首页",
+          icon: "dashboard",
           noCache: true,
-          affix: true,
-        },
-      },
-    ],
+          affix: true
+        }
+      }
+    ]
   },
   {
-    path: '/login',
-    component: (resolve) => require(['@/views/login'], resolve),
-    hidden: true,
+    path: "/login",
+    component: resolve => require(["@/views/login"], resolve),
+    hidden: true
   },
   {
-    path: '/authCallback',
-    component: (resolve) => require(['@/views/authCallback'], resolve),
-    hidden: true,
+    path: "/authCallback",
+    component: resolve => require(["@/views/authCallback"], resolve),
+    hidden: true
   },
   // {
   //   path: '/customerManage',
@@ -113,6 +113,70 @@ export const constantRoutes = [
   //       component: (resolve) =>
   //         require(['@/views/customerManage/lossRemind'], resolve),
   //       meta: { title: '流失提醒', icon: '' },
+  //     },
+  //   ]
+  // },
+  // {
+  //   path: "/communityOperating",
+  //   component: Layout,
+  //   redirect: "/communityOperating/newCustomer",
+  //   meta: { title: "社群运营", icon: "peoples" },
+  //   children: [
+  //     {
+  //       path: "newCustomer",
+  //       name: "newCustomer",
+  //       component: resolve =>
+  //         require(["@/views/communityOperating/newCustomer/list"], resolve),
+  //       meta: { title: "新客自动拉群", icon: "" }
+  //     },
+  //     {
+  //       path: "newCustomerAev",
+  //       name: "newCustomerAev",
+  //       component: resolve =>
+  //         require(["@/views/communityOperating/newCustomer/aev"], resolve),
+  //       meta: { title: "新客自动拉群", icon: "" }
+  //     },
+  //     {
+  //       path: "oldCustomer",
+  //       name: "oldCustomer",
+  //       component: resolve =>
+  //         require(["@/views/communityOperating/oldCustomer/list"], resolve),
+  //       meta: { title: "老客标签建群", icon: "" }
+  //     },
+  //     {
+  //       path: "oldCustomerAev",
+  //       name: "oldCustomerAev",
+  //       component: resolve =>
+  //         require(["@/views/communityOperating/oldCustomer/aev"], resolve),
+  //       meta: { title: "新客自动拉群", icon: "" }
+  //     },
+  //     {
+  //       path: "keywords",
+  //       name: "keywords",
+  //       component: resolve =>
+  //         require(["@/views/communityOperating/keywords/list"], resolve),
+  //       meta: { title: "关键词拉群", icon: "" }
+  //     },
+  //     {
+  //       path: "keywordsAev",
+  //       name: "keywordsAev",
+  //       component: resolve =>
+  //         require(["@/views/communityOperating/keywords/aev"], resolve),
+  //       meta: { title: "新客自动拉群", icon: "" }
+  //     },
+  //     {
+  //       path: "groupSOP",
+  //       name: "groupSOP",
+  //       component: resolve =>
+  //         require(["@/views/communityOperating/groupSOP/list"], resolve),
+  //       meta: { title: "群SOP", icon: "" }
+  //     },
+  //     {
+  //       path: "groupSOPAev",
+  //       name: "groupSOPAev",
+  //       component: resolve =>
+  //         require(["@/views/communityOperating/groupSOP/aev"], resolve),
+  //       meta: { title: "新客自动拉群", icon: "" }
   //     },
   //   ]
   // },
@@ -234,101 +298,142 @@ export const constantRoutes = [
   // {
   //   path: '/material',
   //   component: Layout,
-  //   redirect: '/material/text',
+  //   redirect: '/material/poster',
   //   meta: { title: '素材中心', icon: 'material' },
   //   children: [
   //     {
-  //       path: 'text',
-  //       name: 'MaterialText',
-  //       component: (resolve) => require(['@/views/material/text'], resolve),
-  //       meta: { title: '文本', icon: '' },
+  //       path: 'poster',
+  //       name: 'MaterialPoster',
+  //       component: (resolve) => require(['@/views/material/poster'], resolve),
+  //       meta: { title: '海报', icon: '' },
   //     },
-  //     {
-  //       path: 'image',
-  //       name: 'MaterialImage',
-  //       component: (resolve) => require(['@/views/material/image'], resolve),
-  //       meta: { title: '图片', icon: '' },
-  //     },
-  //     {
-  //       path: 'web',
-  //       name: 'MaterialWeb',
-  //       component: (resolve) => require(['@/views/material/web'], resolve),
-  //       meta: { title: '网页', icon: '' },
-  //     },
-  //     {
-  //       path: 'audio',
-  //       name: 'MaterialAudio',
-  //       component: (resolve) => require(['@/views/material/audio'], resolve),
-  //       meta: { title: '语音', icon: '' },
-  //     },
-  //     {
-  //       path: 'video',
-  //       name: 'MaterialVideo',
-  //       component: (resolve) => require(['@/views/material/video'], resolve),
-  //       meta: { title: '视频', icon: '' },
-  //     },
-  //     {
-  //       path: 'file',
-  //       name: 'MaterialFile',
-  //       component: (resolve) => require(['@/views/material/file'], resolve),
-  //       meta: { title: '文件', icon: '' },
-  //     },
-  //     {
-  //       path: 'applet',
-  //       name: 'MaterialApplet',
-  //       component: (resolve) => require(['@/views/material/applet'], resolve),
-  //       meta: { title: '小程序', icon: '' },
-  //     },
+  // {
+  //   path: 'text',
+  //   name: 'MaterialText',
+  //   component: (resolve) => require(['@/views/material/text'], resolve),
+  //   meta: { title: '文本', icon: '' },
+  // },
+  // {
+  //   path: 'image',
+  //   name: 'MaterialImage',
+  //   component: (resolve) => require(['@/views/material/image'], resolve),
+  //   meta: { title: '图片', icon: '' },
+  // },
+  // {
+  //   path: 'web',
+  //   name: 'MaterialWeb',
+  //   component: (resolve) => require(['@/views/material/web'], resolve),
+  //   meta: { title: '网页', icon: '' },
+  // },
+  // {
+  //   path: 'audio',
+  //   name: 'MaterialAudio',
+  //   component: (resolve) => require(['@/views/material/audio'], resolve),
+  //   meta: { title: '语音', icon: '' },
+  // },
+  // {
+  //   path: 'video',
+  //   name: 'MaterialVideo',
+  //   component: (resolve) => require(['@/views/material/video'], resolve),
+  //   meta: { title: '视频', icon: '' },
+  // },
+  // {
+  //   path: 'file',
+  //   name: 'MaterialFile',
+  //   component: (resolve) => require(['@/views/material/file'], resolve),
+  //   meta: { title: '文件', icon: '' },
+  // },
+  // {
+  //   path: 'applet',
+  //   name: 'MaterialApplet',
+  //   component: (resolve) => require(['@/views/material/applet'], resolve),
+  //   meta: { title: '小程序', icon: '' },
+  // },
   //   ],
   // },
   // {
-  //   path: '/appTool',
+  //   path: "/appTool",
   //   component: Layout,
-  //   redirect: '/appTool/text',
-  //   meta: { title: '应用工具', icon: 'app' },
+  //   redirect: "/appTool/text",
+  //   meta: { title: "应用工具", icon: "app" },
   //   children: [
   //     {
-  //       path: 'chatToolbar',
-  //       name: 'ChatToolbar',
-  //       component: (resolve) => require(['@/views/appTool/chatToolbar/list'], resolve),
-  //       meta: { title: '聊天工具栏', icon: '' }
+  //       path: "chatToolbar",
+  //       name: "ChatToolbar",
+  //       component: resolve =>
+  //         require(["@/views/appTool/chatToolbar/list"], resolve),
+  //       meta: { title: "聊天工具栏", icon: "" }
   //     },
   //     {
-  //       path: 'explain',
+  //       path: "explain",
   //       hidden: true,
-  //       component: (resolve) => require(['@/views/appTool/chatToolbar/explain'], resolve),
-  //       meta: { title: '图文详解', icon: '' }
+  //       component: resolve =>
+  //         require(["@/views/appTool/chatToolbar/explain"], resolve),
+  //       meta: { title: "图文详解", icon: "" }
   //     },
   //     {
-  //       path: 'config',
+  //       path: "config",
   //       hidden: true,
-  //       component: (resolve) => require(['@/views/appTool/chatToolbar/config'], resolve),
-  //       meta: { title: '查看已配置信息', icon: '' }
+  //       component: resolve =>
+  //         require(["@/views/appTool/chatToolbar/config"], resolve),
+  //       meta: { title: "查看已配置信息", icon: "" }
   //     },
   //     {
-  //       path: 'friendCircle',
-  //       name: 'FriendCircle',
-  //       component: (resolve) => require(['@/views/appTool/friendCircle/list'], resolve),
-  //       meta: { title: '朋友圈', icon: '' }
+  //       path: "friendCircle",
+  //       name: "FriendCircle",
+  //       component: resolve =>
+  //         require(["@/views/appTool/friendCircle/list"], resolve),
+  //       meta: { title: "朋友圈", icon: "" }
   //     },
   //     {
-  //       path: 'friendIntroduce',
+  //       path: "friendIntroduce",
   //       hidden: true,
-  //       component: (resolve) => require(['@/views/appTool/friendCircle/introduce'], resolve),
-  //       meta: { title: '功能介绍', icon: '' }
+  //       component: resolve =>
+  //         require(["@/views/appTool/friendCircle/introduce"], resolve),
+  //       meta: { title: "功能介绍", icon: "" }
   //     },
   //     {
-  //       path: 'friendPublish',
+  //       path: "friendPublish",
   //       hidden: true,
-  //       component: (resolve) => require(['@/views/appTool/friendCircle/publish'], resolve),
-  //       meta: { title: '发布动态', icon: '' }
+  //       component: resolve =>
+  //         require(["@/views/appTool/friendCircle/publish"], resolve),
+  //       meta: { title: "发布动态", icon: "" }
   //     },
   //     {
-  //       path: 'friendBackground',
+  //       path: "friendBackground",
   //       hidden: true,
-  //       component: (resolve) => require(['@/views/appTool/friendCircle/background'], resolve),
-  //       meta: { title: '设置顶部背景', icon: '' }
+  //       component: resolve =>
+  //         require(["@/views/appTool/friendCircle/background"], resolve),
+  //       meta: { title: "设置顶部背景", icon: "" }
   //     },
+
+  //     {
+  //       path: "task",
+  //       name: "Task",
+  //       component: resolve => require(["@/views/appTool/task/list"], resolve),
+  //       meta: { title: "任务宝", icon: "" }
+  //     },
+  //     {
+  //       path: "taskAev",
+  //       name: "Task",
+  //       component: resolve => require(["@/views/appTool/task/aev"], resolve),
+  //       meta: { title: "任务宝", icon: "" }
+  //     },
+
+  //     {
+  //       path: "groupFission",
+  //       name: "groupFission",
+  //       component: resolve =>
+  //         require(["@/views/appTool/groupFission/list"], resolve),
+  //       meta: { title: "群裂变", icon: "" }
+  //     },
+  //     {
+  //       path: "groupFissionAev",
+  //       name: "groupFission",
+  //       component: resolve =>
+  //         require(["@/views/appTool/groupFission/aev"], resolve),
+  //       meta: { title: "群裂变", icon: "" }
+  //     }
   //   ]
   // },
   // {
@@ -360,59 +465,58 @@ export const constantRoutes = [
   // },
 
   {
-    path: '/user',
+    path: "/user",
     component: Layout,
     hidden: true,
-    redirect: 'noredirect',
+    redirect: "noredirect",
     children: [
       {
-        path: 'profile',
-        component: (resolve) =>
-          require(['@/views/system/user/profile/index'], resolve),
-        name: 'Profile',
-        meta: { title: '个人中心', icon: 'user' },
-      },
-    ],
+        path: "profile",
+        component: resolve =>
+          require(["@/views/system/user/profile/index"], resolve),
+        name: "Profile",
+        meta: { title: "个人中心", icon: "user" }
+      }
+    ]
   },
   {
-    path: '/dict',
+    path: "/dict",
     component: Layout,
     hidden: true,
     children: [
       {
-        path: 'type/data/:dictId(\\d+)',
-        component: (resolve) => require(['@/views/system/dict/data'], resolve),
-        name: 'Data',
-        meta: { title: '字典数据', icon: '' },
-      },
-    ],
+        path: "type/data/:dictId(\\d+)",
+        component: resolve => require(["@/views/system/dict/data"], resolve),
+        name: "Data",
+        meta: { title: "字典数据", icon: "" }
+      }
+    ]
   },
   {
-    path: '/job',
+    path: "/job",
     component: Layout,
     hidden: true,
     children: [
       {
-        path: 'log',
-        component: (resolve) => require(['@/views/monitor/job/log'], resolve),
-        name: 'JobLog',
-        meta: { title: '调度日志' },
-      },
-    ],
+        path: "log",
+        component: resolve => require(["@/views/monitor/job/log"], resolve),
+        name: "JobLog",
+        meta: { title: "调度日志" }
+      }
+    ]
   },
   {
-    path: '/gen',
+    path: "/gen",
     component: Layout,
     hidden: true,
     children: [
       {
-        path: 'edit/:tableId(\\d+)',
-        component: (resolve) =>
-          require(['@/views/tool/gen/editTable'], resolve),
-        name: 'GenEdit',
-        meta: { title: '修改生成配置' },
-      },
-    ],
+        path: "edit/:tableId(\\d+)",
+        component: resolve => require(["@/views/tool/gen/editTable"], resolve),
+        name: "GenEdit",
+        meta: { title: "修改生成配置" }
+      }
+    ]
   },
   // {
   //   path: '/test',
@@ -420,19 +524,19 @@ export const constantRoutes = [
   //   hidden: true,
   // },
   {
-    path: '/404',
-    component: (resolve) => require(['@/views/error/404'], resolve),
-    hidden: true,
+    path: "/404",
+    component: resolve => require(["@/views/error/404"], resolve),
+    hidden: true
   },
   {
-    path: '/401',
-    component: (resolve) => require(['@/views/error/401'], resolve),
-    hidden: true,
-  },
-]
+    path: "/401",
+    component: resolve => require(["@/views/error/401"], resolve),
+    hidden: true
+  }
+];
 
 export default new Router({
   // mode: 'history',
   scrollBehavior: () => ({ y: 0 }),
-  routes: constantRoutes,
-})
+  routes: constantRoutes
+});

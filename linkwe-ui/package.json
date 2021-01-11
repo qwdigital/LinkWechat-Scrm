@@ -1,8 +1,8 @@
 {
   "name": "linkwechat",
   "version": "0.1.0",
-  "description": "塬微管理系统",
-  "license": "MIT",
+  "description": "LinkWeChat",
+  "license": "GPL-3.0",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -63,6 +63,7 @@
     "vue-quill-editor": "3.0.6",
     "vue-router": "3.0.2",
     "vue-splitpane": "1.0.4",
+    "vue-ueditor-wrap": "^2.4.4",
     "vuedraggable": "2.20.0",
     "vuex": "3.1.0"
   },

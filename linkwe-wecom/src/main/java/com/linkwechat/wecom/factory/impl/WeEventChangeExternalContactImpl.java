@@ -48,6 +48,8 @@ public class WeEventChangeExternalContactImpl implements WeCallBackEventFactory 
     private WeMessagePushClient weMessagePushClient;
     @Autowired
     private IWeCorpAccountService weCorpAccountService;
+    @Autowired
+    private IWeChatContactMappingService weChatContactMappingService;
 
 
     @Override
@@ -72,6 +74,9 @@ public class WeEventChangeExternalContactImpl implements WeCallBackEventFactory 
             case "transfer_fail"://客户接替失败事件
                 transferFail(message);
                 break;
+            case "msg_audit_approved"://客户同意进行聊天内容存档事件
+                msgAuditApproved(message);
+                break;
             default:
                 break;
         }
@@ -80,6 +85,21 @@ public class WeEventChangeExternalContactImpl implements WeCallBackEventFactory 
             //客户群变更事件
             weChatChangeEvent(message);
         }
+    }
+
+    private void msgAuditApproved(WxCpXmlMessageVO message) {
+        String userId = message.getUserId();
+        String externalUserId = message.getExternalUserId();
+        WeChatContactMapping fromMapping = new WeChatContactMapping();
+        fromMapping.setFromId(userId);
+        fromMapping.setReceiveId(externalUserId);
+        fromMapping.setIsCustom(WeConstans.ID_TYPE_EX);
+        weChatContactMappingService.insertWeChatContactMapping(fromMapping);
+        WeChatContactMapping receiveMapping = new WeChatContactMapping();
+        receiveMapping.setFromId(externalUserId);
+        receiveMapping.setReceiveId(userId);
+        receiveMapping.setIsCustom(WeConstans.ID_TYPE_USER);
+        weChatContactMappingService.insertWeChatContactMapping(receiveMapping);
     }
 
     private void weChatChangeEvent(WxCpXmlMessageVO message) {

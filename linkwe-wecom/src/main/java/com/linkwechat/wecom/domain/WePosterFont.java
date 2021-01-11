@@ -50,6 +50,14 @@ public class WePosterFont extends BaseEntity {
      * 状态
      */
     @TableField(value = "del_flag")
-    @ApiModelProperty(value = "1 启用 0 关闭")
+    @ApiModelProperty(value = "0 启用 1 关闭")
     private Integer delFlag;
+
+    @TableField
+    @ApiModelProperty("资源类型")
+    private String mediaType;
+
+    @TableField
+    @ApiModelProperty("分类id")
+    private Long categoryId;
 }

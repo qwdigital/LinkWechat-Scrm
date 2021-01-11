@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeChatCollectionMapper">
+
+    <insert id="addCollection">
+        INSERT INTO
+            we_chat_collection(collection_id,material_id,user_id,create_by,create_time,update_by,update_time)
+        VALUES(#{collectionId},#{materialId},#{userId},#{createBy},#{createTime},#{updateBy},#{updateTime})
+    </insert>
+
+    <delete id="dropCollection">
+        DELETE FROM
+            we_chat_collection
+        <where>
+            material_id=#{materialId} AND user_id=#{userId}
+        </where>
+    </delete>
+    <select id="countCollectionByMaterialIdAndUserId" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM we_chat_collection
+        <where>
+            material_id=#{materialId} AND user_id=#{userId}
+        </where>
+    </select>
+    <select id="findCollections" resultType="com.linkwechat.wecom.domain.vo.WeChatSideVo">
+        SELECT
+            wcc.material_id,
+            wm.material_name,
+            wm.material_url,
+            wm.content,
+            wc.media_type
+        FROM
+            we_chat_collection wcc
+                LEFT JOIN we_material wm ON wcc.material_id = wm.id
+                LEFT JOIN we_category wc ON wm.category_id = wc.id
+       <where>
+           wcc.user_id=#{userId}
+       </where>
+    </select>
+
+</mapper>

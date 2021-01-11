@@ -1,8 +1,8 @@
 package com.linkwechat.web.controller.wecom;
 
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.extension.api.R;
-import com.github.pagehelper.PageInfo;
+import com.linkwechat.common.core.controller.BaseController;
+import com.linkwechat.common.core.domain.ConversationArchiveQuery;
+import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.wecom.service.IWeConversationArchiveService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,18 +19,50 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/wecom/finance")
-public class WeConversationArchiveController {
+public class WeConversationArchiveController extends BaseController {
     @Autowired
     private IWeConversationArchiveService weConversationArchiveService;
 
     /**
-     * 获取内部联系人列表
+     * 获取单聊会话数据接口
      *
+     * @param query      入参
+     * @param /fromId    发送人id
+     * @param /reveiceId 接收人id
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('conversationArchive:InternalContact:list')")
-    @GetMapping("/getInternalContactList")
-    public R<PageInfo<JSONObject>> getInternalContactList(String userId, int pageSize, int pageNum) {
-        return R.ok(weConversationArchiveService.getInternalContactList(userId, pageSize, pageNum));
+    @PreAuthorize("@ss.hasPermi('conversationArchive:chatContact:list')")
+    @GetMapping("/getChatContactList")
+    public TableDataInfo getChatContactList(ConversationArchiveQuery query) {
+        return getDataTable(weConversationArchiveService.getChatContactList(query));
     }
+
+
+    /**
+     * 获取群聊会话数据接口
+     *
+     * @param query   入参
+     * @param /fromId 发送人id
+     * @param /room   接收人id
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('conversationArchive:chatRoomContact:list')")
+    @GetMapping("/getChatRoomContactList")
+    public TableDataInfo getChatRoomContactList(ConversationArchiveQuery query) {
+        return getDataTable(weConversationArchiveService.getChatRoomContactList(query));
+    }
+
+
+    /**
+     * 获取全局会话数据接口
+     *
+     * @param query      入参
+     * @return
+     */
+    @PreAuthorize("@ss.hasPermi('conversationArchive:chatAllContact:list')")
+    @GetMapping("/getChatAllList")
+    public TableDataInfo getChatAllList(ConversationArchiveQuery query) {
+        return getDataTable(weConversationArchiveService.getChatAllList(query));
+    }
+
 }

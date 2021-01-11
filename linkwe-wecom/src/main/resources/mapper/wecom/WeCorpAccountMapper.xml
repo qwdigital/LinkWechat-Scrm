@@ -17,13 +17,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateTime"    column="update_time"    />
         <result property="contactSecret" column="contact_secret" />
         <result property="agentId" column="agent_id" />
+        <result property="chatSecret" column="chat_secret" />
         <result property="providerSecret" column="provider_secret" />
         <result property="customerChurnNoticeSwitch" column="customer_churn_notice_switch" />
         <result property="wxQrLoginRedirectUri" column="wx_qr_login_redirect_uri"/>
     </resultMap>
 
     <sql id="selectWeCorpAccountVo">
-        select id,provider_secret,company_name, corp_id, corp_secret,agent_id ,status, del_flag, create_by, create_time, update_by, update_time,contact_secret, customer_churn_notice_switch,wx_qr_login_redirect_uri from we_corp_account
+        select id,chat_secret,provider_secret,company_name, corp_id, corp_secret,agent_id ,status, del_flag, create_by, create_time, update_by, update_time,contact_secret, customer_churn_notice_switch,wx_qr_login_redirect_uri from we_corp_account
     </sql>
 
     <select id="selectWeCorpAccountList" parameterType="WeCorpAccount" resultMap="WeCorpAccountResult">
@@ -54,7 +55,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
             <if test="contactSecret != null ">contact_secret,</if>
+            <if test="chatSecret != null ">chat_secret,</if>
             <if test="customerChurnNoticeSwitch != null ">customer_churn_notice_switch,</if>
+            <if test="providerSecret != null ">provider_secret,</if>
+            <if test="wxQrLoginRedirectUri != null ">wx_qr_login_redirect_uri,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="companyName != null">#{companyName},</if>
@@ -67,7 +71,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
             <if test="contactSecret != null ">#{contactSecret},</if>
-            <if test="customerChurnNoticeSwitch != null ">#{customer_churn_notice_switch},</if>
+            <if test="chatSecret != null ">#{chatSecret},</if>
+            <if test="customerChurnNoticeSwitch != null ">#{customerChurnNoticeSwitch},</if>
+            <if test="providerSecret != null ">#{providerSecret},</if>
+            <if test="wxQrLoginRedirectUri != null ">#{wxQrLoginRedirectUri},</if>
          </trim>
     </insert>
 
@@ -84,7 +91,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="contactSecret != null ">contact_secret = #{contactSecret},</if>
+            <if test="chatSecret != null ">chat_secret = #{chatSecret},</if>
             <if test="customerChurnNoticeSwitch != null ">customer_churn_notice_switch = #{customerChurnNoticeSwitch},</if>
+
+            <if test="providerSecret != null ">provider_secret = #{providerSecret},</if>
+            <if test="wxQrLoginRedirectUri != null ">wx_qr_login_redirect_uri = #{wxQrLoginRedirectUri},</if>
+
+
         </trim>
         where id = #{id}
     </update>
