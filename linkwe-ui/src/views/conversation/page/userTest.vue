@@ -11,12 +11,16 @@
                 </div>
                 <div class="ct_box ct_boxFirst">
                     <ul>
-                        <li v-for="(i,t) in 49" :key="t" @click="personCheck(i,t)" :class="{'liActive':t==personIndex}">
-                            <el-row :gutter="20">
-                                <el-col :span="4"> <img
-                                        src="http://wx.qlogo.cn/mmhead/pburdzLK7PV4ZRaUcsb0X4ssicO9TqpQHZa26oHRvb1ONZT1r3dI0Aw/0"
-                                        alt=""></el-col>
-                                <el-col :span="16"><span style="line-height:40px">{{i}}</span></el-col>
+                        <!-- -->
+                        <li v-for="(i,t) in CList" :key="t"  @click="personCheck(i,t)"  :class="{'liActive':t==personIndex}">
+                            <el-row :gutter="20" style="   padding: 10px 0;margin:0">
+                                <el-col :span="4">
+                                     <img
+                                        v-if="i.avatar"
+                                        :src="i.avatar"
+                                        alt="头像">
+                                </el-col>
+                                <el-col :span="16" v-if="i"><span style="line-height:40px">{{i.name}}</span></el-col>
                             </el-row>
                         </li>
                     </ul>
@@ -30,78 +34,113 @@
                         </el-input>
                     </div>
                 </div>
-                 <div class="ct_box
-                 "> <div class="hd_tabs">
+                 
+                 <div class="hd_tabs">
                     <el-tabs v-model="activeName">
-                        <el-tab-pane label="单聊" name="0">
-                            <div class="ct_box">                         
-                                暂无联系人
-                            </div>
+                        <el-tab-pane label="单聊" name="0">                                           
+                           <div class="hd_tabs_content">
+                                <!-- <list v-if="activeName==0" :personList="personList" :loading="loading" >
+                                </list> -->
+                           </div>
                         </el-tab-pane>
-                        <el-tab-pane label="群聊" name="1">
-                            <div class="ct_box">
-                                暂无群聊记录
-                            </div>
+                        <el-tab-pane label="群聊" name="2">
+                            <list v-if="activeName==2" :personList="personList" :loading="loading"  @chatFn="chatFn">
+                                </list>
                         </el-tab-pane>                  
                     </el-tabs>
-                </div></div>
+                </div>
+                
            
             </el-col>
             <el-col :span="12">
                 <div class="hd_box">
-                    <div class="hd_name hd_nameRi">下载会话</div>
+                   <div class="hd_name"><span v-if="chatData&&chatData.finalChatContext">与{{chatData.finalChatContext.roomInfo.name}} 的聊天</span>
+                  <span class="fr hd_nameRi">下载会话</span></div>
                 </div>
                 <div class=" hd_tabthree">
-                    <el-tabs v-model="activeNameThree">
-                        <el-tab-pane label="全部" name="0">
+                    <el-tabs v-model="activeNameThree" @tab-click="activeNameThreeClick()">
+                            <el-tab-pane label="全部" name="0">
                             <div class="ct_box">
                                 <div class="hds_time">
-                                    <el-date-picker v-model="takeTime" type="date" placeholder="选择日期">
+                                    <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd'
+                                        range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
+                                        align="right" @change="activeNameThreeClick">
                                     </el-date-picker>
                                 </div>
+                                <chat :allChat="allChat" v-if="allChat.length>=1"></chat>
+                                <el-pagination background v-if="allChat.length>=1" layout="prev, pager, next"
+                                    class="pagination" :current-page="currentPage" @current-change="currentChange"
+                                    :total="total">
+                                </el-pagination>
                             </div>
                         </el-tab-pane>
                         <el-tab-pane label="图片及视频" name="1">
                             <div class="ct_box">
                                 <div class="hds_time">
-                                    <el-date-picker v-model="takeTime" type="date" placeholder="选择日期">
+                                    <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd'
+                                        range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
+                                        align="right" @change="activeNameThreeClick">
                                     </el-date-picker>
                                 </div>
+                                <chat :allChat="allChatImg" v-if="allChatImg.length>=1"></chat>
+                                <el-pagination background v-if="allChatImg.length>=1" class="pagination"
+                                    layout="prev, pager, next" :total="total" @current-change="currentChange"
+                                    :current-page="currentPage">
+                                </el-pagination>
                             </div>
                         </el-tab-pane>
-                        <el-tab-pane label="文件" name="3">
+                        <el-tab-pane label="文件" name="2">
                             <div class="ct_box">
                                 <div class="hds_time">
-                                    <el-date-picker v-model="takeTime" type="date" placeholder="选择日期">
+                                    <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd'
+                                        range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
+                                        align="right" @change="activeNameThreeClick">
                                     </el-date-picker>
                                 </div>
-                                <el-table :data="fileData" stripe style="width: 100%"
+                                <el-table :data="allFile" stripe style="width: 100%"
                                     :header-cell-style="{background:'#fff'}">
-                                    <el-table-column prop="date" label="类型">
+                                    <el-table-column prop="msgtype" label="类型">
                                     </el-table-column>
-                                    <el-table-column prop="name" label="名称">
+                                    <el-table-column label="名称">
+                                        <template slot-scope="scope">
+                                            {{scope.row.file.filename}}
+                                        </template>
                                     </el-table-column>
-                                    <el-table-column prop="address" label="大小">
+                                    <el-table-column label="大小">
+                                        <template slot-scope="scope">
+                                            {{filterSize(scope.row.file.filesize)}}
+                                        </template>
                                     </el-table-column>
-                                    <el-table-column prop="address" label="来源">
+                                    <el-table-column prop="action" label="来源">
+                                        <template slot-scope="scope">
+                                            {{scope.row.tolist[0]}}
+                                        </template>
                                     </el-table-column>
-                                    <el-table-column prop="address" label="操作">
+                                    <el-table-column prop="action" label="操作">
+                                        <template slot-scope="scope">
+                                            <el-button type="text" size="small">下载</el-button>
+                                            <el-button type="text" size="small">查看</el-button>
+                                        </template>
                                     </el-table-column>
                                 </el-table>
                             </div>
                         </el-tab-pane>
-                        <el-tab-pane label="链接" name="4">
+                        <el-tab-pane label="链接" name="3">
                             <div class="ct_box">
                                 <div class="hds_time">
-                                    <el-date-picker v-model="takeTime" type="date" placeholder="选择日期">
+                                    <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd'
+                                        range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
+                                        align="right" @change="activeNameThreeClick">
                                     </el-date-picker>
                                 </div>
                             </div>
                         </el-tab-pane>
-                        <el-tab-pane label="语音通话" name="5">
+                        <el-tab-pane label="语音通话" name="4">
                             <div class="ct_box">
                                 <div class="hds_time">
-                                    <el-date-picker v-model="takeTime" type="date" placeholder="选择日期">
+                                    <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd'
+                                        range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
+                                        align="right" @change="activeNameThreeClick">
                                     </el-date-picker>
                                 </div>
                                 <el-table :data="fileData" stripe style="width: 100%"
@@ -125,35 +164,147 @@
     </div>
 </template>
 <script>
+    import list from '../component/curList.vue'
+    import chat from '../component/chat.vue'
+import {
+        content
+    } from '@/api/content.js'
+     import {
+        yearMouthDay
+    } from '@/utils/common.js'
     export default {
+        components:{
+            list,chat
+        },
         data() {
             return {
                 employAmount: 1,
                 employName: '',
                 talkName: '',
                 personIndex: '-1',
-                activeName: "1",
-                activeNameThree: '1',
+                activeName: "2",
+                activeNameThree: '0',
                 takeTime: '',
-                fileData: []
+                fileData: [],
+                CList:[],
+                personList:[],
+                loading:false,
+                employId:'',
+                chatData:{},
+
+                allChat:[],
+                  allChatImg:[],
+                  allFile:[],
+                  allLInk:[],
+                  allVoice:[],
+                //分页
+                currentPage:1,
+                total:0
+              
             };
         },
-
+        
         methods: {
-            personCheck(name, e) {
-                this.personIndex = e
-                this.talkName = name
+            chatFn(data){
+                this.chatData=data
+                if (data.fromId) {
+                  this.activeNameThreeClick()
+                }
+            },
+            currentChange(){
+                this.currentPage = e
+                this.activeNameThreeClick(true)
+            },
+            personCheck(data, e) {
+                  this.personIndex = e
+                  this.talkName = data.name;
+                  this.employId=data.externalUserid
+                  this.getChatList() 
+            },
+            getChatList(flag){
+              if (!this.employId) {
+                    return
+                }
+                if (flag) {
+                    this.loading = true
+                }
+                content.getTree({
+                    fromId: this.employId,
+                    searchType: this.activeName
+                }).then(({
+                    rows
+                }) => {
+                    console.log(rows)
+                     this.loading = false
+                    this.personList = rows
+                }).catch(err => {
+                    this.loading = false
+                })
+            },
+            activeNameThreeClick(page){
+                  if (!!!page) {
+                    this.currentPage = 1
+                }
+                  let msgType = ''
+                    if (this.activeNameThree == 0) {
+                        msgType = ''
+                    } else if (this.activeNameThree == 1) {
+                        msgType = 'image'
+                    } else if (this.activeNameThree == 2) {
+                        msgType = 'file'
+                    } else if (this.activeNameThree == 3) {
+                        msgType = 'link'
+                    } else if (this.activeNameThree == 4) {
+                        msgType = 'voice'
+                    }
+                  let query = {
+                        fromId: this.chatData.fromId,
+                        receiveId: this.chatData.roomId,
+                        msgType,
+                        pageSize: '10',
+                        pageNum: this.currentPage,
+                        beginTime: this.takeTime ? yearMouthDay(this.takeTime[0]) : "",
+                        endTime: this.takeTime ? yearMouthDay(this.takeTime[1]) : '',
+                    }
+                     content.chatList(query).then(res => {
+                        this.total = Number(res.total)
+                        console.log(res,'chatData')
+                        if (this.activeNameThree == 0) {
+                            return this.allChat = res.rows
+                        }
+                        if (this.activeNameThree == 1) {
+                            return this.allChatImg = res.rows
+                        }
+                        if (this.activeNameThree == 2) {
+                            return this.allFile = res.rows
+                        }
+                        if (this.activeNameThree == 3) {
+                            return this.allLInk = res.rows
+                        }
+                        if (this.activeNameThree == 4) {
+                            return this.allVoice = res.rows
+                        }
+                    })
+            },
+            customerList(){
+            content.listByCustomer().then(res=>{
+               res.rows= res.rows.filter((a,b)=>{ return a&&a.name})    
+                this.CList=res.rows  
+                this.employAmount=res.total;
+           })
             }
-
+        },
+        mounted(){
+           this.customerList()
         }
 
     }
 </script>
 <style lang="scss" scoped>
-    /deep/ #tab-0 {
-        text-indent: 15px;
+    /deep/.el-tabs__nav-scroll {
+        padding-left: 15px;
     }
-
+.fr{float:right;}
     .borderR {
         border-right: 2px solid #ccc;
     }
@@ -184,7 +335,7 @@
             font-size: 18px;
             min-height: 20px;
         }
-
+.hd_tabs_content{ width: 100%;min-height: 653px;border-bottom: 1px solid #efefef; }
         .hd_nameRi {
             color: #199ed8;
             text-align: right;
@@ -193,12 +344,13 @@
         }
 
         .ct_boxFirst {
-            height: 720px;
+            height: 700px;
         }
 
         .ct_box {
             background: white;
-            min-height: 710px;
+            border-bottom: 1px solid #efefef;
+            min-height: 709px;
             padding: 10px;
             overflow-y: scroll;
             color: #999;
@@ -214,12 +366,11 @@
             }
 
             ul li {
-                margin-bottom: 3px;
-                padding: 10px 20px;
+             
                 text-align: left;
                 cursor: pointer;
                 border-bottom: 1px solid #efefef;
-
+                 :hover{ background: #efefef;}
                 img {
                     width: 40px;
                 }
@@ -229,13 +380,20 @@
 
             .liActive {
                 background: lightblue !important;
-                color: #fff;
+                color: #199ed8;
             }
 
             .hds_time {
-                float: left;
+                text-align: left;
+                 width: 100%;
                 padding: 10px 0;
             }
         }
+       
+    }
+      .pagination {
+        padding: 10px 0;
+        height: 30px;
+        float: left;
     }
 </style>

@@ -16,7 +16,7 @@ public interface IWeChatSideService extends IService<WeChatSide> {
      *
      * @return {@link WeChatSide}s
      */
-    public List<WeChatSide> chatSides();
+    public List<WeChatSide> chatSides(String h5);
 
     /**
      * 更新侧边栏信息

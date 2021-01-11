@@ -30,9 +30,9 @@ public class WeChatSideController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('chat:side:list')")
     @GetMapping("/list")
-    public TableDataInfo list() {
+    public TableDataInfo list(@RequestParam(value = "h5") String h5) {
         startPage();
-        List<WeChatSide> weChatSides = weChatSideService.chatSides();
+        List<WeChatSide> weChatSides = weChatSideService.chatSides(h5);
         return getDataTable(weChatSides);
     }
 

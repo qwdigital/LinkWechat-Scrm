@@ -68,8 +68,8 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
                 .minimumShouldMatch(1);
         //时间范围查询
         if (StringUtils.isNotEmpty(query.getBeginTime()) && StringUtils.isNotEmpty(query.getEndTime())) {
-            Date beginTime = DateUtils.dateTime(query.getBeginTime(), DateUtils.YYYY_MM_DD);
-            Date endTime = DateUtils.dateTime(query.getEndTime(), DateUtils.YYYY_MM_DD);
+            Date beginTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD,query.getBeginTime());
+            Date endTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD,query.getEndTime());
             boolQueryBuilder.filter(QueryBuilders.rangeQuery("msgtime").gte(beginTime).lte(endTime));
         }
         builder.query(boolQueryBuilder);
@@ -105,8 +105,8 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
 
         //时间范围查询
         if (StringUtils.isNotEmpty(query.getBeginTime()) && StringUtils.isNotEmpty(query.getEndTime())) {
-            Date beginTime = DateUtils.dateTime(query.getBeginTime(), DateUtils.YYYY_MM_DD);
-            Date endTime = DateUtils.dateTime(query.getEndTime(), DateUtils.YYYY_MM_DD);
+            Date beginTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD,query.getBeginTime());
+            Date endTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD,query.getEndTime());
             boolQueryBuilder.filter(QueryBuilders.rangeQuery("msgtime").gte(beginTime).lte(endTime));
         }
 
@@ -194,8 +194,8 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
 
         //时间范围查询
         if (StringUtils.isNotEmpty(query.getBeginTime()) && StringUtils.isNotEmpty(query.getEndTime())) {
-            Date beginTime = DateUtils.dateTime(query.getBeginTime(), DateUtils.YYYY_MM_DD);
-            Date endTime = DateUtils.dateTime(query.getEndTime(), DateUtils.YYYY_MM_DD);
+            Date beginTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD,query.getBeginTime());
+            Date endTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD,query.getEndTime());
             boolQueryBuilder.filter(QueryBuilders.rangeQuery("msgtime").gte(beginTime).lte(endTime));
         }
         builder.query(boolQueryBuilder);
