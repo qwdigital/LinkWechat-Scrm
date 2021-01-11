@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,7 +66,7 @@ public class WeMsgTlpServiceImpl implements IWeMsgTlpService
     public int insertWeMsgTlp(WeMsgTlp weMsgTlp)
     {
         weMsgTlp.setCreateBy(SecurityUtils.getUsername());
-
+        weMsgTlp.setCreateTime(new Date());
 
         return weMsgTlpMapper.insertWeMsgTlp(weMsgTlp);
 
@@ -112,7 +113,6 @@ public class WeMsgTlpServiceImpl implements IWeMsgTlpService
 //            }
 //
 //        }
-
         return weMsgTlpMapper.updateWeMsgTlp(weMsgTlp);
     }
 
