@@ -72,7 +72,7 @@ export default {
       srcList: [],
       ids: [], // 选中数组
       previewImg: '', // 预览图片地址
-      useDefaultUI: true,
+      useDefaultUI: false,
       options: {
         includeUI: {
           // initMenu: "text",
@@ -83,7 +83,7 @@ export default {
           // },
           usageStatistics: false,
           menuBarPosition: "right",
-          menu: [],
+          menu: [],  // FIXME 因为借用了CANVAS的UI  所以需要使用TEXT，需要额外注释,后面创建自己的UI在去掉
           theme: {
             "common.bi.image": "",
             "common.bisize.width": "251px",
@@ -101,9 +101,7 @@ export default {
             "menu.iconSize.width": "34px",
             "menu.iconSize.height": "34px",
           }
-        },
-        // cssMaxWidth: 640,
-        // cssMaxHeight: 1136
+        }
       }
     }
   },

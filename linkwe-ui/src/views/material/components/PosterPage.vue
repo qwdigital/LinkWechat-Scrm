@@ -36,7 +36,7 @@ export default {
             options = Object.assign(includeUIOptions, this.options);
         }
         this.editorInstance = new ImageEditor(this.$refs.tuiImageEditor, options);
-        document.getElementsByClassName('tui-image-editor-header')[0].innerHTML = '';
+        // document.getElementsByClassName('tui-image-editor-header')[0].innerHTML = '';
        
         if(window.localStorage.getItem('record')){
             let list = JSON.parse(window.localStorage.getItem('record'));
@@ -71,16 +71,16 @@ export default {
             this.activeObjectId = null;
 
             // btns leftBtn
-            this.btn_deleteAll = document.getElementsByClassName('tie-btn-deleteAll')[0];
-            this.btn_deleteAll.name = 'deleteAll';
-            this.btn_delete = document.getElementsByClassName('tie-btn-delete')[0];
-            this.btn_delete.name = 'delete';
-            this.btn_reset = document.getElementsByClassName('tie-btn-reset')[0];
-            this.btn_reset.style.display = 'none'
-            this.btn_redo = document.getElementsByClassName('tie-btn-redo')[0];
-            this.btn_redo.name = 'redo';
-            this.btn_undo = document.getElementsByClassName('tie-btn-undo')[0];
-            this.btn_undo.name = 'undo';
+            // this.btn_deleteAll = document.getElementsByClassName('tie-btn-deleteAll')[0];
+            // this.btn_deleteAll.name = 'deleteAll';
+            // this.btn_delete = document.getElementsByClassName('tie-btn-delete')[0];
+            // this.btn_delete.name = 'delete';
+            // this.btn_reset = document.getElementsByClassName('tie-btn-reset')[0];
+            // this.btn_reset.style.display = 'none'
+            // this.btn_redo = document.getElementsByClassName('tie-btn-redo')[0];
+            // this.btn_redo.name = 'redo';
+            // this.btn_undo = document.getElementsByClassName('tie-btn-undo')[0];
+            // this.btn_undo.name = 'undo';
 
             // btns rightBtn
             this.btnText = document.getElementById('btn-text');
@@ -125,14 +125,10 @@ export default {
             }.bind(this));
         },
         addEventListener() {
-            // Object.keys(this.$listeners).forEach(eventName => {
-            //     this.editorInstance.on(eventName, (...args) => this.$emit(eventName, ...args));
-            // });
-            this.btn_deleteAll.addEventListener('click', this.mouseClickHandler.bind(this))
-            this.btn_delete.addEventListener('click', this.mouseClickHandler.bind(this))
-            // this.btn_reset.addEventListener('click', this.mouseClickHandler.bind(this))
-            this.btn_redo.addEventListener('click', this.mouseClickHandler.bind(this))
-            this.btn_undo.addEventListener('click', this.mouseClickHandler.bind(this))
+            // this.btn_deleteAll.addEventListener('click', this.mouseClickHandler.bind(this))
+            // this.btn_delete.addEventListener('click', this.mouseClickHandler.bind(this))
+            // this.btn_redo.addEventListener('click', this.mouseClickHandler.bind(this))
+            // this.btn_undo.addEventListener('click', this.mouseClickHandler.bind(this))
 
             this.btnText.addEventListener('click', this.mouseClickHandler.bind(this))
             this.btnImage.addEventListener('click', this.mouseClickHandler.bind(this))
@@ -182,6 +178,9 @@ export default {
                 imageEditor.showSubMenu('text');
                 imageEditor.setTextToolbar(obj);
                 imageEditor.activateTextMode();
+            } else {
+                // 目前就一个TEXT SUB
+                this.displayingSubMenu && (this.displayingSubMenu.style.display = 'none');
             }
         },
         //缩放
@@ -192,20 +191,20 @@ export default {
             }
         },
         onRedoStackChanged(length) {
-            if (length) {
-                this.btn_redo.classList.remove('disabled');
-            } else {
-                this.btn_redo.classList.add('disabled');
-            }
-            this.resizeEditor();
+            // if (length) {
+            //     this.btn_redo.classList.remove('disabled');
+            // } else {
+            //     this.btn_redo.classList.add('disabled');
+            // }
+            // this.resizeEditor();
         },
         onUndoStackChanged(length) {
-            if (length) {
-                this.btn_undo.classList.remove('disabled')
-            } else {
-                this.btn_undo.classList.add('disabled')
-            }
-            this.resizeEditor();
+            // if (length) {
+            //     this.btn_undo.classList.remove('disabled')
+            // } else {
+            //     this.btn_undo.classList.add('disabled')
+            // }
+            // this.resizeEditor();
         },
         mouseClickHandler (event) {
             let name = event.currentTarget.name;
@@ -417,7 +416,7 @@ export default {
             // }.bind(this));
             this.editorInstance
             .addText(text || '双击输入文字', {
-                position: pos.originPosition,
+                position: position,
             })
             .then(function (objectProps) {
                 console.log(objectProps);
