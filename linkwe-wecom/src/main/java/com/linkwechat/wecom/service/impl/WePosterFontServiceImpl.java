@@ -55,13 +55,16 @@ public class WePosterFontServiceImpl extends ServiceImpl<WePosterFontMapper,WePo
 
     @Override
     public Font getFont(Long id, Integer size,Integer fontStyle) {
+        int fontType = Font.PLAIN;
+        if(fontStyle.equals(1)){
+            fontType = Font.BOLD;
+        }else if(fontStyle.equals(2)){
+            fontType = Font.ITALIC;
+        }else if(fontStyle.equals(3)){
+            fontType = Font.BOLD + Font.ITALIC;
+        }
         if(id == null || id.equals(0L)){
-            if(fontStyle > 0){
-                return DEFAULT_FONT.deriveFont(fontStyle.equals(1)?Font.BOLD:Font.ITALIC,(float)size);
-            }else {
-                return DEFAULT_FONT.deriveFont((float)size);
-            }
-
+            return DEFAULT_FONT.deriveFont(fontType,(float)size);
         }
         WePosterFont posterFont = this.getById(id);
         if(posterFont == null){
@@ -75,7 +78,7 @@ public class WePosterFontServiceImpl extends ServiceImpl<WePosterFontMapper,WePo
         try {
             font = Font.createFont(Font.TRUETYPE_FONT, byteArrayInputStream);
             FONT_MAP.put(posterFont.getId(),font);
-            font = font.deriveFont((float)size);
+            font = font.deriveFont(fontType,(float)size);
             return font;
         } catch (FontFormatException e) {
             e.printStackTrace();
