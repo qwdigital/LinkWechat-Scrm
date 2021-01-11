@@ -29,4 +29,7 @@ public class ConversationArchiveQuery extends BaseEntity {
 
     /** 关键词 **/
     private String keyWord;
+
+    /** 消息动作 */
+    private String action;
 }

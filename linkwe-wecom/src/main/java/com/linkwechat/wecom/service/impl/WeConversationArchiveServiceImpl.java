@@ -186,6 +186,11 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
                     .must(QueryBuilders.existsQuery("fromInfo.externalUserid")));
         }
 
+        //消息动作
+        if(StringUtils.isNotEmpty(query.getAction())){
+            boolQueryBuilder.must(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("action",query.getAction())));
+        }
+
         //关键词查询并高亮显示
         if (StringUtils.isNotEmpty(query.getKeyWord())){
             boolQueryBuilder.must(QueryBuilders.multiMatchQuery(query.getKeyWord(),"text.content"));
