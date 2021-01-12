@@ -104,6 +104,11 @@ mybatis-plus:
    type-handlers-package: com.linkwechat.framework.handler.**
    configuration:
      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+   global-config:
+     db-config:
+       logic-delete-field: delFlag
+       logic-delete-value: 1
+       logic-not-delete-value: 0
 
 ## MyBatis配置
 #mybatis:
