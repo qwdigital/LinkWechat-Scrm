@@ -69,9 +69,9 @@ spring:
   # redis 配置
   redis:
     # 地址
-    host: localhost
+    host: {REDIS_HOST:localhost}
     # 端口，默认为6379
-    port: 6379
+    port: {REDIS_PORT:6379}
     # 密码
     password:
     # 连接超时时间
@@ -145,7 +145,7 @@ xss:
 # elasticsearch配置
 elasticsearch:
   schema: http
-  address: localhost
+  address: {ES_ADDRESS:localhost}
   connectTimeout: 10000
   socketTimeout: 10000
   connectionRequestTimeout: 10000
