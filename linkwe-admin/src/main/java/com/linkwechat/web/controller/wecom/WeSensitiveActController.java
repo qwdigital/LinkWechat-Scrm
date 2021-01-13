@@ -6,7 +6,10 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.wecom.domain.WeSensitiveAct;
+import com.linkwechat.wecom.domain.WeSensitiveActHit;
+import com.linkwechat.wecom.service.IWeSensitiveActHitService;
 import com.linkwechat.wecom.service.IWeSensitiveActService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,6 +32,9 @@ import java.util.stream.Collectors;
 public class WeSensitiveActController extends BaseController {
     @Autowired
     private IWeSensitiveActService weSensitiveActService;
+
+    @Autowired
+    private IWeSensitiveActHitService weSensitiveActHitService;
 
     /**
      * 查询敏感行为列表
@@ -86,5 +92,27 @@ public class WeSensitiveActController extends BaseController {
         Long[] idArray = new Long[id.length];
         Arrays.stream(id).map(Long::parseLong).collect(Collectors.toList()).toArray(idArray);
         return weSensitiveActService.deleteWeSensitiveActByIds(idArray) ? AjaxResult.success() : AjaxResult.error();
+    }
+
+    /**
+     * 敏感词命中查询
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:sensitiveacthit:list')")
+    @GetMapping("/hit/list")
+    public TableDataInfo hitList() {
+        startPage();
+        List<WeSensitiveActHit> list = weSensitiveActHitService.list();
+        return getDataTable(list);
+    }
+
+    /**
+     * 导出敏感行为记录
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:sensitiveacthit:export')")
+    @PostMapping("/hit/export")
+    public AjaxResult export() {
+        List<WeSensitiveActHit> list = weSensitiveActHitService.list();
+        ExcelUtil<WeSensitiveActHit> util = new ExcelUtil<>(WeSensitiveActHit.class);
+        return util.exportExcel(list, "敏感行为记录");
     }
 }

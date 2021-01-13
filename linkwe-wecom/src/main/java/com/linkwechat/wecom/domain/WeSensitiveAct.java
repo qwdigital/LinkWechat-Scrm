@@ -48,11 +48,11 @@ public class WeSensitiveAct extends BaseEntity {
     private Integer orderNum;
 
     /**
-     * 消息通知
+     * 是否开启记录
      */
-    @TableField(value = "alert_flag")
+    @TableField(value = "enable_flag")
     @ApiModelProperty(value = "1 开启 0 关闭")
-    private Integer alertFlag;
+    private Integer enableFlag;
 
     /**
      * 删除状态
@@ -67,7 +67,7 @@ public class WeSensitiveAct extends BaseEntity {
                 .append("id", getId())
                 .append("actName", getActName())
                 .append("orderNum", getOrderNum())
-                .append("alertFlag", getAlertFlag())
+                .append("enableFlag", getEnableFlag())
                 .append("delFlag", getDelFlag())
                 .append("createBy", getCreateBy())
                 .append("createTime", getCreateTime())
