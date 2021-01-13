@@ -39,7 +39,7 @@ public class WeChatItemController extends BaseController {
     /**
      * h5素材列表
      */
-    @PreAuthorize("@ss.hasPermi('chat:item:list')")
+    //@PreAuthorize("@ss.hasPermi('chat:item:list')")
     @GetMapping("/list")
     public TableDataInfo list(@RequestParam(value = "sideId") Long sideId) {
         startPage();

@@ -30,7 +30,7 @@ public class WeChatCollectionController extends BaseController {
     /**
      * 添加收藏
      */
-    @PreAuthorize("@ss.hasPermi('chat:collection:add')")
+    //@PreAuthorize("@ss.hasPermi('chat:collection:add')")
     @Log(title = "添加收藏", businessType = BusinessType.INSERT)
     @PutMapping("addCollection")
     public AjaxResult addCollection(@RequestParam(value = "materialId") Long materialId,@RequestParam(value = "userId") Long userId) {
@@ -42,7 +42,7 @@ public class WeChatCollectionController extends BaseController {
      * 取消收藏
      */
     @PreAuthorize("@ss.hasPermi('chat:collection:delete')")
-    @Log(title = "取消收藏", businessType = BusinessType.UPDATE)
+   // @Log(title = "取消收藏", businessType = BusinessType.UPDATE)
     @PostMapping(value = "cancleCollection")
     public AjaxResult cancleCollection(@RequestParam(value = "materialId") Long materialId,@RequestParam(value = "userId") Long userId) {
         return toAjax(weChatCollectionService.cancleCollection(materialId, userId));
@@ -51,7 +51,7 @@ public class WeChatCollectionController extends BaseController {
     /**
      * 收藏列表
      */
-    @PreAuthorize("@ss.hasPermi('chat:collection:list')")
+  //  @PreAuthorize("@ss.hasPermi('chat:collection:list')")
     @GetMapping("/list")
     public TableDataInfo list(@RequestParam(value = "userId") Long userId) {
         startPage();

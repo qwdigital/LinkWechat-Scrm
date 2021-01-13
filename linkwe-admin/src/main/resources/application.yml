@@ -165,6 +165,10 @@ wecome:
           - /gettoken
           - /service/get_provider_token
           - /wecom/chat/side/list
+          - /wecom/chat/item/list
+          - /wecom/chat/collection/addCollection
+          - /wecom/chat/collection/cancleCollection
+          - /wecom/chat/collection/list
   needContactTokenUrl:
           - /externalcontact/get_follow_user_list
           - /externalcontact/add_contact_way
