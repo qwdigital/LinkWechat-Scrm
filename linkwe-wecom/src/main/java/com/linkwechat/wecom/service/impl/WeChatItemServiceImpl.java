@@ -45,7 +45,7 @@ public class WeChatItemServiceImpl extends ServiceImpl<WeChatItemMapper, WeChatI
         List<Long> materialIds=new ArrayList<>();
 
 
-        if(chatItemDto.getCheckAll().equals("0")){
+        if("0".equals(chatItemDto.getCheckAll())){
 
             List<WeMaterial> weMaterials = weMaterialService.findWeMaterials(null, null, chatItemDto.getMediaType());
 

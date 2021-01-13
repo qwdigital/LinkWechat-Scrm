@@ -28,7 +28,7 @@ public class WeChatSideController extends BaseController {
     /**
      * 群发侧边栏列表
      */
-    @PreAuthorize("@ss.hasPermi('chat:side:list')")
+   // @PreAuthorize("@ss.hasPermi('chat:side:list')")
     @GetMapping("/list")
     public TableDataInfo list(@RequestParam(value = "h5") String h5) {
         startPage();
