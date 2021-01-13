@@ -33,9 +33,9 @@ td {
   padding: 0;
 }
 body,input, select, textarea /* for ie */ {
-  font: 14px Microsoft YaHei, "宋体", arial, -apple-system, "PingFang SC",
-    "Helvetica Neue", Helvetica, "DejaVu Sans", "Lucida Grande", Tahoma,
-    "Hiragino Sans GB", STHeiti, SimSun, sans-serif;
+  font: 14px Microsoft YaHei, '宋体', arial, -apple-system, 'PingFang SC',
+    'Helvetica Neue', Helvetica, 'DejaVu Sans', 'Lucida Grande', Tahoma,
+    'Hiragino Sans GB', STHeiti, SimSun, sans-serif;
   line-height: 1.15;
   color: #333; /*touch-action: none*/
 } /** 设置默认字体 **/
@@ -119,18 +119,18 @@ a {
 }
 /*click outline for firefox*/
 button::-moz-focus-inner,
-input[type="reset"]::-moz-focus-inner,
-input[type="button"]::-moz-focus-inner,
-input[type="submit"]::-moz-focus-inner,
-input[type="file"] > input[type="button"]::-moz-focus-inner {
+input[type='reset']::-moz-focus-inner,
+input[type='button']::-moz-focus-inner,
+input[type='submit']::-moz-focus-inner,
+input[type='file'] > input[type='button']::-moz-focus-inner {
   border: none;
 }
 /*click outline for IE and other browser*/
 button:focus,
-input[type="reset"]:focus,
-input[type="button"]:focus,
-input[type="submit"]:focus,
-input[type="file"] > input[type="button"]:focus {
+input[type='reset']:focus,
+input[type='button']:focus,
+input[type='submit']:focus,
+input[type='file'] > input[type='button']:focus {
   outline: none;
 }
 
@@ -203,6 +203,23 @@ textarea:-ms-input-placeholder {
   float: right;
   position: relative;
 }
+.flex {
+  display: flex;
+}
+
+.fxbw {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+ais {
+  align-items: stretch;
+}
+
+.aic {
+  align-items: center;
+}
 .al {
   text-align: left;
 }
@@ -255,6 +272,17 @@ textarea:-ms-input-placeholder {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.line2-toe {
+  text-overflow: -o-ellipsis-lastline;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  display: -webkit-box;
+  white-space: pre-wrap;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
 /*close*/
 .close {
   position: relative;
@@ -277,4 +305,100 @@ textarea:-ms-input-placeholder {
 }
 .cp {
   cursor: pointer;
+}
+
+.pt5 {
+  padding-top: 5px;
+}
+.pb5 {
+  padding-bottom: 5px;
+}
+.pt10 {
+  padding-top: 10px;
+}
+.pt15 {
+  padding-top: 15px;
+}
+.pt20 {
+  padding-top: 20px;
+}
+
+.pr5 {
+  padding-right: 5px;
+}
+
+.pb5 {
+  padding-bottom: 5px;
+}
+
+.pl5 {
+  padding-left: 5px;
+}
+
+.mt5 {
+  margin-top: 5px;
+}
+
+.mr5 {
+  margin-right: 5px;
+}
+
+.mb5 {
+  margin-bottom: 5px;
+}
+
+.mb8 {
+  margin-bottom: 8px;
+}
+
+.ml5 {
+  margin-left: 5px;
+}
+
+.mt10 {
+  margin-top: 10px;
+}
+
+.mr10 {
+  margin-right: 10px;
+}
+
+.mb10 {
+  margin-bottom: 10px;
+}
+
+.ml10 {
+  margin-left: 10px;
+}
+
+.mt15 {
+  margin-top: 15px;
+}
+
+.mr15 {
+  margin-right: 15px;
+}
+
+.mb15 {
+  margin-bottom: 15px;
+}
+
+.ml15 {
+  margin-left: 15px;
+}
+
+.mt20 {
+  margin-top: 20px;
+}
+
+.mr20 {
+  margin-right: 20px;
+}
+
+.mb20 {
+  margin-bottom: 20px;
+}
+
+.ml20 {
+  margin-left: 20px;
 }

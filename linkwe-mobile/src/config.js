@@ -13,10 +13,13 @@ const config = {
    * @description api请求基础路径
    */
   // 测试服
-  domain: process.env.NODE_ENV === 'development' ? 'http://192.168.1.32:8888' : 'http://192.168.1.26:8888', // 
+  domain:
+    process.env.NODE_ENV === 'development'
+      ? 'http://192.168.1.32:8888'
+      : 'http://192.168.1.26:8888', //
 
   // 正式服
-  //   domain: process.env.NODE_ENV === 'development' ? 'http://192.168.1.35:8118' : 'https://gateway.visualinsur.cn:8888', // 
+  //   domain: process.env.NODE_ENV === 'development' ? 'http://192.168.1.35:8118' : 'https://gateway.visualinsur.cn:8888', //
   /**
    * @description 默认打开的首页的路由name值，默认为home
    */
@@ -36,6 +39,7 @@ const config = {
 }
 
 config.services = {
+  wecom: '/wecom',
 }
 
 export default config

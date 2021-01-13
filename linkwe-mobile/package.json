@@ -11,6 +11,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "normalize.css": "^8.0.1",
     "vant": "^2.12.2",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
