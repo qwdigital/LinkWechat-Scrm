@@ -33,7 +33,7 @@ public class WeSensitiveActServiceImpl extends ServiceImpl<WeSensitiveActMapper,
         if (weSensitiveAct != null && StringUtils.isNotBlank(weSensitiveAct.getActName())) {
             lambda.eq(WeSensitiveAct::getActName, weSensitiveAct);
         }
-        lambda.orderByDesc(WeSensitiveAct::getOrderNum)
+        lambda.orderByAsc(WeSensitiveAct::getOrderNum)
                 .orderByDesc(WeSensitiveAct::getUpdateTime)
                 .orderByDesc(WeSensitiveAct::getCreateTime);
         return list(lambda);

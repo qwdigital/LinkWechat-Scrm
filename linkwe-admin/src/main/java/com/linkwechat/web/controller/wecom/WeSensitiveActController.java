@@ -72,7 +72,7 @@ public class WeSensitiveActController extends BaseController {
     @PreAuthorize("@ss.hasPermi('wecom:sensitiveact:edit')")
     @Log(title = "修改敏感行为", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@Valid @RequestBody WeSensitiveAct weSensitiveAct) {
+    public AjaxResult edit(@RequestBody WeSensitiveAct weSensitiveAct) {
         Long id = weSensitiveAct.getId();
         WeSensitiveAct originData = weSensitiveActService.selectWeSensitiveActById(id);
         if (originData == null) {
