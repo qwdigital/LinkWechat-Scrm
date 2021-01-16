@@ -2,7 +2,7 @@
 <p></p>
 
 <p align="center">
-  <img alt="logo" src="https://images.gitee.com/uploads/images/2020/1203/143430_03205b51_1480777.png" width="120" style="margin-bottom: 0px;">
+  <img alt="logo" src="https://images.gitee.com/uploads/images/2021/0107/210318_e1f66c96_1480777.png" width="120" style="margin-bottom: 0px;">
 </p>
 <h2 align="center">LinkWeChat —— 让每个企业都是私域流量营销专家</h2>
 

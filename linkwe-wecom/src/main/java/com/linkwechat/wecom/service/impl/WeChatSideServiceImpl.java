@@ -21,8 +21,8 @@ public class WeChatSideServiceImpl extends ServiceImpl<WeChatSideMapper, WeChatS
     private WeChatSideMapper weChatSideMapper;
 
     @Override
-    public List<WeChatSide> chatSides() {
-        return weChatSideMapper.selectWeChatSides();
+    public List<WeChatSide> chatSides(String h5) {
+        return weChatSideMapper.selectWeChatSides(h5);
     }
 
     @Override
