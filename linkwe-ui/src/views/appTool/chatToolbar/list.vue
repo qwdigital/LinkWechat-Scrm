@@ -120,9 +120,9 @@ export default {
               v-model="row.sideName"
               placeholder="请输入"
             ></el-input>
-            <div v-else>
+            <span v-else>
               {{ row.sideName }}
-            </div>
+            </span>
 
             <i
               v-if="!row.isEdit"
@@ -273,8 +273,11 @@ export default {
   }
 }
 .row-icon {
-  font-size: 18px;
-  vertical-align: middle;
-  margin: 7px 0 0 10px;
+  font-size: 14px;
+  // vertical-align: middle;
+  margin-left: 5px;
+}
+.el-icon-circle-check {
+  margin-top: 10px;
 }
 </style>
