@@ -80,6 +80,7 @@ export default {
       update(data)
         .then(() => {
           this.msgSuccess('操作成功')
+          this.$set(data, 'isEdit', false)
           this.loading = false
         })
         .catch(() => {
@@ -110,11 +111,31 @@ export default {
             {{ mediaType[scope.row.mediaType] }}
           </template>
         </el-table-column>
-        <el-table-column
-          label="聊天工具栏名称"
-          align="center"
-          prop="sideName"
-        />
+        <el-table-column label="聊天工具栏名称" align="center" prop="sideName">
+          <template slot-scope="{ row }">
+            <el-input
+              class="bfc-d"
+              style="width: 100px;"
+              v-if="row.isEdit"
+              v-model="row.sideName"
+              placeholder="请输入"
+            ></el-input>
+            <div v-else>
+              {{ row.sideName }}
+            </div>
+
+            <i
+              v-if="!row.isEdit"
+              class="row-icon el-icon-edit"
+              @click="$set(row, 'isEdit', true)"
+            ></i>
+            <i
+              v-else
+              class="row-icon el-icon-circle-check"
+              @click="update(row)"
+            ></i>
+          </template>
+        </el-table-column>
         <el-table-column label="已抓取素材数量" align="center" prop="total" />
         <el-table-column
           label="是否启用"
@@ -240,5 +261,20 @@ export default {
     color: #ffe7be;
     width: 100%;
   }
+}
+.el-table__row {
+  .el-icon-edit {
+    visibility: hidden;
+  }
+  &:hover {
+    .el-icon-edit {
+      visibility: visible;
+    }
+  }
+}
+.row-icon {
+  font-size: 18px;
+  vertical-align: middle;
+  margin: 7px 0 0 10px;
 }
 </style>
