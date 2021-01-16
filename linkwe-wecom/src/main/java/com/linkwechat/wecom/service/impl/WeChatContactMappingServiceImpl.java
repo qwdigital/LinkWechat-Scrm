@@ -18,12 +18,14 @@ import com.linkwechat.wecom.domain.WeChatContactMapping;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.dto.WeGroupMemberDto;
 import com.linkwechat.wecom.domain.dto.customer.CustomerGroupDetail;
 import com.linkwechat.wecom.mapper.WeChatContactMappingMapper;
 import com.linkwechat.wecom.mapper.WeCustomerMapper;
 import com.linkwechat.wecom.mapper.WeUserMapper;
 import com.linkwechat.wecom.service.IWeChatContactMappingService;
 import com.linkwechat.wecom.service.IWeConversationArchiveService;
+import com.linkwechat.wecom.service.IWeGroupMemberService;
 import com.linkwechat.wecom.service.IWeGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +63,8 @@ public class WeChatContactMappingServiceImpl extends ServiceImpl<WeChatContactMa
     private IWeConversationArchiveService weConversationArchiveService;
     @Autowired
     private IWeGroupService weGroupService;
+    @Autowired
+    private IWeGroupMemberService weGroupMemberService;
 
     /**
      * 查询聊天关系映射
@@ -98,7 +102,17 @@ public class WeChatContactMappingServiceImpl extends ServiceImpl<WeChatContactMa
                 } else if (StringUtils.isNotEmpty(item.getRoomId())) {
                     //获取群信息
                     WeGroup weGroup = weGroupService.getOne(new LambdaQueryWrapper<WeGroup>().eq(WeGroup::getChatId, item.getRoomId()));
-                    item.setRoomInfo(weGroup);
+                    //查询群成员头像
+                    if (weGroup!=null){
+                        List<WeGroupMemberDto> weGroupMemberDtos = weGroupMemberService.selectWeGroupMemberListByChatId(item.getRoomId());
+                        String roomAvatar = weGroupMemberDtos.stream()
+                                .map(WeGroupMemberDto::getMemberAvatar)
+                                .filter(StringUtils::isNotEmpty)
+                                .limit(9)
+                                .collect(Collectors.joining(","));
+                        weGroup.setAvatar(roomAvatar);
+                        item.setRoomInfo(weGroup);
+                    }
                     item.setFinalChatContext(weConversationArchiveService.getFinalChatRoomContactInfo(item.getFromId(), item.getRoomId()));
                 }
             });

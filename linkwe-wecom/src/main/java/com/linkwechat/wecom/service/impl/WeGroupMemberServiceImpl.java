@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.wecom.domain.WeGroupMember;
+import com.linkwechat.wecom.domain.dto.WeGroupMemberDto;
 import com.linkwechat.wecom.mapper.WeGroupMemberMapper;
 import com.linkwechat.wecom.service.IWeGroupMemberService;
 import org.springframework.stereotype.Service;
@@ -18,8 +19,14 @@ public class WeGroupMemberServiceImpl extends ServiceImpl<WeGroupMemberMapper,We
 
 
 
+    @Override
     public List<WeGroupMember> selectWeGroupMemberList(WeGroupMember weGroupMember) {
         return this.baseMapper.selectWeGroupMemberList(weGroupMember);
+    }
+
+    @Override
+    public List<WeGroupMemberDto> selectWeGroupMemberListByChatId(String chatId) {
+        return this.baseMapper.selectWeGroupMemberListByChatId(chatId);
     }
 
 
