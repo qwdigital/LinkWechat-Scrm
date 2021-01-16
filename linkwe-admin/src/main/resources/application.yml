@@ -145,7 +145,7 @@ xss:
 # elasticsearch配置
 elasticsearch:
   schema: http
-  address: ${ES_ADDRESS:localhost}
+  address: ${ES_ADDRESS:localhost:9200}
   connectTimeout: 10000
   socketTimeout: 10000
   connectionRequestTimeout: 10000
