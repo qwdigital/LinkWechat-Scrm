@@ -121,6 +121,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .antMatchers("/wecom/chat/collection/cancleCollection").anonymous()
                 .antMatchers("/wecom/chat/collection/addCollection").anonymous()
                 .antMatchers("/wecom/chat/side/list").anonymous()
+                .antMatchers("/wecom/ticket/**").anonymous()
 
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()

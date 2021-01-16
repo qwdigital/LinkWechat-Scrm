@@ -65,6 +65,9 @@ public class WeAccessTokenInterceptor implements Interceptor{
             }else{
                 token=iWeAccessTokenService.findCommonAccessToken();
             }
+            if (uri.contains("ticket/get")){
+                request.addQuery("type","agent_config");
+            }
 
             request.addQuery("access_token",token);
         }
