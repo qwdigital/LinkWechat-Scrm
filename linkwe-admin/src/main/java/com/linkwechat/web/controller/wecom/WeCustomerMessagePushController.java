@@ -99,6 +99,7 @@ public class WeCustomerMessagePushController extends BaseController {
     @PreAuthorize("@ss.hasPermi('customerMessagePush:push:asyncResult')")
     @PostMapping(value = "asyncResult")
     public AjaxResult asyncResult(@RequestParam(value = "msgid") String msgid, @RequestParam(value = "messageId") Long messageId) {
+        weCustomerMessageOriginalService.asyncResult(msgid, messageId);
         return AjaxResult.success();
     }
 
