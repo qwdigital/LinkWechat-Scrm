@@ -27,6 +27,6 @@ public interface IWeChatItemService extends IService<WeChatItem> {
      * @param sideId 侧边栏id
      * @return
      */
-    public List<WeChatSideVo> chatItems(Long sideId);
+    public List<WeChatSideVo> chatItems(Long sideId,String keyword);
 
 }
