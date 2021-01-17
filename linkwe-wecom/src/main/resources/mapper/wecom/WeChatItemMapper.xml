@@ -5,7 +5,7 @@
 <mapper namespace="com.linkwechat.wecom.mapper.WeChatItemMapper">
     <insert id="addItem">
         INSERT INTO
-            we_chat_item(item_id,side_id,material_id,create_by,create_time,update_by,update_time)
+        we_chat_item(item_id,side_id,material_id,create_by,create_time,update_by,update_time)
         VALUES
         <if test="items!=null and items.size()>0">
             <foreach collection="items" open="(" separator="," item="item" close=")">
@@ -14,11 +14,11 @@
         </if>
     </insert>
     <delete id="dropItem">
-         DELETE FROM
-           we_chat_item
-         <where>
-             side_id=#{sideId}
-         </where>
+        DELETE FROM
+        we_chat_item
+        <where>
+            side_id=#{sideId}
+        </where>
     </delete>
 
     <select id="findChatItems" resultType="com.linkwechat.wecom.domain.vo.WeChatSideVo">
@@ -34,6 +34,9 @@
         LEFT JOIN we_category wc ON wm.category_id = wc.id
         <where>
             wci.side_id=#{sideId}
+            <if test="keyword!=null and keyword!=''">
+                AND wm.material_name LIKE CONCAT('%',#{keyword},'%')
+            </if>
         </where>
     </select>
 </mapper>

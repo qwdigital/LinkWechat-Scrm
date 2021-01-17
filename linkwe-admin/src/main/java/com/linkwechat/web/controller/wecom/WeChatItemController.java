@@ -16,6 +16,7 @@ import java.util.List;
 
 /**
  * 聊天工具侧边栏
+ *
  * @author kewen
  */
 @RequestMapping(value = "/wecom/chat/item")
@@ -41,9 +42,10 @@ public class WeChatItemController extends BaseController {
      */
     //@PreAuthorize("@ss.hasPermi('chat:item:list')")
     @GetMapping("/list")
-    public TableDataInfo list(@RequestParam(value = "sideId") Long sideId) {
+    public TableDataInfo list(@RequestParam(value = "sideId") Long sideId
+            , @RequestParam(value = "keyword", required = false) String keyword) {
         startPage();
-        List<WeChatSideVo> weChatSideVos = weChatItemService.chatItems(sideId);
+        List<WeChatSideVo> weChatSideVos = weChatItemService.chatItems(sideId,keyword);
         return getDataTable(weChatSideVos);
     }
 
