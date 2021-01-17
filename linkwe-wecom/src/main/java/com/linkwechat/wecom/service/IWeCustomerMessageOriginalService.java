@@ -40,4 +40,12 @@ public interface IWeCustomerMessageOriginalService extends IService<WeCustomerMe
      */
     CustomerMessagePushVo CustomerMessagePushDetail(Long messageId);
 
+
+    /**
+     * 同步发送结果
+     *
+     * @param msgid 可以用于获取发送结果
+     */
+    void asyncResult(String msgid, Long messageId);
+
 }

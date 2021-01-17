@@ -59,73 +59,80 @@ public class WeCustomerMessageOriginalServiceImpl extends ServiceImpl<WeCustomer
     }
 
     @Override
-    public CustomerMessagePushVo CustomerMessagePushDetail(Long messageId)  {
+    public CustomerMessagePushVo CustomerMessagePushDetail(Long messageId) {
 
 
         CustomerMessagePushVo customerMessagePushDetail = weCustomerMessageOriginalMapper.findCustomerMessagePushDetail(messageId);
-        AtomicInteger atomicInteger=new AtomicInteger();
+
 
         //拉取消息发送结果
-        CompletableFuture.runAsync(()->{
+        CompletableFuture.runAsync(() -> syncSendResult(customerMessagePushDetail.getMsgid(), messageId));
 
-            String msgid = customerMessagePushDetail.getMsgid();
+        return customerMessagePushDetail;
+    }
 
-            if(StringUtils.isNotEmpty(msgid)){
+    @Override
+    public void asyncResult(String msgid, Long messageId) {
+        syncSendResult(msgid, messageId);
+    }
 
-                List<String> msgIds = null;
+    public void syncSendResult(String msgid, Long messageId) {
 
-                try {
+        AtomicInteger atomicInteger = new AtomicInteger();
 
-                    msgIds = objectMapper.readValue(msgid,new TypeReference<List<String>>() { });
+        if (StringUtils.isNotEmpty(msgid)) {
 
-                } catch (JsonProcessingException e) {
+            List<String> msgIds = null;
 
-                    e.printStackTrace();
+            try {
 
-                }
+                msgIds = objectMapper.readValue(msgid, new TypeReference<List<String>>() {
+                });
 
-                if(CollectionUtils.isNotEmpty(msgIds)){
+            } catch (JsonProcessingException e) {
 
-                    msgIds.forEach(m->{
-
-                        QueryCustomerMessageStatusResultDataObjectDto dataObjectDto=new QueryCustomerMessageStatusResultDataObjectDto();
-
-                        dataObjectDto.setMsgid(m);
-
-                        //拉取发送结果
-                        QueryCustomerMessageStatusResultDto queryCustomerMessageStatusResultDto = weCustomerMessagePushClient.queryCustomerMessageStatus(dataObjectDto);
-
-                        if (WeConstans.WE_SUCCESS_CODE.equals(queryCustomerMessageStatusResultDto.getErrcode())) {
-
-
-                            List<DetailMessageStatusResultDto> detailList = queryCustomerMessageStatusResultDto.getDetail_list();
-
-                            detailList.forEach(d-> {
-
-                                if(d.getStatus().equals("1")){
-
-                                    atomicInteger.incrementAndGet();
-
-                                }
-
-                                weCustomerMessgaeResultMapper.updateWeCustomerMessgaeResult(messageId,d.getChat_id(),d.getExternal_userid(),d.getStatus(),d.getSend_time());
-
-                            });
-
-                        }
-
-                    });
-
-                }
+                e.printStackTrace();
 
             }
 
-            //更新微信实际发送条数
-            weCustomerMessageService.updateWeCustomerMessageActualSend(messageId,atomicInteger.get());
+            if (CollectionUtils.isNotEmpty(msgIds)) {
 
-        });
+                msgIds.forEach(m -> {
 
-        return customerMessagePushDetail;
+                    QueryCustomerMessageStatusResultDataObjectDto dataObjectDto = new QueryCustomerMessageStatusResultDataObjectDto();
+
+                    dataObjectDto.setMsgid(m);
+
+                    //拉取发送结果
+                    QueryCustomerMessageStatusResultDto queryCustomerMessageStatusResultDto = weCustomerMessagePushClient.queryCustomerMessageStatus(dataObjectDto);
+
+                    if (WeConstans.WE_SUCCESS_CODE.equals(queryCustomerMessageStatusResultDto.getErrcode())) {
+
+
+                        List<DetailMessageStatusResultDto> detailList = queryCustomerMessageStatusResultDto.getDetail_list();
+
+                        detailList.forEach(d -> {
+
+                            if (d.getStatus().equals("1")) {
+
+                                atomicInteger.incrementAndGet();
+
+                            }
+
+                            weCustomerMessgaeResultMapper.updateWeCustomerMessgaeResult(messageId, d.getChat_id(), d.getExternal_userid(), d.getStatus(), d.getSend_time());
+
+                        });
+
+                    }
+
+                });
+
+            }
+
+        }
+
+        //更新微信实际发送条数
+        weCustomerMessageService.updateWeCustomerMessageActualSend(messageId, atomicInteger.get());
     }
 
 }
