@@ -60,7 +60,7 @@ export default {
         background: 'rgba(0, 0, 0, 0.7)',
       })
       this.metarialParams.materialIds = this.selectedMaterial.map((d) => d.id)
-      if (metarialParams.checkAll == 0) {
+      if (this.metarialParams.checkAll == 0) {
         this.metarialParams.materialIds = []
       }
       getMaterial(this.metarialParams)

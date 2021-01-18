@@ -7,7 +7,7 @@ export default {
   props: {},
   data() {
     return {
-      keywords: '',
+      keyword: '',
       active: 0,
       list: [],
       loading: false,
@@ -43,7 +43,7 @@ export default {
 <template>
   <div>
     <van-search
-      v-model="keywords"
+      v-model="keyword"
       show-action
       placeholder="请输入搜索关键词"
       @search="search"

@@ -33,6 +33,7 @@ export default {
         window.CONFIG.services.wecom +
         '/material/upload',
       headers: window.CONFIG.headers,
+      domain: process.env.VUE_APP_BASE_API
     }
   },
   watch: {},
@@ -131,7 +132,7 @@ export default {
     >
       <slot>
         <template v-if="fileUrl">
-          <img v-if="type === '0'" :src="fileUrl" class="upload-img" />
+          <img v-if="type === '0'" :src="domain + fileUrl" class="upload-img" />
           <div v-else-if="type === '2'">
             <video
               id="myVideo"
@@ -144,7 +145,7 @@ export default {
               :autoplay="false"
               preload="auto"
             >
-              <source :src="fileUrl" type="video/mp4" />
+              <source :src="domain + fileUrl" type="video/mp4" />
             </video>
           </div>
           <div v-else>{{ fileName }}</div>
