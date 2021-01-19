@@ -8,11 +8,9 @@ import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.wecom.client.WeMsgAuditClient;
 import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.dto.WeUserInfoDto;
 import com.linkwechat.wecom.domain.dto.msgaudit.WeMsgAuditDto;
-import com.linkwechat.wecom.domain.vo.WeAllocateCustomersVo;
-import com.linkwechat.wecom.domain.vo.WeAllocateGroupsVo;
-import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
-import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
+import com.linkwechat.wecom.domain.vo.*;
 import com.linkwechat.wecom.mapper.WeUserMapper;
 import com.linkwechat.wecom.service.IWeCustomerService;
 import com.linkwechat.wecom.service.IWeDepartmentService;
@@ -265,6 +263,21 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
             redisCache.expire(WeConstans.weMsgAuditKey,10,TimeUnit.MILLISECONDS);
         }
         return weUserMapper.selectBatchIds(userIds);
+    }
+
+    @Override
+    public WeUserInfoVo getUserInfo(String code) {
+
+
+        WeUserInfoDto getuserinfo = weUserClient.getuserinfo(code);
+
+        return WeUserInfoVo.builder()
+                .userId(getuserinfo.getUserId())
+                .deviceId(getuserinfo.getDeviceId())
+                .externalUserId(getuserinfo.getExternal_userid())
+                .openId(getuserinfo.getOpenId())
+                .build();
+
     }
 
 

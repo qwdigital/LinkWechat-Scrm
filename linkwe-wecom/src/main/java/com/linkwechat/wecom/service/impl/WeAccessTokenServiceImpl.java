@@ -36,7 +36,7 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
 
 
     /**
-     * 获取accessToken
+     * 获取通用accessToken
      */
     @Override
     public String findCommonAccessToken() {
@@ -47,7 +47,7 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
 
 
     /**
-     * 获取外部联系人相关accesstoken
+     * 获取外部联系人相关token
      * @return
      */
     @Override
@@ -67,6 +67,11 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
         return findAccessToken(WeConstans.WE_PROVIDER_ACCESS_TOKEN);
     }
 
+
+    /**
+     * 会话存档相关token
+     * @return
+     */
     @Override
     public String findChatAccessToken() {
         return findAccessToken(WeConstans.WE_CHAT_ACCESS_TOKEN);

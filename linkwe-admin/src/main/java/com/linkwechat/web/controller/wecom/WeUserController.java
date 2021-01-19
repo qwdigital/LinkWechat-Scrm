@@ -215,6 +215,20 @@ public class WeUserController extends BaseController {
     }
 
 
+    /**
+     * 内部应用获取用户userId
+     * @param code
+     * @return
+     */
+    @GetMapping("/getUserInfo")
+    public AjaxResult getUserInfo(String code)
+    {
+
+        return AjaxResult.success(
+                weUserService.getUserInfo(code)
+        );
+    }
+
 
 
 

@@ -1,12 +1,11 @@
 package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dtflys.forest.annotation.Query;
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.dto.WeUserInfoDto;
 import com.linkwechat.wecom.domain.dto.msgaudit.WeMsgAuditDto;
-import com.linkwechat.wecom.domain.vo.WeAllocateCustomersVo;
-import com.linkwechat.wecom.domain.vo.WeAllocateGroupsVo;
-import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
-import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
+import com.linkwechat.wecom.domain.vo.*;
 
 import java.util.List;
 
@@ -116,4 +115,12 @@ public interface IWeUserService extends IService<WeUser>
      * @return
      */
     List<WeUser> getPermitUserList(WeMsgAuditDto msgAuditDto);
+
+
+    /**
+     * 获取访问用户身份(内部应用)
+     * @param code
+     * @return
+     */
+    WeUserInfoVo getUserInfo(@Query("code")String code);
 }

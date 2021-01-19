@@ -123,6 +123,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .antMatchers("/wecom/chat/side/h5List").anonymous()
                 .antMatchers("/wecom/ticket/**").anonymous()
 
+                .antMatchers("/wecom/user/getUserInfo").anonymous()
+
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
                 .and()
