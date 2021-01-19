@@ -34,9 +34,7 @@ server:
 
 # 日志配置
 logging:
-  level:
-    com.ruoyi: debug
-    org.springframework: warn
+  config: classpath:logback.xml
   path: ./logs
 path:
   log: ./logs
