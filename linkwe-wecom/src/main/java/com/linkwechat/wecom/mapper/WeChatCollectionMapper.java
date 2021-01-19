@@ -46,6 +46,6 @@ public interface WeChatCollectionMapper extends BaseMapper<WeChatCollection> {
      * @param userId 用户id
      * @return {@link WeChatSideVo}s
      */
-    public List<WeChatSideVo> findCollections(Long userId);
+    public List<WeChatSideVo> findCollections(@Param("userId") Long userId,@Param("keyword") String keyword);
 
 }

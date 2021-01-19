@@ -36,6 +36,9 @@
                 LEFT JOIN we_category wc ON wm.category_id = wc.id
        <where>
            wcc.user_id=#{userId}
+           <if test="keyword!=null and keyword!=''">
+               AND wm.material_name LIKE CONCAT('%',#{keyword},'%')
+           </if>
        </where>
     </select>
 

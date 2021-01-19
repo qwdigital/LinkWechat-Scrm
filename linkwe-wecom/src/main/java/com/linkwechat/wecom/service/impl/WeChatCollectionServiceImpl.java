@@ -38,8 +38,8 @@ public class WeChatCollectionServiceImpl extends ServiceImpl<WeChatCollectionMap
     }
 
     @Override
-    public List<WeChatSideVo> collections(Long userId) {
-        return weChatCollectionMapper.findCollections(userId);
+    public List<WeChatSideVo> collections(Long userId,String keyword) {
+        return weChatCollectionMapper.findCollections(userId,keyword);
     }
 
 }
