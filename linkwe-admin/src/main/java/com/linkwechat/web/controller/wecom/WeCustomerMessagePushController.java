@@ -87,10 +87,21 @@ public class WeCustomerMessagePushController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('customerMessagePush:push:pushResults')")
     @GetMapping(value = "/pushResults")
-    public TableDataInfo customerMessagePushResult(@RequestParam(value = "messageId") Long messageId,@RequestParam(value = "status") String status){
+    public TableDataInfo customerMessagePushResult(@RequestParam(value = "messageId") Long messageId, @RequestParam(value = "status") String status) {
         startPage();
         List<WeCustomerMessageResultVo> weCustomerMessageResuls = weCustomerMessgaeResultService.customerMessagePushs(messageId, status);
         return getDataTable(weCustomerMessageResuls);
     }
+
+    /**
+     * 同步消息发送结果
+     */
+    @PreAuthorize("@ss.hasPermi('customerMessagePush:push:asyncResult')")
+    @PostMapping(value = "asyncResult")
+    public AjaxResult asyncResult(@RequestParam(value = "msgid") String msgid, @RequestParam(value = "messageId") Long messageId) {
+        weCustomerMessageOriginalService.asyncResult(msgid, messageId);
+        return AjaxResult.success();
+    }
+
 
 }

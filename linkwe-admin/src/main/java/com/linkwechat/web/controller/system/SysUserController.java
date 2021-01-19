@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.system;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.constant.UserConstants;
 import com.linkwechat.common.core.controller.BaseController;
@@ -17,19 +18,23 @@ import com.linkwechat.framework.web.service.TokenService;
 import com.linkwechat.system.service.ISysPostService;
 import com.linkwechat.system.service.ISysRoleService;
 import com.linkwechat.system.service.ISysUserService;
+import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.service.IWeUserService;
 import io.swagger.annotations.ApiOperation;
+import io.vertx.ext.auth.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * 用户信息
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -48,6 +53,10 @@ public class SysUserController extends BaseController
     @Autowired
     private TokenService tokenService;
 
+
+    @Autowired
+    private IWeUserService iWeUserService;
+
     /**
      * 获取用户列表
      */
@@ -56,6 +65,7 @@ public class SysUserController extends BaseController
     public TableDataInfo list(SysUser user)
     {
         startPage();
+
         List<SysUser> list = userService.selectUserList(user);
         return getDataTable(list);
     }
@@ -193,4 +203,27 @@ public class SysUserController extends BaseController
         user.setUpdateBy(SecurityUtils.getUsername());
         return toAjax(userService.updateUserStatus(user));
     }
+
+
+    @GetMapping("/findCurrentLoginUser")
+    public AjaxResult findCurrentLoginUser(HttpServletRequest request){
+        String userId="";
+        LoginUser loginUser = tokenService.getLoginUser(request);
+        if(null != loginUser){
+            SysUser user = loginUser.getUser();
+            if(null != user){
+                List<WeUser> weUsers = iWeUserService.selectWeUserList(WeUser.builder()
+                        .mobile(user.getPhonenumber())
+                        .build());
+                if(CollectionUtil.isNotEmpty(weUsers)){
+                    userId=weUsers.get(0).getUserId();
+
+                }
+            }
+
+        }
+        return AjaxResult.success(userId);
+    }
+
+
 }

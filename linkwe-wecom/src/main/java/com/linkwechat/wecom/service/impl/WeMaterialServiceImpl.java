@@ -61,7 +61,7 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
                 // 上传并返回新文件名称
                 fileName = FileUploadUtils.upload(filePath, file);
             }
-            String url = serverConfig.getUrl() + fileName;
+            String url =  fileName;
             //上传临时素材
             Optional<com.linkwechat.common.enums.MediaType > mediaType = com.linkwechat.common.enums.MediaType .of(type);
             if (!mediaType.isPresent()) {

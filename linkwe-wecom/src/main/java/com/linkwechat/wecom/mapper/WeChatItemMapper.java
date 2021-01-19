@@ -10,12 +10,14 @@ import java.util.List;
 
 /**
  * 聊天工具侧边栏
+ *
  * @author kewen
  */
 public interface WeChatItemMapper extends BaseMapper<WeChatItem> {
 
     /**
      * 批量添加侧边栏素材
+     *
      * @param items 侧边栏素材列表
      * @return 结果
      */
@@ -23,6 +25,7 @@ public interface WeChatItemMapper extends BaseMapper<WeChatItem> {
 
     /**
      * 删除侧边栏素材
+     *
      * @param sideId 侧边栏id
      * @return 结果
      */
@@ -32,8 +35,9 @@ public interface WeChatItemMapper extends BaseMapper<WeChatItem> {
     /**
      * h5素材列表
      *
-     * @param sideId 侧边栏id
+     * @param sideId  侧边栏id
+     * @param keyword 关键词
      * @return
      */
-    public List<WeChatSideVo> findChatItems(@Param("sideId") Long sideId);
+    public List<WeChatSideVo> findChatItems(@Param("sideId") Long sideId, @Param("keyword") String keyword);
 }
