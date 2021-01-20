@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeTaskFissionRewardMapper">
+    
+    <resultMap type="WeTaskFissionReward" id="WeTaskFissionRewardResult">
+        <result property="id"    column="id"    />
+        <result property="taskFissionId"    column="task_fission_id"    />
+        <result property="rewardCode"    column="reward_code"    />
+        <result property="rewardCodeStatus"    column="reward_code_status"    />
+        <result property="rewardUserId"    column="reward_user_id"    />
+        <result property="rewardUser"    column="reward_user"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectWeTaskFissionRewardVo">
+        select id, task_fission_id, reward_code, reward_code_status, reward_user_id, reward_user, create_time from we_task_fission_reward
+    </sql>
+
+    <select id="selectWeTaskFissionRewardList" parameterType="WeTaskFissionReward" resultMap="WeTaskFissionRewardResult">
+        <include refid="selectWeTaskFissionRewardVo"/>
+        <where>  
+            <if test="taskFissionId != null "> and task_fission_id = #{taskFissionId}</if>
+            <if test="rewardCode != null  and rewardCode != ''"> and reward_code = #{rewardCode}</if>
+            <if test="rewardCodeStatus != null "> and reward_code_status = #{rewardCodeStatus}</if>
+            <if test="rewardUserId != null  and rewardUserId != ''"> and reward_user_id = #{rewardUserId}</if>
+            <if test="rewardUser != null  and rewardUser != ''"> and reward_user = #{rewardUser}</if>
+        </where>
+    </select>
+    
+    <select id="selectWeTaskFissionRewardById" parameterType="Long" resultMap="WeTaskFissionRewardResult">
+        <include refid="selectWeTaskFissionRewardVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWeTaskFissionReward" parameterType="WeTaskFissionReward" useGeneratedKeys="true" keyProperty="id">
+        insert into we_task_fission_reward
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="taskFissionId != null">task_fission_id,</if>
+            <if test="rewardCode != null and rewardCode != ''">reward_code,</if>
+            <if test="rewardCodeStatus != null">reward_code_status,</if>
+            <if test="rewardUserId != null">reward_user_id,</if>
+            <if test="rewardUser != null">reward_user,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="taskFissionId != null">#{taskFissionId},</if>
+            <if test="rewardCode != null and rewardCode != ''">#{rewardCode},</if>
+            <if test="rewardCodeStatus != null">#{rewardCodeStatus},</if>
+            <if test="rewardUserId != null">#{rewardUserId},</if>
+            <if test="rewardUser != null">#{rewardUser},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWeTaskFissionReward" parameterType="WeTaskFissionReward">
+        update we_task_fission_reward
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="taskFissionId != null">task_fission_id = #{taskFissionId},</if>
+            <if test="rewardCode != null and rewardCode != ''">reward_code = #{rewardCode},</if>
+            <if test="rewardCodeStatus != null">reward_code_status = #{rewardCodeStatus},</if>
+            <if test="rewardUserId != null">reward_user_id = #{rewardUserId},</if>
+            <if test="rewardUser != null">reward_user = #{rewardUser},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeTaskFissionRewardById" parameterType="Long">
+        delete from we_task_fission_reward where id = #{id}
+    </delete>
+
+    <delete id="deleteWeTaskFissionRewardByIds" parameterType="String">
+        delete from we_task_fission_reward where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>
