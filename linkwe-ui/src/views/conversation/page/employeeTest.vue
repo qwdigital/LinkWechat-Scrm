@@ -32,7 +32,8 @@
                             </list>
                         </el-tab-pane>
                         <el-tab-pane label="群聊" name="2">
-                          
+                            <grouplist v-if="activeName==2" :personList="personList" :loading="loading" @chatFn='chatFn'>
+                            </grouplist>
                         </el-tab-pane>
 
                     </el-tabs>
@@ -151,6 +152,7 @@
 <script>
     import list from '../component/list.vue'
     import chat from '../component/chat.vue'
+    import grouplist from '../component/groupList.vue'
     import * as api from '@/api/organization'
     import {
         content
@@ -160,7 +162,7 @@
     } from '@/utils/common.js'
     export default {
         components: {
-            list,
+            list,grouplist,
             chat
         },
         data() {

@@ -16,7 +16,7 @@ const  getTree=(params)=>{
   }
   const  listByCustomer=(params)=>{
     return request({
-      url:'/chat/mapping/listByCustomer',
+      url:'/wecom/customer/list',
       method: 'get',
       params,
     })

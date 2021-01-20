@@ -8,7 +8,8 @@
                     {{item.text.content}}
                 </div>
                 <div v-else-if="item.msgtype=='image'" class="msgtypeimg">
-                    <img :src="item.image.attachment">
+                    <img src="http://146.56.222.200/api/profile/upload/2021/01/14/544c8259-b3b6-4a49-8a53-b5eeac476384.png">
+                    <!-- http://146.56.222.200:8080 -->
                 </div>
                 <div v-else-if="item.msgtype=='file'" class="msgtypefile" @click="down(item.file)">
                     {{item.file.filename}}
@@ -124,8 +125,10 @@
             width: 100px;
             height: 80px;
             margin: 10px;
+            img{width: 100px;
+            height: 80px;}
         }
-
+ 
         .msgtypecard {
             width: 300px;
             height: 140px;

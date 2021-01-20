@@ -11,7 +11,6 @@
                 </div>
                 <div class="ct_box ct_boxFirst">
                     <ul>
-                        <!-- -->
                         <li v-for="(i,t) in CList" :key="t"  @click="personCheck(i,t)"  :class="{'liActive':t==personIndex}">
                             <el-row :gutter="20" style="   padding: 10px 0;margin:0">
                                 <el-col :span="4">
@@ -287,10 +286,22 @@ import {
                     })
             },
             customerList(){
-            content.listByCustomer().then(res=>{
-               res.rows= res.rows.filter((a,b)=>{ return a&&a.name})    
-                this.CList=res.rows  
-                this.employAmount=res.total;
+          let querys={
+              pageNum:1,
+              pageSize:999,
+              name:this.employName,
+              userId:'',
+              tagIds:'',
+              beginTime:'',
+              endTime:'',
+              status:'',
+              isOpenChat:'1'
+          }
+            content.listByCustomer(querys).then(res=>{
+                console.log(res)
+                 res.rows= res.rows.filter((a,b)=>{ return a&&a.name})    
+                 this.CList=res.rows  
+             this.employAmount=res.total;
            })
             }
         },
