@@ -5,12 +5,9 @@ const service = window.CONFIG.services.wecom + '/chat'
  * 侧边栏列表
  * @param {*} params
  */
-export function getTypeList(params) {
+export function getTypeList() {
   return request({
-    url: service + '/side/list',
-    params: {
-      h5: 1,
-    },
+    url: service + '/side/h5List',
   })
 }
 

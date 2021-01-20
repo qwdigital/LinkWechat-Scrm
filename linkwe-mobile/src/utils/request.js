@@ -24,8 +24,8 @@ function createAxios(baseURL) {
       // console.log('res: ' + res)
       const { data, status } = res
       // code 0:成功，-1/其它:错误
-      if (status === 200 && data.code === 0) {
-        return JSON.stringify(data.result) ? data.result : data.data
+      if (status === 200 && data.code === 200) {
+        return data
       } else if (data.code === 201) {
         // Message.error({
         //   content: `产品已存在`,

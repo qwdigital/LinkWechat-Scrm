@@ -60,7 +60,7 @@ export default {
         background: 'rgba(0, 0, 0, 0.7)',
       })
       this.metarialParams.materialIds = this.selectedMaterial.map((d) => d.id)
-      if (metarialParams.checkAll == 0) {
+      if (this.metarialParams.checkAll == 0) {
         this.metarialParams.materialIds = []
       }
       getMaterial(this.metarialParams)
@@ -80,6 +80,7 @@ export default {
       update(data)
         .then(() => {
           this.msgSuccess('操作成功')
+          this.$set(data, 'isEdit', false)
           this.loading = false
         })
         .catch(() => {
@@ -110,11 +111,31 @@ export default {
             {{ mediaType[scope.row.mediaType] }}
           </template>
         </el-table-column>
-        <el-table-column
-          label="聊天工具栏名称"
-          align="center"
-          prop="sideName"
-        />
+        <el-table-column label="聊天工具栏名称" align="center" prop="sideName">
+          <template slot-scope="{ row }">
+            <el-input
+              class="bfc-d"
+              style="width: 100px;"
+              v-if="row.isEdit"
+              v-model="row.sideName"
+              placeholder="请输入"
+            ></el-input>
+            <span v-else>
+              {{ row.sideName }}
+            </span>
+
+            <i
+              v-if="!row.isEdit"
+              class="row-icon el-icon-edit"
+              @click="$set(row, 'isEdit', true)"
+            ></i>
+            <i
+              v-else
+              class="row-icon el-icon-circle-check"
+              @click="update(row)"
+            ></i>
+          </template>
+        </el-table-column>
         <el-table-column label="已抓取素材数量" align="center" prop="total" />
         <el-table-column
           label="是否启用"
@@ -240,5 +261,23 @@ export default {
     color: #ffe7be;
     width: 100%;
   }
+}
+.el-table__row {
+  .el-icon-edit {
+    visibility: hidden;
+  }
+  &:hover {
+    .el-icon-edit {
+      visibility: visible;
+    }
+  }
+}
+.row-icon {
+  font-size: 14px;
+  // vertical-align: middle;
+  margin-left: 5px;
+}
+.el-icon-circle-check {
+  margin-top: 10px;
 }
 </style>

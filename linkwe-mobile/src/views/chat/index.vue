@@ -1,4 +1,5 @@
 <script>
+import { getLoginUserId } from '@/api/common'
 import { getTypeList } from '@/api/chat'
 import List from './List'
 export default {
@@ -6,24 +7,31 @@ export default {
   props: {},
   data() {
     return {
-      keywords: '',
-      active: 2,
+      keyword: '',
+      active: 0,
       list: [],
       loading: false,
       finished: false,
       show: false,
+      userId: '',
     }
   },
   watch: {},
   computed: {},
   created() {
     this.getList()
+    this.getUserId()
   },
   mounted() {},
   methods: {
     getList() {
       getTypeList().then(({ rows, total }) => {
         this.list = rows
+      })
+    },
+    getUserId() {
+      getLoginUserId().then(({ data }) => {
+        this.userId = data
       })
     },
     search() {},
@@ -35,7 +43,7 @@ export default {
 <template>
   <div>
     <van-search
-      v-model="keywords"
+      v-model="keyword"
       show-action
       placeholder="请输入搜索关键词"
       @search="search"
@@ -45,10 +53,16 @@ export default {
       </template> -->
     </van-search>
     <van-tabs v-model="active">
-      <van-tab title="标签 1">
-        <List></List>
+      <van-tab title="我的">
+        <List :userId="userId"></List>
       </van-tab>
-      <van-tab title="标签 2"><List></List></van-tab>
+      <van-tab
+        :title="item.sideName"
+        v-for="(item, index) in list"
+        :key="index"
+      >
+        <List :sideId="item.sideId" :userId="userId"></List>
+      </van-tab>
     </van-tabs>
 
     <!-- <van-dialog
