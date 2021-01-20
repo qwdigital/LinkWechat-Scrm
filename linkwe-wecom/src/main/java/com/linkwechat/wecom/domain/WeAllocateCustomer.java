@@ -40,5 +40,19 @@ public class WeAllocateCustomer
     /** 原跟进成员的userid */
     private String handoverUserid;
 
+    /**
+     * 接替状态， 1-接替完毕 2-等待接替 3-客户拒绝 4-接替成员客户达到上限 5-无接替记录
+     */
+    private Integer status;
 
+    /**
+     * 接替客户的时间，如果是等待接替状态，则为未来的自动接替时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date takeoverTime;
+
+    /**
+     * 失败原因
+     */
+    private String failReason;
 }
