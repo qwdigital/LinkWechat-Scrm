@@ -29,9 +29,8 @@ export default {
     "tui-image-editor": PosterPage
   },
   data () {
-    const bgPath = ""
-
     return {
+      imgList: {},
       dialog: {
         preview: false, // 预览弹出显示隐藏
         edit: false // 编辑弹出显示隐藏
@@ -162,7 +161,7 @@ export default {
       try {
         const res = await getPosterInfo(item.id)
         const data = res.data || {}
-        console.log(data)
+        console.log('getPosterInfo',data)
         this.posterForm = {
           id: data.id,
           title: data.title,
@@ -179,16 +178,56 @@ export default {
     ready () {
       console.log('ready')
     },
-    checkState (obj) {
-      switch (obj.type) {
-        case 'text':
-          this.showSubMenu('text');
-          this.activateTextMode();
-        break;
-        default:
-          this.activateImageMode();
-        break;
+    onAddText(pos) {
+      this.$refs.tuiImageEditor.editorInstance
+      .addText('双击输入文字', {
+        position: pos.originPosition,
+      })
+      .then(function (objectProps) {
+        console.log(objectProps);
+      });
+    },
+    //移动
+    onObjectMoved(res) {
+      console.log('onObjectMoved')
+      this.getRecord(res)
+    },
+    //新增/选中
+    objectActivated(obj) {
+      console.log('objectActivated')
+      var imageEditor = this.$refs.tuiImageEditor;
+      imageEditor.activeObjectId = obj.id;
+      if (obj.type === 'text') {
+        imageEditor.showSubMenu('text');
+        imageEditor.setTextToolbar(obj);
+        imageEditor.activateTextMode();
       }
+    },
+    //缩放
+    onObjectScaled(obj) {
+      console.log('onObjectScaled')
+      // this.getRecord(res);
+      // this.checkState();
+      if (obj.type === 'text') {
+        this.$refs.tuiImageEditor.inputFontSizeRange.setAttribute('value',obj.fontSize);        
+      }
+    },
+    //重做
+    onRedoStackChanged(length) {
+      if (length) {
+        this.$refs.tuiImageEditor.btn_redo.remove('disabled');
+      } else {
+        this.$refs.tuiImageEditor.btn_redo.add('disabled');
+      }
+      this.$refs.tuiImageEditor.resizeEditor();
+    },
+    onUndoStackChanged(length) {
+      if (length) {
+        this.$refs.tuiImageEditor.btn_undo.classList.remove('disabled')
+      } else {
+        this.$refs.tuiImageEditor.btn_undo.classList.add('disabled')
+      }
+      this.$refs.tuiImageEditor.resizeEditor();
     },
     showSubMenu (type) {
       switch (type) {
@@ -204,6 +243,17 @@ export default {
       if (imageEditor.getDrawingMode() !== 'TEXT') {
         imageEditor.stopDrawingMode();
         imageEditor.startDrawingMode('TEXT');
+      }
+    },
+    checkState (obj) {
+      switch (obj.type) {
+        case 'text':
+          this.showSubMenu('text');
+          this.activateTextMode();
+        break;
+        default:
+          this.activateImageMode();
+        break;
       }
     },
     activateImageMode () {
@@ -239,37 +289,79 @@ export default {
           this.msgSuccess('删除成功')
         })
     },
-    inputFontSizeRangeChange () {
-      this.$refs.tuiImageEditor.inputFontSizeRangeChange();
+    inputFontSizeRangeChange (e) {
+      this.$refs.tuiImageEditor.inputFontSizeRangeChange(e);
+    },
+    getRecord(res){
+      var flag = false;
+      if (this.records && this.records.length) {
+        for (let index = 0; index < this.records.length; index++) {
+          const element ={
+            fill: this.records[index].fill,
+            height: this.records[index].height,
+            id: this.records[index].id,
+            left: this.records[index].left,
+            opacity: this.records[index].opacity,
+            stroke: this.records[index].stroke,
+            strokeWidth: this.records[index].strokeWidth,
+            top: this.records[index].top,
+            type: this.records[index].type,
+            width: this.records[index].width,
+          };
+          if(element.id == res.id){
+            // console.log(element)
+            this.records[index] = res;
+            flag = true;
+          }
+        }
+      } else {
+        this.records = [];
+      }
+      if(!flag){
+        this.records.push(res)
+      }
+    },
+    // FIXME 没写完
+    async reShow (list) {
+      list = JSON.parse('[{"id":2,"type":"i-text","left":55.26947693665858,"top":180.32266601562497,"width":200,"height":45.199999999999996,"fill":"#000000","stroke":null,"strokeWidth":1,"opacity":1,"angle":0,"text":"请输入文字","fontFamily":"Times New Roman","fontSize":40,"fontStyle":"normal","textAlign":"left","fontWeight":"normal"},{"id":3,"type":"image","left":195.71660545226203,"top":506.3232314730081,"width":500,"height":500,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"opacity":1,"angle":0},{"id":4,"type":"image","left":373.102002853498,"top":190.44302690999768,"width":792,"height":792,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"opacity":1,"angle":0}]');
+      let i = 0, len = list && list.length || 0
+      for ( ; i<len; i++) {
+        await this.loadRes(list[i]);
+      }
+    },
+    async loadRes (obj) {
+      return new Promise((resolve) => {
+        let imageEditor = this.$refs.tuiImageEditor.editorInstance;
+        switch (obj.type) {
+          case 'i-text':
+          case 'text':
+            imageEditor.
+            addText(obj.text, {
+                position: {
+                  x: obj.left,
+                  y: obj.right
+                },
+            })
+            .then(function (objectProps) {
+                console.log(objectProps);
+            });
+          break;
+          case 'image':
+            this.editorInstance.addImageObject(imgPath).then(objectProps => {
+                console.log(objectProps.id);
+            }).then(function (objectProps) {
+                console.log(objectProps);
+            });
+          break;
+        }
+      });
     },
     //
     async save() {
+      let list =[];
       try {
-        // const posterForm = this.posterForm
-        // console.log('save', posterForm.id)
-        // let res = {}
-        // if (posterForm.id) {
-        //   // 编辑海报
-        //   res = await updatePoster(Object.assign({}, {
-        //     backgroundImgPath: 'http://106.13.236.58:8080/profile/2020/12/31/5ca3fa0b-55d7-433c-ba02-61d4502e45e1.jpg',
-        //     posterSubassemblyList: []
-        //   }, this.posterForm))
-        // } else {
-        //   // 新建海报
-        //   res = await addPoster(Object.assign({}, {
-        //     backgroundImgPath: 'http://106.13.236.58:8080/profile/2020/12/31/5ca3fa0b-55d7-433c-ba02-61d4502e45e1.jpg',
-        //     posterSubassemblyList: []
-        //   }, this.posterForm))
-        // }
-        // if (res.code === 200) {
-        //   this.msgSuccess(res.msg)
-        //   this.$refs.page.getList(1)
-        //   this.beforeCloseDialog()
-        // }
-
         let imageEditor = this.$refs.tuiImageEditor;
-        let res = {};
-        let list =[];
+        
         let deleteId = [];
         imageEditor.editorInstance._invoker._undoStack.forEach(element => {
           if(element.name == "removeObject"){
@@ -286,9 +378,66 @@ export default {
       
         // const image = this.$refs.tuiImageEditor.editorInstance.toDataURL();
         // res.url = image;
-        res.records = list;
       } catch (error) {
         console.log(error)
+      }
+      
+      // TODO 塞新建海报的数据 
+      let posterSubList = [];
+      let i = 0, len = list.length;
+      while (i < len) {
+        let vo = list[i];
+        let type = list[i].type;
+        let align = vo.textAlign && 
+                    (vo.textAlign === 'left' ? 1 : vo.textAlign === 'center' ? 2 : 3) 
+                    || null; 
+        let isText = type === 'i-text' || type === 'text';
+        let posData = {
+          id: vo.randomId || i,
+          content: vo.text || '',   // 文本内容 
+          delFlag: 1,   // 1 启动  0 删除      FIXME 暂时写死
+          fontColor: vo.fill || '#000000',
+          fontId: isText ? i : null,   // 字体ID   与imgPath互斥
+          fontSize: vo.fontSize,
+          fontTextAlign: align, // 1 2 3  left center right
+          left: vo.left,
+          top: vo.top,
+          width: vo.width,
+          height: vo.height,
+          imgPath: vo.url || '',
+          posterId: null,
+          type: isText ? 1 : vo.objType,   //  1 固定文本 2 固定图片 3 二维码图片
+          alpha: vo.opacity,
+          fontStyle: (vo.italic && vo.bold) ? 3 : vo.italic ? 2 : vo.bold ? 1 : 0, // 0 通常 1 粗体 2 斜体 3 粗 + 斜
+          rotate: vo.angle,
+          order: i,  // 层级
+          categoryId: 0, // 分类ID
+          verticalType: 2 // 居中方式 写死2
+        };
+        posterSubList.push(posData);
+        i++;
+      }
+
+      const posterForm = this.posterForm
+      console.log('save', posterForm.id)
+      let res = {}
+      if (posterForm.id) {
+        // 编辑海报
+        res = await updatePoster(Object.assign({}, {
+          backgroundImgPath: 'http://106.13.236.58:8080/profile/2020/12/31/5ca3fa0b-55d7-433c-ba02-61d4502e45e1.jpg',
+          posterSubassemblyList: []
+        }, this.posterForm))
+      } else {
+        // 新建海报
+        res = await addPoster(Object.assign({}, {
+          backgroundImgPath: 'http://106.13.236.58:8080/profile/2020/12/31/5ca3fa0b-55d7-433c-ba02-61d4502e45e1.jpg',
+          posterSubassemblyList: posterSubList
+        }, this.posterForm))
+      }
+      if (res.code === 200) {
+        this.msgSuccess(res.msg)
+        this.$refs.page.getList(1)
+        this.beforeCloseDialog()
       }
     }
   },
@@ -466,7 +615,7 @@ export default {
                 </li>
                 <li class="menu-item">
                   <label class="no-pointer">
-                    <input id="input-font-size-range" @change="inputFontSizeRangeChange" type="range" min="10" max="100" value="10" />
+                    <input id="input-font-size-range" @change="inputFontSizeRangeChange($event)" type="range" min="10" max="100" value="10" />
                   </label>
                 </li>
                 <li class="menu-item">

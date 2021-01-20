@@ -19,6 +19,7 @@ const editorDefaultOptions = {
 export default {
     name: 'PosterPage',
     props: {
+        btnContainer: null, // 自带按钮容器
         includeUi: {
             type: Boolean,
             default: true
@@ -126,9 +127,16 @@ export default {
                 color: '#000000'
             });
             this.textColorpicker.on('selectColor', function (event) {
-                this.activeObjectId && this.editorInstance.changeTextStyle(this.activeObjectId, {
-                    fill: event.color,
-                });
+                if (this.activeObjectId) {
+                    this.editorInstance.changeTextStyle(this.activeObjectId, {
+                        fill: event.color,
+                    });
+                    let vo = this.records[this.activeObjectId];
+                    if (vo) {
+                        vo.fill = event.color;
+                        this.records[this.activeObjectId] = vo;
+                    }
+                }
             }.bind(this));
         },
         addEventListener() {
@@ -161,6 +169,37 @@ export default {
                 objectActivated: this.objectActivated.bind(this),
                 objectMoved: this.onObjectMoved.bind(this)
             });
+            this.btn_deleteAll.addEventListener('click', this.mouseClickHandler.bind(this))
+            this.btn_delete.addEventListener('click', this.mouseClickHandler.bind(this))
+            this.btn_reset.addEventListener('click', this.mouseClickHandler.bind(this))
+            this.btn_redo.addEventListener('click', this.mouseClickHandler.bind(this))
+            this.btn_undo.addEventListener('click', this.mouseClickHandler.bind(this))
+
+            this.btnText.addEventListener('click', this.mouseClickHandler.bind(this))
+            this.btnImage.addEventListener('click', this.mouseClickHandler.bind(this))
+
+            // text
+            this.btnClose.addEventListener('click', this.mouseClickHandler.bind(this))
+            // this.inputBrushWidthRange.addEventListener('onchange', this.mouseClickHandler.bind(this))
+            i = 0;
+            len = this.btnTextStyle.length;
+            while (i < len) {
+                this.btnTextStyle[i].name = 'textStyle'
+                this.btnTextStyle[i].addEventListener('click', this.mouseClickHandler.bind(this))
+                i++
+            }
+        },
+        redoHandler () {
+            this.displayingSubMenu && (this.displayingSubMenu.style.display = 'none');
+            if (!this.btn_redo.matches(".disabled")) {
+                this.editorInstance.redo();
+            }
+        },
+        undoHandler () {
+            this.displayingSubMenu && (this.displayingSubMenu.style.display = 'none');
+            if (!this.btn_undo.matches(".disabled")) {
+                this.editorInstance.undo();
+            }
         },
         onAddText(pos) {
             this.editorInstance
@@ -170,6 +209,9 @@ export default {
             .then(function (objectProps) {
                 console.log(objectProps);
                 this.records(objectProps)
+                let id = this.GenNonDuplicateID() + '_' + objectProps.id;
+                let target = this.$parent.records[objectProps.id];
+                target && (target.randomId = id);
             }.bind(this));
         },
         //移动
@@ -252,7 +294,7 @@ export default {
         qrCodeHandler () {
             // let codeUrl = 'https://images.gitee.com/uploads/images/2020/1231/234016_20fdd151_1480777.png';
             this.activateImageMode();
-            this.addImage(qrCodeImage);
+            this.addImage(qrCodeImage, 3);
         },
         clearObjects () {
             this.displayingSubMenu && (this.displayingSubMenu.style.display = 'none');
@@ -261,18 +303,6 @@ export default {
         clearActivtyObject () {
             this.displayingSubMenu && (this.displayingSubMenu.style.display = 'none');
             this.activeObjectId && this.editorInstance.removeObject(this.activeObjectId);
-        },
-        redoHandler () {
-            this.displayingSubMenu && (this.displayingSubMenu.style.display = 'none');
-            if (!this.btn_redo.matches(".disabled")) {
-                this.editorInstance.redo();
-            }
-        },
-        undoHandler () {
-            this.displayingSubMenu && (this.displayingSubMenu.style.display = 'none');
-            if (!this.btn_undo.matches(".disabled")) {
-                this.editorInstance.undo();
-            }
         },
         closeHandler () {
             this.editorInstance.stopDrawingMode();
@@ -286,21 +316,26 @@ export default {
                 switch (styleType) {
                     case 'b':
                         styleObj = { fontWeight: 'bold' };
+                        this.records[this.activeObjectId] && (this.records[this.activeObjectId].bold = true)
                     break;
                     case 'i':
                         styleObj = { fontStyle: 'italic' };
+                        this.records[this.activeObjectId] && (this.records[this.activeObjectId].italic = true)
                     break;
                     case 'u':
-                        styleObj = { underline: true };
+                        styleObj = { underline: true };     // 后端暂时不支持 
                     break;
                     case 'l':
-                        styleObj = { textAlign: 'left' };
+                        styleObj = { textAlign: 'left' }; 
+                        this.records[this.activeObjectId] && (this.records[this.activeObjectId].textAlign = 'left')
                     break;
                     case 'c':
                         styleObj = { textAlign: 'center' };
+                        this.records[this.activeObjectId] && (this.records[this.activeObjectId].textAlign = 'center')
                     break;
                     case 'r':
                         styleObj = { textAlign: 'right' };
+                        this.records[this.activeObjectId] && (this.records[this.activeObjectId].textAlign = 'right')
                     break;
                     default:
                         styleObj = {};
@@ -332,9 +367,13 @@ export default {
         },
         inputFontSizeRangeChange () {
             let value = this.inputFontSizeRange.getAttribute('value');
-            this.activeObjectId && this.editorInstance.changeTextStyle(this.activeObjectId, {
-                fontSize: parseInt(value, 10)
-            });
+            if (this.activeObjectId) {
+                let size = parseInt(value, 10);
+                this.editorInstance.changeTextStyle(this.activeObjectId, {
+                    fontSize: size
+                });
+                this.records[this.activeObjectId] && (this.records[this.activeObjectId].fontSize = size);
+            }
         },
         activateTextMode() {
             if (this.editorInstance.getDrawingMode() !== 'TEXT') {
@@ -395,18 +434,23 @@ export default {
         },
         getImages () {
             this.activateImageMode();
-            this.addImage('https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg');
+            this.addImage('https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg',2);
         },
-        addImage (imgPath) {
+        addImage (imgPath, type) {
             if (!imgPath || !imgPath.length){
                 throw Error("imgPath can't null")
             }
-            // return new Promise(function(resolve, reject) {
-                this.editorInstance.addImageObject(imgPath).then(objectProps => {
-                    console.log(objectProps.id);
-                    // resolve(objectProps);
-                });
-            // }.bind(this));
+            this.editorInstance.addImageObject(imgPath).then(objectProps => {
+                console.log(objectProps.id);
+                let id = this.GenNonDuplicateID() + '_' + objectProps.id;
+                this.$parent.imgList[id] = imgPath;  // FIXME 
+                let target = this.$parent.records[objectProps.id];
+                if (target) {
+                    target.url = imgPath;
+                    target.randomId = id;
+                    target.objType = type;
+                }
+            });
         },
         addText (text, style = null, position = null) {
             // return new Promise(function(resolve, reject) {
@@ -434,6 +478,9 @@ export default {
             })
             .then(function (objectProps) {
                 console.log(objectProps);
+                let id = this.GenNonDuplicateID() + '_' + objectProps.id;
+                let target = this.$parent.records[objectProps.id];
+                target && (target.randomId = id);
             });
         },
         activateImageMode () {
@@ -447,28 +494,27 @@ export default {
             editor.style.height = window.getComputedStyle(container).maxHeight;
         },
         getRecord(obj){
-            // {
-            //     "id":1,
-            //     "type":"i-text",
-            //     "left":172.90222908850143,
-            //     "top":39.920166015625,
-            //     "width":200,
-            //     "height":45.199999999999996,
-            //     "fill":"#000000",
-            //     "stroke":null,
-            //     "strokeWidth":1,
-            //     "opacity":1,
-            //     "angle":0,
-            //     "text":"请输入文字",
-            //     "fontFamily":"Times New Roman",
-            //     "fontSize":40,
-            //     "fontStyle":"normal",
-            //     "textAlign":"left",
-            //     "fontWeight":"normal"
-            // }
             if (!this.records) this.records = {};
-            this.records[obj.id] = obj;
-        }
+            let vo = this.records[obj.id];
+            if (vo) {
+                vo.left = obj.left;
+                vo.top = obj.top;
+                vo.width = obj.width;
+                vo.height = obj.height;
+                vo.angle = obj.angle;
+                if (obj.type === 'text' || obj.type === 'i-text') {
+                   vo.text = obj.text;
+                   vo.fontSize = obj.fontSize;
+                }
+                this.records[obj.id] = vo;
+            } else {
+                this.records[obj.id] = obj;
+            }
+            
+        },
+        GenNonDuplicateID(randomLength){
+            return parseFloat(Math.random().toString().substr(3,randomLength) + Date.now()).toString(36)
+        }   
     }
 };
 </script>
