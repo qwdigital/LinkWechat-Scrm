@@ -32,24 +32,21 @@
                         <el-input placeholder="搜索聊天记录" prefix-icon="el-icon-search" v-model="employName">
                         </el-input>
                     </div>
-                </div>
-                 
+                </div>             
                  <div class="hd_tabs">
-                    <el-tabs v-model="activeName">
+                    <el-tabs v-model="activeName"  @tab-click="getChatList()">
                         <el-tab-pane label="单聊" name="0">                                           
                            <div class="hd_tabs_content">
-                                <!-- <list v-if="activeName==0" :personList="personList" :loading="loading" >
-                                </list> -->
+                                <list v-if="activeName==0" :personList="personList" :loading="loading" >
+                                </list>
                            </div>
                         </el-tab-pane>
                         <el-tab-pane label="群聊" name="2">
-                            <list v-if="activeName==2" :personList="personList" :loading="loading"  @chatFn="chatFn">
-                                </list>
+                            <grouplist v-if="activeName==2" :personList="personList" :loading="loading">
+                                </grouplist>
                         </el-tab-pane>                  
                     </el-tabs>
-                </div>
-                
-           
+                </div>     
             </el-col>
             <el-col :span="12">
                 <div class="hd_box">
@@ -163,8 +160,10 @@
     </div>
 </template>
 <script>
-    import list from '../component/curList.vue'
+    import list from '../component/customerList.vue'
     import chat from '../component/chat.vue'
+    
+  import grouplist from '../component/groupList.vue'
 import {
         content
     } from '@/api/content.js'
@@ -173,7 +172,7 @@ import {
     } from '@/utils/common.js'
     export default {
         components:{
-            list,chat
+            list,chat,grouplist
         },
         data() {
             return {
@@ -227,17 +226,17 @@ import {
                 if (flag) {
                     this.loading = true
                 }
+                this.personList=[]
                 content.getTree({
                     fromId: this.employId,
                     searchType: this.activeName
                 }).then(({
                     rows
                 }) => {
-                    console.log(rows)
                      this.loading = false
-                    this.personList = rows
+                   this.personList = rows
                 }).catch(err => {
-                    this.loading = false
+                     this.loading = false
                 })
             },
             activeNameThreeClick(page){
