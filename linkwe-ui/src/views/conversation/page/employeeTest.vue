@@ -245,29 +245,20 @@
           }
 
           if (group) {
-            console.log(query)
             content.chatGrounpList(query).then(res => {
               this.total = Number(res.total)
-              if (this.activeNameThree == 0) {
-                return this.allChat = res.rows
-              }
-              if (this.activeNameThree == 1) {
-                return this.allChatImg = res.rows
-              }
-              if (this.activeNameThree == 2) {
-                return this.allFile = res.rows
-              }
-              if (this.activeNameThree == 3) {
-                return this.allLInk = res.rows
-              }
-              if (this.activeNameThree == 4) {
-                return this.allVoice = res.rows
-              }
+             this.resortData(res)
             })
           } else {
             content.chatList(query).then(res => {
               this.total = Number(res.total)
-              if (this.activeNameThree == 0) {
+             this.resortData(res)
+            })
+          }
+        }
+      },
+      resortData(res){
+         if (this.activeNameThree == 0) {
                 return this.allChat = res.rows
               }
               if (this.activeNameThree == 1) {
@@ -282,9 +273,6 @@
               if (this.activeNameThree == 4) {
                 return this.allVoice = res.rows
               }
-            })
-          }
-        }
       },
       chatFn(data) {
         this.chat = data;
