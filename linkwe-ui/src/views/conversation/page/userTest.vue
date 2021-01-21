@@ -37,7 +37,7 @@
                     <el-tabs v-model="activeName"  @tab-click="getChatList()">
                         <el-tab-pane label="单聊" name="0">                                           
                            <div class="hd_tabs_content">
-                                <list v-if="activeName==0" :personList="personList" :loading="loading" >
+                                <list v-if="activeName==0" :personList="personList" :loading="loading" @chatFn="chatFn" >
                                 </list>
                            </div>
                         </el-tab-pane>
@@ -50,7 +50,7 @@
             </el-col>
             <el-col :span="12">
                 <div class="hd_box">
-                   <div class="hd_name"><span v-if="chatData&&chatData.finalChatContext">与{{chatData.finalChatContext.roomInfo.name}} 的聊天</span>
+                   <div class="hd_name"><span v-if="chatData&&chatData.finalChatContext">与{{chatData.finalChatContext.fromInfo.name}} 的聊天</span>
                   <span class="fr hd_nameRi">下载会话</span></div>
                 </div>
                 <div class=" hd_tabthree">
@@ -62,8 +62,8 @@
                                         range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"
                                         align="right" @change="activeNameThreeClick">
                                     </el-date-picker>
-                                </div>
-                                <chat :allChat="allChat" v-if="allChat.length>=1"></chat>
+                                </div>~                           
+                                <chats :allChat="allChat" v-if="allChat.length>=1"></chats>
                                 <el-pagination background v-if="allChat.length>=1" layout="prev, pager, next"
                                     class="pagination" :current-page="currentPage" @current-change="currentChange"
                                     :total="total">
@@ -78,7 +78,7 @@
                                         align="right" @change="activeNameThreeClick">
                                     </el-date-picker>
                                 </div>
-                                <chat :allChat="allChatImg" v-if="allChatImg.length>=1"></chat>
+                                <!-- <chat :allChat="allChatImg" v-if="allChatImg.length>=1"></chat> -->
                                 <el-pagination background v-if="allChatImg.length>=1" class="pagination"
                                     layout="prev, pager, next" :total="total" @current-change="currentChange"
                                     :current-page="currentPage">
@@ -161,7 +161,7 @@
 </template>
 <script>
     import list from '../component/customerList.vue'
-    import chat from '../component/chat.vue'
+    import chats from '../component/chat.vue'
     
   import grouplist from '../component/groupList.vue'
 import {
@@ -172,7 +172,7 @@ import {
     } from '@/utils/common.js'
     export default {
         components:{
-            list,chat,grouplist
+            list,chats,grouplist
         },
         data() {
             return {
@@ -180,7 +180,7 @@ import {
                 employName: '',
                 talkName: '',
                 personIndex: '-1',
-                activeName: "2",
+                activeName: "0",
                 activeNameThree: '0',
                 takeTime: '',
                 fileData: [],
@@ -205,9 +205,8 @@ import {
         methods: {
             chatFn(data){
                 this.chatData=data
-                if (data.fromId) {
-                  this.activeNameThreeClick()
-                }
+                console.log(data)
+             this.activeNameThreeClick()            
             },
             currentChange(){
                 this.currentPage = e
@@ -257,7 +256,7 @@ import {
                     }
                   let query = {
                         fromId: this.chatData.fromId,
-                        receiveId: this.chatData.roomId,
+                        receiveId: this.chatData.receiveId,
                         msgType,
                         pageSize: '10',
                         pageNum: this.currentPage,
@@ -266,8 +265,9 @@ import {
                     }
                      content.chatList(query).then(res => {
                         this.total = Number(res.total)
-                        console.log(res,'chatData')
+                           console.log( res,this.activeNameThree ,'resresresresres')
                         if (this.activeNameThree == 0) {
+                              console.log('cahar')
                             return this.allChat = res.rows
                         }
                         if (this.activeNameThree == 1) {
