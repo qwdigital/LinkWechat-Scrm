@@ -6,15 +6,14 @@
                
                <el-row style="padding:10px" v-if="item.finalChatContext.msgtype=='text'">
 
-                <el-col :span="3"> <img :src="item.finalChatContext.fromInfo.avatar"></el-col>
+                <el-col :span="3"> <img v-if="item.finalChatContext.fromInfo" :src="item.finalChatContext.fromInfo.avatar"></el-col>
                <el-col :span="21">
-                    <p>{{item.roomInfo.groupName}} <span class="fr gray">{{parseTime(item.finalChatContext.fromInfo.updateTime)}}</span></p>
+                    <p>{{item.finalChatContext.roomInfo.name}} <span class="fr gray">{{parseTime(item.finalChatContext.fromInfo.updateTime)}}</span></p>
                    <p class="gray padt10" v-if="item.finalChatContext.fromInfo">{{item.finalChatContext.fromInfo.name}}:{{item.finalChatContext.text.content}}</p>     
                 </el-col> 
                 </el-row>     
                    <el-row style="padding:10px" v-if="item.finalChatContext.msgtype=='file'">
-
-                <el-col :span="3">&nbsp;</el-col>
+                <el-col :span="3">&nbsp; `</el-col>
                 <el-col :span="21">
                    <p><span class="fr gray">{{parseTime(item.finalChatContext.msgtime)}}</span></p>
                    <p class="gray padt10" >{{item.finalChatContext.from}}:
@@ -49,7 +48,7 @@
         },
         methods:{
             liClick(e){
-                this.$emit('chatFn',e)
+                this.$emit('groupFn',e)
             }
         }
     }
