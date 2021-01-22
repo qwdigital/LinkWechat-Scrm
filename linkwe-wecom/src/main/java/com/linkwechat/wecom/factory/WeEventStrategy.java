@@ -50,7 +50,7 @@ public abstract class WeEventStrategy {
     public WeDepartment setWeDepartMent(WxCpXmlMessageVO message){
         WeDepartment weDepartment = new WeDepartment();
         if (message.getId() != null) {
-            weDepartment.setId(Long.valueOf(message.getId()));
+            weDepartment.setId(message.getId());
         }
         if (message.getName() != null) {
             weDepartment.setName(message.getName());

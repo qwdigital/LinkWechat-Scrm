@@ -138,17 +138,7 @@ public class WeTagServiceImpl extends ServiceImpl<WeTagMapper,WeTag> implements 
             WeCropGroupTagListDto weCropGroupTagListDto = weCropTagClient.getCorpTagListByTagIds(WeFindCropTagParam.builder().tag_id(tagId.split(",")).build());
             List<WeCropGroupTagDto> tag_group = weCropGroupTagListDto.getTag_group();
             if (CollectionUtil.isNotEmpty(tag_group)) {
-                List<WeTagGroup> tagGroupsList = new ArrayList<>();
                 tag_group.stream().forEach(k -> {
-                    WeTagGroup tagGroupInfo = this.weTagGroupService.getOne(new LambdaQueryWrapper<WeTagGroup>()
-                            .eq(WeTagGroup::getGroupId, k.getGroup_id()));
-                    if (tagGroupInfo != null) {
-                        WeTagGroup weTagGroup = new WeTagGroup();
-                        weTagGroup.setCreateBy(SecurityUtils.getUsername());
-                        weTagGroup.setGourpName(k.getGroup_name());
-                        weTagGroup.setGroupId(k.getGroup_id());
-                        tagGroupsList.add(weTagGroup);
-                    }
                     List<WeCropTagDto> tag = k.getTag();
                     if (CollectionUtil.isNotEmpty(tag)) {
                         List<WeTag> weTags = new ArrayList<>();
@@ -156,7 +146,7 @@ public class WeTagServiceImpl extends ServiceImpl<WeTagMapper,WeTag> implements 
                             WeTag tagInfo = this.getOne(new LambdaQueryWrapper<WeTag>()
                                     .eq(WeTag::getGroupId, k.getGroup_id())
                                     .eq(WeTag::getTagId, v.getId()));
-                            if (tagInfo != null) {
+                            if (tagInfo == null) {
                                 WeTag weTag = new WeTag();
                                 weTag.setTagId(v.getId());
                                 weTag.setGroupId(k.getGroup_id());
@@ -167,7 +157,6 @@ public class WeTagServiceImpl extends ServiceImpl<WeTagMapper,WeTag> implements 
                         this.saveBatch(weTags);
                     }
                 });
-                weTagGroupService.saveBatch(tagGroupsList);
             }
         }
     }
@@ -183,13 +172,7 @@ public class WeTagServiceImpl extends ServiceImpl<WeTagMapper,WeTag> implements 
             WeCropGroupTagListDto weCropGroupTagListDto = weCropTagClient.getCorpTagListByTagIds(WeFindCropTagParam.builder().tag_id(tagId.split(",")).build());
             List<WeCropGroupTagDto> tag_group = weCropGroupTagListDto.getTag_group();
             if (CollectionUtil.isNotEmpty(tag_group)) {
-                List<WeTagGroup> tagGroupsList = new ArrayList<>();
                 tag_group.stream().forEach(k -> {
-                    WeTagGroup weTagGroup = new WeTagGroup();
-                    weTagGroup.setCreateBy(SecurityUtils.getUsername());
-                    weTagGroup.setGourpName(k.getGroup_name());
-                    weTagGroup.setGroupId(k.getGroup_id());
-                    tagGroupsList.add(weTagGroup);
                     List<WeCropTagDto> tag = k.getTag();
                     if (CollectionUtil.isNotEmpty(tag)) {
                         List<WeTag> weTags = new ArrayList<>();
@@ -203,7 +186,6 @@ public class WeTagServiceImpl extends ServiceImpl<WeTagMapper,WeTag> implements 
                         this.saveOrUpdateBatch(weTags);
                     }
                 });
-                weTagGroupService.saveOrUpdateBatch(tagGroupsList);
             }
         }
     }

@@ -39,7 +39,7 @@ public class WxCpXmlMessageVO extends WxCpXmlMessage {
 
     @XStreamAlias("Id")
     @XStreamConverter(value = XStreamCDataConverter.class)
-    private String id;
+    private String tagId;
 
     @Data
     public static class BatchJob implements Serializable {

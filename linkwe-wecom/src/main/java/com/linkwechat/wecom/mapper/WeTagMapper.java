@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeTag;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 企业微信标签Mapper接口
@@ -51,7 +52,7 @@ public interface WeTagMapper  extends BaseMapper<WeTag>
      * @param id 企业微信标签ID
      * @return 结果
      */
-    public int deleteWeTagById(String id);
+    public int deleteWeTagById(@Param("id") String id);
 
     /**
      * 批量删除企业微信标签
@@ -59,7 +60,7 @@ public interface WeTagMapper  extends BaseMapper<WeTag>
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    public int deleteWeTagByIds(String[] ids);
+    public int deleteWeTagByIds(@Param("ids") String[] ids);
 
 
     /**

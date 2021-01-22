@@ -25,7 +25,7 @@ public class WeCallBackDeleteCustomerTagImpl extends WeEventStrategy {
         try {
             switch (message.getTagType()){
                 case tagGroup:
-                    weTagGroupService.deleteTagGroup(message.getId());
+                    weTagGroupService.deleteTagGroup(message.getTagId());
                     break;
                 case tag:
                     weTagService.deleteTag(message.getTagId());

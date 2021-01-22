@@ -26,7 +26,7 @@ public class WeCallBackCreateCustomerTagImpl extends WeEventStrategy {
         try {
             switch (message.getTagType()){
                 case tagGroup:
-                    weTagGroupService.createTagGroup(message.getId());
+                    weTagGroupService.createTagGroup(message.getTagId());
                     break;
                 case tag:
                     weTagService.creatTag(message.getTagId());
