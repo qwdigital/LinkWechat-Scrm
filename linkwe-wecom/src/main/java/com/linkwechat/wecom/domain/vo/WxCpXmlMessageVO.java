@@ -29,6 +29,17 @@ public class WxCpXmlMessageVO extends WxCpXmlMessage {
     @XStreamAlias("BatchJob")
     private BatchJob batchJob = new BatchJob();
 
+    @XStreamAlias("FailReason")
+    @XStreamConverter(value = XStreamCDataConverter.class)
+    private String failReason;
+
+    @XStreamAlias("TagType")
+    @XStreamConverter(value = XStreamCDataConverter.class)
+    private String tagType;
+
+    @XStreamAlias("Id")
+    @XStreamConverter(value = XStreamCDataConverter.class)
+    private String id;
 
     @Data
     public static class BatchJob implements Serializable {

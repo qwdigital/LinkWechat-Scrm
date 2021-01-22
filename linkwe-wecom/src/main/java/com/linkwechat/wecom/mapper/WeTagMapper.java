@@ -51,7 +51,7 @@ public interface WeTagMapper  extends BaseMapper<WeTag>
      * @param id 企业微信标签ID
      * @return 结果
      */
-    public int deleteWeTagById(Long id);
+    public int deleteWeTagById(String id);
 
     /**
      * 批量删除企业微信标签
@@ -59,7 +59,7 @@ public interface WeTagMapper  extends BaseMapper<WeTag>
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    public int deleteWeTagByIds(Long[] ids);
+    public int deleteWeTagByIds(String[] ids);
 
 
     /**

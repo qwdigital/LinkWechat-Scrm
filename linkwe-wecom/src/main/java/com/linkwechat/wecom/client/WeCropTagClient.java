@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.client;
 
+import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.DataObject;
 import com.dtflys.forest.annotation.Request;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
@@ -40,7 +41,7 @@ public interface WeCropTagClient {
     @Request(url = "/externalcontact/get_corp_tag_list",
             type = "POST"
     )
-    WeCropGroupTagListDto getCorpTagListByTagIds(@DataObject WeFindCropTagParam weFindCropTagParam);
+    WeCropGroupTagListDto getCorpTagListByTagIds(@Body WeFindCropTagParam weFindCropTagParam);
 
 
     /**

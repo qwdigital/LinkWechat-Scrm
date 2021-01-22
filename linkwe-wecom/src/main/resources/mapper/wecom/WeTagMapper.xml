@@ -54,12 +54,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
 
-    <delete id="deleteWeTagById" parameterType="Long">
-        delete from we_tag where id = #{id}
+    <delete id="deleteWeTagById" parameterType="String">
+        uddate we_tag set status=2 where tag_id = #{id}
     </delete>
 
-    <delete id="deleteWeTagByIds" parameterType="String">
-        delete from we_tag where id in 
+    <delete id="deleteWeTagByIds">
+        uddate we_tag set status=2 where tag_id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>

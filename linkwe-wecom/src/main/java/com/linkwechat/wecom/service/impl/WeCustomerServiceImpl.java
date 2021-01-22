@@ -476,7 +476,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         if (WeConstans.WE_SUCCESS_CODE.equals(externalUserDetail.getErrcode())) {
             //客户入库
             WeCustomer weCustomer = new WeCustomer();
-            BeanUtils.copyPropertiesignoreOther(externalUserDetail.getExternal_contact(), weCustomer);
+            BeanUtils.copyPropertiesASM(externalUserDetail.getExternal_contact(), weCustomer);
             this.saveOrUpdate(weCustomer);
 
             //客户与通讯录客户关系
@@ -491,10 +491,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                         .id(weFlowerCustomerRelId)
                         .userId(kk.getUserid())
                         .description(kk.getDescription())
-                        .remarkCorpName(kk.getRemark_company())
-                        .remarkMobiles(kk.getRemark_mobiles())
-                        .operUserid(kk.getOper_userid())
-                        .addWay(kk.getAdd_way())
+                        .remarkCorpName(kk.getRemarkCorpName())
+                        .remarkMobiles(kk.getRemarkMobiles())
+                        .operUserid(kk.getUserid())
+                        .addWay(kk.getAddWay())
                         .state(kk.getState())
                         .status("0")
                         .externalUserid(weCustomer.getExternalUserid())

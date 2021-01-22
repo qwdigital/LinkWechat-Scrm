@@ -62,13 +62,13 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
     /**
      * 查询通讯录相关客户
      *
-     * @param id 通讯录相关客户ID
+     * @param userId 通讯录相关客户ID
      * @return 通讯录相关客户
      */
     @Override
-    public WeUser selectWeUserById(Long id)
+    public WeUser selectWeUserById(String userId)
     {
-        return weUserMapper.selectWeUserById(id);
+        return weUserMapper.selectWeUserById(userId);
     }
 
     /**
@@ -103,6 +103,18 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
 
     }
 
+    @Override
+    @Transactional
+    public int insertWeUserNoToWeCom(WeUser weUser)
+    {
+        WeUser weUserInfo = weUserMapper.selectWeUserById(weUser.getUserId());
+        if (weUserInfo != null){
+            return weUserMapper.updateWeUser(weUser);
+        }
+        return weUserMapper.insertWeUser(weUser);
+
+    }
+
     /**
      * 修改通讯录相关客户
      * 
@@ -119,6 +131,13 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
                     weUser.transformWeUserDto()
             );
         }
+    }
+
+    @Override
+    @Transactional
+    public int updateWeUserNoToWeCom(WeUser weUser)
+    {
+        return weUserMapper.updateWeUser(weUser);
     }
 
 
@@ -229,6 +248,17 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
             });
         }
 
+    }
+
+    @Override
+    @Transactional
+    public int deleteUserNoToWeCom(String userId) {
+        WeUser weUser = WeUser.builder()
+                .userId(userId)
+                .isActivate(WeConstans.WE_USER_IS_LEAVE)
+                .dimissionTime(new Date())
+                .build();
+        return weUserMapper.updateById(weUser);
     }
 
 

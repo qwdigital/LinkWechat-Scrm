@@ -33,6 +33,10 @@ public class WeConstans {
      */
     public static final String WE_CHAT_ACCESS_TOKEN = "we_chat_access_token";
 
+    /**
+     * 应用相关token
+     */
+    public static final String WE_AGENT_ACCESS_TOKEN = "we_agent_access_token";
 
     /**
      * 企业微信接口返回成功code
@@ -240,6 +244,10 @@ public class WeConstans {
             put("batch_job_result", "weEventBatchJobResultImpl");
             //外部联系人事件
             put("change_external_contact", "weEventChangeExternalContactImpl");
+            //客户群事件
+            put("change_external_chat", "weEventChangeExternalChatImpl");
+            //客户标签事件
+            put("change_external_tag", "weEventChangeExternalTagImpl");
         }
     };
 

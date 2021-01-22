@@ -20,4 +20,10 @@ public interface IWeGroupService extends IService<WeGroup> {
 
 
     void synchWeGroup();
+
+    void createWeGroup(String chatId);
+
+    void updateWeGroup(String chatId);
+
+    void deleteWeGroup(String chatId);
 }

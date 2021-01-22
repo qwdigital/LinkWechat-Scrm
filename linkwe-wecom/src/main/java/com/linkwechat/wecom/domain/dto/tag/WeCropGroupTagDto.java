@@ -27,6 +27,7 @@ public class WeCropGroupTagDto {
     private String group_id;
     private String group_name;
     private Integer order;
+    private Boolean deleted;
     private Long create_time;
     private List<WeCropTagDto> tag;
 

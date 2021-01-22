@@ -3,7 +3,7 @@ package com.linkwechat.common.core.domain;
 import lombok.Data;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 会话存档接口入参实体
  * @date 2020/12/29 14:23
  **/

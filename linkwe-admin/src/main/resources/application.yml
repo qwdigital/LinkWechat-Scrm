@@ -200,8 +200,10 @@ wecome:
           - /msgaudit/check_single_agree
           - /msgaudit/check_room_agree
           - /msgaudit/groupchat/get
+  needAgentTokenUrl:
+          - /message/send
   #企微回调通知配置
   callBack:
-    appIdOrCorpId: 
-    token: 
-    encodingAesKey: 
+    appIdOrCorpId: ww38152475d1bca752
+    token: uEyhhuTKfpS
+    encodingAesKey: diTFQ6B4IW14UN2JplADuhMZsBZHjvuBG24kHFrr4Px

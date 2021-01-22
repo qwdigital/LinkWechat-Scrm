@@ -103,6 +103,15 @@ public class WeDepartmentServiceImpl extends ServiceImpl<WeDepartmentMapper,WeDe
 
     }
 
+    @Override
+    public int insertWeDepartmentNoToWeCom(WeDepartment weDepartment) {
+        WeDepartment department = this.baseMapper.selectWeDepartmentById(weDepartment.getId());
+        if (department !=null){
+            return 0;
+        }
+        return this.baseMapper.insertWeDepartment(weDepartment);
+    }
+
     /**
      * 修改企业微信组织架构相关
      * 

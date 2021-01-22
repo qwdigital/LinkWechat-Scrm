@@ -1,6 +1,7 @@
 package com.linkwechat.web.controller.wecom;
 
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.utils.Threads;
 import com.linkwechat.common.utils.wecom.WxCryptUtil;
 import com.linkwechat.web.controller.common.CommonController;
 import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
@@ -47,7 +48,7 @@ public class WeCallBackController extends CommonController {
             try {
                 WeCallBackEventFactory factory = weEventHandle.factory(wxCpXmlMessage.getEvent());
                 if (factory !=null){
-                    factory.eventHandle(wxCpXmlMessage);
+                    Threads.SINGLE_THREAD_POOL.submit(() -> factory.eventHandle(wxCpXmlMessage));
                 }
             } catch (Exception e) {
                 e.printStackTrace();

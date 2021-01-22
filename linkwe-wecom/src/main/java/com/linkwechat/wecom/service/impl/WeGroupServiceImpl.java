@@ -20,8 +20,6 @@ import com.linkwechat.wecom.mapper.WeGroupMapper;
 import com.linkwechat.wecom.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,6 +63,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
     private WeCustomerClient weCustomerClient;
 
 
+    @Override
     public List<WeGroup> selectWeGroupList(WeGroup weGroup) {
         return this.baseMapper.selectWeGroupList(weGroup);
     }
@@ -208,7 +207,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
             List<WeGroupMember> weGroupMemberList = iWeGroupMemberService.list(new LambdaQueryWrapper<WeGroupMember>().in(WeGroupMember::getChatId,
                     weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList())));
             //存量去重
-            if (CollectionUtil.isNotEmpty(weGroupMemberList)){
+            if (CollectionUtil.isNotEmpty(weGroupMemberList)) {
                 List<WeGroupMember> groupMemberList = weGroupMembers.stream().filter(e -> {
                     for (WeGroupMember weGroupMember : weGroupMemberList) {
                         if (e.getUserId().equals(weGroupMember.getUserId())) {
@@ -218,12 +217,119 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                     return true;
                 }).collect(Collectors.toList());
                 iWeGroupMemberService.saveBatch(groupMemberList);
-            }else {
+            } else {
                 iWeGroupMemberService.saveBatch(weGroupMembers);
             }
         }
 
 
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void createWeGroup(String chatId) {
+        List<WeGroup> weGroups = new ArrayList<>();
+        List<WeGroupMember> weGroupMembers = new ArrayList<>();
+        CustomerGroupDetail customerGroupDetail = weCustomerGroupClient.groupChatDetail(
+                new CustomerGroupDetail().new Params(chatId)
+        );
+        if (CollectionUtil.isNotEmpty(customerGroupDetail.getGroup_chat())) {
+            customerGroupDetail.getGroup_chat().stream().forEach(kk -> {
+                weGroups.add(
+                        WeGroup.builder()
+                                .chatId(kk.getChat_id())
+                                .groupName(kk.getName())
+                                .notice(kk.getNotice())
+                                .owner(kk.getOwner())
+                                .createTime(new Date(kk.getCreate_time() * 1000L))
+                                .build()
+                );
+                List<CustomerGroupMember> memberLists = kk.getMember_list();
+                if (CollectionUtil.isNotEmpty(memberLists)) {
+                    memberLists.stream().forEach(member -> {
+                        weGroupMembers.add(
+                                WeGroupMember.builder()
+                                        .chatId(kk.getChat_id())
+                                        .userId(member.getUserid())
+                                        .joinTime(new Date(member.getJoin_time() * 1000L))
+                                        .joinScene(member.getJoin_scene())
+                                        .joinType(member.getType())
+                                        .unionId(member.getUnionid())
+                                        .build()
+                        );
+                    });
+                }
+            });
+
+            this.saveOrUpdateBatch(weGroups);
+            iWeGroupMemberService.saveBatch(weGroupMembers);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateWeGroup(String chatId) {
+        List<WeGroup> weGroups = new ArrayList<>();
+        List<WeGroupMember> weGroupMembers = new ArrayList<>();
+        CustomerGroupDetail customerGroupDetail = weCustomerGroupClient.groupChatDetail(
+                new CustomerGroupDetail().new Params(chatId)
+        );
+        if (CollectionUtil.isNotEmpty(customerGroupDetail.getGroup_chat())) {
+            customerGroupDetail.getGroup_chat().stream().forEach(kk -> {
+                weGroups.add(
+                        WeGroup.builder()
+                                .chatId(kk.getChat_id())
+                                .groupName(kk.getName())
+                                .notice(kk.getNotice())
+                                .owner(kk.getOwner())
+                                .createTime(new Date(kk.getCreate_time() * 1000L))
+                                .build()
+                );
+                List<CustomerGroupMember> memberLists = kk.getMember_list();
+                if (CollectionUtil.isNotEmpty(memberLists)) {
+                    memberLists.stream().forEach(member -> {
+                        weGroupMembers.add(
+                                WeGroupMember.builder()
+                                        .chatId(kk.getChat_id())
+                                        .userId(member.getUserid())
+                                        .joinTime(new Date(member.getJoin_time() * 1000L))
+                                        .joinScene(member.getJoin_scene())
+                                        .joinType(member.getType())
+                                        .unionId(member.getUnionid())
+                                        .build()
+                        );
+                    });
+                }
+            });
+
+            this.saveOrUpdateBatch(weGroups);
+            //获取表中成员信息
+            List<WeGroupMember> weGroupMemberList = iWeGroupMemberService.list(new LambdaQueryWrapper<WeGroupMember>()
+                    .eq(WeGroupMember::getChatId, chatId));
+            if (weGroupMembers.size() > weGroupMemberList.size()) {
+                //成员信息取差集
+                List<WeGroupMember> list = weGroupMembers.stream().filter(m -> !weGroupMemberList.stream()
+                                .map(d -> d.getUserId()).collect(Collectors.toList()).contains(m.getUserId()))
+                        .collect(Collectors.toList());
+                iWeGroupMemberService.saveBatch(list);
+            } else if (weGroupMembers.size() < weGroupMemberList.size()) {
+                //成员信息取差集
+                List<WeGroupMember> list = weGroupMemberList.stream().filter(m -> !weGroupMembers.stream()
+                        .map(d -> d.getUserId()).collect(Collectors.toList()).contains(m.getUserId()))
+                        .collect(Collectors.toList());
+                iWeGroupMemberService.remove(new LambdaQueryWrapper<WeGroupMember>()
+                        .eq(WeGroupMember::getChatId, chatId)
+                        .in(WeGroupMember::getUserId, list.stream().map(WeGroupMember::getUserId)
+                                .collect(Collectors.toList())));
+            }
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteWeGroup(String chatId) {
+        this.baseMapper.delete(new LambdaQueryWrapper<WeGroup>().eq(WeGroup::getChatId,chatId));
+        iWeGroupMemberService.remove(new LambdaQueryWrapper<WeGroupMember>().eq(WeGroupMember::getChatId,chatId));
     }
 
 }
