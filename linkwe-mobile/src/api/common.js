@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 import config from '@/config'
-const service = config.services.wecom + '/ticket'
+const service = config.services.wecom
 
 /**
  * 获取应用的jsapi_ticket
@@ -8,7 +8,7 @@ const service = config.services.wecom + '/ticket'
  */
 export function getAgentTicket(url) {
   return request({
-    url: service + '/getAgentTicket',
+    url: service + '/ticket/getAgentTicket',
     params: {
       url,
     },
@@ -21,7 +21,7 @@ export function getAgentTicket(url) {
  */
 export function getAppTicket(url) {
   return request({
-    url: service + '/getAppTicket',
+    url: service + '/ticket/getAppTicket',
     params: {
       url,
     },
@@ -32,8 +32,11 @@ export function getAppTicket(url) {
  * 获取企业的jsapi_ticket
  * @param {*} url 页面url
  */
-export function getLoginUserId() {
+export function getUserInfo(code) {
   return request({
-    url: '/system/user/findCurrentLoginUser',
+    url: service + '/user/getUserInfo',
+    params: {
+      code,
+    },
   })
 }

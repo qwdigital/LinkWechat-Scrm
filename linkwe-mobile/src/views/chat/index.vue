@@ -1,5 +1,6 @@
+2
 <script>
-import { getLoginUserId } from '@/api/common'
+import { getUserInfo } from '@/api/common'
 import { getTypeList } from '@/api/chat'
 import List from './List'
 export default {
@@ -14,13 +15,53 @@ export default {
       finished: false,
       show: false,
       userId: '',
+      auth_code: '',
+      auth_code1: '',
     }
   },
   watch: {},
   computed: {},
+  beforeCreate() {
+    // http://106.13.201.219/?auth_code=xxx#/authWehatCallback
+    // console.log('routerbeforeCreate', this.$route);
+    // let auth_code = location.search
+    //   .slice(1)
+    //   .split('&')[0]
+    //   .split('=')[1]
+    //   this.auth_code1 = auth_code
+    // if (!auth_code) {
+    //   this.$toast('未获得授权')
+    //   return
+    // }
+    // getUserInfo(auth_code)
+    //   .then(({ data }) => {
+    //     this.userId = data.userId
+    //     this.$toast('userId:' + this.userId)
+    //   })
+    //   .catch((err) => {
+    //     this.$toast('err:' + err)
+    //   })
+  },
   created() {
+    let auth_code = location.search
+      .slice(1)
+      .split('&')[0]
+      .split('=')[1]
+    this.auth_code1 = auth_code
+    if (!auth_code) {
+      this.$toast('未获得授权')
+      return
+    }
+    getUserInfo(auth_code)
+      .then(({ data }) => {
+        this.userId = data.userId
+        this.$toast('userId:' + this.userId)
+      })
+      .catch((err) => {
+        this.$toast('err:' + err)
+      })
     this.getList()
-    this.getUserId()
+    this.auth_code = location
   },
   mounted() {},
   methods: {
@@ -29,12 +70,9 @@ export default {
         this.list = rows
       })
     },
-    getUserId() {
-      getLoginUserId().then(({ data }) => {
-        this.userId = data
-      })
+    search() {
+      this.$refs['list' + this.active].getList(1)
     },
-    search() {},
     add() {},
   },
 }
@@ -52,16 +90,25 @@ export default {
         <van-icon name="plus" @click="add" />
       </template> -->
     </van-search>
+    <span>{{ auth_code }}</span>
+    <br />
+    <span>auth_code:{{ auth_code1 }}</span>
+
     <van-tabs v-model="active">
-      <van-tab title="我的">
-        <List :userId="userId"></List>
+      <van-tab v-if="!!userId" title="我的">
+        <List ref="list0" :userId="userId" :keyword="keyword"></List>
       </van-tab>
       <van-tab
         :title="item.sideName"
         v-for="(item, index) in list"
         :key="index"
       >
-        <List :sideId="item.sideId" :userId="userId"></List>
+        <List
+          :ref="'list' + (index + 1)"
+          :sideId="item.sideId"
+          :userId="userId"
+          :keyword="keyword"
+        ></List>
       </van-tab>
     </van-tabs>
 

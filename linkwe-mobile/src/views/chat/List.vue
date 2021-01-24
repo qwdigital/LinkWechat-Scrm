@@ -16,38 +16,55 @@ export default {
       type: String,
       default: '',
     },
+    keyword: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
-      list: [{}],
       loading: false,
       finished: false,
+      error: false,
+      pageSize: 1,
+      pageNum: 10,
+      list: [],
       collectList: [],
     }
   },
   watch: {},
   computed: {},
-  created() {},
+  created() {
+    this.getList()
+    this.userId && this.getCollectionList()
+  },
   mounted() {},
   methods: {
-    getList() {
+    getList(page) {
+      let pageSize = page || this.pageSize++
+      let pageNum = this.pageNum
+      let keyword = this.keyword
+      page == 1 && (this.list = [])
       this.loading = true
       ;(this.sideId
-        ? getMaterialList(this.sideId)
-        : getCollectionList(this.userId)
+        ? getMaterialList({ sideId: this.sideId, pageSize, pageNum, keyword })
+        : getCollectionList({ userId: this.userId, pageSize, pageNum, keyword })
       )
         .then(({ rows, total }) => {
-          this.list = rows
+          this.list.push(...rows)
           this.loading = false
-          this.finished = true
+          // 数据全部加载完成
+          if (this.list.length >= total) {
+            this.finished = true
+          }
         })
         .catch(() => {
-          this.loading = false
-          this.finished = true
+          this.error = true
         })
     },
     getCollectionList() {
-      getCollectionList().then(({ rows, total }) => {
+      let data = { userId: this.userId, pageSize: 1, pageNum: 1000 }
+      getCollectionList(data).then(({ rows, total }) => {
         this.collectList = rows.map((d) => d.id)
       })
     },
@@ -117,10 +134,12 @@ export default {
     },
     collect(materialId) {
       ;(this.isCollected(materialId) ? cancleCollection : addCollection)({
-        userId,
+        userId: this.userId,
         materialId,
       }).then(({ data }) => {
-        this.isCollected.splice(this.isCollected.indexOf(materialId), 1)
+        this.isCollected(materialId)
+          ? this.isCollected.splice(this.isCollected.indexOf(materialId), 1)
+          : this.isCollected.push(materialId)
       })
     },
   },
@@ -133,7 +152,9 @@ export default {
       v-model="loading"
       :finished="finished"
       finished-text="没有更多了"
-      @load="getList"
+      :error.sync="error"
+      error-text="请求失败，点击重新加载"
+      @load="getList()"
     >
       <div v-for="(item, index) in list" class="list" :key="index">
         <div class="title">{{ item.content }}</div>
@@ -143,7 +164,7 @@ export default {
 
           <div class="fr flex">
             <div class="action" @click="send(item)">发送</div>
-            <div class="action" @click="collect(item.id)">
+            <div v-if="!!userId" class="action" @click="collect(item.id)">
               {{ isCollected(item.id) ? '已' : '' }}收藏
             </div>
           </div>

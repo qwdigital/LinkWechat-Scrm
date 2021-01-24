@@ -4,8 +4,8 @@ export default {
   name: 'App',
   data() {
     return {
-      appId: 'ww38152475d1bca752',
-      agentId: '1000003',
+      appId: 'appId',
+      agentId: '1000005',
     }
   },
   created() {
