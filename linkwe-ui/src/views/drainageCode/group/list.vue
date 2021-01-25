@@ -1,251 +1,486 @@
-<style lang="scss" scoped>
-.mid-action {
-  display: flex;
-  justify-content: space-between;
-  margin: 10px 0;
-  align-items: center;
-  .total {
-    font-size: 14px;
-    min-height: 32px;
-    line-height: 32px;
-    padding: 0 12px;
-    color: #606266;
-  }
-  .num {
-    color: #00f;
-  }
-}
-</style>
 <template>
-  <div class="app-container page">
-    <el-input placeholder="请输入关键字" style="width: 240px;" class="mr10" v-model="input3">
-      <el-button slot="append" icon="el-icon-search"></el-button>
-    </el-input>
-    <el-button type="primary" icon="el-icon-plus">新建客户群活码</el-button>
-    <el-button type="primary">批量下载</el-button>
+  <div class="page">
+    <el-form
+      :inline="true"
+      class="top-search"
+    >
+      <el-form-item>
+        <el-input
+          v-model="query.activityName"
+          placeholder="请输入活码名称"
+        ></el-input>
+      </el-form-item>
+
+      <el-form-item>
+        <el-input
+          v-model="query.createBy"
+          placeholder="请输入创建人"
+        ></el-input>
+      </el-form-item>
+
+      <el-form-item>
+        <el-date-picker
+          v-model="searchDate"
+          format="yyyy-MM-dd"
+          value-format="yyyyMMdd"
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        ></el-date-picker>
+      </el-form-item>
+
+      <el-form-item
+        class="search-button-area"
+      >
+        <el-button type="primary" @click="handleSearch">查询</el-button>
+        <el-button @click="handleClear">清空</el-button>
+      </el-form-item>
+    </el-form>
 
     <div class="mid-action">
-      <div class="total">
-        客户群活码是一个可变化的群二维码，相当于一个跳转页面，当一个群快满时，会自动在跳转页面中显示另一个群的二维码，突破客户入群的限制。
-        <el-popover placement="right" width="400" trigger="hover">
-          <div class="notic-message">
-            <p>1. 群活码并未改变微信原有规则，只是提供了一个固定不变的入口二维码、根据人数自动换群及扫码数据统计分析等功能</p>
-            <p>2. 如果微信群7天没有加满200人，系统会提前一天通过服务号发送群二维码即将到期提醒，请及时更新群二维码，避免因群二维码过期无法进群</p>
-            <p>3. 微信群超过200人无法扫码只能邀请进群，想实现所有人都能扫码进群，需要拆分为多个200人群，准督多个空群，每扫码200人自动换过</p>
-            <p>4. 支持将活码二维码以图片方式分享朋友圈(活码以文字链接方式分享不影响)，如有需要可以绑定自有域名，或开启防护加速仅支持企业版已认证用户功能</p>
-            <p>5. 根据《微信外链管理规范》，违规内容/用途、用户投诉等可能导致活码被封，且申诉有可能无法解封，具体以官方处理结果为准，无法更换活码的(例如用于印刷)，建议绑定自有域名或开启防护加速功能</p>
-            <p>6. 禁止任何违法、违规用途，所有活码都有专人审核，一经发现即关闭访问、停止分配域名，情节严重将封停账户《微信外链管理规范》</p>
-          </div>
-          <span class="num" slot="reference">使用须知</span>
-        </el-popover>
+      <div>
+        <el-button
+          type="primary"
+          @click="$router.push('/drainageCode/groupAdd')"
+        >
+          新建群活码
+        </el-button>
+      </div>
+
+      <div>
+        <el-button
+          :disabled="multiGroupCode.length === 0"
+          @click="handleBulkDownload"
+        >
+          批量下载
+        </el-button>
+
+        <el-button
+          :disabled="multiGroupCode.length === 0"
+          @click="handleBulkRemove"
+        >
+          批量删除
+        </el-button>
       </div>
     </div>
 
-    <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="样式" align="center" prop="operId" />
-      <el-table-column label="活动名称" align="center" prop="title" />
-      <el-table-column label="活动场景" align="center" prop="businessType" />
-      <el-table-column label="实际群码数" align="center" prop="businessType" />
-      <el-table-column label="扫码次数" align="center" prop="businessType" />
-      <el-table-column label="创建人" align="center" prop="businessType" />
-      <el-table-column label="创建时间" align="center" prop="operTime" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.operTime) }}</span>
+    <el-table
+      :data="groupCodes"
+      v-loading="loading"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column
+        type="selection"
+        width="55"
+        align="center"
+      ></el-table-column>
+
+      <el-table-column
+        prop="activityName"
+        label="活码名称"
+        align="center"
+      ></el-table-column>
+
+      <el-table-column
+        prop="activityDesc"
+        label="活码描述"
+        align="center"
+        width="160"
+      >
+        <template #default="{ row }">
+          <el-popover
+            placement="bottom"
+            width="200"
+            trigger="hover"
+            :content="row.activityDesc"
+          >
+            <div slot="reference" class="table-desc overflow-ellipsis">{{ row.activityDesc }}</div>
+          </el-popover>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+
+      <el-table-column
+        prop="codeUrl"
+        label="活码样式"
+        align="center"
+        width="130"
+      >
+        <template #default="{ row }">
+          <el-popover
+            placement="bottom"
+            trigger="hover"
+          >
+            <el-image
+              slot="reference"
+              :src="row.codeUrl"
+              class="code-image--small"
+            ></el-image>
+            <el-image
+              :src="row.codeUrl"
+              class="code-image"
+            >
+            </el-image>
+          </el-popover>
+        </template>
+      </el-table-column>
+
+      <el-table-column
+        label="实际群码总数"
+        align="center"
+      >
+        <template #default="{ row }">
           <el-button
-            size="mini"
             type="text"
-            icon="el-icon-view"
-            @click="handleView(scope.row,scope.index)"
-            v-hasPermi="['monitor:operlog:query']"
-          >下载</el-button>
+            @click="handleRealCodeDialogOpen(row.id, -1)"
+          >
+            {{ (row.actualList && row.actualList.length) || 0 }}
+          </el-button>
+        </template>
+      </el-table-column>
+
+      <el-table-column
+        prop="availableCodes"
+        label="可用实际群码数"
+        align="center"
+      >
+        <template #default="{ row }">
+          <el-popover
+            v-if="row.aboutToExpireCodes > 0"
+            placement="bottom"
+            width="200"
+            trigger="hover"
+            :content="'有' + row.aboutToExpireCodes + '个实际群码即将过期。'"
+          >
+            <i slot="reference" class="el-icon-warning expire-icon"></i>
+          </el-popover>
+
           <el-button
-            size="mini"
             type="text"
-            icon="el-icon-view"
-            @click="handleView(scope.row,scope.index)"
-            v-hasPermi="['monitor:operlog:query']"
-          >复制链接</el-button>
+            @click="handleRealCodeDialogOpen(row.id, 0)"
+          >
+            {{ row.availableCodes }}
+          </el-button>
+        </template>
+      </el-table-column>
+
+      <el-table-column
+        prop="totalScanTimes"
+        label="扫码总次数"
+        align="center"
+      ></el-table-column>
+
+      <el-table-column
+        prop="createBy"
+        label="创建人"
+        align="center"
+      ></el-table-column>
+
+      <el-table-column
+        prop="createTime"
+        label="创建时间"
+        align="center"
+      ></el-table-column>
+
+      <el-table-column
+        label="操作"
+        align="center"
+      >
+        <template #default="{ row }">
           <el-button
-            size="mini"
             type="text"
-            icon="el-icon-view"
-            @click="handleView(scope.row,scope.index)"
-            v-hasPermi="['monitor:operlog:query']"
-          >查看详情</el-button>
+            size="mini"
+            @click="$router.push({ path: '/drainageCode/customerGroupDetail', query: { groupCodeId: row.id } })"
+          >
+            编辑
+          </el-button>
+
           <el-button
-            size="mini"
             type="text"
-            icon="el-icon-view"
-            @click="handleView(scope.row,scope.index)"
-            v-hasPermi="['monitor:operlog:query']"
-          >编辑</el-button>
+            size="mini"
+            @click="handleDownload(row.id, row.activityName)"
+          >
+            下载
+          </el-button>
+
           <el-button
-            size="mini"
             type="text"
-            icon="el-icon-view"
-            @click="handleView(scope.row,scope.index)"
-            v-hasPermi="['monitor:operlog:query']"
-          >删除</el-button>
+            size="mini"
+            class="copy-btn"
+            :data-clipboard-text="row.codeUrl"
+          >
+            复制
+          </el-button>
+
+          <el-button
+            type="text"
+            size="mini"
+            @click="handleRemove(row.id)"
+          >
+            删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <pagination
-      v-show="total>0"
+      v-show="total > 0"
       :total="total"
-      :page.sync="queryParams.pageNum"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
+      :page.sync="query.pageNum"
+      :limit.sync="query.pageSize"
+      @pagination="getGroupCodes"
     />
+
+    <el-dialog
+      v-if="realCodeDialog"
+      title="实际群码"
+      :visible.sync="realCodeDialog"
+      append-to-body
+      width="70%"
+    >
+      <RealCode ref="realCode" :groupCodeId="openGroupCodeId" :status="openGroupCodeStatus"></RealCode>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import RealCode from './realCode'
+import { getList, remove, downloadBatch, download } from '@/api/drainageCode/group'
+import ClipboardJS from 'clipboard'
+
 export default {
-  name: "Operlog",
-  data() {
+  components: {
+    RealCode
+  },
+
+  data () {
     return {
-      // 遮罩层
-      loading: false,
-      // 选中数组
-      ids: [],
-      // 非多个禁用
-      multiple: true,
-      // 显示搜索条件
-      showSearch: true,
-      // 总条数
-      total: 0,
-      // 表格数据
-      list: [],
-      // 是否显示弹出层
-      open: false,
-      // 类型数据字典
-      typeOptions: [],
-      // 类型数据字典
-      statusOptions: [],
-      // 日期范围
-      dateRange: [],
-      // 表单参数
-      form: {},
-      // 查询参数
-      queryParams: {
+      // 搜索数据
+      query: {
         pageNum: 1,
         pageSize: 10,
-        title: undefined,
-        operName: undefined,
-        businessType: undefined,
-        status: undefined,
+        activityName: '',
+        createBy: '',
+        beginTime: '',
+        endTime: ''
       },
-    };
+      // 加载状态
+      loading: false,
+      // 查询日期
+      searchDate: '',
+      // 多选数据
+      multiGroupCode: [],
+      // 群活码数据
+      groupCodes: [],
+      // 总数据量
+      total: 0,
+      // 实际群码总数dialog
+      realCodeDialog: false,
+      // 打开实际群码关联的群活码ID
+      openGroupCodeId: null,
+      // 打开实际群码的检索状态
+      openGroupCodeStatus: -1,
+      // 拷贝对象
+      clipboard: null
+    }
   },
-  created() {
-    this.getList();
-    this.getDicts("sys_oper_type").then((response) => {
-      this.typeOptions = response.data;
-    });
-    this.getDicts("sys_common_status").then((response) => {
-      this.statusOptions = response.data;
-    });
-  },
+
   methods: {
-    /** 查询登录日志 */
-    getList() {
-      this.loading = false;
-      list(this.addDateRange(this.queryParams, this.dateRange)).then(
-        (response) => {
-          this.list = response.rows;
-          this.total = response.total;
-          this.loading = false;
+    // 获取活码数据
+    getGroupCodes () {
+      const params = Object.assign({}, this.query)
+
+      this.loading = true
+
+      getList(params).then((res) => {
+        if (res.code === 200) {
+          this.groupCodes = res.rows
+          this.total = parseInt(res.total)
         }
-      );
+        this.loading = false
+      }).catch(() => {
+        this.loading = false
+      })
     },
-    // 操作日志状态字典翻译
-    statusFormat(row, column) {
-      return this.selectDictLabel(this.statusOptions, row.status);
+
+    // 查询
+    handleSearch () {
+      this.getGroupCodes()
     },
-    // 操作日志类型字典翻译
-    typeFormat(row, column) {
-      return this.selectDictLabel(this.typeOptions, row.businessType);
+
+    // 搜索栏清空
+    handleClear () {
+      this.searchDate = ''
+
+      this.query = {
+        activityName: '',
+        createBy: '',
+        beginTime: '',
+        endTime: ''
+      }
+
+      this.getGroupCodes()
     },
-    /** 搜索按钮操作 */
-    handleQuery() {
-      this.queryParams.pageNum = 1;
-      this.getList();
+
+    // 批量下载
+    handleBulkDownload () {
+      const ids = this.multiGroupCode.map(group => group.id)
+
+      this.$confirm('是否确认下载所有图片吗?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(() => {
+          return downloadBatch(ids + '')
+        })
+        .then((res) => {
+          if (res != null) {
+            let blob = new Blob([res], { type: 'application/zip' })
+            let url = window.URL.createObjectURL(blob)
+            const link = document.createElement('a') // 创建a标签
+            link.href = url
+            link.download = '批量群活码.zip' // 重命名文件
+            link.click()
+            URL.revokeObjectURL(url) // 释放内存
+          }
+        })
+        .catch(function() {})
     },
-    /** 重置按钮操作 */
-    resetQuery() {
-      this.dateRange = [];
-      this.resetForm("queryForm");
-      this.handleQuery();
+
+    // 批量删除
+    handleBulkRemove () {
+      this.$confirm('确认删除当前群活码?删除操作无法撤销，请谨慎操作。', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(() => {
+        const ids = this.multiGroupCode.map(group => group.id)
+
+        remove(ids + '').then((res) => {
+          if (res.code === 200) {
+            this.getGroupCodes()
+          } else {}
+        })
+      }).catch(() => {})
     },
-    // 多选框选中数据
-    handleSelectionChange(selection) {
-      this.ids = selection.map((item) => item.operId);
-      this.multiple = !selection.length;
-    },
-    /** 详细按钮操作 */
-    handleView(row) {
-      this.open = true;
-      this.form = row;
-    },
-    /** 删除按钮操作 */
-    handleDelete(row) {
-      const operIds = row.operId || this.ids;
-      this.$confirm(
-        '是否确认删除日志编号为"' + operIds + '"的数据项?',
-        "警告",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
+
+    // 下载
+    handleDownload (codeId, activityName) {
+      const name = activityName + '.png'
+
+      download(codeId).then((res) => {
+        if (res != null) {
+          let blob = new Blob([res], { type: 'application/zip' })
+          let url = window.URL.createObjectURL(blob)
+          const link = document.createElement('a') // 创建a标签
+          link.href = url
+          link.download = name // 重命名文件
+          link.click()
+          URL.revokeObjectURL(url) // 释放内存
         }
-      )
-        .then(function () {
-          return delOperlog(operIds);
-        })
-        .then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        })
-        .catch(function () {});
-    },
-    /** 清空按钮操作 */
-    handleClean() {
-      this.$confirm("是否确认清空所有操作日志数据项?", "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
       })
-        .then(function () {
-          return cleanOperlog();
-        })
-        .then(() => {
-          this.getList();
-          this.msgSuccess("清空成功");
-        })
-        .catch(function () {});
     },
-    /** 导出按钮操作 */
-    handleExport() {
-      const queryParams = this.queryParams;
-      this.$confirm("是否确认导出所有操作日志数据项?", "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(function () {
-          return exportOperlog(queryParams);
+
+    // 删除
+    handleRemove (codeId) {
+      this.$confirm('确认删除当前群活码?删除操作无法撤销，请谨慎操作。', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(() => {
+        remove(codeId).then((res) => {
+          if (res.code === 200) {
+            this.getGroupCodes()
+          } else {}
         })
-        .then((response) => {
-          this.download(response.msg);
-        })
-        .catch(function () {});
+      }).catch(() => {})
     },
+
+    // 处理多选
+    handleSelectionChange (val) {
+      this.multiGroupCode = val
+    },
+    
+    // 打开实际群码窗口
+    handleRealCodeDialogOpen (groupCodeId, status) {
+      this.openGroupCodeId = groupCodeId
+      this.openGroupCodeStatus = status
+      this.realCodeDialog = true
+    }
   },
-};
+
+  watch: {
+    searchDate (dateRange) {
+      if (!dateRange || dateRange.length !== 2) {
+        this.query.beginTime = ''
+        this.query.endTime = ''
+      } else {
+        [ this.query.beginTime, this.query.endTime ] = dateRange
+      }
+    },
+
+    // 如果实际群码弹出框关闭,刷新数据
+    realCodeDialog (val) {
+      if (val === false) this.getGroupCodes()
+    }
+  },
+
+  mounted() {
+    this.clipboard = new ClipboardJS('.copy-btn')
+
+    this.clipboard.on('success', (e) => {
+      this.$notify({
+        title: '成功',
+        message: '链接已复制到剪切板，可粘贴。',
+        type: 'success',
+      })
+    })
+
+    this.clipboard.on('error', (e) => {
+      this.$message.error('链接复制失败')
+    })
+  },
+
+  created () {
+    this.getGroupCodes()
+  },
+
+  destroyed () {
+    this.clipboard.destroy()
+  },
+}
 </script>
+
+<style scoped lang="scss">
+  .overflow-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .table-desc {
+    max-width: 150px;
+  }
+
+  .code-image {
+    width: 200px;
+    height: 200px;
+  }
+
+  .code-image--small {
+    width: 50px;
+    height: 50px;
+  }
+
+  .expire-icon {
+    color: red;
+  }
+
+  .mid-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+  }
+</style>
