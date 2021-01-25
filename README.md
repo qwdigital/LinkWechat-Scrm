@@ -9,7 +9,7 @@
 <div align="center">
 
 ![GVP Stars](http://img.shields.io/badge/GPV%20Stars-700+-yellow)
-![GVP Forks](http://img.shields.io/badge/GPV%20Forks-200+-yellow)
+![GVP Forks](http://img.shields.io/badge/GPV%20Forks-250+-yellow)
 ![license](http://img.shields.io/badge/license-GPL%203.0-green)
 
 </div>
@@ -213,7 +213,7 @@ com.linkwechat
 
 #### 在线体验
 
-演示地址：http://106.13.201.219/   
+演示地址：http://www.linkwechat.cn   
 
 演示账号/密码：test/123456
 
