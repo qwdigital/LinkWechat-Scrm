@@ -105,6 +105,16 @@ public class WeConstans {
      */
     public static final Integer WE_ROOT_CATEGORY_ID = 0;
 
+    /**
+     * 实际群活码正在使用中
+     */
+    public static final Integer WE_GROUP_CODE_ENABLE = 0;
+
+    /**
+     * 群活码已禁用/达到扫码次数上限
+     */
+    public static final Integer WE_GROUP_CODE_DISABLE = 2;
+
 
     /**
      * 单人活码
@@ -240,6 +250,9 @@ public class WeConstans {
             put("batch_job_result", "weEventBatchJobResultImpl");
             //外部联系人事件
             put("change_external_contact", "weEventChangeExternalContactImpl");
+            //客户群聊事件
+            put("change_external_chat", "weEventChangeExternalChatImpl");
+
         }
     };
 

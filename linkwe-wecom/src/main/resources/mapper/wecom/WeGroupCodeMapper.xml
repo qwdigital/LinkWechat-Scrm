@@ -1,74 +1,136 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeGroupCodeMapper">
-    
+
     <resultMap type="WeGroupCode" id="WeGroupCodeResult">
-        <result property="id"    column="id"    />
-        <result property="activityHeadUrl"    column="activity_head_url"    />
-        <result property="activityName"    column="activity_name"    />
-        <result property="activityScene"    column="activity_scene"    />
-        <result property="guide"    column="guide"    />
-        <result property="joinGroupIsTip"    column="join_group_is_tip"    />
-        <result property="tipMsg"    column="tip_msg"    />
-        <result property="customerServerQrCode"    column="customer_server_qr_code"    />
-        <result property="delFlag"    column="del_flag"    />
+        <result property="id" column="id"/>
+        <result property="codeUrl" column="code_url"/>
+        <result property="activityHeadUrl" column="activity_head_url"/>
+        <result property="activityName" column="activity_name"/>
+        <result property="activityDesc" column="activity_desc"/>
+        <result property="activityScene" column="activity_scene"/>
+        <result property="guide" column="guide"/>
+        <result property="joinGroupIsTip" column="join_group_is_tip"/>
+        <result property="tipMsg" column="tip_msg"/>
+        <result property="customerServerQrCode" column="customer_server_qr_code"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="create_time"/>
+        <result property="remark" column="remark"/>
+        <result property="availableCodes" column="available_codes"/>
+        <result property="totalScanTimes" column="total_scan_times"/>
+        <result property="aboutToExpireCodes" column="about_to_expire_codes"/>
     </resultMap>
 
     <sql id="selectWeGroupCodeVo">
-        select id, activity_head_url, activity_name, activity_scene, guide, join_group_is_tip, tip_msg, customer_server_qr_code, del_flag from we_group_code
+        SELECT
+        w.id,
+        w.code_url,
+        w.activity_head_url,
+        w.activity_name,
+        w.activity_desc,
+        w.activity_scene,
+        w.guide,
+        w.join_group_is_tip,
+        w.tip_msg,
+        w.customer_server_qr_code,
+        w.del_flag,
+        w.create_by,
+        w.create_time,
+        w.update_by,
+        w.update_time,
+        w.remark,
+        IFNULL((SELECT count(1) FROM we_group_code_actual WHERE (SELECT IFNULL(scan_code_times, 0)) &lt; scan_code_times_limit AND group_code_id = w.id ), 0) AS available_codes,
+        IFNULL((SELECT SUM( scan_code_times ) AS scan_times FROM we_group_code_actual GROUP BY group_code_id HAVING group_code_id = w.id), 0) AS total_scan_times,
+        IFNULL((SELECT count(1) FROM we_group_code_actual WHERE group_code_id = w.id AND TIMESTAMPDIFF(DAY, sysdate(), effect_time ) &lt; 3), 0) AS about_to_expire_codes
+        FROM
+        we_group_code w
+
     </sql>
 
     <select id="selectWeGroupCodeList" parameterType="WeGroupCode" resultMap="WeGroupCodeResult">
         <include refid="selectWeGroupCodeVo"/>
-        <where>  
-            <if test="activityHeadUrl != null  and activityHeadUrl != ''"> and activity_head_url = #{activityHeadUrl}</if>
-            <if test="activityName != null  and activityName != ''"> and activity_name like concat('%', #{activityName}, '%')</if>
-            <if test="activityScene != null  and activityScene != ''"> and activity_scene = #{activityScene}</if>
-            <if test="guide != null  and guide != ''"> and guide = #{guide}</if>
-            <if test="joinGroupIsTip != null "> and join_group_is_tip = #{joinGroupIsTip}</if>
-            <if test="tipMsg != null  and tipMsg != ''"> and tip_msg = #{tipMsg}</if>
-            <if test="customerServerQrCode != null  and customerServerQrCode != ''"> and customer_server_qr_code = #{customerServerQrCode}</if>
+        <where>
+            <if test="activityName != null  and activityName != ''">and w.activity_name like concat('%', #{activityName},
+                '%')
+            </if>
+            <if test="activityDesc != null  and activityDesc != ''">and w.activity_desc like concat('%', #{activityDesc},
+                '%')
+            </if>
+            <if test="activityScene != null  and activityScene != ''">and w.activity_scene = #{activityScene}</if>
+            <if test="guide != null  and guide != ''">and w.guide = #{guide}</if>
+            <if test="joinGroupIsTip != null ">and w.join_group_is_tip = #{joinGroupIsTip}</if>
+            <if test="tipMsg != null  and tipMsg != ''">and w.tip_msg = #{tipMsg}</if>
+            <if test="createBy != null  and createBy != ''">and w.create_by = #{createBy}</if>
+            <if test="customerServerQrCode != null  and customerServerQrCode != ''">and w.customer_server_qr_code =
+                #{customerServerQrCode}
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                and date_format(w.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                and date_format(w.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
         </where>
     </select>
-    
+
+    <select id="selectWeGroupCodeListByIds" resultMap="WeGroupCodeResult">
+        <include refid="selectWeGroupCodeVo"/>
+        where w.id in
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
     <select id="selectWeGroupCodeById" parameterType="Long" resultMap="WeGroupCodeResult">
         <include refid="selectWeGroupCodeVo"/>
-        where id = #{id}
+        where w.id = #{id}
     </select>
-        
+
+    <select id="checkActivityNameUnique" parameterType="String" resultType="int">
+		select count(1) from we_group_code where activity_name = #{activityName} limit 1
+	</select>
+
     <insert id="insertWeGroupCode" parameterType="WeGroupCode">
         insert into we_group_code
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
+            <if test="codeUrl != null">code_url,</if>
             <if test="activityHeadUrl != null">activity_head_url,</if>
             <if test="activityName != null">activity_name,</if>
+            <if test="activityDesc != null">activity_desc,</if>
             <if test="activityScene != null">activity_scene,</if>
             <if test="guide != null">guide,</if>
             <if test="joinGroupIsTip != null">join_group_is_tip,</if>
             <if test="tipMsg != null">tip_msg,</if>
             <if test="customerServerQrCode != null">customer_server_qr_code,</if>
             <if test="delFlag != null">del_flag,</if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
+            <if test="codeUrl != null">#{codeUrl},</if>
             <if test="activityHeadUrl != null">#{activityHeadUrl},</if>
             <if test="activityName != null">#{activityName},</if>
+            <if test="activityDesc != null">#{activityDesc},</if>
             <if test="activityScene != null">#{activityScene},</if>
             <if test="guide != null">#{guide},</if>
             <if test="joinGroupIsTip != null">#{joinGroupIsTip},</if>
             <if test="tipMsg != null">#{tipMsg},</if>
             <if test="customerServerQrCode != null">#{customerServerQrCode},</if>
             <if test="delFlag != null">#{delFlag},</if>
-         </trim>
+        </trim>
     </insert>
 
     <update id="updateWeGroupCode" parameterType="WeGroupCode">
         update we_group_code
         <trim prefix="SET" suffixOverrides=",">
-            <if test="activityHeadUrl != null">activity_head_url = #{activityHeadUrl},</if>
             <if test="activityName != null">activity_name = #{activityName},</if>
+            <if test="activityHeadUrl != null">activity_head_url = #{activityHeadUrl},</if>
+            <if test="activityDesc != null">activity_desc = #{activityDesc},</if>
             <if test="activityScene != null">activity_scene = #{activityScene},</if>
             <if test="guide != null">guide = #{guide},</if>
             <if test="joinGroupIsTip != null">join_group_is_tip = #{joinGroupIsTip},</if>
@@ -84,10 +146,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteWeGroupCodeByIds" parameterType="String">
-        delete from we_group_code where id in 
+        delete from we_group_code where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
     </delete>
-    
+
 </mapper>

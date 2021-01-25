@@ -102,7 +102,7 @@
     <select id="selectWeEmpleCodeByIds" parameterType="java.util.ArrayList" resultMap="WeEmpleCodeResult">
         <include refid="selectWeEmpleCodeLsit"/>
         <if test="ids != null and ids.size > 0">
-            wecode.id in
+            and wecode.id in
             <foreach collection="ids" item="id" open="(" close=")" separator=",">
                 #{id}
             </foreach>
