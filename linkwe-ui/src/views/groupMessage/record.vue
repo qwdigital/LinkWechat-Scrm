@@ -1,16 +1,16 @@
 <script>
-import { getList } from "@/api/groupMessage";
+import { getList, syncMsg } from '@/api/groupMessage'
 export default {
-  name: "Operlog",
+  name: 'Operlog',
   filters: {
     sendInfo(data) {
       if (data.timedTask == 1) {
-        return "定时任务 发送时间:" + data.settingTime;
+        return '定时任务 发送时间:' + data.settingTime
       } else {
-        let unit = data.expectSend == 1 ? "个群" : "人";
-        return `预计发送${data.expectSend}${unit}，已成功发送${data.actualSend}${unit}`;
+        let unit = data.expectSend == 1 ? '个群' : '人'
+        return `预计发送${data.expectSend}${unit}，已成功发送${data.actualSend}${unit}`
       }
-    }
+    },
   },
   data() {
     return {
@@ -32,78 +32,91 @@ export default {
         content: undefined,
         pushType: undefined,
         beginTime: undefined,
-        endTime: undefined
+        endTime: undefined,
       },
       pushType: {
-        0: "发给客户",
-        1: "发给客户群"
+        0: '发给客户',
+        1: '发给客户群',
       },
       pickerOptions: {
         disabledDate(time) {
-          return time.getTime() > Date.now(); // 选当前时间之前的时间
-        }
-      }
-    };
+          return time.getTime() > Date.now() // 选当前时间之前的时间
+        },
+      },
+    }
   },
   created() {
-    this.getList();
+    this.getList()
   },
   methods: {
     getList(page) {
       if (this.dateRange[0]) {
-        this.query.beginTime = this.dateRange[0];
-        this.query.endTime = this.dateRange[1];
+        this.query.beginTime = this.dateRange[0]
+        this.query.endTime = this.dateRange[1]
       } else {
-        this.query.beginTime = "";
-        this.query.endTime = "";
+        this.query.beginTime = ''
+        this.query.endTime = ''
       }
-      page && (this.query.pageNum = page);
-      this.loading = true;
+      page && (this.query.pageNum = page)
+      this.loading = true
       getList(this.query)
         .then(({ rows, total }) => {
-          this.list = rows;
-          this.total = +total;
-          this.loading = false;
-          this.ids = [];
+          this.list = rows
+          this.total = +total
+          this.loading = false
+          this.ids = []
         })
         .catch(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRange = [];
-      this.$refs["queryForm"].resetFields();
-      this.getList(1);
+      this.dateRange = []
+      this.$refs['queryForm'].resetFields()
+      this.getList(1)
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.id);
+      this.ids = selection.map((item) => item.id)
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const operIds = row.operId || this.ids;
+      const operIds = row.operId || this.ids
       this.$confirm(
         '是否确认删除日志编号为"' + operIds + '"的数据项?',
-        "警告",
+        '警告',
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
         }
       )
         .then(function() {})
         .then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
+          this.getList()
+          this.msgSuccess('删除成功')
         })
-        .catch(function() {});
+        .catch(function() {})
     },
     goRoute(id, path) {
-      this.$router.push({ path: "/groupMessage/" + path, query: { id } });
-    }
-  }
-};
+      this.$router.push({ path: '/groupMessage/' + path, query: { id } })
+    },
+    syncMsg(data) {
+      let { msgid, messageId } = data
+      syncMsg({ msgid, messageId })
+        .then(({ data }) => {
+          // this.list = rows
+          // this.total = +total
+          // this.loading = false
+          // this.ids = []
+        })
+        .catch(() => {
+          this.loading = false
+        })
+    },
+  },
+}
 </script>
 <template>
   <div>
@@ -188,7 +201,6 @@ export default {
             v-hasPermi="['enterpriseWechat:view']"
             size="mini"
             type="text"
-            icon="el-icon-view"
             @click="goRoute(scope.row.messageId, 'detail')"
             >查看</el-button
           >
@@ -196,10 +208,16 @@ export default {
             v-hasPermi="['enterpriseWechat:edit']"
             size="mini"
             type="text"
-            icon="el-icon-edit"
             disabled=""
             @click="goRoute(scope.row, 1)"
             >编辑</el-button
+          >
+          <el-button
+            v-hasPermi="['enterpriseWechat:edit']"
+            size="mini"
+            type="text"
+            @click="syncMsg(scope.row)"
+            >同步</el-button
           >
         </template>
       </el-table-column>

@@ -4,9 +4,9 @@
             <ul>             
             <li v-for="(item,index) in personList" :key="index" @click="liClick(item)">
                 <el-row style="padding:10px">
-                <el-col :span="3"> <img :src="item.receiveWeCustomer.avatar"></el-col>
-                <el-col :span="21">
-                    <p>{{item.receiveWeCustomer.name}} <span class="fr gray">{{parseTime(item.finalChatContext.msgtime)}}</span></p>
+                <el-col :span="3"><img :src="item.receiveWeUser.avatarMediaid" ></el-col>
+                <el-col :span="21">            
+                    <p>{{item.receiveWeUser.name}} <span class="fr gray">{{parseTime(item.finalChatContext.msgtime)}}</span></p>
                     <p class="gray padt10" v-if="item.finalChatContext.text">{{item.finalChatContext.text.content}}</p>     
                 </el-col>
                 </el-row>           
@@ -47,7 +47,7 @@
             margin: 0;}
     .list {
         overflow-y:scroll;
-       height: 708px;
+       height: 651px;
       ::-webkit-scrollbar {
                 display: none;
             }

@@ -1,11 +1,11 @@
 <script>
-import { getTree, getList } from '@/api/material'
+import { getTree, getList } from "@/api/material";
 export default {
   components: {},
   props: {
     type: {
       type: String,
-      default: '4',
+      default: "4",
     },
     multiple: {
       type: Boolean,
@@ -23,82 +23,83 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        categoryId: '',
-        search: '',
-        mediaType: '4',
+        categoryId: "",
+        search: "",
+        mediaType: "4",
       },
       list: [], // 列表
       total: 0, // 总条数
       treeData: [], // 树
       // 树props
       treeProps: {
-        children: 'children',
-        label: 'name',
+        children: "children",
+        label: "name",
       },
       // 分组props
       groupProps: {
         // expandTrigger: 'hover',
         checkStrictly: true,
-        children: 'children',
-        label: 'name',
-        value: 'id',
+        children: "children",
+        label: "name",
+        value: "id",
         emitPath: false,
       },
-      radio: '',
+      radio: "",
 
       // 树props
       treeProps: {
-        children: 'children',
-        label: 'name',
+        children: "children",
+        label: "name",
       },
-    }
+      selectedx: []
+    };
   },
   watch: {
     radio(val) {
-      this.$emit('change', val)
+      this.$emit("change", val);
     },
   },
   computed: {},
   created() {
-    this.query.mediaType = this.type
-    this.getTree()
-    this.getList()
+    this.query.mediaType = this.type;
+    this.getTree();
+    this.getList();
   },
   mounted() {},
   methods: {
     // 获取类目树
     getTree() {
       getTree(this.type).then(({ data }) => {
-        this.treeData = data
-      })
+        this.treeData = data;
+      });
     },
     // 获取素材列表
     getList(page) {
-      page && (this.query.pageNum = page)
-      this.loading = true
+      page && (this.query.pageNum = page);
+      this.loading = true;
       getList(this.query)
         .then(({ rows, total }) => {
-          this.list = rows
-          this.total = +total
-          this.loading = false
-          this.$emit('listChange', this.list)
+          this.list = rows;
+          this.total = +total;
+          this.loading = false;
+          this.$emit("listChange", this.list);
         })
         .catch(() => {
-          this.loading = false
-        })
+          this.loading = false;
+        });
     },
     // 节点单击事件
     handleNodeClick(data) {
-      this.query.categoryId = data.id
-      this.getList(1)
+      this.query.categoryId = data.id;
+      this.getList(1);
     },
 
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.$emit('update:selected', selection)
+      this.$emit("update:selected", selection);
     },
   },
-}
+};
 </script>
 
 <template>
@@ -114,7 +115,7 @@ export default {
           <el-input
             v-model="query.search"
             class="ml10 mr10"
-            style="width: 150px;"
+            style="width: 150px"
             @keydown.enter="getList(1)"
           ></el-input>
           <el-button
@@ -200,23 +201,25 @@ export default {
         </el-table>
 
         <el-row v-else :gutter="20">
-          <el-col
-            :span="6"
-            style="margin-bottom: 24px;min-width: 220px;"
-            v-for="(item, index) in list"
-            :key="index"
-          >
-            <el-card shadow="hover" body-style="padding: 0px;">
-              <div class="img-wrap">
-                <el-image :src="item.materialUrl" fit="contain"></el-image>
-              </div>
-              <div style="padding: 14px;">
-                <el-checkbox v-model="ids" :label="item.id">{{
-                  item.materialName
-                }}</el-checkbox>
-              </div>
-            </el-card>
-          </el-col>
+          <el-checkbox-group v-model="selectedx" @change="handleSelectionChange">
+            <el-col
+              :span="6"
+              style="margin-bottom: 24px; min-width: 220px"
+              v-for="(item, index) in list"
+              :key="index"
+            >
+              <el-card shadow="hover" body-style="padding: 0px;">
+                <div class="img-wrap">
+                  <el-image :src="item.materialUrl" fit="contain"></el-image>
+                </div>
+                <div style="padding: 14px">
+                  <el-checkbox :label="item">{{
+                    item.materialName
+                  }}</el-checkbox>
+                </div>
+              </el-card>
+            </el-col>
+          </el-checkbox-group>
         </el-row>
       </el-col>
     </el-row>

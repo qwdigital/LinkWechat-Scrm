@@ -14,9 +14,16 @@ const  getTree=(params)=>{
       params,
     })
   }
+  const  chatGrounpList=(params)=>{
+    return request({
+      url:'/wecom/finance/getChatRoomContactList',
+      method: 'get',
+      params,
+    })
+  }
   const  listByCustomer=(params)=>{
     return request({
-      url:'/chat/mapping/listByCustomer',
+      url:'/wecom/customer/list',
       method: 'get',
       params,
     })
@@ -33,5 +40,6 @@ const  getTree=(params)=>{
     getTree,
     chatList,
     listByCustomer,
-    getChatAllList
+    getChatAllList,
+    chatGrounpList
   }

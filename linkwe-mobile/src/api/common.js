@@ -1,5 +1,6 @@
 import request from '@/utils/request'
-const service = window.CONFIG.services.wecom + '/ticket'
+import config from '@/config'
+const service = config.services.wecom
 
 /**
  * 获取应用的jsapi_ticket
@@ -7,7 +8,7 @@ const service = window.CONFIG.services.wecom + '/ticket'
  */
 export function getAgentTicket(url) {
   return request({
-    url: service + '/getAgentTicket',
+    url: service + '/ticket/getAgentTicket',
     params: {
       url,
     },
@@ -20,7 +21,7 @@ export function getAgentTicket(url) {
  */
 export function getAppTicket(url) {
   return request({
-    url: service + '/getAppTicket',
+    url: service + '/ticket/getAppTicket',
     params: {
       url,
     },
@@ -28,46 +29,14 @@ export function getAppTicket(url) {
 }
 
 /**
- * 收藏列表(h5我的)
- * @param {*} userId
+ * 获取企业的jsapi_ticket
+ * @param {*} url 页面url
  */
-export function getCollectionList(userId) {
+export function getUserInfo(code) {
   return request({
-    url: service + '/collection/list',
+    url: service + '/user/getUserInfo',
     params: {
-      userId,
+      code,
     },
-  })
-}
-
-/**
- * 添加收藏
- * @param {*} data
- * {
-    materialId:素材id
-userId:用户id
-}
- */
-export function addCollection(data) {
-  return request({
-    url: service + '/collection/addCollection',
-    method: 'post',
-    data,
-  })
-}
-
-/**
- * 侧边栏抓取素材
- * @param {*} data
- * {
-    materialId:素材id
-userId:用户id
-}
- */
-export function cancleCollection(data) {
-  return request({
-    url: service + '/collection/cancleCollection',
-    method: 'put',
-    data,
   })
 }

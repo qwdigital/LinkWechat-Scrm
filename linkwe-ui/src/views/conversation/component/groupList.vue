@@ -3,13 +3,24 @@
         <div v-if="personList.length>=1">         
             <ul>             
             <li v-for="(item,index) in personList" :key="index" @click="liClick(item)">
-                <el-row style="padding:10px">
-                <el-col :span="3"> <img :src="item.receiveWeCustomer.avatar"></el-col>
+               
+               <el-row style="padding:10px" v-if="item.finalChatContext.msgtype=='text'">
+
+                <el-col :span="3"> <img v-if="item.finalChatContext.fromInfo" :src="item.finalChatContext.fromInfo.avatar"></el-col>
+               <el-col :span="21">
+                    <p>{{item.finalChatContext.roomInfo.name}} <span class="fr gray">{{parseTime(item.finalChatContext.fromInfo.updateTime)}}</span></p>
+                   <p class="gray padt10" v-if="item.finalChatContext.fromInfo">{{item.finalChatContext.fromInfo.name}}:{{item.finalChatContext.text.content}}</p>     
+                </el-col> 
+                </el-row>     
+                   <el-row style="padding:10px" v-if="item.finalChatContext.msgtype=='file'">
+                <el-col :span="3">&nbsp; `</el-col>
                 <el-col :span="21">
-                    <p>{{item.receiveWeCustomer.name}} <span class="fr gray">{{parseTime(item.finalChatContext.msgtime)}}</span></p>
-                    <p class="gray padt10" v-if="item.finalChatContext.text">{{item.finalChatContext.text.content}}</p>     
+                   <p><span class="fr gray">{{parseTime(item.finalChatContext.msgtime)}}</span></p>
+                   <p class="gray padt10" >{{item.finalChatContext.from}}:
+                       <span v-if="item.finalChatContext.file.fileext=='mp4'">[视频]</span>
+                       </p>     
                 </el-col>
-                </el-row>           
+                </el-row>  
             </li>
         </ul>
         </div>
@@ -37,7 +48,7 @@
         },
         methods:{
             liClick(e){
-                this.$emit('chatFn',e)
+                this.$emit('groupFn',e)
             }
         }
     }

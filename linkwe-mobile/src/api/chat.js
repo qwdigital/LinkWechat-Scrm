@@ -5,12 +5,9 @@ const service = window.CONFIG.services.wecom + '/chat'
  * 侧边栏列表
  * @param {*} params
  */
-export function getTypeList(params) {
+export function getTypeList() {
   return request({
-    url: service + '/side/list',
-    params: {
-      h5: 1,
-    },
+    url: service + '/side/h5List',
   })
 }
 
@@ -18,12 +15,10 @@ export function getTypeList(params) {
  * 素材列表
  * @param {*} sideId
  */
-export function getMaterialList(sideId) {
+export function getMaterialList(params) {
   return request({
     url: service + '/item/list',
-    params: {
-      sideId,
-    },
+    params,
   })
 }
 
@@ -31,12 +26,10 @@ export function getMaterialList(sideId) {
  * 收藏列表(h5我的)
  * @param {*} userId
  */
-export function getCollectionList(userId) {
+export function getCollectionList(params) {
   return request({
     url: service + '/collection/list',
-    params: {
-      userId,
-    },
+    params,
   })
 }
 
@@ -57,7 +50,7 @@ export function addCollection(data) {
 }
 
 /**
- * 侧边栏抓取素材
+ * 取消收藏
  * @param {*} data
  * {
     materialId:素材id
@@ -67,7 +60,7 @@ userId:用户id
 export function cancleCollection(data) {
   return request({
     url: service + '/collection/cancleCollection',
-    method: 'put',
+    method: 'post',
     data,
   })
 }

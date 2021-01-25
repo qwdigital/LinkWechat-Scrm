@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { Toast } from 'vant'
 
 function createAxios(baseURL) {
   const instance = axios.create({
@@ -24,8 +25,8 @@ function createAxios(baseURL) {
       // console.log('res: ' + res)
       const { data, status } = res
       // code 0:成功，-1/其它:错误
-      if (status === 200 && data.code === 0) {
-        return JSON.stringify(data.result) ? data.result : data.data
+      if (status === 200 && data.code === 200) {
+        return data
       } else if (data.code === 201) {
         // Message.error({
         //   content: `产品已存在`,
@@ -44,10 +45,7 @@ function createAxios(baseURL) {
       if (error.response) {
         addErrorLog(error.response)
       } else {
-        // Message.error({
-        //   content: `服务器未启动或连接超时`,
-        //   duration: 3
-        // })
+        Toast.fail('服务器未启动或连接超时')
         console.error('服务器未启动或连接超时')
       }
       return Promise.reject(error)
@@ -71,6 +69,7 @@ function createAxios(baseURL) {
     process.env.NODE_ENV === 'development'
       ? console.error(`错误: 路径: ${responseURL}, 返回值 : ${responseText}`)
       : console.error(`${JSON.parse(responseText).message}`)
+    Toast.fail(`${responseText}`)
   }
 
   return instance
