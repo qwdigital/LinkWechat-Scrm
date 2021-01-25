@@ -1,12 +1,11 @@
 package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dtflys.forest.annotation.Query;
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.dto.WeUserInfoDto;
 import com.linkwechat.wecom.domain.dto.msgaudit.WeMsgAuditDto;
-import com.linkwechat.wecom.domain.vo.WeAllocateCustomersVo;
-import com.linkwechat.wecom.domain.vo.WeAllocateGroupsVo;
-import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
-import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
+import com.linkwechat.wecom.domain.vo.*;
 
 import java.util.List;
 
@@ -21,10 +20,10 @@ public interface IWeUserService extends IService<WeUser>
     /**
      * 查询通讯录相关客户
      *
-     * @param id 通讯录相关客户ID
+     * @param userId 通讯录相关客户ID
      * @return 通讯录相关客户
      */
-    public WeUser selectWeUserById(Long id);
+    public WeUser selectWeUserById(String userId);
 
     /**
      * 查询通讯录相关客户列表
@@ -43,12 +42,26 @@ public interface IWeUserService extends IService<WeUser>
     public void insertWeUser(WeUser weUser);
 
     /**
+     * 新增通讯录相关客户(不同步企微)
+     * @param weUser 通讯录相关客户
+     * @return
+     */
+    public int insertWeUserNoToWeCom(WeUser weUser);
+
+    /**
      * 修改通讯录相关客户
      * 
      * @param weUser 通讯录相关客户
      * @return 结果
      */
     public void updateWeUser(WeUser weUser);
+
+    /**
+     * 修改通讯录相关客户(不同步企微)
+     * @param weUser 通讯录相关客户
+     * @return
+     */
+    public int updateWeUserNoToWeCom(WeUser weUser);
 
 
     /**
@@ -93,6 +106,13 @@ public interface IWeUserService extends IService<WeUser>
      */
     void deleteUser(String[] ids);
 
+    /**
+     * 删除成员
+     * @param userId 成员id
+     * @return
+     */
+    int deleteUserNoToWeCom(String userId);
+
 
     /**
      * 获取历史分配记录的成员
@@ -116,4 +136,12 @@ public interface IWeUserService extends IService<WeUser>
      * @return
      */
     List<WeUser> getPermitUserList(WeMsgAuditDto msgAuditDto);
+
+
+    /**
+     * 获取访问用户身份(内部应用)
+     * @param code
+     * @return
+     */
+    WeUserInfoVo getUserInfo(@Query("code")String code);
 }

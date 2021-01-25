@@ -15,6 +15,7 @@ import java.util.List;
 
 /**
  * 聊天工具侧边栏
+ *
  * @author kewen
  */
 @RequestMapping(value = "/wecom/chat/side")
@@ -28,11 +29,11 @@ public class WeChatSideController extends BaseController {
     /**
      * 群发侧边栏列表
      */
-   // @PreAuthorize("@ss.hasPermi('chat:side:list')")
+    @PreAuthorize("@ss.hasPermi('chat:side:list')")
     @GetMapping("/list")
-    public TableDataInfo list(@RequestParam(value = "h5") String h5) {
+    public TableDataInfo list() {
         startPage();
-        List<WeChatSide> weChatSides = weChatSideService.chatSides(h5);
+        List<WeChatSide> weChatSides = weChatSideService.chatSides("0");
         return getDataTable(weChatSides);
     }
 
@@ -44,6 +45,16 @@ public class WeChatSideController extends BaseController {
     @PutMapping
     public AjaxResult edit(@RequestBody WeChatSide weChatSide) {
         return toAjax(weChatSideService.updateWeChatSide(weChatSide));
+    }
+
+    /**
+     * 群发侧边栏列表
+     */
+    @GetMapping("/h5List")
+    public TableDataInfo h5List() {
+        startPage();
+        List<WeChatSide> weChatSides = weChatSideService.chatSides("1");
+        return getDataTable(weChatSides);
     }
 
 }

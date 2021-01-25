@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @author sxw
+ * @author danmo
  * @description http交互Vo对象
  * @date 2020/12/9 14:14
  **/

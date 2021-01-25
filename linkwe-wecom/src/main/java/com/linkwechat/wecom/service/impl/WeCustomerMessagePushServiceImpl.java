@@ -361,6 +361,13 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
 
         }
 
+        if(customerMessagePushDto.getMessageType().equals("4")){
+            weCustomerMessagePushDto.setImage(customerMessagePushDto.getImageMessage());
+            weCustomerMessagePushDto.setLink(null);
+            weCustomerMessagePushDto.setMiniprogram(null);
+            weCustomerMessagePushDto.setText(customerMessagePushDto.getTextMessage());
+        }
+
     }
 
     /**

@@ -61,6 +61,8 @@ public class WeCorpAccount extends BaseEntity
     @ApiModelProperty("应用id")
     private String agentId;
 
+    @ApiModelProperty("应用密钥")
+    private String agentSecret;
 
     @ApiModelProperty("服务商密钥")
     private String providerSecret;

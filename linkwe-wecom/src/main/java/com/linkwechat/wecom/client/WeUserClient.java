@@ -91,4 +91,13 @@ public interface WeUserClient {
             type = "POST"
     )
     LeaveWeUserListsDto  leaveWeUsers();
+
+
+    /**
+     * 获取访问用户身份(内部应用)
+     * @param code
+     * @return
+     */
+    @Request(url = "/user/getuserinfo")
+    WeUserInfoDto  getuserinfo(@Query("code")String code);
 }

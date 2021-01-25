@@ -111,6 +111,7 @@ public class WeUser
     private Date dimissionTime;
 
 
+    private String remark;
 
 
 

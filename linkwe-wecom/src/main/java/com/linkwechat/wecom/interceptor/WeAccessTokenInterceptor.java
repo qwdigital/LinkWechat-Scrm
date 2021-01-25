@@ -62,8 +62,13 @@ public class WeAccessTokenInterceptor implements Interceptor{
                 token=iWeAccessTokenService.findProviderAccessToken();
             }else if(Arrays.asList(weComeConfig.getNeedChatTokenUrl()).contains(uri)){ //需要会话存档token
                 token=iWeAccessTokenService.findChatAccessToken();
+            }else if(Arrays.asList(weComeConfig.getNeedAgentTokenUrl()).contains(uri)){ //需要应用token
+                token=iWeAccessTokenService.findAgentAccessToken();
             }else{
                 token=iWeAccessTokenService.findCommonAccessToken();
+            }
+            if (uri.contains("ticket/get")){
+                request.addQuery("type","agent_config");
             }
 
             request.addQuery("access_token",token);

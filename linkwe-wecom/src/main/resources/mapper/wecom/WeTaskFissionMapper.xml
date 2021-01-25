@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeTaskFissionMapper">
+    
+    <resultMap type="WeTaskFission" id="WeTaskFissionResult">
+        <result property="id"    column="id"    />
+        <result property="taskName"    column="task_name"    />
+        <result property="fissInfo"    column="fiss_info"    />
+        <result property="fissNum"    column="fiss_num"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="overTime"    column="end_time"    />
+        <result property="customerTagId"    column="customer_tag_id"    />
+        <result property="customerTag"    column="customer_tag"    />
+        <result property="postersPath"    column="posters_path"    />
+        <result property="fissStaffId"    column="fiss_staff_id"    />
+        <result property="fissStaff"    column="fiss_staff"    />
+        <result property="fissStaffQrcode"    column="fiss_staff_qrcode"    />
+        <result property="rewardUrl"    column="reward_url"    />
+        <result property="rewardImagePath"    column="reward_image_path"    />
+        <result property="rewardRule"    column="reward_rule"    />
+        <result property="fissStatus"    column="fiss_status"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectWeTaskFissionVo">
+        select id, task_name, fiss_info, fiss_num, start_time, end_time, customer_tag_id, customer_tag, posters_path, fiss_staff_id, fiss_staff, fiss_staff_qrcode, reward_url, reward_image_path, reward_rule, fiss_status, create_by, create_time, update_by, update_time from we_task_fission
+    </sql>
+
+    <select id="selectWeTaskFissionList" parameterType="WeTaskFission" resultMap="WeTaskFissionResult">
+        <include refid="selectWeTaskFissionVo"/>
+        <where>  
+            <if test="taskName != null  and taskName != ''"> and task_name like concat('%', #{taskName}, '%')</if>
+            <if test="fissInfo != null  and fissInfo != ''"> and fiss_info = #{fissInfo}</if>
+            <if test="fissNum != null "> and fiss_num = #{fissNum}</if>
+            <if test="startTime != null "> and start_time = #{startTime}</if>
+            <if test="overTime != null "> and end_time = #{overTime}</if>
+            <if test="customerTagId != null  and customerTagId != ''"> and customer_tag_id = #{customerTagId}</if>
+            <if test="customerTag != null  and customerTag != ''"> and customer_tag = #{customerTag}</if>
+            <if test="postersPath != null  and postersPath != ''"> and posters_path = #{postersPath}</if>
+            <if test="fissStaffId != null  and fissStaffId != ''"> and fiss_staff_id = #{fissStaffId}</if>
+            <if test="fissStaff != null  and fissStaff != ''"> and fiss_staff = #{fissStaff}</if>
+            <if test="fissStaffQrcode != null  and fissStaffQrcode != ''"> and fiss_staff_qrcode = #{fissStaffQrcode}</if>
+            <if test="rewardUrl != null  and rewardUrl != ''"> and reward_url = #{rewardUrl}</if>
+            <if test="rewardImagePath != null  and rewardImagePath != ''"> and reward_image_path = #{rewardImagePath}</if>
+            <if test="rewardRule != null  and rewardRule != ''"> and reward_rule = #{rewardRule}</if>
+            <if test="fissStatus != null "> and fiss_status = #{fissStatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectWeTaskFissionById" parameterType="Long" resultMap="WeTaskFissionResult">
+        <include refid="selectWeTaskFissionVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWeTaskFission" parameterType="WeTaskFission" useGeneratedKeys="true" keyProperty="id">
+        insert into we_task_fission
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="taskName != null and taskName != ''">task_name,</if>
+            <if test="fissInfo != null">fiss_info,</if>
+            <if test="fissNum != null">fiss_num,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="overTime != null">end_time,</if>
+            <if test="customerTagId != null and customerTagId != ''">customer_tag_id,</if>
+            <if test="customerTag != null">customer_tag,</if>
+            <if test="postersPath != null and postersPath != ''">posters_path,</if>
+            <if test="fissStaffId != null and fissStaffId != ''">fiss_staff_id,</if>
+            <if test="fissStaff != null and fissStaff != ''">fiss_staff,</if>
+            <if test="fissStaffQrcode != null and fissStaffQrcode != ''">fiss_staff_qrcode,</if>
+            <if test="rewardUrl != null and rewardUrl != ''">reward_url,</if>
+            <if test="rewardImagePath != null and rewardImagePath != ''">reward_image_path,</if>
+            <if test="rewardRule != null">reward_rule,</if>
+            <if test="fissStatus != null">fiss_status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="taskName != null and taskName != ''">#{taskName},</if>
+            <if test="fissInfo != null">#{fissInfo},</if>
+            <if test="fissNum != null">#{fissNum},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="overTime != null">#{overTime},</if>
+            <if test="customerTagId != null and customerTagId != ''">#{customerTagId},</if>
+            <if test="customerTag != null">#{customerTag},</if>
+            <if test="postersPath != null and postersPath != ''">#{postersPath},</if>
+            <if test="fissStaffId != null and fissStaffId != ''">#{fissStaffId},</if>
+            <if test="fissStaff != null and fissStaff != ''">#{fissStaff},</if>
+            <if test="fissStaffQrcode != null and fissStaffQrcode != ''">#{fissStaffQrcode},</if>
+            <if test="rewardUrl != null and rewardUrl != ''">#{rewardUrl},</if>
+            <if test="rewardImagePath != null and rewardImagePath != ''">#{rewardImagePath},</if>
+            <if test="rewardRule != null">#{rewardRule},</if>
+            <if test="fissStatus != null">#{fissStatus},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWeTaskFission" parameterType="WeTaskFission">
+        update we_task_fission
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="taskName != null and taskName != ''">task_name = #{taskName},</if>
+            <if test="fissInfo != null">fiss_info = #{fissInfo},</if>
+            <if test="fissNum != null">fiss_num = #{fissNum},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="overTime != null">end_time = #{overTime},</if>
+            <if test="customerTagId != null and customerTagId != ''">customer_tag_id = #{customerTagId},</if>
+            <if test="customerTag != null">customer_tag = #{customerTag},</if>
+            <if test="postersPath != null and postersPath != ''">posters_path = #{postersPath},</if>
+            <if test="fissStaffId != null and fissStaffId != ''">fiss_staff_id = #{fissStaffId},</if>
+            <if test="fissStaff != null and fissStaff != ''">fiss_staff = #{fissStaff},</if>
+            <if test="fissStaffQrcode != null and fissStaffQrcode != ''">fiss_staff_qrcode = #{fissStaffQrcode},</if>
+            <if test="rewardUrl != null and rewardUrl != ''">reward_url = #{rewardUrl},</if>
+            <if test="rewardImagePath != null and rewardImagePath != ''">reward_image_path = #{rewardImagePath},</if>
+            <if test="rewardRule != null">reward_rule = #{rewardRule},</if>
+            <if test="fissStatus != null">fiss_status = #{fissStatus},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeTaskFissionById" parameterType="Long">
+        delete from we_task_fission where id = #{id}
+    </delete>
+
+    <delete id="deleteWeTaskFissionByIds" parameterType="String">
+        delete from we_task_fission where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

@@ -19,8 +19,8 @@ ruoyi:
 
 # 开发环境配置
 server:
-  # 服务器的HTTP端口，默认为8080
-  port: 8089
+  # 服务器的HTTP端口，默认为8090
+  port: 8090
   servlet:
     # 应用的访问路径
     context-path: /
@@ -145,7 +145,7 @@ xss:
 # elasticsearch配置
 elasticsearch:
   schema: http
-  address: ${ES_ADDRESS:localhost}
+  address: ${ES_ADDRESS:localhost:9200}
   connectTimeout: 10000
   socketTimeout: 10000
   connectionRequestTimeout: 10000
@@ -200,8 +200,10 @@ wecome:
           - /msgaudit/check_single_agree
           - /msgaudit/check_room_agree
           - /msgaudit/groupchat/get
+  needAgentTokenUrl:
+          - /message/send
   #企微回调通知配置
   callBack:
-    appIdOrCorpId: 
-    token: 
-    encodingAesKey: 
+    appIdOrCorpId: ww38152475d1bca752
+    token: uEyhhuTKfpS
+    encodingAesKey: diTFQ6B4IW14UN2JplADuhMZsBZHjvuBG24kHFrr4Px

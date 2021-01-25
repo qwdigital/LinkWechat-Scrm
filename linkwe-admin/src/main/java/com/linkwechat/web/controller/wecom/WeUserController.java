@@ -58,10 +58,10 @@ public class WeUserController extends BaseController {
      * 获取通讯录相关客户详细信息
      */
     @PreAuthorize("@ss.hasPermi('contacts:organization:view')")
-    @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("id") Long id)
+    @GetMapping(value = "/{userId}")
+    public AjaxResult getInfo(@PathVariable("userId") String userId)
     {
-        return AjaxResult.success(weUserService.selectWeUserById(id));
+        return AjaxResult.success(weUserService.selectWeUserById(userId));
     }
 
     /**
@@ -214,6 +214,20 @@ public class WeUserController extends BaseController {
         return getDataTable(list);
     }
 
+
+    /**
+     * 内部应用获取用户userId
+     * @param code
+     * @return
+     */
+    @GetMapping("/getUserInfo")
+    public AjaxResult getUserInfo(String code)
+    {
+
+        return AjaxResult.success(
+                weUserService.getUserInfo(code)
+        );
+    }
 
 
 

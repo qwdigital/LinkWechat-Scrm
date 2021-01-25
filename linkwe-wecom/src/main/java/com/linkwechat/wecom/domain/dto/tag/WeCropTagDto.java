@@ -23,6 +23,7 @@ public class WeCropTagDto {
     private String id;
     private String name;
     private String order;
+    private Boolean deleted;
     private Long create_time;
 
     public static List<WeCropTagDto> transFormto(List<WeTag> weTags){

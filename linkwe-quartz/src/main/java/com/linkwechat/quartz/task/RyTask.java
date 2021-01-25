@@ -98,4 +98,14 @@ public class RyTask {
         });
         redisCache.setCacheObject(WeConstans.CONTACT_SEQ_KEY,index);
     }
+
+    /**
+     *
+     * @param corpId 企业id
+     * @param secret 会话密钥
+     */
+    public void getPermitUserList(String corpId, String secret){
+        log.info("执行有参方法: params:{},{}", corpId, secret);
+
+    }
 }

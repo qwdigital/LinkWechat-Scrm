@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 会话存档controller
  * @date 2020/12/19 13:51
  **/

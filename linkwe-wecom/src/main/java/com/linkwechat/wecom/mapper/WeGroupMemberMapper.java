@@ -2,6 +2,7 @@ package com.linkwechat.wecom.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeGroupMember;
+import com.linkwechat.wecom.domain.dto.WeGroupMemberDto;
 
 import java.util.List;
 
@@ -14,6 +15,8 @@ public interface WeGroupMemberMapper extends BaseMapper<WeGroupMember> {
 //    WeGroupMember selectWeGroupMemberById(Long paramLong);
 
     List<WeGroupMember> selectWeGroupMemberList(WeGroupMember paramWeGroupMember);
+
+    List<WeGroupMemberDto> selectWeGroupMemberListByChatId(String chatId);
 
 //    int insertWeGroupMember(WeGroupMember paramWeGroupMember);
 //

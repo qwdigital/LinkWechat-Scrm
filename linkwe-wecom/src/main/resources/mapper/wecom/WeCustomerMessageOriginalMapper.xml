@@ -16,7 +16,8 @@
         wcm.setting_time,
         wcm.expect_send,
         wcm.actual_send,
-        wcm.timed_task
+        wcm.timed_task,
+        wcm.msgid
         FROM
         we_customer_messageOriginal wcmo
         LEFT JOIN we_customer_message wcm ON wcmo.message_original_Id = wcm.original_id

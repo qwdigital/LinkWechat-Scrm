@@ -18,4 +18,6 @@ public interface IWeAccessTokenService {
    public String findChatAccessToken();
 
    public void removeToken();
+
+    String findAgentAccessToken();
 }

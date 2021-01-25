@@ -7,7 +7,7 @@ import com.linkwechat.common.core.domain.ConversationArchiveQuery;
 import java.util.List;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 会话存档业务接口
  * @date 2020/12/19 13:59
  **/

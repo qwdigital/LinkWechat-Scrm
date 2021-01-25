@@ -54,19 +54,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="birthday != null "> and birthday = #{birthday}</if>
     </select>
     
-    <select id="selectWeUserById" parameterType="Long" resultMap="WeUserResult">
+    <select id="selectWeUserById" parameterType="java.lang.String" resultMap="WeUserResult">
         <include refid="selectWeUserVo"/>
-        where id = #{id}
+        where user_id = #{userId}
     </select>
         
     <insert id="insertWeUser" parameterType="WeUser">
         insert into we_user
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">id,</if>
+            <if test="userId != null">user_id,</if>
             <if test="avatarMediaid != null">head_image_url,</if>
             <if test="name != null">user_name,</if>
             <if test="alias != null">alias,</if>
-            <if test="userId != null">user_id,</if>
             <if test="gender != null">gender,</if>
             <if test="mobile != null and mobile != ''">mobile,</if>
             <if test="email != null">email,</if>
@@ -85,11 +84,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="isActivate != null">is_activate,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">#{id},</if>
+            <if test="userId != null">#{userId},</if>
             <if test="avatarMediaid != null">#{avatarMediaid},</if>
             <if test="name != null">#{name},</if>
             <if test="alias != null">#{alias},</if>
-            <if test="userId != null">#{userId},</if>
             <if test="gender != null">#{gender},</if>
             <if test="mobile != null and mobile != ''">#{mobile},</if>
             <if test="email != null">#{email},</if>
@@ -133,7 +131,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="remark != null">remark = #{remark},</if>
             <if test="isActivate != null">is_activate = #{isActivate},</if>
         </trim>
-        where id = #{id}
+        <where>
+            user_id = #{userId}
+        </where>
     </update>
 
 
@@ -191,7 +191,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 
     <insert id="batchInsertWeUser" >
-        insert into we_user (id, head_image_url, user_name, alias,
+        insert into we_user (head_image_url, user_name, alias,
                              user_id, gender, mobile, email, wx_account,
                              department, position, is_leader_in_dept,
                              join_time, enable, id_card,
@@ -199,7 +199,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                              birthday, remark, is_activate)
         values
         <foreach collection="weUsers" item="weUser" index="index" separator=",">
-            (   #{weUser.id},#{weUser.avatarMediaid},#{weUser.name},#{weUser.alias},
+            (   #{weUser.avatarMediaid},#{weUser.name},#{weUser.alias},
                 #{weUser.userId},#{weUser.gender},#{weUser.mobile},#{weUser.email},#{weUser.wxAccount},
                 #{weUser.department},#{weUser.position},#{weUser.isLeaderInDept},
                 #{weUser.joinTime},#{weUser.enable},#{weUser.idCard},

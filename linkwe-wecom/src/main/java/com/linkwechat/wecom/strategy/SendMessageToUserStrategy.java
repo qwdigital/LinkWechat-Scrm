@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * 发送应用消息
@@ -42,9 +44,18 @@ public class SendMessageToUserStrategy implements Strategy {
         of.ifPresent(messageType -> map.put(messageType.getMessageType(), jsonObject));
         //发送消息
         WeMessagePushDto weMessagePushDto = new WeMessagePushDto();
-        weMessagePushDto.setTouser(StringUtils.isNotBlank(weMessagePush.getToUser()) ? Arrays.asList(weMessagePush.getToUser().split(",")) : new ArrayList<>());
-        weMessagePushDto.setToparty(StringUtils.isNotBlank(weMessagePush.getToUser()) ? Arrays.asList(weMessagePush.getToParty().split(",")) : new ArrayList<>());
-        weMessagePushDto.setTotag(StringUtils.isNotBlank(weMessagePush.getToUser()) ? Arrays.asList(weMessagePush.getToTag().split(",")) : new ArrayList<>());
+        Optional.ofNullable(weMessagePush.getToUser()).ifPresent(userId ->{
+            String tousers = Arrays.stream(userId.split(",")).collect(Collectors.joining("|"));
+            weMessagePushDto.setTouser(tousers);
+        });
+        Optional.ofNullable(weMessagePush.getToParty()).ifPresent(partyId ->{
+            String toPartys = Arrays.stream(partyId.split(",")).collect(Collectors.joining("|"));
+            weMessagePushDto.setToparty(toPartys);
+        });
+        Optional.ofNullable(weMessagePush.getToTag()).ifPresent(tagId ->{
+            String tagIds = Arrays.stream(tagId.split(",")).collect(Collectors.joining("|"));
+            weMessagePushDto.setTotag(tagIds);
+        });
         weMessagePushDto.setMsgtype(weMessagePush.getMessageType());
 
         //这个先写在配置文件中

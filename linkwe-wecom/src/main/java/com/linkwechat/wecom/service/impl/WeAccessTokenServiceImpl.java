@@ -36,7 +36,7 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
 
 
     /**
-     * 获取accessToken
+     * 获取通用accessToken
      */
     @Override
     public String findCommonAccessToken() {
@@ -47,7 +47,7 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
 
 
     /**
-     * 获取外部联系人相关accesstoken
+     * 获取外部联系人相关token
      * @return
      */
     @Override
@@ -67,6 +67,11 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
         return findAccessToken(WeConstans.WE_PROVIDER_ACCESS_TOKEN);
     }
 
+
+    /**
+     * 会话存档相关token
+     * @return
+     */
     @Override
     public String findChatAccessToken() {
         return findAccessToken(WeConstans.WE_CHAT_ACCESS_TOKEN);
@@ -101,6 +106,10 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
                 WeAccessTokenDtoDto weAccessTokenDtoDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),wxCorpAccount.getChatSecret());
                 token=weAccessTokenDtoDto.getAccess_token();
                 expires_in=weAccessTokenDtoDto.getExpires_in();
+            }else if (WeConstans.WE_AGENT_ACCESS_TOKEN.equals(accessTokenKey)){
+                WeAccessTokenDtoDto weAccessTokenDtoDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),wxCorpAccount.getAgentSecret());
+                token=weAccessTokenDtoDto.getAccess_token();
+                expires_in=weAccessTokenDtoDto.getExpires_in();
             }
 
             if(StringUtils.isNotEmpty(token)){
@@ -122,6 +131,11 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
         redisCache.deleteObject(WeConstans.WE_COMMON_ACCESS_TOKEN);
         redisCache.deleteObject(WeConstans.WE_CONTACT_ACCESS_TOKEN);
         redisCache.deleteObject(WeConstans.WE_PROVIDER_ACCESS_TOKEN);
+    }
+
+    @Override
+    public String findAgentAccessToken() {
+        return findAccessToken(WeConstans.WE_AGENT_ACCESS_TOKEN);
     }
 
 

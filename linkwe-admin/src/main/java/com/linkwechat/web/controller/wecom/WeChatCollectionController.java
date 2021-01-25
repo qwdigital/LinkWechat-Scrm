@@ -53,9 +53,9 @@ public class WeChatCollectionController extends BaseController {
      */
   //  @PreAuthorize("@ss.hasPermi('chat:collection:list')")
     @GetMapping("/list")
-    public TableDataInfo list(@RequestParam(value = "userId") Long userId) {
+    public TableDataInfo list(@RequestParam(value = "userId") Long userId,@RequestParam(value = "keyword",required = false) String keyword) {
         startPage();
-        List<WeChatSideVo> collections = weChatCollectionService.collections(userId);
+        List<WeChatSideVo> collections = weChatCollectionService.collections(userId,keyword);
         return getDataTable(collections);
     }
 

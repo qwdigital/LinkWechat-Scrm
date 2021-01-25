@@ -8,11 +8,9 @@ import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.wecom.client.WeMsgAuditClient;
 import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.dto.WeUserInfoDto;
 import com.linkwechat.wecom.domain.dto.msgaudit.WeMsgAuditDto;
-import com.linkwechat.wecom.domain.vo.WeAllocateCustomersVo;
-import com.linkwechat.wecom.domain.vo.WeAllocateGroupsVo;
-import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
-import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
+import com.linkwechat.wecom.domain.vo.*;
 import com.linkwechat.wecom.mapper.WeUserMapper;
 import com.linkwechat.wecom.service.IWeCustomerService;
 import com.linkwechat.wecom.service.IWeDepartmentService;
@@ -64,13 +62,13 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
     /**
      * 查询通讯录相关客户
      *
-     * @param id 通讯录相关客户ID
+     * @param userId 通讯录相关客户ID
      * @return 通讯录相关客户
      */
     @Override
-    public WeUser selectWeUserById(Long id)
+    public WeUser selectWeUserById(String userId)
     {
-        return weUserMapper.selectWeUserById(id);
+        return weUserMapper.selectWeUserById(userId);
     }
 
     /**
@@ -105,6 +103,18 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
 
     }
 
+    @Override
+    @Transactional
+    public int insertWeUserNoToWeCom(WeUser weUser)
+    {
+        WeUser weUserInfo = weUserMapper.selectWeUserById(weUser.getUserId());
+        if (weUserInfo != null){
+            return weUserMapper.updateWeUser(weUser);
+        }
+        return weUserMapper.insertWeUser(weUser);
+
+    }
+
     /**
      * 修改通讯录相关客户
      * 
@@ -121,6 +131,13 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
                     weUser.transformWeUserDto()
             );
         }
+    }
+
+    @Override
+    @Transactional
+    public int updateWeUserNoToWeCom(WeUser weUser)
+    {
+        return weUserMapper.updateWeUser(weUser);
     }
 
 
@@ -233,6 +250,17 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
 
     }
 
+    @Override
+    @Transactional
+    public int deleteUserNoToWeCom(String userId) {
+        WeUser weUser = WeUser.builder()
+                .userId(userId)
+                .isActivate(WeConstans.WE_USER_IS_LEAVE)
+                .dimissionTime(new Date())
+                .build();
+        return weUserMapper.updateById(weUser);
+    }
+
 
     /**
      * 获取历史分配记录的成员
@@ -265,6 +293,21 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
             redisCache.expire(WeConstans.weMsgAuditKey,10,TimeUnit.MILLISECONDS);
         }
         return weUserMapper.selectBatchIds(userIds);
+    }
+
+    @Override
+    public WeUserInfoVo getUserInfo(String code) {
+
+
+        WeUserInfoDto getuserinfo = weUserClient.getuserinfo(code);
+
+        return WeUserInfoVo.builder()
+                .userId(getuserinfo.getUserId())
+                .deviceId(getuserinfo.getDeviceId())
+                .externalUserId(getuserinfo.getExternal_userid())
+                .openId(getuserinfo.getOpenId())
+                .build();
+
     }
 
 

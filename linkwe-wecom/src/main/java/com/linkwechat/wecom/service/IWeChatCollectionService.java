@@ -37,6 +37,6 @@ public interface IWeChatCollectionService extends IService<WeChatCollection> {
      * @param userId 用户id
      * @return {@link WeChatSideVo}s
      */
-    public List<WeChatSideVo> collections(Long userId);
+    public List<WeChatSideVo> collections(Long userId,String keyword);
 
 }

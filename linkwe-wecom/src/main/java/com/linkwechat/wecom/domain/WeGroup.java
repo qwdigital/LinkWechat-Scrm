@@ -66,5 +66,11 @@ public class WeGroup {
     @TableField(exist = false)
     private String userIds;
 
+    /**
+     * 群头像
+     */
+    @TableField(exist = false)
+    private String avatar;
+
 
 }
