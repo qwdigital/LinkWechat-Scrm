@@ -48,8 +48,9 @@
       <el-col :span="12">
         <div class="hd_box">
           <div class="hd_name">
-            <!-- <span
+              <!-- <span
               v-if="chatData&&chatData.finalChatContext">与{{chatData.finalChatContext.fromInfo.name}} 的聊天</span> -->
+              <!-- 判断 activeName-->
             <span class="fr hd_nameRi">下载会话</span></div>
         </div>
         <div class=" hd_tabthree">
@@ -204,7 +205,7 @@
          this.chatData = data;
          this.activeNameThreeClick('', true)
       },
-      currentChange() {
+      currentChange(e) {
       this.currentPage = e
         if (this.activeName == '2') {
           return this.activeNameThreeClick(true, true)
@@ -349,13 +350,10 @@
     .hd_tabs {
       background: #fff;
     }
-
-    .hd_tabthree {
-      /deep/ .el-tabs__header {
+  /deep/ .el-tabs__header {
         margin: 0;
       }
-    }
-
+  
     .hd_box {
       padding: 15px;
     }

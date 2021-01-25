@@ -58,7 +58,7 @@
             margin: 0;}
     .list {
         overflow-y:scroll;
-       height: 708px;
+      
       ::-webkit-scrollbar {
                 display: none;
             }
