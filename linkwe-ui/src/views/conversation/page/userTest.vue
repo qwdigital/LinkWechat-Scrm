@@ -47,8 +47,9 @@
       </el-col>
       <el-col :span="12">
         <div class="hd_box">
-          <div class="hd_name"><span
-              v-if="chatData&&chatData.finalChatContext">与{{chatData.finalChatContext.fromInfo.name}} 的聊天</span>
+          <div class="hd_name">
+            <!-- <span
+              v-if="chatData&&chatData.finalChatContext">与{{chatData.finalChatContext.fromInfo.name}} 的聊天</span> -->
             <span class="fr hd_nameRi">下载会话</span></div>
         </div>
         <div class=" hd_tabthree">
