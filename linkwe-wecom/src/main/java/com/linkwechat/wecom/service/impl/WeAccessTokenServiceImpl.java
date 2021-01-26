@@ -1,13 +1,17 @@
 package com.linkwechat.wecom.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeAccessTokenClient;
+import com.linkwechat.wecom.domain.WeApp;
 import com.linkwechat.wecom.domain.WeCorpAccount;
 import com.linkwechat.wecom.domain.dto.WeAccessTokenDtoDto;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
+import com.linkwechat.wecom.service.IWeAppService;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +36,10 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
 
     @Autowired
     private RedisCache redisCache;
+
+
+    @Autowired
+    private IWeAppService iWeAppService;
 
 
 
@@ -76,6 +84,51 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
     public String findChatAccessToken() {
         return findAccessToken(WeConstans.WE_CHAT_ACCESS_TOKEN);
     }
+
+
+
+    /**
+     * 获取第三方应用所需要的token
+     * @param agentId
+     * @return
+     */
+    @Override
+    public String findThirdAppAccessToken(String agentId) {
+
+
+        String token=redisCache.getCacheObject(WeConstans.WE_THIRD_APP_TOKEN+"::"+agentId);
+
+        if(StringUtils.isNotEmpty(token)){
+            return token;
+        }
+
+        WeApp weApp = iWeAppService.getOne(new LambdaQueryWrapper<WeApp>()
+                .eq(WeApp::getAgentId, agentId)
+                .eq(WeApp::getDelFlag, Constants.NORMAL_CODE)
+                .eq(WeApp::getStatus,  Constants.NORMAL_CODE));
+        if(weApp == null){
+            throw new WeComException("当前agentId不可用或不存在");
+        }
+
+        WeCorpAccount wxCorpAccount
+                = iWxCorpAccountService.findValidWeCorpAccount();
+        if(wxCorpAccount == null){
+            throw new WeComException("无可用的corpid和secret");
+        }
+
+        WeAccessTokenDtoDto weAccessTokenDtoDto
+                = accessTokenClient.getToken(wxCorpAccount.getCorpId(),weApp.getAgentSecret());
+        token=weAccessTokenDtoDto.getAccess_token();
+        if(StringUtils.isNotEmpty(token)){
+
+            redisCache.setCacheObject(WeConstans.WE_THIRD_APP_TOKEN+"::"+agentId,token,weAccessTokenDtoDto.getExpires_in().intValue(), TimeUnit.SECONDS);
+        }
+
+
+        return token;
+    }
+
+
 
 
     private String findAccessToken(String accessTokenKey){

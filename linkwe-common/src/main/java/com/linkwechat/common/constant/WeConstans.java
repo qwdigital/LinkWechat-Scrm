@@ -18,6 +18,12 @@ public class WeConstans {
 
 
     /**
+     * 自建应用token
+     */
+    public static  final String WE_THIRD_APP_TOKEN="we_third_app_token";
+
+
+    /**
      * 获取外部联系人相关 token
      */
     public static final String WE_CONTACT_ACCESS_TOKEN = "we_contact_access_token";
@@ -321,4 +327,10 @@ public class WeConstans {
      * 开启会话存档成员列表
      **/
     public static final String weMsgAuditKey = "wecom_msg_audit:user:ids";
+
+
+    /**
+     * 第三方应用ID，参数标实
+     */
+    public static  final  String THIRD_APP_PARAM_TIP="agentId";
 }

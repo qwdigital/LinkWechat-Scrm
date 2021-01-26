@@ -17,6 +17,10 @@ public interface IWeAccessTokenService {
 
    public String findChatAccessToken();
 
+
+   public String findThirdAppAccessToken(String agentId);
+
+
    public void removeToken();
 
     String findAgentAccessToken();
