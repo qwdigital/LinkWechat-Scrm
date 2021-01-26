@@ -299,7 +299,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
                 List<String> owners = groups.stream().map(WeGroup::getOwner).collect(Collectors.toList());
                 for (String owner : owners) {
                     WeCustomerMessagePushDto messagePushDto = new WeCustomerMessagePushDto();
-                    messagePushDto.setChat_type(ChatType.of(customerMessagePushDto.getPushType()).getType());
+                    messagePushDto.setChat_type(ChatType.of(customerMessagePushDto.getPushType()).getName());
                     //客户群的员工id
                     messagePushDto.setSender(owner);
                     seedMessage(messagePushDto, customerMessagePushDto);

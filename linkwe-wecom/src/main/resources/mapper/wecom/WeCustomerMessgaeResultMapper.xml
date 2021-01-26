@@ -38,4 +38,14 @@
         </where>
         GROUP BY user_name
     </select>
+    <select id="checkSendStatus" resultType="java.lang.Integer">
+        SELECT
+
+            COUNT(1)
+        FROM
+            we_customer_messgaeResult
+       <where>
+           message_id =#{messageId} AND `status`='1'
+       </where>
+    </select>
 </mapper>

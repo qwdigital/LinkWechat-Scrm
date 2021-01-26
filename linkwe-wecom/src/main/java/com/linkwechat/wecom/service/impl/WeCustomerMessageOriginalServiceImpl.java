@@ -8,6 +8,7 @@ import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
 import com.linkwechat.wecom.domain.WeCustomerMessageOriginal;
+import com.linkwechat.wecom.domain.dto.message.AsyncResultDto;
 import com.linkwechat.wecom.domain.dto.message.DetailMessageStatusResultDto;
 import com.linkwechat.wecom.domain.dto.message.QueryCustomerMessageStatusResultDataObjectDto;
 import com.linkwechat.wecom.domain.dto.message.QueryCustomerMessageStatusResultDto;
@@ -64,16 +65,19 @@ public class WeCustomerMessageOriginalServiceImpl extends ServiceImpl<WeCustomer
 
         CustomerMessagePushVo customerMessagePushDetail = weCustomerMessageOriginalMapper.findCustomerMessagePushDetail(messageId);
 
-
-        //拉取消息发送结果
-        CompletableFuture.runAsync(() -> syncSendResult(customerMessagePushDetail.getMsgid(), messageId));
+        //检查是否已经同步发送结果
+         if( weCustomerMessgaeResultMapper.checkSendStatus(messageId)==0){
+             //拉取消息发送结果
+             CompletableFuture.runAsync(() -> syncSendResult(customerMessagePushDetail.getMsgid(), messageId));
+         }
 
         return customerMessagePushDetail;
     }
 
     @Override
-    public void asyncResult(String msgid, Long messageId) {
-        syncSendResult(msgid, messageId);
+    public void asyncResult(AsyncResultDto asyncResultDto) throws JsonProcessingException {
+        String msgid=new ObjectMapper().writeValueAsString(asyncResultDto.getMsgids());
+        syncSendResult(msgid, asyncResultDto.getMessageId());
     }
 
     public void syncSendResult(String msgid, Long messageId) {

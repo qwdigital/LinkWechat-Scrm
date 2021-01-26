@@ -6,6 +6,7 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.wecom.domain.dto.message.AsyncResultDto;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
 import com.linkwechat.wecom.domain.vo.CustomerMessagePushVo;
 import com.linkwechat.wecom.domain.vo.WeCustomerMessageResultVo;
@@ -96,10 +97,10 @@ public class WeCustomerMessagePushController extends BaseController {
     /**
      * 同步消息发送结果
      */
-    @PreAuthorize("@ss.hasPermi('customerMessagePush:push:asyncResult')")
+    //@PreAuthorize("@ss.hasPermi('customerMessagePush:push:asyncResult')")
     @PostMapping(value = "asyncResult")
-    public AjaxResult asyncResult(@RequestParam(value = "msgid") String msgid, @RequestParam(value = "messageId") Long messageId) {
-        weCustomerMessageOriginalService.asyncResult(msgid, messageId);
+    public AjaxResult asyncResult(@RequestBody AsyncResultDto asyncResultDto) throws JsonProcessingException {
+        weCustomerMessageOriginalService.asyncResult(asyncResultDto);
         return AjaxResult.success();
     }
 
