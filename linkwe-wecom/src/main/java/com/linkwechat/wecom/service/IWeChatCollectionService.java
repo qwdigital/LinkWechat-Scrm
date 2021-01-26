@@ -20,7 +20,7 @@ public interface IWeChatCollectionService extends IService<WeChatCollection> {
      * @param userId 用户id
      * @return 结果
      */
-    public int addCollection( Long materialId, Long userId);
+    public int addCollection( Long materialId, String userId);
 
     /**
      * 取消收藏
@@ -29,7 +29,7 @@ public interface IWeChatCollectionService extends IService<WeChatCollection> {
      * @param userId 用户id
      * @return 结果
      */
-    public int cancleCollection( Long materialId, Long userId);
+    public int cancleCollection( Long materialId, String userId);
 
     /**
      * 收藏列表
@@ -37,6 +37,6 @@ public interface IWeChatCollectionService extends IService<WeChatCollection> {
      * @param userId 用户id
      * @return {@link WeChatSideVo}s
      */
-    public List<WeChatSideVo> collections(Long userId,String keyword);
+    public List<WeChatSideVo> collections(String userId,String keyword);
 
 }
