@@ -35,7 +35,7 @@
             <el-table :data="fileData" stripe style="width: 100%" :header-cell-style="{background:'#fff'}">
                 <el-table-column prop="date" label="发送者" width="300">
                     <template slot-scope="scope">
-                        {{scope.row.from}}
+                        <p v-if="scope.row.fromInfo">{{scope.row.fromInfo.name}}</p>
                     </template>
                 </el-table-column>
                 <el-table-column prop="name" label=" 内容">
