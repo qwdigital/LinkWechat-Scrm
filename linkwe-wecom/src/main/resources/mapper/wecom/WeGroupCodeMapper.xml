@@ -109,6 +109,12 @@
             <if test="tipMsg != null">tip_msg,</if>
             <if test="customerServerQrCode != null">customer_server_qr_code,</if>
             <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">del_flag,</if>
+
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -122,6 +128,11 @@
             <if test="tipMsg != null">#{tipMsg},</if>
             <if test="customerServerQrCode != null">#{customerServerQrCode},</if>
             <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
         </trim>
     </insert>
 
@@ -137,6 +148,9 @@
             <if test="tipMsg != null">tip_msg = #{tipMsg},</if>
             <if test="customerServerQrCode != null">customer_server_qr_code = #{customerServerQrCode},</if>
             <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
         </trim>
         where id = #{id}
     </update>

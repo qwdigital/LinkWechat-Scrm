@@ -1,17 +1,15 @@
 package com.linkwechat.wecom.service.impl;
 
+import java.io.InputStream;
 import java.util.List;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.linkwechat.common.config.RuoYiConfig;
+import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.config.ServerConfig;
 import com.linkwechat.common.exception.wecom.WeComException;
-import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.QREncode;
-import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUploadUtils;
-import com.linkwechat.common.utils.uuid.IdUtils;
 import com.linkwechat.wecom.domain.WeGroupCodeActual;
 import com.linkwechat.wecom.mapper.WeGroupCodeActualMapper;
 import com.linkwechat.wecom.service.IWeGroupCodeActualService;
@@ -20,7 +18,6 @@ import org.springframework.stereotype.Service;
 import com.linkwechat.wecom.mapper.WeGroupCodeMapper;
 import com.linkwechat.wecom.domain.WeGroupCode;
 import com.linkwechat.wecom.service.IWeGroupCodeService;
-
 /**
  * 客户群活码Service业务层处理
  * 
@@ -41,9 +38,7 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper,WeGrou
     private WeGroupCodeActualMapper weGroupCodeActualMapper;
 
     @Autowired
-    private ServerConfig serverConfig;
-
-    private static final String IMAGE_FORMAT = "png";
+    private CosConfig cosConfig;
 
     /**
      * 查询客户群活码
@@ -107,33 +102,16 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper,WeGrou
     public void insertWeGroupCode(WeGroupCode weGroupCode)
     {
         try {
-
-            String uploadDir = RuoYiConfig.getUploadPath();
-            String fileName = DateUtils.datePath() + "/" + IdUtils.fastUUID() + "." + IMAGE_FORMAT;
-
-            String filePathName = FileUploadUtils.getPathFileName(uploadDir, fileName);
-
             // 生成并保存二维码图片
             String logoUrl = weGroupCode.getActivityHeadUrl();
-            if (StringUtils.isEmpty(logoUrl)) {
-                QREncode.saveQRCode(weGroupCode.getActivityName(), uploadDir + "/" + fileName);
-            } else {
-                QREncode.saveQRCode(weGroupCode.getActivityName(), logoUrl, uploadDir + "/" + fileName);
-            }
-            String codeUrl = serverConfig.getUrl() + filePathName;
+            InputStream in = QREncode.writeToInputStream(QREncode.crateQRCode(weGroupCode.getActivityName(), logoUrl));
+            String fileName = FileUploadUtils.upload2Cos(in, "png", cosConfig);
+            String codeUrl = "https://link-wechat-1251309172.cos.ap-nanjing.myqcloud.com/" + fileName;
             weGroupCode.setCodeUrl(codeUrl);
-
-            if(this.save(weGroupCode)){
-                List<WeGroupCodeActual> actualList = weGroupCode.getActualList();
-                if(CollectionUtil.isNotEmpty(actualList)){
-                    iWeGroupCodeActualService.saveBatch(actualList);
-                }
-            }
+            weGroupCodeMapper.insertWeGroupCode(weGroupCode);
         } catch (Exception e) {
             throw new WeComException(e.getMessage());
         }
-
-
 
     }
 
