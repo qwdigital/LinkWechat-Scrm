@@ -256,6 +256,16 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
     }
 
     /**
+     * 通过成员id 获取去成员活码
+     * @param userId 成员id
+     * @return
+     */
+    @Override
+    public WeEmpleCode getQrcodeByUserId(String userId) {
+        return this.baseMapper.getQrcodeByUserId(userId);
+    }
+
+    /**
      * 新增员工活码
      *
      * @param weEmpleCode

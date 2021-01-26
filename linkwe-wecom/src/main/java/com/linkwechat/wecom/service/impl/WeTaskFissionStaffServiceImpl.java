@@ -84,4 +84,16 @@ public class WeTaskFissionStaffServiceImpl implements IWeTaskFissionStaffService
     public int deleteWeTaskFissionStaffById(Long id) {
         return weTaskFissionStaffMapper.deleteWeTaskFissionStaffById(id);
     }
+
+    /**
+     * t根据任务id获取员工信息列表
+     * @param taskId 任务id
+     * @return
+     */
+    @Override
+    public List<WeTaskFissionStaff> selectWeTaskFissionStaffByTaskId(Long taskId) {
+        WeTaskFissionStaff weTaskFissionStaff = new WeTaskFissionStaff();
+        weTaskFissionStaff.setTaskFissionId(taskId);
+        return weTaskFissionStaffMapper.selectWeTaskFissionStaffList(weTaskFissionStaff);
+    }
 }

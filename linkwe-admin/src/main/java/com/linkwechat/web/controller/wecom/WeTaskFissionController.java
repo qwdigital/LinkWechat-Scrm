@@ -88,4 +88,15 @@ public class WeTaskFissionController extends BaseController {
     public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(weTaskFissionService.deleteWeTaskFissionByIds(ids));
     }
+
+    /**
+     * 发送裂变任务
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:fission:send')")
+    @Log(title = "发送裂变任务", businessType = BusinessType.OTHER)
+    @GetMapping("/{id}")
+    public AjaxResult send(@PathVariable Long id) {
+        weTaskFissionService.sendWeTaskFission(id);
+        return AjaxResult.success();
+    }
 }

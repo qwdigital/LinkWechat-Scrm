@@ -58,4 +58,11 @@ public interface IWeTaskFissionStaffService {
      * @return 结果
      */
     public int deleteWeTaskFissionStaffById(Long id);
+
+    /**
+     * t根据任务id获取员工信息列表
+     * @param taskId 任务id
+     * @return
+     */
+    public List<WeTaskFissionStaff> selectWeTaskFissionStaffByTaskId(Long taskId);
 }

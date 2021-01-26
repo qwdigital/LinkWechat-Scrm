@@ -614,5 +614,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         return weCustomerMapper.updateWeCustomer(weCustomer) == 1;
     }
 
+    @Override
+    public List<WeUser> getCustomerByTag(List<String> ids) {
+        return weCustomerMapper.getCustomerByTag(ids);
+    }
+
 
 }

@@ -58,4 +58,10 @@ public interface IWeTaskFissionService {
      * @return 结果
      */
     public int deleteWeTaskFissionById(Long id);
+
+    /**
+     * 发送任务
+     * @param id 任务id
+     */
+    public void sendWeTaskFission(Long id);
 }

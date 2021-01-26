@@ -31,6 +31,24 @@
         select id, code_type, is_join_confirm_friends, activity_scene, welcome_msg, create_by, create_time, del_flag, config_id,qr_code from we_emple_code
     </sql>
 
+    <sql id="getQrcodeByUserIdVo">
+        select
+        wec.id,
+        wec.code_type,
+        wec.is_join_confirm_friends,
+        wec.activity_scene,
+        wec.welcome_msg,
+        wec.create_by,
+        wec.create_time,
+        wec.del_flag,
+        wec.config_id,
+        wec.qr_code
+        from we_emple_code wec
+        left join we_emple_code_use_scop wecus on wec.id = wecus.emple_code_id
+        and wecus.business_id_type = 2
+        and wecus.del_flag = 0
+    </sql>
+
     <sql id="selectWeEmpleCodeLsit">
                 select
             wecode.id,
@@ -206,4 +224,14 @@
         </if>
     </select>
 
+
+
+    <select id="getQrcodeByUserId" parameterType="java.lang.String" resultType="com.linkwechat.wecom.domain.WeEmpleCode">
+        <include refid="getQrcodeByUserIdVo"/>
+        <where>
+            <if test="userId != null and userId != ''">
+                and wecus.business_id = #{userId}
+            </if>
+        </where>
+    </select>
 </mapper>
