@@ -39,8 +39,9 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="name" label=" 内容">
-                    <template slot-scope="scope" v-if="scope.row.text">
-                        {{scope.row.text.content}}
+                     <template slot-scope="scope">
+                       <p v-if="!!scope.row.content" class="emcode"  v-html="scope.row.content"></p>
+                      <p  v-else-if="!!!scope.row.content&&scope.row.text">{{scope.row.text.content}}</p>         
                     </template>
                 </el-table-column>
                 <el-table-column label="消息状态" width="200">
@@ -221,4 +222,5 @@
             border: none
         }
     }
+    .emcode /deep/ em{color: #ff0000;}
 </style>
