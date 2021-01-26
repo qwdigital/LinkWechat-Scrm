@@ -239,6 +239,10 @@ public class WeConstans {
      */
     public static final long LIMIT = 1_000L;
 
+    /**
+     * 敏感词过滤查询用户分片
+     */
+    public static final Integer SENSITIVE_USER_PIECE = 50;
 
     public static final String AppTicketKey = "ticket:AppGet";
     public static final String AgentTicketKey = "ticket:AgentGet";
