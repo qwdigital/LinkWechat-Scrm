@@ -54,7 +54,7 @@ public class WeTaskFissionController extends BaseController {
      * 获取任务宝详细信息
      */
     @PreAuthorize("@ss.hasPermi('wecom:fission:query')")
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/getInfo/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(weTaskFissionService.selectWeTaskFissionById(id));
     }

@@ -275,6 +275,9 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
             messagePushDto.setChat_type(ChatType.of(customerMessagePushDto.getPushType()).getName());
             List<String> externalUserIds = externalUserIds(customerMessagePushDto.getPushRange(), customerMessagePushDto.getStaffId()
                     , customerMessagePushDto.getDepartment(), customerMessagePushDto.getTag()).stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
+            if(CollectionUtils.isEmpty(externalUserIds)){
+                throw new WeComException("没有外部联系人");
+            }
             messagePushDto.setExternal_userid(externalUserIds);
             seedMessage(messagePushDto, customerMessagePushDto);
             SendMessageResultDto sendMessageResultDto = weCustomerMessagePushClient.sendCustomerMessageToUser(messagePushDto);
