@@ -2,6 +2,7 @@ package com.linkwechat.common.utils.file;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkwechat.common.config.CosConfig;
@@ -147,6 +148,19 @@ public class FileUploadUtils {
         }
     }
 
+    /**
+     * 通过流进行文件上传
+     * @param in 流
+     * @throws IOException
+     */
+    public static String upload2Cos(InputStream in, String fileExtension, CosConfig cosConfig) throws IOException {
+        try {
+            return upload2Cos( in, fileExtension, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION, cosConfig);
+        } catch (Exception e) {
+            throw new IOException(e.getMessage(), e);
+        }
+    }
+
 
     /**
      * 文件上传
@@ -191,7 +205,30 @@ public class FileUploadUtils {
         return fileName;
     }
 
-
+    /**
+     * 将流中的文件传到腾讯云
+     * @param inputStream 输入流
+     * @param fileExtension 被写入流的文件的后缀名
+     * @param allowedExtension 允许的后缀名
+     * @throws FileSizeLimitExceededException 文件大小超过上限
+     * @throws InvalidExtensionException 文件后缀名非法
+     */
+    public static String upload2Cos(InputStream inputStream, String fileExtension, String[] allowedExtension, CosConfig cosConfig) throws FileSizeLimitExceededException, InvalidExtensionException {
+        String fileName = DateUtils.datePath() + "/" + IdUtils.fastUUID() + "." + fileExtension;
+        if (!isAllowedExtension(fileExtension, allowedExtension))
+        {
+            throw new InvalidExtensionException.InvalidImageExtensionException(allowedExtension, fileExtension, fileName);
+        }
+        COSCredentials cred = new BasicCOSCredentials(cosConfig.getSecretId(), cosConfig.getSecretKey());
+        Region region = new Region(cosConfig.getRegion());
+        ClientConfig clientConfig = new ClientConfig(region);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.getBucketName(), fileName ,inputStream ,objectMetadata);
+        cosClient.putObject(putObjectRequest);
+        cosClient.shutdown();
+        return fileName;
+    }
 
 
     public static final String uploadFile(String baseDir, MultipartFile file)

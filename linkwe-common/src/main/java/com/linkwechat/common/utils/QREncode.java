@@ -3,9 +3,7 @@ package com.linkwechat.common.utils;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -21,7 +19,6 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.linkwechat.common.constant.Constants;
-
 
 public class QREncode {
 
@@ -84,13 +81,13 @@ public class QREncode {
     }
 
     /**
-     * 生成二维码
+     * 生成带头像的二维码
      *
      * @param content 内容
-     * @param logoUrl logo 在线地址
+     * @param logoUrl logo在线地址
      * @return
      */
-    private static BufferedImage crateQRCode(String content, String logoUrl) {
+    public static BufferedImage crateQRCode(String content, String logoUrl) {
         if (StringUtils.isNotBlank(content)) {
             ServletOutputStream stream = null;
             HashMap<EncodeHintType, Comparable> hints = new HashMap<>(4);
@@ -151,35 +148,6 @@ public class QREncode {
     }
 
     /**
-     * 生成二维码并保存
-     *
-     * @param content 内容
-     * @throws IOException
-     */
-    public static void saveQRCode(String content, String filePath) throws IOException {
-        BufferedImage image = crateQRCode(content, null);
-        if (StringUtils.isNotNull(image)) {
-            File file = createFile(filePath);
-            ImageIO.write(image, IMAGE_FORMAT, file);
-        }
-    }
-
-    /**
-     * 生成带logo的二维码并保存
-     *
-     * @param content 二维码内容
-     * @param logoUrl logo地址
-     * @throws IOException
-     */
-    public static void saveQRCode(String content, String logoUrl, String filePath) throws IOException {
-        BufferedImage image = crateQRCode(content, logoUrl);
-        if (StringUtils.isNotNull(image)) {
-            File file = createFile(filePath);
-            ImageIO.write(image, IMAGE_FORMAT, file);
-        }
-    }
-
-    /**
      * 生成带二维码并生成流文件进行传输
      *
      * @param content 内容
@@ -208,22 +176,14 @@ public class QREncode {
         }
     }
 
-    /**
-     * 根据指定路径创建空文件
-     * @param path 路径
-     * @return 空文件
-     */
-    private static File createFile(String path) {
-        File file = new File(path);
+    public static InputStream writeToInputStream(BufferedImage bufferedImage) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
         try {
-            if (!file.exists()) {
-                file.getParentFile().mkdir();
-                file.createNewFile();
-            }
+            ImageIO.write(bufferedImage, IMAGE_FORMAT, os);
+            return new ByteArrayInputStream(os.toByteArray());
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new IOException(e.getMessage(), e);
         }
-        return file;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
