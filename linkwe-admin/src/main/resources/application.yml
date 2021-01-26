@@ -145,7 +145,7 @@ xss:
 # elasticsearch配置
 elasticsearch:
   schema: http
-  address: ${ES_ADDRESS:localhost:9200}
+  address: ${ES_ADDRESS:localhost}
   connectTimeout: 10000
   socketTimeout: 10000
   connectionRequestTimeout: 10000
@@ -207,3 +207,10 @@ wecome:
     appIdOrCorpId: ww38152475d1bca752
     token: uEyhhuTKfpS
     encodingAesKey: diTFQ6B4IW14UN2JplADuhMZsBZHjvuBG24kHFrr4Px
+#腾讯云对象存储
+cos:
+  secretId: AKIDQRCizIeUGl13vakkDQMH0VkjhPr1rBBv
+  secretKey: e3D8oFetseC0f8OX9XeV7UcTDiyyQ8cr
+  #link-wechat-1251309172.cos.ap-nanjing.myqcloud.com
+  region: ap-nanjing
+  bucketName: link-wechat-1251309172
