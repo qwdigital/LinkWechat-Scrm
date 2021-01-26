@@ -66,10 +66,10 @@ public class WeCustomerMessageOriginalServiceImpl extends ServiceImpl<WeCustomer
         CustomerMessagePushVo customerMessagePushDetail = weCustomerMessageOriginalMapper.findCustomerMessagePushDetail(messageId);
 
         //检查是否已经同步发送结果
-         if( weCustomerMessgaeResultMapper.checkSendStatus(messageId)==0){
-             //拉取消息发送结果
-             CompletableFuture.runAsync(() -> syncSendResult(customerMessagePushDetail.getMsgid(), messageId));
-         }
+        if( weCustomerMessgaeResultMapper.checkSendStatus(messageId)==0){
+            //拉取消息发送结果
+            CompletableFuture.runAsync(() -> syncSendResult(customerMessagePushDetail.getMsgid(), messageId));
+        }
 
         return customerMessagePushDetail;
     }
@@ -117,7 +117,7 @@ public class WeCustomerMessageOriginalServiceImpl extends ServiceImpl<WeCustomer
 
                         detailList.forEach(d -> {
 
-                            if (d.getStatus().equals("1")) {
+                            if (d.getStatus().equals(WeConstans.sendMessageStatusEnum.SEND.getStatus())) {
 
                                 atomicInteger.incrementAndGet();
 

@@ -97,7 +97,7 @@ public class WeCustomerMessagePushController extends BaseController {
     /**
      * 同步消息发送结果
      */
-    //@PreAuthorize("@ss.hasPermi('customerMessagePush:push:asyncResult')")
+    @PreAuthorize("@ss.hasPermi('customerMessagePush:push:asyncResult')")
     @PostMapping(value = "asyncResult")
     public AjaxResult asyncResult(@RequestBody AsyncResultDto asyncResultDto) throws JsonProcessingException {
         weCustomerMessageOriginalService.asyncResult(asyncResultDto);

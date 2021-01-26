@@ -319,6 +319,48 @@ public class WeConstans {
 
     }
 
+    public static enum sendMessageStatusEnum {
+
+        NOT_SEND("0", "未发送"),
+        SEND("1","已发送"),
+        NOT_FRIEND_SEND("2","因客户不是好友导致发送失败"),
+        RECEIVE_OTHER_MESSAGE("3","-因客户已经收到其他群发消息导致发送失败"),
+        ;
+
+        private String status;
+        private String desc;
+
+        /**
+         * 构造方法
+         *
+         * @param status
+         * @param desc
+         */
+        sendMessageStatusEnum(String status, String desc) {
+            this.setStatus(status);
+            this.setDesc(desc);
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String key) {
+            this.status = status;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
+
+        public void setDesc(String desc) {
+            this.desc = desc;
+        }
+
+    }
+
+
+
     public static final String WECOM_FINANCE_INDEX = "finance";
 
     public static final String WECOM_SENSITIVE_HIT_INDEX = "sensitive";
