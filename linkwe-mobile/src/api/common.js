@@ -29,7 +29,7 @@ export function getAppTicket(url) {
 }
 
 /**
- * 获取企业的jsapi_ticket
+ * 获取登录用户id
  * @param {*} url 页面url
  */
 export function getUserInfo(code) {
@@ -37,6 +37,7 @@ export function getUserInfo(code) {
     url: service + '/user/getUserInfo',
     params: {
       code,
+      agentId: '1000005',
     },
   })
 }

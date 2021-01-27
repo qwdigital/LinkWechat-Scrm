@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Toast } from 'vant'
+import { Toast, Dialog } from 'vant'
 
 function createAxios(baseURL) {
   const instance = axios.create({
@@ -45,7 +45,7 @@ function createAxios(baseURL) {
       if (error.response) {
         addErrorLog(error.response)
       } else {
-        Toast.fail('服务器未启动或连接超时')
+        Dialog({ message: '服务器未启动或连接超时' })
         console.error('服务器未启动或连接超时')
       }
       return Promise.reject(error)
@@ -69,7 +69,7 @@ function createAxios(baseURL) {
     process.env.NODE_ENV === 'development'
       ? console.error(`错误: 路径: ${responseURL}, 返回值 : ${responseText}`)
       : console.error(`${JSON.parse(responseText).message}`)
-    Toast.fail(`${responseText}`)
+    Dialog({ message: responseText })
   }
 
   return instance

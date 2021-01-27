@@ -15,8 +15,6 @@ export default {
       finished: false,
       show: false,
       userId: '',
-      auth_code: '',
-      auth_code1: '',
     }
   },
   watch: {},
@@ -28,7 +26,6 @@ export default {
     //   .slice(1)
     //   .split('&')[0]
     //   .split('=')[1]
-    //   this.auth_code1 = auth_code
     // if (!auth_code) {
     //   this.$toast('未获得授权')
     //   return
@@ -47,7 +44,6 @@ export default {
       .slice(1)
       .split('&')[0]
       .split('=')[1]
-    this.auth_code1 = auth_code
     if (!auth_code) {
       this.$toast('未获得授权')
       return
@@ -58,10 +54,12 @@ export default {
         this.$toast('userId:' + this.userId)
       })
       .catch((err) => {
-        this.$toast('err:' + err)
+        Dialog.confirm({
+          title: '标题',
+          message: err,
+        })
       })
     this.getList()
-    this.auth_code = location
   },
   mounted() {},
   methods: {
@@ -90,10 +88,6 @@ export default {
         <van-icon name="plus" @click="add" />
       </template> -->
     </van-search>
-    <span>{{ auth_code }}</span>
-    <br />
-    <span>auth_code:{{ auth_code1 }}</span>
-
     <van-tabs v-model="active">
       <van-tab v-if="!!userId" title="我的">
         <List ref="list0" :userId="userId" :keyword="keyword"></List>
