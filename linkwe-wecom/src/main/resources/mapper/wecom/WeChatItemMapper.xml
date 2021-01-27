@@ -8,8 +8,8 @@
         we_chat_item(item_id,side_id,material_id,create_by,create_time,update_by,update_time)
         VALUES
         <if test="items!=null and items.size()>0">
-            <foreach collection="items" open="(" separator="," item="item" close=")">
-                #{item.itemId},#{item.sideId},#{item.materialId},#{item.createBy},#{item.createTime},#{item.updateBy},#{item.updateTime}
+            <foreach collection="items" separator="," item="item" >
+                (#{item.itemId},#{item.sideId},#{item.materialId},#{item.createBy},#{item.createTime},#{item.updateBy},#{item.updateTime})
             </foreach>
         </if>
     </insert>

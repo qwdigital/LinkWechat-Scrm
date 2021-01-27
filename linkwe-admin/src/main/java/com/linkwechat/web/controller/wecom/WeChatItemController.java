@@ -31,7 +31,7 @@ public class WeChatItemController extends BaseController {
      * 侧边栏抓取素材
      */
     @PreAuthorize("@ss.hasPermi('chat:item:add')")
-    @Log(title = "侧边栏抓取素材", businessType = BusinessType.INSERT)
+  // @Log(title = "侧边栏抓取素材", businessType = BusinessType.INSERT)
     @PutMapping
     public AjaxResult add(@RequestBody WeChatItemDto chatItemDto) {
         return toAjax(weChatItemService.checkItems(chatItemDto));
