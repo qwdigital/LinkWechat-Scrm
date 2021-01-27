@@ -5,21 +5,20 @@ import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.DateUtils;
-import com.linkwechat.wecom.domain.*;
+import com.linkwechat.wecom.domain.WeTaskFission;
+import com.linkwechat.wecom.domain.WeTaskFissionStaff;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
 import com.linkwechat.wecom.domain.dto.message.LinkMessageDto;
 import com.linkwechat.wecom.mapper.WeTaskFissionMapper;
-import com.linkwechat.wecom.service.*;
-import com.linkwechat.wecom.strategy.MessageContext;
-import com.linkwechat.wecom.strategy.SendMessageToUserStrategy;
+import com.linkwechat.wecom.service.IWeCustomerMessagePushService;
+import com.linkwechat.wecom.service.IWeEmpleCodeService;
+import com.linkwechat.wecom.service.IWeTaskFissionService;
+import com.linkwechat.wecom.service.IWeTaskFissionStaffService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -113,7 +112,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     public void sendWeTaskFission(Long id) {
         WeTaskFission weTaskFission = selectWeTaskFissionById(id);
         //海报路径
-        String postersPath = weTaskFission.getPostersPath();
+        String postersPath = weTaskFission.getPostersUrl();
         //目标员工id
         String fissStaffId = weTaskFission.getFissStaffId();
         //目标员工活码
@@ -134,7 +133,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         customerMessagePushDto.setTag(weTaskFission.getCustomerTagId());
         //查询发起成员
         List<WeTaskFissionStaff> weTaskFissionStaffList = weTaskFissionStaffService.selectWeTaskFissionStaffByTaskId(id);
-        if (CollectionUtil.isNotEmpty(weTaskFissionStaffList)){
+        if (CollectionUtil.isNotEmpty(weTaskFissionStaffList)) {
             //获取部门id
             String departmentIds = weTaskFissionStaffList.stream().filter(weTaskFissionStaff ->
                     WeConstans.USE_SCOP_BUSINESSID_TYPE_ORG.equals(weTaskFissionStaff.getStaffType()))
@@ -150,7 +149,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
             weCustomerMessagePushService.addWeCustomerMessagePush(customerMessagePushDto);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            log.error("发送任务失败》》》》》》》》》》》params:{},ex:{}", JSONObject.toJSONString(customerMessagePushDto),e);
+            log.error("发送任务失败》》》》》》》》》》》params:{},ex:{}", JSONObject.toJSONString(customerMessagePushDto), e);
         }
 
 
