@@ -1,17 +1,24 @@
 package com.linkwechat.web.controller.wecom;
 
+import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.annotation.Log;
+import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.wecom.domain.WeTaskFission;
+import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
 import com.linkwechat.wecom.service.IWeTaskFissionService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -26,6 +33,8 @@ import java.util.List;
 public class WeTaskFissionController extends BaseController {
     @Autowired
     private IWeTaskFissionService weTaskFissionService;
+    @Autowired
+    private CosConfig cosConfig;
 
     /**
      * 查询任务宝列表
@@ -70,16 +79,6 @@ public class WeTaskFissionController extends BaseController {
     }
 
     /**
-     * 修改任务宝
-     */
-    @PreAuthorize("@ss.hasPermi('wecom:fission:edit')")
-    @Log(title = "任务宝", businessType = BusinessType.UPDATE)
-    @PutMapping
-    public AjaxResult edit(@RequestBody WeTaskFission weTaskFission) {
-        return toAjax(weTaskFissionService.updateWeTaskFission(weTaskFission));
-    }
-
-    /**
      * 删除任务宝
      */
     @PreAuthorize("@ss.hasPermi('wecom:fission:remove')")
@@ -98,5 +97,32 @@ public class WeTaskFissionController extends BaseController {
     public AjaxResult send(@PathVariable Long id) {
         weTaskFissionService.sendWeTaskFission(id);
         return AjaxResult.success();
+    }
+
+    /**
+     * 生成带二维码的海报
+     */
+    @PreAuthorize("@ss.hasPermi('wecom:fission:poster')")
+    @Log(title = "生成带二维码的海报", businessType = BusinessType.OTHER)
+    @PostMapping("/poster")
+    public AjaxResult posterGenerate(@RequestBody WeTaskFissionPosterDTO weTaskFissionPosterDTO) {
+        String posterUrl = weTaskFissionService.fissionPosterGenerate(weTaskFissionPosterDTO);
+        JSONObject json = new JSONObject();
+        json.put("posterUrl", posterUrl);
+        return AjaxResult.success(json);
+    }
+
+    /**
+     * 上传兑奖图片
+     */
+    @PreAuthorize("@ss.hasPermi('wechat:fission:upload')")
+    @Log(title = "上传兑奖图片", businessType = BusinessType.OTHER)
+    @PostMapping("/upload")
+    @ApiOperation("上传兑奖图片")
+    public AjaxResult upload(@RequestParam(value = "file") MultipartFile file) throws IOException {
+        String url = FileUploadUtils.upload2Cos(file, cosConfig);
+        JSONObject json = new JSONObject();
+        json.put("rewardImageUrl", url);
+        return AjaxResult.success(json);
     }
 }

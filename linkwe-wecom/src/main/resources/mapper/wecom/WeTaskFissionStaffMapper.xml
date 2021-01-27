@@ -47,6 +47,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
+    <insert id="insertWeTaskFissionStaffList" parameterType="java.util.List" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into we_task_fission_staff(task_fission_id,staff_type,staff_id,staff_name)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.taskFissionId},#{item.staffType},#{item.staffId},#{item.staffName})
+        </foreach>
+    </insert>
+
     <update id="updateWeTaskFissionStaff" parameterType="WeTaskFissionStaff">
         update we_task_fission_staff
         <trim prefix="SET" suffixOverrides=",">

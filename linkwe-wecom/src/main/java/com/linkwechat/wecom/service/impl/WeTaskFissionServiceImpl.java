@@ -5,18 +5,21 @@ import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.DateUtils;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.wecom.domain.WeTaskFission;
+import com.linkwechat.wecom.domain.WeTaskFissionRecord;
 import com.linkwechat.wecom.domain.WeTaskFissionStaff;
+import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
 import com.linkwechat.wecom.domain.dto.message.LinkMessageDto;
 import com.linkwechat.wecom.mapper.WeTaskFissionMapper;
-import com.linkwechat.wecom.service.IWeCustomerMessagePushService;
-import com.linkwechat.wecom.service.IWeEmpleCodeService;
-import com.linkwechat.wecom.service.IWeTaskFissionService;
-import com.linkwechat.wecom.service.IWeTaskFissionStaffService;
+import com.linkwechat.wecom.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +41,10 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     private IWeEmpleCodeService weEmpleCodeService;
     @Autowired
     private IWeCustomerMessagePushService weCustomerMessagePushService;
+    @Autowired
+    private IWeTaskFissionRecordService weTaskFissionRecordService;
+    @Autowired
+    private IWeUserService weUserService;
 
     /**
      * 查询任务宝
@@ -68,9 +75,22 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
      * @return 结果
      */
     @Override
+    @Transactional
     public int insertWeTaskFission(WeTaskFission weTaskFission) {
+        weTaskFission.setCreateBy(SecurityUtils.getUsername());
         weTaskFission.setCreateTime(DateUtils.getNowDate());
-        return weTaskFissionMapper.insertWeTaskFission(weTaskFission);
+        int insertResult = weTaskFissionMapper.insertWeTaskFission(weTaskFission);
+        if (insertResult > 0) {
+            if (CollectionUtils.isNotEmpty(weTaskFission.getTaskFissionStaffs())) {
+                if (weTaskFission.getId() != null) {
+                    weTaskFission.getTaskFissionStaffs().forEach(staff -> {
+                        staff.setTaskFissionId(weTaskFission.getId());
+                    });
+                    weTaskFissionStaffService.insertWeTaskFissionStaffList(weTaskFission.getTaskFissionStaffs());
+                }
+            }
+        }
+        return insertResult;
     }
 
     /**
@@ -153,5 +173,31 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         }
 
 
+    }
+
+    @Override
+    public String fissionPosterGenerate(WeTaskFissionPosterDTO weTaskFissionPosterDTO) {
+        WeUser user = weUserService.selectWeUserById(weTaskFissionPosterDTO.getUserId());
+        if (user != null) {
+            WeTaskFissionRecord record = WeTaskFissionRecord.builder()
+                    .taskFissionId(weTaskFissionPosterDTO.getTaskFissionId())
+                    .customerId(user.getUserId())
+                    .customerName(user.getName()).build();
+            List<WeTaskFissionRecord> searchExists = weTaskFissionRecordService.selectWeTaskFissionRecordList(record);
+            Long recordId;
+            if (CollectionUtils.isNotEmpty(searchExists)) {
+                recordId = searchExists.get(0).getId();
+            } else {
+                int insertRows = weTaskFissionRecordService.insertWeTaskFissionRecord(record);
+                if (insertRows > 0) {
+                    recordId = record.getId();
+                } else {
+                    throw new RuntimeException("生成海报异常：插入裂变记录失败");
+                }
+            }
+            return "";
+        } else {
+            throw new RuntimeException("客户信息不存在");
+        }
     }
 }

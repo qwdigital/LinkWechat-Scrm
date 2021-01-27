@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.core.domain.BaseEntity;
@@ -8,6 +9,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 任务宝主对象 we_task_fission
@@ -54,6 +56,12 @@ public class WeTaskFission extends BaseEntity {
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "活动结束时间", width = 30, dateFormat = "yyyy-MM-dd")
     private Date overTime;
+
+    /**
+     * 发起成员
+     */
+    @TableField(exist = false)
+    private List<WeTaskFissionStaff> taskFissionStaffs;
 
     /**
      * 客户标签id列表，当为全部时保存为all
