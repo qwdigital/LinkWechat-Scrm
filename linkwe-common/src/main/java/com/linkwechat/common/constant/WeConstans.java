@@ -224,6 +224,7 @@ public class WeConstans {
      */
     public static final Integer USE_SCOP_BUSINESSID_TYPE_USER = 2;
     public static final Integer USE_SCOP_BUSINESSID_TYPE_ORG = 1;
+    public static final Integer USE_SCOP_BUSINESSID_TYPE_ALL = 3;
 
     /**
      * 客户流失通知开关 0:关闭 1:开启

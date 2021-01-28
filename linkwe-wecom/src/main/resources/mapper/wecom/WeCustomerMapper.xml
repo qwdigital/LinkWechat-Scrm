@@ -159,7 +159,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                   AND wfcr.status=#{status}
              </if>
             <if test="isOpenChat !=null ">
-                AND wc.is_open_chat=${isOpenChat}
+                AND wc.is_open_chat=#{isOpenChat}
             </if>
         </where>
         ORDER BY wfcr.create_time DESC
