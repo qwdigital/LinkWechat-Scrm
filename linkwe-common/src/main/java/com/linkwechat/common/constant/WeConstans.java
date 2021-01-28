@@ -20,7 +20,7 @@ public class WeConstans {
     /**
      * 自建应用token
      */
-    public static  final String WE_THIRD_APP_TOKEN="we_third_app_token";
+    public static final String WE_THIRD_APP_TOKEN = "we_third_app_token";
 
 
     /**
@@ -250,6 +250,11 @@ public class WeConstans {
      */
     public static final Integer SENSITIVE_USER_PIECE = 50;
 
+    /**
+     * 任务裂变用户活码state前缀
+     */
+    public static final String FISSION_PREFIX = "fis-";
+
     public static final String AppTicketKey = "ticket:AppGet";
     public static final String AgentTicketKey = "ticket:AgentGet";
 
@@ -322,9 +327,9 @@ public class WeConstans {
     public static enum sendMessageStatusEnum {
 
         NOT_SEND("0", "未发送"),
-        SEND("1","已发送"),
-        NOT_FRIEND_SEND("2","因客户不是好友导致发送失败"),
-        RECEIVE_OTHER_MESSAGE("3","-因客户已经收到其他群发消息导致发送失败"),
+        SEND("1", "已发送"),
+        NOT_FRIEND_SEND("2", "因客户不是好友导致发送失败"),
+        RECEIVE_OTHER_MESSAGE("3", "-因客户已经收到其他群发消息导致发送失败"),
         ;
 
         private String status;
@@ -360,7 +365,6 @@ public class WeConstans {
     }
 
 
-
     public static final String WECOM_FINANCE_INDEX = "finance";
 
     public static final String WECOM_SENSITIVE_HIT_INDEX = "sensitive";
@@ -374,5 +378,5 @@ public class WeConstans {
     /**
      * 第三方应用ID，参数标实
      */
-    public static  final  String THIRD_APP_PARAM_TIP="agentId";
+    public static final String THIRD_APP_PARAM_TIP = "agentId";
 }
