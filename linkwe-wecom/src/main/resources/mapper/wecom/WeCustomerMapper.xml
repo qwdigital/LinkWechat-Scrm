@@ -17,7 +17,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="position"    column="position"    />
         <result property="userName"    column="user_name"    />
         <result property="userId"    column="user_id"    />
-        <result property="isOpenChat"    column="is_open_chat"    />
+        <result property="isOpenChat"    column="is_open_chat" jdbcType="INTEGER"  />
         <collection property="weFlowerCustomerRels" ofType="com.linkwechat.wecom.domain.WeFlowerCustomerRel">
             <result property="id"    column="wfcrId"    />
             <result property="userId"    column="user_id"    />
@@ -158,8 +158,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
              <if test="status !=null and status !=''">
                   AND wfcr.status=#{status}
              </if>
-            <if test="isOpenChat !=null">
-                AND wc.is_open_chat=#{isOpenChat}
+            <if test="isOpenChat !=null ">
+                AND wc.is_open_chat=${isOpenChat}
             </if>
         </where>
         ORDER BY wfcr.create_time DESC
