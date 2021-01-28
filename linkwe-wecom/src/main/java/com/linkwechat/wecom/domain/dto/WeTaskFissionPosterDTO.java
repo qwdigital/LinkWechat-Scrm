@@ -12,4 +12,5 @@ public class WeTaskFissionPosterDTO {
     private String userId;
     private Long taskFissionId;
     private String fissStaffId;
+    private Long posterId;
 }

@@ -10,10 +10,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="customerId"    column="customer_id"    />
         <result property="customerName"    column="customer_name"    />
         <result property="fissNum"    column="fiss_num"    />
+        <result property="configId"    column="config_id"    />
     </resultMap>
 
     <sql id="selectWeTaskFissionRecordVo">
-        select id, task_fission_id, customer_id, customer_name, fiss_num from we_task_fission_record
+        select id, task_fission_id, customer_id, customer_name, fiss_num, config_id from we_task_fission_record
     </sql>
 
     <select id="selectWeTaskFissionRecordList" parameterType="WeTaskFissionRecord" resultMap="WeTaskFissionRecordResult">
@@ -38,12 +39,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="customerId != null and customerId != ''">customer_id,</if>
             <if test="customerName != null">customer_name,</if>
             <if test="fissNum != null">fiss_num,</if>
+            <if test="configId != null and configId != ''">config_id,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="taskFissionId != null">#{taskFissionId},</if>
             <if test="customerId != null and customerId != ''">#{customerId},</if>
             <if test="customerName != null">#{customerName},</if>
             <if test="fissNum != null">#{fissNum},</if>
+            <if test="configId != null and configId != ''">#{configId},</if>
          </trim>
     </insert>
 
@@ -54,6 +57,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="customerId != null and customerId != ''">customer_id = #{customerId},</if>
             <if test="customerName != null">customer_name = #{customerName},</if>
             <if test="fissNum != null">fiss_num = #{fissNum},</if>
+            <if test="configId != null">config_id = #{configId},</if>
         </trim>
         where id = #{id}
     </update>
