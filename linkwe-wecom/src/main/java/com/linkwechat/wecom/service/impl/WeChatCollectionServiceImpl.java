@@ -24,7 +24,7 @@ public class WeChatCollectionServiceImpl extends ServiceImpl<WeChatCollectionMap
 
 
     @Override
-    public int addCollection(Long materialId, Long userId) {
+    public int addCollection(Long materialId, String userId) {
         WeChatCollection chatCollection=new WeChatCollection();
         chatCollection.setCollectionId(SnowFlakeUtil.nextId());
         chatCollection.setMaterialId(materialId);
@@ -33,12 +33,12 @@ public class WeChatCollectionServiceImpl extends ServiceImpl<WeChatCollectionMap
     }
 
     @Override
-    public int cancleCollection(Long materialId, Long userId) {
+    public int cancleCollection(Long materialId, String userId) {
         return weChatCollectionMapper.dropCollection(materialId,userId);
     }
 
     @Override
-    public List<WeChatSideVo> collections(Long userId,String keyword) {
+    public List<WeChatSideVo> collections(String userId,String keyword) {
         return weChatCollectionMapper.findCollections(userId,keyword);
     }
 

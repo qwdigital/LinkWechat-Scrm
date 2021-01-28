@@ -145,13 +145,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
              </if>
             <if test="departmentIds != null and departmentIds !=''">
                 <if test="departmentIds.indexOf(',') != -1">
-                    AND wu.department in
+                    OR wu.department in
                     <foreach item="item" index="index" collection="departmentIds.split(',')" open="(" separator="," close=")">
                         #{item}
                     </foreach>
                 </if>
                 <if test="departmentIds.indexOf(',') == -1">
-                    AND wu.department=#{departmentIds}
+                    OR wu.department=#{departmentIds}
                 </if>
             </if>
 

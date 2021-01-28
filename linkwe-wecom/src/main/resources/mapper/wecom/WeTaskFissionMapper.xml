@@ -10,17 +10,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="fissInfo"    column="fiss_info"    />
         <result property="fissNum"    column="fiss_num"    />
         <result property="startTime"    column="start_time"    />
-        <result property="overTime"    column="end_time"    />
+        <result property="overTime"    column="over_time"    />
         <result property="customerTagId"    column="customer_tag_id"    />
         <result property="customerTag"    column="customer_tag"    />
-        <result property="postersPath"    column="posters_path"    />
+        <result property="postersId"    column="posters_id"    />
+        <result property="postersUrl"    column="posters_url"    />
         <result property="fissStaffId"    column="fiss_staff_id"    />
         <result property="fissStaff"    column="fiss_staff"    />
         <result property="fissStaffQrcode"    column="fiss_staff_qrcode"    />
         <result property="rewardUrl"    column="reward_url"    />
-        <result property="rewardImagePath"    column="reward_image_path"    />
+        <result property="rewardImageUrl"    column="reward_image_url"    />
         <result property="rewardRule"    column="reward_rule"    />
         <result property="fissStatus"    column="fiss_status"    />
+        <result property="welcomeMsg"    column="welcome_msg"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -28,7 +30,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectWeTaskFissionVo">
-        select id, task_name, fiss_info, fiss_num, start_time, end_time, customer_tag_id, customer_tag, posters_path, fiss_staff_id, fiss_staff, fiss_staff_qrcode, reward_url, reward_image_path, reward_rule, fiss_status, create_by, create_time, update_by, update_time from we_task_fission
+        select id, task_name, fiss_info, fiss_num, start_time, over_time, customer_tag_id, customer_tag, posters_id, posters_url, fiss_staff_id, fiss_staff, fiss_staff_qrcode, reward_url, reward_image_url, reward_rule, fiss_status, welcome_msg, create_by, create_time, update_by, update_time from we_task_fission
     </sql>
 
     <select id="selectWeTaskFissionList" parameterType="WeTaskFission" resultMap="WeTaskFissionResult">
@@ -38,17 +40,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="fissInfo != null  and fissInfo != ''"> and fiss_info = #{fissInfo}</if>
             <if test="fissNum != null "> and fiss_num = #{fissNum}</if>
             <if test="startTime != null "> and start_time = #{startTime}</if>
-            <if test="overTime != null "> and end_time = #{overTime}</if>
+            <if test="overTime != null "> and over_time = #{overTime}</if>
             <if test="customerTagId != null  and customerTagId != ''"> and customer_tag_id = #{customerTagId}</if>
             <if test="customerTag != null  and customerTag != ''"> and customer_tag = #{customerTag}</if>
-            <if test="postersPath != null  and postersPath != ''"> and posters_path = #{postersPath}</if>
+            <if test="postersId != null "> and posters_id = #{postersId}</if>
+            <if test="postersUrl != null  and postersUrl != ''"> and posters_url = #{postersUrl}</if>
             <if test="fissStaffId != null  and fissStaffId != ''"> and fiss_staff_id = #{fissStaffId}</if>
             <if test="fissStaff != null  and fissStaff != ''"> and fiss_staff = #{fissStaff}</if>
             <if test="fissStaffQrcode != null  and fissStaffQrcode != ''"> and fiss_staff_qrcode = #{fissStaffQrcode}</if>
             <if test="rewardUrl != null  and rewardUrl != ''"> and reward_url = #{rewardUrl}</if>
-            <if test="rewardImagePath != null  and rewardImagePath != ''"> and reward_image_path = #{rewardImagePath}</if>
+            <if test="rewardImageUrl != null  and rewardImageUrl != ''"> and reward_image_url = #{rewardImageUrl}</if>
             <if test="rewardRule != null  and rewardRule != ''"> and reward_rule = #{rewardRule}</if>
             <if test="fissStatus != null "> and fiss_status = #{fissStatus}</if>
+            <if test="welcomeMsg != null  and welcomeMsg != ''"> and welcome_msg = #{welcomeMsg}</if>
         </where>
     </select>
     
@@ -64,17 +68,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="fissInfo != null">fiss_info,</if>
             <if test="fissNum != null">fiss_num,</if>
             <if test="startTime != null">start_time,</if>
-            <if test="overTime != null">end_time,</if>
+            <if test="overTime != null">over_time,</if>
             <if test="customerTagId != null and customerTagId != ''">customer_tag_id,</if>
             <if test="customerTag != null">customer_tag,</if>
-            <if test="postersPath != null and postersPath != ''">posters_path,</if>
+            <if test="postersId != null">posters_id,</if>
+            <if test="postersUrl != null and postersUrl != ''">posters_url,</if>
             <if test="fissStaffId != null and fissStaffId != ''">fiss_staff_id,</if>
             <if test="fissStaff != null and fissStaff != ''">fiss_staff,</if>
             <if test="fissStaffQrcode != null and fissStaffQrcode != ''">fiss_staff_qrcode,</if>
             <if test="rewardUrl != null and rewardUrl != ''">reward_url,</if>
-            <if test="rewardImagePath != null and rewardImagePath != ''">reward_image_path,</if>
+            <if test="rewardImageUrl != null and rewardImageUrl != ''">reward_image_url,</if>
             <if test="rewardRule != null">reward_rule,</if>
             <if test="fissStatus != null">fiss_status,</if>
+            <if test="welcomeMsg != null">welcome_msg,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
@@ -88,14 +94,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="overTime != null">#{overTime},</if>
             <if test="customerTagId != null and customerTagId != ''">#{customerTagId},</if>
             <if test="customerTag != null">#{customerTag},</if>
-            <if test="postersPath != null and postersPath != ''">#{postersPath},</if>
+            <if test="postersId != null">#{postersId},</if>
+            <if test="postersUrl != null and postersUrl != ''">#{postersUrl},</if>
             <if test="fissStaffId != null and fissStaffId != ''">#{fissStaffId},</if>
             <if test="fissStaff != null and fissStaff != ''">#{fissStaff},</if>
             <if test="fissStaffQrcode != null and fissStaffQrcode != ''">#{fissStaffQrcode},</if>
             <if test="rewardUrl != null and rewardUrl != ''">#{rewardUrl},</if>
-            <if test="rewardImagePath != null and rewardImagePath != ''">#{rewardImagePath},</if>
+            <if test="rewardImageUrl != null and rewardImageUrl != ''">#{rewardImageUrl},</if>
             <if test="rewardRule != null">#{rewardRule},</if>
             <if test="fissStatus != null">#{fissStatus},</if>
+            <if test="welcomeMsg != null">#{welcomeMsg},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
@@ -110,17 +118,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="fissInfo != null">fiss_info = #{fissInfo},</if>
             <if test="fissNum != null">fiss_num = #{fissNum},</if>
             <if test="startTime != null">start_time = #{startTime},</if>
-            <if test="overTime != null">end_time = #{overTime},</if>
+            <if test="overTime != null">over_time = #{overTime},</if>
             <if test="customerTagId != null and customerTagId != ''">customer_tag_id = #{customerTagId},</if>
             <if test="customerTag != null">customer_tag = #{customerTag},</if>
-            <if test="postersPath != null and postersPath != ''">posters_path = #{postersPath},</if>
+            <if test="postersId != null">posters_id = #{postersId},</if>
+            <if test="postersUrl != null and postersUrl != ''">posters_url = #{postersUrl},</if>
             <if test="fissStaffId != null and fissStaffId != ''">fiss_staff_id = #{fissStaffId},</if>
             <if test="fissStaff != null and fissStaff != ''">fiss_staff = #{fissStaff},</if>
             <if test="fissStaffQrcode != null and fissStaffQrcode != ''">fiss_staff_qrcode = #{fissStaffQrcode},</if>
             <if test="rewardUrl != null and rewardUrl != ''">reward_url = #{rewardUrl},</if>
-            <if test="rewardImagePath != null and rewardImagePath != ''">reward_image_path = #{rewardImagePath},</if>
+            <if test="rewardImageUrl != null and rewardImageUrl != ''">reward_image_url = #{rewardImageUrl},</if>
             <if test="rewardRule != null">reward_rule = #{rewardRule},</if>
             <if test="fissStatus != null">fiss_status = #{fissStatus},</if>
+            <if test="welcomeMsg != null">welcome_msg = #{welcomeMsg},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>

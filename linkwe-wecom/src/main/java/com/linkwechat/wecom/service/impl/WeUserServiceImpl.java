@@ -296,10 +296,10 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
     }
 
     @Override
-    public WeUserInfoVo getUserInfo(String code) {
+    public WeUserInfoVo getUserInfo(String code,String agentId) {
 
 
-        WeUserInfoDto getuserinfo = weUserClient.getuserinfo(code);
+        WeUserInfoDto getuserinfo = weUserClient.getuserinfo(code,agentId);
 
         return WeUserInfoVo.builder()
                 .userId(getuserinfo.getUserId())

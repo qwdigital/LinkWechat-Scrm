@@ -33,7 +33,7 @@ public class WeChatCollectionController extends BaseController {
     //@PreAuthorize("@ss.hasPermi('chat:collection:add')")
     @Log(title = "添加收藏", businessType = BusinessType.INSERT)
     @PutMapping("addCollection")
-    public AjaxResult addCollection(@RequestParam(value = "materialId") Long materialId,@RequestParam(value = "userId") Long userId) {
+    public AjaxResult addCollection(@RequestParam(value = "materialId") Long materialId,@RequestParam(value = "userId") String userId) {
         return toAjax(weChatCollectionService.addCollection(materialId, userId));
     }
 
@@ -44,7 +44,7 @@ public class WeChatCollectionController extends BaseController {
     @PreAuthorize("@ss.hasPermi('chat:collection:delete')")
    // @Log(title = "取消收藏", businessType = BusinessType.UPDATE)
     @PostMapping(value = "cancleCollection")
-    public AjaxResult cancleCollection(@RequestParam(value = "materialId") Long materialId,@RequestParam(value = "userId") Long userId) {
+    public AjaxResult cancleCollection(@RequestParam(value = "materialId") Long materialId,@RequestParam(value = "userId") String userId) {
         return toAjax(weChatCollectionService.cancleCollection(materialId, userId));
     }
 
@@ -53,7 +53,7 @@ public class WeChatCollectionController extends BaseController {
      */
   //  @PreAuthorize("@ss.hasPermi('chat:collection:list')")
     @GetMapping("/list")
-    public TableDataInfo list(@RequestParam(value = "userId") Long userId,@RequestParam(value = "keyword",required = false) String keyword) {
+    public TableDataInfo list(@RequestParam(value = "userId") String userId,@RequestParam(value = "keyword",required = false) String keyword) {
         startPage();
         List<WeChatSideVo> collections = weChatCollectionService.collections(userId,keyword);
         return getDataTable(collections);

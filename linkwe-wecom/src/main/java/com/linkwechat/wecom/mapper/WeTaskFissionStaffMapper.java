@@ -28,12 +28,20 @@ public interface WeTaskFissionStaffMapper {
     public List<WeTaskFissionStaff> selectWeTaskFissionStaffList(WeTaskFissionStaff weTaskFissionStaff);
 
     /**
-     * 新增裂变任务员工列
+     * 新增裂变任务员工
      *
-     * @param weTaskFissionStaff 裂变任务员工列
+     * @param weTaskFissionStaff 裂变任务员工
      * @return 结果
      */
     public int insertWeTaskFissionStaff(WeTaskFissionStaff weTaskFissionStaff);
+
+    /**
+     * 批量新增裂变任务员工
+     *
+     * @param weTaskFissionStaffList 裂变任务员工List
+     * @return 结果
+     */
+    public int insertWeTaskFissionStaffList(List<WeTaskFissionStaff> weTaskFissionStaffList);
 
     /**
      * 修改裂变任务员工列

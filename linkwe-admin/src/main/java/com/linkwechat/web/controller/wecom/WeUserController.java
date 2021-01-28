@@ -221,11 +221,11 @@ public class WeUserController extends BaseController {
      * @return
      */
     @GetMapping("/getUserInfo")
-    public AjaxResult getUserInfo(String code)
+    public AjaxResult getUserInfo(String code,String agentId)
     {
 
         return AjaxResult.success(
-                weUserService.getUserInfo(code)
+                weUserService.getUserInfo(code,agentId)
         );
     }
 

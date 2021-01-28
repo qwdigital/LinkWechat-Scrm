@@ -124,6 +124,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .antMatchers("/wecom/ticket/**").anonymous()
 
                 .antMatchers("/wecom/user/getUserInfo").anonymous()
+               // .antMatchers("/common/uploadFile2Cos").anonymous()
 
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()

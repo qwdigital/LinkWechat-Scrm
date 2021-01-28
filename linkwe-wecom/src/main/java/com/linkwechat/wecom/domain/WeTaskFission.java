@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.core.domain.BaseEntity;
@@ -8,16 +9,17 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.Date;
+import java.util.List;
 
 /**
- * 任务宝对象 we_task_fission
+ * 任务宝主对象 we_task_fission
  *
- * @author leejoker
- * @date 2021-01-20
+ * @author leejoker <1056650571@qq.com>
+ * @date 2021-01-27
  */
 @Data
 public class WeTaskFission extends BaseEntity {
-    private static final long serialVersionUID = -6092187482853822532L;
+    private static final long serialVersionUID = -3145843701063325455L;
     /**
      * 主键
      */
@@ -56,6 +58,12 @@ public class WeTaskFission extends BaseEntity {
     private Date overTime;
 
     /**
+     * 发起成员
+     */
+    @TableField(exist = false)
+    private List<WeTaskFissionStaff> taskFissionStaffs;
+
+    /**
      * 客户标签id列表，当为全部时保存为all
      */
     @Excel(name = "客户标签id列表，当为全部时保存为all")
@@ -68,10 +76,16 @@ public class WeTaskFission extends BaseEntity {
     private String customerTag;
 
     /**
+     * 海报id
+     */
+    @Excel(name = "海报id")
+    private Long postersId;
+
+    /**
      * 裂变海报路径
      */
     @Excel(name = "裂变海报路径")
-    private String postersPath;
+    private String postersUrl;
 
     /**
      * 任务裂变目标员工
@@ -101,7 +115,7 @@ public class WeTaskFission extends BaseEntity {
      * 兑奖链接图片
      */
     @Excel(name = "兑奖链接图片")
-    private String rewardImagePath;
+    private String rewardImageUrl;
 
     /**
      * 兑奖规则
@@ -115,6 +129,12 @@ public class WeTaskFission extends BaseEntity {
     @Excel(name = "任务裂变活动状态，1 进行中 2 已结束")
     private Integer fissStatus;
 
+    /**
+     * 新客欢迎语
+     */
+    @Excel(name = "新客欢迎语")
+    private String welcomeMsg;
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
@@ -126,14 +146,16 @@ public class WeTaskFission extends BaseEntity {
                 .append("overTime", getOverTime())
                 .append("customerTagId", getCustomerTagId())
                 .append("customerTag", getCustomerTag())
-                .append("postersPath", getPostersPath())
+                .append("postersId", getPostersId())
+                .append("postersUrl", getPostersUrl())
                 .append("fissStaffId", getFissStaffId())
                 .append("fissStaff", getFissStaff())
                 .append("fissStaffQrcode", getFissStaffQrcode())
                 .append("rewardUrl", getRewardUrl())
-                .append("rewardImagePath", getRewardImagePath())
+                .append("rewardImageUrl", getRewardImageUrl())
                 .append("rewardRule", getRewardRule())
                 .append("fissStatus", getFissStatus())
+                .append("welcomeMsg", getWelcomeMsg())
                 .append("createBy", getCreateBy())
                 .append("createTime", getCreateTime())
                 .append("updateBy", getUpdateBy())

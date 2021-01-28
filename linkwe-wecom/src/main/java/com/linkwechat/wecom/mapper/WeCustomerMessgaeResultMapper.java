@@ -38,4 +38,11 @@ public interface WeCustomerMessgaeResultMapper extends BaseMapper<WeCustomerMess
      */
     List<WeCustomerMessageResultVo> customerMessagePushs(@Param("messageId") Long messageId,@Param("status") String status);
 
+    /**
+     * 检查是否已经同步群发结果
+     *
+     * @param messageId 微信消息表id
+     * @return 已发送消息数
+     */
+    int  checkSendStatus(@Param("messageId") Long messageId);
 }

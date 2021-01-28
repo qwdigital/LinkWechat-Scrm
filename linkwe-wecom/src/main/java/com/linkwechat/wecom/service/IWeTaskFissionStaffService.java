@@ -36,6 +36,14 @@ public interface IWeTaskFissionStaffService {
     public int insertWeTaskFissionStaff(WeTaskFissionStaff weTaskFissionStaff);
 
     /**
+     * 批量新增裂变任务员工
+     *
+     * @param weTaskFissionStaffs 裂变任务员工列表
+     * @return 结果
+     */
+    public int insertWeTaskFissionStaffList(List<WeTaskFissionStaff> weTaskFissionStaffs);
+
+    /**
      * 修改裂变任务员工列
      *
      * @param weTaskFissionStaff 裂变任务员工列
@@ -61,6 +69,7 @@ public interface IWeTaskFissionStaffService {
 
     /**
      * t根据任务id获取员工信息列表
+     *
      * @param taskId 任务id
      * @return
      */

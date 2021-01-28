@@ -33,6 +33,10 @@ public class WeComeConfig {
 
     /** 会话存档所需token 的url */
     private String[] needChatTokenUrl;
+
     /** 应用所需token 的url **/
     private String[] needAgentTokenUrl;
+
+    /** 第三方自建应用得url*/
+    private String[] thirdAppUrl;
 }

@@ -27,7 +27,7 @@
     <select id="customerMessagePushs" resultType="com.linkwechat.wecom.domain.vo.WeCustomerMessageResultVo">
         SELECT
         user_name,
-        GROUP_CONCAT(external_name SEPARATOR '、') customers
+        GROUP_CONCAT(IFNULL(external_name,chat_name) SEPARATOR '、') customers
         FROM
         we_customer_messgaeResult
         <where>
@@ -37,5 +37,15 @@
             </if>
         </where>
         GROUP BY user_name
+    </select>
+    <select id="checkSendStatus" resultType="java.lang.Integer">
+        SELECT
+
+            COUNT(1)
+        FROM
+            we_customer_messgaeResult
+       <where>
+           message_id =#{messageId} AND `status`='1'
+       </where>
     </select>
 </mapper>

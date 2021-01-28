@@ -3,6 +3,7 @@ package com.linkwechat.wecom.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.linkwechat.wecom.domain.WeCustomerMessageOriginal;
+import com.linkwechat.wecom.domain.dto.message.AsyncResultDto;
 import com.linkwechat.wecom.domain.vo.CustomerMessagePushVo;
 
 import java.util.List;
@@ -44,8 +45,8 @@ public interface IWeCustomerMessageOriginalService extends IService<WeCustomerMe
     /**
      * 同步发送结果
      *
-     * @param msgid 可以用于获取发送结果
+     * @param asyncResultDto 可以用于获取发送结果
      */
-    void asyncResult(String msgid, Long messageId);
+    void asyncResult(AsyncResultDto asyncResultDto) throws JsonProcessingException;
 
 }

@@ -12,14 +12,17 @@ import com.linkwechat.wecom.domain.dto.WeExternalContactDto;
  **/
 public interface WeExternalContactClient {
 
-    @Request(url="/externalcontact/add_contact_way",
+    @Request(url = "/externalcontact/add_contact_way",
             type = "POST"
     )
     WeExternalContactDto addContactWay(@DataObject WeExternalContactDto.WeContactWay weContactWay);
 
-    @Request(url="/externalcontact/update_contact_way", type = "POST")
+    @Request(url = "/externalcontact/update_contact_way", type = "POST")
     WeExternalContactDto updateContactWay(@DataObject WeExternalContactDto.WeContactWay weContactWay);
 
     @Request(url = "/externalcontact/del_contact_way", type = "POST")
     WeExternalContactDto delContactWay(@Query("configId") String configId);
+
+    @Request(url = "/externalcontact/get_contact_way", type = "POST")
+    WeExternalContactDto getContactWay(@Query("configId") String configId);
 }

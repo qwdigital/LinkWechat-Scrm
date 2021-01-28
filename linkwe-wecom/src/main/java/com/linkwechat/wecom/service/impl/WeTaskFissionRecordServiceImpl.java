@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * 裂变任务完成记录Service业务层处理
+ * 裂变任务记录Service业务层处理
  *
- * @author leejoker
- * @date 2021-01-20
+ * @author ruoyi
+ * @date 2021-01-27
  */
 @Service
 public class WeTaskFissionRecordServiceImpl implements IWeTaskFissionRecordService {
@@ -20,10 +20,10 @@ public class WeTaskFissionRecordServiceImpl implements IWeTaskFissionRecordServi
     private WeTaskFissionRecordMapper weTaskFissionRecordMapper;
 
     /**
-     * 查询裂变任务完成记录
+     * 查询裂变任务记录
      *
-     * @param id 裂变任务完成记录ID
-     * @return 裂变任务完成记录
+     * @param id 裂变任务记录ID
+     * @return 裂变任务记录
      */
     @Override
     public WeTaskFissionRecord selectWeTaskFissionRecordById(Long id) {
@@ -31,10 +31,10 @@ public class WeTaskFissionRecordServiceImpl implements IWeTaskFissionRecordServi
     }
 
     /**
-     * 查询裂变任务完成记录列表
+     * 查询裂变任务记录列表
      *
-     * @param weTaskFissionRecord 裂变任务完成记录
-     * @return 裂变任务完成记录
+     * @param weTaskFissionRecord 裂变任务记录
+     * @return 裂变任务记录
      */
     @Override
     public List<WeTaskFissionRecord> selectWeTaskFissionRecordList(WeTaskFissionRecord weTaskFissionRecord) {
@@ -42,9 +42,9 @@ public class WeTaskFissionRecordServiceImpl implements IWeTaskFissionRecordServi
     }
 
     /**
-     * 新增裂变任务完成记录
+     * 新增裂变任务记录
      *
-     * @param weTaskFissionRecord 裂变任务完成记录
+     * @param weTaskFissionRecord 裂变任务记录
      * @return 结果
      */
     @Override
@@ -53,9 +53,9 @@ public class WeTaskFissionRecordServiceImpl implements IWeTaskFissionRecordServi
     }
 
     /**
-     * 修改裂变任务完成记录
+     * 修改裂变任务记录
      *
-     * @param weTaskFissionRecord 裂变任务完成记录
+     * @param weTaskFissionRecord 裂变任务记录
      * @return 结果
      */
     @Override
@@ -64,9 +64,9 @@ public class WeTaskFissionRecordServiceImpl implements IWeTaskFissionRecordServi
     }
 
     /**
-     * 批量删除裂变任务完成记录
+     * 批量删除裂变任务记录
      *
-     * @param ids 需要删除的裂变任务完成记录ID
+     * @param ids 需要删除的裂变任务记录ID
      * @return 结果
      */
     @Override
@@ -75,9 +75,9 @@ public class WeTaskFissionRecordServiceImpl implements IWeTaskFissionRecordServi
     }
 
     /**
-     * 删除裂变任务完成记录信息
+     * 删除裂变任务记录信息
      *
-     * @param id 裂变任务完成记录ID
+     * @param id 裂变任务记录ID
      * @return 结果
      */
     @Override

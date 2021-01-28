@@ -52,6 +52,11 @@ public class WeTaskFissionStaffServiceImpl implements IWeTaskFissionStaffService
         return weTaskFissionStaffMapper.insertWeTaskFissionStaff(weTaskFissionStaff);
     }
 
+    @Override
+    public int insertWeTaskFissionStaffList(List<WeTaskFissionStaff> weTaskFissionStaffs) {
+        return 0;
+    }
+
     /**
      * 修改裂变任务员工列
      *

@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service;
 
 import com.linkwechat.wecom.domain.WeTaskFission;
+import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
 
 import java.util.List;
 
@@ -61,7 +62,16 @@ public interface IWeTaskFissionService {
 
     /**
      * 发送任务
+     *
      * @param id 任务id
      */
     public void sendWeTaskFission(Long id);
+
+    /**
+     * 生成裂变任务海报
+     *
+     * @param weTaskFissionPosterDTO 裂变任务客户信息
+     * @return
+     */
+    public String fissionPosterGenerate(WeTaskFissionPosterDTO weTaskFissionPosterDTO);
 }

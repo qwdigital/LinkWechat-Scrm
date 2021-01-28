@@ -29,7 +29,7 @@ public interface WeChatCollectionMapper extends BaseMapper<WeChatCollection> {
      * @param userId 用户id
      * @return 结果
      */
-    public int dropCollection(@Param("materialId") Long materialId,@Param("userId") Long userId);
+    public int dropCollection(@Param("materialId") Long materialId,@Param("userId") String userId);
 
     /**
      * 通过素材id和用户id查询当前素材的收藏条数
@@ -38,7 +38,7 @@ public interface WeChatCollectionMapper extends BaseMapper<WeChatCollection> {
      * @param userId 用户id
      * @return 当前素材收藏的条数
      */
-    public int countCollectionByMaterialIdAndUserId(@Param("materialId") Long materialId,@Param("userId") Long userId);
+    public int countCollectionByMaterialIdAndUserId(@Param("materialId") Long materialId,@Param("userId") String userId);
 
     /**
      * 收藏列表
@@ -46,6 +46,6 @@ public interface WeChatCollectionMapper extends BaseMapper<WeChatCollection> {
      * @param userId 用户id
      * @return {@link WeChatSideVo}s
      */
-    public List<WeChatSideVo> findCollections(@Param("userId") Long userId,@Param("keyword") String keyword);
+    public List<WeChatSideVo> findCollections(@Param("userId") String userId,@Param("keyword") String keyword);
 
 }
