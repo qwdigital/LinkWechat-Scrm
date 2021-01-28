@@ -50,6 +50,8 @@ public class WeTaskFissionRecord extends BaseEntity {
     @Excel(name = "裂变客户数量")
     private Long fissNum;
 
+    private String configId;
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
@@ -58,6 +60,7 @@ public class WeTaskFissionRecord extends BaseEntity {
                 .append("customerId", getCustomerId())
                 .append("customerName", getCustomerName())
                 .append("fissNum", getFissNum())
+                .append("configId", getConfigId())
                 .toString();
     }
 }

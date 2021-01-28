@@ -191,6 +191,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
                 int insertRows = weTaskFissionRecordService.insertWeTaskFissionRecord(record);
                 if (insertRows > 0) {
                     recordId = record.getId();
+
                 } else {
                     throw new RuntimeException("生成海报异常：插入裂变记录失败");
                 }
