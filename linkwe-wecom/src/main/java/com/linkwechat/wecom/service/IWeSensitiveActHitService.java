@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeSensitiveActHit;
 
@@ -34,4 +35,11 @@ public interface IWeSensitiveActHitService extends IService<WeSensitiveActHit> {
      * @return 结果
      */
     public boolean insertWeSensitiveActHit(WeSensitiveActHit weSensitiveActHit);
+
+    /**
+     * 过滤敏感行为，并保存
+     *
+     * @param chatDataList
+     */
+    public void hitWeSensitiveAct(List<JSONObject> chatDataList);
 }
