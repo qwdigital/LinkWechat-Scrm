@@ -1,5 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.wecom.domain.WeTaskFissionRecord;
 import com.linkwechat.wecom.mapper.WeTaskFissionRecordMapper;
 import com.linkwechat.wecom.service.IWeTaskFissionRecordService;
@@ -15,7 +17,7 @@ import java.util.List;
  * @date 2021-01-27
  */
 @Service
-public class WeTaskFissionRecordServiceImpl implements IWeTaskFissionRecordService {
+public class WeTaskFissionRecordServiceImpl extends ServiceImpl<WeTaskFissionRecordMapper,WeTaskFissionRecord> implements IWeTaskFissionRecordService {
     @Autowired
     private WeTaskFissionRecordMapper weTaskFissionRecordMapper;
 
@@ -83,5 +85,12 @@ public class WeTaskFissionRecordServiceImpl implements IWeTaskFissionRecordServi
     @Override
     public int deleteWeTaskFissionRecordById(Long id) {
         return weTaskFissionRecordMapper.deleteWeTaskFissionRecordById(id);
+    }
+
+    @Override
+    public WeTaskFissionRecord selectWeTaskFissionRecordByIdAndCustomerId(Long id, String customerId) {
+        return weTaskFissionRecordMapper.selectOne(new LambdaQueryWrapper<WeTaskFissionRecord>()
+        .eq(WeTaskFissionRecord::getId,id)
+        .eq(WeTaskFissionRecord::getCustomerId,customerId));
     }
 }
