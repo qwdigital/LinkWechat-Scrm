@@ -25,7 +25,7 @@ export default {
 <template>
   <div class="preview ac">
     <div class="top">小微</div>
-    <div class="small">塬微科技-企微</div>
+    <div class="small">仟微科技-企微</div>
     <div class="time">凌晨2:20</div>
     <div class="flex msg-li">
       <el-avatar
