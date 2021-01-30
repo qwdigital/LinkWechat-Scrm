@@ -3,6 +3,7 @@ import { getTree, getList } from '@/api/material'
 export default {
   components: {},
   props: {
+    // 0: '图片', 1: '语音', 2: '视频', 3: '普通文件', 4: '文本', 5: '海报',
     type: {
       type: String,
       default: '4',
@@ -168,6 +169,7 @@ export default {
     <el-row :gutter="10">
       <el-col :span="6">
         <el-tree
+          class="bfc-o"
           ref="tree"
           :data="treeData"
           :props="treeProps"
@@ -196,7 +198,16 @@ export default {
           @selection-change="handleSelectionChange"
         >
           <el-table-column type="selection" width="55" align="center" />
-          <el-table-column prop="content" label="文本内容"></el-table-column>
+          <el-table-column
+            v-if="type == 4"
+            prop="content"
+            label="文本内容"
+          ></el-table-column>
+          <el-table-column
+            v-else
+            prop="materialName"
+            label="素材名称"
+          ></el-table-column>
           <el-table-column prop="createTime" label="时间"></el-table-column>
         </el-table>
 
