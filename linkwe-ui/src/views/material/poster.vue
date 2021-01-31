@@ -31,6 +31,7 @@ export default {
   data () {
     return {
       imgList: {},
+      imgData: [],
       dialog: {
         preview: false, // 预览弹出显示隐藏
         edit: false // 编辑弹出显示隐藏
@@ -356,6 +357,13 @@ export default {
         }
       });
     },
+    // 获取子组件传来的数据
+    getImgData(data) {
+      this.imgList.id = data.imgUrl
+      // console.log(data)
+      this.imgData.push(data)
+      // console.log(this.imgData)
+    },
     //
     async save() {
       let list =[];
@@ -387,6 +395,10 @@ export default {
       let i = 0, len = list.length;
       while (i < len) {
         let vo = list[i];
+        vo.objType = this.imgData[i].objType;
+        vo.url = this.imgData[i].url;
+        vo.randomId = this.imgData[i].randomId;
+        // console.log(vo)
         let type = list[i].type;
         let align = vo.textAlign && 
                     (vo.textAlign === 'left' ? 1 : vo.textAlign === 'center' ? 2 : 3) 
@@ -395,8 +407,8 @@ export default {
         let posData = {
           id: vo.randomId || i,
           content: vo.text || '',   // 文本内容 
-          delFlag: 1,   // 1 启动  0 删除      FIXME 暂时写死
-          fontColor: vo.fill || '#000000',
+          delFlag: 0,   // 1 启动  0 删除      FIXME 暂时写死
+          fontColor: vo.fill || '#000000', // 
           fontId: isText ? i : null,   // 字体ID   与imgPath互斥
           fontSize: vo.fontSize,
           fontTextAlign: align, // 1 2 3  left center right
@@ -406,12 +418,12 @@ export default {
           height: vo.height,
           imgPath: vo.url || '',
           posterId: null,
-          type: isText ? 1 : vo.objType,   //  1 固定文本 2 固定图片 3 二维码图片
-          alpha: vo.opacity,
+          type: isText ? 1 : vo.objType,  //  1 固定文本 2 固定图片 3 二维码图片
+          // alpha: vo.opacity, // 页面没有设置透明度，可不传
           fontStyle: (vo.italic && vo.bold) ? 3 : vo.italic ? 2 : vo.bold ? 1 : 0, // 0 通常 1 粗体 2 斜体 3 粗 + 斜
           rotate: vo.angle,
           order: i,  // 层级
-          categoryId: 0, // 分类ID
+          // categoryId: 0, // 分类ID (不需要传了)
           verticalType: 2 // 居中方式 写死2
         };
         posterSubList.push(posData);
@@ -424,13 +436,13 @@ export default {
       if (posterForm.id) {
         // 编辑海报
         res = await updatePoster(Object.assign({}, {
-          backgroundImgPath: 'http://106.13.236.58:8080/profile/2020/12/31/5ca3fa0b-55d7-433c-ba02-61d4502e45e1.jpg',
+          backgroundImgPath: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg',
           posterSubassemblyList: []
         }, this.posterForm))
       } else {
         // 新建海报
         res = await addPoster(Object.assign({}, {
-          backgroundImgPath: 'http://106.13.236.58:8080/profile/2020/12/31/5ca3fa0b-55d7-433c-ba02-61d4502e45e1.jpg',
+          backgroundImgPath: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg',
           posterSubassemblyList: posterSubList
         }, this.posterForm))
       }
@@ -590,6 +602,7 @@ export default {
               ref="tuiImageEditor"
               :include-ui="useDefaultUI"
               :options="options"
+              @getImageData="getImgData"
             ></tui-image-editor>
           </div>
           <div id="tbody-containerui-image-editor-controls">

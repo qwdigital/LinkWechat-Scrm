@@ -1,8 +1,12 @@
 <template>
-    <div ref="tuiImageEditor" style="width: 100%;height: 100%;"></div>
+    <div>
+        <div ref="tuiImageEditor" style="width: 100%;height: 100%;"></div>
+        <select-material ref="selectMaterial" type="1" :showArr="[1]" :visible.sync="visible" @success="getMaterial" />
+    </div>
 </template>
 <script>
 import ImageEditor from 'tui-image-editor';
+import selectMaterial from '@/components/SelectMaterial'
 import { setTimeout } from 'timers';
 import colorPicker from 'tui-color-picker';
 import qrCodeImage from "@/assets/poster/img/qrCodeImage.png";
@@ -18,6 +22,9 @@ const editorDefaultOptions = {
 };
 export default {
     name: 'PosterPage',
+    components: {
+        selectMaterial
+    },
     props: {
         btnContainer: null, // 自带按钮容器
         includeUi: {
@@ -29,6 +36,11 @@ export default {
             default() {
                 return editorDefaultOptions;
             }
+        }
+    },
+    data() {
+        return {
+            visible: false
         }
     },
     mounted() {
@@ -49,7 +61,7 @@ export default {
                 },500)
             });
         }
-        this.editorInstance.loadImageFromURL('https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F171%2F106%2F1472%2F95744001.jpg&refer=http%3A%2F%2Fimg1.gtimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1612444990&t=6589254fe9669cc6a45fd3688f269612', 'imagePoster').then(async result => {
+        this.editorInstance.loadImageFromURL('https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg', 'imagePoster').then(async result => {
             console.log('old : ' + result.oldWidth + ', ' + result.oldHeight);
             console.log('new : ' + result.newWidth + ', ' + result.newHeight);
             // await this.addImage('https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg')
@@ -157,7 +169,6 @@ export default {
                 this.btnTextStyle[i].addEventListener('click', this.mouseClickHandler.bind(this));
                 i++;
             }
-            
             this.editorInstance.on({
                 objectAdded: function (objectProps) {
                     console.info(objectProps);
@@ -433,23 +444,35 @@ export default {
             };
         },
         getImages () {
+            this.visible = true; // 显示图片列表dialog
+            // this.activateImageMode();   
+            // this.addImage('https://images.gitee.com/uploads/images/2020/1231/234016_20fdd151_1480777.png',2);
+        },
+        // 提交选择的图片
+        getMaterial(text, image, file) {
+            // console.log(image.materialUrl)
             this.activateImageMode();
-            this.addImage('https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg',2);
+            this.addImage(image.materialUrl, 2);
+            this.visible = false;
         },
         addImage (imgPath, type) {
             if (!imgPath || !imgPath.length){
                 throw Error("imgPath can't null")
             }
             this.editorInstance.addImageObject(imgPath).then(objectProps => {
-                console.log(objectProps.id);
                 let id = this.GenNonDuplicateID() + '_' + objectProps.id;
-                this.$parent.imgList[id] = imgPath;  // FIXME 
-                let target = this.$parent.records[objectProps.id];
-                if (target) {
+                // this.$parent.imgList[id] = imgPath;  // FIXME
+                // console.log(objectProps)
+                // console.log(this.$parent.records)
+                // let target = this.$parent.records[objectProps.id];
+                
+                let target = {}
+                // if (target) {
                     target.url = imgPath;
-                    target.randomId = id;
+                    target.randomId = objectProps.id;
                     target.objType = type;
-                }
+                // }
+                this.$emit('getImageData', target); // 将图片数据传给父组件保存
             });
         },
         addText (text, style = null, position = null) {
