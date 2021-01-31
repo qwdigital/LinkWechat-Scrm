@@ -190,8 +190,6 @@ wecome:
           - /externalcontact/unionid_to_external_userid
           - /externalcontact/add_msg_template
           - /externalcontact/get_group_msg_result
-          - /get_jsapi_ticket
-          - /ticket/get
   fileUplodUrl:  /media/upload,/media/uploadimg
   needProviderTokenUrl:
           - /service/get_login_info
@@ -201,6 +199,8 @@ wecome:
           - /msgaudit/check_room_agree
           - /msgaudit/groupchat/get
   needAgentTokenUrl:
+          - /get_jsapi_ticket
+          - /ticket/get
           - /message/send
   thirdAppUrl:
           - /user/getuserinfo

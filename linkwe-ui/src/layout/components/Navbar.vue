@@ -10,7 +10,7 @@
     <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
 
     <div class="right-menu">
-      <template v-if="device!=='mobile'">
+      <template v-if="device !== 'mobile'">
         <search id="header-search" class="right-menu-item" />
 
         <el-tooltip content="源码地址" effect="dark" placement="bottom">
@@ -28,9 +28,12 @@
         <screenfull id="screenfull" class="right-menu-item hover-effect" />
       </template>
 
-      <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
+      <el-dropdown
+        class="avatar-container right-menu-item hover-effect"
+        trigger="click"
+      >
         <div class="avatar-wrapper">
-          塬微
+          仟微
           <!-- <img :src="avatar" class="user-avatar"> -->
           <i class="el-icon-caret-bottom" />
         </div>
@@ -51,11 +54,11 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-import Breadcrumb from "@/components/Breadcrumb";
-import Hamburger from "@/components/Hamburger";
-import Search from "@/components/HeaderSearch";
-import screenfull from "@/components/Screenfull";
+import { mapGetters } from 'vuex'
+import Breadcrumb from '@/components/Breadcrumb'
+import Hamburger from '@/components/Hamburger'
+import Search from '@/components/HeaderSearch'
+import screenfull from '@/components/Screenfull'
 
 export default {
   components: {
@@ -65,43 +68,43 @@ export default {
     screenfull,
   },
   computed: {
-    ...mapGetters(["sidebar", "avatar", "device"]),
+    ...mapGetters(['sidebar', 'avatar', 'device']),
     setting: {
       get() {
-        return this.$store.state.settings.showSettings;
+        return this.$store.state.settings.showSettings
       },
       set(val) {
-        this.$store.dispatch("settings/changeSetting", {
-          key: "showSettings",
+        this.$store.dispatch('settings/changeSetting', {
+          key: 'showSettings',
           value: val,
-        });
+        })
       },
     },
   },
   methods: {
     toggleSideBar() {
-      this.$store.dispatch("app/toggleSideBar");
+      this.$store.dispatch('app/toggleSideBar')
     },
     async logout() {
-      this.$confirm("确定注销并退出系统吗？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      this.$confirm('确定注销并退出系统吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       }).then(() => {
-        this.$store.dispatch("LogOut").then(() => {
-          location.href = "/";
-        });
-      });
+        this.$store.dispatch('LogOut').then(() => {
+          location.href = '/'
+        })
+      })
     },
     goto(type) {
       window.open(
         type
-          ? "https://gitee.com/LinkWeChat/link-wechat"
-          : "https://gitee.com/LinkWeChat/link-wechat"
-      );
+          ? 'https://gitee.com/LinkWeChat/link-wechat'
+          : 'https://gitee.com/LinkWeChat/link-wechat'
+      )
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>

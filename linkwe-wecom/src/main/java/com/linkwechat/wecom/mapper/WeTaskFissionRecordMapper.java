@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeTaskFissionRecord;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
  * @author ruoyi
  * @date 2021-01-27
  */
-public interface WeTaskFissionRecordMapper {
+public interface WeTaskFissionRecordMapper extends BaseMapper<WeTaskFissionRecord> {
     /**
      * 查询裂变任务记录
      *

@@ -58,4 +58,7 @@ public interface IWeTaskFissionRecordService {
      * @return 结果
      */
     public int deleteWeTaskFissionRecordById(Long id);
+
+
+    public WeTaskFissionRecord selectWeTaskFissionRecordByIdAndCustomerId(Long id, String customerId);
 }
