@@ -22,6 +22,4 @@ public interface IWeAccessTokenService {
 
 
    public void removeToken();
-
-    String findAgentAccessToken();
 }

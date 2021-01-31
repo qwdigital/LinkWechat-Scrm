@@ -198,12 +198,11 @@ wecome:
           - /msgaudit/check_single_agree
           - /msgaudit/check_room_agree
           - /msgaudit/groupchat/get
-  needAgentTokenUrl:
+  thirdAppUrl:
+          - /user/getuserinfo
           - /get_jsapi_ticket
           - /ticket/get
           - /message/send
-  thirdAppUrl:
-          - /user/getuserinfo
   #企微回调通知配置
   callBack:
     appIdOrCorpId: ww38152475d1bca752

@@ -64,8 +64,6 @@ public class WeAccessTokenInterceptor implements Interceptor{
                 token=iWeAccessTokenService.findProviderAccessToken();
             }else if(Arrays.asList(weComeConfig.getNeedChatTokenUrl()).contains(uri)){ //需要会话存档token
                 token=iWeAccessTokenService.findChatAccessToken();
-            }else if(Arrays.asList(weComeConfig.getNeedAgentTokenUrl()).contains(uri)){ //需要应用token
-                token=iWeAccessTokenService.findAgentAccessToken();
             }else  if(Arrays.asList(weComeConfig.getThirdAppUrl()).contains(uri)){ //第三方自建应用token
                 token=iWeAccessTokenService.findThirdAppAccessToken(request.getHeaderValue(WeConstans.THIRD_APP_PARAM_TIP));
             } else{

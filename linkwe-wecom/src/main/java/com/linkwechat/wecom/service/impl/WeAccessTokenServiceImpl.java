@@ -186,10 +186,5 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
         redisCache.deleteObject(WeConstans.WE_PROVIDER_ACCESS_TOKEN);
     }
 
-    @Override
-    public String findAgentAccessToken() {
-        return findAccessToken(WeConstans.WE_AGENT_ACCESS_TOKEN);
-    }
-
 
 }
