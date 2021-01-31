@@ -28,7 +28,7 @@ public class NetFileUtils {
     public static FileCallable getNetFile(String urlPath){
         FileCallable fileCallable = new FileCallable();
 
-        webClient.getAbs(urlPath).send().onSuccess(response -> {
+        webClient.getAbs(urlPath).timeout(1000L*60L*10L).send().onSuccess(response -> {
             if(response.statusCode() == 200 || response.statusCode() == 302){
                 Buffer buffer = response.body();
                 buffer.getByteBuf();
