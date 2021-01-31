@@ -7,10 +7,12 @@ import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.common.utils.img.ImageUtils;
 import com.linkwechat.common.utils.img.NetFileUtils;
+import com.linkwechat.wecom.domain.WeCategory;
 import com.linkwechat.wecom.domain.WePoster;
 import com.linkwechat.wecom.domain.WePosterFont;
 import com.linkwechat.wecom.domain.WePosterSubassembly;
 import com.linkwechat.wecom.mapper.WePosterMapper;
+import com.linkwechat.wecom.service.IWeCategoryService;
 import com.linkwechat.wecom.service.IWePosterFontService;
 import com.linkwechat.wecom.service.IWePosterService;
 import com.linkwechat.wecom.service.IWePosterSubassemblyService;
@@ -54,6 +56,9 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
     @Resource
     private ServerConfig serverConfig;
 
+    @Resource
+    private IWeCategoryService weCategoryService;
+
 
     /**
      * 查询一条
@@ -86,8 +91,10 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
                     });
                 }
             }
-
         }
+        /*if(poster.getCategoryId() != null){
+            weCategoryService.findWeCategoryById(poster.getId());
+        }*/
 
         return poster;
     }

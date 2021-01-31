@@ -398,12 +398,13 @@ export default {
       ></el-table-column>
       <el-table-column prop="userName" label="添加人（首位）" align="center">
         <template slot-scope="scope">{{
-          scope.row.weFlowerCustomerRels[0].userName
+
+          scope.row.weFlowerCustomerRels[0]?scope.row.weFlowerCustomerRels[0].userName:""
         }}</template>
       </el-table-column>
       <el-table-column prop="createTime" label="添加时间" align="center">
         <template slot-scope="scope">{{
-          scope.row.weFlowerCustomerRels[0].createTime
+          scope.row.weFlowerCustomerRels[0]?scope.row.weFlowerCustomerRels[0].createTime:""
         }}</template>
       </el-table-column>
       <el-table-column prop="address" label="标签" align="center">

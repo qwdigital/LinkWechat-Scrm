@@ -1,5 +1,5 @@
-import request from "@/utils/request";
-const service = window.CONFIG.services.wecom + "/customerMessagePush";
+import request from '@/utils/request'
+const service = window.CONFIG.services.wecom + '/customerMessagePush'
 
 /**
  * 新增企业id
@@ -35,10 +35,10 @@ const service = window.CONFIG.services.wecom + "/customerMessagePush";
  */
 export function add(data) {
   return request({
-    url: service + "/add",
-    method: "post",
-    data
-  });
+    url: service + '/add',
+    method: 'post',
+    data,
+  })
 }
 
 /**
@@ -53,9 +53,9 @@ endTime:结束时间}
  */
 export function getList(params) {
   return request({
-    url: service + "/list",
-    params
-  });
+    url: service + '/list',
+    params,
+  })
 }
 
 /**
@@ -64,9 +64,9 @@ export function getList(params) {
  */
 export function getDetail(messageId) {
   return request({
-    url: service + "/getInfo",
-    params: { messageId }
-  });
+    url: service + '/getInfo',
+    params: { messageId },
+  })
 }
 
 /**
@@ -77,7 +77,21 @@ status:发送状态 0-未发送 1-已发送 2-因客户不是好友导致发送�
  */
 export function getPushResult(params) {
   return request({
-    url: service + "/pushResults",
-    params
-  });
+    url: service + '/pushResults',
+    params,
+  })
+}
+
+/**
+ * 同步消息发送结果
+ * @param {*} data 
+ * msgid:列表msgid
+messageId:消息id
+ */
+export function syncMsg(data) {
+  return request({
+    url: service + '/asyncResult',
+    method: 'post',
+    data,
+  })
 }

@@ -70,7 +70,7 @@ public interface IWeChatContactMappingService extends IService<WeChatContactMapp
      *
      * @param query
      */
-    public List<ElasticSearchEntity> saveWeChatContactMapping(List<JSONObject> query);
+    public List<JSONObject> saveWeChatContactMapping(List<JSONObject> query);
 
     /**
      * 按客户查询关系映射列表

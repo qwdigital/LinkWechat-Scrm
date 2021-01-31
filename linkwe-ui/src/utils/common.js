@@ -52,6 +52,19 @@ export function resetForm(refName) {
 	}
 }
 
+//年月日格式
+export function yearMouthDay(data) {
+	var time = new Date(data);
+    var year = time.getFullYear();
+    var month = time.getMonth()+1;
+    var date = time.getDate();
+   console.log(year+'-'+add0(month)+'-'+add0(date))
+	return year+'-'+add0(month)+'-'+add0(date)
+	
+}
+function add0(m){return m<10?'0'+m:m }
+
+
 // 添加日期范围
 export function addDateRange(params, dateRange) {
 	var search = params;

@@ -6,6 +6,7 @@ import com.linkwechat.wecom.domain.WeChatItem;
 import com.linkwechat.wecom.domain.WeChatSide;
 import com.linkwechat.wecom.domain.WeMaterial;
 import com.linkwechat.wecom.domain.dto.WeChatItemDto;
+import com.linkwechat.wecom.domain.vo.WeChatSideVo;
 import com.linkwechat.wecom.mapper.WeChatItemMapper;
 import com.linkwechat.wecom.mapper.WeChatSideMapper;
 import com.linkwechat.wecom.service.IWeChatItemService;
@@ -92,6 +93,11 @@ public class WeChatItemServiceImpl extends ServiceImpl<WeChatItemMapper, WeChatI
 
 
         return 1;
+    }
+
+    @Override
+    public List<WeChatSideVo> chatItems(Long sideId) {
+        return weChatItemMapper.findChatItems(sideId);
     }
 
     /**
