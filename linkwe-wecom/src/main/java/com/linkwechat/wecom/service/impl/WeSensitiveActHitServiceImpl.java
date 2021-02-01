@@ -103,7 +103,7 @@ public class WeSensitiveActHitServiceImpl extends ServiceImpl<WeSensitiveActHitM
         return null;
     }
 
-    private WeSensitiveAct getSensitiveActType(String msgType) {
+    public WeSensitiveAct getSensitiveActType(String msgType) {
         String type;
         if ("card".equals(msgType)) {
             type = "发名片";

@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.wecom.domain.WeSensitiveAct;
 import com.linkwechat.wecom.domain.WeSensitiveActHit;
 
 import java.util.List;
@@ -42,4 +43,12 @@ public interface IWeSensitiveActHitService extends IService<WeSensitiveActHit> {
      * @param chatDataList
      */
     public void hitWeSensitiveAct(List<JSONObject> chatDataList);
+
+    /**
+     * 获取敏感行为类型
+     *
+     * @param msgType
+     * @return
+     */
+    public WeSensitiveAct getSensitiveActType(String msgType);
 }
