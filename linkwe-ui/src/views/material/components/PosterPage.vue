@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div ref="tuiImageEditor" style="width: 100%;height: 100%;"></div>
+        <div ref="tuiImageEditor" style="width: 100%;height: 700px;"></div>
         <select-material ref="selectMaterial" type="1" :showArr="[1]" :visible.sync="visible" @success="getMaterial" />
     </div>
 </template>
@@ -17,8 +17,7 @@ const includeUIOptions = {
     }
 };
 const editorDefaultOptions = {
-    cssMaxWidth: 640,
-    cssMaxHeight: 1136
+    cssMaxHeight: 700
 };
 export default {
     name: 'PosterPage',
