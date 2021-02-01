@@ -8,7 +8,7 @@
 
 <div align="center">
 
-![GVP Stars](http://img.shields.io/badge/GPV%20Stars-700+-yellow)
+![GVP Stars](http://img.shields.io/badge/GPV%20Stars-750+-yellow)
 ![GVP Forks](http://img.shields.io/badge/GPV%20Forks-250+-yellow)
 ![license](http://img.shields.io/badge/license-GPL%203.0-green)
 
@@ -219,7 +219,7 @@ com.linkwechat
 
 #### 开发进度
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0125/134715_c85518d5_1480777.png "LinkWeChat 1.0.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0201/153811_5fd7deb1_1480777.png "LinkWeChat 1.0.png")
 
 ### 联系作者加入群
 
