@@ -380,4 +380,6 @@ public class WeConstans {
      * 第三方应用ID，参数标实
      */
     public static final String THIRD_APP_PARAM_TIP = "agentId";
+
+    public static final String WECUSTOMERS_KEY="weCustomer";
 }

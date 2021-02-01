@@ -7,11 +7,14 @@ import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.elasticsearch.ElasticSearch;
 import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.service.IWeChatContactMappingService;
+import com.linkwechat.wecom.service.IWeCustomerService;
 import com.linkwechat.wecom.service.IWeSensitiveActHitService;
 import com.linkwechat.wecom.service.IWeSensitiveService;
 import com.tencent.wework.FinanceUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
@@ -43,6 +46,8 @@ public class RyTask {
     private IWeSensitiveService weSensitiveService;
     @Autowired
     private IWeSensitiveActHitService weSensitiveActHitService;
+    @Autowired
+    private IWeCustomerService weCustomerService;
 
     public void ryMultipleParams(String s, Boolean b, Long l, Double d, Integer i) {
         System.out.println(StringUtils.format("执行多参方法： 字符串类型{}，布尔类型{}，长整型{}，浮点型{}，整形{}", s, b, l, d, i));
@@ -86,6 +91,21 @@ public class RyTask {
             } catch (Exception e) {
                 log.error("消息处理异常：ex:{}", e);
                 e.printStackTrace();
+            }
+        }
+    }
+
+    public void WeCustomers(){
+        //查询系统所有客户
+        List<WeCustomer> cacheList = redisCache.getCacheList(WeConstans.WECUSTOMERS_KEY);
+        if(CollectionUtils.isEmpty(cacheList)){
+            List<WeCustomer> customers = weCustomerService.selectWeCustomerList(null);
+            redisCache.setCacheList(WeConstans.WECUSTOMERS_KEY,customers);
+        }else {
+            List<WeCustomer> customers = weCustomerService.selectWeCustomerList(null);
+            List<WeCustomer> weCustomers = redisCache.getCacheList(WeConstans.WECUSTOMERS_KEY);
+            if(CollectionUtils.isNotEmpty(weCustomers) && weCustomers.size()<customers.size()){
+                redisCache.setCacheList(WeConstans.WECUSTOMERS_KEY,customers);
             }
         }
     }
