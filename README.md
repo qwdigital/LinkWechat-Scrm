@@ -219,7 +219,7 @@ com.linkwechat
 
 #### 开发进度
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0201/153811_5fd7deb1_1480777.png "LinkWeChat 1.0.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0201/154446_de8eedbf_1480777.png "LinkWeChat 1.0.png")
 
 ### 联系作者加入群
 
