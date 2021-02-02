@@ -12,6 +12,7 @@ import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.wecom.domain.WeTaskFission;
 import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
 import com.linkwechat.wecom.service.IWeTaskFissionService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +29,7 @@ import java.util.List;
  * @author leejoker
  * @date 2021-01-20
  */
+@Api("任务宝Controller")
 @RestController
 @RequestMapping("/wecom/fission")
 public class WeTaskFissionController extends BaseController {
@@ -39,6 +41,7 @@ public class WeTaskFissionController extends BaseController {
     /**
      * 查询任务宝列表
      */
+    @ApiOperation(value = "查询任务宝列表", httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:fission:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeTaskFission weTaskFission) {
@@ -50,6 +53,7 @@ public class WeTaskFissionController extends BaseController {
     /**
      * 导出任务宝列表
      */
+    @ApiOperation(value = "导出任务宝列表", httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:fission:export')")
     @Log(title = "任务宝", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
@@ -62,6 +66,7 @@ public class WeTaskFissionController extends BaseController {
     /**
      * 获取任务宝详细信息
      */
+    @ApiOperation(value = "获取任务宝详细信息", httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:fission:query')")
     @GetMapping(value = "/getInfo/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
@@ -71,6 +76,7 @@ public class WeTaskFissionController extends BaseController {
     /**
      * 新增任务宝
      */
+    @ApiOperation(value = "新增任务宝", httpMethod = "POST")
     @PreAuthorize("@ss.hasPermi('wecom:fission:add')")
     @Log(title = "任务宝", businessType = BusinessType.INSERT)
     @PostMapping
@@ -81,6 +87,7 @@ public class WeTaskFissionController extends BaseController {
     /**
      * 删除任务宝
      */
+    @ApiOperation(value = "删除任务宝", httpMethod = "DELETE")
     @PreAuthorize("@ss.hasPermi('wecom:fission:remove')")
     @Log(title = "任务宝", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
@@ -91,6 +98,7 @@ public class WeTaskFissionController extends BaseController {
     /**
      * 发送裂变任务
      */
+    @ApiOperation(value = "发送裂变任务", httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:fission:send')")
     @Log(title = "发送裂变任务", businessType = BusinessType.OTHER)
     @GetMapping("/{id}")
@@ -102,6 +110,7 @@ public class WeTaskFissionController extends BaseController {
     /**
      * 生成带二维码的海报
      */
+    @ApiOperation(value = "生成带二维码的海报", httpMethod = "POST")
     @PreAuthorize("@ss.hasPermi('wecom:fission:poster')")
     @Log(title = "生成带二维码的海报", businessType = BusinessType.OTHER)
     @PostMapping("/poster")
@@ -118,7 +127,7 @@ public class WeTaskFissionController extends BaseController {
     @PreAuthorize("@ss.hasPermi('wechat:fission:upload')")
     @Log(title = "上传兑奖图片", businessType = BusinessType.OTHER)
     @PostMapping("/upload")
-    @ApiOperation("上传兑奖图片")
+    @ApiOperation(value = "上传兑奖图片", httpMethod = "POST")
     public AjaxResult upload(@RequestParam(value = "file") MultipartFile file) throws IOException {
         String url = FileUploadUtils.upload2Cos(file, cosConfig);
         JSONObject json = new JSONObject();

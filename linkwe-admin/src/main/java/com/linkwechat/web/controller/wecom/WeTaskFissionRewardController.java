@@ -8,6 +8,8 @@ import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.wecom.domain.WeTaskFissionReward;
 import com.linkwechat.wecom.service.IWeTaskFissionRewardService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,7 @@ import java.util.List;
  * @author leejoker
  * @date 2021-01-20
  */
+@Api(value = "任务裂变奖励Controller")
 @RestController
 @RequestMapping("/wecom/reward")
 public class WeTaskFissionRewardController extends BaseController {
@@ -30,6 +33,7 @@ public class WeTaskFissionRewardController extends BaseController {
     /**
      * 查询任务裂变奖励列表
      */
+    @ApiOperation(value = "查询任务裂变奖励列表",httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:reward:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeTaskFissionReward weTaskFissionReward) {
@@ -41,6 +45,7 @@ public class WeTaskFissionRewardController extends BaseController {
     /**
      * 导出任务裂变奖励列表
      */
+    @ApiOperation(value = "导出任务裂变奖励列表",httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:reward:export')")
     @Log(title = "任务裂变奖励", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
@@ -53,6 +58,7 @@ public class WeTaskFissionRewardController extends BaseController {
     /**
      * 获取任务裂变奖励详细信息
      */
+    @ApiOperation(value = "获取任务裂变奖励详细信息",httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:reward:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
@@ -62,6 +68,7 @@ public class WeTaskFissionRewardController extends BaseController {
     /**
      * 新增任务裂变奖励
      */
+    @ApiOperation(value = "新增任务裂变奖励",httpMethod = "POST")
     @PreAuthorize("@ss.hasPermi('wecom:reward:add')")
     @Log(title = "任务裂变奖励", businessType = BusinessType.INSERT)
     @PostMapping
@@ -72,6 +79,7 @@ public class WeTaskFissionRewardController extends BaseController {
     /**
      * 修改任务裂变奖励
      */
+    @ApiOperation(value = "修改任务裂变奖励",httpMethod = "PUT")
     @PreAuthorize("@ss.hasPermi('wecom:reward:edit')")
     @Log(title = "任务裂变奖励", businessType = BusinessType.UPDATE)
     @PutMapping
@@ -82,6 +90,7 @@ public class WeTaskFissionRewardController extends BaseController {
     /**
      * 删除任务裂变奖励
      */
+    @ApiOperation(value = "删除任务裂变奖励",httpMethod = "DELETE")
     @PreAuthorize("@ss.hasPermi('wecom:reward:remove')")
     @Log(title = "任务裂变奖励", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
