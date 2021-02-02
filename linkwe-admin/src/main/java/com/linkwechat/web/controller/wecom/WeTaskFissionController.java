@@ -29,7 +29,7 @@ import java.util.List;
  * @author leejoker
  * @date 2021-01-20
  */
-@Api("任务宝Controller")
+@Api(description = "任务宝Controller")
 @RestController
 @RequestMapping("/wecom/fission")
 public class WeTaskFissionController extends BaseController {
@@ -90,7 +90,7 @@ public class WeTaskFissionController extends BaseController {
     @ApiOperation(value = "删除任务宝", httpMethod = "DELETE")
     @PreAuthorize("@ss.hasPermi('wecom:fission:remove')")
     @Log(title = "任务宝", businessType = BusinessType.DELETE)
-    @DeleteMapping("/remove/{ids}")
+    @DeleteMapping("/delete/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(weTaskFissionService.deleteWeTaskFissionByIds(ids));
     }

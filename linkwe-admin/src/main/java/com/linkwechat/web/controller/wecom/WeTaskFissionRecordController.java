@@ -22,7 +22,7 @@ import java.util.List;
  * @author leejoker
  * @date 2021-01-20
  */
-@Api(value = "裂变任务完成记录Controller")
+@Api(description = "裂变任务完成记录Controller")
 @RestController
 @RequestMapping("/wecom/record")
 public class WeTaskFissionRecordController extends BaseController {
@@ -70,7 +70,7 @@ public class WeTaskFissionRecordController extends BaseController {
     @ApiOperation(value = "新增裂变任务完成记录",httpMethod = "POST")
     @PreAuthorize("@ss.hasPermi('wecom:record:add')")
     @Log(title = "裂变任务完成记录", businessType = BusinessType.INSERT)
-    @PostMapping
+    @PostMapping("/add")
     public AjaxResult add(@RequestBody WeTaskFissionRecord weTaskFissionRecord) {
         return toAjax(weTaskFissionRecordService.insertWeTaskFissionRecord(weTaskFissionRecord));
     }
@@ -81,7 +81,7 @@ public class WeTaskFissionRecordController extends BaseController {
     @ApiOperation(value = "修改裂变任务完成记录",httpMethod = "PUT")
     @PreAuthorize("@ss.hasPermi('wecom:record:edit')")
     @Log(title = "裂变任务完成记录", businessType = BusinessType.UPDATE)
-    @PutMapping
+    @PutMapping("/edit")
     public AjaxResult edit(@RequestBody WeTaskFissionRecord weTaskFissionRecord) {
         return toAjax(weTaskFissionRecordService.updateWeTaskFissionRecord(weTaskFissionRecord));
     }
@@ -92,7 +92,7 @@ public class WeTaskFissionRecordController extends BaseController {
     @ApiOperation(value = "删除裂变任务完成记录",httpMethod = "DELETE")
     @PreAuthorize("@ss.hasPermi('wecom:record:remove')")
     @Log(title = "裂变任务完成记录", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{ids}")
+    @DeleteMapping("/delete/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(weTaskFissionRecordService.deleteWeTaskFissionRecordByIds(ids));
     }

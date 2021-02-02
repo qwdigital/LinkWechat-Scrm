@@ -23,7 +23,7 @@ import java.util.List;
  * @author leejoker
  * @date 2021-01-20
  */
-@Api(value = "任务裂变奖励Controller")
+@Api(description = "任务裂变奖励Controller")
 @RestController
 @RequestMapping("/wecom/reward")
 public class WeTaskFissionRewardController extends BaseController {
@@ -71,7 +71,7 @@ public class WeTaskFissionRewardController extends BaseController {
     @ApiOperation(value = "新增任务裂变奖励",httpMethod = "POST")
     @PreAuthorize("@ss.hasPermi('wecom:reward:add')")
     @Log(title = "任务裂变奖励", businessType = BusinessType.INSERT)
-    @PostMapping
+    @PostMapping("/add")
     public AjaxResult add(@RequestBody WeTaskFissionReward weTaskFissionReward) {
         return toAjax(weTaskFissionRewardService.insertWeTaskFissionReward(weTaskFissionReward));
     }
@@ -82,7 +82,7 @@ public class WeTaskFissionRewardController extends BaseController {
     @ApiOperation(value = "修改任务裂变奖励",httpMethod = "PUT")
     @PreAuthorize("@ss.hasPermi('wecom:reward:edit')")
     @Log(title = "任务裂变奖励", businessType = BusinessType.UPDATE)
-    @PutMapping
+    @PutMapping("edit")
     public AjaxResult edit(@RequestBody WeTaskFissionReward weTaskFissionReward) {
         return toAjax(weTaskFissionRewardService.updateWeTaskFissionReward(weTaskFissionReward));
     }
@@ -93,7 +93,7 @@ public class WeTaskFissionRewardController extends BaseController {
     @ApiOperation(value = "删除任务裂变奖励",httpMethod = "DELETE")
     @PreAuthorize("@ss.hasPermi('wecom:reward:remove')")
     @Log(title = "任务裂变奖励", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{ids}")
+    @DeleteMapping("/delete/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(weTaskFissionRewardService.deleteWeTaskFissionRewardByIds(ids));
     }

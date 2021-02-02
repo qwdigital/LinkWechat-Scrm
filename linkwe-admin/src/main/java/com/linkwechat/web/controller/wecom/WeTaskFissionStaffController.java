@@ -22,7 +22,7 @@ import java.util.List;
  * @author leejoker
  * @date 2021-01-20
  */
-@Api(value = "裂变任务员工列Controller")
+@Api(description = "裂变任务员工列Controller")
 @RestController
 @RequestMapping("/wecom/staff")
 public class WeTaskFissionStaffController extends BaseController {
@@ -70,7 +70,7 @@ public class WeTaskFissionStaffController extends BaseController {
     @ApiOperation(value = "新增裂变任务员工列",httpMethod = "POST")
     @PreAuthorize("@ss.hasPermi('wecom:staff:add')")
     @Log(title = "裂变任务员工列", businessType = BusinessType.INSERT)
-    @PostMapping
+    @PostMapping("/add")
     public AjaxResult add(@RequestBody WeTaskFissionStaff weTaskFissionStaff) {
         return toAjax(weTaskFissionStaffService.insertWeTaskFissionStaff(weTaskFissionStaff));
     }
@@ -81,7 +81,7 @@ public class WeTaskFissionStaffController extends BaseController {
     @ApiOperation(value = "修改裂变任务员工列",httpMethod = "PUT")
     @PreAuthorize("@ss.hasPermi('wecom:staff:edit')")
     @Log(title = "裂变任务员工列", businessType = BusinessType.UPDATE)
-    @PutMapping
+    @PutMapping("/edit")
     public AjaxResult edit(@RequestBody WeTaskFissionStaff weTaskFissionStaff) {
         return toAjax(weTaskFissionStaffService.updateWeTaskFissionStaff(weTaskFissionStaff));
     }
@@ -92,7 +92,7 @@ public class WeTaskFissionStaffController extends BaseController {
     @ApiOperation(value = "删除裂变任务员工列",httpMethod = "DELETE")
     @PreAuthorize("@ss.hasPermi('wecom:staff:remove')")
     @Log(title = "裂变任务员工列", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{ids}")
+    @DeleteMapping("/delete/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(weTaskFissionStaffService.deleteWeTaskFissionStaffByIds(ids));
     }
