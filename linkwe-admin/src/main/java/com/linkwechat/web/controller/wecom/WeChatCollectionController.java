@@ -32,7 +32,7 @@ public class WeChatCollectionController extends BaseController {
      */
     //@PreAuthorize("@ss.hasPermi('chat:collection:add')")
     @Log(title = "添加收藏", businessType = BusinessType.INSERT)
-    @PutMapping("addCollection")
+    @PostMapping("addCollection")
     public AjaxResult addCollection(@RequestParam(value = "materialId") Long materialId,@RequestParam(value = "userId") String userId) {
         return toAjax(weChatCollectionService.addCollection(materialId, userId));
     }
