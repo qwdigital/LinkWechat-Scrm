@@ -4,7 +4,7 @@ export default {
   name: 'App',
   data() {
     return {
-      appId: 'appId',
+      appId: 'ww24262ce93851488f',
       agentId: '1000005',
     }
   },
@@ -23,16 +23,19 @@ export default {
       getAgentTicket(window.location.href.split('#')[0]).then(({ data }) => {
         let { timestamp, nonceStr, signature } = data
         wx.agentConfig({
+          debug: true,
           corpid: this.appId, // 必填，企业微信的corpid，必须与当前登录的企业一致
           agentid: this.agentId, // 必填，企业微信的应用id （e.g. 1000247）
           timestamp, // 必填，生成签名的时间戳
           nonceStr, // 必填，生成签名的随机串
           signature, // 必填，签名，见附录-JS-SDK使用权限签名算法
-          jsApiList: ['sendChatMessage'], //必填
+          jsApiList: ['sendChatMessage', 'getContext'], //必填
           success: (res) => {
             // 回调
+            this.$toast('agentId成功:')
           },
           fail: (res) => {
+            this.$toast('agentId失败:' + JSON.stringify(res))
             if (res.errMsg.indexOf('function not exist') > -1) {
               alert('版本过低请升级')
             }

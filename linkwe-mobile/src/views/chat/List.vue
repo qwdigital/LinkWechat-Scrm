@@ -12,6 +12,10 @@ export default {
       type: String,
       default: '0',
     },
+    mediaType: {
+      type: String,
+      default: '0',
+    },
     userId: {
       type: String,
       default: '',
@@ -26,8 +30,8 @@ export default {
       loading: false,
       finished: false,
       error: false,
-      pageSize: 1,
-      pageNum: 10,
+      pageNum: 1,
+      pageSize: 10,
       list: [],
       collectList: [],
     }
@@ -47,14 +51,20 @@ export default {
       page == 1 && (this.list = [])
       this.loading = true
       ;(this.sideId
-        ? getMaterialList({ sideId: this.sideId, pageSize, pageNum, keyword })
+        ? getMaterialList({
+            sideId: this.sideId,
+            mediaType: this.mediaType,
+            pageSize,
+            pageNum,
+            keyword,
+          })
         : getCollectionList({ userId: this.userId, pageSize, pageNum, keyword })
       )
         .then(({ rows, total }) => {
           this.list.push(...rows)
           this.loading = false
           // 数据全部加载完成
-          if (this.list.length >= total) {
+          if (this.list.length >= +total) {
             this.finished = true
           }
         })
@@ -73,10 +83,14 @@ export default {
     },
     send(data) {
       let entry = undefined
+      let _this = this
       wx.invoke('getContext', {}, function(res) {
         if (res.err_msg == 'getContext:ok') {
           entry = res.entry //返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
-          if (!['single_chat_tools', 'group_chat_tools'].includes(entry)) {
+          if (
+            !['single_chat_tools', 'group_chat_tools', 'normal'].includes(entry)
+          ) {
+            _this.$toast('入口错误：' + entry)
             return
           }
           // mediaType 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本 5 海报
@@ -114,7 +128,7 @@ export default {
             // case '6':
             //   mes.miniprogram = {
             //     appid: 'wx8bd80126147df384', //小程序的appid
-            //     title: 'this is title', //小程序消息的title
+            //     title: '_this is title', //小程序消息的title
             //     imgUrl:
             //       'https://search-operate.cdn.bcebos.com/d054b8892a7ab572cb296d62ec7f97b6.png', //小程序消息的封面图。必须带http或者https协议头，否则报错 $apiName$:fail invalid imgUrl
             //     page: '/index/page.html', //小程序消息打开后的路径，注意要以.html作为后缀，否则在微信端打开会提示找不到页面
@@ -122,13 +136,19 @@ export default {
             //   break
           }
           mes.msgtype = msgtype[data.mediaType]
-          wx.invoke('sendChatMessage', mes, function(res) {
-            if (res.err_msg == 'sendChatMessage:ok') {
+          _this.$dialog({ message: 'mes：' + JSON.stringify(mes) })
+          wx.invoke('sendChatMessage', mes, function(resSend) {
+            if (resSend.err_msg == 'sendChatMessage:ok') {
               //发送成功
+              _this.$toast('发送成功')
+            } else {
+              //错误处理
+              _this.$dialog({ message: '发送失败：' + JSON.stringify(resSend) })
             }
           })
         } else {
           //错误处理
+          _this.$dialog({ message: '进入失败：' + JSON.stringify(res) })
         }
       })
     },
@@ -140,6 +160,7 @@ export default {
         this.isCollected(materialId)
           ? this.isCollected.splice(this.isCollected.indexOf(materialId), 1)
           : this.isCollected.push(materialId)
+        this.$toast('操作成功')
       })
     },
   },
@@ -157,15 +178,21 @@ export default {
       @load="getList()"
     >
       <div v-for="(item, index) in list" class="list" :key="index">
-        <div class="title">{{ item.content }}</div>
+        <div class="title">
+          {{ item.mediaType == 4 ? item.content : item.materialName }}
+        </div>
         <div class="info">
           {{ item.content }}
           <span>2020/2/4</span>
 
           <div class="fr flex">
             <div class="action" @click="send(item)">发送</div>
-            <div v-if="!!userId" class="action" @click="collect(item.id)">
-              {{ isCollected(item.id) ? '已' : '' }}收藏
+            <div
+              v-if="!!userId"
+              class="action"
+              @click="collect(item.materialId)"
+            >
+              {{ isCollected(item.materialId) ? '已' : '' }}收藏
             </div>
           </div>
         </div>

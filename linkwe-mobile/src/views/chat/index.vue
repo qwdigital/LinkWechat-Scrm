@@ -1,4 +1,3 @@
-2
 <script>
 import { getUserInfo } from '@/api/common'
 import { getTypeList } from '@/api/chat'
@@ -51,7 +50,7 @@ export default {
     getUserInfo(auth_code)
       .then(({ data }) => {
         this.userId = data.userId
-        this.$toast('userId:' + this.userId)
+        // this.$toast('userId:' + this.userId)
       })
       .catch((err) => {
         Dialog.confirm({
@@ -100,6 +99,7 @@ export default {
         <List
           :ref="'list' + (index + 1)"
           :sideId="item.sideId"
+          :mediaType="item.mediaType"
           :userId="userId"
           :keyword="keyword"
         ></List>

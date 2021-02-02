@@ -11,6 +11,7 @@ export function getAgentTicket(url) {
     url: service + '/ticket/getAgentTicket',
     params: {
       url,
+      agentId: '1000005',
     },
   })
 }

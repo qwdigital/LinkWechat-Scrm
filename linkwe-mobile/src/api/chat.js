@@ -45,6 +45,9 @@ export function addCollection(data) {
   return request({
     url: service + '/collection/addCollection',
     method: 'post',
+    // headers: {
+    //   'Content-Type': 'application/x-www-form-urlencoded',
+    // },
     data,
   })
 }
