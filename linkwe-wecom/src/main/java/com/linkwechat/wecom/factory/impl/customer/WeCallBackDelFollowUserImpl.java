@@ -62,17 +62,19 @@ public class WeCallBackDelFollowUserImpl extends WeEventStrategy {
 
                         //增加敏感行为记录，客户删除员工
                         WeSensitiveAct weSensitiveAct = weSensitiveActHitService.getSensitiveActType("拉黑/删除好友");
-                        WeSensitiveActHit weSensitiveActHit = new WeSensitiveActHit();
-                        weSensitiveActHit.setSensitiveActId(weSensitiveAct.getId());
-                        weSensitiveActHit.setSensitiveAct(weSensitiveAct.getActName());
-                        weSensitiveActHit.setCreateTime(new Date(message.getCreateTime()));
-                        weSensitiveActHit.setCreateBy("admin");
-                        WeUser user = weUserService.getById(message.getUserId());
-                        weSensitiveActHit.setOperatorId(weCustomer.getUserId());
-                        weSensitiveActHit.setOperator(weCustomer.getName());
-                        weSensitiveActHit.setOperateTargetId(user.getUserId());
-                        weSensitiveActHit.setOperateTarget(user.getName());
-                        weSensitiveActHitService.insertWeSensitiveActHit(weSensitiveActHit);
+                        if (weSensitiveAct != null && weSensitiveAct.getEnableFlag() == 1) {
+                            WeSensitiveActHit weSensitiveActHit = new WeSensitiveActHit();
+                            weSensitiveActHit.setSensitiveActId(weSensitiveAct.getId());
+                            weSensitiveActHit.setSensitiveAct(weSensitiveAct.getActName());
+                            weSensitiveActHit.setCreateTime(new Date(message.getCreateTime()));
+                            weSensitiveActHit.setCreateBy("admin");
+                            WeUser user = weUserService.getById(message.getUserId());
+                            weSensitiveActHit.setOperatorId(weCustomer.getUserId());
+                            weSensitiveActHit.setOperator(weCustomer.getName());
+                            weSensitiveActHit.setOperateTargetId(user.getUserId());
+                            weSensitiveActHit.setOperateTarget(user.getName());
+                            weSensitiveActHitService.insertWeSensitiveActHit(weSensitiveActHit);
+                        }
                     }
                 });
             }

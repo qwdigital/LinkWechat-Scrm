@@ -76,7 +76,7 @@ public class WeSensitiveActHitServiceImpl extends ServiceImpl<WeSensitiveActHitM
         }).map(chatData -> {
             WeSensitiveActHit weSensitiveActHit = new WeSensitiveActHit();
             WeSensitiveAct weSensitiveAct = getSensitiveActType(chatData.getString("msgtype"));
-            if (weSensitiveAct != null) {
+            if (weSensitiveAct != null && weSensitiveAct.getEnableFlag() == 1) {
                 weSensitiveActHit.setSensitiveAct(weSensitiveAct.getActName());
                 weSensitiveActHit.setSensitiveActId(weSensitiveAct.getId());
                 weSensitiveActHit.setCreateTime(new Date(chatData.getLong("msgtime")));
