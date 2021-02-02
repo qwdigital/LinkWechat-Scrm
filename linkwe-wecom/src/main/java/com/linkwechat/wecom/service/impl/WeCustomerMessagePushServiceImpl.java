@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.enums.ChatType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
@@ -60,6 +61,9 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
 
     @Autowired
     private IWeCustomerMessgaeResultService weCustomerMessgaeResultService;
+
+    @Autowired
+    private RedisCache redisCache;
 
     @Override
     @Transactional
@@ -384,8 +388,8 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
      */
     public List<WeCustomer> externalUserIds(String pushRange, String staffId, String department, String tag) {
         if (pushRange.equals("0")) {
-            //查询系统所有客户
-            return weCustomerService.selectWeCustomerList(null);
+            //从redis中读取数据
+            return redisCache.getCacheList(WeConstans.WECUSTOMERS_KEY);
         } else {
             //按条件查询客户
             //通过部门id查询所有的员工

@@ -76,7 +76,7 @@ public class WeSensitiveActHitServiceImpl extends ServiceImpl<WeSensitiveActHitM
         }).map(chatData -> {
             WeSensitiveActHit weSensitiveActHit = new WeSensitiveActHit();
             WeSensitiveAct weSensitiveAct = getSensitiveActType(chatData.getString("msgtype"));
-            if (weSensitiveAct != null) {
+            if (weSensitiveAct != null && weSensitiveAct.getEnableFlag() == 1) {
                 weSensitiveActHit.setSensitiveAct(weSensitiveAct.getActName());
                 weSensitiveActHit.setSensitiveActId(weSensitiveAct.getId());
                 weSensitiveActHit.setCreateTime(new Date(chatData.getLong("msgtime")));
@@ -103,7 +103,7 @@ public class WeSensitiveActHitServiceImpl extends ServiceImpl<WeSensitiveActHitM
         return null;
     }
 
-    private WeSensitiveAct getSensitiveActType(String msgType) {
+    public WeSensitiveAct getSensitiveActType(String msgType) {
         String type;
         if ("card".equals(msgType)) {
             type = "发名片";
