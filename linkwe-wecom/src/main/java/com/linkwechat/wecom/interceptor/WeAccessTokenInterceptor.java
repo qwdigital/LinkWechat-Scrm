@@ -10,6 +10,7 @@ import com.linkwechat.common.config.WeComeConfig;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,7 @@ import java.util.Arrays;
  * @author: HaoN
  * @create: 2020-08-27 22:36
  **/
+@Slf4j
 @Component
 public class WeAccessTokenInterceptor implements Interceptor{
 
@@ -45,7 +47,7 @@ public class WeAccessTokenInterceptor implements Interceptor{
 
 
         String uri=request.getUrl().replace("http://","");
-
+        log.info(">>>>>>>>>>>>>>>>>>>>>>>>uri：{}",uri);
         //request.setContentType("application/json");
         if(!Arrays.asList(weComeConfig.getFileUplodUrl()).contains(uri)){
             request.setDataType(ForestDataType.JSON);
