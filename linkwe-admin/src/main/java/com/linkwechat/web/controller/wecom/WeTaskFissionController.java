@@ -79,7 +79,7 @@ public class WeTaskFissionController extends BaseController {
     @ApiOperation(value = "新增任务宝", httpMethod = "POST")
     @PreAuthorize("@ss.hasPermi('wecom:fission:add')")
     @Log(title = "任务宝", businessType = BusinessType.INSERT)
-    @PostMapping
+    @PostMapping("/add")
     public AjaxResult add(@RequestBody WeTaskFission weTaskFission) {
         return toAjax(weTaskFissionService.insertWeTaskFission(weTaskFission));
     }
@@ -90,7 +90,7 @@ public class WeTaskFissionController extends BaseController {
     @ApiOperation(value = "删除任务宝", httpMethod = "DELETE")
     @PreAuthorize("@ss.hasPermi('wecom:fission:remove')")
     @Log(title = "任务宝", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{ids}")
+    @DeleteMapping("/remove/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(weTaskFissionService.deleteWeTaskFissionByIds(ids));
     }
@@ -101,7 +101,7 @@ public class WeTaskFissionController extends BaseController {
     @ApiOperation(value = "发送裂变任务", httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:fission:send')")
     @Log(title = "发送裂变任务", businessType = BusinessType.OTHER)
-    @GetMapping("/{id}")
+    @GetMapping("/send/{id}")
     public AjaxResult send(@PathVariable Long id) {
         weTaskFissionService.sendWeTaskFission(id);
         return AjaxResult.success();
