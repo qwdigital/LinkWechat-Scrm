@@ -32,7 +32,7 @@ export default {
           jsApiList: ['sendChatMessage', 'getContext'], //必填
           success: (res) => {
             // 回调
-            this.$toast('agentId成功:')
+            // this.$toast('agentId成功:')
           },
           fail: (res) => {
             this.$toast('agentId失败:' + JSON.stringify(res))
