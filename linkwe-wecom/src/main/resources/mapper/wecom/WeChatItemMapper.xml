@@ -36,8 +36,8 @@
             WHERE
             material_id = wci.material_id
             AND user_id = #{userId}
-        ) collection
-
+        ) collection,
+        wci.create_time
         FROM
         we_chat_item wci
         LEFT JOIN we_material wm ON wci.material_id = wm.id

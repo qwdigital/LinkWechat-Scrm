@@ -1,6 +1,9 @@
 package com.linkwechat.wecom.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * 聊天侧边栏
@@ -38,5 +41,10 @@ public class WeChatSideVo {
      * 是否收藏 0未收藏 1 已收藏
      */
     private String collection;
+
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date createTime;
+
 
 }
