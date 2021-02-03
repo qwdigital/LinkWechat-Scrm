@@ -5,6 +5,7 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.wecom.domain.dto.WeChatCollectionDto;
 import com.linkwechat.wecom.domain.vo.WeChatSideVo;
 import com.linkwechat.wecom.service.IWeChatCollectionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +34,8 @@ public class WeChatCollectionController extends BaseController {
     //@PreAuthorize("@ss.hasPermi('chat:collection:add')")
     @Log(title = "添加收藏", businessType = BusinessType.INSERT)
     @PostMapping("addCollection")
-    public AjaxResult addCollection(@RequestParam(value = "materialId") Long materialId,@RequestParam(value = "userId") String userId) {
-        return toAjax(weChatCollectionService.addCollection(materialId, userId));
+    public AjaxResult addCollection(@RequestBody WeChatCollectionDto chatCollectionDto) {
+        return toAjax(weChatCollectionService.addCollection(chatCollectionDto.getMaterialId(), chatCollectionDto.getUserId()));
     }
 
 
@@ -44,8 +45,8 @@ public class WeChatCollectionController extends BaseController {
     @PreAuthorize("@ss.hasPermi('chat:collection:delete')")
    // @Log(title = "取消收藏", businessType = BusinessType.UPDATE)
     @PostMapping(value = "cancleCollection")
-    public AjaxResult cancleCollection(@RequestParam(value = "materialId") Long materialId,@RequestParam(value = "userId") String userId) {
-        return toAjax(weChatCollectionService.cancleCollection(materialId, userId));
+    public AjaxResult cancleCollection(@RequestBody WeChatCollectionDto chatCollectionDto) {
+        return toAjax(weChatCollectionService.cancleCollection(chatCollectionDto.getMaterialId(), chatCollectionDto.getUserId()));
     }
 
     /**
