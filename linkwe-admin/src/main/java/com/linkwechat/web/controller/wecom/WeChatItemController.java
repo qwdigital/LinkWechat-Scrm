@@ -43,9 +43,9 @@ public class WeChatItemController extends BaseController {
     //@PreAuthorize("@ss.hasPermi('chat:item:list')")
     @GetMapping("/list")
     public TableDataInfo list(@RequestParam(value = "sideId") Long sideId
-            , @RequestParam(value = "keyword", required = false) String keyword,@RequestParam(value = "mediaType") String mediaType) {
+            , @RequestParam(value = "keyword", required = false) String keyword,@RequestParam(value = "mediaType") String mediaType,@RequestParam(value = "userId") String userId) {
         startPage();
-        List<WeChatSideVo> weChatSideVos = weChatItemService.chatItems(sideId,keyword,mediaType);
+        List<WeChatSideVo> weChatSideVos = weChatItemService.chatItems(sideId,keyword,mediaType,userId);
         return getDataTable(weChatSideVos);
     }
 

@@ -1,6 +1,9 @@
 package com.linkwechat.wecom.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.exception.CustomException;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.wecom.domain.WeChatCollection;
 import com.linkwechat.wecom.domain.vo.WeChatSideVo;
@@ -25,6 +28,12 @@ public class WeChatCollectionServiceImpl extends ServiceImpl<WeChatCollectionMap
 
     @Override
     public int addCollection(Long materialId, String userId) {
+        QueryWrapper<WeChatCollection> wrapper = new QueryWrapper<>();
+        wrapper.eq("material_id",materialId).eq("user_id",userId);
+        WeChatCollection queryCollection = weChatCollectionMapper.selectOne(wrapper);
+        if(null!=queryCollection){
+            throw new CustomException("你已收藏");
+        }
         WeChatCollection chatCollection=new WeChatCollection();
         chatCollection.setCollectionId(SnowFlakeUtil.nextId());
         chatCollection.setMaterialId(materialId);

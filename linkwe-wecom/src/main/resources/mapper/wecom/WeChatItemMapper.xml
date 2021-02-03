@@ -27,7 +27,17 @@
         wm.material_name,
         wm.material_url,
         wm.content,
-        wc.media_type
+        wc.media_type,
+        (
+            SELECT
+            COUNT(1)
+            FROM
+            we_chat_collection
+            WHERE
+            material_id = wci.material_id
+            AND user_id = #{userId}
+        ) collection
+
         FROM
         we_chat_item wci
         LEFT JOIN we_material wm ON wci.material_id = wm.id

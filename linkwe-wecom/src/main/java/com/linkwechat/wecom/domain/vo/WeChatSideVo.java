@@ -34,4 +34,9 @@ public class WeChatSideVo {
      */
     private String materialName;
 
+    /**
+     * 是否收藏 0未收藏 1 已收藏
+     */
+    private String collection;
+
 }
