@@ -46,5 +46,4 @@ public class WeChatSideVo {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date createTime;
 
-
 }

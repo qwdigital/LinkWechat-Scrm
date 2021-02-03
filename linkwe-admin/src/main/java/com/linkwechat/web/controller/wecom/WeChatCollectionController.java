@@ -42,7 +42,7 @@ public class WeChatCollectionController extends BaseController {
     /**
      * 取消收藏
      */
-    @PreAuthorize("@ss.hasPermi('chat:collection:delete')")
+   // @PreAuthorize("@ss.hasPermi('chat:collection:delete')")
    // @Log(title = "取消收藏", businessType = BusinessType.UPDATE)
     @PostMapping(value = "cancleCollection")
     public AjaxResult cancleCollection(@RequestBody WeChatCollectionDto chatCollectionDto) {
