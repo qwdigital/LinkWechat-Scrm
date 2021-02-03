@@ -69,6 +69,12 @@ public class WeTaskFission extends BaseEntity {
     private List<WeTaskFissionStaff> taskFissionStaffs;
 
     /**
+     * 客户群
+     */
+    @TableField(exist = false)
+    private List<WeGroup> taskFissionWeGroups;
+
+    /**
      * 客户标签id列表，当为全部时保存为all
      */
     @Excel(name = "客户标签id列表，当为全部时保存为all")
@@ -107,8 +113,8 @@ public class WeTaskFission extends BaseEntity {
     /**
      * 任务裂变目标员工二维码
      */
-    @Excel(name = "任务裂变目标员工二维码")
-    private String fissStaffQrcode;
+    @Excel(name = "任务裂变目标二维码")
+    private String fissQrcode;
 
     /**
      * 兑奖链接
@@ -144,6 +150,7 @@ public class WeTaskFission extends BaseEntity {
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
                 .append("id", getId())
+                .append("fissionType", getFissionType())
                 .append("taskName", getTaskName())
                 .append("fissInfo", getFissInfo())
                 .append("fissNum", getFissNum())
@@ -155,7 +162,7 @@ public class WeTaskFission extends BaseEntity {
                 .append("postersUrl", getPostersUrl())
                 .append("fissStaffId", getFissStaffId())
                 .append("fissStaff", getFissStaff())
-                .append("fissStaffQrcode", getFissStaffQrcode())
+                .append("fissQrcode", getFissQrcode())
                 .append("rewardUrl", getRewardUrl())
                 .append("rewardImageUrl", getRewardImageUrl())
                 .append("rewardRule", getRewardRule())
