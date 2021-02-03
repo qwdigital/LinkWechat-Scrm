@@ -26,6 +26,11 @@ public class WeTaskFission extends BaseEntity {
     private Long id;
 
     /**
+     * 任务类型：1 任务宝 2 群裂变
+     */
+    private Integer fissionType;
+
+    /**
      * 任务活动名称
      */
     @Excel(name = "任务活动名称")

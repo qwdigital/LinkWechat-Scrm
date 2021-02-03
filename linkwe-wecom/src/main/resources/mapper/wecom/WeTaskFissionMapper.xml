@@ -3,9 +3,10 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeTaskFissionMapper">
-    
+
     <resultMap type="WeTaskFission" id="WeTaskFissionResult">
         <result property="id"    column="id"    />
+        <result property="fissionType"    column="fission_type"    />
         <result property="taskName"    column="task_name"    />
         <result property="fissInfo"    column="fiss_info"    />
         <result property="fissNum"    column="fiss_num"    />
@@ -30,12 +31,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectWeTaskFissionVo">
-        select id, task_name, fiss_info, fiss_num, start_time, over_time, customer_tag_id, customer_tag, posters_id, posters_url, fiss_staff_id, fiss_staff, fiss_staff_qrcode, reward_url, reward_image_url, reward_rule, fiss_status, welcome_msg, create_by, create_time, update_by, update_time from we_task_fission
+        select id, fission_type, task_name, fiss_info, fiss_num, start_time, over_time, customer_tag_id, customer_tag, posters_id, posters_url, fiss_staff_id, fiss_staff, fiss_staff_qrcode, reward_url, reward_image_url, reward_rule, fiss_status, welcome_msg, create_by, create_time, update_by, update_time from we_task_fission
     </sql>
 
     <select id="selectWeTaskFissionList" parameterType="WeTaskFission" resultMap="WeTaskFissionResult">
         <include refid="selectWeTaskFissionVo"/>
-        <where>  
+        <where>
+            <if test="fissionType != null "> and fission_type = #{fissionType}</if>
             <if test="taskName != null  and taskName != ''"> and task_name like concat('%', #{taskName}, '%')</if>
             <if test="fissInfo != null  and fissInfo != ''"> and fiss_info = #{fissInfo}</if>
             <if test="fissNum != null "> and fiss_num = #{fissNum}</if>
@@ -55,15 +57,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="welcomeMsg != null  and welcomeMsg != ''"> and welcome_msg = #{welcomeMsg}</if>
         </where>
     </select>
-    
+
     <select id="selectWeTaskFissionById" parameterType="Long" resultMap="WeTaskFissionResult">
         <include refid="selectWeTaskFissionVo"/>
         where id = #{id}
     </select>
-        
+
     <insert id="insertWeTaskFission" parameterType="WeTaskFission" useGeneratedKeys="true" keyProperty="id">
         insert into we_task_fission
         <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fissionType != null">fission_type,</if>
             <if test="taskName != null and taskName != ''">task_name,</if>
             <if test="fissInfo != null">fiss_info,</if>
             <if test="fissNum != null">fiss_num,</if>
@@ -87,6 +90,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateTime != null">update_time,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fissionType != null">#{fissionType},</if>
             <if test="taskName != null and taskName != ''">#{taskName},</if>
             <if test="fissInfo != null">#{fissInfo},</if>
             <if test="fissNum != null">#{fissNum},</if>
@@ -114,6 +118,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateWeTaskFission" parameterType="WeTaskFission">
         update we_task_fission
         <trim prefix="SET" suffixOverrides=",">
+            <if test="fissionType != null">fission_type = #{fissionType},</if>
             <if test="taskName != null and taskName != ''">task_name = #{taskName},</if>
             <if test="fissInfo != null">fiss_info = #{fissInfo},</if>
             <if test="fissNum != null">fiss_num = #{fissNum},</if>
@@ -144,10 +149,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteWeTaskFissionByIds" parameterType="String">
-        delete from we_task_fission where id in 
+        delete from we_task_fission where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
     </delete>
-    
+
 </mapper>
