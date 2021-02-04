@@ -18,6 +18,7 @@ import com.linkwechat.wecom.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,8 +40,6 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     @Autowired
     private IWeTaskFissionStaffService weTaskFissionStaffService;
     @Autowired
-    private IWeEmpleCodeService weEmpleCodeService;
-    @Autowired
     private IWeCustomerMessagePushService weCustomerMessagePushService;
     @Autowired
     private IWeTaskFissionRecordService weTaskFissionRecordService;
@@ -50,6 +49,8 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     private WeExternalContactClient weExternalContactClient;
     @Autowired
     private IWePosterService wePosterService;
+    @Value("${H5.url}")
+    private String pageUrl;
 
     /**
      * 查询任务宝
@@ -139,16 +140,19 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         //海报路径
         String postersPath = weTaskFission.getPostersUrl();
         //目标员工id
-        String fissionTargetId = weTaskFission.getFissionTargetId();
-        //目标员工活码
-        String fissQrcode = weTaskFission.getFissQrcode();
-        //todo 生成海报
+        String fissStaffId = weTaskFission.getFissionTargetId();
+        //todo H5生成海报页面路径
+        StringBuilder pageUrlBuilder = new StringBuilder(pageUrl);
+        pageUrlBuilder.append("?")
+                .append("fissionId=").append(id)
+                .append("&")
+                .append("userId=").append(fissStaffId);
 
         LinkMessageDto linkMessageDto = new LinkMessageDto();
         linkMessageDto.setPicurl(postersPath);
         linkMessageDto.setDesc(weTaskFission.getFissInfo());
         linkMessageDto.setTitle(weTaskFission.getTaskName());
-        linkMessageDto.setUrl("www.baidu.com");
+        linkMessageDto.setUrl(pageUrlBuilder.toString());
 
         CustomerMessagePushDto customerMessagePushDto = new CustomerMessagePushDto();
         customerMessagePushDto.setLinkMessage(linkMessageDto);
