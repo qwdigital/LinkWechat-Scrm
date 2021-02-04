@@ -19,8 +19,8 @@ ruoyi:
 
 # 开发环境配置
 server:
-  # 服务器的HTTP端口，默认为8090
-  port: 8090
+  # 服务器的HTTP端口，默认为8080
+  port: 9999
   servlet:
     # 应用的访问路径
     context-path: /
@@ -215,3 +215,4 @@ cos:
   #link-wechat-1251309172.cos.ap-nanjing.myqcloud.com
   region: ap-nanjing
   bucketName: link-wechat-1251309172
+  imgUrlPrefix: https://link-wechat-1251309172.cos.ap-nanjing.myqcloud.com/
