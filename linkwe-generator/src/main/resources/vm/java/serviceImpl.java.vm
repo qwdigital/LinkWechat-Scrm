@@ -1,109 +1,114 @@
 package ${packageName}.service.impl;
 
-import java.util.List;
-#foreach ($column in $columns)
-#if($column.javaField == 'createTime' || $column.javaField == 'updateTime')
-import DateUtils;
-#break
-#end
-#end
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import org.apache.commons.lang3.StringUtils;
 import ${packageName}.mapper.${ClassName}Mapper;
 import ${packageName}.domain.${ClassName};
 import ${packageName}.service.I${ClassName}Service;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * ${functionName}Service业务层处理
- * 
+ *
  * @author ${author}
  * @date ${datetime}
  */
 @Service
-public class ${ClassName}ServiceImpl implements I${ClassName}Service 
-{
-    @Autowired
-    private ${ClassName}Mapper ${className}Mapper;
+public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${ClassName}> implements I${ClassName}Service {
 
-    /**
-     * 查询${functionName}
-     * 
-     * @param ${pkColumn.javaField} ${functionName}ID
-     * @return ${functionName}
-     */
     @Override
-    public ${ClassName} select${ClassName}ById(${pkColumn.javaType} ${pkColumn.javaField})
-    {
-        return ${className}Mapper.select${ClassName}ById(${pkColumn.javaField});
-    }
-
-    /**
-     * 查询${functionName}列表
-     * 
-     * @param ${className} ${functionName}
-     * @return ${functionName}
-     */
-    @Override
-    public List<${ClassName}> select${ClassName}List(${ClassName} ${className})
-    {
-        return ${className}Mapper.select${ClassName}List(${className});
-    }
-
-    /**
-     * 新增${functionName}
-     * 
-     * @param ${className} ${functionName}
-     * @return 结果
-     */
-    @Override
-    public int insert${ClassName}(${ClassName} ${className})
-    {
-#foreach ($column in $columns)
-#if($column.javaField == 'createTime')
-        ${className}.setCreateTime(DateUtils.getNowDate());
+    public List<${ClassName}> queryList(${ClassName} ${className}) {
+        LambdaQueryWrapper<${ClassName}> lqw = Wrappers.lambdaQuery();
+#foreach($column in $columns)
+#set($queryType=$column.queryType)
+#set($javaField=$column.javaField)
+#set($javaType=$column.javaType)
+#set($columnName=$column.columnName)
+#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+#if($column.query)
+#if($column.queryType == "EQ")
+#if($javaType == 'String')
+        if (StringUtils.isNotBlank(${className}.get$AttrName())){
+            lqw.eq(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#else
+        if (${className}.get$AttrName() != null){
+            lqw.eq(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#end
+#elseif($queryType == "NE")
+#if($javaType == 'String')
+        if (StringUtils.isNotBlank(${className}.get$AttrName())){
+            lqw.ne(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#else
+        if (${className}.get$AttrName() != null){
+            lqw.ne(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#end
+#elseif($queryType == "GT")
+#if($javaType == 'String')
+        if (StringUtils.isNotBlank(${className}.get$AttrName())){
+            lqw.gt(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#else
+        if (${className}.get$AttrName() != null){
+            lqw.gt(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#end
+#elseif($queryType == "GTE")
+#if($javaType == 'String')
+        if (StringUtils.isNotBlank(${className}.get$AttrName())){
+            lqw.ge(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#else
+        if (${className}.get$AttrName() != null){
+            lqw.ge(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#end
+#elseif($queryType == "LT")
+#if($javaType == 'String')
+        if (StringUtils.isNotBlank(${className}.get$AttrName())){
+            lqw.lt(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#else
+        if (${className}.get$AttrName() != null){
+            lqw.lt(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#end
+#elseif($queryType == "LTE")
+#if($javaType == 'String')
+        if (StringUtils.isNotBlank(${className}.get$AttrName())){
+            lqw.le(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#else
+        if (${className}.get$AttrName() != null){
+            lqw.le(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#end
+#elseif($queryType == "LIKE")
+#if($javaType == 'String')
+        if (StringUtils.isNotBlank(${className}.get$AttrName())){
+            lqw.like(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#else
+        if (${className}.get$AttrName() != null){
+            lqw.like(${ClassName}::get$AttrName ,${className}.get$AttrName());
+        }
+#end
+#elseif($queryType == "BETWEEN")
+        Map<String, Object> params = ${className}.getParams();
+        if (params.get("begin$AttrName") != null && params.get("end$AttrName") != null) {
+            lqw.between(${ClassName}::get$AttrName ,params.get("begin$AttrName"),params.get("end$AttrName"));
+        }
 #end
 #end
-        return ${className}Mapper.insert${ClassName}(${className});
-    }
-
-    /**
-     * 修改${functionName}
-     * 
-     * @param ${className} ${functionName}
-     * @return 结果
-     */
-    @Override
-    public int update${ClassName}(${ClassName} ${className})
-    {
-#foreach ($column in $columns)
-#if($column.javaField == 'updateTime')
-        ${className}.setUpdateTime(DateUtils.getNowDate());
 #end
-#end
-        return ${className}Mapper.update${ClassName}(${className});
-    }
-
-    /**
-     * 批量删除${functionName}
-     * 
-     * @param ${pkColumn.javaField}s 需要删除的${functionName}ID
-     * @return 结果
-     */
-    @Override
-    public int delete${ClassName}ByIds(${pkColumn.javaType}[] ${pkColumn.javaField}s)
-    {
-        return ${className}Mapper.delete${ClassName}ByIds(${pkColumn.javaField}s);
-    }
-
-    /**
-     * 删除${functionName}信息
-     * 
-     * @param ${pkColumn.javaField} ${functionName}ID
-     * @return 结果
-     */
-    @Override
-    public int delete${ClassName}ById(${pkColumn.javaType} ${pkColumn.javaField})
-    {
-        return ${className}Mapper.delete${ClassName}ById(${pkColumn.javaField});
+        return this.list(lqw);
     }
 }
