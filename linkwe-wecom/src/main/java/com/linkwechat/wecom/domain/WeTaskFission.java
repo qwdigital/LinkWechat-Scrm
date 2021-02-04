@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.core.domain.BaseEntity;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -24,6 +25,11 @@ public class WeTaskFission extends BaseEntity {
      * 主键
      */
     private Long id;
+
+    /**
+     * 任务类型：1 任务宝 2 群裂变
+     */
+    private Integer fissionType;
 
     /**
      * 任务活动名称
@@ -64,6 +70,12 @@ public class WeTaskFission extends BaseEntity {
     private List<WeTaskFissionStaff> taskFissionStaffs;
 
     /**
+     * 客户群
+     */
+    @TableField(exist = false)
+    private List<WeGroup> taskFissionWeGroups;
+
+    /**
      * 客户标签id列表，当为全部时保存为all
      */
     @Excel(name = "客户标签id列表，当为全部时保存为all")
@@ -90,20 +102,22 @@ public class WeTaskFission extends BaseEntity {
     /**
      * 任务裂变目标员工
      */
-    @Excel(name = "任务裂变目标员工")
-    private String fissStaffId;
+    @Excel(name = "任务裂变目标id")
+    @ApiModelProperty(value = "任务裂变目标id, 目标员工或者群活码id")
+    private String fissionTargetId;
 
     /**
      * 任务裂变目标员工姓名
      */
-    @Excel(name = "任务裂变目标员工姓名")
-    private String fissStaff;
+    @Excel(name = "任务裂变目标")
+    @ApiModelProperty(value = "任务裂变目标, 目标员工名称或者群活码二维码地址")
+    private String fissionTarget;
 
     /**
      * 任务裂变目标员工二维码
      */
-    @Excel(name = "任务裂变目标员工二维码")
-    private String fissStaffQrcode;
+    @Excel(name = "任务裂变目标二维码")
+    private String fissQrcode;
 
     /**
      * 兑奖链接
@@ -139,6 +153,7 @@ public class WeTaskFission extends BaseEntity {
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
                 .append("id", getId())
+                .append("fissionType", getFissionType())
                 .append("taskName", getTaskName())
                 .append("fissInfo", getFissInfo())
                 .append("fissNum", getFissNum())
@@ -148,9 +163,9 @@ public class WeTaskFission extends BaseEntity {
                 .append("customerTag", getCustomerTag())
                 .append("postersId", getPostersId())
                 .append("postersUrl", getPostersUrl())
-                .append("fissStaffId", getFissStaffId())
-                .append("fissStaff", getFissStaff())
-                .append("fissStaffQrcode", getFissStaffQrcode())
+                .append("fissionTargetId", getFissionTargetId())
+                .append("fissionTarget", getFissionTarget())
+                .append("fissQrcode", getFissQrcode())
                 .append("rewardUrl", getRewardUrl())
                 .append("rewardImageUrl", getRewardImageUrl())
                 .append("rewardRule", getRewardRule())

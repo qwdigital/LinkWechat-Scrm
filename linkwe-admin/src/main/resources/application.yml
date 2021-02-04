@@ -215,3 +215,4 @@ cos:
   #link-wechat-1251309172.cos.ap-nanjing.myqcloud.com
   region: ap-nanjing
   bucketName: link-wechat-1251309172
+  imgUrlPrefix: https://link-wechat-1251309172.cos.ap-nanjing.myqcloud.com/

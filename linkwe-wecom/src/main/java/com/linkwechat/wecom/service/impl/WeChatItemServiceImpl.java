@@ -96,8 +96,8 @@ public class WeChatItemServiceImpl extends ServiceImpl<WeChatItemMapper, WeChatI
     }
 
     @Override
-    public List<WeChatSideVo> chatItems(Long sideId,String keyword,String mediaType) {
-        return weChatItemMapper.findChatItems(sideId,keyword,mediaType);
+    public List<WeChatSideVo> chatItems(Long sideId,String keyword,String mediaType,String userId) {
+        return weChatItemMapper.findChatItems(sideId,keyword,mediaType,userId);
     }
 
     /**
