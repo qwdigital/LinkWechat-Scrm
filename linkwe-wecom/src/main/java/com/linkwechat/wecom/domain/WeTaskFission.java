@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.core.domain.BaseEntity;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -101,14 +102,16 @@ public class WeTaskFission extends BaseEntity {
     /**
      * 任务裂变目标员工
      */
-    @Excel(name = "任务裂变目标员工")
-    private String fissStaffId;
+    @Excel(name = "任务裂变目标id")
+    @ApiModelProperty(value = "任务裂变目标id, 目标员工或者群活码id")
+    private String fissionTargetId;
 
     /**
      * 任务裂变目标员工姓名
      */
-    @Excel(name = "任务裂变目标员工姓名")
-    private String fissStaff;
+    @Excel(name = "任务裂变目标")
+    @ApiModelProperty(value = "任务裂变目标, 目标员工名称或者群活码二维码地址")
+    private String fissionTarget;
 
     /**
      * 任务裂变目标员工二维码
@@ -160,8 +163,8 @@ public class WeTaskFission extends BaseEntity {
                 .append("customerTag", getCustomerTag())
                 .append("postersId", getPostersId())
                 .append("postersUrl", getPostersUrl())
-                .append("fissStaffId", getFissStaffId())
-                .append("fissStaff", getFissStaff())
+                .append("fissionTargetId", getFissionTargetId())
+                .append("fissionTarget", getFissionTarget())
                 .append("fissQrcode", getFissQrcode())
                 .append("rewardUrl", getRewardUrl())
                 .append("rewardImageUrl", getRewardImageUrl())

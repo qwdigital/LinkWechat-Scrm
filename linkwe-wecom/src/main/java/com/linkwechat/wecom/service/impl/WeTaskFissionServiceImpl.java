@@ -139,9 +139,9 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         //海报路径
         String postersPath = weTaskFission.getPostersUrl();
         //目标员工id
-        String fissStaffId = weTaskFission.getFissStaffId();
+        String fissionTargetId = weTaskFission.getFissionTargetId();
         //目标员工活码
-        String fissStaffQrcode = weTaskFission.getFissQrcode();
+        String fissQrcode = weTaskFission.getFissQrcode();
         //todo 生成海报
 
         LinkMessageDto linkMessageDto = new LinkMessageDto();
