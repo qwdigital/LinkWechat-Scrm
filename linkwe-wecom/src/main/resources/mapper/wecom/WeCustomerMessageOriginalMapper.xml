@@ -38,6 +38,9 @@
             <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
                 AND date_format(wcmo.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
             </if>
+            <if test="sender!=null and sender!=''">
+                AND wcm.create_by=#{sender}
+            </if>
         </where>
     </select>
     <select id="findCustomerMessagePushDetail"
