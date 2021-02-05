@@ -41,6 +41,10 @@ logging:
 path:
   log: ./logs
 
+#H5地址路径
+H5:
+  url: www.baidu.com
+
 # Spring配置
 spring:
   # 资源信息
