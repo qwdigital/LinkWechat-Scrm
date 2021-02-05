@@ -44,6 +44,8 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
     @Autowired
     private IWeTaskFissionRecordService weTaskFissionRecordService;
     @Autowired
+    private IWeTaskFissionRewardService weTaskFissionRewardService;
+    @Autowired
     private IWeTaskFissionService weTaskFissionService;
 
     @Override
@@ -62,10 +64,12 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
     //裂变任务处理
     private void taskFissionRecordHandle(String state, String wecomCode, String externalUserId) {
         //查询裂变客户任务记录
+        WeCustomer weCustomer = weCustomerService.selectWeCustomerById(externalUserId);
         WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService
-                .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(state),externalUserId);
+                .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(state),weCustomer.getUnionid());
         if (weTaskFissionRecord != null) {
-            weTaskFissionRecord.setFissNum(weTaskFissionRecord.getFissNum() + 1);
+            Long fissNum = weTaskFissionRecord.getFissNum() + 1;
+            weTaskFissionRecord.setFissNum(fissNum);
             weTaskFissionRecordService.updateWeTaskFissionRecord(weTaskFissionRecord);
 
             //查询裂变任务详情
@@ -79,6 +83,17 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                 weCustomerService.sendWelcomeMsg(weWelcomeMsgBuilder.build());
             }
 
+            //裂变数量完成任务处理,消费兑换码
+            if (fissNum >= weTaskFission.getFissNum()){
+                WeTaskFissionReward reward = new WeTaskFissionReward();
+                reward.setTaskFissionId(weTaskFissionRecord.getTaskFissionId());
+                reward.setRewardCodeStatus(0);
+                List<WeTaskFissionReward> weTaskFissionRewardList = weTaskFissionRewardService.selectWeTaskFissionRewardList(reward);
+                WeTaskFissionReward fissionReward = weTaskFissionRewardList.get(0);
+                fissionReward.setRewardUser(weCustomer.getName());
+                fissionReward.setRewardUserId(weCustomer.getExternalUserid());
+                weTaskFissionRewardService.updateWeTaskFissionReward(fissionReward);
+            }
         }
     }
 
