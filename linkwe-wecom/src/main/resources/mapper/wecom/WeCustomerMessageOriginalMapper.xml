@@ -22,9 +22,6 @@
         we_customer_messageOriginal wcmo
         LEFT JOIN we_customer_message wcm ON wcmo.message_original_Id = wcm.original_id
         <where>
-            <if test="sender!=null and sender!=''">
-                AND wcmo.create_by LIKE CONCAT('%',#{sender},'%')
-            </if>
             <if test="content!=null and content!=''">
                 AND wcm.content LIKE CONCAT('%',#{content},'%')
             </if>
