@@ -292,6 +292,7 @@ export default {
     </div>
 
     <el-table
+      v-loading="loading"
       ref="multipleTable"
       :data="list"
       tooltip-effect="dark"

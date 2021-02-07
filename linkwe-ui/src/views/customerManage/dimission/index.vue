@@ -132,7 +132,7 @@ export default {
       label-width="100px"
       class="top-search"
     >
-      <el-form-item label="已离职员工">
+      <el-form-item label="已离职员工" prop="userName">
         <el-input v-model="query.userName" placeholder="请输入"></el-input>
       </el-form-item>
       <el-form-item label="离职日期">
@@ -147,14 +147,6 @@ export default {
         ></el-date-picker>
       </el-form-item>
 
-      <el-form-item label="离职日期">
-        <el-date-picker
-          v-model="query.beginTime"
-          type="date"
-          placeholder="离职日期"
-          align="right"
-        ></el-date-picker>
-      </el-form-item>
       <el-form-item label>
         <el-button
           v-hasPermi="['customerManage:dimission:query']"

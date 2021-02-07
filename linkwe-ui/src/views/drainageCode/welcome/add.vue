@@ -25,7 +25,7 @@ export default {
   watch: {},
   computed: {},
   created() {
-    this.form = this.$route.query
+    this.form = Object.assign(this.form, this.$route.query)
   },
   mounted() {},
   methods: {
@@ -66,7 +66,7 @@ export default {
           <div style="height: 300px;">
             <el-input
               type="textarea"
-              :rows="5"
+              :autosize="{ minRows: 2, maxRows: 6 }"
               maxlength="100"
               show-word-limit
               placeholder="请输入欢迎语"

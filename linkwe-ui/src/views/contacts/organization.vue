@@ -157,7 +157,7 @@ export default {
             .then(() => {
               this.msgSuccess('操作成功')
               this.dialogVisible = false
-              this.getList(!this.form.id && 1)
+              this.getList(form._new && 1)
             })
             .catch(() => {
               this.dialogVisible = false
@@ -260,7 +260,7 @@ export default {
       :inline="true"
       label-width="100px"
     >
-      <el-form-item label="账号/姓名/手机号" label-width="120px" prop="title">
+      <el-form-item label="姓名" prop="title">
         <el-input v-model="query.name" placeholder="请输入" clearable />
       </el-form-item>
       <el-form-item label="入职时间">
@@ -277,7 +277,7 @@ export default {
       <el-form-item label="激活状态">
         <el-select v-model="query.isActivate">
           <el-option label="已激活" :value="1"></el-option>
-          <el-option label="未激活" :value="2"></el-option>
+          <el-option label="未激活" :value="4"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label>
@@ -446,7 +446,7 @@ export default {
 
     <!-- 人员弹窗 -->
     <el-dialog
-      :title="(form.id ? (disabled ? '查看' : '修改') : '添加') + '成员'"
+      :title="(form.userId ? (disabled ? '查看' : '修改') : '添加') + '成员'"
       :visible.sync="dialogVisible"
     >
       <el-row :gutter="10">
@@ -484,7 +484,7 @@ export default {
             </el-form-item>
             <el-form-item label="账号" prop="userId">
               <el-input
-                :disabled="form.id"
+                :disabled="!form._new"
                 v-model="form.userId"
                 placeholder="成员唯一标识，不支持更改，不支持中文"
               ></el-input>
@@ -572,7 +572,7 @@ export default {
       :title="(formDepart.id ? '修改' : '添加') + '部门'"
       :visible.sync="dialogVisibleDepart"
     >
-      <el-form :model="formDepart" :label-width="80">
+      <el-form :model="formDepart" label-width="80px">
         <el-form-item label="部门名称">
           <el-input v-model="formDepart.name"></el-input>
         </el-form-item>

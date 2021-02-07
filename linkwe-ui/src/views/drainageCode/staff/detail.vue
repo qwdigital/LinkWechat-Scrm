@@ -1,5 +1,9 @@
 <script>
-import { getDetail, getUserAddCustomerStat, download } from '@/api/drainageCode/staff'
+import {
+  getDetail,
+  getUserAddCustomerStat,
+  download,
+} from '@/api/drainageCode/staff'
 import ClipboardJS from 'clipboard'
 import echarts from 'echarts'
 export default {
@@ -26,6 +30,7 @@ export default {
         endTime: undefined,
       },
       type: { 1: '单人', 2: '多人', 3: '批量单人' },
+      timeRange: 7,
     }
   },
   created() {
@@ -89,9 +94,11 @@ export default {
       })
     },
     setTime(days) {
+      this.timeRange = days
       let date = new Date()
       date.setDate(date.getDate() - days)
       this.dateRange = [this.getTime(date), this.getTime()]
+      this.getList()
     },
     getHandledValue(num) {
       return num < 10 ? '0' + num : num
@@ -104,19 +111,21 @@ export default {
       return year + '-' + month + '-' + date
     },
     download() {
-      let userName = this.form.weEmpleCodeUseScops.map((item) =>{
-        return item.businessName
-      }).join(",");
-      let name = userName +"-"+this.form.activityScene+".png"
-      download(this.form.id).then((res) =>{
-        if (res!=null) {
-          let blob = new Blob([res], {type: 'application/zip'});
-          let url = window.URL.createObjectURL(blob);
-          const link = document.createElement('a'); // 创建a标签
-          link.href = url;
-          link.download = name; // 重命名文件
-          link.click();
-          URL.revokeObjectURL(url); // 释放内存
+      let userName = this.form.weEmpleCodeUseScops
+        .map((item) => {
+          return item.businessName
+        })
+        .join(',')
+      let name = userName + '-' + this.form.activityScene + '.png'
+      download(this.form.id).then((res) => {
+        if (res != null) {
+          let blob = new Blob([res], { type: 'application/zip' })
+          let url = window.URL.createObjectURL(blob)
+          const link = document.createElement('a') // 创建a标签
+          link.href = url
+          link.download = name // 重命名文件
+          link.click()
+          URL.revokeObjectURL(url) // 释放内存
         }
       })
     },
@@ -182,10 +191,18 @@ export default {
     <div class="mb15">累计总人数：{{ total }}</div>
     <div>
       <el-button-group>
-        <el-button size="small" type="primary" plain @click="setTime(7)"
+        <el-button
+          size="small"
+          type="primary"
+          :plain="timeRange != 7"
+          @click="setTime(7)"
           >近7日</el-button
         >
-        <el-button size="small" type="primary" plain @click="setTime(30)"
+        <el-button
+          size="small"
+          type="primary"
+          :plain="timeRange != 30"
+          @click="setTime(30)"
           >近30日</el-button
         >
       </el-button-group>

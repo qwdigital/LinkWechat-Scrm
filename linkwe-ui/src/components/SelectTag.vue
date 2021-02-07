@@ -36,6 +36,9 @@ export default {
     type(val) {
       val === 'remove' && (this.removeTag = this.selected.slice())
     },
+    selected(val) {
+      this.Pselected = val
+    },
   },
   computed: {
     Pvisible: {
@@ -94,12 +97,14 @@ export default {
               v-show="item.groupId === selectedGroup || !selectedGroup"
               :key="index"
             >
-              <el-checkbox
-                :label="unit"
-                v-for="(unit, unique) in item.weTags"
-                :key="index + unique"
-                >{{ unit.name }}</el-checkbox
-              >
+              <template v-for="(unit, unique) in item.weTags">
+                <el-checkbox
+                  v-if="unit.name.trim()"
+                  :label="unit"
+                  :key="index + unique"
+                  >{{ unit.name }}</el-checkbox
+                >
+              </template>
             </div>
           </template>
         </el-checkbox-group>
@@ -109,7 +114,7 @@ export default {
               v-if="item.groupId === selectedGroup || !selectedGroup"
               :label="item"
               :key="index"
-              >{{ item.name }}</el-checkbox
+              >{{ item.name.trim() || '(空的无效标签，请移除)' }}</el-checkbox
             >
           </template>
         </el-checkbox-group>

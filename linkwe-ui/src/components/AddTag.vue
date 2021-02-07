@@ -1,8 +1,8 @@
 <script>
-import * as api from "@/api/customer/tag";
+import * as api from '@/api/customer/tag'
 
 export default {
-  name: "AddTag",
+  name: 'AddTag',
   components: {},
   props: {
     // 添加标签显隐
@@ -14,7 +14,7 @@ export default {
     form: {
       type: Object,
       default: () => ({
-        gourpName: "",
+        gourpName: '',
         weTags: [],
       }),
     },
@@ -22,15 +22,15 @@ export default {
   data() {
     return {
       // 添加标签输入框
-      newInput: "",
+      newInput: '',
       // 表单验证规则
       rules: Object.freeze({
-        gourpName: [{ required: true, message: "必填项", trigger: "blur" }],
-        weTags: [{ required: true, message: "必填项", trigger: "blur" }],
+        gourpName: [{ required: true, message: '必填项', trigger: 'blur' }],
+        weTags: [{ required: true, message: '必填项', trigger: 'blur' }],
       }),
       // 添加便签按钮显隐
       visibleAdd: false,
-    };
+    }
   },
   watch: {},
   computed: {
@@ -38,13 +38,13 @@ export default {
       get() {
         if (this.visible) {
           this.$nextTick(() => {
-            this.$refs["form"].clearValidate();
-          });
+            this.$refs['form'].clearValidate()
+          })
         }
-        return this.visible;
+        return this.visible
       },
       set(val) {
-        this.$emit("update:visible", val);
+        this.$emit('update:visible', val)
       },
     },
   },
@@ -53,43 +53,42 @@ export default {
   methods: {
     closeTag(tag, index) {
       if (tag.id) {
-        tag.status = 1;
+        tag.status = 1
       } else {
-        this.form.weTags.splice(index, 1);
+        this.form.weTags.splice(index, 1)
       }
     },
 
     showInput() {
-      this.visibleAdd = true;
+      this.visibleAdd = true
       this.$nextTick((_) => {
-        this.$refs.saveTagInput.$refs.input.focus();
-      });
+        this.$refs.saveTagInput.$refs.input.focus()
+      })
     },
     newInputConfirm() {
-      let name = this.newInput;
+      let name = this.newInput
       if (name) {
-        Array.isArray(this.form.weTags) || (this.form.weTags = []);
-        this.form.weTags.push({ name });
+        Array.isArray(this.form.weTags) || (this.form.weTags = [])
+        this.form.weTags.push({ name })
       }
-      this.visibleAdd = false;
-      this.newInput = "";
+      this.visibleAdd = false
+      this.newInput = ''
     },
     submit() {
-      this.$refs["form"].validate((valid) => {
-        let form = JSON.parse(JSON.stringify(this.form));
+      this.$refs['form'].validate((valid) => {
+        let form = JSON.parse(JSON.stringify(this.form))
         if (!form.weTags.length) {
-          return;
+          return
         }
-        debugger;
-        api[form.groupId ? "update" : "add"](form).then(() => {
-          this.msgSuccess("操作成功");
-          this.Pvisible = false;
-          this.$emit("success");
-        });
-      });
+        api[form.groupId ? 'update' : 'add'](form).then(() => {
+          this.msgSuccess('操作成功')
+          this.Pvisible = false
+          this.$emit('success')
+        })
+      })
     },
   },
-};
+}
 </script>
 
 <template>
@@ -118,12 +117,14 @@ export default {
             size="medium"
             :key="index"
             @close="closeTag(item, index)"
-          >{{item.name}}</el-tag>
+          >
+            {{ item.name }}
+          </el-tag>
         </template>
         <el-input
           class="input-new-tag"
           v-if="visibleAdd"
-          v-model="newInput"
+          v-model.trim="newInput"
           ref="saveTagInput"
           size="mini"
           maxlength="10"
@@ -138,11 +139,14 @@ export default {
           class="button-new-tag"
           size="mini"
           @click="showInput"
-        >+ 添加标签</el-button>
+          >+ 添加标签</el-button
+        >
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button type="primary" @click="submit">确 定</el-button>
+      <el-button type="primary" @click="submit" v-preventReClick="1000"
+        >确 定</el-button
+      >
       <el-button @click="Pvisible = false">取 消</el-button>
     </div>
   </el-dialog>
