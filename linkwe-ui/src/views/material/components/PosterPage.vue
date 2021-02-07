@@ -60,12 +60,6 @@ export default {
                 },500)
             });
         }
-        this.editorInstance.loadImageFromURL('https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg', 'imagePoster').then(async result => {
-            console.log('old : ' + result.oldWidth + ', ' + result.oldHeight);
-            console.log('new : ' + result.newWidth + ', ' + result.newHeight);
-            // await this.addImage('https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg')
-            // await this.addText('aloha');
-        });
 
         // hack UI
         this.editorInstance.events.addText = []
@@ -85,6 +79,14 @@ export default {
         this.editorInstance = null;
     },
     methods: {
+        getBackgroundUrl(bacUrl) {
+            this.editorInstance.loadImageFromURL(bacUrl, 'imagePoster').then(async result => {
+                console.log('old : ' + result.oldWidth + ', ' + result.oldHeight);
+                console.log('new : ' + result.newWidth + ', ' + result.newHeight);
+                // await this.addImage('https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg')
+                // await this.addText('aloha');
+            });
+        },
         initBtn () {
 
             this.activeObjectId = null;

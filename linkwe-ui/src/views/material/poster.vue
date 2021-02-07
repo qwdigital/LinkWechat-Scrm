@@ -7,7 +7,7 @@ import {
   removePoster,
 } from '@/api/material/poster.js'
 import MaPage from '@/views/material/components/MaPage'
-
+import SelectMaterial from '@/components/SelectMaterial'
 // Load Style Code
 import "tui-image-editor/dist/tui-image-editor.css";
 import "tui-color-picker/dist/tui-color-picker.css";
@@ -26,12 +26,14 @@ export default {
   name: 'Poster',
   components: { 
     MaPage,
+    SelectMaterial,
     "tui-image-editor": PosterPage
   },
   data () {
     return {
       imgList: {},
       imgData: [],
+      dialogVisibleSelectMaterial: false,
       dialog: {
         preview: false, // 预览弹出显示隐藏
         edit: false // 编辑弹出显示隐藏
@@ -39,6 +41,8 @@ export default {
       posterEdit: {
         step: 0
       },
+      materialSelected: '', // 图片url
+      rangeErrorMsg: '',
       posterForm: {
         title: '', // 海报名称
         categoryId: '', // 所属分类
@@ -47,7 +51,8 @@ export default {
         // count: '', // 虚拟次数
         // sort: '', // 海报排序
         // jump: [], // 跳转页面
-        delFlag: 0 // 是否启用
+        delFlag: 0, // 是否启用
+        mediaId: '', // 图片id
       },
       rules: {
         title: {
@@ -171,8 +176,9 @@ export default {
           title: data.title,
           categoryId: data.categoryId,
           type: data.type,
-          delFlag: data.delFlag
+          delFlag: data.delFlag,
         }
+        this.materialSelected = data.backgroundImgPath
         this.posterEdit.step = 0
         this.dialog.edit = true
       } catch (error) {
@@ -265,9 +271,16 @@ export default {
       imageEditor.stopDrawingMode();
     },
     toNextStep () {
+      if (this.materialSelected === '') {
+        this.rangeErrorMsg = '请选择背景图片'
+        return
+      } else {
+        this.rangeErrorMsg = ''
+      }
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.posterEdit.step = 1
+          this.$refs.tuiImageEditor.getBackgroundUrl(this.materialSelected)
         } else {
           return false;
         }
@@ -367,6 +380,16 @@ export default {
       this.imgData.push(data)
       // console.log(this.imgData)
     },
+    // 选择素材确认按钮
+    submitSelectMaterial(text, image, file) {
+      this.posterForm.mediaId = image.id
+      this.materialSelected = image.materialUrl
+      this.dialogVisibleSelectMaterial = false
+    },
+    removeMaterial() {
+      this.posterForm.mediaId = ''
+      this.materialSelected = ''
+    },
     //
     async save() {
       let list =[];
@@ -439,13 +462,15 @@ export default {
       if (posterForm.id) {
         // 编辑海报
         res = await updatePoster(Object.assign({}, {
-          backgroundImgPath: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg',
-          posterSubassemblyList: []
+          // backgroundImgPath: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg',
+          backgroundImgPath: this.materialSelected,
+          posterSubassemblyList: posterSubList
         }, this.posterForm))
       } else {
         // 新建海报
         res = await addPoster(Object.assign({}, {
-          backgroundImgPath: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg',
+          // backgroundImgPath: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg',
+          backgroundImgPath: this.materialSelected,
           posterSubassemblyList: posterSubList
         }, this.posterForm))
       }
@@ -460,6 +485,7 @@ export default {
 </script>
 
 <template>
+<div>
   <MaPage
     ref="page"
     type="5"
@@ -592,6 +618,22 @@ export default {
                 <el-radio :label="0">否</el-radio>
               </el-radio-group>
             </el-form-item>
+            <el-form-item label="背景图片" :required="true" :error="rangeErrorMsg">
+              <div v-if="materialSelected !== ''">
+                <el-image
+                  style="width: 100px; height: 100px; cursor: pointer;border-radius: 6px;"
+                  :src="materialSelected"
+                  fit="fit"
+                >
+                </el-image>
+                <i class="el-icon-error" @click="removeMaterial"></i>
+              </div>
+              <el-button
+                icon="el-icon-plus"
+                size="mini"
+                @click="dialogVisibleSelectMaterial = true"
+                >添加图片</el-button>
+            </el-form-item>
             <el-form-item>
               <el-button type="success" @click="toNextStep"
                 >前往设计海报</el-button
@@ -604,7 +646,7 @@ export default {
             <tui-image-editor
               ref="tuiImageEditor"
               :include-ui="useDefaultUI"
-              :options="options"
+              :options="options"    
               @getImageData="getImgData"
             ></tui-image-editor>
           </div>
@@ -648,6 +690,15 @@ export default {
       </div>
     </el-dialog>
   </MaPage>
+  <!-- 选择素材弹窗 -->
+  <SelectMaterial
+    :visible.sync="dialogVisibleSelectMaterial"
+    type="1"
+    :showArr="[1]"
+    @success="submitSelectMaterial"
+  >
+  </SelectMaterial>
+</div>
 </template>
 
 <style lang="scss" scoped>
