@@ -57,7 +57,7 @@ public class WeUser
     private String userId;
 
     /** 性别。1表示男性，2表示女性 */
-    private Integer gender=new Integer(1);
+    private Integer gender;
 
     /** 手机号 */
     @NotBlank(message = "手机号不可为空")
