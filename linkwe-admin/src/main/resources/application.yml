@@ -194,6 +194,8 @@ wecome:
           - /externalcontact/unionid_to_external_userid
           - /externalcontact/add_msg_template
           - /externalcontact/get_group_msg_result
+          - /message/send
+          - /appchat/send
   fileUplodUrl:  /media/upload,/media/uploadimg
   needProviderTokenUrl:
           - /service/get_login_info
@@ -206,7 +208,6 @@ wecome:
           - /user/getuserinfo
           - /get_jsapi_ticket
           - /ticket/get
-          - /message/send
   #企微回调通知配置
   callBack:
     appIdOrCorpId: ww24262ce93851488f
