@@ -3,6 +3,7 @@ package com.linkwechat.wecom.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -46,6 +48,9 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
 
     @Autowired
     private IWeMaterialService materialService;
+
+    @Autowired
+    private RedisCache redisCache;
 
     /**
      * 查询员工活码
@@ -237,7 +242,10 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         Long[] departmentIdArr = Arrays.stream(departmentIds.split(","))
                 .filter(StringUtils::isNotEmpty)
                 .map(Long::new).toArray(Long[]::new);
-        return getQrcode(userIdArr,departmentIdArr);
+        WeExternalContactDto qrcode = getQrcode(userIdArr, departmentIdArr);
+        //设置24小时过期
+        redisCache.setCacheObject(WeConstans.WE_EMPLE_CODE_KEY+":"+qrcode.getConfig_id(),qrcode.getConfig_id(),24, TimeUnit.HOURS);
+        return qrcode;
     }
 
     @Override
