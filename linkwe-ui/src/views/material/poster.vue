@@ -421,6 +421,11 @@ export default {
       let i = 0, len = list.length;
       while (i < len) {
         let vo = list[i];
+        if (!this.imgData[i]) {
+          console.log('this.imgData[i] is null')
+          i++;
+          continue;
+        }
         vo.objType = this.imgData[i].objType;
         vo.url = this.imgData[i].url;
         vo.randomId = this.imgData[i].randomId;
