@@ -13,6 +13,7 @@ import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeMessagePushClient;
+import com.linkwechat.wecom.domain.WeCorpAccount;
 import com.linkwechat.wecom.domain.WeSensitive;
 import com.linkwechat.wecom.domain.WeSensitiveAuditScope;
 import com.linkwechat.wecom.domain.WeUser;
@@ -20,6 +21,7 @@ import com.linkwechat.wecom.domain.dto.WeMessagePushDto;
 import com.linkwechat.wecom.domain.dto.message.TextMessageDto;
 import com.linkwechat.wecom.domain.query.WeSensitiveHitQuery;
 import com.linkwechat.wecom.mapper.WeSensitiveMapper;
+import com.linkwechat.wecom.service.IWeCorpAccountService;
 import com.linkwechat.wecom.service.IWeSensitiveAuditScopeService;
 import com.linkwechat.wecom.service.IWeSensitiveService;
 import com.linkwechat.wecom.service.IWeUserService;
@@ -64,6 +66,9 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
 
     @Autowired
     private WeMessagePushClient weMessagePushClient;
+
+    @Autowired
+    private IWeCorpAccountService weCorpAccountService;
 
     /**
      * 查询敏感词设置
@@ -254,6 +259,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
         boolean sendMessage = false;
         if (weSensitive.getAlertFlag().equals(1)) {
             //发送消息通知给相应的审计人
+            WeCorpAccount weCorpAccount = weCorpAccountService.findValidWeCorpAccount();
             String auditUserId = weSensitive.getAuditUserId();
             String content = "有消息触发敏感词，请登录系统及时处理!";
             TextMessageDto textMessageDto = new TextMessageDto();
@@ -262,7 +268,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
             pushDto.setTouser(auditUserId);
             pushDto.setMsgtype(MessageType.TEXT.getMessageType());
             pushDto.setText(textMessageDto);
-            weMessagePushClient.sendMessageToUser(pushDto);
+            weMessagePushClient.sendMessageToUser(pushDto,weCorpAccount.getAgentId());
             sendMessage = true;
         }
         //批量提交插入记录
