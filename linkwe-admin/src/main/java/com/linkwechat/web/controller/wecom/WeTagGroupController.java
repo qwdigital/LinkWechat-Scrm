@@ -44,7 +44,7 @@ public class WeTagGroupController extends BaseController
     public TableDataInfo list(WeTagGroup weTagGroup)
     {
         startPage();
-        synchWeTags();
+        //synchWeTags();
         return getDataTable(
                 weTagGroupService.selectWeTagGroupList(weTagGroup)
         );
