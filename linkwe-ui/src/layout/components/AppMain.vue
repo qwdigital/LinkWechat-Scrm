@@ -6,25 +6,25 @@
 <template>
   <section class="app-main">
     <transition name="fade-transform" mode="out-in">
-      <keep-alive :include="cachedViews">
-        <router-view class="page" :key="key" />
-      </keep-alive>
+      <router-view class="page" :key="key" />
+      <!-- <keep-alive :include="cachedViews">
+      </keep-alive> -->
     </transition>
   </section>
 </template>
 
 <script>
 export default {
-  name: "AppMain",
+  name: 'AppMain',
   computed: {
     cachedViews() {
-      return this.$store.state.tagsView.cachedViews;
+      return this.$store.state.tagsView.cachedViews
     },
     key() {
-      return this.$route.path;
+      return this.$route.path
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>

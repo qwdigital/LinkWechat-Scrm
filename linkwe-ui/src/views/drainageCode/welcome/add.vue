@@ -12,7 +12,7 @@ export default {
       // dialogVisible1: false,
       dialogVisibleSelectMaterial: false,
       form: {
-        id: '',
+        // id: '',
         mediaId: '',
         welcomeMsgTplType: '',
         welcomeMsg: '',
@@ -26,6 +26,7 @@ export default {
   computed: {},
   created() {
     this.form = Object.assign(this.form, this.$route.query)
+    this.$route.meta.title = (this.form.id ? '编辑' : '新建') + '欢迎语'
   },
   mounted() {},
   methods: {

@@ -29,15 +29,27 @@ export default {
       listOneArray: [],
       selectedGroup: '', // 选择的标签分组
       removeTag: [],
-      Pselected: this.selected,
+      Pselected: [],
     }
   },
   watch: {
-    type(val) {
-      val === 'remove' && (this.removeTag = this.selected.slice())
-    },
+    // type(val) {
+    //   val === 'remove' && (this.removeTag = this.selected.slice())
+    // },
     selected(val) {
-      this.Pselected = val
+      if (this.type === 'add') {
+        this.Pselected = []
+        val.forEach((element) => {
+          let find = this.listOneArray.find((d) => {
+            return element.tagId === d.tagId
+          })
+          this.Pselected.push(find)
+        })
+      } else if (this.type === 'remove') {
+        this.removeTag = val.slice()
+        this.Pselected = val.slice()
+      }
+      // this.list = JSON.parse(JSON.stringify(this.list))
     },
   },
   computed: {
@@ -52,14 +64,14 @@ export default {
     },
   },
   created() {
-    // this.type === 'remove' && (this.removeTag = this.Pselected.slice())
     this.getList()
   },
   mounted() {},
   methods: {
     getList() {
       getList().then(({ rows }) => {
-        this.list = Object.freeze(rows)
+        // this.list = Object.freeze(rows)
+        this.list = rows
         this.listOneArray = []
         this.list.forEach((element) => {
           element.weTags.forEach((d) => {
@@ -69,8 +81,21 @@ export default {
       })
     },
     submit() {
+      if (!this.Pselected.length) {
+        this.msgError('请至少选择一个标签')
+        return
+      }
       this.Pvisible = false
       this.$emit('success', this.Pselected)
+    },
+    isChecked(unit) {
+      // debugger
+      return this.Pselected.some((el) => {
+        return unit.tagId === el.tagId
+      })
+    },
+    toJson(data) {
+      return JSON.stringify(data)
     },
   },
 }
@@ -89,19 +114,19 @@ export default {
           :value="item.groupId"
         ></el-option>
       </el-select>
-      <div class="mt20">
-        <el-checkbox-group v-model="Pselected" v-if="type !== 'remove'">
+      <div class="mt20" v-if="Pvisible">
+        <el-checkbox-group v-if="type !== 'remove'" v-model="Pselected">
           <template v-for="(item, index) in list">
             <div
               class="bfc-d mr30"
-              v-show="item.groupId === selectedGroup || !selectedGroup"
+              v-if="item.groupId === selectedGroup || !selectedGroup"
               :key="index"
             >
               <template v-for="(unit, unique) in item.weTags">
                 <el-checkbox
                   v-if="unit.name.trim()"
                   :label="unit"
-                  :key="index + unique"
+                  :key="index + '' + unique"
                   >{{ unit.name }}</el-checkbox
                 >
               </template>

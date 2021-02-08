@@ -69,6 +69,13 @@ export default {
       let name = this.newInput
       if (name) {
         Array.isArray(this.form.weTags) || (this.form.weTags = [])
+        let isExist = this.form.weTags.some((e) => {
+          return e.name === name
+        })
+        if (isExist) {
+          this.msgError('标签名已存在，不可重复添加')
+          return
+        }
         this.form.weTags.push({ name })
       }
       this.visibleAdd = false
@@ -76,6 +83,7 @@ export default {
     },
     submit() {
       this.$refs['form'].validate((valid) => {
+        this.newInput = ''
         let form = JSON.parse(JSON.stringify(this.form))
         if (!form.weTags.length) {
           return
@@ -101,7 +109,7 @@ export default {
     <el-form ref="form" :model="form" :rules="rules" label-width="100px">
       <el-form-item label="标签组名称" prop="gourpName">
         <el-input
-          v-model="form.gourpName"
+          v-model.trim="form.gourpName"
           maxlength="15"
           show-word-limit
           placeholder="请输入标签组名称，该名称不支持再次修改"

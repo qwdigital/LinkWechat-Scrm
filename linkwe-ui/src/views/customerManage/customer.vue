@@ -136,10 +136,9 @@ export default {
         type: 'query',
       }
       this.dialogVisible = true
-      this.$refs.selectTag.$forceUpdate()
+      // this.$refs.selectTag.$forceUpdate()
     },
     makeTag(type) {
-      this.selectedTag = []
       if (!this.multipleSelection.length) {
         this.msgInfo('请选择一位客户')
         return
@@ -148,33 +147,53 @@ export default {
         this.msgInfo('同时只能选择一位客户')
         return
       }
-      let isError = false
+      this.selectedTag = []
+      let hasErrorTag = []
+      let repeat = []
       this.multipleSelection.forEach((element) => {
         element.weFlowerCustomerRels.forEach((child) => {
           child.weFlowerCustomerTagRels.forEach((grandchild) => {
+            // 判断是否有重复标签
+            let isRepeat = this.selectedTag.some((d) => {
+              return d.tagId === grandchild.tagId
+            })
+            // 去重
+            if (isRepeat) {
+              repeat.push(grandchild.tagName)
+              return
+            }
+
             let filter = this.listTagOneArray.find((d) => {
               return d.tagId === grandchild.tagId
             })
             // 如果没有匹配到，则说明该便签处于异常状态，可能已被删除或破坏
             if (!filter) {
+              hasErrorTag.push(grandchild.tagName)
               isError = true
               return
             }
+
             this.selectedTag.push(filter)
           })
         })
       })
-      if (isError) {
-        this.msgError('已有标签不在便签库中，或存在异常')
+      if (hasErrorTag.length > 0) {
+        this.msgError('已有标签[' + hasErrorTag + ']不在标签库中，或存在异常')
         return
       }
+      if (type === 'remove' && this.selectedTag.length === 0) {
+        this.msgError('该客户没有标签，不可进行移除')
+        return
+      }
+
       this.tagDialogType = {
-        title: type === 'add' ? '增加标签' : '移出标签',
+        title:
+          (type === 'add' ? '增加标签' : '移出标签') +
+          (repeat.length ? '（重复的标签已去重显示）' : ''),
         type: type,
       }
-      this.removeTag = this.selectedTag.slice()
       this.dialogVisible = true
-      this.$refs.selectTag.$forceUpdate()
+      // this.$refs.selectTag.$forceUpdate()
     },
     sync() {
       const loading = this.$loading({
@@ -246,6 +265,13 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.multipleSelection = selection
+    },
+    // 用于多选变单选
+    handleSelection(selection, row) {
+      this.$nextTick(() => {
+        this.$refs.table.clearSelection()
+        this.$refs.table.toggleRowSelection(row, true)
+      })
     },
   },
 }
@@ -337,6 +363,7 @@ export default {
           size="mini"
           icon="el-icon-s-flag"
           @click="makeTag('add')"
+          :disabled="multipleSelection.length !== 1"
           >打标签</el-button
         >
         <el-button
@@ -345,6 +372,7 @@ export default {
           size="mini"
           icon="el-icon-brush"
           @click="makeTag('remove')"
+          :disabled="multipleSelection.length !== 1"
           >移除标签</el-button
         >
         <el-button
@@ -366,10 +394,11 @@ export default {
     </div>
 
     <el-table
-      ref="multipleTable"
+      ref="table"
       :data="list"
       tooltip-effect="dark"
-      style="width: 100%"
+      highlight-current-row
+      @select="handleSelection"
       @selection-change="handleSelectionChange"
     >
       <el-table-column

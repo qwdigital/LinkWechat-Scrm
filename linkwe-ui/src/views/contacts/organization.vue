@@ -84,7 +84,7 @@ export default {
       rules: Object.freeze({
         name: [{ required: true, message: '必填项', trigger: 'blur' }],
         userId: [{ required: true, message: '必填项', trigger: 'blur' }],
-        department: [{ required: true, message: '必填项', trigger: 'blur' }],
+        department: [{ required: true, message: '必填项', trigger: 'change' }],
         joinTime: [{ required: true, message: '必填项', trigger: 'blur' }],
         wxAccount: [{ required: true, message: '必填项', trigger: 'blur' }],
         email: [
@@ -143,6 +143,7 @@ export default {
       this.getList(1)
     },
     edit(data, type) {
+      this.$refs['form'] && this.$refs['form'].clearValidate()
       this.form = Object.assign({}, data || { _new: true })
       this.dialogVisible = true
       type || !data ? (this.disabled = false) : (this.disabled = true)
@@ -309,14 +310,14 @@ export default {
         @click="batchImport"
         >批量导入</el-button
       >
-      <el-button
+      <!-- <el-button
         v-hasPermi="['contacts:organization:addMember']"
         type="primary"
         icon="el-icon-plus"
         size="mini"
         @click="edit()"
         >添加成员</el-button
-      >
+      > -->
     </div>
     <el-row :gutter="20">
       <!--部门数据-->
@@ -495,7 +496,7 @@ export default {
                 <el-radio :label="2">女</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="手机号" prop="name">
+            <el-form-item label="手机号" prop="mobile">
               <el-input v-model="form.mobile"></el-input>
             </el-form-item>
             <el-form-item label="邮箱">
