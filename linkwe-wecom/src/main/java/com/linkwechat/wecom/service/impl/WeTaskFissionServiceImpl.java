@@ -15,6 +15,7 @@ import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.img.NetFileUtils;
 import com.linkwechat.wecom.client.WeExternalContactClient;
 import com.linkwechat.wecom.domain.*;
+import com.linkwechat.wecom.domain.dto.WeChatUserDTO;
 import com.linkwechat.wecom.domain.dto.WeExternalContactDto;
 import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
@@ -224,12 +225,13 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     }
 
     @Override
-    public void completeFissionRecord(Long taskFissionId, Long taskFissionRecordId) {
+    public void completeFissionRecord(Long taskFissionId, Long taskFissionRecordId, WeChatUserDTO weChatUserDTO) {
         WeTaskFissionCompleteRecord wfcr = new WeTaskFissionCompleteRecord();
         wfcr.setTaskFissionId(taskFissionId);
         wfcr.setFissionRecordId(taskFissionRecordId);
-        wfcr.setCustomerId("");
-        wfcr.setCustomerName("");
+        String userId = StringUtils.isBlank(weChatUserDTO.getUserid()) ? weChatUserDTO.getUnionid() : weChatUserDTO.getUserid();
+        wfcr.setCustomerId(userId);
+        wfcr.setCustomerName(weChatUserDTO.getName());
         List<WeTaskFissionCompleteRecord> list = weTaskFissionCompleteRecordService.selectWeTaskFissionCompleteRecordList(wfcr);
         if (CollectionUtils.isEmpty(list)) {
             wfcr.setCreateBy(SecurityUtils.getUsername());

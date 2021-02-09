@@ -11,6 +11,7 @@ import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.wecom.domain.WeTaskFission;
+import com.linkwechat.wecom.domain.dto.WeChatUserDTO;
 import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
 import com.linkwechat.wecom.service.IWeTaskFissionService;
 import io.swagger.annotations.Api;
@@ -116,14 +117,14 @@ public class WeTaskFissionController extends BaseController {
     @Log(title = "添加群裂变完成记录", businessType = BusinessType.OTHER)
     @PostMapping("/complete/{id}/records/{recordId}")
     public AjaxResult completeRecord(@PathVariable("id") Long id,
-                                     @PathVariable("recordId") Long recordId) {
+                                     @PathVariable("recordId") Long recordId,
+                                     @RequestBody WeChatUserDTO weChatUserDTO) {
         WeTaskFission taskFission = weTaskFissionService.selectWeTaskFissionById(id);
         if (taskFission == null) {
             return AjaxResult.error(HttpStatus.NOT_FOUND, "数据不存在");
         }
-        //TODO 参数需要添加扫码用户的信息
-        weTaskFissionService.completeFissionRecord(id, recordId);
-        return AjaxResult.success();
+        weTaskFissionService.completeFissionRecord(id, recordId, weChatUserDTO);
+        return AjaxResult.success(taskFission.getFissQrcode());
     }
 
     /**
