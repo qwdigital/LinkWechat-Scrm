@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.linkwechat.wecom.domain.WeCustomerMessageOriginal;
 import com.linkwechat.wecom.domain.dto.message.AsyncResultDto;
+import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
 import com.linkwechat.wecom.domain.vo.CustomerMessagePushVo;
 
 import java.util.List;
@@ -15,12 +16,7 @@ import java.util.List;
  * @date 2020-12-12
  */
 public interface IWeCustomerMessageOriginalService extends IService<WeCustomerMessageOriginal> {
-    /**
-     * 保存原始数据信息
-     * @param weCustomerMessageOriginal 原始数据信息
-     * @return
-     */
-    int saveWeCustomerMessageOriginal(WeCustomerMessageOriginal weCustomerMessageOriginal);
+
 
     /**
      * 群发消息列表
@@ -48,5 +44,13 @@ public interface IWeCustomerMessageOriginalService extends IService<WeCustomerMe
      * @param asyncResultDto 可以用于获取发送结果
      */
     void asyncResult(AsyncResultDto asyncResultDto) throws JsonProcessingException;
+
+    /**
+     * 保存原始数据信息表 WeCustomerMessageOriginal 主键id
+     *
+     * @param customerMessagePushDto
+     * @return
+     */
+    public long saveWeCustomerMessageOriginal(CustomerMessagePushDto customerMessagePushDto);
 
 }
