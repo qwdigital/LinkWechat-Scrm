@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -50,7 +51,7 @@ public class WeCustomerMessagePushController extends BaseController {
     public AjaxResult add(@RequestBody CustomerMessagePushDto customerMessagePushDto) {
         try {
             weCustomerMessagePushService.addWeCustomerMessagePush(customerMessagePushDto);
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException | ParseException e) {
             e.printStackTrace();
             return AjaxResult.error("群发失败");
         }
@@ -103,6 +104,5 @@ public class WeCustomerMessagePushController extends BaseController {
         weCustomerMessageOriginalService.asyncResult(asyncResultDto);
         return AjaxResult.success();
     }
-
 
 }

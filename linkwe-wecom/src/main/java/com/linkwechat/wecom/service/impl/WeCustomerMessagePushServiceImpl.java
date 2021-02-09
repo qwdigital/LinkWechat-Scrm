@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
@@ -16,6 +17,7 @@ import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
 import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.message.*;
 import com.linkwechat.wecom.domain.vo.CustomerMessagePushVo;
+import com.linkwechat.wecom.mapper.WeCustomerMessageTimeTaskMapper;
 import com.linkwechat.wecom.service.*;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,9 +68,12 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
     @Autowired
     private RedisCache redisCache;
 
+    @Autowired
+    private WeCustomerMessageTimeTaskMapper customerMessageTimeTaskMapper;
+
     @Override
     @Transactional
-    public void addWeCustomerMessagePush(CustomerMessagePushDto customerMessagePushDto) throws JsonProcessingException {
+    public void addWeCustomerMessagePush(CustomerMessagePushDto customerMessagePushDto) throws JsonProcessingException, ParseException {
 
         if ((null != customerMessagePushDto.getSettingTime() && !"".equals(customerMessagePushDto.getSettingTime()))
                 && DateUtils.diffTime(new Date(), DateUtil.parse(customerMessagePushDto.getSettingTime(), "yyyy-MM-dd HH:mm:ss")) > 0) {
@@ -77,7 +83,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
         List<WeCustomer> customers = Lists.newArrayList();
         List<WeGroup> groups = new ArrayList<>();
         // 0 发给客户
-        if (customerMessagePushDto.getPushType().equals("0")) {
+        if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_CUSTOMER)) {
             //查询客户信息列表
             customers = externalUserIds(customerMessagePushDto.getPushRange(), customerMessagePushDto.getStaffId()
                     , customerMessagePushDto.getDepartment(), customerMessagePushDto.getTag());
@@ -87,7 +93,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
         }
 
         // 0 发给客户群
-        if (customerMessagePushDto.getPushType().equals("1")) {
+        if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_GROUP)) {
 
             if (customerMessagePushDto.getStaffId() == null || customerMessagePushDto.getStaffId().equals("")) {
                 throw new WeComException("请选择人员！");
@@ -118,29 +124,21 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
         //保存分类消息信息
         weCustomerSeedMessageService.saveSeedMessage(customerMessagePushDto, messageId);
 
+        log.info("消息发送信息：{}", JSONUtil.toJsonStr(customerMessagePushDto));
+        CustomerMessagePushDto customerMessagePushDto1 = JSONUtil.toBean(JSONUtil.parseObj(JSONUtil.toJsonStr(customerMessagePushDto)), CustomerMessagePushDto.class);
+
         //发送群发消息
         //调用微信api发送消息
         if (null == customerMessagePushDto.getSettingTime() || customerMessagePushDto.getSettingTime().equals("")) {
             weCustomerMessageService.sendMessgae(customerMessagePushDto, messageId,customers,groups);
         } else {
 
-            //发送时间不能小于当前时间
-            //定时发送消息(异步执行)
-            //保存消息体到数据库，增加一个发送状态(0 已发送 1 未发送)
-            //定义一个任务执行队列
-            //把任务放入执行队列
-            //任务执行 sendMessgae(WeMessagePush weMessagePush) 方法
-            Timer timer = new Timer();
-            List<WeCustomer> finalCustomers = customers;
-            List<WeGroup> finalGroups = groups;
-            timer.schedule(new TimerTask() {
-                @SneakyThrows
-                @Override
-                public void run() {
-                    weCustomerMessageService.sendMessgae(customerMessagePushDto, messageId, finalCustomers, finalGroups);
+            WeCustomerMessageTimeTask timeTask=new WeCustomerMessageTimeTask(messageId, JSONUtil.toJsonStr(customerMessagePushDto),
+                    JSONUtil.toJsonStr(customers).replaceAll("[\ud800\udc00-\udbff\udfff\ud800-\udfff]", "")
+                    ,JSONUtil.toJsonStr(groups).replaceAll("[\ud800\udc00-\udbff\udfff\ud800-\udfff]", "")
+                    ,DateUtils.getMillionSceondsBydate(customerMessagePushDto.getSettingTime()));
 
-                }
-            }, DateUtil.parse(customerMessagePushDto.getSettingTime(), "yyyy-MM-dd HH:mm:ss"));
+            customerMessageTimeTaskMapper.insert(timeTask);
 
         }
 
@@ -161,7 +159,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
      * @return {@link List}s 客户的外部联系人id列表
      */
     public List<WeCustomer> externalUserIds(String pushRange, String staffId, String department, String tag) {
-        if (pushRange.equals("0")) {
+        if (pushRange.equals(WeConstans.SEND_MESSAGE_CUSTOMER_ALL)) {
             //从redis中读取数据
             return redisCache.getCacheList(WeConstans.WECUSTOMERS_KEY);
         } else {

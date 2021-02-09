@@ -21,4 +21,13 @@ public interface WeCustomerMessageMapper extends BaseMapper<WeCustomerMessage> {
      * @return int
      */
     int updateWeCustomerMessageActualSend(@Param("messageId") Long messageId,@Param("actualSend") Integer actualSend);
+
+    /**
+     * 更新消息发送状态
+     * @param messageId id
+     * @param status 消息发送状态 0 未发送  1 已发送
+     * @return int
+     */
+    int updateWeCustomerMessageCheckStatusById(@Param("messageId") Long messageId,@Param("status") String status);
+
 }
