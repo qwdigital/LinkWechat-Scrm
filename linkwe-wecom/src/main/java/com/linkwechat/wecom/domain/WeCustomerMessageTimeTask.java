@@ -2,9 +2,12 @@ package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
  * 群发消息定时任务表
@@ -14,7 +17,7 @@ import lombok.NoArgsConstructor;
 @TableName("we_customer_messageTimeTask")
 public class WeCustomerMessageTimeTask extends BaseEntity {
 
-    public WeCustomerMessageTimeTask(Long messageId, String messageInfo, String customersInfo, String groupsInfo, Long settingTime) {
+    public WeCustomerMessageTimeTask(Long messageId, CustomerMessagePushDto messageInfo, List<WeCustomer> customersInfo, List<WeGroup> groupsInfo, Long settingTime) {
         this.messageId = messageId;
         this.messageInfo = messageInfo;
         this.customersInfo = customersInfo;
@@ -38,17 +41,17 @@ public class WeCustomerMessageTimeTask extends BaseEntity {
     /**
      * 消息原始信息
      */
-    private String messageInfo;
+    private CustomerMessagePushDto messageInfo;
 
     /**
      * 客户信息列表
      */
-    private String customersInfo;
+    private List<WeCustomer> customersInfo;
 
     /**
      * 客户群组信息列表
      */
-    private String groupsInfo;
+    private List<WeGroup> groupsInfo;
 
     /**
      * 定时时间的毫秒数

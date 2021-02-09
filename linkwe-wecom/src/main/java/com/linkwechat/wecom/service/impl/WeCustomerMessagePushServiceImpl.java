@@ -133,12 +133,10 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
             weCustomerMessageService.sendMessgae(customerMessagePushDto, messageId,customers,groups);
         } else {
 
-            WeCustomerMessageTimeTask timeTask=new WeCustomerMessageTimeTask(messageId, JSONUtil.toJsonStr(customerMessagePushDto),
-                    JSONUtil.toJsonStr(customers).replaceAll("[\ud800\udc00-\udbff\udfff\ud800-\udfff]", "")
-                    ,JSONUtil.toJsonStr(groups).replaceAll("[\ud800\udc00-\udbff\udfff\ud800-\udfff]", "")
+            WeCustomerMessageTimeTask timeTask=new WeCustomerMessageTimeTask(messageId, customerMessagePushDto, customers,groups
                     ,DateUtils.getMillionSceondsBydate(customerMessagePushDto.getSettingTime()));
 
-            customerMessageTimeTaskMapper.insert(timeTask);
+            customerMessageTimeTaskMapper.saveWeCustomerMessageTimeTask(timeTask);
 
         }
 

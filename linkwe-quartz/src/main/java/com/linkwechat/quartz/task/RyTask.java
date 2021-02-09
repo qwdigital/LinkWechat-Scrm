@@ -2,16 +2,16 @@ package com.linkwechat.quartz.task;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.elasticsearch.ElasticSearch;
 import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.WeCustomer;
-import com.linkwechat.wecom.service.IWeChatContactMappingService;
-import com.linkwechat.wecom.service.IWeCustomerService;
-import com.linkwechat.wecom.service.IWeSensitiveActHitService;
-import com.linkwechat.wecom.service.IWeSensitiveService;
+import com.linkwechat.wecom.domain.WeCustomerMessageTimeTask;
+import com.linkwechat.wecom.mapper.WeCustomerMessageTimeTaskMapper;
+import com.linkwechat.wecom.service.*;
 import com.tencent.wework.FinanceUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -48,6 +48,11 @@ public class RyTask {
     private IWeSensitiveActHitService weSensitiveActHitService;
     @Autowired
     private IWeCustomerService weCustomerService;
+    @Autowired
+    private WeCustomerMessageTimeTaskMapper customerMessageTimeTaskMapper;
+
+    @Autowired
+    private IWeCustomerMessageService weCustomerMessageService;
 
     public void ryMultipleParams(String s, Boolean b, Long l, Double d, Integer i) {
         System.out.println(StringUtils.format("执行多参方法： 字符串类型{}，布尔类型{}，长整型{}，浮点型{}，整形{}", s, b, l, d, i));
@@ -130,4 +135,24 @@ public class RyTask {
         log.info("执行有参方法: params:{},{}", corpId, secret);
 
     }
+
+    public void messageTask(){
+
+        //获的当前时间的毫秒数
+        long currentTime = System.currentTimeMillis();
+        //customerMessageTimeTaskMapper
+        List<WeCustomerMessageTimeTask> weCustomerMessageTimeTasks = customerMessageTimeTaskMapper.selectWeCustomerMessageTimeTaskGteSettingTime(currentTime);
+        if(CollectionUtils.isNotEmpty(weCustomerMessageTimeTasks)){
+            weCustomerMessageTimeTasks.forEach(s->{
+                try {
+                    weCustomerMessageService.sendMessgae(s.getMessageInfo(), s.getMessageId(),s.getCustomersInfo(),s.getGroupsInfo());
+                } catch (JsonProcessingException e) {
+                    log.error("定时群发消息处理异常：ex:{}", e);
+                    e.printStackTrace();
+                }
+            });
+        }
+
+    }
+
 }
