@@ -74,7 +74,6 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
             throw new WeComException("发送时间不能小于当前时间");
         }
 
-
         List<WeCustomer> customers = Lists.newArrayList();
         List<WeGroup> groups = new ArrayList<>();
         // 0 发给客户
@@ -82,15 +81,27 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
             //查询客户信息列表
             customers = externalUserIds(customerMessagePushDto.getPushRange(), customerMessagePushDto.getStaffId()
                     , customerMessagePushDto.getDepartment(), customerMessagePushDto.getTag());
+            if(CollectionUtils.isEmpty(customers)){
+                throw new WeComException("没有外部联系人");
+            }
         }
 
         // 0 发给客户群
         if (customerMessagePushDto.getPushType().equals("1")) {
+
+            if (customerMessagePushDto.getStaffId() == null || customerMessagePushDto.getStaffId().equals("")) {
+                throw new WeComException("请选择人员！");
+            }
+
             //查询群组信息列表
             //通过员工id查询群列表
             WeGroup weGroup = new WeGroup();
             weGroup.setUserIds(customerMessagePushDto.getStaffId());
             groups = weGroupService.selectWeGroupList(weGroup);
+            if(CollectionUtils.isEmpty(customers)){
+                throw new WeComException("没有客户群！");
+            }
+
         }
 
         //保存原始数据信息表
@@ -119,10 +130,6 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
             //定义一个任务执行队列
             //把任务放入执行队列
             //任务执行 sendMessgae(WeMessagePush weMessagePush) 方法
-            if (DateUtils.diffTime(new Date(), DateUtil.parse(customerMessagePushDto.getSettingTime(), "yyyy-MM-dd HH:mm:ss")) > 0) {
-                throw new WeComException("发送时间不能小于当前时间");
-            }
-
             Timer timer = new Timer();
             List<WeCustomer> finalCustomers = customers;
             List<WeGroup> finalGroups = groups;

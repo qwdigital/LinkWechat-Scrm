@@ -91,26 +91,23 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
         //发送类类型: 给单个客户发，群发
         //发给客户
         if (customerMessagePushDto.getPushType().equals("0")) {
+
             WeCustomerMessagePushDto messagePushDto = new WeCustomerMessagePushDto();
             messagePushDto.setChat_type(ChatType.of(customerMessagePushDto.getPushType()).getName());
             List<String> externalUserIds = customers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
 
-            if(CollectionUtils.isEmpty(externalUserIds)){
-                throw new WeComException("没有外部联系人");
-            }
             messagePushDto.setExternal_userid(externalUserIds);
             childMessage(messagePushDto, customerMessagePushDto);
             SendMessageResultDto sendMessageResultDto = weCustomerMessagePushClient.sendCustomerMessageToUser(messagePushDto);
             if (WeConstans.WE_SUCCESS_CODE.equals(sendMessageResultDto.getErrcode())) {
                 msgid.add(sendMessageResultDto.getMsgid());
             }
+
         }
 
         //发给客户群
         if (customerMessagePushDto.getPushType().equals("1")) {
-            if (customerMessagePushDto.getStaffId() == null || customerMessagePushDto.getStaffId().equals("")) {
-                throw new WeComException("参数异常！");
-            }
+
             if (CollectionUtils.isNotEmpty(groups)) {
                 List<String> owners = groups.stream().map(WeGroup::getOwner).collect(Collectors.toList());
                 for (String owner : owners) {
@@ -126,6 +123,7 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
                     }
                 }
             }
+
         }
 
         this.updateMsgId(messageId, msgid);
