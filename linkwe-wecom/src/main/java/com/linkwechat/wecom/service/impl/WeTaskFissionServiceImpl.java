@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.enums.TaskFissionType;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -254,9 +255,9 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     }
 
     private void groupQrcodeHandler(WeTaskFission weTaskFission) {
-        //增加群裂变处理
         String groupQrcodeId = weTaskFission.getFissionTargetId();
-        if (StringUtils.isNotBlank(groupQrcodeId)) {
+        if (weTaskFission.getFissionType() != null && weTaskFission.getFissionType().equals(TaskFissionType.GROUP_FISSION.getCode())
+                && StringUtils.isNotBlank(groupQrcodeId) && StringUtils.isBlank(weTaskFission.getFissQrcode())) {
             WeGroupCode groupCode = weGroupCodeService.selectWeGroupCodeById(Long.parseLong(groupQrcodeId));
             if (groupCode != null) {
                 String qrcodeUrl = groupCode.getCodeUrl();
