@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.enums.TaskFissionType;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -49,6 +50,8 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     private WeExternalContactClient weExternalContactClient;
     @Autowired
     private IWePosterService wePosterService;
+    @Autowired
+    private IWeGroupCodeService weGroupCodeService;
     @Value("${H5.url}")
     private String pageUrl;
 
@@ -85,6 +88,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     public int insertWeTaskFission(WeTaskFission weTaskFission) {
         weTaskFission.setCreateBy(SecurityUtils.getUsername());
         weTaskFission.setCreateTime(DateUtils.getNowDate());
+        groupQrcodeHandler(weTaskFission);
         int insertResult = weTaskFissionMapper.insertWeTaskFission(weTaskFission);
         if (insertResult > 0) {
             if (CollectionUtils.isNotEmpty(weTaskFission.getTaskFissionStaffs())) {
@@ -108,6 +112,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     @Override
     public int updateWeTaskFission(WeTaskFission weTaskFission) {
         weTaskFission.setUpdateTime(DateUtils.getNowDate());
+        weTaskFission.setUpdateBy(SecurityUtils.getUsername());
         return weTaskFissionMapper.updateWeTaskFission(weTaskFission);
     }
 
@@ -191,12 +196,6 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         if (user != null) {
             WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), user.getUserId(), user.getName());
             String qrcode = getPosterQRCode(weTaskFissionPosterDTO.getFissStaffId(), record);
-
-            //保存qrcode信息
-            WeTaskFission taskFission = weTaskFissionMapper.selectWeTaskFissionById(weTaskFissionPosterDTO.getTaskFissionId());
-            taskFission.setFissQrcode(qrcode);
-            weTaskFissionMapper.updateWeTaskFission(taskFission);
-
             WePoster poster = wePosterService.selectOne(weTaskFissionPosterDTO.getPosterId());
             poster.getPosterSubassemblyList().stream().filter(Objects::nonNull)
                     .filter(wePosterSubassembly -> wePosterSubassembly.getType() == 3).forEach(wePosterSubassembly -> {
@@ -253,5 +252,17 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
             }
         }
         return recordInfo;
+    }
+
+    private void groupQrcodeHandler(WeTaskFission weTaskFission) {
+        String groupQrcodeId = weTaskFission.getFissionTargetId();
+        if (weTaskFission.getFissionType() != null && weTaskFission.getFissionType().equals(TaskFissionType.GROUP_FISSION.getCode())
+                && StringUtils.isNotBlank(groupQrcodeId) && StringUtils.isBlank(weTaskFission.getFissQrcode())) {
+            WeGroupCode groupCode = weGroupCodeService.selectWeGroupCodeById(Long.parseLong(groupQrcodeId));
+            if (groupCode != null) {
+                String qrcodeUrl = groupCode.getCodeUrl();
+                weTaskFission.setFissQrcode(qrcodeUrl);
+            }
+        }
     }
 }

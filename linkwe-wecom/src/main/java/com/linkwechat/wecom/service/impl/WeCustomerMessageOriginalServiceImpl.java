@@ -5,13 +5,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
 import com.linkwechat.wecom.domain.WeCustomerMessageOriginal;
-import com.linkwechat.wecom.domain.dto.message.AsyncResultDto;
-import com.linkwechat.wecom.domain.dto.message.DetailMessageStatusResultDto;
-import com.linkwechat.wecom.domain.dto.message.QueryCustomerMessageStatusResultDataObjectDto;
-import com.linkwechat.wecom.domain.dto.message.QueryCustomerMessageStatusResultDto;
+import com.linkwechat.wecom.domain.dto.message.*;
 import com.linkwechat.wecom.domain.vo.CustomerMessagePushVo;
 import com.linkwechat.wecom.mapper.WeCustomerMessageOriginalMapper;
 import com.linkwechat.wecom.mapper.WeCustomerMessgaeResultMapper;
@@ -50,11 +48,6 @@ public class WeCustomerMessageOriginalServiceImpl extends ServiceImpl<WeCustomer
     private ObjectMapper objectMapper;
 
     @Override
-    public int saveWeCustomerMessageOriginal(WeCustomerMessageOriginal weCustomerMessageOriginal) {
-        return weCustomerMessageOriginalMapper.insert(weCustomerMessageOriginal);
-    }
-
-    @Override
     public List<CustomerMessagePushVo> customerMessagePushs(String sender, String content, String pushType, String beginTime, String endTime) {
         return weCustomerMessageOriginalMapper.selectCustomerMessagePushs(sender, content, pushType, beginTime, endTime);
     }
@@ -78,6 +71,23 @@ public class WeCustomerMessageOriginalServiceImpl extends ServiceImpl<WeCustomer
     public void asyncResult(AsyncResultDto asyncResultDto) throws JsonProcessingException {
         String msgid=new ObjectMapper().writeValueAsString(asyncResultDto.getMsgids());
         syncSendResult(msgid, asyncResultDto.getMessageId());
+    }
+
+    @Override
+    public long saveWeCustomerMessageOriginal(CustomerMessagePushDto customerMessagePushDto) {
+        //保存原始数据信息表 WeCustomerMessageOriginal 主键id
+        long messageOriginalId = SnowFlakeUtil.nextId();
+        WeCustomerMessageOriginal original = new WeCustomerMessageOriginal();
+        original.setMessageOriginalId(messageOriginalId);
+        original.setStaffId(customerMessagePushDto.getStaffId());
+        original.setDepartment(customerMessagePushDto.getDepartment());
+        original.setPushType(customerMessagePushDto.getPushType());
+        original.setMessageType(customerMessagePushDto.getMessageType());
+        original.setPushRange(customerMessagePushDto.getPushRange());
+        original.setTag(customerMessagePushDto.getTag());
+        original.setDelFlag(0);
+        this.save(original);
+        return messageOriginalId;
     }
 
     public void syncSendResult(String msgid, Long messageId) {
