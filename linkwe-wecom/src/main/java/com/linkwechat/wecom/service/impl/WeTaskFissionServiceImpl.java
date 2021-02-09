@@ -49,6 +49,8 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     private WeExternalContactClient weExternalContactClient;
     @Autowired
     private IWePosterService wePosterService;
+    @Autowired
+    private IWeGroupCodeService weGroupCodeService;
     @Value("${H5.url}")
     private String pageUrl;
 
@@ -85,6 +87,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     public int insertWeTaskFission(WeTaskFission weTaskFission) {
         weTaskFission.setCreateBy(SecurityUtils.getUsername());
         weTaskFission.setCreateTime(DateUtils.getNowDate());
+        groupQrcodeHandler(weTaskFission);
         int insertResult = weTaskFissionMapper.insertWeTaskFission(weTaskFission);
         if (insertResult > 0) {
             if (CollectionUtils.isNotEmpty(weTaskFission.getTaskFissionStaffs())) {
@@ -108,6 +111,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     @Override
     public int updateWeTaskFission(WeTaskFission weTaskFission) {
         weTaskFission.setUpdateTime(DateUtils.getNowDate());
+        weTaskFission.setUpdateBy(SecurityUtils.getUsername());
         return weTaskFissionMapper.updateWeTaskFission(weTaskFission);
     }
 
@@ -247,5 +251,17 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
             }
         }
         return recordInfo;
+    }
+
+    private void groupQrcodeHandler(WeTaskFission weTaskFission) {
+        //增加群裂变处理
+        String groupQrcodeId = weTaskFission.getFissionTargetId();
+        if (StringUtils.isNotBlank(groupQrcodeId)) {
+            WeGroupCode groupCode = weGroupCodeService.selectWeGroupCodeById(Long.parseLong(groupQrcodeId));
+            if (groupCode != null) {
+                String qrcodeUrl = groupCode.getCodeUrl();
+                weTaskFission.setFissQrcode(qrcodeUrl);
+            }
+        }
     }
 }

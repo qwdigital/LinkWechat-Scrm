@@ -9,6 +9,7 @@ import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import javax.validation.constraints.NotBlank;
 import java.util.Date;
 import java.util.List;
 
@@ -103,6 +104,7 @@ public class WeTaskFission extends BaseEntity {
      * 任务裂变目标员工
      */
     @Excel(name = "任务裂变目标id")
+    @NotBlank(message = "目标员工或群活码不能为空")
     @ApiModelProperty(value = "任务裂变目标id, 目标员工或者群活码id")
     private String fissionTargetId;
 
