@@ -191,12 +191,6 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         if (user != null) {
             WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), user.getUserId(), user.getName());
             String qrcode = getPosterQRCode(weTaskFissionPosterDTO.getFissStaffId(), record);
-
-            //保存qrcode信息
-            WeTaskFission taskFission = weTaskFissionMapper.selectWeTaskFissionById(weTaskFissionPosterDTO.getTaskFissionId());
-            taskFission.setFissQrcode(qrcode);
-            weTaskFissionMapper.updateWeTaskFission(taskFission);
-
             WePoster poster = wePosterService.selectOne(weTaskFissionPosterDTO.getPosterId());
             poster.getPosterSubassemblyList().stream().filter(Objects::nonNull)
                     .filter(wePosterSubassembly -> wePosterSubassembly.getType() == 3).forEach(wePosterSubassembly -> {
