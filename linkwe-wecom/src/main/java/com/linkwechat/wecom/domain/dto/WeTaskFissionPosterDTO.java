@@ -11,6 +11,6 @@ import lombok.Data;
 public class WeTaskFissionPosterDTO {
     private String userId;
     private Long taskFissionId;
-    private String fissStaffId;
+    private String fissionTargetId;
     private Long posterId;
 }

@@ -74,4 +74,12 @@ public interface IWeTaskFissionService {
      * @return
      */
     public String fissionPosterGenerate(WeTaskFissionPosterDTO weTaskFissionPosterDTO);
+
+    /**
+     * 添加裂变完成记录
+     *
+     * @param taskFissionId
+     * @param taskFissionRecordId
+     */
+    public void completeFissionRecord(Long taskFissionId, Long taskFissionRecordId);
 }
