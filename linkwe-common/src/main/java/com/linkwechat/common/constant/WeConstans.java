@@ -44,6 +44,11 @@ public class WeConstans {
      */
     public static final String WE_AGENT_ACCESS_TOKEN = "we_agent_access_token";
 
+
+    public static final String WE_EMPLE_CODE_KEY = "we_emple_code_key";
+
+
+
     /**
      * 企业微信接口返回成功code
      */

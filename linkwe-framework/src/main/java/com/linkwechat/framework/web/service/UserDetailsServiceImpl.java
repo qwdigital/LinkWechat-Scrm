@@ -72,7 +72,7 @@ public class UserDetailsServiceImpl implements UserDetailsService
                     .userType(Constants.USER_TYPE_WECOME)
                     .email(weUser.getEmail())
                     .phonenumber(weUser.getMobile())
-                    .sex(weUser.getGender().toString())
+                    .sex(weUser.getGender() ==0 ? "1": weUser.getGender() .toString())
                     .avatar(weUser.getAvatarMediaid())
                     .roleIds(ArrayUtil.toArray(roleMapper.selectRoleList(SysRole.builder()
                             .roleKey(Constants.DEFAULT_WECOME_ROLE_KEY)

@@ -39,6 +39,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="name != null  and name != ''"> and user_name like concat('%', #{name}, '%')</if>
             <if test="alias != null  and alias != ''"> and alias = #{alias}</if>
             <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
+            <if test="isActivate != null"> and is_activate = #{isActivate}</if>
             <if test="gender != null "> and gender = #{gender}</if>
             <if test="mobile != null  and mobile != ''"> and mobile = #{mobile}</if>
             <if test="email != null  and email != ''"> and email = #{email}</if>

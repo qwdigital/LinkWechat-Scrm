@@ -37,7 +37,7 @@ public class WeCallBackController extends CommonController {
     @Value("${wecome.callBack.encodingAesKey}")
     private String encodingAesKey;
 
-    @PostMapping(value = "/recive", produces = {"application/xml;charset=UTF-8"})
+    @PostMapping(value = "/recive")
     public String recive(@RequestBody String msg, @RequestParam(name = "msg_signature") String signature,
                          String timestamp, String nonce) {
         WxCryptUtil wxCryptUtil = new WxCryptUtil(token, encodingAesKey, appIdOrCorpId);
@@ -61,7 +61,7 @@ public class WeCallBackController extends CommonController {
         }
     }
 
-    @GetMapping(value = "/recive", produces = {"application/xml;charset=UTF-8"})
+    @GetMapping(value = "/recive")
     public String recive(HttpServletRequest request) {
         // 微信加密签名
         String sVerifyMsgSig = request.getParameter("msg_signature");

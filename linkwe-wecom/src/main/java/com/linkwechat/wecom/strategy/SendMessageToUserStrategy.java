@@ -68,7 +68,7 @@ public class SendMessageToUserStrategy implements Strategy {
 
         //动态添加微信消息体属性和属性值信息
         WeMessagePushDto target = (WeMessagePushDto) ReflectUtil.getTarget(weMessagePushDto, map);
-        WeMessagePushResultDto weMessagePushResultDto = weMessagePushClient.sendMessageToUser(target);
+        WeMessagePushResultDto weMessagePushResultDto = weMessagePushClient.sendMessageToUser(target,target.getAgentid().toString());
 
         if (weMessagePushResultDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)) {
             weMessagePush.setCreateTime(DateUtils.getNowDate());

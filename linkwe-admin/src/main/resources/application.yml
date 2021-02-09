@@ -209,9 +209,9 @@ wecome:
           - /message/send
   #企微回调通知配置
   callBack:
-    appIdOrCorpId: ww38152475d1bca752
-    token: uEyhhuTKfpS
-    encodingAesKey: diTFQ6B4IW14UN2JplADuhMZsBZHjvuBG24kHFrr4Px
+    appIdOrCorpId: ww24262ce93851488f
+    token: jtQ1aGHgSmH2UHNBIndUtUe6B6EwfR
+    encodingAesKey: Vga4HWv7nFbRDYK8iAaQbxmkuecpo2BAfmXAyWwcXMO
 #腾讯云对象存储
 cos:
   secretId: AKIDQRCizIeUGl13vakkDQMH0VkjhPr1rBBv
