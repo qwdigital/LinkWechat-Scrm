@@ -133,7 +133,7 @@ public class WeMaterialController extends BaseController {
         return AjaxResult.success();
     }
 
-    @PreAuthorize("@ss.hasPermi('wechat:material:temporaryMaterialMediaId')")
+    //@PreAuthorize("@ss.hasPermi('wechat:material:temporaryMaterialMediaId')")
     @Log(title = "获取素材media_id", businessType = BusinessType.OTHER)
     @PostMapping("/temporaryMaterialMediaId")
     @ApiOperation("获取素材media_id")
