@@ -1,5 +1,7 @@
 import request from '@/utils/request'
-const service = window.CONFIG.services.wecom + '/chat'
+const wecom = window.CONFIG.services.wecom
+const service = wecom + '/chat'
+const serviceMaterial = wecom + '/material'
 
 /**
  * 侧边栏列表
@@ -65,5 +67,19 @@ export function cancleCollection(data) {
     url: service + '/collection/cancleCollection',
     method: 'post',
     data,
+  })
+}
+
+/**
+ * 获取企业微信素材media_id
+ * @param {*} params
+ * url [string] 是	素材路径		
+type [string] 是	素材类型		
+name [string] 是	文件名称
+ */
+export function getMaterialMediaId(params) {
+  return request({
+    url: serviceMaterial + '/temporaryMaterialMediaId',
+    params,
   })
 }

@@ -4,6 +4,7 @@ import {
   getCollectionList,
   addCollection,
   cancleCollection,
+  getMaterialMediaId,
 } from '@/api/chat'
 export default {
   components: {},
@@ -46,7 +47,11 @@ export default {
       },
     }
   },
-  watch: {},
+  watch: {
+    userId() {
+      this.getList(1)
+    },
+  },
   computed: {},
   created() {
     this.getList()
@@ -71,6 +76,13 @@ export default {
         : getCollectionList({ userId: this.userId, pageSize, pageNum, keyword })
       )
         .then(({ rows, total }) => {
+          // 判断我的列表
+          if (!this.sideId) {
+            rows.forEach((element) => {
+              element.collection = 1
+            })
+          }
+
           this.list.push(...rows)
 
           this.loading = false
@@ -91,24 +103,31 @@ export default {
     //   })
     // },
     send(data) {
+      this.$toast.loading({
+        message: '正在发送...',
+        duration: 0,
+        forbidClick: true,
+      })
       let entry = undefined
       let _this = this
-      wx.invoke('getContext', {}, function(res) {
+      wx.invoke('getContext', {}, async function(res) {
         if (res.err_msg == 'getContext:ok') {
           entry = res.entry //返回进入H5页面的入口类型，目前 contact_profile、single_chat_tools、group_chat_tools
-
+          let mes = {}
           try {
             if (
               !['single_chat_tools', 'group_chat_tools', 'normal'].includes(
                 entry
               )
             ) {
+              // _this.$toast.clear()
               _this.$toast('入口错误：' + entry)
               return
             }
+
             // mediaType 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本 5 海报
             // msgtype 文本(“text”)，图片(“image”)，视频(“video”)，文件(“file”)，H5(“news”）和小程序(“miniprogram”)
-            let mes = {}
+
             let msgtype = {
               0: 'image',
               2: 'video',
@@ -126,8 +145,18 @@ export default {
               case '0':
               case '2':
               case '3':
+                let dataMediaId = {
+                  url: data.materialUrl,
+                  type: msgtype[data.mediaType],
+                  name: data.materialName,
+                }
+                let resMaterialId = await getMaterialMediaId(dataMediaId)
+                if (!resMaterialId.data) {
+                  _this.$toast('获取素材id失败')
+                  return
+                }
                 mes[msgtype[data.mediaType]] = {
-                  mediaid: data.materialId, //
+                  mediaid: resMaterialId.data.media_id, //
                 }
                 break
               case '5':
@@ -149,20 +178,22 @@ export default {
               //   break
             }
             mes.msgtype = msgtype[data.mediaType]
-            _this.$dialog({ message: 'mes：' + JSON.stringify(mes) })
+            // _this.$dialog({ message: 'mes：' + JSON.stringify(mes) })
           } catch (err) {
             _this.$dialog({ message: 'err' + JSON.stringify(err) })
           }
           wx.invoke('sendChatMessage', mes, function(resSend) {
             if (resSend.err_msg == 'sendChatMessage:ok') {
               //发送成功
-              _this.$toast('发送成功')
+              // _this.$toast('发送成功')
             } else {
               //错误处理
               // _this.$dialog({ message: '发送失败：' + JSON.stringify(resSend) })
             }
           })
+          _this.$toast.clear()
         } else {
+          _this.$toast.clear()
           //错误处理
           _this.$dialog({ message: '进入失败：' + JSON.stringify(res) })
         }
@@ -170,7 +201,7 @@ export default {
     },
     collect(data) {
       // collection 是否收藏 0未收藏 1 已收藏
-      ;(data.collection == 1 || !sideId ? cancleCollection : addCollection)({
+      ;(data.collection == 1 ? cancleCollection : addCollection)({
         userId: this.userId,
         materialId: data.materialId,
       }).then(() => {
@@ -221,11 +252,19 @@ export default {
       >
         <div v-for="(item, index) in list" class="list" :key="index">
           <div class="content bfc-o">
+            <!-- 图片 -->
             <van-image
               v-if="item.mediaType == 0"
               width="80"
               height="80"
               :src="item.materialUrl"
+            />
+            <!-- 视频 -->
+            <van-image
+              v-if="item.mediaType == 2"
+              width="80"
+              height="80"
+              :src="item.coverUrl"
             />
             <span class="title">
               {{ item.mediaType == 4 ? item.content : item.materialName }}
@@ -238,7 +277,7 @@ export default {
             <div class="fr flex">
               <div class="action" @click="send(item)">发送</div>
               <div v-if="!!userId" class="action" @click="collect(item)">
-                {{ item.collection == 1 || !sideId ? '取消' : '' }}收藏
+                {{ item.collection == 1 ? '取消' : '' }}收藏
               </div>
             </div>
           </div>
