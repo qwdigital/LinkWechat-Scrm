@@ -37,9 +37,19 @@
              #{updateTime}
              )
     </insert>
+    <update id="updateTaskSolvedById">
+        UPDATE we_customer_messageTimeTask
+        <set>
+            solved=1
+        </set>
+        <where>
+            task_id=#{taskId}
+        </where>
+    </update>
 
     <select id="selectWeCustomerMessageTimeTaskGteSettingTime" resultMap="tasks">
         SELECT
+        task_id,
         message_id,
         message_info,
         customers_info,
@@ -48,7 +58,7 @@
         FROM
         we_customer_messageTimeTask
         <where>
-            setting_time lte #{timeMillis}
+            setting_time <![CDATA[<=]]> #{timeMillis} AND solved=0
         </where>
     </select>
 

@@ -1,10 +1,12 @@
 package com.linkwechat.framework.handler;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeGroup;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.ibatis.type.*;
 
@@ -19,15 +21,26 @@ import java.util.List;
  */
 //支持的java对象
 @SuppressWarnings("all")
+@Slf4j
 @MappedTypes(value = {WeCustomer.class,WeGroup.class})
 @MappedJdbcTypes({JdbcType.VARCHAR})
 public class ListTypeHandler<T extends Object> implements TypeHandler<List<T>> {
 
-    private List<T> getListByJsonArrayString(String content) {
+    private List getListByJsonArrayString(String content,String filedName) {
+
         if (StringUtils.isEmpty(content)) {
             return new ArrayList<>();
         }
-        return JSON.parseObject(content,new TypeReference<ArrayList>(){});
+
+        if(filedName!=null && "customers_info".equals(filedName)){
+            return JSONObject.parseArray(content, WeCustomer.class);
+        }
+
+        if(filedName!=null && "groups_info".equals(filedName)){
+            return JSONObject.parseArray(content, WeGroup.class);
+        }
+
+        return null;
     }
 
     /**
@@ -57,17 +70,18 @@ public class ListTypeHandler<T extends Object> implements TypeHandler<List<T>> {
 
     @Override
     public List<T> getResult(ResultSet resultSet, String s) throws SQLException {
-        return getListByJsonArrayString(resultSet.getString(s));
+        log.info("序列化集合字段：{}",s);
+        return getListByJsonArrayString(resultSet.getString(s),s);
     }
 
     @Override
     public List<T> getResult(ResultSet resultSet, int i) throws SQLException {
-        return getListByJsonArrayString(resultSet.getString(i));
+        return getListByJsonArrayString(resultSet.getString(i),null);
     }
 
     @Override
     public List<T> getResult(CallableStatement callableStatement, int i) throws SQLException {
-        return getListByJsonArrayString(callableStatement.getString(i));
+        return getListByJsonArrayString(callableStatement.getString(i),null);
     }
 
 

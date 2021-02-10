@@ -58,4 +58,9 @@ public class WeCustomerMessageTimeTask extends BaseEntity {
      */
     private Long settingTime;
 
+    /**
+     * 0 未解决 1 已解决
+     */
+    private Integer solved;
+
 }

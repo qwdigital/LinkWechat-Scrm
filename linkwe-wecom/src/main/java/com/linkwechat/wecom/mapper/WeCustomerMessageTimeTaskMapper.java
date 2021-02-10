@@ -30,4 +30,12 @@ public interface WeCustomerMessageTimeTaskMapper extends BaseMapper<WeCustomerMe
      */
     int saveWeCustomerMessageTimeTask(WeCustomerMessageTimeTask customerMessageTimeTask);
 
+    /**
+     * 更新群发定时任务处理状态
+     *
+     * @param taskId 任务id
+     * @return int
+     */
+    int updateTaskSolvedById(@Param("taskId") Long taskId);
+
 }
