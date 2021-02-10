@@ -135,7 +135,7 @@ public class WeMaterialController extends BaseController {
 
     //@PreAuthorize("@ss.hasPermi('wechat:material:temporaryMaterialMediaId')")
     @Log(title = "获取素材media_id", businessType = BusinessType.OTHER)
-    @PostMapping("/temporaryMaterialMediaId")
+    @GetMapping("/temporaryMaterialMediaId")
     @ApiOperation("获取素材media_id")
     public AjaxResult temporaryMaterialMediaId(@RequestParam(value = "url") String url, @RequestParam(value = "type") String type,@RequestParam(value = "name") String name){
         WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(url, type,name);
