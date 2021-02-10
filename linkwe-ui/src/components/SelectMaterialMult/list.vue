@@ -224,12 +224,23 @@ export default {
             >
               <el-card shadow="hover" body-style="padding: 0px;">
                 <div class="img-wrap">
-                  <el-image :src="item.materialUrl" fit="contain"></el-image>
+                  <el-image
+                    v-if="type == 0"
+                    :src="item.materialUrl"
+                    fit="contain"
+                  ></el-image>
+                  <el-image
+                    v-else-if="type == 2"
+                    :src="item.coverUrl"
+                    fit="contain"
+                  ></el-image>
                 </div>
                 <div style="padding: 14px">
-                  <el-checkbox :label="item">{{
-                    item.materialName
-                  }}</el-checkbox>
+                  <el-checkbox :label="item">
+                    <span class="label">
+                      {{ item.materialName }}
+                    </span>
+                  </el-checkbox>
                 </div>
               </el-card>
             </el-col>
@@ -267,5 +278,11 @@ export default {
     height: 100%;
     top: 0;
   }
+}
+/deep/ .el-checkbox__label {
+  vertical-align: text-top;
+}
+.label {
+  white-space: normal;
 }
 </style>

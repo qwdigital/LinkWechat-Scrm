@@ -10,6 +10,11 @@ export default {
         weFlowerCustomerRels: [{}],
       },
       birthday: '',
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now()
+        },
+      },
     }
   },
   created() {
@@ -66,6 +71,7 @@ export default {
               v-if="datePickerVisible"
               v-model="birthday"
               type="date"
+              :picker-options="pickerOptions"
               value-format="yyyy-MM-dd"
               placeholder="选择日期便于以后客情维护"
               @blur="datePickerVisible = false"
