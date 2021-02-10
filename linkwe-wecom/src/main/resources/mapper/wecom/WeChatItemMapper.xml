@@ -28,6 +28,7 @@
         wm.material_url,
         wm.content,
         wc.media_type,
+        wm.cover_url,
         (
             SELECT
             COUNT(1)
