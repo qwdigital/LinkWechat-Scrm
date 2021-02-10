@@ -31,8 +31,9 @@
         FROM
             we_chat_side
         <where>
+                del_flag=0
                 <if test="h5!=null and h5!='' and h5=='1'.toString()">
-                    `using`=0
+                   AND `using`=0
                 </if>
         </where>
     </select>
