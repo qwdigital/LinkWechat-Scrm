@@ -184,7 +184,7 @@ export default {
           }
           wx.invoke('sendChatMessage', mes, function(resSend) {
             if (resSend.err_msg == 'sendChatMessage:ok') {
-              //发送成功
+              //发送成功 sdk会自动弹出成功提示，无需再加
               // _this.$toast('发送成功')
             } else {
               //错误处理
@@ -215,28 +215,6 @@ export default {
 
 <template>
   <div>
-    <!-- <ul>
-      <li class="li bfc-o">
-        <van-image
-          width="100"
-          height="100"
-          src="https://img01.yzcdn.cn/vant/cat.jpeg"
-        />
-        <span class="title">
-          afsdafddfasfewgoegoeroigwogjrepgerwgowrgjwoerjgweorgjoerwigjir
-        </span>
-      </li>
-      <div class="info">
-        sdv类型
-
-        <div class="fr flex">
-          <div class="action" @click="send(item)">发送</div>
-          <div v-if="!!userId" class="action" @click="collect(item.materialId)">
-            {{ isCollected(item.materialId) ? '取消' : '' }}收藏
-          </div>
-        </div>
-      </div>
-    </ul> -->
     <van-pull-refresh
       v-model="refreshing"
       success-text="刷新成功"
