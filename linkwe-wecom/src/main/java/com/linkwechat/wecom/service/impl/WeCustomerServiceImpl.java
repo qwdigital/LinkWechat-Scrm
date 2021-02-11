@@ -111,7 +111,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
      */
     @Override
     public List<WeCustomer> selectWeCustomerList(WeCustomer weCustomer) {
-
         return weCustomerMapper.selectWeCustomerList(weCustomer);
     }
 

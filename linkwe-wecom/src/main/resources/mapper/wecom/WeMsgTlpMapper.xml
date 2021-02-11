@@ -31,7 +31,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wm.material_url
         FROM
         we_msg_tlp wmt
-        INNER JOIN we_material wm ON wmt.media_id=wm.id
+        LEFT JOIN we_material wm ON wmt.media_id=wm.id
         <where>  
             <if test="welcomeMsg != null  and welcomeMsg != ''"> and wmt.welcome_msg like CONCAT('%',#{welcomeMsg,jdbcType=VARCHAR},'%') </if>
             <if test="welcomeMsgTplType !=null "> and wmt.welcome_msg_tpl_type = #{welcomeMsgTplType}</if>

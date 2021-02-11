@@ -115,6 +115,10 @@ public class WeUser
     private String remark;
 
 
+    private String departmentStr;
+
+
+
 
     /** 转化成企业微信需要的dto对象 */
     public  WeUserDto transformWeUserDto(){
