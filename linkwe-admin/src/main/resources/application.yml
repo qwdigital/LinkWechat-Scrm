@@ -105,7 +105,7 @@ token:
 mybatis-plus:
    mapper-locations: classpath*:mapper/**/*Mapper.xml
    type-aliases-package: com.linkwechat.**.domain
-   type-handlers-package: com.linkwechat.framework.handler.**
+   type-handlers-package: com.linkwechat.framework.handler.GenericTypeHandler,com.linkwechat.framework.handler.StringArrayJoinTypeHandler
    configuration:
      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
    global-config:
