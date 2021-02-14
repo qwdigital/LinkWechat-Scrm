@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisCache;
@@ -16,6 +17,7 @@ import com.linkwechat.wecom.service.IWeCustomerService;
 import com.linkwechat.wecom.service.IWeDepartmentService;
 import com.linkwechat.wecom.service.IWeGroupService;
 import com.linkwechat.wecom.service.IWeUserService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,6 +82,10 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
     @Override
     public List<WeUser> selectWeUserList(WeUser weUser)
     {
+        String[] department = weUser.getDepartment();
+        if(ArrayUtil.isNotEmpty(department)){
+            weUser.setDepartmentStr(StringUtils.join(department, ","));
+        }
         return weUserMapper.selectWeUserList(weUser);
     }
 

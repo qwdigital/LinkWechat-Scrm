@@ -189,4 +189,10 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
         }
         return lDate;
     }
+
+    public static long getMillionSceondsBydate(String date) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS);
+        long millionSeconds = sdf.parse(date).getTime();//毫秒
+        return millionSeconds;
+    }
 }

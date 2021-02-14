@@ -44,7 +44,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mobile != null  and mobile != ''"> and mobile = #{mobile}</if>
             <if test="email != null  and email != ''"> and email = #{email}</if>
             <if test="wxAccount != null  and wxAccount != ''"> and wx_account = #{wxAccount}</if>
-            <if test="department != null  and department.length > 0  "> and FIND_IN_SET(#{department},department)</if>
+            <if test="departmentStr != null  and departmentStr != ''  "> and FIND_IN_SET(#{departmentStr},department)</if>
             <if test="position != null  and position != ''"> and position = #{position}</if>
             <if test="isLeaderInDept != null "> and is_leader_in_dept = #{isLeaderInDept}</if>
             <if test="joinTime != null "> and join_time = #{joinTime}</if>

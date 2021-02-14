@@ -70,7 +70,6 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
 
         if (CollectionUtil.isEmpty(weTags)) {
             this.save(weTagGroup);
-
         } else {
 
             WeCropGropTagDtlDto weCropGropTagDtlDto = weCropTagClient.addCorpTag(WeCropGroupTagDto.transformAddTag(weTagGroup));

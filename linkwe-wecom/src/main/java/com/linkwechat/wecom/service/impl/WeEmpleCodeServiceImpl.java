@@ -98,8 +98,9 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
      */
     @Override
     public List<WeEmpleCode> selectWeEmpleCodeList(WeEmpleCode weEmpleCode) {
+
         List<WeEmpleCode> weEmpleCodeList = this.baseMapper.selectWeEmpleCodeList(weEmpleCode);
-        if (weEmpleCodeList != null) {
+        if (CollectionUtil.isNotEmpty(weEmpleCodeList)) {
             weEmpleCodeList.forEach(empleCode -> {
                 List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = empleCode.getWeEmpleCodeUseScops();
                 if (CollectionUtil.isNotEmpty(weEmpleCodeUseScopList)) {

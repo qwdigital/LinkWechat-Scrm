@@ -30,7 +30,8 @@
             wm.material_url,
             wm.content,
             wc.media_type,
-            wcc.create_time
+            wcc.create_time,
+            wm.cover_url
         FROM
             we_chat_collection wcc
                 LEFT JOIN we_material wm ON wcc.material_id = wm.id

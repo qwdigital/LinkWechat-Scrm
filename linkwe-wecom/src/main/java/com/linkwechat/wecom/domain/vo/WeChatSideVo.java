@@ -46,4 +46,9 @@ public class WeChatSideVo {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date createTime;
 
+    /**
+     * 封面地址
+     */
+    private String coverUrl;
+
 }

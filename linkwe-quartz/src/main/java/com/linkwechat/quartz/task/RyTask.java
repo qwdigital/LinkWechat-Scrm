@@ -2,16 +2,16 @@ package com.linkwechat.quartz.task;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.elasticsearch.ElasticSearch;
 import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.WeCustomer;
-import com.linkwechat.wecom.service.IWeChatContactMappingService;
-import com.linkwechat.wecom.service.IWeCustomerService;
-import com.linkwechat.wecom.service.IWeSensitiveActHitService;
-import com.linkwechat.wecom.service.IWeSensitiveService;
+import com.linkwechat.wecom.domain.WeCustomerMessageTimeTask;
+import com.linkwechat.wecom.mapper.WeCustomerMessageTimeTaskMapper;
+import com.linkwechat.wecom.service.*;
 import com.tencent.wework.FinanceUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
@@ -48,6 +49,12 @@ public class RyTask {
     private IWeSensitiveActHitService weSensitiveActHitService;
     @Autowired
     private IWeCustomerService weCustomerService;
+    @Autowired
+    private WeCustomerMessageTimeTaskMapper customerMessageTimeTaskMapper;
+
+    @Autowired
+    private IWeCustomerMessageService weCustomerMessageService;
+
 
     public void ryMultipleParams(String s, Boolean b, Long l, Double d, Integer i) {
         System.out.println(StringUtils.format("执行多参方法： 字符串类型{}，布尔类型{}，长整型{}，浮点型{}，整形{}", s, b, l, d, i));
@@ -95,17 +102,17 @@ public class RyTask {
         }
     }
 
-    public void WeCustomers(){
+    public void WeCustomers() {
         //查询系统所有客户
         List<WeCustomer> cacheList = redisCache.getCacheList(WeConstans.WECUSTOMERS_KEY);
-        if(CollectionUtils.isEmpty(cacheList)){
+        if (CollectionUtils.isEmpty(cacheList)) {
             List<WeCustomer> customers = weCustomerService.selectWeCustomerList(null);
-            redisCache.setCacheList(WeConstans.WECUSTOMERS_KEY,customers);
-        }else {
+            redisCache.setCacheList(WeConstans.WECUSTOMERS_KEY, customers);
+        } else {
             List<WeCustomer> customers = weCustomerService.selectWeCustomerList(null);
             List<WeCustomer> weCustomers = redisCache.getCacheList(WeConstans.WECUSTOMERS_KEY);
-            if(CollectionUtils.isNotEmpty(weCustomers) && weCustomers.size()<customers.size()){
-                redisCache.setCacheList(WeConstans.WECUSTOMERS_KEY,customers);
+            if (CollectionUtils.isNotEmpty(weCustomers) && weCustomers.size() < customers.size()) {
+                redisCache.setCacheList(WeConstans.WECUSTOMERS_KEY, customers);
             }
         }
     }
@@ -130,4 +137,51 @@ public class RyTask {
         log.info("执行有参方法: params:{},{}", corpId, secret);
 
     }
+
+    /**
+     * 扫描群发消息定时任务
+     */
+    public void messageTask() {
+
+        //获的当前时间的毫秒数
+        long currentTime = System.currentTimeMillis();
+        //customerMessageTimeTaskMapper
+        List<WeCustomerMessageTimeTask> weCustomerMessageTimeTasks = customerMessageTimeTaskMapper.selectWeCustomerMessageTimeTaskGteSettingTime(currentTime);
+
+        final Semaphore semaphore = new Semaphore(5);
+
+        if (CollectionUtils.isNotEmpty(weCustomerMessageTimeTasks)) {
+
+            weCustomerMessageTimeTasks.forEach(
+
+                    s -> {
+
+                        try {
+
+                            semaphore.acquire();
+
+                            if (s.getMessageInfo() != null && s.getMessageId() != null || (s.getMessageInfo().getPushType().equals(WeConstans.SEND_MESSAGE_CUSTOMER)
+                                    && CollectionUtils.isNotEmpty(s.getCustomersInfo())) ||(s.getMessageInfo().getPushType().equals(WeConstans.SEND_MESSAGE_GROUP)
+                                    && CollectionUtils.isNotEmpty(s.getGroupsInfo()))) {
+
+                                weCustomerMessageService.sendMessgae(s.getMessageInfo(), s.getMessageId(), s.getCustomersInfo(), s.getGroupsInfo());
+
+                                //更新消息处理状态
+                                customerMessageTimeTaskMapper.updateTaskSolvedById(s.getTaskId());
+
+                            }
+
+                            semaphore.release();
+
+                        } catch (JsonProcessingException | InterruptedException e) {
+                            log.error("定时群发消息处理异常：ex:{}", e);
+                            e.printStackTrace();
+                        }
+                    }
+
+            );
+        }
+
+    }
+
 }

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeCustomerMessageTimeTaskMapper">
+
+    <resultMap id="tasks" type="com.linkwechat.wecom.domain.WeCustomerMessageTimeTask">
+        <id column="task_id" property="taskId"/>
+        <result column="message_id" property="messageId"/>
+        <result column="message_info" property="messageInfo" typeHandler="com.linkwechat.framework.handler.GenericTypeHandler"/>
+        <result column="customers_info" property="customersInfo" typeHandler="com.linkwechat.framework.handler.ListTypeHandler"/>
+        <result column="groups_info" property="groupsInfo" typeHandler="com.linkwechat.framework.handler.ListTypeHandler"/>
+        <result column="setting_time" property="settingTime"/>
+    </resultMap>
+    <insert id="saveWeCustomerMessageTimeTask">
+        INSERT INTO we_customer_messageTimeTask (
+            message_id,
+            message_info,
+            customers_info,
+            groups_info,
+            setting_time,
+            create_by,
+            create_time,
+            update_by,
+            update_time
+        )
+        VALUES
+            (
+             #{messageId},
+             #{messageInfo,jdbcType=OTHER,typeHandler=com.linkwechat.framework.handler.GenericTypeHandler},
+             #{customersInfo,jdbcType=OTHER,typeHandler=com.linkwechat.framework.handler.ListTypeHandler},
+             #{groupsInfo,jdbcType=OTHER,typeHandler=com.linkwechat.framework.handler.ListTypeHandler},
+             #{settingTime},
+             #{createBy},
+             #{createTime},
+             #{updateBy},
+             #{updateTime}
+             )
+    </insert>
+    <update id="updateTaskSolvedById">
+        UPDATE we_customer_messageTimeTask
+        <set>
+            solved=1
+        </set>
+        <where>
+            task_id=#{taskId}
+        </where>
+    </update>
+
+    <select id="selectWeCustomerMessageTimeTaskGteSettingTime" resultMap="tasks">
+        SELECT
+        task_id,
+        message_id,
+        message_info,
+        customers_info,
+        groups_info,
+        setting_time
+        FROM
+        we_customer_messageTimeTask
+        <where>
+            setting_time <![CDATA[<=]]> #{timeMillis} AND solved=0
+        </where>
+    </select>
+
+</mapper>

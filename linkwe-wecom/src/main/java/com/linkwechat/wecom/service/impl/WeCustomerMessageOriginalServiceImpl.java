@@ -8,9 +8,11 @@ import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
+import com.linkwechat.wecom.domain.WeCustomerMessage;
 import com.linkwechat.wecom.domain.WeCustomerMessageOriginal;
 import com.linkwechat.wecom.domain.dto.message.*;
 import com.linkwechat.wecom.domain.vo.CustomerMessagePushVo;
+import com.linkwechat.wecom.mapper.WeCustomerMessageMapper;
 import com.linkwechat.wecom.mapper.WeCustomerMessageOriginalMapper;
 import com.linkwechat.wecom.mapper.WeCustomerMessgaeResultMapper;
 import com.linkwechat.wecom.service.IWeCustomerMessageOriginalService;
@@ -29,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author kewen
  * @date 2020-12-12
  */
+@SuppressWarnings("all")
 @Service
 public class WeCustomerMessageOriginalServiceImpl extends ServiceImpl<WeCustomerMessageOriginalMapper, WeCustomerMessageOriginal> implements IWeCustomerMessageOriginalService {
 
@@ -46,6 +49,9 @@ public class WeCustomerMessageOriginalServiceImpl extends ServiceImpl<WeCustomer
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private WeCustomerMessageMapper customerMessageMapper;
 
     @Override
     public List<CustomerMessagePushVo> customerMessagePushs(String sender, String content, String pushType, String beginTime, String endTime) {
@@ -130,7 +136,8 @@ public class WeCustomerMessageOriginalServiceImpl extends ServiceImpl<WeCustomer
                             if (d.getStatus().equals(WeConstans.sendMessageStatusEnum.SEND.getStatus())) {
 
                                 atomicInteger.incrementAndGet();
-
+                                //更新消息发送状态
+                                customerMessageMapper.updateWeCustomerMessageCheckStatusById(messageId,WeConstans.sendMessageStatusEnum.SEND.getStatus());
                             }
 
                             weCustomerMessgaeResultMapper.updateWeCustomerMessgaeResult(messageId, d.getChat_id(), d.getExternal_userid(), d.getStatus(), d.getSend_time());

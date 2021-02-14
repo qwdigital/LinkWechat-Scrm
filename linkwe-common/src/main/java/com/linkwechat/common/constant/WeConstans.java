@@ -387,4 +387,25 @@ public class WeConstans {
     public static final String THIRD_APP_PARAM_TIP = "agentId";
 
     public static final String WECUSTOMERS_KEY="weCustomer";
+
+    /**
+     * 发给客户
+     */
+    public static final String SEND_MESSAGE_CUSTOMER = "0";
+
+    /**
+     * 发给客户群
+     */
+    public static final String SEND_MESSAGE_GROUP="1";
+
+    /**
+     * 消息范围 1 指定客户
+     */
+    public static final String SEND_MESSAGE_CUSTOMER_ALL = "0";
+
+    /**
+     * 消息范围 1 指定客户
+     */
+    public static final String SEND_MESSAGE_CUSTOMER_PART="1";
+
 }

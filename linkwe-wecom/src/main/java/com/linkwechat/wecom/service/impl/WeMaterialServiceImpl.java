@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
@@ -141,7 +142,8 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
             conn = (HttpURLConnection) materialUrl.openConnection();
             conn.setRequestMethod("GET");
             conn.setConnectTimeout(20 * 1000);
-            return weMediaClient.upload(conn.getInputStream(), name, type);
+            InputStream inputStream = conn.getInputStream();
+            return weMediaClient.upload(inputStream, name, type);
         }catch (Exception e){
             e.printStackTrace();
             log.error("上传临时文件失败......url:{},type:{},name:{},ex:{},st:{}",url,type,name,e.getMessage(),e.getStackTrace());

@@ -3,6 +3,7 @@ package com.linkwechat.web.controller.wecom;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.config.CosConfig;
+import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
@@ -10,6 +11,7 @@ import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.wecom.domain.WeTaskFission;
+import com.linkwechat.wecom.domain.dto.WeChatUserDTO;
 import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
 import com.linkwechat.wecom.service.IWeTaskFissionService;
 import io.swagger.annotations.Api;
@@ -29,7 +31,7 @@ import java.util.List;
  * @author leejoker
  * @date 2021-01-20
  */
-@Api(description = "任务宝Controller")
+@Api("任务宝Controller")
 @RestController
 @RequestMapping("/wecom/fission")
 public class WeTaskFissionController extends BaseController {
@@ -105,6 +107,24 @@ public class WeTaskFissionController extends BaseController {
     public AjaxResult send(@PathVariable Long id) {
         weTaskFissionService.sendWeTaskFission(id);
         return AjaxResult.success();
+    }
+
+    /**
+     * 添加群裂变完成记录
+     */
+    @ApiOperation(value = "添加群裂变完成记录", httpMethod = "POST")
+    @PreAuthorize("@ss.hasPermi('wecom:fission:complete')")
+    @Log(title = "添加群裂变完成记录", businessType = BusinessType.OTHER)
+    @PostMapping("/complete/{id}/records/{recordId}")
+    public AjaxResult completeRecord(@PathVariable("id") Long id,
+                                     @PathVariable("recordId") Long recordId,
+                                     @RequestBody WeChatUserDTO weChatUserDTO) {
+        WeTaskFission taskFission = weTaskFissionService.selectWeTaskFissionById(id);
+        if (taskFission == null) {
+            return AjaxResult.error(HttpStatus.NOT_FOUND, "数据不存在");
+        }
+        weTaskFissionService.completeFissionRecord(id, recordId, weChatUserDTO);
+        return AjaxResult.success(taskFission.getFissQrcode());
     }
 
     /**

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.ChatType;
-import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.enums.GroupMessageType;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
  * @author kewen
  * @date 2020-12-12
  */
+@SuppressWarnings("all")
 @Service
 public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageMapper, WeCustomerMessage>  implements IWeCustomerMessageService {
 
@@ -90,7 +91,7 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
         //发送群发消息
         //发送类类型: 给单个客户发，群发
         //发给客户
-        if (customerMessagePushDto.getPushType().equals("0")) {
+        if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_CUSTOMER)) {
 
             WeCustomerMessagePushDto messagePushDto = new WeCustomerMessagePushDto();
             messagePushDto.setChat_type(ChatType.of(customerMessagePushDto.getPushType()).getName());
@@ -106,7 +107,7 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
         }
 
         //发给客户群
-        if (customerMessagePushDto.getPushType().equals("1")) {
+        if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_GROUP)) {
 
             if (CollectionUtils.isNotEmpty(groups)) {
                 List<String> owners = groups.stream().map(WeGroup::getOwner).collect(Collectors.toList());
@@ -140,21 +141,21 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
     public void childMessage(WeCustomerMessagePushDto weCustomerMessagePushDto, CustomerMessagePushDto customerMessagePushDto) {
 
         // 消息类型 0 文本消息  1 图片消息 2 链接消息   3 小程序消息
-        if (customerMessagePushDto.getMessageType().equals("0")) {
+        if (customerMessagePushDto.getMessageType().equals(GroupMessageType.TEXT.getType())) {
             weCustomerMessagePushDto.setImage(null);
             weCustomerMessagePushDto.setLink(null);
             weCustomerMessagePushDto.setMiniprogram(null);
             weCustomerMessagePushDto.setText(customerMessagePushDto.getTextMessage());
 
         }
-        if (customerMessagePushDto.getMessageType().equals("1")) {
+        if (customerMessagePushDto.getMessageType().equals(GroupMessageType.IMAGE.getMessageType())) {
             weCustomerMessagePushDto.setImage(customerMessagePushDto.getImageMessage());
             weCustomerMessagePushDto.setLink(null);
             weCustomerMessagePushDto.setMiniprogram(null);
             weCustomerMessagePushDto.setText(null);
 
         }
-        if (customerMessagePushDto.getMessageType().equals("2")) {
+        if (customerMessagePushDto.getMessageType().equals(GroupMessageType.LINK.getType())) {
             weCustomerMessagePushDto.setImage(null);
             weCustomerMessagePushDto.setLink(customerMessagePushDto.getLinkMessage());
             weCustomerMessagePushDto.setMiniprogram(null);
@@ -162,7 +163,7 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
 
         }
 
-        if (customerMessagePushDto.getMessageType().equals("3")) {
+        if (customerMessagePushDto.getMessageType().equals(GroupMessageType.MINIPROGRAM.getType())) {
             weCustomerMessagePushDto.setImage(null);
             weCustomerMessagePushDto.setLink(null);
             weCustomerMessagePushDto.setMiniprogram(customerMessagePushDto.getMiniprogramMessage());
@@ -170,7 +171,7 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
 
         }
 
-        if(customerMessagePushDto.getMessageType().equals("4")){
+        if(customerMessagePushDto.getMessageType().equals(GroupMessageType.TEXT_IMAGE.getType())){
             weCustomerMessagePushDto.setImage(customerMessagePushDto.getImageMessage());
             weCustomerMessagePushDto.setLink(null);
             weCustomerMessagePushDto.setMiniprogram(null);
@@ -178,6 +179,5 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
         }
 
     }
-
 
 }

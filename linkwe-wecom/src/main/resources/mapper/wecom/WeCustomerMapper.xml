@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeCustomerMapper">
     
-    <resultMap type="WeCustomer" id="WeCustomerResult">
+    <resultMap type="com.linkwechat.wecom.domain.WeCustomer" id="WeCustomerResult">
         <id property="externalUserid"    column="external_userid"    />
         <result property="name"    column="name"    />
         <result property="avatar"    column="avatar"    />

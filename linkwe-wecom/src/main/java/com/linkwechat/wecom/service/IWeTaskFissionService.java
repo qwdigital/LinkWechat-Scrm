@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service;
 
 import com.linkwechat.wecom.domain.WeTaskFission;
+import com.linkwechat.wecom.domain.dto.WeChatUserDTO;
 import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
 
 import java.util.List;
@@ -74,4 +75,12 @@ public interface IWeTaskFissionService {
      * @return
      */
     public String fissionPosterGenerate(WeTaskFissionPosterDTO weTaskFissionPosterDTO);
+
+    /**
+     * 添加裂变完成记录
+     *
+     * @param taskFissionId
+     * @param taskFissionRecordId
+     */
+    public void completeFissionRecord(Long taskFissionId, Long taskFissionRecordId, WeChatUserDTO weChatUserDTO);
 }
