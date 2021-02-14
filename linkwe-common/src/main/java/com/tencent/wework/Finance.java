@@ -118,7 +118,7 @@ public class Finance {
             System.loadLibrary("libcurl");
             System.loadLibrary("WeWorkFinanceSdk");
         } else {
-            System.load("/app/project/libWeWorkFinanceSdk_Java.so");
+            System.load("/data/jenkins_home/app/project/libWeWorkFinanceSdk_Java.so");
         }
 
     }
