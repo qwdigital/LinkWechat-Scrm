@@ -245,7 +245,9 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
                 .map(Long::new).toArray(Long[]::new);
         WeExternalContactDto qrcode = getQrcode(userIdArr, departmentIdArr);
         //设置24小时过期
-        redisCache.setCacheObject(WeConstans.WE_EMPLE_CODE_KEY+":"+qrcode.getConfig_id(),qrcode.getConfig_id(),24, TimeUnit.HOURS);
+        if(qrcode !=null && qrcode.getConfig_id() != null){
+            redisCache.setCacheObject(WeConstans.WE_EMPLE_CODE_KEY+":"+qrcode.getConfig_id(),qrcode.getConfig_id(),24, TimeUnit.HOURS);
+        }
         return qrcode;
     }
 
