@@ -108,13 +108,10 @@ public class WeAccessTokenInterceptor implements Interceptor{
      */
     @Override
     public void onSuccess(Object o, ForestRequest forestRequest, ForestResponse forestResponse) {
-
+        log.info("url:【{}】,result:【{}】",forestRequest.getUrl(),forestResponse.getContent());
         WeResultDto weResultDto = JSONUtil.toBean(forestResponse.getContent(), WeResultDto.class);
-
         if(null != weResultDto.getErrcode() && !weResultDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)&& !weResultDto.getErrcode().equals(WeConstans.NOT_EXIST_CONTACT) ){
-
             throw new ForestRuntimeException(forestResponse.getContent());
-
         }
 
     }

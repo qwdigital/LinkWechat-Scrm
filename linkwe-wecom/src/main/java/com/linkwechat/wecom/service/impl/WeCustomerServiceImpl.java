@@ -31,6 +31,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -567,26 +568,31 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             List<WeFlowerCustomerRel> weFlowerCustomerRels = iWeFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
                     .eq(WeFlowerCustomerRel::getExternalUserid, weCustomer.getExternalUserid()));
 
-            if (CollectionUtil.isNotEmpty(weFlowerCustomerRels)) {
-                List<Long> weFlowerCustomerRelIds = weFlowerCustomerRels.stream().map(WeFlowerCustomerRel::getId).collect(Collectors.toList());
-                iWeFlowerCustomerTagRelService.remove(
-                        new LambdaQueryWrapper<WeFlowerCustomerTagRel>().in(WeFlowerCustomerTagRel::getFlowerCustomerRelId,
-                                weFlowerCustomerRelIds)
-                );
+            try {
+                if (CollectionUtil.isNotEmpty(weFlowerCustomerRels)) {
+                    List<Long> weFlowerCustomerRelIds = weFlowerCustomerRels.stream().map(WeFlowerCustomerRel::getId).collect(Collectors.toList());
+                    iWeFlowerCustomerTagRelService.remove(
+                            new LambdaQueryWrapper<WeFlowerCustomerTagRel>().in(WeFlowerCustomerTagRel::getFlowerCustomerRelId,
+                                    weFlowerCustomerRelIds)
+                    );
 
-                iWeFlowerCustomerRelService.removeByIds(
-                        weFlowerCustomerRelIds
-                );
-            }
+                    iWeFlowerCustomerRelService.removeByIds(
+                            weFlowerCustomerRelIds
+                    );
+                }
 
 
-            iWeFlowerCustomerRelService.saveBatch(weFlowerCustomerRel);
+                iWeFlowerCustomerRelService.saveBatch(weFlowerCustomerRel);
 
-            //设置标签跟客户关系，标签和标签组,saveOrUpdate，建立标签与添加人关系
-            if (CollectionUtil.isNotEmpty(weTags) && CollectionUtil.isNotEmpty(weGroups)) {
-                iWeTagService.saveOrUpdateBatch(weTags);
-                iWeTagGroupService.saveOrUpdateBatch(weGroups);
-                iWeFlowerCustomerTagRelService.saveOrUpdateBatch(weFlowerCustomerTagRels);
+                //设置标签跟客户关系，标签和标签组,saveOrUpdate，建立标签与添加人关系
+                if (CollectionUtil.isNotEmpty(weTags) && CollectionUtil.isNotEmpty(weGroups)) {
+                    iWeTagService.saveOrUpdateBatch(weTags);
+                    iWeTagGroupService.saveOrUpdateBatch(weGroups);
+                    iWeFlowerCustomerTagRelService.saveOrUpdateBatch(weFlowerCustomerTagRels);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             }
 
         }
