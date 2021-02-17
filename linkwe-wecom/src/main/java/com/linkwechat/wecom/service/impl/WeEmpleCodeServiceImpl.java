@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisCache;
@@ -18,6 +19,7 @@ import com.linkwechat.wecom.service.IWeEmpleCodeService;
 import com.linkwechat.wecom.service.IWeEmpleCodeTagService;
 import com.linkwechat.wecom.service.IWeEmpleCodeUseScopService;
 import com.linkwechat.wecom.service.IWeMaterialService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
  * @author ruoyi
  * @date 2020-10-04
  */
+@Slf4j
 @Service
 public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmpleCode> implements IWeEmpleCodeService {
 
@@ -245,6 +248,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
                 .map(Long::new).toArray(Long[]::new);
         WeExternalContactDto qrcode = getQrcode(userIdArr, departmentIdArr);
         //设置24小时过期
+        log.info("qrcode:>>>>>>>>>>>【{}】", JSONObject.toJSONString(qrcode));
         if(qrcode !=null && qrcode.getConfig_id() != null){
             redisCache.setCacheObject(WeConstans.WE_EMPLE_CODE_KEY+":"+qrcode.getConfig_id(),qrcode.getConfig_id(),24, TimeUnit.HOURS);
         }
