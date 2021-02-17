@@ -92,6 +92,9 @@ export default {
   <div>
     <div class="top-search">
       <el-form inline label-position="right" :model="form" label-width="80px">
+        <el-form-item label="任务名称">
+          <el-input v-model="query.name" placeholder="请输入"></el-input>
+        </el-form-item>
         <el-form-item label="发送方式">
           <el-select v-model="query.pushType" placeholder="请选择" size="small">
             <el-option
@@ -102,8 +105,20 @@ export default {
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="任务名称">
+        <el-form-item label="创建人">
           <el-input v-model="query.name" placeholder="请输入"></el-input>
+        </el-form-item>
+        <el-form-item label="创建时间">
+          <el-date-picker
+            v-model="dateRange"
+            value-format="yyyy-MM-dd"
+            type="daterange"
+            :picker-options="pickerOptions"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            align="right"
+          ></el-date-picker>
         </el-form-item>
         <el-form-item label>
           <el-button type="primary" @click="getList(1)">查询</el-button>
@@ -126,21 +141,23 @@ export default {
     <el-table v-loading="loading" :data="list">
       <!-- <el-table-column type="selection" width="50" align="center" /> -->
       <el-table-column
-        label="任务活动名称"
+        label="任务名称"
         align="center"
         prop="name"
         :show-overflow-tooltip="true"
       />
-      <el-table-column prop="createTime" label="裂变客户数量" align="center">
+      <el-table-column prop="createTime" label="发送方式" align="center">
+      </el-table-column>
+      <el-table-column prop="createTime" label="当前群人数" align="center">
         <template slot-scope="scope">{{
           Math.floor(Math.random() * 10000)
         }}</template>
       </el-table-column>
-      <el-table-column prop="createTime" label="活动状态" align="center">
-        已结束
+
+      <el-table-column prop="createTime" label="创建人" align="center">
       </el-table-column>
       <el-table-column
-        label="活动时间"
+        label="创建时间"
         align="center"
         prop="createTime"
         width="160"
@@ -158,7 +175,7 @@ export default {
             type="text"
             icon="el-icon-view"
             @click="edit(scope.row, 0)"
-            >查看</el-button
+            >删除</el-button
           >
           <el-button
             v-hasPermi="['enterpriseWechat:edit']"

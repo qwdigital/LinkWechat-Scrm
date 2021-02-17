@@ -93,30 +93,86 @@ export default {
 
 <template>
   <div>
+    <el-form
+      ref="queryForm"
+      :inline="true"
+      :model="query"
+      label-width="80px"
+      class="top-search"
+      size="small"
+    >
+      <el-form-item label="规则名称" prop="name">
+        <el-input v-model="query.name" placeholder="请输入"></el-input>
+      </el-form-item>
+      <el-form-item label="创建人">
+        <div class="tag-input" @click="dialogVisibleSelectUser = true">
+          <el-input v-model="query.name" placeholder="请输入"></el-input>
+          <!-- <span class="tag-place" v-if="!queryUser.length">请选择</span>
+          <template v-else>
+            <el-tag
+              type="info"
+              v-for="(unit, unique) in queryUser"
+              :key="unique"
+              >{{ unit.name }}</el-tag
+            >
+          </template> -->
+        </div>
+      </el-form-item>
+      <el-form-item label="创建时间">
+        <el-date-picker
+          v-model="dateRange"
+          value-format="yyyy-MM-dd"
+          type="daterange"
+          :picker-options="pickerOptions"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          align="right"
+        ></el-date-picker>
+      </el-form-item>
+      <el-form-item label="">
+        <el-button
+          v-hasPermi="['customerManage:customer:query']"
+          type="primary"
+          @click="getList(1)"
+          >查询</el-button
+        >
+        <el-button
+          v-hasPermi="['customerManage:customer:query']"
+          type="info"
+          @click="resetForm()"
+          >重置</el-button
+        >
+      </el-form-item>
+    </el-form>
     <div class="fxbw mb10 aic">
       <div class="total">
-        群SOP 制定推送规则后，通知群主定时给指定客户群发送消息。
+        <el-button type="primary" @click="goRoute()">新建规则</el-button>
+        <!-- 新客自动拉群
+        客户通过员工活码添加员工，自动发送入群引导语、群活码，客户扫码入群。 -->
       </div>
       <div>
-        <el-button type="primary" icon="el-icon-plus" @click="goRoute()"
-          >创建规则</el-button
+        <el-button
+          v-hasPermi="['customerManage:customer:export']"
+          type="cyan"
+          @click="exportCustomer"
+          >批量删除</el-button
         >
-        <el-input
-          placeholder="请输入规则名称"
-          prefix-icon="el-icon-search"
-          v-model="query.welcomeMsg"
-          style="width: 240px; margin-left: 10px;"
-          @change="getList(0)"
-        ></el-input>
       </div>
     </div>
     <!-- <el-card shadow="never" :body-style="{padding: '20px 0 0'}">
     </el-card>-->
 
     <el-table v-loading="loading" :data="list">
-      <!-- <el-table-column type="selection" width="50" align="center" /> -->
+      <el-table-column type="selection" width="50" align="center" />
       <el-table-column
         label="规则名称"
+        align="center"
+        prop="name"
+        :show-overflow-tooltip="true"
+      />
+      <el-table-column
+        label="执行群聊"
         align="center"
         prop="name"
         :show-overflow-tooltip="true"
@@ -143,7 +199,7 @@ export default {
             type="text"
             icon="el-icon-view"
             @click="edit(scope.row, 0)"
-            >查看</el-button
+            >删除</el-button
           >
           <el-button
             v-hasPermi="['enterpriseWechat:edit']"
