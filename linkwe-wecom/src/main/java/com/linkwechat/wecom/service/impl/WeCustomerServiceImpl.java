@@ -592,6 +592,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                log.error("Exception:【{}】",e);
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             }
 
