@@ -92,7 +92,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
             }
         }
 
-        // 0 发给客户群
+        // 1 发给客户群
         if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_GROUP)) {
 
             if (customerMessagePushDto.getStaffId() == null || customerMessagePushDto.getStaffId().equals("")) {
