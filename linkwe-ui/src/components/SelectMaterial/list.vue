@@ -134,7 +134,7 @@ export default {
       v-model="radio"
     >
       <el-radio v-for="(item, index) in list" :label="item" :key="index">
-        <img class="img-li" :src="item.materialUrl" alt />
+        <img crossorigin="anonymous" class="img-li" :src="item.materialUrl" alt />
         <div class="ac mt5">{{ item.materialName }}</div>
       </el-radio>
     </el-radio-group>
