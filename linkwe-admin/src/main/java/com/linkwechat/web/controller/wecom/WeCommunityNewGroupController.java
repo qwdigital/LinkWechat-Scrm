@@ -30,8 +30,8 @@ public class WeCommunityNewGroupController {
     /**
      * 新增员工活码
      */
-    @PreAuthorize("@ss.hasPermi('wecom:code:add')")
-    @Log(title = "员工活码", businessType = BusinessType.INSERT)
+    @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:add')")
+    @Log(title = "新客自动拉群", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     public AjaxResult add(@RequestBody @Validated WeCommunityNewGroupDto communityNewGroupDto) {
         try {
