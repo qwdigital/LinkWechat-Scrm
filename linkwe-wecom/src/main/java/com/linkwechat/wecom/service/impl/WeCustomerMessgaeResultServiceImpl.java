@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeCustomerMessgaeResult;
@@ -39,9 +40,12 @@ public class WeCustomerMessgaeResultServiceImpl extends ServiceImpl<WeCustomerMe
 
         int size = 0;
         // 0 发给客户
-        if (customerMessagePushDto.getPushType().equals("0")) {
+        if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_CUSTOMER)) {
 
             if (CollectionUtils.isNotEmpty(customers)) {
+
+                List<WeCustomerMessgaeResult> weCustomerMessgaeResults=Lists.newArrayList();
+
                 size = customers.size();
                 customers.forEach(customer -> {
                     //微信消息发送结果、保存员工客户关系映射关系数据
@@ -58,15 +62,17 @@ public class WeCustomerMessgaeResultServiceImpl extends ServiceImpl<WeCustomerMe
                     customerMessgaeResult.setStatus("0");
                     customerMessgaeResult.setSettingTime(customerMessagePushDto.getSettingTime());
                     customerMessgaeResult.setDelFlag(0);
-                    this.save(customerMessgaeResult);
+                    weCustomerMessgaeResults.add(customerMessgaeResult);
                 });
+                customerMessgaeResultMapper.batchInsert(weCustomerMessgaeResults);
             }
         }
 
         // 1 发给客户群
-        if (customerMessagePushDto.getPushType().equals("1")) {
+        if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_GROUP)) {
 
             if (CollectionUtils.isNotEmpty(groups)) {
+                List<WeCustomerMessgaeResult> weCustomerMessgaeResults=Lists.newArrayList();
                 size = groups.size();
                 groups.forEach(group -> {
                     //微信消息发送结果、保存员工客户关系映射关系数据
@@ -84,8 +90,9 @@ public class WeCustomerMessgaeResultServiceImpl extends ServiceImpl<WeCustomerMe
                     //群管理员名称
                     customerMessgaeResult.setUserName(group.getGroupLeaderName());
                     customerMessgaeResult.setDelFlag(0);
-                    this.save(customerMessgaeResult);
+                    weCustomerMessgaeResults.add(customerMessgaeResult);
                 });
+                customerMessgaeResultMapper.batchInsert(weCustomerMessgaeResults);
             }
 
         }
