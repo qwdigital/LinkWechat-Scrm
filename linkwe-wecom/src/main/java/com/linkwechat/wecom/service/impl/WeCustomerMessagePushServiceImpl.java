@@ -92,7 +92,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
             }
         }
 
-        // 0 发给客户群
+        // 1 发给客户群
         if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_GROUP)) {
 
             if (customerMessagePushDto.getStaffId() == null || customerMessagePushDto.getStaffId().equals("")) {
@@ -123,9 +123,6 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
 
         //保存分类消息信息
         weCustomerSeedMessageService.saveSeedMessage(customerMessagePushDto, messageId);
-
-        log.info("消息发送信息：{}", JSONUtil.toJsonStr(customerMessagePushDto));
-        CustomerMessagePushDto customerMessagePushDto1 = JSONUtil.toBean(JSONUtil.parseObj(JSONUtil.toJsonStr(customerMessagePushDto)), CustomerMessagePushDto.class);
 
         //发送群发消息
         //调用微信api发送消息

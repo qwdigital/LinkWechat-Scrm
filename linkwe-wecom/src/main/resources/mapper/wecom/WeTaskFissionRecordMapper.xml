@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.system.mapper.WeTaskFissionRecordMapper">
+<mapper namespace="com.linkwechat.wecom.mapper.WeTaskFissionRecordMapper">
     
     <resultMap type="WeTaskFissionRecord" id="WeTaskFissionRecordResult">
         <result property="id"    column="id"    />

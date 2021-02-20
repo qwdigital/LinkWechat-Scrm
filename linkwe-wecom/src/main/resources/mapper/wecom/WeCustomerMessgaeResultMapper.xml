@@ -3,6 +3,49 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeCustomerMessgaeResultMapper">
+
+    <insert id="batchInsert">
+        INSERT INTO we_customer_messgaeResult (
+            messgae_result_id,
+            message_id,
+            external_userid,
+            chat_id,
+            userid,
+            `status`,
+            send_time,
+            external_name,
+            user_name,
+            send_type,
+            setting_time,
+            create_by,
+            create_time,
+            update_by,
+            update_time,
+            del_flag,
+            chat_name
+        )
+        VALUES
+        <foreach collection="list" item="item" separator="," index="index" >
+            (#{item.messgaeResultId},
+            #{item.messageId},
+            #{item.externalUserid},
+            #{item.chatId},
+            #{item.userid},
+            #{item.status},
+            #{item.sendTime},
+            #{item.externalName},
+            #{item.userName},
+            #{item.sendType},
+            #{item.settingTime},
+            #{item.createBy},
+            #{item.createTime},
+            #{item.updateBy},
+            #{item.updateTime},
+            #{item.delFlag},
+            #{item.chatName})
+        </foreach>
+    </insert>
+
     <update id="updateWeCustomerMessgaeResult">
         UPDATE we_customer_messgaeResult
         <set>

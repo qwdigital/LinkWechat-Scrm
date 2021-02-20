@@ -45,4 +45,13 @@ public interface WeCustomerMessgaeResultMapper extends BaseMapper<WeCustomerMess
      * @return 已发送消息数
      */
     int  checkSendStatus(@Param("messageId") Long messageId);
+
+    /**
+     * 批量保存映射关系
+     *
+     * @param weCustomerMessgaeResults 映射关系列表信息
+     * @return int 结果
+     */
+    int batchInsert(@Param("customers") List<WeCustomerMessgaeResult> weCustomerMessgaeResults);
+
 }
