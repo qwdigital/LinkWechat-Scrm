@@ -2,6 +2,8 @@ package com.linkwechat.wecom.domain;
 
 import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.core.domain.BaseEntity;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +17,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * @author ruoyi
  * @date 2021-01-27
  */
+@ApiModel
 @Data
 @Builder
 @AllArgsConstructor
@@ -30,26 +33,31 @@ public class WeTaskFissionRecord extends BaseEntity {
      * 任务裂变表id
      */
     @Excel(name = "任务裂变表id")
+    @ApiModelProperty("任务裂变表id")
     private Long taskFissionId;
 
     /**
      * 裂变任务客户id
      */
     @Excel(name = "裂变任务客户id")
+    @ApiModelProperty("裂变任务客户id")
     private String customerId;
 
     /**
      * 裂变任务客户姓名
      */
     @Excel(name = "裂变任务客户姓名")
+    @ApiModelProperty("裂变任务客户姓名")
     private String customerName;
 
     /**
      * 裂变客户数量
      */
     @Excel(name = "裂变客户数量")
+    @ApiModelProperty("裂变客户数量")
     private Long fissNum;
 
+    @ApiModelProperty("生成二维码配置id")
     private String configId;
 
     @Override

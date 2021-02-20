@@ -27,28 +27,28 @@ public class WeTaskFissionStaff extends BaseEntity {
      * 任务裂变表id
      */
     @Excel(name = "任务裂变表id")
-    @ApiModelProperty(value = "任务裂变表id")
+    @ApiModelProperty("任务裂变表id")
     private Long taskFissionId;
 
     /**
      * 员工或机构，1 组织机构 2 成员 3 全部
      */
     @Excel(name = "员工或机构，1 组织机构 2 成员 3 全部")
-    @ApiModelProperty(value = "员工或机构，1 组织机构 2 成员 3 全部")
+    @ApiModelProperty("员工或机构，1 组织机构 2 成员 3 全部")
     private Integer staffType;
 
     /**
      * 员工或组织机构id,为全部时为空
      */
     @Excel(name = "员工或组织机构id,为全部时为空")
-    @ApiModelProperty(name = "员工或组织机构id,为全部时为空")
+    @ApiModelProperty("员工或组织机构id,为全部时为空")
     private String staffId;
 
     /**
      * 员工或组织机构姓名，类型为全部时，为空
      */
     @Excel(name = "员工或组织机构姓名，类型为全部时，为空")
-    @ApiModelProperty(name = "员工或组织机构姓名，类型为全部时，为空")
+    @ApiModelProperty("员工或组织机构姓名，类型为全部时，为空")
     private String staffName;
 
     @Override
