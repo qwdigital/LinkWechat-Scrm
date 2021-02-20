@@ -71,12 +71,14 @@ public class WeGroup {
 
     /**员工id*/
     @TableField(exist = false)
+    @ApiModelProperty(value = "员工id")
     private String userIds;
 
     /**
      * 群头像
      */
     @TableField(exist = false)
+    @ApiModelProperty(value = "群头像")
     private String avatar;
 
 
