@@ -10,6 +10,7 @@ import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeExternalContactClient;
 import com.linkwechat.wecom.domain.WeEmpleCode;
+import com.linkwechat.wecom.domain.WeEmpleCodeTag;
 import com.linkwechat.wecom.domain.WeEmpleCodeUseScop;
 import com.linkwechat.wecom.domain.WeMaterial;
 import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
@@ -80,17 +81,21 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         if (weEmpleCodeList != null) {
             weEmpleCodeList.forEach(empleCode -> {
                 List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = empleCode.getWeEmpleCodeUseScops();
-                if (CollectionUtil.isNotEmpty(weEmpleCodeUseScopList)) {
-                    String useUserName = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getBusinessName)
-                            .filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
-                    empleCode.setUseUserName(useUserName);
-                    String mobile = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getMobile)
-                            .filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
-                    empleCode.setMobile(mobile);
-                }
+                setUserData(empleCode, weEmpleCodeUseScopList);
             });
         }
         return weEmpleCodeList;
+    }
+
+    private void setUserData(WeEmpleCode empleCode, List<WeEmpleCodeUseScop> weEmpleCodeUseScopList) {
+        if (CollectionUtil.isNotEmpty(weEmpleCodeUseScopList)) {
+            String useUserName = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getBusinessName)
+                    .filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
+            empleCode.setUseUserName(useUserName);
+            String mobile = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getMobile)
+                    .filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
+            empleCode.setMobile(mobile);
+        }
     }
 
     /**
@@ -104,16 +109,18 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
 
         List<WeEmpleCode> weEmpleCodeList = this.baseMapper.selectWeEmpleCodeList(weEmpleCode);
         if (CollectionUtil.isNotEmpty(weEmpleCodeList)) {
+            List<Long> empleCodeIdList = weEmpleCodeList.stream().map(WeEmpleCode::getId).collect(Collectors.toList());
+            List<WeEmpleCodeUseScop> useScopList = iWeEmpleCodeUseScopService.selectWeEmpleCodeUseScopListByIds(empleCodeIdList);
+            List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.selectWeEmpleCodeTagListByIds(empleCodeIdList);
             weEmpleCodeList.forEach(empleCode -> {
-                List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = empleCode.getWeEmpleCodeUseScops();
-                if (CollectionUtil.isNotEmpty(weEmpleCodeUseScopList)) {
-                    String useUserName = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getBusinessName)
-                            .filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
-                    empleCode.setUseUserName(useUserName);
-                    String mobile = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getMobile)
-                            .filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
-                    empleCode.setMobile(mobile);
-                }
+                //活码使用人对象
+                List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = useScopList.stream()
+                        .filter(useScop -> useScop.getEmpleCodeId().equals(empleCode.getId())).collect(Collectors.toList());
+                setUserData(empleCode, weEmpleCodeUseScopList);
+                empleCode.setWeEmpleCodeUseScops(weEmpleCodeUseScopList);
+                //员工活码标签对象
+                empleCode.setWeEmpleCodeTags(tagList.stream()
+                        .filter(tag -> tag.getEmpleCodeId().equals(empleCode.getId())).collect(Collectors.toList()));
             });
         }
         return weEmpleCodeList;

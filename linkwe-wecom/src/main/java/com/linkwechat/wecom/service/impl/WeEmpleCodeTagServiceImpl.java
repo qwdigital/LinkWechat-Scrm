@@ -45,6 +45,11 @@ public class WeEmpleCodeTagServiceImpl extends ServiceImpl<WeEmpleCodeTagMapper,
         return weEmpleCodeTagMapper.selectWeEmpleCodeTagListById(empleCodeId);
     }
 
+    @Override
+    public List<WeEmpleCodeTag> selectWeEmpleCodeTagListByIds(List<Long> empleCodeIdList) {
+        return weEmpleCodeTagMapper.selectWeEmpleCodeTagListByIds(empleCodeIdList);
+    }
+
     /**
      * 新增员工活码标签
      *

@@ -85,7 +85,7 @@
         where 1=1 and wecode.del_flag = 0
 	</sql>
 
-    <select id="selectWeEmpleCodeList" parameterType="WeEmpleCode" resultMap="WeEmpleCodeResult">
+    <select id="selectWeEmpleCodeList" parameterType="WeEmpleCode" resultType="com.linkwechat.wecom.domain.WeEmpleCode">
         <include refid="selectWeEmpleCodeLsit"/>
         <if test="codeType != null ">and wecode.code_type = #{codeType}</if>
         <if test="isJoinConfirmFriends != null ">and wecode.is_join_confirm_friends = #{isJoinConfirmFriends}</if>
@@ -108,6 +108,7 @@
         <if test="useUserName != null and useUserName !=''">
             AND wecusn.business_name like concat('%', #{useUserName}, '%')
         </if>
+        group by wecode.id
     </select>
 
     <select id="selectWeEmpleCodeById" parameterType="Long" resultMap="WeEmpleCodeResult">
