@@ -4,4 +4,24 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeCommunityNewGroupMapper">
 
+    <update id="batchRemoveWeCommunityNewGroupIds">
+        update we_community_new_group set
+        del_flag = 1
+        where new_group_id in
+        <foreach collection="ids" item="id" index="index"
+                 separator="," open="(" close=")">
+            #{newGroupId}
+        </foreach>
+    </update>
+
+    <select id="selectWeCommunityNewGroupList"
+            resultType="com.linkwechat.wecom.domain.vo.WeCommunityNewGroupVo">
+
+    </select>
+
+    <select id="selectWeCommunityNewGroupById"
+            resultType="com.linkwechat.wecom.domain.vo.WeCommunityNewGroupVo">
+
+    </select>
+
 </mapper>
