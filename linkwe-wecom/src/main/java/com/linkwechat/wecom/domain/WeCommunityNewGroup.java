@@ -25,7 +25,7 @@ public class WeCommunityNewGroup extends BaseEntity {
     /**
      * 员工活码名称
      */
-    private Long empleCodeName;
+    private String empleCodeName;
 
     /**
      * 群活码ID
