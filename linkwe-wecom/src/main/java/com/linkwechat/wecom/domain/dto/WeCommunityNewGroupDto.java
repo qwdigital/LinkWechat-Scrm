@@ -39,6 +39,12 @@ public class WeCommunityNewGroupDto {
     private List<WeEmpleCodeTag> weEmpleCodeTags;
 
     /**
+     * 员工活码 id
+     */
+    @TableField(exist = false)
+    private Long weEmpleCodeId;
+
+    /**
      * 群活码ID
      */
     private Long groupCodeId;
