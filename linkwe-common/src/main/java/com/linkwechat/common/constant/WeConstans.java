@@ -371,7 +371,8 @@ public class WeConstans {
     }
 
 
-    public static final String WECOM_FINANCE_INDEX = "finance";
+    //public static final String WECOM_FINANCE_INDEX = "finance";
+    public static final String WECOM_FINANCE_INDEX = "finance_new";
 
     public static final String WECOM_SENSITIVE_HIT_INDEX = "sensitive";
 
