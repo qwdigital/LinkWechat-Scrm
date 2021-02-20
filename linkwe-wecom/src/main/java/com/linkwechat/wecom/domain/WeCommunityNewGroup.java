@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.domain;
 
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import lombok.Data;
 
 /**
@@ -15,7 +16,7 @@ public class WeCommunityNewGroup extends BaseEntity {
     /**
      *主键ID
      */
-    private Long newGroupId;
+    private Long newGroupId= SnowFlakeUtil.nextId();
 
     /**
      *员工活码ID
