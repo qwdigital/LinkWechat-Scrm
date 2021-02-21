@@ -215,7 +215,7 @@ com.linkwechat
 
 演示地址：http://www.linkwechat.cn   
 
-演示账号/密码：test/123456
+演示账号/密码：Wecome/123456
 
 #### 开发进度
 
