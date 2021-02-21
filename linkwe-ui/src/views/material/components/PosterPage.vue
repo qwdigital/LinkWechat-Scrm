@@ -47,6 +47,9 @@ export default {
         if (this.includeUi) {
             options = Object.assign(includeUIOptions, this.options);
         }
+        if (this.editorInstance) {
+            console.log('this.editorInstance')
+        }
         this.editorInstance = new ImageEditor(this.$refs.tuiImageEditor, options);
         document.getElementsByClassName('tui-image-editor-header')[0].innerHTML = '';
        
@@ -67,6 +70,8 @@ export default {
         this.editorInstance.ui._actions.text.modeChange = function () {}
         document.getElementsByClassName('tui-image-editor-submenu')[0].style.display = 'none';
         document.getElementsByClassName('tie-btn-text')[0].style.display = 'none';
+        document.getElementsByClassName('tui-image-editor-main')[0].style.top = '0';
+        document.getElementsByClassName('tui-image-editor-align-wrap')[0].style.verticalAlign = 'top';
 
         this.initBtn();
         this.addEventListener();
@@ -75,6 +80,7 @@ export default {
         // Object.keys(this.$listeners).forEach(eventName => {
         //     this.editorInstance.off(eventName);
         // });
+        console.log('deatory poster')
         this.editorInstance.destroy();
         this.editorInstance = null;
     },
@@ -178,6 +184,7 @@ export default {
                 redoStackChanged: this.onRedoStackChanged.bind(this),
                 objectScaled: this.onObjectScaled.bind(this),
                 addText: this.onAddText.bind(this),
+                textEditing: this.textEditing.bind(this),
                 objectActivated: this.objectActivated.bind(this),
                 objectMoved: this.onObjectMoved.bind(this)
             });
@@ -225,6 +232,10 @@ export default {
                 let target = this.$parent.records[objectProps.id];
                 target && (target.randomId = id);
             }.bind(this));
+        },
+        // 文本改变事件
+        textEditing (e) {
+            console.log('dsds', e)
         },
         //移动
         onObjectMoved(obj) {
@@ -462,10 +473,6 @@ export default {
             }
             this.editorInstance.addImageObject(imgPath).then(objectProps => {
                 let id = this.GenNonDuplicateID() + '_' + objectProps.id;
-                // this.$parent.imgList[id] = imgPath;  // FIXME
-                // console.log(objectProps)
-                // console.log(this.$parent.records)
-                // let target = this.$parent.records[objectProps.id];
                 
                 let target = {}
                 // if (target) {

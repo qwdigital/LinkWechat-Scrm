@@ -32,7 +32,6 @@ export default {
   data () {
     return {
       imgList: {},
-      imgData: [],
       dialogVisibleSelectMaterial: false,
       dialog: {
         preview: false, // 预览弹出显示隐藏
@@ -277,6 +276,13 @@ export default {
       } else {
         this.rangeErrorMsg = ''
       }
+      if (this.$refs.tuiImageEditor && this.$refs.tuiImageEditor.editorInstance) {
+        this.$refs.tuiImageEditor.editorInstance._invoker._redoStack = [];
+        this.$refs.tuiImageEditor.editorInstance._invoker._undoStack = [];
+        this.$refs.tuiImageEditor.records = {}
+        this.records = [];
+        this.imgList = {};
+      }
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.posterEdit.step = 1
@@ -375,10 +381,7 @@ export default {
     },
     // 获取子组件传来的数据
     getImgData(data) {
-      this.imgList.id = data.imgUrl
-      // console.log(data)
-      this.imgData.push(data)
-      // console.log(this.imgData)
+      this.imgList.id = data
     },
     // 选择素材确认按钮
     submitSelectMaterial(text, image, file) {
@@ -393,13 +396,21 @@ export default {
     //
     async save() {
       let list =[];
+      let historys = [];
       try {
         let imageEditor = this.$refs.tuiImageEditor;
-        
-        let deleteId = [];
+        let deleteId = []; 
         imageEditor.editorInstance._invoker._undoStack.forEach(element => {
           if(element.name == "removeObject"){
-              deleteId.push(element.args[1])
+            deleteId.push(element.args[1])
+          } 
+          else 
+          {
+            if (element.args[1] instanceof Array) {
+              historys.push(element.args[1][0])
+            } else {
+              historys.push(element.args[1])
+            }
           }
         })
         Object.values(imageEditor.records).forEach(item => {
@@ -418,23 +429,31 @@ export default {
       
       // TODO 塞新建海报的数据 
       let posterSubList = [];
+      let vo = null;
       let i = 0, len = list.length;
       while (i < len) {
-        let vo = list[i];
-        if (!this.imgData[i]) {
-          console.log('this.imgData[i] is null')
-          i++;
-          continue;
+        vo = list[i];
+        if (this.imgList[vo.id]) {
+          vo.objType = this.imgList[vo.id].objType;
+          vo.url = this.imgList[vo.id].url;
+          vo.randomId = this.imgList[vo.id].randomId
         }
-        vo.objType = this.imgData[i].objType;
-        vo.url = this.imgData[i].url;
-        vo.randomId = this.imgData[i].randomId;
-        // console.log(vo)
-        let type = list[i].type;
+        
+        let type = vo.type;
+        let isText = false;
+        if (type === 'i-text' || type === 'text') {
+          // 如果是文本需要对文字内容进行特殊处理
+          isText = true;
+          let targetData = this.getLastSelectData(vo.id, historys);
+          if (targetData) {
+            vo.text = targetData.text;
+          }
+        }
+
         let align = vo.textAlign && 
                     (vo.textAlign === 'left' ? 1 : vo.textAlign === 'center' ? 2 : 3) 
                     || null; 
-        let isText = type === 'i-text' || type === 'text';
+        
         let posData = {
           id: vo.randomId || i,
           content: vo.text || '',   // 文本内容 
@@ -474,7 +493,6 @@ export default {
       } else {
         // 新建海报
         res = await addPoster(Object.assign({}, {
-          // backgroundImgPath: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg',
           backgroundImgPath: this.materialSelected,
           posterSubassemblyList: posterSubList
         }, this.posterForm))
@@ -484,8 +502,26 @@ export default {
         this.$refs.page.getList(1)
         this.beforeCloseDialog()
       }
+    },
+    getLastSelectData (id, arr) {
+      let index = arr.length - 1, len = 0;
+      let selectData = null;
+      try {
+        while (index >= len) {
+          // 类型转换对比
+          if (arr[index].id == id) {
+            selectData = arr[index];
+            break;
+          }
+          index --;
+        }
+      }catch (e) {
+        console.log('getLastSelectData 循环出错')
+      }
+      
+      return selectData;
     }
-  },
+  }
 }
 </script>
 
