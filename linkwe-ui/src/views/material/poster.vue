@@ -1,6 +1,5 @@
 <script>
 import {
-  getList,
   getPosterInfo,
   addPoster,
   updatePoster,
@@ -32,6 +31,7 @@ export default {
   data () {
     return {
       imgList: {},
+      posterSubassemblyList: [],
       dialogVisibleSelectMaterial: false,
       dialog: {
         preview: false, // 预览弹出显示隐藏
@@ -177,6 +177,7 @@ export default {
           type: data.type,
           delFlag: data.delFlag,
         }
+        this.posterSubassemblyList = data.posterSubassemblyList || [];
         this.materialSelected = data.backgroundImgPath
         this.posterEdit.step = 0
         this.dialog.edit = true
@@ -215,8 +216,6 @@ export default {
     //缩放
     onObjectScaled(obj) {
       console.log('onObjectScaled')
-      // this.getRecord(res);
-      // this.checkState();
       if (obj.type === 'text') {
         this.$refs.tuiImageEditor.inputFontSizeRange.setAttribute('value',obj.fontSize);        
       }
@@ -280,13 +279,14 @@ export default {
         this.$refs.tuiImageEditor.editorInstance._invoker._redoStack = [];
         this.$refs.tuiImageEditor.editorInstance._invoker._undoStack = [];
         this.$refs.tuiImageEditor.records = {}
-        this.records = [];
         this.imgList = {};
       }
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.posterEdit.step = 1
-          this.$refs.tuiImageEditor.getBackgroundUrl(this.materialSelected)
+          this.$refs.tuiImageEditor.getBackgroundUrl(this.materialSelected);
+          // TODO 如果有数据说明是修改，则回显老数据
+          this.posterSubassemblyList.length && this.$refs.tuiImageEditor.reShowDisplay(this.posterSubassemblyList);
         } else {
           return false;
         }
@@ -315,70 +315,35 @@ export default {
     inputFontSizeRangeChange (e) {
       this.$refs.tuiImageEditor.inputFontSizeRangeChange(e);
     },
-    getRecord(res){
-      var flag = false;
-      if (this.records && this.records.length) {
-        for (let index = 0; index < this.records.length; index++) {
-          const element ={
-            fill: this.records[index].fill,
-            height: this.records[index].height,
-            id: this.records[index].id,
-            left: this.records[index].left,
-            opacity: this.records[index].opacity,
-            stroke: this.records[index].stroke,
-            strokeWidth: this.records[index].strokeWidth,
-            top: this.records[index].top,
-            type: this.records[index].type,
-            width: this.records[index].width,
-          };
-          if(element.id == res.id){
-            // console.log(element)
-            this.records[index] = res;
-            flag = true;
-          }
-        }
-      } else {
-        this.records = [];
-      }
-      if(!flag){
-        this.records.push(res)
-      }
-    },
-    // FIXME 没写完
-    async reShow (list) {
-      list = JSON.parse('[{"id":2,"type":"i-text","left":55.26947693665858,"top":180.32266601562497,"width":200,"height":45.199999999999996,"fill":"#000000","stroke":null,"strokeWidth":1,"opacity":1,"angle":0,"text":"请输入文字","fontFamily":"Times New Roman","fontSize":40,"fontStyle":"normal","textAlign":"left","fontWeight":"normal"},{"id":3,"type":"image","left":195.71660545226203,"top":506.3232314730081,"width":500,"height":500,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"opacity":1,"angle":0},{"id":4,"type":"image","left":373.102002853498,"top":190.44302690999768,"width":792,"height":792,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"opacity":1,"angle":0}]');
-      let i = 0, len = list && list.length || 0
-      for ( ; i<len; i++) {
-        await this.loadRes(list[i]);
-      }
-    },
-    async loadRes (obj) {
-      return new Promise((resolve) => {
-        let imageEditor = this.$refs.tuiImageEditor.editorInstance;
-        switch (obj.type) {
-          case 'i-text':
-          case 'text':
-            imageEditor.
-            addText(obj.text, {
-                position: {
-                  x: obj.left,
-                  y: obj.right
-                },
-            })
-            .then(function (objectProps) {
-                console.log(objectProps);
-            });
-          break;
-          case 'image':
-            this.editorInstance.addImageObject(imgPath).then(objectProps => {
-                console.log(objectProps.id);
-            }).then(function (objectProps) {
-                console.log(objectProps);
-            });
-          break;
-        }
-      });
-    },
+    // getRecord(res){
+    //   var flag = false;
+    //   if (this.records && this.records.length) {
+    //     for (let index = 0; index < this.records.length; index++) {
+    //       const element ={
+    //         fill: this.records[index].fill,
+    //         height: this.records[index].height,
+    //         id: this.records[index].id,
+    //         left: this.records[index].left,
+    //         opacity: this.records[index].opacity,
+    //         stroke: this.records[index].stroke,
+    //         strokeWidth: this.records[index].strokeWidth,
+    //         top: this.records[index].top,
+    //         type: this.records[index].type,
+    //         width: this.records[index].width,
+    //       };
+    //       if(element.id == res.id){
+    //         // console.log(element)
+    //         this.records[index] = res;
+    //         flag = true;
+    //       }
+    //     }
+    //   } else {
+    //     this.records = [];
+    //   }
+    //   if(!flag){
+    //     this.records.push(res)
+    //   }
+    // },
     // 获取子组件传来的数据
     getImgData(data) {
       this.imgList.id = data

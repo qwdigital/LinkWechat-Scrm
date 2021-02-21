@@ -85,12 +85,55 @@ export default {
         this.editorInstance = null;
     },
     methods: {
+        // 设置背景图片
         getBackgroundUrl(bacUrl) {
             this.editorInstance.loadImageFromURL(bacUrl, 'imagePoster').then(async result => {
                 console.log('old : ' + result.oldWidth + ', ' + result.oldHeight);
                 console.log('new : ' + result.newWidth + ', ' + result.newHeight);
-                // await this.addImage('https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg')
-                // await this.addText('aloha');
+            });
+        },
+        // 设置修改回显
+        reShowDisplay (reShowDisplays) {
+            let i = 0,len = reShowDisplays.length;
+            let _data = null;
+            while (i < len) {
+                _data = reShowDisplays[i];
+                _data && this.createReShowDisplay(_data);
+                i ++;
+            }
+        },
+        // 1 固定文本 2 固定图片 3 二维码图片
+        async createReShowDisplay(data) {
+            return Promise((resolve)=>{
+                switch (data.type) {
+                    case 1:
+                        this.editorInstance.
+                        addText(data.content, {
+                            position: {
+                                x: data.left,
+                                y: data.top
+                            },
+                        })
+                        .then(function (objectProps) {
+                            console.log(objectProps);
+                            resolve();
+                        });
+                    break;
+                    case 2:
+                    case 3:
+                        this.editorInstance.addImageObject(data.imgPath).then(objectProps => {
+                            console.log(objectProps.id);
+                        }).then(function (objectProps) {
+                            let target = {}
+                            target.url = data.imgPath;
+                            target.randomId = objectProps.id;
+                            target.objType = data.type;
+                            // 将图片数据传给父组件保存
+                            this.$emit('getImageData', target);console.log(objectProps);
+                            resolve()
+                        });
+                    break;
+                }
             });
         },
         initBtn () {
@@ -227,10 +270,7 @@ export default {
             })
             .then(function (objectProps) {
                 console.log(objectProps);
-                this.records(objectProps)
-                let id = this.GenNonDuplicateID() + '_' + objectProps.id;
-                let target = this.$parent.records[objectProps.id];
-                target && (target.randomId = id);
+                this.records(objectProps);
             }.bind(this));
         },
         // 文本改变事件
@@ -457,12 +497,9 @@ export default {
         },
         getImages () {
             this.visible = true; // 显示图片列表dialog
-            // this.activateImageMode();   
-            // this.addImage('https://images.gitee.com/uploads/images/2020/1231/234016_20fdd151_1480777.png',2);
         },
         // 提交选择的图片
         getMaterial(text, image, file) {
-            // console.log(image.materialUrl)
             this.activateImageMode();
             this.addImage(image.materialUrl, 2);
             this.visible = false;
@@ -472,46 +509,22 @@ export default {
                 throw Error("imgPath can't null")
             }
             this.editorInstance.addImageObject(imgPath).then(objectProps => {
-                let id = this.GenNonDuplicateID() + '_' + objectProps.id;
                 
                 let target = {}
-                // if (target) {
-                    target.url = imgPath;
-                    target.randomId = objectProps.id;
-                    target.objType = type;
-                // }
-                this.$emit('getImageData', target); // 将图片数据传给父组件保存
+                target.url = imgPath;
+                target.randomId = objectProps.id;
+                target.objType = type;
+                // 将图片数据传给父组件保存
+                this.$emit('getImageData', target);
             });
         },
         addText (text, style = null, position = null) {
-            // return new Promise(function(resolve, reject) {
-                // !style && (style = {
-                //     fill: '#000',
-                //     fontSize: 20,
-                //     fontWeight: 'bold'
-                // })
-                // !position && (position = {
-                //     x: 10,
-                //     y: 10
-                // })
-                // this.activateTextMode();
-                // this.editorInstance.addText( text, {
-                //     style: style,
-                //     position: position
-                // }).then(objectProps => {
-                //     console.log(objectProps.id);
-                //     resolve(objectProps);
-                // });
-            // }.bind(this));
             this.editorInstance
             .addText(text || '双击输入文字', {
                 position: position,
             })
             .then(function (objectProps) {
                 console.log(objectProps);
-                let id = this.GenNonDuplicateID() + '_' + objectProps.id;
-                let target = this.$parent.records[objectProps.id];
-                target && (target.randomId = id);
             });
         },
         activateImageMode () {
@@ -542,10 +555,10 @@ export default {
                 this.records[obj.id] = obj;
             }
             
-        },
-        GenNonDuplicateID(randomLength){
-            return parseFloat(Math.random().toString().substr(3,randomLength) + Date.now()).toString(36)
-        }   
+        }
+        // GenNonDuplicateID(randomLength){
+        //     return parseFloat(Math.random().toString().substr(3,randomLength) + Date.now()).toString(36)
+        // }   
     }
 };
 </script>
