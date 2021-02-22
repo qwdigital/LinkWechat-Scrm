@@ -256,7 +256,7 @@ LinkWeChat 开源版遵循 [GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/bl
 
 您的捐赠将用于支付该项目的一些费用支出，并激励开发者们以便更好的推动项目的发展，同时欢迎捐赠**公网服务器**用于提高在线演示系统体验。
 
-![image-20210222214357456](/Users/xiarui/Library/Application Support/typora-user-images/image-20210222214357456.png)
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0222/221344_727a0e80_1480777.png "image-20210222214357456.png")
 
 #### 长期捐赠
 
