@@ -55,9 +55,16 @@
         </div>
       </el-form-item>
       <el-checkbox
+        class="fr"
         v-model="loginForm.rememberMe"
         style="margin:0px 0px 25px 0px;"
         >记住密码</el-checkbox
+      >
+      <el-checkbox
+        v-model="isDemonstrationLogin"
+        @change="changeDemonAccount"
+        style="margin:0px 0px 25px 0px;"
+        >演示账号登录</el-checkbox
       >
       <el-form-item style="width:100%;">
         <el-button
@@ -152,6 +159,7 @@ export default {
       redirect: undefined,
       authLink: '',
       dialogVisible: true,
+      isDemonstrationLogin: false,
     }
   },
   watch: {
@@ -226,6 +234,10 @@ export default {
     },
     goVote() {
       window.open('https://www.oschina.net/p/linkwechat')
+    },
+    changeDemonAccount(val) {
+      this.loginForm.username = val ? 'Wecome' : ''
+      this.loginForm.password = val ? '123456' : ''
     },
   },
 }
