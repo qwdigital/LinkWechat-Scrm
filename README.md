@@ -8,7 +8,7 @@
 
 <div align="center">
 
-![GVP Stars](http://img.shields.io/badge/GPV%20Stars-750+-yellow)
+![GVP Stars](http://img.shields.io/badge/GPV%20Stars-800+-red)
 ![GVP Forks](http://img.shields.io/badge/GPV%20Forks-250+-yellow)
 ![license](http://img.shields.io/badge/license-GPL%203.0-green)
 
