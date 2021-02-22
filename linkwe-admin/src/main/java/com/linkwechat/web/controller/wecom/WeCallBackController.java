@@ -1,6 +1,7 @@
 package com.linkwechat.web.controller.wecom;
 
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.utils.Threads;
 import com.linkwechat.common.utils.wecom.WxCryptUtil;
 import com.linkwechat.web.controller.common.CommonController;
 import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
@@ -36,7 +37,7 @@ public class WeCallBackController extends CommonController {
     @Value("${wecome.callBack.encodingAesKey}")
     private String encodingAesKey;
 
-    @PostMapping(value = "/recive", produces = {"application/xml;charset=UTF-8"})
+    @PostMapping(value = "/recive")
     public String recive(@RequestBody String msg, @RequestParam(name = "msg_signature") String signature,
                          String timestamp, String nonce) {
         WxCryptUtil wxCryptUtil = new WxCryptUtil(token, encodingAesKey, appIdOrCorpId);
@@ -47,7 +48,7 @@ public class WeCallBackController extends CommonController {
             try {
                 WeCallBackEventFactory factory = weEventHandle.factory(wxCpXmlMessage.getEvent());
                 if (factory !=null){
-                    factory.eventHandle(wxCpXmlMessage);
+                    Threads.SINGLE_THREAD_POOL.submit(() -> factory.eventHandle(wxCpXmlMessage));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -60,7 +61,7 @@ public class WeCallBackController extends CommonController {
         }
     }
 
-    @GetMapping(value = "/recive", produces = {"application/xml;charset=UTF-8"})
+    @GetMapping(value = "/recive")
     public String recive(HttpServletRequest request) {
         // 微信加密签名
         String sVerifyMsgSig = request.getParameter("msg_signature");

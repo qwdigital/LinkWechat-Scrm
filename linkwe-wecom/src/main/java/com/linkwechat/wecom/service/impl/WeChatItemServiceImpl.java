@@ -45,7 +45,7 @@ public class WeChatItemServiceImpl extends ServiceImpl<WeChatItemMapper, WeChatI
         List<Long> materialIds=new ArrayList<>();
 
 
-        if(chatItemDto.getCheckAll().equals("0")){
+        if("0".equals(chatItemDto.getCheckAll())){
 
             List<WeMaterial> weMaterials = weMaterialService.findWeMaterials(null, null, chatItemDto.getMediaType());
 
@@ -96,8 +96,8 @@ public class WeChatItemServiceImpl extends ServiceImpl<WeChatItemMapper, WeChatI
     }
 
     @Override
-    public List<WeChatSideVo> chatItems(Long sideId) {
-        return weChatItemMapper.findChatItems(sideId);
+    public List<WeChatSideVo> chatItems(Long sideId,String keyword,String mediaType,String userId) {
+        return weChatItemMapper.findChatItems(sideId,keyword,mediaType,userId);
     }
 
     /**

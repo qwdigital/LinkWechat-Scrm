@@ -30,6 +30,8 @@ public interface IWeDepartmentService extends IService<WeDepartment>
      */
     public void insertWeDepartment(WeDepartment weDepartment);
 
+    public int insertWeDepartmentNoToWeCom(WeDepartment weDepartment);
+
     /**
      * 修改企业微信组织架构相关
      * 

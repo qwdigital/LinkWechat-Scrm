@@ -63,4 +63,10 @@ public interface IWeTagGroupService  extends IService<WeTagGroup>
      * @param isSync
      */
     public void batchSaveOrUpdateTagGroupAndTag(List<WeCropGroupTagDto> tagGroup,Boolean isSync);
+
+    void createTagGroup(String id);
+
+    void deleteTagGroup(String id);
+
+    void updateTagGroup(String id);
 }

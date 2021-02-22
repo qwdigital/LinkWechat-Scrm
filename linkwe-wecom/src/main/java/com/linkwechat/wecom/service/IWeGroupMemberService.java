@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeGroupMember;
+import com.linkwechat.wecom.domain.dto.WeGroupMemberDto;
 
 import java.util.List;
 
@@ -13,5 +14,7 @@ import java.util.List;
 public interface IWeGroupMemberService extends IService<WeGroupMember> {
 
     List<WeGroupMember> selectWeGroupMemberList(WeGroupMember paramWeGroupMember);
+
+    List<WeGroupMemberDto> selectWeGroupMemberListByChatId(String chatId);
 
 }

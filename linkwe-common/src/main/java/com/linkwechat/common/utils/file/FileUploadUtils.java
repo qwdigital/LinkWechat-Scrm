@@ -2,7 +2,10 @@ package com.linkwechat.common.utils.file;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.exception.file.FileNameLengthLimitExceededException;
@@ -11,6 +14,15 @@ import com.linkwechat.common.exception.file.InvalidExtensionException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.uuid.IdUtils;
+import com.qcloud.cos.COSClient;
+import com.qcloud.cos.ClientConfig;
+import com.qcloud.cos.auth.BasicCOSCredentials;
+import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.model.ObjectMetadata;
+import com.qcloud.cos.model.PutObjectRequest;
+import com.qcloud.cos.model.PutObjectResult;
+import com.qcloud.cos.region.Region;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author ruoyi
  */
+@Slf4j
 public class FileUploadUtils {
     /**
      * 默认大小 50M
@@ -120,6 +133,103 @@ public class FileUploadUtils {
         return pathFileName;
     }
 
+    /**
+     * 上传到腾讯对象云存储中
+     *
+     * @param file    上传的文件
+     * @return 访问路径
+     * @throws IOException
+     */
+    public static final String upload2Cos(MultipartFile file , CosConfig cosConfig) throws IOException {
+        try {
+            return upload2Cos( file, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION,cosConfig);
+        } catch (Exception e) {
+            throw new IOException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 通过流进行文件上传
+     * @param in 流
+     * @throws IOException
+     */
+    public static String upload2Cos(InputStream in, String fileExtension, CosConfig cosConfig) throws IOException {
+        try {
+            return upload2Cos( in, fileExtension, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION, cosConfig);
+        } catch (Exception e) {
+            throw new IOException(e.getMessage(), e);
+        }
+    }
+
+
+    /**
+     * 文件上传
+     *
+     * @param file             上传的文件
+     * @param allowedExtension 上传文件类型
+     * @return 返回上传成功的文件名
+     * @throws FileSizeLimitExceededException       如果超出最大大小
+     * @throws FileNameLengthLimitExceededException 文件名太长
+     * @throws IOException                          比如读写文件出错时
+     * @throws InvalidExtensionException            文件校验异常
+     */
+    public static final String upload2Cos( MultipartFile file, String[] allowedExtension, CosConfig cosConfig)
+            throws FileSizeLimitExceededException, IOException, FileNameLengthLimitExceededException,
+            InvalidExtensionException {
+        int fileNamelength = file.getOriginalFilename().length();
+        if (fileNamelength > FileUploadUtils.DEFAULT_FILE_NAME_LENGTH) {
+            throw new FileNameLengthLimitExceededException(FileUploadUtils.DEFAULT_FILE_NAME_LENGTH);
+        }
+
+        assertAllowed(file, allowedExtension);
+
+        String fileName = extractFilename(file);
+        // 1 初始化用户身份信息（secretId, secretKey）。
+        COSCredentials cred = new BasicCOSCredentials(cosConfig.getSecretId(), cosConfig.getSecretKey());
+        // 2 设置 bucket 的区域, COS 地域的简称请参照 https://cloud.tencent.com/document/product/436/6224
+        // clientConfig 中包含了设置 region, https(默认 http), 超时, 代理等 set 方法, 使用可参见源码或者常见问题 Java SDK 部分。
+        Region region = new Region(cosConfig.getRegion());
+        ClientConfig clientConfig = new ClientConfig(region);
+        // 3 生成 cos 客户端。
+        COSClient cosClient = new COSClient(cred, clientConfig);
+
+        // 指定要上传到 COS 上对象键
+        String key = "exampleobject";
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.getBucketName(), fileName,file.getInputStream(),objectMetadata);
+        PutObjectResult putObjectResult = cosClient.putObject(putObjectRequest);
+        log.info("{}","https://link-wechat-1251309172.cos.ap-nanjing.myqcloud.com/"+fileName);
+        log.info("腾讯cos上传信息：{}",new ObjectMapper().writeValueAsString(putObjectResult));
+        cosClient.shutdown();
+
+        return fileName;
+    }
+
+    /**
+     * 将流中的文件传到腾讯云
+     * @param inputStream 输入流
+     * @param fileExtension 被写入流的文件的后缀名
+     * @param allowedExtension 允许的后缀名
+     * @throws FileSizeLimitExceededException 文件大小超过上限
+     * @throws InvalidExtensionException 文件后缀名非法
+     */
+    public static String upload2Cos(InputStream inputStream, String fileExtension, String[] allowedExtension, CosConfig cosConfig) throws FileSizeLimitExceededException, InvalidExtensionException {
+        String fileName = DateUtils.datePath() + "/" + IdUtils.fastUUID() + "." + fileExtension;
+        if (!isAllowedExtension(fileExtension, allowedExtension))
+        {
+            throw new InvalidExtensionException.InvalidImageExtensionException(allowedExtension, fileExtension, fileName);
+        }
+        COSCredentials cred = new BasicCOSCredentials(cosConfig.getSecretId(), cosConfig.getSecretKey());
+        Region region = new Region(cosConfig.getRegion());
+        ClientConfig clientConfig = new ClientConfig(region);
+        COSClient cosClient = new COSClient(cred, clientConfig);
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.getBucketName(), fileName ,inputStream ,objectMetadata);
+        cosClient.putObject(putObjectRequest);
+        cosClient.shutdown();
+        return fileName;
+    }
+
 
     public static final String uploadFile(String baseDir, MultipartFile file)
             throws FileSizeLimitExceededException, IOException, FileNameLengthLimitExceededException {
@@ -158,7 +268,7 @@ public class FileUploadUtils {
         return desc;
     }
 
-    private static final String getPathFileName(String uploadDir, String fileName) throws IOException {
+    public static final String getPathFileName(String uploadDir, String fileName) throws IOException {
         int dirLastIndex = RuoYiConfig.getProfile().length() + 1;
         String currentDir = StringUtils.substring(uploadDir, dirLastIndex);
         String pathFileName;

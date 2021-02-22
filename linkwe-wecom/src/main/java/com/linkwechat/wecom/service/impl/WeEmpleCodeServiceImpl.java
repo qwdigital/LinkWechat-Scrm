@@ -1,13 +1,16 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeExternalContactClient;
 import com.linkwechat.wecom.domain.WeEmpleCode;
+import com.linkwechat.wecom.domain.WeEmpleCodeTag;
 import com.linkwechat.wecom.domain.WeEmpleCodeUseScop;
 import com.linkwechat.wecom.domain.WeMaterial;
 import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
@@ -17,11 +20,13 @@ import com.linkwechat.wecom.service.IWeEmpleCodeService;
 import com.linkwechat.wecom.service.IWeEmpleCodeTagService;
 import com.linkwechat.wecom.service.IWeEmpleCodeUseScopService;
 import com.linkwechat.wecom.service.IWeMaterialService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +35,7 @@ import java.util.stream.Collectors;
  * @author ruoyi
  * @date 2020-10-04
  */
+@Slf4j
 @Service
 public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmpleCode> implements IWeEmpleCodeService {
 
@@ -46,6 +52,9 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
 
     @Autowired
     private IWeMaterialService materialService;
+
+    @Autowired
+    private RedisCache redisCache;
 
     /**
      * 查询员工活码
@@ -72,17 +81,21 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         if (weEmpleCodeList != null) {
             weEmpleCodeList.forEach(empleCode -> {
                 List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = empleCode.getWeEmpleCodeUseScops();
-                if (CollectionUtil.isNotEmpty(weEmpleCodeUseScopList)) {
-                    String useUserName = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getBusinessName)
-                            .filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
-                    empleCode.setUseUserName(useUserName);
-                    String mobile = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getMobile)
-                            .filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
-                    empleCode.setMobile(mobile);
-                }
+                setUserData(empleCode, weEmpleCodeUseScopList);
             });
         }
         return weEmpleCodeList;
+    }
+
+    private void setUserData(WeEmpleCode empleCode, List<WeEmpleCodeUseScop> weEmpleCodeUseScopList) {
+        if (CollectionUtil.isNotEmpty(weEmpleCodeUseScopList)) {
+            String useUserName = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getBusinessName)
+                    .filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
+            empleCode.setUseUserName(useUserName);
+            String mobile = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getMobile)
+                    .filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
+            empleCode.setMobile(mobile);
+        }
     }
 
     /**
@@ -93,18 +106,21 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
      */
     @Override
     public List<WeEmpleCode> selectWeEmpleCodeList(WeEmpleCode weEmpleCode) {
+
         List<WeEmpleCode> weEmpleCodeList = this.baseMapper.selectWeEmpleCodeList(weEmpleCode);
-        if (weEmpleCodeList != null) {
+        if (CollectionUtil.isNotEmpty(weEmpleCodeList)) {
+            List<Long> empleCodeIdList = weEmpleCodeList.stream().map(WeEmpleCode::getId).collect(Collectors.toList());
+            List<WeEmpleCodeUseScop> useScopList = iWeEmpleCodeUseScopService.selectWeEmpleCodeUseScopListByIds(empleCodeIdList);
+            List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.selectWeEmpleCodeTagListByIds(empleCodeIdList);
             weEmpleCodeList.forEach(empleCode -> {
-                List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = empleCode.getWeEmpleCodeUseScops();
-                if (CollectionUtil.isNotEmpty(weEmpleCodeUseScopList)) {
-                    String useUserName = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getBusinessName)
-                            .filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
-                    empleCode.setUseUserName(useUserName);
-                    String mobile = weEmpleCodeUseScopList.stream().map(WeEmpleCodeUseScop::getMobile)
-                            .filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
-                    empleCode.setMobile(mobile);
-                }
+                //活码使用人对象
+                List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = useScopList.stream()
+                        .filter(useScop -> useScop.getEmpleCodeId().equals(empleCode.getId())).collect(Collectors.toList());
+                setUserData(empleCode, weEmpleCodeUseScopList);
+                empleCode.setWeEmpleCodeUseScops(weEmpleCodeUseScopList);
+                //员工活码标签对象
+                empleCode.setWeEmpleCodeTags(tagList.stream()
+                        .filter(tag -> tag.getEmpleCodeId().equals(empleCode.getId())).collect(Collectors.toList()));
             });
         }
         return weEmpleCodeList;
@@ -237,7 +253,13 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         Long[] departmentIdArr = Arrays.stream(departmentIds.split(","))
                 .filter(StringUtils::isNotEmpty)
                 .map(Long::new).toArray(Long[]::new);
-        return getQrcode(userIdArr,departmentIdArr);
+        WeExternalContactDto qrcode = getQrcode(userIdArr, departmentIdArr);
+        //设置24小时过期
+        log.info("qrcode:>>>>>>>>>>>【{}】", JSONObject.toJSONString(qrcode));
+        if(qrcode !=null && qrcode.getConfig_id() != null){
+            redisCache.setCacheObject(WeConstans.WE_EMPLE_CODE_KEY+":"+qrcode.getConfig_id(),qrcode.getConfig_id(),24, TimeUnit.HOURS);
+        }
+        return qrcode;
     }
 
     @Override
@@ -253,6 +275,16 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         weContactWay.setUser(userIdArr);
         weContactWay.setParty(departmentIdArr);
         return getQrCode(weContactWay);
+    }
+
+    /**
+     * 通过成员id 获取去成员活码
+     * @param userId 成员id
+     * @return
+     */
+    @Override
+    public WeEmpleCode getQrcodeByUserId(String userId) {
+        return this.baseMapper.getQrcodeByUserId(userId);
     }
 
     /**

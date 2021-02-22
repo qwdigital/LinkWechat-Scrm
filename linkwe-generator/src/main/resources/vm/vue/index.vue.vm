@@ -38,20 +38,33 @@
           <el-option label="请选择字典生成" value="" />
         </el-select>
       </el-form-item>
-#elseif($column.htmlType == "datetime")
+#elseif($column.htmlType == "datetime" && $column.queryType != "BETWEEN")
       <el-form-item label="${comment}" prop="${column.javaField}">
-        <el-date-picker clearable size="small" style="width: 200px"
+        <el-date-picker clearable size="small"
           v-model="queryParams.${column.javaField}"
           type="date"
           value-format="yyyy-MM-dd"
           placeholder="选择${comment}">
         </el-date-picker>
       </el-form-item>
+#elseif($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+      <el-form-item label="${comment}">
+        <el-date-picker
+          v-model="daterange${AttrName}"
+          size="small"
+          style="width: 240px"
+          value-format="yyyy-MM-dd"
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        ></el-date-picker>
+      </el-form-item>
 #end
 #end
 #end
       <el-form-item>
-        <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
@@ -60,6 +73,7 @@
       <el-col :span="1.5">
         <el-button
           type="primary"
+          plain
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
@@ -69,6 +83,7 @@
       <el-col :span="1.5">
         <el-button
           type="success"
+          plain
           icon="el-icon-edit"
           size="mini"
           :disabled="single"
@@ -79,6 +94,7 @@
       <el-col :span="1.5">
         <el-button
           type="danger"
+          plain
           icon="el-icon-delete"
           size="mini"
           :disabled="multiple"
@@ -89,13 +105,14 @@
       <el-col :span="1.5">
         <el-button
           type="warning"
+          plain
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
           v-hasPermi="['${moduleName}:${businessName}:export']"
         >导出</el-button>
       </el-col>
-	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="${businessName}List" @selection-change="handleSelectionChange">
@@ -109,7 +126,7 @@
 #set($comment=$column.columnComment)
 #end
 #if($column.pk)
-      <el-table-column label="${comment}" align="center" prop="${javaField}" />
+      <el-table-column label="${comment}" align="center" prop="${javaField}" v-if="${column.list}"/>
 #elseif($column.list && $column.htmlType == "datetime")
       <el-table-column label="${comment}" align="center" prop="${javaField}" width="180">
         <template slot-scope="scope">
@@ -168,6 +185,18 @@
         <el-form-item label="${comment}" prop="${field}">
           <el-input v-model="form.${field}" placeholder="请输入${comment}" />
         </el-form-item>
+#elseif($column.htmlType == "imageUpload")
+        <el-form-item label="${comment}">
+          <imageUpload v-model="form.${field}"/>
+        </el-form-item>
+#elseif($column.htmlType == "fileUpload")
+        <el-form-item label="${comment}">
+          <fileUpload v-model="form.${field}"/>
+        </el-form-item>
+#elseif($column.htmlType == "editor")
+        <el-form-item label="${comment}">
+          <editor v-model="form.${field}" :min-height="192"/>
+        </el-form-item>
 #elseif($column.htmlType == "select" && "" != $dictType)
         <el-form-item label="${comment}" prop="${field}">
           <el-select v-model="form.${field}" placeholder="请选择${comment}">
@@ -222,10 +251,10 @@
         </el-form-item>
 #elseif($column.htmlType == "datetime")
         <el-form-item label="${comment}" prop="${field}">
-          <el-date-picker clearable size="small" style="width: 200px"
+          <el-date-picker clearable size="small"
             v-model="form.${field}"
-            type="date"
-            value-format="yyyy-MM-dd"
+            type="datetime"
+            value-format="yyyy-MM-dd HH:mm:ss"
             placeholder="选择${comment}">
           </el-date-picker>
         </el-form-item>
@@ -236,6 +265,38 @@
 #end
 #end
 #end
+#end
+#if($table.sub)
+        <el-divider content-position="center">${subTable.functionName}信息</el-divider>
+        <el-row :gutter="10" class="mb8">
+          <el-col :span="1.5">
+            <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd${subClassName}">添加</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDelete${subClassName}">删除</el-button>
+          </el-col>
+        </el-row>
+        <el-table :data="${subclassName}List" :row-class-name="row${subClassName}Index" @selection-change="handle${subClassName}SelectionChange" ref="${subclassName}">
+          <el-table-column type="selection" width="50" align="center" />
+          <el-table-column label="序号" align="center" prop="index" width="50"/>
+#foreach($column in $subTable.columns)
+#set($javaField=$column.javaField)
+#set($parentheseIndex=$column.columnComment.indexOf("（"))
+#if($parentheseIndex != -1)
+#set($comment=$column.columnComment.substring(0, $parentheseIndex))
+#else
+#set($comment=$column.columnComment)
+#end
+#if($column.pk || $javaField == ${subTableFkclassName})
+#elseif($column.list && "" != $javaField)
+          <el-table-column label="$comment" prop="${javaField}">
+            <template slot-scope="scope">
+              <el-input v-model="scope.row.$javaField" placeholder="请输入$comment" />
+            </template>
+          </el-table-column>
+#end
+#end
+        </el-table>
 #end
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -248,15 +309,57 @@
 
 <script>
 import { list${BusinessName}, get${BusinessName}, del${BusinessName}, add${BusinessName}, update${BusinessName}, export${BusinessName} } from "@/api/${moduleName}/${businessName}";
+#foreach($column in $columns)
+#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "imageUpload")
+import ImageUpload from '@/components/ImageUpload';
+#break
+#end
+#end
+#foreach($column in $columns)
+#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "fileUpload")
+import FileUpload from '@/components/FileUpload';
+#break
+#end
+#end
+#foreach($column in $columns)
+#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "editor")
+import Editor from '@/components/Editor';
+#break
+#end
+#end
 
 export default {
   name: "${BusinessName}",
+  components: {
+#foreach($column in $columns)
+#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "imageUpload")
+    ImageUpload,
+#break
+#end
+#end
+#foreach($column in $columns)
+#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "fileUpload")
+    FileUpload,
+#break
+#end
+#end
+#foreach($column in $columns)
+#if($column.insert && !$column.superColumn && !$column.pk && $column.htmlType == "editor")
+    Editor,
+#break
+#end
+#end
+  },
   data() {
     return {
       // 遮罩层
       loading: true,
       // 选中数组
       ids: [],
+#if($table.sub)
+      // 子表选中数据
+      checked${subClassName}: [],
+#end
       // 非单个禁用
       single: true,
       // 非多个禁用
@@ -267,6 +370,10 @@ export default {
       total: 0,
       // ${functionName}表格数据
       ${businessName}List: [],
+#if($table.sub)
+      // ${subTable.functionName}表格数据
+      ${subclassName}List: [],
+#end
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -281,6 +388,10 @@ export default {
 #if(${column.dictType} != '')
       // $comment字典
       ${column.javaField}Options: [],
+#elseif($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+      // $comment时间范围
+      daterange${AttrName}: [],
 #end
 #end
       // 查询参数
@@ -289,7 +400,7 @@ export default {
         pageSize: 10,
 #foreach ($column in $columns)
 #if($column.query)
-        $column.javaField: null#if($velocityCount != $columns.size()),#end
+        $column.javaField: undefined#if($velocityCount != $columns.size()),#end
 
 #end
 #end
@@ -329,6 +440,21 @@ export default {
     /** 查询${functionName}列表 */
     getList() {
       this.loading = true;
+#foreach ($column in $columns)
+#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+      this.queryParams.params = {};
+#break
+#end
+#end
+#foreach ($column in $columns)
+#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+      if (null != this.daterange${AttrName} && '' != this.daterange${AttrName}) {
+        this.queryParams.params["begin${AttrName}"] = this.daterange${AttrName}[0];
+        this.queryParams.params["end${AttrName}"] = this.daterange${AttrName}[1];
+      }
+#end
+#end
       list${BusinessName}(this.queryParams).then(response => {
         this.${businessName}List = response.rows;
         this.total = response.total;
@@ -365,11 +491,14 @@ export default {
         $column.javaField: []#if($velocityCount != $columns.size()),#end
 
 #else
-        $column.javaField: null#if($velocityCount != $columns.size()),#end
+        $column.javaField: undefined#if($velocityCount != $columns.size()),#end
 
 #end
 #end
       };
+#if($table.sub)
+      this.${subclassName}List = [];
+#end
       this.resetForm("form");
     },
     /** 搜索按钮操作 */
@@ -379,6 +508,12 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
+#foreach ($column in $columns)
+#if($column.htmlType == "datetime" && $column.queryType == "BETWEEN")
+#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+      this.daterange${AttrName} = [];
+#end
+#end
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -405,6 +540,9 @@ export default {
         this.form.$column.javaField = this.form.${column.javaField}.split(",");
 #end
 #end
+#if($table.sub)
+        this.${subclassName}List = response.data.${subclassName}List;
+#end
         this.open = true;
         this.title = "修改${functionName}";
       });
@@ -418,21 +556,20 @@ export default {
           this.form.$column.javaField = this.form.${column.javaField}.join(",");
 #end
 #end
+#if($table.sub)
+          this.form.${subclassName}List = this.${subclassName}List;
+#end
           if (this.form.${pkColumn.javaField} != null) {
             update${BusinessName}(this.form).then(response => {
-              if (response.code === 200) {
-                this.msgSuccess("修改成功");
-                this.open = false;
-                this.getList();
-              }
+              this.msgSuccess("修改成功");
+              this.open = false;
+              this.getList();
             });
           } else {
             add${BusinessName}(this.form).then(response => {
-              if (response.code === 200) {
-                this.msgSuccess("新增成功");
-                this.open = false;
-                this.getList();
-              }
+              this.msgSuccess("新增成功");
+              this.open = false;
+              this.getList();
             });
           }
         }
@@ -450,8 +587,42 @@ export default {
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
-        }).catch(function() {});
+        })
     },
+#if($table.sub)
+	/** ${subTable.functionName}序号 */
+    row${subClassName}Index({ row, rowIndex }) {
+      row.index = rowIndex + 1;
+    },
+    /** ${subTable.functionName}添加按钮操作 */
+    handleAdd${subClassName}() {
+      let obj = {};
+#foreach($column in $subTable.columns)
+#if($column.pk || $column.javaField == ${subTableFkclassName})
+#elseif($column.list && "" != $javaField)
+      obj.$column.javaField = "";
+#end
+#end
+      this.${subclassName}List.push(obj);
+    },
+    /** ${subTable.functionName}删除按钮操作 */
+    handleDelete${subClassName}() {
+      if (this.checked${subClassName}.length == 0) {
+        this.$alert("请先选择要删除的${subTable.functionName}数据", "提示", { confirmButtonText: "确定", });
+      } else {
+        this.${subclassName}List.splice(this.checked${subClassName}[0].index - 1, 1);
+      }
+    },
+    /** 单选框选中数据 */
+    handle${subClassName}SelectionChange(selection) {
+      if (selection.length > 1) {
+        this.$refs.${subclassName}.clearSelection();
+        this.$refs.${subclassName}.toggleRowSelection(selection.pop());
+      } else {
+        this.checked${subClassName} = selection;
+      }
+    },
+#end
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
@@ -463,7 +634,7 @@ export default {
           return export${BusinessName}(queryParams);
         }).then(response => {
           this.download(response.msg);
-        }).catch(function() {});
+        })
     }
   }
 };

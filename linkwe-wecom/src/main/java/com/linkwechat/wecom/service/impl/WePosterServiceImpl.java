@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.config.ServerConfig;
 import com.linkwechat.common.utils.file.FileUploadUtils;
@@ -59,6 +60,8 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
     @Resource
     private IWeCategoryService weCategoryService;
 
+    @Resource
+    private CosConfig cosConfig;
 
     /**
      * 查询一条
@@ -119,6 +122,10 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
      */
     @Override
     public String generateSimpleImg(WePoster poster) {
+        if(CollectionUtils.isEmpty(poster.getPosterSubassemblyList())){
+            poster.setSampleImgPath(poster.getBackgroundImgPath());
+            return poster.getBackgroundImgPath();
+        }
         Map<Long, Font> fontMap = poster.getPosterSubassemblyList().stream().filter(wePosterSubassembly -> wePosterSubassembly.getType().equals(1))
                 .peek(wePosterSubassembly -> {
                     if(wePosterSubassembly.getFontId() == null){
@@ -183,8 +190,8 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
             ImageIO.write(backgroundImg, "png", byteArrayOutputStream);
             NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(System.currentTimeMillis()+".jpg",byteArrayOutputStream.toByteArray());
             byteArrayOutputStream.close();
-            String path = FileUploadUtils.uploadFile(streamMultipartFile);
-            poster.setSampleImgPath(serverConfig.getUrl() + path);
+            String path = FileUploadUtils.upload2Cos(streamMultipartFile,cosConfig);
+            poster.setSampleImgPath(cosConfig.getImgUrlPrefix() + path);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("图片生成错误");

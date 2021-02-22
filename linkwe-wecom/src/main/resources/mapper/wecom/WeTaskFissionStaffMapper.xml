@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeTaskFissionStaffMapper">
+    
+    <resultMap type="WeTaskFissionStaff" id="WeTaskFissionStaffResult">
+        <result property="id"    column="id"    />
+        <result property="taskFissionId"    column="task_fission_id"    />
+        <result property="staffType"    column="staff_type"    />
+        <result property="staffId"    column="staff_id"    />
+        <result property="staffName"    column="staff_name"    />
+    </resultMap>
+
+    <sql id="selectWeTaskFissionStaffVo">
+        select id, task_fission_id, staff_type, staff_id, staff_name from we_task_fission_staff
+    </sql>
+
+    <select id="selectWeTaskFissionStaffList" parameterType="WeTaskFissionStaff" resultMap="WeTaskFissionStaffResult">
+        <include refid="selectWeTaskFissionStaffVo"/>
+        <where>  
+            <if test="taskFissionId != null "> and task_fission_id = #{taskFissionId}</if>
+            <if test="staffType != null "> and staff_type = #{staffType}</if>
+            <if test="staffId != null  and staffId != ''"> and staff_id = #{staffId}</if>
+            <if test="staffName != null  and staffName != ''"> and staff_name like concat('%', #{staffName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectWeTaskFissionStaffById" parameterType="Long" resultMap="WeTaskFissionStaffResult">
+        <include refid="selectWeTaskFissionStaffVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWeTaskFissionStaff" parameterType="WeTaskFissionStaff" useGeneratedKeys="true" keyProperty="id">
+        insert into we_task_fission_staff
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="taskFissionId != null">task_fission_id,</if>
+            <if test="staffType != null">staff_type,</if>
+            <if test="staffId != null">staff_id,</if>
+            <if test="staffName != null">staff_name,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="taskFissionId != null">#{taskFissionId},</if>
+            <if test="staffType != null">#{staffType},</if>
+            <if test="staffId != null">#{staffId},</if>
+            <if test="staffName != null">#{staffName},</if>
+         </trim>
+    </insert>
+
+    <insert id="insertWeTaskFissionStaffList" parameterType="java.util.List" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into we_task_fission_staff(task_fission_id,staff_type,staff_id,staff_name)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.taskFissionId},#{item.staffType},#{item.staffId},#{item.staffName})
+        </foreach>
+    </insert>
+
+    <update id="updateWeTaskFissionStaff" parameterType="WeTaskFissionStaff">
+        update we_task_fission_staff
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="taskFissionId != null">task_fission_id = #{taskFissionId},</if>
+            <if test="staffType != null">staff_type = #{staffType},</if>
+            <if test="staffId != null">staff_id = #{staffId},</if>
+            <if test="staffName != null">staff_name = #{staffName},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeTaskFissionStaffById" parameterType="Long">
+        delete from we_task_fission_staff where id = #{id}
+    </delete>
+
+    <delete id="deleteWeTaskFissionStaffByIds" parameterType="String">
+        delete from we_task_fission_staff where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

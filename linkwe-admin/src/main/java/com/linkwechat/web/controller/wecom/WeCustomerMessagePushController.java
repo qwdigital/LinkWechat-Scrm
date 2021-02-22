@@ -6,6 +6,7 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.wecom.domain.dto.message.AsyncResultDto;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
 import com.linkwechat.wecom.domain.vo.CustomerMessagePushVo;
 import com.linkwechat.wecom.domain.vo.WeCustomerMessageResultVo;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -49,7 +51,7 @@ public class WeCustomerMessagePushController extends BaseController {
     public AjaxResult add(@RequestBody CustomerMessagePushDto customerMessagePushDto) {
         try {
             weCustomerMessagePushService.addWeCustomerMessagePush(customerMessagePushDto);
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException | ParseException e) {
             e.printStackTrace();
             return AjaxResult.error("群发失败");
         }
@@ -87,10 +89,20 @@ public class WeCustomerMessagePushController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('customerMessagePush:push:pushResults')")
     @GetMapping(value = "/pushResults")
-    public TableDataInfo customerMessagePushResult(@RequestParam(value = "messageId") Long messageId,@RequestParam(value = "status") String status){
+    public TableDataInfo customerMessagePushResult(@RequestParam(value = "messageId") Long messageId, @RequestParam(value = "status") String status) {
         startPage();
         List<WeCustomerMessageResultVo> weCustomerMessageResuls = weCustomerMessgaeResultService.customerMessagePushs(messageId, status);
         return getDataTable(weCustomerMessageResuls);
+    }
+
+    /**
+     * 同步消息发送结果
+     */
+    @PreAuthorize("@ss.hasPermi('customerMessagePush:push:asyncResult')")
+    @PostMapping(value = "asyncResult")
+    public AjaxResult asyncResult(@RequestBody AsyncResultDto asyncResultDto) throws JsonProcessingException {
+        weCustomerMessageOriginalService.asyncResult(asyncResultDto);
+        return AjaxResult.success();
     }
 
 }

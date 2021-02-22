@@ -1,25 +1,94 @@
 <script>
+import { getList, update, getMaterial } from '@/api/appTool/chatBar'
+import SelectMaterialMult from '@/components/SelectMaterialMult/list'
+
 export default {
-  components: {},
+  components: { SelectMaterialMult },
   props: {},
   data() {
     return {
       dialogVisible: false,
-      list: [
-        { type: "文本类型", name: "企业资料", number: 105, isStart: 1 },
-        { type: "图片类型", name: "图片类型", number: 86, isStart: 1 },
-        { type: "网页类型", name: "网页类型", number: 55, isStart: 1 },
-        { type: "文件类型", name: "文件类型", number: 667, isStart: 1 },
-        { type: "视频类型", name: "视频类型", number: 29, isStart: 1 }
-      ]
-    };
+      loading: false,
+      list: [],
+      mediaType: Object.freeze({
+        0: '图片',
+        1: '语音',
+        2: '视频',
+        3: '普通文件',
+        4: '文本',
+        5: '海报',
+      }),
+
+      metarialParams: {
+        sideId: '',
+        materialIds: [], // '素材id列表',
+        mediaType: '', //  '素材类型 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本 5 海报',
+        checkAll: '1', // '是否全选 0 全选 1 非全选',
+      },
+      selectedMaterial: [],
+    }
   },
   watch: {},
   computed: {},
-  created() {},
+  created() {
+    this.getList()
+  },
   mounted() {},
-  methods: {}
-};
+  methods: {
+    getList() {
+      this.loading = true
+      getList()
+        .then(({ rows, total }) => {
+          this.list = rows
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
+    },
+    openDialog(data) {
+      this.dialogVisible = true
+      this.metarialParams.sideId = data.sideId
+      this.metarialParams.mediaType = data.mediaType
+    },
+    // 抓取素材
+    getMaterial() {
+      const loading = this.$loading({
+        lock: true,
+        text: 'Loading',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)',
+      })
+      this.metarialParams.materialIds = this.selectedMaterial.map((d) => d.id)
+      if (this.metarialParams.checkAll == 0) {
+        this.metarialParams.materialIds = []
+      }
+      getMaterial(this.metarialParams)
+        .then(({ rows, total }) => {
+          // this.list = rows
+          loading.close()
+          this.msgSuccess('操作成功')
+          this.dialogVisible = false
+          this.getList()
+        })
+        .catch(() => {
+          loading.close()
+        })
+    },
+    update(data) {
+      // this.loading = true
+      update(data)
+        .then(() => {
+          this.msgSuccess('操作成功')
+          this.$set(data, 'isEdit', false)
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
+    },
+  },
+}
 </script>
 <template>
   <div>
@@ -36,36 +105,57 @@ export default {
       <div slot="header">
         <span>抓取快捷回复素材</span> 素材抓取后，即可在聊天工具栏使用
       </div>
-      <el-table
-        v-loading="loading"
-        :data="list"
-        @selection-change="handleSelectionChange"
-      >
-        <el-table-column type="selection" width="55" align="center" />
-        <el-table-column label="素材类型" align="center" prop="type" />
-        <el-table-column label="聊天工具栏名称" align="center" prop="name" />
-        <el-table-column label="已抓取素材数量" align="center" prop="number" />
+      <el-table v-loading="loading" :data="list">
+        <el-table-column label="素材类型" align="center" prop="mediaType">
+          <template slot-scope="scope">
+            {{ mediaType[scope.row.mediaType] }}
+          </template>
+        </el-table-column>
+        <el-table-column label="聊天工具栏名称" align="center" prop="sideName">
+          <template slot-scope="{ row }">
+            <el-input
+              class="bfc-d"
+              style="width: 100px;"
+              v-if="row.isEdit"
+              v-model="row.sideName"
+              placeholder="请输入"
+            ></el-input>
+            <span v-else>
+              {{ row.sideName }}
+            </span>
+
+            <i
+              v-if="!row.isEdit"
+              class="row-icon el-icon-edit"
+              @click="$set(row, 'isEdit', true)"
+            ></i>
+            <i
+              v-else
+              class="row-icon el-icon-circle-check"
+              @click="update(row)"
+            ></i>
+          </template>
+        </el-table-column>
+        <el-table-column label="已抓取素材数量" align="center" prop="total" />
         <el-table-column
           label="是否启用"
           align="center"
-          prop="isStart"
+          prop="using"
           width="180"
         >
           <template slot-scope="scope">
             <el-switch
-              v-model="scope.row.isStart"
-              :active-value="1"
-              :inactive-value="0"
-              inactive-color="#ff4949"
+              v-model="scope.row.using"
+              :active-value="0"
+              :inactive-value="1"
+              inactive-color="#ddd"
+              @change="update(scope.row)"
             ></el-switch>
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center" prop="operId">
           <template slot-scope="scope">
-            <el-button
-              size="mini"
-              type="text"
-              @click="handleView(scope.row, scope.index)"
+            <el-button type="text" @click="openDialog(scope.row)"
               >抓取素材</el-button
             >
           </template>
@@ -73,8 +163,7 @@ export default {
       </el-table>
     </el-card>
 
-    <el-card class="mt20" shadow="never" header="红包工具栏">
-      <!-- <div slot="header"></div> -->
+    <!-- <el-card class="mt20" shadow="never" header="红包工具栏">
       <el-row :gutter="10">
         <el-col :span="10">
           <div>
@@ -120,52 +209,26 @@ export default {
           >
             <div class="el-image logo" style>
               <div class="el-image__error">加载失败</div>
-              <!---->
             </div>
-            <el-image class="logo" :src="url" :fit="fit"></el-image>
+            <el-image class="logo" :src="url" fit="fit"></el-image>
             <div class="company-name">脑白金</div>
           </div>
         </el-col>
       </el-row>
-    </el-card>
+    </el-card> -->
 
     <el-dialog
-      title="抓取文本类型素材库"
+      :title="`抓取${mediaType[metarialParams.mediaType]}类型素材库`"
       :visible.sync="dialogVisible"
-      :before-close="dialogBeforeClose"
     >
-      <el-row :gutter="10">
-        <el-col :span="6">
-          <el-tree :data="d" :props="d" @node-click="d"></el-tree>
-        </el-col>
-        <el-col :span="18">
-          <div class="fxbw">
-            素材库更新本分类素材后，自动同步到聊天工具栏
-            <div class="filter-right">
-              <i class="el-icon-arrow-left"></i> 1/1
-              <i class="el-icon-arrow-right"></i>
-            </div>
-          </div>
-          <el-table :data="data" style="width: 100%">
-            <el-table-column type="selection" width="55" align="center" />
-            <el-table-column
-              prop="prop"
-              label="文本内容"
-              width="width"
-            ></el-table-column>
-            <el-table-column
-              prop="prop"
-              label="时间"
-              width="width"
-            ></el-table-column>
-          </el-table>
-        </el-col>
-      </el-row>
+      <SelectMaterialMult
+        :selected.sync="selectedMaterial"
+        :type="metarialParams.mediaType"
+        :key="metarialParams.mediaType"
+      ></SelectMaterialMult>
       <div slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false"
-          >确 定</el-button
-        >
+        <el-button type="primary" @click="getMaterial">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -199,5 +262,23 @@ export default {
     color: #ffe7be;
     width: 100%;
   }
+}
+.el-table__row {
+  .el-icon-edit {
+    visibility: hidden;
+  }
+  &:hover {
+    .el-icon-edit {
+      visibility: visible;
+    }
+  }
+}
+.row-icon {
+  font-size: 14px;
+  // vertical-align: middle;
+  margin-left: 5px;
+}
+.el-icon-circle-check {
+  margin-top: 10px;
 }
 </style>

@@ -39,11 +39,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="name != null  and name != ''"> and user_name like concat('%', #{name}, '%')</if>
             <if test="alias != null  and alias != ''"> and alias = #{alias}</if>
             <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
+            <if test="isActivate != null"> and is_activate = #{isActivate}</if>
             <if test="gender != null "> and gender = #{gender}</if>
             <if test="mobile != null  and mobile != ''"> and mobile = #{mobile}</if>
             <if test="email != null  and email != ''"> and email = #{email}</if>
             <if test="wxAccount != null  and wxAccount != ''"> and wx_account = #{wxAccount}</if>
-            <if test="department != null  and department.length > 0  "> and FIND_IN_SET(#{department},department)</if>
+            <if test="departmentStr != null  and departmentStr != ''  "> and FIND_IN_SET(#{departmentStr},department)</if>
             <if test="position != null  and position != ''"> and position = #{position}</if>
             <if test="isLeaderInDept != null "> and is_leader_in_dept = #{isLeaderInDept}</if>
             <if test="joinTime != null "> and join_time = #{joinTime}</if>
@@ -54,19 +55,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="birthday != null "> and birthday = #{birthday}</if>
     </select>
     
-    <select id="selectWeUserById" parameterType="Long" resultMap="WeUserResult">
+    <select id="selectWeUserById" parameterType="java.lang.String" resultMap="WeUserResult">
         <include refid="selectWeUserVo"/>
-        where id = #{id}
+        where user_id = #{userId}
     </select>
         
     <insert id="insertWeUser" parameterType="WeUser">
         insert into we_user
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">id,</if>
+            <if test="userId != null">user_id,</if>
             <if test="avatarMediaid != null">head_image_url,</if>
             <if test="name != null">user_name,</if>
             <if test="alias != null">alias,</if>
-            <if test="userId != null">user_id,</if>
             <if test="gender != null">gender,</if>
             <if test="mobile != null and mobile != ''">mobile,</if>
             <if test="email != null">email,</if>
@@ -85,11 +85,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="isActivate != null">is_activate,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">#{id},</if>
+            <if test="userId != null">#{userId},</if>
             <if test="avatarMediaid != null">#{avatarMediaid},</if>
             <if test="name != null">#{name},</if>
             <if test="alias != null">#{alias},</if>
-            <if test="userId != null">#{userId},</if>
             <if test="gender != null">#{gender},</if>
             <if test="mobile != null and mobile != ''">#{mobile},</if>
             <if test="email != null">#{email},</if>
@@ -133,7 +132,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="remark != null">remark = #{remark},</if>
             <if test="isActivate != null">is_activate = #{isActivate},</if>
         </trim>
-        where id = #{id}
+        <where>
+            user_id = #{userId}
+        </where>
     </update>
 
 
@@ -191,7 +192,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 
     <insert id="batchInsertWeUser" >
-        insert into we_user (id, head_image_url, user_name, alias,
+        insert into we_user (head_image_url, user_name, alias,
                              user_id, gender, mobile, email, wx_account,
                              department, position, is_leader_in_dept,
                              join_time, enable, id_card,
@@ -199,7 +200,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                              birthday, remark, is_activate)
         values
         <foreach collection="weUsers" item="weUser" index="index" separator=",">
-            (   #{weUser.id},#{weUser.avatarMediaid},#{weUser.name},#{weUser.alias},
+            (   #{weUser.avatarMediaid},#{weUser.name},#{weUser.alias},
                 #{weUser.userId},#{weUser.gender},#{weUser.mobile},#{weUser.email},#{weUser.wxAccount},
                 #{weUser.department},#{weUser.position},#{weUser.isLeaderInDept},
                 #{weUser.joinTime},#{weUser.enable},#{weUser.idCard},

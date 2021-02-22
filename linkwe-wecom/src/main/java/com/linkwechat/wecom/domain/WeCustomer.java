@@ -75,6 +75,9 @@ public class WeCustomer extends BaseEntity
     /** 职位 */
     private String  position;
 
+    /** 是否开启会话存档 0：关闭 1：开启 */
+    private Integer isOpenChat;
+
     /** 添加人员 */
     @TableField(exist = false)
     private List<WeFlowerCustomerRel> weFlowerCustomerRels;

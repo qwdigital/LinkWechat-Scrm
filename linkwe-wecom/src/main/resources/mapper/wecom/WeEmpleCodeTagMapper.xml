@@ -27,6 +27,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         we_emple_code_tag wect
         WHERE wect.del_flag=0 and wect.emple_code_id=#{empleCodeId}
     </select>
+
+    <select id="selectWeEmpleCodeTagListByIds" parameterType="Long" resultMap="WeEmpleCodeTagResult">
+        SELECT
+            wect.id,
+            wect.tag_id,
+            wect.emple_code_id,
+            wect.del_flag,
+            wect.tag_name
+        FROM
+        we_emple_code_tag wect
+        WHERE wect.del_flag=0
+        <if test="empleCodeIdList != null and empleCodeIdList.size > 0">
+            and wect.emple_code_id in
+            <foreach collection="empleCodeIdList" item="empleCodeId" open="(" close=")" separator=",">
+                #{empleCodeId}
+            </foreach>
+        </if>
+    </select>
+
     
     <select id="selectWeEmpleCodeTagById" parameterType="Long" resultMap="WeEmpleCodeTagResult">
         <include refid="selectWeEmpleCodeTagVo"/>

@@ -31,6 +31,14 @@ public interface WeEmpleCodeTagMapper extends BaseMapper<WeEmpleCodeTag>
     public List<WeEmpleCodeTag> selectWeEmpleCodeTagListById(@Param("empleCodeId") Long empleCodeId);
 
     /**
+     * 查询员工活码标签列表
+     *
+     * @param empleCodeIdList 员工活码Ids
+     * @return 员工活码标签集合
+     */
+    List<WeEmpleCodeTag> selectWeEmpleCodeTagListByIds(@Param("empleCodeIdList") List<Long> empleCodeIdList);
+
+    /**
      * 新增员工活码标签
      * 
      * @param weEmpleCodeTag 员工活码标签
@@ -77,4 +85,6 @@ public interface WeEmpleCodeTagMapper extends BaseMapper<WeEmpleCodeTag>
      * @return
      */
     public int batchRemoveWeEmpleCodeTagIds(@Param("ids") List<Long> ids);
+
+
 }

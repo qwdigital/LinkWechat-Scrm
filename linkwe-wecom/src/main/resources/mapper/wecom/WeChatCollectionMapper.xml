@@ -29,13 +29,18 @@
             wm.material_name,
             wm.material_url,
             wm.content,
-            wc.media_type
+            wc.media_type,
+            wcc.create_time,
+            wm.cover_url
         FROM
             we_chat_collection wcc
                 LEFT JOIN we_material wm ON wcc.material_id = wm.id
                 LEFT JOIN we_category wc ON wm.category_id = wc.id
        <where>
            wcc.user_id=#{userId}
+           <if test="keyword!=null and keyword!=''">
+               AND wm.material_name LIKE CONCAT('%',#{keyword},'%')
+           </if>
        </where>
     </select>
 

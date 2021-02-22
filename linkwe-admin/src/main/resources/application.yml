@@ -8,8 +8,8 @@ ruoyi:
   copyrightYear: 2019
   # 实例演示开关
   demoEnabled: true
-  # 文件路径 示例（ Windows配置D:/ruoyi/uploadPath，Linux配置 /home/ruoyi/uploadPath）
-  profile: /home/ruoyi/uploadPath
+  # 文件路径 示例（ Windows配置D:/ruoyi/uploadPath，Linux配置 /app/project/pic）
+  profile: /app/project/pic
   # 获取ip地址开关
   addressEnabled: false
   # 验证码类型 math 数组计算 char 字符验证
@@ -19,8 +19,8 @@ ruoyi:
 
 # 开发环境配置
 server:
-  # 服务器的HTTP端口，默认为8080
-  port: 8080
+  # 服务器的HTTP端口，默认为8090
+  port: 8090
   servlet:
     # 应用的访问路径
     context-path: /
@@ -40,6 +40,10 @@ logging:
   path: ./logs
 path:
   log: ./logs
+
+#H5地址路径
+H5:
+  url: www.baidu.com
 
 # Spring配置
 spring:
@@ -69,9 +73,9 @@ spring:
   # redis 配置
   redis:
     # 地址
-    host: localhost
+    host: ${REDIS_HOST:localhost}
     # 端口，默认为6379
-    port: 6379
+    port: ${REDIS_PORT:6379}
     # 密码
     password:
     # 连接超时时间
@@ -101,9 +105,14 @@ token:
 mybatis-plus:
    mapper-locations: classpath*:mapper/**/*Mapper.xml
    type-aliases-package: com.linkwechat.**.domain
-   type-handlers-package: com.linkwechat.framework.handler.**
+   type-handlers-package: com.linkwechat.framework.handler.GenericTypeHandler,com.linkwechat.framework.handler.StringArrayJoinTypeHandler
    configuration:
      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+   global-config:
+     db-config:
+       logic-delete-field: delFlag
+       logic-delete-value: 1
+       logic-not-delete-value: 0
 
 ## MyBatis配置
 #mybatis:
@@ -140,7 +149,7 @@ xss:
 # elasticsearch配置
 elasticsearch:
   schema: http
-  address: localhost
+  address: ${ES_ADDRESS:localhost}
   connectTimeout: 10000
   socketTimeout: 10000
   connectionRequestTimeout: 10000
@@ -151,6 +160,10 @@ elasticsearch:
 forest:
   interceptors: com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor
   backend: httpclient
+  retry-count: 1 # 请求失败后重试次数，默认为0次不重试
+  max-retry-interval: 1000 #重试间隔时间
+  connect-timeout: 3000 #链接超时时间
+  timeout: 3000  # 请求超时时间
 
 
 wecome:
@@ -159,6 +172,11 @@ wecome:
   noAccessTokenUrl:
           - /gettoken
           - /service/get_provider_token
+          - /wecom/chat/side/list
+          - /wecom/chat/item/list
+          - /wecom/chat/collection/addCollection
+          - /wecom/chat/collection/cancleCollection
+          - /wecom/chat/collection/list
   needContactTokenUrl:
           - /externalcontact/get_follow_user_list
           - /externalcontact/add_contact_way
@@ -180,8 +198,6 @@ wecome:
           - /externalcontact/unionid_to_external_userid
           - /externalcontact/add_msg_template
           - /externalcontact/get_group_msg_result
-          - /get_jsapi_ticket
-          - /ticket/get
   fileUplodUrl:  /media/upload,/media/uploadimg
   needProviderTokenUrl:
           - /service/get_login_info
@@ -190,8 +206,21 @@ wecome:
           - /msgaudit/check_single_agree
           - /msgaudit/check_room_agree
           - /msgaudit/groupchat/get
+  thirdAppUrl:
+          - /user/getuserinfo
+          - /get_jsapi_ticket
+          - /ticket/get
+          - /message/send
   #企微回调通知配置
   callBack:
-    appIdOrCorpId: 
-    token: 
-    encodingAesKey: 
+    appIdOrCorpId: ww24262ce93851488f
+    token: jtQ1aGHgSmH2UHNBIndUtUe6B6EwfR
+    encodingAesKey: Vga4HWv7nFbRDYK8iAaQbxmkuecpo2BAfmXAyWwcXMO
+#腾讯云对象存储
+cos:
+  secretId: AKIDQRCizIeUGl13vakkDQMH0VkjhPr1rBBv
+  secretKey: e3D8oFetseC0f8OX9XeV7UcTDiyyQ8cr
+  #link-wechat-1251309172.cos.ap-nanjing.myqcloud.com
+  region: ap-nanjing
+  bucketName: link-wechat-1251309172
+  imgUrlPrefix: https://link-wechat-1251309172.cos.ap-nanjing.myqcloud.com/

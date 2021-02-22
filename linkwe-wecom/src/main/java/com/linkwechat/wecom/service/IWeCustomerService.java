@@ -97,4 +97,16 @@ public interface IWeCustomerService extends IService<WeCustomer>
      */
     public void sendWelcomeMsg(WeWelcomeMsg weWelcomeMsg);
 
+    /**
+     * 修改客户是否开启会话状态
+     * @param externalUserId 客户id
+     */
+    public boolean updateCustomerChatStatus(String externalUserId);
+
+    /**
+     * 通过标签查询客户列表
+     * @param ids 标签id
+     * @return
+     */
+    public List<WeUser> getCustomerByTag(List<String> ids);
 }

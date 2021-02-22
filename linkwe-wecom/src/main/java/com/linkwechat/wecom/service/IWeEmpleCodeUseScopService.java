@@ -30,6 +30,14 @@ public interface IWeEmpleCodeUseScopService extends IService<WeEmpleCodeUseScop>
     public List<WeEmpleCodeUseScop> selectWeEmpleCodeUseScopListById(Long empleCodeId);
 
     /**
+     * 查询员工活码使用人列表(批量)
+     * @param empleCodeIdList
+     * @return
+     */
+    public List<WeEmpleCodeUseScop> selectWeEmpleCodeUseScopListByIds(List<Long> empleCodeIdList);
+
+
+    /**
      * 新增员工活码使用人
      *
      * @param weEmpleCodeUseScop 员工活码使用人

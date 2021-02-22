@@ -13,22 +13,22 @@ import java.util.List;
 public class WeMessagePushDto {
 
     /**
-     * 指定接收消息的成员，成员ID列表（多个接收者用‘,’分隔，最多支持1000个）。
+     * 指定接收消息的成员，成员ID列表（多个接收者用‘|’分隔，最多支持1000个）。
      * 特殊情况：指定为”@all”，则向该企业应用的全部成员发送
      */
-    private List<String> touser;
+    private String touser;
 
     /**
-     * 指定接收消息的部门，部门ID列表，多个接收者用‘,’分隔，最多支持100个。
+     * 指定接收消息的部门，部门ID列表，多个接收者用‘|’分隔，最多支持100个。
      * 当touser为”@all”时忽略本参数
      */
-    private List<String> toparty;
+    private String toparty;
 
     /**
-     * 指定接收消息的标签，标签ID列表，多个接收者用‘,’分隔，最多支持100个。
+     * 指定接收消息的标签，标签ID列表，多个接收者用‘|’分隔，最多支持100个。
      * 当touser为”@all”时忽略本参数
      */
-    private List<String> totag;
+    private String totag;
 
     /**
      * 消息类型，此时固定为：text

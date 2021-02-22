@@ -1,5 +1,5 @@
 <script>
-import * as api from "@/api/enterpriseId";
+import * as api from '@/api/enterpriseId'
 // import clipboard from "clipboard";
 
 export default {
@@ -10,7 +10,7 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        companyName: ""
+        companyName: '',
       },
       total: 0,
       form: {},
@@ -19,65 +19,65 @@ export default {
       disabled: false,
       loading: false,
       rules: Object.freeze({
-        companyName: [{ required: true, message: "必填项", trigger: "blur" }],
-        corpId: [{ required: true, message: "必填项", trigger: "blur" }],
-        corpSecret: [{ required: true, message: "必填项", trigger: "blur" }],
-        contactSecret: [{ required: true, message: "必填项", trigger: "blur" }]
+        companyName: [{ required: true, message: '必填项', trigger: 'blur' }],
+        corpId: [{ required: true, message: '必填项', trigger: 'blur' }],
+        corpSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
+        contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
       }),
-      status: ["正常", "停用"]
-    };
+      status: ['正常', '停用'],
+    }
   },
   watch: {},
   computed: {},
   created() {
-    this.getList();
+    this.getList()
   },
   mounted() {
     // new clipboard(".copy-btn");
   },
   methods: {
     getList(page) {
-      page && (this.query.pageNum = page);
-      this.loading = true;
+      page && (this.query.pageNum = page)
+      this.loading = true
       api
         .getList(this.query)
         .then(({ rows, total }) => {
-          this.list = rows;
-          this.total = +total;
-          this.loading = false;
+          this.list = rows
+          this.total = +total
+          this.loading = false
         })
         .catch(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
     edit(data, type) {
-      this.form = Object.assign({}, data || {});
-      this.dialogVisible = true;
-      type || !data ? (this.disabled = false) : (this.disabled = true);
+      this.form = Object.assign({}, data || {})
+      this.dialogVisible = true
+      type || !data ? (this.disabled = false) : (this.disabled = true)
     },
     submit() {
-      this.$refs["form"].validate(valid => {
+      this.$refs['form'].validate((valid) => {
         if (valid) {
-          api[this.form.id ? "update" : "add"](this.form)
+          api[this.form.id ? 'update' : 'add'](this.form)
             .then(() => {
-              this.msgSuccess("操作成功");
-              this.dialogVisible = false;
-              this.getList(!this.form.id && 1);
+              this.msgSuccess('操作成功')
+              this.dialogVisible = false
+              this.getList(!this.form.id && 1)
             })
             .catch(() => {
-              this.dialogVisible = false;
-            });
+              this.dialogVisible = false
+            })
         }
-      });
+      })
     },
     start(corpId) {
       api.start(corpId).then(({ rows, total }) => {
-        this.msgSuccess("操作成功");
-        this.getList();
-      });
-    }
-  }
-};
+        this.msgSuccess('操作成功')
+        this.getList()
+      })
+    },
+  },
+}
 </script>
 
 <template>
@@ -227,7 +227,7 @@ export default {
             <el-radio label="label">开启</el-radio>
             <el-radio label="label">不开启</el-radio>
           </el-radio-group>
-          <div>开启后，可以将成员、部门的增删改以及成员的标签变更实时的同步到塬微SCRM，无需手动更新同步。</div>
+          <div>开启后，可以将成员、部门的增删改以及成员的标签变更实时的同步到仟微SCRM，无需手动更新同步。</div>
         </el-form-item>-->
         <el-form-item label="外部联系人管理secret" prop="contactSecret">
           <el-input v-model="form.contactSecret"></el-input>
@@ -237,7 +237,7 @@ export default {
             <el-radio label="label">开启</el-radio>
             <el-radio label="label">不开启</el-radio>
           </el-radio-group>
-          <div>开启后，可以将企业客户的添加、编辑以及主动删除客户和被动被客户删除实时的同步到塬微SCRM，无需手动更新同步。</div>
+          <div>开启后，可以将企业客户的添加、编辑以及主动删除客户和被动被客户删除实时的同步到仟微SCRM，无需手动更新同步。</div>
         </el-form-item>-->
         <el-form-item
           label="企业微信扫码登陆回调地址"

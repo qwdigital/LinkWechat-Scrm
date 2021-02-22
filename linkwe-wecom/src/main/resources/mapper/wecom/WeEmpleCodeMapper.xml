@@ -31,6 +31,24 @@
         select id, code_type, is_join_confirm_friends, activity_scene, welcome_msg, create_by, create_time, del_flag, config_id,qr_code from we_emple_code
     </sql>
 
+    <sql id="getQrcodeByUserIdVo">
+        select
+        wec.id,
+        wec.code_type,
+        wec.is_join_confirm_friends,
+        wec.activity_scene,
+        wec.welcome_msg,
+        wec.create_by,
+        wec.create_time,
+        wec.del_flag,
+        wec.config_id,
+        wec.qr_code
+        from we_emple_code wec
+        left join we_emple_code_use_scop wecus on wec.id = wecus.emple_code_id
+        and wecus.business_id_type = 2
+        and wecus.del_flag = 0
+    </sql>
+
     <sql id="selectWeEmpleCodeLsit">
                 select
             wecode.id,
@@ -67,7 +85,7 @@
         where 1=1 and wecode.del_flag = 0
 	</sql>
 
-    <select id="selectWeEmpleCodeList" parameterType="WeEmpleCode" resultMap="WeEmpleCodeResult">
+    <select id="selectWeEmpleCodeList" parameterType="WeEmpleCode" resultType="com.linkwechat.wecom.domain.WeEmpleCode">
         <include refid="selectWeEmpleCodeLsit"/>
         <if test="codeType != null ">and wecode.code_type = #{codeType}</if>
         <if test="isJoinConfirmFriends != null ">and wecode.is_join_confirm_friends = #{isJoinConfirmFriends}</if>
@@ -90,6 +108,7 @@
         <if test="useUserName != null and useUserName !=''">
             AND wecusn.business_name like concat('%', #{useUserName}, '%')
         </if>
+        group by wecode.id
     </select>
 
     <select id="selectWeEmpleCodeById" parameterType="Long" resultMap="WeEmpleCodeResult">
@@ -102,7 +121,7 @@
     <select id="selectWeEmpleCodeByIds" parameterType="java.util.ArrayList" resultMap="WeEmpleCodeResult">
         <include refid="selectWeEmpleCodeLsit"/>
         <if test="ids != null and ids.size > 0">
-            wecode.id in
+            and wecode.id in
             <foreach collection="ids" item="id" open="(" close=")" separator=",">
                 #{id}
             </foreach>
@@ -206,4 +225,14 @@
         </if>
     </select>
 
+
+
+    <select id="getQrcodeByUserId" parameterType="java.lang.String" resultType="com.linkwechat.wecom.domain.WeEmpleCode">
+        <include refid="getQrcodeByUserIdVo"/>
+        <where>
+            <if test="userId != null and userId != ''">
+                and wecus.business_id = #{userId}
+            </if>
+        </where>
+    </select>
 </mapper>

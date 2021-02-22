@@ -37,4 +37,22 @@
         </where>
     </select>
 
+
+    <select id="selectWeGroupMemberListByChatId" resultType="com.linkwechat.wecom.domain.dto.WeGroupMemberDto">
+        SELECT
+            wgm.chat_id,
+            wgm.join_time,
+            wgm.type,
+            wgm.join_scene,
+            (case when wu.head_image_url is null then wc.avatar else wu.head_image_url end) as member_avatar,
+            (case when wu.user_name is null then wc.name else wu.user_name end) as member_name
+            FROM
+            we_group_member wgm
+            left join we_user wu on wu.user_id = wgm.user_id and wgm.type = 1
+            left join we_customer wc on wc.external_userid = wgm.user_id and wgm.type = 2
+        <where>
+            <if test="chatId != null "> and wgm.chat_id = #{chatId}</if>
+        </where>
+    </select>
+
 </mapper>

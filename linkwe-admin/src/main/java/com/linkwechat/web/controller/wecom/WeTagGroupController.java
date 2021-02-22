@@ -1,6 +1,8 @@
 package com.linkwechat.web.controller.wecom;
 
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
@@ -8,6 +10,7 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.Threads;
+import com.linkwechat.wecom.domain.WeTag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContext;
@@ -22,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.linkwechat.wecom.domain.WeTagGroup;
 import com.linkwechat.wecom.service.IWeTagGroupService;
+
+import java.util.List;
 
 /**
  * 标签组Controller
@@ -44,7 +49,7 @@ public class WeTagGroupController extends BaseController
     public TableDataInfo list(WeTagGroup weTagGroup)
     {
         startPage();
-        synchWeTags();
+        //synchWeTags();
         return getDataTable(
                 weTagGroupService.selectWeTagGroupList(weTagGroup)
         );
@@ -60,6 +65,18 @@ public class WeTagGroupController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody WeTagGroup weTagGroup)
     {
+
+        //校验标签组名称与标签名称是否相同
+        if(StrUtil.isNotBlank(weTagGroup.getGourpName())){
+            List<WeTag> weTags = weTagGroup.getWeTags();
+            if(CollectionUtil.isNotEmpty(weTags)){
+
+                if(weTags.stream().filter(m -> m.getName().equals(weTagGroup.getGourpName())).findAny().isPresent()){
+                    return   AjaxResult.error("标签组名称与标签名不可重复");
+                }
+
+            }
+        }
         weTagGroupService.insertWeTagGroup(weTagGroup);
 
         return AjaxResult.success();

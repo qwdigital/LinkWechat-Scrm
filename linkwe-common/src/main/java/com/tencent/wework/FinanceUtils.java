@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * @author sxw
+ * @author danmo
  * @description
  * @date 2020/12/2 16:01
  **/
@@ -51,7 +51,33 @@ public class FinanceUtils {
         }
     }
 
-    private final static String privateKey = "";
+    private final static String privateKey = "-----BEGIN RSA PRIVATE KEY-----\n" +
+            "MIIEpAIBAAKCAQEAjGwIQIMGDJonMQdX3OJzZN0YVoYbORK1FU/8vhwdI9ixxSGW\n" +
+            "nrAQc6r8k3g1QTXzmKAxdVlAa1OGZCpl5X5A6C9JwDhFpuN+SKJxfxtHNv1oBk0r\n" +
+            "LnDftsdlibZFQn3fiMomxKyU8eujWBe31+pLQXaTSdSHcNhb+NrBa7AtNUr/c7bK\n" +
+            "nnFUZHDpXFB4Z0BhK1cRh2NN7ppLNnIJXpduGrwGtLdx++LsBaX2vjO4qW/DKP2Z\n" +
+            "3gZON1tGoofS1IPhCg0naoRN3lL7ctFAyxOr2ualGOc6hpvBGfjnBKU42aoaKQEi\n" +
+            "7tVJHChonZXMRcm4mdPu5371IzPeR3NYlP3ESQIDAQABAoIBAEux8MDV4GzqrDXB\n" +
+            "v5tSduHoTTZXFFWvv+29MIFKpmqsZSfe81KXlkbD5WOZaRu9+ZJMyFx5wEAaxlc4\n" +
+            "g7UyWcrPsvHrY6CTAYAmEQhzq+/4qhq7fouKTQ46boHNv4gYUmdqkXtzjNbcLzFN\n" +
+            "l8zMf8TKJpul9VzfRLThN2LVlYkkETcCukzZrK+aSCi6E/dL+noL1ndZYmWF5kbB\n" +
+            "lk881x5CdbusYBtoxfh6ie0EXfCyK4duX3OdvXRcSpTdqiqTcrtt9oinh4ZHV930\n" +
+            "BCTPkGGz5UL3C243W3dlzuonNXqwl++FCSyRMVONYSgb4NRJn4fvehjGtXyAv3Sz\n" +
+            "nSAVoAECgYEA9dhYk4DT2Hclaqo/0ugQvUp7oIPN9qFgrZ6nU94SHkdrBqhFrCmz\n" +
+            "32GeYGSsQJQx3T9Kuip7oGX9AOKn3f30NrcuAe9VzzWAkCKQgQgmtMVySAPWCVr9\n" +
+            "4MH77hc3ijxr6iGd70BQ7EDyVQGRvZqOLl1wu7yZ9vhbVHA87KpgHf0CgYEAkjjn\n" +
+            "mNudh+rs8ibrGu+md8bXJdxHtIbncXF5VsV7wi4HlHfKnWqy+z2If1akm2iacnsi\n" +
+            "XDVqyYNExdtoxmbPc/R9ZJ8jP0FLPoWACcjP03r9H+5eiXrmniZbElGshnwKHFFh\n" +
+            "ZlY1xPAXFgEjh10DDG1wK6/9eB13o+NdP7c7yz0CgYEA3HujNOadF84DaJ43j1dB\n" +
+            "bAKYzWRoG4CvzAY12ymW5kD244mWssjT4MsT1y9yrJg8AEj7I+tl5HyTY2/jTVys\n" +
+            "4UV3pZSYSLWbD6lwH8jHrehGjf+ivdE1T5Wp8+YukXOO9PQhSKlN6hR1QXee1YT/\n" +
+            "buWubTDAhJZIknn2qepDOaECgYA/OnITLCwTYOey0ldpn2V5d7cC/RzYmFkuOeZB\n" +
+            "OkYIsoS+k4o+xau9bl8+yQWG2hWnGU3DV6nkl2m+sOC+oihkuL0cLKA+MwrJb0rt\n" +
+            "cDNF/HHGQ/oHMujUTDunUT/sK2jn09ztNqwri7I/5qApYXP3BL+zdHeDYCKi8Kca\n" +
+            "7S3i9QKBgQCgKgQf8u+oRojMH14iJssAyNEhZgmJ85s/BeiUmMuW5K8iZZ5pnVuq\n" +
+            "8nc/IJGVPHRTObdGCd1L4d5UERiX46Z1BjYv/nuK5DScDcB3mq6K9VXJLNE+MxwW\n" +
+            "wOVT+6FjmBRucGXczAkWXCH7++y6gYzE+OuRIdv5sVkE24gNG7sawg==\n" +
+            "-----END RSA PRIVATE KEY-----";
 
     /**
      * 拉取聊天记录

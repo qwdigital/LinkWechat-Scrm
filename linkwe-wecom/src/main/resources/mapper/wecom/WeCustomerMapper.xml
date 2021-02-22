@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeCustomerMapper">
     
-    <resultMap type="WeCustomer" id="WeCustomerResult">
+    <resultMap type="com.linkwechat.wecom.domain.WeCustomer" id="WeCustomerResult">
         <id property="externalUserid"    column="external_userid"    />
         <result property="name"    column="name"    />
         <result property="avatar"    column="avatar"    />
@@ -17,6 +17,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="position"    column="position"    />
         <result property="userName"    column="user_name"    />
         <result property="userId"    column="user_id"    />
+        <result property="isOpenChat"    column="is_open_chat" jdbcType="INTEGER"  />
         <collection property="weFlowerCustomerRels" ofType="com.linkwechat.wecom.domain.WeFlowerCustomerRel">
             <result property="id"    column="wfcrId"    />
             <result property="userId"    column="user_id"    />
@@ -46,7 +47,32 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 
     <sql id="selectWeCustomerVo">
-        select external_userid, name, avatar, type, gender, unionid, birthday, corp_name, corp_full_name, position from we_customer
+        select external_userid, name, avatar, type, gender, unionid, birthday, corp_name, corp_full_name, position, is_open_chat from we_customer
+    </sql>
+    <sql id="selectWeCustomerByTagVo">
+        select
+        wc.external_userid,
+        wc.name,
+        wc.avatar,
+        wc.type,
+        wc.gender,
+        wc.unionid,
+        wc.birthday,
+        wc.corp_name,
+        wc.corp_full_name,
+        wc.position,
+        wc.is_open_chat,
+        wt.tag_id
+        from
+            we_customer wc
+        left join we_flower_customer_rel wfcr on
+            wc.external_userid = wfcr.external_userid
+            and wfcr.status = 0
+        left join we_flower_customer_tag_rel wfctr on
+            wfctr.flower_customer_rel_id = wfcr.id
+        right join we_tag wt on
+        wt.tag_id = wfctr.tag_id
+        and wt.status  = 0
     </sql>
 
     <select id="selectWeCustomerList" parameterType="WeCustomer" resultMap="WeCustomerResult">
@@ -61,6 +87,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wc.corp_name,
             wc.corp_full_name,
             wc.position,
+            wc.is_open_chat,
             wfcr.id as wfcrId,
             wfcr.user_id,
             wfcr.remark,
@@ -118,20 +145,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
              </if>
             <if test="departmentIds != null and departmentIds !=''">
                 <if test="departmentIds.indexOf(',') != -1">
-                    AND wu.department in
+                    OR wu.department in
                     <foreach item="item" index="index" collection="departmentIds.split(',')" open="(" separator="," close=")">
                         #{item}
                     </foreach>
                 </if>
                 <if test="departmentIds.indexOf(',') == -1">
-                    AND wu.department=#{departmentIds}
+                    OR wu.department=#{departmentIds}
                 </if>
             </if>
 
              <if test="status !=null and status !=''">
                   AND wfcr.status=#{status}
              </if>
-
+            <if test="isOpenChat !=null ">
+                AND wc.is_open_chat=#{isOpenChat}
+            </if>
         </where>
         ORDER BY wfcr.create_time DESC
     </select>
@@ -179,6 +208,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="corpName != null">corp_name,</if>
             <if test="corpFullName != null">corp_full_name,</if>
             <if test="position != null">position,</if>
+            <if test="isOpenChat != null">is_open_chat</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="externalUserid != null">#{externalUserid},</if>
@@ -191,6 +221,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="corpName != null">#{corpName},</if>
             <if test="corpFullName != null">#{corpFullName},</if>
             <if test="position != null">#{position},</if>
+            <if test="isOpenChat != null">#{isOpenChat}</if>
          </trim>
     </insert>
 
@@ -207,6 +238,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="corpName != null">corp_name = #{corpName},</if>
             <if test="corpFullName != null">corp_full_name = #{corpFullName},</if>
             <if test="position != null">position = #{position},</if>
+            <if test="isOpenChat != null">is_open_chat = #{isOpenChat}</if>
         </trim>
         where external_userid = #{externalUserid}
     </update>
@@ -235,6 +267,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                   wc.corp_name,
                   wc.corp_full_name,
                   wc.position,
+                  wc.is_open_chat,
                   wfcr.id as wfcrId,
                   wfcr.user_id,
                   wfcr.remark,
@@ -257,6 +290,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.flower_customer_rel_id = wfcr.id
         LEFT JOIN we_tag wt ON wt.tag_id = wfcrf.tag_id
         WHERE wc.external_userid=#{externalUserid}
+    </select>
+
+
+    <select id="getCustomerByTag" parameterType="java.util.ArrayList" resultType="com.linkwechat.wecom.domain.WeUser">
+        <include refid="selectWeCustomerByTagVo"/>
+        <where>
+            and wt.tag_id in
+            <foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </where>
     </select>
     
 </mapper>

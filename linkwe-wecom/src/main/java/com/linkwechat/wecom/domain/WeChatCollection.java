@@ -24,6 +24,6 @@ public class WeChatCollection extends BaseEntity {
     /**
      * 用户id
      */
-    private Long userId;
+    private String userId;
 
 }

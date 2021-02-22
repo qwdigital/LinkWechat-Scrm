@@ -42,7 +42,7 @@ public class CustomerMessagePushDto {
     private String settingTime;
 
     /**
-     * 消息类型 0 文本消息  1 图片消息 2 链接消息   3 小程序消息
+     * 消息类型 0 文本消息  1 图片消息 2 链接消息   3 小程序消息 4 图文消息
      */
     private String messageType;
 

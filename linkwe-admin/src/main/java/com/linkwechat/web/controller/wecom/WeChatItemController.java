@@ -16,6 +16,7 @@ import java.util.List;
 
 /**
  * 聊天工具侧边栏
+ *
  * @author kewen
  */
 @RequestMapping(value = "/wecom/chat/item")
@@ -30,7 +31,7 @@ public class WeChatItemController extends BaseController {
      * 侧边栏抓取素材
      */
     @PreAuthorize("@ss.hasPermi('chat:item:add')")
-    @Log(title = "侧边栏抓取素材", businessType = BusinessType.INSERT)
+  // @Log(title = "侧边栏抓取素材", businessType = BusinessType.INSERT)
     @PutMapping
     public AjaxResult add(@RequestBody WeChatItemDto chatItemDto) {
         return toAjax(weChatItemService.checkItems(chatItemDto));
@@ -39,11 +40,12 @@ public class WeChatItemController extends BaseController {
     /**
      * h5素材列表
      */
-    @PreAuthorize("@ss.hasPermi('chat:item:list')")
+    //@PreAuthorize("@ss.hasPermi('chat:item:list')")
     @GetMapping("/list")
-    public TableDataInfo list(@RequestParam(value = "sideId") Long sideId) {
+    public TableDataInfo list(@RequestParam(value = "sideId") Long sideId
+            , @RequestParam(value = "keyword", required = false) String keyword,@RequestParam(value = "mediaType") String mediaType,@RequestParam(value = "userId") String userId) {
         startPage();
-        List<WeChatSideVo> weChatSideVos = weChatItemService.chatItems(sideId);
+        List<WeChatSideVo> weChatSideVos = weChatItemService.chatItems(sideId,keyword,mediaType,userId);
         return getDataTable(weChatSideVos);
     }
 

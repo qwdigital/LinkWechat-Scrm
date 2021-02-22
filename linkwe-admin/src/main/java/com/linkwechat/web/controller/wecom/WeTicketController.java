@@ -41,10 +41,10 @@ public class WeTicketController extends BaseController {
      */
     @Log(title = "获取企业的jsapi_ticket", businessType = BusinessType.OTHER)
     @GetMapping("/getAppTicket")
-    public AjaxResult getAppTicket(String url) {
+    public AjaxResult getAppTicket(String url,String agentId) {
         String ticketVaule = redisCache.getCacheObject(WeConstans.AppTicketKey);
         if (StringUtils.isEmpty(ticketVaule)) {
-            WeH5TicketDto ticketRes = weTicketClient.getJsapiTicket();
+            WeH5TicketDto ticketRes = weTicketClient.getJsapiTicket(agentId);
             if (ticketRes != null && StringUtils.isNotEmpty(ticketRes.getTicket())) {
                 redisCache.setCacheObject(WeConstans.AppTicketKey, ticketRes.getTicket(), ticketRes.getExpiresIn(), TimeUnit.SECONDS);
             }
@@ -61,10 +61,10 @@ public class WeTicketController extends BaseController {
      */
     @Log(title = "获取应用的jsapi_ticket", businessType = BusinessType.OTHER)
     @GetMapping("/getAgentTicket")
-    public AjaxResult getAgentTicket(String url) {
+    public AjaxResult getAgentTicket(String url,String agentId) {
         String ticketVaule = redisCache.getCacheObject(WeConstans.AgentTicketKey);
         if (StringUtils.isEmpty(ticketVaule)) {
-            WeH5TicketDto ticketRes = weTicketClient.getTicket();
+            WeH5TicketDto ticketRes = weTicketClient.getTicket(agentId);
             if (ticketRes != null && StringUtils.isNotEmpty(ticketRes.getTicket())) {
                 redisCache.setCacheObject(WeConstans.AgentTicketKey, ticketRes.getTicket(), ticketRes.getExpiresIn(), TimeUnit.SECONDS);
             }

@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.common;
 
+import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.config.ServerConfig;
 import com.linkwechat.common.constant.Constants;
@@ -29,6 +30,9 @@ public class CommonController {
 
     @Autowired
     private ServerConfig serverConfig;
+
+    @Autowired
+    private CosConfig cosConfig;
 
     /**
      * 通用下载请求
@@ -104,4 +108,29 @@ public class CommonController {
     public void webResourceDownload(String url, HttpServletRequest request, HttpServletResponse response) throws Exception {
         FileUtils.downloadFile(url, response.getOutputStream());
     }
+
+
+    /**
+     * 通用上传请求
+     */
+    @PostMapping("/common/uploadFile2Cos")
+    public AjaxResult uploadFile2Cos(MultipartFile file) throws Exception {
+        try {
+
+            String fileName = FileUploadUtils.upload2Cos(file, cosConfig);
+
+            AjaxResult ajax = AjaxResult.success();
+            ajax.put("fileName", fileName);
+            ajax.put("url", url(fileName));
+            return ajax;
+        } catch (Exception e) {
+            return AjaxResult.error(e.getMessage());
+        }
+    }
+
+
+    public  String url(String fileName){
+        return "https://link-wechat-1251309172.cos.ap-nanjing.myqcloud.com/"+fileName;
+    }
+
 }

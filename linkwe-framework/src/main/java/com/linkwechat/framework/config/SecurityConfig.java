@@ -115,6 +115,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                 .antMatchers("/*/api-docs").anonymous()
                 .antMatchers("/druid/**").anonymous()
                 .antMatchers("/wecom/callback/**").anonymous()
+
+                .antMatchers("/wecom/chat/item/list").anonymous()
+                .antMatchers("/wecom/chat/collection/list").anonymous()
+                .antMatchers("/wecom/chat/collection/cancleCollection").anonymous()
+                .antMatchers("/wecom/chat/collection/addCollection").anonymous()
+                .antMatchers("/wecom/chat/side/h5List").anonymous()
+                .antMatchers("/wecom/ticket/**").anonymous()
+
+                .antMatchers("/wecom/user/getUserInfo").anonymous()
+               // .antMatchers("/common/uploadFile2Cos").anonymous()
+                .antMatchers("/wecom/material/temporaryMaterialMediaId").anonymous()
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
                 .and()

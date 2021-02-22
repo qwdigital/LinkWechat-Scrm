@@ -78,5 +78,10 @@ public class CustomerMessagePushVo {
      */
     private Integer timedTask;
 
+    /**
+     * 消息发送状态 0 未发送  1 已发送
+     */
+    private String checkStatus;
+
 
 }

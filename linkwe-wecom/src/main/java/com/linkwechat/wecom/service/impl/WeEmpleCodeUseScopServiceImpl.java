@@ -46,6 +46,16 @@ public class WeEmpleCodeUseScopServiceImpl extends ServiceImpl<WeEmpleCodeUseSco
     }
 
     /**
+     * 查询员工活码使用人列表(批量)
+     * @param empleCodeIdList
+     * @return
+     */
+    @Override
+    public List<WeEmpleCodeUseScop> selectWeEmpleCodeUseScopListByIds(List<Long> empleCodeIdList) {
+        return weEmpleCodeUseScopMapper.selectWeEmpleCodeUseScopListByIds(empleCodeIdList);
+    }
+
+    /**
      * 新增员工活码使用人
      *
      * @param weEmpleCodeUseScop 员工活码使用人

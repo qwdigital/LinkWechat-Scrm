@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.client;
 
+import com.dtflys.forest.annotation.Header;
 import com.dtflys.forest.annotation.Request;
 import com.linkwechat.wecom.domain.WeH5TicketDto;
 
@@ -15,7 +16,7 @@ public interface WeTicketClient {
      * @return
      */
     @Request(url = "/get_jsapi_ticket")
-    WeH5TicketDto getJsapiTicket();
+    WeH5TicketDto getJsapiTicket(@Header("agentId") String agentId);
 
     /**
      * 获取应用jsapi_ticket
@@ -23,5 +24,5 @@ public interface WeTicketClient {
      * @return
      */
     @Request(url = "/ticket/get")
-    WeH5TicketDto getTicket();
+    WeH5TicketDto getTicket(@Header("agentId") String agentId);
 }

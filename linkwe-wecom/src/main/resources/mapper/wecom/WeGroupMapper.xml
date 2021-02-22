@@ -13,7 +13,8 @@
             wg.notice,
             wu.user_name as groupLeaderName,
             (SELECT COUNT(*) FROM we_group_member wgm WHERE wgm.chat_id=wg.chat_id) as memberNum,
-            wg.status
+            wg.status,
+            wg.`owner`
         FROM
         we_group wg
         LEFT JOIN  we_user wu ON wg.`owner`=wu.user_id

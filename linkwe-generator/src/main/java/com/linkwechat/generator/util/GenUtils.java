@@ -1,12 +1,13 @@
 package com.linkwechat.generator.util;
 
-import java.util.Arrays;
-import org.apache.commons.lang3.RegExUtils;
 import com.linkwechat.common.constant.GenConstants;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.generator.config.GenConfig;
 import com.linkwechat.generator.domain.GenTable;
 import com.linkwechat.generator.domain.GenTableColumn;
+import org.apache.commons.lang3.RegExUtils;
+
+import java.util.Arrays;
 
 /**
  * 代码生成器 工具类
@@ -40,13 +41,14 @@ public class GenUtils
         column.setCreateBy(table.getCreateBy());
         // 设置java字段名
         column.setJavaField(StringUtils.toCamelCase(columnName));
+        // 设置默认类型
+        column.setJavaType(GenConstants.TYPE_STRING);
 
-        if (arraysContains(GenConstants.COLUMNTYPE_STR, dataType))
+        if (arraysContains(GenConstants.COLUMNTYPE_STR, dataType) || arraysContains(GenConstants.COLUMNTYPE_TEXT, dataType))
         {
-            column.setJavaType(GenConstants.TYPE_STRING);
             // 字符串长度超过500设置为文本域
             Integer columnLength = getColumnLength(column.getColumnType());
-            String htmlType = columnLength >= 500 ? GenConstants.HTML_TEXTAREA : GenConstants.HTML_INPUT;
+            String htmlType = columnLength >= 500 || arraysContains(GenConstants.COLUMNTYPE_TEXT, dataType) ? GenConstants.HTML_TEXTAREA : GenConstants.HTML_INPUT;
             column.setHtmlType(htmlType);
         }
         else if (arraysContains(GenConstants.COLUMNTYPE_TIME, dataType))
@@ -110,6 +112,21 @@ public class GenUtils
                 || StringUtils.endsWithIgnoreCase(columnName, "sex"))
         {
             column.setHtmlType(GenConstants.HTML_SELECT);
+        }
+        // 图片字段设置图片上传控件
+        else if (StringUtils.endsWithIgnoreCase(columnName, "image"))
+        {
+            column.setHtmlType(GenConstants.HTML_IMAGE_UPLOAD);
+        }
+        // 文件字段设置文件上传控件
+        else if (StringUtils.endsWithIgnoreCase(columnName, "file"))
+        {
+            column.setHtmlType(GenConstants.HTML_FILE_UPLOAD);
+        }
+        // 内容字段设置富文本控件
+        else if (StringUtils.endsWithIgnoreCase(columnName, "content"))
+        {
+            column.setHtmlType(GenConstants.HTML_EDITOR);
         }
     }
 

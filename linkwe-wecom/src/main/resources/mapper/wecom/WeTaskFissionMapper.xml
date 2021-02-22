@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeTaskFissionMapper">
+
+    <resultMap type="WeTaskFission" id="WeTaskFissionResult">
+        <result property="id"    column="id"    />
+        <result property="fissionType"    column="fission_type"    />
+        <result property="taskName"    column="task_name"    />
+        <result property="fissInfo"    column="fiss_info"    />
+        <result property="fissNum"    column="fiss_num"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="overTime"    column="over_time"    />
+        <result property="customerTagId"    column="customer_tag_id"    />
+        <result property="customerTag"    column="customer_tag"    />
+        <result property="postersId"    column="posters_id"    />
+        <result property="postersUrl"    column="posters_url"    />
+        <result property="fissionTargetId"    column="fission_target_id"    />
+        <result property="fissionTarget"    column="fission_target"    />
+        <result property="fissQrcode"    column="fiss_qrcode"    />
+        <result property="rewardUrl"    column="reward_url"    />
+        <result property="rewardImageUrl"    column="reward_image_url"    />
+        <result property="rewardRule"    column="reward_rule"    />
+        <result property="fissStatus"    column="fiss_status"    />
+        <result property="welcomeMsg"    column="welcome_msg"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectWeTaskFissionVo">
+        select id, fission_type, task_name, fiss_info, fiss_num, start_time, over_time, customer_tag_id, customer_tag, posters_id, posters_url, fission_target_id, fission_target, fiss_qrcode, reward_url, reward_image_url, reward_rule, fiss_status, welcome_msg, create_by, create_time, update_by, update_time from we_task_fission
+    </sql>
+
+    <select id="selectWeTaskFissionList" parameterType="WeTaskFission" resultMap="WeTaskFissionResult">
+        <include refid="selectWeTaskFissionVo"/>
+        <where>
+            <if test="fissionType != null "> and fission_type = #{fissionType}</if>
+            <if test="taskName != null  and taskName != ''"> and task_name like concat('%', #{taskName}, '%')</if>
+            <if test="fissInfo != null  and fissInfo != ''"> and fiss_info = #{fissInfo}</if>
+            <if test="fissNum != null "> and fiss_num = #{fissNum}</if>
+            <if test="startTime != null "> and start_time = #{startTime}</if>
+            <if test="overTime != null "> and over_time = #{overTime}</if>
+            <if test="customerTagId != null  and customerTagId != ''"> and customer_tag_id = #{customerTagId}</if>
+            <if test="customerTag != null  and customerTag != ''"> and customer_tag = #{customerTag}</if>
+            <if test="postersId != null "> and posters_id = #{postersId}</if>
+            <if test="postersUrl != null  and postersUrl != ''"> and posters_url = #{postersUrl}</if>
+            <if test="fissionTargetId != null  and fissionTargetId != ''"> and fission_target_id = #{fissionTargetId}</if>
+            <if test="fissionTarget != null  and fissionTarget != ''"> and fission_target = #{fissionTarget}</if>
+            <if test="fissQrcode != null  and fissQrcode != ''"> and fiss_qrcode = #{fissQrcode}</if>
+            <if test="rewardUrl != null  and rewardUrl != ''"> and reward_url = #{rewardUrl}</if>
+            <if test="rewardImageUrl != null  and rewardImageUrl != ''"> and reward_image_url = #{rewardImageUrl}</if>
+            <if test="rewardRule != null  and rewardRule != ''"> and reward_rule = #{rewardRule}</if>
+            <if test="fissStatus != null "> and fiss_status = #{fissStatus}</if>
+            <if test="welcomeMsg != null  and welcomeMsg != ''"> and welcome_msg = #{welcomeMsg}</if>
+        </where>
+    </select>
+
+    <select id="selectWeTaskFissionById" parameterType="Long" resultMap="WeTaskFissionResult">
+        <include refid="selectWeTaskFissionVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertWeTaskFission" parameterType="WeTaskFission" useGeneratedKeys="true" keyProperty="id">
+        insert into we_task_fission
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fissionType != null">fission_type,</if>
+            <if test="taskName != null and taskName != ''">task_name,</if>
+            <if test="fissInfo != null">fiss_info,</if>
+            <if test="fissNum != null">fiss_num,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="overTime != null">over_time,</if>
+            <if test="customerTagId != null and customerTagId != ''">customer_tag_id,</if>
+            <if test="customerTag != null">customer_tag,</if>
+            <if test="postersId != null">posters_id,</if>
+            <if test="postersUrl != null and postersUrl != ''">posters_url,</if>
+            <if test="fissionTargetId != null and fissionTargetId != ''">fission_target_id,</if>
+            <if test="fissionTarget != null and fissionTarget != ''">fission_target,</if>
+            <if test="fissQrcode != null and fissQrcode != ''">fiss_qrcode,</if>
+            <if test="rewardUrl != null and rewardUrl != ''">reward_url,</if>
+            <if test="rewardImageUrl != null and rewardImageUrl != ''">reward_image_url,</if>
+            <if test="rewardRule != null">reward_rule,</if>
+            <if test="fissStatus != null">fiss_status,</if>
+            <if test="welcomeMsg != null">welcome_msg,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fissionType != null">#{fissionType},</if>
+            <if test="taskName != null and taskName != ''">#{taskName},</if>
+            <if test="fissInfo != null">#{fissInfo},</if>
+            <if test="fissNum != null">#{fissNum},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="overTime != null">#{overTime},</if>
+            <if test="customerTagId != null and customerTagId != ''">#{customerTagId},</if>
+            <if test="customerTag != null">#{customerTag},</if>
+            <if test="postersId != null">#{postersId},</if>
+            <if test="postersUrl != null and postersUrl != ''">#{postersUrl},</if>
+            <if test="fissionTargetId != null and fissionTargetId != ''">#{fissionTargetId},</if>
+            <if test="fissionTarget != null and fissionTarget != ''">#{fissionTarget},</if>
+            <if test="fissQrcode != null and fissQrcode != ''">#{fissQrcode},</if>
+            <if test="rewardUrl != null and rewardUrl != ''">#{rewardUrl},</if>
+            <if test="rewardImageUrl != null and rewardImageUrl != ''">#{rewardImageUrl},</if>
+            <if test="rewardRule != null">#{rewardRule},</if>
+            <if test="fissStatus != null">#{fissStatus},</if>
+            <if test="welcomeMsg != null">#{welcomeMsg},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWeTaskFission" parameterType="WeTaskFission">
+        update we_task_fission
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="fissionType != null">fission_type = #{fissionType},</if>
+            <if test="taskName != null and taskName != ''">task_name = #{taskName},</if>
+            <if test="fissInfo != null">fiss_info = #{fissInfo},</if>
+            <if test="fissNum != null">fiss_num = #{fissNum},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="overTime != null">over_time = #{overTime},</if>
+            <if test="customerTagId != null and customerTagId != ''">customer_tag_id = #{customerTagId},</if>
+            <if test="customerTag != null">customer_tag = #{customerTag},</if>
+            <if test="postersId != null">posters_id = #{postersId},</if>
+            <if test="postersUrl != null and postersUrl != ''">posters_url = #{postersUrl},</if>
+            <if test="fissionTargetId != null and fissionTargetId != ''">fission_target_id = #{fissionTargetId},</if>
+            <if test="fissionTarget != null and fissionTarget != ''">fission_target = #{fissionTarget},</if>
+            <if test="fissQrcode != null and fissQrcode != ''">fiss_qrcode = #{fissQrcode},</if>
+            <if test="rewardUrl != null and rewardUrl != ''">reward_url = #{rewardUrl},</if>
+            <if test="rewardImageUrl != null and rewardImageUrl != ''">reward_image_url = #{rewardImageUrl},</if>
+            <if test="rewardRule != null">reward_rule = #{rewardRule},</if>
+            <if test="fissStatus != null">fiss_status = #{fissStatus},</if>
+            <if test="welcomeMsg != null">welcome_msg = #{welcomeMsg},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeTaskFissionById" parameterType="Long">
+        delete from we_task_fission where id = #{id}
+    </delete>
+
+    <delete id="deleteWeTaskFissionByIds" parameterType="String">
+        delete from we_task_fission where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

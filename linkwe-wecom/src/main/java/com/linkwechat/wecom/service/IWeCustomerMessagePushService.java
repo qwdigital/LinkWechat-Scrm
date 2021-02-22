@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
 import com.linkwechat.wecom.domain.vo.CustomerMessagePushVo;
 
+import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -19,7 +20,7 @@ public interface IWeCustomerMessagePushService {
      *
      *@param customerMessagePushDto 原始数据信息
      */
-    public void  addWeCustomerMessagePush(CustomerMessagePushDto customerMessagePushDto) throws JsonProcessingException;
+    public void  addWeCustomerMessagePush(CustomerMessagePushDto customerMessagePushDto) throws JsonProcessingException, ParseException;
 
     /**
      * 群发消息列表

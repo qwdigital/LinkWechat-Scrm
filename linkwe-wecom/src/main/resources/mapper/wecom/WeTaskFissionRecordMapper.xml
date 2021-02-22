@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeTaskFissionRecordMapper">
+    
+    <resultMap type="WeTaskFissionRecord" id="WeTaskFissionRecordResult">
+        <result property="id"    column="id"    />
+        <result property="taskFissionId"    column="task_fission_id"    />
+        <result property="customerId"    column="customer_id"    />
+        <result property="customerName"    column="customer_name"    />
+        <result property="fissNum"    column="fiss_num"    />
+        <result property="configId"    column="config_id"    />
+    </resultMap>
+
+    <sql id="selectWeTaskFissionRecordVo">
+        select id, task_fission_id, customer_id, customer_name, fiss_num, config_id from we_task_fission_record
+    </sql>
+
+    <select id="selectWeTaskFissionRecordList" parameterType="WeTaskFissionRecord" resultMap="WeTaskFissionRecordResult">
+        <include refid="selectWeTaskFissionRecordVo"/>
+        <where>  
+            <if test="taskFissionId != null "> and task_fission_id = #{taskFissionId}</if>
+            <if test="customerId != null  and customerId != ''"> and customer_id = #{customerId}</if>
+            <if test="customerName != null  and customerName != ''"> and customer_name like concat('%', #{customerName}, '%')</if>
+            <if test="fissNum != null "> and fiss_num = #{fissNum}</if>
+        </where>
+    </select>
+    
+    <select id="selectWeTaskFissionRecordById" parameterType="Long" resultMap="WeTaskFissionRecordResult">
+        <include refid="selectWeTaskFissionRecordVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWeTaskFissionRecord" parameterType="WeTaskFissionRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into we_task_fission_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="taskFissionId != null">task_fission_id,</if>
+            <if test="customerId != null and customerId != ''">customer_id,</if>
+            <if test="customerName != null">customer_name,</if>
+            <if test="fissNum != null">fiss_num,</if>
+            <if test="configId != null and configId != ''">config_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="taskFissionId != null">#{taskFissionId},</if>
+            <if test="customerId != null and customerId != ''">#{customerId},</if>
+            <if test="customerName != null">#{customerName},</if>
+            <if test="fissNum != null">#{fissNum},</if>
+            <if test="configId != null and configId != ''">#{configId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWeTaskFissionRecord" parameterType="WeTaskFissionRecord">
+        update we_task_fission_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="taskFissionId != null">task_fission_id = #{taskFissionId},</if>
+            <if test="customerId != null and customerId != ''">customer_id = #{customerId},</if>
+            <if test="customerName != null">customer_name = #{customerName},</if>
+            <if test="fissNum != null">fiss_num = #{fissNum},</if>
+            <if test="configId != null">config_id = #{configId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWeTaskFissionRecordById" parameterType="Long">
+        delete from we_task_fission_record where id = #{id}
+    </delete>
+
+    <delete id="deleteWeTaskFissionRecordByIds" parameterType="String">
+        delete from we_task_fission_record where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

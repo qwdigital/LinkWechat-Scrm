@@ -85,4 +85,11 @@ public interface WeEmpleCodeMapper extends BaseMapper<WeEmpleCode>
      * @return
      */
     public WeEmpleCodeDto selectWelcomeMsgByActivityScene(@Param("activityScene") String activityScene, @Param("userId") String userId);
+
+    /**
+     * 通过成员id 获取去成员活码
+     * @param userId 成员id
+     * @return
+     */
+    WeEmpleCode getQrcodeByUserId(String userId);
 }

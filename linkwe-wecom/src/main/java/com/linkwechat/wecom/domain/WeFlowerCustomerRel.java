@@ -48,7 +48,7 @@ public class WeFlowerCustomerRel
      private String remarkCorpName;
 
     /** 该成员对此客户备注的手机号码 */
-    private String[] remarkMobiles;
+    private String remarkMobiles;
 
     /** 发起添加的userid，如果成员主动添加，为成员的userid；如果是客户主动添加，则为客户的外部联系人userid；如果是内部成员共享/管理员分配，则为对应的成员/管理员userid */
     private String operUserid;

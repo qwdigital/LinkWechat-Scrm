@@ -4,10 +4,10 @@
             <ul>             
             <li v-for="(item,index) in personList" :key="index" @click="liClick(item)">
                 <el-row style="padding:10px">
-                <el-col :span="4"> <img :src="item.receiveWeCustomer.avatar"></el-col>
-                <el-col :span="20">
+                <el-col :span="3"> <img :src="item.receiveWeCustomer.avatar"></el-col>
+                <el-col :span="21">
                     <p>{{item.receiveWeCustomer.name}} <span class="fr gray">{{parseTime(item.finalChatContext.msgtime)}}</span></p>
-                   <p class="gray padt10" v-if="item.finalChatContext.text">{{item.finalChatContext.text.content}}</p>     
+                    <p class="gray padt10" v-if="item.finalChatContext.text">{{item.finalChatContext.text.content}}</p>     
                 </el-col>
                 </el-row>           
             </li>

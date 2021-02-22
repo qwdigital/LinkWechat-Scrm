@@ -52,7 +52,7 @@ public interface IWeTagService  extends IService<WeTag>
      * @param ids 需要删除的企业微信标签ID
      * @return 结果
      */
-    public int deleteWeTagByIds(Long[] ids);
+    public int deleteWeTagByIds(String[] ids);
 
     /**
      * 删除企业微信标签信息
@@ -60,7 +60,7 @@ public interface IWeTagService  extends IService<WeTag>
      * @param id 企业微信标签ID
      * @return 结果
      */
-    public int deleteWeTagById(Long id);
+    public int deleteWeTagById(String id);
 
 
     /**
@@ -70,4 +70,9 @@ public interface IWeTagService  extends IService<WeTag>
      */
     public int insertWeTagFromWeTagDto(WeTagDto weTagDto);
 
+    void creatTag(String tagId);
+
+    void deleteTag(String tagId);
+
+    void updateTag(String tagId);
 }

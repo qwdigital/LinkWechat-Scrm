@@ -57,7 +57,7 @@ public class WeUser
     private String userId;
 
     /** 性别。1表示男性，2表示女性 */
-    private Integer gender=new Integer(1);
+    private Integer gender;
 
     /** 手机号 */
     @NotBlank(message = "手机号不可为空")
@@ -102,7 +102,8 @@ public class WeUser
     private Date birthday;
 
     /** 是否激活（1:是；2:否）该字段主要表示当前信息是否同步微信 */
-    private Integer isActivate=new Integer(2);
+    /** 激活状态: 1=已激活，2=已禁用，4=未激活，5=退出企业,6=删除 */
+    private Integer isActivate;
 
     /** 离职是否分配(1:已分配;0:未分配;) */
     private Integer isAllocate;
@@ -110,6 +111,11 @@ public class WeUser
     /** 离职时间 */
     private Date dimissionTime;
 
+
+    private String remark;
+
+
+    private String departmentStr;
 
 
 

@@ -20,10 +20,10 @@ public interface WeUserMapper extends BaseMapper<WeUser>
     /**
      * 查询通讯录相关客户
      *
-     * @param id 通讯录相关客户ID
+     * @param userId 通讯录相关客户ID
      * @return 通讯录相关客户
      */
-    public WeUser selectWeUserById(Long id);
+    public WeUser selectWeUserById(String userId);
 
     /**
      * 查询通讯录相关客户列表

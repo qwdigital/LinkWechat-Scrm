@@ -5,13 +5,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
+import com.linkwechat.wecom.domain.WeCustomerMessage;
 import com.linkwechat.wecom.domain.WeCustomerMessageOriginal;
-import com.linkwechat.wecom.domain.dto.message.DetailMessageStatusResultDto;
-import com.linkwechat.wecom.domain.dto.message.QueryCustomerMessageStatusResultDataObjectDto;
-import com.linkwechat.wecom.domain.dto.message.QueryCustomerMessageStatusResultDto;
+import com.linkwechat.wecom.domain.dto.message.*;
 import com.linkwechat.wecom.domain.vo.CustomerMessagePushVo;
+import com.linkwechat.wecom.mapper.WeCustomerMessageMapper;
 import com.linkwechat.wecom.mapper.WeCustomerMessageOriginalMapper;
 import com.linkwechat.wecom.mapper.WeCustomerMessgaeResultMapper;
 import com.linkwechat.wecom.service.IWeCustomerMessageOriginalService;
@@ -30,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author kewen
  * @date 2020-12-12
  */
+@SuppressWarnings("all")
 @Service
 public class WeCustomerMessageOriginalServiceImpl extends ServiceImpl<WeCustomerMessageOriginalMapper, WeCustomerMessageOriginal> implements IWeCustomerMessageOriginalService {
 
@@ -48,10 +50,8 @@ public class WeCustomerMessageOriginalServiceImpl extends ServiceImpl<WeCustomer
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Override
-    public int saveWeCustomerMessageOriginal(WeCustomerMessageOriginal weCustomerMessageOriginal) {
-        return weCustomerMessageOriginalMapper.insert(weCustomerMessageOriginal);
-    }
+    @Autowired
+    private WeCustomerMessageMapper customerMessageMapper;
 
     @Override
     public List<CustomerMessagePushVo> customerMessagePushs(String sender, String content, String pushType, String beginTime, String endTime) {
@@ -59,73 +59,101 @@ public class WeCustomerMessageOriginalServiceImpl extends ServiceImpl<WeCustomer
     }
 
     @Override
-    public CustomerMessagePushVo CustomerMessagePushDetail(Long messageId)  {
+    public CustomerMessagePushVo CustomerMessagePushDetail(Long messageId) {
 
 
         CustomerMessagePushVo customerMessagePushDetail = weCustomerMessageOriginalMapper.findCustomerMessagePushDetail(messageId);
-        AtomicInteger atomicInteger=new AtomicInteger();
 
-        //拉取消息发送结果
-        CompletableFuture.runAsync(()->{
+        //检查是否已经同步发送结果
+        if( weCustomerMessgaeResultMapper.checkSendStatus(messageId)==0){
+            //拉取消息发送结果
+            CompletableFuture.runAsync(() -> syncSendResult(customerMessagePushDetail.getMsgid(), messageId));
+        }
 
-            String msgid = customerMessagePushDetail.getMsgid();
+        return customerMessagePushDetail;
+    }
 
-            if(StringUtils.isNotEmpty(msgid)){
+    @Override
+    public void asyncResult(AsyncResultDto asyncResultDto) throws JsonProcessingException {
+        String msgid=new ObjectMapper().writeValueAsString(asyncResultDto.getMsgids());
+        syncSendResult(msgid, asyncResultDto.getMessageId());
+    }
 
-                List<String> msgIds = null;
+    @Override
+    public long saveWeCustomerMessageOriginal(CustomerMessagePushDto customerMessagePushDto) {
+        //保存原始数据信息表 WeCustomerMessageOriginal 主键id
+        long messageOriginalId = SnowFlakeUtil.nextId();
+        WeCustomerMessageOriginal original = new WeCustomerMessageOriginal();
+        original.setMessageOriginalId(messageOriginalId);
+        original.setStaffId(customerMessagePushDto.getStaffId());
+        original.setDepartment(customerMessagePushDto.getDepartment());
+        original.setPushType(customerMessagePushDto.getPushType());
+        original.setMessageType(customerMessagePushDto.getMessageType());
+        original.setPushRange(customerMessagePushDto.getPushRange());
+        original.setTag(customerMessagePushDto.getTag());
+        original.setDelFlag(0);
+        this.save(original);
+        return messageOriginalId;
+    }
 
-                try {
+    public void syncSendResult(String msgid, Long messageId) {
 
-                    msgIds = objectMapper.readValue(msgid,new TypeReference<List<String>>() { });
+        AtomicInteger atomicInteger = new AtomicInteger();
 
-                } catch (JsonProcessingException e) {
+        if (StringUtils.isNotEmpty(msgid)) {
 
-                    e.printStackTrace();
+            List<String> msgIds = null;
 
-                }
+            try {
 
-                if(CollectionUtils.isNotEmpty(msgIds)){
+                msgIds = objectMapper.readValue(msgid, new TypeReference<List<String>>() {
+                });
 
-                    msgIds.forEach(m->{
+            } catch (JsonProcessingException e) {
 
-                        QueryCustomerMessageStatusResultDataObjectDto dataObjectDto=new QueryCustomerMessageStatusResultDataObjectDto();
-
-                        dataObjectDto.setMsgid(m);
-
-                        //拉取发送结果
-                        QueryCustomerMessageStatusResultDto queryCustomerMessageStatusResultDto = weCustomerMessagePushClient.queryCustomerMessageStatus(dataObjectDto);
-
-                        if (WeConstans.WE_SUCCESS_CODE.equals(queryCustomerMessageStatusResultDto.getErrcode())) {
-
-
-                            List<DetailMessageStatusResultDto> detailList = queryCustomerMessageStatusResultDto.getDetail_list();
-
-                            detailList.forEach(d-> {
-
-                                if(d.getStatus().equals("1")){
-
-                                    atomicInteger.incrementAndGet();
-
-                                }
-
-                                weCustomerMessgaeResultMapper.updateWeCustomerMessgaeResult(messageId,d.getChat_id(),d.getExternal_userid(),d.getStatus(),d.getSend_time());
-
-                            });
-
-                        }
-
-                    });
-
-                }
+                e.printStackTrace();
 
             }
 
-            //更新微信实际发送条数
-            weCustomerMessageService.updateWeCustomerMessageActualSend(messageId,atomicInteger.get());
+            if (CollectionUtils.isNotEmpty(msgIds)) {
 
-        });
+                msgIds.forEach(m -> {
 
-        return customerMessagePushDetail;
+                    QueryCustomerMessageStatusResultDataObjectDto dataObjectDto = new QueryCustomerMessageStatusResultDataObjectDto();
+
+                    dataObjectDto.setMsgid(m);
+
+                    //拉取发送结果
+                    QueryCustomerMessageStatusResultDto queryCustomerMessageStatusResultDto = weCustomerMessagePushClient.queryCustomerMessageStatus(dataObjectDto);
+
+                    if (WeConstans.WE_SUCCESS_CODE.equals(queryCustomerMessageStatusResultDto.getErrcode())) {
+
+
+                        List<DetailMessageStatusResultDto> detailList = queryCustomerMessageStatusResultDto.getDetail_list();
+
+                        detailList.forEach(d -> {
+
+                            if (d.getStatus().equals(WeConstans.sendMessageStatusEnum.SEND.getStatus())) {
+
+                                atomicInteger.incrementAndGet();
+                                //更新消息发送状态
+                                customerMessageMapper.updateWeCustomerMessageCheckStatusById(messageId,WeConstans.sendMessageStatusEnum.SEND.getStatus());
+                            }
+
+                            weCustomerMessgaeResultMapper.updateWeCustomerMessgaeResult(messageId, d.getChat_id(), d.getExternal_userid(), d.getStatus(), d.getSend_time());
+
+                        });
+
+                    }
+
+                });
+
+            }
+
+        }
+
+        //更新微信实际发送条数
+        weCustomerMessageService.updateWeCustomerMessageActualSend(messageId, atomicInteger.get());
     }
 
 }

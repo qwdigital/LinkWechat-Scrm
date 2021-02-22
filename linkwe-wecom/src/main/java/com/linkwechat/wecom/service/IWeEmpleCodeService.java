@@ -109,4 +109,11 @@ public interface IWeEmpleCodeService  extends IService<WeEmpleCode>
      * @param departmentIdArr 部门id
      */
     public WeExternalContactDto getQrcode(String[] userIdArr, Long[] departmentIdArr);
+
+    /**
+     * 通过成员id 获取去成员活码
+     * @param userId 成员id
+     * @return
+     */
+    WeEmpleCode getQrcodeByUserId(String userId);
 }

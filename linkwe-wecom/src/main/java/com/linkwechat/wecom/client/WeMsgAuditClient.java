@@ -7,7 +7,7 @@ import com.linkwechat.wecom.domain.dto.msgaudit.WeMsgAuditDto;
 import com.linkwechat.wecom.domain.vo.WeMsgAuditVo;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 会话存档接口
  * @date 2020/12/2 16:45
  **/

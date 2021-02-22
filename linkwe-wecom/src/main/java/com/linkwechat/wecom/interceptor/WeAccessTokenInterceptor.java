@@ -5,23 +5,23 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
-import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.ForestDataType;
 import com.linkwechat.common.config.WeComeConfig;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * @description: 微信token拦截器
  * @author: HaoN
  * @create: 2020-08-27 22:36
  **/
+@Slf4j
 @Component
 public class WeAccessTokenInterceptor implements Interceptor{
 
@@ -42,8 +42,12 @@ public class WeAccessTokenInterceptor implements Interceptor{
     public boolean beforeExecute(ForestRequest request) {
 
 
-        String uri=request.getUrl().replace("http://","");
 
+
+
+
+        String uri=request.getUrl().replace("http://","");
+        log.info(">>>>>>>>>>>>>>>>>>>>>>>>uri：{}",uri);
         //request.setContentType("application/json");
         if(!Arrays.asList(weComeConfig.getFileUplodUrl()).contains(uri)){
             request.setDataType(ForestDataType.JSON);
@@ -62,8 +66,13 @@ public class WeAccessTokenInterceptor implements Interceptor{
                 token=iWeAccessTokenService.findProviderAccessToken();
             }else if(Arrays.asList(weComeConfig.getNeedChatTokenUrl()).contains(uri)){ //需要会话存档token
                 token=iWeAccessTokenService.findChatAccessToken();
-            }else{
+            }else  if(Arrays.asList(weComeConfig.getThirdAppUrl()).contains(uri)){ //第三方自建应用token
+                token=iWeAccessTokenService.findThirdAppAccessToken(request.getHeaderValue(WeConstans.THIRD_APP_PARAM_TIP));
+            } else{
                 token=iWeAccessTokenService.findCommonAccessToken();
+            }
+            if (uri.contains("ticket/get")){
+                request.addQuery("type","agent_config");
             }
 
             request.addQuery("access_token",token);
@@ -99,13 +108,10 @@ public class WeAccessTokenInterceptor implements Interceptor{
      */
     @Override
     public void onSuccess(Object o, ForestRequest forestRequest, ForestResponse forestResponse) {
-
+        log.info("url:【{}】,result:【{}】",forestRequest.getUrl(),forestResponse.getContent());
         WeResultDto weResultDto = JSONUtil.toBean(forestResponse.getContent(), WeResultDto.class);
-
         if(null != weResultDto.getErrcode() && !weResultDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)&& !weResultDto.getErrcode().equals(WeConstans.NOT_EXIST_CONTACT) ){
-
             throw new ForestRuntimeException(forestResponse.getContent());
-
         }
 
     }

@@ -30,6 +30,13 @@ public interface WeGroupCodeMapper  extends BaseMapper<WeGroupCode>
     public List<WeGroupCode> selectWeGroupCodeList(WeGroupCode weGroupCode);
 
     /**
+     * 根据群活码id查询群活码列表
+     * @param ids id列表
+     * @return 结果
+     */
+    public List<WeGroupCode> selectWeGroupCodeListByIds(List<String> ids);
+
+    /**
      * 新增客户群活码
      * 
      * @param weGroupCode 客户群活码
@@ -60,4 +67,11 @@ public interface WeGroupCodeMapper  extends BaseMapper<WeGroupCode>
      * @return 结果
      */
     public int deleteWeGroupCodeByIds(Long[] ids);
+
+    /**
+     * 检测活码名称是否唯一
+     * @param activityName 活码名称
+     * @return 结果
+     */
+    public int checkActivityNameUnique(String activityName);
 }

@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.client;
 
 import com.dtflys.forest.annotation.DataObject;
+import com.dtflys.forest.annotation.Header;
 import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
 import com.linkwechat.wecom.domain.dto.*;
@@ -91,4 +92,14 @@ public interface WeUserClient {
             type = "POST"
     )
     LeaveWeUserListsDto  leaveWeUsers();
+
+
+    /**
+     * 获取访问用户身份(内部应用)
+     * @param code
+     * @param agentId 应用的id,请求头中
+     * @return
+     */
+    @Request(url = "/user/getuserinfo")
+    WeUserInfoDto  getuserinfo(@Query("code")String code,@Header("agentId")String agentId);
 }

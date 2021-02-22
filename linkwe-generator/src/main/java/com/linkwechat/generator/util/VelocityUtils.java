@@ -63,6 +63,10 @@ public class VelocityUtils
         {
             setTreeVelocityContext(velocityContext, genTable);
         }
+        if (GenConstants.TPL_SUB.equals(tplCategory))
+        {
+            setSubVelocityContext(velocityContext, genTable);
+        }
         return velocityContext;
     }
 
@@ -94,6 +98,24 @@ public class VelocityUtils
         {
             context.put("tree_name", paramsObj.getString(GenConstants.TREE_NAME));
         }
+    }
+
+    public static void setSubVelocityContext(VelocityContext context, GenTable genTable)
+    {
+        GenTable subTable = genTable.getSubTable();
+        String subTableName = genTable.getSubTableName();
+        String subTableFkName = genTable.getSubTableFkName();
+        String subClassName = genTable.getSubTable().getClassName();
+        String subTableFkClassName = StringUtils.convertToCamelCase(subTableFkName);
+
+        context.put("subTable", subTable);
+        context.put("subTableName", subTableName);
+        context.put("subTableFkName", subTableFkName);
+        context.put("subTableFkClassName", subTableFkClassName);
+        context.put("subTableFkclassName", StringUtils.uncapitalize(subTableFkClassName));
+        context.put("subClassName", subClassName);
+        context.put("subclassName", StringUtils.uncapitalize(subClassName));
+        context.put("subImportList", getImportList(genTable.getSubTable()));
     }
 
     /**
@@ -197,6 +219,37 @@ public class VelocityUtils
         int lastIndex = packageName.lastIndexOf(".");
         String basePackage = StringUtils.substring(packageName, 0, lastIndex);
         return basePackage;
+    }
+
+
+    /**
+     * 根据列类型获取导入包
+     *
+     * @param genTable 业务表对象
+     * @return 返回需要导入的包列表
+     */
+    public static HashSet<String> getImportList(GenTable genTable)
+    {
+        List<GenTableColumn> columns = genTable.getColumns();
+        GenTable subGenTable = genTable.getSubTable();
+        HashSet<String> importList = new HashSet<String>();
+        if (StringUtils.isNotNull(subGenTable))
+        {
+            importList.add("java.util.List");
+        }
+        for (GenTableColumn column : columns)
+        {
+            if (!column.isSuperColumn() && GenConstants.TYPE_DATE.equals(column.getJavaType()))
+            {
+                importList.add("java.util.Date");
+                importList.add("com.fasterxml.jackson.annotation.JsonFormat");
+            }
+            else if (!column.isSuperColumn() && GenConstants.TYPE_BIGDECIMAL.equals(column.getJavaType()))
+            {
+                importList.add("java.math.BigDecimal");
+            }
+        }
+        return importList;
     }
 
     /**

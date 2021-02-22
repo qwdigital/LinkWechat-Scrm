@@ -55,6 +55,7 @@ public class WeMaterialController extends BaseController {
                 WeMaterial weMaterial = new WeMaterial();
                 weMaterial.setMaterialName(wePoster.getTitle());
                 weMaterial.setMaterialUrl(wePoster.getSampleImgPath());
+                weMaterial.setCategoryId(wePoster.getCategoryId());
                 weMaterial.setId(wePoster.getId());
                 return weMaterial;
             }).collect(Collectors.toList());
@@ -132,9 +133,9 @@ public class WeMaterialController extends BaseController {
         return AjaxResult.success();
     }
 
-    @PreAuthorize("@ss.hasPermi('wechat:material:temporaryMaterialMediaId')")
+    //@PreAuthorize("@ss.hasPermi('wechat:material:temporaryMaterialMediaId')")
     @Log(title = "获取素材media_id", businessType = BusinessType.OTHER)
-    @PostMapping("/temporaryMaterialMediaId")
+    @GetMapping("/temporaryMaterialMediaId")
     @ApiOperation("获取素材media_id")
     public AjaxResult temporaryMaterialMediaId(@RequestParam(value = "url") String url, @RequestParam(value = "type") String type,@RequestParam(value = "name") String name){
         WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(url, type,name);

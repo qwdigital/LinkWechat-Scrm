@@ -18,6 +18,12 @@ public class WeConstans {
 
 
     /**
+     * 自建应用token
+     */
+    public static final String WE_THIRD_APP_TOKEN = "we_third_app_token";
+
+
+    /**
      * 获取外部联系人相关 token
      */
     public static final String WE_CONTACT_ACCESS_TOKEN = "we_contact_access_token";
@@ -32,6 +38,15 @@ public class WeConstans {
      * 会话存档相关token
      */
     public static final String WE_CHAT_ACCESS_TOKEN = "we_chat_access_token";
+
+    /**
+     * 应用相关token
+     */
+    public static final String WE_AGENT_ACCESS_TOKEN = "we_agent_access_token";
+
+
+    public static final String WE_EMPLE_CODE_KEY = "we_emple_code_key";
+
 
 
     /**
@@ -104,6 +119,16 @@ public class WeConstans {
      * 企业微信素材目录根id
      */
     public static final Integer WE_ROOT_CATEGORY_ID = 0;
+
+    /**
+     * 实际群活码正在使用中
+     */
+    public static final Integer WE_GROUP_CODE_ENABLE = 0;
+
+    /**
+     * 群活码已禁用/达到扫码次数上限
+     */
+    public static final Integer WE_GROUP_CODE_DISABLE = 2;
 
 
     /**
@@ -204,6 +229,7 @@ public class WeConstans {
      */
     public static final Integer USE_SCOP_BUSINESSID_TYPE_USER = 2;
     public static final Integer USE_SCOP_BUSINESSID_TYPE_ORG = 1;
+    public static final Integer USE_SCOP_BUSINESSID_TYPE_ALL = 3;
 
     /**
      * 客户流失通知开关 0:关闭 1:开启
@@ -225,6 +251,15 @@ public class WeConstans {
      */
     public static final long LIMIT = 1_000L;
 
+    /**
+     * 敏感词过滤查询用户分片
+     */
+    public static final Integer SENSITIVE_USER_PIECE = 50;
+
+    /**
+     * 任务裂变用户活码state前缀
+     */
+    public static final String FISSION_PREFIX = "fis-";
 
     public static final String AppTicketKey = "ticket:AppGet";
     public static final String AgentTicketKey = "ticket:AgentGet";
@@ -240,6 +275,10 @@ public class WeConstans {
             put("batch_job_result", "weEventBatchJobResultImpl");
             //外部联系人事件
             put("change_external_contact", "weEventChangeExternalContactImpl");
+            //客户群事件
+            put("change_external_chat", "weEventChangeExternalChatImpl");
+            //客户标签事件
+            put("change_external_tag", "weEventChangeExternalTagImpl");
         }
     };
 
@@ -291,7 +330,49 @@ public class WeConstans {
 
     }
 
-    public static final String WECOM_FINANCE_INDEX = "finance";
+    public static enum sendMessageStatusEnum {
+
+        NOT_SEND("0", "未发送"),
+        SEND("1", "已发送"),
+        NOT_FRIEND_SEND("2", "因客户不是好友导致发送失败"),
+        RECEIVE_OTHER_MESSAGE("3", "-因客户已经收到其他群发消息导致发送失败"),
+        ;
+
+        private String status;
+        private String desc;
+
+        /**
+         * 构造方法
+         *
+         * @param status
+         * @param desc
+         */
+        sendMessageStatusEnum(String status, String desc) {
+            this.setStatus(status);
+            this.setDesc(desc);
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String key) {
+            this.status = status;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
+
+        public void setDesc(String desc) {
+            this.desc = desc;
+        }
+
+    }
+
+
+    //public static final String WECOM_FINANCE_INDEX = "finance";
+    public static final String WECOM_FINANCE_INDEX = "finance_new";
 
     public static final String WECOM_SENSITIVE_HIT_INDEX = "sensitive";
 
@@ -299,4 +380,33 @@ public class WeConstans {
      * 开启会话存档成员列表
      **/
     public static final String weMsgAuditKey = "wecom_msg_audit:user:ids";
+
+
+    /**
+     * 第三方应用ID，参数标实
+     */
+    public static final String THIRD_APP_PARAM_TIP = "agentId";
+
+    public static final String WECUSTOMERS_KEY="weCustomer";
+
+    /**
+     * 发给客户
+     */
+    public static final String SEND_MESSAGE_CUSTOMER = "0";
+
+    /**
+     * 发给客户群
+     */
+    public static final String SEND_MESSAGE_GROUP="1";
+
+    /**
+     * 消息范围 1 指定客户
+     */
+    public static final String SEND_MESSAGE_CUSTOMER_ALL = "0";
+
+    /**
+     * 消息范围 1 指定客户
+     */
+    public static final String SEND_MESSAGE_CUSTOMER_PART="1";
+
 }

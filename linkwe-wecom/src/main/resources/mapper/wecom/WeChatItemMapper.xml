@@ -5,20 +5,20 @@
 <mapper namespace="com.linkwechat.wecom.mapper.WeChatItemMapper">
     <insert id="addItem">
         INSERT INTO
-            we_chat_item(item_id,side_id,material_id,create_by,create_time,update_by,update_time)
+        we_chat_item(item_id,side_id,material_id,create_by,create_time,update_by,update_time)
         VALUES
         <if test="items!=null and items.size()>0">
-            <foreach collection="items" open="(" separator="," item="item" close=")">
-                #{item.itemId},#{item.sideId},#{item.materialId},#{item.createBy},#{item.createTime},#{item.updateBy},#{item.updateTime}
+            <foreach collection="items" separator="," item="item" >
+                (#{item.itemId},#{item.sideId},#{item.materialId},#{item.createBy},#{item.createTime},#{item.updateBy},#{item.updateTime})
             </foreach>
         </if>
     </insert>
     <delete id="dropItem">
-         DELETE FROM
-           we_chat_item
-         <where>
-             side_id=#{sideId}
-         </where>
+        DELETE FROM
+        we_chat_item
+        <where>
+            side_id=#{sideId}
+        </where>
     </delete>
 
     <select id="findChatItems" resultType="com.linkwechat.wecom.domain.vo.WeChatSideVo">
@@ -27,13 +27,44 @@
         wm.material_name,
         wm.material_url,
         wm.content,
-        wc.media_type
+        wc.media_type,
+        wm.cover_url,
+        (
+            SELECT
+            COUNT(1)
+            FROM
+            we_chat_collection
+            WHERE
+            material_id = wci.material_id
+            AND user_id = #{userId}
+        ) collection,
+        wci.create_time
         FROM
         we_chat_item wci
         LEFT JOIN we_material wm ON wci.material_id = wm.id
         LEFT JOIN we_category wc ON wm.category_id = wc.id
         <where>
             wci.side_id=#{sideId}
+            <if test="keyword!=null and keyword!=''">
+                <if test="mediaType!=null and mediaType=='0'.toString()">
+                    AND wm.content LIKE CONCAT('%',#{keyword},'%')
+                </if>
+                <if test="mediaType!=null and mediaType=='1'.toString()">
+                    AND wm.material_name LIKE CONCAT('%',#{keyword},'%')
+                </if>
+                <if test="mediaType!=null and mediaType=='2'.toString()">
+                    AND wm.material_name LIKE CONCAT('%',#{keyword},'%')
+                </if>
+                <if test="mediaType!=null and mediaType=='3'.toString()">
+                    AND wm.material_name LIKE CONCAT('%',#{keyword},'%')
+                </if>
+                <if test="mediaType!=null and mediaType=='4'.toString()">
+                    AND wm.content LIKE CONCAT('%',#{keyword},'%')
+                </if>
+                <if test="mediaType!=null and mediaType=='5'.toString()">
+                    AND wm.material_name LIKE CONCAT('%',#{keyword},'%')
+                </if>
+            </if>
         </where>
     </select>
 </mapper>

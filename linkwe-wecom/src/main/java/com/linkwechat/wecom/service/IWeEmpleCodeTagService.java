@@ -31,6 +31,14 @@ public interface IWeEmpleCodeTagService extends IService<WeEmpleCodeTag>
     public List<WeEmpleCodeTag> selectWeEmpleCodeTagListById(Long empleCodeId);
 
     /**
+     * 查询员工活码标签列表
+     *
+     * @param empleCodeIdList 员工活码ids
+     * @return 员工活码标签集合
+     */
+    List<WeEmpleCodeTag> selectWeEmpleCodeTagListByIds(List<Long> empleCodeIdList);
+
+    /**
      * 新增员工活码标签
      *
      * @param weEmpleCodeTag 员工活码标签
@@ -76,4 +84,6 @@ public interface IWeEmpleCodeTagService extends IService<WeEmpleCodeTag>
      * @return
      */
     public int batchRemoveWeEmpleCodeTagIds(List<Long> ids);
+
+
 }

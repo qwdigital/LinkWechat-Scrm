@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 会话存档业务实现类
  * @date 2020/12/19 14:00
  **/
@@ -184,6 +184,11 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
         if(StringUtils.isNotEmpty(query.getCustomerName())){
             boolQueryBuilder.must(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("fromInfo.name",query.getCustomerName()))
                     .must(QueryBuilders.existsQuery("fromInfo.externalUserid")));
+        }
+
+        //消息动作
+        if(StringUtils.isNotEmpty(query.getAction())){
+            boolQueryBuilder.must(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("action",query.getAction())));
         }
 
         //关键词查询并高亮显示
