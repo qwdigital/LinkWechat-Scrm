@@ -357,6 +357,7 @@ export default {
         qrCodeHandler () {
             // let codeUrl = 'https://images.gitee.com/uploads/images/2020/1231/234016_20fdd151_1480777.png';
             this.activateImageMode();
+            // 暂时写死二维码
             this.addImage(qrCodeImage, 3);
         },
         clearObjects () {
@@ -511,7 +512,8 @@ export default {
             this.editorInstance.addImageObject(imgPath).then(objectProps => {
                 
                 let target = {}
-                target.url = imgPath;
+                // 二维码是占位符，所以可以写死 
+                target.url = type === 3 ? 'http://www.linkwechat.cn/static/img/qrCodeImage.a6d01316.png' : imgPath;
                 target.randomId = objectProps.id;
                 target.objType = type;
                 // 将图片数据传给父组件保存

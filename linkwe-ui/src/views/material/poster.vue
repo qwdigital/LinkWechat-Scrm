@@ -346,7 +346,7 @@ export default {
     // },
     // 获取子组件传来的数据
     getImgData(data) {
-      this.imgList.id = data
+      this.imgList[data.randomId] = data
     },
     // 选择素材确认按钮
     submitSelectMaterial(text, image, file) {
@@ -427,8 +427,8 @@ export default {
           fontId: isText ? i : null,   // 字体ID   与imgPath互斥
           fontSize: vo.fontSize,
           fontTextAlign: align, // 1 2 3  left center right
-          left: vo.left,
-          top: vo.top,
+          left: parseInt(vo.left),
+          top: parseInt(vo.top),
           width: vo.width,
           height: vo.height,
           imgPath: vo.url || '',
