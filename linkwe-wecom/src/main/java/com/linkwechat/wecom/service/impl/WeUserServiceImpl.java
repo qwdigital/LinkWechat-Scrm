@@ -222,8 +222,9 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
         List<WeUser> weUsers
                 = weUserClient.list(WeConstans.WE_ROOT_DEPARMENT_ID, WeConstans.DEPARTMENT_SUB_WEUSER).getWeUsers();
         if(CollectionUtil.isNotEmpty(weUsers)){
-
-            this.saveOrUpdateBatch(weUsers);
+            weUsers.forEach(userInfo ->{
+                insertWeUserNoToWeCom(userInfo);
+            });
         }
 
     }
