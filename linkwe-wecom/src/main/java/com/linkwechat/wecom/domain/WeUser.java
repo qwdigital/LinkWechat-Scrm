@@ -114,7 +114,7 @@ public class WeUser
 
     private String remark;
 
-
+    @TableField(exist = false)
     private String departmentStr;
 
 
