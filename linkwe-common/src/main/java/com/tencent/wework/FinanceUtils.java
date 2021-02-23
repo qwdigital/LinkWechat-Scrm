@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.config.RuoYiConfig;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.utils.DateUtils;
@@ -244,6 +245,7 @@ public class FinanceUtils {
         getPath(realJsonData, msgType, fileName);
     }
 
+    //本地存储
     private static void getPath(JSONObject realJsonData, String msgType, String fileName) {
         String filePath = getFilePath(msgType);
         JSONObject data = Optional.ofNullable(realJsonData.getJSONObject(msgType))
@@ -254,7 +256,14 @@ public class FinanceUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        data.put("attachment", filePath + "/" + fileName);
+        String currentDir = StringUtils.substring(filePath,downloadWeWorkPath.length()+1);
+        String pathFileName;
+        if(org.apache.commons.lang3.StringUtils.isBlank(currentDir)){
+            pathFileName = Constants.RESOURCE_PREFIX + "/" +fileName;
+        }else {
+            pathFileName = Constants.RESOURCE_PREFIX + "/" + currentDir + "/" + fileName;
+        }
+        data.put("attachment", pathFileName);
         if (realJsonData.containsKey("content")) {
             realJsonData.put("content", data);
         } else {
