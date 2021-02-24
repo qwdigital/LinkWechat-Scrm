@@ -3,16 +3,21 @@ package com.tencent.wework;
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.config.RuoYiConfig;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.file.FileUploadUtils;
+import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.common.utils.uuid.IdUtils;
 import com.linkwechat.common.utils.wecom.RSAUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.security.PrivateKey;
 import java.util.ArrayList;
@@ -244,6 +249,7 @@ public class FinanceUtils {
         getPath(realJsonData, msgType, fileName);
     }
 
+    /*//本地存储
     private static void getPath(JSONObject realJsonData, String msgType, String fileName) {
         String filePath = getFilePath(msgType);
         JSONObject data = Optional.ofNullable(realJsonData.getJSONObject(msgType))
@@ -254,7 +260,39 @@ public class FinanceUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        data.put("attachment", filePath + "/" + fileName);
+        String currentDir = StringUtils.substring(filePath,downloadWeWorkPath.length()+1);
+        String pathFileName;
+        if(org.apache.commons.lang3.StringUtils.isBlank(currentDir)){
+            pathFileName = Constants.RESOURCE_PREFIX + "/" +fileName;
+        }else {
+            pathFileName = Constants.RESOURCE_PREFIX + "/" + currentDir + "/" + fileName;
+        }
+        data.put("attachment", pathFileName);
+        if (realJsonData.containsKey("content")) {
+            realJsonData.put("content", data);
+        } else {
+            realJsonData.put(msgType, data);
+        }
+
+    }*/
+
+    //云存储
+    private static void getPath(JSONObject realJsonData, String msgType, String fileName) {
+        String filePath = getFilePath(msgType);
+        JSONObject data = Optional.ofNullable(realJsonData.getJSONObject(msgType))
+                .orElse(realJsonData.getJSONObject("content"));
+        String sdkfileid = data.getString("sdkfileid");
+        try {
+            getMediaData(sdkfileid, "", "", filePath, fileName);
+            CosConfig cosConfig = SpringUtils.getBean(CosConfig.class);
+            String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
+            StringBuilder cosUrl = new StringBuilder(cosConfig.getImgUrlPrefix());
+            String cosFilePath = FileUploadUtils.upload2Cos(new FileInputStream(filePath + fileName), suffix, cosConfig);
+            cosUrl.append(cosFilePath);
+            data.put("attachment", cosUrl.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (realJsonData.containsKey("content")) {
             realJsonData.put("content", data);
         } else {

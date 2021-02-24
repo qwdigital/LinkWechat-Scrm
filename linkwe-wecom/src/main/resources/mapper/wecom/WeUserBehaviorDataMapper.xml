@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeUserBehaviorDataMapper">
+    
+    <resultMap type="WeUserBehaviorData" id="WeUserBehaviorDataResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="statTime"    column="stat_time"    />
+        <result property="newApplyCnt"    column="new_apply_cnt"    />
+        <result property="newContactCnt"    column="new_contact_cnt"    />
+        <result property="chatCnt"    column="chat_cnt"    />
+        <result property="messageCnt"    column="message_cnt"    />
+        <result property="replyPercentage"    column="reply_percentage"    />
+        <result property="avgReplyTime"    column="avg_reply_time"    />
+        <result property="negativeFeedbackCnt"    column="negative_feedback_cnt"    />
+    </resultMap>
+
+
+</mapper>
