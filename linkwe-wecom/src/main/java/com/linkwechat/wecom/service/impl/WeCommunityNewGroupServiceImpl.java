@@ -152,7 +152,7 @@ public class WeCommunityNewGroupServiceImpl  extends ServiceImpl<WeCommunityNewG
             weCommunityNewGroupVo.setWeEmpleCodeTags(tagList.stream()
                     .filter(tag -> tag.getEmpleCodeId().equals(weCommunityNewGroupVo.getNewGroupId())).collect(Collectors.toList()));
         }
-        return weCommunityNewGroupMapper.selectWeCommunityNewGroupById(newGroupId);
+        return weCommunityNewGroupVo;
     }
 
     private List<WeGroupCodeActual> getWeGroupCodeActuals(WeCommunityNewGroupVo weCommunityNewGroupVo) {
