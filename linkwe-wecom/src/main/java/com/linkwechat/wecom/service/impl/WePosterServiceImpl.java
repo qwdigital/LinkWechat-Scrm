@@ -133,7 +133,7 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
                     }
                 })
                 .collect(Collectors.toMap(WePosterSubassembly::getFontId, wePosterSubassembly -> posterFontService.getFont(wePosterSubassembly.getFontId(), wePosterSubassembly.getFontSize(),wePosterSubassembly.getFontStyle())));
-        Map<String, NetFileUtils.FileCallable> fileCallableMap = poster.getPosterSubassemblyList().stream().filter(wePosterSubassembly -> StringUtils.isNotBlank(wePosterSubassembly.getImgPath())).distinct().collect(Collectors.toMap(WePosterSubassembly::getImgPath, wePosterSubassembly -> NetFileUtils.getNetFile(wePosterSubassembly.getImgPath())));
+        Map<String, NetFileUtils.FileCallable> fileCallableMap = poster.getPosterSubassemblyList().stream().map(WePosterSubassembly::getImgPath).filter(StringUtils::isNotBlank).distinct().collect(Collectors.toMap(s->s, NetFileUtils::getNetFile));
         if (CollectionUtils.isEmpty(fileCallableMap)) {
             fileCallableMap = new HashMap<>();
         }
