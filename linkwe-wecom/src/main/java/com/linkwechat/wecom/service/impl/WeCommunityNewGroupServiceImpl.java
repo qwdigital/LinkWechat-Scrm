@@ -2,12 +2,11 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Lists;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.wecom.client.WeExternalContactClient;
-import com.linkwechat.wecom.domain.WeCommunityNewGroup;
-import com.linkwechat.wecom.domain.WeEmpleCode;
-import com.linkwechat.wecom.domain.WeGroupCode;
+import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.WeCommunityNewGroupDto;
 import com.linkwechat.wecom.domain.dto.WeExternalContactDto;
 import com.linkwechat.wecom.domain.vo.WeCommunityNewGroupVo;
@@ -16,12 +15,14 @@ import com.linkwechat.wecom.mapper.WeGroupCodeMapper;
 import com.linkwechat.wecom.service.IWeCommunityNewGroupService;
 import com.linkwechat.wecom.service.IWeEmpleCodeTagService;
 import com.linkwechat.wecom.service.IWeEmpleCodeUseScopService;
+import com.linkwechat.wecom.service.IWeGroupCodeActualService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 社群运营 新客自动拉群
@@ -51,6 +52,9 @@ public class WeCommunityNewGroupServiceImpl  extends ServiceImpl<WeCommunityNewG
 
     @Autowired
     private WeExternalContactClient weExternalContactClient;
+
+    @Autowired
+    private IWeGroupCodeActualService weGroupCodeActualService;
 
     @Override
     public int add(WeCommunityNewGroupDto communityNewGroupDto) {
@@ -112,12 +116,49 @@ public class WeCommunityNewGroupServiceImpl  extends ServiceImpl<WeCommunityNewG
 
     @Override
     public List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(WeCommunityNewGroup communityNewGroup) {
-        return weCommunityNewGroupMapper.selectWeCommunityNewGroupList(communityNewGroup);
+        List<WeCommunityNewGroupVo> weCommunityNewGroupVos = weCommunityNewGroupMapper.selectWeCommunityNewGroupList(communityNewGroup);
+        if(CollectionUtil.isNotEmpty(weCommunityNewGroupVos)){
+            List<Long> newGroupIdList = weCommunityNewGroupVos.stream().map(WeCommunityNewGroupVo::getNewGroupId).collect(Collectors.toList());
+            List<WeEmpleCodeUseScop> useScopList = iWeEmpleCodeUseScopService.selectWeEmpleCodeUseScopListByIds(newGroupIdList);
+            List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.selectWeEmpleCodeTagListByIds(newGroupIdList);
+            weCommunityNewGroupVos.forEach(newGroup -> {
+                List<WeGroupCodeActual> weGroupCodeActuals = getWeGroupCodeActuals(newGroup);
+                newGroup.setWeGroupUserScops(weGroupCodeActuals);
+                //活码使用人对象
+                List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = useScopList.stream()
+                        .filter(useScop -> useScop.getEmpleCodeId().equals(newGroup.getNewGroupId())).collect(Collectors.toList());
+                newGroup.setWeEmpleCodeUseScops(weEmpleCodeUseScopList);
+                //员工活码标签对象
+                newGroup.setWeEmpleCodeTags(tagList.stream()
+                        .filter(tag -> tag.getEmpleCodeId().equals(newGroup.getNewGroupId())).collect(Collectors.toList()));
+            });
+        }
+        return weCommunityNewGroupVos;
     }
 
     @Override
     public WeCommunityNewGroupVo selectWeCommunityNewGroupById(Long newGroupId) {
+        WeCommunityNewGroupVo weCommunityNewGroupVo = weCommunityNewGroupMapper.selectWeCommunityNewGroupById(newGroupId);
+        if(null!=weCommunityNewGroupVo){
+            List<WeGroupCodeActual> weGroupCodeActuals = getWeGroupCodeActuals(weCommunityNewGroupVo);
+            weCommunityNewGroupVo.setWeGroupUserScops(weGroupCodeActuals);
+            List<WeEmpleCodeUseScop> useScopList = iWeEmpleCodeUseScopService.selectWeEmpleCodeUseScopListByIds(Lists.newArrayList(weCommunityNewGroupVo.getNewGroupId()));
+            List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.selectWeEmpleCodeTagListByIds(Lists.newArrayList(weCommunityNewGroupVo.getNewGroupId()));
+            //活码使用人对象
+            List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = useScopList.stream()
+                    .filter(useScop -> useScop.getEmpleCodeId().equals(weCommunityNewGroupVo.getNewGroupId())).collect(Collectors.toList());
+            weCommunityNewGroupVo.setWeEmpleCodeUseScops(weEmpleCodeUseScopList);
+            //员工活码标签对象
+            weCommunityNewGroupVo.setWeEmpleCodeTags(tagList.stream()
+                    .filter(tag -> tag.getEmpleCodeId().equals(weCommunityNewGroupVo.getNewGroupId())).collect(Collectors.toList()));
+        }
         return weCommunityNewGroupMapper.selectWeCommunityNewGroupById(newGroupId);
+    }
+
+    private List<WeGroupCodeActual> getWeGroupCodeActuals(WeCommunityNewGroupVo weCommunityNewGroupVo) {
+        WeGroupCodeActual weGroupCodeActual = new WeGroupCodeActual();
+        weGroupCodeActual.setGroupCodeId(weCommunityNewGroupVo.getNewGroupId());
+        return weGroupCodeActualService.selectWeGroupCodeActualList(weGroupCodeActual);
     }
 
     @Override
