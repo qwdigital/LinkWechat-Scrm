@@ -326,7 +326,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
      * @param weContactWay
      * @return
      */
-    private WeExternalContactDto getQrCode(WeExternalContactDto.WeContactWay weContactWay) {
+    public WeExternalContactDto getQrCode(WeExternalContactDto.WeContactWay weContactWay) {
         try {
             return weExternalContactClient.addContactWay(weContactWay);
         } catch (Exception e) {
@@ -340,7 +340,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
      * @param weEmpleCode 员工活码实体类
      * @return 企微接口参数实体类
      */
-    private WeExternalContactDto.WeContactWay getWeContactWay(WeEmpleCode weEmpleCode) {
+    public WeExternalContactDto.WeContactWay getWeContactWay(WeEmpleCode weEmpleCode) {
         WeExternalContactDto.WeContactWay weContactWay = new WeExternalContactDto.WeContactWay();
         List<WeEmpleCodeUseScop> weEmpleCodeUseScops = weEmpleCode.getWeEmpleCodeUseScops();
         //根据类型生成相应的活码

@@ -25,11 +25,6 @@ public class WeCommunityNewGroupVo {
     private Long newGroupId;
 
     /**
-     *员工活码ID
-     */
-    private Long empleCodeId;
-
-    /**
      * 员工活码名称
      */
     private String empleCodeName;
@@ -80,6 +75,11 @@ public class WeCommunityNewGroupVo {
      */
     @TableField(exist = false)
     private WeMaterial weMaterial;
+
+    /**
+     * 素材的id
+     */
+    private Long mediaId;
 
     /**
      * 实际群聊

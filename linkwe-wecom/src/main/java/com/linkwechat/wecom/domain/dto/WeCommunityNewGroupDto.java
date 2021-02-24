@@ -39,12 +39,6 @@ public class WeCommunityNewGroupDto {
     private List<WeEmpleCodeTag> weEmpleCodeTags;
 
     /**
-     * 员工活码 id
-     */
-    @TableField(exist = false)
-    private Long weEmpleCodeId;
-
-    /**
      * 群活码ID
      */
     private Long groupCodeId;
@@ -53,5 +47,15 @@ public class WeCommunityNewGroupDto {
      * 客户添加时无需经过确认自动成为好友:1:是;0:否
      */
     private Boolean isJoinConfirmFriends;
+
+    /**
+     * 二维码链接
+     */
+    private String qrCode;
+
+    /**
+     * 素材的id
+     */
+    private Long mediaId;
 
 }
