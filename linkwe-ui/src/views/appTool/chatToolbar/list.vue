@@ -224,6 +224,7 @@ export default {
       <SelectMaterialMult
         :selected.sync="selectedMaterial"
         :type="metarialParams.mediaType"
+        :key="metarialParams.mediaType"
       ></SelectMaterialMult>
       <div slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>

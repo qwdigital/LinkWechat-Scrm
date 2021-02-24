@@ -106,13 +106,15 @@ export default {
       let { msgid, messageId } = data
       syncMsg({ msgid, messageId })
         .then(({ data }) => {
+          this.msgSuccess('同步成功')
+          this.getList()
           // this.list = rows
           // this.total = +total
           // this.loading = false
           // this.ids = []
         })
         .catch(() => {
-          this.loading = false
+          // this.loading = false
         })
     },
   },

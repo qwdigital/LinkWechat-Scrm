@@ -1,5 +1,5 @@
 <script>
-import * as api from "@/api/customer";
+import * as api from '@/api/customer'
 // import clipboard from "clipboard";
 
 export default {
@@ -10,7 +10,7 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        name: ""
+        name: '',
       },
       dateRange: [], // 添加日期
       total: 0,
@@ -20,18 +20,18 @@ export default {
       disabled: false,
       loading: false,
       rules: Object.freeze({
-        name: [{ required: true, message: "必填项", trigger: "blur" }],
-        corpId: [{ required: true, message: "必填项", trigger: "blur" }],
-        corpSecret: [{ required: true, message: "必填项", trigger: "blur" }],
-        contactSecret: [{ required: true, message: "必填项", trigger: "blur" }]
+        name: [{ required: true, message: '必填项', trigger: 'blur' }],
+        corpId: [{ required: true, message: '必填项', trigger: 'blur' }],
+        corpSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
+        contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
       }),
-      status: ["正常", "停用"]
-    };
+      status: ['正常', '停用'],
+    }
   },
   watch: {},
   computed: {},
   created() {
-    this.getList();
+    this.getList()
   },
   mounted() {
     // new clipboard(".copy-btn");
@@ -39,59 +39,62 @@ export default {
   methods: {
     getList(page) {
       if (this.dateRange[0]) {
-        this.query.beginTime = this.dateRange[0];
-        this.query.endTime = this.dateRange[1];
+        this.query.beginTime = this.dateRange[0]
+        this.query.endTime = this.dateRange[1]
       } else {
-        this.query.beginTime = "";
-        this.query.endTime = "";
+        this.query.beginTime = ''
+        this.query.endTime = ''
       }
-      page && (this.query.pageNum = page);
-      this.loading = true;
+      page && (this.query.pageNum = page)
+      this.loading = true
       api
         .getList(this.query)
         .then(({ rows, total }) => {
-          this.list = rows;
-          this.total = +total;
-          this.loading = false;
+          this.list = rows
+          this.total = +total
+          this.loading = false
         })
         .catch(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
     edit(data, type) {
-      this.form = Object.assign({}, data || {});
-      this.dialogVisible = true;
-      type || !data ? (this.disabled = false) : (this.disabled = true);
+      this.form = Object.assign({}, data || {})
+      this.dialogVisible = true
+      type || !data ? (this.disabled = false) : (this.disabled = true)
     },
     submit() {
-      this.$refs["form"].validate(valid => {
+      this.$refs['form'].validate((valid) => {
         if (valid) {
-          api[this.form.id ? "update" : "add"](this.form)
+          api[this.form.id ? 'update' : 'add'](this.form)
             .then(() => {
-              this.msgSuccess("操作成功");
-              this.dialogVisible = false;
-              this.getList(!this.form.id && 1);
+              this.msgSuccess('操作成功')
+              this.dialogVisible = false
+              this.getList(!this.form.id && 1)
             })
             .catch(() => {
-              this.dialogVisible = false;
-            });
+              this.dialogVisible = false
+            })
         }
-      });
+      })
     },
     goRoute(id, path) {
       this.$router.push({
-        path: "/communityOperating/oldCustomerAev",
-        query: { id }
-      });
-    }
-  }
-};
+        path: '/communityOperating/oldCustomerAev',
+        query: { id },
+      })
+    },
+  },
+}
 </script>
 
 <template>
   <div>
     <div class="top-search">
       <el-form inline label-position="right" :model="form" label-width="80px">
+        <el-form-item label="任务名称">
+          <el-input v-model="query.name" placeholder="请输入"></el-input>
+        </el-form-item>
         <el-form-item label="发送方式">
           <el-select v-model="query.pushType" placeholder="请选择" size="small">
             <el-option
@@ -102,8 +105,20 @@ export default {
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="任务名称">
+        <el-form-item label="创建人">
           <el-input v-model="query.name" placeholder="请输入"></el-input>
+        </el-form-item>
+        <el-form-item label="创建时间">
+          <el-date-picker
+            v-model="dateRange"
+            value-format="yyyy-MM-dd"
+            type="daterange"
+            :picker-options="pickerOptions"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            align="right"
+          ></el-date-picker>
         </el-form-item>
         <el-form-item label>
           <el-button type="primary" @click="getList(1)">查询</el-button>
@@ -126,21 +141,23 @@ export default {
     <el-table v-loading="loading" :data="list">
       <!-- <el-table-column type="selection" width="50" align="center" /> -->
       <el-table-column
-        label="任务活动名称"
+        label="任务名称"
         align="center"
         prop="name"
         :show-overflow-tooltip="true"
       />
-      <el-table-column prop="createTime" label="裂变客户数量" align="center">
+      <el-table-column prop="createTime" label="发送方式" align="center">
+      </el-table-column>
+      <el-table-column prop="createTime" label="当前群人数" align="center">
         <template slot-scope="scope">{{
           Math.floor(Math.random() * 10000)
         }}</template>
       </el-table-column>
-      <el-table-column prop="createTime" label="活动状态" align="center">
-        已结束
+
+      <el-table-column prop="createTime" label="创建人" align="center">
       </el-table-column>
       <el-table-column
-        label="活动时间"
+        label="创建时间"
         align="center"
         prop="createTime"
         width="160"
@@ -158,7 +175,7 @@ export default {
             type="text"
             icon="el-icon-view"
             @click="edit(scope.row, 0)"
-            >查看</el-button
+            >删除</el-button
           >
           <el-button
             v-hasPermi="['enterpriseWechat:edit']"
@@ -222,7 +239,7 @@ export default {
             <el-radio label="label">开启</el-radio>
             <el-radio label="label">不开启</el-radio>
           </el-radio-group>
-          <div>开启后，可以将成员、部门的增删改以及成员的标签变更实时的同步到塬微SCRM，无需手动更新同步。</div>
+          <div>开启后，可以将成员、部门的增删改以及成员的标签变更实时的同步到仟微SCRM，无需手动更新同步。</div>
         </el-form-item>-->
         <el-form-item label="外部联系人管理secret" prop="contactSecret">
           <el-input v-model="form.contactSecret"></el-input>
@@ -232,7 +249,7 @@ export default {
             <el-radio label="label">开启</el-radio>
             <el-radio label="label">不开启</el-radio>
           </el-radio-group>
-          <div>开启后，可以将企业客户的添加、编辑以及主动删除客户和被动被客户删除实时的同步到塬微SCRM，无需手动更新同步。</div>
+          <div>开启后，可以将企业客户的添加、编辑以及主动删除客户和被动被客户删除实时的同步到仟微SCRM，无需手动更新同步。</div>
         </el-form-item>-->
         <el-form-item
           label="企业微信扫码登陆回调地址"

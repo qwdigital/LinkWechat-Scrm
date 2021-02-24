@@ -1,6 +1,16 @@
 import request from '@/utils/request'
 import { dataURLtoFile } from '@/utils/common'
 
+const service = window.CONFIG.services.common
+
+export function upload(data) {
+  return request({
+    url: service + '/uploadFile2Cos',
+    method: 'POST',
+    data,
+  })
+}
+
 /**
  * 下载网络连接文件
  * @param {*} params 
