@@ -47,6 +47,7 @@
                 <upload
                   :fileUrl.sync="form.activityHeadUrl"
                   class="image-uploader"
+                  @update:file="handleUploadedHeadImage"
                 >
                   <div slot="tip">
                     注: 只支持2M以内的jpg/png格式图片
@@ -184,6 +185,9 @@
 
 <script>
 import { add, update, getDetail } from '@/api/drainageCode/group'
+import { uploadDataURL } from '@/api/common'
+import { v4 as uuidv4 } from 'uuid'
+import { AwesomeQR } from 'awesome-qr'
 
 export default {
   props: {
@@ -203,8 +207,16 @@ export default {
         guide: '',
         joinGroupIsTip: 0,
         tipMsg: '',
-        customerServerQrCode: ''
+        customerServerQrCode: '',
+        // 生成的群活码UUID
+        uuid: '',
+        // 群活码链接
+        codeUrl: ''
       },
+      // 活码头像数据
+      headImage: null,
+      // 群活码H5页面地址
+      h5uri: '',
       rules: {
         activityName: [
           { required: true, message: '请输入活码名称', trigger: 'blur' }
@@ -219,13 +231,57 @@ export default {
   methods: {
     // 新增群活码
     add () {
-      this.$refs.form.validate((valid) => {
+      this.$refs.form.validate(async (valid) => {
         if (!valid) return
 
-        add(this.form).then((res) => {
-          this.$emit('next', res.id)
+        // 用来区分群活码，生成的二维码需要带有唯一区分信息，所以由前端生成
+        if (!this.form.uuid) {
+          this.form.uuid = uuidv4().replace(/-/g, '')
+        }
+
+        let options = {
+          text: this.qrCodeText,
+          size: 200,
+          margin: 0
+        }
+
+        // 添加logo信息
+        if (this.form.activityHeadUrl) {
+          options = Object.assign(options, {
+            logoImage: this.headImage,
+            logoMargin: 2,
+            logoCornerRadius: 3
+          })
+        }
+
+        const qr = new AwesomeQR(options)
+
+        qr.draw().then((dataURL) => {
+          // 上传群活码图片到云存储
+          uploadDataURL(dataURL).then((res) => {
+            if (res.code === 200) {
+              this.form.codeUrl = res.url
+
+              // 新增群活码数据至数据库
+              add(this.form).then((res) => {
+                this.$emit('next', res.id)
+              })
+            } else {
+            }
+          })
         })
       })
+    },
+
+    // 获取上传的头像数据
+    handleUploadedHeadImage (file) {
+      const reader = new FileReader()
+      reader.readAsDataURL(file.raw)
+
+      reader.onload = () => {
+        this.headImage = reader.result
+      }
+
     },
 
     // 更新群活码
@@ -252,7 +308,9 @@ export default {
             guide: res.data.guide,
             joinGroupIsTip: parseInt(res.data.joinGroupIsTip),
             tipMsg: res.data.tipMsg,
-            customerServerQrCode: res.data.customerServerQrCode
+            customerServerQrCode: res.data.customerServerQrCode,
+            uuid: res.data.uuid,
+            codeUrl: res.data.codeUrl
           }
         } else {
         }
@@ -264,7 +322,13 @@ export default {
       if (!this.groupCodeId) return this.add()
 
       this.update()
-      // this.$emit('next')
+      this.$emit('next')
+    }
+  },
+
+  computed: {
+    qrCodeText () {
+      return process.env.VUE_APP_BASE_API + this.h5uri + '?id=' + this.form.uuid
     }
   },
 

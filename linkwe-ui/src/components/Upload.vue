@@ -105,6 +105,7 @@ export default {
         // this.$emit('update:fileName', res.data.materialName)
         this.$emit('update:fileUrl', res.url)
         this.$emit('update:fileName', res.fileName)
+        this.$emit('update:file', file)
         // this.fileUrl = URL.createObjectURL(file.raw)
       }
     },
