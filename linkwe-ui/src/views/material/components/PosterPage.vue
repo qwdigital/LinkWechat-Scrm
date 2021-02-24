@@ -39,6 +39,7 @@ export default {
     },
     data() {
         return {
+            qrCodeUrl: 'http://www.linkwechat.cn/static/img/qrCodeImage.a6d01316.png',
             visible: false
         }
     },
@@ -86,25 +87,47 @@ export default {
     },
     methods: {
         // 设置背景图片
-        getBackgroundUrl(bacUrl) {
+        getBackgroundUrl(bacUrl, posterSubassemblyList) {
             this.editorInstance.loadImageFromURL(bacUrl, 'imagePoster').then(async result => {
                 console.log('old : ' + result.oldWidth + ', ' + result.oldHeight);
                 console.log('new : ' + result.newWidth + ', ' + result.newHeight);
+
+                // 由于篡改了tuiimage,第一次使用addText会报错，错误不影响流程，但是会导致promise中断，提前触发报错。
+                try {
+                    this.editorInstance.
+                    addText('', {
+                        position: {
+                            x: 0,
+                            y: 0
+                        },
+                    })
+                    .then(function (objectProps) {
+                        console.log('dd');
+                    }).catch(()=>{});
+                } catch (e) {
+                    console.log('addText 内部状态错误')
+                }
+                // FIXME 暂时延迟回显
+                setTimeout(()=>{
+                    posterSubassemblyList.length && this.reShowDisplay(posterSubassemblyList);
+                }, 500);
             });
         },
         // 设置修改回显
-        reShowDisplay (reShowDisplays) {
+        async reShowDisplay (reShowDisplays) {
             let i = 0,len = reShowDisplays.length;
             let _data = null;
             while (i < len) {
                 _data = reShowDisplays[i];
-                _data && this.createReShowDisplay(_data);
+                if (_data) {
+                    await this.createReShowDisplay(_data);
+                }
                 i ++;
             }
         },
         // 1 固定文本 2 固定图片 3 二维码图片
-        async createReShowDisplay(data) {
-            return Promise((resolve)=>{
+        createReShowDisplay(data) {
+            return new Promise((resolve)=>{
                 switch (data.type) {
                     case 1:
                         this.editorInstance.
@@ -118,16 +141,24 @@ export default {
                             console.log(objectProps);
                             resolve();
                         });
+                       
                     break;
                     case 2:
                     case 3:
-                        this.editorInstance.addImageObject(data.imgPath).then(objectProps => {
+                        this.editorInstance.addImageObject(
+                            data.type === 2 ? data.imgPath : 
+                            data.imgPath === this.qrCodeUrl ? qrCodeImage : data.imgPath
+                        ).then(objectProps => {
                             console.log(objectProps.id);
-                        }).then(function (objectProps) {
                             let target = {}
                             target.url = data.imgPath;
                             target.randomId = objectProps.id;
                             target.objType = data.type;
+
+                            this.editorInstance.setObjectProperties(objectProps.id, {
+                                left: data.left,
+                                top: data.top
+                            })
                             // 将图片数据传给父组件保存
                             this.$emit('getImageData', target);console.log(objectProps);
                             resolve()
@@ -513,7 +544,7 @@ export default {
                 
                 let target = {}
                 // 二维码是占位符，所以可以写死 
-                target.url = type === 3 ? 'http://www.linkwechat.cn/static/img/qrCodeImage.a6d01316.png' : imgPath;
+                target.url = type === 3 ? this.qrCodeUrl : imgPath;
                 target.randomId = objectProps.id;
                 target.objType = type;
                 // 将图片数据传给父组件保存

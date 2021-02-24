@@ -284,9 +284,7 @@ export default {
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.posterEdit.step = 1
-          this.$refs.tuiImageEditor.getBackgroundUrl(this.materialSelected);
-          // TODO 如果有数据说明是修改，则回显老数据
-          this.posterSubassemblyList.length && this.$refs.tuiImageEditor.reShowDisplay(this.posterSubassemblyList);
+          this.$refs.tuiImageEditor.getBackgroundUrl(this.materialSelected, this.posterSubassemblyList);
         } else {
           return false;
         }
@@ -424,7 +422,7 @@ export default {
           content: vo.text || '',   // 文本内容 
           delFlag: 0,   // 1 启动  0 删除      FIXME 暂时写死
           fontColor: vo.fill || '#000000', // 
-          fontId: isText ? i : null,   // 字体ID   与imgPath互斥
+          fontId: null,// TODO 后端让传NULL  isText ? i : null,   // 字体ID   与imgPath互斥
           fontSize: vo.fontSize,
           fontTextAlign: align, // 1 2 3  left center right
           left: parseInt(vo.left),
