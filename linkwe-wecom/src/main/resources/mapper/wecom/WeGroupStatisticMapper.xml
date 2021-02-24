@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeGroupStatisticMapper">
+    
+    <resultMap type="WeGroupStatistic" id="WeGroupStatisticResult">
+        <result property="id"    column="id"    />
+        <result property="chatId"    column="chat_id"    />
+        <result property="statTime"    column="stat_time"    />
+        <result property="newChatCnt"    column="new_chat_cnt"    />
+        <result property="chatTotal"    column="chat_total"    />
+        <result property="chatHasMsg"    column="chat_has_msg"    />
+        <result property="newMemberCnt"    column="new_member_cnt"    />
+        <result property="memberTotal"    column="member_total"    />
+        <result property="memberHasMsg"    column="member_has_msg"    />
+        <result property="msgTotal"    column="msg_total"    />
+    </resultMap>
+
+
+</mapper>

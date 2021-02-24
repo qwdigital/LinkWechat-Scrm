@@ -1,15 +1,13 @@
 package com.linkwechat.wecom.client;
 
 import com.dtflys.forest.annotation.DataObject;
+import com.dtflys.forest.annotation.JSONBody;
 import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
-import com.linkwechat.wecom.domain.dto.WeCustomerDto;
-import com.linkwechat.wecom.domain.dto.WeResultDto;
-import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
-import com.linkwechat.wecom.domain.dto.customer.CutomerTagEdit;
-import com.linkwechat.wecom.domain.dto.customer.ExternalUserDetail;
-import com.linkwechat.wecom.domain.dto.customer.ExternalUserList;
-import com.linkwechat.wecom.domain.dto.customer.FollowUserList;
+import com.linkwechat.wecom.domain.dto.*;
+import com.linkwechat.wecom.domain.dto.customer.*;
+import com.linkwechat.wecom.domain.query.GroupChatStatisticQuery;
+import com.linkwechat.wecom.domain.query.UserBehaviorDataQuery;
 
 
 import java.util.Map;
@@ -93,5 +91,19 @@ public interface WeCustomerClient {
     ExternalUserDetail unionidToExternalUserid(@DataObject ExternalUserDetail.ExternalContact  unionid);
 
 
+    /**
+     * 联系客户统计
+     * @return
+     */
+    @Request(url = "/externalcontact/get_user_behavior_data",
+            type = "POST")
+    UserBehaviorDataDto getUserBehaviorData(@JSONBody UserBehaviorDataQuery query);
 
+    /**
+     * 联系客户统计
+     * @return
+     */
+    @Request(url = "/externalcontact/groupchat/statistic",
+            type = "POST")
+    GroupChatStatisticDto getGroupChatStatistic(@JSONBody GroupChatStatisticQuery query);
 }
