@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	
+    <modelVersion>4.0.0</modelVersion>
+
     <groupId>com.linkwechat</groupId>
     <artifactId>linkwechat</artifactId>
     <version>3.1.0</version>
@@ -11,18 +11,18 @@
     <name>linkwechat</name>
     <url>http://www.ruoyi.vip</url>
     <description>若依管理系统</description>
-    
+
     <properties>
         <springboot.vaerion>2.3.7.RELEASE</springboot.vaerion>
         <linkwe.version>3.1.0</linkwe.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-<!--        <mybatis.boot.version>1.3.2</mybatis.boot.version>-->
+        <!--        <mybatis.boot.version>1.3.2</mybatis.boot.version>-->
         <druid.version>1.1.14</druid.version>
         <bitwalker.version>1.19</bitwalker.version>
         <swagger.version>2.9.2</swagger.version>
-		<kaptcha.version>2.3.2</kaptcha.version>
+        <kaptcha.version>2.3.2</kaptcha.version>
         <pagehelper.boot.version>1.2.7</pagehelper.boot.version>
         <fastjson.version>1.2.73</fastjson.version>
         <oshi.version>3.9.1</oshi.version>
@@ -39,8 +39,9 @@
         <mybatis-plus.version>3.4.0</mybatis-plus.version>
         <vertx.version>4.0.0</vertx.version>
         <netty-version>4.1.49.Final</netty-version>
+        <nacos.version>2.2.5.RELEASE</nacos.version>
     </properties>
-	
+
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
@@ -61,35 +62,35 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            
+
             <!--阿里数据库连接池 -->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
                 <version>${druid.version}</version>
             </dependency>
-	        
+
             <!-- 解析客户端操作系统、浏览器等 -->
             <dependency>
                 <groupId>eu.bitwalker</groupId>
                 <artifactId>UserAgentUtils</artifactId>
                 <version>${bitwalker.version}</version>
             </dependency>
-			
+
             <!-- pagehelper 分页插件 -->
             <dependency>
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
                 <version>${pagehelper.boot.version}</version>
             </dependency>
-			
+
             <!-- 获取系统信息 -->
             <dependency>
                 <groupId>com.github.oshi</groupId>
                 <artifactId>oshi-core</artifactId>
                 <version>${oshi.version}</version>
             </dependency>
-			
+
             <!-- swagger2-->
             <dependency>
                 <groupId>io.springfox</groupId>
@@ -106,91 +107,91 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-			
+
             <!-- swagger2-UI-->
             <dependency>
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-swagger-ui</artifactId>
                 <version>${swagger.version}</version>
             </dependency>
-            
+
             <!--io常用工具类 -->
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons.io.version}</version>
             </dependency>
-	
+
             <!--文件上传工具类 -->
             <dependency>
                 <groupId>commons-fileupload</groupId>
                 <artifactId>commons-fileupload</artifactId>
                 <version>${commons.fileupload.version}</version>
             </dependency>
-			
+
             <!-- excel工具 -->
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi.version}</version>
             </dependency>
-			
+
             <!--velocity代码生成使用模板 -->
             <dependency>
                 <groupId>org.apache.velocity</groupId>
                 <artifactId>velocity</artifactId>
                 <version>${velocity.version}</version>
             </dependency>
-	        
+
             <!-- 阿里JSON解析器 -->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
             </dependency>
-			
+
             <!--Token生成与解析-->
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt</artifactId>
                 <version>${jwt.version}</version>
             </dependency>
-			
+
             <!--验证码 -->
             <dependency>
                 <groupId>com.github.penggle</groupId>
                 <artifactId>kaptcha</artifactId>
                 <version>${kaptcha.version}</version>
             </dependency>
-            
+
             <!-- 定时任务-->
             <dependency>
                 <groupId>com.linkwechat</groupId>
                 <artifactId>linkwe-quartz</artifactId>
                 <version>${linkwe.version}</version>
             </dependency>
-	
+
             <!-- 代码生成-->
             <dependency>
                 <groupId>com.linkwechat</groupId>
                 <artifactId>linkwe-generator</artifactId>
                 <version>${linkwe.version}</version>
             </dependency>
-			
+
             <!-- 核心模块-->
             <dependency>
                 <groupId>com.linkwechat</groupId>
                 <artifactId>linkwe-framework</artifactId>
                 <version>${linkwe.version}</version>
             </dependency>
-			
+
             <!-- 系统模块-->
             <dependency>
                 <groupId>com.linkwechat</groupId>
                 <artifactId>linkwe-system</artifactId>
                 <version>${linkwe.version}</version>
             </dependency>
-			
+
             <!-- 通用工具-->
             <dependency>
                 <groupId>com.linkwechat</groupId>
@@ -257,6 +258,17 @@
                 <version>${vertx.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+                <version>${nacos.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+                <version>${nacos.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -269,12 +281,8 @@
         <module>linkwe-common</module>
         <module>linkwe-wecom</module>
     </modules>
+
     <packaging>pom</packaging>
-
-
-    <dependencies>
-
-    </dependencies>
 
     <build>
         <plugins>
