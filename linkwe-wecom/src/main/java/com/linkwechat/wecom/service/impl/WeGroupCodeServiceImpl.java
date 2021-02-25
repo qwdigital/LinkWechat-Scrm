@@ -102,12 +102,6 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper,WeGrou
     public void insertWeGroupCode(WeGroupCode weGroupCode)
     {
         try {
-            // 生成并保存二维码图片
-            String logoUrl = weGroupCode.getActivityHeadUrl();
-            InputStream in = QREncode.writeToInputStream(QREncode.crateQRCode(weGroupCode.getActivityName(), logoUrl));
-            String fileName = FileUploadUtils.upload2Cos(in, "png", cosConfig);
-            String codeUrl = "https://link-wechat-1251309172.cos.ap-nanjing.myqcloud.com/" + fileName;
-            weGroupCode.setCodeUrl(codeUrl);
             weGroupCodeMapper.insertWeGroupCode(weGroupCode);
         } catch (Exception e) {
             throw new WeComException(e.getMessage());

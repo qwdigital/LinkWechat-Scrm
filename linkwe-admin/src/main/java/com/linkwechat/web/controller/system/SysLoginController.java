@@ -159,32 +159,4 @@ public class SysLoginController
 
     }
 
-//    /**
-//     * 从群活码获取第一个可用的实际码
-//     */
-//    @GetMapping("/getChatQRCode")
-//    public AjaxResult getActual(Long weGroupCodeId) {
-//        WeGroupCode weGroupCode = weGroupCodeService.selectWeGroupCodeById(weGroupCodeId);
-//        List<WeGroupCodeActual> weGroupCodeActualList = weGroupCodeService.selectActualListByGroupCodeId(weGroupCodeId);
-//        WeGroupCodeActual weGroupCodeActual = null;
-//        for (WeGroupCodeActual item : weGroupCodeActualList) {
-//            // 获取第一个可用的实际码
-//            if (item.getStatus().intValue() == WeConstans.WE_GROUP_CODE_ENABLE) {
-//                weGroupCodeActual = item;
-//                break;
-//            }
-//        }
-//        if (StringUtils.isNotNull(weGroupCodeActual)) {
-//            AjaxResult ajax = AjaxResult.success();
-//            ajax.put("tipMsg", weGroupCode.getTipMsg());
-//            ajax.put("activityName", weGroupCode.getActivityName());
-//            ajax.put("groupName", weGroupCodeActual.getChatGroupName());
-//            ajax.put("actualQRCode", weGroupCodeActual.getActualGroupQrCode());
-//            return ajax;
-//        } else {
-//            return AjaxResult.error(HttpStatus.NOT_FOUND, "数据不存在");
-//        }
-//    }
-
-
 }
