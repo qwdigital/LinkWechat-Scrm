@@ -46,7 +46,7 @@ public class WeGroupCodeController extends BaseController {
     /**
      * 查询客户群活码列表
      */
-    @PreAuthorize("@ss.hasPermi('wecom:groupCode:list')")
+    @PreAuthorize("@ss.hasPermi('drainageCode:group:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeGroupCode weGroupCode) {
         startPage();
@@ -57,7 +57,7 @@ public class WeGroupCodeController extends BaseController {
     /**
      * 批量下载群活码
      */
-    @PreAuthorize("@ss.hasPermi('wecom:groupCode:downloadBatch')")
+    @PreAuthorize("@ss.hasPermi('drainageCode:group:downloadBatch')")
     @Log(title = "群活码批量下载", businessType = BusinessType.OTHER)
     @GetMapping("/downloadBatch")
     public void downloadBatch(String ids, HttpServletRequest request, HttpServletResponse response) {
@@ -92,7 +92,7 @@ public class WeGroupCodeController extends BaseController {
         }
     }
 
-    @PreAuthorize("@ss.hasPermi('wecom:groupCode:download')")
+    @PreAuthorize("@ss.hasPermi('drainageCode:group:download')")
     @Log(title = "群活码下载", businessType = BusinessType.OTHER)
     @GetMapping("/download")
     public void download(String id, HttpServletRequest request, HttpServletResponse response) {
@@ -120,7 +120,7 @@ public class WeGroupCodeController extends BaseController {
     /**
      * 获取客户群活码详细信息
      */
-    @PreAuthorize("@ss.hasPermi('wecom:groupCode:query')")
+    @PreAuthorize("@ss.hasPermi('drainageCode:group:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
         WeGroupCode weGroupCode = weGroupCodeService.selectWeGroupCodeById(id);
@@ -135,7 +135,7 @@ public class WeGroupCodeController extends BaseController {
     /**
      * 新增客户群活码
      */
-    @PreAuthorize("@ss.hasPermi('wecom:groupCode:add')")
+    @PreAuthorize("@ss.hasPermi('drainageCode:group:add')")
     @Log(title = "客户群活码", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody WeGroupCode weGroupCode) {
@@ -153,7 +153,7 @@ public class WeGroupCodeController extends BaseController {
     /**
      * 修改客户群活码
      */
-    @PreAuthorize("@ss.hasPermi('wecom:groupCode:edit')")
+    @PreAuthorize("@ss.hasPermi('drainageCode:group:edit')")
     @Log(title = "客户群活码", businessType = BusinessType.UPDATE)
     @PutMapping(value = "/{id}")
     public AjaxResult edit(@PathVariable("id") Long id, @RequestBody WeGroupCode weGroupCode) {
@@ -174,7 +174,7 @@ public class WeGroupCodeController extends BaseController {
     /**
      * 删除客户群活码
      */
-    @PreAuthorize("@ss.hasPermi('wecom:groupCode:remove')")
+    @PreAuthorize("@ss.hasPermi('drainageCode:group:remove')")
     @Log(title = "客户群活码", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult batchRemove(@PathVariable Long[] ids) {

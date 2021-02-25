@@ -36,6 +36,11 @@ public class WeGroupCode extends BaseEntity {
     private String codeUrl;
 
     /**
+     * 二维码的uuid
+     */
+    private String uuid;
+
+    /**
      * 活码头像
      */
     private String activityHeadUrl;
