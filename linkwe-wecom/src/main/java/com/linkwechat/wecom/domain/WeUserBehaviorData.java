@@ -76,7 +76,7 @@ public class WeUserBehaviorData implements Serializable {
      * 已回复聊天占比，浮点型，客户主动发起聊天后，成员在一个自然日内有回复过消息的聊天数/客户主动发起的聊天数比例，不包括群聊，仅在确有聊天时返回
      */
     @Excel(name = "已回复聊天占比，浮点型，客户主动发起聊天后，成员在一个自然日内有回复过消息的聊天数/客户主动发起的聊天数比例，不包括群聊，仅在确有聊天时返回")
-    private Long replyPercentage;
+    private Float replyPercentage;
 
     /**
      * 平均首次回复时长

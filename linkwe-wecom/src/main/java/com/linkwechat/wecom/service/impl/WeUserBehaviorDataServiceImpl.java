@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.wecom.domain.WeUserBehaviorData;
+import com.linkwechat.wecom.domain.dto.WePageCountDto;
+import com.linkwechat.wecom.domain.query.WePageStateQuery;
 import com.linkwechat.wecom.mapper.WeUserBehaviorDataMapper;
 import com.linkwechat.wecom.service.IWeUserBehaviorDataService;
 import org.apache.commons.lang3.StringUtils;
@@ -51,5 +53,25 @@ public class WeUserBehaviorDataServiceImpl extends ServiceImpl<WeUserBehaviorDat
             lqw.eq(WeUserBehaviorData::getNegativeFeedbackCnt ,weUserBehaviorData.getNegativeFeedbackCnt());
         }
         return this.list(lqw);
+    }
+
+    @Override
+    public WePageCountDto getCountDataByDay(String dateTime,String type) {
+        return this.baseMapper.getCountDataByDay(dateTime,type);
+    }
+
+    @Override
+    public List<WePageCountDto> getDayCountData(WePageStateQuery wePageStateQuery) {
+        return this.baseMapper.getDayCountData(wePageStateQuery);
+    }
+
+    @Override
+    public List<WePageCountDto> getWeekCountData(WePageStateQuery wePageStateQuery) {
+        return this.baseMapper.getWeekCountData(wePageStateQuery);
+    }
+
+    @Override
+    public List<WePageCountDto> getMonthCountData(WePageStateQuery wePageStateQuery) {
+        return this.baseMapper.getMonthCountData(wePageStateQuery);
     }
 }

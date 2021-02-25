@@ -1,17 +1,21 @@
 package com.linkwechat.quartz.task;
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisCache;
-import com.linkwechat.wecom.domain.WeCorpAccount;
-import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.dto.WePageCountDto;
+import com.linkwechat.wecom.domain.dto.WePageStaticDataDto;
+import com.linkwechat.wecom.domain.query.WePageStateQuery;
 import com.linkwechat.wecom.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,8 +42,13 @@ public class PageHomeDataTask {
     private IWeGroupMemberService weGroupMemberService;
 
     @Autowired
-    private RedisCache redisCache;
+    private IWeUserBehaviorDataService weUserBehaviorDataService;
 
+    @Autowired
+    private IWeGroupStatisticService weGroupStatisticService;
+
+    @Autowired
+    private RedisCache redisCache;
 
     public void getCorpBasicData(){
         //查询当前使用企业
@@ -64,7 +73,97 @@ public class PageHomeDataTask {
 
 
     public void getCorpRealTimeData(){
-        //今日
-        //发起申请数
+        WePageStaticDataDto wePageStaticDataDto = new WePageStaticDataDto();
+        //今天
+        wePageStaticDataDto.setToday(getTodayData());
+        wePageStaticDataDto.setWeek(getWeekData());
+        wePageStaticDataDto.setMonth(getMonthData());
+        wePageStaticDataDto.setUpdateTime(DateUtil.now());
+        redisCache.setCacheObject("getCorpRealTimeData",wePageStaticDataDto);
+    }
+
+    private WePageStaticDataDto.PageStaticData getTodayData(){
+        /**
+         * 今日
+         */
+        String today = DateUtil.today();
+        String yesterday = DateUtil.yesterday().toDateStr();
+        //客户统计
+        WePageCountDto newTime = weUserBehaviorDataService.getCountDataByDay(today,"d");
+        /**
+         * 昨日
+         */
+        //客户统计
+        WePageCountDto lastTime = weUserBehaviorDataService.getCountDataByDay(yesterday,"d");
+
+        WePageStaticDataDto.PageStaticData pageStaticData = setPageStaticData(newTime, lastTime);
+
+        WePageStateQuery wePageStateQuery = new WePageStateQuery();
+        //获取15天前的时间
+        wePageStateQuery.setStartTime(DateUtil.offsetDay(new Date(), -15).toDateStr());
+        wePageStateQuery.setEndTime(today);
+        wePageStateQuery.setFew(14);
+        List<WePageCountDto> dayCountData = weUserBehaviorDataService.getDayCountData(wePageStateQuery);
+        pageStaticData.setDataList(dayCountData);
+
+        return pageStaticData;
+    }
+
+    private WePageStaticDataDto.PageStaticData getWeekData(){
+        /**
+         * 本周
+         */
+        //客户统计
+        WePageCountDto newTime = weUserBehaviorDataService.getCountDataByDay(DateUtil.today(),"w");
+        /**
+         * 上周
+         */
+        //客户统计
+        WePageCountDto lastTime = weUserBehaviorDataService.getCountDataByDay(DateUtil.lastWeek().toDateStr(),"w");
+
+        WePageStaticDataDto.PageStaticData pageStaticData = setPageStaticData(newTime, lastTime);
+
+        WePageStateQuery wePageStateQuery = new WePageStateQuery();
+        wePageStateQuery.setFew(5);
+        List<WePageCountDto> weekCountData = weUserBehaviorDataService.getWeekCountData(wePageStateQuery);
+        pageStaticData.setDataList(weekCountData);
+
+        return pageStaticData;
+    }
+
+    private WePageStaticDataDto.PageStaticData getMonthData(){
+        /**
+         * 本周
+         */
+        //客户统计
+        WePageCountDto newTime = weUserBehaviorDataService.getCountDataByDay(DateUtil.today(),"m");
+        /**
+         * 上周
+         */
+        //客户统计
+        WePageCountDto lastTime = weUserBehaviorDataService.getCountDataByDay(DateUtil.lastMonth().toDateStr(),"m");
+
+        WePageStaticDataDto.PageStaticData pageStaticData = setPageStaticData(newTime, lastTime);
+
+        WePageStateQuery wePageStateQuery = new WePageStateQuery();
+        wePageStateQuery.setFew(5);
+        List<WePageCountDto> monthCountData = weUserBehaviorDataService.getMonthCountData(wePageStateQuery);
+        pageStaticData.setDataList(monthCountData);
+
+        return pageStaticData;
+    }
+
+
+    private WePageStaticDataDto.PageStaticData setPageStaticData(WePageCountDto nowTime,WePageCountDto lastTime){
+        WePageStaticDataDto.PageStaticData pageStaticData = new WePageStaticDataDto.PageStaticData();
+
+        pageStaticData.setNewApplyCnt(nowTime.getNewApplyCnt());
+        pageStaticData.setNewApplyCntDiff(nowTime.getNewApplyCnt() - lastTime.getNewApplyCnt());
+        pageStaticData.setNegativeFeedbackCnt(nowTime.getNegativeFeedbackCnt());
+        pageStaticData.setNegativeFeedbackCntDiff(nowTime.getNegativeFeedbackCnt() - lastTime.getNegativeFeedbackCnt());
+        pageStaticData.setNewContactCnt(nowTime.getNewContactCnt());
+        pageStaticData.setNewContactCntDiff(nowTime.getNewContactCnt() - lastTime.getNewContactCnt());
+
+        return pageStaticData;
     }
 }
