@@ -88,7 +88,7 @@ public class WeUserBehaviorData implements Serializable {
      * 删除/拉黑成员的客户数，即将成员删除或加入黑名单的客户数
      */
     @Excel(name = "删除/拉黑成员的客户数，即将成员删除或加入黑名单的客户数")
-    private Long negativeFeedbackCnt;
+    private Integer negativeFeedbackCnt;
 
     @TableField(exist = false)
     private Map<String, Object> params = new HashMap<>();
