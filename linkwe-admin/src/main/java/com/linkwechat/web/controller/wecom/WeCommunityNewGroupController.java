@@ -12,6 +12,9 @@ import com.linkwechat.wecom.domain.WeEmpleCode;
 import com.linkwechat.wecom.domain.dto.WeCommunityNewGroupDto;
 import com.linkwechat.wecom.domain.vo.WeCommunityNewGroupVo;
 import com.linkwechat.wecom.service.IWeCommunityNewGroupService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -28,6 +31,7 @@ import java.util.stream.Collectors;
  * @author kewen
  * @date 2021-02-19
  */
+@Api(description = "新客自动拉群 Controller")
 @Controller
 @RequestMapping(value = "communityNewGroup")
 public class WeCommunityNewGroupController extends BaseController {
@@ -38,6 +42,7 @@ public class WeCommunityNewGroupController extends BaseController {
     /**
      * 查询新客自动拉群列表
      */
+    @ApiOperation(value = "查询新客自动拉群列表",httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeCommunityNewGroup communityNewGroup) {
@@ -49,15 +54,17 @@ public class WeCommunityNewGroupController extends BaseController {
     /**
      * 获取新客自动拉群详细信息
      */
+    @ApiOperation(value = "获取新客自动拉群详细信息",httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:query')")
     @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("newGroupId") Long newGroupId) {
+    public AjaxResult getInfo(@PathVariable("newGroupId") @ApiParam("主键ID") Long newGroupId) {
         return AjaxResult.success(weCommunityNewGroupService.selectWeCommunityNewGroupById(newGroupId));
     }
 
     /**
      * 修改新客自动拉群
      */
+    @ApiOperation(value = "修改新客自动拉群",httpMethod = "PUT")
     @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:edit')")
     @Log(title = "新客自动拉群", businessType = BusinessType.UPDATE)
     @PutMapping("/update")
@@ -70,6 +77,7 @@ public class WeCommunityNewGroupController extends BaseController {
     /**
      * 删除新客自动拉群
      */
+    @ApiOperation(value = "删除新客自动拉群",httpMethod = "DELETE")
     @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:remove')")
     @Log(title = "新客自动拉群", businessType = BusinessType.DELETE)
     @DeleteMapping("/delete/{ids}")
@@ -82,6 +90,7 @@ public class WeCommunityNewGroupController extends BaseController {
     /**
      * 新增新客自动拉群
      */
+    @ApiOperation(value = "新增新客自动拉群",httpMethod = "POST")
     @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:add')")
     @Log(title = "新客自动拉群", businessType = BusinessType.INSERT)
     @PostMapping("/add")

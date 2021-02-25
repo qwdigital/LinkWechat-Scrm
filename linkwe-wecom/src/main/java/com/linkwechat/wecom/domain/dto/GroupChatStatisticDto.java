@@ -23,9 +23,11 @@ public class GroupChatStatisticDto {
         /**
          * 数据日期，为当日0点的时间戳
          */
-        @JSONField(format="unixtime")
-        @JsonFormat(pattern = "yyyy-MM-dd")
         private Date statTime;
+
+        public void setStatTime(Long statTime) {
+            this.statTime = new Date(statTime * 1000);
+        }
 
         private StatisticData data;
 

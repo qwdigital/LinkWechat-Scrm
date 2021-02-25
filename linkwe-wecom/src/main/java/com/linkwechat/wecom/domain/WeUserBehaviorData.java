@@ -45,7 +45,7 @@ public class WeUserBehaviorData implements Serializable {
      * 数据日期，为当日0点的时间戳
      */
     @Excel(name = "数据日期，为当日0点的时间戳", width = 30, dateFormat = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date statTime;
 
     /**

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeUserBehaviorData;
 import com.linkwechat.wecom.domain.dto.WePageCountDto;
 import com.linkwechat.wecom.domain.query.WePageStateQuery;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public interface WeUserBehaviorDataMapper extends BaseMapper<WeUserBehaviorData>
      * @param dateTime
      * @return WeUserBehaviorDataDto
      */
-    public WePageCountDto getCountDataByDay(String dateTime,String type);
+    public WePageCountDto getCountDataByDay(@Param("dateTime") String dateTime, @Param("type") String type);
 
     /**
      * 按天维度查询数据统计

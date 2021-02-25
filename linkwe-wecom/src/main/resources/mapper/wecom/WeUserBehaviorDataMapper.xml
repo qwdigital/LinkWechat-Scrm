@@ -19,25 +19,25 @@
 
     <select id="getCountDataByDay" resultType="com.linkwechat.wecom.domain.dto.WePageCountDto">
             select
-            date_format(stat_time, '%Y-%m-%d') as x_time
-            sum(new_apply_cnt) as new_apply_cnt,
-            sum(new_contact_cnt) as new_contact_cnt
-            sum(chat_cnt) as chat_cnt
-            sum(new_contact_cnt) as message_cnt
-            sum(new_contact_cnt) as reply_percentage
-            sum(new_contact_cnt) as avg_reply_time
-            sum(new_contact_cnt) as negative_feedback_cnt
+            date_format(stat_time, '%Y-%m-%d') as x_time,
+            IFNULL(sum(new_apply_cnt),0) as new_apply_cnt,
+            IFNULL(sum(new_contact_cnt),0) as new_contact_cnt,
+            IFNULL(sum(chat_cnt),0) as chat_cnt,
+            IFNULL(sum(message_cnt),0) as message_cnt,
+            IFNULL(sum(reply_percentage),0) as reply_percentage,
+            IFNULL(sum(avg_reply_time),0) as avg_reply_time,
+            IFNULL(sum(negative_feedback_cnt),0) as negative_feedback_cnt
             from we_user_behavior_data
             <where>
                 <choose>
-                    <when test="type !=null and type == 'd'">
+                    <when test="type !=null and type == 'day'">
                         date_format(stat_time, '%Y-%m-%d') = date_format(#{dateTime}, '%Y-%m-%d');
                     </when>
-                    <when test="type !=null and type == 'w'">
-                        YEARWEEK(date_format(stat_time,'%Y-%m-%d')) = YEARWEEK(date_format(#{dateTime}, '%Y-%m-%d')});
+                    <when test="type !=null and type == 'week'">
+                        YEARWEEK(date_format(stat_time,'%Y-%m-%d')) = YEARWEEK(date_format(#{dateTime}, '%Y-%m-%d'));
                     </when>
-                    <when test="type !=null and type == 'm'">
-                        DATE_FORMAT(date_format(stat_time,'%Y-%m')) = DATE_FORMAT(date_format(#{dateTime}, '%Y-%m'));
+                    <when test="type !=null and type == 'month'">
+                        DATE_FORMAT(stat_time,'%Y-%m') = DATE_FORMAT(#{dateTime}, '%Y-%m');
                     </when>
                     <!--查询今年-->
                     <otherwise>

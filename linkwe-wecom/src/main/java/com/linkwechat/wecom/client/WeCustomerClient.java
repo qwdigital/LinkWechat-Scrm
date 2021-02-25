@@ -100,10 +100,18 @@ public interface WeCustomerClient {
     UserBehaviorDataDto getUserBehaviorData(@JSONBody UserBehaviorDataQuery query);
 
     /**
-     * 联系客户统计
+     * 群聊数据统计（按群主聚合的方式）
      * @return
      */
     @Request(url = "/externalcontact/groupchat/statistic",
             type = "POST")
     GroupChatStatisticDto getGroupChatStatistic(@JSONBody GroupChatStatisticQuery query);
+
+    /**
+     * 群聊数据统计(按自然日聚合的方式)
+     * @return
+     */
+    @Request(url = "/externalcontact/groupchat/statistic_group_by_day",
+            type = "POST")
+    GroupChatStatisticDto getGroupChatStatisticGroupByDay(@JSONBody GroupChatStatisticQuery query);
 }

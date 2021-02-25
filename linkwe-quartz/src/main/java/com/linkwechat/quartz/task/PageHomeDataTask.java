@@ -95,12 +95,12 @@ public class PageHomeDataTask {
         String today = DateUtil.today();
         String yesterday = DateUtil.yesterday().toDateStr();
         //客户统计
-        WePageCountDto newTime = weUserBehaviorDataService.getCountDataByDay(today,"d");
+        WePageCountDto newTime = weUserBehaviorDataService.getCountDataByDay(today,"day");
         /**
          * 昨日
          */
         //客户统计
-        WePageCountDto lastTime = weUserBehaviorDataService.getCountDataByDay(yesterday,"d");
+        WePageCountDto lastTime = weUserBehaviorDataService.getCountDataByDay(yesterday,"day");
 
         WePageStaticDataDto.PageStaticData pageStaticData = setPageStaticData(newTime, lastTime);
 
@@ -120,12 +120,12 @@ public class PageHomeDataTask {
          * 本周
          */
         //客户统计
-        WePageCountDto newTime = weUserBehaviorDataService.getCountDataByDay(DateUtil.today(),"w");
+        WePageCountDto newTime = weUserBehaviorDataService.getCountDataByDay(DateUtil.today(),"week");
         /**
          * 上周
          */
         //客户统计
-        WePageCountDto lastTime = weUserBehaviorDataService.getCountDataByDay(DateUtil.lastWeek().toDateStr(),"w");
+        WePageCountDto lastTime = weUserBehaviorDataService.getCountDataByDay(DateUtil.lastWeek().toDateStr(),"week");
 
         WePageStaticDataDto.PageStaticData pageStaticData = setPageStaticData(newTime, lastTime);
 
@@ -142,12 +142,12 @@ public class PageHomeDataTask {
          * 本周
          */
         //客户统计
-        WePageCountDto newTime = weUserBehaviorDataService.getCountDataByDay(DateUtil.today(),"m");
+        WePageCountDto newTime = weUserBehaviorDataService.getCountDataByDay(DateUtil.today(),"month");
         /**
          * 上周
          */
         //客户统计
-        WePageCountDto lastTime = weUserBehaviorDataService.getCountDataByDay(DateUtil.lastMonth().toDateStr(),"m");
+        WePageCountDto lastTime = weUserBehaviorDataService.getCountDataByDay(DateUtil.lastMonth().toDateStr(),"month");
 
         WePageStaticDataDto.PageStaticData pageStaticData = setPageStaticData(newTime, lastTime);
 

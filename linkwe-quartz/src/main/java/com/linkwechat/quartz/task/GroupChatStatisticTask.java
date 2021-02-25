@@ -55,7 +55,7 @@ public class GroupChatStatisticTask {
                 idList.add(weGroup.getOwner());
                 ownerFilter.setUserid_list(idList);
                 query.setOwnerFilter(ownerFilter);
-                GroupChatStatisticDto groupChatStatistic = weCustomerClient.getGroupChatStatistic(query);
+                GroupChatStatisticDto groupChatStatistic = weCustomerClient.getGroupChatStatisticGroupByDay(query);
                 List<GroupChatStatisticDto.GroupchatStatisticData> items = groupChatStatistic.getItems();
                 if(CollectionUtil.isNotEmpty(items)){
                     items.forEach(groupchatStatisticData -> {
