@@ -50,6 +50,12 @@ public class PageHomeDataTask {
     @Autowired
     private RedisCache redisCache;
 
+
+    public void getPageHomeDataData(){
+        getCorpBasicData();
+        getCorpRealTimeData();
+    }
+
     public void getCorpBasicData(){
         //查询当前使用企业
         //WeCorpAccount weCorpAccount = weCorpAccountService.findValidWeCorpAccount();
