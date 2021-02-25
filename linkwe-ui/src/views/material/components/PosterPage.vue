@@ -130,6 +130,7 @@ export default {
             return new Promise((resolve)=>{
                 switch (data.type) {
                     case 1:
+                        this.activateTextMode();
                         this.editorInstance.
                         addText(data.content, {
                             position: {
@@ -139,12 +140,20 @@ export default {
                         })
                         .then(function (objectProps) {
                             console.log(objectProps);
+                            // 重置 TextStyle
+                            this.editorInstance.changeTextStyle(objectProps.id, {
+                                fontSize: data.fontSize,
+                                fill: data.fontColor,
+                                textAlign: data.fontTextAlign === 1 ? 'left' : 
+                                            data.fontTextAlign === 2 ? 'center' : 'right'
+                            });
                             resolve();
                         });
                        
                     break;
                     case 2:
                     case 3:
+                        this.activateImageMode()
                         this.editorInstance.addImageObject(
                             data.type === 2 ? data.imgPath : 
                             data.imgPath === this.qrCodeUrl ? qrCodeImage : data.imgPath
