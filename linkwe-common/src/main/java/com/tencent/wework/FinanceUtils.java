@@ -287,7 +287,7 @@ public class FinanceUtils {
             CosConfig cosConfig = SpringUtils.getBean(CosConfig.class);
             String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
             StringBuilder cosUrl = new StringBuilder(cosConfig.getImgUrlPrefix());
-            String cosFilePath = FileUploadUtils.upload2Cos(new FileInputStream(filePath + fileName), suffix, cosConfig);
+            String cosFilePath = FileUploadUtils.upload2Cos(new FileInputStream(new File(filePath, fileName)), suffix, cosConfig);
             cosUrl.append(cosFilePath);
             data.put("attachment", cosUrl.toString());
         } catch (Exception e) {
