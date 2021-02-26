@@ -39,6 +39,7 @@ export default {
     },
     data() {
         return {
+            qrCodeUrl: 'http://www.linkwechat.cn/static/img/qrCodeImage.a6d01316.png',
             visible: false
         }
     },
@@ -46,6 +47,9 @@ export default {
         let options = editorDefaultOptions;
         if (this.includeUi) {
             options = Object.assign(includeUIOptions, this.options);
+        }
+        if (this.editorInstance) {
+            console.log('this.editorInstance')
         }
         this.editorInstance = new ImageEditor(this.$refs.tuiImageEditor, options);
         document.getElementsByClassName('tui-image-editor-header')[0].innerHTML = '';
@@ -67,6 +71,8 @@ export default {
         this.editorInstance.ui._actions.text.modeChange = function () {}
         document.getElementsByClassName('tui-image-editor-submenu')[0].style.display = 'none';
         document.getElementsByClassName('tie-btn-text')[0].style.display = 'none';
+        document.getElementsByClassName('tui-image-editor-main')[0].style.top = '0';
+        document.getElementsByClassName('tui-image-editor-align-wrap')[0].style.verticalAlign = 'top';
 
         this.initBtn();
         this.addEventListener();
@@ -75,16 +81,99 @@ export default {
         // Object.keys(this.$listeners).forEach(eventName => {
         //     this.editorInstance.off(eventName);
         // });
+        console.log('deatory poster')
         this.editorInstance.destroy();
         this.editorInstance = null;
     },
     methods: {
-        getBackgroundUrl(bacUrl) {
+        // 设置背景图片
+        getBackgroundUrl(bacUrl, posterSubassemblyList) {
             this.editorInstance.loadImageFromURL(bacUrl, 'imagePoster').then(async result => {
                 console.log('old : ' + result.oldWidth + ', ' + result.oldHeight);
                 console.log('new : ' + result.newWidth + ', ' + result.newHeight);
-                // await this.addImage('https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg')
-                // await this.addText('aloha');
+
+                // 由于篡改了tuiimage,第一次使用addText会报错，错误不影响流程，但是会导致promise中断，提前触发报错。
+                try {
+                    this.editorInstance.
+                    addText('', {
+                        position: {
+                            x: 0,
+                            y: 0
+                        },
+                    })
+                    .then(function (objectProps) {
+                        console.log('dd');
+                    }).catch(()=>{});
+                } catch (e) {
+                    console.log('addText 内部状态错误')
+                }
+                // FIXME 暂时延迟回显
+                setTimeout(()=>{
+                    posterSubassemblyList.length && this.reShowDisplay(posterSubassemblyList);
+                }, 500);
+            });
+        },
+        // 设置修改回显
+        async reShowDisplay (reShowDisplays) {
+            let i = 0,len = reShowDisplays.length;
+            let _data = null;
+            while (i < len) {
+                _data = reShowDisplays[i];
+                if (_data) {
+                    await this.createReShowDisplay(_data);
+                }
+                i ++;
+            }
+        },
+        // 1 固定文本 2 固定图片 3 二维码图片
+        createReShowDisplay(data) {
+            return new Promise((resolve)=>{
+                switch (data.type) {
+                    case 1:
+                        this.activateTextMode();
+                        this.editorInstance.
+                        addText(data.content, {
+                            position: {
+                                x: data.left,
+                                y: data.top
+                            },
+                        })
+                        .then(function (objectProps) {
+                            console.log(objectProps);
+                            // 重置 TextStyle
+                            this.editorInstance.changeTextStyle(objectProps.id, {
+                                fontSize: data.fontSize,
+                                fill: data.fontColor,
+                                textAlign: data.fontTextAlign === 1 ? 'left' : 
+                                            data.fontTextAlign === 2 ? 'center' : 'right'
+                            });
+                            resolve();
+                        });
+                       
+                    break;
+                    case 2:
+                    case 3:
+                        this.activateImageMode()
+                        this.editorInstance.addImageObject(
+                            data.type === 2 ? data.imgPath : 
+                            data.imgPath === this.qrCodeUrl ? qrCodeImage : data.imgPath
+                        ).then(objectProps => {
+                            console.log(objectProps.id);
+                            let target = {}
+                            target.url = data.imgPath;
+                            target.randomId = objectProps.id;
+                            target.objType = data.type;
+
+                            this.editorInstance.setObjectProperties(objectProps.id, {
+                                left: data.left,
+                                top: data.top
+                            })
+                            // 将图片数据传给父组件保存
+                            this.$emit('getImageData', target);console.log(objectProps);
+                            resolve()
+                        });
+                    break;
+                }
             });
         },
         initBtn () {
@@ -178,6 +267,7 @@ export default {
                 redoStackChanged: this.onRedoStackChanged.bind(this),
                 objectScaled: this.onObjectScaled.bind(this),
                 addText: this.onAddText.bind(this),
+                textEditing: this.textEditing.bind(this),
                 objectActivated: this.objectActivated.bind(this),
                 objectMoved: this.onObjectMoved.bind(this)
             });
@@ -220,11 +310,12 @@ export default {
             })
             .then(function (objectProps) {
                 console.log(objectProps);
-                this.records(objectProps)
-                let id = this.GenNonDuplicateID() + '_' + objectProps.id;
-                let target = this.$parent.records[objectProps.id];
-                target && (target.randomId = id);
+                this.records(objectProps);
             }.bind(this));
+        },
+        // 文本改变事件
+        textEditing (e) {
+            console.log('dsds', e)
         },
         //移动
         onObjectMoved(obj) {
@@ -306,6 +397,7 @@ export default {
         qrCodeHandler () {
             // let codeUrl = 'https://images.gitee.com/uploads/images/2020/1231/234016_20fdd151_1480777.png';
             this.activateImageMode();
+            // 暂时写死二维码
             this.addImage(qrCodeImage, 3);
         },
         clearObjects () {
@@ -446,12 +538,9 @@ export default {
         },
         getImages () {
             this.visible = true; // 显示图片列表dialog
-            // this.activateImageMode();   
-            // this.addImage('https://images.gitee.com/uploads/images/2020/1231/234016_20fdd151_1480777.png',2);
         },
         // 提交选择的图片
         getMaterial(text, image, file) {
-            // console.log(image.materialUrl)
             this.activateImageMode();
             this.addImage(image.materialUrl, 2);
             this.visible = false;
@@ -461,50 +550,23 @@ export default {
                 throw Error("imgPath can't null")
             }
             this.editorInstance.addImageObject(imgPath).then(objectProps => {
-                let id = this.GenNonDuplicateID() + '_' + objectProps.id;
-                // this.$parent.imgList[id] = imgPath;  // FIXME
-                // console.log(objectProps)
-                // console.log(this.$parent.records)
-                // let target = this.$parent.records[objectProps.id];
                 
                 let target = {}
-                // if (target) {
-                    target.url = imgPath;
-                    target.randomId = objectProps.id;
-                    target.objType = type;
-                // }
-                this.$emit('getImageData', target); // 将图片数据传给父组件保存
+                // 二维码是占位符，所以可以写死 
+                target.url = type === 3 ? this.qrCodeUrl : imgPath;
+                target.randomId = objectProps.id;
+                target.objType = type;
+                // 将图片数据传给父组件保存
+                this.$emit('getImageData', target);
             });
         },
         addText (text, style = null, position = null) {
-            // return new Promise(function(resolve, reject) {
-                // !style && (style = {
-                //     fill: '#000',
-                //     fontSize: 20,
-                //     fontWeight: 'bold'
-                // })
-                // !position && (position = {
-                //     x: 10,
-                //     y: 10
-                // })
-                // this.activateTextMode();
-                // this.editorInstance.addText( text, {
-                //     style: style,
-                //     position: position
-                // }).then(objectProps => {
-                //     console.log(objectProps.id);
-                //     resolve(objectProps);
-                // });
-            // }.bind(this));
             this.editorInstance
             .addText(text || '双击输入文字', {
                 position: position,
             })
             .then(function (objectProps) {
                 console.log(objectProps);
-                let id = this.GenNonDuplicateID() + '_' + objectProps.id;
-                let target = this.$parent.records[objectProps.id];
-                target && (target.randomId = id);
             });
         },
         activateImageMode () {
@@ -535,10 +597,10 @@ export default {
                 this.records[obj.id] = obj;
             }
             
-        },
-        GenNonDuplicateID(randomLength){
-            return parseFloat(Math.random().toString().substr(3,randomLength) + Date.now()).toString(36)
-        }   
+        }
+        // GenNonDuplicateID(randomLength){
+        //     return parseFloat(Math.random().toString().substr(3,randomLength) + Date.now()).toString(36)
+        // }   
     }
 };
 </script>

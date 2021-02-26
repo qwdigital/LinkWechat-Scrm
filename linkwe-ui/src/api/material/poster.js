@@ -23,6 +23,7 @@ export function updatePoster(data) {
  * @param {*} data
  */
 export function addPoster(data) {
+  console.log(JSON.stringify(data))
   return request({ url: serviceCategory + '/insert', method: 'post', data })
 }
 
