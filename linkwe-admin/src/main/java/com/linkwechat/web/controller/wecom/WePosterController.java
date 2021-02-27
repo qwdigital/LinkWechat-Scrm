@@ -104,8 +104,6 @@ public class WePosterController extends BaseController {
         }
         List<WePosterSubassembly> deleteList = new ArrayList<>(posterSubassemblyMap.values());
         if (!CollectionUtils.isEmpty(deleteList)) {
-            //deleteList.forEach(wePosterSubassembly -> wePosterSubassembly.setDelFlag(1));
-            //wePosterSubassemblyService.updateBatchById(deleteList);
             wePosterSubassemblyService.update(Wrappers.lambdaUpdate(WePosterSubassembly.class).set(WePosterSubassembly::getDelFlag,1).in(WePosterSubassembly::getId,deleteList.stream().map(WePosterSubassembly::getId).collect(Collectors.toList())));
         }
         return AjaxResult.success("修改成功");
