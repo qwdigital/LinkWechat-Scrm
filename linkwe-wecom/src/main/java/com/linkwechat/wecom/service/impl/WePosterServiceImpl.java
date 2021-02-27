@@ -126,10 +126,19 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
             poster.setSampleImgPath(poster.getBackgroundImgPath());
             return poster.getBackgroundImgPath();
         }
+        Set<Long> existFontId = new HashSet<>();
         Map<Long, Font> fontMap = poster.getPosterSubassemblyList().stream().filter(wePosterSubassembly -> wePosterSubassembly.getType().equals(1))
                 .peek(wePosterSubassembly -> {
-                    if(wePosterSubassembly.getFontId() == null){
+                    if (wePosterSubassembly.getFontId() == null) {
                         wePosterSubassembly.setFontId(0L);
+                    }
+                })
+                .filter(wePosterSubassembly -> {
+                    if(existFontId.contains(wePosterSubassembly.getFontId())){
+                        return false;
+                    }else {
+                        existFontId.add(wePosterSubassembly.getFontId());
+                        return true;
                     }
                 })
                 .collect(Collectors.toMap(WePosterSubassembly::getFontId, wePosterSubassembly -> posterFontService.getFont(wePosterSubassembly.getFontId(), wePosterSubassembly.getFontSize(),wePosterSubassembly.getFontStyle())));
