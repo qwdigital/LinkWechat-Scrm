@@ -268,7 +268,7 @@ export default {
           v-hasPermi="['wecom:code:remove']"
           type="primary"
           size="mini"
-          @click="remove"
+          @click="remove()"
           >删除</el-button
         >
         <el-button
