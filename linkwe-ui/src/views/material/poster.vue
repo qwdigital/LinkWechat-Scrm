@@ -166,6 +166,7 @@ export default {
       this.dialog.preview = true
     },
     async edit (item) {
+      console.log('edit!!!!!!!')
       try {
         const res = await getPosterInfo(item.id)
         const data = res.data || {}
@@ -177,6 +178,7 @@ export default {
           type: data.type,
           delFlag: data.delFlag,
         }
+        this.posterSubassemblyList = [];
         this.posterSubassemblyList = data.posterSubassemblyList || [];
         this.materialSelected = data.backgroundImgPath
         this.posterEdit.step = 0
@@ -311,7 +313,7 @@ export default {
         })
     },
     inputFontSizeRangeChange (e) {
-      this.$refs.tuiImageEditor.inputFontSizeRangeChange(e);
+      this.$refs.tuiImageEditor.inputFontSizeRangeChange();
     },
     // getRecord(res){
     //   var flag = false;
@@ -397,9 +399,9 @@ export default {
       while (i < len) {
         vo = list[i];
         if (this.imgList[vo.id]) {
-          vo.objType = this.imgList[vo.id].objType;
-          vo.url = this.imgList[vo.id].url;
-          vo.randomId = this.imgList[vo.id].randomId
+          vo.objType =    this.imgList[vo.id].objType;
+          vo.url =        this.imgList[vo.id].url;
+          vo.randomId =   this.imgList[vo.id].randomId
         }
         
         let type = vo.type;
@@ -408,36 +410,40 @@ export default {
           // 如果是文本需要对文字内容进行特殊处理
           isText = true;
           let targetData = this.getLastSelectData(vo.id, historys);
-          if (targetData) {
-            vo.text = targetData.text;
+          vo.text = targetData && targetData.text || vo.text || '';
+
+          // 如果文本没有数据则移除
+          if (!vo.text.length) {
+            i++;
+            continue;
           }
         }
 
         let align = vo.textAlign && 
                     (vo.textAlign === 'left' ? 1 : vo.textAlign === 'center' ? 2 : 3) 
-                    || null; 
+                    || 1; 
         
         let posData = {
-          id: vo.randomId || i,
-          content: vo.text || '',   // 文本内容 
-          delFlag: 0,   // 1 启动  0 删除      FIXME 暂时写死
-          fontColor: vo.fill || '#000000', // 
-          fontId: null,// TODO 后端让传NULL  isText ? i : null,   // 字体ID   与imgPath互斥
-          fontSize: vo.fontSize,
-          fontTextAlign: align, // 1 2 3  left center right
-          left: parseInt(vo.left),
-          top: parseInt(vo.top),
-          width: vo.width,
-          height: vo.height,
-          imgPath: vo.url || '',
-          posterId: null,
-          type: isText ? 1 : vo.objType,  //  1 固定文本 2 固定图片 3 二维码图片
-          // alpha: vo.opacity, // 页面没有设置透明度，可不传
-          fontStyle: (vo.italic && vo.bold) ? 3 : vo.italic ? 2 : vo.bold ? 1 : 0, // 0 通常 1 粗体 2 斜体 3 粗 + 斜
-          rotate: vo.angle,
-          order: i,  // 层级
-          // categoryId: 0, // 分类ID (不需要传了)
-          verticalType: 2 // 居中方式 写死2
+          id:           null,                     // 修改的时候后端默认没增删，沟通后让先传null
+          content:      vo.text || '',            // 文本内容 
+          delFlag:      0,                        // 1 启动  0 删除      FIXME 暂时写死
+          fontColor:    vo.fill || '#000000',
+          fontId:       null,                     // TODO 后端让传NULL  isText ? i : null,   // 字体ID   与imgPath互斥
+          fontSize:     parseInt(vo.fontSize),
+          fontTextAlign: align,                   // 1 2 3  left center right
+          left:         parseInt(vo.left) - (isText ? 0 : vo.width >> 1),   //  FIXME：显示偏移了
+          top:          parseInt(vo.top) - (isText ? 0 : vo.height >> 1),
+          width:        Math.ceil(vo.width + vo.fontSize / 2),
+          height:       parseInt(vo.height),
+          imgPath:      vo.url || '',
+          posterId:     null,
+          type:         isText ? 1 : vo.objType,  // 1 固定文本 2 固定图片 3 二维码图片
+          // alpha: vo.opacity,                   // 后端暂时不支持
+          fontStyle:    (vo.italic && vo.bold) ? 3 : vo.italic ? 2 : vo.bold ? 1 : 0, // 0 通常 1 粗体 2 斜体 3 粗 + 斜
+          rotate:       vo.angle,
+          order:        i,                        // 层级
+          // categoryId: 0,                       // 分类ID (不需要传了)
+          verticalType: 2                         // 居中方式后端让写死2
         };
         posterSubList.push(posData);
         i++;
@@ -677,7 +683,7 @@ export default {
                 </li>
                 <li class="menu-item">
                   <label class="no-pointer">
-                    <input id="input-font-size-range" @change="inputFontSizeRangeChange($event)" type="range" min="10" max="100" value="10" />
+                    <input id="input-font-size-range" @change="inputFontSizeRangeChange($event)" type="range" min="10" max="100" value="40" />
                   </label>
                 </li>
                 <li class="menu-item">

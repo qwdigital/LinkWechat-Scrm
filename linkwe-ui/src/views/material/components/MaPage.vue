@@ -171,6 +171,8 @@ export default {
     edit(data, type) {
       switch (type) {
         case 5:
+          // 清除编辑的数据
+          this.$parent.posterSubassemblyList = [];
           this.$parent.posterEdit.step = 0
           this.$parent.dialog.edit = true
         break
