@@ -40,6 +40,7 @@
                 AND wcm.create_by=#{sender}
             </if>
         </where>
+        ORDER BY wcmo.create_time DESC
     </select>
     <select id="findCustomerMessagePushDetail"
             resultType="com.linkwechat.wecom.domain.vo.CustomerMessagePushVo">
