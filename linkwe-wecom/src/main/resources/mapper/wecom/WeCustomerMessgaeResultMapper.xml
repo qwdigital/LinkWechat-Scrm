@@ -25,7 +25,7 @@
             chat_name
         )
         VALUES
-        <foreach collection="list" item="item" separator="," index="index" >
+        <foreach collection="customers" item="item" separator="," index="index" >
             (#{item.messgaeResultId},
             #{item.messageId},
             #{item.externalUserid},

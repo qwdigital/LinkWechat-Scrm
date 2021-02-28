@@ -37,7 +37,20 @@
             resultType="com.linkwechat.wecom.domain.vo.WeCommunityNewGroupVo">
          <include refid="selectSql"/>
          <where>
-             emple_code_name LIKE CONCAT("%",#{empleCodeName},"%") AND del_flag = 0
+             del_flag = 0
+             <if test="empleCodeName!=null and empleCodeName!=''">
+                 AND  emple_code_name LIKE CONCAT("%",#{empleCodeName},"%")
+             </if>
+             <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                 AND date_format(create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+             </if>
+
+             <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                 AND date_format(create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+             </if>
+             <if test="createBy!=null and createBy!=''">
+                 AND create_by LIKE CONCAT("%",#{createBy},"%")
+             </if>
          </where>
     </select>
 
