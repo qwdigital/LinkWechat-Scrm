@@ -433,7 +433,7 @@ export default {
           fontTextAlign: align,                   // 1 2 3  left center right
           left:         parseInt(vo.left) - (isText ? 0 : vo.width >> 1),   //  FIXME：显示偏移了
           top:          parseInt(vo.top) - (isText ? 0 : vo.height >> 1),
-          width:        Math.ceil(vo.width + vo.fontSize / 2),
+          width:        parseInt(vo.width + (isText ? vo.fontSize / 2 : 0)),
           height:       parseInt(vo.height),
           imgPath:      vo.url || '',
           posterId:     null,
