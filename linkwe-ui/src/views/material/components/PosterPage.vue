@@ -97,8 +97,8 @@ export default {
                     this.editorInstance.
                     addText('', {
                         position: {
-                            x: 0,
-                            y: 0
+                            x: -100,
+                            y: -100
                         },
                     })
                     .then(function (objectProps) {
@@ -124,13 +124,26 @@ export default {
                 }
                 i ++;
             }
+            // fixme 有个bug，暂时在添加空的文本重制下状态
+            this.editorInstance.
+            addText('', {
+                position: {
+                    x: -100,
+                    y: -100
+                },
+            })
+
+            // 清楚状态
+            this.activateImageMode();
         },
         // 1 固定文本 2 固定图片 3 二维码图片
         createReShowDisplay(data) {
             return new Promise((resolve)=>{
                 switch (data.type) {
                     case 1:
+                        this.showSubMenu('text');
                         this.activateTextMode();
+                        
                         this.editorInstance.
                         addText(data.content, {
                             position: {
@@ -139,38 +152,60 @@ export default {
                             },
                         })
                         .then(function (objectProps) {
-                            console.log(objectProps);
+                            this.activeObjectId = objectProps.id;
+                            objectProps.left =      data.left;
+                            objectProps.top =       data.top;
+                            objectProps.fontSize =  data.fontSize;
+                            objectProps.fill =      data.fontColor;
+                            objectProps.textAlign = data.textAlign;
+                            this.getRecord(objectProps);
+
                             // 重置 TextStyle
                             this.editorInstance.changeTextStyle(objectProps.id, {
-                                fontSize: data.fontSize,
-                                fill: data.fontColor,
-                                textAlign: data.fontTextAlign === 1 ? 'left' : 
+                                fontSize:   data.fontSize,
+                                fill:       data.fontColor,
+                                textAlign:  data.fontTextAlign === 1 ? 'left' : 
                                             data.fontTextAlign === 2 ? 'center' : 'right'
-                            });
-                            resolve();
-                        });
-                       
+                            }).then(()=>{
+                                resolve();
+                            })                    
+                        }.bind(this));
                     break;
                     case 2:
                     case 3:
-                        this.activateImageMode()
+                        this.activateImageMode();
+                        
                         this.editorInstance.addImageObject(
                             data.type === 2 ? data.imgPath : 
                             data.imgPath === this.qrCodeUrl ? qrCodeImage : data.imgPath
                         ).then(objectProps => {
                             console.log(objectProps.id);
+                            this.activeObjectId = objectProps.id;
+
                             let target = {}
-                            target.url = data.imgPath;
-                            target.randomId = objectProps.id;
-                            target.objType = data.type;
+                            data.displayId =    objectProps.id;
+                            target.url =        data.imgPath;
+                            target.randomId =   objectProps.id;
+                            target.objType =    data.type;
 
                             this.editorInstance.setObjectProperties(objectProps.id, {
-                                left: data.left,
-                                top: data.top
+                                left:       data.left + data.width / 2,
+                                top:        data.top + data.height / 2
+                            }).then(()=>{
+                                let obj = {
+                                    left:   data.left + data.width / 2,
+                                    top:    data.top + data.height / 2,
+                                    width:  data.width,
+                                    height: data.height,
+                                    angle:  data.rotate,
+                                    id:     data.displayId
+                                }
+                                this.getRecord(obj);
+                                resolve()
                             })
                             // 将图片数据传给父组件保存
-                            this.$emit('getImageData', target);console.log(objectProps);
-                            resolve()
+                            this.$emit('getImageData', target);
+                            console.log(objectProps);
                         });
                     break;
                 }
@@ -310,23 +345,24 @@ export default {
             })
             .then(function (objectProps) {
                 console.log(objectProps);
-                this.records(objectProps);
+                this.getRecord(objectProps);
             }.bind(this));
         },
         // 文本改变事件
         textEditing (e) {
-            console.log('dsds', e)
+            console.log('textEditing', e)
         },
         //移动
         onObjectMoved(obj) {
-            console.log('onObjectMoved');
+            console.log('onObjectMoved', JSON.stringify(obj));
             this.getRecord(obj);
         },
         //新增/选中
         objectActivated(obj) {
             console.log('objectActivated');
+            // 第一次选中tui-image传过来的位置有问题，这里处理一下，如果之前有数据不使用选中的数据
             this.activeObjectId = obj.id;
-            this.getRecord(obj);
+            this.getRecord(obj, true);
             if (obj.type === 'text' || obj.type === 'i-text') {
                 this.showSubMenu('text');
                 this.setTextToolbar(obj);
@@ -341,7 +377,12 @@ export default {
             console.log('onObjectScaled')
             this.getRecord(obj);
             if (obj.type === 'text' || obj.type === 'i-text') {
-                this.inputFontSizeRange.setAttribute('value',obj.fontSize);        
+                let size = obj.fontSize;
+                size = size > 100 ? 100 : size < 10 ? 10 : size;
+                // this.editorInstance.changeTextStyle(this.activeObjectId, {
+                //     fontSize: size
+                // });        
+                this.inputFontSizeRange.value = size;
             }
         },
         onRedoStackChanged(length) {
@@ -452,7 +493,7 @@ export default {
             let fontSize = obj.fontSize;
             let fontColor = obj.fill;
 
-            this.inputFontSizeRange.setAttribute('value', fontSize);
+            this.inputFontSizeRange.value = fontSize;
             this.textColorpicker.setColor(fontColor);
         },
         showSubMenu (type) {
@@ -470,9 +511,11 @@ export default {
             this.displayingSubMenu = submenu;
         },
         inputFontSizeRangeChange () {
-            let value = this.inputFontSizeRange.getAttribute('value');
+            console.log('inputFontSizeRangeChange')
+            let value = this.inputFontSizeRange.value;
             if (this.activeObjectId) {
                 let size = parseInt(value, 10);
+                size = size > 100 ? 100 : size < 10 ? 10 : size;
                 this.editorInstance.changeTextStyle(this.activeObjectId, {
                     fontSize: size
                 });
@@ -570,8 +613,7 @@ export default {
             });
         },
         activateImageMode () {
-            let imageEditor = this.editorInstance;
-            imageEditor.stopDrawingMode();
+            this.editorInstance.stopDrawingMode();
         },
         resizeEditor () {
             let editor = document.getElementsByClassName('tui-image-editor')[0];
@@ -579,9 +621,13 @@ export default {
             
             editor.style.height = window.getComputedStyle(container).maxHeight;
         },
-        getRecord(obj){
+        getRecord(obj, isSelect){
             if (!this.records) this.records = {};
             let vo = this.records[obj.id];
+
+            // 如果之前有数据且是选中传过来的数据，不接收
+            if (vo && isSelect) return;
+
             if (vo) {
                 vo.left = obj.left;
                 vo.top = obj.top;
@@ -591,6 +637,8 @@ export default {
                 if (obj.type === 'text' || obj.type === 'i-text') {
                    vo.text = obj.text;
                    vo.fontSize = obj.fontSize;
+                   vo.fill = obj.fontColor,
+                   vo.textAlign = obj.textAlign
                 }
                 this.records[obj.id] = vo;
             } else {

@@ -15,6 +15,7 @@ export function getList(params) {
  * @param {*} params
  */
 export function updatePoster(data) {
+  console.log('poster change:', JSON.stringify(data))
  return request({ url: serviceCategory + '/update', method: 'put', data })
 }
 
@@ -23,7 +24,7 @@ export function updatePoster(data) {
  * @param {*} data
  */
 export function addPoster(data) {
-  console.log(JSON.stringify(data))
+  console.log('poster add:', JSON.stringify(data))
   return request({ url: serviceCategory + '/insert', method: 'post', data })
 }
 
