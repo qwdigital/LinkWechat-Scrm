@@ -26,10 +26,9 @@ public interface IWeCommunityNewGroupService extends IService<WeCommunityNewGrou
     /**
      * 查询新客自动拉群列表
      *
-     * @param communityNewGroup 搜索信息
      * @return {@link WeCommunityNewGroup}s
      */
-    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(WeCommunityNewGroup communityNewGroup);
+    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(String empleCodeName, String createBy, String beginTime, String endTime);
 
     /**
      * 获取新客自动拉群详细信息

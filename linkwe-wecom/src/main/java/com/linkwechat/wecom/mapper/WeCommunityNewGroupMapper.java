@@ -21,7 +21,8 @@ public interface WeCommunityNewGroupMapper extends BaseMapper<WeCommunityNewGrou
      * @param communityNewGroup 搜索信息
      * @return {@link WeCommunityNewGroup}s
      */
-    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(WeCommunityNewGroup communityNewGroup);
+    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(@Param("empleCodeName") String empleCodeName, @Param("createBy") String createBy
+            ,@Param("beginTime") String beginTime, @Param("endTime") String endTime);
 
     /**
      * 获取新客自动拉群详细信息

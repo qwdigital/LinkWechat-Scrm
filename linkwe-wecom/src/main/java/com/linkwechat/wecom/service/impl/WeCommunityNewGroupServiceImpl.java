@@ -115,8 +115,8 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
     }
 
     @Override
-    public List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(WeCommunityNewGroup communityNewGroup) {
-        List<WeCommunityNewGroupVo> weCommunityNewGroupVos = weCommunityNewGroupMapper.selectWeCommunityNewGroupList(communityNewGroup);
+    public List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(String empleCodeName, String createBy, String beginTime, String endTime) {
+        List<WeCommunityNewGroupVo> weCommunityNewGroupVos = weCommunityNewGroupMapper.selectWeCommunityNewGroupList(empleCodeName, createBy, beginTime, endTime);
         if (CollectionUtil.isNotEmpty(weCommunityNewGroupVos)) {
             List<Long> newGroupIdList = weCommunityNewGroupVos.stream().map(WeCommunityNewGroupVo::getNewGroupId).collect(Collectors.toList());
             List<WeEmpleCodeUseScop> useScopList = iWeEmpleCodeUseScopService.selectWeEmpleCodeUseScopListByIds(newGroupIdList);
