@@ -126,13 +126,24 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
             poster.setSampleImgPath(poster.getBackgroundImgPath());
             return poster.getBackgroundImgPath();
         }
-        Map<Long, Font> fontMap = poster.getPosterSubassemblyList().stream().filter(wePosterSubassembly -> wePosterSubassembly.getType().equals(1))
+        Set<String> existFontId = new HashSet<>();
+        Map<String, Font> fontMap = poster.getPosterSubassemblyList().stream().filter(wePosterSubassembly -> wePosterSubassembly.getType().equals(1))
                 .peek(wePosterSubassembly -> {
-                    if(wePosterSubassembly.getFontId() == null){
+                    if (wePosterSubassembly.getFontId() == null) {
                         wePosterSubassembly.setFontId(0L);
                     }
                 })
-                .collect(Collectors.toMap(WePosterSubassembly::getFontId, wePosterSubassembly -> posterFontService.getFont(wePosterSubassembly.getFontId(), wePosterSubassembly.getFontSize(),wePosterSubassembly.getFontStyle())));
+                .filter(wePosterSubassembly -> {
+                    if(existFontId.contains(wePosterSubassembly.getFontId()+"_"+wePosterSubassembly.getFontSize()+"_"+wePosterSubassembly.getFontStyle())){
+                        return false;
+                    }else {
+                        existFontId.add(wePosterSubassembly.getFontId()+"_"+wePosterSubassembly.getFontSize()+"_"+wePosterSubassembly.getFontStyle());
+                        return true;
+                    }
+                })
+                .collect(Collectors.toMap(wePosterSubassembly -> {
+                    return wePosterSubassembly.getFontId()+"_"+wePosterSubassembly.getFontSize()+"_"+wePosterSubassembly.getFontStyle();
+                }, wePosterSubassembly -> posterFontService.getFont(wePosterSubassembly.getFontId(), wePosterSubassembly.getFontSize(),wePosterSubassembly.getFontStyle())));
         Map<String, NetFileUtils.FileCallable> fileCallableMap = poster.getPosterSubassemblyList().stream().map(WePosterSubassembly::getImgPath).filter(StringUtils::isNotBlank).distinct().collect(Collectors.toMap(s->s, NetFileUtils::getNetFile));
         if (CollectionUtils.isEmpty(fileCallableMap)) {
             fileCallableMap = new HashMap<>();
@@ -151,7 +162,7 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
         poster.setHeight(backgroundImg.getHeight());
         poster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {
             if (wePosterSubassembly.getType().equals(1)) {
-                Font font = fontMap.get(wePosterSubassembly.getFontId());
+                Font font = fontMap.get(wePosterSubassembly.getFontId()+"_"+wePosterSubassembly.getFontSize()+"_"+wePosterSubassembly.getFontStyle());
                 FontMetrics fontMetrics = ImageUtils.getFontMetrics(font);
                 Color color;
                 if (StringUtils.isNotBlank(wePosterSubassembly.getFontColor())) {

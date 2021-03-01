@@ -5,23 +5,21 @@
 <mapper namespace="com.linkwechat.wecom.mapper.WeCommunityNewGroupMapper">
 
     <sql id="selectSql">
-        SELECT
-            new_group_id,
-            emple_code_name,
-            group_code_id,
-            create_by,
-            create_time,
-            update_by,
-            update_time,
-            del_flag,
-            activity_scene,
-            welcome_msg,
-            qr_code,
-            is_join_confirm_friends,
-            media_id,
-            join_friend_nums
-        FROM
-            we_community_new_group
+        SELECT new_group_id,
+               emple_code_name,
+               group_code_id,
+               create_by,
+               create_time,
+               update_by,
+               update_time,
+               del_flag,
+               activity_scene,
+               welcome_msg,
+               qr_code,
+               is_join_confirm_friends,
+               media_id,
+               join_friend_nums
+        FROM we_community_new_group
     </sql>
     <update id="batchRemoveWeCommunityNewGroupIds">
         update we_community_new_group set
@@ -29,16 +27,29 @@
         where new_group_id in
         <foreach collection="ids" item="id" index="index"
                  separator="," open="(" close=")">
-            #{newGroupId}
+            #{id}
         </foreach>
     </update>
 
     <select id="selectWeCommunityNewGroupList"
             resultType="com.linkwechat.wecom.domain.vo.WeCommunityNewGroupVo">
-         <include refid="selectSql"/>
-         <where>
-             emple_code_name LIKE CONCAT("%",#{empleCodeName},"%") AND del_flag = 0
-         </where>
+        <include refid="selectSql"/>
+        <where>
+            del_flag = 0
+            <if test="empleCodeName!=null and empleCodeName!=''">
+                AND emple_code_name LIKE CONCAT("%",#{empleCodeName},"%")
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+            <if test="createBy!=null and createBy!=''">
+                AND create_by LIKE CONCAT("%",#{createBy},"%")
+            </if>
+        </where>
     </select>
 
     <select id="selectWeCommunityNewGroupById"
@@ -46,6 +57,17 @@
         <include refid="selectSql"/>
         <where>
             new_group_id =#{newGroupId}
+        </where>
+    </select>
+
+    <select id="selectWeCommunityNewGroupByIds" resultType="com.linkwechat.wecom.domain.vo.WeCommunityNewGroupVo">
+        <include refid="selectSql"/>
+        <where>
+            new_group_id in
+            <foreach collection="ids" item="id" index="index"
+                     separator="," open="(" close=")">
+                #{id}
+            </foreach>
         </where>
     </select>
 

@@ -21,7 +21,8 @@ public interface WeCommunityNewGroupMapper extends BaseMapper<WeCommunityNewGrou
      * @param communityNewGroup 搜索信息
      * @return {@link WeCommunityNewGroup}s
      */
-    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(WeCommunityNewGroup communityNewGroup);
+    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(@Param("empleCodeName") String empleCodeName, @Param("createBy") String createBy
+            ,@Param("beginTime") String beginTime, @Param("endTime") String endTime);
 
     /**
      * 获取新客自动拉群详细信息
@@ -37,5 +38,13 @@ public interface WeCommunityNewGroupMapper extends BaseMapper<WeCommunityNewGrou
      * @return
      */
     int batchRemoveWeCommunityNewGroupIds(List<String> idList);
+
+    /**
+     * 通过id查询新客自动拉群信息列表
+     *
+     * @param ids id列表
+     * @return {@link WeCommunityNewGroup} 新客自动拉群信息
+     */
+    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupByIds(@Param("ids") List<String> ids);
 
 }

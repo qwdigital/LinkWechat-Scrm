@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-public class WeCommunityNewGroupServiceImpl  extends ServiceImpl<WeCommunityNewGroupMapper, WeCommunityNewGroup> implements IWeCommunityNewGroupService {
+public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGroupMapper, WeCommunityNewGroup> implements IWeCommunityNewGroupService {
 
     @Autowired
     private WeGroupCodeMapper weGroupCodeMapper;
@@ -61,7 +61,7 @@ public class WeCommunityNewGroupServiceImpl  extends ServiceImpl<WeCommunityNewG
 
         //检查群活码是否存在
         WeGroupCode weGroupCode = weGroupCodeMapper.selectWeGroupCodeById(communityNewGroupDto.getGroupCodeId());
-        if(null!=weGroupCode){
+        if (null != weGroupCode) {
             throw new WeComException("群活码不存在！");
         }
         WeEmpleCode weEmpleCode = getWeEmpleCode(communityNewGroupDto);
@@ -71,7 +71,7 @@ public class WeCommunityNewGroupServiceImpl  extends ServiceImpl<WeCommunityNewG
         WeExternalContactDto qrCode = weEmpleCodeService.getQrCode(weContactWay);
 
         //保存新客自动拉群信息
-        WeCommunityNewGroup communityNewGroup=new WeCommunityNewGroup();
+        WeCommunityNewGroup communityNewGroup = new WeCommunityNewGroup();
         communityNewGroup.setNewGroupId(weGroupCode.getId());
         communityNewGroup.setEmpleCodeName(communityNewGroupDto.getActivityScene());
         communityNewGroup.setDelFlag(0);
@@ -115,9 +115,9 @@ public class WeCommunityNewGroupServiceImpl  extends ServiceImpl<WeCommunityNewG
     }
 
     @Override
-    public List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(WeCommunityNewGroup communityNewGroup) {
-        List<WeCommunityNewGroupVo> weCommunityNewGroupVos = weCommunityNewGroupMapper.selectWeCommunityNewGroupList(communityNewGroup);
-        if(CollectionUtil.isNotEmpty(weCommunityNewGroupVos)){
+    public List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(String empleCodeName, String createBy, String beginTime, String endTime) {
+        List<WeCommunityNewGroupVo> weCommunityNewGroupVos = weCommunityNewGroupMapper.selectWeCommunityNewGroupList(empleCodeName, createBy, beginTime, endTime);
+        if (CollectionUtil.isNotEmpty(weCommunityNewGroupVos)) {
             List<Long> newGroupIdList = weCommunityNewGroupVos.stream().map(WeCommunityNewGroupVo::getNewGroupId).collect(Collectors.toList());
             List<WeEmpleCodeUseScop> useScopList = iWeEmpleCodeUseScopService.selectWeEmpleCodeUseScopListByIds(newGroupIdList);
             List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.selectWeEmpleCodeTagListByIds(newGroupIdList);
@@ -139,7 +139,7 @@ public class WeCommunityNewGroupServiceImpl  extends ServiceImpl<WeCommunityNewG
     @Override
     public WeCommunityNewGroupVo selectWeCommunityNewGroupById(Long newGroupId) {
         WeCommunityNewGroupVo weCommunityNewGroupVo = weCommunityNewGroupMapper.selectWeCommunityNewGroupById(newGroupId);
-        if(null!=weCommunityNewGroupVo){
+        if (null != weCommunityNewGroupVo) {
             List<WeGroupCodeActual> weGroupCodeActuals = getWeGroupCodeActuals(weCommunityNewGroupVo);
             weCommunityNewGroupVo.setWeGroupUserScops(weGroupCodeActuals);
             List<WeEmpleCodeUseScop> useScopList = iWeEmpleCodeUseScopService.selectWeEmpleCodeUseScopListByIds(Lists.newArrayList(weCommunityNewGroupVo.getNewGroupId()));
@@ -166,13 +166,13 @@ public class WeCommunityNewGroupServiceImpl  extends ServiceImpl<WeCommunityNewG
 
         //检查群活码是否存在
         WeGroupCode weGroupCode = weGroupCodeMapper.selectWeGroupCodeById(communityNewGroupDto.getGroupCodeId());
-        if(null!=weGroupCode){
+        if (null != weGroupCode) {
             throw new WeComException("群活码不存在！");
         }
 
         //查询新客自动拉群信息
         WeCommunityNewGroup communityNewGroup = weCommunityNewGroupMapper.selectById(communityNewGroupDto.getGroupCodeId());
-        if(null!=communityNewGroup){
+        if (null != communityNewGroup) {
             throw new WeComException("信息不存在！");
         }
 
@@ -216,4 +216,13 @@ public class WeCommunityNewGroupServiceImpl  extends ServiceImpl<WeCommunityNewG
         return weCommunityNewGroupMapper.batchRemoveWeCommunityNewGroupIds(idList);
     }
 
+    @Override
+    public WeCommunityNewGroupVo selectWeCommunityNewGroupById(long id) {
+        return weCommunityNewGroupMapper.selectWeCommunityNewGroupById(id);
+    }
+
+    @Override
+    public List<WeCommunityNewGroupVo> selectWeCommunityNewGroupByIds(List<String> ids) {
+        return weCommunityNewGroupMapper.selectWeCommunityNewGroupByIds(ids);
+    }
 }

@@ -257,7 +257,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
     private void addHitSensitiveList(List<JSONObject> json, WeSensitive weSensitive) {
         elasticSearch.createIndex2(WeConstans.WECOM_SENSITIVE_HIT_INDEX, getSensitiveHitMapping());
         boolean sendMessage = false;
-        if (weSensitive.getAlertFlag().equals(1)) {
+        if (weSensitive.getAlertFlag().equals(1) && CollectionUtils.isNotEmpty(json)) {
             //发送消息通知给相应的审计人
             WeCorpAccount weCorpAccount = weCorpAccountService.findValidWeCorpAccount();
             String auditUserId = weSensitive.getAuditUserId();
@@ -268,7 +268,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
             pushDto.setTouser(auditUserId);
             pushDto.setMsgtype(MessageType.TEXT.getMessageType());
             pushDto.setText(textMessageDto);
-            weMessagePushClient.sendMessageToUser(pushDto,weCorpAccount.getAgentId());
+            weMessagePushClient.sendMessageToUser(pushDto, weCorpAccount.getAgentId());
             sendMessage = true;
         }
         //批量提交插入记录

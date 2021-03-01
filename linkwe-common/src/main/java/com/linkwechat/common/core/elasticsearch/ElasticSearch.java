@@ -97,12 +97,16 @@ public class ElasticSearch {
                 return;
             }
             CreateIndexRequest request = new CreateIndexRequest(idxName);
+            GetIndexRequest getIndexRequest = new GetIndexRequest(idxName);
             buildSetting(request);
             request.mapping(builder);
 //            request.settings() 手工指定Setting
-            CreateIndexResponse res = restHighLevelClient.indices().create(request, RequestOptions.DEFAULT);
-            if (!res.isAcknowledged()) {
-                log.info("初始化失败");
+            boolean exists = restHighLevelClient.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
+            if (!exists) {
+                CreateIndexResponse res = restHighLevelClient.indices().create(request, RequestOptions.DEFAULT);
+                if (!res.isAcknowledged()) {
+                    log.info("初始化失败");
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
