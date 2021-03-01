@@ -5,7 +5,7 @@
         <div class="hd_box">
           <div class="hd_name">客户列表（{{employAmount}}）</div>
           <div class="paddingT10">
-            <el-input placeholder="搜索客户" prefix-icon="el-icon-search" v-model="employName">
+            <el-input placeholder="搜索客户" prefix-icon="el-icon-search" v-model="employName" @keyup.enter.native="customerList" >
             </el-input>
           </div>
         </div>
@@ -26,7 +26,7 @@
         <div class="hd_box">
           <div class="hd_name">{{talkName}}</div>
           <div class="paddingT10">
-            <el-input placeholder="搜索聊天记录" prefix-icon="el-icon-search" v-model="employName">
+            <el-input placeholder="搜索聊天记录" prefix-icon="el-icon-search" v-model="chatContent">
             </el-input>
           </div>
         </div>
@@ -107,7 +107,7 @@
                     </template>
                   </el-table-column>
                   <el-table-column prop="action" label="操作">
-                    <template slot-scope="scope">
+                    <template >
                       <el-button type="text" size="small">下载</el-button>
                       <el-button type="text" size="small">查看</el-button>
                     </template>
@@ -172,6 +172,7 @@
         employAmount: 1,
         employName: '',
         talkName: '',
+        chatContent:"",
         personIndex: '-1',
         activeName: "0",
         activeNameThree: '0',

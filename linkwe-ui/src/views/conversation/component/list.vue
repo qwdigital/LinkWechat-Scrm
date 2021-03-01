@@ -6,8 +6,9 @@
                 <el-row style="padding:10px">
                 <el-col :span="3"> <img :src="item.receiveWeCustomer.avatar"></el-col>
                 <el-col :span="21">
-                    <p>{{item.receiveWeCustomer.name}} <span class="fr gray">{{parseTime(item.finalChatContext.msgtime)}}</span></p>
-                    <p class="gray padt10" v-if="item.finalChatContext.text">{{item.finalChatContext.text.content}}</p>     
+                    <!-- {{parseTime(item.finalChatContext.msgtime)}} <span class="fr gray"></span>-->
+                    <p>{{item.receiveWeCustomer.name}} </p>
+                    <!-- <p class="gray padt10" v-if="item.finalChatContext.text">{{item.finalChatContext.text.content}}</p>      -->
                 </el-col>
                 </el-row>           
             </li>
@@ -63,6 +64,7 @@
             cursor: pointer;
             p{white-space:nowrap;
             overflow:hidden;
+            line-height: 40px;
             text-overflow:ellipsis;}
             :hover{ background: #efefef;}
             img {
