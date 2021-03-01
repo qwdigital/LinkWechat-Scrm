@@ -64,6 +64,9 @@ Vue.prototype.msgInfo = function(msg) {
   this.$message.info(msg)
 }
 
+import { pickerOptions } from '@/utils/index'
+Vue.prototype.pickerOptions = pickerOptions
+
 // 全局组件挂载
 Vue.component('Pagination', Pagination)
 Vue.component('RightToolbar', RightToolbar)

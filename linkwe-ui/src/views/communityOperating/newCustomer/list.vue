@@ -10,6 +10,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         activityScene: '',
+        createBy: '',
         beginTime: '', // "开始时间",
         endTime: '', // "结束时间"
       },
@@ -48,8 +49,7 @@ export default {
       }
       page && (this.query.pageNum = page)
       this.loading = true
-      api
-        .getList(this.query)
+      getList(this.query)
         .then(({ rows, total }) => {
           this.list = rows
           this.total = +total
@@ -147,9 +147,9 @@ export default {
         <el-input v-model="query.name" placeholder="请输入"></el-input>
       </el-form-item>
       <el-form-item label="创建人">
-        <div class="tag-input" @click="dialogVisibleSelectUser = true">
-          <el-input v-model="query.name" placeholder="请输入"></el-input>
-          <!-- <span class="tag-place" v-if="!queryUser.length">请选择</span>
+        <el-input v-model="query.createBy" placeholder="请输入"></el-input>
+        <!-- <div class="tag-input" @click="dialogVisibleSelectUser = true">
+          <span class="tag-place" v-if="!queryUser.length">请选择</span>
           <template v-else>
             <el-tag
               type="info"
@@ -157,8 +157,8 @@ export default {
               :key="unique"
               >{{ unit.name }}</el-tag
             >
-          </template> -->
-        </div>
+          </template>
+        </div> -->
       </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
