@@ -33,6 +33,7 @@ public interface IWeCommunityNewGroupService extends IService<WeCommunityNewGrou
 
     /**
      * 获取新客自动拉群详细信息
+     *
      * @param newGroupId 主键id
      * @return {@link WeCommunityNewGroupVo} 自动拉群信息
      */
@@ -40,6 +41,7 @@ public interface IWeCommunityNewGroupService extends IService<WeCommunityNewGrou
 
     /**
      * 修改新客自动拉群
+     *
      * @param communityNewGroupDto 信息
      * @return 结果
      */
@@ -51,5 +53,22 @@ public interface IWeCommunityNewGroupService extends IService<WeCommunityNewGrou
      * @param idList id列表
      * @return
      */
-   int batchRemoveWeCommunityNewGroupIds(List<String> idList);
+    int batchRemoveWeCommunityNewGroupIds(List<String> idList);
+
+    /**
+     * 通过id查询新客自动拉群信息
+     *
+     * @param id id
+     * @return {@link WeCommunityNewGroup} 新客自动拉群信息
+     */
+    WeCommunityNewGroupVo selectWeCommunityNewGroupById(long id);
+
+    /**
+     * 通过id查询新客自动拉群信息列表
+     *
+     * @param ids id列表
+     * @return {@link WeCommunityNewGroup} 新客自动拉群信息
+     */
+    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupByIds(List<String> ids);
+
 }
