@@ -54,22 +54,22 @@
             <el-col :span="6">{{erchatsTable.negativeFeedbackCnt}}</el-col>
           </el-row>
           <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:20px">
-            <el-col :span="6">比{{time}}天 <i
+            <el-col :span="6">比{{time}} <i
                 :class="{'el-icon-top':Number(erchatsTable.newApplyCntDiff)>=1,'el-icon-bottom':Number(erchatsTable.newApplyCntDiff)<0,'redicon':Number(erchatsTable.newApplyCntDiff)>=1,'greenicon':Number(erchatsTable.newApplyCntDiff)<0}"></i>
               <span
                 :class="{'redicon':Number(erchatsTable.newApplyCntDiff)>=1,'greenicon':Number(erchatsTable.newApplyCntDiff)<0}">{{erchatsTable.newApplyCntDiff}}</span>
             </el-col>
-            <el-col :span="6">比{{time}}天 <i
+            <el-col :span="6">比{{time}} <i
                 :class="{'el-icon-top':Number(erchatsTable.newContactCntDiff)>=1,'el-icon-bottom':Number(erchatsTable.newContactCntDiff)<0,'redicon':Number(erchatsTable.newContactCntDiff)>=1,'greenicon':Number(erchatsTable.newContactCntDiff)<0}"></i>
               <span
                 :class="{'redicon':Number(erchatsTable.newContactCntDiff)>=1,'greenicon':Number(erchatsTable.newContactCntDiff)<0}">{{erchatsTable.newContactCntDiff}}</span>
             </el-col>
-            <el-col :span="6">比{{time}}天 <i
+            <el-col :span="6">比{{time}} <i
                 :class="{'el-icon-top':Number(erchatsTable.newMemberCntDiff)>=1,'el-icon-bottom':Number(erchatsTable.newMemberCntDiff)<0,'redicon':Number(erchatsTable.newMemberCntDiff)>=1,'greenicon':Number(erchatsTable.newMemberCntDiff)<0}"></i>
               <span
                 :class="{'redicon':Number(erchatsTable.newMemberCntDiff)>=1,'greenicon':Number(erchatsTable.newMemberCntDiff)<0}">{{erchatsTable.newMemberCntDiff}}</span>
             </el-col>
-            <el-col :span="6">比{{time}}天 <i
+            <el-col :span="6">比{{time}} <i
                 :class="{'el-icon-top':Number(erchatsTable.negativeFeedbackCntDiff)>=1,'el-icon-bottom':Number(erchatsTable.negativeFeedbackCntDiff)<0,'redicon':Number(erchatsTable.negativeFeedbackCntDiff)>=1,'greenicon':Number(erchatsTable.negativeFeedbackCntDiff)<0}"></i>
               <span
                 :class="{'redicon':Number(erchatsTable.negativeFeedbackCntDiff)>=1,'greenicon':Number(erchatsTable.negativeFeedbackCntDiff)<0}">{{erchatsTable.negativeFeedbackCntDiff}}</span>
@@ -182,7 +182,7 @@
         table: {},
         erchatsTable: {},
         allData: {},
-        time: '昨',
+        time: '昨天',
         uptime: '21321-21321:22',
         timeType: 'day',
         charts: '',
@@ -191,13 +191,9 @@
     },
     methods: {
       getTimeState() {
-        // 获取当前时间
         let timeNow = new Date();
-        // 获取当前小时
         let hours = timeNow.getHours();
-        // 设置默认文字
         let state = ``;
-        // 判断当前时间段
         if (hours >= 0 && hours <= 10) {
           state = `早上好!`;
         } else if (hours > 10 && hours <= 14) {
@@ -212,13 +208,17 @@
       timeTypeCheck() {
         console.log(this.allData)
         if (this.timeType == 'day') {
+          this.time='昨天'
           this.erchatsTable = this.allData.today
         } else if (this.timeType == 'week') {
+           this.time='上周'
           this.erchatsTable = this.allData.week
 
         } else if (this.timeType == 'month') {
+           this.time='上月'
           this.erchatsTable = this.allData.month
         } else if (this.timeType == 'reset') {
+           this.time='昨天'
           this.timeType = 'day'
           this.erchatInfo()
         }
