@@ -1,39 +1,503 @@
 <template>
-  <div>
-    <img class="img" src="@/assets/image/index.png" alt="" />
-    <div class="button" @click="goWeb"></div>
+  <div class="index">
+    <div class="index_l whitebg">
+      <div class="box titlebox">
+        <p class="adminname">{{getTimeState()}},Admin</p>
+        <p>20230-2-2 123:3123:1232</p>
+      </div>
+      <div class="tables">
+        <div style="text-align:left">
+          <el-row type="flex" class="row-bg" justify="space-between">
+            <el-col :span="24">实时数据</el-col>
+          </el-row>
+          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:20px">
+            <el-col :span="6">企业成员总数</el-col>
+            <el-col :span="6">客户总人数</el-col>
+            <el-col :span="6">客户群总数</el-col>
+            <el-col :span="6">群成员总数</el-col>
+          </el-row>
+          <el-row type="flex" class="row-bg" justify="space-between"
+            style="margin-top:20px;font-size:35px;font-weight:bold">
+            <el-col :span="6">{{table.customerCount}}</el-col>
+            <el-col :span="6">{{table.groupMemberCount}}</el-col>
+            <el-col :span="6">{{table.groupCount}}</el-col>
+            <el-col :span="6">{{table.userCount}}</el-col>
+          </el-row>
+        </div>
+      </div>
+      <div class="dataall" style="margin-top:20px">
+        <div style="text-align:left">
+          <el-row type="flex" class="row-bg" justify="space-between">
+            <el-col :span="24">实时数据 <span class="fr fontgay">更新于{{uptime}}</span></el-col>
+          </el-row>
+          <el-row type="flex" class="row-bg" justify="space-between">
+            <el-col :span="24">
+              <el-radio-group v-model="timeType" style="margin-top: 20px;" @change="timeTypeCheck">
+                <el-radio-button label="day">今日</el-radio-button>
+                <el-radio-button label="week">本周</el-radio-button>
+                <el-radio-button label="month">本月</el-radio-button>
+                <el-radio-button label="reset"><i class="el-icon-refresh"> </i></el-radio-button>
+              </el-radio-group>
+            </el-col>
+          </el-row>
+          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:20px">
+            <el-col :span="6">发起申请数</el-col>
+            <el-col :span="6">新增客户数</el-col>
+            <el-col :span="6">群新增人数</el-col>
+            <el-col :span="6">流失客户数</el-col>
+          </el-row>
+          <el-row type="flex" class="row-bg" justify="space-between"
+            style="margin-top:20px;font-size:35px;font-weight:bold">
+            <el-col :span="6">{{erchatsTable.newApplyCnt}}</el-col>
+            <el-col :span="6">{{erchatsTable.newContactCnt}}</el-col>
+            <el-col :span="6">{{erchatsTable.newMemberCnt}}</el-col>
+            <el-col :span="6">{{erchatsTable.negativeFeedbackCnt}}</el-col>
+          </el-row>
+          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:20px">
+            <el-col :span="6">比{{time}} <i
+                :class="{'el-icon-top':Number(erchatsTable.newApplyCntDiff)>=1,'el-icon-bottom':Number(erchatsTable.newApplyCntDiff)<0,'redicon':Number(erchatsTable.newApplyCntDiff)>=1,'greenicon':Number(erchatsTable.newApplyCntDiff)<0}"></i>
+              <span
+                :class="{'redicon':Number(erchatsTable.newApplyCntDiff)>=1,'greenicon':Number(erchatsTable.newApplyCntDiff)<0}">{{erchatsTable.newApplyCntDiff}}</span>
+            </el-col>
+            <el-col :span="6">比{{time}} <i
+                :class="{'el-icon-top':Number(erchatsTable.newContactCntDiff)>=1,'el-icon-bottom':Number(erchatsTable.newContactCntDiff)<0,'redicon':Number(erchatsTable.newContactCntDiff)>=1,'greenicon':Number(erchatsTable.newContactCntDiff)<0}"></i>
+              <span
+                :class="{'redicon':Number(erchatsTable.newContactCntDiff)>=1,'greenicon':Number(erchatsTable.newContactCntDiff)<0}">{{erchatsTable.newContactCntDiff}}</span>
+            </el-col>
+            <el-col :span="6">比{{time}} <i
+                :class="{'el-icon-top':Number(erchatsTable.newMemberCntDiff)>=1,'el-icon-bottom':Number(erchatsTable.newMemberCntDiff)<0,'redicon':Number(erchatsTable.newMemberCntDiff)>=1,'greenicon':Number(erchatsTable.newMemberCntDiff)<0}"></i>
+              <span
+                :class="{'redicon':Number(erchatsTable.newMemberCntDiff)>=1,'greenicon':Number(erchatsTable.newMemberCntDiff)<0}">{{erchatsTable.newMemberCntDiff}}</span>
+            </el-col>
+            <el-col :span="6">比{{time}} <i
+                :class="{'el-icon-top':Number(erchatsTable.negativeFeedbackCntDiff)>=1,'el-icon-bottom':Number(erchatsTable.negativeFeedbackCntDiff)<0,'redicon':Number(erchatsTable.negativeFeedbackCntDiff)>=1,'greenicon':Number(erchatsTable.negativeFeedbackCntDiff)<0}"></i>
+              <span
+                :class="{'redicon':Number(erchatsTable.negativeFeedbackCntDiff)>=1,'greenicon':Number(erchatsTable.negativeFeedbackCntDiff)<0}">{{erchatsTable.negativeFeedbackCntDiff}}</span>
+            </el-col>
+          </el-row>
+          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:20px">
+            <div id="main" style="width: 100%;height: 500px;"></div>
+          </el-row>
+        </div>
+      </div>
+      <div class="car dataall">
+        <div>
+          <el-row type="flex" class="row-bg" justify="space-between">
+            <el-col :span="24">功能直通车 </el-col>
+          </el-row>
+          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:20px;text-align:center">
+            <el-col :span="4" v-for="(index,i) in car" :key="i">
+              <div class="circle"></div>
+            </el-col>
+
+          </el-row>
+          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:20px">
+            <el-col :span="4" v-for="(index,i) in car" :key="i" style="text-align:center">{{index.name}}</el-col>
+          </el-row>
+        </div>
+      </div>
+    </div>
+    <div class="index_r whitebg">
+      <div class="inedx_r_top">
+        <div class="inedx_r_top_header btmboder">
+          <div class="inedx_r_top_t">LinkWeChat 企业微信 SCRM</div>
+          <div class="inedx_r_top_bottom">
+            <span class="fontgay">版本信息 </span> <span class="fr">
+              <el-button type="primary" plain round>测试版</el-button>
+            </span>
+          </div>
+        </div>
+        <div class="inedx_r_top_bottom">
+          <span class="fontgay">可有日期:xx </span> <span class="fr ">永久</span>
+        </div>
+      </div>
+      <div class="twolink">
+        <div class="twolinkbox" style="color: orange"><i class="el-icon-warning-outline"></i>帮助文档</div>
+        <div class="twolinkbox" style="float:right;color:#199ed8"><i class="el-icon-s-management"></i>开发文档</div>
+      </div>
+      <div class="listcard">
+        <div class="inedx_r_top_bottom">
+          <span>更新日志</span> <span class="fr" style="color:#199ed8">更多</span>
+        </div>
+        <ul>
+          <li>1.0版本测试</li>
+          <li>1.0.1版本测试</li>
+          <li>1.0.32版本测试</li>
+        </ul>
+      </div>
+      <div class="listcard">
+        <div class="inedx_r_top_bottom">
+          <span>企业学院</span> <span class="fr" style="color:#199ed8">更多</span>
+        </div>
+        <ul>
+          <li>1.0版本测试</li>
+          <li>1.0.1版本测试</li>
+          <li>1.0.32版本测试</li>
+        </ul>
+      </div>
+      <div class="listcard">
+        <div class="inedx_r_top_bottom">
+          <span>开发群</span>
+
+        </div>
+      </div>
+      <div class="listcard">
+        <div class="inedx_r_top_bottom">
+          <span>客户群</span>
+
+        </div>
+      </div>
+    </div>
   </div>
 </template>
-
 <script>
-export default {
-  name: 'Index',
-  components: {},
-  data() {
-    return {}
-  },
-  methods: {
-    goWeb() {
-      window.open('https://gitee.com/LinkWeChat/link-wechat')
+  import {
+    content
+  } from '@/api/content.js'
+  import echarts from 'echarts'
+  export default {
+    name: 'Index',
+    components: {},
+    data() {
+      return {
+        car: [{
+          name: '发起申请数',
+          url: '/'
+        }, {
+          name: '发起申请数',
+          url: '/'
+        }, {
+          name: '发起申请数',
+          url: '/'
+        }, {
+          name: '发起申请数',
+          url: '/'
+        }, {
+          name: '发起申请数',
+          url: '/'
+        }, {
+          name: '发起申请数',
+          url: '/'
+        }],
+        table: {},
+        erchatsTable: {},
+        allData: {},
+        time: '昨天',
+        uptime: '21321-21321:22',
+        timeType: 'day',
+        charts: '',
+        opinionData: ["3", "2", "4", "4", "5"]
+      }
     },
-  },
-}
-</script>
+    methods: {
+      getTimeState() {
+        let timeNow = new Date();
+        let hours = timeNow.getHours();
+        let state = ``;
+        if (hours >= 0 && hours <= 10) {
+          state = `早上好!`;
+        } else if (hours > 10 && hours <= 14) {
+          state = `中午好!`;
+        } else if (hours > 14 && hours <= 18) {
+          state = `下午好!`;
+        } else if (hours > 18 && hours <= 24) {
+          state = `晚上好!`;
+        }
+        return state;
+      },
+      timeTypeCheck() {
+        console.log(this.allData)
+        if (this.timeType == 'day') {
+          this.time='昨天'
+          this.erchatsTable = this.allData.today
+        } else if (this.timeType == 'week') {
+           this.time='上周'
+          this.erchatsTable = this.allData.week
 
+        } else if (this.timeType == 'month') {
+           this.time='上月'
+          this.erchatsTable = this.allData.month
+        } else if (this.timeType == 'reset') {
+           this.time='昨天'
+          this.timeType = 'day'
+          this.erchatInfo()
+        }
+      },
+      tableInfo() {
+        content.indexTable().then(res => {
+          this.table = res.data
+        })
+      },
+      erchatInfo() {
+        content.indexTable().then(res => {
+          let data = {
+            updateTime: "2021-02-24 23:59:59",
+            today: {
+              newApplyCnt: 1, //发起申请数
+              newApplyCntDiff: -1, //发起申请数差值
+              newContactCnt: 2, //新增客户数
+              newContactCntDiff: 0, //新增客户数差值
+              newMemberCnt: 3, //群新增人数
+              newMemberCntDiff: -1, //群新增人数差值
+              negativeFeedbackCnt: 3, //流失客户数
+              negativeFeedbackCntDiff: 2, //流失客户数差值,
+              dataList: [{
+                xTime: '',
+                newApplyCnt: 0,
+                newContactCnt: 0,
+                newMemberCnt: 0,
+                negativeFeedbackCnt: 0
+              }]
+            },
+            week: {
+              newApplyCnt: 0,
+              newApplyCntDiff: -1,
+              newContactCnt: 0,
+              newContactCntDiff: 2,
+              newMemberCnt: 0,
+              newMemberCntDiff: 0,
+              negativeFeedbackCnt: 0,
+              negativeFeedbackCntDiff: -3,
+              dataList: [{
+                xTime: '',
+                newApplyCnt: 0,
+                newContactCnt: 0,
+                newMemberCnt: 0,
+                negativeFeedbackCnt: 0
+              }]
+            },
+            month: {
+              newApplyCnt: 0,
+              newApplyCntDiff: 0,
+              newContactCnt: 0,
+              newContactCntDiff: 0,
+              newMemberCnt: 0,
+              newMemberCntDiff: 0,
+              negativeFeedbackCnt: 0,
+              negativeFeedbackCntDiff: 0,
+              dataList: [{
+                xTime: '',
+                newApplyCnt: 0,
+                newContactCnt: 0,
+                newMemberCnt: 0,
+                negativeFeedbackCnt: 0
+              }]
+            },
+          }
+          this.allData = data;
+          this.erchatsTable = data.today;
+          this.uptime = data.updateTime;
+        })
+      },
+      drawLine(id) {
+        this.charts = echarts.init(document.getElementById(id))
+        this.charts.setOption({
+          tooltip: {
+            trigger: 'axis'
+          },
+          legend: {
+            data: ['近七日收益']
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: ["1", "2", "3", "4", "5"]
+          },
+          yAxis: {
+            type: 'value'
+          },
+          series: [{
+            name: '近七日收益',
+            type: 'line',
+            stack: '总量',
+            data: this.opinionData
+          }, {
+            name: '近七q日收益',
+            type: 'line',
+            stack: '总量',
+            data: this.opinionData
+          }]
+        })
+      }
+    },
+    //调用
+    mounted() {
+      this.$nextTick(function () {
+        this.drawLine('main')
+      })
+      this.erchatInfo()
+      this.tableInfo()
+    }
+  }
+
+</script>
 <style lang="scss" scoped>
-.page {
-  position: relative;
-  padding: 0;
-}
-.img {
-  width: 100%;
-}
-.button {
-  position: absolute;
-  top: 58%;
-  left: 11%;
-  width: 12%;
-  height: 8%;
-  cursor: pointer;
-}
+  .index {
+    margin: 0;
+    padding: 2% 1%;
+    width: 100%;
+    background: #f1f1f1;
+    overflow: hidden;
+    .fontgay {
+      color: #999;
+      font-size: 14px;
+    }
+    .fr {
+      float: right;
+    }
+
+    .redicon {
+      color: #ff0000;
+    }
+
+    .greenicon {
+      color: green;
+    }
+
+    .tables {
+      width: 100%;
+      height: 150px;
+      background: #fff;
+      border-radius: 5px;
+      padding: 15px;
+      font-size: 16px;
+    }
+
+    .whitebg {
+      min-height: 1000px;
+      float: left;
+      border-radius: 5px;
+    }
+
+    .index_l {
+      width: 75%;
+    }
+
+    .circle {
+      width: 80px;
+      height: 80px;
+      background: #999;
+      border-radius: 50%;
+      margin: 0 auto;
+    }
+
+    .index_r {
+      width: 23%;
+      margin-left: 2%;
+
+      .listcard {
+        width: 100%;
+        background: #fff;
+        overflow: hidden;
+        border-radius: 5px;
+        margin-top: 20px;
+        padding: 0 15px;
+
+        ul {
+          padding: 0;
+        }
+
+        ul li {
+          line-height: 40px;
+        }
+
+        .inedx_r_top_bottom {
+          height: 60px;
+          line-height: 60px;
+          padding: 0 15px;
+          font-weight: bold;
+        }
+      }
+
+      .inedx_r_top {
+        width: 100%;
+        background: #fff;
+        height: 240px;
+        border-radius: 5px;
+
+        .inedx_r_top_header {
+          height: 180px;
+          width: 100%;
+          color: #999;
+        }
+
+        .inedx_r_top_t {
+          height: 120px;
+          width: 100%;
+          line-height: 120px;
+          padding: 0 15px;
+          font-size: 26px;
+          color: #199ed8;
+        }
+
+        .inedx_r_top_bottom {
+          height: 60px;
+          line-height: 60px;
+          padding: 0 15px;
+        }
+
+        .btmboder {
+          border-bottom: 1px solid #efefef;
+        }
+      }
+
+      .twolink {
+        width: 100%;
+        height: 60px;
+        line-height: 60px;
+        margin-top: 20px;
+        font-size: 16px;
+        cursor: pointer;
+
+        .twolinkbox {
+          width: 48%;
+          float: left;
+          background: #fff;
+          text-align: center;
+        }
+      }
+    }
+
+    .box {
+      width: 100%;
+    }
+
+    .titlebox {
+      height: 80px;
+      padding: 10px 0;
+      background: #f1f1f1;
+
+      p {
+        line-height: 30px;
+        margin: 0;
+        padding: 0;
+      }
+    }
+
+    .adminname {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .dataall {
+      width: 100%;
+      height: 800px;
+      background: #fff;
+      border-radius: 5px;
+      padding: 20px;
+      font-size: 16px;
+    }
+
+    .car {
+      height: 200px;
+      margin-top: 20px;
+    }
+  }
+
 </style>

@@ -98,7 +98,7 @@
                     </template>
                   </el-table-column>
                   <el-table-column prop="action" label="操作">
-                    <template slot-scope="scope">
+                    <template >
                       <el-button type="text" size="small">下载</el-button>
                       <el-button type="text" size="small">查看</el-button>
                     </template>
@@ -323,7 +323,6 @@
           let querys = {
             pageNum: '1',
             pageSize: '999',
-            isActivate: '4',
             department: data.id
           }
           api.getList(querys).then(({
