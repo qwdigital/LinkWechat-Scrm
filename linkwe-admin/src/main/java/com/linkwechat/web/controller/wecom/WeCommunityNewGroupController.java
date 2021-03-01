@@ -43,7 +43,7 @@ import java.util.zip.ZipOutputStream;
  */
 @Api(description = "新客自动拉群 Controller")
 @Controller
-@RequestMapping(value = "communityNewGroup")
+@RequestMapping(value = "/wecom/communityNewGroup")
 public class WeCommunityNewGroupController extends BaseController {
 
     @Autowired
