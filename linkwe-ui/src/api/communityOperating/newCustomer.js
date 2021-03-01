@@ -116,3 +116,27 @@ export function remove(ids) {
     method: 'DELETE',
   })
 }
+
+/**
+ * 批量下载
+ * @param {*} 	员工活码ids,多个逗号隔开
+ */
+export function downloadBatch(ids) {
+  return request({
+    url: service + '/downloadBatch',
+    params: {
+      ids,
+    },
+    responseType: 'blob',
+  })
+}
+
+export function download(id) {
+  return request({
+    url: service + '/download',
+    params: {
+      id,
+    },
+    responseType: 'blob',
+  })
+}

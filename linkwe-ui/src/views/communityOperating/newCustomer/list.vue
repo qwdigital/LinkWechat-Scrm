@@ -1,5 +1,10 @@
 <script>
-import { getList, remove } from '@/api/communityOperating/newCustomer'
+import {
+  getList,
+  remove,
+  download,
+  downloadBatch,
+} from '@/api/communityOperating/newCustomer'
 
 export default {
   components: {},
@@ -9,7 +14,7 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        activityScene: '',
+        empleCodeName: '',
         createBy: '',
         beginTime: '', // "开始时间",
         endTime: '', // "结束时间"
@@ -91,8 +96,8 @@ export default {
         })
         .catch(function() {})
     },
-    download(id, userName, activityScene) {
-      let name = userName + '-' + activityScene + '.png'
+    download(id, userName, empleCodeName) {
+      let name = userName + '-' + empleCodeName + '.png'
       download(id).then((res) => {
         if (res != null) {
           let blob = new Blob([res], { type: 'application/zip' })
@@ -143,8 +148,8 @@ export default {
       class="top-search"
       size="small"
     >
-      <el-form-item label="活码名称" prop="name">
-        <el-input v-model="query.name" placeholder="请输入"></el-input>
+      <el-form-item label="活码名称">
+        <el-input v-model="query.empleCodeName" placeholder="请输入"></el-input>
       </el-form-item>
       <el-form-item label="创建人">
         <el-input v-model="query.createBy" placeholder="请输入"></el-input>

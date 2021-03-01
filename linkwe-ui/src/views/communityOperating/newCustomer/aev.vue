@@ -1,6 +1,6 @@
 <script>
-import { getDetail, add, update, getQrcode } from '@/api/drainageCode/staff'
-import { getList } from '@/api/drainageCode/welcome'
+import { getDetail, add, update } from '@/api/communityOperating/newCustomer'
+// import { getList } from '@/api/drainageCode/welcome'
 import PhoneDialog from '@/components/PhoneDialog'
 import SelectUser from '@/components/SelectUser'
 import SelectTag from '@/components/SelectTag'
@@ -76,20 +76,14 @@ export default {
     },
     // 选择人员变化事件
     selectedUser(users) {
-      let params = { userIds: [], departmentIds: [] }
+      // debugger
       this.form.weEmpleCodeUseScops = users.map((d) => {
-        d.userId && params.userIds.push(d.userId)
-        d.id && params.departmentIds.push(d.id)
         return {
           businessId: d.id || d.userId,
           businessName: d.name,
           businessIdType: d.userId ? 2 : 1,
+          mobile: d.mobile,
         }
-      })
-      params.userIds += ''
-      params.departmentIds += ''
-      getQrcode(params).then(({ data }) => {
-        this.$set(this.form, 'qrCode', data.qr_code)
       })
     },
     submitSelectTag(data) {
@@ -99,10 +93,8 @@ export default {
       }))
     },
     // 选择二维码确认按钮
-    submitSelectQrCode(text, image, file) {
-      this.form.mediaId = image.id
-      this.materialSelected = image.materialUrl
-      this.dialogVisibleSelectQrCode = false
+    submitSelectQrCode(data) {
+      this.form.qrCode = data.codeUrl
     },
     removeMaterial() {
       this.form.mediaId = ''

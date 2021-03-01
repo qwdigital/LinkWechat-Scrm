@@ -44,14 +44,6 @@ export default {
         this.$emit('update:visible', val)
       },
     },
-    Ptype: {
-      get() {
-        return this.type
-      },
-      set(val) {
-        this.$emit('update:type', val)
-      },
-    },
   },
   created() {
     this.getList()
@@ -167,12 +159,7 @@ export default {
 
         <el-table-column label="实际群码总数" align="center">
           <template #default="{ row }">
-            <el-button
-              type="text"
-              @click="handleRealCodeDialogOpen(row.id, -1)"
-            >
-              {{ (row.actualList && row.actualList.length) || 0 }}
-            </el-button>
+            {{ (row.actualList && row.actualList.length) || 0 }}
           </template>
         </el-table-column>
 
@@ -192,9 +179,7 @@ export default {
               <i slot="reference" class="el-icon-warning expire-icon"></i>
             </el-popover>
 
-            <el-button type="text" @click="handleRealCodeDialogOpen(row.id, 0)">
-              {{ row.availableCodes }}
-            </el-button>
+            {{ row.availableCodes }}
           </template>
         </el-table-column>
       </el-table>
