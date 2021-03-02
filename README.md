@@ -15,7 +15,7 @@
 
 </div>
 
-<h6 align="center" color="#FF0000">如果您觉得我们的开源项目很有帮助，请点击 Star 吧~谢谢支持！</h6>
+<h5 align="center" style="color:red">如果您觉得我们的开源项目很有帮助，请点击 Star 吧~谢谢支持！</h5>
 
 <p></p>
 <p></p>
