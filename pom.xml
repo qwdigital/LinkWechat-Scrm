@@ -39,7 +39,7 @@
         <mybatis-plus.version>3.4.0</mybatis-plus.version>
         <vertx.version>4.0.0</vertx.version>
         <netty-version>4.1.49.Final</netty-version>
-        <nacos.version>2.2.1.RELEASE</nacos.version>
+        <nacos.version>2.2.5.RELEASE</nacos.version>
     </properties>
 
     <!-- 依赖声明 -->
