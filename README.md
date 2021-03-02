@@ -15,7 +15,7 @@
 
 </div>
 
-<h5 align="center"><font color="red">如果您觉得我们的开源项目很有帮助，请点击 Star 吧，谢谢支持！</font></h5>
+<h5 align="center">如果您觉得我们的开源项目很有帮助，请点击 Star 吧，谢谢支持！</h5>
 
 <p></p>
 <p></p>
