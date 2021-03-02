@@ -178,7 +178,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
         builder.sort("msgtime", SortOrder.ASC);
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-
+        boolQueryBuilder.must(QueryBuilders.termQuery("msgtype", "text"));
         //成员姓名查询
         if(StringUtils.isNotEmpty(query.getUserName())){
             boolQueryBuilder.must(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("fromInfo.name",query.getUserName()))
