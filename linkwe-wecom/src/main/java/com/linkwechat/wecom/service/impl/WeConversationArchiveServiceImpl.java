@@ -49,7 +49,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
         int from = (pageNum - 1) * pageSize;
         builder.size(pageSize);
         builder.from(from);
-        builder.sort("msgtime", SortOrder.DESC);
+        builder.sort("msgtime", SortOrder.ASC);
         BoolQueryBuilder fromBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", ""))
                 .must(QueryBuilders.matchQuery("from", query.getFromId()))
                 .must(QueryBuilders.matchQuery("tolist.keyword", query.getReceiveId()));
@@ -85,7 +85,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
         int from = (pageNum - 1) * pageSize;
         builder.size(pageSize);
         builder.from(from);
-        builder.sort("msgtime", SortOrder.DESC);
+        builder.sort("msgtime", SortOrder.ASC);
 
         BoolQueryBuilder fromBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", query.getRoomId()))
                 .must(QueryBuilders.matchQuery("from", query.getFromId()));
@@ -118,7 +118,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
     @Override
     public JSONObject getFinalChatContactInfo(String fromId, String receiveId) {
         SearchSourceBuilder builder = new SearchSourceBuilder();
-        builder.sort("msgtime", SortOrder.DESC);
+        builder.sort("msgtime", SortOrder.ASC);
         builder.size(1);
         BoolQueryBuilder fromBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", ""))
                 .must(QueryBuilders.matchQuery("from", fromId))
@@ -143,7 +143,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
     @Override
     public JSONObject getFinalChatRoomContactInfo(String fromId, String roomId) {
         SearchSourceBuilder builder = new SearchSourceBuilder();
-        builder.sort("msgtime", SortOrder.DESC);
+        builder.sort("msgtime", SortOrder.ASC);
         builder.size(1);
         BoolQueryBuilder fromBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", roomId))
                 .must(QueryBuilders.matchQuery("from", fromId));
@@ -171,7 +171,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
         int from = (pageNum - 1) * pageSize;
         builder.size(pageSize);
         builder.from(from);
-        builder.sort("msgtime", SortOrder.DESC);
+        builder.sort("msgtime", SortOrder.ASC);
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
