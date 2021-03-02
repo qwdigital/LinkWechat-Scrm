@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * @author danmo
@@ -230,6 +231,17 @@ public class ElasticSearch {
         }
     }
 
+    public void insertBatchAsync(String idxName, List<JSONObject> list, Consumer<List<JSONObject>> consumer) {
+        BulkRequest request = new BulkRequest();
+        list.parallelStream().forEach(item -> request.add(new IndexRequest(idxName, "_doc").id(item.getString("msgid"))
+                .source(item, XContentType.JSON)));
+        try {
+            restHighLevelClient.bulkAsync(request, RequestOptions.DEFAULT, getActionListener(consumer, list));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void updateBatch(String idxName, List<ElasticSearchEntity> list) {
         BulkRequest request = new BulkRequest();
         list.forEach(item -> request.add(new UpdateRequest(idxName, item.getId()).upsert(item.getData(), XContentType.JSON)));
@@ -375,6 +387,20 @@ public class ElasticSearch {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public ActionListener getActionListener(Consumer consumer, List<JSONObject> list) {
+        return new ActionListener() {
+            @Override
+            public void onResponse(Object o) {
+                consumer.accept(list);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                log.warn("work with es failed, exception={}", ExceptionUtils.getStackTrace(e));
+            }
+        };
     }
 
     public ActionListener getActionListener(BiConsumer consumer, List<ElasticSearchEntity> list, Object param) {

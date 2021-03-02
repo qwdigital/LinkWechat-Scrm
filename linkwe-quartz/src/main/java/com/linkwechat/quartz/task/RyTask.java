@@ -3,7 +3,6 @@ package com.linkwechat.quartz.task;
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.elasticsearch.ElasticSearch;
 import com.linkwechat.common.core.redis.RedisCache;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
 
 /**
  * 定时任务调度测试
@@ -92,9 +90,7 @@ public class RyTask {
                 List<JSONObject> elasticSearchEntities = weChatContactMappingService.saveWeChatContactMapping(chatDataList);
                 //获取敏感行为命中信息
                 weSensitiveActHitService.hitWeSensitiveAct(chatDataList);
-                List<Consumer<List<JSONObject>>> consumerList = Lists.newArrayList();
-                consumerList.add(weSensitiveService::hitSensitive);
-                elasticSearch.insertBatchAsync(WeConstans.WECOM_FINANCE_INDEX, elasticSearchEntities, consumerList);
+                elasticSearch.insertBatchAsync(WeConstans.WECOM_FINANCE_INDEX, elasticSearchEntities, weSensitiveService::hitSensitive);
             } catch (Exception e) {
                 log.error("消息处理异常：ex:{}", e);
                 e.printStackTrace();
@@ -161,7 +157,7 @@ public class RyTask {
                             semaphore.acquire();
 
                             if (s.getMessageInfo() != null && s.getMessageId() != null || (s.getMessageInfo().getPushType().equals(WeConstans.SEND_MESSAGE_CUSTOMER)
-                                    && CollectionUtils.isNotEmpty(s.getCustomersInfo())) ||(s.getMessageInfo().getPushType().equals(WeConstans.SEND_MESSAGE_GROUP)
+                                    && CollectionUtils.isNotEmpty(s.getCustomersInfo())) || (s.getMessageInfo().getPushType().equals(WeConstans.SEND_MESSAGE_GROUP)
                                     && CollectionUtils.isNotEmpty(s.getGroupsInfo()))) {
 
                                 weCustomerMessageService.sendMessgae(s.getMessageInfo(), s.getMessageId(), s.getCustomersInfo(), s.getGroupsInfo());
