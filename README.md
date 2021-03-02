@@ -9,13 +9,13 @@
 
 <div align="center">
 
-![GVP Stars](http://img.shields.io/badge/GPV%20Stars-800+-red)
-![GVP Forks](http://img.shields.io/badge/GPV%20Forks-250+-yellow)
+![GVP Stars](http://img.shields.io/badge/GPV%20Stars-850+-red)
+![GVP Forks](http://img.shields.io/badge/GPV%20Forks-300+-yellow)
 ![license](http://img.shields.io/badge/license-GPL%203.0-green)
 
 </div>
 
-<h5 align="center" style="color:red">如果您觉得我们的开源项目很有帮助，请点击 Star 吧~谢谢支持！</h5>
+<h5 align="center"><font color="red">如果您觉得我们的开源项目很有帮助，请点击 Star 吧，谢谢支持！</font></h5>
 
 <p></p>
 <p></p>
