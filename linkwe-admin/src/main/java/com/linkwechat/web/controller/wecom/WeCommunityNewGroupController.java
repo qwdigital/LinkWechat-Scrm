@@ -55,7 +55,7 @@ public class WeCommunityNewGroupController extends BaseController {
     @ApiOperation(value = "查询新客自动拉群列表", httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:list')")
     @GetMapping("/list")
-    public TableDataInfo list(@RequestParam(value = "empleCodeName", required = false) String empleCodeName
+    public TableDataInfo<List<WeCommunityNewGroupVo>> list(@RequestParam(value = "empleCodeName", required = false) String empleCodeName
             , @RequestParam(value = "createBy", required = false) String createBy
             , @RequestParam(value = "beginTime", required = false) String beginTime
             , @RequestParam(value = "endTime", required = false) String endTime) {
