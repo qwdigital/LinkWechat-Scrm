@@ -14,6 +14,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.IndicesOptions;
+import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -216,14 +218,35 @@ public class ElasticSearch {
      *
      * @param idxName
      * @param list
-     * @param consumers
+     * @param consumer
      */
-    public void insertBatchAsync(String idxName, List<JSONObject> list, List<Consumer<List<JSONObject>>> consumers) {
+    public void insertBatchAsync(String idxName, List<ElasticSearchEntity> list, BiConsumer consumer, Object param) {
+        BulkRequest request = new BulkRequest();
+        list.parallelStream().forEach(item -> request.add(new IndexRequest(idxName, "_doc").id(item.getId())
+                .source(item.getData(), XContentType.JSON)));
+        try {
+            restHighLevelClient.bulkAsync(request, RequestOptions.DEFAULT, getActionListener(consumer, list, param));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void insertBatchAsync(String idxName, List<JSONObject> list, Consumer<List<JSONObject>> consumer) {
         BulkRequest request = new BulkRequest();
         list.parallelStream().forEach(item -> request.add(new IndexRequest(idxName, "_doc").id(item.getString("msgid"))
                 .source(item, XContentType.JSON)));
         try {
-            restHighLevelClient.bulkAsync(request, RequestOptions.DEFAULT, getActionListener(list, consumers));
+            restHighLevelClient.bulkAsync(request, RequestOptions.DEFAULT, getActionListener(consumer, list));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updateBatch(String idxName, List<ElasticSearchEntity> list) {
+        BulkRequest request = new BulkRequest();
+        list.forEach(item -> request.add(new UpdateRequest(idxName, item.getId()).upsert(item.getData(), XContentType.JSON)));
+        try {
+            restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -366,11 +389,25 @@ public class ElasticSearch {
         }
     }
 
-    public ActionListener getActionListener(List<JSONObject> list, List<Consumer<List<JSONObject>>> consumers) {
+    public ActionListener getActionListener(Consumer consumer, List<JSONObject> list) {
         return new ActionListener() {
             @Override
             public void onResponse(Object o) {
-                consumers.forEach(consumer -> consumer.accept(list));
+                consumer.accept(list);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                log.warn("work with es failed, exception={}", ExceptionUtils.getStackTrace(e));
+            }
+        };
+    }
+
+    public ActionListener getActionListener(BiConsumer consumer, List<ElasticSearchEntity> list, Object param) {
+        return new ActionListener() {
+            @Override
+            public void onResponse(Object o) {
+                consumer.accept(list, param);
             }
 
             @Override
