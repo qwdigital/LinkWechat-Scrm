@@ -167,6 +167,7 @@ forest:
 
 
 wecome:
+  chatKey: finance
   serverUrl: https://qyapi.weixin.qq.com/
   weComePrefix: cgi-bin
   noAccessTokenUrl:
