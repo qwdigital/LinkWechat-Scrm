@@ -1,6 +1,7 @@
 package com.linkwechat.quartz.task;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.wecom.client.WeCustomerClient;
@@ -55,17 +56,22 @@ public class GroupChatStatisticTask {
                 idList.add(weGroup.getOwner());
                 ownerFilter.setUserid_list(idList);
                 query.setOwnerFilter(ownerFilter);
-                GroupChatStatisticDto groupChatStatistic = weCustomerClient.getGroupChatStatisticGroupByDay(query);
-                List<GroupChatStatisticDto.GroupchatStatisticData> items = groupChatStatistic.getItems();
-                if(CollectionUtil.isNotEmpty(items)){
-                    items.forEach(groupchatStatisticData -> {
-                        WeGroupStatistic weGroupStatistic = new WeGroupStatistic();
-                        GroupChatStatisticDto.StatisticData data = groupchatStatisticData.getData();
-                        BeanUtils.copyPropertiesignoreOther(data, weGroupStatistic);
-                        weGroupStatistic.setChatId(weGroup.getChatId());
-                        weGroupStatistic.setStatTime(groupchatStatisticData.getStatTime());
-                        weGroupStatisticList.add(weGroupStatistic);
-                    });
+                try {
+                    GroupChatStatisticDto groupChatStatistic = weCustomerClient.getGroupChatStatisticGroupByDay(query);
+                    List<GroupChatStatisticDto.GroupchatStatisticData> items = groupChatStatistic.getItems();
+                    if(CollectionUtil.isNotEmpty(items)){
+                        items.forEach(groupchatStatisticData -> {
+                            WeGroupStatistic weGroupStatistic = new WeGroupStatistic();
+                            GroupChatStatisticDto.StatisticData data = groupchatStatisticData.getData();
+                            BeanUtils.copyPropertiesignoreOther(data, weGroupStatistic);
+                            weGroupStatistic.setChatId(weGroup.getChatId());
+                            weGroupStatistic.setStatTime(groupchatStatisticData.getStatTime());
+                            weGroupStatisticList.add(weGroupStatistic);
+                        });
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log.error("群聊数据拉取失败: ownerFilter:【{}】,ex:【{}】", JSONObject.toJSONString(ownerFilter),e.getStackTrace());
                 }
             });
             weGroupStatisticService.saveBatch(weGroupStatisticList);

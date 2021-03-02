@@ -2,6 +2,7 @@ package com.linkwechat.web.controller.wecom;
 
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.redis.RedisCache;
+import com.linkwechat.wecom.domain.dto.WePageStaticDataDto;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import com.linkwechat.wecom.service.IWeUserService;
 import io.swagger.annotations.Api;
@@ -42,6 +43,7 @@ public class WePageDateContraller {
     @PreAuthorize("@ss.hasPermi('wecom:page:getCorpRealTimeData')")
     @GetMapping("/getCorpRealTimeData")
     public AjaxResult getCorpRealTimeData(){
-        return AjaxResult.success(redisCache.getCacheList("getCorpRealTimeData"));
+        WePageStaticDataDto wePageStaticDataDto = redisCache.getCacheObject("getCorpRealTimeData");
+        return AjaxResult.success(wePageStaticDataDto);
     }
 }

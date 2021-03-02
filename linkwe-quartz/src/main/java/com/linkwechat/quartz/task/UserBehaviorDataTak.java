@@ -2,6 +2,7 @@ package com.linkwechat.quartz.task;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.wecom.client.WeCustomerClient;
@@ -65,13 +66,18 @@ public class UserBehaviorDataTak {
                     List<String> idList = new ArrayList<>();
                     idList.add(weUser.getUserId());
                     query.setUserid(idList);
-                    UserBehaviorDataDto userBehaviorData = weCustomerClient.getUserBehaviorData(query);
-                    List<UserBehaviorDataDto.BehaviorData> behaviorDataList = userBehaviorData.getBehaviorData();
-                    for (UserBehaviorDataDto.BehaviorData data : behaviorDataList) {
-                        WeUserBehaviorData weUserBehaviorData = new WeUserBehaviorData();
-                        BeanUtils.copyPropertiesignoreOther(data, weUserBehaviorData);
-                        weUserBehaviorData.setUserId(weUser.getUserId());
-                        dataList.add(weUserBehaviorData);
+                    try {
+                        UserBehaviorDataDto userBehaviorData = weCustomerClient.getUserBehaviorData(query);
+                        List<UserBehaviorDataDto.BehaviorData> behaviorDataList = userBehaviorData.getBehaviorData();
+                        for (UserBehaviorDataDto.BehaviorData data : behaviorDataList) {
+                            WeUserBehaviorData weUserBehaviorData = new WeUserBehaviorData();
+                            BeanUtils.copyPropertiesignoreOther(data, weUserBehaviorData);
+                            weUserBehaviorData.setUserId(weUser.getUserId());
+                            dataList.add(weUserBehaviorData);
+                        }
+                    } catch (ForestRuntimeException e) {
+                        e.printStackTrace();
+                        log.error("员工数据拉取失败: userId:【{}】,ex:【{}】",weUser.getUserId(),e.getStackTrace());
                     }
                 });
                 weUserBehaviorDataService.saveBatch(dataList);
