@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -256,8 +257,23 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
 
     private void addHitSensitiveList(List<JSONObject> json, WeSensitive weSensitive) {
         elasticSearch.createIndex2(WeConstans.WECOM_SENSITIVE_HIT_INDEX, getSensitiveHitMapping());
-        boolean sendMessage = false;
-        if (weSensitive.getAlertFlag().equals(1) && CollectionUtils.isNotEmpty(json)) {
+        //批量提交插入记录
+        if (CollectionUtils.isNotEmpty(json)) {
+            List<ElasticSearchEntity> list = json.stream().filter(Objects::nonNull).map(j -> {
+                ElasticSearchEntity ese = new ElasticSearchEntity();
+                j.put("status", "0");
+                ese.setData(j);
+                ese.setId(j.getString("msgid"));
+                return ese;
+            }).collect(Collectors.toList());
+            elasticSearch.insertBatchAsync(WeConstans.WECOM_SENSITIVE_HIT_INDEX, list, this::sendMessage, weSensitive);
+        }
+    }
+
+    private void sendMessage(Object listObj, Object weSensitiveObj) {
+        WeSensitive weSensitive = (WeSensitive) weSensitiveObj;
+        List<ElasticSearchEntity> list = (List<ElasticSearchEntity>) listObj;
+        if (weSensitive.getAlertFlag().equals(1) && CollectionUtils.isNotEmpty(list)) {
             //发送消息通知给相应的审计人
             WeCorpAccount weCorpAccount = weCorpAccountService.findValidWeCorpAccount();
             String auditUserId = weSensitive.getAuditUserId();
@@ -269,21 +285,13 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
             pushDto.setMsgtype(MessageType.TEXT.getMessageType());
             pushDto.setText(textMessageDto);
             weMessagePushClient.sendMessageToUser(pushDto, weCorpAccount.getAgentId());
-            sendMessage = true;
-        }
-        //批量提交插入记录
-        if (CollectionUtils.isNotEmpty(json)) {
-            boolean finalSendMessage = sendMessage;
-            List<ElasticSearchEntity> list = json.stream().filter(Objects::nonNull).map(j -> {
-                ElasticSearchEntity ese = new ElasticSearchEntity();
-                if (finalSendMessage) {
-                    j.put("status", "1");
-                }
-                ese.setData(j);
-                ese.setId(j.getString("msgid"));
-                return ese;
+            //批量更新
+            list = list.stream().peek(entity -> {
+                Map map = entity.getData();
+                map.put("status", "1");
+                entity.setData(map);
             }).collect(Collectors.toList());
-            elasticSearch.insertBatch(WeConstans.WECOM_SENSITIVE_HIT_INDEX, list);
+            elasticSearch.updateBatch(WeConstans.WECOM_SENSITIVE_HIT_INDEX, list);
         }
     }
 
