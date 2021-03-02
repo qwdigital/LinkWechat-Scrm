@@ -35,6 +35,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,6 +71,9 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
 
     @Autowired
     private IWeCorpAccountService weCorpAccountService;
+
+    @Value("${wecome.chatKey}")
+    private String chartKey;
 
     /**
      * 查询敏感词设置
@@ -322,7 +326,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
                 userBuilder.minimumShouldMatch(1);
                 BoolQueryBuilder searchBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchPhraseQuery("text.content", patternWord)).must(userBuilder);
                 builder.query(searchBuilder);
-                List<JSONObject> list = elasticSearch.search(WeConstans.WECOM_FINANCE_INDEX, builder, JSONObject.class);
+                List<JSONObject> list = elasticSearch.search(chartKey, builder, JSONObject.class);
                 list.parallelStream().forEach(j -> j.put("pattern_words", patternWord));
                 resultList.addAll(list);
             }
