@@ -122,4 +122,11 @@ public interface IWeCustomerService extends IService<WeCustomer>
      */
     WeCustomerPortrait findCustomerByOperUseridAndCustomerId(@Param("externalUserid") String externalUserid, @Param("operUserid") String operUserid);
 
+
+    /**
+     * 跟新客户画像
+     * @param weCustomerPortrait
+     */
+    void updateWeCustomerPortrait(WeCustomerPortrait weCustomerPortrait);
+
 }

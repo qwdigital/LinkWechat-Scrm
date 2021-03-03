@@ -89,4 +89,23 @@ public class WeFlowerCustomerRel
     @TableField(exist = false)
     private String endTime;
 
+
+    /** 备注 */
+    private String remark;
+
+
+    /** 邮件 */
+    private String email;
+
+
+    /** qq */
+    private String qq;
+
+    /**地址*/
+    private String address;
+
+
+
+
+
 }

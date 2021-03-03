@@ -632,5 +632,26 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         return weCustomerMapper.findCustomerByOperUseridAndCustomerId(externalUserid,operUserid);
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateWeCustomerPortrait(WeCustomerPortrait weCustomerPortrait) {
+        WeCustomer weCustomer
+                = WeCustomer.builder().build();
+        BeanUtils.copyBeanProp(weCustomer,weCustomerPortrait);
+        //更新用户基本信息表
+        this.updateById(
+                weCustomer
+        );
+
+
+        WeFlowerCustomerRel weFlowerCustomerRel = WeFlowerCustomerRel.builder().build();
+        BeanUtils.copyBeanProp(weFlowerCustomerRel,weCustomerPortrait);
+        //更新企业添加人表
+        iWeFlowerCustomerRelService.update(weFlowerCustomerRel,new LambdaQueryWrapper<WeFlowerCustomerRel>()
+        .eq(WeFlowerCustomerRel::getExternalUserid,weCustomerPortrait.getExternalUserid())
+        .eq(WeFlowerCustomerRel::getOperUserid,weCustomerPortrait.getOperUserid()));
+
+    }
+
 
 }

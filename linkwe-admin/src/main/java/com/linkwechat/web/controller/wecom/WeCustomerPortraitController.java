@@ -2,11 +2,10 @@ package com.linkwechat.web.controller.wecom;
 
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.wecom.domain.WeCustomerPortrait;
 import com.linkwechat.wecom.service.IWeCustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @description: 客户画像相关controller
@@ -31,10 +30,27 @@ public class WeCustomerPortraitController extends BaseController {
     @GetMapping(value = "/findWeCustomerInfo")
     public AjaxResult findWeCustomerInfo(String externalUserid, String operUserid){
 
-
         return AjaxResult.success(
                 iWeCustomerService.findCustomerByOperUseridAndCustomerId(externalUserid,operUserid)
         );
+    }
+
+
+    /**
+     * 客户画像资料更新
+     * @param weCustomerPortrait
+     * @return
+     */
+    @PostMapping(value = "/updateWeCustomerInfo")
+    public AjaxResult updateWeCustomerInfo(@RequestBody WeCustomerPortrait weCustomerPortrait){
+
+
+
+
+        iWeCustomerService.updateWeCustomerPortrait(weCustomerPortrait);
+
+
+        return AjaxResult.success();
     }
 
 

@@ -12,6 +12,10 @@ import java.util.List;
  **/
 @Data
 public class WeCustomerPortrait {
+    //外部联系人id
+    private String externalUserid;
+    //企业员工id
+    private String operUserid;
     //客户昵称
     private String name;
     //客户备注
