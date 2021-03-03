@@ -3,12 +3,12 @@
     <div class="index_l whitebg">
       <div class="box titlebox">
         <p class="adminname">{{getTimeState()}},Admin</p>
-        <p>20230-2-2 123:3123:1232</p>
+        <p>{{parseTime(nowTime)}}</p>
       </div>
       <div class="tables">
         <div style="text-align:left">
           <el-row type="flex" class="row-bg" justify="space-between">
-            <el-col :span="24">实时数据</el-col>
+            <el-col :span="24" style="font-weight:bold">实时数据</el-col>
           </el-row>
           <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:20px">
             <el-col :span="6">企业成员总数</el-col>
@@ -28,7 +28,7 @@
       <div class="dataall" style="margin-top:20px">
         <div style="text-align:left">
           <el-row type="flex" class="row-bg" justify="space-between">
-            <el-col :span="24">实时数据 <span class="fr fontgay">更新于{{uptime}}</span></el-col>
+            <el-col :span="24"  style="font-weight:bold">实时数据 <span class="fr fontgay">更新于{{uptime}}</span></el-col>
           </el-row>
           <el-row type="flex" class="row-bg" justify="space-between">
             <el-col :span="24">
@@ -76,7 +76,9 @@
             </el-col>
           </el-row>
           <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:20px">
-            <div id="main" style="width: 100%;height: 500px;"></div>
+            <div id="fatherbox" >
+               <div id="main"  ref="views"></div>
+            </div>
           </el-row>
         </div>
       </div>
@@ -151,6 +153,10 @@
   </div>
 </template>
 <script>
+var elementResizeDetectorMaker = require("element-resize-detector")
+ import {
+    parseTime
+  } from '@/utils/common.js'
   import {
     content
   } from '@/api/content.js'
@@ -160,6 +166,7 @@
     components: {},
     data() {
       return {
+       nowTime:new Date(),
         car: [{
           name: '发起申请数',
           url: '/'
@@ -186,7 +193,8 @@
         uptime: '21321-21321:22',
         timeType: 'day',
         charts: '',
-        opinionData: ["3", "2", "4", "4", "5"]
+        opinionData: ["3", "2", "4", "4", "5"],
+        charts:null
       }
     },
     methods: {
@@ -289,8 +297,12 @@
           this.uptime = data.updateTime;
         })
       },
-      drawLine(id) {
-        this.charts = echarts.init(document.getElementById(id))
+      drawLine(id,width) {
+        let obj=document.getElementById(id)
+        obj.style.width=width?`${width}px`:'100%';
+        obj.style.height='500px';
+        this.charts = echarts.init(obj)
+
         this.charts.setOption({
           tooltip: {
             trigger: 'axis'
@@ -329,10 +341,20 @@
     //调用
     mounted() {
       this.$nextTick(function () {
-        this.drawLine('main')
+        this.drawLine('main','')
       })
       this.erchatInfo()
       this.tableInfo()
+      var erd = elementResizeDetectorMaker()
+      let that=this
+       erd.listenTo(document.getElementById("fatherbox"), function (element) {
+      var width = element.offsetWidth
+      var height = element.offsetHeight
+        that.$nextTick(function () {
+         console.log(this.$refs['views'])
+         this.drawLine('main',width)
+      })
+    })
     }
   }
 
@@ -347,6 +369,9 @@
     .fontgay {
       color: #999;
       font-size: 14px;
+    }
+    #fatherbox{ width: 100%;height: 500px; overflow-y: scroll;}
+    #main{ width: 100%;height: 500px; 
     }
     .fr {
       float: right;
@@ -418,21 +443,21 @@
       .inedx_r_top {
         width: 100%;
         background: #fff;
-        height: 240px;
+        height: 220px;
         border-radius: 5px;
 
         .inedx_r_top_header {
-          height: 180px;
+          height: 160px;
           width: 100%;
           color: #999;
         }
 
         .inedx_r_top_t {
-          height: 120px;
+          height: 100px;
           width: 100%;
-          line-height: 120px;
+          line-height: 100px;
           padding: 0 15px;
-          font-size: 26px;
+          font-size: 21px;
           color: #199ed8;
         }
 
