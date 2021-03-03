@@ -303,4 +303,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
     
+    
+    <select id="findCustomerByOperUseridAndCustomerId" resultType="com.linkwechat.wecom.domain.WeCustomerPortrait">
+            SELECT
+                  wc.`name`,
+                  wfcr.remark,
+                  wfcr.remark_mobiles,
+                  wc.birthday,
+                  wfcr.email,
+                  wfcr.address,
+                  wfcr.qq,
+                  wc.position,
+                  wfcr.remark_corp_name,
+                  wfcr.description
+            FROM
+                we_customer wc
+            LEFT JOIN we_flower_customer_rel wfcr on wc.external_userid=wfcr.external_userid
+            WHERE wc.external_userid=#{externalUserid} and wfcr.oper_userid=#{operUserid}
+    </select>
+    
 </mapper>

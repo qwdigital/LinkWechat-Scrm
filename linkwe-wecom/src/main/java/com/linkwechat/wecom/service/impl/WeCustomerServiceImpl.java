@@ -626,4 +626,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     }
 
 
+
+    @Override
+    public WeCustomerPortrait findCustomerByOperUseridAndCustomerId(String externalUserid, String operUserid) {
+        return weCustomerMapper.findCustomerByOperUseridAndCustomerId(externalUserid,operUserid);
+    }
+
+
 }
