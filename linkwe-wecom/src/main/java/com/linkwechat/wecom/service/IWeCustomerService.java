@@ -7,8 +7,6 @@ import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
-import org.apache.ibatis.annotations.Param;
-
 
 import java.util.List;
 
@@ -120,7 +118,7 @@ public interface IWeCustomerService extends IService<WeCustomer>
      * @param operUserid
      * @return
      */
-    WeCustomerPortrait findCustomerByOperUseridAndCustomerId(@Param("externalUserid") String externalUserid, @Param("operUserid") String operUserid);
+    WeCustomerPortrait findCustomerByOperUseridAndCustomerId(String externalUserid,String operUserid);
 
 
     /**

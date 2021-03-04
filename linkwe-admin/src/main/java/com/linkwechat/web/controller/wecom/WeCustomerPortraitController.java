@@ -3,7 +3,9 @@ package com.linkwechat.web.controller.wecom;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.wecom.domain.WeCustomerPortrait;
+import com.linkwechat.wecom.domain.WeTagGroup;
 import com.linkwechat.wecom.service.IWeCustomerService;
+import com.linkwechat.wecom.service.IWeTagGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +21,10 @@ public class WeCustomerPortraitController extends BaseController {
 
     @Autowired
     private IWeCustomerService iWeCustomerService;
+
+
+    @Autowired
+    private IWeTagGroupService weTagGroupService;
 
 
     /**
@@ -51,6 +57,24 @@ public class WeCustomerPortraitController extends BaseController {
 
 
         return AjaxResult.success();
+    }
+
+
+
+    /**
+     * 获取当前系统所有可用标签
+     * @return
+     */
+    @GetMapping(value = "/findAllTags")
+    public AjaxResult findAllTags(){
+
+        return AjaxResult.success(
+                weTagGroupService.selectWeTagGroupList(
+                        WeTagGroup.builder()
+                                .build()
+                )
+        );
+
     }
 
 

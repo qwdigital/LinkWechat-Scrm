@@ -629,7 +629,20 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
     @Override
     public WeCustomerPortrait findCustomerByOperUseridAndCustomerId(String externalUserid, String operUserid) {
-        return weCustomerMapper.findCustomerByOperUseridAndCustomerId(externalUserid,operUserid);
+        WeCustomerPortrait weCustomerPortrait
+                = weCustomerMapper.findCustomerByOperUseridAndCustomerId(externalUserid, operUserid);
+
+        if(null != weCustomerPortrait){
+            //获取当前客户拥有得标签
+            weCustomerPortrait.setWeTagGroupList(
+                    iWeTagGroupService.findCustomerTagByFlowerCustomerRelId(
+                            weCustomerPortrait.getFlowerCustomerRelId()
+                    )
+            );
+        }
+
+
+        return weCustomerPortrait;
     }
 
     @Override
