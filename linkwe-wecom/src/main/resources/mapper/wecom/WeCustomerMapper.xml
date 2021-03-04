@@ -323,5 +323,34 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             LEFT JOIN we_flower_customer_rel wfcr on wc.external_userid=wfcr.external_userid
             WHERE wc.external_userid=#{externalUserid} and wfcr.oper_userid=#{operUserid}
     </select>
+
+
+    <select id="countSocialConn" resultType="com.linkwechat.wecom.domain.WeCustomerSocialConn">
+            SELECT
+                    (
+                        SELECT
+                            count(*)
+                        FROM
+                            we_flower_customer_rel wfcr WHERE wfcr.external_userid=wc.external_userid
+                    ) AS addEmployeNum,
+                    (
+                      SELECT
+                        COUNT(*)
+                      FROM
+                       we_group_member wgm where  wgm.union_id=wc.external_userid
+                    ) AS addGroupNum,
+                    (
+                        SELECT
+                            COUNT(*)
+                        FROM we_group_member where chat_id in (
+                            SELECT
+                                chat_id
+                            FROM
+                                `we_group_member` where union_id=wc.external_userid
+                            ) and user_id=#{operUserid}
+                    ) AS commonGroupNum
+                    FROM we_customer wc WHERE wc.external_userid=#{externalUserid}
+
+    </select>
     
 </mapper>

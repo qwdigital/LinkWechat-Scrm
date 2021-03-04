@@ -42,4 +42,7 @@ public class WeCustomerPortrait {
     //客户标签
     private List<WeTagGroup> weTagGroupList;
 
+    //客户社交关系
+    private WeCustomerSocialConn socialConn;
+
 }

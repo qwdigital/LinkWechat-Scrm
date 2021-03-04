@@ -127,4 +127,8 @@ public interface IWeCustomerService extends IService<WeCustomer>
      */
     void updateWeCustomerPortrait(WeCustomerPortrait weCustomerPortrait);
 
+
+
+
+
 }
