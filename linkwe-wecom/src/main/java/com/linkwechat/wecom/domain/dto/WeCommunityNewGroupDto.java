@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -32,7 +33,7 @@ public class WeCommunityNewGroupDto {
     @ApiModelProperty("欢迎语")
     private String welcomeMsg;
 
-    @NotEmpty(message = "员工信息不能为空")
+    @NotNull(message = "员工信息不能为空")
     /** 使用员工 */
     @TableField(exist = false)
     @ApiModelProperty("使用员工")
