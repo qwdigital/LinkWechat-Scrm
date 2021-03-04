@@ -3,11 +3,15 @@ package com.linkwechat.web.controller.wecom;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.wecom.domain.WeCustomerPortrait;
+import com.linkwechat.wecom.domain.WeFlowerCustomerTagRel;
 import com.linkwechat.wecom.domain.WeTagGroup;
+import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.service.IWeCustomerService;
 import com.linkwechat.wecom.service.IWeTagGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @description: 客户画像相关controller
@@ -76,6 +80,52 @@ public class WeCustomerPortraitController extends BaseController {
         );
 
     }
+
+
+    /**
+     * 更新客户画像标签
+     * @param weMakeCustomerTag
+     * @return
+     */
+    @PostMapping(value = "/updateWeCustomerPorTraitTag")
+    public AjaxResult updateWeCustomerPorTraitTag(@RequestBody WeMakeCustomerTag weMakeCustomerTag){
+
+
+
+        iWeCustomerService.makeLabel(weMakeCustomerTag);
+
+        return AjaxResult.success();
+    }
+
+
+    /**
+     * 查看客户添加的员工
+     * @param externalUserid
+     * @return
+     */
+    @GetMapping(value = "/findAddaddEmployes/{externalUserid}")
+    public AjaxResult findaddEmployes(@PathVariable String externalUserid){
+
+
+        return AjaxResult.success();
+    }
+
+
+    /**
+     * 获取用户添加的群
+     * @param externalUserid
+     * @param operUserid
+     * @return
+     */
+    @GetMapping(value = "/findAddGroupNum")
+    public AjaxResult findAddGroupNum(String externalUserid,String operUserid){
+
+
+        return AjaxResult.success();
+    }
+
+
+
 
 
 

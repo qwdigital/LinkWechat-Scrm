@@ -8,7 +8,6 @@ import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.common.utils.Threads;
 import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.wecom.client.WeCropTagClient;
 import com.linkwechat.wecom.client.WeCustomerClient;
@@ -639,6 +638,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                             weCustomerPortrait.getFlowerCustomerRelId()
                     )
             );
+
+           //客户社交关系
+            weCustomerPortrait.setSocialConn(
+                   this.baseMapper.countSocialConn(externalUserid,operUserid)
+            );
+
         }
 
 
@@ -665,6 +670,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         .eq(WeFlowerCustomerRel::getOperUserid,weCustomerPortrait.getOperUserid()));
 
     }
+
+
+
 
 
 }
