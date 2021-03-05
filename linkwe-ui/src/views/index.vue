@@ -3,12 +3,12 @@
     <div class="index_l whitebg">
       <div class="box titlebox">
         <p class="adminname">{{getTimeState()}},Admin</p>
-        <p>20230-2-2 123:3123:1232</p>
+        <p>{{parseTime(nowTime)}}</p>
       </div>
       <div class="tables">
         <div style="text-align:left">
           <el-row type="flex" class="row-bg" justify="space-between">
-            <el-col :span="24">实时数据</el-col>
+            <el-col :span="24" style="font-weight:bold">实时数据</el-col>
           </el-row>
           <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:20px">
             <el-col :span="6">企业成员总数</el-col>
@@ -28,7 +28,7 @@
       <div class="dataall" style="margin-top:20px">
         <div style="text-align:left">
           <el-row type="flex" class="row-bg" justify="space-between">
-            <el-col :span="24">实时数据 <span class="fr fontgay">更新于{{uptime}}</span></el-col>
+            <el-col :span="24"  style="font-weight:bold">实时数据 <span class="fr fontgay">更新于{{uptime}}</span></el-col>
           </el-row>
           <el-row type="flex" class="row-bg" justify="space-between">
             <el-col :span="24">
@@ -50,7 +50,7 @@
             style="margin-top:20px;font-size:35px;font-weight:bold">
             <el-col :span="6">{{erchatsTable.newApplyCnt}}</el-col>
             <el-col :span="6">{{erchatsTable.newContactCnt}}</el-col>
-            <el-col :span="6">{{erchatsTable.newMemberCnt}}</el-col>
+            <el-col :span="6">{{erchatsTable.newMemberCnt?erchatsTable.newMemberCnt:0}}</el-col>
             <el-col :span="6">{{erchatsTable.negativeFeedbackCnt}}</el-col>
           </el-row>
           <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:20px">
@@ -67,7 +67,7 @@
             <el-col :span="6">比{{time}} <i
                 :class="{'el-icon-top':Number(erchatsTable.newMemberCntDiff)>=1,'el-icon-bottom':Number(erchatsTable.newMemberCntDiff)<0,'redicon':Number(erchatsTable.newMemberCntDiff)>=1,'greenicon':Number(erchatsTable.newMemberCntDiff)<0}"></i>
               <span
-                :class="{'redicon':Number(erchatsTable.newMemberCntDiff)>=1,'greenicon':Number(erchatsTable.newMemberCntDiff)<0}">{{erchatsTable.newMemberCntDiff}}</span>
+                :class="{'redicon':Number(erchatsTable.newMemberCntDiff)>=1,'greenicon':Number(erchatsTable.newMemberCntDiff)<0}">{{erchatsTable.newMemberCntDiff?erchatsTable.newMemberCntDiff:0}}</span>
             </el-col>
             <el-col :span="6">比{{time}} <i
                 :class="{'el-icon-top':Number(erchatsTable.negativeFeedbackCntDiff)>=1,'el-icon-bottom':Number(erchatsTable.negativeFeedbackCntDiff)<0,'redicon':Number(erchatsTable.negativeFeedbackCntDiff)>=1,'greenicon':Number(erchatsTable.negativeFeedbackCntDiff)<0}"></i>
@@ -76,7 +76,9 @@
             </el-col>
           </el-row>
           <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:20px">
-            <div id="main" style="width: 100%;height: 500px;"></div>
+            <div id="fatherbox" >
+               <div id="main"  ref="views"></div>
+            </div>
           </el-row>
         </div>
       </div>
@@ -151,6 +153,11 @@
   </div>
 </template>
 <script>
+var elementResizeDetectorMaker = require("element-resize-detector")
+ import {
+    parseTime
+  } from '@/utils/common.js'
+  import { arrData } from "@/utils/common.js";
   import {
     content
   } from '@/api/content.js'
@@ -160,6 +167,7 @@
     components: {},
     data() {
       return {
+       nowTime:new Date(),
         car: [{
           name: '发起申请数',
           url: '/'
@@ -181,12 +189,19 @@
         }],
         table: {},
         erchatsTable: {},
+        xAxis:["1", "2", "3", "4", "5"],
         allData: {},
         time: '昨天',
-        uptime: '21321-21321:22',
+        uptime: '',
         timeType: 'day',
         charts: '',
-        opinionData: ["3", "2", "4", "4", "5"]
+        opinionData:{
+          opinionData1:[],
+          opinionData2:[],
+          opinionData3:[],
+          opinionData4:[]
+        },
+        charts:null
       }
     },
     methods: {
@@ -205,18 +220,29 @@
         }
         return state;
       },
+      canvansData(){
+           let bkdata=(arrData(this.erchatsTable.dataList))
+           this.opinionData.opinionData1=bkdata.arr1;
+           this.opinionData.opinionData2=bkdata.arr2;
+           this.opinionData.opinionData3=bkdata.arr3;
+           this.opinionData.opinionData3=[];
+           this.opinionData.opinionData4=bkdata.arr4;
+           this.xAxis=bkdata.btm1;
+           this.drawLine('main','')
+      },
       timeTypeCheck() {
-        console.log(this.allData)
         if (this.timeType == 'day') {
           this.time='昨天'
           this.erchatsTable = this.allData.today
+         this.canvansData()
         } else if (this.timeType == 'week') {
            this.time='上周'
           this.erchatsTable = this.allData.week
-
+           this.canvansData()
         } else if (this.timeType == 'month') {
            this.time='上月'
-          this.erchatsTable = this.allData.month
+           this.erchatsTable = this.allData.month
+           this.canvansData()
         } else if (this.timeType == 'reset') {
            this.time='昨天'
           this.timeType = 'day'
@@ -226,77 +252,28 @@
       tableInfo() {
         content.indexTable().then(res => {
           this.table = res.data
+          
         })
       },
       erchatInfo() {
-        content.indexTable().then(res => {
-          let data = {
-            updateTime: "2021-02-24 23:59:59",
-            today: {
-              newApplyCnt: 1, //发起申请数
-              newApplyCntDiff: -1, //发起申请数差值
-              newContactCnt: 2, //新增客户数
-              newContactCntDiff: 0, //新增客户数差值
-              newMemberCnt: 3, //群新增人数
-              newMemberCntDiff: -1, //群新增人数差值
-              negativeFeedbackCnt: 3, //流失客户数
-              negativeFeedbackCntDiff: 2, //流失客户数差值,
-              dataList: [{
-                xTime: '',
-                newApplyCnt: 0,
-                newContactCnt: 0,
-                newMemberCnt: 0,
-                negativeFeedbackCnt: 0
-              }]
-            },
-            week: {
-              newApplyCnt: 0,
-              newApplyCntDiff: -1,
-              newContactCnt: 0,
-              newContactCntDiff: 2,
-              newMemberCnt: 0,
-              newMemberCntDiff: 0,
-              negativeFeedbackCnt: 0,
-              negativeFeedbackCntDiff: -3,
-              dataList: [{
-                xTime: '',
-                newApplyCnt: 0,
-                newContactCnt: 0,
-                newMemberCnt: 0,
-                negativeFeedbackCnt: 0
-              }]
-            },
-            month: {
-              newApplyCnt: 0,
-              newApplyCntDiff: 0,
-              newContactCnt: 0,
-              newContactCntDiff: 0,
-              newMemberCnt: 0,
-              newMemberCntDiff: 0,
-              negativeFeedbackCnt: 0,
-              negativeFeedbackCntDiff: 0,
-              dataList: [{
-                xTime: '',
-                newApplyCnt: 0,
-                newContactCnt: 0,
-                newMemberCnt: 0,
-                negativeFeedbackCnt: 0
-              }]
-            },
-          }
-          this.allData = data;
-          this.erchatsTable = data.today;
-          this.uptime = data.updateTime;
+        content.indexEchart().then(res => {
+           this.allData = res.data;
+           this.uptime =res.data.updateTime;
+           this.erchatsTable = this.allData.today
+           this.canvansData()
         })
       },
-      drawLine(id) {
-        this.charts = echarts.init(document.getElementById(id))
+      drawLine(id,width) {
+        let obj=document.getElementById(id)
+        obj.style.width=width?`${width}px`:'100%';
+        obj.style.height='500px';
+        this.charts = echarts.init(obj)
         this.charts.setOption({
           tooltip: {
             trigger: 'axis'
           },
           legend: {
-            data: ['近七日收益']
+            data: ['发起申请数','新增客户数','群新增人数','流失客户数']
           },
           grid: {
             left: '3%',
@@ -307,32 +284,52 @@
           xAxis: {
             type: 'category',
             boundaryGap: false,
-            data: ["1", "2", "3", "4", "5"]
+            data: this.xAxis
           },
           yAxis: {
             type: 'value'
           },
-          series: [{
-            name: '近七日收益',
+          series: 
+          [{
+            name: '发起申请数',
             type: 'line',
             stack: '总量',
-            data: this.opinionData
-          }, {
-            name: '近七q日收益',
+            data: this.opinionData.opinionData1
+          },
+          {
+            name: '新增客户数',
             type: 'line',
             stack: '总量',
-            data: this.opinionData
+            data: this.opinionData.opinionData2
+          },
+          {
+            name: '群新增人数',
+            type: 'line',
+            stack: '总量',
+            data: this.opinionData.opinionData3
+          },
+          {
+            name: '流失客户数',
+            type: 'line',
+            stack: '总量',
+            data: this.opinionData.opinionData4
           }]
         })
       }
     },
     //调用
     mounted() {
-      this.$nextTick(function () {
-        this.drawLine('main')
-      })
       this.erchatInfo()
       this.tableInfo()
+      var erd = elementResizeDetectorMaker()
+      let that=this
+       erd.listenTo(document.getElementById("fatherbox"), function (element) {
+      var width = element.offsetWidth
+      var height = element.offsetHeight
+        that.$nextTick(function () {
+         this.drawLine('main',width)
+      })
+    })
     }
   }
 
@@ -347,6 +344,9 @@
     .fontgay {
       color: #999;
       font-size: 14px;
+    }
+    #fatherbox{ width: 100%;height: 500px; overflow-y: scroll;}
+    #main{ width: 100%;height: 500px; 
     }
     .fr {
       float: right;
@@ -418,21 +418,21 @@
       .inedx_r_top {
         width: 100%;
         background: #fff;
-        height: 240px;
+        height: 220px;
         border-radius: 5px;
 
         .inedx_r_top_header {
-          height: 180px;
+          height: 160px;
           width: 100%;
           color: #999;
         }
 
         .inedx_r_top_t {
-          height: 120px;
+          height: 100px;
           width: 100%;
-          line-height: 120px;
+          line-height: 100px;
           padding: 0 15px;
-          font-size: 26px;
+          font-size: 21px;
           color: #199ed8;
         }
 

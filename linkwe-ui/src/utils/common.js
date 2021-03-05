@@ -182,3 +182,34 @@ export function dataURLtoFile (dataURL) {
     }
     return new File([u8arr], '', { type: mime })
   }
+
+  /**
+ * 整理echat 数据
+ * @param {*} arrData 数据 
+ */
+export function arrData (data) {
+    let obj={
+		arr1:[],
+		arr2:[],
+		arr3:[],
+		arr4:[],
+		btm1:[],
+	}
+
+	data.forEach((a,b)=>{
+		obj.arr1.push(a.newApplyCnt)
+		obj.btm1.push(a.xtime)
+		if(!!a.newMemberCnt){
+			obj.arr3.push(a.newMemberCnt)
+		}else{
+			obj.arr3=[]
+		}
+		obj.arr2.push(a.newContactCnt)
+		obj.arr4.push(a.negativeFeedbackCnt)
+	})
+	//newApplyCnt =>arr1
+	//newContactCnt =>arr2
+	//negativeFeedbackCnt =>arr4
+	console.log(obj)
+	return obj
+  }
