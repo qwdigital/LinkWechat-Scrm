@@ -50,7 +50,7 @@
             style="margin-top:20px;font-size:35px;font-weight:bold">
             <el-col :span="6">{{erchatsTable.newApplyCnt}}</el-col>
             <el-col :span="6">{{erchatsTable.newContactCnt}}</el-col>
-            <el-col :span="6">{{erchatsTable.newMemberCnt}}</el-col>
+            <el-col :span="6">{{erchatsTable.newMemberCnt?erchatsTable.newMemberCnt:0}}</el-col>
             <el-col :span="6">{{erchatsTable.negativeFeedbackCnt}}</el-col>
           </el-row>
           <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:20px">
@@ -67,7 +67,7 @@
             <el-col :span="6">比{{time}} <i
                 :class="{'el-icon-top':Number(erchatsTable.newMemberCntDiff)>=1,'el-icon-bottom':Number(erchatsTable.newMemberCntDiff)<0,'redicon':Number(erchatsTable.newMemberCntDiff)>=1,'greenicon':Number(erchatsTable.newMemberCntDiff)<0}"></i>
               <span
-                :class="{'redicon':Number(erchatsTable.newMemberCntDiff)>=1,'greenicon':Number(erchatsTable.newMemberCntDiff)<0}">{{erchatsTable.newMemberCntDiff}}</span>
+                :class="{'redicon':Number(erchatsTable.newMemberCntDiff)>=1,'greenicon':Number(erchatsTable.newMemberCntDiff)<0}">{{erchatsTable.newMemberCntDiff?erchatsTable.newMemberCntDiff:0}}</span>
             </el-col>
             <el-col :span="6">比{{time}} <i
                 :class="{'el-icon-top':Number(erchatsTable.negativeFeedbackCntDiff)>=1,'el-icon-bottom':Number(erchatsTable.negativeFeedbackCntDiff)<0,'redicon':Number(erchatsTable.negativeFeedbackCntDiff)>=1,'greenicon':Number(erchatsTable.negativeFeedbackCntDiff)<0}"></i>
@@ -157,6 +157,7 @@ var elementResizeDetectorMaker = require("element-resize-detector")
  import {
     parseTime
   } from '@/utils/common.js'
+  import { arrData } from "@/utils/common.js";
   import {
     content
   } from '@/api/content.js'
@@ -188,12 +189,18 @@ var elementResizeDetectorMaker = require("element-resize-detector")
         }],
         table: {},
         erchatsTable: {},
+        xAxis:["1", "2", "3", "4", "5"],
         allData: {},
         time: '昨天',
-        uptime: '21321-21321:22',
+        uptime: '',
         timeType: 'day',
         charts: '',
-        opinionData: ["3", "2", "4", "4", "5"],
+        opinionData:{
+          opinionData1:[],
+          opinionData2:[],
+          opinionData3:[],
+          opinionData4:[]
+        },
         charts:null
       }
     },
@@ -213,18 +220,29 @@ var elementResizeDetectorMaker = require("element-resize-detector")
         }
         return state;
       },
+      canvansData(){
+           let bkdata=(arrData(this.erchatsTable.dataList))
+           this.opinionData.opinionData1=bkdata.arr1;
+           this.opinionData.opinionData2=bkdata.arr2;
+           this.opinionData.opinionData3=bkdata.arr3;
+           this.opinionData.opinionData3=[];
+           this.opinionData.opinionData4=bkdata.arr4;
+           this.xAxis=bkdata.btm1;
+           this.drawLine('main','')
+      },
       timeTypeCheck() {
-        console.log(this.allData)
         if (this.timeType == 'day') {
           this.time='昨天'
           this.erchatsTable = this.allData.today
+         this.canvansData()
         } else if (this.timeType == 'week') {
            this.time='上周'
           this.erchatsTable = this.allData.week
-
+           this.canvansData()
         } else if (this.timeType == 'month') {
            this.time='上月'
-          this.erchatsTable = this.allData.month
+           this.erchatsTable = this.allData.month
+           this.canvansData()
         } else if (this.timeType == 'reset') {
            this.time='昨天'
           this.timeType = 'day'
@@ -234,67 +252,15 @@ var elementResizeDetectorMaker = require("element-resize-detector")
       tableInfo() {
         content.indexTable().then(res => {
           this.table = res.data
+          
         })
       },
       erchatInfo() {
-        content.indexTable().then(res => {
-          let data = {
-            updateTime: "2021-02-24 23:59:59",
-            today: {
-              newApplyCnt: 1, //发起申请数
-              newApplyCntDiff: -1, //发起申请数差值
-              newContactCnt: 2, //新增客户数
-              newContactCntDiff: 0, //新增客户数差值
-              newMemberCnt: 3, //群新增人数
-              newMemberCntDiff: -1, //群新增人数差值
-              negativeFeedbackCnt: 3, //流失客户数
-              negativeFeedbackCntDiff: 2, //流失客户数差值,
-              dataList: [{
-                xTime: '',
-                newApplyCnt: 0,
-                newContactCnt: 0,
-                newMemberCnt: 0,
-                negativeFeedbackCnt: 0
-              }]
-            },
-            week: {
-              newApplyCnt: 0,
-              newApplyCntDiff: -1,
-              newContactCnt: 0,
-              newContactCntDiff: 2,
-              newMemberCnt: 0,
-              newMemberCntDiff: 0,
-              negativeFeedbackCnt: 0,
-              negativeFeedbackCntDiff: -3,
-              dataList: [{
-                xTime: '',
-                newApplyCnt: 0,
-                newContactCnt: 0,
-                newMemberCnt: 0,
-                negativeFeedbackCnt: 0
-              }]
-            },
-            month: {
-              newApplyCnt: 0,
-              newApplyCntDiff: 0,
-              newContactCnt: 0,
-              newContactCntDiff: 0,
-              newMemberCnt: 0,
-              newMemberCntDiff: 0,
-              negativeFeedbackCnt: 0,
-              negativeFeedbackCntDiff: 0,
-              dataList: [{
-                xTime: '',
-                newApplyCnt: 0,
-                newContactCnt: 0,
-                newMemberCnt: 0,
-                negativeFeedbackCnt: 0
-              }]
-            },
-          }
-          this.allData = data;
-          this.erchatsTable = data.today;
-          this.uptime = data.updateTime;
+        content.indexEchart().then(res => {
+           this.allData = res.data;
+           this.uptime =res.data.updateTime;
+           this.erchatsTable = this.allData.today
+           this.canvansData()
         })
       },
       drawLine(id,width) {
@@ -302,13 +268,12 @@ var elementResizeDetectorMaker = require("element-resize-detector")
         obj.style.width=width?`${width}px`:'100%';
         obj.style.height='500px';
         this.charts = echarts.init(obj)
-
         this.charts.setOption({
           tooltip: {
             trigger: 'axis'
           },
           legend: {
-            data: ['近七日收益']
+            data: ['发起申请数','新增客户数','群新增人数','流失客户数']
           },
           grid: {
             left: '3%',
@@ -319,30 +284,41 @@ var elementResizeDetectorMaker = require("element-resize-detector")
           xAxis: {
             type: 'category',
             boundaryGap: false,
-            data: ["1", "2", "3", "4", "5"]
+            data: this.xAxis
           },
           yAxis: {
             type: 'value'
           },
-          series: [{
-            name: '近七日收益',
+          series: 
+          [{
+            name: '发起申请数',
             type: 'line',
             stack: '总量',
-            data: this.opinionData
-          }, {
-            name: '近七q日收益',
+            data: this.opinionData.opinionData1
+          },
+          {
+            name: '新增客户数',
             type: 'line',
             stack: '总量',
-            data: this.opinionData
+            data: this.opinionData.opinionData2
+          },
+          {
+            name: '群新增人数',
+            type: 'line',
+            stack: '总量',
+            data: this.opinionData.opinionData3
+          },
+          {
+            name: '流失客户数',
+            type: 'line',
+            stack: '总量',
+            data: this.opinionData.opinionData4
           }]
         })
       }
     },
     //调用
     mounted() {
-      this.$nextTick(function () {
-        this.drawLine('main','')
-      })
       this.erchatInfo()
       this.tableInfo()
       var erd = elementResizeDetectorMaker()
@@ -351,7 +327,6 @@ var elementResizeDetectorMaker = require("element-resize-detector")
       var width = element.offsetWidth
       var height = element.offsetHeight
         that.$nextTick(function () {
-         console.log(this.$refs['views'])
          this.drawLine('main',width)
       })
     })
