@@ -319,7 +319,7 @@
         return data.name.indexOf(value) !== -1;
       },
       handleNodeClick(data, add) {
-        if (!data.gender) {
+        if (!data.userId) {
           let querys = {
             pageNum: '1',
             pageSize: '999',
@@ -328,15 +328,9 @@
           api.getList(querys).then(({
             rows
           }) => {
-            if (add == true) {
-              console.log(this.treeData, data, rows)
-              this.treeData[0].children = data.children.concat(rows)
-              return
-            } else {
               const newChild = rows;
               this.$set(data, 'children', []);
               data.children = rows
-            }
           })
         } else {
           this.talkName = data.name;

@@ -66,7 +66,8 @@ Vue.prototype.msgInfo = function(msg) {
 
 import { pickerOptions } from '@/utils/index'
 Vue.prototype.pickerOptions = pickerOptions
-
+import VideoPlayer from 'vue-video-player'
+ Vue.use(VideoPlayer);
 // 全局组件挂载
 Vue.component('Pagination', Pagination)
 Vue.component('RightToolbar', RightToolbar)
