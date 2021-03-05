@@ -44,6 +44,7 @@
     "clipboard": "2.0.4",
     "core-js": "3.6.5",
     "echarts": "4.2.1",
+    "element-resize-detector": "^1.2.2",
     "element-ui": "2.13.2",
     "fabric": "^3.5.1",
     "file-saver": "2.0.1",
