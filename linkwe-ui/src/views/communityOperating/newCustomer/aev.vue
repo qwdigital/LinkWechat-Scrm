@@ -19,7 +19,7 @@ export default {
         activityScene: '',
         groupCodeId: 0,
         isJoinConfirmFriends: true,
-        mediaId: 0,
+        // mediaId: 0,
         qrCode: '',
         weEmpleCodeTags: [
           {
@@ -76,13 +76,14 @@ export default {
     },
     // 选择人员变化事件
     selectedUser(users) {
-      // debugger
+      debugger
       this.form.weEmpleCodeUseScops = users.map((d) => {
         return {
           businessId: d.id || d.userId,
           businessName: d.name,
           businessIdType: d.userId ? 2 : 1,
           mobile: d.mobile,
+          empleCodeId: d.empleCodeId,
         }
       })
     },
@@ -94,7 +95,10 @@ export default {
     },
     // 选择二维码确认按钮
     submitSelectQrCode(data) {
+      // debugger
+      this.form.groupCodeId = data.id
       this.form.qrCode = data.codeUrl
+      this.$refs.form.validateField('qrCode')
     },
     removeMaterial() {
       this.form.mediaId = ''
@@ -105,16 +109,20 @@ export default {
         this.msgError('请至少选择一名使用员工')
         return
       }
-      this.loading = true
-      ;(this.form.id ? update : add)(this.form)
-        .then(({ data }) => {
-          this.msgSuccess('操作成功')
-          this.loading = false
-          this.$router.back()
-        })
-        .catch(() => {
-          this.loading = false
-        })
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          this.loading = true
+          ;(this.form.id ? update : add)({ WeCommunityNewGroupDto: this.form })
+            .then(({ data }) => {
+              this.msgSuccess('操作成功')
+              this.loading = false
+              this.$router.back()
+            })
+            .catch(() => {
+              this.loading = false
+            })
+        }
+      })
     },
   },
 }

@@ -153,6 +153,7 @@
     <SelectUser
       :visible.sync="dialogVisibleSelectAuditUser"
       title="选择添加人"
+      isSigleSelect
       @success="selectedAuditUser"
     ></SelectUser>
   </div>
