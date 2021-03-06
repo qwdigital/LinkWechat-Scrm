@@ -110,21 +110,21 @@
           </div>
         </div>
         <div class="inedx_r_top_bottom">
-          <span class="fontgay">可有日期:xx </span> <span class="fr ">永久</span>
+          <span class="fontgay">可有日期: </span> <span class="fr ">永久</span>
         </div>
       </div>
       <div class="twolink">
-        <div class="twolinkbox" style="color: orange"><i class="el-icon-warning-outline"></i>帮助文档</div>
-        <div class="twolinkbox" style="float:right;color:#199ed8"><i class="el-icon-s-management"></i>开发文档</div>
+        <div class="twolinkbox" style="color: orange"><i class="el-icon-warning-outline"></i> <span>帮助文档</span></div>
+        <div class="twolinkbox" style="float:right;color:#199ed8"><i class="el-icon-s-management"></i><span>开发文档</span> </div>
       </div>
       <div class="listcard">
         <div class="inedx_r_top_bottom">
           <span>更新日志</span> <span class="fr" style="color:#199ed8">更多</span>
         </div>
         <ul>
-          <li>1.0版本测试</li>
-          <li>1.0.1版本测试</li>
-          <li>1.0.32版本测试</li>
+          <li>即将上线，敬请期待</li>
+          <li>即将上线，敬请期待</li>
+          <li>即将上线，敬请期待</li>
         </ul>
       </div>
       <div class="listcard">
@@ -132,9 +132,9 @@
           <span>企业学院</span> <span class="fr" style="color:#199ed8">更多</span>
         </div>
         <ul>
-          <li>1.0版本测试</li>
-          <li>1.0.1版本测试</li>
-          <li>1.0.32版本测试</li>
+          <li>即将上线，敬请期待</li>
+          <li>即将上线，敬请期待</li>
+          <li>即将上线，敬请期待</li>
         </ul>
       </div>
       <div class="listcard">
@@ -405,6 +405,7 @@ var elementResizeDetectorMaker = require("element-resize-detector")
 
         ul li {
           line-height: 40px;
+          text-indent: 2em;
         }
 
         .inedx_r_top_bottom {
@@ -456,6 +457,7 @@ var elementResizeDetectorMaker = require("element-resize-detector")
         cursor: pointer;
 
         .twolinkbox {
+          span{text-indent: 10px;}
           width: 48%;
           float: left;
           background: #fff;
