@@ -61,7 +61,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
         //检查群活码是否存在
         WeGroupCode weGroupCode = weGroupCodeMapper.selectWeGroupCodeById(communityNewGroupDto.getGroupCodeId());
-        if (null != weGroupCode) {
+        if (null == weGroupCode) {
             throw new WeComException("群活码不存在！");
         }
         WeEmpleCode weEmpleCode = getWeEmpleCode(communityNewGroupDto);
