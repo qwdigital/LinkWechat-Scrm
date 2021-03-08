@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.linkwechat.wecom.domain.WeCustomerAddUser;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.vo.WeAllocateCustomersVo;
 import com.linkwechat.wecom.domain.vo.WeAllocateGroupsVo;
@@ -97,4 +98,12 @@ public interface WeUserMapper extends BaseMapper<WeUser>
      * @return
      */
     public List<WeAllocateGroupsVo>  getAllocateGroups(WeAllocateGroupsVo weAllocateGroupsVo);
+
+
+    /**
+     * 根据客户id获取客户添加人
+     * @param externalUserid
+     * @return
+     */
+    List<WeCustomerAddUser> findWeUserByCutomerId(@Param("externalUserid") String externalUserid);
 }

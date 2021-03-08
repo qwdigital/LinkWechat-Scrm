@@ -350,7 +350,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                             ) and user_id=#{operUserid}
                     ) AS commonGroupNum
                     FROM we_customer wc WHERE wc.external_userid=#{externalUserid}
-
     </select>
+
+
+
     
 </mapper>

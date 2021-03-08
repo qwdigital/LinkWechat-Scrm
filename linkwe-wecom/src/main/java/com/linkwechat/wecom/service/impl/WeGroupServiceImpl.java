@@ -9,6 +9,7 @@ import com.linkwechat.wecom.client.WeCustomerClient;
 import com.linkwechat.wecom.client.WeCustomerGroupClient;
 import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.domain.WeAllocateGroup;
+import com.linkwechat.wecom.domain.WeCustomerAddGroup;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeGroupMember;
 import com.linkwechat.wecom.domain.dto.AllocateWeGroupDto;
@@ -17,7 +18,9 @@ import com.linkwechat.wecom.domain.dto.customer.CustomerGroupList;
 import com.linkwechat.wecom.domain.dto.customer.CustomerGroupMember;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.mapper.WeGroupMapper;
-import com.linkwechat.wecom.service.*;
+import com.linkwechat.wecom.service.IWeAllocateGroupService;
+import com.linkwechat.wecom.service.IWeGroupMemberService;
+import com.linkwechat.wecom.service.IWeGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -44,11 +47,6 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
     @Autowired
     private IWeGroupMemberService iWeGroupMemberService;
 
-    @Autowired
-    private IWeUserService weUserService;
-
-    @Autowired
-    private IWeCustomerService weCustomerService;
 
 
     @Autowired
@@ -330,6 +328,11 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
     public void deleteWeGroup(String chatId) {
         this.baseMapper.delete(new LambdaQueryWrapper<WeGroup>().eq(WeGroup::getChatId,chatId));
         iWeGroupMemberService.remove(new LambdaQueryWrapper<WeGroupMember>().eq(WeGroupMember::getChatId,chatId));
+    }
+
+    @Override
+    public List<WeCustomerAddGroup> findWeGroupByCustomer(String operUserid, String externalUserid) {
+        return this.baseMapper.findWeGroupByCustomer(operUserid,externalUserid);
     }
 
 }

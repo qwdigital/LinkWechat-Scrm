@@ -7,7 +7,9 @@ import com.linkwechat.wecom.domain.WeFlowerCustomerTagRel;
 import com.linkwechat.wecom.domain.WeTagGroup;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.service.IWeCustomerService;
+import com.linkwechat.wecom.service.IWeGroupService;
 import com.linkwechat.wecom.service.IWeTagGroupService;
+import com.linkwechat.wecom.service.IWeUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +31,14 @@ public class WeCustomerPortraitController extends BaseController {
 
     @Autowired
     private IWeTagGroupService weTagGroupService;
+
+
+    @Autowired
+    private IWeUserService iWeUserService;
+
+
+    @Autowired
+    private IWeGroupService iWeGroupService;
 
 
     /**
@@ -107,7 +117,9 @@ public class WeCustomerPortraitController extends BaseController {
     public AjaxResult findaddEmployes(@PathVariable String externalUserid){
 
 
-        return AjaxResult.success();
+        return AjaxResult.success(
+                iWeUserService.findWeUserByCutomerId(externalUserid)
+        );
     }
 
 
@@ -120,9 +132,13 @@ public class WeCustomerPortraitController extends BaseController {
     @GetMapping(value = "/findAddGroupNum")
     public AjaxResult findAddGroupNum(String externalUserid,String operUserid){
 
-
-        return AjaxResult.success();
+        return AjaxResult.success(
+                iWeGroupService.findWeGroupByCustomer(operUserid,externalUserid)
+        );
     }
+
+
+
 
 
 

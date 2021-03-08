@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.wecom.domain.WeCustomerAddGroup;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 
@@ -26,4 +27,6 @@ public interface IWeGroupService extends IService<WeGroup> {
     void updateWeGroup(String chatId);
 
     void deleteWeGroup(String chatId);
+
+    List<WeCustomerAddGroup> findWeGroupByCustomer(String operUserid,String externalUserid);
 }
