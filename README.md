@@ -8,7 +8,7 @@
 
 <div align="center">
 
-![GVP Stars](http://img.shields.io/badge/GPV%20Stars-850+-red)
+<a href='https://gitee.com/LinkWeChat/link-wechat/stargazers'><img src='https://gitee.com/LinkWeChat/link-wechat/badge/star.svg?theme=gvp' alt='star'></img></a>
 ![GVP Forks](http://img.shields.io/badge/GPV%20Forks-300+-yellow)
 ![license](http://img.shields.io/badge/license-GPL%203.0-green)
 
