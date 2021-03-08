@@ -150,6 +150,8 @@ xss:
 elasticsearch:
   schema: http
   address: ${ES_ADDRESS:localhost}
+  userName: ""
+  password: ""
   connectTimeout: 10000
   socketTimeout: 10000
   connectionRequestTimeout: 10000

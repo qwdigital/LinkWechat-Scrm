@@ -1,6 +1,10 @@
 package com.linkwechat.common.config;
 
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -30,6 +34,11 @@ public class ElasticSearchConfig {
     @Value("${elasticsearch.address}")
     private String address;
 
+    @Value("${elasticsearch.userName}")
+    private String userName;
+
+    @Value("${elasticsearch.password}")
+    private String password;
     /**
      * 连接超时时间
      */
@@ -70,6 +79,8 @@ public class ElasticSearchConfig {
             String port = addr.split(":")[1];
             hostLists.add(new HttpHost(host, Integer.parseInt(port), schema));
         }
+        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
         // 转换成 HttpHost 数组
         HttpHost[] httpHost = hostLists.toArray(new HttpHost[]{});
         // 构建连接对象
@@ -85,6 +96,7 @@ public class ElasticSearchConfig {
         builder.setHttpClientConfigCallback(httpClientBuilder -> {
             httpClientBuilder.setMaxConnTotal(maxConnectNum);
             httpClientBuilder.setMaxConnPerRoute(maxConnectPerRoute);
+            httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
             return httpClientBuilder;
         });
         return new RestHighLevelClient(builder);
