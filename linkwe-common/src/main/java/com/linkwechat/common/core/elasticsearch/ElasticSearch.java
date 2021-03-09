@@ -238,7 +238,7 @@ public class ElasticSearch {
 
     public void insertBatchAsync(String idxName, List<JSONObject> list, Consumer<List<JSONObject>> consumer) {
         BulkRequest request = new BulkRequest();
-        list.parallelStream().forEach(item -> request.add(new IndexRequest(idxName, "_doc").id(item.getString("msgid"))
+        list.forEach(item -> request.add(new IndexRequest(idxName, "_doc").id(item.getString("msgid"))
                 .source(item, XContentType.JSON)));
         try {
             if (!CollectionUtils.isEmpty(request.requests())) {
