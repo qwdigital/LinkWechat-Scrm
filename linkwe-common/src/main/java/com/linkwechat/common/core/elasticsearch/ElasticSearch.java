@@ -32,6 +32,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -207,7 +208,9 @@ public class ElasticSearch {
         list.forEach(item -> request.add(new IndexRequest(idxName, "_doc").id(item.getId())
                 .source(item.getData(), XContentType.JSON)));
         try {
-            restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
+            if (!CollectionUtils.isEmpty(request.requests())) {
+                restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -225,7 +228,9 @@ public class ElasticSearch {
         list.parallelStream().forEach(item -> request.add(new IndexRequest(idxName, "_doc").id(item.getId())
                 .source(item.getData(), XContentType.JSON)));
         try {
-            restHighLevelClient.bulkAsync(request, RequestOptions.DEFAULT, getActionListener(consumer, list, param));
+            if (!CollectionUtils.isEmpty(request.requests())) {
+                restHighLevelClient.bulkAsync(request, RequestOptions.DEFAULT, getActionListener(consumer, list, param));
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -236,7 +241,9 @@ public class ElasticSearch {
         list.parallelStream().forEach(item -> request.add(new IndexRequest(idxName, "_doc").id(item.getString("msgid"))
                 .source(item, XContentType.JSON)));
         try {
-            restHighLevelClient.bulkAsync(request, RequestOptions.DEFAULT, getActionListener(consumer, list));
+            if (!CollectionUtils.isEmpty(request.requests())) {
+                restHighLevelClient.bulkAsync(request, RequestOptions.DEFAULT, getActionListener(consumer, list));
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -246,7 +253,9 @@ public class ElasticSearch {
         BulkRequest request = new BulkRequest();
         list.forEach(item -> request.add(new UpdateRequest(idxName, item.getId()).upsert(item.getData(), XContentType.JSON)));
         try {
-            restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
+            if (!CollectionUtils.isEmpty(request.requests())) {
+                restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -268,7 +277,9 @@ public class ElasticSearch {
         BulkRequest request = new BulkRequest();
         idList.forEach(item -> request.add(new DeleteRequest(idxName, "_doc", item.toString())));
         try {
-            restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
+            if (!CollectionUtils.isEmpty(request.requests())) {
+                restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
