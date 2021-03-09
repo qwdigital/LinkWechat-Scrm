@@ -1,6 +1,7 @@
 package com.linkwechat.web.controller.wecom;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
@@ -151,14 +152,60 @@ public class WeCustomerPortraitController extends BaseController {
      */
     @GetMapping(value = "/findTrajectory")
     public TableDataInfo findTrajectory(Integer trajectoryType){
-
         startPage();
-
         return getDataTable(
                 iWeCustomerTrajectoryService.list(new LambdaQueryWrapper<WeCustomerTrajectory>()
-                .eq(WeCustomerTrajectory::getTrajectoryType,trajectoryType))
+                .eq(WeCustomerTrajectory::getTrajectoryType,trajectoryType)
+                .ne(WeCustomerTrajectory::getStatus,Constants.DELETE_CODE))
         );
     }
+
+
+    /**
+     * 添加或编辑轨迹
+     * @param trajectory
+     * @return
+     */
+    @PostMapping(value = "/addOrEditWaitHandle")
+    public AjaxResult addOrEditWaitHandle(@RequestBody WeCustomerTrajectory trajectory){
+
+
+        iWeCustomerTrajectoryService.saveOrUpdate(trajectory);
+
+        return AjaxResult.success();
+    }
+
+
+    /**
+     * 删除轨迹
+     * @param trajectoryId
+     * @return
+     */
+    @DeleteMapping(value = "/removeTrajectory/{trajectoryId}")
+    public AjaxResult removeTrajectory(@PathVariable String trajectoryId){
+        iWeCustomerTrajectoryService.updateById(WeCustomerTrajectory.builder()
+                .id(trajectoryId)
+                .status(Constants.DELETE_CODE)
+                .build());
+        return AjaxResult.success();
+    }
+
+
+    /**
+     * 完成待办
+     * @param trajectoryId
+     * @return
+     */
+    @DeleteMapping(value = "/handleWait/{trajectoryId}")
+    public AjaxResult handleWait(@PathVariable String trajectoryId){
+        iWeCustomerTrajectoryService.updateById(WeCustomerTrajectory.builder()
+                .id(trajectoryId)
+                .status(Constants.HANDLE_SUCCESS)
+                .build());
+        return AjaxResult.success();
+    }
+
+
 
 
 
