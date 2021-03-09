@@ -457,12 +457,13 @@ var elementResizeDetectorMaker = require("element-resize-detector")
         }
 
         .inedx_r_top_t {
-          height: 100px;
-          width: 100%;
-          line-height: 100px;
-          padding: 0 15px;
-          font-size: 21px;
-          color: #199ed8;
+         height: 100px;
+        width: 100%;
+        line-height: 100px;
+        padding: 0 15px;
+        word-break: break-all;
+        font-size: 17px;
+        color: #199ed8;
         }
 
         .inedx_r_top_bottom {
