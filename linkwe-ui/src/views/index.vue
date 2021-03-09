@@ -366,7 +366,6 @@ var elementResizeDetectorMaker = require("element-resize-detector")
     .fr {
       float: right;
     }
-
     .redicon {
       color: #ff0000;
     }
@@ -432,8 +431,8 @@ var elementResizeDetectorMaker = require("element-resize-detector")
          height: 220px;
          text-align: center;
          img{
-           width: 200px;
-           height: 200px;
+           max-width: 200px;
+           max-height: 200px;
          }
        }
         .inedx_r_top_bottom {
@@ -458,12 +457,13 @@ var elementResizeDetectorMaker = require("element-resize-detector")
 
         .inedx_r_top_t {
          height: 100px;
-        width: 100%;
-        line-height: 100px;
-        padding: 0 15px;
-        word-break: break-all;
-        font-size: 17px;
-        color: #199ed8;
+         width: 100%;
+         line-height: 100px;
+         padding: 0 15px;
+         word-break: break-all;
+         font-weight: bold;
+         font-size: 16px;
+         color: #199ed8;
         }
 
         .inedx_r_top_bottom {
