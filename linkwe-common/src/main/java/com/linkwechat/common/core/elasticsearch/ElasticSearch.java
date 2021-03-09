@@ -208,7 +208,7 @@ public class ElasticSearch {
         list.forEach(item -> request.add(new IndexRequest(idxName, "_doc").id(item.getId())
                 .source(item.getData(), XContentType.JSON)));
         try {
-            if (!CollectionUtils.isEmpty(list)) {
+            if (!CollectionUtils.isEmpty(request.requests())) {
                 restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
             }
         } catch (Exception e) {
@@ -228,7 +228,7 @@ public class ElasticSearch {
         list.parallelStream().forEach(item -> request.add(new IndexRequest(idxName, "_doc").id(item.getId())
                 .source(item.getData(), XContentType.JSON)));
         try {
-            if (!CollectionUtils.isEmpty(list)) {
+            if (!CollectionUtils.isEmpty(request.requests())) {
                 restHighLevelClient.bulkAsync(request, RequestOptions.DEFAULT, getActionListener(consumer, list, param));
             }
         } catch (Exception e) {
@@ -241,7 +241,7 @@ public class ElasticSearch {
         list.parallelStream().forEach(item -> request.add(new IndexRequest(idxName, "_doc").id(item.getString("msgid"))
                 .source(item, XContentType.JSON)));
         try {
-            if (!CollectionUtils.isEmpty(list)) {
+            if (!CollectionUtils.isEmpty(request.requests())) {
                 restHighLevelClient.bulkAsync(request, RequestOptions.DEFAULT, getActionListener(consumer, list));
             }
         } catch (Exception e) {
@@ -253,7 +253,7 @@ public class ElasticSearch {
         BulkRequest request = new BulkRequest();
         list.forEach(item -> request.add(new UpdateRequest(idxName, item.getId()).upsert(item.getData(), XContentType.JSON)));
         try {
-            if (!CollectionUtils.isEmpty(list)) {
+            if (!CollectionUtils.isEmpty(request.requests())) {
                 restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
             }
         } catch (Exception e) {
@@ -277,7 +277,7 @@ public class ElasticSearch {
         BulkRequest request = new BulkRequest();
         idList.forEach(item -> request.add(new DeleteRequest(idxName, "_doc", item.toString())));
         try {
-            if (!CollectionUtils.isEmpty(idList)) {
+            if (!CollectionUtils.isEmpty(request.requests())) {
                 restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
             }
         } catch (Exception e) {
