@@ -15,7 +15,7 @@ public class WeCustomerPortrait {
     //外部联系人id
     private String externalUserid;
     //企业员工id
-    private String operUserid;
+    private String userId;
     //客户与企业员工关系id
     private String flowerCustomerRelId;
     //客户昵称

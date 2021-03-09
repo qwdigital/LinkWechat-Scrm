@@ -84,19 +84,19 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
     /**
      * 根据外部联系人ID和企业员工ID获取当前客户信息
      * @param externalUserid
-     * @param operUserid
+     * @param userid
      * @return
      */
-    WeCustomerPortrait findCustomerByOperUseridAndCustomerId(@Param("externalUserid") String externalUserid,@Param("operUserid") String operUserid);
+    WeCustomerPortrait findCustomerByOperUseridAndCustomerId(@Param("externalUserid") String externalUserid,@Param("userid") String userid);
 
 
     /**
      * 统计客户社交关系
      * @param externalUserid 客户id
-     * @param operUserid 员工id
+     * @param userid 员工id
      * @return
      */
-    WeCustomerSocialConn countSocialConn(@Param("externalUserid")String externalUserid,@Param("operUserid")String operUserid);
+    WeCustomerSocialConn countSocialConn(@Param("externalUserid")String externalUserid,@Param("userid")String userid);
 
 
 }

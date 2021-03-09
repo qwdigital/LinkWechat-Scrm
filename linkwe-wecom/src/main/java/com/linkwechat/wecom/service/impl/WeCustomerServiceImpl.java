@@ -627,9 +627,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
     @Override
-    public WeCustomerPortrait findCustomerByOperUseridAndCustomerId(String externalUserid, String operUserid) {
+    public WeCustomerPortrait findCustomerByOperUseridAndCustomerId(String externalUserid, String userid) {
         WeCustomerPortrait weCustomerPortrait
-                = weCustomerMapper.findCustomerByOperUseridAndCustomerId(externalUserid, operUserid);
+                = weCustomerMapper.findCustomerByOperUseridAndCustomerId(externalUserid, userid);
 
         if(null != weCustomerPortrait){
             //获取当前客户拥有得标签
@@ -641,9 +641,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
            //客户社交关系
             weCustomerPortrait.setSocialConn(
-                   this.baseMapper.countSocialConn(externalUserid,operUserid)
+                   this.baseMapper.countSocialConn(externalUserid,userid)
             );
-
+        }else {
+            weCustomerPortrait=new WeCustomerPortrait();
         }
 
 
@@ -667,7 +668,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         //更新企业添加人表
         iWeFlowerCustomerRelService.update(weFlowerCustomerRel,new LambdaQueryWrapper<WeFlowerCustomerRel>()
         .eq(WeFlowerCustomerRel::getExternalUserid,weCustomerPortrait.getExternalUserid())
-        .eq(WeFlowerCustomerRel::getOperUserid,weCustomerPortrait.getOperUserid()));
+        .eq(WeFlowerCustomerRel::getUserId,weCustomerPortrait.getUserId()));
 
     }
 
