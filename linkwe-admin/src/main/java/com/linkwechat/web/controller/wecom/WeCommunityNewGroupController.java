@@ -69,7 +69,7 @@ public class WeCommunityNewGroupController extends BaseController {
      */
     @ApiOperation(value = "获取新客自动拉群详细信息", httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:query')")
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/{newGroupId}")
     public AjaxResult<WeCommunityNewGroupVo> getInfo(@PathVariable("newGroupId") @ApiParam("主键ID") String newGroupId) {
         return AjaxResult.success(weCommunityNewGroupService.selectWeCommunityNewGroupById(new Long(newGroupId)));
     }
