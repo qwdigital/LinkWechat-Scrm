@@ -87,14 +87,15 @@
           <el-row type="flex" class="row-bg" justify="space-between">
             <el-col :span="24">功能直通车 </el-col>
           </el-row>
-          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:20px;text-align:center">
-            <el-col :span="4" v-for="(index,i) in car" :key="i">
-              <div class="circle"></div>
+          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:20px;text-align:center" >
+            <el-col :span="4" v-for="(index,i) in car" :key="i" >
+              <div class="circle" @click="carLink(index)" >
+                <img :src="index.img" alt="">
+              </div>
             </el-col>
-
           </el-row>
-          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:20px">
-            <el-col :span="4" v-for="(index,i) in car" :key="i" style="text-align:center">{{index.name}}</el-col>
+          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:20px" >
+            <el-col :span="4" v-for="(index,i) in car" :key="i" style="text-align:center" @click="carLink(index)">{{index.name}}</el-col>
           </el-row>
         </div>
       </div>
@@ -140,13 +141,17 @@
       <div class="listcard">
         <div class="inedx_r_top_bottom">
           <span>开发群</span>
-
+        </div>
+        <div class="listcard_img">
+          <img :src="bossImg" alt="">
         </div>
       </div>
       <div class="listcard">
         <div class="inedx_r_top_bottom">
           <span>客户群</span>
-
+        </div>
+           <div class="listcard_img">
+          <img :src="bossImg" alt="">
         </div>
       </div>
     </div>
@@ -168,24 +173,31 @@ var elementResizeDetectorMaker = require("element-resize-detector")
     data() {
       return {
        nowTime:new Date(),
+       bossImg:require('@/assets/index/boss.png'),
         car: [{
-          name: '发起申请数',
-          url: '/'
+          name: '客户管理',
+          url: '/customerManage/customer',
+          img:require('@/assets/index/customer.png')
         }, {
-          name: '发起申请数',
-          url: '/'
+          name: '内容存档',
+          url: '/conversation/content',
+          img:require('@/assets/index/customer.png')
         }, {
-          name: '发起申请数',
-          url: '/'
+          name: '任务宝',
+          url: '/appTool/task',
+          img:require('@/assets/index/rwb.png')
         }, {
-          name: '发起申请数',
-          url: '/'
+          name: '消息群发',
+          url: '/groupMessage/add',
+          img:require('@/assets/index/xzqf.png')
         }, {
-          name: '发起申请数',
-          url: '/'
+          name: '员工活码',
+          url: '/drainageCode/staff',
+          img:require('@/assets/index/yghm.png')
         }, {
-          name: '发起申请数',
-          url: '/'
+          name: '字典管理',
+          url: '/system/dict',
+          img:require('@/assets/index/zdlq.png')
         }],
         table: {},
         erchatsTable: {},
@@ -205,6 +217,9 @@ var elementResizeDetectorMaker = require("element-resize-detector")
       }
     },
     methods: {
+      carLink(e){
+        this.$router.push(e.url)
+      },
       getTimeState() {
         let timeNow = new Date();
         let hours = timeNow.getHours();
@@ -385,6 +400,11 @@ var elementResizeDetectorMaker = require("element-resize-detector")
       background: #999;
       border-radius: 50%;
       margin: 0 auto;
+      img{
+        border-radius: 50%; 
+      width: 80px;
+      height: 80px;
+      }
     }
 
     .index_r {
@@ -405,9 +425,17 @@ var elementResizeDetectorMaker = require("element-resize-detector")
 
         ul li {
           line-height: 40px;
-          text-indent: 2em;
+          text-indent: 12px;
         }
-
+       .listcard_img{
+         width: 100%;
+         height: 220px;
+         text-align: center;
+         img{
+           width: 200px;
+           height: 200px;
+         }
+       }
         .inedx_r_top_bottom {
           height: 60px;
           line-height: 60px;
