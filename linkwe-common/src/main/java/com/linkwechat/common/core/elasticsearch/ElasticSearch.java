@@ -208,7 +208,9 @@ public class ElasticSearch {
         list.forEach(item -> request.add(new IndexRequest(idxName, "_doc").id(item.getId())
                 .source(item.getData(), XContentType.JSON)));
         try {
-            restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
+            if (!CollectionUtils.isEmpty(list)) {
+                restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
