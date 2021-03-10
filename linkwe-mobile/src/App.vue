@@ -12,9 +12,9 @@ export default {
   watch: {
     // 通过config接口注入权限验证配置
     // 所有需要使用JS-SDK的页面必须先注入配置信息，否则将无法调用（同一个url仅需调用一次，对于变化url的SPA（single-page application）的web app可在每次url变化时进行调用）
-    $route() {
-      this.wxConfig()
-    },
+    // $route() {
+    //   this.wxConfig()
+    // },
   },
   methods: {
     wxConfig() {
