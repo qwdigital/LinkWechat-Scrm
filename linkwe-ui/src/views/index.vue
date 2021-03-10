@@ -309,24 +309,28 @@ var elementResizeDetectorMaker = require("element-resize-detector")
             name: '发起申请数',
             type: 'line',
             stack: '总量',
+         smooth: true,
             data: this.opinionData.opinionData1
           },
           {
             name: '新增客户数',
             type: 'line',
             stack: '总量',
+            smooth: true,
             data: this.opinionData.opinionData2
           },
           {
             name: '群新增人数',
             type: 'line',
             stack: '总量',
+            smooth: true,
             data: this.opinionData.opinionData3
           },
           {
             name: '流失客户数',
             type: 'line',
             stack: '总量',
+            smooth: true,
             data: this.opinionData.opinionData4
           }]
         })
