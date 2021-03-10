@@ -1,39 +1,63 @@
 <script>
-import { getDetail, add, update, getQrcode } from '@/api/drainageCode/staff'
-import { getList } from '@/api/drainageCode/welcome'
+import { getDetail, add, update } from '@/api/communityOperating/newCustomer'
+// import { getList } from '@/api/drainageCode/welcome'
 import PhoneDialog from '@/components/PhoneDialog'
 import SelectUser from '@/components/SelectUser'
 import SelectTag from '@/components/SelectTag'
-import SelectMaterial from '@/components/SelectMaterial'
+import SelectQrCode from '@/components/SelectQrCode'
 export default {
-  components: { PhoneDialog, SelectTag, SelectUser, SelectMaterial },
+  components: { PhoneDialog, SelectTag, SelectUser, SelectQrCode },
   data() {
     return {
       dialogVisibleSelectUser: false,
       dialogVisibleSelectTag: false,
-      dialogVisibleSelectMaterial: false,
-      dialogVisibleSelectWel: false,
+      dialogVisibleSelectQrCode: false,
       // 遮罩层
       loading: false,
       // 表单参数
       form: {
-        codeType: 1,
+        activityScene: '',
+        groupCodeId: 0,
+        isJoinConfirmFriends: true,
+        // mediaId: 0,
         qrCode: '',
-        isJoinConfirmFriends: 0,
-        weEmpleCodeTags: [],
-        weEmpleCodeUseScops: [],
+        weEmpleCodeTags: [
+          {
+            delFlag: 0,
+            empleCodeId: 0,
+            id: 0,
+            tagId: 'string',
+            tagName: 'string',
+          },
+        ],
+        weEmpleCodeUseScops: [
+          {
+            businessId: 'string',
+            businessIdType: 0,
+            businessName: 'string',
+            delFlag: 0,
+            empleCodeId: 0,
+            id: 0,
+            mobile: 'string',
+          },
+        ],
+        welcomeMsg: '',
       },
+      rules: Object.freeze({
+        activityScene: [{ required: true, message: '必填项', trigger: 'blur' }],
+        weEmpleCodeUseScops: [
+          { required: true, message: '必填项', trigger: 'change' },
+        ],
+        welcomeMsg: [{ required: true, message: '必填项', trigger: 'blur' }],
+        qrCode: [{ required: true, message: '必填项', trigger: 'change' }],
+      }),
       materialSelected: '',
-      welQuery: { welcomeMsg: '' },
-      welLoading: false,
-      welList: [],
-      welSelected: {},
-      type: { 1: '单人', 2: '多人', 3: '批量单人' },
     }
   },
   created() {
     let id = this.$route.query.id
     id && this.getDetail(id)
+    this.$route.meta.title = (id ? '编辑' : '新建') + '新客自动拉群'
   },
   methods: {
     /** 获取详情 */
@@ -46,35 +70,21 @@ export default {
         this.loading = false
       })
     },
-    /** 获取欢迎语列表 */
-    getWelList() {
-      this.welLoading = true
-      getList(this.welQuery).then(({ rows }) => {
-        this.welList = rows
-        this.$refs.table.$forceUpdate()
-        this.welLoading = false
-      })
-    },
     codeTypeChange() {
       this.form.weEmpleCodeUseScops = []
       this.form.qrCode = ''
     },
     // 选择人员变化事件
     selectedUser(users) {
-      let params = { userIds: [], departmentIds: [] }
+      debugger
       this.form.weEmpleCodeUseScops = users.map((d) => {
-        d.userId && params.userIds.push(d.userId)
-        d.id && params.departmentIds.push(d.id)
         return {
           businessId: d.id || d.userId,
           businessName: d.name,
           businessIdType: d.userId ? 2 : 1,
+          mobile: d.mobile,
+          empleCodeId: d.empleCodeId,
         }
-      })
-      params.userIds += ''
-      params.departmentIds += ''
-      getQrcode(params).then(({ data }) => {
-        this.$set(this.form, 'qrCode', data.qr_code)
       })
     },
     submitSelectTag(data) {
@@ -83,44 +93,43 @@ export default {
         tagName: d.name,
       }))
     },
-    // 选择素材确认按钮
-    submitSelectMaterial(text, image, file) {
-      this.form.mediaId = image.id
-      this.materialSelected = image.materialUrl
-      this.dialogVisibleSelectMaterial = false
+    // 选择二维码确认按钮
+    submitSelectQrCode(data) {
+      // debugger
+      this.form.groupCodeId = data.id
+      this.form.qrCode = data.codeUrl
+      this.$refs.form.validateField('qrCode')
     },
     removeMaterial() {
       this.form.mediaId = ''
       this.materialSelected = ''
-    },
-    // 欢迎语确认按钮
-    selectWelcome() {
-      this.form.welcomeMsg = this.welSelected.welcomeMsg
-      this.form.mediaId = this.welSelected.mediaId
-      this.dialogVisibleSelectWel = false
     },
     submit() {
       if (!this.form.weEmpleCodeUseScops.length) {
         this.msgError('请至少选择一名使用员工')
         return
       }
-      this.loading = true
-      ;(this.form.id ? update : add)(this.form)
-        .then(({ data }) => {
-          this.msgSuccess('操作成功')
-          this.loading = false
-          this.$router.back()
-        })
-        .catch(() => {
-          this.loading = false
-        })
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          this.loading = true
+          ;(this.form.id ? update : add)({ WeCommunityNewGroupDto: this.form })
+            .then(({ data }) => {
+              this.msgSuccess('操作成功')
+              this.loading = false
+              this.$router.back()
+            })
+            .catch(() => {
+              this.loading = false
+            })
+        }
+      })
     },
   },
 }
 </script>
 <template>
   <div class="wrap" v-loading="loading">
-    <el-form :model="form" ref="form" label-width="100px">
+    <el-form :model="form" ref="form" :rules="rules" label-width="100px">
       <el-form-item label="活码名称" prop="activityScene">
         <el-input
           v-model="form.activityScene"
@@ -130,7 +139,7 @@ export default {
           clearable
         />
       </el-form-item>
-      <el-form-item label="使用员工">
+      <el-form-item label="使用员工" prop="weEmpleCodeUseScops">
         <!-- closable -->
         <el-tag
           size="medium"
@@ -149,7 +158,7 @@ export default {
         >
       </el-form-item>
 
-      <el-form-item label="加群引导语" prop="isJoinConfirmFriends">
+      <el-form-item label="加群引导语" prop="welcomeMsg">
         <el-input
           type="textarea"
           v-model="form.welcomeMsg"
@@ -160,18 +169,21 @@ export default {
           clearable
         />
       </el-form-item>
-      <el-form-item label="选择群活码" prop="activityScene">
+      <el-form-item label="选择群活码" prop="qrCode">
+        <el-image v-if="form.qrCode" :src="form.qrCode" class="code-image">
+        </el-image>
+
         <el-button
           type="primary"
           plain
           class="ml10"
           icon="el-icon-plus"
           size="mini"
-          @click="dialogVisibleSelectUser = true"
-          >{{ form.weEmpleCodeUseScops.length ? '修改' : '添加' }}</el-button
+          @click="dialogVisibleSelectQrCode = true"
+          >{{ form.qrCode ? '修改' : '选择' }}</el-button
         >
       </el-form-item>
-      <el-form-item label="扫码标签" prop="weEmpleCodeTags">
+      <el-form-item label="新客户标签" prop="weEmpleCodeTags">
         <!-- closable -->
         <el-tag
           size="medium"
@@ -237,58 +249,12 @@ export default {
     >
     </SelectTag>
 
-    <!-- 选择素材弹窗 -->
-    <SelectMaterial
-      :visible.sync="dialogVisibleSelectMaterial"
-      type="1"
-      :showArr="[1]"
-      @success="submitSelectMaterial"
+    <!-- 选择二维码弹窗 -->
+    <SelectQrCode
+      :visible.sync="dialogVisibleSelectQrCode"
+      @success="submitSelectQrCode"
     >
-    </SelectMaterial>
-
-    <el-dialog
-      key="a"
-      title="选择欢迎语"
-      :visible.sync="dialogVisibleSelectWel"
-      width="500"
-    >
-      <div>
-        <el-input
-          class="welcome-input"
-          placeholder="请输入关键字"
-          v-model="welQuery.welcomeMsg"
-        >
-          <el-button slot="append" @click="getWelList">查询</el-button>
-        </el-input>
-        <el-table
-          ref="table"
-          v-loading="welLoading"
-          :data="welList"
-          :max-height="300"
-          :show-header="false"
-          highlight-current-row
-          @current-change="(val) => (welSelected = val)"
-        >
-          <el-table-column
-            property="welcomeMsg"
-            show-overflow-tooltip
-          ></el-table-column>
-          <el-table-column width="60">
-            <template slot-scope="{ row }">
-              <i
-                v-if="welSelected.id === row.id"
-                class="el-icon-check"
-                style="color: rgb(65, 133, 244); font-size: 25px;"
-              ></i>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-      <div slot="footer">
-        <el-button @click="dialogVisibleSelectWel = false">取 消</el-button>
-        <el-button type="primary" @click="selectWelcome">确 定</el-button>
-      </div>
-    </el-dialog>
+    </SelectQrCode>
   </div>
 </template>
 <style lang="scss" scoped>
@@ -310,6 +276,8 @@ export default {
   width: 80%;
   margin: 0 auto 20px;
 }
-.el-icon-error {
+.code-image {
+  width: 100px;
+  height: 100px;
 }
 </style>

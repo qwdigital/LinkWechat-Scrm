@@ -1,5 +1,10 @@
 <script>
-import * as api from '@/api/customer'
+import {
+  getList,
+  remove,
+  download,
+  downloadBatch,
+} from '@/api/communityOperating/newCustomer'
 
 export default {
   components: {},
@@ -9,7 +14,8 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        name: '',
+        empleCodeName: '',
+        createBy: '',
         beginTime: '', // "开始时间",
         endTime: '', // "结束时间"
       },
@@ -20,18 +26,13 @@ export default {
       dialogVisible: false,
       disabled: false,
       loading: false,
-      rules: Object.freeze({
-        name: [{ required: true, message: '必填项', trigger: 'blur' }],
-        corpId: [{ required: true, message: '必填项', trigger: 'blur' }],
-        corpSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
-        contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
-      }),
       status: ['正常', '停用'],
       pushType: {
         0: '发给客户',
         1: '发给客户群',
       },
       queryUser: [], // 搜索框选择的添加人
+      ids: [],
     }
   },
   watch: {},
@@ -53,8 +54,7 @@ export default {
       }
       page && (this.query.pageNum = page)
       this.loading = true
-      api
-        .getList(this.query)
+      getList(this.query)
         .then(({ rows, total }) => {
           this.list = rows
           this.total = +total
@@ -69,26 +69,70 @@ export default {
       this.dialogVisible = true
       type || !data ? (this.disabled = false) : (this.disabled = true)
     },
-    submit() {
-      this.$refs['form'].validate((valid) => {
-        if (valid) {
-          api[this.form.id ? 'update' : 'add'](this.form)
-            .then(() => {
-              this.msgSuccess('操作成功')
-              this.dialogVisible = false
-              this.getList(!this.form.id && 1)
-            })
-            .catch(() => {
-              this.dialogVisible = false
-            })
-        }
-      })
-    },
-    goRoute(id, path) {
+    goRoute(id) {
       this.$router.push({
         path: '/communityOperating/newCustomerAev',
         query: { id },
       })
+    },
+    // 多选框选中数据
+    handleSelectionChange(selection) {
+      this.ids = selection.map((item) => item.id)
+    },
+    /** 删除按钮操作 */
+    remove(id) {
+      const ids = id || this.ids
+      this.$confirm('是否确认删除?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(function() {
+          return remove(ids)
+        })
+        .then(() => {
+          this.getList()
+          this.msgSuccess('删除成功')
+        })
+        .catch(function() {})
+    },
+    download(id, userName, empleCodeName) {
+      let name = userName + '-' + empleCodeName + '.png'
+      download(id).then((res) => {
+        if (res != null) {
+          let blob = new Blob([res], { type: 'application/zip' })
+          let url = window.URL.createObjectURL(blob)
+          const link = document.createElement('a') // 创建a标签
+          link.href = url
+          link.download = name // 重命名文件
+          link.click()
+          URL.revokeObjectURL(url) // 释放内存
+        }
+      })
+    },
+    /** 批量下载 */
+    downloadBatch(qrCode) {
+      this.$confirm('是否确认下载所有图片吗?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(() => {
+          return downloadBatch(this.ids + '')
+          // window.open(downloadBatch(this.ids))
+        })
+        .then((res) => {
+          if (res != null) {
+            let blob = new Blob([res], { type: 'application/zip' })
+            let url = window.URL.createObjectURL(blob)
+            const link = document.createElement('a') // 创建a标签
+            link.href = url
+            link.download = '批量员工活码.zip' // 重命名文件
+            link.click()
+            URL.revokeObjectURL(url) // 释放内存
+          }
+        })
+        .catch(function() {})
     },
   },
 }
@@ -104,13 +148,13 @@ export default {
       class="top-search"
       size="small"
     >
-      <el-form-item label="活码名称" prop="name">
-        <el-input v-model="query.name" placeholder="请输入"></el-input>
+      <el-form-item label="活码名称">
+        <el-input v-model="query.empleCodeName" placeholder="请输入"></el-input>
       </el-form-item>
       <el-form-item label="创建人">
-        <div class="tag-input" @click="dialogVisibleSelectUser = true">
-          <el-input v-model="query.name" placeholder="请输入"></el-input>
-          <!-- <span class="tag-place" v-if="!queryUser.length">请选择</span>
+        <el-input v-model="query.createBy" placeholder="请输入"></el-input>
+        <!-- <div class="tag-input" @click="dialogVisibleSelectUser = true">
+          <span class="tag-place" v-if="!queryUser.length">请选择</span>
           <template v-else>
             <el-tag
               type="info"
@@ -118,8 +162,8 @@ export default {
               :key="unique"
               >{{ unit.name }}</el-tag
             >
-          </template> -->
-        </div>
+          </template>
+        </div> -->
       </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
@@ -156,11 +200,11 @@ export default {
         客户通过员工活码添加员工，自动发送入群引导语、群活码，客户扫码入群。 -->
       </div>
       <div>
-        <el-button type="primary" @click="goRoute()">批量下载</el-button>
+        <el-button type="primary" @click="download()">批量下载</el-button>
         <el-button
           v-hasPermi="['customerManage:customer:export']"
           type="cyan"
-          @click="exportCustomer"
+          @click="remove()"
           >批量删除</el-button
         >
       </div>
@@ -168,7 +212,11 @@ export default {
     <!-- <el-card shadow="never" :body-style="{padding: '20px 0 0'}">
     </el-card>-->
 
-    <el-table v-loading="loading" :data="list">
+    <el-table
+      v-loading="loading"
+      :data="list"
+      @selection-change="handleSelectionChange"
+    >
       <el-table-column type="selection" width="50" align="center" />
       <el-table-column prop="createTime" label="活码名称" align="center">
       </el-table-column>
@@ -222,13 +270,13 @@ export default {
         width="180"
         class-name="small-padding fixed-width"
       >
-        <template slot-scope="scope">
+        <template slot-scope="{ row }">
           <el-button
             v-hasPermi="['enterpriseWechat:edit']"
             size="mini"
             type="text"
             icon="el-icon-edit"
-            @click="edit(scope.row, 1)"
+            @click="goRoute(row.id)"
             >编辑</el-button
           >
           <el-button
@@ -236,7 +284,7 @@ export default {
             size="mini"
             type="text"
             icon="el-icon-view"
-            @click="edit(scope.row, 0)"
+            @click="download(row)"
             >下载</el-button
           >
           <el-button
@@ -244,7 +292,7 @@ export default {
             size="mini"
             type="text"
             icon="el-icon-edit"
-            @click="edit(scope.row, 1)"
+            @click="remove(row.id)"
             >删除</el-button
           >
         </template>
@@ -258,74 +306,5 @@ export default {
       :limit.sync="query.pageSize"
       @pagination="getList()"
     />
-
-    <el-dialog title="查看企业微信号" :visible.sync="dialogVisible">
-      <el-form
-        ref="form"
-        label-position="right"
-        :model="form"
-        :rules="rules"
-        label-width="160px"
-        :disabled="disabled"
-      >
-        <el-form-item label="企业名称" prop="name">
-          <el-input v-model="form.name" :disabled="form.id"></el-input>
-        </el-form-item>
-        <el-form-item label="企业ID（CorpID）" prop="corpId">
-          <el-input
-            :disabled="form.id"
-            v-model="form.corpId"
-            style="width: 80%"
-            placeholder="可在新闻公告应用的生日祝福等场景使用"
-          ></el-input>
-          <el-link class="fr" type="primary">如何获取？</el-link>
-        </el-form-item>
-        <!-- <el-form-item label="Token">
-          <el-input disabled id="copy-input" v-model="form.name" placeholder="成员唯一标识，不支持更改，不支持中文"></el-input>
-          <el-button type="primary" class="copy-btn" data-clipboard-target="#copy-input">复制</el-button>
-        </el-form-item>
-        <el-form-item label="EncodingAESKey">
-          <el-input disabled id="copy-input1" v-model="form.name"></el-input>
-          <el-button type="primary" class="copy-btn" data-clipboard-target="#copy-input1">复制</el-button>
-        </el-form-item>-->
-        <el-form-item label="服务商secret" prop="providerSecret">
-          <el-input v-model="form.providerSecret" style="width: 80%"></el-input>
-          <el-link class="fr" type="primary">如何获取？</el-link>
-        </el-form-item>
-        <el-form-item label="通讯录管理secret" prop="corpSecret">
-          <el-input v-model="form.corpSecret" style="width: 80%"></el-input>
-          <el-link class="fr" type="primary">如何获取？</el-link>
-        </el-form-item>
-        <!-- <el-form-item label="通讯录事件服务">
-          <el-radio-group v-model="form.contactSecret">
-            <el-radio label="label">开启</el-radio>
-            <el-radio label="label">不开启</el-radio>
-          </el-radio-group>
-          <div>开启后，可以将成员、部门的增删改以及成员的标签变更实时的同步到仟微SCRM，无需手动更新同步。</div>
-        </el-form-item>-->
-        <el-form-item label="外部联系人管理secret" prop="contactSecret">
-          <el-input v-model="form.contactSecret"></el-input>
-        </el-form-item>
-        <!-- <el-form-item label="通讯录事件服务">
-          <el-radio-group v-model="form.model">
-            <el-radio label="label">开启</el-radio>
-            <el-radio label="label">不开启</el-radio>
-          </el-radio-group>
-          <div>开启后，可以将企业客户的添加、编辑以及主动删除客户和被动被客户删除实时的同步到仟微SCRM，无需手动更新同步。</div>
-        </el-form-item>-->
-        <el-form-item
-          label="企业微信扫码登陆回调地址"
-          prop="wxQrLoginRedirectUri"
-        >
-          <el-input v-model="form.wxQrLoginRedirectUri"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submit" v-show="!disabled"
-          >确 定</el-button
-        >
-      </div>
-    </el-dialog>
   </div>
 </template>

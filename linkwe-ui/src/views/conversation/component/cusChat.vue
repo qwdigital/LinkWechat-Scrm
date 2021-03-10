@@ -13,9 +13,6 @@
                 <div v-else-if="item.msgtype=='file'" class="msgtypefile" @click="down(item.file)">
                     {{item.file.filename}}
                 </div>
-                <!--  <div v-else-if="item.msgtype=='link'&&item.text" class="msgtypelink">
-                    {{item.text.content}}
-                 </div>-->
                 <div v-else-if="item.msgtype=='voice'" class="msgtypevoice">
                     <i class="el-icon-video-play"  @click="play(item,'voice')"></i>
                 </div>

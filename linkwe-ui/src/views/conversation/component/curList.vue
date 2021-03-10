@@ -4,11 +4,11 @@
             <ul>             
             <li v-for="(item,index) in personList" :key="index" @click="liClick(item)">
                 <el-row style="padding:10px">
-                <el-col :span="4"> <img :src="item.finalChatContext.fromInfo.avatar"></el-col>
-                <el-col :span="20">
+                <span class="fl"> <img :src="item.finalChatContext.fromInfo.avatar"></span>
+                <span class="fl"  style="margin-left:8px;">
                     <p>{{item.roomInfo.groupName}} <span class="fr gray">{{parseTime(item.finalChatContext.msgtime)}}</span></p>
-                 <p class="gray padt10" v-if="item.finalChatContext.text">{{item.finalChatContext.text.content}}</p>   
-                </el-col>
+                 <p class="gray " v-if="item.finalChatContext.text">{{item.finalChatContext.text.content}}</p>   
+                </span>
                 </el-row>           
             </li>
         </ul>
@@ -45,6 +45,7 @@
 <style lang="scss" scoped>
 *{ padding: 0;
             margin: 0;}
+            .fl{float: left;}
     .list {
         overflow-y:scroll;
        height: 652px;

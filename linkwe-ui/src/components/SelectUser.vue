@@ -100,7 +100,7 @@ export default {
       } else {
         let index = this.userList.indexOf(data)
 
-        index > 0 && this.userList.splice(index, 1)
+        index > -1 && this.userList.splice(index, 1)
       }
       // console.log(data, checked, indeterminate);
     },

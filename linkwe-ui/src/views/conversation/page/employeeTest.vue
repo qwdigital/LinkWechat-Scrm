@@ -23,8 +23,8 @@
           <el-tabs v-model="activeName" @tab-click="tabClick(true)">
             <el-tab-pane label="内部联系人" name="0">
               <div class="ct_box">
-                <list v-if="activeName==0" :personList="personList" :loading="loading" @chatFn='chatFn'>
-                </list>
+                <insideList v-if="activeName==0" :personList="personList" :loading="loading" @chatFn='chatFn'>
+                </insideList>
               </div>
             </el-tab-pane>
             <el-tab-pane label="外部联系人" name="1">
@@ -98,7 +98,7 @@
                     </template>
                   </el-table-column>
                   <el-table-column prop="action" label="操作">
-                    <template slot-scope="scope">
+                    <template >
                       <el-button type="text" size="small">下载</el-button>
                       <el-button type="text" size="small">查看</el-button>
                     </template>
@@ -143,6 +143,7 @@
 <script>
   import list from '../component/list.vue'
   import chat from '../component/chat.vue'
+  import insideList from "../component/insideList.vue";
   import grouplist from '../component/groupList.vue'
   import * as api from '@/api/organization'
   import {
@@ -155,6 +156,7 @@
     components: {
       list,
       grouplist,
+      insideList,
       chat
     },
     data() {
@@ -211,13 +213,15 @@
         if (this.activeName == '2') {
           return this.activeNameThreeClick(true, true)
         }
+        
         this.activeNameThreeClick(true)
       },
       activeNameThreeClick(page, group) {
+        console.log(this.activeName)
         if (!!!page) {
           this.currentPage = 1
         }
-        if (this.chat && this.chat.receiveWeCustomer) {
+        if (this.chat) {
           let msgType = ''
           if (this.activeNameThree == 0) {
             msgType = ''
@@ -238,13 +242,12 @@
             beginTime: this.takeTime ? yearMouthDay(this.takeTime[0]) : "",
             endTime: this.takeTime ? yearMouthDay(this.takeTime[1]) : '',
           }
-          if (group) {
+          if (this.activeName=='2') {
             query.roomId = this.chat.roomId
           } else {
             query.receiveId = this.chat.receiveId
           }
-
-          if (group) {
+          if (this.activeName=='2') {
             content.chatGrounpList(query).then(res => {
               this.total = Number(res.total)
              this.resortData(res)
@@ -276,8 +279,9 @@
       },
       chatFn(data) {
         this.chat = data;
-        if (data.receiveWeCustomer) {
-          this.activeNameThreeClick()
+        if (data) {
+          console.log(122132)
+            this.activeNameThreeClick()
         }
       },
       groupFn(data) {
@@ -319,25 +323,18 @@
         return data.name.indexOf(value) !== -1;
       },
       handleNodeClick(data, add) {
-        if (!data.gender) {
+        if (!data.userId) {
           let querys = {
             pageNum: '1',
             pageSize: '999',
-            isActivate: '4',
             department: data.id
           }
           api.getList(querys).then(({
             rows
           }) => {
-            if (add == true) {
-              console.log(this.treeData, data, rows)
-              this.treeData[0].children = data.children.concat(rows)
-              return
-            } else {
               const newChild = rows;
               this.$set(data, 'children', []);
               data.children = rows
-            }
           })
         } else {
           this.talkName = data.name;

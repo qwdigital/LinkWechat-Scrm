@@ -4,9 +4,9 @@
             <ul>             
             <li v-for="(item,index) in personList" :key="index" @click="liClick(item)">
                 <el-row style="padding:10px">
-                 <span class="fl"> <img :src="item.receiveWeCustomer.avatar"></span>
+                 <span class="fl"> <img :src="item.finalChatContext.fromInfo.avatarMediaid"></span>
                  <span class="fl" style="margin-left:8px">
-                    <p>{{item.receiveWeCustomer.name}} </p>
+                    <p>{{item.finalChatContext.fromInfo.name}} </p>
                 </span>
                 </el-row>           
             </li>
@@ -36,6 +36,7 @@
         },
         methods:{
             liClick(e){
+                console.log(e)
                 this.$emit('chatFn',e)
             }
         }
@@ -57,7 +58,6 @@
        .gray{color: #999;}
        .padt10{padding-top: 10px;}
         ul li {
-            padding: 10px;
             overflow: hidden;
             border-bottom: 1px solid #efefef;
             cursor: pointer;

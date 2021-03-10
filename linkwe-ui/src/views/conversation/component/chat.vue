@@ -1,153 +1,233 @@
 <template>
-    <div class="takecontent">
-        <ul>
-            <li v-for="(item,index) in allChat" :key="index">
-                <div :style="{'color':item.action=='send'?'#199ed8':'#999'}">{{item.from}} <span
-                        :style="{'color':item.action=='send'?'#199ed8':'#999'}">{{parseTime(item.msgtime)}}</span></div>
-                <div v-if="item.msgtype=='text'" class="msgtypetext">
-                    {{item.text.content}}
-                </div>
-                <div v-else-if="item.msgtype=='image'" class="msgtypeimg">
-                    <img src="http://146.56.222.200/api/profile/upload/2021/01/14/544c8259-b3b6-4a49-8a53-b5eeac476384.png">
-                 
-                </div>
-                <div v-else-if="item.msgtype=='file'" class="msgtypefile" @click="down(item.file)">
-                    {{item.file.filename}}
-                </div>
-               
-                <div v-else-if="item.msgtype=='voice'" class="msgtypevoice">
-                    <i class="el-icon-video-play"  @click="play(item,'voice')"></i>
-                </div>
-                <div v-else-if="item.msgtype=='video'" class="msgtypevideo">
-                    <i class="el-icon-video-play"  @click="play(item,'video')"></i>
-                </div>
-                
-                 <div v-else-if="item.msgtype=='location'" class="msgtypecard ">
-                    <div class="card_name"></div>
-                    <div class="card_foot">{{item.location.address}}</div>
-                </div>
-                 <div v-else-if="item.msgtype=='weapp'" class="msgtypecard ">
-                    <div class="card_name"></div>
-                    <div class="card_foot">小程序</div>
-                </div>
-                <div v-else-if="item.msgtype=='card'" class="msgtypecard ">
-                    <div class="card_name">{{item.card.corpname}}</div>
-                    <div class="card_foot">个人名片</div>
-                </div>
-            </li>
-        </ul>
-        <el-dialog :visible.sync="dia" :show-close='false'>
-            <p>播放</p>
+  <div class="takecontent">
+    <ul>
+      <li v-for="(item,index) in allChat" :key="index">
+        <!-- <span v-if="item.fromInfo.name">{{item.fromInfo.name}}</span> -->
+        <div :style="{'color':item.action=='send'?'#199ed8':'#999'}"><span v-if="item.fromInfo">{{item.fromInfo.name}}</span>  <span
+            :style="{'color':item.action=='send'?'#199ed8':'#999'}">{{parseTime(item.msgtime)}}</span></div>
+        <div v-if="item.msgtype=='text'" class="msgtypetext">
+          {{item.text.content}}
+        </div>
+        <div v-else-if="item.msgtype=='image'" class="msgtypeimg">
+          <img :src="item.image.attachment" @click="showImg(item)">
+        </div>
+        <div v-else-if="item.msgtype=='file'" class="msgtypefile" @click="down(item.file)">
+          {{item.file.filename}}
+        </div>
 
-        </el-dialog>
+        <div v-else-if="item.msgtype=='voice'" class="msgtypevoice">
+          <i class="el-icon-microphone"  style=" font-size: 40px; color: #199ed8;" @click="playVideo(item)"></i>
+        </div>
+        <div v-else-if="item.msgtype=='emotion'" class="msgtypeimg">
+        <img :src="item.emotion.attachment" @click="showImg(item)">
+        </div>
+        <div v-else-if="item.msgtype=='video'" class="msgtypevideo">
+          <i class="el-icon-video-play" style=" font-size: 40px;  color: #199ed8;" @click="play(item,'video')"></i>
+        </div>
+
+        <div v-else-if="item.msgtype=='location'" class="msgtypecard ">
+          <div class="card_name"></div>
+          <div class="card_foot">{{item.location.address}}</div>
+        </div>
+        <div v-else-if="item.msgtype=='weapp'" class="msgtypecard ">
+          <div class="card_name"></div>
+          <div class="card_foot">小程序</div>
+        </div>
+        <div v-else-if="item.msgtype=='card'" class="msgtypecard ">
+          <div class="card_name">{{item.card.corpname}}</div>
+          <div class="card_foot">个人名片</div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="shabowbox" v-show="dia" >
+        <div class="close" @click="dia=false"><i class="el-icon-circle-close"></i></div>
+        <div class="shabowboxvidoe">
+        <video-player  class="video-player vjs-custom-skin"
+      ref="videoPlayer"
+      id="videoPlayer"
+      :playsinline="true" :options="playerOptions"></video-player>
     </div>
+    </div>
+    <div class="shabowbox" v-show="diavioce" >
+        <div class="close" @click="diavioce=false"><i class="el-icon-circle-close"></i></div>
+        <div class="shabowboxvidoe shabowboxaudio">
+        <AudioPlayer :audio-list="vioceSrc"
+                 :before-play="onBeforePlay" />
+         </div>
+    </div>
+    <el-dialog
+  :visible.sync="dialogVisible"
+  width="30%"
+>
+ <img :src="imgSrc" style="width:100%;max-height:600px">
+  <span slot="footer" class="dialog-footer">
+  </span>
+</el-dialog>
+  </div>
 </template>
 
 <script>
-    import {
-        parseTime,
-        yearMouthDay,
-       
-    } from '@/utils/common.js'
-    export default {
-        props: {
-            allChat: {
-                type: Array,
-                defluat: () => []
-            }
-        },
 
-        data() {
-            return {
-                dia: false
-            }
-        },
-        methods: {
-            play() {
-                this.dia = true
-            },
-            down(e){
-                //下载文件
-            }
+
+  import 'video.js/dist/video-js.css'
+  import 'vue-video-player/src/custom-theme.css'
+  
+  import {
+    parseTime,
+    yearMouthDay
+  } from '@/utils/common.js'
+  export default {
+  
+    props: {
+      allChat: {
+        type: Array,
+        defluat: () => []
+      }
+    },
+
+    data() {
+      return {
+        dia: false,
+        diavioce:false,
+        dialogVisible:false,
+        imgSrc:'',
+        vioceSrc:[],
+        playerOptions: {
+          playbackRates: [0.7, 1.0, 1.5, 2.0], //播放速度
+          autoplay: false, //如果true,浏览器准备好时开始回放。
+          controls: true, //控制条
+          preload: 'auto', //视频预加载
+          muted: false, //默认情况下将会消除任何音频。
+          loop: false, //导致视频一结束就重新开始。
+          language: 'zh-CN',
+          aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
+          fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
+          sources: [{
+            type: 'video/mp4',
+            src: 'https://v-cdn.zjol.com.cn/280443.mp4' //你所放置的视频的地址，最好是放在服务器上
+          }],
+          poster: "", //你的封面地址（覆盖在视频上面的图片）
+          width: document.documentElement.clientWidth,
+          height:'475',
+          notSupportedMessage: '此视频暂无法播放，请稍后再试' //允许覆盖Video.js无法播放媒体源时显示的默认信息。
         }
+      }
+    },
+    methods: {
+      playVideo(e){
+         this.vioceSrc=[e.voice.attachment]
+         this.diavioce=true;
+      },
+      onBeforePlay(next){
+       next() // 开始播放
+       
+      },
+      showImg(e){
+        this.imgSrc=e.image.attachment;
+        this.dialogVisible=true
+      },
+      play(e) {
+          this.dia=true
+           const player = this.$refs.videoPlayer.player
+           this.playerOptions['sources'][0]['src']=e.video.attachment;
+           player.play()
+      },
+      down(e) {
+        //下载文件
+      }
     }
+  }
+
 </script>
 <style lang="scss" scoped>
-    * {
-        padding: 0;
-        margin: 0;
+  * {
+    padding: 0;
+    margin: 0;
+  }
+#videoPlayer /deep/ .vjs-tech{ height: 450px;}
+.shabowbox{ position: fixed;width:100%;height: 100%; background: rgba(0, 0, 0,0.4);left: 0;top: 0;z-index: 2000;}
+.shabowboxvidoe{ position: fixed;width: 800px; height: 475px;left: 50%;margin-left: -400px;top:50%;margin-top: -235px;;z-index: 2001;background: #fff;}
+.shabowboxaudio{ height: 125px;padding: 12px;}
+ .close{ position: fixed;width: 50px; height:50px;right: 10px;z-index: 2012;top: 10px;text-align: center;line-height: 50px;font-size: 20px;color: #FFF;cursor: pointer;font-size: 43px;}
+  .takecontent {
+    text-align: left;
+    width: 100%;
+    height: 600px;
+    overflow-y: scroll;
+
+    ::-webkit-scrollbar {
+      display: none;
     }
 
-    .takecontent {
-        text-align: left;
-        width: 100%;
-        height: 600px;
-        overflow-y: scroll;
+    ul li {
+      padding: 8px;
+    }
 
-        ::-webkit-scrollbar {
-            display: none;
-        }
+    .msgtypetext {
+      padding: 10px 0;
+    }
 
-        ul li {
-            padding: 8px;
-        }
+    .msgtypevoice {
+      margin: 10px;
+    }
 
-        .msgtypetext {
-            padding: 10px 0;
-        }
+    .msgtypefile {
+      margin: 10px;
+      width: 200px;
+      height: 40px;
+      line-height: 40px;
+      cursor: pointer;
+      color: #199ed8;
+      text-indent: 10px;
+      box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2), 0 1px 4px 0 rgba(0, 0, 0, 0.19);
+    }
 
-        .msgtypevoice {
-            margin: 10px;
-        }
+    .card_name {
+      line-height: 80px;
+      text-indent: 10px;
+    }
 
-        .msgtypefile {
-            margin: 10px;
-            width: 200px;
-            height: 40px;
-            line-height: 40px;
-             cursor: pointer;
-               color: #199ed8;
-            text-indent: 10px;
-            box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2), 0 1px 4px 0 rgba(0, 0, 0, 0.19);
-        }
-        .card_name{ line-height: 80px;text-indent: 10px;}
-        .msgtypevideo {
-            margin: 10px;
-            font-size: 40px;
-            cursor: pointer;
-            color: #199ed8;
-            border-radius: 8px;
-        }
-
-        .msgtypeimg {
-            width: 100px;
-            height: 80px;
-            margin: 10px;
-            img{width: 100px;
-            height: 80px;}
-        }
+    .msgtypevideo {
+      margin: 10px;
+     
+      cursor: pointer;
  
-        .msgtypecard {
-            width: 300px;
-            height: 140px;
-            margin: 10px;
-            border-radius: 8px;
-            -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 8px 0 rgba(0, 0, 0, 0.19);
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 8px 0 rgba(0, 0, 0, 0.19);
-            position: relative;
-
-            .card_foot {
-                position: absolute;
-                height: 20px;
-                border-top: 1px solid #efefef;
-                text-align: left;
-                bottom: 15px;
-                padding: 10px;
-                color: #333;
-                font-weight: bold;
-                width: 100%;
-            }
-        }
-
+      border-radius: 8px;
     }
+
+    .msgtypeimg {
+      width: 100px;
+      height: 80px;
+      margin: 10px;
+
+      img {
+        width: 100px;
+        height: 80px;
+      }
+    }
+
+    .msgtypecard {
+      width: 300px;
+      height: 140px;
+      margin: 10px;
+      border-radius: 8px;
+      -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 8px 0 rgba(0, 0, 0, 0.19);
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 8px 0 rgba(0, 0, 0, 0.19);
+      position: relative;
+
+      .card_foot {
+        position: absolute;
+        height: 20px;
+        border-top: 1px solid #efefef;
+        text-align: left;
+        bottom: 15px;
+        padding: 10px;
+        color: #333;
+        font-weight: bold;
+        width: 100%;
+      }
+    }
+
+  }
 </style>
