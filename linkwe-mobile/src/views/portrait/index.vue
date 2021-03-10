@@ -140,7 +140,7 @@
         <p class="f12" style="position:relative; left:-32px;">
           2021-02-16 星期二
         </p>
-        <van-step>
+        <van-step class="msg">
           <span class="f12 po"> 12:40</span>
           <span class="fs14">信息动态</span>
           <span class="deldynamic">删除</span>
@@ -366,6 +366,7 @@ export default {
       // 接口开始
       externalUserid: "", // 客户Id
       userid: "", // 员工Id
+
     };
   },
   methods: {
@@ -616,6 +617,11 @@ export default {
   .van-field__control {
     background-color: #f2f2f2;
     padding: 0 10px;
+  }
+}
+/deep/.msg {
+  &::after {
+    border: none;
   }
 }
 </style>
