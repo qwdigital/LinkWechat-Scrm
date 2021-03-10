@@ -1,10 +1,10 @@
 package com.linkwechat.wecom.service;
 
-import java.util.List;
-
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeTagGroup;
 import com.linkwechat.wecom.domain.dto.tag.WeCropGroupTagDto;
+
+import java.util.List;
 
 /**
  * 标签组Service接口
@@ -69,4 +69,13 @@ public interface IWeTagGroupService  extends IService<WeTagGroup>
     void deleteTagGroup(String id);
 
     void updateTagGroup(String id);
+
+
+
+    /**
+     * 根据企业员工与添加客户关系id给客户打标签
+     * @param flowerCustomerRelId
+     * @return
+     */
+    public List<WeTagGroup> findCustomerTagByFlowerCustomerRelId(String flowerCustomerRelId);
 }

@@ -266,6 +266,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 
 
+    <select id="findWeUserByCutomerId" resultType="com.linkwechat.wecom.domain.WeCustomerAddUser">
+            SELECT
+                wu.user_name,
+                wu.user_id,
+                wu.head_image_url,
+                wfcr.create_time
+            FROM
+                `we_flower_customer_rel` wfcr
+            INNER JOIN we_user wu ON wfcr.user_id = wu.user_id
+            WHERE wfcr.external_userid=#{externalUserid}
+    </select>
+
 
 
 

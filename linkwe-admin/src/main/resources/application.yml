@@ -150,6 +150,8 @@ xss:
 elasticsearch:
   schema: http
   address: ${ES_ADDRESS:localhost}
+  userName: ""
+  password: ""
   connectTimeout: 10000
   socketTimeout: 10000
   connectionRequestTimeout: 10000
@@ -167,6 +169,7 @@ forest:
 
 
 wecome:
+  chatKey: finance
   serverUrl: https://qyapi.weixin.qq.com/
   weComePrefix: cgi-bin
   noAccessTokenUrl:
@@ -198,6 +201,8 @@ wecome:
           - /externalcontact/unionid_to_external_userid
           - /externalcontact/add_msg_template
           - /externalcontact/get_group_msg_result
+          - /externalcontact/get_user_behavior_data
+          - /externalcontact/groupchat/statistic
   fileUplodUrl:  /media/upload,/media/uploadimg
   needProviderTokenUrl:
           - /service/get_login_info

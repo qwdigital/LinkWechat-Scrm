@@ -8,6 +8,7 @@ import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.wecom.client.WeMsgAuditClient;
 import com.linkwechat.wecom.client.WeUserClient;
+import com.linkwechat.wecom.domain.WeCustomerAddUser;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.dto.WeUserInfoDto;
 import com.linkwechat.wecom.domain.dto.msgaudit.WeMsgAuditDto;
@@ -222,8 +223,9 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
         List<WeUser> weUsers
                 = weUserClient.list(WeConstans.WE_ROOT_DEPARMENT_ID, WeConstans.DEPARTMENT_SUB_WEUSER).getWeUsers();
         if(CollectionUtil.isNotEmpty(weUsers)){
-
-            this.saveOrUpdateBatch(weUsers);
+            weUsers.forEach(userInfo ->{
+                insertWeUserNoToWeCom(userInfo);
+            });
         }
 
     }
@@ -314,6 +316,11 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
                 .openId(getuserinfo.getOpenId())
                 .build();
 
+    }
+
+    @Override
+    public List<WeCustomerAddUser> findWeUserByCutomerId(String externalUserid) {
+        return this.baseMapper.findWeUserByCutomerId(externalUserid);
     }
 
 

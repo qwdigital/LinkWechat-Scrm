@@ -18,6 +18,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -34,6 +35,9 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
     @Autowired
     private ElasticSearch elasticSearch;
 
+    @Value("${wecome.chatKey}")
+    private String chartKey;
+
     /**
      * 根据用户ID 获取对应内部联系人列表
      *
@@ -49,7 +53,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
         int from = (pageNum - 1) * pageSize;
         builder.size(pageSize);
         builder.from(from);
-        builder.sort("msgtime", SortOrder.DESC);
+        builder.sort("msgtime", SortOrder.ASC);
         BoolQueryBuilder fromBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", ""))
                 .must(QueryBuilders.matchQuery("from", query.getFromId()))
                 .must(QueryBuilders.matchQuery("tolist.keyword", query.getReceiveId()));
@@ -73,7 +77,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
             boolQueryBuilder.filter(QueryBuilders.rangeQuery("msgtime").gte(beginTime).lte(endTime));
         }
         builder.query(boolQueryBuilder);
-        return elasticSearch.searchPage(WeConstans.WECOM_FINANCE_INDEX, builder, pageNum, pageSize, JSONObject.class);
+        return elasticSearch.searchPage(chartKey, builder, pageNum, pageSize, JSONObject.class);
     }
 
     @Override
@@ -85,7 +89,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
         int from = (pageNum - 1) * pageSize;
         builder.size(pageSize);
         builder.from(from);
-        builder.sort("msgtime", SortOrder.DESC);
+        builder.sort("msgtime", SortOrder.ASC);
 
         BoolQueryBuilder fromBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", query.getRoomId()))
                 .must(QueryBuilders.matchQuery("from", query.getFromId()));
@@ -111,14 +115,14 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
         }
 
         builder.query(boolQueryBuilder);
-        return elasticSearch.searchPage(WeConstans.WECOM_FINANCE_INDEX, builder, pageNum, pageSize, JSONObject.class);
+        return elasticSearch.searchPage(chartKey, builder, pageNum, pageSize, JSONObject.class);
     }
 
 
     @Override
     public JSONObject getFinalChatContactInfo(String fromId, String receiveId) {
         SearchSourceBuilder builder = new SearchSourceBuilder();
-        builder.sort("msgtime", SortOrder.DESC);
+        builder.sort("msgtime", SortOrder.ASC);
         builder.size(1);
         BoolQueryBuilder fromBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", ""))
                 .must(QueryBuilders.matchQuery("from", fromId))
@@ -132,7 +136,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
                 .should(toLsitBuilder)
                 .minimumShouldMatch(1);
         builder.query(boolQueryBuilder);
-        List<JSONObject> resultList = elasticSearch.search(WeConstans.WECOM_FINANCE_INDEX, builder, JSONObject.class);
+        List<JSONObject> resultList = elasticSearch.search(chartKey, builder, JSONObject.class);
         if (CollectionUtil.isNotEmpty(resultList)) {
             return resultList.get(0);
         } else {
@@ -143,7 +147,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
     @Override
     public JSONObject getFinalChatRoomContactInfo(String fromId, String roomId) {
         SearchSourceBuilder builder = new SearchSourceBuilder();
-        builder.sort("msgtime", SortOrder.DESC);
+        builder.sort("msgtime", SortOrder.ASC);
         builder.size(1);
         BoolQueryBuilder fromBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("roomid", roomId))
                 .must(QueryBuilders.matchQuery("from", fromId));
@@ -154,7 +158,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
                 .should(fromBuilder)
                 .should(roomidBuilder);
         builder.query(boolQueryBuilder);
-        List<JSONObject> resultList = elasticSearch.search(WeConstans.WECOM_FINANCE_INDEX, builder, JSONObject.class);
+        List<JSONObject> resultList = elasticSearch.search(chartKey, builder, JSONObject.class);
         if (CollectionUtil.isNotEmpty(resultList)) {
             return resultList.get(0);
         } else {
@@ -171,10 +175,10 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
         int from = (pageNum - 1) * pageSize;
         builder.size(pageSize);
         builder.from(from);
-        builder.sort("msgtime", SortOrder.DESC);
+        builder.sort("msgtime", SortOrder.ASC);
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-
+        boolQueryBuilder.must(QueryBuilders.termQuery("msgtype", "text"));
         //成员姓名查询
         if(StringUtils.isNotEmpty(query.getUserName())){
             boolQueryBuilder.must(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("fromInfo.name",query.getUserName()))
@@ -204,7 +208,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
             boolQueryBuilder.filter(QueryBuilders.rangeQuery("msgtime").gte(beginTime).lte(endTime));
         }
         builder.query(boolQueryBuilder);
-        PageInfo<JSONObject> pageInfo = elasticSearch.searchPage(WeConstans.WECOM_FINANCE_INDEX, builder, pageNum, pageSize, JSONObject.class);
+        PageInfo<JSONObject> pageInfo = elasticSearch.searchPage(chartKey, builder, pageNum, pageSize, JSONObject.class);
         return pageInfo;
     }
 }

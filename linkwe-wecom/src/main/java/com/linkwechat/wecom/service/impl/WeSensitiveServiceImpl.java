@@ -35,11 +35,13 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -69,6 +71,9 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
 
     @Autowired
     private IWeCorpAccountService weCorpAccountService;
+
+    @Value("${wecome.chatKey}")
+    private String chartKey;
 
     /**
      * 查询敏感词设置
@@ -256,8 +261,23 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
 
     private void addHitSensitiveList(List<JSONObject> json, WeSensitive weSensitive) {
         elasticSearch.createIndex2(WeConstans.WECOM_SENSITIVE_HIT_INDEX, getSensitiveHitMapping());
-        boolean sendMessage = false;
-        if (weSensitive.getAlertFlag().equals(1)) {
+        //批量提交插入记录
+        if (CollectionUtils.isNotEmpty(json)) {
+            List<ElasticSearchEntity> list = json.stream().filter(Objects::nonNull).map(j -> {
+                ElasticSearchEntity ese = new ElasticSearchEntity();
+                j.put("status", "0");
+                ese.setData(j);
+                ese.setId(j.getString("msgid"));
+                return ese;
+            }).collect(Collectors.toList());
+            elasticSearch.insertBatchAsync(WeConstans.WECOM_SENSITIVE_HIT_INDEX, list, this::sendMessage, weSensitive);
+        }
+    }
+
+    private void sendMessage(Object listObj, Object weSensitiveObj) {
+        WeSensitive weSensitive = (WeSensitive) weSensitiveObj;
+        List<ElasticSearchEntity> list = (List<ElasticSearchEntity>) listObj;
+        if (weSensitive.getAlertFlag().equals(1) && CollectionUtils.isNotEmpty(list)) {
             //发送消息通知给相应的审计人
             WeCorpAccount weCorpAccount = weCorpAccountService.findValidWeCorpAccount();
             String auditUserId = weSensitive.getAuditUserId();
@@ -268,22 +288,14 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
             pushDto.setTouser(auditUserId);
             pushDto.setMsgtype(MessageType.TEXT.getMessageType());
             pushDto.setText(textMessageDto);
-            weMessagePushClient.sendMessageToUser(pushDto,weCorpAccount.getAgentId());
-            sendMessage = true;
-        }
-        //批量提交插入记录
-        if (CollectionUtils.isNotEmpty(json)) {
-            boolean finalSendMessage = sendMessage;
-            List<ElasticSearchEntity> list = json.stream().filter(Objects::nonNull).map(j -> {
-                ElasticSearchEntity ese = new ElasticSearchEntity();
-                if (finalSendMessage) {
-                    j.put("status", "1");
-                }
-                ese.setData(j);
-                ese.setId(j.getString("msgid"));
-                return ese;
+            weMessagePushClient.sendMessageToUser(pushDto, weCorpAccount.getAgentId());
+            //批量更新
+            list = list.stream().peek(entity -> {
+                Map map = entity.getData();
+                map.put("status", "1");
+                entity.setData(map);
             }).collect(Collectors.toList());
-            elasticSearch.insertBatch(WeConstans.WECOM_SENSITIVE_HIT_INDEX, list);
+            elasticSearch.updateBatch(WeConstans.WECOM_SENSITIVE_HIT_INDEX, list);
         }
     }
 
@@ -314,7 +326,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
                 userBuilder.minimumShouldMatch(1);
                 BoolQueryBuilder searchBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchPhraseQuery("text.content", patternWord)).must(userBuilder);
                 builder.query(searchBuilder);
-                List<JSONObject> list = elasticSearch.search(WeConstans.WECOM_FINANCE_INDEX, builder, JSONObject.class);
+                List<JSONObject> list = elasticSearch.search(chartKey, builder, JSONObject.class);
                 list.parallelStream().forEach(j -> j.put("pattern_words", patternWord));
                 resultList.addAll(list);
             }

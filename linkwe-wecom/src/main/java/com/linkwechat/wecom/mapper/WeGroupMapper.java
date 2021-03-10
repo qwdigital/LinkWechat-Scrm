@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.linkwechat.wecom.domain.WeCustomerAddGroup;
 import com.linkwechat.wecom.domain.WeGroup;
 import org.apache.ibatis.annotations.Param;
 
@@ -27,4 +28,6 @@ public interface WeGroupMapper extends BaseMapper<WeGroup> {
 //    int batchLogicDeleteByIds(@Param("ids") List<Long> ids);
 //
 //    int batchInsetWeGroup(@Param("weGroups") List<WeGroup> weGroups);
+
+    List<WeCustomerAddGroup> findWeGroupByCustomer(@Param("userId") String userId,@Param("externalUserid") String externalUserid);
 }

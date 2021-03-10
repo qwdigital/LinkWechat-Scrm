@@ -7,6 +7,7 @@
     <resultMap type="WeGroupCode" id="WeGroupCodeResult">
         <result property="id" column="id"/>
         <result property="codeUrl" column="code_url"/>
+        <result property="uuid" column="uuid"/>
         <result property="activityHeadUrl" column="activity_head_url"/>
         <result property="activityName" column="activity_name"/>
         <result property="activityDesc" column="activity_desc"/>
@@ -30,6 +31,7 @@
         SELECT
         w.id,
         w.code_url,
+        w.uuid,
         w.activity_head_url,
         w.activity_name,
         w.activity_desc,
@@ -100,6 +102,7 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="codeUrl != null">code_url,</if>
+            <if test="uuid != null">uuid,</if>
             <if test="activityHeadUrl != null">activity_head_url,</if>
             <if test="activityName != null">activity_name,</if>
             <if test="activityDesc != null">activity_desc,</if>
@@ -119,6 +122,7 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
             <if test="codeUrl != null">#{codeUrl},</if>
+            <if test="uuid != null">#{uuid},</if>
             <if test="activityHeadUrl != null">#{activityHeadUrl},</if>
             <if test="activityName != null">#{activityName},</if>
             <if test="activityDesc != null">#{activityDesc},</if>

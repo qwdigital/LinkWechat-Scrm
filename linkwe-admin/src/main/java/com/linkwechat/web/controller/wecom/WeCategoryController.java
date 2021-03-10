@@ -30,7 +30,7 @@ public class WeCategoryController extends BaseController {
     /**
      * 类目树
      */
-    @PreAuthorize("@ss.hasPermi('wechat:category:list')")
+//    @PreAuthorize("@ss.hasPermi('wechat:category:list')")
     @GetMapping("/list")
     @ApiOperation("类目树")
     public AjaxResult list(@RequestParam("mediaType") String mediaType) {
@@ -40,7 +40,7 @@ public class WeCategoryController extends BaseController {
     /**
      * 通过id查询类目详细信息
      */
-    @PreAuthorize("@ss.hasPermi('wechat:category:query')")
+//    @PreAuthorize("@ss.hasPermi('wechat:category:query')")
     @GetMapping(value = "/{id}")
     @ApiOperation("通过id查询类目详细信息")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
@@ -50,7 +50,7 @@ public class WeCategoryController extends BaseController {
     /**
      * 添加类目
      */
-    @PreAuthorize("@ss.hasPermi('wechat:category:add')")
+//    @PreAuthorize("@ss.hasPermi('wechat:category:add')")
     @Log(title = "添加类目", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("添加类目")
@@ -61,7 +61,7 @@ public class WeCategoryController extends BaseController {
     /**
      * 更新目录
      */
-    @PreAuthorize("@ss.hasPermi('wechat:category:edit')")
+//    @PreAuthorize("@ss.hasPermi('wechat:category:edit')")
     @Log(title = "更新目录", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("更新目录")
@@ -73,7 +73,7 @@ public class WeCategoryController extends BaseController {
     /**
      * 删除类目
      */
-    @PreAuthorize("@ss.hasPermi('wechat:category:remove')")
+//    @PreAuthorize("@ss.hasPermi('wechat:category:remove')")
     @Log(title = "删除类目", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     @ApiOperation("删除类目")

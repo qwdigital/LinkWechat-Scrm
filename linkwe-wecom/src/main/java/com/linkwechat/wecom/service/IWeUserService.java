@@ -2,10 +2,12 @@ package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.dtflys.forest.annotation.Query;
+import com.linkwechat.wecom.domain.WeCustomerAddUser;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.dto.WeUserInfoDto;
 import com.linkwechat.wecom.domain.dto.msgaudit.WeMsgAuditDto;
 import com.linkwechat.wecom.domain.vo.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -144,4 +146,12 @@ public interface IWeUserService extends IService<WeUser>
      * @return
      */
     WeUserInfoVo getUserInfo(String code,String agentId);
+
+
+    /**
+     * 根据客户id获取客户添加人
+     * @param externalUserid
+     * @return
+     */
+    List<WeCustomerAddUser> findWeUserByCutomerId(String externalUserid);
 }

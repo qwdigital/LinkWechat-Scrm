@@ -13,6 +13,7 @@ import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.wecom.domain.WeTaskFission;
 import com.linkwechat.wecom.domain.dto.WeChatUserDTO;
 import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
+import com.linkwechat.wecom.domain.query.WeTaskFissionStatisticQO;
 import com.linkwechat.wecom.service.IWeTaskFissionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -50,6 +51,17 @@ public class WeTaskFissionController extends BaseController {
         startPage();
         List<WeTaskFission> list = weTaskFissionService.selectWeTaskFissionList(weTaskFission);
         return getDataTable(list);
+    }
+
+    /**
+     * 查询统计信息
+     */
+    @ApiOperation(value = "查询统计信息", httpMethod = "GET")
+    @PreAuthorize("@ss.hasPermi('wecom:fission:stat')")
+    @GetMapping("/stat")
+    public AjaxResult statistics(WeTaskFissionStatisticQO weTaskFissionStatisticQO) {
+        //TODO 待完成
+        return null;
     }
 
     /**

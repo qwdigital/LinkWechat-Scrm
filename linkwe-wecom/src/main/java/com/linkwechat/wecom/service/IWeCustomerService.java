@@ -2,11 +2,11 @@ package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeCustomer;
+import com.linkwechat.wecom.domain.WeCustomerPortrait;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
-
 
 import java.util.List;
 
@@ -109,4 +109,26 @@ public interface IWeCustomerService extends IService<WeCustomer>
      * @return
      */
     public List<WeUser> getCustomerByTag(List<String> ids);
+
+
+
+    /**
+     * 根据外部联系人ID和企业员工ID获取当前客户信息
+     * @param externalUserid
+     * @param userid
+     * @return
+     */
+    WeCustomerPortrait findCustomerByOperUseridAndCustomerId(String externalUserid,String userid);
+
+
+    /**
+     * 跟新客户画像
+     * @param weCustomerPortrait
+     */
+    void updateWeCustomerPortrait(WeCustomerPortrait weCustomerPortrait);
+
+
+
+
+
 }

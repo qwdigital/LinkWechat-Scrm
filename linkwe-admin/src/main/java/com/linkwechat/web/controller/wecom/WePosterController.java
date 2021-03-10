@@ -79,7 +79,7 @@ public class WePosterController extends BaseController {
         poster.setMediaType(null);
         wePosterService.generateSimpleImg(poster);
         wePosterService.saveOrUpdate(poster);
-        List<WePosterSubassembly> posterSubassemblyList = wePosterSubassemblyService.lambdaQuery().eq(WePosterSubassembly::getPosterId, poster.getId()).eq(WePosterSubassembly::getDelFlag, 1).list();
+        List<WePosterSubassembly> posterSubassemblyList = wePosterSubassemblyService.lambdaQuery().eq(WePosterSubassembly::getPosterId, poster.getId()).eq(WePosterSubassembly::getDelFlag, 0).list();
         Map<Long, WePosterSubassembly> posterSubassemblyMap = posterSubassemblyList.stream().collect(Collectors.toMap(WePosterSubassembly::getId, p -> p));
         if(!CollectionUtils.isEmpty(poster.getPosterSubassemblyList())) {
             List<WePosterSubassembly> insertList = new ArrayList<>();
@@ -104,8 +104,7 @@ public class WePosterController extends BaseController {
         }
         List<WePosterSubassembly> deleteList = new ArrayList<>(posterSubassemblyMap.values());
         if (!CollectionUtils.isEmpty(deleteList)) {
-            deleteList.forEach(wePosterSubassembly -> wePosterSubassembly.setDelFlag(1));
-            wePosterSubassemblyService.updateBatchById(deleteList);
+            wePosterSubassemblyService.update(Wrappers.lambdaUpdate(WePosterSubassembly.class).set(WePosterSubassembly::getDelFlag,1).in(WePosterSubassembly::getId,deleteList.stream().map(WePosterSubassembly::getId).collect(Collectors.toList())));
         }
         return AjaxResult.success("修改成功");
     }

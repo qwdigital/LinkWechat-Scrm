@@ -156,6 +156,11 @@ public class Constants
 
 
 
+    /**完成待办*/
+    public static final String HANDLE_SUCCESS="1";
+
+
+
 
 
 

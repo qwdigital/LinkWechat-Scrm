@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeUserBehaviorDataMapper">
+
+    <resultMap type="WeUserBehaviorData" id="WeUserBehaviorDataResult">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="statTime" column="stat_time"/>
+        <result property="newApplyCnt" column="new_apply_cnt"/>
+        <result property="newContactCnt" column="new_contact_cnt"/>
+        <result property="chatCnt" column="chat_cnt"/>
+        <result property="messageCnt" column="message_cnt"/>
+        <result property="replyPercentage" column="reply_percentage"/>
+        <result property="avgReplyTime" column="avg_reply_time"/>
+        <result property="negativeFeedbackCnt" column="negative_feedback_cnt"/>
+    </resultMap>
+
+    <select id="getCountDataByDay" resultType="com.linkwechat.wecom.domain.dto.WePageCountDto">
+            select
+            date_format(stat_time, '%Y-%m-%d') as x_time,
+            IFNULL(sum(new_apply_cnt),0) as new_apply_cnt,
+            IFNULL(sum(new_contact_cnt),0) as new_contact_cnt,
+            IFNULL(sum(chat_cnt),0) as chat_cnt,
+            IFNULL(sum(message_cnt),0) as message_cnt,
+            IFNULL(sum(reply_percentage),0) as reply_percentage,
+            IFNULL(sum(avg_reply_time),0) as avg_reply_time,
+            IFNULL(sum(negative_feedback_cnt),0) as negative_feedback_cnt
+            from we_user_behavior_data
+            <where>
+                <choose>
+                    <when test="type !=null and type == 'day'">
+                        date_format(stat_time, '%Y-%m-%d') = date_format(#{dateTime}, '%Y-%m-%d');
+                    </when>
+                    <when test="type !=null and type == 'week'">
+                        YEARWEEK(date_format(stat_time,'%Y-%m-%d')) = YEARWEEK(date_format(#{dateTime}, '%Y-%m-%d'));
+                    </when>
+                    <when test="type !=null and type == 'month'">
+                        DATE_FORMAT(stat_time,'%Y-%m') = DATE_FORMAT(#{dateTime}, '%Y-%m');
+                    </when>
+                    <!--查询今年-->
+                    <otherwise>
+                        YEAR(stat_time) = YEAR(#{dateTime});
+                    </otherwise>
+                </choose>
+            </where>
+
+    </select>
+
+    <select id="getDayCountData" resultType="com.linkwechat.wecom.domain.dto.WePageCountDto">
+        SELECT
+        tbl._date AS x_time,
+        IFNULL(tbr.new_apply_cnt,0) as new_apply_cnt,
+        IFNULL(tbr.new_contact_cnt,0) as new_contact_cnt,
+        IFNULL(tbr.chat_cnt,0) as chat_cnt,
+        IFNULL(tbr.message_cnt,0) as message_cnt,
+        IFNULL(tbr.reply_percentage,0) as reply_percentage,
+        IFNULL(tbr.avg_reply_time,0) as avg_reply_time,
+        IFNULL(tbr.negative_feedback_cnt,0) as negative_feedback_cnt
+        FROM (SELECT (@s:=@s+1) AS _index,STR_TO_DATE(DATE(DATE_SUB(CURRENT_DATE,INTERVAL @s DAY)),'%Y-%m-%d') AS _date
+        FROM information_schema.CHARACTER_SETS,(SELECT @s:=-1) AS init WHERE
+        @s &lt; #{few}
+        ORDER BY _date) AS tbl
+        LEFT JOIN(SELECT
+        sum(ifnull(wubd.new_apply_cnt, 0)) new_apply_cnt,
+        sum(ifnull(wubd.new_contact_cnt, 0)) new_contact_cnt,
+        sum(ifnull(wubd.chat_cnt, 0))                 chat_cnt,
+        sum(ifnull(wubd.message_cnt, 0))                 message_cnt,
+        sum(ifnull(wubd.reply_percentage, 0))                 reply_percentage,
+        sum(ifnull(wubd.avg_reply_time, 0))                 avg_reply_time,
+        sum(ifnull(wubd.negative_feedback_cnt, 0))                 negative_feedback_cnt,
+
+        STR_TO_DATE(DATE_FORMAT(wubd.stat_time,'%Y-%m-%d'),'%Y-%m-%d') AS finish_date
+
+        FROM we_user_behavior_data wubd
+        where
+        STR_TO_DATE(DATE_FORMAT(wubd.stat_time,'%Y-%m-%d'),'%Y-%m-%d') &gt;= #{startTime}
+
+        AND STR_TO_DATE(DATE_FORMAT(wubd.stat_time,'%Y-%m-%d'),'%Y-%m-%d') &lt;= #{endTime}
+
+        GROUP BY finish_date
+
+        ORDER BY finish_date
+
+        ) AS tbr ON tbl._date = tbr.finish_date GROUP BY tbl._date;
+    </select>
+
+    <select id="getWeekCountData" resultType="com.linkwechat.wecom.domain.dto.WePageCountDto">
+        select CONCAT(left(tbl._date,4),'年',right(tbl._date,2),'周') as x_time,
+        IFNULL(tbr.new_apply_cnt,0) as new_apply_cnt,
+        IFNULL(tbr.new_contact_cnt,0) as new_contact_cnt,
+        IFNULL(tbr.chat_cnt,0) as chat_cnt,
+        IFNULL(tbr.message_cnt,0) as message_cnt,
+        IFNULL(tbr.reply_percentage,0) as reply_percentage,
+        IFNULL(tbr.avg_reply_time,0) as avg_reply_time,
+        IFNULL(tbr.negative_feedback_cnt,0) as negative_feedback_cnt
+        from (select (@s := @s + 1) as _index,
+        yearweek(date(date_sub(date_format(current_date, '%Y-%m-%d'), interval @s week))) as _date
+        from information_schema.character_sets,
+        (select @s := -1) as init
+        where @s  &lt; #{few}
+        order by _date)
+        as tbl
+        left join(select
+        sum(ifnull(wubd.new_apply_cnt, 0)) new_apply_cnt,
+        sum(ifnull(wubd.new_contact_cnt, 0)) new_contact_cnt,
+        sum(ifnull(wubd.chat_cnt, 0))                 chat_cnt,
+        sum(ifnull(wubd.message_cnt, 0))                 message_cnt,
+        sum(ifnull(wubd.reply_percentage, 0))                 reply_percentage,
+        sum(ifnull(wubd.avg_reply_time, 0))                 avg_reply_time,
+        sum(ifnull(wubd.negative_feedback_cnt, 0))                 negative_feedback_cnt,
+        yearweek(date_format(wubd.stat_time, '%Y-%m-%d')) as finish_date
+
+        from we_user_behavior_data wubd
+
+        where yearweek(date_format(wubd.stat_time, '%Y-%m-%d')) &gt;=
+        yearweek(date(date_sub(date_format(current_date, '%Y-%m-%d'), interval #{few} week)))
+        and yearweek(date_format(wubd.stat_time, '%Y-%m-%d')) &lt;=
+        yearweek(date_format(current_date, '%Y-%m-%d'))
+
+        group by finish_date
+        order by finish_date
+        ) as tbr on tbl._date = tbr.finish_date
+        group by tbl._date;
+    </select>
+
+    <select id="getMonthCountData" resultType="com.linkwechat.wecom.domain.dto.WePageCountDto">
+        select tbl._date as x_time,
+        IFNULL(tbr.new_apply_cnt,0) as new_apply_cnt,
+        IFNULL(tbr.new_contact_cnt,0) as new_contact_cnt,
+        IFNULL(tbr.chat_cnt,0) as chat_cnt,
+        IFNULL(tbr.message_cnt,0) as message_cnt,
+        IFNULL(tbr.reply_percentage,0) as reply_percentage,
+        IFNULL(tbr.avg_reply_time,0) as avg_reply_time,
+        IFNULL(tbr.negative_feedback_cnt,0) as negative_feedback_cnt
+        from (select (@s := @s + 1) as _index, date_format(date_sub(current_date, interval @s month), '%Y-%m') as _date
+        from information_schema.character_sets,
+        (select @s := -1) as init
+        where @s &lt; #{few}
+        order by _date) as tbl
+        left join(select
+        sum(ifnull(wubd.new_apply_cnt, 0)) new_apply_cnt,
+        sum(ifnull(wubd.new_contact_cnt, 0)) new_contact_cnt,
+        sum(ifnull(wubd.chat_cnt, 0))                 chat_cnt,
+        sum(ifnull(wubd.message_cnt, 0))                 message_cnt,
+        sum(ifnull(wubd.reply_percentage, 0))                 reply_percentage,
+        sum(ifnull(wubd.avg_reply_time, 0))                 avg_reply_time,
+        sum(ifnull(wubd.negative_feedback_cnt, 0))                 negative_feedback_cnt,
+        date_format(wubd.stat_time, '%Y-%m') as finish_date
+        from we_user_behavior_data wubd
+        where
+        str_to_date(date_format(wubd.stat_time, '%Y-%m'), '%Y-%m') &gt;=
+        str_to_date(date_format(date_sub(current_date, interval #{few} month), '%Y-%m'), '%Y-%m')
+        and str_to_date(date_format(wubd.stat_time, '%Y-%m'), '%Y-%m') &lt;=
+        str_to_date(date_format(current_date, '%Y-%m'), '%Y-%m')
+        group by finish_date
+        order by finish_date
+        ) as tbr on tbl._date = tbr.finish_date
+        group by tbl._date;
+    </select>
+</mapper>

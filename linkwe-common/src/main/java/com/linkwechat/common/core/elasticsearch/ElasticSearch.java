@@ -14,6 +14,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.IndicesOptions;
+import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
@@ -31,12 +32,14 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -97,12 +100,16 @@ public class ElasticSearch {
                 return;
             }
             CreateIndexRequest request = new CreateIndexRequest(idxName);
+            GetIndexRequest getIndexRequest = new GetIndexRequest(idxName);
             buildSetting(request);
             request.mapping(builder);
 //            request.settings() 手工指定Setting
-            CreateIndexResponse res = restHighLevelClient.indices().create(request, RequestOptions.DEFAULT);
-            if (!res.isAcknowledged()) {
-                log.info("初始化失败");
+            boolean exists = restHighLevelClient.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
+            if (!exists) {
+                CreateIndexResponse res = restHighLevelClient.indices().create(request, RequestOptions.DEFAULT);
+                if (!res.isAcknowledged()) {
+                    log.info("初始化失败");
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -201,7 +208,9 @@ public class ElasticSearch {
         list.forEach(item -> request.add(new IndexRequest(idxName, "_doc").id(item.getId())
                 .source(item.getData(), XContentType.JSON)));
         try {
-            restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
+            if (!CollectionUtils.isEmpty(request.requests())) {
+                restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -212,14 +221,41 @@ public class ElasticSearch {
      *
      * @param idxName
      * @param list
-     * @param consumers
+     * @param consumer
      */
-    public void insertBatchAsync(String idxName, List<JSONObject> list, List<Consumer<List<JSONObject>>> consumers) {
+    public void insertBatchAsync(String idxName, List<ElasticSearchEntity> list, BiConsumer consumer, Object param) {
         BulkRequest request = new BulkRequest();
-        list.parallelStream().forEach(item -> request.add(new IndexRequest(idxName, "_doc").id(item.getString("msgid"))
+        list.parallelStream().forEach(item -> request.add(new IndexRequest(idxName, "_doc").id(item.getId())
+                .source(item.getData(), XContentType.JSON)));
+        try {
+            if (!CollectionUtils.isEmpty(request.requests())) {
+                restHighLevelClient.bulkAsync(request, RequestOptions.DEFAULT, getActionListener(consumer, list, param));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void insertBatchAsync(String idxName, List<JSONObject> list, Consumer<List<JSONObject>> consumer) {
+        BulkRequest request = new BulkRequest();
+        list.forEach(item -> request.add(new IndexRequest(idxName, "_doc").id(item.getString("msgid"))
                 .source(item, XContentType.JSON)));
         try {
-            restHighLevelClient.bulkAsync(request, RequestOptions.DEFAULT, getActionListener(list, consumers));
+            if (!CollectionUtils.isEmpty(request.requests())) {
+                restHighLevelClient.bulkAsync(request, RequestOptions.DEFAULT, getActionListener(consumer, list));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updateBatch(String idxName, List<ElasticSearchEntity> list) {
+        BulkRequest request = new BulkRequest();
+        list.forEach(item -> request.add(new UpdateRequest(idxName, item.getId()).upsert(item.getData(), XContentType.JSON)));
+        try {
+            if (!CollectionUtils.isEmpty(request.requests())) {
+                restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -241,7 +277,9 @@ public class ElasticSearch {
         BulkRequest request = new BulkRequest();
         idList.forEach(item -> request.add(new DeleteRequest(idxName, "_doc", item.toString())));
         try {
-            restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
+            if (!CollectionUtils.isEmpty(request.requests())) {
+                restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -362,11 +400,25 @@ public class ElasticSearch {
         }
     }
 
-    public ActionListener getActionListener(List<JSONObject> list, List<Consumer<List<JSONObject>>> consumers) {
+    public ActionListener getActionListener(Consumer consumer, List<JSONObject> list) {
         return new ActionListener() {
             @Override
             public void onResponse(Object o) {
-                consumers.forEach(consumer -> consumer.accept(list));
+                consumer.accept(list);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                log.warn("work with es failed, exception={}", ExceptionUtils.getStackTrace(e));
+            }
+        };
+    }
+
+    public ActionListener getActionListener(BiConsumer consumer, List<ElasticSearchEntity> list, Object param) {
+        return new ActionListener() {
+            @Override
+            public void onResponse(Object o) {
+                consumer.accept(list, param);
             }
 
             @Override
