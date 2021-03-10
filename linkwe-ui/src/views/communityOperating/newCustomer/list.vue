@@ -96,8 +96,8 @@ export default {
         })
         .catch(function() {})
     },
-    download(id, userName, empleCodeName) {
-      let name = userName + '-' + empleCodeName + '.png'
+    download(data) {
+      let name = data.activityScene + '-' + data.newGroupId + '.png'
       download(id).then((res) => {
         if (res != null) {
           let blob = new Blob([res], { type: 'application/zip' })
@@ -196,8 +196,17 @@ export default {
     <div class="fxbw mb10 aic">
       <div class="total">
         <el-button type="primary" @click="goRoute()">新建自动拉群</el-button>
-        <!-- 新客自动拉群
-        客户通过员工活码添加员工，自动发送入群引导语、群活码，客户扫码入群。 -->
+        <!-- 新客自动拉群 -->
+        <el-tooltip
+          effect="light"
+          content="客户通过员工活码添加员工，自动发送入群引导语、群活码，客户扫码入群。"
+          placement="top-start"
+        >
+          <i
+            class="el-icon-question"
+            style="font-size: 26px;vertical-align: middle; margin-left: 10px;"
+          ></i>
+        </el-tooltip>
       </div>
       <div>
         <el-button type="primary" @click="download()">批量下载</el-button>
@@ -218,45 +227,69 @@ export default {
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="50" align="center" />
-      <el-table-column prop="createTime" label="活码名称" align="center">
+      <el-table-column prop="activityScene" label="活码名称" align="center">
+      </el-table-column>
+      <el-table-column label="员工活码" align="center" prop="qrCode">
+        <template slot-scope="{ row }">
+          <el-image v-if="row.qrCode" :src="row.qrCode" class="code-image">
+          </el-image>
+        </template>
       </el-table-column>
       <el-table-column
-        label="员工活码"
+        prop="weEmpleCodeUseScops"
+        label="使用员工"
         align="center"
-        prop="name"
         :show-overflow-tooltip="true"
-      />
-      <el-table-column prop="createTime" label="活动名称" align="center">
-        <template slot-scope="scope">{{
-          Math.floor(Math.random() * 10000)
-        }}</template>
-      </el-table-column>
-      <el-table-column prop="createTime" label="使用员工" align="center">
-        已结束
+      >
+        <template slot-scope="{ row }">
+          <el-tag
+            size="medium"
+            type="info"
+            v-for="(item, index) in row.weEmpleCodeUseScops"
+            :key="index"
+            >{{ item.businessName }}</el-tag
+          >
+        </template>
       </el-table-column>
       <el-table-column
         label="客户标签"
         align="center"
-        prop="createTime"
         width="160"
-      ></el-table-column>
+        :show-overflow-tooltip="true"
+      >
+        <template slot-scope="{ row }">
+          <el-tag
+            size="medium"
+            type="info"
+            v-for="(item, index) in row.weEmpleCodeTags"
+            :key="index"
+            >{{ item.tagName }}</el-tag
+          >
+        </template>
+      </el-table-column>
       <el-table-column
         label="实际群聊"
         align="center"
-        prop="createTime"
-        width="160"
-      ></el-table-column>
+        :show-overflow-tooltip="true"
+      >
+        <template slot-scope="{ row }">
+          <el-tag
+            size="medium"
+            v-for="(item, index) in row.weGroupUserScops"
+            :key="index"
+            >{{ item.chatGroupName }}</el-tag
+          >
+        </template>
+      </el-table-column>
       <el-table-column
         label="添加好友数"
         align="center"
-        prop="createTime"
-        width="160"
+        prop="joinFriendNums"
       ></el-table-column>
       <el-table-column
         label="创建人"
         align="center"
-        prop="createTime"
-        width="160"
+        prop="createBy"
       ></el-table-column>
       <el-table-column
         label="创建时间"
@@ -273,26 +306,20 @@ export default {
         <template slot-scope="{ row }">
           <el-button
             v-hasPermi="['enterpriseWechat:edit']"
-            size="mini"
             type="text"
-            icon="el-icon-edit"
-            @click="goRoute(row.id)"
+            @click="goRoute(row.newGroupId)"
             >编辑</el-button
           >
           <el-button
             v-hasPermi="['enterpriseWechat:view']"
-            size="mini"
             type="text"
-            icon="el-icon-view"
             @click="download(row)"
             >下载</el-button
           >
           <el-button
             v-hasPermi="['enterpriseWechat:edit']"
-            size="mini"
             type="text"
-            icon="el-icon-edit"
-            @click="remove(row.id)"
+            @click="remove(row.newGroupId)"
             >删除</el-button
           >
         </template>

@@ -112,7 +112,7 @@ export function update(data) {
  */
 export function remove(ids) {
   return request({
-    url: service + '/delete' + ids,
+    url: service + '/delete/' + ids,
     method: 'DELETE',
   })
 }

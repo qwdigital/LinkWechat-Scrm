@@ -76,7 +76,7 @@ export default {
     },
     // 选择人员变化事件
     selectedUser(users) {
-      debugger
+      // debugger
       this.form.weEmpleCodeUseScops = users.map((d) => {
         return {
           businessId: d.id || d.userId,
@@ -112,7 +112,7 @@ export default {
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.loading = true
-          ;(this.form.id ? update : add)({ WeCommunityNewGroupDto: this.form })
+          ;(this.form.newGroupId ? update : add)(this.form)
             .then(({ data }) => {
               this.msgSuccess('操作成功')
               this.loading = false
