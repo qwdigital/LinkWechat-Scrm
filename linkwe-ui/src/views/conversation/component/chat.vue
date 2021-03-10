@@ -2,24 +2,27 @@
   <div class="takecontent">
     <ul>
       <li v-for="(item,index) in allChat" :key="index">
-        <div :style="{'color':item.action=='send'?'#199ed8':'#999'}">{{item.from}} <span
+        <!-- <span v-if="item.fromInfo.name">{{item.fromInfo.name}}</span> -->
+        <div :style="{'color':item.action=='send'?'#199ed8':'#999'}"><span v-if="item.fromInfo">{{item.fromInfo.name}}</span>  <span
             :style="{'color':item.action=='send'?'#199ed8':'#999'}">{{parseTime(item.msgtime)}}</span></div>
         <div v-if="item.msgtype=='text'" class="msgtypetext">
           {{item.text.content}}
         </div>
         <div v-else-if="item.msgtype=='image'" class="msgtypeimg">
-          <img :src="item.image.attachment">
-
+          <img :src="item.image.attachment" @click="showImg(item)">
         </div>
         <div v-else-if="item.msgtype=='file'" class="msgtypefile" @click="down(item.file)">
           {{item.file.filename}}
         </div>
 
         <div v-else-if="item.msgtype=='voice'" class="msgtypevoice">
-          <i class="el-icon-video-play" @click="play(item,'voice')"></i>
+          <i class="el-icon-microphone"  style=" font-size: 40px; color: #199ed8;" @click="playVideo(item)"></i>
+        </div>
+        <div v-else-if="item.msgtype=='emotion'" class="msgtypeimg">
+        <img :src="item.emotion.attachment" @click="showImg(item)">
         </div>
         <div v-else-if="item.msgtype=='video'" class="msgtypevideo">
-          <i class="el-icon-video-play" @click="play(item,'video')"></i>
+          <i class="el-icon-video-play" style=" font-size: 40px;  color: #199ed8;" @click="play(item,'video')"></i>
         </div>
 
         <div v-else-if="item.msgtype=='location'" class="msgtypecard ">
@@ -37,7 +40,6 @@
       </li>
     </ul>
 
-      
     <div class="shabowbox" v-show="dia" >
         <div class="close" @click="dia=false"><i class="el-icon-circle-close"></i></div>
         <div class="shabowboxvidoe">
@@ -47,11 +49,27 @@
       :playsinline="true" :options="playerOptions"></video-player>
     </div>
     </div>
-    
+    <div class="shabowbox" v-show="diavioce" >
+        <div class="close" @click="diavioce=false"><i class="el-icon-circle-close"></i></div>
+        <div class="shabowboxvidoe shabowboxaudio">
+        <AudioPlayer :audio-list="vioceSrc"
+                 :before-play="onBeforePlay" />
+         </div>
+    </div>
+    <el-dialog
+  :visible.sync="dialogVisible"
+  width="30%"
+>
+ <img :src="imgSrc" style="width:100%;max-height:600px">
+  <span slot="footer" class="dialog-footer">
+  </span>
+</el-dialog>
   </div>
 </template>
 
 <script>
+
+
   import 'video.js/dist/video-js.css'
   import 'vue-video-player/src/custom-theme.css'
   
@@ -60,6 +78,7 @@
     yearMouthDay
   } from '@/utils/common.js'
   export default {
+  
     props: {
       allChat: {
         type: Array,
@@ -70,6 +89,10 @@
     data() {
       return {
         dia: false,
+        diavioce:false,
+        dialogVisible:false,
+        imgSrc:'',
+        vioceSrc:[],
         playerOptions: {
           playbackRates: [0.7, 1.0, 1.5, 2.0], //播放速度
           autoplay: false, //如果true,浏览器准备好时开始回放。
@@ -92,6 +115,18 @@
       }
     },
     methods: {
+      playVideo(e){
+         this.vioceSrc=[e.voice.attachment]
+         this.diavioce=true;
+      },
+      onBeforePlay(next){
+       next() // 开始播放
+       
+      },
+      showImg(e){
+        this.imgSrc=e.image.attachment;
+        this.dialogVisible=true
+      },
       play(e) {
           this.dia=true
            const player = this.$refs.videoPlayer.player
@@ -112,7 +147,8 @@
   }
 #videoPlayer /deep/ .vjs-tech{ height: 450px;}
 .shabowbox{ position: fixed;width:100%;height: 100%; background: rgba(0, 0, 0,0.4);left: 0;top: 0;z-index: 2000;}
-.shabowboxvidoe{ position: fixed;width: 800px; height: 475px;left: 50%;margin-left: -400px;top:50%;margin-top: -235px;;z-index: 2001;background: floralwhite;}
+.shabowboxvidoe{ position: fixed;width: 800px; height: 475px;left: 50%;margin-left: -400px;top:50%;margin-top: -235px;;z-index: 2001;background: #fff;}
+.shabowboxaudio{ height: 125px;padding: 12px;}
  .close{ position: fixed;width: 50px; height:50px;right: 10px;z-index: 2012;top: 10px;text-align: center;line-height: 50px;font-size: 20px;color: #FFF;cursor: pointer;font-size: 43px;}
   .takecontent {
     text-align: left;
@@ -154,9 +190,9 @@
 
     .msgtypevideo {
       margin: 10px;
-      font-size: 40px;
+     
       cursor: pointer;
-      color: #199ed8;
+ 
       border-radius: 8px;
     }
 
