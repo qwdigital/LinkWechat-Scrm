@@ -49,16 +49,16 @@ public class WeCustomerPortraitController extends BaseController {
 
 
     /**
-     * 根据客户id和当前企业员工id获取员工详细信息
+     * 根据客户id和当前企业员工id获取客户详细信息
      * @param externalUserid
-     * @param operUserid
+     * @param userid
      * @return
      */
     @GetMapping(value = "/findWeCustomerInfo")
-    public AjaxResult findWeCustomerInfo(String externalUserid, String operUserid){
+    public AjaxResult findWeCustomerInfo(String externalUserid, String userid){
 
         return AjaxResult.success(
-                iWeCustomerService.findCustomerByOperUseridAndCustomerId(externalUserid,operUserid)
+                iWeCustomerService.findCustomerByOperUseridAndCustomerId(externalUserid,userid)
         );
     }
 

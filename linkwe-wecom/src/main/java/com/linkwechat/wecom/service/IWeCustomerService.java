@@ -115,10 +115,10 @@ public interface IWeCustomerService extends IService<WeCustomer>
     /**
      * 根据外部联系人ID和企业员工ID获取当前客户信息
      * @param externalUserid
-     * @param operUserid
+     * @param userid
      * @return
      */
-    WeCustomerPortrait findCustomerByOperUseridAndCustomerId(String externalUserid,String operUserid);
+    WeCustomerPortrait findCustomerByOperUseridAndCustomerId(String externalUserid,String userid);
 
 
     /**
