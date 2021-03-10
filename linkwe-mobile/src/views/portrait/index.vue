@@ -65,7 +65,12 @@
     </div>
     <div class="divider"></div>
     <!-- 点击客户标签里的编辑触发弹出框开始 -->
-    <van-action-sheet v-model="show" title="客户标签">
+    <van-action-sheet v-model="show">
+      <van-nav-bar
+        title="客户标签"
+        right-text="取消"
+        @click-right="show = false"
+      />
       <div class="content">
         <span>测试:</span>
         <van-row gutter="8" class="labels">
@@ -93,13 +98,6 @@
         </div>
       </div>
     </van-action-sheet>
-    <!-- <van-action-sheet
-  v-model="show"
-  :actions="actions"
-  cancel-text="取消"
-  close-on-click-action
-  @cancel="onCancel"
-/> -->
     <!-- 点击客户标签里的编辑触发弹出框结束 -->
     <!-- 社交关系 -->
     <div class="realationship">
@@ -161,7 +159,7 @@
         <p class="f12" style="position:relative; left:-32px;">
           2021-02-16 星期二
         </p>
-        <van-step>
+        <van-step @click="todonewsshow = true">
           <span class="f12 po"> 12:40</span>
           <span class="fs14">待办动态</span>
           <span class="finish">完成</span>
@@ -171,45 +169,171 @@
       </van-steps>
     </div>
     <!-- 点击添加待办触发弹出框开始 -->
-    <van-action-sheet v-model="usershow" title="客户待办">
+    <van-action-sheet v-model="usershow">
+      <van-nav-bar
+        title="客户待办"
+        right-text="取消"
+        @click-right="usershow = false"
+      />
       <!-- 表单 -->
       <van-form @submit="onSubmit">
+        <!-- 待办内容 -->
         <van-field
           v-model="conagency"
           name="待办内容"
           label="待办内容"
           placeholder="请输入待办内容"
           type="textarea"
+          required
           :rules="[{ required: true, message: '请输入待办内容' }]"
           class="conagency"
         />
-        <!-- 待办内容 -->
 
+        <!-- 待办日期 -->
         <van-field
-          v-model="dataagency"
+          v-model="dateagency"
+          is-link
           readonly
-          clickable
-          name="calendar"
-          :value="value"
-          label="日历"
-          placeholder="点击选择日期"
-          @click="showCalendar = true"
-          :rules="[{ required: true, message: '请填写密码' }]"
+          label="待办日期"
+          placeholder="请选择"
+          @click="dateshow = true"
+          required
+          :rules="[{ required: true, message: '请输入待办日期' }]"
         />
+        <van-calendar
+          v-model="dateshow"
+          @confirm="onConfirm"
+          color="#1989fa"
+          :min-date="minDate"
+          :max-date="maxDate"
+        />
+        <!-- 待办时间 -->
+        <van-field
+          v-model="timeagency"
+          is-link
+          readonly
+          label="待办时间"
+          placeholder="请选择"
+          @click="starttimeshow = true"
+          required
+          :rules="[{ required: true, message: '请输入待办时间' }]"
+        />
+        <van-action-sheet v-model="starttimeshow">
+          <van-datetime-picker
+            v-model="currentTime"
+            type="time"
+            title="请选择开始时间"
+            :min-hour="0"
+            :max-hour="23"
+            @cancel="timecancel"
+            @confirm="starttimeconfirm"
+          />
+        </van-action-sheet>
+        <van-action-sheet v-model="endtimeshow">
+          <van-datetime-picker
+            v-model="currentTime"
+            type="time"
+            title="请选择结束时间"
+            :min-hour="0"
+            :max-hour="23"
+            @cancel="timecancel"
+            @confirm="endtimeconfirm"
+          />
+        </van-action-sheet>
+        <!-- 保存 -->
         <div style="margin: 16px;">
           <van-button round block type="info" native-type="submit"
-            >提交</van-button
+            >保存</van-button
           >
         </div>
       </van-form>
     </van-action-sheet>
     <!-- 点击添加待办触发弹出框结束 -->
+    <!-- 点击待办动态触发弹出框开始 -->
+    <van-action-sheet v-model="todonewsshow">
+      <van-nav-bar
+        title="客户待办"
+        right-text="删除"
+        @click-right="deltodoshow"
+      />
+      <!-- 待办内容 -->
+      <van-field
+        v-model="conagency"
+        name="待办内容"
+        label="待办内容"
+        placeholder="请输入待办内容"
+        type="textarea"
+        required
+        readonly
+        :rules="[{ required: true, message: '请输入待办内容' }]"
+        class="conagency"
+      />
 
+      <!-- 待办日期 -->
+      <van-field
+        v-model="dateagency"
+        is-link
+        readonly
+        label="待办日期"
+        placeholder="请选择"
+        @click="dateshow = true"
+        required
+        :rules="[{ required: true, message: '请输入待办日期' }]"
+      />
+      <van-calendar
+        v-model="dateshow"
+        @confirm="onConfirm"
+        color="#1989fa"
+        :min-date="minDate"
+        :max-date="maxDate"
+      />
+      <!-- 待办时间 -->
+      <van-field
+        v-model="timeagency"
+        is-link
+        readonly
+        label="待办时间"
+        placeholder="请选择"
+        @click="starttimeshow = true"
+        required
+        :rules="[{ required: true, message: '请输入待办时间' }]"
+      />
+      <van-action-sheet v-model="starttimeshow">
+        <van-datetime-picker
+          v-model="currentTime"
+          type="time"
+          title="请选择开始时间"
+          :min-hour="0"
+          :max-hour="23"
+          @cancel="timecancel"
+          @confirm="starttimeconfirm"
+        />
+      </van-action-sheet>
+      <van-action-sheet v-model="endtimeshow">
+        <van-datetime-picker
+          v-model="currentTime"
+          type="time"
+          title="请选择结束时间"
+          :min-hour="0"
+          :max-hour="23"
+          @cancel="timecancel"
+          @confirm="endtimeconfirm"
+        />
+      </van-action-sheet>
+      <!-- 保存 -->
+      <div style="margin: 16px;">
+        <van-button round block type="info" native-type="submit"
+          >保存</van-button
+        >
+      </div>
+    </van-action-sheet>
+    <!-- 点击添加待办触发弹出框结束 -->
     <div class="divider"></div>
   </div>
 </template>
 
 <script>
+import { getCustomerInfo } from '@/api/portrait' 
 export default {
   data() {
     return {
@@ -218,16 +342,74 @@ export default {
       // 客户待办的弹出框开始
       usershow: false,
       conagency: "", // 待办内容
-      dataagency: "", // 待办日期
-      timeagency: "", // 待办时间
+
+      // 待办日期
+      dateagency: "",
+      dateshow: false,
+      minDate: new Date(2021, 0, 1),
+      maxDate: new Date(2021, 12, 31),
+      // 待办时间
+      timeagency: "",
+      starttimeshow: false,
+      endtimeshow: false,
+      currentTime: "12:00",
+      startTime: "",
+      endTime: "",
       // 客户待办的弹出框结束
 
       actions: [{ name: "选项一" }, { name: "选项二" }, { name: "选项三" }],
       // 步骤条
       active: -1,
+      // 客户轨迹
+      // 待办动态
+      todonewsshow: false,
+      // 接口开始
+      externalUserid: "", // 客户Id
+      userid: "", // 员工Id
     };
   },
   methods: {
+    // 添加代办
+    // 表单提交
+    onSubmit() {},
+    // 待办日期
+    formatDate(dateagency) {
+      return `${dateagency.getFullYear()}-${dateagency.getMonth() +
+        1}-${dateagency.getDate()}`;
+    },
+    onConfirm(dateagency) {
+      this.dateshow = false;
+      this.dateagency = this.formatDate(dateagency);
+    },
+    // 待办时间
+    timecancel() {
+      this.starttimeshow = false;
+    },
+    starttimeconfirm(value) {
+      this.startTime = value;
+      this.starttimeshow = false;
+      this.endtimeshow = true;
+    },
+    endtimeconfirm(value) {
+      this.endTime = value;
+      this.endtimeshow = false;
+      let time = "";
+      if (this.startTime > this.endTime) {
+        time = this.startTime;
+        this.startTime = this.endTime;
+        this.endTime = time;
+      }
+      // console.log(this.startTime, this.endTime);
+      this.endtimeshow = false;
+      this.timeagency = this.formatTime();
+    },
+    formatTime() {
+      return `${this.startTime}-${this.endTime}`;
+    },
+    // 待办动态
+    // 点击删除按钮
+    deltodoshow() {},
+
     goRoute() {
       this.$router.push({
         path: "/detail",
@@ -253,6 +435,19 @@ export default {
       console.log(456);
     },
     saveInfo() {},
+  },
+  created() {
+    // 获取客户详细信息
+    getCustomerInfo({
+      externalUserid: this.externalUserid,
+      userid: this.userid,
+    })
+      .then(({ data }) => {
+        console.log(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
 };
 </script>
