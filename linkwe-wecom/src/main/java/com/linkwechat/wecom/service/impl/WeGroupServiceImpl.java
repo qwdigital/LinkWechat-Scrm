@@ -204,20 +204,11 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
             this.saveOrUpdateBatch(weGroups);
             List<WeGroupMember> weGroupMemberList = iWeGroupMemberService.list(new LambdaQueryWrapper<WeGroupMember>().in(WeGroupMember::getChatId,
                     weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList())));
-            //存量去重
+
             if (CollectionUtil.isNotEmpty(weGroupMemberList)) {
-                List<WeGroupMember> groupMemberList = weGroupMembers.stream().filter(e -> {
-                    for (WeGroupMember weGroupMember : weGroupMemberList) {
-                        if (e.getUserId().equals(weGroupMember.getUserId())) {
-                            return false;
-                        }
-                    }
-                    return true;
-                }).collect(Collectors.toList());
-                iWeGroupMemberService.saveBatch(groupMemberList);
-            } else {
-                iWeGroupMemberService.saveBatch(weGroupMembers);
+                iWeGroupMemberService.removeByIds(weGroupMemberList.stream().map(WeGroupMember::getId).collect(Collectors.toList()));
             }
+            iWeGroupMemberService.saveBatch(weGroupMembers);
         }
 
 
