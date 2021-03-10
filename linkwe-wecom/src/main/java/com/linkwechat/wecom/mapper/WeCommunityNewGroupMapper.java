@@ -37,7 +37,7 @@ public interface WeCommunityNewGroupMapper extends BaseMapper<WeCommunityNewGrou
      * @param idList id列表
      * @return
      */
-    int batchRemoveWeCommunityNewGroupIds(List<String> idList);
+    int batchRemoveWeCommunityNewGroupIds(@Param("ids") List<String> idList);
 
     /**
      * 通过id查询新客自动拉群信息列表
