@@ -50,7 +50,7 @@
                 wu.user_name as ownerName,
                 COUNT(wgm.id)  as groupMemberNum,
                 wgm.join_time,
-                (SELECT count(*) FROM we_group_member wgmr WHERE wgmr.chat_id=wg.chat_id and wgmr.user_id=#{operUserid}) as commonGroup
+                (SELECT count(*) FROM we_group_member wgmr WHERE wgmr.chat_id=wg.chat_id and wgmr.user_id=#{userId}) as commonGroup
             FROM
                 `we_group` wg
             LEFT JOIN we_group_member wgm ON wgm.chat_id=wg.chat_id

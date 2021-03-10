@@ -322,8 +322,8 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
     }
 
     @Override
-    public List<WeCustomerAddGroup> findWeGroupByCustomer(String operUserid, String externalUserid) {
-        return this.baseMapper.findWeGroupByCustomer(operUserid,externalUserid);
+    public List<WeCustomerAddGroup> findWeGroupByCustomer(String userId, String externalUserid) {
+        return this.baseMapper.findWeGroupByCustomer(userId,externalUserid);
     }
 
 }

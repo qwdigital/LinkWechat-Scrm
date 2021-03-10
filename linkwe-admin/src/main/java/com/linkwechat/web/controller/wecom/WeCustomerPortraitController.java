@@ -133,14 +133,14 @@ public class WeCustomerPortraitController extends BaseController {
     /**
      * 获取用户添加的群
      * @param externalUserid
-     * @param operUserid
+     * @param userId
      * @return
      */
     @GetMapping(value = "/findAddGroupNum")
-    public AjaxResult findAddGroupNum(String externalUserid,String operUserid){
+    public AjaxResult findAddGroupNum(String externalUserid,String userId){
 
         return AjaxResult.success(
-                iWeGroupService.findWeGroupByCustomer(operUserid,externalUserid)
+                iWeGroupService.findWeGroupByCustomer(userId,externalUserid)
         );
     }
 
