@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.exception.wecom.WeComException;
@@ -72,7 +73,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
         //保存新客自动拉群信息
         WeCommunityNewGroup communityNewGroup = new WeCommunityNewGroup();
-        communityNewGroup.setNewGroupId(weGroupCode.getId());
+        communityNewGroup.setGroupCodeId(weGroupCode.getId());
         communityNewGroup.setEmpleCodeName(communityNewGroupDto.getActivityScene());
         communityNewGroup.setDelFlag(0);
         communityNewGroup.setCreateTime(new Date());
@@ -117,6 +118,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
     @Override
     public List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(String empleCodeName, String createBy, String beginTime, String endTime) {
         List<WeCommunityNewGroupVo> weCommunityNewGroupVos = weCommunityNewGroupMapper.selectWeCommunityNewGroupList(empleCodeName, createBy, beginTime, endTime);
+
         if (CollectionUtil.isNotEmpty(weCommunityNewGroupVos)) {
             List<Long> newGroupIdList = weCommunityNewGroupVos.stream().map(WeCommunityNewGroupVo::getNewGroupId).collect(Collectors.toList());
             List<WeEmpleCodeUseScop> useScopList = iWeEmpleCodeUseScopService.selectWeEmpleCodeUseScopListByIds(newGroupIdList);
@@ -166,13 +168,15 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
         //检查群活码是否存在
         WeGroupCode weGroupCode = weGroupCodeMapper.selectWeGroupCodeById(communityNewGroupDto.getGroupCodeId());
-        if (null != weGroupCode) {
+        if (null == weGroupCode) {
             throw new WeComException("群活码不存在！");
         }
 
         //查询新客自动拉群信息
-        WeCommunityNewGroup communityNewGroup = weCommunityNewGroupMapper.selectById(communityNewGroupDto.getGroupCodeId());
-        if (null != communityNewGroup) {
+        WeCommunityNewGroup communityNewGroup =  weCommunityNewGroupMapper.selectOne(new LambdaQueryWrapper<WeCommunityNewGroup>()
+        .eq(WeCommunityNewGroup::getGroupCodeId,communityNewGroupDto.getGroupCodeId()));
+//        WeCommunityNewGroup communityNewGroup = weCommunityNewGroupMapper.selectById(communityNewGroupDto.getGroupCodeId());
+        if (null == communityNewGroup) {
             throw new WeComException("信息不存在！");
         }
 
@@ -180,6 +184,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         WeEmpleCode weEmpleCode = getWeEmpleCode(communityNewGroupDto);
 
         WeExternalContactDto.WeContactWay weContactWay = weEmpleCodeService.getWeContactWay(weEmpleCode);
+
         try {
             weExternalContactClient.updateContactWay(weContactWay);
         } catch (Exception e) {

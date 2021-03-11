@@ -55,7 +55,7 @@ public class WeCustomerPortraitController extends BaseController {
      * @return
      */
     @GetMapping(value = "/findWeCustomerInfo")
-    public AjaxResult findWeCustomerInfo(String externalUserid, String userid){
+    public AjaxResult findWeCustomerInfo(String externalUserid, String userid) throws Exception {
 
         return AjaxResult.success(
                 iWeCustomerService.findCustomerByOperUseridAndCustomerId(externalUserid,userid)

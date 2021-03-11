@@ -38,6 +38,8 @@ public class WeCustomerPortrait {
     private String remarkCorpName;
     //描述
     private String description;
+    //年纪
+    private int age;
 
     //客户标签
     private List<WeTagGroup> weTagGroupList;

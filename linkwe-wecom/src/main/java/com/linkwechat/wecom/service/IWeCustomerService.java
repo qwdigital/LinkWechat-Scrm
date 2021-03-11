@@ -118,7 +118,7 @@ public interface IWeCustomerService extends IService<WeCustomer>
      * @param userid
      * @return
      */
-    WeCustomerPortrait findCustomerByOperUseridAndCustomerId(String externalUserid,String userid);
+    WeCustomerPortrait findCustomerByOperUseridAndCustomerId(String externalUserid,String userid) throws Exception;
 
 
     /**
