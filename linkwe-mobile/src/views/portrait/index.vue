@@ -383,57 +383,59 @@ export default {
       })
       let entry = undefined
       let _this = this
-      wx.invoke('getContext', {}, function(res) {
-        if (res.err_msg == 'getContext:ok') {
-          entry = res.entry //返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
-          if (
-            ![
-              'single_chat_tools',
-              'group_chat_tools',
-              'contact_profile',
-            ].includes(entry)
-          ) {
-            // _this.$toast.clear()
-            _this.$toast('入口错误：' + entry)
-            return
-          }
-
-          wx.invoke('getCurExternalContact', {}, function(resContact) {
-            if (resContact.err_msg == 'getCurExternalContact:ok') {
-              this.externalUserid = resContact.userId //返回当前外部联系人userId
-              // 获取客户详细信息
-              getCustomerInfo({
-                externalUserid: this.externalUserid,
-                userid: this.userId,
-              })
-                .then(({ data }) => {
-                  _this.$toast.clear()
-                  console.log(data)
-                  _this.$dialog({
-                    message: '获取客户失败：' + JSON.stringify(data),
-                  })
-                })
-                .catch((err) => {
-                  _this.$toast.clear()
-                  console.log(err)
-                  _this.$dialog({
-                    message: '获取客户失败：' + JSON.stringify(err),
-                  })
-                })
-            } else {
-              _this.$toast.clear()
-              //错误处理
-              _this.$dialog({
-                message: '获取客户id失败：' + JSON.stringify(resContact),
-              })
+      try {
+        wx.invoke('getContext', {}, function(res) {
+          if (res.err_msg == 'getContext:ok') {
+            entry = res.entry //返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
+            if (
+              ![
+                'single_chat_tools',
+                'group_chat_tools',
+                'contact_profile',
+              ].includes(entry)
+            ) {
+              // _this.$toast.clear()
+              _this.$toast('入口错误：' + entry)
+              return
             }
-          })
-        } else {
-          _this.$toast.clear()
-          //错误处理
-          _this.$dialog({ message: '进入失败：' + JSON.stringify(res) })
-        }
-      })
+
+            wx.invoke('getCurExternalContact', {}, function(resContact) {
+              if (resContact.err_msg == 'getCurExternalContact:ok') {
+                _this.externalUserid = resContact.userId //返回当前外部联系人userId
+                // 获取客户详细信息
+                getCustomerInfo({
+                  externalUserid: _this.externalUserid,
+                  userid: _this.userId,
+                })
+                  .then(({ data }) => {
+                    _this.$toast.clear()
+                    _this.$dialog({
+                      message: '获取客户成功：' + JSON.stringify(data),
+                    })
+                  })
+                  .catch((err) => {
+                    _this.$toast.clear()
+                    _this.$dialog({
+                      message: '获取客户失败：' + JSON.stringify(err),
+                    })
+                  })
+              } else {
+                _this.$toast.clear()
+                //错误处理
+                _this.$dialog({
+                  message: '获取客户id失败：' + JSON.stringify(resContact),
+                })
+              }
+            })
+          } else {
+            _this.$toast.clear()
+            //错误处理
+            _this.$dialog({ message: '进入失败：' + JSON.stringify(res) })
+          }
+        })
+      } catch (err) {
+        _this.$dialog({ message: 'err' + JSON.stringify(err) })
+      }
     },
     // 添加代办
     // 表单提交
