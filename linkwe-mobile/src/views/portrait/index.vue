@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 头部 -->
-    <div class="header">
+    <!-- <div class="header">
       <van-icon
         name="cross"
         color="#9c9c9c"
@@ -10,7 +10,7 @@
       />
       <span class="title"> 客户画像 </span>
     </div>
-    <van-divider />
+    <van-divider /> -->
     <!-- 详细资料 -->
     <div class="details">
       <div class="detail">
@@ -21,29 +21,31 @@
               <span>张三 &nbsp; &nbsp;</span
               ><van-icon name="manager" color="#9c9c9c" />
             </div>
-            <div class="c9"><span>昵称：</span><span>王二毛</span></div>
+            <div class="c9">
+              <span>昵称：</span><span>{{ form.name }}</span>
+            </div>
           </div>
         </div>
         <div class="data" @click="goRoute">详细资料></div>
       </div>
       <div class="detail">
         <div class="c9">手机号</div>
-        <div>123@qq.com</div>
+        <div>{{ form.remarkMobiles }}</div>
       </div>
       <van-divider />
       <div class="detail">
         <div class="c9">年龄</div>
-        <div>123@qq.com</div>
+        <div>{{ getage }}</div>
       </div>
       <van-divider />
       <div class="detail">
         <div class="c9">生日</div>
-        <div>123@qq.com</div>
+        <div>{{ form.birthday }}</div>
       </div>
       <van-divider />
       <div class="detail">
         <div class="c9">邮箱</div>
-        <div>123@qq.com</div>
+        <div>{{ form.email }}</div>
       </div>
     </div>
     <div class="divider"></div>
@@ -333,7 +335,8 @@
 </template>
 
 <script>
-import { getCustomerInfo } from '@/api/portrait' 
+import { getCustomerInfo } from "@/api/portrait";
+import { getUserInfo } from "@/api/common";
 export default {
   data() {
     return {
@@ -364,10 +367,62 @@ export default {
       // 待办动态
       todonewsshow: false,
       // 接口开始
-      externalUserid: "", // 客户Id
-      userid: "", // 员工Id
-
+      externalUserid: "wm2H-nDQAACG5x4XjsM1OoW8UVfpbn3A", // 客户Id
+      userid: "45DuXiangShangQingXie", // 员工Id
+      form: {
+        name: "", // 昵称
+        remarkMobiles: "", // 手机号
+        birthday: "", // 客户生日
+        email: "", // 邮箱
+        address: "", // 地址
+        qq: "", // qq
+        position: "", // 职业
+        remarkCorpName: "", // 公司
+        description: "", // 其他描述
+      },
     };
+  },
+  computed: {
+    // 获取客户年龄
+    getage: function() {
+      // `this` 指向 vm 实例
+      let nowdata = new Date();
+      let yearnow = nowdata.getFullYear();
+      let mouthnow = nowdata.getMonth() + 1;
+      let daynow = nowdata.getDate();
+      // console.log(yearnow,mouthnow,daynow);
+      // this.form.birthday = "1995-03-11";
+      if (this.form.birthday) {
+        const year = this.form.birthday.substring(0, 4);
+        const mouth =
+          this.form.birthday.substring(5, 6) == 0
+            ? this.form.birthday.substring(6, 7)
+            : this.form.birthday.substring(5, 7);
+        const day =
+          this.form.birthday.substring(7, 8) == 0
+            ? this.form.birthday.substring(8, 9)
+            : this.form.birthday.substring(8, 10);
+        // console.log(day);
+        // console.log(mouth);
+        // console.log(typeof(birthday));
+        // console.log(birthday);
+        console.log(parseInt(mouthnow),parseInt(mouth));
+        if (parseInt(mouthnow) > parseInt(mouth)) {
+          let age = parseInt(yearnow) - parseInt(year);
+          return age;
+        } else if (
+          (parseInt(mouthnow) == parseInt(mouth) && parseInt(daynow) >= parseInt(day))
+        ) {
+          let age = parseInt(yearnow) - parseInt(year) ;
+          return age;
+        } else {
+          let age = parseInt(yearnow) - parseInt(year)-1;
+          return age;
+        }
+      } else {
+        return "";
+      }
+    },
   },
   methods: {
     // 添加代办
@@ -438,13 +493,35 @@ export default {
     saveInfo() {},
   },
   created() {
+    // 获取用户Id
+    //  let auth_code = location.search
+    //   .slice(1)
+    //   .split('&')[0]
+    //   .split('=')[1]
+    // if (!auth_code) {
+    //   this.$toast('未获得授权')
+    //   return
+    // }
+    // getUserInfo(auth_code)
+    //   .then(({ data }) => {
+    //     this.userId = data.userId
+    //     // this.$toast('userId:' + this.userId)
+    //     console.log(this.userId);
+    //   })
+    //   .catch((err) => {
+    //     Dialog.confirm({
+    //       title: '标题',
+    //       message: err,
+    //     })
+    //   })
     // 获取客户详细信息
     getCustomerInfo({
       externalUserid: this.externalUserid,
       userid: this.userid,
     })
       .then(({ data }) => {
-        console.log(data);
+        this.form = data;
+        // console.log(this.form);
       })
       .catch((err) => {
         console.log(err);
