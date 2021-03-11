@@ -20,7 +20,7 @@ ruoyi:
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为8090
-  port: 8090
+  port: ${APP_PORT:8090}
   servlet:
     # 应用的访问路径
     context-path: /
@@ -55,11 +55,11 @@ spring:
     active: druid
   # 文件上传
   servlet:
-     multipart:
-       # 单个文件大小
-       max-file-size:  10MB
-       # 设置总上传的文件大小
-       max-request-size:  20MB
+    multipart:
+      # 单个文件大小
+      max-file-size: 10MB
+      # 设置总上传的文件大小
+      max-request-size: 20MB
   task:
     execution:
       pool:
@@ -95,24 +95,24 @@ spring:
 
 # token配置
 token:
-    # 令牌自定义标识
-    header: Authorization
-    # 令牌密钥
-    secret: abcdefghijklmnopqrstuvwxyz
-    # 令牌有效期（默认30分钟）
-    expireTime: 30
+  # 令牌自定义标识
+  header: Authorization
+  # 令牌密钥
+  secret: abcdefghijklmnopqrstuvwxyz
+  # 令牌有效期（默认30分钟）
+  expireTime: 30
 
 mybatis-plus:
-   mapper-locations: classpath*:mapper/**/*Mapper.xml
-   type-aliases-package: com.linkwechat.**.domain
-   type-handlers-package: com.linkwechat.framework.handler.GenericTypeHandler,com.linkwechat.framework.handler.StringArrayJoinTypeHandler
-   configuration:
-     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-   global-config:
-     db-config:
-       logic-delete-field: delFlag
-       logic-delete-value: 1
-       logic-not-delete-value: 0
+  mapper-locations: classpath*:mapper/**/*Mapper.xml
+  type-aliases-package: com.linkwechat.**.domain
+  type-handlers-package: com.linkwechat.framework.handler.GenericTypeHandler,com.linkwechat.framework.handler.StringArrayJoinTypeHandler
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: delFlag
+      logic-delete-value: 1
+      logic-not-delete-value: 0
 
 ## MyBatis配置
 #mybatis:
@@ -173,49 +173,49 @@ wecome:
   serverUrl: https://qyapi.weixin.qq.com/
   weComePrefix: cgi-bin
   noAccessTokenUrl:
-          - /gettoken
-          - /service/get_provider_token
-          - /wecom/chat/side/list
-          - /wecom/chat/item/list
-          - /wecom/chat/collection/addCollection
-          - /wecom/chat/collection/cancleCollection
-          - /wecom/chat/collection/list
+    - /gettoken
+    - /service/get_provider_token
+    - /wecom/chat/side/list
+    - /wecom/chat/item/list
+    - /wecom/chat/collection/addCollection
+    - /wecom/chat/collection/cancleCollection
+    - /wecom/chat/collection/list
   needContactTokenUrl:
-          - /externalcontact/get_follow_user_list
-          - /externalcontact/add_contact_way
-          - /externalcontact/update_contact_way
-          - /externalcontact/add_corp_tag
-          - /externalcontact/get_corp_tag_list
-          - /externalcontact/del_corp_tag
-          - /externalcontact/edit_corp_tag
-          - /externalcontact/list
-          - /externalcontact/get
-          - /externalcontact/batch/get_by_user
-          - /externalcontact/groupchat/list
-          - /externalcontact/groupchat/get
-          - /externalcontact/mark_tag
-          - /externalcontact/transfer
-          - /externalcontact/groupchat/transfer
-          - /externalcontact/get_unassigned_list
-          - /externalcontact/send_welcome_msg
-          - /externalcontact/unionid_to_external_userid
-          - /externalcontact/add_msg_template
-          - /externalcontact/get_group_msg_result
-          - /externalcontact/get_user_behavior_data
-          - /externalcontact/groupchat/statistic
-  fileUplodUrl:  /media/upload,/media/uploadimg
+    - /externalcontact/get_follow_user_list
+    - /externalcontact/add_contact_way
+    - /externalcontact/update_contact_way
+    - /externalcontact/add_corp_tag
+    - /externalcontact/get_corp_tag_list
+    - /externalcontact/del_corp_tag
+    - /externalcontact/edit_corp_tag
+    - /externalcontact/list
+    - /externalcontact/get
+    - /externalcontact/batch/get_by_user
+    - /externalcontact/groupchat/list
+    - /externalcontact/groupchat/get
+    - /externalcontact/mark_tag
+    - /externalcontact/transfer
+    - /externalcontact/groupchat/transfer
+    - /externalcontact/get_unassigned_list
+    - /externalcontact/send_welcome_msg
+    - /externalcontact/unionid_to_external_userid
+    - /externalcontact/add_msg_template
+    - /externalcontact/get_group_msg_result
+    - /externalcontact/get_user_behavior_data
+    - /externalcontact/groupchat/statistic
+  fileUplodUrl: /media/upload,/media/uploadimg
   needProviderTokenUrl:
-          - /service/get_login_info
+    - /service/get_login_info
   needChatTokenUrl:
-          - /msgaudit/get_permit_user_list
-          - /msgaudit/check_single_agree
-          - /msgaudit/check_room_agree
-          - /msgaudit/groupchat/get
+    - /msgaudit/get_permit_user_list
+    - /msgaudit/check_single_agree
+    - /msgaudit/check_room_agree
+    - /msgaudit/groupchat/get
   thirdAppUrl:
-          - /user/getuserinfo
-          - /get_jsapi_ticket
-          - /ticket/get
-          - /message/send
+    - /user/getuserinfo
+    - /get_jsapi_ticket
+    - /ticket/get
+    - /message/send
   #企微回调通知配置
   callBack:
     appIdOrCorpId: ww24262ce93851488f
