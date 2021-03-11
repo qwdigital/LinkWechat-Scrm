@@ -114,12 +114,12 @@
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>1.2.2</version>
+                <version>1.1.1</version>
                 <configuration>
-                    <imageName>${project.artifactId}</imageName>
+                    <imageName>${parent.artifactId}</imageName>
                     <dockerDirectory>${basedir}/src/main/docker</dockerDirectory>
                     <imageTags>
-                        <imageTag>link-wechat</imageTag>
+                        <imageTag>${parent.version}</imageTag>
                     </imageTags>
                     <buildArgs>
                         <!--指定参数jar-->

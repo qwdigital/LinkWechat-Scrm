@@ -3,8 +3,8 @@ version: '3.3'
 # 如需配置变量，请在environment中进行变量配置
 services:
   api:
-    image: link-wechat
-    container_name: link-wechat
+    image: linkwechat
+    container_name: linkwechat
     environment:
       - JAVA_OPTS=-Xms4096m -Xmx4096m -Duser.timezone=Asia/Shanghai
       - TZ=Asia/Shanghai
