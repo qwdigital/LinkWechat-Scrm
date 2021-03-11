@@ -1,5 +1,4 @@
 <script>
-import { getUserInfo } from '@/api/common'
 import { getTypeList } from '@/api/chat'
 import List from './List'
 export default {
@@ -13,51 +12,18 @@ export default {
       loading: false,
       finished: false,
       show: false,
-      userId: '',
+      // userId: this.$store.state.userId,
     }
   },
   watch: {},
-  computed: {},
-  beforeCreate() {
-    // http://106.13.201.219/?auth_code=xxx#/authWehatCallback
-    // console.log('routerbeforeCreate', this.$route);
-    // let auth_code = location.search
-    //   .slice(1)
-    //   .split('&')[0]
-    //   .split('=')[1]
-    // if (!auth_code) {
-    //   this.$toast('未获得授权')
-    //   return
-    // }
-    // getUserInfo(auth_code)
-    //   .then(({ data }) => {
-    //     this.userId = data.userId
-    //     this.$toast('userId:' + this.userId)
-    //   })
-    //   .catch((err) => {
-    //     this.$toast('err:' + err)
-    //   })
+  computed: {
+    userId() {
+      return this.$store.state.userId
+    },
   },
+  beforeCreate() {},
   created() {
-    let auth_code = location.search
-      .slice(1)
-      .split('&')[0]
-      .split('=')[1]
-    if (!auth_code) {
-      this.$toast('未获得授权')
-      return
-    }
-    getUserInfo(auth_code)
-      .then(({ data }) => {
-        this.userId = data.userId
-        // this.$toast('userId:' + this.userId)
-      })
-      .catch((err) => {
-        Dialog.confirm({
-          title: '标题',
-          message: err,
-        })
-      })
+    // this.$toast('userId:' + this.$store.state.userId)
     this.getList()
   },
   mounted() {},

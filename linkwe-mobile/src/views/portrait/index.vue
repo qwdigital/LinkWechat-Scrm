@@ -333,7 +333,7 @@
 </template>
 
 <script>
-import { getCustomerInfo } from '@/api/portrait' 
+import { getCustomerInfo } from '@/api/portrait'
 export default {
   data() {
     return {
@@ -341,71 +341,136 @@ export default {
       show: false,
       // 客户待办的弹出框开始
       usershow: false,
-      conagency: "", // 待办内容
+      conagency: '', // 待办内容
 
       // 待办日期
-      dateagency: "",
+      dateagency: '',
       dateshow: false,
       minDate: new Date(2021, 0, 1),
       maxDate: new Date(2021, 12, 31),
       // 待办时间
-      timeagency: "",
+      timeagency: '',
       starttimeshow: false,
       endtimeshow: false,
-      currentTime: "12:00",
-      startTime: "",
-      endTime: "",
+      currentTime: '12:00',
+      startTime: '',
+      endTime: '',
       // 客户待办的弹出框结束
 
-      actions: [{ name: "选项一" }, { name: "选项二" }, { name: "选项三" }],
+      actions: [{ name: '选项一' }, { name: '选项二' }, { name: '选项三' }],
       // 步骤条
       active: -1,
       // 客户轨迹
       // 待办动态
       todonewsshow: false,
       // 接口开始
-      externalUserid: "", // 客户Id
-      userid: "", // 员工Id
-
-    };
+      externalUserid: '', // 客户Id
+      userId: '', // 员工Id
+    }
+  },
+  watch: {
+    '$store.state.userId'(val) {
+      this.userId = val
+      this.getDetail()
+    },
   },
   methods: {
+    getDetail() {
+      this.$toast.loading({
+        message: '正在加载...',
+        duration: 0,
+        forbidClick: true,
+      })
+      let entry = undefined
+      let _this = this
+      wx.invoke('getContext', {}, function(res) {
+        if (res.err_msg == 'getContext:ok') {
+          entry = res.entry //返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
+          if (
+            ![
+              'single_chat_tools',
+              'group_chat_tools',
+              'contact_profile',
+            ].includes(entry)
+          ) {
+            // _this.$toast.clear()
+            _this.$toast('入口错误：' + entry)
+            return
+          }
+
+          wx.invoke('getCurExternalContact', {}, function(resContact) {
+            if (resContact.err_msg == 'getCurExternalContact:ok') {
+              this.externalUserid = resContact.userId //返回当前外部联系人userId
+              // 获取客户详细信息
+              getCustomerInfo({
+                externalUserid: this.externalUserid,
+                userid: this.userId,
+              })
+                .then(({ data }) => {
+                  _this.$toast.clear()
+                  console.log(data)
+                  _this.$dialog({
+                    message: '获取客户失败：' + JSON.stringify(data),
+                  })
+                })
+                .catch((err) => {
+                  _this.$toast.clear()
+                  console.log(err)
+                  _this.$dialog({
+                    message: '获取客户失败：' + JSON.stringify(err),
+                  })
+                })
+            } else {
+              _this.$toast.clear()
+              //错误处理
+              _this.$dialog({
+                message: '获取客户id失败：' + JSON.stringify(resContact),
+              })
+            }
+          })
+        } else {
+          _this.$toast.clear()
+          //错误处理
+          _this.$dialog({ message: '进入失败：' + JSON.stringify(res) })
+        }
+      })
+    },
     // 添加代办
     // 表单提交
     onSubmit() {},
     // 待办日期
     formatDate(dateagency) {
       return `${dateagency.getFullYear()}-${dateagency.getMonth() +
-        1}-${dateagency.getDate()}`;
+        1}-${dateagency.getDate()}`
     },
     onConfirm(dateagency) {
-      this.dateshow = false;
-      this.dateagency = this.formatDate(dateagency);
+      this.dateshow = false
+      this.dateagency = this.formatDate(dateagency)
     },
     // 待办时间
     timecancel() {
-      this.starttimeshow = false;
+      this.starttimeshow = false
     },
     starttimeconfirm(value) {
-      this.startTime = value;
-      this.starttimeshow = false;
-      this.endtimeshow = true;
+      this.startTime = value
+      this.starttimeshow = false
+      this.endtimeshow = true
     },
     endtimeconfirm(value) {
-      this.endTime = value;
-      this.endtimeshow = false;
-      let time = "";
+      this.endTime = value
+      this.endtimeshow = false
+      let time = ''
       if (this.startTime > this.endTime) {
-        time = this.startTime;
-        this.startTime = this.endTime;
-        this.endTime = time;
+        time = this.startTime
+        this.startTime = this.endTime
+        this.endTime = time
       }
       // console.log(this.startTime, this.endTime);
-      this.endtimeshow = false;
-      this.timeagency = this.formatTime();
+      this.endtimeshow = false
+      this.timeagency = this.formatTime()
     },
     formatTime() {
-      return `${this.startTime}-${this.endTime}`;
+      return `${this.startTime}-${this.endTime}`
     },
     // 待办动态
     // 点击删除按钮
@@ -413,44 +478,32 @@ export default {
 
     goRoute() {
       this.$router.push({
-        path: "/detail",
+        path: '/detail',
         query: {
           //   type
         },
-      });
+      })
     },
     detailGoRoute() {
       this.$router.push({
-        path: "/community",
+        path: '/community',
         query: {
           //   type
         },
-      });
+      })
     },
     // 第一层标签
     userLabel() {
-      console.log(123);
+      console.log(123)
     },
     // 第二层标签
     changeLabel() {
-      console.log(456);
+      console.log(456)
     },
     saveInfo() {},
   },
-  created() {
-    // 获取客户详细信息
-    getCustomerInfo({
-      externalUserid: this.externalUserid,
-      userid: this.userid,
-    })
-      .then(({ data }) => {
-        console.log(data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  },
-};
+  created() {},
+}
 </script>
 
 <style lang="less" scoped>

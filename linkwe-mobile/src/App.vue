@@ -1,45 +1,68 @@
 <script>
+import { getUserInfo } from '@/api/common'
 import { getAgentTicket, getAppTicket } from '@/api/common'
+import { param2Obj } from '@/utils/index'
 export default {
   name: 'App',
   data() {
     return {
-      appId: '',
-      agentId: '1000005',
+      corpId: '',
+      agentId: '',
     }
   },
-  created() {},
+  async created() {
+    // http://106.13.201.219/?code=xxx&state=linkwechat#/route
+    // console.log('routerbeforeCreate', this.$route);
+    // this.$dialog({ message: 'url' + JSON.stringify(window.location) })
+    let query = param2Obj(window.location.search)
+    let code = query.code
+    this.corpId = query.corpId
+    this.agentId = query.agentId
+    if (!code) {
+      this.$toast('未获得授权')
+      return
+    }
+    let { data } = await getUserInfo(code, query.agentId)
+    this.$store.state.userId = data.userId
+    // this.$toast('userId:' + this.$store.state.userId)
+  },
   watch: {
     // 通过config接口注入权限验证配置
     // 所有需要使用JS-SDK的页面必须先注入配置信息，否则将无法调用（同一个url仅需调用一次，对于变化url的SPA（single-page application）的web app可在每次url变化时进行调用）
-    // $route() {
-    //   this.wxConfig()
-    // },
+    $route() {
+      this.wxConfig()
+    },
   },
   methods: {
     wxConfig() {
-      getAgentTicket(window.location.href.split('#')[0]).then(({ data }) => {
-        let { timestamp, nonceStr, signature } = data
-        wx.agentConfig({
-          debug: true,
-          corpid: this.appId, // 必填，企业微信的corpid，必须与当前登录的企业一致
-          agentid: this.agentId, // 必填，企业微信的应用id （e.g. 1000247）
-          timestamp, // 必填，生成签名的时间戳
-          nonceStr, // 必填，生成签名的随机串
-          signature, // 必填，签名，见附录-JS-SDK使用权限签名算法
-          jsApiList: ['sendChatMessage', 'getContext'], //必填
-          success: (res) => {
-            // 回调
-            // this.$toast('agentId成功:')
-          },
-          fail: (res) => {
-            this.$toast('agentId失败:' + JSON.stringify(res))
-            if (res.errMsg.indexOf('function not exist') > -1) {
-              alert('版本过低请升级')
-            }
-          },
-        })
-      })
+      getAgentTicket(window.location.href.split('#')[0], this.agentId).then(
+        ({ data }) => {
+          let { timestamp, nonceStr, signature } = data
+          wx.agentConfig({
+            debug: true,
+            corpid: this.corpId, // 必填，企业微信的corpid，必须与当前登录的企业一致
+            agentid: this.agentId, // 必填，企业微信的应用id （e.g. 1000247）
+            timestamp, // 必填，生成签名的时间戳
+            nonceStr, // 必填，生成签名的随机串
+            signature, // 必填，签名，见附录-JS-SDK使用权限签名算法
+            jsApiList: [
+              'sendChatMessage',
+              'getContext',
+              'getCurExternalContact',
+            ], //必填
+            success: (res) => {
+              // 回调
+              // this.$toast('agentId成功:')
+            },
+            fail: (res) => {
+              this.$toast('agentId失败:' + JSON.stringify(res))
+              if (res.errMsg.indexOf('function not exist') > -1) {
+                alert('版本过低请升级')
+              }
+            },
+          })
+        }
+      )
     },
     // 丢弃
     // _wxConfig() {
@@ -49,7 +72,7 @@ export default {
     //     wx.config({
     //       beta: true, // 必须这么写，否则wx.invoke调用形式的jsapi会有问题
     //       debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-    //       appId: this.appId, // 必填，企业微信的corpID
+    //       corpId: this.corpId, // 必填，企业微信的corpID
     //       timestamp, // 必填，生成签名的时间戳
     //       nonceStr, // 必填，生成签名的随机串
     //       signature, // 必填，签名，见 附录-JS-SDK使用权限签名算法
@@ -60,7 +83,7 @@ export default {
     //       getAgentTicket(window.location.href).then(({ data }) => {
     //         let { timestamp, nonceStr, signature } = data
     //         wx.agentConfig({
-    //           corpid: this.appId, // 必填，企业微信的corpid，必须与当前登录的企业一致
+    //           corpid: this.corpId, // 必填，企业微信的corpid，必须与当前登录的企业一致
     //           agentid: this.agentId, // 必填，企业微信的应用id （e.g. 1000247）
     //           timestamp, // 必填，生成签名的时间戳
     //           nonceStr, // 必填，生成签名的随机串
