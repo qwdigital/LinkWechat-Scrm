@@ -1,13 +1,15 @@
 <template>
   <div class="takecontent">
     <ul>
+  
       <li v-for="(item,index) in allChat" :key="index">
         <!-- <span v-if="item.fromInfo.name">{{item.fromInfo.name}}</span> -->
         <div :style="{'color':item.action=='send'?'#199ed8':'#999'}"><span v-if="item.fromInfo">{{item.fromInfo.name}}</span>  <span
             :style="{'color':item.action=='send'?'#199ed8':'#999'}">{{parseTime(item.msgtime)}}</span></div>
-        <div v-if="item.msgtype=='text'" class="msgtypetext">
+        <div v-if="item.msgtype=='text'" class="msgtypetext"  >
           {{item.text.content}}
         </div>
+        
         <div v-else-if="item.msgtype=='image'" class="msgtypeimg">
           <img :src="item.image.attachment" @click="showImg(item)">
         </div>
@@ -24,12 +26,15 @@
         <div v-else-if="item.msgtype=='video'" class="msgtypevideo">
           <i class="el-icon-video-play" style=" font-size: 40px;  color: #199ed8;" @click="play(item,'video')"></i>
         </div>
-
-        <div v-else-if="item.msgtype=='location'" class="msgtypecard ">
-          <div class="card_name"></div>
-          <div class="card_foot">{{item.location.address}}</div>
+        <div v-else-if="item.msgtype=='location'" class="msgtypecard" >
+          <div class="card_name">
+            <el-amap ref="map" vid="amapDemo"  :center="[item.location.longitude, item.location.latitude]" :zoom="zoom"  class="amap-demo" style="pointer-events: none;">
+             <el-amap-marker :position="[item.location.longitude, item.location.latitude]"></el-amap-marker>
+           </el-amap>
+          </div>
+          <div class="card_foot" >{{item.location.address}}</div>
         </div>
-        <div v-else-if="item.msgtype=='weapp'" class="msgtypecard ">
+        <div v-else-if="item.msgtype=='weapp'" class="msgtypecard">
           <div class="card_name"></div>
           <div class="card_foot">小程序</div>
         </div>
@@ -69,7 +74,7 @@
 
 <script>
 
-
+    import { AMapManager } from 'vue-amap';
   import 'video.js/dist/video-js.css'
   import 'vue-video-player/src/custom-theme.css'
   
@@ -78,14 +83,16 @@
     yearMouthDay
   } from '@/utils/common.js'
   export default {
-  
+  components:{AMapManager},
     props: {
       allChat: {
         type: Array,
         defluat: () => []
       }
     },
-
+  mounted(){
+   
+  },
     data() {
       return {
         dia: false,
@@ -111,10 +118,28 @@
           width: document.documentElement.clientWidth,
           height:'475',
           notSupportedMessage: '此视频暂无法播放，请稍后再试' //允许覆盖Video.js无法播放媒体源时显示的默认信息。
-        }
+        },
+        
+        
+           zoom: 15,
+           center: [117.148118, 36.660223],
+            markers: [
+            {
+              position: [117.148118, 36.660223],
+              visible: false,
+              draggable: false,
+             
+            }
+          ]
+        
+         
+        
+    
       }
     },
     methods: {
+       
+     
       playVideo(e){
          this.vioceSrc=[e.voice.attachment]
          this.diavioce=true;
@@ -184,6 +209,8 @@
     }
 
     .card_name {
+      width: 320px;
+      height: 105px;
       line-height: 80px;
       text-indent: 10px;
     }
@@ -208,7 +235,7 @@
     }
 
     .msgtypecard {
-      width: 300px;
+      width: 320px;
       height: 140px;
       margin: 10px;
       border-radius: 8px;

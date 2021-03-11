@@ -280,7 +280,6 @@
       chatFn(data) {
         this.chat = data;
         if (data) {
-          console.log(122132)
             this.activeNameThreeClick()
         }
       },

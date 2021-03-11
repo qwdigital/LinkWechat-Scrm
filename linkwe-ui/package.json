@@ -66,6 +66,7 @@
     "video.js": "^7.11.4",
     "videojs-contrib-hls": "^5.15.0",
     "vue": "2.6.10",
+    "vue-amap": "^0.5.10",
     "vue-count-to": "1.0.13",
     "vue-cropper": "0.4.9",
     "vue-quill-editor": "3.0.6",
