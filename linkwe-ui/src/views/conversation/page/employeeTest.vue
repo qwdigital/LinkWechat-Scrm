@@ -98,8 +98,8 @@
                     </template>
                   </el-table-column>
                   <el-table-column prop="action" label="操作">
-                    <template >
-                      <el-button type="text" size="small">下载</el-button>
+                    <template slot-scope="scope">
+                      <el-button type="text" size="small" @click="downloadFile(scope.row)">下载</el-button>
                       <el-button type="text" size="small">查看</el-button>
                     </template>
                   </el-table-column>
@@ -150,7 +150,7 @@
     content
   } from '@/api/content.js'
   import {
-    yearMouthDay
+    yearMouthDay,download
   } from '@/utils/common.js'
   export default {
     components: {
@@ -197,6 +197,16 @@
       this.getTree()
     },
     methods: {
+      downloadFile(e){  
+      const url = window.URL.createObjectURL(new Blob([e.file.attachment],{type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8'}))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download',e.file.filename) // 下载文件的名称及文件类型后缀
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link); // 下载完成移除元素
+      window.URL.revokeObjectURL(url); // 释放掉blob对象
+      },
       filterSize(size) {
         if (!size) return '';
         if (size < this.pow1024(1)) return size + ' B';
