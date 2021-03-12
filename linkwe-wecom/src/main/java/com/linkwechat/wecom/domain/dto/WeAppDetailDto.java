@@ -26,12 +26,6 @@ public class WeAppDetailDto extends WeResultDto{
     private Integer isreportenter;
     //应用主页url
     private String home_url;
-
     //企业应用头像的mediaid，通过素材管理接口上传图片获得mediaid，上传后会自动裁剪成方形和圆形两个头像
     private String logo_mediaid;
-
-
-
-
-
 }

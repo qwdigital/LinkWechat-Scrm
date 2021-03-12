@@ -20,6 +20,7 @@ import com.linkwechat.wecom.service.IWeGroupCodeActualService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -58,6 +59,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
     private IWeGroupCodeActualService weGroupCodeActualService;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int add(WeCommunityNewGroupDto communityNewGroupDto) {
 
         //检查群活码是否存在
@@ -70,6 +72,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         //生成员工活码信息
         WeExternalContactDto.WeContactWay weContactWay = weEmpleCodeService.getWeContactWay(weEmpleCode);
         WeExternalContactDto qrCode = weEmpleCodeService.getQrCode(weContactWay);
+
 
         //保存新客自动拉群信息
         WeCommunityNewGroup communityNewGroup = new WeCommunityNewGroup();
@@ -166,6 +169,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int updateWeCommunityNewGroup(WeCommunityNewGroupDto communityNewGroupDto) {
 
         //检查群活码是否存在
@@ -173,11 +177,10 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         if (null == weGroupCode) {
             throw new WeComException("群活码不存在！");
         }
-
         //查询新客自动拉群信息
-        WeCommunityNewGroup communityNewGroup = weCommunityNewGroupMapper.selectOne(new LambdaQueryWrapper<WeCommunityNewGroup>()
-                .eq(WeCommunityNewGroup::getGroupCodeId, communityNewGroupDto.getGroupCodeId()));
-//        WeCommunityNewGroup communityNewGroup = weCommunityNewGroupMapper.selectById(communityNewGroupDto.getGroupCodeId());
+//        WeCommunityNewGroup communityNewGroup = weCommunityNewGroupMapper.selectOne(new LambdaQueryWrapper<WeCommunityNewGroup>()
+//                .eq(WeCommunityNewGroup::getGroupCodeId, communityNewGroupDto.getGroupCodeId()));
+        WeCommunityNewGroup communityNewGroup = weCommunityNewGroupMapper.selectById(communityNewGroupDto.getNewGroupId());
         if (null == communityNewGroup) {
             throw new WeComException("信息不存在！");
         }
@@ -192,7 +195,6 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         communityNewGroup.setEmpleCodeName(communityNewGroupDto.getActivityScene());
         communityNewGroup.setDelFlag(0);
         communityNewGroup.setCreateTime(new Date());
@@ -207,11 +209,11 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         if (this.updateById(communityNewGroup)) {
             if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
                 weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setEmpleCodeId(communityNewGroup.getNewGroupId()));
-                iWeEmpleCodeUseScopService.updateBatchById(weEmpleCode.getWeEmpleCodeUseScops());
+                iWeEmpleCodeUseScopService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeUseScops());
             }
             if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeTags())) {
                 weEmpleCode.getWeEmpleCodeTags().forEach(item -> item.setEmpleCodeId(communityNewGroup.getNewGroupId()));
-                weEmpleCodeTagService.updateBatchById(weEmpleCode.getWeEmpleCodeTags());
+                weEmpleCodeTagService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeTags());
             }
         }
 

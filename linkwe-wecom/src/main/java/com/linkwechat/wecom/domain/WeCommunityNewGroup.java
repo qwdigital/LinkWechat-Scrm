@@ -1,5 +1,7 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import io.swagger.annotations.ApiModel;
@@ -14,11 +16,13 @@ import lombok.Data;
  */
 @ApiModel
 @Data
+@TableName("we_community_new_group")
 public class WeCommunityNewGroup extends BaseEntity {
 
     /**
      *主键ID
      */
+    @TableId
     private Long newGroupId= SnowFlakeUtil.nextId();
 
     /**

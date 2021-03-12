@@ -19,7 +19,6 @@ public interface WeAppClient {
     @Request(url = "/agent/list")
     WeAppDto  findAgentList();
 
-
     /**
      * 根据应用id获取应用详情
      * @param agentid
@@ -28,7 +27,6 @@ public interface WeAppClient {
     @Request(url = "/agent/get")
     WeAppDetailDto  findAgentById(@Query("agentid") Integer agentid);
 
-
     /**
      * 设置应用
      * @param weAppDetailDto
@@ -36,6 +34,4 @@ public interface WeAppClient {
      */
     @Request(url = "/agent/set")
     WeResultDto updateAgentById(@DataObject WeAppDetailDto weAppDetailDto);
-
-
 }
