@@ -18,14 +18,18 @@ public interface WeCommunityNewGroupMapper extends BaseMapper<WeCommunityNewGrou
     /**
      * 查询新客自动拉群列表
      *
-     * @param communityNewGroup 搜索信息
-     * @return {@link WeCommunityNewGroup}s
+     * @param employCodeName 员工名称
+     * @param createBy       创建人
+     * @param beginTime      开始时间
+     * @param endTime        结束时间
+     * @return {WeCommunityNewGroupVo}s 列表
      */
-    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(@Param("empleCodeName") String empleCodeName, @Param("createBy") String createBy
-            ,@Param("beginTime") String beginTime, @Param("endTime") String endTime);
+    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(@Param("employCodeName") String employCodeName, @Param("createBy") String createBy
+            , @Param("beginTime") String beginTime, @Param("endTime") String endTime);
 
     /**
      * 获取新客自动拉群详细信息
+     *
      * @param newGroupId 主键id
      * @return {@link WeCommunityNewGroupVo} 自动拉群信息
      */

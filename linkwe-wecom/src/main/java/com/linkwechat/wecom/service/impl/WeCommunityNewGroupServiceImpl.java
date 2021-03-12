@@ -85,6 +85,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
         if (qrCode != null) {
             communityNewGroup.setQrCode(qrCode.getQr_code());
+            communityNewGroup.setConfigId(qrCode.getConfig_id());
         }
 
         if (this.save(communityNewGroup)) {
@@ -112,6 +113,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         weEmpleCode.setWeEmpleCodeTags(communityNewGroupDto.getWeEmpleCodeTags());
         weEmpleCode.setQrCode(communityNewGroupDto.getQrCode());
         weEmpleCode.setMediaId(communityNewGroupDto.getMediaId());
+        weEmpleCode.setConfigId(communityNewGroupDto.getConfigId());
         return weEmpleCode;
     }
 
@@ -173,8 +175,8 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         }
 
         //查询新客自动拉群信息
-        WeCommunityNewGroup communityNewGroup =  weCommunityNewGroupMapper.selectOne(new LambdaQueryWrapper<WeCommunityNewGroup>()
-        .eq(WeCommunityNewGroup::getGroupCodeId,communityNewGroupDto.getGroupCodeId()));
+        WeCommunityNewGroup communityNewGroup = weCommunityNewGroupMapper.selectOne(new LambdaQueryWrapper<WeCommunityNewGroup>()
+                .eq(WeCommunityNewGroup::getGroupCodeId, communityNewGroupDto.getGroupCodeId()));
 //        WeCommunityNewGroup communityNewGroup = weCommunityNewGroupMapper.selectById(communityNewGroupDto.getGroupCodeId());
         if (null == communityNewGroup) {
             throw new WeComException("信息不存在！");

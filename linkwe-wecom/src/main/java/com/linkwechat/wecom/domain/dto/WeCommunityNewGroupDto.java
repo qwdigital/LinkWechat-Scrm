@@ -59,6 +59,12 @@ public class WeCommunityNewGroupDto {
     private Boolean isJoinConfirmFriends;
 
     /**
+     * 新增联系方式的配置id
+     */
+    @ApiModelProperty("新增联系方式的配置id")
+    private String configId;
+
+    /**
      * 二维码链接
      */
     @ApiModelProperty("二维码链接")
