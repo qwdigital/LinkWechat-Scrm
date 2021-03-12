@@ -17,29 +17,29 @@ export default {
       // 表单参数
       form: {
         activityScene: '',
-        groupCodeId: 0,
-        isJoinConfirmFriends: true,
+        groupCodeId: undefined,
+        isJoinConfirmFriends: 0,
         // mediaId: 0,
         qrCode: '',
         weEmpleCodeTags: [
-          {
-            delFlag: 0,
-            empleCodeId: 0,
-            id: 0,
-            tagId: 'string',
-            tagName: 'string',
-          },
+          // {
+          //   delFlag: 0,
+          //   empleCodeId: 0,
+          //   id: 0,
+          //   tagId: 'string',
+          //   tagName: 'string',
+          // },
         ],
         weEmpleCodeUseScops: [
-          {
-            businessId: 'string',
-            businessIdType: 0,
-            businessName: 'string',
-            delFlag: 0,
-            empleCodeId: 0,
-            id: 0,
-            mobile: 'string',
-          },
+          // {
+          //   businessId: 'string',
+          //   businessIdType: 0,
+          //   businessName: 'string',
+          //   delFlag: 0,
+          //   empleCodeId: 0,
+          //   id: 0,
+          //   mobile: 'string',
+          // },
         ],
         welcomeMsg: '',
       },
@@ -95,7 +95,7 @@ export default {
     },
     // 选择二维码确认按钮
     submitSelectQrCode(data) {
-      // debugger
+      debugger
       this.form.groupCodeId = data.id
       this.form.qrCode = data.codeUrl
       this.$refs.form.validateField('qrCode')

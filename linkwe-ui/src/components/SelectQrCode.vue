@@ -74,7 +74,7 @@ export default {
 
 <template>
   <el-dialog
-    title="选择素材"
+    :title="title"
     :visible.sync="Pvisible"
     width="650px"
     append-to-body
