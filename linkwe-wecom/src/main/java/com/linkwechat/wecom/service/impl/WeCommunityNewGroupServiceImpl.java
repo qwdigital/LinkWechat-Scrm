@@ -128,6 +128,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
             List<Long> newGroupIdList = weCommunityNewGroupVos.stream().map(WeCommunityNewGroupVo::getNewGroupId).collect(Collectors.toList());
             List<WeEmpleCodeUseScop> useScopList = iWeEmpleCodeUseScopService.selectWeEmpleCodeUseScopListByIds(newGroupIdList);
             List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.selectWeEmpleCodeTagListByIds(newGroupIdList);
+
             weCommunityNewGroupVos.forEach(newGroup -> {
                 List<WeGroupCodeActual> weGroupCodeActuals = getWeGroupCodeActuals(newGroup);
                 newGroup.setWeGroupUserScops(weGroupCodeActuals);
@@ -202,8 +203,8 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         communityNewGroup.setActivityScene(communityNewGroupDto.getActivityScene());
         communityNewGroup.setWelcomeMsg(communityNewGroupDto.getWelcomeMsg());
         communityNewGroup.setIsJoinConfirmFriends(communityNewGroupDto.getIsJoinConfirmFriends());
-        communityNewGroup.setMediaId(communityNewGroup.getMediaId());
-        communityNewGroup.setGroupCodeId(communityNewGroup.getGroupCodeId());
+        communityNewGroup.setMediaId(communityNewGroupDto.getMediaId());
+        communityNewGroup.setGroupCodeId(communityNewGroupDto.getGroupCodeId());
 
         //更新新客自动拉群信息
         if (this.updateById(communityNewGroup)) {
