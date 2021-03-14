@@ -95,7 +95,14 @@ public class WeTaskFissionController extends BaseController {
     @Log(title = "任务宝", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     public AjaxResult add(@RequestBody WeTaskFission weTaskFission) {
-        return toAjax(weTaskFissionService.insertWeTaskFission(weTaskFission));
+        Long fissionTaskId = weTaskFissionService.insertWeTaskFission(weTaskFission);
+        //TODO 根据需要返回VO
+        if (fissionTaskId != null) {
+            JSONObject json = new JSONObject();
+            json.put("id", fissionTaskId);
+            return AjaxResult.success(json.toJSONString());
+        }
+        return AjaxResult.error();
     }
 
     /**

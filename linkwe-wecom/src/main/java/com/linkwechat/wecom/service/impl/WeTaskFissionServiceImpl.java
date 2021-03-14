@@ -30,10 +30,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -103,7 +103,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
      */
     @Override
     @Transactional
-    public int insertWeTaskFission(WeTaskFission weTaskFission) {
+    public Long insertWeTaskFission(WeTaskFission weTaskFission) {
         weTaskFission.setCreateBy(SecurityUtils.getUsername());
         weTaskFission.setCreateTime(DateUtils.getNowDate());
         groupQrcodeHandler(weTaskFission);
@@ -118,7 +118,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
                 }
             }
         }
-        return insertResult;
+        return weTaskFission.getId();
     }
 
     /**
