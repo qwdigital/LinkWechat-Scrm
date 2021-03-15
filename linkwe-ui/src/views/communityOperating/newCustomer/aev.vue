@@ -95,7 +95,7 @@ export default {
     },
     // 选择二维码确认按钮
     submitSelectQrCode(data) {
-      debugger
+      // debugger
       this.form.groupCodeId = data.id
       this.form.qrCode = data.codeUrl
       this.$refs.form.validateField('qrCode')

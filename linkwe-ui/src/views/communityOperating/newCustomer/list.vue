@@ -77,7 +77,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map((item) => item.id)
+      this.ids = selection.map((item) => item.newGroupId)
     },
     /** 删除按钮操作 */
     remove(id) {
@@ -98,7 +98,7 @@ export default {
     },
     download(data) {
       let name = data.activityScene + '-' + data.newGroupId + '.png'
-      download(id).then((res) => {
+      download(data.newGroupId).then((res) => {
         if (res != null) {
           let blob = new Blob([res], { type: 'application/zip' })
           let url = window.URL.createObjectURL(blob)
@@ -111,8 +111,8 @@ export default {
       })
     },
     /** 批量下载 */
-    downloadBatch(qrCode) {
-      this.$confirm('是否确认下载所有图片吗?', '警告', {
+    downloadBatch() {
+      this.$confirm('是否确认下载所有活码图片吗?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
@@ -209,9 +209,15 @@ export default {
         </el-tooltip>
       </div>
       <div>
-        <el-button type="primary" @click="download()">批量下载</el-button>
+        <el-button
+          type="primary"
+          :disabled="!ids.length"
+          @click="downloadBatch()"
+          >批量下载</el-button
+        >
         <el-button
           v-hasPermi="['customerManage:customer:export']"
+          :disabled="!ids.length"
           type="cyan"
           @click="remove()"
           >批量删除</el-button
