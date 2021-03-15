@@ -1,143 +1,22 @@
-<script>
-import { getDetail, add, update, getQrcode } from '@/api/drainageCode/staff'
-import { getList } from '@/api/drainageCode/welcome'
-import PhoneDialog from '@/components/PhoneDialog'
-import SelectUser from '@/components/SelectUser'
-import SelectTag from '@/components/SelectTag'
-import SelectMaterial from '@/components/SelectMaterial'
-export default {
-  components: { PhoneDialog, SelectTag, SelectUser, SelectMaterial },
-  data() {
-    return {
-      dialogVisibleSelectUser: false,
-      dialogVisibleSelectTag: false,
-      dialogVisibleSelectMaterial: false,
-      dialogVisibleSelectWel: false,
-      // 遮罩层
-      loading: false,
-      // 表单参数
-      form: {
-        codeType: 1,
-        qrCode: '',
-        isJoinConfirmFriends: 0,
-        weEmpleCodeTags: [],
-        weEmpleCodeUseScops: [],
-      },
-      materialSelected: '',
-      welQuery: { welcomeMsg: '' },
-      welLoading: false,
-      welList: [],
-      welSelected: {},
-      type: { 1: '单人', 2: '多人', 3: '批量单人' },
-      activeName: '',
-    }
-  },
-  created() {
-    let id = this.$route.query.id
-    id && this.getDetail(id)
-  },
-  methods: {
-    /** 获取详情 */
-    getDetail(id) {
-      this.loading = true
-      getDetail(id).then(({ data }) => {
-        this.form = data
-        this.materialSelected =
-          data.weMaterial == null ? '' : data.weMaterial.materialUrl
-        this.loading = false
-      })
-    },
-    /** 获取欢迎语列表 */
-    getWelList() {
-      this.welLoading = true
-      getList(this.welQuery).then(({ rows }) => {
-        this.welList = rows
-        this.$refs.table.$forceUpdate()
-        this.welLoading = false
-      })
-    },
-    codeTypeChange() {
-      this.form.weEmpleCodeUseScops = []
-      this.form.qrCode = ''
-    },
-    // 选择人员变化事件
-    selectedUser(users) {
-      let params = { userIds: [], departmentIds: [] }
-      this.form.weEmpleCodeUseScops = users.map((d) => {
-        d.userId && params.userIds.push(d.userId)
-        d.id && params.departmentIds.push(d.id)
-        return {
-          businessId: d.id || d.userId,
-          businessName: d.name,
-          businessIdType: d.userId ? 2 : 1,
-        }
-      })
-      params.userIds += ''
-      params.departmentIds += ''
-      getQrcode(params).then(({ data }) => {
-        this.$set(this.form, 'qrCode', data.qr_code)
-      })
-    },
-    submitSelectTag(data) {
-      this.form.weEmpleCodeTags = data.map((d) => ({
-        tagId: d.tagId,
-        tagName: d.name,
-      }))
-    },
-    // 选择素材确认按钮
-    submitSelectMaterial(text, image, file) {
-      this.form.mediaId = image.id
-      this.materialSelected = image.materialUrl
-      this.dialogVisibleSelectMaterial = false
-    },
-    removeMaterial() {
-      this.form.mediaId = ''
-      this.materialSelected = ''
-    },
-    // 欢迎语确认按钮
-    selectWelcome() {
-      this.form.welcomeMsg = this.welSelected.welcomeMsg
-      this.form.mediaId = this.welSelected.mediaId
-      this.dialogVisibleSelectWel = false
-    },
-    submit() {
-      if (!this.form.weEmpleCodeUseScops.length) {
-        this.msgError('请至少选择一名使用员工')
-        return
-      }
-      this.loading = true
-      ;(this.form.id ? update : add)(this.form)
-        .then(({ data }) => {
-          this.msgSuccess('操作成功')
-          this.loading = false
-          this.$router.back()
-        })
-        .catch(() => {
-          this.loading = false
-        })
-    },
-  },
-}
-</script>
 <template>
   <div class="wrap" v-loading="loading">
     <el-form :model="form" ref="form" label-width="100px">
-      <el-form-item label="规则名称" prop="activityScene">
+      <el-form-item label="规则名称" prop="ruleName">
         <el-input
-          v-model="form.activityScene"
+          v-model="form.ruleName"
           maxlength="30"
           show-word-limit
           placeholder="请输入"
           clearable
         />
       </el-form-item>
+
       <el-form-item label="执行群聊">
-        <!-- closable -->
         <el-tag
           size="medium"
-          v-for="(item, index) in form.weEmpleCodeUseScops"
+          v-for="(group, index) in customerGroups"
           :key="index"
-          >{{ item.businessName }}</el-tag
+          >{{ group.groupName }}</el-tag
         >
         <el-button
           type="primary"
@@ -145,14 +24,14 @@ export default {
           class="ml10"
           icon="el-icon-plus"
           size="mini"
-          @click="dialogVisibleSelectUser = true"
-          >{{ form.weEmpleCodeUseScops.length ? '修改' : '添加' }}</el-button
+          @click="dialogVisibleSelectCustomerGroup = true"
+          >{{ customerGroups.length ? '修改' : '添加' }}</el-button
         >
       </el-form-item>
 
-      <el-form-item label="内容名称" prop="isJoinConfirmFriends">
+      <el-form-item label="内容名称" prop="title">
         <el-input
-          v-model="form.welcomeMsg"
+          v-model="form.title"
           maxlength="220"
           show-word-limit
           :autosize="{ minRows: 5, maxRows: 20 }"
@@ -160,7 +39,8 @@ export default {
           clearable
         />
       </el-form-item>
-      <el-form-item label="执行时间" prop="codeType">
+
+      <el-form-item label="执行时间">
         <el-date-picker
           v-model="dateRange"
           value-format="yyyy-MM-dd"
@@ -172,30 +52,96 @@ export default {
           align="right"
         ></el-date-picker>
       </el-form-item>
-      <el-form-item label="消息内容" prop="activityScene">
+
+      <el-form-item label="消息内容">
         <div class="content-left">
           <el-button class="create" @click="goRoute">新建素材</el-button>
+
           <el-tabs v-model="activeName">
             <el-tab-pane name="0">
               <span slot="label"> <i class="el-icon-date"></i> 文本 </span>
               <el-input
-                v-model="form.textMessage"
+                v-model="form.content"
                 type="textarea"
                 maxlength="220"
                 show-word-limit
                 :autosize="{ minRows: 10, maxRows: 50 }"
                 placeholder="请输入"
+                class="mb8"
               ></el-input>
+
+              <div
+                v-for="text in textMaterialList"
+                :key="text.id"
+                class="text-wrapper"
+              >
+                <div
+                  class="content overflow-ellipsis"
+                >
+                  {{ text.content }}
+                </div>
+
+                <el-button
+                  icon="el-icon-close"
+                  class="remove-btn"
+                  size="mini"
+                  @click="removeTextMaterial(text)"
+                >
+                </el-button>
+              </div>
             </el-tab-pane>
+
             <el-tab-pane name="1">
               <span slot="label"> <i class="el-icon-date"></i> 图片 </span>
-              <el-image
-                v-if="form.imageMessage"
-                style="width: 200px;"
-                :src="form.imageMessage"
-                fit="fit"
-              ></el-image>
+
+              <div
+                v-for="image in imageMaterialList"
+                :key="image.id"
+                class="image-wrapper"
+              >
+                <el-image
+                  :src="image.materialUrl"
+                  fit="fit"
+                >
+                </el-image>
+
+                <el-button
+                  icon="el-icon-close"
+                  class="remove-btn"
+                  size="mini"
+                  @click="removeImageMaterial(image)"
+                >
+                </el-button>
+              </div>
+
+              <div
+                v-for="url in form.picList"
+                :key="url"
+                class="image-wrapper"
+              >
+                <el-image
+                  :src="url"
+                  fit="fit"
+                >
+                </el-image>
+
+                <el-button
+                  icon="el-icon-close"
+                  class="remove-btn"
+                  size="mini"
+                  @click="removeImage(url)"
+                >
+                </el-button>
+              </div>
+
+              <upload
+                :fileUrl.sync="uploadImageUrl"
+                class="image-uploader"
+              >
+                <i class="el-icon-plus uploader-icon"></i>
+              </upload>
             </el-tab-pane>
+
             <el-button
               type="primary"
               class="mt20"
@@ -217,34 +163,34 @@ export default {
       <div class="tip">欢迎语样式</div>
 
       <PhoneDialog
-        :message="form.welcomeMsg || '请输入加群引导语'"
-        :isOther="!!materialSelected"
+        :message="form.content || '请输入加群引导语'"
+        :imageList="imageList"
+        :messageList="messageList"
       >
-        <el-image style="border-radius: 6px;" :src="materialSelected" fit="fit">
-        </el-image>
+        <template #image="{ image }">
+          <el-image style="border-radius: 6px;  width: 100px;" :src="image" fit="fit">
+          </el-image>
+        </template>
+        <template #text="{ text }">
+          {{ text }}
+        </template>
       </PhoneDialog>
     </div>
 
-    <!-- 选择使用员工弹窗 -->
-    <SelectUser
-      :key="form.codeType"
-      :visible.sync="dialogVisibleSelectUser"
-      title="选择使用员工"
-      :isOnlyLeaf="form.codeType !== 2"
-      :isSigleSelect="form.codeType == 1"
-      @success="selectedUser"
-    ></SelectUser>
-
-    <!-- 选择标签弹窗 -->
-    <SelectTag
-      :visible.sync="dialogVisibleSelectTag"
-      :selected="form.toTag"
-      @success="submitSelectTag"
-    >
-    </SelectTag>
-
     <!-- 选择素材弹窗 -->
     <SelectMaterial
+      v-if="activeName === '0'"
+      :key="0"
+      :visible.sync="dialogVisibleSelectMaterial"
+      type="0"
+      :showArr="[0]"
+      @success="submitSelectMaterial"
+    >
+    </SelectMaterial>
+
+    <SelectMaterial
+      v-else
+      :key="1"
       :visible.sync="dialogVisibleSelectMaterial"
       type="1"
       :showArr="[1]"
@@ -252,70 +198,277 @@ export default {
     >
     </SelectMaterial>
 
-    <el-dialog
-      key="a"
-      title="选择欢迎语"
-      :visible.sync="dialogVisibleSelectWel"
-      width="500"
+    <!-- 选择客户群聊 -->
+    <SelectCustomerGroup
+      :visible.sync="dialogVisibleSelectCustomerGroup"
+      @success="submitSelectCustomerGroup"
+      :multiSelect="true"
     >
-      <div>
-        <el-input
-          class="welcome-input"
-          placeholder="请输入关键字"
-          v-model="welQuery.welcomeMsg"
-        >
-          <el-button slot="append" @click="getWelList">查询</el-button>
-        </el-input>
-        <el-table
-          ref="table"
-          v-loading="welLoading"
-          :data="welList"
-          :max-height="300"
-          :show-header="false"
-          highlight-current-row
-          @current-change="(val) => (welSelected = val)"
-        >
-          <el-table-column
-            property="welcomeMsg"
-            show-overflow-tooltip
-          ></el-table-column>
-          <el-table-column width="60">
-            <template slot-scope="{ row }">
-              <i
-                v-if="welSelected.id === row.id"
-                class="el-icon-check"
-                style="color: rgb(65, 133, 244); font-size: 25px;"
-              ></i>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-      <div slot="footer">
-        <el-button @click="dialogVisibleSelectWel = false">取 消</el-button>
-        <el-button type="primary" @click="selectWelcome">确 定</el-button>
-      </div>
-    </el-dialog>
+    </SelectCustomerGroup>
   </div>
 </template>
+
+<script>
+import { getDetail, add, update } from '@/api/communityOperating/groupSOP'
+import PhoneDialog from '@/components/PhoneDialog'
+import SelectMaterial from '@/components/SelectMaterial'
+import SelectCustomerGroup from '@/components/SelectCustomerGroup'
+
+export default {
+  components: { PhoneDialog, SelectMaterial, SelectCustomerGroup },
+
+  data() {
+    return {
+      ruleId: '',
+      dialogVisibleSelectMaterial: false,
+      dialogVisibleSelectCustomerGroup: false,
+      // 遮罩层
+      loading: false,
+      // 表单参数
+      form: {
+        ruleName: '',             // 规则名称
+        chatIdList: [],           // 群聊ID
+        title: '',                // 内容标题
+        content: '',              // 内容
+        materialIdList: [],       // 素材ID
+        startExeTime: '',         // 开始执行时间
+        stopExeTime: '',          // 结束执行时间
+        picList: []               // 手动上传图片
+      },
+      dateRange: [],
+      activeName: '',
+      customerGroups: [],
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() < Date.now()
+        }
+      },
+      uploadImageUrl: '',
+      imageMaterialList: [],
+      textMaterialList: []
+    }
+  },
+
+  methods: {
+    /** 获取详情 */
+    getDetail(id) {
+      this.loading = true
+      getDetail(id).then(({ data }) => {
+        this.form = data
+
+        this.dateRange = [this.form.startExeTime, this.form.stopExeTime]
+        this.customerGroups = data.groupList
+
+        this.form.materialIdList = []
+
+        for (let material of data.materialList) {
+          if (material.materialUrl) {
+            this.imageMaterialList.push(material)
+          } else {
+            this.textMaterialList.push(material)
+          }
+
+          this.form.materialIdList.push(material.id)
+        }
+
+        this.loading = false
+      })
+    },
+
+    // 选择素材确认按钮
+    submitSelectMaterial(text, image, file) {
+      text && text.id && !this.form.materialIdList.includes(text.id) && this.form.materialIdList.push(text.id) && this.textMaterialList.push(text)
+      image && image.id && !this.form.materialIdList.includes(image.id) && this.form.materialIdList.push(image.id) && this.imageMaterialList.push(image)
+    },
+
+    // 选择客户群聊确认
+    submitSelectCustomerGroup (groups) {
+      this.customerGroups = groups
+    },
+
+    submit() {
+      if (!this.form.chatIdList.length) {
+        this.msgError('请至少选择一个群聊')
+        return
+      }
+
+      if (this.ruleId) {
+        update(this.ruleId, this.form).then(({ data }) => {
+          this.msgSuccess('操作成功')
+          this.loading = false
+          this.$router.back()
+        }).catch(() => {
+          this.loading = false
+        })
+      } else {
+        add(this.form).then(({ data }) => {
+          this.msgSuccess('操作成功')
+          this.loading = false
+          this.$router.back()
+        }).catch(() => {
+          this.loading = false
+        })
+      }
+    },
+
+    goRoute () {
+      const path = this.activeName === '0' ? '/material/text' : '/material/image'
+
+      this.$router.push({
+        path: path,
+      })
+    },
+
+    removeImage (url) {
+      this.picList.splice(this.picList.indexOf(url), 1)
+    },
+
+    removeImageMaterial (image) {
+      this.imageMaterialList.splice(this.imageMaterialList.indexOf(image), 1)
+      this.form.materialIdList.splice(this.form.materialIdList.indexOf(image.id), 1)
+    },
+
+    removeTextMaterial (text) {
+      this.textMaterialList.splice(this.textMaterialList.indexOf(text), 1)
+      this.form.materialIdList.splice(this.form.materialIdList.indexOf(text.id), 1)
+    }
+  },
+
+  watch: {
+    // 日期选择器数据同步至查询参数
+    dateRange (dateRange) {
+      if (!dateRange || dateRange.length !== 2) {
+        this.form.startExeTime = ''
+        this.form.stopExeTime = ''
+      } else {
+        [ this.form.startExeTime, this.form.stopExeTime ] = dateRange
+      }
+    },
+
+    customerGroups (groups) {
+      this.form.chatIdList = groups.map((g) => g.chatId)
+    },
+
+    uploadImageUrl (url) {
+      if (url) this.form.picList.push(url)
+    }
+  },
+
+  computed: {
+    imageMaterialUrls () {
+      const urls = this.imageMaterialList.map(m => m.materialUrl)
+      return urls
+    },
+
+    messageList () {
+      const texts = this.textMaterialList.map(t => t.content)
+      return texts
+    },
+
+    imageList () {
+      const list = this.form.picList.concat(this.imageMaterialUrls)
+
+      return list
+    }
+  },
+
+  created() {
+    this.ruleId = this.$route.query.id
+    this.ruleId && this.getDetail(this.ruleId)
+  },
+}
+</script>
+
 <style lang="scss" scoped>
-.wrap {
-  display: flex;
-  margin-top: 24px;
-  .el-form {
-    margin-right: 10%;
+  .wrap {
+    display: flex;
+    margin-top: 24px;
+    .el-form {
+      margin-right: 10%;
+    }
   }
-}
-.preview-wrap {
-  line-height: 26px;
-}
-.tip {
-  color: #999;
-}
-.welcome-input {
-  display: table;
-  width: 80%;
-  margin: 0 auto 20px;
-}
-.el-icon-error {
-}
+
+  .preview-wrap {
+    line-height: 26px;
+  }
+
+  .tip {
+    color: #999;
+  }
+
+  .welcome-input {
+    display: table;
+    width: 80%;
+    margin: 0 auto 20px;
+  }
+
+  /deep/ .image-uploader {
+    .uploader-icon {
+      width: 80px;
+      height: 80px;
+      line-height: 80px;
+    }
+
+    .upload-img {
+      width: 80px;
+      height: 80px;
+    }
+  }
+
+  .uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+    border-radius: 6px;
+    border: 1px dashed #d9d9d9;
+  }
+
+  .image-wrapper {
+    width: 100px;
+    position: relative;
+    display: inline-block;
+
+    .remove-btn {
+      top: 2px;
+    }
+  }
+
+  .text-wrapper {
+    width: 100px;
+    position: relative;
+
+    .content {
+      background-color: #e8f4ff;
+      border-color: #d1e9ff;
+      padding: 0 10px;
+      font-size: 12px;
+      border-radius: 4px;
+      color: #1890ff;
+    }
+
+    .remove-btn {
+      top: 5px;
+    }
+  }
+
+  .text-wrapper, .image-wrapper {
+    margin: 5px;
+
+    .remove-btn {
+      position: absolute;
+      right: 2px;
+      padding: 5px;
+      border: none;
+      background: transparent;
+    }
+  }
+
+  .overflow-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 </style>

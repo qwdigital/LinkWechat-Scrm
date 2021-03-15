@@ -1,17 +1,22 @@
 <script>
-import { getList } from '@/api/drainageCode/group'
+import { getList } from '@/api/customer/group'
 
 export default {
   components: {},
   props: {
-    // 添加标签显隐
+    // 选择客户群聊显隐
     visible: {
       type: Boolean,
       default: false,
     },
     title: {
       type: String,
-      default: '选择群活码',
+      default: '选择客户群聊',
+    },
+    // 多选
+    multiSelect: {
+      type: Boolean,
+      default: false
     },
     selected: {
       type: Array,
@@ -24,14 +29,15 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        activityName: '',
-        createBy: '',
+        groupLeader: '',
+        groupName: '',
         beginTime: '',
         endTime: '',
       },
       list: [], // 列表
       total: 0, // 总条数
-      radio: '',
+      selectedGroup: '',
+      multiSelectedGroups: [],
     }
   },
   watch: {
@@ -71,18 +77,24 @@ export default {
           this.loading = false
         })
     },
+
     submit() {
       this.Pvisible = false
-      this.$emit('success', this.radio)
+      this.$emit('success', this.multiSelect ? this.multiSelectedGroups : this.selectedGroup)
     },
+
     setSelected () {
       if (!this.selected.length) return
 
       this.list.forEach((code) => {
         if (code.id == this.selected[0].id) {
-          this.radio = code
+          this.selectedGroup = code
         }
       })
+    },
+
+    handleSelectionChange (val) {
+      this.multiSelectedGroups = val
     }
   },
 }
@@ -99,11 +111,13 @@ export default {
       <el-form ref="form" :model="query" label-width="">
         <el-form-item label="">
           <el-input
-            v-model="query.activityName"
+            v-model="query.groupName"
             class="ml10 mr10"
             style="width: 150px;"
-            placeholder="请输入名称"
+            placeholder="请输入群名"
             @keydown.enter="getList(1)"
+            clearable
+            @clear="getList(1)"
           ></el-input>
           <el-button
             v-hasPermi="['contacts:organization:query']"
@@ -122,82 +136,39 @@ export default {
           ></el-pagination>
         </el-form-item>
       </el-form>
-      <el-table :data="list" v-loading="loading">
-        <el-table-column width="30">
+
+      <el-table :data="list" v-loading="loading" @selection-change="handleSelectionChange">
+        <el-table-column type="selection" width="50" align="center" v-if="multiSelect"/>
+        <el-table-column width="30" v-else>
           <template slot-scope="scope">
-            <el-radio v-model="radio" :label="scope.row">'</el-radio>
+            <el-radio v-model="selectedGroup" :label="scope.row">'</el-radio>
           </template>
         </el-table-column>
 
         <el-table-column
-          prop="activityName"
-          label="活码名称"
+          prop="groupName"
+          label="群名"
           align="center"
         ></el-table-column>
 
         <el-table-column
-          prop="activityDesc"
-          label="活码描述"
+          prop="memberNum"
+          label="群人数"
           align="center"
-          width="160"
         >
-          <template #default="{ row }">
-            <el-popover
-              placement="bottom"
-              width="200"
-              trigger="hover"
-              :content="row.activityDesc"
-            >
-              <div slot="reference" class="table-desc overflow-ellipsis">
-                {{ row.activityDesc }}
-              </div>
-            </el-popover>
-          </template>
         </el-table-column>
 
         <el-table-column
-          prop="codeUrl"
-          label="活码样式"
+          prop="groupLeaderName"
+          label="群主"
           align="center"
-          width="130"
-        >
-          <template #default="{ row }">
-            <el-popover placement="bottom" trigger="hover">
-              <el-image
-                slot="reference"
-                :src="row.codeUrl"
-                class="code-image--small"
-              ></el-image>
-              <el-image :src="row.codeUrl" class="code-image"> </el-image>
-            </el-popover>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="实际群码总数" align="center">
-          <template #default="{ row }">
-            {{ (row.actualList && row.actualList.length) || 0 }}
-          </template>
-        </el-table-column>
+        ></el-table-column>
 
         <el-table-column
-          prop="availableCodes"
-          label="可用实际群码数"
+          prop="createTime"
+          label="创建时间"
           align="center"
-        >
-          <template #default="{ row }">
-            <el-popover
-              v-if="row.aboutToExpireCodes > 0"
-              placement="bottom"
-              width="200"
-              trigger="hover"
-              :content="'有' + row.aboutToExpireCodes + '个实际群码即将过期。'"
-            >
-              <i slot="reference" class="el-icon-warning expire-icon"></i>
-            </el-popover>
-
-            {{ row.availableCodes }}
-          </template>
-        </el-table-column>
+        ></el-table-column>
       </el-table>
     </div>
     <div slot="footer">

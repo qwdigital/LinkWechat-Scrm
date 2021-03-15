@@ -51,6 +51,20 @@ export default {
       }
       // this.list = JSON.parse(JSON.stringify(this.list))
     },
+    list (val) {
+      if (this.type === 'add') {
+        this.Pselected = []
+        this.selected.forEach((element) => {
+          let find = this.listOneArray.find((d) => {
+            return element.tagId === d.tagId
+          })
+          this.Pselected.push(find)
+        })
+      } else if (this.type === 'remove') {
+        this.removeTag = this.selected.slice()
+        this.Pselected = this.selected.slice()
+      }
+    }
   },
   computed: {
     Pvisible: {

@@ -231,7 +231,7 @@ export default {
   methods: {
     // 新增群活码
     add () {
-      this.$refs.form.validate(async (valid) => {
+      this.$refs.form.validate((valid) => {
         if (!valid) return
 
         // 用来区分群活码，生成的二维码需要带有唯一区分信息，所以由前端生成

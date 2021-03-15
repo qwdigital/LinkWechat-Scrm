@@ -10,6 +10,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    imageList: {
+      type: Array,
+      default: () => []
+    },
+    messageList: {
+      type: Array,
+      default: () => []
+    }
   },
   data() {
     return {}
@@ -44,6 +52,26 @@ export default {
         ></el-avatar>
         <div class="msg" style="line-height: 0; padding: 5px;">
           <slot></slot>
+        </div>
+      </li>
+      <li class="flex msg-li" v-for="message in messageList" :key="message">
+        <el-avatar
+          shape="square"
+          size="small"
+          :src="require('@/assets/image/profile.jpg')"
+        ></el-avatar>
+        <div class="msg">
+          <slot name="text" v-bind:text="message"></slot>
+        </div>
+      </li>
+      <li class="flex msg-li" v-for="image in imageList" :key="image">
+        <el-avatar
+          shape="square"
+          size="small"
+          :src="require('@/assets/image/profile.jpg')"
+        ></el-avatar>
+        <div class="msg" style="line-height: 0; padding: 5px;">
+          <slot name="image" v-bind:image="image"></slot>
         </div>
       </li>
     </ul>
