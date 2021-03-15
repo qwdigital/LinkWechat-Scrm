@@ -19,3 +19,4 @@ velocity.log
 .DS_Store
 logs
 .m2
+linkwe-ui/.env.production

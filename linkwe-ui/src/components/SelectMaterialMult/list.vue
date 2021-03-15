@@ -3,6 +3,7 @@ import { getTree, getList } from '@/api/material'
 export default {
   components: {},
   props: {
+    // 0: '图片', 1: '语音', 2: '视频', 3: '普通文件', 4: '文本', 5: '海报',
     type: {
       type: String,
       default: '4',
@@ -51,6 +52,7 @@ export default {
         children: 'children',
         label: 'name',
       },
+      selectedx: [],
     }
   },
   watch: {
@@ -114,7 +116,7 @@ export default {
           <el-input
             v-model="query.search"
             class="ml10 mr10"
-            style="width: 150px;"
+            style="width: 150px"
             @keydown.enter="getList(1)"
           ></el-input>
           <el-button
@@ -167,6 +169,7 @@ export default {
     <el-row :gutter="10">
       <el-col :span="6">
         <el-tree
+          class="bfc-o"
           ref="tree"
           :data="treeData"
           :props="treeProps"
@@ -190,33 +193,58 @@ export default {
           ></el-pagination>
         </div>
         <el-table
-          v-if="[3, 4].includes(+type)"
+          v-if="[1, 3, 4].includes(+type)"
           :data="list"
           @selection-change="handleSelectionChange"
         >
           <el-table-column type="selection" width="55" align="center" />
-          <el-table-column prop="content" label="文本内容"></el-table-column>
+          <el-table-column
+            v-if="type == 4"
+            prop="content"
+            label="文本内容"
+          ></el-table-column>
+          <el-table-column
+            v-else
+            prop="materialName"
+            label="素材名称"
+          ></el-table-column>
           <el-table-column prop="createTime" label="时间"></el-table-column>
         </el-table>
 
         <el-row v-else :gutter="20">
-          <el-col
-            :span="6"
-            style="margin-bottom: 24px;min-width: 220px;"
-            v-for="(item, index) in list"
-            :key="index"
+          <el-checkbox-group
+            v-model="selectedx"
+            @change="handleSelectionChange"
           >
-            <el-card shadow="hover" body-style="padding: 0px;">
-              <div class="img-wrap">
-                <el-image :src="item.materialUrl" fit="contain"></el-image>
-              </div>
-              <div style="padding: 14px;">
-                <el-checkbox v-model="ids" :label="item.id">{{
-                  item.materialName
-                }}</el-checkbox>
-              </div>
-            </el-card>
-          </el-col>
+            <el-col
+              :span="6"
+              style="margin-bottom: 24px; min-width: 220px"
+              v-for="(item, index) in list"
+              :key="index"
+            >
+              <el-card shadow="hover" body-style="padding: 0px;">
+                <div class="img-wrap">
+                  <el-image
+                    v-if="type == 0"
+                    :src="item.materialUrl"
+                    fit="contain"
+                  ></el-image>
+                  <el-image
+                    v-else-if="type == 2"
+                    :src="item.coverUrl"
+                    fit="contain"
+                  ></el-image>
+                </div>
+                <div style="padding: 14px">
+                  <el-checkbox :label="item">
+                    <span class="label">
+                      {{ item.materialName }}
+                    </span>
+                  </el-checkbox>
+                </div>
+              </el-card>
+            </el-col>
+          </el-checkbox-group>
         </el-row>
       </el-col>
     </el-row>
@@ -250,5 +278,11 @@ export default {
     height: 100%;
     top: 0;
   }
+}
+/deep/ .el-checkbox__label {
+  vertical-align: text-top;
+}
+.label {
+  white-space: normal;
 }
 </style>

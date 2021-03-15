@@ -231,7 +231,12 @@ export default {
         ></el-date-picker>
       </el-form-item>
       <el-form-item label=" ">
-        <el-button type="cyan" @click="getList(1)">查询</el-button>
+        <el-button
+          v-hasPermi="['wecom:code:list']"
+          type="cyan"
+          @click="getList(1)"
+          >查询</el-button
+        >
         <el-button @click="resetQuery">重置</el-button>
         <!-- <el-button @click="resetQuery">导出</el-button> -->
       </el-form-item>
@@ -245,14 +250,32 @@ export default {
         <span class="num">{{ total }}</span> 个
       </div>
       <div>
-        <el-button type="primary" size="mini" @click="goRoute('staffAdd')"
+        <el-button
+          v-hasPermi="['wecom:code:add']"
+          type="primary"
+          size="mini"
+          @click="goRoute('staffAdd')"
           >新建员工活码</el-button
         >
-        <el-button type="primary" size="mini" @click="dialogVisible = true"
+        <el-button
+          v-hasPermi="['wecom:code:batchAdd']"
+          type="primary"
+          size="mini"
+          @click="dialogVisible = true"
           >批量新建</el-button
         >
-        <el-button type="primary" size="mini" @click="remove">删除</el-button>
-        <el-button type="primary" size="mini" @click="downloadBatch()"
+        <el-button
+          v-hasPermi="['wecom:code:remove']"
+          type="primary"
+          size="mini"
+          @click="remove()"
+          >删除</el-button
+        >
+        <el-button
+          v-hasPermi="['wecom:code:downloadBatch']"
+          type="primary"
+          size="mini"
+          @click="downloadBatch()"
           >批量下载</el-button
         >
       </div>
@@ -310,7 +333,7 @@ export default {
           <el-button
             type="text"
             @click="download(row.id, row.useUserName, row.activityScene)"
-            v-hasPermi="['monitor:operlog:query']"
+            v-hasPermi="['wecom:code:download']"
             >下载</el-button
           >
           <el-button
@@ -323,19 +346,19 @@ export default {
           <el-button
             type="text"
             @click="goRoute('staffDetail', row.id)"
-            v-hasPermi="['monitor:operlog:query']"
+            v-hasPermi="['drainageCode:staff:detail']"
             >查看详情</el-button
           >
           <el-button
             type="text"
             @click="goRoute('staffAdd', row.id)"
-            v-hasPermi="['monitor:operlog:query']"
+            v-hasPermi="['wecom:code:edit']"
             >编辑</el-button
           >
           <el-button
             type="text"
             @click="remove(row.id)"
-            v-hasPermi="['monitor:operlog:query']"
+            v-hasPermi="['wecom:code:remove']"
             >删除</el-button
           >
         </template>

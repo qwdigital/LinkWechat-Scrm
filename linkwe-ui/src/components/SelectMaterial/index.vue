@@ -69,7 +69,7 @@ export default {
 </script>
 
 <template>
-  <el-dialog title="选择素材" :visible.sync="Pvisible" width="650px">
+  <el-dialog title="选择素材" :visible.sync="Pvisible" width="650px" append-to-body>
     <div>
       <el-tabs v-model="Ptype">
         <el-tab-pane name="0" v-if="showArr.includes(0)">

@@ -98,11 +98,19 @@ export default {
     // 获取类目树
     getTree() {
       getTree(this.type).then(({ data }) => {
-        this.treeData = data
+        this.treeData = [{
+          id: "",
+          name: "全部",
+          parentId: "0",
+          hasParent: false,
+          hasChildren: true,
+          children: data || []
+        }]
       })
     },
     // 获取素材列表
     getList(page) {
+      console.log('getList', page, JSON.stringify(this.query))
       page && (this.query.pageNum = page)
       this.loading = true
       getList(this.query)
@@ -161,14 +169,24 @@ export default {
     },
     // 素材添加/编辑
     edit(data, type) {
-      this.form = Object.assign(
-        {},
-        data || { categoryId: this.query.categoryId }
-      )
-      this.dialogVisible = true
-      this.$nextTick(() => {
-        this.$refs['form'].clearValidate()
-      })
+      switch (type) {
+        case 5:
+          // 清除编辑的数据
+          this.$parent.posterSubassemblyList = [];
+          this.$parent.posterEdit.step = 0
+          this.$parent.dialog.edit = true
+        break
+        default:
+          this.form = Object.assign(
+            {},
+            data || { categoryId: this.query.categoryId }
+          )
+          this.dialogVisible = true
+          this.$nextTick(() => {
+            this.$refs['form'].clearValidate()
+          })
+        break;
+      }
       // type || !data ? (this.disabled = false) : (this.disabled = true)
     },
     // 素材提交
@@ -246,7 +264,7 @@ export default {
           >
             <div class="custom-tree-node" slot-scope="{ node, data }">
               <span>{{ node.label }}</span>
-              <span class="fr">
+              <span class="fr" v-if="data.id">
                 <i
                   v-hasPermi="['material:editType']"
                   class="el-icon-edit"
@@ -298,7 +316,7 @@ export default {
             <div style="position: relative; margin: 10px 0;">
               <el-cascader
                 v-model="group"
-                :options="treeData"
+                :options="treeData[0].children"
                 :props="groupProps"
               ></el-cascader>
             </div>
@@ -323,7 +341,7 @@ export default {
             <el-button
               v-hasPermi="['material:add']"
               type="primary"
-              @click="edit(1)"
+              @click="edit(1, ~~type)"
               >添加{{ typeTitle[type] }}</el-button
             >
           </div>
@@ -380,7 +398,7 @@ export default {
         <el-form-item label="分类" prop="categoryId">
           <el-cascader
             v-model="form.categoryId"
-            :options="treeData"
+            :options="treeData[0].children"
             :props="groupProps"
           ></el-cascader>
         </el-form-item>

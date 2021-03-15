@@ -31,6 +31,7 @@ window.CONFIG = {
 
   services: {
     wecom: '/wecom',
+    common: '/common',
   },
 
   get headers() {

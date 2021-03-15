@@ -2,15 +2,12 @@ import request from '@/utils/request'
 const service = window.CONFIG.services.wecom + '/chat'
 
 /**
- *
+ * 侧边栏列表
  * @param {*} params
  */
-export function getList(params) {
+export function getList() {
   return request({
     url: service + '/side/list',
-    params: {
-      h5: 0,
-    },
   })
 }
 
