@@ -128,10 +128,25 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
      * @return 结果
      */
     @Override
-    public int updateWeTaskFission(WeTaskFission weTaskFission) {
+    @Transactional
+    public Long updateWeTaskFission(WeTaskFission weTaskFission) {
         weTaskFission.setUpdateTime(DateUtils.getNowDate());
         weTaskFission.setUpdateBy(SecurityUtils.getUsername());
-        return weTaskFissionMapper.updateWeTaskFission(weTaskFission);
+        groupQrcodeHandler(weTaskFission);
+        int updateResult = weTaskFissionMapper.updateWeTaskFission(weTaskFission);
+        if (updateResult > 0) {
+            if (CollectionUtils.isNotEmpty(weTaskFission.getTaskFissionStaffs())) {
+                List<WeTaskFissionStaff> staffList = weTaskFissionStaffService.selectWeTaskFissionStaffByTaskId(weTaskFission.getId());
+                if (CollectionUtils.isNotEmpty(staffList)) {
+                    weTaskFissionStaffService.deleteWeTaskFissionStaffByIds(staffList.stream().map(WeTaskFissionStaff::getId).toArray(Long[]::new));
+                }
+                weTaskFission.getTaskFissionStaffs().forEach(staff -> {
+                    staff.setTaskFissionId(weTaskFission.getId());
+                });
+                weTaskFissionStaffService.insertWeTaskFissionStaffList(weTaskFission.getTaskFissionStaffs());
+            }
+        }
+        return weTaskFission.getId();
     }
 
     /**

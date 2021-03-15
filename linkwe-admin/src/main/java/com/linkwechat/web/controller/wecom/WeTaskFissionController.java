@@ -1,5 +1,7 @@
 package com.linkwechat.web.controller.wecom;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.config.CosConfig;
@@ -17,6 +19,7 @@ import com.linkwechat.wecom.domain.query.WeTaskFissionStatisticQO;
 import com.linkwechat.wecom.service.IWeTaskFissionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -96,13 +99,36 @@ public class WeTaskFissionController extends BaseController {
     @PostMapping("/add")
     public AjaxResult add(@RequestBody WeTaskFission weTaskFission) {
         Long fissionTaskId = weTaskFissionService.insertWeTaskFission(weTaskFission);
-        //TODO 根据需要返回VO
         if (fissionTaskId != null) {
             JSONObject json = new JSONObject();
             json.put("id", fissionTaskId);
             return AjaxResult.success(json.toJSONString());
         }
         return AjaxResult.error();
+    }
+
+    /**
+     * 编辑任务宝
+     */
+    @ApiOperation(value = "编辑任务宝", httpMethod = "POST")
+    @PreAuthorize("@ss.hasPermi('wecom:fission:edit')")
+    @Log(title = "任务宝", businessType = BusinessType.INSERT)
+    @PutMapping("/edit")
+    public AjaxResult edit(@RequestBody WeTaskFission weTaskFission) {
+        if (ObjectUtils.isEmpty(weTaskFission.getId())) {
+            return AjaxResult.error("数据id为空");
+        }
+        WeTaskFission fissionTask = weTaskFissionService.selectWeTaskFissionById(weTaskFission.getId());
+        if (ObjectUtils.isEmpty(fissionTask)) {
+            return AjaxResult.error("数据不存在");
+        }
+        CopyOptions options = CopyOptions.create();
+        options.setIgnoreNullValue(true);
+        BeanUtil.copyProperties(weTaskFission, fissionTask, options);
+        Long id = weTaskFissionService.updateWeTaskFission(fissionTask);
+        JSONObject json = new JSONObject();
+        json.put("id", id);
+        return AjaxResult.success(json.toJSONString());
     }
 
     /**
