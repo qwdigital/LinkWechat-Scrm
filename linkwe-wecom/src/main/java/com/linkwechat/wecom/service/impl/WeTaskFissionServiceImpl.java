@@ -164,12 +164,14 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         String postersPath = weTaskFission.getPostersUrl();
         //目标员工id
         String fissStaffId = weTaskFission.getFissionTargetId();
-        //todo H5生成海报页面路径
+        //H5生成海报页面路径
         StringBuilder pageUrlBuilder = new StringBuilder(pageUrl);
         pageUrlBuilder.append("?")
                 .append("fissionId=").append(id)
                 .append("&")
-                .append("userId=").append(fissStaffId);
+                .append("userId=").append(fissStaffId)
+                .append("&")
+                .append("posterId=").append(weTaskFission.getPostersId());
 
         LinkMessageDto linkMessageDto = new LinkMessageDto();
         linkMessageDto.setPicurl(postersPath);
