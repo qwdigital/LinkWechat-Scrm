@@ -1,0 +1,32 @@
+.container{
+    height: 100%;
+    width: 100%;
+    background-color: #eeeeee;
+}
+.posterImg{
+    width: 100%;
+}
+.footerLink{
+    height: 2rem;
+    width: 100%;
+    background-color: #ffffff;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: .36rem;
+}
+.sharePic{
+    background-color: cornflowerblue;
+    color: #ffffff;
+    height: 1.5rem;
+    line-height: 1.5rem;
+    text-align: center;
+    padding: 0 .7rem;
+    border-radius: 10px;
+}
+.myTaskDetail{
+    color: cornflowerblue;
+}
