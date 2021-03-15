@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WePresTagGroupTaskStatMapper">
+
+    <resultMap type="WePresTagGroupTaskStatVo" id="WePresTagGroupTaskStatResult">
+        <result property="customerName"    column="customer_name"    />
+        <result property="isSent"    column="is_sent"    />
+        <result property="isInGroup"    column="is_in_group"    />
+    </resultMap>
+
+    <select id="getStatByTaskId" parameterType="Long" resultMap="WePresTagGroupTaskStatResult">
+        SELECT
+            *
+        FROM
+        (
+        SELECT DISTINCT
+            wc.`name` AS customer_name,
+            IFNULL( wptgs.is_sent, 0 ) AS is_sent,
+            IFNULL( wptgs.is_in_group, 0 ) AS is_in_group
+        FROM
+            we_pres_tag_group_tag wptgt
+            LEFT JOIN we_flower_customer_tag_rel wfctr ON wfctr.tag_id = wptgt.tag_id
+            LEFT JOIN we_flower_customer_rel wfcr ON wfcr.id = wfctr.flower_customer_rel_id
+            LEFT JOIN we_customer wc ON wc.external_userid = wfcr.external_userid
+            LEFT JOIN we_pres_tag_group_stat wptgs ON wptgt.task_id = wptgs.task_id
+            AND wptgs.external_userid = wfcr.external_userid
+        WHERE
+            wptgt.task_id = #{taskId}
+        ) t
+        WHERE
+        1 = 1
+        <if test="customerName != null and customerName !='' ">
+            AND t.customer_name LIKE concat('%', #{customerName}, '%')
+        </if>
+        <if test="isSent != null">
+            AND t.is_sent = #{isSent}
+        </if>
+        <if test="isInGroup != null ">
+            AND t.is_in_group = #{isInGroup}
+        </if>
+    </select>
+
+    <delete id="removeStatByTaskId" parameterType="Long">
+        delete from we_pres_tag_group_stat where task_id = #{taskId}
+    </delete>
+
+</mapper>

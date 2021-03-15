@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeGroupSopMapper">
+
+    <resultMap id="WeGroupSopResult" type="WeGroupSopVo">
+        <result property="ruleId" column="rule_id" />
+        <result property="ruleName" column="rule_name" />
+        <result property="title" column="title" />
+        <result property="content" column="content" />
+        <result property="startExeTime" column="start_time" />
+        <result property="stopExeTime" column="end_time" />
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectGroupVo">
+        SELECT
+            rule_id,
+            rule_name,
+            title,
+            content,
+            start_time,
+            end_time,
+            create_by,
+            create_time,
+            update_by,
+            update_time
+        FROM
+            we_group_sop
+    </sql>
+
+    <select id="getGroupSopById" resultMap="WeGroupSopResult">
+        <include refid="selectGroupVo" />
+        WHERE rule_id = #{ruleId}
+    </select>
+
+    <select id="getGroupSopList" resultMap="WeGroupSopResult">
+        <include refid="selectGroupVo" />
+        <where>
+            1 = 1
+            <if test="ruleName != null and ruleName!=''">
+                AND rule_name LIKE CONCAT("%",#{ruleName},"%")
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+            <if test="createBy!=null and createBy!=''">
+                AND create_by LIKE CONCAT("%",#{createBy},"%")
+            </if>
+        </where>
+    </select>
+
+    <select id="getChatIdListByRuleId" resultType="String">
+        SELECT
+            wg.chat_id
+        FROM
+            we_group_sop wgs
+            LEFT JOIN we_group_sop_chat wgsc ON wgs.rule_id = wgsc.rule_id
+            LEFT JOIN we_group wg ON wg.chat_id = wgsc.chat_id
+        WHERE wgs.rule_id = #{ruleId}
+    </select>
+
+    <select id="getMaterialIdListByRuleId" resultType="Long">
+        SELECT
+            wm.id
+        FROM
+            we_group_sop wgs
+            LEFT JOIN we_group_sop_material wgsm ON wgs.rule_id = wgsm.rule_id
+            LEFT JOIN we_material wm ON wm.id = wgsm.material_id
+        WHERE wgs.rule_id = #{ruleId}
+    </select>
+
+    <select id="isRuleNameUnique" resultType="int" parameterType="String">
+        select count(1) from we_group_sop where rule_name = #{ruleName}
+    </select>
+
+</mapper>

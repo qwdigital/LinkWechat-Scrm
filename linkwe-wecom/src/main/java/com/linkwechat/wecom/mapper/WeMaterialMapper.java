@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeMaterial;
 import org.apache.ibatis.annotations.Param;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * @author KEWEN
  * @date 2020-10-09
  */
-public interface WeMaterialMapper {
+public interface WeMaterialMapper extends BaseMapper<WeMaterial> {
 
 
     /**
