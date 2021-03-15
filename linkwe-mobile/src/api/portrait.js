@@ -11,7 +11,6 @@ export function getCustomerInfo(params) {
 }
 // 客户画像资料更新
 export function getWeCustomerInfo(data) {
-  debugger
   return request({
     url: service + "/updateWeCustomerInfo",
     method: 'post',

@@ -35,7 +35,7 @@
       <van-divider />
       <div class="detail">
         <div class="c9">年龄</div>
-        <div>{{ getage }}</div>
+        <div>{{ form.age }}</div>
       </div>
       <van-divider />
       <div class="detail">
@@ -372,6 +372,7 @@ export default {
       form: {
         name: "", // 昵称
         remarkMobiles: "", // 手机号
+        age:"", // 年龄
         birthday: "", // 客户生日
         email: "", // 邮箱
         address: "", // 地址
@@ -383,46 +384,7 @@ export default {
     };
   },
   computed: {
-    // 获取客户年龄
-    getage: function() {
-      // `this` 指向 vm 实例
-      let nowdata = new Date();
-      let yearnow = nowdata.getFullYear();
-      let mouthnow = nowdata.getMonth() + 1;
-      let daynow = nowdata.getDate();
-      // console.log(yearnow,mouthnow,daynow);
-      // this.form.birthday = "1995-03-11";
-      if (this.form.birthday) {
-        const year = this.form.birthday.substring(0, 4);
-        const mouth =
-          this.form.birthday.substring(5, 6) == 0
-            ? this.form.birthday.substring(6, 7)
-            : this.form.birthday.substring(5, 7);
-        const day =
-          this.form.birthday.substring(7, 8) == 0
-            ? this.form.birthday.substring(8, 9)
-            : this.form.birthday.substring(8, 10);
-        // console.log(day);
-        // console.log(mouth);
-        // console.log(typeof(birthday));
-        // console.log(birthday);
-        console.log(parseInt(mouthnow),parseInt(mouth));
-        if (parseInt(mouthnow) > parseInt(mouth)) {
-          let age = parseInt(yearnow) - parseInt(year);
-          return age;
-        } else if (
-          (parseInt(mouthnow) == parseInt(mouth) && parseInt(daynow) >= parseInt(day))
-        ) {
-          let age = parseInt(yearnow) - parseInt(year) ;
-          return age;
-        } else {
-          let age = parseInt(yearnow) - parseInt(year)-1;
-          return age;
-        }
-      } else {
-        return "";
-      }
-    },
+    
   },
   methods: {
     // 添加代办
@@ -493,28 +455,6 @@ export default {
     saveInfo() {},
   },
   created() {
-    // 获取用户Id
-    //  let auth_code = location.search
-    //   .slice(1)
-    //   .split('&')[0]
-    //   .split('=')[1]
-    // if (!auth_code) {
-    //   this.$toast('未获得授权')
-    //   return
-    // }
-    // getUserInfo(auth_code)
-    //   .then(({ data }) => {
-    //     this.userId = data.userId
-    //     // this.$toast('userId:' + this.userId)
-    //     console.log(this.userId);
-    //   })
-    //   .catch((err) => {
-    //     Dialog.confirm({
-    //       title: '标题',
-    //       message: err,
-    //     })
-    //   })
-    // 获取客户详细信息
     getCustomerInfo({
       externalUserid: this.externalUserid,
       userid: this.userid,
