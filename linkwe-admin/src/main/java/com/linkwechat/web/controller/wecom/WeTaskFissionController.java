@@ -64,6 +64,12 @@ public class WeTaskFissionController extends BaseController {
     @GetMapping("/stat")
     public AjaxResult statistics(WeTaskFissionStatisticQO weTaskFissionStatisticQO) {
         //TODO 待完成
+        //record表和complete_record表增加创建时间
+        //record表增加完成时间
+        //三个统计维度：
+        //  1. 日新增：每天裂变客户数
+        //  2. 日参与：每天扫码参加活动的客户数
+        //  3. 日完成：每天完成裂变任务的客户数
         return null;
     }
 
