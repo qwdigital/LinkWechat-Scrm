@@ -120,4 +120,9 @@ public class WeCommunityNewGroupVo {
     @ApiModelProperty(value = "创建时间", hidden = true)
     private Date createTime = new Date();
 
+    /**
+     * 个人码
+     */
+    private String userQrCode;
+
 }

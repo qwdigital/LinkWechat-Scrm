@@ -85,4 +85,10 @@ public class WeCommunityNewGroup extends BaseEntity {
     @ApiModelProperty("0 未删除 1 已删除")
     private int delFlag;
 
+
+    /**
+     * 员工活码
+     */
+    private String userQrCode;
+
 }
