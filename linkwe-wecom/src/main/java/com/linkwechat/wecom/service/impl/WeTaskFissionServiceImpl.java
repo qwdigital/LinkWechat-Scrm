@@ -277,21 +277,21 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     }
 
     private String getUserFissionQrcode(String fissionTargetId, WeTaskFissionRecord record) {
-        WeExternalContactDto dto = null;
+        String qrcode;
         if (StringUtils.isNotBlank(record.getConfigId())) {
-            dto = weExternalContactClient.getContactWay(record.getConfigId());
-        }
-        if (dto == null) {
+            qrcode = record.getConfigId();
+        } else {
             //获取二维码
             WeExternalContactDto.WeContactWay contactWay = posterContactWay(fissionTargetId, record.getId());
-            dto = weExternalContactClient.addContactWay(contactWay);
-            record.setConfigId(dto.getConfig_id());
+            WeExternalContactDto dto = weExternalContactClient.addContactWay(contactWay);
+            record.setConfigId(dto.getQr_code());
             int updateResult = weTaskFissionRecordService.updateWeTaskFissionRecord(record);
             if (updateResult <= 0) {
                 throw new RuntimeException("生成海报异常：更新裂变记录失败");
             }
+            qrcode = dto.getQr_code();
         }
-        return dto.getQr_code();
+        return qrcode;
     }
 
     private String getGroupFissionQrcode(Long taskFissionId, String fissionTargetId, WeTaskFissionRecord record, WeUser user) {
