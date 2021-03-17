@@ -1,38 +1,38 @@
 <template>
   <div class="takecontent">
     <ul>
-  
+
       <li v-for="(item,index) in allChat" :key="index">
         <!-- <span v-if="item.fromInfo.name">{{item.fromInfo.name}}</span> -->
-        <div :style="{'color':item.action=='send'?'#199ed8':'#999'}"><span v-if="item.fromInfo">{{item.fromInfo.name}}</span>  <span
+        <div :style="{'color':item.action=='send'?'#199ed8':'#999'}"><span
+            v-if="item.fromInfo">{{item.fromInfo.name}}</span> <span
             :style="{'color':item.action=='send'?'#199ed8':'#999'}">{{parseTime(item.msgtime)}}</span></div>
-        <div v-if="item.msgtype=='text'" class="msgtypetext"  >
+        <div v-if="item.msgtype=='text'" class="msgtypetext">
           {{item.text.content}}
         </div>
-        
         <div v-else-if="item.msgtype=='image'" class="msgtypeimg">
           <img :src="item.image.attachment" @click="showImg(item)">
         </div>
         <div v-else-if="item.msgtype=='file'" class="msgtypefile" @click="down(item.file)">
           {{item.file.filename}}
         </div>
-
         <div v-else-if="item.msgtype=='voice'" class="msgtypevoice">
-          <i class="el-icon-microphone"  style=" font-size: 40px; color: #199ed8;" @click="playVideo(item)"></i>
+          <i class="el-icon-microphone" style=" font-size: 40px; color: #199ed8;" @click="playVideo(item)"></i>
         </div>
         <div v-else-if="item.msgtype=='emotion'" class="msgtypeimg">
-        <img :src="item.emotion.attachment" @click="showImg(item)">
+          <img :src="item.emotion.attachment" @click="showImg(item)">
         </div>
         <div v-else-if="item.msgtype=='video'" class="msgtypevideo">
           <i class="el-icon-video-play" style=" font-size: 40px;  color: #199ed8;" @click="play(item,'video')"></i>
         </div>
-        <div v-else-if="item.msgtype=='location'" class="msgtypecard" >
+        <div v-else-if="item.msgtype=='location'" class="msgtypecard">
           <div class="card_name">
-            <el-amap ref="map" vid="amapDemo"  :center="[item.location.longitude, item.location.latitude]" :zoom="zoom"  class="amap-demo" style="pointer-events: none;">
-             <el-amap-marker :position="[item.location.longitude, item.location.latitude]"></el-amap-marker>
-           </el-amap>
+            <el-amap ref="map" vid="amapDemo" :center="[item.location.longitude, item.location.latitude]" :zoom="zoom"
+              class="amap-demo" style="pointer-events: none;">
+              <el-amap-marker :position="[item.location.longitude, item.location.latitude]"></el-amap-marker>
+            </el-amap>
           </div>
-          <div class="card_foot" >{{item.location.address}}</div>
+          <div class="card_foot">{{item.location.address}}</div>
         </div>
         <div v-else-if="item.msgtype=='weapp'" class="msgtypecard">
           <div class="card_name"></div>
@@ -45,61 +45,58 @@
       </li>
     </ul>
 
-    <div class="shabowbox" v-show="dia" >
-        <div class="close" @click="dia=false"><i class="el-icon-circle-close"></i></div>
-        <div class="shabowboxvidoe">
-        <video-player  class="video-player vjs-custom-skin"
-      ref="videoPlayer"
-      id="videoPlayer"
-      :playsinline="true" :options="playerOptions"></video-player>
+    <div class="shabowbox" v-show="dia">
+      <div class="close" @click="dia=false"><i class="el-icon-circle-close"></i></div>
+      <div class="shabowboxvidoe">
+        <video-player class="video-player vjs-custom-skin" ref="videoPlayer" id="videoPlayer" :playsinline="true"
+          :options="playerOptions"></video-player>
+      </div>
     </div>
+    <div class="shabowbox" v-show="diavioce">
+      <div class="close" @click="vioceClose"><i class="el-icon-circle-close"></i></div>
+      <div class="shabowboxvidoe shabowboxaudio">
+        <AudioPlayer :audio-list="vioceSrc" ref="AudioPlayer" :before-play="onBeforePlay" />
+      </div>
     </div>
-    <div class="shabowbox" v-show="diavioce" >
-        <div class="close" @click="diavioce=false"><i class="el-icon-circle-close"></i></div>
-        <div class="shabowboxvidoe shabowboxaudio">
-        <AudioPlayer :audio-list="vioceSrc"
-                 :before-play="onBeforePlay" />
-         </div>
-    </div>
-    <el-dialog
-  :visible.sync="dialogVisible"
-  width="30%"
->
- <img :src="imgSrc" style="width:100%;max-height:600px">
-  <span slot="footer" class="dialog-footer">
-  </span>
-</el-dialog>
+    <el-dialog :visible.sync="dialogVisible" width="30%">
+      <img :src="imgSrc" style="width:100%;max-height:600px">
+      <span slot="footer" class="dialog-footer">
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-
-    import { AMapManager } from 'vue-amap';
+  import {
+    AMapManager
+  } from 'vue-amap';
   import 'video.js/dist/video-js.css'
   import 'vue-video-player/src/custom-theme.css'
-  
+
   import {
     parseTime,
     yearMouthDay
   } from '@/utils/common.js'
   export default {
-  components:{AMapManager},
+    components: {
+      AMapManager
+    },
     props: {
       allChat: {
         type: Array,
         defluat: () => []
       }
     },
-  mounted(){
-   
-  },
+    mounted() {
+
+    },
     data() {
       return {
         dia: false,
-        diavioce:false,
-        dialogVisible:false,
-        imgSrc:'',
-        vioceSrc:[],
+        diavioce: false,
+        dialogVisible: false,
+        imgSrc: '',
+        vioceSrc: [],
         playerOptions: {
           playbackRates: [0.7, 1.0, 1.5, 2.0], //播放速度
           autoplay: false, //如果true,浏览器准备好时开始回放。
@@ -116,50 +113,55 @@
           }],
           poster: "", //你的封面地址（覆盖在视频上面的图片）
           width: document.documentElement.clientWidth,
-          height:'475',
+          height: '475',
           notSupportedMessage: '此视频暂无法播放，请稍后再试' //允许覆盖Video.js无法播放媒体源时显示的默认信息。
         },
-        
-        
-           zoom: 15,
-           center: [117.148118, 36.660223],
-            markers: [
-            {
-              position: [117.148118, 36.660223],
-              visible: false,
-              draggable: false,
-             
-            }
-          ]
-        
-         
-        
-    
+
+
+        zoom: 15,
+        center: [117.148118, 36.660223],
+        markers: [{
+          position: [117.148118, 36.660223],
+          visible: false,
+          draggable: false,
+
+        }]
       }
     },
     methods: {
-       
-     
-      playVideo(e){
-         this.vioceSrc=[e.voice.attachment]
-         this.diavioce=true;
+      vioceClose() {
+        this.diavioce = false
+        const mp3 = this.$refs.AudioPlayer;
+        mp3.pause()
       },
-      onBeforePlay(next){
-       next() // 开始播放
-       
+      playVideo(e) {
+        this.vioceSrc = [ e.voice.attachment] 
+        this.diavioce = true;
       },
-      showImg(e){
-        this.imgSrc=e.image.attachment;
-        this.dialogVisible=true
+      onBeforePlay(next) {
+        next() // 开始播放
+      },
+      showImg(e) {
+        this.imgSrc = e.image.attachment;
+        this.dialogVisible = true
       },
       play(e) {
-          this.dia=true
-           const player = this.$refs.videoPlayer.player
-           this.playerOptions['sources'][0]['src']=e.video.attachment;
-           player.play()
+        this.dia = true
+        const player = this.$refs.videoPlayer.player
+        this.playerOptions['sources'][0]['src'] = e.video.attachment;
+        player.play()
       },
       down(e) {
-        //下载文件
+        const url = window.URL.createObjectURL(new Blob([e.attachment], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8'
+        }))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', e.filename) // 下载文件的名称及文件类型后缀
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link); // 下载完成移除元素
+        window.URL.revokeObjectURL(url); // 释放掉blob对象
       }
     }
   }
@@ -170,11 +172,54 @@
     padding: 0;
     margin: 0;
   }
-#videoPlayer /deep/ .vjs-tech{ height: 450px;}
-.shabowbox{ position: fixed;width:100%;height: 100%; background: rgba(0, 0, 0,0.4);left: 0;top: 0;z-index: 2000;}
-.shabowboxvidoe{ position: fixed;width: 800px; height: 475px;left: 50%;margin-left: -400px;top:50%;margin-top: -235px;;z-index: 2001;background: #fff;}
-.shabowboxaudio{ height: 125px;padding: 12px;}
- .close{ position: fixed;width: 50px; height:50px;right: 10px;z-index: 2012;top: 10px;text-align: center;line-height: 50px;font-size: 20px;color: #FFF;cursor: pointer;font-size: 43px;}
+
+  #videoPlayer /deep/ .vjs-tech {
+    height: 450px;
+  }
+
+  .shabowbox {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    left: 0;
+    top: 0;
+    z-index: 2000;
+  }
+
+  .shabowboxvidoe {
+    position: fixed;
+    width: 800px;
+    height: 475px;
+    left: 50%;
+    margin-left: -400px;
+    top: 50%;
+    margin-top: -235px;
+    ;
+    z-index: 2001;
+    background: #fff;
+  }
+
+  .shabowboxaudio {
+    height: 125px;
+    padding: 12px;
+  }
+
+  .close {
+    position: fixed;
+    width: 50px;
+    height: 50px;
+    right: 10px;
+    z-index: 2012;
+    top: 10px;
+    text-align: center;
+    line-height: 50px;
+    font-size: 20px;
+    color: #FFF;
+    cursor: pointer;
+    font-size: 43px;
+  }
+
   .takecontent {
     text-align: left;
     width: 100%;
@@ -217,9 +262,9 @@
 
     .msgtypevideo {
       margin: 10px;
-     
+
       cursor: pointer;
- 
+
       border-radius: 8px;
     }
 
@@ -257,4 +302,5 @@
     }
 
   }
+
 </style>
