@@ -39,6 +39,7 @@ export default {
         ({ data }) => {
           let { timestamp, nonceStr, signature } = data
           wx.agentConfig({
+            beta: true, // 必须这么写，否则wx.invoke调用形式的jsapi会有问题
             debug: true,
             corpid: this.corpId, // 必填，企业微信的corpid，必须与当前登录的企业一致
             agentid: this.agentId, // 必填，企业微信的应用id （e.g. 1000247）
