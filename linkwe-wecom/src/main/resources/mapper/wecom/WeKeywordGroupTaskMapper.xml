@@ -69,13 +69,6 @@
         WHERE wkg.task_id = #{taskId}
     </select>
 
-    <delete id="batchRemoveTaskByIds">
-        delete from we_keyword_group where task_id in
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
-
     <select id="checkNameUnique" parameterType="String" resultType="int">
         select count(1) from we_keyword_group where task_name = #{taskName}
     </select>

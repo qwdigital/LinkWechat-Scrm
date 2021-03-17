@@ -80,19 +80,21 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
      * @param weGroupSop     新增所用数据
      * @param groupIdList    选中的群聊id
      * @param materialIdList 素材
-     * @param picList        手动上传的图片URL
+     * @param picUrlList     手动上传的图片URL
      * @return 结果
      */
     @Override
     @Transactional
-    public int addGroupSop(WeGroupSop weGroupSop, List<String> groupIdList, List<Long> materialIdList, List<String> picList) {
+    public int addGroupSop(WeGroupSop weGroupSop, List<String> groupIdList, List<Long> materialIdList, List<String> picUrlList) {
         if (this.save(weGroupSop)) {
             Long ruleId = weGroupSop.getRuleId();
             // 保存群聊及素材关联
             this.saveChatAndMaterialBinds(ruleId, groupIdList, materialIdList);
             // 保存手动上传的图片素材
-            List<WeGroupSopPic> sopPicList = picList.stream().map(e -> new WeGroupSopPic(ruleId, e)).collect(Collectors.toList());
-            sopPicMapper.batchSopPic(sopPicList);
+            List<WeGroupSopPic> sopPicList = picUrlList.stream().map(picUrl -> new WeGroupSopPic(ruleId, picUrl)).collect(Collectors.toList());
+            if (StringUtils.isNotEmpty(sopPicList)) {
+                sopPicMapper.batchSopPic(sopPicList);
+            }
             return 1;
         }
         return 0;
@@ -104,12 +106,12 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
      * @param weGroupSop     更新所用数据
      * @param groupIdList    选中的群聊id
      * @param materialIdList 素材
-     * @param picList        手动上传的图片URL
+     * @param picUrlList     手动上传的图片URL
      * @return 结果
      */
     @Override
     @Transactional
-    public int updateGroupSop(WeGroupSop weGroupSop, List<String> groupIdList, List<Long> materialIdList, List<String> picList) {
+    public int updateGroupSop(WeGroupSop weGroupSop, List<String> groupIdList, List<Long> materialIdList, List<String> picUrlList) {
         if (this.updateById(weGroupSop)) {
             Long ruleId = weGroupSop.getRuleId();
             // 先删除旧数据
@@ -121,8 +123,10 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
             sopPicMapper.delete(queryWrapper.eq("rule_id", ruleId));
 
             // 保留新上传的图片
-            List<WeGroupSopPic> sopPicList = picList.stream().map(e -> new WeGroupSopPic(ruleId, e)).collect(Collectors.toList());
-            sopPicMapper.batchSopPic(sopPicList);
+            List<WeGroupSopPic> sopPicList = picUrlList.stream().map(picUrl -> new WeGroupSopPic(ruleId, picUrl)).collect(Collectors.toList());
+            if (StringUtils.isNotEmpty(sopPicList)) {
+                sopPicMapper.batchSopPic(sopPicList);
+            }
             return 1;
         }
         return 0;
@@ -165,7 +169,6 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
     public boolean isRuleNameUnique(String ruleName) {
         return groupSopMapper.isRuleNameUnique(ruleName) == 0;
     }
-
 
     /**
      * 根据关联条件查询该sop所关联的群聊及素材对象，并将其放入WeGroupSopVo相应属性中用于前端使用
@@ -241,7 +244,7 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
         QueryWrapper<WeGroupSopPic> picQueryWrapper = new QueryWrapper<>();
         picQueryWrapper.eq("rule_id", ruleId);
         List<WeGroupSopPic> sopPicList = sopPicMapper.selectList(picQueryWrapper);
-        List<String> picList = sopPicList.stream().map(WeGroupSopPic::getPicUrl).collect(Collectors.toList());
-        sopVo.setPicList(picList);
+        List<String> picUrlList = sopPicList.stream().map(WeGroupSopPic::getPicUrl).collect(Collectors.toList());
+        sopVo.setPicList(picUrlList);
     }
 }
