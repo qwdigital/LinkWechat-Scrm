@@ -42,14 +42,6 @@ public interface WeKeywordGroupTaskMapper extends BaseMapper<WeKeywordGroupTask>
     WeKeywordGroupTaskVo getTaskById(Long taskId);
 
     /**
-     * 根据id列表批量删除任务
-     *
-     * @param ids id列表
-     * @return 删除行数
-     */
-    int batchRemoveTaskByIds(Long[] ids);
-
-    /**
      * 根据任务id获取对应所有的群聊名称
      *
      * @param taskId 任务id
