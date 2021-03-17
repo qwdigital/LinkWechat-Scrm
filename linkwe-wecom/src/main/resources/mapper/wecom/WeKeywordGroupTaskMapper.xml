@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeKeywordGroupTaskMapper">
+
+    <resultMap id="WeKeywordGroupTaskResult" type="WeKeywordGroupTaskVo">
+        <result property="taskId" column="task_id"/>
+        <result property="taskName" column="task_name"/>
+        <result property="welcomeMsg" column="welcome_msg"/>
+        <result property="groupCodeId" column="group_code_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectTaskVo">
+        SELECT DISTINCT
+            wkg.task_id,
+            wkg.task_name,
+            wkg.group_code_id,
+            wkg.welcome_msg,
+            wkg.create_by,
+            wkg.create_time,
+            wkg.update_by,
+            wkg.update_time
+        FROM
+            we_keyword_group wkg
+            LEFT JOIN we_keyword_group_kw wkgk ON wkgk.task_id = wkg.task_id
+    </sql>
+
+    <select id="getTaskById" parameterType="Long" resultMap="WeKeywordGroupTaskResult">
+        <include refid="selectTaskVo" />
+        WHERE wkg.task_id = #{taskId}
+    </select>
+
+    <select id="getTaskList" resultMap="WeKeywordGroupTaskResult">
+        <include refid="selectTaskVo" />
+        <where>
+            1 = 1
+            <if test="taskName != null and taskName !='' ">
+                AND wkg.task_name LIKE CONCAT("%",#{taskName},"%")
+            </if>
+            <if test="keyword != null and keyword !='' ">
+                AND wkgk.keyword LIKE CONCAT("%",#{keyword},"%")
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(wkg.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(wkg.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+            <if test="createBy!=null and createBy!=''">
+                AND wkg.create_by LIKE CONCAT("%",#{createBy},"%")
+            </if>
+        </where>
+    </select>
+
+    <select id="getGroupNameListByTaskId" parameterType="Long" resultType="String">
+        SELECT DISTINCT
+            g.group_name
+        FROM
+            we_keyword_group wkg
+            LEFT JOIN we_group_code gc ON wkg.group_code_id = gc.id
+            LEFT JOIN we_group_code_actual gca ON gca.group_code_id = gc.id
+            LEFT JOIN we_group g ON g.chat_id = gca.chat_id
+        WHERE wkg.task_id = #{taskId}
+    </select>
+
+    <delete id="batchRemoveTaskByIds">
+        delete from we_keyword_group where task_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="checkNameUnique" parameterType="String" resultType="int">
+        select count(1) from we_keyword_group where task_name = #{taskName}
+    </select>
+</mapper>

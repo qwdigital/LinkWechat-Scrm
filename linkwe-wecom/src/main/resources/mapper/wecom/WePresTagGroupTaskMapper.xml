@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WePresTagGroupTaskMapper">
+
+    <resultMap id="WePresTagGroupTaskResult" type="WePresTagGroupTaskVo">
+        <result property="taskId" column="task_id" />
+        <result property="taskName" column="task_name" />
+        <result property="welcomeMsg" column="welcome_msg" />
+        <result property="sendType" column="send_type" />
+        <result property="groupCodeId" column="group_code_id" />
+        <result property="totalMember" column="total_member" />
+        <result property="sendScope" column="send_scope" />
+        <result property="sendGender" column="send_gender" />
+        <result property="cusBeginTime" column="cus_begin_time" />
+        <result property="cusEndTime" column="cus_end_time" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectTaskVo">
+        SELECT
+            wptg.task_id,
+            wptg.task_name,
+            wptg.welcome_msg,
+            wptg.send_type,
+            wptg.group_code_id,
+            wptg.send_scope,
+            wptg.send_gender,
+            wptg.cus_begin_time,
+            wptg.cus_end_time,
+            wptg.create_by,
+            wptg.create_time,
+            wptg.update_by,
+            wptg.update_time,
+            IFNULL((SELECT SUM( wgca.scan_code_times ) AS scan_times FROM we_group_code_actual wgca GROUP BY group_code_id HAVING group_code_id = wgc.id), 0) as total_member
+        FROM
+            we_pres_tag_group wptg
+            left join we_group_code wgc on wgc.id = wptg.group_code_id
+    </sql>
+    
+    <select id="selectTaskById" parameterType="Long" resultMap="WePresTagGroupTaskResult">
+        <include refid="selectTaskVo"></include>
+        where wptg.task_id = #{taskId}
+    </select>
+    
+    <select id="selectTaskList" resultMap="WePresTagGroupTaskResult">
+        <include refid="selectTaskVo"></include>
+        <where>
+            1 = 1
+            <if test="taskName != null and taskName!=''">
+                AND wptg.task_name LIKE CONCAT("%",#{taskName},"%")
+            </if>
+            <if test="sendType != null">
+                AND wptg.send_type = #{sendType}
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(wptg.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(wptg.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+            <if test="createBy!=null and createBy!=''">
+                AND wptg.create_by LIKE CONCAT("%",#{createBy},"%")
+            </if>
+        </where>
+    </select>
+
+    <select id="checkTaskNameUnique" parameterType="String" resultType="int">
+        select count(1) from we_pres_tag_group where task_name = #{taskName}
+    </select>
+
+</mapper>

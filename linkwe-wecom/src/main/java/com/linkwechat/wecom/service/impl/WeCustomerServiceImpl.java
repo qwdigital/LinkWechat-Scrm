@@ -5,6 +5,7 @@ import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
@@ -627,11 +628,16 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
     @Override
-    public WeCustomerPortrait findCustomerByOperUseridAndCustomerId(String externalUserid, String userid) {
+    public WeCustomerPortrait findCustomerByOperUseridAndCustomerId(String externalUserid, String userid) throws Exception {
         WeCustomerPortrait weCustomerPortrait
                 = weCustomerMapper.findCustomerByOperUseridAndCustomerId(externalUserid, userid);
 
         if(null != weCustomerPortrait){
+
+          if(weCustomerPortrait.getBirthday() != null){
+                        weCustomerPortrait.setAge(DateUtils.getAge(weCustomerPortrait.getBirthday()));
+          }
+
             //获取当前客户拥有得标签
             weCustomerPortrait.setWeTagGroupList(
                     iWeTagGroupService.findCustomerTagByFlowerCustomerRelId(

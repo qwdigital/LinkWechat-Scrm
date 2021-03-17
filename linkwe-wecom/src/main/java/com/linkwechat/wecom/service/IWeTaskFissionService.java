@@ -35,7 +35,7 @@ public interface IWeTaskFissionService {
      * @param weTaskFission 任务宝
      * @return 结果
      */
-    public int insertWeTaskFission(WeTaskFission weTaskFission);
+    public Long insertWeTaskFission(WeTaskFission weTaskFission);
 
     /**
      * 修改任务宝
@@ -43,7 +43,7 @@ public interface IWeTaskFissionService {
      * @param weTaskFission 任务宝
      * @return 结果
      */
-    public int updateWeTaskFission(WeTaskFission weTaskFission);
+    public Long updateWeTaskFission(WeTaskFission weTaskFission);
 
     /**
      * 批量删除任务宝

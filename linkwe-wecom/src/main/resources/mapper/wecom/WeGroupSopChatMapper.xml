@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeGroupSopChatMapper">
+    <insert id="batchBindsSopChat">
+        insert into we_group_sop_chat(rule_id, chat_id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.ruleId},#{item.chatId})
+        </foreach>
+    </insert>
+</mapper>

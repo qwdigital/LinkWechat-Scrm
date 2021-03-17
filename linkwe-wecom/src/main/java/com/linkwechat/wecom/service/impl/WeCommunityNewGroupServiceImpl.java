@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.exception.wecom.WeComException;
@@ -19,6 +20,7 @@ import com.linkwechat.wecom.service.IWeGroupCodeActualService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -57,6 +59,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
     private IWeGroupCodeActualService weGroupCodeActualService;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int add(WeCommunityNewGroupDto communityNewGroupDto) {
 
         //检查群活码是否存在
@@ -72,7 +75,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
         //保存新客自动拉群信息
         WeCommunityNewGroup communityNewGroup = new WeCommunityNewGroup();
-        communityNewGroup.setNewGroupId(weGroupCode.getId());
+        communityNewGroup.setGroupCodeId(weGroupCode.getId());
         communityNewGroup.setEmpleCodeName(communityNewGroupDto.getActivityScene());
         communityNewGroup.setDelFlag(0);
         communityNewGroup.setCreateTime(new Date());
@@ -80,13 +83,16 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         communityNewGroup.setActivityScene(communityNewGroupDto.getActivityScene());
         communityNewGroup.setWelcomeMsg(communityNewGroupDto.getWelcomeMsg());
         communityNewGroup.setIsJoinConfirmFriends(communityNewGroupDto.getIsJoinConfirmFriends());
-        communityNewGroup.setMediaId(communityNewGroup.getMediaId());
-
+        communityNewGroup.setMediaId(communityNewGroupDto.getMediaId());
+        communityNewGroup.setQrCode(communityNewGroupDto.getQrCode());
+        communityNewGroup.setConfigId(qrCode.getConfig_id());
         if (qrCode != null) {
-            communityNewGroup.setQrCode(qrCode.getQr_code());
+            communityNewGroup.setUserQrCode(qrCode.getQr_code());
+
         }
 
         if (this.save(communityNewGroup)) {
+
             if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
                 weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setEmpleCodeId(communityNewGroup.getNewGroupId()));
                 iWeEmpleCodeUseScopService.saveBatch(weEmpleCode.getWeEmpleCodeUseScops());
@@ -111,16 +117,19 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         weEmpleCode.setWeEmpleCodeTags(communityNewGroupDto.getWeEmpleCodeTags());
         weEmpleCode.setQrCode(communityNewGroupDto.getQrCode());
         weEmpleCode.setMediaId(communityNewGroupDto.getMediaId());
+        weEmpleCode.setConfigId(communityNewGroupDto.getConfigId());
         return weEmpleCode;
     }
 
     @Override
     public List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(String empleCodeName, String createBy, String beginTime, String endTime) {
         List<WeCommunityNewGroupVo> weCommunityNewGroupVos = weCommunityNewGroupMapper.selectWeCommunityNewGroupList(empleCodeName, createBy, beginTime, endTime);
+
         if (CollectionUtil.isNotEmpty(weCommunityNewGroupVos)) {
             List<Long> newGroupIdList = weCommunityNewGroupVos.stream().map(WeCommunityNewGroupVo::getNewGroupId).collect(Collectors.toList());
             List<WeEmpleCodeUseScop> useScopList = iWeEmpleCodeUseScopService.selectWeEmpleCodeUseScopListByIds(newGroupIdList);
             List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.selectWeEmpleCodeTagListByIds(newGroupIdList);
+
             weCommunityNewGroupVos.forEach(newGroup -> {
                 List<WeGroupCodeActual> weGroupCodeActuals = getWeGroupCodeActuals(newGroup);
                 newGroup.setWeGroupUserScops(weGroupCodeActuals);
@@ -162,17 +171,19 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int updateWeCommunityNewGroup(WeCommunityNewGroupDto communityNewGroupDto) {
 
         //检查群活码是否存在
         WeGroupCode weGroupCode = weGroupCodeMapper.selectWeGroupCodeById(communityNewGroupDto.getGroupCodeId());
-        if (null != weGroupCode) {
+        if (null == weGroupCode) {
             throw new WeComException("群活码不存在！");
         }
-
         //查询新客自动拉群信息
-        WeCommunityNewGroup communityNewGroup = weCommunityNewGroupMapper.selectById(communityNewGroupDto.getGroupCodeId());
-        if (null != communityNewGroup) {
+//        WeCommunityNewGroup communityNewGroup = weCommunityNewGroupMapper.selectOne(new LambdaQueryWrapper<WeCommunityNewGroup>()
+//                .eq(WeCommunityNewGroup::getGroupCodeId, communityNewGroupDto.getGroupCodeId()));
+        WeCommunityNewGroup communityNewGroup = weCommunityNewGroupMapper.selectById(communityNewGroupDto.getNewGroupId());
+        if (null == communityNewGroup) {
             throw new WeComException("信息不存在！");
         }
 
@@ -180,12 +191,14 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         WeEmpleCode weEmpleCode = getWeEmpleCode(communityNewGroupDto);
 
         WeExternalContactDto.WeContactWay weContactWay = weEmpleCodeService.getWeContactWay(weEmpleCode);
+
         try {
-            weExternalContactClient.updateContactWay(weContactWay);
+            WeExternalContactDto weExternalContactDto = weExternalContactClient.updateContactWay(weContactWay);
+            System.out.println(weExternalContactDto.getQr_code());
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         communityNewGroup.setEmpleCodeName(communityNewGroupDto.getActivityScene());
         communityNewGroup.setDelFlag(0);
         communityNewGroup.setCreateTime(new Date());
@@ -193,18 +206,18 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         communityNewGroup.setActivityScene(communityNewGroupDto.getActivityScene());
         communityNewGroup.setWelcomeMsg(communityNewGroupDto.getWelcomeMsg());
         communityNewGroup.setIsJoinConfirmFriends(communityNewGroupDto.getIsJoinConfirmFriends());
-        communityNewGroup.setMediaId(communityNewGroup.getMediaId());
-        communityNewGroup.setGroupCodeId(communityNewGroup.getGroupCodeId());
-
+        communityNewGroup.setMediaId(communityNewGroupDto.getMediaId());
+        communityNewGroup.setGroupCodeId(communityNewGroupDto.getGroupCodeId());
+        communityNewGroup.setQrCode(communityNewGroupDto.getQrCode());
         //更新新客自动拉群信息
         if (this.updateById(communityNewGroup)) {
             if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
                 weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setEmpleCodeId(communityNewGroup.getNewGroupId()));
-                iWeEmpleCodeUseScopService.updateBatchById(weEmpleCode.getWeEmpleCodeUseScops());
+                iWeEmpleCodeUseScopService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeUseScops());
             }
             if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeTags())) {
                 weEmpleCode.getWeEmpleCodeTags().forEach(item -> item.setEmpleCodeId(communityNewGroup.getNewGroupId()));
-                weEmpleCodeTagService.updateBatchById(weEmpleCode.getWeEmpleCodeTags());
+                weEmpleCodeTagService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeTags());
             }
         }
 

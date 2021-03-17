@@ -30,10 +30,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -103,7 +103,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
      */
     @Override
     @Transactional
-    public int insertWeTaskFission(WeTaskFission weTaskFission) {
+    public Long insertWeTaskFission(WeTaskFission weTaskFission) {
         weTaskFission.setCreateBy(SecurityUtils.getUsername());
         weTaskFission.setCreateTime(DateUtils.getNowDate());
         groupQrcodeHandler(weTaskFission);
@@ -118,7 +118,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
                 }
             }
         }
-        return insertResult;
+        return weTaskFission.getId();
     }
 
     /**
@@ -128,10 +128,25 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
      * @return 结果
      */
     @Override
-    public int updateWeTaskFission(WeTaskFission weTaskFission) {
+    @Transactional
+    public Long updateWeTaskFission(WeTaskFission weTaskFission) {
         weTaskFission.setUpdateTime(DateUtils.getNowDate());
         weTaskFission.setUpdateBy(SecurityUtils.getUsername());
-        return weTaskFissionMapper.updateWeTaskFission(weTaskFission);
+        groupQrcodeHandler(weTaskFission);
+        int updateResult = weTaskFissionMapper.updateWeTaskFission(weTaskFission);
+        if (updateResult > 0) {
+            if (CollectionUtils.isNotEmpty(weTaskFission.getTaskFissionStaffs())) {
+                List<WeTaskFissionStaff> staffList = weTaskFissionStaffService.selectWeTaskFissionStaffByTaskId(weTaskFission.getId());
+                if (CollectionUtils.isNotEmpty(staffList)) {
+                    weTaskFissionStaffService.deleteWeTaskFissionStaffByIds(staffList.stream().map(WeTaskFissionStaff::getId).toArray(Long[]::new));
+                }
+                weTaskFission.getTaskFissionStaffs().forEach(staff -> {
+                    staff.setTaskFissionId(weTaskFission.getId());
+                });
+                weTaskFissionStaffService.insertWeTaskFissionStaffList(weTaskFission.getTaskFissionStaffs());
+            }
+        }
+        return weTaskFission.getId();
     }
 
     /**
@@ -164,12 +179,14 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         String postersPath = weTaskFission.getPostersUrl();
         //目标员工id
         String fissStaffId = weTaskFission.getFissionTargetId();
-        //todo H5生成海报页面路径
+        //H5生成海报页面路径
         StringBuilder pageUrlBuilder = new StringBuilder(pageUrl);
         pageUrlBuilder.append("?")
                 .append("fissionId=").append(id)
                 .append("&")
-                .append("userId=").append(fissStaffId);
+                .append("userId=").append(fissStaffId)
+                .append("&")
+                .append("posterId=").append(weTaskFission.getPostersId());
 
         LinkMessageDto linkMessageDto = new LinkMessageDto();
         linkMessageDto.setPicurl(postersPath);

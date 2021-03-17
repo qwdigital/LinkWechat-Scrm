@@ -1,5 +1,7 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import io.swagger.annotations.ApiModel;
@@ -14,11 +16,13 @@ import lombok.Data;
  */
 @ApiModel
 @Data
+@TableName("we_community_new_group")
 public class WeCommunityNewGroup extends BaseEntity {
 
     /**
      *主键ID
      */
+    @TableId
     private Long newGroupId= SnowFlakeUtil.nextId();
 
     /**
@@ -38,6 +42,12 @@ public class WeCommunityNewGroup extends BaseEntity {
      */
     @ApiModelProperty("欢迎语")
     private String welcomeMsg;
+
+    /**
+     * 新增联系方式的配置id
+     */
+    @ApiModelProperty("新增联系方式的配置id")
+    private String configId;
 
     /**
      * 二维码链接
@@ -74,5 +84,11 @@ public class WeCommunityNewGroup extends BaseEntity {
      */
     @ApiModelProperty("0 未删除 1 已删除")
     private int delFlag;
+
+
+    /**
+     * 员工活码
+     */
+    private String userQrCode;
 
 }

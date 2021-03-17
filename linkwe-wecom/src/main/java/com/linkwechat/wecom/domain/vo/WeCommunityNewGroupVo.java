@@ -22,7 +22,7 @@ import java.util.List;
 public class WeCommunityNewGroupVo {
 
     /**
-     *主键ID
+     * 主键ID
      */
     @ApiModelProperty("主键ID")
     private Long newGroupId;
@@ -44,6 +44,12 @@ public class WeCommunityNewGroupVo {
      */
     @ApiModelProperty("欢迎语")
     private String welcomeMsg;
+
+    /**
+     * 群活码id
+     */
+    @ApiModelProperty("群活码id")
+    private Long groupCodeId;
 
     /**
      * 新增联系方式的配置id
@@ -101,13 +107,22 @@ public class WeCommunityNewGroupVo {
     @ApiModelProperty("实际群聊")
     private List<WeGroupCodeActual> weGroupUserScops;
 
-    /** 创建者 */
-    @ApiModelProperty(value = "创建者",hidden = true)
+    /**
+     * 创建者
+     */
+    @ApiModelProperty(value = "创建者", hidden = true)
     private String createBy;
 
-    /** 创建时间 */
+    /**
+     * 创建时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @ApiModelProperty(value = "创建时间",hidden = true)
-    private Date createTime=new Date();
+    @ApiModelProperty(value = "创建时间", hidden = true)
+    private Date createTime = new Date();
+
+    /**
+     * 个人码
+     */
+    private String userQrCode;
 
 }
