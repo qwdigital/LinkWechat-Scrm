@@ -73,7 +73,6 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         WeExternalContactDto.WeContactWay weContactWay = weEmpleCodeService.getWeContactWay(weEmpleCode);
         WeExternalContactDto qrCode = weEmpleCodeService.getQrCode(weContactWay);
 
-
         //保存新客自动拉群信息
         WeCommunityNewGroup communityNewGroup = new WeCommunityNewGroup();
         communityNewGroup.setGroupCodeId(weGroupCode.getId());
@@ -84,14 +83,16 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         communityNewGroup.setActivityScene(communityNewGroupDto.getActivityScene());
         communityNewGroup.setWelcomeMsg(communityNewGroupDto.getWelcomeMsg());
         communityNewGroup.setIsJoinConfirmFriends(communityNewGroupDto.getIsJoinConfirmFriends());
-        communityNewGroup.setMediaId(communityNewGroup.getMediaId());
-
+        communityNewGroup.setMediaId(communityNewGroupDto.getMediaId());
+        communityNewGroup.setQrCode(communityNewGroupDto.getQrCode());
+        communityNewGroup.setConfigId(qrCode.getConfig_id());
         if (qrCode != null) {
-            communityNewGroup.setQrCode(qrCode.getQr_code());
-            communityNewGroup.setConfigId(qrCode.getConfig_id());
+            communityNewGroup.setUserQrCode(qrCode.getQr_code());
+
         }
 
         if (this.save(communityNewGroup)) {
+
             if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
                 weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setEmpleCodeId(communityNewGroup.getNewGroupId()));
                 iWeEmpleCodeUseScopService.saveBatch(weEmpleCode.getWeEmpleCodeUseScops());
@@ -192,7 +193,9 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         WeExternalContactDto.WeContactWay weContactWay = weEmpleCodeService.getWeContactWay(weEmpleCode);
 
         try {
-            weExternalContactClient.updateContactWay(weContactWay);
+            WeExternalContactDto weExternalContactDto = weExternalContactClient.updateContactWay(weContactWay);
+            System.out.println(weExternalContactDto.getQr_code());
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -205,7 +208,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         communityNewGroup.setIsJoinConfirmFriends(communityNewGroupDto.getIsJoinConfirmFriends());
         communityNewGroup.setMediaId(communityNewGroupDto.getMediaId());
         communityNewGroup.setGroupCodeId(communityNewGroupDto.getGroupCodeId());
-
+        communityNewGroup.setQrCode(communityNewGroupDto.getQrCode());
         //更新新客自动拉群信息
         if (this.updateById(communityNewGroup)) {
             if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {

@@ -19,7 +19,8 @@
                is_join_confirm_friends,
                media_id,
                join_friend_nums,
-               config_id
+               config_id,
+               user_qr_code
         FROM we_community_new_group
     </sql>
     <update id="batchRemoveWeCommunityNewGroupIds">
