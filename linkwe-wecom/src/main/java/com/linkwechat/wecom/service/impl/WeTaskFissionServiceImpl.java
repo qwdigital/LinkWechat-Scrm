@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.collect.Lists;
 import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.TaskFissionType;
@@ -21,6 +22,8 @@ import com.linkwechat.wecom.domain.dto.WeExternalContactDto;
 import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
 import com.linkwechat.wecom.domain.dto.message.LinkMessageDto;
+import com.linkwechat.wecom.domain.vo.WeTaskFissionDailyDataVO;
+import com.linkwechat.wecom.domain.vo.WeTaskFissionStatisticVO;
 import com.linkwechat.wecom.mapper.WeTaskFissionMapper;
 import com.linkwechat.wecom.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -84,7 +87,10 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
      */
     @Override
     public WeTaskFission selectWeTaskFissionById(Long id) {
-        return weTaskFissionMapper.selectWeTaskFissionById(id);
+        WeTaskFission taskFission = weTaskFissionMapper.selectWeTaskFissionById(id);
+        List<WeTaskFissionStaff> staffList = weTaskFissionStaffService.selectWeTaskFissionStaffByTaskId(id);
+        taskFission.setTaskFissionStaffs(staffList);
+        return taskFission;
     }
 
     /**
@@ -270,7 +276,6 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         wfcr.setCustomerName(weChatUserDTO.getName());
         List<WeTaskFissionCompleteRecord> list = weTaskFissionCompleteRecordService.selectWeTaskFissionCompleteRecordList(wfcr);
         if (CollectionUtils.isEmpty(list)) {
-            wfcr.setCreateBy(SecurityUtils.getUsername());
             wfcr.setCreateTime(new Date());
             weTaskFissionCompleteRecordService.insertWeTaskFissionCompleteRecord(wfcr);
         }
@@ -284,7 +289,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
 
 
         WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService
-                .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId),externalUseriId);
+                .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), externalUseriId);
 
         Long recordId = Optional.ofNullable(weTaskFissionRecord).map(WeTaskFissionRecord::getId)
                 .orElseThrow(() -> new WeComException("任务记录信息不存在"));
@@ -296,6 +301,42 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
 
         return weCustomerService.listByIds(eidList);
     }
+
+    @Override
+    public WeTaskFissionStatisticVO taskFissionStatistic(Long taskFissionId, Date startTime, Date endTime) {
+        WeTaskFissionStatisticVO vo = new WeTaskFissionStatisticVO();
+        WeTaskFission taskFission = weTaskFissionMapper.selectWeTaskFissionById(taskFissionId);
+        if (taskFission == null) {
+            throw new WeComException("任务数据不存在");
+        }
+        vo.setTaskFissionId(taskFissionId);
+        vo.setTaskName(taskFission.getTaskName());
+        vo.setStartTime(startTime);
+        vo.setEndTime(endTime);
+        Map<String, List<WeTaskFissionCompleteRecord>> completeRecordsMap = weTaskFissionCompleteRecordService.statisticCompleteRecords(taskFissionId, startTime, endTime).parallelStream().filter(Objects::nonNull).collect(Collectors.groupingBy(item -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getCreateTime())));
+        Map<String, List<WeTaskFissionRecord>> recordsMap = weTaskFissionRecordService.statisticRecords(taskFissionId, startTime, endTime).parallelStream().filter(Objects::nonNull).collect(Collectors.groupingBy(item -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getCreateTime())));
+        List<WeTaskFissionDailyDataVO> dailyDataList = Lists.newArrayList();
+        DateUtils.findDates(startTime, endTime).parallelStream().map(d -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, d))
+                .forEach(date -> {
+                    WeTaskFissionDailyDataVO v = new WeTaskFissionDailyDataVO();
+                    v.setDay(date);
+                    List<WeTaskFissionCompleteRecord> completeList = completeRecordsMap.get(date);
+                    List<WeTaskFissionRecord> recordsList = recordsMap.get(date);
+                    if (CollectionUtils.isNotEmpty(completeList)) {
+                        v.setIncrease(completeList.size());
+                    }
+                    if (CollectionUtils.isNotEmpty(recordsList)) {
+                        v.setAttend(recordsList.size());
+                        int completeSize = (int) recordsList.stream().filter(r -> r.getCompleteTime() != null).count();
+                        v.setComplete(completeSize);
+                    }
+                    dailyDataList.add(v);
+                });
+        vo.setData(dailyDataList);
+        return vo;
+    }
+
+    /*************************************** private functions **************************************/
 
     private String getPosterQRCode(String fissionTargetId, WeTaskFissionRecord record, String userId) {
         String qrCode = record.getQrCode();
@@ -328,10 +369,10 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     private String getGroupFissionQrcode(Long taskFissionId, String fissionTargetId, WeTaskFissionRecord record, String userId) {
         String qrCode = null;
         WeUser weUser = weUserService.selectWeUserById(userId);
-        if (weUser != null){
+        if (weUser != null) {
             String avatar = weUser.getAvatarMediaid();
             WeMaterial file = weMaterialService.findWeMaterialById(Long.parseLong(avatar));
-            String avatarUrl = StringUtils.isEmpty(avatar)?file.getMaterialUrl():avatar;
+            String avatarUrl = StringUtils.isEmpty(avatar) ? file.getMaterialUrl() : avatar;
             String content = "/wecom/fission/complete/" + taskFissionId + "/records/" + record.getId();
             BufferedImage bufferedImage = QREncode.crateQRCode(content, avatarUrl);
             if (bufferedImage != null) {
@@ -345,7 +386,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
                 }
             }
             return qrCode;
-        }else {
+        } else {
             throw new WeComException("生成二维码异常,用户信息不存在");
         }
     }

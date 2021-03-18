@@ -10,6 +10,9 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.DateUtils;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.wecom.domain.WeCustomer;
@@ -17,6 +20,7 @@ import com.linkwechat.wecom.domain.WeTaskFission;
 import com.linkwechat.wecom.domain.dto.WeChatUserDTO;
 import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
 import com.linkwechat.wecom.domain.query.WeTaskFissionStatisticQO;
+import com.linkwechat.wecom.domain.vo.WeTaskFissionStatisticVO;
 import com.linkwechat.wecom.service.IWeTaskFissionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +32,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 
@@ -64,15 +70,22 @@ public class WeTaskFissionController extends BaseController {
     @ApiOperation(value = "查询统计信息", httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:fission:stat')")
     @GetMapping("/stat")
-    public AjaxResult statistics(WeTaskFissionStatisticQO weTaskFissionStatisticQO) {
-        //TODO 待完成
-        //record表和complete_record表增加创建时间
-        //record表增加完成时间
-        //三个统计维度：
-        //  1. 日新增：每天裂变客户数
-        //  2. 日参与：每天扫码参加活动的客户数
-        //  3. 日完成：每天完成裂变任务的客户数
-        return null;
+    public AjaxResult statistics(WeTaskFissionStatisticQO weTaskFissionStatisticQO) throws ParseException {
+        Date st;
+        Date et = DateUtils.getNowDate();
+        if (weTaskFissionStatisticQO.getSeven()) {
+            st = DateUtils.addDays(et, -7);
+        } else if (weTaskFissionStatisticQO.getThirty()) {
+            st = DateUtils.addDays(et, -30);
+        } else {
+            if (StringUtils.isNotBlank(weTaskFissionStatisticQO.getBeginTime()) ^ StringUtils.isNotBlank(weTaskFissionStatisticQO.getEndTime())) {
+                throw new WeComException("开始或结束时间不能为空");
+            }
+            st = DateUtils.parseDate(weTaskFissionStatisticQO.getBeginTime() + " 00:00:00", "yyyy-MM-dd HH:mm:ss");
+            et = DateUtils.parseDate(weTaskFissionStatisticQO.getEndTime() + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
+        }
+        WeTaskFissionStatisticVO vo = weTaskFissionService.taskFissionStatistic(weTaskFissionStatisticQO.getTaskFissionId(), st, et);
+        return AjaxResult.success(vo);
     }
 
     /**
@@ -216,7 +229,7 @@ public class WeTaskFissionController extends BaseController {
     @PreAuthorize("@ss.hasPermi('wecom:fission:getCustomerListById')")
     @Log(title = "根据任务id和unionId获取添加客户列表", businessType = BusinessType.OTHER)
     @GetMapping("/getCustomerListById/{unionId}/{fissionId}")
-    public AjaxResult<List<WeCustomer>> getCustomerListById(@ApiParam("微信用户id") String unionId,@ApiParam("任务id") String fissionId) {
+    public AjaxResult<List<WeCustomer>> getCustomerListById(@ApiParam("微信用户id") String unionId, @ApiParam("任务id") String fissionId) {
         return AjaxResult.success(weTaskFissionService.getCustomerListById(unionId, fissionId));
     }
 }

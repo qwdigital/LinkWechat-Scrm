@@ -1,12 +1,14 @@
 package com.linkwechat.wecom.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.annotation.Excel;
-import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+
+import java.util.Date;
 
 /**
  * 裂变任务完成记录对象 we_task_fission_complete_record
@@ -16,7 +18,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  */
 @ApiModel
 @Data
-public class WeTaskFissionCompleteRecord extends BaseEntity {
+public class WeTaskFissionCompleteRecord {
     private static final long serialVersionUID = -9170275723334248435L;
     /**
      * 主键
@@ -51,6 +53,13 @@ public class WeTaskFissionCompleteRecord extends BaseEntity {
     @ApiModelProperty("裂变客户姓名")
     private String customerName;
 
+    /**
+     * 创建时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty("创建时间")
+    private Date createTime = new Date();
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
@@ -59,6 +68,7 @@ public class WeTaskFissionCompleteRecord extends BaseEntity {
                 .append("fissionRecordId", getFissionRecordId())
                 .append("customerId", getCustomerId())
                 .append("customerName", getCustomerName())
+                .append("createTime", getCreateTime())
                 .toString();
     }
 }
