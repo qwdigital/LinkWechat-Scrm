@@ -11,12 +11,13 @@
         <result property="customerName" column="customer_name"/>
         <result property="fissNum" column="fiss_num"/>
         <result property="qrCode" column="qr_code"/>
+        <result property="poster" column="poster"/>
         <result property="createTime" column="create_time"/>
         <result property="completeTime" column="complete_time"/>
     </resultMap>
 
     <sql id="selectWeTaskFissionRecordVo">
-        select id, task_fission_id, customer_id, customer_name, fiss_num, qr_code, create_time, complete_time from
+        select id, task_fission_id, customer_id, customer_name, fiss_num, qr_code, poster, create_time, complete_time from
         we_task_fission_record
     </sql>
 
@@ -46,6 +47,7 @@
             <if test="customerName != null">customer_name,</if>
             <if test="fissNum != null">fiss_num,</if>
             <if test="qrCode != null and qrCode != ''">qr_code,</if>
+            <if test="poster != null and poster != ''">poster,</if>
             <if test="createTime != null">create_time,</if>
             <if test="completeTime != null">complete_time,</if>
         </trim>
@@ -55,6 +57,7 @@
             <if test="customerName != null">#{customerName},</if>
             <if test="fissNum != null">#{fissNum},</if>
             <if test="qrCode != null and qrCode != ''">#{qrCode},</if>
+            <if test="poster != null and poster != ''">#{poster},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="completeTime != null">#{completeTime},</if>
         </trim>
@@ -67,7 +70,8 @@
             <if test="customerId != null and customerId != ''">customer_id = #{customerId},</if>
             <if test="customerName != null">customer_name = #{customerName},</if>
             <if test="fissNum != null">fiss_num = #{fissNum},</if>
-            <if test="qrCode != null">qr_code = #{qrCode},</if>
+            <if test="qrCode != null and qrCode != ''">qr_code = #{qrCode},</if>
+            <if test="poster != null and poster != ''">poster = #{poster},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="completeTime != null">complete_time = #{completeTime},</if>
         </trim>

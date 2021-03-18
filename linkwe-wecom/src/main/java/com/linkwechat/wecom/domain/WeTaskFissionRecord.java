@@ -59,8 +59,11 @@ public class WeTaskFissionRecord extends BaseEntity {
     @ApiModelProperty("裂变客户数量")
     private Long fissNum;
 
-    @ApiModelProperty("生成二维码")
+    @ApiModelProperty("二维码链接")
     private String qrCode;
+
+    @ApiModelProperty("海报链接")
+    private String poster;
 
     @ApiModelProperty("完成时间")
     private Date completeTime;
@@ -74,6 +77,7 @@ public class WeTaskFissionRecord extends BaseEntity {
                 .append("customerName", getCustomerName())
                 .append("fissNum", getFissNum())
                 .append("qrCode", getQrCode())
+                .append("poster", getPoster())
                 .append("completeTime", getCompleteTime())
                 .toString();
     }

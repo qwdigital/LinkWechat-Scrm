@@ -230,13 +230,26 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         WeUser user = weUserService.selectWeUserById(weTaskFissionPosterDTO.getUserId());
         if (user != null) {
             WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), user.getUserId(), user.getName());
-            String qrcode = getPosterQRCode(weTaskFissionPosterDTO.getFissionTargetId(), record, user);
-            WePoster poster = wePosterService.selectOne(weTaskFissionPosterDTO.getPosterId());
-            poster.getPosterSubassemblyList().stream().filter(Objects::nonNull)
-                    .filter(wePosterSubassembly -> wePosterSubassembly.getType() == 3).forEach(wePosterSubassembly -> {
-                wePosterSubassembly.setImgPath(qrcode);
-            });
-            return wePosterService.generateSimpleImg(poster);
+            String posterUrl = record.getPoster();
+            if (StringUtils.isBlank(posterUrl)) {
+                String qrcode = getPosterQRCode(weTaskFissionPosterDTO.getFissionTargetId(), record, user);
+                if (StringUtils.isBlank(qrcode)) {
+                    throw new WeComException("生成的二维码为空");
+                }
+                WePoster poster = wePosterService.selectOne(weTaskFissionPosterDTO.getPosterId());
+                poster.getPosterSubassemblyList().stream().filter(Objects::nonNull)
+                        .filter(wePosterSubassembly -> wePosterSubassembly.getType() == 3).forEach(wePosterSubassembly -> {
+                    wePosterSubassembly.setImgPath(qrcode);
+                });
+                posterUrl = wePosterService.generateSimpleImg(poster);
+                if (StringUtils.isBlank(posterUrl)) {
+                    throw new WeComException("生成的海报为空");
+                }
+                record.setQrCode(qrcode);
+                record.setPoster(posterUrl);
+                weTaskFissionRecordService.updateWeTaskFissionRecord(record);
+            }
+            return posterUrl;
         } else {
             throw new RuntimeException("客户信息不存在");
         }
@@ -259,57 +272,47 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     }
 
     private String getPosterQRCode(String fissionTargetId, WeTaskFissionRecord record, WeUser user) {
-        String qrCode;
-        Long taskFissionId = record.getTaskFissionId();
-        WeTaskFission taskFission = weTaskFissionMapper.selectWeTaskFissionById(taskFissionId);
-        Integer taskFissionType = taskFission.getFissionType();
-        if (TaskFissionType.USER_FISSION.getCode().equals(taskFissionType)) {
-            qrCode = getUserFissionQrcode(fissionTargetId, record);
-        } else if (TaskFissionType.GROUP_FISSION.getCode().equals(taskFissionType)) {
-            qrCode = getGroupFissionQrcode(taskFissionId, fissionTargetId, record, user);
-        } else {
-            throw new WeComException("错误的任务类型");
-        }
+        String qrCode = record.getQrCode();
         if (StringUtils.isBlank(qrCode)) {
-            throw new WeComException("生成的二维码为空");
+            Long taskFissionId = record.getTaskFissionId();
+            WeTaskFission taskFission = weTaskFissionMapper.selectWeTaskFissionById(taskFissionId);
+            Integer taskFissionType = taskFission.getFissionType();
+            if (TaskFissionType.USER_FISSION.getCode().equals(taskFissionType)) {
+                qrCode = getUserFissionQrcode(fissionTargetId, record);
+            } else if (TaskFissionType.GROUP_FISSION.getCode().equals(taskFissionType)) {
+                qrCode = getGroupFissionQrcode(taskFissionId, fissionTargetId, record, user);
+            } else {
+                throw new WeComException("错误的任务类型");
+            }
         }
         return qrCode;
     }
 
     private String getUserFissionQrcode(String fissionTargetId, WeTaskFissionRecord record) {
-        String qrcode;
-        if (StringUtils.isNotBlank(record.getQrCode())) {
-            qrcode = record.getQrCode();
-        } else {
-            //获取二维码
-            WeExternalContactDto.WeContactWay contactWay = posterContactWay(fissionTargetId, record.getId());
-            WeExternalContactDto dto = weExternalContactClient.addContactWay(contactWay);
-            record.setQrCode(dto.getQr_code());
-            int updateResult = weTaskFissionRecordService.updateWeTaskFissionRecord(record);
-            if (updateResult <= 0) {
-                throw new RuntimeException("生成海报异常：更新裂变记录失败");
-            }
+        //获取二维码
+        String qrcode = null;
+        WeExternalContactDto.WeContactWay contactWay = posterContactWay(fissionTargetId, record.getId());
+        WeExternalContactDto dto = weExternalContactClient.addContactWay(contactWay);
+        if (dto != null) {
             qrcode = dto.getQr_code();
         }
         return qrcode;
     }
 
     private String getGroupFissionQrcode(Long taskFissionId, String fissionTargetId, WeTaskFissionRecord record, WeUser user) {
-        String qrCode = record.getQrCode();
+        String qrCode = null;
         String avatar = user.getAvatarMediaid();
         WeMaterial file = weMaterialService.findWeMaterialById(Long.parseLong(avatar));
-        if (StringUtils.isBlank(qrCode)) {
-            String content = "/wecom/fission/complete/" + taskFissionId + "/records/" + record.getId();
-            BufferedImage bufferedImage = QREncode.crateQRCode(content, file.getMaterialUrl());
-            if (bufferedImage != null) {
-                try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-                    ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
-                    NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(System.currentTimeMillis() + ".jpg", byteArrayOutputStream.toByteArray());
-                    qrCode = FileUploadUtils.upload2Cos(streamMultipartFile, cosConfig);
-                } catch (Exception e) {
-                    log.warn("生成海报二维码异常, fissionTargetId={}, record={}, user={}, exception={}", fissionTargetId, record, user, ExceptionUtils.getStackTrace(e));
-                    throw new WeComException("生成二维码异常");
-                }
+        String content = "/wecom/fission/complete/" + taskFissionId + "/records/" + record.getId();
+        BufferedImage bufferedImage = QREncode.crateQRCode(content, file.getMaterialUrl());
+        if (bufferedImage != null) {
+            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+                ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
+                NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(System.currentTimeMillis() + ".jpg", byteArrayOutputStream.toByteArray());
+                qrCode = FileUploadUtils.upload2Cos(streamMultipartFile, cosConfig);
+            } catch (Exception e) {
+                log.warn("生成海报二维码异常, fissionTargetId={}, record={}, user={}, exception={}", fissionTargetId, record, user, ExceptionUtils.getStackTrace(e));
+                throw new WeComException("生成二维码异常");
             }
         }
         return qrCode;
