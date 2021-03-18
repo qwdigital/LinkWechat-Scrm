@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service;
 
+import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeTaskFission;
 import com.linkwechat.wecom.domain.dto.WeChatUserDTO;
 import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
@@ -83,4 +84,6 @@ public interface IWeTaskFissionService {
      * @param taskFissionRecordId
      */
     public void completeFissionRecord(Long taskFissionId, Long taskFissionRecordId, WeChatUserDTO weChatUserDTO);
+
+    List<WeCustomer> getCustomerListById(String unionId, String fissionId);
 }

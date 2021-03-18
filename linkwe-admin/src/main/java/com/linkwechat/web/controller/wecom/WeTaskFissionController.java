@@ -12,6 +12,7 @@ import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.poi.ExcelUtil;
+import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeTaskFission;
 import com.linkwechat.wecom.domain.dto.WeChatUserDTO;
 import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
@@ -19,6 +20,7 @@ import com.linkwechat.wecom.domain.query.WeTaskFissionStatisticQO;
 import com.linkwechat.wecom.service.IWeTaskFissionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -204,5 +206,17 @@ public class WeTaskFissionController extends BaseController {
         JSONObject json = new JSONObject();
         json.put("rewardImageUrl", url);
         return AjaxResult.success(json);
+    }
+
+
+    /**
+     * 根据任务id和uuid获取添加客户列表
+     */
+    @ApiOperation(value = "根据任务id和uuid获取添加客户列表", httpMethod = "GET")
+    @PreAuthorize("@ss.hasPermi('wecom:fission:getCustomerListById')")
+    @Log(title = "根据任务id和uuid获取添加客户列表", businessType = BusinessType.OTHER)
+    @GetMapping("/getCustomerListById/{unionId}/{fissionId}")
+    public AjaxResult<List<WeCustomer>> getCustomerListById(@ApiParam("微信用户id") String unionId,@ApiParam("任务id") String fissionId) {
+        return AjaxResult.success(weTaskFissionService.getCustomerListById(unionId, fissionId));
     }
 }

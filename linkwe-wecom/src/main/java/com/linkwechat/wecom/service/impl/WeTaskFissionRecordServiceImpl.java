@@ -90,7 +90,7 @@ public class WeTaskFissionRecordServiceImpl extends ServiceImpl<WeTaskFissionRec
     @Override
     public WeTaskFissionRecord selectWeTaskFissionRecordByIdAndCustomerId(Long id, String customerId) {
         return weTaskFissionRecordMapper.selectOne(new LambdaQueryWrapper<WeTaskFissionRecord>()
-        .eq(WeTaskFissionRecord::getId,id)
+        .eq(WeTaskFissionRecord::getTaskFissionId,id)
         .eq(WeTaskFissionRecord::getCustomerId,customerId));
     }
 }
