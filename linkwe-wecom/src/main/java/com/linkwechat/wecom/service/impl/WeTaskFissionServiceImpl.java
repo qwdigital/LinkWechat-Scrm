@@ -26,6 +26,7 @@ import com.linkwechat.wecom.domain.vo.WeTaskFissionDailyDataVO;
 import com.linkwechat.wecom.domain.vo.WeTaskFissionStatisticVO;
 import com.linkwechat.wecom.mapper.WeTaskFissionMapper;
 import com.linkwechat.wecom.service.*;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -283,13 +284,20 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
 
     @Override
     public List<WeCustomer> getCustomerListById(String unionId, String fissionId) {
-        WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getUnionid, unionId));
-        String externalUseriId = Optional.ofNullable(weCustomer).map(WeCustomer::getExternalUserid)
-                .orElseThrow(() -> new WeComException("用户信息不存在"));
+        WeTaskFissionRecord weTaskFissionRecord = null;
+        if(StringUtils.isEmpty(unionId)){
+            weTaskFissionRecord = weTaskFissionRecordService
+                    .getOne(new LambdaQueryWrapper<WeTaskFissionRecord>().eq(WeTaskFissionRecord::getTaskFissionId,fissionId));
+
+        }else {
+            WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getUnionid, unionId));
+            String externalUseriId = Optional.ofNullable(weCustomer).map(WeCustomer::getExternalUserid)
+                    .orElseThrow(() -> new WeComException("用户信息不存在"));
 
 
-        WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService
-                .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), externalUseriId);
+            weTaskFissionRecord = weTaskFissionRecordService
+                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), externalUseriId);
+        }
 
         Long recordId = Optional.ofNullable(weTaskFissionRecord).map(WeTaskFissionRecord::getId)
                 .orElseThrow(() -> new WeComException("任务记录信息不存在"));
