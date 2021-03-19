@@ -1,8 +1,10 @@
 package com.linkwechat.wecom.service;
 
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeTaskFissionCompleteRecord;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -11,7 +13,7 @@ import java.util.List;
  * @author ruoyi
  * @date 2021-01-27
  */
-public interface IWeTaskFissionCompleteRecordService {
+public interface IWeTaskFissionCompleteRecordService extends IService<WeTaskFissionCompleteRecord> {
     /**
      * 查询裂变任务完成记录
      *
@@ -59,4 +61,6 @@ public interface IWeTaskFissionCompleteRecordService {
      * @return 结果
      */
     public int deleteWeTaskFissionCompleteRecordById(Long id);
+
+    public List<WeTaskFissionCompleteRecord> statisticCompleteRecords(Long taskFissionId, Date startTime, Date endTime);
 }

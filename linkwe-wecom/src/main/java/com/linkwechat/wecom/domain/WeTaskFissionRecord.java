@@ -1,7 +1,7 @@
 package com.linkwechat.wecom.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.annotation.Excel;
-import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -24,7 +24,7 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WeTaskFissionRecord extends BaseEntity {
+public class WeTaskFissionRecord {
     private static final long serialVersionUID = 8770538385789110599L;
     /**
      * 主键
@@ -65,7 +65,15 @@ public class WeTaskFissionRecord extends BaseEntity {
     @ApiModelProperty("海报链接")
     private String poster;
 
-    @ApiModelProperty("完成时间")
+    /**
+     * 创建时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty(value = "创建时间")
+    private Date createTime = new Date();
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty(value = "完成时间")
     private Date completeTime;
 
     @Override
@@ -78,6 +86,7 @@ public class WeTaskFissionRecord extends BaseEntity {
                 .append("fissNum", getFissNum())
                 .append("qrCode", getQrCode())
                 .append("poster", getPoster())
+                .append("createTime", getCreateTime())
                 .append("completeTime", getCompleteTime())
                 .toString();
     }

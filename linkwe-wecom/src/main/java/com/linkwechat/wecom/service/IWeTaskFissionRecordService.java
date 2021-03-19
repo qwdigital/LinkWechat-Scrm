@@ -1,7 +1,9 @@
 package com.linkwechat.wecom.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeTaskFissionRecord;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -10,7 +12,7 @@ import java.util.List;
  * @author ruoyi
  * @date 2021-01-27
  */
-public interface IWeTaskFissionRecordService {
+public interface IWeTaskFissionRecordService extends IService<WeTaskFissionRecord> {
     /**
      * 查询裂变任务记录
      *
@@ -61,4 +63,6 @@ public interface IWeTaskFissionRecordService {
 
 
     public WeTaskFissionRecord selectWeTaskFissionRecordByIdAndCustomerId(Long id, String customerId);
+
+    public List<WeTaskFissionRecord> statisticRecords(Long taskFissionId, Date startTime, Date endTime);
 }
