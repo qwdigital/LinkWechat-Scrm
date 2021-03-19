@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service;
 
 import com.linkwechat.wecom.domain.WeTaskFissionReward;
+import com.linkwechat.wecom.domain.vo.WeTaskFissionRewardVo;
 
 import java.util.List;
 
@@ -58,4 +59,12 @@ public interface IWeTaskFissionRewardService {
      * @return 结果
      */
     public int deleteWeTaskFissionRewardById(Long id);
+
+    /**
+     * 根据微信用户id和任务id获取任务裂变奖励详细信息
+     * @param fissionId 任务id
+     * @param unionId  微信用户id
+     * @return
+     */
+    public WeTaskFissionRewardVo getRewardByFissionId(String fissionId, String unionId);
 }

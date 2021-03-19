@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeTaskFissionReward;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
  * @author leejoker
  * @date 2021-01-20
  */
-public interface WeTaskFissionRewardMapper {
+public interface WeTaskFissionRewardMapper extends BaseMapper<WeTaskFissionReward> {
     /**
      * 查询任务裂变奖励
      *

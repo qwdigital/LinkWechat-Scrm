@@ -229,7 +229,8 @@ public class WeTaskFissionController extends BaseController {
     @PreAuthorize("@ss.hasPermi('wecom:fission:getCustomerListById')")
     @Log(title = "根据任务id和unionId获取添加客户列表", businessType = BusinessType.OTHER)
     @GetMapping("/getCustomerListById/{fissionId}/{unionId}")
-    public AjaxResult<List<WeCustomer>> getCustomerListById(@ApiParam("任务id") String fissionId,@ApiParam("微信用户id") String unionId) {
+    public AjaxResult<List<WeCustomer>> getCustomerListById(@ApiParam("任务id") @PathVariable("fissionId") String fissionId
+            , @PathVariable("unionId") @ApiParam("微信用户id") String unionId) {
         return AjaxResult.success(weTaskFissionService.getCustomerListById(unionId, fissionId));
     }
 }

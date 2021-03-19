@@ -7,9 +7,11 @@ import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.wecom.domain.WeTaskFissionReward;
+import com.linkwechat.wecom.domain.vo.WeTaskFissionRewardVo;
 import com.linkwechat.wecom.service.IWeTaskFissionRewardService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -96,5 +98,17 @@ public class WeTaskFissionRewardController extends BaseController {
     @DeleteMapping("/delete/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(weTaskFissionRewardService.deleteWeTaskFissionRewardByIds(ids));
+    }
+
+
+    /**
+     * 根据微信用户id和任务id获取任务裂变奖励详细信息
+     */
+    @ApiOperation(value = "根据微信用户id和任务id获取任务裂变奖励详细信息",httpMethod = "GET")
+    @PreAuthorize("@ss.hasPermi('wecom:getRewardById:query')")
+    @GetMapping(value = "/getRewardByFissionId/{fissionId}/{unionId}")
+    public AjaxResult<WeTaskFissionRewardVo> getRewardByFissionId(@ApiParam("任务id") @PathVariable("fissionId") String fissionId
+            , @PathVariable("unionId") @ApiParam("微信用户id") String unionId) {
+        return AjaxResult.success(weTaskFissionRewardService.getRewardByFissionId(fissionId,unionId));
     }
 }
