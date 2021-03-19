@@ -26,7 +26,6 @@ import com.linkwechat.wecom.domain.vo.WeTaskFissionDailyDataVO;
 import com.linkwechat.wecom.domain.vo.WeTaskFissionStatisticVO;
 import com.linkwechat.wecom.mapper.WeTaskFissionMapper;
 import com.linkwechat.wecom.service.*;
-import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -244,7 +243,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
             WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), weCustomer.getExternalUserid(), weCustomer.getName());
             String posterUrl = record.getPoster();
             if (StringUtils.isBlank(posterUrl)) {
-                String qrcode = getPosterQRCode(weTaskFissionPosterDTO.getFissionTargetId(), record, weTaskFissionPosterDTO.getUserId());
+                String qrcode = getPosterQRCode(weTaskFissionPosterDTO.getFissionTargetId(), record, weCustomer);
                 if (StringUtils.isBlank(qrcode)) {
                     throw new WeComException("生成的二维码为空");
                 }
@@ -285,11 +284,11 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     @Override
     public List<WeCustomer> getCustomerListById(String unionId, String fissionId) {
         WeTaskFissionRecord weTaskFissionRecord = null;
-        if(StringUtils.isEmpty(unionId)){
+        if (StringUtils.isEmpty(unionId)) {
             weTaskFissionRecord = weTaskFissionRecordService
-                    .getOne(new LambdaQueryWrapper<WeTaskFissionRecord>().eq(WeTaskFissionRecord::getTaskFissionId,fissionId));
+                    .getOne(new LambdaQueryWrapper<WeTaskFissionRecord>().eq(WeTaskFissionRecord::getTaskFissionId, fissionId));
 
-        }else {
+        } else {
             WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getUnionid, unionId));
             String externalUseriId = Optional.ofNullable(weCustomer).map(WeCustomer::getExternalUserid)
                     .orElseThrow(() -> new WeComException("用户信息不存在"));
@@ -346,7 +345,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
 
     /*************************************** private functions **************************************/
 
-    private String getPosterQRCode(String fissionTargetId, WeTaskFissionRecord record, String userId) {
+    private String getPosterQRCode(String fissionTargetId, WeTaskFissionRecord record, WeCustomer weCustomer) {
         String qrCode = record.getQrCode();
         if (StringUtils.isBlank(qrCode)) {
             Long taskFissionId = record.getTaskFissionId();
@@ -355,7 +354,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
             if (TaskFissionType.USER_FISSION.getCode().equals(taskFissionType)) {
                 qrCode = getUserFissionQrcode(fissionTargetId, record);
             } else if (TaskFissionType.GROUP_FISSION.getCode().equals(taskFissionType)) {
-                qrCode = getGroupFissionQrcode(taskFissionId, fissionTargetId, record, userId);
+                qrCode = getGroupFissionQrcode(taskFissionId, record, weCustomer);
             } else {
                 throw new WeComException("错误的任务类型");
             }
@@ -374,11 +373,10 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         return qrcode;
     }
 
-    private String getGroupFissionQrcode(Long taskFissionId, String fissionTargetId, WeTaskFissionRecord record, String userId) {
+    private String getGroupFissionQrcode(Long taskFissionId, WeTaskFissionRecord record, WeCustomer weCustomer) {
         String qrCode = null;
-        WeUser weUser = weUserService.selectWeUserById(userId);
-        if (weUser != null) {
-            String avatar = weUser.getAvatarMediaid();
+        if (weCustomer != null) {
+            String avatar = weCustomer.getAvatar();
             WeMaterial file = weMaterialService.findWeMaterialById(Long.parseLong(avatar));
             String avatarUrl = StringUtils.isEmpty(avatar) ? file.getMaterialUrl() : avatar;
             String content = "/wecom/fission/complete/" + taskFissionId + "/records/" + record.getId();
@@ -389,7 +387,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
                     NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(System.currentTimeMillis() + ".jpg", byteArrayOutputStream.toByteArray());
                     qrCode = FileUploadUtils.upload2Cos(streamMultipartFile, cosConfig);
                 } catch (Exception e) {
-                    log.warn("生成海报二维码异常, fissionTargetId={}, record={}, user={}, exception={}", fissionTargetId, record, weUser, ExceptionUtils.getStackTrace(e));
+                    log.warn("生成海报二维码异常, record={}, customer={}, exception={}", record, weCustomer, ExceptionUtils.getStackTrace(e));
                     throw new WeComException("生成二维码异常");
                 }
             }
