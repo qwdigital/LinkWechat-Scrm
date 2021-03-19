@@ -15,9 +15,6 @@ public class WeTaskFissionPosterDTO {
     @ApiModelProperty("客户id(微信用户Id)")
     private String unionId;
 
-    @ApiModelProperty("企微成员id")
-    private String userId;
-
     @ApiModelProperty("任务id")
     private Long taskFissionId;
 
