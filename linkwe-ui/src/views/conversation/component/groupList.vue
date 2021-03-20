@@ -7,8 +7,7 @@
                 <span class="fl"> 
                     <div class="ninebox">
                         <ul v-if="item.roomInfo">
-                            <li v-for="(a,i) in item.roomInfo.avatar.split(',')" :key="i"><img :src="a" alt=""></li>
-                             
+                            <li v-for="(a,i) in item.roomInfo.avatar.split(',')" :key="i"><img :src="a" ></li>
                         </ul>
                     </div>
                 
@@ -63,13 +62,13 @@
 *{ padding: 0;
 .fl{float: left;}
       margin: 0;}
-      .ninebox{ width: 62px; height: 60px; border: 1px solid #199ed8;;
+      .ninebox{ width: 54px; height: 52px; border: 1px solid #199ed8;;
       ul li{
           float: left;
-          width: 17px;
-          height: 17px;
+          width: 15px;
+          height: 15px;
           padding: 0!important;
-          margin:1px 2px 2px 1px;
+          margin:1px 1px 1px 1px;
       }}
     .list {
         overflow-y:scroll;
@@ -83,7 +82,7 @@
        .gray{color: #999;}
        .padt10{padding-top: 10px;}
         ul li {
-            padding: 10px;
+            padding:3px 10px;
             overflow: hidden;
             border-bottom: 1px solid #efefef;
             cursor: pointer;
@@ -92,8 +91,8 @@
             text-overflow:ellipsis;}
             :hover{ background: #efefef;}
             img {
-                width: 40px;
-                height: 40px;
+                width: 100%;
+                height: 100%;
                 float: left
             }
         }

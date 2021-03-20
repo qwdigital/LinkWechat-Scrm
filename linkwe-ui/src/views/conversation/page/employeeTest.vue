@@ -208,7 +208,7 @@
     },
     mounted() {
       this.getTree()
-      this.getAmount()
+      //this.getAmount()
     },
     methods: {
       voiceLook(e){
@@ -251,7 +251,10 @@
         this.activeNameThreeClick(true)
       },
       activeNameThreeClick(page, group) {
-        console.log(this.activeName)
+        console.log(!!this.chat.id)
+     if(!!!this.chat.id){
+       return //没有选择人
+     }
         if (!!!page) {
           this.currentPage = 1
         }
@@ -355,18 +358,18 @@
         if (!value) return true;
         return data.name.indexOf(value) !== -1;
       },
-      getAmount(){
-           let querys = {
-            pageNum: '1',
-            pageSize: '999',
-            department: ''
-          }
-          api.getList(querys).then(({
-            total
-          }) => {
-             this.employAmount= total
-          })
-      },
+      // getAmount(){
+      //      let querys = {
+      //       pageNum: '1',
+      //       pageSize: '999',
+      //       department: ''
+      //     }
+      //     api.getList(querys).then(({
+      //       total
+      //     }) => {
+      //        this.employAmount= total
+      //     })
+      // },
       handleNodeClick(data, add) {
         if (!data.userId) {
           let querys = {
