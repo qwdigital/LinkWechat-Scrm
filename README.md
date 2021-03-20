@@ -8,9 +8,9 @@
 
 <div align="center">
 
-<a href='https://gitee.com/LinkWeChat/link-wechat/stargazers'><img src='https://gitee.com/LinkWeChat/link-wechat/badge/star.svg?theme=gvp' alt='star'></img></a>
-<a href='https://gitee.com/LinkWeChat/link-wechat/members'><img src='https://gitee.com/LinkWeChat/link-wechat/badge/fork.svg?theme=gvp' alt='fork'></img></a>
-![license](http://img.shields.io/badge/license-GPL%203.0-green)
+[![star](https://gitee.com/LinkWeChat/link-wechat/badge/star.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/stargazers)
+[![fork](https://gitee.com/LinkWeChat/link-wechat/badge/fork.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/members)
+[![license](http://img.shields.io/badge/license-GPL%203.0-green)](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
 
 </div>
 
