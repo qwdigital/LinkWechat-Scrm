@@ -105,9 +105,9 @@ public class WeTaskFissionRewardServiceImpl implements IWeTaskFissionRewardServi
     }
 
     @Override
-    public WeTaskFissionRewardVo getRewardByFissionId(String fissionId, String unionId) {
+    public WeTaskFissionRewardVo getRewardByFissionId(String fissionId, String eid) {
         WeTaskFissionRewardVo weTaskFissionRewardVo = new WeTaskFissionRewardVo();
-        WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getUnionid, unionId));
+        WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getExternalUserid, eid));
         String externalUseriId = Optional.ofNullable(weCustomer).map(WeCustomer::getExternalUserid)
                 .orElseThrow(() -> new WeComException("用户信息不存在"));
 

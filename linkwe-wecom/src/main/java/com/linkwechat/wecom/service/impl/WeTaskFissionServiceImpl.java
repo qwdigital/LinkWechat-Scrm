@@ -283,16 +283,16 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     }
 
     @Override
-    public List<WeCustomer> getCustomerListById(String unionId, String fissionId) {
+    public List<WeCustomer> getCustomerListById(String eid, String fissionId) {
         WeTaskFissionRecord weTaskFissionRecord;
-        if (StringUtils.isEmpty(unionId)) {
+        if (StringUtils.isEmpty(eid)) {
             List<WeTaskFissionRecord> weTaskFissionRecords = weTaskFissionRecordService
                     .list(new LambdaQueryWrapper<WeTaskFissionRecord>().eq(WeTaskFissionRecord::getTaskFissionId, fissionId));
             return Optional.ofNullable(weTaskFissionRecords).orElseGet(ArrayList::new).stream()
                     .map(record -> weCustomerService.selectWeCustomerById(record.getCustomerId()))
                     .filter(Objects::nonNull).collect(Collectors.toList());
         } else {
-            WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getUnionid, unionId));
+            WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getExternalUserid, eid));
             String externalUseriId = Optional.ofNullable(weCustomer).map(WeCustomer::getExternalUserid)
                     .orElseThrow(() -> new WeComException("用户信息不存在"));
             weTaskFissionRecord = weTaskFissionRecordService
@@ -342,10 +342,10 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     }
 
     @Override
-    public WeTaskFissionProgressVO getCustomerTaskProgress(WeTaskFission taskFission, String unionId) {
+    public WeTaskFissionProgressVO getCustomerTaskProgress(WeTaskFission taskFission, String eid) {
         long complete = 0L;
         long total = taskFission.getFissNum();
-        List<WeCustomer> list = getCustomerListById(unionId, String.valueOf(taskFission.getId()));
+        List<WeCustomer> list = getCustomerListById(eid, String.valueOf(taskFission.getId()));
         if (CollectionUtils.isNotEmpty(list)) {
             complete = list.size();
         } else {

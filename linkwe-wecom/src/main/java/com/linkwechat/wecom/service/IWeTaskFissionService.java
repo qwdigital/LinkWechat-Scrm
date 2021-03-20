@@ -92,5 +92,5 @@ public interface IWeTaskFissionService {
 
     WeTaskFissionStatisticVO taskFissionStatistic(Long taskFissionId, Date startTime, Date endTime);
 
-    WeTaskFissionProgressVO getCustomerTaskProgress(WeTaskFission taskFission, String unionId);
+    WeTaskFissionProgressVO getCustomerTaskProgress(WeTaskFission taskFission, String eid);
 }

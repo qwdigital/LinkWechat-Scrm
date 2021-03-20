@@ -63,8 +63,8 @@ public interface IWeTaskFissionRewardService {
     /**
      * 根据微信用户id和任务id获取任务裂变奖励详细信息
      * @param fissionId 任务id
-     * @param unionId  微信用户id
+     * @param eid  客户id
      * @return
      */
-    public WeTaskFissionRewardVo getRewardByFissionId(String fissionId, String unionId);
+    public WeTaskFissionRewardVo getRewardByFissionId(String fissionId, String eid);
 }
