@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -268,7 +269,7 @@ public class WeTaskFissionController extends BaseController {
         if (weTaskFission != null) {
             List<WeCustomer> customers = weTaskFissionService.getCustomerListById(null, String.valueOf(id));
             if (CollectionUtils.isNotEmpty(customers)) {
-                customers.forEach(customer -> {
+                customers.stream().filter(Objects::nonNull).forEach(customer -> {
                     WeTaskFissionTotalProgressVO vo = new WeTaskFissionTotalProgressVO();
                     vo.setCustomer(customer);
                     vo.setProgress(weTaskFissionService.getCustomerTaskProgress(weTaskFission, customer.getUnionid()));

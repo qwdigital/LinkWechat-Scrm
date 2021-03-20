@@ -289,7 +289,8 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
             List<WeTaskFissionRecord> weTaskFissionRecords = weTaskFissionRecordService
                     .list(new LambdaQueryWrapper<WeTaskFissionRecord>().eq(WeTaskFissionRecord::getTaskFissionId, fissionId));
             return Optional.ofNullable(weTaskFissionRecords).orElseGet(ArrayList::new).stream()
-                    .map(record -> weCustomerService.selectWeCustomerById(record.getCustomerId())).collect(Collectors.toList());
+                    .map(record -> weCustomerService.selectWeCustomerById(record.getCustomerId()))
+                    .filter(Objects::nonNull).collect(Collectors.toList());
         } else {
             WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getUnionid, unionId));
             String externalUseriId = Optional.ofNullable(weCustomer).map(WeCustomer::getExternalUserid)
