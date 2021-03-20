@@ -4,24 +4,36 @@ import java.util.HashMap;
 
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.constant.HttpStatus;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * 操作消息提醒
  * 
  * @author ruoyi
  */
-public class AjaxResult<T> extends HashMap<String, Object>
+@ApiModel
+public class AjaxResult<T>
 {
     private static final long serialVersionUID = 1L;
 
     /** 状态码 */
     public static final String CODE_TAG = "code";
 
+    @ApiModelProperty("状态码")
+    private int code;
+
     /** 返回内容 */
     public static final String MSG_TAG = "msg";
 
+    @ApiModelProperty("返回内容")
+    private String msg;
+
     /** 数据对象 */
     public static final String DATA_TAG = "data";
+
+    @ApiModelProperty("数据对象")
+    private T date;
 
     /**
      * 初始化一个新创建的 AjaxResult 对象，使其表示一个空消息。
@@ -38,8 +50,8 @@ public class AjaxResult<T> extends HashMap<String, Object>
      */
     public AjaxResult(int code, String msg)
     {
-        super.put(CODE_TAG, code);
-        super.put(MSG_TAG, msg);
+        this.code = code;
+        this.msg = msg;
     }
 
     /**
@@ -51,12 +63,9 @@ public class AjaxResult<T> extends HashMap<String, Object>
      */
     public AjaxResult(int code, String msg, T data)
     {
-        super.put(CODE_TAG, code);
-        super.put(MSG_TAG, msg);
-        if (StringUtils.isNotNull(data))
-        {
-            super.put(DATA_TAG, data);
-        }
+        this.code = code;
+        this.msg = msg;
+        this.date = data;
     }
 
     /**
@@ -74,7 +83,7 @@ public class AjaxResult<T> extends HashMap<String, Object>
      * 
      * @return 成功消息
      */
-    public static AjaxResult success(Object data)
+    public static <T> AjaxResult success(T data)
     {
         return AjaxResult.success("操作成功", data);
     }
@@ -97,7 +106,7 @@ public class AjaxResult<T> extends HashMap<String, Object>
      * @param data 数据对象
      * @return 成功消息
      */
-    public static AjaxResult success(String msg, Object data)
+    public static <T> AjaxResult success(String msg, T data)
     {
         return new AjaxResult(HttpStatus.SUCCESS, msg, data);
     }
