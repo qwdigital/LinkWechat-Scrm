@@ -20,11 +20,13 @@ import com.linkwechat.wecom.domain.WeTaskFission;
 import com.linkwechat.wecom.domain.dto.WeChatUserDTO;
 import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
 import com.linkwechat.wecom.domain.query.WeTaskFissionStatisticQO;
+import com.linkwechat.wecom.domain.vo.WeTaskFissionProgressVO;
 import com.linkwechat.wecom.domain.vo.WeTaskFissionStatisticVO;
 import com.linkwechat.wecom.service.IWeTaskFissionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -223,14 +226,39 @@ public class WeTaskFissionController extends BaseController {
 
 
     /**
-     * 根据任务id和unionId获取添加客户列表
+     * 根据任务id获取参与任务客户列表
      */
-    @ApiOperation(value = "根据任务id和unionId获取添加客户列表", httpMethod = "GET")
+    @ApiOperation(value = "根据任务id获取参与任务客户列表", httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:fission:getCustomerListById')")
-    @Log(title = "根据任务id和unionId获取添加客户列表", businessType = BusinessType.OTHER)
-    @GetMapping("/getCustomerListById/{fissionId}/{unionId}")
-    public AjaxResult<List<WeCustomer>> getCustomerListById(@ApiParam("任务id") @PathVariable("fissionId") String fissionId
+    @Log(title = "根据任务id获取参与任务客户列表", businessType = BusinessType.OTHER)
+    @GetMapping("/getCustomerListById/{id}")
+    public AjaxResult<List<WeCustomer>> getCustomerListById(@ApiParam("任务id") @PathVariable("id") String id) {
+        return AjaxResult.success(weTaskFissionService.getCustomerListById(null, id));
+    }
+
+    /**
+     * 获取客户邀请列表和任务进度
+     */
+    @ApiOperation(value = "获取客户邀请列表和任务进度", httpMethod = "GET")
+    @PreAuthorize("@ss.hasPermi('wecom:fission:getCustomerProgress')")
+    @Log(title = "获取客户邀请列表和任务进度", businessType = BusinessType.OTHER)
+    @GetMapping("/{id}/progress/{unionId}")
+    public AjaxResult<WeTaskFissionProgressVO> getCustomerProgress(@ApiParam("任务id") @PathVariable("id") Long id
             , @PathVariable("unionId") @ApiParam("微信用户id") String unionId) {
-        return AjaxResult.success(weTaskFissionService.getCustomerListById(unionId, fissionId));
+        WeTaskFission weTaskFission = weTaskFissionService.selectWeTaskFissionById(id);
+        if (weTaskFission != null) {
+            long complete = 0L;
+            long total = weTaskFission.getFissNum();
+            List<WeCustomer> list = weTaskFissionService.getCustomerListById(unionId, String.valueOf(id));
+            if (CollectionUtils.isNotEmpty(list)) {
+                complete = list.size();
+            } else {
+                list = new ArrayList<>();
+            }
+            return AjaxResult.success(WeTaskFissionProgressVO.builder()
+                    .total(total).completed(complete).customers(list).build());
+        } else {
+            throw new WeComException("任务不存在");
+        }
     }
 }
