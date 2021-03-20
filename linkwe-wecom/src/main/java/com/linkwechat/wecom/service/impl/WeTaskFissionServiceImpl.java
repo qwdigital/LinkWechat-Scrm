@@ -23,6 +23,7 @@ import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
 import com.linkwechat.wecom.domain.dto.message.LinkMessageDto;
 import com.linkwechat.wecom.domain.vo.WeTaskFissionDailyDataVO;
+import com.linkwechat.wecom.domain.vo.WeTaskFissionProgressVO;
 import com.linkwechat.wecom.domain.vo.WeTaskFissionStatisticVO;
 import com.linkwechat.wecom.mapper.WeTaskFissionMapper;
 import com.linkwechat.wecom.service.*;
@@ -341,6 +342,19 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
                 });
         vo.setData(dailyDataList);
         return vo;
+    }
+
+    @Override
+    public WeTaskFissionProgressVO getCustomerTaskProgress(WeTaskFission taskFission, String unionId) {
+        long complete = 0L;
+        long total = taskFission.getFissNum();
+        List<WeCustomer> list = getCustomerListById(unionId, String.valueOf(taskFission.getId()));
+        if (CollectionUtils.isNotEmpty(list)) {
+            complete = list.size();
+        } else {
+            list = new ArrayList<>();
+        }
+        return WeTaskFissionProgressVO.builder().total(total).completed(complete).customers(list).build();
     }
 
     /*************************************** private functions **************************************/

@@ -4,6 +4,7 @@ import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeTaskFission;
 import com.linkwechat.wecom.domain.dto.WeChatUserDTO;
 import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
+import com.linkwechat.wecom.domain.vo.WeTaskFissionProgressVO;
 import com.linkwechat.wecom.domain.vo.WeTaskFissionStatisticVO;
 
 import java.util.Date;
@@ -90,4 +91,6 @@ public interface IWeTaskFissionService {
     List<WeCustomer> getCustomerListById(String unionId, String fissionId);
 
     WeTaskFissionStatisticVO taskFissionStatistic(Long taskFissionId, Date startTime, Date endTime);
+
+    WeTaskFissionProgressVO getCustomerTaskProgress(WeTaskFission taskFission, String unionId);
 }

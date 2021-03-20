@@ -3,6 +3,8 @@ package com.linkwechat.web.controller.wecom;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.nacos.common.utils.CollectionUtils;
+import com.google.common.collect.Lists;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.constant.HttpStatus;
@@ -22,11 +24,11 @@ import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
 import com.linkwechat.wecom.domain.query.WeTaskFissionStatisticQO;
 import com.linkwechat.wecom.domain.vo.WeTaskFissionProgressVO;
 import com.linkwechat.wecom.domain.vo.WeTaskFissionStatisticVO;
+import com.linkwechat.wecom.domain.vo.WeTaskFissionTotalProgressVO;
 import com.linkwechat.wecom.service.IWeTaskFissionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,7 +37,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -236,6 +237,7 @@ public class WeTaskFissionController extends BaseController {
         return AjaxResult.success(weTaskFissionService.getCustomerListById(null, id));
     }
 
+
     /**
      * 获取客户邀请列表和任务进度
      */
@@ -247,16 +249,33 @@ public class WeTaskFissionController extends BaseController {
             , @PathVariable("unionId") @ApiParam("微信用户id") String unionId) {
         WeTaskFission weTaskFission = weTaskFissionService.selectWeTaskFissionById(id);
         if (weTaskFission != null) {
-            long complete = 0L;
-            long total = weTaskFission.getFissNum();
-            List<WeCustomer> list = weTaskFissionService.getCustomerListById(unionId, String.valueOf(id));
-            if (CollectionUtils.isNotEmpty(list)) {
-                complete = list.size();
-            } else {
-                list = new ArrayList<>();
+            return AjaxResult.success(weTaskFissionService.getCustomerTaskProgress(weTaskFission, unionId));
+        } else {
+            throw new WeComException("任务不存在");
+        }
+    }
+
+    /**
+     * 获取任务所有参与客户的完成情况
+     */
+    @ApiOperation(value = "获取客户邀请列表和任务进度", httpMethod = "GET")
+    @PreAuthorize("@ss.hasPermi('wecom:fission:getCustomerProgress')")
+    @Log(title = "获取客户邀请列表和任务进度", businessType = BusinessType.OTHER)
+    @GetMapping("/{id}/progress")
+    public AjaxResult<List<WeTaskFissionTotalProgressVO>> getAllCustomerProgress(@ApiParam("任务id") @PathVariable("id") Long id) {
+        WeTaskFission weTaskFission = weTaskFissionService.selectWeTaskFissionById(id);
+        List<WeTaskFissionTotalProgressVO> list = Lists.newArrayList();
+        if (weTaskFission != null) {
+            List<WeCustomer> customers = weTaskFissionService.getCustomerListById(null, String.valueOf(id));
+            if (CollectionUtils.isNotEmpty(customers)) {
+                customers.forEach(customer -> {
+                    WeTaskFissionTotalProgressVO vo = new WeTaskFissionTotalProgressVO();
+                    vo.setCustomer(customer);
+                    vo.setProgress(weTaskFissionService.getCustomerTaskProgress(weTaskFission, customer.getUnionid()));
+                    list.add(vo);
+                });
             }
-            return AjaxResult.success(WeTaskFissionProgressVO.builder()
-                    .total(total).completed(complete).customers(list).build());
+            return AjaxResult.success(list);
         } else {
             throw new WeComException("任务不存在");
         }
