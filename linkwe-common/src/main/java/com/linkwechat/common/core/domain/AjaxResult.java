@@ -1,6 +1,7 @@
 package com.linkwechat.common.core.domain;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.linkwechat.common.constant.HttpStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -21,6 +22,7 @@ public class AjaxResult<T> implements Serializable {
 
     private static final long serialVersionUID = 7337293201809451832L;
 
+    @JsonIgnore
     private HashMap<String, Object> map;
 
     /**
