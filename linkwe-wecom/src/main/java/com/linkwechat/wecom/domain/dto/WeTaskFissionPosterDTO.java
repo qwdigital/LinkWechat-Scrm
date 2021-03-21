@@ -12,8 +12,8 @@ import lombok.Data;
 @ApiModel
 @Data
 public class WeTaskFissionPosterDTO {
-    @ApiModelProperty("客户id(微信用户Id)")
-    private String unionId;
+    @ApiModelProperty("客户id")
+    private String eid;
 
     @ApiModelProperty("任务id")
     private Long taskFissionId;

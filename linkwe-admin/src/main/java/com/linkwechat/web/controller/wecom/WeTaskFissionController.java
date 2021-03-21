@@ -259,9 +259,9 @@ public class WeTaskFissionController extends BaseController {
     /**
      * 获取任务所有参与客户的完成情况
      */
-    @ApiOperation(value = "获取客户邀请列表和任务进度", httpMethod = "GET")
+    @ApiOperation(value = "获取任务所有参与客户的完成情况", httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:fission:getCustomerProgress')")
-    @Log(title = "获取客户邀请列表和任务进度", businessType = BusinessType.OTHER)
+    @Log(title = "获取任务所有参与客户的完成情况", businessType = BusinessType.OTHER)
     @GetMapping("/{id}/progress")
     public AjaxResult<List<WeTaskFissionTotalProgressVO>> getAllCustomerProgress(@ApiParam("任务id") @PathVariable("id") Long id) {
         WeTaskFission weTaskFission = weTaskFissionService.selectWeTaskFissionById(id);

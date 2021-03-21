@@ -238,7 +238,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     @Transactional
     public String fissionPosterGenerate(WeTaskFissionPosterDTO weTaskFissionPosterDTO) {
         WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>()
-                .eq(WeCustomer::getUnionid, weTaskFissionPosterDTO.getUnionId()));
+                .eq(WeCustomer::getExternalUserid, weTaskFissionPosterDTO.getEid()));
         if (weCustomer != null) {
             //任务表添加当前客户任务
             WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), weCustomer.getExternalUserid(), weCustomer.getName());
