@@ -251,7 +251,7 @@
         this.activeNameThreeClick(true)
       },
       activeNameThreeClick(page, group) {
-        console.log(!!this.chat.id)
+       console.log(this.chat.id,'this.chat.id')
      if(!!!this.chat.id){
        return //没有选择人
      }
@@ -287,12 +287,15 @@
           if (this.activeName=='2') {
             content.chatGrounpList(query).then(res => {
               this.total = Number(res.total)
-             this.resortData(res)
+              console.log(res,'this.activeName=')
+             this.resortData(res.data)
             })
           } else {
+           
             content.chatList(query).then(res => {
+               console.log(res,'ssss')
               this.total = Number(res.total)
-             this.resortData(res)
+             this.resortData(res.data)
             })
           }
         }
@@ -338,17 +341,16 @@
         if (!this.employId) {
           return
         }
+        console.log
         if (flag) {
           this.loading = true
         }
         content.getTree({
           fromId: this.employId,
           searchType: this.activeName
-        }).then(({
-          rows
-        }) => {
+        }).then((res) => {
           this.loading = false
-          this.personList = rows
+          this.personList = res.data.rows
         }).catch(err => {
           this.loading = false
         })
@@ -377,14 +379,10 @@
             pageSize: '999',
             department: data.id
           }
-          api.getList(querys).then(({
-            rows
-          }) => {
-           
+          api.getList(querys).then(res => {
               this.$set(data, 'children', []);
-              data.children = rows
+              data.children = res.data.rows
           })
-          
         } else {
           this.talkName = data.name;
           this.employId = data.userId;

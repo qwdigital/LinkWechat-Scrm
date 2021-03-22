@@ -16,7 +16,7 @@
                 <el-col :span="4">
                   <img v-if="i.avatar" :src="i.avatar" alt="头像">
                 </el-col>
-                <el-col :span="16" v-if="i"><span style="line-height:40px">{{i.name}}</span></el-col>
+                <el-col :span="20" v-if="i"><span style="line-height:40px">{{i.name}}</span></el-col>
               </el-row>
             </li>
           </ul>
@@ -230,11 +230,11 @@
         content.getTree({
           fromId: this.employId,
           searchType: this.activeName
-        }).then(({
-          rows
-        }) => {
+        }).then((
+          res
+        ) => {
           this.loading = false
-          this.personList = rows
+          this.personList =res.data.rows
         }).catch(err => {
           this.loading = false
         })
@@ -255,7 +255,6 @@
         } else if (this.activeNameThree == 4) {
           msgType = 'voice'
         }
-
         let query = {
           fromId: this.chatData.fromId,
           msgType,
@@ -271,13 +270,13 @@
         }
           if (group) {
             content.chatGrounpList(query).then(res => {
-              this.total = Number(res.total)
-             this.resortData(res)
+              this.total = Number(res.data.total)
+             this.resortData(res.data)
             })
           } else {
             content.chatList(query).then(res => {
-              this.total = Number(res.total)
-             this.resortData(res)
+              this.total =  Number(res.data.total)
+             this.resortData(res.data)
             })
           }   
       },
@@ -312,11 +311,11 @@
         }
         content.listByCustomer(querys).then(res => {
           console.log(res)
-          res.rows = res.rows.filter((a, b) => {
+          res.rows = res.data.rows.filter((a, b) => {
             return a && a.name
           })
-          this.CList = res.rows
-          this.employAmount = res.total;
+          this.CList = res.data.rows
+          this.employAmount = res.data.total;
         })
       }
     },
