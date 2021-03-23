@@ -63,7 +63,7 @@ public class WeTaskFissionController extends BaseController {
     @ApiOperation(value = "查询任务宝列表", httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:fission:list')")
     @GetMapping("/list")
-    public TableDataInfo list(WeTaskFission weTaskFission) {
+    public TableDataInfo<List<WeTaskFission>> list(WeTaskFission weTaskFission) {
         startPage();
         List<WeTaskFission> list = weTaskFissionService.selectWeTaskFissionList(weTaskFission);
         return getDataTable(list);
@@ -75,7 +75,7 @@ public class WeTaskFissionController extends BaseController {
     @ApiOperation(value = "查询统计信息", httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:fission:stat')")
     @GetMapping("/stat")
-    public AjaxResult statistics(WeTaskFissionStatisticQO weTaskFissionStatisticQO) throws ParseException {
+    public AjaxResult<WeTaskFissionStatisticVO> statistics(WeTaskFissionStatisticQO weTaskFissionStatisticQO) throws ParseException {
         Date st;
         Date et = DateUtils.getNowDate();
         if (weTaskFissionStatisticQO.getSeven()) {
@@ -112,7 +112,7 @@ public class WeTaskFissionController extends BaseController {
     @ApiOperation(value = "获取任务宝详细信息", httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:fission:query')")
     @GetMapping(value = "/getInfo/{id}")
-    public AjaxResult getInfo(@PathVariable("id") Long id) {
+    public AjaxResult<WeTaskFission> getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(weTaskFissionService.selectWeTaskFissionById(id));
     }
 
@@ -195,7 +195,7 @@ public class WeTaskFissionController extends BaseController {
             return AjaxResult.error(HttpStatus.NOT_FOUND, "数据不存在");
         }
         weTaskFissionService.completeFissionRecord(id, recordId, weChatUserDTO);
-        return AjaxResult.success(taskFission.getFissQrcode());
+        return AjaxResult.success("操作成功",taskFission.getFissQrcode());
     }
 
     /**
@@ -205,7 +205,7 @@ public class WeTaskFissionController extends BaseController {
     @PreAuthorize("@ss.hasPermi('wecom:fission:poster')")
     @Log(title = "生成带二维码的海报", businessType = BusinessType.OTHER)
     @PostMapping("/poster")
-    public AjaxResult posterGenerate(@RequestBody WeTaskFissionPosterDTO weTaskFissionPosterDTO) {
+    public AjaxResult<JSONObject> posterGenerate(@RequestBody WeTaskFissionPosterDTO weTaskFissionPosterDTO) {
         String posterUrl = weTaskFissionService.fissionPosterGenerate(weTaskFissionPosterDTO);
         JSONObject json = new JSONObject();
         json.put("posterUrl", posterUrl);
@@ -219,7 +219,7 @@ public class WeTaskFissionController extends BaseController {
     @Log(title = "上传兑奖图片", businessType = BusinessType.OTHER)
     @PostMapping("/upload")
     @ApiOperation(value = "上传兑奖图片", httpMethod = "POST")
-    public AjaxResult upload(@RequestParam(value = "file") MultipartFile file) throws IOException {
+    public AjaxResult<JSONObject> upload(@RequestParam(value = "file") MultipartFile file) throws IOException {
         String url = FileUploadUtils.upload2Cos(file, cosConfig);
         JSONObject json = new JSONObject();
         json.put("rewardImageUrl", url);
