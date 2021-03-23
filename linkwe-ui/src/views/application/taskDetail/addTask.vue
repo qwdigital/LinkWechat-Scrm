@@ -27,7 +27,8 @@ export default {
                 fissionTargetId: '',
                 welcomeMsg: '',
                 rewardUrl: '',
-                rewardImageUrl: ''
+                rewardImageUrl: '',
+                rewardRule: ''
             },
             rewardImageUrlTemp: '',
             action:
@@ -55,12 +56,14 @@ export default {
             dialogVisibleSelectPoster: false,
             dialogVisibleTargetStff: false,
             selectTagType: '',
-            pageType: 'add'
+            pageType: 'add',
+            taskDetail: {}
         }
-    },
+    },  
     created () {
         if (this.$route.query.id) {
-
+            this.pageType = 'edit'
+            this.getList(this.$route.query.id)
         }
     },
     mounted () {
@@ -106,27 +109,79 @@ export default {
                     }
                     delete params.tagType
                     params.fissionType = 1
-                    taskApi.addTask(params)
-                        .then(res => {
-                            if (res.code == 200) {
-                                this.$message({
-                                    message: '新增成功',
-                                    type: 'success'
-                                });
-                                taskApi.sendFission(JSON.parse(res.msg).id)
-                            }
-                            //    
+                    if(this.pageType == 'add'){
+                        this.addTaskRequest(params)
+                    }else{
+                        params['id'] = this.$route.query.id
+                        this.editTaskRequest(params)
+                    }
 
-                        })
                 })
             } catch (error) {
 
             }
 
         },
+        addTaskRequest (params) {
+            taskApi.addTask(params)
+                .then(res => {
+                    if (res.code == 200) {
+                        this.$message({
+                            message: '新增成功',
+                            type: 'success'
+                        });
+                        taskApi.sendFission(JSON.parse(res.msg).id)
+                    }
+                    //    
+
+                })
+        },
+        editTaskRequest(params){
+             taskApi.editTask(params)
+                .then(res => {
+                    if (res.code == 200) {
+                        this.$message({
+                            message: '修改成功',
+                            type: 'success'
+                        });
+                        // taskApi.sendFission(JSON.parse(res.msg).id)
+                    }
+                    //    
+
+                })
+        },
         changeType () {
             // console.log(this.groupForm.sendType)
             // this.groupForm.taskFissionStaffs = []
+        },
+        getList (id) {
+            taskApi.getTaskDetail(id)
+                .then(res => {
+                    this.taskDetail = res.data
+                    console.log(res.data)
+                    let query = {
+                        taskName: res.data.taskName,
+                        fissInfo: res.data.fissInfo,
+                        fissNum: res.data.fissNum,
+                        dateRange: [res.data.startTime + ' 00:00:00', res.data.overTime + ' 00:00:00'],
+                    }
+                    this.query = query
+                    this.groupForm = {
+                        taskFissionStaffs: res.data.taskFissionStaffs,
+                        sendType: (res.data.taskFissionStaffs.length && res.data.taskFissionStaffs[0].staffId) ? 1 : 0,
+                        customerTag: res.data.customerTagId == 'all' ? '' : res.data.customerTag.split(','),
+                        customerTagId: res.data.customerTagId == 'all' ? 'all' : '',
+                        tagType: res.data.customerTagId == 'all' ? 0 : 1,
+                        postersId: res.data.postersId,
+                        postersUrl: res.data.postersUrl,
+                        fissionTarget: res.data.fissionTarget,
+                        fissionTargetId: res.data.fissionTargetId,
+                        welcomeMsg: res.data.welcomeMsg,
+                        rewardUrl: res.data.rewardUrl,
+                        rewardImageUrl: res.data.rewardImageUrl,
+                        rewardRule: res.data.rewardRule
+                    }
+                })
         },
         changeTagType () {
 
@@ -149,7 +204,6 @@ export default {
                 }
                 return selectParam
             })
-            console.log(this.taskFissionStaffs)
         },
         submitSelectTag (value) {
             let tagIds = [], tagName = []
@@ -458,7 +512,7 @@ export default {
         <el-button
             type="primary"
             @click="submitForm()"
-        >立即创建</el-button>
+        >{{pageType=='edit'?'立即修改':'立即创建'}}</el-button>
 
         <!-- 选择使用员工弹窗 -->
         <SelectUser
@@ -498,7 +552,7 @@ export default {
 <style lang="scss" >
 .task-edit-container {
     background-color: #efeff4;
-    height: 100%;
+    // height: 100%;
     .edit-model {
         background: #fff;
         margin-bottom: 20px;

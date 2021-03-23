@@ -31,3 +31,19 @@ export function getList(params) {
       method: 'get',
     })
   }
+
+  export function getStat(params) {
+    return request({
+      url: service + '/stat',
+      method: 'get',
+      params,
+    })
+  }
+
+  export function editTask (data) {
+    return request({
+      url: service + '/edit',
+      method: 'put',
+      data,
+    })
+  }

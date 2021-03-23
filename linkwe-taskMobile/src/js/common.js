@@ -19,5 +19,8 @@ $(function(){
 
     window.dpr = dpr;
     window.rem = rem;
-  
 })
+
+
+
+

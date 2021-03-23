@@ -40,3 +40,37 @@
     padding: .5rem;
     margin-bottom: .4rem;
 }
+.codeImg{
+    height: 1rem;
+}
+.customersList{
+    display: flex;
+    align-items: center;
+    font-size: .4rem;
+    background-color:rgb(246, 246, 249) ;
+    padding: .2rem;
+}
+.customersBox{
+    padding: .5rem;
+    background-color: #fff;
+}
+.customersSuccess{
+    flex:1;
+    text-align: right;
+    color: rgb(163, 269, 131);
+}
+.customersImg{
+    height: 1rem;
+    border-radius: 50%;
+    margin-right: .2rem;
+}
+.activityPoster{
+    padding:.5rem ;
+    font-size: .5rem;
+    background-color: #fff;
+    margin-top: .5rem;
+}
+.activityPosterImg{
+    width: 100%;
+    margin-top: .5rem;
+}
