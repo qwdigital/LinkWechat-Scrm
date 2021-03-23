@@ -2,13 +2,13 @@
   <div class="employ">
     <el-row>
       <el-col :span="6" class="borderR">
-        <div class="hd_box">
+        <!-- <div class="hd_box">
           <div class="hd_name">成员（{{employAmount}}）</div>
           <div class="paddingT10">
             <el-input placeholder="请输入内容" prefix-icon="el-icon-search" v-model="employName">
             </el-input>
           </div>
-        </div>
+        </div> -->
         <div class="ct_box ct_boxFirst">
           <el-tree class="filter-tree" :data="treeData" :props="defaultProps" :filter-node-method="filterNode"
             ref="tree" @node-click="handleNodeClick" :default-expand-all="true">
@@ -100,7 +100,7 @@
                   <el-table-column prop="action" label="操作">
                     <template slot-scope="scope">
                       <el-button type="text" size="small" @click="downloadFile(scope.row)">下载</el-button>
-                      <el-button type="text" size="small">查看</el-button>
+                    
                     </template>
                   </el-table-column>
                 </el-table>
@@ -122,14 +122,26 @@
                     start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="activeNameThreeClick">
                   </el-date-picker>
                 </div>
-                <el-table :data="fileData" stripe style="width: 100%" :header-cell-style="{background:'#fff'}">
+                <el-table :data="allVoice" stripe style="width: 100%" :header-cell-style="{background:'#fff'}">
                   <el-table-column prop="date" label="发起人">
+                    <template slot-scope="scope">
+                      {{scope.row.fromInfo.name}}
+                    </template>
                   </el-table-column>
                   <el-table-column prop="name" label="通话时间">
+                     <template slot-scope="scope">
+                      {{parseTime(scope.row.msgtime)}}
+                    </template>
                   </el-table-column>
                   <el-table-column prop="address" label="时长">
+                  <template slot-scope="scope">
+                      {{(scope.row.voice.play_length)}}s
+                    </template>
                   </el-table-column>
                   <el-table-column prop="address" label="操作">
+                    <template slot-scope="scope">
+                      <el-button type="text" size="small" @click="voiceLook(scope.row.voice)">查看</el-button>
+                    </template>
                   </el-table-column>
                 </el-table>
               </div>
@@ -150,8 +162,9 @@
     content
   } from '@/api/content.js'
   import {
-    yearMouthDay,download
+    yearMouthDay,parseTime
   } from '@/utils/common.js'
+
   export default {
     components: {
       list,
@@ -195,8 +208,19 @@
     },
     mounted() {
       this.getTree()
+      //this.getAmount()
     },
     methods: {
+      voiceLook(e){
+       const url = window.URL.createObjectURL(new Blob([e.attachment]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download','yuyin') // 下载文件的名称及文件类型后缀
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link); // 下载完成移除元素
+      window.URL.revokeObjectURL(url); // 释放掉blob对象
+      },
       downloadFile(e){  
       const url = window.URL.createObjectURL(new Blob([e.file.attachment],{type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8'}))
       const link = document.createElement('a')
@@ -227,7 +251,10 @@
         this.activeNameThreeClick(true)
       },
       activeNameThreeClick(page, group) {
-        console.log(this.activeName)
+       console.log(this.chat.id,'this.chat.id')
+     if(!!!this.chat.id){
+       return //没有选择人
+     }
         if (!!!page) {
           this.currentPage = 1
         }
@@ -260,12 +287,15 @@
           if (this.activeName=='2') {
             content.chatGrounpList(query).then(res => {
               this.total = Number(res.total)
-             this.resortData(res)
+              console.log(res,'this.activeName=')
+             this.resortData(res.data)
             })
           } else {
+           
             content.chatList(query).then(res => {
+               console.log(res,'ssss')
               this.total = Number(res.total)
-             this.resortData(res)
+             this.resortData(res.data)
             })
           }
         }
@@ -311,17 +341,16 @@
         if (!this.employId) {
           return
         }
+        console.log
         if (flag) {
           this.loading = true
         }
         content.getTree({
           fromId: this.employId,
           searchType: this.activeName
-        }).then(({
-          rows
-        }) => {
+        }).then((res) => {
           this.loading = false
-          this.personList = rows
+          this.personList = res.data.rows
         }).catch(err => {
           this.loading = false
         })
@@ -331,6 +360,18 @@
         if (!value) return true;
         return data.name.indexOf(value) !== -1;
       },
+      // getAmount(){
+      //      let querys = {
+      //       pageNum: '1',
+      //       pageSize: '999',
+      //       department: ''
+      //     }
+      //     api.getList(querys).then(({
+      //       total
+      //     }) => {
+      //        this.employAmount= total
+      //     })
+      // },
       handleNodeClick(data, add) {
         if (!data.userId) {
           let querys = {
@@ -338,12 +379,9 @@
             pageSize: '999',
             department: data.id
           }
-          api.getList(querys).then(({
-            rows
-          }) => {
-              const newChild = rows;
+          api.getList(querys).then(res => {
               this.$set(data, 'children', []);
-              data.children = rows
+              data.children = res.data.rows
           })
         } else {
           this.talkName = data.name;
@@ -413,7 +451,7 @@
     }
 
     .ct_boxFirst {
-      height: 707px !important;
+      height: 800px !important;
     }
 
     .ct_box {

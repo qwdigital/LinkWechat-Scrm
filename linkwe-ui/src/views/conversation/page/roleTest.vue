@@ -4,7 +4,6 @@
       <el-row>
         <el-form-item label="员工名称">
           <el-input v-model="form.Ename" placeholder="客户名称" style="width:300px"></el-input>
-
         </el-form-item>
         <el-form-item label="客户名称">
           <el-input v-model="form.Cname" placeholder="客户名称" style="width:300px"></el-input>
@@ -15,7 +14,6 @@
           <el-input v-model="form.Scontent" placeholder="查找内容" style="width:300px"></el-input>
         </el-form-item>
         <el-form-item label="时间范围">
-
           <el-date-picker v-model="form.Stime" type="datetimerange" format='yyyy-MM-dd' range-separator="至"
             start-placeholder="开始日期" end-placeholder="结束日期" align="right">
           </el-date-picker>
@@ -146,8 +144,8 @@
         }
         content.getChatAllList(query).then(res => {
           console.log(res)
-          this.fileData = res.rows;
-          this.total = Number(res.total)
+          this.fileData = res.data.rows;
+          this.total = Number(res.data.total)
         })
       },
       chechName(e) {
