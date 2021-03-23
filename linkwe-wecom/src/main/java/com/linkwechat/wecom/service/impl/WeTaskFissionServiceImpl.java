@@ -39,6 +39,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -101,7 +102,13 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
      * @return 任务宝
      */
     @Override
-    public List<WeTaskFission> selectWeTaskFissionList(WeTaskFission weTaskFission) {
+    public List<WeTaskFission> selectWeTaskFissionList(WeTaskFission weTaskFission) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf_day = new SimpleDateFormat("yyyy-MM-dd");
+        if (weTaskFission.getStartTime() != null && weTaskFission.getOverTime() != null) {
+            weTaskFission.setStartTime(sdf.parse(sdf_day.format(weTaskFission.getStartTime()) + " 00:00:00"));
+            weTaskFission.setOverTime(sdf.parse(sdf_day.format(weTaskFission.getOverTime()) + " 23:59:59"));
+        }
         return weTaskFissionMapper.selectWeTaskFissionList(weTaskFission);
     }
 

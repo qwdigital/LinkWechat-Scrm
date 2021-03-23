@@ -63,7 +63,7 @@ public class WeTaskFissionController extends BaseController {
     @ApiOperation(value = "查询任务宝列表", httpMethod = "GET")
     @PreAuthorize("@ss.hasPermi('wecom:fission:list')")
     @GetMapping("/list")
-    public TableDataInfo<List<WeTaskFission>> list(WeTaskFission weTaskFission) {
+    public TableDataInfo<List<WeTaskFission>> list(WeTaskFission weTaskFission) throws ParseException {
         startPage();
         List<WeTaskFission> list = weTaskFissionService.selectWeTaskFissionList(weTaskFission);
         return getDataTable(list);
@@ -100,7 +100,7 @@ public class WeTaskFissionController extends BaseController {
     @PreAuthorize("@ss.hasPermi('wecom:fission:export')")
     @Log(title = "任务宝", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
-    public AjaxResult export(WeTaskFission weTaskFission) {
+    public AjaxResult export(WeTaskFission weTaskFission) throws ParseException {
         List<WeTaskFission> list = weTaskFissionService.selectWeTaskFissionList(weTaskFission);
         ExcelUtil<WeTaskFission> util = new ExcelUtil<WeTaskFission>(WeTaskFission.class);
         return util.exportExcel(list, "fission");
@@ -195,7 +195,7 @@ public class WeTaskFissionController extends BaseController {
             return AjaxResult.error(HttpStatus.NOT_FOUND, "数据不存在");
         }
         weTaskFissionService.completeFissionRecord(id, recordId, weChatUserDTO);
-        return AjaxResult.success("操作成功",taskFission.getFissQrcode());
+        return AjaxResult.success("操作成功", taskFission.getFissQrcode());
     }
 
     /**
