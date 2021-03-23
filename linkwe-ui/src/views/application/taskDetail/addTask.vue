@@ -131,6 +131,9 @@ export default {
                             type: 'success'
                         });
                         taskApi.sendFission(JSON.parse(res.msg).id)
+                        this.$router.push({
+                                path: '/application/taskGroup',
+                            })
                     }
                     //    
 
@@ -144,6 +147,9 @@ export default {
                             message: '修改成功',
                             type: 'success'
                         });
+                          this.$router.push({
+                                path: '/application/taskGroup',
+                            })
                         // taskApi.sendFission(JSON.parse(res.msg).id)
                     }
                     //    
