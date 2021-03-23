@@ -27,6 +27,6 @@ public class ResponseAdvice implements ResponseBodyAdvice {
         if (o instanceof AjaxResult) {
             return ((AjaxResult) o).build();
         }
-        return AjaxResult.success(o).build();
+        return o;
     }
 }
