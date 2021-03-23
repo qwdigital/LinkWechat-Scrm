@@ -305,6 +305,7 @@ LinkWeChat 开源版遵循 [GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/bl
 | :------: | :-----: | 
 |   上海六感科技有限公司   | 八核 16G 服务器一台 |
 |    Happy   | 两核 8G 服务器一台 |
+|  平山阑槛倚晴空    | 两核 4G 服务器一台 |
 
 ---
 
