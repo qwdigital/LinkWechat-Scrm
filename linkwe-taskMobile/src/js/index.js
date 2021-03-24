@@ -31,7 +31,7 @@ $(function(){
         alert('长按图片在弹出菜单中发送给朋友或者可保存图片分享至朋友圈')
     });
     $('.myTaskDetail').click(function(){
-        window.location.href = `/taskProcess.html?eid=${eid}&taskFissionId=${taskFissionId}`
+        window.location.href = `./taskProcess.html?eid=${eid}&taskFissionId=${taskFissionId}`
     });
     
 })
