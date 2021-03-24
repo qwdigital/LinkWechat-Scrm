@@ -158,7 +158,12 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
     public List<WeCustomer> externalUserIds(String pushRange, String staffId, String department, String tag) {
         if (pushRange.equals(WeConstans.SEND_MESSAGE_CUSTOMER_ALL)) {
             //从redis中读取数据
-            return redisCache.getCacheList(WeConstans.WECUSTOMERS_KEY);
+            List<WeCustomer> customers = redisCache.getCacheList(WeConstans.WECUSTOMERS_KEY);
+            if (CollectionUtils.isEmpty(customers)) {
+                customers = weCustomerService.selectWeCustomerList(null);
+                redisCache.setCacheList(WeConstans.WECUSTOMERS_KEY, customers);
+            }
+            return customers;
         } else {
             //按条件查询客户
             //通过部门id查询所有的员工
