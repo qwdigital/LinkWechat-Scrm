@@ -127,7 +127,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
                // .antMatchers("/common/uploadFile2Cos").anonymous()
                 .antMatchers("/wecom/material/temporaryMaterialMediaId").anonymous()
                 .antMatchers("/wecom/portrait/**").anonymous()
-
+                  .antMatchers("/wecom/fission/**").anonymous()
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
                 .and()
