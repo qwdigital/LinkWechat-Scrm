@@ -84,7 +84,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
         if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_CUSTOMER)) {
             //查询客户信息列表
             if ("all".equals(customerMessagePushDto.getTag())) {
-                customers = externalUserIds(WeConstans.SEND_MESSAGE_CUSTOMER_ALL, null, null, null);
+                customers = externalUserIds(WeConstans.SEND_MESSAGE_CUSTOMER_ALL, customerMessagePushDto.getStaffId(), customerMessagePushDto.getDepartment(), customerMessagePushDto.getTag());
             } else {
                 customers = externalUserIds(customerMessagePushDto.getPushRange(), customerMessagePushDto.getStaffId()
                         , customerMessagePushDto.getDepartment(), customerMessagePushDto.getTag());
@@ -163,7 +163,10 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
                 customers = weCustomerService.selectWeCustomerList(null);
                 redisCache.setCacheList(WeConstans.WECUSTOMERS_KEY, customers);
             }
-            return customers;
+            WeCustomer weCustomer = new WeCustomer();
+            weCustomer.setUserIds(staffId);
+            weCustomer.setDepartmentIds(department);
+            return weCustomerService.selectWeCustomerList(weCustomer);
         } else {
             //按条件查询客户
             //通过部门id查询所有的员工
