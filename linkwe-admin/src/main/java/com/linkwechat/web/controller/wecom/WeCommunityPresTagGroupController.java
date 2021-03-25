@@ -33,7 +33,7 @@ public class WeCommunityPresTagGroupController extends BaseController {
     /**
      * 获取老客标签建群列表数据
      */
-    @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:list')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:list')")
     @GetMapping(path = "/list")
     public TableDataInfo<List<WePresTagGroupTaskVo>> getList(
             @RequestParam(value = "taskName", required = false) String taskName,
@@ -49,7 +49,7 @@ public class WeCommunityPresTagGroupController extends BaseController {
     /**
      * 新建老客标签建群任务
      */
-    @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:add')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:add')")
     @PostMapping
     public AjaxResult addTask(@RequestBody @Validated WePresTagGroupTaskDto wePresTagGroupTaskDto) {
         // 检测任务名是否可用
@@ -65,7 +65,7 @@ public class WeCommunityPresTagGroupController extends BaseController {
     /**
      * 根据获取任务详细信息
      */
-    @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:query')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:query')")
     @GetMapping(path = "/{id}")
     public AjaxResult getTask(@PathVariable("id") Long id) {
         WePresTagGroupTaskVo taskVo = taskService.getTaskById(id);
@@ -82,7 +82,7 @@ public class WeCommunityPresTagGroupController extends BaseController {
     /**
      * 更新任务信息
      */
-    @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:edit')")
+    //    @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:edit')")
     @PutMapping(path = "/{id}")
     public AjaxResult updateTask(@PathVariable("id") Long id, @RequestBody @Validated WePresTagGroupTaskDto wePresTagGroupTaskDto) {
         // 检测任务名是否可用
@@ -102,7 +102,7 @@ public class WeCommunityPresTagGroupController extends BaseController {
     /**
      * 批量删除老客标签建群任务
      */
-    @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:remove')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:remove')")
     @DeleteMapping(path = "/{ids}")
     public AjaxResult batchRemoveTask(@PathVariable("ids") Long[] ids) {
         return toAjax(taskService.batchRemoveTaskByIds(ids));
@@ -111,7 +111,7 @@ public class WeCommunityPresTagGroupController extends BaseController {
     /**
      * 根据老客标签建群id及过滤条件，获取其统计信息
      */
-    @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:query')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:query')")
     @GetMapping(path = "/stat/{id}")
     public TableDataInfo<List<WePresTagGroupTaskStatVo>> getStatInfo(
             @PathVariable("id") Long id,

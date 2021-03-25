@@ -47,7 +47,7 @@ public class WeEmpleCodeController extends BaseController {
     /**
      * 查询员工活码列表
      */
-    @PreAuthorize("@ss.hasPermi('wecom:code:list')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:code:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeEmpleCode weEmpleCode) {
         startPage();
@@ -59,7 +59,7 @@ public class WeEmpleCodeController extends BaseController {
     /**
      * 获取员工活码详细信息
      */
-    @PreAuthorize("@ss.hasPermi('wecom:code:query')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:code:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(weEmpleCodeService.selectWeEmpleCodeById(id));
@@ -68,7 +68,7 @@ public class WeEmpleCodeController extends BaseController {
     /**
      * 新增员工活码
      */
-    @PreAuthorize("@ss.hasPermi('wecom:code:add')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:code:add')")
     @Log(title = "员工活码", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     public AjaxResult add(@RequestBody @Validated WeEmpleCode weEmpleCode) {
@@ -89,7 +89,7 @@ public class WeEmpleCodeController extends BaseController {
     /**
      * 批量新增员工活码
      */
-    @PreAuthorize("@ss.hasPermi('wecom:code:batchAdd')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:code:batchAdd')")
     @Log(title = "批量新增员工活码", businessType = BusinessType.INSERT)
     @PostMapping("/batchAdd")
     public AjaxResult batchAdd(@RequestBody @Validated WeEmpleCode weEmpleCode) {
@@ -109,7 +109,7 @@ public class WeEmpleCodeController extends BaseController {
     /**
      * 修改员工活码
      */
-    @PreAuthorize("@ss.hasPermi('wecom:code:edit')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:code:edit')")
     @Log(title = "员工活码", businessType = BusinessType.UPDATE)
     @PutMapping("/update")
     public AjaxResult edit(@RequestBody WeEmpleCode weEmpleCode) {
@@ -121,7 +121,7 @@ public class WeEmpleCodeController extends BaseController {
     /**
      * 删除员工活码
      */
-    @PreAuthorize("@ss.hasPermi('wecom:code:remove')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:code:remove')")
     @Log(title = "员工活码", businessType = BusinessType.DELETE)
     @DeleteMapping("/delete/{ids}")
     public AjaxResult remove(@PathVariable String ids) {
@@ -135,7 +135,7 @@ public class WeEmpleCodeController extends BaseController {
      * @param userIds 员工id
      * @param departmentIds 部门id
      */
-    @PreAuthorize("@ss.hasPermi('wecom:code:qrcode')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:code:qrcode')")
     @Log(title = "获取员工二维码", businessType = BusinessType.DELETE)
     @GetMapping("/getQrcode")
     public AjaxResult getQrcode(String userIds, String departmentIds) {
@@ -150,7 +150,7 @@ public class WeEmpleCodeController extends BaseController {
      * @param response 输出
      * @throws Exception
      */
-    @PreAuthorize("@ss.hasPermi('wecom:code:downloadBatch')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:code:downloadBatch')")
     @Log(title = "员工活码批量下载", businessType = BusinessType.OTHER)
     @GetMapping("/downloadBatch")
     public void downloadBatch(String ids, HttpServletRequest request, HttpServletResponse response){
@@ -190,7 +190,7 @@ public class WeEmpleCodeController extends BaseController {
         }
     }
 
-    @PreAuthorize("@ss.hasPermi('wecom:code:download')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:code:download')")
     @Log(title = "员工活码下载", businessType = BusinessType.OTHER)
     @GetMapping("/download")
     public void download(String id, HttpServletRequest request, HttpServletResponse response){
@@ -211,7 +211,7 @@ public class WeEmpleCodeController extends BaseController {
      * 成员添加客户统计
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('wecom:code:getUserAddCustomerStat')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:code:getUserAddCustomerStat')")
     @Log(title = "成员添加客户统计", businessType = BusinessType.OTHER)
     @GetMapping("/getUserAddCustomerStat")
     public AjaxResult getUserAddCustomerStat(WeFlowerCustomerRel weFlowerCustomerRel){

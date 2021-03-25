@@ -61,7 +61,7 @@ public class WeTaskFissionController extends BaseController {
      * 查询任务宝列表
      */
     @ApiOperation(value = "查询任务宝列表", httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:fission:list')")
+    //    @PreAuthorize("@ss.hasPermi('wecom:fission:list')")
     @GetMapping("/list")
     public TableDataInfo<List<WeTaskFission>> list(WeTaskFission weTaskFission) throws ParseException {
         startPage();
@@ -73,7 +73,7 @@ public class WeTaskFissionController extends BaseController {
      * 查询统计信息
      */
     @ApiOperation(value = "查询统计信息", httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:fission:stat')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:fission:stat')")
     @GetMapping("/stat")
     public AjaxResult<WeTaskFissionStatisticVO> statistics(WeTaskFissionStatisticQO weTaskFissionStatisticQO) throws ParseException {
         Date st;
@@ -97,7 +97,7 @@ public class WeTaskFissionController extends BaseController {
      * 导出任务宝列表
      */
     @ApiOperation(value = "导出任务宝列表", httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:fission:export')")
+    //    @PreAuthorize("@ss.hasPermi('wecom:fission:export')")
     @Log(title = "任务宝", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public AjaxResult export(WeTaskFission weTaskFission) throws ParseException {
@@ -110,7 +110,7 @@ public class WeTaskFissionController extends BaseController {
      * 获取任务宝详细信息
      */
     @ApiOperation(value = "获取任务宝详细信息", httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:fission:query')")
+    //    @PreAuthorize("@ss.hasPermi('wecom:fission:query')")
     @GetMapping(value = "/getInfo/{id}")
     public AjaxResult<WeTaskFission> getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(weTaskFissionService.selectWeTaskFissionById(id));
@@ -120,7 +120,7 @@ public class WeTaskFissionController extends BaseController {
      * 新增任务宝
      */
     @ApiOperation(value = "新增任务宝", httpMethod = "POST")
-    @PreAuthorize("@ss.hasPermi('wecom:fission:add')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:fission:add')")
     @Log(title = "任务宝", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     public AjaxResult add(@RequestBody WeTaskFission weTaskFission) {
@@ -137,7 +137,7 @@ public class WeTaskFissionController extends BaseController {
      * 编辑任务宝
      */
     @ApiOperation(value = "编辑任务宝", httpMethod = "POST")
-    @PreAuthorize("@ss.hasPermi('wecom:fission:edit')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:fission:edit')")
     @Log(title = "任务宝", businessType = BusinessType.INSERT)
     @PutMapping("/edit")
     public AjaxResult edit(@RequestBody WeTaskFission weTaskFission) {
@@ -161,7 +161,7 @@ public class WeTaskFissionController extends BaseController {
      * 删除任务宝
      */
     @ApiOperation(value = "删除任务宝", httpMethod = "DELETE")
-    @PreAuthorize("@ss.hasPermi('wecom:fission:remove')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:fission:remove')")
     @Log(title = "任务宝", businessType = BusinessType.DELETE)
     @DeleteMapping("/delete/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
@@ -172,7 +172,7 @@ public class WeTaskFissionController extends BaseController {
      * 发送裂变任务
      */
     @ApiOperation(value = "发送裂变任务", httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:fission:send')")
+    //    @PreAuthorize("@ss.hasPermi('wecom:fission:send')")
     @Log(title = "发送裂变任务", businessType = BusinessType.OTHER)
     @GetMapping("/send/{id}")
     public AjaxResult send(@PathVariable Long id) {
@@ -184,7 +184,7 @@ public class WeTaskFissionController extends BaseController {
      * 添加群裂变完成记录
      */
     @ApiOperation(value = "添加群裂变完成记录", httpMethod = "POST")
-    @PreAuthorize("@ss.hasPermi('wecom:fission:complete')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:fission:complete')")
     @Log(title = "添加群裂变完成记录", businessType = BusinessType.OTHER)
     @PostMapping("/complete/{id}/records/{recordId}")
     public AjaxResult completeRecord(@PathVariable("id") Long id,
@@ -202,7 +202,7 @@ public class WeTaskFissionController extends BaseController {
      * 生成带二维码的海报
      */
     @ApiOperation(value = "生成带二维码的海报", httpMethod = "POST")
-    @PreAuthorize("@ss.hasPermi('wecom:fission:poster')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:fission:poster')")
     @Log(title = "生成带二维码的海报", businessType = BusinessType.OTHER)
     @PostMapping("/poster")
     public AjaxResult<JSONObject> posterGenerate(@RequestBody WeTaskFissionPosterDTO weTaskFissionPosterDTO) {
@@ -215,7 +215,7 @@ public class WeTaskFissionController extends BaseController {
     /**
      * 上传兑奖图片
      */
-    @PreAuthorize("@ss.hasPermi('wechat:fission:upload')")
+    //   @PreAuthorize("@ss.hasPermi('wechat:fission:upload')")
     @Log(title = "上传兑奖图片", businessType = BusinessType.OTHER)
     @PostMapping("/upload")
     @ApiOperation(value = "上传兑奖图片", httpMethod = "POST")
@@ -231,7 +231,7 @@ public class WeTaskFissionController extends BaseController {
      * 根据任务id获取参与任务客户列表
      */
     @ApiOperation(value = "根据任务id获取参与任务客户列表", httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:fission:getCustomerListById')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:fission:getCustomerListById')")
     @Log(title = "根据任务id获取参与任务客户列表", businessType = BusinessType.OTHER)
     @GetMapping("/getCustomerListById/{id}")
     public AjaxResult<List<WeCustomer>> getCustomerListById(@ApiParam("任务id") @PathVariable("id") String id) {
@@ -243,7 +243,7 @@ public class WeTaskFissionController extends BaseController {
      * 获取客户邀请列表和任务进度
      */
     @ApiOperation(value = "获取客户邀请列表和任务进度", httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:fission:getCustomerProgress')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:fission:getCustomerProgress')")
     @Log(title = "获取客户邀请列表和任务进度", businessType = BusinessType.OTHER)
     @GetMapping("/{id}/progress/{eid}")
     public AjaxResult<WeTaskFissionProgressVO> getCustomerProgress(@ApiParam("任务id") @PathVariable("id") Long id
@@ -260,7 +260,7 @@ public class WeTaskFissionController extends BaseController {
      * 获取任务所有参与客户的完成情况
      */
     @ApiOperation(value = "获取任务所有参与客户的完成情况", httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:fission:getCustomerProgress')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:fission:getCustomerProgress')")
     @Log(title = "获取任务所有参与客户的完成情况", businessType = BusinessType.OTHER)
     @GetMapping("/{id}/progress")
     public AjaxResult<List<WeTaskFissionTotalProgressVO>> getAllCustomerProgress(@ApiParam("任务id") @PathVariable("id") Long id) {

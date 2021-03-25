@@ -41,7 +41,7 @@ public class WeCommunityKeywordGroupController extends BaseController {
      * @param endTime   结束时间
      * @return 列表数据
      */
-    @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:list')")
+//    @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:list')")
     @GetMapping(path = "/list")
     public TableDataInfo<List<WeKeywordGroupTaskVo>> list(
             @RequestParam(value = "taskName", required = false) String taskName,
@@ -63,7 +63,7 @@ public class WeCommunityKeywordGroupController extends BaseController {
      * @param taskId 任务id
      * @return 任务详情
      */
-    @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:query')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:query')")
     @GetMapping(path = "/{taskId}")
     public AjaxResult getTask(@PathVariable("taskId") Long taskId) {
         WeKeywordGroupTaskVo keywordsGroupVo = keywordToGroupService.getTaskById(taskId);
@@ -78,7 +78,7 @@ public class WeCommunityKeywordGroupController extends BaseController {
      * @param keywordToGroupDto 添加任务所需的数据
      * @return 结果
      */
-    @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:add')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:add')")
     @PostMapping(path = "/")
     public AjaxResult addTask(@RequestBody @Validated WeKeywordGroupTaskDto keywordToGroupDto) {
         // 群活码必须存在
@@ -103,7 +103,7 @@ public class WeCommunityKeywordGroupController extends BaseController {
      * @param keywordToGroupDto 更新所需数据
      * @return 结果
      */
-    @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:edit')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:edit')")
     @PutMapping(path = "/{taskId}")
     public AjaxResult updateTask(@PathVariable("taskId") Long taskId, @RequestBody @Validated WeKeywordGroupTaskDto keywordToGroupDto) {
         // 群活码必须存在
@@ -130,7 +130,7 @@ public class WeCommunityKeywordGroupController extends BaseController {
      * @param ids id列表
      * @return 结果
      */
-    @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:remove')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:remove')")
     @DeleteMapping(path = "/{ids}")
     public AjaxResult batchDeleteTask(@PathVariable("ids") Long[] ids) {
         return toAjax(keywordToGroupService.batchRemoveTaskByIds(ids));

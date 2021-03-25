@@ -41,7 +41,7 @@ public class WeUserController extends BaseController {
     /**
      * 查询通讯录相关客户列表
      */
-    @PreAuthorize("@ss.hasPermi('contacts:organization:query')")
+    //  @PreAuthorize("@ss.hasPermi('contacts:organization:query')")
     @GetMapping("/list")
     @ApiOperation("获取通讯录人员列表")
     public TableDataInfo list(WeUser weUser)
@@ -57,7 +57,7 @@ public class WeUserController extends BaseController {
     /**
      * 获取通讯录相关客户详细信息
      */
-    @PreAuthorize("@ss.hasPermi('contacts:organization:view')")
+    //   @PreAuthorize("@ss.hasPermi('contacts:organization:view')")
     @GetMapping(value = "/{userId}")
     public AjaxResult getInfo(@PathVariable("userId") String userId)
     {
@@ -67,7 +67,7 @@ public class WeUserController extends BaseController {
     /**
      * 新增通讯录相关客户
      */
-    @PreAuthorize("@ss.hasPermi('contacts:organization:addMember')")
+    //  @PreAuthorize("@ss.hasPermi('contacts:organization:addMember')")
     @Log(title = "通讯录相关客户", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增通讯录客户")
@@ -80,7 +80,7 @@ public class WeUserController extends BaseController {
     /**
      * 修改通讯录相关客户
      */
-    @PreAuthorize("@ss.hasPermi('contacts:organization:edit')")
+    //  @PreAuthorize("@ss.hasPermi('contacts:organization:edit')")
     @Log(title = "更新通讯录客户", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("更新通讯录客户")
@@ -96,7 +96,7 @@ public class WeUserController extends BaseController {
      * @param weUser
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('contacts:organization:forbidden')")
+    //   @PreAuthorize("@ss.hasPermi('contacts:organization:forbidden')")
     @Log(title = "启用禁用用户", businessType = BusinessType.UPDATE)
     @PutMapping("/startOrStop")
     @ApiOperation("是否启用(1表示启用成员，0表示禁用成员)")
@@ -113,7 +113,7 @@ public class WeUserController extends BaseController {
      * @param weLeaveUserVo
      * @return
      */
-     @PreAuthorize("@ss.hasPermi('customerManage:dimission:filter')")
+    //    @PreAuthorize("@ss.hasPermi('customerManage:dimission:filter')")
      @GetMapping({"/leaveUserAllocateList"})
      public TableDataInfo leaveUserAllocateList(WeLeaveUserVo weLeaveUserVo) {
        startPage();
@@ -129,7 +129,7 @@ public class WeUserController extends BaseController {
      * @param weLeaveUserVo
      * @return
      */
-     @PreAuthorize("@ss.hasPermi('customerManage:dimission:query')")
+    //    @PreAuthorize("@ss.hasPermi('customerManage:dimission:query')")
      @GetMapping({"/leaveUserNoAllocateList"})
      public TableDataInfo leaveUserNoAllocateList(WeLeaveUserVo weLeaveUserVo) {
         startPage();
@@ -145,7 +145,7 @@ public class WeUserController extends BaseController {
      * @param weLeaveUserInfoAllocateVo
      * @return
      */
-     @PreAuthorize("@ss.hasPermi('customerManage:dimission:allocate')")
+    //   @PreAuthorize("@ss.hasPermi('customerManage:dimission:allocate')")
      @PutMapping({"/allocateLeaveUserAboutData"})
      public AjaxResult allocateLeaveUserAboutData(@RequestBody WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
 
@@ -159,7 +159,7 @@ public class WeUserController extends BaseController {
      *  同步成员
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('contacts:organization:sync')")
+    //   @PreAuthorize("@ss.hasPermi('contacts:organization:sync')")
     @GetMapping({"/synchWeUser"})
     public AjaxResult synchWeUser(){
 
@@ -174,7 +174,7 @@ public class WeUserController extends BaseController {
      * 删除用户
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('contacts:organization:removeMember')")
+    //   @PreAuthorize("@ss.hasPermi('contacts:organization:removeMember')")
     @DeleteMapping({"/{ids}"})
     public AjaxResult deleteUser(@PathVariable String[] ids){
 
@@ -191,7 +191,7 @@ public class WeUserController extends BaseController {
      * @param weAllocateCustomersVo
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('wecom:user:getAllocateCustomers')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:user:getAllocateCustomers')")
     @GetMapping({"/getAllocateCustomers"})
     public TableDataInfo getAllocateCustomers(WeAllocateCustomersVo weAllocateCustomersVo){
         startPage();
@@ -206,7 +206,7 @@ public class WeUserController extends BaseController {
      * @param weAllocateGroupsVo
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('wecom:user:getAllocateGroups')")
+    //    @PreAuthorize("@ss.hasPermi('wecom:user:getAllocateGroups')")
     @GetMapping({"/getAllocateGroups"})
     public TableDataInfo getAllocateGroups(WeAllocateGroupsVo weAllocateGroupsVo){
         startPage();

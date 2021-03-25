@@ -30,7 +30,7 @@ public class WeMessagePushController extends BaseController {
     /**
      * 查询消息发送的列表
      */
-    @PreAuthorize("@ss.hasPermi('system:push:list')")
+    //  @PreAuthorize("@ss.hasPermi('system:push:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeMessagePush weMessagePush) {
         startPage();
@@ -41,7 +41,7 @@ public class WeMessagePushController extends BaseController {
     /**
      * 导出消息发送的列表
      */
-    @PreAuthorize("@ss.hasPermi('system:push:export')")
+    // @PreAuthorize("@ss.hasPermi('system:push:export')")
     @Log(title = "消息发送的", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public AjaxResult export(WeMessagePush weMessagePush) {
@@ -53,7 +53,7 @@ public class WeMessagePushController extends BaseController {
     /**
      * 获取消息发送的详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:push:query')")
+    //  @PreAuthorize("@ss.hasPermi('system:push:query')")
     @GetMapping(value = "/{messagePushId}")
     public AjaxResult getInfo(@PathVariable("messagePushId") Long messagePushId) {
         return AjaxResult.success(weMessagePushService.selectWeMessagePushById(messagePushId));
@@ -62,7 +62,7 @@ public class WeMessagePushController extends BaseController {
     /**
      * 新增消息发送的
      */
-    @PreAuthorize("@ss.hasPermi('system:push:add')")
+    //  @PreAuthorize("@ss.hasPermi('system:push:add')")
     @Log(title = "消息发送的", businessType = BusinessType.INSERT)
     @PostMapping(value = "add")
     public AjaxResult add(@RequestBody WeMessagePush weMessagePush) {
@@ -73,7 +73,7 @@ public class WeMessagePushController extends BaseController {
     /**
      * 删除消息发送的
      */
-    @PreAuthorize("@ss.hasPermi('system:push:remove')")
+    //  @PreAuthorize("@ss.hasPermi('system:push:remove')")
     @Log(title = "消息发送的", businessType = BusinessType.DELETE)
     @DeleteMapping("/{messagePushIds}")
     public AjaxResult remove(@PathVariable Long[] messagePushIds) {

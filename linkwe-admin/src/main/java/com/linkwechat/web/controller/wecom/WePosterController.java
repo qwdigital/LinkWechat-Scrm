@@ -45,7 +45,7 @@ public class WePosterController extends BaseController {
 
     @PostMapping(value = "insert")
     @ApiOperation("创建海报")
-    @PreAuthorize("@ss.hasAnyPermi('wecom:poster:insert')")
+    //   @PreAuthorize("@ss.hasAnyPermi('wecom:poster:insert')")
     @Transactional(rollbackFor = RuntimeException.class)
     public AjaxResult insert(@RequestBody WePoster poster) {
         wePosterService.generateSimpleImg(poster);
@@ -70,7 +70,7 @@ public class WePosterController extends BaseController {
 
     @PutMapping(value = "update")
     @ApiOperation("修改海报")
-    @PreAuthorize("@ss.hasAnyPermi('wecom:poster:update')")
+    //  @PreAuthorize("@ss.hasAnyPermi('wecom:poster:update')")
     @Transactional(rollbackFor = RuntimeException.class)
     public AjaxResult update(@RequestBody WePoster poster) {
         if (poster.getId() == null) {
@@ -122,7 +122,7 @@ public class WePosterController extends BaseController {
     }*/
 
     @GetMapping(value = "entity/{id}")
-    @PreAuthorize("@ss.hasAnyPermi('wecom:poster:entity')")
+    //    @PreAuthorize("@ss.hasAnyPermi('wecom:poster:entity')")
     @ApiOperation("查询海报详情")
     public AjaxResult entity(@PathVariable Long id) {
         return AjaxResult.success(wePosterService.selectOne(id));
@@ -130,7 +130,7 @@ public class WePosterController extends BaseController {
 
     @GetMapping(value = "page")
     @ApiOperation("分页查询海报")
-    @PreAuthorize("@ss.hasAnyPermi('wecom:poster:page')")
+    //    @PreAuthorize("@ss.hasAnyPermi('wecom:poster:page')")
     public AjaxResult page(Long categoryId, String name) {
         startPage();
         List<WePoster> fontList = wePosterService.lambdaQuery()
@@ -144,7 +144,7 @@ public class WePosterController extends BaseController {
 
     @DeleteMapping(value = "delete/{id}")
     @ApiOperation(value = "删除海报")
-    @PreAuthorize("@ss.hasAnyPermi('wecom:poster:delete')")
+    //    @PreAuthorize("@ss.hasAnyPermi('wecom:poster:delete')")
     @Transactional(rollbackFor = RuntimeException.class)
     public AjaxResult deletePosterFont(@PathVariable Long id) {
         wePosterService.update(

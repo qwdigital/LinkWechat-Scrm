@@ -39,7 +39,7 @@ public class WeSensitiveActController extends BaseController {
     /**
      * 查询敏感行为列表
      */
-    @PreAuthorize("@ss.hasPermi('wecom:sensitiveact:list')")
+//     @PreAuthorize("@ss.hasPermi('wecom:sensitiveact:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeSensitiveAct weSensitiveAct) {
         startPage();
@@ -50,7 +50,7 @@ public class WeSensitiveActController extends BaseController {
     /**
      * 获取敏感行为详细信息
      */
-    @PreAuthorize("@ss.hasPermi('wecom:sensitiveact:query')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:sensitiveact:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(weSensitiveActService.selectWeSensitiveActById(id));
@@ -59,7 +59,7 @@ public class WeSensitiveActController extends BaseController {
     /**
      * 新增敏感行为设置
      */
-    @PreAuthorize("@ss.hasPermi('wecom:sensitiveact:add')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:sensitiveact:add')")
     @Log(title = "新增敏感行为", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Valid @RequestBody WeSensitiveAct weSensitiveAct) {
@@ -69,7 +69,7 @@ public class WeSensitiveActController extends BaseController {
     /**
      * 修改敏感词设置
      */
-    @PreAuthorize("@ss.hasPermi('wecom:sensitiveact:edit')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:sensitiveact:edit')")
     @Log(title = "修改敏感行为", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody WeSensitiveAct weSensitiveAct) {
@@ -84,7 +84,7 @@ public class WeSensitiveActController extends BaseController {
     /**
      * 删除敏感词设置
      */
-    @PreAuthorize("@ss.hasPermi('wecom:sensitiveact:remove')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:sensitiveact:remove')")
     @Log(title = "删除敏感行为", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable("ids") String ids) {
@@ -97,7 +97,7 @@ public class WeSensitiveActController extends BaseController {
     /**
      * 敏感词命中查询
      */
-    @PreAuthorize("@ss.hasPermi('wecom:sensitiveacthit:list')")
+    //    @PreAuthorize("@ss.hasPermi('wecom:sensitiveacthit:list')")
     @GetMapping("/hit/list")
     public TableDataInfo hitList() {
         startPage();
@@ -108,7 +108,7 @@ public class WeSensitiveActController extends BaseController {
     /**
      * 导出敏感行为记录
      */
-    @PreAuthorize("@ss.hasPermi('wecom:sensitiveacthit:export')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:sensitiveacthit:export')")
     @PostMapping("/hit/export")
     public AjaxResult export() {
         List<WeSensitiveActHit> list = weSensitiveActHitService.list();

@@ -33,14 +33,14 @@ public class WePageDateContraller {
      *
      */
     @ApiOperation(value = "数据总览controller",httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:page:getCorpBasicData')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:page:getCorpBasicData')")
     @GetMapping("/getCorpBasicData")
     public AjaxResult getCorpBasicData(){
         return AjaxResult.success(redisCache.getCacheMap("getCorpBasicData"));
     }
 
     @ApiOperation(value = "实时数据controller",httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:page:getCorpRealTimeData')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:page:getCorpRealTimeData')")
     @GetMapping("/getCorpRealTimeData")
     public AjaxResult getCorpRealTimeData(){
         WePageStaticDataDto wePageStaticDataDto = redisCache.getCacheObject("getCorpRealTimeData");

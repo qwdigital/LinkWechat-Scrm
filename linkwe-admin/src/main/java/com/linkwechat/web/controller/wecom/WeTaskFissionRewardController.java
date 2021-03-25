@@ -36,7 +36,7 @@ public class WeTaskFissionRewardController extends BaseController {
      * 查询任务裂变奖励列表
      */
     @ApiOperation(value = "查询任务裂变奖励列表",httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:reward:list')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:reward:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeTaskFissionReward weTaskFissionReward) {
         startPage();
@@ -48,7 +48,7 @@ public class WeTaskFissionRewardController extends BaseController {
      * 导出任务裂变奖励列表
      */
     @ApiOperation(value = "导出任务裂变奖励列表",httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:reward:export')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:reward:export')")
     @Log(title = "任务裂变奖励", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public AjaxResult export(WeTaskFissionReward weTaskFissionReward) {
@@ -61,7 +61,7 @@ public class WeTaskFissionRewardController extends BaseController {
      * 获取任务裂变奖励详细信息
      */
     @ApiOperation(value = "获取任务裂变奖励详细信息",httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:reward:query')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:reward:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(weTaskFissionRewardService.selectWeTaskFissionRewardById(id));
@@ -71,7 +71,7 @@ public class WeTaskFissionRewardController extends BaseController {
      * 新增任务裂变奖励
      */
     @ApiOperation(value = "新增任务裂变奖励",httpMethod = "POST")
-    @PreAuthorize("@ss.hasPermi('wecom:reward:add')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:reward:add')")
     @Log(title = "任务裂变奖励", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     public AjaxResult add(@RequestBody WeTaskFissionReward weTaskFissionReward) {
@@ -82,7 +82,7 @@ public class WeTaskFissionRewardController extends BaseController {
      * 修改任务裂变奖励
      */
     @ApiOperation(value = "修改任务裂变奖励",httpMethod = "PUT")
-    @PreAuthorize("@ss.hasPermi('wecom:reward:edit')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:reward:edit')")
     @Log(title = "任务裂变奖励", businessType = BusinessType.UPDATE)
     @PutMapping("edit")
     public AjaxResult edit(@RequestBody WeTaskFissionReward weTaskFissionReward) {
@@ -93,7 +93,7 @@ public class WeTaskFissionRewardController extends BaseController {
      * 删除任务裂变奖励
      */
     @ApiOperation(value = "删除任务裂变奖励",httpMethod = "DELETE")
-    @PreAuthorize("@ss.hasPermi('wecom:reward:remove')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:reward:remove')")
     @Log(title = "任务裂变奖励", businessType = BusinessType.DELETE)
     @DeleteMapping("/delete/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
@@ -105,7 +105,7 @@ public class WeTaskFissionRewardController extends BaseController {
      * 根据微信用户id和任务id获取任务裂变奖励详细信息
      */
     @ApiOperation(value = "根据微信用户id和任务id获取任务裂变奖励详细信息",httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:getRewardByFissionId:query')")
+    //    @PreAuthorize("@ss.hasPermi('wecom:getRewardByFissionId:query')")
     @GetMapping(value = "/getRewardByFissionId/{fissionId}/{eid}")
     public AjaxResult<WeTaskFissionRewardVo> getRewardByFissionId(@ApiParam("任务id") @PathVariable("fissionId") String fissionId
             , @PathVariable("eid") @ApiParam("客户id") String eid) {

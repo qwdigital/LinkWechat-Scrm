@@ -33,7 +33,7 @@ public class WeTaskFissionStaffController extends BaseController {
      * 查询裂变任务员工列列表
      */
     @ApiOperation(value = "查询裂变任务员工列列表",httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:staff:list')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:staff:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeTaskFissionStaff weTaskFissionStaff) {
         startPage();
@@ -45,7 +45,7 @@ public class WeTaskFissionStaffController extends BaseController {
      * 导出裂变任务员工列列表
      */
     @ApiOperation(value = "导出裂变任务员工列列表",httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:staff:export')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:staff:export')")
     @Log(title = "裂变任务员工列", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public AjaxResult export(WeTaskFissionStaff weTaskFissionStaff) {
@@ -58,7 +58,7 @@ public class WeTaskFissionStaffController extends BaseController {
      * 获取裂变任务员工列详细信息
      */
     @ApiOperation(value = "获取裂变任务员工列详细信息",httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:staff:query')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:staff:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(weTaskFissionStaffService.selectWeTaskFissionStaffById(id));
@@ -68,7 +68,7 @@ public class WeTaskFissionStaffController extends BaseController {
      * 新增裂变任务员工列
      */
     @ApiOperation(value = "新增裂变任务员工列",httpMethod = "POST")
-    @PreAuthorize("@ss.hasPermi('wecom:staff:add')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:staff:add')")
     @Log(title = "裂变任务员工列", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     public AjaxResult add(@RequestBody WeTaskFissionStaff weTaskFissionStaff) {
@@ -79,7 +79,7 @@ public class WeTaskFissionStaffController extends BaseController {
      * 修改裂变任务员工列
      */
     @ApiOperation(value = "修改裂变任务员工列",httpMethod = "PUT")
-    @PreAuthorize("@ss.hasPermi('wecom:staff:edit')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:staff:edit')")
     @Log(title = "裂变任务员工列", businessType = BusinessType.UPDATE)
     @PutMapping("/edit")
     public AjaxResult edit(@RequestBody WeTaskFissionStaff weTaskFissionStaff) {
@@ -90,7 +90,7 @@ public class WeTaskFissionStaffController extends BaseController {
      * 删除裂变任务员工列
      */
     @ApiOperation(value = "删除裂变任务员工列",httpMethod = "DELETE")
-    @PreAuthorize("@ss.hasPermi('wecom:staff:remove')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:staff:remove')")
     @Log(title = "裂变任务员工列", businessType = BusinessType.DELETE)
     @DeleteMapping("/delete/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {

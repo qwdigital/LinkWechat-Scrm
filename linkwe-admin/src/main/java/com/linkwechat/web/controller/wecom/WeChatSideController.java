@@ -29,7 +29,7 @@ public class WeChatSideController extends BaseController {
     /**
      * 群发侧边栏列表
      */
-    @PreAuthorize("@ss.hasPermi('chat:side:list')")
+//    @PreAuthorize("@ss.hasPermi('chat:side:list')")
     @GetMapping("/list")
     public TableDataInfo list() {
         startPage();
@@ -40,7 +40,7 @@ public class WeChatSideController extends BaseController {
     /**
      * 更新侧边栏信息
      */
-    @PreAuthorize("@ss.hasPermi('chat:side:edit')")
+//    @PreAuthorize("@ss.hasPermi('chat:side:edit')")
     @Log(title = "更新侧边栏信息", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody WeChatSide weChatSide) {

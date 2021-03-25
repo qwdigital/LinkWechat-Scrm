@@ -33,7 +33,7 @@ public class WeSensitiveController extends BaseController {
     /**
      * 查询敏感词设置列表
      */
-    @PreAuthorize("@ss.hasPermi('wecom:sensitive:list')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:sensitive:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeSensitive weSensitive) {
         startPage();
@@ -44,7 +44,7 @@ public class WeSensitiveController extends BaseController {
     /**
      * 获取敏感词设置详细信息
      */
-    @PreAuthorize("@ss.hasPermi('wecom:sensitive:query')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:sensitive:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(weSensitiveService.selectWeSensitiveById(id));
@@ -53,7 +53,7 @@ public class WeSensitiveController extends BaseController {
     /**
      * 新增敏感词设置
      */
-    @PreAuthorize("@ss.hasPermi('wecom:sensitive:add')")
+    //    @PreAuthorize("@ss.hasPermi('wecom:sensitive:add')")
     @Log(title = "敏感词设置", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Valid @RequestBody WeSensitive weSensitive) {
@@ -63,7 +63,7 @@ public class WeSensitiveController extends BaseController {
     /**
      * 修改敏感词设置
      */
-    @PreAuthorize("@ss.hasPermi('wecom:sensitive:edit')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:sensitive:edit')")
     @Log(title = "敏感词设置", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Valid @RequestBody WeSensitive weSensitive) {
@@ -78,7 +78,7 @@ public class WeSensitiveController extends BaseController {
     /**
      * 删除敏感词设置
      */
-    @PreAuthorize("@ss.hasPermi('wecom:sensitive:remove')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:sensitive:remove')")
     @Log(title = "敏感词设置", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable("ids") String ids) {
@@ -91,7 +91,7 @@ public class WeSensitiveController extends BaseController {
     /**
      * 敏感词命中查询
      */
-    @PreAuthorize("@ss.hasPermi('wecom:sensitivehit:list')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:sensitivehit:list')")
     @GetMapping("/hit/list")
     public TableDataInfo hitList(WeSensitiveHitQuery query) {
         return getDataTable(weSensitiveService.getHitSensitiveList(query));
