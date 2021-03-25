@@ -56,13 +56,13 @@
         <div class="data" is-link @click="show = true">编辑</div>
       </div>
       <van-row gutter="10" class="labels">
+        <van-col span="4.5" v-for="(item, index) in labels" :key="index"> <div class="label">{{item.name}}</div></van-col>
+        <!-- <van-col span="4.5"> <div class="label">标签1</div></van-col>
         <van-col span="4.5"> <div class="label">标签1</div></van-col>
         <van-col span="4.5"> <div class="label">标签1</div></van-col>
         <van-col span="4.5"> <div class="label">标签1</div></van-col>
         <van-col span="4.5"> <div class="label">标签1</div></van-col>
-        <van-col span="4.5"> <div class="label">标签1</div></van-col>
-        <van-col span="4.5"> <div class="label">标签1</div></van-col>
-        <van-col span="4.5"> <div class="label">标签1</div></van-col>
+        <van-col span="4.5"> <div class="label">标签1</div></van-col> -->
       </van-row>
     </div>
     <div class="divider"></div>
@@ -335,7 +335,7 @@
 </template>
 
 <script>
-import { getCustomerInfo } from "@/api/portrait";
+import { getCustomerInfo, getAllTags } from "@/api/portrait";
 import { getUserInfo } from "@/api/common";
 export default {
   data() {
@@ -380,7 +380,9 @@ export default {
         position: "", // 职业
         remarkCorpName: "", // 公司
         description: "", // 其他描述
+        weTagGroupList:[], // 客户标签合集
       },
+      labels: [] // 客户标签
     };
   },
   computed: {
@@ -455,17 +457,26 @@ export default {
     saveInfo() {},
   },
   created() {
+    // 获取客户信息
     getCustomerInfo({
       externalUserid: this.externalUserid,
       userid: this.userid,
     })
       .then(({ data }) => {
         this.form = data;
-        // console.log(this.form);
+        console.log(this.form);
       })
       .catch((err) => {
         console.log(err);
       });
+      // getAllTags()
+      // .then(({ data }) => {
+      //   // console.log(data);
+      //   this.labels = data
+      // })
+      // .catch((err) => {
+      //   console.log(err);
+      // });
   },
 };
 </script>

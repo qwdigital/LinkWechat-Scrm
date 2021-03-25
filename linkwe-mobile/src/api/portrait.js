@@ -28,9 +28,10 @@ export function getWeCustomerInfo(data) {
     }
   });
 }
-// //   获取当前系统所有可用标签
-// export function getAllTags() {
-//   return request({
-    
-//   });
-// }
+//   获取当前系统所有可用标签
+export function getAllTags(params) {
+  return request({
+    url: service + "/findAllTags",
+    params,
+  });
+}
