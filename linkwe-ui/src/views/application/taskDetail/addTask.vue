@@ -100,6 +100,7 @@ export default {
                     }
                     delete params.sendType
                     //客户标签选择全部
+                    console.log(params)
                     if (!params.tagType) {
                         params.customerTag = ''
                         params.customerTagId = 'all'
@@ -176,7 +177,7 @@ export default {
                         taskFissionStaffs: res.data.taskFissionStaffs,
                         sendType: (res.data.taskFissionStaffs.length && res.data.taskFissionStaffs[0].staffId) ? 1 : 0,
                         customerTag: res.data.customerTagId == 'all' ? '' : res.data.customerTag.split(','),
-                        customerTagId: res.data.customerTagId == 'all' ? 'all' : '',
+                        customerTagId: res.data.customerTagId == 'all' ? 'all' : res.data.customerTagId.split(','),
                         tagType: res.data.customerTagId == 'all' ? 0 : 1,
                         postersId: res.data.postersId,
                         postersUrl: res.data.postersUrl,
