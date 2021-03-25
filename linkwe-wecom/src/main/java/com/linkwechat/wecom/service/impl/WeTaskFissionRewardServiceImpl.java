@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.wecom.domain.WeCustomer;
@@ -105,9 +106,9 @@ public class WeTaskFissionRewardServiceImpl implements IWeTaskFissionRewardServi
     }
 
     @Override
-    public WeTaskFissionRewardVo getRewardByFissionId(String fissionId, String unionId) {
+    public WeTaskFissionRewardVo getRewardByFissionId(String fissionId, String eid) {
         WeTaskFissionRewardVo weTaskFissionRewardVo = new WeTaskFissionRewardVo();
-        WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getUnionid, unionId));
+        WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getExternalUserid, eid));
         String externalUseriId = Optional.ofNullable(weCustomer).map(WeCustomer::getExternalUserid)
                 .orElseThrow(() -> new WeComException("用户信息不存在"));
 
@@ -116,20 +117,21 @@ public class WeTaskFissionRewardServiceImpl implements IWeTaskFissionRewardServi
                 .orElseThrow(() -> new WeComException("任务信息不存在"));
 
         WeTaskFission weTaskFission = weTaskFissionService.selectWeTaskFissionById(Long.valueOf(fissionId));
-        Optional.ofNullable(weTaskFission).ifPresent(fission ->{
+        Optional.ofNullable(weTaskFission).ifPresent(fission -> {
             weTaskFissionRewardVo.setRewardRule(fission.getRewardRule());
             weTaskFissionRewardVo.setRewardImageUrl(fission.getRewardImageUrl());
             weTaskFissionRewardVo.setRewardUrl(fission.getRewardUrl());
         });
 
-        if(completeTime != null){
+        if (completeTime != null) {
             WeTaskFissionReward fissionReward = weTaskFissionRewardMapper.selectOne(new LambdaQueryWrapper<WeTaskFissionReward>()
                     .eq(WeTaskFissionReward::getTaskFissionId, fissionId)
                     .eq(WeTaskFissionReward::getRewardUserId, externalUseriId));
             weTaskFissionRewardVo.setWeTaskFissionReward(fissionReward);
-
+            //发放兑奖码之后，置为已使用
+            Optional.ofNullable(fissionReward).ifPresent(reward -> weTaskFissionRewardMapper.update(reward, new LambdaUpdateWrapper<WeTaskFissionReward>()
+                    .set(WeTaskFissionReward::getRewardCodeStatus, 1).eq(WeTaskFissionReward::getId, reward.getId())));
         }
-
         return weTaskFissionRewardVo;
     }
 }

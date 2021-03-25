@@ -23,6 +23,7 @@ import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
 import com.linkwechat.wecom.domain.dto.message.LinkMessageDto;
 import com.linkwechat.wecom.domain.vo.WeTaskFissionDailyDataVO;
+import com.linkwechat.wecom.domain.vo.WeTaskFissionProgressVO;
 import com.linkwechat.wecom.domain.vo.WeTaskFissionStatisticVO;
 import com.linkwechat.wecom.mapper.WeTaskFissionMapper;
 import com.linkwechat.wecom.service.*;
@@ -38,6 +39,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -100,7 +102,13 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
      * @return 任务宝
      */
     @Override
-    public List<WeTaskFission> selectWeTaskFissionList(WeTaskFission weTaskFission) {
+    public List<WeTaskFission> selectWeTaskFissionList(WeTaskFission weTaskFission) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf_day = new SimpleDateFormat("yyyy-MM-dd");
+        if (weTaskFission.getStartTime() != null && weTaskFission.getOverTime() != null) {
+            weTaskFission.setStartTime(sdf.parse(sdf_day.format(weTaskFission.getStartTime()) + " 00:00:00"));
+            weTaskFission.setOverTime(sdf.parse(sdf_day.format(weTaskFission.getOverTime()) + " 23:59:59"));
+        }
         return weTaskFissionMapper.selectWeTaskFissionList(weTaskFission);
     }
 
@@ -237,7 +245,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     @Transactional
     public String fissionPosterGenerate(WeTaskFissionPosterDTO weTaskFissionPosterDTO) {
         WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>()
-                .eq(WeCustomer::getUnionid, weTaskFissionPosterDTO.getUnionId()));
+                .eq(WeCustomer::getExternalUserid, weTaskFissionPosterDTO.getEid()));
         if (weCustomer != null) {
             //任务表添加当前客户任务
             WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), weCustomer.getExternalUserid(), weCustomer.getName());
@@ -282,31 +290,28 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     }
 
     @Override
-    public List<WeCustomer> getCustomerListById(String unionId, String fissionId) {
-        WeTaskFissionRecord weTaskFissionRecord = null;
-        if (StringUtils.isEmpty(unionId)) {
-            weTaskFissionRecord = weTaskFissionRecordService
-                    .getOne(new LambdaQueryWrapper<WeTaskFissionRecord>().eq(WeTaskFissionRecord::getTaskFissionId, fissionId));
-
+    public List<WeCustomer> getCustomerListById(String eid, String fissionId) {
+        WeTaskFissionRecord weTaskFissionRecord;
+        if (StringUtils.isEmpty(eid)) {
+            List<WeTaskFissionRecord> weTaskFissionRecords = weTaskFissionRecordService
+                    .list(new LambdaQueryWrapper<WeTaskFissionRecord>().eq(WeTaskFissionRecord::getTaskFissionId, fissionId));
+            return Optional.ofNullable(weTaskFissionRecords).orElseGet(ArrayList::new).stream()
+                    .map(record -> weCustomerService.selectWeCustomerById(record.getCustomerId()))
+                    .filter(Objects::nonNull).collect(Collectors.toList());
         } else {
-            WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getUnionid, unionId));
+            WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getExternalUserid, eid));
             String externalUseriId = Optional.ofNullable(weCustomer).map(WeCustomer::getExternalUserid)
                     .orElseThrow(() -> new WeComException("用户信息不存在"));
-
-
             weTaskFissionRecord = weTaskFissionRecordService
                     .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), externalUseriId);
+            Optional.ofNullable(weTaskFissionRecord).map(WeTaskFissionRecord::getId)
+                    .orElseThrow(() -> new WeComException("任务记录信息不存在"));
+            List<WeFlowerCustomerRel> list = weFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
+                    .eq(WeFlowerCustomerRel::getState, WeConstans.FISSION_PREFIX + weTaskFissionRecord.getId()));
+            List<String> eidList = Optional.ofNullable(list).orElseGet(ArrayList::new).stream()
+                    .map(WeFlowerCustomerRel::getExternalUserid).collect(Collectors.toList());
+            return weCustomerService.listByIds(eidList);
         }
-
-        Long recordId = Optional.ofNullable(weTaskFissionRecord).map(WeTaskFissionRecord::getId)
-                .orElseThrow(() -> new WeComException("任务记录信息不存在"));
-
-        List<WeFlowerCustomerRel> list = weFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
-                .eq(WeFlowerCustomerRel::getState, WeConstans.FISSION_PREFIX + weTaskFissionRecord.getId()));
-        List<String> eidList = Optional.ofNullable(list).orElseGet(ArrayList::new).stream()
-                .map(WeFlowerCustomerRel::getExternalUserid).collect(Collectors.toList());
-
-        return weCustomerService.listByIds(eidList);
     }
 
     @Override
@@ -341,6 +346,19 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
                 });
         vo.setData(dailyDataList);
         return vo;
+    }
+
+    @Override
+    public WeTaskFissionProgressVO getCustomerTaskProgress(WeTaskFission taskFission, String eid) {
+        long complete = 0L;
+        long total = taskFission.getFissNum();
+        List<WeCustomer> list = getCustomerListById(eid, String.valueOf(taskFission.getId()));
+        if (CollectionUtils.isNotEmpty(list)) {
+            complete = list.size();
+        } else {
+            list = new ArrayList<>();
+        }
+        return WeTaskFissionProgressVO.builder().total(total).completed(complete).customers(list).build();
     }
 
     /*************************************** private functions **************************************/
