@@ -199,6 +199,8 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         //H5生成海报页面路径
         StringBuilder pageUrlBuilder = new StringBuilder(pageUrl);
         pageUrlBuilder.append("?")
+                .append("agentId=").append("1000010")
+                .append("&")
                 .append("fissionId=").append(id)
                 .append("&")
                 .append("userId=").append(fissStaffId)
