@@ -53,8 +53,8 @@
                     start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="activeNameThreeClick">
                   </el-date-picker>
                 </div>
-                <chat :allChat="allChat" v-if="allChat.length>=1"></chat>
-                <el-pagination background v-if="allChat.length>=1" layout="prev, pager, next" class="pagination"
+                <chat :allChat="allChat" v-if="allChat&&allChat.length>=1"></chat>
+                <el-pagination background v-if="allChat&&allChat.length>=1" layout="prev, pager, next" class="pagination"
                   :current-page="currentPage" @current-change="currentChange" :total="total">
                 </el-pagination>
               </div>
@@ -66,8 +66,8 @@
                     start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="activeNameThreeClick">
                   </el-date-picker>
                 </div>
-                <chat :allChat="allChatImg" v-if="allChatImg.length>=1"></chat>
-                <el-pagination background v-if="allChatImg.length>=1" class="pagination" layout="prev, pager, next"
+                <chat :allChat="allChatImg" v-if="allChatImg&&allChatImg.length>=1"></chat>
+                <el-pagination background v-if="allChatImg&&allChatImg.length>=1" class="pagination" layout="prev, pager, next"
                   :total="total" @current-change="currentChange" :current-page="currentPage">
                 </el-pagination>
               </div>
@@ -288,14 +288,13 @@
             content.chatGrounpList(query).then(res => {
               this.total = Number(res.total)
               console.log(res,'this.activeName=')
-             this.resortData(res.data)
+             this.resortData(res)
             })
           } else {
-           
             content.chatList(query).then(res => {
-               console.log(res,'ssss')
+               console.log(res.rows,'ssss')
               this.total = Number(res.total)
-             this.resortData(res.data)
+             this.resortData(res)
             })
           }
         }
@@ -348,9 +347,9 @@
         content.getTree({
           fromId: this.employId,
           searchType: this.activeName
-        }).then((res) => {
+        }).then(({rows}) => {
           this.loading = false
-          this.personList = res.data.rows
+          this.personList =rows
         }).catch(err => {
           this.loading = false
         })
@@ -360,18 +359,7 @@
         if (!value) return true;
         return data.name.indexOf(value) !== -1;
       },
-      // getAmount(){
-      //      let querys = {
-      //       pageNum: '1',
-      //       pageSize: '999',
-      //       department: ''
-      //     }
-      //     api.getList(querys).then(({
-      //       total
-      //     }) => {
-      //        this.employAmount= total
-      //     })
-      // },
+  
       handleNodeClick(data, add) {
         if (!data.userId) {
           let querys = {
@@ -379,9 +367,10 @@
             pageSize: '999',
             department: data.id
           }
-          api.getList(querys).then(res => {
+          api.getList(querys).then(({rows}) => {
               this.$set(data, 'children', []);
-              data.children = res.data.rows
+              
+              data.children =rows
           })
         } else {
           this.talkName = data.name;

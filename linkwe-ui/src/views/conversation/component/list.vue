@@ -1,6 +1,6 @@
 <template>
     <div class="list" v-loading="loading">
-        <div v-if="personList">         
+        <div v-if="personList.length>=1">         
             <ul>             
             <li v-for="(item,index) in personList" :key="index" @click="liClick(item)">
                 <el-row style="padding:10px">
