@@ -96,12 +96,9 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
 
         // 1 发给客户群
         if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_GROUP)) {
-
             if (customerMessagePushDto.getStaffId() == null || customerMessagePushDto.getStaffId().equals("")) {
                 throw new WeComException("请选择人员！");
             }
-
-            //查询群组信息列表
             //通过员工id查询群列表
             WeGroup weGroup = new WeGroup();
             weGroup.setUserIds(customerMessagePushDto.getStaffId());
@@ -109,12 +106,10 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
             if (CollectionUtils.isEmpty(groups)) {
                 throw new WeComException("没有客户群！");
             }
-
         }
 
         //保存原始数据信息表
         long messageOriginalId = weCustomerMessageOriginalService.saveWeCustomerMessageOriginal(customerMessagePushDto);
-
         long messageId = SnowFlakeUtil.nextId();
 
         //保存映射信息
@@ -131,14 +126,10 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
         if (null == customerMessagePushDto.getSettingTime() || customerMessagePushDto.getSettingTime().equals("")) {
             weCustomerMessageService.sendMessgae(customerMessagePushDto, messageId, customers, groups);
         } else {
-
             WeCustomerMessageTimeTask timeTask = new WeCustomerMessageTimeTask(messageId, customerMessagePushDto, customers, groups
                     , DateUtils.getMillionSceondsBydate(customerMessagePushDto.getSettingTime()));
-
             customerMessageTimeTaskMapper.saveWeCustomerMessageTimeTask(timeTask);
-
         }
-
     }
 
     @Override
