@@ -1,6 +1,6 @@
 <template>
   <div class="wrap" v-loading="loading">
-    <el-form :model="form" ref="form" label-width="100px">
+    <el-form :model="form" ref="form" :rules="rules" label-width="100px">
       <el-form-item label="任务名称" prop="taskName">
         <el-input
           v-model="form.taskName"
@@ -192,7 +192,7 @@ export default {
         welcomeMsg: '',             // 加群引导语
         sendType: 0,                // 发送方式
         groupCodeId: '',            // 群活码ID
-        tagList: [],      // 标签
+        tagList: [],                // 标签
         scopeList: [],              // 员工
         sendScope: 0,               // 发送范围 
         sendGender: 0,              // 发送性别
@@ -220,7 +220,11 @@ export default {
         { label: '全部客户', value: 0 },
         { label: '部分客户', value: 1 },
       ],
-      pickerOptions: {}
+      pickerOptions: {},
+      rules: Object.freeze({
+        taskName: [{ required: true, message: '必填项', trigger: 'blur' }],
+        welcomeMsg: [{ required: true, message: '必填项', trigger: 'blur' }],
+      }),
     }
   },
 
@@ -235,7 +239,6 @@ export default {
         this.groupQrCode = data.groupCodeInfo
         this.form.groupCodeId = this.groupQrCode.id
         this.dateRange = [this.form.cusBeginTime, this.form.cusEndTime]
-
 
         this.codes = [ data.groupCodeInfo ]
 
@@ -260,12 +263,12 @@ export default {
     },
 
     submit() {
-      if (!this.form.scopeList.length) {
+      if (this.form.sendScope === 1 && !this.form.scopeList.length) {
         this.msgError('请至少选择一名使用员工')
         return
       }
 
-      if (!this.form.tagList.length) {
+      if (this.form.sendScope === 1 && !this.form.tagList.length) {
         this.msgError('请至少选择一个标签')
         return
       }
@@ -275,25 +278,28 @@ export default {
         return
       }
 
-      this.loading = true
-
-      if (this.taskId) {
-        update(this.taskId, this.form).then(() => {
-          this.msgSuccess('更新成功')
-          this.loading = false
-          this.$router.back()
-        }).catch(() => {
-          this.loading = false
-        })
-      } else {
-        add(this.form).then(() => {
-          this.msgSuccess('添加成功')
-          this.loading = false
-          this.$router.back()
-        }).catch(() => {
-          this.loading = false
-        })
-      }
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          this.loading = true
+          if (this.taskId) {
+            update(this.taskId, this.form).then(() => {
+              this.msgSuccess('更新成功')
+              this.loading = false
+              this.$router.back()
+            }).catch(() => {
+              this.loading = false
+            })
+          } else {
+            add(this.form).then(() => {
+              this.msgSuccess('添加成功')
+              this.loading = false
+              this.$router.back()
+            }).catch(() => {
+              this.loading = false
+            })
+          }
+        }
+      })
     },
   },
 

@@ -186,7 +186,7 @@
             </el-form-item>
 
             <el-form-item label>
-              <el-button type="primary" @click="getStat(1)">查询</el-button>
+              <el-button type="primary" @click="customerSearch">查询</el-button>
               <el-button @click="resetCustomerQuery">重置</el-button>
             </el-form-item>
           </el-form>
@@ -227,7 +227,7 @@
           :total="customerTotal"
           :page.sync="customerQuery.pageNum"
           :limit.sync="customerQuery.pageSize"
-          @pagination="getStat()"
+          @pagination="customerFilter"
         />
       </div>
     </el-dialog>
@@ -284,6 +284,8 @@ export default {
       customerLoading: false,
       // 客户统计数据
       customerList: [],
+      // 展示用客户统计数据
+      customerShowList: [],
       // 是否在群选择项
       inGroupOptions: [
         { label: '在群', value: 1 },
@@ -321,7 +323,7 @@ export default {
       page && (this.customerQuery.pageNum = page)
       this.customerLoading = true
 
-      getStat(this.customerSearchId, this.customerQuery).then(({ rows, total }) => {
+      getStat(this.customerSearchId).then(({ rows, total }) => {
         this.customerList = rows
         this.customerTotal = +total
         this.customerLoading = false
@@ -398,16 +400,32 @@ export default {
       this.getStat(1)
     },
 
+    // 过滤客户统计数据
+    customerFilter () {
+      const l = []
+      for (let data of this.customerList) {
+        if (this.customerQuery.customerName !== '' && !this.customerQuery.customerName.includes(data.customerName)) continue
+        if (this.customerQuery.isInGroup !== '' && this.customerQuery.isInGroup !== data.isInGroup) continue
+        if (this.customerQuery.isSent !== '' && this.customerQuery.isSent !== data.isSent) continue
+
+        l.push(data)
+      }
+
+      this.customerShowList = l.slice(this.customerQuery.pageNum * this.customerQuery.pageSize, this.customerQuery.pageSize)
+    },
+
     // 客户统计查询
     customerSearch () {
-      this.getStat()
+      // this.getStat()
+      this.customerFilter()
     },
 
     // 客户统计重置
     resetCustomerQuery () {
       this.$refs['customerForm'].resetFields()
 
-      this.getStat(1)
+      // this.getStat(1)
+      this.customerFilter()
     }
   },
 

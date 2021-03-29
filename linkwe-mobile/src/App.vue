@@ -15,6 +15,10 @@ export default {
     // console.log('routerbeforeCreate', this.$route);
     // this.$dialog({ message: 'url' + JSON.stringify(window.location) })
     let query = param2Obj(window.location.search)
+    let hash = param2Obj(window.location.hash)
+
+    query = Object.assign(query, hash)
+
     let code = query.code
     this.corpId = query.corpId
     this.agentId = query.agentId
@@ -22,15 +26,17 @@ export default {
       this.$toast('未获得授权')
       return
     }
-    let { data } = await getUserInfo(code, query.agentId)
+    let { data } = await getUserInfo(code, this.agentId)
     this.$store.state.userId = data.userId
     // this.$toast('userId:' + this.$store.state.userId)
   },
   watch: {
     // 通过config接口注入权限验证配置
     // 所有需要使用JS-SDK的页面必须先注入配置信息，否则将无法调用（同一个url仅需调用一次，对于变化url的SPA（single-page application）的web app可在每次url变化时进行调用）
-    $route() {
-      this.wxConfig()
+    $route(route) {
+      // this.wxConfig()
+      const noAuth = route.meta ? route.meta.noAuth : false
+      !noAuth && this.wxConfig()
     },
   },
   methods: {
@@ -50,6 +56,9 @@ export default {
               'sendChatMessage',
               'getContext',
               'getCurExternalContact',
+              'openEnterpriseChat',
+              'shareToExternalContact',
+              'shareToExternalChat',
             ], //必填
             success: (res) => {
               // 回调

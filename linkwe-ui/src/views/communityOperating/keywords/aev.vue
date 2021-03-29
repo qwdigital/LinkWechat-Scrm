@@ -1,6 +1,6 @@
 <template>
   <div class="wrap" v-loading="loading">
-    <el-form :model="form" ref="form" label-width="100px">
+    <el-form :model="form" ref="form" :rules="rules" label-width="100px">
       <el-form-item label="活码名称" prop="taskName">
         <el-input
           v-model="form.taskName"
@@ -96,7 +96,12 @@ export default {
         keywords: '',             // 关键词
       },
       codes: [],
-      groupQrCode: {}
+      groupQrCode: {},
+      rules: Object.freeze({
+        taskName: [{ required: true, message: '必填项', trigger: 'blur' }],
+        welcomeMsg: [{ required: true, message: '必填项', trigger: 'blur' }],
+        keywords: [{ required: true, message: '必填项', trigger: 'blur' }],
+      }),
     }
   },
   
@@ -121,30 +126,33 @@ export default {
     },
 
     submit() {
-      // if (!this.form.weEmpleCodeUseScops.length) {
-      //   this.msgError('请至少选择一名使用员工')
-      //   return
-      // }
-
-      this.loading = true
-
-      if (this.taskId) {
-        update(this.taskId, this.form).then(() => {
-          this.msgSuccess('更新成功')
-          this.loading = false
-          this.$router.back()
-        }).catch(() => {
-          this.loading = false
-        })
-      } else {
-        add(this.form).then(() => {
-          this.msgSuccess('添加成功')
-          this.loading = false
-          this.$router.back()
-        }).catch(() => {
-          this.loading = false
-        })
+      if (!this.form.groupCodeId) {
+        this.msgError('请选择一个群活码')
+        return
       }
+
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          this.loading = true
+          if (this.taskId) {
+            update(this.taskId, this.form).then(() => {
+              this.msgSuccess('更新成功')
+              this.loading = false
+              this.$router.back()
+            }).catch(() => {
+              this.loading = false
+            })
+          } else {
+            add(this.form).then(() => {
+              this.msgSuccess('添加成功')
+              this.loading = false
+              this.$router.back()
+            }).catch(() => {
+              this.loading = false
+            })
+          }
+        }
+      })
     },
 
     // 选择二维码确认按钮

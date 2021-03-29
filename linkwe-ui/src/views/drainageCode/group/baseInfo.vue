@@ -328,7 +328,7 @@ export default {
 
   computed: {
     qrCodeText () {
-      return process.env.VUE_APP_BASE_API + this.h5uri + '?id=' + this.form.uuid
+      return window.CONFIG.groupCodeH5Link + '?id=' + this.form.uuid
     }
   },
 
