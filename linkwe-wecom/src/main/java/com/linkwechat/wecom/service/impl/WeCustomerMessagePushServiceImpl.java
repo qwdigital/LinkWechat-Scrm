@@ -106,7 +106,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
             WeGroup weGroup = new WeGroup();
             weGroup.setUserIds(customerMessagePushDto.getStaffId());
             groups = weGroupService.selectWeGroupList(weGroup);
-            if (CollectionUtils.isEmpty(customers)) {
+            if (CollectionUtils.isEmpty(groups)) {
                 throw new WeComException("没有客户群！");
             }
 
