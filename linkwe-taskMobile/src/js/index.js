@@ -9,7 +9,7 @@ $(function(){
     //code, agentId
     const fissionTargetId = getUrlParam('fissionTargetId');
     const posterId = getUrlParam('posterId');
-    const taskFissionId = getUrlParam('taskFissionId');
+    const taskFissionId = getUrlParam('fissionId');
     const agentId = getUrlParam('agentId');
     const code = config.code
     let eid = ''
@@ -17,7 +17,7 @@ $(function(){
         getUserInfo({code,agentId})
         .then(res=>{
             let data = res.data;
-            eid = data.external_userid
+            eid = data.externalUserid?data.externalUserid:data.userId
             getPoster({fissionTargetId,posterId,taskFissionId,eid})
             .then(res=>{
                 $('.posterImg').attr('src',res.data.postersUrl)

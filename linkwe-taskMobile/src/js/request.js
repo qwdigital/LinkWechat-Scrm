@@ -8,7 +8,7 @@ const request = (url,params,method='get')=>{
     return new Promise((relosve,reject)=>{
         $.ajax({
             headers: {
-                "Authorization":'Bearer eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE2MTcyNjk4NzQsImxvZ2luX3VzZXJfa2V5IjoiYzhiZGE0NWEtMTdiNC00YjU2LTk1MzItNmFkMDdhM2UyZTI0In0.-ZFDrpsAL_bE4kLi5yyrpxBhqd5v7ekfbAB47_Rpn_aLaOKCPHCKGa9UCNtWgf2Itu3hb2o_9otVnwku9GbG4g',
+                "Content-Type":"application/json"
               },
             url,
             data:params,
