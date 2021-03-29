@@ -1,6 +1,6 @@
 <template>
   <div class="wrap" v-loading="loading">
-    <el-form :model="form" ref="form" label-width="100px">
+    <el-form :model="form" ref="form" :rules="rules" label-width="100px">
       <el-form-item label="规则名称" prop="ruleName">
         <el-input
           v-model="form.ruleName"
@@ -245,7 +245,11 @@ export default {
       },
       uploadImageUrl: '',
       imageMaterialList: [],
-      textMaterialList: []
+      textMaterialList: [],
+      rules: Object.freeze({
+        ruleName: [{ required: true, message: '必填项', trigger: 'blur' }],
+        title: [{ required: true, message: '必填项', trigger: 'blur' }],
+      }),
     }
   },
 
@@ -292,23 +296,38 @@ export default {
         return
       }
 
-      if (this.ruleId) {
-        update(this.ruleId, this.form).then(({ data }) => {
-          this.msgSuccess('操作成功')
-          this.loading = false
-          this.$router.back()
-        }).catch(() => {
-          this.loading = false
-        })
-      } else {
-        add(this.form).then(({ data }) => {
-          this.msgSuccess('操作成功')
-          this.loading = false
-          this.$router.back()
-        }).catch(() => {
-          this.loading = false
-        })
+      if (!this.form.startExeTime || !this.form.stopExeTime) {
+        this.msgError('请选择执行时间')
+        return
       }
+
+      if (!this.form.content && !this.form.picList && !this.form.materialIdList) {
+        this.msgError('请输入消息内容')
+        return
+      }
+
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          this.loading = true
+          if (this.ruleId) {
+            update(this.ruleId, this.form).then(({ data }) => {
+              this.msgSuccess('操作成功')
+              this.loading = false
+              this.$router.back()
+            }).catch(() => {
+              this.loading = false
+            })
+          } else {
+            add(this.form).then(({ data }) => {
+              this.msgSuccess('操作成功')
+              this.loading = false
+              this.$router.back()
+            }).catch(() => {
+              this.loading = false
+            })
+          }
+        }
+      })
     },
 
     goRoute () {
@@ -320,7 +339,7 @@ export default {
     },
 
     removeImage (url) {
-      this.picList.splice(this.picList.indexOf(url), 1)
+      this.form.picList.splice(this.form.picList.indexOf(url), 1)
     },
 
     removeImageMaterial (image) {

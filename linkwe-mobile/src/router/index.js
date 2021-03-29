@@ -62,6 +62,68 @@ const routes = [
       title: '',
     },
   },
+  // 群活码扫描跳转页面
+  {
+    path: '/groupCode',
+    name: 'groupCode',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "about" */ '../views/groupCode/index'),
+    hidden: true,
+    meta: {
+      title: '',
+      noAuth: true
+    },
+  },
+  // 群活码扫描跳转页面
+  {
+    path: '/task',
+    // name: 'task',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "about" */ '../views/communityOperating/task/index'),
+    children: [
+      {
+        path: '',
+        component: () => import(/* webpackChunkName: "about" */ '../views/communityOperating/task/list'),
+        hidden: true,
+        meta: {
+          title: '',
+          // noAuth: true
+        },
+      },
+      {
+        path: 'state',
+        name: 'taskState',
+        component: () => import(/* webpackChunkName: "about" */ '../views/communityOperating/task/state.vue'),
+        hidden: true,
+        meta: {
+          title: '',
+          noAuth: true
+        },
+      },
+    ],
+    hidden: true,
+    meta: {
+      title: '',
+      noAuth: true
+    },
+  },
+  // 群活码扫描跳转页面
+  {
+    path: '/keywords',
+    name: 'keywords',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "about" */ '../views/communityOperating/keywords/index'),
+    hidden: true,
+    meta: {
+      title: ''
+    },
+  },
 ]
 
 const router = new VueRouter({

@@ -144,8 +144,8 @@
         }
         content.getChatAllList(query).then(res => {
           console.log(res)
-          this.fileData = res.data.rows;
-          this.total = Number(res.data.total)
+          this.fileData = res.rows;
+          this.total = Number(res.total)
         })
       },
       chechName(e) {

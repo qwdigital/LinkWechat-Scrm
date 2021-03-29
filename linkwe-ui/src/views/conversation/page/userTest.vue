@@ -231,10 +231,10 @@
           fromId: this.employId,
           searchType: this.activeName
         }).then((
-          res
+          {rows}
         ) => {
           this.loading = false
-          this.personList =res.data.rows
+          this.personList =rows
         }).catch(err => {
           this.loading = false
         })
@@ -270,13 +270,13 @@
         }
           if (group) {
             content.chatGrounpList(query).then(res => {
-              this.total = Number(res.data.total)
-             this.resortData(res.data)
+              this.total = Number(res.total)
+             this.resortData(res)
             })
           } else {
             content.chatList(query).then(res => {
-              this.total =  Number(res.data.total)
-             this.resortData(res.data)
+              this.total =  Number(res.total)
+             this.resortData(res)
             })
           }   
       },
@@ -310,12 +310,9 @@
           isOpenChat: '1'
         }
         content.listByCustomer(querys).then(res => {
-          console.log(res)
-          res.rows = res.data.rows.filter((a, b) => {
-            return a && a.name
-          })
-          this.CList = res.data.rows
-          this.employAmount = res.data.total;
+        console.log(res,'rows')
+          this.CList = res.rows
+          this.employAmount = res.total;
         })
       }
     },
