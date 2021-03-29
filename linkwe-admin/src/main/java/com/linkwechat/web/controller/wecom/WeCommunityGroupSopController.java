@@ -40,7 +40,7 @@ public class WeCommunityGroupSopController extends BaseController {
      * @return 群sop规则列表
      */
     @ApiOperation(value = "通过过滤条件获取群sop列表", httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:communityGroupSop:list')")
+//    @PreAuthorize("@ss.hasPermi('wecom:communityGroupSop:list')")
     @GetMapping(path = "/list")
     public TableDataInfo<List<WeGroupSopVo>> getSopList(
             @RequestParam(value = "ruleName", required = false) String ruleName,
@@ -61,7 +61,7 @@ public class WeCommunityGroupSopController extends BaseController {
      * @return 结果
      */
     @ApiOperation(value = "新增SOP规则", httpMethod = "POST")
-    @PreAuthorize("@ss.hasPermi('wecom:communityGroupSop:add')")
+//    @PreAuthorize("@ss.hasPermi('wecom:communityGroupSop:add')")
     @PostMapping(path = "/")
     public AjaxResult addGroupSop(@Validated @RequestBody WeGroupSopDto groupSopDto) {
         if (!groupSopService.isRuleNameUnique(groupSopDto.getRuleName())) {
@@ -86,7 +86,7 @@ public class WeCommunityGroupSopController extends BaseController {
      * @return 结果
      */
     @ApiOperation(value = "通过规则id获取sop规则详情", httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:communityGroupSop:query')")
+//    @PreAuthorize("@ss.hasPermi('wecom:communityGroupSop:query')")
     @GetMapping(path = "/{ruleId}")
     public AjaxResult getGroupSop(@PathVariable("ruleId") Long ruleId) {
         WeGroupSopVo groupSopVo = groupSopService.getGroupSopById(ruleId);
@@ -104,7 +104,7 @@ public class WeCommunityGroupSopController extends BaseController {
      * @return 结果
      */
     @ApiOperation(value = "更改SOP规则", httpMethod = "PUT")
-    @PreAuthorize("@ss.hasPermi('wecom:communityGroupSop:edit')")
+//    @PreAuthorize("@ss.hasPermi('wecom:communityGroupSop:edit')")
     @PutMapping(path = "/{ruleId}")
     public AjaxResult updateGroupSop(@PathVariable Long ruleId, @Validated @RequestBody WeGroupSopDto groupSopDto) {
         // 校验是否存在
@@ -136,7 +136,7 @@ public class WeCommunityGroupSopController extends BaseController {
      * @return 结果
      */
     @ApiOperation(value = "根据id列表批量删除群sop规则", httpMethod = "DELETE")
-    @PreAuthorize("@ss.hasPermi('wecom:communityGroupSop:remove')")
+//    @PreAuthorize("@ss.hasPermi('wecom:communityGroupSop:remove')")
     @DeleteMapping(path = "/{ids}")
     public AjaxResult batchDeleteSopRule(@PathVariable("ids") Long[] ids) {
         return toAjax(groupSopService.batchRemoveGroupSopByIds(ids));

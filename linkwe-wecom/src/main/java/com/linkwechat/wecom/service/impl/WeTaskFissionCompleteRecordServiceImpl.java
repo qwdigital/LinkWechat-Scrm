@@ -1,11 +1,14 @@
 package com.linkwechat.wecom.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.wecom.domain.WeTaskFissionCompleteRecord;
 import com.linkwechat.wecom.mapper.WeTaskFissionCompleteRecordMapper;
 import com.linkwechat.wecom.service.IWeTaskFissionCompleteRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -15,7 +18,7 @@ import java.util.List;
  * @date 2021-01-27
  */
 @Service
-public class WeTaskFissionCompleteRecordServiceImpl implements IWeTaskFissionCompleteRecordService {
+public class WeTaskFissionCompleteRecordServiceImpl extends ServiceImpl<WeTaskFissionCompleteRecordMapper, WeTaskFissionCompleteRecord> implements IWeTaskFissionCompleteRecordService {
     @Autowired
     private WeTaskFissionCompleteRecordMapper weTaskFissionCompleteRecordMapper;
 
@@ -83,5 +86,14 @@ public class WeTaskFissionCompleteRecordServiceImpl implements IWeTaskFissionCom
     @Override
     public int deleteWeTaskFissionCompleteRecordById(Long id) {
         return weTaskFissionCompleteRecordMapper.deleteWeTaskFissionCompleteRecordById(id);
+    }
+
+    @Override
+    public List<WeTaskFissionCompleteRecord> statisticCompleteRecords(Long taskFissionId, Date startTime, Date endTime) {
+        LambdaQueryWrapper<WeTaskFissionCompleteRecord> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(WeTaskFissionCompleteRecord::getTaskFissionId, taskFissionId).
+                between(WeTaskFissionCompleteRecord::getCreateTime, startTime, endTime).
+                orderByAsc(WeTaskFissionCompleteRecord::getCreateTime);
+        return weTaskFissionCompleteRecordMapper.selectList(wrapper);
     }
 }

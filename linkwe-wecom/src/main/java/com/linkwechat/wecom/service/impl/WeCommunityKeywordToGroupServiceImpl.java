@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.WeKeywordGroupTaskKeyword;
 import com.linkwechat.wecom.domain.WeKeywordGroupTask;
 import com.linkwechat.wecom.domain.WeGroupCode;
@@ -96,9 +97,13 @@ public class WeCommunityKeywordToGroupServiceImpl extends ServiceImpl<WeKeywordG
     public int addTask(WeKeywordGroupTask task, String[] keywords) {
         if(this.save(task)) {
             // 构建关键词对象并存储
-            List<WeKeywordGroupTaskKeyword> weKeywordGroupTaskKeywordList = Arrays.stream(keywords)
-                    .map(word -> new WeKeywordGroupTaskKeyword(task.getTaskId(), word)).collect(Collectors.toList());
-            taskKwMapper.batchBindsTaskKeyword(weKeywordGroupTaskKeywordList);
+            List<WeKeywordGroupTaskKeyword> taskKeywordList = Arrays
+                    .stream(keywords)
+                    .map(word -> new WeKeywordGroupTaskKeyword(task.getTaskId(), word))
+                    .collect(Collectors.toList());
+            if (StringUtils.isNotEmpty(taskKeywordList)) {
+                taskKwMapper.batchBindsTaskKeyword(taskKeywordList);
+            }
             return 1;
         }
         return 0;
@@ -120,9 +125,13 @@ public class WeCommunityKeywordToGroupServiceImpl extends ServiceImpl<WeKeywordG
             taskKwQueryWrapper.eq("task_id", task.getTaskId());
             taskKwMapper.delete(taskKwQueryWrapper);
             // 再重新插入新的关键词
-            List<WeKeywordGroupTaskKeyword> weKeywordGroupTaskKeywordList = Arrays.stream(keywords)
-                    .map(word -> new WeKeywordGroupTaskKeyword(task.getTaskId(), word)).collect(Collectors.toList());
-            taskKwMapper.batchBindsTaskKeyword(weKeywordGroupTaskKeywordList);
+            List<WeKeywordGroupTaskKeyword> taskKeywordList = Arrays
+                    .stream(keywords)
+                    .map(word -> new WeKeywordGroupTaskKeyword(task.getTaskId(), word))
+                    .collect(Collectors.toList());
+            if (StringUtils.isNotEmpty(taskKeywordList)) {
+                taskKwMapper.batchBindsTaskKeyword(taskKeywordList);
+            }
             return 1;
         }
         return 0;
@@ -141,7 +150,9 @@ public class WeCommunityKeywordToGroupServiceImpl extends ServiceImpl<WeKeywordG
         QueryWrapper<WeKeywordGroupTaskKeyword> taskKwQueryWrapper = new QueryWrapper<>();
         taskKwQueryWrapper.in("task_id", Arrays.asList(ids));
         taskKwMapper.delete(taskKwQueryWrapper);
-        return taskMapper.batchRemoveTaskByIds(ids);
+        QueryWrapper<WeKeywordGroupTask> taskQueryWrapper = new QueryWrapper<>();
+        taskKwQueryWrapper.in("task_id", Arrays.asList(ids));
+        return taskMapper.delete(taskQueryWrapper);
     }
 
     /**

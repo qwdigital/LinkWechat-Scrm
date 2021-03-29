@@ -2,6 +2,7 @@ package com.linkwechat.wecom.factory.impl.customer;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.*;
@@ -54,27 +55,27 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
             weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId());
         }
         if (message.getState() != null && message.getWelcomeCode() != null) {
-            if (isNumeric(message.getState())) {
-                taskFissionRecordHandle(message.getState(), message.getWelcomeCode(), message.getExternalUserId());
+            if (isFission(message.getState())) {
+                taskFissionRecordHandle(message.getState(), message.getWelcomeCode(), message.getUserId(), message.getExternalUserId());
+            }else {
+                empleCodeHandle(message.getState(), message.getWelcomeCode(), message.getUserId(), message.getExternalUserId());
             }
-            empleCodeHandle(message.getState(), message.getWelcomeCode(), message.getUserId(), message.getExternalUserId());
         }
     }
 
     //裂变任务处理
-    private void taskFissionRecordHandle(String state, String wecomCode, String externalUserId) {
+    private void taskFissionRecordHandle(String state, String wecomCode, String userId, String externalUserId) {
         //查询裂变客户任务记录
-        WeCustomer weCustomer = weCustomerService.selectWeCustomerById(externalUserId);
-        WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService
-                .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(state),weCustomer.getUnionid());
+        String fissionRecordId = state.substring(WeConstans.FISSION_PREFIX.length());
+        WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService.selectWeTaskFissionRecordById(Long.valueOf(fissionRecordId));
         if (weTaskFissionRecord != null) {
-            Long fissNum = weTaskFissionRecord.getFissNum() + 1;
-            weTaskFissionRecord.setFissNum(fissNum);
-            weTaskFissionRecordService.updateWeTaskFissionRecord(weTaskFissionRecord);
-
             //查询裂变任务详情
             WeTaskFission weTaskFission = weTaskFissionService
                     .selectWeTaskFissionById(weTaskFissionRecord.getTaskFissionId());
+
+            Long fissNum = weTaskFissionRecord.getFissNum() + 1;
+            weTaskFissionRecord.setFissNum(fissNum);
+
             if (weTaskFission != null){
                 //发送欢迎语
                 String welcomeMsg = weTaskFission.getWelcomeMsg();
@@ -85,15 +86,18 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
 
             //裂变数量完成任务处理,消费兑换码
             if (fissNum >= weTaskFission.getFissNum()){
+                weTaskFissionRecord.setCompleteTime(new Date());
                 WeTaskFissionReward reward = new WeTaskFissionReward();
                 reward.setTaskFissionId(weTaskFissionRecord.getTaskFissionId());
                 reward.setRewardCodeStatus(0);
                 List<WeTaskFissionReward> weTaskFissionRewardList = weTaskFissionRewardService.selectWeTaskFissionRewardList(reward);
                 WeTaskFissionReward fissionReward = weTaskFissionRewardList.get(0);
-                fissionReward.setRewardUser(weCustomer.getName());
-                fissionReward.setRewardUserId(weCustomer.getExternalUserid());
+                fissionReward.setRewardUser(weTaskFissionRecord.getCustomerName());
+                fissionReward.setRewardUserId(weTaskFissionRecord.getCustomerId());
                 weTaskFissionRewardService.updateWeTaskFissionReward(fissionReward);
             }
+
+            weTaskFissionRecordService.updateWeTaskFissionRecord(weTaskFissionRecord);
         }
     }
 
@@ -156,14 +160,11 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
         }
     }
 
-    private boolean isNumeric(String str) {
-        try {
-            new BigDecimal(str);
-        } catch (Exception e) {
-            //异常 说明包含非数字。
-            return false;
+    private boolean isFission(String str) {
+        if (str.indexOf(WeConstans.FISSION_PREFIX) != -1){
+            return true;
         }
-        return true;
+       return false;
     }
 
 

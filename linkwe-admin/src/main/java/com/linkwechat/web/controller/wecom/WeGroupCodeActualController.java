@@ -31,7 +31,7 @@ public class WeGroupCodeActualController extends BaseController {
     /**
      * 查询实际群码列表
      */
-    @PreAuthorize("@ss.hasPermi('wecom:actual:list')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:actual:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeGroupCodeActual weGroupCodeActual) {
         startPage();
@@ -55,7 +55,7 @@ public class WeGroupCodeActualController extends BaseController {
     /**
      * 获取实际群码详细信息
      */
-    @PreAuthorize("@ss.hasPermi('wecom:actual:query')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:actual:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
         WeGroupCodeActual weGroupCodeActual = weGroupCodeActualService.selectWeGroupCodeActualById(id);
@@ -68,7 +68,7 @@ public class WeGroupCodeActualController extends BaseController {
     /**
      * 新增实际群码查询
      */
-    @PreAuthorize("@ss.hasPermi('wecom:actual:add')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:actual:add')")
     @Log(title = "实际群码", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody WeGroupCodeActual weGroupCodeActual) {
@@ -82,7 +82,7 @@ public class WeGroupCodeActualController extends BaseController {
     /**
      * 修改实际群码
      */
-    @PreAuthorize("@ss.hasPermi('wecom:actual:edit')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:actual:edit')")
     @Log(title = "实际群码", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody WeGroupCodeActual weGroupCodeActual) {
@@ -101,7 +101,7 @@ public class WeGroupCodeActualController extends BaseController {
     /**
      * 删除实际群码
      */
-    @PreAuthorize("@ss.hasPermi('wecom:actual:remove')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:actual:remove')")
     @Log(title = "实际群码", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {

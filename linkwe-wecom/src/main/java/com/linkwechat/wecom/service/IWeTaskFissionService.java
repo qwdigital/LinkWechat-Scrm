@@ -1,9 +1,14 @@
 package com.linkwechat.wecom.service;
 
+import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeTaskFission;
 import com.linkwechat.wecom.domain.dto.WeChatUserDTO;
 import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
+import com.linkwechat.wecom.domain.vo.WeTaskFissionProgressVO;
+import com.linkwechat.wecom.domain.vo.WeTaskFissionStatisticVO;
 
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,7 +32,7 @@ public interface IWeTaskFissionService {
      * @param weTaskFission 任务宝
      * @return 任务宝集合
      */
-    public List<WeTaskFission> selectWeTaskFissionList(WeTaskFission weTaskFission);
+    public List<WeTaskFission> selectWeTaskFissionList(WeTaskFission weTaskFission) throws ParseException;
 
     /**
      * 新增任务宝
@@ -83,4 +88,10 @@ public interface IWeTaskFissionService {
      * @param taskFissionRecordId
      */
     public void completeFissionRecord(Long taskFissionId, Long taskFissionRecordId, WeChatUserDTO weChatUserDTO);
+
+    List<WeCustomer> getCustomerListById(String unionId, String fissionId);
+
+    WeTaskFissionStatisticVO taskFissionStatistic(Long taskFissionId, Date startTime, Date endTime);
+
+    WeTaskFissionProgressVO getCustomerTaskProgress(WeTaskFission taskFission, String eid);
 }

@@ -1,6 +1,8 @@
 package com.linkwechat.common.constant;
 
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +48,6 @@ public class WeConstans {
 
 
     public static final String WE_EMPLE_CODE_KEY = "we_emple_code_key";
-
 
 
     /**
@@ -330,8 +331,8 @@ public class WeConstans {
 
     }
 
-    public static enum sendMessageStatusEnum {
-
+    @Getter
+    public enum sendMessageStatusEnum {
         NOT_SEND("0", "未发送"),
         SEND("1", "已发送"),
         NOT_FRIEND_SEND("2", "因客户不是好友导致发送失败"),
@@ -348,26 +349,9 @@ public class WeConstans {
          * @param desc
          */
         sendMessageStatusEnum(String status, String desc) {
-            this.setStatus(status);
-            this.setDesc(desc);
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public void setStatus(String key) {
             this.status = status;
-        }
-
-        public String getDesc() {
-            return desc;
-        }
-
-        public void setDesc(String desc) {
             this.desc = desc;
         }
-
     }
 
 
@@ -387,7 +371,7 @@ public class WeConstans {
      */
     public static final String THIRD_APP_PARAM_TIP = "agentId";
 
-    public static final String WECUSTOMERS_KEY="weCustomer";
+    public static final String WECUSTOMERS_KEY = "weCustomer";
 
     /**
      * 发给客户
@@ -397,7 +381,7 @@ public class WeConstans {
     /**
      * 发给客户群
      */
-    public static final String SEND_MESSAGE_GROUP="1";
+    public static final String SEND_MESSAGE_GROUP = "1";
 
     /**
      * 消息范围 1 指定客户
@@ -407,6 +391,6 @@ public class WeConstans {
     /**
      * 消息范围 1 指定客户
      */
-    public static final String SEND_MESSAGE_CUSTOMER_PART="1";
+    public static final String SEND_MESSAGE_CUSTOMER_PART = "1";
 
 }

@@ -36,7 +36,7 @@ public class WeMsgTlpController extends BaseController
     /**
      * 查询欢迎语模板列表
      */
-    @PreAuthorize("@ss.hasPermi('wecom:tlp:list')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:tlp:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeMsgTlp weMsgTlp)
     {
@@ -49,7 +49,7 @@ public class WeMsgTlpController extends BaseController
     /**
      * 获取欢迎语模板详细信息
      */
-    @PreAuthorize("@ss.hasPermi('wecom:tlp:query')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:tlp:query')")
     @GetMapping(value = "/scop/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
@@ -62,7 +62,7 @@ public class WeMsgTlpController extends BaseController
     /**
      * 新增欢迎语模板
      */
-    @PreAuthorize("@ss.hasPermi('wecom:tlp:add')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:tlp:add')")
     @Log(title = "新增欢迎语模板", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody WeMsgTlp weMsgTlp)
@@ -73,7 +73,7 @@ public class WeMsgTlpController extends BaseController
     /**
      * 修改欢迎语模板
      */
-    @PreAuthorize("@ss.hasPermi('wecom:tlp:edit')")
+    //  @PreAuthorize("@ss.hasPermi('wecom:tlp:edit')")
     @Log(title = "修改欢迎语模板", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody WeMsgTlp weMsgTlp)
@@ -84,7 +84,7 @@ public class WeMsgTlpController extends BaseController
     /**
      * 删除欢迎语模板
      */
-    @PreAuthorize("@ss.hasPermi('wecom:tlp:remove')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:tlp:remove')")
     @Log(title = "删除欢迎语模板", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)

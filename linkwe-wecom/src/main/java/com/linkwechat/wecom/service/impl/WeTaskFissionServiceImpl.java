@@ -2,7 +2,9 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.collect.Lists;
 import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.TaskFissionType;
@@ -20,6 +22,9 @@ import com.linkwechat.wecom.domain.dto.WeExternalContactDto;
 import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
 import com.linkwechat.wecom.domain.dto.message.LinkMessageDto;
+import com.linkwechat.wecom.domain.vo.WeTaskFissionDailyDataVO;
+import com.linkwechat.wecom.domain.vo.WeTaskFissionProgressVO;
+import com.linkwechat.wecom.domain.vo.WeTaskFissionStatisticVO;
 import com.linkwechat.wecom.mapper.WeTaskFissionMapper;
 import com.linkwechat.wecom.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -34,9 +39,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -67,6 +71,10 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     @Autowired
     private IWeMaterialService weMaterialService;
     @Autowired
+    private IWeCustomerService weCustomerService;
+    @Autowired
+    private IWeFlowerCustomerRelService weFlowerCustomerRelService;
+    @Autowired
     private IWeTaskFissionCompleteRecordService weTaskFissionCompleteRecordService;
     @Autowired
     private CosConfig cosConfig;
@@ -81,7 +89,10 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
      */
     @Override
     public WeTaskFission selectWeTaskFissionById(Long id) {
-        return weTaskFissionMapper.selectWeTaskFissionById(id);
+        WeTaskFission taskFission = weTaskFissionMapper.selectWeTaskFissionById(id);
+        List<WeTaskFissionStaff> staffList = weTaskFissionStaffService.selectWeTaskFissionStaffByTaskId(id);
+        taskFission.setTaskFissionStaffs(staffList);
+        return taskFission;
     }
 
     /**
@@ -91,7 +102,13 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
      * @return 任务宝
      */
     @Override
-    public List<WeTaskFission> selectWeTaskFissionList(WeTaskFission weTaskFission) {
+    public List<WeTaskFission> selectWeTaskFissionList(WeTaskFission weTaskFission) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf_day = new SimpleDateFormat("yyyy-MM-dd");
+        if (weTaskFission.getStartTime() != null && weTaskFission.getOverTime() != null) {
+            weTaskFission.setStartTime(sdf.parse(sdf_day.format(weTaskFission.getStartTime()) + " 00:00:00"));
+            weTaskFission.setOverTime(sdf.parse(sdf_day.format(weTaskFission.getOverTime()) + " 23:59:59"));
+        }
         return weTaskFissionMapper.selectWeTaskFissionList(weTaskFission);
     }
 
@@ -182,6 +199,8 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         //H5生成海报页面路径
         StringBuilder pageUrlBuilder = new StringBuilder(pageUrl);
         pageUrlBuilder.append("?")
+                .append("agentId=").append("1000010")
+                .append("&")
                 .append("fissionId=").append(id)
                 .append("&")
                 .append("userId=").append(fissStaffId)
@@ -227,18 +246,33 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     @Override
     @Transactional
     public String fissionPosterGenerate(WeTaskFissionPosterDTO weTaskFissionPosterDTO) {
-        WeUser user = weUserService.selectWeUserById(weTaskFissionPosterDTO.getUserId());
-        if (user != null) {
-            WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), user.getUserId(), user.getName());
-            String qrcode = getPosterQRCode(weTaskFissionPosterDTO.getFissionTargetId(), record, user);
-            WePoster poster = wePosterService.selectOne(weTaskFissionPosterDTO.getPosterId());
-            poster.getPosterSubassemblyList().stream().filter(Objects::nonNull)
-                    .filter(wePosterSubassembly -> wePosterSubassembly.getType() == 3).forEach(wePosterSubassembly -> {
-                wePosterSubassembly.setImgPath(qrcode);
-            });
-            return wePosterService.generateSimpleImg(poster);
+        WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>()
+                .eq(WeCustomer::getExternalUserid, weTaskFissionPosterDTO.getEid()));
+        if (weCustomer != null) {
+            //任务表添加当前客户任务
+            WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), weCustomer.getExternalUserid(), weCustomer.getName());
+            String posterUrl = record.getPoster();
+            if (StringUtils.isBlank(posterUrl)) {
+                String qrcode = getPosterQRCode(weTaskFissionPosterDTO.getFissionTargetId(), record, weCustomer);
+                if (StringUtils.isBlank(qrcode)) {
+                    throw new WeComException("生成的二维码为空");
+                }
+                WePoster poster = wePosterService.selectOne(weTaskFissionPosterDTO.getPosterId());
+                poster.getPosterSubassemblyList().stream().filter(Objects::nonNull)
+                        .filter(wePosterSubassembly -> wePosterSubassembly.getType() == 3).forEach(wePosterSubassembly -> {
+                    wePosterSubassembly.setImgPath(qrcode);
+                });
+                posterUrl = wePosterService.generateSimpleImg(poster);
+                if (StringUtils.isBlank(posterUrl)) {
+                    throw new WeComException("生成的海报为空");
+                }
+                record.setQrCode(qrcode);
+                record.setPoster(posterUrl);
+                weTaskFissionRecordService.updateWeTaskFissionRecord(record);
+            }
+            return posterUrl;
         } else {
-            throw new RuntimeException("客户信息不存在");
+            throw new WeComException("客户信息不存在");
         }
     }
 
@@ -252,67 +286,135 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         wfcr.setCustomerName(weChatUserDTO.getName());
         List<WeTaskFissionCompleteRecord> list = weTaskFissionCompleteRecordService.selectWeTaskFissionCompleteRecordList(wfcr);
         if (CollectionUtils.isEmpty(list)) {
-            wfcr.setCreateBy(SecurityUtils.getUsername());
             wfcr.setCreateTime(new Date());
             weTaskFissionCompleteRecordService.insertWeTaskFissionCompleteRecord(wfcr);
         }
     }
 
-    private String getPosterQRCode(String fissionTargetId, WeTaskFissionRecord record, WeUser user) {
-        String qrCode;
-        Long taskFissionId = record.getTaskFissionId();
-        WeTaskFission taskFission = weTaskFissionMapper.selectWeTaskFissionById(taskFissionId);
-        Integer taskFissionType = taskFission.getFissionType();
-        if (TaskFissionType.USER_FISSION.getCode().equals(taskFissionType)) {
-            qrCode = getUserFissionQrcode(fissionTargetId, record);
-        } else if (TaskFissionType.GROUP_FISSION.getCode().equals(taskFissionType)) {
-            qrCode = getGroupFissionQrcode(taskFissionId, fissionTargetId, record, user);
+    @Override
+    public List<WeCustomer> getCustomerListById(String eid, String fissionId) {
+        WeTaskFissionRecord weTaskFissionRecord;
+        if (StringUtils.isEmpty(eid)) {
+            List<WeTaskFissionRecord> weTaskFissionRecords = weTaskFissionRecordService
+                    .list(new LambdaQueryWrapper<WeTaskFissionRecord>().eq(WeTaskFissionRecord::getTaskFissionId, fissionId));
+            return Optional.ofNullable(weTaskFissionRecords).orElseGet(ArrayList::new).stream()
+                    .map(record -> weCustomerService.selectWeCustomerById(record.getCustomerId()))
+                    .filter(Objects::nonNull).collect(Collectors.toList());
         } else {
-            throw new WeComException("错误的任务类型");
+            WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getExternalUserid, eid));
+            String externalUseriId = Optional.ofNullable(weCustomer).map(WeCustomer::getExternalUserid)
+                    .orElseThrow(() -> new WeComException("用户信息不存在"));
+            weTaskFissionRecord = weTaskFissionRecordService
+                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), externalUseriId);
+            Optional.ofNullable(weTaskFissionRecord).map(WeTaskFissionRecord::getId)
+                    .orElseThrow(() -> new WeComException("任务记录信息不存在"));
+            List<WeFlowerCustomerRel> list = weFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
+                    .eq(WeFlowerCustomerRel::getState, WeConstans.FISSION_PREFIX + weTaskFissionRecord.getId()));
+            List<String> eidList = Optional.ofNullable(list).orElseGet(ArrayList::new).stream()
+                    .map(WeFlowerCustomerRel::getExternalUserid).collect(Collectors.toList());
+            return weCustomerService.listByIds(eidList);
         }
+    }
+
+    @Override
+    public WeTaskFissionStatisticVO taskFissionStatistic(Long taskFissionId, Date startTime, Date endTime) {
+        WeTaskFissionStatisticVO vo = new WeTaskFissionStatisticVO();
+        WeTaskFission taskFission = weTaskFissionMapper.selectWeTaskFissionById(taskFissionId);
+        if (taskFission == null) {
+            throw new WeComException("任务数据不存在");
+        }
+        vo.setTaskFissionId(taskFissionId);
+        vo.setTaskName(taskFission.getTaskName());
+        vo.setStartTime(startTime);
+        vo.setEndTime(endTime);
+        Map<String, List<WeTaskFissionCompleteRecord>> completeRecordsMap = weTaskFissionCompleteRecordService.statisticCompleteRecords(taskFissionId, startTime, endTime).parallelStream().filter(Objects::nonNull).collect(Collectors.groupingBy(item -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getCreateTime())));
+        Map<String, List<WeTaskFissionRecord>> recordsMap = weTaskFissionRecordService.statisticRecords(taskFissionId, startTime, endTime).parallelStream().filter(Objects::nonNull).collect(Collectors.groupingBy(item -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getCreateTime())));
+        List<WeTaskFissionDailyDataVO> dailyDataList = Lists.newArrayList();
+        DateUtils.findDates(startTime, endTime).parallelStream().map(d -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, d))
+                .forEach(date -> {
+                    WeTaskFissionDailyDataVO v = new WeTaskFissionDailyDataVO();
+                    v.setDay(date);
+                    List<WeTaskFissionCompleteRecord> completeList = completeRecordsMap.get(date);
+                    List<WeTaskFissionRecord> recordsList = recordsMap.get(date);
+                    if (CollectionUtils.isNotEmpty(completeList)) {
+                        v.setIncrease(completeList.size());
+                    }
+                    if (CollectionUtils.isNotEmpty(recordsList)) {
+                        v.setAttend(recordsList.size());
+                        int completeSize = (int) recordsList.stream().filter(r -> r.getCompleteTime() != null).count();
+                        v.setComplete(completeSize);
+                    }
+                    dailyDataList.add(v);
+                });
+        vo.setData(dailyDataList);
+        return vo;
+    }
+
+    @Override
+    public WeTaskFissionProgressVO getCustomerTaskProgress(WeTaskFission taskFission, String eid) {
+        long complete = 0L;
+        long total = taskFission.getFissNum();
+        List<WeCustomer> list = getCustomerListById(eid, String.valueOf(taskFission.getId()));
+        if (CollectionUtils.isNotEmpty(list)) {
+            complete = list.size();
+        } else {
+            list = new ArrayList<>();
+        }
+        return WeTaskFissionProgressVO.builder().total(total).completed(complete).customers(list).build();
+    }
+
+    /*************************************** private functions **************************************/
+
+    private String getPosterQRCode(String fissionTargetId, WeTaskFissionRecord record, WeCustomer weCustomer) {
+        String qrCode = record.getQrCode();
         if (StringUtils.isBlank(qrCode)) {
-            throw new WeComException("生成的二维码为空");
+            Long taskFissionId = record.getTaskFissionId();
+            WeTaskFission taskFission = weTaskFissionMapper.selectWeTaskFissionById(taskFissionId);
+            Integer taskFissionType = taskFission.getFissionType();
+            if (TaskFissionType.USER_FISSION.getCode().equals(taskFissionType)) {
+                qrCode = getUserFissionQrcode(fissionTargetId, record);
+            } else if (TaskFissionType.GROUP_FISSION.getCode().equals(taskFissionType)) {
+                qrCode = getGroupFissionQrcode(taskFissionId, record, weCustomer);
+            } else {
+                throw new WeComException("错误的任务类型");
+            }
         }
         return qrCode;
     }
 
     private String getUserFissionQrcode(String fissionTargetId, WeTaskFissionRecord record) {
-        WeExternalContactDto dto = null;
-        if (StringUtils.isNotBlank(record.getConfigId())) {
-            dto = weExternalContactClient.getContactWay(record.getConfigId());
+        //获取二维码
+        String qrcode = null;
+        WeExternalContactDto.WeContactWay contactWay = posterContactWay(fissionTargetId, record.getId());
+        WeExternalContactDto dto = weExternalContactClient.addContactWay(contactWay);
+        if (dto != null) {
+            qrcode = dto.getQr_code();
         }
-        if (dto == null) {
-            //获取二维码
-            WeExternalContactDto.WeContactWay contactWay = posterContactWay(fissionTargetId, record.getId());
-            dto = weExternalContactClient.addContactWay(contactWay);
-            record.setConfigId(dto.getConfig_id());
-            int updateResult = weTaskFissionRecordService.updateWeTaskFissionRecord(record);
-            if (updateResult <= 0) {
-                throw new RuntimeException("生成海报异常：更新裂变记录失败");
-            }
-        }
-        return dto.getQr_code();
+        return qrcode;
     }
 
-    private String getGroupFissionQrcode(Long taskFissionId, String fissionTargetId, WeTaskFissionRecord record, WeUser user) {
-        String qrCode = record.getConfigId();
-        String avatar = user.getAvatarMediaid();
-        WeMaterial file = weMaterialService.findWeMaterialById(Long.parseLong(avatar));
-        if (StringUtils.isBlank(qrCode)) {
+    private String getGroupFissionQrcode(Long taskFissionId, WeTaskFissionRecord record, WeCustomer weCustomer) {
+        String qrCode = null;
+        if (weCustomer != null) {
+            String avatar = weCustomer.getAvatar();
+            WeMaterial file = weMaterialService.findWeMaterialById(Long.parseLong(avatar));
+            String avatarUrl = StringUtils.isEmpty(avatar) ? file.getMaterialUrl() : avatar;
             String content = "/wecom/fission/complete/" + taskFissionId + "/records/" + record.getId();
-            BufferedImage bufferedImage = QREncode.crateQRCode(content, file.getMaterialUrl());
+            BufferedImage bufferedImage = QREncode.crateQRCode(content, avatarUrl);
             if (bufferedImage != null) {
                 try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
                     ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
                     NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(System.currentTimeMillis() + ".jpg", byteArrayOutputStream.toByteArray());
                     qrCode = FileUploadUtils.upload2Cos(streamMultipartFile, cosConfig);
                 } catch (Exception e) {
-                    log.warn("生成海报二维码异常, fissionTargetId={}, record={}, user={}, exception={}", fissionTargetId, record, user, ExceptionUtils.getStackTrace(e));
+                    log.warn("生成海报二维码异常, record={}, customer={}, exception={}", record, weCustomer, ExceptionUtils.getStackTrace(e));
                     throw new WeComException("生成二维码异常");
                 }
             }
+            return qrCode;
+        } else {
+            throw new WeComException("生成二维码异常,用户信息不存在");
         }
-        return qrCode;
     }
 
     private WeExternalContactDto.WeContactWay posterContactWay(String fissionTargetId, Long recordId) {
@@ -338,7 +440,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
             if (insertRows > 0) {
                 recordInfo = record;
             } else {
-                throw new RuntimeException("生成海报异常：插入裂变记录失败");
+                throw new WeComException("生成海报异常：插入裂变记录失败");
             }
         }
         return recordInfo;

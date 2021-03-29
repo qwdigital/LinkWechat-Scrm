@@ -173,8 +173,6 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
                 taskTagMapper.batchBindsTaskTags(wePresTagGroupTaskTagList);
             }
 
-            // 更新范围
-
             // 先解除旧的员工绑定信息
             QueryWrapper<WePresTagGroupTaskScope> taskScopeQueryWrapper = new QueryWrapper<>();
             taskScopeQueryWrapper.eq("task_id", taskId);

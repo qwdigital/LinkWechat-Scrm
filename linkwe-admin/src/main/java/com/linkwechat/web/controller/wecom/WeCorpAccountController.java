@@ -31,7 +31,7 @@ public class WeCorpAccountController extends BaseController
     /**
      * 查询企业id相关配置列表
      */
-    @PreAuthorize("@ss.hasPermi('wechat:corp:list')")
+    //  @PreAuthorize("@ss.hasPermi('wechat:corp:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeCorpAccount weCorpAccount)
     {
@@ -44,7 +44,7 @@ public class WeCorpAccountController extends BaseController
     /**
      * 获取企业id相关配置详细信息
      */
-    @PreAuthorize("@ss.hasPermi('wechat:corp:query')")
+    //   @PreAuthorize("@ss.hasPermi('wechat:corp:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
@@ -54,7 +54,7 @@ public class WeCorpAccountController extends BaseController
     /**
      * 新增企业id相关配置
      */
-    @PreAuthorize("@ss.hasPermi('wechat:corp:add')")
+    //   @PreAuthorize("@ss.hasPermi('wechat:corp:add')")
     @Log(title = "新增企业id相关配置", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody WeCorpAccount weCorpAccount)
@@ -65,7 +65,7 @@ public class WeCorpAccountController extends BaseController
     /**
      * 修改企业id相关配置
      */
-    @PreAuthorize("@ss.hasPermi('wechat:corp:edit')")
+    //   @PreAuthorize("@ss.hasPermi('wechat:corp:edit')")
     @Log(title = "修改企业id相关配置", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody WeCorpAccount weCorpAccount)
@@ -76,7 +76,7 @@ public class WeCorpAccountController extends BaseController
     /**
      * 启用有效企业微信账号
      */
-    @PreAuthorize("@ss.hasPermi('wechat:corp:startVailWeCorpAccount')")
+    //  @PreAuthorize("@ss.hasPermi('wechat:corp:startVailWeCorpAccount')")
     @Log(title = "启用有效企业微信账号", businessType = BusinessType.DELETE)
 	@PutMapping("/startVailWeCorpAccount/{corpId}")
     public AjaxResult startWeCorpAccount(@PathVariable String corpId)
@@ -87,7 +87,7 @@ public class WeCorpAccountController extends BaseController
     /**
      * 客户流失通知开关
      */
-    @PreAuthorize("@ss.hasPermi('wechat:corp:startCustomerChurnNoticeSwitch')")
+    //   @PreAuthorize("@ss.hasPermi('wechat:corp:startCustomerChurnNoticeSwitch')")
     @Log(title = "客户流失通知开关", businessType = BusinessType.UPDATE)
     @PutMapping("/startCustomerChurnNoticeSwitch/{status}")
     public AjaxResult startCustomerChurnNoticeSwitch(@PathVariable String status)
@@ -98,7 +98,7 @@ public class WeCorpAccountController extends BaseController
     /**
      * 客户流失通知开关查询
      */
-    @PreAuthorize("@ss.hasPermi('wechat:corp:getCustomerChurnNoticeSwitch')")
+    //   @PreAuthorize("@ss.hasPermi('wechat:corp:getCustomerChurnNoticeSwitch')")
     @Log(title = "客户流失通知开关查询", businessType = BusinessType.OTHER)
     @GetMapping("/getCustomerChurnNoticeSwitch")
     public AjaxResult getCustomerChurnNoticeSwitch()

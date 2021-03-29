@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Data
 public class WeTaskFissionStatisticVO {
-    private Long id;
+    private Long taskFissionId;
     private String taskName;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date startTime;

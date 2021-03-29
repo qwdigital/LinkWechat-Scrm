@@ -44,7 +44,7 @@ public class WeMaterialController extends BaseController {
     /**
      * 查询素材列表
      */
-    @PreAuthorize("@ss.hasPermi('wecom:material:list')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:material:list')")
     @GetMapping("/list")
     public TableDataInfo list(@RequestParam(value = "categoryId", required = false) String categoryId
             , @RequestParam(value = "search", required = false) String search,@RequestParam(value = "mediaType") String mediaType) {
@@ -69,7 +69,7 @@ public class WeMaterialController extends BaseController {
     /**
      * 查询素材详细信息
      */
-    @PreAuthorize("@ss.hasPermi('wechat:material:query')")
+    //  @PreAuthorize("@ss.hasPermi('wechat:material:query')")
     @GetMapping(value = "/{id}")
     @ApiOperation("查询素材详细信息")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
@@ -79,7 +79,7 @@ public class WeMaterialController extends BaseController {
     /**
      * 添加素材信息
      */
-    @PreAuthorize("@ss.hasPermi('wechat:material:add')")
+    //   @PreAuthorize("@ss.hasPermi('wechat:material:add')")
     @Log(title = "添加素材信息", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("添加素材信息")
@@ -90,7 +90,7 @@ public class WeMaterialController extends BaseController {
     /**
      * 更新素材信息
      */
-    @PreAuthorize("@ss.hasPermi('wechat:material:edit')")
+    //   @PreAuthorize("@ss.hasPermi('wechat:material:edit')")
     @Log(title = "更新素材信息", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("更新素材信息")
@@ -101,7 +101,7 @@ public class WeMaterialController extends BaseController {
     /**
      * 删除素材信息
      */
-    @PreAuthorize("@ss.hasPermi('wechat:material:remove')")
+    //   @PreAuthorize("@ss.hasPermi('wechat:material:remove')")
     @Log(title = "删除素材信息", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     @ApiOperation("删除素材信息")
@@ -112,7 +112,7 @@ public class WeMaterialController extends BaseController {
     /**
      * 上传素材信息
      */
-    @PreAuthorize("@ss.hasPermi('wechat:material:upload')")
+    //   @PreAuthorize("@ss.hasPermi('wechat:material:upload')")
     @Log(title = "上传素材信息", businessType = BusinessType.OTHER)
     @PostMapping("/upload")
     @ApiOperation("上传素材信息")
@@ -124,7 +124,7 @@ public class WeMaterialController extends BaseController {
     /**
      * 更换分组
      */
-    @PreAuthorize("@ss.hasPermi('wechat:material:resetCategory')")
+    //   @PreAuthorize("@ss.hasPermi('wechat:material:resetCategory')")
     @Log(title = "更换分组", businessType = BusinessType.OTHER)
     @PutMapping("/resetCategory")
     @ApiOperation("更换分组")

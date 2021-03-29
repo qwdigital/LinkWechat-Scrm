@@ -21,8 +21,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- *
  * 聊天工具侧边栏
+ *
  * @author kewen
  */
 @Service
@@ -39,84 +39,51 @@ public class WeChatItemServiceImpl extends ServiceImpl<WeChatItemMapper, WeChatI
 
     @Override
     public int checkItems(WeChatItemDto chatItemDto) {
-
-
-
-        List<Long> materialIds=new ArrayList<>();
-
-
-        if("0".equals(chatItemDto.getCheckAll())){
-
+        List<Long> materialIds = new ArrayList<>();
+        if ("0".equals(chatItemDto.getCheckAll())) {
             List<WeMaterial> weMaterials = weMaterialService.findWeMaterials(null, null, chatItemDto.getMediaType());
-
-            if(CollectionUtils.isNotEmpty(weMaterials)){
-
-
-                materialIds=  weMaterials.stream().map(WeMaterial::getId).collect(Collectors.toList());
-
-
+            if (CollectionUtils.isNotEmpty(weMaterials)) {
+                materialIds = weMaterials.stream().map(WeMaterial::getId).collect(Collectors.toList());
             }
-
-        }else {
-
-            materialIds= chatItemDto.getMaterialIds();
-
+        } else {
+            materialIds = chatItemDto.getMaterialIds();
         }
-
         List<Long> finalMaterialIds = materialIds;
         Optional.ofNullable(materialIds).ifPresent(
-
-                s->{
-
-                    List<WeChatItem> items=new ArrayList<>();
-
-                    finalMaterialIds.forEach(materialId->{
-
-
-                        WeChatItem item=new WeChatItem();
+                s -> {
+                    List<WeChatItem> items = new ArrayList<>();
+                    finalMaterialIds.forEach(materialId -> {
+                        WeChatItem item = new WeChatItem();
                         item.setItemId(SnowFlakeUtil.nextId());
                         item.setMaterialId(materialId);
                         item.setSideId(chatItemDto.getSideId());
                         items.add(item);
-
-
                     });
-
                     weChatItemMapper.dropItem(chatItemDto.getSideId());
-
-                    weChatItemMapper.addItem(items);
-
+                    if (CollectionUtils.isNotEmpty(items)) {
+                        weChatItemMapper.addItem(items);
+                    }
                     checkItemsTotal(chatItemDto, finalMaterialIds);
-
                 }
         );
-
-
         return 1;
     }
 
     @Override
-    public List<WeChatSideVo> chatItems(Long sideId,String keyword,String mediaType,String userId) {
-        return weChatItemMapper.findChatItems(sideId,keyword,mediaType,userId);
+    public List<WeChatSideVo> chatItems(Long sideId, String keyword, String mediaType, String userId) {
+        return weChatItemMapper.findChatItems(sideId, keyword, mediaType, userId);
     }
 
     /**
      * 更新该次选择的素材数
      *
-     * @param chatItemDto 侧边栏信息
+     * @param chatItemDto      侧边栏信息
      * @param finalMaterialIds 素材id列表
      */
     private void checkItemsTotal(WeChatItemDto chatItemDto, List<Long> finalMaterialIds) {
-
-
-        WeChatSide side=new WeChatSide();
+        WeChatSide side = new WeChatSide();
         side.setSideId(chatItemDto.getSideId());
         side.setTotal(finalMaterialIds.size());
         weChatSideMapper.updateWeChatSideById(side);
-
-
     }
-
-
-
 }

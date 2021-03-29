@@ -8,6 +8,7 @@ import com.linkwechat.wecom.service.IWeTaskFissionRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ import java.util.List;
  * @date 2021-01-27
  */
 @Service
-public class WeTaskFissionRecordServiceImpl extends ServiceImpl<WeTaskFissionRecordMapper,WeTaskFissionRecord> implements IWeTaskFissionRecordService {
+public class WeTaskFissionRecordServiceImpl extends ServiceImpl<WeTaskFissionRecordMapper, WeTaskFissionRecord> implements IWeTaskFissionRecordService {
     @Autowired
     private WeTaskFissionRecordMapper weTaskFissionRecordMapper;
 
@@ -90,7 +91,16 @@ public class WeTaskFissionRecordServiceImpl extends ServiceImpl<WeTaskFissionRec
     @Override
     public WeTaskFissionRecord selectWeTaskFissionRecordByIdAndCustomerId(Long id, String customerId) {
         return weTaskFissionRecordMapper.selectOne(new LambdaQueryWrapper<WeTaskFissionRecord>()
-        .eq(WeTaskFissionRecord::getId,id)
-        .eq(WeTaskFissionRecord::getCustomerId,customerId));
+                .eq(WeTaskFissionRecord::getTaskFissionId, id)
+                .eq(WeTaskFissionRecord::getCustomerId, customerId));
+    }
+
+    @Override
+    public List<WeTaskFissionRecord> statisticRecords(Long taskFissionId, Date startTime, Date endTime) {
+        LambdaQueryWrapper<WeTaskFissionRecord> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(WeTaskFissionRecord::getTaskFissionId, taskFissionId).
+                between(WeTaskFissionRecord::getCreateTime, startTime, endTime).
+                orderByAsc(WeTaskFissionRecord::getCreateTime);
+        return weTaskFissionRecordMapper.selectList(wrapper);
     }
 }

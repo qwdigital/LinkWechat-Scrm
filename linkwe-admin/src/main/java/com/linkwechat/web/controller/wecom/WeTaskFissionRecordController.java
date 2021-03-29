@@ -33,7 +33,7 @@ public class WeTaskFissionRecordController extends BaseController {
      * 查询裂变任务完成记录列表
      */
     @ApiOperation(value = "查询裂变任务完成记录列表",httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:record:list')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:record:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeTaskFissionRecord weTaskFissionRecord) {
         startPage();
@@ -45,7 +45,7 @@ public class WeTaskFissionRecordController extends BaseController {
      * 导出裂变任务完成记录列表
      */
     @ApiOperation(value = "导出裂变任务完成记录列表",httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:record:export')")
+    //    @PreAuthorize("@ss.hasPermi('wecom:record:export')")
     @Log(title = "裂变任务完成记录", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public AjaxResult export(WeTaskFissionRecord weTaskFissionRecord) {
@@ -58,7 +58,7 @@ public class WeTaskFissionRecordController extends BaseController {
      * 获取裂变任务完成记录详细信息
      */
     @ApiOperation(value = "获取裂变任务完成记录详细信息",httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:record:query')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:record:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(weTaskFissionRecordService.selectWeTaskFissionRecordById(id));
@@ -68,7 +68,7 @@ public class WeTaskFissionRecordController extends BaseController {
      * 新增裂变任务完成记录
      */
     @ApiOperation(value = "新增裂变任务完成记录",httpMethod = "POST")
-    @PreAuthorize("@ss.hasPermi('wecom:record:add')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:record:add')")
     @Log(title = "裂变任务完成记录", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     public AjaxResult add(@RequestBody WeTaskFissionRecord weTaskFissionRecord) {
@@ -79,7 +79,7 @@ public class WeTaskFissionRecordController extends BaseController {
      * 修改裂变任务完成记录
      */
     @ApiOperation(value = "修改裂变任务完成记录",httpMethod = "PUT")
-    @PreAuthorize("@ss.hasPermi('wecom:record:edit')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:record:edit')")
     @Log(title = "裂变任务完成记录", businessType = BusinessType.UPDATE)
     @PutMapping("/edit")
     public AjaxResult edit(@RequestBody WeTaskFissionRecord weTaskFissionRecord) {
@@ -90,7 +90,7 @@ public class WeTaskFissionRecordController extends BaseController {
      * 删除裂变任务完成记录
      */
     @ApiOperation(value = "删除裂变任务完成记录",httpMethod = "DELETE")
-    @PreAuthorize("@ss.hasPermi('wecom:record:remove')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:record:remove')")
     @Log(title = "裂变任务完成记录", businessType = BusinessType.DELETE)
     @DeleteMapping("/delete/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {

@@ -53,7 +53,7 @@ public class WeCommunityNewGroupController extends BaseController {
      * 查询新客自动拉群列表
      */
     @ApiOperation(value = "查询新客自动拉群列表", httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:list')")
+    //    @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:list')")
     @GetMapping("/list")
     public TableDataInfo<List<WeCommunityNewGroupVo>> list(@RequestParam(value = "empleCodeName", required = false) String empleCodeName
             , @RequestParam(value = "createBy", required = false) String createBy
@@ -68,7 +68,7 @@ public class WeCommunityNewGroupController extends BaseController {
      * 获取新客自动拉群详细信息
      */
     @ApiOperation(value = "获取新客自动拉群详细信息", httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:query')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:query')")
     @GetMapping(value = "/{newGroupId}")
     public AjaxResult<WeCommunityNewGroupVo> getInfo(@PathVariable("newGroupId") @ApiParam("主键ID") String newGroupId) {
         return AjaxResult.success(weCommunityNewGroupService.selectWeCommunityNewGroupById(new Long(newGroupId)));
@@ -78,7 +78,7 @@ public class WeCommunityNewGroupController extends BaseController {
      * 修改新客自动拉群
      */
     @ApiOperation(value = "修改新客自动拉群", httpMethod = "PUT")
-    @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:edit')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:edit')")
     @Log(title = "新客自动拉群", businessType = BusinessType.UPDATE)
     @PutMapping("/update")
     public AjaxResult edit(@RequestBody @Validated WeCommunityNewGroupDto communityNewGroupDto) {
@@ -91,7 +91,7 @@ public class WeCommunityNewGroupController extends BaseController {
      * 删除新客自动拉群
      */
     @ApiOperation(value = "删除新客自动拉群", httpMethod = "DELETE")
-    @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:remove')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:remove')")
     @Log(title = "新客自动拉群", businessType = BusinessType.DELETE)
     @DeleteMapping("/delete/{ids}")
     public AjaxResult remove(@PathVariable String ids) {
@@ -104,7 +104,7 @@ public class WeCommunityNewGroupController extends BaseController {
      * 新增新客自动拉群
      */
     @ApiOperation(value = "新增新客自动拉群", httpMethod = "POST")
-    @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:add')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:add')")
     @Log(title = "新客自动拉群", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     public AjaxResult add(@RequestBody @Validated WeCommunityNewGroupDto communityNewGroupDto) {
@@ -132,7 +132,7 @@ public class WeCommunityNewGroupController extends BaseController {
      * @throws Exception
      */
     @ApiOperation(value = "员工活码批量下载", httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:code:downloadBatch')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:code:downloadBatch')")
     @Log(title = "员工活码批量下载", businessType = BusinessType.OTHER)
     @GetMapping("/downloadBatch")
     public void downloadBatch(String ids, HttpServletRequest request, HttpServletResponse response) {
@@ -174,7 +174,7 @@ public class WeCommunityNewGroupController extends BaseController {
     }
 
     @ApiOperation(value = "员工活码下载", httpMethod = "GET")
-    @PreAuthorize("@ss.hasPermi('wecom:code:download')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:code:download')")
     @Log(title = "员工活码下载", businessType = BusinessType.OTHER)
     @GetMapping("/download")
     public void download(String id, HttpServletRequest request, HttpServletResponse response) {

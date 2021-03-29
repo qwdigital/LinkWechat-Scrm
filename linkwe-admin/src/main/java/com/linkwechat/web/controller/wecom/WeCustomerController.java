@@ -38,7 +38,7 @@ public class WeCustomerController extends BaseController
     /**
      * 查询企业微信客户列表
      */
-    @PreAuthorize("@ss.hasPermi('customerManage:customer:list')")
+    //  @PreAuthorize("@ss.hasPermi('customerManage:customer:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeCustomer weCustomer)
     {
@@ -53,7 +53,7 @@ public class WeCustomerController extends BaseController
      * 根据员工ID获取客户
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('customerManage:customer:list')")
+    //  @PreAuthorize("@ss.hasPermi('customerManage:customer:list')")
     @GetMapping("/getCustomersByUserId/{externalUserid}")
     public AjaxResult getCustomersByUserId(@PathVariable String externalUserid){
 
@@ -64,7 +64,7 @@ public class WeCustomerController extends BaseController
     /**
      * 导出企业微信客户列表
      */
-    @PreAuthorize("@ss.hasPermi('wecom:customer:export')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:customer:export')")
     @Log(title = "企业微信客户", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public AjaxResult export(WeCustomer weCustomer)
@@ -77,7 +77,7 @@ public class WeCustomerController extends BaseController
     /**
      * 获取企业微信客户详细信息
      */
-    @PreAuthorize("@ss.hasPermi('customerManage:customer:view')")
+    //  @PreAuthorize("@ss.hasPermi('customerManage:customer:view')")
     @GetMapping(value = "/{externalUserId}")
     public AjaxResult getInfo(@PathVariable("externalUserId") String externalUserId)
     {
@@ -89,7 +89,7 @@ public class WeCustomerController extends BaseController
     /**
      * 修改企业微信客户
      */
-    @PreAuthorize("@ss.hasPermi('wecom:customer:edit')")
+    //   @PreAuthorize("@ss.hasPermi('wecom:customer:edit')")
     @Log(title = "企业微信客户", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody WeCustomer weCustomer)
@@ -103,7 +103,7 @@ public class WeCustomerController extends BaseController
      * 客户同步接口
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('customerManage:customer:sync')")
+    //   @PreAuthorize("@ss.hasPermi('customerManage:customer:sync')")
     @Log(title = "企业微信客户同步接口", businessType = BusinessType.DELETE)
     @GetMapping("/synchWeCustomer")
     public AjaxResult synchWeCustomer() {
@@ -125,7 +125,7 @@ public class WeCustomerController extends BaseController
      * @param weMakeCustomerTag
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('customerManage/customer:makeTag')")
+    //   @PreAuthorize("@ss.hasPermi('customerManage/customer:makeTag')")
     @Log(title = "客户打标签", businessType = BusinessType.UPDATE)
     @PostMapping("/makeLabel")
     public AjaxResult makeLabel(@RequestBody WeMakeCustomerTag weMakeCustomerTag){
@@ -140,7 +140,7 @@ public class WeCustomerController extends BaseController
      * 移除客户标签
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('customerManage:customer:removeTag')")
+    //   @PreAuthorize("@ss.hasPermi('customerManage:customer:removeTag')")
     @Log(title = "移除客户标签", businessType = BusinessType.DELETE)
     @DeleteMapping("/removeLabel")
     public AjaxResult removeLabel(@RequestBody WeMakeCustomerTag weMakeCustomerTag){

@@ -1,7 +1,7 @@
 package com.linkwechat.wecom.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.annotation.Excel;
-import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -10,6 +10,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+
+import java.util.Date;
 
 /**
  * 裂变任务记录对象 we_task_fission_record
@@ -22,7 +24,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WeTaskFissionRecord extends BaseEntity {
+public class WeTaskFissionRecord {
     private static final long serialVersionUID = 8770538385789110599L;
     /**
      * 主键
@@ -57,8 +59,22 @@ public class WeTaskFissionRecord extends BaseEntity {
     @ApiModelProperty("裂变客户数量")
     private Long fissNum;
 
-    @ApiModelProperty("生成二维码配置id")
-    private String configId;
+    @ApiModelProperty("二维码链接")
+    private String qrCode;
+
+    @ApiModelProperty("海报链接")
+    private String poster;
+
+    /**
+     * 创建时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty(value = "创建时间")
+    private Date createTime = new Date();
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty(value = "完成时间")
+    private Date completeTime;
 
     @Override
     public String toString() {
@@ -68,7 +84,10 @@ public class WeTaskFissionRecord extends BaseEntity {
                 .append("customerId", getCustomerId())
                 .append("customerName", getCustomerName())
                 .append("fissNum", getFissNum())
-                .append("configId", getConfigId())
+                .append("qrCode", getQrCode())
+                .append("poster", getPoster())
+                .append("createTime", getCreateTime())
+                .append("completeTime", getCompleteTime())
                 .toString();
     }
 }

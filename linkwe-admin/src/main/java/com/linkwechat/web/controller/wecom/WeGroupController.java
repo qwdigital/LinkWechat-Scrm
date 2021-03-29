@@ -36,7 +36,7 @@ public class WeGroupController extends BaseController {
     @Autowired
     private IWeGroupMemberService weGroupMemberService;
 
-    @PreAuthorize("@ss.hasPermi('customerManage:group:list')")
+    //  @PreAuthorize("@ss.hasPermi('customerManage:group:list')")
     @GetMapping({"/list"})
     public TableDataInfo list(WeGroup weGroup) {
         startPage();
@@ -46,7 +46,7 @@ public class WeGroupController extends BaseController {
 
 
 
-    @PreAuthorize("@ss.hasPermi('customerManage:group:view')")
+    //   @PreAuthorize("@ss.hasPermi('customerManage:group:view')")
     @GetMapping({"/members"})
     public TableDataInfo list(WeGroupMember weGroupMember) {
         startPage();
@@ -58,7 +58,7 @@ public class WeGroupController extends BaseController {
      *  同步客户群
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('customerManage:group:sync')")
+    //   @PreAuthorize("@ss.hasPermi('customerManage:group:sync')")
     @GetMapping({"/synchWeGroup"})
     public AjaxResult synchWeGroup(){
         try {
@@ -78,7 +78,7 @@ public class WeGroupController extends BaseController {
      * @param userId
      * @return
      */
-    @PreAuthorize("@ss.hasPermi('customerManage:group:sync')")
+    //   @PreAuthorize("@ss.hasPermi('customerManage:group:sync')")
     @GetMapping({"/getGroupsByUserId/{userId}"})
     public AjaxResult  getGroupsByUserId(@PathVariable String userId){
 
