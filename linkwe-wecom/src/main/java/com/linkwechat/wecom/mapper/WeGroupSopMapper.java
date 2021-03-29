@@ -71,4 +71,13 @@ public interface WeGroupSopMapper extends BaseMapper<WeGroupSop> {
      * @return 结果
      */
     List<String> getChatIdListByRuleId(Long ruleId);
+
+    /**
+     *  根据员工id获取对应的sop任务列表
+     * @param emplId 员工id
+     * @param isDone 已完成还是待处理
+     * @return 结果
+     */
+    List<WeGroupSopVo> getEmplTaskList(@Param("emplId") String emplId, @Param("isDone") boolean isDone);
+
 }

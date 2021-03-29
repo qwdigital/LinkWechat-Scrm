@@ -24,4 +24,9 @@ public class WePresTagGroupTaskScope {
      */
     private String weUserId;
 
+    /**
+     * 是否已处理
+     */
+    private boolean isDone;
+
 }

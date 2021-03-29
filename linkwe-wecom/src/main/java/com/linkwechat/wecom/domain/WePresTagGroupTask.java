@@ -58,4 +58,9 @@ public class WePresTagGroupTask extends BaseEntity {
      */
     private String cusEndTime;
 
+    /**
+     * 企业群发消息的id
+     */
+    private String msgid;
+
 }

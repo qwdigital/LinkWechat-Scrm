@@ -1,7 +1,9 @@
 package com.linkwechat.wecom.service;
 
 import com.linkwechat.wecom.domain.WeGroupSop;
+import com.linkwechat.wecom.domain.vo.WeCommunityTaskEmplVo;
 import com.linkwechat.wecom.domain.vo.WeGroupSopVo;
+import com.linkwechat.wecom.domain.vo.WeKeywordGroupTaskVo;
 
 import java.util.List;
 
@@ -68,4 +70,29 @@ public interface IWeGroupSopService {
      * @return 是否唯一
      */
     boolean isRuleNameUnique(String ruleName);
+
+    /**
+     *  根据员工id获取对应的sop任务列表
+     * @param emplId 员工id
+     * @param isDone 已完成还是待处理
+     * @return 结果
+     */
+    List<WeGroupSopVo> getEmplTaskList(String emplId, boolean isDone);
+
+    /**
+     * 变更某员工sop规则发送任务的状态
+     *
+     * @param ruleId 规则名称
+     * @param emplId 群聊的群主id
+     * @return 结果
+     */
+    int updateChatSopStatus(Long ruleId, String emplId);
+
+    /**
+     * 根据SOP 规则id获取所有使用人员信息
+     *
+     * @param ruleId sop id
+     * @return 结果
+     */
+    List<WeCommunityTaskEmplVo> getScopeListByRuleId(Long ruleId);
 }

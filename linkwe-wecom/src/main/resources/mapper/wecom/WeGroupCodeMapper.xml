@@ -170,4 +170,9 @@
         </foreach>
     </delete>
 
+    <select id="getWeGroupByUuid" parameterType="String" resultMap="WeGroupCodeResult">
+        <include refid="selectWeGroupCodeVo" />
+        where w.uuid = #{uuid}
+    </select>
+
 </mapper>

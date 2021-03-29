@@ -165,4 +165,15 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper,WeGrou
         int rows =  weGroupCodeMapper.checkActivityNameUnique(weGroupCode.getActivityName());
         return rows == 0;
     }
+
+    /**
+     * 根据 uuid获取群活码
+     *
+     * @param uuid uuid
+     * @return 结果
+     */
+    @Override
+    public WeGroupCode getWeGroupByUuid(String uuid) {
+        return weGroupCodeMapper.getWeGroupByUuid(uuid);
+    }
 }

@@ -22,4 +22,9 @@ public class WeGroupSopChat {
      * 实际群聊id
      */
     private String chatId;
+
+    /**
+     * 是否已完成
+     */
+    private boolean isDone;
 }

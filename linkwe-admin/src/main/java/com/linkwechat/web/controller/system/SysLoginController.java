@@ -52,9 +52,6 @@ public class SysLoginController
     @Autowired
     private WeAccessTokenClient weAccessTokenClient;
 
-//    @Autowired
-//    private IWeGroupCodeService weGroupCodeService;
-
 
     /**
      * 登录方法

@@ -2,8 +2,8 @@ package com.linkwechat.wecom.domain.vo;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.linkwechat.common.enums.CommunityTaskType;
 import com.linkwechat.wecom.domain.WeGroup;
-import com.linkwechat.wecom.domain.WeMaterial;
 import lombok.Data;
 
 import java.util.Date;
@@ -11,6 +11,12 @@ import java.util.List;
 
 @Data
 public class WeGroupSopVo {
+
+    /**
+     * 类型。该属性仅用于H5页面与老客标签建群混合列表的任务类型判断
+     */
+    @TableField(exist = false)
+    private final Integer type = CommunityTaskType.SOP.getType();
 
     /**
      * id
@@ -36,7 +42,7 @@ public class WeGroupSopVo {
      * 素材列表
      */
     @TableField(exist = false)
-    private List<WeMaterial> materialList;
+    private List<WeMaterialVo> materialList;
 
     /**
      * 自上传图片列表
@@ -49,6 +55,12 @@ public class WeGroupSopVo {
      */
     @TableField(exist = false)
     private List<WeGroup> groupList;
+
+    /**
+     * 执行人列表
+     */
+    @TableField(exist = false)
+    private List<WeCommunityTaskEmplVo> scopeList;
 
     /**
      * 开始执行时间

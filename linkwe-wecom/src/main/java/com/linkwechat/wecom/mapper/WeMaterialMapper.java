@@ -2,6 +2,7 @@ package com.linkwechat.wecom.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeMaterial;
+import com.linkwechat.wecom.domain.vo.WeMaterialVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -74,5 +75,10 @@ public interface WeMaterialMapper extends BaseMapper<WeMaterial> {
      */
     int resetCategory(@Param("categoryId") String categoryId, @Param("material") String material);
 
-
+    /**
+     * 根据id列表获取素材Vo列表
+     * @param ids 素材id列表
+     * @return 结果
+     */
+    List<WeMaterialVo> findMaterialVoListByIds(Long[] ids);
 }

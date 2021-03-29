@@ -10,14 +10,14 @@ import lombok.Data;
 public class WePresTagGroupTaskStatVo {
 
     /**
-     * 客户id
+     * 客户名称
      */
     private String customerName;
 
     /**
-     * 是否已发送
+     * 发送状态
      */
-    private boolean isSent = false;
+    private String status;
 
     /**
      * 是否已在群
