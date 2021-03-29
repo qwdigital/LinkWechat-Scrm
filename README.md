@@ -224,7 +224,7 @@ com.linkwechat
 
 #### 在线体验
 
-演示地址：http://www.linkwechat.cn   
+演示地址：http://demo.linkwechat.cn  
 
 演示账号/密码：Wecome/123456
 
