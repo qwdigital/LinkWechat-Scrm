@@ -39,7 +39,7 @@ export default {
     },
     data() {
         return {
-            qrCodeUrl: 'http://www.linkwechat.cn/static/img/qrCodeImage.a6d01316.png',
+            qrCodeUrl: 'http://demo.linkwechat.cn/static/img/qrCodeImage.a6d01316.png',
             visible: false
         }
     },
