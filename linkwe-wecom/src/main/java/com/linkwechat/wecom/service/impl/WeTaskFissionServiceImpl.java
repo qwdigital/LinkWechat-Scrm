@@ -203,7 +203,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
                 .append("&")
                 .append("fissionId=").append(id)
                 .append("&")
-                .append("userId=").append(fissStaffId)
+                .append("fissionTargetId=").append(fissStaffId)
                 .append("&")
                 .append("posterId=").append(weTaskFission.getPostersId());
 
