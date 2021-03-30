@@ -125,6 +125,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/wecom/material/temporaryMaterialMediaId").anonymous()
                 .antMatchers("/wecom/portrait/**").anonymous()
                 .antMatchers("/wecom/fission/poster", "/wecom/fission/*/progress/*").anonymous()
+                .antMatchers("/wecom/groupCode/getActualCode/*").anonymous()
 
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
