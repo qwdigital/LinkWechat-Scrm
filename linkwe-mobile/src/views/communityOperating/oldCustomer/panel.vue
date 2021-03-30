@@ -180,10 +180,10 @@ export default {
 
     groupCodeUrl () {
       if (window.location.hash[0] === '#') {
-        return window.location.origin + '/#/groupCode?id=' + this.task.groupCodeInfo.uuid
+        return window.location.origin + window.location.pathname + '#/groupCode?id=' + this.task.groupCodeInfo.uuid
       }
 
-      return window.location.origin + '/groupCode?id=' + this.task.groupCodeInfo.uuid
+      return window.location.origin + window.location.pathname + 'groupCode?id=' + this.task.groupCodeInfo.uuid
     }
   },
 

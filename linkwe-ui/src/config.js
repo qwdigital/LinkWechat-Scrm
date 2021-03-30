@@ -39,7 +39,7 @@ window.CONFIG = {
    * 由于群活码是由前端生成，需要配置一下群活码跳转的链接
    * 例如: http://xxx.xxx.xx/h5/groupCode
    */
-  groupCodeH5Link: '',
+  groupCodeH5Link: 'http://linkwechat.cn/mobile/#/groupCode',
 
   get headers() {
     return { Authorization: 'Bearer ' + getToken() }
