@@ -221,9 +221,7 @@ public class WeUserController extends BaseController {
      */
     @GetMapping("/getUserInfo")
     public AjaxResult getUserInfo(String code, String agentId) {
-        log.info("[getUserInfo] code={}, agentId={}", code, agentId);
         WeUserInfoVo userInfo = weUserService.getUserInfo(code, agentId);
-        log.info("[getUserInfp] userInfo={}", userInfo);
         return AjaxResult.success(userInfo);
     }
 }
