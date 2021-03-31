@@ -86,6 +86,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
      * @return 数据库新增行数
      */
     @Override
+    @Transactional
     public int add(WePresTagGroupTaskDto taskDto) {
 
         // 创建WeCommunityOldGroup对象进行存储
@@ -94,7 +95,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
         BeanUtils.copyProperties(taskDto, task);
         task.setCreateBy(SecurityUtils.getUsername());
         int res = 0;
-        if (this.save(task)) {
+        if (taskMapper.insertTask(task) > 0) {
             // 保存标签对象
             List<String> tagIdList = taskDto.getTagList();
             if (CollectionUtil.isNotEmpty(tagIdList)) {
@@ -200,7 +201,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
         BeanUtils.copyProperties(wePresTagGroupTaskDto, wePresTagGroupTask);
         wePresTagGroupTask.setTaskId(taskId);
         wePresTagGroupTask.setUpdateBy(SecurityUtils.getUsername());
-        if (taskMapper.updateById(wePresTagGroupTask) == 1) {
+        if (taskMapper.updateTask(wePresTagGroupTask) > 0) {
             // 更新标签
             // 先删除旧标签
             QueryWrapper<WePresTagGroupTaskTag> taskTagQueryWrapper = new QueryWrapper<>();
@@ -422,6 +423,9 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
         // 获取agentId
         WeCorpAccount validWeCorpAccount = corpAccountService.findValidWeCorpAccount();
         String agentId = validWeCorpAccount.getAgentId();
+        if (StringUtils.isEmpty(agentId)) {
+            throw new WeComException("当前agentId不可用或不存在");
+        }
         pushDto.setAgentid(Integer.valueOf(agentId));
 
         // 设置文本消息

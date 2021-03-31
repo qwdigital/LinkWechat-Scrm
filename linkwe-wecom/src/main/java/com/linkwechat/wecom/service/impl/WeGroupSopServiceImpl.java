@@ -3,6 +3,7 @@ package com.linkwechat.wecom.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.enums.CommunityTaskType;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeMessagePushClient;
 import com.linkwechat.wecom.domain.*;
@@ -326,9 +327,12 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
         String toUser = groupList.stream().map(WeGroup::getOwner).collect(Collectors.joining("|"));
         pushDto.setTouser(toUser);
 
-        // 设置agentId
+        // 获取agentId
         WeCorpAccount validWeCorpAccount = corpAccountService.findValidWeCorpAccount();
         String agentId = validWeCorpAccount.getAgentId();
+        if (StringUtils.isEmpty(agentId)) {
+            throw new WeComException("当前agentId不可用或不存在");
+        }
         pushDto.setAgentid(Integer.valueOf(agentId));
 
         // 设置消息内容

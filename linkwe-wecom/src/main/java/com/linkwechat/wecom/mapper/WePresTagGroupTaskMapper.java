@@ -15,6 +15,19 @@ import java.util.List;
 public interface WePresTagGroupTaskMapper extends BaseMapper<WePresTagGroupTask> {
 
     /**
+     * 添加新任务
+     * @param task 老客标签建群任务
+     * @return 结果
+     */
+    int insertTask(WePresTagGroupTask task);
+
+    /**
+     * 更新任务
+     * @param task 建群任务信息
+     * @return 结果
+     */
+    int updateTask(WePresTagGroupTask task);
+    /**
      * 获取老客户标签建群任务
      *
      * @param taskId 任务id

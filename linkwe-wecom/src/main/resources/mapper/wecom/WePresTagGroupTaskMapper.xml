@@ -88,4 +88,53 @@
         AND wptg.send_type = 1;
     </select>
 
+    <insert id="insertTask" parameterType="WePresTagGroupTask">
+        INSERT INTO we_pres_tag_group
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="taskId != null">task_id,</if>
+            <if test="taskName != null">task_name,</if>
+            <if test="sendType != null">send_type,</if>
+            <if test="groupCodeId != null">group_code_id,</if>
+            <if test="welcomeMsg != null">welcome_msg,</if>
+            <if test="sendScope != null">send_scope,</if>
+            <if test="sendGender != null">send_gender,</if>
+            <if test="cusBeginTime != null and cusBeginTime !=''">cus_begin_time,</if>
+            <if test="cusEndTime != null and cusEndTime !=''">cus_end_time,</if>
+            <if test="msgid != null">msgid,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="createBy != null">create_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="taskId != null">#{taskId},</if>
+            <if test="taskName != null">#{taskName},</if>
+            <if test="sendType != null">#{sendType},</if>
+            <if test="groupCodeId != null">#{groupCodeId},</if>
+            <if test="welcomeMsg != null">#{welcomeMsg},</if>
+            <if test="sendScope != null">#{sendScope},</if>
+            <if test="sendGender != null">#{sendGender},</if>
+            <if test="cusBeginTime != null and cusBeginTime !=''">#{cusBeginTime},</if>
+            <if test="cusEndTime != null and cusEndTime !=''">#{cusEndTime},</if>
+            <if test="msgid != null">#{msgid},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTask" parameterType="WePresTagGroupTask">
+        UPDATE we_pres_tag_group
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="taskName != null">task_name = #{taskName},</if>
+            <if test="sendType != null">send_type = #{sendType},</if>
+            <if test="groupCodeId != null">group_code_id = #{groupCodeId},</if>
+            <if test="welcomeMsg != null">welcome_msg = #{welcomeMsg},</if>
+            <if test="sendScope != null">send_scope = #{sendScope},</if>
+            <if test="sendGender != null">send_gender = #{sendGender},</if>
+            <if test="cusBeginTime != null and cusBeginTime !=''">cus_begin_time = #{cusBeginTime},</if>
+            <if test="cusEndTime != null and cusEndTime !=''">cus_end_time = #{cusEndTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        WHERE task_id = #{taskId}
+    </update>
+
 </mapper>

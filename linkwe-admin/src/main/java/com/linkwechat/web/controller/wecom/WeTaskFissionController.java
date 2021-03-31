@@ -3,7 +3,7 @@ package com.linkwechat.web.controller.wecom;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.nacos.common.utils.CollectionUtils;
+//import com.alibaba.nacos.common.utils.CollectionUtils;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.config.CosConfig;
@@ -268,7 +268,7 @@ public class WeTaskFissionController extends BaseController {
         List<WeTaskFissionTotalProgressVO> list = Lists.newArrayList();
         if (weTaskFission != null) {
             List<WeCustomer> customers = weTaskFissionService.getCustomerListById(null, String.valueOf(id));
-            if (CollectionUtils.isNotEmpty(customers)) {
+            if (StringUtils.isNotEmpty(customers)) {
                 customers.stream().filter(Objects::nonNull).forEach(customer -> {
                     WeTaskFissionTotalProgressVO vo = new WeTaskFissionTotalProgressVO();
                     vo.setCustomer(customer);
