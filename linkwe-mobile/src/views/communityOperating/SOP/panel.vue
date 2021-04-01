@@ -45,7 +45,7 @@
         <van-cell title="未完成成员" is-link :value="showTodo" @click="goState"></van-cell>
       </div>
 
-      <div class="send-button">
+      <div class="send-button" v-if="!state">
         <van-button type="info" size="mini" @click="send">发送</van-button>
       </div>
     </div>

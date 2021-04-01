@@ -44,8 +44,6 @@ export default {
   data () {
     return {
       isDone: 0,          // 0: 待处理  1: 已处理
-      waitingNum: 0,      // 待处理数据量
-      finishedNum: 0,     // 已处理数据量
       taskType: 0,        // 任务类型  0:全部  1:老客标签建群  2:群SOP
       loading: false,     // 加载状态
       todo: [],           // 待处理数据
