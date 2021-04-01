@@ -224,7 +224,7 @@ wecome:
   # JS SDK 身份校验url
   authorizeUrl: https://open.weixin.qq.com/connect/oauth2/authorize
   # JS SDK身份校验成功后的redirect url
-  authorizeRedirectUrl: http://some_redirect_url/#/task
+  authorizeRedirectUrl: http://linkwechat.cn/mobile/#/task
 #腾讯云对象存储
 cos:
   secretId: AKIDQRCizIeUGl13vakkDQMH0VkjhPr1rBBv
