@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service;
 
+import com.linkwechat.wecom.domain.WePresTagGroupTask;
 import com.linkwechat.wecom.domain.WeTag;
 import com.linkwechat.wecom.domain.dto.WePresTagGroupTaskDto;
 import com.linkwechat.wecom.domain.vo.WeCommunityTaskEmplVo;
@@ -14,12 +15,13 @@ import java.util.List;
 public interface IWePresTagGroupTaskService {
 
     /**
-     * 新增建群任务
-     *
-     * @param taskDto 建群所需数据
-     * @return 数据库新增行数
+     * 添加新标签建群任务
+     * @param task 建群任务本体信息
+     * @param tagIdList 标签列表
+     * @param emplIdList 员工列表
+     * @return 结果
      */
-    int add(WePresTagGroupTaskDto taskDto);
+    int add(WePresTagGroupTask task, List<String> tagIdList, List<String> emplIdList);
 
     /**
      * 根据条件查询任务列表
@@ -108,4 +110,10 @@ public interface IWePresTagGroupTaskService {
      * @return 结果
      */
     int updateEmplTaskStatus(Long taskId, String emplId);
+
+    /**
+     * 根据标签建群任务信息发送消息
+     * @param task 标签建群任务
+     */
+    void sendMessage(WePresTagGroupTask task);
 }

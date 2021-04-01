@@ -80,7 +80,7 @@ public class WeCommunityH5Controller extends BaseController {
             res.put("todo", todoList);
             doneList.addAll(tagGroupTaskService.getEmplTaskList(emplId, true));
             doneList.addAll(sopService.getEmplTaskList(emplId, true));
-            res.put("done", todoList);
+            res.put("done", doneList);
         }
         SysUser user = userService.selectUserByUserName(emplId);
         boolean isAdmin = user != null && user.isAdmin();

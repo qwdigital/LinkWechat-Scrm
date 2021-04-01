@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service;
 
+import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeGroupSop;
 import com.linkwechat.wecom.domain.vo.WeCommunityTaskEmplVo;
 import com.linkwechat.wecom.domain.vo.WeGroupSopVo;
@@ -95,4 +96,10 @@ public interface IWeGroupSopService {
      * @return 结果
      */
     List<WeCommunityTaskEmplVo> getScopeListByRuleId(Long ruleId);
+
+    /**
+     * 向指定的群聊进行sop企微消息推送
+     * @param groupIdList 群聊id列表
+     */
+    void sendMessage(List<String> groupIdList);
 }

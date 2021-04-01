@@ -18,6 +18,7 @@ import com.linkwechat.wecom.service.IWeGroupSopService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,14 +56,11 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
     @Autowired
     private WeMessagePushClient messagePushClient;
 
-    @Value("${wecome.authorizeUrl")
+    @Value("${wecome.authorizeUrl}")
     private String authorizeUrl;
 
-    @Value("${wecome.authorizeRedirectUrl")
+    @Value("${wecome.authorizeRedirectUrl}")
     private String authorizeRedirectUrl;
-
-    @Value("${wecome.callBack.appIdOrCorpId}")
-    private String corpId;
 
     /**
      * 通过规则id获取sop规则
@@ -73,7 +71,9 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
     @Override
     public WeGroupSopVo getGroupSopById(Long ruleId) {
         WeGroupSopVo groupSopVo = groupSopMapper.getGroupSopById(ruleId);
-        this.setChatAndMaterialAndPicList(groupSopVo);
+        if (StringUtils.isNotNull(groupSopVo)) {
+            setChatAndMaterialAndPicList(groupSopVo);
+        }
         return groupSopVo;
     }
 
@@ -114,7 +114,6 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
             if (StringUtils.isNotEmpty(sopPicList)) {
                 sopPicMapper.batchSopPic(sopPicList);
             }
-            this.sendMessage(ruleId);
             return 1;
         }
         return 0;
@@ -319,17 +318,23 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
     /**
      * 消息推送(企微API 消息推送 - 发送应用消息)
      */
-    private void sendMessage(Long ruleId) {
+    @Override
+    @Async
+    public void sendMessage(List<String> groupIdList) {
+
         // 构造请求参数
         WeMessagePushDto pushDto = new WeMessagePushDto();
-        // 根据群聊获取员工(群主)列表
-        List<WeGroup> groupList = this.getGroupListByRuleId(ruleId);
+        // 查询群聊列表，获取群主列表
+        QueryWrapper<WeGroup> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("chat_id", groupIdList);
+        List<WeGroup> groupList = groupMapper.selectList(queryWrapper);
         String toUser = groupList.stream().map(WeGroup::getOwner).collect(Collectors.joining("|"));
         pushDto.setTouser(toUser);
 
         // 获取agentId
         WeCorpAccount validWeCorpAccount = corpAccountService.findValidWeCorpAccount();
         String agentId = validWeCorpAccount.getAgentId();
+        String corpId = validWeCorpAccount.getCorpId();
         if (StringUtils.isEmpty(agentId)) {
             throw new WeComException("当前agentId不可用或不存在");
         }
@@ -341,7 +346,7 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
         TextMessageDto text = new TextMessageDto();
         String REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s", authorizeRedirectUrl, corpId, agentId, CommunityTaskType.SOP.getType()));
         String context = String.format(
-                "你有一个新任务，<a href='%s?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'>请点击此链接查看</a>",
+                "你有新的SOP待发送，<a href='%s?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'>请点击此链接查看</a>",
                 authorizeUrl, corpId, REDIRECT_URI);
         text.setContent(context);
         pushDto.setText(text);

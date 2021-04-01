@@ -5,6 +5,10 @@ import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.bean.BeanUtils;
+import com.linkwechat.wecom.domain.WePresTagGroupTask;
 import com.linkwechat.wecom.domain.dto.WePresTagGroupTaskDto;
 import com.linkwechat.wecom.domain.vo.WePresTagGroupTaskStatVo;
 import com.linkwechat.wecom.domain.vo.WePresTagGroupTaskVo;
@@ -56,7 +60,18 @@ public class WeCommunityPresTagGroupController extends BaseController {
         if (null == groupCodeService.selectWeGroupCodeById(wePresTagGroupTaskDto.getGroupCodeId())) {
             return AjaxResult.error(HttpStatus.NOT_FOUND, "群活码不存在");
         }
-        return toAjax(taskService.add(wePresTagGroupTaskDto));
+        // 创建新任务并保存
+        WePresTagGroupTask task = new WePresTagGroupTask();
+        BeanUtils.copyProperties(wePresTagGroupTaskDto, task);
+        task.setCreateBy(SecurityUtils.getUsername());
+        List<String> tagList = wePresTagGroupTaskDto.getTagList();
+        List<String> scopeList = wePresTagGroupTaskDto.getScopeList();
+        int affectedRows = taskService.add(task, tagList, scopeList);
+        if (affectedRows > 0) {
+            // 若保存成功，则进行异步消息推送
+            taskService.sendMessage(task);
+        }
+        return toAjax(affectedRows);
     }
 
     /**
@@ -65,7 +80,11 @@ public class WeCommunityPresTagGroupController extends BaseController {
     //  @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:query')")
     @GetMapping(path = "/{id}")
     public AjaxResult getTask(@PathVariable("id") Long id) {
-        return AjaxResult.success(taskService.getTaskById(id));
+        WePresTagGroupTaskVo taskVo = taskService.getTaskById(id);
+        if (StringUtils.isNull(taskVo)) {
+            return AjaxResult.error(HttpStatus.NOT_FOUND, "群活码不存在");
+        }
+        return AjaxResult.success();
     }
 
     /**

@@ -27,6 +27,7 @@ import com.linkwechat.wecom.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,28 +77,18 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
     @Value("${wecome.authorizeRedirectUrl}")
     private String authorizeRedirectUrl;
 
-    @Value("${wecome.callBack.appIdOrCorpId}")
-    private String corpId;
-
     /**
-     * 新增建群任务
-     *
-     * @param taskDto 建群所需数据
-     * @return 数据库新增行数
+     * 添加新标签建群任务
+     * @param task 建群任务本体信息
+     * @param tagIdList 标签列表
+     * @param emplIdList 员工列表
+     * @return 结果
      */
     @Override
     @Transactional
-    public int add(WePresTagGroupTaskDto taskDto) {
-
-        // 创建WeCommunityOldGroup对象进行存储
-        WePresTagGroupTask task = new WePresTagGroupTask();
-
-        BeanUtils.copyProperties(taskDto, task);
-        task.setCreateBy(SecurityUtils.getUsername());
-        int res = 0;
+    public int add(WePresTagGroupTask task, List<String> tagIdList, List<String> emplIdList) {
         if (taskMapper.insertTask(task) > 0) {
             // 保存标签对象
-            List<String> tagIdList = taskDto.getTagList();
             if (CollectionUtil.isNotEmpty(tagIdList)) {
                 List<WePresTagGroupTaskTag> taskTagList = tagIdList
                         .stream()
@@ -107,7 +98,6 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
             }
 
             // 保存员工信息
-            List<String> emplIdList = taskDto.getScopeList();
             if (CollectionUtil.isNotEmpty(emplIdList)) {
                 List<WePresTagGroupTaskScope> wePresTagGroupTaskScopeList = emplIdList
                         .stream()
@@ -115,13 +105,9 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
                         .collect(Collectors.toList());
                 taskScopeMapper.batchBindsTaskScopes(wePresTagGroupTaskScopeList);
             }
-
-            this.sendMessage(task);
-
-            res = 1;
+            return 1;
         }
-
-        return res;
+        return 0;
     }
 
     /**
@@ -153,7 +139,9 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
     @Override
     public WePresTagGroupTaskVo getTaskById(Long taskId) {
         WePresTagGroupTaskVo taskVo = taskMapper.selectTaskById(taskId);
-        this.setGroupCodeAndScopeAndTag(taskVo);
+        if (StringUtils.isNotNull(taskVo)) {
+            setGroupCodeAndScopeAndTag(taskVo);
+        }
         return taskVo;
     }
 
@@ -348,7 +336,9 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
      *
      * @param task 建群任务
      */
-    private void sendMessage(WePresTagGroupTask task) {
+    @Override
+    @Async
+    public void sendMessage(WePresTagGroupTask task) {
         try {
 
             Integer sendType = task.getSendType();
@@ -423,6 +413,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
         // 获取agentId
         WeCorpAccount validWeCorpAccount = corpAccountService.findValidWeCorpAccount();
         String agentId = validWeCorpAccount.getAgentId();
+        String corpId = validWeCorpAccount.getCorpId();
         if (StringUtils.isEmpty(agentId)) {
             throw new WeComException("当前agentId不可用或不存在");
         }

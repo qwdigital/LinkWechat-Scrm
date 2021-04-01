@@ -19,7 +19,7 @@ public class WePresTagGroupTask extends BaseEntity {
      *主键ID
      */
     @TableId
-    private Long taskId = SnowFlakeUtil.nextId();;
+    private Long taskId = SnowFlakeUtil.nextId();
 
     /**
      * 任务名称

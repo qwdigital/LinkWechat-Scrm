@@ -76,7 +76,12 @@ public class WeCommunityGroupSopController extends BaseController {
         List<Long> materialIdList = groupSopDto.getMaterialIdList();
         // 上传的图片的URl列表
         List<String> picList = groupSopDto.getPicList();
-        return toAjax(groupSopService.addGroupSop(weGroupSop, groupIdList, materialIdList, picList));
+        int affectedRows = groupSopService.addGroupSop(weGroupSop, groupIdList, materialIdList, picList);
+        if (affectedRows > 0) {
+            // 添加成功后进行异步消息推送
+            groupSopService.sendMessage(groupIdList);
+        }
+        return toAjax(affectedRows);
     }
 
     /**
