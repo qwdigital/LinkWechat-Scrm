@@ -121,8 +121,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/wecom/ticket/**").anonymous()
 
                 .antMatchers("/wecom/user/getUserInfo").anonymous()
-                // .antMatchers("/common/uploadFile2Cos").anonymous()
-                .antMatchers("/wecom/material/temporaryMaterialMediaId").anonymous()
+               // .antMatchers("/common/uploadFile2Cos").anonymous()
+//                .antMatchers("/wecom/material/temporaryMaterialMediaId").anonymous()
                 .antMatchers("/wecom/portrait/**").anonymous()
                 .antMatchers("/wecom/fission/poster", "/wecom/fission/*/progress/*").anonymous()
                 // 获取实际群活码和社群运营H5页面不需要登录
