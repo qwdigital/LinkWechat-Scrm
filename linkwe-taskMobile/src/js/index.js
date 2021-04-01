@@ -17,7 +17,7 @@ $(function(){
         getUserInfo({code,agentId})
         .then(res=>{
             let data = res.data;
-            eid = data.externalUserid?data.externalUserid:data.userId
+            eid = data.externalUserId?data.externalUserId:data.userId
             getPoster({fissionTargetId,posterId,taskFissionId,eid})
             .then(res=>{
                 $('.posterImg').attr('src',res.data.postersUrl)
