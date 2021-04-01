@@ -148,7 +148,8 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
             weCustomerMessagePushDto.setText(customerMessagePushDto.getTextMessage());
 
         }
-        if (customerMessagePushDto.getMessageType().equals(GroupMessageType.IMAGE.getMessageType())) {
+
+        if (customerMessagePushDto.getMessageType().equals(GroupMessageType.IMAGE.getType())) {
             weCustomerMessagePushDto.setImage(customerMessagePushDto.getImageMessage());
             weCustomerMessagePushDto.setLink(null);
             weCustomerMessagePushDto.setMiniprogram(null);

@@ -10,26 +10,26 @@ import lombok.Data;
 @Data
 public class ConversationArchiveQuery extends BaseEntity {
     /** 发送人Id */
-    private String fromId;
+    private String fromId="";
 
     /** 成员名称 */
-    private String userName;
+    private String userName="";
 
     /** 接收人Id */
-    private String receiveId;
+    private String receiveId="";
 
     /** 客户姓名 */
-    private String customerName;
+    private String customerName="";
 
     /** 群聊Id */
-    private String roomId;
+    private String roomId="";
 
     /** 类型 */
-    private String msgType;
+    private String msgType="";
 
     /** 关键词 **/
-    private String keyWord;
+    private String keyWord="";
 
     /** 消息动作 */
-    private String action;
+    private String action="";
 }
