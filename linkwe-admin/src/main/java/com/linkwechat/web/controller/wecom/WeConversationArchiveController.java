@@ -1,9 +1,13 @@
 package com.linkwechat.web.controller.wecom;
 
+import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.ConversationArchiveQuery;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.wecom.service.IWeConversationArchiveService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @description 会话存档controller
  * @date 2020/12/19 13:51
  **/
+@Api("会话存档controller")
 @Slf4j
 @RestController
 @RequestMapping("/wecom/finance")
@@ -32,8 +37,9 @@ public class WeConversationArchiveController extends BaseController {
      * @return
      */
     //   @PreAuthorize("@ss.hasPermi('conversationArchive:chatContact:list')")
+    @ApiOperation(value = "获取单聊会话数据接口",httpMethod = "GET")
     @GetMapping("/getChatContactList")
-    public TableDataInfo getChatContactList(ConversationArchiveQuery query) {
+    public TableDataInfo<PageInfo<JSONObject>> getChatContactList(ConversationArchiveQuery query) {
         return getDataTable(weConversationArchiveService.getChatContactList(query));
     }
 
@@ -47,8 +53,9 @@ public class WeConversationArchiveController extends BaseController {
      * @return
      */
     //  @PreAuthorize("@ss.hasPermi('conversationArchive:chatRoomContact:list')")
+    @ApiOperation(value = "获取群聊会话数据接口",httpMethod = "GET")
     @GetMapping("/getChatRoomContactList")
-    public TableDataInfo getChatRoomContactList(ConversationArchiveQuery query) {
+    public TableDataInfo<PageInfo<JSONObject>> getChatRoomContactList(ConversationArchiveQuery query) {
         return getDataTable(weConversationArchiveService.getChatRoomContactList(query));
     }
 
@@ -60,8 +67,9 @@ public class WeConversationArchiveController extends BaseController {
      * @return
      */
     //  @PreAuthorize("@ss.hasPermi('conversationArchive:chatAllContact:list')")
+    @ApiOperation(value = "获取全局会话数据接口",httpMethod = "GET")
     @GetMapping("/getChatAllList")
-    public TableDataInfo getChatAllList(ConversationArchiveQuery query) {
+    public TableDataInfo<PageInfo<JSONObject>> getChatAllList(ConversationArchiveQuery query) {
         return getDataTable(weConversationArchiveService.getChatAllList(query));
     }
 
