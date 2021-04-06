@@ -245,12 +245,12 @@ public class WeTaskFissionController extends BaseController {
     @ApiOperation(value = "获取客户邀请列表和任务进度", httpMethod = "GET")
     //   @PreAuthorize("@ss.hasPermi('wecom:fission:getCustomerProgress')")
     @Log(title = "获取客户邀请列表和任务进度", businessType = BusinessType.OTHER)
-    @GetMapping("/{id}/progress/{eid}")
+    @GetMapping("/{id}/progress/{unionId}")
     public AjaxResult<WeTaskFissionProgressVO> getCustomerProgress(@ApiParam("任务id") @PathVariable("id") Long id
-            , @PathVariable("eid") @ApiParam("客户id") String eid) {
+            , @PathVariable("unionId") @ApiParam("客户id") String unionId) {
         WeTaskFission weTaskFission = weTaskFissionService.selectWeTaskFissionById(id);
         if (weTaskFission != null) {
-            return AjaxResult.success(weTaskFissionService.getCustomerTaskProgress(weTaskFission, eid));
+            return AjaxResult.success(weTaskFissionService.getCustomerTaskProgress(weTaskFission, unionId));
         } else {
             throw new WeComException("任务不存在");
         }
