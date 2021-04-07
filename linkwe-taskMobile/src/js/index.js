@@ -1,6 +1,6 @@
 import '../css/base.css'
 import '../css/index.css'
-import {getPoster,getUserInfo} from './api'
+import {getPoster,getUserInfo,getToken,getWXUserInfo} from './api'
 import {getUrlParam,getWxCode} from './utils'
 import config from './contant'
 
@@ -10,20 +10,24 @@ $(function(){
     const fissionTargetId = getUrlParam('fissionTargetId');
     const posterId = getUrlParam('posterId');
     const taskFissionId = getUrlParam('fissionId');
-    const agentId = getUrlParam('agentId');
     const code = config.code
-    let eid = ''
     try {
-        getUserInfo({code,agentId})
-        .then(res=>{
-            let data = res.data;
-            eid = data.externalUserId?data.externalUserId:data.userId
-            getPoster({fissionTargetId,posterId,taskFissionId,eid})
+        getToken(code)
             .then(res=>{
-                $('.posterImg').attr('src',res.data.postersUrl)
-                localStorage.setItem('postersUrl',res.data.postersUrl)
+                let data =res.data
+                localStorage.setItem('userinfo',JSON.stringify(data))
+                getWXUserInfo({openId:data.openId,lang:"zh_CN"})
+                .then(resp=>{
+                    let userData = resp.data;
+                    let unionId = userData.unionId
+                    getPoster({fissionTargetId,posterId,taskFissionId,unionId})
+                    .then(res=>{
+                        $('.posterImg').attr('src',res.data.postersUrl)
+                        localStorage.setItem('postersUrl',res.data.postersUrl)
+                    })
+                })
             })
-        })
+       
     } catch (error) {
         console.log(error)
     }

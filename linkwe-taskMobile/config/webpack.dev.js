@@ -26,7 +26,8 @@ var dev = {
         // host:'0.0.0.0',
         proxy: {
             '/': {
-                target: 'http://146.56.222.200:8090',
+                target: 'http://119.45.28.29:8090',
+                // target: 'http://146.56.222.200:8090',
                 // target:'http://47.112.117.15:40001',
                 changeOrigin: true,
                 // ws: true,
