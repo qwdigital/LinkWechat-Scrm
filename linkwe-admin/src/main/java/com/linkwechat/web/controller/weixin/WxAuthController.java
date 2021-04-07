@@ -33,7 +33,7 @@ public class WxAuthController extends CommonController {
      */
     @ApiOperation(value = "通过code获取网页授权token",httpMethod = "GET")
     @GetMapping("/getToken")
-    public AjaxResult<WxTokenDto> getToken(@ApiParam(value = "URL上的code参数",required = true) String code, @ApiParam(value = "用户的唯一标识",required = true) String openId) {
+    public AjaxResult<WxTokenDto> getToken(@ApiParam(value = "URL上的code参数",required = true) String code, @ApiParam(value = "用户的唯一标识",required = false) String openId) {
         return AjaxResult.success(wxAuthService.getToken(code,openId));
     }
 
