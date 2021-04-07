@@ -1,13 +1,11 @@
 package com.linkwechat.wecom.client;
 
-import com.dtflys.forest.annotation.DataObject;
-import com.dtflys.forest.annotation.JSONBody;
-import com.dtflys.forest.annotation.Query;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.*;
 import com.linkwechat.wecom.domain.dto.customer.*;
 import com.linkwechat.wecom.domain.query.GroupChatStatisticQuery;
 import com.linkwechat.wecom.domain.query.UserBehaviorDataQuery;
+import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 
 
 import java.util.Map;
@@ -17,6 +15,7 @@ import java.util.Map;
  * @author: HaoN
  * @create: 2020-09-15 14:15
  **/
+@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
 public interface WeCustomerClient {
 
     /**

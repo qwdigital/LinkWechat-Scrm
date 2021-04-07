@@ -1,16 +1,19 @@
 package com.linkwechat.wecom.client;
 
+import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.DataObject;
 import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
 import com.linkwechat.wecom.domain.dto.WeDepartMentDto;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
+import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 
 /**
  * @description: 企业微信部门相关客户端
  * @author: HaoN
  * @create: 2020-08-27 16:40
  **/
+@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
 public interface WeDepartMentClient {
 
     /**
