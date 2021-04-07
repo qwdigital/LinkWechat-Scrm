@@ -16,7 +16,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
  */
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, PageHelperAutoConfiguration.class})
 @MapperScan("com.linkwechat.*.mapper")
-@ForestScan(basePackages = "com.linkwechat.wecom.client")
+@ForestScan(basePackages = {"com.linkwechat.wecom.client","com.linkwechat.wecom.wxclient"})
 @EnableAsync
 @EnableDiscoveryClient
 public class LinkWeChatApplication {
