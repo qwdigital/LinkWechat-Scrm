@@ -8,7 +8,7 @@ import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeAccessTokenClient;
 import com.linkwechat.wecom.domain.WeApp;
-import com.linkwechat.wecom.domain.WeCorpAccount;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.wecom.domain.dto.WeAccessTokenDtoDto;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
 import com.linkwechat.wecom.service.IWeAppService;

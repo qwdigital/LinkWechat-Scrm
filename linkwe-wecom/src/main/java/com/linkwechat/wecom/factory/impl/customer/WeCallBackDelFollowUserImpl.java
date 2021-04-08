@@ -2,6 +2,7 @@ package com.linkwechat.wecom.factory.impl.customer;
 
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.wecom.client.WeMessagePushClient;
 import com.linkwechat.wecom.domain.*;
