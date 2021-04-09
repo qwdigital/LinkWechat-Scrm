@@ -19,7 +19,7 @@ export function getUserInfo(params) {
   }
   
   export function getWXUserInfo(params) {
-    return request(`/wecom/user/getUserInfo`,params,'get')
+    return request(`/weixin/auth/getUserInfo`,params,'get')
   }
 //   export function getReward(params) {
 //     return request(`wecom/reward/getRewardByFissionId/${params.fissionId}/${params.eid}`,null,'get')
