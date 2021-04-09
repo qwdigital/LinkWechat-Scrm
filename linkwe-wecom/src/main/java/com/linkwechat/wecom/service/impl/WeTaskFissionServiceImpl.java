@@ -153,6 +153,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         int updateResult = weTaskFissionMapper.updateWeTaskFission(weTaskFission);
         if (updateResult > 0) {
             if (CollectionUtils.isNotEmpty(weTaskFission.getTaskFissionStaffs())) {
+                log.info("发起成员信息：【{}】",JSONObject.toJSONString(weTaskFission.getTaskFissionStaffs()));
                 List<WeTaskFissionStaff> staffList = weTaskFissionStaffService.selectWeTaskFissionStaffByTaskId(weTaskFission.getId());
                 if (CollectionUtils.isNotEmpty(staffList)) {
                     weTaskFissionStaffService.deleteWeTaskFissionStaffByIds(staffList.stream().map(WeTaskFissionStaff::getId).toArray(Long[]::new));
