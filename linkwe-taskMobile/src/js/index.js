@@ -6,8 +6,11 @@ import config from './contant'
 
 $(function(){
     const taskFissionId = getUrlParam('fissionId');
-    const code = config.code
     const eid = null
+    //防止存入了错误的userinfo
+    if(localStorage.getItem('userinfo') == undefined || localStorage.getItem('userinfo') == 'undefined'){
+        localStorage.removeItem('userinfo')
+    }
     $('.sharePic').click(function(){
         alert('长按图片在弹出菜单中发送给朋友或者可保存图片分享至朋友圈')
     });
@@ -27,7 +30,7 @@ $(function(){
     }
     //缓存中没有用户信息，进入授权流程
     getWxCode()
-
+    const code = config.code
     if(!code){
         //防止跳转前进入流程
         return
@@ -36,8 +39,10 @@ $(function(){
         getToken(code)
             .then(res=>{
                 let data =res.data
-                localStorage.setItem('userinfo',JSON.stringify(data))
-                getPosterFlow({openId:data.openId,lang:"zh_CN"})
+                if(data && data.openId){
+                    localStorage.setItem('userinfo',JSON.stringify(data))
+                    getPosterFlow({openId:data.openId,lang:"zh_CN"})
+                }
             })
        
     } catch (error) {
