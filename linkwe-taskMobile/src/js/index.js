@@ -62,8 +62,8 @@ function getPosterFlow(params){
         let unionId = userData.unionId
         getPoster({fissionTargetId,posterId,taskFissionId,unionId})
         .then(res=>{
-            $('.posterImg').attr('src',res.data.postersUrl)
-            localStorage.setItem('postersUrl',res.data.postersUrl)
+            $('.posterImg').attr('src',res.data.posterUrl)
+            localStorage.setItem('postersUrl',res.data.posterUrl)
         })
     })
 }
