@@ -14,9 +14,7 @@ $(function(){
     $('.sharePic').click(function(){
         alert('长按图片在弹出菜单中发送给朋友或者可保存图片分享至朋友圈')
     });
-    $('.myTaskDetail').click(function(){
-        window.location.href = `./taskProcess.html?eid=${eid}&taskFissionId=${taskFissionId}`
-    });
+
     let userinfo = localStorage.getItem('userinfo')
     //取缓存中的用户信息
     if(userinfo){
@@ -60,6 +58,9 @@ function getPosterFlow(params){
     .then(resp=>{
         let userData = resp.data;
         let unionId = userData.unionId
+        $('.myTaskDetail').click(function(){
+            window.location.href = `./taskProcess.html?eid=${unionId}&taskFissionId=${taskFissionId}`
+        });
         getPoster({fissionTargetId,posterId,taskFissionId,unionId})
         .then(res=>{
             $('.posterImg').attr('src',res.data.posterUrl)
