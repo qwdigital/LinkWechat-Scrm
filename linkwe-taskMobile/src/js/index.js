@@ -5,6 +5,15 @@ import {getUrlParam,getWxCode} from './utils'
 import config from './contant'
 
 $(function(){
+    const taskFissionId = getUrlParam('fissionId');
+    const code = config.code
+    const eid = null
+    $('.sharePic').click(function(){
+        alert('长按图片在弹出菜单中发送给朋友或者可保存图片分享至朋友圈')
+    });
+    $('.myTaskDetail').click(function(){
+        window.location.href = `./taskProcess.html?eid=${eid}&taskFissionId=${taskFissionId}`
+    });
     let userinfo = localStorage.getItem('userinfo')
     //取缓存中的用户信息
     if(userinfo){
@@ -18,8 +27,7 @@ $(function(){
     }
     //缓存中没有用户信息，进入授权流程
     getWxCode()
-    const taskFissionId = getUrlParam('fissionId');
-    const code = config.code
+
     if(!code){
         //防止跳转前进入流程
         return
@@ -35,12 +43,7 @@ $(function(){
     } catch (error) {
         console.log(error)
     }
-    $('.sharePic').click(function(){
-        alert('长按图片在弹出菜单中发送给朋友或者可保存图片分享至朋友圈')
-    });
-    $('.myTaskDetail').click(function(){
-        window.location.href = `./taskProcess.html?eid=${eid}&taskFissionId=${taskFissionId}`
-    });
+
     
 })
 //{openId:data.openId,lang:"zh_CN"}
