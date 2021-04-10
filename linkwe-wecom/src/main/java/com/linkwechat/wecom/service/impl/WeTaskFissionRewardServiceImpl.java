@@ -106,13 +106,13 @@ public class WeTaskFissionRewardServiceImpl implements IWeTaskFissionRewardServi
     }
 
     @Override
-    public WeTaskFissionRewardVo getRewardByFissionId(String fissionId, String eid) {
+    public WeTaskFissionRewardVo getRewardByFissionId(String fissionId, String unionId) {
         WeTaskFissionRewardVo weTaskFissionRewardVo = new WeTaskFissionRewardVo();
-        WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getExternalUserid, eid));
-        String externalUseriId = Optional.ofNullable(weCustomer).map(WeCustomer::getExternalUserid)
+        WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getUnionid, unionId));
+        String customerUnionId = Optional.ofNullable(weCustomer).map(WeCustomer::getUnionid)
                 .orElseThrow(() -> new WeComException("用户信息不存在"));
 
-        WeTaskFissionRecord record = weTaskFissionRecordService.selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), externalUseriId);
+        WeTaskFissionRecord record = weTaskFissionRecordService.selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), customerUnionId);
         Date completeTime = Optional.ofNullable(record).map(WeTaskFissionRecord::getCompleteTime)
                 .orElseThrow(() -> new WeComException("任务信息不存在"));
 
@@ -126,7 +126,7 @@ public class WeTaskFissionRewardServiceImpl implements IWeTaskFissionRewardServi
         if (completeTime != null) {
             WeTaskFissionReward fissionReward = weTaskFissionRewardMapper.selectOne(new LambdaQueryWrapper<WeTaskFissionReward>()
                     .eq(WeTaskFissionReward::getTaskFissionId, fissionId)
-                    .eq(WeTaskFissionReward::getRewardUserId, externalUseriId));
+                    .eq(WeTaskFissionReward::getRewardUserId, customerUnionId));
             weTaskFissionRewardVo.setWeTaskFissionReward(fissionReward);
             //发放兑奖码之后，置为已使用
             Optional.ofNullable(fissionReward).ifPresent(reward -> weTaskFissionRewardMapper.update(reward, new LambdaUpdateWrapper<WeTaskFissionReward>()
