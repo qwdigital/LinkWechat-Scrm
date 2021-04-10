@@ -5,15 +5,14 @@ const baseUrl = window.location.origin.includes('localhost') ? window.location.o
 
 const request = (url,params,method='get')=>{
     url = baseUrl + url
+    params = (method!='get' && params) ?  JSON.stringify(params) : params
     return new Promise((relosve,reject)=>{
         $.ajax({
-            headers: {
-                "Content-Type":"application/json"
-              },
             url,
             data:params,
-            dataType:"json",
+            dataType:"JSON",
             type:method,
+            contentType: 'application/json',
             success(res){
                 if(res.code !== 200){
                     alert(res.msg)
