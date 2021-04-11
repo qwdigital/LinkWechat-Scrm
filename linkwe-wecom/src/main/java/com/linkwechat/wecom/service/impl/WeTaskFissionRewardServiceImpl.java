@@ -119,11 +119,11 @@ public class WeTaskFissionRewardServiceImpl implements IWeTaskFissionRewardServi
         Date completeTime = record.getCompleteTime();
         WeTaskFission weTaskFission = weTaskFissionService.selectWeTaskFissionById(Long.valueOf(fissionId));
         Optional.ofNullable(weTaskFission).ifPresent(fission -> {
-            weTaskFissionRewardVo.setRewardUrl(fission.getRewardUrl());
+            weTaskFissionRewardVo.setRewardRule(fission.getRewardRule());
         });
         if (completeTime != null) {
             Optional.ofNullable(weTaskFission).ifPresent(fission -> {
-                weTaskFissionRewardVo.setRewardRule(fission.getRewardRule());
+                weTaskFissionRewardVo.setRewardUrl(fission.getRewardUrl());
                 weTaskFissionRewardVo.setRewardImageUrl(fission.getRewardImageUrl());
             });
             WeTaskFissionReward fissionReward = weTaskFissionRewardMapper.selectOne(new LambdaQueryWrapper<WeTaskFissionReward>()
