@@ -113,8 +113,10 @@ public class WeTaskFissionRewardServiceImpl implements IWeTaskFissionRewardServi
                 .orElseThrow(() -> new WeComException("用户信息不存在"));
 
         WeTaskFissionRecord record = weTaskFissionRecordService.selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), customerUnionId);
-        Date completeTime = Optional.ofNullable(record).map(WeTaskFissionRecord::getCompleteTime)
-                .orElseThrow(() -> new WeComException("任务信息不存在"));
+        if (record == null){
+            throw  new WeComException("任务信息不存在");
+        }
+        Date completeTime = record.getCompleteTime();
 
         WeTaskFission weTaskFission = weTaskFissionService.selectWeTaskFissionById(Long.valueOf(fissionId));
         Optional.ofNullable(weTaskFission).ifPresent(fission -> {
