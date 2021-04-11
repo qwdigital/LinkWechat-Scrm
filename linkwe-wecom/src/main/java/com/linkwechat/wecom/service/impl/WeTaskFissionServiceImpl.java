@@ -302,18 +302,18 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
                     .map(record -> weCustomerService.selectWeCustomerById(record.getCustomerId()))
                     .filter(Objects::nonNull).collect(Collectors.toList());
         } else {
-            WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getUnionid, unionId));
-            String uid = Optional.ofNullable(weCustomer).map(WeCustomer::getUnionid)
-                    .orElseThrow(() -> new WeComException("用户信息不存在"));
             weTaskFissionRecord = weTaskFissionRecordService
-                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), uid);
-            Optional.ofNullable(weTaskFissionRecord).map(WeTaskFissionRecord::getId)
-                    .orElseThrow(() -> new WeComException("任务记录信息不存在"));
+                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), unionId);
+            Optional.ofNullable(weTaskFissionRecord).orElseThrow(() -> new WeComException("任务记录信息不存在"));
             List<WeFlowerCustomerRel> list = weFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
                     .eq(WeFlowerCustomerRel::getState, WeConstans.FISSION_PREFIX + weTaskFissionRecord.getId()));
             List<String> eidList = Optional.ofNullable(list).orElseGet(ArrayList::new).stream()
                     .map(WeFlowerCustomerRel::getExternalUserid).collect(Collectors.toList());
-            return weCustomerService.listByIds(eidList);
+            if (CollectionUtil.isNotEmpty(eidList)){
+                return weCustomerService.listByIds(eidList);
+            }else {
+                return null;
+            }
         }
     }
 

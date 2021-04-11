@@ -152,10 +152,10 @@ public class WeTaskFissionController extends BaseController {
         CopyOptions options = CopyOptions.create();
         options.setIgnoreNullValue(true);
         BeanUtil.copyProperties(weTaskFission, fissionTask, options);
-        if (CollectionUtil.isNotEmpty(weTaskFission.getTaskFissionStaffs())){
+        if (CollectionUtil.isNotEmpty(weTaskFission.getTaskFissionStaffs())) {
             fissionTask.setTaskFissionStaffs(weTaskFission.getTaskFissionStaffs());
         }
-        if (CollectionUtil.isNotEmpty(weTaskFission.getTaskFissionWeGroups())){
+        if (CollectionUtil.isNotEmpty(weTaskFission.getTaskFissionWeGroups())) {
             fissionTask.setTaskFissionWeGroups(weTaskFission.getTaskFissionWeGroups());
         }
         Long id = weTaskFissionService.updateWeTaskFission(fissionTask);

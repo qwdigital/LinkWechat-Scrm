@@ -63,7 +63,7 @@ public class WeiXinAuthInterceptor implements Interceptor {
             if(StringUtils.isEmpty(refreshToken)){
                 throw new WeComException(1001,"token失效，请重新授权");
             }else {
-                wxTokenDto = wxAuthClient.refreshToken(appId, secret, grantType, refreshToken);
+                wxTokenDto = wxAuthClient.refreshToken(appId, grantType, refreshToken);
                 if(wxTokenDto != null && StringUtils.isNotEmpty(wxTokenDto.getAccessToken())){
                     redisCache.setCacheObject(WeConstans.WX_AUTH_ACCESS_TOKEN+":"+ openId, wxTokenDto, wxTokenDto.getExpiresIn(), TimeUnit.SECONDS);
                 }
