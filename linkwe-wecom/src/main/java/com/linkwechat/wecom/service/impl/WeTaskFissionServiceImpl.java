@@ -431,7 +431,8 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         WeTaskFissionRecord record = WeTaskFissionRecord.builder()
                 .taskFissionId(taskFissionId)
                 .customerId(customerId)
-                .customerName(customerName).build();
+                .customerName(customerName)
+                .createTime(new Date()).build();
         List<WeTaskFissionRecord> searchExists = weTaskFissionRecordService.selectWeTaskFissionRecordList(record);
         WeTaskFissionRecord recordInfo;
         if (CollectionUtils.isNotEmpty(searchExists)) {
