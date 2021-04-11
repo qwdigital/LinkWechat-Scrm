@@ -117,13 +117,14 @@ public class WeTaskFissionRewardServiceImpl implements IWeTaskFissionRewardServi
             throw  new WeComException("任务信息不存在");
         }
         Date completeTime = record.getCompleteTime();
-
+        WeTaskFission weTaskFission = weTaskFissionService.selectWeTaskFissionById(Long.valueOf(fissionId));
+        Optional.ofNullable(weTaskFission).ifPresent(fission -> {
+            weTaskFissionRewardVo.setRewardUrl(fission.getRewardUrl());
+        });
         if (completeTime != null) {
-            WeTaskFission weTaskFission = weTaskFissionService.selectWeTaskFissionById(Long.valueOf(fissionId));
             Optional.ofNullable(weTaskFission).ifPresent(fission -> {
                 weTaskFissionRewardVo.setRewardRule(fission.getRewardRule());
                 weTaskFissionRewardVo.setRewardImageUrl(fission.getRewardImageUrl());
-                weTaskFissionRewardVo.setRewardUrl(fission.getRewardUrl());
             });
             WeTaskFissionReward fissionReward = weTaskFissionRewardMapper.selectOne(new LambdaQueryWrapper<WeTaskFissionReward>()
                     .eq(WeTaskFissionReward::getTaskFissionId, fissionId)
