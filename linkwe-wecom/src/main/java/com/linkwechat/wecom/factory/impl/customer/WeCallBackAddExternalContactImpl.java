@@ -48,10 +48,14 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
     private IWeTaskFissionRewardService weTaskFissionRewardService;
     @Autowired
     private IWeTaskFissionService weTaskFissionService;
+    @Autowired
+    private ThreadLocal<WeCustomer> weCustomerThreadLocal = new ThreadLocal<>();
 
     @Override
     public void eventHandle(WxCpXmlMessageVO message) {
         if (message.getExternalUserId() != null) {
+            WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getExternalUserid, message.getExternalUserId()));
+            weCustomerThreadLocal.set(weCustomer);
             weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId());
         }
         if (message.getState() != null && message.getWelcomeCode() != null) {
@@ -73,13 +77,15 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
             //查询裂变任务详情
             WeTaskFission weTaskFission = weTaskFissionService
                     .selectWeTaskFissionById(weTaskFissionRecord.getTaskFissionId());
-
-            Long fissNum = weTaskFissionRecord.getFissNum() + 1;
-            weTaskFissionRecord.setFissNum(fissNum);
+            Long fissNum = weTaskFissionRecord.getFissNum();
+            if (weCustomerThreadLocal.get() != null){
+                fissNum++;
+                weTaskFissionRecord.setFissNum(fissNum);
+            }
             log.info("查询裂变任务详情  >>>>>>>>>>{}",JSONObject.toJSONString(weTaskFissionRecord));
             if (weTaskFission != null){
                 //发送欢迎语
-                WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(weTaskFission.getWelcomeMsg());
+                WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(wecomCode);
                 weWelcomeMsgBuilder.text(WeWelcomeMsg.Text.builder()
                         .content(weTaskFission.getWelcomeMsg()).build());
                 weCustomerService.sendWelcomeMsg(weWelcomeMsgBuilder.build());
