@@ -200,8 +200,6 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         //H5生成海报页面路径
         StringBuilder pageUrlBuilder = new StringBuilder(pageUrl);
         pageUrlBuilder.append("?")
-                .append("agentId=").append("1000010")
-                .append("&")
                 .append("fissionId=").append(id)
                 .append("&")
                 .append("fissionTargetId=").append(fissStaffId)
@@ -215,6 +213,9 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         linkMessageDto.setUrl(pageUrlBuilder.toString());
 
         CustomerMessagePushDto customerMessagePushDto = new CustomerMessagePushDto();
+        if (weTaskFission.getStartTime() != null){
+            customerMessagePushDto.setSettingTime(DateUtils.dateTime(weTaskFission.getStartTime()));
+        }
         customerMessagePushDto.setLinkMessage(linkMessageDto);
         customerMessagePushDto.setPushType("0");
         customerMessagePushDto.setPushRange("1");
