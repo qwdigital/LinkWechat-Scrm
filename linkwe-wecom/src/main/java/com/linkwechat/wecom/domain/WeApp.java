@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import lombok.AllArgsConstructor;
@@ -29,9 +30,38 @@ public class WeApp {
     /**应用id**/
     private String agentId;
 
+    /**应用名称**/
+    private String agentName;
+
 
     /**应用密钥**/
     private String agentSecret;
+
+
+    /**应用描述**/
+    private String description;
+
+    /**应用图标**/
+    private String squareLogoUrl;
+
+    /**企业应用是否被停用(1:是;0:否)**/
+    private Integer close;
+
+
+    /**企业应用可信域名**/
+    private String redirectDomain;
+
+
+    /**企业应用是否打开地理位置上报 0：不上报；1：进入会话上报；**/
+    private Integer reportLocationFlag;
+
+
+    /**是否上报用户进入应用事件。0：不接收；1：接收**/
+    private Integer isreportenter;
+
+
+    /**应用主页url**/
+    private String homeUrl;
 
 
     /**应用类型(1:自建应用;)**/
@@ -50,6 +80,11 @@ public class WeApp {
 
     /**帐号状态（0正常 1停用)**/
     private String status;
+
+
+    /**企业应用头像的mediaid，通过素材管理接口上传图片获得mediaid，上传后会自动裁剪成方形和圆形两个头像**/
+    @TableField(exist = false)
+    private String logoMediaid;
 
 
 

@@ -482,6 +482,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             //客户入库
             WeCustomer weCustomer = new WeCustomer();
             BeanUtils.copyPropertiesASM(externalUserDetail.getExternal_contact(), weCustomer);
+            weCustomer.setCreateTime(new Date());
+            weCustomer.setUpdateTime(new Date());
             this.saveOrUpdate(weCustomer);
 
             //客户与通讯录客户关系

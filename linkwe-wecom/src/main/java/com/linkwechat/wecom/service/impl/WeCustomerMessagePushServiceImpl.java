@@ -74,15 +74,15 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
     @Transactional(rollbackFor = Exception.class)
     public void addWeCustomerMessagePush(CustomerMessagePushDto customerMessagePushDto) throws JsonProcessingException, ParseException {
 
-//        if ((null != customerMessagePushDto.getSettingTime() && !"".equals(customerMessagePushDto.getSettingTime()))
-//                && DateUtils.diffTime(new Date(), DateUtil.parse(customerMessagePushDto.getSettingTime(), "yyyy-MM-dd HH:mm")) > 0) {
-//            throw new WeComException("发送时间不能小于当前时间");
-//        }
-
-
-        if(StrUtil.isBlank(customerMessagePushDto.getSettingTime())){
-            throw new WeComException("发送时间不能为空");
+        if ((null != customerMessagePushDto.getSettingTime() && !"".equals(customerMessagePushDto.getSettingTime()))
+                && DateUtils.diffTime(new Date(), DateUtil.parse(customerMessagePushDto.getSettingTime(), "yyyy-MM-dd HH:mm")) > 0) {
+            throw new WeComException("发送时间不能小于当前时间");
         }
+
+
+        /*if(StrUtil.isBlank(customerMessagePushDto.getSettingTime())){
+            throw new WeComException("发送时间不能为空");
+        }*/
 
 
         List<WeCustomer> customers = Lists.newArrayList();

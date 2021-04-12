@@ -153,6 +153,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         int updateResult = weTaskFissionMapper.updateWeTaskFission(weTaskFission);
         if (updateResult > 0) {
             if (CollectionUtils.isNotEmpty(weTaskFission.getTaskFissionStaffs())) {
+                log.info("发起成员信息：【{}】",JSONObject.toJSONString(weTaskFission.getTaskFissionStaffs()));
                 List<WeTaskFissionStaff> staffList = weTaskFissionStaffService.selectWeTaskFissionStaffByTaskId(weTaskFission.getId());
                 if (CollectionUtils.isNotEmpty(staffList)) {
                     weTaskFissionStaffService.deleteWeTaskFissionStaffByIds(staffList.stream().map(WeTaskFissionStaff::getId).toArray(Long[]::new));
@@ -301,18 +302,18 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
                     .map(record -> weCustomerService.selectWeCustomerById(record.getCustomerId()))
                     .filter(Objects::nonNull).collect(Collectors.toList());
         } else {
-            WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getUnionid, unionId));
-            String uid = Optional.ofNullable(weCustomer).map(WeCustomer::getUnionid)
-                    .orElseThrow(() -> new WeComException("用户信息不存在"));
             weTaskFissionRecord = weTaskFissionRecordService
-                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), uid);
-            Optional.ofNullable(weTaskFissionRecord).map(WeTaskFissionRecord::getId)
-                    .orElseThrow(() -> new WeComException("任务记录信息不存在"));
+                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), unionId);
+            Optional.ofNullable(weTaskFissionRecord).orElseThrow(() -> new WeComException("任务记录信息不存在"));
             List<WeFlowerCustomerRel> list = weFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
                     .eq(WeFlowerCustomerRel::getState, WeConstans.FISSION_PREFIX + weTaskFissionRecord.getId()));
             List<String> eidList = Optional.ofNullable(list).orElseGet(ArrayList::new).stream()
                     .map(WeFlowerCustomerRel::getExternalUserid).collect(Collectors.toList());
-            return weCustomerService.listByIds(eidList);
+            if (CollectionUtil.isNotEmpty(eidList)){
+                return weCustomerService.listByIds(eidList);
+            }else {
+                return null;
+            }
         }
     }
 
@@ -430,7 +431,8 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         WeTaskFissionRecord record = WeTaskFissionRecord.builder()
                 .taskFissionId(taskFissionId)
                 .customerId(customerId)
-                .customerName(customerName).build();
+                .customerName(customerName)
+                .createTime(new Date()).build();
         List<WeTaskFissionRecord> searchExists = weTaskFissionRecordService.selectWeTaskFissionRecordList(record);
         WeTaskFissionRecord recordInfo;
         if (CollectionUtils.isNotEmpty(searchExists)) {

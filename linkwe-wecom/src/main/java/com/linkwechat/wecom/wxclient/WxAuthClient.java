@@ -39,7 +39,7 @@ public interface WxAuthClient {
      * @return
      */
     @Request(url = "/oauth2/refresh_token", type = "GET")
-    WxTokenDto refreshToken(String id, @Query("appid") String appId, @Query("grant_type") String grantType,
+    WxTokenDto refreshToken(@Query("appid") String appId, @Query("grant_type") String grantType,
                             @Query("refresh_token") String refreshToken);
 
     /**
