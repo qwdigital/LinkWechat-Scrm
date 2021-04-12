@@ -364,6 +364,15 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         return WeTaskFissionProgressVO.builder().total(total).completed(complete).customers(list).build();
     }
 
+    /**
+     * 更新过期任务
+     * @return
+     */
+    @Override
+    public void updateExpiredWeTaskFission() {
+         weTaskFissionMapper.updateExpiredWeTaskFission();
+    }
+
     /*************************************** private functions **************************************/
 
     private String getPosterQRCode(String fissionTargetId, WeTaskFissionRecord record, WeCustomer weCustomer) {
