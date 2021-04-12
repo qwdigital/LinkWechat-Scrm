@@ -157,8 +157,13 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                         WeMediaDto weMediaDto = weMaterialService
                                 .uploadTemporaryMaterial(messageMap.getMaterialUrl(), MediaType.IMAGE.getMediaType(),messageMap.getMaterialName());
                         Optional.ofNullable(weMediaDto).ifPresent(media -> {
-                            weWelcomeMsgBuilder.image(WeWelcomeMsg.Image.builder().media_id(media.getMedia_id())
+                            List attachments = new ArrayList();
+                            JSONObject json = new JSONObject();
+                            json.put("msgtype",weMediaDto.getType());
+                            json.put(weMediaDto.getType(),WeWelcomeMsg.Image.builder().media_id(media.getMedia_id())
                                     .pic_url(media.getUrl()).build());
+                            attachments.add(json);
+                            weWelcomeMsgBuilder.attachments(attachments);
                         });
                     }
                     weCustomerService.sendWelcomeMsg(weWelcomeMsgBuilder.build());
