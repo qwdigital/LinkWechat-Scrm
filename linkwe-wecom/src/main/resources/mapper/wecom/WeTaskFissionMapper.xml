@@ -156,7 +156,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </delete>
 
-    <select id="updateExpiredWeTaskFission">
+    <update id="updateExpiredWeTaskFission">
         update we_task_fission as wtff,
         (
             select
@@ -170,5 +170,5 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         set wtff.fiss_status = 2
         where
             wtff.id = wtfl.id
-    </select>
+    </update>
 </mapper>
