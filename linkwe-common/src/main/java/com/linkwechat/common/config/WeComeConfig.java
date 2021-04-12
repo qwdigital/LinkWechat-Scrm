@@ -36,4 +36,7 @@ public class WeComeConfig {
 
     /** 第三方自建应用得url*/
     private String[] thirdAppUrl;
+
+    /**多租户相关表*/
+    private String[] needTenant=new String[]{};
 }

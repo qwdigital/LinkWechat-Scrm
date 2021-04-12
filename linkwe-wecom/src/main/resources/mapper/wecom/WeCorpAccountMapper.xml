@@ -125,8 +125,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
 
+    <select id="findWeCorpByAccount" resultMap="WeCorpAccountResult">
+        <include refid="selectWeCorpAccountVo"/>
+        WHERE
+        del_flag = 0
+        AND corp_account = #{corpAccount}
+    </select>
 
 
 
-    
+
 </mapper>
