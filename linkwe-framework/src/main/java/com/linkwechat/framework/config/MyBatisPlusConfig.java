@@ -10,8 +10,11 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import com.github.pagehelper.PageInterceptor;
 import com.linkwechat.common.config.WeComeConfig;
+import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.wecom.service.IWeAccessTokenService;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.StringValue;
 import org.apache.ibatis.plugin.Interceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +35,9 @@ public class MyBatisPlusConfig
     @Autowired
     WeComeConfig weComeConfig;
 
+    @Autowired
+    IWeAccessTokenService iWeAccessTokenService;
+
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
@@ -46,7 +52,8 @@ public class MyBatisPlusConfig
                     // 获取租户 ID 值表达式，只支持单个 ID 值
                     @Override
                     public Expression getTenantId() {
-                        return new LongValue(1088248166370832385L);
+
+                        return new StringValue(SecurityUtils.getLoginUser().getUser().getWeCorpAccount().getCorpId());
                     }
                     // 这是 default 方法,默认返回 false 表示所有表都需要拼多租户条件,
                     // 这里设置 role表不需要该条件

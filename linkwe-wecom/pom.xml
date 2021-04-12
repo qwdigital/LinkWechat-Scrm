@@ -27,6 +27,10 @@
             <artifactId>spring-test</artifactId>
             <version>5.2.9.RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>com.linkwechat</groupId>
+            <artifactId>linkwe-system</artifactId>
+        </dependency>
 
 
     </dependencies>

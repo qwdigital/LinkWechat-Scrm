@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.system;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysMenu;
@@ -51,6 +52,9 @@ public class SysLoginController
 
     @Autowired
     private WeAccessTokenClient weAccessTokenClient;
+
+
+
 
 //    @Autowired
 //    private IWeGroupCodeService weGroupCodeService;
@@ -156,7 +160,30 @@ public class SysLoginController
         }
 
         return ajax;
+    }
 
+
+    /**
+     * 通过企业id和企业密钥登录
+     * @param corpId
+     * @param corpSecret
+     * @return
+     */
+    @GetMapping("/corpLogin")
+    public AjaxResult corpLogin(String corpId,String corpSecret){
+        List<WeCorpAccount> weCorpAccounts = iWxCorpAccountService.selectWeCorpAccountList(WeCorpAccount.builder()
+                .corpId(corpId)
+                .corpSecret(corpSecret)
+                .delFlag(Constants.NORMAL_CODE)
+                .build());
+        if(CollectionUtil.isEmpty(weCorpAccounts)){
+
+            return AjaxResult.error("当前企业id与企业密码不匹配或不存在");
+        }
+
+          return AjaxResult.success(
+                  loginService.noPwdLogin(weCorpAccounts.get(0).getCropAccount())
+          );
     }
 
 }

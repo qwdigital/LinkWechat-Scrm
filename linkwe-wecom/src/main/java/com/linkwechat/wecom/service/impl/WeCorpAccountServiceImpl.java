@@ -2,9 +2,17 @@ package com.linkwechat.wecom.service.impl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import cn.hutool.core.util.ArrayUtil;
+import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.domain.entity.SysRole;
+import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.system.mapper.SysRoleMapper;
+import com.linkwechat.system.service.ISysUserService;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +29,24 @@ import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 @Service
 public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
 
-    @Autowired
-    private WeCorpAccountMapper weCorpAccountMapper;
 
 
     @Autowired
     private IWeAccessTokenService iWeAccessTokenService;
+
+
+    @Autowired
+    private IWeCorpAccountService iWeCorpAccountService;
+
+    @Autowired
+    private ISysUserService iSysUserService;
+
+    @Autowired
+    private RuoYiConfig ruoYiConfig;
+
+
+    @Autowired
+    private SysRoleMapper roleMapper;
 
     /**
      * 查询企业id相关配置
@@ -37,7 +57,7 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     @Override
     public WeCorpAccount selectWeCorpAccountById(Long id)
     {
-        return weCorpAccountMapper.selectWeCorpAccountById(id);
+        return iWeCorpAccountService.selectWeCorpAccountById(id);
     }
 
     /**
@@ -49,7 +69,7 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     @Override
     public List<WeCorpAccount> selectWeCorpAccountList(WeCorpAccount wxCorpAccount)
     {
-        return weCorpAccountMapper.selectWeCorpAccountList(wxCorpAccount);
+        return iWeCorpAccountService.selectWeCorpAccountList(wxCorpAccount);
     }
 
     /**
@@ -61,8 +81,23 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     @Override
     public int insertWeCorpAccount(WeCorpAccount wxCorpAccount)
     {
+        int returnCode = iWeCorpAccountService.insertWeCorpAccount(wxCorpAccount);
 
-        return weCorpAccountMapper.insertWeCorpAccount(wxCorpAccount);
+        if(Constants.SERVICE_STATUS_ERROR<returnCode){
+            iSysUserService.insertUser(
+                    SysUser.builder()
+                            .userName(wxCorpAccount.getCropAccount())
+                            .nickName(wxCorpAccount.getCompanyName())
+                            .userType(Constants.USER_TYOE_CORP_ADMIN)
+                            .roleIds(ArrayUtil.toArray(roleMapper.selectRoleList(SysRole.builder()
+                                    .roleKey(Constants.DEFAULT_WECOME_CORP_ADMIN)
+                                    .build()).stream().map(SysRole::getRoleId).collect(Collectors.toList()), Long.class))
+                            .password(SecurityUtils.encryptPassword(ruoYiConfig.getWeUserDefaultPwd()))
+                            .build()
+            );
+        }
+
+        return returnCode;
     }
 
     /**
@@ -75,7 +110,7 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     public int updateWeCorpAccount(WeCorpAccount wxCorpAccount)
     {
 
-        int returnCode = weCorpAccountMapper.updateWeCorpAccount(wxCorpAccount);
+        int returnCode = iWeCorpAccountService.updateWeCorpAccount(wxCorpAccount);
         if(Constants.SERVICE_RETURN_SUCCESS_CODE<returnCode){
 
 
@@ -95,7 +130,7 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
      */
     @Override
     public WeCorpAccount findValidWeCorpAccount() {
-        return weCorpAccountMapper.findValidWeCorpAccount();
+        return iWeCorpAccountService.findValidWeCorpAccount();
     }
 
 
@@ -106,7 +141,7 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     @Override
     public int startVailWeCorpAccount(String corpId) {
 
-        int returnCode = weCorpAccountMapper.startVailWeCorpAccount(corpId);
+        int returnCode = iWeCorpAccountService.startVailWeCorpAccount(corpId);
 
         if(Constants.SERVICE_RETURN_SUCCESS_CODE<returnCode){
 
@@ -123,12 +158,12 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     public int startCustomerChurnNoticeSwitch(String status) {
         WeCorpAccount validWeCorpAccount = findValidWeCorpAccount();
         validWeCorpAccount.setCustomerChurnNoticeSwitch(status);
-        return weCorpAccountMapper.updateWeCorpAccount(validWeCorpAccount);
+        return iWeCorpAccountService.updateWeCorpAccount(validWeCorpAccount);
     }
 
     @Override
     public String getCustomerChurnNoticeSwitch() {
-        WeCorpAccount validWeCorpAccount = weCorpAccountMapper.findValidWeCorpAccount();
+        WeCorpAccount validWeCorpAccount = iWeCorpAccountService.findValidWeCorpAccount();
         String noticeSwitch = Optional.ofNullable(validWeCorpAccount).map(WeCorpAccount::getCustomerChurnNoticeSwitch)
                 .orElse(WeConstans.DEL_FOLLOW_USER_SWITCH_CLOSE);
         return noticeSwitch;
@@ -137,7 +172,7 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
 
     @Override
     public WeCorpAccount findWeCorpByAccount(String corpAccount) {
-        return weCorpAccountMapper.findWeCorpByAccount(corpAccount);
+        return iWeCorpAccountService.findWeCorpByAccount(corpAccount);
     }
 
 
