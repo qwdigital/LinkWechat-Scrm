@@ -63,19 +63,19 @@ public class WeDepartmentServiceImpl extends ServiceImpl<WeDepartmentMapper,WeDe
     {
 
         //校验数据中中是否存在根节点,如果不存在,从微信端获取,同时入库
-        WeDepartment weDepartment=this.baseMapper.selectWeDepartmentById(WeConstans.WE_ROOT_DEPARMENT_ID);
-        if(null == weDepartment){
-            WeDepartMentDto weDepartMentDto=weDepartMentClient.weDepartMents(WeConstans.WE_ROOT_DEPARMENT_ID);
-            if(WeConstans.WE_SUCCESS_CODE.equals(weDepartMentDto.getErrcode())
-            && CollectionUtils.isNotEmpty(weDepartMentDto.getDepartment())){
-                this.baseMapper.insertWeDepartment(
-                        WeDepartment.transformWeDepartment(
-                                weDepartMentDto.getDepartment().stream().filter(item->item.getId().equals(WeConstans.WE_ROOT_DEPARMENT_ID)).findFirst().get()
-                        )
-                );
-
-            }
-        }
+//        WeDepartment weDepartment=this.baseMapper.selectWeDepartmentById(WeConstans.WE_ROOT_DEPARMENT_ID);
+//        if(null == weDepartment){
+//            WeDepartMentDto weDepartMentDto=weDepartMentClient.weDepartMents(WeConstans.WE_ROOT_DEPARMENT_ID);
+//            if(WeConstans.WE_SUCCESS_CODE.equals(weDepartMentDto.getErrcode())
+//            && CollectionUtils.isNotEmpty(weDepartMentDto.getDepartment())){
+//                this.baseMapper.insertWeDepartment(
+//                        WeDepartment.transformWeDepartment(
+//                                weDepartMentDto.getDepartment().stream().filter(item->item.getId().equals(WeConstans.WE_ROOT_DEPARMENT_ID)).findFirst().get()
+//                        )
+//                );
+//
+//            }
+//        }
 
         return this.baseMapper.selectWeDepartmentList();
     }

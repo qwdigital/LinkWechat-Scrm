@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import com.github.pagehelper.PageInterceptor;
 import com.linkwechat.common.config.WeComeConfig;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.common.utils.SecurityUtils;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.StringValue;
@@ -48,7 +49,13 @@ public class MyBatisPlusConfig
                     @Override
                     public Expression getTenantId() {
 
-                        return new StringValue(SecurityUtils.getLoginUser().getUser().getWeCorpAccount().getCorpId());
+                        WeCorpAccount weCorpAccount
+                                = SecurityUtils.getLoginUser().getUser().getWeCorpAccount();
+                        if(null != weCorpAccount){
+                            return new StringValue(weCorpAccount.getCorpId());
+                        }
+
+                        return null;
                     }
                     // 这是 default 方法,默认返回 false 表示所有表都需要拼多租户条件,
                     // 这里设置 role表不需要该条件

@@ -136,8 +136,6 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
 
     private String findAccessToken(String accessTokenKey){
 
-        //            WeCorpAccount wxCorpAccount
-//                    = iWxCorpAccountService.findValidWeCorpAccount();
 
 
         WeCorpAccount wxCorpAccount
@@ -149,7 +147,7 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
         }
 
 
-        String  weAccessToken =redisCache.getCacheObject(accessTokenKey+"::"+wxCorpAccount.getAgentId());
+        String  weAccessToken =redisCache.getCacheObject(accessTokenKey+"::"+wxCorpAccount.getCorpId());
 
 
 
@@ -180,7 +178,7 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
             }
 
             if(StringUtils.isNotEmpty(token)){
-                redisCache.setCacheObject(accessTokenKey+"::"+wxCorpAccount.getAgentId(),token,expires_in.intValue(), TimeUnit.SECONDS);
+                redisCache.setCacheObject(accessTokenKey+"::"+wxCorpAccount.getCorpId(),token,expires_in.intValue(), TimeUnit.SECONDS);
                 weAccessToken = token;
             }
 
