@@ -194,21 +194,10 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
      * 清空redis中的相关token
      */
     @Override
-    public void removeToken() {
-
-        LoginUser loginUser = SecurityUtils.getLoginUser();
-        if(null != loginUser){
-            SysUser user = loginUser.getUser();
-            if(null != user){
-                WeCorpAccount weCorpAccount = user.getWeCorpAccount();
-                if(null != weCorpAccount){
-                    redisCache.deleteObject(WeConstans.WE_COMMON_ACCESS_TOKEN+"::"+weCorpAccount.getAgentId());
-                    redisCache.deleteObject(WeConstans.WE_CONTACT_ACCESS_TOKEN+"::"+weCorpAccount.getAgentId());
-                    redisCache.deleteObject(WeConstans.WE_PROVIDER_ACCESS_TOKEN+"::"+weCorpAccount.getAgentId());
-                }
-            }
-        }
-
+    public void removeToken(WeCorpAccount wxCorpAccount) {
+        redisCache.deleteObject(WeConstans.WE_COMMON_ACCESS_TOKEN+"::"+wxCorpAccount.getAgentId());
+        redisCache.deleteObject(WeConstans.WE_CONTACT_ACCESS_TOKEN+"::"+wxCorpAccount.getAgentId());
+        redisCache.deleteObject(WeConstans.WE_PROVIDER_ACCESS_TOKEN+"::"+wxCorpAccount.getAgentId());
     }
 
 

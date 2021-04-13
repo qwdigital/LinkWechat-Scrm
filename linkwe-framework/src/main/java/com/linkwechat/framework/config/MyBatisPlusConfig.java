@@ -1,7 +1,5 @@
 package com.linkwechat.framework.config;
 
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
@@ -11,9 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerIntercept
 import com.github.pagehelper.PageInterceptor;
 import com.linkwechat.common.config.WeComeConfig;
 import com.linkwechat.common.utils.SecurityUtils;
-import com.linkwechat.wecom.service.IWeAccessTokenService;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.StringValue;
 import org.apache.ibatis.plugin.Interceptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +17,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
-import java.util.List;
 
 
 /**
@@ -35,8 +30,10 @@ public class MyBatisPlusConfig
     @Autowired
     WeComeConfig weComeConfig;
 
-    @Autowired
-    IWeAccessTokenService iWeAccessTokenService;
+
+
+
+
 
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
@@ -47,8 +44,6 @@ public class MyBatisPlusConfig
 
         interceptor.addInnerInterceptor(new TenantLineInnerInterceptor(
                 new TenantLineHandler() {
-                    // manager_id = 1088248166370832385
-
                     // 获取租户 ID 值表达式，只支持单个 ID 值
                     @Override
                     public Expression getTenantId() {

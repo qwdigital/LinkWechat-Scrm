@@ -1,24 +1,28 @@
 package com.linkwechat.wecom.service.impl;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.entity.SysRole;
 import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.system.mapper.SysRoleMapper;
 import com.linkwechat.system.service.ISysUserService;
+import com.linkwechat.wecom.mapper.WeCorpAccountMapper;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.linkwechat.wecom.mapper.WeCorpAccountMapper;
-import com.linkwechat.common.core.domain.entity.WeCorpAccount;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+//import com.linkwechat.system.mapper.SysRoleMapper;
+//import com.linkwechat.system.service.ISysUserService;
 
 /**
  * 企业id相关配置Service业务层处理
@@ -35,8 +39,7 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     private IWeAccessTokenService iWeAccessTokenService;
 
 
-    @Autowired
-    private IWeCorpAccountService iWeCorpAccountService;
+
 
     @Autowired
     private ISysUserService iSysUserService;
@@ -48,6 +51,10 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     @Autowired
     private SysRoleMapper roleMapper;
 
+
+    @Autowired
+    private WeCorpAccountMapper weCorpAccountMapper;
+
     /**
      * 查询企业id相关配置
      * 
@@ -57,7 +64,7 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     @Override
     public WeCorpAccount selectWeCorpAccountById(Long id)
     {
-        return iWeCorpAccountService.selectWeCorpAccountById(id);
+        return weCorpAccountMapper.selectWeCorpAccountById(id);
     }
 
     /**
@@ -69,7 +76,7 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     @Override
     public List<WeCorpAccount> selectWeCorpAccountList(WeCorpAccount wxCorpAccount)
     {
-        return iWeCorpAccountService.selectWeCorpAccountList(wxCorpAccount);
+        return weCorpAccountMapper.selectWeCorpAccountList(wxCorpAccount);
     }
 
     /**
@@ -81,7 +88,7 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     @Override
     public int insertWeCorpAccount(WeCorpAccount wxCorpAccount)
     {
-        int returnCode = iWeCorpAccountService.insertWeCorpAccount(wxCorpAccount);
+        int returnCode = weCorpAccountMapper.insertWeCorpAccount(wxCorpAccount);
 
         if(Constants.SERVICE_STATUS_ERROR<returnCode){
             iSysUserService.insertUser(
@@ -110,11 +117,11 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     public int updateWeCorpAccount(WeCorpAccount wxCorpAccount)
     {
 
-        int returnCode = iWeCorpAccountService.updateWeCorpAccount(wxCorpAccount);
+        int returnCode = weCorpAccountMapper.updateWeCorpAccount(wxCorpAccount);
         if(Constants.SERVICE_RETURN_SUCCESS_CODE<returnCode){
 
 
-            iWeAccessTokenService.removeToken();
+            iWeAccessTokenService.removeToken(wxCorpAccount);
 
         }
 
@@ -130,7 +137,7 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
      */
     @Override
     public WeCorpAccount findValidWeCorpAccount() {
-        return iWeCorpAccountService.findValidWeCorpAccount();
+        return weCorpAccountMapper.findValidWeCorpAccount();
     }
 
 
@@ -141,29 +148,42 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
     @Override
     public int startVailWeCorpAccount(String corpId) {
 
-        int returnCode = iWeCorpAccountService.startVailWeCorpAccount(corpId);
-
-        if(Constants.SERVICE_RETURN_SUCCESS_CODE<returnCode){
-
-
-            iWeAccessTokenService.removeToken();
-
-        }
-
-
-        return returnCode;
+//        List<WeCorpAccount> weCorpAccounts = weCorpAccountMapper.selectWeCorpAccountList(
+//                WeCorpAccount.builder()
+//                        .corpId(corpId)
+//                        .delFlag(Constants.NORMAL_CODE)
+//                        .build()
+//        );
+//        if(CollectionUtil.isNotEmpty(weCorpAccounts)){
+//
+//            WeCorpAccount weCorpAccount = weCorpAccounts.get(0);
+//
+//        }
+//
+//        int returnCode = weCorpAccountMapper.startVailWeCorpAccount(corpId);
+//
+//        if(Constants.SERVICE_RETURN_SUCCESS_CODE<returnCode){
+//
+//
+//            iWeAccessTokenService.removeToken();
+//
+//        }
+//
+//
+//        return returnCode;
+        return 1;
     }
 
     @Override
     public int startCustomerChurnNoticeSwitch(String status) {
         WeCorpAccount validWeCorpAccount = findValidWeCorpAccount();
         validWeCorpAccount.setCustomerChurnNoticeSwitch(status);
-        return iWeCorpAccountService.updateWeCorpAccount(validWeCorpAccount);
+        return weCorpAccountMapper.updateWeCorpAccount(validWeCorpAccount);
     }
 
     @Override
     public String getCustomerChurnNoticeSwitch() {
-        WeCorpAccount validWeCorpAccount = iWeCorpAccountService.findValidWeCorpAccount();
+        WeCorpAccount validWeCorpAccount = weCorpAccountMapper.findValidWeCorpAccount();
         String noticeSwitch = Optional.ofNullable(validWeCorpAccount).map(WeCorpAccount::getCustomerChurnNoticeSwitch)
                 .orElse(WeConstans.DEL_FOLLOW_USER_SWITCH_CLOSE);
         return noticeSwitch;
@@ -172,7 +192,7 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
 
     @Override
     public WeCorpAccount findWeCorpByAccount(String corpAccount) {
-        return iWeCorpAccountService.findWeCorpByAccount(corpAccount);
+        return weCorpAccountMapper.findWeCorpByAccount(corpAccount);
     }
 
 

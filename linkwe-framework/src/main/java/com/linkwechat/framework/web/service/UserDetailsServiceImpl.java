@@ -1,6 +1,7 @@
 package com.linkwechat.framework.web.service;
 
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.domain.entity.SysRole;
@@ -60,6 +61,7 @@ public class UserDetailsServiceImpl implements UserDetailsService
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
     {
         SysUser user = userService.selectUserByUserName(username);
+        System.out.println(user.getUserType());
         if (StringUtils.isNull(user))
         {
             //企业管理登录
@@ -119,7 +121,7 @@ public class UserDetailsServiceImpl implements UserDetailsService
         }
 
        //当前登录用户为企业管理，设置corpId和密钥相关
-       if(user.getUserType().equals(Constants.USER_TYOE_CORP_ADMIN)){
+       if(Constants.USER_TYOE_CORP_ADMIN.equals(user.getUserType())){
           user.setWeCorpAccount(
                   iWeCorpAccountService.findWeCorpByAccount(username)
           );

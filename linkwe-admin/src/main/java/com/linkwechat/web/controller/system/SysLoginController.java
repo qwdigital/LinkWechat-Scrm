@@ -93,12 +93,14 @@ public class SysLoginController
         Set<String> roles = permissionService.getRolePermission(user);
         // 权限集合
         Set<String> permissions = permissionService.getMenuPermission(user);
+
         //校验用户是否拥有可用corpid
-        WeCorpAccount wxCorpAccount
-                = iWxCorpAccountService.findValidWeCorpAccount();
-        if(null != wxCorpAccount){
-            user.setValidCropId(true);
-        }
+//        WeCorpAccount wxCorpAccount
+//                = iWxCorpAccountService.findValidWeCorpAccount();
+//        if(null != wxCorpAccount){
+//            user.setValidCropId(true);
+//        }
+
         AjaxResult ajax = AjaxResult.success();
         ajax.put("user", user);
         ajax.put("roles", roles);
@@ -128,15 +130,15 @@ public class SysLoginController
     @GetMapping("/findWxQrLoginInfo")
     public AjaxResult findQrLoginParm(){
 
-        WeCorpAccount validWeCorpAccount
-                = iWxCorpAccountService.findValidWeCorpAccount();
-        if(null != validWeCorpAccount){
-            validWeCorpAccount.setContactSecret(null);
-            validWeCorpAccount.setCorpSecret(null);
-            validWeCorpAccount.setProviderSecret(null);
-        }
+//        WeCorpAccount validWeCorpAccount
+//                = iWxCorpAccountService.findValidWeCorpAccount();
+//        if(null != validWeCorpAccount){
+//            validWeCorpAccount.setContactSecret(null);
+//            validWeCorpAccount.setCorpSecret(null);
+//            validWeCorpAccount.setProviderSecret(null);
+//        }
 
-        return AjaxResult.success(validWeCorpAccount);
+        return AjaxResult.success();
     }
 
 

@@ -1,5 +1,7 @@
 package com.linkwechat.wecom.service;
 
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
+
 /**
  * @description: 微信token相关接口
  * @author: My
@@ -21,5 +23,5 @@ public interface IWeAccessTokenService {
    public String findThirdAppAccessToken(String agentId);
 
 
-   public void removeToken();
+   public void removeToken(WeCorpAccount wxCorpAccount);
 }
