@@ -234,7 +234,7 @@ com.linkwechat
 
 ### 联系作者加入群
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/234016_20fdd151_1480777.png "江总微信.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0413/220657_e8efa82e_409467.png "屏幕截图.png")
 
 ### 特别鸣谢
 
