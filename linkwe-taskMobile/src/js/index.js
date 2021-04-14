@@ -6,11 +6,7 @@ import config from './contant'
 
 $(function(){
     const taskFissionId = getUrlParam('fissionId');
-    const eid = null
-    //防止存入了错误的userinfo
-    if(localStorage.getItem('userinfo') == undefined || localStorage.getItem('userinfo') == 'undefined'){
-        localStorage.removeItem('userinfo')
-    }
+
     $('.sharePic').click(function(){
         alert('长按图片在弹出菜单中发送给朋友或者可保存图片分享至朋友圈')
     });
@@ -44,7 +40,7 @@ $(function(){
             })
        
     } catch (error) {
-        console.log(error)
+        alert(error)
     }
 
     
@@ -58,13 +54,13 @@ function getPosterFlow(params){
     .then(resp=>{
         let userData = resp.data;
         let unionId = userData.unionId
-        $('.myTaskDetail').click(function(){
-            window.location.href = `./taskProcess.html?eid=${unionId}&taskFissionId=${taskFissionId}`
-        });
         getPoster({fissionTargetId,posterId,taskFissionId,unionId})
         .then(res=>{
             $('.posterImg').attr('src',res.data.posterUrl)
             localStorage.setItem('postersUrl',res.data.posterUrl)
         })
+        $('.myTaskDetail').click(function(){
+            window.location.href = `./taskProcess.html?eid=${unionId}&taskFissionId=${taskFissionId}`
+        });
     })
 }
