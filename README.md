@@ -234,7 +234,7 @@ com.linkwechat
 
 ### 联系作者加入群
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0413/220657_e8efa82e_409467.png "屏幕截图.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0414/093533_899b0110_1480777.png "江冬勤-linkwechat咨询.png")
 
 ### 特别鸣谢
 
