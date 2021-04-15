@@ -40,7 +40,7 @@ export function getDetail(id) {
  */
 export function add(data) {
   return request({
-    url: service + '/add',
+    url: service + '/',
     method: 'post',
     data,
   })
