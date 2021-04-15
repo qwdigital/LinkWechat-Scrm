@@ -1,6 +1,8 @@
 package com.linkwechat.wecom.mapper;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.annotation.SqlParser;
 import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import org.apache.ibatis.annotations.Param;
 
@@ -18,6 +20,7 @@ public interface WeCorpAccountMapper
      * @param id 企业id相关配置ID
      * @return 企业id相关配置
      */
+    @SqlParser(filter = true)
     public WeCorpAccount selectWeCorpAccountById(Long id);
 
     /**
@@ -26,6 +29,7 @@ public interface WeCorpAccountMapper
      * @param wxCorpAccount 企业id相关配置
      * @return 企业id相关配置集合
      */
+    @SqlParser(filter = true)
     public List<WeCorpAccount> selectWeCorpAccountList(WeCorpAccount wxCorpAccount);
 
     /**
@@ -34,6 +38,7 @@ public interface WeCorpAccountMapper
      * @param wxCorpAccount 企业id相关配置
      * @return 结果
      */
+    @SqlParser(filter = true)
     public int insertWeCorpAccount(WeCorpAccount wxCorpAccount);
 
     /**
@@ -42,6 +47,7 @@ public interface WeCorpAccountMapper
      * @param wxCorpAccount 企业id相关配置
      * @return 结果
      */
+    @SqlParser(filter = true)
     public int updateWeCorpAccount(WeCorpAccount wxCorpAccount);
 
 
@@ -50,6 +56,7 @@ public interface WeCorpAccountMapper
      * 获取有效cropid
      * @return
      */
+    @SqlParser(filter = true)
     public WeCorpAccount findValidWeCorpAccount();
 
 
@@ -58,6 +65,7 @@ public interface WeCorpAccountMapper
      * @param corpId
      * @return
      */
+    @SqlParser(filter = true)
     public int startVailWeCorpAccount(@Param("corpId") String corpId);
 
 
@@ -66,5 +74,6 @@ public interface WeCorpAccountMapper
      * @param corpAccount
      * @return
      */
+    @SqlParser(filter = true)
     WeCorpAccount findWeCorpByAccount(@Param("corpAccount") String corpAccount);
 }
