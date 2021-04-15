@@ -1,151 +1,22 @@
-<script>
-import { getDetail, add, update } from '@/api/communityOperating/newCustomer'
-// import { getList } from '@/api/drainageCode/welcome'
-import PhoneDialog from '@/components/PhoneDialog'
-import SelectUser from '@/components/SelectUser'
-import SelectTag from '@/components/SelectTag'
-import SelectQrCode from '@/components/SelectQrCode'
-export default {
-  components: { PhoneDialog, SelectTag, SelectUser, SelectQrCode },
-  data() {
-    return {
-      dialogVisibleSelectUser: false,
-      dialogVisibleSelectTag: false,
-      dialogVisibleSelectQrCode: false,
-      // 遮罩层
-      loading: false,
-      // 表单参数
-      form: {
-        activityScene: '',
-        groupCodeId: undefined,
-        isJoinConfirmFriends: 0,
-        // mediaId: 0,
-        qrCode: '',
-        weEmpleCodeTags: [
-          // {
-          //   delFlag: 0,
-          //   empleCodeId: 0,
-          //   id: 0,
-          //   tagId: 'string',
-          //   tagName: 'string',
-          // },
-        ],
-        weEmpleCodeUseScops: [
-          // {
-          //   businessId: 'string',
-          //   businessIdType: 0,
-          //   businessName: 'string',
-          //   delFlag: 0,
-          //   empleCodeId: 0,
-          //   id: 0,
-          //   mobile: 'string',
-          // },
-        ],
-        welcomeMsg: '',
-      },
-      rules: Object.freeze({
-        activityScene: [{ required: true, message: '必填项', trigger: 'blur' }],
-        weEmpleCodeUseScops: [
-          { required: true, message: '必填项', trigger: 'change' },
-        ],
-        welcomeMsg: [{ required: true, message: '必填项', trigger: 'blur' }],
-        qrCode: [{ required: true, message: '必填项', trigger: 'change' }],
-      }),
-      materialSelected: '',
-    }
-  },
-  created() {
-    let id = this.$route.query.id
-    id && this.getDetail(id)
-    this.$route.meta.title = (id ? '编辑' : '新建') + '新客自动拉群'
-  },
-  methods: {
-    /** 获取详情 */
-    getDetail(id) {
-      this.loading = true
-      getDetail(id).then(({ data }) => {
-        this.form = data
-        this.materialSelected =
-          data.weMaterial == null ? '' : data.weMaterial.materialUrl
-        this.loading = false
-      })
-    },
-    codeTypeChange() {
-      this.form.weEmpleCodeUseScops = []
-      this.form.qrCode = ''
-    },
-    // 选择人员变化事件
-    selectedUser(users) {
-      // debugger
-      this.form.weEmpleCodeUseScops = users.map((d) => {
-        return {
-          businessId: d.id || d.userId,
-          businessName: d.name,
-          businessIdType: d.userId ? 2 : 1,
-          mobile: d.mobile,
-          empleCodeId: d.empleCodeId,
-        }
-      })
-    },
-    submitSelectTag(data) {
-      this.form.weEmpleCodeTags = data.map((d) => ({
-        tagId: d.tagId,
-        tagName: d.name,
-      }))
-    },
-    // 选择二维码确认按钮
-    submitSelectQrCode(data) {
-      // debugger
-      this.form.groupCodeId = data.id
-      this.form.qrCode = data.codeUrl
-      this.$refs.form.validateField('qrCode')
-    },
-    removeMaterial() {
-      this.form.mediaId = ''
-      this.materialSelected = ''
-    },
-    submit() {
-      if (!this.form.weEmpleCodeUseScops.length) {
-        this.msgError('请至少选择一名使用员工')
-        return
-      }
-      this.$refs.form.validate((valid) => {
-        if (valid) {
-          this.loading = true
-          ;(this.form.newGroupId ? update : add)(this.form)
-            .then(({ data }) => {
-              this.msgSuccess('操作成功')
-              this.loading = false
-              this.$router.back()
-            })
-            .catch(() => {
-              this.loading = false
-            })
-        }
-      })
-    },
-  },
-}
-</script>
 <template>
   <div class="wrap" v-loading="loading">
     <el-form :model="form" ref="form" :rules="rules" label-width="100px">
-      <el-form-item label="活码名称" prop="activityScene">
+      <el-form-item label="活码名称" prop="codeName">
         <el-input
-          v-model="form.activityScene"
+          v-model="form.codeName"
           maxlength="30"
           show-word-limit
           placeholder="请输入"
           clearable
         />
       </el-form-item>
-      <el-form-item label="使用员工" prop="weEmpleCodeUseScops">
+      <el-form-item label="使用员工" prop="users">
         <!-- closable -->
         <el-tag
           size="medium"
-          v-for="(item, index) in form.weEmpleCodeUseScops"
+          v-for="(user, index) in users"
           :key="index"
-          >{{ item.businessName }}</el-tag
+          >{{ user.businessName }}</el-tag
         >
         <el-button
           type="primary"
@@ -154,7 +25,7 @@ export default {
           icon="el-icon-plus"
           size="mini"
           @click="dialogVisibleSelectUser = true"
-          >{{ form.weEmpleCodeUseScops.length ? '修改' : '添加' }}</el-button
+          >{{ users.length ? '修改' : '添加' }}</el-button
         >
       </el-form-item>
 
@@ -169,8 +40,8 @@ export default {
           clearable
         />
       </el-form-item>
-      <el-form-item label="选择群活码" prop="qrCode">
-        <el-image v-if="form.qrCode" :src="form.qrCode" class="code-image">
+      <el-form-item label="选择群活码">
+        <el-image v-if="groupQrCode && groupQrCode.codeUrl" :src="groupQrCode.codeUrl" class="code-image">
         </el-image>
 
         <el-button
@@ -180,16 +51,16 @@ export default {
           icon="el-icon-plus"
           size="mini"
           @click="dialogVisibleSelectQrCode = true"
-          >{{ form.qrCode ? '修改' : '选择' }}</el-button
+          >{{ groupQrCode && groupQrCode.codeUrl ? '修改' : '选择' }}</el-button
         >
       </el-form-item>
-      <el-form-item label="新客户标签" prop="weEmpleCodeTags">
+      <el-form-item label="新客户标签" prop="tags">
         <!-- closable -->
         <el-tag
           size="medium"
-          v-for="(item, index) in form.weEmpleCodeTags"
+          v-for="(tag, index) in tags"
           :key="index"
-          >{{ item.tagName }}</el-tag
+          >{{ tag.tagName }}</el-tag
         >
         <el-button
           type="primary"
@@ -204,11 +75,11 @@ export default {
           根据使用场景做标签记录，扫码添加的客户，可自动打上标签
         </div> -->
       </el-form-item>
-      <el-form-item label="添加设置" prop="isJoinConfirmFriends">
+      <el-form-item label="添加设置" prop="skipVerify">
         <el-checkbox
           :true-label="1"
           :false-label="0"
-          v-model="form.isJoinConfirmFriends"
+          v-model="form.skipVerify"
           >客户添加时无需经过确认自动成为好友</el-checkbox
         >
       </el-form-item>
@@ -224,9 +95,9 @@ export default {
 
       <PhoneDialog
         :message="form.welcomeMsg || '请输入加群引导语'"
-        :isOther="!!materialSelected"
+        :isOther="(groupQrCode && groupQrCode.codeUrl) ? true : false"
       >
-        <el-image style="border-radius: 6px;" :src="materialSelected" fit="fit">
+        <el-image style="border-radius: 6px; width: 100px;" :src="groupQrCode.codeUrl" fit="fit">
         </el-image>
       </PhoneDialog>
     </div>
@@ -238,13 +109,13 @@ export default {
       title="选择使用员工"
       :isOnlyLeaf="form.codeType !== 2"
       :isSigleSelect="form.codeType == 1"
-      @success="selectedUser"
+      @success="submitSelectUser"
     ></SelectUser>
 
     <!-- 选择标签弹窗 -->
     <SelectTag
       :visible.sync="dialogVisibleSelectTag"
-      :selected="form.toTag"
+      :selected="tags"
       @success="submitSelectTag"
     >
     </SelectTag>
@@ -253,10 +124,155 @@ export default {
     <SelectQrCode
       :visible.sync="dialogVisibleSelectQrCode"
       @success="submitSelectQrCode"
+      :selected="codes"
     >
     </SelectQrCode>
   </div>
 </template>
+
+<script>
+import { getDetail, add, update } from '@/api/communityOperating/newCustomer'
+import PhoneDialog from '@/components/PhoneDialog'
+import SelectUser from '@/components/SelectUser'
+import SelectTag from '@/components/SelectTag'
+import SelectQrCode from '@/components/SelectQrCode'
+
+export default {
+  components: { PhoneDialog, SelectTag, SelectUser, SelectQrCode },
+
+  data() {
+    return {
+      newGroupId: '',
+      dialogVisibleSelectUser: false,
+      dialogVisibleSelectTag: false,
+      dialogVisibleSelectQrCode: false,
+      // 遮罩层
+      loading: false,
+      // 表单参数
+      form: {
+        codeName: '',
+        groupCodeId: undefined,
+        skipVerify: 0,
+        tagList: [],
+        emplList: [],
+        welcomeMsg: '',
+      },
+      tags: [],
+      users: [],
+      codes: [],
+      groupQrCode: {},
+      rules: Object.freeze({
+        codeName: [{ required: true, message: '必填项', trigger: 'blur' }],
+        tagList: [
+          { required: true, message: '必填项', trigger: 'change' },
+        ],
+        welcomeMsg: [{ required: true, message: '必填项', trigger: 'blur' }]
+      })
+    }
+  },
+  
+  methods: {
+    /** 获取详情 */
+    getDetail(id) {
+      this.loading = true
+      getDetail(id).then(({ data }) => {
+        this.form.codeName = data.codeName
+        this.form.skipVerify = data.skipVerify
+        this.form.welcomeMsg = data.welcomeMsg
+        this.form.groupCodeId = data.groupCodeInfo.id
+
+        this.codes = [ data.groupCodeInfo ]
+        this.groupQrCode = data.groupCodeInfo
+
+        this.tags = data.tagList
+        this.users = data.emplList
+
+        this.loading = false
+      })
+    },
+
+    // 选择人员变化事件
+    submitSelectUser (users) {
+      this.users = users.map((d) => {
+        return {
+          businessId: d.id || d.userId,
+          businessName: d.name,
+          businessIdType: d.userId ? 2 : 1,
+          mobile: d.mobile,
+          empleCodeId: d.empleCodeId
+        }
+      })
+    },
+
+    submitSelectTag (tags) {
+      this.tags = tags.map((t) => {
+        return {
+          tagId: t.tagId,
+          tagName: t.name
+        }
+      })
+    },
+
+    // 选择二维码确认按钮
+    submitSelectQrCode (data) {
+      this.groupQrCode = data
+      this.form.groupCodeId = data.id
+    },
+
+    submit() {
+      if (!this.users.length) {
+        this.msgError('请至少选择一名使用员工')
+        return
+      }
+
+      if (!this.form.groupCodeId) {
+        this.msgError('请选择一个群活码')
+        return
+      }
+
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          this.loading = true
+          if (this.newGroupId) {
+            update(this.newGroupId, this.form).then(() => {
+              this.msgSuccess('更新成功')
+              this.loading = false
+              this.$router.back()
+            }).catch(() => {
+              this.loading = false
+            })
+          } else {
+            add(this.form).then(() => {
+              this.msgSuccess('添加成功')
+              this.loading = false
+              this.$router.back()
+            }).catch(() => {
+              this.loading = false
+            })
+          }
+        }
+      })
+    }
+  },
+
+  watch: {
+    tags (tags) {
+      this.form.tagList = tags.map((t) => t.tagId)
+    },
+
+    users (users) {
+      this.form.emplList = users.map((u) => u.businessId)
+    }
+  },
+
+  created() {
+    this.newGroupId = this.$route.query.id
+    this.newGroupId && this.getDetail(this.newGroupId)
+    this.$route.meta.title = (this.newGroupId ? '编辑' : '新建') + '新客自动拉群'
+  }
+}
+</script>
+
 <style lang="scss" scoped>
 .wrap {
   display: flex;

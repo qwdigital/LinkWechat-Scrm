@@ -30,37 +30,17 @@ export function getDetail(id) {
  * 新增新客自动拉群
  * @param {Object} data 
 {
-  "activityScene": "string",
-  "groupCodeId": 0,
-  "isJoinConfirmFriends": true,
-  "mediaId": 0,
-  "qrCode": "string",
-  "weEmpleCodeTags": [
-    {
-      "delFlag": 0,
-      "empleCodeId": 0,
-      "id": 0,
-      "tagId": "string",
-      "tagName": "string"
-    }
-  ],
-  "weEmpleCodeUseScops": [
-    {
-      "businessId": "string",
-      "businessIdType": 0,
-      "businessName": "string",
-      "delFlag": 0,
-      "empleCodeId": 0,
-      "id": 0,
-      "mobile": "string"
-    }
-  ],
+  "codeName": "string",
+  "groupCodeId": 'string',
+  "skipVerify": true,
+  "tagList": [],
+  "emplList": [],
   "welcomeMsg": "string"
 }
  */
 export function add(data) {
   return request({
-    url: service + '/add',
+    url: service + '/',
     method: 'post',
     data,
   })
@@ -70,37 +50,17 @@ export function add(data) {
    * 修改新客自动拉群
    * @param {*} data 
 {
-  "activityScene": "string",
-  "groupCodeId": 0,
-  "isJoinConfirmFriends": true,
-  "mediaId": 0,
-  "qrCode": "string",
-  "weEmpleCodeTags": [
-    {
-      "delFlag": 0,
-      "empleCodeId": 0,
-      "id": 0,
-      "tagId": "string",
-      "tagName": "string"
-    }
-  ],
-  "weEmpleCodeUseScops": [
-    {
-      "businessId": "string",
-      "businessIdType": 0,
-      "businessName": "string",
-      "delFlag": 0,
-      "empleCodeId": 0,
-      "id": 0,
-      "mobile": "string"
-    }
-  ],
+  "codeName": "string",
+  "groupCodeId": 'string',
+  "skipVerify": true,
+  "tagList": [],
+  "emplList": [],
   "welcomeMsg": "string"
 }
    */
-export function update(data) {
+export function update(id, data) {
   return request({
-    url: service + '/update',
+    url: service + '/' + id,
     method: 'put',
     data,
   })
@@ -112,7 +72,7 @@ export function update(data) {
  */
 export function remove(ids) {
   return request({
-    url: service + '/delete/' + ids,
+    url: service + '/' + ids,
     method: 'DELETE',
   })
 }

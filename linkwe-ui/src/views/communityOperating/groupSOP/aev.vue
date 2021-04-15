@@ -258,10 +258,13 @@ export default {
     getDetail(id) {
       this.loading = true
       getDetail(id).then(({ data }) => {
-        this.form = data
-
         this.dateRange = [this.form.startExeTime, this.form.stopExeTime]
         this.customerGroups = data.groupList
+
+        this.form.ruleName = data.ruleName || ''
+        this.form.title = data.title || ''
+        this.form.content = data.content || ''
+        this.form.picList = data.picList || []
 
         this.form.materialIdList = []
 

@@ -14,7 +14,7 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        empleCodeName: '',
+        emplCodeName: '',
         createBy: '',
         beginTime: '', // "开始时间",
         endTime: '', // "结束时间"
@@ -35,7 +35,6 @@ export default {
       ids: [],
     }
   },
-  watch: {},
   computed: {},
   created() {
     this.getList()
@@ -45,24 +44,16 @@ export default {
   },
   methods: {
     getList(page) {
-      if (this.dateRange[0]) {
-        this.query.beginTime = this.dateRange[0]
-        this.query.endTime = this.dateRange[1]
-      } else {
-        this.query.beginTime = ''
-        this.query.endTime = ''
-      }
       page && (this.query.pageNum = page)
       this.loading = true
-      getList(this.query)
-        .then(({ rows, total }) => {
-          this.list = rows
-          this.total = +total
-          this.loading = false
-        })
-        .catch(() => {
-          this.loading = false
-        })
+
+      getList(this.query).then(({ rows, total }) => {
+        this.list = rows
+        this.total = +total
+        this.loading = false
+      }).catch(() => {
+        this.loading = false
+      })
     },
     edit(data, type) {
       this.form = Object.assign({}, data || {})
@@ -77,7 +68,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map((item) => item.newGroupId)
+      this.ids = selection.map((item) => item.id)
     },
     /** 删除按钮操作 */
     remove(id) {
@@ -97,8 +88,8 @@ export default {
         .catch(function() {})
     },
     download(data) {
-      let name = data.activityScene + '-' + data.newGroupId + '.png'
-      download(data.newGroupId).then((res) => {
+      let name = data.codeName + '.png'
+      download(data.id).then((res) => {
         if (res != null) {
           let blob = new Blob([res], { type: 'application/zip' })
           let url = window.URL.createObjectURL(blob)
@@ -134,7 +125,27 @@ export default {
         })
         .catch(function() {})
     },
+
+    // 重置查询参数
+    resetQuery () {
+      this.dateRange = []
+      this.$refs['queryForm'].resetFields()
+
+      this.getList(1)
+    },
   },
+
+  watch: {
+    // 日期选择器数据同步至查询参数
+    dateRange (dateRange) {
+      if (!dateRange || dateRange.length !== 2) {
+        this.query.beginTime = ''
+        this.query.endTime = ''
+      } else {
+        [ this.query.beginTime, this.query.endTime ] = dateRange
+      }
+    }
+  }
 }
 </script>
 
@@ -148,22 +159,11 @@ export default {
       class="top-search"
       size="small"
     >
-      <el-form-item label="活码名称">
-        <el-input v-model="query.empleCodeName" placeholder="请输入"></el-input>
+      <el-form-item label="活码名称" prop="emplCodeName">
+        <el-input v-model="query.emplCodeName" placeholder="请输入"></el-input>
       </el-form-item>
-      <el-form-item label="创建人">
+      <el-form-item label="创建人" prop="createBy">
         <el-input v-model="query.createBy" placeholder="请输入"></el-input>
-        <!-- <div class="tag-input" @click="dialogVisibleSelectUser = true">
-          <span class="tag-place" v-if="!queryUser.length">请选择</span>
-          <template v-else>
-            <el-tag
-              type="info"
-              v-for="(unit, unique) in queryUser"
-              :key="unique"
-              >{{ unit.name }}</el-tag
-            >
-          </template>
-        </div> -->
       </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
@@ -187,7 +187,7 @@ export default {
         <el-button
           v-hasPermi="['customerManage:customer:query']"
           type="info"
-          @click="resetForm()"
+          @click="resetQuery()"
           >重置</el-button
         >
       </el-form-item>
@@ -233,16 +233,33 @@ export default {
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="50" align="center" />
-      <el-table-column prop="activityScene" label="活码名称" align="center">
+      <el-table-column prop="codeName" label="活码名称" align="center">
       </el-table-column>
-      <el-table-column label="员工活码" align="center" prop="qrCode">
-        <template slot-scope="{ row }">
-          <el-image v-if="row.qrCode" :src="row.qrCode" class="code-image">
-          </el-image>
+      <el-table-column label="员工活码" align="center" prop="qrCode" width="130">
+        <template #default="{ row }">
+          <el-popover
+            placement="bottom"
+            trigger="hover"
+          >
+            <el-image
+              slot="reference"
+              :src="row.emplCodeUrl"
+              class="code-image--small"
+            ></el-image>
+            <el-image
+              :src="row.emplCodeUrl"
+              class="code-image"
+            >
+            </el-image>
+          </el-popover>
         </template>
+        <!-- <template slot-scope="{ row }">
+          <el-image v-if="row.emplCodeUrl" :src="row.emplCodeUrl" class="code-image">
+          </el-image>
+        </template> -->
       </el-table-column>
       <el-table-column
-        prop="weEmpleCodeUseScops"
+        prop="emplList"
         label="使用员工"
         align="center"
         :show-overflow-tooltip="true"
@@ -251,7 +268,7 @@ export default {
           <el-tag
             size="medium"
             type="info"
-            v-for="(item, index) in row.weEmpleCodeUseScops"
+            v-for="(item, index) in row.emplList"
             :key="index"
             >{{ item.businessName }}</el-tag
           >
@@ -267,7 +284,7 @@ export default {
           <el-tag
             size="medium"
             type="info"
-            v-for="(item, index) in row.weEmpleCodeTags"
+            v-for="(item, index) in row.tagList"
             :key="index"
             >{{ item.tagName }}</el-tag
           >
@@ -281,16 +298,16 @@ export default {
         <template slot-scope="{ row }">
           <el-tag
             size="medium"
-            v-for="(item, index) in row.weGroupUserScops"
+            v-for="(item, index) in row.groupList"
             :key="index"
-            >{{ item.chatGroupName }}</el-tag
+            >{{ item.groupName }}</el-tag
           >
         </template>
       </el-table-column>
       <el-table-column
         label="添加好友数"
         align="center"
-        prop="joinFriendNums"
+        prop="cusNumber"
       ></el-table-column>
       <el-table-column
         label="创建人"
@@ -313,7 +330,7 @@ export default {
           <el-button
             v-hasPermi="['enterpriseWechat:edit']"
             type="text"
-            @click="goRoute(row.newGroupId)"
+            @click="goRoute(row.id)"
             >编辑</el-button
           >
           <el-button
@@ -325,7 +342,7 @@ export default {
           <el-button
             v-hasPermi="['enterpriseWechat:edit']"
             type="text"
-            @click="remove(row.newGroupId)"
+            @click="remove(row.id)"
             >删除</el-button
           >
         </template>
@@ -341,3 +358,15 @@ export default {
     />
   </div>
 </template>
+
+<style scoped lang="scss">
+  .code-image {
+    width: 200px;
+    height: 200px;
+  }
+
+  .code-image--small {
+    width: 50px;
+    height: 50px;
+  }
+</style>
