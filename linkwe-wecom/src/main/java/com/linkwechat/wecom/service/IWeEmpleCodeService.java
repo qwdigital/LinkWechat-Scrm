@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * 员工活码Service接口
- * 
+ *
  * @author ruoyi
  * @date 2020-10-04
  */
@@ -41,7 +41,7 @@ public interface IWeEmpleCodeService  extends IService<WeEmpleCode>
 
     /**
      * 新增员工活码
-     * 
+     *
      * @param weEmpleCode 员工活码
      * @return 结果
      */
@@ -49,7 +49,7 @@ public interface IWeEmpleCodeService  extends IService<WeEmpleCode>
 
     /**
      * 修改员工活码
-     * 
+     *
      * @param weEmpleCode 员工活码
      * @return 结果
      */
@@ -83,11 +83,18 @@ public interface IWeEmpleCodeService  extends IService<WeEmpleCode>
 
     /**
      * 通过活动场景获取客户欢迎语
-     * @param activityScene 活动场景
+     * @param scenario 活动场景
      * @param userId 成员id
      * @return
      */
-    public WeEmpleCodeDto selectWelcomeMsgByActivityScene(String activityScene, String userId);
+    public WeEmpleCodeDto selectWelcomeMsgByScenario(String scenario, String userId);
+
+    /**
+     * 通过state定位员工活码
+     * @param state state
+     * @return 员工活码
+     */
+    WeEmpleCodeDto selectWelcomeMsgByState(String state);
 
     /**
      * 批量新增员工活码
@@ -116,4 +123,10 @@ public interface IWeEmpleCodeService  extends IService<WeEmpleCode>
      * @return
      */
     WeEmpleCode getQrcodeByUserId(String userId);
+
+    /**
+     * 递增扫码次数
+     * @param state state
+     */
+    void updateScanTimesByState(String state);
 }

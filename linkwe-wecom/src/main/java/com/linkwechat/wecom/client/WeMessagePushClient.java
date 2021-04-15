@@ -15,7 +15,7 @@ import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
  * @create: 2020-10-17 22:41
  **/
 @SuppressWarnings("all")
-@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
+//@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
 public interface WeMessagePushClient {
 
     /**

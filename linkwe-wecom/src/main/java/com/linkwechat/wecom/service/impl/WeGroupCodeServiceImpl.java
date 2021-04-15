@@ -1,15 +1,11 @@
 package com.linkwechat.wecom.service.impl;
 
-import java.io.InputStream;
 import java.util.List;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.config.CosConfig;
-import com.linkwechat.common.config.ServerConfig;
 import com.linkwechat.common.exception.wecom.WeComException;
-import com.linkwechat.common.utils.QREncode;
-import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.wecom.domain.WeGroupCodeActual;
 import com.linkwechat.wecom.mapper.WeGroupCodeActualMapper;
 import com.linkwechat.wecom.service.IWeGroupCodeActualService;
@@ -36,9 +32,6 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper,WeGrou
 
     @Autowired
     private WeGroupCodeActualMapper weGroupCodeActualMapper;
-
-    @Autowired
-    private CosConfig cosConfig;
 
     /**
      * 查询客户群活码

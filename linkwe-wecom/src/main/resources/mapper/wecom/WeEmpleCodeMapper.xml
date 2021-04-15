@@ -7,8 +7,8 @@
     <resultMap type="WeEmpleCode" id="WeEmpleCodeResult">
         <result property="id" column="id"/>
         <result property="codeType" column="code_type"/>
-        <result property="isJoinConfirmFriends" column="is_join_confirm_friends"/>
-        <result property="activityScene" column="activity_scene"/>
+        <result property="skipVerify" column="skip_verify"/>
+        <result property="scenario" column="scenario"/>
         <result property="welcomeMsg" column="welcome_msg"/>
         <result property="createBy" column="create_by"/>
         <result property="createTime" column="create_time"/>
@@ -16,6 +16,8 @@
         <result property="configId" column="config_id"/>
         <result property="qrCode" column="qr_code"/>
         <result property="mediaId" column="media_id"/>
+        <result property="scanTimes" column="scan_times" />
+        <result property="state" column="state" />
         <collection property="weEmpleCodeUseScops" ofType="com.linkwechat.wecom.domain.WeEmpleCodeUseScop">
             <result property="businessId" column="business_id"/>
             <result property="businessName" column="business_name"/>
@@ -28,21 +30,23 @@
     </resultMap>
 
     <sql id="selectWeEmpleCodeVo">
-        select id, code_type, is_join_confirm_friends, activity_scene, welcome_msg, create_by, create_time, del_flag, config_id,qr_code from we_emple_code
+        select id, code_type, skip_verify, scenario, welcome_msg, create_by, create_time, del_flag, config_id,qr_code, state, scan_times from we_emple_code
     </sql>
 
     <sql id="getQrcodeByUserIdVo">
         select
         wec.id,
         wec.code_type,
-        wec.is_join_confirm_friends,
-        wec.activity_scene,
+        wec.skip_verify,
+        wec.scenario,
         wec.welcome_msg,
         wec.create_by,
         wec.create_time,
         wec.del_flag,
         wec.config_id,
-        wec.qr_code
+        wec.state,
+        wec.qr_code,
+        wec.scan_times
         from we_emple_code wec
         left join we_emple_code_use_scop wecus on wec.id = wecus.emple_code_id
         and wecus.business_id_type = 2
@@ -54,14 +58,16 @@
             wecode.id,
             wecode.code_type,
             wecode.media_id,
-            wecode.is_join_confirm_friends,
-            wecode.activity_scene,
+            wecode.skip_verify,
+            wecode.scenario,
             wecode.welcome_msg,
             wecode.create_by,
             wecode.create_time,
             wecode.del_flag,
             wecode.config_id,
             wecode.qr_code,
+            wecode.state,
+            wecode.scan_times,
             wecusn.business_id,
             wecusn.business_name,
             wecusn.mobile,
@@ -88,9 +94,9 @@
     <select id="selectWeEmpleCodeList" parameterType="WeEmpleCode" resultType="com.linkwechat.wecom.domain.WeEmpleCode">
         <include refid="selectWeEmpleCodeLsit"/>
         <if test="codeType != null ">and wecode.code_type = #{codeType}</if>
-        <if test="isJoinConfirmFriends != null ">and wecode.is_join_confirm_friends = #{isJoinConfirmFriends}</if>
-        <if test="activityScene != null  and activityScene != ''">
-            and wecode.activity_scene like concat('%', #{activityScene}, '%')
+        <if test="skipVerify != null ">and wecode.skip_verify = #{skipVerify}</if>
+        <if test="scenario != null  and scenario != ''">
+            and wecode.scenario like concat('%', #{scenario}, '%')
         </if>
         <if test="welcomeMsg != null ">and wecode.welcome_msg = #{welcomeMsg}</if>
         <if test="createBy != null and createBy !=''">
@@ -133,8 +139,8 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="codeType != null">code_type,</if>
-            <if test="isJoinConfirmFriends != null">is_join_confirm_friends,</if>
-            <if test="activityScene != null">activity_scene,</if>
+            <if test="skipVerify != null">skip_verify,</if>
+            <if test="scenario != null">scenario,</if>
             <if test="welcomeMsg != null">welcome_msg,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
@@ -142,12 +148,14 @@
             <if test="configId != null">config_id,</if>
             <if test="qrCode != null">qr_code,</if>
             <if test="mediaId != null">media_id,</if>
+            <if test="state != null">state,</if>
+            <if test="scanTimes != null">scan_times</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
             <if test="codeType != null">#{codeType},</if>
-            <if test="isJoinConfirmFriends != null">#{isJoinConfirmFriends},</if>
-            <if test="activityScene != null">#{activityScene},</if>
+            <if test="skipVerify != null">#{skipVerify},</if>
+            <if test="scenario != null">#{scenario},</if>
             <if test="welcomeMsg != null">#{welcomeMsg},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
@@ -155,6 +163,8 @@
             <if test="configId != null">#{configId},</if>
             <if test="qrCode != null">#{qrCode},</if>
             <if test="mediaId != null">#{mediaId},</if>
+            <if test="state != null">#{state},</if>
+            <if test="scanTimes != null">#{scanTimes}</if>
         </trim>
     </insert>
 
@@ -162,8 +172,8 @@
         update we_emple_code
         <trim prefix="SET" suffixOverrides=",">
             <if test="codeType != null">code_type = #{codeType},</if>
-            <if test="isJoinConfirmFriends != null">is_join_confirm_friends = #{isJoinConfirmFriends},</if>
-            <if test="activityScene != null">activity_scene = #{activityScene},</if>
+            <if test="skipVerify != null">skip_verify = #{skipVerify},</if>
+            <if test="scenario != null">scenario = #{scenario},</if>
             <if test="welcomeMsg != null">welcome_msg = #{welcomeMsg},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
@@ -171,6 +181,8 @@
             <if test="configId != null">config_id = #{configId},</if>
             <if test="qrCode != null">qr_code = #{qrCode},</if>
             <if test="mediaId != null">media_id = #{mediaId},</if>
+            <if test="state != null">state = #{state},</if>
+            <if test="scanTimes != null">scan_times = #{scanTimes}</if>
         </trim>
         where id = #{id}
     </update>
@@ -198,7 +210,7 @@
     </update>
 
 
-    <select id="selectWelcomeMsgByActivityScene" parameterType="String"
+    <select id="selectWelcomeMsgByScenario" parameterType="String"
             resultType="com.linkwechat.wecom.domain.dto.WeEmpleCodeDto">
         select
         wecode.id as emple_code_id,
@@ -217,11 +229,35 @@
         wm .id = wecode.media_id
         where
         wecode.del_flag = 0
-        <if test="activityScene != null and activityScene != ''">
-            and wecode.activity_scene = #{activityScene}
+        <if test="scenario != null and scenario != ''">
+            and wecode.scenario = #{scenario}
         </if>
         <if test="userId != null and userId != ''">
             and wecus.business_id = #{userId}
+        </if>
+    </select>
+
+
+    <select id="selectWelcomeMsgByState" parameterType="String" resultType="com.linkwechat.wecom.domain.dto.WeEmpleCodeDto">
+        select
+        wecode.id as emple_code_id,
+        wecode.welcome_msg ,
+        wm.category_id,
+        wm.material_url,
+        wm.content,
+        wm.material_name,
+        wm.digest,
+        wm.cover_url
+        from
+        we_emple_code wecode
+        left join we_emple_code_use_scop wecus on
+        wecode.id = wecus.emple_code_id
+        left join we_material wm on
+        wm .id = wecode.media_id
+        where
+        wecode.del_flag = 0
+        <if test="state != null and state != ''">
+            and wecode.state = #{state}
         </if>
     </select>
 
@@ -235,4 +271,10 @@
             </if>
         </where>
     </select>
+
+    <update id="updateScanTimesByState" parameterType="String">
+        update we_emple_code
+        set scan_times = scan_times + 1
+        where state = #{state}
+    </update>
 </mapper>

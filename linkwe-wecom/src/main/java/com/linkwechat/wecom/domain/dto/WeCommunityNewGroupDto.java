@@ -1,9 +1,5 @@
 package com.linkwechat.wecom.domain.dto;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.linkwechat.wecom.domain.WeEmpleCodeTag;
-import com.linkwechat.wecom.domain.WeEmpleCodeUseScop;
-import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -17,56 +13,39 @@ import java.util.List;
 @Data
 public class WeCommunityNewGroupDto {
 
+    /**
+     * 活码名称
+     */
+    @NotNull(message = "活码名不能为空")
+    private String codeName;
 
     /**
-     * 主键
+     * 指定的员工(id)
      */
-    private String newGroupId;
-
-    /**
-     * 活动场景
-     */
-    private String activityScene;
+    @NotNull(message = "使用员工不能为空")
+    private List<String> emplList;
 
     /**
      * 欢迎语
      */
+    @NotNull(message = "欢迎语不能为空")
     private String welcomeMsg;
-
-    @NotNull(message = "员工信息不能为空")
-    /** 使用员工 */
-    @TableField(exist = false)
-    private List<WeEmpleCodeUseScop> weEmpleCodeUseScops;
-
-    /**
-     * 扫码标签
-     */
-    @TableField(exist = false)
-    private List<WeEmpleCodeTag> weEmpleCodeTags;
 
     /**
      * 群活码ID
      */
+    @NotNull(message = "群活码不能为空")
     private Long groupCodeId;
 
     /**
-     * 客户添加时无需经过确认自动成为好友:1:是;0:否
+     * 标签id列表
      */
-    private Boolean isJoinConfirmFriends;
+    @NotNull(message = "标签不能为空")
+    private List<String> tagList;
 
     /**
-     * 新增联系方式的配置id
+     * 是否跳过验证自动加好友
      */
-    private String configId;
-
-    /**
-     * 二维码链接
-     */
-    private String qrCode;
-
-    /**
-     * 素材的id
-     */
-    private Long mediaId;
+    private Boolean skipVerify = true;
 
 }

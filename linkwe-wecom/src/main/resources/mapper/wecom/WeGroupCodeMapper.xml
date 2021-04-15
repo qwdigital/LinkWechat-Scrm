@@ -93,6 +93,29 @@
         where w.id = #{id}
     </select>
 
+    <select id="selectWeGroupListByGroupCodeId" parameterType="Long" resultType="WeGroup">
+        SELECT
+            wg.*
+        FROM
+            we_group wg
+                LEFT JOIN we_group_code_actual wgca ON wgca.chat_id = wg.chat_id
+                LEFT JOIN we_group_code wgc ON wgc.id = wgca.group_code_id
+        WHERE
+            wgc.id = #{groupCodeId}
+    </select>
+
+    <select id="selectScanTimesByGroupCodeId" parameterType="Long" resultType="int">
+        SELECT
+            IFNULL(SUM( wgca.scan_code_times ), 0) AS scan_times
+        FROM
+            we_group_code_actual wgca
+                LEFT JOIN we_group_code wgc ON wgc.id = wgca.group_code_id
+        GROUP BY
+            wgc.id
+        HAVING
+            wgc.id = #{groupCodeId}
+    </select>
+
     <select id="checkActivityNameUnique" parameterType="String" resultType="int">
 		select count(1) from we_group_code where activity_name = #{activityName} limit 1
 	</select>

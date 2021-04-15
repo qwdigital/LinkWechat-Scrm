@@ -43,7 +43,7 @@ public class WeEmpleCodeUseScop
 
     /** 0:正常;2:删除; */
     @ApiModelProperty("0:正常;2:删除")
-    private Integer delFlag=new Integer(0);
+    private Integer delFlag = 0;
 
     /** 活码使用人员名称 */
     @ApiModelProperty("活码使用人员名称")

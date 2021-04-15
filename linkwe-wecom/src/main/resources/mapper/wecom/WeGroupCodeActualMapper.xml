@@ -108,6 +108,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
 
+    <update id="updateScanTimesByChatId" parameterType="String">
+        update we_group_code_actual
+        set scan_code_times = scan_code_times + 1
+        where chat_id = #{chatId}
+    </update>
+
     <delete id="deleteWeGroupCodeActualById" parameterType="Long">
         delete from we_group_code_actual where id = #{id}
     </delete>
