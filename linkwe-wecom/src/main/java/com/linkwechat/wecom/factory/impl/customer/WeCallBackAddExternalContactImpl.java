@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,6 +47,11 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
     private IWeTaskFissionRewardService weTaskFissionRewardService;
     @Autowired
     private IWeTaskFissionService weTaskFissionService;
+    @Autowired
+    private IWeCommunityNewGroupService weCommunityNewGroupService;
+    @Autowired
+    private IWeGroupCodeService weGroupCodeService;
+
     private ThreadLocal<WeFlowerCustomerRel> weFlowerCustomerRelThreadLocal = new ThreadLocal<>();
 
     @Override
@@ -121,12 +125,19 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
      */
     private void empleCodeHandle(String state, String wecomCode, String userId, String externalUserId) {
         try {
+            log.debug("递增扫码次数>>>>>>>>>>>>>>>");
+            // 增加扫码次数
+            weEmpleCodeService.updateScanTimesByState(state);
             log.info("执行发送欢迎语>>>>>>>>>>>>>>>");
             WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(wecomCode);
-            WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByActivityScene(state, userId);
+            // 获取员工活码相关信息
+            WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByState(state);
             if (messageMap != null) {
                 String empleCodeId = messageMap.getEmpleCodeId();
-                //查询活码对应标签
+
+                // 查询对应员工活码
+
+                // 查询活码对应标签
                 List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.list(new LambdaQueryWrapper<WeEmpleCodeTag>()
                         .eq(WeEmpleCodeTag::getEmpleCodeId, empleCodeId));
                 //查询外部联系人与通讯录关系数据
@@ -148,23 +159,26 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                     weFlowerCustomerTagRelService.saveOrUpdateBatch(weFlowerCustomerTagRels);
                 });
                 log.debug(">>>>>>>>>欢迎语查询结果：{}", JSONObject.toJSONString(messageMap));
+                // 发送欢迎语
                 if (messageMap != null) {
+
                     if (StringUtils.isNotEmpty(messageMap.getWelcomeMsg())) {
                         weWelcomeMsgBuilder.text(WeWelcomeMsg.Text.builder()
                                 .content(messageMap.getWelcomeMsg()).build());
                     }
+
+                    // 构造WeMediaDto。要么是普通情况创建的员工活码，使用创建时指定的素材，要么是新客拉群信创建的员工活码，使用对应群活码图片作为素材
                     if (StringUtils.isNotEmpty(messageMap.getCategoryId())) {
-                        WeMediaDto weMediaDto = weMaterialService
-                                .uploadTemporaryMaterial(messageMap.getMaterialUrl(), MediaType.IMAGE.getMediaType(),messageMap.getMaterialName());
-                        Optional.ofNullable(weMediaDto).ifPresent(media -> {
-                            List attachments = new ArrayList();
-                            JSONObject json = new JSONObject();
-                            json.put("msgtype",weMediaDto.getType());
-                            json.put(weMediaDto.getType(),WeWelcomeMsg.Image.builder().media_id(media.getMedia_id())
-                                    .pic_url(media.getUrl()).build());
-                            attachments.add(json);
-                            weWelcomeMsgBuilder.attachments(attachments);
-                        });
+                        WeMediaDto weMediaDto = weMaterialService.uploadTemporaryMaterial(messageMap.getMaterialUrl(), MediaType.IMAGE.getMediaType(),messageMap.getMaterialName());
+                        bindAttachments(weWelcomeMsgBuilder, weMediaDto);
+                    }
+
+                    WeCommunityNewGroup communityNewGroup = weCommunityNewGroupService.getOne(new LambdaQueryWrapper<WeCommunityNewGroup>()
+                            .eq(WeCommunityNewGroup::getEmplCodeId, Long.valueOf(empleCodeId)));
+                    if (StringUtils.isNotNull(communityNewGroup)) {
+                        WeGroupCode weGroupCode = weGroupCodeService.selectWeGroupCodeById(communityNewGroup.getGroupCodeId());
+                        WeMediaDto weMediaDto = weMaterialService.uploadTemporaryMaterial(weGroupCode.getCodeUrl(), MediaType.IMAGE.getMediaType(), weGroupCode.getActivityName());
+                        bindAttachments(weWelcomeMsgBuilder, weMediaDto);
                     }
                     weCustomerService.sendWelcomeMsg(weWelcomeMsgBuilder.build());
                 }
@@ -173,6 +187,18 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
             e.printStackTrace();
             log.error("执行发送欢迎语失败！", e);
         }
+    }
+
+    private void bindAttachments(WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder, WeMediaDto weMediaDto) {
+        Optional.ofNullable(weMediaDto).ifPresent(media -> {
+            List attachments = new ArrayList();
+            JSONObject json = new JSONObject();
+            json.put("msgtype",weMediaDto.getType());
+            json.put(weMediaDto.getType(),WeWelcomeMsg.Image.builder().media_id(media.getMedia_id())
+                    .pic_url(media.getUrl()).build());
+            attachments.add(json);
+            weWelcomeMsgBuilder.attachments(attachments);
+        });
     }
 
     private boolean isFission(String str) {

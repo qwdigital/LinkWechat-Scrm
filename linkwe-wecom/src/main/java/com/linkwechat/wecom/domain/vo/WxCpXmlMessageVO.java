@@ -41,6 +41,22 @@ public class WxCpXmlMessageVO extends WxCpXmlMessage {
     @XStreamConverter(value = XStreamCDataConverter.class)
     private String tagId;
 
+    @XStreamAlias("UpdateDetail")
+    @XStreamConverter(value = XStreamCDataConverter.class)
+    private String updateDetail;
+
+    @XStreamAlias("JoinScene")
+    @XStreamConverter(value = XStreamCDataConverter.class)
+    private String joinScene;
+
+    @XStreamAlias("QuitScene")
+    @XStreamConverter(value = XStreamCDataConverter.class)
+    private String quitScene;
+
+    @XStreamAlias("MemChangeCnt")
+    @XStreamConverter(value = XStreamCDataConverter.class)
+    private String memberChangeCnt;
+
     @Data
     public static class BatchJob implements Serializable {
         private static final long serialVersionUID = -3418685294606228837L;

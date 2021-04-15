@@ -12,7 +12,7 @@ import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
  * @author: KeWen
  * @create: 2020-10-25 21:34
  **/
-@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
+//@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
 public interface WeCustomerMessagePushClient {
 
 

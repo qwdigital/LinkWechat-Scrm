@@ -169,7 +169,7 @@ public class WeEmpleCodeController extends BaseController {
                     }
                     URL url = new URL(qrCode);
                     //每个二维码名称
-                    String fileName = weEmpleCode.getUseUserName()+"-"+weEmpleCode.getActivityScene()+".jpg";
+                    String fileName = weEmpleCode.getUseUserName()+"-"+weEmpleCode.getScenario()+".jpg";
                     zos.putNextEntry(new ZipEntry(fileName));
                     InputStream fis = url.openConnection().getInputStream();
                     byte[] buffer = new byte[1024];

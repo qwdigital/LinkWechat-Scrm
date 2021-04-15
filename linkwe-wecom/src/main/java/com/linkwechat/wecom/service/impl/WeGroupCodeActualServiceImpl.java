@@ -130,4 +130,14 @@ public class WeGroupCodeActualServiceImpl extends ServiceImpl<WeGroupCodeActualM
         int rows = weGroupCodeActualMapper.checkChatIdUnique(chatId);
         return rows == 0;
     }
+
+    /**
+     * 通过群id递增其实际群活码扫码次数
+     *
+     * @param chatId
+     */
+    @Override
+    public void updateScanTimesByChatId(String chatId) {
+        weGroupCodeActualMapper.updateScanTimesByChatId(chatId);
+    }
 }

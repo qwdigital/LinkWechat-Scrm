@@ -3,7 +3,7 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeEmpleCodeUseScopMapper">
-    
+
     <resultMap type="WeEmpleCodeUseScop" id="WeEmpleCodeUseScopResult">
         <result property="id"    column="id"    />
         <result property="empleCodeId"    column="emple_code_id"    />
@@ -44,12 +44,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             </foreach>
         </if>
     </select>
-    
+
     <select id="selectWeEmpleCodeUseScopById" parameterType="Long" resultMap="WeEmpleCodeUseScopResult">
         <include refid="selectWeEmpleCodeUseScopVo"/>
         where id = #{id}
     </select>
-        
+
     <insert id="insertWeEmpleCodeUseScop" parameterType="WeEmpleCodeUseScop">
         insert into we_emple_code_use_scop
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -84,17 +84,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteWeEmpleCodeUseScopByIds" parameterType="String">
-        delete from we_emple_code_use_scop where id in 
+        delete from we_emple_code_use_scop where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
     </delete>
 
     <insert id="batchInsetWeEmpleCodeUseScop">
-        insert into we_emple_code_use_scop (id,emple_code_id,business_id,business_name,del_flag)
+        insert into we_emple_code_use_scop (id,emple_code_id,business_id,business_name, business_id_type, del_flag)
         values
         <foreach collection="weEmpleCodeUseScops" item="scop" index="index" separator=",">
-            (#{scop.id},#{scop.empleCodeId},#{scop.businessId},#{scop.businessName},#{scop.delFlag})
+            (#{scop.id},#{scop.empleCodeId},#{scop.businessId},#{scop.businessName},#{scop.businessIdType},#{scop.delFlag})
         </foreach>
     </insert>
 
@@ -102,10 +102,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         update we_emple_code_use_scop  set
         del_flag = 2
         where emple_code_id in
-        <foreach collection="array" item="id" index="index"
+        <foreach collection="list" item="id" index="index"
                  separator="," open="(" close=")">
             #{id}
         </foreach>
     </update>
-    
+
 </mapper>
