@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -214,7 +215,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
 
         CustomerMessagePushDto customerMessagePushDto = new CustomerMessagePushDto();
         if (weTaskFission.getStartTime() != null){
-            customerMessagePushDto.setSettingTime(DateUtils.dateTime(weTaskFission.getStartTime()));
+            customerMessagePushDto.setSettingTime(DateUtil.formatDateTime(weTaskFission.getStartTime()));
         }
         customerMessagePushDto.setLinkMessage(linkMessageDto);
         customerMessagePushDto.setPushType("0");
