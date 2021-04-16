@@ -19,7 +19,7 @@ services:
       - REDIS_HOST
       - REDIS_PORT
     ports:
-      - "${APP_PORT}:8090"
+      - 8090
     volumes:
       - ./logs:/logs
       # 上传文件地址，请根据实际${ruoyi.profile}自行修改映射
