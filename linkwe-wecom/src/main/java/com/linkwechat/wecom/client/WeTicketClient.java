@@ -11,7 +11,7 @@ import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
  * @description h5获取签名
  * @date 2021/1/6 11:51
  **/
-//@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
+@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
 public interface WeTicketClient {
     /**
      * 获取去企业jsapi_ticket

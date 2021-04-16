@@ -17,7 +17,7 @@ import java.io.InputStream;
  * @Description:
  * @Date: create in 2020/9/24 0024 0:14
  */
-//@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
+@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
 public interface WeMediaClient {
 
     /**

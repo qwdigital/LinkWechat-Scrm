@@ -12,7 +12,7 @@ import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
  * @author: HaoN
  * @create: 2020-10-13 10:39
  **/
-//@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
+@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
 public interface WeExternalContactClient {
 
     @Request(url = "/externalcontact/add_contact_way",
