@@ -31,6 +31,8 @@
 
 ---
 
+[LinkWeChat 官方帮助文档——语雀](https://www.yuque.com/linkwechat/help)
+
 
 ### 平台简介
 
