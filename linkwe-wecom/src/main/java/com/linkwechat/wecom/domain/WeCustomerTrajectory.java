@@ -29,8 +29,13 @@ public class WeCustomerTrajectory {
     private String content;
     //处理日期
     private Date createDate;
-    //处理时间
-    private Time createTime;
+
+    //处理开始时间
+    private Time startTime;
+
+    //处理结束时间
+    private Time endTime;
+
     //0:正常;1:删除;2:完成
     private String status;
 }
