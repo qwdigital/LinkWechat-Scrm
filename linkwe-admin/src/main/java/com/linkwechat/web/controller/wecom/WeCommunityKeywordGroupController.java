@@ -12,7 +12,6 @@ import com.linkwechat.wecom.domain.vo.WeKeywordGroupTaskVo;
 import com.linkwechat.wecom.service.IWeCommunityKeywordToGroupService;
 import com.linkwechat.wecom.service.IWeGroupCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,8 +48,7 @@ public class WeCommunityKeywordGroupController extends BaseController {
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "beginTime", required = false) String beginTime,
             @RequestParam(value = "endTime", required = false) String endTime
-    )
-    {
+    ) {
         startPage();
         List<WeKeywordGroupTaskVo> taskList = keywordToGroupService
                 .getTaskList(taskName, createBy, keyword, beginTime, endTime);
@@ -66,10 +64,7 @@ public class WeCommunityKeywordGroupController extends BaseController {
     //  @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:query')")
     @GetMapping(path = "/{taskId}")
     public AjaxResult getTask(@PathVariable("taskId") Long taskId) {
-        WeKeywordGroupTaskVo keywordsGroupVo = keywordToGroupService.getTaskById(taskId);
-        // 获取群活码
-        keywordsGroupVo.setGroupCodeInfo(groupCodeService.selectWeGroupCodeById(keywordsGroupVo.getGroupCodeId()));
-        return AjaxResult.success(keywordsGroupVo);
+        return AjaxResult.success(keywordToGroupService.getTaskById(taskId));
     }
 
     /**

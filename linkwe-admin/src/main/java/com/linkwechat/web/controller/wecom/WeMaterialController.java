@@ -8,6 +8,7 @@ import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.wecom.domain.WeMaterial;
 import com.linkwechat.wecom.domain.dto.ResetCategoryDto;
+import com.linkwechat.wecom.domain.dto.TemporaryMaterialDto;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.vo.WeMaterialFileVO;
 import com.linkwechat.wecom.service.IWeMaterialService;
@@ -135,10 +136,12 @@ public class WeMaterialController extends BaseController {
 
     //@PreAuthorize("@ss.hasPermi('wechat:material:temporaryMaterialMediaId')")
     @Log(title = "获取素材media_id", businessType = BusinessType.OTHER)
-    @GetMapping("/temporaryMaterialMediaId")
+    @PostMapping("/temporaryMaterialMediaId")
     @ApiOperation("获取素材media_id")
-    public AjaxResult temporaryMaterialMediaId(@RequestParam(value = "url") String url, @RequestParam(value = "type") String type,@RequestParam(value = "name") String name){
-        WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(url, type,name);
+    public AjaxResult temporaryMaterialMediaId(@RequestBody TemporaryMaterialDto temporaryMaterialDto){
+        WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(temporaryMaterialDto.getUrl(),
+                temporaryMaterialDto.getType()
+                ,temporaryMaterialDto.getName());
         return AjaxResult.success(weMediaDto);
     }
 

@@ -10,40 +10,46 @@
         <result property="isInGroup"    column="is_in_group"    />
     </resultMap>
 
-    <select id="getStatByTaskId" parameterType="Long" resultMap="WePresTagGroupTaskStatResult">
-        SELECT
-            *
-        FROM
-        (
-        SELECT DISTINCT
-            wc.`name` AS customer_name,
-            IFNULL( wptgs.is_sent, 0 ) AS is_sent,
-            IFNULL( wptgs.is_in_group, 0 ) AS is_in_group
-        FROM
-            we_pres_tag_group_tag wptgt
-            LEFT JOIN we_flower_customer_tag_rel wfctr ON wfctr.tag_id = wptgt.tag_id
-            LEFT JOIN we_flower_customer_rel wfcr ON wfcr.id = wfctr.flower_customer_rel_id
-            LEFT JOIN we_customer wc ON wc.external_userid = wfcr.external_userid
-            LEFT JOIN we_pres_tag_group_stat wptgs ON wptgt.task_id = wptgs.task_id
-            AND wptgs.external_userid = wfcr.external_userid
-        WHERE
-            wptgt.task_id = #{taskId}
-        ) t
-        WHERE
-        1 = 1
-        <if test="customerName != null and customerName !='' ">
-            AND t.customer_name LIKE concat('%', #{customerName}, '%')
-        </if>
-        <if test="isSent != null">
-            AND t.is_sent = #{isSent}
-        </if>
-        <if test="isInGroup != null ">
-            AND t.is_in_group = #{isInGroup}
-        </if>
-    </select>
-
     <delete id="removeStatByTaskId" parameterType="Long">
         delete from we_pres_tag_group_stat where task_id = #{taskId}
     </delete>
 
+    <select id="getAllExternalIdByTaskId" parameterType="Long" resultType="String">
+        SELECT DISTINCT
+            wc.external_userid
+        FROM
+            we_customer wc
+                LEFT JOIN we_group_member wgm ON wgm.user_id = wc.external_userid
+                LEFT JOIN we_group wg ON wg.chat_id = wgm.chat_id
+                LEFT JOIN we_group_code_actual wgca ON wgca.chat_id = wg.chat_id
+                LEFT JOIN we_pres_tag_group wptg ON wptg.group_code_id = wgca.group_code_id
+        WHERE
+            wptg.task_id = #{taskId}
+    </select>
+    
+    <select id="selectStatInfoByTaskId" parameterType="Long" resultMap="WePresTagGroupTaskStatResult">
+        SELECT
+            wc.`name`,
+            0 AS is_sent,
+            (
+                SELECT
+                    count(1) > 0
+                FROM
+                    we_customer wc1
+                        LEFT JOIN we_group_member wgm ON wgm.user_id = wc1.external_userid
+                        LEFT JOIN we_group wg ON wg.chat_id = wgm.chat_id
+                        LEFT JOIN we_group_code_actual wgca ON wgca.chat_id = wg.chat_id
+                        LEFT JOIN we_pres_tag_group wptg1 ON wptg1.group_code_id = wgca.group_code_id
+                WHERE
+                    wc1.external_userid = wptgs.external_userid
+            ) AS is_in_group
+        FROM
+            we_pres_tag_group_stat wptgs
+                LEFT JOIN we_pres_tag_group wptg ON wptgs.task_id = wptg.task_id
+                LEFT JOIN we_customer wc ON wc.external_userid = wptgs.external_userid
+        WHERE
+            wptgs.task_id = #{taskId}
+
+
+    </select>
 </mapper>

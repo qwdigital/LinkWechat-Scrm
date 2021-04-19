@@ -41,12 +41,6 @@ public class WeAccessTokenInterceptor implements Interceptor{
      */
     @Override
     public boolean beforeExecute(ForestRequest request) {
-
-
-
-
-
-
         String uri=request.getUrl().replace("http://","");
         log.info(">>>>>>>>>>>>>>>>>>>>>>>>uri：{}",uri);
         //request.setContentType("application/json");
@@ -54,9 +48,6 @@ public class WeAccessTokenInterceptor implements Interceptor{
             request.setDataType(ForestDataType.JSON);
             request.setContentType("application/json");
         }
-
-
-
         // 添加请求参数access_token
         if(!Arrays.asList(weComeConfig.getNoAccessTokenUrl()).contains(uri)){
             String token="";
@@ -78,8 +69,6 @@ public class WeAccessTokenInterceptor implements Interceptor{
 
             request.addQuery("access_token",token);
         }
-
-
         //添加服务器统一请求地址
         request.setUrl(weComeConfig.getServerUrl()+weComeConfig.getWeComePrefix()+uri);
 

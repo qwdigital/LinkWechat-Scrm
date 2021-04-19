@@ -94,4 +94,10 @@ public interface IWeTaskFissionService {
     WeTaskFissionStatisticVO taskFissionStatistic(Long taskFissionId, Date startTime, Date endTime);
 
     WeTaskFissionProgressVO getCustomerTaskProgress(WeTaskFission taskFission, String eid);
+
+    /**
+     * 更新过期任务
+     * @return
+     */
+    public void updateExpiredWeTaskFission();
 }

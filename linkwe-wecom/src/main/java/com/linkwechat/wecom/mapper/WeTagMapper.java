@@ -5,6 +5,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeTag;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 /**
  * 企业微信标签Mapper接口
@@ -12,6 +13,7 @@ import org.apache.ibatis.annotations.Param;
  * @author ruoyi
  * @date 2020-09-07
  */
+@Repository
 public interface WeTagMapper  extends BaseMapper<WeTag>
 {
     /**

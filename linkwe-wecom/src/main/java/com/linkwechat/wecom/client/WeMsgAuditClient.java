@@ -1,16 +1,19 @@
 package com.linkwechat.wecom.client;
 
+import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.DataObject;
 import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
 import com.linkwechat.wecom.domain.dto.msgaudit.WeMsgAuditDto;
 import com.linkwechat.wecom.domain.vo.WeMsgAuditVo;
+import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 
 /**
  * @author danmo
  * @description 会话存档接口
  * @date 2020/12/2 16:45
  **/
+@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
 public interface WeMsgAuditClient {
 
     /**

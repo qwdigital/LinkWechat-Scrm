@@ -347,14 +347,23 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
             if (CollectionUtil.isNotEmpty(addTags)) {
                 addTags.removeAll(Collections.singleton(null));
+
+                //移除重复标签(避免客户重复打标签)
+                this.removeLabel(WeMakeCustomerTag.builder()
+                        .externalUserid(weMakeCustomerTag.getExternalUserid())
+                        .addTag(addTags)
+                        .build());
+
                 List<WeFlowerCustomerTagRel> tagRels = new ArrayList<>();
 
                 List<CutomerTagEdit> cutomerTagEdits = new ArrayList<>();
+
                 flowerCustomerRels.stream().forEach(customer -> {
                     CutomerTagEdit cutomerTagEdit = CutomerTagEdit.builder()
                             .userid(customer.getUserId())
                             .external_userid(customer.getExternalUserid())
                             .build();
+
                     List<String> tags = new ArrayList<>();
                     addTags.stream().forEach(tag -> {
                         tags.add(tag.getTagId());
@@ -473,6 +482,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             //客户入库
             WeCustomer weCustomer = new WeCustomer();
             BeanUtils.copyPropertiesASM(externalUserDetail.getExternal_contact(), weCustomer);
+            weCustomer.setCreateTime(new Date());
+            weCustomer.setUpdateTime(new Date());
             this.saveOrUpdate(weCustomer);
 
             //客户与通讯录客户关系

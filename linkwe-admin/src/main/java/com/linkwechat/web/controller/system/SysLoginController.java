@@ -158,9 +158,7 @@ public class SysLoginController
 
                 String token = loginService.noPwdLogin(loginInfo.getUser_info().getUserid());
                 ajax.put(Constants.TOKEN, token);
-
         }
-
         return ajax;
     }
 

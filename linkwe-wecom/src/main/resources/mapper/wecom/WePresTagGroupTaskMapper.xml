@@ -9,12 +9,15 @@
         <result property="taskName" column="task_name" />
         <result property="welcomeMsg" column="welcome_msg" />
         <result property="sendType" column="send_type" />
-        <result property="groupCodeId" column="group_code_id" />
+        <result property="codeUrl" column="code_url" />
+        <result property="codeUuid" column="code_uuid" />
+        <result property="codeId" column="group_code_id" />
         <result property="totalMember" column="total_member" />
         <result property="sendScope" column="send_scope" />
         <result property="sendGender" column="send_gender" />
         <result property="cusBeginTime" column="cus_begin_time" />
         <result property="cusEndTime" column="cus_end_time" />
+        <result property="msgid" column="msgid" />
         <result property="createBy" column="create_by" />
         <result property="createTime" column="create_time" />
         <result property="updateBy" column="update_by" />
@@ -27,28 +30,31 @@
             wptg.task_name,
             wptg.welcome_msg,
             wptg.send_type,
-            wptg.group_code_id,
             wptg.send_scope,
             wptg.send_gender,
             wptg.cus_begin_time,
             wptg.cus_end_time,
+            wptg.msgid,
             wptg.create_by,
             wptg.create_time,
             wptg.update_by,
             wptg.update_time,
+            wgc.code_url,
+            wgc.uuid as code_uuid,
+            wgc.id as group_code_id,
             IFNULL((SELECT SUM( wgca.scan_code_times ) AS scan_times FROM we_group_code_actual wgca GROUP BY group_code_id HAVING group_code_id = wgc.id), 0) as total_member
         FROM
             we_pres_tag_group wptg
-            left join we_group_code wgc on wgc.id = wptg.group_code_id
+            LEFT JOIN we_group_code wgc ON wgc.id = wptg.group_code_id
     </sql>
-    
+
     <select id="selectTaskById" parameterType="Long" resultMap="WePresTagGroupTaskResult">
-        <include refid="selectTaskVo"></include>
+        <include refid="selectTaskVo"/>
         where wptg.task_id = #{taskId}
     </select>
-    
+
     <select id="selectTaskList" resultMap="WePresTagGroupTaskResult">
-        <include refid="selectTaskVo"></include>
+        <include refid="selectTaskVo"/>
         <where>
             1 = 1
             <if test="taskName != null and taskName!=''">
@@ -73,5 +79,62 @@
     <select id="checkTaskNameUnique" parameterType="String" resultType="int">
         select count(1) from we_pres_tag_group where task_name = #{taskName}
     </select>
+
+    <select id="getTaskListByEmplId" resultMap="WePresTagGroupTaskResult">
+        <include refid="selectTaskVo" />
+        LEFT JOIN we_pres_tag_group_scope wptgs ON wptgs.task_id = wptg.task_id
+        WHERE wptgs.we_user_id = #{emplId}
+        AND wptgs.is_done = #{isDone}
+        AND wptg.send_type = 1;
+    </select>
+
+    <insert id="insertTask" parameterType="WePresTagGroupTask">
+        INSERT INTO we_pres_tag_group
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="taskId != null">task_id,</if>
+            <if test="taskName != null">task_name,</if>
+            <if test="sendType != null">send_type,</if>
+            <if test="groupCodeId != null">group_code_id,</if>
+            <if test="welcomeMsg != null">welcome_msg,</if>
+            <if test="sendScope != null">send_scope,</if>
+            <if test="sendGender != null">send_gender,</if>
+            <if test="cusBeginTime != null and cusBeginTime !=''">cus_begin_time,</if>
+            <if test="cusEndTime != null and cusEndTime !=''">cus_end_time,</if>
+            <if test="msgid != null">msgid,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="createBy != null">create_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="taskId != null">#{taskId},</if>
+            <if test="taskName != null">#{taskName},</if>
+            <if test="sendType != null">#{sendType},</if>
+            <if test="groupCodeId != null">#{groupCodeId},</if>
+            <if test="welcomeMsg != null">#{welcomeMsg},</if>
+            <if test="sendScope != null">#{sendScope},</if>
+            <if test="sendGender != null">#{sendGender},</if>
+            <if test="cusBeginTime != null and cusBeginTime !=''">#{cusBeginTime},</if>
+            <if test="cusEndTime != null and cusEndTime !=''">#{cusEndTime},</if>
+            <if test="msgid != null">#{msgid},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTask" parameterType="WePresTagGroupTask">
+        UPDATE we_pres_tag_group
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="taskName != null">task_name = #{taskName},</if>
+            <if test="sendType != null">send_type = #{sendType},</if>
+            <if test="groupCodeId != null">group_code_id = #{groupCodeId},</if>
+            <if test="welcomeMsg != null">welcome_msg = #{welcomeMsg},</if>
+            <if test="sendScope != null">send_scope = #{sendScope},</if>
+            <if test="sendGender != null">send_gender = #{sendGender},</if>
+            <if test="cusBeginTime != null and cusBeginTime !=''">cus_begin_time = #{cusBeginTime},</if>
+            <if test="cusEndTime != null and cusEndTime !=''">cus_end_time = #{cusEndTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        WHERE task_id = #{taskId}
+    </update>
 
 </mapper>

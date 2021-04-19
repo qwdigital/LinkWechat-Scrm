@@ -221,6 +221,10 @@ wecome:
     appIdOrCorpId: ww24262ce93851488f
     token: jtQ1aGHgSmH2UHNBIndUtUe6B6EwfR
     encodingAesKey: Vga4HWv7nFbRDYK8iAaQbxmkuecpo2BAfmXAyWwcXMO
+  # JS SDK 身份校验url
+  authorizeUrl: https://open.weixin.qq.com/connect/oauth2/authorize
+  # JS SDK身份校验成功后的redirect url
+  authorizeRedirectUrl: http://www.linkwechat.cn/mobile/#/task
 #腾讯云对象存储
 cos:
   secretId: AKIDQRCizIeUGl13vakkDQMH0VkjhPr1rBBv

@@ -3,6 +3,7 @@ package com.linkwechat.web.controller.wecom;
 import cn.hutool.core.collection.CollectionUtil;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.constant.HttpStatus;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -41,7 +43,7 @@ import java.util.zip.ZipOutputStream;
 @RequestMapping("/wecom/groupCode")
 public class WeGroupCodeController extends BaseController {
     @Autowired
-    private IWeGroupCodeService weGroupCodeService;
+    private IWeGroupCodeService groupCodeService;
 
     /**
      * 查询客户群活码列表
@@ -50,7 +52,7 @@ public class WeGroupCodeController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo list(WeGroupCode weGroupCode) {
         startPage();
-        List<WeGroupCode> list = weGroupCodeService.selectWeGroupCodeList(weGroupCode);
+        List<WeGroupCode> list = groupCodeService.selectWeGroupCodeList(weGroupCode);
         return getDataTable(list);
     }
 
@@ -64,7 +66,7 @@ public class WeGroupCodeController extends BaseController {
         List<String> idList = Arrays.stream(Optional.ofNullable(ids).orElse("").split(","))
                 .filter(StringUtils::isNotEmpty).collect(Collectors.toList());
         try {
-            List<WeGroupCode> weGroupCodeList = weGroupCodeService.selectWeGroupCodeListByIds(idList);
+            List<WeGroupCode> weGroupCodeList = groupCodeService.selectWeGroupCodeListByIds(idList);
             ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
             if (CollectionUtil.isNotEmpty(weGroupCodeList)) {
                 for (WeGroupCode weGroupCode : weGroupCodeList) {
@@ -96,7 +98,7 @@ public class WeGroupCodeController extends BaseController {
     @Log(title = "群活码下载", businessType = BusinessType.OTHER)
     @GetMapping("/download")
     public void download(String id, HttpServletRequest request, HttpServletResponse response) {
-        WeGroupCode weGroupCode = weGroupCodeService.selectWeGroupCodeById(Long.valueOf(id));
+        WeGroupCode weGroupCode = groupCodeService.selectWeGroupCodeById(Long.valueOf(id));
         try {
             FileUtils.downloadFile(weGroupCode.getCodeUrl(), response.getOutputStream());
         } catch (IOException e) {
@@ -104,30 +106,17 @@ public class WeGroupCodeController extends BaseController {
         }
     }
 
-//    /**
-//     * 导出客户群活码列表
-//     */
-//    @PreAuthorize("@ss.hasPermi('wecom:code:export')")
-//    @Log(title = "客户群活码", businessType = BusinessType.EXPORT)
-//    @GetMapping("/export")
-//    public AjaxResult export(WeGroupCode weGroupCode)
-//    {
-//        List<WeGroupCode> list = weGroupCodeService.selectWeGroupCodeList(weGroupCode);
-//        ExcelUtil<WeGroupCode> util = new ExcelUtil<WeGroupCode>(WeGroupCode.class);
-//        return util.exportExcel(list, "code");
-//    }
-
     /**
      * 获取客户群活码详细信息
      */
     //   @PreAuthorize("@ss.hasPermi('drainageCode:group:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
-        WeGroupCode weGroupCode = weGroupCodeService.selectWeGroupCodeById(id);
+        WeGroupCode weGroupCode = groupCodeService.selectWeGroupCodeById(id);
         if (StringUtils.isNull(weGroupCode)) {
             return AjaxResult.error(HttpStatus.NOT_FOUND, "数据不存在");
         }
-        List<WeGroupCodeActual> weGroupCodeActualList = weGroupCodeService.selectActualListByGroupCodeId(weGroupCode.getId());
+        List<WeGroupCodeActual> weGroupCodeActualList = groupCodeService.selectActualListByGroupCodeId(weGroupCode.getId());
         weGroupCode.setActualList(weGroupCodeActualList);
         return AjaxResult.success(weGroupCode);
     }
@@ -140,12 +129,12 @@ public class WeGroupCodeController extends BaseController {
     @PostMapping
     public AjaxResult add(@Validated @RequestBody WeGroupCode weGroupCode) {
         // 唯一性检查
-        if (!weGroupCodeService.checkActivityNameUnique(weGroupCode)) {
+        if (!groupCodeService.checkActivityNameUnique(weGroupCode)) {
             return AjaxResult.error("添加群活码失败，活码名称 " + weGroupCode.getActivityName() + " 已存在");
         }
         AjaxResult ajax = AjaxResult.success();
         weGroupCode.setCreateBy(SecurityUtils.getUsername());
-        weGroupCodeService.insertWeGroupCode(weGroupCode);
+        groupCodeService.insertWeGroupCode(weGroupCode);
         ajax.put("id", weGroupCode.getId());
         return ajax;
     }
@@ -157,18 +146,18 @@ public class WeGroupCodeController extends BaseController {
     @Log(title = "客户群活码", businessType = BusinessType.UPDATE)
     @PutMapping(value = "/{id}")
     public AjaxResult edit(@PathVariable("id") Long id, @RequestBody WeGroupCode weGroupCode) {
-        WeGroupCode originalCode = weGroupCodeService.selectWeGroupCodeById(id);
+        WeGroupCode originalCode = groupCodeService.selectWeGroupCodeById(id);
         if (StringUtils.isNull(originalCode)) {
             return AjaxResult.error(HttpStatus.NOT_FOUND, "数据不存在");
         }
         // 唯一性检查
         if (!originalCode.getActivityName().equals(weGroupCode.getActivityName()) &&
-                !weGroupCodeService.checkActivityNameUnique(weGroupCode)) {
+                !groupCodeService.checkActivityNameUnique(weGroupCode)) {
             return AjaxResult.error("修改群活码失败，活码名称 " + weGroupCode.getActivityName() + " 已存在");
         }
         weGroupCode.setId(id);
         weGroupCode.setUpdateBy(SecurityUtils.getUsername());
-        return toAjax(weGroupCodeService.updateWeGroupCode(weGroupCode));
+        return toAjax(groupCodeService.updateWeGroupCode(weGroupCode));
     }
 
     /**
@@ -178,19 +167,42 @@ public class WeGroupCodeController extends BaseController {
     @Log(title = "客户群活码", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult batchRemove(@PathVariable Long[] ids) {
-        return toAjax(weGroupCodeService.deleteWeGroupCodeByIds(ids));
+        return toAjax(groupCodeService.deleteWeGroupCodeByIds(ids));
     }
 
-//    /**
-//     * 删除客户群活码
-//     */
-//    @PreAuthorize("@ss.hasPermi('wecom:code:remove')")
-//    @Log(title = "客户群活码", businessType = BusinessType.DELETE)
-//	@DeleteMapping("/{ids}")
-//    public AjaxResult remove(@PathVariable Long[] ids)
-//    {
-//        return toAjax(weGroupCodeService.deleteWeGroupCodeByIds(ids));
-//    }
+    /**
+     * 从群活码获取第一个可用的实际码
+     */
+    @GetMapping("/getActualCode/{groupCodeId}")
+    public AjaxResult getActual(@PathVariable("groupCodeId") String groupCodeUuid) {
+        WeGroupCode groupCode = groupCodeService.getWeGroupByUuid(groupCodeUuid);
+        List<WeGroupCodeActual> actualCodeList = groupCodeService.selectActualListByGroupCodeId(groupCode.getId());
+        WeGroupCodeActual groupCodeActual = null;
+        for (WeGroupCodeActual item : actualCodeList) {
+            // 获取第一个可用的实际码
+            if (item.getStatus().intValue() == WeConstans.WE_GROUP_CODE_ENABLE) {
+                groupCodeActual = item;
+                break;
+            }
+        }
+        if (StringUtils.isNotNull(groupCodeActual)) {
+            AjaxResult ajax = AjaxResult.success();
+
+            HashMap<String, String> data = new HashMap<>();
+            data.put("activityName", groupCode.getActivityName());
+            data.put("tipMsg", groupCode.getTipMsg());
+            data.put("guide", groupCode.getGuide());
+            data.put("actualQRCode", groupCodeActual.getActualGroupQrCode());
+            data.put("isOpenTip", groupCode.getJoinGroupIsTip().toString());
+            data.put("serviceQrCode", groupCode.getCustomerServerQrCode());
+            data.put("groupName", groupCodeActual.getChatGroupName());
+            ajax.put("data", data);
+            return ajax;
+        } else {
+            // 找不到可用的实际群活码也不要抛出错误，否则前端H5页面不好处理。
+            return AjaxResult.success("没有可用的实际群活码!");
+        }
+    }
 
 
 }

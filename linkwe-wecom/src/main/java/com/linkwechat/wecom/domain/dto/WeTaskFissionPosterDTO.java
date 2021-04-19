@@ -13,7 +13,7 @@ import lombok.Data;
 @Data
 public class WeTaskFissionPosterDTO {
     @ApiModelProperty("客户id")
-    private String eid;
+    private String unionId;
 
     @ApiModelProperty("任务id")
     private Long taskFissionId;

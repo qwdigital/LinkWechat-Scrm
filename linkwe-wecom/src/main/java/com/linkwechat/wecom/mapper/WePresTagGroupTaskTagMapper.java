@@ -25,8 +25,17 @@ public interface WePresTagGroupTaskTagMapper extends BaseMapper<WePresTagGroupTa
 
     /**
      * 批量绑定建群任务与标签
+     *
      * @param taskTagList 任务-标签关联对象
      * @return 结果
      */
     int batchBindsTaskTags(List<WePresTagGroupTaskTag> taskTagList);
+
+    /**
+     * 通过任务id获取所有符合该任务标签的客户的external_id
+     *
+     * @param taskId 热任务id
+     * @return 结果
+     */
+    List<String> getExternalUserIdListByTaskId(Long taskId);
 }

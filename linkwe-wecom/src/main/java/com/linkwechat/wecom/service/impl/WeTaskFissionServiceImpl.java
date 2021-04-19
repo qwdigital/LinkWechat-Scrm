@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -153,6 +154,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         int updateResult = weTaskFissionMapper.updateWeTaskFission(weTaskFission);
         if (updateResult > 0) {
             if (CollectionUtils.isNotEmpty(weTaskFission.getTaskFissionStaffs())) {
+                log.info("发起成员信息：【{}】",JSONObject.toJSONString(weTaskFission.getTaskFissionStaffs()));
                 List<WeTaskFissionStaff> staffList = weTaskFissionStaffService.selectWeTaskFissionStaffByTaskId(weTaskFission.getId());
                 if (CollectionUtils.isNotEmpty(staffList)) {
                     weTaskFissionStaffService.deleteWeTaskFissionStaffByIds(staffList.stream().map(WeTaskFissionStaff::getId).toArray(Long[]::new));
@@ -199,11 +201,9 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         //H5生成海报页面路径
         StringBuilder pageUrlBuilder = new StringBuilder(pageUrl);
         pageUrlBuilder.append("?")
-                .append("agentId=").append("1000010")
-                .append("&")
                 .append("fissionId=").append(id)
                 .append("&")
-                .append("userId=").append(fissStaffId)
+                .append("fissionTargetId=").append(fissStaffId)
                 .append("&")
                 .append("posterId=").append(weTaskFission.getPostersId());
 
@@ -214,6 +214,9 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         linkMessageDto.setUrl(pageUrlBuilder.toString());
 
         CustomerMessagePushDto customerMessagePushDto = new CustomerMessagePushDto();
+        if (weTaskFission.getStartTime() != null){
+            customerMessagePushDto.setSettingTime(DateUtil.formatDateTime(weTaskFission.getStartTime()));
+        }
         customerMessagePushDto.setLinkMessage(linkMessageDto);
         customerMessagePushDto.setPushType("0");
         customerMessagePushDto.setPushRange("1");
@@ -247,10 +250,10 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     @Transactional
     public String fissionPosterGenerate(WeTaskFissionPosterDTO weTaskFissionPosterDTO) {
         WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>()
-                .eq(WeCustomer::getExternalUserid, weTaskFissionPosterDTO.getEid()));
+                .eq(WeCustomer::getUnionid, weTaskFissionPosterDTO.getUnionId()));
         if (weCustomer != null) {
             //任务表添加当前客户任务
-            WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), weCustomer.getExternalUserid(), weCustomer.getName());
+            WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), weCustomer.getUnionid(), weCustomer.getName());
             String posterUrl = record.getPoster();
             if (StringUtils.isBlank(posterUrl)) {
                 String qrcode = getPosterQRCode(weTaskFissionPosterDTO.getFissionTargetId(), record, weCustomer);
@@ -292,27 +295,27 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     }
 
     @Override
-    public List<WeCustomer> getCustomerListById(String eid, String fissionId) {
+    public List<WeCustomer> getCustomerListById(String unionId, String fissionId) {
         WeTaskFissionRecord weTaskFissionRecord;
-        if (StringUtils.isEmpty(eid)) {
+        if (StringUtils.isEmpty(unionId)) {
             List<WeTaskFissionRecord> weTaskFissionRecords = weTaskFissionRecordService
                     .list(new LambdaQueryWrapper<WeTaskFissionRecord>().eq(WeTaskFissionRecord::getTaskFissionId, fissionId));
             return Optional.ofNullable(weTaskFissionRecords).orElseGet(ArrayList::new).stream()
                     .map(record -> weCustomerService.selectWeCustomerById(record.getCustomerId()))
                     .filter(Objects::nonNull).collect(Collectors.toList());
         } else {
-            WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getExternalUserid, eid));
-            String externalUseriId = Optional.ofNullable(weCustomer).map(WeCustomer::getExternalUserid)
-                    .orElseThrow(() -> new WeComException("用户信息不存在"));
             weTaskFissionRecord = weTaskFissionRecordService
-                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), externalUseriId);
-            Optional.ofNullable(weTaskFissionRecord).map(WeTaskFissionRecord::getId)
-                    .orElseThrow(() -> new WeComException("任务记录信息不存在"));
+                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), unionId);
+            Optional.ofNullable(weTaskFissionRecord).orElseThrow(() -> new WeComException("任务记录信息不存在"));
             List<WeFlowerCustomerRel> list = weFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
                     .eq(WeFlowerCustomerRel::getState, WeConstans.FISSION_PREFIX + weTaskFissionRecord.getId()));
             List<String> eidList = Optional.ofNullable(list).orElseGet(ArrayList::new).stream()
                     .map(WeFlowerCustomerRel::getExternalUserid).collect(Collectors.toList());
-            return weCustomerService.listByIds(eidList);
+            if (CollectionUtil.isNotEmpty(eidList)){
+                return weCustomerService.listByIds(eidList);
+            }else {
+                return null;
+            }
         }
     }
 
@@ -351,16 +354,25 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     }
 
     @Override
-    public WeTaskFissionProgressVO getCustomerTaskProgress(WeTaskFission taskFission, String eid) {
+    public WeTaskFissionProgressVO getCustomerTaskProgress(WeTaskFission taskFission, String unionId) {
         long complete = 0L;
         long total = taskFission.getFissNum();
-        List<WeCustomer> list = getCustomerListById(eid, String.valueOf(taskFission.getId()));
+        List<WeCustomer> list = getCustomerListById(unionId, String.valueOf(taskFission.getId()));
         if (CollectionUtils.isNotEmpty(list)) {
             complete = list.size();
         } else {
             list = new ArrayList<>();
         }
         return WeTaskFissionProgressVO.builder().total(total).completed(complete).customers(list).build();
+    }
+
+    /**
+     * 更新过期任务
+     * @return
+     */
+    @Override
+    public void updateExpiredWeTaskFission() {
+         weTaskFissionMapper.updateExpiredWeTaskFission();
     }
 
     /*************************************** private functions **************************************/
@@ -430,7 +442,8 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         WeTaskFissionRecord record = WeTaskFissionRecord.builder()
                 .taskFissionId(taskFissionId)
                 .customerId(customerId)
-                .customerName(customerName).build();
+                .customerName(customerName)
+                .createTime(new Date()).build();
         List<WeTaskFissionRecord> searchExists = weTaskFissionRecordService.selectWeTaskFissionRecordList(record);
         WeTaskFissionRecord recordInfo;
         if (CollectionUtils.isNotEmpty(searchExists)) {

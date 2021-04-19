@@ -14,6 +14,17 @@ import java.util.Map;
 public class WeConstans {
 
     /**
+     * 微信授权token
+     */
+    public static final String WX_AUTH_ACCESS_TOKEN = "wx_auth_access_token";
+    public static final String WX_AUTH_REFRESH_ACCESS_TOKEN = "wx_auth_refresh_access_token";
+
+    /**
+     * 微信通用token
+     */
+    public static final String WX_ACCESS_TOKEN = "wx_access_token";
+
+    /**
      * 企业微信相关token
      */
     public static final String WE_COMMON_ACCESS_TOKEN = "we_common_access_token";

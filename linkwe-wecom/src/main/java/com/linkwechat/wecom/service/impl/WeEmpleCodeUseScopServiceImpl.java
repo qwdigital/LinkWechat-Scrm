@@ -115,7 +115,7 @@ public class WeEmpleCodeUseScopServiceImpl extends ServiceImpl<WeEmpleCodeUseSco
     }
 
     /**
-     * 批量物理删除
+     * 批量逻辑删除
      * @param ids
      * @return
      */

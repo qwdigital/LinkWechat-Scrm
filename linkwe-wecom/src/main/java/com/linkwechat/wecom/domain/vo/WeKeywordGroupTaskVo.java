@@ -3,7 +3,6 @@ package com.linkwechat.wecom.domain.vo;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.linkwechat.wecom.domain.WeGroupCode;
 import com.linkwechat.wecom.domain.WeKeywordGroupTaskKeyword;
 import lombok.Data;
 
@@ -37,7 +36,7 @@ public class WeKeywordGroupTaskVo {
      * 群活码信息
      */
     @TableField(exist = false)
-    private WeGroupCode groupCodeInfo;
+    private WeGroupCodeVo groupCodeInfo;
 
     /**
      * 关键词
@@ -46,7 +45,7 @@ public class WeKeywordGroupTaskVo {
     private List<WeKeywordGroupTaskKeyword> keywordList;
 
     /**
-     * 实际群聊
+     * 实际群聊(仅群聊名称)
      */
     @TableField(exist = false)
     private List<String> groupNameList;

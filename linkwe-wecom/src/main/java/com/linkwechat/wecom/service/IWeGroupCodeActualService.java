@@ -75,4 +75,10 @@ public interface IWeGroupCodeActualService extends IService<WeGroupCodeActual>
      * @return 结果
      */
     public boolean checkChatIdUnique(WeGroupCodeActual weGroupCodeActual);
+
+    /**
+     * 通过群id递增其实际群活码扫码次数
+     * @param chatId
+     */
+    void updateScanTimesByChatId(String chatId);
 }

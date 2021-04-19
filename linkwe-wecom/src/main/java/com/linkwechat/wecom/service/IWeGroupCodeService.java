@@ -20,14 +20,15 @@ public interface IWeGroupCodeService extends IService<WeGroupCode> {
      * @param id 客户群活码ID
      * @return 客户群活码
      */
-    public WeGroupCode selectWeGroupCodeById(Long id);
+    WeGroupCode selectWeGroupCodeById(Long id);
 
     /**
      * 根据群活码id查询实际码列表
+     *
      * @param groupCodeId 群活码id
      * @return 结果
      */
-    public List<WeGroupCodeActual> selectActualListByGroupCodeId(Long groupCodeId);
+    List<WeGroupCodeActual> selectActualListByGroupCodeId(Long groupCodeId);
 
     /**
      * 查询客户群活码列表
@@ -35,7 +36,7 @@ public interface IWeGroupCodeService extends IService<WeGroupCode> {
      * @param weGroupCode 客户群活码
      * @return 客户群活码集合
      */
-    public List<WeGroupCode> selectWeGroupCodeList(WeGroupCode weGroupCode);
+    List<WeGroupCode> selectWeGroupCodeList(WeGroupCode weGroupCode);
 
     /**
      * 根据群活码id查询群活码列表
@@ -43,7 +44,7 @@ public interface IWeGroupCodeService extends IService<WeGroupCode> {
      * @param ids id列表
      * @return 结果
      */
-    public List<WeGroupCode> selectWeGroupCodeListByIds(List<String> ids);
+    List<WeGroupCode> selectWeGroupCodeListByIds(List<String> ids);
 
     /**
      * 新增客户群活码
@@ -51,7 +52,7 @@ public interface IWeGroupCodeService extends IService<WeGroupCode> {
      * @param weGroupCode 客户群活码
      * @return 结果
      */
-    public void insertWeGroupCode(WeGroupCode weGroupCode);
+    void insertWeGroupCode(WeGroupCode weGroupCode);
 
     /**
      * 修改客户群活码
@@ -59,7 +60,7 @@ public interface IWeGroupCodeService extends IService<WeGroupCode> {
      * @param weGroupCode 客户群活码
      * @return 结果
      */
-    public int updateWeGroupCode(WeGroupCode weGroupCode);
+    int updateWeGroupCode(WeGroupCode weGroupCode);
 
     /**
      * 批量删除客户群活码
@@ -67,7 +68,7 @@ public interface IWeGroupCodeService extends IService<WeGroupCode> {
      * @param ids 需要删除的客户群活码ID
      * @return 结果
      */
-    public int deleteWeGroupCodeByIds(Long[] ids);
+    int deleteWeGroupCodeByIds(Long[] ids);
 
     /**
      * 删除客户群活码信息
@@ -75,12 +76,22 @@ public interface IWeGroupCodeService extends IService<WeGroupCode> {
      * @param id 客户群活码ID
      * @return 结果
      */
-    public int deleteWeGroupCodeById(Long id);
+    int deleteWeGroupCodeById(Long id);
 
     /**
      * 检测活码名称是否唯一
+     *
      * @param weGroupCode 活码对象
      * @return 结果
      */
-    public boolean checkActivityNameUnique(WeGroupCode weGroupCode);
+    boolean checkActivityNameUnique(WeGroupCode weGroupCode);
+
+    /**
+     * 根据 uuid获取群活码
+     *
+     * @param uuid uuid
+     * @return 结果
+     */
+    WeGroupCode getWeGroupByUuid(String uuid);
+
 }

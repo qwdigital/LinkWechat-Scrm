@@ -2,9 +2,11 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisCache;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
@@ -16,6 +18,8 @@ import com.linkwechat.wecom.domain.WeMaterial;
 import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
 import com.linkwechat.wecom.domain.dto.WeExternalContactDto;
 import com.linkwechat.wecom.mapper.WeEmpleCodeMapper;
+import com.linkwechat.wecom.mapper.WeEmpleCodeTagMapper;
+import com.linkwechat.wecom.mapper.WeEmpleCodeUseScopMapper;
 import com.linkwechat.wecom.service.IWeEmpleCodeService;
 import com.linkwechat.wecom.service.IWeEmpleCodeTagService;
 import com.linkwechat.wecom.service.IWeEmpleCodeUseScopService;
@@ -55,6 +59,12 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
 
     @Autowired
     private RedisCache redisCache;
+
+    @Autowired
+    private WeEmpleCodeUseScopMapper scopMapper;
+
+    @Autowired
+    private WeEmpleCodeTagMapper codeTagMapper;
 
     /**
      * 查询员工活码
@@ -137,6 +147,8 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
     public void insertWeEmpleCode(WeEmpleCode weEmpleCode) {
         weEmpleCode.setCreateTime(new Date());
         weEmpleCode.setCreateBy(SecurityUtils.getUsername());
+        // 使用员工活码的id作为state
+        weEmpleCode.setState(weEmpleCode.getId().toString());
         addWeEmplCode(weEmpleCode);
     }
 
@@ -210,8 +222,18 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
     }
 
     @Override
-    public WeEmpleCodeDto selectWelcomeMsgByActivityScene(String activityScene, String userId) {
-        return this.baseMapper.selectWelcomeMsgByActivityScene(activityScene, userId);
+    public WeEmpleCodeDto selectWelcomeMsgByScenario(String scenario, String userId) {
+        return this.baseMapper.selectWelcomeMsgByScenario(scenario, userId);
+    }
+
+    /**
+     * 通过state定位员工活码
+     * @param state state
+     * @return 员工活码
+     */
+    @Override
+    public WeEmpleCodeDto selectWelcomeMsgByState(String state) {
+        return this.baseMapper.selectWelcomeMsgByState(state);
     }
 
     /**
@@ -226,10 +248,10 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         weEmpleCode.setCreateTime(new Date());
         weEmpleCode.setCreateBy(SecurityUtils.getUsername());
         weEmpleCode.setCodeType(WeConstans.SINGLE_EMPLE_CODE_TYPE);
-        weEmpleCode.setIsJoinConfirmFriends(Optional.ofNullable(weEmpleCode.getIsJoinConfirmFriends())
+        weEmpleCode.setSkipVerify(Optional.ofNullable(weEmpleCode.getSkipVerify())
                 .orElse(WeConstans.IS_JOIN_CONFIR_MFRIENDS));
 
-        weEmpleCode.setActivityScene(Optional.ofNullable(weEmpleCode.getActivityScene())
+        weEmpleCode.setScenario(Optional.ofNullable(weEmpleCode.getScenario())
                 .orElse(WeConstans.ONE_PERSON_CODE_GENERATED_BATCH));
 
         Optional.ofNullable(weEmpleCode).map(WeEmpleCode::getWeEmpleCodeUseScops)
@@ -239,6 +261,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
                 return;
             }
             weEmpleCode.setId(SnowFlakeUtil.nextId());
+            weEmpleCode.setState(weEmpleCode.getId().toString());
             List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = new ArrayList<>();
             weEmpleCodeUseScopList.add(useScops);
             weEmpleCode.setWeEmpleCodeUseScops(weEmpleCodeUseScopList);
@@ -347,8 +370,8 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         weContactWay.setConfig_id(weEmpleCode.getConfigId());
         weContactWay.setType(weEmpleCode.getCodeType());
         weContactWay.setScene(WeConstans.QR_CODE_EMPLE_CODE_SCENE);
-        weContactWay.setSkip_verify(weEmpleCode.getIsJoinConfirmFriends());
-        weContactWay.setState(weEmpleCode.getActivityScene());
+        weContactWay.setSkip_verify(weEmpleCode.getSkipVerify());
+        weContactWay.setState(weEmpleCode.getState());
         if (CollectionUtil.isNotEmpty(weEmpleCodeUseScops)) {
             //员工列表
             String[] userIdArr = weEmpleCodeUseScops.stream().filter(itme ->
@@ -367,5 +390,15 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
 
         }
         return weContactWay;
+    }
+
+    /**
+     * 递增扫码次数
+     *
+     * @param state state
+     */
+    @Override
+    public void updateScanTimesByState(String state) {
+        this.baseMapper.updateScanTimesByState(state);
     }
 }

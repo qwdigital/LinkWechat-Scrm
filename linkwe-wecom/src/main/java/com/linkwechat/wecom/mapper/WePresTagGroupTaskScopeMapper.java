@@ -2,8 +2,9 @@ package com.linkwechat.wecom.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WePresTagGroupTaskScope;
-import com.linkwechat.wecom.domain.vo.WeEmplVo;
+import com.linkwechat.wecom.domain.vo.WeCommunityTaskEmplVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public interface WePresTagGroupTaskScopeMapper extends BaseMapper<WePresTagGroup
      * @param taskId 建群任务id
      * @return 结果
      */
-    List<WeEmplVo> getScopeListByTaskId(Long taskId);
+    List<WeCommunityTaskEmplVo> getScopeListByTaskId(Long taskId);
 
     /**
      * 批量绑定任务与使用人员
@@ -26,4 +27,13 @@ public interface WePresTagGroupTaskScopeMapper extends BaseMapper<WePresTagGroup
      * @return 结果
      */
     int batchBindsTaskScopes(List<WePresTagGroupTaskScope> taskScopeList);
+
+    /**
+     * 员工发送信息后，变更其任务状态为 "完成"
+     *
+     * @param taskId 任务id
+     * @param emplId 员工id
+     * @return 结果
+     */
+    int updateEmplTaskStatus(@Param("taskId") Long taskId, @Param("emplId") String emplId);
 }

@@ -22,6 +22,21 @@
             wcog.task_id = #{taskId}
 	</select>
 
+    <select id="getExternalUserIdListByTaskId" parameterType="Long" resultType="String">
+        SELECT DISTINCT
+            wc.external_userid
+        FROM
+            we_pres_tag_group_tag wptgt
+                LEFT JOIN
+            we_flower_customer_tag_rel wfctr ON wfctr.tag_id = wptgt.tag_id
+                LEFT JOIN
+            we_flower_customer_rel wfcr ON wfcr.id = wfctr.flower_customer_rel_id
+                LEFT JOIN
+            we_customer wc ON wc.external_userid = wfcr.external_userid
+        WHERE
+            wptgt.task_id = #{taskId}
+    </select>
+
     <insert id="batchBindsTaskTags">
         insert into we_pres_tag_group_tag(task_id, tag_id) values
         <foreach item="item" index="index" collection="list" separator=",">

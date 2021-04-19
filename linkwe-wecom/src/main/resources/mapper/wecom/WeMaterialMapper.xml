@@ -19,6 +19,22 @@
         <result property="audioTime" column="audio_time"/>
     </resultMap>
 
+    <resultMap id="materialVoMap" type="WeMaterialVo">
+        <id property="mediaType" column="media_type"/>
+        <id property="id" column="id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="materialUrl" column="material_url"/>
+        <result property="content" column="content"/>
+        <result property="materialName" column="material_name"/>
+        <result property="digest" column="digest"/>
+        <result property="coverUrl" column="cover_url"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="audioTime" column="audio_time"/>
+    </resultMap>
+
     <insert id="insertWeMaterial">
         INSERT INTO
         we_material
@@ -199,6 +215,17 @@
                 AND wc.media_type=#{mediaType}
             </if>
         </where>
+    </select>
+
+    <select id="findMaterialVoListByIds" resultMap="materialVoMap">
+        SELECT wc.media_type, wm.id, wm.material_url,wm.content,wm.material_name,wm.digest,wm.audio_time,wm.cover_url,wm.create_by,wm.create_time,wm.update_by,wm.update_time
+        from we_material wm
+        left join we_category wc on wc.id = wm.category_id
+        where
+            wm.id in
+            <foreach collection="array" open="(" close=")" item="item" separator=",">
+                #{item}
+            </foreach>
     </select>
 
     <sql id="material">
