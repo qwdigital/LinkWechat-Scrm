@@ -22,10 +22,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="providerSecret" column="provider_secret" />
         <result property="customerChurnNoticeSwitch" column="customer_churn_notice_switch" />
         <result property="wxQrLoginRedirectUri" column="wx_qr_login_redirect_uri"/>
+        <result property="cropAccount" column="corp_account"/>
     </resultMap>
 
     <sql id="selectWeCorpAccountVo">
-        select id,chat_secret,provider_secret,company_name, corp_id, corp_secret,agent_id, agent_secret, status, del_flag, create_by, create_time, update_by, update_time,contact_secret, customer_churn_notice_switch,wx_qr_login_redirect_uri from we_corp_account
+        select id,chat_secret,corp_account,provider_secret,company_name, corp_id, corp_secret,agent_id, agent_secret, status, del_flag, create_by, create_time, update_by, update_time,contact_secret, customer_churn_notice_switch,wx_qr_login_redirect_uri from we_corp_account
     </sql>
 
     <select id="selectWeCorpAccountList" parameterType="WeCorpAccount" resultMap="WeCorpAccountResult">
@@ -62,6 +63,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="customerChurnNoticeSwitch != null ">customer_churn_notice_switch,</if>
             <if test="providerSecret != null ">provider_secret,</if>
             <if test="wxQrLoginRedirectUri != null ">wx_qr_login_redirect_uri,</if>
+            <if test="cropAccount != null">corp_account,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="companyName != null">#{companyName},</if>
@@ -80,6 +82,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="customerChurnNoticeSwitch != null ">#{customerChurnNoticeSwitch},</if>
             <if test="providerSecret != null ">#{providerSecret},</if>
             <if test="wxQrLoginRedirectUri != null ">#{wxQrLoginRedirectUri},</if>
+            <if test="cropAccount != null">#{cropAccount},</if>
          </trim>
     </insert>
 
@@ -100,11 +103,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="agentId != null ">agent_id = #{agentId},</if>
             <if test="agentSecret != null ">agent_secret =#{agentSecret},</if>
             <if test="customerChurnNoticeSwitch != null ">customer_churn_notice_switch = #{customerChurnNoticeSwitch},</if>
-
             <if test="providerSecret != null ">provider_secret = #{providerSecret},</if>
             <if test="wxQrLoginRedirectUri != null ">wx_qr_login_redirect_uri = #{wxQrLoginRedirectUri},</if>
-
-
+            <if test="cropAccount != null">corp_account = #{cropAccount},</if>
         </trim>
         where id = #{id}
     </update>
@@ -125,8 +126,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
 
+    <select id="findWeCorpByAccount" resultMap="WeCorpAccountResult">
+        <include refid="selectWeCorpAccountVo"/>
+        WHERE
+        del_flag = 0
+        AND corp_account = #{corpAccount}
+    </select>
 
 
 
-    
+
 </mapper>

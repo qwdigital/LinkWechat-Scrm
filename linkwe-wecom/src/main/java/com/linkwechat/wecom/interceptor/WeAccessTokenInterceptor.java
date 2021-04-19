@@ -8,6 +8,7 @@ import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.utils.ForestDataType;
 import com.linkwechat.common.config.WeComeConfig;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
 import lombok.extern.slf4j.Slf4j;

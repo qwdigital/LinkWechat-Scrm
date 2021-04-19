@@ -77,7 +77,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectWeCustomerList" parameterType="WeCustomer" resultMap="WeCustomerResult">
         SELECT
-             DISTINCT wc.external_userid,
+            DISTINCT wc.external_userid,
             wc.`name`,
             wc.avatar,
             wc.type,

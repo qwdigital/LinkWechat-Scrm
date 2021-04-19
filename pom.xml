@@ -83,6 +83,16 @@
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
                 <version>${pagehelper.boot.version}</version>
+                <exclusions>
+<!--                    <exclusion>-->
+<!--                        <groupId>com.github.jsqlparser</groupId>-->
+<!--                        <artifactId>jsqlparser</artifactId>-->
+<!--                    </exclusion>-->
+                    <exclusion>
+                        <groupId>org.mybatis.spring.boot</groupId>
+                        <artifactId>mybatis-spring-boot-starter</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- 获取系统信息 -->
@@ -245,6 +255,12 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.github.jsqlparser</groupId>
+                        <artifactId>jsqlparser</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -270,6 +286,9 @@
                 <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
                 <version>${nacos.version}</version>
             </dependency>
+
+
+
 
             <dependency>
                 <groupId>javax.xml.bind</groupId>

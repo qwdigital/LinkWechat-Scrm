@@ -130,6 +130,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/wecom/community/h5/**").anonymous()
                 //微信授权接口
                 .antMatchers("/weixin/auth/**").anonymous()
+                // .antMatchers("/common/uploadFile2Cos").anonymous()
+                .antMatchers("/wecom/material/temporaryMaterialMediaId").anonymous()
+
+                .antMatchers("/wecom/portrait/**").anonymous()
+                .antMatchers("/wecom/findAddaddEmployes").anonymous()
+
+                .antMatchers("/corpLogin").anonymous()
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
                 .and()

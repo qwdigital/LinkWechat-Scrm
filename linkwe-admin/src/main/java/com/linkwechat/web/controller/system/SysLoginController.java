@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.system;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysMenu;
@@ -12,7 +13,7 @@ import com.linkwechat.framework.web.service.SysPermissionService;
 import com.linkwechat.framework.web.service.TokenService;
 import com.linkwechat.system.service.ISysMenuService;
 import com.linkwechat.wecom.client.WeAccessTokenClient;
-import com.linkwechat.wecom.domain.WeCorpAccount;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.wecom.domain.dto.WeLoginUserInfoDto;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,12 @@ public class SysLoginController
     private WeAccessTokenClient weAccessTokenClient;
 
 
+
+
+//    @Autowired
+//    private IWeGroupCodeService weGroupCodeService;
+
+
     /**
      * 登录方法
      * 
@@ -86,12 +93,14 @@ public class SysLoginController
         Set<String> roles = permissionService.getRolePermission(user);
         // 权限集合
         Set<String> permissions = permissionService.getMenuPermission(user);
+
         //校验用户是否拥有可用corpid
-        WeCorpAccount wxCorpAccount
-                = iWxCorpAccountService.findValidWeCorpAccount();
-        if(null != wxCorpAccount){
-            user.setValidCropId(true);
-        }
+//        WeCorpAccount wxCorpAccount
+//                = iWxCorpAccountService.findValidWeCorpAccount();
+//        if(null != wxCorpAccount){
+//            user.setValidCropId(true);
+//        }
+
         AjaxResult ajax = AjaxResult.success();
         ajax.put("user", user);
         ajax.put("roles", roles);
@@ -121,15 +130,15 @@ public class SysLoginController
     @GetMapping("/findWxQrLoginInfo")
     public AjaxResult findQrLoginParm(){
 
-        WeCorpAccount validWeCorpAccount
-                = iWxCorpAccountService.findValidWeCorpAccount();
-        if(null != validWeCorpAccount){
-            validWeCorpAccount.setContactSecret(null);
-            validWeCorpAccount.setCorpSecret(null);
-            validWeCorpAccount.setProviderSecret(null);
-        }
+//        WeCorpAccount validWeCorpAccount
+//                = iWxCorpAccountService.findValidWeCorpAccount();
+//        if(null != validWeCorpAccount){
+//            validWeCorpAccount.setContactSecret(null);
+//            validWeCorpAccount.setCorpSecret(null);
+//            validWeCorpAccount.setProviderSecret(null);
+//        }
 
-        return AjaxResult.success(validWeCorpAccount);
+        return AjaxResult.success();
     }
 
 
@@ -155,18 +164,26 @@ public class SysLoginController
 
 
     /**
-     * 租户登录
+     * 通过企业id和企业密钥登录
      * @param corpId
      * @param corpSecret
      * @return
      */
-    @GetMapping("/tenantLogin")
-    public AjaxResult tenantLogin(String corpId,String corpSecret){
-        AjaxResult ajax = AjaxResult.success();
+    @GetMapping("/corpLogin")
+    public AjaxResult corpLogin(String corpId,String corpSecret){
+        List<WeCorpAccount> weCorpAccounts = iWxCorpAccountService.selectWeCorpAccountList(WeCorpAccount.builder()
+                .corpId(corpId)
+                .corpSecret(corpSecret)
+                .delFlag(Constants.NORMAL_CODE)
+                .build());
+        if(CollectionUtil.isEmpty(weCorpAccounts)){
 
+            return AjaxResult.error("当前企业id与企业密码不匹配或不存在");
+        }
 
-
-        return ajax;
+          return AjaxResult.success(
+                  loginService.noPwdLogin(weCorpAccounts.get(0).getCropAccount())
+          );
     }
 
 }

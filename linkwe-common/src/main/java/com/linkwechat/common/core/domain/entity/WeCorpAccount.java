@@ -1,4 +1,4 @@
-package com.linkwechat.wecom.domain;
+package com.linkwechat.common.core.domain.entity;
 
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -14,7 +14,7 @@ import javax.validation.constraints.NotBlank;
 
 /**
  * 企业id相关配置对象 wx_corp_account
- * 
+ *
  * @author ruoyi
  * @date 2020-08-24
  */
@@ -76,4 +76,8 @@ public class WeCorpAccount extends BaseEntity
 
     @ApiModelProperty("客户流失通知开关 0:关闭 1:开启")
     private String customerChurnNoticeSwitch = new String("0");
+
+
+    @ApiModelProperty("企业管理员账号")
+    private String cropAccount;
 }

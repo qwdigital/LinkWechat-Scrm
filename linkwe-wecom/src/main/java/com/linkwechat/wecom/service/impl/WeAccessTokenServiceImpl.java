@@ -3,12 +3,15 @@ package com.linkwechat.wecom.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeAccessTokenClient;
 import com.linkwechat.wecom.domain.WeApp;
-import com.linkwechat.wecom.domain.WeCorpAccount;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.wecom.domain.dto.WeAccessTokenDtoDto;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
 import com.linkwechat.wecom.service.IWeAppService;
@@ -133,16 +136,25 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
 
     private String findAccessToken(String accessTokenKey){
 
-        String  weAccessToken =redisCache.getCacheObject(accessTokenKey);
+
+
+        WeCorpAccount wxCorpAccount
+                = SecurityUtils.getLoginUser().getUser().getWeCorpAccount();
+
+        if(null == wxCorpAccount){
+            //返回错误异常，让用户绑定企业id相关信息
+            throw new WeComException("无可用的corpid和secret");
+        }
+
+
+        String  weAccessToken =redisCache.getCacheObject(accessTokenKey+"::"+wxCorpAccount.getCorpId());
+
+
 
         //为空,请求微信服务器同时缓存到redis中
         if(StringUtils.isEmpty(weAccessToken)){
-            WeCorpAccount wxCorpAccount
-                    = iWxCorpAccountService.findValidWeCorpAccount();
-            if(null == wxCorpAccount){
-                //返回错误异常，让用户绑定企业id相关信息
-                throw new WeComException("无可用的corpid和secret");
-            }
+
+
             String token="";
             Long expires_in=null;
             if(WeConstans.WE_COMMON_ACCESS_TOKEN.equals(accessTokenKey) || WeConstans.WE_CONTACT_ACCESS_TOKEN.equals(accessTokenKey)){
@@ -166,7 +178,7 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
             }
 
             if(StringUtils.isNotEmpty(token)){
-                redisCache.setCacheObject(accessTokenKey,token,expires_in.intValue(), TimeUnit.SECONDS);
+                redisCache.setCacheObject(accessTokenKey+"::"+wxCorpAccount.getCorpId(),token,expires_in.intValue(), TimeUnit.SECONDS);
                 weAccessToken = token;
             }
 
@@ -180,10 +192,10 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
      * 清空redis中的相关token
      */
     @Override
-    public void removeToken() {
-        redisCache.deleteObject(WeConstans.WE_COMMON_ACCESS_TOKEN);
-        redisCache.deleteObject(WeConstans.WE_CONTACT_ACCESS_TOKEN);
-        redisCache.deleteObject(WeConstans.WE_PROVIDER_ACCESS_TOKEN);
+    public void removeToken(WeCorpAccount wxCorpAccount) {
+        redisCache.deleteObject(WeConstans.WE_COMMON_ACCESS_TOKEN+"::"+wxCorpAccount.getAgentId());
+        redisCache.deleteObject(WeConstans.WE_CONTACT_ACCESS_TOKEN+"::"+wxCorpAccount.getAgentId());
+        redisCache.deleteObject(WeConstans.WE_PROVIDER_ACCESS_TOKEN+"::"+wxCorpAccount.getAgentId());
     }
 
 

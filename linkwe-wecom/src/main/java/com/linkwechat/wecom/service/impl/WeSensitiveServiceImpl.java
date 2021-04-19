@@ -13,7 +13,7 @@ import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeMessagePushClient;
-import com.linkwechat.wecom.domain.WeCorpAccount;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.wecom.domain.WeSensitive;
 import com.linkwechat.wecom.domain.WeSensitiveAuditScope;
 import com.linkwechat.wecom.domain.WeUser;
