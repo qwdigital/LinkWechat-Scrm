@@ -58,10 +58,4 @@ public interface WeTaskFissionMapper {
      * @return 结果
      */
     public int deleteWeTaskFissionByIds(Long[] ids);
-
-    /**
-     * 更新过期任务
-     * @return
-     */
-    public void updateExpiredWeTaskFission();
 }

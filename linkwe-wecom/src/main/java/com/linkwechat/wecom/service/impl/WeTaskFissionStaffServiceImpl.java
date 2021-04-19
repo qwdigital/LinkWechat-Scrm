@@ -54,7 +54,7 @@ public class WeTaskFissionStaffServiceImpl implements IWeTaskFissionStaffService
 
     @Override
     public int insertWeTaskFissionStaffList(List<WeTaskFissionStaff> weTaskFissionStaffs) {
-        return weTaskFissionStaffMapper.insertWeTaskFissionStaffList(weTaskFissionStaffs);
+        return 0;
     }
 
     /**

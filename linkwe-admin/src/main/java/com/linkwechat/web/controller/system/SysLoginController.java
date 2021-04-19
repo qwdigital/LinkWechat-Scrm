@@ -12,7 +12,7 @@ import com.linkwechat.framework.web.service.SysPermissionService;
 import com.linkwechat.framework.web.service.TokenService;
 import com.linkwechat.system.service.ISysMenuService;
 import com.linkwechat.wecom.client.WeAccessTokenClient;
-import com.linkwechat.wecom.domain.WeCorpAccount;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.wecom.domain.dto.WeLoginUserInfoDto;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,11 +149,24 @@ public class SysLoginController
 
                 String token = loginService.noPwdLogin(loginInfo.getUser_info().getUserid());
                 ajax.put(Constants.TOKEN, token);
-
         }
+        return ajax;
+    }
+
+
+    /**
+     * 租户登录
+     * @param corpId
+     * @param corpSecret
+     * @return
+     */
+    @GetMapping("/tenantLogin")
+    public AjaxResult tenantLogin(String corpId,String corpSecret){
+        AjaxResult ajax = AjaxResult.success();
+
+
 
         return ajax;
-
     }
 
 }

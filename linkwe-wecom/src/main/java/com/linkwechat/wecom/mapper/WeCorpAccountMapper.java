@@ -1,7 +1,7 @@
 package com.linkwechat.wecom.mapper;
 
 import java.util.List;
-import com.linkwechat.wecom.domain.WeCorpAccount;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -59,4 +59,12 @@ public interface WeCorpAccountMapper
      * @return
      */
     public int startVailWeCorpAccount(@Param("corpId") String corpId);
+
+
+    /**
+     * 根据企业账号获取企业相关配置
+     * @param corpAccount
+     * @return
+     */
+    WeCorpAccount findWeCorpByAccount(@Param("corpAccount") String corpAccount);
 }

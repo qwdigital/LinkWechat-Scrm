@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.wecom;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
@@ -18,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -149,6 +151,27 @@ public class WeCustomerController extends BaseController
 
         return AjaxResult.success();
 
+    }
+
+
+
+    /**
+     * 查询企业微信客户列表(六感)
+     */
+    //  @PreAuthorize("@ss.hasPermi('customerManage:customer:list')")
+    @GetMapping("/listConcise")
+    public TableDataInfo listConcise(WeCustomer weCustomer)
+    {
+        startPage();
+
+        List<WeCustomer> list = weCustomerService.selectWeCustomerList(weCustomer);
+        if(CollectionUtil.isNotEmpty(list)){
+
+            list.stream().forEach(k->{
+                k.setWeFlowerCustomerRels(new ArrayList<>());
+            });
+        }
+        return getDataTable(list);
     }
 
 }

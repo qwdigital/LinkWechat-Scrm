@@ -3,8 +3,6 @@ package com.linkwechat.wecom.domain.dto;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
-
 /**
  * @author admin
  * @date 2020-11-18
@@ -13,8 +11,6 @@ import java.util.List;
 @Builder
 public class WeWelcomeMsg {
     private String welcome_code;
-
-    private List attachments;
 
     private Text text;
 

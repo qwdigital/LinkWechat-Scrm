@@ -5,14 +5,12 @@ import java.util.Optional;
 
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
-import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.linkwechat.wecom.mapper.WeCorpAccountMapper;
-import com.linkwechat.wecom.domain.WeCorpAccount;
-import org.springframework.transaction.annotation.Transactional;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 
 /**
  * 企业id相关配置Service业务层处理
@@ -134,6 +132,11 @@ public class WeCorpAccountServiceImpl implements IWeCorpAccountService {
         String noticeSwitch = Optional.ofNullable(validWeCorpAccount).map(WeCorpAccount::getCustomerChurnNoticeSwitch)
                 .orElse(WeConstans.DEL_FOLLOW_USER_SWITCH_CLOSE);
         return noticeSwitch;
+    }
+
+    @Override
+    public WeCorpAccount findWeCorpByAccount(String corpAccount) {
+        return weCorpAccountMapper.findWeCorpByAccount(corpAccount);
     }
 
 

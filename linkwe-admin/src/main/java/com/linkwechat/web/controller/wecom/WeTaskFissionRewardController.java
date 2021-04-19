@@ -106,9 +106,9 @@ public class WeTaskFissionRewardController extends BaseController {
      */
     @ApiOperation(value = "根据微信用户id和任务id获取任务裂变奖励详细信息",httpMethod = "GET")
     //    @PreAuthorize("@ss.hasPermi('wecom:getRewardByFissionId:query')")
-    @GetMapping(value = "/getRewardByFissionId/{fissionId}/{unionId}")
+    @GetMapping(value = "/getRewardByFissionId/{fissionId}/{eid}")
     public AjaxResult<WeTaskFissionRewardVo> getRewardByFissionId(@ApiParam("任务id") @PathVariable("fissionId") String fissionId
-            , @PathVariable("unionId") @ApiParam("客户id") String unionId) {
-        return AjaxResult.success(weTaskFissionRewardService.getRewardByFissionId(fissionId,unionId));
+            , @PathVariable("eid") @ApiParam("客户id") String eid) {
+        return AjaxResult.success(weTaskFissionRewardService.getRewardByFissionId(fissionId,eid));
     }
 }

@@ -153,7 +153,6 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         int updateResult = weTaskFissionMapper.updateWeTaskFission(weTaskFission);
         if (updateResult > 0) {
             if (CollectionUtils.isNotEmpty(weTaskFission.getTaskFissionStaffs())) {
-                log.info("发起成员信息：【{}】",JSONObject.toJSONString(weTaskFission.getTaskFissionStaffs()));
                 List<WeTaskFissionStaff> staffList = weTaskFissionStaffService.selectWeTaskFissionStaffByTaskId(weTaskFission.getId());
                 if (CollectionUtils.isNotEmpty(staffList)) {
                     weTaskFissionStaffService.deleteWeTaskFissionStaffByIds(staffList.stream().map(WeTaskFissionStaff::getId).toArray(Long[]::new));
@@ -200,6 +199,8 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         //H5生成海报页面路径
         StringBuilder pageUrlBuilder = new StringBuilder(pageUrl);
         pageUrlBuilder.append("?")
+                .append("agentId=").append("1000010")
+                .append("&")
                 .append("fissionId=").append(id)
                 .append("&")
                 .append("fissionTargetId=").append(fissStaffId)
@@ -213,9 +214,6 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         linkMessageDto.setUrl(pageUrlBuilder.toString());
 
         CustomerMessagePushDto customerMessagePushDto = new CustomerMessagePushDto();
-        if (weTaskFission.getStartTime() != null){
-            customerMessagePushDto.setSettingTime(DateUtils.dateTime(weTaskFission.getStartTime()));
-        }
         customerMessagePushDto.setLinkMessage(linkMessageDto);
         customerMessagePushDto.setPushType("0");
         customerMessagePushDto.setPushRange("1");
@@ -303,18 +301,18 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
                     .map(record -> weCustomerService.selectWeCustomerById(record.getCustomerId()))
                     .filter(Objects::nonNull).collect(Collectors.toList());
         } else {
+            WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getUnionid, unionId));
+            String uid = Optional.ofNullable(weCustomer).map(WeCustomer::getUnionid)
+                    .orElseThrow(() -> new WeComException("用户信息不存在"));
             weTaskFissionRecord = weTaskFissionRecordService
-                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), unionId);
-            Optional.ofNullable(weTaskFissionRecord).orElseThrow(() -> new WeComException("任务记录信息不存在"));
+                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), uid);
+            Optional.ofNullable(weTaskFissionRecord).map(WeTaskFissionRecord::getId)
+                    .orElseThrow(() -> new WeComException("任务记录信息不存在"));
             List<WeFlowerCustomerRel> list = weFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
                     .eq(WeFlowerCustomerRel::getState, WeConstans.FISSION_PREFIX + weTaskFissionRecord.getId()));
             List<String> eidList = Optional.ofNullable(list).orElseGet(ArrayList::new).stream()
                     .map(WeFlowerCustomerRel::getExternalUserid).collect(Collectors.toList());
-            if (CollectionUtil.isNotEmpty(eidList)){
-                return weCustomerService.listByIds(eidList);
-            }else {
-                return null;
-            }
+            return weCustomerService.listByIds(eidList);
         }
     }
 
@@ -363,15 +361,6 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
             list = new ArrayList<>();
         }
         return WeTaskFissionProgressVO.builder().total(total).completed(complete).customers(list).build();
-    }
-
-    /**
-     * 更新过期任务
-     * @return
-     */
-    @Override
-    public void updateExpiredWeTaskFission() {
-         weTaskFissionMapper.updateExpiredWeTaskFission();
     }
 
     /*************************************** private functions **************************************/
@@ -441,8 +430,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         WeTaskFissionRecord record = WeTaskFissionRecord.builder()
                 .taskFissionId(taskFissionId)
                 .customerId(customerId)
-                .customerName(customerName)
-                .createTime(new Date()).build();
+                .customerName(customerName).build();
         List<WeTaskFissionRecord> searchExists = weTaskFissionRecordService.selectWeTaskFissionRecordList(record);
         WeTaskFissionRecord recordInfo;
         if (CollectionUtils.isNotEmpty(searchExists)) {

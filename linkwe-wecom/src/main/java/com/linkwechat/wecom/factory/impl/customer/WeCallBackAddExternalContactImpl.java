@@ -48,15 +48,10 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
     private IWeTaskFissionRewardService weTaskFissionRewardService;
     @Autowired
     private IWeTaskFissionService weTaskFissionService;
-    private ThreadLocal<WeFlowerCustomerRel> weFlowerCustomerRelThreadLocal = new ThreadLocal<>();
 
     @Override
     public void eventHandle(WxCpXmlMessageVO message) {
         if (message.getExternalUserId() != null) {
-            WeFlowerCustomerRel weFlowerCustomerRel = weFlowerCustomerRelService.getOne(new LambdaQueryWrapper<WeFlowerCustomerRel>()
-                    .eq(WeFlowerCustomerRel::getExternalUserid, message.getExternalUserId())
-                    .eq(WeFlowerCustomerRel::getUserId,message.getUserId()));
-            weFlowerCustomerRelThreadLocal.set(weFlowerCustomerRel);
             weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId());
         }
         if (message.getState() != null && message.getWelcomeCode() != null) {
@@ -70,7 +65,6 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
 
     //裂变任务处理
     private void taskFissionRecordHandle(String state, String wecomCode, String userId, String externalUserId) {
-        log.info("裂变任务处理  >>>>>>>>>>start");
         //查询裂变客户任务记录
         String fissionRecordId = state.substring(WeConstans.FISSION_PREFIX.length());
         WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService.selectWeTaskFissionRecordById(Long.valueOf(fissionRecordId));
@@ -78,23 +72,20 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
             //查询裂变任务详情
             WeTaskFission weTaskFission = weTaskFissionService
                     .selectWeTaskFissionById(weTaskFissionRecord.getTaskFissionId());
-            Long fissNum = weTaskFissionRecord.getFissNum();
-            if (weFlowerCustomerRelThreadLocal.get() == null){
-                fissNum++;
-                weTaskFissionRecord.setFissNum(fissNum);
-            }
-            log.info("查询裂变任务详情  >>>>>>>>>>{}",JSONObject.toJSONString(weTaskFissionRecord));
+
+            Long fissNum = weTaskFissionRecord.getFissNum() + 1;
+            weTaskFissionRecord.setFissNum(fissNum);
+
             if (weTaskFission != null){
                 //发送欢迎语
-                WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(wecomCode);
-                weWelcomeMsgBuilder.text(WeWelcomeMsg.Text.builder()
-                        .content(weTaskFission.getWelcomeMsg()).build());
+                String welcomeMsg = weTaskFission.getWelcomeMsg();
+                WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = JSONObject.parseObject(welcomeMsg, WeWelcomeMsg.WeWelcomeMsgBuilder.class);
+                weWelcomeMsgBuilder.welcome_code(wecomCode);
                 weCustomerService.sendWelcomeMsg(weWelcomeMsgBuilder.build());
             }
 
             //裂变数量完成任务处理,消费兑换码
             if (fissNum >= weTaskFission.getFissNum()){
-                log.info("裂变数量完成任务处理,消费兑换码  >>>>>>>>>>{}",fissNum);
                 weTaskFissionRecord.setCompleteTime(new Date());
                 WeTaskFissionReward reward = new WeTaskFissionReward();
                 reward.setTaskFissionId(weTaskFissionRecord.getTaskFissionId());
@@ -105,9 +96,8 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                 fissionReward.setRewardUserId(weTaskFissionRecord.getCustomerId());
                 weTaskFissionRewardService.updateWeTaskFissionReward(fissionReward);
             }
-            log.info("裂变任务处理变更  >>>>>>>>>>{}",JSONObject.toJSONString(weTaskFissionRecord));
+
             weTaskFissionRecordService.updateWeTaskFissionRecord(weTaskFissionRecord);
-            log.info("裂变任务处理  >>>>>>>>>>end");
         }
     }
 
@@ -157,13 +147,8 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                         WeMediaDto weMediaDto = weMaterialService
                                 .uploadTemporaryMaterial(messageMap.getMaterialUrl(), MediaType.IMAGE.getMediaType(),messageMap.getMaterialName());
                         Optional.ofNullable(weMediaDto).ifPresent(media -> {
-                            List attachments = new ArrayList();
-                            JSONObject json = new JSONObject();
-                            json.put("msgtype",weMediaDto.getType());
-                            json.put(weMediaDto.getType(),WeWelcomeMsg.Image.builder().media_id(media.getMedia_id())
+                            weWelcomeMsgBuilder.image(WeWelcomeMsg.Image.builder().media_id(media.getMedia_id())
                                     .pic_url(media.getUrl()).build());
-                            attachments.add(json);
-                            weWelcomeMsgBuilder.attachments(attachments);
                         });
                     }
                     weCustomerService.sendWelcomeMsg(weWelcomeMsgBuilder.build());

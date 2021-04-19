@@ -106,29 +106,27 @@ public class WeTaskFissionRewardServiceImpl implements IWeTaskFissionRewardServi
     }
 
     @Override
-    public WeTaskFissionRewardVo getRewardByFissionId(String fissionId, String unionId) {
+    public WeTaskFissionRewardVo getRewardByFissionId(String fissionId, String eid) {
         WeTaskFissionRewardVo weTaskFissionRewardVo = new WeTaskFissionRewardVo();
-        WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getUnionid, unionId));
-        String customerUnionId = Optional.ofNullable(weCustomer).map(WeCustomer::getUnionid)
+        WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getExternalUserid, eid));
+        String externalUseriId = Optional.ofNullable(weCustomer).map(WeCustomer::getExternalUserid)
                 .orElseThrow(() -> new WeComException("用户信息不存在"));
 
-        WeTaskFissionRecord record = weTaskFissionRecordService.selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), customerUnionId);
-        if (record == null){
-            throw  new WeComException("任务信息不存在");
-        }
-        Date completeTime = record.getCompleteTime();
+        WeTaskFissionRecord record = weTaskFissionRecordService.selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), externalUseriId);
+        Date completeTime = Optional.ofNullable(record).map(WeTaskFissionRecord::getCompleteTime)
+                .orElseThrow(() -> new WeComException("任务信息不存在"));
+
         WeTaskFission weTaskFission = weTaskFissionService.selectWeTaskFissionById(Long.valueOf(fissionId));
         Optional.ofNullable(weTaskFission).ifPresent(fission -> {
             weTaskFissionRewardVo.setRewardRule(fission.getRewardRule());
+            weTaskFissionRewardVo.setRewardImageUrl(fission.getRewardImageUrl());
+            weTaskFissionRewardVo.setRewardUrl(fission.getRewardUrl());
         });
+
         if (completeTime != null) {
-            Optional.ofNullable(weTaskFission).ifPresent(fission -> {
-                weTaskFissionRewardVo.setRewardUrl(fission.getRewardUrl());
-                weTaskFissionRewardVo.setRewardImageUrl(fission.getRewardImageUrl());
-            });
             WeTaskFissionReward fissionReward = weTaskFissionRewardMapper.selectOne(new LambdaQueryWrapper<WeTaskFissionReward>()
                     .eq(WeTaskFissionReward::getTaskFissionId, fissionId)
-                    .eq(WeTaskFissionReward::getRewardUserId, customerUnionId));
+                    .eq(WeTaskFissionReward::getRewardUserId, externalUseriId));
             weTaskFissionRewardVo.setWeTaskFissionReward(fissionReward);
             //发放兑奖码之后，置为已使用
             Optional.ofNullable(fissionReward).ifPresent(reward -> weTaskFissionRewardMapper.update(reward, new LambdaUpdateWrapper<WeTaskFissionReward>()

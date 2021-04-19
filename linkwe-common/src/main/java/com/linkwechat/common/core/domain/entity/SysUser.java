@@ -105,6 +105,9 @@ public class SysUser extends BaseEntity
     /** 是否具有有效得cropId */
     private boolean validCropId=false;
 
+
+     private WeCorpAccount weCorpAccount;
+
     public SysUser()
     {
 

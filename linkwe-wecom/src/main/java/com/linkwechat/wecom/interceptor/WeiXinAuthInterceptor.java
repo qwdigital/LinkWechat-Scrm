@@ -56,20 +56,21 @@ public class WeiXinAuthInterceptor implements Interceptor {
 
     private String findAccessToken(String openId){
         //获取用户token
-        WxTokenDto wxTokenDto = redisCache.getCacheObject(WeConstans.WX_AUTH_ACCESS_TOKEN + ":" + openId);
-        if (wxTokenDto == null){
+        String accessToken =redisCache.getCacheObject(WeConstans.WX_AUTH_ACCESS_TOKEN+":"+ openId);
+        if (StringUtils.isEmpty(accessToken)){
             //当用户token失效，则获取refreshToken
             String refreshToken = redisCache.getCacheObject(WeConstans.WX_AUTH_REFRESH_ACCESS_TOKEN + ":" + openId);
             if(StringUtils.isEmpty(refreshToken)){
                 throw new WeComException(1001,"token失效，请重新授权");
             }else {
-                wxTokenDto = wxAuthClient.refreshToken(appId, grantType, refreshToken);
+                WxTokenDto wxTokenDto = wxAuthClient.refreshToken(appId, secret, grantType, refreshToken);
                 if(wxTokenDto != null && StringUtils.isNotEmpty(wxTokenDto.getAccessToken())){
-                    redisCache.setCacheObject(WeConstans.WX_AUTH_ACCESS_TOKEN+":"+ openId, wxTokenDto, wxTokenDto.getExpiresIn(), TimeUnit.SECONDS);
+                    redisCache.setCacheObject(WeConstans.WX_AUTH_ACCESS_TOKEN+":"+ openId, wxTokenDto.getAccessToken(), wxTokenDto.getExpiresIn(), TimeUnit.SECONDS);
+                    accessToken = wxTokenDto.getAccessToken();
                 }
             }
         }
-        return wxTokenDto.getAccessToken();
+        return accessToken;
     }
 
 

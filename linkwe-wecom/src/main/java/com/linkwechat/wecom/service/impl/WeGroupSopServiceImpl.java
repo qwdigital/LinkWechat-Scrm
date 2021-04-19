@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.common.enums.CommunityTaskType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;

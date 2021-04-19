@@ -59,16 +59,16 @@ public class WeTaskFission extends BaseEntity {
     /**
      * 活动开始时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Excel(name = "活动开始时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @Excel(name = "活动开始时间", width = 30, dateFormat = "yyyy-MM-dd")
     @ApiModelProperty(value = "活动开始时间")
     private Date startTime;
 
     /**
      * 活动结束时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Excel(name = "活动结束时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @Excel(name = "活动结束时间", width = 30, dateFormat = "yyyy-MM-dd")
     @ApiModelProperty(value = "活动结束时间")
     private Date overTime;
 
