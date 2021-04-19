@@ -62,21 +62,21 @@ public class UserDetailsServiceImpl implements UserDetailsService
         SysUser user = userService.selectUserByUserName(username);
         if (StringUtils.isNull(user))
         {
-            //企业管理登录
-            //查询企业管理相关账号
-            WeCorpAccount weCorpByAccount = iWeCorpAccountService.findWeCorpByAccount(username);
-            if(null != weCorpByAccount){
-                //注册到we_user表中
-                user=SysUser.builder()
-                        .userName(weCorpByAccount.getCropAccount())
-                        .nickName(weCorpByAccount.getCompanyName())
-                        .userType(Constants.USER_TYOE_CORP_ADMIN)
-                        .roleIds(ArrayUtil.toArray(roleMapper.selectRoleList(SysRole.builder()
-                                .roleKey(Constants.DEFAULT_WECOME_CORP_ADMIN)
-                                .build()).stream().map(SysRole::getRoleId).collect(Collectors.toList()), Long.class))
-                        .password(SecurityUtils.encryptPassword(ruoYiConfig.getWeUserDefaultPwd()))
-                        .build();
-            }
+//            //企业管理登录
+//            //查询企业管理相关账号
+//            WeCorpAccount weCorpByAccount = iWeCorpAccountService.findWeCorpByAccount(username);
+//            if(null != weCorpByAccount){
+//                //注册到we_user表中
+//                user=SysUser.builder()
+//                        .userName(weCorpByAccount.getCropAccount())
+//                        .nickName(weCorpByAccount.getCompanyName())
+//                        .userType(Constants.USER_TYOE_CORP_ADMIN)
+//                        .roleIds(ArrayUtil.toArray(roleMapper.selectRoleList(SysRole.builder()
+//                                .roleKey(Constants.DEFAULT_WECOME_CORP_ADMIN)
+//                                .build()).stream().map(SysRole::getRoleId).collect(Collectors.toList()), Long.class))
+//                        .password(SecurityUtils.encryptPassword(ruoYiConfig.getWeUserDefaultPwd()))
+//                        .build();
+//            }
 
 //            else{
 //
@@ -119,11 +119,11 @@ public class UserDetailsServiceImpl implements UserDetailsService
         }
 
        //当前登录用户为企业管理，设置corpId和密钥相关
-       if(user.getUserType().equals(Constants.USER_TYOE_CORP_ADMIN)){
-          user.setWeCorpAccount(
-                  iWeCorpAccountService.findWeCorpByAccount(username)
-          );
-       }
+//       if(user.getUserType().equals(Constants.USER_TYOE_CORP_ADMIN)){
+//          user.setWeCorpAccount(
+//                  iWeCorpAccountService.findWeCorpByAccount(username)
+//          );
+//       }
 
 
         return createLoginUser(user);
