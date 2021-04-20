@@ -24,13 +24,21 @@ public class WeAppController extends BaseController {
 
 
 
-    @PutMapping("/updateWeApp")
-    public AjaxResult updateWeApp(@RequestBody WeApp weApp){
+    @PostMapping("/addWeapp")
+    public AjaxResult addWeApp(@RequestBody WeApp weApp){
 
-        iWeAppService.updateById(weApp);
+        iWeAppService.addWeApp(weApp);
 
         return AjaxResult.success();
     }
+
+
+
+    @PostMapping("/updateWeApp")
+   public AjaxResult updateWeApp(@RequestBody WeApp weApp){
+        iWeAppService.updateWeApp(weApp);
+        return AjaxResult.success();
+   }
 
 
 

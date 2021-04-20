@@ -1,15 +1,21 @@
 package com.linkwechat.wecom.domain.dto;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 企业应用详情接口
  */
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeAppDetailDto extends WeResultDto{
     //企业应用id
-    private Long agentid;
+    private String agentid;
     //企业应用名称
     private String name;
     //企业应用方形头像
@@ -28,4 +34,33 @@ public class WeAppDetailDto extends WeResultDto{
     private String home_url;
     //企业应用头像的mediaid，通过素材管理接口上传图片获得mediaid，上传后会自动裁剪成方形和圆形两个头像
     private String logo_mediaid;
+
+    //企业应用可见范围（人员）
+    private AllowUserinfos allow_userinfos;
+
+    //企业应用可见范围（部门）
+    private AllowPartys allow_partys;
+
+
+
+    //可见部门
+    @Data
+    public class AllowPartys{
+        private String[] partyid;
+
+    }
+
+
+    @Data
+    public class AllowUserinfos{
+        private user[] user;
+    }
+
+    @Data
+    public class user{
+        private String userid;
+    }
+
+
+
 }

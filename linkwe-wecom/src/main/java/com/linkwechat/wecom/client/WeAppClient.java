@@ -28,7 +28,7 @@ public interface WeAppClient {
      * @return
      */
     @Request(url = "/agent/get")
-    WeAppDetailDto  findAgentById(@Query("agentid") Integer agentid);
+    WeAppDetailDto  findAgentById(@Query("agentid") String agentid);
 
     /**
      * 设置应用

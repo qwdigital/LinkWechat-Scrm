@@ -9,4 +9,10 @@ import com.linkwechat.wecom.domain.WeApp;
  * @create: 2021-01-26 18:44
  **/
 public interface IWeAppService extends IService<WeApp> {
+
+
+    void addWeApp(WeApp weApp);
+
+
+    void updateWeApp(WeApp weApp);
 }
