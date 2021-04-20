@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -113,7 +112,7 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
         try {
             log.info("执行发送欢迎语>>>>>>>>>>>>>>>");
             WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(wecomCode);
-            WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByActivityScene(state, userId);
+            WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByState(state);
             if (messageMap != null) {
                 String empleCodeId = messageMap.getEmpleCodeId();
                 //查询活码对应标签
