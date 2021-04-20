@@ -3,6 +3,7 @@ package com.linkwechat.wecom.mapper;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeGroupCode;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
@@ -86,4 +87,18 @@ public interface WeGroupCodeMapper  extends BaseMapper<WeGroupCode>
      * @return 结果
      */
     WeGroupCode getWeGroupByUuid(String uuid);
+
+    /**
+     * 根据群活码id获取对应所有群聊信息
+     * @param groupCodeId 群活码id
+     * @return 结果
+     */
+    List<WeGroup> selectWeGroupListByGroupCodeId(Long groupCodeId);
+
+    /**
+     * 获取群活码的总扫码次数
+     * @param groupCodeId 群活码id
+     * @return 总扫码次数
+     */
+    int selectScanTimesByGroupCodeId(Long groupCodeId);
 }

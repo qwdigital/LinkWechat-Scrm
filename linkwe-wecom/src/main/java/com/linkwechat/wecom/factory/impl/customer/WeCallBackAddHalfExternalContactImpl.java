@@ -54,7 +54,7 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
             if (message.getState() != null && message.getWelcomeCode() != null) {
                 log.info("执行发送欢迎语>>>>>>>>>>>>>>>");
                 WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(message.getWelcomeCode());
-                WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByActivityScene(message.getState(),message.getUserId());
+                WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByScenario(message.getState(),message.getUserId());
                 String empleCodeId = messageMap.getEmpleCodeId();
                 //查询活码对应标签
                 List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.list(new LambdaQueryWrapper<WeEmpleCodeTag>()
