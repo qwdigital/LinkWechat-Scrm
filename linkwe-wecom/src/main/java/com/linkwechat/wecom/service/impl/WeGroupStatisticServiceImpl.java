@@ -1,6 +1,8 @@
 package com.linkwechat.wecom.service.impl;
 
 import com.linkwechat.wecom.domain.WeGroupStatistic;
+import com.linkwechat.wecom.domain.dto.WePageCountDto;
+import com.linkwechat.wecom.domain.query.WePageStateQuery;
 import com.linkwechat.wecom.mapper.WeGroupStatisticMapper;
 import com.linkwechat.wecom.service.IWeGroupStatisticService;
 import org.springframework.stereotype.Service;
@@ -53,5 +55,26 @@ public class WeGroupStatisticServiceImpl extends ServiceImpl<WeGroupStatisticMap
             lqw.eq(WeGroupStatistic::getMsgTotal ,weGroupStatistic.getMsgTotal());
         }
         return this.list(lqw);
+    }
+
+
+    @Override
+    public WePageCountDto getCountDataByDay(String dateTime, String type) {
+        return this.baseMapper.getCountDataByDay(dateTime,type);
+    }
+
+    @Override
+    public List<WePageCountDto> getDayCountData(WePageStateQuery wePageStateQuery) {
+        return this.baseMapper.getDayCountData(wePageStateQuery);
+    }
+
+    @Override
+    public List<WePageCountDto> getWeekCountData(WePageStateQuery wePageStateQuery) {
+        return this.baseMapper.getWeekCountData(wePageStateQuery);
+    }
+
+    @Override
+    public List<WePageCountDto> getMonthCountData(WePageStateQuery wePageStateQuery) {
+        return this.baseMapper.getMonthCountData(wePageStateQuery);
     }
 }

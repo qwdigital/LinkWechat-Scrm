@@ -18,4 +18,146 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
 
+    <select id="getCountDataByDay" resultType="com.linkwechat.wecom.domain.dto.WePageCountDto">
+        select
+        date_format(stat_time, '%Y-%m-%d') as x_time,
+        IFNULL(sum(new_chat_cnt), 0)       as new_chat_cnt,
+        IFNULL(sum(chat_total), 0)         as chat_total,
+        IFNULL(sum(chat_has_msg), 0)       as chat_has_msg,
+        IFNULL(sum(new_member_cnt), 0)     as new_member_cnt,
+        IFNULL(sum(member_total), 0)       as member_total,
+        IFNULL(sum(member_has_msg), 0)     as member_has_msg,
+        IFNULL(sum(msg_total), 0)          as msg_total
+        from we_group_statistic
+        <where>
+            <choose>
+                <when test="type !=null and type == 'day'">
+                    date_format(stat_time, '%Y-%m-%d') = date_format(#{dateTime}, '%Y-%m-%d');
+                </when>
+                <when test="type !=null and type == 'week'">
+                    YEARWEEK(date_format(stat_time,'%Y-%m-%d')) = YEARWEEK(date_format(#{dateTime}, '%Y-%m-%d'));
+                </when>
+                <when test="type !=null and type == 'month'">
+                    DATE_FORMAT(stat_time,'%Y-%m') = DATE_FORMAT(#{dateTime}, '%Y-%m');
+                </when>
+                <!--查询今年-->
+                <otherwise>
+                    YEAR(stat_time) = YEAR(#{dateTime});
+                </otherwise>
+            </choose>
+        </where>
+
+    </select>
+
+
+    <select id="getDayCountData" resultType="com.linkwechat.wecom.domain.dto.WePageCountDto">
+        SELECT
+        tbl._date AS x_time,
+        IFNULL(sum(new_chat_cnt), 0)       as new_chat_cnt,
+        IFNULL(sum(chat_total), 0)         as chat_total,
+        IFNULL(sum(chat_has_msg), 0)       as chat_has_msg,
+        IFNULL(sum(new_member_cnt), 0)     as new_member_cnt,
+        IFNULL(sum(member_total), 0)       as member_total,
+        IFNULL(sum(member_has_msg), 0)     as member_has_msg,
+        IFNULL(sum(msg_total), 0)          as msg_total
+        FROM (SELECT (@s:=@s+1) AS _index,STR_TO_DATE(DATE(DATE_SUB(CURRENT_DATE,INTERVAL @s DAY)),'%Y-%m-%d') AS _date
+        FROM information_schema.CHARACTER_SETS,(SELECT @s:=-1) AS init WHERE
+        @s &lt; #{few}
+        ORDER BY _date) AS tbl
+        LEFT JOIN(SELECT
+        sum(ifnull(wgs.new_chat_cnt, 0)) new_chat_cnt,
+        sum(ifnull(wgs.chat_total, 0)) chat_total,
+        sum(ifnull(wgs.chat_has_msg, 0)) chat_has_msg,
+        sum(ifnull(wgs.new_member_cnt, 0)) new_member_cnt,
+        sum(ifnull(wgs.member_total, 0)) member_total,
+        sum(ifnull(wgs.member_has_msg, 0)) member_has_msg,
+        sum(ifnull(wgs.msg_total, 0)) msg_total,
+        STR_TO_DATE(DATE_FORMAT(wgs.stat_time,'%Y-%m-%d'),'%Y-%m-%d') AS finish_date
+
+        FROM we_group_statistic wgs
+        where
+        STR_TO_DATE(DATE_FORMAT(wgs.stat_time,'%Y-%m-%d'),'%Y-%m-%d') &gt;= #{startTime}
+
+        AND STR_TO_DATE(DATE_FORMAT(wgs.stat_time,'%Y-%m-%d'),'%Y-%m-%d') &lt;= #{endTime}
+
+        GROUP BY finish_date
+
+        ORDER BY finish_date
+
+        ) AS tbr ON tbl._date = tbr.finish_date GROUP BY tbl._date;
+    </select>
+
+    <select id="getWeekCountData" resultType="com.linkwechat.wecom.domain.dto.WePageCountDto">
+        select CONCAT(left(tbl._date,4),'年',right(tbl._date,2),'周') as x_time,
+        IFNULL(sum(new_chat_cnt), 0)      as new_chat_cnt,
+        IFNULL(sum(chat_total), 0)         as chat_total,
+        IFNULL(sum(chat_has_msg), 0)       as chat_has_msg,
+        IFNULL(sum(new_member_cnt), 0)     as new_member_cnt,
+        IFNULL(sum(member_total), 0)       as member_total,
+        IFNULL(sum(member_has_msg), 0)     as member_has_msg,
+        IFNULL(sum(msg_total), 0)          as msg_total
+        from (select (@s := @s + 1) as _index,
+        yearweek(date(date_sub(date_format(current_date, '%Y-%m-%d'), interval @s week))) as _date
+        from information_schema.character_sets,
+        (select @s := -1) as init
+        where @s  &lt; #{few}
+        order by _date)
+        as tbl
+        left join(select
+        sum(ifnull(wgs.new_chat_cnt, 0)) new_chat_cnt,
+        sum(ifnull(wgs.chat_total, 0)) chat_total,
+        sum(ifnull(wgs.chat_has_msg, 0)) chat_has_msg,
+        sum(ifnull(wgs.new_member_cnt, 0)) new_member_cnt,
+        sum(ifnull(wgs.member_total, 0)) member_total,
+        sum(ifnull(wgs.member_has_msg, 0)) member_has_msg,
+        sum(ifnull(wgs.msg_total, 0)) msg_total,
+        yearweek(date_format(wgs.stat_time, '%Y-%m-%d')) as finish_date
+
+        from we_group_statistic wgs
+
+        where yearweek(date_format(wgs.stat_time, '%Y-%m-%d')) &gt;=
+        yearweek(date(date_sub(date_format(current_date, '%Y-%m-%d'), interval #{few} week)))
+        and yearweek(date_format(wgs.stat_time, '%Y-%m-%d')) &lt;=
+        yearweek(date_format(current_date, '%Y-%m-%d'))
+
+        group by finish_date
+        order by finish_date
+        ) as tbr on tbl._date = tbr.finish_date
+        group by tbl._date;
+    </select>
+
+    <select id="getMonthCountData" resultType="com.linkwechat.wecom.domain.dto.WePageCountDto">
+        select tbl._date as x_time,
+        IFNULL(sum(new_chat_cnt), 0)      as new_chat_cnt,
+        IFNULL(sum(chat_total), 0)         as chat_total,
+        IFNULL(sum(chat_has_msg), 0)       as chat_has_msg,
+        IFNULL(sum(new_member_cnt), 0)     as new_member_cnt,
+        IFNULL(sum(member_total), 0)       as member_total,
+        IFNULL(sum(member_has_msg), 0)     as member_has_msg,
+        IFNULL(sum(msg_total), 0)          as msg_total
+        from (select (@s := @s + 1) as _index, date_format(date_sub(current_date, interval @s month), '%Y-%m') as _date
+        from information_schema.character_sets,
+        (select @s := -1) as init
+        where @s &lt; #{few}
+        order by _date) as tbl
+        left join(select
+        sum(ifnull(wgs.new_chat_cnt, 0)) new_chat_cnt,
+        sum(ifnull(wgs.chat_total, 0)) chat_total,
+        sum(ifnull(wgs.chat_has_msg, 0)) chat_has_msg,
+        sum(ifnull(wgs.new_member_cnt, 0)) new_member_cnt,
+        sum(ifnull(wgs.member_total, 0)) member_total,
+        sum(ifnull(wgs.member_has_msg, 0)) member_has_msg,
+        sum(ifnull(wgs.msg_total, 0)) msg_total,
+        date_format(wgs.stat_time, '%Y-%m') as finish_date
+        from we_group_statistic wgs
+        where
+        str_to_date(date_format(wgs.stat_time, '%Y-%m'), '%Y-%m') &gt;=
+        str_to_date(date_format(date_sub(current_date, interval #{few} month), '%Y-%m'), '%Y-%m')
+        and str_to_date(date_format(wgs.stat_time, '%Y-%m'), '%Y-%m') &lt;=
+        str_to_date(date_format(current_date, '%Y-%m'), '%Y-%m')
+        group by finish_date
+        order by finish_date
+        ) as tbr on tbl._date = tbr.finish_date
+        group by tbl._date;
+    </select>
 </mapper>
