@@ -1,8 +1,9 @@
 package com.linkwechat.wecom.service;
 
+import com.linkwechat.wecom.domain.WePresTagGroupTask;
 import com.linkwechat.wecom.domain.WeTag;
 import com.linkwechat.wecom.domain.dto.WePresTagGroupTaskDto;
-import com.linkwechat.wecom.domain.vo.WeEmplVo;
+import com.linkwechat.wecom.domain.vo.WeCommunityTaskEmplVo;
 import com.linkwechat.wecom.domain.vo.WePresTagGroupTaskVo;
 import com.linkwechat.wecom.domain.vo.WePresTagGroupTaskStatVo;
 
@@ -14,12 +15,13 @@ import java.util.List;
 public interface IWePresTagGroupTaskService {
 
     /**
-     * 新增建群任务
-     *
-     * @param taskDto 建群所需数据
-     * @return 数据库新增行数
+     * 添加新标签建群任务
+     * @param task 建群任务本体信息
+     * @param tagIdList 标签列表
+     * @param emplIdList 员工列表
+     * @return 结果
      */
-    int add(WePresTagGroupTaskDto taskDto);
+    int add(WePresTagGroupTask task, List<String> tagIdList, List<String> emplIdList);
 
     /**
      * 根据条件查询任务列表
@@ -31,7 +33,7 @@ public interface IWePresTagGroupTaskService {
      * @param endTime   结束时间
      * @return 结果
      */
-    List<WePresTagGroupTaskVo> selectTaskListList(String taskName, Integer sendType, String createBy, String beginTime, String endTime);
+    List<WePresTagGroupTaskVo> selectTaskList(String taskName, Integer sendType, String createBy, String beginTime, String endTime);
 
     /**
      * 通过id获取老客标签建群任务
@@ -69,27 +71,49 @@ public interface IWePresTagGroupTaskService {
     /**
      * 通过老客标签建群id获取其统计信息
      *
-     * @param taskId       任务id
-     * @param customerName 客户名
-     * @param isSent       是否已发送
-     * @param isInGroup    是否已在群
+     * @param taskId 任务id
      * @return 统计信息
      */
-    List<WePresTagGroupTaskStatVo> getStatByTaskId(Long taskId, String customerName, Integer isSent, Integer isInGroup);
+    List<WePresTagGroupTaskStatVo> getStatByTaskId(Long taskId);
+
 
     /**
-     * 通过任务id获取对应使用员工
+     * 根据任务id获取对应员工信息列表
      *
      * @param taskId 任务id
      * @return 结果
      */
-    List<WeEmplVo> getEmplListByTaskId(Long taskId);
+    List<WeCommunityTaskEmplVo> getScopeListByTaskId(Long taskId);
 
     /**
-     * 通过任务id获取标签列表
+     * 根据任务id获取对应标签信息列表
      *
      * @param taskId 任务id
      * @return 结果
      */
     List<WeTag> getTagListByTaskId(Long taskId);
+
+    /**
+     * 获取员工建群任务信息
+     *
+     * @param emplId 员工id
+     * @param isDone 是否已处理
+     * @return 结果
+     */
+    List<WePresTagGroupTaskVo> getEmplTaskList(String emplId, boolean isDone);
+
+    /**
+     * 员工发送信息后，变更其任务状态为 "完成"
+     *
+     * @param taskId 任务id
+     * @param emplId 员工id
+     * @return 结果
+     */
+    int updateEmplTaskStatus(Long taskId, String emplId);
+
+    /**
+     * 根据标签建群任务信息发送消息
+     * @param task 标签建群任务
+     */
+    void sendMessage(WePresTagGroupTask task);
 }

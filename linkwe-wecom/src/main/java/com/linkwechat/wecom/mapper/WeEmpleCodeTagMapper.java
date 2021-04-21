@@ -5,6 +5,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeEmpleCodeTag;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 /**
  * 员工活码标签Mapper接口
@@ -12,6 +13,7 @@ import org.apache.ibatis.annotations.Param;
  * @author ruoyi
  * @date 2020-10-04
  */
+@Repository
 public interface WeEmpleCodeTagMapper extends BaseMapper<WeEmpleCodeTag>
 {
     /**
@@ -81,7 +83,7 @@ public interface WeEmpleCodeTagMapper extends BaseMapper<WeEmpleCodeTag>
 
     /**
      * 批量逻辑删除
-     * @param ids
+     * @param ids 员工活码id列表
      * @return
      */
     public int batchRemoveWeEmpleCodeTagIds(@Param("ids") List<Long> ids);

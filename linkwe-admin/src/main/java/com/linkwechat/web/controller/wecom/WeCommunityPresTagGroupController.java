@@ -5,12 +5,13 @@ import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
-import com.linkwechat.wecom.domain.WeGroupCode;
-import com.linkwechat.wecom.domain.WeTag;
+import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.bean.BeanUtils;
+import com.linkwechat.wecom.domain.WePresTagGroupTask;
 import com.linkwechat.wecom.domain.dto.WePresTagGroupTaskDto;
 import com.linkwechat.wecom.domain.vo.WePresTagGroupTaskStatVo;
 import com.linkwechat.wecom.domain.vo.WePresTagGroupTaskVo;
-import com.linkwechat.wecom.domain.vo.WeEmplVo;
 import com.linkwechat.wecom.service.IWePresTagGroupTaskService;
 import com.linkwechat.wecom.service.IWeGroupCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class WeCommunityPresTagGroupController extends BaseController {
             @RequestParam(value = "beginTime", required = false) String beginTime,
             @RequestParam(value = "endTime", required = false) String endTime) {
         startPage();
-        List<WePresTagGroupTaskVo> wePresTagGroupTaskVoList = taskService.selectTaskListList(taskName, sendType, createBy, beginTime, endTime);
+        List<WePresTagGroupTaskVo> wePresTagGroupTaskVoList = taskService.selectTaskList(taskName, sendType, createBy, beginTime, endTime);
         return getDataTable(wePresTagGroupTaskVoList);
     }
 
@@ -57,9 +58,20 @@ public class WeCommunityPresTagGroupController extends BaseController {
             return AjaxResult.error("任务名已存在");
         }
         if (null == groupCodeService.selectWeGroupCodeById(wePresTagGroupTaskDto.getGroupCodeId())) {
-            return AjaxResult.error(HttpStatus.NOT_FOUND,"群活码不存在");
+            return AjaxResult.error(HttpStatus.NOT_FOUND, "群活码不存在");
         }
-        return toAjax(taskService.add(wePresTagGroupTaskDto));
+        // 创建新任务并保存
+        WePresTagGroupTask task = new WePresTagGroupTask();
+        BeanUtils.copyProperties(wePresTagGroupTaskDto, task);
+        task.setCreateBy(SecurityUtils.getUsername());
+        List<String> tagList = wePresTagGroupTaskDto.getTagList();
+        List<String> scopeList = wePresTagGroupTaskDto.getScopeList();
+        int affectedRows = taskService.add(task, tagList, scopeList);
+        if (affectedRows > 0) {
+            // 若保存成功，则进行异步消息推送
+            taskService.sendMessage(task);
+        }
+        return toAjax(affectedRows);
     }
 
     /**
@@ -69,14 +81,10 @@ public class WeCommunityPresTagGroupController extends BaseController {
     @GetMapping(path = "/{id}")
     public AjaxResult getTask(@PathVariable("id") Long id) {
         WePresTagGroupTaskVo taskVo = taskService.getTaskById(id);
-        // 获取标签和使用人员
-        List<WeTag> tagList = taskService.getTagListByTaskId(id);
-        List<WeEmplVo> emplVoList = taskService.getEmplListByTaskId(id);
-        WeGroupCode weGroupCode = groupCodeService.selectWeGroupCodeById(taskVo.getGroupCodeId());
-        taskVo.setGroupCodeInfo(weGroupCode);
-        taskVo.setTagList(tagList);
-        taskVo.setScopeList(emplVoList);
-        return AjaxResult.success(taskVo);
+        if (StringUtils.isNull(taskVo)) {
+            return AjaxResult.error(HttpStatus.NOT_FOUND, "群活码不存在");
+        }
+        return AjaxResult.success();
     }
 
     /**
@@ -94,7 +102,7 @@ public class WeCommunityPresTagGroupController extends BaseController {
             return AjaxResult.error("任务名已存在");
         }
         if (null == groupCodeService.selectWeGroupCodeById(wePresTagGroupTaskDto.getGroupCodeId())) {
-            return AjaxResult.error(HttpStatus.NOT_FOUND,"群活码不存在");
+            return AjaxResult.error(HttpStatus.NOT_FOUND, "群活码不存在");
         }
         return toAjax(taskService.updateTask(id, wePresTagGroupTaskDto));
     }
@@ -118,10 +126,12 @@ public class WeCommunityPresTagGroupController extends BaseController {
             @RequestParam(value = "customerName", required = false) String customerName,
             @RequestParam(value = "isInGroup", required = false) Integer isInGroup,
             @RequestParam(value = "isSent", required = false) Integer isSent
-            ) {
+    ) {
+
         startPage();
-        List<WePresTagGroupTaskStatVo> statVoList = taskService.getStatByTaskId(id, customerName, isInGroup, isSent);
+        List<WePresTagGroupTaskStatVo> statVoList = taskService.getStatByTaskId(id);
         return getDataTable(statVoList);
     }
+
 
 }

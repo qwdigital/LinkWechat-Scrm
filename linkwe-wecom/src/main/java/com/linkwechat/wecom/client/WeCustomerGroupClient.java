@@ -1,16 +1,19 @@
 package com.linkwechat.wecom.client;
 
+import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.DataObject;
 import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
 import com.linkwechat.wecom.domain.dto.customer.CustomerGroupDetail;
 import com.linkwechat.wecom.domain.dto.customer.CustomerGroupList;
+import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 
 /**
  * @description: 客户群
  * @author: HaoN
  * @create: 2020-10-20 21:50
  **/
+@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
 public interface WeCustomerGroupClient {
 
 

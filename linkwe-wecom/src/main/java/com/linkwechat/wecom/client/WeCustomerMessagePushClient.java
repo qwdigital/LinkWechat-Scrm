@@ -1,19 +1,18 @@
 package com.linkwechat.wecom.client;
 
-import com.dtflys.forest.annotation.Body;
-import com.dtflys.forest.annotation.DataObject;
-import com.dtflys.forest.annotation.Query;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.message.QueryCustomerMessageStatusResultDataObjectDto;
 import com.linkwechat.wecom.domain.dto.message.QueryCustomerMessageStatusResultDto;
 import com.linkwechat.wecom.domain.dto.message.SendMessageResultDto;
 import com.linkwechat.wecom.domain.dto.message.WeCustomerMessagePushDto;
+import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 
 /**
  * @description: 群发消息
  * @author: KeWen
  * @create: 2020-10-25 21:34
  **/
+@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
 public interface WeCustomerMessagePushClient {
 
 

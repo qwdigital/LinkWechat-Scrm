@@ -1,8 +1,8 @@
 package com.linkwechat.wecom.service;
 
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
+
 import java.util.List;
-import com.linkwechat.wecom.domain.WeCorpAccount;
-import org.apache.ibatis.annotations.Param;
 
 /**
  * 企业id相关配置Service接口
@@ -71,4 +71,7 @@ public interface IWeCorpAccountService
      * 客户流失通知开关查询
      */
     public String getCustomerChurnNoticeSwitch();
+
+
+    WeCorpAccount findWeCorpByAccount(String corpAccount);
 }

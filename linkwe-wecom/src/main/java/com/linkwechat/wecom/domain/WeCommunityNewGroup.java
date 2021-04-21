@@ -23,72 +23,25 @@ public class WeCommunityNewGroup extends BaseEntity {
      *主键ID
      */
     @TableId
-    private Long newGroupId= SnowFlakeUtil.nextId();
+    private Long id = SnowFlakeUtil.nextId();
 
     /**
      * 员工活码名称
      */
-    @ApiModelProperty("员工活码名称")
-    private String empleCodeName;
+    private String emplCodeName;
 
     /**
-     * 活动场景
+     * 群活码id
      */
-    @ApiModelProperty("活动场景")
-    private String activityScene;
-
-    /**
-     * 欢迎语
-     */
-    @ApiModelProperty("欢迎语")
-    private String welcomeMsg;
-
-    /**
-     * 新增联系方式的配置id
-     */
-    @ApiModelProperty("新增联系方式的配置id")
-    private String configId;
-
-    /**
-     * 二维码链接
-     */
-    @ApiModelProperty("二维码链接")
-    private String qrCode;
-
-    /**
-     * 客户添加时无需经过确认自动成为好友:1:是;0:否
-     */
-    @ApiModelProperty("客户添加时无需经过确认自动成为好友:1:是;0:否")
-    private Boolean isJoinConfirmFriends;
-
-    /**
-     * 添加好友数
-     */
-    @ApiModelProperty("添加好友数")
-    private Integer joinFriendNums;
-
-    /**
-     * 群活码ID
-     */
-    @ApiModelProperty("群活码ID")
     private Long groupCodeId;
 
     /**
-     * 素材的id
+     * 员工活码id
      */
-    @ApiModelProperty("素材的id")
-    private Long mediaId;
+    private Long emplCodeId;
 
     /**
      * 0 未删除 1 已删除
      */
-    @ApiModelProperty("0 未删除 1 已删除")
-    private int delFlag;
-
-
-    /**
-     * 员工活码
-     */
-    private String userQrCode;
-
+    private int delFlag = 0;
 }

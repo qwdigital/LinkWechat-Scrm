@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeEmpleCode;
 import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
  * @author ruoyi
  * @date 2020-10-04
  */
+@Repository
 public interface WeEmpleCodeMapper extends BaseMapper<WeEmpleCode>
 {
     /**
@@ -81,10 +83,17 @@ public interface WeEmpleCodeMapper extends BaseMapper<WeEmpleCode>
 
     /**
      * 通过活动场景获取客户欢迎语
-     * @param activityScene 活动场景
+     * @param scenario 活动场景
      * @return
      */
-    public WeEmpleCodeDto selectWelcomeMsgByActivityScene(@Param("activityScene") String activityScene, @Param("userId") String userId);
+    public WeEmpleCodeDto selectWelcomeMsgByScenario(@Param("scenario") String scenario, @Param("userId") String userId);
+
+    /**
+     * 通过state定位员工活码
+     * @param state state
+     * @return 员工活码
+     */
+    WeEmpleCodeDto selectWelcomeMsgByState(@Param("state") String state);
 
     /**
      * 通过成员id 获取去成员活码
@@ -92,4 +101,10 @@ public interface WeEmpleCodeMapper extends BaseMapper<WeEmpleCode>
      * @return
      */
     WeEmpleCode getQrcodeByUserId(String userId);
+
+    /**
+     * 递增扫码次数
+     * @param state state
+     */
+    void updateScanTimesByState(String state);
 }

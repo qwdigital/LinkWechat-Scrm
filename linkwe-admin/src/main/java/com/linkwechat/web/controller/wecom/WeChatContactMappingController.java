@@ -10,6 +10,8 @@ import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.wecom.domain.WeChatContactMapping;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.service.IWeChatContactMappingService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +31,7 @@ import java.util.List;
  * @author ruoyi
  * @date 2020-12-27
  */
+@Api("聊天关系映射Controller")
 @RestController
 @RequestMapping("/chat/mapping")
 public class WeChatContactMappingController extends BaseController
@@ -40,8 +43,9 @@ public class WeChatContactMappingController extends BaseController
      * 查询聊天关系映射列表
      */
 //    @PreAuthorize("@ss.hasPermi('chat:mapping:list')")
+    @ApiOperation(value = "查询聊天关系映射列表",httpMethod = "GET")
     @GetMapping("/list")
-    public TableDataInfo list(WeChatContactMapping weChatContactMapping)
+    public TableDataInfo<List<WeChatContactMapping>> list(WeChatContactMapping weChatContactMapping)
     {
         startPage();
         List<WeChatContactMapping> list = weChatContactMappingService.selectWeChatContactMappingList(weChatContactMapping);
@@ -52,8 +56,9 @@ public class WeChatContactMappingController extends BaseController
      * 按客户查询关系映射列表
      */
 //    @PreAuthorize("@ss.hasPermi('chat:mapping:listByCustomer')")
+    @ApiOperation(value = "按客户查询关系映射列表",httpMethod = "GET")
     @GetMapping("/listByCustomer")
-    public TableDataInfo listByCustomer()
+    public TableDataInfo<PageInfo<WeCustomer>> listByCustomer()
     {
         startPage();
         PageInfo<WeCustomer> weCustomerPageInfo = weChatContactMappingService.listByCustomer();

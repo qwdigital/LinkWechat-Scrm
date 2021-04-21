@@ -16,16 +16,17 @@ public interface WePresTagGroupTaskStatMapper extends BaseMapper<WePresTagGroupT
 
     /**
      * 根据 老客标签建群任务id及附属相关属性条件获取任务对应的客户统计
-     * @param taskId 任务id
-     * @param customerName 客户名称
-     * @param isInGroup 是否在群
-     * @param isSent 是否已发送
+     *
+     * @param taskId       任务id
      * @return 客户统计列表
      */
-    List<WePresTagGroupTaskStatVo> getStatByTaskId(
-            @Param("taskId") Long taskId,
-            @Param("customerName") String customerName,
-            @Param("isSent") Integer isSent,
-            @Param("isInGroup") Integer isInGroup
-    );
+    List<WePresTagGroupTaskStatVo> selectStatInfoByTaskId(@Param("taskId") Long taskId);
+
+    /**
+     * 通过taskId获取所有外部联系人id
+     *
+     * @param taskId 老客标签建群任务id
+     * @return 结果
+     */
+    List<String> getAllExternalIdByTaskId(Long taskId);
 }

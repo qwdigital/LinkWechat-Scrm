@@ -1,15 +1,13 @@
 package com.linkwechat.web.controller.wecom;
 
 import com.linkwechat.common.annotation.Log;
-import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
-import com.linkwechat.wecom.domain.WeCorpAccount;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

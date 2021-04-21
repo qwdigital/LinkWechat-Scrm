@@ -63,4 +63,13 @@ public interface IWeCommunityKeywordToGroupService {
      * @return 结果
      */
     boolean taskNameIsUnique(String taskName);
+
+
+    /**
+     * 通过名称或者关键词进行过滤
+     *
+     * @param word 过滤字段
+     * @return 结果
+     */
+    List<WeKeywordGroupTaskVo> filterByNameOrKeyword(String word);
 }

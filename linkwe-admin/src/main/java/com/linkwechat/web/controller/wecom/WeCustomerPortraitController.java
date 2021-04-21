@@ -153,11 +153,18 @@ public class WeCustomerPortraitController extends BaseController {
     @GetMapping(value = "/findTrajectory")
     public TableDataInfo findTrajectory(Integer trajectoryType){
         startPage();
+        LambdaQueryWrapper<WeCustomerTrajectory> ne = new LambdaQueryWrapper<WeCustomerTrajectory>()
+                .ne(WeCustomerTrajectory::getStatus, Constants.DELETE_CODE);
+
+        if(trajectoryType != null){
+            ne.eq(WeCustomerTrajectory::getTrajectoryType, trajectoryType);
+        }
+
+
         return getDataTable(
-                iWeCustomerTrajectoryService.list(new LambdaQueryWrapper<WeCustomerTrajectory>()
-                .eq(WeCustomerTrajectory::getTrajectoryType,trajectoryType)
-                .ne(WeCustomerTrajectory::getStatus,Constants.DELETE_CODE))
+                iWeCustomerTrajectoryService.list(ne)
         );
+
     }
 
 

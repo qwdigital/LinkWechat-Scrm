@@ -203,7 +203,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
                 .append("&")
                 .append("fissionId=").append(id)
                 .append("&")
-                .append("userId=").append(fissStaffId)
+                .append("fissionTargetId=").append(fissStaffId)
                 .append("&")
                 .append("posterId=").append(weTaskFission.getPostersId());
 
@@ -247,10 +247,10 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     @Transactional
     public String fissionPosterGenerate(WeTaskFissionPosterDTO weTaskFissionPosterDTO) {
         WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>()
-                .eq(WeCustomer::getExternalUserid, weTaskFissionPosterDTO.getEid()));
+                .eq(WeCustomer::getUnionid, weTaskFissionPosterDTO.getUnionId()));
         if (weCustomer != null) {
             //任务表添加当前客户任务
-            WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), weCustomer.getExternalUserid(), weCustomer.getName());
+            WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), weCustomer.getUnionid(), weCustomer.getName());
             String posterUrl = record.getPoster();
             if (StringUtils.isBlank(posterUrl)) {
                 String qrcode = getPosterQRCode(weTaskFissionPosterDTO.getFissionTargetId(), record, weCustomer);
@@ -292,20 +292,20 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     }
 
     @Override
-    public List<WeCustomer> getCustomerListById(String eid, String fissionId) {
+    public List<WeCustomer> getCustomerListById(String unionId, String fissionId) {
         WeTaskFissionRecord weTaskFissionRecord;
-        if (StringUtils.isEmpty(eid)) {
+        if (StringUtils.isEmpty(unionId)) {
             List<WeTaskFissionRecord> weTaskFissionRecords = weTaskFissionRecordService
                     .list(new LambdaQueryWrapper<WeTaskFissionRecord>().eq(WeTaskFissionRecord::getTaskFissionId, fissionId));
             return Optional.ofNullable(weTaskFissionRecords).orElseGet(ArrayList::new).stream()
                     .map(record -> weCustomerService.selectWeCustomerById(record.getCustomerId()))
                     .filter(Objects::nonNull).collect(Collectors.toList());
         } else {
-            WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getExternalUserid, eid));
-            String externalUseriId = Optional.ofNullable(weCustomer).map(WeCustomer::getExternalUserid)
+            WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getUnionid, unionId));
+            String uid = Optional.ofNullable(weCustomer).map(WeCustomer::getUnionid)
                     .orElseThrow(() -> new WeComException("用户信息不存在"));
             weTaskFissionRecord = weTaskFissionRecordService
-                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), externalUseriId);
+                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), uid);
             Optional.ofNullable(weTaskFissionRecord).map(WeTaskFissionRecord::getId)
                     .orElseThrow(() -> new WeComException("任务记录信息不存在"));
             List<WeFlowerCustomerRel> list = weFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
@@ -351,10 +351,10 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     }
 
     @Override
-    public WeTaskFissionProgressVO getCustomerTaskProgress(WeTaskFission taskFission, String eid) {
+    public WeTaskFissionProgressVO getCustomerTaskProgress(WeTaskFission taskFission, String unionId) {
         long complete = 0L;
         long total = taskFission.getFissNum();
-        List<WeCustomer> list = getCustomerListById(eid, String.valueOf(taskFission.getId()));
+        List<WeCustomer> list = getCustomerListById(unionId, String.valueOf(taskFission.getId()));
         if (CollectionUtils.isNotEmpty(list)) {
             complete = list.size();
         } else {

@@ -4,6 +4,7 @@ package com.linkwechat.wecom.domain;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,11 +13,13 @@ import lombok.EqualsAndHashCode;
 @TableName("we_pres_tag_group")
 public class WePresTagGroupTask extends BaseEntity {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      *主键ID
      */
     @TableId
-    private Long taskId;
+    private Long taskId = SnowFlakeUtil.nextId();
 
     /**
      * 任务名称
@@ -57,5 +60,10 @@ public class WePresTagGroupTask extends BaseEntity {
      * 目标客户被添加结束时间
      */
     private String cusEndTime;
+
+    /**
+     * 企业群发消息的id
+     */
+    private String msgid;
 
 }

@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
@@ -70,13 +71,19 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
     private WeCustomerMessageTimeTaskMapper customerMessageTimeTaskMapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void addWeCustomerMessagePush(CustomerMessagePushDto customerMessagePushDto) throws JsonProcessingException, ParseException {
 
-        if ((null != customerMessagePushDto.getSettingTime() && !"".equals(customerMessagePushDto.getSettingTime()))
-                && DateUtils.diffTime(new Date(), DateUtil.parse(customerMessagePushDto.getSettingTime(), "yyyy-MM-dd HH:mm:ss")) > 0) {
-            throw new WeComException("发送时间不能小于当前时间");
+//        if ((null != customerMessagePushDto.getSettingTime() && !"".equals(customerMessagePushDto.getSettingTime()))
+//                && DateUtils.diffTime(new Date(), DateUtil.parse(customerMessagePushDto.getSettingTime(), "yyyy-MM-dd HH:mm")) > 0) {
+//            throw new WeComException("发送时间不能小于当前时间");
+//        }
+
+
+        if(StrUtil.isBlank(customerMessagePushDto.getSettingTime())){
+            throw new WeComException("发送时间不能为空");
         }
+
 
         List<WeCustomer> customers = Lists.newArrayList();
         List<WeGroup> groups = new ArrayList<>();

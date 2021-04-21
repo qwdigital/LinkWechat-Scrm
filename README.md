@@ -8,9 +8,9 @@
 
 <div align="center">
 
-[![star](https://gitee.com/LinkWeChat/link-wechat/badge/star.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/stargazers)
-[![fork](https://gitee.com/LinkWeChat/link-wechat/badge/fork.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/members)
-[![license](http://img.shields.io/badge/license-GPL%203.0-green)](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
+![GVP Stars](http://img.shields.io/badge/GPV%20Stars-700+-yellow)
+![GVP Forks](http://img.shields.io/badge/GPV%20Forks-200+-yellow)
+![license](http://img.shields.io/badge/license-GPL%203.0-green)
 
 </div>
 
@@ -18,21 +18,8 @@
 <p></p>
 <p></p>
 <p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/233450_65d03349_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_00.png")
-
----
-
- **如果您觉得我们的开源项目很有帮助，请帮忙点击右上方的  :star: Star ，您的认可就是我们最大的动力，谢谢支持！:heart:** 
-
----
-
-[LinkWeChat 官方帮助文档——语雀](https://www.yuque.com/linkwechat/help)
-
 
 ### 平台简介
 
@@ -226,13 +213,13 @@ com.linkwechat
 
 #### 在线体验
 
-演示地址：http://demo.linkwechat.cn  
+演示地址：http://106.13.201.219/   
 
-演示账号/密码：Wecome/123456
+演示账号/密码：test/123456
 
 #### 开发进度
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0315/205221_36f5b3f3_1480777.png "LinkWeChat 1.0.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/233603_09dc4ac4_1480777.png "LinkWeChat 1.0.png")
 
 ### 联系作者加入群
 

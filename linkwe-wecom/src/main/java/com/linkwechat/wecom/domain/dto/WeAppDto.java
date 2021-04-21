@@ -15,11 +15,19 @@ public class WeAppDto extends WeResultDto{
     @Data
     public class Agent{
         //企业应用id
-        private Long agentid;
+        private String agentid;
         //企业应用名称
         private String name;
         //企业应用方形头像url
         private String  square_logo_url;
+
+
+
+
+
     }
+
+
+
 
 }

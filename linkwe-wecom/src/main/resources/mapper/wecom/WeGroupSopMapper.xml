@@ -82,4 +82,25 @@
         select count(1) from we_group_sop where rule_name = #{ruleName}
     </select>
 
+    <select id="getEmplTaskList" resultMap="WeGroupSopResult">
+        SELECT
+            wgs.rule_id,
+            wgs.rule_name,
+            wgs.title,
+            wgs.content,
+            wgs.start_time,
+            wgs.end_time,
+            wgs.create_by,
+            wgs.create_time,
+            wgs.update_by,
+            wgs.update_time
+        FROM
+            we_user wu
+            LEFT JOIN we_group wg ON wu.user_id = wg.`owner`
+            LEFT JOIN we_group_sop_chat wgsc ON wg.chat_id = wgsc.chat_id
+            LEFT JOIN we_group_sop wgs ON wgs.rule_id = wgsc.rule_id
+        WHERE
+            wu.user_id = #{emplId} AND wgsc.is_done = #{isDone}
+    </select>
+
 </mapper>

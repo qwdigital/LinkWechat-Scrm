@@ -7,6 +7,7 @@ import com.linkwechat.wecom.domain.vo.WeAllocateCustomersVo;
 import com.linkwechat.wecom.domain.vo.WeAllocateGroupsVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserVo;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
  * @author ruoyi
  * @date 2020-08-31
  */
+@Repository
 public interface WeUserMapper extends BaseMapper<WeUser>
 {
     /**

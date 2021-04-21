@@ -1,9 +1,11 @@
 package com.linkwechat.wecom.client;
 
+import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.DataFile;
 import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.annotation.Query;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
+import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -15,6 +17,7 @@ import java.io.InputStream;
  * @Description:
  * @Date: create in 2020/9/24 0024 0:14
  */
+@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
 public interface WeMediaClient {
 
     /**

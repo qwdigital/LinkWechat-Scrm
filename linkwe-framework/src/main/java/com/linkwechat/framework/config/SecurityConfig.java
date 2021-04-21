@@ -121,9 +121,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/wecom/ticket/**").anonymous()
 
                 .antMatchers("/wecom/user/getUserInfo").anonymous()
-                // .antMatchers("/common/uploadFile2Cos").anonymous()
-                .antMatchers("/wecom/material/temporaryMaterialMediaId").anonymous()
+               // .antMatchers("/common/uploadFile2Cos").anonymous()
+//                .antMatchers("/wecom/material/temporaryMaterialMediaId").anonymous()
                 .antMatchers("/wecom/portrait/**").anonymous()
+                .antMatchers("/wecom/fission/poster", "/wecom/fission/*/progress/*", "/wecom/reward/getRewardByFissionId/**").anonymous()
+                // 获取实际群活码和社群运营H5页面不需要登录
+                .antMatchers("/wecom/groupCode/getActualCode/**").anonymous()
+                .antMatchers("/wecom/community/h5/**").anonymous()
+                //微信授权接口
+                .antMatchers("/weixin/auth/**").anonymous()
+
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
                 .and()

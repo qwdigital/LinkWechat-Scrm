@@ -1,16 +1,19 @@
 package com.linkwechat.wecom.client;
 
+import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.DataObject;
 import com.dtflys.forest.annotation.Request;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.domain.dto.tag.*;
+import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 
 /**
  * @description: 企业微信标签相关
  * @author: HaoN
  * @create: 2020-10-17 11:00
  **/
+@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
 public interface WeCropTagClient {
 
     /**

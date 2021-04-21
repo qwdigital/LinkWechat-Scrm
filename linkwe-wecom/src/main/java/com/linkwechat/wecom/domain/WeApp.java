@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @description: 自建应用相关
@@ -34,7 +36,7 @@ public class WeApp {
     private String agentSecret;
 
 
-    /**应用类型(1:自建应用;)**/
+    /**应用类型(1:自建应用;2:小程序)**/
     private Integer appType;
 
 
@@ -52,8 +54,28 @@ public class WeApp {
     private String status;
 
 
+    /**可见范围部门id，使用逗号隔开**/
+    private String allowPartys;
 
 
+    /**可见范围人员id，使用逗号隔开**/
+    private String allowUserinfos;
+
+
+    /**应用名称**/
+    private String agentName;
+
+
+    /**企业应用描述**/
+    private String description;
+
+
+    /**应用头像**/
+    private String squareLogoUrl;
+
+
+    @TableField(exist = false)
+    private String logoMediaid;
 
 
 }

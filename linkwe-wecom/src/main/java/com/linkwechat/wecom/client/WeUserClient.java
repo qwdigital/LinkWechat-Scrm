@@ -1,16 +1,15 @@
 package com.linkwechat.wecom.client;
 
-import com.dtflys.forest.annotation.DataObject;
-import com.dtflys.forest.annotation.Header;
-import com.dtflys.forest.annotation.Query;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.*;
+import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 
 /**
  * @description: 企业微信通讯录成员
  * @author: HaoN
  * @create: 2020-08-27 16:42
  **/
+@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
 public interface WeUserClient {
 
     /**

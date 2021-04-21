@@ -4,7 +4,7 @@ package com.linkwechat.wecom.domain.vo;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.linkwechat.wecom.domain.WeGroupCode;
+import com.linkwechat.common.enums.CommunityTaskType;
 import com.linkwechat.wecom.domain.WeTag;
 import lombok.Data;
 
@@ -16,6 +16,12 @@ import java.util.List;
  */
 @Data
 public class WePresTagGroupTaskVo {
+
+    /**
+     * 类型。该属性仅用于H5页面与SOP混合列表的任务类型判断
+     */
+    @TableField(exist = false)
+    private final Integer type = CommunityTaskType.TAG.getType();
 
     /**
      * 老客标签建群任务id
@@ -33,16 +39,25 @@ public class WePresTagGroupTaskVo {
     private String welcomeMsg;
 
     /**
-     * 群活码id
+     * 群活吗id
      */
     @JsonIgnore
-    private Long groupCodeId;
+    private Long codeId;
 
     /**
-     * 群活码信息
+     * 群活码连接
      */
+    @JsonIgnore
+    private String codeUrl;
+
+    /**
+     * 群活码uuid
+     */
+    @JsonIgnore
+    private String CodeUuid;
+
     @TableField(exist = false)
-    private WeGroupCode groupCodeInfo;
+    private WeGroupCodeVo groupCodeInfo;
 
     /**
      * 发送方式 0: 企业群发 1：个人群发
@@ -58,7 +73,7 @@ public class WePresTagGroupTaskVo {
      * 使用员工
      */
     @TableField(exist = false)
-    private List<WeEmplVo> scopeList;
+    private List<WeCommunityTaskEmplVo> scopeList;
 
     /**
      * 标签
@@ -87,6 +102,11 @@ public class WePresTagGroupTaskVo {
     private String cusEndTime;
 
     /**
+     * msgid
+     */
+    private String msgid;
+
+    /**
      * 创建者
      */
     private String createBy;
@@ -107,4 +127,12 @@ public class WePresTagGroupTaskVo {
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private String updateTime;
+
+    /**
+     * 设置群活码信息
+     */
+    public void fillGroupCodeVo() {
+        WeGroupCodeVo groupCodeVo = new WeGroupCodeVo(this.getCodeId(), this.getCodeUuid(), this.getCodeUrl());
+        this.setGroupCodeInfo(groupCodeVo);
+    }
 }

@@ -151,10 +151,16 @@ public class Constants
     public static final  String USER_TYPE_WECOME="11";
 
 
+    /** 企业管理 */
+    public static  final String USER_TYOE_CORP_ADMIN="22";
+
+
     /** 企业微信用户系统中默认用户 */
     public static final String DEFAULT_WECOME_ROLE_KEY="WeCome";
 
 
+    /** 企业微信用户系统中默认用户 */
+    public static final String DEFAULT_WECOME_CORP_ADMIN="CROP_ADMIN_ROLE";
 
     /**完成待办*/
     public static final String HANDLE_SUCCESS="1";
