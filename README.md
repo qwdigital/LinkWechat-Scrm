@@ -8,8 +8,8 @@
 
 <div align="center">
 
-![GVP Stars](http://img.shields.io/badge/GPV%20Stars-700+-yellow)
-![GVP Forks](http://img.shields.io/badge/GPV%20Forks-200+-yellow)
+[![star](https://gitee.com/LinkWeChat/link-wechat/badge/star.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/stargazers)
+[![fork](https://gitee.com/LinkWeChat/link-wechat/badge/fork.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/members)
 ![license](http://img.shields.io/badge/license-GPL%203.0-green)
 
 </div>
@@ -20,6 +20,14 @@
 <p></p>
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/233450_65d03349_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_00.png")
+
+---
+
+ **如果您觉得我们的开源项目很有帮助，请帮忙点击右上方的  :star: Star ，您的认可就是我们最大的动力，谢谢支持！:heart:** 
+
+---
+
+[LinkWeChat 官方帮助手册——语雀](https://www.yuque.com/linkwechat/help)
 
 ### 平台简介
 
@@ -219,7 +227,7 @@ com.linkwechat
 
 #### 开发进度
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/233603_09dc4ac4_1480777.png "LinkWeChat 1.0.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0421/133541_6ad30f83_1480777.png "LinkWeChat 1.0.png")
 
 ### 联系作者加入群
 
