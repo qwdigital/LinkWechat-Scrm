@@ -228,7 +228,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
         userBuilder.minimumShouldMatch(1);
         boolQueryBuilder.must(userBuilder);
         if (StringUtils.isNotBlank(weSensitiveHitQuery.getKeyword())) {
-            BoolQueryBuilder keywordBuilder = QueryBuilders.boolQuery().should(QueryBuilders.matchPhraseQuery("text.content", weSensitiveHitQuery.getKeyword()));
+            BoolQueryBuilder keywordBuilder = QueryBuilders.boolQuery().should(QueryBuilders.matchPhraseQuery("content", weSensitiveHitQuery.getKeyword()));
             boolQueryBuilder.must(keywordBuilder);
         }
         builder.query(boolQueryBuilder);
@@ -247,7 +247,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
                 List<WeUser> uList = weUserService.selectWeUserList(user);
                 if (CollectionUtils.isNotEmpty(uList)) {
                     json.put("from", uList.get(0).getName());
-                    json.put("content", j.getJSONObject("text").getString("content"));
+                    json.put("content", j.getString("content"));
                     json.put("msgtime", j.getString("msgtime"));
                     json.put("status", j.getString("status"));
                     json.put("patternWords", j.getString("pattern_words"));
@@ -324,7 +324,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
                 BoolQueryBuilder userBuilder = QueryBuilders.boolQuery();
                 subUsers.parallelStream().forEach(user -> userBuilder.should(QueryBuilders.termQuery("from", user)));
                 userBuilder.minimumShouldMatch(1);
-                BoolQueryBuilder searchBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchPhraseQuery("text.content", patternWord)).must(userBuilder);
+                BoolQueryBuilder searchBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchPhraseQuery("content", patternWord)).must(userBuilder);
                 builder.query(searchBuilder);
                 List<JSONObject> list = elasticSearch.search(chartKey, builder, JSONObject.class);
                 list.parallelStream().forEach(j -> j.put("pattern_words", patternWord));
@@ -379,10 +379,8 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
                     .startObject("pattern_words")
                     .field("type", "keyword")
                     .endObject()
-                    .startObject("text")
                     .startObject("content")
                     .field("type", "text")
-                    .endObject()
                     .endObject()
                     .endObject()
                     .endObject();
