@@ -35,3 +35,53 @@ export function getAllTags(params) {
     params,
   });
 }
+// 更新客户画像标签 
+export function updateWeCustomerPorTraitTag(data) {
+  return request({
+    url: service + "/updateWeCustomerPorTraitTag",
+    method: 'post',
+    data,
+  });
+}
+// 查看客户添加的员工
+export function findAddaddEmployes(params) {
+    return request({
+        url: service + "/findAddaddEmployes/" + params,
+    });
+  }
+//  获取用户添加的群
+export function findAddGroupNum(params) {
+    return request({
+      url: service + "/findAddGroupNum",
+      params,
+    });
+  }
+//  获取轨迹信息
+export function findTrajectory(params) {
+    return request({
+      url: service + "/findTrajectory",
+      params,
+    });
+  }
+//  添加或编辑轨迹 
+export function addOrEditWaitHandle(data) {
+    return request({
+      url: service + "/addOrEditWaitHandle",
+      method: 'post',
+      data,
+    });
+  }
+//  删除轨迹 
+export function removeTrajectory(params) {
+    return request({
+        url: service + "/removeTrajectory/" + params,
+        method: 'delete',
+    });
+  }
+//  完成待办 
+export function handleWait(params) {
+    return request({
+        url: service + "/handleWait/" + params,
+        method: 'delete',
+    });
+  }

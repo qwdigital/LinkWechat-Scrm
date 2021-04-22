@@ -2,10 +2,16 @@
 import { getAgentTicket, getAppTicket } from '@/api/common'
 export default {
   name: 'App',
+  provide() {
+      return {
+          reload: this.reload
+      }
+  },
   data() {
     return {
       appId: '',
       agentId: '1000005',
+      isRouterAlive : true
     }
   },
   created() {},
@@ -17,6 +23,12 @@ export default {
     // },
   },
   methods: {
+      reload () {
+          this.isRouterAlive = false
+          this.$nextTick(function() {
+              this.isRouterAlive = true
+          })
+      },
     wxConfig() {
       getAgentTicket(window.location.href.split('#')[0]).then(({ data }) => {
         let { timestamp, nonceStr, signature } = data
@@ -89,7 +101,7 @@ export default {
 </script>
 <template>
   <div id="app">
-    <router-view class="page" />
+    <router-view class="page" v-if="isRouterAlive" />
   </div>
 </template>
 
