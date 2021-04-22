@@ -54,4 +54,18 @@ public interface WeCommunityNewGroupMapper extends BaseMapper<WeCommunityNewGrou
      */
     List<WeCommunityNewGroupVo> selectWeCommunityNewGroupByIds(@Param("ids") List<Long> ids);
 
+    /**
+     * 通过员工活码id逻辑删除对应新客拉群信息
+     * @param emplCodeId 员工活码id
+     * @return 结果
+     */
+    int removeWeCommunityNewGroupByEmplCodeId(@Param("emplCodeId") Long emplCodeId);
+
+    /**
+     * 通过群活码id逻辑删除对应新客拉群信息
+     * @param groupCodeId 群活码id
+     * @return 结果
+     */
+    int removeWeCommunityNewGroupByGroupCodeId(@Param("groupCodeId") Long groupCodeId);
+
 }

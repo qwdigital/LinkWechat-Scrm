@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.wecom.domain.WeGroupCodeActual;
+import com.linkwechat.wecom.mapper.WeCommunityNewGroupMapper;
 import com.linkwechat.wecom.mapper.WeGroupCodeActualMapper;
 import com.linkwechat.wecom.service.IWeGroupCodeActualService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 import com.linkwechat.wecom.mapper.WeGroupCodeMapper;
 import com.linkwechat.wecom.domain.WeGroupCode;
 import com.linkwechat.wecom.service.IWeGroupCodeService;
+import org.springframework.transaction.annotation.Transactional;
+
 /**
  * 客户群活码Service业务层处理
  * 
@@ -32,6 +35,9 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper,WeGrou
 
     @Autowired
     private WeGroupCodeActualMapper weGroupCodeActualMapper;
+
+    @Autowired
+    private WeCommunityNewGroupMapper communityNewGroupMapper;
 
     /**
      * 查询客户群活码
@@ -142,8 +148,11 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper,WeGrou
      * @return 结果
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int deleteWeGroupCodeById(Long id)
     {
+        // 需要删除新科拉群信息
+        communityNewGroupMapper.removeWeCommunityNewGroupByGroupCodeId(id);
         return weGroupCodeMapper.deleteWeGroupCodeById(id);
     }
 
