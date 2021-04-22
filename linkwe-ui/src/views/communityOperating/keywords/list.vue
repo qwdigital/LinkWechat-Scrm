@@ -314,7 +314,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(() => {
-        const ids = this.multiSelect.map(t => t.id)
+        const ids = this.multiSelect.map(t => t.taskId)
 
         remove(ids + '').then((res) => {
           if (res.code === 200) {

@@ -19,7 +19,7 @@ export default {
         pageSize: 10,
         useUserName: undefined,
         mobile: undefined,
-        activityScene: undefined,
+        scenario: undefined,
         createBy: undefined,
         beginTime: undefined,
         endTime: undefined,
@@ -129,8 +129,8 @@ export default {
         this.getList(1)
       })
     },
-    download(id, userName, activityScene) {
-      let name = userName + '-' + activityScene + '.png'
+    download(id, userName, scenario) {
+      let name = userName + '-' + scenario + '.png'
       download(id).then((res) => {
         if (res != null) {
           let blob = new Blob([res], { type: 'application/zip' })
@@ -204,9 +204,9 @@ export default {
           @keyup.enter.native="getList(1)"
         />
       </el-form-item>
-      <el-form-item label="活动场景" prop="activityScene">
+      <el-form-item label="活动场景" prop="scenario">
         <el-input
-          v-model="query.activityScene"
+          v-model="query.scenario"
           placeholder="请输入"
           clearable
           @keyup.enter.native="getList(1)"
@@ -313,7 +313,7 @@ export default {
       <el-table-column
         label="活动场景"
         align="center"
-        prop="activityScene"
+        prop="scenario"
         show-overflow-tooltip
       />
       <el-table-column label="创建人" align="center" prop="createBy" />
@@ -332,7 +332,7 @@ export default {
         <template slot-scope="{ row }">
           <el-button
             type="text"
-            @click="download(row.id, row.useUserName, row.activityScene)"
+            @click="download(row.id, row.useUserName, row.scenario)"
             v-hasPermi="['wecom:code:download']"
             >下载</el-button
           >
