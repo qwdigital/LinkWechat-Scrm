@@ -3,6 +3,7 @@ package com.linkwechat.wecom.service;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.core.domain.ConversationArchiveQuery;
+import com.linkwechat.wecom.domain.vo.ConversationArchiveVo;
 
 import java.util.List;
 
@@ -19,9 +20,9 @@ public interface IWeConversationArchiveService {
      * @param /reveiceId 接收人id
      * @return
      */
-    PageInfo<JSONObject> getChatContactList(ConversationArchiveQuery query);
+    PageInfo<ConversationArchiveVo> getChatContactList(ConversationArchiveQuery query);
 
-    PageInfo<JSONObject> getChatRoomContactList(ConversationArchiveQuery query);
+    PageInfo<ConversationArchiveVo> getChatRoomContactList(ConversationArchiveQuery query);
 
     /**
      * 查询最早聊天记录
@@ -45,6 +46,6 @@ public interface IWeConversationArchiveService {
      * @param query 参
      * @return
      */
-    PageInfo<JSONObject> getChatAllList(ConversationArchiveQuery query);
+    PageInfo<ConversationArchiveVo> getChatAllList(ConversationArchiveQuery query);
 }
 

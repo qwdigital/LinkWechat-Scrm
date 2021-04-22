@@ -75,4 +75,11 @@
         </where>
     </select>
 
+    <update id="removeWeCommunityNewGroupByEmplCodeId" parameterType="Long">
+        UPDATE we_community_new_group SET del_flag = 1 WHERE empl_code_id = #{emplCodeId}
+    </update>
+
+    <update id="removeWeCommunityNewGroupByGroupCodeId" parameterType="Long">
+        UPDATE we_community_new_group SET del_flag = 1 WHERE group_code_id = #{groupCodeId}
+    </update>
 </mapper>

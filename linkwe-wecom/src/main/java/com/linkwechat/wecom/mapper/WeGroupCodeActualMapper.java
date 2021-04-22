@@ -5,6 +5,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeGroupCodeActual;
+import org.springframework.stereotype.Repository;
 
 /**
  * 实际群码Mapper接口
@@ -12,6 +13,7 @@ import com.linkwechat.wecom.domain.WeGroupCodeActual;
  * @author ruoyi
  * @date 2020-10-07
  */
+@Repository
 public interface WeGroupCodeActualMapper extends BaseMapper<WeGroupCodeActual> {
     /**
      * 查询实际群码

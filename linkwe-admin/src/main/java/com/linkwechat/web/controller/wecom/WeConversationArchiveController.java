@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.ConversationArchiveQuery;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.wecom.domain.vo.ConversationArchiveVo;
 import com.linkwechat.wecom.service.IWeConversationArchiveService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,7 +40,7 @@ public class WeConversationArchiveController extends BaseController {
     //   @PreAuthorize("@ss.hasPermi('conversationArchive:chatContact:list')")
     @ApiOperation(value = "获取单聊会话数据接口",httpMethod = "GET")
     @GetMapping("/getChatContactList")
-    public TableDataInfo<PageInfo<JSONObject>> getChatContactList(ConversationArchiveQuery query) {
+    public TableDataInfo<PageInfo<ConversationArchiveVo>> getChatContactList(ConversationArchiveQuery query) {
         return getDataTable(weConversationArchiveService.getChatContactList(query));
     }
 
@@ -55,7 +56,7 @@ public class WeConversationArchiveController extends BaseController {
     //  @PreAuthorize("@ss.hasPermi('conversationArchive:chatRoomContact:list')")
     @ApiOperation(value = "获取群聊会话数据接口",httpMethod = "GET")
     @GetMapping("/getChatRoomContactList")
-    public TableDataInfo<PageInfo<JSONObject>> getChatRoomContactList(ConversationArchiveQuery query) {
+    public TableDataInfo<PageInfo<ConversationArchiveVo>> getChatRoomContactList(ConversationArchiveQuery query) {
         return getDataTable(weConversationArchiveService.getChatRoomContactList(query));
     }
 
@@ -69,7 +70,7 @@ public class WeConversationArchiveController extends BaseController {
     //  @PreAuthorize("@ss.hasPermi('conversationArchive:chatAllContact:list')")
     @ApiOperation(value = "获取全局会话数据接口",httpMethod = "GET")
     @GetMapping("/getChatAllList")
-    public TableDataInfo<PageInfo<JSONObject>> getChatAllList(ConversationArchiveQuery query) {
+    public TableDataInfo<PageInfo<ConversationArchiveVo>> getChatAllList(ConversationArchiveQuery query) {
         return getDataTable(weConversationArchiveService.getChatAllList(query));
     }
 

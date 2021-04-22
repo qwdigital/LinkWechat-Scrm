@@ -10,6 +10,7 @@ import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.core.page.TableSupport;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.wecom.domain.vo.ConversationArchiveVo;
 import com.linkwechat.wecom.service.IWeConversationArchiveService;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -45,7 +46,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
      * @return
      */
     @Override
-    public PageInfo<JSONObject> getChatContactList(ConversationArchiveQuery query) {
+    public PageInfo<ConversationArchiveVo> getChatContactList(ConversationArchiveQuery query) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
         Integer pageNum = pageDomain.getPageNum() == null ? 1 : pageDomain.getPageNum();
         Integer pageSize = pageDomain.getPageSize() == null ? 10 : pageDomain.getPageSize();
@@ -77,11 +78,11 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
             boolQueryBuilder.filter(QueryBuilders.rangeQuery("msgtime").gte(beginTime).lte(endTime));
         }
         builder.query(boolQueryBuilder);
-        return elasticSearch.searchPage(chartKey, builder, pageNum, pageSize, JSONObject.class);
+        return elasticSearch.searchPage(chartKey, builder, pageNum, pageSize, ConversationArchiveVo.class);
     }
 
     @Override
-    public PageInfo<JSONObject> getChatRoomContactList(ConversationArchiveQuery query) {
+    public PageInfo<ConversationArchiveVo> getChatRoomContactList(ConversationArchiveQuery query) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
         Integer pageNum = pageDomain.getPageNum() == null ? 1 : pageDomain.getPageNum();
         Integer pageSize = pageDomain.getPageSize() == null ? 10 : pageDomain.getPageSize();
@@ -115,7 +116,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
         }
 
         builder.query(boolQueryBuilder);
-        return elasticSearch.searchPage(chartKey, builder, pageNum, pageSize, JSONObject.class);
+        return elasticSearch.searchPage(chartKey, builder, pageNum, pageSize, ConversationArchiveVo.class);
     }
 
 
@@ -167,7 +168,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
     }
 
     @Override
-    public PageInfo<JSONObject> getChatAllList(ConversationArchiveQuery query) {
+    public PageInfo<ConversationArchiveVo> getChatAllList(ConversationArchiveQuery query) {
         PageDomain pageDomain = TableSupport.buildPageRequest();
         Integer pageNum = pageDomain.getPageNum() == null ? 1 : pageDomain.getPageNum();
         Integer pageSize = pageDomain.getPageSize() == null ? 10 : pageDomain.getPageSize();
@@ -208,7 +209,7 @@ public class WeConversationArchiveServiceImpl implements IWeConversationArchiveS
             boolQueryBuilder.filter(QueryBuilders.rangeQuery("msgtime").gte(beginTime).lte(endTime));
         }
         builder.query(boolQueryBuilder);
-        PageInfo<JSONObject> pageInfo = elasticSearch.searchPage(chartKey, builder, pageNum, pageSize, JSONObject.class);
+        PageInfo<ConversationArchiveVo> pageInfo = elasticSearch.searchPage(chartKey, builder, pageNum, pageSize, ConversationArchiveVo.class);
         return pageInfo;
     }
 }
