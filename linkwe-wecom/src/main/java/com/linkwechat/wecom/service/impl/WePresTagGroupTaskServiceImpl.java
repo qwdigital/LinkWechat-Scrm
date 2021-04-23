@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.common.enums.ChatType;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.enums.TaskSendType;

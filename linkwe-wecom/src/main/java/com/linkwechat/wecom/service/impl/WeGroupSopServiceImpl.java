@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.common.enums.CommunityTaskType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
@@ -9,8 +10,8 @@ import com.linkwechat.wecom.client.WeMessagePushClient;
 import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.WeMessagePushDto;
 import com.linkwechat.wecom.domain.dto.message.TextMessageDto;
-import com.linkwechat.wecom.domain.vo.WeGroupSopVo;
 import com.linkwechat.wecom.domain.vo.WeCommunityTaskEmplVo;
+import com.linkwechat.wecom.domain.vo.WeGroupSopVo;
 import com.linkwechat.wecom.domain.vo.WeMaterialVo;
 import com.linkwechat.wecom.mapper.*;
 import com.linkwechat.wecom.service.IWeCorpAccountService;

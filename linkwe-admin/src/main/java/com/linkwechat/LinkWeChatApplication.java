@@ -22,7 +22,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class LinkWeChatApplication {
     public static void main(String[] args) {
 
-
         SpringApplication.run(LinkWeChatApplication.class, args);
         System.out.println("(♥◠‿◠)ﾉﾞ  LinkWeChat启动成功   ლ(´ڡ`ლ)ﾞ  \n" +
                 " .-------.       ____     __        \n" +

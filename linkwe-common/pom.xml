@@ -255,10 +255,10 @@
             <version>1.68</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>com.github.jsqlparser</groupId>-->
-<!--            <artifactId>jsqlparser</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.github.jsqlparser</groupId>
+            <artifactId>jsqlparser</artifactId>
+        </dependency>
 
     </dependencies>
 
