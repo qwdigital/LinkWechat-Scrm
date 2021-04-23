@@ -14,7 +14,7 @@
     </div>
     <van-divider />
     <!-- 详细资料 -->
-    <van-form @submit="saveUserInformation" :disabled="flage" >
+    <van-form @submit="saveUserInformation" :disabled="flage">
       <div class="details">
         <div class="detail">
           <div class="left">
@@ -24,69 +24,72 @@
                 <span>张三 &nbsp; &nbsp;</span
                 ><van-icon name="manager" color="#9c9c9c" />
               </div>
-              <div class="c9"><span>昵称：</span><span>王二毛</span></div>
+              <div class="c9">
+                <span>昵称：</span><span>{{ form.name }}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
       <van-field
-        v-model="phonenumber"
+        v-model="form.remarkMobiles"
         name="手机号"
         label="手机号"
         placeholder="手机号"
         input-align="right"
       />
       <van-field
-        v-model="userage"
+        v-model="form.age"
         name="年龄"
         label="年龄"
         placeholder="年龄"
         input-align="right"
       />
-      <div class="details">
-      <div class="detail">
-        <div class="c9" >生日</div>
-        <div class="c9" >123@qq.com</div>
-      </div>
-      </div>
+      <van-field
+        v-model="form.birthday"
+        name="生日"
+        label="生日"
+        placeholder="生日"
+        input-align="right"
+      />
       <!-- -------------------------- -->
-       <van-field
-        v-model="emaile"
+      <van-field
+        v-model="form.email"
         name="邮箱"
         label="邮箱"
         placeholder="邮箱"
         input-align="right"
       />
-       <van-field
-        v-model="address"
+      <van-field
+        v-model="form.address"
         name="地址"
         label="地址"
         placeholder="地址"
         input-align="right"
       />
-       <van-field
-        v-model="userQQ"
+      <van-field
+        v-model="form.qq"
         name="QQ"
         label="QQ"
         placeholder="QQ"
         input-align="right"
       />
-       <van-field
-        v-model="occupation"
+      <van-field
+        v-model="form.position"
         name="职业"
         label="职业"
         placeholder="职业"
         input-align="right"
       />
-       <van-field
-        v-model="company"
+      <van-field
+        v-model="form.remarkCorpName"
         name="公司"
         label="公司"
         placeholder="公司"
         input-align="right"
       />
-       <van-field
-        v-model="others"
+      <van-field
+        v-model="form.description"
         name="其他描述"
         label="其他描述"
         placeholder="其他描述"
@@ -94,26 +97,51 @@
         type="textarea"
         class="others"
       />
-
     </van-form>
   </div>
 </template>
 <script>
+import { getCustomerInfo, getWeCustomerInfo } from "@/api/portrait";
+import { getUserInfo } from "@/api/common";
 export default {
   data() {
     return {
       flage: true,
+      // 接口开始
       // 表单数据
-      phonenumber: "456456",
-      userage:'23',
-      emaile:'227385@qq.com',
-      address:'address',
-      userQQ:'227385',
-      occupation:'occupation',
-      company:'company',
-      others:'11111111111111111111111111111111111111111111111111111111111'
-
+      form: {
+        externalUserid: "wm2H-nDQAACG5x4XjsM1OoW8UVfpbn3A", // 客户Id
+        userId: "45DuXiangShangQingXie", // 员工Id
+        name: "", // 昵称
+        remarkMobiles: "", // 手机号
+        birthday: "", // 客户生日
+        age:'',// 年龄
+        email: "", // 邮箱
+        address: "", // 地址
+        qq: "", // qq
+        position: "", // 职业
+        remarkCorpName: "", // 公司
+        description: "", // 其他描述
+      },
     };
+  },
+  computed: {
+    // 获取客户年龄
+  },
+  created() {
+    // 获取客户详细信息
+    getCustomerInfo({
+      externalUserid: this.form.externalUserid,
+      userId: this.form.userId,
+    })
+      .then(({ data }) => {
+        console.log(data);
+        this.form = data;
+        console.log(this.form);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
   methods: {
     edit() {
@@ -122,6 +150,14 @@ export default {
     // 点击保存按钮提交表单
     saveUserInformation() {
       this.flage = !this.flage;
+
+      getWeCustomerInfo(this.form)
+        .then((data)=> {
+          console.log(data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
   },
 };
