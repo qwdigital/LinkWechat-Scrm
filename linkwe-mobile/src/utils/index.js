@@ -1,11 +1,10 @@
 /**
- * 请求路径参数转为对象
+ * query请求路径参数转为对象
  * @param {*} url
  */
 export function param2Obj(url) {
-  const search = decodeURIComponent(url)
-    .split('?')[1]
-    .split('#')[0]
+  let search = decodeURIComponent(url).split('?')[1]
+  search = search && search.split('#')[0]
   if (!search) {
     return {}
   }

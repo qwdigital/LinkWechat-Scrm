@@ -28,13 +28,15 @@ export default {
     let code = query.code
     this.corpId = query.corpId
     this.agentId = query.agentId
+    this.$toast('agentId:' + this.agentId)
+
     if (!code) {
       this.$toast('未获得授权')
       return
     }
     let { data } = await getUserInfo(code, this.agentId)
     this.$store.state.userId = data.userId
-    // this.$toast('userId:' + this.$store.state.userId)
+    this.$toast('userId:' + this.$store.state.userId)
   },
   watch: {
     // 通过config接口注入权限验证配置
@@ -49,7 +51,7 @@ export default {
     reload() {
       this.isRouterAlive = false
       this.$nextTick(function() {
-        this.isRouterAlive = true
+        // this.isRouterAlive = true
       })
     },
     wxConfig() {

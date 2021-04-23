@@ -22,7 +22,7 @@
       >
         <van-tab :title="'添加的员工(' + staff.length + ')'">
           <van-list v-model="loading" :finished="finished" @load="onLoad">
-            <van-cell v-for="(item,index) in staff" :key="index">
+            <van-cell v-for="(item, index) in staff" :key="index">
               <div class="details">
                 <div class="detail">
                   <div class="left">
@@ -56,7 +56,7 @@
                     </div>
                     <div class="right">
                       <div>
-                        {{ item.groupName + "(" + item.groupMemberNum + ")" }}
+                        {{ item.groupName + '(' + item.groupMemberNum + ')' }}
                       </div>
                       <div>
                         <span class="c9">群主：</span>
@@ -82,7 +82,7 @@
 </template>
 
 <script>
-import { findAddaddEmployes, findAddGroupNum } from "@/api/portrait";
+import { findAddaddEmployes, findAddGroupNum } from '@/api/portrait'
 export default {
   data() {
     return {
@@ -95,43 +95,45 @@ export default {
       groupChat: [], // 添加的群聊
       commonGroup: [], // 共同的群聊
       //   externalUserid: "wmiGuBCgAAIH-T9ekaE-Q52N2lKWeInw",
-      externalUserid: "FengJuZhuDeJieDao",
-      userid: "45DuXiangShangQingXie", // 员工Id
-    };
+      externalUserid: '',
+      userid: this.$store.state.userId, // 员工Id
+    }
   },
   created() {
-    this.findAddaddEmployes();
-    this.findAddGroupNum();
+    this.externalUserid = this.$route.query.customerId
+
+    this.findAddaddEmployes()
+    this.findAddGroupNum()
   },
   methods: {
     conGroup() {
-       this.groupChat = this.commonGroup 
-    //    console.log(123);
+      this.groupChat = this.commonGroup
+      //    console.log(123);
     },
     onLoad() {
       setTimeout(() => {
         for (let i = 0; i < 2; i++) {
-          this.list.push(this.list.length + 1);
+          this.list.push(this.list.length + 1)
         }
 
         // 加载状态结束
-        this.loading = false;
+        this.loading = false
 
         // 数据全部加载完成
         if (this.list.length >= 2) {
-          this.finished = true;
+          this.finished = true
         }
-      }, 1000);
+      }, 1000)
     },
     findAddaddEmployes() {
       findAddaddEmployes(this.externalUserid)
         .then(({ data }) => {
           //   console.log(data);
-          this.staff = data;
+          this.staff = data
         })
         .catch((err) => {
-          console.log(err);
-        });
+          console.log(err)
+        })
     },
     findAddGroupNum() {
       findAddGroupNum({
@@ -140,36 +142,36 @@ export default {
       })
         .then(({ data }) => {
           //   console.log(data);
-        //   debugger
-          this.groupChat = data;
+          //   debugger
+          this.groupChat = data
           this.commonGroup = this.groupChat.filter((ele) => {
             //   debugger
-            return ele.groupMemberNum == 1;
-          });
+            return ele.groupMemberNum == 1
+          })
         })
         .catch((err) => {
-          console.log(err);
-        });
+          console.log(err)
+        })
     },
     // 时间处理器
     getTime(data) {
-      const date = new Date(data);
+      const date = new Date(data)
       // console.log(timer.getFullYear());
-      var Y = date.getFullYear() + "-";
+      var Y = date.getFullYear() + '-'
       var M =
         (date.getMonth() + 1 < 10
-          ? "0" + (date.getMonth() + 1)
-          : date.getMonth() + 1) + "-";
+          ? '0' + (date.getMonth() + 1)
+          : date.getMonth() + 1) + '-'
       var D =
-        date.getDate() < 10 ? "0" + date.getDate() : date.getDate() + "   ";
+        date.getDate() < 10 ? '0' + date.getDate() : date.getDate() + '   '
       var h =
-        (date.getHours() < 10 ? "0" + date.getHours() : date.getHours()) + ":";
+        (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
       var m =
-        date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
-      return Y + M + D + h + m;
+        date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+      return Y + M + D + h + m
     },
   },
-};
+}
 </script>
 
 <style lang="less" scoped>

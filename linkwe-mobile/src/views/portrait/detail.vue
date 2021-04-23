@@ -101,8 +101,8 @@
   </div>
 </template>
 <script>
-import { getCustomerInfo, getWeCustomerInfo } from "@/api/portrait";
-import { getUserInfo } from "@/api/common";
+import { getCustomerInfo, getWeCustomerInfo } from '@/api/portrait'
+import { getUserInfo } from '@/api/common'
 export default {
   data() {
     return {
@@ -110,57 +110,58 @@ export default {
       // 接口开始
       // 表单数据
       form: {
-        externalUserid: "wm2H-nDQAACG5x4XjsM1OoW8UVfpbn3A", // 客户Id
-        userId: "45DuXiangShangQingXie", // 员工Id
-        name: "", // 昵称
-        remarkMobiles: "", // 手机号
-        birthday: "", // 客户生日
-        age:'',// 年龄
-        email: "", // 邮箱
-        address: "", // 地址
-        qq: "", // qq
-        position: "", // 职业
-        remarkCorpName: "", // 公司
-        description: "", // 其他描述
+        externalUserid: '', // 客户Id
+        userId: this.$store.state.userId, // 员工Id
+        name: '', // 昵称
+        remarkMobiles: '', // 手机号
+        birthday: '', // 客户生日
+        age: '', // 年龄
+        email: '', // 邮箱
+        address: '', // 地址
+        qq: '', // qq
+        position: '', // 职业
+        remarkCorpName: '', // 公司
+        description: '', // 其他描述
       },
-    };
+    }
   },
   computed: {
     // 获取客户年龄
   },
   created() {
+    this.form.externalUserid = this.$route.query.customerId
     // 获取客户详细信息
     getCustomerInfo({
       externalUserid: this.form.externalUserid,
       userId: this.form.userId,
     })
       .then(({ data }) => {
-        console.log(data);
-        this.form = data;
-        console.log(this.form);
+        console.log(data)
+        this.form = data
+        console.log(this.form)
       })
       .catch((err) => {
-        console.log(err);
-      });
+        console.log(err)
+      })
   },
   methods: {
     edit() {
-      this.flage = !this.flage;
+      this.flage = !this.flage
     },
     // 点击保存按钮提交表单
     saveUserInformation() {
-      this.flage = !this.flage;
+      this.flage = !this.flage
 
       getWeCustomerInfo(this.form)
-        .then((data)=> {
-          console.log(data);
+        .then((data) => {
+          console.log(data)
         })
         .catch((err) => {
-          console.log(err);
-        });
+          console.log(err)
+        })
     },
   },
-};
+}
 </script>
 
 <style lang="less" scoped>

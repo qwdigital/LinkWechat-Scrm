@@ -26,7 +26,7 @@
             </div>
           </div>
         </div>
-        <div class="data" @click="goRoute">详细资料></div>
+        <div class="data" @click="goRoute('/detail')">详细资料></div>
       </div>
       <div class="detail">
         <div class="c9">手机号</div>
@@ -123,7 +123,7 @@
     <div class="realationship">
       <div class="detail">
         <div>社交关系</div>
-        <div class="data" @click="detailGoRoute()">详情</div>
+        <div class="data" @click="goRoute('/community')">详情</div>
       </div>
       <div class="detail">
         <div class="boxnumber">
@@ -387,7 +387,7 @@ export default {
       //   externalUserid: "wm2H-nDQAACG5x4XjsM1OoW8UVfpbn3A", // 客户Id
       //   externalUserid: "wmiGuBCgAAgeijfvvpJ62cBfwrB-c4kw",
       externalUserid: 'FengJuZhuDeJieDao',
-      userid: '45DuXiangShangQingXie', // 员工Id
+      userid: this.$store.state.userId, // 员工Id
       form: {
         name: '', // 昵称
         remarkMobiles: '', // 手机号
@@ -490,7 +490,8 @@ export default {
       this.styleActive4 = ''
     },
     activity() {
-      ;(this.trajectoryType = 3), this.findTrajectory()
+      this.trajectoryType = 3
+      this.findTrajectory()
       this.styleActive1 = ''
       this.styleActive2 = ''
       this.styleActive3 = 'background:#1989fa;color:#fff'
@@ -562,18 +563,11 @@ export default {
     // 点击删除按钮
     deltodoshow() {},
 
-    goRoute() {
+    goRoute(path) {
       this.$router.push({
-        path: '/detail',
+        path,
         query: {
-          //   type
-        },
-      })
-    },
-    detailGoRoute() {
-      this.$router.push({
-        path: '/community',
-        query: {
+          customerId: this.externalUserid,
           //   type
         },
       })
@@ -695,20 +689,45 @@ export default {
     },
   },
   created() {
-    // 获取客户信息
     let _this = this
-    _this.findAddaddEmployes(),
-      _this.findAddGroupNum(),
-      _this.getCustomerInfo(),
-      _this.findTrajectory(),
-      getAllTags()
-        .then(({ data }) => {
-          // console.log(data);
-          this.alllabel = data
+    wx.invoke('getContext', {}, function(res) {
+      if (res.err_msg == 'getContext:ok') {
+        entry = res.entry //返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
+        if (
+          ![
+            'single_chat_tools',
+            'group_chat_tools',
+            'contact_profile',
+          ].includes(entry)
+        ) {
+          // _this.$toast.clear()
+          _this.$toast('入口错误：' + entry)
+          return
+        }
+        wx.invoke('getCurExternalContact', {}, (res) => {
+          if (res.err_msg == 'getCurExternalContact:ok') {
+            _this.externalUserid = res.userId //返回当前外部联系人userId
+            // 获取客户信息
+            _this.findAddaddEmployes(),
+              _this.findAddGroupNum(),
+              _this.getCustomerInfo(),
+              _this.findTrajectory(),
+              getAllTags()
+                .then(({ data }) => {
+                  // console.log(data);
+                  _this.alllabel = data
+                })
+                .catch((err) => {
+                  console.log(err)
+                })
+          } else {
+            //错误处理
+          }
         })
-        .catch((err) => {
-          console.log(err)
-        })
+      } else {
+        //错误处理
+      }
+    })
   },
   components: {
     StepList,
