@@ -17,6 +17,7 @@ import com.linkwechat.wecom.domain.WeEmpleCodeUseScop;
 import com.linkwechat.wecom.domain.WeMaterial;
 import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
 import com.linkwechat.wecom.domain.dto.WeExternalContactDto;
+import com.linkwechat.wecom.mapper.WeCommunityNewGroupMapper;
 import com.linkwechat.wecom.mapper.WeEmpleCodeMapper;
 import com.linkwechat.wecom.mapper.WeEmpleCodeTagMapper;
 import com.linkwechat.wecom.mapper.WeEmpleCodeUseScopMapper;
@@ -61,10 +62,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
     private RedisCache redisCache;
 
     @Autowired
-    private WeEmpleCodeUseScopMapper scopMapper;
-
-    @Autowired
-    private WeEmpleCodeTagMapper codeTagMapper;
+    private WeCommunityNewGroupMapper communityNewGroupMapper;
 
     /**
      * 查询员工活码
@@ -205,6 +203,9 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         if (weEmpleCode != null && weEmpleCode.getConfigId() != null) {
             weExternalContactClient.delContactWay(weEmpleCode.getConfigId());
         }
+        // 删除对应的新科拉群信息
+        communityNewGroupMapper.removeWeCommunityNewGroupByEmplCodeId(id);
+        // 删除员工活码
         return this.baseMapper.deleteWeEmpleCodeById(id);
     }
 

@@ -13,7 +13,7 @@
     <description>若依管理系统</description>
 
     <properties>
-        <springboot.vaerion>2.3.7.RELEASE</springboot.vaerion>
+        <springboot.version>2.3.7.RELEASE</springboot.version>
         <linkwe.version>3.1.0</linkwe.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -59,7 +59,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>${springboot.vaerion}</version>
+                <version>${springboot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

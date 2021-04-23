@@ -142,7 +142,6 @@ public class RyTask {
      * 扫描群发消息定时任务
      */
     public void messageTask() {
-
         //获的当前时间的毫秒数
         long currentTime = System.currentTimeMillis();
         //customerMessageTimeTaskMapper
@@ -153,32 +152,22 @@ public class RyTask {
         if (CollectionUtils.isNotEmpty(weCustomerMessageTimeTasks)) {
 
             weCustomerMessageTimeTasks.forEach(
-
                     s -> {
-
                         try {
-
                             semaphore.acquire();
-
                             if (s.getMessageInfo() != null && s.getMessageId() != null || (s.getMessageInfo().getPushType().equals(WeConstans.SEND_MESSAGE_CUSTOMER)
                                     && CollectionUtils.isNotEmpty(s.getCustomersInfo())) || (s.getMessageInfo().getPushType().equals(WeConstans.SEND_MESSAGE_GROUP)
                                     && CollectionUtils.isNotEmpty(s.getGroupsInfo()))) {
-
                                 weCustomerMessageService.sendMessgae(s.getMessageInfo(), s.getMessageId(), s.getCustomersInfo(), s.getGroupsInfo());
-
                                 //更新消息处理状态
                                 customerMessageTimeTaskMapper.updateTaskSolvedById(s.getTaskId());
-
                             }
-
                             semaphore.release();
-
                         } catch (JsonProcessingException | InterruptedException e) {
                             log.error("定时群发消息处理异常：ex:{}", e);
                             e.printStackTrace();
                         }
                     }
-
             );
         }
 
