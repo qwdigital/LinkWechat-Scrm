@@ -68,6 +68,11 @@ public class CustomerMessagePushDto {
      */
     private MiniprogramMessageDto miniprogramMessage;
 
+    /**
+     * 视频
+     */
+    private VideoDto videoDto;
+
 
     /**
      * 消息内容

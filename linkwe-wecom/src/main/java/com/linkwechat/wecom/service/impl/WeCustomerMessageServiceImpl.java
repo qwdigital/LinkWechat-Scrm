@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -139,46 +140,46 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
      * @param customerMessagePushDto   群发消息
      */
     public void childMessage(WeCustomerMessagePushDto weCustomerMessagePushDto, CustomerMessagePushDto customerMessagePushDto) {
-
+        List list = new ArrayList();
         // 消息类型 0 文本消息  1 图片消息 2 链接消息   3 小程序消息
         if (customerMessagePushDto.getMessageType().equals(GroupMessageType.TEXT.getType())) {
-            weCustomerMessagePushDto.setImage(null);
-            weCustomerMessagePushDto.setLink(null);
-            weCustomerMessagePushDto.setMiniprogram(null);
             weCustomerMessagePushDto.setText(customerMessagePushDto.getTextMessage());
-
         }
 
         if (customerMessagePushDto.getMessageType().equals(GroupMessageType.IMAGE.getType())) {
-            weCustomerMessagePushDto.setImage(customerMessagePushDto.getImageMessage());
-            weCustomerMessagePushDto.setLink(null);
-            weCustomerMessagePushDto.setMiniprogram(null);
-            weCustomerMessagePushDto.setText(null);
-
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("msgtype","image");
+            jsonObject.put("image",customerMessagePushDto.getImageMessage());
+            list.add(jsonObject);
         }
         if (customerMessagePushDto.getMessageType().equals(GroupMessageType.LINK.getType())) {
-            weCustomerMessagePushDto.setImage(null);
-            weCustomerMessagePushDto.setLink(customerMessagePushDto.getLinkMessage());
-            weCustomerMessagePushDto.setMiniprogram(null);
-            weCustomerMessagePushDto.setText(null);
-
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("msgtype","link");
+            jsonObject.put("link",customerMessagePushDto.getLinkMessage());
+            list.add(jsonObject);
         }
 
         if (customerMessagePushDto.getMessageType().equals(GroupMessageType.MINIPROGRAM.getType())) {
-            weCustomerMessagePushDto.setImage(null);
-            weCustomerMessagePushDto.setLink(null);
-            weCustomerMessagePushDto.setMiniprogram(customerMessagePushDto.getMiniprogramMessage());
-            weCustomerMessagePushDto.setText(null);
-
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("msgtype","miniprogram");
+            jsonObject.put("miniprogram",customerMessagePushDto.getMiniprogramMessage());
+            list.add(jsonObject);
         }
 
         if(customerMessagePushDto.getMessageType().equals(GroupMessageType.TEXT_IMAGE.getType())){
-            weCustomerMessagePushDto.setImage(customerMessagePushDto.getImageMessage());
-            weCustomerMessagePushDto.setLink(null);
-            weCustomerMessagePushDto.setMiniprogram(null);
-            weCustomerMessagePushDto.setText(customerMessagePushDto.getTextMessage());
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("msgtype","text_image");
+            jsonObject.put("text_image",customerMessagePushDto.getTextMessage());
+            list.add(jsonObject);
         }
 
+        if(customerMessagePushDto.getMessageType().equals(GroupMessageType.VIDEO.getType())){
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("msgtype","video");
+            jsonObject.put("video",customerMessagePushDto.getVideoDto());
+            list.add(jsonObject);
+        }
+        weCustomerMessagePushDto.setAttachments(list);
     }
 
 }

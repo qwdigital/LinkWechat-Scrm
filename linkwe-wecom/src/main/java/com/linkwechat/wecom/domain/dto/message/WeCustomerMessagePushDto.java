@@ -28,18 +28,22 @@ public class WeCustomerMessagePushDto {
     private TextMessageDto text;
 
     /**
+     * 附件
+     */
+    private List attachments;
+
+    /**
      * 图片消息
      */
-    private ImageMessageDto image;
+    //private ImageMessageDto image;
 
     /**
      * 链接消息
      */
-    private LinkMessageDto link;
+    //private LinkMessageDto link;
 
     /**
      * 小程序消息
      */
-    private MiniprogramMessageDto miniprogram;
-
+    //private MiniprogramMessageDto miniprogram;
 }
