@@ -4,6 +4,7 @@ import * as taskApi from '@/api/task'
 import SelectTag from '@/components/SelectTag'
 import SelectUser from '@/components/SelectUser'
 import SelectPoster from '@/components/SelectPoster'
+import SelectQrCode from '@/components/SelectQrCode'
 export default {
   name: 'editTask',
   components: {
@@ -11,6 +12,7 @@ export default {
     SelectTag,
     SelectPoster,
     TargetSelectUser: SelectUser,
+    SelectQrCode
   },
   data() {
     return {
@@ -233,8 +235,8 @@ export default {
     },
     tagetSelect(value) {
       console.log(value)
-      this.groupForm.fissionTarget = value[0].name
-      this.groupForm.fissionTargetId = value[0].userId
+      this.groupForm.fissionTarget = value.codeUrl
+      this.groupForm.fissionTargetId = value.id
     },
     insertCustomer() {
       this.groupForm.welcomeMsg += '#客户昵称#'
@@ -254,6 +256,12 @@ export default {
       return isJPG
     },
   },
+  computed:{
+      arrayTarget(){
+        
+          return [].concat({id:this.groupForm.fissionTargetId})
+      }
+  }
 }
 </script>
 
@@ -324,7 +332,7 @@ export default {
             icon="el-icon-plus"
             size="mini"
             @click="dialogVisibleSelectUser = true"
-            >选择成员</el-button
+            >选择群活码</el-button
           >
         </el-form-item>
         <!-- <el-form-item label="客户标签" prop="tagType">
@@ -391,7 +399,7 @@ export default {
             >添加员工</el-button
           >
           <div v-if="groupForm.fissionTargetId" class="changePosterBody">
-            <el-tag>{{ groupForm.fissionTarget }}</el-tag>
+               <img :src="groupForm.fissionTarget" class="postersUrl" />
             <span class="changeUrl" @click="dialogVisibleTargetStff = true"
               >修改</span
             >
@@ -492,7 +500,7 @@ export default {
       @success="submitSelecPoster"
     >
     </SelectPoster>
-    <TargetSelectUser
+    <!-- <TargetSelectUser
       key="1"
       :visible.sync="dialogVisibleTargetStff"
       title="选择成员"
@@ -500,7 +508,14 @@ export default {
       :isSigleSelect="true"
       @success="tagetSelect"
     >
-    </TargetSelectUser>
+    </TargetSelectUser> -->
+        <!-- 选择群活码弹窗 -->
+    <SelectQrCode
+      :visible.sync="dialogVisibleTargetStff"
+      @success="tagetSelect"
+      :selected="arrayTarget"
+    >
+    </SelectQrCode>
   </div>
 </template>
 
