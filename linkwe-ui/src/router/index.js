@@ -470,40 +470,60 @@ export const constantRoutes = [
   //     },
   //   ]
   // },
-  //  {
-  //     path: '/application',
-  //     component: Layout,
-  //     meta: { title: '', icon: 'wechat' },
-  //     children: [
-  //       {
-  //         path: 'taskGroup',
-  //         name: 'taskGroup',
-  //         component: (resolve) => require(['@/views/application/taskGroup'], resolve),
-  //         meta: { title: '任务宝', icon: '' }
-  //       },
-  //       {
-  //         path: 'taskDetail',
-  //         name: 'taskDetail',
-  //         hidden: true,
-  //         component: (resolve) => require(['@/views/application/taskDetail'], resolve),
-  //         meta: { title: '任务详情', icon: '' }
-  //       },
-  //       {
-  //         path: 'editTask',
-  //         name: 'editTask',
-  //         hidden: true,
-  //         component: (resolve) => require(['@/views/application/taskDetail/editTask'], resolve),
-  //         meta: { title: '编辑活动任务', icon: '' }
-  //       },
-  //       {
-  //         path: 'addTask',
-  //         name: 'addTask',
-  //         hidden: true,
-  //         component: (resolve) => require(['@/views/application/taskDetail/addTask'], resolve),
-  //         meta: { title: '新增活动任务', icon: '' }
-  //       },
-  //     ]
-  //   },
+//    {
+//       path: '/application',
+//       component: Layout,
+//       meta: { title: '', icon: 'wechat' },
+//       children: [
+//         {
+//           path: 'taskGroup',
+//           name: 'taskGroup',
+//           component: (resolve) => require(['@/views/application/taskGroup'], resolve),
+//           meta: { title: '任务宝', icon: '' }
+//         },
+//         {
+//           path: 'taskDetail',
+//           name: 'taskDetail',
+//           hidden: true,
+//           component: (resolve) => require(['@/views/application/taskDetail'], resolve),
+//           meta: { title: '任务详情', icon: '' }
+//         },
+//         {
+//           path: 'editTask',
+//           name: 'editTask',
+//           hidden: true,
+//           component: (resolve) => require(['@/views/application/taskDetail/editTask'], resolve),
+//           meta: { title: '编辑活动任务', icon: '' }
+//         },
+//         {
+//           path: 'addTask',
+//           name: 'addTask',
+//           hidden: true,
+//           component: (resolve) => require(['@/views/application/taskDetail/addTask'], resolve),
+//           meta: { title: '新增活动任务', icon: '' }
+//         },
+//         {
+//             path: 'groupFission',
+//             name: 'groupFission',
+//             component: (resolve) => require(['@/views/application/groupFission'], resolve),
+//             meta: { title: '群裂变', icon: '' }
+//         },
+//         {
+//             path: 'addFission',
+//             name: 'addFission',
+//             hidden: true,
+//             component: (resolve) => require(['@/views/application/fissionDetail/addFission'], resolve),
+//             meta: { title: '新增群裂变', icon: '' }
+//           },
+//           {
+//             path: 'fissionDetail',
+//             name: 'fissionDetail',
+//             hidden: true,
+//             component: (resolve) => require(['@/views/application/fissionDetail'], resolve),
+//             meta: { title: '任务详情', icon: '' }
+//           },
+//       ]
+//     },
   {
     path: '/user',
     component: Layout,
