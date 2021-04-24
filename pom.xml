@@ -31,7 +31,7 @@
         <poi.version>3.17</poi.version>
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.0</jwt.version>
-        <forest.version>1.5.0-RC3</forest.version>
+        <forest.version>1.5.0</forest.version>
         <lombok.version>1.18.16</lombok.version>
         <reflectasm.version>1.11.9</reflectasm.version>
         <hutool.version>5.4.1</hutool.version>
@@ -211,7 +211,7 @@
             <!--forset-->
             <dependency>
                 <groupId>com.dtflys.forest</groupId>
-                <artifactId>spring-boot-starter-forest</artifactId>
+                <artifactId>forest-spring-boot-starter</artifactId>
                 <version>${forest.version}</version>
             </dependency>
 

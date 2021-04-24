@@ -145,4 +145,11 @@ public class WeMaterialController extends BaseController {
         return AjaxResult.success(weMediaDto);
     }
 
+    @Log(title = "上传素材图片", businessType = BusinessType.OTHER)
+    @PostMapping("/uploadimg")
+    @ApiOperation("上传素材图片")
+    public AjaxResult<WeMediaDto> uploadImg(MultipartFile file){
+        return AjaxResult.success(materialService.uploadImg(file));
+    }
+
 }
