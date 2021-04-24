@@ -1,5 +1,7 @@
 package com.linkwechat.wecom.service;
 
+import com.linkwechat.wecom.domain.WeApp;
+
 /**
  * @description: 微信token相关接口
  * @author: My
@@ -19,6 +21,8 @@ public interface IWeAccessTokenService {
 
 
    public String findThirdAppAccessToken(String agentId);
+
+
 
 
    public void removeToken();

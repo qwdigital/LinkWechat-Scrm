@@ -106,6 +106,15 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
                 .eq(WeApp::getAgentId, agentId)
                 .eq(WeApp::getDelFlag, Constants.NORMAL_CODE)
                 .eq(WeApp::getStatus,  Constants.NORMAL_CODE));
+
+        return findThirdAppAccessToken(weApp);
+
+    }
+
+
+    private String findThirdAppAccessToken(WeApp weApp){
+
+
         if(weApp == null){
             throw new WeComException("当前agentId不可用或不存在");
         }
@@ -118,14 +127,15 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
 
         WeAccessTokenDtoDto weAccessTokenDtoDto
                 = accessTokenClient.getToken(wxCorpAccount.getCorpId(),weApp.getAgentSecret());
-        token=weAccessTokenDtoDto.getAccess_token();
-        if(StringUtils.isNotEmpty(token)){
 
-            redisCache.setCacheObject(WeConstans.WE_THIRD_APP_TOKEN+"::"+agentId,token,weAccessTokenDtoDto.getExpires_in().intValue(), TimeUnit.SECONDS);
+        if(StringUtils.isNotEmpty(weAccessTokenDtoDto.getAccess_token())){
+
+            redisCache.setCacheObject(WeConstans.WE_THIRD_APP_TOKEN+"::"+weApp.getAgentId(),weAccessTokenDtoDto.getAccess_token(),weAccessTokenDtoDto.getExpires_in().intValue(), TimeUnit.SECONDS);
         }
 
 
-        return token;
+        return weAccessTokenDtoDto.getAccess_token();
+
     }
 
 
