@@ -20,3 +20,5 @@ velocity.log
 logs
 .m2
 linkwe-ui/.env.production
+linkwe-mobile/mobile/
+linkwe-taskMobile/dist/

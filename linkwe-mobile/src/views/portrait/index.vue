@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 头部 -->
-    <div class="header">
+    <!-- <div class="header">
       <van-icon
         name="cross"
         color="#9c9c9c"
@@ -10,7 +10,7 @@
       />
       <span class="title"> 客户画像 </span>
     </div>
-    <van-divider />
+    <van-divider /> -->
     <!-- 详细资料 -->
     <div class="details">
       <div class="detail">
@@ -21,29 +21,31 @@
               <span>张三 &nbsp; &nbsp;</span
               ><van-icon name="manager" color="#9c9c9c" />
             </div>
-            <div class="c9"><span>昵称：</span><span>王二毛</span></div>
+            <div class="c9">
+              <span>昵称：</span><span>{{ form.name }}</span>
+            </div>
           </div>
         </div>
-        <div class="data" @click="goRoute">详细资料></div>
+        <div class="data" @click="goRoute('/detail')">详细资料></div>
       </div>
       <div class="detail">
         <div class="c9">手机号</div>
-        <div>123@qq.com</div>
+        <div>{{ form.remarkMobiles }}</div>
       </div>
       <van-divider />
       <div class="detail">
         <div class="c9">年龄</div>
-        <div>123@qq.com</div>
+        <div>{{ form.age }}</div>
       </div>
       <van-divider />
       <div class="detail">
         <div class="c9">生日</div>
-        <div>123@qq.com</div>
+        <div>{{ form.birthday ? form.birthday.substring(0, 10) : '' }}</div>
       </div>
       <van-divider />
       <div class="detail">
         <div class="c9">邮箱</div>
-        <div>123@qq.com</div>
+        <div>{{ form.email }}</div>
       </div>
     </div>
     <div class="divider"></div>
@@ -51,16 +53,24 @@
     <div class="userlabel">
       <div class="detail">
         <div>客户标签</div>
-        <div class="data" is-link @click="show = true">编辑</div>
+        <div class="data" is-link @click="labelEdit">编辑</div>
       </div>
-      <van-row gutter="10" class="labels">
+      <van-row gutter="10" class="labelstyle">
+        <van-col span="4.5" v-for="(item, index) in labels" :key="index">
+          <div
+            class="label"
+            v-for="(item1, index1) in item.weTags"
+            :key="index1"
+          >
+            {{ item1.name }}
+          </div></van-col
+        >
+        <!-- <van-col span="4.5"> <div class="label">标签1</div></van-col>
         <van-col span="4.5"> <div class="label">标签1</div></van-col>
         <van-col span="4.5"> <div class="label">标签1</div></van-col>
         <van-col span="4.5"> <div class="label">标签1</div></van-col>
         <van-col span="4.5"> <div class="label">标签1</div></van-col>
-        <van-col span="4.5"> <div class="label">标签1</div></van-col>
-        <van-col span="4.5"> <div class="label">标签1</div></van-col>
-        <van-col span="4.5"> <div class="label">标签1</div></van-col>
+        <van-col span="4.5"> <div class="label">标签1</div></van-col> -->
       </van-row>
     </div>
     <div class="divider"></div>
@@ -73,23 +83,33 @@
       />
       <div class="content">
         <span>测试:</span>
-        <van-row gutter="8" class="labels">
-          <van-col span="4.5"
-            ><div class="label" @click="userLabel">标签1</div></van-col
+        <van-row gutter="8" class="labelstyle">
+          <van-col span="4.5" v-for="(item, index) in grouplabel" :key="index"
+            ><div
+              class="label"
+              @click="userLabel(item)"
+              :style="
+                addTag.some((item1) => item1.tagId == item.tagId)
+                  ? isActive
+                  : ''
+              "
+            >
+              {{ item.name }}
+            </div></van-col
           >
-          <van-col span="4.5"> <div class="label">标签1</div></van-col>
-          <van-col span="4.5"> <div class="label">标签1</div></van-col>
-          <van-col span="4.5"> <div class="label">标签1</div></van-col>
-          <van-col span="4.5"> <div class="label">标签1</div></van-col>
-          <van-col span="4.5"> <div class="label">标签1</div></van-col>
-          <van-col span="4.5"> <div class="label">标签1</div></van-col>
         </van-row>
         <div class="branch" v-if="true">
           <van-divider />
           <p>标签组:</p>
-          <van-row class="labels">
-            <van-col span="4.5"
-              ><div class="label" @click="changeLabel">标签1</div></van-col
+          <van-row gutter="8" class="labelstyle">
+            <van-col span="4.5" v-for="(item, index) in alllabel" :key="index"
+              ><div
+                class="label"
+                :class="{ styleactive: styleactive == item.groupId }"
+                @click="changeLabel(item)"
+              >
+                {{ item.gourpName }}
+              </div></van-col
             >
           </van-row>
           <van-button type="info" class="saveinfo" round @click="saveInfo"
@@ -103,20 +123,20 @@
     <div class="realationship">
       <div class="detail">
         <div>社交关系</div>
-        <div class="data" @click="detailGoRoute">详情</div>
+        <div class="data" @click="goRoute('/community')">详情</div>
       </div>
       <div class="detail">
         <div class="boxnumber">
           <p>添加的员工</p>
-          <div class="number">8</div>
+          <div class="number">{{ staff.length }}</div>
         </div>
         <div class="boxnumber">
           <p>添加的群聊</p>
-          <div class="number">8</div>
+          <div class="number">{{ groupChat.length }}</div>
         </div>
         <div class="boxnumber">
           <p>共同的群聊</p>
-          <div class="number">8</div>
+          <div class="number">{{ commonGroup.length }}</div>
         </div>
       </div>
     </div>
@@ -127,46 +147,32 @@
         <div>客户轨迹</div>
         <div class="data" is-link @click="usershow = true">添加待办></div>
       </div>
-      <van-row gutter="8" class="labels">
-        <van-col span="6"> <div class="label1">信息动态</div></van-col>
-        <van-col span="6"> <div class="label1">社交动态</div></van-col>
-        <van-col span="6"> <div class="label1">活动动态</div></van-col>
-        <van-col span="6"> <div class="label1">待办动态</div></van-col>
+      <van-row gutter="8" class="labelstyle">
+        <van-col span="6">
+          <div class="label1" @click="information" :style="styleActive1">
+            信息动态
+          </div></van-col
+        >
+        <van-col span="6">
+          <div class="label1" @click="socialContact" :style="styleActive2">
+            社交动态
+          </div></van-col
+        >
+        <van-col span="6">
+          <div class="label1" @click="activity" :style="styleActive3">
+            活动动态
+          </div></van-col
+        >
+        <van-col span="6">
+          <div class="label1" @click="dealtWith" :style="styleActive4">
+            待办动态
+          </div></van-col
+        >
       </van-row>
 
       <!-- 步骤条 -->
-      <van-steps direction="vertical" inactive-color="#2c8cf0" :active="active">
-        <!-- 时间 -->
-        <p class="f12" style="position:relative; left:-32px;">
-          2021-02-16 星期二
-        </p>
-        <van-step class="msg">
-          <span class="f12 po"> 12:40</span>
-          <span class="fs14">信息动态</span>
-          <span class="deldynamic">删除</span>
-          <p class="fs14 con ">编辑编辑</p>
-        </van-step>
-        <van-step>
-          <span class="f12 po"> 12:40</span>
-          <span class="fs14">社交动态</span>
-          <span class="deldynamic">删除</span>
-          <p class="fs14 con ">编辑编辑</p>
-        </van-step>
-      </van-steps>
-      <van-divider />
-      <van-steps direction="vertical" inactive-color="#2c8cf0" :active="active">
-        <!-- 时间 -->
-        <p class="f12" style="position:relative; left:-32px;">
-          2021-02-16 星期二
-        </p>
-        <van-step @click="todonewsshow = true">
-          <span class="f12 po"> 12:40</span>
-          <span class="fs14">待办动态</span>
-          <span class="finish">完成</span>
-          <span class="deldynamic">删除</span>
-          <p class="fs14 con ">编辑编辑</p>
-        </van-step>
-      </van-steps>
+
+      <StepList :stepList="list"></StepList>
     </div>
     <!-- 点击添加待办触发弹出框开始 -->
     <van-action-sheet v-model="usershow">
@@ -241,8 +247,13 @@
           />
         </van-action-sheet>
         <!-- 保存 -->
-        <div style="margin: 16px;">
-          <van-button round block type="info" native-type="submit"
+        <div style="margin: 30px;">
+          <van-button
+            round
+            block
+            type="info"
+            native-type="submit"
+            @click="saveInfo2"
             >保存</van-button
           >
         </div>
@@ -333,7 +344,17 @@
 </template>
 
 <script>
-import { getCustomerInfo } from '@/api/portrait'
+import {
+  getCustomerInfo,
+  getAllTags,
+  updateWeCustomerPorTraitTag,
+  findAddaddEmployes,
+  findAddGroupNum,
+  findTrajectory,
+  addOrEditWaitHandle,
+} from '@/api/portrait'
+// import { getUserInfo } from "@/api/common";
+import StepList from '../../components/StepList.vue'
 export default {
   data() {
     return {
@@ -358,88 +379,152 @@ export default {
       // 客户待办的弹出框结束
 
       actions: [{ name: '选项一' }, { name: '选项二' }, { name: '选项三' }],
-      // 步骤条
-      active: -1,
+      // active:false,
       // 客户轨迹
       // 待办动态
       todonewsshow: false,
       // 接口开始
-      externalUserid: '', // 客户Id
-      userId: '', // 员工Id
+      //   externalUserid: "wm2H-nDQAACG5x4XjsM1OoW8UVfpbn3A", // 客户Id
+      //   externalUserid: "wmiGuBCgAAgeijfvvpJ62cBfwrB-c4kw",
+      externalUserid: 'FengJuZhuDeJieDao',
+      userid: this.$store.state.userId, // 员工Id
+      form: {
+        name: '', // 昵称
+        remarkMobiles: '', // 手机号
+        age: '', // 年龄
+        birthday: '', // 客户生日
+        email: '', // 邮箱
+        address: '', // 地址
+        qq: '', // qq
+        position: '', // 职业
+        remarkCorpName: '', // 公司
+        description: '', // 其他描述
+        weTagGroupList: [], // 客户标签合集
+      },
+      labels: [], // 客户标签
+      alllabel: [], // 标签组
+      grouplabel: [], // 一组标签
+      // 点击测试组标签获取的变量
+      groupId: '',
+      name: '',
+      tagId: '',
+      addTag: [], // 添加的参数
+      isactive: false,
+      isActive: 'background:#1989fa;color:#fff',
+      styleActive1: '',
+      styleActive2: '',
+      styleActive3: '',
+      styleActive4: '',
+      //   activelabel:true
+      staff: [], // 添加的员工
+      groupChat: [], // 添加的群聊
+      commonGroup: [], // 共同的群聊
+      //   客户轨迹
+      pageNum: 1,
+      pageSize: 3,
+      trajectoryType: 0,
+      loading: false,
+      finished: false,
+      list: [],
+      styleactive: '',
+      flage: true,
     }
   },
-  watch: {
-    '$store.state.userId'(val) {
-      this.userId = val
-      this.getDetail()
-    },
+  computed: {
+    //   activeLabel : () => {
+    //       this.addTag.forEach((value) => {
+    //           value.name == this.name
+    //       })
+    //       return this.activelabel
+    //   }
   },
   methods: {
-    getDetail() {
-      this.$toast.loading({
-        message: '正在加载...',
-        duration: 0,
-        forbidClick: true,
-      })
-      let entry = undefined
-      let _this = this
-      try {
-        wx.invoke('getContext', {}, function(res) {
-          if (res.err_msg == 'getContext:ok') {
-            entry = res.entry //返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
-            if (
-              ![
-                'single_chat_tools',
-                'group_chat_tools',
-                'contact_profile',
-              ].includes(entry)
-            ) {
-              // _this.$toast.clear()
-              _this.$toast('入口错误：' + entry)
-              return
-            }
-
-            wx.invoke('getCurExternalContact', {}, function(resContact) {
-              if (resContact.err_msg == 'getCurExternalContact:ok') {
-                _this.externalUserid = resContact.userId //返回当前外部联系人userId
-                // 获取客户详细信息
-                getCustomerInfo({
-                  externalUserid: _this.externalUserid,
-                  userid: _this.userId,
-                })
-                  .then(({ data }) => {
-                    _this.$toast.clear()
-                    _this.$dialog({
-                      message: '获取客户成功：' + JSON.stringify(data),
-                    })
-                  })
-                  .catch((err) => {
-                    _this.$toast.clear()
-                    _this.$dialog({
-                      message: '获取客户失败：' + JSON.stringify(err),
-                    })
-                  })
-              } else {
-                _this.$toast.clear()
-                //错误处理
-                _this.$dialog({
-                  message: '获取客户id失败：' + JSON.stringify(resContact),
-                })
-              }
-            })
-          } else {
-            _this.$toast.clear()
-            //错误处理
-            _this.$dialog({ message: '进入失败：' + JSON.stringify(res) })
+    //   客户待办点击保存事件
+    saveInfo2() {},
+    // 添加或编辑轨迹
+    addOrEditWaitHandle(form) {
+      addOrEditWaitHandle(form)
+        .then((data) => {
+          //  重新获取列表
+          this.findAddaddEmployes()
+          if (data.code == 200) {
+            this.$toast.success('保存成功')
+            this.usershow = false
           }
         })
-      } catch (err) {
-        _this.$dialog({ message: 'err' + JSON.stringify(err) })
-      }
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    //   获取轨迹信息
+    findTrajectory() {
+      let _this = this
+      let form = _this.trajectoryType
+        ? {
+            trajectoryType: _this.trajectoryType,
+          }
+        : ''
+      findTrajectory(form)
+        .then((data) => {
+          //   console.log(data.total);
+          this.list = data.rows
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 点击信息动态
+    information() {
+      // console.log(123);
+      ;(this.trajectoryType = 1), this.findTrajectory()
+      this.styleActive1 = 'background:#1989fa;color:#fff'
+      this.styleActive2 = ''
+      this.styleActive3 = ''
+      this.styleActive4 = ''
+    },
+    socialContact() {
+      ;(this.trajectoryType = 2), this.findTrajectory()
+      this.styleActive1 = ''
+      this.styleActive2 = 'background:#1989fa;color:#fff'
+      this.styleActive3 = ''
+      this.styleActive4 = ''
+    },
+    activity() {
+      this.trajectoryType = 3
+      this.findTrajectory()
+      this.styleActive1 = ''
+      this.styleActive2 = ''
+      this.styleActive3 = 'background:#1989fa;color:#fff'
+      this.styleActive4 = ''
+    },
+    dealtWith() {
+      ;(this.trajectoryType = 4), this.findTrajectory()
+      this.styleActive1 = ''
+      this.styleActive2 = ''
+      this.styleActive3 = ''
+      this.styleActive4 = 'background:#1989fa;color:#fff'
     },
     // 添加代办
     // 表单提交
-    onSubmit() {},
+    onSubmit() {
+      let form = {
+        trajectoryType: 4,
+        externalUserid: this.externalUserid,
+        content: this.conagency,
+        createDate: new Date(this.dateagency),
+        startTime: new Date(this.startTime),
+        endTime: new Date(this.endTime),
+        status: 1,
+      }
+      this.addOrEditWaitHandle(form)
+      //   表单重置
+      this.conagency = ''
+      this.dateagency = ''
+      this.startTime = ''
+      this.endTime = ''
+      // 重新获取列表
+      this.findTrajectory()
+    },
     // 待办日期
     formatDate(dateagency) {
       return `${dateagency.getFullYear()}-${dateagency.getMonth() +
@@ -478,33 +563,175 @@ export default {
     // 点击删除按钮
     deltodoshow() {},
 
-    goRoute() {
+    goRoute(path) {
       this.$router.push({
-        path: '/detail',
+        path,
         query: {
-          //   type
-        },
-      })
-    },
-    detailGoRoute() {
-      this.$router.push({
-        path: '/community',
-        query: {
+          customerId: this.externalUserid,
           //   type
         },
       })
     },
     // 第一层标签
-    userLabel() {
-      console.log(123)
+    userLabel(item) {
+      // debugger
+      //   console.log(item.tagId);
+      if (this.addTag.length == 0) {
+        this.addTag.push({
+          groupId: item.groupId,
+          name: item.name,
+          tagId: item.tagId,
+        })
+      } else {
+        this.addTag.forEach((item1) => {
+          if (item.tagId == item1.tagId) {
+            this.flage = false // 数组里存在该对象
+          }
+        })
+        // 数组里不存在该对象,则添加
+        if (this.flage) {
+          this.addTag.push({
+            groupId: item.groupId,
+            name: item.name,
+            tagId: item.tagId,
+          })
+        } else {
+          // 数组里存在该对象,则删除
+          this.addTag = this.addTag.filter((element) => {
+            return element.name !== item.name
+          })
+        }
+      }
     },
     // 第二层标签
-    changeLabel() {
-      console.log(456)
+    changeLabel(item) {
+      //   console.log(item.groupId);
+      this.styleactive = item.groupId
+      this.grouplabel = item.weTags
     },
-    saveInfo() {},
+    saveInfo() {
+      // 更新客户画像标签 [{ groupId: this.groupId, name: this.name, tagId: this.tagId }]
+      updateWeCustomerPorTraitTag({
+        externalUserid: this.externalUserid,
+        addTag: this.addTag,
+      })
+        .then((res) => {
+          console.log(res)
+          if (res.code == 200) {
+            this.show = false
+            //   重新获取客户标签
+            this.getCustomerInfo()
+            this.$toast.success('保存成功')
+          }
+
+          // console.log(123);
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 点击编辑按钮
+    labelEdit() {
+      this.show = true
+      //   console.log(this.labels);
+      if (this.labels) {
+        this.labels.forEach((ele) => {
+          this.addTag.push(ele.weTags)
+        })
+      }
+      // 获取用户当前的lable,将当前用户的lable与所有lable进行对比，相同的弹框内蓝色展示
+      // 弹框内的标签组选中时蓝色展示
+      // 弹框内的子标签与选中时蓝色展示，点击时
+    },
+    findAddaddEmployes() {
+      findAddaddEmployes(this.externalUserid)
+        .then(({ data }) => {
+          // console.log(data);
+          this.staff = data
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    findAddGroupNum() {
+      findAddGroupNum({
+        externalUserid: this.externalUserid,
+        userId: this.userId,
+      })
+        .then(({ data }) => {
+          //   console.log(data);
+          this.groupChat = data
+          //   console.log(this.groupChat);
+          this.commonGroup = this.groupChat.filter((ele) => {
+            //   debugger
+            return ele.groupMemberNum == 1
+          })
+          //   console.log(this.commonGroup);
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    getCustomerInfo() {
+      getCustomerInfo({
+        externalUserid: this.externalUserid,
+        userid: this.userid,
+      })
+        .then(({ data }) => {
+          // console.log(data);
+          this.form = data
+          this.labels = this.form.weTagGroupList
+          // console.log(this.form);
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
   },
-  created() {},
+  created() {
+    let _this = this
+    wx.invoke('getContext', {}, function(res) {
+      if (res.err_msg == 'getContext:ok') {
+        entry = res.entry //返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
+        if (
+          ![
+            'single_chat_tools',
+            'group_chat_tools',
+            'contact_profile',
+          ].includes(entry)
+        ) {
+          // _this.$toast.clear()
+          _this.$toast('入口错误：' + entry)
+          return
+        }
+        wx.invoke('getCurExternalContact', {}, (res) => {
+          if (res.err_msg == 'getCurExternalContact:ok') {
+            _this.externalUserid = res.userId //返回当前外部联系人userId
+            // 获取客户信息
+            _this.findAddaddEmployes(),
+              _this.findAddGroupNum(),
+              _this.getCustomerInfo(),
+              _this.findTrajectory(),
+              getAllTags()
+                .then(({ data }) => {
+                  // console.log(data);
+                  _this.alllabel = data
+                })
+                .catch((err) => {
+                  console.log(err)
+                })
+          } else {
+            //错误处理
+          }
+        })
+      } else {
+        //错误处理
+      }
+    })
+  },
+  components: {
+    StepList,
+  },
 }
 </script>
 
@@ -569,19 +796,20 @@ export default {
   }
 }
 // 客户标签
-.labels {
+.labelstyle {
   display: flex;
   flex-wrap: wrap;
   // justify-content: space-between;
   padding-top: 10px;
   .label,
   .label1 {
+    display: inline-block;
     width: 60px;
     height: 18px;
     font-size: 12px;
     background-color: #f2f2f2;
     text-align: center;
-    margin: 10px 0px;
+    margin: 10px 0 10px 10px;
     line-height: 18px;
     border-radius: 6px;
   }
@@ -593,7 +821,7 @@ export default {
     width: 90%;
     height: 30px;
     left: 50%;
-    top: 240%;
+    top: 150%;
     transform: translate(-50%, -50%);
   }
 }
@@ -615,7 +843,7 @@ export default {
   padding-right: 16px;
 }
 .addwaiting {
-  .labels {
+  .labelstyle {
     .label1 {
       width: 80px;
       margin-bottom: 20px;
@@ -674,9 +902,8 @@ export default {
     padding: 0 10px;
   }
 }
-/deep/.msg {
-  &::after {
-    border: none;
-  }
+/deep/.styleactive {
+  //   background: #f00;
+  color: #2c8cf0;
 }
 </style>

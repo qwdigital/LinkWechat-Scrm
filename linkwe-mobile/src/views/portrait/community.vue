@@ -20,19 +20,22 @@
         line-height="1.4px"
         title-active-color="#2C8CF0"
       >
-        <van-tab title="添加的员工(5)">
+        <van-tab :title="'添加的员工(' + staff.length + ')'">
           <van-list v-model="loading" :finished="finished" @load="onLoad">
-            <van-cell v-for="item in list" :key="item">
+            <van-cell v-for="(item, index) in staff" :key="index">
               <div class="details">
                 <div class="detail">
                   <div class="left">
-                    <div class="img"><img src="" alt="" /></div>
+                    <div class="img">
+                      <img :src="item.headImageUrl" alt="" />
+                    </div>
                     <div class="right">
                       <div>
-                        <span>张三 &nbsp; &nbsp;</span>
+                        <span>{{ item.userName }} &nbsp; &nbsp;</span>
                       </div>
                       <div class="c9">
-                        <span>添加时间：</span><span>2021-02-17 00:50</span>
+                        <span>添加时间：</span>
+                        <span>{{ getTime(item.createTime) }}</span>
                       </div>
                     </div>
                   </div>
@@ -41,27 +44,33 @@
             </van-cell>
           </van-list>
         </van-tab>
-        <van-tab title="添加的群聊(3)"
-          >
-          <div class="groupchat1">只看与我共同的群聊</div>
+        <van-tab :title="'添加的群聊(' + groupChat.length + ')'">
+          <div class="groupchat1" @click="conGroup">只看与我共同的群聊</div>
           <van-list v-model="loading" :finished="finished" @load="onLoad">
-            <van-cell v-for="item in list" :key="item">
+            <van-cell v-for="(item, index) in groupChat" :key="index">
               <div class="details">
                 <div class="detail">
                   <div class="left">
-                    <div class="img"><img src="" alt="" /></div>
+                    <div class="img">
+                      <img src="@/assets/avatar.jpg" alt="" />
+                    </div>
                     <div class="right">
-                      <div>客户分享群(群人数)</div>
+                      <div>
+                        {{ item.groupName + '(' + item.groupMemberNum + ')' }}
+                      </div>
                       <div>
                         <span class="c9">群主：</span>
-                        <span class="c9">张三</span>
+                        <span class="c9">{{ item.ownerName }}</span>
                       </div>
                       <div class="c9">
-                        <span>入群时间：</span><span>2021-02-17 00:50</span>
+                        <span>入群时间：</span
+                        ><span>{{ getTime(item.joinTime) }}</span>
                       </div>
                     </div>
                   </div>
-                  <div class="groupchat2">共同群聊</div>
+                  <div class="groupchat2" v-if="!item.commonGroup">
+                    共同群聊
+                  </div>
                 </div>
               </div>
             </van-cell>
@@ -73,6 +82,7 @@
 </template>
 
 <script>
+import { findAddaddEmployes, findAddGroupNum } from '@/api/portrait'
 export default {
   data() {
     return {
@@ -81,26 +91,87 @@ export default {
       list: [],
       loading: false,
       finished: false,
-    };
+      staff: [], // 添加的员工
+      groupChat: [], // 添加的群聊
+      commonGroup: [], // 共同的群聊
+      //   externalUserid: "wmiGuBCgAAIH-T9ekaE-Q52N2lKWeInw",
+      externalUserid: '',
+      userid: this.$store.state.userId, // 员工Id
+    }
+  },
+  created() {
+    this.externalUserid = this.$route.query.customerId
+
+    this.findAddaddEmployes()
+    this.findAddGroupNum()
   },
   methods: {
+    conGroup() {
+      this.groupChat = this.commonGroup
+      //    console.log(123);
+    },
     onLoad() {
       setTimeout(() => {
         for (let i = 0; i < 2; i++) {
-          this.list.push(this.list.length + 1);
+          this.list.push(this.list.length + 1)
         }
 
         // 加载状态结束
-        this.loading = false;
+        this.loading = false
 
         // 数据全部加载完成
         if (this.list.length >= 2) {
-          this.finished = true;
+          this.finished = true
         }
-      }, 1000);
+      }, 1000)
+    },
+    findAddaddEmployes() {
+      findAddaddEmployes(this.externalUserid)
+        .then(({ data }) => {
+          //   console.log(data);
+          this.staff = data
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    findAddGroupNum() {
+      findAddGroupNum({
+        externalUserid: this.externalUserid,
+        userId: this.userId,
+      })
+        .then(({ data }) => {
+          //   console.log(data);
+          //   debugger
+          this.groupChat = data
+          this.commonGroup = this.groupChat.filter((ele) => {
+            //   debugger
+            return ele.groupMemberNum == 1
+          })
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    // 时间处理器
+    getTime(data) {
+      const date = new Date(data)
+      // console.log(timer.getFullYear());
+      var Y = date.getFullYear() + '-'
+      var M =
+        (date.getMonth() + 1 < 10
+          ? '0' + (date.getMonth() + 1)
+          : date.getMonth() + 1) + '-'
+      var D =
+        date.getDate() < 10 ? '0' + date.getDate() : date.getDate() + '   '
+      var h =
+        (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
+      var m =
+        date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+      return Y + M + D + h + m
     },
   },
-};
+}
 </script>
 
 <style lang="less" scoped>
@@ -156,25 +227,25 @@ export default {
 }
 // 添加的群聊
 .groupchat1 {
-    width: 120px;
-    height: 20px;
-    font-size: 12px;
-    background-color: #fff;
-    border-radius: 20px;
-    text-align: center;
-    line-height: 20px;
-    margin: 10px 20px;
+  width: 120px;
+  height: 20px;
+  font-size: 12px;
+  background-color: #fff;
+  border-radius: 20px;
+  text-align: center;
+  line-height: 20px;
+  margin: 10px 20px;
 }
 .groupchat2 {
-      width: 60px;
-    height: 20px;
-    font-size: 12px;
-    background-color: #fff;
-    border-radius: 5px;
-    text-align: center;
-    line-height: 20px;
-    margin: 10px 0px;
-    color: #2C8CF0;
-    border: 1px solid #2C8CF0;
+  width: 60px;
+  height: 20px;
+  font-size: 12px;
+  background-color: #fff;
+  border-radius: 5px;
+  text-align: center;
+  line-height: 20px;
+  margin: 10px 0px;
+  color: #2c8cf0;
+  border: 1px solid #2c8cf0;
 }
 </style>

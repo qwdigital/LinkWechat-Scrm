@@ -4,10 +4,16 @@ import { getAgentTicket, getAppTicket } from '@/api/common'
 import { param2Obj } from '@/utils/index'
 export default {
   name: 'App',
+  provide() {
+    return {
+      reload: this.reload,
+    }
+  },
   data() {
     return {
       corpId: '',
       agentId: '',
+      isRouterAlive: true,
     }
   },
   async created() {
@@ -22,13 +28,15 @@ export default {
     let code = query.code
     this.corpId = query.corpId
     this.agentId = query.agentId
+    this.$toast('agentId:' + this.agentId)
+
     if (!code) {
       this.$toast('未获得授权')
       return
     }
     let { data } = await getUserInfo(code, this.agentId)
     this.$store.state.userId = data.userId
-    // this.$toast('userId:' + this.$store.state.userId)
+    this.$toast('userId:' + this.$store.state.userId)
   },
   watch: {
     // 通过config接口注入权限验证配置
@@ -40,6 +48,12 @@ export default {
     },
   },
   methods: {
+    reload() {
+      this.isRouterAlive = false
+      this.$nextTick(function() {
+        // this.isRouterAlive = true
+      })
+    },
     wxConfig() {
       getAgentTicket(window.location.href.split('#')[0], this.agentId).then(
         ({ data }) => {
@@ -122,7 +136,7 @@ export default {
 </script>
 <template>
   <div id="app">
-    <router-view class="page" />
+    <router-view class="page" v-if="isRouterAlive" />
   </div>
 </template>
 
