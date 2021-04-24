@@ -26,6 +26,7 @@ export default {
         contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
       }),
       status: ['正常', '停用'],
+      dialogVisibleSelectMaterial: false,
     }
   },
   watch: {},
@@ -83,6 +84,13 @@ export default {
         query: { id },
       })
     },
+
+    // 选择素材确认按钮
+    submitSelectMaterial(text, image, file) {
+      this.form.logoMediaid = image.id
+      this.form.squareLogoUrl = image.materialUrl
+      this.dialogVisibleSelectMaterial = false
+    },
   },
 }
 </script>
@@ -118,12 +126,18 @@ export default {
         class="list"
         @click="edit(item)"
       >
-        <el-image :src="item.url" fit="fit"></el-image>
+        <el-image :src="item.squareLogoUrl" fit="fit"></el-image>
         <div>
           <div class="title">{{ item.agentName }}</div>
           <div class="title">{{ item.agentId }}</div>
           <div class="desc">{{ item.agentSecret }}</div>
         </div>
+      </li>
+      <li class="list aic" @click="edit()">
+        <div class="el-image ac">
+          <i class="el-icon-plus cc" style="color: #666"></i>
+        </div>
+        <div>添加应用</div>
       </li>
     </ul>
 
@@ -135,37 +149,94 @@ export default {
       @pagination="getList()"
     /> -->
 
-    <el-dialog title="查看企业微信号" :visible.sync="dialogVisible">
+    <el-dialog :title="form.id ? '查看' : '新增'" :visible.sync="dialogVisible">
       <el-form
         ref="form"
         label-position="right"
         :model="form"
         :rules="rules"
-        label-width="160px"
+        label-width="100px"
       >
-        <el-form-item label="应用标题" prop="agentName">
-          <el-input v-model="form.agentName"></el-input>
-        </el-form-item>
-        <el-form-item label="应用描述" prop="description">
-          <el-input v-model="form.description"></el-input>
-        </el-form-item>
-        <el-form-item label="应用Id" prop="agentId">
-          <el-input v-model="form.agentId" :disabled="!!form.id"></el-input>
-        </el-form-item>
-        <el-form-item label="应用Secret" prop="agentSecret">
-          <el-input
-            :disabled="!!form.id"
-            v-model="form.agentSecret"
-            placeholder="应用Secret"
-          ></el-input>
-          <!-- <el-link class="fr" type="primary">如何获取？</el-link> -->
-        </el-form-item>
+        <el-row :gutter="10">
+          <el-col :span="4">
+            <div
+              class="avatar-wrap ac"
+              @click="dialogVisibleSelectMaterial = true"
+            >
+              <img
+                class="avatar"
+                v-if="form.squareLogoUrl"
+                :src="form.squareLogoUrl"
+              />
+              <i v-else class="el-icon-plus avatar-uploader-icon cc"></i>
+            </div>
+            <!-- <el-image
+              style="width: 100px; height: 100px;border: 1px solid #eee; border-radius: 5px;"
+              :src="form.squareLogoUrl"
+              fit="fit"
+            ></el-image> -->
+          </el-col>
+          <el-col :span="20">
+            <el-form-item label="应用标题" prop="agentName">
+              <el-input
+                v-model="form.agentName"
+                placeholder="请输入应用标题"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="应用描述" prop="description">
+              <el-input
+                v-model="form.description"
+                placeholder="请输入应用描述"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="应用Id" prop="agentId">
+              <el-input
+                v-model="form.agentId"
+                :disabled="!!form.id"
+                placeholder="请输入应用Id"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="应用Secret" prop="agentSecret">
+              <el-input
+                :disabled="!!form.id"
+                v-model="form.agentSecret"
+                placeholder="请输入应用Secret"
+              ></el-input>
+              <!-- <el-link class="fr" type="primary">如何获取？</el-link> -->
+            </el-form-item>
+            <el-form-item label="可见范围" v-if="form.id">
+              <div class="flex">
+                <div
+                  v-for="(item, index) of form.allowPartys.split(',')"
+                  :key="index"
+                >
+                  <i class="el-icon-folder-opened" v-if="item"></i>{{ item }}
+                </div>
+                <div
+                  v-for="(item, index) of form.allowUserinfos.split(',')"
+                  :key="'1' + index"
+                >
+                  <i class="el-icon-s-custom" v-if="item"></i>{{ item }}
+                </div>
+              </div>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <div slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="submit">确 定</el-button>
       </div>
     </el-dialog>
+
+    <!-- 选择素材弹窗 -->
+    <SelectMaterial
+      :visible.sync="dialogVisibleSelectMaterial"
+      type="1"
+      :showArr="[1]"
+      @success="submitSelectMaterial"
+    >
+    </SelectMaterial>
   </div>
 </template>
 
@@ -173,6 +244,7 @@ export default {
 .list-wrap {
   display: flex;
   flex-wrap: wrap;
+  line-height: 20px;
   .list {
     width: 23%;
     padding: 20px;
@@ -184,6 +256,9 @@ export default {
       width: 50px;
       height: 50px;
       flex: none;
+      border: 1px solid #eee;
+      border-radius: 5px;
+      background: #eee;
     }
     .title {
       font-size: 16px;
@@ -193,5 +268,19 @@ export default {
       word-break: break-all;
     }
   }
+}
+.avatar-wrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border: 1px solid #eee;
+  border-radius: 5px;
+}
+.avatar {
+  width: 100%;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #ddd;
 }
 </style>
