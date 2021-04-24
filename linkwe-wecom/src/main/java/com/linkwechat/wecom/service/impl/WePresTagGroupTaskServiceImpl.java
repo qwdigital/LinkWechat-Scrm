@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -384,7 +385,13 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
             WeGroupCode groupCode = groupCodeMapper.selectWeGroupCodeById(task.getGroupCodeId());
             WeMediaDto mediaDto = materialService.uploadTemporaryMaterial(groupCode.getCodeUrl(), MediaType.IMAGE.getMediaType(), "临时文件");
             image.setMedia_id(mediaDto.getMedia_id());
-            queryData.setImage(image);
+            //queryData.setImage(image);
+            List list = new ArrayList();
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("msgtype","image");
+            jsonObject.put("image",image);
+            list.add(jsonObject);
+            queryData.setAttachments(list);
 
             // 调用企业群发接口
             SendMessageResultDto resultDto = customerMessagePushClient.sendCustomerMessageToUser(queryData);
