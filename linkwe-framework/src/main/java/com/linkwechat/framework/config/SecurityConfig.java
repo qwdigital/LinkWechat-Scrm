@@ -132,7 +132,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/weixin/auth/**").anonymous()
 
 
-                .antMatchers("/wecom/user/synchWeUser").anonymous()
+                //.antMatchers("/wecom/user/synchWeUser").anonymous()
 
 
                 // 除上面外的所有请求全部需要鉴权认证
