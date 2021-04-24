@@ -105,6 +105,10 @@ export default {
         this.loading = false
         // this.$emit('update:fileUrl', res.data.materialUrl)
         // this.$emit('update:fileName', res.data.materialName)
+        if (this.type == 0) {
+          res.url = res.data.url
+          res.fileName = res.data.url
+        }
         this.$emit('update:fileUrl', res.url)
         this.$emit('update:fileName', res.fileName)
         this.$emit('update:file', file)
