@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.interceptor;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
@@ -58,7 +59,14 @@ public class WeAccessTokenInterceptor implements Interceptor{
             }else if(Arrays.asList(weComeConfig.getNeedChatTokenUrl()).contains(uri)){ //需要会话存档token
                 token=iWeAccessTokenService.findChatAccessToken();
             }else  if(Arrays.asList(weComeConfig.getThirdAppUrl()).contains(uri)){ //第三方自建应用token
-                token=iWeAccessTokenService.findThirdAppAccessToken(request.getHeaderValue(WeConstans.THIRD_APP_PARAM_TIP));
+
+
+                token=iWeAccessTokenService.findThirdAppAccessToken(
+
+                        StrUtil.isEmpty(request.getHeaderValue(WeConstans.THIRD_APP_PARAM_TIP))?(String) request.getQuery(WeConstans.THIRD_APP_PARAM_TIP):request.getHeaderValue(WeConstans.THIRD_APP_PARAM_TIP)
+
+                );
+
             } else{
                 token=iWeAccessTokenService.findCommonAccessToken();
             }

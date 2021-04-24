@@ -13,7 +13,7 @@ import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
  * @author: HaoN
  * @create: 2020-08-26 14:33
  **/
-@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
+//@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
 public interface WeAccessTokenClient {
     /**
      *  获取token(常用token,联系人token)

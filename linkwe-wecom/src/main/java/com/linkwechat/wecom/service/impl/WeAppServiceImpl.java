@@ -11,6 +11,7 @@ import com.linkwechat.wecom.domain.WeDepartment;
 import com.linkwechat.wecom.domain.dto.WeAppDetailDto;
 import com.linkwechat.wecom.domain.dto.WeAppDto;
 import com.linkwechat.wecom.mapper.WeAppMapper;
+import com.linkwechat.wecom.service.IWeAccessTokenService;
 import com.linkwechat.wecom.service.IWeAppService;
 import com.linkwechat.wecom.service.IWeDepartmentService;
 import com.linkwechat.wecom.service.IWeUserService;
@@ -43,6 +44,10 @@ public class WeAppServiceImpl extends ServiceImpl<WeAppMapper, WeApp> implements
     IWeUserService iWeUserService;
 
 
+    @Autowired
+    IWeAccessTokenService iWeAccessTokenService;
+
+
     /**
      * 保存应用
      * @param weApp
@@ -51,6 +56,7 @@ public class WeAppServiceImpl extends ServiceImpl<WeAppMapper, WeApp> implements
     @Transactional
     public void addWeApp(WeApp weApp) {
 
+
       if(null !=this.getOne(new LambdaQueryWrapper<WeApp>()
               .eq(WeApp::getAgentId, weApp.getAgentId())
               .eq(WeApp::getDelFlag, Constants.SUCCESS))){
@@ -58,18 +64,24 @@ public class WeAppServiceImpl extends ServiceImpl<WeAppMapper, WeApp> implements
       }
 
 
+       weApp.setCreateTime(new Date());
+      if(this.save(weApp)){
+          WeAppDetailDto weAppDetailDto
+                  = weAppClient.findAgentById(weApp.getAgentId());
+          if(null != weAppDetailDto){
 
-        WeAppDetailDto weAppDetailDto
-                = weAppClient.findAgentById(weApp.getAgentId());
-        if(null != weAppDetailDto){
-            weApp.setAgentName(weAppDetailDto.getName());
-            weApp.setCreateTime(new Date());
-            weApp.setSquareLogoUrl(weAppDetailDto.getSquare_logo_url());
-            weApp.setDescription(weAppDetailDto.getDescription());
-            weApp.setAllowPartys(StringUtils.join(weAppDetailDto.getAllow_partys().getPartyid(),","));
-            weApp.setAllowUserinfos(StringUtils.join(weAppDetailDto.getAllow_userinfos().getUser(),","));
-            this.save(weApp);
-        }
+              weApp.setAgentName(weAppDetailDto.getName());
+              weApp.setCreateTime(new Date());
+              weApp.setSquareLogoUrl(weAppDetailDto.getSquare_logo_url());
+              weApp.setDescription(weAppDetailDto.getDescription());
+              weApp.setAllowPartys(StringUtils.join(weAppDetailDto.getAllow_partys().getPartyid(),","));
+              weApp.setAllowUserinfos(StringUtils.join(weAppDetailDto.getAllow_userinfos().getUser(),","));
+              System.out.println("============================================");
+              this.updateById(weApp);
+          }
+      }
+
+
 
     }
 
@@ -85,7 +97,7 @@ public class WeAppServiceImpl extends ServiceImpl<WeAppMapper, WeApp> implements
                             .logo_mediaid(weApp.getLogoMediaid())
                             .description(weApp.getDescription())
                             .name(weApp.getAgentName())
-                            .build()
+                            .build(),weApp.getAgentId()
             );
         }
 
