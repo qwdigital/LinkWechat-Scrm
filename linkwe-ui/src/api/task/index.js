@@ -17,9 +17,10 @@ export function getList(params) {
     })
   }
 
-  export function getTaskDetail (id) {
+  export function getTaskDetail (id,type) {
+      let url = type?`${service}/getInfo/${id}/${type}`:`${service}/getInfo/${id}`
     return request({
-      url:  `${service}/getInfo/${id}`,
+      url,
       method: 'get',
     })
   }
