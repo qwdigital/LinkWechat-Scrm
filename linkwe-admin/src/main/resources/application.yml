@@ -73,9 +73,9 @@ spring:
   # redis 配置
   redis:
     # 地址
-    host: ${REDIS_HOST:localhost}
+    host: 127.0.0.1
     # 端口，默认为6379
-    port: ${REDIS_PORT:6379}
+    port: 6379
     # 密码
     password:
     # 连接超时时间
@@ -114,14 +114,6 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 
-## MyBatis配置
-#mybatis:
-#    # 搜索指定包别名
-#    typeAliasesPackage: com.linkwechat.**.domain
-#    # 配置mapper的扫描，找到所有的mapper.xml映射文件
-#    mapperLocations: classpath*:mapper/**/*Mapper.xml
-#    # 加载全局的配置文件
-#    configLocation: classpath:mybatis/mybatis-config.xml
 
 # PageHelper分页插件
 pagehelper:
@@ -149,7 +141,7 @@ xss:
 # elasticsearch配置
 elasticsearch:
   schema: http
-  address: ${ES_ADDRESS:localhost}
+  address: 127.0.0.1
   userName: ""
   password: ""
   connectTimeout: 10000
@@ -218,18 +210,27 @@ wecome:
     - /message/send
   #企微回调通知配置
   callBack:
-    appIdOrCorpId: ww24262ce93851488f
-    token: jtQ1aGHgSmH2UHNBIndUtUe6B6EwfR
-    encodingAesKey: Vga4HWv7nFbRDYK8iAaQbxmkuecpo2BAfmXAyWwcXMO
+    appIdOrCorpId:
+    token:
+    encodingAesKey:
   # JS SDK 身份校验url
-  authorizeUrl: https://open.weixin.qq.com/connect/oauth2/authorize
+  authorizeUrl:
   # JS SDK身份校验成功后的redirect url
-  authorizeRedirectUrl: http://www.linkwechat.cn/mobile/#/task
+  authorizeRedirectUrl:
 #腾讯云对象存储
 cos:
-  secretId: AKIDQRCizIeUGl13vakkDQMH0VkjhPr1rBBv
-  secretKey: e3D8oFetseC0f8OX9XeV7UcTDiyyQ8cr
-  #link-wechat-1251309172.cos.ap-nanjing.myqcloud.com
-  region: ap-nanjing
-  bucketName: link-wechat-1251309172
-  imgUrlPrefix: https://link-wechat-1251309172.cos.ap-nanjing.myqcloud.com/
+  #id
+  secretId:
+  #密钥
+  secretKey:
+  #地区
+  region:
+  #区块空间
+  bucketName:
+  #访问前缀
+  imgUrlPrefix:
+
+#微信公众号配置
+weixin:
+  appid:
+  secret:
