@@ -85,7 +85,7 @@ export function getPushResult(params) {
 /**
  * 同步消息发送结果
  * @param {*} data 
- * msgid:列表msgid
+ * msgids:列表msgid
 messageId:消息id
  */
 export function syncMsg(data) {

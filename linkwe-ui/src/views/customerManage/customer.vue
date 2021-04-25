@@ -114,7 +114,7 @@ export default {
           this.loading = false
         })
     },
-    getListTag() {
+    getListTag(refresh) {
       getListTag().then(({ rows }) => {
         this.listTagOneArray = []
         rows.forEach((element) => {
@@ -122,6 +122,13 @@ export default {
             this.listTagOneArray.push(d)
           })
         })
+        if (refresh) {
+          this.$refs.selectTag.getList()
+          this.form = {
+            gourpName: '',
+            weTags: [],
+          }
+        }
       })
     },
     getListOrganization() {
@@ -497,64 +504,6 @@ export default {
         >
       </div>
     </SelectTag>
-    <!-- <el-dialog
-      key="1"
-      :title="tagDialogType.title"
-      :visible.sync="dialogVisible"
-    >
-      <div>
-        <span class="mr20">选择分组</span>
-        <el-select v-model="selectedGroup" placeholder="请选择">
-          <el-option label="所有标签" value></el-option>
-          <el-option
-            v-for="(item, index) in listTag"
-            :key="index"
-            :label="item.gourpName"
-            :value="item.groupId"
-          ></el-option>
-        </el-select>
-        <div class="mt20">
-          <el-checkbox-group
-            v-model="selectedTag"
-            v-if="tagDialogType.type !== 'remove'"
-          >
-            <template v-for="(item, index) in listTag">
-              <div
-                class="bfc-d"
-                v-show="item.groupId === selectedGroup || !selectedGroup"
-                :key="index"
-              >
-                <el-checkbox
-                  :label="unit"
-                  v-for="(unit, unique) in item.weTags"
-                  :key="index + unique"
-                  >{{ unit.name }}</el-checkbox
-                >
-              </div>
-            </template>
-          </el-checkbox-group>
-          <el-checkbox-group v-else v-model="selectedTag">
-            <template v-for="(item, index) in removeTag">
-              <el-checkbox
-                v-if="item.groupId === selectedGroup || !selectedGroup"
-                :label="item"
-                :key="index"
-                >{{ item.name }}</el-checkbox
-              >
-            </template>
-          </el-checkbox-group>
-        </div>
-        <div class="mt20" v-show="tagDialogType.type === 'add'">
-          <el-button type="primary" @click="dialogVisibleAddTag = true"
-            >添加标签</el-button
-          >
-        </div>
-      </div>
-      <div slot="footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitSelectTag">确 定</el-button>
-      </div>
-    </el-dialog> -->
 
     <!-- 选择添加人弹窗 -->
     <SelectUser
@@ -567,7 +516,7 @@ export default {
     <AddTag
       :visible.sync="dialogVisibleAddTag"
       :form="form"
-      @success="getListTag()"
+      @success="getListTag(true)"
     />
   </div>
 </template>

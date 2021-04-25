@@ -104,7 +104,7 @@ export default {
     },
     syncMsg(data) {
       let { msgid, messageId } = data
-      syncMsg({ msgid, messageId })
+      syncMsg({ msgids: [msgid], messageId })
         .then(({ data }) => {
           this.msgSuccess('同步成功')
           this.getList()
