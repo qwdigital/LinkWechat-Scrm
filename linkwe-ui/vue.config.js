@@ -39,6 +39,7 @@ module.exports = {
       },
     },
     disableHostCheck: true,
+    // https: true,
   },
   css: {
     loaderOptions: {
