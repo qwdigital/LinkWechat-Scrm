@@ -13,6 +13,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -157,13 +160,18 @@ public class WeUserController extends BaseController {
      */
     //   @PreAuthorize("@ss.hasPermi('contacts:organization:sync')")
     @GetMapping({"/synchWeUser"})
-    public AjaxResult synchWeUser() {
-
-
-        weUserService.synchWeUser();
-
+    public AjaxResult synchWeUser(){
+        try {
+            SecurityContext context = SecurityContextHolder.getContext();
+            SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+            SecurityContextHolder.setContext(context);
+            weUserService.synchWeUser();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return AjaxResult.success(WeConstans.SYNCH_TIP);
     }
+
 
 
     /**
