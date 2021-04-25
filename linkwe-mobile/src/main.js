@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import config from '@/config'
+import '@/assets/icon/iconfont.css'
 
 window.CONFIG = config
 

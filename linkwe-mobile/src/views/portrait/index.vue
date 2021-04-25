@@ -19,7 +19,8 @@
           <div class="right">
             <div>
               <span>张三 &nbsp; &nbsp;</span
-              ><van-icon name="manager" color="#9c9c9c" />
+              ><span class="icon iconfont icon-man"></span>
+              <span class="icon iconfont icon-xingbie"></span>
             </div>
             <div class="c9">
               <span>昵称：</span><span>{{ form.name }}</span>
@@ -40,7 +41,7 @@
       <van-divider />
       <div class="detail">
         <div class="c9">生日</div>
-        <div>{{ form.birthday ? form.birthday.substring(0, 10) : '' }}</div>
+        <div>{{ form.birthday ? form.birthday.substring(0, 10) : "" }}</div>
       </div>
       <van-divider />
       <div class="detail">
@@ -352,9 +353,9 @@ import {
   findAddGroupNum,
   findTrajectory,
   addOrEditWaitHandle,
-} from '@/api/portrait'
+} from "@/api/portrait";
 // import { getUserInfo } from "@/api/common";
-import StepList from '../../components/StepList.vue'
+import StepList from "../../components/StepList.vue";
 export default {
   data() {
     return {
@@ -362,23 +363,23 @@ export default {
       show: false,
       // 客户待办的弹出框开始
       usershow: false,
-      conagency: '', // 待办内容
+      conagency: "", // 待办内容
 
       // 待办日期
-      dateagency: '',
+      dateagency: "",
       dateshow: false,
       minDate: new Date(2021, 0, 1),
       maxDate: new Date(2021, 12, 31),
       // 待办时间
-      timeagency: '',
+      timeagency: "",
       starttimeshow: false,
       endtimeshow: false,
-      currentTime: '12:00',
-      startTime: '',
-      endTime: '',
+      currentTime: "12:00",
+      startTime: "",
+      endTime: "",
       // 客户待办的弹出框结束
 
-      actions: [{ name: '选项一' }, { name: '选项二' }, { name: '选项三' }],
+      actions: [{ name: "选项一" }, { name: "选项二" }, { name: "选项三" }],
       // active:false,
       // 客户轨迹
       // 待办动态
@@ -386,35 +387,35 @@ export default {
       // 接口开始
       //   externalUserid: "wm2H-nDQAACG5x4XjsM1OoW8UVfpbn3A", // 客户Id
       //   externalUserid: "wmiGuBCgAAgeijfvvpJ62cBfwrB-c4kw",
-      externalUserid: 'FengJuZhuDeJieDao',
+      externalUserid: "FengJuZhuDeJieDao",
       userid: this.$store.state.userId, // 员工Id
       form: {
-        name: '', // 昵称
-        remarkMobiles: '', // 手机号
-        age: '', // 年龄
-        birthday: '', // 客户生日
-        email: '', // 邮箱
-        address: '', // 地址
-        qq: '', // qq
-        position: '', // 职业
-        remarkCorpName: '', // 公司
-        description: '', // 其他描述
+        name: "", // 昵称
+        remarkMobiles: "", // 手机号
+        age: "", // 年龄
+        birthday: "", // 客户生日
+        email: "", // 邮箱
+        address: "", // 地址
+        qq: "", // qq
+        position: "", // 职业
+        remarkCorpName: "", // 公司
+        description: "", // 其他描述
         weTagGroupList: [], // 客户标签合集
       },
       labels: [], // 客户标签
       alllabel: [], // 标签组
       grouplabel: [], // 一组标签
       // 点击测试组标签获取的变量
-      groupId: '',
-      name: '',
-      tagId: '',
+      groupId: "",
+      name: "",
+      tagId: "",
       addTag: [], // 添加的参数
       isactive: false,
-      isActive: 'background:#1989fa;color:#fff',
-      styleActive1: '',
-      styleActive2: '',
-      styleActive3: '',
-      styleActive4: '',
+      isActive: "background:#1989fa;color:#fff",
+      styleActive1: "",
+      styleActive2: "",
+      styleActive3: "",
+      styleActive4: "",
       //   activelabel:true
       staff: [], // 添加的员工
       groupChat: [], // 添加的群聊
@@ -426,9 +427,9 @@ export default {
       loading: false,
       finished: false,
       list: [],
-      styleactive: '',
+      styleactive: "",
       flage: true,
-    }
+    };
   },
   computed: {
     //   activeLabel : () => {
@@ -446,63 +447,63 @@ export default {
       addOrEditWaitHandle(form)
         .then((data) => {
           //  重新获取列表
-          this.findAddaddEmployes()
+          this.findAddaddEmployes();
           if (data.code == 200) {
-            this.$toast.success('保存成功')
-            this.usershow = false
+            this.$toast.success("保存成功");
+            this.usershow = false;
           }
         })
         .catch((err) => {
-          console.log(err)
-        })
+          console.log(err);
+        });
     },
     //   获取轨迹信息
     findTrajectory() {
-      let _this = this
+      let _this = this;
       let form = _this.trajectoryType
         ? {
             trajectoryType: _this.trajectoryType,
           }
-        : ''
+        : "";
       findTrajectory(form)
         .then((data) => {
           //   console.log(data.total);
-          this.list = data.rows
+          this.list = data.rows;
         })
         .catch((err) => {
-          console.log(err)
-        })
+          console.log(err);
+        });
     },
     // 点击信息动态
     information() {
       // console.log(123);
-      ;(this.trajectoryType = 1), this.findTrajectory()
-      this.styleActive1 = 'background:#1989fa;color:#fff'
-      this.styleActive2 = ''
-      this.styleActive3 = ''
-      this.styleActive4 = ''
+      (this.trajectoryType = 1), this.findTrajectory();
+      this.styleActive1 = "background:#1989fa;color:#fff";
+      this.styleActive2 = "";
+      this.styleActive3 = "";
+      this.styleActive4 = "";
     },
     socialContact() {
-      ;(this.trajectoryType = 2), this.findTrajectory()
-      this.styleActive1 = ''
-      this.styleActive2 = 'background:#1989fa;color:#fff'
-      this.styleActive3 = ''
-      this.styleActive4 = ''
+      (this.trajectoryType = 2), this.findTrajectory();
+      this.styleActive1 = "";
+      this.styleActive2 = "background:#1989fa;color:#fff";
+      this.styleActive3 = "";
+      this.styleActive4 = "";
     },
     activity() {
-      this.trajectoryType = 3
-      this.findTrajectory()
-      this.styleActive1 = ''
-      this.styleActive2 = ''
-      this.styleActive3 = 'background:#1989fa;color:#fff'
-      this.styleActive4 = ''
+      this.trajectoryType = 3;
+      this.findTrajectory();
+      this.styleActive1 = "";
+      this.styleActive2 = "";
+      this.styleActive3 = "background:#1989fa;color:#fff";
+      this.styleActive4 = "";
     },
     dealtWith() {
-      ;(this.trajectoryType = 4), this.findTrajectory()
-      this.styleActive1 = ''
-      this.styleActive2 = ''
-      this.styleActive3 = ''
-      this.styleActive4 = 'background:#1989fa;color:#fff'
+      (this.trajectoryType = 4), this.findTrajectory();
+      this.styleActive1 = "";
+      this.styleActive2 = "";
+      this.styleActive3 = "";
+      this.styleActive4 = "background:#1989fa;color:#fff";
     },
     // 添加代办
     // 表单提交
@@ -515,49 +516,49 @@ export default {
         startTime: new Date(this.startTime),
         endTime: new Date(this.endTime),
         status: 1,
-      }
-      this.addOrEditWaitHandle(form)
+      };
+      this.addOrEditWaitHandle(form);
       //   表单重置
-      this.conagency = ''
-      this.dateagency = ''
-      this.startTime = ''
-      this.endTime = ''
+      this.conagency = "";
+      this.dateagency = "";
+      this.startTime = "";
+      this.endTime = "";
       // 重新获取列表
-      this.findTrajectory()
+      this.findTrajectory();
     },
     // 待办日期
     formatDate(dateagency) {
       return `${dateagency.getFullYear()}-${dateagency.getMonth() +
-        1}-${dateagency.getDate()}`
+        1}-${dateagency.getDate()}`;
     },
     onConfirm(dateagency) {
-      this.dateshow = false
-      this.dateagency = this.formatDate(dateagency)
+      this.dateshow = false;
+      this.dateagency = this.formatDate(dateagency);
     },
     // 待办时间
     timecancel() {
-      this.starttimeshow = false
+      this.starttimeshow = false;
     },
     starttimeconfirm(value) {
-      this.startTime = value
-      this.starttimeshow = false
-      this.endtimeshow = true
+      this.startTime = value;
+      this.starttimeshow = false;
+      this.endtimeshow = true;
     },
     endtimeconfirm(value) {
-      this.endTime = value
-      this.endtimeshow = false
-      let time = ''
+      this.endTime = value;
+      this.endtimeshow = false;
+      let time = "";
       if (this.startTime > this.endTime) {
-        time = this.startTime
-        this.startTime = this.endTime
-        this.endTime = time
+        time = this.startTime;
+        this.startTime = this.endTime;
+        this.endTime = time;
       }
       // console.log(this.startTime, this.endTime);
-      this.endtimeshow = false
-      this.timeagency = this.formatTime()
+      this.endtimeshow = false;
+      this.timeagency = this.formatTime();
     },
     formatTime() {
-      return `${this.startTime}-${this.endTime}`
+      return `${this.startTime}-${this.endTime}`;
     },
     // 待办动态
     // 点击删除按钮
@@ -570,7 +571,7 @@ export default {
           customerId: this.externalUserid,
           //   type
         },
-      })
+      });
     },
     // 第一层标签
     userLabel(item) {
@@ -581,33 +582,33 @@ export default {
           groupId: item.groupId,
           name: item.name,
           tagId: item.tagId,
-        })
+        });
       } else {
         this.addTag.forEach((item1) => {
           if (item.tagId == item1.tagId) {
-            this.flage = false // 数组里存在该对象
+            this.flage = false; // 数组里存在该对象
           }
-        })
+        });
         // 数组里不存在该对象,则添加
         if (this.flage) {
           this.addTag.push({
             groupId: item.groupId,
             name: item.name,
             tagId: item.tagId,
-          })
+          });
         } else {
           // 数组里存在该对象,则删除
           this.addTag = this.addTag.filter((element) => {
-            return element.name !== item.name
-          })
+            return element.name !== item.name;
+          });
         }
       }
     },
     // 第二层标签
     changeLabel(item) {
       //   console.log(item.groupId);
-      this.styleactive = item.groupId
-      this.grouplabel = item.weTags
+      this.styleactive = item.groupId;
+      this.grouplabel = item.weTags;
     },
     saveInfo() {
       // 更新客户画像标签 [{ groupId: this.groupId, name: this.name, tagId: this.tagId }]
@@ -616,28 +617,28 @@ export default {
         addTag: this.addTag,
       })
         .then((res) => {
-          console.log(res)
+          console.log(res);
           if (res.code == 200) {
-            this.show = false
+            this.show = false;
             //   重新获取客户标签
-            this.getCustomerInfo()
-            this.$toast.success('保存成功')
+            this.getCustomerInfo();
+            this.$toast.success("保存成功");
           }
 
           // console.log(123);
         })
         .catch((err) => {
-          console.log(err)
-        })
+          console.log(err);
+        });
     },
     // 点击编辑按钮
     labelEdit() {
-      this.show = true
+      this.show = true;
       //   console.log(this.labels);
       if (this.labels) {
         this.labels.forEach((ele) => {
-          this.addTag.push(ele.weTags)
-        })
+          this.addTag.push(ele.weTags);
+        });
       }
       // 获取用户当前的lable,将当前用户的lable与所有lable进行对比，相同的弹框内蓝色展示
       // 弹框内的标签组选中时蓝色展示
@@ -647,11 +648,11 @@ export default {
       findAddaddEmployes(this.externalUserid)
         .then(({ data }) => {
           // console.log(data);
-          this.staff = data
+          this.staff = data;
         })
         .catch((err) => {
-          console.log(err)
-        })
+          console.log(err);
+        });
     },
     findAddGroupNum() {
       findAddGroupNum({
@@ -660,17 +661,17 @@ export default {
       })
         .then(({ data }) => {
           //   console.log(data);
-          this.groupChat = data
+          this.groupChat = data;
           //   console.log(this.groupChat);
           this.commonGroup = this.groupChat.filter((ele) => {
             //   debugger
-            return ele.groupMemberNum == 1
-          })
+            return ele.groupMemberNum == 1;
+          });
           //   console.log(this.commonGroup);
         })
         .catch((err) => {
-          console.log(err)
-        })
+          console.log(err);
+        });
     },
     getCustomerInfo() {
       getCustomerInfo({
@@ -679,34 +680,34 @@ export default {
       })
         .then(({ data }) => {
           // console.log(data);
-          this.form = data
-          this.labels = this.form.weTagGroupList
+          this.form = data;
+          this.labels = this.form.weTagGroupList;
           // console.log(this.form);
         })
         .catch((err) => {
-          console.log(err)
-        })
+          console.log(err);
+        });
     },
   },
   created() {
-    let _this = this
-    wx.invoke('getContext', {}, function(res) {
-      if (res.err_msg == 'getContext:ok') {
-        entry = res.entry //返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
+    let _this = this;
+    wx.invoke("getContext", {}, function(res) {
+      if (res.err_msg == "getContext:ok") {
+        entry = res.entry; //返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
         if (
           ![
-            'single_chat_tools',
-            'group_chat_tools',
-            'contact_profile',
+            "single_chat_tools",
+            "group_chat_tools",
+            "contact_profile",
           ].includes(entry)
         ) {
           // _this.$toast.clear()
-          _this.$toast('入口错误：' + entry)
-          return
+          _this.$toast("入口错误：" + entry);
+          return;
         }
-        wx.invoke('getCurExternalContact', {}, (res) => {
-          if (res.err_msg == 'getCurExternalContact:ok') {
-            _this.externalUserid = res.userId //返回当前外部联系人userId
+        wx.invoke("getCurExternalContact", {}, (res) => {
+          if (res.err_msg == "getCurExternalContact:ok") {
+            _this.externalUserid = res.userId; //返回当前外部联系人userId
             // 获取客户信息
             _this.findAddaddEmployes(),
               _this.findAddGroupNum(),
@@ -715,24 +716,24 @@ export default {
               getAllTags()
                 .then(({ data }) => {
                   // console.log(data);
-                  _this.alllabel = data
+                  _this.alllabel = data;
                 })
                 .catch((err) => {
-                  console.log(err)
-                })
+                  console.log(err);
+                });
           } else {
             //错误处理
           }
-        })
+        });
       } else {
         //错误处理
       }
-    })
+    });
   },
   components: {
     StepList,
   },
-}
+};
 </script>
 
 <style lang="less" scoped>
@@ -831,6 +832,9 @@ export default {
   height: 60px;
   width: 100%;
   margin: 20px;
+  p {
+    font-size: 12px;
+  }
   .number {
     text-align: center;
     margin-top: 20px;
@@ -905,5 +909,8 @@ export default {
 /deep/.styleactive {
   //   background: #f00;
   color: #2c8cf0;
+}
+.iconfont {
+    color: #2c8cf0;
 }
 </style>
