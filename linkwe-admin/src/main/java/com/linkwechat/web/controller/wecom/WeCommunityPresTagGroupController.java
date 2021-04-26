@@ -84,7 +84,7 @@ public class WeCommunityPresTagGroupController extends BaseController {
         if (StringUtils.isNull(taskVo)) {
             return AjaxResult.error(HttpStatus.NOT_FOUND, "群活码不存在");
         }
-        return AjaxResult.success();
+        return AjaxResult.success(taskVo);
     }
 
     /**

@@ -1,6 +1,6 @@
 package com.linkwechat.wecom.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.enums.WeEmpleCodeType;
 import com.linkwechat.common.exception.wecom.WeComException;
@@ -162,7 +162,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
             // 更新员工活码以及其对应的 "联系我" 配置
             WeEmpleCode weEmplCode = weEmpleCodeMapper.selectWeEmpleCodeById(communityNewGroup.getEmplCodeId());
             // 更改员工活码的扫码标签、使用员工
-            getScopsAndTags(weEmplCode, communityNewGroupDto);
+            setScopsAndTags(weEmplCode, communityNewGroupDto);
             // 更新使用场景、欢迎语、是否验证
             weEmplCode.setScenario(communityNewGroupDto.getCodeName());
             weEmplCode.setWelcomeMsg(communityNewGroupDto.getWelcomeMsg());
@@ -210,8 +210,8 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
         WeEmpleCode weEmpleCode = new WeEmpleCode();
 
-        // 获取员工和扫码标签
-        getScopsAndTags(weEmpleCode, communityNewGroupDto);
+        // 设置员工和扫码标签
+        setScopsAndTags(weEmpleCode, communityNewGroupDto);
 
         // 固定为多人类型
         weEmpleCode.setCodeType(WeEmpleCodeType.MULTI.getType());
@@ -231,10 +231,15 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         return weEmpleCode;
     }
 
-    private void getScopsAndTags(WeEmpleCode weEmpleCode, WeCommunityNewGroupDto communityNewGroupDto) {
+    /**
+     * 设置员工活码的标签列表和员工列表
+     * @param weEmpleCode 员工活码
+     * @param communityNewGroupDto 新客拉群信息
+     */
+    private void setScopsAndTags(WeEmpleCode weEmpleCode, WeCommunityNewGroupDto communityNewGroupDto) {
         // 获取活码员工列表 TODO user_id是对应business_id?
-        QueryWrapper<WeUser> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.in("user_id", communityNewGroupDto.getEmplList());
+        LambdaQueryWrapper<WeUser> userQueryWrapper = new LambdaQueryWrapper<>();
+        userQueryWrapper.in(WeUser::getUserId, communityNewGroupDto.getEmplList());
         List<WeUser> weUserList = weUserMapper.selectList(userQueryWrapper);
         List<WeEmpleCodeUseScop> weEmpleCodeUseScopList = weUserList.stream().map(e -> {
             WeEmpleCodeUseScop scop = new WeEmpleCodeUseScop();
@@ -248,8 +253,8 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
         // 获取活码标签
         List<String> tagIdList = communityNewGroupDto.getTagList();
-        QueryWrapper<WeTag> tagQueryWrapper = new QueryWrapper<>();
-        tagQueryWrapper.in("tag_id", tagIdList);
+        LambdaQueryWrapper<WeTag> tagQueryWrapper = new LambdaQueryWrapper<>();
+        tagQueryWrapper.in(WeTag::getTagId, tagIdList);
         List<WeTag> weTagList = weTagMapper.selectList(tagQueryWrapper);
         List<WeEmpleCodeTag> weEmpleCodeTagList = weTagList.stream().map(e -> {
             WeEmpleCodeTag tag = new WeEmpleCodeTag();
@@ -267,20 +272,31 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
      * @param vo 新客自动拉群
      */
     private void getCompleteEmplCodeInfo(WeCommunityNewGroupVo vo) {
-        // 获取群活码信息
+        // 设置员工活码信息
+        WeEmpleCode empleCode = weEmpleCodeMapper.selectWeEmpleCodeById(vo.getEmplCodeId());
+
+        Optional.ofNullable(empleCode).ifPresent(e -> {
+            vo.setEmplCodeUrl(e.getQrCode());
+            vo.setWelcomeMsg(e.getWelcomeMsg());
+            vo.setSkipVerify(e.getSkipVerify());
+        });
+
+        // 设置群活码信息
         WeGroupCode weGroupCode = weGroupCodeMapper.selectWeGroupCodeById(vo.getGroupCodeId());
-        WeGroupCodeVo weGroupCodeVo = new WeGroupCodeVo();
-        BeanUtils.copyProperties(weGroupCode, weGroupCodeVo);
-        vo.setGroupCodeInfo(weGroupCodeVo);
+        Optional.ofNullable(weGroupCode).ifPresent(e -> {
+            WeGroupCodeVo groupCodeVo = WeGroupCodeVo
+                    .builder()
+                    .id(e.getId())
+                    .codeUrl(e.getCodeUrl())
+                    .uuid(e.getUuid())
+                    .build();
+            BeanUtils.copyProperties(e, groupCodeVo);
+            vo.setGroupCodeInfo(groupCodeVo);
+        });
 
         // 获取员工列表信息
         List<WeEmpleCodeUseScop> empleCodeUseScopList = empleCodeUseScopMapper.selectWeEmpleCodeUseScopListById(vo.getEmplCodeId());
         vo.setEmplList(empleCodeUseScopList);
-
-        // 获取员工活码信息
-        WeEmpleCode empleCode = weEmpleCodeMapper.selectWeEmpleCodeById(vo.getEmplCodeId());
-        vo.setEmplCodeUrl(empleCode.getQrCode());
-        vo.setWelcomeMsg(empleCode.getWelcomeMsg());
 
         //  获取相关群聊信息
         List<WeGroup> groupList = weGroupCodeMapper.selectWeGroupListByGroupCodeId(vo.getGroupCodeId());
@@ -289,7 +305,5 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         // 获取标签信息
         List<WeEmpleCodeTag> tagList = empleCodeTagMapper.selectWeEmpleCodeTagListById(vo.getEmplCodeId());
         vo.setTagList(tagList);
-
-        vo.setSkipVerify(empleCode.getSkipVerify());
     }
 }

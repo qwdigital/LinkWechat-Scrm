@@ -1,6 +1,6 @@
 package com.linkwechat.wecom.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.WeGroupCode;
@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -58,7 +59,7 @@ public class WeCommunityKeywordToGroupServiceImpl extends ServiceImpl<WeKeywordG
                 taskVo.setKeywordList(taskKeywordList);
             }
             // 群活码信息
-            taskVo.setGroupCodeInfo(this.getGroupVoByTaskId(taskVo.getGroupCodeId()));
+            setGroupCodeVoByTask(taskVo);
             // 通过群活码id查询对应的群
             List<String> groupNameList = taskMapper.getGroupNameListByTaskId(taskVo.getTaskId());
             groupNameList.removeIf(Objects::isNull);
@@ -83,7 +84,7 @@ public class WeCommunityKeywordToGroupServiceImpl extends ServiceImpl<WeKeywordG
             taskVo.setKeywordList(keywordList);
         }
         // 群活码
-        taskVo.setGroupCodeInfo(this.getGroupVoByTaskId(taskVo.getGroupCodeId()));
+        setGroupCodeVoByTask(taskVo);
         // 群聊名称列表
         List<String> groupNameList = taskMapper.getGroupNameListByTaskId(taskVo.getTaskId());
         groupNameList.removeIf(Objects::isNull);
@@ -127,9 +128,9 @@ public class WeCommunityKeywordToGroupServiceImpl extends ServiceImpl<WeKeywordG
     public int updateTask(WeKeywordGroupTask task, String[] keywords) {
         if (taskMapper.updateById(task) == 1) {
             // 删除原有的关键词
-            QueryWrapper<WeKeywordGroupTaskKeyword> taskKwQueryWrapper = new QueryWrapper<>();
-            taskKwQueryWrapper.eq("task_id", task.getTaskId());
-            taskKwMapper.delete(taskKwQueryWrapper);
+            LambdaQueryWrapper<WeKeywordGroupTaskKeyword> keywordWrapper = new LambdaQueryWrapper<>();
+            keywordWrapper.eq(WeKeywordGroupTaskKeyword::getTaskId, task.getTaskId());
+            taskKwMapper.delete(keywordWrapper);
             // 再重新插入新的关键词
             List<WeKeywordGroupTaskKeyword> taskKeywordList = Arrays
                     .stream(keywords)
@@ -153,14 +154,17 @@ public class WeCommunityKeywordToGroupServiceImpl extends ServiceImpl<WeKeywordG
     @Transactional
     public int batchRemoveTaskByIds(Long[] ids) {
         // 移除其所有关键词对象
-        QueryWrapper<WeKeywordGroupTaskKeyword> taskKwQueryWrapper = new QueryWrapper<>();
-        taskKwQueryWrapper.in("task_id", Arrays.asList(ids));
-        taskKwMapper.delete(taskKwQueryWrapper);
-        QueryWrapper<WeKeywordGroupTask> taskQueryWrapper = new QueryWrapper<>();
-        taskKwQueryWrapper.in("task_id", Arrays.asList(ids));
-        return taskMapper.delete(taskQueryWrapper);
-    }
+        LambdaQueryWrapper<WeKeywordGroupTaskKeyword> keywordWrapper = new LambdaQueryWrapper<>();
+        keywordWrapper.in(WeKeywordGroupTaskKeyword::getTaskId, Arrays.asList(ids));
+        taskKwMapper.delete(keywordWrapper);
 
+        LambdaQueryWrapper<WeKeywordGroupTask> taskWrapper = new LambdaQueryWrapper<>();
+        taskWrapper.in(WeKeywordGroupTask::getTaskId, Arrays.asList(ids));
+        return taskMapper.delete(taskWrapper);
+    }
+/*
+
+ */
     /**
      * 检测任务名是否唯一
      *
@@ -186,7 +190,7 @@ public class WeCommunityKeywordToGroupServiceImpl extends ServiceImpl<WeKeywordG
             taskVo.setKeywordList(this.getTaskKeywordList(taskVo.getTaskId()));
             List<String> groupNameList = taskMapper.getGroupNameListByTaskId(taskVo.getTaskId());
             // 群活码
-            taskVo.setGroupCodeInfo(this.getGroupVoByTaskId(taskVo.getGroupCodeId()));
+            setGroupCodeVoByTask(taskVo);
             // 群名称列表
             groupNameList.removeIf(StringUtils::isNull);
             taskVo.setGroupNameList(groupNameList);
@@ -200,23 +204,23 @@ public class WeCommunityKeywordToGroupServiceImpl extends ServiceImpl<WeKeywordG
      * @param taskId 任务id
      */
     private List<WeKeywordGroupTaskKeyword> getTaskKeywordList(Long taskId) {
-        QueryWrapper<WeKeywordGroupTaskKeyword> taskKeywordQueryWrapper = new QueryWrapper<>();
-        taskKeywordQueryWrapper.eq("task_id", taskId);
-        return taskKwMapper.selectList(taskKeywordQueryWrapper);
+        LambdaQueryWrapper<WeKeywordGroupTaskKeyword> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(WeKeywordGroupTaskKeyword::getTaskId, taskId);
+        return taskKwMapper.selectList(wrapper);
     }
 
     /**
      * 获取群活码简略信息
-     *
-     * @param groupCodeId 群活码id
-     * @return 群活码简略信息
+     * @param taskVo 关键词任务信息
      */
-    private WeGroupCodeVo getGroupVoByTaskId(Long groupCodeId) {
-        WeGroupCode groupCode = groupCodeMapper.selectWeGroupCodeById(groupCodeId);
-        WeGroupCodeVo groupCodeVo = new WeGroupCodeVo();
-        groupCodeVo.setId(groupCode.getId());
-        groupCodeVo.setCodeUrl(groupCode.getCodeUrl());
-        groupCodeVo.setUuid(groupCode.getUuid());
-        return groupCodeVo;
+    private void setGroupCodeVoByTask(WeKeywordGroupTaskVo taskVo) {
+        WeGroupCode groupCode = groupCodeMapper.selectWeGroupCodeById(taskVo.getGroupCodeId());
+        Optional.ofNullable(groupCode).ifPresent(code -> {
+            WeGroupCodeVo groupCodeVo = new WeGroupCodeVo();
+            groupCodeVo.setId(code.getId());
+            groupCodeVo.setCodeUrl(code.getCodeUrl());
+            groupCodeVo.setUuid(code.getUuid());
+            taskVo.setGroupCodeInfo(groupCodeVo);
+        });
     }
 }
