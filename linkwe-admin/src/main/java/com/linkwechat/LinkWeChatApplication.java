@@ -18,7 +18,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @MapperScan("com.linkwechat.*.mapper")
 @ForestScan(basePackages = {"com.linkwechat.wecom.client","com.linkwechat.wecom.wxclient"})
 @EnableAsync
-@EnableDiscoveryClient
+//@EnableDiscoveryClient
 public class LinkWeChatApplication {
     public static void main(String[] args) {
 
