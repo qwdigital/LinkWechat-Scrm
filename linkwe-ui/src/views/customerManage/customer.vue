@@ -93,7 +93,7 @@ export default {
   methods: {
     getList(page) {
       // console.log(this.dateRange);
-      if (this.dateRange[0]) {
+      if (this.dateRange) {
         this.query.beginTime = this.dateRange[0]
         this.query.endTime = this.dateRange[1]
       } else {

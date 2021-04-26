@@ -99,7 +99,7 @@ export default {
   methods: {
     getList(page) {
       // console.log(this.dateRange);
-      if (this.dateRange[0]) {
+      if (this.dateRange) {
         this.query.beginTime = this.dateRange[0]
         this.query.endTime = this.dateRange[1]
       } else {
@@ -225,8 +225,9 @@ export default {
         <el-date-picker
           v-model="dateRange"
           type="daterange"
+          value-format="yyyy-MM-dd"
           :picker-options="pickerOptions"
-          range-separator="至"
+          range-separator="-"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
           align="right"
