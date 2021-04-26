@@ -808,10 +808,12 @@ export default {
     width: 60px;
     height: 18px;
     font-size: 12px;
-    background-color: #f2f2f2;
+    // background-color: #f2f2f2;
+    color: #2c8cf0;
+    border:1px solid #2c8cf0 ;
     text-align: center;
     margin: 10px 0 10px 10px;
-    line-height: 18px;
+    line-height: 16px;
     border-radius: 6px;
   }
 }
