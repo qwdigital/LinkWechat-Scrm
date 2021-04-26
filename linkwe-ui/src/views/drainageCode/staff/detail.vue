@@ -214,6 +214,7 @@ export default {
         style="width: 260px"
         value-format="yyyy-MM-dd"
         type="daterange"
+        :clearable="false"
         range-separator="-"
         start-placeholder="开始日期"
         end-placeholder="结束日期"
