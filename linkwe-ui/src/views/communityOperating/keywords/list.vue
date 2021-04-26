@@ -345,7 +345,8 @@ export default {
 
     // 获取显示用keyword字符串
     getDisplayKeywords (row) {
-      const keywords = row.keywordList.map(k => k.keyword)
+      const keywordList = row.keywordList || []
+      const keywords = keywordList.map(k => k.keyword)
 
       return keywords.join(' ')
     },
