@@ -152,7 +152,7 @@ elasticsearch:
 
 # forest配置
 forest:
-  interceptors: com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor
+ # interceptors: com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor
   backend: httpclient
   retry-count: 1 # 请求失败后重试次数，默认为0次不重试
   max-retry-interval: 1000 #重试间隔时间
