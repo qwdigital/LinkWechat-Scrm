@@ -3,7 +3,7 @@
     <!-- 头部 -->
     <div class="header">
       <van-icon
-        name="cross"
+        name="arrow-left"
         color="#9c9c9c"
         size="16"
         @click="$router.back()"
@@ -168,7 +168,7 @@ export default {
 .header {
   margin: 20px 10px 10px;
   vertical-align: center;
-  text-align: center;
+//   text-align: center;
 }
 .van-icon-cross {
   position: absolute;
@@ -176,6 +176,7 @@ export default {
 }
 .title {
   text-align: center;
+  font-size: 14px;
 }
 //  详细资料
 .details {
