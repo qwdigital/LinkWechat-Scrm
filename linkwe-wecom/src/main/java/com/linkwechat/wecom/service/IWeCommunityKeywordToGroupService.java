@@ -1,6 +1,6 @@
 package com.linkwechat.wecom.service;
 
-import com.linkwechat.wecom.domain.WeKeywordGroupTask;
+import com.linkwechat.wecom.domain.dto.WeKeywordGroupTaskDto;
 import com.linkwechat.wecom.domain.vo.WeKeywordGroupTaskVo;
 
 import java.util.List;
@@ -33,20 +33,18 @@ public interface IWeCommunityKeywordToGroupService {
     /**
      * 创建新任务
      *
-     * @param task     待存储的对象
-     * @param keywords 关键词
+     * @param taskDto 任务信息
      * @return 结果
      */
-    int addTask(WeKeywordGroupTask task, String[] keywords);
+    int addTask(WeKeywordGroupTaskDto taskDto);
 
     /**
      * 对指定任务进行更新
-     *
-     * @param task     待更新对象
-     * @param keywords 关键词
+     * @param taskId 待更新任务的id
+     * @param taskDto 任务信息
      * @return 结果
      */
-    int updateTask(WeKeywordGroupTask task, String[] keywords);
+    int updateTask(Long taskId, WeKeywordGroupTaskDto taskDto);
 
     /**
      * 根据id列表批量删除任务

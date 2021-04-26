@@ -3,6 +3,8 @@ package com.linkwechat.wecom.domain;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.common.utils.SnowFlakeUtil;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -10,6 +12,7 @@ import lombok.EqualsAndHashCode;
  * 社区运营 - 关键词拉群任务实体
  */
 @Data
+@Builder
 @EqualsAndHashCode(callSuper = true)
 @TableName("we_keyword_group")
 public class WeKeywordGroupTask extends BaseEntity {
@@ -18,7 +21,7 @@ public class WeKeywordGroupTask extends BaseEntity {
      * 主键id
      */
     @TableId
-    private Long taskId;
+    private Long taskId = SnowFlakeUtil.nextId();
 
     /**
      * 任务名称
