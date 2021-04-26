@@ -113,11 +113,11 @@
           >
             <el-image
               slot="reference"
-              :src="row.groupCodeInfo.codeUrl"
+              :src="(row.groupCodeInfo && row.groupCodeInfo.codeUrl) || ''"
               class="code-image--small"
             ></el-image>
             <el-image
-              :src="row.groupCodeInfo.codeUrl"
+              :src="(row.groupCodeInfo && row.groupCodeInfo.codeUrl ) || ''"
               class="code-image"
             >
             </el-image>

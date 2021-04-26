@@ -258,8 +258,8 @@ export default {
     getDetail(id) {
       this.loading = true
       getDetail(id).then(({ data }) => {
-        this.dateRange = [this.form.startExeTime, this.form.stopExeTime]
-        this.customerGroups = data.groupList
+        this.dateRange = [data.startExeTime || '', data.stopExeTime || '']
+        this.customerGroups = data.groupList || []
 
         this.form.ruleName = data.ruleName || ''
         this.form.title = data.title || ''
@@ -268,7 +268,9 @@ export default {
 
         this.form.materialIdList = []
 
-        for (let material of data.materialList) {
+        const materialList = data.materialList || []
+
+        for (let material of materialList) {
           if (material.materialUrl) {
             this.imageMaterialList.push(material)
           } else {

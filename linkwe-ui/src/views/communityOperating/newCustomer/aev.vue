@@ -176,16 +176,22 @@ export default {
     getDetail(id) {
       this.loading = true
       getDetail(id).then(({ data }) => {
-        this.form.codeName = data.codeName
-        this.form.skipVerify = data.skipVerify
-        this.form.welcomeMsg = data.welcomeMsg
-        this.form.groupCodeId = data.groupCodeInfo.id
+        this.form.codeName = data.codeName || ''
+        this.form.skipVerify = data.skipVerify || 0
+        this.form.welcomeMsg = data.welcomeMsg || ''
 
-        this.codes = [ data.groupCodeInfo ]
-        this.groupQrCode = data.groupCodeInfo
+        if (data.groupCodeInfo && data.groupCodeInfo.id) {
+          this.codes = [ data.groupCodeInfo ]
+          this.groupQrCode = data.groupCodeInfo
+          this.form.groupCodeId = data.groupCodeInfo.id
+        } else {
+          this.codes = []
+          this.groupQrCode = {}
+          this.form.groupCodeId = ''
+        }
 
-        this.tags = data.tagList
-        this.users = data.emplList
+        this.tags = data.tagList || []
+        this.users = data.emplList || []
 
         this.loading = false
       })

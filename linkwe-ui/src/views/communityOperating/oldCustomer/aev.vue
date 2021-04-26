@@ -233,14 +233,25 @@ export default {
     getDetail(id) {
       this.loading = true
       getDetail(id).then(({ data }) => {
-        this.form = data
-        this.tags = this.form.tagList
-        this.users = this.form.scopeList
-        this.groupQrCode = data.groupCodeInfo
-        this.form.groupCodeId = this.groupQrCode.id
-        this.dateRange = [this.form.cusBeginTime, this.form.cusEndTime]
+        this.form.taskName = data.taskName || ''
+        this.form.welcomeMsg = data.welcomeMsg || ''
+        this.form.sendType = data.sendType || 0
+        this.form.sendScope = data.sendScope || 0
+        this.form.sendGender = data.sendGender || 0
 
-        this.codes = [ data.groupCodeInfo ]
+        this.tags = data.tagList || []
+        this.users = data.scopeList || []
+        this.dateRange = [data.cusBeginTime || '', data.cusEndTime || '']
+
+        if (data.groupCodeInfo && data.groupCodeInfo.id) {
+          this.codes = [ data.groupCodeInfo ]
+          this.groupQrCode = data.groupCodeInfo
+          this.form.groupCodeId = this.groupQrCode.id
+        } else {
+          this.codes = []
+          this.groupQrCode = {}
+          this.form.groupCodeId = ''
+        }
 
         this.loading = false
       })
