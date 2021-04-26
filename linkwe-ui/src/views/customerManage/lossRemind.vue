@@ -205,7 +205,7 @@ export default {
       class="top-search"
       size="small"
     >
-      <el-form-item label="客户名称">
+      <el-form-item label="客户名称" prop="name">
         <el-input v-model="query.name" placeholder="请输入"></el-input>
       </el-form-item>
       <el-form-item label="添加人">

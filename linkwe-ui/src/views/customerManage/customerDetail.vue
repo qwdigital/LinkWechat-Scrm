@@ -113,7 +113,7 @@ export default {
         </el-row>
         <el-row :gutter="10">
           <el-col :span="10">标签：</el-col>
-          <el-col :span="12">
+          <el-col :span="14">
             <div
               v-for="(item, index) in customer.weFlowerCustomerRels"
               :key="index"
@@ -194,6 +194,9 @@ export default {
   .el-col-10 {
     width: 100px;
     text-align: right;
+  }
+  .el-tag {
+    margin-bottom: 5px;
   }
 }
 .el-icon-s-custom {
