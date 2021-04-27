@@ -673,6 +673,7 @@ export default {
           console.log(err);
         });
     },
+
     getCustomerInfo() {
       getCustomerInfo({
         externalUserid: this.externalUserid,
@@ -914,5 +915,9 @@ export default {
 }
 .iconfont {
     color: #2c8cf0;
+   
 }
+ .icon-xingbie {
+        color: pink;
+    }
 </style>

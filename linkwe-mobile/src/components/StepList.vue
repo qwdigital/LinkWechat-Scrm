@@ -27,13 +27,16 @@
               {{ getTime2(getTime1(item1.createDate)) }}</span
             >
             <span class="fs14">{{ chargeType(item1.trajectoryType) }}</span>
-            <span
+            <span class="finish-box">
+                <span
               class="finish"
               v-if="item1.trajectoryType == 4"
               @click="finDynamic(item1.id)"
               >完成</span
             >
             <span class="deldynamic" @click="delDynamic(item1.id)">删除</span>
+            </span>
+            
             <p class="fs14 con ">{{ item1.content }}</p>
           </van-step>
           <!-- <van-step>
@@ -252,12 +255,23 @@ export default {
   left: 51px;
   margin-top: 20px;
 }
-.finish {
+.finish-box {
+     display: inline-block;
   position: relative;
   color: #2c8cf0;
   font-size: 12px;
   font-weight: 600;
-  right: -138px;
+  left: 140px;
+  top: 0px;
+  width: 65px;
+}
+.finish {
+   
+  position: absolute;
+  color: #2c8cf0;
+  font-size: 12px;
+  font-weight: 600;
+//   right: -138px;
   top: 0px;
 }
 </style>
