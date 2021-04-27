@@ -59,7 +59,7 @@ LinkWeChat 是一款基于人工智能的企业微信 SCRM 系统，为企业构
 
 ```java
 JDK >= 1.8 (推荐1.8版本)
-Mysql >= 5.5.0 (推荐5.7版本)
+Mysql >= 5.7.0 (推荐5.7版本)
 Redis >= 3.0
 Maven >= 3.0
 Node >= 10
