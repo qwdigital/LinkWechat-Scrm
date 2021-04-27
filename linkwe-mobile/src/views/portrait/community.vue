@@ -2,13 +2,14 @@
   <div>
     <!-- 头部 -->
     <div class="header">
+      
+      <span class="title"> 社群关系 </span>
       <van-icon
         name="cross"
         color="#9c9c9c"
         size="16"
         @click="$router.back()"
       />
-      <span class="title"> 社群关系 </span>
     </div>
     <van-divider />
     <!-- 标签页 -->
@@ -185,16 +186,16 @@ export default {
   background-color: #f2f2f2;
 }
 .header {
-  margin: 20px 10px 10px;
+  margin: 20px 20px 10px;
   vertical-align: center;
-  text-align: center;
+  text-align: left;
 }
 .van-icon-cross {
-  position: absolute;
-  left: 10px;
+  float: right;
 }
 .title {
   text-align: center;
+  font-size: 14px;
 }
 /* 添加的员工 */
 .details {
