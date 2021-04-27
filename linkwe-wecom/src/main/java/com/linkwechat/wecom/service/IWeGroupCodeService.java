@@ -94,4 +94,11 @@ public interface IWeGroupCodeService extends IService<WeGroupCode> {
      */
     WeGroupCode getWeGroupByUuid(String uuid);
 
+    /**
+     * 通过员工活码获取群活码，用于新客自动拉群。
+     * @param state 员工活码state
+     * @return 群活码URL
+     */
+    String selectGroupCodeUrlByEmplCodeState(String state);
+
 }

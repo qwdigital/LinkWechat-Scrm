@@ -2,6 +2,7 @@ package com.linkwechat.web.controller.wecom;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 //import com.alibaba.nacos.common.utils.CollectionUtils;
 import com.google.common.collect.Lists;
@@ -151,6 +152,12 @@ public class WeTaskFissionController extends BaseController {
         CopyOptions options = CopyOptions.create();
         options.setIgnoreNullValue(true);
         BeanUtil.copyProperties(weTaskFission, fissionTask, options);
+        if (CollectionUtil.isNotEmpty(weTaskFission.getTaskFissionStaffs())) {
+            fissionTask.setTaskFissionStaffs(weTaskFission.getTaskFissionStaffs());
+        }
+        if (CollectionUtil.isNotEmpty(weTaskFission.getTaskFissionWeGroups())) {
+            fissionTask.setTaskFissionWeGroups(weTaskFission.getTaskFissionWeGroups());
+        }
         Long id = weTaskFissionService.updateWeTaskFission(fissionTask);
         JSONObject json = new JSONObject();
         json.put("id", id);
@@ -222,7 +229,7 @@ public class WeTaskFissionController extends BaseController {
     public AjaxResult<JSONObject> upload(@RequestParam(value = "file") MultipartFile file) throws IOException {
         String url = FileUploadUtils.upload2Cos(file, cosConfig);
         JSONObject json = new JSONObject();
-        json.put("rewardImageUrl", url);
+        json.put("rewardImageUrl", cosConfig.getImgUrlPrefix()+url);
         return AjaxResult.success(json);
     }
 

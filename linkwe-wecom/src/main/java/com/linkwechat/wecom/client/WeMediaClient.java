@@ -19,23 +19,13 @@ import java.io.InputStream;
  */
 @BaseRequest(interceptor = WeAccessTokenInterceptor.class)
 public interface WeMediaClient {
-
-    /**
-     * 上传临时素材
-     * @param file
-     * @param type
-     * @return
-     */
-    @Post(url="/media/upload")
-    WeMediaDto upload(@DataFile(value = "media") File file, @Query("type") String type);
-
     /**
      * 上传图片
      * @param multipartFile
      * @return
      */
     @Post(url="/media/uploadimg")
-    WeMediaDto  uploadimg(@DataFile(value = "file") MultipartFile multipartFile);
+    WeMediaDto  uploadimg(@DataFile(value = "fieldNameHere") MultipartFile multipartFile);
 
 
     /**

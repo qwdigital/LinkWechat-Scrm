@@ -1,6 +1,6 @@
 package com.linkwechat.wecom.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.common.enums.CommunityTaskType;
@@ -10,8 +10,8 @@ import com.linkwechat.wecom.client.WeMessagePushClient;
 import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.WeMessagePushDto;
 import com.linkwechat.wecom.domain.dto.message.TextMessageDto;
-import com.linkwechat.wecom.domain.vo.WeGroupSopVo;
 import com.linkwechat.wecom.domain.vo.WeCommunityTaskEmplVo;
+import com.linkwechat.wecom.domain.vo.WeGroupSopVo;
 import com.linkwechat.wecom.domain.vo.WeMaterialVo;
 import com.linkwechat.wecom.mapper.*;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
@@ -139,8 +139,8 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
             // 再插入新数据
             this.saveChatAndMaterialBinds(ruleId, groupIdList, materialIdList);
             // 删除旧图片
-            QueryWrapper<WeGroupSopPic> queryWrapper = new QueryWrapper<>();
-            sopPicMapper.delete(queryWrapper.eq("rule_id", ruleId));
+            LambdaQueryWrapper<WeGroupSopPic> queryWrapper = new LambdaQueryWrapper<>();
+            sopPicMapper.delete(queryWrapper.eq(WeGroupSopPic::getRuleId, ruleId));
 
             // 保留新上传的图片
             List<WeGroupSopPic> sopPicList = picUrlList.stream().map(picUrl -> new WeGroupSopPic(ruleId, picUrl)).collect(Collectors.toList());
@@ -164,16 +164,17 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
         int affectedRows = groupSopMapper.deleteBatchIds(Arrays.asList(ids));
         if (affectedRows > 0) {
             // 解除群聊和素材关联
-            QueryWrapper<WeGroupSopChat> sopGroupQueryWrapper = new QueryWrapper<>();
-            sopGroupQueryWrapper.in("rule_id", Arrays.asList(ids));
-            sopChatMapper.delete(sopGroupQueryWrapper);
-            QueryWrapper<WeGroupSopMaterial> sopMaterialQueryWrapper = new QueryWrapper<>();
-            sopMaterialQueryWrapper.in("rule_id", Arrays.asList(ids));
-            sopMaterialMapper.delete(sopMaterialQueryWrapper);
+            LambdaQueryWrapper<WeGroupSopChat> groupQueryWrapper = new LambdaQueryWrapper<>();
+            groupQueryWrapper.in(WeGroupSopChat::getRuleId, Arrays.asList(ids));
+            sopChatMapper.delete(groupQueryWrapper);
+
+            LambdaQueryWrapper<WeGroupSopMaterial> materialQueryWrapper = new LambdaQueryWrapper<>();
+            materialQueryWrapper.in(WeGroupSopMaterial::getRuleId, Arrays.asList(ids));
+            sopMaterialMapper.delete(materialQueryWrapper);
 
             // 删除手动上传的图片
-            QueryWrapper<WeGroupSopPic> picQueryWrapper = new QueryWrapper<>();
-            picQueryWrapper.in("rule_id", Arrays.asList(ids));
+            LambdaQueryWrapper<WeGroupSopPic> picQueryWrapper = new LambdaQueryWrapper<>();
+            picQueryWrapper.in(WeGroupSopPic::getRuleId, Arrays.asList(ids));
             sopPicMapper.delete(picQueryWrapper);
         }
         return affectedRows;
@@ -216,8 +217,8 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
         }
 
         // 设置图片列表
-        QueryWrapper<WeGroupSopPic> picQueryWrapper = new QueryWrapper<>();
-        picQueryWrapper.eq("rule_id", ruleId);
+        LambdaQueryWrapper<WeGroupSopPic> picQueryWrapper = new LambdaQueryWrapper<>();
+        picQueryWrapper.eq(WeGroupSopPic::getRuleId, ruleId);
         List<WeGroupSopPic> sopPicList = sopPicMapper.selectList(picQueryWrapper);
         if (StringUtils.isNotEmpty(sopPicList)) {
             List<String> picUrlList = sopPicList.stream().map(WeGroupSopPic::getPicUrl).collect(Collectors.toList());
@@ -255,12 +256,14 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
      * @param ruleId 规则id
      */
     private void deleteChatAndMaterialBinds(Long ruleId) {
-        QueryWrapper<WeGroupSopChat> sopChatQueryWrapper = new QueryWrapper<>();
-        sopChatQueryWrapper.eq("rule_id", ruleId);
-        sopChatMapper.delete(sopChatQueryWrapper);
-        QueryWrapper<WeGroupSopMaterial> sopMaterialQueryWrapper = new QueryWrapper<>();
-        sopMaterialQueryWrapper.eq("rule_id", ruleId);
-        sopMaterialMapper.delete(sopMaterialQueryWrapper);
+        // 删除群聊绑定
+        LambdaQueryWrapper<WeGroupSopChat> chatQueryWrapper = new LambdaQueryWrapper<>();
+        chatQueryWrapper.eq(WeGroupSopChat::getRuleId, ruleId);
+        sopChatMapper.delete(chatQueryWrapper);
+        // 删除素材绑定
+        LambdaQueryWrapper<WeGroupSopMaterial> materialQueryWrapper = new LambdaQueryWrapper<>();
+        materialQueryWrapper.eq(WeGroupSopMaterial::getRuleId, ruleId);
+        sopMaterialMapper.delete(materialQueryWrapper);
     }
 
     /**
@@ -306,11 +309,11 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
      * @return 群聊信息列表
      */
     private List<WeGroup> getGroupListByRuleId(Long ruleId) {
-        QueryWrapper<WeGroup> groupQueryWrapper = new QueryWrapper<>();
+        LambdaQueryWrapper<WeGroup> groupQueryWrapper = new LambdaQueryWrapper<>();
         List<String> chatIdList = groupSopMapper.getChatIdListByRuleId(ruleId);
         List<WeGroup> groupList = new ArrayList<>();
         if (StringUtils.isNotEmpty(chatIdList)) {
-            groupQueryWrapper.in("chat_id", chatIdList);
+            groupQueryWrapper.in(WeGroup::getChatId, chatIdList);
             groupList = groupMapper.selectList(groupQueryWrapper);
         }
         return groupList;
@@ -326,10 +329,13 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
         // 构造请求参数
         WeMessagePushDto pushDto = new WeMessagePushDto();
         // 查询群聊列表，获取群主列表
-        QueryWrapper<WeGroup> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in("chat_id", groupIdList);
+        LambdaQueryWrapper<WeGroup> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(WeGroup::getChatId, groupIdList);
         List<WeGroup> groupList = groupMapper.selectList(queryWrapper);
-        String toUser = groupList.stream().map(WeGroup::getOwner).collect(Collectors.joining("|"));
+        String toUser = groupList
+                .stream()
+                .map(WeGroup::getOwner)
+                .collect(Collectors.joining("|"));
         pushDto.setTouser(toUser);
 
         // 获取agentId

@@ -10,6 +10,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    imageList: {
+      type: Array,
+      default: () => []
+    },
+    messageList: {
+      type: Array,
+      default: () => []
+    }
   },
   data() {
     return {}
@@ -27,24 +35,46 @@ export default {
     <div class="top">小微</div>
     <div class="small">仟微科技-企微</div>
     <div class="time">凌晨2:20</div>
-    <div class="flex msg-li">
-      <el-avatar
-        shape="square"
-        size="small"
-        :src="require('@/assets/image/profile.jpg')"
-      ></el-avatar>
-      <div class="msg">{{ message }}</div>
-    </div>
-    <div class="flex msg-li" v-if="isOther">
-      <el-avatar
-        shape="square"
-        size="small"
-        :src="require('@/assets/image/profile.jpg')"
-      ></el-avatar>
-      <div class="msg" style="line-height: 0; padding: 5px;">
-        <slot></slot>
-      </div>
-    </div>
+    <ul class="msg-ul">
+      <li class="flex msg-li">
+        <el-avatar
+          shape="square"
+          size="small"
+          :src="require('@/assets/image/profile.jpg')"
+        ></el-avatar>
+        <div class="msg">{{ message }}</div>
+      </li>
+      <li class="flex msg-li" v-if="isOther">
+        <el-avatar
+          shape="square"
+          size="small"
+          :src="require('@/assets/image/profile.jpg')"
+        ></el-avatar>
+        <div class="msg" style="line-height: 0; padding: 5px;">
+          <slot></slot>
+        </div>
+      </li>
+      <li class="flex msg-li" v-for="message in messageList" :key="message">
+        <el-avatar
+          shape="square"
+          size="small"
+          :src="require('@/assets/image/profile.jpg')"
+        ></el-avatar>
+        <div class="msg">
+          <slot name="text" v-bind:text="message"></slot>
+        </div>
+      </li>
+      <li class="flex msg-li" v-for="image in imageList" :key="image">
+        <el-avatar
+          shape="square"
+          size="small"
+          :src="require('@/assets/image/profile.jpg')"
+        ></el-avatar>
+        <div class="msg" style="line-height: 0; padding: 5px;">
+          <slot name="image" v-bind:image="image"></slot>
+        </div>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -67,6 +97,12 @@ export default {
     color: #aaa;
     transform: scale(0.8);
     padding: 10px 0 5px;
+  }
+  .msg-ul {
+    margin: 0;
+    padding: 0;
+    max-height: 80%;
+    overflow: auto;
   }
   .msg-li {
     margin-bottom: 10px;

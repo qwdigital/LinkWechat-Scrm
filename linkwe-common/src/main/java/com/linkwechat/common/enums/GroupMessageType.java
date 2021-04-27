@@ -33,6 +33,11 @@ public enum GroupMessageType {
      */
     TEXT_IMAGE("4", "text_image"),
 
+    /**
+     * 视频
+     */
+    VIDEO("5", "video")
+
     ;
     /**
      * 媒体类型

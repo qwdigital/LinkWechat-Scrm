@@ -101,4 +101,11 @@ public interface WeGroupCodeMapper  extends BaseMapper<WeGroupCode>
      * @return 总扫码次数
      */
     int selectScanTimesByGroupCodeId(Long groupCodeId);
+
+    /**
+     * 通过员工活码获取群活码，用于新客自动拉群。
+     * @param state 员工活码state
+     * @return 群活码URL
+     */
+    String selectGroupCodeUrlByEmplCodeState(String state);
 }

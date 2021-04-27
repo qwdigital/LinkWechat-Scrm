@@ -22,9 +22,9 @@ npm run serve
 ## 发布
 
 ```bash
-# 构建测试环境
-npm run build:stage
+# 构建测试环境（暂未配置）
+# npm run build:stage
 
 # 构建生产环境
-npm run build:prod
+npm run build
 ```

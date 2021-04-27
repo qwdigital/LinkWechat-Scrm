@@ -1,0 +1,23 @@
+{
+  "id": "2510853",
+  "name": "linkWechart",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "13963323",
+      "name": "性别",
+      "font_class": "man",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "16921771",
+      "name": "性别",
+      "font_class": "xingbie",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    }
+  ]
+}

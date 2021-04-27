@@ -31,15 +31,13 @@ public interface WxAuthClient {
     /**
      * 刷新access_token
      *
-     *
-     * @param id
      * @param appId     公众号的唯一标识
      * @param grantType 填写为refresh_token
      * @param refreshToken 填写通过access_token获取到的refresh_token参数
      * @return
      */
     @Request(url = "/oauth2/refresh_token", type = "GET")
-    WxTokenDto refreshToken(String id, @Query("appid") String appId, @Query("grant_type") String grantType,
+    WxTokenDto refreshToken(@Query("appid") String appId, @Query("grant_type") String grantType,
                             @Query("refresh_token") String refreshToken);
 
     /**

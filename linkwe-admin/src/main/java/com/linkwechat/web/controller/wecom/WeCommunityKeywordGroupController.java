@@ -76,19 +76,7 @@ public class WeCommunityKeywordGroupController extends BaseController {
     //   @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:add')")
     @PostMapping(path = "/")
     public AjaxResult addTask(@RequestBody @Validated WeKeywordGroupTaskDto keywordToGroupDto) {
-        // 群活码必须存在
-        if (null == groupCodeService.selectWeGroupCodeById(keywordToGroupDto.getGroupCodeId())) {
-            return AjaxResult.error(HttpStatus.NOT_FOUND, "群活码不存在");
-        }
-        // 任务名称必须唯一
-        if (!keywordToGroupService.taskNameIsUnique(keywordToGroupDto.getTaskName())) {
-            return AjaxResult.error(HttpStatus.BAD_REQUEST, "任务名称已存在");
-        }
-        WeKeywordGroupTask task = new WeKeywordGroupTask();
-        BeanUtils.copyProperties(keywordToGroupDto, task);
-        task.setCreateBy(SecurityUtils.getUsername());
-        String[] keywords = keywordToGroupDto.getKeywords().split(",");
-        return toAjax(keywordToGroupService.addTask(task, keywords));
+        return toAjax(keywordToGroupService.addTask(keywordToGroupDto));
     }
 
     /**
@@ -101,22 +89,7 @@ public class WeCommunityKeywordGroupController extends BaseController {
     //   @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:edit')")
     @PutMapping(path = "/{taskId}")
     public AjaxResult updateTask(@PathVariable("taskId") Long taskId, @RequestBody @Validated WeKeywordGroupTaskDto keywordToGroupDto) {
-        // 群活码必须存在
-        if (null == groupCodeService.selectWeGroupCodeById(keywordToGroupDto.getGroupCodeId())) {
-            return AjaxResult.error(HttpStatus.NOT_FOUND, "群活码不存在");
-        }
-        // 若名称发生更改，则必须唯一
-        String inputTaskName = keywordToGroupDto.getTaskName();
-        String originalName = keywordToGroupService.getTaskById(taskId).getTaskName();
-        if (!originalName.equals(inputTaskName) && !keywordToGroupService.taskNameIsUnique(inputTaskName)) {
-            return AjaxResult.error(HttpStatus.BAD_REQUEST, "任务名称已存在");
-        }
-        WeKeywordGroupTask task = new WeKeywordGroupTask();
-        BeanUtils.copyProperties(keywordToGroupDto, task);
-        task.setTaskId(taskId);
-        task.setUpdateBy(SecurityUtils.getUsername());
-        String[] keywords = keywordToGroupDto.getKeywords().split(",");
-        return toAjax(keywordToGroupService.updateTask(task, keywords));
+        return toAjax(keywordToGroupService.updateTask(taskId, keywordToGroupDto));
     }
 
     /**

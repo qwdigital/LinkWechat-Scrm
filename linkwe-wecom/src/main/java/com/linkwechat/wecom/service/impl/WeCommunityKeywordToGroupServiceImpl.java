@@ -1,11 +1,14 @@
 package com.linkwechat.wecom.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.constant.HttpStatus;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.WeGroupCode;
 import com.linkwechat.wecom.domain.WeKeywordGroupTaskKeyword;
 import com.linkwechat.wecom.domain.WeKeywordGroupTask;
+import com.linkwechat.wecom.domain.dto.WeKeywordGroupTaskDto;
 import com.linkwechat.wecom.domain.vo.WeGroupCodeVo;
 import com.linkwechat.wecom.domain.vo.WeKeywordGroupTaskVo;
 import com.linkwechat.wecom.mapper.WeGroupCodeMapper;
@@ -17,9 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -58,7 +59,7 @@ public class WeCommunityKeywordToGroupServiceImpl extends ServiceImpl<WeKeywordG
                 taskVo.setKeywordList(taskKeywordList);
             }
             // 群活码信息
-            taskVo.setGroupCodeInfo(this.getGroupVoByTaskId(taskVo.getGroupCodeId()));
+            setGroupCodeVoByTask(taskVo);
             // 通过群活码id查询对应的群
             List<String> groupNameList = taskMapper.getGroupNameListByTaskId(taskVo.getTaskId());
             groupNameList.removeIf(Objects::isNull);
@@ -83,7 +84,7 @@ public class WeCommunityKeywordToGroupServiceImpl extends ServiceImpl<WeKeywordG
             taskVo.setKeywordList(keywordList);
         }
         // 群活码
-        taskVo.setGroupCodeInfo(this.getGroupVoByTaskId(taskVo.getGroupCodeId()));
+        setGroupCodeVoByTask(taskVo);
         // 群聊名称列表
         List<String> groupNameList = taskMapper.getGroupNameListByTaskId(taskVo.getTaskId());
         groupNameList.removeIf(Objects::isNull);
@@ -94,18 +95,24 @@ public class WeCommunityKeywordToGroupServiceImpl extends ServiceImpl<WeKeywordG
     /**
      * 创建新任务
      *
-     * @param task     待存储的对象
-     * @param keywords 关键词
+     * @param taskDto 任务信息
      * @return 结果
      */
     @Override
-    @Transactional
-    public int addTask(WeKeywordGroupTask task, String[] keywords) {
+    @Transactional(rollbackFor = Exception.class)
+    public int addTask(WeKeywordGroupTaskDto taskDto) {
+        validation(taskDto, true);
+        WeKeywordGroupTask task = WeKeywordGroupTask.builder()
+                .groupCodeId(taskDto.getGroupCodeId())
+                .taskName(taskDto.getTaskName())
+                .welcomeMsg(taskDto.getWelcomeMsg())
+                .build();
+
         if (this.save(task)) {
-            // 构建关键词对象并存储
-            List<WeKeywordGroupTaskKeyword> taskKeywordList = Arrays
-                    .stream(keywords)
-                    .map(word -> new WeKeywordGroupTaskKeyword(task.getTaskId(), word))
+            // 构建关键词对象并存储,需要先校验关键词长度
+            List<WeKeywordGroupTaskKeyword> taskKeywordList = parseLongKeywordsString(taskDto.getKeywords())
+                    .stream()
+                    .map(keyword -> new WeKeywordGroupTaskKeyword(task.getTaskId(), keyword))
                     .collect(Collectors.toList());
             if (StringUtils.isNotEmpty(taskKeywordList)) {
                 taskKwMapper.batchBindsTaskKeyword(taskKeywordList);
@@ -117,23 +124,30 @@ public class WeCommunityKeywordToGroupServiceImpl extends ServiceImpl<WeKeywordG
 
     /**
      * 对指定任务进行更新
-     *
-     * @param task     待更新对象
-     * @param keywords 关键词
+     * @param taskId 待更新任务的id
+     * @param taskDto 任务信息
      * @return 结果
      */
     @Override
-    @Transactional
-    public int updateTask(WeKeywordGroupTask task, String[] keywords) {
+    @Transactional(rollbackFor = Exception.class)
+    public int updateTask(Long taskId, WeKeywordGroupTaskDto taskDto) {
+        validation(taskDto, false);
+        WeKeywordGroupTask task = WeKeywordGroupTask.builder()
+                .groupCodeId(taskDto.getGroupCodeId())
+                .taskName(taskDto.getTaskName())
+                .welcomeMsg(taskDto.getWelcomeMsg())
+                .taskId(taskId)
+                .build();
         if (taskMapper.updateById(task) == 1) {
             // 删除原有的关键词
-            QueryWrapper<WeKeywordGroupTaskKeyword> taskKwQueryWrapper = new QueryWrapper<>();
-            taskKwQueryWrapper.eq("task_id", task.getTaskId());
-            taskKwMapper.delete(taskKwQueryWrapper);
+            LambdaQueryWrapper<WeKeywordGroupTaskKeyword> keywordWrapper = new LambdaQueryWrapper<>();
+            keywordWrapper.eq(WeKeywordGroupTaskKeyword::getTaskId, task.getTaskId());
+            taskKwMapper.delete(keywordWrapper);
+
             // 再重新插入新的关键词
-            List<WeKeywordGroupTaskKeyword> taskKeywordList = Arrays
-                    .stream(keywords)
-                    .map(word -> new WeKeywordGroupTaskKeyword(task.getTaskId(), word))
+            List<WeKeywordGroupTaskKeyword> taskKeywordList = parseLongKeywordsString(taskDto.getKeywords())
+                    .stream()
+                    .map(keyword -> new WeKeywordGroupTaskKeyword(task.getTaskId(), keyword))
                     .collect(Collectors.toList());
             if (StringUtils.isNotEmpty(taskKeywordList)) {
                 taskKwMapper.batchBindsTaskKeyword(taskKeywordList);
@@ -150,15 +164,16 @@ public class WeCommunityKeywordToGroupServiceImpl extends ServiceImpl<WeKeywordG
      * @return 删除行数
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int batchRemoveTaskByIds(Long[] ids) {
         // 移除其所有关键词对象
-        QueryWrapper<WeKeywordGroupTaskKeyword> taskKwQueryWrapper = new QueryWrapper<>();
-        taskKwQueryWrapper.in("task_id", Arrays.asList(ids));
-        taskKwMapper.delete(taskKwQueryWrapper);
-        QueryWrapper<WeKeywordGroupTask> taskQueryWrapper = new QueryWrapper<>();
-        taskKwQueryWrapper.in("task_id", Arrays.asList(ids));
-        return taskMapper.delete(taskQueryWrapper);
+        LambdaQueryWrapper<WeKeywordGroupTaskKeyword> keywordWrapper = new LambdaQueryWrapper<>();
+        keywordWrapper.in(WeKeywordGroupTaskKeyword::getTaskId, Arrays.asList(ids));
+        taskKwMapper.delete(keywordWrapper);
+
+        LambdaQueryWrapper<WeKeywordGroupTask> taskWrapper = new LambdaQueryWrapper<>();
+        taskWrapper.in(WeKeywordGroupTask::getTaskId, Arrays.asList(ids));
+        return taskMapper.delete(taskWrapper);
     }
 
     /**
@@ -186,7 +201,7 @@ public class WeCommunityKeywordToGroupServiceImpl extends ServiceImpl<WeKeywordG
             taskVo.setKeywordList(this.getTaskKeywordList(taskVo.getTaskId()));
             List<String> groupNameList = taskMapper.getGroupNameListByTaskId(taskVo.getTaskId());
             // 群活码
-            taskVo.setGroupCodeInfo(this.getGroupVoByTaskId(taskVo.getGroupCodeId()));
+            setGroupCodeVoByTask(taskVo);
             // 群名称列表
             groupNameList.removeIf(StringUtils::isNull);
             taskVo.setGroupNameList(groupNameList);
@@ -200,23 +215,68 @@ public class WeCommunityKeywordToGroupServiceImpl extends ServiceImpl<WeKeywordG
      * @param taskId 任务id
      */
     private List<WeKeywordGroupTaskKeyword> getTaskKeywordList(Long taskId) {
-        QueryWrapper<WeKeywordGroupTaskKeyword> taskKeywordQueryWrapper = new QueryWrapper<>();
-        taskKeywordQueryWrapper.eq("task_id", taskId);
-        return taskKwMapper.selectList(taskKeywordQueryWrapper);
+        LambdaQueryWrapper<WeKeywordGroupTaskKeyword> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(WeKeywordGroupTaskKeyword::getTaskId, taskId);
+        return taskKwMapper.selectList(wrapper);
     }
 
     /**
      * 获取群活码简略信息
-     *
-     * @param groupCodeId 群活码id
-     * @return 群活码简略信息
+     * @param taskVo 关键词任务信息
      */
-    private WeGroupCodeVo getGroupVoByTaskId(Long groupCodeId) {
-        WeGroupCode groupCode = groupCodeMapper.selectWeGroupCodeById(groupCodeId);
-        WeGroupCodeVo groupCodeVo = new WeGroupCodeVo();
-        groupCodeVo.setId(groupCode.getId());
-        groupCodeVo.setCodeUrl(groupCode.getCodeUrl());
-        groupCodeVo.setUuid(groupCode.getUuid());
-        return groupCodeVo;
+    private void setGroupCodeVoByTask(WeKeywordGroupTaskVo taskVo) {
+        WeGroupCode groupCode = groupCodeMapper.selectWeGroupCodeById(taskVo.getGroupCodeId());
+        Optional.ofNullable(groupCode).ifPresent(code -> {
+            WeGroupCodeVo groupCodeVo = new WeGroupCodeVo();
+            groupCodeVo.setId(code.getId());
+            groupCodeVo.setCodeUrl(code.getCodeUrl());
+            groupCodeVo.setUuid(code.getUuid());
+            taskVo.setGroupCodeInfo(groupCodeVo);
+        });
+    }
+    /**
+     * 校验数据
+     * @param taskDto 待校验数据
+     * @param addMode 是否是新增模式(更新时不需要检测任务名)
+     */
+
+    private void validation(WeKeywordGroupTaskDto taskDto, boolean addMode) {
+        final int MAX_NAME_LENGTH = 30;
+        final int MAX_MSG_LENGTH = 220;
+
+        // 群活码必须存在
+        if (null == groupCodeMapper.selectWeGroupCodeById(taskDto.getGroupCodeId())) {
+            throw new CustomException("群活码不存在", HttpStatus.BAD_REQUEST);
+        }
+        // 任务名称必须唯一
+        if (!taskNameIsUnique(taskDto.getTaskName()) && addMode) {
+            throw new CustomException("任务名称已存在", HttpStatus.BAD_REQUEST);
+        }
+        // 名称不可超长
+        if (taskDto.getTaskName().length() > MAX_NAME_LENGTH) {
+            throw new CustomException("活码名称长度超长，请重新输入", HttpStatus.BAD_REQUEST);
+        }
+        // 引导语不可超长
+        if (taskDto.getWelcomeMsg().length() > MAX_MSG_LENGTH) {
+            throw new CustomException("引导语长度超长，请重新输入", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * 对关键词长字符串进行校验，获取关键词列表
+     * @param longKeywordsString 关键词长字符串
+     * @return 关键词列表
+     */
+    private List<String> parseLongKeywordsString(String longKeywordsString) {
+        String[] keywords = longKeywordsString.split(",");
+        final int MAX_KEYWORD_LENGTH = 10;
+        List<String> resultList = new ArrayList<>();
+        for (String keyword : keywords) {
+            if (keyword.length() > MAX_KEYWORD_LENGTH) {
+                throw new CustomException(String.format("关键字 %s 长度过长，请重新输入。", keyword), HttpStatus.BAD_REQUEST);
+            }
+            resultList.add(keyword);
+        }
+        return resultList;
     }
 }

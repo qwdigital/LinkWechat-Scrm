@@ -4,7 +4,6 @@ import java.util.List;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.wecom.domain.WeGroupCodeActual;
 import com.linkwechat.wecom.mapper.WeCommunityNewGroupMapper;
@@ -151,7 +150,7 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper,WeGrou
     @Transactional(rollbackFor = Exception.class)
     public int deleteWeGroupCodeById(Long id)
     {
-        // 需要删除新科拉群信息
+        // 需要删除新客拉群信息
         communityNewGroupMapper.removeWeCommunityNewGroupByGroupCodeId(id);
         return weGroupCodeMapper.deleteWeGroupCodeById(id);
     }
@@ -177,5 +176,15 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper,WeGrou
     @Override
     public WeGroupCode getWeGroupByUuid(String uuid) {
         return weGroupCodeMapper.getWeGroupByUuid(uuid);
+    }
+
+    /**
+     * 通过员工活码获取群活码，用于新客自动拉群。
+     * @param state 员工活码state
+     * @return 群活码URL
+     */
+    @Override
+    public String selectGroupCodeUrlByEmplCodeState(String state) {
+        return weGroupCodeMapper.selectGroupCodeUrlByEmplCodeState(state);
     }
 }

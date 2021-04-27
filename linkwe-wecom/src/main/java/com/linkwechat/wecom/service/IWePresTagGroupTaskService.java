@@ -53,10 +53,9 @@ public interface IWePresTagGroupTaskService {
 
     /**
      * 更新老客户标签建群任务
-     *
+     * @param taskId 待更新任务id
      * @param wePresTagGroupTaskDto 更新数据
-     * @return 结果
-     * @taskId 待更新任务id
+     * @return 更新条数
      */
     int updateTask(Long taskId, WePresTagGroupTaskDto wePresTagGroupTaskDto);
 

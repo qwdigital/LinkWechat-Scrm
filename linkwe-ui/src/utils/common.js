@@ -165,3 +165,51 @@ export function handleTree(data, id, parentId, children) {
 	});
 	return result;
 }
+
+/**
+ * dataURL转化为File对象
+ * @param {*} dataURL 本地数据 base64
+ */
+export function dataURLtoFile (dataURL) {
+    const arr = dataURL.split(',')
+    const mime = arr[0].match(/:(.*?);/)[1]
+    const bstr = atob(arr[1])
+    let n = bstr.length
+    const u8arr = new Uint8Array(n)
+    while (n) {
+      u8arr[n - 1] = bstr.charCodeAt(n - 1)
+      n -= 1 // to make eslint happy
+    }
+    return new File([u8arr], '', { type: mime })
+  }
+
+  /**
+ * 整理echat 数据
+ * @param {*} arrData 数据 
+ */
+export function arrData (data) {
+    let obj={
+		arr1:[],
+		arr2:[],
+		arr3:[],
+		arr4:[],
+		btm1:[],
+	}
+
+	data.forEach((a,b)=>{
+		obj.arr1.push(a.newApplyCnt)
+		obj.btm1.push(a.xtime)
+		if(!!a.newMemberCnt){
+			obj.arr3.push(a.newMemberCnt)
+		}else{
+			obj.arr3=[]
+		}
+		obj.arr2.push(a.newContactCnt)
+		obj.arr4.push(a.negativeFeedbackCnt)
+	})
+	//newApplyCnt =>arr1
+	//newContactCnt =>arr2
+	//negativeFeedbackCnt =>arr4
+	console.log(obj)
+	return obj
+  }

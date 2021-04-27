@@ -5,7 +5,7 @@
         <div class="hd_box">
           <div class="hd_name">客户列表（{{employAmount}}）</div>
           <div class="paddingT10">
-            <el-input placeholder="搜索客户" prefix-icon="el-icon-search" v-model="employName">
+            <el-input placeholder="搜索客户" prefix-icon="el-icon-search" v-model="employName" @keyup.enter.native="customerList" >
             </el-input>
           </div>
         </div>
@@ -16,7 +16,7 @@
                 <el-col :span="4">
                   <img v-if="i.avatar" :src="i.avatar" alt="头像">
                 </el-col>
-                <el-col :span="16" v-if="i"><span style="line-height:40px">{{i.name}}</span></el-col>
+                <el-col :span="20" v-if="i"><span style="line-height:40px">{{i.name}}</span></el-col>
               </el-row>
             </li>
           </ul>
@@ -26,7 +26,7 @@
         <div class="hd_box">
           <div class="hd_name">{{talkName}}</div>
           <div class="paddingT10">
-            <el-input placeholder="搜索聊天记录" prefix-icon="el-icon-search" v-model="employName">
+            <el-input placeholder="搜索聊天记录" prefix-icon="el-icon-search" v-model="chatContent">
             </el-input>
           </div>
         </div>
@@ -107,7 +107,7 @@
                     </template>
                   </el-table-column>
                   <el-table-column prop="action" label="操作">
-                    <template slot-scope="scope">
+                    <template >
                       <el-button type="text" size="small">下载</el-button>
                       <el-button type="text" size="small">查看</el-button>
                     </template>
@@ -172,6 +172,7 @@
         employAmount: 1,
         employName: '',
         talkName: '',
+        chatContent:"",
         personIndex: '-1',
         activeName: "0",
         activeNameThree: '0',
@@ -229,11 +230,11 @@
         content.getTree({
           fromId: this.employId,
           searchType: this.activeName
-        }).then(({
-          rows
-        }) => {
+        }).then((
+          {rows}
+        ) => {
           this.loading = false
-          this.personList = rows
+          this.personList =rows
         }).catch(err => {
           this.loading = false
         })
@@ -254,7 +255,6 @@
         } else if (this.activeNameThree == 4) {
           msgType = 'voice'
         }
-
         let query = {
           fromId: this.chatData.fromId,
           msgType,
@@ -275,7 +275,7 @@
             })
           } else {
             content.chatList(query).then(res => {
-              this.total = Number(res.total)
+              this.total =  Number(res.total)
              this.resortData(res)
             })
           }   
@@ -310,10 +310,7 @@
           isOpenChat: '1'
         }
         content.listByCustomer(querys).then(res => {
-          console.log(res)
-          res.rows = res.rows.filter((a, b) => {
-            return a && a.name
-          })
+        console.log(res,'rows')
           this.CList = res.rows
           this.employAmount = res.total;
         })

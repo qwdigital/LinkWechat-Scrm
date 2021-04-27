@@ -1,9 +1,6 @@
 package com.linkwechat.wecom.client;
 
-import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.DataObject;
-import com.dtflys.forest.annotation.Query;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.WeAppDetailDto;
 import com.linkwechat.wecom.domain.dto.WeAppDto;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
@@ -35,6 +32,6 @@ public interface WeAppClient {
      * @param weAppDetailDto
      * @return
      */
-    @Request(url = "/agent/set")
-    WeResultDto updateAgentById(@DataObject WeAppDetailDto weAppDetailDto);
+    @Request(url = "/agent/set",type = "POST")
+    WeResultDto updateAgentById(@DataObject WeAppDetailDto weAppDetailDto,@Header("agentid")String agentid);
 }

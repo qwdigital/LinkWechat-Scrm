@@ -86,6 +86,7 @@ export default {
       <div class="total"></div>
       <div>
         <el-button
+          v-hasPermi="['wecom:tlp:add']"
           type="primary"
           size="mini"
           icon="el-icon-plus"
@@ -116,14 +117,14 @@ export default {
             size="mini"
             type="text"
             @click="goRoute(scope.row)"
-            v-hasPermi="['monitor:operlog:query']"
+            v-hasPermi="['wecom:tlp:edit']"
             >编辑</el-button
           >
           <el-button
             size="mini"
             type="text"
             @click="remove(scope.row.id)"
-            v-hasPermi="['monitor:operlog:query']"
+            v-hasPermi="['wecom:tlp:remove']"
             >删除</el-button
           >
         </template>

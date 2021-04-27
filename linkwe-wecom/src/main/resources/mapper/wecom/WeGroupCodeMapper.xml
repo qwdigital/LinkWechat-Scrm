@@ -51,7 +51,6 @@
         IFNULL((SELECT count(1) FROM we_group_code_actual WHERE group_code_id = w.id AND TIMESTAMPDIFF(DAY, sysdate(), effect_time ) &lt; 3), 0) AS about_to_expire_codes
         FROM
         we_group_code w
-
     </sql>
 
     <select id="selectWeGroupCodeList" parameterType="WeGroupCode" resultMap="WeGroupCodeResult">
@@ -114,6 +113,20 @@
             wgc.id
         HAVING
             wgc.id = #{groupCodeId}
+    </select>
+
+    <select id="selectGroupCodeUrlByEmplCodeState" parameterType="String" resultType="String">
+        SELECT DISTINCT
+            wgc.code_url
+        FROM
+            we_group_code wgc
+                LEFT JOIN we_community_new_group wcn ON wgc.id = wcn.group_code_id
+                LEFT JOIN we_emple_code wec ON wec.id = wcn.empl_code_id
+        WHERE
+            wgc.del_flag = 0
+          AND wcn.del_flag = 0
+          AND wec.del_flag = 0
+          AND wec.state = #{state}
     </select>
 
     <select id="checkActivityNameUnique" parameterType="String" resultType="int">

@@ -10,6 +10,11 @@ export default {
         weFlowerCustomerRels: [{}],
       },
       birthday: '',
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now()
+        },
+      },
     }
   },
   created() {
@@ -66,6 +71,7 @@ export default {
               v-if="datePickerVisible"
               v-model="birthday"
               type="date"
+              :picker-options="pickerOptions"
               value-format="yyyy-MM-dd"
               placeholder="选择日期便于以后客情维护"
               @blur="datePickerVisible = false"
@@ -107,7 +113,7 @@ export default {
         </el-row>
         <el-row :gutter="10">
           <el-col :span="10">标签：</el-col>
-          <el-col :span="12">
+          <el-col :span="14">
             <div
               v-for="(item, index) in customer.weFlowerCustomerRels"
               :key="index"
@@ -188,6 +194,9 @@ export default {
   .el-col-10 {
     width: 100px;
     text-align: right;
+  }
+  .el-tag {
+    margin-bottom: 5px;
   }
 }
 .el-icon-s-custom {

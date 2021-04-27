@@ -79,5 +79,5 @@ public class WeCorpAccount extends BaseEntity
 
 
     @ApiModelProperty("企业管理员账号")
-    private String cropAccount;
+    private String corpAccount;
 }

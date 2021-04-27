@@ -50,7 +50,7 @@ export default {
   },
   methods: {
     getList(page) {
-      if (this.dateRange[0]) {
+      if (this.dateRange) {
         this.query.beginTime = this.dateRange[0]
         this.query.endTime = this.dateRange[1]
       } else {
@@ -104,7 +104,7 @@ export default {
     },
     syncMsg(data) {
       let { msgid, messageId } = data
-      syncMsg({ msgid, messageId })
+      syncMsg({ msgids: [msgid], messageId })
         .then(({ data }) => {
           this.msgSuccess('同步成功')
           this.getList()

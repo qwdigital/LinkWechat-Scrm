@@ -13,6 +13,7 @@ import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.vo.WeMaterialFileVO;
 import com.linkwechat.wecom.service.IWeMaterialService;
 import com.linkwechat.wecom.service.IWePosterService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
  * @author KEWEN
  * @date 2020-10-08
  */
+@Api("企业微信素材管理")
 @RestController
 @RequestMapping("/wecom/material")
 public class WeMaterialController extends BaseController {
@@ -142,6 +144,15 @@ public class WeMaterialController extends BaseController {
         WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(temporaryMaterialDto.getUrl(),
                 temporaryMaterialDto.getType()
                 ,temporaryMaterialDto.getName());
+        return AjaxResult.success(weMediaDto);
+    }
+
+    @Log(title = "上传素材图片", businessType = BusinessType.OTHER)
+    @PostMapping("/uploadimg")
+    @ApiOperation("上传素材图片")
+    public AjaxResult<WeMediaDto> uploadImg(MultipartFile file){
+        WeMediaDto weMediaDto = materialService.uploadImg(file);
+        weMediaDto.setFileName(file.getResource().getFilename());
         return AjaxResult.success(weMediaDto);
     }
 

@@ -2,13 +2,13 @@
   <div class="employ">
     <el-row>
       <el-col :span="6" class="borderR">
-        <div class="hd_box">
+        <!-- <div class="hd_box">
           <div class="hd_name">成员（{{employAmount}}）</div>
           <div class="paddingT10">
             <el-input placeholder="请输入内容" prefix-icon="el-icon-search" v-model="employName">
             </el-input>
           </div>
-        </div>
+        </div> -->
         <div class="ct_box ct_boxFirst">
           <el-tree class="filter-tree" :data="treeData" :props="defaultProps" :filter-node-method="filterNode"
             ref="tree" @node-click="handleNodeClick" :default-expand-all="true">
@@ -23,8 +23,8 @@
           <el-tabs v-model="activeName" @tab-click="tabClick(true)">
             <el-tab-pane label="内部联系人" name="0">
               <div class="ct_box">
-                <list v-if="activeName==0" :personList="personList" :loading="loading" @chatFn='chatFn'>
-                </list>
+                <insideList v-if="activeName==0" :personList="personList" :loading="loading" @chatFn='chatFn'>
+                </insideList>
               </div>
             </el-tab-pane>
             <el-tab-pane label="外部联系人" name="1">
@@ -53,8 +53,8 @@
                     start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="activeNameThreeClick">
                   </el-date-picker>
                 </div>
-                <chat :allChat="allChat" v-if="allChat.length>=1"></chat>
-                <el-pagination background v-if="allChat.length>=1" layout="prev, pager, next" class="pagination"
+                <chat :allChat="allChat" v-if="allChat&&allChat.length>=1"></chat>
+                <el-pagination background v-if="allChat&&allChat.length>=1" layout="prev, pager, next" class="pagination"
                   :current-page="currentPage" @current-change="currentChange" :total="total">
                 </el-pagination>
               </div>
@@ -66,8 +66,8 @@
                     start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="activeNameThreeClick">
                   </el-date-picker>
                 </div>
-                <chat :allChat="allChatImg" v-if="allChatImg.length>=1"></chat>
-                <el-pagination background v-if="allChatImg.length>=1" class="pagination" layout="prev, pager, next"
+                <chat :allChat="allChatImg" v-if="allChatImg&&allChatImg.length>=1"></chat>
+                <el-pagination background v-if="allChatImg&&allChatImg.length>=1" class="pagination" layout="prev, pager, next"
                   :total="total" @current-change="currentChange" :current-page="currentPage">
                 </el-pagination>
               </div>
@@ -99,8 +99,8 @@
                   </el-table-column>
                   <el-table-column prop="action" label="操作">
                     <template slot-scope="scope">
-                      <el-button type="text" size="small">下载</el-button>
-                      <el-button type="text" size="small">查看</el-button>
+                      <el-button type="text" size="small" @click="downloadFile(scope.row)">下载</el-button>
+                    
                     </template>
                   </el-table-column>
                 </el-table>
@@ -122,14 +122,26 @@
                     start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="activeNameThreeClick">
                   </el-date-picker>
                 </div>
-                <el-table :data="fileData" stripe style="width: 100%" :header-cell-style="{background:'#fff'}">
+                <el-table :data="allVoice" stripe style="width: 100%" :header-cell-style="{background:'#fff'}">
                   <el-table-column prop="date" label="发起人">
+                    <template slot-scope="scope">
+                      {{scope.row.fromInfo.name}}
+                    </template>
                   </el-table-column>
                   <el-table-column prop="name" label="通话时间">
+                     <template slot-scope="scope">
+                      {{parseTime(scope.row.msgtime)}}
+                    </template>
                   </el-table-column>
                   <el-table-column prop="address" label="时长">
+                  <template slot-scope="scope">
+                      {{(scope.row.voice.play_length)}}s
+                    </template>
                   </el-table-column>
                   <el-table-column prop="address" label="操作">
+                    <template slot-scope="scope">
+                      <el-button type="text" size="small" @click="voiceLook(scope.row.voice)">查看</el-button>
+                    </template>
                   </el-table-column>
                 </el-table>
               </div>
@@ -143,18 +155,21 @@
 <script>
   import list from '../component/list.vue'
   import chat from '../component/chat.vue'
+  import insideList from "../component/insideList.vue";
   import grouplist from '../component/groupList.vue'
   import * as api from '@/api/organization'
   import {
     content
   } from '@/api/content.js'
   import {
-    yearMouthDay
+    yearMouthDay,parseTime
   } from '@/utils/common.js'
+
   export default {
     components: {
       list,
       grouplist,
+      insideList,
       chat
     },
     data() {
@@ -193,8 +208,29 @@
     },
     mounted() {
       this.getTree()
+      //this.getAmount()
     },
     methods: {
+      voiceLook(e){
+       const url = window.URL.createObjectURL(new Blob([e.attachment]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download','yuyin') // 下载文件的名称及文件类型后缀
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link); // 下载完成移除元素
+      window.URL.revokeObjectURL(url); // 释放掉blob对象
+      },
+      downloadFile(e){  
+      const url = window.URL.createObjectURL(new Blob([e.file.attachment],{type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8'}))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download',e.file.filename) // 下载文件的名称及文件类型后缀
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link); // 下载完成移除元素
+      window.URL.revokeObjectURL(url); // 释放掉blob对象
+      },
       filterSize(size) {
         if (!size) return '';
         if (size < this.pow1024(1)) return size + ' B';
@@ -211,13 +247,18 @@
         if (this.activeName == '2') {
           return this.activeNameThreeClick(true, true)
         }
+        
         this.activeNameThreeClick(true)
       },
       activeNameThreeClick(page, group) {
+       console.log(this.chat.id,'this.chat.id')
+     if(!!!this.chat.id){
+       return //没有选择人
+     }
         if (!!!page) {
           this.currentPage = 1
         }
-        if (this.chat && this.chat.receiveWeCustomer) {
+        if (this.chat) {
           let msgType = ''
           if (this.activeNameThree == 0) {
             msgType = ''
@@ -238,19 +279,20 @@
             beginTime: this.takeTime ? yearMouthDay(this.takeTime[0]) : "",
             endTime: this.takeTime ? yearMouthDay(this.takeTime[1]) : '',
           }
-          if (group) {
+          if (this.activeName=='2') {
             query.roomId = this.chat.roomId
           } else {
             query.receiveId = this.chat.receiveId
           }
-
-          if (group) {
+          if (this.activeName=='2') {
             content.chatGrounpList(query).then(res => {
               this.total = Number(res.total)
+              console.log(res,'this.activeName=')
              this.resortData(res)
             })
           } else {
             content.chatList(query).then(res => {
+               console.log(res.rows,'ssss')
               this.total = Number(res.total)
              this.resortData(res)
             })
@@ -276,8 +318,8 @@
       },
       chatFn(data) {
         this.chat = data;
-        if (data.receiveWeCustomer) {
-          this.activeNameThreeClick()
+        if (data) {
+            this.activeNameThreeClick()
         }
       },
       groupFn(data) {
@@ -298,17 +340,16 @@
         if (!this.employId) {
           return
         }
+        console.log
         if (flag) {
           this.loading = true
         }
         content.getTree({
           fromId: this.employId,
           searchType: this.activeName
-        }).then(({
-          rows
-        }) => {
+        }).then(({rows}) => {
           this.loading = false
-          this.personList = rows
+          this.personList =rows
         }).catch(err => {
           this.loading = false
         })
@@ -318,26 +359,18 @@
         if (!value) return true;
         return data.name.indexOf(value) !== -1;
       },
+  
       handleNodeClick(data, add) {
-        if (!data.gender) {
+        if (!data.userId) {
           let querys = {
             pageNum: '1',
             pageSize: '999',
-            isActivate: '4',
             department: data.id
           }
-          api.getList(querys).then(({
-            rows
-          }) => {
-            if (add == true) {
-              console.log(this.treeData, data, rows)
-              this.treeData[0].children = data.children.concat(rows)
-              return
-            } else {
-              const newChild = rows;
+          api.getList(querys).then(({rows}) => {
               this.$set(data, 'children', []);
-              data.children = rows
-            }
+              
+              data.children =rows
           })
         } else {
           this.talkName = data.name;
@@ -407,7 +440,7 @@
     }
 
     .ct_boxFirst {
-      height: 707px !important;
+      height: 800px !important;
     }
 
     .ct_box {

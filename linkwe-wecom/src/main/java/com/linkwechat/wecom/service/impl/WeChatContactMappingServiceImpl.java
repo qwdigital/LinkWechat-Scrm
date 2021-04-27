@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -94,7 +95,13 @@ public class WeChatContactMappingServiceImpl extends ServiceImpl<WeChatContactMa
                         item.setReceiveWeUser(weUserMapper.selectOne(new LambdaQueryWrapper<WeUser>().eq(WeUser::getUserId, item.getReceiveId())));
                     } else if (WeConstans.ID_TYPE_EX.equals(item.getIsCustom())) {
                         //获取外部联系人信息
-                        item.setReceiveWeCustomer(weCustomerMapper.selectWeCustomerById(item.getReceiveId()));
+                        WeCustomer weCustomer = weCustomerMapper.selectWeCustomerById(item.getReceiveId());
+                        if(null == weCustomer){
+                            weCustomer=new WeCustomer();
+                        }
+                        item.setReceiveWeCustomer(
+                                weCustomer
+                        );
                     } else if (WeConstans.ID_TYPE_MACHINE.equals(item.getIsCustom())) {
                         //拉去机器人信息暂不处理
                     }
@@ -233,7 +240,15 @@ public class WeChatContactMappingServiceImpl extends ServiceImpl<WeChatContactMa
                 .eq(WeChatContactMapping::getIsCustom, WeConstans.ID_TYPE_EX);
         List<WeChatContactMapping> weChatContactMappingList = this.baseMapper.selectList(lambdaQueryWrapper);
         List<WeCustomer> resultList = Optional.ofNullable(weChatContactMappingList).orElseGet(ArrayList::new)
-                .stream().map(item -> weCustomerMapper.selectWeCustomerById(item.getReceiveId())).collect(Collectors.toList());
+        .stream().map(item ->
+                        weCustomerMapper.selectWeCustomerById(item.getReceiveId())
+                ).collect(Collectors.toList());
+
+        if(CollectionUtil.isNotEmpty(resultList)){
+            resultList.removeAll(Collections.singleton(null));
+        }
+
+
         PageInfo<WeCustomer> weCustomerPageInfo = new PageInfo<>(resultList);
         weCustomerPageInfo.setTotal(new PageInfo<>(weChatContactMappingList).getTotal());
         return weCustomerPageInfo;

@@ -12,7 +12,7 @@ export default {
       // dialogVisible1: false,
       dialogVisibleSelectMaterial: false,
       form: {
-        id: '',
+        // id: '',
         mediaId: '',
         welcomeMsgTplType: '',
         welcomeMsg: '',
@@ -25,7 +25,8 @@ export default {
   watch: {},
   computed: {},
   created() {
-    this.form = this.$route.query
+    this.form = Object.assign(this.form, this.$route.query)
+    this.$route.meta.title = (this.form.id ? '编辑' : '新建') + '欢迎语'
   },
   mounted() {},
   methods: {
@@ -66,7 +67,7 @@ export default {
           <div style="height: 300px;">
             <el-input
               type="textarea"
-              :rows="5"
+              :autosize="{ minRows: 2, maxRows: 6 }"
               maxlength="100"
               show-word-limit
               placeholder="请输入欢迎语"

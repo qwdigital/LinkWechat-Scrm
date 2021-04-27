@@ -30,9 +30,11 @@ export default {
       loading: false,
       action:
         process.env.VUE_APP_BASE_API +
-        '/common/uploadFile2Cos',
+        (this.type == 0
+          ? '/wecom/material/uploadimg'
+          : '/common/uploadFile2Cos'),
       headers: window.CONFIG.headers,
-      domain: process.env.VUE_APP_BASE_API
+      domain: process.env.VUE_APP_BASE_API,
     }
   },
   watch: {},
@@ -103,8 +105,13 @@ export default {
         this.loading = false
         // this.$emit('update:fileUrl', res.data.materialUrl)
         // this.$emit('update:fileName', res.data.materialName)
+        if (this.type == 0) {
+          res.url = res.data.url
+          res.fileName = res.data.url
+        }
         this.$emit('update:fileUrl', res.url)
         this.$emit('update:fileName', res.fileName)
+        this.$emit('update:file', file)
         // this.fileUrl = URL.createObjectURL(file.raw)
       }
     },

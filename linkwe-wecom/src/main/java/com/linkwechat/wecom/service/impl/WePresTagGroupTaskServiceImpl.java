@@ -1,8 +1,9 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.common.enums.ChatType;
@@ -158,30 +159,29 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
         List<Long> ids = Arrays.asList(idList);
 
         // 解除关联的标签
-        QueryWrapper<WePresTagGroupTaskTag> taskTagQueryWrapper = new QueryWrapper<>();
-        taskTagQueryWrapper.in("task_id", ids);
-        taskTagMapper.delete(taskTagQueryWrapper);
+        LambdaQueryWrapper<WePresTagGroupTaskTag> tagQueryWrapper = new LambdaQueryWrapper<>();
+        tagQueryWrapper.in(WePresTagGroupTaskTag::getTaskId, ids);
+        taskTagMapper.delete(tagQueryWrapper);
         // 解除关联的员工
-        QueryWrapper<WePresTagGroupTaskScope> taskScopeQueryWrapper = new QueryWrapper<>();
-        taskScopeQueryWrapper.in("task_id", ids);
-        taskScopeMapper.delete(taskScopeQueryWrapper);
+        LambdaQueryWrapper<WePresTagGroupTaskScope> scopeQueryWrapper = new LambdaQueryWrapper<>();
+        scopeQueryWrapper.in(WePresTagGroupTaskScope::getTaskId, ids);
+        taskScopeMapper.delete(scopeQueryWrapper);
         // 删除其用户统计
-        QueryWrapper<WePresTagGroupTaskStat> statQueryWrapper = new QueryWrapper<>();
-        statQueryWrapper.in("task_id", ids);
+        LambdaQueryWrapper<WePresTagGroupTaskStat> statQueryWrapper = new LambdaQueryWrapper<>();
+        statQueryWrapper.in(WePresTagGroupTaskStat::getTaskId, ids);
         taskStatMapper.delete(statQueryWrapper);
 
-        // 删除task
-        QueryWrapper<WePresTagGroupTask> taskQueryWrapper = new QueryWrapper<>();
-        taskQueryWrapper.in("task_id", ids);
+        // 最后删除task
+        LambdaQueryWrapper<WePresTagGroupTask> taskQueryWrapper = new LambdaQueryWrapper<>();
+        taskQueryWrapper.in(WePresTagGroupTask::getTaskId, ids);
         return taskMapper.delete(taskQueryWrapper);
     }
 
     /**
      * 更新老客户标签建群任务
-     *
+     * @param taskId 待更新任务id
      * @param wePresTagGroupTaskDto 更新数据
-     * @return 结果
-     * @taskId 待更新任务id
+     * @return 更新条数
      */
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
@@ -191,22 +191,25 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
         wePresTagGroupTask.setTaskId(taskId);
         wePresTagGroupTask.setUpdateBy(SecurityUtils.getUsername());
         if (taskMapper.updateTask(wePresTagGroupTask) > 0) {
-            // 更新标签
-            // 先删除旧标签
-            QueryWrapper<WePresTagGroupTaskTag> taskTagQueryWrapper = new QueryWrapper<>();
-            taskTagQueryWrapper.eq("task_id", taskId);
+
+            // 更新标签 - 先删除旧标签
+            LambdaUpdateWrapper<WePresTagGroupTaskTag> taskTagQueryWrapper = new LambdaUpdateWrapper<>();
+            taskTagQueryWrapper.eq(WePresTagGroupTaskTag::getTaskId, taskId);
             taskTagMapper.delete(taskTagQueryWrapper);
-            // 再添加新标签
+            // 更新标签 - 再添加新标签
             List<String> tagIdList = wePresTagGroupTaskDto.getTagList();
             if (CollectionUtil.isNotEmpty(tagIdList)) {
-                List<WePresTagGroupTaskTag> wePresTagGroupTaskTagList = tagIdList.stream().map(id -> new WePresTagGroupTaskTag(taskId, id)).collect(Collectors.toList());
+                List<WePresTagGroupTaskTag> wePresTagGroupTaskTagList = tagIdList
+                        .stream()
+                        .map(id -> new WePresTagGroupTaskTag(taskId, id))
+                        .collect(Collectors.toList());
                 taskTagMapper.batchBindsTaskTags(wePresTagGroupTaskTagList);
             }
 
             // 先解除旧的员工绑定信息
-            QueryWrapper<WePresTagGroupTaskScope> taskScopeQueryWrapper = new QueryWrapper<>();
-            taskScopeQueryWrapper.eq("task_id", taskId);
-            taskScopeMapper.delete(taskScopeQueryWrapper);
+            LambdaUpdateWrapper<WePresTagGroupTaskScope> scopeQueryWrapper = new LambdaUpdateWrapper<>();
+            scopeQueryWrapper.eq(WePresTagGroupTaskScope::getTaskId, taskId);
+            taskScopeMapper.delete(scopeQueryWrapper);
 
             // 再重新绑定员工信息
             List<String> userIdList = wePresTagGroupTaskDto.getScopeList();
@@ -379,20 +382,26 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
             text.setContent(task.getWelcomeMsg());
             queryData.setText(text);
 
-            // 群活码图片（上传临时文件获取media_id） TODO 过期问题？
+            // 群活码图片（上传临时文件获取media_id）
             ImageMessageDto image = new ImageMessageDto();
             WeGroupCode groupCode = groupCodeMapper.selectWeGroupCodeById(task.getGroupCodeId());
             WeMediaDto mediaDto = materialService.uploadTemporaryMaterial(groupCode.getCodeUrl(), MediaType.IMAGE.getMediaType(), "临时文件");
             image.setMedia_id(mediaDto.getMedia_id());
-            queryData.setImage(image);
+            //queryData.setImage(image);
+            List list = new ArrayList();
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("msgtype","image");
+            jsonObject.put("image",image);
+            list.add(jsonObject);
+            queryData.setAttachments(list);
 
             // 调用企业群发接口
             SendMessageResultDto resultDto = customerMessagePushClient.sendCustomerMessageToUser(queryData);
 
             // 设定该任务的msgid
-            UpdateWrapper<WePresTagGroupTask> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.eq("task_id", task.getTaskId());
-            updateWrapper.set("msgid", resultDto.getMsgid());
+            LambdaUpdateWrapper<WePresTagGroupTask> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(WePresTagGroupTask::getTaskId, task.getTaskId());
+            updateWrapper.set(WePresTagGroupTask::getMsgid, resultDto.getMsgid());
             this.update(updateWrapper);
         } catch (Exception e) {
             e.printStackTrace();

@@ -156,4 +156,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </delete>
 
+    <update id="updateExpiredWeTaskFission">
+        update we_task_fission as wtff,
+        (
+            select
+                id
+            from
+                we_task_fission wtf
+            where
+                wtf.fiss_status = 1
+            and now() &gt;= wtf.over_time
+        )as wtfl
+        set wtff.fiss_status = 2
+        where
+            wtff.id = wtfl.id
+    </update>
 </mapper>

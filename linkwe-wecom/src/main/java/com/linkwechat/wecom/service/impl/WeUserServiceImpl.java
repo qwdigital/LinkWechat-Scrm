@@ -133,7 +133,7 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
     public void updateWeUser(WeUser weUser)
     {
 
-        if(this.updateById(weUser)){
+        if(this.updateWeUserNoToWeCom(weUser) > 0){
             weUserClient.updateUser(
                     weUser.transformWeUserDto()
             );

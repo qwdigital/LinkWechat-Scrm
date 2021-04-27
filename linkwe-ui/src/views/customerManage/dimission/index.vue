@@ -73,9 +73,12 @@ export default {
   methods: {
     /** 查询 */
     getList(page) {
-      if (this.dateRange[0]) {
+      if (this.dateRange) {
         this.query.beginTime = this.dateRange[0]
         this.query.endTime = this.dateRange[1]
+      } else {
+        this.query.beginTime = ''
+        this.query.endTime = ''
       }
       page && (this.query.pageNum = page)
       this.loading = true
@@ -132,29 +135,22 @@ export default {
       label-width="100px"
       class="top-search"
     >
-      <el-form-item label="已离职员工">
+      <el-form-item label="已离职员工" prop="userName">
         <el-input v-model="query.userName" placeholder="请输入"></el-input>
       </el-form-item>
       <el-form-item label="离职日期">
         <el-date-picker
           v-model="dateRange"
           type="daterange"
+          value-format="yyyy-MM-dd"
           :picker-options="pickerOptions"
-          range-separator="至"
+          range-separator="-"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
           align="right"
         ></el-date-picker>
       </el-form-item>
 
-      <el-form-item label="离职日期">
-        <el-date-picker
-          v-model="query.beginTime"
-          type="date"
-          placeholder="离职日期"
-          align="right"
-        ></el-date-picker>
-      </el-form-item>
       <el-form-item label>
         <el-button
           v-hasPermi="['customerManage:dimission:query']"
