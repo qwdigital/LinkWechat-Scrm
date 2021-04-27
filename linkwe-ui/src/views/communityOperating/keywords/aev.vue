@@ -113,13 +113,19 @@ export default {
         this.form.taskName = data.taskName
         this.form.welcomeMsg = data.welcomeMsg
 
-        const keywords = data.keywordList.map((k) => k.keyword)
+        const keywordList = data.keywordList || []
+        const keywords = keywordList.map((k) => k.keyword)
         this.form.keywords = keywords.join(',')
 
-        this.form.groupCodeId = data.groupCodeInfo.id
-
-        this.codes = [ data.groupCodeInfo ]
-        this.groupQrCode = data.groupCodeInfo
+        if (data.groupCodeInfo && data.groupCodeInfo.id) {
+          this.form.groupCodeId = data.groupCodeInfo.id
+          this.codes = [ data.groupCodeInfo ]
+          this.groupQrCode = data.groupCodeInfo
+        } else {
+          this.form.groupCodeId = ''
+          this.codes = []
+          this.groupQrCode = {}
+        }
 
         this.loading = false
       })

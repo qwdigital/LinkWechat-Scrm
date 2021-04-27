@@ -101,7 +101,7 @@ export default {
 
 <template>
   <el-dialog
-    :title="(form.groupId ? '修改' : '添加') + '标签'"
+    :title="(form.groupId ? '修改' : '添加') + '标签/组'"
     :visible.sync="Pvisible"
     width="500px"
     append-to-body
