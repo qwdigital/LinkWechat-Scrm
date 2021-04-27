@@ -18,6 +18,7 @@
         <result property="mediaId" column="media_id"/>
         <result property="scanTimes" column="scan_times" />
         <result property="state" column="state" />
+        <result property="isJoinConfirmFriends" column="is_join_confirm_friends" />
         <collection property="weEmpleCodeUseScops" ofType="com.linkwechat.wecom.domain.WeEmpleCodeUseScop">
             <result property="businessId" column="business_id"/>
             <result property="businessName" column="business_name"/>
@@ -72,7 +73,8 @@
             wecusn.business_name,
             wecusn.mobile,
             wect.tag_id,
-            wect.tag_name
+            wect.tag_name,
+            wecode.is_join_confirm_friends
         from
             we_emple_code wecode
         left join (
@@ -149,7 +151,8 @@
             <if test="qrCode != null">qr_code,</if>
             <if test="mediaId != null">media_id,</if>
             <if test="state != null">state,</if>
-            <if test="scanTimes != null">scan_times</if>
+            <if test="scanTimes != null">scan_times,</if>
+            <if test="isJoinConfirmFriends != null">is_join_confirm_friends,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -164,7 +167,8 @@
             <if test="qrCode != null">#{qrCode},</if>
             <if test="mediaId != null">#{mediaId},</if>
             <if test="state != null">#{state},</if>
-            <if test="scanTimes != null">#{scanTimes}</if>
+            <if test="scanTimes != null">#{scanTimes},</if>
+            <if test="isJoinConfirmFriends != null">#{isJoinConfirmFriends},</if>
         </trim>
     </insert>
 
@@ -182,7 +186,8 @@
             <if test="qrCode != null">qr_code = #{qrCode},</if>
             <if test="mediaId != null">media_id = #{mediaId},</if>
             <if test="state != null">state = #{state},</if>
-            <if test="scanTimes != null">scan_times = #{scanTimes}</if>
+            <if test="scanTimes != null">scan_times = #{scanTimes},</if>
+            <if test="isJoinConfirmFriends != null"> is_join_confirm_friends =#{isJoinConfirmFriends},</if>
         </trim>
         where id = #{id}
     </update>
