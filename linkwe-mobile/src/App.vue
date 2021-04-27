@@ -28,7 +28,7 @@ export default {
     let code = query.code
     this.corpId = query.corpId
     this.agentId = query.agentId
-    this.$toast('agentId:' + this.agentId)
+    // this.$toast('agentId:' + this.agentId)
 
     if (!code) {
       this.$toast('未获得授权')
@@ -36,7 +36,7 @@ export default {
     }
     let { data } = await getUserInfo(code, this.agentId)
     this.$store.state.userId = data.userId
-    this.$toast('userId:' + this.$store.state.userId)
+    // this.$toast('userId:' + this.$store.state.userId)
   },
   watch: {
     // 通过config接口注入权限验证配置
@@ -51,42 +51,46 @@ export default {
     reload() {
       this.isRouterAlive = false
       this.$nextTick(function() {
-        // this.isRouterAlive = true
+        this.isRouterAlive = true
       })
     },
-    wxConfig() {
-      getAgentTicket(window.location.href.split('#')[0], this.agentId).then(
-        ({ data }) => {
-          let { timestamp, nonceStr, signature } = data
-          wx.agentConfig({
-            beta: true, // 必须这么写，否则wx.invoke调用形式的jsapi会有问题
-            debug: true,
-            corpid: this.corpId, // 必填，企业微信的corpid，必须与当前登录的企业一致
-            agentid: this.agentId, // 必填，企业微信的应用id （e.g. 1000247）
-            timestamp, // 必填，生成签名的时间戳
-            nonceStr, // 必填，生成签名的随机串
-            signature, // 必填，签名，见附录-JS-SDK使用权限签名算法
-            jsApiList: [
-              'sendChatMessage',
-              'getContext',
-              'getCurExternalContact',
-              'openEnterpriseChat',
-              'shareToExternalContact',
-              'shareToExternalChat',
-            ], //必填
-            success: (res) => {
-              // 回调
-              // this.$toast('agentId成功:')
-            },
-            fail: (res) => {
-              this.$toast('agentId失败:' + JSON.stringify(res))
-              if (res.errMsg.indexOf('function not exist') > -1) {
-                alert('版本过低请升级')
-              }
-            },
-          })
-        }
-      )
+    async wxConfig() {
+      this.$store.state.agentConfigStatus = false
+      try {
+        let { data } = await getAgentTicket(
+          window.location.href.split('#')[0],
+          this.agentId
+        )
+        let { timestamp, nonceStr, signature } = data
+        wx.agentConfig({
+          beta: true, // 必须这么写，否则wx.invoke调用形式的jsapi会有问题
+          debug: true,
+          corpid: this.corpId, // 必填，企业微信的corpid，必须与当前登录的企业一致
+          agentid: this.agentId, // 必填，企业微信的应用id （e.g. 1000247）
+          timestamp, // 必填，生成签名的时间戳
+          nonceStr, // 必填，生成签名的随机串
+          signature, // 必填，签名，见附录-JS-SDK使用权限签名算法
+          jsApiList: [
+            'sendChatMessage',
+            'getContext',
+            'getCurExternalContact',
+            'openEnterpriseChat',
+            'shareToExternalContact',
+            'shareToExternalChat',
+          ], //必填
+          success: (res) => {
+            // 回调
+            this.$toast('agentId成功:')
+            this.$store.state.agentConfigStatus = true
+          },
+          fail: (res) => {
+            this.$toast('agentId失败:' + JSON.stringify(res))
+            if (res.errMsg.indexOf('function not exist') > -1) {
+              alert('版本过低请升级')
+            }
+          },
+        })
+      } catch (error) {}
     },
     // 丢弃
     // _wxConfig() {

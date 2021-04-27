@@ -387,7 +387,7 @@ export default {
       // 接口开始
       //   externalUserid: "wm2H-nDQAACG5x4XjsM1OoW8UVfpbn3A", // 客户Id
       //   externalUserid: "wmiGuBCgAAgeijfvvpJ62cBfwrB-c4kw",
-      externalUserid: 'FengJuZhuDeJieDao',
+      externalUserid: '',
       userid: this.$store.state.userId, // 员工Id
       form: {
         name: '', // 昵称
@@ -431,6 +431,11 @@ export default {
       flage: true,
     }
   },
+  watch: {
+    '$store.state.agentConfigStatus'(val) {
+      val && this.init()
+    },
+  },
   computed: {
     //   activeLabel : () => {
     //       this.addTag.forEach((value) => {
@@ -440,6 +445,51 @@ export default {
     //   }
   },
   methods: {
+    init() {
+      let _this = this
+      wx.invoke('getContext', {}, function(res) {
+        if (res.err_msg == 'getContext:ok') {
+          let entry = res.entry //返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
+          if (
+            ![
+              'single_chat_tools',
+              'group_chat_tools',
+              'contact_profile',
+            ].includes(entry)
+          ) {
+            // _this.$toast.clear()
+            _this.$toast('入口错误：' + entry)
+            return
+          }
+          wx.invoke('getCurExternalContact', {}, (res) => {
+            if (res.err_msg == 'getCurExternalContact:ok') {
+              _this.externalUserid = res.userId //返回当前外部联系人userId
+              // 获取客户信息
+              _this.findAddaddEmployes()
+              _this.findAddGroupNum()
+              _this.getCustomerInfo()
+              _this.findTrajectory()
+              getAllTags()
+                .then(({ data }) => {
+                  // console.log(data);
+                  _this.alllabel = data
+                })
+                .catch((err) => {
+                  console.log(err)
+                })
+            } else {
+              //错误处理
+              _this.$dialog({ message: '进入失败：' + JSON.stringify(res) })
+            }
+            _this.$toast.clear()
+          })
+        } else {
+          //错误处理
+          _this.$toast.clear()
+          _this.$dialog({ message: '进入失败：' + JSON.stringify(res) })
+        }
+      })
+    },
     //   客户待办点击保存事件
     saveInfo2() {},
     // 添加或编辑轨迹
@@ -691,44 +741,10 @@ export default {
     },
   },
   created() {
-    let _this = this
-    wx.invoke('getContext', {}, function(res) {
-      if (res.err_msg == 'getContext:ok') {
-        entry = res.entry //返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
-        if (
-          ![
-            'single_chat_tools',
-            'group_chat_tools',
-            'contact_profile',
-          ].includes(entry)
-        ) {
-          // _this.$toast.clear()
-          _this.$toast('入口错误：' + entry)
-          return
-        }
-        wx.invoke('getCurExternalContact', {}, (res) => {
-          if (res.err_msg == 'getCurExternalContact:ok') {
-            _this.externalUserid = res.userId //返回当前外部联系人userId
-            // 获取客户信息
-            _this.findAddaddEmployes(),
-              _this.findAddGroupNum(),
-              _this.getCustomerInfo(),
-              _this.findTrajectory(),
-              getAllTags()
-                .then(({ data }) => {
-                  // console.log(data);
-                  _this.alllabel = data
-                })
-                .catch((err) => {
-                  console.log(err)
-                })
-          } else {
-            //错误处理
-          }
-        })
-      } else {
-        //错误处理
-      }
+    this.$toast.loading({
+      message: 'loading...',
+      duration: 0,
+      forbidClick: true,
     })
   },
   components: {
