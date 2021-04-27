@@ -35,14 +35,13 @@
     <update id="updateWeCategory">
         UPDATE we_category
         <trim prefix="set" suffixOverrides=",">
-            <if test="id != null">id,</if>
-            <if test="mediaType != null">media_type,</if>
-            <if test="name != null">name,</if>
-            <if test="parentId != null">parent_id,</if>
-            <if test="createBy != null">create_by,</if>
-            <if test="createTime != null">create_time,</if>
-            <if test="updateBy != null">update_by,</if>
-            <if test="updateTime != null">update_time,</if>
+            <if test="mediaType != null">media_type=#{mediaType},</if>
+            <if test="name != null">name=#{name},</if>
+            <if test="parentId != null">parent_id=#{parentId},</if>
+            <if test="createBy != null">create_by=#{createBy},</if>
+            <if test="createTime != null">create_time=#{createTime},</if>
+            <if test="updateBy != null">update_by=#{updateBy},</if>
+            <if test="updateTime != null">update_time=#{updateTime},</if>
         </trim>
         <where>
             id=#{id}

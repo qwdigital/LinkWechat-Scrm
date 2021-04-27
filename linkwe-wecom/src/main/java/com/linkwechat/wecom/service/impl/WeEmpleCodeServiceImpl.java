@@ -168,11 +168,11 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         if (this.baseMapper.updateWeEmpleCode(weEmpleCode) == 1) {
             if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
                 weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
-                iWeEmpleCodeUseScopService.updateBatchById(weEmpleCode.getWeEmpleCodeUseScops());
+                iWeEmpleCodeUseScopService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeUseScops());
             }
             if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeTags())) {
                 weEmpleCode.getWeEmpleCodeTags().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
-                weEmpleCodeTagService.updateBatchById(weEmpleCode.getWeEmpleCodeTags());
+                weEmpleCodeTagService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeTags());
             }
         }
     }
