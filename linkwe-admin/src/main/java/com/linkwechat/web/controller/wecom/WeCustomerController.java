@@ -12,6 +12,7 @@ import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.service.IWeCustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
@@ -30,7 +31,9 @@ import java.util.List;
 @RequestMapping("/wecom/customer")
 public class WeCustomerController extends BaseController
 {
+
     @Autowired
+    @Lazy
     private IWeCustomerService weCustomerService;
 
 
