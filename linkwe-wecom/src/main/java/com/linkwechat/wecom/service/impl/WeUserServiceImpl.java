@@ -102,7 +102,7 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
     {
 
 
-        if(this.save(weUser)){
+        if(this.insertWeUserNoToWeCom(weUser) > 0){
             weUserClient.createUser(
                     weUser.transformWeUserDto()
             );
