@@ -421,7 +421,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
                     throw new WeComException("生成二维码异常");
                 }
             }
-            return qrCode;
+            return cosConfig.getImgUrlPrefix()+ qrCode;
         } else {
             throw new WeComException("生成二维码异常,用户信息不存在");
         }
