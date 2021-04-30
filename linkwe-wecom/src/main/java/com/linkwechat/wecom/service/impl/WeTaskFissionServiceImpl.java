@@ -408,9 +408,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     private String getGroupFissionQrcode(Long taskFissionId, WeTaskFissionRecord record, WeCustomer weCustomer) {
         String qrCode = null;
         if (weCustomer != null) {
-            String avatar = weCustomer.getAvatar();
-            WeMaterial file = weMaterialService.findWeMaterialById(Long.parseLong(avatar));
-            String avatarUrl = StringUtils.isEmpty(avatar) ? file.getMaterialUrl() : avatar;
+            String avatarUrl = weCustomer.getAvatar();
             String content = "/wecom/fission/complete/" + taskFissionId + "/records/" + record.getId();
             BufferedImage bufferedImage = QREncode.crateQRCode(content, avatarUrl);
             if (bufferedImage != null) {
