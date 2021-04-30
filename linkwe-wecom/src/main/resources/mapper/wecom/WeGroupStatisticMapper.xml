@@ -150,11 +150,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         sum(ifnull(wgs.msg_total, 0)) msg_total,
         date_format(wgs.stat_time, '%Y-%m') as finish_date
         from we_group_statistic wgs
-        where
+        /*where
         str_to_date(date_format(wgs.stat_time, '%Y-%m'), '%Y-%m') &gt;=
         str_to_date(date_format(date_sub(current_date, interval #{few} month), '%Y-%m'), '%Y-%m')
         and str_to_date(date_format(wgs.stat_time, '%Y-%m'), '%Y-%m') &lt;=
-        str_to_date(date_format(current_date, '%Y-%m'), '%Y-%m')
+        str_to_date(date_format(current_date, '%Y-%m'), '%Y-%m')*/
         group by finish_date
         order by finish_date
         ) as tbr on tbl._date = tbr.finish_date
