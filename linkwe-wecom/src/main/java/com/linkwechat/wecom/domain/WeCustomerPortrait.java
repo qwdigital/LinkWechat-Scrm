@@ -20,6 +20,8 @@ public class WeCustomerPortrait {
     private String flowerCustomerRelId;
     //客户昵称
     private String name;
+    //客户性别(0-未知 1-男性 2-女性)
+    private Integer gender;
     //客户备注
     private String remark;
     //备注客户手机号
@@ -40,6 +42,8 @@ public class WeCustomerPortrait {
     private String description;
     //年纪
     private int age;
+    //客户头像
+    private String avatar;
 
     //客户标签
     private List<WeTagGroup> weTagGroupList;

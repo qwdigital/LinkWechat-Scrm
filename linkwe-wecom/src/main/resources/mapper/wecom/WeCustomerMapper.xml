@@ -317,7 +317,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                   wfcr.remark_corp_name,
                   wfcr.description,
                   wfcr.id as flowerCustomerRelId,
-                  wfcr.user_id
+                  wfcr.user_id,
+                  wc.avatar
             FROM
                 we_customer wc
             LEFT JOIN we_flower_customer_rel wfcr on wc.external_userid=wfcr.external_userid
