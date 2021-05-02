@@ -73,7 +73,6 @@ public class WeCustomerPortraitController extends BaseController {
 
 
 
-
         iWeCustomerService.updateWeCustomerPortrait(weCustomerPortrait);
 
 
@@ -211,6 +210,8 @@ public class WeCustomerPortraitController extends BaseController {
                 .build());
         return AjaxResult.success();
     }
+
+
 
 
 

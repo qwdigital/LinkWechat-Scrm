@@ -5,4 +5,6 @@ import com.linkwechat.wecom.domain.WeCustomerTrajectory;
 
 public interface IWeCustomerTrajectoryService extends IService<WeCustomerTrajectory> {
 
+    void waitHandleMsg(String url);
+
 }
