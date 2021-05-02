@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -27,6 +28,7 @@ public class WeCustomerPortrait {
     //备注客户手机号
     private String remarkMobiles;
     //客户生日
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date birthday;
     //邮箱
     private String email;
