@@ -18,11 +18,13 @@
       <div class="details">
         <div class="detail">
           <div class="left">
-            <div class="img"><img src="" alt="" /></div>
+            <div class="img"><img :src="form.avatar" alt="" /></div>
             <div class="right">
               <div>
-                <span>张三 &nbsp; &nbsp;</span
-                ><van-icon name="manager" color="#9c9c9c" />
+                <span>{{form.remark ? form.remark: form.name+"_"+form.remarkCorpName }} &nbsp; &nbsp;</span
+                ><span class="icon iconfont icon-man" v-if="form.gender == 1"></span>
+              <span class="icon iconfont icon-xingbie" v-else-if="form.gender ==2"></span>
+              <van-icon name="manager" color="#9c9c9c" v-else />
               </div>
               <div class="c9">
                 <span>昵称：</span><span>{{ form.name }}</span>
@@ -165,6 +167,13 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.iconfont {
+    color: #2c8cf0;
+}
+
+.icon-xingbie {
+    color: pink;
+}
 .header {
   margin: 20px 10px 10px;
   vertical-align: center;

@@ -15,12 +15,13 @@
     <div class="details">
       <div class="detail">
         <div class="left">
-          <div class="img"><img src="" alt="" /></div>
+          <div class="img"><img :src="form.avatar" alt="" /></div>
           <div class="right">
             <div>
-              <span>张三 &nbsp; &nbsp;</span
-              ><span class="icon iconfont icon-man"></span>
-              <span class="icon iconfont icon-xingbie"></span>
+              <span>{{ form.remark ? form.remark: form.name+"_"+form.remarkCorpName }} &nbsp; &nbsp;</span
+              ><span class="icon iconfont icon-man" v-if="form.gender == 1"></span>
+              <span class="icon iconfont icon-xingbie" v-else-if="form.gender ==2"></span>
+              <van-icon name="manager" color="#9c9c9c" v-else />
             </div>
             <div class="c9">
               <span>昵称：</span><span>{{ form.name }}</span>
@@ -388,7 +389,7 @@ export default {
       //   externalUserid: "wm2H-nDQAACG5x4XjsM1OoW8UVfpbn3A", // 客户Id
       //   externalUserid: "wmiGuBCgAAgeijfvvpJ62cBfwrB-c4kw",
       externalUserid: '',
-      userid: this.$store.state.userId, // 员工Id
+      userId: this.$store.state.userId, // 员工Id
       form: {
         name: '', // 昵称
         remarkMobiles: '', // 手机号
@@ -727,7 +728,7 @@ export default {
     getCustomerInfo() {
       getCustomerInfo({
         externalUserid: this.externalUserid,
-        userid: this.userid,
+        userId: this.userId,
       })
         .then(({ data }) => {
           // console.log(data);
@@ -931,5 +932,8 @@ export default {
 }
 .iconfont {
   color: #2c8cf0;
+}
+.icon-xingbie {
+    color: pink;
 }
 </style>
