@@ -28,7 +28,7 @@
             </div>
           </div>
         </div>
-        <div class="data" @click="goRoute('/detail')">详细资料></div>
+        <div class="data" @click="goRoute('/customerDetail')">详细资料></div>
       </div>
       <div class="detail">
         <div class="c9">手机号</div>

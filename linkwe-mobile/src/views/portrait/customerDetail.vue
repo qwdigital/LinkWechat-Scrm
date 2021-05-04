@@ -21,10 +21,22 @@
             <div class="img"><img :src="form.avatar" alt="" /></div>
             <div class="right">
               <div>
-                <span>{{form.remark ? form.remark: form.name+"_"+form.remarkCorpName }} &nbsp; &nbsp;</span
-                ><span class="icon iconfont icon-man" v-if="form.gender == 1"></span>
-              <span class="icon iconfont icon-xingbie" v-else-if="form.gender ==2"></span>
-              <van-icon name="manager" color="#9c9c9c" v-else />
+                <span
+                  >{{
+                    form.remark
+                      ? form.remark
+                      : form.name + "_" + form.remarkCorpName
+                  }}
+                  &nbsp; &nbsp;</span
+                ><span
+                  class="icon iconfont icon-man"
+                  v-if="form.gender == 1"
+                ></span>
+                <span
+                  class="icon iconfont icon-xingbie"
+                  v-else-if="form.gender == 2"
+                ></span>
+                <van-icon name="manager" color="#9c9c9c" v-else />
               </div>
               <div class="c9">
                 <span>昵称：</span><span>{{ form.name }}</span>
@@ -53,7 +65,16 @@
         label="生日"
         placeholder="生日"
         input-align="right"
+        @click="!flage ? (show = true) : ''"
       />
+      <van-popup v-model="show"> 内容</van-popup>
+      <!-- <van-datetime-picker
+        v-model="currentDate"
+        type="date"
+        title="选择年月日"
+        :min-date="minDate"
+        :max-date="maxDate"
+      /> -->
       <!-- -------------------------- -->
       <van-field
         v-model="form.email"
@@ -103,81 +124,86 @@
   </div>
 </template>
 <script>
-import { getCustomerInfo, getWeCustomerInfo } from '@/api/portrait'
-import { getUserInfo } from '@/api/common'
+import { getCustomerInfo, getWeCustomerInfo } from "@/api/portrait";
+import { getUserInfo } from "@/api/common";
 export default {
   data() {
     return {
       flage: true,
+      //   选择生日
+      show: false,
+      minDate: new Date(1940, 0, 1),
+      maxDate: new Date(),
       // 接口开始
       // 表单数据
       form: {
-        externalUserid: '', // 客户Id
+        externalUserid: "", // 客户Id
         userId: this.$store.state.userId, // 员工Id
-        name: '', // 昵称
-        remarkMobiles: '', // 手机号
-        birthday: '', // 客户生日
-        age: '', // 年龄
-        email: '', // 邮箱
-        address: '', // 地址
-        qq: '', // qq
-        position: '', // 职业
-        remarkCorpName: '', // 公司
-        description: '', // 其他描述
+        name: "", // 昵称
+        remarkMobiles: "", // 手机号
+        birthday: "", // 客户生日
+        age: "", // 年龄
+        email: "", // 邮箱
+        address: "", // 地址
+        qq: "", // qq
+        position: "", // 职业
+        remarkCorpName: "", // 公司
+        description: "", // 其他描述
       },
-    }
+    };
   },
   computed: {
     // 获取客户年龄
   },
   created() {
-    this.form.externalUserid = this.$route.query.customerId
+    this.form.externalUserid = this.$route.query.customerId;
     // 获取客户详细信息
     getCustomerInfo({
       externalUserid: this.form.externalUserid,
       userId: this.form.userId,
     })
       .then(({ data }) => {
-        console.log(data)
-        this.form = data
-        console.log(this.form)
+        console.log(data);
+        this.form = data;
+        console.log(this.form);
       })
       .catch((err) => {
-        console.log(err)
-      })
+        console.log(err);
+      });
   },
   methods: {
+    //   选择生日
     edit() {
-      this.flage = !this.flage
+      this.flage = !this.flage;
     },
     // 点击保存按钮提交表单
     saveUserInformation() {
-      this.flage = !this.flage
+      this.flage = !this.flage;
 
       getWeCustomerInfo(this.form)
         .then((data) => {
-          console.log(data)
+          console.log(data);
         })
         .catch((err) => {
-          console.log(err)
-        })
+          console.log(err);
+        });
     },
   },
-}
+};
 </script>
 
 <style lang="less" scoped>
 .iconfont {
-    color: #2c8cf0;
+  color: #2c8cf0;
 }
 
 .icon-xingbie {
-    color: pink;
+  color: pink;
 }
 .header {
   margin: 20px 10px 10px;
   vertical-align: center;
-//   text-align: center;
+  //   text-align: center;
 }
 .van-icon-cross {
   position: absolute;
