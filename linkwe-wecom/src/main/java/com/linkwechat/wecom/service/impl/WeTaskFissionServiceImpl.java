@@ -201,12 +201,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         //目标员工id
         String fissStaffId = weTaskFission.getFissionTargetId();
         //H5生成海报页面路径
-        StringBuilder pageUrlBuilder = new StringBuilder();
-        if(weTaskFission.getFissionType() != null && weTaskFission.getFissionType() == 1){
-            pageUrlBuilder.append(pageUrl);
-        }else if(weTaskFission.getFissionType() != null && weTaskFission.getFissionType() == 2){
-            pageUrlBuilder.append(pageGroupUrl);
-        }
+        StringBuilder pageUrlBuilder = new StringBuilder(pageUrl);
         pageUrlBuilder.append("?")
                 .append("fissionId=").append(id)
                 .append("&")
@@ -415,8 +410,13 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         String qrCode = null;
         if (weCustomer != null) {
             String avatarUrl = weCustomer.getAvatar();
-            String content = "/wecom/fission/complete/" + taskFissionId + "/records/" + record.getId();
-            BufferedImage bufferedImage = QREncode.crateQRCode(content, avatarUrl);
+            StringBuilder contentBuilder = new StringBuilder(pageGroupUrl);
+            contentBuilder.append("?")
+                    .append("fissionId=")
+                    .append(taskFissionId)
+                    .append("recordId=")
+                    .append(record.getId());
+            BufferedImage bufferedImage = QREncode.crateQRCode(contentBuilder.toString(), avatarUrl);
             if (bufferedImage != null) {
                 try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
                     ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
