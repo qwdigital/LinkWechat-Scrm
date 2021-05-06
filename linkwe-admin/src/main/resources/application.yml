@@ -46,6 +46,7 @@ ruoyi:
       - /wecom/groupCode/getActualCode/**
       - /wecom/community/h5/**
       - /weixin/auth/**
+      - /wecom/material/temporaryMaterialMediald
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为8090
