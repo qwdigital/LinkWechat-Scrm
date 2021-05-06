@@ -79,8 +79,10 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     private IWeTaskFissionCompleteRecordService weTaskFissionCompleteRecordService;
     @Autowired
     private CosConfig cosConfig;
-    @Value("${H5.url}")
+    @Value("${H5.fissionUrl}")
     private String pageUrl;
+    @Value("${H5.fissionGroupUrl}")
+    private String pageGroupUrl;
 
     /**
      * 查询任务宝
@@ -199,14 +201,18 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         //目标员工id
         String fissStaffId = weTaskFission.getFissionTargetId();
         //H5生成海报页面路径
-        StringBuilder pageUrlBuilder = new StringBuilder(pageUrl);
+        StringBuilder pageUrlBuilder = new StringBuilder();
+        if(weTaskFission.getFissionType() != null && weTaskFission.getFissionType() == 1){
+            pageUrlBuilder.append(pageUrl);
+        }else if(weTaskFission.getFissionType() != null && weTaskFission.getFissionType() == 2){
+            pageUrlBuilder.append(pageGroupUrl);
+        }
         pageUrlBuilder.append("?")
                 .append("fissionId=").append(id)
                 .append("&")
                 .append("fissionTargetId=").append(fissStaffId)
                 .append("&")
                 .append("posterId=").append(weTaskFission.getPostersId());
-
         LinkMessageDto linkMessageDto = new LinkMessageDto();
         linkMessageDto.setPicurl(postersPath);
         linkMessageDto.setDesc(weTaskFission.getFissInfo());
