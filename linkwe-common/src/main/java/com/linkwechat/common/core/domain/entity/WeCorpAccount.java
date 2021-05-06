@@ -1,5 +1,8 @@
 package com.linkwechat.common.core.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import io.swagger.annotations.ApiModel;
@@ -8,7 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.constraints.NotBlank;
 
@@ -23,11 +25,14 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel("企业id配置相关实体")
+@TableName("we_corp_account")
 public class WeCorpAccount extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
+    @TableId
+    @ApiModelProperty("主键")
     private Long id= SnowFlakeUtil.nextId();
 
     /** 企业名称 */
@@ -36,12 +41,12 @@ public class WeCorpAccount extends BaseEntity
     private String companyName;
 
     /** 企业ID */
-    @ApiModelProperty("企业ID")
+    @ApiModelProperty("企业corpId")
     @NotBlank(message = "企业ID不能为空")
     private String corpId;
 
     /** 应用的密钥凭证 */
-    @ApiModelProperty("应用的密钥凭证")
+    @ApiModelProperty("企业为corpSecret")
     @NotBlank(message = "应用的密钥凭证不能为空")
     private String corpSecret;
 
@@ -75,7 +80,7 @@ public class WeCorpAccount extends BaseEntity
     private String wxQrLoginRedirectUri;
 
     @ApiModelProperty("客户流失通知开关 0:关闭 1:开启")
-    private String customerChurnNoticeSwitch = new String("0");
+    private String customerChurnNoticeSwitch = Constants.NORMAL_CODE;
 
 
     @ApiModelProperty("企业管理员账号")

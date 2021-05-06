@@ -33,6 +33,11 @@ public class RuoYiConfig
     /** 企业微信账号登录系统默认密码 */
     private static String weUserDefaultPwd="123456";
 
+
+
+    /**匿名访问的URL*/
+    private String[] anonUrl;
+
     public String getName()
     {
         return name;
@@ -131,5 +136,13 @@ public class RuoYiConfig
 
     public  void setWeUserDefaultPwd(String weUserDefaultPwd) {
         RuoYiConfig.weUserDefaultPwd = weUserDefaultPwd;
+    }
+
+    public String[] getAnonUrl() {
+        return anonUrl;
+    }
+
+    public void setAnonUrl(String[] anonUrl) {
+        this.anonUrl = anonUrl;
     }
 }

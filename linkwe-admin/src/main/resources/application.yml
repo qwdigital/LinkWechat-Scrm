@@ -16,7 +16,36 @@ ruoyi:
   captchaType: math
   # 企业微信用户首次登录系统默认密码
   weUserDefaultPwd: 123456
-
+  #匿名访问的URL
+  anonUrl:
+      - /login
+      - /captchaImage
+      - /findWxQrLoginInfo
+      - /wxQrLogin
+      - /profile/**
+      - /common/download**
+      - /common/download/resource**
+      - /common/download/url**
+      - /swagger-ui.html
+      - /swagger-resources/**
+      - /webjars/**
+      - /*/api-docs
+      - /druid/**
+      - /wecom/callback/**
+      - /wecom/chat/item/list
+      - /wecom/chat/collection/list
+      - /wecom/chat/collection/cancleCollection
+      - /wecom/chat/collection/addCollection
+      - /wecom/chat/side/h5List
+      - /wecom/ticket/**
+      - /wecom/user/getUserInfo
+      - /wecom/portrait/**
+      - /wecom/fission/poster
+      - /wecom/fission/*/progress/*
+      - /wecom/reward/getRewardByFissionId/**
+      - /wecom/groupCode/getActualCode/**
+      - /wecom/community/h5/**
+      - /weixin/auth/**
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为8090

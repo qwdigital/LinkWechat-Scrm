@@ -1,8 +1,10 @@
 package com.linkwechat.framework.config;
 
+import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.framework.security.filter.JwtAuthenticationTokenFilter;
 import com.linkwechat.framework.security.handle.AuthenticationEntryPointImpl;
 import com.linkwechat.framework.security.handle.LogoutSuccessHandlerImpl;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -55,6 +57,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private CorsFilter corsFilter;
 
+
+    @Autowired
+    private RuoYiConfig ruoYiConfig;
+
+
     /**
      * 解决 无法直接注入 AuthenticationManager
      *
@@ -84,6 +91,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
+
+        System.out.println(
+                StringUtils.join(ruoYiConfig.getAnonUrl(),",")
+        );
+
         httpSecurity
                 // CSRF禁用，因为不使用session
                 .csrf().disable()
@@ -93,8 +105,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 // 过滤请求
                 .authorizeRequests()
-                // 对于登录login 验证码captchaImage 允许匿名访问
-                .antMatchers("/login", "/captchaImage", "/findWxQrLoginInfo", "/wxQrLogin").anonymous()
+
+                .antMatchers(ruoYiConfig.getAnonUrl()).anonymous()
+
+//                .antMatchers("/login", "/captchaImage", "/findWxQrLoginInfo", "/wxQrLogin").anonymous()
                 .antMatchers(
                         HttpMethod.GET,
                         "/*.html",
@@ -102,34 +116,34 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.css",
                         "/**/*.js"
                 ).permitAll()
-                .antMatchers("/profile/**").anonymous()
-                .antMatchers("/common/download**").anonymous()
-                .antMatchers("/common/download/resource**").anonymous()
-                .antMatchers("/common/download/url**").anonymous()
-                .antMatchers("/swagger-ui.html").anonymous()
-                .antMatchers("/swagger-resources/**").anonymous()
-                .antMatchers("/webjars/**").anonymous()
-                .antMatchers("/*/api-docs").anonymous()
-                .antMatchers("/druid/**").anonymous()
-                .antMatchers("/wecom/callback/**").anonymous()
-
-                .antMatchers("/wecom/chat/item/list").anonymous()
-                .antMatchers("/wecom/chat/collection/list").anonymous()
-                .antMatchers("/wecom/chat/collection/cancleCollection").anonymous()
-                .antMatchers("/wecom/chat/collection/addCollection").anonymous()
-                .antMatchers("/wecom/chat/side/h5List").anonymous()
-                .antMatchers("/wecom/ticket/**").anonymous()
-
-                .antMatchers("/wecom/user/getUserInfo").anonymous()
-               // .antMatchers("/common/uploadFile2Cos").anonymous()
-//                .antMatchers("/wecom/material/temporaryMaterialMediaId").anonymous()
-                .antMatchers("/wecom/portrait/**").anonymous()
-                .antMatchers("/wecom/fission/poster", "/wecom/fission/*/progress/*", "/wecom/reward/getRewardByFissionId/**").anonymous()
-                // 获取实际群活码和社群运营H5页面不需要登录
-                .antMatchers("/wecom/groupCode/getActualCode/**").anonymous()
-                .antMatchers("/wecom/community/h5/**").anonymous()
-                //微信授权接口
-                .antMatchers("/weixin/auth/**").anonymous()
+//                .antMatchers("/profile/**").anonymous()
+//                .antMatchers("/common/download**").anonymous()
+//                .antMatchers("/common/download/resource**").anonymous()
+//                .antMatchers("/common/download/url**").anonymous()
+//                .antMatchers("/swagger-ui.html").anonymous()
+//                .antMatchers("/swagger-resources/**").anonymous()
+//                .antMatchers("/webjars/**").anonymous()
+//                .antMatchers("/*/api-docs").anonymous()
+//                .antMatchers("/druid/**").anonymous()
+//                .antMatchers("/wecom/callback/**").anonymous()
+//
+//                .antMatchers("/wecom/chat/item/list").anonymous()
+//                .antMatchers("/wecom/chat/collection/list").anonymous()
+//                .antMatchers("/wecom/chat/collection/cancleCollection").anonymous()
+//                .antMatchers("/wecom/chat/collection/addCollection").anonymous()
+//                .antMatchers("/wecom/chat/side/h5List").anonymous()
+//                .antMatchers("/wecom/ticket/**").anonymous()
+//
+//                .antMatchers("/wecom/user/getUserInfo").anonymous()
+//               // .antMatchers("/common/uploadFile2Cos").anonymous()
+////                .antMatchers("/wecom/material/temporaryMaterialMediaId").anonymous()
+//                .antMatchers("/wecom/portrait/**").anonymous()
+//                .antMatchers("/wecom/fission/poster", "/wecom/fission/*/progress/*", "/wecom/reward/getRewardByFissionId/**").anonymous()
+//                // 获取实际群活码和社群运营H5页面不需要登录
+//                .antMatchers("/wecom/groupCode/getActualCode/**").anonymous()
+//                .antMatchers("/wecom/community/h5/**").anonymous()
+//                //微信授权接口
+//                .antMatchers("/weixin/auth/**").anonymous()
 
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()
@@ -141,6 +155,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 添加CORS filter
         httpSecurity.addFilterBefore(corsFilter, JwtAuthenticationTokenFilter.class);
         httpSecurity.addFilterBefore(corsFilter, LogoutFilter.class);
+
+        String join = StringUtils.join(ruoYiConfig.getAnonUrl(), ",");
     }
 
 
@@ -159,4 +175,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
     }
+
+
 }

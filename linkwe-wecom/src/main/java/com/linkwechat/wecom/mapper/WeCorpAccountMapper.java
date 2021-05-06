@@ -1,6 +1,6 @@
 package com.linkwechat.wecom.mapper;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import org.apache.ibatis.annotations.Param;
 
@@ -10,47 +10,8 @@ import org.apache.ibatis.annotations.Param;
  * @author ruoyi
  * @date 2020-08-24
  */
-public interface WeCorpAccountMapper
+public interface WeCorpAccountMapper extends BaseMapper<WeCorpAccount>
 {
-    /**
-     * 查询企业id相关配置
-     * 
-     * @param id 企业id相关配置ID
-     * @return 企业id相关配置
-     */
-    public WeCorpAccount selectWeCorpAccountById(Long id);
-
-    /**
-     * 查询企业id相关配置列表
-     * 
-     * @param wxCorpAccount 企业id相关配置
-     * @return 企业id相关配置集合
-     */
-    public List<WeCorpAccount> selectWeCorpAccountList(WeCorpAccount wxCorpAccount);
-
-    /**
-     * 新增企业id相关配置
-     * 
-     * @param wxCorpAccount 企业id相关配置
-     * @return 结果
-     */
-    public int insertWeCorpAccount(WeCorpAccount wxCorpAccount);
-
-    /**
-     * 修改企业id相关配置
-     * 
-     * @param wxCorpAccount 企业id相关配置
-     * @return 结果
-     */
-    public int updateWeCorpAccount(WeCorpAccount wxCorpAccount);
-
-
-
-    /**
-     * 获取有效cropid
-     * @return
-     */
-    public WeCorpAccount findValidWeCorpAccount();
 
 
     /**
@@ -58,13 +19,7 @@ public interface WeCorpAccountMapper
      * @param corpId
      * @return
      */
-    public int startVailWeCorpAccount(@Param("corpId") String corpId);
+     int startVailWeCorpAccount(@Param("corpId") String corpId);
 
 
-    /**
-     * 根据企业账号获取企业相关配置
-     * @param corpAccount
-     * @return
-     */
-    WeCorpAccount findWeCorpByAccount(@Param("corpAccount") String corpAccount);
 }
