@@ -7,8 +7,16 @@
 </head>
 <body>
     <div class='container'>
-        <div>
-            扫码结果页面
+        <div id="qrcode" class="qrcode">
+            <div class="qrcode-tip"> 长按识别进入群组 </div>
+            <div class="qrcode-content">
+                <img id="qrcodeImg" src="">
+            </div>
+        </div>
+
+        <div id="error" class="error-content">
+            <div id="message">
+            </div>
         </div>
     </div>
 </body>

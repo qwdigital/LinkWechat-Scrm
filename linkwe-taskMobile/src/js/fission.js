@@ -1,3 +1,6 @@
+import '../css/fission.css'
+import '../css/base.css'
+
 import {getPoster,getUserInfo,getToken,getWXUserInfo, setFissionComplete} from './api'
 import {getUrlParam,getWxCode} from './utils'
 import config from './contant'
@@ -11,14 +14,21 @@ $(function(){
             fissionComplete(userinfo.openId)
         } catch (error) {
             alert(error)
+            setErrorMessage('获取用户信息失败')
         }
         return
     }
     //缓存中没有用户信息，进入授权流程
     getWxCode()
+
     const code = config.code
+    console.log('code: ', code)
     if(!code){
+        console.error('code获取失败')
         //防止跳转前进入流程
+
+        setErrorMessage('微信授权失败')
+
         return
     }
     try {
@@ -28,19 +38,29 @@ $(function(){
                 if(data && data.openId){
                     localStorage.setItem('userinfo',JSON.stringify(data))
                     fissionComplete(userinfo.openId)
+                } else {
+                    setErrorMessage('获取用户信息失败')
                 }
             })
        
     } catch (error) {
         alert(error)
+        setErrorMessage('获取用户信息失败')
     }
-
-    
 })
 
 function fissionComplete(openId) {
     const fissionId = getUrlParam('fissionId');
     const recordId = getUrlParam('recordId');
+
+    console.log('参数 fissionId: ', fissionId)
+    console.log('参数 recordId: ', recordId)
+    console.log('参数 openId: ', openId)
+
+    if (!(fissionId && recordId && openId)) {
+        setErrorMessage('缺失必要数据, 请联系管理员')
+        return
+    }
 
     const wxparams = {
         openId: openId,
@@ -54,6 +74,24 @@ function fissionComplete(openId) {
             name: userData.nickName,
             unionid: userData.unionId,
             userid: userData.openId
+        }).then((resp) => {
+            if (resp.code === 200 && resp.data) {
+                setQrcode(resp.data)
+            } else {
+                setErrorMessage('未获取到可用的二维码')
+            }
         })
     })
+}
+
+function setErrorMessage (message) {
+    $('#qrcode').css('display', 'none')
+    $('#error').css('display', 'block')
+    $('#message').html(message)
+}
+
+function setQrcode (img) {
+    $('#qrcode').css('display', 'block')
+    $('#error').css('display', 'none')
+    $('#qrcodeImg').attr('src', img)
 }

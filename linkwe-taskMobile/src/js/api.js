@@ -26,6 +26,7 @@ export function getUserInfo(params) {
 //   }
 
 export function setFissionComplete(fissionId, recordId, params) {
+  console.log('更新状态, 参数: ', params)
   return request(`/wecom/fission/complete/${fissionId}/records/${recordId}`, params, 'post')
 }
   
