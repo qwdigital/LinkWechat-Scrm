@@ -222,6 +222,9 @@ export default {
           <el-input v-model="form.corpSecret" style="width: 80%"></el-input>
           <el-link class="fr" type="primary">如何获取？</el-link>
         </el-form-item>
+        <el-form-item label="会话存档secret" prop="chatSecret">
+          <el-input v-model="form.chatSecret" style="width: 80%"></el-input>
+        </el-form-item>
         <!-- <el-form-item label="通讯录事件服务">
           <el-radio-group v-model="form.contactSecret">
             <el-radio label="label">开启</el-radio>

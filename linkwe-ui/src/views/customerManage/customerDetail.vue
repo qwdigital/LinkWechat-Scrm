@@ -41,6 +41,13 @@ export default {
         this.birthday = this.customer.birthday
       })
     },
+    remark(item) {
+      return (
+        item.remark ||
+        this.customer.name +
+          (item.remarkCorpName ? '-' + item.remarkCorpName : '')
+      )
+    },
   },
 }
 </script>
@@ -88,69 +95,63 @@ export default {
       </div>
     </div>
 
-    <el-card shadow="never" :body-style="{ width: '400px' }">
-      <div>
-        <el-button
-          v-if="customer.weFlowerCustomerRels[0].status == 1"
-          class="fr"
-          type="danger"
-          plain
-          size="mini"
-          >该员工已被客户删除</el-button
-        >
-        <el-row :gutter="10">
-          <el-col :span="10">备注名：</el-col>
-          <el-col :span="10">
-            <el-tooltip
-              class="item"
-              effect="dark"
-              :content="customer.name"
-              placement="top-start"
-            >
-              <div class="toe al">{{ customer.name }}</div>
-            </el-tooltip>
-          </el-col>
-        </el-row>
-        <el-row :gutter="10">
-          <el-col :span="10">标签：</el-col>
-          <el-col :span="14">
-            <div
-              v-for="(item, index) in customer.weFlowerCustomerRels"
-              :key="index"
-            >
-              <el-tag
-                type="info"
-                v-for="(unit, unique) in item.weFlowerCustomerTagRels"
-                :key="unique"
-                >{{ unit.tagName }}</el-tag
-              >
+    <el-card
+      v-for="(item, index) of customer.weFlowerCustomerRels"
+      :key="index"
+      shadow="never"
+      :body-style="{ width: '400px' }"
+    >
+      <el-button
+        v-if="item.status == 1"
+        class="fr"
+        type="danger"
+        plain
+        size="mini"
+        >该员工已被客户删除</el-button
+      >
+      <el-row :gutter="10">
+        <el-col :span="10">备注名：</el-col>
+        <el-col :span="10">
+          <el-tooltip
+            class="item"
+            effect="dark"
+            :content="remark(item)"
+            placement="top-start"
+          >
+            <div class="toe al">
+              {{ remark(item) }}
             </div>
-          </el-col>
-        </el-row>
-        <el-row :gutter="10">
-          <el-col :span="10">个人标签：</el-col>
-          <el-col :span="12">{{ '--' }}</el-col>
-        </el-row>
-        <el-divider></el-divider>
-        <el-row :gutter="10">
-          <el-col :span="10">添加人：</el-col>
-          <el-col :span="12">{{
-            customer.weFlowerCustomerRels[0].userName
-          }}</el-col>
-        </el-row>
-        <el-row :gutter="10">
-          <el-col :span="10">所在部门：</el-col>
-          <el-col :span="12">{{
-            customer.weFlowerCustomerRels[0].department
-          }}</el-col>
-        </el-row>
-        <el-row :gutter="10">
-          <el-col :span="10">添加时间：</el-col>
-          <el-col :span="12">{{
-            customer.weFlowerCustomerRels[0].createTime
-          }}</el-col>
-        </el-row>
-      </div>
+          </el-tooltip>
+        </el-col>
+      </el-row>
+      <el-row :gutter="10">
+        <el-col :span="10">标签：</el-col>
+        <el-col :span="14">
+          <el-tag
+            type="info"
+            v-for="(unit, unique) in item.weFlowerCustomerTagRels"
+            :key="unique"
+            >{{ unit.tagName }}</el-tag
+          >
+        </el-col>
+      </el-row>
+      <el-row :gutter="10">
+        <el-col :span="10">个人标签：</el-col>
+        <el-col :span="12">{{ '--' }}</el-col>
+      </el-row>
+      <el-divider></el-divider>
+      <el-row :gutter="10">
+        <el-col :span="10">添加人：</el-col>
+        <el-col :span="12">{{ item.userName }}</el-col>
+      </el-row>
+      <el-row :gutter="10">
+        <el-col :span="10">所在部门：</el-col>
+        <el-col :span="12">{{ item.department }}</el-col>
+      </el-row>
+      <el-row :gutter="10">
+        <el-col :span="10">添加时间：</el-col>
+        <el-col :span="12">{{ item.createTime }}</el-col>
+      </el-row>
     </el-card>
   </div>
 </template>
@@ -186,7 +187,7 @@ export default {
 
 .el-card {
   display: inline-block;
-  margin-top: 20px;
+  margin: 20px 20px 0 0;
   .el-row {
     color: #666;
     margin-bottom: 10px;
