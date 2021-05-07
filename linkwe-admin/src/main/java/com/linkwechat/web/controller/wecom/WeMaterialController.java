@@ -16,9 +16,7 @@ import com.linkwechat.wecom.service.IWePosterService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,11 +42,10 @@ public class WeMaterialController extends BaseController {
     @Resource
     private IWePosterService wePosterService;
 
-    /**
-     * 查询素材列表
-     */
+
     //   @PreAuthorize("@ss.hasPermi('wecom:material:list')")
     @GetMapping("/list")
+    @ApiOperation("查询素材列表")
     public TableDataInfo list(@RequestParam(value = "categoryId", required = false) String categoryId
             , @RequestParam(value = "search", required = false) String search,@RequestParam(value = "mediaType") String mediaType) {
         startPage();
@@ -69,9 +66,8 @@ public class WeMaterialController extends BaseController {
         return getDataTable(list);
     }
 
-    /**
-     * 查询素材详细信息
-     */
+
+
     //  @PreAuthorize("@ss.hasPermi('wechat:material:query')")
     @GetMapping(value = "/{id}")
     @ApiOperation("查询素材详细信息")
@@ -79,9 +75,7 @@ public class WeMaterialController extends BaseController {
         return AjaxResult.success(materialService.findWeMaterialById(id));
     }
 
-    /**
-     * 添加素材信息
-     */
+
     //   @PreAuthorize("@ss.hasPermi('wechat:material:add')")
     @Log(title = "添加素材信息", businessType = BusinessType.INSERT)
     @PostMapping
@@ -90,9 +84,7 @@ public class WeMaterialController extends BaseController {
         return toAjax(materialService.insertWeMaterial(material));
     }
 
-    /**
-     * 更新素材信息
-     */
+
     //   @PreAuthorize("@ss.hasPermi('wechat:material:edit')")
     @Log(title = "更新素材信息", businessType = BusinessType.UPDATE)
     @PutMapping
@@ -101,9 +93,7 @@ public class WeMaterialController extends BaseController {
         return toAjax(materialService.updateWeMaterial(material));
     }
 
-    /**
-     * 删除素材信息
-     */
+
     //   @PreAuthorize("@ss.hasPermi('wechat:material:remove')")
     @Log(title = "删除素材信息", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
@@ -112,9 +102,7 @@ public class WeMaterialController extends BaseController {
         return toAjax(materialService.deleteWeMaterialByIds(ids));
     }
 
-    /**
-     * 上传素材信息
-     */
+
     //   @PreAuthorize("@ss.hasPermi('wechat:material:upload')")
     @Log(title = "上传素材信息", businessType = BusinessType.OTHER)
     @PostMapping("/upload")
@@ -124,9 +112,7 @@ public class WeMaterialController extends BaseController {
         return AjaxResult.success(weMaterialFileVO);
     }
 
-    /**
-     * 更换分组
-     */
+
     //   @PreAuthorize("@ss.hasPermi('wechat:material:resetCategory')")
     @Log(title = "更换分组", businessType = BusinessType.OTHER)
     @PutMapping("/resetCategory")
@@ -146,6 +132,8 @@ public class WeMaterialController extends BaseController {
                 ,temporaryMaterialDto.getName());
         return AjaxResult.success(weMediaDto);
     }
+
+
 
     @Log(title = "上传素材图片", businessType = BusinessType.OTHER)
     @PostMapping("/uploadimg")
