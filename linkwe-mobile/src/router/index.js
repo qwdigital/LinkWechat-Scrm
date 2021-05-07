@@ -38,12 +38,12 @@ const routes = [
   },
   //  用户画像详情
   {
-    path: '/detail',
-    name: 'detail',
+    path: '/customerDetail',
+    name: 'customerDetail',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/portrait/detail.vue'),
+    component: () => import(/* webpackChunkName: "about" */ '../views/portrait/customerDetail.vue'),
     hidden: true,
     meta: {
       title: '',
