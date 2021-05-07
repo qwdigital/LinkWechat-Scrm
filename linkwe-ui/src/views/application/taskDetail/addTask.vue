@@ -46,6 +46,7 @@ export default {
           { required: true, message: '请输入活动名称', trigger: 'blur' },
         ],
         postersId: [{ required: true, message: '请输入海报', trigger: 'blur' }],
+        fissionTargetId: [{ required: true, message: '请选择员工', trigger: 'blur' }],
         fissNum: [
           { required: true, message: '请输入数量', trigger: 'blur' },
           { pattern: /^[1-9]+$/, message: '请输入数字', trigger: 'blur' },
@@ -247,12 +248,13 @@ export default {
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === 'image/jpeg'
+      const isPNG = file.type === 'image/png'
 
-      if (!isJPG) {
-        this.$message.error('上传头像图片只能是 JPG 格式!')
+      if (!isJPG && !isPNG) {
+        this.$message.error('上传头像图片只能是 JPG/PNG 格式!')
       }
 
-      return isJPG
+      return isJPG || isPNG
     },
   },
 }
@@ -380,7 +382,7 @@ export default {
           </div>
         </el-form-item>
 
-        <el-form-item label="添加员工">
+        <el-form-item label="添加员工" prop="fissionTargetId">
           <el-button
             type="primary"
             class="ml10"
