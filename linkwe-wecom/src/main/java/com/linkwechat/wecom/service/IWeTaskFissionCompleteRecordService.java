@@ -6,6 +6,7 @@ import com.linkwechat.wecom.domain.WeTaskFissionCompleteRecord;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 裂变任务完成记录Service接口
@@ -63,4 +64,18 @@ public interface IWeTaskFissionCompleteRecordService extends IService<WeTaskFiss
     public int deleteWeTaskFissionCompleteRecordById(Long id);
 
     public List<WeTaskFissionCompleteRecord> statisticCompleteRecords(Long taskFissionId, Date startTime, Date endTime);
+
+    /**
+     * 根据任务id查询裂变任务完成记录列表
+     * @param taskFissionIds 任务id
+     * @return
+     */
+    List<WeTaskFissionCompleteRecord> getListByTaskIds(Set<Long> taskFissionIds);
+
+    /**
+     * 根据任务id查询裂变任务完成记录列表
+     * @param taskFissionId
+     * @return
+     */
+    List<WeTaskFissionCompleteRecord> getCompleteListByTaskId(Long taskFissionId);
 }

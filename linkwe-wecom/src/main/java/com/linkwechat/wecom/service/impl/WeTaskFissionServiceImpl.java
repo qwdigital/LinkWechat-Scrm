@@ -4,10 +4,12 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.enums.TaskFissionType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
@@ -52,7 +54,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
+public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, WeTaskFission>  implements IWeTaskFissionService {
     @Autowired
     private WeTaskFissionMapper weTaskFissionMapper;
     @Autowired
@@ -77,6 +79,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     private IWeFlowerCustomerRelService weFlowerCustomerRelService;
     @Autowired
     private IWeTaskFissionCompleteRecordService weTaskFissionCompleteRecordService;
+
     @Autowired
     private CosConfig cosConfig;
     @Value("${H5.fissionUrl}")
@@ -291,6 +294,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
         List<WeTaskFissionCompleteRecord> list = weTaskFissionCompleteRecordService.selectWeTaskFissionCompleteRecordList(wfcr);
         if (CollectionUtils.isEmpty(list)) {
             wfcr.setCreateTime(new Date());
+            wfcr.setAvatar(weChatUserDTO.getAvatar());
             weTaskFissionCompleteRecordService.insertWeTaskFissionCompleteRecord(wfcr);
         }
     }
@@ -356,15 +360,23 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
 
     @Override
     public WeTaskFissionProgressVO getCustomerTaskProgress(WeTaskFission taskFission, String unionId) {
-        long complete = 0L;
         long total = taskFission.getFissNum();
-        List<WeCustomer> list = getCustomerListById(unionId, String.valueOf(taskFission.getId()));
-        if (CollectionUtils.isNotEmpty(list)) {
-            complete = list.size();
-        } else {
-            list = new ArrayList<>();
+        List<WeCustomer> list = new ArrayList<>();
+        if(taskFission.getFissionType() == 1){
+            list.addAll(getCustomerListById(unionId, String.valueOf(taskFission.getId())));
+        }else {
+            List<WeTaskFissionCompleteRecord> completeRecordList = weTaskFissionCompleteRecordService.getCompleteListByTaskId(taskFission.getId());
+            if(CollectionUtil.isNotEmpty(completeRecordList)){
+                completeRecordList.forEach(completeRecord ->{
+                    WeCustomer weCustomer = new WeCustomer();
+                    weCustomer.setAvatar(completeRecord.getAvatar());
+                    weCustomer.setUnionid(completeRecord.getCustomerId());
+                    weCustomer.setName(completeRecord.getCustomerName());
+                    list.add(weCustomer);
+                });
+            }
         }
-        return WeTaskFissionProgressVO.builder().total(total).completed(complete).customers(list).build();
+        return WeTaskFissionProgressVO.builder().total(total).completed(new Long(list.size())).customers(list).build();
     }
 
     /**
@@ -374,6 +386,20 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
     @Override
     public void updateExpiredWeTaskFission() {
          weTaskFissionMapper.updateExpiredWeTaskFission();
+    }
+
+
+    /**
+     * 根据群活码id 查询任务列表
+     * @param groupCodeId 群活码id
+     * @return
+     */
+    @Override
+    public List<WeTaskFission> getTaskFissionListByGroupCodeId(Long groupCodeId) {
+        return this.list(new LambdaQueryWrapper<WeTaskFission>()
+        .eq(WeTaskFission::getFissionTargetId,groupCodeId)
+        .eq(WeTaskFission::getFissionType,2)
+        .eq(WeTaskFission::getFissStatus,1));
     }
 
     /*************************************** private functions **************************************/

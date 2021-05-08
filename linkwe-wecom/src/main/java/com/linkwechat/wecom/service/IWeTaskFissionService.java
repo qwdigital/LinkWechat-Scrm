@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeTaskFission;
 import com.linkwechat.wecom.domain.dto.WeChatUserDTO;
@@ -17,7 +18,7 @@ import java.util.List;
  * @author leejoker
  * @date 2021-01-20
  */
-public interface IWeTaskFissionService {
+public interface IWeTaskFissionService extends IService<WeTaskFission> {
     /**
      * 查询任务宝
      *
@@ -100,4 +101,11 @@ public interface IWeTaskFissionService {
      * @return
      */
     public void updateExpiredWeTaskFission();
+
+    /**
+     * 根据群活码id 查询任务列表
+     * @param groupCodeId 群活码id
+     * @return
+     */
+    List<WeTaskFission> getTaskFissionListByGroupCodeId(Long groupCodeId);
 }

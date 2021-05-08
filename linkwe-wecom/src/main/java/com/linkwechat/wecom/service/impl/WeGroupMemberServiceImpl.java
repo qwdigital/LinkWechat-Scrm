@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.wecom.domain.WeGroupMember;
 import com.linkwechat.wecom.domain.dto.WeGroupMemberDto;
@@ -27,6 +28,13 @@ public class WeGroupMemberServiceImpl extends ServiceImpl<WeGroupMemberMapper,We
     @Override
     public List<WeGroupMemberDto> selectWeGroupMemberListByChatId(String chatId) {
         return this.baseMapper.selectWeGroupMemberListByChatId(chatId);
+    }
+
+    @Override
+    public WeGroupMember selectWeGroupMemberByUnionId(String chatId, String unionId) {
+        return this.getOne(new LambdaQueryWrapper<WeGroupMember>()
+        .eq(WeGroupMember::getChatId,chatId)
+        .eq(WeGroupMember::getUnionId,unionId));
     }
 
 
