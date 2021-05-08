@@ -11,10 +11,12 @@
         <result property="customerId" column="customer_id"/>
         <result property="customerName" column="customer_name"/>
         <result property="createTime" column="create_time"/>
+        <result property="status" column="status"/>
+        <result property="customerAvatar" column="customer_avatar"/>
     </resultMap>
 
     <sql id="selectWeTaskFissionCompleteRecordVo">
-        select id, task_fission_id, fission_record_id, customer_id, customer_name, create_time from
+        select id, task_fission_id, fission_record_id, customer_id, customer_name, create_time, status, customer_avatar from
         we_task_fission_complete_record
     </sql>
 
@@ -25,6 +27,7 @@
             <if test="taskFissionId != null ">and task_fission_id = #{taskFissionId}</if>
             <if test="fissionRecordId != null ">and fission_record_id = #{fissionRecordId}</if>
             <if test="customerId != null  and customerId != ''">and customer_id = #{customerId}</if>
+            <if test="status != null">and status = #{status}</if>
             <if test="customerName != null  and customerName != ''">and customer_name like concat('%', #{customerName},
                 '%')
             </if>
@@ -46,6 +49,8 @@
             <if test="customerId != null and customerId != ''">customer_id,</if>
             <if test="customerName != null">customer_name,</if>
             <if test="createTime != null">create_time,</if>
+            <if test="status != null">status,</if>
+            <if test="customerAvatar != null">customer_avatar,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="taskFissionId != null">#{taskFissionId},</if>
@@ -53,6 +58,8 @@
             <if test="customerId != null and customerId != ''">#{customerId},</if>
             <if test="customerName != null">#{customerName},</if>
             <if test="createTime != null">#{createTime},</if>
+            <if test="status != null">#{status},</if>
+            <if test="customerAvatar != null">#{customerAvatar},</if>
         </trim>
     </insert>
 
@@ -64,6 +71,8 @@
             <if test="customerId != null and customerId != ''">customer_id = #{customerId},</if>
             <if test="customerName != null">customer_name = #{customerName},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="customerAvatar != null">customer_avatar = #{customerAvatar},</if>
         </trim>
         where id = #{id}
     </update>
