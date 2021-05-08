@@ -414,7 +414,7 @@ public class WeTaskFissionServiceImpl implements IWeTaskFissionService {
             contentBuilder.append("?")
                     .append("fissionId=")
                     .append(taskFissionId)
-                    .append("recordId=")
+                    .append("&recordId=")
                     .append(record.getId());
             BufferedImage bufferedImage = QREncode.crateQRCode(contentBuilder.toString(), avatarUrl);
             if (bufferedImage != null) {
