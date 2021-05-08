@@ -21,9 +21,20 @@ const htmlTemplateIndex = new HtmlWebpackPlugin({
     minify:false,
     filename:'index.html'
 })
+
+const htmlTemplateFission = new HtmlWebpackPlugin({
+    template:'html-withimg-loader!' + path.resolve(__dirname,'../src/fission.html'),
+    hash:true,
+    // chunks:['common','list'],
+    chunks:['common','fission'],
+    inject: true,
+    minify:false,
+    filename:'fission.html'
+})
 var dev = {
     entry : {
         'taskProcess':'./src/js/taskProcess.js',
+        'fission':'./src/js/fission.js',
         'index':'./src/js/index.js',
         'common':'./src/js/common.js'
     },
@@ -78,6 +89,7 @@ var dev = {
 		}),
         htmlTemplateIndex,
         htmlTemplateProcess,
+        htmlTemplateFission,
         new webpack.HotModuleReplacementPlugin(),
     ]
 }

@@ -10,7 +10,8 @@ export default {
                 pageSize: 10,
                 taskName: "",
                 startTime: "",
-                overTime: ""
+                overTime: "",
+                fissionType: 1
             },
             dateRange: [],
             tableData: [],
