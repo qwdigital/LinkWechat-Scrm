@@ -1,4 +1,4 @@
-package ${packageName}.domain;
+package ${packageName}.wecom.domain;
 
 #foreach ($import in $subImportList)
 import ${import};

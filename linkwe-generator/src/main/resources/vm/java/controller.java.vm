@@ -1,4 +1,4 @@
-package ${packageName}.controller;
+package ${packageName}.web.controller.wecom;
 
 import java.util.List;
 import java.util.Arrays;

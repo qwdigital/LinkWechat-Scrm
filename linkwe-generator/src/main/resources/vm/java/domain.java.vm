@@ -1,4 +1,4 @@
-package ${packageName}.domain;
+package ${packageName}.wecom.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
