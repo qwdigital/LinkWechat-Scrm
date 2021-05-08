@@ -30,7 +30,7 @@
             <span class="finish-box">
                 <span
               class="finish"
-              v-if="item1.trajectoryType == 4"
+              v-if="item1.trajectoryType == 4 && item1.status !=3"
               @click="finDynamic(item1.id)"
               >完成</span
             >
@@ -213,7 +213,7 @@ export default {
       handleWait(id)
         .then((data) => {
           if (data.code == 200) {
-            this.delDynamic(id);
+            // this.delDynamic(id);
             this.reload();
           }
         })
@@ -250,6 +250,7 @@ export default {
   color: #9c9c9c;
   font-size: 12px;
   font-weight: 600;
+  margin-right: 16px;
 }
 .con {
   left: 51px;
@@ -258,20 +259,15 @@ export default {
 .finish-box {
      display: inline-block;
   position: relative;
-  color: #2c8cf0;
-  font-size: 12px;
-  font-weight: 600;
-  left: 140px;
-  top: 0px;
-  width: 65px;
+  left: 100px;
+  width: 25%;
 }
 .finish {
-   
   position: absolute;
   color: #2c8cf0;
   font-size: 12px;
   font-weight: 600;
-//   right: -138px;
-  top: 0px;
+//   right: 30px;
+//   top: 0px;
 }
 </style>

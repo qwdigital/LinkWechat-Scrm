@@ -102,7 +102,6 @@ export default {
   },
   created() {
     this.externalUserid = this.$route.query.customerId
-
     this.findAddaddEmployes()
     this.findAddGroupNum()
   },

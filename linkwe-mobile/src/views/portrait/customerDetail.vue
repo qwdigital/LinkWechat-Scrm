@@ -58,6 +58,7 @@
         label="年龄"
         placeholder="年龄"
         input-align="right"
+        disabled
       />
       <van-field
         v-model="form.birthday"
@@ -67,14 +68,16 @@
         input-align="right"
         @click="!flage ? (show = true) : ''"
       />
-      <van-popup v-model="show"> 内容</van-popup>
-      <!-- <van-datetime-picker
-        v-model="currentDate"
-        type="date"
-        title="选择年月日"
-        :min-date="minDate"
-        :max-date="maxDate"
-      /> -->
+      <van-popup v-model="show" position="bottom" round :style="{ height: '60%' }">
+        <van-datetime-picker
+          v-model="currentDate"
+          type="date"
+          title="选择年月日"
+          :min-date="minDate"
+          :max-date="maxDate"
+          @confirm="confirm"
+          @cancel = "cancel"
+      /></van-popup>
       <!-- -------------------------- -->
       <van-field
         v-model="form.email"
@@ -134,6 +137,7 @@ export default {
       show: false,
       minDate: new Date(1940, 0, 1),
       maxDate: new Date(),
+      currentDate: new Date(2000, 0, 17),
       // 接口开始
       // 表单数据
       form: {
@@ -156,6 +160,7 @@ export default {
     // 获取客户年龄
   },
   created() {
+
     this.form.externalUserid = this.$route.query.customerId;
     // 获取客户详细信息
     getCustomerInfo({
@@ -163,9 +168,9 @@ export default {
       userId: this.form.userId,
     })
       .then(({ data }) => {
-        console.log(data);
+        // console.log(data);
         this.form = data;
-        console.log(this.form);
+        // console.log(this.form);
       })
       .catch((err) => {
         console.log(err);
@@ -173,13 +178,37 @@ export default {
   },
   methods: {
     //   选择生日
+    confirm(val) {
+        this.show = false
+        this.form.birthday =this.getTime (val) 
+        console.log(val);
+    },
+    cancel () {
+        this.show = false
+    },
     edit() {
       this.flage = !this.flage;
+    },
+    // 时间处理器
+    getTime(data) {
+      const date = new Date(data)
+      // console.log(timer.getFullYear());
+      var Y = date.getFullYear() + '-'
+      var M =
+        (date.getMonth() + 1 < 10
+          ? '0' + (date.getMonth() + 1)
+          : date.getMonth() + 1) + '-'
+      var D =
+        date.getDate() < 10 ? '0' + date.getDate() : date.getDate() + '   '
+    //   var h =
+    //     (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
+    //   var m =
+    //     date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+      return Y + M + D
     },
     // 点击保存按钮提交表单
     saveUserInformation() {
       this.flage = !this.flage;
-
       getWeCustomerInfo(this.form)
         .then((data) => {
           console.log(data);

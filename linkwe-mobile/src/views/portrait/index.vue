@@ -18,9 +18,21 @@
           <div class="img"><img :src="form.avatar" alt="" /></div>
           <div class="right">
             <div>
-              <span>{{ form.remark ? form.remark: form.name+"_"+form.remarkCorpName }} &nbsp; &nbsp;</span
-              ><span class="icon iconfont icon-man" v-if="form.gender == 1"></span>
-              <span class="icon iconfont icon-xingbie" v-else-if="form.gender ==2"></span>
+              <span
+                >{{
+                  form.remark
+                    ? form.remark
+                    : form.name + "_" + form.remarkCorpName
+                }}
+                &nbsp; &nbsp;</span
+              ><span
+                class="icon iconfont icon-man"
+                v-if="form.gender == 1"
+              ></span>
+              <span
+                class="icon iconfont icon-xingbie"
+                v-else-if="form.gender == 2"
+              ></span>
               <van-icon name="manager" color="#9c9c9c" v-else />
             </div>
             <div class="c9">
@@ -42,7 +54,7 @@
       <van-divider />
       <div class="detail">
         <div class="c9">生日</div>
-        <div>{{ form.birthday ? form.birthday.substring(0, 10) : '' }}</div>
+        <div>{{ form.birthday ? form.birthday.substring(0, 10) : "" }}</div>
       </div>
       <van-divider />
       <div class="detail">
@@ -242,7 +254,7 @@
             v-model="currentTime"
             type="time"
             title="请选择结束时间"
-            :min-hour="0"
+            :min-hour="minHour"
             :max-hour="23"
             @cancel="timecancel"
             @confirm="endtimeconfirm"
@@ -262,85 +274,6 @@
       </van-form>
     </van-action-sheet>
     <!-- 点击添加待办触发弹出框结束 -->
-    <!-- 点击待办动态触发弹出框开始 -->
-    <van-action-sheet v-model="todonewsshow">
-      <van-nav-bar
-        title="客户待办"
-        right-text="删除"
-        @click-right="deltodoshow"
-      />
-      <!-- 待办内容 -->
-      <van-field
-        v-model="conagency"
-        name="待办内容"
-        label="待办内容"
-        placeholder="请输入待办内容"
-        type="textarea"
-        required
-        readonly
-        :rules="[{ required: true, message: '请输入待办内容' }]"
-        class="conagency"
-      />
-
-      <!-- 待办日期 -->
-      <van-field
-        v-model="dateagency"
-        is-link
-        readonly
-        label="待办日期"
-        placeholder="请选择"
-        @click="dateshow = true"
-        required
-        :rules="[{ required: true, message: '请输入待办日期' }]"
-      />
-      <van-calendar
-        v-model="dateshow"
-        @confirm="onConfirm"
-        color="#1989fa"
-        :min-date="minDate"
-        :max-date="maxDate"
-      />
-      <!-- 待办时间 -->
-      <van-field
-        v-model="timeagency"
-        is-link
-        readonly
-        label="待办时间"
-        placeholder="请选择"
-        @click="starttimeshow = true"
-        required
-        :rules="[{ required: true, message: '请输入待办时间' }]"
-      />
-      <van-action-sheet v-model="starttimeshow">
-        <van-datetime-picker
-          v-model="currentTime"
-          type="time"
-          title="请选择开始时间"
-          :min-hour="0"
-          :max-hour="23"
-          @cancel="timecancel"
-          @confirm="starttimeconfirm"
-        />
-      </van-action-sheet>
-      <van-action-sheet v-model="endtimeshow">
-        <van-datetime-picker
-          v-model="currentTime"
-          type="time"
-          title="请选择结束时间"
-          :min-hour="0"
-          :max-hour="23"
-          @cancel="timecancel"
-          @confirm="endtimeconfirm"
-        />
-      </van-action-sheet>
-      <!-- 保存 -->
-      <div style="margin: 16px;">
-        <van-button round block type="info" native-type="submit"
-          >保存</van-button
-        >
-      </div>
-    </van-action-sheet>
-    <!-- 点击添加待办触发弹出框结束 -->
     <div class="divider"></div>
   </div>
 </template>
@@ -354,9 +287,10 @@ import {
   findAddGroupNum,
   findTrajectory,
   addOrEditWaitHandle,
-} from '@/api/portrait'
+} from "@/api/portrait";
 // import { getUserInfo } from "@/api/common";
-import StepList from '../../components/StepList.vue'
+import StepList from "../../components/StepList.vue";
+import { param2Obj } from '@/utils/index'
 export default {
   data() {
     return {
@@ -364,23 +298,23 @@ export default {
       show: false,
       // 客户待办的弹出框开始
       usershow: false,
-      conagency: '', // 待办内容
+      conagency: "", // 待办内容
 
       // 待办日期
-      dateagency: '',
+      dateagency: "",
       dateshow: false,
-      minDate: new Date(2021, 0, 1),
-      maxDate: new Date(2021, 12, 31),
+      minDate: new Date(),
+      maxDate: new Date(2030, 12, 31),
       // 待办时间
-      timeagency: '',
+      timeagency: "",
       starttimeshow: false,
       endtimeshow: false,
-      currentTime: '12:00',
-      startTime: '',
-      endTime: '',
+      currentTime: "12:00",
+      startTime: "",
+      endTime: "",
       // 客户待办的弹出框结束
 
-      actions: [{ name: '选项一' }, { name: '选项二' }, { name: '选项三' }],
+      actions: [{ name: "选项一" }, { name: "选项二" }, { name: "选项三" }],
       // active:false,
       // 客户轨迹
       // 待办动态
@@ -388,35 +322,35 @@ export default {
       // 接口开始
       //   externalUserid: "wm2H-nDQAACG5x4XjsM1OoW8UVfpbn3A", // 客户Id
       //   externalUserid: "wmiGuBCgAAgeijfvvpJ62cBfwrB-c4kw",
-      externalUserid: '',
+      externalUserid: "",
       userId: this.$store.state.userId, // 员工Id
       form: {
-        name: '', // 昵称
-        remarkMobiles: '', // 手机号
-        age: '', // 年龄
-        birthday: '', // 客户生日
-        email: '', // 邮箱
-        address: '', // 地址
-        qq: '', // qq
-        position: '', // 职业
-        remarkCorpName: '', // 公司
-        description: '', // 其他描述
+        name: "", // 昵称
+        remarkMobiles: "", // 手机号
+        age: "", // 年龄
+        birthday: "", // 客户生日
+        email: "", // 邮箱
+        address: "", // 地址
+        qq: "", // qq
+        position: "", // 职业
+        remarkCorpName: "", // 公司
+        description: "", // 其他描述
         weTagGroupList: [], // 客户标签合集
       },
       labels: [], // 客户标签
       alllabel: [], // 标签组
       grouplabel: [], // 一组标签
       // 点击测试组标签获取的变量
-      groupId: '',
-      name: '',
-      tagId: '',
+      groupId: "",
+      name: "",
+      tagId: "",
       addTag: [], // 添加的参数
       isactive: false,
-      isActive: 'background:#1989fa;color:#fff',
-      styleActive1: '',
-      styleActive2: '',
-      styleActive3: '',
-      styleActive4: '',
+      isActive: "background:#1989fa;color:#fff",
+      styleActive1: "",
+      styleActive2: "",
+      styleActive3: "",
+      styleActive4: "",
       //   activelabel:true
       staff: [], // 添加的员工
       groupChat: [], // 添加的群聊
@@ -428,13 +362,14 @@ export default {
       loading: false,
       finished: false,
       list: [],
-      styleactive: '',
+      styleactive: "",
       flage: true,
-    }
+      agentId:''
+    };
   },
   watch: {
-    '$store.state.agentConfigStatus'(val) {
-      val && this.init()
+    "$store.state.agentConfigStatus"(val) {
+      val && this.init();
     },
   },
   computed: {
@@ -444,52 +379,70 @@ export default {
     //       })
     //       return this.activelabel
     //   }
+      minHour : () => {
+          let date = new Date() 
+         this.dateagency == this.getTime() ? date.getHours():0
+          return this.minHour
+      }
   },
   methods: {
+       // 时间处理器
+    getTime(data) {
+      const date = new Date(data)
+      // console.log(timer.getFullYear());
+      var Y = date.getFullYear() + '-'
+      var M =
+        (date.getMonth() + 1 < 10
+          ? '0' + (date.getMonth() + 1)
+          : date.getMonth() + 1) + '-'
+      var D =
+        date.getDate() < 10 ? '0' + date.getDate() : date.getDate() + ''
+      return Y + M + D 
+    },
     init() {
-      let _this = this
-      wx.invoke('getContext', {}, function(res) {
-        if (res.err_msg == 'getContext:ok') {
-          let entry = res.entry //返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
+      let _this = this;
+      wx.invoke("getContext", {}, function(res) {
+        if (res.err_msg == "getContext:ok") {
+          let entry = res.entry; //返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
           if (
             ![
-              'single_chat_tools',
-              'group_chat_tools',
-              'contact_profile',
+              "single_chat_tools",
+              "group_chat_tools",
+              "contact_profile",
             ].includes(entry)
           ) {
             // _this.$toast.clear()
-            _this.$toast('入口错误：' + entry)
-            return
+            _this.$toast("入口错误：" + entry);
+            return;
           }
-          wx.invoke('getCurExternalContact', {}, (res) => {
-            if (res.err_msg == 'getCurExternalContact:ok') {
-              _this.externalUserid = res.userId //返回当前外部联系人userId
+          wx.invoke("getCurExternalContact", {}, (res) => {
+            if (res.err_msg == "getCurExternalContact:ok") {
+              _this.externalUserid = res.userId; //返回当前外部联系人userId
               // 获取客户信息
-              _this.findAddaddEmployes()
-              _this.findAddGroupNum()
-              _this.getCustomerInfo()
-              _this.findTrajectory()
+              _this.findAddaddEmployes();
+              _this.findAddGroupNum();
+              _this.getCustomerInfo();
+              _this.findTrajectory();
               getAllTags()
                 .then(({ data }) => {
                   // console.log(data);
-                  _this.alllabel = data
+                  _this.alllabel = data;
                 })
                 .catch((err) => {
-                  console.log(err)
-                })
+                  console.log(err);
+                });
             } else {
               //错误处理
-              _this.$dialog({ message: '进入失败：' + JSON.stringify(res) })
+              _this.$dialog({ message: "进入失败：" + JSON.stringify(res) });
             }
-            _this.$toast.clear()
-          })
+            _this.$toast.clear();
+          });
         } else {
           //错误处理
-          _this.$toast.clear()
-          _this.$dialog({ message: '进入失败：' + JSON.stringify(res) })
+          _this.$toast.clear();
+          _this.$dialog({ message: "进入失败：" + JSON.stringify(res) });
         }
-      })
+      });
     },
     //   客户待办点击保存事件
     saveInfo2() {},
@@ -498,118 +451,120 @@ export default {
       addOrEditWaitHandle(form)
         .then((data) => {
           //  重新获取列表
-          this.findAddaddEmployes()
+          this.findAddaddEmployes();
           if (data.code == 200) {
-            this.$toast.success('保存成功')
-            this.usershow = false
+            this.$toast.success("保存成功");
+            this.usershow = false;
           }
         })
         .catch((err) => {
-          console.log(err)
-        })
+          console.log(err);
+        });
     },
     //   获取轨迹信息
     findTrajectory() {
-      let _this = this
+      let _this = this;
       let form = _this.trajectoryType
         ? {
             trajectoryType: _this.trajectoryType,
           }
-        : ''
+        : "";
       findTrajectory(form)
         .then((data) => {
           //   console.log(data.total);
-          this.list = data.rows
+          this.list = data.rows;
         })
         .catch((err) => {
-          console.log(err)
-        })
+          console.log(err);
+        });
     },
     // 点击信息动态
     information() {
       // console.log(123);
-      ;(this.trajectoryType = 1), this.findTrajectory()
-      this.styleActive1 = 'background:#1989fa;color:#fff'
-      this.styleActive2 = ''
-      this.styleActive3 = ''
-      this.styleActive4 = ''
+      (this.trajectoryType = 1), this.findTrajectory();
+      this.styleActive1 = "background:#1989fa;color:#fff";
+      this.styleActive2 = "";
+      this.styleActive3 = "";
+      this.styleActive4 = "";
     },
     socialContact() {
-      ;(this.trajectoryType = 2), this.findTrajectory()
-      this.styleActive1 = ''
-      this.styleActive2 = 'background:#1989fa;color:#fff'
-      this.styleActive3 = ''
-      this.styleActive4 = ''
+      (this.trajectoryType = 2), this.findTrajectory();
+      this.styleActive1 = "";
+      this.styleActive2 = "background:#1989fa;color:#fff";
+      this.styleActive3 = "";
+      this.styleActive4 = "";
     },
     activity() {
-      this.trajectoryType = 3
-      this.findTrajectory()
-      this.styleActive1 = ''
-      this.styleActive2 = ''
-      this.styleActive3 = 'background:#1989fa;color:#fff'
-      this.styleActive4 = ''
+      this.trajectoryType = 3;
+      this.findTrajectory();
+      this.styleActive1 = "";
+      this.styleActive2 = "";
+      this.styleActive3 = "background:#1989fa;color:#fff";
+      this.styleActive4 = "";
     },
     dealtWith() {
-      ;(this.trajectoryType = 4), this.findTrajectory()
-      this.styleActive1 = ''
-      this.styleActive2 = ''
-      this.styleActive3 = ''
-      this.styleActive4 = 'background:#1989fa;color:#fff'
+      (this.trajectoryType = 4), this.findTrajectory();
+      this.styleActive1 = "";
+      this.styleActive2 = "";
+      this.styleActive3 = "";
+      this.styleActive4 = "background:#1989fa;color:#fff";
     },
     // 添加代办
     // 表单提交
     onSubmit() {
       let form = {
         trajectoryType: 4,
+        userId:this.userId,
         externalUserid: this.externalUserid,
         content: this.conagency,
         createDate: new Date(this.dateagency),
         startTime: new Date(this.startTime),
         endTime: new Date(this.endTime),
         status: 1,
-      }
-      this.addOrEditWaitHandle(form)
+        agentId:this.agentId,
+      };
+      this.addOrEditWaitHandle(form);
       //   表单重置
-      this.conagency = ''
-      this.dateagency = ''
-      this.startTime = ''
-      this.endTime = ''
+      this.conagency = "";
+      this.dateagency = "";
+      this.startTime = "";
+      this.endTime = "";
       // 重新获取列表
-      this.findTrajectory()
+      this.findTrajectory();
     },
     // 待办日期
     formatDate(dateagency) {
       return `${dateagency.getFullYear()}-${dateagency.getMonth() +
-        1}-${dateagency.getDate()}`
+        1}-${dateagency.getDate()}`;
     },
     onConfirm(dateagency) {
-      this.dateshow = false
-      this.dateagency = this.formatDate(dateagency)
+      this.dateshow = false;
+      this.dateagency = this.formatDate(dateagency);
     },
     // 待办时间
     timecancel() {
-      this.starttimeshow = false
+      this.starttimeshow = false;
     },
     starttimeconfirm(value) {
-      this.startTime = value
-      this.starttimeshow = false
-      this.endtimeshow = true
+      this.startTime = value;
+      this.starttimeshow = false;
+      this.endtimeshow = true;
     },
     endtimeconfirm(value) {
-      this.endTime = value
-      this.endtimeshow = false
-      let time = ''
+      this.endTime = value;
+      this.endtimeshow = false;
+      let time = "";
       if (this.startTime > this.endTime) {
-        time = this.startTime
-        this.startTime = this.endTime
-        this.endTime = time
+        time = this.startTime;
+        this.startTime = this.endTime;
+        this.endTime = time;
       }
       // console.log(this.startTime, this.endTime);
-      this.endtimeshow = false
-      this.timeagency = this.formatTime()
+      this.endtimeshow = false;
+      this.timeagency = this.formatTime();
     },
     formatTime() {
-      return `${this.startTime}-${this.endTime}`
+      return `${this.startTime}-${this.endTime}`;
     },
     // 待办动态
     // 点击删除按钮
@@ -622,7 +577,7 @@ export default {
           customerId: this.externalUserid,
           //   type
         },
-      })
+      });
     },
     // 第一层标签
     userLabel(item) {
@@ -633,33 +588,33 @@ export default {
           groupId: item.groupId,
           name: item.name,
           tagId: item.tagId,
-        })
+        });
       } else {
         this.addTag.forEach((item1) => {
           if (item.tagId == item1.tagId) {
-            this.flage = false // 数组里存在该对象
+            this.flage = false; // 数组里存在该对象
           }
-        })
+        });
         // 数组里不存在该对象,则添加
         if (this.flage) {
           this.addTag.push({
             groupId: item.groupId,
             name: item.name,
             tagId: item.tagId,
-          })
+          });
         } else {
           // 数组里存在该对象,则删除
           this.addTag = this.addTag.filter((element) => {
-            return element.name !== item.name
-          })
+            return element.name !== item.name;
+          });
         }
       }
     },
     // 第二层标签
     changeLabel(item) {
-      //   console.log(item.groupId);
-      this.styleactive = item.groupId
-      this.grouplabel = item.weTags
+        // console.log(item);
+      this.styleactive = item.groupId;
+      this.grouplabel = item.weTags;
     },
     saveInfo() {
       // 更新客户画像标签 [{ groupId: this.groupId, name: this.name, tagId: this.tagId }]
@@ -668,28 +623,28 @@ export default {
         addTag: this.addTag,
       })
         .then((res) => {
-          console.log(res)
+        //   console.log(res);
           if (res.code == 200) {
-            this.show = false
+            this.show = false;
             //   重新获取客户标签
-            this.getCustomerInfo()
-            this.$toast.success('保存成功')
+            this.getCustomerInfo();
+            this.$toast.success("保存成功");
           }
 
           // console.log(123);
         })
         .catch((err) => {
-          console.log(err)
-        })
+          console.log(err);
+        });
     },
     // 点击编辑按钮
     labelEdit() {
-      this.show = true
+      this.show = true;
       //   console.log(this.labels);
       if (this.labels) {
         this.labels.forEach((ele) => {
-          this.addTag.push(ele.weTags)
-        })
+          this.addTag.push(ele.weTags[0]);
+        });
       }
       // 获取用户当前的lable,将当前用户的lable与所有lable进行对比，相同的弹框内蓝色展示
       // 弹框内的标签组选中时蓝色展示
@@ -699,30 +654,31 @@ export default {
       findAddaddEmployes(this.externalUserid)
         .then(({ data }) => {
           // console.log(data);
-          this.staff = data
+          this.staff = data;
         })
         .catch((err) => {
-          console.log(err)
-        })
+          console.log(err);
+        });
     },
     findAddGroupNum() {
+      // this.$toast('userId:' + this.userId)
       findAddGroupNum({
         externalUserid: this.externalUserid,
         userId: this.userId,
       })
         .then(({ data }) => {
           //   console.log(data);
-          this.groupChat = data
+          this.groupChat = data;
           //   console.log(this.groupChat);
           this.commonGroup = this.groupChat.filter((ele) => {
             //   debugger
-            return ele.groupMemberNum == 1
-          })
+            return ele.groupMemberNum == 1;
+          });
           //   console.log(this.commonGroup);
         })
         .catch((err) => {
-          console.log(err)
-        })
+          console.log(err);
+        });
     },
 
     getCustomerInfo() {
@@ -732,26 +688,32 @@ export default {
       })
         .then(({ data }) => {
           // console.log(data);
-          this.form = data
-          this.labels = this.form.weTagGroupList
+          this.form = data;
+          this.labels = this.form.weTagGroupList;
           // console.log(this.form);
         })
         .catch((err) => {
-          console.log(err)
-        })
+          console.log(err);
+        });
     },
   },
   created() {
     this.$toast.loading({
-      message: 'loading...',
+      message: "loading...",
       duration: 0,
       forbidClick: true,
-    })
+    });
+    // 获取agentId
+    let query = param2Obj(window.location.search);
+    let hash = param2Obj(window.location.hash);
+    query = Object.assign(query, hash);
+    this.agentId = query.agentId;
+    console.log(agentId);
   },
   components: {
     StepList,
   },
-}
+};
 </script>
 
 <style lang="less" scoped>
@@ -922,7 +884,8 @@ export default {
   line-height: 40px;
   flex-direction: column;
   .van-field__control {
-    background-color: #f2f2f2;
+    // background-color: #f2f2f2;
+    background-color: #F6FBFF;
     padding: 0 10px;
   }
 }
@@ -934,6 +897,6 @@ export default {
   color: #2c8cf0;
 }
 .icon-xingbie {
-    color: pink;
+  color: pink;
 }
 </style>
