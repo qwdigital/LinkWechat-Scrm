@@ -2,7 +2,6 @@
   <div>
     <!-- 头部 -->
     <div class="header">
-      
       <span class="title"> 社群关系 </span>
       <van-icon
         name="cross"
@@ -97,8 +96,12 @@ export default {
       commonGroup: [], // 共同的群聊
       //   externalUserid: "wmiGuBCgAAIH-T9ekaE-Q52N2lKWeInw",
       externalUserid: '',
-      userid: this.$store.state.userId, // 员工Id
     }
+  },
+  computed: {
+    userId() {
+      return this.$store.state.userId // 员工Id
+    },
   },
   created() {
     this.externalUserid = this.$route.query.customerId

@@ -322,8 +322,8 @@ export default {
       // 接口开始
       //   externalUserid: "wm2H-nDQAACG5x4XjsM1OoW8UVfpbn3A", // 客户Id
       //   externalUserid: "wmiGuBCgAAgeijfvvpJ62cBfwrB-c4kw",
-      externalUserid: "",
-      userId: this.$store.state.userId, // 员工Id
+      externalUserid: '',
+      // userId: this.$store.state.userId, // 员工Id
       form: {
         name: "", // 昵称
         remarkMobiles: "", // 手机号
@@ -373,6 +373,9 @@ export default {
     },
   },
   computed: {
+    userId() {
+      return this.$store.state.userId
+    },
     //   activeLabel : () => {
     //       this.addTag.forEach((value) => {
     //           value.name == this.name
@@ -682,6 +685,7 @@ export default {
     },
 
     getCustomerInfo() {
+      this.$toast('userId:' + this.userId)
       getCustomerInfo({
         externalUserid: this.externalUserid,
         userId: this.userId,

@@ -80,7 +80,7 @@ export default {
           ], //必填
           success: (res) => {
             // 回调
-            this.$toast('agentId成功:')
+            // this.$toast('agentId成功:')
             this.$store.state.agentConfigStatus = true
           },
           fail: (res) => {
