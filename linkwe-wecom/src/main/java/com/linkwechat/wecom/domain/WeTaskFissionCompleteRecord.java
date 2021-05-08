@@ -64,7 +64,7 @@ public class WeTaskFissionCompleteRecord {
     private Integer status;
 
     @ApiModelProperty("客户头像")
-    private String avatar;
+    private String customerAvatar;
 
     @Override
     public String toString() {

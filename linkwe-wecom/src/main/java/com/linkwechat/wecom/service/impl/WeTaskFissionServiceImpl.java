@@ -294,7 +294,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
         List<WeTaskFissionCompleteRecord> list = weTaskFissionCompleteRecordService.selectWeTaskFissionCompleteRecordList(wfcr);
         if (CollectionUtils.isEmpty(list)) {
             wfcr.setCreateTime(new Date());
-            wfcr.setAvatar(weChatUserDTO.getAvatar());
+            wfcr.setCustomerAvatar(weChatUserDTO.getAvatar());
             weTaskFissionCompleteRecordService.insertWeTaskFissionCompleteRecord(wfcr);
         }
     }
@@ -369,7 +369,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
             if(CollectionUtil.isNotEmpty(completeRecordList)){
                 completeRecordList.forEach(completeRecord ->{
                     WeCustomer weCustomer = new WeCustomer();
-                    weCustomer.setAvatar(completeRecord.getAvatar());
+                    weCustomer.setAvatar(completeRecord.getCustomerAvatar());
                     weCustomer.setUnionid(completeRecord.getCustomerId());
                     weCustomer.setName(completeRecord.getCustomerName());
                     list.add(weCustomer);
