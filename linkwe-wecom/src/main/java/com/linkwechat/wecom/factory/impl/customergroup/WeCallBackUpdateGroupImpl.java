@@ -63,6 +63,7 @@ public class WeCallBackUpdateGroupImpl extends WeEventStrategy {
      * @param chatId
      */
     private void groupFissionEnterCheck(String chatId){
+        log.info("群裂变客户入群校验>>>>>>>>>>>>>>>>>>>>>start");
         WeGroupCodeActual weGroupCodeActual = groupCodeActualService.selectActualCodeByChatId(chatId);
         //查询群活码id
         Long groupCodeId = Optional.ofNullable(weGroupCodeActual).map(WeGroupCodeActual::getGroupCodeId).orElse(0L);
