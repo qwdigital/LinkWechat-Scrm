@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.constant.WeConstans;
-import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.enums.TaskFissionType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
@@ -54,7 +53,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, WeTaskFission>  implements IWeTaskFissionService {
+public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, WeTaskFission> implements IWeTaskFissionService {
     @Autowired
     private WeTaskFissionMapper weTaskFissionMapper;
     @Autowired
@@ -159,7 +158,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
         int updateResult = weTaskFissionMapper.updateWeTaskFission(weTaskFission);
         if (updateResult > 0) {
             if (CollectionUtils.isNotEmpty(weTaskFission.getTaskFissionStaffs())) {
-                log.info("发起成员信息：【{}】",JSONObject.toJSONString(weTaskFission.getTaskFissionStaffs()));
+                log.info("发起成员信息：【{}】", JSONObject.toJSONString(weTaskFission.getTaskFissionStaffs()));
                 List<WeTaskFissionStaff> staffList = weTaskFissionStaffService.selectWeTaskFissionStaffByTaskId(weTaskFission.getId());
                 if (CollectionUtils.isNotEmpty(staffList)) {
                     weTaskFissionStaffService.deleteWeTaskFissionStaffByIds(staffList.stream().map(WeTaskFissionStaff::getId).toArray(Long[]::new));
@@ -218,7 +217,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
         linkMessageDto.setUrl(pageUrlBuilder.toString());
 
         CustomerMessagePushDto customerMessagePushDto = new CustomerMessagePushDto();
-        if (weTaskFission.getStartTime() != null){
+        if (weTaskFission.getStartTime() != null) {
             customerMessagePushDto.setSettingTime(DateUtil.formatDateTime(weTaskFission.getStartTime()));
         }
         customerMessagePushDto.setLinkMessage(linkMessageDto);
@@ -316,9 +315,9 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                     .eq(WeFlowerCustomerRel::getState, WeConstans.FISSION_PREFIX + weTaskFissionRecord.getId()));
             List<String> eidList = Optional.ofNullable(list).orElseGet(ArrayList::new).stream()
                     .map(WeFlowerCustomerRel::getExternalUserid).collect(Collectors.toList());
-            if (CollectionUtil.isNotEmpty(eidList)){
+            if (CollectionUtil.isNotEmpty(eidList)) {
                 return weCustomerService.listByIds(eidList);
-            }else {
+            } else {
                 return null;
             }
         }
@@ -338,7 +337,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
         Map<String, List<WeTaskFissionCompleteRecord>> completeRecordsMap = weTaskFissionCompleteRecordService.statisticCompleteRecords(taskFissionId, startTime, endTime).parallelStream().filter(Objects::nonNull).collect(Collectors.groupingBy(item -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getCreateTime())));
         Map<String, List<WeTaskFissionRecord>> recordsMap = weTaskFissionRecordService.statisticRecords(taskFissionId, startTime, endTime).parallelStream().filter(Objects::nonNull).collect(Collectors.groupingBy(item -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getCreateTime())));
         List<WeTaskFissionDailyDataVO> dailyDataList = Lists.newArrayList();
-        DateUtils.findDates(startTime, endTime).parallelStream().map(d -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, d))
+        DateUtils.findDates(startTime, endTime).stream().map(d -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, d))
                 .forEach(date -> {
                     WeTaskFissionDailyDataVO v = new WeTaskFissionDailyDataVO();
                     v.setDay(date);
@@ -362,12 +361,12 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
     public WeTaskFissionProgressVO getCustomerTaskProgress(WeTaskFission taskFission, String unionId) {
         long total = taskFission.getFissNum();
         List<WeCustomer> list = new ArrayList<>();
-        if(taskFission.getFissionType() == 1){
+        if (taskFission.getFissionType() == 1) {
             list.addAll(getCustomerListById(unionId, String.valueOf(taskFission.getId())));
-        }else {
+        } else {
             List<WeTaskFissionCompleteRecord> completeRecordList = weTaskFissionCompleteRecordService.getCompleteListByTaskId(taskFission.getId());
-            if(CollectionUtil.isNotEmpty(completeRecordList)){
-                completeRecordList.forEach(completeRecord ->{
+            if (CollectionUtil.isNotEmpty(completeRecordList)) {
+                completeRecordList.forEach(completeRecord -> {
                     WeCustomer weCustomer = new WeCustomer();
                     weCustomer.setAvatar(completeRecord.getCustomerAvatar());
                     weCustomer.setUnionid(completeRecord.getCustomerId());
@@ -381,25 +380,27 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
 
     /**
      * 更新过期任务
+     *
      * @return
      */
     @Override
     public void updateExpiredWeTaskFission() {
-         weTaskFissionMapper.updateExpiredWeTaskFission();
+        weTaskFissionMapper.updateExpiredWeTaskFission();
     }
 
 
     /**
      * 根据群活码id 查询任务列表
+     *
      * @param groupCodeId 群活码id
      * @return
      */
     @Override
     public List<WeTaskFission> getTaskFissionListByGroupCodeId(Long groupCodeId) {
         return this.list(new LambdaQueryWrapper<WeTaskFission>()
-        .eq(WeTaskFission::getFissionTargetId,groupCodeId)
-        .eq(WeTaskFission::getFissionType,2)
-        .eq(WeTaskFission::getFissStatus,1));
+                .eq(WeTaskFission::getFissionTargetId, groupCodeId)
+                .eq(WeTaskFission::getFissionType, 2)
+                .eq(WeTaskFission::getFissStatus, 1));
     }
 
     /*************************************** private functions **************************************/
@@ -453,7 +454,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                     throw new WeComException("生成二维码异常");
                 }
             }
-            return cosConfig.getImgUrlPrefix()+ qrCode;
+            return cosConfig.getImgUrlPrefix() + qrCode;
         } else {
             throw new WeComException("生成二维码异常,用户信息不存在");
         }
