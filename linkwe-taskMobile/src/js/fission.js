@@ -76,7 +76,10 @@ function fissionComplete(openId) {
             userid: userData.openId
         }).then((resp) => {
             if (resp.code === 200 && resp.data) {
-                setQrcode(resp.data)
+                setResult({
+                    qrcode: resp.data,
+                    avatar: resp.avatar
+                })
             } else {
                 setErrorMessage('未获取到可用的二维码')
             }
@@ -90,8 +93,9 @@ function setErrorMessage (message) {
     $('#message').html(message)
 }
 
-function setQrcode (img) {
+function setResult (data) {
     $('#qrcode').css('display', 'block')
     $('#error').css('display', 'none')
-    $('#qrcodeImg').attr('src', img)
+    $('#qrcodeImg').attr('src', data.qrcode)
+    if (data.avatar) $('#avatar').attr('src', data.avatar)
 }
