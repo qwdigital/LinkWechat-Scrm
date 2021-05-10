@@ -6,26 +6,26 @@
         <!-- <span v-if="item.fromInfo.name">{{item.fromInfo.name}}</span> -->
         <div :style="{'color':item.action=='send'?'#199ed8':'#999'}"><span
             v-if="item.fromInfo">{{item.fromInfo.name}}</span> <span
-            :style="{'color':item.action=='send'?'#199ed8':'#999'}">{{parseTime(item.msgtime)}}</span></div>
-        <div v-if="item.msgtype=='text'" class="msgtypetext">
+            :style="{'color':item.action=='send'?'#199ed8':'#999'}">{{parseTime(item.msgTime)}}</span></div>
+        <div v-if="item.msgType=='text'" class="msgtypetext">
           {{item.text.content}}
         </div>
-        <div v-else-if="item.msgtype=='image'" class="msgtypeimg">
+        <div v-else-if="item.msgType=='image'" class="msgtypeimg">
           <img :src="item.image.attachment" @click="showImg(item)">
         </div>
-        <div v-else-if="item.msgtype=='file'" class="msgtypefile" @click="down(item.file)">
+        <div v-else-if="item.msgType=='file'" class="msgtypefile" @click="down(item.file)">
           {{item.file.filename}}
         </div>
-        <div v-else-if="item.msgtype=='voice'" class="msgtypevoice">
+        <div v-else-if="item.msgType=='voice'" class="msgtypevoice">
           <i class="el-icon-microphone" style=" font-size: 40px; color: #199ed8;" @click="playVideo(item)"></i>
         </div>
-        <div v-else-if="item.msgtype=='emotion'" class="msgtypeimg">
+        <div v-else-if="item.msgType=='emotion'" class="msgtypeimg">
           <img :src="item.emotion.attachment" @click="showImg(item)">
         </div>
-        <div v-else-if="item.msgtype=='video'" class="msgtypevideo">
+        <div v-else-if="item.msgType=='video'" class="msgtypevideo">
           <i class="el-icon-video-play" style=" font-size: 40px;  color: #199ed8;" @click="play(item,'video')"></i>
         </div>
-        <div v-else-if="item.msgtype=='location'" class="msgtypecard">
+        <div v-else-if="item.msgType=='location'" class="msgtypecard">
           <div class="card_name">
             <el-amap ref="map" vid="amapDemo" :center="[item.location.longitude, item.location.latitude]" :zoom="zoom"
               class="amap-demo" style="pointer-events: none;">
@@ -34,11 +34,11 @@
           </div>
           <div class="card_foot">{{item.location.address}}</div>
         </div>
-        <div v-else-if="item.msgtype=='weapp'" class="msgtypecard">
+        <div v-else-if="item.msgType=='weapp'" class="msgtypecard">
           <div class="card_name"></div>
           <div class="card_foot">小程序</div>
         </div>
-        <div v-else-if="item.msgtype=='card'" class="msgtypecard ">
+        <div v-else-if="item.msgType=='card'" class="msgtypecard ">
           <div class="card_name">{{item.card.corpname}}</div>
           <div class="card_foot">个人名片</div>
         </div>
