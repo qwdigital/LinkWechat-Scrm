@@ -28,15 +28,6 @@
     width: 70%;
 }
 
-.avatar {
-    margin-left: 15%;
-}
-
-.avatar > img {
-    width: 150px;
-    border-radius: 10px;
-}
-
 .error-content {
     text-align: center;
     font-size: 40px;

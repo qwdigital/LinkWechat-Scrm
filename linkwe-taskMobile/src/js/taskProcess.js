@@ -37,7 +37,7 @@ $(function(){
                                 +"<span class='customersSuccess'>邀请成功</span>"
                             +"</div>"
             })
-            $('.completeNum').text(data.total)
+            $('.completeNum').text(data.completed)
             $('.loseNum').text((data.total - data.completed))
             $('.customersBox').html(htmlStr)
         })
