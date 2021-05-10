@@ -37,7 +37,7 @@ export default {
         rewardImageUrl: '',
         rewardRule: '',
       },
-      rewardImageUrlTemp: '',
+      // rewardImageUrlTemp: '',
       action:
         process.env.VUE_APP_BASE_API +
         window.CONFIG.services.wecom +
@@ -51,7 +51,8 @@ export default {
         fissionTargetId: [{ required: true, message: '请选择群活码', trigger: 'blur' }],
         fissNum: [
           { required: true, message: '请输入数量', trigger: 'blur' },
-          { pattern: /^[1-9]+$/, message: '请输入数字', trigger: 'blur' },
+          // { pattern: /^[1-9]+$/, message: '请输入数字', trigger: 'blur' },
+          { pattern: /^[1-9]\d*$/, message: '请输入数字', trigger: 'blur' },
         ],
         dateRange: [
           { required: true, message: '时间不可为空', trigger: 'blur' },
@@ -244,8 +245,7 @@ export default {
     },
     handleAvatarSuccess(res, file) {
       //   this.rewardImageUrlTemp = URL.createObjectURL(file.raw) //预览
-      this.rewardImageUrlTemp = this.groupForm.rewardImageUrl =
-        res.data.rewardImageUrl
+      this.groupForm.rewardImageUrl = res.data.rewardImageUrl
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === 'image/jpeg'
@@ -433,8 +433,8 @@ export default {
             :before-upload="beforeAvatarUpload"
           >
             <img
-              v-if="rewardImageUrlTemp"
-              :src="rewardImageUrlTemp"
+              v-if="groupForm.rewardImageUrl"
+              :src="groupForm.rewardImageUrl"
               class="avatar"
             />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
