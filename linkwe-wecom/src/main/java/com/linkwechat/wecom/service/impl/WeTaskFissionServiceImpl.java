@@ -287,8 +287,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
         WeTaskFissionCompleteRecord wfcr = new WeTaskFissionCompleteRecord();
         wfcr.setTaskFissionId(taskFissionId);
         wfcr.setFissionRecordId(taskFissionRecordId);
-        String userId = StringUtils.isBlank(weChatUserDTO.getUserid()) ? weChatUserDTO.getUnionid() : weChatUserDTO.getUserid();
-        wfcr.setCustomerId(userId);
+        wfcr.setCustomerId(weChatUserDTO.getUnionid());
         wfcr.setCustomerName(weChatUserDTO.getName());
         List<WeTaskFissionCompleteRecord> list = weTaskFissionCompleteRecordService.selectWeTaskFissionCompleteRecordList(wfcr);
         if (CollectionUtils.isEmpty(list)) {
