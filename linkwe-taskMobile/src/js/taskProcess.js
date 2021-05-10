@@ -38,7 +38,8 @@ $(function(){
                             +"</div>"
             })
             $('.completeNum').text(data.completed)
-            $('.loseNum').text((data.total - data.completed))
+            const left = (data.total - data.completed) < 0 ? 0 : (data.total - data.completed)
+            $('.loseNum').text(left)
             $('.customersBox').html(htmlStr)
         })
   getReward({fissionId,eid})
