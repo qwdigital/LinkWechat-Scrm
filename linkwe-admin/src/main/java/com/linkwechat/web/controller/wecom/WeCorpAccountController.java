@@ -1,12 +1,16 @@
 package com.linkwechat.web.controller.wecom;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.annotation.Log;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
-import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,84 +25,76 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/wecom/corp")
+@Api("企业id配置接口")
 public class WeCorpAccountController extends BaseController
 {
     @Autowired
     private IWeCorpAccountService weCorpAccountService;
 
-    /**
-     * 查询企业id相关配置列表
-     */
+
     //  @PreAuthorize("@ss.hasPermi('wechat:corp:list')")
     @GetMapping("/list")
+    @ApiOperation("查询企业id相关配置列表")
     public TableDataInfo list(WeCorpAccount weCorpAccount)
     {
         startPage();
-        List<WeCorpAccount> list = weCorpAccountService.selectWeCorpAccountList(weCorpAccount);
+        List<WeCorpAccount> list = weCorpAccountService.list(new LambdaQueryWrapper<WeCorpAccount>()
+        .eq(WeCorpAccount::getDelFlag,Constants.NORMAL_CODE)
+        .like(WeCorpAccount::getCompanyName,weCorpAccount.getCompanyName()));
         return getDataTable(list);
     }
 
 
-    /**
-     * 获取企业id相关配置详细信息
-     */
-    //   @PreAuthorize("@ss.hasPermi('wechat:corp:query')")
-    @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("id") Long id)
-    {
-        return AjaxResult.success(weCorpAccountService.selectWeCorpAccountById(id));
-    }
 
-    /**
-     * 新增企业id相关配置
-     */
+
     //   @PreAuthorize("@ss.hasPermi('wechat:corp:add')")
     @Log(title = "新增企业id相关配置", businessType = BusinessType.INSERT)
     @PostMapping
+    @ApiOperation("新增企业id相关配置")
     public AjaxResult add(@Validated @RequestBody WeCorpAccount weCorpAccount)
     {
-        return toAjax(weCorpAccountService.insertWeCorpAccount(weCorpAccount));
+        weCorpAccountService.save(weCorpAccount);
+
+        return AjaxResult.success();
     }
 
-    /**
-     * 修改企业id相关配置
-     */
     //   @PreAuthorize("@ss.hasPermi('wechat:corp:edit')")
     @Log(title = "修改企业id相关配置", businessType = BusinessType.UPDATE)
     @PutMapping
+    @ApiOperation("修改企业id相关配置")
     public AjaxResult edit(@Validated @RequestBody WeCorpAccount weCorpAccount)
     {
-        return toAjax(weCorpAccountService.updateWeCorpAccount(weCorpAccount));
+        weCorpAccountService.updateById(weCorpAccount);
+        return AjaxResult.success();
     }
 
-    /**
-     * 启用有效企业微信账号
-     */
+
     //  @PreAuthorize("@ss.hasPermi('wechat:corp:startVailWeCorpAccount')")
     @Log(title = "启用有效企业微信账号", businessType = BusinessType.DELETE)
 	@PutMapping("/startVailWeCorpAccount/{corpId}")
+    @ApiOperation("启用有效企业微信账号")
     public AjaxResult startWeCorpAccount(@PathVariable String corpId)
     {
         return toAjax(weCorpAccountService.startVailWeCorpAccount(corpId));
     }
 
-    /**
-     * 客户流失通知开关
-     */
+
     //   @PreAuthorize("@ss.hasPermi('wechat:corp:startCustomerChurnNoticeSwitch')")
     @Log(title = "客户流失通知开关", businessType = BusinessType.UPDATE)
     @PutMapping("/startCustomerChurnNoticeSwitch/{status}")
+    @ApiOperation("客户流失通知开关")
     public AjaxResult startCustomerChurnNoticeSwitch(@PathVariable String status)
     {
-        return toAjax(weCorpAccountService.startCustomerChurnNoticeSwitch(status));
+        weCorpAccountService.startCustomerChurnNoticeSwitch(status);
+
+        return AjaxResult.success();
     }
 
-    /**
-     * 客户流失通知开关查询
-     */
+
     //   @PreAuthorize("@ss.hasPermi('wechat:corp:getCustomerChurnNoticeSwitch')")
     @Log(title = "客户流失通知开关查询", businessType = BusinessType.OTHER)
     @GetMapping("/getCustomerChurnNoticeSwitch")
+    @ApiOperation("客户流失通知开关查询")
     public AjaxResult getCustomerChurnNoticeSwitch()
     {
         return AjaxResult.success("操作成功",weCorpAccountService.getCustomerChurnNoticeSwitch());

@@ -163,7 +163,7 @@ public class Constants
     public static final String DEFAULT_WECOME_CORP_ADMIN="CROP_ADMIN_ROLE";
 
     /**完成待办*/
-    public static final String HANDLE_SUCCESS="1";
+    public static final String HANDLE_SUCCESS="3";
 
 
 

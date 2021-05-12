@@ -20,6 +20,7 @@ import com.linkwechat.wecom.service.IWeGroupService;
 import com.linkwechat.wecom.service.IWeUserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -102,7 +103,7 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
     {
 
 
-        if(this.save(weUser)){
+        if(this.insertWeUserNoToWeCom(weUser) > 0){
             weUserClient.createUser(
                     weUser.transformWeUserDto()
             );
@@ -215,6 +216,7 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper,WeUser> implemen
      */
     @Override
     @Transactional
+    @Async
     public void synchWeUser(){
 
         //同步部门

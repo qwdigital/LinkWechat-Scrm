@@ -20,7 +20,7 @@ public interface WeCustomerMessageMapper extends BaseMapper<WeCustomerMessage> {
      * @param actualSend 实际发送消息数（客户对应多少人 客户群对应多个群）
      * @return int
      */
-    int updateWeCustomerMessageActualSend(@Param("messageId") Long messageId,@Param("actualSend") Integer actualSend);
+    int updateWeCustomerMessageActualSend(@Param("messageId") Long messageId, @Param("actualSend") Integer actualSend);
 
     /**
      * 更新消息发送状态
@@ -28,6 +28,6 @@ public interface WeCustomerMessageMapper extends BaseMapper<WeCustomerMessage> {
      * @param status 消息发送状态 0 未发送  1 已发送
      * @return int
      */
-    int updateWeCustomerMessageCheckStatusById(@Param("messageId") Long messageId,@Param("status") String status);
+    int updateWeCustomerMessageCheckStatusById(@Param("messageId") Long messageId, @Param("status") String status);
 
 }

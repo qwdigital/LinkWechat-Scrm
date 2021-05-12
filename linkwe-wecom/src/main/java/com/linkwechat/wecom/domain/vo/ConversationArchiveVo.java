@@ -123,6 +123,9 @@ public class ConversationArchiveVo {
     @ApiModel
     @Data
     private class Content{
+        @ApiModelProperty("文件路径")
+        private String attachment;
+
         @ApiModelProperty("文本消息内容")
         private String content;
 

@@ -49,7 +49,7 @@ public interface WeCustomerClient {
      * @return
      */
     @Request(url = "/externalcontact/batch/get_by_user", type = "POST")
-    ExternalUserList getByUser(@DataObject Map<String,Object> query);
+    ExternalUserList getByUser(@DataObject Map<String, Object> query);
 
 
     /**
@@ -87,7 +87,7 @@ public interface WeCustomerClient {
      */
     @Request(url = "/externalcontact/unionid_to_external_userid",
             type = "POST")
-    ExternalUserDetail unionidToExternalUserid(@DataObject ExternalUserDetail.ExternalContact  unionid);
+    ExternalUserDetail unionidToExternalUserid(@DataObject ExternalUserDetail.ExternalContact unionid);
 
 
     /**

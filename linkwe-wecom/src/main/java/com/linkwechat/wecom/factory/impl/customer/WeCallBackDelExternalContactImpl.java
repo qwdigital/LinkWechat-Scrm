@@ -36,7 +36,7 @@ public class WeCallBackDelExternalContactImpl extends WeEventStrategy {
     @Override
     public void eventHandle(WxCpXmlMessageVO message) {
         if (message.getExternalUserId() != null) {
-            weCustomerService.deleteCustomersByEid(message.getExternalUserId());
+            //weCustomerService.deleteCustomersByEid(message.getExternalUserId());
             weFlowerCustomerRelService.deleteFollowUser(message.getUserId(), message.getExternalUserId());
 
             //增加敏感行为记录，员工删除客户

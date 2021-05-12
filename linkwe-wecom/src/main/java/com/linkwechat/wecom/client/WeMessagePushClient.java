@@ -24,7 +24,7 @@ public interface WeMessagePushClient {
     @Request(url = "/message/send",
             type = "POST"
     )
-    WeMessagePushResultDto sendMessageToUser(@DataObject WeMessagePushDto weMessagePushDto,@Header("agentId") String agentId);
+    WeMessagePushResultDto sendMessageToUser(@DataObject WeMessagePushDto weMessagePushDto, @Header("agentId") String agentId);
 
     /**
      * 应用推送消息

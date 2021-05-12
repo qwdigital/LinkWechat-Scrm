@@ -33,7 +33,7 @@ public interface WeAccessTokenClient {
      */
     @Request(url = "/service/get_provider_token",
     type="POST")
-    WeAccessTokenDtoDto getProviderToken(@Body("corpid") String corpid,@Body("provider_secret") String provider_secret);
+    WeAccessTokenDtoDto getProviderToken(@Body("corpid") String corpid, @Body("provider_secret") String provider_secret);
 
 
     /**

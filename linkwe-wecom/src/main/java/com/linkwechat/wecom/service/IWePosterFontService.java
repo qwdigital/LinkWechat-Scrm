@@ -18,6 +18,6 @@ public interface IWePosterFontService extends IService<WePosterFont> {
      * @param fontStyle 字体类型 0 通常 1 粗体 2 斜体
      * @return
      */
-    public Font getFont(Long id,Integer size,Integer fontStyle);
+    public Font getFont(Long id, Integer size, Integer fontStyle);
 
 }

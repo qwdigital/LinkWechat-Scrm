@@ -60,6 +60,12 @@ public class WeTaskFissionCompleteRecord {
     @ApiModelProperty("创建时间")
     private Date createTime = new Date();
 
+    @ApiModelProperty("状态 0 有效 1 无效")
+    private Integer status;
+
+    @ApiModelProperty("客户头像")
+    private String customerAvatar;
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)

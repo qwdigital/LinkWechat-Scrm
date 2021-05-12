@@ -33,5 +33,5 @@ public interface WeAppClient {
      * @return
      */
     @Request(url = "/agent/set",type = "POST")
-    WeResultDto updateAgentById(@DataObject WeAppDetailDto weAppDetailDto,@Header("agentid")String agentid);
+    WeResultDto updateAgentById(@DataObject WeAppDetailDto weAppDetailDto, @Header("agentid") String agentid);
 }

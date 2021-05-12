@@ -47,7 +47,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="departmentStr != null  and departmentStr != ''  "> and FIND_IN_SET(#{departmentStr},department)</if>
             <if test="position != null  and position != ''"> and position = #{position}</if>
             <if test="isLeaderInDept != null "> and is_leader_in_dept = #{isLeaderInDept}</if>
-            <if test="joinTime != null "> and join_time = #{joinTime}</if>
+            <if test="beginTime != null and beginTime !='' and endTime !=null and endTime !=''">
+                and  DATE_FORMAT(join_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
+            </if>
             <if test="idCard != null  and idCard != ''"> and id_card = #{idCard}</if>
             <if test="qqAccount != null  and qqAccount != ''"> and qq_account = #{qqAccount}</if>
             <if test="telephone != null  and telephone != ''"> and telephone = #{telephone}</if>

@@ -1,4 +1,4 @@
-package ${packageName}.service;
+package ${packageName}.wecom.service;
 
 import ${packageName}.domain.${ClassName};
 import com.baomidou.mybatisplus.extension.service.IService;

@@ -12,4 +12,5 @@ public class WeChatUserDTO {
     private String userid;
     private String unionid;
     private String name;
+    private String avatar;
 }

@@ -32,6 +32,6 @@ public interface IWeCustomerMessagePushService {
      * @param endTime 结束时间
      * @return {@link CustomerMessagePushVo}s
      */
-    public List<CustomerMessagePushVo> customerMessagePushs(String sender,String content,String pushType,String beginTime,String endTime);
+    public List<CustomerMessagePushVo> customerMessagePushs(String sender, String content, String pushType, String beginTime, String endTime);
 
 }

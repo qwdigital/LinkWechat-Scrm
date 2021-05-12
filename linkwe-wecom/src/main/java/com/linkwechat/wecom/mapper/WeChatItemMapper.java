@@ -39,5 +39,5 @@ public interface WeChatItemMapper extends BaseMapper<WeChatItem> {
      * @param keyword 关键词
      * @return
      */
-    public List<WeChatSideVo> findChatItems(@Param("sideId") Long sideId, @Param("keyword") String keyword,@Param("mediaType") String mediaType,@Param("userId") String userId);
+    public List<WeChatSideVo> findChatItems(@Param("sideId") Long sideId, @Param("keyword") String keyword, @Param("mediaType") String mediaType, @Param("userId") String userId);
 }

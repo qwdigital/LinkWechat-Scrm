@@ -129,9 +129,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                    AND date_format(wfcr.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
              </if>
 
-            <if test="status != null and status !=''">
-                AND wfcr.status = #{status}
-            </if>
+
              <if test="tagIds != null and tagIds !=''">
                    <if test="tagIds.indexOf(',') != -1">
                        AND  wt.tag_id in
@@ -154,7 +152,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                     OR wu.department=#{departmentIds}
                 </if>
             </if>
-
              <if test="status !=null and status !=''">
                   AND wfcr.status=#{status}
              </if>
@@ -317,7 +314,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                   wfcr.remark_corp_name,
                   wfcr.description,
                   wfcr.id as flowerCustomerRelId,
-                  wfcr.user_id
+                  wfcr.user_id,
+                  wc.avatar,
+                  wfcr.external_userid,
+                  wc.gender
             FROM
                 we_customer wc
             LEFT JOIN we_flower_customer_rel wfcr on wc.external_userid=wfcr.external_userid

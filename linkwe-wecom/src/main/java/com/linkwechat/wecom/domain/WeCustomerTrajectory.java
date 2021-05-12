@@ -36,6 +36,15 @@ public class WeCustomerTrajectory {
     //处理结束时间
     private Time endTime;
 
+
+
     //0:正常;1:删除;2:完成
     private String status;
+
+    //当前员工的id
+    private String userId;
+
+
+    //当前应用的id
+    private String agentId;
 }

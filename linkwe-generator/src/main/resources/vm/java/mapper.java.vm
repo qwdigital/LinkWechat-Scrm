@@ -1,4 +1,4 @@
-package ${packageName}.mapper;
+package ${packageName}.wecom.mapper;
 
 import ${packageName}.domain.${ClassName};
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

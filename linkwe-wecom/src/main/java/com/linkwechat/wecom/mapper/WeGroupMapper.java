@@ -29,5 +29,5 @@ public interface WeGroupMapper extends BaseMapper<WeGroup> {
 //
 //    int batchInsetWeGroup(@Param("weGroups") List<WeGroup> weGroups);
 
-    List<WeCustomerAddGroup> findWeGroupByCustomer(@Param("userId") String userId,@Param("externalUserid") String externalUserid);
+    List<WeCustomerAddGroup> findWeGroupByCustomer(@Param("userId") String userId, @Param("externalUserid") String externalUserid);
 }

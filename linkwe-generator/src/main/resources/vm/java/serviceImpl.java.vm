@@ -1,4 +1,4 @@
-package ${packageName}.service.impl;
+package ${packageName}.wecom.service.impl;
 
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;

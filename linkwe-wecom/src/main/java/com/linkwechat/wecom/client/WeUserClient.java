@@ -59,7 +59,7 @@ public interface WeUserClient {
      * @return
      */
     @Request(url="/user/list")
-    WeUserListDto  list(@Query("department_id") Long departmentId,@Query("fetch_child") Integer fetchChild);
+    WeUserListDto  list(@Query("department_id") Long departmentId, @Query("fetch_child") Integer fetchChild);
 
 
     /**
@@ -100,5 +100,5 @@ public interface WeUserClient {
      * @return
      */
     @Request(url = "/user/getuserinfo")
-    WeUserInfoDto  getuserinfo(@Query("code")String code,@Header("agentId")String agentId);
+    WeUserInfoDto  getuserinfo(@Query("code") String code, @Header("agentId") String agentId);
 }

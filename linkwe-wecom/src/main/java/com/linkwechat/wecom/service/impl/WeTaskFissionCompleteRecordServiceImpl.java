@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 裂变任务完成记录Service业务层处理
@@ -95,5 +97,24 @@ public class WeTaskFissionCompleteRecordServiceImpl extends ServiceImpl<WeTaskFi
                 between(WeTaskFissionCompleteRecord::getCreateTime, startTime, endTime).
                 orderByAsc(WeTaskFissionCompleteRecord::getCreateTime);
         return weTaskFissionCompleteRecordMapper.selectList(wrapper);
+    }
+
+    /**
+     * 根据任务id查询裂变任务完成记录列表
+     * @param taskFissionIds 任务id
+     * @return
+     */
+    @Override
+    public List<WeTaskFissionCompleteRecord> getListByTaskIds(Set<Long> taskFissionIds) {
+        return this.list(new LambdaQueryWrapper<WeTaskFissionCompleteRecord>()
+        .in(WeTaskFissionCompleteRecord::getTaskFissionId,taskFissionIds)
+        .eq(WeTaskFissionCompleteRecord::getStatus,1));
+    }
+
+    @Override
+    public List<WeTaskFissionCompleteRecord> getCompleteListByTaskId(Long taskFissionId) {
+        return this.list(new LambdaQueryWrapper<WeTaskFissionCompleteRecord>()
+                .eq(WeTaskFissionCompleteRecord::getTaskFissionId,taskFissionId)
+                .eq(WeTaskFissionCompleteRecord::getStatus,0));
     }
 }

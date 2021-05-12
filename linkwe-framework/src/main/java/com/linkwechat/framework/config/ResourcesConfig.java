@@ -24,6 +24,8 @@ public class ResourcesConfig implements WebMvcConfigurer
     @Autowired
     private RepeatSubmitInterceptor repeatSubmitInterceptor;
 
+
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry)
     {
@@ -63,6 +65,7 @@ public class ResourcesConfig implements WebMvcConfigurer
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
+
 
 
 

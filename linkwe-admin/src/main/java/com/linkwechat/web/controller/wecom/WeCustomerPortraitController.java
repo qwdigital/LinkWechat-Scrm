@@ -51,14 +51,14 @@ public class WeCustomerPortraitController extends BaseController {
     /**
      * 根据客户id和当前企业员工id获取客户详细信息
      * @param externalUserid
-     * @param userid
+     * @param userId
      * @return
      */
     @GetMapping(value = "/findWeCustomerInfo")
-    public AjaxResult findWeCustomerInfo(String externalUserid, String userid) throws Exception {
+    public AjaxResult findWeCustomerInfo(String externalUserid, String userId) throws Exception {
 
         return AjaxResult.success(
-                iWeCustomerService.findCustomerByOperUseridAndCustomerId(externalUserid,userid)
+                iWeCustomerService.findCustomerByOperUseridAndCustomerId(externalUserid,userId)
         );
     }
 
@@ -70,7 +70,6 @@ public class WeCustomerPortraitController extends BaseController {
      */
     @PostMapping(value = "/updateWeCustomerInfo")
     public AjaxResult updateWeCustomerInfo(@RequestBody WeCustomerPortrait weCustomerPortrait){
-
 
 
 
@@ -211,6 +210,8 @@ public class WeCustomerPortraitController extends BaseController {
                 .build());
         return AjaxResult.success();
     }
+
+
 
 
 

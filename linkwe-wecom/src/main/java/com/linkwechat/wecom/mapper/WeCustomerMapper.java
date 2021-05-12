@@ -87,7 +87,7 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
      * @param userid
      * @return
      */
-    WeCustomerPortrait findCustomerByOperUseridAndCustomerId(@Param("externalUserid") String externalUserid,@Param("userid") String userid);
+    WeCustomerPortrait findCustomerByOperUseridAndCustomerId(@Param("externalUserid") String externalUserid, @Param("userid") String userid);
 
 
     /**
@@ -96,7 +96,7 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
      * @param userid 员工id
      * @return
      */
-    WeCustomerSocialConn countSocialConn(@Param("externalUserid")String externalUserid,@Param("userid")String userid);
+    WeCustomerSocialConn countSocialConn(@Param("externalUserid") String externalUserid, @Param("userid") String userid);
 
 
 }
