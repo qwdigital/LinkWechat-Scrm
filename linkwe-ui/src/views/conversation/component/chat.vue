@@ -14,7 +14,7 @@
           <img :src="item.image.attachment" @click="showImg(item)">
         </div>
         <div v-else-if="item.msgType=='file'" class="msgtypefile" @click="down(item.file)">
-          {{item.file.filename}}
+          {{item.file.fileName}}
         </div>
         <div v-else-if="item.msgType=='voice'" class="msgtypevoice">
           <i class="el-icon-microphone" style=" font-size: 40px; color: #199ed8;" @click="playVideo(item)"></i>
@@ -35,11 +35,11 @@
           <div class="card_foot">{{item.location.address}}</div>
         </div>
         <div v-else-if="item.msgType=='weapp'" class="msgtypecard">
-          <div class="card_name"></div>
+          <div class="card_name">{{item.weApp.title}}</div>
           <div class="card_foot">小程序</div>
         </div>
         <div v-else-if="item.msgType=='card'" class="msgtypecard ">
-          <div class="card_name">{{item.card.corpname}}</div>
+          <div class="card_name">{{item.card.corpName}}</div>
           <div class="card_foot">个人名片</div>
         </div>
       </li>
