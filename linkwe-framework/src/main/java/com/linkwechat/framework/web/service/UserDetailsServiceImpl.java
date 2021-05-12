@@ -1,20 +1,11 @@
 package com.linkwechat.framework.web.service;
 
-import cn.hutool.core.util.ArrayUtil;
-import com.linkwechat.common.config.RuoYiConfig;
-import com.linkwechat.common.constant.Constants;
-import com.linkwechat.common.core.domain.entity.SysRole;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.UserStatus;
 import com.linkwechat.common.exception.BaseException;
-import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.system.mapper.SysRoleMapper;
 import com.linkwechat.system.service.ISysUserService;
-import com.linkwechat.common.core.domain.entity.WeCorpAccount;
-import com.linkwechat.wecom.service.IWeCorpAccountService;
-import com.linkwechat.wecom.service.IWeUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.stream.Collectors;
 
 /**
  * 用户验证处理
@@ -41,19 +30,8 @@ public class UserDetailsServiceImpl implements UserDetailsService
     @Autowired
     private SysPermissionService permissionService;
 
-    @Autowired
-    private IWeUserService iWeUserService;
 
 
-    @Autowired
-    private RuoYiConfig ruoYiConfig;
-
-    @Autowired
-    private SysRoleMapper roleMapper;
-
-
-    @Autowired
-    private IWeCorpAccountService iWeCorpAccountService;
 
 
     @Override
@@ -62,6 +40,9 @@ public class UserDetailsServiceImpl implements UserDetailsService
         SysUser user = userService.selectUserByUserName(username);
         if (StringUtils.isNull(user))
         {
+
+            log.info("登录用户：{} 不存在.", username);
+            throw new BaseException("对不起，您的账号：" + username + " 不存在");
 //            //企业管理登录
 //            //查询企业管理相关账号
 //            WeCorpAccount weCorpByAccount = iWeCorpAccountService.findWeCorpByAccount(username);
@@ -103,9 +84,9 @@ public class UserDetailsServiceImpl implements UserDetailsService
 //                        .password(SecurityUtils.encryptPassword(ruoYiConfig.getWeUserDefaultPwd()))
 //                        .build();
 //            }
-            userService.insertUser(
-                    user
-            );
+//            userService.insertUser(
+//                    user
+//            );
         }
         else if (UserStatus.DELETED.getCode().equals(user.getDelFlag()))
         {
