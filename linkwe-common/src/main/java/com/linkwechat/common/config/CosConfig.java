@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
  * @author Kewen
  */
 @Component
-@ConfigurationProperties(prefix = "cos")
+//@ConfigurationProperties(prefix = "cos")
 @Data
 public class CosConfig {
 

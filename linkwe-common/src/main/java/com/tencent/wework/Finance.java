@@ -1,6 +1,8 @@
 package com.tencent.wework;
 
 
+import com.linkwechat.common.utils.OsUtils;
+
 public class Finance {
     public native static long NewSdk();
 
@@ -111,7 +113,7 @@ public class Finance {
     public native static int IsMediaDataFinish(long mediaData);
 
     static {
-        if (isWindows()) {
+        if (OsUtils.isWindows()) {
             System.loadLibrary("libeay32");
             System.loadLibrary("libprotobuf");
             System.loadLibrary("ssleay32");
@@ -123,9 +125,5 @@ public class Finance {
 
     }
 
-    public static boolean isWindows() {
-        String osName = System.getProperties().getProperty("os.name");
-        System.out.println("current system is " + osName);
-        return osName.toUpperCase().indexOf("WINDOWS") != -1;
-    }
+
 }

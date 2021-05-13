@@ -8,6 +8,8 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.file.FileUtils;
+import com.linkwechat.framework.web.domain.server.SysFile;
+import com.linkwechat.framework.web.service.FileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,10 @@ public class CommonController {
 
     @Autowired
     private CosConfig cosConfig;
+
+
+    @Autowired
+    private FileService fileService;
 
     /**
      * 通用下载请求
@@ -117,11 +123,14 @@ public class CommonController {
     public AjaxResult uploadFile2Cos(MultipartFile file) throws Exception {
         try {
 
-            String fileName = FileUploadUtils.upload2Cos(file, cosConfig);
+            SysFile sysFile
+                    = fileService.upload(file);
+
+//            String fileName = FileUploadUtils.upload2Cos(file, cosConfig);
 
             AjaxResult ajax = AjaxResult.success();
-            ajax.put("fileName", fileName);
-            ajax.put("url", url(fileName));
+            ajax.put("fileName", sysFile.getFileName());
+            ajax.put("url", sysFile.getImgUrlPrefix()+sysFile.getFileName());
             return ajax;
         } catch (Exception e) {
             return AjaxResult.error(e.getMessage());
@@ -129,8 +138,8 @@ public class CommonController {
     }
 
 
-    public  String url(String fileName){
-        return "https://link-wechat-1251309172.cos.ap-nanjing.myqcloud.com/"+fileName;
-    }
+//    public  String url(String fileName){
+//        return "https://link-wechat-1251309172.cos.ap-nanjing.myqcloud.com/"+fileName;
+//    }
 
 }
