@@ -149,8 +149,12 @@ public class WeMaterialController extends BaseController {
     @PostMapping("/uploadimg")
     @ApiOperation("上传素材图片")
     public AjaxResult<WeMediaDto> uploadImg(MultipartFile file){
-        WeMediaDto weMediaDto = materialService.uploadImg(file);
-        weMediaDto.setFileName(file.getResource().getFilename());
+         WeMediaDto weMediaDto=new WeMediaDto();
+//        WeMediaDto weMediaDto = materialService.uploadImg(file);
+//        weMediaDto.setFileName(file.getResource().getFilename());
+        WeMaterialFileVO weMaterialFileVO = materialService.uploadWeMaterialFile(file, MediaType.IMAGE.getType());
+        weMediaDto.setFileName(weMaterialFileVO.getMaterialName());
+        weMediaDto.setUrl(weMaterialFileVO.getMaterialUrl());
         return AjaxResult.success(weMediaDto);
     }
 
