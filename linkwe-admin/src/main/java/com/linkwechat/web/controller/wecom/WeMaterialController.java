@@ -52,12 +52,12 @@ public class WeMaterialController extends BaseController {
         List<WeMaterial> list;
         if(StringUtils.isNotBlank(mediaType) && mediaType.equals(MediaType.POSTER.getType())){
             list = wePosterService.list(StringUtils.isBlank(categoryId)?null:Long.valueOf(categoryId),search).stream().map(wePoster -> {
-                WeMaterial weMaterial = new WeMaterial();
-                weMaterial.setMaterialName(wePoster.getTitle());
-                weMaterial.setMaterialUrl(wePoster.getSampleImgPath());
-                weMaterial.setCategoryId(wePoster.getCategoryId());
-                weMaterial.setId(wePoster.getId());
-                return weMaterial;
+                    WeMaterial weMaterial = new WeMaterial();
+                    weMaterial.setMaterialName(wePoster.getTitle());
+                    weMaterial.setMaterialUrl(wePoster.getSampleImgPath());
+                    weMaterial.setCategoryId(wePoster.getCategoryId());
+                    weMaterial.setId(wePoster.getId());
+                    return weMaterial;
             }).collect(Collectors.toList());
         }else {
             list = materialService.findWeMaterials(categoryId, search,mediaType);
@@ -122,17 +122,27 @@ public class WeMaterialController extends BaseController {
         return AjaxResult.success();
     }
 
+//    //@PreAuthorize("@ss.hasPermi('wechat:material:temporaryMaterialMediaId')")
+//    @Log(title = "获取素材media_id", businessType = BusinessType.OTHER)
+//    @PostMapping("/temporaryMaterialMediaId")
+//    @ApiOperation("获取素材media_id")
+//    public AjaxResult temporaryMaterialMediaId(@RequestBody TemporaryMaterialDto temporaryMaterialDto){
+//        WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(temporaryMaterialDto.getUrl(),
+//                temporaryMaterialDto.getType()
+//                ,temporaryMaterialDto.getName());
+//        return AjaxResult.success(weMediaDto);
+//    }
+
     //@PreAuthorize("@ss.hasPermi('wechat:material:temporaryMaterialMediaId')")
     @Log(title = "获取素材media_id", businessType = BusinessType.OTHER)
-    @PostMapping("/temporaryMaterialMediaId")
+    @GetMapping("/temporaryMaterialMediaId")
     @ApiOperation("获取素材media_id")
-    public AjaxResult temporaryMaterialMediaId(@RequestBody TemporaryMaterialDto temporaryMaterialDto){
-        WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(temporaryMaterialDto.getUrl(),
-                temporaryMaterialDto.getType()
-                ,temporaryMaterialDto.getName());
+    public AjaxResult temporaryMaterialMediaId(String url,String type,String name){
+        WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(url,
+                type
+                ,name);
         return AjaxResult.success(weMediaDto);
     }
-
 
 
     @Log(title = "上传素材图片", businessType = BusinessType.OTHER)

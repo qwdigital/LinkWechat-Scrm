@@ -20,7 +20,7 @@ public interface IWeChatCollectionService extends IService<WeChatCollection> {
      * @param userId 用户id
      * @return 结果
      */
-    public int addCollection( Long materialId, String userId);
+    public boolean addCollection( Long materialId, String userId);
 
     /**
      * 取消收藏

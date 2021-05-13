@@ -27,18 +27,19 @@ public class WeChatCollectionServiceImpl extends ServiceImpl<WeChatCollectionMap
 
 
     @Override
-    public int addCollection(Long materialId, String userId) {
+    public boolean addCollection(Long materialId, String userId) {
         QueryWrapper<WeChatCollection> wrapper = new QueryWrapper<>();
         wrapper.eq("material_id",materialId).eq("user_id",userId);
         WeChatCollection queryCollection = weChatCollectionMapper.selectOne(wrapper);
         if(null!=queryCollection){
-            throw new CustomException("你已收藏");
+            return false;
         }
         WeChatCollection chatCollection=new WeChatCollection();
         chatCollection.setCollectionId(SnowFlakeUtil.nextId());
         chatCollection.setMaterialId(materialId);
         chatCollection.setUserId(userId);
-        return weChatCollectionMapper.addCollection(chatCollection);
+        weChatCollectionMapper.addCollection(chatCollection);
+        return true;
     }
 
     @Override
