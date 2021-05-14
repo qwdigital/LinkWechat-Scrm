@@ -1,5 +1,101 @@
-# 数据源配置
+# 项目相关配置
+ruoyi:
+  # 名称
+  name: RuoYi
+  # 版本
+  version: 3.1.0
+  # 版权年份
+  copyrightYear: 2019
+  startTenant: false
+  # 实例演示开关
+  demoEnabled: true
+  # 是否开启文件云上传（使用的是腾讯云，如果开启了，则需要配置腾讯云存储相关信息；如果关闭了则文件存储再本地，需要配置本地路径）
+  file:
+    startCosUpload: true
+    imgUrlPrefix:
+    #腾讯云对象存储
+    cos:
+      secretId:
+      secretKey:
+      #link-wechat-1251309172.cos.ap-nanjing.myqcloud.com
+      region:
+      bucketName:
+  # 文件路径 示例（ Windows配置D:/ruoyi/uploadPath，Linux配置 /app/project/pic）
+  #profile: /data/jenkins_home/app/project/
+  # 获取ip地址开关
+  addressEnabled: false
+  # 验证码类型 math 数组计算 char 字符验证
+  captchaType: math
+  # 企业微信用户首次登录系统默认密码
+  weUserDefaultPwd: 123456
+  #匿名访问的URL
+  anonUrl:
+    - /login
+    - /captchaImage
+    - /findWxQrLoginInfo
+    - /wxQrLogin
+    - /profile/**
+    - /common/download**
+    - /common/download/resource**
+    - /common/download/url**
+    - /swagger-ui.html
+    - /swagger-resources/**
+    - /webjars/**
+    - /*/api-docs
+    - /druid/**
+    - /wecom/callback/**
+    - /wecom/chat/item/list
+    - /wecom/chat/collection/list
+    - /wecom/chat/collection/cancleCollection
+    - /wecom/chat/collection/addCollection
+    - /wecom/chat/side/h5List
+    - /wecom/ticket/**
+    - /wecom/user/getUserInfo
+    - /wecom/portrait/**
+    - /wecom/fission/poster
+    - /wecom/fission/complete/**
+    - /wecom/fission/*/progress/*
+    - /wecom/reward/getRewardByFissionId/**
+    - /wecom/groupCode/getActualCode/**
+    - /wecom/community/h5/**
+    - /weixin/auth/**
+    - /wecom/material/temporaryMaterialMediaId
+
+# 开发环境配置
+server:
+  # 服务器的HTTP端口，默认为8090
+  port: 8090
+  servlet:
+    # 应用的访问路径
+    context-path: /
+  tomcat:
+    # tomcat的URI编码
+    uri-encoding: UTF-8
+    # tomcat最大线程数，默认为200
+    max-threads: 800
+    # Tomcat启动初始化的线程数，默认值25
+    min-spare-threads: 30
+
+# 日志配置
+logging:
+  level:
+    com.ruoyi: debug
+    org.springframework: warn
+  path: ./logs
+path:
+  log: ./logs
+
+#H5地址路径
+H5:
+  url:
+  fissionUrl:
+  fissionGroupUrl:
+# Spring配置
 spring:
+  # 资源信息
+  messages:
+    # 国际化资源文件路径
+    basename: i18n/messages
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driverClassName: com.mysql.cj.jdbc.Driver
@@ -8,7 +104,7 @@ spring:
       master:
         url: jdbc:mysql://127.0.0.1:3306/link-wechat-prod?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
         username: root
-        password: root
+        password: 123456
       # 从库数据源
       slave:
         # 从数据源开关/默认关闭
@@ -55,3 +151,186 @@ spring:
         wall:
           config:
             multi-statement-allow: true
+  # 文件上传
+  servlet:
+    multipart:
+      # 单个文件大小
+      max-file-size:  10MB
+      # 设置总上传的文件大小
+      max-request-size:  20MB
+  task:
+    execution:
+      pool:
+        keep-alive: 10s
+      thread-name-prefix: common-pool-
+  # 服务模块
+  devtools:
+    restart:
+      # 热部署开关
+      enabled: true
+  # redis 配置
+  redis:
+    # 地址
+    host: 127.0.0.1
+    # 端口，默认为6379
+    port: 6379
+    # 密码
+    password:
+    # 连接超时时间
+    timeout: 10s
+    lettuce:
+      pool:
+        # 连接池中的最小空闲连接
+        min-idle: 0
+        # 连接池中的最大空闲连接
+        max-idle: 8
+        # 连接池的最大数据库连接数
+        max-active: 8
+        # #连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1ms
+
+
+# token配置
+token:
+  # 令牌自定义标识
+  header: Authorization
+  # 令牌密钥
+  secret: abcdefghijklmnopqrstuvwxyz
+  # 令牌有效期（默认30分钟）
+  expireTime: 30
+
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*Mapper.xml
+  type-aliases-package: com.linkwechat.**.domain
+  type-handlers-package: com.linkwechat.framework.handler.GenericTypeHandler,com.linkwechat.framework.handler.StringArrayJoinTypeHandler
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: delFlag
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+## MyBatis配置
+#mybatis:
+#    # 搜索指定包别名
+#    typeAliasesPackage: com.linkwechat.**.domain
+#    # 配置mapper的扫描，找到所有的mapper.xml映射文件
+#    mapperLocations: classpath*:mapper/**/*Mapper.xml
+#    # 加载全局的配置文件
+#    configLocation: classpath:mybatis/mybatis-config.xml
+
+# PageHelper分页插件
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+# Swagger配置
+swagger:
+  # 是否开启swagger
+  enabled: true
+  # 请求前缀
+  pathMapping:
+
+# 防止XSS攻击
+xss:
+  # 过滤开关
+  enabled: true
+  # 排除链接（多个用逗号分隔）
+  excludes: /system/notice/*
+  # 匹配链接
+  urlPatterns: /system/*,/monitor/*,/tool/*
+
+# elasticsearch配置
+elasticsearch:
+  schema: http
+  address:
+  userName:
+  password:
+  connectTimeout: 10000
+  socketTimeout: 10000
+  connectionRequestTimeout: 10000
+  maxConnectNum: 100
+  maxConnectPerRoute: 100
+
+# forest配置
+forest:
+  backend: httpclient
+  retry-count: 1 # 请求失败后重试次数，默认为0次不重试
+  max-retry-interval: 1000 #重试间隔时间
+  connect-timeout: 3000 #链接超时时间
+  timeout: 3000  # 请求超时时间
+
+
+wecome:
+  chatKey: finance_new
+  serverUrl: https://qyapi.weixin.qq.com/
+  weComePrefix: cgi-bin
+  noAccessTokenUrl:
+    - /gettoken
+    - /service/get_provider_token
+    - /wecom/chat/side/list
+    - /wecom/chat/item/list
+    - /wecom/chat/collection/addCollection
+    - /wecom/chat/collection/cancleCollection
+    - /wecom/chat/collection/list
+  needContactTokenUrl:
+    - /externalcontact/get_follow_user_list
+    - /externalcontact/add_contact_way
+    - /externalcontact/update_contact_way
+    - /externalcontact/add_corp_tag
+    - /externalcontact/get_corp_tag_list
+    - /externalcontact/del_corp_tag
+    - /externalcontact/edit_corp_tag
+    - /externalcontact/list
+    - /externalcontact/get
+    - /externalcontact/batch/get_by_user
+    - /externalcontact/groupchat/list
+    - /externalcontact/groupchat/get
+    - /externalcontact/mark_tag
+    - /externalcontact/transfer
+    - /externalcontact/groupchat/transfer
+    - /externalcontact/get_unassigned_list
+    - /externalcontact/send_welcome_msg
+    - /externalcontact/unionid_to_external_userid
+    - /externalcontact/add_msg_template
+    - /externalcontact/get_group_msg_result
+    - /externalcontact/get_user_behavior_data
+    - /externalcontact/groupchat/statistic
+    - /externalcontact/groupchat/statistic_group_by_day
+  fileUplodUrl:  /media/upload,/media/uploadimg
+  needProviderTokenUrl:
+    - /service/get_login_info
+  needChatTokenUrl:
+    - /msgaudit/get_permit_user_list
+    - /msgaudit/check_single_agree
+    - /msgaudit/check_room_agree
+    - /msgaudit/groupchat/get
+  thirdAppUrl:
+    - /user/getuserinfo
+    - /get_jsapi_ticket
+    - /ticket/get
+    - /agent/list
+    - /message/send
+    - /agent/get
+    - /agent/set
+  needTenant:
+    - we_department
+    - we_user
+    - we_customer
+    - we_tag_group
+  #企微回调通知配置
+  callBack:
+    appIdOrCorpId: ww38152475d1bca752
+    token: Fm05d6n0NpuFrvOlgVxIbeSXtjgz
+    encodingAesKey: laevP8xCEG7BUqv5GuYXfg9HaRecxe4MU5F5cmnAI7n
+  # JS SDK 身份校验url
+  authorizeUrl: https://open.weixin.qq.com/connect/oauth2/authorize
+  # JS SDK身份校验成功后的redirect url
+  authorizeRedirectUrl: http://linkwechat.cn/mobile/#/task
+
+weixin:
+  appid:
+  secret:

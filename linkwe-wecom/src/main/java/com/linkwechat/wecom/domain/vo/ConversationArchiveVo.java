@@ -52,61 +52,61 @@ public class ConversationArchiveVo {
     private String msgType;
 
     @ApiModelProperty("文本消息内容")
-    private Content text;
+    private Content text=new Content();
 
     @ApiModelProperty("图片消息内容")
-    private Content image;
+    private Content image=new Content();
 
     @ApiModelProperty("撤回消息")
-    private Content revoke;
+    private Content revoke=new Content();
 
     @ApiModelProperty("同意会话聊天内容")
-    private Content disagree;
+    private Content disagree=new Content();
 
     @ApiModelProperty("语音内容")
-    private Content voice;
+    private Content voice=new Content();
 
     @ApiModelProperty("视频内容")
-    private Content video;
+    private Content video=new Content();
 
     @ApiModelProperty("名片")
-    private Content card;
+    private Content card=new Content();
 
     @ApiModelProperty("位置")
-    private Content location;
+    private Content location=new Content();
 
     @ApiModelProperty("表情")
-    private Content emotion;
+    private Content emotion=new Content();
 
     @ApiModelProperty("文件")
-    private Content file;
+    private Content file=new Content();
 
     @ApiModelProperty("链接")
-    private Content link;
+    private Content link=new Content();
 
     @ApiModelProperty("小程序消息")
-    private Content weApp;
+    private Content weApp=new Content();
 
     @ApiModelProperty("会话记录消息")
-    private Content chatReCord;
+    private Content chatReCord=new Content();
 
     @ApiModelProperty("待办消息")
-    private Content todo;
+    private Content todo=new Content();
 
     @ApiModelProperty("投票消息")
-    private Content vote;
+    private Content vote=new Content();
 
     @ApiModelProperty("填表消息")
-    private Collect collect;
+    private Collect collect=new Collect();
 
     @ApiModelProperty("红包消息")
-    private RedPacket redPacket;
+    private RedPacket redPacket=new RedPacket();
 
     @ApiModelProperty("会议邀请消息")
-    private Meeting meeting;
+    private Meeting meeting=new Meeting();
 
     @ApiModelProperty("在线文档消息")
-    private Content doc;
+    private Content doc=new Content();
 
     @ApiModelProperty("MarkDown格式消息/图文消息")
     private JSONObject info;
@@ -118,7 +118,7 @@ public class ConversationArchiveVo {
     private JSONObject meetingVoiceCall;
 
     @ApiModelProperty("日程消息")
-    private Calendar calendar;
+    private Calendar calendar=new Calendar();
 
     @ApiModel
     @Data

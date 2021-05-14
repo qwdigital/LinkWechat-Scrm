@@ -38,6 +38,10 @@ public class RuoYiConfig
     private FileConfig file;
 
 
+    /**是否开启多租户*/
+    private boolean startTenant=false;
+
+
 
     /**匿名访问的URL*/
     private String[] anonUrl;
@@ -160,5 +164,13 @@ public class RuoYiConfig
 
     public void setFile(FileConfig file) {
         this.file = file;
+    }
+
+    public boolean isStartTenant() {
+        return startTenant;
+    }
+
+    public void setStartTenant(boolean startTenant) {
+        this.startTenant = startTenant;
     }
 }

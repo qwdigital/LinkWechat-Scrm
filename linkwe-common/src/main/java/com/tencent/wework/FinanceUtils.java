@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @date 2020/12/2 16:01
  **/
 @Slf4j
+
 public class FinanceUtils {
     /**
      * NewSdk返回的sdk指针
@@ -100,7 +101,7 @@ public class FinanceUtils {
         }
         String content = Finance.GetContentFromSlice(slice);
         JSONArray chatdataArr = JSONObject.parseObject(content).getJSONArray("chatdata");
-        log.info("开始执行数据解析:------------");
+        log.info("开始执行数据解析:------------"+content);
         AtomicLong LocalSEQ = new AtomicLong();
         if (CollectionUtil.isNotEmpty(chatdataArr)) {
             chatdataArr.stream().map(data -> (JSONObject) data).forEach(data -> {
