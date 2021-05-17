@@ -4,7 +4,9 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -112,6 +114,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
      */
     @Override
     public List<WeCustomer> selectWeCustomerList(WeCustomer weCustomer) {
+        //当前登录用户为企业用户
+        if(Constants.USER_TYPE_WECOME
+                .equals(SecurityUtils.getLoginUser().getUser().getUserType())){
+            weCustomer.setUserIds((SecurityUtils.getLoginUser().getUser().getUserName()));
+        }
+
         return weCustomerMapper.selectWeCustomerList(weCustomer);
     }
 
@@ -468,7 +476,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
      */
     @Override
     public List<WeUser> getCustomersByUserId(String externalUserid) {
-        return this.baseMapper.getCustomersByUserId(externalUserid);
+        String userId=null;
+        if(Constants.USER_TYPE_WECOME.equals(SecurityUtils.getLoginUser().getUser().getUserType())){
+             userId=SecurityUtils.getLoginUser().getUser().getUserName();
+        }
+        return this.baseMapper.getCustomersByUserId(externalUserid,userId);
     }
 
     @Override

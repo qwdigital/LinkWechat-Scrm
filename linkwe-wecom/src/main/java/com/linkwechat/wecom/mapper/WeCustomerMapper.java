@@ -71,7 +71,7 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
      * @param externalUserid
      * @return
      */
-    public List<WeUser> getCustomersByUserId(@Param("externalUserid") String externalUserid);
+    public List<WeUser> getCustomersByUserId(@Param("externalUserid") String externalUserid,@Param("userId") String userId);
 
     /**
      * 通过标签查询客户列表

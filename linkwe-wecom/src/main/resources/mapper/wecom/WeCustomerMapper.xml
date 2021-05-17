@@ -77,7 +77,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectWeCustomerList" parameterType="WeCustomer" resultMap="WeCustomerResult">
         SELECT
-             DISTINCT wc.external_userid,
+            DISTINCT wc.external_userid,
             wc.`name`,
             wc.avatar,
             wc.type,
@@ -128,8 +128,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
              <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
                    AND date_format(wfcr.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
              </if>
-
-
              <if test="tagIds != null and tagIds !=''">
                    <if test="tagIds.indexOf(',') != -1">
                        AND  wt.tag_id in
@@ -278,7 +276,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                   wfcrf.flower_customer_rel_id,
                   wt.tag_id,
                   wt.create_time,
-                  wt.`name` as tagName,
+                  DISTINCT wt.`name` as tagName,
                   (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department
         FROM
             we_customer wc
@@ -287,6 +285,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.flower_customer_rel_id = wfcr.id
         LEFT JOIN we_tag wt ON wt.tag_id = wfcrf.tag_id
         WHERE wc.external_userid=#{externalUserid}
+        <if test="userId != null and userId !=''">
+          AND wfcr.user_id=#{userId}
+        </if>
     </select>
 
 
