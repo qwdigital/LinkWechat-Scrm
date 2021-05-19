@@ -5,4 +5,14 @@
 <mapper namespace="com.linkwechat.wecom.mapper.WeCategoryMapper">
 
 
+     <select id="deleteWeCategoryById">
+         UPDATE we_category
+         set del_flag=2
+         <where>
+             id in
+             <foreach collection="array" open="(" close=")" item="item" separator=",">
+                 #{item}
+             </foreach>
+         </where>
+     </select>
 </mapper>

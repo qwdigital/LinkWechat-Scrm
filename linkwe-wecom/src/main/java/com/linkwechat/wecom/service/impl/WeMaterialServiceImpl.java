@@ -46,7 +46,7 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
     private WeMediaClient weMediaClient;
 
     @Autowired
-    private CosConfig cosConfig;
+    private RuoYiConfig ruoYiConfig;
 
     @Override
     public WeMaterialFileVO uploadWeMaterialFile(MultipartFile file, String type) {
@@ -79,7 +79,7 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
             //构造返回结果
 //            return WeMaterialFileVO.builder().materialUrl(url).materialName(file.getOriginalFilename()).build();
 
-            return WeMaterialFileVO.builder().materialUrl(cosConfig.getImgUrlPrefix()).materialName(FileUploadUtils.upload2Cos(file, cosConfig)).build();
+            return WeMaterialFileVO.builder().materialUrl(ruoYiConfig.getFile().getImgUrlPrefix()).materialName(FileUploadUtils.upload2Cos(file, ruoYiConfig.getFile().getCos())).build();
         } catch (Exception e) {
             throw new WeComException(e.getMessage());
         }

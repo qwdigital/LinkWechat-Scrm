@@ -117,7 +117,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         //当前登录用户为企业用户
         if(Constants.USER_TYPE_WECOME
                 .equals(SecurityUtils.getLoginUser().getUser().getUserType())){
-            weCustomer.setUserIds((SecurityUtils.getLoginUser().getUser().getUserName()));
+            weCustomer.setUserIds((SecurityUtils.getLoginUser().getUser().getWeUserId()));
         }
 
         return weCustomerMapper.selectWeCustomerList(weCustomer);
@@ -478,7 +478,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     public List<WeUser> getCustomersByUserId(String externalUserid) {
         String userId=null;
         if(Constants.USER_TYPE_WECOME.equals(SecurityUtils.getLoginUser().getUser().getUserType())){
-             userId=SecurityUtils.getLoginUser().getUser().getUserName();
+             userId=SecurityUtils.getLoginUser().getUser().getWeUserId();
         }
         return this.baseMapper.getCustomersByUserId(externalUserid,userId);
     }

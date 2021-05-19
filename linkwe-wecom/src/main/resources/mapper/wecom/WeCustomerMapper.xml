@@ -276,7 +276,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                   wfcrf.flower_customer_rel_id,
                   wt.tag_id,
                   wt.create_time,
-                  DISTINCT wt.`name` as tagName,
+                  wt.`name` as tagName,
                   (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department
         FROM
             we_customer wc

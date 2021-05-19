@@ -1,6 +1,7 @@
 package com.linkwechat.framework.web.service;
 
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.constant.Constants;
@@ -26,6 +27,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -71,7 +73,7 @@ public class UserDetailsServiceImpl implements UserDetailsService
         if (StringUtils.isNull(user))
         {
 
-            //            //查询企业管理相关账号
+         //查询企业管理相关账号
             WeCorpAccount weCorpByAccount = iWeCorpAccountService.getOne(new LambdaQueryWrapper<WeCorpAccount>().eq(WeCorpAccount::getCorpAccount, username)
                     .eq(WeCorpAccount::getDelFlag, Constants.NORMAL_CODE));
             if(null != weCorpByAccount){
@@ -87,31 +89,31 @@ public class UserDetailsServiceImpl implements UserDetailsService
                         .build();
             } else{
                 //we_user表中去查询，如果该表为空则提示用户不存在，如果不为空，则将用户记录注册到系统用户表中
-                WeUser weUser
-                        = new WeUser();
-                try {
-                    weUser=iWeUserService.getOne(new LambdaQueryWrapper<WeUser>()
-                            .eq(WeUser::getUserId,username));
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
+                WeUser  weUser=iWeUserService.getOne(new LambdaQueryWrapper<WeUser>()
+                        .eq(WeUser::getMobile,username)
+                        .ne(WeUser::getIsActivate,new Integer(6)));
                 if(null == weUser){
                     throw new BaseException("对不起，您的账号：" + username + " 不存在");
                 }
+                if(StrUtil.isBlank(weUser.getMobile())){
+                    throw new BaseException("请填写当前企业员工的手机号：" + username + " 然后再登录");
+                }
                 //注册到we_user表中
                 user=SysUser.builder()
-                        .userName(weUser.getUserId())
+                        .userName(username)
                         .nickName(weUser.getName())
                         .userType(Constants.USER_TYPE_WECOME)
                         .email(weUser.getEmail())
                         .phonenumber(weUser.getMobile())
                         .sex(weUser.getGender() ==0 ? "1": weUser.getGender() .toString())
                         .avatar(weUser.getAvatarMediaid())
+                        .weUserId(weUser.getUserId())
                         .roleIds(ArrayUtil.toArray(iSysRoleService.selectRoleList(SysRole.builder()
                                 .roleKey(Constants.DEFAULT_WECOME_ROLE_KEY)
                                 .build()).stream().map(SysRole::getRoleId).collect(Collectors.toList()), Long.class))
                         .password(SecurityUtils.encryptPassword(ruoYiConfig.getWeUserDefaultPwd()))
                         .build();
+
             }
 
             if(user != null){

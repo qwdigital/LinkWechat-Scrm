@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.wecom;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.controller.BaseController;
@@ -78,21 +79,23 @@ public class WeCategoryController extends BaseController {
     /**
      * 删除类目
      */
-//    @PreAuthorize("@ss.hasPermi('wechat:category:remove')")
+//    @PreAuthorize("@ss.hasPermi('wechat:category:remove')") Constants.DELETE_CODE
     @Log(title = "删除类目", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     @ApiOperation("删除类目")
     public AjaxResult remove(@PathVariable Long[] ids) {
-        List<WeCategory> categorys=new ArrayList<>();
-        for (Long id:ids) {
-            categorys.add(
-                    WeCategory.builder()
-                            .id(id)
-                            .delFlag(Constants.DELETE_CODE)
-                            .build()
-            );
-        }
-        weCategoryService.updateBatchById(categorys);
+        weCategoryService.deleteWeCategoryById(ids);
+//        List<WeCategory> categorys=new ArrayList<>();
+//        for (Long id:ids) {
+//            categorys.add(
+//                    WeCategory.builder()
+//                            .id(id)
+//                            .delFlag("55")
+//                            .build()
+//            );
+//        }
+//        weCategoryService.updateBatchById(categorys);
+
         return AjaxResult.success();
     }
 

@@ -7,5 +7,5 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface WeCategoryMapper extends BaseMapper<WeCategory> {
-
+    void deleteWeCategoryById(Long[] ids);
 }

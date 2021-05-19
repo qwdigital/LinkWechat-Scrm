@@ -34,7 +34,7 @@ public class WeCategoryServiceImpl extends ServiceImpl<WeCategoryMapper,WeCatego
         if (null != weCategory) {
             throw new WeComException("名称已存在！");
         }
-        category.setCreateTime(DateUtil.date());
+//        category.setCreateTime(DateUtil.date());
         category.setId(SnowFlakeUtil.nextId());
          this.save(category);
     }
@@ -50,7 +50,7 @@ public class WeCategoryServiceImpl extends ServiceImpl<WeCategoryMapper,WeCatego
         if (null != weCategory) {
             throw new WeComException("名称已存在！");
         }
-        category.setUpdateTime(DateUtil.date());
+//        category.setUpdateTime(DateUtil.date());
         this.updateById(category);
     }
 
@@ -74,6 +74,10 @@ public class WeCategoryServiceImpl extends ServiceImpl<WeCategoryMapper,WeCatego
         return TreeUtil.build(weCategoryVos);
     }
 
+    @Override
+    public void deleteWeCategoryById(Long[] ids) {
+         this.baseMapper.deleteWeCategoryById(ids);
+    }
 
 
 }

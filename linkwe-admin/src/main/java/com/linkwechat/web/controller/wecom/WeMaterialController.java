@@ -154,7 +154,7 @@ public class WeMaterialController extends BaseController {
 //        weMediaDto.setFileName(file.getResource().getFilename());
         WeMaterialFileVO weMaterialFileVO = materialService.uploadWeMaterialFile(file, MediaType.IMAGE.getType());
         weMediaDto.setFileName(weMaterialFileVO.getMaterialName());
-        weMediaDto.setUrl(weMaterialFileVO.getMaterialUrl());
+        weMediaDto.setUrl(weMaterialFileVO.getMaterialUrl()+weMaterialFileVO.getMaterialName());
         return AjaxResult.success(weMediaDto);
     }
 

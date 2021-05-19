@@ -102,9 +102,9 @@ spring:
     druid:
       # 主库数据源
       master:
-        url: jdbc:mysql://127.0.0.1:3306/link-wechat-prod?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+        url: jdbc:mysql://127.0.0.1:10179/lw-test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
         username: root
-        password: 123456
+        password: root
       # 从库数据源
       slave:
         # 从数据源开关/默认关闭
@@ -247,8 +247,8 @@ xss:
 elasticsearch:
   schema: http
   address:
-  userName:
-  password:
+  userName: "elastic"
+  password: "0p-0p-0p-"
   connectTimeout: 10000
   socketTimeout: 10000
   connectionRequestTimeout: 10000
@@ -323,13 +323,13 @@ wecome:
     - we_tag_group
   #企微回调通知配置
   callBack:
-    appIdOrCorpId: ww38152475d1bca752
-    token: Fm05d6n0NpuFrvOlgVxIbeSXtjgz
-    encodingAesKey: laevP8xCEG7BUqv5GuYXfg9HaRecxe4MU5F5cmnAI7n
+    appIdOrCorpId:
+    token:
+    encodingAesKey:
   # JS SDK 身份校验url
-  authorizeUrl: https://open.weixin.qq.com/connect/oauth2/authorize
+  authorizeUrl:
   # JS SDK身份校验成功后的redirect url
-  authorizeRedirectUrl: http://linkwechat.cn/mobile/#/task
+  authorizeRedirectUrl:
 
 weixin:
   appid:
