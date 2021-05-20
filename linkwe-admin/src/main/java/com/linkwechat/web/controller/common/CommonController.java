@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,9 +33,6 @@ public class CommonController {
 
     @Autowired
     private ServerConfig serverConfig;
-
-    @Autowired
-    private CosConfig cosConfig;
 
 
     @Autowired
@@ -122,12 +120,8 @@ public class CommonController {
     @PostMapping("/common/uploadFile2Cos")
     public AjaxResult uploadFile2Cos(MultipartFile file) throws Exception {
         try {
-
             SysFile sysFile
                     = fileService.upload(file);
-
-//            String fileName = FileUploadUtils.upload2Cos(file, cosConfig);
-
             AjaxResult ajax = AjaxResult.success();
             ajax.put("fileName", sysFile.getFileName());
             ajax.put("url", sysFile.getImgUrlPrefix()+sysFile.getFileName());
@@ -138,8 +132,15 @@ public class CommonController {
     }
 
 
-//    public  String url(String fileName){
-//        return "https://link-wechat-1251309172.cos.ap-nanjing.myqcloud.com/"+fileName;
-//    }
+    /**
+     * 本地图片下载
+     */
+    @GetMapping("/findFile")
+    public void findFile(HttpServletResponse response,String fileName){
+            fileService.findFile(fileName,response);
+    }
+
+
+
 
 }
