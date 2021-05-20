@@ -6,10 +6,21 @@ ruoyi:
   version: 3.1.0
   # 版权年份
   copyrightYear: 2019
+  startTenant: false
   # 实例演示开关
   demoEnabled: true
+  # 是否开启文件云上传（使用的是腾讯云，如果开启了，则需要配置腾讯云存储相关信息；如果关闭了则文件存储再本地，需要配置本地路径）
+  file:
+    startCosUpload: true
+    imgUrlPrefix:
+    #腾讯云对象存储
+    cos:
+      secretId:
+      secretKey:
+      region:
+      bucketName:
   # 文件路径 示例（ Windows配置D:/ruoyi/uploadPath，Linux配置 /app/project/pic）
-  profile: /app/project/pic
+  #profile: /data/jenkins_home/app/project/
   # 获取ip地址开关
   addressEnabled: false
   # 验证码类型 math 数组计算 char 字符验证
@@ -18,39 +29,41 @@ ruoyi:
   weUserDefaultPwd: 123456
   #匿名访问的URL
   anonUrl:
-      - /login
-      - /captchaImage
-      - /findWxQrLoginInfo
-      - /wxQrLogin
-      - /profile/**
-      - /common/download**
-      - /common/download/resource**
-      - /common/download/url**
-      - /swagger-ui.html
-      - /swagger-resources/**
-      - /webjars/**
-      - /*/api-docs
-      - /druid/**
-      - /wecom/callback/**
-      - /wecom/chat/item/list
-      - /wecom/chat/collection/list
-      - /wecom/chat/collection/cancleCollection
-      - /wecom/chat/collection/addCollection
-      - /wecom/chat/side/h5List
-      - /wecom/ticket/**
-      - /wecom/user/getUserInfo
-      - /wecom/portrait/**
-      - /wecom/fission/poster
-      - /wecom/fission/*/progress/*
-      - /wecom/reward/getRewardByFissionId/**
-      - /wecom/groupCode/getActualCode/**
-      - /wecom/community/h5/**
-      - /weixin/auth/**
-      - /wecom/material/temporaryMaterialMediald
+    - /login
+    - /captchaImage
+    - /findWxQrLoginInfo
+    - /wxQrLogin
+    - /profile/**
+    - /common/download**
+    - /common/download/resource**
+    - /common/download/url**
+    - /swagger-ui.html
+    - /swagger-resources/**
+    - /webjars/**
+    - /*/api-docs
+    - /druid/**
+    - /wecom/callback/**
+    - /wecom/chat/item/list
+    - /wecom/chat/collection/list
+    - /wecom/chat/collection/cancleCollection
+    - /wecom/chat/collection/addCollection
+    - /wecom/chat/side/h5List
+    - /wecom/ticket/**
+    - /wecom/user/getUserInfo
+    - /wecom/portrait/**
+    - /wecom/fission/poster
+    - /wecom/fission/complete/**
+    - /wecom/fission/*/progress/*
+    - /wecom/reward/getRewardByFissionId/**
+    - /wecom/groupCode/getActualCode/**
+    - /wecom/community/h5/**
+    - /weixin/auth/**
+    - /wecom/material/temporaryMaterialMediaId
+
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为8090
-  port: ${APP_PORT:8090}
+  port: 8090
   servlet:
     # 应用的访问路径
     context-path: /
@@ -73,23 +86,77 @@ path:
 
 #H5地址路径
 H5:
-  url: www.baidu.com
-
+  url:
+  fissionUrl:
+  fissionGroupUrl:
 # Spring配置
 spring:
   # 资源信息
   messages:
     # 国际化资源文件路径
     basename: i18n/messages
-  profiles:
-    active: druid
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    druid:
+      # 主库数据源
+      master:
+        url: jdbc:mysql://127.0.0.1:10179/lw-test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+        username: root
+        password: root
+      # 从库数据源
+      slave:
+        # 从数据源开关/默认关闭
+        enabled: false
+        url:
+        username:
+        password:
+      # 初始连接数
+      initialSize: 5
+      # 最小连接池数量
+      minIdle: 10
+      # 最大连接池数量
+      maxActive: 20
+      # 配置获取连接等待超时的时间
+      maxWait: 60000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      timeBetweenEvictionRunsMillis: 60000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      minEvictableIdleTimeMillis: 300000
+      # 配置一个连接在池中最大生存的时间，单位是毫秒
+      maxEvictableIdleTimeMillis: 900000
+      # 配置检测连接是否有效
+      validationQuery: SELECT 1 FROM DUAL
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      webStatFilter:
+        enabled: true
+      statViewServlet:
+        enabled: true
+        # 设置白名单，不填则允许所有访问
+        allow:
+        url-pattern: /druid/*
+        # 控制台管理用户名和密码
+        login-username:
+        login-password:
+      filter:
+        stat:
+          enabled: true
+          # 慢SQL记录
+          log-slow-sql: true
+          slow-sql-millis: 1000
+          merge-sql: true
+        wall:
+          config:
+            multi-statement-allow: true
   # 文件上传
   servlet:
     multipart:
       # 单个文件大小
-      max-file-size: 10MB
+      max-file-size:  10MB
       # 设置总上传的文件大小
-      max-request-size: 20MB
+      max-request-size:  20MB
   task:
     execution:
       pool:
@@ -122,7 +189,6 @@ spring:
         max-wait: -1ms
 
 
-
 # token配置
 token:
   # 令牌自定义标识
@@ -144,6 +210,14 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 
+## MyBatis配置
+#mybatis:
+#    # 搜索指定包别名
+#    typeAliasesPackage: com.linkwechat.**.domain
+#    # 配置mapper的扫描，找到所有的mapper.xml映射文件
+#    mapperLocations: classpath*:mapper/**/*Mapper.xml
+#    # 加载全局的配置文件
+#    configLocation: classpath:mybatis/mybatis-config.xml
 
 # PageHelper分页插件
 pagehelper:
@@ -171,9 +245,9 @@ xss:
 # elasticsearch配置
 elasticsearch:
   schema: http
-  address: 127.0.0.1
-  userName: ""
-  password: ""
+  address:
+  userName:
+  password:
   connectTimeout: 10000
   socketTimeout: 10000
   connectionRequestTimeout: 10000
@@ -182,7 +256,6 @@ elasticsearch:
 
 # forest配置
 forest:
- # interceptors: com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor
   backend: httpclient
   retry-count: 1 # 请求失败后重试次数，默认为0次不重试
   max-retry-interval: 1000 #重试间隔时间
@@ -191,7 +264,7 @@ forest:
 
 
 wecome:
-  chatKey: finance
+  chatKey: finance_new
   serverUrl: https://qyapi.weixin.qq.com/
   weComePrefix: cgi-bin
   noAccessTokenUrl:
@@ -225,7 +298,8 @@ wecome:
     - /externalcontact/get_group_msg_result
     - /externalcontact/get_user_behavior_data
     - /externalcontact/groupchat/statistic
-  fileUplodUrl: /media/upload,/media/uploadimg
+    - /externalcontact/groupchat/statistic_group_by_day
+  fileUplodUrl:  /media/upload,/media/uploadimg
   needProviderTokenUrl:
     - /service/get_login_info
   needChatTokenUrl:
@@ -237,7 +311,15 @@ wecome:
     - /user/getuserinfo
     - /get_jsapi_ticket
     - /ticket/get
+    - /agent/list
     - /message/send
+    - /agent/get
+    - /agent/set
+  needTenant:
+    - we_department
+    - we_user
+    - we_customer
+    - we_tag_group
   #企微回调通知配置
   callBack:
     appIdOrCorpId:
@@ -247,20 +329,7 @@ wecome:
   authorizeUrl:
   # JS SDK身份校验成功后的redirect url
   authorizeRedirectUrl:
-#腾讯云对象存储
-cos:
-  #id
-  secretId:
-  #密钥
-  secretKey:
-  #地区
-  region:
-  #区块空间
-  bucketName:
-  #访问前缀
-  imgUrlPrefix:
 
-#微信公众号配置
 weixin:
   appid:
   secret:
