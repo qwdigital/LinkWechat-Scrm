@@ -123,7 +123,7 @@ export default {
             }
             return getMaterialMediaId(dataMediaId).then((res) => {
               // debugger
-              form.imageMessage.media_id = res.data
+              form.imageMessage.media_id = res.data.media_id
             })
           }
         })
