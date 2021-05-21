@@ -160,7 +160,7 @@ name [string] 是	文件名称
 export function getMaterialMediaId(data) {
   return request({
     url: service + '/temporaryMaterialMediaId',
-    method: 'POST',
+    method: 'GET',
     data,
   })
 }
