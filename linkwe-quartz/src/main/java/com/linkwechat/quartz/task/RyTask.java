@@ -123,10 +123,13 @@ public class RyTask {
         searchSourceBuilder.sort(sortBuilderPrice);
         searchSourceBuilder.size(1);
         List<JSONObject> searchResultList = elasticSearch.search(chartKey, searchSourceBuilder, JSONObject.class);
-        searchResultList.stream().findFirst().ifPresent(result -> {
-            index.set(result.getLong(WeConstans.CONTACT_SEQ_KEY) + 1);
-        });
-        redisCache.setCacheObject(WeConstans.CONTACT_SEQ_KEY, index);
+        if(CollectionUtil.isNotEmpty(searchResultList)){
+            searchResultList.stream().findFirst().ifPresent(result -> {
+                index.set(result.getLong(WeConstans.CONTACT_SEQ_KEY) + 1);
+            });
+            redisCache.setCacheObject(WeConstans.CONTACT_SEQ_KEY, index);
+        }
+
     }
 
     /**
