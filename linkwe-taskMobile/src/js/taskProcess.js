@@ -37,8 +37,9 @@ $(function(){
                                 +"<span class='customersSuccess'>邀请成功</span>"
                             +"</div>"
             })
-            $('.completeNum').text(data.total)
-            $('.loseNum').text((data.total - data.completed))
+            $('.completeNum').text(data.completed)
+            const left = (data.total - data.completed) < 0 ? 0 : (data.total - data.completed)
+            $('.loseNum').text(left)
             $('.customersBox').html(htmlStr)
         })
   getReward({fissionId,eid})

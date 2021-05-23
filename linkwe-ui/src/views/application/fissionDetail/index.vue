@@ -191,14 +191,14 @@ export default {
           {{ taskDetail.startTime }}至{{ taskDetail.overTime }}
         </div>
       </div>
-      <div class="task-row">
+      <!-- <div class="task-row">
         <div class="task-label">活动发起成员:</div>
         <div class="task-value"></div>
       </div>
       <div class="task-row" style="margin-bottom:30px">
         <div class="task-label">客户标签:</div>
         <div class="task-value">{{ taskDetail.customerTag }}</div>
-      </div>
+      </div> -->
       <div class="task-row">
         <div class="task-label">裂变海报:</div>
         <img style="width:30px" :src="taskDetail.postersUrl" />
