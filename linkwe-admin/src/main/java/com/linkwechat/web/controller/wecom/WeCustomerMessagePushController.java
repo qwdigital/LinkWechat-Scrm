@@ -15,7 +15,10 @@ import com.linkwechat.wecom.service.IWeCustomerMessagePushService;
 import com.linkwechat.wecom.service.IWeCustomerMessgaeResultService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -33,6 +36,7 @@ public class WeCustomerMessagePushController extends BaseController {
 
 
     @Autowired
+    @Lazy
     private IWeCustomerMessagePushService weCustomerMessagePushService;
 
     @Autowired
@@ -50,7 +54,11 @@ public class WeCustomerMessagePushController extends BaseController {
     @PostMapping(value = "add")
     public AjaxResult add(@RequestBody CustomerMessagePushDto customerMessagePushDto) {
         try {
+            SecurityContext context = SecurityContextHolder.getContext();
+            SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+            SecurityContextHolder.setContext(context);
             weCustomerMessagePushService.addWeCustomerMessagePush(customerMessagePushDto);
+
         } catch (JsonProcessingException | ParseException e) {
             e.printStackTrace();
             return AjaxResult.error("群发失败");

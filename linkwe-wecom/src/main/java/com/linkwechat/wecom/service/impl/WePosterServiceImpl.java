@@ -125,6 +125,8 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
             return poster.getBackgroundImgPath();
         }
         Set<String> existFontId = new HashSet<>();
+
+
         Map<String, Font> fontMap = poster.getPosterSubassemblyList().stream().filter(wePosterSubassembly -> wePosterSubassembly.getType().equals(1))
                 .peek(wePosterSubassembly -> {
                     if (wePosterSubassembly.getFontId() == null) {
@@ -149,17 +151,29 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
             fileCallableMap = new HashMap<>();
         }
         fileCallableMap.put(poster.getBackgroundImgPath(), NetFileUtils.getNetFile(poster.getBackgroundImgPath()));
+
+
+
+
         Map<String, BufferedImage> bufferedImageMap = fileCallableMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, stringFileCallableEntry -> {
             try {
-                return ImageUtils.copyBufferedImage(ImageIO.read(new ByteArrayInputStream(Objects.requireNonNull(NetFileUtils.getByteArrayOutputStream(stringFileCallableEntry.getValue(), false)).toByteArray())), BufferedImage.TYPE_INT_ARGB);
+                return ImageUtils.copyBufferedImage(ImageIO.read(new ByteArrayInputStream(Objects.requireNonNull(NetFileUtils.getByteArrayOutputStream(stringFileCallableEntry.getValue(), false)).toByteArray())),
+                        BufferedImage.TYPE_INT_ARGB);
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new RuntimeException("图片读取错误");
             }
         }));
+
+
         BufferedImage backgroundImg = bufferedImageMap.get(poster.getBackgroundImgPath());
         poster.setWidth(backgroundImg.getWidth());
         poster.setHeight(backgroundImg.getHeight());
+
+
+
+
+
         poster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {
             if (wePosterSubassembly.getType().equals(1)) {
                 Font font = fontMap.get(wePosterSubassembly.getFontId() + "_" + wePosterSubassembly.getFontSize() + "_" + wePosterSubassembly.getFontStyle());
@@ -196,13 +210,15 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
             }
 
         });
+
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try {
             ImageIO.write(backgroundImg, "png", byteArrayOutputStream);
             NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(System.currentTimeMillis() + ".jpg", byteArrayOutputStream.toByteArray());
             byteArrayOutputStream.close();
             String path = FileUploadUtils.upload2Cos(streamMultipartFile, ruoYiConfig.getFile().getCos());
-            poster.setSampleImgPath(ruoYiConfig.getFile().getImgUrlPrefix() + path);
+            poster.setSampleImgPath(ruoYiConfig.getFile().getCos().getCosImgUrlPrefix() + path);
             return poster.getSampleImgPath();
         } catch (IOException e) {
             e.printStackTrace();

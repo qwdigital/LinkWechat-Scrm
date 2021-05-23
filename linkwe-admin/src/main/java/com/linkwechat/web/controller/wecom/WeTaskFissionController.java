@@ -229,7 +229,7 @@ public class WeTaskFissionController extends BaseController {
     public AjaxResult<JSONObject> upload(@RequestParam(value = "file") MultipartFile file) throws IOException {
         String url = FileUploadUtils.upload2Cos(file, cosConfig);
         JSONObject json = new JSONObject();
-        json.put("rewardImageUrl", cosConfig.getImgUrlPrefix()+url);
+        json.put("rewardImageUrl", cosConfig.getCosImgUrlPrefix()+url);
         return AjaxResult.success(json);
     }
 

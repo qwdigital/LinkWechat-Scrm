@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * 通用请求处理
@@ -124,7 +125,7 @@ public class CommonController {
                     = fileService.upload(file);
             AjaxResult ajax = AjaxResult.success();
             ajax.put("fileName", sysFile.getFileName());
-            ajax.put("url", sysFile.getImgUrlPrefix()+sysFile.getFileName());
+            ajax.put("url", sysFile.getFileName());
             return ajax;
         } catch (Exception e) {
             return AjaxResult.error(e.getMessage());
@@ -133,11 +134,11 @@ public class CommonController {
 
 
     /**
-     * 本地图片下载
+     * 获取图片
      */
-    @GetMapping("/findFile")
-    public void findFile(HttpServletResponse response,String fileName){
-            fileService.findFile(fileName,response);
+    @GetMapping("/common/findImage")
+    public void findImage(HttpServletResponse response,String fileName){
+            fileService.findImage(fileName,response);
     }
 
 

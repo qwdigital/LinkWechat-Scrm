@@ -1,25 +1,27 @@
 package com.linkwechat.framework.web.service;
 
 
+import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.utils.OsUtils;
 import com.linkwechat.common.utils.file.FileUploadUtils;
+import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.framework.web.domain.server.SysFile;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 
 /**
  * 文件服务
  */
 @Component
+@Slf4j
 public class FileService {
 
 
@@ -59,39 +61,26 @@ public class FileService {
     }
 
 
+    /**
+     * 获取图片(本地,或者网络图片)
+     * @param fileName
+     * @param rp
+     */
+    public void findImage(String fileName, HttpServletResponse rp){
+         try {
+             String fileDownUrl="";
+             rp.setContentType("image/png");
+             if(ruoYiConfig.getFile().isStartCosUpload()) {//开启云上传
+                 fileDownUrl= ruoYiConfig.getFile().getCos().getCosImgUrlPrefix();
+                 FileUtils.downloadFile(fileDownUrl+fileName,rp.getOutputStream());
+             }else{
+                 fileDownUrl=OsUtils.isWindows()?WINDOWSFILEPATH+"/"+fileName:LINUXFILEPATH+"/"+fileName;
+                 FileUtils.writeBytes(fileDownUrl,rp.getOutputStream());
+             }
+         }catch (Exception e){
+              log.error("图片获取异常:"+e.getMessage());
 
-    public void findFile(String fileName, HttpServletResponse rp){
-        String fileDownUrl="";
-//        if(ruoYiConfig.getFile().isStartCosUpload()) {//开启云上传
-//            fileDownUrl= ruoYiConfig.getFile().getImgUrlPrefix();
-//        }else{
-            fileDownUrl=OsUtils.isWindows()?WINDOWSFILEPATH+fileName:LINUXFILEPATH+fileName;
-//        }
-        File file=new File(fileDownUrl);
-        if (file.exists()) {
-            FileInputStream fis = null;
-            OutputStream os = null;
-            try {
-                fis = new FileInputStream(file);
-                os = rp.getOutputStream();
-                int count = 0;
-                byte[] buffer = new byte[1024 * 8];
-                while ((count = fis.read(buffer)) != -1) {
-                    os.write(buffer, 0, count);
-                    os.flush();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    fis.close();
-                    os.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
+         }
     }
 
 

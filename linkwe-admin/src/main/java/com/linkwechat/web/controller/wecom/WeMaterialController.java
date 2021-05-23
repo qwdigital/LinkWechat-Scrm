@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -99,7 +100,9 @@ public class WeMaterialController extends BaseController {
     @DeleteMapping("/{ids}")
     @ApiOperation("删除素材信息")
     public AjaxResult remove(@PathVariable Long[] ids) {
-        return toAjax(materialService.deleteWeMaterialByIds(ids));
+        materialService.deleteWeMaterialByIds(ids);
+
+        return AjaxResult.success();
     }
 
 
@@ -136,7 +139,7 @@ public class WeMaterialController extends BaseController {
     //@PreAuthorize("@ss.hasPermi('wechat:material:temporaryMaterialMediaId')")
     @Log(title = "获取素材media_id", businessType = BusinessType.OTHER)
     @GetMapping("/temporaryMaterialMediaId")
-    @ApiOperation("获取素材media_id")
+    @ApiOperation("H5端发送获取素材media_id")
     public AjaxResult temporaryMaterialMediaId(String url,String type,String name){
         WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(url,
                 type
@@ -145,13 +148,32 @@ public class WeMaterialController extends BaseController {
     }
 
 
+    //@PreAuthorize("@ss.hasPermi('wechat:material:temporaryMaterialMediaId')")
+    @Log(title = "获取素材media_id", businessType = BusinessType.OTHER)
+    @PostMapping("/temporaryMaterialMediaIdForWeb")
+    @ApiOperation("web端发送获取素材media_id")
+    public AjaxResult temporaryMaterialMediaIdForWeb(@RequestBody TemporaryMaterialDto temporaryMaterialDto){
+
+        WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(temporaryMaterialDto.getUrl(),
+                 MediaType.of( temporaryMaterialDto.getType()).get().getMediaType()
+                ,temporaryMaterialDto.getName());
+        return AjaxResult.success(weMediaDto);
+    }
+
+
+
+
+
+
+
     @Log(title = "上传素材图片", businessType = BusinessType.OTHER)
     @PostMapping("/uploadimg")
     @ApiOperation("上传素材图片")
-    public AjaxResult<WeMediaDto> uploadImg(MultipartFile file){
+    public AjaxResult<WeMediaDto> uploadImg(MultipartFile file, HttpServletRequest request){
+        System.out.println(request.getServerName());
          WeMediaDto weMediaDto=new WeMediaDto();
 //        WeMediaDto weMediaDto = materialService.uploadImg(file);
-//        weMediaDto.setFileName(file.getResource().getFilename());
+//        weMediaDto.setFileName(file.getResource().getFilename());  weMaterialFileVO.getMaterialUrl()+
         WeMaterialFileVO weMaterialFileVO = materialService.uploadWeMaterialFile(file, MediaType.IMAGE.getType());
         weMediaDto.setFileName(weMaterialFileVO.getMaterialName());
         weMediaDto.setUrl(weMaterialFileVO.getMaterialUrl()+weMaterialFileVO.getMaterialName());

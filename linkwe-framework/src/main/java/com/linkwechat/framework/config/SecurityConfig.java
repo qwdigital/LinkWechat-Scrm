@@ -108,7 +108,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .antMatchers(ruoYiConfig.getAnonUrl()).anonymous()
 
-//                .antMatchers("/login", "/captchaImage", "/findWxQrLoginInfo", "/wxQrLogin").anonymous()
                 .antMatchers(
                         HttpMethod.GET,
                         "/*.html",
@@ -116,34 +115,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.css",
                         "/**/*.js"
                 ).permitAll()
-//                .antMatchers("/profile/**").anonymous()
-//                .antMatchers("/common/download**").anonymous()
-//                .antMatchers("/common/download/resource**").anonymous()
-//                .antMatchers("/common/download/url**").anonymous()
-//                .antMatchers("/swagger-ui.html").anonymous()
-//                .antMatchers("/swagger-resources/**").anonymous()
-//                .antMatchers("/webjars/**").anonymous()
-//                .antMatchers("/*/api-docs").anonymous()
-//                .antMatchers("/druid/**").anonymous()
-//                .antMatchers("/wecom/callback/**").anonymous()
-//
-//                .antMatchers("/wecom/chat/item/list").anonymous()
-//                .antMatchers("/wecom/chat/collection/list").anonymous()
-//                .antMatchers("/wecom/chat/collection/cancleCollection").anonymous()
-//                .antMatchers("/wecom/chat/collection/addCollection").anonymous()
-//                .antMatchers("/wecom/chat/side/h5List").anonymous()
-//                .antMatchers("/wecom/ticket/**").anonymous()
-//
-//                .antMatchers("/wecom/user/getUserInfo").anonymous()
-//               // .antMatchers("/common/uploadFile2Cos").anonymous()
-////                .antMatchers("/wecom/material/temporaryMaterialMediaId").anonymous()
-//                .antMatchers("/wecom/portrait/**").anonymous()
-//                .antMatchers("/wecom/fission/poster", "/wecom/fission/*/progress/*", "/wecom/reward/getRewardByFissionId/**").anonymous()
-//                // 获取实际群活码和社群运营H5页面不需要登录
-//                .antMatchers("/wecom/groupCode/getActualCode/**").anonymous()
-//                .antMatchers("/wecom/community/h5/**").anonymous()
-//                //微信授权接口
-//                .antMatchers("/weixin/auth/**").anonymous()
 
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated()

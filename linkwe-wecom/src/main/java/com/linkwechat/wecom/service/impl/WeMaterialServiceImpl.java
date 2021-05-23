@@ -78,8 +78,9 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
             }
             //构造返回结果
 //            return WeMaterialFileVO.builder().materialUrl(url).materialName(file.getOriginalFilename()).build();
+            return WeMaterialFileVO.builder().materialUrl(ruoYiConfig.getFile().getCos().getCosImgUrlPrefix()).materialName(FileUploadUtils.upload2Cos(file, ruoYiConfig.getFile().getCos())).build();
 
-            return WeMaterialFileVO.builder().materialUrl(ruoYiConfig.getFile().getImgUrlPrefix()).materialName(FileUploadUtils.upload2Cos(file, ruoYiConfig.getFile().getCos())).build();
+//            return WeMaterialFileVO.builder().materialUrl(ruoYiConfig.getFile().getCos().getCosImgUrlPrefix()+"/common/findImage?fileName=/").materialName(FileUploadUtils.upload2Cos(file, ruoYiConfig.getFile().getCos())).build();
         } catch (Exception e) {
             throw new WeComException(e.getMessage());
         }
@@ -99,8 +100,8 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
     }
 
     @Override
-    public int deleteWeMaterialByIds(Long[] ids) {
-        return weMaterialMapper.deleteWeMaterialByIds(ids);
+    public void deleteWeMaterialByIds(Long[] ids) {
+         weMaterialMapper.deleteWeMaterialByIds(ids);
     }
 
     @Override

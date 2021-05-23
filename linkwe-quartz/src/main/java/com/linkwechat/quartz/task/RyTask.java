@@ -103,18 +103,18 @@ public class RyTask {
     }
 
     public void WeCustomers() {
-        //查询系统所有客户
-        List<WeCustomer> cacheList = redisCache.getCacheList(WeConstans.WECUSTOMERS_KEY);
-        if (CollectionUtils.isEmpty(cacheList)) {
-            List<WeCustomer> customers = weCustomerService.selectWeCustomerList(null);
-            redisCache.setCacheList(WeConstans.WECUSTOMERS_KEY, customers);
-        } else {
-            List<WeCustomer> customers = weCustomerService.selectWeCustomerList(null);
-            List<WeCustomer> weCustomers = redisCache.getCacheList(WeConstans.WECUSTOMERS_KEY);
-            if (CollectionUtils.isNotEmpty(weCustomers) && weCustomers.size() < customers.size()) {
-                redisCache.setCacheList(WeConstans.WECUSTOMERS_KEY, customers);
-            }
-        }
+//        //查询系统所有客户
+//        List<WeCustomer> cacheList = redisCache.getCacheList(WeConstans.WECUSTOMERS_KEY);
+//        if (CollectionUtils.isEmpty(cacheList)) {
+//            List<WeCustomer> customers = weCustomerService.selectWeCustomerList(null);
+//            redisCache.setCacheList(WeConstans.WECUSTOMERS_KEY, customers);
+//        } else {
+//            List<WeCustomer> customers = weCustomerService.selectWeCustomerList(null);
+//            List<WeCustomer> weCustomers = redisCache.getCacheList(WeConstans.WECUSTOMERS_KEY);
+//            if (CollectionUtils.isNotEmpty(weCustomers) && weCustomers.size() < customers.size()) {
+//                redisCache.setCacheList(WeConstans.WECUSTOMERS_KEY, customers);
+//            }
+//        }
     }
 
     private void setRedisCacheSeqValue(AtomicLong index) {

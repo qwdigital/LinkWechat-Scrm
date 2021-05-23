@@ -166,7 +166,7 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                 // 新客拉群创建的员工活码欢迎语图片(群活码图片)
                 String codeUrl = weGroupCodeService.selectGroupCodeUrlByEmplCodeState(state);
                 if (StringUtils.isNotNull(codeUrl)) {
-                    buildWelcomeMsgImg(weWelcomeMsgBuilder, codeUrl, codeUrl.replaceAll(cosConfig.getImgUrlPrefix(), ""));
+                    buildWelcomeMsgImg(weWelcomeMsgBuilder, codeUrl, codeUrl.replaceAll(cosConfig.getCosImgUrlPrefix(), ""));
                 }
                 // 普通员工活码欢迎语图片
                 else if (StringUtils.isNotEmpty(messageMap.getCategoryId())) {

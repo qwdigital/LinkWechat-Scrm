@@ -48,7 +48,7 @@ public interface IWeMaterialService {
      * @param ids id列表
      * @return {@link int}
      */
-    int deleteWeMaterialByIds(Long[] ids);
+    void deleteWeMaterialByIds(Long[] ids);
 
     /**
      * 更新素材信息

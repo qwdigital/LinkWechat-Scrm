@@ -453,7 +453,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                     throw new WeComException("生成二维码异常");
                 }
             }
-            return cosConfig.getImgUrlPrefix() + qrCode;
+            return cosConfig.getCosImgUrlPrefix() + qrCode;
         } else {
             throw new WeComException("生成二维码异常,用户信息不存在");
         }

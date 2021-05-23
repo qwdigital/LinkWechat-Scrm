@@ -20,6 +20,6 @@ public class CosConfig {
 
     private String bucketName;
 
-    private String imgUrlPrefix;
+    private String cosImgUrlPrefix;
 
 }

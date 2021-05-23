@@ -21,6 +21,7 @@ import com.linkwechat.wecom.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,6 +73,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @Async
     public void addWeCustomerMessagePush(CustomerMessagePushDto customerMessagePushDto) throws JsonProcessingException, ParseException {
 
 //        if ((null != customerMessagePushDto.getSettingTime() && !"".equals(customerMessagePushDto.getSettingTime()))

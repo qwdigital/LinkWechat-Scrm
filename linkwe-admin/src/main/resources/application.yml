@@ -12,13 +12,20 @@ ruoyi:
   # 是否开启文件云上传（使用的是腾讯云，如果开启了，则需要配置腾讯云存储相关信息；如果关闭了则文件存储再本地，需要配置本地路径）
   file:
     startCosUpload: true
+    #图片在系统中的访问前缀,图片无论是上传云端还是服务器本地,都通过本地读取资源,然后返回前端
     imgUrlPrefix:
     #腾讯云对象存储
     cos:
+      #id
       secretId:
+      #密钥
       secretKey:
+      #地区
       region:
+      #区块空间
       bucketName:
+      #访问前缀
+      cosImgUrlPrefix:
   # 文件路径 示例（ Windows配置D:/ruoyi/uploadPath，Linux配置 /app/project/pic）
   #profile: /data/jenkins_home/app/project/
   # 获取ip地址开关
@@ -59,6 +66,7 @@ ruoyi:
     - /wecom/community/h5/**
     - /weixin/auth/**
     - /wecom/material/temporaryMaterialMediaId
+    - /common/findImage
 
 # 开发环境配置
 server:
@@ -86,9 +94,9 @@ path:
 
 #H5地址路径
 H5:
-  url:
-  fissionUrl:
-  fissionGroupUrl:
+  url: http://h5.linkwechat.cn/index.html
+  fissionUrl: http://h5.linkwechat.cn/index.html
+  fissionGroupUrl: http://h5.linkwechat.cn/fission.html
 # Spring配置
 spring:
   # 资源信息
@@ -101,7 +109,7 @@ spring:
     druid:
       # 主库数据源
       master:
-        url: jdbc:mysql://127.0.0.1:10179/lw-test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+        url: jdbc:mysql://127.0.0.1:10179/link-wechat?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
         username: root
         password: root
       # 从库数据源
@@ -210,14 +218,6 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 
-## MyBatis配置
-#mybatis:
-#    # 搜索指定包别名
-#    typeAliasesPackage: com.linkwechat.**.domain
-#    # 配置mapper的扫描，找到所有的mapper.xml映射文件
-#    mapperLocations: classpath*:mapper/**/*Mapper.xml
-#    # 加载全局的配置文件
-#    configLocation: classpath:mybatis/mybatis-config.xml
 
 # PageHelper分页插件
 pagehelper:
@@ -246,8 +246,8 @@ xss:
 elasticsearch:
   schema: http
   address:
-  userName:
-  password:
+  userName: "elastic"
+  password: "0p-0p-0p-"
   connectTimeout: 10000
   socketTimeout: 10000
   connectionRequestTimeout: 10000
@@ -331,5 +331,5 @@ wecome:
   authorizeRedirectUrl:
 
 weixin:
-  appid:
-  secret:
+  appid: wxa57479bcd3f15461
+  secret: f23f4becdcac9819f292a3754fd8f84e
