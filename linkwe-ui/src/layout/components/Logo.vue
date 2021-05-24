@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar-logo-container" :class="{ collapse: collapse }">
+  <div class="logo-container" :class="{ collapse: collapse }">
     <transition name="sidebarLogoFade">
       <router-link
         v-if="collapse"
@@ -26,7 +26,7 @@ export default {
   props: {
     collapse: {
       type: Boolean,
-      required: true,
+      // required: true,
     },
   },
   data() {
@@ -48,12 +48,9 @@ export default {
   opacity: 0;
 }
 
-.sidebar-logo-container {
+.logo-container {
   position: relative;
-  width: 100%;
-  height: 50px;
-  line-height: 50px;
-  background: #2b2f3a;
+  width: 210px;
   text-align: center;
   overflow: hidden;
 
