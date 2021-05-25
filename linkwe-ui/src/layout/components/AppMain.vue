@@ -1,8 +1,3 @@
-<style lang="scss" scoped>
-.page {
-  padding: 16px 24px 24px;
-}
-</style>
 <template>
   <section class="app-main">
     <transition name="fade-transform" mode="out-in">
@@ -34,7 +29,7 @@ export default {
   width: 100%;
   position: relative;
   overflow: auto;
-  background-color: #fff;
+  // background-color: #fff;
 }
 
 .fixed-header + .app-main {

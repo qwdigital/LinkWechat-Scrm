@@ -12,8 +12,14 @@
       <div class="main main-size">
         <sidebar v-if="$route.name !== '首页'" class="sidebar-container" />
         <div class="main-container">
-          <hamburger id="hamburger-container" class="hamburger-container" />
-          <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
+          <div v-show="$route.name !== '首页'">
+            <hamburger id="hamburger-container" class="hamburger-container" />
+            <span class="slogan">仟微科技 |</span>
+            <breadcrumb
+              id="breadcrumb-container"
+              class="breadcrumb-container"
+            />
+          </div>
 
           <!-- <div :class="{ 'fixed-header': fixedHeader }">
             <navbar />
@@ -99,6 +105,12 @@ export default {
   .main-wrap {
     height: calc(100vh - 58px);
     background: #eee;
+    .main {
+      height: 100%;
+      padding: 10px;
+      display: flex;
+      align-items: stretch;
+    }
   }
 }
 
@@ -137,5 +149,10 @@ export default {
   &:hover {
     background: rgba(0, 0, 0, 0.025);
   }
+}
+.slogan {
+  font-size: 22px;
+  color: #999;
+  vertical-align: middle;
 }
 </style>

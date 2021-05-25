@@ -197,6 +197,7 @@ export default {
     margin: 0 20px;
     flex: none;
     position: relative;
+    cursor: pointer;
     &.active::after {
       content: '';
       display: inline-block;

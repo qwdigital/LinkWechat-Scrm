@@ -1,5 +1,5 @@
 <template>
-  <div style="padding: 0 15px;display: inline-block;" @click="toggleClick">
+  <div style="padding-right: 15px;display: inline-block;" @click="toggleClick">
     <svg
       :class="{ 'is-active': $store.state.app.sidebar.opened }"
       class="hamburger"
@@ -22,7 +22,7 @@ export default {
     $route(route) {
       // if you go to the redirect page, do not update the breadcrumbs
       if (route.name == '首页') {
-        // this.$store.state.app.sidebar.opened = false
+        this.$store.state.app.sidebar.opened = 0
       }
     },
   },

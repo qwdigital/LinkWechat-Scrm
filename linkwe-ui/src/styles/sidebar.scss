@@ -1,25 +1,28 @@
 #app {
   .main-container {
     min-height: 100%;
-    transition: margin-left 0.28s;
-    margin-left: $sideBarWidth;
+    transition: all 0.28s;
+    margin-left: 40px;
     position: relative;
+    flex: auto;
+    overflow: hidden;
   }
 
   .sidebar-container {
     transition: width 0.28s;
     width: $sideBarWidth !important;
     background-color: $menuBg;
-    height: calc(100% - 58px);
-    position: fixed;
     font-size: 0px;
     bottom: 0;
     z-index: 1001;
     overflow: hidden;
+    flex: none;
+    box-shadow: 0px 2px 2px 0px rgba(228, 228, 228, 0.35);
+    border-radius: 10px;
 
     .el-menu-item.is-active {
-      color: #fff !important;
       background-color: $menuActiveBg !important;
+      border-right: 2px solid #0079de;
     }
 
     // reset element-ui css
@@ -91,11 +94,11 @@
 
   .hideSidebar {
     .sidebar-container {
-      width: 54px !important;
+      width: 0 !important;
     }
 
     .main-container {
-      margin-left: 54px;
+      margin-left: 0;
     }
 
     .submenu-title-noDropdown {

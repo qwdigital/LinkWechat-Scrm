@@ -1,6 +1,7 @@
 import { constantRoutes } from '@/router'
 import { getRouters } from '@/api/menu'
 import Layout from '@/layout/index'
+import View from '@/layout/components/View'
 
 const permission = {
   state: {
@@ -30,7 +31,7 @@ const permission = {
 }
 
 // 遍历后台传来的路由字符串，转换为组件对象
-function filterAsyncRouter(asyncRouterMap) {
+function filterAsyncRouter(asyncRouterMap, level) {
   return asyncRouterMap.filter((route) => {
     if (route.component) {
       // Layout组件特殊处理
@@ -38,13 +39,17 @@ function filterAsyncRouter(asyncRouterMap) {
         if (route.redirect === 'noRedirect' && route.children.length) {
           route.redirect = route.path + '/' + route.children[0].path
         }
-        route.component = Layout
+        if (level === 2) {
+          route.component = View
+        } else {
+          route.component = Layout
+        }
       } else {
         route.component = loadView(route.component)
       }
     }
     if (route.children != null && route.children && route.children.length) {
-      route.children = filterAsyncRouter(route.children)
+      route.children = filterAsyncRouter(route.children, 2)
     }
     return true
   })

@@ -38,6 +38,11 @@ export const constantRoutes = [
     ],
   },
   {
+    path: '',
+    redirect: '/index',
+    hidden: true,
+  },
+  {
     path: '/index',
     component: Layout,
     redirect: '/index',
