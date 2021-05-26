@@ -119,9 +119,14 @@
 }
 .el-table .el-table__body-wrapper tr {
   box-shadow: 0px 0px 5px 0px rgba(195, 195, 195, 0.35);
-  border-radius: 4px;
 }
 .el-table th.is-leaf,
 .el-table td {
   border-bottom: 0;
+}
+.el-table tr td {
+  &:first-child,
+  &:last-child {
+    border-radius: 4px;
+  }
 }

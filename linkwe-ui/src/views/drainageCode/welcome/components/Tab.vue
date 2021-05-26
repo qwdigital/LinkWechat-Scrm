@@ -139,7 +139,6 @@ export default {
   justify-content: space-between;
   padding: 10px 0;
   align-items: center;
-  background: #fff;
   .total {
     background-color: rgba(65, 133, 244, 0.1);
     // border: 1px solid rgba(65, 133, 244, 0.2);
