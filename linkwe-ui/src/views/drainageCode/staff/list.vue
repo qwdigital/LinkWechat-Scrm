@@ -285,6 +285,7 @@ export default {
       v-loading="loading"
       :data="list"
       @selection-change="handleSelectionChange"
+      max-height="350"
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="样式" align="center" prop="qrCode">

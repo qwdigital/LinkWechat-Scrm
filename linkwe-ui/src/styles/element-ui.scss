@@ -105,3 +105,23 @@
 .el-range-separator {
   box-sizing: content-box;
 }
+
+.el-table {
+  background-color: transparent;
+}
+.el-table__body {
+  border-spacing: 0 10px;
+}
+.el-table .el-table__header-wrapper th,
+.el-table .el-table__fixed-header-wrapper th,
+.el-table .el-table__header-wrapper tr {
+  background-color: transparent !important;
+}
+.el-table .el-table__body-wrapper tr {
+  box-shadow: 0px 0px 5px 0px rgba(195, 195, 195, 0.35);
+  border-radius: 4px;
+}
+.el-table th.is-leaf,
+.el-table td {
+  border-bottom: 0;
+}
