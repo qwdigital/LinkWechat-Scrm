@@ -1,95 +1,103 @@
 <template>
   <div class="login">
-    <el-form
-      ref="loginForm"
-      :model="loginForm"
-      :rules="loginRules"
-      class="login-form"
-    >
-      <h3 class="title">LinkWeChat</h3>
-      <el-form-item prop="username">
-        <el-input
-          v-model="loginForm.username"
-          type="text"
-          auto-complete="off"
-          placeholder="账号"
+    <div class="login-wrap">
+      <img class="login-bg1" src="@/assets/image/login_bg1.png" alt="" />
+      <img class="login-bg2" src="@/assets/image/login_bg2.png" alt="" />
+      <img class="login-bg3" src="@/assets/image/login_bg3.png" alt="" />
+      <div class="login-form-wrap">
+        <el-form
+          ref="loginForm"
+          :model="loginForm"
+          :rules="loginRules"
+          class="login-form"
         >
-          <svg-icon
-            slot="prefix"
-            icon-class="user"
-            class="el-input__icon input-icon"
-          />
-        </el-input>
-      </el-form-item>
-      <el-form-item prop="password">
-        <el-input
-          v-model="loginForm.password"
-          type="password"
-          auto-complete="off"
-          placeholder="密码"
-          @keyup.enter.native="handleLogin"
-        >
-          <svg-icon
-            slot="prefix"
-            icon-class="password"
-            class="el-input__icon input-icon"
-          />
-        </el-input>
-      </el-form-item>
-      <el-form-item prop="code">
-        <el-input
-          v-model="loginForm.code"
-          auto-complete="off"
-          placeholder="验证码"
-          style="width: 63%"
-          @keyup.enter.native="handleLogin"
-        >
-          <svg-icon
-            slot="prefix"
-            icon-class="validCode"
-            class="el-input__icon input-icon"
-          />
-        </el-input>
-        <div class="login-code">
-          <img :src="codeUrl" @click="getCode" class="login-code-img" />
-        </div>
-      </el-form-item>
-      <el-checkbox
-        class="fr"
-        v-model="loginForm.rememberMe"
-        style="margin:0px 0px 25px 0px;"
-        >记住密码</el-checkbox
-      >
-      <el-checkbox
-        v-model="isDemonstrationLogin"
-        @change="changeDemonAccount"
-        style="margin:0px 0px 25px 0px;"
-        >演示账号登录</el-checkbox
-      >
-      <el-form-item style="width:100%;">
-        <el-button
-          :loading="loading"
-          size="medium"
-          type="primary"
-          style="width:100%;"
-          @click.native.prevent="handleLogin"
-        >
-          <span v-if="!loading">登 录</span>
-          <span v-else>登 录 中...</span>
-        </el-button>
-      </el-form-item>
-      <el-form-item class="ac" v-if="authLink">
-        <a :href="authLink">
-          <img
-            src="//wwcdn.weixin.qq.com/node/wwopen/wwopenmng/style/images/independent/brand/300x40_white$4dab5411.png"
-            srcset="
-              //wwcdn.weixin.qq.com/node/wwopen/wwopenmng/style/images/independent/brand/300x40_white_2x$6a1f5234.png 2x
-            "
-            alt="企业微信登录"
-          />
-        </a>
-      </el-form-item>
-    </el-form>
+          <h3 class="title">LinkWeChat</h3>
+          <el-form-item prop="username">
+            <el-input
+              v-model="loginForm.username"
+              type="text"
+              auto-complete="off"
+              placeholder="账号"
+            >
+              <svg-icon
+                slot="prefix"
+                icon-class="user"
+                class="el-input__icon input-icon"
+              />
+            </el-input>
+          </el-form-item>
+          <el-form-item prop="password">
+            <el-input
+              v-model="loginForm.password"
+              type="password"
+              auto-complete="off"
+              placeholder="密码"
+              @keyup.enter.native="handleLogin"
+            >
+              <svg-icon
+                slot="prefix"
+                icon-class="password"
+                class="el-input__icon input-icon"
+              />
+            </el-input>
+          </el-form-item>
+          <el-form-item prop="code">
+            <el-input
+              v-model="loginForm.code"
+              auto-complete="off"
+              placeholder="验证码"
+              style="width: 63%"
+              @keyup.enter.native="handleLogin"
+            >
+              <svg-icon
+                slot="prefix"
+                icon-class="validCode"
+                class="el-input__icon input-icon"
+              />
+            </el-input>
+            <div class="login-code">
+              <img :src="codeUrl" @click="getCode" class="login-code-img" />
+            </div>
+          </el-form-item>
+          <el-checkbox
+            class="fr"
+            v-model="loginForm.rememberMe"
+            style="margin:0px 0px 25px 0px;"
+            >记住密码</el-checkbox
+          >
+          <el-checkbox
+            v-model="isDemonstrationLogin"
+            @change="changeDemonAccount"
+            style="margin:0px 0px 25px 0px;"
+            >演示账号登录</el-checkbox
+          >
+          <el-form-item style="width:100%;">
+            <el-button
+              :loading="loading"
+              size="medium"
+              type="primary"
+              style="width:100%;"
+              @click.native.prevent="handleLogin"
+            >
+              <span v-if="!loading">登 录</span>
+              <span v-else>登 录 中...</span>
+            </el-button>
+          </el-form-item>
+          <el-form-item class="ac" v-if="authLink">
+            <a :href="authLink">
+              <img
+                src="//wwcdn.weixin.qq.com/node/wwopen/wwopenmng/style/images/independent/brand/300x40_white$4dab5411.png"
+                srcset="
+                  //wwcdn.weixin.qq.com/node/wwopen/wwopenmng/style/images/independent/brand/300x40_white_2x$6a1f5234.png 2x
+                "
+                alt="企业微信登录"
+              />
+            </a>
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
+
     <!--  底部  -->
     <div class="el-login-footer">
       <span>Copyright © 2018-2019 LinkWechat All Rights Reserved.</span>
@@ -249,13 +257,13 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100%;
-  background-image: url('../assets/image/login-background.png');
+  // background-image: url('../assets/image/login-background.png');
   background-size: cover;
 }
 .title {
   margin: 0px auto 30px auto;
   text-align: center;
-  color: #707070;
+  color: #027dfe;
 }
 
 .login-form {
@@ -263,6 +271,8 @@ export default {
   background: #ffffff;
   width: 400px;
   padding: 25px 25px 5px 25px;
+  position: relative;
+  top: 120px;
   .el-input {
     height: 38px;
     input {
@@ -313,5 +323,35 @@ export default {
 }
 .el-dialog__body {
   padding: 0px 20px;
+}
+[class*='login-bg'] {
+  position: absolute;
+  z-index: -1;
+}
+.login-form-wrap {
+  position: relative;
+  background: #fff;
+  height: 609px;
+  top: 50px;
+  left: 100px;
+}
+.login-wrap {
+  position: relative;
+  width: 1180px;
+  height: 720px;
+}
+.login-bg1 {
+  top: 0;
+  left: 0;
+}
+.login-bg2 {
+  top: 50px;
+  left: 370px;
+  z-index: 10;
+}
+.login-bg3 {
+  top: 220px;
+  right: 25px;
+  z-index: 20;
 }
 </style>
