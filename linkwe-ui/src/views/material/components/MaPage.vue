@@ -98,14 +98,16 @@ export default {
     // 获取类目树
     getTree() {
       getTree(this.type).then(({ data }) => {
-        this.treeData = [{
-          id: "",
-          name: "全部",
-          parentId: "0",
-          hasParent: false,
-          hasChildren: true,
-          children: data || []
-        }]
+        this.treeData = [
+          {
+            id: '',
+            name: '全部',
+            parentId: '0',
+            hasParent: false,
+            hasChildren: true,
+            children: data || [],
+          },
+        ]
       })
     },
     // 获取素材列表
@@ -172,10 +174,10 @@ export default {
       switch (type) {
         case 5:
           // 清除编辑的数据
-          this.$parent.posterSubassemblyList = [];
+          this.$parent.posterSubassemblyList = []
           this.$parent.posterEdit.step = 0
           this.$parent.dialog.edit = true
-        break
+          break
         default:
           this.form = Object.assign(
             {},
@@ -185,7 +187,7 @@ export default {
           this.$nextTick(() => {
             this.$refs['form'].clearValidate()
           })
-        break;
+          break
       }
       // type || !data ? (this.disabled = false) : (this.disabled = true)
     },
@@ -240,8 +242,8 @@ export default {
 
 <template>
   <div class="page">
-    <el-row :gutter="20">
-      <el-col :span="6" :xs="24">
+    <el-row type="flex" justify="space-between">
+      <el-col :span="6">
         <div>
           <el-button
             v-hasPermi="['material:addType']"
@@ -255,6 +257,7 @@ export default {
           <!-- :filter-node-method="filterNode" -->
           <el-tree
             ref="tree"
+            class="left-tree"
             :data="treeData"
             :props="treeProps"
             :expand-on-click-node="false"
@@ -267,19 +270,19 @@ export default {
               <span class="fr" v-if="data.id">
                 <i
                   v-hasPermi="['material:editType']"
-                  class="el-icon-edit"
+                  class="el-icon-edit-outline"
                   title="编辑"
                   @click.stop="treeEdit(data, 1)"
                 ></i>
                 <i
                   v-hasPermi="['material:addType']"
-                  class="el-icon-plus"
+                  class="el-icon-circle-plus-outline"
                   title="添加子分类"
                   @click.stop="treeEdit(data, 0)"
                 ></i>
                 <i
                   v-hasPermi="['material:removeType']"
-                  class="el-icon-minus"
+                  class="el-icon-delete"
                   title="删除"
                   @click.stop="treeRemove(data.id)"
                 ></i>
@@ -289,7 +292,7 @@ export default {
         </div>
       </el-col>
 
-      <el-col :span="18" :xs="24">
+      <el-col :span="17">
         <!-- <el-checkbox
           :indeterminate="isIndeterminate"
           v-model="checkAll"

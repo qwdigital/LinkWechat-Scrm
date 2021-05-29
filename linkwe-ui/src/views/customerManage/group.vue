@@ -179,7 +179,7 @@ export default {
         >
         <el-button
           v-hasPermi="['customerManage:group:export']"
-          type="cyan"
+          type="success"
           @click="handleExport"
           >导出列表</el-button
         >
@@ -201,8 +201,6 @@ export default {
         <el-button
           v-hasPermi="['customerManage:group:sync']"
           type="primary"
-          size="mini"
-          icon="el-icon-refresh"
           @click="sync"
           >同步客户群</el-button
         >

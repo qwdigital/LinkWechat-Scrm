@@ -32,6 +32,12 @@ export default {
   computed: {},
   created() {
     this.getList()
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div><span>抓取快捷回复素材，</span>素材抓取后，即可在聊天工具栏使用</div>
+      `
+    )
   },
   mounted() {},
   methods: {
@@ -101,67 +107,57 @@ export default {
         >查看已配置信息</el-button
       >
     </div>
-    <el-card shadow="never" header="红包工具栏">
-      <div slot="header">
-        <span>抓取快捷回复素材</span> 素材抓取后，即可在聊天工具栏使用
-      </div>
-      <el-table v-loading="loading" :data="list">
-        <el-table-column label="素材类型" align="center" prop="mediaType">
-          <template slot-scope="scope">
-            {{ mediaType[scope.row.mediaType] }}
-          </template>
-        </el-table-column>
-        <el-table-column label="聊天工具栏名称" align="center" prop="sideName">
-          <template slot-scope="{ row }">
-            <el-input
-              class="bfc-d"
-              style="width: 100px;"
-              v-if="row.isEdit"
-              v-model="row.sideName"
-              placeholder="请输入"
-            ></el-input>
-            <span v-else>
-              {{ row.sideName }}
-            </span>
+    <el-table v-loading="loading" :data="list">
+      <el-table-column label="素材类型" align="center" prop="mediaType">
+        <template slot-scope="scope">
+          {{ mediaType[scope.row.mediaType] }}
+        </template>
+      </el-table-column>
+      <el-table-column label="聊天工具栏名称" align="center" prop="sideName">
+        <template slot-scope="{ row }">
+          <el-input
+            class="bfc-d"
+            style="width: 100px;"
+            v-if="row.isEdit"
+            v-model="row.sideName"
+            placeholder="请输入"
+          ></el-input>
+          <span v-else>
+            {{ row.sideName }}
+          </span>
 
-            <i
-              v-if="!row.isEdit"
-              class="row-icon el-icon-edit"
-              @click="$set(row, 'isEdit', true)"
-            ></i>
-            <i
-              v-else
-              class="row-icon el-icon-circle-check"
-              @click="update(row)"
-            ></i>
-          </template>
-        </el-table-column>
-        <el-table-column label="已抓取素材数量" align="center" prop="total" />
-        <el-table-column
-          label="是否启用"
-          align="center"
-          prop="using"
-          width="180"
-        >
-          <template slot-scope="scope">
-            <el-switch
-              v-model="scope.row.using"
-              :active-value="0"
-              :inactive-value="1"
-              inactive-color="#ddd"
-              @change="update(scope.row)"
-            ></el-switch>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" align="center" prop="operId">
-          <template slot-scope="scope">
-            <el-button type="text" @click="openDialog(scope.row)"
-              >抓取素材</el-button
-            >
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
+          <i
+            v-if="!row.isEdit"
+            class="row-icon el-icon-edit"
+            @click="$set(row, 'isEdit', true)"
+          ></i>
+          <i
+            v-else
+            class="row-icon el-icon-circle-check"
+            @click="update(row)"
+          ></i>
+        </template>
+      </el-table-column>
+      <el-table-column label="已抓取素材数量" align="center" prop="total" />
+      <el-table-column label="是否启用" align="center" prop="using" width="180">
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.using"
+            :active-value="0"
+            :inactive-value="1"
+            inactive-color="#ddd"
+            @change="update(scope.row)"
+          ></el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" prop="operId">
+        <template slot-scope="scope">
+          <el-button type="text" @click="openDialog(scope.row)"
+            >抓取素材</el-button
+          >
+        </template>
+      </el-table-column>
+    </el-table>
 
     <!-- <el-card class="mt20" shadow="never" header="红包工具栏">
       <el-row :gutter="10">

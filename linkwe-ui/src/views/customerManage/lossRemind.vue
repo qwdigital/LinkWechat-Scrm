@@ -262,13 +262,13 @@ export default {
         >
         <el-button
           v-hasPermi="['customerManage:customer:query']"
-          type="info"
+          type="success"
           @click="resetForm()"
           >重置</el-button
         >
         <el-button
           v-hasPermi="['customerManage:customer:export']"
-          type="cyan"
+          type="info"
           @click="exportCustomer"
           >导出列表</el-button
         >

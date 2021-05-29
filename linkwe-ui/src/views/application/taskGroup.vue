@@ -20,6 +20,13 @@ export default {
   },
   created() {
     this.getList()
+
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>是通过管理员统一下发群发消息的任务，将消息推送给员工，员工点击任务按钮进行发送，将任务裂变海报以 H5 网页链接的形式发送给客户。此方式也会消耗一月四次客户群发触达的次数限制。</div>
+      `
+    )
   },
   methods: {
     getList(data) {

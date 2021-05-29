@@ -55,52 +55,54 @@ export default {
 <template>
   <div>
     <!-- <el-button slot="append" circle icon="el-icon-back" @click="$router.back()"></el-button>返回 -->
-    <div class="flex aic">
-      <el-avatar :size="100" :src="customer.avatar"></el-avatar>
-      <div class="info-wrap">
-        <div class="mb10">
-          {{ customer.name }}
-          <span
-            :style="{ color: customer.type == 1 ? '#4bde03' : '#f9a90b' }"
-            >{{ { 1: '@微信', 2: '@企业微信' }[customer.type] }}</span
-          >
-          <i
-            :class="[
-              'el-icon-s-custom',
-              { 1: 'man', 2: 'woman' }[customer.gender],
-            ]"
-          ></i>
-        </div>
-        <div class="info">
-          出生日期：{{ customer.birthday || '--' }}
-          <div class="bfc-d ml20">
-            <el-date-picker
-              v-if="datePickerVisible"
-              v-model="birthday"
-              type="date"
-              :picker-options="pickerOptions"
-              value-format="yyyy-MM-dd"
-              placeholder="选择日期便于以后客情维护"
-              @blur="datePickerVisible = false"
-              @change="updateBirthday"
-            ></el-date-picker>
-            <i
-              v-else
-              v-hasPermi="['customerManage:customer:edit']"
-              class="el-icon-edit"
-              @click="datePickerVisible = true"
-            ></i>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <el-card
       v-for="(item, index) of customer.weFlowerCustomerRels"
       :key="index"
       shadow="never"
-      :body-style="{ width: '400px' }"
+      :body-style="{ width: '410px', lineHeight: '30px' }"
     >
+      <div class="flex aic mt20">
+        <el-avatar :size="50" :src="customer.avatar"></el-avatar>
+        <div class="info-wrap">
+          <div class="mb10">
+            {{ customer.name }}
+            <span
+              :style="{ color: customer.type == 1 ? '#4bde03' : '#f9a90b' }"
+              >{{ { 1: '@微信', 2: '@企业微信' }[customer.type] }}</span
+            >
+            <i
+              :class="[
+                'el-icon-s-custom',
+                { 1: 'man', 2: 'woman' }[customer.gender],
+              ]"
+            ></i>
+          </div>
+          <div class="info">
+            出生日期：{{ customer.birthday }}
+            <div class="bfc-d">
+              <el-date-picker
+                v-if="datePickerVisible"
+                v-model="birthday"
+                type="date"
+                :picker-options="pickerOptions"
+                value-format="yyyy-MM-dd"
+                placeholder="选择日期便于以后客情维护"
+                @blur="datePickerVisible = false"
+                @change="updateBirthday"
+              ></el-date-picker>
+              <i
+                v-else
+                v-hasPermi="['customerManage:customer:edit']"
+                class="el-icon-edit"
+                @click="datePickerVisible = true"
+              ></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <el-divider></el-divider>
+
       <el-button
         v-if="item.status == 1"
         class="fr"
@@ -140,6 +142,7 @@ export default {
         <el-col :span="12">{{ '--' }}</el-col>
       </el-row>
       <el-divider></el-divider>
+
       <el-row :gutter="10">
         <el-col :span="10">添加人：</el-col>
         <el-col :span="12">{{ item.userName }}</el-col>

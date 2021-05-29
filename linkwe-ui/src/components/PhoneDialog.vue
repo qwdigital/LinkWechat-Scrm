@@ -12,12 +12,12 @@ export default {
     },
     imageList: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     messageList: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   data() {
     return {}
@@ -80,11 +80,11 @@ export default {
 
 <style lang="scss" scoped>
 .preview {
-  width: 260px;
-  background: #eee;
-  border-radius: 8px;
+  width: 219px;
+  height: 361px;
+  background: #f5f5f5;
+  border-radius: 4px;
   padding: 15px 10px;
-  height: 350px;
   line-height: 1.25;
   .top {
     font-weight: 600;

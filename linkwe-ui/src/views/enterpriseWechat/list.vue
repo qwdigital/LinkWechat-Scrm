@@ -104,8 +104,6 @@ export default {
       <el-button
         v-hasPermi="['enterpriseWechat:add']"
         type="primary"
-        icon="el-icon-plus"
-        size="mini"
         @click="edit()"
         >添加</el-button
       >

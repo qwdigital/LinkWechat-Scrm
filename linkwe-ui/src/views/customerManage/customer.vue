@@ -88,6 +88,13 @@ export default {
     this.getList()
     this.getListTag()
     this.getListOrganization()
+
+    // this.$store.dispatch(
+    //   'app/setBusininessDesc',
+    //   `
+    //     <div>用于查看当前企业所有的客户列表及详细信息，支持对客户进行打标签。</div>
+    //   `
+    // )
   },
   mounted() {},
   methods: {
@@ -344,13 +351,13 @@ export default {
         >
         <el-button
           v-hasPermi="['customerManage:customer:query']"
-          type="info"
+          type="success"
           @click="resetForm()"
           >重置</el-button
         >
         <el-button
           v-hasPermi="['customerManage:customer:export']"
-          type="cyan"
+          type="info"
           @click="exportCustomer"
           >导出列表</el-button
         >
@@ -367,8 +374,6 @@ export default {
         <el-button
           v-hasPermi="['customerManage/customer:makeTag']"
           type="primary"
-          size="mini"
-          icon="el-icon-s-flag"
           @click="makeTag('add')"
           :disabled="multipleSelection.length !== 1"
           >打标签</el-button
@@ -376,8 +381,6 @@ export default {
         <el-button
           v-hasPermi="['customerManage:customer:removeTag']"
           type="primary"
-          size="mini"
-          icon="el-icon-brush"
           @click="makeTag('remove')"
           :disabled="multipleSelection.length !== 1"
           >移除标签</el-button
@@ -385,16 +388,12 @@ export default {
         <el-button
           v-hasPermi="['customerManage:customer:sync']"
           type="primary"
-          size="mini"
-          icon="el-icon-refresh"
           @click="sync"
           >同步客户</el-button
         >
         <el-button
           v-hasPermi="['customerManage:customer:checkRepeat']"
           type="primary"
-          size="mini"
-          icon="el-icon-view"
           >查看重复客户</el-button
         >
       </div>

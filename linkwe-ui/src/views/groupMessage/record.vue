@@ -168,7 +168,7 @@ export default {
       </el-form-item>
       <el-form-item label=" ">
         <el-button type="primary" @click="getList(1)">查询</el-button>
-        <el-button @click="resetQuery">重置</el-button>
+        <el-button type="success" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 

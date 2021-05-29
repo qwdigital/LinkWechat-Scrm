@@ -1,7 +1,13 @@
 <template>
   <div>
     <div class="top-search">
-      <el-form inline label-position="right" :model="query" label-width="80px" ref="queryForm">
+      <el-form
+        inline
+        label-position="right"
+        :model="query"
+        label-width="80px"
+        ref="queryForm"
+      >
         <el-form-item label="规则名称" prop="ruleName">
           <el-input v-model="query.ruleName" placeholder="请输入"></el-input>
         </el-form-item>
@@ -55,8 +61,16 @@
       </div>
     </div>
 
-    <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="50" align="center"></el-table-column>
+    <el-table
+      v-loading="loading"
+      :data="list"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column
+        type="selection"
+        width="50"
+        align="center"
+      ></el-table-column>
 
       <el-table-column
         label="规则名称"
@@ -65,11 +79,7 @@
         :show-overflow-tooltip="true"
       ></el-table-column>
 
-      <el-table-column
-        label="执行群聊"
-        align="center"
-        width="120"
-      >
+      <el-table-column label="执行群聊" align="center" width="120">
         <template #default="{ row }">
           <el-popover
             placement="bottom"
@@ -77,15 +87,17 @@
             trigger="hover"
             :content="getDisplayGroups(row)"
           >
-            <div slot="reference" class="table-desc overflow-ellipsis">{{ getDisplayGroups(row) }}</div>
+            <div slot="reference" class="table-desc overflow-ellipsis">
+              {{ getDisplayGroups(row) }}
+            </div>
           </el-popover>
         </template>
       </el-table-column>
 
-      <el-table-column 
-        label="创建人" 
-        align="center" 
-        prop="createBy" 
+      <el-table-column
+        label="创建人"
+        align="center"
+        prop="createBy"
       ></el-table-column>
 
       <el-table-column
@@ -139,43 +151,45 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        ruleName: '',         // 规则名称
-        createBy: '',         // 创建人
-        beginTime: '',        // 创建开始时间
-        endTime: '',          // 创建结束时间
+        ruleName: '', // 规则名称
+        createBy: '', // 创建人
+        beginTime: '', // 创建开始时间
+        endTime: '', // 创建结束时间
       },
-      dateRange: [],          // 添加日期
-      total: 0,               // 群SOP数据总量
-      list: [],               // 群SOP数据
-      multiSelect: [],        // 多选数据
+      dateRange: [], // 添加日期
+      total: 0, // 群SOP数据总量
+      list: [], // 群SOP数据
+      multiSelect: [], // 多选数据
       loading: false,
-      pickerOptions: {}
+      pickerOptions: {},
     }
   },
 
   methods: {
-    getList (page) {
+    getList(page) {
       page && (this.query.pageNum = page)
       this.loading = true
 
-      getList(this.query).then(({ rows, total }) => {
-        this.list = rows
-        this.total = +total
-        this.loading = false
-      }).catch(() => {
-        this.loading = false
-      })
+      getList(this.query)
+        .then(({ rows, total }) => {
+          this.list = rows
+          this.total = +total
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
     },
 
-    goRoute (id) {
+    goRoute(id) {
       this.$router.push({
         path: '/communityOperating/groupSOPAev',
-        query: { 'id': id },
+        query: { id: id },
       })
     },
 
     // 重置查询参数
-    resetQuery () {
+    resetQuery() {
       this.dateRange = []
       this.$refs['queryForm'].resetFields()
 
@@ -183,45 +197,51 @@ export default {
     },
 
     // 批量删除
-    handleBulkRemove () {
+    handleBulkRemove() {
       this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
-      }).then(() => {
-        const ids = this.multiSelect.map(r => r.ruleId)
+      })
+        .then(() => {
+          const ids = this.multiSelect.map((r) => r.ruleId)
 
-        remove(ids + '').then((res) => {
-          if (res.code === 200) {
-            this.getList()
-          } else {}
+          remove(ids + '').then((res) => {
+            if (res.code === 200) {
+              this.getList()
+            } else {
+            }
+          })
         })
-      }).catch(() => {})
+        .catch(() => {})
     },
 
     // 删除
-    handleRemove (id) {
+    handleRemove(id) {
       this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
-      }).then(() => {
-        remove(id + '').then((res) => {
-          if (res.code === 200) {
-            this.getList()
-          } else {}
+      })
+        .then(() => {
+          remove(id + '').then((res) => {
+            if (res.code === 200) {
+              this.getList()
+            } else {
+            }
+          })
         })
-      }).catch(() => {})
+        .catch(() => {})
     },
 
     // 处理多选
-    handleSelectionChange (val) {
+    handleSelectionChange(val) {
       this.multiSelect = val
     },
 
     // 获取显示用实际群聊
-    getDisplayGroups (row) {
-      const groups = row.groupList.map(g => g.groupName)
+    getDisplayGroups(row) {
+      const groups = row.groupList.map((g) => g.groupName)
 
       return groups.join(' ')
     },
@@ -229,30 +249,37 @@ export default {
 
   watch: {
     // 日期选择器数据同步至查询参数
-    dateRange (dateRange) {
+    dateRange(dateRange) {
       if (!dateRange || dateRange.length !== 2) {
         this.query.beginTime = ''
         this.query.endTime = ''
       } else {
-        [ this.query.beginTime, this.query.endTime ] = dateRange
+        ;[this.query.beginTime, this.query.endTime] = dateRange
       }
-    }
+    },
   },
 
   created() {
     this.getList()
-  }
+
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>管理员在创建群 SOP 规则后，员工通过推送的消息通知，在规定时间内给规定群聊发送规定内容。</div>
+      `
+    )
+  },
 }
 </script>
 
 <style scoped lang="scss">
-  .overflow-ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+.overflow-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  .table-desc {
-    max-width: 120px;
-  }
+.table-desc {
+  max-width: 120px;
+}
 </style>

@@ -489,6 +489,13 @@ export default {
 
   created() {
     this.getList(1)
+
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>企业通过下发任务通知员工给选中的标签客户主动发送加群引导语以及群活码，客户扫码后入群。</div>
+      `
+    )
   },
 }
 </script>

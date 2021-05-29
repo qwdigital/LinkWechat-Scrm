@@ -1,6 +1,13 @@
 <template>
   <el-breadcrumb class="app-breadcrumb" separator="/">
     <transition-group name="breadcrumb">
+      <el-breadcrumb-item key="1">
+        <svg-icon
+          @click="handleLink({ path: '/index' })"
+          iconClass="home"
+          class="cp home"
+        ></svg-icon>
+      </el-breadcrumb-item>
       <el-breadcrumb-item v-for="(item, index) in levelList" :key="item.path">
         <span
           v-if="item.redirect === 'noRedirect' || index == levelList.length - 1"
@@ -58,9 +65,9 @@ export default {
       console.log(matched)
       const first = matched[0]
 
-      if (!this.isDashboard(first)) {
-        matched = [{ path: '/index', meta: { title: '首页' } }].concat(matched)
-      }
+      // if (!this.isDashboard(first)) {
+      //   matched = [{ path: '/index', meta: { title: '首页' } }].concat(matched)
+      // }
 
       this.levelList = matched.filter(
         (item) => item.meta && item.meta.title && item.meta.breadcrumb !== false
@@ -106,5 +113,8 @@ export default {
 .el-icon-question {
   color: #888;
   margin-left: 10px;
+}
+.home {
+  color: $blue;
 }
 </style>

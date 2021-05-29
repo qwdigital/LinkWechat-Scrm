@@ -6,6 +6,8 @@
     position: relative;
     flex: auto;
     overflow: auto;
+    display: flex;
+    flex-direction: column;
   }
 
   .sidebar-container {

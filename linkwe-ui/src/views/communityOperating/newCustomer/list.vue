@@ -38,6 +38,12 @@ export default {
   computed: {},
   created() {
     this.getList()
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>指在客户通过员工活码加为好友后，员工自动推送入群引导语和群活码，客户可通过群活码扫码入群。</div>
+      `
+    )
   },
   mounted() {
     // new clipboard(".copy-btn");
@@ -47,13 +53,15 @@ export default {
       page && (this.query.pageNum = page)
       this.loading = true
 
-      getList(this.query).then(({ rows, total }) => {
-        this.list = rows
-        this.total = +total
-        this.loading = false
-      }).catch(() => {
-        this.loading = false
-      })
+      getList(this.query)
+        .then(({ rows, total }) => {
+          this.list = rows
+          this.total = +total
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
     },
     edit(data, type) {
       this.form = Object.assign({}, data || {})
@@ -127,7 +135,7 @@ export default {
     },
 
     // 重置查询参数
-    resetQuery () {
+    resetQuery() {
       this.dateRange = []
       this.$refs['queryForm'].resetFields()
 
@@ -137,15 +145,15 @@ export default {
 
   watch: {
     // 日期选择器数据同步至查询参数
-    dateRange (dateRange) {
+    dateRange(dateRange) {
       if (!dateRange || dateRange.length !== 2) {
         this.query.beginTime = ''
         this.query.endTime = ''
       } else {
-        [ this.query.beginTime, this.query.endTime ] = dateRange
+        ;[this.query.beginTime, this.query.endTime] = dateRange
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -235,22 +243,20 @@ export default {
       <el-table-column type="selection" width="50" align="center" />
       <el-table-column prop="codeName" label="活码名称" align="center">
       </el-table-column>
-      <el-table-column label="员工活码" align="center" prop="qrCode" width="130">
+      <el-table-column
+        label="员工活码"
+        align="center"
+        prop="qrCode"
+        width="130"
+      >
         <template #default="{ row }">
-          <el-popover
-            placement="bottom"
-            trigger="hover"
-          >
+          <el-popover placement="bottom" trigger="hover">
             <el-image
               slot="reference"
               :src="row.emplCodeUrl"
               class="code-image--small"
             ></el-image>
-            <el-image
-              :src="row.emplCodeUrl"
-              class="code-image"
-            >
-            </el-image>
+            <el-image :src="row.emplCodeUrl" class="code-image"> </el-image>
           </el-popover>
         </template>
         <!-- <template slot-scope="{ row }">
@@ -360,13 +366,13 @@ export default {
 </template>
 
 <style scoped lang="scss">
-  .code-image {
-    width: 200px;
-    height: 200px;
-  }
+.code-image {
+  width: 200px;
+  height: 200px;
+}
 
-  .code-image--small {
-    width: 50px;
-    height: 50px;
-  }
+.code-image--small {
+  width: 50px;
+  height: 50px;
+}
 </style>

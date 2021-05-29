@@ -22,11 +22,7 @@
             :data-clipboard-text="h5Link"
             >复制地址</el-button
           >
-          <el-link
-            type="info"
-            @click="openHelpDialog"
-            >如何配置？</el-link
-          >
+          <el-link type="info" @click="openHelpDialog">如何配置？</el-link>
         </div>
       </div>
     </div>
@@ -92,7 +88,11 @@
       </div>
     </div>
 
-    <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
+    <el-table
+      v-loading="loading"
+      :data="list"
+      @selection-change="handleSelectionChange"
+    >
       <el-table-column type="selection" width="50" align="center" />
       <el-table-column
         label="活码名称"
@@ -101,23 +101,16 @@
         :show-overflow-tooltip="true"
       />
 
-      <el-table-column
-        label="群活码"
-        align="center"
-        width="130"
-      >
+      <el-table-column label="群活码" align="center" width="130">
         <template #default="{ row }">
-          <el-popover
-            placement="bottom"
-            trigger="hover"
-          >
+          <el-popover placement="bottom" trigger="hover">
             <el-image
               slot="reference"
               :src="(row.groupCodeInfo && row.groupCodeInfo.codeUrl) || ''"
               class="code-image--small"
             ></el-image>
             <el-image
-              :src="(row.groupCodeInfo && row.groupCodeInfo.codeUrl ) || ''"
+              :src="(row.groupCodeInfo && row.groupCodeInfo.codeUrl) || ''"
               class="code-image"
             >
             </el-image>
@@ -125,11 +118,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column
-        label="关键词"
-        align="center"
-        width="120"
-      >
+      <el-table-column label="关键词" align="center" width="120">
         <template #default="{ row }">
           <el-popover
             placement="bottom"
@@ -137,16 +126,14 @@
             trigger="hover"
             :content="getDisplayKeywords(row)"
           >
-            <div slot="reference" class="table-desc overflow-ellipsis">{{ getDisplayKeywords(row) }}</div>
+            <div slot="reference" class="table-desc overflow-ellipsis">
+              {{ getDisplayKeywords(row) }}
+            </div>
           </el-popover>
         </template>
       </el-table-column>
 
-      <el-table-column
-        label="实际群聊"
-        align="center"
-        width="120"
-      >
+      <el-table-column label="实际群聊" align="center" width="120">
         <template #default="{ row }">
           <el-popover
             placement="bottom"
@@ -154,7 +141,9 @@
             trigger="hover"
             :content="getDisplayRealGroups(row)"
           >
-            <div slot="reference" class="table-desc overflow-ellipsis">{{ getDisplayRealGroups(row) }}</div>
+            <div slot="reference" class="table-desc overflow-ellipsis">
+              {{ getDisplayRealGroups(row) }}
+            </div>
           </el-popover>
         </template>
       </el-table-column>
@@ -221,23 +210,36 @@
     >
       <div class="help">
         <div class="step">
-          <p> 1、登录企业微信官方后台，进入应用管理，点击 LinkWeChat，再点击【配置到聊天工具栏】。 </p>
-          <el-image :src="require('@/assets/example/keywordHelp1.png')"></el-image>
+          <p>
+            1、登录企业微信官方后台，进入应用管理，点击
+            LinkWeChat，再点击【配置到聊天工具栏】。
+          </p>
+          <el-image
+            :src="require('@/assets/example/keywordHelp1.png')"
+          ></el-image>
         </div>
 
         <div class="step">
-          <p> 2、点击【配置】后，进入配置页面。 </p>
-          <el-image :src="require('@/assets/example/keywordHelp2.png')"></el-image>
+          <p>2、点击【配置】后，进入配置页面。</p>
+          <el-image
+            :src="require('@/assets/example/keywordHelp2.png')"
+          ></el-image>
         </div>
 
         <div class="step">
-          <p> 3、点击【配置页面】后，在弹窗中，输入页面名称及链接，并确定即可。进入配置页面。 </p>
-          <el-image :src="require('@/assets/example/keywordHelp3.png')"></el-image>
+          <p>
+            3、点击【配置页面】后，在弹窗中，输入页面名称及链接，并确定即可。进入配置页面。
+          </p>
+          <el-image
+            :src="require('@/assets/example/keywordHelp3.png')"
+          ></el-image>
         </div>
       </div>
 
       <div slot="footer">
-        <el-button type="primary" @click="dialogHowToConfig = false"> 我知道了 </el-button>
+        <el-button type="primary" @click="dialogHowToConfig = false">
+          我知道了
+        </el-button>
       </div>
     </el-dialog>
   </div>
@@ -257,50 +259,52 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        taskName: '',         // 活码名称
-        createBy: '',         // 创建人
-        keyword: '',          // 关键词
-        beginTime: '',        // 创建开始时间
-        endTime: ''           // 创建结束时间
+        taskName: '', // 活码名称
+        createBy: '', // 创建人
+        keyword: '', // 关键词
+        beginTime: '', // 创建开始时间
+        endTime: '', // 创建结束时间
       },
       queryCreateByName: '',
-      dateRange: [],          // 添加日期
-      total: 0,               // 关键词拉群数据总量
-      list: [],               // 关键词拉群数据
-      multiSelect: [],        // 多选数据
+      dateRange: [], // 添加日期
+      total: 0, // 关键词拉群数据总量
+      list: [], // 关键词拉群数据
+      multiSelect: [], // 多选数据
       dialogVisible: false,
       dialogHowToConfig: false,
       disabled: false,
       loading: false,
       pickerOptions: {},
-      clipboard: null
+      clipboard: null,
     }
   },
 
   methods: {
-    getList (page) {
+    getList(page) {
       page && (this.query.pageNum = page)
       this.loading = true
 
-      getList(this.query).then(({ rows, total }) => {
-        this.list = rows
-        this.total = +total
-        this.loading = false
-      }).catch(() => {
-        this.loading = false
-      })
+      getList(this.query)
+        .then(({ rows, total }) => {
+          this.list = rows
+          this.total = +total
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
     },
 
     // 跳转至新增和编辑页面
-    goRoute (id) {
+    goRoute(id) {
       this.$router.push({
         path: '/communityOperating/keywordsAev',
-        query: { 'id': id },
+        query: { id: id },
       })
     },
 
     // 重置查询参数
-    resetQuery () {
+    resetQuery() {
       this.dateRange = []
       this.$refs['queryForm'].resetFields()
 
@@ -308,73 +312,79 @@ export default {
     },
 
     // 批量删除
-    handleBulkRemove () {
+    handleBulkRemove() {
       this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
-      }).then(() => {
-        const ids = this.multiSelect.map(t => t.taskId)
+      })
+        .then(() => {
+          const ids = this.multiSelect.map((t) => t.taskId)
 
-        remove(ids + '').then((res) => {
-          if (res.code === 200) {
-            this.getList()
-          } else {}
+          remove(ids + '').then((res) => {
+            if (res.code === 200) {
+              this.getList()
+            } else {
+            }
+          })
         })
-      }).catch(() => {})
+        .catch(() => {})
     },
 
     // 删除
-    handleRemove (id) {
+    handleRemove(id) {
       this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
-      }).then(() => {
-        remove(id + '').then((res) => {
-          if (res.code === 200) {
-            this.getList()
-          } else {}
+      })
+        .then(() => {
+          remove(id + '').then((res) => {
+            if (res.code === 200) {
+              this.getList()
+            } else {
+            }
+          })
         })
-      }).catch(() => {})
+        .catch(() => {})
     },
 
-    openHelpDialog () {
+    openHelpDialog() {
       this.dialogHowToConfig = true
     },
 
     // 获取显示用keyword字符串
-    getDisplayKeywords (row) {
+    getDisplayKeywords(row) {
       const keywordList = row.keywordList || []
-      const keywords = keywordList.map(k => k.keyword)
+      const keywords = keywordList.map((k) => k.keyword)
 
       return keywords.join(' ')
     },
 
     // 获取显示用实际群码字符串
-    getDisplayRealGroups (row) {
+    getDisplayRealGroups(row) {
       return row.groupNameList.join(' ')
     },
 
     // 处理多选
-    handleSelectionChange (val) {
+    handleSelectionChange(val) {
       this.multiSelect = val
-    }
+    },
   },
 
   watch: {
     // 日期选择器数据同步至查询参数
-    dateRange (dateRange) {
+    dateRange(dateRange) {
       if (!dateRange || dateRange.length !== 2) {
         this.query.beginTime = ''
         this.query.endTime = ''
       } else {
-        [ this.query.beginTime, this.query.endTime ] = dateRange
+        ;[this.query.beginTime, this.query.endTime] = dateRange
       }
-    }
+    },
   },
 
-  mounted () {
+  mounted() {
     this.clipboard = new ClipboardJS('.copy-btn')
 
     this.clipboard.on('success', (e) => {
@@ -390,81 +400,85 @@ export default {
     })
   },
 
-  created () {
+  created() {
     this.getList(1)
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>当企业开通聊天工具栏后，用户可点击聊天工具栏中的【关键字群发】，搜索或选择某个关键词下的引导语及群活码，进行一键发送，客户手动扫码进群。</div>
+      `
+    )
   },
 
-  destroyed () {
+  destroyed() {
     this.clipboard.destroy()
-  }
+  },
 }
 </script>
 
 <style scoped lang="scss">
-  .link-info {
+.link-info {
+  .link-info__header {
+    padding-bottom: 10px;
+    font-size: 16px;
+  }
 
-    .link-info__header {
-      padding-bottom: 10px;
-      font-size: 16px;
-    }
+  .link-info__content {
+    color: #aaaaaa;
+    padding: 5px 0;
+  }
 
-    .link-info__content {
-      color: #AAAAAA;
-      padding: 5px 0;
-    }
+  .link {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
 
-    .link {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
+    .link__content {
+      background: #e0e0e0;
+      margin: 8px 10px 8px 0;
+      border-radius: 4px;
+      line-height: 32px;
+      padding: 0 12px;
 
-      .link__content {
-
-        background: #e0e0e0;
-        margin: 8px 10px 8px 0;
-        border-radius: 4px;
-        line-height: 32px;
-        padding: 0 12px;
-
-        span {
-          align-items: center;
-          height: 100%;
-          color: #AAAAAA;
-        }
+      span {
+        align-items: center;
+        height: 100%;
+        color: #aaaaaa;
       }
+    }
 
-      .link__action {
-        :nth-child(n+2) {
-          margin-left: 10px;
-        }
+    .link__action {
+      :nth-child(n + 2) {
+        margin-left: 10px;
       }
     }
   }
+}
 
-  .help {
-    .step {
-      margin-bottom: 20px;
-    }
+.help {
+  .step {
+    margin-bottom: 20px;
   }
+}
 
-  .code-image {
-    width: 200px;
-    height: 200px;
-  }
+.code-image {
+  width: 200px;
+  height: 200px;
+}
 
-  .code-image--small {
-    width: 50px;
-    height: 50px;
-  }
+.code-image--small {
+  width: 50px;
+  height: 50px;
+}
 
-  .overflow-ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+.overflow-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  .table-desc {
-    max-width: 120px;
-  }
+.table-desc {
+  max-width: 120px;
+}
 </style>

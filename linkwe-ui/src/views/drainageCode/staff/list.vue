@@ -47,6 +47,12 @@ export default {
   },
   created() {
     this.getList()
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>支持单人、批量单人及多人方式新建员工活码，客户可以通过扫描员工活码添加员工为好友，并支持自动给客户打标签和发送欢迎语。</div>
+      `
+    )
   },
   mounted() {
     var clipboard = new ClipboardJS('.copy-btn')

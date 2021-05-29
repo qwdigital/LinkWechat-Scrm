@@ -20,6 +20,13 @@ export default {
   },
   created() {
     this.getList()
+
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>用于查看当前企业所有的客户列表及详细信息，支持对客户进行打标签。</div>
+      `
+    )
   },
   methods: {
     getList(data) {

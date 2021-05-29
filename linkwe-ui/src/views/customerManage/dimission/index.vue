@@ -68,6 +68,12 @@ export default {
   computed: {},
   created() {
     this.getList()
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>从通讯录将离职员工删除后，可以分配他的客户及客户群给其他员工继续跟进。</div>
+      `
+    )
   },
   mounted() {},
   methods: {
@@ -160,7 +166,7 @@ export default {
         >
         <el-button
           v-hasPermi="['customerManage:dimission:query']"
-          type="info"
+          type="success"
           @click="resetForm('queryForm')"
           >重置</el-button
         >
@@ -168,21 +174,17 @@ export default {
     </el-form>
 
     <div class="mid-action">
-      <div class="total">
-        从通讯录将离职员工删除后，可以分配他的客户及客户群给其他员工继续跟进
-      </div>
+      <div></div>
       <div>
         <el-button
           v-hasPermi="['customerManage:dimission:filter']"
           type="primary"
-          size="mini"
           @click="$router.push({ path: '/customerManage/allocatedStaffList' })"
           >已分配的离职员工</el-button
         >
         <el-button
           v-hasPermi="['customerManage:dimission:allocate']"
-          type="primary"
-          size="mini"
+          type="info"
           @click="showSelectDialog"
           >分配给其他员工</el-button
         >

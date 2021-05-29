@@ -448,6 +448,14 @@ export default {
 
   created() {
     this.getGroupCodes()
+
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>群活码原理为把多个群二维码统一为固定的活码，群满自动切换新群，无需手动更新二维码，并未改变微信原有入群规则。</div>
+        <div>本质上相当于一个中间跳转页面，当一个群快满时，会自动在跳转页面中显示另一个群的二维码，从而突破客户加群的限制。</div>
+      `
+    )
   },
 
   destroyed() {

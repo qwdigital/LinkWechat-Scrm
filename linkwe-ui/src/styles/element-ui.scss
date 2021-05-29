@@ -119,6 +119,7 @@
 }
 .el-table .el-table__body-wrapper tr {
   box-shadow: 0px 0px 5px 0px rgba(195, 195, 195, 0.35);
+  height: 50px;
 }
 .el-table th.is-leaf,
 .el-table td {
@@ -128,5 +129,14 @@
   &:first-child,
   &:last-child {
     border-radius: 4px;
+  }
+}
+
+.el-form-item {
+  margin: 0 !important;
+  padding: 10px;
+  &:hover {
+    background: #e5f1fc;
+    border-radius: 10px;
   }
 }

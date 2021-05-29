@@ -104,25 +104,19 @@ export default {
         <el-button
           v-hasPermi="['customerManage:tag:add']"
           type="primary"
-          size="mini"
-          icon="el-icon-plus"
           @click="edit()"
           >新建标签组</el-button
         >
         <el-button
           v-hasPermi="['customerManage:tag:sync']"
-          type="primary"
-          size="mini"
-          icon="el-icon-refresh"
+          type="info"
           @click="syncTag"
           >同步标签组</el-button
         >
         <el-button
           v-hasPermi="['customerManage:tag:remove']"
-          v-if="ids.length"
-          type="primary"
-          size="mini"
-          icon="el-icon-delete"
+          :disabled="!ids.length"
+          type="danger"
           @click="remove()"
           >批量删除</el-button
         >

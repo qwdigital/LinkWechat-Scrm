@@ -89,7 +89,6 @@ export default {
           v-hasPermi="['wecom:tlp:add']"
           type="primary"
           size="mini"
-          icon="el-icon-plus"
           @click="goRoute()"
           >新建{{ wel[type] }}欢迎语</el-button
         >
