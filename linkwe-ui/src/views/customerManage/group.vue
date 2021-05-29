@@ -257,24 +257,4 @@ export default {
   </div>
 </template>
 
-<style lang="scss" scoped>
-.mid-action {
-  display: flex;
-  justify-content: space-between;
-  margin: 10px 0;
-  align-items: center;
-  .total {
-    background-color: rgba(65, 133, 244, 0.1);
-    border: 1px solid rgba(65, 133, 244, 0.2);
-    border-radius: 3px;
-    font-size: 14px;
-    min-height: 32px;
-    line-height: 32px;
-    padding: 0 12px;
-    color: #606266;
-  }
-  .num {
-    color: #00f;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

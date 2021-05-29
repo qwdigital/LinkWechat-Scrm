@@ -10,6 +10,15 @@
         <a v-else @click.prevent="handleLink(item)">{{ item.meta.title }}</a>
       </el-breadcrumb-item>
     </transition-group>
+    <el-popover
+      v-if="busininessDesc"
+      placement="top-start"
+      title="引导语"
+      trigger="hover"
+    >
+      <div v-html="busininessDesc"></div>
+      <i class="el-icon-question" slot="reference"></i>
+    </el-popover>
   </el-breadcrumb>
 </template>
 
@@ -28,7 +37,13 @@ export default {
       if (route.path.startsWith('/redirect/')) {
         return
       }
+      this.$store.state.app.busininessDesc = ''
       this.getBreadcrumb()
+    },
+  },
+  computed: {
+    busininessDesc() {
+      return this.$store.state.app.busininessDesc
     },
   },
   created() {
@@ -87,5 +102,9 @@ export default {
     color: $blue;
     cursor: text;
   }
+}
+.el-icon-question {
+  color: #888;
+  margin-left: 10px;
 }
 </style>

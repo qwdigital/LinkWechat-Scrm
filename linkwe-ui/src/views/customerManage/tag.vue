@@ -99,7 +99,7 @@ export default {
 <template>
   <div class="app-container">
     <div class="mid-action">
-      <div class="total"></div>
+      <div></div>
       <div>
         <el-button
           v-hasPermi="['customerManage:tag:add']"
@@ -182,14 +182,4 @@ export default {
     />
   </div>
 </template>
-<style lang="scss" scoped>
-.mid-action {
-  display: flex;
-  justify-content: space-between;
-  margin: 10px 0;
-  align-items: center;
-  .num {
-    color: #00f;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

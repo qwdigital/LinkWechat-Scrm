@@ -94,6 +94,13 @@ export default {
     this.getListTag()
     this.getListOrganization()
     this.getLossRemindStatus()
+
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>开启后，当员工被客户删除时，被删除的员工将收到一条消息提醒</div>
+      `
+    )
   },
   mounted() {},
   methods: {
@@ -281,14 +288,6 @@ export default {
           inactive-color="#ff4949"
           @change="remindSwitch"
         ></el-switch>
-        <el-tooltip
-          class="item"
-          effect="dark"
-          content="开启后，当员工被客户删除时，被删除的员工将收到一条消息提醒"
-          placement="top-end"
-        >
-          <i class="el-icon-warning-outline"></i>
-        </el-tooltip>
       </div>
     </div>
 
@@ -397,40 +396,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.tag-input {
-  width: 240px;
-  display: flex;
-  border-radius: 4px;
-  border: 1px solid #dcdfe6;
-  align-items: center;
-  padding: 0 15px;
-  overflow: hidden;
-  height: 32px;
-  .tag-place {
-    color: #bbb;
-    font-size: 14px;
-  }
-}
-.mid-action {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  align-items: center;
-  background: #fff;
-  .total {
-    background-color: rgba(65, 133, 244, 0.1);
-    border: 1px solid rgba(65, 133, 244, 0.2);
-    border-radius: 3px;
-    font-size: 14px;
-    min-height: 32px;
-    line-height: 32px;
-    padding: 0 12px;
-    color: #606266;
-  }
-  .num {
-    color: #00f;
-  }
-}
 .el-icon-s-custom {
   font-size: 16px;
   margin-left: 4px;

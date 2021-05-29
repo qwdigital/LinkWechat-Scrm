@@ -1,7 +1,13 @@
 <template>
   <div>
     <div class="top-search">
-      <el-form inline label-position="right" :model="query" label-width="80px" ref="queryForm">
+      <el-form
+        inline
+        label-position="right"
+        :model="query"
+        label-width="80px"
+        ref="queryForm"
+      >
         <el-form-item label="任务名称" prop="taskName">
           <el-input v-model="query.taskName" placeholder="请输入"></el-input>
         </el-form-item>
@@ -63,7 +69,11 @@
       </div>
     </div>
 
-    <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
+    <el-table
+      v-loading="loading"
+      :data="list"
+      @selection-change="handleSelectionChange"
+    >
       <el-table-column type="selection" width="50" align="center" />
 
       <el-table-column
@@ -81,20 +91,13 @@
 
       <el-table-column label="当前群人数" align="center">
         <template #default="{ row }">
-          <el-button
-            type="text"
-            @click="openCustomerDialog(row.taskId)"
-          >
+          <el-button type="text" @click="openCustomerDialog(row.taskId)">
             {{ row.totalMember }}
           </el-button>
         </template>
       </el-table-column>
 
-      <el-table-column
-        label="客户标签"
-        align="center"
-        width="120"
-      >
+      <el-table-column label="客户标签" align="center" width="120">
         <template #default="{ row }">
           <el-popover
             placement="bottom"
@@ -102,7 +105,9 @@
             trigger="hover"
             :content="getDisplayTags(row)"
           >
-            <div slot="reference" class="table-desc overflow-ellipsis">{{ getDisplayTags(row) }}</div>
+            <div slot="reference" class="table-desc overflow-ellipsis">
+              {{ getDisplayTags(row) }}
+            </div>
           </el-popover>
         </template>
       </el-table-column>
@@ -152,19 +157,29 @@
       @pagination="getList()"
     />
 
-    <el-dialog
-      title="客户统计"
-      :visible.sync="dialogVisible"
-    >
+    <el-dialog title="客户统计" :visible.sync="dialogVisible">
       <div>
         <div class="top-search">
-          <el-form inline label-position="right" :model="customerQuery" label-width="80px" ref="customerForm">
+          <el-form
+            inline
+            label-position="right"
+            :model="customerQuery"
+            label-width="80px"
+            ref="customerForm"
+          >
             <el-form-item prop="customerName">
-              <el-input v-model="customerQuery.customerName" placeholder="请输入客户名称"></el-input>
+              <el-input
+                v-model="customerQuery.customerName"
+                placeholder="请输入客户名称"
+              ></el-input>
             </el-form-item>
 
             <el-form-item prop="isInGroup">
-              <el-select v-model="customerQuery.isInGroup" placeholder="全部" size="small">
+              <el-select
+                v-model="customerQuery.isInGroup"
+                placeholder="全部"
+                size="small"
+              >
                 <el-option
                   v-for="(inGroup, index) in inGroupOptions"
                   :label="inGroup.label"
@@ -175,7 +190,11 @@
             </el-form-item>
 
             <el-form-item prop="isSent">
-              <el-select v-model="customerQuery.isSent" placeholder="全部状态" size="small">
+              <el-select
+                v-model="customerQuery.isSent"
+                placeholder="全部状态"
+                size="small"
+              >
                 <el-option
                   v-for="(status, index) in sendStatusOptions"
                   :label="status.label"
@@ -191,13 +210,9 @@
             </el-form-item>
           </el-form>
         </div>
-        
+
         <el-table v-loading="customerLoading" :data="customerList">
-          <el-table-column
-            label="客户名"
-            align="center"
-            prop="customerName"
-          />
+          <el-table-column label="客户名" align="center" prop="customerName" />
 
           <el-table-column prop="sent" label="送达状态" align="center">
             <template #default="{ row }">
@@ -246,11 +261,11 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        taskName: '',   // 任务名称
-        sendType: '',   // 发送方式
-        createBy: '',   // 创建人
-        beginTime: '',  // 创建开始时间
-        endTime: ''     // 创建结束时间
+        taskName: '', // 任务名称
+        sendType: '', // 发送方式
+        createBy: '', // 创建人
+        beginTime: '', // 创建开始时间
+        endTime: '', // 创建结束时间
       },
       // 老客标签建群总数据量
       total: 0,
@@ -261,7 +276,7 @@ export default {
       // 可用的发送方式数据
       sendTypeOptions: [
         { label: '企业群发', value: 0 },
-        { label: '个人群发', value: 1 }
+        { label: '个人群发', value: 1 },
       ],
       // 创建日期[开始时间, 结束时间]
       dateRange: [],
@@ -274,9 +289,9 @@ export default {
       customerQuery: {
         pageNum: 1,
         pageSize: 10,
-        customerName: '',     // 客户名称
-        isInGroup: '',        // 是否在群
-        isSent: '',           // 是否送达
+        customerName: '', // 客户名称
+        isInGroup: '', // 是否在群
+        isSent: '', // 是否送达
       },
       // 客户统计总数据量
       customerTotal: 0,
@@ -289,59 +304,63 @@ export default {
       // 是否在群选择项
       inGroupOptions: [
         { label: '在群', value: 1 },
-        { label: '不在群', value: 0 }
+        { label: '不在群', value: 0 },
       ],
       // 是否送达选择项
       sendStatusOptions: [
         { label: '已送达', value: 1 },
-        { label: '未送达', value: 0 }
+        { label: '未送达', value: 0 },
       ],
       // 客户统计会话
       dialogVisible: false,
       // 日期选择器选项
-      pickerOptions: {}
+      pickerOptions: {},
     }
   },
-  
+
   methods: {
     // 获取老客标签建群数据
-    getList (page) {
+    getList(page) {
       page && (this.query.pageNum = page)
       this.loading = true
 
-      getList(this.query).then(({ rows, total }) => {
-        this.list = rows
-        this.total = +total
-        this.loading = false
-      }).catch(() => {
-        this.loading = false
-      })
+      getList(this.query)
+        .then(({ rows, total }) => {
+          this.list = rows
+          this.total = +total
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
     },
 
     // 获取客户统计数据
-    getStat (page) {
+    getStat(page) {
       page && (this.customerQuery.pageNum = page)
       this.customerLoading = true
 
-      getStat(this.customerSearchId).then(({ rows, total }) => {
-        this.customerList = rows
-        this.customerTotal = +total
-        this.customerLoading = false
-      }).catch(() => {
-        this.customerLoading = false
-      })
+      getStat(this.customerSearchId)
+        .then(({ rows, total }) => {
+          this.customerList = rows
+          this.customerTotal = +total
+          this.customerLoading = false
+        })
+        .catch(() => {
+          this.customerLoading = false
+        })
     },
 
     // 跳转至新增和编辑页面
-    goRoute (id) {
+    goRoute(id) {
       this.$router.push({
         path: '/communityOperating/oldCustomerAev',
-        query: { 'id': id },
+        query: { id: id },
       })
     },
 
     // 重置查询参数
-    resetQuery () {
+    resetQuery() {
       this.dateRange = []
       this.$refs['queryForm'].resetFields()
 
@@ -349,51 +368,57 @@ export default {
     },
 
     // 获取显示用tag字符串
-    getDisplayTags (row) {
-      const tags = row.tagList.map(t => t.name)
+    getDisplayTags(row) {
+      const tags = row.tagList.map((t) => t.name)
 
       return tags.join(' ')
     },
 
     // 批量删除
-    handleBulkRemove () {
+    handleBulkRemove() {
       this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
-      }).then(() => {
-        const ids = this.multiSelect.map(t => t.taskId)
+      })
+        .then(() => {
+          const ids = this.multiSelect.map((t) => t.taskId)
 
-        remove(ids + '').then((res) => {
-          if (res.code === 200) {
-            this.getList()
-          } else {}
+          remove(ids + '').then((res) => {
+            if (res.code === 200) {
+              this.getList()
+            } else {
+            }
+          })
         })
-      }).catch(() => {})
+        .catch(() => {})
     },
 
     // 删除
-    handleRemove (id) {
+    handleRemove(id) {
       this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
-      }).then(() => {
-        remove(id + '').then((res) => {
-          if (res.code === 200) {
-            this.getList()
-          } else {}
+      })
+        .then(() => {
+          remove(id + '').then((res) => {
+            if (res.code === 200) {
+              this.getList()
+            } else {
+            }
+          })
         })
-      }).catch(() => {})
+        .catch(() => {})
     },
 
     // 处理多选
-    handleSelectionChange (val) {
+    handleSelectionChange(val) {
       this.multiSelect = val
     },
 
     // 打开客户统计会话
-    openCustomerDialog (id) {
+    openCustomerDialog(id) {
       this.customerSearchId = id
       this.dialogVisible = true
 
@@ -401,73 +426,81 @@ export default {
     },
 
     // 过滤客户统计数据
-    customerFilter () {
+    customerFilter() {
       const l = []
       for (let data of this.customerList) {
-        if (this.customerQuery.customerName !== '' && !this.customerQuery.customerName.includes(data.customerName)) continue
-        if (this.customerQuery.isInGroup !== '' && this.customerQuery.isInGroup !== data.isInGroup) continue
-        if (this.customerQuery.isSent !== '' && this.customerQuery.isSent !== data.isSent) continue
+        if (
+          this.customerQuery.customerName !== '' &&
+          !this.customerQuery.customerName.includes(data.customerName)
+        )
+          continue
+        if (
+          this.customerQuery.isInGroup !== '' &&
+          this.customerQuery.isInGroup !== data.isInGroup
+        )
+          continue
+        if (
+          this.customerQuery.isSent !== '' &&
+          this.customerQuery.isSent !== data.isSent
+        )
+          continue
 
         l.push(data)
       }
 
-      this.customerShowList = l.slice(this.customerQuery.pageNum * this.customerQuery.pageSize, this.customerQuery.pageSize)
+      this.customerShowList = l.slice(
+        this.customerQuery.pageNum * this.customerQuery.pageSize,
+        this.customerQuery.pageSize
+      )
     },
 
     // 客户统计查询
-    customerSearch () {
+    customerSearch() {
       // this.getStat()
       this.customerFilter()
     },
 
     // 客户统计重置
-    resetCustomerQuery () {
+    resetCustomerQuery() {
       this.$refs['customerForm'].resetFields()
 
       // this.getStat(1)
       this.customerFilter()
-    }
+    },
   },
 
   watch: {
     // 日期选择器数据同步至查询参数
-    dateRange (dateRange) {
+    dateRange(dateRange) {
       if (!dateRange || dateRange.length !== 2) {
         this.query.beginTime = ''
         this.query.endTime = ''
       } else {
-        [ this.query.beginTime, this.query.endTime ] = dateRange
+        ;[this.query.beginTime, this.query.endTime] = dateRange
       }
     },
 
-    dialogVisible (val) {
+    dialogVisible(val) {
       if (!val) this.$refs['customerForm'].resetFields()
       this.customerList = []
       this.customerTotal = 0
-    }
+    },
   },
 
   created() {
     this.getList(1)
-  }
+  },
 }
 </script>
 
 <style scoped lang="scss">
-  .overflow-ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+.overflow-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  .table-desc {
-    max-width: 120px;
-  }
-
-  .mid-action {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 10px 0;
-  }
+.table-desc {
+  max-width: 120px;
+}
 </style>

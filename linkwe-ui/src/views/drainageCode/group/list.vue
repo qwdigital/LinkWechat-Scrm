@@ -1,9 +1,6 @@
 <template>
   <div class="page">
-    <el-form
-      :inline="true"
-      class="top-search"
-    >
+    <el-form :inline="true" class="top-search">
       <el-form-item>
         <el-input
           v-model="query.activityName"
@@ -30,9 +27,7 @@
         ></el-date-picker>
       </el-form-item>
 
-      <el-form-item
-        class="search-button-area"
-      >
+      <el-form-item class="search-button-area">
         <el-button type="primary" @click="handleSearch">查询</el-button>
         <el-button @click="handleClear">清空</el-button>
       </el-form-item>
@@ -95,7 +90,9 @@
             trigger="hover"
             :content="row.activityDesc"
           >
-            <div slot="reference" class="table-desc overflow-ellipsis">{{ row.activityDesc }}</div>
+            <div slot="reference" class="table-desc overflow-ellipsis">
+              {{ row.activityDesc }}
+            </div>
           </el-popover>
         </template>
       </el-table-column>
@@ -107,33 +104,20 @@
         width="130"
       >
         <template #default="{ row }">
-          <el-popover
-            placement="bottom"
-            trigger="hover"
-          >
+          <el-popover placement="bottom" trigger="hover">
             <el-image
               slot="reference"
               :src="row.codeUrl"
               class="code-image--small"
             ></el-image>
-            <el-image
-              :src="row.codeUrl"
-              class="code-image"
-            >
-            </el-image>
+            <el-image :src="row.codeUrl" class="code-image"> </el-image>
           </el-popover>
         </template>
       </el-table-column>
 
-      <el-table-column
-        label="实际群码总数"
-        align="center"
-      >
+      <el-table-column label="实际群码总数" align="center">
         <template #default="{ row }">
-          <el-button
-            type="text"
-            @click="handleRealCodeDialogOpen(row.id, -1)"
-          >
+          <el-button type="text" @click="handleRealCodeDialogOpen(row.id, -1)">
             {{ (row.actualList && row.actualList.length) || 0 }}
           </el-button>
         </template>
@@ -155,10 +139,7 @@
             <i slot="reference" class="el-icon-warning expire-icon"></i>
           </el-popover>
 
-          <el-button
-            type="text"
-            @click="handleRealCodeDialogOpen(row.id, 0)"
-          >
+          <el-button type="text" @click="handleRealCodeDialogOpen(row.id, 0)">
             {{ row.availableCodes }}
           </el-button>
         </template>
@@ -182,15 +163,17 @@
         align="center"
       ></el-table-column>
 
-      <el-table-column
-        label="操作"
-        align="center"
-      >
+      <el-table-column label="操作" align="center">
         <template #default="{ row }">
           <el-button
             type="text"
             size="mini"
-            @click="$router.push({ path: '/drainageCode/customerGroupDetail', query: { groupCodeId: row.id } })"
+            @click="
+              $router.push({
+                path: '/drainageCode/customerGroupDetail',
+                query: { groupCodeId: row.id },
+              })
+            "
           >
             编辑
           </el-button>
@@ -212,11 +195,7 @@
             复制
           </el-button>
 
-          <el-button
-            type="text"
-            size="mini"
-            @click="handleRemove(row.id)"
-          >
+          <el-button type="text" size="mini" @click="handleRemove(row.id)">
             删除
           </el-button>
         </template>
@@ -238,22 +217,31 @@
       append-to-body
       width="70%"
     >
-      <RealCode ref="realCode" :groupCodeId="openGroupCodeId" :status="openGroupCodeStatus"></RealCode>
+      <RealCode
+        ref="realCode"
+        :groupCodeId="openGroupCodeId"
+        :status="openGroupCodeStatus"
+      ></RealCode>
     </el-dialog>
   </div>
 </template>
 
 <script>
 import RealCode from './realCode'
-import { getList, remove, downloadBatch, download } from '@/api/drainageCode/group'
+import {
+  getList,
+  remove,
+  downloadBatch,
+  download,
+} from '@/api/drainageCode/group'
 import ClipboardJS from 'clipboard'
 
 export default {
   components: {
-    RealCode
+    RealCode,
   },
 
-  data () {
+  data() {
     return {
       // 搜索数据
       query: {
@@ -262,7 +250,7 @@ export default {
         activityName: '',
         createBy: '',
         beginTime: '',
-        endTime: ''
+        endTime: '',
       },
       // 加载状态
       loading: false,
@@ -281,50 +269,52 @@ export default {
       // 打开实际群码的检索状态
       openGroupCodeStatus: -1,
       // 拷贝对象
-      clipboard: null
+      clipboard: null,
     }
   },
 
   methods: {
     // 获取活码数据
-    getGroupCodes () {
+    getGroupCodes() {
       const params = Object.assign({}, this.query)
 
       this.loading = true
 
-      getList(params).then((res) => {
-        if (res.code === 200) {
-          this.groupCodes = res.rows
-          this.total = parseInt(res.total)
-        }
-        this.loading = false
-      }).catch(() => {
-        this.loading = false
-      })
+      getList(params)
+        .then((res) => {
+          if (res.code === 200) {
+            this.groupCodes = res.rows
+            this.total = parseInt(res.total)
+          }
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
     },
 
     // 查询
-    handleSearch () {
+    handleSearch() {
       this.getGroupCodes()
     },
 
     // 搜索栏清空
-    handleClear () {
+    handleClear() {
       this.searchDate = ''
 
       this.query = {
         activityName: '',
         createBy: '',
         beginTime: '',
-        endTime: ''
+        endTime: '',
       }
 
       this.getGroupCodes()
     },
 
     // 批量下载
-    handleBulkDownload () {
-      const ids = this.multiGroupCode.map(group => group.id)
+    handleBulkDownload() {
+      const ids = this.multiGroupCode.map((group) => group.id)
 
       this.$confirm('是否确认下载所有图片吗?', '警告', {
         confirmButtonText: '确定',
@@ -349,24 +339,31 @@ export default {
     },
 
     // 批量删除
-    handleBulkRemove () {
-      this.$confirm('确认删除当前群活码?删除操作无法撤销，请谨慎操作。', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }).then(() => {
-        const ids = this.multiGroupCode.map(group => group.id)
+    handleBulkRemove() {
+      this.$confirm(
+        '确认删除当前群活码?删除操作无法撤销，请谨慎操作。',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }
+      )
+        .then(() => {
+          const ids = this.multiGroupCode.map((group) => group.id)
 
-        remove(ids + '').then((res) => {
-          if (res.code === 200) {
-            this.getGroupCodes()
-          } else {}
+          remove(ids + '').then((res) => {
+            if (res.code === 200) {
+              this.getGroupCodes()
+            } else {
+            }
+          })
         })
-      }).catch(() => {})
+        .catch(() => {})
     },
 
     // 下载
-    handleDownload (codeId, activityName) {
+    handleDownload(codeId, activityName) {
       const name = activityName + '.png'
 
       download(codeId).then((res) => {
@@ -383,47 +380,54 @@ export default {
     },
 
     // 删除
-    handleRemove (codeId) {
-      this.$confirm('确认删除当前群活码?删除操作无法撤销，请谨慎操作。', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }).then(() => {
-        remove(codeId).then((res) => {
-          if (res.code === 200) {
-            this.getGroupCodes()
-          } else {}
+    handleRemove(codeId) {
+      this.$confirm(
+        '确认删除当前群活码?删除操作无法撤销，请谨慎操作。',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }
+      )
+        .then(() => {
+          remove(codeId).then((res) => {
+            if (res.code === 200) {
+              this.getGroupCodes()
+            } else {
+            }
+          })
         })
-      }).catch(() => {})
+        .catch(() => {})
     },
 
     // 处理多选
-    handleSelectionChange (val) {
+    handleSelectionChange(val) {
       this.multiGroupCode = val
     },
-    
+
     // 打开实际群码窗口
-    handleRealCodeDialogOpen (groupCodeId, status) {
+    handleRealCodeDialogOpen(groupCodeId, status) {
       this.openGroupCodeId = groupCodeId
       this.openGroupCodeStatus = status
       this.realCodeDialog = true
-    }
+    },
   },
 
   watch: {
-    searchDate (dateRange) {
+    searchDate(dateRange) {
       if (!dateRange || dateRange.length !== 2) {
         this.query.beginTime = ''
         this.query.endTime = ''
       } else {
-        [ this.query.beginTime, this.query.endTime ] = dateRange
+        ;[this.query.beginTime, this.query.endTime] = dateRange
       }
     },
 
     // 如果实际群码弹出框关闭,刷新数据
-    realCodeDialog (val) {
+    realCodeDialog(val) {
       if (val === false) this.getGroupCodes()
-    }
+    },
   },
 
   mounted() {
@@ -442,45 +446,38 @@ export default {
     })
   },
 
-  created () {
+  created() {
     this.getGroupCodes()
   },
 
-  destroyed () {
+  destroyed() {
     this.clipboard.destroy()
   },
 }
 </script>
 
 <style scoped lang="scss">
-  .overflow-ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+.overflow-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  .table-desc {
-    max-width: 150px;
-  }
+.table-desc {
+  max-width: 150px;
+}
 
-  .code-image {
-    width: 200px;
-    height: 200px;
-  }
+.code-image {
+  width: 200px;
+  height: 200px;
+}
 
-  .code-image--small {
-    width: 50px;
-    height: 50px;
-  }
+.code-image--small {
+  width: 50px;
+  height: 50px;
+}
 
-  .expire-icon {
-    color: red;
-  }
-
-  .mid-action {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 10px 0;
-  }
+.expire-icon {
+  color: red;
+}
 </style>
