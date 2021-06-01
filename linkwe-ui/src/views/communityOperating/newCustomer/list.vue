@@ -204,17 +204,6 @@ export default {
     <div class="fxbw mb10 aic">
       <div class="total">
         <el-button type="primary" @click="goRoute()">新建自动拉群</el-button>
-        <!-- 新客自动拉群 -->
-        <el-tooltip
-          effect="light"
-          content="客户通过员工活码添加员工，自动发送入群引导语、群活码，客户扫码入群。"
-          placement="top-start"
-        >
-          <i
-            class="el-icon-question"
-            style="font-size: 26px;vertical-align: middle; margin-left: 10px;"
-          ></i>
-        </el-tooltip>
       </div>
       <div>
         <el-button
