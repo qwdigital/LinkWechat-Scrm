@@ -76,7 +76,9 @@
             <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
                 and date_format(w.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
             </if>
+
         </where>
+        ORDER BY w.create_time DESC
     </select>
 
     <select id="selectWeGroupCodeListByIds" resultMap="WeGroupCodeResult">

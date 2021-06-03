@@ -20,6 +20,7 @@
         <result property="state" column="state" />
         <result property="isJoinConfirmFriends" column="is_join_confirm_friends" />
         <collection property="weEmpleCodeUseScops" ofType="com.linkwechat.wecom.domain.WeEmpleCodeUseScop">
+            <result property="id" column="scopeId"/>
             <result property="businessId" column="business_id"/>
             <result property="businessName" column="business_name"/>
             <result property="mobile" column="mobile"/>
@@ -74,12 +75,13 @@
             wecusn.mobile,
             wect.tag_id,
             wect.tag_name,
-            wecode.is_join_confirm_friends
+            wecode.is_join_confirm_friends,
+            wecusn.id as scopeId
         from
             we_emple_code wecode
         left join (
             SELECT
-                wecus.emple_code_id, wecus.business_id, wecus.business_name,wu.mobile
+               wecus.id, wecus.emple_code_id, wecus.business_id, wecus.business_name,wu.mobile
             FROM
                 we_emple_code_use_scop wecus
             LEFT JOIN we_user wu ON
@@ -117,6 +119,7 @@
             AND wecusn.business_name like concat('%', #{useUserName}, '%')
         </if>
         group by wecode.id
+        order by  wecode.create_time desc
     </select>
 
     <select id="selectWeEmpleCodeById" parameterType="Long" resultMap="WeEmpleCodeResult">
