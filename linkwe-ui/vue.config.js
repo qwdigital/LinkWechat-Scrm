@@ -1,5 +1,6 @@
 'use strict'
 const path = require('path')
+const performancePlugin = require('performance_test_plugins_milk')
 
 function resolve(dir) {
   return path.join(__dirname, dir)
@@ -55,6 +56,9 @@ module.exports = {
         '@': resolve('src'),
       },
     },
+    plugins: [
+        new performancePlugin()
+    ]
   },
   chainWebpack(config) {
     // 修复HMR
