@@ -268,8 +268,9 @@ export default {
         :model="query"
         :rules="ruleForm"
         ref="ruleForm"
-        label-width="150px"
+        label-width="120px"
         class="top-search"
+        labelPosition="left"
       >
         <el-form-item label="目标活动名称" prop="taskName">
           <el-input v-model="query.taskName" placeholder="请输入"></el-input>
@@ -302,9 +303,10 @@ export default {
       <el-form
         :model="query"
         :rules="ruleForm"
-        label-width="150px"
+        label-width="120px"
         ref="fissStaff"
         class="top-search"
+        labelPosition="left"
       >
         <el-form-item label="发起成员" prop="taskNames">
           <el-radio-group v-model="groupForm.sendType" @change="changeType">
@@ -360,8 +362,9 @@ export default {
         :model="groupForm"
         :rules="ruleForm"
         ref="fissTarget"
-        label-width="150px"
+        label-width="120px"
         class="top-search"
+        labelPosition="left"
       >
         <el-form-item label="选择海报" prop="postersId">
           <el-button
@@ -410,8 +413,9 @@ export default {
       <el-form
         :model="groupForm"
         ref="reward"
-        label-width="150px"
+        label-width="120px"
         class="top-search"
+        labelPosition="left"
       >
         <el-form-item label="兑奖链接" prop="rewardUrl">
           <el-input
@@ -561,6 +565,7 @@ export default {
   .title {
     text-align: left;
     color: #303133;
+    margin-bottom: 10px;
   }
 }
 .avatar-uploader .el-upload {

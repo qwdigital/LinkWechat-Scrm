@@ -206,6 +206,7 @@ export default {
                 <el-radio-group
                     @change='dateChange'
                     v-model="dateSelect"
+                    style="margin-bottom:10px"
                 >
                     <el-radio-button label="近7日"></el-radio-button>
                     <el-radio-button label="近30日"></el-radio-button>
@@ -255,6 +256,7 @@ export default {
         .title {
             color: #303133;
             text-align: left;
+            margin-bottom: 10px;
         }
         .dateRang {
             display: flex;

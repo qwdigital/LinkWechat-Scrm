@@ -16,6 +16,7 @@ export default {
       dateRange: [],
       tableData: [],
       total: 0,
+      loading:false
     }
   },
   created() {
@@ -30,10 +31,12 @@ export default {
   },
   methods: {
     getList(data) {
+      this.loading = true
       let params = Object.assign({}, this.query, data)
       api.getList(params).then(({ rows, total }) => {
         this.tableData = rows
         this.total = +total
+        this.loading = false
       })
     },
     resetForm() {},
@@ -62,7 +65,6 @@ export default {
       ref="queryForm"
       :inline="true"
       :model="query"
-      label-width="100px"
       class="top-search"
       size="small"
     >
@@ -84,11 +86,13 @@ export default {
           v-hasPermi="['customerManage:customer:query']"
           type="primary"
           @click="getList({ pageNum: 1 })"
+          :loading="loading"
           >查询</el-button
         >
         <el-button
           v-hasPermi="['customerManage:customer:query']"
           type="primary"
+          style="background: #FA7216;color: #FFFFFF;border-color:#FA7216"
           @click="newAdd()"
           >新增任务</el-button
         >
@@ -112,19 +116,20 @@ export default {
           <el-button
             @click="toDetail(scope.row)"
             v-hasPermi="['enterpriseWechat:view']"
-            size="mini"
+            size="medium"
             type="text"
             icon="el-icon-view"
-            >查看</el-button
+            ></el-button
           >
           <el-button
             v-if="scope.row.fissStatus != 2"
             @click="toEdit(scope.row)"
             v-hasPermi="['enterpriseWechat:edit']"
-            size="mini"
+            size="medium"
             type="text"
-            icon="el-icon-edit"
-            >编辑</el-button
+            icon="el-icon-edit-outline"
+            style="color:#E74E59"
+            ></el-button
           >
         </template>
       </el-table-column>
