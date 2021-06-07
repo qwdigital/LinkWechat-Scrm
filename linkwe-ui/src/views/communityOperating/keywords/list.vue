@@ -1,3 +1,164 @@
+<script>
+import { getList, remove } from '@/api/communityOperating/keywords'
+import ClipboardJS from 'clipboard'
+import SelectUser from '@/components/SelectUser'
+
+export default {
+  components: { SelectUser },
+  props: {},
+  data() {
+    return {
+      h5Link: 'https://platform.wshoto.com/H5/?corpId=ww8e09372aff8d9190',
+      query: {
+        pageNum: 1,
+        pageSize: 10,
+        taskName: '', // 活码名称
+        createBy: '', // 创建人
+        keyword: '', // 关键词
+        beginTime: '', // 创建开始时间
+        endTime: '', // 创建结束时间
+      },
+      queryCreateByName: '',
+      dateRange: [], // 添加日期
+      total: 0, // 关键词拉群数据总量
+      list: [], // 关键词拉群数据
+      multiSelect: [], // 多选数据
+      dialogVisible: false,
+      dialogHowToConfig: false,
+      disabled: false,
+      loading: false,
+      pickerOptions: {},
+      clipboard: null,
+    }
+  },
+  watch: {
+    // 日期选择器数据同步至查询参数
+    dateRange(dateRange) {
+      if (!dateRange || dateRange.length !== 2) {
+        this.query.beginTime = ''
+        this.query.endTime = ''
+      } else {
+        ;[this.query.beginTime, this.query.endTime] = dateRange
+      }
+    },
+  },
+  created() {
+    this.getList(1)
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>当企业开通聊天工具栏后，用户可点击聊天工具栏中的【关键字群发】，搜索或选择某个关键词下的引导语及群活码，进行一键发送，客户手动扫码进群。</div>
+      `
+    )
+  },
+  mounted() {
+    this.clipboard = new ClipboardJS('.copy-btn')
+
+    this.clipboard.on('success', (e) => {
+      this.$notify({
+        title: '成功',
+        message: '链接已复制到剪切板，可粘贴。',
+        type: 'success',
+      })
+    })
+
+    this.clipboard.on('error', (e) => {
+      this.$message.error('链接复制失败')
+    })
+  },
+  destroyed() {
+    this.clipboard.destroy()
+  },
+  methods: {
+    // 获取关键词拉群数据
+    getList(page) {
+      page && (this.query.pageNum = page)
+      this.loading = true
+
+      getList(this.query)
+        .then(({ rows, total }) => {
+          this.list = rows
+          this.total = +total
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
+    },
+    // 新增/编辑关键词拉群
+    goRoute(id) {
+      this.$router.push({
+        path: '/communityOperating/keywordsAev',
+        query: { id: id },
+      })
+    },
+    // 重置查询参数
+    resetQuery() {
+      this.dateRange = []
+      this.$refs['queryForm'].resetFields()
+
+      this.getList(1)
+    },
+    // 批量删除
+    handleBulkRemove() {
+      this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(() => {
+          const ids = this.multiSelect.map((t) => t.taskId)
+
+          remove(ids + '')
+            .then((res) => {
+              if (res.code === 200) {
+                this.getList()
+              } else {
+              }
+            })
+        })
+        .catch(() => {})
+    },
+    // 删除
+    handleRemove(id) {
+      this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(() => {
+          remove(id + '')
+            .then((res) => {
+              if (res.code === 200) {
+                this.getList()
+              } else {
+              }
+            })
+        })
+        .catch(() => {})
+    },
+    openHelpDialog() {
+      this.dialogHowToConfig = true
+    },
+    // 获取显示用keyword字符串
+    getDisplayKeywords(row) {
+      const keywordList = row.keywordList || []
+      const keywords = keywordList.map((k) => k.keyword)
+
+      return keywords.join(' ')
+    },
+    // 获取显示用实际群码字符串
+    getDisplayRealGroups(row) {
+      return row.groupNameList.join(' ')
+    },
+    // 处理多选
+    handleSelectionChange(val) {
+      this.multiSelect = val
+    },
+  }
+}
+</script>
+
 <template>
   <div>
     <div class="link-info">
@@ -5,14 +166,12 @@
       <div class="link-info__content">
         请点击按钮复制该应用链接，并将应用页面配置到聊天工具栏，方便成员在与客户的聊天中查看和使用，提高服务效率
       </div>
-
       <div class="link">
         <div class="link__content">
           <span>
             {{ h5Link }}
           </span>
         </div>
-
         <div class="link__action">
           <el-button
             v-hasPermi="['customerManage:customer:query']"
@@ -65,9 +224,8 @@
         >
         <el-button
           v-hasPermi="['customerManage:customer:query']"
-          type="info"
           @click="resetQuery()"
-          >重置</el-button
+          >清空</el-button
         >
       </el-form-item>
     </el-form>
@@ -93,15 +251,22 @@
       :data="list"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="50" align="center" />
+      <el-table-column
+        type="selection"
+        width="50"
+        align="center"
+      />
       <el-table-column
         label="活码名称"
         align="center"
         prop="taskName"
         :show-overflow-tooltip="true"
       />
-
-      <el-table-column label="群活码" align="center" width="130">
+      <el-table-column
+        label="群活码"
+        align="center"
+        width="130"
+      >
         <template #default="{ row }">
           <el-popover placement="bottom" trigger="hover">
             <el-image
@@ -112,13 +277,15 @@
             <el-image
               :src="(row.groupCodeInfo && row.groupCodeInfo.codeUrl) || ''"
               class="code-image"
-            >
-            </el-image>
+            ></el-image>
           </el-popover>
         </template>
       </el-table-column>
-
-      <el-table-column label="关键词" align="center" width="120">
+      <el-table-column
+        label="关键词"
+        align="center"
+        width="120"
+      >
         <template #default="{ row }">
           <el-popover
             placement="bottom"
@@ -132,8 +299,11 @@
           </el-popover>
         </template>
       </el-table-column>
-
-      <el-table-column label="实际群聊" align="center" width="120">
+      <el-table-column
+        label="实际群聊"
+        align="center"
+        width="120"
+      >
         <template #default="{ row }">
           <el-popover
             placement="bottom"
@@ -147,19 +317,16 @@
           </el-popover>
         </template>
       </el-table-column>
-
       <el-table-column
         label="创建人"
         align="center"
         prop="createBy"
       ></el-table-column>
-
       <el-table-column
         label="创建时间"
         align="center"
         prop="createTime"
       ></el-table-column>
-
       <el-table-column
         label="操作"
         align="center"
@@ -218,14 +385,12 @@
             :src="require('@/assets/example/keywordHelp1.png')"
           ></el-image>
         </div>
-
         <div class="step">
           <p>2、点击【配置】后，进入配置页面。</p>
           <el-image
             :src="require('@/assets/example/keywordHelp2.png')"
           ></el-image>
         </div>
-
         <div class="step">
           <p>
             3、点击【配置页面】后，在弹窗中，输入页面名称及链接，并确定即可。进入配置页面。
@@ -235,7 +400,6 @@
           ></el-image>
         </div>
       </div>
-
       <div slot="footer">
         <el-button type="primary" @click="dialogHowToConfig = false">
           我知道了
@@ -245,189 +409,16 @@
   </div>
 </template>
 
-<script>
-import { getList, remove } from '@/api/communityOperating/keywords'
-import ClipboardJS from 'clipboard'
-import SelectUser from '@/components/SelectUser'
-
-export default {
-  components: { SelectUser },
-  props: {},
-  data() {
-    return {
-      h5Link: 'https://platform.wshoto.com/H5/?corpId=ww8e09372aff8d9190',
-      query: {
-        pageNum: 1,
-        pageSize: 10,
-        taskName: '', // 活码名称
-        createBy: '', // 创建人
-        keyword: '', // 关键词
-        beginTime: '', // 创建开始时间
-        endTime: '', // 创建结束时间
-      },
-      queryCreateByName: '',
-      dateRange: [], // 添加日期
-      total: 0, // 关键词拉群数据总量
-      list: [], // 关键词拉群数据
-      multiSelect: [], // 多选数据
-      dialogVisible: false,
-      dialogHowToConfig: false,
-      disabled: false,
-      loading: false,
-      pickerOptions: {},
-      clipboard: null,
-    }
-  },
-
-  methods: {
-    getList(page) {
-      page && (this.query.pageNum = page)
-      this.loading = true
-
-      getList(this.query)
-        .then(({ rows, total }) => {
-          this.list = rows
-          this.total = +total
-          this.loading = false
-        })
-        .catch(() => {
-          this.loading = false
-        })
-    },
-
-    // 跳转至新增和编辑页面
-    goRoute(id) {
-      this.$router.push({
-        path: '/communityOperating/keywordsAev',
-        query: { id: id },
-      })
-    },
-
-    // 重置查询参数
-    resetQuery() {
-      this.dateRange = []
-      this.$refs['queryForm'].resetFields()
-
-      this.getList(1)
-    },
-
-    // 批量删除
-    handleBulkRemove() {
-      this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      })
-        .then(() => {
-          const ids = this.multiSelect.map((t) => t.taskId)
-
-          remove(ids + '').then((res) => {
-            if (res.code === 200) {
-              this.getList()
-            } else {
-            }
-          })
-        })
-        .catch(() => {})
-    },
-
-    // 删除
-    handleRemove(id) {
-      this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      })
-        .then(() => {
-          remove(id + '').then((res) => {
-            if (res.code === 200) {
-              this.getList()
-            } else {
-            }
-          })
-        })
-        .catch(() => {})
-    },
-
-    openHelpDialog() {
-      this.dialogHowToConfig = true
-    },
-
-    // 获取显示用keyword字符串
-    getDisplayKeywords(row) {
-      const keywordList = row.keywordList || []
-      const keywords = keywordList.map((k) => k.keyword)
-
-      return keywords.join(' ')
-    },
-
-    // 获取显示用实际群码字符串
-    getDisplayRealGroups(row) {
-      return row.groupNameList.join(' ')
-    },
-
-    // 处理多选
-    handleSelectionChange(val) {
-      this.multiSelect = val
-    },
-  },
-
-  watch: {
-    // 日期选择器数据同步至查询参数
-    dateRange(dateRange) {
-      if (!dateRange || dateRange.length !== 2) {
-        this.query.beginTime = ''
-        this.query.endTime = ''
-      } else {
-        ;[this.query.beginTime, this.query.endTime] = dateRange
-      }
-    },
-  },
-
-  mounted() {
-    this.clipboard = new ClipboardJS('.copy-btn')
-
-    this.clipboard.on('success', (e) => {
-      this.$notify({
-        title: '成功',
-        message: '链接已复制到剪切板，可粘贴。',
-        type: 'success',
-      })
-    })
-
-    this.clipboard.on('error', (e) => {
-      this.$message.error('链接复制失败')
-    })
-  },
-
-  created() {
-    this.getList(1)
-    this.$store.dispatch(
-      'app/setBusininessDesc',
-      `
-        <div>当企业开通聊天工具栏后，用户可点击聊天工具栏中的【关键字群发】，搜索或选择某个关键词下的引导语及群活码，进行一键发送，客户手动扫码进群。</div>
-      `
-    )
-  },
-
-  destroyed() {
-    this.clipboard.destroy()
-  },
-}
-</script>
-
 <style scoped lang="scss">
 .link-info {
   .link-info__header {
     padding-bottom: 10px;
     font-size: 16px;
   }
-
   .link-info__content {
     color: #aaaaaa;
     padding: 5px 0;
   }
-
   .link {
     display: flex;
     align-items: center;
@@ -447,7 +438,6 @@ export default {
         color: #aaaaaa;
       }
     }
-
     .link__action {
       :nth-child(n + 2) {
         margin-left: 10px;
@@ -455,29 +445,24 @@ export default {
     }
   }
 }
-
 .help {
   .step {
     margin-bottom: 20px;
   }
 }
-
 .code-image {
   width: 200px;
   height: 200px;
 }
-
 .code-image--small {
   width: 50px;
   height: 50px;
 }
-
 .overflow-ellipsis {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .table-desc {
   max-width: 120px;
 }

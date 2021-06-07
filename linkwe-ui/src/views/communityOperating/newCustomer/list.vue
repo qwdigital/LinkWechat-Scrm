@@ -14,13 +14,13 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        emplCodeName: '',
-        createBy: '',
-        beginTime: '', // "开始时间",
-        endTime: '', // "结束时间"
+        emplCodeName: '', // 活码名称 
+        createBy: '', // 创建人
+        beginTime: '', // 开始日期
+        endTime: '', // 结束日期
       },
       dateRange: [], // 添加日期
-      total: 0,
+      total: 0, // 数据总量
       form: {},
       list: [],
       dialogVisible: false,
@@ -36,6 +36,17 @@ export default {
     }
   },
   computed: {},
+  watch: {
+    // 日期选择器数据同步至查询参数
+    dateRange(dateRange) {
+      if (!dateRange || dateRange.length !== 2) {
+        this.query.beginTime = ''
+        this.query.endTime = ''
+      } else {
+        ;[this.query.beginTime, this.query.endTime] = dateRange
+      }
+    },
+  },
   created() {
     this.getList()
     this.$store.dispatch(
@@ -49,6 +60,7 @@ export default {
     // new clipboard(".copy-btn");
   },
   methods: {
+    // 获取新客数据
     getList(page) {
       page && (this.query.pageNum = page)
       this.loading = true
@@ -63,11 +75,7 @@ export default {
           this.loading = false
         })
     },
-    edit(data, type) {
-      this.form = Object.assign({}, data || {})
-      this.dialogVisible = true
-      type || !data ? (this.disabled = false) : (this.disabled = true)
-    },
+    // 新建/编辑新客数据
     goRoute(id) {
       this.$router.push({
         path: '/communityOperating/newCustomerAev',
@@ -95,21 +103,23 @@ export default {
         })
         .catch(function() {})
     },
+    // 下载
     download(data) {
       let name = data.codeName + '.png'
-      download(data.id).then((res) => {
-        if (res != null) {
-          let blob = new Blob([res], { type: 'application/zip' })
-          let url = window.URL.createObjectURL(blob)
-          const link = document.createElement('a') // 创建a标签
-          link.href = url
-          link.download = name // 重命名文件
-          link.click()
-          URL.revokeObjectURL(url) // 释放内存
-        }
-      })
+      download(data.id)
+        .then((res) => {
+          if (res != null) {
+            let blob = new Blob([res], { type: 'application/zip' })
+            let url = window.URL.createObjectURL(blob)
+            const link = document.createElement('a') // 创建a标签
+            link.href = url
+            link.download = name // 重命名文件
+            link.click()
+            URL.revokeObjectURL(url) // 释放内存
+          }
+        })
     },
-    /** 批量下载 */
+    // 批量下载
     downloadBatch() {
       this.$confirm('是否确认下载所有活码图片吗?', '警告', {
         confirmButtonText: '确定',
@@ -133,7 +143,6 @@ export default {
         })
         .catch(function() {})
     },
-
     // 重置查询参数
     resetQuery() {
       this.dateRange = []
@@ -141,19 +150,7 @@ export default {
 
       this.getList(1)
     },
-  },
-
-  watch: {
-    // 日期选择器数据同步至查询参数
-    dateRange(dateRange) {
-      if (!dateRange || dateRange.length !== 2) {
-        this.query.beginTime = ''
-        this.query.endTime = ''
-      } else {
-        ;[this.query.beginTime, this.query.endTime] = dateRange
-      }
-    },
-  },
+  }
 }
 </script>
 
@@ -194,9 +191,8 @@ export default {
         >
         <el-button
           v-hasPermi="['customerManage:customer:query']"
-          type="info"
           @click="resetQuery()"
-          >重置</el-button
+          >清空</el-button
         >
       </el-form-item>
     </el-form>
@@ -229,9 +225,16 @@ export default {
       :data="list"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="50" align="center" />
-      <el-table-column prop="codeName" label="活码名称" align="center">
-      </el-table-column>
+      <el-table-column
+        type="selection"
+        width="50"
+        align="center"
+      ></el-table-column>
+      <el-table-column
+        prop="codeName"
+        label="活码名称"
+        align="center"
+      ></el-table-column>
       <el-table-column
         label="员工活码"
         align="center"
@@ -245,7 +248,7 @@ export default {
               :src="row.emplCodeUrl"
               class="code-image--small"
             ></el-image>
-            <el-image :src="row.emplCodeUrl" class="code-image"> </el-image>
+            <el-image :src="row.emplCodeUrl" class="code-image"></el-image>
           </el-popover>
         </template>
         <!-- <template slot-scope="{ row }">

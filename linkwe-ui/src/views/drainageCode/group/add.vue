@@ -1,3 +1,52 @@
+<script>
+import BaseInfo from './baseInfo'
+import RealCode from './realCode'
+import GroupCode from './groupCode'
+
+export default {
+  components: {
+    BaseInfo,
+    RealCode,
+    GroupCode
+  },
+  data() {
+    return {
+      // 当前群活码ID
+      groupCodeId: null,
+      // 当前激活的步骤
+      active: 0
+    }
+  },
+  methods: {
+    // 下一步
+    next(groupCodeId) {
+      if (groupCodeId) this.groupCodeId = groupCodeId
+      this.active += 1
+      if (this.active > 3) this.active = 1
+    },
+    // 上一步
+    prev() {
+      this.active -= 1
+      if (this.active < 0) this.active = 0
+    },
+    // 完成
+    finished() {
+      this.next()
+
+      this.$router.back()
+    },
+    // 新增或更新群活码
+    handleGroupCode() {
+      this.$refs.baseInfo.submit()
+    },
+    // 管理实际群活码
+    handleRealCode() {
+      this.next()
+    }
+  }
+}
+</script>
+
 <template>
   <div class="page">
     <el-steps
@@ -14,11 +63,9 @@
       <div v-if="active === 0">
         <BaseInfo ref="baseInfo" :groupCodeId="groupCodeId" @next="next"></BaseInfo>
       </div>
-
       <div v-if="active === 1">
         <RealCode ref="realCode" :groupCodeId="groupCodeId" @next="next"></RealCode>
       </div>
-
       <div v-if="active === 2">
         <GroupCode :groupCodeId="groupCodeId"></GroupCode>
       </div>
@@ -41,64 +88,9 @@
   </div>
 </template>
 
-<script>
-import BaseInfo from './baseInfo'
-import RealCode from './realCode'
-import GroupCode from './groupCode'
-
-export default {
-  components: {
-    BaseInfo,
-    RealCode,
-    GroupCode
-  },
-
-  data () {
-    return {
-      // 当前群活码ID
-      groupCodeId: null,
-      // 当前激活的步骤
-      active: 0
-    }
-  },
-
-  methods: {
-    // 下一步
-    next (groupCodeId) {
-      if (groupCodeId) this.groupCodeId = groupCodeId
-      this.active += 1
-      if (this.active > 3) this.active = 1
-    },
-
-    // 上一步
-    prev () {
-      this.active -= 1
-      if (this.active < 0) this.active = 0
-    },
-
-    // 完成
-    finished () {
-      this.next()
-
-      this.$router.back()
-    },
-
-    // 新增或更新群活码
-    handleGroupCode () {
-      this.$refs.baseInfo.submit()
-    },
-
-    // 管理实际群活码
-    handleRealCode() {
-      this.next()
-    }
-  }
-}
-</script>
-
 <style scoped lang="scss">
-  .page-content {
-    padding-top: 50px;
-    padding-bottom: 20px;
-  }
+.page-content {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
 </style>
