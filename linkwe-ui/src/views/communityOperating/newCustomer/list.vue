@@ -148,7 +148,9 @@ export default {
       this.dateRange = []
       this.$refs['queryForm'].resetFields()
 
-      this.getList(1)
+      this.$nextTick(() => {
+        this.getList(1)
+      })
     },
   }
 }
@@ -160,7 +162,7 @@ export default {
       ref="queryForm"
       :inline="true"
       :model="query"
-      label-width="80px"
+      label-width="100px"
       class="top-search"
       size="small"
     >
@@ -182,7 +184,7 @@ export default {
           align="right"
         ></el-date-picker>
       </el-form-item>
-      <el-form-item label="">
+      <el-form-item label=" ">
         <el-button
           v-hasPermi="['customerManage:customer:query']"
           type="primary"
@@ -191,14 +193,15 @@ export default {
         >
         <el-button
           v-hasPermi="['customerManage:customer:query']"
+          type="success"
           @click="resetQuery()"
-          >清空</el-button
+          >重置</el-button
         >
       </el-form-item>
     </el-form>
 
-    <div class="fxbw mb10 aic">
-      <div class="total">
+    <div class="mid-action">
+      <div>
         <el-button type="primary" @click="goRoute()">新建自动拉群</el-button>
       </div>
       <div>
@@ -217,8 +220,6 @@ export default {
         >
       </div>
     </div>
-    <!-- <el-card shadow="never" :body-style="{padding: '20px 0 0'}">
-    </el-card>-->
 
     <el-table
       v-loading="loading"

@@ -373,7 +373,12 @@ export default {
     </el-table>
 
     <el-dialog title="实际群码" :visible.sync="dialog" append-to-body>
-      <el-form :model="form" ref="form" label-width="120px" :rules="rules">
+      <el-form
+        :model="form"
+        ref="form"
+        label-width="120px"
+        :rules="rules"
+      >
         <el-form-item label="群名称" prop="groupName">
           <el-input
             v-model="form.groupName"

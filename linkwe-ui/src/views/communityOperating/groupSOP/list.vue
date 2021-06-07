@@ -69,7 +69,9 @@ export default {
       this.dateRange = []
       this.$refs['queryForm'].resetFields()
 
-      this.getList(1)
+      this.$$nextTick(() => {
+        this.getList(1)
+      })
     },
     // 批量删除
     handleBulkRemove() {
@@ -130,7 +132,7 @@ export default {
         inline
         label-position="right"
         :model="query"
-        label-width="80px"
+        label-width="100px"
         ref="queryForm"
       >
         <el-form-item label="规则名称" prop="ruleName">
@@ -151,7 +153,7 @@ export default {
             align="right"
           ></el-date-picker>
         </el-form-item>
-        <el-form-item label="">
+        <el-form-item label=" ">
           <el-button
             v-hasPermi="['customerManage:customer:query']"
             type="primary"
@@ -160,15 +162,16 @@ export default {
           >
           <el-button
             v-hasPermi="['customerManage:customer:query']"
+            type="success"
             @click="resetQuery()"
-            >清空</el-button
+            >重置</el-button
           >
         </el-form-item>
       </el-form>
     </div>
 
-    <div class="fxbw mb10 aic">
-      <div class="total">
+    <div class="mid-action">
+      <div>
         <el-button type="primary" @click="goRoute()">新建规则</el-button>
       </div>
       <div>

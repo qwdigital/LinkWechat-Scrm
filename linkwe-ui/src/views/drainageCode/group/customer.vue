@@ -62,7 +62,7 @@ export default {
     handleSelectionChange(val) {
       this.currentRow = val
     },
-    handleClear() {
+    resetQuery() {
       this.searchDate = []
       this.$refs['queryForm'].resetFields()
 
@@ -84,14 +84,15 @@ export default {
       :model="query"
       :inline="true"
       class="top-search"
+      label-width="100px"
     >
-      <el-form-item prop="groupName">
+      <el-form-item label="群名" prop="groupName">
         <el-input v-model="query.groupName" placeholder="请输入群名"></el-input>
       </el-form-item>
-      <el-form-item prop="groupLeader">
+      <el-form-item label="群主" prop="groupLeader">
         <el-input v-model="query.groupLeader" placeholder="请输入群主"></el-input>
       </el-form-item>
-      <el-form-item>
+      <el-form-item label="创建时间">
         <el-date-picker
           v-model="searchDate"
           format="yyyy-MM-dd"
@@ -102,9 +103,9 @@ export default {
           end-placeholder="结束日期"
         ></el-date-picker>
       </el-form-item>
-      <el-form-item>
+      <el-form-item label=" ">
         <el-button type="primary" @click="getList">查询</el-button>
-        <el-button @click="handleClear">清空</el-button>
+        <el-button type="success" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 

@@ -98,17 +98,13 @@ export default {
       this.getGroupCodes()
     },
     // 搜索栏清空
-    handleClear() {
+    resetQuery() {
       this.searchDate = ''
+      this.$refs['queryForm'].resetFields()
 
-      this.query = {
-        activityName: '',
-        createBy: '',
-        beginTime: '',
-        endTime: '',
-      }
-
-      this.getGroupCodes()
+      this.$nextTick(() => {
+        this.getGroupCodes()
+      })
     },
     // 批量下载
     handleBulkDownload() {
@@ -214,20 +210,26 @@ export default {
 
 <template>
   <div class="page">
-    <el-form :inline="true" class="top-search">
-      <el-form-item>
+    <el-form
+      ref="queryForm"
+      :model="query"
+      inline
+      class="top-search"
+      label-width="100px"
+    >
+      <el-form-item label="活码名称" prop="activityName">
         <el-input
           v-model="query.activityName"
           placeholder="请输入活码名称"
         ></el-input>
       </el-form-item>
-      <el-form-item>
+      <el-form-item label="创建人" prop="createBy">
         <el-input
           v-model="query.createBy"
           placeholder="请输入创建人"
         ></el-input>
       </el-form-item>
-      <el-form-item>
+      <el-form-item label="创建时间">
         <el-date-picker
           v-model="searchDate"
           format="yyyy-MM-dd"
@@ -238,9 +240,9 @@ export default {
           end-placeholder="结束日期"
         ></el-date-picker>
       </el-form-item>
-      <el-form-item class="search-button-area">
+      <el-form-item label=" ">
         <el-button type="primary" @click="handleSearch">查询</el-button>
-        <el-button @click="handleClear">清空</el-button>
+        <el-button type="success" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 

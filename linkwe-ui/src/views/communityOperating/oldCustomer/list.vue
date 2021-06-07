@@ -126,7 +126,9 @@ export default {
       this.dateRange = []
       this.$refs['queryForm'].resetFields()
 
-      this.getList(1)
+      this.$nextTick(() => {
+        this.getList(1)
+      })
     },
     // 获取显示用tag字符串
     getDisplayTags(row) {
@@ -234,7 +236,7 @@ export default {
         inline
         label-position="right"
         :model="query"
-        label-width="80px"
+        label-width="100px"
         ref="queryForm"
       >
         <el-form-item label="任务名称" prop="taskName">
@@ -269,9 +271,9 @@ export default {
             align="right"
           ></el-date-picker>
         </el-form-item>
-        <el-form-item label>
+        <el-form-item label=" ">
           <el-button type="primary" @click="getList(1)">查询</el-button>
-          <el-button @click="resetQuery">清空</el-button>
+          <el-button type="success" @click="resetQuery">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
