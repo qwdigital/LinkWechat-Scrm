@@ -44,13 +44,14 @@ import java.util.zip.ZipOutputStream;
 public class WeGroupCodeController extends BaseController {
     @Autowired
     private IWeGroupCodeService groupCodeService;
-
     /**
      * 查询客户群活码列表
      */
 //     @PreAuthorize("@ss.hasPermi('drainageCode:group:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeGroupCode weGroupCode) {
+
+
         startPage();
         List<WeGroupCode> list = groupCodeService.selectWeGroupCodeList(weGroupCode);
         return getDataTable(list);

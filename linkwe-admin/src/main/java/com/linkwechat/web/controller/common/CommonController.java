@@ -125,7 +125,7 @@ public class CommonController {
                     = fileService.upload(file);
             AjaxResult ajax = AjaxResult.success();
             ajax.put("fileName", sysFile.getFileName());
-            ajax.put("url", sysFile.getFileName());
+            ajax.put("url", sysFile.getImgUrlPrefix()+sysFile.getFileName());
             return ajax;
         } catch (Exception e) {
             return AjaxResult.error(e.getMessage());

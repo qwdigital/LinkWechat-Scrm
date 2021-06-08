@@ -44,19 +44,22 @@ public class FileService {
      */
      public SysFile upload(MultipartFile file) throws IOException {
         String fileName="";
+        String imgUrlPrefix="";
         if(ruoYiConfig.getFile().isStartCosUpload()){//开启云上传
              //开启云上传开关则云上传，不然上传本地
              fileName = FileUploadUtils.upload2Cos(file, ruoYiConfig.getFile().getCos());
+            imgUrlPrefix = ruoYiConfig.getFile().getCos().getCosImgUrlPrefix();
          }else {//本地上传
             File osFile=OsUtils.isWindows()?new File(WINDOWSFILEPATH):new File(LINUXFILEPATH);
             if(!osFile.exists()){
                 osFile.mkdirs();
             }
             fileName = FileUploadUtils.upload(osFile.getPath(), file);
+            imgUrlPrefix = ruoYiConfig.getFile().getImgUrlPrefix();
         }
         return SysFile.builder()
                 .fileName(fileName)
-                .imgUrlPrefix(ruoYiConfig.getFile().getImgUrlPrefix())
+                .imgUrlPrefix(imgUrlPrefix)
                 .build();
     }
 
