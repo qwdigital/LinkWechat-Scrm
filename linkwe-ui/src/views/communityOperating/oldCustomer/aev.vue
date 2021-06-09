@@ -367,8 +367,6 @@ export default {
   width: 80%;
   margin: 0 auto 20px;
 }
-.el-icon-error {
-}
 .phone-dialog-image {
   border-radius: 6px;
   width: 100px;

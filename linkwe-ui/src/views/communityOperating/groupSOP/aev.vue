@@ -9,7 +9,7 @@ export default {
   data() {
     const checkContent = (rule, value, callback) => {
       if (!this.form.content && this.form.picList.length === 0 && this.form.materialIdList.length === 0) {
-        callback(new Error('该项为必填项1'))
+        callback(new Error('该项为必填项'))
       } else {
         callback()
       }
