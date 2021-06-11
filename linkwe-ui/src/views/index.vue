@@ -18,8 +18,8 @@
           </el-row>
           <el-row type="flex" class="row-bg" justify="space-between"
             style="margin-top:20px;font-size:35px;font-weight:bold">
+            <el-col :span="6">{{table.userCount}}</el-col>
             <el-col :span="6">{{table.customerCount}}</el-col>
-            <el-col :span="6">{{table.groupMemberCount}}</el-col>
             <el-col :span="6">{{table.groupCount}}</el-col>
             <el-col :span="6">{{table.userCount}}</el-col>
           </el-row>
@@ -267,7 +267,7 @@ var elementResizeDetectorMaker = require("element-resize-detector")
       tableInfo() {
         content.indexTable().then(res => {
           this.table = res.data
-          
+
         })
       },
       erchatInfo() {
@@ -304,7 +304,7 @@ var elementResizeDetectorMaker = require("element-resize-detector")
           yAxis: {
             type: 'value'
           },
-          series: 
+          series:
           [{
             name: '发起申请数',
             type: 'line',
@@ -365,7 +365,7 @@ var elementResizeDetectorMaker = require("element-resize-detector")
       font-size: 14px;
     }
     #fatherbox{ width: 100%;height: 500px; overflow-y: scroll;}
-    #main{ width: 100%;height: 500px; 
+    #main{ width: 100%;height: 500px;
     }
     .fr {
       float: right;
@@ -404,7 +404,7 @@ var elementResizeDetectorMaker = require("element-resize-detector")
       border-radius: 50%;
       margin: 0 auto;
       img{
-        border-radius: 50%; 
+        border-radius: 50%;
       width: 80px;
       height: 80px;
       }
