@@ -27,7 +27,6 @@ export default {
       dialogHowToConfig: false,
       disabled: false,
       loading: false,
-      pickerOptions: {},
       clipboard: null,
     }
   },
@@ -111,13 +110,12 @@ export default {
         .then(() => {
           const ids = this.multiSelect.map((t) => t.taskId)
 
-          remove(ids + '')
-            .then((res) => {
-              if (res.code === 200) {
-                this.getList()
-              } else {
-              }
-            })
+          remove(ids + '').then((res) => {
+            if (res.code === 200) {
+              this.getList()
+            } else {
+            }
+          })
         })
         .catch(() => {})
     },
@@ -129,13 +127,12 @@ export default {
         type: 'warning',
       })
         .then(() => {
-          remove(id + '')
-            .then((res) => {
-              if (res.code === 200) {
-                this.getList()
-              } else {
-              }
-            })
+          remove(id + '').then((res) => {
+            if (res.code === 200) {
+              this.getList()
+            } else {
+            }
+          })
         })
         .catch(() => {})
     },
@@ -157,7 +154,7 @@ export default {
     handleSelectionChange(val) {
       this.multiSelect = val
     },
-  }
+  },
 }
 </script>
 
@@ -254,22 +251,14 @@ export default {
       :data="list"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column
-        type="selection"
-        width="50"
-        align="center"
-      />
+      <el-table-column type="selection" width="50" align="center" />
       <el-table-column
         label="活码名称"
         align="center"
         prop="taskName"
         :show-overflow-tooltip="true"
       />
-      <el-table-column
-        label="群活码"
-        align="center"
-        width="130"
-      >
+      <el-table-column label="群活码" align="center" width="130">
         <template #default="{ row }">
           <el-popover placement="bottom" trigger="hover">
             <el-image
@@ -284,11 +273,7 @@ export default {
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column
-        label="关键词"
-        align="center"
-        width="120"
-      >
+      <el-table-column label="关键词" align="center" width="120">
         <template #default="{ row }">
           <el-popover
             placement="bottom"
@@ -302,11 +287,7 @@ export default {
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column
-        label="实际群聊"
-        align="center"
-        width="120"
-      >
+      <el-table-column label="实际群聊" align="center" width="120">
         <template #default="{ row }">
           <el-popover
             placement="bottom"

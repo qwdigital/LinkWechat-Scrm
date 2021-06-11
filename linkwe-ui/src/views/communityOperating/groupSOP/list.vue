@@ -17,7 +17,6 @@ export default {
       list: [], // 群SOP数据
       multiSelect: [], // 多选数据
       loading: false,
-      pickerOptions: {},
     }
   },
   watch: {
@@ -83,13 +82,12 @@ export default {
         .then(() => {
           const ids = this.multiSelect.map((r) => r.ruleId)
 
-          remove(ids + '')
-            .then((res) => {
-              if (res.code === 200) {
-                this.getList()
-              } else {
-              }
-            })
+          remove(ids + '').then((res) => {
+            if (res.code === 200) {
+              this.getList()
+            } else {
+            }
+          })
         })
         .catch(() => {})
     },
@@ -101,13 +99,12 @@ export default {
         type: 'warning',
       })
         .then(() => {
-          remove(id + '')
-            .then((res) => {
-              if (res.code === 200) {
-                this.getList()
-              } else {
-              }
-            })
+          remove(id + '').then((res) => {
+            if (res.code === 200) {
+              this.getList()
+            } else {
+            }
+          })
         })
         .catch(() => {})
     },
@@ -121,7 +118,7 @@ export default {
 
       return groups.join(' ')
     },
-  }
+  },
 }
 </script>
 
@@ -201,11 +198,7 @@ export default {
         prop="ruleName"
         :show-overflow-tooltip="true"
       ></el-table-column>
-      <el-table-column
-        label="执行群聊"
-        align="center"
-        width="120"
-      >
+      <el-table-column label="执行群聊" align="center" width="120">
         <template #default="{ row }">
           <el-popover
             placement="bottom"

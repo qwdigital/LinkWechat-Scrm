@@ -100,7 +100,10 @@ export default {
         .catch(function() {})
     },
     goRoute(id, path) {
-      this.$router.push({ path: '/groupMessage/' + path, query: { id } })
+      this.$router.push({
+        path: '/customerMaintain/groupMessage/' + path,
+        query: { id },
+      })
     },
     syncMsg(data) {
       let { msgid, messageId } = data

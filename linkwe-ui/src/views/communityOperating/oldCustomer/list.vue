@@ -1,9 +1,5 @@
 <script>
-import {
-  getList,
-  remove,
-  getStat
-} from '@/api/communityOperating/oldCustomer'
+import { getList, remove, getStat } from '@/api/communityOperating/oldCustomer'
 
 export default {
   components: {},
@@ -54,7 +50,6 @@ export default {
         { label: '未送达', value: 0 },
       ],
       dialogVisible: false, // 客户统计会话
-      pickerOptions: {}, // 日期选择器选项
     }
   },
   watch: {
@@ -146,13 +141,12 @@ export default {
         .then(() => {
           const ids = this.multiSelect.map((t) => t.taskId)
 
-          remove(ids + '')
-            .then((res) => {
-              if (res.code === 200) {
-                this.getList()
-              } else {
-              }
-            })
+          remove(ids + '').then((res) => {
+            if (res.code === 200) {
+              this.getList()
+            } else {
+            }
+          })
         })
         .catch(() => {})
     },
@@ -164,13 +158,12 @@ export default {
         type: 'warning',
       })
         .then(() => {
-          remove(id + '')
-            .then((res) => {
-              if (res.code === 200) {
-                this.getList()
-              } else {
-              }
-            })
+          remove(id + '').then((res) => {
+            if (res.code === 200) {
+              this.getList()
+            } else {
+            }
+          })
         })
         .catch(() => {})
     },
@@ -243,11 +236,7 @@ export default {
           <el-input v-model="query.taskName" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="发送方式" prop="sendType">
-          <el-select
-            v-model="query.sendType"
-            placeholder="请选择"
-            size="small"
-          >
+          <el-select v-model="query.sendType" placeholder="请选择" size="small">
             <el-option
               v-for="(sendType, index) in sendTypeOptions"
               :label="sendType.label"
@@ -315,11 +304,7 @@ export default {
         prop="taskName"
         :show-overflow-tooltip="true"
       ></el-table-column>
-      <el-table-column
-        prop="sendType"
-        label="发送方式"
-        align="center"
-      >
+      <el-table-column prop="sendType" label="发送方式" align="center">
         <template #default="{ row }">
           {{ parseInt(row.sendType) === 0 ? '企业群发' : '个人群发' }}
         </template>
@@ -331,11 +316,7 @@ export default {
           </el-button>
         </template>
       </el-table-column>
-      <el-table-column
-        label="客户标签"
-        align="center"
-        width="120"
-      >
+      <el-table-column label="客户标签" align="center" width="120">
         <template #default="{ row }">
           <el-popover
             placement="bottom"
@@ -452,11 +433,7 @@ export default {
             align="center"
             prop="customerName"
           ></el-table-column>
-          <el-table-column
-            prop="sent"
-            label="送达状态"
-            align="center"
-          >
+          <el-table-column prop="sent" label="送达状态" align="center">
             <template #default="{ row }">
               <template v-if="row.sent">
                 已送达
@@ -466,11 +443,7 @@ export default {
               </template>
             </template>
           </el-table-column>
-          <el-table-column
-            prop="inGroup"
-            label="是否在群"
-            align="center"
-          >
+          <el-table-column prop="inGroup" label="是否在群" align="center">
             <template #default="{ row }">
               <template v-if="row.inGroup">
                 在群

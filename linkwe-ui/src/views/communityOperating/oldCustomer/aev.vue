@@ -22,7 +22,7 @@ export default {
         groupCodeId: '', // 群活码ID
         tagList: [], // 标签
         scopeList: [], // 员工
-        sendScope: 0, // 发送范围 
+        sendScope: 0, // 发送范围
         sendGender: 0, // 发送性别
         cusBeginTime: '', // 目标客户添加起始时间
         cusEndTime: '', // 目标客户添加结束时间
@@ -46,29 +46,28 @@ export default {
         { label: '全部客户', value: 0 },
         { label: '部分客户', value: 1 },
       ],
-      pickerOptions: {},
       rules: Object.freeze({
         taskName: [
-          { required: true, message: '该项为必填项', trigger: 'blur' }
+          { required: true, message: '该项为必填项', trigger: 'blur' },
         ],
         welcomeMsg: [
-          { required: true, message: '该项为必填项', trigger: 'blur' }
+          { required: true, message: '该项为必填项', trigger: 'blur' },
         ],
         groupCodeId: [
-          { required: true, message: '该项为必填项', trigger: 'blur' }
+          { required: true, message: '该项为必填项', trigger: 'blur' },
         ],
         sendType: [
-          { required: true, message: '该项为必填项', trigger: 'blur' }
+          { required: true, message: '该项为必填项', trigger: 'blur' },
         ],
         sendScope: [
-          { required: true, message: '该项为必填项', trigger: 'blur' }
+          { required: true, message: '该项为必填项', trigger: 'blur' },
         ],
         tagListValidate: [
-          { required: true, message: '该项为必填项', trigger: 'change' }
+          { required: true, message: '该项为必填项', trigger: 'change' },
         ],
         scopeListValidate: [
-          { required: true, message: '该项为必填项', trigger: 'change' }
-        ]
+          { required: true, message: '该项为必填项', trigger: 'change' },
+        ],
       }),
     }
   },
@@ -93,7 +92,7 @@ export default {
         return tag.tagId
       })
       this.$refs.form.validateField('tagList')
-    }
+    },
   },
   created() {
     this.taskId = this.$route.query.id
@@ -103,30 +102,29 @@ export default {
     /** 获取详情 */
     getDetail(id) {
       this.loading = true
-      getDetail(id)
-        .then(({ data }) => {
-          this.form.taskName = data.taskName || ''
-          this.form.welcomeMsg = data.welcomeMsg || ''
-          this.form.sendType = data.sendType || 0
-          this.form.sendScope = data.sendScope || 0
-          this.form.sendGender = data.sendGender || 0
+      getDetail(id).then(({ data }) => {
+        this.form.taskName = data.taskName || ''
+        this.form.welcomeMsg = data.welcomeMsg || ''
+        this.form.sendType = data.sendType || 0
+        this.form.sendScope = data.sendScope || 0
+        this.form.sendGender = data.sendGender || 0
 
-          this.tags = data.tagList || []
-          this.users = data.scopeList || []
-          this.dateRange = [data.cusBeginTime || '', data.cusEndTime || '']
+        this.tags = data.tagList || []
+        this.users = data.scopeList || []
+        this.dateRange = [data.cusBeginTime || '', data.cusEndTime || '']
 
-          if (data.groupCodeInfo && data.groupCodeInfo.id) {
-            this.codes = [ data.groupCodeInfo ]
-            this.groupQrCode = data.groupCodeInfo
-            this.form.groupCodeId = this.groupQrCode.id
-          } else {
-            this.codes = []
-            this.groupQrCode = {}
-            this.form.groupCodeId = ''
-          }
+        if (data.groupCodeInfo && data.groupCodeInfo.id) {
+          this.codes = [data.groupCodeInfo]
+          this.groupQrCode = data.groupCodeInfo
+          this.form.groupCodeId = this.groupQrCode.id
+        } else {
+          this.codes = []
+          this.groupQrCode = {}
+          this.form.groupCodeId = ''
+        }
 
-          this.loading = false
-        })
+        this.loading = false
+      })
     },
     // 选择人员事件
     submitSelectUser(users) {
@@ -170,18 +168,13 @@ export default {
         }
       })
     },
-  }
+  },
 }
 </script>
 
 <template>
   <div class="wrap" v-loading="loading">
-    <el-form
-      :model="form"
-      ref="form"
-      :rules="rules"
-      label-width="100px"
-    >
+    <el-form :model="form" ref="form" :rules="rules" label-width="100px">
       <el-form-item label="任务名称" prop="taskName">
         <el-input
           v-model="form.taskName"
@@ -241,7 +234,10 @@ export default {
         </el-radio-group>
       </el-form-item>
       <el-form-item label="发送性别" prop="sendGender">
-        <el-radio-group v-model="form.sendGender" :disabled="form.sendScope == 0">
+        <el-radio-group
+          v-model="form.sendGender"
+          :disabled="form.sendScope == 0"
+        >
           <el-radio
             v-for="(sendGender, index) in sendGenderOptions"
             :key="index"
@@ -268,12 +264,9 @@ export default {
         prop="tagList"
         :rules="form.sendScope === 1 ? rules.tagListValidate : []"
       >
-        <el-tag
-          size="medium"
-          v-for="(tag, index) in tags"
-          :key="index"
-          >{{ tag.name }}</el-tag
-        >
+        <el-tag size="medium" v-for="(tag, index) in tags" :key="index">{{
+          tag.name
+        }}</el-tag>
         <el-button
           type="primary"
           :class="tags.length > 0 ? 'ml10' : ''"
@@ -290,12 +283,9 @@ export default {
         prop="scopeList"
         :rules="form.sendScope === 1 ? rules.scopeListValidate : []"
       >
-        <el-tag
-          size="medium"
-          v-for="(user, index) in users"
-          :key="index"
-          >{{ user.name }}</el-tag
-        >
+        <el-tag size="medium" v-for="(user, index) in users" :key="index">{{
+          user.name
+        }}</el-tag>
         <el-button
           type="primary"
           plain
@@ -318,7 +308,7 @@ export default {
       <div class="tip">欢迎语样式</div>
       <PhoneDialog
         :message="form.welcomeMsg || '请输入加群引导语'"
-        :isOther="(groupQrCode && groupQrCode.codeUrl) ? true : false"
+        :isOther="groupQrCode && groupQrCode.codeUrl ? true : false"
       >
         <el-image class="phone-dialog-image" :src="groupQrCode.codeUrl">
         </el-image>
