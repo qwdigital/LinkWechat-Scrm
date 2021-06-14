@@ -61,10 +61,13 @@ export default {
     <div class="flex aic">
       <el-avatar
         :size="50"
+        style="flex: none;"
         src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
       ></el-avatar>
       <div class="info-wrap">
-        <div style="margin-bottom: 15px;">{{ group.groupName }}</div>
+        <div style="margin-bottom: 15px; font-weight: 500;">
+          {{ group.groupName }}
+        </div>
         <div class="info">
           <span class="key">群主：</span>{{ group.groupLeaderName }}
           <span class="line">|</span>
