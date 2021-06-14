@@ -67,20 +67,29 @@ Vue.prototype.msgInfo = function(msg) {
 import { pickerOptions } from '@/utils/index'
 Vue.prototype.pickerOptions = pickerOptions
 import VideoPlayer from 'vue-video-player'
- Vue.use(VideoPlayer);
- import AudioPlayer from '@liripeng/vue-audio-player'
+Vue.use(VideoPlayer)
+import AudioPlayer from '@liripeng/vue-audio-player'
 import '@liripeng/vue-audio-player/lib/vue-audio-player.css'
 
 Vue.use(AudioPlayer)
-import VueAMap from 'vue-amap';
+import VueAMap from 'vue-amap'
 
-Vue.use(VueAMap);
+Vue.use(VueAMap)
 
 VueAMap.initAMapApiLoader({
-  key: '32396af00cd726deed804cf5b63ed2d8',
-  plugin: ['AMap.Autocomplete', 'AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.PolyEditor', 'AMap.CircleEditor'],
-  v: '1.4.4'
-});
+  key: '32396af00cd726deed804cf5b63ed2d8',
+  plugin: [
+    'AMap.Autocomplete',
+    'AMap.PlaceSearch',
+    'AMap.Scale',
+    'AMap.OverView',
+    'AMap.ToolBar',
+    'AMap.MapType',
+    'AMap.PolyEditor',
+    'AMap.CircleEditor',
+  ],
+  v: '1.4.4',
+})
 // 全局组件挂载
 Vue.component('Pagination', Pagination)
 Vue.component('RightToolbar', RightToolbar)

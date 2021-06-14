@@ -28,11 +28,10 @@ export default {
   data() {
     return {
       loading: false,
-      action:
-        process.env.VUE_APP_BASE_API +
-        (this.type == 0
-          ? '/wecom/material/uploadimg'
-          : '/common/uploadFile2Cos'),
+      action: process.env.VUE_APP_BASE_API + '/common/uploadFile2Cos',
+      // (this.type == 0
+      //   ? '/wecom/material/uploadimg'
+      //   : '/common/uploadFile2Cos'),
       headers: window.CONFIG.headers,
       domain: process.env.VUE_APP_BASE_API,
     }
