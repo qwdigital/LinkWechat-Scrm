@@ -63,7 +63,8 @@ export default {
         :size="50"
         style="flex: none;"
         src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
-      ></el-avatar>
+      >
+      </el-avatar>
       <div class="info-wrap">
         <div style="margin-bottom: 15px; font-weight: 500;">
           {{ group.groupName }}

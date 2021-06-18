@@ -167,7 +167,7 @@ export default {
         .then(({ data }) => {
           this.msgSuccess('操作成功')
           this.loading = false
-          this.$router.push('/groupMessage/record')
+          this.$router.back()
         })
         .catch(() => {
           this.loading = false
