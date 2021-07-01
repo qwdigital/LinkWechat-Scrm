@@ -39,9 +39,9 @@
         <mybatis-plus.version>3.4.0</mybatis-plus.version>
         <vertx.version>4.0.0</vertx.version>
         <netty-version>4.1.49.Final</netty-version>
-        <nacos.version>2.2.5.RELEASE</nacos.version>
         <jaxb.version>2.3.1</jaxb.version>
         <jsqlparser.version>4.0</jsqlparser.version>
+        <nacos.starter.version>1.0.1</nacos.starter.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -267,18 +267,6 @@
             </dependency>
 
             <dependency>
-                <groupId>com.alibaba.cloud</groupId>
-                <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
-                <version>${nacos.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.alibaba.cloud</groupId>
-                <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-                <version>${nacos.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
                 <version>${jaxb.version}</version>
@@ -297,6 +285,11 @@
                 <version>${jsqlparser.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>io.github.leejoker</groupId>
+                <artifactId>linkwechat-nacos-starter</artifactId>
+                <version>${nacos.starter.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
