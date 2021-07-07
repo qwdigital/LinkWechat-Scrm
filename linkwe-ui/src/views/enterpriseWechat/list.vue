@@ -246,6 +246,31 @@ export default {
         >
           <el-input v-model="form.wxQrLoginRedirectUri"></el-input>
         </el-form-item>
+        <el-form-item label="应用回调token密钥" prop="token">
+          <el-input v-model="form.token"></el-input>
+        </el-form-item>
+
+        <el-form-item label="应用回调消息体加密密钥" prop="encodingAesKey">
+          <el-input v-model="form.encodingAesKey"></el-input>
+        </el-form-item>
+        <el-form-item label="微信公众号APPID" prop="appld">
+          <el-input v-model="form.appld"></el-input>
+        </el-form-item>
+        <el-form-item label="微信公众号密钥" prop="secret">
+          <el-input v-model="form.secret"></el-input>
+        </el-form-item>
+        <el-form-item label="任务宝H5访问地址" prop="fissionUrl">
+          <el-input v-model="form.fissionUrl"></el-input>
+        </el-form-item>
+        <el-form-item label="群裂变H5访问地址" prop="fissionGroupUr">
+          <el-input v-model="form.fissionGroupUr"></el-input>
+        </el-form-item>
+        <el-form-item label="H5域名" prop="h5DoMainName">
+          <el-input v-model="form.h5DoMainName"></el-input>
+        </el-form-item>
+        <el-form-item label="会话私钥" prop="financePrivateKey">
+          <el-input v-model="form.financePrivateKey"></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
