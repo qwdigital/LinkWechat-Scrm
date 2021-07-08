@@ -100,10 +100,10 @@ export default {
   <div>
     <div>
       配置聊天工具栏，方便成员在外部会话中查看和使用，提高服务效率。
-      <el-button type="text" @click="$router.push('/appTool/explain')"
+      <el-button type="text" @click="$router.push('explain')"
         >图文详解</el-button
       >
-      <el-button type="text" @click="$router.push('/appTool/config')"
+      <el-button type="text" @click="$router.push({ path: 'config' })"
         >查看已配置信息</el-button
       >
     </div>
