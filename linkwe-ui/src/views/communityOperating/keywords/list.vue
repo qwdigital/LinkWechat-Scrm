@@ -16,7 +16,7 @@ export default {
         createBy: '', // 创建人
         keyword: '', // 关键词
         beginTime: '', // 创建开始时间
-        endTime: '', // 创建结束时间
+        endTime: '' // 创建结束时间
       },
       queryCreateByName: '',
       dateRange: [], // 添加日期
@@ -27,7 +27,7 @@ export default {
       dialogHowToConfig: false,
       disabled: false,
       loading: false,
-      clipboard: null,
+      clipboard: null
     }
   },
   watch: {
@@ -39,7 +39,7 @@ export default {
       } else {
         ;[this.query.beginTime, this.query.endTime] = dateRange
       }
-    },
+    }
   },
   created() {
     this.getList(1)
@@ -57,7 +57,7 @@ export default {
       this.$notify({
         title: '成功',
         message: '链接已复制到剪切板，可粘贴。',
-        type: 'success',
+        type: 'success'
       })
     })
 
@@ -87,8 +87,8 @@ export default {
     // 新增/编辑关键词拉群
     goRoute(id) {
       this.$router.push({
-        path: '/communityOperating/keywordsAev',
-        query: { id: id },
+        path: 'keywordsAev',
+        query: { id: id }
       })
     },
     // 重置查询参数
@@ -105,7 +105,7 @@ export default {
       this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(() => {
           const ids = this.multiSelect.map((t) => t.taskId)
@@ -124,7 +124,7 @@ export default {
       this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(() => {
           remove(id + '').then((res) => {
@@ -153,8 +153,8 @@ export default {
     // 处理多选
     handleSelectionChange(val) {
       this.multiSelect = val
-    },
-  },
+    }
+  }
 }
 </script>
 

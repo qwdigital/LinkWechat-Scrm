@@ -14,19 +14,19 @@ export default {
         pageSize: 10,
         userName: undefined,
         beginTime: undefined,
-        endTime: undefined,
+        endTime: undefined
       },
       loading: false,
       isMoreFilter: false,
       total: 0,
       form: {
         user: '',
-        region: '',
+        region: ''
       },
       list: [],
       currentRow: {},
       dialogVisibleSelectUser: false,
-      dateRange: [], // 离职日期
+      dateRange: [] // 离职日期
     }
   },
   watch: {},
@@ -83,7 +83,7 @@ export default {
       api
         .allocate({
           handoverUserid: this.currentRow.userId,
-          takeoverUserid: userlist[0].userId,
+          takeoverUserid: userlist[0].userId
         })
         .then(() => {
           this.msgSuccess('操作成功')
@@ -92,8 +92,8 @@ export default {
     // 选中数据
     handleCurrentChange(val) {
       this.currentRow = val
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -144,7 +144,7 @@ export default {
         <el-button
           v-hasPermi="['customerManage:dimission:filter']"
           type="primary"
-          @click="$router.push({ path: '/customerManage/allocatedStaffList' })"
+          @click="$router.push({ path: 'allocatedStaffList' })"
           >已分配的离职员工</el-button
         >
         <el-button

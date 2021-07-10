@@ -10,13 +10,13 @@ export default {
         ruleName: '', // 规则名称
         createBy: '', // 创建人
         beginTime: '', // 创建开始时间
-        endTime: '', // 创建结束时间
+        endTime: '' // 创建结束时间
       },
       dateRange: [], // 添加日期
       total: 0, // 群SOP数据总量
       list: [], // 群SOP数据
       multiSelect: [], // 多选数据
-      loading: false,
+      loading: false
     }
   },
   watch: {
@@ -28,7 +28,7 @@ export default {
       } else {
         ;[this.query.beginTime, this.query.endTime] = dateRange
       }
-    },
+    }
   },
   created() {
     this.getList()
@@ -59,8 +59,8 @@ export default {
     // 新增/编辑群SOP
     goRoute(id) {
       this.$router.push({
-        path: '/communityOperating/groupSOPAev',
-        query: { id: id },
+        path: 'groupSOPAev',
+        query: { id: id }
       })
     },
     // 重置查询参数
@@ -77,7 +77,7 @@ export default {
       this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(() => {
           const ids = this.multiSelect.map((r) => r.ruleId)
@@ -96,7 +96,7 @@ export default {
       this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(() => {
           remove(id + '').then((res) => {
@@ -117,8 +117,8 @@ export default {
       const groups = row.groupList.map((g) => g.groupName)
 
       return groups.join(' ')
-    },
-  },
+    }
+  }
 }
 </script>
 

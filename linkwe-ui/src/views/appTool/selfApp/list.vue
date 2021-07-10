@@ -10,7 +10,7 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        name: '',
+        name: ''
       },
       dateRange: [], // 添加日期
       total: 0,
@@ -23,10 +23,10 @@ export default {
         name: [{ required: true, message: '必填项', trigger: 'blur' }],
         corpId: [{ required: true, message: '必填项', trigger: 'blur' }],
         corpSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
-        contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
+        contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }]
       }),
       status: ['正常', '停用'],
-      dialogVisibleSelectMaterial: false,
+      dialogVisibleSelectMaterial: false
     }
   },
   watch: {},
@@ -87,8 +87,8 @@ export default {
     },
     goRoute(id, path) {
       this.$router.push({
-        path: '/appTool/taskAev',
-        query: { id },
+        path: 'taskAev',
+        query: { id }
       })
     },
 
@@ -97,8 +97,8 @@ export default {
       this.form.logoMediaid = image.id
       this.form.squareLogoUrl = image.materialUrl
       this.dialogVisibleSelectMaterial = false
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -237,13 +237,13 @@ export default {
     </el-dialog>
 
     <!-- 选择素材弹窗 -->
-    <SelectMaterial
+    <!-- <SelectMaterial
       :visible.sync="dialogVisibleSelectMaterial"
       type="1"
       :showArr="[1]"
       @success="submitSelectMaterial"
     >
-    </SelectMaterial>
+    </SelectMaterial> -->
   </div>
 </template>
 

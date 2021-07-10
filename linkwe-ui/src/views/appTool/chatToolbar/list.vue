@@ -16,16 +16,16 @@ export default {
         2: '视频',
         3: '普通文件',
         4: '文本',
-        5: '海报',
+        5: '海报'
       }),
 
       metarialParams: {
         sideId: '',
         materialIds: [], // '素材id列表',
         mediaType: '', //  '素材类型 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本 5 海报',
-        checkAll: '1', // '是否全选 0 全选 1 非全选',
+        checkAll: '1' // '是否全选 0 全选 1 非全选',
       },
-      selectedMaterial: [],
+      selectedMaterial: []
     }
   },
   watch: {},
@@ -63,7 +63,7 @@ export default {
         lock: true,
         text: 'Loading',
         spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.7)',
+        background: 'rgba(0, 0, 0, 0.7)'
       })
       this.metarialParams.materialIds = this.selectedMaterial.map((d) => d.id)
       if (this.metarialParams.checkAll == 0) {
@@ -92,8 +92,8 @@ export default {
         .catch(() => {
           this.loading = false
         })
-    },
-  },
+    }
+  }
 }
 </script>
 <template>
@@ -103,9 +103,9 @@ export default {
       <el-button type="text" @click="$router.push('explain')"
         >图文详解</el-button
       >
-      <el-button type="text" @click="$router.push({ path: 'config' })"
+      <!-- <el-button type="text" @click="$router.push({ path: 'config' })"
         >查看已配置信息</el-button
-      >
+      > -->
     </div>
     <el-table v-loading="loading" :data="list">
       <el-table-column label="素材类型" align="center" prop="mediaType">

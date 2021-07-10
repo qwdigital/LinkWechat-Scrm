@@ -11,7 +11,7 @@ export default {
         pageSize: 10,
         groupName: undefined,
         beginTime: undefined,
-        endTime: undefined,
+        endTime: undefined
       },
       // 日期范围
       dateRange: [],
@@ -24,7 +24,7 @@ export default {
       // 总条数
       total: 0,
       // 表格数据
-      list: [],
+      list: []
     }
   },
   created() {
@@ -63,7 +63,7 @@ export default {
         lock: true,
         text: 'Loading',
         spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.7)',
+        background: 'rgba(0, 0, 0, 0.7)'
       })
       api.sync().then((r) => {
         loading.close()
@@ -90,8 +90,8 @@ export default {
       //     this.download(response.msg);
       //   })
       //   .catch(function () {});
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -199,8 +199,8 @@ export default {
             icon="el-icon-view"
             @click="
               $router.push({
-                path: '/customerManage/groupDetail',
-                query: scope.row,
+                path: 'groupDetail',
+                query: scope.row
               })
             "
             v-hasPermi="['customerManage:group:view']"

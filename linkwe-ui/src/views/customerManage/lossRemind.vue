@@ -3,7 +3,7 @@ import {
   getList,
   exportCustomer,
   lossRemind,
-  getLossRemindStatus,
+  getLossRemindStatus
 } from '@/api/customer'
 import { getList as getListTag } from '@/api/customer/tag'
 import { getList as getListOrganization } from '@/api/organization'
@@ -24,7 +24,7 @@ export default {
         tagIds: '', // "标签id,多个标签，id使用逗号隔开",
         beginTime: '', // "开始时间",
         endTime: '', // "结束时间"
-        status: 1,
+        status: 1
       },
       queryTag: [], // 搜索框选择的标签
       queryUser: [], // 搜索框选择的添加人
@@ -35,7 +35,7 @@ export default {
       // 添加标签表单
       form: {
         gourpName: '',
-        weTags: [],
+        weTags: []
       },
       list: [], // 客户列表
       listOrganization: [], // 组织架构列表
@@ -47,9 +47,9 @@ export default {
       removeTag: [], // 可移除的标签
       tagDialogType: {
         title: '', // 选择标签弹窗标题
-        type: '', // 弹窗类型
+        type: '' // 弹窗类型
       },
-      isNotice: '0',
+      isNotice: '0'
     }
   },
   watch: {},
@@ -115,7 +115,7 @@ export default {
       this.selectedTag = this.queryTag
       this.tagDialogType = {
         title: '选择标签',
-        type: 'query',
+        type: 'query'
       }
       this.dialogVisible = true
     },
@@ -125,7 +125,7 @@ export default {
       this.$confirm('是否确认导出所有客户数据项?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(function() {
           return exportCustomer(queryParams)
@@ -162,8 +162,8 @@ export default {
       lossRemind(val).then(() => {
         this.msgSuccess('操作成功')
       })
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -279,7 +279,7 @@ export default {
           <i
             :class="[
               'el-icon-s-custom',
-              { 1: 'man', 2: 'woman' }[scope.row.gender],
+              { 1: 'man', 2: 'woman' }[scope.row.gender]
             ]"
           ></i>
         </template>
@@ -320,8 +320,8 @@ export default {
             v-hasPermi="['customerManage:customer:view']"
             @click="
               $router.push({
-                path: '/customerManage/customerDetail',
-                query: { id: scope.row.externalUserid },
+                path: 'customerDetail',
+                query: { id: scope.row.externalUserid }
               })
             "
             type="text"

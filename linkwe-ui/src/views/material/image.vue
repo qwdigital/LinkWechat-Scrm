@@ -7,7 +7,7 @@ export default {
   data() {
     return {
       srcList: [],
-      ids: [], // 选中数组
+      ids: [] // 选中数组
     }
   },
   watch: {},
@@ -15,8 +15,8 @@ export default {
   methods: {
     listChange(data) {
       this.srcList = data.map((item) => item.materialUrl)
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -44,12 +44,12 @@ export default {
             ></el-image>
             <div class="actions">
               <i
-                v-hasPermi="['material:edit']"
+                v-hasPermi="['wechat:material:edit']"
                 class="el-icon-edit cp"
                 @click="$refs.page.edit(item)"
               ></i>
               <i
-                v-hasPermi="['material:remove']"
+                v-hasPermi="['wechat:material:remove']"
                 class="el-icon-delete cp"
                 @click="$refs.page.remove(item.id)"
               ></i>

@@ -14,7 +14,7 @@ export default {
         sendType: '', // 发送方式
         createBy: '', // 创建人
         beginTime: '', // 创建开始时间
-        endTime: '', // 创建结束时间
+        endTime: '' // 创建结束时间
       },
       total: 0, // 老客标签建群总数据量
       loading: false, // 主页table加载状态
@@ -22,7 +22,7 @@ export default {
       // 可用的发送方式数据
       sendTypeOptions: [
         { label: '企业群发', value: 0 },
-        { label: '个人群发', value: 1 },
+        { label: '个人群发', value: 1 }
       ],
       dateRange: [], // 创建日期[开始时间, 结束时间]
       multiSelect: [], // 多选数据
@@ -33,7 +33,7 @@ export default {
         pageSize: 10,
         customerName: '', // 客户名称
         isInGroup: '', // 是否在群
-        isSent: '', // 是否送达
+        isSent: '' // 是否送达
       },
       customerTotal: 0, // 客户统计总数据量
       customerLoading: false, // 客户统计table加载状态
@@ -42,14 +42,14 @@ export default {
       // 是否在群选择项
       inGroupOptions: [
         { label: '在群', value: 1 },
-        { label: '不在群', value: 0 },
+        { label: '不在群', value: 0 }
       ],
       // 是否送达选择项
       sendStatusOptions: [
         { label: '已送达', value: 1 },
-        { label: '未送达', value: 0 },
+        { label: '未送达', value: 0 }
       ],
-      dialogVisible: false, // 客户统计会话
+      dialogVisible: false // 客户统计会话
     }
   },
   watch: {
@@ -66,7 +66,7 @@ export default {
       if (!val) this.$refs['customerForm'].resetFields()
       this.customerList = []
       this.customerTotal = 0
-    },
+    }
   },
   created() {
     this.getList(1)
@@ -112,8 +112,8 @@ export default {
     // 新增/编辑老客数据
     goRoute(id) {
       this.$router.push({
-        path: '/communityOperating/oldCustomerAev',
-        query: { id: id },
+        path: 'oldCustomerAev',
+        query: { id: id }
       })
     },
     // 重置查询参数
@@ -136,7 +136,7 @@ export default {
       this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(() => {
           const ids = this.multiSelect.map((t) => t.taskId)
@@ -155,7 +155,7 @@ export default {
       this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(() => {
           remove(id + '').then((res) => {
@@ -217,8 +217,8 @@ export default {
 
       // this.getStat(1)
       this.customerFilter()
-    },
-  },
+    }
+  }
 }
 </script>
 

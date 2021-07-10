@@ -11,12 +11,12 @@ export default {
         taskName: '',
         startTime: '',
         overTime: '',
-        fissionType: 1,
+        fissionType: 1
       },
       dateRange: [],
       tableData: [],
       total: 0,
-      loading:false
+      loading: false
     }
   },
   created() {
@@ -42,20 +42,20 @@ export default {
     resetForm() {},
     toDetail(row) {
       this.$router.push({
-        path: `/application/taskDetail?id=${row.id}`,
+        path: `taskDetail?id=${row.id}`
       })
     },
     newAdd() {
       this.$router.push({
-        path: '/application/addTask',
+        path: 'addTask'
       })
     },
     toEdit(row) {
       this.$router.push({
-        path: `/application/addTask?id=${row.id}`,
+        path: `addTask?id=${row.id}`
       })
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -119,8 +119,7 @@ export default {
             size="medium"
             type="text"
             icon="el-icon-view"
-            ></el-button
-          >
+          ></el-button>
           <el-button
             v-if="scope.row.fissStatus != 2"
             @click="toEdit(scope.row)"
@@ -129,8 +128,7 @@ export default {
             type="text"
             icon="el-icon-edit-outline"
             style="color:#E74E59"
-            ></el-button
-          >
+          ></el-button>
         </template>
       </el-table-column>
     </el-table>

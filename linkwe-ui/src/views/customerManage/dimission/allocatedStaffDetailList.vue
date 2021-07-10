@@ -7,8 +7,8 @@ export default {
   props: {
     dateRange: {
       type: Array,
-      default: () => [],
-    },
+      default: () => []
+    }
   },
   data() {
     return {
@@ -18,11 +18,11 @@ export default {
         pageSize: 10,
         handoverUserId: undefined,
         beginTime: undefined,
-        endTime: undefined,
+        endTime: undefined
       },
       loading: false,
       total: 0,
-      list: [],
+      list: []
     }
   },
   watch: {},
@@ -50,8 +50,8 @@ export default {
         .catch(() => {
           this.loading = false
         })
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -81,8 +81,8 @@ export default {
             v-hasPermi="['customerManage:dimission:edit']"
             @click="
               $router.push({
-                path: '/customerManage/customerDetail',
-                query: { id: scope.row.id },
+                path: 'customerDetail',
+                query: { id: scope.row.id }
               })
             "
             type="text"

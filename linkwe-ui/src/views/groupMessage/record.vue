@@ -10,7 +10,7 @@ export default {
         let unit = data.expectSend == 1 ? '个群' : '人'
         return `预计发送${data.expectSend}${unit}，已成功发送${data.actualSend}${unit}`
       }
-    },
+    }
   },
   data() {
     return {
@@ -32,17 +32,17 @@ export default {
         content: undefined,
         pushType: undefined,
         beginTime: undefined,
-        endTime: undefined,
+        endTime: undefined
       },
       pushType: {
         0: '发给客户',
-        1: '发给客户群',
+        1: '发给客户群'
       },
       pickerOptions: {
         disabledDate(time) {
           return time.getTime() > Date.now() // 选当前时间之前的时间
-        },
-      },
+        }
+      }
     }
   },
   created() {
@@ -89,7 +89,7 @@ export default {
         {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          type: 'warning',
+          type: 'warning'
         }
       )
         .then(function() {})
@@ -101,8 +101,8 @@ export default {
     },
     goRoute(id, path) {
       this.$router.push({
-        path: '/customerMaintain/groupMessage/' + path,
-        query: { id },
+        path: path,
+        query: { id }
       })
     },
     syncMsg(data) {
@@ -119,8 +119,8 @@ export default {
         .catch(() => {
           // this.loading = false
         })
-    },
-  },
+    }
+  }
 }
 </script>
 <template>

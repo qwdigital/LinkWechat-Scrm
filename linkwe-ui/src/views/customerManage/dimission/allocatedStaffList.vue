@@ -13,13 +13,13 @@ export default {
         pageSize: 10,
         userName: undefined,
         beginTime: undefined,
-        endTime: undefined,
+        endTime: undefined
       },
       loading: false,
       total: 0,
       list: [],
       dialogVisibleSelectUser: false,
-      dateRange: [], // 离职日期
+      dateRange: [] // 离职日期
     }
   },
   watch: {},
@@ -53,8 +53,8 @@ export default {
     resetForm(formName) {
       this.dateRange = []
       this.$refs['queryForm'].resetFields()
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -131,8 +131,8 @@ export default {
             v-hasPermi="['customerManage:dimission:edit']"
             @click="
               $router.push({
-                path: '/customerManage/allocatedStaffDetail',
-                query: { userId: scope.row.userId },
+                path: 'allocatedStaffDetail',
+                query: { userId: scope.row.userId }
               })
             "
             type="text"

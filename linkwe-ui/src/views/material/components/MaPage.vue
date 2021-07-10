@@ -10,7 +10,7 @@ import {
   add,
   update,
   remove,
-  moveGroup,
+  moveGroup
 } from '@/api/material'
 
 // import {
@@ -24,13 +24,13 @@ export default {
     // "0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本 5 海报 6 海报字体",
     type: {
       type: String,
-      default: '0',
+      default: '0'
     },
     // 选中的素材ids
     selected: {
       type: [Array, String],
-      default: '',
-    },
+      default: ''
+    }
   },
   data() {
     return {
@@ -41,7 +41,7 @@ export default {
         pageSize: 10,
         categoryId: '',
         search: '',
-        mediaType: '0',
+        mediaType: '0'
       },
       list: [], // 列表
       total: 0, // 总条数
@@ -49,7 +49,7 @@ export default {
       // 树props
       treeProps: {
         children: 'children',
-        label: 'name',
+        label: 'name'
       },
       treeForm: {}, // 树表格
       treeDialogVisible: false, // 树表格对话框显隐
@@ -63,7 +63,7 @@ export default {
         children: 'children',
         label: 'name',
         value: 'id',
-        emitPath: false,
+        emitPath: false
       },
 
       typeTitle: ['图片', '语音', '视频', '文件', '文本', '海报', '海报字体'],
@@ -72,18 +72,18 @@ export default {
       // 表单校验
       rules: Object.freeze({
         categoryId: [
-          { required: true, message: '不能为空', trigger: 'change' },
+          { required: true, message: '不能为空', trigger: 'change' }
         ],
         content: [{ required: true, message: '不能为空', trigger: 'blur' }],
         materialUrl: [
-          { required: true, message: '不能为空', trigger: 'change' },
+          { required: true, message: '不能为空', trigger: 'change' }
         ],
         materialName: [
-          { required: true, message: '不能为空', trigger: 'blur' },
+          { required: true, message: '不能为空', trigger: 'blur' }
         ],
         digest: [{ required: true, message: '不能为空', trigger: 'blur' }],
-        coverUrl: [{ required: true, message: '不能为空', trigger: 'blur' }],
-      }),
+        coverUrl: [{ required: true, message: '不能为空', trigger: 'blur' }]
+      })
     }
   },
   watch: {},
@@ -105,8 +105,8 @@ export default {
             parentId: '0',
             hasParent: false,
             hasChildren: true,
-            children: data || [],
-          },
+            children: data || []
+          }
         ]
       })
     },
@@ -159,7 +159,7 @@ export default {
     // 类目树节点删除
     treeRemove(id) {
       this.$confirm('是否确认删除吗?', '警告', {
-        type: 'warning',
+        type: 'warning'
       })
         .then(function() {
           return removeTree(id)
@@ -214,7 +214,7 @@ export default {
     remove(id) {
       const Ids = id || this.selected + ''
       this.$confirm('是否确认删除吗?', '警告', {
-        type: 'warning',
+        type: 'warning'
       })
         .then(function() {
           return remove(Ids)
@@ -235,8 +235,8 @@ export default {
     // 下载
     download(data) {
       window.open(data.materialUrl)
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -246,7 +246,7 @@ export default {
       <el-col :span="6">
         <div>
           <el-button
-            v-hasPermi="['material:addType']"
+            v-hasPermi="['wechat:category:add']"
             slot="reference"
             type="primary"
             @click="treeEdit({}, 0)"
@@ -269,19 +269,19 @@ export default {
               <span>{{ node.label }}</span>
               <span class="fr" v-if="data.id">
                 <i
-                  v-hasPermi="['material:editType']"
+                  v-hasPermi="['wechat:category:edit']"
                   class="el-icon-edit-outline"
                   title="编辑"
                   @click.stop="treeEdit(data, 1)"
                 ></i>
                 <i
-                  v-hasPermi="['material:addType']"
+                  v-hasPermi="['wechat:category:edit']"
                   class="el-icon-circle-plus-outline"
                   title="添加子分类"
                   @click.stop="treeEdit(data, 0)"
                 ></i>
                 <i
-                  v-hasPermi="['material:removeType']"
+                  v-hasPermi="['wechat:category:remove']"
                   class="el-icon-delete"
                   title="删除"
                   @click.stop="treeRemove(data.id)"
@@ -307,9 +307,14 @@ export default {
             prefix-icon="el-icon-search"
             style="width: 300px;"
           />
-          <el-button class="ml10" @click="getList(1)">搜索</el-button>
           <el-button
-            v-hasPermi="['material:remove']"
+            class="ml10"
+            @click="getList(1)"
+            v-hasPermi="['wecom:material:list']"
+            >搜索</el-button
+          >
+          <el-button
+            v-hasPermi="['wechat:material:remove']"
             @click="remove()"
             :disabled="selected.length === 0"
             >删除</el-button
@@ -332,7 +337,7 @@ export default {
               >
             </div>
             <el-button
-              v-hasPermi="['material:edit']"
+              v-hasPermi="['wechat:material:resetCategory']"
               slot="reference"
               class="ml10"
               :disabled="selected.length === 0"
@@ -342,7 +347,7 @@ export default {
 
           <div class="fr">
             <el-button
-              v-hasPermi="['material:add']"
+              v-hasPermi="['wechat:material:add']"
               type="primary"
               @click="edit(1, ~~type)"
               >添加{{ typeTitle[type] }}</el-button

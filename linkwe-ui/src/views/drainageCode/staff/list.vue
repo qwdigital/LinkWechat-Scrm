@@ -4,7 +4,7 @@ import {
   remove,
   batchAdd,
   downloadBatch,
-  download,
+  download
 } from '@/api/drainageCode/staff'
 import SelectUser from '@/components/SelectUser'
 import ClipboardJS from 'clipboard'
@@ -22,7 +22,7 @@ export default {
         scenario: undefined,
         createBy: undefined,
         beginTime: undefined,
-        endTime: undefined,
+        endTime: undefined
       },
       // 日期范围
       dateRange: [],
@@ -41,8 +41,8 @@ export default {
         qrcode: '',
         isJoinConfirmFriends: 0,
         weEmpleCodeTags: [],
-        weEmpleCodeUseScops: [],
-      },
+        weEmpleCodeUseScops: []
+      }
     }
   },
   created() {
@@ -60,7 +60,7 @@ export default {
       this.$notify({
         title: '成功',
         message: '链接已复制到剪切板，可粘贴。',
-        type: 'success',
+        type: 'success'
       })
     })
     clipboard.on('error', (e) => {
@@ -97,7 +97,7 @@ export default {
       this.getList(1)
     },
     goRoute(path, id) {
-      this.$router.push({ path: '/drainageCode/' + path, query: { id } })
+      this.$router.push({ path: path, query: { id } })
     },
 
     // 多选框选中数据
@@ -110,7 +110,7 @@ export default {
       this.$confirm('是否确认删除?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(function() {
           return remove(ids)
@@ -127,7 +127,7 @@ export default {
         return {
           businessId: d.id || d.userId,
           businessName: d.name,
-          businessIdType: d.userId ? 2 : 1,
+          businessIdType: d.userId ? 2 : 1
         }
       })
       batchAdd(this.form).then(({ data }) => {
@@ -154,7 +154,7 @@ export default {
       this.$confirm('是否确认下载所有图片吗?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(() => {
           return downloadBatch(this.ids + '')
@@ -172,8 +172,8 @@ export default {
           }
         })
         .catch(function() {})
-    },
-  },
+    }
+  }
 }
 </script>
 

@@ -3,7 +3,7 @@ import {
   getList,
   remove,
   download,
-  downloadBatch,
+  downloadBatch
 } from '@/api/communityOperating/newCustomer'
 
 export default {
@@ -14,10 +14,10 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        emplCodeName: '', // 活码名称 
+        emplCodeName: '', // 活码名称
         createBy: '', // 创建人
         beginTime: '', // 开始日期
-        endTime: '', // 结束日期
+        endTime: '' // 结束日期
       },
       dateRange: [], // 添加日期
       total: 0, // 数据总量
@@ -29,10 +29,10 @@ export default {
       status: ['正常', '停用'],
       pushType: {
         0: '发给客户',
-        1: '发给客户群',
+        1: '发给客户群'
       },
       queryUser: [], // 搜索框选择的添加人
-      ids: [],
+      ids: []
     }
   },
   computed: {},
@@ -45,7 +45,7 @@ export default {
       } else {
         ;[this.query.beginTime, this.query.endTime] = dateRange
       }
-    },
+    }
   },
   created() {
     this.getList()
@@ -78,8 +78,8 @@ export default {
     // 新建/编辑新客数据
     goRoute(id) {
       this.$router.push({
-        path: '/communityOperating/newCustomerAev',
-        query: { id },
+        path: 'newCustomerAev',
+        query: { id }
       })
     },
     // 多选框选中数据
@@ -92,7 +92,7 @@ export default {
       this.$confirm('是否确认删除?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(function() {
           return remove(ids)
@@ -106,25 +106,24 @@ export default {
     // 下载
     download(data) {
       let name = data.codeName + '.png'
-      download(data.id)
-        .then((res) => {
-          if (res != null) {
-            let blob = new Blob([res], { type: 'application/zip' })
-            let url = window.URL.createObjectURL(blob)
-            const link = document.createElement('a') // 创建a标签
-            link.href = url
-            link.download = name // 重命名文件
-            link.click()
-            URL.revokeObjectURL(url) // 释放内存
-          }
-        })
+      download(data.id).then((res) => {
+        if (res != null) {
+          let blob = new Blob([res], { type: 'application/zip' })
+          let url = window.URL.createObjectURL(blob)
+          const link = document.createElement('a') // 创建a标签
+          link.href = url
+          link.download = name // 重命名文件
+          link.click()
+          URL.revokeObjectURL(url) // 释放内存
+        }
+      })
     },
     // 批量下载
     downloadBatch() {
       this.$confirm('是否确认下载所有活码图片吗?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(() => {
           return downloadBatch(this.ids + '')
@@ -151,7 +150,7 @@ export default {
       this.$nextTick(() => {
         this.getList(1)
       })
-    },
+    }
   }
 }
 </script>

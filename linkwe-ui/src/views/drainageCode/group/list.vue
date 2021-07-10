@@ -4,7 +4,7 @@ import {
   getList,
   remove,
   downloadBatch,
-  download,
+  download
 } from '@/api/drainageCode/group'
 import ClipboardJS from 'clipboard'
 
@@ -18,7 +18,7 @@ export default {
         activityName: '',
         createBy: '',
         beginTime: '',
-        endTime: '',
+        endTime: ''
       },
       loading: false,
       searchDate: '', // 查询日期
@@ -28,7 +28,7 @@ export default {
       realCodeDialog: false, // 实际群码总数dialog
       openGroupCodeId: null, // 打开实际群码关联的群活码ID
       openGroupCodeStatus: -1, // 打开实际群码的检索状态
-      clipboard: null, // 拷贝对象
+      clipboard: null // 拷贝对象
     }
   },
   watch: {
@@ -43,7 +43,7 @@ export default {
     // 如果实际群码弹出框关闭,刷新数据
     realCodeDialog(val) {
       if (val === false) this.getGroupCodes()
-    },
+    }
   },
   mounted() {
     this.clipboard = new ClipboardJS('.copy-btn')
@@ -52,7 +52,7 @@ export default {
       this.$notify({
         title: '成功',
         message: '链接已复制到剪切板，可粘贴。',
-        type: 'success',
+        type: 'success'
       })
     })
 
@@ -113,7 +113,7 @@ export default {
       this.$confirm('是否确认下载所有图片吗?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(() => {
           return downloadBatch(ids + '')
@@ -139,19 +139,18 @@ export default {
         {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          type: 'warning',
+          type: 'warning'
         }
       )
         .then(() => {
           const ids = this.multiGroupCode.map((group) => group.id)
 
-          remove(ids + '')
-            .then((res) => {
-              if (res.code === 200) {
-                this.getGroupCodes()
-              } else {
-              }
-            })
+          remove(ids + '').then((res) => {
+            if (res.code === 200) {
+              this.getGroupCodes()
+            } else {
+            }
+          })
         })
         .catch(() => {})
     },
@@ -159,18 +158,17 @@ export default {
     handleDownload(codeId, activityName) {
       const name = activityName + '.png'
 
-      download(codeId)
-        .then((res) => {
-          if (res != null) {
-            let blob = new Blob([res], { type: 'application/zip' })
-            let url = window.URL.createObjectURL(blob)
-            const link = document.createElement('a') // 创建a标签
-            link.href = url
-            link.download = name // 重命名文件
-            link.click()
-            URL.revokeObjectURL(url) // 释放内存
-          }
-        })
+      download(codeId).then((res) => {
+        if (res != null) {
+          let blob = new Blob([res], { type: 'application/zip' })
+          let url = window.URL.createObjectURL(blob)
+          const link = document.createElement('a') // 创建a标签
+          link.href = url
+          link.download = name // 重命名文件
+          link.click()
+          URL.revokeObjectURL(url) // 释放内存
+        }
+      })
     },
     // 删除
     handleRemove(codeId) {
@@ -180,17 +178,16 @@ export default {
         {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          type: 'warning',
+          type: 'warning'
         }
       )
         .then(() => {
-          remove(codeId)
-            .then((res) => {
-              if (res.code === 200) {
-                this.getGroupCodes()
-              } else {
-              }
-            })
+          remove(codeId).then((res) => {
+            if (res.code === 200) {
+              this.getGroupCodes()
+            } else {
+            }
+          })
         })
         .catch(() => {})
     },
@@ -203,7 +200,7 @@ export default {
       this.openGroupCodeId = groupCodeId
       this.openGroupCodeStatus = status
       this.realCodeDialog = true
-    },
+    }
   }
 }
 </script>
@@ -368,8 +365,8 @@ export default {
             size="mini"
             @click="
               $router.push({
-                path: '/drainageCode/customerGroupDetail',
-                query: { groupCodeId: row.id },
+                path: 'customerGroupDetail',
+                query: { groupCodeId: row.id }
               })
             "
             >编辑</el-button
@@ -387,10 +384,7 @@ export default {
             :data-clipboard-text="row.codeUrl"
             >复制</el-button
           >
-          <el-button
-            type="text"
-            size="mini"
-            @click="handleRemove(row.id)"
+          <el-button type="text" size="mini" @click="handleRemove(row.id)"
             >删除</el-button
           >
         </template>
