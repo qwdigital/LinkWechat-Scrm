@@ -30,7 +30,7 @@
             <el-col :span="6">{{ table.customerCount }}</el-col>
             <el-col :span="6">{{ table.groupMemberCount }}</el-col>
             <el-col :span="6">{{ table.groupCount }}</el-col>
-             <el-col :span="6">{{table.groupMemberCount}}</el-col>
+            <el-col :span="6">{{ table.userCount }}</el-col>
           </el-row>
         </div>
       </div>

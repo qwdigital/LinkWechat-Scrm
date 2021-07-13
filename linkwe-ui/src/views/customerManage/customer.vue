@@ -406,7 +406,8 @@ export default {
       </el-table-column>
       <el-table-column prop="createTime" label="添加时间" align="center">
         <template slot-scope="scope">{{
-          scope.row.weFlowerCustomerRels[0] ? scope.row.weFlowerCustomerRels[0].addTime
+          scope.row.weFlowerCustomerRels[0]
+            ? scope.row.weFlowerCustomerRels[0].createTime
             : ''
         }}</template>
       </el-table-column>
@@ -418,7 +419,7 @@ export default {
           >
             <el-tag
               type="info"
-              v-for="(unit, unique) in item.weTags"
+              v-for="(unit, unique) in item.weFlowerCustomerTagRels"
               :key="unique"
               >{{ unit.tagName }}</el-tag
             >

@@ -103,7 +103,7 @@ export function exportCustomer(query) {
  */
 export function getDetail(externalUserid) {
   return request({
-      url: service + '/externalUserId/' + externalUserid,
+    url: service + '/getCustomersByUserId/' + externalUserid,
   })
 }
 

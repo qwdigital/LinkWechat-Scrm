@@ -129,14 +129,14 @@ export default {
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center" />
-          <el-table-column label="标签组" align="center" prop="groupName" />
+      <el-table-column label="标签组" align="center" prop="gourpName" />
       <el-table-column label="标签" align="center" prop="weTags">
         <template slot-scope="scope">
           <el-tag
             type="info"
             v-for="(item, index) in scope.row.weTags"
             :key="index"
-                >{{ item.tagName }}</el-tag
+            >{{ item.name }}</el-tag
           >
         </template>
       </el-table-column>

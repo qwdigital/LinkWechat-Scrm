@@ -184,7 +184,7 @@ export default {
       <el-table-column
         label="创建时间"
         align="center"
-        prop="addTime"
+        prop="createTime"
         width="180"
       ></el-table-column>
       <el-table-column
