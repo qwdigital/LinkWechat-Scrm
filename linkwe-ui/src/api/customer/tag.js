@@ -1,6 +1,11 @@
+/***
+ * @file:
+ * @author: qi.yeqing
+ * @Date: 2021-07-13 11:43:55
+ */
 import request from '@/utils/request'
 const service = window.CONFIG.services.wecom + '/group'
-
+const service2 = window.CONFIG.services.wecom
 // 客户标签
 
 /**
@@ -20,7 +25,7 @@ export function getList(params) {
 
 /**
  * 新增客户标签
- * @param {Object} data 
+ * @param {Object} data
 {
     "gourpName": "标签组名称",
     "weTags": [{
@@ -38,7 +43,7 @@ export function add(data) {
 
 /**
  * 客户标签编辑
- * @param {*} data 
+ * @param {*} data
 {
     "id": "主键",
     "gourpName": "标签分组名",
@@ -52,7 +57,7 @@ export function add(data) {
  */
 export function update(data) {
   return request({
-    url: service,
+    url: service2+'/customer/edit',
     method: 'put',
     data,
   })
@@ -64,8 +69,8 @@ export function update(data) {
  */
 export function remove(ids) {
   return request({
-    url: service + '/' + ids,
-    method: 'DELETE',
+    url: service2 + '/customer/' + ids,
+    method: 'get',
   })
 }
 

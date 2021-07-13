@@ -12,6 +12,7 @@ export default {
         pageSize: 10,
         isActivate: '',
         department: '',
+        deptId:'',
       },
       dateRange: [],
       treeData: [],
@@ -108,7 +109,8 @@ export default {
         })
     },
     handleNodeClick(data) {
-      this.query.department = data.id == 1 ? '' : data.id
+      this.query.department = data.id == 1 ? '' : data.id;
+      this.query.deptId=data.deptId
       this.getList(1)
     },
     edit(data, type) {
