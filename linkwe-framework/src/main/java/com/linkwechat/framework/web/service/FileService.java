@@ -48,7 +48,7 @@ public class FileService {
         if(ruoYiConfig.getFile().isStartCosUpload()){//开启云上传
              //开启云上传开关则云上传，不然上传本地
              fileName = FileUploadUtils.upload2Cos(file, ruoYiConfig.getFile().getCos());
-            imgUrlPrefix = ruoYiConfig.getFile().getCos().getCosImgUrlPrefix();
+             imgUrlPrefix = ruoYiConfig.getFile().getCos().getCosImgUrlPrefix();
          }else {//本地上传
             File osFile=OsUtils.isWindows()?new File(WINDOWSFILEPATH):new File(LINUXFILEPATH);
             if(!osFile.exists()){

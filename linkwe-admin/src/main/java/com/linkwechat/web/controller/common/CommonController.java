@@ -5,6 +5,7 @@ import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.config.ServerConfig;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.FileVo;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.file.FileUtils;
@@ -123,10 +124,12 @@ public class CommonController {
         try {
             SysFile sysFile
                     = fileService.upload(file);
-            AjaxResult ajax = AjaxResult.success();
-            ajax.put("fileName", sysFile.getFileName());
-            ajax.put("url", sysFile.getImgUrlPrefix()+sysFile.getFileName());
-            return ajax;
+            return AjaxResult.success(
+                    FileVo.builder()
+                            .fileName(sysFile.getFileName())
+                            .url(sysFile.getImgUrlPrefix()+sysFile.getFileName())
+                            .build()
+            );
         } catch (Exception e) {
             return AjaxResult.error(e.getMessage());
         }
