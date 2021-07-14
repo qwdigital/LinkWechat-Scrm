@@ -6,6 +6,7 @@ import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.utils.OsUtils;
 import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.file.FileUtils;
+import com.linkwechat.common.utils.file.MimeTypeUtils;
 import com.linkwechat.framework.web.domain.server.SysFile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,25 +43,35 @@ public class FileService {
      * @return
      * @throws IOException
      */
-     public SysFile upload(MultipartFile file) throws IOException {
-        String fileName="";
-        String imgUrlPrefix="";
-        if(ruoYiConfig.getFile().isStartCosUpload()){//开启云上传
-             //开启云上传开关则云上传，不然上传本地
-             fileName = FileUploadUtils.upload2Cos(file, ruoYiConfig.getFile().getCos());
-             imgUrlPrefix = ruoYiConfig.getFile().getCos().getCosImgUrlPrefix();
-         }else {//本地上传
-            File osFile=OsUtils.isWindows()?new File(WINDOWSFILEPATH):new File(LINUXFILEPATH);
-            if(!osFile.exists()){
-                osFile.mkdirs();
-            }
-            fileName = FileUploadUtils.upload(osFile.getPath(), file);
-            imgUrlPrefix = ruoYiConfig.getFile().getImgUrlPrefix();
-        }
-        return SysFile.builder()
-                .fileName(fileName)
-                .imgUrlPrefix(imgUrlPrefix)
-                .build();
+     public SysFile upload(MultipartFile file) throws Exception {
+
+         try {
+             FileUploadUtils.assertAllowed(file, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION);
+             String fileName="";
+             String imgUrlPrefix="";
+             if(ruoYiConfig.getFile().isStartCosUpload()){//开启云上传
+                 //开启云上传开关则云上传，不然上传本地
+                 fileName = FileUploadUtils.upload2Cos(file, ruoYiConfig.getFile().getCos());
+                 imgUrlPrefix = ruoYiConfig.getFile().getCos().getCosImgUrlPrefix();
+             }else {//本地上传
+                 File osFile=OsUtils.isWindows()?new File(WINDOWSFILEPATH):new File(LINUXFILEPATH);
+                 if(!osFile.exists()){
+                     osFile.mkdirs();
+                 }
+                 fileName = FileUploadUtils.upload(osFile.getPath(), file);
+                 imgUrlPrefix = ruoYiConfig.getFile().getImgUrlPrefix();
+             }
+             return SysFile.builder()
+                     .fileName(fileName)
+                     .imgUrlPrefix(imgUrlPrefix)
+                     .build();
+
+         }catch (Exception e){
+
+             throw e;
+
+         }
+
     }
 
 

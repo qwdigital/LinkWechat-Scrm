@@ -9,6 +9,7 @@ import com.linkwechat.common.core.domain.FileVo;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.file.FileUtils;
+import com.linkwechat.common.utils.file.MimeTypeUtils;
 import com.linkwechat.framework.web.domain.server.SysFile;
 import com.linkwechat.framework.web.service.FileService;
 import org.slf4j.Logger;
@@ -120,8 +121,9 @@ public class CommonController {
      * 通用上传请求
      */
     @PostMapping("/common/uploadFile2Cos")
-    public AjaxResult uploadFile2Cos(MultipartFile file) throws Exception {
+    public AjaxResult uploadFile2Cos(MultipartFile file){
         try {
+
             SysFile sysFile
                     = fileService.upload(file);
             return AjaxResult.success(
@@ -131,7 +133,7 @@ public class CommonController {
                             .build()
             );
         } catch (Exception e) {
-            return AjaxResult.error(e.getMessage());
+            return AjaxResult.error("不支持当前文件上传或文件过大建议传20MB以内的文件");
         }
     }
 

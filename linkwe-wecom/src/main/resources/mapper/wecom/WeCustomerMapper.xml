@@ -288,6 +288,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <if test="userId != null and userId !=''">
           AND wfcr.user_id=#{userId}
         </if>
+        ORDER BY wfcr.create_time ASC limit 1
     </select>
 
 
