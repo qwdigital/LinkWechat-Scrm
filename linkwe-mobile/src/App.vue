@@ -6,14 +6,14 @@ export default {
   name: 'App',
   provide() {
     return {
-      reload: this.reload,
+      reload: this.reload
     }
   },
   data() {
     return {
       corpId: '',
       agentId: '',
-      isRouterAlive: true,
+      isRouterAlive: true
     }
   },
   async created() {
@@ -45,12 +45,12 @@ export default {
       // this.wxConfig()
       const noAuth = route.meta ? route.meta.noAuth : false
       !noAuth && this.wxConfig()
-    },
+    }
   },
   methods: {
     reload() {
       this.isRouterAlive = false
-      this.$nextTick(function() {
+      this.$nextTick(() => {
         this.isRouterAlive = true
       })
     },
@@ -76,7 +76,7 @@ export default {
             'getCurExternalContact',
             'openEnterpriseChat',
             'shareToExternalContact',
-            'shareToExternalChat',
+            'shareToExternalChat'
           ], //必填
           success: (res) => {
             // 回调
@@ -88,10 +88,10 @@ export default {
             if (res.errMsg.indexOf('function not exist') > -1) {
               alert('版本过低请升级')
             }
-          },
+          }
         })
       } catch (error) {}
-    },
+    }
     // 丢弃
     // _wxConfig() {
     //   // 获取企业的jsapi_ticket
@@ -135,7 +135,7 @@ export default {
     //     })
     //   })
     // },
-  },
+  }
 }
 </script>
 <template>
