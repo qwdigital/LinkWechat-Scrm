@@ -22,7 +22,7 @@
                 >{{
                   form.remark
                     ? form.remark
-                    : form.name + '_' + form.remarkCorpName
+                    : (form.name || '') + '_' + (form.remarkCorpName || '')
                 }}
                 &nbsp; &nbsp;</span
               ><span
