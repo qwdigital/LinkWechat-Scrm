@@ -249,12 +249,12 @@ export default {
     </el-form>
 
     <div class="mid-action">
-      <div class="total">
+      <!-- <div class="total">
         己选
         <span class="num">{{ total }}</span> 条，当前已经配置
         <span class="num">{{ total }}</span> 个 最多配置
         <span class="num">{{ total }}</span> 个
-      </div>
+      </div> -->
       <div>
         <el-button
           v-hasPermi="['wecom:code:add']"
@@ -263,13 +263,13 @@ export default {
           @click="goRoute('staffAdd')"
           >新建员工活码</el-button
         >
-        <el-button
+        <!-- <el-button
           v-hasPermi="['wecom:code:batchAdd']"
           type="primary"
           size="mini"
           @click="dialogVisible = true"
           >批量新建</el-button
-        >
+        > -->
         <el-button
           v-hasPermi="['wecom:code:remove']"
           type="primary"

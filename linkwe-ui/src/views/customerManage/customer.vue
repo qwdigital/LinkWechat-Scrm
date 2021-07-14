@@ -54,12 +54,12 @@ export default {
     this.getListTag()
     this.getListOrganization()
 
-    // this.$store.dispatch(
-    //   'app/setBusininessDesc',
-    //   `
-    //     <div>用于查看当前企业所有的客户列表及详细信息，支持对客户进行打标签。</div>
-    //   `
-    // )
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>用于查看当前企业所有的客户列表及详细信息，支持对客户进行打标签。</div>
+      `
+    )
   },
   mounted() {},
   methods: {
@@ -251,6 +251,12 @@ export default {
         this.$refs.table.clearSelection()
         this.$refs.table.toggleRowSelection(row, true)
       })
+    },
+    goRoute(row) {
+      this.$router.push({
+        path: 'customerDetail',
+        query: { id: row.externalUserid }
+      })
     }
   }
 }
@@ -330,10 +336,25 @@ export default {
     </el-form>
 
     <div class="mid-action">
-      <div class="total">
-        共
+      <div>
+        <!-- 共
         <span class="num">{{ total }}</span> 位客户，实际客户
-        <span class="num">{{ total }}</span> 位。
+        <span class="num">{{ total }}</span> 位。 -->
+        <el-button
+          v-hasPermi="['customerManage:customer:sync']"
+          v-preventReClick
+          type="primary"
+          @click="sync"
+          >同步客户</el-button
+        >
+        <el-button
+          v-hasPermi="['customerManage:customer:checkRepeat']"
+          type="primary"
+          >查看重复客户</el-button
+        >
+        <!-- <div>
+          最近同步：2021-05-17 15:05:43
+        </div> -->
       </div>
       <div>
         <el-button
@@ -349,17 +370,6 @@ export default {
           @click="makeTag('remove')"
           :disabled="multipleSelection.length !== 1"
           >移除标签</el-button
-        >
-        <el-button
-          v-hasPermi="['customerManage:customer:sync']"
-          type="primary"
-          @click="sync"
-          >同步客户</el-button
-        >
-        <el-button
-          v-hasPermi="['customerManage:customer:checkRepeat']"
-          type="primary"
-          >查看重复客户</el-button
         >
       </div>
     </div>
@@ -378,18 +388,19 @@ export default {
         width="55"
       ></el-table-column>
       <el-table-column label="客户" prop="name" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.name }}
-          <span
-            :style="{ color: scope.row.type === 1 ? '#4bde03' : '#f9a90b' }"
-            >{{ { 1: '@微信', 2: '@企业微信' }[scope.row.type] }}</span
-          >
-          <i
-            :class="[
-              'el-icon-s-custom',
-              { 1: 'man', 2: 'woman' }[scope.row.gender]
-            ]"
-          ></i>
+        <template slot-scope="{ row }">
+          <div class="cp" @click="goRoute(row)">
+            {{ row.name }}
+            <span :style="{ color: row.type === 1 ? '#4bde03' : '#f9a90b' }">{{
+              { 1: '@微信', 2: '@企业微信' }[row.type]
+            }}</span>
+            <i
+              :class="[
+                'el-icon-s-custom',
+                { 1: 'man', 2: 'woman' }[row.gender]
+              ]"
+            ></i>
+          </div>
         </template>
       </el-table-column>
       <el-table-column
@@ -398,25 +409,22 @@ export default {
         align="center"
       ></el-table-column>
       <el-table-column prop="userName" label="添加人（首位）" align="center">
-        <template slot-scope="scope">{{
-          scope.row.weFlowerCustomerRels[0]
-            ? scope.row.weFlowerCustomerRels[0].userName
+        <template slot-scope="{ row }">{{
+          row.weFlowerCustomerRels[0]
+            ? row.weFlowerCustomerRels[0].userName
             : ''
         }}</template>
       </el-table-column>
       <el-table-column prop="createTime" label="添加时间" align="center">
-        <template slot-scope="scope">{{
-          scope.row.weFlowerCustomerRels[0]
-            ? scope.row.weFlowerCustomerRels[0].createTime
+        <template slot-scope="{ row }">{{
+          row.weFlowerCustomerRels[0]
+            ? row.weFlowerCustomerRels[0].createTime
             : ''
         }}</template>
       </el-table-column>
       <el-table-column prop="address" label="标签" align="center">
-        <template slot-scope="scope">
-          <div
-            v-for="(item, index) in scope.row.weFlowerCustomerRels"
-            :key="index"
-          >
+        <template slot-scope="{ row }">
+          <div v-for="(item, index) in row.weFlowerCustomerRels" :key="index">
             <el-tag
               type="info"
               v-for="(unit, unique) in item.weFlowerCustomerTagRels"
@@ -427,15 +435,10 @@ export default {
         </template>
       </el-table-column>
       <el-table-column label="操作" width="100">
-        <template slot-scope="scope">
+        <template slot-scope="{ row }">
           <el-button
             v-hasPermi="['customerManage:customer:view']"
-            @click="
-              $router.push({
-                path: 'customerDetail',
-                query: { id: scope.row.externalUserid }
-              })
-            "
+            @click="goRoute(row)"
             type="text"
             size="small"
             >查看</el-button
