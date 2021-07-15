@@ -36,7 +36,7 @@ export default {
     this.$store.dispatch(
       'app/setBusininessDesc',
       `
-        <div>从通讯录将离职员工删除后，可以分配他的客户及客户群给其他员工继续跟进。</div>
+        <div>将离职成员的客户和客户群分配给其他成员跟进并继续提供服务。</div>
       `
     )
   },

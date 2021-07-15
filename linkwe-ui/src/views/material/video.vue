@@ -74,6 +74,7 @@ export default {
 <style lang="scss" scoped>
 .img-wrap {
   position: relative;
+  height: 200px;
   &:hover .actions {
     opacity: 1;
   }

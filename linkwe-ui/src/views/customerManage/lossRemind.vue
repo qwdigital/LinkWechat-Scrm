@@ -63,7 +63,7 @@ export default {
     this.$store.dispatch(
       'app/setBusininessDesc',
       `
-        <div>开启后，当员工被客户删除时，被删除的员工将收到一条消息提醒</div>
+        <div>当企业成员被客户删除时，会在流失列表中产生一条记录，开启删除通知后，被删除的成员会收到一条推送</div>
       `
     )
   },

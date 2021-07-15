@@ -23,35 +23,35 @@ export default {
         messageType: '0',
         imageMessage: {
           media_id: '', // '图片的media_id',
-          pic_url: '', // '图片的链接',
+          pic_url: '' // '图片的链接',
         },
         linkMessage: {
           title: '', // '图文消息标题',
           picurl: '', // '图文消息封面的url',
           desc: '', // '图文消息的描述，最多512个字节',
-          url: '', // '图文消息的链接',
+          url: '' // '图文消息的链接',
         },
         textMessage: {
-          content: '', //'消息文本内容，最多4000个字节',
+          content: '' //'消息文本内容，最多4000个字节',
         },
         miniprogramMessage: {
           title: '', // '小程序消息标题，最多64个字节',
           pic_media_id: '', // '小程序消息封面的mediaid，封面图建议尺寸为520*416',
           appid: '', // '小程序appid，必须是关联到企业的小程序应用',
-          page: '', // '小程序page路径',
-        },
+          page: '' // '小程序page路径',
+        }
       },
       userParty: [],
       rules: {},
       statusOptions: Object.freeze([
         { label: '发送给客户', value: '0' },
-        { label: '发送给客户群', value: '1' },
+        { label: '发送给客户群', value: '1' }
       ]),
       activeName: '0',
       dialogVisibleSelectCustomer: false,
       dialogVisibleSelectUser: false,
       dialogVisibleSelectTag: false,
-      dialogVisibleSelectMaterial: false,
+      dialogVisibleSelectMaterial: false
     }
   },
   watch: {},
@@ -71,7 +71,7 @@ export default {
       }${this.userParty[0] && this.isOnlyTag ? '，且' : ''}${
         this.isOnlyTag ? '满足' + this.form.tag[0].name + '等标签的' : ''
       }${this.form.pushType == 0 ? '客户' : '客户群'}`
-    },
+    }
   },
   created() {
     this.$store.dispatch(
@@ -133,10 +133,12 @@ export default {
     },
     // 选择素材确认按钮
     submitSelectMaterial(text, image, file) {
-      this.form.textMessage.content = text.content
-      // this.form.imageMessage.media_id = image.id
-      this.form.imageMessage.pic_url = image.materialUrl
-      this.form.imageMessage._materialName = image.materialName
+      if (this.activeName == 0) {
+        this.form.textMessage.content = text.content
+      } else if (this.activeName == 1) {
+        this.form.imageMessage.pic_url = image.materialUrl
+        this.form.imageMessage._materialName = image.materialName
+      }
     },
     submit() {
       this.loading = true
@@ -149,7 +151,7 @@ export default {
             let dataMediaId = {
               url: form.imageMessage.pic_url,
               type: '0',
-              name: form.imageMessage._materialName,
+              name: form.imageMessage._materialName
             }
             return getMaterialMediaId(dataMediaId).then((res) => {
               // debugger
@@ -167,13 +169,13 @@ export default {
         .then(({ data }) => {
           this.msgSuccess('操作成功')
           this.loading = false
-          this.$router.back()
+          this.$router.push('record')
         })
         .catch(() => {
           this.loading = false
         })
-    },
-  },
+    }
+  }
 }
 </script>
 
