@@ -7,4 +7,7 @@ public interface IWeCustomerTrajectoryService extends IService<WeCustomerTraject
 
     void waitHandleMsg(String url);
 
+
+    void inforMationNews(String userId,String externalUserid,Integer trajectoryType);
+
 }

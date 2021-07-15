@@ -19,6 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 public class WeMakeCustomerTag {
     private String externalUserid;
+    private String userId;
     private List<WeTag> addTag;
 
 }

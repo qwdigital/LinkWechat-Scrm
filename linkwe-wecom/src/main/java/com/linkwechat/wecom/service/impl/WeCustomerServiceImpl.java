@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.enums.TrajectorySceneType;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -79,6 +80,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
     @Autowired
     private WeUserClient weUserClient;
+
+
+    @Autowired
+    private  IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
 
 
     @Override
@@ -346,7 +351,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
         //查询出当前用户对应的
         List<WeFlowerCustomerRel> flowerCustomerRels = iWeFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
-                .eq(WeFlowerCustomerRel::getExternalUserid, weMakeCustomerTag.getExternalUserid()));
+                .eq(WeFlowerCustomerRel::getExternalUserid, weMakeCustomerTag.getExternalUserid())
+                .eq(WeFlowerCustomerRel::getUserId,weMakeCustomerTag.getUserId())
+        );
         if (CollectionUtil.isNotEmpty(flowerCustomerRels)) {
 
 
@@ -398,6 +405,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     }
                 }
             }
+
+
+
+            iWeCustomerTrajectoryService.inforMationNews(weMakeCustomerTag.getUserId(),weMakeCustomerTag.getExternalUserid(),
+                    TrajectorySceneType.TRAJECTORY_TYPE_XXDT_SZBQ.getKey());
+
         }
 
 
@@ -684,15 +697,14 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         this.updateById(
                 weCustomer
         );
-
-
         WeFlowerCustomerRel weFlowerCustomerRel = WeFlowerCustomerRel.builder().build();
         BeanUtils.copyBeanProp(weFlowerCustomerRel,weCustomerPortrait);
         //更新企业添加人表
         iWeFlowerCustomerRelService.update(weFlowerCustomerRel,new LambdaQueryWrapper<WeFlowerCustomerRel>()
         .eq(WeFlowerCustomerRel::getExternalUserid,weCustomerPortrait.getExternalUserid())
         .eq(WeFlowerCustomerRel::getUserId,weCustomerPortrait.getUserId()));
-
+        //添加轨迹内容(信息动态)
+        iWeCustomerTrajectoryService.inforMationNews(weCustomerPortrait.getUserId(),weCustomerPortrait.getExternalUserid(), TrajectorySceneType.TRAJECTORY_TYPE_XXDT_BCZL.getKey());
     }
 
 

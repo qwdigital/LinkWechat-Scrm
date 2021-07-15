@@ -6,10 +6,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.enums.MessageType;
+import com.linkwechat.common.enums.TrajectorySceneType;
+import com.linkwechat.common.enums.TrajectoryType;
 import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
 import com.linkwechat.wecom.client.WeMessagePushClient;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeCustomerTrajectory;
+import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.dto.WeMessagePushDto;
 import com.linkwechat.wecom.domain.dto.message.TextMessageDto;
 import com.linkwechat.wecom.domain.dto.message.WeCustomerMessagePushDto;
@@ -17,7 +20,9 @@ import com.linkwechat.wecom.mapper.WeCustomerTrajectoryMapper;
 import com.linkwechat.wecom.service.IWeCustomerMessageService;
 import com.linkwechat.wecom.service.IWeCustomerService;
 import com.linkwechat.wecom.service.IWeCustomerTrajectoryService;
+import com.linkwechat.wecom.service.IWeUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotBlank;
@@ -36,6 +41,11 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
 
     @Autowired
     private IWeCustomerService iWeCustomerService;
+
+
+
+    @Autowired
+    private IWeUserService iWeUserService;
 
     /**
      * 待办理处理通知
@@ -69,7 +79,31 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
             });
 
         }
-
-
     }
+
+
+    /**
+     * 信息动态编辑
+     * @param userId
+     * @param externalUserid
+     * @param trajectoryType
+     */
+    @Override
+    public void inforMationNews(String userId, String externalUserid, Integer trajectoryType) {
+        WeUser weUser = iWeUserService.getById(userId);
+        if(null != weUser){
+            this.save(
+                    WeCustomerTrajectory.builder()
+                            .externalUserid(externalUserid)
+                            .trajectoryType(TrajectoryType.TRAJECTORY_TYPE_XXDT.getType())
+                            .userId(userId)
+                            .content(
+                                    TrajectorySceneType.TRAJECTORY_TYPE_XXDT_BCZL.getKey().equals(trajectoryType)?
+                                            "员工"+weUser.getName()+"编辑了当前客户信息":"员工"+weUser.getName()+"编辑了当前客户标签"
+                            ).build()
+            );
+        }
+    }
+
+
 }
