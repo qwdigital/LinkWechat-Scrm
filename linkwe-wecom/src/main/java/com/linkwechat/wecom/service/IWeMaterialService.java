@@ -94,6 +94,8 @@ public interface IWeMaterialService {
      */
     public WeMediaDto uploadTemporaryMaterial(String url, String type,String name);
 
+    public WeMediaDto uploadTemporaryMaterial(String url, String type);
+
     /**
      * 上传素材图片
      * @param file

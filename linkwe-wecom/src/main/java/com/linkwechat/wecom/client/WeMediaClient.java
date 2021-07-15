@@ -36,4 +36,13 @@ public interface WeMediaClient {
     @Post(url = "/media/upload")
     WeMediaDto upload(@DataFile(value = "media", fileName = "${1}") InputStream file, String filename, @Query("type") String type);
 
+    /**
+     * 上传临时素材
+     * Inputstream 对象
+     * 使用byte数组和Inputstream对象时一定要定义fileName属性
+     */
+    @Post(url = "/media/upload")
+    WeMediaDto upload(@DataFile(value = "media") InputStream file, @Query("type") String type);
+
+
 }
