@@ -98,7 +98,7 @@ export default {
         >
       </el-form-item>
     </el-form>
-    <el-table :data="tableData" border style="width: 100%">
+    <el-table :data="tableData">
       <el-table-column prop="taskName" label="任务活动名称"> </el-table-column>
       <el-table-column prop="fissNum" label="裂变客户数量"> </el-table-column>
       <el-table-column prop="fissStatus" label="活动状态">
@@ -111,7 +111,7 @@ export default {
           <p>{{ scope.row.startTime }}-{{ scope.row.overTime }}</p>
         </template>
       </el-table-column>
-      <el-table-column prop="operation" label="操作">
+      <el-table-column prop="operation" label="操作" width="120">
         <template slot-scope="scope">
           <el-button
             @click="toDetail(scope.row)"

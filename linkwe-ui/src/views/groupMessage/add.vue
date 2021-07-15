@@ -143,10 +143,9 @@ export default {
     submit() {
       this.loading = true
       let form = JSON.parse(JSON.stringify(this.form))
-      form.messageType = this.activeName
       Promise.resolve()
         .then(() => {
-          if (form.messageType == 1) {
+          if (form.imageMessage.pic_url) {
             // debugger
             let dataMediaId = {
               url: form.imageMessage.pic_url,
@@ -160,6 +159,13 @@ export default {
           }
         })
         .then(() => {
+          if (form.imageMessage.pic_url && form.textMessage.content) {
+            form.messageType = '4'
+          } else if (form.imageMessage.pic_url) {
+            form.messageType = '1'
+          } else if (form.textMessage.content) {
+            form.messageType = '0'
+          }
           // debugger
           form.tag = form.tag.map((d) => d.tagId) + ''
           form.department += ''
