@@ -4,28 +4,23 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
-import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.enums.TrajectorySceneType;
 import com.linkwechat.common.enums.TrajectoryType;
-import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
 import com.linkwechat.wecom.client.WeMessagePushClient;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeCustomerTrajectory;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.dto.WeMessagePushDto;
 import com.linkwechat.wecom.domain.dto.message.TextMessageDto;
-import com.linkwechat.wecom.domain.dto.message.WeCustomerMessagePushDto;
+import com.linkwechat.wecom.mapper.WeCustomerMapper;
 import com.linkwechat.wecom.mapper.WeCustomerTrajectoryMapper;
-import com.linkwechat.wecom.service.IWeCustomerMessageService;
-import com.linkwechat.wecom.service.IWeCustomerService;
+import com.linkwechat.wecom.mapper.WeUserMapper;
 import com.linkwechat.wecom.service.IWeCustomerTrajectoryService;
 import com.linkwechat.wecom.service.IWeUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,15 +32,21 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
 
     @Autowired
     private WeMessagePushClient weMessagePushClient;
-
+//
+//
+////    @Autowired
+////    private IWeCustomerService iWeCustomerService;
+//
+    @Autowired
+    private WeCustomerMapper weCustomerMapper;
+//
+//
+//
+//    @Autowired
+//    private IWeUserService iWeUserService;
 
     @Autowired
-    private IWeCustomerService iWeCustomerService;
-
-
-
-    @Autowired
-    private IWeUserService iWeUserService;
+    private WeUserMapper weUserMapper;
 
     /**
      * 待办理处理通知
@@ -59,7 +60,7 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
                         " AND concat_ws(' ',create_date,end_time) >= DATE_FORMAT(NOW(),'%Y-%m-%d %H:%i:%s')"));
         if(CollectionUtil.isNotEmpty(trajectories)){
 
-            List<WeCustomer> weCustomers = iWeCustomerService.listByIds(
+            List<WeCustomer> weCustomers = weCustomerMapper.selectBatchIds(
                     trajectories.stream().map(WeCustomerTrajectory::getExternalUserid).collect(Collectors.toList())
             );
             Map<String, WeCustomer> weCustomerMap
@@ -90,7 +91,7 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
      */
     @Override
     public void inforMationNews(String userId, String externalUserid, Integer trajectoryType) {
-        WeUser weUser = iWeUserService.getById(userId);
+        WeUser weUser = weUserMapper.selectById(userId);
         if(null != weUser){
             this.save(
                     WeCustomerTrajectory.builder()
