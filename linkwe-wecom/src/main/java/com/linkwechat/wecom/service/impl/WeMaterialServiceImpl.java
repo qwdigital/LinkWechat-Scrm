@@ -153,27 +153,6 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
     }
 
     @Override
-    public WeMediaDto uploadTemporaryMaterial(String url, String type) {
-        HttpURLConnection conn = null;
-        try{
-            URL materialUrl = new URL(url);
-            conn = (HttpURLConnection) materialUrl.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setConnectTimeout(20 * 1000);
-            InputStream inputStream = conn.getInputStream();
-            return weMediaClient.upload(inputStream, type);
-        }catch (Exception e){
-            e.printStackTrace();
-            log.error("上传临时文件失败......url:{},type:{},ex:{},st:{}",url,type,e.getMessage(),e.getStackTrace());
-        }finally {
-            if (conn !=null){
-                conn = null;
-            }
-        }
-        return null;
-    }
-
-    @Override
     public WeMediaDto uploadImg(MultipartFile file) {
         return weMediaClient.uploadimg(file);
     }

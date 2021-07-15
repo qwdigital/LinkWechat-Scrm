@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service.impl;
 
+import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -155,7 +156,8 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
         if (customerMessagePushDto.getMessageType().equals(GroupMessageType.IMAGE.getType())) {
             ImageMessageDto imageMessage = customerMessagePushDto.getImageMessage();
             try {
-                WeMediaDto weMediaDto = weMaterialService.uploadTemporaryMaterial(imageMessage.getPic_url(), GroupMessageType.IMAGE.getMessageType());
+                WeMediaDto weMediaDto = weMaterialService.uploadTemporaryMaterial(imageMessage.getPic_url(),
+                        FileUtil.getName(imageMessage.getPic_url()),GroupMessageType.IMAGE.getMessageType());
                 imageMessage.setMedia_id(weMediaDto.getMedia_id());
             } catch (Exception e) {
             }
