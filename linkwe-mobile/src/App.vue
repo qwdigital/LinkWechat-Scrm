@@ -30,8 +30,16 @@ export default {
     this.agentId = query.agentId
     // this.$toast('agentId:' + this.agentId)
 
+    this.$router.onReady(() => {
+      const noAuth = this.$router.app.$route.meta ? this.$router.app.$route.meta.noAuth : false
+
+      if (!code && !noAuth) {
+        this.$toast('未获得授权')
+      }
+    })
+
     if (!code) {
-      this.$toast('未获得授权')
+      // this.$toast('未获得授权')
       return
     }
     let { data } = await getUserInfo(code, this.agentId)
@@ -80,10 +88,11 @@ export default {
           ], //必填
           success: (res) => {
             // 回调
-            // this.$toast('agentId成功:')
+            this.$toast('agentId成功:')
             this.$store.state.agentConfigStatus = true
           },
           fail: (res) => {
+            console.log('agent config 失败: ', res)
             this.$toast('agentId失败:' + JSON.stringify(res))
             if (res.errMsg.indexOf('function not exist') > -1) {
               alert('版本过低请升级')

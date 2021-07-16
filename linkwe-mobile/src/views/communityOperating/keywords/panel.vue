@@ -21,7 +21,7 @@
       </div>
 
       <div class="content">
-        <div>
+        <div v-if="task.groupCodeInfo && task.groupCodeInfo.codeUrl">
           <van-image width="50" :src="task.groupCodeInfo.codeUrl"></van-image>
         </div>
 
@@ -46,15 +46,13 @@ import ClipboardJS from 'clipboard'
 
 export default {
   name: 'KeywordPanel',
-
   props: {
     task: {
       type: Object,
       required: true
     },
   },
-
-  data () {
+  data() {
     return {
       showCopy: false,        // 展示复制按钮
       touchDelay: 750,        // 触发显示按钮的长按时常
@@ -62,17 +60,16 @@ export default {
       touch: false,
     }
   },
-
   methods: {
-    send () {
+    send() {
       wx.invoke("sendChatMessage", {
           msgtype: 'news',
           news: {
             link: this.groupCodeUrl,
             title: '客户群活码',
-            desc: '',
-            imgUrl: '',
-          }
+            desc: '客户群活码',
+            imgUrl: this.imgUrl,
+          },
         }, function(res) {
           if (res.err_msg == "sendChatMessage:ok") {
           } else {
@@ -80,38 +77,37 @@ export default {
         }
       )
     },
-
-    touchStart () {
+    touchStart() {
       clearTimeout(this.copyEvent)
 
       this.copyEvent = setTimeout(() => {
         this.touch = true
       }, this.touchDelay)
     },
-
-    touchEnd () {
+    touchEnd() {
       clearTimeout(this.copyEvent)
       if (this.touch) this.showCopy = true
       this.touch = false
     }
   },
-
   computed: {
-    keywords () {
+    keywords() {
       if (!this.task || !this.task.keywordList) return []
       const keywords = this.task.keywordList.map((k) => k.keyword)
       return keywords
     },
-
-    groupCodeUrl () {
+    groupCodeUrl() {
       if (window.location.hash[0] === '#') {
-        return window.location.origin + window.location.pathname + '#/groupCode?id=' + this.task.groupCodeInfo.uuid
+        return window.location.origin + window.location.pathname + '#/groupCode?id=' + this.task.groupCodeInfo.id
       }
 
-      return window.location.origin + window.location.pathname + 'groupCode?id=' + this.task.groupCodeInfo.uuid
+      return window.location.origin + window.location.pathname + 'groupCode?id=' + this.task.groupCodeInfo.id
+    },
+    imgUrl() {
+      if (this.task.groupCodeInfo && this.task.groupCodeInfo.codeUrl) return this.task.groupCodeInfo.codeUrl
+      return ''
     }
   },
-
   mounted() {
     this.clipboard = new ClipboardJS('.copy-btn_' + this.task.taskId)
 
