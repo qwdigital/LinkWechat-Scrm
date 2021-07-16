@@ -36,7 +36,6 @@ public class WeCustomerMessagePushController extends BaseController {
 
 
     @Autowired
-    @Lazy
     private IWeCustomerMessagePushService weCustomerMessagePushService;
 
     @Autowired
@@ -59,7 +58,7 @@ public class WeCustomerMessagePushController extends BaseController {
             SecurityContextHolder.setContext(context);
             weCustomerMessagePushService.addWeCustomerMessagePush(customerMessagePushDto);
 
-        } catch (JsonProcessingException | ParseException e) {
+        } catch (JsonProcessingException | ParseException | CloneNotSupportedException e) {
             e.printStackTrace();
             return AjaxResult.error("群发失败");
         }

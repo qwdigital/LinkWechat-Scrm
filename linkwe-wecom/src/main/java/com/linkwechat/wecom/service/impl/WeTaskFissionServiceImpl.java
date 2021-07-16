@@ -246,7 +246,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
             SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
             SecurityContextHolder.setContext(context);
             weCustomerMessagePushService.addWeCustomerMessagePush(customerMessagePushDto);
-        } catch (JsonProcessingException | ParseException e) {
+        } catch (JsonProcessingException | ParseException | CloneNotSupportedException e) {
             e.printStackTrace();
             log.error("发送任务失败》》》》》》》》》》》params:{},ex:{}", JSONObject.toJSONString(customerMessagePushDto), e);
         }

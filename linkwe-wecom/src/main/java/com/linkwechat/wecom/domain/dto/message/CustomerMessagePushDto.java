@@ -2,6 +2,7 @@ package com.linkwechat.wecom.domain.dto.message;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,7 +10,7 @@ import java.util.List;
  */
 @SuppressWarnings("all")
 @Data
-public class CustomerMessagePushDto {
+public class CustomerMessagePushDto implements Cloneable{
 
     /**
      * 群发类型 0 发给客户 1 发给客户群
@@ -105,6 +106,27 @@ public class CustomerMessagePushDto {
         }
 
         return null;
+    }
+
+
+    @Override
+    public CustomerMessagePushDto clone() throws CloneNotSupportedException {
+        return (CustomerMessagePushDto) super.clone();
+    }
+
+
+    public List<CustomerMessagePushDto> handleImageAndText() throws CloneNotSupportedException {
+        List<CustomerMessagePushDto> customerMessagePushDtos=new ArrayList<>();
+        CustomerMessagePushDto cloneOne = this.clone();
+        cloneOne.setMessageType("0");
+        customerMessagePushDtos.add(cloneOne);
+
+
+        CustomerMessagePushDto cloneTwo = this.clone();
+        cloneTwo.setMessageType("1");
+        customerMessagePushDtos.add(cloneTwo);
+
+         return customerMessagePushDtos;
     }
 
 

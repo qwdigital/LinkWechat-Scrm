@@ -18,9 +18,9 @@ public interface IWeCustomerMessagePushService {
     /**
      * 新增群发消息发送
      *
-     *@param customerMessagePushDto 原始数据信息
+     *@param customerMessagePush 原始数据信息
      */
-    public void  addWeCustomerMessagePush(CustomerMessagePushDto customerMessagePushDto) throws JsonProcessingException, ParseException;
+    public void  addWeCustomerMessagePush(CustomerMessagePushDto customerMessagePush) throws JsonProcessingException, ParseException, CloneNotSupportedException;
 
     /**
      * 群发消息列表

@@ -135,4 +135,16 @@ public interface IWeCustomerService extends IService<WeCustomer>
      */
     public List<WeCustomer> selectWeCustomerAllList(WeCustomer weCustomer);
 
+    /**
+     * 查询企业微信客户列表,不查询一对多关系相关数据
+     *
+     * @param weCustomer 企业微信客户
+     * @return 企业微信客户集合
+     */
+    List<WeCustomer> selectWeCustomerListNoRel(WeCustomer weCustomer);
+
+
+
+
+
 }

@@ -712,5 +712,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         return weCustomerMapper.selectWeCustomerList(weCustomer);
     }
 
+    @Override
+    public List<WeCustomer> selectWeCustomerListNoRel(WeCustomer weCustomer) {
+        return weCustomerMapper.selectWeCustomerListNoRel(weCustomer);
+    }
+
 
 }
