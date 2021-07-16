@@ -119,9 +119,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Override
     public List<WeCustomer> selectWeCustomerList(WeCustomer weCustomer) {
         //当前登录用户为企业用户
-        if(Constants.USER_TYPE_WECOME
-                .equals(SecurityUtils.getLoginUser().getUser().getUserType())){
-            weCustomer.setUserIds((SecurityUtils.getLoginUser().getUser().getWeUserId()));
+        try {
+            if(Constants.USER_TYPE_WECOME
+                    .equals(SecurityUtils.getLoginUser().getUser().getUserType())){
+                weCustomer.setUserIds((SecurityUtils.getLoginUser().getUser().getWeUserId()));
+            }
+        } catch (Exception e) {
         }
 
         return weCustomerMapper.selectWeCustomerList(weCustomer);
