@@ -48,9 +48,10 @@ export default {
           this.form.taskName = data.taskName
           this.form.welcomeMsg = data.welcomeMsg
 
-          const keywordList = data.keywordList || []
-          const keywords = keywordList.map((k) => k.keyword)
-          this.form.keywords = keywords.join(',')
+          // const keywordList = data.keywordList || []
+          // const keywords = keywordList.map((k) => k.keyword)
+          // this.form.keywords = keywords.join(',')
+          this.form.keywords = data.keywords
 
           if (data.groupCodeInfo && data.groupCodeInfo.id) {
             this.form.groupCodeId = data.groupCodeInfo.id

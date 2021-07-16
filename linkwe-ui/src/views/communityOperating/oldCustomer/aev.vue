@@ -262,7 +262,6 @@ export default {
       <el-form-item
         label="客户标签"
         prop="tagList"
-        :rules="form.sendScope === 1 ? rules.tagListValidate : []"
       >
         <el-tag size="medium" v-for="(tag, index) in tags" :key="index">{{
           tag.name
@@ -281,7 +280,6 @@ export default {
       <el-form-item
         label="添加人"
         prop="scopeList"
-        :rules="form.sendScope === 1 ? rules.scopeListValidate : []"
       >
         <el-tag size="medium" v-for="(user, index) in users" :key="index">{{
           user.name

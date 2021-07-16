@@ -14,7 +14,7 @@ export default {
         pageSize: 10,
         taskName: '', // 活码名称
         createBy: '', // 创建人
-        keyword: '', // 关键词
+        keywords: '', // 关键词
         beginTime: '', // 创建开始时间
         endTime: '' // 创建结束时间
       },
@@ -148,6 +148,7 @@ export default {
     },
     // 获取显示用实际群码字符串
     getDisplayRealGroups(row) {
+      if (!row || !row.groupNameList) return ''
       return row.groupNameList.join(' ')
     },
     // 处理多选
@@ -199,8 +200,8 @@ export default {
       <el-form-item label="创建人" prop="createBy">
         <el-input v-model="query.createBy" placeholder="请输入"></el-input>
       </el-form-item>
-      <el-form-item label="关键词" prop="keyword">
-        <el-input v-model="query.keyword" placeholder="请输入"></el-input>
+      <el-form-item label="关键词" prop="keywords">
+        <el-input v-model="query.keywords" placeholder="请输入"></el-input>
       </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
@@ -279,10 +280,11 @@ export default {
             placement="bottom"
             width="200"
             trigger="hover"
-            :content="getDisplayKeywords(row)"
+            :content="row.keywords"
           >
             <div slot="reference" class="table-desc overflow-ellipsis">
-              {{ getDisplayKeywords(row) }}
+              <!-- {{ getDisplayKeywords(row) }} -->
+              {{ row.keywords }}
             </div>
           </el-popover>
         </template>
@@ -293,10 +295,11 @@ export default {
             placement="bottom"
             width="200"
             trigger="hover"
-            :content="getDisplayRealGroups(row)"
+            :content="row.groupNameList"
           >
             <div slot="reference" class="table-desc overflow-ellipsis">
-              {{ getDisplayRealGroups(row) }}
+              <!-- {{ getDisplayRealGroups(row) }} -->
+              {{ row.groupNameList }}
             </div>
           </el-popover>
         </template>

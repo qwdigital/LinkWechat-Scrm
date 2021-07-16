@@ -35,7 +35,8 @@ export default {
       customerGroups: [],
       pickerOptions: {
         disabledDate(time) {
-          return time.getTime() < Date.now()
+          // return time.getTime() < Date.now()
+          return time.getTime() < new Date(new Date(new Date().toLocaleDateString()).getTime())
         }
       },
       uploadImageUrl: '',
@@ -239,8 +240,8 @@ export default {
       >
         <el-date-picker
           v-model="dateRange"
-          value-format="yyyy-MM-dd"
-          type="daterange"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          type="datetimerange"
           :picker-options="pickerOptions"
           range-separator="至"
           start-placeholder="开始日期"

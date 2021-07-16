@@ -1,8 +1,5 @@
 <script>
 import { add, update, getDetail } from '@/api/drainageCode/group'
-import { uploadDataURL } from '@/api/common'
-import { v4 as uuidv4 } from 'uuid'
-import { AwesomeQR } from 'awesome-qr'
 
 export default {
   props: {
@@ -17,20 +14,14 @@ export default {
       form: {
         activityName: '',
         activityDesc: '',
-        activityHeadUrl: '',
+        avatarUrl: '',
         guide: '',
-        joinGroupIsTip: 0,
+        showTip: 0,
         tipMsg: '',
         customerServerQrCode: '',
-        // 生成的群活码UUID
-        uuid: '',
-        // 群活码链接
-        codeUrl: ''
       },
       // 活码头像数据
       headImage: null,
-      // 群活码H5页面地址
-      h5uri: '',
       rules: {
         activityName: [
           { required: true, message: '请输入活码名称', trigger: 'blur' }
@@ -39,11 +30,6 @@ export default {
           { required: true, message: '请输入活码描述', trigger: 'blur' }
         ]
       }
-    }
-  },
-  computed: {
-    qrCodeText() {
-      return window.CONFIG.groupCodeH5Link + '?id=' + this.form.uuid
     }
   },
   created() {
@@ -55,44 +41,10 @@ export default {
       this.$refs.form.validate((valid) => {
         if (!valid) return
 
-        // 用来区分群活码，生成的二维码需要带有唯一区分信息，所以由前端生成
-        if (!this.form.uuid) {
-          this.form.uuid = uuidv4().replace(/-/g, '')
-        }
-
-        let options = {
-          text: this.qrCodeText,
-          size: 200,
-          margin: 0
-        }
-
-        // 添加logo信息
-        if (this.form.activityHeadUrl) {
-          options = Object.assign(options, {
-            logoImage: this.headImage,
-            logoMargin: 2,
-            logoCornerRadius: 3
-          })
-        }
-
-        const qr = new AwesomeQR(options)
-
-        qr.draw()
-          .then((dataURL) => {
-            // 上传群活码图片到云存储
-            uploadDataURL(dataURL)
-              .then((res) => {
-                if (res.code === 200) {
-                  this.form.codeUrl = res.url
-
-                  // 新增群活码数据至数据库
-                  add(this.form)
-                    .then((res) => {
-                      this.$emit('next', res.id)
-                    })
-                } else {
-                }
-              })
+        // 新增群活码数据至数据库
+        add(this.form)
+          .then((res) => {
+            this.$emit('next', res.id)
           })
       })
     },
@@ -126,9 +78,9 @@ export default {
             this.form = {
               activityName: res.data.activityName,
               activityDesc: res.data.activityDesc,
-              activityHeadUrl: res.data.activityHeadUrl,
+              avatarUrl: res.data.avatarUrl,
               guide: res.data.guide,
-              joinGroupIsTip: parseInt(res.data.joinGroupIsTip),
+              showTip: parseInt(res.data.showTip),
               tipMsg: res.data.tipMsg,
               customerServerQrCode: res.data.customerServerQrCode,
               uuid: res.data.uuid,
@@ -177,7 +129,7 @@ export default {
             <el-col :sm="24" :md="12">
               <el-form-item label="活码头像">
                 <upload
-                  :fileUrl.sync="form.activityHeadUrl"
+                  :fileUrl.sync="form.avatarUrl"
                   class="image-uploader"
                   @update:file="handleUploadedHeadImage"
                 >
@@ -202,7 +154,7 @@ export default {
             <el-col :span="24">
               <el-form-item label="无法加群提示">
                 <el-switch
-                  v-model="form.joinGroupIsTip"
+                  v-model="form.showTip"
                   :active-value="1"
                   :inactive-value="0"
                 ></el-switch>
@@ -211,7 +163,7 @@ export default {
             </el-col>
             <transition name="el-fade-in-linear">
               <el-col
-                v-show="form.joinGroupIsTip === 1"
+                v-show="form.showTip === 1"
                 :sm="24"
                 :md="12"
               >
@@ -222,7 +174,7 @@ export default {
             </transition>
             <transition name="el-fade-in-linear">
               <el-col
-                v-show="form.joinGroupIsTip === 1"
+                v-show="form.showTip === 1"
                 :sm="24"
                 :md="12"
               >
@@ -281,7 +233,7 @@ export default {
               </div>
             </div>
             <transition name="el-fade-in-linear">
-              <div v-show="form.joinGroupIsTip" class="preview-customer-service">
+              <div v-show="form.showTip" class="preview-customer-service">
                 <el-button type="danger"> 无法加群? </el-button>
               </div>
             </transition>
