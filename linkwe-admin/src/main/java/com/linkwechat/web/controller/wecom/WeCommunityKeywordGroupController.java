@@ -1,57 +1,42 @@
 package com.linkwechat.web.controller.wecom;
 
-import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.SecurityUtils;
-import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.wecom.domain.WeKeywordGroupTask;
-import com.linkwechat.wecom.domain.dto.WeKeywordGroupTaskDto;
-import com.linkwechat.wecom.domain.vo.WeKeywordGroupTaskVo;
 import com.linkwechat.wecom.service.IWeCommunityKeywordToGroupService;
-import com.linkwechat.wecom.service.IWeGroupCodeService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 /**
  * 关键词拉群controller
  */
+@Api(tags = "关键词拉群")
 @RestController
 @RequestMapping(value = "/wecom/communityKeywordGroup")
 public class WeCommunityKeywordGroupController extends BaseController {
 
     @Autowired
-    private IWeCommunityKeywordToGroupService keywordToGroupService;
+    private IWeCommunityKeywordToGroupService service;
 
-    @Autowired
-    private IWeGroupCodeService groupCodeService;
 
     /**
      * 根据过滤条件获取关键词拉群任务列表
-     *
-     * @param taskName  任务名称
-     * @param createBy  创建人
-     * @param keyword   关键词
-     * @param beginTime 开始时间
-     * @param endTime   结束时间
-     * @return 列表数据
      */
+    @ApiOperation(value = "获取关键词拉群任务列表")
 //    @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:list')")
     @GetMapping(path = "/list")
-    public TableDataInfo<List<WeKeywordGroupTaskVo>> list(
-            @RequestParam(value = "taskName", required = false) String taskName,
-            @RequestParam(value = "createBy", required = false) String createBy,
-            @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "beginTime", required = false) String beginTime,
-            @RequestParam(value = "endTime", required = false) String endTime
-    ) {
+    public TableDataInfo<List<WeKeywordGroupTask>> list(WeKeywordGroupTask task) {
         startPage();
-        List<WeKeywordGroupTaskVo> taskList = keywordToGroupService
-                .getTaskList(taskName, createBy, keyword, beginTime, endTime);
+        List<WeKeywordGroupTask> taskList = service.getTaskList(task);
         return getDataTable(taskList);
     }
 
@@ -61,35 +46,43 @@ public class WeCommunityKeywordGroupController extends BaseController {
      * @param taskId 任务id
      * @return 任务详情
      */
+    @ApiOperation(value = "获取任务详情")
     //  @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:query')")
     @GetMapping(path = "/{taskId}")
-    public AjaxResult getTask(@PathVariable("taskId") Long taskId) {
-        return AjaxResult.success(keywordToGroupService.getTaskById(taskId));
+    public AjaxResult getTask(@ApiParam("任务id") @PathVariable("taskId") Long taskId) {
+        return AjaxResult.success(service.getTaskById(taskId));
     }
 
     /**
      * 添加新任务
      *
-     * @param keywordToGroupDto 添加任务所需的数据
+     * @param task 添加任务所需的数据
      * @return 结果
      */
+    @ApiOperation(value = "添加新任务")
     //   @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:add')")
     @PostMapping(path = "/")
-    public AjaxResult addTask(@RequestBody @Validated WeKeywordGroupTaskDto keywordToGroupDto) {
-        return toAjax(keywordToGroupService.addTask(keywordToGroupDto));
+    public AjaxResult addTask(@RequestBody @Validated WeKeywordGroupTask task) {
+        if (service.isNameOccupied(task)) {
+            return AjaxResult.error("关键词拉群任务名称"+ task.getTaskName() +"已存在");
+        }
+        task.setCreateBy(SecurityUtils.getUsername());
+        task.setCreateTime(new Date());
+        return toAjax(service.addTask(task));
     }
 
     /**
      * 根据id及更新数据对指定任务进行更新
-     *
-     * @param taskId            任务id
-     * @param keywordToGroupDto 更新所需数据
-     * @return 结果
      */
+    @ApiOperation(value = "更新任务")
     //   @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:edit')")
-    @PutMapping(path = "/{taskId}")
-    public AjaxResult updateTask(@PathVariable("taskId") Long taskId, @RequestBody @Validated WeKeywordGroupTaskDto keywordToGroupDto) {
-        return toAjax(keywordToGroupService.updateTask(taskId, keywordToGroupDto));
+    @PutMapping("/{taskId}")
+    public AjaxResult updateTask(
+            @ApiParam("任务id") @PathVariable("taskId") Long taskId, @RequestBody @Validated WeKeywordGroupTask task) {
+        task.setTaskId(taskId);
+        task.setUpdateBy(SecurityUtils.getUsername());
+        task.setUpdateTime(new Date());
+        return toAjax(service.updateTask(task));
     }
 
     /**
@@ -98,10 +91,11 @@ public class WeCommunityKeywordGroupController extends BaseController {
      * @param ids id列表
      * @return 结果
      */
+    @ApiOperation(value = "批量删除任务")
     //   @PreAuthorize("@ss.hasPermi('wecom:communityKeyword:remove')")
     @DeleteMapping(path = "/{ids}")
-    public AjaxResult batchDeleteTask(@PathVariable("ids") Long[] ids) {
-        return toAjax(keywordToGroupService.batchRemoveTaskByIds(ids));
+    public AjaxResult batchDeleteTask(@ApiParam("待删除任务id数组") @PathVariable("ids") Long[] ids) {
+        return toAjax(service.batchRemoveTaskByIds(ids));
     }
 
 }

@@ -2,6 +2,7 @@ package com.linkwechat.wecom.domain.dto;
 
 import lombok.Data;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,7 +41,6 @@ public class WeCommunityNewGroupDto {
     /**
      * 标签id列表
      */
-    @NotNull(message = "标签不能为空")
     private List<String> tagList;
 
     /**

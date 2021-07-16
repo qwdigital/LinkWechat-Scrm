@@ -2,6 +2,7 @@ package com.linkwechat.wecom.domain;
 
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -66,4 +67,9 @@ public class WePresTagGroupTask extends BaseEntity {
      */
     private String msgid;
 
+    /**
+     * 逻辑删除字段
+     */
+    @TableLogic(value = "0", delval = "1")
+    private Integer delFlag;
 }

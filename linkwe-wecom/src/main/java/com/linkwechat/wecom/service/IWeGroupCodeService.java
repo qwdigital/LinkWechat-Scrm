@@ -14,13 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
  * @date 2020-10-07
  */
 public interface IWeGroupCodeService extends IService<WeGroupCode> {
-    /**
-     * 查询客户群活码
-     *
-     * @param id 客户群活码ID
-     * @return 客户群活码
-     */
-    WeGroupCode selectWeGroupCodeById(Long id);
 
     /**
      * 根据群活码id查询实际码列表
@@ -28,7 +21,7 @@ public interface IWeGroupCodeService extends IService<WeGroupCode> {
      * @param groupCodeId 群活码id
      * @return 结果
      */
-    List<WeGroupCodeActual> selectActualListByGroupCodeId(Long groupCodeId);
+    List<WeGroupCodeActual> selectActualList(Long groupCodeId);
 
     /**
      * 查询客户群活码列表
@@ -39,18 +32,9 @@ public interface IWeGroupCodeService extends IService<WeGroupCode> {
     List<WeGroupCode> selectWeGroupCodeList(WeGroupCode weGroupCode);
 
     /**
-     * 根据群活码id查询群活码列表
-     *
-     * @param ids id列表
-     * @return 结果
-     */
-    List<WeGroupCode> selectWeGroupCodeListByIds(List<String> ids);
-
-    /**
      * 新增客户群活码
      *
      * @param weGroupCode 客户群活码
-     * @return 结果
      */
     void insertWeGroupCode(WeGroupCode weGroupCode);
 
@@ -79,23 +63,16 @@ public interface IWeGroupCodeService extends IService<WeGroupCode> {
     int deleteWeGroupCodeById(Long id);
 
     /**
-     * 检测活码名称是否唯一
+     * 检测活码名称是否被占用
      *
      * @param weGroupCode 活码对象
      * @return 结果
      */
-    boolean checkActivityNameUnique(WeGroupCode weGroupCode);
-
-    /**
-     * 根据 uuid获取群活码
-     *
-     * @param uuid uuid
-     * @return 结果
-     */
-    WeGroupCode getWeGroupByUuid(String uuid);
+    boolean isNameOccupied(WeGroupCode weGroupCode);
 
     /**
      * 通过员工活码获取群活码，用于新客自动拉群。
+     *
      * @param state 员工活码state
      * @return 群活码URL
      */

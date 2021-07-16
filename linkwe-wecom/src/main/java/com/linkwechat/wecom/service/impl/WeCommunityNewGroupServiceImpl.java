@@ -69,8 +69,8 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
     public int add(WeCommunityNewGroupDto communityNewGroupDto) {
 
         //检查群活码是否存在
-        WeGroupCode weGroupCode = weGroupCodeMapper.selectWeGroupCodeById(communityNewGroupDto.getGroupCodeId());
-        if (null == weGroupCode) {
+        WeGroupCode weGroupCode = weGroupCodeMapper.selectById(communityNewGroupDto.getGroupCodeId());
+        if (!Optional.ofNullable(weGroupCode).isPresent()) {
             throw new WeComException("群活码不存在！");
         }
 
@@ -85,8 +85,11 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
         // 保存员工活码信息
         if (weEmpleCodeMapper.insertWeEmpleCode(weEmpleCode) > 0) {
-            // 批量保存员工活码标签
-            empleCodeTagMapper.batchInsetWeEmpleCodeTag(weEmpleCode.getWeEmpleCodeTags());
+
+            if (StringUtils.isNotEmpty(weEmpleCode.getWeEmpleCodeTags())) {
+                // 批量保存员工活码标签
+                empleCodeTagMapper.batchInsetWeEmpleCodeTag(weEmpleCode.getWeEmpleCodeTags());
+            }
             // 批量保存活码使用员工
             empleCodeUseScopMapper.batchInsetWeEmpleCodeUseScop(weEmpleCode.getWeEmpleCodeUseScops());
 
@@ -108,15 +111,12 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
     /**
      * 查询新客自动拉群列表
      *
-     * @param emplCodeName 员工活码名称
-     * @param createBy     创建者
-     * @param beginTime    开始时间
-     * @param endTime      结束时间
+     * @param weCommunityNewGroup 新科拉群过滤条件
      * @return {@link WeCommunityNewGroupVo}s
      */
     @Override
-    public List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(String emplCodeName, String createBy, String beginTime, String endTime) {
-        List<WeCommunityNewGroupVo> communityNewGroupVos = weCommunityNewGroupMapper.selectWeCommunityNewGroupList(emplCodeName, createBy, beginTime, endTime);
+    public List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(WeCommunityNewGroup weCommunityNewGroup) {
+        List<WeCommunityNewGroupVo> communityNewGroupVos = weCommunityNewGroupMapper.selectWeCommunityNewGroupList(weCommunityNewGroup);
         if (StringUtils.isNotEmpty(communityNewGroupVos)) {
             communityNewGroupVos.forEach(this::getCompleteEmplCodeInfo);
         }
@@ -152,7 +152,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
             throw new WeComException("新客拉群信息不存在！");
         }
         // 检查群活码是否存在
-        WeGroupCode weGroupCode = weGroupCodeMapper.selectWeGroupCodeById(communityNewGroupDto.getGroupCodeId());
+        WeGroupCode weGroupCode = weGroupCodeMapper.selectById(communityNewGroupDto.getGroupCodeId());
         if (null == weGroupCode) {
             throw new WeComException("群活码不存在！");
         }
@@ -219,7 +219,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         weEmpleCode.setSkipVerify(communityNewGroupDto.getSkipVerify());
         // 欢迎语
         weEmpleCode.setWelcomeMsg(communityNewGroupDto.getWelcomeMsg());
-        // state，用于区分客户具体是通过哪个「联系我」添加，最大30个字符。使用id作为值即可，使用uuid则会超长。
+        // state，用于区分客户具体是通过哪个「联系我」添加，最大30个字符。使用id作为值即可。
         weEmpleCode.setState(weEmpleCode.getId().toString());
 
         // 活动场景，使用键入的活码名称
@@ -233,7 +233,8 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
     /**
      * 设置员工活码的标签列表和员工列表
-     * @param weEmpleCode 员工活码
+     *
+     * @param weEmpleCode          员工活码
      * @param communityNewGroupDto 新客拉群信息
      */
     private void setScopsAndTags(WeEmpleCode weEmpleCode, WeCommunityNewGroupDto communityNewGroupDto) {
@@ -253,17 +254,19 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
         // 获取活码标签
         List<String> tagIdList = communityNewGroupDto.getTagList();
-        LambdaQueryWrapper<WeTag> tagQueryWrapper = new LambdaQueryWrapper<>();
-        tagQueryWrapper.in(WeTag::getTagId, tagIdList);
-        List<WeTag> weTagList = weTagMapper.selectList(tagQueryWrapper);
-        List<WeEmpleCodeTag> weEmpleCodeTagList = weTagList.stream().map(e -> {
-            WeEmpleCodeTag tag = new WeEmpleCodeTag();
-            tag.setEmpleCodeId(weEmpleCode.getId());
-            tag.setTagId(e.getTagId());
-            tag.setTagName(e.getName());
-            return tag;
-        }).collect(Collectors.toList());
-        weEmpleCode.setWeEmpleCodeTags(weEmpleCodeTagList);
+        if (StringUtils.isNotEmpty(tagIdList)) {
+            LambdaQueryWrapper<WeTag> tagQueryWrapper = new LambdaQueryWrapper<>();
+            tagQueryWrapper.in(WeTag::getTagId, tagIdList);
+            List<WeTag> weTagList = weTagMapper.selectList(tagQueryWrapper);
+            List<WeEmpleCodeTag> weEmpleCodeTagList = weTagList.stream().map(e -> {
+                WeEmpleCodeTag tag = new WeEmpleCodeTag();
+                tag.setEmpleCodeId(weEmpleCode.getId());
+                tag.setTagId(e.getTagId());
+                tag.setTagName(e.getName());
+                return tag;
+            }).collect(Collectors.toList());
+            weEmpleCode.setWeEmpleCodeTags(weEmpleCodeTagList);
+        }
     }
 
     /**
@@ -282,13 +285,12 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         });
 
         // 设置群活码信息
-        WeGroupCode weGroupCode = weGroupCodeMapper.selectWeGroupCodeById(vo.getGroupCodeId());
+        WeGroupCode weGroupCode = weGroupCodeMapper.selectById(vo.getGroupCodeId());
         Optional.ofNullable(weGroupCode).ifPresent(e -> {
             WeGroupCodeVo groupCodeVo = WeGroupCodeVo
                     .builder()
                     .id(e.getId())
                     .codeUrl(e.getCodeUrl())
-                    .uuid(e.getUuid())
                     .build();
             BeanUtils.copyProperties(e, groupCodeVo);
             vo.setGroupCodeInfo(groupCodeVo);

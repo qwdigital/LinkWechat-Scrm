@@ -498,7 +498,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
         String groupQrcodeId = weTaskFission.getFissionTargetId();
         if (weTaskFission.getFissionType() != null && weTaskFission.getFissionType().equals(TaskFissionType.GROUP_FISSION.getCode())
                 && StringUtils.isNotBlank(groupQrcodeId) && StringUtils.isBlank(weTaskFission.getFissQrcode())) {
-            WeGroupCode groupCode = weGroupCodeService.selectWeGroupCodeById(Long.parseLong(groupQrcodeId));
+            WeGroupCode groupCode = weGroupCodeService.getById(Long.parseLong(groupQrcodeId));
             if (groupCode != null) {
                 String qrcodeUrl = groupCode.getCodeUrl();
                 weTaskFission.setFissQrcode(qrcodeUrl);

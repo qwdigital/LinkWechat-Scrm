@@ -3,6 +3,7 @@ package com.linkwechat.wecom.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeCommunityNewGroup;
 import com.linkwechat.wecom.domain.vo.WeCommunityNewGroupVo;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +16,7 @@ import java.util.Optional;
  * @author kewen
  * @date 2021-02-19
  */
-@Repository
+@Mapper
 public interface WeCommunityNewGroupMapper extends BaseMapper<WeCommunityNewGroup> {
 
     /**
@@ -27,9 +28,9 @@ public interface WeCommunityNewGroupMapper extends BaseMapper<WeCommunityNewGrou
      * @param endTime      结束时间
      * @return {WeCommunityNewGroupVo}s 列表
      */
-    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(@Param("emplCodeName") String emplCodeName, @Param("createBy") String createBy
-            , @Param("beginTime") String beginTime, @Param("endTime") String endTime);
-
+//    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(@Param("emplCodeName") String emplCodeName, @Param("createBy") String createBy
+//            , @Param("beginTime") String beginTime, @Param("endTime") String endTime);
+    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(WeCommunityNewGroup weCommunityNewGroup);
     /**
      * 获取新客自动拉群详细信息
      *
@@ -60,12 +61,4 @@ public interface WeCommunityNewGroupMapper extends BaseMapper<WeCommunityNewGrou
      * @return 结果
      */
     int removeWeCommunityNewGroupByEmplCodeId(@Param("emplCodeId") Long emplCodeId);
-
-    /**
-     * 通过群活码id逻辑删除对应新客拉群信息
-     * @param groupCodeId 群活码id
-     * @return 结果
-     */
-    int removeWeCommunityNewGroupByGroupCodeId(@Param("groupCodeId") Long groupCodeId);
-
 }

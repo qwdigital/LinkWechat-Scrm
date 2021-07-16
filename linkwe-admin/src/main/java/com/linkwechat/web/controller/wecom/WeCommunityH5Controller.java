@@ -6,7 +6,7 @@ import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.CommunityTaskType;
 import com.linkwechat.system.service.ISysUserService;
-import com.linkwechat.wecom.domain.vo.WeKeywordGroupTaskVo;
+import com.linkwechat.wecom.domain.WeKeywordGroupTask;
 import com.linkwechat.wecom.service.IWeCommunityKeywordToGroupService;
 import com.linkwechat.wecom.service.IWeGroupSopService;
 import com.linkwechat.wecom.service.IWePresTagGroupTaskService;
@@ -106,7 +106,6 @@ public class WeCommunityH5Controller extends BaseController {
 
     }
 
-
     /**
      * 用于支持H5页面的名称和关键字检索
      *
@@ -116,7 +115,7 @@ public class WeCommunityH5Controller extends BaseController {
     @GetMapping(path = "/filter")
     public TableDataInfo filter(@RequestParam("word") String word) {
         startPage();
-        List<WeKeywordGroupTaskVo> taskList = keywordToGroupService.filterByNameOrKeyword(word);
+        List<WeKeywordGroupTask> taskList = keywordToGroupService.filterByNameOrKeyword(word);
         return getDataTable(taskList);
     }
 }

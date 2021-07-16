@@ -37,11 +37,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
 
-    <select id="selectActualListByGroupCodeId" parameterType="WeGroupCodeActual" resultMap="WeGroupCodeActualResult">
+    <select id="selectActualList" parameterType="WeGroupCodeActual" resultMap="WeGroupCodeActualResult">
         <include refid="selectWeGroupCodeActualVo"/>
         <where>
             group_code_id = #{groupCodeId}
         </where>
+        order by create_time
     </select>
 
     <select id="selectWeGroupCodeActualByChatId" parameterType="String" resultMap="WeGroupCodeActualResult">

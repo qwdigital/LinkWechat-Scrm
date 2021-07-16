@@ -5,47 +5,46 @@
 <mapper namespace="com.linkwechat.wecom.mapper.WePresTagGroupTaskMapper">
 
     <resultMap id="WePresTagGroupTaskResult" type="WePresTagGroupTaskVo">
-        <result property="taskId" column="task_id" />
-        <result property="taskName" column="task_name" />
-        <result property="welcomeMsg" column="welcome_msg" />
-        <result property="sendType" column="send_type" />
-        <result property="codeUrl" column="code_url" />
-        <result property="codeUuid" column="code_uuid" />
-        <result property="codeId" column="group_code_id" />
-        <result property="totalMember" column="total_member" />
-        <result property="sendScope" column="send_scope" />
-        <result property="sendGender" column="send_gender" />
-        <result property="cusBeginTime" column="cus_begin_time" />
-        <result property="cusEndTime" column="cus_end_time" />
-        <result property="msgid" column="msgid" />
-        <result property="createBy" column="create_by" />
-        <result property="createTime" column="create_time" />
-        <result property="updateBy" column="update_by" />
-        <result property="updateTime" column="update_time" />
+        <result property="taskId" column="task_id"/>
+        <result property="taskName" column="task_name"/>
+        <result property="welcomeMsg" column="welcome_msg"/>
+        <result property="sendType" column="send_type"/>
+        <result property="codeUrl" column="code_url"/>
+        <result property="codeId" column="group_code_id"/>
+        <result property="totalMember" column="total_member"/>
+        <result property="sendScope" column="send_scope"/>
+        <result property="sendGender" column="send_gender"/>
+        <result property="cusBeginTime" column="cus_begin_time"/>
+        <result property="cusEndTime" column="cus_end_time"/>
+        <result property="msgid" column="msgid"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
     </resultMap>
 
     <sql id="selectTaskVo">
-        SELECT
-            wptg.task_id,
-            wptg.task_name,
-            wptg.welcome_msg,
-            wptg.send_type,
-            wptg.send_scope,
-            wptg.send_gender,
-            wptg.cus_begin_time,
-            wptg.cus_end_time,
-            wptg.msgid,
-            wptg.create_by,
-            wptg.create_time,
-            wptg.update_by,
-            wptg.update_time,
-            wgc.code_url,
-            wgc.uuid as code_uuid,
-            wgc.id as group_code_id,
-            IFNULL((SELECT SUM( wgca.scan_code_times ) AS scan_times FROM we_group_code_actual wgca GROUP BY group_code_id HAVING group_code_id = wgc.id), 0) as total_member
-        FROM
-            we_pres_tag_group wptg
-            LEFT JOIN we_group_code wgc ON wgc.id = wptg.group_code_id
+        SELECT wptg.task_id,
+               wptg.task_name,
+               wptg.welcome_msg,
+               wptg.send_type,
+               wptg.send_scope,
+               wptg.send_gender,
+               wptg.cus_begin_time,
+               wptg.cus_end_time,
+               wptg.msgid,
+               wptg.create_by,
+               wptg.create_time,
+               wptg.update_by,
+               wptg.update_time,
+               wgc.code_url,
+               wgc.id                                     as group_code_id,
+               IFNULL((SELECT SUM(wgca.scan_code_times) AS scan_times
+                       FROM we_group_code_actual wgca
+                       GROUP BY group_code_id
+                       HAVING group_code_id = wgc.id), 0) as total_member
+        FROM we_pres_tag_group wptg
+                 LEFT JOIN we_group_code wgc ON wgc.id = wptg.group_code_id
     </sql>
 
     <select id="selectTaskById" parameterType="Long" resultMap="WePresTagGroupTaskResult">
@@ -56,7 +55,7 @@
     <select id="selectTaskList" resultMap="WePresTagGroupTaskResult">
         <include refid="selectTaskVo"/>
         <where>
-            1 = 1
+            wptg.`del_flag` = 0
             <if test="taskName != null and taskName!=''">
                 AND wptg.task_name LIKE CONCAT("%",#{taskName},"%")
             </if>
@@ -74,19 +73,90 @@
                 AND wptg.create_by LIKE CONCAT("%",#{createBy},"%")
             </if>
         </where>
-    </select>
-
-    <select id="checkTaskNameUnique" parameterType="String" resultType="int">
-        select count(1) from we_pres_tag_group where task_name = #{taskName}
+        order by wptg.`create_time` desc
     </select>
 
     <select id="getTaskListByEmplId" resultMap="WePresTagGroupTaskResult">
-        <include refid="selectTaskVo" />
+        <include refid="selectTaskVo"/>
         LEFT JOIN we_pres_tag_group_scope wptgs ON wptgs.task_id = wptg.task_id
         WHERE wptgs.we_user_id = #{emplId}
         AND wptgs.is_done = #{isDone}
-        AND wptg.send_type = 1;
+        AND wptg.send_type = 1 AND wptg.`del_flag` = 0;
     </select>
+
+    <select id="selectStaffList" parameterType="WePresTagGroupTask" resultType="String">
+        SELECT DISTINCT
+        u.`user_id`
+        FROM
+        we_user u
+        LEFT JOIN we_flower_customer_rel wfcr ON u.`user_id` = wfcr.`user_id`
+        LEFT JOIN we_customer wc ON wc.external_userid = wfcr.external_userid
+        LEFT JOIN we_flower_customer_tag_rel wfctr ON wfcr.`id` = wfctr.`flower_customer_rel_id`
+        LEFT JOIN we_pres_tag_group_tag gtr ON wfctr.`tag_id` = gtr.`tag_id`
+        LEFT JOIN we_pres_tag_group task ON task.`task_id` = gtr.`task_id`
+        WHERE
+        task.`task_id` = #{taskId}
+        <!-- 性别过滤 -->
+        <if test="sendGender != null and sendGender != ''">
+            AND wc.`gender` = #{sendGender}
+        </if>
+        <!-- 添加客户时间过滤 -->
+        <if test="cusBeginTime != null and cusBeginTime != ''">
+            and date_format(wfcr.`create_time`,'%y%m%d') &gt;= date_format(#{cusBeginTime},'%y%m%d')
+        </if>
+        <if test="cusEndTime != null and cusEndTime != ''"><!-- 结束时间检索 -->
+            and date_format(wfcr.`create_time`,'%y%m%d') &lt;= date_format(#{cusEndTime},'%y%m%d')
+        </if>
+
+    </select>
+
+    <select id="selectExternalUserIds" resultType="String">
+        SELECT
+            customer.`external_userid`
+        FROM
+            we_customer customer
+        WHERE 1 = 1
+        <if test="hasTag">
+            AND customer.external_userid in (
+            SELECT
+            t3.external_userid
+            FROM
+            we_pres_tag_group task
+            LEFT JOIN we_pres_tag_group_tag t1 ON t1.task_id = task.task_id
+            LEFT JOIN we_flower_customer_tag_rel t2 ON t2.tag_id = t1.tag_id
+            LEFT JOIN we_flower_customer_rel t3 ON t2.flower_customer_rel_id = t3.id
+            WHERE
+            task.task_id = #{taskId}
+            )
+        </if>
+
+        <if test="hasScope">
+            AND customer.external_userid in (
+            SELECT
+            t3.external_userid
+            FROM
+            we_pres_tag_group task
+            LEFT JOIN we_pres_tag_group_scope scope ON scope.task_id = task.task_id
+            LEFT JOIN we_flower_customer_rel t3 ON t3.user_id = scope.we_user_id
+            LEFT JOIN we_customer customer ON customer.external_userid = t3.external_userid
+            WHERE
+            task.task_id = #{taskId}
+            )
+        </if>
+
+        <!-- 性别过滤 -->
+        <if test="gender != null and gender != ''">
+            AND customer.`gender` = #{gender}
+        </if>
+        <!-- 添加客户时间过滤 -->
+        <if test="beginTime != null and beginTime != ''">
+            and date_format(customer.`create_time`,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+        </if>
+        <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+            and date_format(customer.`create_time`,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+        </if>
+    </select>
+
 
     <insert id="insertTask" parameterType="WePresTagGroupTask">
         INSERT INTO we_pres_tag_group

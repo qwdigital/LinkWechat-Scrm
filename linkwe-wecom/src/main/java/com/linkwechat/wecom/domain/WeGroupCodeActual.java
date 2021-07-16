@@ -5,10 +5,12 @@ import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
 
@@ -19,10 +21,11 @@ import javax.validation.constraints.NotNull;
  * @author ruoyi
  * @date 2020-10-07
  */
+@EqualsAndHashCode(callSuper = true)
 @ApiModel
 @Data
 @TableName("we_group_code_actual")
-public class WeGroupCodeActual
+public class WeGroupCodeActual extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 

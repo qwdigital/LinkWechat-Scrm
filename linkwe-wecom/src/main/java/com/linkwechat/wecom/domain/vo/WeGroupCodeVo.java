@@ -19,7 +19,5 @@ public class WeGroupCodeVo {
 
     private Long id;
 
-    private String uuid;
-
     private String codeUrl;
 }

@@ -2,6 +2,7 @@ package com.linkwechat.web.controller.wecom;
 
 
 import com.linkwechat.common.constant.HttpStatus;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
@@ -53,23 +54,26 @@ public class WeCommunityPresTagGroupController extends BaseController {
     //   @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:add')")
     @PostMapping
     public AjaxResult addTask(@RequestBody @Validated WePresTagGroupTaskDto wePresTagGroupTaskDto) {
-        // 检测任务名是否可用
-        if (!taskService.checkTaskNameUnique(wePresTagGroupTaskDto.getTaskName())) {
-            return AjaxResult.error("任务名已存在");
-        }
-        if (null == groupCodeService.selectWeGroupCodeById(wePresTagGroupTaskDto.getGroupCodeId())) {
+        if (null == groupCodeService.getById(wePresTagGroupTaskDto.getGroupCodeId())) {
             return AjaxResult.error(HttpStatus.NOT_FOUND, "群活码不存在");
         }
-        // 创建新任务并保存
         WePresTagGroupTask task = new WePresTagGroupTask();
         BeanUtils.copyProperties(wePresTagGroupTaskDto, task);
+        // 检测任务名是否可用
+        if (taskService.isNameOccupied(task)) {
+            return AjaxResult.error("任务名已存在");
+        }
         task.setCreateBy(SecurityUtils.getUsername());
         List<String> tagList = wePresTagGroupTaskDto.getTagList();
         List<String> scopeList = wePresTagGroupTaskDto.getScopeList();
         int affectedRows = taskService.add(task, tagList, scopeList);
         if (affectedRows > 0) {
-            // 若保存成功，则进行异步消息推送
-            taskService.sendMessage(task);
+            boolean hasScope = StringUtils.isNotEmpty(wePresTagGroupTaskDto.getScopeList());
+            boolean hasTag = StringUtils.isNotEmpty(wePresTagGroupTaskDto.getTagList());
+            List<String> externalIds = taskService
+                    .selectExternalUserIds(task.getTaskId(), hasScope, hasTag, wePresTagGroupTaskDto.getSendScope(),
+                            wePresTagGroupTaskDto.getCusBeginTime(), wePresTagGroupTaskDto.getCusEndTime());
+            taskService.sendMessage(task, externalIds);
         }
         return toAjax(affectedRows);
     }
@@ -93,15 +97,7 @@ public class WeCommunityPresTagGroupController extends BaseController {
     //    @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:edit')")
     @PutMapping(path = "/{id}")
     public AjaxResult updateTask(@PathVariable("id") Long id, @RequestBody @Validated WePresTagGroupTaskDto wePresTagGroupTaskDto) {
-        // 检测任务名是否可用
-        WePresTagGroupTaskVo original = taskService.getTaskById(id);
-        // 判断名称是否发生变化
-        boolean newName = wePresTagGroupTaskDto.getTaskName().equals(original.getTaskName());
-        // 新名称不能已存在
-        if (!taskService.checkTaskNameUnique(wePresTagGroupTaskDto.getTaskName()) && !newName) {
-            return AjaxResult.error("任务名已存在");
-        }
-        if (null == groupCodeService.selectWeGroupCodeById(wePresTagGroupTaskDto.getGroupCodeId())) {
+        if (null == groupCodeService.getById(wePresTagGroupTaskDto.getGroupCodeId())) {
             return AjaxResult.error(HttpStatus.NOT_FOUND, "群活码不存在");
         }
         return toAjax(taskService.updateTask(id, wePresTagGroupTaskDto));

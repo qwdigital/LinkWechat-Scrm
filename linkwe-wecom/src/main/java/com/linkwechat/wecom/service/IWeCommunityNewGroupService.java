@@ -27,9 +27,10 @@ public interface IWeCommunityNewGroupService extends IService<WeCommunityNewGrou
     /**
      * 查询新客自动拉群列表
      *
+     * @param weCommunityNewGroup 新科拉群过滤条件
      * @return {@link WeCommunityNewGroupVo}s
      */
-    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(String emplCodeName, String createBy, String beginTime, String endTime);
+    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(WeCommunityNewGroup weCommunityNewGroup);
 
     /**
      * 获取新客自动拉群详细信息

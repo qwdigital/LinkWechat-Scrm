@@ -27,7 +27,7 @@ public class WeEmpleCodeUseScop
 
     /** $column.columnComment */
     @TableId
-    private Long id;
+    private Long id = SnowFlakeUtil.nextId();
 
     /** 员工活码id */
     @ApiModelProperty("员工活码id")

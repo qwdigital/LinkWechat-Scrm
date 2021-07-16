@@ -6,6 +6,7 @@ import com.linkwechat.wecom.domain.dto.WePresTagGroupTaskDto;
 import com.linkwechat.wecom.domain.vo.WeCommunityTaskEmplVo;
 import com.linkwechat.wecom.domain.vo.WePresTagGroupTaskVo;
 import com.linkwechat.wecom.domain.vo.WePresTagGroupTaskStatVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -16,8 +17,9 @@ public interface IWePresTagGroupTaskService {
 
     /**
      * 添加新标签建群任务
-     * @param task 建群任务本体信息
-     * @param tagIdList 标签列表
+     *
+     * @param task       建群任务本体信息
+     * @param tagIdList  标签列表
      * @param emplIdList 员工列表
      * @return 结果
      */
@@ -53,19 +55,12 @@ public interface IWePresTagGroupTaskService {
 
     /**
      * 更新老客户标签建群任务
-     * @param taskId 待更新任务id
+     *
+     * @param taskId                待更新任务id
      * @param wePresTagGroupTaskDto 更新数据
      * @return 更新条数
      */
     int updateTask(Long taskId, WePresTagGroupTaskDto wePresTagGroupTaskDto);
-
-    /**
-     * 检测任务名是否已存在
-     *
-     * @param taskName 任务名
-     * @return 结果
-     */
-    boolean checkTaskNameUnique(String taskName);
 
     /**
      * 通过老客标签建群id获取其统计信息
@@ -112,7 +107,25 @@ public interface IWePresTagGroupTaskService {
 
     /**
      * 根据标签建群任务信息发送消息
+     *
      * @param task 标签建群任务
      */
-    void sendMessage(WePresTagGroupTask task);
+    void sendMessage(WePresTagGroupTask task, List<String> externalIds);
+
+    /**
+     * 任务名是否已占用
+     *
+     * @param task 任务信息
+     * @return 名称是否占用
+     */
+    boolean isNameOccupied(WePresTagGroupTask task);
+
+    List<String> selectExternalUserIds(
+            Long taskId,
+            boolean hasScope,
+            boolean hasTag,
+            Integer gender,
+            String beginTime,
+            String endTime
+    );
 }

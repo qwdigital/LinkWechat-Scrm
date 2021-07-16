@@ -3,7 +3,9 @@ package com.linkwechat.wecom.domain.dto;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -28,7 +30,8 @@ public class WePresTagGroupTaskDto {
     /**
      * 加群引导语
      */
-    @NotNull(message = "引导语不能为空")
+    @Size(max = 64, message = "引导与不能超过64字符")
+    @NotBlank(message = "引导语不能为空")
     private String welcomeMsg;
 
     /**
@@ -50,7 +53,6 @@ public class WePresTagGroupTaskDto {
     /**
      * 发送范围 0: 全部客户 1：部分客户
      */
-    @NotNull(message = "发送范围不能为空")
     private Integer sendScope;
 
     /**

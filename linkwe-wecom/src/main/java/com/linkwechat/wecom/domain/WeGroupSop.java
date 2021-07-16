@@ -2,6 +2,7 @@ package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import lombok.Data;
@@ -47,5 +48,11 @@ public class WeGroupSop extends BaseEntity {
      */
     @TableField(value = "end_time")
     private String stopExeTime;
+
+    /**
+     * 逻辑删除字段
+     */
+    @TableLogic(value = "0", delval = "1")
+    private Integer delFlag;
 
 }

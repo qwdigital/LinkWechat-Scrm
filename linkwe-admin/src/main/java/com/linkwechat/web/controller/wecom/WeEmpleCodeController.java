@@ -6,6 +6,7 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUtils;
@@ -23,9 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -154,38 +153,19 @@ public class WeEmpleCodeController extends BaseController {
     @Log(title = "员工活码批量下载", businessType = BusinessType.OTHER)
     @GetMapping("/downloadBatch")
     public void downloadBatch(String ids, HttpServletRequest request, HttpServletResponse response){
-        List<String> idList = Arrays.stream(Optional.ofNullable(ids).orElse("").split(","))
-                .filter(StringUtils::isNotEmpty).collect(Collectors.toList());
+        List<Map<String, String>> fileList = Arrays
+                .stream(Optional.ofNullable(ids).orElse("").split(","))
+                .filter(StringUtils::isNotEmpty)
+                .map(id -> {
+                    WeEmpleCode code = weEmpleCodeService.getById(id);
+                    Map<String, String> fileMap = new HashMap<>();
+                    fileMap.put("fileName", code.getUseUserName() + "-" + code.getScenario()+".jpg");
+                    fileMap.put("url", code.getQrCode());
+                    return fileMap;})
+                .collect(Collectors.toList());
         try {
-            //通过员工活码id查询活码数据
-            List<WeEmpleCode> weEmpleCodeLsit = weEmpleCodeService.selectWeEmpleCodeByIds(idList);
-            //zip输出流
-            ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
-            if (CollectionUtil.isNotEmpty(weEmpleCodeLsit)){
-                for (WeEmpleCode weEmpleCode : weEmpleCodeLsit){
-                    String qrCode = weEmpleCode.getQrCode();
-                    if (StringUtils.isEmpty(qrCode)){
-                        continue;
-                    }
-                    URL url = new URL(qrCode);
-                    //每个二维码名称
-                    String fileName = weEmpleCode.getUseUserName()+"-"+weEmpleCode.getScenario()+".jpg";
-                    zos.putNextEntry(new ZipEntry(fileName));
-                    InputStream fis = url.openConnection().getInputStream();
-                    byte[] buffer = new byte[1024];
-                    int r = 0;
-                    while ((r = fis.read(buffer)) != -1) {
-                        zos.write(buffer, 0, r);
-                    }
-                    fis.close();
-                }
-            }
-            //关闭zip输出流
-            zos.flush();
-            zos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e){
+            FileUtils.batchDownloadFile(fileList, response.getOutputStream());
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -196,7 +176,7 @@ public class WeEmpleCodeController extends BaseController {
     public void download(String id, HttpServletRequest request, HttpServletResponse response){
         WeEmpleCode weEmpleCode = weEmpleCodeService.selectWeEmpleCodeById(Long.valueOf(id));
         if (StringUtils.isEmpty(weEmpleCode.getQrCode())){
-            return;
+            throw new CustomException("活码不存在");
         }else {
             try {
                 FileUtils.downloadFile(weEmpleCode.getQrCode(), response.getOutputStream());

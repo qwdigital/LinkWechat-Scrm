@@ -35,13 +35,13 @@
 
     <select id="getGroupSopById" resultMap="WeGroupSopResult">
         <include refid="selectGroupVo" />
-        WHERE rule_id = #{ruleId}
+        WHERE rule_id = #{ruleId} AND del_flag = 0
     </select>
 
     <select id="getGroupSopList" resultMap="WeGroupSopResult">
         <include refid="selectGroupVo" />
         <where>
-            1 = 1
+            del_flag = 0
             <if test="ruleName != null and ruleName!=''">
                 AND rule_name LIKE CONCAT("%",#{ruleName},"%")
             </if>
@@ -56,6 +56,7 @@
                 AND create_by LIKE CONCAT("%",#{createBy},"%")
             </if>
         </where>
+        order by create_time DESC
     </select>
 
     <select id="getChatIdListByRuleId" resultType="String">
@@ -76,10 +77,6 @@
             LEFT JOIN we_group_sop_material wgsm ON wgs.rule_id = wgsm.rule_id
             LEFT JOIN we_material wm ON wm.id = wgsm.material_id
         WHERE wgs.rule_id = #{ruleId}
-    </select>
-
-    <select id="isRuleNameUnique" resultType="int" parameterType="String">
-        select count(1) from we_group_sop where rule_name = #{ruleName}
     </select>
 
     <select id="getEmplTaskList" resultMap="WeGroupSopResult">

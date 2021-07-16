@@ -50,12 +50,6 @@ public class WePresTagGroupTaskVo {
     @JsonIgnore
     private String codeUrl;
 
-    /**
-     * 群活码uuid
-     */
-    @JsonIgnore
-    private String CodeUuid;
-
     @TableField(exist = false)
     private WeGroupCodeVo groupCodeInfo;
 
@@ -132,7 +126,7 @@ public class WePresTagGroupTaskVo {
      * 设置群活码信息
      */
     public void fillGroupCodeVo() {
-        WeGroupCodeVo groupCodeVo = new WeGroupCodeVo(this.getCodeId(), this.getCodeUuid(), this.getCodeUrl());
+        WeGroupCodeVo groupCodeVo = new WeGroupCodeVo(this.getCodeId(),this.getCodeUrl());
         this.setGroupCodeInfo(groupCodeVo);
     }
 }
