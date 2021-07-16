@@ -167,13 +167,13 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
             //从redis中读取数据
             List<WeCustomer> customers = redisCache.getCacheList(WeConstans.WECUSTOMERS_KEY);
             if (CollectionUtils.isEmpty(customers)) {
-                customers = weCustomerService.selectWeCustomerList(null);
+                WeCustomer weCustomer = new WeCustomer();
+                weCustomer.setUserIds(staffId);
+                weCustomer.setDepartmentIds(department);
+                customers = weCustomerService.selectWeCustomerList(weCustomer);
                 redisCache.setCacheList(WeConstans.WECUSTOMERS_KEY, customers);
             }
-            WeCustomer weCustomer = new WeCustomer();
-            weCustomer.setUserIds(staffId);
-            weCustomer.setDepartmentIds(department);
-            return weCustomerService.selectWeCustomerList(weCustomer);
+            return customers;
         } else {
             //按条件查询客户
             //通过部门id查询所有的员工
