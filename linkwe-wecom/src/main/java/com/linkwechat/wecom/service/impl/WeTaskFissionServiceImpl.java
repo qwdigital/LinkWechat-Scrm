@@ -34,6 +34,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -240,6 +242,9 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
             customerMessagePushDto.setDepartment(departmentIds);
         }
         try {
+            SecurityContext context = SecurityContextHolder.getContext();
+            SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+            SecurityContextHolder.setContext(context);
             weCustomerMessagePushService.addWeCustomerMessagePush(customerMessagePushDto);
         } catch (JsonProcessingException | ParseException e) {
             e.printStackTrace();

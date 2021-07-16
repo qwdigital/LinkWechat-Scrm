@@ -128,7 +128,11 @@ public interface IWeCustomerService extends IService<WeCustomer>
     void updateWeCustomerPortrait(WeCustomerPortrait weCustomerPortrait);
 
 
-
-
+    /**
+     * 查询全部客户列表
+     * @param weCustomer
+     * @return
+     */
+    public List<WeCustomer> selectWeCustomerAllList(WeCustomer weCustomer);
 
 }

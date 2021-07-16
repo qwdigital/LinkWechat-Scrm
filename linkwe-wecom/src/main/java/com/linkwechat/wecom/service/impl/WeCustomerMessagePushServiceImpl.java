@@ -170,8 +170,9 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
                 WeCustomer weCustomer = new WeCustomer();
                 weCustomer.setUserIds(staffId);
                 weCustomer.setDepartmentIds(department);
-                customers = weCustomerService.selectWeCustomerList(weCustomer);
+                customers = weCustomerService.selectWeCustomerAllList(weCustomer);
                 redisCache.setCacheList(WeConstans.WECUSTOMERS_KEY, customers);
+                redisCache.expire(WeConstans.WECUSTOMERS_KEY,2 * 60L);
             }
             return customers;
         } else {
@@ -182,7 +183,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
             weCustomer.setUserIds(staffId);
             weCustomer.setTagIds(tag);
             weCustomer.setDepartmentIds(department);
-            return weCustomerService.selectWeCustomerList(weCustomer);
+            return weCustomerService.selectWeCustomerAllList(weCustomer);
         }
     }
 

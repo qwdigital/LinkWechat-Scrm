@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.TrajectorySceneType;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -119,12 +120,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Override
     public List<WeCustomer> selectWeCustomerList(WeCustomer weCustomer) {
         //当前登录用户为企业用户
-        try {
-            if(Constants.USER_TYPE_WECOME
-                    .equals(SecurityUtils.getLoginUser().getUser().getUserType())){
-                weCustomer.setUserIds((SecurityUtils.getLoginUser().getUser().getWeUserId()));
-            }
-        } catch (Exception e) {
+        if(Constants.USER_TYPE_WECOME
+                .equals(SecurityUtils.getLoginUser().getUser().getUserType())){
+            weCustomer.setUserIds((SecurityUtils.getLoginUser().getUser().getWeUserId()));
         }
 
         return weCustomerMapper.selectWeCustomerList(weCustomer);
@@ -709,8 +707,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         iWeCustomerTrajectoryService.inforMationNews(weCustomerPortrait.getUserId(),weCustomerPortrait.getExternalUserid(), TrajectorySceneType.TRAJECTORY_TYPE_XXDT_BCZL.getKey());
     }
 
-
-
+    @Override
+    public List<WeCustomer> selectWeCustomerAllList(WeCustomer weCustomer) {
+        return weCustomerMapper.selectWeCustomerList(weCustomer);
+    }
 
 
 }
