@@ -23,23 +23,21 @@
               <div>
                 <span
                   >{{
-                    form.remark
-                      ? form.remark
-                      : form.name + '_' + form.remarkCorpName
+                    user.remark
+                      ? user.remark
+                      : (user.name || '') + '-' + (user.remarkCorpName || '')
                   }}
-                  &nbsp; &nbsp;</span
-                ><span
-                  class="icon iconfont icon-man"
-                  v-if="form.gender == 1"
-                ></span>
+                </span>
+                <span class="icon iconfont icon-man" v-if="user.gender == 1">
+                </span>
                 <span
                   class="icon iconfont icon-xingbie"
-                  v-else-if="form.gender == 2"
+                  v-else-if="user.gender == 2"
                 ></span>
                 <van-icon name="manager" color="#9c9c9c" v-else />
               </div>
               <div class="c9">
-                <span>昵称：</span><span>{{ form.name }}</span>
+                <span>昵称：</span><span>{{ user.name }}</span>
               </div>
             </div>
           </div>
@@ -53,6 +51,7 @@
         input-align="right"
       />
       <van-field
+        v-if="flage"
         v-model="form.age"
         name="年龄"
         label="年龄"
@@ -68,7 +67,12 @@
         input-align="right"
         @click="!flage ? (show = true) : ''"
       />
-      <van-popup v-model="show" position="bottom" round :style="{ height: '60%' }">
+      <van-popup
+        v-model="show"
+        position="bottom"
+        round
+        :style="{ height: '60%' }"
+      >
         <van-datetime-picker
           v-model="currentDate"
           type="date"
@@ -76,7 +80,7 @@
           :min-date="minDate"
           :max-date="maxDate"
           @confirm="confirm"
-          @cancel = "cancel"
+          @cancel="cancel"
       /></van-popup>
       <!-- -------------------------- -->
       <van-field
@@ -128,7 +132,6 @@
 </template>
 <script>
 import { getCustomerInfo, getWeCustomerInfo } from '@/api/portrait'
-import { getUserInfo } from '@/api/common'
 export default {
   data() {
     return {
@@ -140,6 +143,7 @@ export default {
       currentDate: new Date(2000, 0, 17),
       // 接口开始
       // 表单数据
+      user: {},
       form: {
         externalUserid: '', // 客户Id
         userId: '', // 员工Id
@@ -152,28 +156,25 @@ export default {
         qq: '', // qq
         position: '', // 职业
         remarkCorpName: '', // 公司
-        description: '', // 其他描述
-      },
+        description: '' // 其他描述
+      }
     }
   },
   computed: {
-    // 获取客户年龄
     userId() {
       return this.$store.state.userId // 员工Id
-    },
+    }
   },
   created() {
-
-    this.form.externalUserid = this.$route.query.customerId;
+    this.form.externalUserid = this.$route.query.customerId
     // 获取客户详细信息
     getCustomerInfo({
       externalUserid: this.form.externalUserid,
-      userId: this.userId,
+      userId: this.userId
     })
       .then(({ data }) => {
-        // console.log(data);
-        this.form = data;
-        // console.log(this.form);
+        this.form = data
+        this.user = Object.assign({}, data)
       })
       .catch((err) => {
         console.log(err)
@@ -182,12 +183,12 @@ export default {
   methods: {
     //   选择生日
     confirm(val) {
-        this.show = false
-        this.form.birthday =this.getTime (val) 
-        console.log(val);
+      this.show = false
+      this.form.birthday = this.getTime(val)
+      console.log(val)
     },
-    cancel () {
-        this.show = false
+    cancel() {
+      this.show = false
     },
     edit() {
       this.flage = !this.flage
@@ -203,24 +204,30 @@ export default {
           : date.getMonth() + 1) + '-'
       var D =
         date.getDate() < 10 ? '0' + date.getDate() : date.getDate() + '   '
-    //   var h =
-    //     (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
-    //   var m =
-    //     date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+      //   var h =
+      //     (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
+      //   var m =
+      //     date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
       return Y + M + D
     },
     // 点击保存按钮提交表单
     saveUserInformation() {
-      this.flage = !this.flage;
+      this.$toast.loading({
+        message: 'loading...',
+        duration: 0,
+        forbidClick: true
+      })
+      this.flage = !this.flage
+      this.form.userId = this.userId
       getWeCustomerInfo(this.form)
         .then((data) => {
-          console.log(data)
+          this.$toast('操作成功')
         })
         .catch((err) => {
           console.log(err)
         })
-    },
-  },
+    }
+  }
 }
 </script>
 
