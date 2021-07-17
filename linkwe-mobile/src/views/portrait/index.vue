@@ -181,7 +181,6 @@
       />
       <div class="content">
         <div v-for="(item, index) in alllabel" :key="index">
-          <!-- :class="{ styleactive: styleactive == item.groupId }" -->
           <div class="mb10 mt5">{{ item.gourpName }}：</div>
           <div class="labelstyle">
             <div
@@ -337,7 +336,7 @@ export default {
       // 待办动态
       todonewsshow: false,
       // 接口开始
-      externalUserid: 'wmiGuBCgAAoCBD1frD3hRplbsXoBLx6g', // 客户Id
+      // externalUserid: 'wmiGuBCgAAoCBD1frD3hRplbsXoBLx6g', // 客户Id
       // externalUserid: 'wmiGuBCgAAgeijfvvpJ62cBfwrB-c4kw',
       form: {
         name: '', // 昵称
@@ -376,7 +375,6 @@ export default {
       loading: false,
       finished: false,
       list: [],
-      styleactive: '',
       agentId: ''
     }
   },
@@ -387,7 +385,8 @@ export default {
   },
   computed: {
     userId() {
-      return this.$store.state.userId || 'FengJuZhuDeJieDao'
+      return this.$store.state.userId
+      //  || 'FengJuZhuDeJieDao'
     },
     //   activeLabel : () => {
     //       this.addTag.forEach((value) => {
@@ -401,29 +400,29 @@ export default {
     }
   },
   created() {
-    // this.$toast.loading({
-    //   message: 'loading...',
-    //   duration: 0,
-    //   forbidClick: true
-    // })
+    this.$toast.loading({
+      message: 'loading...',
+      duration: 0,
+      forbidClick: true
+    })
     // 获取agentId
     let query = param2Obj(window.location.search)
     let hash = param2Obj(window.location.hash)
     query = Object.assign(query, hash)
-    // this.agentId = query.agentId
+    this.agentId = query.agentId
     // console.log(agentId)
 
-    this.findAddaddEmployes()
-    this.findAddGroupNum()
-    this.getCustomerInfo()
-    this.findTrajectory()
-    getAllTags()
-      .then(({ data }) => {
-        this.alllabel = data
-      })
-      .catch((err) => {
-        console.log(err)
-      })
+    // this.findAddaddEmployes()
+    // this.findAddGroupNum()
+    // this.getCustomerInfo()
+    // this.findTrajectory()
+    // getAllTags()
+    //   .then(({ data }) => {
+    //     this.alllabel = data
+    //   })
+    //   .catch((err) => {
+    //     console.log(err)
+    //   })
   },
 
   methods: {
@@ -769,7 +768,7 @@ export default {
     display: inline-block;
     min-width: 45px;
     font-size: 12px;
-    padding: 3px 5px;
+    padding: 4px 5px 3px;
     // background-color: #f2f2f2;
     color: #2c8cf0;
     border: 1px solid #2c8cf0;
@@ -871,10 +870,7 @@ export default {
     padding: 0 10px;
   }
 }
-/deep/.styleactive {
-  //   background: #f00;
-  color: #2c8cf0;
-}
+
 .iconfont {
   color: #2c8cf0;
 }
