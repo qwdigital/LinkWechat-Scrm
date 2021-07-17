@@ -13,7 +13,7 @@ const service = axios.create({
       ? '/api'
       : process.env.VUE_APP_BASE_API,
   // 超时
-  timeout: 10000,
+  timeout: 10000
 })
 // request拦截器
 service.interceptors.request.use(
@@ -47,7 +47,7 @@ service.interceptors.response.use(
         {
           confirmButtonText: '重新登录',
           cancelButtonText: '取消',
-          type: 'warning',
+          type: 'warning'
         }
       ).then(() => {
         store.dispatch('LogOut').then(() => {
@@ -57,32 +57,34 @@ service.interceptors.response.use(
     } else if (code === 500) {
       Message({
         message: msg,
-        type: 'error',
+        type: 'error'
       })
-      return Promise.reject(new Error(msg))
+      // return Promise.reject(new Error(msg))
+      return Promise.reject()
     } else {
       Notification.error({
-        title: msg,
+        title: msg
       })
-      return Promise.reject('error')
+      return Promise.reject()
     }
   },
   (error) => {
     console.log('err' + error)
-    let { message } = error
+    let { message, response, config } = error
     if (message == 'Network Error') {
       message = '后端接口连接异常'
     } else if (message.includes('timeout')) {
       message = '系统接口请求超时'
-    } else if (message.includes('Request failed with status code')) {
-      message = '系统接口' + message.substr(message.length - 3) + '异常'
+    } else if (response) {
+      let status = response.status
+      mes = '系统接口:' + status + '异常'
     }
     Message({
-      message: message,
+      message: `${message}:${config.url}`,
       type: 'error',
-      duration: 5 * 1000,
+      duration: 5 * 1000
     })
-    return Promise.reject(error)
+    return Promise.reject()
   }
 )
 

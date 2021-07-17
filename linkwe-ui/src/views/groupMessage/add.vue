@@ -165,6 +165,9 @@ export default {
             form.messageType = '1'
           } else if (form.textMessage.content) {
             form.messageType = '0'
+          } else {
+            this.msgInfo('消息内容不能为空')
+            return Promise.reject()
           }
           // debugger
           form.tag = form.tag.map((d) => d.tagId) + ''
