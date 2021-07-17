@@ -10,7 +10,11 @@
       </el-breadcrumb-item>
       <el-breadcrumb-item v-for="(item, index) in levelList" :key="item.path">
         <span
-          v-if="item.redirect === 'noRedirect' || index == levelList.length - 1"
+          v-if="
+            item.redirect === 'noRedirect' ||
+              index == levelList.length - 1 ||
+              !/^\//gi.test(item.redirect)
+          "
           class="no-redirect"
           >{{ item.meta.title }}</span
         >
@@ -35,7 +39,7 @@ import pathToRegexp from 'path-to-regexp'
 export default {
   data() {
     return {
-      levelList: null,
+      levelList: null
     }
   },
   watch: {
@@ -46,12 +50,12 @@ export default {
       }
       this.$store.state.app.busininessDesc = ''
       this.getBreadcrumb()
-    },
+    }
   },
   computed: {
     busininessDesc() {
       return this.$store.state.app.busininessDesc
-    },
+    }
   },
   created() {
     this.getBreadcrumb()
@@ -87,13 +91,15 @@ export default {
     },
     handleLink(item) {
       const { redirect, path } = item
+      console.log(redirect, 'redirect')
       if (redirect) {
         this.$router.push(redirect)
         return
       }
+      console.log(this.pathCompile(path))
       this.$router.push(this.pathCompile(path))
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -106,7 +112,7 @@ export default {
   margin-left: 8px;
 
   .no-redirect {
-    color: $blue;
+    color: #999;
     cursor: text;
   }
 }
