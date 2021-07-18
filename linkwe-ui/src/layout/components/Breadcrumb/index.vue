@@ -66,7 +66,6 @@ export default {
       let matched = this.$route.matched.filter(
         (item) => item.meta && item.meta.title
       )
-      console.log(matched)
       const first = matched[0]
 
       // if (!this.isDashboard(first)) {
@@ -91,12 +90,10 @@ export default {
     },
     handleLink(item) {
       const { redirect, path } = item
-      console.log(redirect, 'redirect')
       if (redirect) {
         this.$router.push(redirect)
         return
       }
-      console.log(this.pathCompile(path))
       this.$router.push(this.pathCompile(path))
     }
   }

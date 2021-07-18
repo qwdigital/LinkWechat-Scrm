@@ -1,5 +1,4 @@
 <script>
-import { getAllocateCustomers } from '@/api/customer/dimission'
 import AllocatedStaffDetailList from './allocatedStaffDetailList'
 
 export default {
@@ -8,18 +7,8 @@ export default {
   props: {},
   data() {
     return {
-      // 查询参数
-      query: {
-        pageNum: 1,
-        pageSize: 10,
-        handoverUserId: undefined,
-        beginTime: undefined,
-        endTime: undefined,
-      },
-      loading: false,
-      total: 0,
-      list: [],
-      dateRange: [], // 离职日期
+      active: 'customer',
+      dateRange: [] // 离职日期
     }
   },
   watch: {},
@@ -28,13 +17,14 @@ export default {
   mounted() {},
   methods: {
     getList() {
-      this.$refs.AllocatedStaffDetailList.getList(1)
+      this.$refs[this.active].getList(1)
     },
     resetForm(formName) {
       this.dateRange = []
       this.$refs['queryForm'].resetFields()
-    },
-  },
+      this.getList()
+    }
+  }
 }
 </script>
 
@@ -43,14 +33,14 @@ export default {
     <el-form
       ref="queryForm"
       :inline="true"
-      :model="query"
-      label-width="100px"
+      label-width="70px"
       class="top-search"
     >
       <el-form-item label="离职日期">
         <el-date-picker
           v-model="dateRange"
           type="daterange"
+          value-format="yyyy-MM-dd"
           :picker-options="pickerOptions"
           range-separator="至"
           start-placeholder="开始日期"
@@ -74,17 +64,18 @@ export default {
       </el-form-item>
     </el-form>
 
-    <el-tabs value="first" type="card">
-      <el-tab-pane label="已分配客户" name="first">
+    <el-tabs v-model="active">
+      <el-tab-pane label="已分配客户" name="customer">
         <AllocatedStaffDetailList
-          ref="AllocatedStaffDetailList"
+          ref="customer"
           :dateRange="dateRange"
         ></AllocatedStaffDetailList>
       </el-tab-pane>
-      <el-tab-pane label="已分配群聊" name="second">
+      <el-tab-pane label="已分配群聊" name="group">
         <AllocatedStaffDetailList
-          ref="AllocatedStaffDetailList"
+          ref="group"
           :dateRange="dateRange"
+          type="group"
         ></AllocatedStaffDetailList>
       </el-tab-pane>
     </el-tabs>

@@ -15,7 +15,7 @@ userName:
 export function getList(params) {
   return request({
     url: service + '/leaveUserAllocateList',
-    params,
+    params
   })
 }
 
@@ -33,7 +33,7 @@ userName:
 export function getListNo(params) {
   return request({
     url: service + '/leaveUserNoAllocateList',
-    params,
+    params
   })
 }
 
@@ -49,7 +49,7 @@ export function allocate(data) {
   return request({
     url: service + '/allocateLeaveUserAboutData',
     method: 'put',
-    data,
+    data
   })
 }
 
@@ -67,6 +67,24 @@ export function allocate(data) {
 export function getAllocateCustomers(params) {
   return request({
     url: service + '/getAllocateCustomers',
-    params,
+    params
+  })
+}
+
+/**
+ * 离职已分配客户群
+ * @param {*} params
+ {
+  "pageNum": 0,
+  "pageSize": 0,
+  "beginTime": "",
+  "endTime": "",
+  "oldOwner": "" 原群主ID
+}
+ */
+export function getAllocateGroups(params) {
+  return request({
+    url: service + '/getAllocateGroups',
+    params
   })
 }

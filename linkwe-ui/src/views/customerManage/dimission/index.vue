@@ -80,6 +80,7 @@ export default {
         this.dialogVisibleSelectUser = true
         return
       }
+      let loading = this.$loading()
       api
         .allocate({
           handoverUserid: this.currentRow.userId,
@@ -87,6 +88,10 @@ export default {
         })
         .then(() => {
           this.msgSuccess('操作成功')
+          loading.close()
+        })
+        .catch(() => {
+          loading.close()
         })
     },
     // 选中数据
@@ -157,6 +162,7 @@ export default {
     </div>
 
     <el-table
+      v-loading="loading"
       ref="multipleTable"
       :data="list"
       tooltip-effect="dark"
