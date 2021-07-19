@@ -2,7 +2,10 @@ package com.linkwechat.wecom.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeCustomerMessage;
+import com.linkwechat.wecom.domain.dto.message.DetailMessageStatusResultDto;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 群发消息  微信消息表Mapper接口
@@ -29,5 +32,7 @@ public interface WeCustomerMessageMapper extends BaseMapper<WeCustomerMessage> {
      * @return int
      */
     int updateWeCustomerMessageCheckStatusById(@Param("messageId") Long messageId,@Param("status") String status);
+
+
 
 }

@@ -53,9 +53,7 @@ public class WeCustomerMessagePushController extends BaseController {
     @PostMapping(value = "add")
     public AjaxResult add(@RequestBody CustomerMessagePushDto customerMessagePushDto) {
         try {
-            SecurityContext context = SecurityContextHolder.getContext();
-            SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
-            SecurityContextHolder.setContext(context);
+
             weCustomerMessagePushService.addWeCustomerMessagePush(customerMessagePushDto);
 
         } catch (JsonProcessingException | ParseException | CloneNotSupportedException e) {

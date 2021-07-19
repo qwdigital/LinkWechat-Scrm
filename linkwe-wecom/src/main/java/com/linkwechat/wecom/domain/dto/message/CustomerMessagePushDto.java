@@ -84,7 +84,7 @@ public class CustomerMessagePushDto implements Cloneable{
     public String content() {
 
         if (this.getMessageType()!=null) {
-            // 消息类型 0 文本消息  1 图片消息 2 链接消息   3 小程序消息
+            // 消息类型 0 文本消息  1 图片消息 2 链接消息   3 小程序消息 4 图文
             if ( this.getMessageType().equals("0")) {
                 return this.getTextMessage().getContent();
             }
@@ -103,6 +103,12 @@ public class CustomerMessagePushDto implements Cloneable{
 
                 return this.getMiniprogramMessage().getTitle() + ":" + this.getMiniprogramMessage().getPage();
             }
+
+            if(this.getMessageType().equals("4")){
+
+                return this.getTextMessage().getContent()+","+this.getImageMessage().getPic_url();
+
+            }
         }
 
         return null;
@@ -115,19 +121,6 @@ public class CustomerMessagePushDto implements Cloneable{
     }
 
 
-    public List<CustomerMessagePushDto> handleImageAndText() throws CloneNotSupportedException {
-        List<CustomerMessagePushDto> customerMessagePushDtos=new ArrayList<>();
-        CustomerMessagePushDto cloneOne = this.clone();
-        cloneOne.setMessageType("0");
-        customerMessagePushDtos.add(cloneOne);
-
-
-        CustomerMessagePushDto cloneTwo = this.clone();
-        cloneTwo.setMessageType("1");
-        customerMessagePushDtos.add(cloneTwo);
-
-         return customerMessagePushDtos;
-    }
 
 
 }

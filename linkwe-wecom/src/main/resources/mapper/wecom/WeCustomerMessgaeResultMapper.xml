@@ -65,8 +65,10 @@
                 AND external_userid=#{externalUserid}
             </if>
         </where>
-
     </update>
+
+
+
     <select id="customerMessagePushs" resultType="com.linkwechat.wecom.domain.vo.WeCustomerMessageResultVo">
         SELECT
         user_name,

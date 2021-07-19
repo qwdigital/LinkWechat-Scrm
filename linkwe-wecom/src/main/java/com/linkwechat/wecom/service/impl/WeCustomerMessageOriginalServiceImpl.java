@@ -19,6 +19,7 @@ import com.linkwechat.wecom.service.IWeCustomerMessageOriginalService;
 import com.linkwechat.wecom.service.IWeCustomerMessageService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -131,14 +132,16 @@ public class WeCustomerMessageOriginalServiceImpl extends ServiceImpl<WeCustomer
 
                         List<DetailMessageStatusResultDto> detailList = queryCustomerMessageStatusResultDto.getDetail_list();
 
+
+
                         detailList.forEach(d -> {
 
-                            if (d.getStatus().equals(WeConstans.sendMessageStatusEnum.SEND.getStatus())) {
-
-                                atomicInteger.incrementAndGet();
-                                //更新消息发送状态
-                                customerMessageMapper.updateWeCustomerMessageCheckStatusById(messageId,WeConstans.sendMessageStatusEnum.SEND.getStatus());
-                            }
+//                            if (d.getStatus().equals(WeConstans.sendMessageStatusEnum.SEND.getStatus())) {
+//
+//                                atomicInteger.incrementAndGet();
+//                                //更新消息发送状态
+//                                customerMessageMapper.updateWeCustomerMessageCheckStatusById(messageId,WeConstans.sendMessageStatusEnum.SEND.getStatus());
+//                            }
 
                             weCustomerMessgaeResultMapper.updateWeCustomerMessgaeResult(messageId, d.getChat_id(), d.getExternal_userid(), d.getStatus(), d.getSend_time());
 

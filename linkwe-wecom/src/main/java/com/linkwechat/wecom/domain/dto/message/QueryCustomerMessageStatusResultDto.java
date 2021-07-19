@@ -17,6 +17,7 @@ public class QueryCustomerMessageStatusResultDto extends WeResultDto {
 
     private String check_status;
 
+
 }
 
 

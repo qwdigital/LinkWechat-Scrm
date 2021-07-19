@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
@@ -349,10 +350,16 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Transactional(rollbackFor = Exception.class)
     public void makeLabel(WeMakeCustomerTag weMakeCustomerTag) {
 
+        LambdaQueryWrapper<WeFlowerCustomerRel> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(WeFlowerCustomerRel::getExternalUserid, weMakeCustomerTag.getExternalUserid());
+
+        if(StrUtil.isNotBlank(weMakeCustomerTag.getUserId())){
+            wrapper.eq(WeFlowerCustomerRel::getUserId,weMakeCustomerTag.getUserId());
+        }
+
         //查询出当前用户对应的
-        List<WeFlowerCustomerRel> flowerCustomerRels = iWeFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
-                .eq(WeFlowerCustomerRel::getExternalUserid, weMakeCustomerTag.getExternalUserid())
-                .eq(WeFlowerCustomerRel::getUserId,weMakeCustomerTag.getUserId())
+        List<WeFlowerCustomerRel> flowerCustomerRels = iWeFlowerCustomerRelService.list(
+                wrapper
         );
         if (CollectionUtil.isNotEmpty(flowerCustomerRels)) {
 

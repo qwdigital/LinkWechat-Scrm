@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -34,6 +35,7 @@ public class WeFlowerCustomerRel
 
 
     /** 添加了此外部联系人的企业成员userid */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String userId;
 
     /** 外部联系人名称 */

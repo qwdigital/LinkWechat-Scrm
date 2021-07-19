@@ -15,10 +15,7 @@ import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeCustomerMessage;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
-import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
-import com.linkwechat.wecom.domain.dto.message.ImageMessageDto;
-import com.linkwechat.wecom.domain.dto.message.SendMessageResultDto;
-import com.linkwechat.wecom.domain.dto.message.WeCustomerMessagePushDto;
+import com.linkwechat.wecom.domain.dto.message.*;
 import com.linkwechat.wecom.mapper.WeCustomerMessageMapper;
 import com.linkwechat.wecom.service.IWeCustomerMessageService;
 import com.linkwechat.wecom.service.IWeMaterialService;
@@ -89,7 +86,9 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
         //通过messageId更新msgIds
         WeCustomerMessage weCustomerMessage = new WeCustomerMessage();
         weCustomerMessage.setMessageId(messageId);
-        weCustomerMessage.setMsgid(objectMapper.writeValueAsString(msgIds));
+//        String result = msgIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+        weCustomerMessage.setMsgid(msgIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
+//        weCustomerMessage.setMsgid(objectMapper.writeValueAsString(msgIds));
         weCustomerMessageMapper.updateWeCustomerMessageMsgIdById(weCustomerMessage);
     }
 
@@ -102,6 +101,7 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
         if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_CUSTOMER)) {
 
             WeCustomerMessagePushDto messagePushDto = new WeCustomerMessagePushDto();
+
             messagePushDto.setChat_type(ChatType.of(customerMessagePushDto.getPushType()).getName());
             List<String> externalUserIds = customers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
 
@@ -134,6 +134,7 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
             }
 
         }
+
 
         this.updateMsgId(messageId, msgid);
 
@@ -182,9 +183,11 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
 
         if(customerMessagePushDto.getMessageType().equals(GroupMessageType.TEXT_IMAGE.getType())){
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("msgtype","text_image");
-            jsonObject.put("text_image",customerMessagePushDto.getTextMessage());
+            jsonObject.put("msgtype","image");
+            jsonObject.put("image",customerMessagePushDto.getImageMessage());
             list.add(jsonObject);
+
+            weCustomerMessagePushDto.setText(customerMessagePushDto.getTextMessage());
         }
 
         if(customerMessagePushDto.getMessageType().equals(GroupMessageType.VIDEO.getType())){

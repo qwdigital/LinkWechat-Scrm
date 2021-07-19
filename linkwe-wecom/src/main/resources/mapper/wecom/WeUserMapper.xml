@@ -237,7 +237,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>
             <if test="handoverUserId != null and handoverUserId !=''">and wac.handover_userid=#{handoverUserId}</if>
             <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
-                DATE_FORMAT(wu.dimission_time,'%Y-%m-%d') BETWEEN #{beginTime}  AND #{endTime}
+                and  DATE_FORMAT(wu.dimission_time,'%Y-%m-%d') BETWEEN #{beginTime}  AND #{endTime}
             </if>
         </where>
     </select>
@@ -258,7 +258,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>
             <if test="oldOwner != null and oldOwner !=''">and wag.old_owner=#{oldOwner}</if>
             <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
-                DATE_FORMAT(wu.dimission_time,'%Y-%m-%d') BETWEEN #{beginTime}  AND #{endTime}
+                and  DATE_FORMAT(wu.dimission_time,'%Y-%m-%d') BETWEEN #{beginTime}  AND #{endTime}
             </if>
         </where>
 

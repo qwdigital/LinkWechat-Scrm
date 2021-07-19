@@ -81,97 +81,78 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addWeCustomerMessagePush(CustomerMessagePushDto customerMessagePush) throws JsonProcessingException, ParseException, CloneNotSupportedException {
+    public void addWeCustomerMessagePush(CustomerMessagePushDto customerMessagePushDto) throws JsonProcessingException, ParseException, CloneNotSupportedException {
 
-        if(StrUtil.isNotBlank(customerMessagePush.getSettingTime())){
-            if(DateUtils.diffTime(new Date(), DateUtil.parse(customerMessagePush.getSettingTime(), "yyyy-MM-dd HH:mm")) > 0){
+        if(StrUtil.isNotBlank(customerMessagePushDto.getSettingTime())){
+            if(DateUtils.diffTime(new Date(), DateUtil.parse(customerMessagePushDto.getSettingTime(), "yyyy-MM-dd HH:mm")) > 0){
                 throw new WeComException("发送时间不能小于当前时间");
             }
         }
 
-        List<CustomerMessagePushDto> customerMessagePushDtos=new ArrayList<>();
 
-        if(customerMessagePush.getMessageType().equals("4")){
+        if(customerMessagePushDto.getMessageType().equals("1")){//等于图片或者图文，根据图片URL，获取新的media_id
 
-            customerMessagePushDtos=customerMessagePush.handleImageAndText();
-
-        }else{
-            customerMessagePushDtos.add(customerMessagePush);
-        }
+            ImageMessageDto imageMessage = customerMessagePushDto.getImageMessage();
 
 
-         for(CustomerMessagePushDto customerMessagePushDto:customerMessagePushDtos){
-
-
-                if(customerMessagePush.getMessageType().equals("1")){//等于图片或者图文，根据图片URL，获取新的media_id
-
-                    ImageMessageDto imageMessage = customerMessagePushDto.getImageMessage();
-
-
-                    if(null != imageMessage && StrUtil.isNotBlank(imageMessage.getPic_url())){
-                        WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(imageMessage.getPic_url(),
-                                MediaType.IMAGE.getMediaType()
-                                ,imageMessage.getPic_url());
-                        if(StrUtil.isNotBlank(weMediaDto.getMedia_id())){
-                            imageMessage.setMedia_id(weMediaDto.getMedia_id());
-                        }
-
-                    }
-
+            if(null != imageMessage && StrUtil.isNotBlank(imageMessage.getPic_url())){
+                WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(imageMessage.getPic_url(),
+                        MediaType.IMAGE.getMediaType()
+                        ,imageMessage.getPic_url());
+                if(StrUtil.isNotBlank(weMediaDto.getMedia_id())){
+                    imageMessage.setMedia_id(weMediaDto.getMedia_id());
                 }
-
-
-                List<WeCustomer> customers = Lists.newArrayList();
-                List<WeGroup> groups = new ArrayList<>();
-                // 0 发给客户
-                if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_CUSTOMER)) {
-                    //查询客户信息列表
-                    if ("all".equals(customerMessagePushDto.getTag())) {
-                        customers = externalUserIds(WeConstans.SEND_MESSAGE_CUSTOMER_ALL, customerMessagePushDto.getStaffId(), customerMessagePushDto.getDepartment(), customerMessagePushDto.getTag());
-                    } else {
-                        customers = externalUserIds(customerMessagePushDto.getPushRange(), customerMessagePushDto.getStaffId()
-                                , customerMessagePushDto.getDepartment(), customerMessagePushDto.getTag());
-                    }
-
-
-                    if (CollectionUtils.isEmpty(customers)) {
-                        throw new WeComException("没有外部联系人");
-                    }
-                }
-
-                // 1 发给客户群
-                if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_GROUP)) {
-                    if (customerMessagePushDto.getStaffId() == null || customerMessagePushDto.getStaffId().equals("")) {
-                        throw new WeComException("请选择人员！");
-                    }
-                    //通过员工id查询群列表
-                    WeGroup weGroup = new WeGroup();
-                    weGroup.setUserIds(customerMessagePushDto.getStaffId());
-                    groups = weGroupService.selectWeGroupList(weGroup);
-                    if (CollectionUtils.isEmpty(groups)) {
-                        throw new WeComException("没有客户群！");
-                    }
-                }
-
-                //保存原始数据信息表
-                long messageOriginalId = weCustomerMessageOriginalService.saveWeCustomerMessageOriginal(customerMessagePushDto);
-                long messageId = SnowFlakeUtil.nextId();
-
-                //保存映射信息
-                int size = weCustomerMessgaeResultService.workerMappingCustomer(customerMessagePushDto, messageId, customers, groups);
-
-                //保存微信消息
-                weCustomerMessageService.saveWeCustomerMessage(messageId, messageOriginalId, customerMessagePushDto, size, customerMessagePushDto.content());
-
-                //保存分类消息信息
-                weCustomerSeedMessageService.saveSeedMessage(customerMessagePushDto, messageId);
-
-
-                this.sendMessage(customerMessagePushDto,messageId,customers,groups);
-
-
 
             }
+
+        }
+
+        List<WeCustomer> customers = Lists.newArrayList();
+        List<WeGroup> groups = new ArrayList<>();
+        // 0 发给客户
+        if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_CUSTOMER)) {
+            //查询客户信息列表
+            if ("all".equals(customerMessagePushDto.getTag())) {
+                customers = externalUserIds(WeConstans.SEND_MESSAGE_CUSTOMER_ALL, customerMessagePushDto.getStaffId(), customerMessagePushDto.getDepartment(), customerMessagePushDto.getTag());
+            } else {
+                customers = externalUserIds(customerMessagePushDto.getPushRange(), customerMessagePushDto.getStaffId()
+                        , customerMessagePushDto.getDepartment(), customerMessagePushDto.getTag());
+            }
+
+
+            if (CollectionUtils.isEmpty(customers)) {
+                throw new WeComException("没有外部联系人");
+            }
+        }
+
+        // 1 发给客户群
+        if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_GROUP)) {
+            if (customerMessagePushDto.getStaffId() == null || customerMessagePushDto.getStaffId().equals("")) {
+                throw new WeComException("请选择人员！");
+            }
+            //通过员工id查询群列表
+            WeGroup weGroup = new WeGroup();
+            weGroup.setUserIds(customerMessagePushDto.getStaffId());
+            groups = weGroupService.selectWeGroupList(weGroup);
+            if (CollectionUtils.isEmpty(groups)) {
+                throw new WeComException("没有客户群！");
+            }
+        }
+
+        //保存原始数据信息表
+        long messageOriginalId = weCustomerMessageOriginalService.saveWeCustomerMessageOriginal(customerMessagePushDto);
+        long messageId = SnowFlakeUtil.nextId();
+
+        //保存映射信息
+        int size = weCustomerMessgaeResultService.workerMappingCustomer(customerMessagePushDto, messageId, customers, groups);
+
+        //保存微信消息
+        weCustomerMessageService.saveWeCustomerMessage(messageId, messageOriginalId, customerMessagePushDto, size, customerMessagePushDto.content());
+
+        //保存分类消息信息
+        weCustomerSeedMessageService.saveSeedMessage(customerMessagePushDto, messageId);
+
+        this.sendMessage(customerMessagePushDto,messageId,customers,groups);
 
     }
 
