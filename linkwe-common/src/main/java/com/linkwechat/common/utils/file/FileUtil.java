@@ -6,8 +6,6 @@ import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.utils.OsUtils;
 import com.linkwechat.common.utils.spring.SpringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
