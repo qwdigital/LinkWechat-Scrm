@@ -304,15 +304,17 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
 
     @Override
     public List<WeCustomer> getCustomerListById(String unionId, String fissionId) {
-        WeTaskFissionRecord weTaskFissionRecord;
+        List<WeCustomer> customerList = new LinkedList<>();
         if (StringUtils.isEmpty(unionId)) {
-            List<WeTaskFissionRecord> weTaskFissionRecords = weTaskFissionRecordService
-                    .list(new LambdaQueryWrapper<WeTaskFissionRecord>().eq(WeTaskFissionRecord::getTaskFissionId, fissionId));
-            return Optional.ofNullable(weTaskFissionRecords).orElseGet(ArrayList::new).stream()
-                    .map(record -> weCustomerService.selectWeCustomerById(record.getCustomerId()))
-                    .filter(Objects::nonNull).collect(Collectors.toList());
+            List<WeTaskFissionRecord> weTaskFissionRecords = weTaskFissionRecordService.list(new LambdaQueryWrapper<WeTaskFissionRecord>().eq(WeTaskFissionRecord::getTaskFissionId, fissionId));
+            if(CollectionUtil.isNotEmpty(weTaskFissionRecords)){
+                weTaskFissionRecords.forEach(record -> {
+                    WeCustomer weCustomer = weCustomerService.selectWeCustomerById(record.getCustomerId());
+                    customerList.add(weCustomer);
+                });
+            }
         } else {
-            weTaskFissionRecord = weTaskFissionRecordService
+            WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService
                     .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), unionId);
             Optional.ofNullable(weTaskFissionRecord).orElseThrow(() -> new WeComException("任务记录信息不存在"));
             List<WeFlowerCustomerRel> list = weFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
@@ -320,11 +322,10 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
             List<String> eidList = Optional.ofNullable(list).orElseGet(ArrayList::new).stream()
                     .map(WeFlowerCustomerRel::getExternalUserid).collect(Collectors.toList());
             if (CollectionUtil.isNotEmpty(eidList)) {
-                return weCustomerService.listByIds(eidList);
-            } else {
-                return null;
+                customerList.addAll(weCustomerService.listByIds(eidList));
             }
         }
+        return customerList;
     }
 
     @Override
@@ -366,7 +367,10 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
         long total = taskFission.getFissNum();
         List<WeCustomer> list = new ArrayList<>();
         if (taskFission.getFissionType() == 1) {
-            list.addAll(getCustomerListById(unionId, String.valueOf(taskFission.getId())));
+            List<WeCustomer> customerList = getCustomerListById(unionId, String.valueOf(taskFission.getId()));
+            if(CollectionUtil.isNotEmpty(customerList)){
+                list.addAll(customerList);
+            }
         } else {
             List<WeTaskFissionCompleteRecord> completeRecordList = weTaskFissionCompleteRecordService.getCompleteListByTaskId(taskFission.getId());
             if (CollectionUtil.isNotEmpty(completeRecordList)) {
@@ -379,7 +383,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                 });
             }
         }
-        return WeTaskFissionProgressVO.builder().total(total).completed(new Long(list.size())).customers(list).build();
+        return WeTaskFissionProgressVO.builder().total(total).completed((long) list.size()).customers(list).build();
     }
 
     /**

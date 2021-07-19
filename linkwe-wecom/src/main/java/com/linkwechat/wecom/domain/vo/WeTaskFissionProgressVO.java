@@ -1,6 +1,9 @@
 package com.linkwechat.wecom.domain.vo;
 
 import com.linkwechat.wecom.domain.WeCustomer;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,10 +18,16 @@ import java.util.List;
  * 客户任务进度和邀请列表
  * </p>
  */
+@ApiModel
 @Data
 @Builder
 public class WeTaskFissionProgressVO {
+    @ApiModelProperty("总数")
     private Long total;
+
+    @ApiModelProperty("完成数")
     private Long completed;
+
+    @ApiModelProperty("客户列表")
     private List<WeCustomer> customers;
 }
