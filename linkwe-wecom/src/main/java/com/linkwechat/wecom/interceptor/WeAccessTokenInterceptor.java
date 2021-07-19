@@ -2,6 +2,7 @@ package com.linkwechat.wecom.interceptor;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
@@ -15,7 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @description: 微信token拦截器
@@ -34,6 +38,9 @@ public class WeAccessTokenInterceptor implements Interceptor{
     @Autowired
     private WeComeConfig weComeConfig;
 
+    @Resource
+    private ForestConfiguration forestConfiguration;
+
 
 
     /**
@@ -41,9 +48,11 @@ public class WeAccessTokenInterceptor implements Interceptor{
      */
     @Override
     public boolean beforeExecute(ForestRequest request) {
-        String uri=request.getUrl().replace("http://","");
+        String weComServerUrl = String.valueOf(forestConfiguration.getVariableValue("weComServerUrl"));
+        String weComePrefix = String.valueOf(forestConfiguration.getVariableValue("weComePrefix"));
+        String uri=request.getUrl().replace(weComServerUrl+weComePrefix,"");
         log.info(">>>>>>>>>>>>>>>>>>>>>>>>uri：{}",uri);
-        //request.setContentType("application/json");
+
         if(!Arrays.asList(weComeConfig.getFileUplodUrl()).contains(uri)){
             request.setDataType(ForestDataType.JSON);
             request.setContentType("application/json");
@@ -59,26 +68,19 @@ public class WeAccessTokenInterceptor implements Interceptor{
             }else if(Arrays.asList(weComeConfig.getNeedChatTokenUrl()).contains(uri)){ //需要会话存档token
                 token=iWeAccessTokenService.findChatAccessToken();
             }else  if(Arrays.asList(weComeConfig.getThirdAppUrl()).contains(uri)){ //第三方自建应用token
-
-
                 token=iWeAccessTokenService.findThirdAppAccessToken(
-
                         StrUtil.isEmpty(request.getHeaderValue(WeConstans.THIRD_APP_PARAM_TIP))?(String) request.getQuery(WeConstans.THIRD_APP_PARAM_TIP):request.getHeaderValue(WeConstans.THIRD_APP_PARAM_TIP)
-
                 );
-
             } else{
                 token=iWeAccessTokenService.findCommonAccessToken();
             }
             if (uri.contains("ticket/get")){
                 request.addQuery("type","agent_config");
             }
-
             request.addQuery("access_token",token);
         }
         //添加服务器统一请求地址
-        request.setUrl(weComeConfig.getServerUrl()+weComeConfig.getWeComePrefix()+uri);
-
+       // request.setUrl(weComeConfig.getServerUrl()+weComeConfig.getWeComePrefix()+uri);
         return true;
     }
 

@@ -15,7 +15,7 @@ import java.util.Map;
  * @author: HaoN
  * @create: 2020-09-15 14:15
  **/
-@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
+@BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
 public interface WeCustomerClient {
 
     /**

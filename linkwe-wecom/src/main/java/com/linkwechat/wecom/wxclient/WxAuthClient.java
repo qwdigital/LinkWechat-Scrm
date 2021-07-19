@@ -12,8 +12,7 @@ import com.linkwechat.wecom.interceptor.WeiXinAuthInterceptor;
  * @description
  * @date 2021/4/5 15:47
  **/
-@BaseRequest(baseURL = "https://api.weixin.qq.com/sns",contentType = "application/json"
-        ,interceptor = WeiXinAuthInterceptor.class)
+@BaseRequest(baseURL = "${wxServerUrl}${wxPrefix}",contentType = "application/json",interceptor = WeiXinAuthInterceptor.class)
 public interface WxAuthClient {
     /**
      * 获取微信授权token

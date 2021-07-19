@@ -11,7 +11,7 @@ import com.linkwechat.wecom.interceptor.WeiXinAccessTokenInterceptor;
  * @description
  * @date 2021/4/5 17:11
  **/
-@BaseRequest(baseURL = "https://api.weixin.qq.com/cgi-bin",contentType = "application/json")
+@BaseRequest(baseURL = "${wxServerUrl}${weComePrefix}",contentType = "application/json")
 public interface WxCommonClient {
     /**
      * 获取微信token
