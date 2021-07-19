@@ -451,7 +451,8 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                     ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
                     NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(System.currentTimeMillis() + ".jpg", byteArrayOutputStream.toByteArray());
                     JSONObject fileInfo = FileUtil.upload(streamMultipartFile);
-                    return fileInfo.getString("imgUrlPrefix");
+                    log.info(">>>>>>>>>>>>fileInfo:{}",fileInfo.toJSONString());
+                    return fileInfo.getString("imgUrlPrefix")+fileInfo.getString("fileName");
                 } catch (Exception e) {
                     log.warn("生成海报二维码异常, record={}, customer={}, exception={}", JSONObject.toJSONString(record), JSONObject.toJSONString(weCustomer), ExceptionUtils.getStackTrace(e));
                     throw new WeComException("生成二维码异常");
