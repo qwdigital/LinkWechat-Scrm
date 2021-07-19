@@ -248,8 +248,8 @@ xss:
 elasticsearch:
   schema: http
   address: 
-  userName: "elastic"
-  password: "0p-0p-0p-"
+  userName: ""
+  password: ""
   connectTimeout: 10000
   socketTimeout: 10000
   connectionRequestTimeout: 10000
@@ -263,7 +263,7 @@ forest:
   max-retry-interval: 1000 #重试间隔时间
   connect-timeout: 3000 #链接超时时间
   timeout: 3000  # 请求超时时间
-  variables:
+  variables: #全局变量 企微和微信接口地址
     weComServerUrl: https://qyapi.weixin.qq.com/
     weComePrefix: cgi-bin
     wxServerUrl: https://api.weixin.qq.com/
