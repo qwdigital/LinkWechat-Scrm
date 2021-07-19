@@ -16,6 +16,7 @@ import com.linkwechat.common.utils.QREncode;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUploadUtils;
+import com.linkwechat.common.utils.file.FileUtil;
 import com.linkwechat.common.utils.img.NetFileUtils;
 import com.linkwechat.wecom.client.WeExternalContactClient;
 import com.linkwechat.wecom.domain.*;
@@ -65,15 +66,11 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
     @Autowired
     private IWeTaskFissionRecordService weTaskFissionRecordService;
     @Autowired
-    private IWeUserService weUserService;
-    @Autowired
     private WeExternalContactClient weExternalContactClient;
     @Autowired
     private IWePosterService wePosterService;
     @Autowired
     private IWeGroupCodeService weGroupCodeService;
-    @Autowired
-    private IWeMaterialService weMaterialService;
     @Autowired
     private IWeCustomerService weCustomerService;
     @Autowired
@@ -81,8 +78,6 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
     @Autowired
     private IWeTaskFissionCompleteRecordService weTaskFissionCompleteRecordService;
 
-    @Autowired
-    private CosConfig cosConfig;
     @Value("${H5.fissionUrl}")
     private String pageUrl;
     @Value("${H5.fissionGroupUrl}")
@@ -442,7 +437,6 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
     }
 
     private String getGroupFissionQrcode(Long taskFissionId, WeTaskFissionRecord record, WeCustomer weCustomer) {
-        String qrCode = null;
         if (weCustomer != null) {
             String avatarUrl = weCustomer.getAvatar();
             StringBuilder contentBuilder = new StringBuilder(pageGroupUrl);
@@ -456,13 +450,14 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                 try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
                     ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
                     NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(System.currentTimeMillis() + ".jpg", byteArrayOutputStream.toByteArray());
-                    qrCode = FileUploadUtils.upload2Cos(streamMultipartFile, cosConfig);
+                    JSONObject fileInfo = FileUtil.upload(streamMultipartFile);
+                    return fileInfo.getString("imgUrlPrefix");
                 } catch (Exception e) {
-                    log.warn("生成海报二维码异常, record={}, customer={}, exception={}", record, weCustomer, ExceptionUtils.getStackTrace(e));
+                    log.warn("生成海报二维码异常, record={}, customer={}, exception={}", JSONObject.toJSONString(record), JSONObject.toJSONString(weCustomer), ExceptionUtils.getStackTrace(e));
                     throw new WeComException("生成二维码异常");
                 }
             }
-            return cosConfig.getCosImgUrlPrefix() + qrCode;
+            throw new WeComException("生成二维码异常");
         } else {
             throw new WeComException("生成二维码异常,用户信息不存在");
         }
