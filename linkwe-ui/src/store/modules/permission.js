@@ -6,13 +6,13 @@ import View from '@/layout/components/View'
 const permission = {
   state: {
     routes: [],
-    addRoutes: [],
+    addRoutes: []
   },
   mutations: {
     SET_ROUTES: (state, routes) => {
       state.addRoutes = routes
       state.routes = constantRoutes.concat(routes)
-    },
+    }
   },
   actions: {
     // 生成路由
@@ -26,20 +26,22 @@ const permission = {
           resolve(accessedRoutes)
         })
       })
-    },
-  },
+    }
+  }
 }
 
 // 遍历后台传来的路由字符串，转换为组件对象
-function filterAsyncRouter(asyncRouterMap, level) {
-  return asyncRouterMap.filter((route) => {
+let level = 0
+function filterAsyncRouter(asyncRouterMap) {
+  level++
+  let res = asyncRouterMap.filter((route) => {
     if (route.component) {
       // Layout组件特殊处理
       if (route.component === 'Layout') {
         if (route.redirect === 'noRedirect' && route.children.length) {
           route.redirect = route.path + '/' + route.children[0].path
         }
-        if (level === 2) {
+        if (level != 1) {
           route.component = View
         } else {
           route.component = Layout
@@ -49,10 +51,12 @@ function filterAsyncRouter(asyncRouterMap, level) {
       }
     }
     if (route.children != null && route.children && route.children.length) {
-      route.children = filterAsyncRouter(route.children, 2)
+      route.children = filterAsyncRouter(route.children)
     }
     return true
   })
+  level--
+  return res
 }
 
 export const loadView = (view) => {
