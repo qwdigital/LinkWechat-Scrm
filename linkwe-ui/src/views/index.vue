@@ -131,35 +131,33 @@
           <p class="p1 p3 margint20">LinkWechat 企业微信SCRM</p>
           <p class="p2 p4">版本信息：开源 <span class="fr">可用期限：永久源</span></p>
           <el-row :gutter="20" type="flex" class="row-bg" justify="center" style="text-align:center">
-            <el-col :span="10" class="flexspan"> <img src="../assets/index/bzwd.png"/> 帮助手册</el-col>
+            <el-col :span="10" class="flexspan"> <img src="../assets/index/bzwd.png"/>
+            <a href="https://www.yuque.com/linkwechat/help"> 帮助手册</a>
+            </el-col>
             <el-col :span="2"></el-col>
-            <el-col :span="10" class="flexspan"><img src="../assets/index/kfsc.png"/> 开发文档</el-col>
+            <el-col :span="10" class="flexspan" @click.native="alerts('《使用手册》正在加急上线中，敬请关注…')"><img src="../assets/index/kfsc.png"/> 开发文档</el-col>
           </el-row>
         </div>
         <div class="inedx_r_top_bottom">
           <span class="inedx_r_top_bottomp1"><img src="../assets/index/gxrz.png"/> 更新日志</span>
-          <span class="fr" style="color:#0079DE">更多</span>
+          <span class="fr" style="color:#0079DE" @click="alerts('《更新日志》正在加急上线中，敬请关注…')">更多</span>
           <ul>
-            <li>即将上线，敬请期待 <span class="fr">03-26</span></li>
-            <li>即将上线，敬请期待 <span class="fr">03-26</span></li>
-            <li>即将上线，敬请期待 <span class="fr">03-26</span></li>
+               <li v-for="(index, i) in 3" :key="i"  @click="alerts('暂无内容')">即将上线，敬请期待 <span class="fr">03-26</span></li>
           </ul>
         </div>
         <div class="inedx_r_top_bottom">
-          <span class="inedx_r_top_bottomp1"><img src="../assets/index/qyxy.png"/> 企微学院</span>
-          <span class="fr" style="color:#199ed8">更多</span>
+          <span class="inedx_r_top_bottomp1"><img src="../assets/index/qyxy.png"/> 私域学院</span>
+          <span class="fr" style="color:#0079DE">更多</span>
           <ul>
-            <li>即将上线，敬请期待 <span class="fr">03-26</span></li>
-            <li>即将上线，敬请期待 <span class="fr">03-26</span></li>
-            <li>即将上线，敬请期待 <span class="fr">03-26</span></li>
+            <li v-for="(index, i) in 3" :key="i"  @click="alerts('暂无内容')">即将上线，敬请期待 <span class="fr">03-26</span></li>
           </ul>
         </div>
         <div class="inedx_r_top_bottom" style="text-align:center">
-          <p style="text-align:left"> <span class="inedx_r_top_bottomp1"> <img src="../assets/index/kfq.png"/>  开发群</span></p>
+          <p style="text-align:left"> <span class="inedx_r_top_bottomp1"> <img src="../assets/index/kfq.png"/>  官方交流</span></p>
           <img :src="bossImg" class="img" />
         </div>
         <div class="inedx_r_top_bottom" style="text-align:center">
-          <p style="text-align:left"> <span class="inedx_r_top_bottomp1"> <img src="../assets/index/khq.png"/> 客户群</span></p>
+          <p style="text-align:left"> <span class="inedx_r_top_bottomp1"> <img src="../assets/index/khq.png"/> 联系客服</span></p>
           <img :src="bossImg" class="img" />
         </div>
       </div>
@@ -244,6 +242,13 @@
       }
     },
     methods: {
+      alerts(message){
+          this.$message({
+          message: message,
+          center: true,
+            type: 'success'
+        });
+      },
       carLink(e) {
         this.$router.push(e)
       },
