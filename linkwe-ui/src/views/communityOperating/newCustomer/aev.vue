@@ -1,135 +1,3 @@
-<template>
-  <div class="wrap" v-loading="loading">
-    <el-form :model="form" ref="form" :rules="rules" label-width="100px">
-      <el-form-item label="活码名称" prop="codeName">
-        <el-input
-          v-model="form.codeName"
-          maxlength="30"
-          show-word-limit
-          placeholder="请输入"
-          clearable
-        />
-      </el-form-item>
-      <el-form-item label="使用员工" prop="users">
-        <!-- closable -->
-        <el-tag
-          size="medium"
-          v-for="(user, index) in users"
-          :key="index"
-          >{{ user.businessName }}</el-tag
-        >
-        <el-button
-          type="primary"
-          plain
-          class="ml10"
-          icon="el-icon-plus"
-          size="mini"
-          @click="dialogVisibleSelectUser = true"
-          >{{ users.length ? '修改' : '添加' }}</el-button
-        >
-      </el-form-item>
-
-      <el-form-item label="加群引导语" prop="welcomeMsg">
-        <el-input
-          type="textarea"
-          v-model="form.welcomeMsg"
-          maxlength="220"
-          show-word-limit
-          :autosize="{ minRows: 5, maxRows: 20 }"
-          placeholder="请输入"
-          clearable
-        />
-      </el-form-item>
-      <el-form-item label="选择群活码">
-        <el-image v-if="groupQrCode && groupQrCode.codeUrl" :src="groupQrCode.codeUrl" class="code-image">
-        </el-image>
-
-        <el-button
-          type="primary"
-          plain
-          class="ml10"
-          icon="el-icon-plus"
-          size="mini"
-          @click="dialogVisibleSelectQrCode = true"
-          >{{ groupQrCode && groupQrCode.codeUrl ? '修改' : '选择' }}</el-button
-        >
-      </el-form-item>
-      <el-form-item label="新客户标签" prop="tags">
-        <!-- closable -->
-        <el-tag
-          size="medium"
-          v-for="(tag, index) in tags"
-          :key="index"
-          >{{ tag.tagName }}</el-tag
-        >
-        <el-button
-          type="primary"
-          class="ml10"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="dialogVisibleSelectTag = true"
-          >添加标签</el-button
-        >
-        <!-- <div class="tip">
-          根据使用场景做标签记录，扫码添加的客户，可自动打上标签
-        </div> -->
-      </el-form-item>
-      <el-form-item label="添加设置" prop="skipVerify">
-        <el-checkbox
-          :true-label="1"
-          :false-label="0"
-          v-model="form.skipVerify"
-          >客户添加时无需经过确认自动成为好友</el-checkbox
-        >
-      </el-form-item>
-      <el-form-item label=" ">
-        <el-button type="primary" @click="submit">保存</el-button>
-        <el-button @click="$router.back()">取消</el-button>
-      </el-form-item>
-    </el-form>
-
-    <div class="preview-wrap">
-      <!-- 预览 -->
-      <div class="tip">欢迎语样式</div>
-
-      <PhoneDialog
-        :message="form.welcomeMsg || '请输入加群引导语'"
-        :isOther="(groupQrCode && groupQrCode.codeUrl) ? true : false"
-      >
-        <el-image style="border-radius: 6px; width: 100px;" :src="groupQrCode.codeUrl" fit="fit">
-        </el-image>
-      </PhoneDialog>
-    </div>
-
-    <!-- 选择使用员工弹窗 -->
-    <SelectUser
-      :key="form.codeType"
-      :visible.sync="dialogVisibleSelectUser"
-      title="选择使用员工"
-      :isOnlyLeaf="form.codeType !== 2"
-      :isSigleSelect="form.codeType == 1"
-      @success="submitSelectUser"
-    ></SelectUser>
-
-    <!-- 选择标签弹窗 -->
-    <SelectTag
-      :visible.sync="dialogVisibleSelectTag"
-      :selected="tags"
-      @success="submitSelectTag"
-    >
-    </SelectTag>
-
-    <!-- 选择二维码弹窗 -->
-    <SelectQrCode
-      :visible.sync="dialogVisibleSelectQrCode"
-      @success="submitSelectQrCode"
-      :selected="codes"
-    >
-    </SelectQrCode>
-  </div>
-</template>
-
 <script>
 import { getDetail, add, update } from '@/api/communityOperating/newCustomer'
 import PhoneDialog from '@/components/PhoneDialog'
@@ -152,7 +20,7 @@ export default {
         welcomeMsg: '', //加群引导语
         groupCodeId: undefined, // 群活码ID
         tagList: [], // 客户标签
-        skipVerify: 0, // 无需确认自动加好友
+        skipVerify: 0 // 无需确认自动加好友
       },
       tags: [],
       users: [],
@@ -166,10 +34,10 @@ export default {
           { required: true, message: '该项为必填项', trigger: 'blur' }
         ],
         tagList: [
-          { required: true, message: '该项为必填项', trigger: 'change' },
+          { required: true, message: '该项为必填项', trigger: 'change' }
         ],
         groupCodeId: [
-          { required: true, message: '该项为必填项', trigger: 'blur' },
+          { required: true, message: '该项为必填项', trigger: 'blur' }
         ],
         welcomeMsg: [
           { required: true, message: '该项为必填项', trigger: 'blur' }
@@ -189,33 +57,33 @@ export default {
   created() {
     this.newGroupId = this.$route.query.id
     this.newGroupId && this.getDetail(this.newGroupId)
-    this.$route.meta.title = (this.newGroupId ? '编辑' : '新建') + '新客自动拉群'
+    this.$route.meta.title =
+      (this.newGroupId ? '编辑' : '新建') + '新客自动拉群'
   },
   methods: {
     /** 获取详情 */
     getDetail(id) {
       this.loading = true
-      getDetail(id)
-        .then(({ data }) => {
-          this.form.codeName = data.codeName || ''
-          this.form.skipVerify = data.skipVerify || 0
-          this.form.welcomeMsg = data.welcomeMsg || ''
+      getDetail(id).then(({ data }) => {
+        this.form.codeName = data.codeName || ''
+        this.form.skipVerify = data.skipVerify || 0
+        this.form.welcomeMsg = data.welcomeMsg || ''
 
-          if (data.groupCodeInfo && data.groupCodeInfo.id) {
-            this.codes = [ data.groupCodeInfo ]
-            this.groupQrCode = data.groupCodeInfo
-            this.form.groupCodeId = data.groupCodeInfo.id
-          } else {
-            this.codes = []
-            this.groupQrCode = {}
-            this.form.groupCodeId = ''
-          }
+        if (data.groupCodeInfo && data.groupCodeInfo.id) {
+          this.codes = [data.groupCodeInfo]
+          this.groupQrCode = data.groupCodeInfo
+          this.form.groupCodeId = data.groupCodeInfo.id
+        } else {
+          this.codes = []
+          this.groupQrCode = {}
+          this.form.groupCodeId = ''
+        }
 
-          this.tags = data.tagList || []
-          this.users = data.emplList || []
+        this.tags = data.tagList || []
+        this.users = data.emplList || []
 
-          this.loading = false
-        })
+        this.loading = false
+      })
     },
     // 选择人员变化事件
     submitSelectUser(users) {
@@ -278,12 +146,7 @@ export default {
 
 <template>
   <div class="wrap" v-loading="loading">
-    <el-form
-      :model="form"
-      ref="form"
-      :rules="rules"
-      label-width="100px"
-    >
+    <el-form :model="form" ref="form" :rules="rules" label-width="100px">
       <el-form-item label="活码名称" prop="codeName">
         <el-input
           v-model="form.codeName"
@@ -295,12 +158,9 @@ export default {
       </el-form-item>
       <el-form-item label="使用员工" prop="emplList">
         <!-- closable -->
-        <el-tag
-          size="medium"
-          v-for="(user, index) in users"
-          :key="index"
-          >{{ user.businessName }}</el-tag
-        >
+        <el-tag size="medium" v-for="(user, index) in users" :key="index">{{
+          user.businessName
+        }}</el-tag>
         <el-button
           type="primary"
           plain
@@ -339,12 +199,9 @@ export default {
       </el-form-item>
       <el-form-item label="新客户标签" prop="tags">
         <!-- closable -->
-        <el-tag
-          size="medium"
-          v-for="(tag, index) in tags"
-          :key="index"
-          >{{ tag.tagName }}</el-tag
-        >
+        <el-tag size="medium" v-for="(tag, index) in tags" :key="index">{{
+          tag.tagName
+        }}</el-tag>
         <el-button
           type="primary"
           :class="tags.length > 0 ? 'ml10' : ''"
@@ -359,10 +216,7 @@ export default {
         </div> -->
       </el-form-item>
       <el-form-item label="添加设置" prop="skipVerify">
-        <el-checkbox
-          :true-label="1"
-          :false-label="0"
-          v-model="form.skipVerify"
+        <el-checkbox :true-label="1" :false-label="0" v-model="form.skipVerify"
           >客户添加时无需经过确认自动成为好友</el-checkbox
         >
       </el-form-item>
@@ -377,7 +231,7 @@ export default {
       <div class="tip">欢迎语样式</div>
       <PhoneDialog
         :message="form.welcomeMsg || '请输入加群引导语'"
-        :isOther="(groupQrCode && groupQrCode.codeUrl) ? true : false"
+        :isOther="groupQrCode && groupQrCode.codeUrl ? true : false"
       >
         <el-image
           class="phone-dialog-image"

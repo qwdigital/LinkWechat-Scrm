@@ -239,7 +239,6 @@ export default {
         prop="emplList"
         label="使用员工"
         align="center"
-        prop="qrCode"
         width="130"
       >
         <template #default="{ row }">
