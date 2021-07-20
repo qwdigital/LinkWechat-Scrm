@@ -169,10 +169,10 @@ export default {
       })
     },
     goRoute() {
-      const path = this.activeName === '0' ? '/material/text' : '/material/image'
+      const pathName = this.activeName === '0' ? 'Text' : 'Image'
 
       this.$router.push({
-        path: path,
+        name: pathName,
       })
     },
     removeImage(url) {
