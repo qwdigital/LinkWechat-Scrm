@@ -4,7 +4,7 @@ import {
   remove,
   batchAdd,
   downloadBatch,
-  download,
+  download
 } from '@/api/drainageCode/staff'
 import SelectUser from '@/components/SelectUser'
 import ClipboardJS from 'clipboard'
@@ -22,7 +22,7 @@ export default {
         scenario: undefined,
         createBy: undefined,
         beginTime: undefined,
-        endTime: undefined,
+        endTime: undefined
       },
       // 日期范围
       dateRange: [],
@@ -41,12 +41,18 @@ export default {
         qrcode: '',
         isJoinConfirmFriends: 0,
         weEmpleCodeTags: [],
-        weEmpleCodeUseScops: [],
-      },
+        weEmpleCodeUseScops: []
+      }
     }
   },
   created() {
     this.getList()
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>支持单人、批量单人及多人方式新建员工活码，客户可以通过扫描员工活码添加员工为好友，并支持自动给客户打标签和发送欢迎语。</div>
+      `
+    )
   },
   mounted() {
     var clipboard = new ClipboardJS('.copy-btn')
@@ -54,7 +60,7 @@ export default {
       this.$notify({
         title: '成功',
         message: '链接已复制到剪切板，可粘贴。',
-        type: 'success',
+        type: 'success'
       })
     })
     clipboard.on('error', (e) => {
@@ -91,7 +97,7 @@ export default {
       this.getList(1)
     },
     goRoute(path, id) {
-      this.$router.push({ path: '/drainageCode/' + path, query: { id } })
+      this.$router.push({ path: path, query: { id } })
     },
 
     // 多选框选中数据
@@ -104,7 +110,7 @@ export default {
       this.$confirm('是否确认删除?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(function() {
           return remove(ids)
@@ -121,7 +127,7 @@ export default {
         return {
           businessId: d.id || d.userId,
           businessName: d.name,
-          businessIdType: d.userId ? 2 : 1,
+          businessIdType: d.userId ? 2 : 1
         }
       })
       batchAdd(this.form).then(({ data }) => {
@@ -148,7 +154,7 @@ export default {
       this.$confirm('是否确认下载所有图片吗?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(() => {
           return downloadBatch(this.ids + '')
@@ -166,8 +172,8 @@ export default {
           }
         })
         .catch(function() {})
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -243,12 +249,12 @@ export default {
     </el-form>
 
     <div class="mid-action">
-      <div class="total">
+      <!-- <div class="total">
         己选
         <span class="num">{{ total }}</span> 条，当前已经配置
         <span class="num">{{ total }}</span> 个 最多配置
         <span class="num">{{ total }}</span> 个
-      </div>
+      </div> -->
       <div>
         <el-button
           v-hasPermi="['wecom:code:add']"
@@ -257,13 +263,13 @@ export default {
           @click="goRoute('staffAdd')"
           >新建员工活码</el-button
         >
-        <el-button
+        <!-- <el-button
           v-hasPermi="['wecom:code:batchAdd']"
           type="primary"
           size="mini"
           @click="dialogVisible = true"
           >批量新建</el-button
-        >
+        > -->
         <el-button
           v-hasPermi="['wecom:code:remove']"
           type="primary"
@@ -285,6 +291,7 @@ export default {
       v-loading="loading"
       :data="list"
       @selection-change="handleSelectionChange"
+      max-height="600"
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="样式" align="center" prop="qrCode">
@@ -382,24 +389,4 @@ export default {
   </div>
 </template>
 
-<style lang="scss" scoped>
-.mid-action {
-  display: flex;
-  justify-content: space-between;
-  margin: 10px 0;
-  align-items: center;
-  .total {
-    background-color: rgba(65, 133, 244, 0.1);
-    border: 1px solid rgba(65, 133, 244, 0.2);
-    border-radius: 3px;
-    font-size: 14px;
-    min-height: 32px;
-    line-height: 32px;
-    padding: 0 12px;
-    color: #606266;
-  }
-  .num {
-    color: #00f;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

@@ -3,7 +3,7 @@ import {
   getList,
   exportCustomer,
   lossRemind,
-  getLossRemindStatus,
+  getLossRemindStatus
 } from '@/api/customer'
 import { getList as getListTag } from '@/api/customer/tag'
 import { getList as getListOrganization } from '@/api/organization'
@@ -24,53 +24,18 @@ export default {
         tagIds: '', // "标签id,多个标签，id使用逗号隔开",
         beginTime: '', // "开始时间",
         endTime: '', // "结束时间"
-        status: 1,
+        status: 1
       },
       queryTag: [], // 搜索框选择的标签
       queryUser: [], // 搜索框选择的添加人
       dateRange: [], // 添加日期
-      // 日期快捷选项
-      pickerOptions: {
-        disabledDate(time) {
-          return time.getTime() > Date.now()
-        },
-        shortcuts: [
-          {
-            text: '最近一周',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-              picker.$emit('pick', [start, end])
-            },
-          },
-          {
-            text: '最近一个月',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-              picker.$emit('pick', [start, end])
-            },
-          },
-          {
-            text: '最近三个月',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-              picker.$emit('pick', [start, end])
-            },
-          },
-        ],
-      },
       loading: false,
       isMoreFilter: false,
       total: 0,
       // 添加标签表单
       form: {
         gourpName: '',
-        weTags: [],
+        weTags: []
       },
       list: [], // 客户列表
       listOrganization: [], // 组织架构列表
@@ -82,9 +47,9 @@ export default {
       removeTag: [], // 可移除的标签
       tagDialogType: {
         title: '', // 选择标签弹窗标题
-        type: '', // 弹窗类型
+        type: '' // 弹窗类型
       },
-      isNotice: '0',
+      isNotice: '0'
     }
   },
   watch: {},
@@ -94,6 +59,13 @@ export default {
     this.getListTag()
     this.getListOrganization()
     this.getLossRemindStatus()
+
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>当企业成员被客户删除时，会在流失列表中产生一条记录，开启删除通知后，被删除的成员会收到一条推送</div>
+      `
+    )
   },
   mounted() {},
   methods: {
@@ -143,7 +115,7 @@ export default {
       this.selectedTag = this.queryTag
       this.tagDialogType = {
         title: '选择标签',
-        type: 'query',
+        type: 'query'
       }
       this.dialogVisible = true
     },
@@ -153,7 +125,7 @@ export default {
       this.$confirm('是否确认导出所有客户数据项?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(function() {
           return exportCustomer(queryParams)
@@ -190,8 +162,8 @@ export default {
       lossRemind(val).then(() => {
         this.msgSuccess('操作成功')
       })
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -255,13 +227,13 @@ export default {
         >
         <el-button
           v-hasPermi="['customerManage:customer:query']"
-          type="info"
+          type="success"
           @click="resetForm()"
           >重置</el-button
         >
         <el-button
           v-hasPermi="['customerManage:customer:export']"
-          type="cyan"
+          type="info"
           @click="exportCustomer"
           >导出列表</el-button
         >
@@ -281,14 +253,6 @@ export default {
           inactive-color="#ff4949"
           @change="remindSwitch"
         ></el-switch>
-        <el-tooltip
-          class="item"
-          effect="dark"
-          content="开启后，当员工被客户删除时，被删除的员工将收到一条消息提醒"
-          placement="top-end"
-        >
-          <i class="el-icon-warning-outline"></i>
-        </el-tooltip>
       </div>
     </div>
 
@@ -315,7 +279,7 @@ export default {
           <i
             :class="[
               'el-icon-s-custom',
-              { 1: 'man', 2: 'woman' }[scope.row.gender],
+              { 1: 'man', 2: 'woman' }[scope.row.gender]
             ]"
           ></i>
         </template>
@@ -356,8 +320,8 @@ export default {
             v-hasPermi="['customerManage:customer:view']"
             @click="
               $router.push({
-                path: '/customerManage/customerDetail',
-                query: { id: scope.row.externalUserid },
+                path: 'customerDetail',
+                query: { id: scope.row.externalUserid }
               })
             "
             type="text"
@@ -397,40 +361,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.tag-input {
-  width: 240px;
-  display: flex;
-  border-radius: 4px;
-  border: 1px solid #dcdfe6;
-  align-items: center;
-  padding: 0 15px;
-  overflow: hidden;
-  height: 32px;
-  .tag-place {
-    color: #bbb;
-    font-size: 14px;
-  }
-}
-.mid-action {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  align-items: center;
-  background: #fff;
-  .total {
-    background-color: rgba(65, 133, 244, 0.1);
-    border: 1px solid rgba(65, 133, 244, 0.2);
-    border-radius: 3px;
-    font-size: 14px;
-    min-height: 32px;
-    line-height: 32px;
-    padding: 0 12px;
-    color: #606266;
-  }
-  .num {
-    color: #00f;
-  }
-}
 .el-icon-s-custom {
   font-size: 16px;
   margin-left: 4px;

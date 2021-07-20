@@ -19,53 +19,18 @@ export default {
         userIds: '', // "添加人id",
         tagIds: '', // "标签id,多个标签，id使用逗号隔开",
         beginTime: '', // "开始时间",
-        endTime: '', // "结束时间"
+        endTime: '' // "结束时间"
       },
       queryTag: [], // 搜索框选择的标签
       queryUser: [], // 搜索框选择的添加人
       dateRange: [], // 添加日期
-      // 日期快捷选项
-      pickerOptions: {
-        disabledDate(time) {
-          return time.getTime() > Date.now()
-        },
-        shortcuts: [
-          {
-            text: '最近一周',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-              picker.$emit('pick', [start, end])
-            },
-          },
-          {
-            text: '最近一个月',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-              picker.$emit('pick', [start, end])
-            },
-          },
-          {
-            text: '最近三个月',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-              picker.$emit('pick', [start, end])
-            },
-          },
-        ],
-      },
       loading: false,
       isMoreFilter: false,
       total: 0,
       // 添加标签表单
       form: {
         gourpName: '',
-        weTags: [],
+        weTags: []
       },
       list: [], // 客户列表
       listOrganization: [], // 组织架构列表
@@ -78,8 +43,8 @@ export default {
       removeTag: [], // 可移除的标签
       tagDialogType: {
         title: '', // 选择标签弹窗标题
-        type: '', // 弹窗类型
-      },
+        type: '' // 弹窗类型
+      }
     }
   },
   watch: {},
@@ -88,6 +53,13 @@ export default {
     this.getList()
     this.getListTag()
     this.getListOrganization()
+
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>用于查看当前企业所有的客户列表及详细信息，支持对客户进行打标签。</div>
+      `
+    )
   },
   mounted() {},
   methods: {
@@ -126,7 +98,7 @@ export default {
           this.$refs.selectTag.getList()
           this.form = {
             gourpName: '',
-            weTags: [],
+            weTags: []
           }
         }
       })
@@ -140,7 +112,7 @@ export default {
       this.selectedTag = this.queryTag
       this.tagDialogType = {
         title: '选择标签',
-        type: 'query',
+        type: 'query'
       }
       this.dialogVisible = true
       // this.$refs.selectTag.$forceUpdate()
@@ -197,7 +169,7 @@ export default {
         title:
           (type === 'add' ? '增加标签' : '移出标签') +
           (repeat.length ? '（重复的标签已去重显示）' : ''),
-        type: type,
+        type: type
       }
       this.dialogVisible = true
       // this.$refs.selectTag.$forceUpdate()
@@ -207,7 +179,7 @@ export default {
         lock: true,
         text: 'Loading',
         spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.7)',
+        background: 'rgba(0, 0, 0, 0.7)'
       })
       api
         .sync()
@@ -226,7 +198,7 @@ export default {
       this.$confirm('是否确认导出所有客户数据项?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(function() {
           return api.exportCustomer(queryParams)
@@ -249,11 +221,11 @@ export default {
       } else {
         let data = {
           externalUserid: this.multipleSelection[0].externalUserid,
-          addTag: selected,
+          addTag: selected
         }
         let apiType = {
           add: 'makeLabel',
-          remove: 'removeLabel',
+          remove: 'removeLabel'
         }
         api[apiType[this.tagDialogType.type]](data).then(() => {
           this.msgSuccess('操作成功')
@@ -280,7 +252,13 @@ export default {
         this.$refs.table.toggleRowSelection(row, true)
       })
     },
-  },
+    goRoute(row) {
+      this.$router.push({
+        path: 'customerDetail',
+        query: { id: row.externalUserid }
+      })
+    }
+  }
 }
 </script>
 
@@ -344,13 +322,13 @@ export default {
         >
         <el-button
           v-hasPermi="['customerManage:customer:query']"
-          type="info"
+          type="success"
           @click="resetForm()"
           >重置</el-button
         >
         <el-button
           v-hasPermi="['customerManage:customer:export']"
-          type="cyan"
+          type="info"
           @click="exportCustomer"
           >导出列表</el-button
         >
@@ -358,17 +336,30 @@ export default {
     </el-form>
 
     <div class="mid-action">
-      <div class="total">
-        共
+      <div>
+        <!-- 共
         <span class="num">{{ total }}</span> 位客户，实际客户
-        <span class="num">{{ total }}</span> 位。
+        <span class="num">{{ total }}</span> 位。 -->
+        <el-button
+          v-hasPermi="['customerManage:customer:sync']"
+          v-preventReClick
+          type="primary"
+          @click="sync"
+          >同步客户</el-button
+        >
+        <el-button
+          v-hasPermi="['customerManage:customer:checkRepeat']"
+          type="primary"
+          >查看重复客户</el-button
+        >
+        <!-- <div>
+          最近同步：2021-05-17 15:05:43
+        </div> -->
       </div>
       <div>
         <el-button
           v-hasPermi="['customerManage/customer:makeTag']"
           type="primary"
-          size="mini"
-          icon="el-icon-s-flag"
           @click="makeTag('add')"
           :disabled="multipleSelection.length !== 1"
           >打标签</el-button
@@ -376,26 +367,9 @@ export default {
         <el-button
           v-hasPermi="['customerManage:customer:removeTag']"
           type="primary"
-          size="mini"
-          icon="el-icon-brush"
           @click="makeTag('remove')"
           :disabled="multipleSelection.length !== 1"
           >移除标签</el-button
-        >
-        <el-button
-          v-hasPermi="['customerManage:customer:sync']"
-          type="primary"
-          size="mini"
-          icon="el-icon-refresh"
-          @click="sync"
-          >同步客户</el-button
-        >
-        <el-button
-          v-hasPermi="['customerManage:customer:checkRepeat']"
-          type="primary"
-          size="mini"
-          icon="el-icon-view"
-          >查看重复客户</el-button
         >
       </div>
     </div>
@@ -414,18 +388,19 @@ export default {
         width="55"
       ></el-table-column>
       <el-table-column label="客户" prop="name" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.name }}
-          <span
-            :style="{ color: scope.row.type === 1 ? '#4bde03' : '#f9a90b' }"
-            >{{ { 1: '@微信', 2: '@企业微信' }[scope.row.type] }}</span
-          >
-          <i
-            :class="[
-              'el-icon-s-custom',
-              { 1: 'man', 2: 'woman' }[scope.row.gender],
-            ]"
-          ></i>
+        <template slot-scope="{ row }">
+          <div class="cp" @click="goRoute(row)">
+            {{ row.name }}
+            <span :style="{ color: row.type === 1 ? '#4bde03' : '#f9a90b' }">{{
+              { 1: '@微信', 2: '@企业微信' }[row.type]
+            }}</span>
+            <i
+              :class="[
+                'el-icon-s-custom',
+                { 1: 'man', 2: 'woman' }[row.gender]
+              ]"
+            ></i>
+          </div>
         </template>
       </el-table-column>
       <el-table-column
@@ -434,25 +409,22 @@ export default {
         align="center"
       ></el-table-column>
       <el-table-column prop="userName" label="添加人（首位）" align="center">
-        <template slot-scope="scope">{{
-          scope.row.weFlowerCustomerRels[0]
-            ? scope.row.weFlowerCustomerRels[0].userName
+        <template slot-scope="{ row }">{{
+          row.weFlowerCustomerRels[0]
+            ? row.weFlowerCustomerRels[0].userName
             : ''
         }}</template>
       </el-table-column>
       <el-table-column prop="createTime" label="添加时间" align="center">
-        <template slot-scope="scope">{{
-          scope.row.weFlowerCustomerRels[0]
-            ? scope.row.weFlowerCustomerRels[0].createTime
+        <template slot-scope="{ row }">{{
+          row.weFlowerCustomerRels[0]
+            ? row.weFlowerCustomerRels[0].createTime
             : ''
         }}</template>
       </el-table-column>
       <el-table-column prop="address" label="标签" align="center">
-        <template slot-scope="scope">
-          <div
-            v-for="(item, index) in scope.row.weFlowerCustomerRels"
-            :key="index"
-          >
+        <template slot-scope="{ row }">
+          <div v-for="(item, index) in row.weFlowerCustomerRels" :key="index">
             <el-tag
               type="info"
               v-for="(unit, unique) in item.weFlowerCustomerTagRels"
@@ -463,15 +435,10 @@ export default {
         </template>
       </el-table-column>
       <el-table-column label="操作" width="100">
-        <template slot-scope="scope">
+        <template slot-scope="{ row }">
           <el-button
             v-hasPermi="['customerManage:customer:view']"
-            @click="
-              $router.push({
-                path: '/customerManage/customerDetail',
-                query: { id: scope.row.externalUserid },
-              })
-            "
+            @click="goRoute(row)"
             type="text"
             size="small"
             >查看</el-button
@@ -522,40 +489,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.tag-input {
-  width: 240px;
-  display: flex;
-  border-radius: 4px;
-  border: 1px solid #dcdfe6;
-  align-items: center;
-  padding: 0 15px;
-  overflow: hidden;
-  height: 32px;
-  .tag-place {
-    color: #bbb;
-    font-size: 14px;
-  }
-}
-.mid-action {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  align-items: center;
-  background: #fff;
-  .total {
-    background-color: rgba(65, 133, 244, 0.1);
-    border: 1px solid rgba(65, 133, 244, 0.2);
-    border-radius: 3px;
-    font-size: 14px;
-    min-height: 32px;
-    line-height: 32px;
-    padding: 0 12px;
-    color: #606266;
-  }
-  .num {
-    color: #00f;
-  }
-}
 .el-icon-s-custom {
   font-size: 16px;
   margin-left: 4px;

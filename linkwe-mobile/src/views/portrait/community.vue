@@ -2,7 +2,6 @@
   <div>
     <!-- 头部 -->
     <div class="header">
-      
       <span class="title"> 社群关系 </span>
       <van-icon
         name="cross"
@@ -96,13 +95,16 @@ export default {
       groupChat: [], // 添加的群聊
       commonGroup: [], // 共同的群聊
       //   externalUserid: "wmiGuBCgAAIH-T9ekaE-Q52N2lKWeInw",
-      externalUserid: '',
-      userid: this.$store.state.userId, // 员工Id
+      externalUserid: ''
+    }
+  },
+  computed: {
+    userId() {
+      return this.$store.state.userId // 员工Id
     }
   },
   created() {
     this.externalUserid = this.$route.query.customerId
-
     this.findAddaddEmployes()
     this.findAddGroupNum()
   },
@@ -139,7 +141,7 @@ export default {
     findAddGroupNum() {
       findAddGroupNum({
         externalUserid: this.externalUserid,
-        userId: this.userId,
+        userId: this.userId
       })
         .then(({ data }) => {
           //   console.log(data);
@@ -170,8 +172,8 @@ export default {
       var m =
         date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
       return Y + M + D + h + m
-    },
-  },
+    }
+  }
 }
 </script>
 

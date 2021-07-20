@@ -37,7 +37,7 @@ export default {
         rewardImageUrl: '',
         rewardRule: '',
       },
-      rewardImageUrlTemp: '',
+      // rewardImageUrlTemp: '',
       action:
         process.env.VUE_APP_BASE_API +
         window.CONFIG.services.wecom +
@@ -47,10 +47,12 @@ export default {
         taskName: [
           { required: true, message: '请输入活动名称', trigger: 'blur' },
         ],
-        postersId: [{ required: true, message: '请输入海报', trigger: 'blur' }],
+        postersId: [{ required: true, message: '请选择海报', trigger: 'blur' }],
+        fissionTargetId: [{ required: true, message: '请选择群活码', trigger: 'blur' }],
         fissNum: [
           { required: true, message: '请输入数量', trigger: 'blur' },
-          { pattern: /^[1-9]+$/, message: '请输入数字', trigger: 'blur' },
+          // { pattern: /^[1-9]+$/, message: '请输入数字', trigger: 'blur' },
+          { pattern: /^[1-9]\d*$/, message: '请输入数字', trigger: 'blur' },
         ],
         dateRange: [
           { required: true, message: '时间不可为空', trigger: 'blur' },
@@ -59,7 +61,7 @@ export default {
       dialogVisibleSelectUser: false,
       dialogVisibleSelectTag: false,
       dialogVisibleSelectPoster: false,
-      dialogVisibleTargetStff: false,
+      dialogVisibleSelectGroupCode: false,
       selectTagType: '',
       pageType: 'add',
       taskDetail: {},
@@ -243,17 +245,17 @@ export default {
     },
     handleAvatarSuccess(res, file) {
       //   this.rewardImageUrlTemp = URL.createObjectURL(file.raw) //预览
-      this.rewardImageUrlTemp = this.groupForm.rewardImageUrl =
-        res.data.rewardImageUrl
+      this.groupForm.rewardImageUrl = res.data.rewardImageUrl
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === 'image/jpeg'
+      const isPNG = file.type === 'image/png'
 
-      if (!isJPG) {
-        this.$message.error('上传头像图片只能是 JPG 格式!')
+      if (!isJPG && !isPNG) {
+        this.$message.error('上传头像图片只能是 JPG/PNG 格式!')
       }
 
-      return isJPG
+      return isJPG || isPNG
     },
   },
   computed:{
@@ -273,8 +275,9 @@ export default {
         :model="query"
         :rules="ruleForm"
         ref="ruleForm"
-        label-width="150px"
+        label-width="120px"
         class="top-search"
+        labelPosition="left"
       >
         <el-form-item label="群裂变名称" prop="taskName">
           <el-input v-model="query.taskName" placeholder="请输入"></el-input>
@@ -307,9 +310,10 @@ export default {
       <el-form
         :model="query"
         :rules="ruleForm"
-        label-width="150px"
+        label-width="120px"
         ref="fissStaff"
         class="top-search"
+        labelPosition="left"
       >
         <el-form-item label="发起成员" prop="taskNames">
           <el-radio-group v-model="groupForm.sendType" @change="changeType">
@@ -332,7 +336,7 @@ export default {
             icon="el-icon-plus"
             size="mini"
             @click="dialogVisibleSelectUser = true"
-            >选择群活码</el-button
+            >选择群主</el-button
           >
         </el-form-item>
         <!-- <el-form-item label="客户标签" prop="tagType">
@@ -365,8 +369,9 @@ export default {
         :model="groupForm"
         :rules="ruleForm"
         ref="fissTarget"
-        label-width="150px"
+        label-width="120px"
         class="top-search"
+        labelPosition="left"
       >
         <el-form-item label="选择海报" prop="postersId">
           <el-button
@@ -387,7 +392,7 @@ export default {
           </div>
         </el-form-item>
 
-        <el-form-item label="添加员工">
+        <el-form-item label="群活码" prop="fissionTargetId">
           <el-button
             type="primary"
             class="ml10"
@@ -395,18 +400,15 @@ export default {
             icon="el-icon-plus"
             size="mini"
             v-if="!groupForm.fissionTargetId"
-            @click="dialogVisibleTargetStff = true"
-            >添加员工</el-button
+            @click="dialogVisibleSelectGroupCode = true"
+            >选择群活码</el-button
           >
           <div v-if="groupForm.fissionTargetId" class="changePosterBody">
                <img :src="groupForm.fissionTarget" class="postersUrl" />
-            <span class="changeUrl" @click="dialogVisibleTargetStff = true"
+            <span class="changeUrl" @click="dialogVisibleSelectGroupCode = true"
               >修改</span
             >
           </div>
-          <p class="targetTips">
-            选择员工，用于此次任务裂变的目标添加人。如不选择将默认使用本次活动下发员工的活码信息。
-          </p>
         </el-form-item>
       </el-form>
     </div>
@@ -415,8 +417,9 @@ export default {
       <el-form
         :model="groupForm"
         ref="reward"
-        label-width="150px"
+        label-width="120px"
         class="top-search"
+        labelPosition="left"
       >
         <el-form-item label="兑奖链接" prop="rewardUrl">
           <el-input
@@ -434,8 +437,8 @@ export default {
             :before-upload="beforeAvatarUpload"
           >
             <img
-              v-if="rewardImageUrlTemp"
-              :src="rewardImageUrlTemp"
+              v-if="groupForm.rewardImageUrl"
+              :src="groupForm.rewardImageUrl"
               class="avatar"
             />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -457,8 +460,9 @@ export default {
       <el-form
         :model="groupForm"
         ref="welcomeTips"
-        label-width="150px"
+        label-width="120px"
         class="top-search"
+        labelPosition="left"
       >
         <div class="welcomeBox">
           <el-input
@@ -502,7 +506,7 @@ export default {
     </SelectPoster>
     <!-- <TargetSelectUser
       key="1"
-      :visible.sync="dialogVisibleTargetStff"
+      :visible.sync="dialogVisibleSelectGroupCode"
       title="选择成员"
       :isOnlyLeaf="true"
       :isSigleSelect="true"
@@ -511,7 +515,7 @@ export default {
     </TargetSelectUser> -->
         <!-- 选择群活码弹窗 -->
     <SelectQrCode
-      :visible.sync="dialogVisibleTargetStff"
+      :visible.sync="dialogVisibleSelectGroupCode"
       @success="tagetSelect"
       :selected="arrayTarget"
     >

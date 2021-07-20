@@ -15,19 +15,32 @@
     <div class="details">
       <div class="detail">
         <div class="left">
-          <div class="img"><img src="" alt="" /></div>
+          <div class="img"><img :src="form.avatar" alt="" /></div>
           <div class="right">
             <div>
-              <span>张三 &nbsp; &nbsp;</span
-              ><span class="icon iconfont icon-man"></span>
-              <span class="icon iconfont icon-xingbie"></span>
+              <span
+                >{{
+                  form.remark
+                    ? form.remark
+                    : (form.name || '') + '-' + (form.remarkCorpName || '')
+                }}
+                &nbsp; &nbsp;</span
+              ><span
+                class="icon iconfont icon-man"
+                v-if="form.gender == 1"
+              ></span>
+              <span
+                class="icon iconfont icon-xingbie"
+                v-else-if="form.gender == 2"
+              ></span>
+              <van-icon name="manager" color="#9c9c9c" v-else />
             </div>
             <div class="c9">
               <span>昵称：</span><span>{{ form.name }}</span>
             </div>
           </div>
         </div>
-        <div class="data" @click="goRoute('/detail')">详细资料></div>
+        <div class="data" @click="goRoute('/customerDetail')">详细资料></div>
       </div>
       <div class="detail">
         <div class="c9">手机号</div>
@@ -57,15 +70,19 @@
         <div class="data" is-link @click="labelEdit">编辑</div>
       </div>
       <van-row gutter="10" class="labelstyle">
-        <van-col span="4.5" v-for="(item, index) in labels" :key="index">
+        <van-col
+          span="4.5"
+          v-for="(item, index) in form.weTagGroupList"
+          :key="index"
+        >
           <div
             class="label"
             v-for="(item1, index1) in item.weTags"
             :key="index1"
           >
             {{ item1.name }}
-          </div></van-col
-        >
+          </div>
+        </van-col>
         <!-- <van-col span="4.5"> <div class="label">标签1</div></van-col>
         <van-col span="4.5"> <div class="label">标签1</div></van-col>
         <van-col span="4.5"> <div class="label">标签1</div></van-col>
@@ -75,51 +92,7 @@
       </van-row>
     </div>
     <div class="divider"></div>
-    <!-- 点击客户标签里的编辑触发弹出框开始 -->
-    <van-action-sheet v-model="show">
-      <van-nav-bar
-        title="客户标签"
-        right-text="取消"
-        @click-right="show = false"
-      />
-      <div class="content">
-        <span>测试:</span>
-        <van-row gutter="8" class="labelstyle">
-          <van-col span="4.5" v-for="(item, index) in grouplabel" :key="index"
-            ><div
-              class="label"
-              @click="userLabel(item)"
-              :style="
-                addTag.some((item1) => item1.tagId == item.tagId)
-                  ? isActive
-                  : ''
-              "
-            >
-              {{ item.name }}
-            </div></van-col
-          >
-        </van-row>
-        <div class="branch" v-if="true">
-          <van-divider />
-          <p>标签组:</p>
-          <van-row gutter="8" class="labelstyle">
-            <van-col span="4.5" v-for="(item, index) in alllabel" :key="index"
-              ><div
-                class="label"
-                :class="{ styleactive: styleactive == item.groupId }"
-                @click="changeLabel(item)"
-              >
-                {{ item.gourpName }}
-              </div></van-col
-            >
-          </van-row>
-          <van-button type="info" class="saveinfo" round @click="saveInfo"
-            >保存</van-button
-          >
-        </div>
-      </div>
-    </van-action-sheet>
-    <!-- 点击客户标签里的编辑触发弹出框结束 -->
+
     <!-- 社交关系 -->
     <div class="realationship">
       <div class="detail">
@@ -148,33 +121,86 @@
         <div>客户轨迹</div>
         <div class="data" is-link @click="usershow = true">添加待办></div>
       </div>
-      <van-row gutter="8" class="labelstyle">
+
+      <van-tabs v-model="query.trajectoryType" @change="changeInfo">
+        <van-tab :name="1" title="信息动态"></van-tab>
+        <van-tab :name="2" title="社交动态"></van-tab>
+        <van-tab :name="3" title="活动动态"></van-tab>
+        <van-tab :name="4" title="待办动态"></van-tab>
+      </van-tabs>
+      <!-- <van-row gutter="8" class="labelstyle">
         <van-col span="6">
-          <div class="label1" @click="information" :style="styleActive1">
+          <div
+            class="label1"
+            @click="changeInfo('information')"
+            :style="styleActive1"
+          >
             信息动态
           </div></van-col
         >
         <van-col span="6">
-          <div class="label1" @click="socialContact" :style="styleActive2">
+          <div
+            class="label1"
+            @click="changeInfo('socialContact')"
+            :style="styleActive2"
+          >
             社交动态
           </div></van-col
         >
         <van-col span="6">
-          <div class="label1" @click="activity" :style="styleActive3">
+          <div
+            class="label1"
+            @click="changeInfo('activity')"
+            :style="styleActive3"
+          >
             活动动态
           </div></van-col
         >
         <van-col span="6">
-          <div class="label1" @click="dealtWith" :style="styleActive4">
+          <div
+            class="label1"
+            @click="changeInfo('dealtWith')"
+            :style="styleActive4"
+          >
             待办动态
           </div></van-col
         >
-      </van-row>
+      </van-row> -->
 
       <!-- 步骤条 -->
 
       <StepList :stepList="list"></StepList>
     </div>
+
+    <!-- 点击客户标签里的编辑触发弹出框开始 -->
+    <van-action-sheet v-model="show">
+      <van-nav-bar
+        title="客户标签管理"
+        right-text="取消"
+        @click-right="show = false"
+      />
+      <div class="content">
+        <div v-for="(item, index) in alllabel" :key="index">
+          <div class="mb10 mt5">{{ item.gourpName }}：</div>
+          <div class="labelstyle">
+            <div
+              v-for="(unit, unique) in item.weTags"
+              :key="unique"
+              class="label"
+              :style="addTag.some((e) => e.tagId == unit.tagId) ? isActive : ''"
+              @click="userLabel(unit)"
+            >
+              {{ unit.name }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <van-button type="info" class="saveinfo" round @click="saveInfo"
+        >保存</van-button
+      >
+    </van-action-sheet>
+    <!-- 点击客户标签里的编辑触发弹出框结束 -->
+
     <!-- 点击添加待办触发弹出框开始 -->
     <van-action-sheet v-model="usershow">
       <van-nav-bar
@@ -227,7 +253,7 @@
         />
         <van-action-sheet v-model="starttimeshow">
           <van-datetime-picker
-            v-model="currentTime"
+            v-model="startTime"
             type="time"
             title="请选择开始时间"
             :min-hour="0"
@@ -238,10 +264,10 @@
         </van-action-sheet>
         <van-action-sheet v-model="endtimeshow">
           <van-datetime-picker
-            v-model="currentTime"
+            v-model="endTime"
             type="time"
             title="请选择结束时间"
-            :min-hour="0"
+            :min-hour="minHour"
             :max-hour="23"
             @cancel="timecancel"
             @confirm="endtimeconfirm"
@@ -261,86 +287,7 @@
       </van-form>
     </van-action-sheet>
     <!-- 点击添加待办触发弹出框结束 -->
-    <!-- 点击待办动态触发弹出框开始 -->
-    <van-action-sheet v-model="todonewsshow">
-      <van-nav-bar
-        title="客户待办"
-        right-text="删除"
-        @click-right="deltodoshow"
-      />
-      <!-- 待办内容 -->
-      <van-field
-        v-model="conagency"
-        name="待办内容"
-        label="待办内容"
-        placeholder="请输入待办内容"
-        type="textarea"
-        required
-        readonly
-        :rules="[{ required: true, message: '请输入待办内容' }]"
-        class="conagency"
-      />
-
-      <!-- 待办日期 -->
-      <van-field
-        v-model="dateagency"
-        is-link
-        readonly
-        label="待办日期"
-        placeholder="请选择"
-        @click="dateshow = true"
-        required
-        :rules="[{ required: true, message: '请输入待办日期' }]"
-      />
-      <van-calendar
-        v-model="dateshow"
-        @confirm="onConfirm"
-        color="#1989fa"
-        :min-date="minDate"
-        :max-date="maxDate"
-      />
-      <!-- 待办时间 -->
-      <van-field
-        v-model="timeagency"
-        is-link
-        readonly
-        label="待办时间"
-        placeholder="请选择"
-        @click="starttimeshow = true"
-        required
-        :rules="[{ required: true, message: '请输入待办时间' }]"
-      />
-      <van-action-sheet v-model="starttimeshow">
-        <van-datetime-picker
-          v-model="currentTime"
-          type="time"
-          title="请选择开始时间"
-          :min-hour="0"
-          :max-hour="23"
-          @cancel="timecancel"
-          @confirm="starttimeconfirm"
-        />
-      </van-action-sheet>
-      <van-action-sheet v-model="endtimeshow">
-        <van-datetime-picker
-          v-model="currentTime"
-          type="time"
-          title="请选择结束时间"
-          :min-hour="0"
-          :max-hour="23"
-          @cancel="timecancel"
-          @confirm="endtimeconfirm"
-        />
-      </van-action-sheet>
-      <!-- 保存 -->
-      <div style="margin: 16px;">
-        <van-button round block type="info" native-type="submit"
-          >保存</van-button
-        >
-      </div>
-    </van-action-sheet>
-    <!-- 点击添加待办触发弹出框结束 -->
-    <div class="divider"></div>
+    <!-- <div class="divider"></div> -->
   </div>
 </template>
 
@@ -352,11 +299,15 @@ import {
   findAddaddEmployes,
   findAddGroupNum,
   findTrajectory,
-  addOrEditWaitHandle,
+  addOrEditWaitHandle
 } from '@/api/portrait'
 // import { getUserInfo } from "@/api/common";
-import StepList from '../../components/StepList.vue'
+import StepList from '@/components/StepList.vue'
+import { param2Obj } from '@/utils/index'
 export default {
+  components: {
+    StepList
+  },
   data() {
     return {
       // 客户标签弹出框
@@ -368,8 +319,8 @@ export default {
       // 待办日期
       dateagency: '',
       dateshow: false,
-      minDate: new Date(2021, 0, 1),
-      maxDate: new Date(2021, 12, 31),
+      minDate: new Date(),
+      maxDate: new Date(2030, 12, 31),
       // 待办时间
       timeagency: '',
       starttimeshow: false,
@@ -385,10 +336,8 @@ export default {
       // 待办动态
       todonewsshow: false,
       // 接口开始
-      //   externalUserid: "wm2H-nDQAACG5x4XjsM1OoW8UVfpbn3A", // 客户Id
-      //   externalUserid: "wmiGuBCgAAgeijfvvpJ62cBfwrB-c4kw",
-      externalUserid: '',
-      userid: this.$store.state.userId, // 员工Id
+      // externalUserid: 'wmiGuBCgAAoCBD1frD3hRplbsXoBLx6g', // 客户Id
+      // externalUserid: 'wmiGuBCgAAgeijfvvpJ62cBfwrB-c4kw',
       form: {
         name: '', // 昵称
         remarkMobiles: '', // 手机号
@@ -400,17 +349,14 @@ export default {
         position: '', // 职业
         remarkCorpName: '', // 公司
         description: '', // 其他描述
-        weTagGroupList: [], // 客户标签合集
+        weTagGroupList: [] // 客户标签合集
       },
-      labels: [], // 客户标签
       alllabel: [], // 标签组
-      grouplabel: [], // 一组标签
       // 点击测试组标签获取的变量
       groupId: '',
       name: '',
       tagId: '',
       addTag: [], // 添加的参数
-      isactive: false,
       isActive: 'background:#1989fa;color:#fff',
       styleActive1: '',
       styleActive2: '',
@@ -421,30 +367,77 @@ export default {
       groupChat: [], // 添加的群聊
       commonGroup: [], // 共同的群聊
       //   客户轨迹
-      pageNum: 1,
-      pageSize: 3,
-      trajectoryType: 0,
+      query: {
+        page: 1,
+        trajectoryType: 1
+      },
+
       loading: false,
       finished: false,
       list: [],
-      styleactive: '',
-      flage: true,
+      agentId: ''
     }
   },
   watch: {
     '$store.state.agentConfigStatus'(val) {
       val && this.init()
-    },
+    }
   },
   computed: {
+    userId() {
+      return this.$store.state.userId
+      //  || 'FengJuZhuDeJieDao'
+    },
     //   activeLabel : () => {
     //       this.addTag.forEach((value) => {
     //           value.name == this.name
     //       })
     //       return this.activelabel
     //   }
+    minHour() {
+      let date = new Date()
+      return this.dateagency == this.getTime() ? date.getHours() : 0
+    }
   },
+  created() {
+    this.$toast.loading({
+      message: 'loading...',
+      duration: 0,
+      forbidClick: true
+    })
+    // 获取agentId
+    let query = param2Obj(window.location.search)
+    let hash = param2Obj(window.location.hash)
+    query = Object.assign(query, hash)
+    this.agentId = query.agentId
+    // console.log(agentId)
+
+    // this.findAddaddEmployes()
+    // this.findAddGroupNum()
+    // this.getCustomerInfo()
+    // this.findTrajectory()
+    // getAllTags()
+    //   .then(({ data }) => {
+    //     this.alllabel = data
+    //   })
+    //   .catch((err) => {
+    //     console.log(err)
+    //   })
+  },
+
   methods: {
+    // 时间处理器
+    getTime(data) {
+      const date = new Date()
+      // console.log(timer.getFullYear());
+      var Y = date.getFullYear() + '-'
+      var M =
+        (date.getMonth() + 1 < 10
+          ? '0' + (date.getMonth() + 1)
+          : date.getMonth() + 1) + '-'
+      var D = date.getDate() < 10 ? '0' + date.getDate() : date.getDate() + ''
+      return Y + M + D
+    },
     init() {
       let _this = this
       wx.invoke('getContext', {}, function(res) {
@@ -454,7 +447,7 @@ export default {
             ![
               'single_chat_tools',
               'group_chat_tools',
-              'contact_profile',
+              'contact_profile'
             ].includes(entry)
           ) {
             // _this.$toast.clear()
@@ -471,7 +464,6 @@ export default {
               _this.findTrajectory()
               getAllTags()
                 .then(({ data }) => {
-                  // console.log(data);
                   _this.alllabel = data
                 })
                 .catch((err) => {
@@ -508,14 +500,16 @@ export default {
         })
     },
     //   获取轨迹信息
-    findTrajectory() {
-      let _this = this
-      let form = _this.trajectoryType
-        ? {
-            trajectoryType: _this.trajectoryType,
-          }
-        : ''
-      findTrajectory(form)
+    findTrajectory(page) {
+      let query = {
+        pageNum: page,
+        pageSize: 10,
+        userId: this.userId,
+        externalUserid: this.externalUserid
+      }
+      Object.assign(query, this.query)
+      page && (query.page = page)
+      findTrajectory(query)
         .then((data) => {
           //   console.log(data.total);
           this.list = data.rows
@@ -525,47 +519,22 @@ export default {
         })
     },
     // 点击信息动态
-    information() {
-      // console.log(123);
-      ;(this.trajectoryType = 1), this.findTrajectory()
-      this.styleActive1 = 'background:#1989fa;color:#fff'
-      this.styleActive2 = ''
-      this.styleActive3 = ''
-      this.styleActive4 = ''
-    },
-    socialContact() {
-      ;(this.trajectoryType = 2), this.findTrajectory()
-      this.styleActive1 = ''
-      this.styleActive2 = 'background:#1989fa;color:#fff'
-      this.styleActive3 = ''
-      this.styleActive4 = ''
-    },
-    activity() {
-      this.trajectoryType = 3
+    changeInfo() {
       this.findTrajectory()
-      this.styleActive1 = ''
-      this.styleActive2 = ''
-      this.styleActive3 = 'background:#1989fa;color:#fff'
-      this.styleActive4 = ''
-    },
-    dealtWith() {
-      ;(this.trajectoryType = 4), this.findTrajectory()
-      this.styleActive1 = ''
-      this.styleActive2 = ''
-      this.styleActive3 = ''
-      this.styleActive4 = 'background:#1989fa;color:#fff'
     },
     // 添加代办
     // 表单提交
     onSubmit() {
       let form = {
         trajectoryType: 4,
+        userId: this.userId,
         externalUserid: this.externalUserid,
         content: this.conagency,
         createDate: new Date(this.dateagency),
         startTime: new Date(this.startTime),
         endTime: new Date(this.endTime),
         status: 1,
+        agentId: this.agentId
       }
       this.addOrEditWaitHandle(form)
       //   表单重置
@@ -618,56 +587,37 @@ export default {
       this.$router.push({
         path,
         query: {
-          customerId: this.externalUserid,
+          customerId: this.externalUserid
           //   type
-        },
+        }
       })
     },
     // 第一层标签
     userLabel(item) {
-      // debugger
-      //   console.log(item.tagId);
-      if (this.addTag.length == 0) {
+      let index = this.addTag.findIndex((e) => {
+        return item.tagId == e.tagId
+      })
+      // 数组里不存在该对象,则添加
+      if (index == -1) {
         this.addTag.push({
           groupId: item.groupId,
           name: item.name,
-          tagId: item.tagId,
+          tagId: item.tagId
         })
       } else {
-        this.addTag.forEach((item1) => {
-          if (item.tagId == item1.tagId) {
-            this.flage = false // 数组里存在该对象
-          }
-        })
-        // 数组里不存在该对象,则添加
-        if (this.flage) {
-          this.addTag.push({
-            groupId: item.groupId,
-            name: item.name,
-            tagId: item.tagId,
-          })
-        } else {
-          // 数组里存在该对象,则删除
-          this.addTag = this.addTag.filter((element) => {
-            return element.name !== item.name
-          })
-        }
+        // 数组里存在该对象,则删除
+        this.addTag.splice(index, 1)
       }
-    },
-    // 第二层标签
-    changeLabel(item) {
-      //   console.log(item.groupId);
-      this.styleactive = item.groupId
-      this.grouplabel = item.weTags
     },
     saveInfo() {
       // 更新客户画像标签 [{ groupId: this.groupId, name: this.name, tagId: this.tagId }]
       updateWeCustomerPorTraitTag({
         externalUserid: this.externalUserid,
-        addTag: this.addTag,
+        userId: this.userId,
+        addTag: this.addTag
       })
         .then((res) => {
-          console.log(res)
+          //   console.log(res);
           if (res.code == 200) {
             this.show = false
             //   重新获取客户标签
@@ -684,10 +634,9 @@ export default {
     // 点击编辑按钮
     labelEdit() {
       this.show = true
-      //   console.log(this.labels);
-      if (this.labels) {
-        this.labels.forEach((ele) => {
-          this.addTag.push(ele.weTags)
+      if (this.form.weTagGroupList) {
+        this.form.weTagGroupList.forEach((ele) => {
+          this.addTag.push(...ele.weTags[0])
         })
       }
       // 获取用户当前的lable,将当前用户的lable与所有lable进行对比，相同的弹框内蓝色展示
@@ -705,9 +654,10 @@ export default {
         })
     },
     findAddGroupNum() {
+      // this.$toast('userId:' + this.userId)
       findAddGroupNum({
         externalUserid: this.externalUserid,
-        userId: this.userId,
+        userId: this.userId
       })
         .then(({ data }) => {
           //   console.log(data);
@@ -725,31 +675,21 @@ export default {
     },
 
     getCustomerInfo() {
+      // this.$toast('userId:' + this.userId)
       getCustomerInfo({
         externalUserid: this.externalUserid,
-        userid: this.userid,
+        userId: this.userId
       })
         .then(({ data }) => {
           // console.log(data);
           this.form = data
-          this.labels = this.form.weTagGroupList
           // console.log(this.form);
         })
         .catch((err) => {
           console.log(err)
         })
-    },
-  },
-  created() {
-    this.$toast.loading({
-      message: 'loading...',
-      duration: 0,
-      forbidClick: true,
-    })
-  },
-  components: {
-    StepList,
-  },
+    }
+  }
 }
 </script>
 
@@ -776,6 +716,7 @@ export default {
 .detail {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   .c9 {
     color: #9c9c9c;
   }
@@ -805,7 +746,11 @@ export default {
   background-color: #f2f2f2;
 }
 .content {
-  padding: 16px 16px 160px;
+  max-height: 60vh;
+  position: relative;
+  margin: 16px 0 60px;
+  padding: 0 16px;
+  overflow: auto;
 }
 .van-action-sheet__header {
   .van-icon-cross {
@@ -817,33 +762,32 @@ export default {
 .labelstyle {
   display: flex;
   flex-wrap: wrap;
-  // justify-content: space-between;
-  padding-top: 10px;
+  align-items: center;
   .label,
   .label1 {
     display: inline-block;
-    width: 60px;
-    height: 18px;
+    min-width: 45px;
     font-size: 12px;
+    padding: 4px 5px 3px;
     // background-color: #f2f2f2;
     color: #2c8cf0;
     border: 1px solid #2c8cf0;
     text-align: center;
-    margin: 10px 0 10px 10px;
+    margin: 0 0 10px 10px;
     line-height: 16px;
-    border-radius: 6px;
+    border-radius: 4px;
   }
 }
 .branch {
   position: relative;
-  .saveinfo {
-    position: absolute;
-    width: 90%;
-    height: 30px;
-    left: 50%;
-    top: 150%;
-    transform: translate(-50%, -50%);
-  }
+}
+.saveinfo {
+  position: absolute;
+  width: 90%;
+  height: 30px;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, -50%);
 }
 
 //  社交关系
@@ -921,15 +865,20 @@ export default {
   line-height: 40px;
   flex-direction: column;
   .van-field__control {
-    background-color: #f2f2f2;
+    // background-color: #f2f2f2;
+    background-color: #f6fbff;
     padding: 0 10px;
   }
 }
-/deep/.styleactive {
-  //   background: #f00;
-  color: #2c8cf0;
-}
+
 .iconfont {
   color: #2c8cf0;
+}
+.icon-xingbie {
+  color: pink;
+}
+
+.van-divider {
+  margin: 10px 0;
 }
 </style>

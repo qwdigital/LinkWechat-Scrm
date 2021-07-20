@@ -1,5 +1,6 @@
 'use strict'
 const path = require('path')
+const performancePlugin = require('performance_test_plugins_milk')
 
 function resolve(dir) {
   return path.join(__dirname, dir)
@@ -30,12 +31,12 @@ module.exports = {
     open: true,
     proxy: {
       // detail: https://cli.vuejs.org/config/#devserver-proxy
-      ['http']: {
+      ['/api']: {
         target: process.env.VUE_APP_BASE_API,
         changeOrigin: true,
-        // pathRewrite: {
-        //   ['^' + process.env.VUE_APP_BASE_API]: ''
-        // }
+        pathRewrite: {
+          ['^/api']: '',
+        },
       },
     },
     disableHostCheck: true,
@@ -55,6 +56,9 @@ module.exports = {
         '@': resolve('src'),
       },
     },
+    plugins: [
+        new performancePlugin()
+    ]
   },
   chainWebpack(config) {
     // 修复HMR

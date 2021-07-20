@@ -8,16 +8,16 @@ export default {
     // 添加标签显隐
     visible: {
       type: Boolean,
-      default: false,
+      default: false
     },
     // 表单参数
     form: {
       type: Object,
       default: () => ({
         gourpName: '',
-        weTags: [],
-      }),
-    },
+        weTags: []
+      })
+    }
   },
   data() {
     return {
@@ -26,10 +26,10 @@ export default {
       // 表单验证规则
       rules: Object.freeze({
         gourpName: [{ required: true, message: '必填项', trigger: 'blur' }],
-        weTags: [{ required: true, message: '必填项', trigger: 'blur' }],
+        weTags: [{ required: true, message: '必填项', trigger: 'blur' }]
       }),
       // 添加便签按钮显隐
-      visibleAdd: false,
+      visibleAdd: false
     }
   },
   watch: {},
@@ -45,8 +45,8 @@ export default {
       },
       set(val) {
         this.$emit('update:visible', val)
-      },
-    },
+      }
+    }
   },
   created() {},
   mounted() {},
@@ -94,8 +94,8 @@ export default {
           this.$emit('success')
         })
       })
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -162,7 +162,7 @@ export default {
 
 <style lang="scss" scoped>
 .input-new-tag {
-  width: 90px;
+  width: auto;
   margin-left: 10px;
   vertical-align: bottom;
 }

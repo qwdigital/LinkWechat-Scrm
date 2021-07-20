@@ -64,7 +64,7 @@ export default {
     <el-form ref="form" :model="form" label-width="80px" class="form">
       <el-form-item label="欢迎语">
         <el-card shadow="never" class="card">
-          <div style="height: 300px;">
+          <div style="height: 200px;">
             <el-input
               type="textarea"
               :autosize="{ minRows: 2, maxRows: 6 }"
@@ -75,6 +75,23 @@ export default {
             ></el-input>
           </div>
           <div class="bfc-o">
+            <div v-if="form.materialUrl">
+              <el-image
+                style="width: 100px; height: 100px; cursor: pointer;border-radius: 6px;"
+                :src="form.materialUrl"
+                fit="fit"
+              >
+              </el-image>
+              <i class="el-icon-error" @click="removeMaterial"></i>
+            </div>
+            <el-button
+              icon="el-icon-plus"
+              size="mini"
+              @click="dialogVisibleSelectMaterial = true"
+            >
+              添加图片
+            </el-button>
+
             <el-button
               type="default"
               class="fr"
@@ -83,16 +100,6 @@ export default {
               @click="insertName()"
               >插入客户昵称</el-button
             >
-          </div>
-          <el-divider></el-divider>
-          <div v-if="form.materialUrl">
-            <el-image
-              style="width: 100px; height: 100px; cursor: pointer;border-radius: 6px;"
-              :src="form.materialUrl"
-              fit="fit"
-            >
-            </el-image>
-            <i class="el-icon-error" @click="removeMaterial"></i>
           </div>
 
           <!-- <el-popover placement="top-start" trigger="hover">
@@ -117,16 +124,9 @@ export default {
               >添加图片</el-button
             >
           </el-popover> -->
-
-          <el-button
-            icon="el-icon-plus"
-            size="mini"
-            @click="dialogVisibleSelectMaterial = true"
-            >添加图片</el-button
-          >
         </el-card>
       </el-form-item>
-      <el-form-item label=" ">
+      <el-form-item label=" " class="ar">
         <el-button type="primary" @click="submit">保存</el-button>
         <el-button @click="$router.back()">取消</el-button>
       </el-form-item>

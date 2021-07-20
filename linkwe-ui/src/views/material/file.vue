@@ -6,7 +6,7 @@ export default {
   components: { MaPage },
   data() {
     return {
-      ids: [], // 选中数组
+      ids: [] // 选中数组
     }
   },
   watch: {},
@@ -15,8 +15,8 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map((item) => item.id)
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -41,22 +41,19 @@ export default {
         class-name="small-padding fixed-width"
       >
         <template slot-scope="scope">
-          <el-button
-            type="text"
-            @click="$refs.page.download(scope.row)"
-            v-hasPermi="['material:download']"
+          <el-button type="text" @click="$refs.page.download(scope.row)"
             >下载</el-button
           >
           <el-button
             type="text"
             @click="$refs.page.edit(scope.row)"
-            v-hasPermi="['material:edit']"
+            v-hasPermi="['wechat:material:edit']"
             >修改</el-button
           >
           <el-button
             type="text"
             @click="$refs.page.remove(scope.row.id)"
-            v-hasPermi="['material:remove']"
+            v-hasPermi="['wechat:material:remove']"
             >删除</el-button
           >
         </template>

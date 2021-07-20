@@ -104,8 +104,6 @@ export default {
       <el-button
         v-hasPermi="['enterpriseWechat:add']"
         type="primary"
-        icon="el-icon-plus"
-        size="mini"
         @click="edit()"
         >添加</el-button
       >
@@ -222,6 +220,9 @@ export default {
           <el-input v-model="form.corpSecret" style="width: 80%"></el-input>
           <el-link class="fr" type="primary">如何获取？</el-link>
         </el-form-item>
+        <el-form-item label="会话存档secret" prop="chatSecret">
+          <el-input v-model="form.chatSecret" style="width: 80%"></el-input>
+        </el-form-item>
         <!-- <el-form-item label="通讯录事件服务">
           <el-radio-group v-model="form.contactSecret">
             <el-radio label="label">开启</el-radio>
@@ -244,6 +245,31 @@ export default {
           prop="wxQrLoginRedirectUri"
         >
           <el-input v-model="form.wxQrLoginRedirectUri"></el-input>
+        </el-form-item>
+        <el-form-item label="应用回调token密钥" prop="token">
+          <el-input v-model="form.token"></el-input>
+        </el-form-item>
+
+        <el-form-item label="应用回调消息体加密密钥" prop="encodingAesKey">
+          <el-input v-model="form.encodingAesKey"></el-input>
+        </el-form-item>
+        <el-form-item label="微信公众号APPID" prop="appld">
+          <el-input v-model="form.appld"></el-input>
+        </el-form-item>
+        <el-form-item label="微信公众号密钥" prop="secret">
+          <el-input v-model="form.secret"></el-input>
+        </el-form-item>
+        <el-form-item label="任务宝H5访问地址" prop="fissionUrl">
+          <el-input v-model="form.fissionUrl"></el-input>
+        </el-form-item>
+        <el-form-item label="群裂变H5访问地址" prop="fissionGroupUr">
+          <el-input v-model="form.fissionGroupUr"></el-input>
+        </el-form-item>
+        <el-form-item label="H5域名" prop="h5DoMainName">
+          <el-input v-model="form.h5DoMainName"></el-input>
+        </el-form-item>
+        <el-form-item label="会话私钥" prop="financePrivateKey">
+          <el-input v-model="form.financePrivateKey"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer">

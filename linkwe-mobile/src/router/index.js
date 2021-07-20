@@ -10,8 +10,8 @@ const routes = [
     name: 'Home',
     component: Home,
     meta: {
-      title: '首页',
-    },
+      title: '首页'
+    }
   },
   {
     path: '/chat',
@@ -21,8 +21,8 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/chat'),
     meta: {
-      title: 'chat',
-    },
+      title: 'chat'
+    }
   },
   // 用户画像
   {
@@ -31,23 +31,27 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/portrait/index'),
+    component: () =>
+      import(/* webpackChunkName: "about" */ '../views/portrait/index'),
     meta: {
-      title: 'portrait',
-    },
+      title: 'portrait'
+    }
   },
   //  用户画像详情
   {
-    path: '/detail',
-    name: 'detail',
+    path: '/customerDetail',
+    name: 'customerDetail',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/portrait/detail.vue'),
+    component: () =>
+      import(
+        /* webpackChunkName: "about" */ '../views/portrait/customerDetail.vue'
+      ),
     hidden: true,
     meta: {
-      title: '',
-    },
+      title: ''
+    }
   },
   // 社群关系
   {
@@ -56,11 +60,12 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/portrait/community.vue'),
+    component: () =>
+      import(/* webpackChunkName: "about" */ '../views/portrait/community.vue'),
     hidden: true,
     meta: {
-      title: '',
-    },
+      title: ''
+    }
   },
   // 群活码扫描跳转页面
   {
@@ -69,12 +74,13 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/groupCode/index'),
+    component: () =>
+      import(/* webpackChunkName: "about" */ '../views/groupCode/index'),
     hidden: true,
     meta: {
       title: '',
       noAuth: true
-    },
+    }
   },
   // 群活码扫描跳转页面
   {
@@ -83,33 +89,42 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/communityOperating/task/index'),
+    component: () =>
+      import(
+        /* webpackChunkName: "about" */ '../views/communityOperating/task/index'
+      ),
     children: [
       {
         path: '',
-        component: () => import(/* webpackChunkName: "about" */ '../views/communityOperating/task/list'),
+        component: () =>
+          import(
+            /* webpackChunkName: "about" */ '../views/communityOperating/task/list'
+          ),
         hidden: true,
         meta: {
-          title: '',
+          title: ''
           // noAuth: true
-        },
+        }
       },
       {
         path: 'state',
         name: 'taskState',
-        component: () => import(/* webpackChunkName: "about" */ '../views/communityOperating/task/state.vue'),
+        component: () =>
+          import(
+            /* webpackChunkName: "about" */ '../views/communityOperating/task/state.vue'
+          ),
         hidden: true,
         meta: {
           title: '',
           noAuth: true
-        },
-      },
+        }
+      }
     ],
     hidden: true,
     meta: {
       title: '',
       noAuth: true
-    },
+    }
   },
   // 群活码扫描跳转页面
   {
@@ -118,18 +133,19 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/communityOperating/keywords/index'),
+    component: () =>
+      import(
+        /* webpackChunkName: "about" */ '../views/communityOperating/keywords/index'
+      ),
     hidden: true,
     meta: {
       title: ''
-    },
-  },
+    }
+  }
 ]
 
 const router = new VueRouter({
-  routes,
+  routes
 })
 
 export default router
-
-  

@@ -1,16 +1,9 @@
-<style lang="scss" scoped>
-.page {
-  padding: 16px 24px 24px;
-}
-</style>
 <template>
-  <section class="app-main">
-    <transition name="fade-transform" mode="out-in">
-      <router-view class="page" :key="key" />
-      <!-- <keep-alive :include="cachedViews">
+  <transition name="fade-transform" mode="out-in">
+    <router-view class="page app-main" :key="key" />
+    <!-- <keep-alive :include="cachedViews">
       </keep-alive> -->
-    </transition>
-  </section>
+  </transition>
 </template>
 
 <script>
@@ -33,8 +26,10 @@ export default {
   // min-height: calc(100vh - 50px);
   width: 100%;
   position: relative;
-  overflow: auto;
-  background-color: #fff;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-top: 15px;
+  // background-color: #fff;
 }
 
 .fixed-header + .app-main {

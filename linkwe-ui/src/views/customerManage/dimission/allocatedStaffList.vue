@@ -13,48 +13,13 @@ export default {
         pageSize: 10,
         userName: undefined,
         beginTime: undefined,
-        endTime: undefined,
+        endTime: undefined
       },
       loading: false,
       total: 0,
       list: [],
       dialogVisibleSelectUser: false,
-      dateRange: [], // 离职日期
-      // 日期快捷选项
-      pickerOptions: {
-        disabledDate(time) {
-          return time.getTime() > Date.now()
-        },
-        shortcuts: [
-          {
-            text: '最近一周',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-              picker.$emit('pick', [start, end])
-            },
-          },
-          {
-            text: '最近一个月',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-              picker.$emit('pick', [start, end])
-            },
-          },
-          {
-            text: '最近三个月',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-              picker.$emit('pick', [start, end])
-            },
-          },
-        ],
-      },
+      dateRange: [] // 离职日期
     }
   },
   watch: {},
@@ -88,8 +53,8 @@ export default {
     resetForm(formName) {
       this.dateRange = []
       this.$refs['queryForm'].resetFields()
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -166,8 +131,8 @@ export default {
             v-hasPermi="['customerManage:dimission:edit']"
             @click="
               $router.push({
-                path: '/customerManage/allocatedStaffDetail',
-                query: { userId: scope.row.userId },
+                path: 'allocatedStaffDetail',
+                query: { userId: scope.row.userId }
               })
             "
             type="text"

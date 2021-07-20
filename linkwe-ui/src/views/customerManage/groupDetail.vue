@@ -60,27 +60,41 @@ export default {
     <!-- <el-button slot="append" circle icon="el-icon-back" @click="$router.back()"></el-button>返回 -->
     <div class="flex aic">
       <el-avatar
-        :size="100"
+        :size="50"
+        style="flex: none;"
         src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
-      ></el-avatar>
+      >
+      </el-avatar>
       <div class="info-wrap">
-        <div style="margin-bottom: 20px;">{{ group.groupName }}</div>
+        <div style="margin-bottom: 15px; font-weight: 500;">
+          {{ group.groupName }}
+        </div>
         <div class="info">
-          群主：{{ group.groupLeaderName }} | 创建时间：{{ group.createTime }} |
-          群公告：{{ group.notice || '未设置' }}
+          <span class="key">群主：</span>{{ group.groupLeaderName }}
+          <span class="line">|</span>
+          <span class="key">创建时间：</span>{{ group.createTime }}
+          <span class="line">|</span>
+          <span class="key">群公告：</span>{{ group.notice || '未设置' }}
         </div>
       </div>
     </div>
-    <el-input placeholder="请输入群成员" v-model="query.memberName" class>
-      <el-button slot="append" @click="getList(1)">查询</el-button>
+    <el-input
+      size="normal"
+      placeholder="请输入群成员"
+      v-model="query.memberName"
+      class
+    >
+      <el-button type="primary" slot="append" @click="getList(1)">
+        <span class="key">查询</span>
+      </el-button>
     </el-input>
     <el-table
       v-loading="loading"
       :data="list"
       @selection-change="handleSelectionChange"
     >
-      <!-- <el-table-column type="selection" width="55" align="center" /> -->
-      <el-table-column label="群成员" align="center" prop="memberName">
+      <el-table-column width="55" />
+      <el-table-column label="群成员" prop="memberName">
         <template slot-scope="scope">
           {{ scope.row.memberName }}
           <!-- <span
@@ -89,13 +103,8 @@ export default {
           <!-- <i :class="['el-icon-s-custom', ({1: 'man', 2: 'woman'})[scope.row.gender]]"></i> -->
         </template>
       </el-table-column>
-      <el-table-column
-        label="进群时间"
-        align="center"
-        prop="joinTime"
-        width="180"
-      ></el-table-column>
-      <el-table-column label="进群方式" align="center" prop="joinScene">
+      <el-table-column label="进群时间" prop="joinTime"></el-table-column>
+      <el-table-column label="进群方式" prop="joinScene">
         <template slot-scope="scope">
           <span>{{ joinScene[scope.row.joinScene] }}</span>
         </template>
@@ -113,25 +122,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.mid-action {
-  display: flex;
-  justify-content: space-between;
-  margin: 10px 0;
-  align-items: center;
-  .total {
-    background-color: rgba(65, 133, 244, 0.1);
-    border: 1px solid rgba(65, 133, 244, 0.2);
-    border-radius: 3px;
-    font-size: 14px;
-    min-height: 32px;
-    line-height: 32px;
-    padding: 0 12px;
-    color: #606266;
-  }
-  .num {
-    color: #00f;
-  }
-}
 .el-input {
   display: table;
   width: 30%;
@@ -140,7 +130,15 @@ export default {
 .info-wrap {
   margin-left: 20px;
   .info {
-    color: #aaa;
+    color: #666;
   }
+
+  .line {
+    padding: 15px;
+    color: #dbdbdb;
+  }
+}
+.key {
+  color: $blue;
 }
 </style>

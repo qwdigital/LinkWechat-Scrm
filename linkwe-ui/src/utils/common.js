@@ -60,7 +60,7 @@ export function yearMouthDay(data) {
     var date = time.getDate();
    console.log(year+'-'+add0(month)+'-'+add0(date))
 	return year+'-'+add0(month)+'-'+add0(date)
-	
+
 }
 function add0(m){return m<10?'0'+m:m }
 
@@ -185,7 +185,7 @@ export function dataURLtoFile (dataURL) {
 
   /**
  * 整理echat 数据
- * @param {*} arrData 数据 
+ * @param {*} arrData 数据
  */
 export function arrData (data) {
     let obj={
@@ -199,17 +199,10 @@ export function arrData (data) {
 	data.forEach((a,b)=>{
 		obj.arr1.push(a.newApplyCnt)
 		obj.btm1.push(a.xtime)
-		if(!!a.newMemberCnt){
-			obj.arr3.push(a.newMemberCnt)
-		}else{
-			obj.arr3=[]
-		}
+		obj.arr3.push(a.newMemberCnt)
 		obj.arr2.push(a.newContactCnt)
 		obj.arr4.push(a.negativeFeedbackCnt)
 	})
-	//newApplyCnt =>arr1
-	//newContactCnt =>arr2
-	//negativeFeedbackCnt =>arr4
 	console.log(obj)
 	return obj
   }

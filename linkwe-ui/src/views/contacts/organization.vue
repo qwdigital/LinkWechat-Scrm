@@ -37,40 +37,6 @@ export default {
       dialogVisible: false,
       disabled: false,
       loading: false,
-      pickerOptions: {
-        disabledDate(time) {
-          return time.getTime() > Date.now()
-        },
-        shortcuts: [
-          {
-            text: '最近一周',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-              picker.$emit('pick', [start, end])
-            },
-          },
-          {
-            text: '最近一个月',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-              picker.$emit('pick', [start, end])
-            },
-          },
-          {
-            text: '最近三个月',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-              picker.$emit('pick', [start, end])
-            },
-          },
-        ],
-      },
       multipleSelection: [],
       formDepart: {},
       dialogVisibleDepart: false,
@@ -287,9 +253,7 @@ export default {
       <el-form-item label>
         <el-button
           v-hasPermi="['contacts:organization:query']"
-          type="cyan"
-          icon="el-icon-search"
-          size="mini"
+          type="primary"
           @click="getList(1)"
           >查询</el-button
         >
@@ -300,16 +264,12 @@ export default {
       <el-button
         v-hasPermi="['contacts:organization:sync']"
         type="primary"
-        icon="el-icon-refresh"
-        size="mini"
         @click="syncUser"
         >同步成员</el-button
       >
       <el-button
         v-hasPermi="['contacts:organization:import']"
-        type="primary"
-        icon="el-icon-plus"
-        size="mini"
+        type="info"
         @click="batchImport"
         >批量导入</el-button
       >
@@ -317,18 +277,18 @@ export default {
         v-hasPermi="['contacts:organization:addMember']"
         type="primary"
         icon="el-icon-plus"
-        size="mini"
         @click="edit()"
         >添加成员</el-button
       > -->
     </div>
-    <el-row :gutter="20">
+    <el-row type="flex" justify="space-between">
       <!--部门数据-->
-      <el-col :span="6" :xs="24">
+      <el-col :span="6">
         <div class="head-container">
           <!-- <div>部门架构</div> -->
           <!-- :filter-node-method="filterNode" -->
           <el-tree
+            class="left-tree"
             :data="treeData"
             :props="defaultProps"
             :expand-on-click-node="false"
@@ -340,20 +300,20 @@ export default {
               <span>{{ node.label }}</span>
               <span class="fr">
                 <i
-                  class="el-icon-edit"
+                  class="el-icon-edit-outline"
                   title="编辑"
                   v-hasPermi="['contacts:organization:editDep']"
                   v-if="node.level !== 1"
                   @click.stop="departEdit(data, 1)"
                 ></i>
                 <i
-                  class="el-icon-plus"
+                  class="el-icon-circle-plus-outline"
                   title="添加"
                   v-hasPermi="['contacts:organization:addDep']"
                   @click.stop="departEdit(data, 0)"
                 ></i>
                 <i
-                  class="el-icon-minus"
+                  class="el-icon-delete"
                   title="删除"
                   v-hasPermi="['contacts:organization:removeDep']"
                   v-if="node.level !== 1"
@@ -365,7 +325,7 @@ export default {
         </div>
       </el-col>
       <!--用户数据-->
-      <el-col :span="18" :xs="24">
+      <el-col :span="17">
         <el-table
           v-loading="loading"
           :data="userList"

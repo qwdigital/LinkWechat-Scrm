@@ -1,5 +1,8 @@
 <script>
-import { getAllocateCustomers } from '@/api/customer/dimission'
+import {
+  getAllocateCustomers,
+  getAllocateGroups
+} from '@/api/customer/dimission'
 
 export default {
   name: 'AllocatedStaffDetailList',
@@ -7,8 +10,12 @@ export default {
   props: {
     dateRange: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
+    type: {
+      type: String,
+      default: 'customer'
+    }
   },
   data() {
     return {
@@ -17,18 +24,20 @@ export default {
         pageNum: 1,
         pageSize: 10,
         handoverUserId: undefined,
+        oldOwner: undefined,
         beginTime: undefined,
-        endTime: undefined,
+        endTime: undefined
       },
       loading: false,
       total: 0,
-      list: [],
+      list: []
     }
   },
   watch: {},
   computed: {},
   created() {
     this.query.handoverUserId = this.$route.query.userId
+    this.query.oldOwner = this.$route.query.userId
     this.getList()
   },
   mounted() {},
@@ -41,7 +50,9 @@ export default {
       }
       page && (this.query.pageNum = page)
       this.loading = true
-      getAllocateCustomers(this.query)
+      ;(this.type === 'customer' ? getAllocateCustomers : getAllocateGroups)(
+        this.query
+      )
         .then(({ rows, total }) => {
           this.list = rows
           this.total = +total
@@ -50,8 +61,8 @@ export default {
         .catch(() => {
           this.loading = false
         })
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -63,8 +74,16 @@ export default {
       tooltip-effect="dark"
       style="width: 100%"
     >
-      <el-table-column prop="customerName" label="客户名称"></el-table-column>
-      <el-table-column prop="takeUserName" label="接替员工"></el-table-column>
+      <el-table-column
+        v-if="type === 'customer'"
+        prop="customerName"
+        label="客户名称"
+      ></el-table-column>
+      <el-table-column v-else prop="groupName" label="群名称"></el-table-column>
+      <el-table-column
+        :prop="type === 'customer' ? 'takeUserName' : 'newOwnerName'"
+        label="接替员工"
+      ></el-table-column>
       <el-table-column
         prop="department"
         label="接替员工所属部门"
@@ -81,8 +100,8 @@ export default {
             v-hasPermi="['customerManage:dimission:edit']"
             @click="
               $router.push({
-                path: '/customerManage/customerDetail',
-                query: { id: scope.row.id },
+                path: 'customerDetail',
+                query: { id: scope.row.id }
               })
             "
             type="text"

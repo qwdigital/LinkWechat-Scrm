@@ -10,7 +10,7 @@ export default {
     SelectUser,
     SelectTag,
     SelectPoster,
-    TargetSelectUser: SelectUser,
+    TargetSelectUser: SelectUser
   },
   data() {
     return {
@@ -18,7 +18,7 @@ export default {
         taskName: '',
         fissInfo: '',
         fissNum: '',
-        dateRange: '',
+        dateRange: ''
       },
       groupForm: {
         taskFissionStaffs: [],
@@ -33,7 +33,7 @@ export default {
         welcomeMsg: '',
         rewardUrl: '',
         rewardImageUrl: '',
-        rewardRule: '',
+        rewardRule: ''
       },
       rewardImageUrlTemp: '',
       action:
@@ -43,16 +43,19 @@ export default {
       headers: window.CONFIG.headers,
       ruleForm: {
         taskName: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' },
+          { required: true, message: '请输入活动名称', trigger: 'blur' }
         ],
         postersId: [{ required: true, message: '请输入海报', trigger: 'blur' }],
+        fissionTargetId: [
+          { required: true, message: '请选择员工', trigger: 'blur' }
+        ],
         fissNum: [
           { required: true, message: '请输入数量', trigger: 'blur' },
-          { pattern: /^[1-9]+$/, message: '请输入数字', trigger: 'blur' },
+          { pattern: /^[1-9]+$/, message: '请输入数字', trigger: 'blur' }
         ],
         dateRange: [
-          { required: true, message: '时间不可为空', trigger: 'blur' },
-        ],
+          { required: true, message: '时间不可为空', trigger: 'blur' }
+        ]
       },
       dialogVisibleSelectUser: false,
       dialogVisibleSelectTag: false,
@@ -60,7 +63,7 @@ export default {
       dialogVisibleTargetStff: false,
       selectTagType: '',
       pageType: 'add',
-      taskDetail: {},
+      taskDetail: {}
     }
   },
   created() {
@@ -87,7 +90,7 @@ export default {
           console.log('验证通过,提交表单')
           let params = {
             ...this.query,
-            ...this.groupForm,
+            ...this.groupForm
           }
           params.startTime = params.dateRange[0]
           params.overTime = params.dateRange[1]
@@ -98,8 +101,8 @@ export default {
               {
                 staffId: '',
                 staffName: '',
-                staffType: 3,
-              },
+                staffType: 3
+              }
             ]
           }
           delete params.sendType
@@ -128,11 +131,11 @@ export default {
         if (res.code == 200) {
           this.$message({
             message: '新增成功',
-            type: 'success',
+            type: 'success'
           })
           taskApi.sendFission(JSON.parse(res.msg).id)
           this.$router.push({
-            path: '/application/taskGroup',
+            path: 'taskGroup'
           })
         }
         //
@@ -143,10 +146,10 @@ export default {
         if (res.code == 200) {
           this.$message({
             message: '修改成功',
-            type: 'success',
+            type: 'success'
           })
           this.$router.push({
-            path: '/application/taskGroup',
+            path: 'taskGroup'
           })
           // taskApi.sendFission(JSON.parse(res.msg).id)
         }
@@ -167,8 +170,8 @@ export default {
           fissNum: res.data.fissNum,
           dateRange: [
             res.data.startTime + ' 00:00:00',
-            res.data.overTime + ' 00:00:00',
-          ],
+            res.data.overTime + ' 00:00:00'
+          ]
         }
         this.query = query
         this.groupForm = {
@@ -194,7 +197,7 @@ export default {
           welcomeMsg: res.data.welcomeMsg,
           rewardUrl: res.data.rewardUrl,
           rewardImageUrl: res.data.rewardImageUrl,
-          rewardRule: res.data.rewardRule,
+          rewardRule: res.data.rewardRule
         }
       })
     },
@@ -206,13 +209,13 @@ export default {
           selectParam = {
             staffId: item.userId,
             staffName: item.name,
-            staffType: 2,
+            staffType: 2
           }
         } else {
           selectParam = {
             staffId: item.id,
             staffName: item.name,
-            staffType: 1,
+            staffType: 1
           }
         }
         return selectParam
@@ -247,14 +250,15 @@ export default {
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === 'image/jpeg'
+      const isPNG = file.type === 'image/png'
 
-      if (!isJPG) {
-        this.$message.error('上传头像图片只能是 JPG 格式!')
+      if (!isJPG && !isPNG) {
+        this.$message.error('上传头像图片只能是 JPG/PNG 格式!')
       }
 
-      return isJPG
-    },
-  },
+      return isJPG || isPNG
+    }
+  }
 }
 </script>
 
@@ -266,8 +270,9 @@ export default {
         :model="query"
         :rules="ruleForm"
         ref="ruleForm"
-        label-width="150px"
+        label-width="120px"
         class="top-search"
+        labelPosition="left"
       >
         <el-form-item label="目标活动名称" prop="taskName">
           <el-input v-model="query.taskName" placeholder="请输入"></el-input>
@@ -300,9 +305,10 @@ export default {
       <el-form
         :model="query"
         :rules="ruleForm"
-        label-width="150px"
+        label-width="120px"
         ref="fissStaff"
         class="top-search"
+        labelPosition="left"
       >
         <el-form-item label="发起成员" prop="taskNames">
           <el-radio-group v-model="groupForm.sendType" @change="changeType">
@@ -358,8 +364,9 @@ export default {
         :model="groupForm"
         :rules="ruleForm"
         ref="fissTarget"
-        label-width="150px"
+        label-width="120px"
         class="top-search"
+        labelPosition="left"
       >
         <el-form-item label="选择海报" prop="postersId">
           <el-button
@@ -380,7 +387,7 @@ export default {
           </div>
         </el-form-item>
 
-        <el-form-item label="添加员工">
+        <el-form-item label="添加员工" prop="fissionTargetId">
           <el-button
             type="primary"
             class="ml10"
@@ -408,8 +415,9 @@ export default {
       <el-form
         :model="groupForm"
         ref="reward"
-        label-width="150px"
+        label-width="120px"
         class="top-search"
+        labelPosition="left"
       >
         <el-form-item label="兑奖链接" prop="rewardUrl">
           <el-input
@@ -559,6 +567,7 @@ export default {
   .title {
     text-align: left;
     color: #303133;
+    margin-bottom: 10px;
   }
 }
 .avatar-uploader .el-upload {

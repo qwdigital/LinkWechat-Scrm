@@ -73,13 +73,15 @@ export default {
           // });
         })
       } else {
-        getList({ department: node.data.id }).then(({ rows }) => {
-          rows.forEach((element) => {
-            element.key = createUniqueString()
-          })
-          node.data.children && rows.push(...node.data.children)
-          resolve(rows)
-        })
+        getList({ department: node.data.id, isActivate: 1 }).then(
+          ({ rows }) => {
+            rows.forEach((element) => {
+              element.key = createUniqueString()
+            })
+            node.data.children && rows.push(...node.data.children)
+            resolve(rows)
+          }
+        )
       }
     },
     // 选择变化

@@ -7,17 +7,17 @@ export default {
   props: {
     fileUrl: {
       type: String,
-      default: '',
+      default: ''
     },
     fileName: {
       type: String,
-      default: '',
+      default: ''
     },
     // 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file)
     type: {
       type: String,
-      default: '0',
-    },
+      default: '0'
+    }
     // beforeUpload: {
     //   type: Function,
     //   default: function() {
@@ -28,11 +28,10 @@ export default {
   data() {
     return {
       loading: false,
-      action:
-        process.env.VUE_APP_BASE_API +
-        (this.type == 0
-          ? '/wecom/material/uploadimg'
-          : '/common/uploadFile2Cos'),
+      action: process.env.VUE_APP_BASE_API + '/common/uploadFile2Cos',
+      // (this.type == 0
+      //   ? '/wecom/material/uploadimg'
+      //   : '/common/uploadFile2Cos'),
       headers: window.CONFIG.headers,
       domain: process.env.VUE_APP_BASE_API,
     }
@@ -41,7 +40,7 @@ export default {
   computed: {
     accept() {
       return ['image/*', 'amr/*', 'video/*', '*'][this.type]
-    },
+    }
   },
   created() {},
   mounted() {},
@@ -105,12 +104,13 @@ export default {
         this.loading = false
         // this.$emit('update:fileUrl', res.data.materialUrl)
         // this.$emit('update:fileName', res.data.materialName)
-        if (this.type == 0) {
-          res.url = res.data.url
-          res.fileName = res.data.url
-        }
-        this.$emit('update:fileUrl', res.url)
-        this.$emit('update:fileName', res.fileName)
+
+        // if (this.type == 0) {
+        //   res.url = res.data.url
+        //   res.fileName = res.data.url
+        // }
+        this.$emit('update:fileUrl', res.data.url)
+        this.$emit('update:fileName', res.data.fileName)
         this.$emit('update:file', file)
         // this.fileUrl = URL.createObjectURL(file.raw)
       }
@@ -118,8 +118,8 @@ export default {
     onError(err, file, fileList) {
       this.loading = false
       this.$message.error('上传文件失败')
-    },
-  },
+    }
+  }
 }
 </script>
 

@@ -191,21 +191,21 @@ export default {
           {{ taskDetail.startTime }}至{{ taskDetail.overTime }}
         </div>
       </div>
-      <div class="task-row">
+      <!-- <div class="task-row">
         <div class="task-label">活动发起成员:</div>
         <div class="task-value"></div>
       </div>
       <div class="task-row" style="margin-bottom:30px">
         <div class="task-label">客户标签:</div>
         <div class="task-value">{{ taskDetail.customerTag }}</div>
-      </div>
+      </div> -->
       <div class="task-row">
         <div class="task-label">裂变海报:</div>
         <img style="width:30px" :src="taskDetail.postersUrl" />
       </div>
       <div class="task-row" style="margin-bottom:30px">
-        <div class="task-label">员工:</div>
-        <div class="task-value">{{ taskDetail.fissionTarget }}</div>
+        <div class="task-label">群活码:</div>
+        <img style="width: 50px" :src="taskDetail.fissionTarget" />
       </div>
 
       <div class="task-row">
@@ -214,7 +214,7 @@ export default {
       </div>
       <div class="task-row" style="margin-bottom:30px">
         <div class="task-label">兑奖图片:</div>
-        <img style="width:30px" :src="taskDetail.rewardImageUrl" />
+        <img style="width:30px" v-if="taskDetail.rewardImageUrl" :src="taskDetail.rewardImageUrl" />
       </div>
       <div class="task-row">
         <div class="task-label">新客欢迎语:</div>

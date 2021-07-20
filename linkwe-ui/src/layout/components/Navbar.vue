@@ -1,13 +1,19 @@
 <template>
-  <div class="navbar">
-    <hamburger
-      id="hamburger-container"
-      :is-active="sidebar.opened"
-      class="hamburger-container"
-      @toggleClick="toggleSideBar"
-    />
+  <div class="navbar main-size">
+    <logo />
 
-    <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
+    <el-scrollbar class="nav-scrollbar">
+      <template v-for="(route, index) in permission_routes">
+        <div
+          v-if="!route.hidden"
+          :class="['nav', $route.path.startsWith(route.path) && 'active']"
+          :key="route.path + index"
+          @click="goLink(route.path)"
+        >
+          {{ route.meta && route.meta.title }}
+        </div>
+      </template>
+    </el-scrollbar>
 
     <div class="right-menu">
       <template v-if="device !== 'mobile'">
@@ -19,11 +25,11 @@
           </div>
         </el-tooltip>
 
-        <!-- <el-tooltip content="文档地址" effect="dark" placement="bottom">
+        <el-tooltip content="文档地址" effect="dark" placement="bottom">
           <div class="right-menu-item hover-effect">
             <svg-icon icon-class="question" @click="goto(1)" />
           </div>
-        </el-tooltip>-->
+        </el-tooltip>
 
         <screenfull id="screenfull" class="right-menu-item hover-effect" />
       </template>
@@ -54,21 +60,21 @@
 </template>
 
 <script>
+import { isExternal } from '@/utils/validate'
 import { mapGetters } from 'vuex'
-import Breadcrumb from '@/components/Breadcrumb'
-import Hamburger from '@/components/Hamburger'
+import Logo from './Logo'
+
 import Search from '@/components/HeaderSearch'
 import screenfull from '@/components/Screenfull'
 
 export default {
   components: {
-    Breadcrumb,
-    Hamburger,
+    Logo,
     Search,
     screenfull,
   },
   computed: {
-    ...mapGetters(['sidebar', 'avatar', 'device']),
+    ...mapGetters(['avatar', 'device', 'permission_routes']),
     setting: {
       get() {
         return this.$store.state.settings.showSettings
@@ -81,10 +87,10 @@ export default {
       },
     },
   },
+  mounted() {
+    // console.log(this.permission_routes)
+  },
   methods: {
-    toggleSideBar() {
-      this.$store.dispatch('app/toggleSideBar')
-    },
     async logout() {
       this.$confirm('确定注销并退出系统吗？', '提示', {
         confirmButtonText: '确定',
@@ -99,9 +105,16 @@ export default {
     goto(type) {
       window.open(
         type
-          ? 'https://gitee.com/LinkWeChat/link-wechat'
+          ? 'https://www.yuque.com/linkwechat/help/dsatfs'
           : 'https://gitee.com/LinkWeChat/link-wechat'
       )
+    },
+    goLink(path) {
+      if (!isExternal(path)) {
+        this.$router.push({ path })
+      } else {
+        window.open(path, '_blank')
+      }
     },
   },
 }
@@ -109,28 +122,14 @@ export default {
 
 <style lang="scss" scoped>
 .navbar {
-  height: 50px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   position: relative;
-  background: #fff;
+  color: #fff;
   box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
-
-  .hamburger-container {
-    line-height: 46px;
-    height: 100%;
-    float: left;
-    cursor: pointer;
-    transition: background 0.3s;
-    -webkit-tap-highlight-color: transparent;
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.025);
-    }
-  }
-
-  .breadcrumb-container {
-    float: left;
-  }
 
   .errLog-container {
     display: inline-block;
@@ -138,9 +137,8 @@ export default {
   }
 
   .right-menu {
-    float: right;
-    height: 100%;
-    line-height: 50px;
+    position: absolute;
+    right: 0;
 
     &:focus {
       outline: none;
@@ -149,10 +147,9 @@ export default {
     .right-menu-item {
       display: inline-block;
       padding: 0 8px;
-      height: 100%;
       font-size: 18px;
-      color: #5a5e66;
-      vertical-align: text-bottom;
+      // color: #5a5e66;
+      vertical-align: middle;
 
       &.hover-effect {
         cursor: pointer;
@@ -169,7 +166,7 @@ export default {
 
       .avatar-wrapper {
         position: relative;
-
+        color: #fff;
         .user-avatar {
           cursor: pointer;
           width: 40px;
@@ -181,10 +178,37 @@ export default {
           cursor: pointer;
           position: absolute;
           right: -20px;
-          top: 25px;
+          top: 5px;
           font-size: 12px;
         }
       }
+    }
+  }
+}
+
+.nav-scrollbar {
+  width: calc(100% - 450px);
+  /deep/.el-scrollbar__view {
+    white-space: nowrap;
+    line-height: 58px;
+  }
+  .nav {
+    display: inline-block;
+    margin: 0 20px;
+    flex: none;
+    position: relative;
+    cursor: pointer;
+    &.active::after {
+      content: '';
+      display: inline-block;
+      position: absolute;
+      bottom: 2px;
+      width: 42px;
+      height: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 6px;
+      background: #fff;
     }
   }
 }

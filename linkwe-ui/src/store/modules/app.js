@@ -2,15 +2,18 @@ import Cookies from 'js-cookie'
 
 const state = {
   sidebar: {
-    opened: Cookies.get('sidebarStatus') ? !!+Cookies.get('sidebarStatus') : true,
-    withoutAnimation: false
+    opened: Cookies.get('sidebarStatus')
+      ? !!+Cookies.get('sidebarStatus')
+      : true,
+    withoutAnimation: false,
   },
   device: 'desktop',
-  size: Cookies.get('size') || 'medium'
+  size: Cookies.get('size') || 'medium',
+  busininessDesc: undefined,
 }
 
 const mutations = {
-  TOGGLE_SIDEBAR: state => {
+  TOGGLE_SIDEBAR: (state) => {
     state.sidebar.opened = !state.sidebar.opened
     state.sidebar.withoutAnimation = false
     if (state.sidebar.opened) {
@@ -30,7 +33,10 @@ const mutations = {
   SET_SIZE: (state, size) => {
     state.size = size
     Cookies.set('size', size)
-  }
+  },
+  SET_busininessDesc: (state, busininessDesc) => {
+    state.busininessDesc = busininessDesc
+  },
 }
 
 const actions = {
@@ -45,12 +51,15 @@ const actions = {
   },
   setSize({ commit }, size) {
     commit('SET_SIZE', size)
-  }
+  },
+  setBusininessDesc({ commit }, busininessDesc) {
+    commit('SET_busininessDesc', busininessDesc)
+  },
 }
 
 export default {
   namespaced: true,
   state,
   mutations,
-  actions
+  actions,
 }

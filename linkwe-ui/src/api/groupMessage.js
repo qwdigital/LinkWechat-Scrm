@@ -2,7 +2,7 @@ import request from '@/utils/request'
 const service = window.CONFIG.services.wecom + '/customerMessagePush'
 
 /**
- * 新增企业id
+ * 新增群发
  * @param {Object} data
 {
     "pushType": "群发类型 0 发给客户 1 发给客户群",
@@ -37,7 +37,7 @@ export function add(data) {
   return request({
     url: service + '/add',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -54,7 +54,7 @@ endTime:结束时间}
 export function getList(params) {
   return request({
     url: service + '/list',
-    params,
+    params
   })
 }
 
@@ -65,7 +65,7 @@ export function getList(params) {
 export function getDetail(messageId) {
   return request({
     url: service + '/getInfo',
-    params: { messageId },
+    params: { messageId }
   })
 }
 
@@ -78,7 +78,7 @@ status:发送状态 0-未发送 1-已发送 2-因客户不是好友导致发送�
 export function getPushResult(params) {
   return request({
     url: service + '/pushResults',
-    params,
+    params
   })
 }
 
@@ -92,6 +92,6 @@ export function syncMsg(data) {
   return request({
     url: service + '/asyncResult',
     method: 'post',
-    data,
+    data
   })
 }

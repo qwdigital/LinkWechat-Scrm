@@ -28,15 +28,15 @@
             >
             <span class="fs14">{{ chargeType(item1.trajectoryType) }}</span>
             <span class="finish-box">
-                <span
-              class="finish"
-              v-if="item1.trajectoryType == 4"
-              @click="finDynamic(item1.id)"
-              >完成</span
-            >
-            <span class="deldynamic" @click="delDynamic(item1.id)">删除</span>
+              <span
+                class="finish"
+                v-if="item1.trajectoryType == 4 && item1.status != 3"
+                @click="finDynamic(item1.id)"
+                >完成</span
+              >
+              <span class="deldynamic" @click="delDynamic(item1.id)">删除</span>
             </span>
-            
+
             <p class="fs14 con ">{{ item1.content }}</p>
           </van-step>
           <!-- <van-step>
@@ -53,10 +53,10 @@
 </template>
 
 <script>
-import { removeTrajectory, handleWait } from "@/api/portrait";
+import { removeTrajectory, handleWait } from '@/api/portrait'
 export default {
-  props: ["stepList"],
-  inject:['reload'],
+  props: ['stepList'],
+  inject: ['reload'],
   data() {
     return {
       // 步骤条
@@ -66,45 +66,45 @@ export default {
       // 轨迹内层
       nlist: [],
       oldele: [],
-      content: "",
+      content: '',
       type: 0,
       wList: [],
       finished: false,
-      loading: false,
-    };
+      loading: false
+    }
   },
   watch: {
     stepList(newVal, oldVal) {
-    //   console.log(newVal, oldVal);
+      //   console.log(newVal, oldVal);
       if (newVal != oldVal) {
         //   debugger
-        this.wlist = [];
-        this.wList = [];
-        this.oldele = [];
-        this.nlist = [];
+        this.wlist = []
+        this.wList = []
+        this.oldele = []
+        this.nlist = []
       }
 
       newVal.forEach((ele) => {
-        this.oldele.push(parseInt(this.getTime(ele.createDate)));
+        this.oldele.push(parseInt(this.getTime(ele.createDate)))
         // console.log(parseInt(this.getTime(ele.createDate)));
-      });
+      })
       //   console.log(this.oldele);
-      this.oldele = this.newArr(this.oldele).sort(this.f);
+      this.oldele = this.newArr(this.oldele).sort(this.f)
       //   console.log(this.oldele);
       for (let i = 0; i < this.oldele.length; i++) {
         for (let j = 0; j < newVal.length; j++) {
           // console.log(newVal[j].createDate);
           if (this.oldele[i] == this.getTime(newVal[j].createDate)) {
-            this.nlist.push(newVal[j]);
+            this.nlist.push(newVal[j])
             // console.log(this.nlist);
           }
         }
-        this.wlist.push(this.nlist);
-        this.nlist = [];
+        this.wlist.push(this.nlist)
+        this.nlist = []
       }
       // console.log(this.wlist);
       this.onLoad()
-    },
+    }
   },
   methods: {
     onLoad() {
@@ -112,82 +112,82 @@ export default {
       // setTimeout 仅做示例，真实场景中一般为 ajax 请求
       setTimeout(() => {
         //   debugger
-        let total = this.wlist.length > 10 ? 10 : this.wlist.length;
+        let total = this.wlist.length > 10 ? 10 : this.wlist.length
         for (let i = 0; i < total; i++) {
-          this.wList.push(this.wlist[i]);
+          this.wList.push(this.wlist[i])
         }
         // 加载状态结束
-        this.loading = false;
+        this.loading = false
 
         // 数据全部加载完成
         if (this.wList.length >= this.wlist.length) {
-          this.finished = true;
+          this.finished = true
         }
-      }, 1000);
+      }, 1000)
     },
     //   根据数字判断类型
     chargeType(num) {
       if (num == 1) {
-        return (this.type = "信息动态");
+        return (this.type = '信息动态')
       } else if (num == 2) {
-        return (this.type = "社交动态");
+        return (this.type = '社交动态')
       } else if (num == 3) {
-        return (this.type = "活动规则");
+        return (this.type = '活动规则')
       } else if (num == 4) {
-        return (this.type = "待办动态");
+        return (this.type = '待办动态')
       }
     },
     //   数组去重
     newArr(arr) {
-      return Array.from(new Set(arr));
+      return Array.from(new Set(arr))
     },
     // 数组由大到小排序
     f(a, b) {
       //排序函数
-      return -(a - b); //取反并返回比较参数
+      return -(a - b) //取反并返回比较参数
     },
     // 时间处理器
     getTime(data) {
-      const date = new Date(data);
+      const date = new Date(data)
       // console.log(timer.getFullYear());
-      var Y = date.getFullYear();
+      var Y = date.getFullYear()
       var M =
         date.getMonth() + 1 < 10
-          ? "0" + (date.getMonth() + 1)
-          : date.getMonth() + 1;
-      var D = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
-      return Y + M + D;
+          ? '0' + (date.getMonth() + 1)
+          : date.getMonth() + 1
+      var D = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+      return Y + M + D
     },
     getTime1(data) {
-      const date = new Date(data);
+      const date = new Date(data)
       // console.log(timer.getFullYear());
-      var Y = date.getFullYear() + "-";
+      var Y = date.getFullYear() + '-'
       var M =
         (date.getMonth() + 1 < 10
-          ? "0" + (date.getMonth() + 1)
-          : date.getMonth() + 1) + "-";
-      var D = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
-      return Y + M + D;
+          ? '0' + (date.getMonth() + 1)
+          : date.getMonth() + 1) + '-'
+      var D = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+      return Y + M + D
     },
     getTime2(data) {
-      const date = new Date(data);
+      const date = new Date(data)
       // console.log(timer.getFullYear());
       var h =
-        (date.getHours() < 10 ? "0" + date.getHours() : date.getHours()) + ":";
+        (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
       var m =
-        date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
-      return h + m;
+        date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+      return h + m
     },
     // 处理星期几
     getTime3(time) {
-      var dateArray = time.split("-");
+      var dateArray = time.split('-')
       var date = new Date(
         dateArray[0],
         parseInt(dateArray[1] - 1),
         dateArray[2]
-      );
-      var week = "星期" + "日一二三四五六".charAt(date.getDay());
-      return week;
+      )
+      var week = '星期' + '日一二三四五六'.charAt(date.getDay())
+      return week
     },
     // 删除轨迹
     delDynamic(id) {
@@ -199,30 +199,30 @@ export default {
             // this.msgSuccess("删除成功");
             // debugger
             // location.reload();
-            this.$toast.success('删除成功');
-            this.reload ()
+            this.$toast.success('删除成功')
+            this.reload()
             // 重新获取全部数据
           }
         })
         .catch((err) => {
-          console.log(err);
-        });
+          console.log(err)
+        })
     },
     // 点击完成
     finDynamic(id) {
       handleWait(id)
         .then((data) => {
           if (data.code == 200) {
-            this.delDynamic(id);
-            this.reload();
+            // this.delDynamic(id);
+            this.reload()
           }
         })
         .catch((err) => {
-          console.log(err);
-        });
-    },
-  },
-};
+          console.log(err)
+        })
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>
@@ -250,28 +250,24 @@ export default {
   color: #9c9c9c;
   font-size: 12px;
   font-weight: 600;
+  margin-right: 16px;
 }
 .con {
   left: 51px;
   margin-top: 20px;
 }
 .finish-box {
-     display: inline-block;
+  display: inline-block;
   position: relative;
-  color: #2c8cf0;
-  font-size: 12px;
-  font-weight: 600;
-  left: 140px;
-  top: 0px;
-  width: 65px;
+  left: 100px;
+  width: 25%;
 }
 .finish {
-   
   position: absolute;
   color: #2c8cf0;
   font-size: 12px;
   font-weight: 600;
-//   right: -138px;
-  top: 0px;
+  //   right: 30px;
+  //   top: 0px;
 }
 </style>

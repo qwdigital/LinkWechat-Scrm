@@ -3,7 +3,7 @@ import {
   getList,
   remove,
   download,
-  downloadBatch,
+  downloadBatch
 } from '@/api/communityOperating/newCustomer'
 
 export default {
@@ -14,13 +14,13 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        emplCodeName: '',
-        createBy: '',
-        beginTime: '', // "开始时间",
-        endTime: '', // "结束时间"
+        emplCodeName: '', // 活码名称
+        createBy: '', // 创建人
+        beginTime: '', // 开始日期
+        endTime: '' // 结束日期
       },
       dateRange: [], // 添加日期
-      total: 0,
+      total: 0, // 数据总量
       form: {},
       list: [],
       dialogVisible: false,
@@ -29,41 +29,57 @@ export default {
       status: ['正常', '停用'],
       pushType: {
         0: '发给客户',
-        1: '发给客户群',
+        1: '发给客户群'
       },
       queryUser: [], // 搜索框选择的添加人
-      ids: [],
+      ids: []
     }
   },
   computed: {},
+  watch: {
+    // 日期选择器数据同步至查询参数
+    dateRange(dateRange) {
+      if (!dateRange || dateRange.length !== 2) {
+        this.query.beginTime = ''
+        this.query.endTime = ''
+      } else {
+        ;[this.query.beginTime, this.query.endTime] = dateRange
+      }
+    }
+  },
   created() {
     this.getList()
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>指在客户通过员工活码加为好友后，员工自动推送入群引导语和群活码，客户可通过群活码扫码入群。</div>
+      `
+    )
   },
   mounted() {
     // new clipboard(".copy-btn");
   },
   methods: {
+    // 获取新客数据
     getList(page) {
       page && (this.query.pageNum = page)
       this.loading = true
 
-      getList(this.query).then(({ rows, total }) => {
-        this.list = rows
-        this.total = +total
-        this.loading = false
-      }).catch(() => {
-        this.loading = false
-      })
+      getList(this.query)
+        .then(({ rows, total }) => {
+          this.list = rows
+          this.total = +total
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
     },
-    edit(data, type) {
-      this.form = Object.assign({}, data || {})
-      this.dialogVisible = true
-      type || !data ? (this.disabled = false) : (this.disabled = true)
-    },
+    // 新建/编辑新客数据
     goRoute(id) {
       this.$router.push({
-        path: '/communityOperating/newCustomerAev',
-        query: { id },
+        path: 'newCustomerAev',
+        query: { id }
       })
     },
     // 多选框选中数据
@@ -76,7 +92,7 @@ export default {
       this.$confirm('是否确认删除?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(function() {
           return remove(ids)
@@ -87,6 +103,7 @@ export default {
         })
         .catch(function() {})
     },
+    // 下载
     download(data) {
       let name = data.codeName + '.png'
       download(data.id).then((res) => {
@@ -101,12 +118,12 @@ export default {
         }
       })
     },
-    /** 批量下载 */
+    // 批量下载
     downloadBatch() {
       this.$confirm('是否确认下载所有活码图片吗?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(() => {
           return downloadBatch(this.ids + '')
@@ -125,25 +142,14 @@ export default {
         })
         .catch(function() {})
     },
-
     // 重置查询参数
-    resetQuery () {
+    resetQuery() {
       this.dateRange = []
       this.$refs['queryForm'].resetFields()
 
-      this.getList(1)
-    },
-  },
-
-  watch: {
-    // 日期选择器数据同步至查询参数
-    dateRange (dateRange) {
-      if (!dateRange || dateRange.length !== 2) {
-        this.query.beginTime = ''
-        this.query.endTime = ''
-      } else {
-        [ this.query.beginTime, this.query.endTime ] = dateRange
-      }
+      this.$nextTick(() => {
+        this.getList(1)
+      })
     }
   }
 }
@@ -155,7 +161,7 @@ export default {
       ref="queryForm"
       :inline="true"
       :model="query"
-      label-width="80px"
+      label-width="100px"
       class="top-search"
       size="small"
     >
@@ -177,7 +183,7 @@ export default {
           align="right"
         ></el-date-picker>
       </el-form-item>
-      <el-form-item label="">
+      <el-form-item label=" ">
         <el-button
           v-hasPermi="['customerManage:customer:query']"
           type="primary"
@@ -186,27 +192,16 @@ export default {
         >
         <el-button
           v-hasPermi="['customerManage:customer:query']"
-          type="info"
+          type="success"
           @click="resetQuery()"
           >重置</el-button
         >
       </el-form-item>
     </el-form>
 
-    <div class="fxbw mb10 aic">
-      <div class="total">
+    <div class="mid-action">
+      <div>
         <el-button type="primary" @click="goRoute()">新建自动拉群</el-button>
-        <!-- 新客自动拉群 -->
-        <el-tooltip
-          effect="light"
-          content="客户通过员工活码添加员工，自动发送入群引导语、群活码，客户扫码入群。"
-          placement="top-start"
-        >
-          <i
-            class="el-icon-question"
-            style="font-size: 26px;vertical-align: middle; margin-left: 10px;"
-          ></i>
-        </el-tooltip>
       </div>
       <div>
         <el-button
@@ -224,33 +219,37 @@ export default {
         >
       </div>
     </div>
-    <!-- <el-card shadow="never" :body-style="{padding: '20px 0 0'}">
-    </el-card>-->
 
     <el-table
       v-loading="loading"
       :data="list"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="50" align="center" />
-      <el-table-column prop="codeName" label="活码名称" align="center">
-      </el-table-column>
-      <el-table-column label="员工活码" align="center" prop="qrCode" width="130">
+      <el-table-column
+        type="selection"
+        width="50"
+        align="center"
+      ></el-table-column>
+      <el-table-column
+        prop="codeName"
+        label="活码名称"
+        align="center"
+      ></el-table-column>
+      <el-table-column
+        prop="emplList"
+        label="使用员工"
+        align="center"
+        prop="qrCode"
+        width="130"
+      >
         <template #default="{ row }">
-          <el-popover
-            placement="bottom"
-            trigger="hover"
-          >
+          <el-popover placement="bottom" trigger="hover">
             <el-image
               slot="reference"
               :src="row.emplCodeUrl"
               class="code-image--small"
             ></el-image>
-            <el-image
-              :src="row.emplCodeUrl"
-              class="code-image"
-            >
-            </el-image>
+            <el-image :src="row.emplCodeUrl" class="code-image"></el-image>
           </el-popover>
         </template>
         <!-- <template slot-scope="{ row }">
@@ -360,13 +359,13 @@ export default {
 </template>
 
 <style scoped lang="scss">
-  .code-image {
-    width: 200px;
-    height: 200px;
-  }
+.code-image {
+  width: 200px;
+  height: 200px;
+}
 
-  .code-image--small {
-    width: 50px;
-    height: 50px;
-  }
+.code-image--small {
+  width: 50px;
+  height: 50px;
+}
 </style>

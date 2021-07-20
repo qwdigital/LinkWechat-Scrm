@@ -16,12 +16,16 @@
         </div>
       </el-form-item>
       <el-form-item>
-        <el-input v-model="form.keyword" placeholder="搜索关键词" style="width:300px">
+        <el-input
+          v-model="form.keyword"
+          placeholder="搜索关键词"
+          style="width:300px"
+        >
           <el-button slot="prepend" icon="el-icon-search"></el-button>
         </el-input>
       </el-form-item>
       <el-form-item>
-          <el-button type="primary" @click="getSensitiveList">查询</el-button>
+        <el-button type="primary" @click="getSensitiveList">查询</el-button>
       </el-form-item>
     </el-form>
     <div class="search-content">
@@ -41,30 +45,41 @@
             range-separator="至"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
-            class="date-range">
+            class="date-range"
+          >
           </el-date-picker>
         </el-col>
       </el-row>
     </div>
-    <el-table :data="tableData" stripe style="width: 100%"
-      :header-cell-style="{background:'#fff'}">
-      <el-table-column prop="pattern_words" label="敏感词">
-      </el-table-column>
-      <el-table-column prop="content" label="内容">
-      </el-table-column>
-      <el-table-column prop="from" label="触发者">
-      </el-table-column>
+    <el-table
+      :data="tableData"
+      stripe
+      style="width: 100%"
+      :header-cell-style="{ background: '#fff' }"
+    >
+      <el-table-column prop="pattern_words" label="敏感词"> </el-table-column>
+      <el-table-column prop="content" label="内容"> </el-table-column>
+      <el-table-column prop="from" label="触发者"> </el-table-column>
       <el-table-column prop="status" label="消息状态">
-        <template slot="header" >
-          {{floorRange}} 
-          <el-select size="mini" v-model="floorRange" class="noborder" @change="chechName(floorRange)">
-            <el-option v-for="item in displayOptions" :key="item.value" :label="item.label" :value="item.value">
+        <template slot="header">
+          {{ floorRange }}
+          <el-select
+            size="mini"
+            v-model="floorRange"
+            class="noborder"
+            @change="chechName(floorRange)"
+          >
+            <el-option
+              v-for="item in displayOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
             </el-option>
           </el-select>
         </template>
       </el-table-column>
-      <el-table-column prop="msgtime" label="发送时间">
-      </el-table-column>
+      <el-table-column prop="msgtime" label="发送时间"> </el-table-column>
     </el-table>
     <pagination
       v-show="total > 0"
@@ -84,10 +99,10 @@
 </template>
 <script>
 import * as sensitiveApis from '@/api/conversation/security'
-import SelectUser from "@/components/SelectUser"
+import SelectUser from '@/components/SelectUser'
 export default {
   components: {
-    SelectUser
+    SelectUser,
   },
   data() {
     return {
@@ -96,7 +111,7 @@ export default {
         pageNum: 1,
         scopeType: '',
         auditScopeId: '',
-        keyword: '' // 关键词
+        keyword: '', // 关键词
       },
       selectDate: '',
       dateRangeValue: '', // 时间选择
@@ -104,28 +119,29 @@ export default {
       queryUser: [], // 搜索框选择的添加人
       query: {
         pageNum: 1,
-        pageSize: 10
+        pageSize: 10,
       },
       total: 0,
       dialogVisibleSelectUser: false, // 选择添加人弹窗显隐
-      floorRange:'全部',
-        displayOptions: [{
-          value: "0",
-          label: "全部"
+      floorRange: '全部',
+      displayOptions: [
+        {
+          value: '0',
+          label: '全部',
         },
         {
-          value: "1",
-          label: "已发送"
+          value: '1',
+          label: '已发送',
         },
         {
-          value: "2",
-          label: "已撤回"
+          value: '2',
+          label: '已撤回',
         },
         {
-          value: "3",
-          label: "已删除"
-        }
-      ]  
+          value: '3',
+          label: '已删除',
+        },
+      ],
     }
   },
   methods: {
@@ -133,7 +149,7 @@ export default {
       if (this.queryUser.length > 0) {
         this.form.pageSize = this.query.pageSize
         this.form.pageNum = this.query.pageNum
-        sensitiveApis.getSecurityList(this.form).then(res => {
+        sensitiveApis.getSecurityList(this.form).then((res) => {
           if (res.code === 200) {
             this.tableData = res.rows
             this.total = Number(res.total)
@@ -157,54 +173,40 @@ export default {
     selectedUser(list) {
       // console.log(list)
       this.queryUser = list
-      this.form.scopeType = list.map(d => d.department) + ""
-      this.form.auditScopeId = list.map(d => d.userId) + "" 
+      this.form.scopeType = list.map((d) => d.department) + ''
+      this.form.auditScopeId = list.map((d) => d.userId) + ''
       this.getSensitiveList()
-    }
-  }
+    },
+  },
 }
 </script>
 <style lang="scss" scoped>
-  .demo-form-inline {
-    background: #efefef;
-    padding: 18px 10px 0 10px;
-  }
-  .tag-input {
-    width: 240px;
-    display: flex;
-    border-radius: 4px;
-    border: 1px solid #dcdfe6;
-    align-items: center;
-    padding: 0 15px;
-    overflow: hidden;
-    height: 32px;
-    background: #fff;
-    .tag-place {
-      color: #bbb;
-      font-size: 14px;
-    }
-  }
-  .search-content {
+.demo-form-inline {
+  background: #efefef;
+  padding: 18px 10px 0 10px;
+}
+
+.search-content {
+  height: 40px;
+  margin-top: 15px;
+  padding: 10px;
+  .left-title {
     height: 40px;
-    margin-top: 15px;
-    padding: 10px;
-    .left-title {
-      height: 40px;
-      line-height: 40px;
-    }
-    .date-range {
-      margin-left: 10px;
-      width: 300px;
-    }
+    line-height: 40px;
   }
-  .noborder {
-    /deep/ .el-input--mini .el-input__inner{
-      width: 2px;
-      border: none;
-    }
+  .date-range {
+    margin-left: 10px;
+    width: 300px;
   }
-  .content {
-    margin-top: 15px;
-    padding: 10px;
+}
+.noborder {
+  /deep/ .el-input--mini .el-input__inner {
+    width: 2px;
+    border: none;
   }
+}
+.content {
+  margin-top: 15px;
+  padding: 10px;
+}
 </style>

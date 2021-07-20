@@ -4,7 +4,7 @@ import TabContent from './TabContent'
 
 export default {
   components: {
-    TabContent,
+    TabContent
   },
   props: {},
   data() {
@@ -12,7 +12,7 @@ export default {
       data: {},
       activeName: '0',
       total1: 0,
-      total0: 0,
+      total0: 0
     }
   },
   watch: {},
@@ -24,17 +24,27 @@ export default {
   },
   mounted() {},
   methods: {
-    notice() {},
-  },
+    notice() {}
+  }
 }
 </script>
 
 <template>
   <div>
-    <div>
-      创建人：{{ data.sender }}
-      <div>消息内容：{{ data.content }}</div>
-    </div>
+    <el-card shadow="hover" class="mb10">
+      <span class="label">创建人：</span>
+      {{ data.sender }}
+      <div class="mt10 flex aic">
+        <span class="label">消息内容：</span>
+        <el-image
+          v-if="/^http.*\.(png|jpeg|jpg|gif)$/gi.test(data.content)"
+          style="width: 80px; height: 80px;border-radius:6px"
+          :src="data.content"
+          fit="fit"
+        ></el-image>
+        <span v-else>{{ data.content }}</span>
+      </div>
+    </el-card>
     <!-- <el-button class="notice" type="primary" @click="notice"
       >通知员工发送</el-button
     > -->
@@ -49,4 +59,10 @@ export default {
   </div>
 </template>
 
-<style lang="less" scoped></style>
+<style lang="scss" scoped>
+.label {
+  width: 70px;
+  display: inline-block;
+  text-align: right;
+}
+</style>

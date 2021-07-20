@@ -5,16 +5,16 @@ import Video from 'video.js'
 export default {
   name: 'Video',
   components: {
-    MaPage,
+    MaPage
   },
   data() {
     return {
-      ids: [], // 选中数组
+      ids: [] // 选中数组
     }
   },
   watch: {},
   created() {},
-  methods: {},
+  methods: {}
 }
 </script>
 
@@ -43,17 +43,16 @@ export default {
             </video>
             <div class="actions">
               <i
-                v-hasPermi="['material:download']"
                 class="el-icon-download"
                 @click="$refs.page.download(item)"
               ></i>
               <i
-                v-hasPermi="['material:edit']"
+                v-hasPermi="['wechat:material:edit']"
                 class="el-icon-edit cp"
                 @click="$refs.page.edit(item)"
               ></i>
               <i
-                v-hasPermi="['material:remove']"
+                v-hasPermi="['wechat:material:remove']"
                 class="el-icon-delete cp"
                 @click="$refs.page.remove(item.id)"
               ></i>
@@ -75,6 +74,7 @@ export default {
 <style lang="scss" scoped>
 .img-wrap {
   position: relative;
+  height: 200px;
   &:hover .actions {
     opacity: 1;
   }

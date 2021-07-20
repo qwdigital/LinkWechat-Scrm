@@ -10,7 +10,7 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        name: '',
+        name: ''
       },
       dateRange: [], // 添加日期
       total: 0,
@@ -23,16 +23,23 @@ export default {
         name: [{ required: true, message: '必填项', trigger: 'blur' }],
         corpId: [{ required: true, message: '必填项', trigger: 'blur' }],
         corpSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
-        contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
+        contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }]
       }),
       status: ['正常', '停用'],
-      dialogVisibleSelectMaterial: false,
+      dialogVisibleSelectMaterial: false
     }
   },
   watch: {},
   computed: {},
   created() {
     this.getList()
+
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>用于添加自建应用，方便自建应用的配置与管理。</div>
+      `
+    )
   },
   mounted() {
     // new clipboard(".copy-btn");
@@ -80,8 +87,8 @@ export default {
     },
     goRoute(id, path) {
       this.$router.push({
-        path: '/appTool/taskAev',
-        query: { id },
+        path: 'taskAev',
+        query: { id }
       })
     },
 
@@ -90,14 +97,14 @@ export default {
       this.form.logoMediaid = image.id
       this.form.squareLogoUrl = image.materialUrl
       this.dialogVisibleSelectMaterial = false
-    },
-  },
+    }
+  }
 }
 </script>
 
 <template>
   <div>
-    <div class="top-search">
+    <!-- <div class="top-search">
       <el-tooltip
         effect="light"
         content="用于添加自建应用，方便自建应用的配置与管理。"
@@ -108,7 +115,7 @@ export default {
           style="font-size: 26px;vertical-align: middle; margin-left: 10px;"
         ></i>
       </el-tooltip>
-    </div>
+    </div> -->
     <!-- <div class="ar mb10">
       <el-button
         v-hasPermi="['enterpriseWechat:add']"
@@ -230,17 +237,21 @@ export default {
     </el-dialog>
 
     <!-- 选择素材弹窗 -->
-    <SelectMaterial
+    <!-- <SelectMaterial
       :visible.sync="dialogVisibleSelectMaterial"
       type="1"
       :showArr="[1]"
       @success="submitSelectMaterial"
     >
-    </SelectMaterial>
+    </SelectMaterial> -->
   </div>
 </template>
 
 <style lang="scss" scoped>
+.page {
+  padding: 20px;
+  border-radius: 5px;
+}
 .list-wrap {
   display: flex;
   flex-wrap: wrap;
