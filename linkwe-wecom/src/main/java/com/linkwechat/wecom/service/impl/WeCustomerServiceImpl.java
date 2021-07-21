@@ -142,11 +142,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         FollowUserList followUserList = weCustomerClient.getFollowUserList();
         if (WeConstans.WE_SUCCESS_CODE.equals(followUserList.getErrcode())
                 && ArrayUtil.isNotEmpty(followUserList.getFollow_user())) {
-            SecurityContext securityContext = SecurityContextHolder.getContext();
             Arrays.asList(followUserList.getFollow_user())
                     .parallelStream().forEach(k -> {
                 try {
-                    SecurityContextHolder.setContext(securityContext);
                     weFlowerCustomerHandle(k);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -203,7 +201,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                         WeTagGroup.builder()
                                                 .groupId(tagGroup.getGroup_id())
                                                 .gourpName(tagGroup.getGroup_name())
-                                                .createBy(SecurityUtils.getUsername())
+//                                                .createBy(SecurityUtils.getUsername())
                                                 .build()
                                 );
 
@@ -222,6 +220,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
                                             weFlowerCustomerTagRels.add(
                                                     WeFlowerCustomerTagRel.builder()
+                                                            .externalUserid(weCustomer.getExternalUserid())
                                                             .flowerCustomerRelId(weFlowerCustomerRelId)
                                                             .tagId(tag)
                                                             .createTime(new Date())
@@ -392,6 +391,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                         tagRels.add(
                                 WeFlowerCustomerTagRel.builder()
                                         .flowerCustomerRelId(customer.getId())
+                                        .externalUserid(customer.getExternalUserid())
                                         .tagId(tag.getTagId())
                                         .createTime(new Date())
                                         .build()

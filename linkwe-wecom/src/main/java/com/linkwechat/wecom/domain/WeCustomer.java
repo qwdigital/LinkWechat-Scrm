@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,7 @@ import java.util.List;
 @TableName("we_customer")
 public class WeCustomer extends BaseEntity {
     private static final long serialVersionUID = 1L;
+
 
 
     /**
