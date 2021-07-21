@@ -1,10 +1,14 @@
 package com.linkwechat.common.utils.file;
 
+import com.linkwechat.common.utils.StringUtils;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -72,6 +76,40 @@ public class FileUtils extends org.apache.commons.io.FileUtils
                 }
             }
         }
+    }
+
+    /**
+     * 批量下载文件，打包为zip。
+     * @param fileList 文件列表，每个元素应包含fileName、url，前者即为文件名，后者为下载所需链接
+     * @param os 输出流
+     */
+    public static void batchDownloadFile(List<Map<String, String>> fileList, OutputStream os) {
+        try {
+            ZipOutputStream zos = new ZipOutputStream(os);
+            for (Map<String, String> fileInfo: fileList) {
+                String fileName = fileInfo.get("fileName");
+                String url = fileInfo.get("url");
+                // 跳过不包含指定键位的对象
+                if (StringUtils.isEmpty(url) || StringUtils.isEmpty(fileName)){
+                    continue;
+                }
+                URL _url = new URL(url);
+                zos.putNextEntry(new ZipEntry(fileName));
+                InputStream fis = _url.openConnection().getInputStream();
+                byte[] buffer = new byte[1024];
+                int r = 0;
+                while ((r = fis.read(buffer)) != -1) {
+                    zos.write(buffer, 0, r);
+                }
+                fis.close();
+            }
+            //关闭zip输出流
+            zos.flush();
+            zos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**

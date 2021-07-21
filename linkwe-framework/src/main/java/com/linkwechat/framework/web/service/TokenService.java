@@ -1,10 +1,13 @@
 package com.linkwechat.framework.web.service;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
+
+import com.linkwechat.common.config.RuoYiConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -40,6 +43,9 @@ public class TokenService
     // 令牌有效期（默认30分钟）
     @Value("${token.expireTime}")
     private int expireTime;
+
+    @Autowired
+    private RuoYiConfig ruoYiConfig;
 
     protected static final long MILLIS_SECOND = 1000;
 
@@ -208,11 +214,19 @@ public class TokenService
      */
     private String getToken(HttpServletRequest request)
     {
-        String token = request.getHeader(header);
-        if (StringUtils.isNotEmpty(token) && token.startsWith(Constants.TOKEN_PREFIX))
-        {
-            token = token.replace(Constants.TOKEN_PREFIX, "");
+        String token = "";
+        //移除匿名接口中请求头的token
+        if(!Arrays.asList(ruoYiConfig.getAnonUrl()).contains(request.getRequestURI())){
+//            request.removeAttribute(header);
+//            request.
+             token = request.getHeader(header);
+            if (StringUtils.isNotEmpty(token) && token.startsWith(Constants.TOKEN_PREFIX))
+            {
+                token = token.replace(Constants.TOKEN_PREFIX, "");
+            }
         }
+
+
         return token;
     }
 

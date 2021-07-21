@@ -3,6 +3,7 @@ package com.linkwechat.wecom.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeChatContactMapping;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * @author ruoyi
  * @date 2020-12-27
  */
+@Mapper
 public interface WeChatContactMappingMapper extends BaseMapper<WeChatContactMapping> {
     /**
      * 查询聊天关系映射

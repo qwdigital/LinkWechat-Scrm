@@ -76,7 +76,7 @@ public interface WeGroupCodeActualMapper extends BaseMapper<WeGroupCodeActual> {
      * @param groupCodeId 群活码id
      * @return 结果
      */
-    List<WeGroupCodeActual> selectActualListByGroupCodeId(Long groupCodeId);
+    List<WeGroupCodeActual> selectActualList(Long groupCodeId);
 
     /**
      * 通过群活码id删除实际码

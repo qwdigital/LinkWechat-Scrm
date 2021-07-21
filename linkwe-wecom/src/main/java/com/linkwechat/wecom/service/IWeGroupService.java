@@ -28,5 +28,5 @@ public interface IWeGroupService extends IService<WeGroup> {
 
     void deleteWeGroup(String chatId);
 
-    List<WeCustomerAddGroup> findWeGroupByCustomer(String userId, String externalUserid);
+    List<WeCustomerAddGroup> findWeGroupByCustomer(String userId,String externalUserid);
 }

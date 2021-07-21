@@ -28,7 +28,7 @@ public interface IWeCustomerMessageOriginalService extends IService<WeCustomerMe
      * @param endTime 结束时间
      * @return {@link CustomerMessagePushVo}s
      */
-    List<CustomerMessagePushVo> customerMessagePushs(String sender, String content, String pushType, String beginTime, String endTime);
+    List<CustomerMessagePushVo> customerMessagePushs(String sender,String content,String pushType,String beginTime,String endTime);
 
     /**
      * 群发详情

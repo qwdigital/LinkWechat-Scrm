@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
+import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.config.ServerConfig;
 import com.linkwechat.common.constant.WeConstans;
@@ -40,38 +41,46 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
 
     @Autowired
     private WeMaterialMapper weMaterialMapper;
-    @Autowired
-    private ServerConfig serverConfig;
+
     @Autowired
     private WeMediaClient weMediaClient;
+
+    @Autowired
+    private RuoYiConfig ruoYiConfig;
 
     @Override
     public WeMaterialFileVO uploadWeMaterialFile(MultipartFile file, String type) {
         if (null == file) {
             throw new WeComException("文件为空！");
         }
-
         try {
-            //上传文件到文件服务器
-            // 上传文件路径
-            String filePath = RuoYiConfig.getUploadPath();
-            String fileName = "";
-            if (com.linkwechat.common.enums.MediaType .FILE.getType().equals(type)) {
-                fileName = FileUploadUtils.uploadFile(file);
-            } else {
-                // 上传并返回新文件名称
-                fileName = FileUploadUtils.upload(filePath, file);
-            }
-            String url =  fileName;
-            //上传临时素材
+
+
+//            /**
+//             * 当前上传腾讯云
+//             */
+//            String s = FileUploadUtils.upload2Cos(file, cosConfig);
+//            //上传文件到文件服务器
+//            // 上传文件路径
+//            String filePath = RuoYiConfig.getUploadPath();
+//            String fileName = "";
+//            if (com.linkwechat.common.enums.MediaType .FILE.getType().equals(type)) {
+//                fileName = FileUploadUtils.uploadFile(file);
+//            } else {
+//                // 上传并返回新文件名称
+//                fileName = FileUploadUtils.upload(filePath, file);
+//            }
+//            String url =  fileName;
+//            //上传临时素材
             Optional<com.linkwechat.common.enums.MediaType > mediaType = com.linkwechat.common.enums.MediaType .of(type);
             if (!mediaType.isPresent()) {
                 throw new WeComException("媒体类型出错！");
             }
-
-
             //构造返回结果
-            return WeMaterialFileVO.builder().materialUrl(url).materialName(file.getOriginalFilename()).build();
+//            return WeMaterialFileVO.builder().materialUrl(url).materialName(file.getOriginalFilename()).build();
+            return WeMaterialFileVO.builder().materialUrl(ruoYiConfig.getFile().getCos().getCosImgUrlPrefix()).materialName(FileUploadUtils.upload2Cos(file, ruoYiConfig.getFile().getCos())).build();
+
+//            return WeMaterialFileVO.builder().materialUrl(ruoYiConfig.getFile().getCos().getCosImgUrlPrefix()+"/common/findImage?fileName=/").materialName(FileUploadUtils.upload2Cos(file, ruoYiConfig.getFile().getCos())).build();
         } catch (Exception e) {
             throw new WeComException(e.getMessage());
         }
@@ -91,8 +100,8 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
     }
 
     @Override
-    public int deleteWeMaterialByIds(Long[] ids) {
-        return weMaterialMapper.deleteWeMaterialByIds(ids);
+    public void deleteWeMaterialByIds(Long[] ids) {
+         weMaterialMapper.deleteWeMaterialByIds(ids);
     }
 
     @Override

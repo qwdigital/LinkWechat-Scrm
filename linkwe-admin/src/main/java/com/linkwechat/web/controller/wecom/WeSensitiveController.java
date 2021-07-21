@@ -9,8 +9,9 @@ import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.wecom.domain.WeSensitive;
 import com.linkwechat.wecom.domain.query.WeSensitiveHitQuery;
 import com.linkwechat.wecom.service.IWeSensitiveService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/wecom/sensitive")
+@Api(tags = "敏感词管理")
 public class WeSensitiveController extends BaseController {
     @Autowired
     private IWeSensitiveService weSensitiveService;
@@ -35,6 +37,7 @@ public class WeSensitiveController extends BaseController {
      */
     //   @PreAuthorize("@ss.hasPermi('wecom:sensitive:list')")
     @GetMapping("/list")
+    @ApiOperation("查询敏感词列表")
     public TableDataInfo list(WeSensitive weSensitive) {
         startPage();
         List<WeSensitive> list = weSensitiveService.selectWeSensitiveList(weSensitive);
@@ -46,6 +49,7 @@ public class WeSensitiveController extends BaseController {
      */
     //   @PreAuthorize("@ss.hasPermi('wecom:sensitive:query')")
     @GetMapping(value = "/{id}")
+    @ApiOperation("查询敏感词详情")
     public AjaxResult getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(weSensitiveService.selectWeSensitiveById(id));
     }
@@ -56,6 +60,7 @@ public class WeSensitiveController extends BaseController {
     //    @PreAuthorize("@ss.hasPermi('wecom:sensitive:add')")
     @Log(title = "敏感词设置", businessType = BusinessType.INSERT)
     @PostMapping
+    @ApiOperation("添加敏感词")
     public AjaxResult add(@Valid @RequestBody WeSensitive weSensitive) {
         return toAjax(weSensitiveService.insertWeSensitive(weSensitive));
     }
@@ -66,6 +71,7 @@ public class WeSensitiveController extends BaseController {
     //   @PreAuthorize("@ss.hasPermi('wecom:sensitive:edit')")
     @Log(title = "敏感词设置", businessType = BusinessType.UPDATE)
     @PutMapping
+    @ApiOperation("修改敏感词")
     public AjaxResult edit(@Valid @RequestBody WeSensitive weSensitive) {
         Long id = weSensitive.getId();
         WeSensitive originData = weSensitiveService.selectWeSensitiveById(id);
@@ -81,6 +87,7 @@ public class WeSensitiveController extends BaseController {
     //   @PreAuthorize("@ss.hasPermi('wecom:sensitive:remove')")
     @Log(title = "敏感词设置", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
+    @ApiOperation("删除敏感词")
     public AjaxResult remove(@PathVariable("ids") String ids) {
         String[] id = ids.split(",");
         Long[] idArray = new Long[id.length];
@@ -93,6 +100,7 @@ public class WeSensitiveController extends BaseController {
      */
     //   @PreAuthorize("@ss.hasPermi('wecom:sensitivehit:list')")
     @GetMapping("/hit/list")
+    @ApiOperation("敏感词命中查询")
     public TableDataInfo hitList(WeSensitiveHitQuery query) {
         return getDataTable(weSensitiveService.getHitSensitiveList(query));
     }

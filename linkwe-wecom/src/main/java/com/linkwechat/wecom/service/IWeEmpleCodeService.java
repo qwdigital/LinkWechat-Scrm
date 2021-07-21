@@ -22,14 +22,14 @@ public interface IWeEmpleCodeService  extends IService<WeEmpleCode>
      * @param id 员工活码ID
      * @return 员工活码
      */
-    public WeEmpleCode selectWeEmpleCodeById(Long id);
+    WeEmpleCode selectWeEmpleCodeById(Long id);
 
     /**
      * 批量查询员工活码
      * @param ids 员工活码ID
      * @return
      */
-    public List<WeEmpleCode> selectWeEmpleCodeByIds(List<String> ids);
+    List<WeEmpleCode> selectWeEmpleCodeByIds(List<String> ids);
 
     /**
      * 查询员工活码列表
@@ -37,7 +37,7 @@ public interface IWeEmpleCodeService  extends IService<WeEmpleCode>
      * @param weEmpleCode 员工活码
      * @return 员工活码集合
      */
-    public List<WeEmpleCode> selectWeEmpleCodeList(WeEmpleCode weEmpleCode);
+    List<WeEmpleCode> selectWeEmpleCodeList(WeEmpleCode weEmpleCode);
 
     /**
      * 新增员工活码
@@ -45,7 +45,7 @@ public interface IWeEmpleCodeService  extends IService<WeEmpleCode>
      * @param weEmpleCode 员工活码
      * @return 结果
      */
-    public void insertWeEmpleCode(WeEmpleCode weEmpleCode);
+    void insertWeEmpleCode(WeEmpleCode weEmpleCode);
 
     /**
      * 修改员工活码
@@ -53,7 +53,7 @@ public interface IWeEmpleCodeService  extends IService<WeEmpleCode>
      * @param weEmpleCode 员工活码
      * @return 结果
      */
-    public void updateWeEmpleCode(WeEmpleCode weEmpleCode);
+    void updateWeEmpleCode(WeEmpleCode weEmpleCode);
 
 //    /**
 //     * 批量删除员工活码

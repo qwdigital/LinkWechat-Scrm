@@ -48,7 +48,7 @@ public interface IWeMaterialService {
      * @param ids id列表
      * @return {@link int}
      */
-    int deleteWeMaterialByIds(Long[] ids);
+    void deleteWeMaterialByIds(Long[] ids);
 
     /**
      * 更新素材信息
@@ -73,7 +73,7 @@ public interface IWeMaterialService {
      * @param search     搜索值
      * @return {@link WeMaterial}s
      */
-    List<WeMaterial> findWeMaterials(String categoryId, String search, String mediaType);
+    List<WeMaterial> findWeMaterials(String categoryId, String search,String mediaType);
 
     /**
      * 更换分组
@@ -92,7 +92,7 @@ public interface IWeMaterialService {
      * @param name 素材名称
      * @return
      */
-    public WeMediaDto uploadTemporaryMaterial(String url, String type, String name);
+    public WeMediaDto uploadTemporaryMaterial(String url, String type,String name);
 
     /**
      * 上传素材图片

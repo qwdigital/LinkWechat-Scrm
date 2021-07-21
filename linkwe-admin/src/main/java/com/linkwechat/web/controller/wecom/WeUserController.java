@@ -164,9 +164,6 @@ public class WeUserController extends BaseController {
     @GetMapping({"/synchWeUser"})
     public AjaxResult synchWeUser(){
         try {
-            SecurityContext context = SecurityContextHolder.getContext();
-            SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
-            SecurityContextHolder.setContext(context);
             weUserService.synchWeUser();
         } catch (Exception e) {
             e.printStackTrace();

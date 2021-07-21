@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service.impl;
 
+import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,11 +14,11 @@ import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeCustomerMessage;
 import com.linkwechat.wecom.domain.WeGroup;
-import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
-import com.linkwechat.wecom.domain.dto.message.SendMessageResultDto;
-import com.linkwechat.wecom.domain.dto.message.WeCustomerMessagePushDto;
+import com.linkwechat.wecom.domain.dto.WeMediaDto;
+import com.linkwechat.wecom.domain.dto.message.*;
 import com.linkwechat.wecom.mapper.WeCustomerMessageMapper;
 import com.linkwechat.wecom.service.IWeCustomerMessageService;
+import com.linkwechat.wecom.service.IWeMaterialService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,9 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
 
     @Autowired
     private WeCustomerMessagePushClient weCustomerMessagePushClient;
+
+    @Autowired
+    private IWeMaterialService weMaterialService;
 
 
     @Override
@@ -82,7 +86,9 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
         //通过messageId更新msgIds
         WeCustomerMessage weCustomerMessage = new WeCustomerMessage();
         weCustomerMessage.setMessageId(messageId);
-        weCustomerMessage.setMsgid(objectMapper.writeValueAsString(msgIds));
+//        String result = msgIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+        weCustomerMessage.setMsgid(msgIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
+//        weCustomerMessage.setMsgid(objectMapper.writeValueAsString(msgIds));
         weCustomerMessageMapper.updateWeCustomerMessageMsgIdById(weCustomerMessage);
     }
 
@@ -95,6 +101,7 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
         if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_CUSTOMER)) {
 
             WeCustomerMessagePushDto messagePushDto = new WeCustomerMessagePushDto();
+
             messagePushDto.setChat_type(ChatType.of(customerMessagePushDto.getPushType()).getName());
             List<String> externalUserIds = customers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
 
@@ -128,6 +135,7 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
 
         }
 
+
         this.updateMsgId(messageId, msgid);
 
     }
@@ -147,9 +155,16 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
         }
 
         if (customerMessagePushDto.getMessageType().equals(GroupMessageType.IMAGE.getType())) {
+            ImageMessageDto imageMessage = customerMessagePushDto.getImageMessage();
+            try {
+                WeMediaDto weMediaDto = weMaterialService.uploadTemporaryMaterial(imageMessage.getPic_url(),
+                        FileUtil.getName(imageMessage.getPic_url()),GroupMessageType.IMAGE.getMessageType());
+                imageMessage.setMedia_id(weMediaDto.getMedia_id());
+            } catch (Exception e) {
+            }
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("msgtype","image");
-            jsonObject.put("image",customerMessagePushDto.getImageMessage());
+            jsonObject.put("image",imageMessage);
             list.add(jsonObject);
         }
         if (customerMessagePushDto.getMessageType().equals(GroupMessageType.LINK.getType())) {
@@ -168,9 +183,11 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
 
         if(customerMessagePushDto.getMessageType().equals(GroupMessageType.TEXT_IMAGE.getType())){
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("msgtype","text_image");
-            jsonObject.put("text_image",customerMessagePushDto.getTextMessage());
+            jsonObject.put("msgtype","image");
+            jsonObject.put("image",customerMessagePushDto.getImageMessage());
             list.add(jsonObject);
+
+            weCustomerMessagePushDto.setText(customerMessagePushDto.getTextMessage());
         }
 
         if(customerMessagePushDto.getMessageType().equals(GroupMessageType.VIDEO.getType())){

@@ -19,6 +19,8 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.linkwechat.common.constant.Constants;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 public class QREncode {
 
@@ -184,6 +186,15 @@ public class QREncode {
         } catch (Exception e) {
             throw new IOException(e.getMessage(), e);
         }
+    }
+
+    public static MultipartFile getQRCodeMultipartFile(String content, String logoUrl) throws IOException {
+        BufferedImage bufferedImage = crateQRCode(content, logoUrl);
+        //读取图片转换为 BufferedImage
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write( bufferedImage, "jpg", baos );
+        //转换为MultipartFile
+        return new MockMultipartFile("groupQrCode","groupQrCode.jpg","text/plain", baos.toByteArray());
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

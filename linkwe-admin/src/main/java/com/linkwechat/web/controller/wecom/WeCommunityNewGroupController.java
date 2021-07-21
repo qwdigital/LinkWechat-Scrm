@@ -10,6 +10,7 @@ import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUtils;
+import com.linkwechat.wecom.domain.WeCommunityNewGroup;
 import com.linkwechat.wecom.domain.WeEmpleCode;
 import com.linkwechat.wecom.domain.dto.WeCommunityNewGroupDto;
 import com.linkwechat.wecom.domain.vo.WeCommunityNewGroupVo;
@@ -28,9 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -83,7 +83,6 @@ public class WeCommunityNewGroupController extends BaseController {
                 exc.printStackTrace();
             }
         });
-        return;
     }
 
     /**
@@ -98,34 +97,19 @@ public class WeCommunityNewGroupController extends BaseController {
     @Log(title = "员工活码批量下载", businessType = BusinessType.OTHER)
     @GetMapping("/downloadBatch")
     public void downloadBatch(Long[] ids, HttpServletRequest request, HttpServletResponse response) {
+        List<Map<String, String>> fileList = weCommunityNewGroupService
+                .selectWeCommunityNewGroupByIds(Arrays.asList(ids))
+                .stream()
+                .map(e -> {
+                    WeEmpleCode code = weEmpleCodeService.getById(e.getEmplCodeId());
+                    Map<String, String> fileMap = new HashMap<>();
+                    fileMap.put("fileName", code.getUseUserName() + "-" + code.getScenario()+".jpg");
+                    fileMap.put("url", code.getQrCode());
+                    return fileMap;
+                })
+                .collect(Collectors.toList());
         try {
-            List<WeCommunityNewGroupVo> weCommunityNewGroupVos = weCommunityNewGroupService.selectWeCommunityNewGroupByIds(Arrays.asList(ids));
-            //zip输出流
-            ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
-            if (CollectionUtil.isNotEmpty(weCommunityNewGroupVos)) {
-                for (WeCommunityNewGroupVo communityNewGroupVo : weCommunityNewGroupVos) {
-                    // 获取改新客拉群对应员工活码的二维码
-                    WeEmpleCode empleCode = weEmpleCodeService.selectWeEmpleCodeById(communityNewGroupVo.getEmplCodeId());
-                    String qrCode = empleCode.getQrCode();
-                    if (StringUtils.isEmpty(qrCode)) {
-                        continue;
-                    }
-                    URL url = new URL(qrCode);
-                    // 二维码名称使用场景
-                    String fileName = empleCode.getScenario() + ".png";
-                    zos.putNextEntry(new ZipEntry(fileName));
-                    InputStream fis = url.openConnection().getInputStream();
-                    byte[] buffer = new byte[1024];
-                    int r = 0;
-                    while ((r = fis.read(buffer)) != -1) {
-                        zos.write(buffer, 0, r);
-                    }
-                    fis.close();
-                }
-            }
-            //关闭zip输出流
-            zos.flush();
-            zos.close();
+            FileUtils.batchDownloadFile(fileList, response.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -137,13 +121,9 @@ public class WeCommunityNewGroupController extends BaseController {
     @ApiOperation(value = "查询新客自动拉群列表", httpMethod = "GET")
     //    @PreAuthorize("@ss.hasPermi('wecom:communityNewGroup:list')")
     @GetMapping("/list")
-    public TableDataInfo<List<WeCommunityNewGroupVo>> list(
-            @RequestParam(value = "emplCodeName", required = false) String emplCodeName,
-            @RequestParam(value = "createBy", required = false) String createBy,
-            @RequestParam(value = "beginTime", required = false) String beginTime,
-            @RequestParam(value = "endTime", required = false) String endTime) {
+    public TableDataInfo<List<WeCommunityNewGroupVo>> list(WeCommunityNewGroup weCommunityNewGroup) {
         startPage();
-        List<WeCommunityNewGroupVo> communityNewGroupVos = weCommunityNewGroupService.selectWeCommunityNewGroupList(emplCodeName, createBy, beginTime, endTime);
+        List<WeCommunityNewGroupVo> communityNewGroupVos = weCommunityNewGroupService.selectWeCommunityNewGroupList(weCommunityNewGroup);
         return getDataTable(communityNewGroupVos);
     }
 

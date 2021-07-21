@@ -18,6 +18,8 @@ import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.poi.ExcelUtil;
+import com.linkwechat.framework.web.domain.server.SysFile;
+import com.linkwechat.framework.web.service.FileService;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeTaskFission;
 import com.linkwechat.wecom.domain.dto.WeChatUserDTO;
@@ -55,8 +57,12 @@ import java.util.Objects;
 public class WeTaskFissionController extends BaseController {
     @Autowired
     private IWeTaskFissionService weTaskFissionService;
+
     @Autowired
     private CosConfig cosConfig;
+
+    @Autowired
+    private FileService fileService;
 
     /**
      * 查询任务宝列表
@@ -226,10 +232,13 @@ public class WeTaskFissionController extends BaseController {
     @Log(title = "上传兑奖图片", businessType = BusinessType.OTHER)
     @PostMapping("/upload")
     @ApiOperation(value = "上传兑奖图片", httpMethod = "POST")
-    public AjaxResult<JSONObject> upload(@RequestParam(value = "file") MultipartFile file) throws IOException {
-        String url = FileUploadUtils.upload2Cos(file, cosConfig);
+    public AjaxResult<JSONObject> upload(@RequestParam(value = "file") MultipartFile file) throws Exception {
+
+        SysFile sysFile
+                = fileService.upload(file);
+//        String url = FileUploadUtils.upload2Cos(file, cosConfig);
         JSONObject json = new JSONObject();
-        json.put("rewardImageUrl", cosConfig.getImgUrlPrefix()+url);
+        json.put("rewardImageUrl", sysFile.getImgUrlPrefix()+sysFile.getFileName());
         return AjaxResult.success(json);
     }
 

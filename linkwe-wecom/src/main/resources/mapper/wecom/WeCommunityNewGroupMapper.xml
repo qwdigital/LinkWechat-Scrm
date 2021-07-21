@@ -54,6 +54,7 @@
                 AND create_by LIKE CONCAT("%",#{createBy},"%")
             </if>
         </where>
+        order by create_time desc
     </select>
 
     <select id="selectWeCommunityNewGroupById" resultMap="communityNewGroupResult">
@@ -79,7 +80,4 @@
         UPDATE we_community_new_group SET del_flag = 1 WHERE empl_code_id = #{emplCodeId}
     </update>
 
-    <update id="removeWeCommunityNewGroupByGroupCodeId" parameterType="Long">
-        UPDATE we_community_new_group SET del_flag = 1 WHERE group_code_id = #{groupCodeId}
-    </update>
 </mapper>

@@ -5,19 +5,25 @@ import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.config.ServerConfig;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.FileVo;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.file.FileUtils;
+import com.linkwechat.common.utils.file.MimeTypeUtils;
+import com.linkwechat.framework.web.domain.server.SysFile;
+import com.linkwechat.framework.web.service.FileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * 通用请求处理
@@ -31,8 +37,9 @@ public class CommonController {
     @Autowired
     private ServerConfig serverConfig;
 
+
     @Autowired
-    private CosConfig cosConfig;
+    private FileService fileService;
 
     /**
      * 通用下载请求
@@ -114,23 +121,32 @@ public class CommonController {
      * 通用上传请求
      */
     @PostMapping("/common/uploadFile2Cos")
-    public AjaxResult uploadFile2Cos(MultipartFile file) throws Exception {
+    public AjaxResult uploadFile2Cos(MultipartFile file){
         try {
 
-            String fileName = FileUploadUtils.upload2Cos(file, cosConfig);
-
-            AjaxResult ajax = AjaxResult.success();
-            ajax.put("fileName", fileName);
-            ajax.put("url", url(fileName));
-            return ajax;
+            SysFile sysFile
+                    = fileService.upload(file);
+            return AjaxResult.success(
+                    FileVo.builder()
+                            .fileName(sysFile.getFileName())
+                            .url(sysFile.getImgUrlPrefix()+sysFile.getFileName())
+                            .build()
+            );
         } catch (Exception e) {
-            return AjaxResult.error(e.getMessage());
+            return AjaxResult.error("不支持当前文件上传或文件过大建议传20MB以内的文件");
         }
     }
 
 
-    public  String url(String fileName){
-        return "https://link-wechat-1251309172.cos.ap-nanjing.myqcloud.com/"+fileName;
+    /**
+     * 获取图片
+     */
+    @GetMapping("/common/findImage")
+    public void findImage(HttpServletResponse response,String fileName){
+            fileService.findImage(fileName,response);
     }
+
+
+
 
 }

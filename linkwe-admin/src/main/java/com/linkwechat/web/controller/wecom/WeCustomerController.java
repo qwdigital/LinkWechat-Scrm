@@ -13,8 +13,6 @@ import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.service.IWeCustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +44,6 @@ public class WeCustomerController extends BaseController
     public TableDataInfo list(WeCustomer weCustomer)
     {
         startPage();
-
         List<WeCustomer> list = weCustomerService.selectWeCustomerList(weCustomer);
         return getDataTable(list);
     }
@@ -111,9 +108,6 @@ public class WeCustomerController extends BaseController
     @GetMapping("/synchWeCustomer")
     public AjaxResult synchWeCustomer() {
         try {
-            SecurityContext context = SecurityContextHolder.getContext();
-            SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
-            SecurityContextHolder.setContext(context);
             weCustomerService.synchWeCustomer();
         } catch (Exception e) {
             e.printStackTrace();

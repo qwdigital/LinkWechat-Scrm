@@ -7,13 +7,12 @@
     <resultMap type="WeGroupCode" id="WeGroupCodeResult">
         <result property="id" column="id"/>
         <result property="codeUrl" column="code_url"/>
-        <result property="uuid" column="uuid"/>
-        <result property="activityHeadUrl" column="activity_head_url"/>
+        <result property="avatarUrl" column="avatar_url"/>
         <result property="activityName" column="activity_name"/>
         <result property="activityDesc" column="activity_desc"/>
         <result property="activityScene" column="activity_scene"/>
         <result property="guide" column="guide"/>
-        <result property="joinGroupIsTip" column="join_group_is_tip"/>
+        <result property="showTip" column="show_tip"/>
         <result property="tipMsg" column="tip_msg"/>
         <result property="customerServerQrCode" column="customer_server_qr_code"/>
         <result property="delFlag" column="del_flag"/>
@@ -29,26 +28,25 @@
 
     <sql id="selectWeGroupCodeVo">
         SELECT
-        w.id,
-        w.code_url,
-        w.uuid,
-        w.activity_head_url,
-        w.activity_name,
-        w.activity_desc,
-        w.activity_scene,
-        w.guide,
-        w.join_group_is_tip,
-        w.tip_msg,
-        w.customer_server_qr_code,
-        w.del_flag,
-        w.create_by,
-        w.create_time,
-        w.update_by,
-        w.update_time,
-        w.remark,
-        IFNULL((SELECT count(1) FROM we_group_code_actual WHERE (SELECT IFNULL(scan_code_times, 0)) &lt; scan_code_times_limit AND group_code_id = w.id ), 0) AS available_codes,
-        IFNULL((SELECT SUM( scan_code_times ) AS scan_times FROM we_group_code_actual GROUP BY group_code_id HAVING group_code_id = w.id), 0) AS total_scan_times,
-        IFNULL((SELECT count(1) FROM we_group_code_actual WHERE group_code_id = w.id AND TIMESTAMPDIFF(DAY, sysdate(), effect_time ) &lt; 3), 0) AS about_to_expire_codes
+        w.`id`,
+        w.`code_url`,
+        w.`avatar_url`,
+        w.`activity_name`,
+        w.`activity_desc`,
+        w.`activity_scene`,
+        w.`guide`,
+        w.`show_tip`,
+        w.`tip_msg`,
+        w.`customer_server_qr_code`,
+        w.`del_flag`,
+        w.`create_by`,
+        w.`create_time`,
+        w.`update_by`,
+        w.`update_time`,
+        w.`remark`,
+        IFNULL((SELECT count(1) FROM we_group_code_actual WHERE (SELECT IFNULL(scan_code_times, 0)) &lt; scan_code_times_limit AND group_code_id = w.`id` ), 0) AS available_codes,
+        IFNULL((SELECT SUM( scan_code_times ) AS scan_times FROM we_group_code_actual WHERE group_code_id = w.`id` GROUP BY group_code_id), 0) AS total_scan_times,
+        IFNULL((SELECT count(1) FROM we_group_code_actual WHERE group_code_id = w.`id` AND TIMESTAMPDIFF(DAY, sysdate(), effect_time ) &lt; 3), 0) AS about_to_expire_codes
         FROM
         we_group_code w
     </sql>
@@ -56,40 +54,35 @@
     <select id="selectWeGroupCodeList" parameterType="WeGroupCode" resultMap="WeGroupCodeResult">
         <include refid="selectWeGroupCodeVo"/>
         <where>
-            <if test="activityName != null  and activityName != ''">and w.activity_name like concat('%', #{activityName},
+            w.`del_flag` = 0
+            <if test="activityName != null  and activityName != ''">and w.`activity_name` like concat('%', #{activityName},
                 '%')
             </if>
-            <if test="activityDesc != null  and activityDesc != ''">and w.activity_desc like concat('%', #{activityDesc},
+            <if test="activityDesc != null  and activityDesc != ''">and w.`activity_desc` like concat('%', #{activityDesc},
                 '%')
             </if>
-            <if test="activityScene != null  and activityScene != ''">and w.activity_scene = #{activityScene}</if>
-            <if test="guide != null  and guide != ''">and w.guide = #{guide}</if>
-            <if test="joinGroupIsTip != null ">and w.join_group_is_tip = #{joinGroupIsTip}</if>
-            <if test="tipMsg != null  and tipMsg != ''">and w.tip_msg = #{tipMsg}</if>
-            <if test="createBy != null  and createBy != ''">and w.create_by = #{createBy}</if>
-            <if test="customerServerQrCode != null  and customerServerQrCode != ''">and w.customer_server_qr_code =
+            <if test="activityScene != null  and activityScene != ''">and w.`activity_scene` = #{activityScene}</if>
+            <if test="guide != null  and guide != ''">and w.`guide` = #{guide}</if>
+            <if test="showTip != null and showTip != ''">and w.`show_tip` = #{showTip}</if>
+            <if test="tipMsg != null  and tipMsg != ''">and w.`tip_msg` = #{tipMsg}</if>
+            <if test="createBy != null  and createBy != ''">and w.`create_by` = #{createBy}</if>
+            <if test="customerServerQrCode != null  and customerServerQrCode != ''">and w.`customer_server_qr_code` =
                 #{customerServerQrCode}
             </if>
             <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
-                and date_format(w.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+                and date_format(w.`create_time`,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
             </if>
             <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
-                and date_format(w.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+                and date_format(w.`create_time`,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
             </if>
-        </where>
-    </select>
 
-    <select id="selectWeGroupCodeListByIds" resultMap="WeGroupCodeResult">
-        <include refid="selectWeGroupCodeVo"/>
-        where w.id in
-        <foreach item="id" collection="list" open="(" separator="," close=")">
-            #{id}
-        </foreach>
+        </where>
+        ORDER BY w.create_time DESC
     </select>
 
     <select id="selectWeGroupCodeById" parameterType="Long" resultMap="WeGroupCodeResult">
         <include refid="selectWeGroupCodeVo"/>
-        where w.id = #{id}
+        where w.`id` = #{id} and w.`del_flag` = 0
     </select>
 
     <select id="selectWeGroupListByGroupCodeId" parameterType="Long" resultType="WeGroup">
@@ -97,8 +90,8 @@
             wg.*
         FROM
             we_group wg
-                LEFT JOIN we_group_code_actual wgca ON wgca.chat_id = wg.chat_id
-                LEFT JOIN we_group_code wgc ON wgc.id = wgca.group_code_id
+                LEFT JOIN we_group_code_actual wgca ON wgca.chat_id = wg.chat_id AND wgca.`del_flag` = 0
+                LEFT JOIN we_group_code wgc ON wgc.id = wgca.group_code_id AND wgc.`del_flag` = 0
         WHERE
             wgc.id = #{groupCodeId}
     </select>
@@ -109,10 +102,10 @@
         FROM
             we_group_code_actual wgca
                 LEFT JOIN we_group_code wgc ON wgc.id = wgca.group_code_id
+        WHERE
+            wgc.id = #{groupCodeId}
         GROUP BY
             wgc.id
-        HAVING
-            wgc.id = #{groupCodeId}
     </select>
 
     <select id="selectGroupCodeUrlByEmplCodeState" parameterType="String" resultType="String">
@@ -120,31 +113,24 @@
             wgc.code_url
         FROM
             we_group_code wgc
-                LEFT JOIN we_community_new_group wcn ON wgc.id = wcn.group_code_id
-                LEFT JOIN we_emple_code wec ON wec.id = wcn.empl_code_id
+                LEFT JOIN we_community_new_group wcn ON wgc.id = wcn.group_code_id AND wcn.del_flag = 0
+                LEFT JOIN we_emple_code wec ON wec.id = wcn.empl_code_id AND wec.del_flag = 0
         WHERE
-            wgc.del_flag = 0
-          AND wcn.del_flag = 0
-          AND wec.del_flag = 0
-          AND wec.state = #{state}
+            wgc.del_flag = 0 AND wec.state = #{state}
     </select>
 
-    <select id="checkActivityNameUnique" parameterType="String" resultType="int">
-		select count(1) from we_group_code where activity_name = #{activityName} limit 1
-	</select>
 
     <insert id="insertWeGroupCode" parameterType="WeGroupCode">
         insert into we_group_code
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="codeUrl != null">code_url,</if>
-            <if test="uuid != null">uuid,</if>
-            <if test="activityHeadUrl != null">activity_head_url,</if>
+            <if test="avatarUrl != null">avatar_url,</if>
             <if test="activityName != null">activity_name,</if>
             <if test="activityDesc != null">activity_desc,</if>
             <if test="activityScene != null">activity_scene,</if>
             <if test="guide != null">guide,</if>
-            <if test="joinGroupIsTip != null">join_group_is_tip,</if>
+            <if test="showTip != null">show_tip,</if>
             <if test="tipMsg != null">tip_msg,</if>
             <if test="customerServerQrCode != null">customer_server_qr_code,</if>
             <if test="delFlag != null">del_flag,</if>
@@ -158,13 +144,12 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
             <if test="codeUrl != null">#{codeUrl},</if>
-            <if test="uuid != null">#{uuid},</if>
-            <if test="activityHeadUrl != null">#{activityHeadUrl},</if>
+            <if test="avatarUrl != null">#{avatarUrl},</if>
             <if test="activityName != null">#{activityName},</if>
             <if test="activityDesc != null">#{activityDesc},</if>
             <if test="activityScene != null">#{activityScene},</if>
             <if test="guide != null">#{guide},</if>
-            <if test="joinGroupIsTip != null">#{joinGroupIsTip},</if>
+            <if test="showTip != null">#{showTip},</if>
             <if test="tipMsg != null">#{tipMsg},</if>
             <if test="customerServerQrCode != null">#{customerServerQrCode},</if>
             <if test="delFlag != null">#{delFlag},</if>
@@ -180,11 +165,11 @@
         update we_group_code
         <trim prefix="SET" suffixOverrides=",">
             <if test="activityName != null">activity_name = #{activityName},</if>
-            <if test="activityHeadUrl != null">activity_head_url = #{activityHeadUrl},</if>
+            <if test="avatarUrl != null">avatar_url = #{avatarUrl},</if>
             <if test="activityDesc != null">activity_desc = #{activityDesc},</if>
             <if test="activityScene != null">activity_scene = #{activityScene},</if>
             <if test="guide != null">guide = #{guide},</if>
-            <if test="joinGroupIsTip != null">join_group_is_tip = #{joinGroupIsTip},</if>
+            <if test="showTip != null">show_tip = #{showTip},</if>
             <if test="tipMsg != null">tip_msg = #{tipMsg},</if>
             <if test="customerServerQrCode != null">customer_server_qr_code = #{customerServerQrCode},</if>
             <if test="delFlag != null">del_flag = #{delFlag},</if>
@@ -194,21 +179,5 @@
         </trim>
         where id = #{id}
     </update>
-
-    <delete id="deleteWeGroupCodeById" parameterType="Long">
-        delete from we_group_code where id = #{id}
-    </delete>
-
-    <delete id="deleteWeGroupCodeByIds" parameterType="String">
-        delete from we_group_code where id in
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
-
-    <select id="getWeGroupByUuid" parameterType="String" resultMap="WeGroupCodeResult">
-        <include refid="selectWeGroupCodeVo" />
-        where w.uuid = #{uuid}
-    </select>
 
 </mapper>

@@ -2,10 +2,7 @@ package com.linkwechat.wecom.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeKeywordGroupTask;
-import com.linkwechat.wecom.domain.vo.WeKeywordGroupTaskVo;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -13,25 +10,13 @@ import java.util.List;
  * 关键词拉群mapper
  */
 @Mapper
-@Repository
 public interface WeKeywordGroupTaskMapper extends BaseMapper<WeKeywordGroupTask> {
     /**
      * 根据过滤条件获取关键词拉群任务列表
-     *
-     * @param taskName  任务名称
-     * @param createBy  创建人
-     * @param keyword   关键词
-     * @param beginTime 开始时间
-     * @param endTime   结束时间
-     * @return 列表数据
+     * @param task 查询信息
+     * @return 结果
      */
-    List<WeKeywordGroupTaskVo> getTaskList(
-            @Param("taskName") String taskName,
-            @Param("createBy") String createBy,
-            @Param("keyword") String keyword,
-            @Param("beginTime") String beginTime,
-            @Param("endTime") String endTime
-    );
+    List<WeKeywordGroupTask> getTaskList(WeKeywordGroupTask task);
 
     /**
      * 根据id获取任务性情
@@ -39,23 +24,7 @@ public interface WeKeywordGroupTaskMapper extends BaseMapper<WeKeywordGroupTask>
      * @param taskId 任务id
      * @return 结果
      */
-    WeKeywordGroupTaskVo getTaskById(Long taskId);
-
-    /**
-     * 根据任务id获取对应所有的群聊名称
-     *
-     * @param taskId 任务id
-     * @return 结果
-     */
-    List<String> getGroupNameListByTaskId(Long taskId);
-
-    /**
-     * 校验名称是否唯一
-     *
-     * @param taskName 任务名
-     * @return 结果
-     */
-    int checkNameUnique(String taskName);
+    WeKeywordGroupTask getTaskById(Long taskId);
 
     /**
      * 通过名称或者关键词进行过滤
@@ -63,5 +32,5 @@ public interface WeKeywordGroupTaskMapper extends BaseMapper<WeKeywordGroupTask>
      * @param word 过滤字段
      * @return 结果
      */
-    List<WeKeywordGroupTaskVo> filterByNameOrKeyword(String word);
+    List<WeKeywordGroupTask> filterByNameOrKeyword(String word);
 }

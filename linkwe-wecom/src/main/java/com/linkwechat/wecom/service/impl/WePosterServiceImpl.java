@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.config.CosConfig;
+import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.config.ServerConfig;
 import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.img.ImageUtils;
@@ -15,6 +16,7 @@ import com.linkwechat.wecom.service.IWePosterFontService;
 import com.linkwechat.wecom.service.IWePosterService;
 import com.linkwechat.wecom.service.IWePosterSubassemblyService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -37,23 +39,27 @@ import java.util.stream.Collectors;
 @Service
 public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> implements IWePosterService {
 
-    @Resource
-    private WePosterMapper wePosterMapper;
+//    @Resource
+//    private WePosterMapper wePosterMapper;
 
-    @Resource
+    @Autowired
     private IWePosterSubassemblyService posterSubassemblyService;
 
-    @Resource
+    @Autowired
     private IWePosterFontService posterFontService;
 
-    @Resource
-    private ServerConfig serverConfig;
 
-    @Resource
-    private IWeCategoryService weCategoryService;
+    @Autowired
+    private RuoYiConfig ruoYiConfig;
 
-    @Resource
-    private CosConfig cosConfig;
+//    @Resource
+//    private ServerConfig serverConfig;
+//
+//    @Resource
+//    private IWeCategoryService weCategoryService;
+
+//    @Resource
+//    private CosConfig cosConfig;
 
     /**
      * 查询一条
@@ -119,6 +125,8 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
             return poster.getBackgroundImgPath();
         }
         Set<String> existFontId = new HashSet<>();
+
+
         Map<String, Font> fontMap = poster.getPosterSubassemblyList().stream().filter(wePosterSubassembly -> wePosterSubassembly.getType().equals(1))
                 .peek(wePosterSubassembly -> {
                     if (wePosterSubassembly.getFontId() == null) {
@@ -136,22 +144,36 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
                 .collect(Collectors.toMap(wePosterSubassembly -> {
                     return wePosterSubassembly.getFontId() + "_" + wePosterSubassembly.getFontSize() + "_" + wePosterSubassembly.getFontStyle();
                 }, wePosterSubassembly -> posterFontService.getFont(wePosterSubassembly.getFontId(), wePosterSubassembly.getFontSize(), wePosterSubassembly.getFontStyle())));
+
+
         Map<String, NetFileUtils.FileCallable> fileCallableMap = poster.getPosterSubassemblyList().stream().map(WePosterSubassembly::getImgPath).filter(StringUtils::isNotBlank).distinct().collect(Collectors.toMap(s -> s, NetFileUtils::getNetFile));
         if (CollectionUtils.isEmpty(fileCallableMap)) {
             fileCallableMap = new HashMap<>();
         }
         fileCallableMap.put(poster.getBackgroundImgPath(), NetFileUtils.getNetFile(poster.getBackgroundImgPath()));
+
+
+
+
         Map<String, BufferedImage> bufferedImageMap = fileCallableMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, stringFileCallableEntry -> {
             try {
-                return ImageUtils.copyBufferedImage(ImageIO.read(new ByteArrayInputStream(Objects.requireNonNull(NetFileUtils.getByteArrayOutputStream(stringFileCallableEntry.getValue(), false)).toByteArray())), BufferedImage.TYPE_INT_ARGB);
+                return ImageUtils.copyBufferedImage(ImageIO.read(new ByteArrayInputStream(Objects.requireNonNull(NetFileUtils.getByteArrayOutputStream(stringFileCallableEntry.getValue(), false)).toByteArray())),
+                        BufferedImage.TYPE_INT_ARGB);
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new RuntimeException("图片读取错误");
             }
         }));
+
+
         BufferedImage backgroundImg = bufferedImageMap.get(poster.getBackgroundImgPath());
         poster.setWidth(backgroundImg.getWidth());
         poster.setHeight(backgroundImg.getHeight());
+
+
+
+
+
         poster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {
             if (wePosterSubassembly.getType().equals(1)) {
                 Font font = fontMap.get(wePosterSubassembly.getFontId() + "_" + wePosterSubassembly.getFontSize() + "_" + wePosterSubassembly.getFontStyle());
@@ -188,13 +210,15 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
             }
 
         });
+
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try {
             ImageIO.write(backgroundImg, "png", byteArrayOutputStream);
             NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(System.currentTimeMillis() + ".jpg", byteArrayOutputStream.toByteArray());
             byteArrayOutputStream.close();
-            String path = FileUploadUtils.upload2Cos(streamMultipartFile, cosConfig);
-            poster.setSampleImgPath(cosConfig.getImgUrlPrefix() + path);
+            String path = FileUploadUtils.upload2Cos(streamMultipartFile, ruoYiConfig.getFile().getCos());
+            poster.setSampleImgPath(ruoYiConfig.getFile().getCos().getCosImgUrlPrefix() + path);
             return poster.getSampleImgPath();
         } catch (IOException e) {
             e.printStackTrace();

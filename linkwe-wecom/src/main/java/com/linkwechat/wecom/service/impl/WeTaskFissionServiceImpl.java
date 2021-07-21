@@ -16,6 +16,7 @@ import com.linkwechat.common.utils.QREncode;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUploadUtils;
+import com.linkwechat.common.utils.file.FileUtil;
 import com.linkwechat.common.utils.img.NetFileUtils;
 import com.linkwechat.wecom.client.WeExternalContactClient;
 import com.linkwechat.wecom.domain.*;
@@ -34,6 +35,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,15 +66,11 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
     @Autowired
     private IWeTaskFissionRecordService weTaskFissionRecordService;
     @Autowired
-    private IWeUserService weUserService;
-    @Autowired
     private WeExternalContactClient weExternalContactClient;
     @Autowired
     private IWePosterService wePosterService;
     @Autowired
     private IWeGroupCodeService weGroupCodeService;
-    @Autowired
-    private IWeMaterialService weMaterialService;
     @Autowired
     private IWeCustomerService weCustomerService;
     @Autowired
@@ -79,8 +78,6 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
     @Autowired
     private IWeTaskFissionCompleteRecordService weTaskFissionCompleteRecordService;
 
-    @Autowired
-    private CosConfig cosConfig;
     @Value("${H5.fissionUrl}")
     private String pageUrl;
     @Value("${H5.fissionGroupUrl}")
@@ -240,8 +237,11 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
             customerMessagePushDto.setDepartment(departmentIds);
         }
         try {
+            SecurityContext context = SecurityContextHolder.getContext();
+            SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+            SecurityContextHolder.setContext(context);
             weCustomerMessagePushService.addWeCustomerMessagePush(customerMessagePushDto);
-        } catch (JsonProcessingException | ParseException e) {
+        } catch (JsonProcessingException | ParseException | CloneNotSupportedException e) {
             e.printStackTrace();
             log.error("发送任务失败》》》》》》》》》》》params:{},ex:{}", JSONObject.toJSONString(customerMessagePushDto), e);
         }
@@ -299,15 +299,17 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
 
     @Override
     public List<WeCustomer> getCustomerListById(String unionId, String fissionId) {
-        WeTaskFissionRecord weTaskFissionRecord;
+        List<WeCustomer> customerList = new LinkedList<>();
         if (StringUtils.isEmpty(unionId)) {
-            List<WeTaskFissionRecord> weTaskFissionRecords = weTaskFissionRecordService
-                    .list(new LambdaQueryWrapper<WeTaskFissionRecord>().eq(WeTaskFissionRecord::getTaskFissionId, fissionId));
-            return Optional.ofNullable(weTaskFissionRecords).orElseGet(ArrayList::new).stream()
-                    .map(record -> weCustomerService.selectWeCustomerById(record.getCustomerId()))
-                    .filter(Objects::nonNull).collect(Collectors.toList());
+            List<WeTaskFissionRecord> weTaskFissionRecords = weTaskFissionRecordService.list(new LambdaQueryWrapper<WeTaskFissionRecord>().eq(WeTaskFissionRecord::getTaskFissionId, fissionId));
+            if(CollectionUtil.isNotEmpty(weTaskFissionRecords)){
+                weTaskFissionRecords.forEach(record -> {
+                    WeCustomer weCustomer = weCustomerService.selectWeCustomerById(record.getCustomerId());
+                    customerList.add(weCustomer);
+                });
+            }
         } else {
-            weTaskFissionRecord = weTaskFissionRecordService
+            WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService
                     .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), unionId);
             Optional.ofNullable(weTaskFissionRecord).orElseThrow(() -> new WeComException("任务记录信息不存在"));
             List<WeFlowerCustomerRel> list = weFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
@@ -315,11 +317,10 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
             List<String> eidList = Optional.ofNullable(list).orElseGet(ArrayList::new).stream()
                     .map(WeFlowerCustomerRel::getExternalUserid).collect(Collectors.toList());
             if (CollectionUtil.isNotEmpty(eidList)) {
-                return weCustomerService.listByIds(eidList);
-            } else {
-                return null;
+                customerList.addAll(weCustomerService.listByIds(eidList));
             }
         }
+        return customerList;
     }
 
     @Override
@@ -361,7 +362,10 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
         long total = taskFission.getFissNum();
         List<WeCustomer> list = new ArrayList<>();
         if (taskFission.getFissionType() == 1) {
-            list.addAll(getCustomerListById(unionId, String.valueOf(taskFission.getId())));
+            List<WeCustomer> customerList = getCustomerListById(unionId, String.valueOf(taskFission.getId()));
+            if(CollectionUtil.isNotEmpty(customerList)){
+                list.addAll(customerList);
+            }
         } else {
             List<WeTaskFissionCompleteRecord> completeRecordList = weTaskFissionCompleteRecordService.getCompleteListByTaskId(taskFission.getId());
             if (CollectionUtil.isNotEmpty(completeRecordList)) {
@@ -374,7 +378,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                 });
             }
         }
-        return WeTaskFissionProgressVO.builder().total(total).completed(new Long(list.size())).customers(list).build();
+        return WeTaskFissionProgressVO.builder().total(total).completed((long) list.size()).customers(list).build();
     }
 
     /**
@@ -433,7 +437,6 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
     }
 
     private String getGroupFissionQrcode(Long taskFissionId, WeTaskFissionRecord record, WeCustomer weCustomer) {
-        String qrCode = null;
         if (weCustomer != null) {
             String avatarUrl = weCustomer.getAvatar();
             StringBuilder contentBuilder = new StringBuilder(pageGroupUrl);
@@ -447,13 +450,15 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                 try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
                     ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
                     NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(System.currentTimeMillis() + ".jpg", byteArrayOutputStream.toByteArray());
-                    qrCode = FileUploadUtils.upload2Cos(streamMultipartFile, cosConfig);
+                    JSONObject fileInfo = FileUtil.upload(streamMultipartFile);
+                    log.info(">>>>>>>>>>>>fileInfo:{}",fileInfo.toJSONString());
+                    return fileInfo.getString("imgUrlPrefix")+fileInfo.getString("fileName");
                 } catch (Exception e) {
-                    log.warn("生成海报二维码异常, record={}, customer={}, exception={}", record, weCustomer, ExceptionUtils.getStackTrace(e));
+                    log.warn("生成海报二维码异常, record={}, customer={}, exception={}", JSONObject.toJSONString(record), JSONObject.toJSONString(weCustomer), ExceptionUtils.getStackTrace(e));
                     throw new WeComException("生成二维码异常");
                 }
             }
-            return cosConfig.getImgUrlPrefix() + qrCode;
+            throw new WeComException("生成二维码异常");
         } else {
             throw new WeComException("生成二维码异常,用户信息不存在");
         }
@@ -493,7 +498,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
         String groupQrcodeId = weTaskFission.getFissionTargetId();
         if (weTaskFission.getFissionType() != null && weTaskFission.getFissionType().equals(TaskFissionType.GROUP_FISSION.getCode())
                 && StringUtils.isNotBlank(groupQrcodeId) && StringUtils.isBlank(weTaskFission.getFissQrcode())) {
-            WeGroupCode groupCode = weGroupCodeService.selectWeGroupCodeById(Long.parseLong(groupQrcodeId));
+            WeGroupCode groupCode = weGroupCodeService.getById(Long.parseLong(groupQrcodeId));
             if (groupCode != null) {
                 String qrcodeUrl = groupCode.getCodeUrl();
                 weTaskFission.setFissQrcode(qrcodeUrl);

@@ -1,17 +1,16 @@
 package com.linkwechat.wecom.service;
 
-import com.linkwechat.wecom.domain.WeGroup;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeGroupSop;
 import com.linkwechat.wecom.domain.vo.WeCommunityTaskEmplVo;
 import com.linkwechat.wecom.domain.vo.WeGroupSopVo;
-import com.linkwechat.wecom.domain.vo.WeKeywordGroupTaskVo;
 
 import java.util.List;
 
 /**
  * 社区运营 群sop service接口
  */
-public interface IWeGroupSopService {
+public interface IWeGroupSopService extends IService<WeGroupSop> {
 
     /**
      * 通过规则id获取sop规则
@@ -65,15 +64,8 @@ public interface IWeGroupSopService {
     int batchRemoveGroupSopByIds(Long[] ids);
 
     /**
-     * 校验规则名是否唯一
+     * 根据员工id获取对应的sop任务列表
      *
-     * @param ruleName 规则名
-     * @return 是否唯一
-     */
-    boolean isRuleNameUnique(String ruleName);
-
-    /**
-     *  根据员工id获取对应的sop任务列表
      * @param emplId 员工id
      * @param isDone 已完成还是待处理
      * @return 结果
@@ -99,7 +91,16 @@ public interface IWeGroupSopService {
 
     /**
      * 向指定的群聊进行sop企微消息推送
+     *
      * @param groupIdList 群聊id列表
      */
     void sendMessage(List<String> groupIdList);
+
+    /**
+     * 规则名是否已被占用
+     *
+     * @param groupSop 规则信息
+     * @return 是否被占用
+     */
+    boolean isNameOccupied(WeGroupSop groupSop);
 }

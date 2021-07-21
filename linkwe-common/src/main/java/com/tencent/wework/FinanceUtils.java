@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @date 2020/12/2 16:01
  **/
 @Slf4j
+
 public class FinanceUtils {
     /**
      * NewSdk返回的sdk指针
@@ -100,7 +101,7 @@ public class FinanceUtils {
         }
         String content = Finance.GetContentFromSlice(slice);
         JSONArray chatdataArr = JSONObject.parseObject(content).getJSONArray("chatdata");
-        log.info("开始执行数据解析:------------");
+        log.info("开始执行数据解析:------------"+content);
         AtomicLong LocalSEQ = new AtomicLong();
         if (CollectionUtil.isNotEmpty(chatdataArr)) {
             chatdataArr.stream().map(data -> (JSONObject) data).forEach(data -> {
@@ -285,7 +286,7 @@ public class FinanceUtils {
             getMediaData(sdkfileid, "", "", filePath, fileName);
             CosConfig cosConfig = SpringUtils.getBean(CosConfig.class);
             String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
-            StringBuilder cosUrl = new StringBuilder(cosConfig.getImgUrlPrefix());
+            StringBuilder cosUrl = new StringBuilder(cosConfig.getCosImgUrlPrefix());
             String cosFilePath = FileUploadUtils.upload2Cos(new FileInputStream(new File(filePath, fileName)), suffix, cosConfig);
             cosUrl.append(cosFilePath);
             data.put("attachment", cosUrl.toString());

@@ -5,11 +5,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.common.enums.ChatType;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.enums.TaskSendType;
 import com.linkwechat.common.enums.CommunityTaskType;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -31,12 +34,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -79,6 +84,9 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
     @Value("${wecome.authorizeRedirectUrl}")
     private String authorizeRedirectUrl;
 
+    @Autowired
+    private IWeCustomerMessagePushService weCustomerMessagePushService;
+
     /**
      * 添加新标签建群任务
      * @param task 建群任务本体信息
@@ -87,7 +95,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.READ_COMMITTED)
     public int add(WePresTagGroupTask task, List<String> tagIdList, List<String> emplIdList) {
         if (taskMapper.insertTask(task) > 0) {
             // 保存标签对象
@@ -154,7 +162,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
      * @return 删除的行数
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.READ_COMMITTED)
     public int batchRemoveTaskByIds(Long[] idList) {
         List<Long> ids = Arrays.asList(idList);
 
@@ -184,11 +192,16 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
      * @return 更新条数
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.READ_COMMITTED)
     public int updateTask(Long taskId, WePresTagGroupTaskDto wePresTagGroupTaskDto) {
         WePresTagGroupTask wePresTagGroupTask = new WePresTagGroupTask();
         BeanUtils.copyProperties(wePresTagGroupTaskDto, wePresTagGroupTask);
         wePresTagGroupTask.setTaskId(taskId);
+
+        if (isNameOccupied(wePresTagGroupTask)) {
+            throw new CustomException("任务名已存在");
+        }
+
         wePresTagGroupTask.setUpdateBy(SecurityUtils.getUsername());
         if (taskMapper.updateTask(wePresTagGroupTask) > 0) {
 
@@ -220,18 +233,6 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
             return 1;
         }
         return 0;
-    }
-
-    /**
-     * 检测任务名是否已存在
-     *
-     * @param taskName 任务名
-     * @return 结果
-     */
-    @Override
-    public boolean checkTaskNameUnique(String taskName) {
-        int count = taskMapper.checkTaskNameUnique(taskName);
-        return count <= 0;
     }
 
     /**
@@ -317,8 +318,24 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
      * @return 结果
      */
     @Override
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.READ_COMMITTED)
     public int updateEmplTaskStatus(Long taskId, String emplId) {
         return taskScopeMapper.updateEmplTaskStatus(taskId, emplId);
+    }
+
+    /**
+     * 任务名是否已占用
+     *
+     * @param task 任务信息
+     * @return 名称是否占用
+     */
+    @Override
+    public boolean isNameOccupied(WePresTagGroupTask task) {
+        Long currentId = Optional.ofNullable(task.getTaskId()).orElse(-1L);
+        LambdaQueryWrapper<WePresTagGroupTask> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(WePresTagGroupTask::getDelFlag, 0).eq(WePresTagGroupTask::getTaskName, task.getTaskName());
+        List<WePresTagGroupTask> queryRes = baseMapper.selectList(queryWrapper);
+        return !queryRes.isEmpty() && !currentId.equals(queryRes.get(0).getTaskId());
     }
 
     /**
@@ -335,6 +352,11 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
         taskVo.setTagList(this.getTagListByTaskId(taskVo.getTaskId()));
     }
 
+    @Override
+    public List<String> selectExternalUserIds(Long taskId, boolean hasScope, boolean hasTag, Integer gender, String beginTime, String endTime) {
+        return baseMapper.selectExternalUserIds(taskId, hasScope, hasTag, gender, beginTime, endTime);
+    }
+
     /**
      * 任务派发
      *
@@ -342,14 +364,13 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
      */
     @Override
     @Async
-    public void sendMessage(WePresTagGroupTask task) {
+    public void sendMessage(WePresTagGroupTask task, List<String> externalIds) {
         try {
-
             Integer sendType = task.getSendType();
 
             if (sendType.equals(TaskSendType.CROP.getType())) {
                 // 企业群发
-                this.sendCorpMessage(task);
+                this.sendCorpMessage(task, externalIds);
 
             } else {
                 // 个人群发
@@ -366,16 +387,19 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
      *
      * @param task 建群任务信息
      */
-    private void sendCorpMessage(WePresTagGroupTask task) {
+    private void sendCorpMessage(WePresTagGroupTask task, List<String> externalIds) {
         try {
 
             // 构建企微api参数 [客户联系 - 消息推送 - 创建企业群发]
 
-            // 群发任务的类型、外部联系人id列表
-            List<String> externalIdList = taskTagMapper.getExternalUserIdListByTaskId(task.getTaskId());
+
+            if (externalIds.isEmpty()) {
+                throw new CustomException("查不到客户！");
+            }
+
             WeCustomerMessagePushDto queryData = new WeCustomerMessagePushDto();
             queryData.setChat_type(ChatType.SINGLE.getName());
-            queryData.setExternal_userid(externalIdList);
+            queryData.setExternal_userid(externalIds);
 
             // 引导语
             TextMessageDto text = new TextMessageDto();
@@ -384,7 +408,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
 
             // 群活码图片（上传临时文件获取media_id）
             ImageMessageDto image = new ImageMessageDto();
-            WeGroupCode groupCode = groupCodeMapper.selectWeGroupCodeById(task.getGroupCodeId());
+            WeGroupCode groupCode = groupCodeMapper.selectById(task.getGroupCodeId());
             WeMediaDto mediaDto = materialService.uploadTemporaryMaterial(groupCode.getCodeUrl(), MediaType.IMAGE.getMediaType(), "临时文件");
             image.setMedia_id(mediaDto.getMedia_id());
             //queryData.setImage(image);
@@ -441,6 +465,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
         pushDto.setMsgtype("text");
 
         // 请求消息推送接口，获取结果 [消息推送 - 发送应用消息]
+        log.debug("发送个人群发信息 ============> ");
         messagePushClient.sendMessageToUser(pushDto, agentId);
     }
 }

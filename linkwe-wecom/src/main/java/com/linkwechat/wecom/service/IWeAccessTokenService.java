@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service;
 
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.wecom.domain.WeApp;
 
 /**
@@ -25,5 +26,5 @@ public interface IWeAccessTokenService {
 
 
 
-   public void removeToken();
+   public void removeToken(WeCorpAccount wxCorpAccount);
 }

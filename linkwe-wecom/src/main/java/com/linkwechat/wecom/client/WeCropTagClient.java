@@ -13,7 +13,7 @@ import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
  * @author: HaoN
  * @create: 2020-10-17 11:00
  **/
-@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
+@BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
 public interface WeCropTagClient {
 
     /**

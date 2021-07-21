@@ -1,17 +1,18 @@
 package com.linkwechat.wecom.mapper;
 
 import com.linkwechat.wecom.domain.vo.WePresTagGroupTaskVo;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WePresTagGroupTask;
-import org.springframework.stereotype.Repository;
+import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 
 /**
  * 老客户标签建群相关Mapper接口
  */
-@Repository
+@Mapper
 public interface WePresTagGroupTaskMapper extends BaseMapper<WePresTagGroupTask> {
 
     /**
@@ -54,14 +55,6 @@ public interface WePresTagGroupTaskMapper extends BaseMapper<WePresTagGroupTask>
     );
 
     /**
-     * 检测任务名是否已被占用
-     *
-     * @param taskName 任务名
-     * @return 是否被占用
-     */
-    int checkTaskNameUnique(String taskName);
-
-    /**
      * 获取某员工的任务
      *
      * @param emplId 员工id
@@ -70,4 +63,19 @@ public interface WePresTagGroupTaskMapper extends BaseMapper<WePresTagGroupTask>
      */
     List<WePresTagGroupTaskVo> getTaskListByEmplId(@Param("emplId") String emplId, @Param("isDone") boolean isDone);
 
+    /**
+     * 根据task获取员工信息
+     * @param task
+     * @return
+     */
+    List<String> selectStaffList(WePresTagGroupTask task);
+
+    List<String> selectExternalUserIds(
+            @Param("taskId") Long taskId,
+            @Param("hasScope") boolean hasScope,
+            @Param("hasTag") boolean hasTag,
+            @Param("gender") Integer gender,
+            @Param("beginTime") String beginTime,
+            @Param("endTime") String endTime
+    );
 }

@@ -49,14 +49,6 @@ public interface WeGroupSopMapper extends BaseMapper<WeGroupSop> {
     int batchRemoveWeGroupSopByIds(Long[] ruleIds);
 
     /**
-     * 校验规则名是否已存在
-     *
-     * @param ruleName 规则名
-     * @return 结果
-     */
-    int isRuleNameUnique(String ruleName);
-
-    /**
      * 通过规则id获取其所有素材id
      *
      * @param ruleId sop规则id

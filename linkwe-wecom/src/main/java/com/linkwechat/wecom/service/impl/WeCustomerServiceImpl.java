@@ -2,9 +2,13 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.enums.TrajectorySceneType;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -79,6 +83,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     private WeUserClient weUserClient;
 
 
+    @Autowired
+    private  IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
+
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean saveOrUpdate(WeCustomer weCustomer) {
@@ -112,6 +120,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
      */
     @Override
     public List<WeCustomer> selectWeCustomerList(WeCustomer weCustomer) {
+        //当前登录用户为企业用户
+        if(Constants.USER_TYPE_WECOME
+                .equals(SecurityUtils.getLoginUser().getUser().getUserType())){
+            weCustomer.setUserIds((SecurityUtils.getLoginUser().getUser().getWeUserId()));
+        }
+
         return weCustomerMapper.selectWeCustomerList(weCustomer);
     }
 
@@ -128,11 +142,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         FollowUserList followUserList = weCustomerClient.getFollowUserList();
         if (WeConstans.WE_SUCCESS_CODE.equals(followUserList.getErrcode())
                 && ArrayUtil.isNotEmpty(followUserList.getFollow_user())) {
-            SecurityContext securityContext = SecurityContextHolder.getContext();
             Arrays.asList(followUserList.getFollow_user())
                     .parallelStream().forEach(k -> {
                 try {
-                    SecurityContextHolder.setContext(securityContext);
                     weFlowerCustomerHandle(k);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -189,7 +201,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                         WeTagGroup.builder()
                                                 .groupId(tagGroup.getGroup_id())
                                                 .gourpName(tagGroup.getGroup_name())
-                                                .createBy(SecurityUtils.getUsername())
+//                                                .createBy(SecurityUtils.getUsername())
                                                 .build()
                                 );
 
@@ -208,6 +220,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
                                             weFlowerCustomerTagRels.add(
                                                     WeFlowerCustomerTagRel.builder()
+                                                            .externalUserid(weCustomer.getExternalUserid())
                                                             .flowerCustomerRelId(weFlowerCustomerRelId)
                                                             .tagId(tag)
                                                             .createTime(new Date())
@@ -336,9 +349,17 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Transactional(rollbackFor = Exception.class)
     public void makeLabel(WeMakeCustomerTag weMakeCustomerTag) {
 
+        LambdaQueryWrapper<WeFlowerCustomerRel> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(WeFlowerCustomerRel::getExternalUserid, weMakeCustomerTag.getExternalUserid());
+
+        if(StrUtil.isNotBlank(weMakeCustomerTag.getUserId())){
+            wrapper.eq(WeFlowerCustomerRel::getUserId,weMakeCustomerTag.getUserId());
+        }
+
         //查询出当前用户对应的
-        List<WeFlowerCustomerRel> flowerCustomerRels = iWeFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
-                .eq(WeFlowerCustomerRel::getExternalUserid, weMakeCustomerTag.getExternalUserid()));
+        List<WeFlowerCustomerRel> flowerCustomerRels = iWeFlowerCustomerRelService.list(
+                wrapper
+        );
         if (CollectionUtil.isNotEmpty(flowerCustomerRels)) {
 
 
@@ -370,6 +391,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                         tagRels.add(
                                 WeFlowerCustomerTagRel.builder()
                                         .flowerCustomerRelId(customer.getId())
+                                        .externalUserid(customer.getExternalUserid())
                                         .tagId(tag.getTagId())
                                         .createTime(new Date())
                                         .build()
@@ -390,6 +412,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     }
                 }
             }
+
+
+
+            iWeCustomerTrajectoryService.inforMationNews(weMakeCustomerTag.getUserId(),weMakeCustomerTag.getExternalUserid(),
+                    TrajectorySceneType.TRAJECTORY_TYPE_XXDT_SZBQ.getKey());
+
         }
 
 
@@ -468,7 +496,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
      */
     @Override
     public List<WeUser> getCustomersByUserId(String externalUserid) {
-        return this.baseMapper.getCustomersByUserId(externalUserid);
+        String userId=null;
+        if(Constants.USER_TYPE_WECOME.equals(SecurityUtils.getLoginUser().getUser().getUserType())){
+             userId=SecurityUtils.getLoginUser().getUser().getWeUserId();
+        }
+        return this.baseMapper.getCustomersByUserId(externalUserid,userId);
     }
 
     @Override
@@ -672,19 +704,25 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         this.updateById(
                 weCustomer
         );
-
-
         WeFlowerCustomerRel weFlowerCustomerRel = WeFlowerCustomerRel.builder().build();
         BeanUtils.copyBeanProp(weFlowerCustomerRel,weCustomerPortrait);
         //更新企业添加人表
         iWeFlowerCustomerRelService.update(weFlowerCustomerRel,new LambdaQueryWrapper<WeFlowerCustomerRel>()
         .eq(WeFlowerCustomerRel::getExternalUserid,weCustomerPortrait.getExternalUserid())
         .eq(WeFlowerCustomerRel::getUserId,weCustomerPortrait.getUserId()));
-
+        //添加轨迹内容(信息动态)
+        iWeCustomerTrajectoryService.inforMationNews(weCustomerPortrait.getUserId(),weCustomerPortrait.getExternalUserid(), TrajectorySceneType.TRAJECTORY_TYPE_XXDT_BCZL.getKey());
     }
 
+    @Override
+    public List<WeCustomer> selectWeCustomerAllList(WeCustomer weCustomer) {
+        return weCustomerMapper.selectWeCustomerList(weCustomer);
+    }
 
-
+    @Override
+    public List<WeCustomer> selectWeCustomerListNoRel(WeCustomer weCustomer) {
+        return weCustomerMapper.selectWeCustomerListNoRel(weCustomer);
+    }
 
 
 }

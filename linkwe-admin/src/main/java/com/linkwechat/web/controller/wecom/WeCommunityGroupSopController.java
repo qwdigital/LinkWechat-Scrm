@@ -64,11 +64,13 @@ public class WeCommunityGroupSopController extends BaseController {
 //    @PreAuthorize("@ss.hasPermi('wecom:communityGroupSop:add')")
     @PostMapping(path = "/")
     public AjaxResult addGroupSop(@Validated @RequestBody WeGroupSopDto groupSopDto) {
-        if (!groupSopService.isRuleNameUnique(groupSopDto.getRuleName())) {
-            return AjaxResult.error(HttpStatus.BAD_REQUEST, "规则名称已存在");
-        }
+
         WeGroupSop weGroupSop = new WeGroupSop();
         BeanUtils.copyProperties(groupSopDto, weGroupSop);
+
+        if (groupSopService.isNameOccupied(weGroupSop)) {
+            return AjaxResult.error(HttpStatus.BAD_REQUEST, "规则名称已存在");
+        }
         weGroupSop.setCreateBy(SecurityUtils.getUsername());
         // 群聊id列表
         List<String> groupIdList = groupSopDto.getChatIdList();
@@ -116,14 +118,15 @@ public class WeCommunityGroupSopController extends BaseController {
         if (null == groupSopService.getGroupSopById(ruleId)) {
             return AjaxResult.error(HttpStatus.NOT_FOUND, "该群SOP规则不存在");
         }
+        WeGroupSop weGroupSop = new WeGroupSop();
+        weGroupSop.setRuleId(ruleId);
+        BeanUtils.copyProperties(groupSopDto, weGroupSop);
+
         // 校验规则名是否可用
-        WeGroupSopVo original = groupSopService.getGroupSopById(ruleId);
-        if (!groupSopDto.getRuleName().equals(original.getRuleName()) && !groupSopService.isRuleNameUnique(groupSopDto.getRuleName())) {
+        if (groupSopService.isNameOccupied(weGroupSop)) {
             return AjaxResult.error(HttpStatus.BAD_REQUEST, "规则名称已存在");
         }
-        WeGroupSop weGroupSop = new WeGroupSop();
-        BeanUtils.copyProperties(groupSopDto, weGroupSop);
-        weGroupSop.setRuleId(ruleId);
+
         weGroupSop.setUpdateBy(SecurityUtils.getUsername());
         // 群聊id列表
         List<String> groupIdList = groupSopDto.getChatIdList();

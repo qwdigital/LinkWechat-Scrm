@@ -36,6 +36,10 @@ public class WeFlowerCustomerTagRel
     /** 添加客户的企业微信用户 */
     private Long flowerCustomerRelId;
 
+
+    /**外部联系人id(客户id) */
+    private String externalUserid;
+
     /** 标签id */
     private String tagId;
 

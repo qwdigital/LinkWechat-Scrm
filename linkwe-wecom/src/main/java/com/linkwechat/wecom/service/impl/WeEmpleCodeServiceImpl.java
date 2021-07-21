@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -165,16 +166,25 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (this.baseMapper.updateWeEmpleCode(weEmpleCode) == 1) {
-            if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
-                weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
-                iWeEmpleCodeUseScopService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeUseScops());
+        try {
+
+            if (this.baseMapper.updateWeEmpleCode(weEmpleCode) == 1) {
+                if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
+                    List<WeEmpleCodeUseScop> weEmpleCodeUseScops = weEmpleCode.getWeEmpleCodeUseScops();
+                    weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
+                    iWeEmpleCodeUseScopService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeUseScops());
+                }
+                if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeTags())) {
+                    weEmpleCode.getWeEmpleCodeTags().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
+                    weEmpleCodeTagService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeTags());
+                }
             }
-            if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeTags())) {
-                weEmpleCode.getWeEmpleCodeTags().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
-                weEmpleCodeTagService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeTags());
-            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+
         }
+
     }
 
 //    /**

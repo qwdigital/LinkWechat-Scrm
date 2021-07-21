@@ -145,7 +145,7 @@ public interface IWeUserService extends IService<WeUser>
      * @param code
      * @return
      */
-    WeUserInfoVo getUserInfo(String code, String agentId);
+    WeUserInfoVo getUserInfo(String code,String agentId);
 
 
     /**

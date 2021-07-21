@@ -13,7 +13,7 @@ import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
  * @author: HaoN
  * @create: 2020-08-26 14:33
  **/
-@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
+@BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
 public interface WeAccessTokenClient {
     /**
      *  获取token(常用token,联系人token)
@@ -33,7 +33,7 @@ public interface WeAccessTokenClient {
      */
     @Request(url = "/service/get_provider_token",
     type="POST")
-    WeAccessTokenDtoDto getProviderToken(@Body("corpid") String corpid, @Body("provider_secret") String provider_secret);
+    WeAccessTokenDtoDto getProviderToken(@Body("corpid") String corpid,@Body("provider_secret") String provider_secret);
 
 
     /**

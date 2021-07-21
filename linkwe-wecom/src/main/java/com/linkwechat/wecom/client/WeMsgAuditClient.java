@@ -13,7 +13,7 @@ import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
  * @description 会话存档接口
  * @date 2020/12/2 16:45
  **/
-@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
+@BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
 public interface WeMsgAuditClient {
 
     /**

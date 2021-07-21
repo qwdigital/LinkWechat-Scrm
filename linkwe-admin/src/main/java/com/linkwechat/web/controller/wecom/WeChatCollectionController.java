@@ -35,7 +35,12 @@ public class WeChatCollectionController extends BaseController {
     @Log(title = "添加收藏", businessType = BusinessType.INSERT)
     @PostMapping("addCollection")
     public AjaxResult addCollection(@RequestBody WeChatCollectionDto chatCollectionDto) {
-        return toAjax(weChatCollectionService.addCollection(chatCollectionDto.getMaterialId(), chatCollectionDto.getUserId()));
+        boolean b =
+                weChatCollectionService.addCollection(chatCollectionDto.getMaterialId(), chatCollectionDto.getUserId());
+        if(weChatCollectionService.addCollection(chatCollectionDto.getMaterialId(), chatCollectionDto.getUserId())){
+           return AjaxResult.success();
+        }
+        return  AjaxResult.success("当前素材不可重复收藏");
     }
 
 

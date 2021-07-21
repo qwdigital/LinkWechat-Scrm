@@ -1,11 +1,24 @@
 package com.linkwechat.framework.web.service;
 
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.config.RuoYiConfig;
+import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.domain.entity.SysRole;
 import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.UserStatus;
 import com.linkwechat.common.exception.BaseException;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.system.service.ISysRoleService;
 import com.linkwechat.system.service.ISysUserService;
+import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.service.IWeCorpAccountService;
+import com.linkwechat.wecom.service.IWeUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +26,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 用户验证处理
@@ -31,6 +47,22 @@ public class UserDetailsServiceImpl implements UserDetailsService
     private SysPermissionService permissionService;
 
 
+    @Autowired
+    private IWeCorpAccountService iWeCorpAccountService;
+
+
+    @Autowired
+    private ISysRoleService iSysRoleService;
+
+
+    @Autowired
+    private RuoYiConfig ruoYiConfig;
+
+
+    @Autowired
+    private IWeUserService iWeUserService;
+
+
 
 
 
@@ -41,52 +73,54 @@ public class UserDetailsServiceImpl implements UserDetailsService
         if (StringUtils.isNull(user))
         {
 
-            log.info("登录用户：{} 不存在.", username);
-            throw new BaseException("对不起，您的账号：" + username + " 不存在");
-//            //企业管理登录
-//            //查询企业管理相关账号
-//            WeCorpAccount weCorpByAccount = iWeCorpAccountService.findWeCorpByAccount(username);
-//            if(null != weCorpByAccount){
-//                //注册到we_user表中
-//                user=SysUser.builder()
-//                        .userName(weCorpByAccount.getCropAccount())
-//                        .nickName(weCorpByAccount.getCompanyName())
-//                        .userType(Constants.USER_TYOE_CORP_ADMIN)
-//                        .roleIds(ArrayUtil.toArray(roleMapper.selectRoleList(SysRole.builder()
-//                                .roleKey(Constants.DEFAULT_WECOME_CORP_ADMIN)
-//                                .build()).stream().map(SysRole::getRoleId).collect(Collectors.toList()), Long.class))
-//                        .password(SecurityUtils.encryptPassword(ruoYiConfig.getWeUserDefaultPwd()))
-//                        .build();
-//            }
+         //查询企业管理相关账号
+            WeCorpAccount weCorpByAccount = iWeCorpAccountService.getOne(new LambdaQueryWrapper<WeCorpAccount>().eq(WeCorpAccount::getCorpAccount, username)
+                    .eq(WeCorpAccount::getDelFlag, Constants.NORMAL_CODE));
+            if(null != weCorpByAccount){
+                //注册到we_user表中
+                user=SysUser.builder()
+                        .userName(weCorpByAccount.getCorpAccount())
+                        .nickName(weCorpByAccount.getCompanyName())
+                        .userType(Constants.USER_TYOE_CORP_ADMIN)
+                        .roleIds(ArrayUtil.toArray(iSysRoleService.selectRoleList(SysRole.builder()
+                                .roleKey(Constants.DEFAULT_WECOME_CORP_ADMIN)
+                                .build()).stream().map(SysRole::getRoleId).collect(Collectors.toList()), Long.class))
+                        .password(SecurityUtils.encryptPassword(ruoYiConfig.getWeUserDefaultPwd()))
+                        .build();
+            } else{
+                //we_user表中去查询，如果该表为空则提示用户不存在，如果不为空，则将用户记录注册到系统用户表中
+                WeUser  weUser=iWeUserService.getOne(new LambdaQueryWrapper<WeUser>()
+                        .eq(WeUser::getMobile,username)
+                        .ne(WeUser::getIsActivate,new Integer(6)));
+                if(null == weUser){
+                    throw new BaseException("对不起，您的账号：" + username + " 不存在");
+                }
+                if(StrUtil.isBlank(weUser.getMobile())){
+                    throw new BaseException("请填写当前企业员工的手机号：" + username + " 然后再登录");
+                }
+                //注册到we_user表中
+                user=SysUser.builder()
+                        .userName(username)
+                        .nickName(weUser.getName())
+                        .userType(Constants.USER_TYPE_WECOME)
+                        .email(weUser.getEmail())
+                        .phonenumber(weUser.getMobile())
+                        .sex(weUser.getGender() ==0 ? "1": weUser.getGender() .toString())
+                        .avatar(weUser.getAvatarMediaid())
+                        .weUserId(weUser.getUserId())
+                        .roleIds(ArrayUtil.toArray(iSysRoleService.selectRoleList(SysRole.builder()
+                                .roleKey(Constants.DEFAULT_WECOME_ROLE_KEY)
+                                .build()).stream().map(SysRole::getRoleId).collect(Collectors.toList()), Long.class))
+                        .password(SecurityUtils.encryptPassword(ruoYiConfig.getWeUserDefaultPwd()))
+                        .build();
 
-//            else{
-//
-//                //we_user表中去查询，如果该表为空则提示用户不存在，如果不为空，则将用户记录注册到系统用户表中
-//                WeUser weUser
-//                        = iWeUserService.getById(username);
-//                if(null == weUser){
-//                    log.info("登录用户：{} 不存在.", username);
-//                    throw new UsernameNotFoundException("登录用户：" + username + " 不存在");
-//                }
-//
-//                //注册到we_user表中
-//                user=SysUser.builder()
-//                        .userName(weUser.getUserId())
-//                        .nickName(weUser.getName())
-//                        .userType(Constants.USER_TYPE_WECOME)
-//                        .email(weUser.getEmail())
-//                        .phonenumber(weUser.getMobile())
-//                        .sex(weUser.getGender() ==0 ? "1": weUser.getGender() .toString())
-//                        .avatar(weUser.getAvatarMediaid())
-//                        .roleIds(ArrayUtil.toArray(roleMapper.selectRoleList(SysRole.builder()
-//                                .roleKey(Constants.DEFAULT_WECOME_ROLE_KEY)
-//                                .build()).stream().map(SysRole::getRoleId).collect(Collectors.toList()), Long.class))
-//                        .password(SecurityUtils.encryptPassword(ruoYiConfig.getWeUserDefaultPwd()))
-//                        .build();
-//            }
-//            userService.insertUser(
-//                    user
-//            );
+            }
+
+            if(user != null){
+                userService.insertUser(
+                        user
+                );
+            }
         }
         else if (UserStatus.DELETED.getCode().equals(user.getDelFlag()))
         {
@@ -99,12 +133,14 @@ public class UserDetailsServiceImpl implements UserDetailsService
             throw new BaseException("对不起，您的账号：" + username + " 已停用");
         }
 
+
        //当前登录用户为企业管理，设置corpId和密钥相关
-//       if(user.getUserType().equals(Constants.USER_TYOE_CORP_ADMIN)){
-//          user.setWeCorpAccount(
-//                  iWeCorpAccountService.findWeCorpByAccount(username)
-//          );
-//       }
+       if(Constants.USER_TYOE_CORP_ADMIN.equals(user.getUserType())){
+          user.setWeCorpAccount(
+                  iWeCorpAccountService.getOne(new LambdaQueryWrapper<WeCorpAccount>().eq(WeCorpAccount::getCorpAccount, username)
+                          .eq(WeCorpAccount::getDelFlag, Constants.NORMAL_CODE))
+          );
+       }
 
 
         return createLoginUser(user);

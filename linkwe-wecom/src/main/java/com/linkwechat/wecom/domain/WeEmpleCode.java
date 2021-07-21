@@ -107,9 +107,4 @@ public class WeEmpleCode extends BaseEntity {
      */
     @TableField(exist = false)
     private String mobile;
-
-    /**
-     * 客户添加时是否需要经过确认自动成为好友  1:是  0:否
-     */
-    private Integer isJoinConfirmFriends;
 }

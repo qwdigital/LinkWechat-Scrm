@@ -25,7 +25,7 @@ public interface IWeUserBehaviorDataService extends IService<WeUserBehaviorData>
      * @param dateTime
      * @return WeUserBehaviorDataDto
      */
-    WePageCountDto getCountDataByDay(String dateTime, String type);
+    WePageCountDto getCountDataByDay(String dateTime,String type);
 
     /**
      * 按天维度查询数据统计

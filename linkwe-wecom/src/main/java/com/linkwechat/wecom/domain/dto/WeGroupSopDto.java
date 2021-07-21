@@ -2,7 +2,9 @@ package com.linkwechat.wecom.domain.dto;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -13,7 +15,8 @@ public class WeGroupSopDto {
     /**
      * 规则名
      */
-    @NotNull(message = "规则名不可为空")
+    @Size(max = 64, message = "规则名称不可超过64字符")
+    @NotBlank(message = "规则名不可为空")
     private String ruleName;
 
     /**
@@ -25,13 +28,15 @@ public class WeGroupSopDto {
     /**
      * 内容标题
      */
-    @NotNull(message = "标题不可为空")
+    @Size(max = 64, message = "标题不可超过64字符")
+    @NotBlank(message = "标题不可为空")
     private String title;
 
     /**
      * 消息内容
      */
-    @NotNull(message = "内容不可为空")
+    @Size(max = 255, message = "标题不可超过255字符")
+    @NotBlank(message = "内容不可为空")
     private String content;
 
     /**

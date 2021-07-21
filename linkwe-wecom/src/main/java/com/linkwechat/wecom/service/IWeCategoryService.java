@@ -34,6 +34,8 @@ public interface IWeCategoryService extends IService<WeCategory> {
      */
     List<? extends Tree<?>> findWeCategoryByMediaType(@Param("mediaType") String mediaType);
 
+    void deleteWeCategoryById(Long[] ids);
+
 
 
 }

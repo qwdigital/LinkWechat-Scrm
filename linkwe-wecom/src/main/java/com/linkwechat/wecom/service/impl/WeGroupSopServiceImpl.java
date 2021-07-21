@@ -9,6 +9,7 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeMessagePushClient;
 import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.WeMessagePushDto;
+import com.linkwechat.wecom.domain.dto.WeMessagePushResultDto;
 import com.linkwechat.wecom.domain.dto.message.TextMessageDto;
 import com.linkwechat.wecom.domain.vo.WeCommunityTaskEmplVo;
 import com.linkwechat.wecom.domain.vo.WeGroupSopVo;
@@ -21,12 +22,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -104,7 +107,7 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.READ_COMMITTED)
     public int addGroupSop(WeGroupSop weGroupSop, List<String> groupIdList, List<Long> materialIdList, List<String> picUrlList) {
         if (this.save(weGroupSop)) {
             Long ruleId = weGroupSop.getRuleId();
@@ -130,7 +133,7 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.READ_COMMITTED)
     public int updateGroupSop(WeGroupSop weGroupSop, List<String> groupIdList, List<Long> materialIdList, List<String> picUrlList) {
         if (this.updateById(weGroupSop)) {
             Long ruleId = weGroupSop.getRuleId();
@@ -159,7 +162,7 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.READ_COMMITTED)
     public int batchRemoveGroupSopByIds(Long[] ids) {
         int affectedRows = groupSopMapper.deleteBatchIds(Arrays.asList(ids));
         if (affectedRows > 0) {
@@ -178,17 +181,6 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
             sopPicMapper.delete(picQueryWrapper);
         }
         return affectedRows;
-    }
-
-    /**
-     * 校验规则名是否唯一
-     *
-     * @param ruleName 规则名
-     * @return 是否唯一
-     */
-    @Override
-    public boolean isRuleNameUnique(String ruleName) {
-        return groupSopMapper.isRuleNameUnique(ruleName) == 0;
     }
 
     /**
@@ -320,10 +312,25 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
     }
 
     /**
+     * 规则名是否已被占用
+     *
+     * @param groupSop 规则信息
+     * @return 是否被占用
+     */
+    @Override
+    public boolean isNameOccupied(WeGroupSop groupSop) {
+        Long currentId = Optional.ofNullable(groupSop.getRuleId()).orElse(-1L);
+        LambdaQueryWrapper<WeGroupSop> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(WeGroupSop::getRuleName, groupSop.getRuleName()).eq(WeGroupSop::getDelFlag, 0);
+        List<WeGroupSop> queryRes = baseMapper.selectList(queryWrapper);
+        return !queryRes.isEmpty() && !currentId.equals(queryRes.get(0).getRuleId());
+    }
+
+    /**
      * 消息推送(企微API 消息推送 - 发送应用消息)
      */
     @Override
-    @Async
+//    @Async
     public void sendMessage(List<String> groupIdList) {
 
         // 构造请求参数

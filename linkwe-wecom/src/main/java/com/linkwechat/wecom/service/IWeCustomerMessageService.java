@@ -24,7 +24,7 @@ public interface IWeCustomerMessageService extends IService<WeCustomerMessage> {
      * @param actualSend 实际发送消息数（客户对应多少人 客户群对应多个群）
      * @return int
      */
-    int updateWeCustomerMessageActualSend(Long messageId, Integer actualSend);
+    int updateWeCustomerMessageActualSend( Long messageId, Integer actualSend);
 
     /**
      * 保存微信消息  WeCustomerMessage
@@ -33,7 +33,7 @@ public interface IWeCustomerMessageService extends IService<WeCustomerMessage> {
      * @param customerMessagePushDto
      * @param size
      */
-     void saveWeCustomerMessage(long messageId, long messageOriginalId, CustomerMessagePushDto customerMessagePushDto, int size, String content);
+     void saveWeCustomerMessage(long messageId, long messageOriginalId, CustomerMessagePushDto customerMessagePushDto, int size,String content);
 
     /**
      *
@@ -50,6 +50,6 @@ public interface IWeCustomerMessageService extends IService<WeCustomerMessage> {
      * @param messageId
      * @throws JsonProcessingException
      */
-    public void sendMessgae(CustomerMessagePushDto customerMessagePushDto, long messageId, List<WeCustomer> customers, List<WeGroup> groups) throws JsonProcessingException;
+    public void sendMessgae(CustomerMessagePushDto customerMessagePushDto, long messageId,List<WeCustomer> customers,List<WeGroup> groups) throws JsonProcessingException;
 
 }

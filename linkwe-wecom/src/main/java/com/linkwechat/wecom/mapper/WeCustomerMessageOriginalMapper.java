@@ -25,8 +25,8 @@ public interface WeCustomerMessageOriginalMapper extends BaseMapper<WeCustomerMe
      * @param endTime 结束时间
      * @return {@link CustomerMessagePushVo}s
      */
-    public List<CustomerMessagePushVo> selectCustomerMessagePushs(@Param("sender") String sender, @Param("content") String content
-            , @Param("pushType") String pushType, @Param("beginTime") String beginTime, @Param("endTime") String endTime);
+    public List<CustomerMessagePushVo> selectCustomerMessagePushs(@Param("sender") String sender,@Param("content") String content
+            ,@Param("pushType") String pushType, @Param("beginTime") String beginTime,@Param("endTime") String endTime);
 
     /**
      * 群发详情

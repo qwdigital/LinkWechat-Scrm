@@ -15,7 +15,7 @@ import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
  * @create: 2020-10-17 22:41
  **/
 @SuppressWarnings("all")
-@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
+@BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
 public interface WeMessagePushClient {
 
     /**
@@ -24,7 +24,7 @@ public interface WeMessagePushClient {
     @Request(url = "/message/send",
             type = "POST"
     )
-    WeMessagePushResultDto sendMessageToUser(@DataObject WeMessagePushDto weMessagePushDto, @Header("agentId") String agentId);
+    WeMessagePushResultDto sendMessageToUser(@DataObject WeMessagePushDto weMessagePushDto,@Header("agentId") String agentId);
 
     /**
      * 应用推送消息

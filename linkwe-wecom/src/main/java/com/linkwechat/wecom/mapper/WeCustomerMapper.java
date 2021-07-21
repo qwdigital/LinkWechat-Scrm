@@ -71,7 +71,7 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
      * @param externalUserid
      * @return
      */
-    public List<WeUser> getCustomersByUserId(@Param("externalUserid") String externalUserid);
+    public List<WeUser> getCustomersByUserId(@Param("externalUserid") String externalUserid,@Param("userId") String userId);
 
     /**
      * 通过标签查询客户列表
@@ -87,7 +87,7 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
      * @param userid
      * @return
      */
-    WeCustomerPortrait findCustomerByOperUseridAndCustomerId(@Param("externalUserid") String externalUserid, @Param("userid") String userid);
+    WeCustomerPortrait findCustomerByOperUseridAndCustomerId(@Param("externalUserid") String externalUserid,@Param("userid") String userid);
 
 
     /**
@@ -96,7 +96,17 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
      * @param userid 员工id
      * @return
      */
-    WeCustomerSocialConn countSocialConn(@Param("externalUserid") String externalUserid, @Param("userid") String userid);
+    WeCustomerSocialConn countSocialConn(@Param("externalUserid")String externalUserid,@Param("userid")String userid);
+
+
+
+    /**
+     * 查询企业微信客户列表,不查询一对多关系相关数据
+     *
+     * @param weCustomer 企业微信客户
+     * @return 企业微信客户集合
+     */
+    public List<WeCustomer> selectWeCustomerListNoRel(WeCustomer weCustomer);
 
 
 }

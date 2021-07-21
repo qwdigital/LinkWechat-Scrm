@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.system;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysMenu;
@@ -154,19 +155,31 @@ public class SysLoginController
     }
 
 
+
     /**
-     * 租户登录
+     * 通过企业id和企业密钥登录
      * @param corpId
      * @param corpSecret
      * @return
      */
-    @GetMapping("/tenantLogin")
-    public AjaxResult tenantLogin(String corpId,String corpSecret){
-        AjaxResult ajax = AjaxResult.success();
+    @GetMapping("/corpLogin")
+    public AjaxResult corpLogin(String corpId,String corpSecret){
+
+        WeCorpAccount weCorpAccount = iWxCorpAccountService.getOne(new LambdaQueryWrapper<WeCorpAccount>()
+                .eq(WeCorpAccount::getCorpId, corpId)
+                .eq(WeCorpAccount::getCorpSecret, corpSecret)
+                .eq(WeCorpAccount::getDelFlag, Constants.NORMAL_CODE));
 
 
+        if(weCorpAccount == null){
 
-        return ajax;
+            return AjaxResult.error("当前企业id与企业密码不匹配或不存在");
+        }
+
+        return AjaxResult.success(
+                loginService.noPwdLogin(weCorpAccount.getCorpAccount())
+        );
     }
+
 
 }

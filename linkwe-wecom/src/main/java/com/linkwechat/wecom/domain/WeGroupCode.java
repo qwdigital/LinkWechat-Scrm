@@ -2,13 +2,17 @@ package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 
@@ -33,59 +37,70 @@ public class WeGroupCode extends BaseEntity {
     /**
      * 活码URL
      */
+    @ApiModelProperty(value = "活码URL")
     private String codeUrl;
-
-    /**
-     * 二维码的uuid
-     */
-    private String uuid;
 
     /**
      * 活码头像
      */
-    private String activityHeadUrl;
+    @ApiModelProperty(value = "活码头像URL")
+    private String avatarUrl;
 
     /**
      * 活码名称
      */
-    @NotNull(message = "活码名称不能为空")
+    @ApiModelProperty(value = "活码名称")
+    @Size(max = 60, message = "活码名称最大长度为60个字符")
+    @NotBlank(message = "活码名称不能为空")
     private String activityName;
 
     /**
      * 活码描述
      */
-    @NotNull(message = "活码描述不能为空")
+    @ApiModelProperty(value = "活码描述")
+    @Size(max = 60, message = "活码描述最大长度为60个字符")
     private String activityDesc;
 
     /**
      * 场景
      */
+    @ApiModelProperty(value = "场景")
+    @Size(max = 60, message = "场景最大长度为60个字符")
+//    @NotBlank(message = "场景不能为空")
     private String activityScene;
 
     /**
      * 加群引导语
      */
+    @ApiModelProperty(value = "加群引导语")
+    @Size(max = 100, message = "加群引导语最大长度为60个字符")
     private String guide;
 
     /**
      * 进群是否提示:1:是;0:否;
      */
-    private Long joinGroupIsTip;
+    private Long showTip;
 
     /**
      * 进群提示语
      */
+    @ApiModelProperty(value = "进群提示语")
+    @Size(max = 100, message = "进群提示语最大长度为60个字符")
     private String tipMsg;
 
     /**
      * 客服二维码
      */
+    @ApiModelProperty(value = "客服二维码")
+    @Size(max = 100, message = "客服二维码提示语最大长度为60个字符")
     private String customerServerQrCode;
 
     /**
-     * 0:正常;2:删除;
+     * 0:正常; 1:删除;
      */
-    private Long delFlag;
+    @JsonIgnore
+    @TableLogic(value = "0", delval = "1")
+    private Long delFlag = 0L;
 
     /**
      * 可用实际码数量
@@ -110,5 +125,12 @@ public class WeGroupCode extends BaseEntity {
      */
     @TableField(exist = false)
     private List<WeGroupCodeActual> actualList;
+
+    /**
+     * 实际码id列表,用于前端绑定实际群活码
+     */
+    @JsonIgnore
+    @TableField(exist = false)
+    private List<Long> actualIdList;
 
 }

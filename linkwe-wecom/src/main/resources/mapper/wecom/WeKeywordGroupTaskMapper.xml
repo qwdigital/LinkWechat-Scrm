@@ -4,15 +4,17 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeKeywordGroupTaskMapper">
 
-    <resultMap id="WeKeywordGroupTaskResult" type="WeKeywordGroupTaskVo">
-        <result property="taskId" column="task_id"/>
+    <resultMap id="WeKeywordGroupTaskResult" type="WeKeywordGroupTask">
+        <id property="taskId" column="task_id"/>
         <result property="taskName" column="task_name"/>
         <result property="welcomeMsg" column="welcome_msg"/>
-        <result property="groupCodeId" column="group_code_id"/>
         <result property="createBy" column="create_by"/>
         <result property="createTime" column="create_time"/>
         <result property="updateBy" column="update_by"/>
         <result property="updateTime" column="update_time"/>
+        <result property="keywords" column="keywords" />
+        <result property="groupNameList" column="group_name_list" javaType="java.lang.String"/>
+        <association property="groupCodeInfo" column="group_code_id" javaType="com.linkwechat.wecom.domain.vo.WeGroupCodeVo" select="selectGroupByTaskId" />
     </resultMap>
 
     <sql id="selectTaskVo">
@@ -21,29 +23,56 @@
             wkg.task_name,
             wkg.group_code_id,
             wkg.welcome_msg,
+            wkg.keywords,
+            GROUP_CONCAT(DISTINCT wg.group_name SEPARATOR ' ') AS group_name_list,
             wkg.create_by,
             wkg.create_time,
             wkg.update_by,
-            wkg.update_time
+            wkg.update_time,
+            wkg.del_flag
         FROM
             we_keyword_group wkg
-            LEFT JOIN we_keyword_group_kw wkgk ON wkgk.task_id = wkg.task_id
+            LEFT JOIN we_group_code gc ON wkg.group_code_id = gc.id AND gc.del_flag = 0
+            LEFT JOIN we_group_code_actual gca ON gca.group_code_id = gc.id AND gca.del_flag = 0
+            LEFT JOIN we_group wg ON wg.chat_id = gca.chat_id
+
     </sql>
+
+<!--    <select id="selectGroupNameByTaskId" parameterType="Long" resultMap="groupNameResultMap">-->
+<!--        select distinct wg.group_name-->
+<!--        from we_keyword_group wkg-->
+<!--        LEFT JOIN we_keyword_group_kw wkgk ON wkgk.task_id = wkg.task_id-->
+<!--        LEFT JOIN we_group_code gc ON wkg.group_code_id = gc.id-->
+<!--        LEFT JOIN we_group_code_actual gca ON gca.group_code_id = gc.id-->
+<!--        LEFT JOIN we_group wg ON wg.chat_id = gca.chat_id-->
+<!--        WHERE wkg.task_id = #{taskId}-->
+<!--    </select>-->
+
+<!--    <select id="selectKeywordByTaskId" resultMap="keywordResultMap">-->
+<!--        select task_id, keyword from we_keyword_group_kw where task_id = #{taskId}-->
+<!--    </select>-->
+
+    <select id="selectGroupByTaskId" parameterType="Long" resultType="WeGroupCodeVo">
+        select distinct wgc.id, wgc.code_url
+        from we_group_code wgc left join we_keyword_group wkg on wgc.id = wkg.group_code_id
+        where wgc.id = #{groupCodeId};
+    </select>
 
     <select id="getTaskById" parameterType="Long" resultMap="WeKeywordGroupTaskResult">
         <include refid="selectTaskVo" />
-        WHERE wkg.task_id = #{taskId}
+        WHERE wkg.task_id = #{taskId} AND wkg.del_flag = 0
+        GROUP BY wkg.task_id
     </select>
 
     <select id="getTaskList" resultMap="WeKeywordGroupTaskResult">
         <include refid="selectTaskVo" />
-        <where>
-            1 = 1
+        WHERE
+            wkg.del_flag = 0
             <if test="taskName != null and taskName !='' ">
                 AND wkg.task_name LIKE CONCAT("%",#{taskName},"%")
             </if>
-            <if test="keyword != null and keyword !='' ">
-                AND wkgk.keyword LIKE CONCAT("%",#{keyword},"%")
+            <if test="keywords != null and keywords != ''">
+                AND FIND_IN_SET(#{keywords}, keywords)
             </if>
             <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
                 AND date_format(wkg.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
@@ -55,27 +84,25 @@
             <if test="createBy!=null and createBy!=''">
                 AND wkg.create_by LIKE CONCAT("%",#{createBy},"%")
             </if>
-        </where>
+        GROUP BY wkg.task_id
+        order by create_time desc
     </select>
 
-    <select id="getGroupNameListByTaskId" parameterType="Long" resultType="String">
-        SELECT DISTINCT
-            g.group_name
-        FROM
-            we_keyword_group wkg
-            LEFT JOIN we_group_code gc ON wkg.group_code_id = gc.id
-            LEFT JOIN we_group_code_actual gca ON gca.group_code_id = gc.id
-            LEFT JOIN we_group g ON g.chat_id = gca.chat_id
-        WHERE wkg.task_id = #{taskId}
-    </select>
-
-    <select id="checkNameUnique" parameterType="String" resultType="int">
-        select count(1) from we_keyword_group where task_name = #{taskName}
-    </select>
+<!--    <select id="getGroupNameListByTaskId" parameterType="Long" resultType="String">-->
+<!--        SELECT DISTINCT-->
+<!--            g.group_name-->
+<!--        FROM-->
+<!--            we_keyword_group wkg-->
+<!--            LEFT JOIN we_group_code gc ON wkg.group_code_id = gc.id-->
+<!--            LEFT JOIN we_group_code_actual gca ON gca.group_code_id = gc.id-->
+<!--            LEFT JOIN we_group g ON g.chat_id = gca.chat_id-->
+<!--        WHERE wkg.task_id = #{taskId}-->
+<!--    </select>-->
 
     <select id="filterByNameOrKeyword" parameterType="String" resultMap="WeKeywordGroupTaskResult">
         <include refid="selectTaskVo" />
         WHERE wkg.task_name LIKE CONCAT("%",#{word},"%")
-        OR wkgk.keyword LIKE CONCAT("%",#{word},"%")
+        OR FIND_IN_SET(#{word}, wkg.keywords)
+        GROUP BY wkg.task_id
     </select>
 </mapper>

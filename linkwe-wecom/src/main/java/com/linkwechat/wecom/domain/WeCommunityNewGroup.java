@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -43,5 +44,6 @@ public class WeCommunityNewGroup extends BaseEntity {
     /**
      * 0 未删除 1 已删除
      */
-    private int delFlag = 0;
+    @TableLogic
+    private int delFlag;
 }

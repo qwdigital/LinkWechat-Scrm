@@ -9,7 +9,7 @@ import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 /**
  * 应用管理相关接口
  */
-@BaseRequest(interceptor = WeAccessTokenInterceptor.class)
+@BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
 public interface WeAppClient {
 
     /**
@@ -33,5 +33,5 @@ public interface WeAppClient {
      * @return
      */
     @Request(url = "/agent/set",type = "POST")
-    WeResultDto updateAgentById(@DataObject WeAppDetailDto weAppDetailDto, @Header("agentid") String agentid);
+    WeResultDto updateAgentById(@DataObject WeAppDetailDto weAppDetailDto,@Header("agentid")String agentid);
 }

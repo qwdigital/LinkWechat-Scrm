@@ -1,5 +1,6 @@
 package com.linkwechat.common.config;
 
+import com.linkwechat.common.utils.OsUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +33,13 @@ public class RuoYiConfig
 
     /** 企业微信账号登录系统默认密码 */
     private static String weUserDefaultPwd="123456";
+
+
+    private FileConfig file;
+
+
+    /**是否开启多租户*/
+    private boolean startTenant=false;
 
 
 
@@ -80,7 +88,11 @@ public class RuoYiConfig
 
     public static String getProfile()
     {
-        return profile;
+        if(OsUtils.isWindows()){
+            return "D:/linkWeChat/uploadPath";
+
+        }
+        return "/linkWeChat/uploadPath";
     }
 
     public void setProfile(String profile)
@@ -144,5 +156,21 @@ public class RuoYiConfig
 
     public void setAnonUrl(String[] anonUrl) {
         this.anonUrl = anonUrl;
+    }
+
+    public FileConfig getFile() {
+        return file;
+    }
+
+    public void setFile(FileConfig file) {
+        this.file = file;
+    }
+
+    public boolean isStartTenant() {
+        return startTenant;
+    }
+
+    public void setStartTenant(boolean startTenant) {
+        this.startTenant = startTenant;
     }
 }

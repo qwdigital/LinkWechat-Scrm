@@ -107,7 +107,6 @@ public class WeCustomerPortraitController extends BaseController {
     public AjaxResult updateWeCustomerPorTraitTag(@RequestBody WeMakeCustomerTag weMakeCustomerTag){
 
 
-
         iWeCustomerService.makeLabel(weMakeCustomerTag);
 
         return AjaxResult.success();
@@ -150,16 +149,15 @@ public class WeCustomerPortraitController extends BaseController {
      * @return
      */
     @GetMapping(value = "/findTrajectory")
-    public TableDataInfo findTrajectory(Integer trajectoryType){
+    public TableDataInfo findTrajectory(String userId,String externalUserid,Integer trajectoryType){
         startPage();
         LambdaQueryWrapper<WeCustomerTrajectory> ne = new LambdaQueryWrapper<WeCustomerTrajectory>()
-                .ne(WeCustomerTrajectory::getStatus, Constants.DELETE_CODE);
-
+                .ne(WeCustomerTrajectory::getStatus, Constants.DELETE_CODE)
+                .eq(WeCustomerTrajectory::getUserId,userId)
+                .eq(WeCustomerTrajectory::getExternalUserid,externalUserid);
         if(trajectoryType != null){
             ne.eq(WeCustomerTrajectory::getTrajectoryType, trajectoryType);
         }
-
-
         return getDataTable(
                 iWeCustomerTrajectoryService.list(ne)
         );

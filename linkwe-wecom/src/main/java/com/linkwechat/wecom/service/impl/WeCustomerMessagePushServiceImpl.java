@@ -2,11 +2,13 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisCache;
+import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -14,13 +16,16 @@ import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeCustomerMessageTimeTask;
 import com.linkwechat.wecom.domain.WeGroup;
+import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
+import com.linkwechat.wecom.domain.dto.message.ImageMessageDto;
 import com.linkwechat.wecom.domain.vo.CustomerMessagePushVo;
 import com.linkwechat.wecom.mapper.WeCustomerMessageTimeTaskMapper;
 import com.linkwechat.wecom.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,14 +75,13 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
     @Autowired
     private WeCustomerMessageTimeTaskMapper customerMessageTimeTaskMapper;
 
+
+    @Autowired
+    private IWeMaterialService materialService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addWeCustomerMessagePush(CustomerMessagePushDto customerMessagePushDto) throws JsonProcessingException, ParseException {
-
-//        if ((null != customerMessagePushDto.getSettingTime() && !"".equals(customerMessagePushDto.getSettingTime()))
-//                && DateUtils.diffTime(new Date(), DateUtil.parse(customerMessagePushDto.getSettingTime(), "yyyy-MM-dd HH:mm")) > 0) {
-//            throw new WeComException("发送时间不能小于当前时间");
-//        }
+    public void addWeCustomerMessagePush(CustomerMessagePushDto customerMessagePushDto) throws JsonProcessingException, ParseException, CloneNotSupportedException {
 
         if(StrUtil.isNotBlank(customerMessagePushDto.getSettingTime())){
             if(DateUtils.diffTime(new Date(), DateUtil.parse(customerMessagePushDto.getSettingTime(), "yyyy-MM-dd HH:mm")) > 0){
@@ -85,12 +89,23 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
             }
         }
 
-        /*if(StrUtil.isBlank(customerMessagePushDto.getSettingTime())){
-            throw new WeComException("发送时间不能为空");
-        }*/
+
+        if(customerMessagePushDto.getMessageType().equals("1")){//等于图片或者图文，根据图片URL，获取新的media_id
+
+            ImageMessageDto imageMessage = customerMessagePushDto.getImageMessage();
 
 
+            if(null != imageMessage && StrUtil.isNotBlank(imageMessage.getPic_url())){
+                WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(imageMessage.getPic_url(),
+                        MediaType.IMAGE.getMediaType()
+                        ,imageMessage.getPic_url());
+                if(StrUtil.isNotBlank(weMediaDto.getMedia_id())){
+                    imageMessage.setMedia_id(weMediaDto.getMedia_id());
+                }
 
+            }
+
+        }
 
         List<WeCustomer> customers = Lists.newArrayList();
         List<WeGroup> groups = new ArrayList<>();
@@ -103,6 +118,8 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
                 customers = externalUserIds(customerMessagePushDto.getPushRange(), customerMessagePushDto.getStaffId()
                         , customerMessagePushDto.getDepartment(), customerMessagePushDto.getTag());
             }
+
+
             if (CollectionUtils.isEmpty(customers)) {
                 throw new WeComException("没有外部联系人");
             }
@@ -135,6 +152,14 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
         //保存分类消息信息
         weCustomerSeedMessageService.saveSeedMessage(customerMessagePushDto, messageId);
 
+        this.sendMessage(customerMessagePushDto,messageId,customers,groups);
+
+    }
+
+
+
+    private void sendMessage(CustomerMessagePushDto customerMessagePushDto, long messageId,  List<WeCustomer> customers,List<WeGroup> groups ) throws ParseException, JsonProcessingException {
+
         //发送群发消息
         //调用微信api发送消息
         if (null == customerMessagePushDto.getSettingTime() || customerMessagePushDto.getSettingTime().equals("")) {
@@ -144,6 +169,9 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
                     , DateUtils.getMillionSceondsBydate(customerMessagePushDto.getSettingTime()));
             customerMessageTimeTaskMapper.saveWeCustomerMessageTimeTask(timeTask);
         }
+
+
+
     }
 
     @Override
@@ -165,13 +193,20 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
             //从redis中读取数据
             List<WeCustomer> customers = redisCache.getCacheList(WeConstans.WECUSTOMERS_KEY);
             if (CollectionUtils.isEmpty(customers)) {
-                customers = weCustomerService.selectWeCustomerList(null);
+                WeCustomer weCustomer = new WeCustomer();
+                weCustomer.setUserIds(staffId);
+                weCustomer.setDepartmentIds(department);
+                customers = weCustomerService.selectWeCustomerAllList(weCustomer);
                 redisCache.setCacheList(WeConstans.WECUSTOMERS_KEY, customers);
+                redisCache.expire(WeConstans.WECUSTOMERS_KEY,2 * 60L);
+            }else{
+                return customers;
             }
+
             WeCustomer weCustomer = new WeCustomer();
             weCustomer.setUserIds(staffId);
             weCustomer.setDepartmentIds(department);
-            return weCustomerService.selectWeCustomerList(weCustomer);
+            return weCustomerService.selectWeCustomerListNoRel(weCustomer);
         } else {
             //按条件查询客户
             //通过部门id查询所有的员工
@@ -180,7 +215,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
             weCustomer.setUserIds(staffId);
             weCustomer.setTagIds(tag);
             weCustomer.setDepartmentIds(department);
-            return weCustomerService.selectWeCustomerList(weCustomer);
+            return weCustomerService.selectWeCustomerListNoRel(weCustomer);
         }
     }
 

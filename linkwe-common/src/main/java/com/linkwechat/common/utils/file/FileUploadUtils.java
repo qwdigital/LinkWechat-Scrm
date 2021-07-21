@@ -56,6 +56,8 @@ public class FileUploadUtils {
         return defaultBaseDir;
     }
 
+
+
     /**
      * 以默认配置进行文件上传
      *
@@ -194,11 +196,10 @@ public class FileUploadUtils {
         COSClient cosClient = new COSClient(cred, clientConfig);
 
         // 指定要上传到 COS 上对象键
-        String key = "exampleobject";
         ObjectMetadata objectMetadata = new ObjectMetadata();
         PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.getBucketName(), fileName,file.getInputStream(),objectMetadata);
         PutObjectResult putObjectResult = cosClient.putObject(putObjectRequest);
-        log.info("{}","https://link-wechat-1251309172.cos.ap-nanjing.myqcloud.com/"+fileName);
+        log.info("{}",cosConfig.getCosImgUrlPrefix()+fileName);
         log.info("腾讯cos上传信息：{}",new ObjectMapper().writeValueAsString(putObjectResult));
         cosClient.shutdown();
 

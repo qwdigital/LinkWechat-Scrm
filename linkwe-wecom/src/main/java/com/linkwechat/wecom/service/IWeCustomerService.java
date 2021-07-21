@@ -118,7 +118,7 @@ public interface IWeCustomerService extends IService<WeCustomer>
      * @param userid
      * @return
      */
-    WeCustomerPortrait findCustomerByOperUseridAndCustomerId(String externalUserid, String userid) throws Exception;
+    WeCustomerPortrait findCustomerByOperUseridAndCustomerId(String externalUserid,String userid) throws Exception;
 
 
     /**
@@ -126,6 +126,22 @@ public interface IWeCustomerService extends IService<WeCustomer>
      * @param weCustomerPortrait
      */
     void updateWeCustomerPortrait(WeCustomerPortrait weCustomerPortrait);
+
+
+    /**
+     * 查询全部客户列表
+     * @param weCustomer
+     * @return
+     */
+    public List<WeCustomer> selectWeCustomerAllList(WeCustomer weCustomer);
+
+    /**
+     * 查询企业微信客户列表,不查询一对多关系相关数据
+     *
+     * @param weCustomer 企业微信客户
+     * @return 企业微信客户集合
+     */
+    List<WeCustomer> selectWeCustomerListNoRel(WeCustomer weCustomer);
 
 
 

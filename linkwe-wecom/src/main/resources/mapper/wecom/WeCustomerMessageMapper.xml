@@ -21,6 +21,7 @@
             message_id=#{messageId}
         </where>
     </update>
+
     <update id="updateWeCustomerMessageCheckStatusById">
         UPDATE we_customer_message
         <set>
@@ -30,5 +31,7 @@
             message_id=#{messageId}
         </where>
     </update>
+
+
 
 </mapper>

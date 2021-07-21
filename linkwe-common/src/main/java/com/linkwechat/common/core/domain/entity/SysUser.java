@@ -50,6 +50,9 @@ public class SysUser extends BaseEntity
     /** 用户类型（00系统用户）(11:企业微信用户) */
     private String userType;
 
+    /**当前微信用户对应微信端的id*/
+    private String weUserId;
+
     /** 用户邮箱 */
     @Excel(name = "用户邮箱")
     private String email;
