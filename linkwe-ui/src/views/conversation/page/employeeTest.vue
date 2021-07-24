@@ -10,97 +10,178 @@
           </div>
         </div> -->
         <div class="ct_box ct_boxFirst">
-          <el-tree class="filter-tree" :data="treeData" :props="defaultProps" :filter-node-method="filterNode"
-            ref="tree" @node-click="handleNodeClick" :default-expand-all="true">
+          <el-tree
+            class="filter-tree"
+            :data="treeData"
+            :props="defaultProps"
+            :filter-node-method="filterNode"
+            ref="tree"
+            @node-click="handleNodeClick"
+            :default-expand-all="true"
+          >
           </el-tree>
         </div>
       </el-col>
       <el-col :span="6" class="borderR">
         <div class="hd_box">
-          <div class="hd_name">{{talkName}}</div>
+          <div class="hd_name">{{ talkName }}</div>
         </div>
         <div class="hd_tabs">
           <el-tabs v-model="activeName" @tab-click="tabClick(true)">
             <el-tab-pane label="内部联系人" name="0">
               <div class="ct_box">
-                <insideList v-if="activeName==0" :personList="personList" :loading="loading" @chatFn='chatFn'>
+                <insideList
+                  v-if="activeName == 0"
+                  :personList="personList"
+                  :loading="loading"
+                  @chatFn="chatFn"
+                >
                 </insideList>
               </div>
             </el-tab-pane>
             <el-tab-pane label="外部联系人" name="1">
-              <list v-if="activeName==1" :personList="personList" :loading="loading" @chatFn='chatFn'>
+              <list
+                v-if="activeName == 1"
+                :personList="personList"
+                :loading="loading"
+                @chatFn="chatFn"
+              >
               </list>
             </el-tab-pane>
             <el-tab-pane label="群聊" name="2">
-              <grouplist v-if="activeName==2" :personList="personList" :loading="loading" @groupFn='groupFn'>
+              <grouplist
+                v-if="activeName == 2"
+                :personList="personList"
+                :loading="loading"
+                @groupFn="groupFn"
+              >
               </grouplist>
             </el-tab-pane>
-
           </el-tabs>
         </div>
       </el-col>
       <el-col :span="12">
         <div class="hd_box">
-          <div class="hd_name"><span v-if="chat.receiveWeCustomer"> 与{{chat.receiveWeCustomer.name}}的聊天</span>
-            <span class="fr hd_nameRi">下载会话</span></div>
+          <div class="hd_name">
+            <span v-if="chat.receiveWeCustomer">
+              与{{ chat.receiveWeCustomer.name }}的聊天</span
+            >
+            <span class="fr hd_nameRi">下载会话</span>
+          </div>
         </div>
         <div class=" hd_tabthree">
-          <el-tabs v-model="activeNameThree" @tab-click="activeNameThreeClick()">
+          <el-tabs
+            v-model="activeNameThree"
+            @tab-click="activeNameThreeClick()"
+          >
             <el-tab-pane label="全部" name="0">
               <div class="ct_box">
                 <div class="hds_time">
-                  <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd' range-separator="至"
-                    start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="activeNameThreeClick">
+                  <el-date-picker
+                    v-model="takeTime"
+                    type="datetimerange"
+                    format="yyyy-MM-dd"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    align="right"
+                    @change="activeNameThreeClick"
+                  >
                   </el-date-picker>
                 </div>
-                <chat :allChat="allChat" v-if="allChat&&allChat.length>=1"></chat>
-                <el-pagination background v-if="allChat&&allChat.length>=1" layout="prev, pager, next" class="pagination"
-                  :current-page="currentPage" @current-change="currentChange" :total="total">
+                <chat
+                  :allChat="allChat"
+                  v-if="allChat && allChat.length >= 1"
+                ></chat>
+                <el-pagination
+                  background
+                  v-if="allChat && allChat.length >= 1"
+                  layout="prev, pager, next"
+                  class="pagination"
+                  :current-page="currentPage"
+                  @current-change="currentChange"
+                  :total="total"
+                >
                 </el-pagination>
               </div>
             </el-tab-pane>
             <el-tab-pane label="图片及视频" name="1">
               <div class="ct_box">
                 <div class="hds_time">
-                  <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd' range-separator="至"
-                    start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="activeNameThreeClick">
+                  <el-date-picker
+                    v-model="takeTime"
+                    type="datetimerange"
+                    format="yyyy-MM-dd"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    align="right"
+                    @change="activeNameThreeClick"
+                  >
                   </el-date-picker>
                 </div>
-                <chat :allChat="allChatImg" v-if="allChatImg&&allChatImg.length>=1"></chat>
-                <el-pagination background v-if="allChatImg&&allChatImg.length>=1" class="pagination" layout="prev, pager, next"
-                  :total="total" @current-change="currentChange" :current-page="currentPage">
+                <chat
+                  :allChat="allChatImg"
+                  v-if="allChatImg && allChatImg.length >= 1"
+                ></chat>
+                <el-pagination
+                  background
+                  v-if="allChatImg && allChatImg.length >= 1"
+                  class="pagination"
+                  layout="prev, pager, next"
+                  :total="total"
+                  @current-change="currentChange"
+                  :current-page="currentPage"
+                >
                 </el-pagination>
               </div>
             </el-tab-pane>
             <el-tab-pane label="文件" name="2">
               <div class="ct_box">
                 <div class="hds_time">
-                  <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd' range-separator="至"
-                    start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="activeNameThreeClick">
+                  <el-date-picker
+                    v-model="takeTime"
+                    type="datetimerange"
+                    format="yyyy-MM-dd"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    align="right"
+                    @change="activeNameThreeClick"
+                  >
                   </el-date-picker>
                 </div>
-                <el-table :data="allFile" stripe style="width: 100%" :header-cell-style="{background:'#fff'}">
+                <el-table
+                  :data="allFile"
+                  stripe
+                  style="width: 100%"
+                  :header-cell-style="{ background: '#fff' }"
+                >
                   <el-table-column prop="msgtype" label="类型">
                   </el-table-column>
                   <el-table-column label="名称">
                     <template slot-scope="scope">
-                      {{scope.row.file.filename}}
+                      {{ scope.row.file.filename }}
                     </template>
                   </el-table-column>
                   <el-table-column label="大小">
                     <template slot-scope="scope">
-                      {{filterSize(scope.row.file.filesize)}}
+                      {{ filterSize(scope.row.file.filesize) }}
                     </template>
                   </el-table-column>
                   <el-table-column prop="action" label="来源">
                     <template slot-scope="scope">
-                      {{scope.row.tolist[0]}}
+                      {{ scope.row.tolist[0] }}
                     </template>
                   </el-table-column>
                   <el-table-column prop="action" label="操作">
                     <template slot-scope="scope">
-                      <el-button type="text" size="small" @click="downloadFile(scope.row)">下载</el-button>
-                    
+                      <el-button
+                        type="text"
+                        size="small"
+                        @click="downloadFile(scope.row)"
+                        >下载</el-button
+                      >
                     </template>
                   </el-table-column>
                 </el-table>
@@ -109,8 +190,16 @@
             <el-tab-pane label="链接" name="3">
               <div class="ct_box">
                 <div class="hds_time">
-                  <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd' range-separator="至"
-                    start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="activeNameThreeClick">
+                  <el-date-picker
+                    v-model="takeTime"
+                    type="datetimerange"
+                    format="yyyy-MM-dd"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    align="right"
+                    @change="activeNameThreeClick"
+                  >
                   </el-date-picker>
                 </div>
               </div>
@@ -118,29 +207,47 @@
             <el-tab-pane label="语音通话" name="4">
               <div class="ct_box">
                 <div class="hds_time">
-                  <el-date-picker v-model="takeTime" type="datetimerange" format='yyyy-MM-dd' range-separator="至"
-                    start-placeholder="开始日期" end-placeholder="结束日期" align="right" @change="activeNameThreeClick">
+                  <el-date-picker
+                    v-model="takeTime"
+                    type="datetimerange"
+                    format="yyyy-MM-dd"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    align="right"
+                    @change="activeNameThreeClick"
+                  >
                   </el-date-picker>
                 </div>
-                <el-table :data="allVoice" stripe style="width: 100%" :header-cell-style="{background:'#fff'}">
+                <el-table
+                  :data="allVoice"
+                  stripe
+                  style="width: 100%"
+                  :header-cell-style="{ background: '#fff' }"
+                >
                   <el-table-column prop="date" label="发起人">
                     <template slot-scope="scope">
-                      {{scope.row.fromInfo.name}}
+                      {{ scope.row.fromInfo.name }}
                     </template>
                   </el-table-column>
                   <el-table-column prop="name" label="通话时间">
-                     <template slot-scope="scope">
-                      {{parseTime(scope.row.msgtime)}}
+                    <template slot-scope="scope">
+                      {{ parseTime(scope.row.msgtime) }}
                     </template>
                   </el-table-column>
                   <el-table-column prop="address" label="时长">
-                  <template slot-scope="scope">
-                      {{(scope.row.voice.play_length)}}s
+                    <template slot-scope="scope">
+                      {{ scope.row.voice.play_length }}s
                     </template>
                   </el-table-column>
                   <el-table-column prop="address" label="操作">
                     <template slot-scope="scope">
-                      <el-button type="text" size="small" @click="voiceLook(scope.row.voice)">查看</el-button>
+                      <el-button
+                        type="text"
+                        size="small"
+                        @click="voiceLook(scope.row.voice)"
+                        >查看</el-button
+                      >
                     </template>
                   </el-table-column>
                 </el-table>
@@ -153,323 +260,315 @@
   </div>
 </template>
 <script>
-  import list from '../component/list.vue'
-  import chat from '../component/chat.vue'
-  import insideList from "../component/insideList.vue";
-  import grouplist from '../component/groupList.vue'
-  import * as api from '@/api/organization'
-  import {
-    content
-  } from '@/api/content.js'
-  import {
-    yearMouthDay,parseTime
-  } from '@/utils/common.js'
+import list from '../component/list.vue'
+import chat from '../component/chat.vue'
+import insideList from '../component/insideList.vue'
+import grouplist from '../component/groupList.vue'
+import * as api from '@/api/organization'
+import { content } from '@/api/content.js'
+import { yearMouthDay, parseTime } from '@/utils/common.js'
 
-  export default {
-    components: {
-      list,
-      grouplist,
-      insideList,
-      chat
-    },
-    data() {
-      return {
-        employAmount: 1,
-        employId: '',
-        employName: '',
-        talkName: '',
-        treeData: [],
-        defaultProps: {
-          label: 'name',
-          children: 'children',
-        },
-        activeName: "1",
-        activeNameThree: '0',
-        takeTime: '',
-        fileData: [],
-        chat: {},
+export default {
+  components: {
+    list,
+    grouplist,
+    insideList,
+    chat
+  },
+  data() {
+    return {
+      employAmount: 1,
+      employId: '',
+      employName: '',
+      talkName: '',
+      treeData: [],
+      defaultProps: {
+        label: 'name',
+        children: 'children'
+      },
+      activeName: '1',
+      activeNameThree: '0',
+      takeTime: '',
+      fileData: [],
+      chat: {},
 
-        personList: [],
-        loading: false,
-        allChat: [], //全部聊天记录
-        allChatImg: [], //图片，
-        allVoice: [],
-        allFile: [],
-        allLInk: [],
-        //分页
-        total: '',
-        currentPage: ''
-      };
+      personList: [],
+      loading: false,
+      allChat: [], //全部聊天记录
+      allChatImg: [], //图片，
+      allVoice: [],
+      allFile: [],
+      allLInk: [],
+      //分页
+      total: '',
+      currentPage: ''
+    }
+  },
+  watch: {
+    employName(val) {
+      this.$refs.tree.filter(val)
+    }
+  },
+  mounted() {
+    this.getTree()
+    //this.getAmount()
+  },
+  methods: {
+    voiceLook(e) {
+      const url = window.URL.createObjectURL(new Blob([e.attachment]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', 'yuyin') // 下载文件的名称及文件类型后缀
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link) // 下载完成移除元素
+      window.URL.revokeObjectURL(url) // 释放掉blob对象
     },
-    watch: {
-      employName(val) {
-        this.$refs.tree.filter(val);
+    downloadFile(e) {
+      const url = window.URL.createObjectURL(
+        new Blob([e.file.attachment], {
+          type:
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8'
+        })
+      )
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', e.file.filename) // 下载文件的名称及文件类型后缀
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link) // 下载完成移除元素
+      window.URL.revokeObjectURL(url) // 释放掉blob对象
+    },
+    filterSize(size) {
+      if (!size) return ''
+      if (size < this.pow1024(1)) return size + ' B'
+      if (size < this.pow1024(2))
+        return (size / this.pow1024(1)).toFixed(2) + ' KB'
+      if (size < this.pow1024(3))
+        return (size / this.pow1024(2)).toFixed(2) + ' MB'
+      if (size < this.pow1024(4))
+        return (size / this.pow1024(3)).toFixed(2) + ' GB'
+      return (size / pow1024(4)).toFixed(2) + ' TB'
+    },
+    pow1024(num) {
+      return Math.pow(1024, num)
+    },
+    currentChange(e) {
+      this.currentPage = e
+      if (this.activeName == '2') {
+        return this.activeNameThreeClick(true, true)
       }
+
+      this.activeNameThreeClick(true)
     },
-    mounted() {
-      this.getTree()
-      //this.getAmount()
-    },
-    methods: {
-      voiceLook(e){
-       const url = window.URL.createObjectURL(new Blob([e.attachment]))
-      const link = document.createElement('a')
-      link.href = url
-      link.setAttribute('download','yuyin') // 下载文件的名称及文件类型后缀
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link); // 下载完成移除元素
-      window.URL.revokeObjectURL(url); // 释放掉blob对象
-      },
-      downloadFile(e){  
-      const url = window.URL.createObjectURL(new Blob([e.file.attachment],{type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8'}))
-      const link = document.createElement('a')
-      link.href = url
-      link.setAttribute('download',e.file.filename) // 下载文件的名称及文件类型后缀
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link); // 下载完成移除元素
-      window.URL.revokeObjectURL(url); // 释放掉blob对象
-      },
-      filterSize(size) {
-        if (!size) return '';
-        if (size < this.pow1024(1)) return size + ' B';
-        if (size < this.pow1024(2)) return (size / this.pow1024(1)).toFixed(2) + ' KB';
-        if (size < this.pow1024(3)) return (size / this.pow1024(2)).toFixed(2) + ' MB';
-        if (size < this.pow1024(4)) return (size / this.pow1024(3)).toFixed(2) + ' GB';
-        return (size / pow1024(4)).toFixed(2) + ' TB'
-      },
-      pow1024(num) {
-        return Math.pow(1024, num)
-      },
-      currentChange(e) {
-        this.currentPage = e
-        if (this.activeName == '2') {
-          return this.activeNameThreeClick(true, true)
+    activeNameThreeClick(page, group) {
+      console.log(this.chat.id, 'this.chat.id')
+      if (!!!this.chat.id) {
+        return //没有选择人
+      }
+      if (!!!page) {
+        this.currentPage = 1
+      }
+      if (this.chat) {
+        let msgType = ''
+        if (this.activeNameThree == 0) {
+          msgType = ''
+        } else if (this.activeNameThree == 1) {
+          msgType = 'image'
+        } else if (this.activeNameThree == 2) {
+          msgType = 'file'
+        } else if (this.activeNameThree == 3) {
+          msgType = 'link'
+        } else if (this.activeNameThree == 4) {
+          msgType = 'voice'
         }
-        
-        this.activeNameThreeClick(true)
-      },
-      activeNameThreeClick(page, group) {
-       console.log(this.chat.id,'this.chat.id')
-     if(!!!this.chat.id){
-       return //没有选择人
-     }
-        if (!!!page) {
-          this.currentPage = 1
-        }
-        if (this.chat) {
-          let msgType = ''
-          if (this.activeNameThree == 0) {
-            msgType = ''
-          } else if (this.activeNameThree == 1) {
-            msgType = 'image'
-          } else if (this.activeNameThree == 2) {
-            msgType = 'file'
-          } else if (this.activeNameThree == 3) {
-            msgType = 'link'
-          } else if (this.activeNameThree == 4) {
-            msgType = 'voice'
-          }
-          let query = {
-            fromId: this.employId,
-            msgType,
-            pageSize: '10',
-            pageNum: this.currentPage,
-            beginTime: this.takeTime ? yearMouthDay(this.takeTime[0]) : "",
-            endTime: this.takeTime ? yearMouthDay(this.takeTime[1]) : '',
-          }
-          if (this.activeName=='2') {
-            query.roomId = this.chat.roomId
-          } else {
-            query.receiveId = this.chat.receiveId
-          }
-          if (this.activeName=='2') {
-            content.chatGrounpList(query).then(res => {
-              this.total = Number(res.total)
-              console.log(res,'this.activeName=')
-             this.resortData(res)
-            })
-          } else {
-            content.chatList(query).then(res => {
-               console.log(res.rows,'ssss')
-              this.total = Number(res.total)
-             this.resortData(res)
-            })
-          }
-        }
-      },
-      resortData(res){
-         if (this.activeNameThree == 0) {
-                return this.allChat = res.rows
-              }
-              if (this.activeNameThree == 1) {
-                return this.allChatImg = res.rows
-              }
-              if (this.activeNameThree == 2) {
-                return this.allFile = res.rows
-              }
-              if (this.activeNameThree == 3) {
-                return this.allLInk = res.rows
-              }
-              if (this.activeNameThree == 4) {
-                return this.allVoice = res.rows
-              }
-      },
-      chatFn(data) {
-        this.chat = data;
-        if (data) {
-            this.activeNameThreeClick()
-        }
-      },
-      groupFn(data) {
-        this.chat = data;
-        this.chat.receiveWeCustomer = 'a'
-        this.activeNameThreeClick('', true)
-      },
-      getTree() {
-        api.getTree().then(({
-          data
-        }) => {
-          this.treeData = this.handleTree(data)
-          this.handleNodeClick(this.treeData[0], true)
-        })
-      },
-      tabClick(flag) {
-        this.personList = []
-        if (!this.employId) {
-          return
-        }
-        console.log
-        if (flag) {
-          this.loading = true
-        }
-        content.getTree({
+        let query = {
           fromId: this.employId,
-          searchType: this.activeName
-        }).then(({rows}) => {
-          this.loading = false
-          this.personList =rows
-        }).catch(err => {
-          this.loading = false
-        })
-      },
-      filterNode(value, data) {
-        console.log(value, data)
-        if (!value) return true;
-        return data.name.indexOf(value) !== -1;
-      },
-  
-      handleNodeClick(data, add) {
-        if (!data.userId) {
-          let querys = {
-            pageNum: '1',
-            pageSize: '999',
-            department: data.id
-          }
-          api.getList(querys).then(({rows}) => {
-              this.$set(data, 'children', []);
-              
-              data.children =rows
+          msgType,
+          pageSize: '10',
+          pageNum: this.currentPage,
+          beginTime: this.takeTime ? yearMouthDay(this.takeTime[0]) : '',
+          endTime: this.takeTime ? yearMouthDay(this.takeTime[1]) : ''
+        }
+        if (this.activeName == '2') {
+          query.roomId = this.chat.roomId
+        } else {
+          query.receiveId = this.chat.receiveId
+        }
+        if (this.activeName == '2') {
+          content.chatGrounpList(query).then((res) => {
+            this.total = Number(res.total)
+            console.log(res, 'this.activeName=')
+            this.resortData(res)
           })
         } else {
-          this.talkName = data.name;
-          this.employId = data.userId;
-          this.tabClick()
+          content.chatList(query).then((res) => {
+            console.log(res.rows, 'ssss')
+            this.total = Number(res.total)
+            this.resortData(res)
+          })
         }
       }
+    },
+    resortData(res) {
+      if (this.activeNameThree == 0) {
+        return (this.allChat = res.rows)
+      }
+      if (this.activeNameThree == 1) {
+        return (this.allChatImg = res.rows)
+      }
+      if (this.activeNameThree == 2) {
+        return (this.allFile = res.rows)
+      }
+      if (this.activeNameThree == 3) {
+        return (this.allLInk = res.rows)
+      }
+      if (this.activeNameThree == 4) {
+        return (this.allVoice = res.rows)
+      }
+    },
+    chatFn(data) {
+      this.chat = data
+      if (data) {
+        this.activeNameThreeClick()
+      }
+    },
+    groupFn(data) {
+      this.chat = data
+      this.chat.receiveWeCustomer = 'a'
+      this.activeNameThreeClick('', true)
+    },
+    getTree() {
+      api.getTree().then(({ data }) => {
+        this.treeData = this.handleTree(data)
+        this.handleNodeClick(this.treeData[0], true)
+      })
+    },
+    tabClick(flag) {
+      this.personList = []
+      if (!this.employId) {
+        return
+      }
+      console.log
+      if (flag) {
+        this.loading = true
+      }
+      content
+        .getTree({
+          fromId: this.employId,
+          searchType: this.activeName
+        })
+        .then(({ rows }) => {
+          this.loading = false
+          this.personList = rows
+        })
+        .catch((err) => {
+          this.loading = false
+        })
+    },
+    filterNode(value, data) {
+      console.log(value, data)
+      if (!value) return true
+      return data.name.indexOf(value) !== -1
+    },
+
+    handleNodeClick(data, add) {
+      if (!data.userId) {
+        let querys = {
+          pageNum: '1',
+          pageSize: '999',
+          department: data.id
+        }
+        api.getList(querys).then(({ rows }) => {
+          this.$set(data, 'children', [])
+
+          data.children = rows
+        })
+      } else {
+        this.talkName = data.name
+        this.employId = data.userId
+        this.tabClick()
+      }
     }
-
   }
-
+}
 </script>
 <style lang="scss" scoped>
-  * {
-    margin: 0;
-    padding: 0;
-  }
+/deep/.el-tabs__nav-scroll {
+  padding-left: 15px;
+}
 
-  /deep/.el-tabs__nav-scroll {
-    padding-left: 15px;
-  }
+.borderR {
+  border-right: 2px solid #ccc;
+}
 
-  .fr {
-    float: right;
-  }
+.paddingT10 {
+  padding-top: 10px;
+}
 
-  .borderR {
-    border-right: 2px solid #ccc;
-  }
+.employ {
+  background: #f6f6f9;
+  min-height: 800px;
 
-  .paddingT10 {
-    padding-top: 10px
-  }
+  .hd_tabs {
+    background: #fff;
 
-  .employ {
-    background: #f6f6f9;
-    min-height: 800px;
-
-    .hd_tabs {
-      background: #fff;
-
-      /deep/ .el-tabs__header {
-        margin: 0;
-      }
-    }
-
-    .hd_tabthree {
-      /deep/ .el-tabs__header {
-        margin: 0;
-      }
-    }
-
-    .hd_box {
-      padding: 15px;
-    }
-
-    .hd_name {
-      font-size: 18px;
-      min-height: 20px;
-    }
-
-    .hd_nameRi {
-      color: #199ed8;
-      text-align: right;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .ct_boxFirst {
-      height: 800px !important;
-    }
-
-    .ct_box {
-      background: white;
-      height: 710px;
-      padding: 10px;
-      overflow-y: scroll;
-      border-bottom: 1px solid #efefef;
-      color: #999;
-      text-align: center;
-
-      ::-webkit-scrollbar {
-        display: none;
-      }
-
-      .hds_time {
-        text-align: left;
-        width: 100%;
-        padding: 10px 0;
-      }
-
+    /deep/ .el-tabs__header {
+      margin: 0;
     }
   }
 
-  .pagination {
-    padding: 10px 0;
-    height: 30px;
-
-    float: left;
+  .hd_tabthree {
+    /deep/ .el-tabs__header {
+      margin: 0;
+    }
   }
 
+  .hd_box {
+    padding: 15px;
+  }
+
+  .hd_name {
+    font-size: 18px;
+    min-height: 20px;
+  }
+
+  .hd_nameRi {
+    color: #199ed8;
+    text-align: right;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .ct_boxFirst {
+    height: 800px !important;
+  }
+
+  .ct_box {
+    background: white;
+    height: 710px;
+    padding: 10px;
+    overflow-y: scroll;
+    border-bottom: 1px solid #efefef;
+    color: #999;
+    text-align: center;
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    .hds_time {
+      text-align: left;
+      width: 100%;
+      padding: 10px 0;
+    }
+  }
+}
+
+.pagination {
+  padding: 10px 0;
+  height: 30px;
+
+  float: left;
+}
 </style>
