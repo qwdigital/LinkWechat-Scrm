@@ -3,6 +3,7 @@ package com.linkwechat.quartz.task;
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.linkwechat.common.config.WeComeConfig;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.elasticsearch.ElasticSearch;
 import com.linkwechat.common.core.redis.RedisCache;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -47,10 +49,21 @@ public class RyTask {
     @Autowired
     private IWeSensitiveActHitService weSensitiveActHitService;
 
+    @Autowired
+    private WeComeConfig weComeConfig;
 
-    @Value("${wecome.chatKey}")
-    private String chartKey;
 
+    @PostConstruct
+    public void init() {
+        try{
+            //初始化es索引
+            elasticSearch.createIndex2(weComeConfig.getChatKey(), elasticSearch.getFinanceMapping());
+        }catch (Exception e){
+            log.error(e.getMessage());
+
+        }
+
+    }
 
     public void ryMultipleParams(String s, Boolean b, Long l, Double d, Integer i) {
         System.out.println(StringUtils.format("执行多参方法： 字符串类型{}，布尔类型{}，长整型{}，浮点型{}，整形{}", s, b, l, d, i));
@@ -68,7 +81,7 @@ public class RyTask {
     public void FinanceTask(String corpId, String secret) throws IOException {
         log.info("执行有参方法: params:{},{}", corpId, secret);
         //创建索引
-        elasticSearch.createIndex2(chartKey, elasticSearch.getFinanceMapping());
+        elasticSearch.createIndex2(weComeConfig.getChatKey(), elasticSearch.getFinanceMapping());
         //从缓存中获取消息标识
 
         Object seqObject = Optional.ofNullable(redisCache.getCacheObject(WeConstans.CONTACT_SEQ_KEY)).orElse(0L);
@@ -88,7 +101,7 @@ public class RyTask {
                 List<JSONObject> elasticSearchEntities = weChatContactMappingService.saveWeChatContactMapping(chatDataList);
                 //获取敏感行为命中信息
                 weSensitiveActHitService.hitWeSensitiveAct(chatDataList);
-                elasticSearch.insertBatchAsync(chartKey, elasticSearchEntities, weSensitiveService::hitSensitive);
+                elasticSearch.insertBatchAsync(weComeConfig.getChatKey(), elasticSearchEntities, weSensitiveService::hitSensitive);
             } catch (Exception e) {
                 log.error("消息处理异常：ex:{}", e);
                 e.printStackTrace();
@@ -116,7 +129,7 @@ public class RyTask {
         SortBuilder<?> sortBuilderPrice = SortBuilders.fieldSort(WeConstans.CONTACT_SEQ_KEY).order(SortOrder.DESC);
         searchSourceBuilder.sort(sortBuilderPrice);
         searchSourceBuilder.size(1);
-        List<JSONObject> searchResultList = elasticSearch.search(chartKey, searchSourceBuilder, JSONObject.class);
+        List<JSONObject> searchResultList = elasticSearch.search(weComeConfig.getChatKey(), searchSourceBuilder, JSONObject.class);
         if(CollectionUtil.isNotEmpty(searchResultList)){
             searchResultList.stream().findFirst().ifPresent(result -> {
                 index.set(result.getLong(WeConstans.CONTACT_SEQ_KEY) + 1);
