@@ -127,7 +127,8 @@ export default {
     },
     // 获取显示用tag字符串
     getDisplayTags(row) {
-      const tags = row.tagList.map((t) => t.name)
+      if (!(row && row.length > 0)) return ''
+      const tags = row.tagList.map((t) => t && t.name ? t.name : '')
 
       return tags.join(' ')
     },
