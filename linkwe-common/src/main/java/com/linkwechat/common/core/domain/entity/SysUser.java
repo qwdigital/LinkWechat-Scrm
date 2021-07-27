@@ -109,6 +109,9 @@ public class SysUser extends BaseEntity
     private boolean validCropId=false;
 
 
+    private String companyName;
+
+
      private WeCorpAccount weCorpAccount;
 
     public SysUser()
@@ -317,6 +320,15 @@ public class SysUser extends BaseEntity
     public void setPostIds(Long[] postIds)
     {
         this.postIds = postIds;
+    }
+
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 
     @Override

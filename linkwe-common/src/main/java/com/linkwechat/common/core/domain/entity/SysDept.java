@@ -5,6 +5,10 @@ import java.util.List;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.linkwechat.common.core.domain.BaseEntity;
@@ -14,6 +18,9 @@ import com.linkwechat.common.core.domain.BaseEntity;
  * 
  * @author ruoyi
  */
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class SysDept extends BaseEntity
 {
     private static final long serialVersionUID = 1L;

@@ -47,4 +47,11 @@ public class WeCustomerTrajectory {
 
     //当前应用的id
     private String agentId;
+
+
+    //创建时间
+    private Date createTime;
+
+
+
 }

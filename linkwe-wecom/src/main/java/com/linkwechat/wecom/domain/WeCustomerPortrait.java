@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.util.Date;
@@ -12,6 +13,7 @@ import java.util.List;
  * @create: 2021-03-03 11:49
  **/
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class WeCustomerPortrait {
     //外部联系人id
     private String externalUserid;
