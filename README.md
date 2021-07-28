@@ -105,6 +105,8 @@ npm  run serve
 - `username` : 账号
 - `password `: 密码
 
+数据库脚本：[https://gitee.com/LinkWeChat_admin/link-we-chat-db/tree/master](https://gitee.com/LinkWeChat_admin/link-we-chat-db/tree/master)
+
 
 2、开发环境配置
 
