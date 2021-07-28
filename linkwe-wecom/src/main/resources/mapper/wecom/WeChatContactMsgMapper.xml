@@ -66,11 +66,11 @@
                     (
                         select to_list as receiver, `action` , msg_time, msg_type, contact
                         from we_chat_contact_msg
-                        where from_id = ${fromId} and <![CDATA[ room_id <> '' ]]>
+                        where from_id = ${fromId} and room_id &lt;&gt; ''
                             union
                         select from_id as receiver, `action`, msg_time, msg_type, contact
                         from we_chat_contact_msg
-                        where FIND_IN_SET(${fromId}, to_list) and <![CDATA[ room_id <> '' ]]>
+                        where FIND_IN_SET(${fromId}, to_list) and room_id  &lt;&gt; ''
                         order by msg_time desc
                 ) as msg group by receiver order by msg.msg_time desc) t
         inner join we_group wg on t.receiver = wg.chat_id;
