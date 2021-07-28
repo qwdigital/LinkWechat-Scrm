@@ -200,11 +200,6 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-// * {
-//   padding: 0;
-//   margin: 0;
-// }
-
 #videoPlayer /deep/ .vjs-tech {
   height: 450px;
 }

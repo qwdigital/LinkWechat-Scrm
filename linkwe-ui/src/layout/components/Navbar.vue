@@ -17,7 +17,7 @@
 
     <div class="right-menu">
       <template v-if="device !== 'mobile'">
-        <search id="header-search" class="right-menu-item" />
+        <!-- <search id="header-search" class="right-menu-item" /> -->
 
         <el-tooltip content="源码地址" effect="dark" placement="bottom">
           <div class="right-menu-item hover-effect">
@@ -27,7 +27,8 @@
 
         <el-tooltip content="文档地址" effect="dark" placement="bottom">
           <div class="right-menu-item hover-effect">
-            <svg-icon icon-class="question" @click="goto(1)" />
+            <i class="el-icon-reading document" @click="goto(1)"></i>
+            <!-- <svg-icon icon-class="question" @click="goto(1)" /> -->
           </div>
         </el-tooltip>
 
@@ -71,7 +72,7 @@ export default {
   components: {
     Logo,
     Search,
-    screenfull,
+    screenfull
   },
   computed: {
     ...mapGetters(['avatar', 'device', 'permission_routes']),
@@ -82,10 +83,10 @@ export default {
       set(val) {
         this.$store.dispatch('settings/changeSetting', {
           key: 'showSettings',
-          value: val,
+          value: val
         })
-      },
-    },
+      }
+    }
   },
   mounted() {
     // console.log(this.permission_routes)
@@ -95,7 +96,7 @@ export default {
       this.$confirm('确定注销并退出系统吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       }).then(() => {
         this.$store.dispatch('LogOut').then(() => {
           location.href = '/'
@@ -115,8 +116,8 @@ export default {
       } else {
         window.open(path, '_blank')
       }
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -158,6 +159,10 @@ export default {
         &:hover {
           background: rgba(0, 0, 0, 0.025);
         }
+      }
+
+      .document {
+        font-size: 20px;
       }
     }
 
