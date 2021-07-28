@@ -56,13 +56,6 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-// * {
-//   padding: 0;
-//   margin: 0;
-// }
-.fl {
-  float: left;
-}
 .list {
   overflow-y: scroll;
   height: 652px;
@@ -72,9 +65,6 @@ export default {
 
   /deep/ .el-loading-spinner {
     margin-top: 20px;
-  }
-  .fr {
-    float: right;
   }
   .gray {
     color: #999;

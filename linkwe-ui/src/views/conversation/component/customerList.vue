@@ -66,9 +66,6 @@ export default {
   /deep/ .el-loading-spinner {
     margin-top: 20px;
   }
-  .fr {
-    float: right;
-  }
   .gray {
     color: #999;
   }
