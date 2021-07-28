@@ -404,4 +404,8 @@ public class WeConstans {
      */
     public static final String SEND_MESSAGE_CUSTOMER_PART = "1";
 
+    /**
+     * 会话消息订阅的频道
+     */
+    public static final String CONVERSATION_MSG_CHANNEL = "CONVERSATION_MSG_CHANNEL";
 }

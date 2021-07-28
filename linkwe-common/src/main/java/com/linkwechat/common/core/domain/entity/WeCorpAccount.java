@@ -82,6 +82,8 @@ public class WeCorpAccount extends BaseEntity
     @ApiModelProperty("客户流失通知开关 0:关闭 1:开启")
     private String customerChurnNoticeSwitch = Constants.NORMAL_CODE;
 
+    @ApiModelProperty("会话存档私钥")
+    private String financePrivateKey;
 
     @ApiModelProperty("企业管理员账号")
     private String corpAccount;

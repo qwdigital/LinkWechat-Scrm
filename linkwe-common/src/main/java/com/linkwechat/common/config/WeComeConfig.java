@@ -39,7 +39,4 @@ public class WeComeConfig {
 
     /**多租户相关表*/
     private String[] needTenant=new String[]{};
-
-    /**ES索引KEY**/
-    private String chatKey;
 }

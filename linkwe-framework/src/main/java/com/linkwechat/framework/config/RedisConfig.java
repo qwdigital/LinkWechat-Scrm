@@ -1,15 +1,21 @@
 package com.linkwechat.framework.config;
 
+import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.framework.listener.ChatMsgCheckListener;
+import com.linkwechat.framework.listener.ChatMsgListener;
 import com.linkwechat.framework.listener.EmpleCodeExpiredListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.Topic;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -53,14 +59,30 @@ public class RedisConfig extends CachingConfigurerSupport
 
 
     @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer() {
+    public RedisMessageListenerContainer redisMessageListenerContainer(MessageListenerAdapter chatMsgAdapter,
+                                                                       MessageListenerAdapter chatMsgCheckAdapter) {
         RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
         redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory);
+        //定义监听渠道
+        Topic msgChannel = new ChannelTopic(WeConstans.CONVERSATION_MSG_CHANNEL);
+        //定义监听器监听的Redis的消息
+        redisMessageListenerContainer.addMessageListener(chatMsgAdapter,msgChannel);
+        redisMessageListenerContainer.addMessageListener(chatMsgCheckAdapter,msgChannel);
         return redisMessageListenerContainer;
     }
 
     @Bean
     public EmpleCodeExpiredListener codeExpiredListener() {
-        return new EmpleCodeExpiredListener(this.redisMessageListenerContainer());
+        return new EmpleCodeExpiredListener(this.redisMessageListenerContainer(null,null));
+    }
+
+    @Bean
+    MessageListenerAdapter chatMsgAdapter(ChatMsgListener receiver){
+        return new MessageListenerAdapter(receiver);
+    }
+
+    @Bean
+    MessageListenerAdapter chatMsgCheckAdapter(ChatMsgCheckListener receiver){
+        return new MessageListenerAdapter(receiver);
     }
 }

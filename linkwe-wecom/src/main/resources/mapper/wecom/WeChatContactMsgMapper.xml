@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeChatContactMsgMapper">
+
+    <resultMap type="WeChatContactMsg" id="WeChatContactMsgResult">
+        <result property="id" column="id"/>
+        <result property="msgId" column="msg_id"/>
+        <result property="fromId" column="from_id"/>
+        <result property="toList" column="to_list"/>
+        <result property="roomId" column="room_id"/>
+        <result property="action" column="action"/>
+        <result property="msgType" column="msg_type"/>
+        <result property="msgTime" column="msg_time"/>
+        <result property="contact" column="contact"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+
+    <select id="selectExternalChatList" resultType="com.linkwechat.wecom.domain.vo.WeChatContactMsgVo">
+        select t.*, wc.name, wc.avatar from
+            (
+                select receiver, msg_time,`action`, msg_type, contact
+                from
+                    (
+                        select to_list as receiver, `action` , msg_time, msg_type, contact
+                        from we_chat_contact_msg
+                        where from_id = ${fromId} and is_external = 0 and room_id = ''
+                            union
+                        select from_id as receiver, `action`, msg_time, msg_type, contact
+                        from we_chat_contact_msg
+                        where FIND_IN_SET(${fromId}, to_list) and is_external = 0 and room_id = ''
+                        order by msg_time desc
+                ) as msg group by receiver order by msg.msg_time desc) t
+        inner join we_customer wc on t.receiver = wc.external_userid;
+    </select>
+
+
+    <select id="selectInternalChatList" resultType="com.linkwechat.wecom.domain.vo.WeChatContactMsgVo">
+        select t.*, wu.user_name as name , wu.head_image_url as avatar from
+            (
+                select receiver, msg_time,`action`, msg_type, contact
+                from
+                    (
+                        select to_list as receiver, `action` , msg_time, msg_type, contact
+                        from we_chat_contact_msg
+                        where from_id = ${fromId} and is_external = 1 and room_id = ''
+                            union
+                        select from_id as receiver, `action`, msg_time, msg_type, contact
+                        from we_chat_contact_msg
+                        where FIND_IN_SET(${fromId}, to_list) and is_external = 1 and room_id = ''
+                        order by msg_time desc
+                ) as msg group by receiver order by msg.msg_time desc) t
+        inner join we_user wu on t.receiver = wu.user_id;
+    </select>
+
+    <select id="selectGroupChatList" resultType="com.linkwechat.wecom.domain.vo.WeChatContactMsgVo">
+        select t.*, wg.group_name as name , '' as avatar from
+            (
+                select receiver, msg_time,`action`, msg_type, contact
+                from
+                    (
+                        select to_list as receiver, `action` , msg_time, msg_type, contact
+                        from we_chat_contact_msg
+                        where from_id = ${fromId} and <![CDATA[ room_id <> '' ]]>
+                            union
+                        select from_id as receiver, `action`, msg_time, msg_type, contact
+                        from we_chat_contact_msg
+                        where FIND_IN_SET(${fromId}, to_list) and <![CDATA[ room_id <> '' ]]>
+                        order by msg_time desc
+                ) as msg group by receiver order by msg.msg_time desc) t
+        inner join we_group wg on t.receiver = wg.chat_id;
+    </select>
+</mapper>
