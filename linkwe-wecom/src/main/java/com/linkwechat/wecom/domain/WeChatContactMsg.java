@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -42,7 +43,7 @@ private static final long serialVersionUID=1L;
     private String msgId;
 
     /** 消息记录seq值 */
-    @ApiModelProperty("消息记录seq值")
+    @ApiModelProperty(value = "消息记录seq值",hidden = true)
     private Long seq;
 
     /** 发送人id */
@@ -82,7 +83,14 @@ private static final long serialVersionUID=1L;
     private String contact;
 
     /** 是否为外部聊天 0 外部 1 内部 */
-    @ApiModelProperty("是否为外部聊天 0 外部 1 内部")
+    @ApiModelProperty(value = "是否为外部聊天 0 外部 1 内部", hidden = true)
     private Integer isExternal;
+
+    /**
+     * 名称
+     */
+    @ApiModelProperty("名称")
+    @TableField(exist = false)
+    private String name;
 
 }

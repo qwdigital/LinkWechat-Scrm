@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.wecom;
 
+import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -35,7 +36,7 @@ public class WeChatContactMsgController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('linkwechat:msg:list')")
     @GetMapping("/list")
-    public TableDataInfo list(WeChatContactMsg weChatContactMsg) {
+    public TableDataInfo<List<WeChatContactMsg>> list(WeChatContactMsg weChatContactMsg) {
         startPage();
         List<WeChatContactMsg> list = iWeChatContactMsgService.queryList(weChatContactMsg);
         return getDataTable(list);
@@ -58,7 +59,7 @@ public class WeChatContactMsgController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('linkwechat:msg:query')" )
     @GetMapping(value = "/{id}" )
-    public AjaxResult getInfo(@PathVariable("id" ) Long id) {
+    public AjaxResult<WeChatContactMsg> getInfo(@PathVariable("id" ) Long id) {
         return AjaxResult.success(iWeChatContactMsgService.getById(id));
     }
 
@@ -117,5 +118,16 @@ public class WeChatContactMsgController extends BaseController {
     @GetMapping("selectGroupChatList/{fromId}" )
     public AjaxResult<List<WeChatContactMsgVo>> selectGroupChatList(@PathVariable("fromId") String fromId) {
         return AjaxResult.success(iWeChatContactMsgService.selectGroupChatList(fromId));
+    }
+
+    /**
+     * 全文检索 会话列表
+     */
+    @Log(title = "全文检索 会话列表" , businessType = BusinessType.OTHER)
+    @GetMapping("selectFullSearchChatList}" )
+    public TableDataInfo<List<WeChatContactMsgVo>> selectFullSearchChatList(WeChatContactMsg weChatContactMsg) {
+        startPage();
+        List<WeChatContactMsgVo> list = iWeChatContactMsgService.selectFullSearchChatList(weChatContactMsg);
+        return getDataTable(list);
     }
 }

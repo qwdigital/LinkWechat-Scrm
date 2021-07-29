@@ -41,4 +41,11 @@ public interface IWeChatContactMsgService extends IService<WeChatContactMsg> {
      * @return 会话列表
      */
     List<WeChatContactMsgVo> selectGroupChatList(String fromId);
+
+    /**
+     * 全文检索 会话列表
+     * @param weChatContactMsg 检索条件
+     * @return 会话列表
+     */
+    List<WeChatContactMsgVo> selectFullSearchChatList(WeChatContactMsg weChatContactMsg);
 }

@@ -19,6 +19,9 @@ public class WeChatContactMsgVo {
     @ApiModelProperty("接收人id")
     private String receiver;
 
+    @ApiModelProperty("发送人人id")
+    private String fromId;
+
     @ApiModelProperty("名称")
     private String name;
 

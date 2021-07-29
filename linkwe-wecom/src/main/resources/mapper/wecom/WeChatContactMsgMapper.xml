@@ -29,11 +29,11 @@
                     (
                         select to_list as receiver, `action` , msg_time, msg_type, contact
                         from we_chat_contact_msg
-                        where from_id = ${fromId} and is_external = 0 and room_id = ''
+                        where from_id = #{fromId} and is_external = 0 and room_id = ''
                             union
                         select from_id as receiver, `action`, msg_time, msg_type, contact
                         from we_chat_contact_msg
-                        where FIND_IN_SET(${fromId}, to_list) and is_external = 0 and room_id = ''
+                        where FIND_IN_SET(#{fromId}, to_list) and is_external = 0 and room_id = ''
                         order by msg_time desc
                 ) as msg group by receiver order by msg.msg_time desc) t
         inner join we_customer wc on t.receiver = wc.external_userid;
@@ -48,11 +48,11 @@
                     (
                         select to_list as receiver, `action` , msg_time, msg_type, contact
                         from we_chat_contact_msg
-                        where from_id = ${fromId} and is_external = 1 and room_id = ''
+                        where from_id = #{fromId} and is_external = 1 and room_id = ''
                             union
                         select from_id as receiver, `action`, msg_time, msg_type, contact
                         from we_chat_contact_msg
-                        where FIND_IN_SET(${fromId}, to_list) and is_external = 1 and room_id = ''
+                        where FIND_IN_SET(#{fromId}, to_list) and is_external = 1 and room_id = ''
                         order by msg_time desc
                 ) as msg group by receiver order by msg.msg_time desc) t
         inner join we_user wu on t.receiver = wu.user_id;
@@ -66,13 +66,50 @@
                     (
                         select to_list as receiver, `action` , msg_time, msg_type, contact
                         from we_chat_contact_msg
-                        where from_id = ${fromId} and room_id &lt;&gt; ''
+                        where from_id = #{fromId} and room_id &lt;&gt; ''
                             union
                         select from_id as receiver, `action`, msg_time, msg_type, contact
                         from we_chat_contact_msg
-                        where FIND_IN_SET(${fromId}, to_list) and room_id  &lt;&gt; ''
+                        where FIND_IN_SET(#{fromId}, to_list) and room_id  &lt;&gt; ''
                         order by msg_time desc
                 ) as msg group by receiver order by msg.msg_time desc) t
         inner join we_group wg on t.receiver = wg.chat_id;
+    </select>
+
+    <select id="selectFullSearchChatList" resultType="com.linkwechat.wecom.domain.vo.WeChatContactMsgVo">
+        select * from
+        (
+            select from_id,
+                   msg_time,
+                   `action`,
+                   msg_type,
+                   contact,
+                   if((case when LOCATE('wm', from_id) or LOCATE('wo', from_id) then 0 else 1 end),
+                      (select wu.user_name from we_user wu where wccm.from_id = wu.user_id),
+                      (select wc.name from we_customer wc where wccm.from_id = wc.external_userid)) as name
+            from we_chat_contact_msg wccm
+        ) t
+        <where>
+            <if test="name != null and name != ''">
+                and t.name like concat('%', #{name}, '%')
+            </if>
+            <if test="fromId != null and fromId != ''">
+                and t.fromId = #{fromId}
+            </if>
+            <if test="action != null and action != ''">
+                and t.action = #{action}
+            </if>
+            <if test="contact != null and contact != ''">
+                and t.contact like concat('%', #{contact}, '%')
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(t.msg_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(t.msg_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+        </where>
+
     </select>
 </mapper>

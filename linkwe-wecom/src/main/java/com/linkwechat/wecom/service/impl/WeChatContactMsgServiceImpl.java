@@ -54,8 +54,9 @@ public class WeChatContactMsgServiceImpl extends ServiceImpl<WeChatContactMsgMap
             lqw.eq(WeChatContactMsg::getMsgTime ,weChatContactMsg.getMsgTime());
         }
         if (StringUtils.isNotBlank(weChatContactMsg.getContact())){
-            lqw.eq(WeChatContactMsg::getContact ,weChatContactMsg.getContact());
+            lqw.like(WeChatContactMsg::getContact ,weChatContactMsg.getContact());
         }
+        lqw.orderByDesc(WeChatContactMsg::getMsgTime);
         return this.list(lqw);
     }
 
@@ -88,5 +89,10 @@ public class WeChatContactMsgServiceImpl extends ServiceImpl<WeChatContactMsgMap
             });
         }
         return this.baseMapper.selectGroupChatList(fromId);
+    }
+
+    @Override
+    public List<WeChatContactMsgVo> selectFullSearchChatList(WeChatContactMsg weChatContactMsg) {
+        return this.baseMapper.selectFullSearchChatList(weChatContactMsg);
     }
 }
