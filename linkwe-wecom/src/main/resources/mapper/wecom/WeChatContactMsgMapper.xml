@@ -64,7 +64,7 @@
                 select receiver, msg_time,`action`, msg_type, contact
                 from
                     (
-                        select to_list as receiver, `action` , msg_time, msg_type, contact
+                        select room_id as receiver, `action` , msg_time, msg_type, contact
                         from we_chat_contact_msg
                         where from_id = #{fromId} and room_id &lt;&gt; ''
                             union
