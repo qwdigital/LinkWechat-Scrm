@@ -137,7 +137,7 @@ public class WeChatContactMsgController extends BaseController {
      */
     @ApiOperation("全文检索 会话列表")
     @Log(title = "全文检索 会话列表" , businessType = BusinessType.OTHER)
-    @GetMapping("selectFullSearchChatList}" )
+    @GetMapping("selectFullSearchChatList" )
     public TableDataInfo<List<WeChatContactMsgVo>> selectFullSearchChatList(WeChatContactMsg weChatContactMsg) {
         startPage();
         List<WeChatContactMsgVo> list = iWeChatContactMsgService.selectFullSearchChatList(weChatContactMsg);
