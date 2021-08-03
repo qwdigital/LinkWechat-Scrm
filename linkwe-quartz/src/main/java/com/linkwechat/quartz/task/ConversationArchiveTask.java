@@ -35,7 +35,6 @@ public class ConversationArchiveTask {
     public void FinanceTask(){
         log.info("会话存档定时任务执行----------------->");
         Long seqLong = 0L;
-        log.info(">>>>>>>seq:{}", seqLong);
         WeCorpAccount corpAccount = weCorpAccountService.findValidWeCorpAccount();
         if(corpAccount == null){
             log.info("无有效企业----------------->");
