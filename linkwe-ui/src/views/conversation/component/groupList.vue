@@ -7,15 +7,12 @@
           :key="index"
           @click="liClick(item)"
         >
-          <el-row
-            style="padding:10px"
-            v-if="item.finalChatContext.msgtype == 'text'"
-          >
+          <el-row style="padding:10px" v-if="item.msgType == 'text'">
             <span class="fl">
               <div class="ninebox">
-                <ul v-if="item.roomInfo">
+                <ul v-if="item.avatar">
                   <li
-                    v-for="(a, i) in item.roomInfo.avatar.split(',')"
+                    v-for="(a, i) in item.avatar.split(',')"
                     :key="i"
                   >
                     <img :src="a" />
@@ -25,14 +22,14 @@
             </span>
             <span class="fl" style="margin-left:8px;line-height:60px">
               <p>
-                {{ item.finalChatContext.roomInfo.name }}
+                {{ item.name }}
                 <span class="fr gray">{{
-                  parseTime(item.finalChatContext.fromInfo.updateTime)
+                    item.msgTime
                 }}</span>
               </p>
-              <p class="gray" v-if="item.finalChatContext.fromInfo">
-                {{ item.finalChatContext.fromInfo.name }}:{{
-                  item.finalChatContext.text.content
+              <p class="gray" v-if="item">
+                {{ item.name }}:{{
+                  item.content
                 }}
               </p>
             </span>
@@ -43,7 +40,7 @@
                    <p><span class="fr gray">{{parseTime(item.finalChatContext.msgtime)}}</span></p>
                    <p class="gray padt10" >{{item.finalChatContext.from}}:
                        <span v-if="item.finalChatContext.file.fileext=='mp4'">[视频]</span>
-                       </p>     
+                       </p>
                 </el-col>
                 </el-row>   -->
         </li>

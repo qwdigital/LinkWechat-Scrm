@@ -249,7 +249,7 @@ import list from '../component/customerList.vue'
 import chats from '../component/chat.vue'
 
 import grouplist from '../component/groupList.vue'
-import { content } from '@/api/content.js'
+import { content } from '@/api/conversation/content.js'
 import { yearMouthDay } from '@/utils/common.js'
 export default {
   components: {

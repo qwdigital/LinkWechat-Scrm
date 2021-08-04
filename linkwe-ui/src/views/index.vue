@@ -261,7 +261,7 @@
 <script>
 var elementResizeDetectorMaker = require('element-resize-detector')
 import { arrData } from '@/utils/common.js'
-import { content } from '@/api/content.js'
+import { content } from '@/api/conversation/content.js'
 import echarts from 'echarts'
 export default {
   name: 'Index',

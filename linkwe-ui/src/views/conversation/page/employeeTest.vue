@@ -227,17 +227,17 @@
                 >
                   <el-table-column prop="date" label="发起人">
                     <template slot-scope="scope">
-                      {{ scope.row.fromInfo.name }}
+                      {{ scope.row.name }}
                     </template>
                   </el-table-column>
                   <el-table-column prop="name" label="通话时间">
                     <template slot-scope="scope">
-                      {{ parseTime(scope.row.msgtime) }}
+                      {{ scope.row.msgTime }}
                     </template>
                   </el-table-column>
                   <el-table-column prop="address" label="时长">
                     <template slot-scope="scope">
-                      {{ scope.row.voice.play_length }}s
+                      {{ JSON.parse(scope.row.contact).play_length }}s
                     </template>
                   </el-table-column>
                   <el-table-column prop="address" label="操作">
@@ -245,7 +245,7 @@
                       <el-button
                         type="text"
                         size="small"
-                        @click="voiceLook(scope.row.voice)"
+                        @click="voiceLook(JSON.parse(scope.row.contact))"
                         >查看</el-button
                       >
                     </template>
@@ -265,7 +265,7 @@ import chat from '../component/chat.vue'
 import insideList from '../component/insideList.vue'
 import grouplist from '../component/groupList.vue'
 import * as api from '@/api/organization'
-import { content } from '@/api/content.js'
+import { content } from '@/api/conversation/content.js'
 import { yearMouthDay, parseTime } from '@/utils/common.js'
 
 export default {
@@ -278,7 +278,7 @@ export default {
   data() {
     return {
       employAmount: 1,
-      employId: '',
+      fromId: '',
       employName: '',
       talkName: '',
       treeData: [],
@@ -362,8 +362,8 @@ export default {
       this.activeNameThreeClick(true)
     },
     activeNameThreeClick(page, group) {
-      console.log(this.chat.id, 'this.chat.id')
-      if (!!!this.chat.id) {
+      console.log(this.chat.receiver,this.fromId, 'this.chat.id')
+      if (!!!this.chat.receiver) {
         return //没有选择人
       }
       if (!!!page) {
@@ -383,31 +383,26 @@ export default {
           msgType = 'voice'
         }
         let query = {
-          fromId: this.employId,
+          fromId: this.fromId,
+
           msgType,
           pageSize: '10',
           pageNum: this.currentPage,
+          orderByColumn: "msg_time",
+          isAsc: "asc",
           beginTime: this.takeTime ? yearMouthDay(this.takeTime[0]) : '',
           endTime: this.takeTime ? yearMouthDay(this.takeTime[1]) : ''
         }
-        if (this.activeName == '2') {
-          query.roomId = this.chat.roomId
-        } else {
-          query.receiveId = this.chat.receiveId
+        if (this.activeName != '2') {
+          query.toList =  this.chat.receiver
+        }else {
+          query.roomId =  this.chat.receiver
         }
-        if (this.activeName == '2') {
-          content.chatGrounpList(query).then((res) => {
-            this.total = Number(res.total)
-            console.log(res, 'this.activeName=')
-            this.resortData(res)
-          })
-        } else {
-          content.chatList(query).then((res) => {
-            console.log(res.rows, 'ssss')
-            this.total = Number(res.total)
-            this.resortData(res)
-          })
-        }
+        content.chatList(query).then((res) => {
+          console.log(res.rows, 'ssss')
+          this.total = Number(res.total)
+          this.resortData(res)
+        })
       }
     },
     resortData(res) {
@@ -446,25 +441,50 @@ export default {
     },
     tabClick(flag) {
       this.personList = []
-      if (!this.employId) {
+      if (!this.fromId) {
         return
       }
-      console.log
       if (flag) {
         this.loading = true
       }
-      content
-        .getTree({
-          fromId: this.employId,
-          searchType: this.activeName
-        })
-        .then(({ rows }) => {
-          this.loading = false
-          this.personList = rows
-        })
-        .catch((err) => {
-          this.loading = false
-        })
+      if(this.activeName == 0){
+        content
+          .getInternalChatList({
+            fromId: this.fromId
+          })
+          .then(({ data }) => {
+            this.loading = false
+            this.personList = data
+          })
+          .catch((err) => {
+            this.loading = false
+          })
+      }else if(this.activeName == 1){
+        content
+          .getExternalChatList({
+            fromId: this.fromId
+          })
+          .then(({ data }) => {
+            this.loading = false
+            this.personList = data
+          })
+          .catch((err) => {
+            this.loading = false
+          })
+      }else {
+        content
+          .getGroupChatList({
+            fromId: this.fromId
+          })
+          .then(({ data }) => {
+            this.loading = false
+            this.personList = data
+          })
+          .catch((err) => {
+            this.loading = false
+          })
+      }
+
     },
     filterNode(value, data) {
       console.log(value, data)
@@ -486,7 +506,7 @@ export default {
         })
       } else {
         this.talkName = data.name
-        this.employId = data.userId
+        this.fromId = data.userId
         this.tabClick()
       }
     }

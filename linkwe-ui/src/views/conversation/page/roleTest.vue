@@ -83,7 +83,7 @@
 <script>
   import {
     content
-  } from '@/api/content.js'
+  } from '@/api/conversation/content.js'
   import {
     yearMouthDay,
     parseTime

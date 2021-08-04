@@ -8,9 +8,12 @@
           @click="liClick(item)"
         >
           <el-row style="padding:10px">
-            <span class="fl"> <img :src="item.receiveWeCustomer.avatar"/></span>
+            <span class="fl"> <img :src="item.avatar"/></span>
             <span class="fl" style="margin-left:8px">
-              <p>{{ item.receiveWeCustomer.name }}</p>
+              <p>{{ item.name }}</p>
+            </span>
+            <span class="fl">
+              <p>{{ item.contact }}</p>
             </span>
           </el-row>
         </li>
@@ -32,7 +35,6 @@ export default {
       defluat: false
     }
   },
-
   data() {
     return {
       loadings: true
@@ -42,6 +44,14 @@ export default {
     liClick(e) {
       console.log(e, 'liClick')
       this.$emit('chatFn', e)
+    },
+    msgContentType(type,msg){
+      console.log(type,msg, 'msgContentType')
+      //消息获取
+      /*case msg = JSON.parse(msg);
+      switch (type){
+        case "text":
+      }*/
     }
   }
 }

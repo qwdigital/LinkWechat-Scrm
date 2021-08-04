@@ -1,15 +1,28 @@
 import request from '@/utils/request'
-const getTree = (params) => {
+const getExternalChatList = (params) => {
   return request({
-    url: '/chat/mapping/list',
-    method: 'get',
-    params,
+    url: '/linkwechat/msg/selectExternalChatList/'+ params.fromId,
+    method: 'get'
+  })
+}
+
+const getInternalChatList = (params) => {
+  return request({
+    url: '/linkwechat/msg/selectInternalChatList/'+ params.fromId,
+    method: 'get'
+  })
+}
+
+const getGroupChatList = (params) => {
+  return request({
+    url: '/linkwechat/msg/selectGroupChatList/'+ params.fromId,
+    method: 'get'
   })
 }
 
 const chatList = (params) => {
   return request({
-    url: '/wecom/finance/getChatContactList',
+    url: '/linkwechat/msg/list',
     method: 'get',
     params,
   })
@@ -26,7 +39,7 @@ const indexEchart = () => {
     method: 'get'
   })
 }
-// 
+//
 const chatGrounpList = (params) => {
   return request({
     url: '/wecom/finance/getChatRoomContactList',
@@ -52,7 +65,9 @@ const getChatAllList = (params) => {
 export const content = {
   indexEchart,
   indexTable,
-  getTree,
+  getExternalChatList,
+  getInternalChatList,
+  getGroupChatList,
   chatList,
   listByCustomer,
   getChatAllList,

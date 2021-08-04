@@ -4,40 +4,40 @@
       <li v-for="(item, index) in allChat" :key="index">
         <!-- <span v-if="item.fromInfo.name">{{item.fromInfo.name}}</span> -->
         <div :style="{ color: item.action == 'send' ? '#199ed8' : '#999' }">
-          <span v-if="item.fromInfo">{{ item.fromInfo.name }}</span>
+          <span v-if="item">{{ item.name }}</span>
           <span
             :style="{ color: item.action == 'send' ? '#199ed8' : '#999' }"
-            >{{ parseTime(item.msgTime) }}</span
+            >{{ item.msgTime }}</span
           >
         </div>
         <div v-if="item.msgType == 'text'" class="msgtypetext">
-          {{ item.text.content }}
+          {{ JSON.parse(item.contact).content }}
         </div>
         <div v-else-if="item.msgType == 'image'" class="msgtypeimg">
-          <img :src="item.image.attachment" @click="showImg(item)" />
+          <img :src="JSON.parse(item.contact).attachment" @click="showImg(JSON.parse(item.contact))" />
         </div>
         <div
           v-else-if="item.msgType == 'file'"
           class="msgtypefile"
-          @click="down(item.file)"
+          @click="down(JSON.parse(item.contact))"
         >
-          {{ item.file.fileName }}
+          {{ JSON.parse(item.contact).fileName }}
         </div>
         <div v-else-if="item.msgType == 'voice'" class="msgtypevoice">
           <i
             class="el-icon-microphone"
             style=" font-size: 40px; color: #199ed8;"
-            @click="playVideo(item)"
+            @click="playVideo(JSON.parse(item.contact))"
           ></i>
         </div>
         <div v-else-if="item.msgType == 'emotion'" class="msgtypeimg">
-          <img :src="item.emotion.attachment" @click="showImg(item)" />
+          <img :src="JSON.parse(item.contact).attachment" @click="showImg(item)" />
         </div>
         <div v-else-if="item.msgType == 'video'" class="msgtypevideo">
           <i
             class="el-icon-video-play"
             style=" font-size: 40px;  color: #199ed8;"
-            @click="play(item, 'video')"
+            @click="play(JSON.parse(item.contact), 'video')"
           ></i>
         </div>
         <div v-else-if="item.msgType == 'location'" class="msgtypecard">
@@ -45,24 +45,24 @@
             <el-amap
               ref="map"
               vid="amapDemo"
-              :center="[item.location.longitude, item.location.latitude]"
+              :center="[JSON.parse(item.contact).longitude, JSON.parse(item.contact).latitude]"
               :zoom="zoom"
               class="amap-demo"
               style="pointer-events: none;"
             >
               <el-amap-marker
-                :position="[item.location.longitude, item.location.latitude]"
+                :position="[JSON.parse(item.contact).longitude, iJSON.parse(item.contact).latitude]"
               ></el-amap-marker>
             </el-amap>
           </div>
-          <div class="card_foot">{{ item.location.address }}</div>
+          <div class="card_foot">{{ JSON.parse(item.contact).address }}</div>
         </div>
         <div v-else-if="item.msgType == 'weapp'" class="msgtypecard">
-          <div class="card_name">{{ item.weApp.title }}</div>
+          <div class="card_name">{{ JSON.parse(item.contact).title }}</div>
           <div class="card_foot">小程序</div>
         </div>
         <div v-else-if="item.msgType == 'card'" class="msgtypecard ">
-          <div class="card_name">{{ item.card.corpName }}</div>
+          <div class="card_name">{{ JSON.parse(item.contact).corpName }}</div>
           <div class="card_foot">个人名片</div>
         </div>
       </li>
@@ -165,20 +165,20 @@ export default {
       mp3.pause()
     },
     playVideo(e) {
-      this.vioceSrc = [e.voice.attachment]
+      this.vioceSrc = [e.attachment]
       this.diavioce = true
     },
     onBeforePlay(next) {
       next() // 开始播放
     },
     showImg(e) {
-      this.imgSrc = e.image.attachment
+      this.imgSrc = e.attachment
       this.dialogVisible = true
     },
     play(e) {
       this.dia = true
       const player = this.$refs.videoPlayer.player
-      this.playerOptions['sources'][0]['src'] = e.video.attachment
+      this.playerOptions['sources'][0]['src'] = e.attachment
       player.play()
     },
     down(e) {

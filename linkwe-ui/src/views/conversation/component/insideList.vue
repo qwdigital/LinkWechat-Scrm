@@ -9,10 +9,10 @@
         >
           <el-row style="padding:10px">
             <span class="fl">
-              <img :src="item.finalChatContext.fromInfo.avatarMediaid"
+              <img :src="item.avatar"
             /></span>
             <span class="fl" style="margin-left:8px">
-              <p>{{ item.finalChatContext.fromInfo.name }}</p>
+              <p>{{ item.name }}</p>
             </span>
           </el-row>
         </li>
