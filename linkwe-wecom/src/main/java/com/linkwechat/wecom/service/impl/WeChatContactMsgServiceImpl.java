@@ -36,10 +36,12 @@ public class WeChatContactMsgServiceImpl extends ServiceImpl<WeChatContactMsgMap
             lqw.eq(WeChatContactMsg::getMsgId ,weChatContactMsg.getMsgId());
         }
         if (StringUtils.isNotBlank(weChatContactMsg.getFromId())){
-            lqw.eq(WeChatContactMsg::getFromId ,weChatContactMsg.getFromId());
+            lqw.and(wrapper -> wrapper.eq(WeChatContactMsg::getFromId ,weChatContactMsg.getFromId())
+                    .or().eq(WeChatContactMsg::getToList,weChatContactMsg.getFromId()));
         }
         if (StringUtils.isNotBlank(weChatContactMsg.getToList())){
-            lqw.eq(WeChatContactMsg::getToList ,weChatContactMsg.getToList());
+            lqw.and(wrapper -> wrapper.eq(WeChatContactMsg::getFromId ,weChatContactMsg.getToList())
+                    .or().eq(WeChatContactMsg::getToList,weChatContactMsg.getToList()));
         }
         if (StringUtils.isNotBlank(weChatContactMsg.getRoomId())){
             lqw.eq(WeChatContactMsg::getRoomId ,weChatContactMsg.getRoomId());
@@ -51,7 +53,8 @@ public class WeChatContactMsgServiceImpl extends ServiceImpl<WeChatContactMsgMap
             lqw.eq(WeChatContactMsg::getMsgType ,weChatContactMsg.getMsgType());
         }
         if (weChatContactMsg.getMsgTime() != null){
-            lqw.eq(WeChatContactMsg::getMsgTime ,weChatContactMsg.getMsgTime());
+            lqw.and(wrapper -> wrapper.ge(WeChatContactMsg::getMsgTime,weChatContactMsg.getMsgTime())
+                    .le(WeChatContactMsg::getMsgTime,weChatContactMsg.getMsgTime()));
         }
         if (StringUtils.isNotBlank(weChatContactMsg.getContact())){
             lqw.like(WeChatContactMsg::getContact ,weChatContactMsg.getContact());

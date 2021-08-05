@@ -20,7 +20,6 @@ public interface IWeChatContactMsgService extends IService<WeChatContactMsg> {
      */
     List<WeChatContactMsg> queryList(WeChatContactMsg weChatContactMsg);
 
-
     /**
      * 外部联系人 会话列表
      * @param fromId 消息发送人id

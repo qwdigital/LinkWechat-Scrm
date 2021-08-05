@@ -20,6 +20,7 @@
         <result property="updateTime" column="update_time"/>
     </resultMap>
 
+    <sql id="chatSql">select msg_id, from_id, to_list as receiver, `action`, msg_time, msg_type,is_external, contact from we_chat_contact_msg</sql>
 
     <select id="selectExternalChatList" resultType="com.linkwechat.wecom.domain.vo.WeChatContactMsgVo">
         select t.*, wc.name, wc.avatar from
@@ -132,6 +133,5 @@
                 AND date_format(t.msg_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
             </if>
         </where>
-
     </select>
 </mapper>
