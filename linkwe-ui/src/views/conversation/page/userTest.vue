@@ -42,6 +42,7 @@
               placeholder="搜索聊天记录"
               prefix-icon="el-icon-search"
               v-model="chatContent"
+              @keyup.enter.native="chatMsgList"
             >
             </el-input>
           </div>
@@ -271,7 +272,7 @@ export default {
       CList: [],
       personList: [],
       loading: false,
-      employId: '',
+      fromId: '',
       chatData: {},
 
       allChat: [],
@@ -288,7 +289,7 @@ export default {
   methods: {
     chatFn(data) {
       this.chatData = data
-      console.log(data)
+      console.log(data,"<><><><>><")
       this.activeNameThreeClick()
     },
     groupFn(data) {
@@ -305,29 +306,43 @@ export default {
     personCheck(data, e) {
       this.personIndex = e
       this.talkName = data.name
-      this.employId = data.externalUserid
+      this.fromId = data.externalUserid
       this.getChatList()
     },
     getChatList(flag) {
-      if (!this.employId) {
+      if (!this.fromId) {
         return
       }
       if (flag) {
         this.loading = true
       }
       this.personList = []
-      content
-        .getTree({
-          fromId: this.employId,
-          searchType: this.activeName
-        })
-        .then(({ rows }) => {
-          this.loading = false
-          this.personList = rows
-        })
-        .catch((err) => {
-          this.loading = false
-        })
+      if(this.activeName == '0'){
+        content
+          .selectAloneChatList({
+            fromId: this.fromId,
+            contact: this.chatContent
+          })
+          .then(({ data }) => {
+            this.loading = false
+            this.personList = data
+          })
+          .catch((err) => {
+            this.loading = false
+          })
+      }else {
+        content
+          .getGroupChatList({
+            roomId: this.fromId
+          })
+          .then(({ data }) => {
+            this.loading = false
+            this.personList = data
+          })
+          .catch((err) => {
+            this.loading = false
+          })
+      }
     },
     activeNameThreeClick(page, group) {
       if (!!!page) {
@@ -345,8 +360,10 @@ export default {
       } else if (this.activeNameThree == 4) {
         msgType = 'voice'
       }
+
       let query = {
-        fromId: this.chatData.fromId,
+        fromId: this.fromId,
+        toList: this.chatData.receiver,
         msgType,
         pageSize: '10',
         pageNum: this.currentPage,
@@ -392,11 +409,6 @@ export default {
         pageNum: 1,
         pageSize: 999,
         name: this.employName,
-        userId: '',
-        tagIds: '',
-        beginTime: '',
-        endTime: '',
-        status: '',
         isOpenChat: '1'
       }
       content.listByCustomer(querys).then((res) => {
@@ -404,6 +416,9 @@ export default {
         this.CList = res.rows
         this.employAmount = res.total
       })
+    },
+    chatMsgList() {
+      this.getChatList();
     }
   },
   mounted() {

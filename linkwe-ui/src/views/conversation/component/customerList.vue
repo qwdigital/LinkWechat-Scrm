@@ -9,17 +9,17 @@
         >
           <el-row style="padding:10px">
             <el-col :span="3"
-              ><img :src="item.receiveWeUser.avatarMediaid"
+              ><img :src="item.avatar"
             /></el-col>
             <el-col :span="21">
               <p>
-                {{ item.receiveWeUser.name }}
+                {{ item.name }}
                 <span class="fr gray">{{
-                  parseTime(item.finalChatContext.msgtime)
+                    item.msgTime
                 }}</span>
               </p>
-              <p class="gray padt10" v-if="item.finalChatContext.text">
-                {{ item.finalChatContext.text.content }}
+              <p class="gray padt10" v-if="item.contact">
+                {{ JSON.parse(item.contact).content }}
               </p>
             </el-col>
           </el-row>

@@ -1,28 +1,37 @@
 import request from '@/utils/request'
 const getExternalChatList = (params) => {
   return request({
-    url: '/linkwechat/msg/selectExternalChatList/'+ params.fromId,
+    url: '/chat/msg/selectExternalChatList/'+ params.fromId,
     method: 'get'
   })
 }
 
+const selectAloneChatList = (params) => {
+  return request({
+    url: '/chat/msg/selectAloneChatList\n/',
+    method: 'get',
+    params
+  })
+}
+
+
 const getInternalChatList = (params) => {
   return request({
-    url: '/linkwechat/msg/selectInternalChatList/'+ params.fromId,
+    url: '/chat/msg/selectInternalChatList/'+ params.fromId,
     method: 'get'
   })
 }
 
 const getGroupChatList = (params) => {
   return request({
-    url: '/linkwechat/msg/selectGroupChatList/'+ params.fromId,
+    url: '/chat/msg/selectGroupChatList/'+ params.fromId,
     method: 'get'
   })
 }
 
 const chatList = (params) => {
   return request({
-    url: '/linkwechat/msg/list',
+    url: '/chat/msg/list',
     method: 'get',
     params,
   })
@@ -66,6 +75,7 @@ export const content = {
   indexEchart,
   indexTable,
   getExternalChatList,
+  selectAloneChatList,
   getInternalChatList,
   getGroupChatList,
   chatList,
