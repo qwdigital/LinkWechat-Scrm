@@ -48,14 +48,7 @@ const indexEchart = () => {
     method: 'get'
   })
 }
-//
-const chatGrounpList = (params) => {
-  return request({
-    url: '/wecom/finance/getChatRoomContactList',
-    method: 'get',
-    params,
-  })
-}
+
 const listByCustomer = (params) => {
   return request({
     url: '/wecom/customer/list',
@@ -63,9 +56,9 @@ const listByCustomer = (params) => {
     params,
   })
 }
-const getChatAllList = (params) => {
+const getFullSearchChatList = (params) => {
   return request({
-    url: '/wecom/finance/getChatAllList',
+    url: '/chat/msg/selectFullSearchChatList',
     method: 'get',
     params,
   })
@@ -80,6 +73,5 @@ export const content = {
   getGroupChatList,
   chatList,
   listByCustomer,
-  getChatAllList,
-  chatGrounpList
+  getFullSearchChatList
 }

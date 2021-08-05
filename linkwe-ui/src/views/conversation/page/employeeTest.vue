@@ -383,8 +383,6 @@ export default {
           msgType = 'voice'
         }
         let query = {
-          fromId: this.fromId,
-
           msgType,
           pageSize: '10',
           pageNum: this.currentPage,
@@ -394,6 +392,7 @@ export default {
           endTime: this.takeTime ? yearMouthDay(this.takeTime[1]) : ''
         }
         if (this.activeName != '2') {
+          query.fromId = this.fromId
           query.toList =  this.chat.receiver
         }else {
           query.roomId =  this.chat.receiver

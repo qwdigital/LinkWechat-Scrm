@@ -333,7 +333,7 @@ export default {
       }else {
         content
           .getGroupChatList({
-            roomId: this.fromId
+            fromId: this.fromId
           })
           .then(({ data }) => {
             this.loading = false
@@ -362,8 +362,6 @@ export default {
       }
 
       let query = {
-        fromId: this.fromId,
-        toList: this.chatData.receiver,
         msgType,
         pageSize: '10',
         pageNum: this.currentPage,
@@ -371,12 +369,13 @@ export default {
         endTime: this.takeTime ? yearMouthDay(this.takeTime[1]) : ''
       }
       if (group) {
-        query.roomId = this.chatData.roomId
+        query.roomId = this.chatData.receiver
       } else {
-        query.receiveId = this.chatData.receiveId
+        query.fromId = this.fromId
+        query.toList = this.chatData.receiver
       }
       if (group) {
-        content.chatGrounpList(query).then((res) => {
+        content.chatList(query).then((res) => {
           this.total = Number(res.total)
           this.resortData(res)
         })

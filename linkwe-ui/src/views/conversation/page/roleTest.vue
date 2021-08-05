@@ -32,13 +32,13 @@
       <el-table :data="fileData" stripe style="width: 100%" :header-cell-style="{background:'#fff'}">
         <el-table-column prop="date" label="发送者" width="180">
           <template slot-scope="scope">
-            <p v-if="scope.row.fromInfo">{{scope.row.fromInfo.name}}</p>
+            <p v-if="scope.row">{{scope.row.name}}</p>
           </template>
         </el-table-column>
         <el-table-column prop="name" label=" 内容">
           <template slot-scope="scope">
-            <p v-if="!!scope.row.content" class="emcode" v-html="scope.row.content"></p>
-            <p v-else-if="!!!scope.row.content&&scope.row.text">{{scope.row.text.content}}</p>
+            <p v-if="!!scope.row.contact" class="emcode" v-html="scope.row.contact"></p>
+            <p v-else-if="!!!scope.row.contact&&scope.row.text">{{JSON.parse(scope.row.contact).content}}</p>
           </template>
         </el-table-column>
         <el-table-column label="消息状态" width="200">
@@ -69,8 +69,8 @@
           </template>
         </el-table-column>
         <el-table-column prop="address" label="发送时间" width="200">
-          <template slot-scope="scope" v-if="scope.row.text">
-            {{parseTime(scope.row.msgtime)}}
+          <template slot-scope="scope">
+            {{ scope.row.msgTime }}
           </template>
         </el-table-column>
       </el-table>
@@ -134,16 +134,17 @@
           this.currentPage = 1
         }
         let query = {
-          userName: this.form.Ename,
+          name: this.form.Ename,
           customerName: this.form.Cname,
-          keyWord: this.form.Scontent,
+          contact: this.form.Scontent,
           beginTime: this.form.Stime ? yearMouthDay(this.form.Stime[0]) : "",
           endTime: this.form.Stime ? yearMouthDay(this.form.Stime[1]) : "",
           pageNum: this.currentPage,
-          action: this.ac
+          action: this.ac,
+          orderByColumn: "msg_time",
+          isAsc: "desc"
         }
-        content.getChatAllList(query).then(res => {
-          console.log(res)
+        content.getFullSearchChatList(query).then(res => {
           this.fileData = res.rows;
           this.total = Number(res.total)
         })
