@@ -39,6 +39,28 @@
         inner join we_customer wc on t.receiver = wc.external_userid;
     </select>
 
+    <select id="selectAloneChatList" resultType="com.linkwechat.wecom.domain.vo.WeChatContactMsgVo">
+        select t.*, ifnull(wu.user_name, wc.name) as name, ifnull(wu.head_image_url, wc.avatar) as avatar
+            from (select receiver, msg_time, `action`, msg_type, contact
+                    from (select to_list as receiver, `action`, msg_time, msg_type, contact from we_chat_contact_msg
+                            where from_id = #{fromId}
+                            and room_id = ''
+                            <if test="contact != null and contact != ''">
+                                and contact like concat('%', #{contact}, '%')
+                            </if>
+                          union
+                          select from_id as receiver, `action`, msg_time, msg_type, contact from we_chat_contact_msg
+                            where FIND_IN_SET(#{fromId}, to_list)
+                            and room_id = ''
+                            <if test="contact != null and contact != ''">
+                                and contact like concat('%', #{contact}, '%')
+                            </if>
+                            order by msg_time desc) as msg
+                            group by receiver order by msg.msg_time desc) as t
+         left join we_user wu on t.receiver = wu.user_id and  (case when LOCATE('wm', t.receiver) or LOCATE('wo', t.receiver) then 0 else 1 end) = 1
+         left join we_customer wc on t.receiver = wc.external_userid and (case when LOCATE('wm', t.receiver) or LOCATE('wo', t.receiver) then 0 else 1 end) = 0;
+    </select>
+
 
     <select id="selectInternalChatList" resultType="com.linkwechat.wecom.domain.vo.WeChatContactMsgVo">
         select t.*, wu.user_name as name , wu.head_image_url as avatar from

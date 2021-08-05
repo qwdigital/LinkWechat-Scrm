@@ -16,11 +16,18 @@ import java.util.List;
 public interface WeChatContactMsgMapper extends BaseMapper<WeChatContactMsg> {
 
     /**
-     * 外部联系人/单聊 会话列表
+     * 外部联系人 会话列表
      * @param fromId 消息发送人id
      * @return 会话列表
      */
     List<WeChatContactMsgVo> selectExternalChatList(@Param("fromId") String fromId);
+
+    /**
+     * 单聊 会话列表
+     * @param weChatContactMsg 入参
+     * @return 会话列表
+     */
+    List<WeChatContactMsgVo> selectAloneChatList(WeChatContactMsg weChatContactMsg);
 
     /**
      * 内部联系人 会话列表

@@ -29,7 +29,7 @@ import java.util.List;
 @Api(tags = "会话存档管理")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
-@RequestMapping("/linkwechat/msg" )
+@RequestMapping("/chat/msg" )
 public class WeChatContactMsgController extends BaseController {
 
     private final IWeChatContactMsgService iWeChatContactMsgService;
@@ -105,11 +105,21 @@ public class WeChatContactMsgController extends BaseController {
     /**
      * 外部联系人/单聊 会话列表
      */
-    @ApiOperation("外部联系人/单聊 会话列表")
-    @Log(title = "外部联系人/单聊 会话列表" , businessType = BusinessType.OTHER)
-    @GetMapping("selectExternalChatList/{fromId}" )
+    @ApiOperation("外部联系人 会话列表")
+    @Log(title = "外部联系人 会话列表" , businessType = BusinessType.OTHER)
+    @GetMapping("/selectExternalChatList/{fromId}" )
     public AjaxResult<List<WeChatContactMsgVo>> selectExternalChatList(@PathVariable("fromId") String fromId) {
         return AjaxResult.success(iWeChatContactMsgService.selectExternalChatList(fromId));
+    }
+
+    /**
+     * 外部联系人/单聊 会话列表
+     */
+    @ApiOperation("单聊 会话列表")
+    @Log(title = "单聊 会话列表" , businessType = BusinessType.OTHER)
+    @GetMapping("/selectAloneChatList" )
+    public AjaxResult<List<WeChatContactMsgVo>> selectAloneChatList(WeChatContactMsg weChatContactMsg) {
+        return AjaxResult.success(iWeChatContactMsgService.selectAloneChatList(weChatContactMsg));
     }
 
     /**
@@ -117,7 +127,7 @@ public class WeChatContactMsgController extends BaseController {
      */
     @ApiOperation("内部联系人 会话列表")
     @Log(title = "内部联系人 会话列表" , businessType = BusinessType.OTHER)
-    @GetMapping("selectInternalChatList/{fromId}" )
+    @GetMapping("/selectInternalChatList" )
     public AjaxResult<List<WeChatContactMsgVo>> selectInternalChatList(@PathVariable("fromId") String fromId) {
         return AjaxResult.success(iWeChatContactMsgService.selectInternalChatList(fromId));
     }
@@ -127,7 +137,7 @@ public class WeChatContactMsgController extends BaseController {
      */
     @ApiOperation("群聊 会话列表")
     @Log(title = "群聊 会话列表" , businessType = BusinessType.OTHER)
-    @GetMapping("selectGroupChatList/{fromId}" )
+    @GetMapping("/selectGroupChatList/{fromId}" )
     public AjaxResult<List<WeChatContactMsgVo>> selectGroupChatList(@PathVariable("fromId") String fromId) {
         return AjaxResult.success(iWeChatContactMsgService.selectGroupChatList(fromId));
     }
@@ -137,7 +147,7 @@ public class WeChatContactMsgController extends BaseController {
      */
     @ApiOperation("全文检索 会话列表")
     @Log(title = "全文检索 会话列表" , businessType = BusinessType.OTHER)
-    @GetMapping("selectFullSearchChatList" )
+    @GetMapping("/selectFullSearchChatList" )
     public TableDataInfo<List<WeChatContactMsgVo>> selectFullSearchChatList(WeChatContactMsg weChatContactMsg) {
         startPage();
         List<WeChatContactMsgVo> list = iWeChatContactMsgService.selectFullSearchChatList(weChatContactMsg);

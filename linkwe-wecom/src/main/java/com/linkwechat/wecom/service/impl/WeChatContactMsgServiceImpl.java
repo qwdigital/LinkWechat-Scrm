@@ -66,6 +66,11 @@ public class WeChatContactMsgServiceImpl extends ServiceImpl<WeChatContactMsgMap
     }
 
     @Override
+    public List<WeChatContactMsgVo> selectAloneChatList(WeChatContactMsg weChatContactMsg) {
+        return this.baseMapper.selectAloneChatList(weChatContactMsg);
+    }
+
+    @Override
     public List<WeChatContactMsgVo> selectInternalChatList(String fromId) {
         return this.baseMapper.selectInternalChatList(fromId);
     }
