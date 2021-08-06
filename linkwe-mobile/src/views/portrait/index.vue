@@ -22,7 +22,8 @@
                 >{{
                   form.remark
                     ? form.remark
-                    : (form.name || '') + '-' + (form.remarkCorpName || '')
+                    : (form.name || '') +
+                      (form.remarkCorpName ? '-' + form.remarkCorpName : '')
                 }}
                 &nbsp; &nbsp;</span
               ><span
@@ -69,7 +70,7 @@
         <div>客户标签</div>
         <div class="data" is-link @click="labelEdit">编辑</div>
       </div>
-      <van-row gutter="10" class="labelstyle">
+      <van-row v-if="form.weTagGroupList" gutter="10" class="labelstyle mt15">
         <van-col
           span="4.5"
           v-for="(item, index) in form.weTagGroupList"
@@ -386,7 +387,7 @@ export default {
   computed: {
     userId() {
       return this.$store.state.userId
-      //  || 'FengJuZhuDeJieDao'
+      // || 'FengJuZhuDeJieDao'
     },
     //   activeLabel : () => {
     //       this.addTag.forEach((value) => {
@@ -416,6 +417,7 @@ export default {
     // this.findAddGroupNum()
     // this.getCustomerInfo()
     // this.findTrajectory()
+
     // getAllTags()
     //   .then(({ data }) => {
     //     this.alllabel = data
