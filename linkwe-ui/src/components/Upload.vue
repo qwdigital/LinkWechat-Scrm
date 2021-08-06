@@ -113,6 +113,9 @@ export default {
         this.$emit('update:fileName', res.data.fileName)
         this.$emit('update:file', file)
         // this.fileUrl = URL.createObjectURL(file.raw)
+      } else {
+        this.loading = false
+        this.$message.error(res.msg)
       }
     },
     onError(err, file, fileList) {

@@ -98,7 +98,7 @@ export default {
         >
       </el-form-item>
     </el-form>
-    <el-table :data="tableData" border style="width: 100%">
+    <el-table :data="tableData">
       <el-table-column prop="taskName" label="群裂变名称"> </el-table-column>
       <el-table-column prop="fissNum" label="裂变客户数量"> </el-table-column>
       <el-table-column prop="fissStatus" label="活动状态">
