@@ -94,7 +94,7 @@ export default {
       @selection-change="handleSelectionChange"
     >
       <el-table-column width="55" />
-      <el-table-column label="群成员" prop="memberName">
+      <el-table-column label="群成员" prop="name">
         <template slot-scope="scope">
           {{ scope.row.memberName }}
           <!-- <span
