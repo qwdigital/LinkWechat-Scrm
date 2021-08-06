@@ -18,4 +18,6 @@ public interface IWeGroupMemberService extends IService<WeGroupMember> {
     List<WeGroupMemberDto> selectWeGroupMemberListByChatId(String chatId);
 
     WeGroupMember selectWeGroupMemberByUnionId(String chatId, String unionId);
+
+    void insertBatch(List<WeGroupMember> weGroupMembers);
 }

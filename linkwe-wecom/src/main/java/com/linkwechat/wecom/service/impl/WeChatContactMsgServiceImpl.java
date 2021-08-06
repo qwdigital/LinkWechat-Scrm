@@ -96,7 +96,7 @@ public class WeChatContactMsgServiceImpl extends ServiceImpl<WeChatContactMsgMap
                 }
             });
         }
-        return this.baseMapper.selectGroupChatList(fromId);
+        return weChatContactMsgVos;
     }
 
     @Override
