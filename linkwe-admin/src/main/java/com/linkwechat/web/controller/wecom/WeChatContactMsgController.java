@@ -127,7 +127,7 @@ public class WeChatContactMsgController extends BaseController {
      */
     @ApiOperation("内部联系人 会话列表")
     @Log(title = "内部联系人 会话列表" , businessType = BusinessType.OTHER)
-    @GetMapping("/selectInternalChatList" )
+    @GetMapping("/selectInternalChatList/{fromId}" )
     public AjaxResult<List<WeChatContactMsgVo>> selectInternalChatList(@PathVariable("fromId") String fromId) {
         return AjaxResult.success(iWeChatContactMsgService.selectInternalChatList(fromId));
     }
