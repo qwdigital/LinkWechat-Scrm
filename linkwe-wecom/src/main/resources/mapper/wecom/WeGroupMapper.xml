@@ -8,7 +8,9 @@
     <select id="selectWeGroupList" parameterType="WeGroup" resultType="com.linkwechat.wecom.domain.WeGroup">
         SELECT
             wg.chat_id,
-            wg.group_name,
+            if(wg.group_name = '' or wg.group_name is null,
+                (SELECT group_concat(name separator '、') FROM we_group_member wgm  WHERE wgm.chat_id = wg.chat_id limit 10),
+                wg.group_name) as group_name,
             wg.add_time,
             wg.notice,
             wu.user_name as groupLeaderName,

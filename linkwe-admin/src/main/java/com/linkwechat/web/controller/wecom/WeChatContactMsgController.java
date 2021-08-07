@@ -153,4 +153,17 @@ public class WeChatContactMsgController extends BaseController {
         List<WeChatContactMsgVo> list = iWeChatContactMsgService.selectFullSearchChatList(weChatContactMsg);
         return getDataTable(list);
     }
+
+    /**
+     * 全文检索 会话列表
+     */
+    @ApiOperation("全文检索 导出列表")
+    @Log(title = "全文检索 导出列表" , businessType = BusinessType.OTHER)
+    @GetMapping("/selectFullSearchChatList/export" )
+    public AjaxResult fullSearchChatListExport(WeChatContactMsg weChatContactMsg) {
+        startPage();
+        List<WeChatContactMsgVo> list = iWeChatContactMsgService.selectFullSearchChatList(weChatContactMsg);
+        ExcelUtil<WeChatContactMsgVo> util = new ExcelUtil<WeChatContactMsgVo>(WeChatContactMsgVo.class);
+        return util.exportExcel(list, "msg" );
+    }
 }
