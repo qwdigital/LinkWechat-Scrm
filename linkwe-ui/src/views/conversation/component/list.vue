@@ -1,22 +1,27 @@
 <template>
   <div class="list" v-loading="loading">
-    <div v-if="personList.length >= 1">
+    <div v-if="personList.length">
       <ul>
         <li
           v-for="(item, index) in personList"
           :key="index"
           @click="liClick(item)"
         >
-          <el-row style="padding:10px">
-            <span class="fl"> <img :src="item.receiveWeCustomer.avatar"/></span>
+          <el-row>
+            <span class="fl"> <img :src="item.avatar"/></span>
             <span class="fl" style="margin-left:8px">
-              <p>{{ item.receiveWeCustomer.name }}</p>
+              <p>{{ item.name }}</p>
             </span>
+            <!-- <span class="fl">
+              <p>{{ item.contact }}</p>
+            </span> -->
           </el-row>
         </li>
       </ul>
     </div>
-    <div v-else></div>
+    <div class="ac" v-else>
+      暂无数据
+    </div>
   </div>
 </template>
 <script>
@@ -32,7 +37,6 @@ export default {
       defluat: false
     }
   },
-
   data() {
     return {
       loadings: true
@@ -42,6 +46,14 @@ export default {
     liClick(e) {
       console.log(e, 'liClick')
       this.$emit('chatFn', e)
+    },
+    msgContentType(type, msg) {
+      console.log(type, msg, 'msgContentType')
+      //消息获取
+      /*case msg = JSON.parse(msg);
+      switch (type){
+        case "text":
+      }*/
     }
   }
 }
@@ -49,7 +61,7 @@ export default {
 <style lang="scss" scoped>
 .list {
   overflow-y: scroll;
-  height: 708px;
+  height: calc(100vh - 328px);
   ::-webkit-scrollbar {
     display: none;
   }

@@ -10,7 +10,7 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        companyName: '',
+        companyName: ''
       },
       total: 0,
       form: {},
@@ -22,9 +22,9 @@ export default {
         companyName: [{ required: true, message: '必填项', trigger: 'blur' }],
         corpId: [{ required: true, message: '必填项', trigger: 'blur' }],
         corpSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
-        contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
+        contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }]
       }),
-      status: ['正常', '停用'],
+      status: ['正常', '停用']
     }
   },
   watch: {},
@@ -75,8 +75,8 @@ export default {
         this.msgSuccess('操作成功')
         this.getList()
       })
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -270,6 +270,9 @@ export default {
         </el-form-item>
         <el-form-item label="会话私钥" prop="financePrivateKey">
           <el-input v-model="form.financePrivateKey"></el-input>
+        </el-form-item>
+        <el-form-item label="消息提醒agentId" prop="agentId">
+          <el-input v-model="form.agentId"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer">

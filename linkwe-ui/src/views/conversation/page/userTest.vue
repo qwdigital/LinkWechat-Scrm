@@ -14,7 +14,7 @@
             </el-input>
           </div>
         </div>
-        <div class="ct_box ct_boxFirst">
+        <div class="ct_box ct_boxFirst" style="height: calc(100vh - 288px)">
           <ul>
             <li
               v-for="(i, t) in CList"
@@ -42,6 +42,7 @@
               placeholder="搜索聊天记录"
               prefix-icon="el-icon-search"
               v-model="chatContent"
+              @keyup.enter.native="chatMsgList"
             >
             </el-input>
           </div>
@@ -249,7 +250,7 @@ import list from '../component/customerList.vue'
 import chats from '../component/chat.vue'
 
 import grouplist from '../component/groupList.vue'
-import { content } from '@/api/content.js'
+import { content } from '@/api/conversation/content.js'
 import { yearMouthDay } from '@/utils/common.js'
 export default {
   components: {
@@ -271,7 +272,7 @@ export default {
       CList: [],
       personList: [],
       loading: false,
-      employId: '',
+      fromId: '',
       chatData: {},
 
       allChat: [],
@@ -288,7 +289,7 @@ export default {
   methods: {
     chatFn(data) {
       this.chatData = data
-      console.log(data)
+      console.log(data, '<><><><>><')
       this.activeNameThreeClick()
     },
     groupFn(data) {
@@ -305,29 +306,43 @@ export default {
     personCheck(data, e) {
       this.personIndex = e
       this.talkName = data.name
-      this.employId = data.externalUserid
+      this.fromId = data.externalUserid
       this.getChatList()
     },
     getChatList(flag) {
-      if (!this.employId) {
+      if (!this.fromId) {
         return
       }
       if (flag) {
         this.loading = true
       }
       this.personList = []
-      content
-        .getTree({
-          fromId: this.employId,
-          searchType: this.activeName
-        })
-        .then(({ rows }) => {
-          this.loading = false
-          this.personList = rows
-        })
-        .catch((err) => {
-          this.loading = false
-        })
+      if (this.activeName == '0') {
+        content
+          .selectAloneChatList({
+            fromId: this.fromId,
+            contact: this.chatContent
+          })
+          .then(({ data }) => {
+            this.loading = false
+            this.personList = data
+          })
+          .catch((err) => {
+            this.loading = false
+          })
+      } else {
+        content
+          .getGroupChatList({
+            fromId: this.fromId
+          })
+          .then(({ data }) => {
+            this.loading = false
+            this.personList = data
+          })
+          .catch((err) => {
+            this.loading = false
+          })
+      }
     },
     activeNameThreeClick(page, group) {
       if (!!!page) {
@@ -345,8 +360,8 @@ export default {
       } else if (this.activeNameThree == 4) {
         msgType = 'voice'
       }
+
       let query = {
-        fromId: this.chatData.fromId,
         msgType,
         pageSize: '10',
         pageNum: this.currentPage,
@@ -354,12 +369,13 @@ export default {
         endTime: this.takeTime ? yearMouthDay(this.takeTime[1]) : ''
       }
       if (group) {
-        query.roomId = this.chatData.roomId
+        query.roomId = this.chatData.receiver
       } else {
-        query.receiveId = this.chatData.receiveId
+        query.fromId = this.fromId
+        query.toList = this.chatData.receiver
       }
       if (group) {
-        content.chatGrounpList(query).then((res) => {
+        content.chatList(query).then((res) => {
           this.total = Number(res.total)
           this.resortData(res)
         })
@@ -392,11 +408,6 @@ export default {
         pageNum: 1,
         pageSize: 999,
         name: this.employName,
-        userId: '',
-        tagIds: '',
-        beginTime: '',
-        endTime: '',
-        status: '',
         isOpenChat: '1'
       }
       content.listByCustomer(querys).then((res) => {
@@ -404,6 +415,9 @@ export default {
         this.CList = res.rows
         this.employAmount = res.total
       })
+    },
+    chatMsgList() {
+      this.getChatList()
     }
   },
   mounted() {
@@ -426,7 +440,6 @@ export default {
 
 .employ {
   background: #f6f6f9;
-  min-height: 800px;
 
   .hd_tabs {
     background: #fff;
@@ -446,7 +459,6 @@ export default {
 
   .hd_tabs_content {
     width: 100%;
-    min-height: 653px;
     border-bottom: 1px solid #efefef;
   }
 
@@ -458,13 +470,11 @@ export default {
   }
 
   .ct_boxFirst {
-    height: 700px;
   }
 
   .ct_box {
     background: white;
     border-bottom: 1px solid #efefef;
-    min-height: 709px;
     padding: 10px;
     overflow-y: scroll;
     color: #999;

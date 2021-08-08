@@ -129,7 +129,7 @@ export default {
     // 新建素材按钮
     goRoute() {
       let contentType = ['text', 'image', 'file']
-      window.open('#/material/' + contentType[this.activeName])
+      window.open('#/customerMaintain/material/' + contentType[this.activeName])
     },
     // 选择素材确认按钮
     submitSelectMaterial(text, image, file) {

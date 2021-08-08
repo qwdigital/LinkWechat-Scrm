@@ -259,8 +259,7 @@
 </template>
 <script>
 var elementResizeDetectorMaker = require('element-resize-detector')
-import { arrData } from '@/utils/common.js'
-import { content } from '@/api/content.js'
+import { content } from '@/api/conversation/content.js'
 import echarts from 'echarts'
 export default {
   name: 'Index',
@@ -319,12 +318,6 @@ export default {
     }
   },
   methods: {
-    canvansData(obj, name, arr, btmarr, color) {
-      let bkdata = arrData(this.erchatsTable.dataList)
-      let data = bkdata[arr]
-      this.xAxis = bkdata[btmarr]
-      this.drawLine(obj, name, data, color)
-    },
     timeTypeCheck(type) {
       switch (type) {
         case 'today':
@@ -360,10 +353,25 @@ export default {
       })
     },
     serErchat() {
-      this.canvansData('main', ['发起申请数'], 'arr1', 'btm1', '#088AEE')
-      this.canvansData('main2', ['新增客户数'], 'arr2', 'btm2', '#E74E59')
-      this.canvansData('main3', ['群新增人数'], 'arr3', 'btm3', '#14BF48')
-      this.canvansData('main4', ['流失客户数'], 'arr4', 'btm4', '#FA7216')
+      let data = {
+        arr1: [],
+        arr2: [],
+        arr3: [],
+        arr4: [],
+        time: []
+      }
+      this.erchatsTable.dataList.forEach((a) => {
+        data.arr1.push(a.newApplyCnt)
+        data.time.push(a.xtime)
+        data.arr3.push(a.newMemberCnt)
+        data.arr2.push(a.newContactCnt)
+        data.arr4.push(a.negativeFeedbackCnt)
+      })
+      this.xAxis = data.time
+      this.drawLine('main', ['发起申请数'], data.arr1, '#088AEE')
+      this.drawLine('main2', ['新增客户数'], data.arr2, '#E74E59')
+      this.drawLine('main3', ['群新增人数'], data.arr3, '#14BF48')
+      this.drawLine('main4', ['流失客户数'], data.arr4, '#FA7216')
     },
     drawLine(id, arrData, data, color) {
       let obj = document.getElementById(id)

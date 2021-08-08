@@ -7,7 +7,7 @@ const service = window.CONFIG.services.wecom + '/weapp'
  */
 export function getList() {
   return request({
-    url: service + '/list',
+    url: service + '/list'
   })
 }
 
@@ -30,6 +30,15 @@ export function update(data) {
   return request({
     url: service + '/updateWeApp',
     method: 'put',
-    data,
+    data
+  })
+}
+
+// 添加
+export function add(data) {
+  return request({
+    url: service + '/addWeApp',
+    method: 'post',
+    data
   })
 }

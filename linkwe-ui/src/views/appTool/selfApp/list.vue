@@ -1,5 +1,5 @@
 <script>
-import { getList, update } from '@/api/appTool/selfApp'
+import { getList, update, add } from '@/api/appTool/selfApp'
 // import clipboard from "clipboard";
 
 export default {
@@ -73,7 +73,7 @@ export default {
     submit() {
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          update(this.form)
+          ;(this.form.id ? update : add)(this.form)
             .then(() => {
               this.msgSuccess('操作成功')
               this.dialogVisible = false
@@ -262,6 +262,8 @@ export default {
     display: flex;
     border: 1px solid #eee;
     margin: 0 20px 20px 0;
+    background: #fff;
+    border-radius: 6px;
     .el-image {
       margin-right: 10px;
       width: 50px;

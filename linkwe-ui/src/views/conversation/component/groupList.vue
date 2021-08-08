@@ -1,41 +1,30 @@
 <template>
   <div class="list" v-loading="loading">
-    <div v-if="personList">
+    <div v-if="personList.length">
       <ul>
         <li
           v-for="(item, index) in personList"
           :key="index"
           @click="liClick(item)"
         >
-          <el-row
-            style="padding:10px"
-            v-if="item.finalChatContext.msgtype == 'text'"
-          >
-            <span class="fl">
-              <div class="ninebox">
-                <ul v-if="item.roomInfo">
-                  <li
-                    v-for="(a, i) in item.roomInfo.avatar.split(',')"
-                    :key="i"
-                  >
-                    <img :src="a" />
-                  </li>
-                </ul>
-              </div>
-            </span>
-            <span class="fl" style="margin-left:8px;line-height:60px">
+          <el-row type="flex" v-if="item.msgType == 'text'">
+            <div class="ninebox">
+              <ul v-if="item.avatar">
+                <li v-for="(a, i) in item.avatar.split(',')" :key="i">
+                  <img :src="a" />
+                </li>
+              </ul>
+            </div>
+            <div class="fl" style="margin-left:8px;line-height:60px">
               <p>
-                {{ item.finalChatContext.roomInfo.name }}
-                <span class="fr gray">{{
-                  parseTime(item.finalChatContext.fromInfo.updateTime)
-                }}</span>
+                {{ item.name }}
+                <!-- <span class="fr gray">{{ item.msgTime }}</span> -->
               </p>
-              <p class="gray" v-if="item.finalChatContext.fromInfo">
-                {{ item.finalChatContext.fromInfo.name }}:{{
-                  item.finalChatContext.text.content
-                }}
-              </p>
-            </span>
+              <!-- <p class="gray" v-if="item">
+                {{ item.name }}:
+                {{ item.content }}
+              </p> -->
+            </div>
           </el-row>
           <!-- <el-row style="padding:10px" v-if="item.finalChatContext.msgtype=='file'">
                 <el-col :span="3">&nbsp;</el-col>
@@ -43,13 +32,15 @@
                    <p><span class="fr gray">{{parseTime(item.finalChatContext.msgtime)}}</span></p>
                    <p class="gray padt10" >{{item.finalChatContext.from}}:
                        <span v-if="item.finalChatContext.file.fileext=='mp4'">[视频]</span>
-                       </p>     
+                       </p>
                 </el-col>
                 </el-row>   -->
         </li>
       </ul>
     </div>
-    <div v-else></div>
+    <div class="ac" v-else>
+      暂无数据
+    </div>
   </div>
 </template>
 <script>
@@ -80,6 +71,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .ninebox {
+  flex: none;
   width: 54px;
   height: 52px;
   border: 1px solid #199ed8;
@@ -93,6 +85,7 @@ export default {
 }
 .list {
   overflow-y: scroll;
+  height: calc(100vh - 328px);
 
   ::-webkit-scrollbar {
     display: none;

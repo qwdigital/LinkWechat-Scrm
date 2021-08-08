@@ -218,7 +218,11 @@ export default {
   components: { PhoneDialog, SelectMaterial, SelectCustomerGroup },
   data() {
     const checkContent = (rule, value, callback) => {
-      if (!this.form.content && this.form.picList.length === 0 && this.form.materialIdList.length === 0) {
+      if (
+        !this.form.content &&
+        this.form.picList.length === 0 &&
+        this.form.materialIdList.length === 0
+      ) {
         callback(new Error('该项为必填项'))
       } else {
         callback()
@@ -246,7 +250,10 @@ export default {
       pickerOptions: {
         disabledDate(time) {
           // return time.getTime() < Date.now()
-          return time.getTime() < new Date(new Date(new Date().toLocaleDateString()).getTime())
+          return (
+            time.getTime() <
+            new Date(new Date(new Date().toLocaleDateString()).getTime())
+          )
         }
       },
       uploadImageUrl: '',
@@ -256,9 +263,7 @@ export default {
         ruleName: [
           { required: true, message: '该项为必填项', trigger: 'blur' }
         ],
-        title: [
-          { required: true, message: '该项为必填项', trigger: 'blur' }
-        ],
+        title: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
         chatIdList: [
           { required: true, message: '该项为必填项', trigger: 'change' }
         ],
@@ -268,8 +273,8 @@ export default {
         content: [
           // { required: true, message: '该项为必填项', trigger: 'change' },
           { validator: checkContent, trigger: 'change' }
-        ],
-      }),
+        ]
+      })
     }
   },
   watch: {
@@ -279,7 +284,7 @@ export default {
         this.form.startExeTime = ''
         this.form.stopExeTime = ''
       } else {
-        [ this.form.startExeTime, this.form.stopExeTime ] = dateRange
+        ;[this.form.startExeTime, this.form.stopExeTime] = dateRange
       }
     },
     customerGroups(groups) {
@@ -293,11 +298,11 @@ export default {
   },
   computed: {
     imageMaterialUrls() {
-      const urls = this.imageMaterialList.map(m => m.materialUrl)
+      const urls = this.imageMaterialList.map((m) => m.materialUrl)
       return urls
     },
     messageList() {
-      const texts = this.textMaterialList.map(t => t.content)
+      const texts = this.textMaterialList.map((t) => t.content)
       return texts
     },
     imageList() {
@@ -313,37 +318,44 @@ export default {
     /** 获取详情 */
     getDetail(id) {
       this.loading = true
-      getDetail(id)
-        .then(({ data }) => {
-          this.dateRange = [data.startExeTime || '', data.stopExeTime || '']
-          this.customerGroups = data.groupList || []
+      getDetail(id).then(({ data }) => {
+        this.dateRange = [data.startExeTime || '', data.stopExeTime || '']
+        this.customerGroups = data.groupList || []
 
-          this.form.ruleName = data.ruleName || ''
-          this.form.title = data.title || ''
-          this.form.content = data.content || ''
-          this.form.picList = data.picList || []
+        this.form.ruleName = data.ruleName || ''
+        this.form.title = data.title || ''
+        this.form.content = data.content || ''
+        this.form.picList = data.picList || []
 
-          this.form.materialIdList = []
+        this.form.materialIdList = []
 
-          const materialList = data.materialList || []
+        const materialList = data.materialList || []
 
-          for (let material of materialList) {
-            if (material.materialUrl) {
-              this.imageMaterialList.push(material)
-            } else {
-              this.textMaterialList.push(material)
-            }
-
-            this.form.materialIdList.push(material.id)
+        for (let material of materialList) {
+          if (material.materialUrl) {
+            this.imageMaterialList.push(material)
+          } else {
+            this.textMaterialList.push(material)
           }
 
-          this.loading = false
-        })
+          this.form.materialIdList.push(material.id)
+        }
+
+        this.loading = false
+      })
     },
     // 选择素材确认按钮
     submitSelectMaterial(text, image, file) {
-      text && text.id && !this.form.materialIdList.includes(text.id) && this.form.materialIdList.push(text.id) && this.textMaterialList.push(text)
-      image && image.id && !this.form.materialIdList.includes(image.id) && this.form.materialIdList.push(image.id) && this.imageMaterialList.push(image)
+      text &&
+        text.id &&
+        !this.form.materialIdList.includes(text.id) &&
+        this.form.materialIdList.push(text.id) &&
+        this.textMaterialList.push(text)
+      image &&
+        image.id &&
+        !this.form.materialIdList.includes(image.id) &&
+        this.form.materialIdList.push(image.id) &&
+        this.imageMaterialList.push(image)
       this.$refs.form.validateField('content')
     },
     // 选择客户群聊确认
@@ -379,22 +391,25 @@ export default {
       })
     },
     goRoute() {
-      const pathName = this.activeName === '0' ? 'Text' : 'Image'
-
-      this.$router.push({
-        name: pathName,
-      })
+      let contentType = ['text', 'image', 'file']
+      window.open('#/customerMaintain/material/' + contentType[this.activeName])
     },
     removeImage(url) {
       this.form.picList.splice(this.form.picList.indexOf(url), 1)
     },
     removeImageMaterial(image) {
       this.imageMaterialList.splice(this.imageMaterialList.indexOf(image), 1)
-      this.form.materialIdList.splice(this.form.materialIdList.indexOf(image.id), 1)
+      this.form.materialIdList.splice(
+        this.form.materialIdList.indexOf(image.id),
+        1
+      )
     },
     removeTextMaterial(text) {
       this.textMaterialList.splice(this.textMaterialList.indexOf(text), 1)
-      this.form.materialIdList.splice(this.form.materialIdList.indexOf(text.id), 1)
+      this.form.materialIdList.splice(
+        this.form.materialIdList.indexOf(text.id),
+        1
+      )
     }
   }
 }
@@ -402,12 +417,7 @@ export default {
 
 <template>
   <div class="wrap" v-loading="loading">
-    <el-form
-      :model="form"
-      ref="form"
-      :rules="rules"
-      label-width="100px"
-    >
+    <el-form :model="form" ref="form" :rules="rules" label-width="100px">
       <el-form-item label="规则名称" prop="ruleName">
         <el-input
           v-model="form.ruleName"
@@ -444,10 +454,7 @@ export default {
           clearable
         ></el-input>
       </el-form-item>
-      <el-form-item
-        label="执行时间"
-        prop="startExeTime"
-      >
+      <el-form-item label="执行时间" prop="startExeTime">
         <el-date-picker
           v-model="dateRange"
           value-format="yyyy-MM-dd HH:mm:ss"
@@ -505,11 +512,7 @@ export default {
                   @click="removeImageMaterial(image)"
                 ></el-button>
               </div>
-              <div
-                v-for="url in form.picList"
-                :key="url"
-                class="image-wrapper"
-              >
+              <div v-for="url in form.picList" :key="url" class="image-wrapper">
                 <el-image :src="url" fit="fit"></el-image>
                 <el-button
                   icon="el-icon-close"
@@ -519,10 +522,7 @@ export default {
                 ></el-button>
               </div>
 
-              <upload
-                :fileUrl.sync="uploadImageUrl"
-                class="image-uploader"
-              >
+              <upload :fileUrl.sync="uploadImageUrl" class="image-uploader">
                 <i class="el-icon-plus uploader-icon"></i>
               </upload>
             </el-tab-pane>
@@ -655,7 +655,8 @@ export default {
     top: 5px;
   }
 }
-.text-wrapper, .image-wrapper {
+.text-wrapper,
+.image-wrapper {
   margin: 5px;
 
   .remove-btn {

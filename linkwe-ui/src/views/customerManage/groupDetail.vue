@@ -22,7 +22,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         groupId: undefined,
-        memberName: undefined,
+        name: undefined,
       },
       joinScene: {
         1: '由成员邀请入群（直接邀请入群）',
@@ -81,7 +81,7 @@ export default {
     <el-input
       size="normal"
       placeholder="请输入群成员"
-      v-model="query.memberName"
+      v-model="query.name"
       class
     >
       <el-button type="primary" slot="append" @click="getList(1)">
@@ -94,9 +94,9 @@ export default {
       @selection-change="handleSelectionChange"
     >
       <el-table-column width="55" />
-      <el-table-column label="群成员" prop="memberName">
+      <el-table-column label="群成员" prop="name">
         <template slot-scope="scope">
-          {{ scope.row.memberName }}
+          {{ scope.row.name }}
           <!-- <span
             :style="{color: scope.row.joinType == 1 ? '#4bde03' : '#f9a90b'}"
           >{{ ({1: '@微信', 2: '@企业微信'})[scope.row.joinType] }}</span>-->

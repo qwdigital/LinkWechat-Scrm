@@ -1,6 +1,6 @@
 <template>
   <div class="list" v-loading="loading">
-    <div v-if="personList.length >= 1">
+    <div v-if="personList.length">
       <ul>
         <li
           v-for="(item, index) in personList"
@@ -8,17 +8,17 @@
           @click="liClick(item)"
         >
           <el-row style="padding:10px">
-            <span class="fl">
-              <img :src="item.finalChatContext.fromInfo.avatarMediaid"
-            /></span>
+            <span class="fl"> <img :src="item.avatar"/></span>
             <span class="fl" style="margin-left:8px">
-              <p>{{ item.finalChatContext.fromInfo.name }}</p>
+              <p>{{ item.name }}</p>
             </span>
           </el-row>
         </li>
       </ul>
     </div>
-    <div v-else></div>
+    <div class="ac" v-else>
+      暂无数据
+    </div>
   </div>
 </template>
 <script>
@@ -51,7 +51,8 @@ export default {
 <style lang="scss" scoped>
 .list {
   overflow-y: scroll;
-  height: 708px;
+  height: calc(100vh - 328px);
+
   ::-webkit-scrollbar {
     display: none;
   }

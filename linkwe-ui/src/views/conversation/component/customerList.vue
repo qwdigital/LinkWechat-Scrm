@@ -8,18 +8,14 @@
           @click="liClick(item)"
         >
           <el-row style="padding:10px">
-            <el-col :span="3"
-              ><img :src="item.receiveWeUser.avatarMediaid"
-            /></el-col>
+            <el-col :span="3"><img :src="item.avatar"/></el-col>
             <el-col :span="21">
               <p>
-                {{ item.receiveWeUser.name }}
-                <span class="fr gray">{{
-                  parseTime(item.finalChatContext.msgtime)
-                }}</span>
+                {{ item.name }}
+                <span class="fr gray">{{ item.msgTime }}</span>
               </p>
-              <p class="gray padt10" v-if="item.finalChatContext.text">
-                {{ item.finalChatContext.text.content }}
+              <p class="gray padt10" v-if="item.contact">
+                {{ JSON.parse(item.contact).content }}
               </p>
             </el-col>
           </el-row>
@@ -58,7 +54,7 @@ export default {
 <style lang="scss" scoped>
 .list {
   overflow-y: scroll;
-  height: 651px;
+  height: calc(100vh - 328px);
   ::-webkit-scrollbar {
     display: none;
   }
