@@ -14,7 +14,7 @@
             </el-input>
           </div>
         </div>
-        <div class="ct_box ct_boxFirst">
+        <div class="ct_box ct_boxFirst" style="height: calc(100vh - 288px)">
           <ul>
             <li
               v-for="(i, t) in CList"
@@ -289,7 +289,7 @@ export default {
   methods: {
     chatFn(data) {
       this.chatData = data
-      console.log(data,"<><><><>><")
+      console.log(data, '<><><><>><')
       this.activeNameThreeClick()
     },
     groupFn(data) {
@@ -317,7 +317,7 @@ export default {
         this.loading = true
       }
       this.personList = []
-      if(this.activeName == '0'){
+      if (this.activeName == '0') {
         content
           .selectAloneChatList({
             fromId: this.fromId,
@@ -330,7 +330,7 @@ export default {
           .catch((err) => {
             this.loading = false
           })
-      }else {
+      } else {
         content
           .getGroupChatList({
             fromId: this.fromId
@@ -417,7 +417,7 @@ export default {
       })
     },
     chatMsgList() {
-      this.getChatList();
+      this.getChatList()
     }
   },
   mounted() {
@@ -440,7 +440,6 @@ export default {
 
 .employ {
   background: #f6f6f9;
-  min-height: 800px;
 
   .hd_tabs {
     background: #fff;
@@ -460,7 +459,6 @@ export default {
 
   .hd_tabs_content {
     width: 100%;
-    min-height: 653px;
     border-bottom: 1px solid #efefef;
   }
 
@@ -472,13 +470,11 @@ export default {
   }
 
   .ct_boxFirst {
-    height: 700px;
   }
 
   .ct_box {
     background: white;
     border-bottom: 1px solid #efefef;
-    min-height: 709px;
     padding: 10px;
     overflow-y: scroll;
     color: #999;

@@ -9,253 +9,258 @@
             </el-input>
           </div>
         </div> -->
-        <div class="ct_box ct_boxFirst">
+        <div class="ct_box ct_boxFirst" style="height: calc(100vh - 197px)">
           <el-tree
+            ref="tree"
             class="filter-tree"
             :data="treeData"
             :props="defaultProps"
             :filter-node-method="filterNode"
-            ref="tree"
+            highlight-current
             @node-click="handleNodeClick"
             :default-expand-all="true"
           >
           </el-tree>
         </div>
       </el-col>
-      <el-col :span="6" class="borderR">
-        <div class="hd_box">
-          <div class="hd_name">{{ talkName }}</div>
-        </div>
-        <div class="hd_tabs">
-          <el-tabs v-model="activeName" @tab-click="tabClick(true)">
-            <el-tab-pane label="内部联系人" name="0">
-              <div class="ct_box">
-                <insideList
-                  v-if="activeName == 0"
+      <template v-if="talkName">
+        <el-col :span="6" class="borderR">
+          <div class="hd_box">
+            <div class="hd_name">{{ talkName }}</div>
+          </div>
+          <div class="hd_tabs">
+            <el-tabs v-model="activeName" @tab-click="tabClick(true)">
+              <el-tab-pane label="内部联系人" name="0">
+                <div class="ct_box">
+                  <insideList
+                    v-if="activeName == 0"
+                    :personList="personList"
+                    :loading="loading"
+                    @chatFn="chatFn"
+                  >
+                  </insideList>
+                </div>
+              </el-tab-pane>
+              <el-tab-pane label="外部联系人" name="1">
+                <list
+                  class="ct_box"
+                  v-if="activeName == 1"
                   :personList="personList"
                   :loading="loading"
                   @chatFn="chatFn"
                 >
-                </insideList>
-              </div>
-            </el-tab-pane>
-            <el-tab-pane label="外部联系人" name="1">
-              <list
-                v-if="activeName == 1"
-                :personList="personList"
-                :loading="loading"
-                @chatFn="chatFn"
-              >
-              </list>
-            </el-tab-pane>
-            <el-tab-pane label="群聊" name="2">
-              <grouplist
-                v-if="activeName == 2"
-                :personList="personList"
-                :loading="loading"
-                @groupFn="groupFn"
-              >
-              </grouplist>
-            </el-tab-pane>
-          </el-tabs>
-        </div>
-      </el-col>
-      <el-col :span="12">
-        <div class="hd_box">
-          <div class="hd_name">
-            <span v-if="chat.receiveWeCustomer">
-              与{{ chat.receiveWeCustomer.name }}的聊天</span
-            >
-            <span class="fr hd_nameRi">下载会话</span>
+                </list>
+              </el-tab-pane>
+              <el-tab-pane label="群聊" name="2">
+                <grouplist
+                  class="ct_box"
+                  v-if="activeName == 2"
+                  :personList="personList"
+                  :loading="loading"
+                  @groupFn="groupFn"
+                >
+                </grouplist>
+              </el-tab-pane>
+            </el-tabs>
           </div>
-        </div>
-        <div class=" hd_tabthree">
-          <el-tabs
-            v-model="activeNameThree"
-            @tab-click="activeNameThreeClick()"
-          >
-            <el-tab-pane label="全部" name="0">
-              <div class="ct_box">
-                <div class="hds_time">
-                  <el-date-picker
-                    v-model="takeTime"
-                    type="datetimerange"
-                    format="yyyy-MM-dd"
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    align="right"
-                    @change="activeNameThreeClick"
+        </el-col>
+        <el-col :span="12">
+          <div class="hd_box">
+            <div class="hd_name">
+              <span v-if="chat.receiveWeCustomer">
+                与{{ chat.receiveWeCustomer.name }}的聊天</span
+              >
+              <span class="fr hd_nameRi">下载会话</span>
+            </div>
+          </div>
+          <div class=" hd_tabthree">
+            <el-tabs
+              v-model="activeNameThree"
+              @tab-click="activeNameThreeClick()"
+            >
+              <el-tab-pane label="全部" name="0">
+                <div class="ct_box">
+                  <div class="hds_time">
+                    <el-date-picker
+                      v-model="takeTime"
+                      type="datetimerange"
+                      format="yyyy-MM-dd"
+                      range-separator="至"
+                      start-placeholder="开始日期"
+                      end-placeholder="结束日期"
+                      align="right"
+                      @change="activeNameThreeClick"
+                    >
+                    </el-date-picker>
+                  </div>
+                  <chat
+                    :allChat="allChat"
+                    v-if="allChat && allChat.length >= 1"
+                  ></chat>
+                  <el-pagination
+                    background
+                    v-if="allChat && allChat.length >= 1"
+                    layout="prev, pager, next"
+                    class="pagination"
+                    :current-page="currentPage"
+                    @current-change="currentChange"
+                    :total="total"
                   >
-                  </el-date-picker>
+                  </el-pagination>
                 </div>
-                <chat
-                  :allChat="allChat"
-                  v-if="allChat && allChat.length >= 1"
-                ></chat>
-                <el-pagination
-                  background
-                  v-if="allChat && allChat.length >= 1"
-                  layout="prev, pager, next"
-                  class="pagination"
-                  :current-page="currentPage"
-                  @current-change="currentChange"
-                  :total="total"
-                >
-                </el-pagination>
-              </div>
-            </el-tab-pane>
-            <el-tab-pane label="图片及视频" name="1">
-              <div class="ct_box">
-                <div class="hds_time">
-                  <el-date-picker
-                    v-model="takeTime"
-                    type="datetimerange"
-                    format="yyyy-MM-dd"
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    align="right"
-                    @change="activeNameThreeClick"
+              </el-tab-pane>
+              <el-tab-pane label="图片及视频" name="1">
+                <div class="ct_box">
+                  <div class="hds_time">
+                    <el-date-picker
+                      v-model="takeTime"
+                      type="datetimerange"
+                      format="yyyy-MM-dd"
+                      range-separator="至"
+                      start-placeholder="开始日期"
+                      end-placeholder="结束日期"
+                      align="right"
+                      @change="activeNameThreeClick"
+                    >
+                    </el-date-picker>
+                  </div>
+                  <chat
+                    :allChat="allChatImg"
+                    v-if="allChatImg && allChatImg.length >= 1"
+                  ></chat>
+                  <el-pagination
+                    background
+                    v-if="allChatImg && allChatImg.length >= 1"
+                    class="pagination"
+                    layout="prev, pager, next"
+                    :total="total"
+                    @current-change="currentChange"
+                    :current-page="currentPage"
                   >
-                  </el-date-picker>
+                  </el-pagination>
                 </div>
-                <chat
-                  :allChat="allChatImg"
-                  v-if="allChatImg && allChatImg.length >= 1"
-                ></chat>
-                <el-pagination
-                  background
-                  v-if="allChatImg && allChatImg.length >= 1"
-                  class="pagination"
-                  layout="prev, pager, next"
-                  :total="total"
-                  @current-change="currentChange"
-                  :current-page="currentPage"
-                >
-                </el-pagination>
-              </div>
-            </el-tab-pane>
-            <el-tab-pane label="文件" name="2">
-              <div class="ct_box">
-                <div class="hds_time">
-                  <el-date-picker
-                    v-model="takeTime"
-                    type="datetimerange"
-                    format="yyyy-MM-dd"
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    align="right"
-                    @change="activeNameThreeClick"
+              </el-tab-pane>
+              <el-tab-pane label="文件" name="2">
+                <div class="ct_box">
+                  <div class="hds_time">
+                    <el-date-picker
+                      v-model="takeTime"
+                      type="datetimerange"
+                      format="yyyy-MM-dd"
+                      range-separator="至"
+                      start-placeholder="开始日期"
+                      end-placeholder="结束日期"
+                      align="right"
+                      @change="activeNameThreeClick"
+                    >
+                    </el-date-picker>
+                  </div>
+                  <el-table
+                    :data="allFile"
+                    stripe
+                    style="width: 100%"
+                    :header-cell-style="{ background: '#fff' }"
                   >
-                  </el-date-picker>
+                    <el-table-column prop="msgtype" label="类型">
+                    </el-table-column>
+                    <el-table-column label="名称">
+                      <template slot-scope="scope">
+                        {{ scope.row.file.filename }}
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="大小">
+                      <template slot-scope="scope">
+                        {{ filterSize(scope.row.file.filesize) }}
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="action" label="来源">
+                      <template slot-scope="scope">
+                        {{ scope.row.tolist[0] }}
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="action" label="操作">
+                      <template slot-scope="scope">
+                        <el-button
+                          type="text"
+                          size="small"
+                          @click="downloadFile(scope.row)"
+                          >下载</el-button
+                        >
+                      </template>
+                    </el-table-column>
+                  </el-table>
                 </div>
-                <el-table
-                  :data="allFile"
-                  stripe
-                  style="width: 100%"
-                  :header-cell-style="{ background: '#fff' }"
-                >
-                  <el-table-column prop="msgtype" label="类型">
-                  </el-table-column>
-                  <el-table-column label="名称">
-                    <template slot-scope="scope">
-                      {{ scope.row.file.filename }}
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="大小">
-                    <template slot-scope="scope">
-                      {{ filterSize(scope.row.file.filesize) }}
-                    </template>
-                  </el-table-column>
-                  <el-table-column prop="action" label="来源">
-                    <template slot-scope="scope">
-                      {{ scope.row.tolist[0] }}
-                    </template>
-                  </el-table-column>
-                  <el-table-column prop="action" label="操作">
-                    <template slot-scope="scope">
-                      <el-button
-                        type="text"
-                        size="small"
-                        @click="downloadFile(scope.row)"
-                        >下载</el-button
-                      >
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </div>
-            </el-tab-pane>
-            <el-tab-pane label="链接" name="3">
-              <div class="ct_box">
-                <div class="hds_time">
-                  <el-date-picker
-                    v-model="takeTime"
-                    type="datetimerange"
-                    format="yyyy-MM-dd"
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    align="right"
-                    @change="activeNameThreeClick"
+              </el-tab-pane>
+              <el-tab-pane label="链接" name="3">
+                <div class="ct_box">
+                  <div class="hds_time">
+                    <el-date-picker
+                      v-model="takeTime"
+                      type="datetimerange"
+                      format="yyyy-MM-dd"
+                      range-separator="至"
+                      start-placeholder="开始日期"
+                      end-placeholder="结束日期"
+                      align="right"
+                      @change="activeNameThreeClick"
+                    >
+                    </el-date-picker>
+                  </div>
+                </div>
+              </el-tab-pane>
+              <el-tab-pane label="语音通话" name="4">
+                <div class="ct_box">
+                  <div class="hds_time">
+                    <el-date-picker
+                      v-model="takeTime"
+                      type="datetimerange"
+                      format="yyyy-MM-dd"
+                      range-separator="至"
+                      start-placeholder="开始日期"
+                      end-placeholder="结束日期"
+                      align="right"
+                      @change="activeNameThreeClick"
+                    >
+                    </el-date-picker>
+                  </div>
+                  <el-table
+                    :data="allVoice"
+                    stripe
+                    style="width: 100%"
+                    :header-cell-style="{ background: '#fff' }"
                   >
-                  </el-date-picker>
+                    <el-table-column prop="date" label="发起人">
+                      <template slot-scope="scope">
+                        {{ scope.row.name }}
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="name" label="通话时间">
+                      <template slot-scope="scope">
+                        {{ scope.row.msgTime }}
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="address" label="时长">
+                      <template slot-scope="scope">
+                        {{ JSON.parse(scope.row.contact).play_length }}s
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="address" label="操作">
+                      <template slot-scope="scope">
+                        <el-button
+                          type="text"
+                          size="small"
+                          @click="voiceLook(JSON.parse(scope.row.contact))"
+                          >查看</el-button
+                        >
+                      </template>
+                    </el-table-column>
+                  </el-table>
                 </div>
-              </div>
-            </el-tab-pane>
-            <el-tab-pane label="语音通话" name="4">
-              <div class="ct_box">
-                <div class="hds_time">
-                  <el-date-picker
-                    v-model="takeTime"
-                    type="datetimerange"
-                    format="yyyy-MM-dd"
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    align="right"
-                    @change="activeNameThreeClick"
-                  >
-                  </el-date-picker>
-                </div>
-                <el-table
-                  :data="allVoice"
-                  stripe
-                  style="width: 100%"
-                  :header-cell-style="{ background: '#fff' }"
-                >
-                  <el-table-column prop="date" label="发起人">
-                    <template slot-scope="scope">
-                      {{ scope.row.name }}
-                    </template>
-                  </el-table-column>
-                  <el-table-column prop="name" label="通话时间">
-                    <template slot-scope="scope">
-                      {{ scope.row.msgTime }}
-                    </template>
-                  </el-table-column>
-                  <el-table-column prop="address" label="时长">
-                    <template slot-scope="scope">
-                      {{ JSON.parse(scope.row.contact).play_length }}s
-                    </template>
-                  </el-table-column>
-                  <el-table-column prop="address" label="操作">
-                    <template slot-scope="scope">
-                      <el-button
-                        type="text"
-                        size="small"
-                        @click="voiceLook(JSON.parse(scope.row.contact))"
-                        >查看</el-button
-                      >
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </div>
-            </el-tab-pane>
-          </el-tabs>
-        </div>
-      </el-col>
+              </el-tab-pane>
+            </el-tabs>
+          </div>
+        </el-col>
+      </template>
     </el-row>
   </div>
 </template>
@@ -286,7 +291,7 @@ export default {
         label: 'name',
         children: 'children'
       },
-      activeName: '1',
+      activeName: '0',
       activeNameThree: '0',
       takeTime: '',
       fileData: [],
@@ -362,7 +367,7 @@ export default {
       this.activeNameThreeClick(true)
     },
     activeNameThreeClick(page, group) {
-      console.log(this.chat.receiver,this.fromId, 'this.chat.id')
+      console.log(this.chat.receiver, this.fromId, 'this.chat.id')
       if (!!!this.chat.receiver) {
         return //没有选择人
       }
@@ -386,16 +391,16 @@ export default {
           msgType,
           pageSize: '10',
           pageNum: this.currentPage,
-          orderByColumn: "msg_time",
-          isAsc: "asc",
+          orderByColumn: 'msg_time',
+          isAsc: 'asc',
           beginTime: this.takeTime ? yearMouthDay(this.takeTime[0]) : '',
           endTime: this.takeTime ? yearMouthDay(this.takeTime[1]) : ''
         }
         if (this.activeName != '2') {
           query.fromId = this.fromId
-          query.toList =  this.chat.receiver
-        }else {
-          query.roomId =  this.chat.receiver
+          query.toList = this.chat.receiver
+        } else {
+          query.roomId = this.chat.receiver
         }
         content.chatList(query).then((res) => {
           console.log(res.rows, 'ssss')
@@ -446,7 +451,7 @@ export default {
       if (flag) {
         this.loading = true
       }
-      if(this.activeName == 0){
+      if (this.activeName == 0) {
         content
           .getInternalChatList({
             fromId: this.fromId
@@ -458,7 +463,7 @@ export default {
           .catch((err) => {
             this.loading = false
           })
-      }else if(this.activeName == 1){
+      } else if (this.activeName == 1) {
         content
           .getExternalChatList({
             fromId: this.fromId
@@ -470,7 +475,7 @@ export default {
           .catch((err) => {
             this.loading = false
           })
-      }else {
+      } else {
         content
           .getGroupChatList({
             fromId: this.fromId
@@ -483,7 +488,6 @@ export default {
             this.loading = false
           })
       }
-
     },
     filterNode(value, data) {
       console.log(value, data)
@@ -527,7 +531,6 @@ export default {
 
 .employ {
   background: #f6f6f9;
-  min-height: 800px;
 
   .hd_tabs {
     background: #fff;
@@ -560,12 +563,11 @@ export default {
   }
 
   .ct_boxFirst {
-    height: 800px !important;
   }
 
   .ct_box {
     background: white;
-    height: 710px;
+    height: calc(100vh - 286px);
     padding: 10px;
     overflow-y: scroll;
     border-bottom: 1px solid #efefef;
