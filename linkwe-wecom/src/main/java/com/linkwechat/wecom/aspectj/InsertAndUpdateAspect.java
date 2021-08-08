@@ -2,6 +2,7 @@ package com.linkwechat.wecom.aspectj;
 
 
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.SecurityUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -50,8 +51,9 @@ public class InsertAndUpdateAspect {
     private void isInsertBaseEntity(Object arg) {
         if (arg instanceof BaseEntity) {
             BaseEntity next1 = (BaseEntity) arg;
-            next1.setCreateBy(SecurityUtils.getUsername());
-            next1.setUpdateBy(SecurityUtils.getUsername());
+            String userName = getUserName();
+            next1.setCreateBy(userName);
+            next1.setUpdateBy(userName);
             Date date = new Date();
             if (next1.getCreateTime() == null) {
                 next1.setCreateTime(date);
@@ -60,6 +62,16 @@ public class InsertAndUpdateAspect {
                 next1.setUpdateTime(date);
             }
         }
+    }
+
+    private String getUserName() {
+        String userName;
+        try {
+            userName = SecurityUtils.getUsername();
+        } catch (CustomException e){
+            userName = "admin";
+        }
+        return userName;
     }
 
     @Before(value = "executeUpdate()")
@@ -73,7 +85,7 @@ public class InsertAndUpdateAspect {
                     for (Object next : collection) {
                         if (next instanceof BaseEntity) {
                             BaseEntity next1 = (BaseEntity) next;
-                            next1.setUpdateBy(SecurityUtils.getUsername());
+                            next1.setUpdateBy(getUserName());
                             Date date = new Date();
                             if (next1.getUpdateTime() == null) {
                                 next1.setUpdateTime(date);
@@ -82,7 +94,7 @@ public class InsertAndUpdateAspect {
                     }
                 } else if (arg instanceof BaseEntity) {
                     BaseEntity arg1 = (BaseEntity) arg;
-                    arg1.setUpdateBy(SecurityUtils.getUsername());
+                    arg1.setUpdateBy(getUserName());
                     Date date = new Date();
                     if (arg1.getUpdateTime() == null) {
                         arg1.setUpdateTime(date);
