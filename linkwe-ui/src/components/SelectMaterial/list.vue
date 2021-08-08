@@ -79,7 +79,7 @@ export default {
 
 <template>
   <div>
-    <el-form ref="form" :model="query" label-width="80px">
+    <el-form ref="form" :model="query" label-width="70px">
       <el-form-item label="选择分组">
         <el-cascader
           v-model="query.categoryId"
@@ -143,7 +143,9 @@ export default {
               alt
             />
           </el-card>
-          <div class="mt10 toe">{{ item.materialName }}</div>
+          <div class="mt10 toe" :title="item.materialName">
+            {{ item.materialName }}
+          </div>
         </div>
       </el-radio>
     </el-radio-group>
