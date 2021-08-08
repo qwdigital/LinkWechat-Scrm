@@ -1,6 +1,6 @@
 package com.linkwechat.common.core.domain;
 
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
  * @create: 2021-07-13 15:25
  **/
 @Data
-@Builder
+@SuperBuilder
 public class FileVo {
     private  String fileName;
     private String url;

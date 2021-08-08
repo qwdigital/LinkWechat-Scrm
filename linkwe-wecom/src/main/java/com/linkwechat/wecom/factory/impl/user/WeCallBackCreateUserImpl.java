@@ -21,7 +21,7 @@ public class WeCallBackCreateUserImpl extends WeEventStrategy {
     @Override
     public void eventHandle(WxCpXmlMessageVO message) {
         try {
-            weUserService.insertWeUserNoToWeCom(setWeUserData(message));
+            weUserService.insert2Data(setWeUserData(message));
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

@@ -212,7 +212,7 @@ public class SysUserController extends BaseController
         if(null != loginUser){
             SysUser user = loginUser.getUser();
             if(null != user){
-                List<WeUser> weUsers = iWeUserService.selectWeUserList(WeUser.builder()
+                List<WeUser> weUsers = iWeUserService.getList(WeUser.builder()
                         .mobile(user.getPhonenumber())
                         .build());
                 if(CollectionUtil.isNotEmpty(weUsers)){

@@ -8,7 +8,7 @@ import com.linkwechat.common.annotation.Excel.Type;
 import com.linkwechat.common.annotation.Excels;
 import com.linkwechat.common.core.domain.BaseEntity;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -25,7 +25,7 @@ import java.util.List;
  * @author ruoyi
  */
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 public class SysUser extends BaseEntity
 {

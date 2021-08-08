@@ -3,7 +3,7 @@ package com.linkwechat.wecom.domain;
 import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.Data;
 
 
@@ -14,7 +14,7 @@ import lombok.Data;
  * @date 2020-10-04
  */
 @Data
-@Builder
+@SuperBuilder
 public class WeMsgTlpScope extends BaseEntity
 {
     private static final long serialVersionUID = 1L;

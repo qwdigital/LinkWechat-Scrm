@@ -19,38 +19,19 @@ import java.util.List;
 public interface WeUserMapper extends BaseMapper<WeUser>
 {
     /**
-     * 查询通讯录相关客户
-     *
-     * @param userId 通讯录相关客户ID
-     * @return 通讯录相关客户
-     */
-    public WeUser selectWeUserById(String userId);
-
-    /**
      * 查询通讯录相关客户列表
      * 
      * @param weUser 通讯录相关客户
      * @return 通讯录相关客户集合
      */
-    public List<WeUser> selectWeUserList(WeUser weUser);
+    public List<WeUser> getList(WeUser weUser);
 
     /**
-     * 新增通讯录相关客户
-     * 
-     * @param weUser 通讯录相关客户
-     * @return 结果
+     * 批量新增或更新
+     * @param weUserList 成员数据
+     * @return
      */
-    public int insertWeUser(WeUser weUser);
-
-    /**
-     * 修改通讯录相关客户
-     * 
-     * @param weUser 通讯录相关客户
-     * @return 结果
-     */
-    public int updateWeUser(WeUser weUser);
-
-
+    public void insertBatch(@Param("weUserList") List<WeUser> weUserList);
     /**
      * 离职未分配员工
      * @param weLeaveUserVo
@@ -65,23 +46,6 @@ public interface WeUserMapper extends BaseMapper<WeUser>
      * @return
      */
     public List<WeLeaveUserVo> leaveAllocateUserList(WeLeaveUserVo weLeaveUserVo);
-
-
-
-    /**
-     * 删除当前表的员工
-     * @return
-     */
-    public int  deleteWeUser();
-
-
-    /**
-     * 批量插入员工
-     * @param weUsers
-     * @return
-     */
-    public int batchInsertWeUser(@Param("weUsers") List<WeUser> weUsers);
-
 
     /**
      * 获取历史分配记录的成员

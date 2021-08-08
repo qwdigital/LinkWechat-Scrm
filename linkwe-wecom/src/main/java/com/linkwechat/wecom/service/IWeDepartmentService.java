@@ -20,7 +20,7 @@ public interface IWeDepartmentService extends IService<WeDepartment>
      * 
      * @return 企业微信组织架构相关集合
      */
-    public List<WeDepartment> selectWeDepartmentList();
+    public List<WeDepartment> getList();
 
     /**
      * 新增企业微信组织架构相关
@@ -28,9 +28,14 @@ public interface IWeDepartmentService extends IService<WeDepartment>
      * @param weDepartment 企业微信组织架构相关
      * @return 结果
      */
-    public void insertWeDepartment(WeDepartment weDepartment);
+    public void insert(WeDepartment weDepartment);
 
-    public int insertWeDepartmentNoToWeCom(WeDepartment weDepartment);
+    /**
+     * 新增部门
+     * @param weDepartment
+     * @return
+     */
+    public void insert2Data(WeDepartment weDepartment);
 
     /**
      * 修改企业微信组织架构相关
@@ -38,7 +43,7 @@ public interface IWeDepartmentService extends IService<WeDepartment>
      * @param weDepartment 企业微信组织架构相关
      * @return 结果
      */
-    public void updateWeDepartment(WeDepartment weDepartment);
+    public void update(WeDepartment weDepartment);
 
 
 
@@ -53,5 +58,13 @@ public interface IWeDepartmentService extends IService<WeDepartment>
      * 根据部门id删除部门
      * @param ids
      */
-    public void deleteWeDepartmentByIds(String[] ids);
+    public void deleteByIds(Long[] ids);
+
+    /**
+     * 根据部门id 查询部门信息
+     *
+     * @param deptId 部门id
+     * @return 企业微信组织架构相关集合
+     */
+    public WeDepartment getByDeptId(Long deptId);
 }

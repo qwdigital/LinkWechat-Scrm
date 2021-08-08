@@ -22,7 +22,7 @@ public class WeCallBackCreatePartyImpl extends WeEventStrategy {
     @Override
     public void eventHandle(WxCpXmlMessageVO message) {
         try {
-            weDepartmentService.insertWeDepartmentNoToWeCom(setWeDepartMent(message));
+            weDepartmentService.insert2Data(setWeDepartMent(message));
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

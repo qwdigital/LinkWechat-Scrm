@@ -5,6 +5,7 @@ import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * @author danmo
@@ -27,21 +28,21 @@ public abstract class WeEventStrategy {
                 .address(message.getAddress())
                 .telephone(message.getTelephone())
                 .mobile(message.getMobile())
-                .avatarMediaid(message.getAvatar())
+                .headImageUrl(message.getAvatar())
                 .position(message.getPosition())
                 .build();
         if (message.getStatus() != null) {
             weUser.setIsActivate(Integer.valueOf(message.getStatus()));
         }
         if (message.getIsLeaderInDept() != null) {
-            String[] isLeaderInDeptArr = Arrays.stream(message.getIsLeaderInDept())
-                    .map(String::valueOf).toArray(String[]::new);
-            weUser.setIsLeaderInDept(isLeaderInDeptArr);
+            String isLeaderInDeptStr = Arrays.stream(message.getIsLeaderInDept())
+                    .map(String::valueOf).collect(Collectors.joining(","));
+            weUser.setIsLeaderInDept(isLeaderInDeptStr);
         }
         if (message.getDepartments() != null) {
-            String[] departmentsArr = Arrays.stream(message.getDepartments())
-                    .map(String::valueOf).toArray(String[]::new);
-            weUser.setDepartment(departmentsArr);
+            String departmentsStr = Arrays.stream(message.getDepartments())
+                    .map(String::valueOf).collect(Collectors.joining(","));
+            weUser.setDepartment(departmentsStr);
         }
         return weUser;
     }
@@ -50,7 +51,7 @@ public abstract class WeEventStrategy {
     public WeDepartment setWeDepartMent(WxCpXmlMessageVO message){
         WeDepartment weDepartment = new WeDepartment();
         if (message.getId() != null) {
-            weDepartment.setId(message.getId());
+            weDepartment.setId(Long.parseLong(message.getId()));
         }
         if (message.getName() != null) {
             weDepartment.setName(message.getName());

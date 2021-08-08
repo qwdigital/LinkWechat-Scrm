@@ -1,6 +1,6 @@
 package com.linkwechat.wecom.domain.dto.tag;
 
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.Data;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
  * @create: 2020-10-20 13:03
  **/
 @Data
-@Builder
+@SuperBuilder
 public class WeFindCropTagParam {
     private String[] tag_id;
     private List<String> group_id;

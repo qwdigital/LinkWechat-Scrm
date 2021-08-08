@@ -1,7 +1,6 @@
 package com.linkwechat.wecom.factory;
 
 import com.linkwechat.common.constant.WeConstans;
-import me.chanjar.weixin.cp.bean.WxCpXmlMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

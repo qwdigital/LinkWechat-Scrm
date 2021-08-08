@@ -208,7 +208,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
         if (weSensitiveHitQuery.getScopeType().equals(WeConstans.USE_SCOP_BUSINESSID_TYPE_USER)) {
             userIds.add(weSensitiveHitQuery.getAuditScopeId());
         } else {
-            List<String> userIdList = weUserService.selectWeUserList(WeUser.builder().department(new String[]{weSensitiveHitQuery.getAuditScopeId()}).build())
+            List<String> userIdList = weUserService.getList(WeUser.builder().department(weSensitiveHitQuery.getAuditScopeId()).build())
                     .stream().filter(Objects::nonNull).map(WeUser::getUserId).collect(Collectors.toList());
             userIds.addAll(userIdList);
         }
@@ -244,7 +244,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
                 String userId = j.getString("from");
                 WeUser user = new WeUser();
                 user.setUserId(userId);
-                List<WeUser> uList = weUserService.selectWeUserList(user);
+                List<WeUser> uList = weUserService.getList(user);
                 if (CollectionUtils.isNotEmpty(uList)) {
                     json.put("from", uList.get(0).getName());
                     json.put("content", j.getString("content"));
@@ -305,7 +305,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
             if (scope.getScopeType().equals(WeConstans.USE_SCOP_BUSINESSID_TYPE_USER)) {
                 users.add(scope.getAuditScopeId());
             } else {
-                List<String> userIdList = weUserService.selectWeUserList(WeUser.builder().department(new String[]{scope.getAuditScopeId()}).build())
+                List<String> userIdList = weUserService.getList(WeUser.builder().department(scope.getAuditScopeId()).build())
                         .stream().filter(Objects::nonNull).map(WeUser::getUserId).collect(Collectors.toList());
                 users.addAll(userIdList);
             }

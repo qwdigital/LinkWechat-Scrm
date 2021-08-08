@@ -11,7 +11,7 @@ public class WeComException extends RuntimeException {
 
     protected String message;
 
-    private Integer code;
+    private Integer code = -1;
 
     public WeComException(String message)
     {

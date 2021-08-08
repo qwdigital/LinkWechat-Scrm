@@ -120,10 +120,8 @@ public class WeCustomerPortraitController extends BaseController {
      */
     @GetMapping(value = "/findAddaddEmployes/{externalUserid}")
     public AjaxResult findaddEmployes(@PathVariable String externalUserid){
-
-
         return AjaxResult.success(
-                iWeUserService.findWeUserByCutomerId(externalUserid)
+                iWeUserService.findWeUserByCustomerId(externalUserid)
         );
     }
 

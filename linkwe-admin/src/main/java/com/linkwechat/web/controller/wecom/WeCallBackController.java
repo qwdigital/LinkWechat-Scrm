@@ -9,9 +9,11 @@ import com.linkwechat.wecom.factory.WeCallBackEventFactory;
 import com.linkwechat.wecom.factory.WeEventHandle;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.security.AnyTypePermission;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.util.xml.XStreamInitializer;
-import me.chanjar.weixin.cp.bean.WxCpXmlMessage;
+import me.chanjar.weixin.cp.bean.message.WxCpXmlMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
  * @description 企微回调通知接口
  * @date 2020/11/6 17:31
  **/
+@Api(tags = "企微回调通知")
 @Slf4j
 @RestController
 @RequestMapping("/wecom/callback")
@@ -37,6 +40,7 @@ public class WeCallBackController extends CommonController {
     @Value("${wecome.callBack.encodingAesKey}")
     private String encodingAesKey;
 
+    @ApiModelProperty("post数据接收")
     @PostMapping(value = "/recive")
     public String recive(@RequestBody String msg, @RequestParam(name = "msg_signature") String signature,
                          String timestamp, String nonce) {
@@ -61,6 +65,7 @@ public class WeCallBackController extends CommonController {
         }
     }
 
+    @ApiModelProperty("get数据校验")
     @GetMapping(value = "/recive")
     public String recive(HttpServletRequest request) {
         // 微信加密签名

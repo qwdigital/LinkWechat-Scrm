@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.util.XmlUtils;
 import me.chanjar.weixin.common.util.xml.XStreamCDataConverter;
-import me.chanjar.weixin.cp.bean.WxCpXmlMessage;
+import me.chanjar.weixin.cp.bean.message.WxCpXmlMessage;
 import me.chanjar.weixin.cp.util.xml.XStreamTransformer;
 
 import java.io.Serializable;
@@ -39,7 +39,7 @@ public class WxCpXmlMessageVO extends WxCpXmlMessage {
 
     @XStreamAlias("Id")
     @XStreamConverter(value = XStreamCDataConverter.class)
-    private String tagId;
+    private String id;
 
     @XStreamAlias("UpdateDetail")
     @XStreamConverter(value = XStreamCDataConverter.class)

@@ -1,9 +1,6 @@
 package com.linkwechat.wecom.client;
 
-import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.DataObject;
-import com.dtflys.forest.annotation.DataVariable;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.msgaudit.WeMsgAuditDto;
 import com.linkwechat.wecom.domain.vo.WeMsgAuditVo;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
@@ -22,7 +19,7 @@ public interface WeMsgAuditClient {
     @Request(url = "/msgaudit/get_permit_user_list",
             type = "POST"
     )
-    WeMsgAuditDto getPermitUserList(@DataObject WeMsgAuditDto msgAuditDto);
+    WeMsgAuditDto getPermitUserList(@JSONBody WeMsgAuditDto msgAuditDto);
 
     /**
      * 单聊 获取会话中外部成员的同意情况
@@ -32,7 +29,7 @@ public interface WeMsgAuditClient {
     @Request(url = "/msgaudit/check_single_agree",
             type = "POST"
     )
-    WeMsgAuditDto checkSingleAgree(@DataObject WeMsgAuditDto msgAuditDto);
+    WeMsgAuditDto checkSingleAgree(@JSONBody WeMsgAuditDto msgAuditDto);
 
     /**
      * 群聊 获取群会话中外部成员的同意情况
@@ -42,7 +39,7 @@ public interface WeMsgAuditClient {
     @Request(url = "/msgaudit/check_room_agree",
             type = "POST"
     )
-    WeMsgAuditDto checkRoomAgree(@DataObject WeMsgAuditVo weMsgAuditVo);
+    WeMsgAuditDto checkRoomAgree(@JSONBody WeMsgAuditVo weMsgAuditVo);
 
     /**
      * 获取会话内容存档内部群信息
@@ -52,5 +49,5 @@ public interface WeMsgAuditClient {
     @Request(url = "/msgaudit/groupchat/get",
             type = "POST"
     )
-    WeMsgAuditDto getGroupChat(@DataObject WeMsgAuditVo weMsgAuditVo);
+    WeMsgAuditDto getGroupChat(@JSONBody WeMsgAuditVo weMsgAuditVo);
 }

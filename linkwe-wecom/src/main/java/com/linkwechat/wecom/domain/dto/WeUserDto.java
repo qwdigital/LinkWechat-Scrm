@@ -2,6 +2,8 @@ package com.linkwechat.wecom.domain.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @description: 通讯录用户
  * @author: HaoN
@@ -32,13 +34,13 @@ public class WeUserDto extends WeResultDto{
     private String email;
 
     //成员所属部门id列表,不超过100个
-    private String[] department;
+    private List<String> department;
 
     //职位
     private String position;
 
     //身份:表示在所在的部门内是否为上级。1表示为上级，0表示非上级。
-    private String[] is_leader_in_dept;
+    private List<String> is_leader_in_dept;
 
     //启用/禁用成员。1表示启用成员，0表示禁用成员
     private Integer enable;

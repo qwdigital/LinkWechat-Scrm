@@ -1,8 +1,8 @@
 package com.linkwechat.wecom.client;
 
 import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.DataObject;
 import com.dtflys.forest.annotation.Header;
+import com.dtflys.forest.annotation.JSONBody;
 import com.dtflys.forest.annotation.Request;
 import com.linkwechat.wecom.domain.dto.WeMessagePushDto;
 import com.linkwechat.wecom.domain.dto.WeMessagePushGroupDto;
@@ -24,7 +24,7 @@ public interface WeMessagePushClient {
     @Request(url = "/message/send",
             type = "POST"
     )
-    WeMessagePushResultDto sendMessageToUser(@DataObject WeMessagePushDto weMessagePushDto,@Header("agentId") String agentId);
+    WeMessagePushResultDto sendMessageToUser(@JSONBody WeMessagePushDto weMessagePushDto, @Header("agentId") String agentId);
 
     /**
      * 应用推送消息
@@ -32,6 +32,6 @@ public interface WeMessagePushClient {
     @Request(url = "/appchat/send",
             type = "POST"
     )
-    WeMessagePushResultDto sendMessageToUserGroup(@DataObject WeMessagePushGroupDto weMessagePushGroupDto);
+    WeMessagePushResultDto sendMessageToUserGroup(@JSONBody WeMessagePushGroupDto weMessagePushGroupDto);
 
 }

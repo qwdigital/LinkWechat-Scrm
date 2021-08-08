@@ -3,7 +3,7 @@ package com.linkwechat.wecom.domain.dto.tag;
 import cn.hutool.core.collection.CollectionUtil;
 import com.linkwechat.wecom.domain.WeTag;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,7 +16,7 @@ import java.util.List;
  * @create: 2020-10-17 20:03
  **/
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class WeCropTagDto {

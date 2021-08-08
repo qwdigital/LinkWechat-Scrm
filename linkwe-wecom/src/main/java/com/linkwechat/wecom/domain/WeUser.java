@@ -1,22 +1,24 @@
 package com.linkwechat.wecom.domain;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.linkwechat.common.config.jackson.StringArrayDeserialize;
-import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.BaseEntity;
-import com.linkwechat.common.utils.SnowFlakeUtil;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.bean.BeanUtils;
+import com.linkwechat.common.utils.spring.SpringUtils;
+import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.dto.WeUserDto;
+import com.linkwechat.wecom.service.IWeMaterialService;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
@@ -31,7 +33,7 @@ import java.util.Date;
 @ApiModel
 @Data
 @TableName("we_user")
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class WeUser extends BaseEntity
@@ -42,7 +44,7 @@ public class WeUser extends BaseEntity
     /** 用户头像 */
     @ApiModelProperty("用户头像")
     @TableField(value = "head_image_url")
-    private String avatarMediaid;
+    private String headImageUrl;
 
 
     /** 用户名称 */
@@ -60,6 +62,9 @@ public class WeUser extends BaseEntity
     @NotBlank(message = "账号不可为空")
     @TableId
     private String userId;
+
+    @ApiModelProperty("成员的open_userid")
+    private String openUserId;
 
     /** 性别。1表示男性，2表示女性 */
     @ApiModelProperty("性别。1表示男性，2表示女性")
@@ -80,7 +85,7 @@ public class WeUser extends BaseEntity
 
     /** 用户所属部门,使用逗号隔开,字符串格式存储 */
     @ApiModelProperty("用户所属部门")
-    private String[] department;
+    private String department;
 
     /** 职务 */
     @ApiModelProperty("职务")
@@ -88,11 +93,11 @@ public class WeUser extends BaseEntity
 
     /** 1表示为上级,0表示普通成员(非上级)。 */
     @ApiModelProperty("1表示为上级,0表示普通成员(非上级)")
-    private String[] isLeaderInDept;
+    private String isLeaderInDept;
 
     /** 入职时间 */
     @ApiModelProperty("入职时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date joinTime;
 
     /** 是否启用(1表示启用成员，0表示禁用成员) */
@@ -116,14 +121,14 @@ public class WeUser extends BaseEntity
     private String address;
 
     /** 生日 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     @ApiModelProperty("生日")
     private Date birthday;
 
     /** 是否激活（1:是；2:否）该字段主要表示当前信息是否同步微信 */
     /** 激活状态: 1=已激活，2=已禁用，4=未激活，5=退出企业,6=删除 */
     @ApiModelProperty("激活状态: 1=已激活，2=已禁用，4=未激活，5=退出企业,6=删除")
-    private Integer isActivate=new Integer(4);
+    private Integer isActivate;
 
     /** 离职是否分配(1:已分配;0:未分配;) */
     @ApiModelProperty("离职是否分配(1:已分配;0:未分配;)")
@@ -137,28 +142,31 @@ public class WeUser extends BaseEntity
     @ApiModelProperty("备注")
     private String remark;
 
-    @TableField(exist = false)
-    private String departmentStr;
-
-
+    @ApiModelProperty("是否开启会话存档 0：关闭 1：开启")
+    private Integer isOpenChat;
 
 
     /** 转化成企业微信需要的dto对象 */
     public  WeUserDto transformWeUserDto(){
         WeUserDto weUserDto=new WeUserDto();
-
-        BeanUtils.copyPropertiesASM(this,weUserDto);
-
+        BeanUtils.copyProperties(this,weUserDto);
+        /**
+         * 换取素材id
+         */
+        if(StringUtils.isNotEmpty(this.getHeadImageUrl())){
+            WeMediaDto image = SpringUtils.getBean(IWeMaterialService.class)
+                    .uploadTemporaryMaterial(this.getHeadImageUrl(), "image", FileUtil.getName(this.getHeadImageUrl()));
+            if (image != null){
+                weUserDto.setAvatar_mediaid(image.getMedia_id());
+            }
+        }
+        weUserDto.setUserid(this.getUserId());
+        if(StringUtils.isNotEmpty(this.getIsLeaderInDept())){
+            weUserDto.setIs_leader_in_dept(CollectionUtil.toList(this.getIsLeaderInDept().split(",")));
+        }
+        if(StringUtils.isNotEmpty(this.getDepartment())){
+            weUserDto.setDepartment(CollectionUtil.toList(this.getDepartment().split(",")));
+        }
         return weUserDto;
-    }
-
-    @JsonDeserialize(using = StringArrayDeserialize.class)
-    public void setDepartment(String[] department) {
-        this.department = department;
-    }
-
-    @JsonDeserialize(using = StringArrayDeserialize.class)
-    public void setIsLeaderInDept(String[] isLeaderInDept) {
-        this.isLeaderInDept = isLeaderInDept;
     }
 }

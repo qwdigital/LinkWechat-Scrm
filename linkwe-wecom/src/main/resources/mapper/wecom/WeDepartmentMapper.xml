@@ -8,57 +8,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="id"    column="id"    />
         <result property="name"    column="name"    />
         <result property="parentId"    column="parent_id"    />
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
     </resultMap>
 
     <sql id="selectWeDepartmentVo">
-        select id, name, parent_id from we_department
+        select id, name, parent_id, create_by, update_by, create_time, update_time from we_department
     </sql>
 
-    <select id="selectWeDepartmentList"  resultMap="WeDepartmentResult">
-        <include refid="selectWeDepartmentVo"/>
-    </select>
-    
-    <select id="selectWeDepartmentById" parameterType="Long" resultMap="WeDepartmentResult">
-        <include refid="selectWeDepartmentVo"/>
-        where id = #{id}
-    </select>
-        
-    <insert id="insertWeDepartment" parameterType="WeDepartment">
-        insert into we_department
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">id,</if>
-            <if test="name != null and name != ''">name,</if>
-            <if test="parentId != null">parent_id,</if>
-         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">#{id},</if>
-            <if test="name != null and name != ''">#{name},</if>
-            <if test="parentId != null">#{parentId},</if>
-         </trim>
-    </insert>
 
-    <update id="updateWeDepartment" parameterType="WeDepartment">
-        update we_department
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="name != null and name != ''">name = #{name},</if>
-            <if test="parentId != null">parent_id = #{parentId},</if>
-        </trim>
-        where id = #{id}
-    </update>
-
-
-
-    <delete id="deleteAllWeDepartment" >
-        delete from we_department
-    </delete>
-
-
-    <insert id="batchInsertWeDepartment" >
-        insert into we_department (id, name, parent_id)
+    <insert id="insertBatch">
+        insert into we_department (id, `name`, parent_id,create_by,update_by,create_time,update_time)
         values
-        <foreach collection="weDepartments" item="weDepartment" index="index" separator=",">
-            (#{weDepartment.id},#{weDepartment.name},#{weDepartment.parentId})
+        <foreach collection="weDepartmentList" item="weDepartment" index="index" separator=",">
+            (#{weDepartment.id},#{weDepartment.name},#{weDepartment.parentId}
+            ,#{weDepartment.createBy},#{weDepartment.updateBy},#{weDepartment.createTime}
+            ,#{weDepartment.updateTime})
         </foreach>
+        on duplicate key update `name`= values(`name`),parent_id= values(parent_id)
+        ,update_by= values(update_by),update_time= values(update_time)
     </insert>
 
 

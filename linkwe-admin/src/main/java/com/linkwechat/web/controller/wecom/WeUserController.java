@@ -13,8 +13,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
@@ -31,58 +29,61 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/wecom/user")
-@Api("通讯录人员接口")
+@Api(tags = "通讯录人员接口")
 @Slf4j
 public class WeUserController extends BaseController {
 
     @Autowired
-    @Lazy
     private IWeUserService weUserService;
-
 
     /**
      * 查询通讯录相关客户列表
      */
-    //  @PreAuthorize("@ss.hasPermi('contacts:organization:query')")
+    //@PreAuthorize("@ss.hasPermi('contacts:organization:query')")
+    @Log(title = "查询通讯录相关客户列表", businessType = BusinessType.SELECT)
     @GetMapping("/list")
-    @ApiOperation("获取通讯录人员列表")
-    public TableDataInfo list(WeUser weUser) {
+    @ApiOperation(value = "获取通讯录人员列表", httpMethod = "GET")
+    public TableDataInfo<List<WeUser>> list(WeUser weUser) {
         startPage();
-        List<WeUser> list = weUserService.selectWeUserList(weUser);
+        List<WeUser> list = weUserService.getList(weUser);
         return getDataTable(list);
     }
 
 
     /**
      * 获取通讯录相关客户详细信息
+     *
+     * @return
      */
-    //   @PreAuthorize("@ss.hasPermi('contacts:organization:view')")
-    @GetMapping(value = "/{userId}")
-    public AjaxResult getInfo(@PathVariable("userId") String userId) {
-        return AjaxResult.success(weUserService.selectWeUserById(userId));
+    //@PreAuthorize("@ss.hasPermi('contacts:organization:view')")
+    @Log(title = "获取通讯录相关客户详细信息", businessType = BusinessType.SELECT)
+    @GetMapping(value = "/{id}")
+    @ApiOperation(value = "获取通讯录相关客户详细信息", httpMethod = "GET")
+    public AjaxResult<WeUser> getInfo(@PathVariable("id") Long id) {
+        return AjaxResult.success(weUserService.getById(id));
     }
 
     /**
      * 新增通讯录相关客户
      */
-    //  @PreAuthorize("@ss.hasPermi('contacts:organization:addMember')")
+    //@PreAuthorize("@ss.hasPermi('contacts:organization:addMember')")
     @Log(title = "通讯录相关客户", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增通讯录客户")
     public AjaxResult add(@Validated @RequestBody WeUser weUser) {
-        weUserService.insertWeUser(weUser);
+        weUserService.insert(weUser);
         return AjaxResult.success();
     }
 
     /**
      * 修改通讯录相关客户
      */
-    //  @PreAuthorize("@ss.hasPermi('contacts:organization:edit')")
+    //@PreAuthorize("@ss.hasPermi('contacts:organization:edit')")
     @Log(title = "更新通讯录客户", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("更新通讯录客户")
     public AjaxResult edit(@RequestBody WeUser weUser) {
-        weUserService.updateWeUser(weUser);
+        weUserService.update(weUser);
         return AjaxResult.success();
     }
 
@@ -93,14 +94,12 @@ public class WeUserController extends BaseController {
      * @param weUser
      * @return
      */
-    //   @PreAuthorize("@ss.hasPermi('contacts:organization:forbidden')")
+    //@PreAuthorize("@ss.hasPermi('contacts:organization:forbidden')")
     @Log(title = "启用禁用用户", businessType = BusinessType.UPDATE)
     @PutMapping("/startOrStop")
     @ApiOperation("是否启用(1表示启用成员，0表示禁用成员)")
     public AjaxResult startOrStop(@RequestBody WeUser weUser) {
-
         weUserService.startOrStop(weUser);
-
         return AjaxResult.success();
     }
 
@@ -112,8 +111,10 @@ public class WeUserController extends BaseController {
      * @return
      */
     //    @PreAuthorize("@ss.hasPermi('customerManage:dimission:filter')")
+    @ApiOperation("离职已分配")
+    @Log(title = "离职已分配", businessType = BusinessType.SELECT)
     @GetMapping({"/leaveUserAllocateList"})
-    public TableDataInfo leaveUserAllocateList(WeLeaveUserVo weLeaveUserVo) {
+    public TableDataInfo<List<WeLeaveUserVo>> leaveUserAllocateList(WeLeaveUserVo weLeaveUserVo) {
         startPage();
         weLeaveUserVo.setIsActivate(WeConstans.WE_USER_IS_LEAVE);
         weLeaveUserVo.setIsAllocate(WeConstans.LEAVE_ALLOCATE_STATE);
@@ -129,8 +130,10 @@ public class WeUserController extends BaseController {
      * @return
      */
     //    @PreAuthorize("@ss.hasPermi('customerManage:dimission:query')")
+    @ApiOperation("离职未分配")
+    @Log(title = "离职未分配", businessType = BusinessType.SELECT)
     @GetMapping({"/leaveUserNoAllocateList"})
-    public TableDataInfo leaveUserNoAllocateList(WeLeaveUserVo weLeaveUserVo) {
+    public TableDataInfo<List<WeLeaveUserVo>> leaveUserNoAllocateList(WeLeaveUserVo weLeaveUserVo) {
         startPage();
         weLeaveUserVo.setIsActivate(WeConstans.WE_USER_IS_LEAVE);
         weLeaveUserVo.setIsAllocate(WeConstans.LEAVE_NO_ALLOCATE_STATE);
@@ -146,6 +149,8 @@ public class WeUserController extends BaseController {
      * @return
      */
     //   @PreAuthorize("@ss.hasPermi('customerManage:dimission:allocate')")
+    @ApiOperation("离职分配")
+    @Log(title = "离职分配", businessType = BusinessType.UPDATE)
     @PutMapping({"/allocateLeaveUserAboutData"})
     public AjaxResult allocateLeaveUserAboutData(@RequestBody WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
 
@@ -161,17 +166,16 @@ public class WeUserController extends BaseController {
      * @return
      */
     //   @PreAuthorize("@ss.hasPermi('contacts:organization:sync')")
+    @ApiOperation("同步成员")
+    @Log(title = "同步成员", businessType = BusinessType.OTHER)
     @GetMapping({"/synchWeUser"})
-    public AjaxResult synchWeUser(){
-        try {
-            weUserService.synchWeUser();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public AjaxResult synchWeUser() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+        SecurityContextHolder.setContext(context);
+        weUserService.synchWeUser();
         return AjaxResult.success(WeConstans.SYNCH_TIP);
     }
-
-
 
     /**
      * 删除用户
@@ -179,13 +183,11 @@ public class WeUserController extends BaseController {
      * @return
      */
     //   @PreAuthorize("@ss.hasPermi('contacts:organization:removeMember')")
+    @ApiOperation("删除用户")
+    @Log(title = "删除用户", businessType = BusinessType.DELETE)
     @DeleteMapping({"/{ids}"})
     public AjaxResult deleteUser(@PathVariable String[] ids) {
-
-
         weUserService.deleteUser(ids);
-
-
         return AjaxResult.success();
     }
 
@@ -197,8 +199,10 @@ public class WeUserController extends BaseController {
      * @return
      */
     //   @PreAuthorize("@ss.hasPermi('wecom:user:getAllocateCustomers')")
+    @ApiOperation("获取历史分配记录的成员")
+    @Log(title = "获取历史分配记录的成员", businessType = BusinessType.SELECT)
     @GetMapping({"/getAllocateCustomers"})
-    public TableDataInfo getAllocateCustomers(WeAllocateCustomersVo weAllocateCustomersVo) {
+    public TableDataInfo<List<WeAllocateCustomersVo>> getAllocateCustomers(WeAllocateCustomersVo weAllocateCustomersVo) {
         startPage();
         List<WeAllocateCustomersVo> list = weUserService.getAllocateCustomers(weAllocateCustomersVo);
         return getDataTable(list);
@@ -212,8 +216,10 @@ public class WeUserController extends BaseController {
      * @return
      */
     //    @PreAuthorize("@ss.hasPermi('wecom:user:getAllocateGroups')")
+    @ApiOperation("获取历史分配记录的群")
+    @Log(title = "获取历史分配记录的群", businessType = BusinessType.SELECT)
     @GetMapping({"/getAllocateGroups"})
-    public TableDataInfo getAllocateGroups(WeAllocateGroupsVo weAllocateGroupsVo) {
+    public TableDataInfo<List<WeAllocateGroupsVo>> getAllocateGroups(WeAllocateGroupsVo weAllocateGroupsVo) {
         startPage();
         List<WeAllocateGroupsVo> list = weUserService.getAllocateGroups(weAllocateGroupsVo);
         return getDataTable(list);
@@ -226,8 +232,10 @@ public class WeUserController extends BaseController {
      * @param code
      * @return
      */
+    @Log(title = "内部应用获取用户userId", businessType = BusinessType.SELECT)
+    @ApiOperation("内部应用获取用户userId")
     @GetMapping("/getUserInfo")
-    public AjaxResult getUserInfo(String code, String agentId) {
+    public AjaxResult<WeUserInfoVo> getUserInfo(String code, String agentId) {
         WeUserInfoVo userInfo = weUserService.getUserInfo(code, agentId);
         return AjaxResult.success(userInfo);
     }

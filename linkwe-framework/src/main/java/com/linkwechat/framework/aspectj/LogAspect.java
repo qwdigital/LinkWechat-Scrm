@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.framework.manager.AsyncManager;
 import com.linkwechat.framework.web.service.TokenService;
 import org.aspectj.lang.JoinPoint;
@@ -92,8 +93,12 @@ public class LogAspect
             String ip = IpUtils.getIpAddr(ServletUtils.getRequest());
             operLog.setOperIp(ip);
             // 返回参数
-            operLog.setJsonResult(JSON.toJSONString(jsonResult));
-
+            String jsonResultStr = JSON.toJSONString(jsonResult);
+            if (jsonResultStr.length() > 2000){
+                operLog.setJsonResult(jsonResultStr.substring(0,2000));
+            }else {
+                operLog.setJsonResult(jsonResultStr);
+            }
             operLog.setOperUrl(ServletUtils.getRequest().getRequestURI());
             if (loginUser != null)
             {

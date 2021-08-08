@@ -1,11 +1,12 @@
 package com.linkwechat.wecom.domain.dto;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.wecom.domain.WeUser;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,11 +23,20 @@ public class WeUserListDto extends WeResultDto{
     public List<WeUser>  getWeUsers(){
         List<WeUser> weUsers=new ArrayList<>();
         if(CollectionUtil.isNotEmpty(userlist)){
-            userlist.stream().forEach(k->{
+            userlist.forEach(user -> {
                 WeUser weUser=new WeUser();
-                BeanUtils.copyPropertiesASM(k,weUser);
-                weUser.setIsActivate(k.getStatus());
-                weUser.setAvatarMediaid(k.getAvatar());
+                BeanUtil.copyProperties(user,weUser);
+                weUser.setUserId(user.getUserid());
+                weUser.setOpenUserId(user.getOpen_userid());
+                weUser.setIsActivate(user.getStatus());
+                weUser.setHeadImageUrl(user.getAvatar());
+                weUser.setJoinTime(new Date());
+                if (CollectionUtil.isNotEmpty(user.getDepartment())){
+                    weUser.setDepartment(String.join(",", user.getDepartment()));
+                }
+                if (CollectionUtil.isNotEmpty(user.getIs_leader_in_dept())){
+                    weUser.setIsLeaderInDept(String.join(",", user.getIs_leader_in_dept()));
+                }
                 weUsers.add(weUser);
             });
         }

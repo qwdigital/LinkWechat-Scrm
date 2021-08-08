@@ -25,10 +25,10 @@ public class WeCallBackUpdateCustomerTagImpl extends WeEventStrategy {
         try {
             switch (message.getTagType()){
                 case tagGroup:
-                    weTagGroupService.updateTagGroup(message.getTagId());
+                    weTagGroupService.updateTagGroup(message.getId());
                     break;
                 case tag:
-                    weTagService.updateTag(message.getTagId());
+                    weTagService.updateTag(message.getId());
                     break;
                 default:
                     break;

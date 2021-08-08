@@ -1,6 +1,6 @@
 package com.linkwechat.wecom.domain.dto;
 
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.Data;
 
 /**
@@ -8,7 +8,7 @@ import lombok.Data;
  * @date 2020-11-18
  */
 @Data
-@Builder
+@SuperBuilder
 public class WeWelcomeMsg {
     private String welcome_code;
 
@@ -21,7 +21,7 @@ public class WeWelcomeMsg {
     private MiniProgram miniprogram;
 
     @Data
-    @Builder
+    @SuperBuilder
     public static class Text {
         /**
          * 消息文本内容,最长为4000字节
@@ -30,7 +30,7 @@ public class WeWelcomeMsg {
     }
 
     @Data
-    @Builder
+    @SuperBuilder
     public static class Image {
         /**
          * 图片的media_id
@@ -43,7 +43,7 @@ public class WeWelcomeMsg {
     }
 
     @Data
-    @Builder
+    @SuperBuilder
     public static class Link {
         /**
          * 图文消息标题，最长为128字节
@@ -64,7 +64,7 @@ public class WeWelcomeMsg {
     }
 
     @Data
-    @Builder
+    @SuperBuilder
     public static class MiniProgram {
         /**
          * 小程序消息标题，最长为64字节

@@ -1,6 +1,6 @@
 package com.linkwechat.wecom.domain.vo;
 
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.Data;
 
 /**
@@ -9,7 +9,7 @@ import lombok.Data;
  * @create: 2021-01-20 00:21
  **/
 @Data
-@Builder
+@SuperBuilder
 public class WeUserInfoVo {
 
 
