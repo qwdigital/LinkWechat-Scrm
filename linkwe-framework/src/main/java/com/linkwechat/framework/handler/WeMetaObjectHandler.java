@@ -1,6 +1,7 @@
 package com.linkwechat.framework.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -28,10 +29,9 @@ public class WeMetaObjectHandler implements MetaObjectHandler {
         this.setFieldValByName(CREATE_TIME, new Date(), metaObject);
         this.setFieldValByName(UPDATE_TIME, new Date(), metaObject);
         //创建人
-        if (StringUtils.isNotEmpty(SecurityUtils.getUsername())) {
-            this.setFieldValByName(CREATE_BY, SecurityUtils.getUsername(), metaObject);
-            this.setFieldValByName(UPDATE_BY, SecurityUtils.getUsername(), metaObject);
-        }
+        String userName = getUserName();
+        this.setFieldValByName(CREATE_BY, userName, metaObject);
+        this.setFieldValByName(UPDATE_BY, userName, metaObject);
     }
 
     @Override
@@ -39,8 +39,16 @@ public class WeMetaObjectHandler implements MetaObjectHandler {
         //更新时间
         this.setFieldValByName(UPDATE_TIME, new Date(), metaObject);
         //更新人
-        if (StringUtils.isNotEmpty(SecurityUtils.getUsername())) {
-            this.setFieldValByName(UPDATE_BY, SecurityUtils.getUsername(), metaObject);
+        this.setFieldValByName(UPDATE_BY, getUserName(), metaObject);
+    }
+
+    private String getUserName() {
+        String userName;
+        try {
+            userName = SecurityUtils.getUsername();
+        } catch (CustomException e){
+            userName = "admin";
         }
+        return userName;
     }
 }
