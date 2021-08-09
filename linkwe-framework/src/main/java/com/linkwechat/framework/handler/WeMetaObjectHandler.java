@@ -21,7 +21,7 @@ public class WeMetaObjectHandler implements MetaObjectHandler {
     private static final String CREATE_TIME = "createTime";
     private static final String CREATE_BY = "createBy";
     private static final String UPDATE_TIME = "updateTime";
-    private static final String UPDATE_BY = "updateBY";
+    private static final String UPDATE_BY = "updateBy";
 
     @Override
     public void insertFill(MetaObject metaObject) {
