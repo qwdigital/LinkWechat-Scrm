@@ -121,6 +121,10 @@
                     and wccm.to_list = #{toList}
                 </if>
 
+                <if test="roomId != null and roomId != ''">
+                    and wccm.room_id = #{roomId}
+                </if>
+
                 <if test="msgType != null and msgType != ''">
                     and wccm.msg_type = #{msgType}
                 </if>
