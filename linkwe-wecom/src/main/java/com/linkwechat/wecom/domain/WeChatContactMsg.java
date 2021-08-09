@@ -86,7 +86,11 @@ private static final long serialVersionUID=1L;
     @ApiModelProperty(value = "是否为外部聊天 0 外部 1 内部", hidden = true)
     private Integer isExternal;
 
-    @ApiModelProperty("名称")
+    @ApiModelProperty("成员名称")
     @TableField(exist = false)
-    private String name;
+    private String userName;
+
+    @ApiModelProperty("客户名称")
+    @TableField(exist = false)
+    private String customerName;
 }

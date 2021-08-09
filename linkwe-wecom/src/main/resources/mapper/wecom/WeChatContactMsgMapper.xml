@@ -107,17 +107,24 @@
                    `action`,
                    msg_type,
                    contact,
-                   if((case when LOCATE('wm', from_id) or LOCATE('wo', from_id) then 0 else 1 end),
-                      (select wu.user_name from we_user wu where wccm.from_id = wu.user_id),
-                      (select wc.name from we_customer wc where wccm.from_id = wc.external_userid)) as name,
-                    if((case when LOCATE('wm', from_id) or LOCATE('wo', from_id) then 0 else 1 end),
-                        (select wu.head_image_url from we_user wu where wccm.from_id = wu.user_id),
-                        (select wc.avatar from we_customer wc where wccm.from_id = wc.external_userid)) as avatar
+                   ifnull(wc.name,wu.user_name) as name,
+                   ifnull(wc.avatar,wu.head_image_url) as avatar
             from we_chat_contact_msg wccm
+            left join we_user wu on wccm.from_id = wu.user_id and  (case when LOCATE('wm', wccm.from_id) or LOCATE('wo', wccm.from_id) then 0 else 1 end) = 1
+            left join we_customer wc on wccm.from_id = wc.external_userid and (case when LOCATE('wm', wccm.from_id) or LOCATE('wo', wccm.from_id) then 0 else 1 end) = 0
             <where>
                 <if test="fromId != null and fromId != ''">
                     and wccm.fromId = #{fromId}
                 </if>
+
+                <if test="toList != null and toList != ''">
+                    and wccm.to_list = #{toList}
+                </if>
+
+                <if test="msgType != null and msgType != ''">
+                    and wccm.msg_type = #{msgType}
+                </if>
+
                 <if test="action != null and action != ''">
                     and wccm.action = #{action}
                 </if>
@@ -131,12 +138,18 @@
                 <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
                     AND date_format(wccm.msg_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
                 </if>
+
+                <if test="userName != null and userName != ''">
+                    and wu.user_name like concat('%', #{userName}, '%')
+                </if>
+
+                <if test="customerName != null and customerName != ''">
+                    and wc.name like concat('%', #{customerName}, '%')
+                </if>
             </where>
         ) t
         <where>
-            <if test="name != null and name != ''">
-                and t.name like concat('%', #{name}, '%')
-            </if>
+
         </where>
     </select>
 </mapper>
