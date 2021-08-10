@@ -32,9 +32,8 @@
     </el-form>
     <div>
       <el-table
+        v-loading="loading"
         :data="fileData"
-        stripe
-        style="width: 100%"
         :header-cell-style="{ background: '#fff' }"
       >
         <el-table-column prop="date" label="发送者" width="180">
@@ -43,15 +42,8 @@
           </template>
         </el-table-column>
         <el-table-column prop="name" label=" 内容">
-          <template slot-scope="scope">
-            <p
-              v-if="!!scope.row.contact"
-              class="emcode"
-              v-html="scope.row.contact"
-            ></p>
-            <p v-else-if="!!!scope.row.contact && scope.row.text">
-              {{ JSON.parse(scope.row.contact).content }}
-            </p>
+          <template slot-scope="{ row }">
+            <ChatContent :message="row"></ChatContent>
           </template>
         </el-table-column>
         <el-table-column label="消息状态" width="200">
@@ -111,7 +103,10 @@
 <script>
 import { content } from '@/api/conversation/content.js'
 import { yearMouthDay, parseTime } from '@/utils/common.js'
+import ChatContent from '@/components/ChatContent'
 export default {
+  components: { ChatContent },
+
   data() {
     return {
       form: {
@@ -142,7 +137,8 @@ export default {
           value: 'switch',
           label: '切回企业日志'
         }
-      ]
+      ],
+      loading: false
     }
   },
   mounted() {
@@ -154,6 +150,7 @@ export default {
       this.init(true)
     },
     init(flag) {
+      this.loading = true
       if (!!!flag) {
         this.currentPage = 1
       }
@@ -164,14 +161,21 @@ export default {
         beginTime: this.form.Stime ? yearMouthDay(this.form.Stime[0]) : '',
         endTime: this.form.Stime ? yearMouthDay(this.form.Stime[1]) : '',
         pageNum: this.currentPage,
+        pageSize: 10,
         action: this.ac,
         orderByColumn: 'msg_time',
         isAsc: 'desc'
       }
-      content.getFullSearchChatList(query).then((res) => {
-        this.fileData = res.rows
-        this.total = Number(res.total)
-      })
+      content
+        .getFullSearchChatList(query)
+        .then((res) => {
+          this.fileData = res.rows
+          this.total = Number(res.total)
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
     },
     chechName(e) {
       if (e == '') {
@@ -189,6 +193,15 @@ export default {
       }
       console.log(e, this.ac)
       this.init()
+    },
+    parseMesContent(data, type) {
+      let contact = JSON.parse(data)
+      let typeDict = {
+        text: 'content',
+        image: 'attachment',
+        text: 'content'
+      }
+      return contact[type]
     }
   }
 }
