@@ -1,40 +1,53 @@
 <template>
   <div>
-    <el-form :inline="true" :model="form" class="top-serach">
+    <el-form :inline="true" :model="query" class="top-serach">
       <el-form-item label="员工名称">
-        <el-input v-model="form.Ename" placeholder="客户名称"></el-input>
+        <el-input
+          v-model="query.userName"
+          clearable
+          placeholder="客户名称"
+        ></el-input>
       </el-form-item>
       <el-form-item label="客户名称">
-        <el-input v-model="form.Cname" placeholder="客户名称"></el-input>
+        <el-input
+          v-model="query.customerName"
+          clearable
+          placeholder="客户名称"
+        ></el-input>
       </el-form-item>
       <el-form-item label="查找内容">
-        <el-input v-model="form.Scontent" placeholder="查找内容"></el-input>
+        <el-input
+          v-model="query.contact"
+          clearable
+          placeholder="查找内容"
+        ></el-input>
       </el-form-item>
       <el-form-item label="时间范围">
         <el-date-picker
-          v-model="form.Stime"
-          type="datetimerange"
+          v-model="dateRange"
+          type="daterange"
           format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd"
           range-separator="至"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
           align="right"
+          :picker-options="pickerOptions"
         >
         </el-date-picker>
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="init">查询</el-button>
+        <el-button type="primary" @click="getList(1)">查询</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button>导出列表</el-button>
+        <el-button @click="exportList()">导出列表</el-button>
       </el-form-item>
     </el-form>
     <div>
       <el-table
+        v-loading="loading"
         :data="fileData"
-        stripe
-        style="width: 100%"
         :header-cell-style="{ background: '#fff' }"
       >
         <el-table-column prop="date" label="发送者" width="180">
@@ -43,15 +56,8 @@
           </template>
         </el-table-column>
         <el-table-column prop="name" label=" 内容">
-          <template slot-scope="scope">
-            <p
-              v-if="!!scope.row.contact"
-              class="emcode"
-              v-html="scope.row.contact"
-            ></p>
-            <p v-else-if="!!!scope.row.contact && scope.row.text">
-              {{ JSON.parse(scope.row.contact).content }}
-            </p>
+          <template slot-scope="{ row }">
+            <ChatContent :message="row"></ChatContent>
           </template>
         </el-table-column>
         <el-table-column label="消息状态" width="200">
@@ -101,26 +107,30 @@
         class="pagination"
         layout="prev, pager, next"
         :total="total"
-        @current-change="currentChange"
-        :current-page="currentPage"
+        @current-change="getList"
+        :current-page.sync="query.pageNum"
       >
       </el-pagination>
     </div>
   </div>
 </template>
 <script>
-import { content } from '@/api/conversation/content.js'
-import { yearMouthDay, parseTime } from '@/utils/common.js'
+import { getChatList, exportList } from '@/api/conversation/content.js'
+import ChatContent from '@/components/ChatContent'
 export default {
+  components: { ChatContent },
   data() {
     return {
-      form: {
-        Ename: '',
-        Cname: '',
-        Scontent: '',
-        Stime: ''
+      query: {
+        userName: '',
+        customerName: '',
+        contact: '',
+        beginTime: '',
+        endTime: '',
+        pageNum: 1,
+        pageSize: 10
       },
-      currentPage: 1,
+      dateRange: [],
       total: 0,
       ac: '',
       fileData: [],
@@ -142,36 +152,46 @@ export default {
           value: 'switch',
           label: '切回企业日志'
         }
-      ]
+      ],
+      loading: false
     }
   },
-  mounted() {
-    this.init()
+  created() {
+    this.getList()
   },
   methods: {
-    currentChange(e) {
-      this.currentPage = e
-      this.init(true)
-    },
-    init(flag) {
-      if (!!!flag) {
-        this.currentPage = 1
+    getList(page) {
+      if (this.dateRange) {
+        this.query.beginTime = this.dateRange[0]
+        this.query.endTime = this.dateRange[1]
+      } else {
+        this.query.beginTime = ''
+        this.query.endTime = ''
       }
-      let query = {
-        name: this.form.Ename,
-        customerName: this.form.Cname,
-        contact: this.form.Scontent,
-        beginTime: this.form.Stime ? yearMouthDay(this.form.Stime[0]) : '',
-        endTime: this.form.Stime ? yearMouthDay(this.form.Stime[1]) : '',
-        pageNum: this.currentPage,
-        action: this.ac,
-        orderByColumn: 'msg_time',
-        isAsc: 'desc'
-      }
-      content.getFullSearchChatList(query).then((res) => {
-        this.fileData = res.rows
-        this.total = Number(res.total)
-      })
+      page && (this.query.pageNum = page)
+      this.loading = true
+      // let query = {
+      //   name: this.form.userName,
+      //   customerName: this.form.customerName,
+      //   contact: this.form.contact,
+      //   beginTime: this.form.Stime ? yearMouthDay(this.form.Stime[0]) : '',
+      //   endTime: this.form.Stime ? yearMouthDay(this.form.Stime[1]) : '',
+      //   pageNum: this.query.pageNum,
+      //   pageSize: 10,
+      //   action: this.ac,
+      //   orderByColumn: 'msg_time',
+      //   isAsc: 'desc'
+      // }
+
+      getChatList(this.query)
+        .then((res) => {
+          this.fileData = res.rows
+          this.total = ~~res.total
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
     },
     chechName(e) {
       if (e == '') {
@@ -188,7 +208,30 @@ export default {
         this.ac = 'switch'
       }
       console.log(e, this.ac)
-      this.init()
+      this.getList()
+    },
+    parseMesContent(data, type) {
+      let contact = JSON.parse(data)
+      let typeDict = {
+        text: 'content',
+        image: 'attachment',
+        text: 'content'
+      }
+      return contact[type]
+    },
+    exportList() {
+      this.$confirm('是否确认导出所有数据项?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          return exportList(this.query)
+        })
+        .then((response) => {
+          this.download(response.msg)
+        })
+        .catch(function() {})
     }
   }
 }

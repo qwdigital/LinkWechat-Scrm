@@ -70,7 +70,7 @@
               <span v-if="chat.receiveWeCustomer">
                 与{{ chat.receiveWeCustomer.name }}的聊天</span
               >
-              <span class="fr hd_nameRi">下载会话</span>
+              <span class="fr hd_nameRi" @click="exportList()">下载会话</span>
             </div>
           </div>
           <div class=" hd_tabthree">
@@ -78,21 +78,22 @@
               v-model="activeNameThree"
               @tab-click="activeNameThreeClick()"
             >
+              <div class="date-range">
+                <el-date-picker
+                  v-model="dateRange"
+                  type="daterange"
+                  format="yyyy-MM-dd"
+                  value-format="yyyy-MM-dd"
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  align="right"
+                  @change="activeNameThreeClick"
+                >
+                </el-date-picker>
+              </div>
               <el-tab-pane label="全部" name="0">
                 <div class="ct_box">
-                  <div class="hds_time">
-                    <el-date-picker
-                      v-model="takeTime"
-                      type="datetimerange"
-                      format="yyyy-MM-dd"
-                      range-separator="至"
-                      start-placeholder="开始日期"
-                      end-placeholder="结束日期"
-                      align="right"
-                      @change="activeNameThreeClick"
-                    >
-                    </el-date-picker>
-                  </div>
                   <chat
                     :allChat="allChat"
                     v-if="allChat && allChat.length >= 1"
@@ -111,19 +112,6 @@
               </el-tab-pane>
               <el-tab-pane label="图片及视频" name="1">
                 <div class="ct_box">
-                  <div class="hds_time">
-                    <el-date-picker
-                      v-model="takeTime"
-                      type="datetimerange"
-                      format="yyyy-MM-dd"
-                      range-separator="至"
-                      start-placeholder="开始日期"
-                      end-placeholder="结束日期"
-                      align="right"
-                      @change="activeNameThreeClick"
-                    >
-                    </el-date-picker>
-                  </div>
                   <chat
                     :allChat="allChatImg"
                     v-if="allChatImg && allChatImg.length >= 1"
@@ -135,26 +123,13 @@
                     layout="prev, pager, next"
                     :total="total"
                     @current-change="currentChange"
-                    :current-page="currentPage"
+                    :current-page.sync="currentPage"
                   >
                   </el-pagination>
                 </div>
               </el-tab-pane>
               <el-tab-pane label="文件" name="2">
                 <div class="ct_box">
-                  <div class="hds_time">
-                    <el-date-picker
-                      v-model="takeTime"
-                      type="datetimerange"
-                      format="yyyy-MM-dd"
-                      range-separator="至"
-                      start-placeholder="开始日期"
-                      end-placeholder="结束日期"
-                      align="right"
-                      @change="activeNameThreeClick"
-                    >
-                    </el-date-picker>
-                  </div>
                   <el-table
                     :data="allFile"
                     stripe
@@ -192,37 +167,10 @@
                 </div>
               </el-tab-pane>
               <el-tab-pane label="链接" name="3">
-                <div class="ct_box">
-                  <div class="hds_time">
-                    <el-date-picker
-                      v-model="takeTime"
-                      type="datetimerange"
-                      format="yyyy-MM-dd"
-                      range-separator="至"
-                      start-placeholder="开始日期"
-                      end-placeholder="结束日期"
-                      align="right"
-                      @change="activeNameThreeClick"
-                    >
-                    </el-date-picker>
-                  </div>
-                </div>
+                <div class="ct_box"></div>
               </el-tab-pane>
               <el-tab-pane label="语音通话" name="4">
                 <div class="ct_box">
-                  <div class="hds_time">
-                    <el-date-picker
-                      v-model="takeTime"
-                      type="datetimerange"
-                      format="yyyy-MM-dd"
-                      range-separator="至"
-                      start-placeholder="开始日期"
-                      end-placeholder="结束日期"
-                      align="right"
-                      @change="activeNameThreeClick"
-                    >
-                    </el-date-picker>
-                  </div>
                   <el-table
                     :data="allVoice"
                     stripe
@@ -265,13 +213,12 @@
   </div>
 </template>
 <script>
-import list from '../component/list.vue'
-import chat from '../component/chat.vue'
-import insideList from '../component/insideList.vue'
-import grouplist from '../component/groupList.vue'
-import * as api from '@/api/organization'
-import { content } from '@/api/conversation/content.js'
-import { yearMouthDay, parseTime } from '@/utils/common.js'
+import list from './component/list.vue'
+import chat from './component/chat.vue'
+import insideList from './component/insideList.vue'
+import grouplist from './component/groupList.vue'
+import * as apiOrg from '@/api/organization'
+import api from '@/api/conversation/content.js'
 
 export default {
   components: {
@@ -293,7 +240,7 @@ export default {
       },
       activeName: '0',
       activeNameThree: '0',
-      takeTime: '',
+      dateRange: [],
       fileData: [],
       chat: {},
 
@@ -367,7 +314,7 @@ export default {
       this.activeNameThreeClick(true)
     },
     activeNameThreeClick(page, group) {
-      console.log(this.chat.receiver, this.fromId, 'this.chat.id')
+      // console.log(this.chat.receiver, this.fromId, 'this.chat.id')
       if (!!!this.chat.receiver) {
         return //没有选择人
       }
@@ -390,11 +337,16 @@ export default {
         let query = {
           msgType,
           pageSize: '10',
-          pageNum: this.currentPage,
-          orderByColumn: 'msg_time',
-          isAsc: 'asc',
-          beginTime: this.takeTime ? yearMouthDay(this.takeTime[0]) : '',
-          endTime: this.takeTime ? yearMouthDay(this.takeTime[1]) : ''
+          pageNum: this.currentPage
+          // orderByColumn: 'msg_time',
+          // isAsc: 'asc'
+        }
+        if (this.dateRange) {
+          query.beginTime = this.dateRange[0]
+          query.endTime = this.dateRange[1]
+        } else {
+          query.beginTime = ''
+          query.endTime = ''
         }
         if (this.activeName != '2') {
           query.fromId = this.fromId
@@ -402,9 +354,10 @@ export default {
         } else {
           query.roomId = this.chat.receiver
         }
-        content.chatList(query).then((res) => {
+        this.query = query
+        api.getChatList(query).then((res) => {
           console.log(res.rows, 'ssss')
-          this.total = Number(res.total)
+          this.total = ~~res.total
           this.resortData(res)
         })
       }
@@ -438,7 +391,7 @@ export default {
       this.activeNameThreeClick('', true)
     },
     getTree() {
-      api.getTree().then(({ data }) => {
+      apiOrg.getTree().then(({ data }) => {
         this.treeData = this.handleTree(data)
         this.handleNodeClick(this.treeData[0], true)
       })
@@ -452,10 +405,8 @@ export default {
         this.loading = true
       }
       if (this.activeName == 0) {
-        content
-          .getInternalChatList({
-            fromId: this.fromId
-          })
+        api
+          .getInternalChatList(this.fromId)
           .then(({ data }) => {
             this.loading = false
             this.personList = data
@@ -464,10 +415,8 @@ export default {
             this.loading = false
           })
       } else if (this.activeName == 1) {
-        content
-          .getExternalChatList({
-            fromId: this.fromId
-          })
+        api
+          .getExternalChatList(this.fromId)
           .then(({ data }) => {
             this.loading = false
             this.personList = data
@@ -476,10 +425,8 @@ export default {
             this.loading = false
           })
       } else {
-        content
-          .getGroupChatList({
-            fromId: this.fromId
-          })
+        api
+          .getGroupChatList(this.fromId)
           .then(({ data }) => {
             this.loading = false
             this.personList = data
@@ -502,7 +449,7 @@ export default {
           pageSize: '999',
           department: data.id
         }
-        api.getList(querys).then(({ rows }) => {
+        apiOrg.getList(querys).then(({ rows }) => {
           this.$set(data, 'children', [])
 
           data.children = rows
@@ -512,6 +459,20 @@ export default {
         this.fromId = data.userId
         this.tabClick()
       }
+    },
+    exportList() {
+      this.$confirm('是否确认导出所有数据项?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          return api.exportList(this.query)
+        })
+        .then((response) => {
+          this.download(response.msg)
+        })
+        .catch(function() {})
     }
   }
 }
@@ -577,15 +538,12 @@ export default {
     ::-webkit-scrollbar {
       display: none;
     }
-
-    .hds_time {
-      text-align: left;
-      width: 100%;
-      padding: 10px 0;
-    }
   }
 }
-
+.date-range {
+  padding: 10px;
+  background: #fff;
+}
 .pagination {
   padding: 10px 0;
   height: 30px;

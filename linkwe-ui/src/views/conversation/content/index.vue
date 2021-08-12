@@ -14,9 +14,9 @@
   </div>
 </template>
 <script>
-import employee from './page/employeeTest.vue'
-import user from './page/userTest.vue'
-import role from './page/roleTest.vue'
+import employee from './employeeTest.vue'
+import user from './userTest.vue'
+import role from './roleTest.vue'
 export default {
   components: { employee, user, role },
   data() {
