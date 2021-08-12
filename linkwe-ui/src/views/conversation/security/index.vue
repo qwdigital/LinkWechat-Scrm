@@ -14,9 +14,9 @@
   </div>
 </template>
 <script>
-import alarmingSensitive from './securityPage/alarmingSensitive.vue'
-import sensitiveList from './securityPage/sensitiveList.vue'
-import setSensitiveWord from './securityPage/setSensitiveWord'
+import alarmingSensitive from './alarmingSensitive.vue'
+import sensitiveList from './sensitiveList.vue'
+import setSensitiveWord from './setSensitiveWord'
 export default {
   components: {
     sensitiveList,

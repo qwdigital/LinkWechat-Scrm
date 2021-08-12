@@ -1,41 +1,45 @@
 import request from '@/utils/request'
-const getExternalChatList = (params) => {
+
+// 外部联系人 会话列表
+const getExternalChatList = (fromId) => {
   return request({
-    url: '/chat/msg/selectExternalChatList/'+ params.fromId,
+    url: '/chat/msg/selectExternalChatList/' + fromId,
     method: 'get'
   })
 }
 
+// 单聊 会话列表
 const selectAloneChatList = (params) => {
   return request({
-    url: '/chat/msg/selectAloneChatList\n/',
+    url: '/chat/msg/selectAloneChatList',
     method: 'get',
     params
   })
 }
 
-
-const getInternalChatList = (params) => {
+// 内部联系人列表
+const getInternalChatList = (fromId) => {
   return request({
-    url: '/chat/msg/selectInternalChatList/'+ params.fromId,
+    url: '/chat/msg/selectInternalChatList/' + fromId,
     method: 'get'
   })
 }
 
-const getGroupChatList = (params) => {
+const getGroupChatList = (fromId) => {
   return request({
-    url: '/chat/msg/selectGroupChatList/'+ params.fromId,
+    url: '/chat/msg/selectGroupChatList/' + fromId,
     method: 'get'
   })
 }
 
-const chatList = (params) => {
-  return request({
-    url: '/chat/msg/list',
-    method: 'get',
-    params,
-  })
-}
+// const chatList = (params) => {
+//   return request({
+//     url: '/chat/msg/list',
+//     method: 'get',
+//     params
+//   })
+// }
+
 const indexTable = () => {
   return request({
     url: '/wecom/page/getCorpBasicData',
@@ -49,18 +53,22 @@ const indexEchart = () => {
   })
 }
 
-const listByCustomer = (params) => {
-  return request({
-    url: '/wecom/customer/list',
-    method: 'get',
-    params,
-  })
-}
-const getFullSearchChatList = (params) => {
+// 全文检索 会话列表
+export const getChatList = (params) => {
   return request({
     url: '/chat/msg/selectFullSearchChatList',
     method: 'get',
-    params,
+    params
+  })
+}
+
+// 全文检索 导出列表
+export const exportList = (params) => {
+  return request({
+    url: '/chat/msg/selectFullSearchChatList/export',
+    method: 'get',
+    params
+    // responseType: 'blob'
   })
 }
 //
@@ -71,7 +79,8 @@ export const content = {
   selectAloneChatList,
   getInternalChatList,
   getGroupChatList,
-  chatList,
-  listByCustomer,
-  getFullSearchChatList
+  // chatList,
+  getChatList
 }
+
+export default content

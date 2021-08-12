@@ -3,34 +3,49 @@
     <el-row>
       <el-col :span="6" class="borderR">
         <div class="hd_box">
-          <div class="hd_name">客户列表（{{ employAmount }}）</div>
+          <div class="hd_name">客户列表（{{ customerTotal }}）</div>
           <div class="paddingT10">
             <el-input
               placeholder="搜索客户"
               prefix-icon="el-icon-search"
-              v-model="employName"
-              @keyup.enter.native="customerList"
+              v-model="customerQuery.name"
+              @keyup.enter.native="getCustomerList(1)"
             >
             </el-input>
           </div>
         </div>
-        <div class="ct_box ct_boxFirst" style="height: calc(100vh - 288px)">
-          <ul>
-            <li
-              v-for="(i, t) in CList"
+        <div v-loading="customerLoading" class="ct_box">
+          <ul v-infinite-scroll="getCustomerList" class="customer-wrap">
+            <el-row
+              v-for="(item, t) in customerList"
               :key="t"
-              @click="personCheck(i, t)"
+              tag="li"
+              @click.native="personCheck(item, t)"
+              class="customer-li"
               :class="{ liActive: t == personIndex }"
+              :gutter="20"
+              type="flex"
+              align="middle"
             >
-              <el-row :gutter="20" style="   padding: 10px 0;margin:0">
-                <el-col :span="4">
-                  <img v-if="i.avatar" :src="i.avatar" alt="头像" />
-                </el-col>
-                <el-col :span="20" v-if="i"
-                  ><span style="line-height:40px">{{ i.name }}</span></el-col
-                >
-              </el-row>
-            </li>
+              <el-col :span="4">
+                <img v-if="item.avatar" :src="item.avatar" alt="头像" />
+              </el-col>
+              <el-col :span="10" v-if="item" class="toe">
+                <span style="line-height:40px">{{ item.name }}</span>
+              </el-col>
+              <el-col :span="10" class="ar">
+                <span
+                  :style="{ color: item.type === 1 ? '#4bde03' : '#f9a90b' }"
+                  >{{ { 1: '@微信', 2: '@企业微信' }[item.type] }}
+                </span>
+                <i
+                  :class="[
+                    'el-icon-s-custom',
+                    { 1: 'man', 2: 'woman' }[item.gender]
+                  ]"
+                ></i>
+              </el-col>
+            </el-row>
           </ul>
         </div>
       </el-col>
@@ -246,11 +261,12 @@
   </div>
 </template>
 <script>
-import list from '../component/customerList.vue'
-import chats from '../component/chat.vue'
+import list from './component/customerList.vue'
+import chats from './component/chat.vue'
 
-import grouplist from '../component/groupList.vue'
-import { content } from '@/api/conversation/content.js'
+import grouplist from './component/groupList.vue'
+import api from '@/api/conversation/content.js'
+import * as apiCustomer from '@/api/customer/index'
 import { yearMouthDay } from '@/utils/common.js'
 export default {
   components: {
@@ -260,8 +276,14 @@ export default {
   },
   data() {
     return {
-      employAmount: 1,
-      employName: '',
+      customerLoading: false,
+      customerQuery: {
+        pageNum: 1,
+        pageSize: 10,
+        name: ''
+      },
+      customerList: [],
+      customerTotal: 0,
       talkName: '',
       chatContent: '',
       personIndex: '-1',
@@ -269,7 +291,6 @@ export default {
       activeNameThree: '0',
       takeTime: '',
       fileData: [],
-      CList: [],
       personList: [],
       loading: false,
       fromId: '',
@@ -285,7 +306,9 @@ export default {
       total: 0
     }
   },
-
+  created() {
+    // this.customerList()
+  },
   methods: {
     chatFn(data) {
       this.chatData = data
@@ -318,7 +341,7 @@ export default {
       }
       this.personList = []
       if (this.activeName == '0') {
-        content
+        api
           .selectAloneChatList({
             fromId: this.fromId,
             contact: this.chatContent
@@ -331,7 +354,7 @@ export default {
             this.loading = false
           })
       } else {
-        content
+        api
           .getGroupChatList({
             fromId: this.fromId
           })
@@ -375,12 +398,12 @@ export default {
         query.toList = this.chatData.receiver
       }
       if (group) {
-        content.chatList(query).then((res) => {
+        api.getChatList(query).then((res) => {
           this.total = Number(res.total)
           this.resortData(res)
         })
       } else {
-        content.chatList(query).then((res) => {
+        api.getChatList(query).then((res) => {
           this.total = Number(res.total)
           this.resortData(res)
         })
@@ -403,25 +426,23 @@ export default {
         return (this.allVoice = res.rows)
       }
     },
-    customerList() {
-      let querys = {
-        pageNum: 1,
-        pageSize: 999,
-        name: this.employName,
-        isOpenChat: '1'
+    getCustomerList(page) {
+      this.customerLoading = true
+      if (page) {
+        this.customerQuery.pageNum = page
+        this.customerList = []
       }
-      content.listByCustomer(querys).then((res) => {
-        console.log(res, 'rows')
-        this.CList = res.rows
-        this.employAmount = res.total
+      page && (this.customerQuery.pageNum = page)
+      apiCustomer.getList(this.customerQuery).then((res) => {
+        this.customerList.push(...res.rows)
+        this.customerTotal = ~~res.total
+        this.customerQuery.pageNum++
+        this.customerLoading = false
       })
     },
     chatMsgList() {
       this.getChatList()
     }
-  },
-  mounted() {
-    this.customerList()
   }
 }
 </script>
@@ -469,32 +490,30 @@ export default {
     cursor: pointer;
   }
 
-  .ct_boxFirst {
-  }
-
-  .ct_box {
+  .customer-wrap {
+    position: relative;
+    height: calc(100vh - 288px);
     background: white;
     border-bottom: 1px solid #efefef;
-    padding: 10px;
     overflow-y: scroll;
     color: #999;
     text-align: center;
-
-    ::-webkit-scrollbar {
-      display: none;
+    .customer-li {
+      padding: 10px;
     }
+  }
 
-    ul {
-      margin: 0;
-      padding: 0;
-    }
+  .ct_box {
+    // ::-webkit-scrollbar {
+    //   display: none;
+    // }
 
     ul li {
       text-align: left;
       cursor: pointer;
       border-bottom: 1px solid #efefef;
 
-      :hover {
+      &:hover {
         background: #efefef;
       }
 
@@ -504,8 +523,8 @@ export default {
     }
 
     .liActive {
-      background: lightblue !important;
-      color: #199ed8;
+      background: #e2e2e2 !important;
+      // color: #fff;
     }
 
     .hds_time {
@@ -520,5 +539,17 @@ export default {
   padding: 10px 0;
   height: 30px;
   float: left;
+}
+
+.el-icon-s-custom {
+  font-size: 16px;
+  margin-left: 4px;
+  color: #999;
+  &.man {
+    color: #13a2e8;
+  }
+  &.woman {
+    color: #f753b2;
+  }
 }
 </style>
