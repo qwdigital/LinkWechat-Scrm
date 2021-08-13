@@ -76,14 +76,11 @@ export default {
 </script>
 
 <template>
-  <div>
-    <div v-if="message.msgType === 'text'" class="msgtypetext">
+  <div class="message">
+    <template v-if="message.msgType === 'text'">
       {{ content }}
-    </div>
-    <div
-      v-else-if="'image,emotion'.includes(message.msgType)"
-      class="msgtypeimg"
-    >
+    </template>
+    <template v-else-if="'image,emotion'.includes(message.msgType)">
       <el-image
         style="width: 100px; height: 100px"
         :src="content"
@@ -91,7 +88,7 @@ export default {
         :preview-src-list="[content]"
       >
       </el-image>
-    </div>
+    </template>
     <a
       v-else-if="'file'.includes(message.msgType)"
       class="msgtypefile"
@@ -108,7 +105,7 @@ export default {
     >
       {{ content }}
     </a>
-    <div v-else-if="message.msgType === 'voice'" class="msgtypevoice">
+    <div v-else-if="message.msgType === 'voice'">
       <i
         class="el-icon-microphone"
         style=" font-size: 40px; color: #199ed8;"
@@ -209,6 +206,25 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+.message {
+  position: relative;
+  padding: 10px;
+  line-height: 14px;
+  border-radius: 5px;
+  background: $blue;
+  color: #fff;
+  display: inline-block;
+  &::before {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    left: -13px;
+    width: 0;
+    height: 0;
+    border: 7px solid transparent;
+    border-right-color: $blue;
+  }
+}
 .msgtypefile {
   margin: 5px;
   width: 200px;

@@ -4,7 +4,7 @@
       <li v-for="(item, index) in allChat" :key="index">
         <!-- <span v-if="item.fromInfo.name">{{item.fromInfo.name}}</span> -->
         <div class="mb15">
-          <span class="mr20">{{ item.fromId }}</span>
+          <span class="mr20">{{ item.name }}</span>
           <span
             :style="{ color: item.action == 'send' ? '#199ed8' : '#999' }"
             >{{ item.msgTime }}</span

@@ -67,9 +67,7 @@
         <el-col :span="12">
           <div class="hd_box">
             <div class="hd_name">
-              <span v-if="chat.receiveWeCustomer">
-                与{{ chat.receiveWeCustomer.name }}的聊天</span
-              >
+              <span v-if="chat"> 与{{ chat.name }}的聊天</span>
               <span class="fr hd_nameRi" @click="exportList()">下载会话</span>
             </div>
           </div>
