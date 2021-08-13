@@ -4,21 +4,16 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
-import com.linkwechat.common.core.domain.elastic.ElasticSearchEntity;
 import com.linkwechat.common.core.elasticsearch.ElasticSearch;
 import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.core.page.TableSupport;
-import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeMessagePushClient;
-import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.wecom.domain.WeSensitive;
 import com.linkwechat.wecom.domain.WeSensitiveAuditScope;
 import com.linkwechat.wecom.domain.WeUser;
-import com.linkwechat.wecom.domain.dto.WeMessagePushDto;
-import com.linkwechat.wecom.domain.dto.message.TextMessageDto;
 import com.linkwechat.wecom.domain.query.WeSensitiveHitQuery;
 import com.linkwechat.wecom.mapper.WeSensitiveMapper;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
@@ -39,9 +34,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -182,26 +175,6 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
     }
 
     @Override
-    public void hitSensitive(List<JSONObject> entityList) {
-        log.info("执行敏感词命中过滤,time=[{}]", System.currentTimeMillis());
-        //获取所有的敏感词规则
-        List<WeSensitive> allSensitiveRules = weSensitiveMapper.selectWeSensitiveList(new WeSensitive());
-        //根据规则过滤命中
-        if (CollectionUtils.isNotEmpty(allSensitiveRules)) {
-            allSensitiveRules.parallelStream().forEach(weSensitive -> {
-                List<JSONObject> jsonList = Lists.newArrayList();
-                List<String> patternWords = Arrays.asList(weSensitive.getPatternWords().split(","));
-                List<String> users = getScopeUsers(weSensitive.getAuditUserScope());
-                patternWords.forEach(patternWord -> {
-                    jsonList.addAll(hitSensitiveInES(patternWord, users));
-                });
-                //将命中结果插入es
-                addHitSensitiveList(jsonList, weSensitive);
-            });
-        }
-    }
-
-    @Override
     public PageInfo<JSONObject> getHitSensitiveList(WeSensitiveHitQuery weSensitiveHitQuery) {
         elasticSearch.createIndex2(WeConstans.WECOM_SENSITIVE_HIT_INDEX, getSensitiveHitMapping());
         List<String> userIds = Lists.newArrayList();
@@ -259,47 +232,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
         return pageInfo;
     }
 
-    private void addHitSensitiveList(List<JSONObject> json, WeSensitive weSensitive) {
-        elasticSearch.createIndex2(WeConstans.WECOM_SENSITIVE_HIT_INDEX, getSensitiveHitMapping());
-        //批量提交插入记录
-        if (CollectionUtils.isNotEmpty(json)) {
-            List<ElasticSearchEntity> list = json.stream().filter(Objects::nonNull).map(j -> {
-                ElasticSearchEntity ese = new ElasticSearchEntity();
-                j.put("status", "0");
-                ese.setData(j);
-                ese.setId(j.getString("msgid"));
-                return ese;
-            }).collect(Collectors.toList());
-            elasticSearch.insertBatchAsync(WeConstans.WECOM_SENSITIVE_HIT_INDEX, list, this::sendMessage, weSensitive);
-        }
-    }
-
-    private void sendMessage(Object listObj, Object weSensitiveObj) {
-        WeSensitive weSensitive = (WeSensitive) weSensitiveObj;
-        List<ElasticSearchEntity> list = (List<ElasticSearchEntity>) listObj;
-        if (weSensitive.getAlertFlag().equals(1) && CollectionUtils.isNotEmpty(list)) {
-            //发送消息通知给相应的审计人
-            WeCorpAccount weCorpAccount = weCorpAccountService.findValidWeCorpAccount();
-            String auditUserId = weSensitive.getAuditUserId();
-            String content = "有消息触发敏感词，请登录系统及时处理!";
-            TextMessageDto textMessageDto = new TextMessageDto();
-            textMessageDto.setContent(content);
-            WeMessagePushDto pushDto = new WeMessagePushDto();
-            pushDto.setTouser(auditUserId);
-            pushDto.setMsgtype(MessageType.TEXT.getMessageType());
-            pushDto.setText(textMessageDto);
-            weMessagePushClient.sendMessageToUser(pushDto, weCorpAccount.getAgentId());
-            //批量更新
-            list = list.stream().peek(entity -> {
-                Map map = entity.getData();
-                map.put("status", "1");
-                entity.setData(map);
-            }).collect(Collectors.toList());
-            elasticSearch.updateBatch(WeConstans.WECOM_SENSITIVE_HIT_INDEX, list);
-        }
-    }
-
-    private List<String> getScopeUsers(List<WeSensitiveAuditScope> scopeList) {
+    public List<String> getScopeUsers(List<WeSensitiveAuditScope> scopeList) {
         List<String> users = Lists.newArrayList();
         scopeList.forEach(scope -> {
             if (scope.getScopeType().equals(WeConstans.USE_SCOP_BUSINESSID_TYPE_USER)) {
@@ -311,39 +244,6 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
             }
         });
         return users;
-    }
-
-    private List<JSONObject> hitSensitiveInES(String patternWord, List<String> users) {
-        int pieceSize = userPiecesCount(users);
-        if (pieceSize != -1) {
-            List<JSONObject> resultList = Lists.newArrayList();
-            for (int i = 0; i < pieceSize; i++) {
-                List<String> subUsers = users.subList(i + i * pieceSize, i + pieceSize - 1);
-                SearchSourceBuilder builder = new SearchSourceBuilder();
-                builder.sort("msgtime", SortOrder.DESC);
-                BoolQueryBuilder userBuilder = QueryBuilders.boolQuery();
-                subUsers.parallelStream().forEach(user -> userBuilder.should(QueryBuilders.termQuery("from", user)));
-                userBuilder.minimumShouldMatch(1);
-                BoolQueryBuilder searchBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchPhraseQuery("content", patternWord)).must(userBuilder);
-                builder.query(searchBuilder);
-                List<JSONObject> list = elasticSearch.search(chartKey, builder, JSONObject.class);
-                list.parallelStream().forEach(j -> j.put("pattern_words", patternWord));
-                resultList.addAll(list);
-            }
-            return resultList;
-        }
-        return Lists.newArrayList();
-    }
-
-    private int userPiecesCount(List<String> users) {
-        if (CollectionUtils.isNotEmpty(users)) {
-            if (users.size() % WeConstans.SENSITIVE_USER_PIECE != 0) {
-                return users.size() / WeConstans.SENSITIVE_USER_PIECE + 1;
-            } else {
-                return users.size() / WeConstans.SENSITIVE_USER_PIECE;
-            }
-        }
-        return -1;
     }
 
     private XContentBuilder getSensitiveHitMapping() {
