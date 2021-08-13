@@ -114,11 +114,11 @@
             left join we_customer wc on wccm.from_id = wc.external_userid and (case when LOCATE('wm', wccm.from_id) or LOCATE('wo', wccm.from_id) then 0 else 1 end) = 0
             <where>
                 <if test="fromId != null and fromId != ''">
-                    and wccm.from_id = #{fromId}
+                    and (wccm.from_id = #{fromId} or wccm.to_list = #{fromId})
                 </if>
 
                 <if test="toList != null and toList != ''">
-                    and wccm.to_list = #{toList}
+                    and (wccm.to_list = #{toList} or wccm.from_id = #{toList})
                 </if>
 
                 <if test="roomId != null and roomId != ''">
