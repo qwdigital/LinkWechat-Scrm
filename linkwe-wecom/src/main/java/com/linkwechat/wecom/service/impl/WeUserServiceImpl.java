@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * 通讯录相关客户Service业务层处理
@@ -206,7 +207,9 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper, WeUser> impleme
         List<WeUser> weUsers = weUserClient.list(WeConstans.WE_ROOT_DEPARMENT_ID,
                 WeConstans.DEPARTMENT_SUB_WEUSER).getWeUsers();
         if (CollectionUtil.isNotEmpty(weUsers)) {
-            List<List<WeUser>> lists = Lists.partition(weUsers, 500);
+            List<WeUser> collect
+                    = weUsers.stream().filter(o -> !o.getUserId().equals("45DuXiangShangQingXie")).collect(Collectors.toList());
+            List<List<WeUser>> lists = Lists.partition(collect, 500);
             for(List<WeUser> list : lists){
                 this.weUserMapper.insertBatch(list);
             }
