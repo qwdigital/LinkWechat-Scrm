@@ -22,9 +22,6 @@ import com.linkwechat.wecom.service.IWeSensitiveService;
 import com.linkwechat.wecom.service.IWeUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -221,50 +218,5 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
             }
         });
         return users;
-    }
-
-    private XContentBuilder getSensitiveHitMapping() {
-        try {
-            //创建索引
-            XContentBuilder mapping = XContentFactory.jsonBuilder()
-                    .startObject()
-                    .startObject("properties")
-                    .startObject("msgid")
-                    .field("type", "keyword")
-                    .endObject()
-                    .startObject("seq")
-                    .field("type", "long")
-                    .endObject()
-                    .startObject("action")
-                    .field("type", "keyword")
-                    .endObject()
-                    .startObject("from")
-                    .field("type", "keyword")
-                    .endObject()
-                    .startObject("roomid")
-                    .field("type", "keyword")
-                    .endObject()
-                    .startObject("msgtime")
-                    .field("type", "long")
-                    .endObject()
-                    .startObject("msgtype")
-                    .field("type", "keyword")
-                    .endObject()
-                    .startObject("status")
-                    .field("type", "keyword")
-                    .endObject()
-                    .startObject("pattern_words")
-                    .field("type", "keyword")
-                    .endObject()
-                    .startObject("content")
-                    .field("type", "text")
-                    .endObject()
-                    .endObject()
-                    .endObject();
-            return mapping;
-        } catch (Exception e) {
-            log.warn("create sensitive-hit mapping failed, exception={}", ExceptionUtils.getStackTrace(e));
-        }
-        return null;
     }
 }
