@@ -1,7 +1,7 @@
 <template>
   <div class="takecontent">
     <ul>
-      <li v-for="(item, index) in allChat" :key="index">
+      <li v-for="(item, index) in data" :key="index">
         <!-- <span v-if="item.fromInfo.name">{{item.fromInfo.name}}</span> -->
         <div class="mb15">
           <span class="mr20">{{ item.name }}</span>
@@ -24,7 +24,7 @@ export default {
     ChatContent
   },
   props: {
-    allChat: {
+    data: {
       type: Array,
       defluat: () => []
     }
@@ -86,7 +86,6 @@ export default {
 .takecontent {
   text-align: left;
   width: 100%;
-  height: 600px;
   overflow-y: scroll;
 
   ::-webkit-scrollbar {
@@ -95,74 +94,6 @@ export default {
 
   ul li {
     padding: 10px;
-  }
-
-  .msgtypetext {
-    padding: 10px 0;
-  }
-
-  .msgtypevoice {
-    margin: 10px;
-  }
-
-  .msgtypefile {
-    margin: 10px;
-    width: 200px;
-    height: 40px;
-    line-height: 40px;
-    cursor: pointer;
-    color: #199ed8;
-    text-indent: 10px;
-    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2), 0 1px 4px 0 rgba(0, 0, 0, 0.19);
-  }
-
-  .card_name {
-    width: 320px;
-    height: 105px;
-    line-height: 80px;
-    text-indent: 10px;
-  }
-
-  .msgtypevideo {
-    margin: 10px;
-
-    cursor: pointer;
-
-    border-radius: 8px;
-  }
-
-  .msgtypeimg {
-    width: 100px;
-    height: 80px;
-    margin: 10px;
-
-    img {
-      width: 100px;
-      height: 80px;
-    }
-  }
-
-  .msgtypecard {
-    width: 320px;
-    height: 140px;
-    margin: 10px;
-    border-radius: 8px;
-    -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
-      0 6px 8px 0 rgba(0, 0, 0, 0.19);
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 8px 0 rgba(0, 0, 0, 0.19);
-    position: relative;
-
-    .card_foot {
-      position: absolute;
-      height: 20px;
-      border-top: 1px solid #efefef;
-      text-align: left;
-      bottom: 15px;
-      padding: 10px;
-      color: #333;
-      font-weight: bold;
-      width: 100%;
-    }
   }
 }
 </style>
