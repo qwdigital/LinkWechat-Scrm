@@ -54,36 +54,17 @@ export default {
       const player = this.$refs.videoPlayer.player
       this.playerOptions['sources'][0]['src'] = e.attachment
       player.play()
-    },
-    down(type) {
-      let contact = JSON.parse(this.message.contact)
-      const url = window.URL.createObjectURL(
-        new Blob([contact[type]], {
-          type:
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8'
-        })
-      )
-      const link = document.createElement('a')
-      link.href = url
-      link.setAttribute('download', this.content) // 下载文件的名称及文件类型后缀
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link) // 下载完成移除元素
-      window.URL.revokeObjectURL(url) // 释放掉blob对象
     }
   }
 }
 </script>
 
 <template>
-  <div>
-    <div v-if="message.msgType === 'text'" class="msgtypetext">
+  <div class="message">
+    <template v-if="message.msgType === 'text'">
       {{ content }}
-    </div>
-    <div
-      v-else-if="'image,emotion'.includes(message.msgType)"
-      class="msgtypeimg"
-    >
+    </template>
+    <template v-else-if="'image,emotion'.includes(message.msgType)">
       <el-image
         style="width: 100px; height: 100px"
         :src="content"
@@ -91,7 +72,7 @@ export default {
         :preview-src-list="[content]"
       >
       </el-image>
-    </div>
+    </template>
     <a
       v-else-if="'file'.includes(message.msgType)"
       class="msgtypefile"
@@ -108,7 +89,7 @@ export default {
     >
       {{ content }}
     </a>
-    <div v-else-if="message.msgType === 'voice'" class="msgtypevoice">
+    <div v-else-if="message.msgType === 'voice'">
       <i
         class="el-icon-microphone"
         style=" font-size: 40px; color: #199ed8;"
@@ -186,6 +167,7 @@ export default {
       <div class="card_name">{{ content }}</div>
       <div class="card_foot">个人名片</div>
     </div>
+    <div v-else>不支持的消息类型：{{ message.msgType }}</div>
 
     <el-dialog
       v-if="audioSrc[0]"
@@ -194,14 +176,14 @@ export default {
       @close="close"
     >
       <div class="shabowboxvidoe shabowboxaudio">
-        <AudioPlayer
+        <!-- <AudioPlayer
           :audio-list="audioSrc"
           ref="AudioPlayer"
           :before-play="onBeforePlay"
-        />
-        <!-- <audio controls>
+        /> -->
+        <audio controls>
           <source :src="audioSrc[0]" type="audio/mpeg" />
-        </audio> -->
+        </audio>
       </div>
       <span slot="footer" class="dialog-footer"> </span>
     </el-dialog>
@@ -209,6 +191,25 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+.message {
+  position: relative;
+  padding: 10px;
+  line-height: 14px;
+  border-radius: 5px;
+  background: $blue;
+  color: #fff;
+  display: inline-block;
+  &::before {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    left: -13px;
+    width: 0;
+    height: 0;
+    border: 7px solid transparent;
+    border-right-color: $blue;
+  }
+}
 .msgtypefile {
   margin: 5px;
   width: 200px;
@@ -229,6 +230,8 @@ export default {
     0 6px 8px 0 rgba(0, 0, 0, 0.19);
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 8px 0 rgba(0, 0, 0, 0.19);
   position: relative;
+  background: #f8f8f8;
+  overflow: hidden;
 
   .card_name {
     width: 320px;

@@ -8,17 +8,17 @@
         <user v-if="activeName == 2"></user>
       </el-tab-pane>
       <el-tab-pane label="全局检索" name="3">
-        <role v-if="activeName == 3"></role>
+        <global v-if="activeName == 3"></global>
       </el-tab-pane>
     </el-tabs>
   </div>
 </template>
 <script>
-import employee from './employeeTest.vue'
-import user from './userTest.vue'
-import role from './roleTest.vue'
+import employee from './employee.vue'
+import user from './customer.vue'
+import global from './global.vue'
 export default {
-  components: { employee, user, role },
+  components: { employee, user, global },
   data() {
     return {
       activeName: '1'
@@ -31,6 +31,8 @@ export default {
   }
 }
 </script>
-<style scoped>
-/* *{margin: 0;padding: 0;} */
+<style lang="scss" scoped>
+/deep/.pd15 {
+  padding: 15px;
+}
 </style>

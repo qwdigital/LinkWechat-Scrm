@@ -1,32 +1,36 @@
 <template>
-  <div class="list" v-loading="loading">
-    <div v-if="personList.length">
-      <ul>
-        <li
-          v-for="(item, index) in personList"
-          :key="index"
-          @click="liClick(item)"
-        >
-          <el-row type="flex" v-if="item.msgType == 'text'">
-            <div class="ninebox">
-              <ul v-if="item.avatar">
-                <li v-for="(a, i) in item.avatar.split(',')" :key="i">
-                  <img :src="a" />
-                </li>
-              </ul>
-            </div>
-            <div class="fl" style="margin-left:8px;line-height:60px">
-              <p>
-                {{ item.name }}
-                <!-- <span class="fr gray">{{ item.msgTime }}</span> -->
-              </p>
-              <!-- <p class="gray" v-if="item">
+  <div class="groupList" v-loading="loading">
+    <ul v-if="personList.length">
+      <li
+        v-for="(item, index) in personList"
+        :key="index"
+        :class="{ active: index == active }"
+        @click="liClick(item, index)"
+      >
+        <el-row type="flex" align="middle">
+          <div class="ninebox">
+            <ul v-if="item.avatar">
+              <li v-for="(a, i) in item.avatar.split(',')" :key="i">
+                <img :src="a" />
+              </li>
+            </ul>
+          </div>
+          <div
+            style="margin-left:8px;line-height:60px"
+            class="toe"
+            :title="item.name"
+          >
+            {{ item.name }}
+            <!-- <p>
+              <span class="fr gray">{{ item.msgTime }}</span>
+            </p> -->
+            <!-- <p class="gray" v-if="item">
                 {{ item.name }}:
                 {{ item.content }}
               </p> -->
-            </div>
-          </el-row>
-          <!-- <el-row style="padding:10px" v-if="item.finalChatContext.msgtype=='file'">
+          </div>
+        </el-row>
+        <!-- <el-row style="padding:10px" v-if="item.finalChatContext.msgtype=='file'">
                 <el-col :span="3">&nbsp;</el-col>
                 <el-col :span="21">
                    <p><span class="fr gray">{{parseTime(item.finalChatContext.msgtime)}}</span></p>
@@ -35,12 +39,9 @@
                        </p>
                 </el-col>
                 </el-row>   -->
-        </li>
-      </ul>
-    </div>
-    <div class="ac" v-else>
-      暂无数据
-    </div>
+      </li>
+    </ul>
+    <el-empty v-else :image-size="100"></el-empty>
   </div>
 </template>
 <script>
@@ -59,12 +60,14 @@ export default {
 
   data() {
     return {
-      loadings: true
+      loadings: true,
+      active: undefined
     }
   },
   methods: {
-    liClick(e) {
-      this.$emit('groupFn', e)
+    liClick(data, index) {
+      this.active = index
+      this.$emit('groupFn', data)
     }
   }
 }
@@ -75,6 +78,7 @@ export default {
   width: 54px;
   height: 52px;
   border: 1px solid #199ed8;
+  overflow: hidden;
   ul li {
     float: left;
     width: 15px;
@@ -83,8 +87,8 @@ export default {
     margin: 1px 1px 1px 1px;
   }
 }
-.list {
-  overflow-y: scroll;
+.groupList {
+  overflow-y: auto;
   height: calc(100vh - 328px);
 
   ::-webkit-scrollbar {
@@ -111,8 +115,11 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    :hover {
+    &:hover {
       background: #efefef;
+    }
+    &.active {
+      background: #ebf4fc;
     }
     img {
       width: 100%;
