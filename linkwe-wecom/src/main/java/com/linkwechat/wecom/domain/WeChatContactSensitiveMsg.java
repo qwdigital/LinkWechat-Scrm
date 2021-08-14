@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.annotation.Excel;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author leejoker <1056650571@qq.com>
@@ -51,4 +53,13 @@ public class WeChatContactSensitiveMsg extends BaseEntity implements Serializabl
     @Excel(name = "匹配的内容")
     @ApiModelProperty("匹配的内容")
     private String content;
+
+    @Excel(name = "发送用户id")
+    @ApiModelProperty("发送用户id")
+    @TableField(value = "from_id")
+    private String from;
+
+    @Excel(name = "发送时间")
+    @ApiModelProperty("发送时间")
+    private Date msgTime;
 }

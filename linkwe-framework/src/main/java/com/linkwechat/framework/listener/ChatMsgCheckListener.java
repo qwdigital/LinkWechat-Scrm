@@ -95,6 +95,8 @@ public class ChatMsgCheckListener implements MessageListener {
                         wrapper.eq(WeChatContactMsg::getMsgId, msgId);
                         WeChatContactMsg ccm = weChatContactMsgService.getOne(wrapper);
                         wccsm.setWeChatContactId(ccm.getId());
+                        wccsm.setFrom(ccm.getFromId());
+                        wccsm.setMsgTime(ccm.getMsgTime());
                         int result = weChatContactSensitiveMsgMapper.insert(wccsm);
                         if (result > 0) {
                             sendMessage(wccsm, weSensitive);

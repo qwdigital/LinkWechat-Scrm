@@ -1,20 +1,20 @@
 package com.linkwechat.wecom.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
-import com.github.pagehelper.PageInfo;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.elasticsearch.ElasticSearch;
-import com.linkwechat.common.core.page.PageDomain;
-import com.linkwechat.common.core.page.TableSupport;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeMessagePushClient;
+import com.linkwechat.wecom.domain.WeChatContactSensitiveMsg;
 import com.linkwechat.wecom.domain.WeSensitive;
 import com.linkwechat.wecom.domain.WeSensitiveAuditScope;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.query.WeSensitiveHitQuery;
+import com.linkwechat.wecom.domain.vo.WeChatContactSensitiveMsgVO;
+import com.linkwechat.wecom.mapper.WeChatContactSensitiveMsgMapper;
 import com.linkwechat.wecom.mapper.WeSensitiveMapper;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import com.linkwechat.wecom.service.IWeSensitiveAuditScopeService;
@@ -25,10 +25,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -64,6 +60,9 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
 
     @Autowired
     private IWeCorpAccountService weCorpAccountService;
+
+    @Autowired
+    private WeChatContactSensitiveMsgMapper weChatContactSensitiveMsgMapper;
 
     @Value("${wecome.chatKey}")
     private String chartKey;
@@ -175,8 +174,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
     }
 
     @Override
-    public PageInfo<JSONObject> getHitSensitiveList(WeSensitiveHitQuery weSensitiveHitQuery) {
-        elasticSearch.createIndex2(WeConstans.WECOM_SENSITIVE_HIT_INDEX, getSensitiveHitMapping());
+    public List<WeChatContactSensitiveMsgVO> getHitSensitiveList(WeSensitiveHitQuery weSensitiveHitQuery) {
         List<String> userIds = Lists.newArrayList();
         if (weSensitiveHitQuery.getScopeType().equals(WeConstans.USE_SCOP_BUSINESSID_TYPE_USER)) {
             userIds.add(weSensitiveHitQuery.getAuditScopeId());
@@ -185,51 +183,30 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
                     .stream().filter(Objects::nonNull).map(WeUser::getUserId).collect(Collectors.toList());
             userIds.addAll(userIdList);
         }
-        PageDomain pageDomain = TableSupport.buildPageRequest();
-        Integer pageNum = pageDomain.getPageNum() == null ? 1 : pageDomain.getPageNum();
-        Integer pageSize = pageDomain.getPageSize() == null ? 10 : pageDomain.getPageSize();
-        SearchSourceBuilder builder = new SearchSourceBuilder();
-        int from = (pageNum - 1) * pageSize;
-        builder.size(pageSize);
-        builder.from(from);
-        builder.sort("msgtime", SortOrder.DESC);
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        BoolQueryBuilder userBuilder = QueryBuilders.boolQuery();
-        userIds.forEach(user -> {
-            userBuilder.should(QueryBuilders.termQuery("from.keyword", user));
-        });
-        userBuilder.minimumShouldMatch(1);
-        boolQueryBuilder.must(userBuilder);
+        LambdaQueryWrapper<WeChatContactSensitiveMsg> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(WeChatContactSensitiveMsg::getFrom, userIds);
         if (StringUtils.isNotBlank(weSensitiveHitQuery.getKeyword())) {
-            BoolQueryBuilder keywordBuilder = QueryBuilders.boolQuery().should(QueryBuilders.matchPhraseQuery("content", weSensitiveHitQuery.getKeyword()));
-            boolQueryBuilder.must(keywordBuilder);
+            wrapper.like(WeChatContactSensitiveMsg::getPatternWords, weSensitiveHitQuery.getKeyword());
         }
-        builder.query(boolQueryBuilder);
-        PageInfo<JSONObject> pageInfo = elasticSearch.searchPage(WeConstans.WECOM_SENSITIVE_HIT_INDEX, builder, pageNum, pageSize, JSONObject.class);
-        return hitPageInfoHandler(pageInfo);
+        wrapper.orderByDesc(WeChatContactSensitiveMsg::getMsgTime);
+        List<WeChatContactSensitiveMsg> msgList = weChatContactSensitiveMsgMapper.selectList(wrapper);
+        return hitPageInfoHandler(msgList);
     }
 
-    private PageInfo<JSONObject> hitPageInfoHandler(PageInfo<JSONObject> pageInfo) {
-        List<JSONObject> jsonList = pageInfo.getList();
-        if (CollectionUtils.isNotEmpty(jsonList)) {
-            List<JSONObject> newList = jsonList.stream().map(j -> {
-                JSONObject json = new JSONObject();
-                String userId = j.getString("from");
-                WeUser user = new WeUser();
-                user.setUserId(userId);
-                List<WeUser> uList = weUserService.getList(user);
-                if (CollectionUtils.isNotEmpty(uList)) {
-                    json.put("from", uList.get(0).getName());
-                    json.put("content", j.getString("content"));
-                    json.put("msgtime", j.getString("msgtime"));
-                    json.put("status", j.getString("status"));
-                    json.put("patternWords", j.getString("pattern_words"));
-                }
-                return json;
-            }).collect(Collectors.toList());
-            pageInfo.setList(newList);
+    private List<WeChatContactSensitiveMsgVO> hitPageInfoHandler(List<WeChatContactSensitiveMsg> msgList) {
+        List<WeChatContactSensitiveMsgVO> voList = Lists.newArrayList();
+        if (CollectionUtils.isNotEmpty(msgList)) {
+            msgList.forEach(msg -> {
+                WeChatContactSensitiveMsgVO vo = new WeChatContactSensitiveMsgVO();
+                vo.setContent(msg.getContent());
+                vo.setFrom(msg.getFrom());
+                vo.setMsgtime(msg.getMsgTime());
+                vo.setStatus(msg.getSendStatus().toString());
+                vo.setPatternWords(msg.getPatternWords());
+                voList.add(vo);
+            });
         }
-        return pageInfo;
+        return voList;
     }
 
     public List<String> getScopeUsers(List<WeSensitiveAuditScope> scopeList) {
