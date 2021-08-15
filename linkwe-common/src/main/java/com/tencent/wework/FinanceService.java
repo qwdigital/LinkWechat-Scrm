@@ -230,7 +230,7 @@ public class FinanceService{
     }
 
     private void setMediaVoiceData(JSONObject realJsonData, String msgType) {
-        String fileName = IdUtils.simpleUUID() + ".mp3";
+        String fileName = IdUtils.simpleUUID() + ".amr";
         getPath(realJsonData, msgType, fileName);
     }
 
