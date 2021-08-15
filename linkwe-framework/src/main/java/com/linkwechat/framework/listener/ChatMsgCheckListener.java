@@ -16,6 +16,7 @@ import com.linkwechat.wecom.mapper.WeChatContactSensitiveMsgMapper;
 import com.linkwechat.wecom.mapper.WeSensitiveMapper;
 import com.linkwechat.wecom.service.IWeChatContactMsgService;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
+import com.linkwechat.wecom.service.IWeSensitiveActHitService;
 import com.linkwechat.wecom.service.IWeSensitiveService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -49,6 +50,8 @@ public class ChatMsgCheckListener implements MessageListener {
     private IWeCorpAccountService weCorpAccountService;
     @Autowired
     private WeMessagePushClient weMessagePushClient;
+    @Autowired
+    private IWeSensitiveActHitService weSensitiveActHitService;
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
@@ -61,16 +64,23 @@ public class ChatMsgCheckListener implements MessageListener {
     }
 
     private void msgContextHandle(JSONObject jsonObject) {
+        String msgType = jsonObject.getString("msgtype");
+        if ("external_redpacket".equals(msgType)
+                || "redpacket".equals(msgType)
+                || "card".equals(msgType)) {
+            weSensitiveActHitService.hitWeSensitiveAct(jsonObject);
+        } else {
+            handleSensitiveHit(jsonObject, msgType);
+        }
+    }
+
+    private void handleSensitiveHit(JSONObject jsonObject, String msgType) {
         String from = jsonObject.getString("from");
         String msgId = jsonObject.getString("msgid");
-        String roomId = jsonObject.getString("roomid");
-        String msgType = jsonObject.getString("msgtype");
-        String content = null;
         String objectString = jsonObject.getString(jsonObject.getString("msgtype"));
+        String content = null;
         if (StringUtils.isNotEmpty(objectString)) {
             content = objectString;
-        } else if ("external_redpacket".equals(msgType)) {
-            content = jsonObject.getString("redpacket");
         } else if ("docmsg".equals(msgType)) {
             content = jsonObject.getString("doc");
         } else if ("markdown".equals(msgType)
@@ -81,7 +91,7 @@ public class ChatMsgCheckListener implements MessageListener {
         //获取所有的敏感词规则
         List<WeSensitive> allSensitiveRules = weSensitiveMapper.selectWeSensitiveList(new WeSensitive());
         //根据规则过滤命中
-        if (CollectionUtils.isNotEmpty(allSensitiveRules) && StringUtils.isBlank(roomId)) {
+        if (CollectionUtils.isNotEmpty(allSensitiveRules)) {
             String finalContent = content;
             allSensitiveRules.parallelStream().forEach(weSensitive -> {
                 List<String> patternWords = Arrays.asList(weSensitive.getPatternWords().split(","));

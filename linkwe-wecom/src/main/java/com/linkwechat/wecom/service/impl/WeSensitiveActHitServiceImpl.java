@@ -19,14 +19,11 @@ import com.linkwechat.wecom.mapper.WeUserMapper;
 import com.linkwechat.wecom.service.IWeSensitiveActHitService;
 import com.linkwechat.wecom.service.IWeSensitiveActService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @author leejoker <1056650571@qq.com>
@@ -62,35 +59,27 @@ public class WeSensitiveActHitServiceImpl extends ServiceImpl<WeSensitiveActHitM
     }
 
     @Override
-    @Async
     @Transactional
-    public void hitWeSensitiveAct(List<JSONObject> chatDataList) {
-        List<WeSensitiveActHit> saveList = chatDataList.stream().filter(chatData -> {
-            String type = chatData.getString("msgtype");
-            String roomId = chatData.getString("roomid");
-            if (("card".equals(type) || "redpacket".equals(type))
-                    && StringUtils.isEmpty(roomId)) {
-                return true;
+    public void hitWeSensitiveAct(JSONObject chatJson) {
+        if (chatJson != null) {
+            String roomId = chatJson.getString("roomid");
+            if (StringUtils.isEmpty(roomId)) {
+                WeSensitiveActHit weSensitiveActHit = new WeSensitiveActHit();
+                WeSensitiveAct weSensitiveAct = getSensitiveActType(chatJson.getString("msgtype"));
+                if (weSensitiveAct != null && weSensitiveAct.getEnableFlag() == 1) {
+                    weSensitiveActHit.setSensitiveAct(weSensitiveAct.getActName());
+                    weSensitiveActHit.setSensitiveActId(weSensitiveAct.getId());
+                    weSensitiveActHit.setCreateTime(new Date(chatJson.getLong("msgtime")));
+                    weSensitiveActHit.setCreateBy(SecurityUtils.getUsername());
+                    String operatorId = chatJson.getString("from");
+                    String operatorTargetId = chatJson.getJSONArray("tolist").getString(0);
+                    weSensitiveActHit.setOperatorId(operatorId);
+                    weSensitiveActHit.setOperateTargetId(operatorTargetId);
+                    setUserOrCustomerInfo(weSensitiveActHit);
+                    saveOrUpdate(weSensitiveActHit);
+                }
             }
-            return false;
-        }).map(chatData -> {
-            WeSensitiveActHit weSensitiveActHit = new WeSensitiveActHit();
-            WeSensitiveAct weSensitiveAct = getSensitiveActType(chatData.getString("msgtype"));
-            if (weSensitiveAct != null && weSensitiveAct.getEnableFlag() == 1) {
-                weSensitiveActHit.setSensitiveAct(weSensitiveAct.getActName());
-                weSensitiveActHit.setSensitiveActId(weSensitiveAct.getId());
-                weSensitiveActHit.setCreateTime(new Date(chatData.getLong("msgtime")));
-                weSensitiveActHit.setCreateBy(SecurityUtils.getUsername());
-                String operatorId = chatData.getString("from");
-                String operatorTargetId = chatData.getJSONArray("tolist").getString(0);
-                weSensitiveActHit.setOperatorId(operatorId);
-                weSensitiveActHit.setOperateTargetId(operatorTargetId);
-                setUserOrCustomerInfo(weSensitiveActHit);
-                return weSensitiveActHit;
-            }
-            return null;
-        }).filter(Objects::nonNull).collect(Collectors.toList());
-        saveOrUpdateBatch(saveList);
+        }
     }
 
     private WeSensitiveAct getSensitiveAct(String type) {
