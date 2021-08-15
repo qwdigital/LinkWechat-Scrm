@@ -70,27 +70,23 @@
         <div>客户标签</div>
         <div class="data" is-link @click="labelEdit">编辑</div>
       </div>
-      <van-row v-if="form.weTagGroupList" gutter="10" class="labelstyle mt15">
-        <van-col
-          span="4.5"
-          v-for="(item, index) in form.weTagGroupList"
-          :key="index"
-        >
+      <div v-if="form.weTagGroupList" class="labelstyle mt15">
+        <template v-for="item in form.weTagGroupList">
           <div
             class="label"
-            v-for="(item1, index1) in item.weTags"
-            :key="index1"
+            v-for="(unit, unique) in item.weTags"
+            :key="unique"
           >
-            {{ item1.name }}
+            {{ unit.name }}
           </div>
-        </van-col>
+        </template>
         <!-- <van-col span="4.5"> <div class="label">标签1</div></van-col>
         <van-col span="4.5"> <div class="label">标签1</div></van-col>
         <van-col span="4.5"> <div class="label">标签1</div></van-col>
         <van-col span="4.5"> <div class="label">标签1</div></van-col>
         <van-col span="4.5"> <div class="label">标签1</div></van-col>
         <van-col span="4.5"> <div class="label">标签1</div></van-col> -->
-      </van-row>
+      </div>
     </div>
     <div class="divider"></div>
 
@@ -129,44 +125,6 @@
         <van-tab :name="3" title="活动动态"></van-tab>
         <van-tab :name="4" title="待办动态"></van-tab>
       </van-tabs>
-      <!-- <van-row gutter="8" class="labelstyle">
-        <van-col span="6">
-          <div
-            class="label1"
-            @click="changeInfo('information')"
-            :style="styleActive1"
-          >
-            信息动态
-          </div></van-col
-        >
-        <van-col span="6">
-          <div
-            class="label1"
-            @click="changeInfo('socialContact')"
-            :style="styleActive2"
-          >
-            社交动态
-          </div></van-col
-        >
-        <van-col span="6">
-          <div
-            class="label1"
-            @click="changeInfo('activity')"
-            :style="styleActive3"
-          >
-            活动动态
-          </div></van-col
-        >
-        <van-col span="6">
-          <div
-            class="label1"
-            @click="changeInfo('dealtWith')"
-            :style="styleActive4"
-          >
-            待办动态
-          </div></van-col
-        >
-      </van-row> -->
 
       <!-- 步骤条 -->
 
@@ -275,7 +233,7 @@
           />
         </van-action-sheet>
         <!-- 保存 -->
-        <div style="margin: 30px;">
+        <div style="margin: 30px">
           <van-button
             round
             block
@@ -442,7 +400,7 @@ export default {
     },
     init() {
       let _this = this
-      wx.invoke('getContext', {}, function(res) {
+      wx.invoke('getContext', {}, function (res) {
         if (res.err_msg == 'getContext:ok') {
           let entry = res.entry //返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
           if (
@@ -549,8 +507,9 @@ export default {
     },
     // 待办日期
     formatDate(dateagency) {
-      return `${dateagency.getFullYear()}-${dateagency.getMonth() +
-        1}-${dateagency.getDate()}`
+      return `${dateagency.getFullYear()}-${
+        dateagency.getMonth() + 1
+      }-${dateagency.getDate()}`
     },
     onConfirm(dateagency) {
       this.dateshow = false
@@ -765,8 +724,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  .label,
-  .label1 {
+  .label {
     display: inline-block;
     min-width: 45px;
     font-size: 12px;
