@@ -126,7 +126,7 @@ export default {
     },
     groupFn(data) {
       this.queryChat = {
-        fromId: this.fromId,
+        // fromId: this.fromId,
         receiveName: data.name,
         roomId: data.receiver
       }
