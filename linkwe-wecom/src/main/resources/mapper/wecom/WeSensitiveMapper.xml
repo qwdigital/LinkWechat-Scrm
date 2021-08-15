@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeSensitiveMapper">
 
-    <resultMap type="WeSensitive" id="WeSensitiveResult">
+    <resultMap type="com.linkwechat.wecom.domain.WeSensitive" id="WeSensitiveResult">
         <result property="id" column="id"/>
         <result property="strategyName" column="strategy_name"/>
         <result property="patternWords" column="pattern_words"/>
@@ -33,7 +33,7 @@
         = b.sensitive_id
     </sql>
 
-    <select id="selectWeSensitiveList" parameterType="WeSensitive" resultMap="WeSensitiveResult">
+    <select id="selectWeSensitiveList" parameterType="com.linkwechat.wecom.domain.WeSensitive" resultMap="WeSensitiveResult">
         <include refid="selectWeSensitiveList"/>
         <where>
             <if test="strategyName != null  and strategyName != ''">and a.strategy_name like concat('%',
@@ -64,7 +64,7 @@
         order by a.update_time desc, a.create_time desc
     </select>
 
-    <insert id="insertWeSensitive" parameterType="WeSensitive" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertWeSensitive" parameterType="com.linkwechat.wecom.domain.WeSensitive" useGeneratedKeys="true" keyProperty="id">
         insert into we_sensitive
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="strategyName != null and strategyName != ''">strategy_name,</if>
@@ -92,7 +92,7 @@
         </trim>
     </insert>
 
-    <update id="updateWeSensitive" parameterType="WeSensitive">
+    <update id="updateWeSensitive" parameterType="com.linkwechat.wecom.domain.WeSensitive">
         update we_sensitive
         <trim prefix="SET" suffixOverrides=",">
             <if test="strategyName != null and strategyName != ''">strategy_name = #{strategyName},</if>
