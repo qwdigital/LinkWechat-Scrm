@@ -42,6 +42,10 @@ public class RuoYiConfig
     private boolean startTenant=false;
 
 
+    /**是否可以修改密码*/
+    private boolean editPwd=true;
+
+
 
     /**匿名访问的URL*/
     private String[] anonUrl;
@@ -172,5 +176,13 @@ public class RuoYiConfig
 
     public void setStartTenant(boolean startTenant) {
         this.startTenant = startTenant;
+    }
+
+    public boolean isEditPwd() {
+        return editPwd;
+    }
+
+    public void setEditPwd(boolean editPwd) {
+        this.editPwd = editPwd;
     }
 }
