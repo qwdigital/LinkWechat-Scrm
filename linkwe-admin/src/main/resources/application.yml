@@ -7,18 +7,22 @@ ruoyi:
   # 版权年份
   copyrightYear: 2019
   startTenant: false
+  editPwd: false
   # 实例演示开关
   demoEnabled: true
+  # 是否开启文件云上传（使用的是腾讯云，如果开启了，则需要配置腾讯云存储相关信息；如果关闭了则文件存储再本地，需要配置本地路径）
   file:
-    startCosUpload: true
-#腾讯云对象存储
+    startCosUpload: false
+    #如果startCosUpload为false时必须设置，则文件资源放在本地服务器上，该配置为文件访问前缀,配置到nginx上可以直接访问
+    imgUrlPrefix: /lwImg
+    #腾讯云对象存储
     cos:
-      secretId: 
-      secretKey: 
+      secretId:
+      secretKey:
       #link-wechat-1251309172.cos.ap-nanjing.myqcloud.com
-      region: 
-      bucketName: 
-      cosImgUrlPrefix: 
+      region:
+      bucketName:
+      cosImgUrlPrefix:
   # 文件路径 示例（ Windows配置D:/ruoyi/uploadPath，Linux配置 /app/project/pic）
   #profile: /data/jenkins_home/app/project/
   # 获取ip地址开关
@@ -27,39 +31,39 @@ ruoyi:
   captchaType: math
   # 企业微信用户首次登录系统默认密码
   weUserDefaultPwd: 123456
-   #匿名访问的URL
+  #匿名访问的URL
   anonUrl:
-      - /login
-      - /captchaImage
-      - /findWxQrLoginInfo
-      - /wxQrLogin
-      - /profile/**
-      - /common/download**
-      - /common/download/resource**
-      - /common/download/url**
-      - /swagger-ui.html
-      - /swagger-resources/**
-      - /webjars/**
-      - /*/api-docs
-      - /druid/**
-      - /wecom/callback/**
-      - /wecom/chat/item/list
-      - /wecom/chat/collection/list
-      - /wecom/chat/collection/cancleCollection
-      - /wecom/chat/collection/addCollection
-      - /wecom/chat/side/h5List
-      - /wecom/ticket/**
-      - /wecom/user/getUserInfo
-      - /wecom/portrait/**
-      - /wecom/fission/poster
-      - /wecom/fission/complete/**
-      - /wecom/fission/*/progress/*
-      - /wecom/reward/getRewardByFissionId/**
-      - /wecom/groupCode/getActualCode/**
-      - /wecom/community/h5/**
-      - /weixin/auth/**
-      - /wecom/material/temporaryMaterialMediaId
-      - /common/findFile
+    - /login
+    - /captchaImage
+    - /findWxQrLoginInfo
+    - /wxQrLogin
+    - /profile/**
+    - /common/download**
+    - /common/download/resource**
+    - /common/download/url**
+    - /swagger-ui.html
+    - /swagger-resources/**
+    - /webjars/**
+    - /*/api-docs
+    - /druid/**
+    - /wecom/callback/**
+    - /wecom/chat/item/list
+    - /wecom/chat/collection/list
+    - /wecom/chat/collection/cancleCollection
+    - /wecom/chat/collection/addCollection
+    - /wecom/chat/side/h5List
+    - /wecom/ticket/**
+    - /wecom/user/getUserInfo
+    - /wecom/portrait/**
+    - /wecom/fission/poster
+    - /wecom/fission/complete/**
+    - /wecom/fission/*/progress/*
+    - /wecom/reward/getRewardByFissionId/**
+    - /wecom/groupCode/getActualCode/**
+    - /wecom/community/h5/**
+    - /weixin/auth/**
+    - /wecom/material/temporaryMaterialMediaId
+    - /common/findFile
 
 # 开发环境配置
 server:
@@ -81,6 +85,7 @@ logging:
   level:
     com.ruoyi: debug
     org.springframework: warn
+  path: ./logs
 path:
   log: ./logs
 
@@ -97,67 +102,67 @@ spring:
     # 国际化资源文件路径
     basename: i18n/messages
   datasource:
-        type: com.alibaba.druid.pool.DruidDataSource
-        driverClassName: com.mysql.cj.jdbc.Driver
-        druid:
-            # 主库数据源
-            master:
-                url: jdbc:mysql://127.0.0.1:10179/link-wechat-prod?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
-                username: root
-                password: root
-            # 从库数据源
-            slave:
-                # 从数据源开关/默认关闭
-                enabled: false
-                url:
-                username:
-                password:
-            # 初始连接数
-            initialSize: 5
-            # 最小连接池数量
-            minIdle: 10
-            # 最大连接池数量
-            maxActive: 20
-            # 配置获取连接等待超时的时间
-            maxWait: 60000
-            # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
-            timeBetweenEvictionRunsMillis: 60000
-            # 配置一个连接在池中最小生存的时间，单位是毫秒
-            minEvictableIdleTimeMillis: 300000
-            # 配置一个连接在池中最大生存的时间，单位是毫秒
-            maxEvictableIdleTimeMillis: 900000
-            # 配置检测连接是否有效
-            validationQuery: SELECT 1 FROM DUAL
-            testWhileIdle: true
-            testOnBorrow: false
-            testOnReturn: false
-            webStatFilter:
-                enabled: true
-            statViewServlet:
-                enabled: true
-                # 设置白名单，不填则允许所有访问
-                allow:
-                url-pattern: /druid/*
-                # 控制台管理用户名和密码
-                login-username:
-                login-password:
-            filter:
-                stat:
-                    enabled: true
-                    # 慢SQL记录
-                    log-slow-sql: true
-                    slow-sql-millis: 1000
-                    merge-sql: true
-                wall:
-                    config:
-                        multi-statement-allow: true
+    type: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    druid:
+      # 主库数据源
+      master:
+        url: jdbc:mysql://127.0.0.1:10179/link-wechat-prod?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+        username: root
+        password: root
+      # 从库数据源
+      slave:
+        # 从数据源开关/默认关闭
+        enabled: false
+        url:
+        username:
+        password:
+      # 初始连接数
+      initialSize: 5
+      # 最小连接池数量
+      minIdle: 10
+      # 最大连接池数量
+      maxActive: 20
+      # 配置获取连接等待超时的时间
+      maxWait: 60000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      timeBetweenEvictionRunsMillis: 60000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      minEvictableIdleTimeMillis: 300000
+      # 配置一个连接在池中最大生存的时间，单位是毫秒
+      maxEvictableIdleTimeMillis: 900000
+      # 配置检测连接是否有效
+      validationQuery: SELECT 1 FROM DUAL
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      webStatFilter:
+        enabled: true
+      statViewServlet:
+        enabled: true
+        # 设置白名单，不填则允许所有访问
+        allow:
+        url-pattern: /druid/*
+        # 控制台管理用户名和密码
+        login-username:
+        login-password:
+      filter:
+        stat:
+          enabled: true
+          # 慢SQL记录
+          log-slow-sql: true
+          slow-sql-millis: 1000
+          merge-sql: true
+        wall:
+          config:
+            multi-statement-allow: true
   # 文件上传
   servlet:
-     multipart:
-       # 单个文件大小
-       max-file-size:  10MB
-       # 设置总上传的文件大小
-       max-request-size:  20MB
+    multipart:
+      # 单个文件大小
+      max-file-size:  10MB
+      # 设置总上传的文件大小
+      max-request-size:  20MB
   task:
     execution:
       pool:
@@ -192,24 +197,24 @@ spring:
 
 # token配置
 token:
-    # 令牌自定义标识
-    header: Authorization
-    # 令牌密钥
-    secret: abcdefghijklmnopqrstuvwxyz
-    # 令牌有效期（默认30分钟）
-    expireTime: 30
+  # 令牌自定义标识
+  header: Authorization
+  # 令牌密钥
+  secret: abcdefghijklmnopqrstuvwxyz
+  # 令牌有效期（默认30分钟）
+  expireTime: 30
 
 mybatis-plus:
-   mapper-locations: classpath*:mapper/**/*Mapper.xml
-   type-aliases-package: com.linkwechat.**.domain
-   type-handlers-package: com.linkwechat.framework.handler.GenericTypeHandler,com.linkwechat.framework.handler.StringArrayJoinTypeHandler
-   configuration:
-     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-   global-config:
-     db-config:
-       logic-delete-field: delFlag
-       logic-delete-value: 1
-       logic-not-delete-value: 0
+  mapper-locations: classpath*:mapper/**/*Mapper.xml
+  type-aliases-package: com.linkwechat.**.domain
+  type-handlers-package: com.linkwechat.framework.handler.GenericTypeHandler,com.linkwechat.framework.handler.StringArrayJoinTypeHandler
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: delFlag
+      logic-delete-value: 1
+      logic-not-delete-value: 0
 
 ## MyBatis配置
 #mybatis:
@@ -246,9 +251,9 @@ xss:
 # elasticsearch配置
 #elasticsearch:
 #  schema: http
-#  address:
-#  userName: ""
-#  password: ""
+#  address: 47.112.117.15:7200,47.112.117.15:7201,47.112.117.15:7202
+#  userName: "elastic"
+#  password: "0p-0p-0p-"
 #  connectTimeout: 10000
 #  socketTimeout: 10000
 #  connectionRequestTimeout: 10000
@@ -262,7 +267,7 @@ forest:
   max-retry-interval: 1000 #重试间隔时间
   connect-timeout: 3000 #链接超时时间
   timeout: 3000  # 请求超时时间
-  variables: #全局变量 企微和微信接口地址
+  variables:
     weComServerUrl: https://qyapi.weixin.qq.com/
     weComePrefix: cgi-bin
     wxServerUrl: https://api.weixin.qq.com/
@@ -273,73 +278,73 @@ wecome:
   serverUrl: https://qyapi.weixin.qq.com/
   weComePrefix: cgi-bin
   noAccessTokenUrl:
-          - /gettoken
-          - /service/get_provider_token
-          - /wecom/chat/side/list
-          - /wecom/chat/item/list
-          - /wecom/chat/collection/addCollection
-          - /wecom/chat/collection/cancleCollection
-          - /wecom/chat/collection/list
+    - /gettoken
+    - /service/get_provider_token
+    - /wecom/chat/side/list
+    - /wecom/chat/item/list
+    - /wecom/chat/collection/addCollection
+    - /wecom/chat/collection/cancleCollection
+    - /wecom/chat/collection/list
   needContactTokenUrl:
-          - /externalcontact/get_follow_user_list
-          - /externalcontact/add_contact_way
-          - /externalcontact/update_contact_way
-          - /externalcontact/add_corp_tag
-          - /externalcontact/get_corp_tag_list
-          - /externalcontact/del_corp_tag
-          - /externalcontact/edit_corp_tag
-          - /externalcontact/list
-          - /externalcontact/get
-          - /externalcontact/batch/get_by_user
-          - /externalcontact/groupchat/list
-          - /externalcontact/groupchat/get
-          - /externalcontact/mark_tag
-          - /externalcontact/transfer
-          - /externalcontact/groupchat/transfer
-          - /externalcontact/get_unassigned_list
-          - /externalcontact/send_welcome_msg
-          - /externalcontact/unionid_to_external_userid
-          - /externalcontact/add_msg_template
-          - /externalcontact/get_group_msg_result
-          - /externalcontact/get_user_behavior_data
-          - /externalcontact/groupchat/statistic
-          - /externalcontact/groupchat/statistic_group_by_day
+    - /externalcontact/get_follow_user_list
+    - /externalcontact/add_contact_way
+    - /externalcontact/update_contact_way
+    - /externalcontact/add_corp_tag
+    - /externalcontact/get_corp_tag_list
+    - /externalcontact/del_corp_tag
+    - /externalcontact/edit_corp_tag
+    - /externalcontact/list
+    - /externalcontact/get
+    - /externalcontact/batch/get_by_user
+    - /externalcontact/groupchat/list
+    - /externalcontact/groupchat/get
+    - /externalcontact/mark_tag
+    - /externalcontact/transfer
+    - /externalcontact/groupchat/transfer
+    - /externalcontact/get_unassigned_list
+    - /externalcontact/send_welcome_msg
+    - /externalcontact/unionid_to_external_userid
+    - /externalcontact/add_msg_template
+    - /externalcontact/get_group_msg_result
+    - /externalcontact/get_user_behavior_data
+    - /externalcontact/groupchat/statistic
+    - /externalcontact/groupchat/statistic_group_by_day
   fileUplodUrl:  /media/upload,/media/uploadimg
   needProviderTokenUrl:
-          - /service/get_login_info
+    - /service/get_login_info
   needChatTokenUrl:
-          - /msgaudit/get_permit_user_list
-          - /msgaudit/check_single_agree
-          - /msgaudit/check_room_agree
-          - /msgaudit/groupchat/get
+    - /msgaudit/get_permit_user_list
+    - /msgaudit/check_single_agree
+    - /msgaudit/check_room_agree
+    - /msgaudit/groupchat/get
   thirdAppUrl:
-          - /user/getuserinfo
-          - /get_jsapi_ticket
-          - /ticket/get
-          - /agent/list
-          - /message/send
-          - /agent/get
-          - /agent/set
+    - /user/getuserinfo
+    - /get_jsapi_ticket
+    - /ticket/get
+    - /agent/list
+    - /message/send
+    - /agent/get
+    - /agent/set
   needTenant:
-          - we_department
-          - we_user
-          - we_customer
-          - we_flower_customer_rel
-          - we_flower_customer_tag_rel
-          - we_group
-          - we_group_member
-          - we_tag_group
-          - we_tag  
+    - we_department
+    - we_user
+    - we_customer
+    - we_flower_customer_rel
+    - we_flower_customer_tag_rel
+    - we_group
+    - we_group_member
+    - we_tag_group
+    - we_tag
   #企微回调通知配置
   callBack:
-    appIdOrCorpId: 
-    token: 
-    encodingAesKey: 
+    appIdOrCorpId: ww38152475d1bca752
+    token: Fm05d6n0NpuFrvOlgVxIbeSXtjgz
+    encodingAesKey: laevP8xCEG7BUqv5GuYXfg9HaRecxe4MU5F5cmnAI7n
   # JS SDK 身份校验url
   authorizeUrl: https://open.weixin.qq.com/connect/oauth2/authorize
   # JS SDK身份校验成功后的redirect url
-  authorizeRedirectUrl: 
+  authorizeRedirectUrl: http://linkwechat.cn/mobile/#/task
 
 weixin:
-  appid: 
-  secret: 
+  appid: wxa57479bcd3f15461
+  secret: f23f4becdcac9819f292a3754fd8f84e

@@ -1,6 +1,5 @@
 package com.linkwechat.web.controller.common;
 
-import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.config.ServerConfig;
 import com.linkwechat.common.constant.Constants;
@@ -9,7 +8,6 @@ import com.linkwechat.common.core.domain.FileVo;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.file.FileUtils;
-import com.linkwechat.common.utils.file.MimeTypeUtils;
 import com.linkwechat.framework.web.domain.server.SysFile;
 import com.linkwechat.framework.web.service.FileService;
 import org.slf4j.Logger;
@@ -17,13 +15,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
  * 通用请求处理
