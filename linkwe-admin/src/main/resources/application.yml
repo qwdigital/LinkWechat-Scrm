@@ -10,7 +10,9 @@ ruoyi:
   # 实例演示开关
   demoEnabled: true
   file:
-    startCosUpload: true
+    startCosUpload: false
+     #如果startCosUpload关闭了，则文件资源放在本地服务器上，该配置为文件访问前缀,配置到nginx上可以直接访问
+    imgUrlPrefix: /lwImg
 #腾讯云对象存储
     cos:
       secretId:
