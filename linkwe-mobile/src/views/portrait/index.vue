@@ -70,7 +70,7 @@
         <div>客户标签</div>
         <div class="data" is-link @click="labelEdit">编辑</div>
       </div>
-      <div v-if="form.weTagGroupList" class="labelstyle mt15">
+      <div v-if="form.weTagGroupList" class="labelstyle mt10">
         <template v-for="item in form.weTagGroupList">
           <div
             class="label"
@@ -128,7 +128,10 @@
 
       <!-- 步骤条 -->
 
-      <StepList :stepList="list"></StepList>
+      <div class="ac">
+        <van-loading v-if="loadingStep" type="spinner" />
+      </div>
+      <StepList :stepList="list" @reload="changeInfo()"></StepList>
     </div>
 
     <!-- 点击客户标签里的编辑触发弹出框开始 -->
@@ -295,7 +298,7 @@ export default {
       // 待办动态
       todonewsshow: false,
       // 接口开始
-      // externalUserid: 'wmiGuBCgAAoCBD1frD3hRplbsXoBLx6g', // 客户Id
+      externalUserid: '', // 客户IdwmiGuBCgAAoCBD1frD3hRplbsXoBLx6g
       // externalUserid: 'wmiGuBCgAAgeijfvvpJ62cBfwrB-c4kw',
       form: {
         name: '', // 昵称
@@ -334,7 +337,8 @@ export default {
       loading: false,
       finished: false,
       list: [],
-      agentId: ''
+      agentId: '', // 1000012,
+      loadingStep: false
     }
   },
   watch: {
@@ -400,7 +404,7 @@ export default {
     },
     init() {
       let _this = this
-      wx.invoke('getContext', {}, function (res) {
+      wx.invoke('getContext', {}, function(res) {
         if (res.err_msg == 'getContext:ok') {
           let entry = res.entry //返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
           if (
@@ -450,6 +454,8 @@ export default {
         .then((data) => {
           //  重新获取列表
           this.findAddaddEmployes()
+          this.findTrajectory()
+
           if (data.code == 200) {
             this.$toast.success('保存成功')
             this.usershow = false
@@ -461,6 +467,7 @@ export default {
     },
     //   获取轨迹信息
     findTrajectory(page) {
+      this.loadingStep = true
       let query = {
         pageNum: page,
         pageSize: 10,
@@ -468,14 +475,15 @@ export default {
         externalUserid: this.externalUserid
       }
       Object.assign(query, this.query)
-      page && (query.page = page)
       findTrajectory(query)
         .then((data) => {
           //   console.log(data.total);
           this.list = data.rows
+          this.loadingStep = false
         })
         .catch((err) => {
           console.log(err)
+          this.loadingStep = false
         })
     },
     // 点击信息动态
@@ -490,9 +498,9 @@ export default {
         userId: this.userId,
         externalUserid: this.externalUserid,
         content: this.conagency,
-        createDate: new Date(this.dateagency),
-        startTime: new Date(this.startTime),
-        endTime: new Date(this.endTime),
+        createDate: this.dateagency,
+        startTime: `${this.dateagency} ${this.startTime}:00`,
+        endTime: `${this.dateagency} ${this.endTime}:00`,
         status: 1,
         agentId: this.agentId
       }
@@ -502,14 +510,11 @@ export default {
       this.dateagency = ''
       this.startTime = ''
       this.endTime = ''
-      // 重新获取列表
-      this.findTrajectory()
     },
     // 待办日期
     formatDate(dateagency) {
-      return `${dateagency.getFullYear()}-${
-        dateagency.getMonth() + 1
-      }-${dateagency.getDate()}`
+      return `${dateagency.getFullYear()}-${dateagency.getMonth() +
+        1}-${dateagency.getDate()}`
     },
     onConfirm(dateagency) {
       this.dateshow = false
