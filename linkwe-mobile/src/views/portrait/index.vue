@@ -80,12 +80,6 @@
             {{ unit.name }}
           </div>
         </template>
-        <!-- <van-col span="4.5"> <div class="label">标签1</div></van-col>
-        <van-col span="4.5"> <div class="label">标签1</div></van-col>
-        <van-col span="4.5"> <div class="label">标签1</div></van-col>
-        <van-col span="4.5"> <div class="label">标签1</div></van-col>
-        <van-col span="4.5"> <div class="label">标签1</div></van-col>
-        <van-col span="4.5"> <div class="label">标签1</div></van-col> -->
       </div>
     </div>
     <div class="divider"></div>
@@ -298,8 +292,9 @@ export default {
       // 待办动态
       todonewsshow: false,
       // 接口开始
-      externalUserid: '', // 客户IdwmiGuBCgAAoCBD1frD3hRplbsXoBLx6g
-      // externalUserid: 'wmiGuBCgAAgeijfvvpJ62cBfwrB-c4kw',
+      externalUserid: '',
+      // externalUserid: 'wmiGuBCgAAoCBD1frD3hRplbsXoBLx6g', // 客户IdwmiGuBCgAAoCBD1frD3hRplbsXoBLx6g
+      // externalUserid: 'wmiGuBCgAAsQVuCR_zoXfnQsnCGG25rQ',
       form: {
         name: '', // 昵称
         remarkMobiles: '', // 手机号
@@ -373,7 +368,7 @@ export default {
     let hash = param2Obj(window.location.hash)
     query = Object.assign(query, hash)
     this.agentId = query.agentId
-    // console.log(agentId)
+    console.log(agentId)
 
     // this.findAddaddEmployes()
     // this.findAddGroupNum()
@@ -602,7 +597,7 @@ export default {
       this.show = true
       if (this.form.weTagGroupList) {
         this.form.weTagGroupList.forEach((ele) => {
-          this.addTag.push(...ele.weTags[0])
+          this.addTag.push(...ele.weTags)
         })
       }
       // 获取用户当前的lable,将当前用户的lable与所有lable进行对比，相同的弹框内蓝色展示

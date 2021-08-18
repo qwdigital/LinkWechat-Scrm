@@ -7,11 +7,10 @@
       loading-text="上划加载更多"
     >
       <van-cell v-for="(item, index) in wList" :key="index">
-        <!-- {{item[0].createDate}} -->
         <!-- 时间 -->
         <p class="f12" style="position:relative; ">
-          {{ dateFormat(item[0].createDate, 'yyyy-MM-dd') }}
-          {{ dateFormat(item[0].createDate, 'ww') }}
+          {{ dateFormat(item[0].createTime, 'yyyy-MM-dd') }}
+          {{ dateFormat(item[0].createTime, 'ww') }}
           <!-- {{item1.trajectoryType}} -->
         </p>
         <!-- <van-cell> -->
@@ -24,7 +23,7 @@
         >
           <van-step class="msg">
             <span class="f12 po">
-              {{ dateFormat(item[0].createDate, 'hh:mm') }}</span
+              {{ dateFormat(item[0].createTime, 'hh:mm') }}</span
             >
             <span class="fs14">{{ chargeType(item1.trajectoryType) }}</span>
             <span class="finish-box">
@@ -78,15 +77,15 @@ export default {
       let dayList = []
 
       newVal.forEach((ele) => {
-        let date = this.dateFormat(ele.createDate, 'yyyyMMdd')
+        let date = this.dateFormat(ele.createTime, 'yyyyMMdd')
         dayList.includes(date) || dayList.push(date)
       })
       dayList.sort((a, b) => b - a)
       for (let i = 0; i < dayList.length; i++) {
         let timeList = []
         for (let j = 0; j < newVal.length; j++) {
-          // console.log(newVal[j].createDate);
-          if (dayList[i] == this.dateFormat(newVal[j].createDate, 'yyyyMMdd')) {
+          // console.log(newVal[j].createTime);
+          if (dayList[i] == this.dateFormat(newVal[j].createTime, 'yyyyMMdd')) {
             timeList.push(newVal[j])
           }
         }
@@ -101,23 +100,22 @@ export default {
   },
   methods: {
     onLoad() {
-      // 异步更新数据
-      // setTimeout 仅做示例，真实场景中一般为 ajax 请求
-      setTimeout(() => {
-        //   debugger
-        let total = this.wlist.length > 10 ? 10 : this.wlist.length
-        for (let i = 0; i < total; i++) {
-          this.wList.push(this.wlist[i])
-        }
-        console.log(this.wList)
-        // 加载状态结束
-        this.loading = false
-
-        // 数据全部加载完成
-        if (this.wList.length >= this.wlist.length) {
-          this.finished = true
-        }
-      }, 1000)
+      // // 异步更新数据
+      // // setTimeout 仅做示例，真实场景中一般为 ajax 请求
+      // setTimeout(() => {
+      //   //   debugger
+      //   let total = this.wlist.length > 10 ? 10 : this.wlist.length
+      //   for (let i = 0; i < total; i++) {
+      //     this.wList.push(this.wlist[i])
+      //   }
+      //   console.log(this.wList)
+      //   // 加载状态结束
+      //   this.loading = false
+      //   // 数据全部加载完成
+      //   if (this.wList.length >= this.wlist.length) {
+      //     this.finished = true
+      //   }
+      // }, 1000)
     },
     //   根据数字判断类型
     chargeType(num) {
