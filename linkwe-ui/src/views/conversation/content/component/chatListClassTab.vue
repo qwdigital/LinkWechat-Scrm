@@ -141,7 +141,9 @@ export default {
       this.getList(1)
     }
   },
-  created() {},
+  created() {
+    this.getList(1)
+  },
   mounted() {},
   methods: {
     getList(page) {
