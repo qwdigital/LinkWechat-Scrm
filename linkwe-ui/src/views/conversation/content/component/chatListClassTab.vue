@@ -147,9 +147,9 @@ export default {
   mounted() {},
   methods: {
     getList(page) {
-      if (!this.queryChat.fromId) {
-        return //没有选择人
-      }
+      // if (!this.queryChat.fromId) {
+      //   return //没有选择人
+      // }
       this.loading = true
       let query = {
         msgType: this.type == 'all' ? '' : this.type,
