@@ -2,6 +2,7 @@ package com.linkwechat.wecom.interceptor;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
@@ -51,7 +52,6 @@ public class WeAccessTokenInterceptor implements Interceptor{
         String weComServerUrl = String.valueOf(forestConfiguration.getVariableValue("weComServerUrl"));
         String weComePrefix = String.valueOf(forestConfiguration.getVariableValue("weComePrefix"));
         String uri=request.getUrl().replace(weComServerUrl+weComePrefix,"");
-        log.info(">>>>>>>>>>>>>>>>>>>>>>>>uri：{}",uri);
 
         if(!Arrays.asList(weComeConfig.getFileUplodUrl()).contains(uri)){
             request.setDataType(ForestDataType.JSON);
@@ -74,13 +74,8 @@ public class WeAccessTokenInterceptor implements Interceptor{
             } else{
                 token=iWeAccessTokenService.findCommonAccessToken();
             }
-            if (uri.contains("ticket/get")){
-                request.addQuery("type","agent_config");
-            }
             request.addQuery("access_token",token);
         }
-        //添加服务器统一请求地址
-       // request.setUrl(weComeConfig.getServerUrl()+weComeConfig.getWeComePrefix()+uri);
         return true;
     }
 
@@ -94,8 +89,6 @@ public class WeAccessTokenInterceptor implements Interceptor{
      */
     @Override
     public void onError(ForestRuntimeException e, ForestRequest forestRequest, ForestResponse forestResponse) {
-
-
     }
 
 
@@ -107,12 +100,11 @@ public class WeAccessTokenInterceptor implements Interceptor{
      */
     @Override
     public void onSuccess(Object o, ForestRequest forestRequest, ForestResponse forestResponse) {
-        log.info("url:【{}】,result:【{}】",forestRequest.getUrl(),forestResponse.getContent());
+        log.info("url:{},result:{}",forestRequest.getUrl(),forestResponse.getContent());
         WeResultDto weResultDto = JSONUtil.toBean(forestResponse.getContent(), WeResultDto.class);
         if(null != weResultDto.getErrcode() && !weResultDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)&& !weResultDto.getErrcode().equals(WeConstans.NOT_EXIST_CONTACT) ){
             throw new ForestRuntimeException(forestResponse.getContent());
         }
-
     }
 
 

@@ -23,27 +23,4 @@ public interface WeAccessTokenClient {
      */
     @Request(url = "/gettoken")
     WeAccessTokenDtoDto getToken(@Query("corpid") String corpId, @Query("corpsecret") String corpSecret);
-
-
-    /**
-     * 获取供应商token
-     * @param corpid 服务商的corpid
-     * @param provider_secret 服务商的secret，在服务商管理后台可见
-     * @return
-     */
-    @Request(url = "/service/get_provider_token",
-    type="POST")
-    WeAccessTokenDtoDto getProviderToken(@Body("corpid") String corpid,@Body("provider_secret") String provider_secret);
-
-
-    /**
-     * 获取登录用户信息(扫码)
-     * @param auth_code
-     * @return
-     */
-    @Request(url = "/service/get_login_info",
-            type = "POST"
-    )
-    WeLoginUserInfoDto getLoginInfo(@Body("auth_code") String auth_code);
-
 }

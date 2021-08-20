@@ -6,6 +6,7 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysDept;
 import com.linkwechat.common.core.domain.entity.SysMenu;
 import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.common.core.domain.model.LoginBody;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.utils.ServletUtils;
@@ -14,9 +15,10 @@ import com.linkwechat.framework.web.service.SysPermissionService;
 import com.linkwechat.framework.web.service.TokenService;
 import com.linkwechat.system.service.ISysDeptService;
 import com.linkwechat.system.service.ISysMenuService;
-import com.linkwechat.wecom.client.WeAccessTokenClient;
-import com.linkwechat.common.core.domain.entity.WeCorpAccount;
+import com.linkwechat.system.service.ISysUserService;
+import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.domain.dto.WeLoginUserInfoDto;
+import com.linkwechat.wecom.domain.dto.WeUserInfoDto;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,10 +56,13 @@ public class SysLoginController
 
 
     @Autowired
-    private WeAccessTokenClient weAccessTokenClient;
+    private WeUserClient weUserClient;
 
     @Autowired
     private ISysDeptService iSysDeptService;
+
+    @Autowired
+    private ISysUserService sysUserService;
 
 
     /**
@@ -152,19 +157,24 @@ public class SysLoginController
 
     /**
      * 扫码登录微信端回调
-     * @param auth_code
+     * @param auth_code 授权code
+     * @param agentId 应用id
      * @return
      */
     @GetMapping("/wxQrLogin")
-    public AjaxResult wxQrLogin(String auth_code){
+    public AjaxResult wxQrLogin(String auth_code, String agentId){
 
         AjaxResult ajax = AjaxResult.success();
 
-        WeLoginUserInfoDto loginInfo = weAccessTokenClient.getLoginInfo(auth_code);
-        if( null != loginInfo.getUser_info()){
-
-                String token = loginService.noPwdLogin(loginInfo.getUser_info().getUserid());
+        WeUserInfoDto userInfo = weUserClient.getUserInfo(auth_code, agentId);
+        if( null != userInfo){
+            SysUser sysUser = sysUserService.selectUserByCorpUserId(userInfo.getUserId());
+            if (null != sysUser){
+                String token = loginService.noPwdLogin(sysUser.getUserName());
                 ajax.put(Constants.TOKEN, token);
+            }else {
+                return AjaxResult.error("请绑定后再登录");
+            }
         }
         return ajax;
     }

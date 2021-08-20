@@ -267,19 +267,15 @@ forest:
   max-retry-interval: 1000 #重试间隔时间
   connect-timeout: 3000 #链接超时时间
   timeout: 3000  # 请求超时时间
-  variables:
+  variables:   # 全局变量
     weComServerUrl: https://qyapi.weixin.qq.com/
     weComePrefix: cgi-bin
     wxServerUrl: https://api.weixin.qq.com/
     wxPrefix: sns
 
 wecome:
-  chatKey: finance_new
-  serverUrl: https://qyapi.weixin.qq.com/
-  weComePrefix: cgi-bin
   noAccessTokenUrl:
     - /gettoken
-    - /service/get_provider_token
     - /wecom/chat/side/list
     - /wecom/chat/item/list
     - /wecom/chat/collection/addCollection
