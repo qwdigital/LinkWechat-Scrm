@@ -306,8 +306,6 @@ wecome:
     - /externalcontact/groupchat/statistic
     - /externalcontact/groupchat/statistic_group_by_day
   fileUplodUrl:  /media/upload,/media/uploadimg
-  needProviderTokenUrl:
-    - /service/get_login_info
   needChatTokenUrl:
     - /msgaudit/get_permit_user_list
     - /msgaudit/check_single_agree
