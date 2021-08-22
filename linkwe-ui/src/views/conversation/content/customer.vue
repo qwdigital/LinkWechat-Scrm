@@ -44,6 +44,14 @@
                   ></i>
                 </el-col>
               </el-row>
+
+              <div class="ac mt10 mb15">
+                {{
+                  customerList.length != customerTotal
+                    ? '下拉加载更多'
+                    : '看到底了～'
+                }}
+              </div>
             </template>
             <el-empty v-else :image-size="100"></el-empty>
           </ul>

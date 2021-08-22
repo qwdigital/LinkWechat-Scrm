@@ -7,11 +7,10 @@
       loading-text="上划加载更多"
     >
       <van-cell v-for="(item, index) in wList" :key="index">
-        <!-- {{item[0].createDate}} -->
         <!-- 时间 -->
         <p class="f12" style="position:relative; ">
-          {{ getTime1(item[0].createDate) }}
-          {{ getTime3(getTime1(item[0].createDate)) }}
+          {{ dateFormat(item[0].createTime, 'yyyy-MM-dd') }}
+          {{ dateFormat(item[0].createTime, 'ww') }}
           <!-- {{item1.trajectoryType}} -->
         </p>
         <!-- <van-cell> -->
@@ -24,7 +23,7 @@
         >
           <van-step class="msg">
             <span class="f12 po">
-              {{ getTime2(getTime1(item1.createDate)) }}</span
+              {{ dateFormat(item[0].createTime, 'hh:mm') }}</span
             >
             <span class="fs14">{{ chargeType(item1.trajectoryType) }}</span>
             <span class="finish-box">
@@ -47,13 +46,14 @@
         </van-step> -->
         </van-steps>
       </van-cell>
-      <van-divider />
+      <!-- <van-divider /> -->
     </van-list>
   </div>
 </template>
 
 <script>
 import { removeTrajectory, handleWait } from '@/api/portrait'
+import { dateFormat } from '@/utils'
 export default {
   props: ['stepList'],
   inject: ['reload'],
@@ -63,9 +63,6 @@ export default {
       active: -1,
       //   轨迹外层按时间
       wlist: [],
-      // 轨迹内层
-      nlist: [],
-      oldele: [],
       content: '',
       type: 0,
       wList: [],
@@ -76,54 +73,49 @@ export default {
   watch: {
     stepList(newVal, oldVal) {
       //   console.log(newVal, oldVal);
-      if (newVal != oldVal) {
-        //   debugger
-        this.wlist = []
-        this.wList = []
-        this.oldele = []
-        this.nlist = []
-      }
+      this.wList = []
+      let dayList = []
 
       newVal.forEach((ele) => {
-        this.oldele.push(parseInt(this.getTime(ele.createDate)))
-        // console.log(parseInt(this.getTime(ele.createDate)));
+        let date = this.dateFormat(ele.createTime, 'yyyyMMdd')
+        dayList.includes(date) || dayList.push(date)
       })
-      //   console.log(this.oldele);
-      this.oldele = this.newArr(this.oldele).sort(this.f)
-      //   console.log(this.oldele);
-      for (let i = 0; i < this.oldele.length; i++) {
+      dayList.sort((a, b) => b - a)
+      for (let i = 0; i < dayList.length; i++) {
+        let timeList = []
         for (let j = 0; j < newVal.length; j++) {
-          // console.log(newVal[j].createDate);
-          if (this.oldele[i] == this.getTime(newVal[j].createDate)) {
-            this.nlist.push(newVal[j])
-            // console.log(this.nlist);
+          // console.log(newVal[j].createTime);
+          if (dayList[i] == this.dateFormat(newVal[j].createTime, 'yyyyMMdd')) {
+            timeList.push(newVal[j])
           }
         }
-        this.wlist.push(this.nlist)
-        this.nlist = []
+        this.wList.push(timeList)
       }
+      this.loading = false
+      this.finished = true
+
       // console.log(this.wlist);
-      this.onLoad()
+      // this.onLoad()
     }
   },
   methods: {
     onLoad() {
-      // 异步更新数据
-      // setTimeout 仅做示例，真实场景中一般为 ajax 请求
-      setTimeout(() => {
-        //   debugger
-        let total = this.wlist.length > 10 ? 10 : this.wlist.length
-        for (let i = 0; i < total; i++) {
-          this.wList.push(this.wlist[i])
-        }
-        // 加载状态结束
-        this.loading = false
-
-        // 数据全部加载完成
-        if (this.wList.length >= this.wlist.length) {
-          this.finished = true
-        }
-      }, 1000)
+      // // 异步更新数据
+      // // setTimeout 仅做示例，真实场景中一般为 ajax 请求
+      // setTimeout(() => {
+      //   //   debugger
+      //   let total = this.wlist.length > 10 ? 10 : this.wlist.length
+      //   for (let i = 0; i < total; i++) {
+      //     this.wList.push(this.wlist[i])
+      //   }
+      //   console.log(this.wList)
+      //   // 加载状态结束
+      //   this.loading = false
+      //   // 数据全部加载完成
+      //   if (this.wList.length >= this.wlist.length) {
+      //     this.finished = true
+      //   }
+      // }, 1000)
     },
     //   根据数字判断类型
     chargeType(num) {
@@ -137,85 +129,34 @@ export default {
         return (this.type = '待办动态')
       }
     },
-    //   数组去重
-    newArr(arr) {
-      return Array.from(new Set(arr))
+    dateFormat(data, format) {
+      return dateFormat(new Date(data), format)
     },
-    // 数组由大到小排序
-    f(a, b) {
-      //排序函数
-      return -(a - b) //取反并返回比较参数
-    },
-    // 时间处理器
-    getTime(data) {
-      const date = new Date(data)
-      // console.log(timer.getFullYear());
-      var Y = date.getFullYear()
-      var M =
-        date.getMonth() + 1 < 10
-          ? '0' + (date.getMonth() + 1)
-          : date.getMonth() + 1
-      var D = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
-      return Y + M + D
-    },
-    getTime1(data) {
-      const date = new Date(data)
-      // console.log(timer.getFullYear());
-      var Y = date.getFullYear() + '-'
-      var M =
-        (date.getMonth() + 1 < 10
-          ? '0' + (date.getMonth() + 1)
-          : date.getMonth() + 1) + '-'
-      var D = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
-      return Y + M + D
-    },
-    getTime2(data) {
-      const date = new Date(data)
-      // console.log(timer.getFullYear());
-      var h =
-        (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
-      var m =
-        date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
-      return h + m
-    },
-    // 处理星期几
-    getTime3(time) {
-      var dateArray = time.split('-')
-      var date = new Date(
-        dateArray[0],
-        parseInt(dateArray[1] - 1),
-        dateArray[2]
-      )
-      var week = '星期' + '日一二三四五六'.charAt(date.getDay())
-      return week
-    },
+
     // 删除轨迹
     delDynamic(id) {
-      removeTrajectory(id)
-        .then((data) => {
-          //   console.log(data.code);
-          if (data.code == 200) {
-            //   提示删除成功
-            // this.msgSuccess("删除成功");
-            // debugger
-            // location.reload();
-            this.$toast.success('删除成功')
-            this.reload()
-            // 重新获取全部数据
-          }
+      this.$dialog
+        .confirm({
+          title: '警告',
+          message: '确定要删除吗？'
         })
-        .catch((err) => {
-          console.log(err)
+        .then(() => {
+          return removeTrajectory(id)
+        })
+        .then((data) => {
+          this.$toast.success('删除成功')
+          // 重新获取全部数据
+          this.$emit('reload')
+        })
+        .catch(() => {
+          // on cancel
         })
     },
     // 点击完成
     finDynamic(id) {
       handleWait(id)
         .then((data) => {
-          if (data.code == 200) {
-            // this.delDynamic(id);
-            this.reload()
-          }
+          this.$emit('reload')
         })
         .catch((err) => {
           console.log(err)
@@ -250,17 +191,15 @@ export default {
   color: #9c9c9c;
   font-size: 12px;
   font-weight: 600;
-  margin-right: 16px;
 }
 .con {
   left: 51px;
   margin-top: 20px;
 }
 .finish-box {
-  display: inline-block;
+  float: right;
   position: relative;
-  left: 100px;
-  width: 25%;
+  width: 80px;
 }
 .finish {
   position: absolute;

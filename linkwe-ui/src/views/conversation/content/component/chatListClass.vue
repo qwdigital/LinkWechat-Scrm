@@ -6,7 +6,10 @@
         <span class="fr download" @click="exportList()">下载会话</span>
       </div>
     </div>
-    <el-tabs v-model="activeTab">
+    <el-tabs
+      v-model="activeTab"
+      @tab-click="(v) => opened.includes(v.name) || opened.push(v.name)"
+    >
       <el-tab-pane
         v-for="(item, index) of list"
         :key="index"
@@ -14,6 +17,7 @@
         :name="item.type"
       >
         <chatListClassTab
+          v-if="opened.includes(item.type)"
           :queryChat="queryChat"
           :type="item.type"
         ></chatListClassTab>
@@ -36,6 +40,7 @@ export default {
   data() {
     return {
       activeTab: 'all',
+      opened: ['all'],
       list: [
         {
           label: '全部',
@@ -60,7 +65,11 @@ export default {
       ]
     }
   },
-  watch: {},
+  watch: {
+    queryChat() {
+      this.opened = ['all']
+    }
+  },
   mounted() {},
   methods: {
     exportList() {

@@ -22,7 +22,8 @@
                 >{{
                   form.remark
                     ? form.remark
-                    : (form.name || '') + '-' + (form.remarkCorpName || '')
+                    : (form.name || '') +
+                      (form.remarkCorpName ? '-' + form.remarkCorpName : '')
                 }}
                 &nbsp; &nbsp;</span
               ><span
@@ -69,27 +70,17 @@
         <div>客户标签</div>
         <div class="data" is-link @click="labelEdit">编辑</div>
       </div>
-      <van-row gutter="10" class="labelstyle">
-        <van-col
-          span="4.5"
-          v-for="(item, index) in form.weTagGroupList"
-          :key="index"
-        >
+      <div v-if="form.weTagGroupList" class="labelstyle mt10">
+        <template v-for="item in form.weTagGroupList">
           <div
             class="label"
-            v-for="(item1, index1) in item.weTags"
-            :key="index1"
+            v-for="(unit, unique) in item.weTags"
+            :key="unique"
           >
-            {{ item1.name }}
+            {{ unit.name }}
           </div>
-        </van-col>
-        <!-- <van-col span="4.5"> <div class="label">标签1</div></van-col>
-        <van-col span="4.5"> <div class="label">标签1</div></van-col>
-        <van-col span="4.5"> <div class="label">标签1</div></van-col>
-        <van-col span="4.5"> <div class="label">标签1</div></van-col>
-        <van-col span="4.5"> <div class="label">标签1</div></van-col>
-        <van-col span="4.5"> <div class="label">标签1</div></van-col> -->
-      </van-row>
+        </template>
+      </div>
     </div>
     <div class="divider"></div>
 
@@ -128,48 +119,13 @@
         <van-tab :name="3" title="活动动态"></van-tab>
         <van-tab :name="4" title="待办动态"></van-tab>
       </van-tabs>
-      <!-- <van-row gutter="8" class="labelstyle">
-        <van-col span="6">
-          <div
-            class="label1"
-            @click="changeInfo('information')"
-            :style="styleActive1"
-          >
-            信息动态
-          </div></van-col
-        >
-        <van-col span="6">
-          <div
-            class="label1"
-            @click="changeInfo('socialContact')"
-            :style="styleActive2"
-          >
-            社交动态
-          </div></van-col
-        >
-        <van-col span="6">
-          <div
-            class="label1"
-            @click="changeInfo('activity')"
-            :style="styleActive3"
-          >
-            活动动态
-          </div></van-col
-        >
-        <van-col span="6">
-          <div
-            class="label1"
-            @click="changeInfo('dealtWith')"
-            :style="styleActive4"
-          >
-            待办动态
-          </div></van-col
-        >
-      </van-row> -->
 
       <!-- 步骤条 -->
 
-      <StepList :stepList="list"></StepList>
+      <div class="ac">
+        <van-loading v-if="loadingStep" type="spinner" />
+      </div>
+      <StepList :stepList="list" @reload="changeInfo()"></StepList>
     </div>
 
     <!-- 点击客户标签里的编辑触发弹出框开始 -->
@@ -274,7 +230,7 @@
           />
         </van-action-sheet>
         <!-- 保存 -->
-        <div style="margin: 30px;">
+        <div style="margin: 30px">
           <van-button
             round
             block
@@ -336,8 +292,9 @@ export default {
       // 待办动态
       todonewsshow: false,
       // 接口开始
-      // externalUserid: 'wmiGuBCgAAoCBD1frD3hRplbsXoBLx6g', // 客户Id
-      // externalUserid: 'wmiGuBCgAAgeijfvvpJ62cBfwrB-c4kw',
+      externalUserid: '',
+      // externalUserid: 'wmiGuBCgAAoCBD1frD3hRplbsXoBLx6g', // 客户IdwmiGuBCgAAoCBD1frD3hRplbsXoBLx6g
+      // externalUserid: 'wmiGuBCgAAsQVuCR_zoXfnQsnCGG25rQ',
       form: {
         name: '', // 昵称
         remarkMobiles: '', // 手机号
@@ -375,7 +332,8 @@ export default {
       loading: false,
       finished: false,
       list: [],
-      agentId: ''
+      agentId: '', // 1000012,
+      loadingStep: false
     }
   },
   watch: {
@@ -386,7 +344,7 @@ export default {
   computed: {
     userId() {
       return this.$store.state.userId
-      //  || 'FengJuZhuDeJieDao'
+      // || 'FengJuZhuDeJieDao'
     },
     //   activeLabel : () => {
     //       this.addTag.forEach((value) => {
@@ -410,12 +368,13 @@ export default {
     let hash = param2Obj(window.location.hash)
     query = Object.assign(query, hash)
     this.agentId = query.agentId
-    // console.log(agentId)
+    console.log(agentId)
 
     // this.findAddaddEmployes()
     // this.findAddGroupNum()
     // this.getCustomerInfo()
     // this.findTrajectory()
+
     // getAllTags()
     //   .then(({ data }) => {
     //     this.alllabel = data
@@ -490,6 +449,8 @@ export default {
         .then((data) => {
           //  重新获取列表
           this.findAddaddEmployes()
+          this.findTrajectory()
+
           if (data.code == 200) {
             this.$toast.success('保存成功')
             this.usershow = false
@@ -501,6 +462,7 @@ export default {
     },
     //   获取轨迹信息
     findTrajectory(page) {
+      this.loadingStep = true
       let query = {
         pageNum: page,
         pageSize: 10,
@@ -508,14 +470,15 @@ export default {
         externalUserid: this.externalUserid
       }
       Object.assign(query, this.query)
-      page && (query.page = page)
       findTrajectory(query)
         .then((data) => {
           //   console.log(data.total);
           this.list = data.rows
+          this.loadingStep = false
         })
         .catch((err) => {
           console.log(err)
+          this.loadingStep = false
         })
     },
     // 点击信息动态
@@ -530,9 +493,9 @@ export default {
         userId: this.userId,
         externalUserid: this.externalUserid,
         content: this.conagency,
-        createDate: new Date(this.dateagency),
-        startTime: new Date(this.startTime),
-        endTime: new Date(this.endTime),
+        createDate: this.dateagency,
+        startTime: `${this.dateagency} ${this.startTime}:00`,
+        endTime: `${this.dateagency} ${this.endTime}:00`,
         status: 1,
         agentId: this.agentId
       }
@@ -542,8 +505,6 @@ export default {
       this.dateagency = ''
       this.startTime = ''
       this.endTime = ''
-      // 重新获取列表
-      this.findTrajectory()
     },
     // 待办日期
     formatDate(dateagency) {
@@ -636,7 +597,7 @@ export default {
       this.show = true
       if (this.form.weTagGroupList) {
         this.form.weTagGroupList.forEach((ele) => {
-          this.addTag.push(...ele.weTags[0])
+          this.addTag.push(...ele.weTags)
         })
       }
       // 获取用户当前的lable,将当前用户的lable与所有lable进行对比，相同的弹框内蓝色展示
@@ -763,8 +724,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  .label,
-  .label1 {
+  .label {
     display: inline-block;
     min-width: 45px;
     font-size: 12px;
