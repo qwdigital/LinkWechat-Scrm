@@ -70,23 +70,14 @@ public class ChatMsgCheckListener implements MessageListener {
                 || "card".equals(msgType)) {
             weSensitiveActHitService.hitWeSensitiveAct(jsonObject);
         } else {
-            handleSensitiveHit(jsonObject, msgType);
+            handleSensitiveHit(jsonObject);
         }
     }
 
-    private void handleSensitiveHit(JSONObject jsonObject, String msgType) {
+    private void handleSensitiveHit(JSONObject jsonObject) {
         String from = jsonObject.getString("from");
         String msgId = jsonObject.getString("msgid");
-        String objectString = jsonObject.getString(jsonObject.getString("msgtype"));
-        String content = null;
-        if (StringUtils.isNotEmpty(objectString)) {
-            content = objectString;
-        } else if ("docmsg".equals(msgType)) {
-            content = jsonObject.getString("doc");
-        } else if ("markdown".equals(msgType)
-                || "news".equals(msgType)) {
-            content = jsonObject.getString("info");
-        }
+        String content = jsonObject.getString("contact");
         log.info("执行敏感词命中过滤,time=[{}]", System.currentTimeMillis());
         //获取所有的敏感词规则
         List<WeSensitive> allSensitiveRules = weSensitiveMapper.selectWeSensitiveList(new WeSensitive());

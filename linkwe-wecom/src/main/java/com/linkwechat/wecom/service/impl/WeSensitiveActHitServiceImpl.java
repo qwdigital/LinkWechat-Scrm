@@ -59,7 +59,6 @@ public class WeSensitiveActHitServiceImpl extends ServiceImpl<WeSensitiveActHitM
     }
 
     @Override
-    @Transactional
     public void hitWeSensitiveAct(JSONObject chatJson) {
         if (chatJson != null) {
             String roomId = chatJson.getString("roomid");
@@ -69,10 +68,8 @@ public class WeSensitiveActHitServiceImpl extends ServiceImpl<WeSensitiveActHitM
                 if (weSensitiveAct != null && weSensitiveAct.getEnableFlag() == 1) {
                     weSensitiveActHit.setSensitiveAct(weSensitiveAct.getActName());
                     weSensitiveActHit.setSensitiveActId(weSensitiveAct.getId());
-                    weSensitiveActHit.setCreateTime(new Date(chatJson.getLong("msgtime")));
-                    weSensitiveActHit.setCreateBy(SecurityUtils.getUsername());
                     String operatorId = chatJson.getString("from");
-                    String operatorTargetId = chatJson.getJSONArray("tolist").getString(0);
+                    String operatorTargetId = chatJson.getString("tolist");
                     weSensitiveActHit.setOperatorId(operatorId);
                     weSensitiveActHit.setOperateTargetId(operatorTargetId);
                     setUserOrCustomerInfo(weSensitiveActHit);
