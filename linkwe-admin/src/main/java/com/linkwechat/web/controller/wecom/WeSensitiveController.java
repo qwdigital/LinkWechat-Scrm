@@ -8,6 +8,7 @@ import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.wecom.domain.WeSensitive;
 import com.linkwechat.wecom.domain.query.WeSensitiveHitQuery;
+import com.linkwechat.wecom.domain.vo.WeChatContactSensitiveMsgVO;
 import com.linkwechat.wecom.service.IWeSensitiveService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,7 +39,7 @@ public class WeSensitiveController extends BaseController {
     //   @PreAuthorize("@ss.hasPermi('wecom:sensitive:list')")
     @GetMapping("/list")
     @ApiOperation("查询敏感词列表")
-    public TableDataInfo list(WeSensitive weSensitive) {
+    public TableDataInfo<List<WeSensitive>> list(WeSensitive weSensitive) {
         startPage();
         List<WeSensitive> list = weSensitiveService.selectWeSensitiveList(weSensitive);
         return getDataTable(list);
@@ -101,7 +102,7 @@ public class WeSensitiveController extends BaseController {
     //   @PreAuthorize("@ss.hasPermi('wecom:sensitivehit:list')")
     @GetMapping("/hit/list")
     @ApiOperation("敏感词命中查询")
-    public TableDataInfo hitList(WeSensitiveHitQuery query) {
+    public TableDataInfo<List<WeChatContactSensitiveMsgVO>> hitList(WeSensitiveHitQuery query) {
         return getDataTable(weSensitiveService.getHitSensitiveList(query));
     }
 }

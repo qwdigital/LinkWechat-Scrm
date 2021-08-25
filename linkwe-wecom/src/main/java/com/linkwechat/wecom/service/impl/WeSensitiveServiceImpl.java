@@ -1,5 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
@@ -173,7 +175,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
     @Override
     public List<WeChatContactSensitiveMsgVO> getHitSensitiveList(WeSensitiveHitQuery weSensitiveHitQuery) {
         List<String> userIds = Lists.newArrayList();
-        if (weSensitiveHitQuery.getScopeType().equals(WeConstans.USE_SCOP_BUSINESSID_TYPE_USER)) {
+        if (ObjectUtil.equal(WeConstans.USE_SCOP_BUSINESSID_TYPE_USER,weSensitiveHitQuery.getScopeType())) {
             userIds.add(weSensitiveHitQuery.getAuditScopeId());
         } else {
             List<String> userIdList = weUserService.getList(WeUser.builder().department(weSensitiveHitQuery.getAuditScopeId()).build())
@@ -181,7 +183,9 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
             userIds.addAll(userIdList);
         }
         LambdaQueryWrapper<WeChatContactSensitiveMsg> wrapper = new LambdaQueryWrapper<>();
-        wrapper.in(WeChatContactSensitiveMsg::getFrom, userIds);
+        if(CollectionUtil.isNotEmpty(userIds)){
+            wrapper.in(WeChatContactSensitiveMsg::getFrom, userIds);
+        }
         if (StringUtils.isNotBlank(weSensitiveHitQuery.getKeyword())) {
             wrapper.like(WeChatContactSensitiveMsg::getPatternWords, weSensitiveHitQuery.getKeyword());
         }
