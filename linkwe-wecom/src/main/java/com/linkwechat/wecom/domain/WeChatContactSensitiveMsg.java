@@ -38,9 +38,9 @@ public class WeChatContactSensitiveMsg extends BaseEntity implements Serializabl
     /**
      * 主键id
      */
-    @Excel(name = "消息表关联id")
-    @ApiModelProperty("消息表关联id")
-    private Long weChatContactId;
+    @Excel(name = "消息id")
+    @ApiModelProperty("消息id")
+    private String msgId;
 
     @Excel(name = "通知发送状态")
     @ApiModelProperty("通知发送状态, 0 未发送 1 已发送")

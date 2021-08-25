@@ -26,6 +26,7 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -77,27 +78,35 @@ public class ChatMsgCheckListener implements MessageListener {
     private void handleSensitiveHit(JSONObject jsonObject) {
         String from = jsonObject.getString("from");
         String msgId = jsonObject.getString("msgid");
-        String content = jsonObject.getString("contact");
+        String msgtype = jsonObject.getString("msgtype");
+        StringBuilder objectString = new StringBuilder(jsonObject.getString(msgtype));
+        if("external_redpacket".equals(msgtype)){
+            objectString.append(jsonObject.getString("redpacket"));
+        }else if("docmsg".equals(msgtype)){
+            objectString.append(jsonObject.getString("doc"));
+        }else if("markdown".equals(msgtype)
+                || "news".equals(msgtype)){
+            objectString.append(jsonObject.getString("info"));
+        }
         log.info("执行敏感词命中过滤,time=[{}]", System.currentTimeMillis());
         //获取所有的敏感词规则
         List<WeSensitive> allSensitiveRules = weSensitiveMapper.selectWeSensitiveList(new WeSensitive());
         //根据规则过滤命中
         if (CollectionUtils.isNotEmpty(allSensitiveRules)) {
-            String finalContent = content;
-            allSensitiveRules.parallelStream().forEach(weSensitive -> {
+            String finalContent = objectString.toString();
+            allSensitiveRules.forEach(weSensitive -> {
                 List<String> patternWords = Arrays.asList(weSensitive.getPatternWords().split(","));
                 List<String> users = weSensitiveService.getScopeUsers(weSensitive.getAuditUserScope());
+                log.info("handleSensitiveHit: >>>>>>>>>>>>>>>>>>>>>>finalContent:{}, patternWords:{},users:{},from:{}", finalContent, JSONObject.toJSONString(patternWords),  JSONObject.toJSONString(users), from);
                 if (StringUtils.isNotBlank(finalContent)
                         && !CollectionUtils.isEmpty(users)
                         && users.stream().anyMatch(from::equals)) {
                     WeChatContactSensitiveMsg wccsm = hitSensitive(patternWords, from, finalContent);
+                    log.info("handleSensitiveHit: >>>>>>>>>>>>>>>>>>>>>> wccsm:{}",JSONObject.toJSONString(wccsm));
                     if (wccsm != null) {
-                        LambdaQueryWrapper<WeChatContactMsg> wrapper = new LambdaQueryWrapper<>();
-                        wrapper.eq(WeChatContactMsg::getMsgId, msgId);
-                        WeChatContactMsg ccm = weChatContactMsgService.getOne(wrapper);
-                        wccsm.setWeChatContactId(ccm.getId());
-                        wccsm.setFrom(ccm.getFromId());
-                        wccsm.setMsgTime(ccm.getMsgTime());
+                        wccsm.setMsgId(msgId);
+                        wccsm.setFrom(from);
+                        wccsm.setMsgTime(new Date(jsonObject.getLong("msgtime")));
                         int result = weChatContactSensitiveMsgMapper.insert(wccsm);
                         if (result > 0) {
                             sendMessage(wccsm, weSensitive);
@@ -110,11 +119,12 @@ public class ChatMsgCheckListener implements MessageListener {
 
     private WeChatContactSensitiveMsg hitSensitive(List<String> patternWords, String user, String content) {
         WeChatContactSensitiveMsg weChatContactSensitiveMsg = new WeChatContactSensitiveMsg();
-        patternWords = patternWords.stream().filter(content::contains).collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(patternWords)) {
+        String patternWordStr = patternWords.stream().filter(content.trim()::contains).collect(Collectors.joining(","));
+        log.info("hitSensitive: >>>>>>>>>>>>>>>>>>>>>> patternWordStr:{}",patternWordStr);
+        if (StringUtils.isNotEmpty(patternWordStr)) {
             weChatContactSensitiveMsg.setContent(content);
             weChatContactSensitiveMsg.setSendStatus(0);
-            weChatContactSensitiveMsg.setPatternWords(String.join(", ", patternWords));
+            weChatContactSensitiveMsg.setPatternWords(patternWordStr);
             return weChatContactSensitiveMsg;
         }
         return null;
