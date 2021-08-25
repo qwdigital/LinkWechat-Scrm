@@ -57,9 +57,8 @@ public class ChatMsgCheckListener implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
 
-        log.info(">> 订阅消息,会话审核订阅者：{}, topic: {}", message, new String(pattern));
         JSONObject jsonObject = JSONObject.parseObject(new String(message.getBody()));
-        log.info(">> 订阅消息,会话存档消息：{}", jsonObject.toJSONString());
+        log.info(">>》》》 订阅消息,会话审核订阅者：message:{}", jsonObject.toJSONString());
 
         Threads.SINGLE_THREAD_POOL.submit(() -> msgContextHandle(jsonObject));
     }
