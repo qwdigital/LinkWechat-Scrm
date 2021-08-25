@@ -142,6 +142,7 @@ public class ChatMsgCheckListener implements MessageListener {
             pushDto.setTouser(auditUserId);
             pushDto.setMsgtype(MessageType.TEXT.getMessageType());
             pushDto.setText(textMessageDto);
+            pushDto.setAgentid(Integer.parseInt(weCorpAccount.getAgentId()));
             weMessagePushClient.sendMessageToUser(pushDto, weCorpAccount.getAgentId());
             wccsm.setSendStatus(1);
             weChatContactSensitiveMsgMapper.updateById(wccsm);
