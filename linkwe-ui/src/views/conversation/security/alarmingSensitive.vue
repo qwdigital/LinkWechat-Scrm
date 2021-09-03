@@ -15,7 +15,7 @@
             </el-table-column>
           </el-table>
           <pagination
-            v-show="total > 0"
+            v-show="recordPageTotal > 0"
             :total="recordPageTotal"
             :page.sync="recordPageConfig.pageNum"
             :limit.sync="recordPageConfig.pageSize"
