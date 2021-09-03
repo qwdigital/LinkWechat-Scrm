@@ -5,11 +5,11 @@
         <el-tab-pane label="敏感记录" name="1">
           <el-table :data="recordSensitive" stripe style="width: 100%"
             :header-cell-style="{background:'#fff'}">
-            <el-table-column prop="operator" label="操作员工">
+            <el-table-column prop="createBy" label="操作员工">
             </el-table-column>
-            <el-table-column prop="operateTarget" label="操作对象">
+            <el-table-column prop="auditUserName" label="操作对象">
             </el-table-column>
-            <el-table-column prop="sensitiveAct" label="敏感行为">
+            <el-table-column prop="patternWords" label="敏感行为">
             </el-table-column>
             <el-table-column prop="updateTime" label="操作时间">
             </el-table-column>
@@ -66,7 +66,6 @@ export default {
   },
   mounted() {
     this.getSensiveRecordList()
-    this.getSensitiveManagementList()
   },
   methods: {
     getSensiveRecordList() {
@@ -89,7 +88,12 @@ export default {
       console.log(e)
     },
     handleClick(tab, event) {
-      console.log(tab, event)
+      console.log(this.activeName==='2')
+      if(this.activeName==='2'){
+       this.getSensitiveManagementList()
+      }else{
+        this.getSensiveRecordList()
+      }
     }
   }
 }
