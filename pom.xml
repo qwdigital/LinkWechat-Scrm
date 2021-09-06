@@ -41,7 +41,7 @@
         <netty-version>4.1.49.Final</netty-version>
         <jaxb.version>2.3.1</jaxb.version>
         <jsqlparser.version>4.0</jsqlparser.version>
-        <nacos.starter.version>1.0.1</nacos.starter.version>
+        <nacos.starter.version>1.0.2</nacos.starter.version>
     </properties>
 
     <!-- 依赖声明 -->
