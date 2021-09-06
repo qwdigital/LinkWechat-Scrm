@@ -75,7 +75,7 @@ public class ChatMsgCheckListener implements MessageListener {
     }
 
     private void handleSensitiveHit(JSONObject jsonObject) {
-        String from = jsonObject.getString("from");
+        String fromId = jsonObject.getString("from");
         String msgId = jsonObject.getString("msgid");
         String msgtype = jsonObject.getString("msgtype");
         StringBuilder objectString = new StringBuilder(jsonObject.getString(msgtype));
@@ -96,15 +96,15 @@ public class ChatMsgCheckListener implements MessageListener {
             allSensitiveRules.forEach(weSensitive -> {
                 List<String> patternWords = Arrays.asList(weSensitive.getPatternWords().split(","));
                 List<String> users = weSensitiveService.getScopeUsers(weSensitive.getAuditUserScope());
-                log.info("handleSensitiveHit: >>>>>>>>>>>>>>>>>>>>>>finalContent:{}, patternWords:{},users:{},from:{}", finalContent, JSONObject.toJSONString(patternWords),  JSONObject.toJSONString(users), from);
+                log.info("handleSensitiveHit: >>>>>>>>>>>>>>>>>>>>>>finalContent:{}, patternWords:{},users:{},from:{}", finalContent, JSONObject.toJSONString(patternWords),  JSONObject.toJSONString(users), fromId);
                 if (StringUtils.isNotBlank(finalContent)
                         && !CollectionUtils.isEmpty(users)
-                        && users.stream().anyMatch(from::equals)) {
-                    WeChatContactSensitiveMsg wccsm = hitSensitive(patternWords, from, finalContent);
+                        && users.stream().anyMatch(fromId::equals)) {
+                    WeChatContactSensitiveMsg wccsm = hitSensitive(patternWords, fromId, finalContent);
                     log.info("handleSensitiveHit: >>>>>>>>>>>>>>>>>>>>>> wccsm:{}",JSONObject.toJSONString(wccsm));
                     if (wccsm != null) {
                         wccsm.setMsgId(msgId);
-                        wccsm.setFrom(from);
+                        wccsm.setFromId(fromId);
                         wccsm.setMsgTime(new Date(jsonObject.getLong("msgtime")));
                         int result = weChatContactSensitiveMsgMapper.insert(wccsm);
                         if (result > 0) {

@@ -16,7 +16,7 @@ import java.util.Date;
 @Data
 public class WeChatContactSensitiveMsgVO {
     @ApiModelProperty("发送人")
-    private String from;
+    private String fromId;
     @ApiModelProperty("发送内容")
     private String content;
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")

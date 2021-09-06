@@ -184,7 +184,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
         }
         LambdaQueryWrapper<WeChatContactSensitiveMsg> wrapper = new LambdaQueryWrapper<>();
         if(CollectionUtil.isNotEmpty(userIds)){
-            wrapper.in(WeChatContactSensitiveMsg::getFrom, userIds);
+            wrapper.in(WeChatContactSensitiveMsg::getFromId, userIds);
         }
         if (StringUtils.isNotBlank(weSensitiveHitQuery.getKeyword())) {
             wrapper.like(WeChatContactSensitiveMsg::getPatternWords, weSensitiveHitQuery.getKeyword());
@@ -200,7 +200,7 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
             msgList.forEach(msg -> {
                 WeChatContactSensitiveMsgVO vo = new WeChatContactSensitiveMsgVO();
                 vo.setContent(msg.getContent());
-                vo.setFrom(msg.getFrom());
+                vo.setFromId(msg.getFromId());
                 vo.setMsgtime(msg.getMsgTime());
                 vo.setStatus(msg.getSendStatus().toString());
                 vo.setPatternWords(msg.getPatternWords());
