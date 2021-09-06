@@ -57,7 +57,7 @@ public class WeChatContactSensitiveMsg extends BaseEntity implements Serializabl
     @Excel(name = "发送用户id")
     @ApiModelProperty("发送用户id")
     @TableField(value = "from_id")
-    private String from;
+    private String fromId;
 
     @Excel(name = "发送时间")
     @ApiModelProperty("发送时间")
