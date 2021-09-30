@@ -1,6 +1,9 @@
 package com.linkwechat.wecom.domain.dto.customer;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.Date;
@@ -14,14 +17,14 @@ import java.util.List;
 @Data
 public class CustomerGroupDetail extends WeResultDto {
 
-    private List<GroupChat> group_chat;
+    private List<GroupChat> groupChat;
 
 
     @Data
     public class GroupChat{
 
         /**客户群ID*/
-        private String chat_id;
+        private String chatId;
 
 
         /**群名*/
@@ -31,13 +34,16 @@ public class CustomerGroupDetail extends WeResultDto {
         private String owner;
 
         /**群的创建时间*/
-        private long create_time;
+        private long createTime;
 
         /**群公告*/
         private String notice;
 
         /**群成员列表*/
-        private List<CustomerGroupMember> member_list;
+        private List<CustomerGroupMember> memberList;
+
+        /**群管理员列表*/
+        private List<JSONObject> adminList;
 
     }
 
@@ -45,16 +51,15 @@ public class CustomerGroupDetail extends WeResultDto {
     /**
      * 请求参数
      */
+    @AllArgsConstructor
     @Data
     public class Params{
 
 
         private String chat_id;
 
+        private Integer need_name;
 
-        public Params(String chat_id) {
-            this.chat_id = chat_id;
-        }
     }
 
 

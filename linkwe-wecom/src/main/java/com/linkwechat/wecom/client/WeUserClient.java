@@ -20,7 +20,7 @@ public interface WeUserClient {
     @Request(url="/user/create",
             type = "POST"
     )
-    WeResultDto createUser(@DataObject WeUserDto weUserDto);
+    WeResultDto createUser(@JSONBody WeUserDto weUserDto);
 
 
     /**
@@ -40,7 +40,7 @@ public interface WeUserClient {
     @Request(url="/user/update",
             type = "POST"
     )
-    WeResultDto updateUser(@DataObject WeUserDto weUserDto);
+    WeResultDto updateUser(@JSONBody WeUserDto weUserDto);
 
 
     /**
@@ -69,7 +69,7 @@ public interface WeUserClient {
     @Request(url="/externalcontact/transfer",
             type = "POST"
     )
-    WeResultDto allocateCustomer(@DataObject AllocateWeCustomerDto allocateWeCustomerDto);
+    WeResultDto allocateCustomer(@JSONBody AllocateWeCustomerDto allocateWeCustomerDto);
 
 
     /**
@@ -79,7 +79,7 @@ public interface WeUserClient {
     @Request(url="/externalcontact/groupchat/transfer",
             type = "POST"
     )
-    WeResultDto allocateGroup(@DataObject AllocateWeGroupDto allocateWeGroupDto);
+    WeResultDto allocateGroup(@JSONBody AllocateWeGroupDto allocateWeGroupDto);
 
 
     /**
@@ -100,5 +100,5 @@ public interface WeUserClient {
      * @return
      */
     @Request(url = "/user/getuserinfo")
-    WeUserInfoDto  getuserinfo(@Query("code")String code,@Header("agentId")String agentId);
+    WeUserInfoDto  getUserInfo(@Query("code")String code,@Header("agentId")String agentId);
 }

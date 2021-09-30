@@ -26,6 +26,6 @@ public interface WeTicketClient {
      *
      * @return
      */
-    @Request(url = "/ticket/get")
+    @Request(url = "/ticket/get?type=agent_config")
     WeH5TicketDto getTicket(@Header("agentId") String agentId);
 }

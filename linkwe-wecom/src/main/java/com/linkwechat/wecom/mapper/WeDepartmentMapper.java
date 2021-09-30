@@ -15,48 +15,9 @@ import org.apache.ibatis.annotations.Param;
 public interface WeDepartmentMapper extends BaseMapper<WeDepartment>
 {
     /**
-     * 查询企业微信组织架构相关
-     * 
-     * @param id 企业微信组织架构相关ID
-     * @return 企业微信组织架构相关
-     */
-    public WeDepartment selectWeDepartmentById(Long id);
-
-    /**
-     * 查询企业微信组织架构相关列表
-     *
-     * @return 企业微信组织架构相关集合
-     */
-    public List<WeDepartment> selectWeDepartmentList();
-
-    /**
-     * 新增企业微信组织架构相关
-     * 
-     * @param weDepartment 企业微信组织架构相关
-     * @return 结果
-     */
-    public int insertWeDepartment(WeDepartment weDepartment);
-
-    /**
-     * 修改企业微信组织架构相关
-     * 
-     * @param weDepartment 企业微信组织架构相关
-     * @return 结果
-     */
-    public int updateWeDepartment(WeDepartment weDepartment);
-
-
-    /**
-     * 删除部门表所有数据
+     *  批量新增或更新
+     * @param weDepartmentList
      * @return
      */
-    public int deleteAllWeDepartment();
-
-
-    /**
-     *  批量保存
-     * @param weDepartments
-     * @return
-     */
-    public int batchInsertWeDepartment(@Param("weDepartments") List<WeDepartment> weDepartments);
+    public int insertBatch(@Param("weDepartmentList") List<WeDepartment> weDepartmentList);
 }

@@ -4,7 +4,7 @@ import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.annotation.Excel.ColumnType;
 import com.linkwechat.common.core.domain.BaseEntity;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -16,7 +16,7 @@ import javax.validation.constraints.Size;
  * 
  * @author ruoyi
  */
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 public class SysRole extends BaseEntity
 {

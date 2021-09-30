@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.factory.impl.customer;
 
+import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.config.CosConfig;
@@ -166,7 +167,7 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                 // 新客拉群创建的员工活码欢迎语图片(群活码图片)
                 String codeUrl = weGroupCodeService.selectGroupCodeUrlByEmplCodeState(state);
                 if (StringUtils.isNotNull(codeUrl)) {
-                    buildWelcomeMsgImg(weWelcomeMsgBuilder, codeUrl, codeUrl.replaceAll(cosConfig.getCosImgUrlPrefix(), ""));
+                    buildWelcomeMsgImg(weWelcomeMsgBuilder, codeUrl, FileUtil.getName(codeUrl));
                 }
                 // 普通员工活码欢迎语图片
                 else if (StringUtils.isNotEmpty(messageMap.getCategoryId())) {

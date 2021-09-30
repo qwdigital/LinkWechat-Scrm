@@ -1,9 +1,6 @@
 package com.linkwechat.wecom.client;
 
-import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.DataObject;
-import com.dtflys.forest.annotation.Query;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.customer.CustomerGroupDetail;
 import com.linkwechat.wecom.domain.dto.customer.CustomerGroupList;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
@@ -25,7 +22,7 @@ public interface WeCustomerGroupClient {
     @Request(url="/externalcontact/groupchat/list",
             type = "POST"
     )
-    CustomerGroupList groupChatLists(@DataObject CustomerGroupList.Params params);
+    CustomerGroupList groupChatLists(@JSONBody CustomerGroupList.Params params);
 
 
     /**
@@ -36,5 +33,5 @@ public interface WeCustomerGroupClient {
     @Request(url="/externalcontact/groupchat/get",
             type = "POST"
     )
-    CustomerGroupDetail groupChatDetail(@DataObject CustomerGroupDetail.Params params);
+    CustomerGroupDetail groupChatDetail(@JSONBody CustomerGroupDetail.Params params);
 }

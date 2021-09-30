@@ -4,7 +4,7 @@ import com.linkwechat.wecom.domain.WeCustomer;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.Data;
 
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.List;
  */
 @ApiModel
 @Data
-@Builder
+@SuperBuilder
 public class WeTaskFissionProgressVO {
     @ApiModelProperty("总数")
     private Long total;

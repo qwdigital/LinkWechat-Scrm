@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeChatContactMsgMapper">
+
+    <resultMap type="WeChatContactMsg" id="WeChatContactMsgResult">
+        <result property="id" column="id"/>
+        <result property="msgId" column="msg_id"/>
+        <result property="fromId" column="from_id"/>
+        <result property="toList" column="to_list"/>
+        <result property="roomId" column="room_id"/>
+        <result property="action" column="action"/>
+        <result property="msgType" column="msg_type"/>
+        <result property="msgTime" column="msg_time"/>
+        <result property="contact" column="contact"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="chatSql">select msg_id, from_id, to_list as receiver, `action`, msg_time, msg_type,is_external, contact from we_chat_contact_msg</sql>
+
+    <select id="selectExternalChatList" resultType="com.linkwechat.wecom.domain.vo.WeChatContactMsgVo">
+        select t.*, wc.name, wc.avatar from
+            (
+                select receiver, msg_time,`action`, msg_type, contact
+                from
+                    (
+                        select to_list as receiver, `action` , msg_time, msg_type, contact
+                        from we_chat_contact_msg
+                        where from_id = #{fromId} and is_external = 0 and room_id = ''
+                            union
+                        select from_id as receiver, `action`, msg_time, msg_type, contact
+                        from we_chat_contact_msg
+                        where FIND_IN_SET(#{fromId}, to_list) and is_external = 0 and room_id = ''
+                        order by msg_time desc
+                ) as msg group by receiver order by msg.msg_time desc) t
+        inner join we_customer wc on t.receiver = wc.external_userid;
+    </select>
+
+    <select id="selectAloneChatList" resultType="com.linkwechat.wecom.domain.vo.WeChatContactMsgVo">
+        select t.*, ifnull(wu.user_name, wc.name) as name, ifnull(wu.head_image_url, wc.avatar) as avatar
+            from (select receiver, msg_time, `action`, msg_type, contact
+                    from (select to_list as receiver, `action`, msg_time, msg_type, contact from we_chat_contact_msg
+                            where from_id = #{fromId}
+                            and room_id = ''
+                            <if test="contact != null and contact != ''">
+                                and contact like concat('%', #{contact}, '%')
+                            </if>
+                          union
+                          select from_id as receiver, `action`, msg_time, msg_type, contact from we_chat_contact_msg
+                            where FIND_IN_SET(#{fromId}, to_list)
+                            and room_id = ''
+                            <if test="contact != null and contact != ''">
+                                and contact like concat('%', #{contact}, '%')
+                            </if>
+                            order by msg_time desc) as msg
+                            group by receiver order by msg.msg_time desc) as t
+         left join we_user wu on t.receiver = wu.user_id and  (case when LOCATE('wm', t.receiver) or LOCATE('wo', t.receiver) then 0 else 1 end) = 1
+         left join we_customer wc on t.receiver = wc.external_userid and (case when LOCATE('wm', t.receiver) or LOCATE('wo', t.receiver) then 0 else 1 end) = 0;
+    </select>
+
+
+    <select id="selectInternalChatList" resultType="com.linkwechat.wecom.domain.vo.WeChatContactMsgVo">
+        select t.*, wu.user_name as name , wu.head_image_url as avatar from
+            (
+                select receiver, msg_time,`action`, msg_type, contact
+                from
+                    (
+                        select to_list as receiver, `action` , msg_time, msg_type, contact
+                        from we_chat_contact_msg
+                        where from_id = #{fromId} and is_external = 1 and room_id = ''
+                            union
+                        select from_id as receiver, `action`, msg_time, msg_type, contact
+                        from we_chat_contact_msg
+                        where FIND_IN_SET(#{fromId}, to_list) and is_external = 1 and room_id = ''
+                        order by msg_time desc
+                ) as msg group by receiver order by msg.msg_time desc) t
+        inner join we_user wu on t.receiver = wu.user_id;
+    </select>
+
+    <select id="selectGroupChatList" resultType="com.linkwechat.wecom.domain.vo.WeChatContactMsgVo">
+        select t.*, wg.group_name as name , '' as avatar from
+            (
+                select receiver, msg_time,`action`, msg_type, contact
+                from
+                    (
+                        select room_id as receiver, `action` , msg_time, msg_type, contact
+                        from we_chat_contact_msg
+                        where from_id = #{fromId} and room_id &lt;&gt; ''
+                            union
+                        select room_id as receiver, `action`, msg_time, msg_type, contact
+                        from we_chat_contact_msg
+                        where FIND_IN_SET(#{fromId}, to_list) and room_id  &lt;&gt; ''
+                        order by msg_time desc
+                ) as msg group by receiver order by msg.msg_time desc) t
+        inner join we_group wg on t.receiver = wg.chat_id;
+    </select>
+
+    <select id="selectFullSearchChatList" resultType="com.linkwechat.wecom.domain.vo.WeChatContactMsgVo">
+        select * from
+        (
+            select from_id,
+                   msg_time,
+                   `action`,
+                   msg_type,
+                   contact,
+                   ifnull(wc.name,wu.user_name) as name,
+                   ifnull(wc.avatar,wu.head_image_url) as avatar
+            from we_chat_contact_msg wccm
+            left join we_user wu on wccm.from_id = wu.user_id and  (case when LOCATE('wm', wccm.from_id) or LOCATE('wo', wccm.from_id) then 0 else 1 end) = 1
+            left join we_customer wc on wccm.from_id = wc.external_userid and (case when LOCATE('wm', wccm.from_id) or LOCATE('wo', wccm.from_id) then 0 else 1 end) = 0
+            <where>
+                <if test="fromId != null and fromId != ''">
+                    and (wccm.from_id = #{fromId} or wccm.to_list = #{fromId})
+                </if>
+
+                <if test="toList != null and toList != ''">
+                    and (wccm.to_list = #{toList} or wccm.from_id = #{toList})
+                </if>
+
+                <if test="roomId != null and roomId != ''">
+                    and wccm.room_id = #{roomId}
+                </if>
+
+                <if test="msgType != null and msgType != ''">
+                    and wccm.msg_type = #{msgType}
+                </if>
+
+                <if test="action != null and action != ''">
+                    and wccm.action = #{action}
+                </if>
+                <if test="contact != null and contact != ''">
+                    and wccm.contact like concat('%', #{contact}, '%')
+                </if>
+                <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                    AND date_format(wccm.msg_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+                </if>
+
+                <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                    AND date_format(wccm.msg_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+                </if>
+
+                <if test="userName != null and userName != ''">
+                    and wu.user_name like concat('%', #{userName}, '%')
+                </if>
+
+                <if test="customerName != null and customerName != ''">
+                    and wc.name like concat('%', #{customerName}, '%')
+                </if>
+            </where>
+        ) t
+        <where>
+
+        </where>
+    </select>
+</mapper>

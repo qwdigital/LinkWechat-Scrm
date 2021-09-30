@@ -14,8 +14,10 @@ import java.util.List;
 @Data
 public class CustomerGroupList extends WeResultDto {
 
-    //返回结果
-    private List<GroupChat> group_chat_list;
+    /**
+     * 客户群列表
+     */
+    private List<GroupChat> groupChatList;
 
 
     /**
@@ -41,7 +43,7 @@ public class CustomerGroupList extends WeResultDto {
     public class GroupChat{
 
         /**客户群ID*/
-        private String chat_id;
+        private String chatId;
 
         /**0 - 正常;1 - 跟进人离职;2 - 离职继承中;3 - 离职继承完成*/
         private Integer status;

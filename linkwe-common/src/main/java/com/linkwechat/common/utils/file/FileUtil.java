@@ -45,7 +45,7 @@ public class FileUtil {
                  fileName = FileUploadUtils.upload2Cos(file, ruoYiConfig.getFile().getCos());
                  imgUrlPrefix = ruoYiConfig.getFile().getCos().getCosImgUrlPrefix();
              }else {//本地上传
-                 File osFile= OsUtils.isWindows()?new File(WINDOWSFILEPATH):new File(LINUXFILEPATH);
+                 File osFile=OsUtils.isWindows()?new File(WINDOWSFILEPATH):new File(LINUXFILEPATH);
                  if(!osFile.exists()){
                      osFile.mkdirs();
                  }

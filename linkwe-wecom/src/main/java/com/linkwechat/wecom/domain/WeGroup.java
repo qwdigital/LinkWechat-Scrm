@@ -9,7 +9,7 @@ import com.linkwechat.common.utils.SnowFlakeUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,11 +24,11 @@ import java.util.Date;
  */
 @ApiModel
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName("we_group")
-public class WeGroup {
+public class WeGroup extends BaseEntity{
     private static final long serialVersionUID = 1L;
 
     @TableId
@@ -37,9 +37,6 @@ public class WeGroup {
 
     @ApiModelProperty(value = "群名")
     private String groupName;
-
-    @TableField(exist = false)
-    private Long memberNum;
 
     @ApiModelProperty(value = "群公告")
     private String notice;
@@ -50,36 +47,25 @@ public class WeGroup {
     @ApiModelProperty(value = "0 - 正常;1 - 跟进人离职;2 - 离职继承中;3 - 离职继承完成")
     private Integer status;
 
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date createTime;
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date addTime;
+
+    @ApiModelProperty(value = "管理员id")
+    private String adminUserId;
+
 
     @TableField(exist = false)
     private String groupLeaderName;
-
 
     @TableField(exist = false)
     private String groupLeader;
 
     @TableField(exist = false)
-    @JsonFormat( pattern = "yyyy-MM-dd")
-    private String beginTime;
-
-    @TableField(exist = false)
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private String endTime;
+    private Long memberNum;
 
     /**员工id*/
     @TableField(exist = false)
     @ApiModelProperty(value = "员工id")
     private String userIds;
-
-    /**
-     * 群头像
-     */
-    @TableField(exist = false)
-    @ApiModelProperty(value = "群头像")
-    private String avatar;
-
-
 }

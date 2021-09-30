@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeSensitiveAct;
 import com.linkwechat.wecom.domain.WeSensitiveActHit;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -40,9 +41,10 @@ public interface IWeSensitiveActHitService extends IService<WeSensitiveActHit> {
     /**
      * 过滤敏感行为，并保存
      *
-     * @param chatDataList
+     * @param chatJson
      */
-    public void hitWeSensitiveAct(List<JSONObject> chatDataList);
+    @Transactional
+    void hitWeSensitiveAct(JSONObject chatJson);
 
     /**
      * 获取敏感行为类型

@@ -5,7 +5,7 @@ import com.linkwechat.wecom.domain.dto.message.LinkMessageDto;
 import com.linkwechat.wecom.domain.dto.message.MiniprogramMessageDto;
 import com.linkwechat.wecom.domain.dto.message.TextMessageDto;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,7 +13,7 @@ import java.util.List;
 
 @SuppressWarnings("all")
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class WeMessagePushDto {

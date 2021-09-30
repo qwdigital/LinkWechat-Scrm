@@ -120,10 +120,8 @@ public class WeCustomerPortraitController extends BaseController {
      */
     @GetMapping(value = "/findAddaddEmployes/{externalUserid}")
     public AjaxResult findaddEmployes(@PathVariable String externalUserid){
-
-
         return AjaxResult.success(
-                iWeUserService.findWeUserByCutomerId(externalUserid)
+                iWeUserService.findWeUserByCustomerId(externalUserid)
         );
     }
 
@@ -154,7 +152,8 @@ public class WeCustomerPortraitController extends BaseController {
         LambdaQueryWrapper<WeCustomerTrajectory> ne = new LambdaQueryWrapper<WeCustomerTrajectory>()
                 .ne(WeCustomerTrajectory::getStatus, Constants.DELETE_CODE)
                 .eq(WeCustomerTrajectory::getUserId,userId)
-                .eq(WeCustomerTrajectory::getExternalUserid,externalUserid);
+                .eq(WeCustomerTrajectory::getExternalUserid,externalUserid)
+                .orderByDesc(WeCustomerTrajectory::getCreateTime);
         if(trajectoryType != null){
             ne.eq(WeCustomerTrajectory::getTrajectoryType, trajectoryType);
         }

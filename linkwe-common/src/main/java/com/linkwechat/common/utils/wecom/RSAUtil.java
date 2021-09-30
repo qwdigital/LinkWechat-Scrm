@@ -1,5 +1,6 @@
 package com.linkwechat.common.utils.wecom;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
@@ -21,6 +22,13 @@ import java.util.Base64;
  * @date 2020/12/7 23:37
  **/
 public class RSAUtil {
+    static{
+        try{
+            Security.addProvider(new BouncyCastleProvider());
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
     /**
      * RSA pkcs1 2048bit 解密工具,
      * 获取私钥PrivateKey

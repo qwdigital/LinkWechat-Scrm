@@ -5,12 +5,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
@@ -18,6 +25,11 @@ import springfox.documentation.annotations.ApiIgnore;
  * 
  * @author ruoyi
  */
+@ApiModel
+@Data
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
 public class BaseEntity implements Serializable
 {
     private static final long serialVersionUID = 1L;
@@ -29,21 +41,25 @@ public class BaseEntity implements Serializable
 
     /** 创建者 */
     @ApiModelProperty(hidden = true)
+    @TableField(fill = FieldFill.INSERT)
     private String createBy;
 
     /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(hidden = true)
-    private Date createTime=new Date();
+    @TableField(fill = FieldFill.INSERT)
+    private Date createTime;
 
     /** 更新者 */
     @ApiModelProperty(hidden = true)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String updateBy;
 
     /** 更新时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(hidden = true)
-    private Date updateTime=new Date();
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private Date updateTime;
 
     /** 备注 */
     @TableField(exist = false)
@@ -66,6 +82,11 @@ public class BaseEntity implements Serializable
     @TableField(exist = false)
     @ApiModelProperty(hidden = true)
     private Map<String, Object> params;
+
+
+
+
+
 
     public String getSearchValue()
     {
@@ -165,4 +186,5 @@ public class BaseEntity implements Serializable
     {
         this.params = params;
     }
+
 }

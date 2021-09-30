@@ -1,12 +1,12 @@
 package com.linkwechat.wecom.domain.vo;
 
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.Data;
 
 /**
  * 素材文件信息
  */
-@Builder
+@SuperBuilder
 @Data
 public class WeMaterialFileVO {
 

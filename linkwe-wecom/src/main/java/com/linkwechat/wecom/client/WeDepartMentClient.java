@@ -1,9 +1,6 @@
 package com.linkwechat.wecom.client;
 
-import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.DataObject;
-import com.dtflys.forest.annotation.Query;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.WeDepartMentDto;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
@@ -24,7 +21,7 @@ public interface WeDepartMentClient {
      @Request(url="/department/create",
              type = "POST"
      )
-     WeResultDto createWeDepartMent(@DataObject WeDepartMentDto.DeartMentDto deartMentDto);
+     WeResultDto createWeDepartMent(@JSONBody WeDepartMentDto.DeartMentDto deartMentDto);
 
 
 
@@ -36,7 +33,7 @@ public interface WeDepartMentClient {
     @Request(url="/department/update",
             type = "POST"
     )
-    WeResultDto updateWeDepartMent(@DataObject WeDepartMentDto.DeartMentDto deartMentDto);
+    WeResultDto updateWeDepartMent(@JSONBody WeDepartMentDto.DeartMentDto deartMentDto);
 
 
     /**

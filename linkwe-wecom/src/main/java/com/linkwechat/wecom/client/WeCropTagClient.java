@@ -1,9 +1,6 @@
 package com.linkwechat.wecom.client;
 
-import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.Body;
-import com.dtflys.forest.annotation.DataObject;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.domain.dto.tag.*;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
@@ -24,7 +21,7 @@ public interface WeCropTagClient {
     @Request(url="/externalcontact/add_corp_tag",
             type = "POST"
     )
-    WeCropGropTagDtlDto addCorpTag(@DataObject WeCropGroupTagDto weCropGroupTag);
+    WeCropGropTagDtlDto addCorpTag(@JSONBody WeCropGroupTagDto weCropGroupTag);
 
 
     /**
@@ -55,7 +52,7 @@ public interface WeCropTagClient {
     @Request(url = "/externalcontact/del_corp_tag",
             type = "POST"
     )
-    WeResultDto delCorpTag(@DataObject WeCropDelDto weCropDelDto);
+    WeResultDto delCorpTag(@JSONBody WeCropDelDto weCropDelDto);
 
 
     /**
@@ -66,5 +63,5 @@ public interface WeCropTagClient {
     @Request(url = "/externalcontact/edit_corp_tag",
             type = "POST"
     )
-    WeResultDto editCorpTag(@DataObject WeCropTagDto weCropTagDto);
+    WeResultDto editCorpTag(@JSONBody WeCropTagDto weCropTagDto);
 }

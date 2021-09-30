@@ -6,7 +6,7 @@ import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.wecom.domain.WeTag;
 import com.linkwechat.wecom.domain.WeTagGroup;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * @create: 2020-10-17 20:02
  **/
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class WeCropGroupTagDto {

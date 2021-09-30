@@ -1,18 +1,7 @@
 package com.linkwechat.system.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.linkwechat.system.domain.SysPost;
-import com.linkwechat.system.domain.SysUserPost;
-import com.linkwechat.system.domain.SysUserRole;
-import com.linkwechat.system.service.ISysConfigService;
-import com.linkwechat.system.service.ISysUserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.annotation.DataScope;
 import com.linkwechat.common.constant.UserConstants;
 import com.linkwechat.common.core.domain.entity.SysRole;
@@ -20,11 +9,20 @@ import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.system.mapper.SysPostMapper;
-import com.linkwechat.system.mapper.SysRoleMapper;
-import com.linkwechat.system.mapper.SysUserMapper;
-import com.linkwechat.system.mapper.SysUserPostMapper;
-import com.linkwechat.system.mapper.SysUserRoleMapper;
+import com.linkwechat.system.domain.SysPost;
+import com.linkwechat.system.domain.SysUserPost;
+import com.linkwechat.system.domain.SysUserRole;
+import com.linkwechat.system.mapper.*;
+import com.linkwechat.system.service.ISysConfigService;
+import com.linkwechat.system.service.ISysUserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 用户 业务层处理
@@ -32,7 +30,7 @@ import com.linkwechat.system.mapper.SysUserRoleMapper;
  * @author ruoyi
  */
 @Service
-public class SysUserServiceImpl implements ISysUserService
+public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements ISysUserService
 {
     private static final Logger log = LoggerFactory.getLogger(SysUserServiceImpl.class);
 
@@ -454,5 +452,11 @@ public class SysUserServiceImpl implements ISysUserService
             successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
         }
         return successMsg.toString();
+    }
+
+    @Override
+    public SysUser selectUserByCorpUserId(String corpUserId) {
+        return this.baseMapper.selectOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getWeUserId,corpUserId)
+                .eq(SysUser::getDelFlag,0).eq(SysUser::getStatus,0));
     }
 }

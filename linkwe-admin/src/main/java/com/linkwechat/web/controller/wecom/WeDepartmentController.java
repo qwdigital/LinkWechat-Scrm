@@ -9,25 +9,23 @@ import com.linkwechat.wecom.service.IWeDepartmentService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 /**
  * 企业微信组织架构相关Controller
- * 
+ *
  * @author ruoyi
  * @date 2020-09-01
  */
-@Api("微信组织架构相关接口")
+@Api(tags = "微信组织架构相关接口")
 @RestController
 @RequestMapping("/wecom/department")
-public class WeDepartmentController extends BaseController
-{
+public class WeDepartmentController extends BaseController {
     @Autowired
     private IWeDepartmentService weDepartmentService;
-
 
 
     /**
@@ -36,10 +34,8 @@ public class WeDepartmentController extends BaseController
     //  @PreAuthorize("@ss.hasPermi('contacts:organization:list')")
     @GetMapping("/list")
     @ApiOperation("获取部门列表")
-    public AjaxResult list()
-    {
-
-        List<WeDepartment> list = weDepartmentService.selectWeDepartmentList();
+    public AjaxResult<List<WeDepartment>> list() {
+        List<WeDepartment> list = weDepartmentService.getList();
         return AjaxResult.success(list);
     }
 
@@ -51,9 +47,8 @@ public class WeDepartmentController extends BaseController
     @Log(title = "企业微信组织架构相关", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("添加部门")
-    public AjaxResult add(@Validated @RequestBody WeDepartment weDepartment)
-    {
-        weDepartmentService.insertWeDepartment(weDepartment);
+    public AjaxResult add(@Validated @RequestBody WeDepartment weDepartment) {
+        weDepartmentService.insert(weDepartment);
         return AjaxResult.success();
     }
 
@@ -64,9 +59,8 @@ public class WeDepartmentController extends BaseController
     @Log(title = "企业微信组织架构相关", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("更新部门")
-    public AjaxResult edit(@RequestBody WeDepartment weDepartment)
-    {
-        weDepartmentService.updateWeDepartment(weDepartment);
+    public AjaxResult edit(@RequestBody WeDepartment weDepartment) {
+        weDepartmentService.update(weDepartment);
         return AjaxResult.success();
     }
 
@@ -75,11 +69,10 @@ public class WeDepartmentController extends BaseController
      */
     //  @PreAuthorize("@ss.hasPermi('wecom:department:remove')")
     @Log(title = "企业微信组织架构相关", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable String[] ids)
-    {
+    @DeleteMapping("/{ids}")
+    public AjaxResult remove(@PathVariable Long[] ids) {
 
-        weDepartmentService.deleteWeDepartmentByIds(ids);
+        weDepartmentService.deleteByIds(ids);
 
         return AjaxResult.success();
     }

@@ -37,5 +37,10 @@ public class WeGroupMemberServiceImpl extends ServiceImpl<WeGroupMemberMapper,We
         .eq(WeGroupMember::getUnionId,unionId));
     }
 
+    @Override
+    public void insertBatch(List<WeGroupMember> weGroupMembers) {
+        this.baseMapper.insertBatch(weGroupMembers);
+    }
+
 
 }

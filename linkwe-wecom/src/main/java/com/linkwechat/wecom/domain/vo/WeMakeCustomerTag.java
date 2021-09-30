@@ -2,7 +2,7 @@ package com.linkwechat.wecom.domain.vo;
 
 import com.linkwechat.wecom.domain.WeTag;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +14,7 @@ import java.util.List;
  * @create: 2020-10-24 20:09
  **/
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class WeMakeCustomerTag {

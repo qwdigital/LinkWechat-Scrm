@@ -5,11 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 /**
  * spring redis 工具类
@@ -223,5 +226,17 @@ public class RedisCache
     public Collection<String> keys(final String pattern)
     {
         return redisTemplate.keys(pattern);
+    }
+
+
+    /**
+     * 将给定的消息发布到给定的频道
+     *
+     * @param channel 要发布到的频道
+     * @param message 消息内容
+     */
+    public void convertAndSend(String channel, Object message)
+    {
+        redisTemplate.convertAndSend(channel,message);
     }
 }

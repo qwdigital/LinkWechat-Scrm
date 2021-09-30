@@ -8,8 +8,10 @@
     <select id="selectWeGroupList" parameterType="WeGroup" resultType="com.linkwechat.wecom.domain.WeGroup">
         SELECT
             wg.chat_id,
-            wg.group_name,
-            wg.create_time,
+            if(wg.group_name = '' or wg.group_name is null,
+                (SELECT group_concat(name separator '、') FROM we_group_member wgm  WHERE wgm.chat_id = wg.chat_id limit 10),
+                wg.group_name) as group_name,
+            wg.add_time,
             wg.notice,
             wu.user_name as groupLeaderName,
             (SELECT COUNT(*) FROM we_group_member wgm WHERE wgm.chat_id=wg.chat_id) as memberNum,
@@ -22,11 +24,11 @@
             <if test="groupName != null  and groupName != ''"> and wg.group_name like concat('%', #{groupName}, '%')</if>
             <if test="groupLeader != null  and groupLeader != ''"> and wu.user_name like concat('%', #{groupLeader}, '%')</if>
             <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
-                AND date_format(wg.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+                AND date_format(wg.add_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
             </if>
 
             <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
-                AND date_format(wg.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+                AND date_format(wg.add_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
             </if>
             <if test="userIds != null and userIds !=''">
                 <if test="userIds.indexOf(',') != -1">
@@ -60,4 +62,15 @@
     </select>
 
 
+    <insert id="insertBatch">
+        insert into we_group (chat_id, group_name, owner, add_time, notice, status,admin_user_id, create_by, create_time,update_by, update_time)
+        values
+        <foreach collection="weGroups" item="weGroup" index="index" separator=",">
+            (#{weGroup.chatId},#{weGroup.groupName},#{weGroup.owner},#{weGroup.addTime},#{weGroup.notice},#{weGroup.status},#{weGroup.adminUserId},
+            #{weGroup.createBy},#{weGroup.createTime},#{weGroup.updateBy},#{weGroup.updateTime})
+        </foreach>
+        on duplicate key update group_name= values(group_name),owner= values(owner),
+        notice= values(notice),status= values(status),admin_user_id= values(admin_user_id),
+        update_by= values(update_by),update_time= values(update_time)
+    </insert>
 </mapper>

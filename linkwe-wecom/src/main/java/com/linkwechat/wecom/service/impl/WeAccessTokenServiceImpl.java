@@ -183,10 +183,6 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
                 token=weAccessTokenDtoDto.getAccess_token();
                 expires_in=weAccessTokenDtoDto.getExpires_in();
 
-            }else  if(WeConstans.WE_PROVIDER_ACCESS_TOKEN.equals(accessTokenKey)){
-                WeAccessTokenDtoDto providerToken = accessTokenClient.getProviderToken(wxCorpAccount.getCorpId(), wxCorpAccount.getProviderSecret());
-                token=providerToken.getProvider_access_token();
-                expires_in=providerToken.getExpires_in();
             }else if (WeConstans.WE_CHAT_ACCESS_TOKEN.equals(accessTokenKey)){
                 WeAccessTokenDtoDto weAccessTokenDtoDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),wxCorpAccount.getChatSecret());
                 token=weAccessTokenDtoDto.getAccess_token();
@@ -228,11 +224,6 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
                             WeConstans.WE_COMMON_ACCESS_TOKEN.equals(accessTokenKey) ? wxCorpAccount.getCorpSecret() : wxCorpAccount.getContactSecret());
                     token=weAccessTokenDtoDto.getAccess_token();
                     expires_in=weAccessTokenDtoDto.getExpires_in();
-
-                }else  if(WeConstans.WE_PROVIDER_ACCESS_TOKEN.equals(accessTokenKey)){
-                    WeAccessTokenDtoDto providerToken = accessTokenClient.getProviderToken(wxCorpAccount.getCorpId(), wxCorpAccount.getProviderSecret());
-                    token=providerToken.getProvider_access_token();
-                    expires_in=providerToken.getExpires_in();
                 }else if (WeConstans.WE_CHAT_ACCESS_TOKEN.equals(accessTokenKey)){
                     WeAccessTokenDtoDto weAccessTokenDtoDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),wxCorpAccount.getChatSecret());
                     token=weAccessTokenDtoDto.getAccess_token();

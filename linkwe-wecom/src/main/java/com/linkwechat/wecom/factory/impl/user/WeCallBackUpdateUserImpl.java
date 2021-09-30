@@ -22,7 +22,7 @@ public class WeCallBackUpdateUserImpl extends WeEventStrategy {
     @Override
     public void eventHandle(WxCpXmlMessageVO message) {
         try {
-            weUserService.updateWeUserNoToWeCom(setWeUserData(message));
+            weUserService.update2Data(setWeUserData(message));
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

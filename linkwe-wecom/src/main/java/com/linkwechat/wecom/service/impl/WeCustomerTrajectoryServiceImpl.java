@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
@@ -97,6 +98,7 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
                     WeCustomerTrajectory.builder()
                             .externalUserid(externalUserid)
                             .trajectoryType(TrajectoryType.TRAJECTORY_TYPE_XXDT.getType())
+                            .createTime(new DateTime())
                             .userId(userId)
                             .content(
                                     TrajectorySceneType.TRAJECTORY_TYPE_XXDT_BCZL.getKey().equals(trajectoryType)?

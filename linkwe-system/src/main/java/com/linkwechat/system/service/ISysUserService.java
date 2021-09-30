@@ -164,4 +164,11 @@ public interface ISysUserService
      * @return 结果
      */
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
+
+    /**
+     * 根据企微成员id 查询系统用户信息
+     * @param corpUserId 以为成员id
+     * @return
+     */
+    public SysUser selectUserByCorpUserId(String corpUserId);
 }

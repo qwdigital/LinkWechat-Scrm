@@ -1,13 +1,10 @@
 package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.dtflys.forest.annotation.Query;
 import com.linkwechat.wecom.domain.WeCustomerAddUser;
 import com.linkwechat.wecom.domain.WeUser;
-import com.linkwechat.wecom.domain.dto.WeUserInfoDto;
 import com.linkwechat.wecom.domain.dto.msgaudit.WeMsgAuditDto;
 import com.linkwechat.wecom.domain.vo.*;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -19,13 +16,29 @@ import java.util.List;
  */
 public interface IWeUserService extends IService<WeUser>
 {
+
+    /**
+     * 根据id查询通讯录相关客户
+     *
+     * @param idList id列表
+     * @return 通讯录相关客户
+     */
+    public List<WeUser> getListByIds(List<Long> idList);
+
+    /**
+     * 根据id查询通讯录相关客户
+     * @param id
+     * @return
+     */
+    public WeUser getById(Long id);
+
     /**
      * 查询通讯录相关客户
      *
      * @param userId 通讯录相关客户ID
      * @return 通讯录相关客户
      */
-    public WeUser selectWeUserById(String userId);
+    public WeUser getByUserId(String userId);
 
     /**
      * 查询通讯录相关客户列表
@@ -33,7 +46,7 @@ public interface IWeUserService extends IService<WeUser>
      * @param weUser 通讯录相关客户
      * @return 通讯录相关客户集合
      */
-    public List<WeUser> selectWeUserList(WeUser weUser);
+    public List<WeUser> getList(WeUser weUser);
 
     /**
      * 新增通讯录相关客户
@@ -41,14 +54,14 @@ public interface IWeUserService extends IService<WeUser>
      * @param weUser 通讯录相关客户
      * @return 结果
      */
-    public void insertWeUser(WeUser weUser);
+    public void insert(WeUser weUser);
 
     /**
      * 新增通讯录相关客户(不同步企微)
      * @param weUser 通讯录相关客户
      * @return
      */
-    public int insertWeUserNoToWeCom(WeUser weUser);
+    public boolean insert2Data(WeUser weUser);
 
     /**
      * 修改通讯录相关客户
@@ -56,14 +69,14 @@ public interface IWeUserService extends IService<WeUser>
      * @param weUser 通讯录相关客户
      * @return 结果
      */
-    public void updateWeUser(WeUser weUser);
+    public void update(WeUser weUser);
 
     /**
      * 修改通讯录相关客户(不同步企微)
      * @param weUser 通讯录相关客户
      * @return
      */
-    public int updateWeUserNoToWeCom(WeUser weUser);
+    public boolean update2Data(WeUser weUser);
 
 
     /**
@@ -104,16 +117,16 @@ public interface IWeUserService extends IService<WeUser>
 
     /**
      * 删除用户
-     * @param ids
+     * @param userIds
      */
-    void deleteUser(String[] ids);
+    void deleteUser(String[]  userIds);
 
     /**
      * 删除成员
      * @param userId 成员id
      * @return
      */
-    int deleteUserNoToWeCom(String userId);
+    boolean deleteUserNoToWeCom(String userId);
 
 
     /**
@@ -134,7 +147,6 @@ public interface IWeUserService extends IService<WeUser>
 
     /**
      * 获取会话内容存档开启成员列表
-     * @param msgAuditDto
      * @return
      */
     List<WeUser> getPermitUserList(WeMsgAuditDto msgAuditDto);
@@ -153,5 +165,7 @@ public interface IWeUserService extends IService<WeUser>
      * @param externalUserid
      * @return
      */
-    List<WeCustomerAddUser> findWeUserByCutomerId(String externalUserid);
+    List<WeCustomerAddUser> findWeUserByCustomerId(String externalUserid);
+
+
 }

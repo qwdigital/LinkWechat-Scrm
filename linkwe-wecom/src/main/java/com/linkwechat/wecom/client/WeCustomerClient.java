@@ -49,7 +49,7 @@ public interface WeCustomerClient {
      * @return
      */
     @Request(url = "/externalcontact/batch/get_by_user", type = "POST")
-    ExternalUserList getByUser(@DataObject Map<String,Object> query);
+    ExternalUserList getByUser(@JSONBody Map<String,Object> query);
 
 
     /**
@@ -60,7 +60,7 @@ public interface WeCustomerClient {
     @Request(url="/externalcontact/remark",
             type = "POST"
     )
-    WeResultDto remark(@DataObject WeCustomerDto.WeCustomerRemark weCustomerRemark);
+    WeResultDto remark(@JSONBody WeCustomerDto.WeCustomerRemark weCustomerRemark);
 
 
     /**
@@ -70,7 +70,7 @@ public interface WeCustomerClient {
     @Request(url = "/externalcontact/mark_tag",
              type = "POST"
     )
-    WeResultDto makeCustomerLabel(@DataObject CutomerTagEdit cutomerTagEdit);
+    WeResultDto makeCustomerLabel(@JSONBody CutomerTagEdit cutomerTagEdit);
 
 
     /**
@@ -78,7 +78,7 @@ public interface WeCustomerClient {
      */
     @Request(url = "/externalcontact/send_welcome_msg",
             type = "POST")
-    WeResultDto sendWelcomeMsg(@DataObject WeWelcomeMsg wxCpWelcomeMsg);
+    WeResultDto sendWelcomeMsg(@JSONBody WeWelcomeMsg wxCpWelcomeMsg);
 
 
     /**
@@ -87,7 +87,7 @@ public interface WeCustomerClient {
      */
     @Request(url = "/externalcontact/unionid_to_external_userid",
             type = "POST")
-    ExternalUserDetail unionidToExternalUserid(@DataObject ExternalUserDetail.ExternalContact  unionid);
+    ExternalUserDetail unionidToExternalUserid(@JSONBody ExternalUserDetail.ExternalContact  unionid);
 
 
     /**

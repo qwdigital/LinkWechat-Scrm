@@ -106,7 +106,7 @@ public class UserDetailsServiceImpl implements UserDetailsService
                         .email(weUser.getEmail())
                         .phonenumber(weUser.getMobile())
                         .sex(weUser.getGender() ==0 ? "1": weUser.getGender() .toString())
-                        .avatar(weUser.getAvatarMediaid())
+                        .avatar(weUser.getHeadImageUrl())
                         .weUserId(weUser.getUserId())
                         .roleIds(ArrayUtil.toArray(iSysRoleService.selectRoleList(SysRole.builder()
                                 .roleKey(Constants.DEFAULT_WECOME_ROLE_KEY)

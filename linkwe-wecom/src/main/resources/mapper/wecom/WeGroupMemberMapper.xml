@@ -11,29 +11,18 @@
             wgm.join_time,
             wgm.type,
             wgm.join_scene,
-            CASE
-            WHEN wgm.type=1 THEN
-            (
-                    SELECT wu.user_name FROM  we_user wu
-                    WHERE wu.user_id=wgm.user_id
-                    <if test="memberName != null  and memberName != ''">
-                     AND wu.user_name like concat('%', #{memberName}, '%')
-                   </if>
-            )
-            WHEN wgm.type = 2 THEN
-            (
-                    SELECT wc.name FROM we_customer wc
-                    WHERE wc.external_userid=wgm.user_id
-                    <if test="memberName != null  and memberName != ''">
-                        AND wc.name like concat('%', #{memberName}, '%')
-                    </if>
-            )
-            END memberName
+            wgm.name,
+            wgm.group_nick_name,
+            wgm.invitor_user_id
         FROM
         we_group_member wgm
         <where>
-            <if test="chatId != null "> and wgm.chat_id = #{chatId}</if>
-            <if test="memberName != null  and memberName != ''">HAVING memberName  IS NOT NULL</if>
+            <if test="chatId != null ">
+                and wgm.chat_id = #{chatId}
+            </if>
+            <if test="name != null  and name != ''">
+                AND wgm.name like concat('%', #{name}, '%')
+            </if>
         </where>
     </select>
 
@@ -44,8 +33,8 @@
             wgm.join_time,
             wgm.type,
             wgm.join_scene,
-            (case when wu.head_image_url is null then wc.avatar else wu.head_image_url end) as member_avatar,
-            (case when wu.user_name is null then wc.name else wu.user_name end) as member_name
+            wgm.name as member_name,
+            (case when wu.head_image_url is null then wc.avatar else wu.head_image_url end) as member_avatar
             FROM
             we_group_member wgm
             left join we_user wu on wu.user_id = wgm.user_id and wgm.type = 1
@@ -55,4 +44,21 @@
         </where>
     </select>
 
+    <insert id="insertBatch">
+        insert into we_group_member (chat_id, user_id, union_id, join_time, join_scene, `type`,
+        group_nick_name,`name`,invitor_user_id,
+        create_by, create_time,update_by, update_time)
+        values
+        <foreach collection="weGroupMembers" item="weGroupMember" index="index" separator=",">
+            (#{weGroupMember.chatId},#{weGroupMember.userId},#{weGroupMember.unionId},
+            #{weGroupMember.joinTime},#{weGroupMember.joinScene},#{weGroupMember.type},
+            #{weGroupMember.groupNickName},#{weGroupMember.name},#{weGroupMember.invitorUserId},
+            #{weGroupMember.createBy},#{weGroupMember.createTime},
+            #{weGroupMember.updateBy},#{weGroupMember.updateTime})
+        </foreach>
+        on duplicate key update
+        join_time= values(join_time),join_scene= values(join_scene),
+        group_nick_name= values(group_nick_name),`name`= values(`name`),invitor_user_id= values(invitor_user_id),
+        `type`= values(`type`),update_by= values(update_by),update_time= values(update_time)
+    </insert>
 </mapper>
