@@ -99,7 +99,7 @@
           <div class="sub-title">匹配词间用逗号隔开</div>
         </el-form-item>
         <el-form-item label="审计范围" :required="true" :error="rangeErrorMsg">
-          <div class="tag-input" @click="openAuditUserRange">
+          <div class="tag-input" style="width:auto;" @click="openAuditUserRange">
             <span class="tag-place" v-if="!auditUserRange.length"
               >请选择<span class="prompt-title"
                 >若不选择，则默认全体成员</span
@@ -116,7 +116,7 @@
           </div>
         </el-form-item>
         <el-form-item label="审计人" :required="true" :error="errorMsg">
-          <div class="tag-input" @click="openAuditUser">
+          <div class="tag-input" style="width:auto;"  @click="openAuditUser">
             <span class="tag-place" v-if="!auditUser.length"
               >请选择<span class="prompt-title">请选择部门负责人</span></span
             >
@@ -237,7 +237,7 @@ export default {
           const params = this.addForm
           let auditUserScope = []
           const obj = {
-            scopeType: this.auditUserRange.map((d) => d.department) + '',
+            scopeType:2,// this.auditUserRange.map((d) => d.department) + '',
             auditScopeId: this.auditUserRange.map((d) => d.userId) + '',
             auditScopeName: this.auditUserRange.map((d) => d.name) + '',
           }

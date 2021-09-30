@@ -173,7 +173,8 @@ export default {
     selectedUser(list) {
       // console.log(list)
       this.queryUser = list
-      this.form.scopeType = list.map((d) => d.department) + ''
+      this.form.scopeType = 2; //list.map((d) => d.department) + ''
+      console.log(list,'scopeType')
       this.form.auditScopeId = list.map((d) => d.userId) + ''
       this.getSensitiveList()
     },
