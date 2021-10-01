@@ -7,6 +7,7 @@ import com.linkwechat.web.controller.common.CommonController;
 import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 import com.linkwechat.wecom.factory.WeCallBackEventFactory;
 import com.linkwechat.wecom.factory.WeEventHandle;
+import com.linkwechat.wecom.factory.impl.customer.WeCallBackAddExternalContactImpl;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 import io.swagger.annotations.Api;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -40,6 +42,9 @@ public class WeCallBackController extends CommonController {
     @Value("${wecome.callBack.encodingAesKey}")
     private String encodingAesKey;
 
+
+
+
     @ApiModelProperty("post数据接收")
     @PostMapping(value = "/recive")
     public String recive(@RequestBody String msg, @RequestParam(name = "msg_signature") String signature,
@@ -50,6 +55,7 @@ public class WeCallBackController extends CommonController {
             WxCpXmlMessageVO wxCpXmlMessage = StrXmlToBean(decrypt);
             log.info("企微回调通知接口 wxCpXmlMessage:{}", JSONObject.toJSONString(wxCpXmlMessage));
             try {
+//                ;
                 WeCallBackEventFactory factory = weEventHandle.factory(wxCpXmlMessage.getEvent());
                 if (factory !=null){
                     Threads.SINGLE_THREAD_POOL.submit(() -> factory.eventHandle(wxCpXmlMessage));

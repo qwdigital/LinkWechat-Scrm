@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeCustomer;
+import com.linkwechat.wecom.domain.WeCustomerList;
 import com.linkwechat.wecom.domain.WeCustomerPortrait;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
@@ -142,6 +143,14 @@ public interface IWeCustomerService extends IService<WeCustomer>
      * @return 企业微信客户集合
      */
     List<WeCustomer> selectWeCustomerListNoRel(WeCustomer weCustomer);
+
+
+    /**
+     * 重构版客户列表
+     * @param weCustomerList
+     * @return
+     */
+    List<WeCustomerList> findWeCustomerList(WeCustomerList weCustomerList);
 
 
 

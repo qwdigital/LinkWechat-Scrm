@@ -164,4 +164,16 @@ public class WeCustomer extends BaseEntity {
     @ApiModelProperty(hidden = true)
     @TableField(exist = false)
     private String updateBy;
+
+
+    /**
+     * 首位添加人
+     */
+    private String firstUserId;
+
+
+    /**
+     * 首位添加时间
+     */
+    private Date firstAddTime;
 }

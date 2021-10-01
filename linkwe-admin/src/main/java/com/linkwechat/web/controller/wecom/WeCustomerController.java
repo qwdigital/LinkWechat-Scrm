@@ -9,8 +9,10 @@ import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.wecom.domain.WeCustomer;
+import com.linkwechat.wecom.domain.WeCustomerList;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.service.IWeCustomerService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.validation.annotation.Validated;
@@ -60,6 +62,21 @@ public class WeCustomerController extends BaseController
 
          return AjaxResult.success(weCustomerService.getCustomersByUserId(externalUserid));
     }
+
+
+    /**
+     * 查询企业微信客户列表(重构版)
+     */
+    //  @PreAuthorize("@ss.hasPermi('customerManage:customer:list')")
+    @GetMapping("/findWeCustomerList")
+    @ApiOperation("查询企业微信客户列表(重构版)")
+    public TableDataInfo findWeCustomerList(WeCustomerList weCustomerList)
+    {
+        startPage();
+        List<WeCustomerList> list = weCustomerService.findWeCustomerList(weCustomerList);
+        return getDataTable(list);
+    }
+
 
     /**
      * 导出企业微信客户列表

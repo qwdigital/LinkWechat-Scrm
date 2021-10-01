@@ -49,6 +49,7 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
     private IWeTaskFissionRewardService weTaskFissionRewardService;
     @Autowired
     private IWeTaskFissionService weTaskFissionService;
+
     private ThreadLocal<WeFlowerCustomerRel> weFlowerCustomerRelThreadLocal = new ThreadLocal<>();
 
     @Autowired
@@ -66,6 +67,20 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
             weFlowerCustomerRelThreadLocal.set(weFlowerCustomerRel);
             weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId());
         }
+//        WeEmpleCode weEmpleCode
+//                = weEmpleCodeService.getById(message.getState());
+
+//        if(message.getState() != null){
+//
+//            if(weEmpleCode != null){
+//                if (isFission(message.getState())) {
+//                    taskFissionRecordHandle(message.getState(), message.getWelcomeCode(), message.getUserId(), message.getExternalUserId());
+//                } else {
+//                    empleCodeHandle(message.getState(), weEmpleCode.getWelcomeMsg(), message.getUserId(), message.getExternalUserId());
+//                }
+//            }
+//        }
+
         if (message.getState() != null && message.getWelcomeCode() != null) {
             if (isFission(message.getState())) {
                 taskFissionRecordHandle(message.getState(), message.getWelcomeCode(), message.getUserId(), message.getExternalUserId());
@@ -73,6 +88,7 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                 empleCodeHandle(message.getState(), message.getWelcomeCode(), message.getUserId(), message.getExternalUserId());
             }
         }
+
     }
 
     //裂变任务处理
