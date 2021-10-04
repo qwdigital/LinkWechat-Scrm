@@ -166,7 +166,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
             // 更新使用场景、欢迎语、是否验证
             weEmplCode.setScenario(communityNewGroupDto.getCodeName());
             weEmplCode.setWelcomeMsg(communityNewGroupDto.getWelcomeMsg());
-            weEmplCode.setSkipVerify(communityNewGroupDto.getSkipVerify());
+            weEmplCode.setIsJoinConfirmFriends(communityNewGroupDto.getSkipVerify()?new Integer(1):new Integer(0));
             weEmpleCodeService.updateWeEmpleCode(weEmplCode);
         } catch (Exception e) {
             throw new WeComException("员工活码更新失败");
@@ -216,7 +216,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         // 固定为多人类型
         weEmpleCode.setCodeType(WeEmpleCodeType.MULTI.getType());
 
-        weEmpleCode.setSkipVerify(communityNewGroupDto.getSkipVerify());
+        weEmpleCode.setIsJoinConfirmFriends(communityNewGroupDto.getSkipVerify()?new Integer(1):new Integer(0));
         // 欢迎语
         weEmpleCode.setWelcomeMsg(communityNewGroupDto.getWelcomeMsg());
         // state，用于区分客户具体是通过哪个「联系我」添加，最大30个字符。使用id作为值即可。
@@ -281,7 +281,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         Optional.ofNullable(empleCode).ifPresent(e -> {
             vo.setEmplCodeUrl(e.getQrCode());
             vo.setWelcomeMsg(e.getWelcomeMsg());
-            vo.setSkipVerify(e.getSkipVerify());
+            vo.setSkipVerify(e.getIsJoinConfirmFriends().equals(new Integer(1))?true:false);
         });
 
         // 设置群活码信息

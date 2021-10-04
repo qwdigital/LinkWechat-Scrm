@@ -108,10 +108,25 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
             return token;
         }
 
-        WeApp weApp = iWeAppService.getOne(new LambdaQueryWrapper<WeApp>()
-                .eq(WeApp::getAgentId, agentId)
-                .eq(WeApp::getDelFlag, Constants.NORMAL_CODE)
-                .eq(WeApp::getStatus,  Constants.NORMAL_CODE));
+        WeApp weApp=null;
+        //首先表中查询提醒的appid
+        WeCorpAccount weCorpAccount = iWxCorpAccountService.findValidWeCorpAccount();
+        if(weCorpAccount != null){
+            if(weCorpAccount.getAgentId().equals(agentId)){
+                weApp=WeApp.builder()
+                        .agentId(weCorpAccount.getAgentId())
+                        .agentSecret(weCorpAccount.getAgentSecret())
+                        .build();
+            }
+        }
+
+        if(weApp==null){
+            weApp = iWeAppService.getOne(new LambdaQueryWrapper<WeApp>()
+                    .eq(WeApp::getAgentId, agentId)
+                    .eq(WeApp::getDelFlag, Constants.NORMAL_CODE)
+                    .eq(WeApp::getStatus,  Constants.NORMAL_CODE));
+        }
+
 
         return findThirdAppAccessToken(weApp);
 

@@ -1,6 +1,5 @@
 package com.linkwechat.wecom.domain.dto;
 
-import lombok.experimental.SuperBuilder;
 import lombok.Data;
 
 /**
@@ -45,6 +44,9 @@ public class WeExternalContactDto extends WeResultDto {
 
         //样式
         private Integer style = 1;
+
+
+
 
         public WeContactWay() {
         }

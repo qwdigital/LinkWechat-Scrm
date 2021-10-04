@@ -33,10 +33,6 @@ public class WeEmpleCode extends BaseEntity {
      */
     private Integer codeType;
 
-    /**
-     * 客户添加时无需经过确认自动成为好友:1:是;0:否
-     */
-    private Boolean skipVerify;
 
     /**
      * 活动场景,和 联系我 接口需要的 scene 不是一回事
@@ -107,4 +103,9 @@ public class WeEmpleCode extends BaseEntity {
      */
     @TableField(exist = false)
     private String mobile;
+
+    /**
+     * 客户添加时是否需要经过确认自动成为好友  1:是  0:否
+     */
+    private Integer isJoinConfirmFriends;
 }

@@ -3,9 +3,19 @@ package com.linkwechat.wecom.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.utils.DateUtils;
+import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
+import com.linkwechat.wecom.domain.WeFlowerCustomerTagRel;
+import com.linkwechat.wecom.mapper.WeCustomerMapper;
+import com.linkwechat.wecom.mapper.WeCustomerTagRelMapper;
 import com.linkwechat.wecom.mapper.WeFlowerCustomerRelMapper;
+import com.linkwechat.wecom.mapper.WeFlowerCustomerTagRelMapper;
+import com.linkwechat.wecom.service.IWeCustomerService;
+import com.linkwechat.wecom.service.IWeCustomerTagRelService;
 import com.linkwechat.wecom.service.IWeFlowerCustomerRelService;
+import com.linkwechat.wecom.service.IWeFlowerCustomerTagRelService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,13 +33,44 @@ import java.util.stream.Collectors;
 public class WeFlowerCustomerRelServiceImpl extends ServiceImpl<WeFlowerCustomerRelMapper, WeFlowerCustomerRel> implements IWeFlowerCustomerRelService {
 
 
+
+
+    @Autowired
+    @Lazy
+    IWeCustomerService iWeCustomerService;
+
+
+
+    @Autowired
+    WeFlowerCustomerTagRelMapper weFlowerCustomerTagRelMapper;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean deleteFollowUser(String userId, String externalUserid) {
-        return this.update(WeFlowerCustomerRel.builder().status("1").build()
-                , new LambdaQueryWrapper<WeFlowerCustomerRel>()
-                        .eq(WeFlowerCustomerRel::getUserId, userId)
-                        .eq(WeFlowerCustomerRel::getExternalUserid, externalUserid));
+    public void deleteFollowUser(String userId, String externalUserid) {
+
+        //如何是首位添加人删除的客户，直接删除该客户，否则直接删除关系
+        WeCustomer weCustomer
+                =  iWeCustomerService.getById(externalUserid);
+        if(weCustomer != null){
+            if(weCustomer.getFirstUserId().equals(userId)){
+                //删除客户
+                iWeCustomerService.removeById(externalUserid);
+            }
+
+            //删除更进关系
+            this.remove(new LambdaQueryWrapper<WeFlowerCustomerRel>()
+                    .eq(WeFlowerCustomerRel::getExternalUserid,externalUserid)
+                    .eq(WeFlowerCustomerRel::getUserId,userId));
+
+            //删除跟进人给客户打的标签
+            weFlowerCustomerTagRelMapper.delete(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                    .eq(WeFlowerCustomerTagRel::getExternalUserid,externalUserid)
+                    .eq(WeFlowerCustomerTagRel::getUserId,userId));
+        }
+
+
+
+
     }
 
     @Override

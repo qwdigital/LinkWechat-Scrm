@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import io.swagger.annotations.ApiModel;
@@ -22,7 +23,7 @@ public class WeEmpleCodeTag
 
     /** $column.columnComment */
     @TableId
-    private Long id= SnowFlakeUtil.nextId();
+    private Long id;
 
     /** 标签id */
     @ApiModelProperty("标签id")
@@ -33,7 +34,8 @@ public class WeEmpleCodeTag
     private Long empleCodeId;
 
     /** 0:正常;2:删除; */
-    @ApiModelProperty("0:正常;2:删除")
+    @ApiModelProperty("0:正常;1:删除")
+    @TableLogic
     private Integer delFlag = 0;
 
     /** 标签名 */

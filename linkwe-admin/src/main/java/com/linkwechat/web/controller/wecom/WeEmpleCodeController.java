@@ -1,6 +1,5 @@
 package com.linkwechat.web.controller.wecom;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
