@@ -48,7 +48,7 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
     public void eventHandle(WxCpXmlMessageVO message) {
         try {
             if (message.getExternalUserId() != null) {
-                weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId());
+                weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId(),message.getUserId());
             }
             //向扫码客户发送欢迎语
             if (message.getState() != null && message.getWelcomeCode() != null) {

@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
@@ -81,6 +82,14 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
                 weEmpleCode.setWeMaterial(weMaterialInfo);
             }
         });
+
+
+        weEmpleCode.setWeEmpleCodeTags(
+                weEmpleCodeTagService.list(new LambdaQueryWrapper<WeEmpleCodeTag>()
+                        .eq(WeEmpleCodeTag::getEmpleCodeId,weEmpleCode.getId()))
+        );
+
+
         return weEmpleCode;
     }
 
@@ -168,20 +177,40 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         }
         try {
 
-            if (this.baseMapper.updateWeEmpleCode(weEmpleCode) == 1) {
+            if (this.updateById(weEmpleCode)) {
                 if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
-                    List<WeEmpleCodeUseScop> weEmpleCodeUseScops = weEmpleCode.getWeEmpleCodeUseScops();
-                    weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
-                    iWeEmpleCodeUseScopService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeUseScops());
+
+                    //移除原有的记录
+                    if(iWeEmpleCodeUseScopService.remove(new LambdaQueryWrapper<WeEmpleCodeUseScop>()
+                            .eq(WeEmpleCodeUseScop::getEmpleCodeId,weEmpleCode.getId()))){
+
+                        weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
+                        iWeEmpleCodeUseScopService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeUseScops());
+
+                    }
+
                 }
                 if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeTags())) {
-                    weEmpleCode.getWeEmpleCodeTags().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
-                    weEmpleCodeTagService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeTags());
+
+                    //有id的更新
+                    weEmpleCodeTagService.remove(new LambdaQueryWrapper<WeEmpleCodeTag>()
+                            .eq(WeEmpleCodeTag::getEmpleCodeId,weEmpleCode.getId()));
+
+
+                      weEmpleCode.getWeEmpleCodeTags().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
+                    weEmpleCode.getWeEmpleCodeTags().stream().forEach(k->{
+                        k.setEmpleCodeId(weEmpleCode.getId());
+                        k.setId(SnowFlakeUtil.nextId());
+                    });
+
+                      weEmpleCodeTagService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeTags());
+
+
                 }
             }
 
         }catch (Exception e){
-            e.printStackTrace();
+           log.error("活码更新失败::"+e.getMessage());
 
         }
 
@@ -244,7 +273,16 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
      */
     @Override
     public WeEmpleCodeDto selectWelcomeMsgByState(String state) {
-        return this.baseMapper.selectWelcomeMsgByState(state);
+
+
+        WeEmpleCode weEmpleCode = this.getOne(new LambdaQueryWrapper<WeEmpleCode>()
+                .eq(WeEmpleCode::getState, state));
+
+
+        return WeEmpleCodeDto.builder()
+                .empleCodeId(weEmpleCode==null?state:String.valueOf(weEmpleCode.getId()))
+                .welcomeMsg(weEmpleCode==null?"你好":weEmpleCode.getWelcomeMsg())
+                .build();
     }
 
     /**
@@ -259,8 +297,6 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         weEmpleCode.setCreateTime(new Date());
         weEmpleCode.setCreateBy(SecurityUtils.getUsername());
         weEmpleCode.setCodeType(WeConstans.SINGLE_EMPLE_CODE_TYPE);
-        weEmpleCode.setSkipVerify(Optional.ofNullable(weEmpleCode.getSkipVerify())
-                .orElse(WeConstans.IS_JOIN_CONFIR_MFRIENDS));
 
         weEmpleCode.setScenario(Optional.ofNullable(weEmpleCode.getScenario())
                 .orElse(WeConstans.ONE_PERSON_CODE_GENERATED_BATCH));
@@ -342,7 +378,8 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
             weEmpleCode.setConfigId(qrCode.getConfig_id());
             weEmpleCode.setQrCode(qrCode.getQr_code());
         }
-        if (this.baseMapper.insertWeEmpleCode(weEmpleCode) == 1) {
+
+        if (this.save(weEmpleCode)) {
             if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
                 weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
                 iWeEmpleCodeUseScopService.saveBatch(weEmpleCode.getWeEmpleCodeUseScops());
@@ -381,7 +418,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         weContactWay.setConfig_id(weEmpleCode.getConfigId());
         weContactWay.setType(weEmpleCode.getCodeType());
         weContactWay.setScene(WeConstans.QR_CODE_EMPLE_CODE_SCENE);
-        weContactWay.setSkip_verify(weEmpleCode.getSkipVerify());
+        weContactWay.setSkip_verify(weEmpleCode.getIsJoinConfirmFriends().equals(new Integer(0))?false:true);
         weContactWay.setState(weEmpleCode.getState());
         if (CollectionUtil.isNotEmpty(weEmpleCodeUseScops)) {
             //员工列表

@@ -55,8 +55,6 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
     @Autowired
     private IWeGroupCodeService weGroupCodeService;
 
-    @Autowired
-    private CosConfig cosConfig;
 
     @Override
     public void eventHandle(WxCpXmlMessageVO message) {
@@ -65,21 +63,9 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                     .eq(WeFlowerCustomerRel::getExternalUserid, message.getExternalUserId())
                     .eq(WeFlowerCustomerRel::getUserId,message.getUserId()));
             weFlowerCustomerRelThreadLocal.set(weFlowerCustomerRel);
-            weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId());
+            weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId(),message.getUserId());
         }
-//        WeEmpleCode weEmpleCode
-//                = weEmpleCodeService.getById(message.getState());
 
-//        if(message.getState() != null){
-//
-//            if(weEmpleCode != null){
-//                if (isFission(message.getState())) {
-//                    taskFissionRecordHandle(message.getState(), message.getWelcomeCode(), message.getUserId(), message.getExternalUserId());
-//                } else {
-//                    empleCodeHandle(message.getState(), weEmpleCode.getWelcomeMsg(), message.getUserId(), message.getExternalUserId());
-//                }
-//            }
-//        }
 
         if (message.getState() != null && message.getWelcomeCode() != null) {
             if (isFission(message.getState())) {
@@ -143,57 +129,68 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
      * @param externalUserId 客户id
      */
     private void empleCodeHandle(String state, String wecomCode, String userId, String externalUserId) {
-        try {
-            log.info("执行发送欢迎语>>>>>>>>>>>>>>>");
-            WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(wecomCode);
-            WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByState(state);
+        if(StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(externalUserId)){
+            try {
 
-            if (StringUtils.isNotNull(messageMap)) {
-                String empleCodeId = messageMap.getEmpleCodeId();
-                //查询活码对应标签
-                List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.list(new LambdaQueryWrapper<WeEmpleCodeTag>()
-                        .eq(WeEmpleCodeTag::getEmpleCodeId, empleCodeId));
-                //查询外部联系人与通讯录关系数据
-                WeFlowerCustomerRel weFlowerCustomerRel = weFlowerCustomerRelService
-                        .getOne(new LambdaQueryWrapper<WeFlowerCustomerRel>()
-                                .eq(WeFlowerCustomerRel::getUserId, userId)
-                                .eq(WeFlowerCustomerRel::getExternalUserid, externalUserId));
-                //为外部联系人添加员工活码标签
-                List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
-                Optional.ofNullable(weFlowerCustomerRel).ifPresent(weFlowerCustomerRel1 -> {
-                    Optional.ofNullable(tagList).orElseGet(ArrayList::new).forEach(tag -> {
-                        weFlowerCustomerTagRels.add(
-                                WeFlowerCustomerTagRel.builder()
-                                        .flowerCustomerRelId(weFlowerCustomerRel.getId())
-                                        .tagId(tag.getTagId())
-                                        .createTime(new Date())
-                                        .build()
-                        );
+                log.info("执行发送欢迎语>>>>>>>>>>>>>>>");
+                WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(wecomCode);
+                WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByState(state);
+                if (StringUtils.isNotNull(messageMap)) {
+                    //查询活码对应标签
+                    List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.list(new LambdaQueryWrapper<WeEmpleCodeTag>()
+                            .eq(WeEmpleCodeTag::getEmpleCodeId, messageMap.getEmpleCodeId()));
+
+                    //查询外部联系人与通讯录关系数据
+                    WeFlowerCustomerRel weFlowerCustomerRel = weFlowerCustomerRelService
+                            .getOne(new LambdaQueryWrapper<WeFlowerCustomerRel>()
+                                    .eq(WeFlowerCustomerRel::getUserId, userId)
+                                    .eq(WeFlowerCustomerRel::getExternalUserid, externalUserId));
+
+                    //为外部联系人添加员工活码标签
+                    List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
+                    Optional.ofNullable(weFlowerCustomerRel).ifPresent(weFlowerCustomerRel1 -> {
+                        Optional.ofNullable(tagList).orElseGet(ArrayList::new).forEach(tag -> {
+
+
+                            weFlowerCustomerTagRels.add(
+                                    WeFlowerCustomerTagRel.builder()
+                                            .flowerCustomerRelId(weFlowerCustomerRel.getId())
+                                            .userId(userId)
+                                            .externalUserid(externalUserId)
+                                            .tagId(tag.getTagId())
+                                            .createTime(new Date())
+                                            .relTagType(new Integer(1))
+                                            .build()
+                            );
+
+                        });
+
+
+                        weFlowerCustomerTagRelService.saveOrUpdateBatch(weFlowerCustomerTagRels);
                     });
-                    weFlowerCustomerTagRelService.saveOrUpdateBatch(weFlowerCustomerTagRels);
-                });
 
-                // 发送欢迎语
-                log.debug(">>>>>>>>>欢迎语查询结果：{}", JSONObject.toJSONString(messageMap));
-                // 设定欢迎语文字
-                if (StringUtils.isNotEmpty(messageMap.getWelcomeMsg())) {
-                    weWelcomeMsgBuilder.text(WeWelcomeMsg.Text.builder().content(messageMap.getWelcomeMsg()).build());
+                    // 发送欢迎语
+                    log.debug(">>>>>>>>>欢迎语查询结果：{}", JSONObject.toJSONString(messageMap));
+                    // 设定欢迎语文字
+                    if (StringUtils.isNotEmpty(messageMap.getWelcomeMsg())) {
+                        weWelcomeMsgBuilder.text(WeWelcomeMsg.Text.builder().content(messageMap.getWelcomeMsg()).build());
+                    }
+                    // 设置欢迎语图片
+                    // 新客拉群创建的员工活码欢迎语图片(群活码图片)
+                    String codeUrl = weGroupCodeService.selectGroupCodeUrlByEmplCodeState(state);
+                    if (StringUtils.isNotNull(codeUrl)) {
+                        buildWelcomeMsgImg(weWelcomeMsgBuilder, codeUrl, FileUtil.getName(codeUrl));
+                    }
+                    // 普通员工活码欢迎语图片
+                    else if (StringUtils.isNotEmpty(messageMap.getCategoryId())) {
+                        buildWelcomeMsgImg(weWelcomeMsgBuilder, messageMap.getMaterialUrl(), messageMap.getMaterialName());
+                    }
+                    weCustomerService.sendWelcomeMsg(weWelcomeMsgBuilder.build());
                 }
-                // 设置欢迎语图片
-                // 新客拉群创建的员工活码欢迎语图片(群活码图片)
-                String codeUrl = weGroupCodeService.selectGroupCodeUrlByEmplCodeState(state);
-                if (StringUtils.isNotNull(codeUrl)) {
-                    buildWelcomeMsgImg(weWelcomeMsgBuilder, codeUrl, FileUtil.getName(codeUrl));
-                }
-                // 普通员工活码欢迎语图片
-                else if (StringUtils.isNotEmpty(messageMap.getCategoryId())) {
-                    buildWelcomeMsgImg(weWelcomeMsgBuilder, messageMap.getMaterialUrl(), messageMap.getMaterialName());
-                }
-                weCustomerService.sendWelcomeMsg(weWelcomeMsgBuilder.build());
+
+            } catch (Exception e) {
+                log.error("执行发送欢迎语失败！", e.getMessage());
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error("执行发送欢迎语失败！", e);
         }
     }
 

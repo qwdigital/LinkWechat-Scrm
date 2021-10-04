@@ -300,7 +300,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         LEFT JOIN we_user wu ON wc.first_user_id=wu.user_id
         LEFT JOIN we_flower_customer_tag_rel wfctr ON wfctr.external_userid=wc.external_userid AND  wfctr.rel_tag_type=1
         LEFT JOIN we_tag wt ON wt.tag_id=wfctr.tag_id
-        <where>
+        where wc.del_flag=0
             <if test="name != null and name !=''">
                 AND  wc.`name` like concat('%',#{name,jdbcType=VARCHAR},'%')
             </if>
@@ -319,7 +319,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="beginTime !=null and beginTime != '' and endTime !='' and endTime != null">
                 AND  date_format(wc.first_add_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
             </if>
-        </where>
         GROUP BY wc.external_userid
     </select>
 
@@ -385,6 +384,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="corpFullName != null">corp_full_name = #{corpFullName},</if>
             <if test="position != null">position = #{position},</if>
             <if test="isOpenChat != null">is_open_chat = #{isOpenChat}</if>
+            <if test="delFlag !=null"> del_flag =#{delFlag} </if>
         </trim>
         where external_userid = #{externalUserid}
     </update>
@@ -431,7 +431,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                   (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department
         FROM
             we_customer wc
-        LEFT JOIN we_flower_customer_rel wfcr ON wc.external_userid=wfcr.external_userid
+        LEFT JOIN we_flower_customer_rel wfcr ON wc.first_user_id=wfcr.user_id
         LEFT JOIN we_user wu ON wu.user_id=wfcr.user_id
         LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.flower_customer_rel_id = wfcr.id
         LEFT JOIN we_tag wt ON wt.tag_id = wfcrf.tag_id

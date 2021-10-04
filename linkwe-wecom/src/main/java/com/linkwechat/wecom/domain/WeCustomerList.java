@@ -1,8 +1,10 @@
 package com.linkwechat.wecom.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class WeCustomerList {
@@ -17,9 +19,13 @@ public class WeCustomerList {
     //跟踪状态
     private Integer trackState;
     //首位添加人时间
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date firstAddTime;
     //标签名称，使用逗号隔开
     private String tagNames;
+
+
+    private List<WeFlowerCustomerRel> weFlowerCustomerRels;
 
     //查询条件客户姓名
     private String name;

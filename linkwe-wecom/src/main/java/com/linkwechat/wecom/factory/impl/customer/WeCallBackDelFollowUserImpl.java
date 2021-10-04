@@ -56,9 +56,11 @@ public class WeCallBackDelFollowUserImpl extends WeEventStrategy {
                         weMessagePushDto.setMsgtype(MessageType.TEXT.getMessageType());
                         weMessagePushDto.setTouser(message.getUserId());
                         weMessagePushDto.setText(textMessageDto);
+
                         Optional.ofNullable(validWeCorpAccount).map(WeCorpAccount::getAgentId).ifPresent(agentId -> {
                             weMessagePushDto.setAgentid(Integer.valueOf(agentId));
                         });
+
                         weMessagePushClient.sendMessageToUser(weMessagePushDto,weMessagePushDto.getAgentid().toString());
 
                         //增加敏感行为记录，客户删除员工

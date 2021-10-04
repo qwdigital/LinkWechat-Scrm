@@ -1,6 +1,8 @@
 package com.linkwechat.web.controller.wecom;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
@@ -10,8 +12,12 @@ import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeCustomerList;
+import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
+import com.linkwechat.wecom.domain.WeFlowerCustomerTagRel;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.service.IWeCustomerService;
+import com.linkwechat.wecom.service.IWeFlowerCustomerRelService;
+import com.linkwechat.wecom.service.IWeFlowerCustomerTagRelService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -35,6 +41,13 @@ public class WeCustomerController extends BaseController
     @Autowired
     @Lazy
     private IWeCustomerService weCustomerService;
+
+
+    @Autowired
+    private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
+
+    @Autowired
+    private IWeFlowerCustomerRelService weFlowerCustomerRelService;
 
 
 
@@ -74,6 +87,25 @@ public class WeCustomerController extends BaseController
     {
         startPage();
         List<WeCustomerList> list = weCustomerService.findWeCustomerList(weCustomerList);
+        if(CollectionUtil.isNotEmpty(list)){
+            list.stream().forEach(k->{
+                WeFlowerCustomerRel customerRel = weFlowerCustomerRelService.getOne(new LambdaQueryWrapper<WeFlowerCustomerRel>()
+                        .eq(WeFlowerCustomerRel::getUserId, k.getFirstUserId())
+                        .eq(WeFlowerCustomerRel::getExternalUserid, k.getExternalUserid()));
+                if(customerRel !=null){
+                    customerRel.setWeFlowerCustomerTagRels(
+                            weFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                                    .eq(WeFlowerCustomerTagRel::getUserId,k.getFirstUserId())
+                                    .eq(WeFlowerCustomerTagRel::getExternalUserid,k.getExternalUserid()))
+                    );
+                }
+
+                k.setWeFlowerCustomerRels(ListUtil.toList(
+                        customerRel
+                ));
+            });
+
+        }
         return getDataTable(list);
     }
 

@@ -19,7 +19,7 @@ public interface IWeFlowerCustomerRelService extends IService<WeFlowerCustomerRe
      * @param userId 企业成员id
      * @param externalUserid 用户id
      */
-    public Boolean deleteFollowUser(String userId, String externalUserid);
+    public void deleteFollowUser(String userId, String externalUserid);
 
     /**
      * 成员添加客户统计

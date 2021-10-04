@@ -3,6 +3,7 @@ package com.linkwechat.wecom.domain;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.annotation.Excel;
@@ -176,4 +177,11 @@ public class WeCustomer extends BaseEntity {
      * 首位添加时间
      */
     private Date firstAddTime;
+
+
+    /**
+     * 0:正常;1:删除
+     */
+    @TableLogic
+    private Integer delFlag;
 }

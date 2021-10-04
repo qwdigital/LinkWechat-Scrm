@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -49,8 +50,7 @@ import java.util.stream.Stream;
  */
 @Service
 public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCustomer> implements IWeCustomerService {
-    @Autowired
-    private WeCustomerMapper weCustomerMapper;
+
 
 
     @Autowired
@@ -87,19 +87,19 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     private  IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
 
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public boolean saveOrUpdate(WeCustomer weCustomer) {
-        if (weCustomer.getExternalUserid() != null) {
-            WeCustomer weCustomerBean = selectWeCustomerById(weCustomer.getExternalUserid());
-            if (weCustomerBean != null) {
-                return weCustomerMapper.updateWeCustomer(weCustomer) == 1;
-            } else {
-                return weCustomerMapper.insertWeCustomer(weCustomer) == 1;
-            }
-        }
-        return false;
-    }
+//    @Override
+//    @Transactional(rollbackFor = Exception.class)
+//    public boolean saveOrUpdate(WeCustomer weCustomer) {
+//        if (weCustomer.getExternalUserid() != null) {
+//            WeCustomer weCustomerBean = selectWeCustomerById(weCustomer.getExternalUserid());
+//            if (weCustomerBean != null) {
+//                return weCustomerMapper.updateWeCustomer(weCustomer) == 1;
+//            } else {
+//                return weCustomerMapper.insertWeCustomer(weCustomer) == 1;
+//            }
+//        }
+//        return false;
+//    }
 
     /**
      * 查询企业微信客户
@@ -109,7 +109,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
      */
     @Override
     public WeCustomer selectWeCustomerById(String externalUserId) {
-        return weCustomerMapper.selectWeCustomerById(externalUserId);
+        return this.baseMapper.selectWeCustomerById(externalUserId);
     }
 
     /**
@@ -126,7 +126,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             weCustomer.setUserIds((SecurityUtils.getLoginUser().getUser().getWeUserId()));
         }
 
-        return weCustomerMapper.selectWeCustomerList(weCustomer);
+        return this.baseMapper.selectWeCustomerList(weCustomer);
     }
 
 
@@ -474,9 +474,33 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     public void makeLabel(WeMakeCustomerTag weMakeCustomerTag) {
         List<WeTag> addTags = weMakeCustomerTag.getAddTag();
 
+
         if(CollectionUtil.isNotEmpty(addTags)){
 
+            if(StringUtils.isEmpty(weMakeCustomerTag.getUserId())){
+                //设置首位添加人打标签
+                WeCustomer weCustomer
+                        = this.getById(weMakeCustomerTag.getExternalUserid());
+                if(null != weCustomer){
+                    weMakeCustomerTag.setUserId(weCustomer.getFirstUserId());
+                }
+            }
+
+
+            WeFlowerCustomerRel weFlowerCustomerRel = iWeFlowerCustomerRelService.getOne(new LambdaQueryWrapper<WeFlowerCustomerRel>()
+                    .eq(WeFlowerCustomerRel::getExternalUserid, weMakeCustomerTag.getExternalUserid())
+                    .eq(WeFlowerCustomerRel::getUserId, weMakeCustomerTag.getUserId())
+            );
+
+
+            if(weFlowerCustomerRel != null){
+                weMakeCustomerTag.setFlowerCustomerRelId(weFlowerCustomerRel.getId());
+            }
+
+
+
             List<WeFlowerCustomerTagRel> tagRels = new ArrayList<>();
+
 
             iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
                     .eq(WeFlowerCustomerTagRel::getExternalUserid,weMakeCustomerTag.getExternalUserid())
@@ -489,6 +513,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                         WeFlowerCustomerTagRel.builder()
                                 .flowerCustomerRelId(SnowFlakeUtil.nextId())
                                 .externalUserid(weMakeCustomerTag.getExternalUserid())
+                                .flowerCustomerRelId(weMakeCustomerTag.getFlowerCustomerRelId())
+                                .userId(weMakeCustomerTag.getUserId())
                                 .relTagType(new Integer(1))
                                 .tagId(k.getTagId())
                                 .build()
@@ -660,7 +686,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void getCustomersInfoAndSynchWeCustomer(String externalUserid) {
+    public void getCustomersInfoAndSynchWeCustomer(String externalUserid,String userId) {
 
         //获取指定客户的详情
         ExternalUserDetail externalUserDetail = weCustomerClient.get(externalUserid);
@@ -669,7 +695,16 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             //客户入库
             WeCustomer weCustomer = new WeCustomer();
             BeanUtils.copyPropertiesASM(externalUserDetail.getExternal_contact(), weCustomer);
-            this.saveOrUpdate(weCustomer);
+
+            //判断该客户是否存在
+            if(this.baseMapper.selectWeCustomerById(externalUserid) != null){//直接更新无需修改首位添加人和时间
+                weCustomer.setDelFlag(new Integer(0));
+                this.baseMapper.updateWeCustomer(weCustomer);
+            }else {
+                weCustomer.setFirstUserId(userId);
+                weCustomer.setFirstAddTime(new Date());
+                this.save(weCustomer);
+            }
 
             //客户与通讯录客户关系
             List<WeTag> weTags = new ArrayList<>();
@@ -757,6 +792,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
                 }
             });
+
+
             List<WeFlowerCustomerRel> weFlowerCustomerRels = iWeFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
                     .eq(WeFlowerCustomerRel::getExternalUserid, weCustomer.getExternalUserid()));
 
@@ -780,7 +817,17 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 if (CollectionUtil.isNotEmpty(weTags) && CollectionUtil.isNotEmpty(weGroups)) {
                     iWeTagService.saveOrUpdateBatch(weTags);
                     iWeTagGroupService.saveOrUpdateBatch(weGroups);
-                    iWeFlowerCustomerTagRelService.saveOrUpdateBatch(weFlowerCustomerTagRels);
+
+
+                    List<WeFlowerCustomerTagRel> tagRels
+                            = weFlowerCustomerTagRels.stream().filter(rel -> Objects.nonNull(rel.getUserId())).collect(Collectors.toList());
+
+                    if(CollectionUtil.isNotEmpty(tagRels)){
+
+                        iWeFlowerCustomerTagRelService.saveOrUpdateBatch(tagRels);
+
+                    }
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -809,12 +856,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         WeCustomer weCustomer = new WeCustomer();
         weCustomer.setExternalUserid(externalUserId);
         weCustomer.setIsOpenChat(1);
-        return weCustomerMapper.updateWeCustomer(weCustomer) == 1;
+        return this.baseMapper.updateWeCustomer(weCustomer) == 1;
     }
 
     @Override
     public List<WeUser> getCustomerByTag(List<String> ids) {
-        return weCustomerMapper.getCustomerByTag(ids);
+        return this.baseMapper.getCustomerByTag(ids);
     }
 
 
@@ -822,7 +869,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Override
     public WeCustomerPortrait findCustomerByOperUseridAndCustomerId(String externalUserid, String userid) throws Exception {
         WeCustomerPortrait weCustomerPortrait
-                = weCustomerMapper.findCustomerByOperUseridAndCustomerId(externalUserid, userid);
+                = this.baseMapper.findCustomerByOperUseridAndCustomerId(externalUserid, userid);
 
         if(null != weCustomerPortrait){
 
@@ -871,12 +918,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
     @Override
     public List<WeCustomer> selectWeCustomerAllList(WeCustomer weCustomer) {
-        return weCustomerMapper.selectWeCustomerList(weCustomer);
+        return this.baseMapper.selectWeCustomerList(weCustomer);
     }
 
     @Override
     public List<WeCustomer> selectWeCustomerListNoRel(WeCustomer weCustomer) {
-        return weCustomerMapper.selectWeCustomerListNoRel(weCustomer);
+        return this.baseMapper.selectWeCustomerListNoRel(weCustomer);
     }
 
 
