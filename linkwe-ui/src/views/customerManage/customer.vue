@@ -166,9 +166,7 @@ export default {
       }
 
       this.tagDialogType = {
-        title:
-          (type === 'add' ? '增加标签' : '移出标签') +
-          (repeat.length ? '（重复的标签已去重显示）' : ''),
+        title: (type === 'add' ? '增加标签' : '移出标签') + (repeat.length ? '（重复的标签已去重显示）' : ''),
         type: type
       }
       this.dialogVisible = true
@@ -264,14 +262,7 @@ export default {
 
 <template>
   <div>
-    <el-form
-      ref="queryForm"
-      :inline="true"
-      :model="query"
-      label-width="100px"
-      class="top-search"
-      size="small"
-    >
+    <el-form ref="queryForm" :inline="true" :model="query" label-width="100px" class="top-search" size="small">
       <el-form-item label="客户名称" prop="name">
         <el-input v-model="query.name" placeholder="请输入"></el-input>
       </el-form-item>
@@ -279,12 +270,7 @@ export default {
         <div class="tag-input" @click="dialogVisibleSelectUser = true">
           <span class="tag-place" v-if="!queryUser.length">请选择</span>
           <template v-else>
-            <el-tag
-              type="info"
-              v-for="(unit, unique) in queryUser"
-              :key="unique"
-              >{{ unit.name }}</el-tag
-            >
+            <el-tag type="info" v-for="(unit, unique) in queryUser" :key="unique">{{ unit.name }}</el-tag>
           </template>
         </div>
       </el-form-item>
@@ -304,32 +290,14 @@ export default {
         <div class="tag-input" @click="showTagDialog">
           <span class="tag-place" v-if="!queryTag.length">请选择</span>
           <template v-else>
-            <el-tag
-              type="info"
-              v-for="(unit, unique) in queryTag"
-              :key="unique"
-              >{{ unit.name }}</el-tag
-            >
+            <el-tag type="info" v-for="(unit, unique) in queryTag" :key="unique">{{ unit.name }}</el-tag>
           </template>
         </div>
       </el-form-item>
       <el-form-item label=" ">
-        <el-button
-          v-hasPermi="['customerManage:customer:query']"
-          type="primary"
-          @click="getList(1)"
-          >查询</el-button
-        >
-        <el-button
-          v-hasPermi="['customerManage:customer:query']"
-          type="success"
-          @click="resetForm()"
-          >重置</el-button
-        >
-        <el-button
-          v-hasPermi="['customerManage:customer:export']"
-          type="info"
-          @click="exportCustomer"
+        <el-button v-hasPermi="['customerManage:customer:query']" type="primary" @click="getList(1)">查询</el-button>
+        <el-button v-hasPermi="['customerManage:customer:query']" type="success" @click="resetForm()">重置</el-button>
+        <el-button v-hasPermi="['customerManage:customer:export']" type="info" @click="exportCustomer"
           >导出列表</el-button
         >
       </el-form-item>
@@ -340,18 +308,10 @@ export default {
         <!-- 共
         <span class="num">{{ total }}</span> 位客户，实际客户
         <span class="num">{{ total }}</span> 位。 -->
-        <el-button
-          v-hasPermi="['customerManage:customer:sync']"
-          v-preventReClick
-          type="primary"
-          @click="sync"
+        <el-button v-hasPermi="['customerManage:customer:sync']" v-preventReClick type="primary" @click="sync"
           >同步客户</el-button
         >
-        <el-button
-          v-hasPermi="['customerManage:customer:checkRepeat']"
-          type="primary"
-          >查看重复客户</el-button
-        >
+        <el-button v-hasPermi="['customerManage:customer:checkRepeat']" type="primary">查看重复客户</el-button>
         <!-- <div>
           最近同步：2021-05-17 15:05:43
         </div> -->
@@ -382,65 +342,42 @@ export default {
       @select="handleSelection"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column
-        type="selection"
-        align="center"
-        width="55"
-      ></el-table-column>
+      <el-table-column type="selection" align="center" width="55"></el-table-column>
       <el-table-column label="客户" prop="name" align="center">
         <template slot-scope="{ row }">
           <div class="cp" @click="goRoute(row)">
-            {{ row.name }}
-            <span :style="{ color: row.type === 1 ? '#4bde03' : '#f9a90b' }">{{
+            {{ row.customerName }}
+            <!-- <span :style="{ color: row.type === 1 ? '#4bde03' : '#f9a90b' }">{{
               { 1: '@微信', 2: '@企业微信' }[row.type]
             }}</span>
-            <i
-              :class="[
-                'el-icon-s-custom',
-                { 1: 'man', 2: 'woman' }[row.gender]
-              ]"
-            ></i>
+            <i :class="['el-icon-s-custom', { 1: 'man', 2: 'woman' }[row.gender]]"></i> -->
           </div>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="corpName"
-        label="公司名称"
-        align="center"
-      ></el-table-column>
+      <!-- <el-table-column prop="corpName" label="公司名称" align="center"></el-table-column> -->
       <el-table-column prop="userName" label="添加人（首位）" align="center">
-        <template slot-scope="{ row }">{{
-          row.weFlowerCustomerRels[0]
-            ? row.weFlowerCustomerRels[0].userName
-            : ''
-        }}</template>
+        <!-- <template slot-scope="{ row }">{{
+          row.weFlowerCustomerRels[0] ? row.weFlowerCustomerRels[0].userName : ''
+        }}</template> -->
       </el-table-column>
-      <el-table-column prop="createTime" label="添加时间" align="center">
-        <template slot-scope="{ row }">{{
-          row.weFlowerCustomerRels[0]
-            ? row.weFlowerCustomerRels[0].createTime
-            : ''
-        }}</template>
+      <el-table-column prop="firstAddTime" label="添加时间" align="center">
+        <!-- <template slot-scope="{ row }">{{
+          row.weFlowerCustomerRels[0] ? row.weFlowerCustomerRels[0].createTime : ''
+        }}</template> -->
       </el-table-column>
-      <el-table-column prop="address" label="标签" align="center">
-        <template slot-scope="{ row }">
-          <div v-for="(item, index) in row.weFlowerCustomerRels" :key="index">
-            <el-tag
-              type="info"
-              v-for="(unit, unique) in item.weFlowerCustomerTagRels"
-              :key="unique"
-              >{{ unit.tagName }}</el-tag
-            >
-          </div>
+      <el-table-column prop="tagNames" label="标签" align="center">
+        <template slot-scope="{ row }" v-if="row.tagNames">
+          <el-tag type="info" v-for="(unit, unique) in row.tagNames.split(',')" :key="unique">{{ unit }}</el-tag>
+          <!-- <div v-for="(item, index) in row.weFlowerCustomerRels" :key="index">
+            <el-tag type="info" v-for="(unit, unique) in item.weFlowerCustomerTagRels" :key="unique">{{
+              unit.tagName
+            }}</el-tag>
+          </div> -->
         </template>
       </el-table-column>
       <el-table-column label="操作" width="100">
         <template slot-scope="{ row }">
-          <el-button
-            v-hasPermi="['customerManage:customer:view']"
-            @click="goRoute(row)"
-            type="text"
-            size="small"
+          <el-button v-hasPermi="['customerManage:customer:view']" @click="goRoute(row)" type="text" size="small"
             >查看</el-button
           >
           <!-- <el-button type="text" size="small">编辑</el-button> -->
@@ -466,25 +403,15 @@ export default {
       @success="submitSelectTag"
     >
       <div class="mt20" v-show="tagDialogType.type === 'add'">
-        <el-button type="primary" @click="dialogVisibleAddTag = true"
-          >添加标签</el-button
-        >
+        <el-button type="primary" @click="dialogVisibleAddTag = true">添加标签</el-button>
       </div>
     </SelectTag>
 
     <!-- 选择添加人弹窗 -->
-    <SelectUser
-      :visible.sync="dialogVisibleSelectUser"
-      title="选择添加人"
-      @success="selectedUser"
-    ></SelectUser>
+    <SelectUser :visible.sync="dialogVisibleSelectUser" title="选择添加人" @success="selectedUser"></SelectUser>
 
     <!-- 添加标签弹窗 -->
-    <AddTag
-      :visible.sync="dialogVisibleAddTag"
-      :form="form"
-      @success="getListTag(true)"
-    />
+    <AddTag :visible.sync="dialogVisibleAddTag" :form="form" @success="getListTag(true)" />
   </div>
 </template>
 
