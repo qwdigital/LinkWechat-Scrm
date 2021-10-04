@@ -2,40 +2,21 @@
 <template>
   <div class="add-sensitive-word">
     <el-form :inline="true" :model="form" class="demo-form-inline">
-      <el-button
-        type="primary"
-        class="add-btn"
-        icon="el-icon-plus"
-        @click="addSensitive"
-        >添加敏感词</el-button
-      >
+      <el-form-item label="">
+        <el-button type="primary" class="add-btn" icon="el-icon-plus" @click="addSensitive">添加敏感词</el-button>
+      </el-form-item>
       <el-form-item>
-        <el-input
-          v-model="form.patternWords"
-          placeholder="搜索关键词"
-          style="width:300px"
-        >
-          <el-button
-            slot="prepend"
-            icon="el-icon-search"
-            @click="getSettingList"
-          ></el-button>
+        <el-input v-model="form.patternWords" placeholder="搜索关键词" style="width:300px">
+          <el-button slot="prepend" icon="el-icon-search" @click="getSettingList"></el-button>
         </el-input>
       </el-form-item>
     </el-form>
-    <el-table
-      :data="tableData"
-      stripe
-      style="width: 100%"
-      :header-cell-style="{ background: '#fff' }"
-    >
+    <el-table :data="tableData" stripe style="width: 100%" :header-cell-style="{ background: '#fff' }">
       <el-table-column prop="strategyName" label="策略名称"> </el-table-column>
       <el-table-column prop="patternWords" label="匹配词"> </el-table-column>
       <el-table-column prop="auditScopeName" label="审计范围">
         <template slot-scope="scope">
-          <el-tag size="medium">{{
-            scope.row.auditUserScope[0].auditScopeName
-          }}</el-tag>
+          <el-tag size="medium">{{ scope.row.auditUserScope[0].auditScopeName }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="auditUserName" label="审计人"> </el-table-column>
@@ -51,20 +32,8 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            >修改</el-button
-          >
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            >删除</el-button
-          >
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)">修改</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -76,66 +45,37 @@
       @pagination="getSettingList()"
     />
     <!-- 添加敏感词 -->
-    <el-dialog
-      title="添加敏感词"
-      :visible.sync="open"
-      width="600px"
-      append-to-body
-    >
-      <el-form
-        ref="addForm"
-        :model="addForm"
-        :rules="rules"
-        label-width="130px"
-      >
+    <el-dialog title="添加敏感词" :visible.sync="open" width="600px" append-to-body>
+      <el-form ref="addForm" :model="addForm" :rules="rules" label-width="130px">
         <el-form-item label="敏感词策略名称" prop="strategyName">
           <el-input v-model="addForm.strategyName" placeholder="例：红包" />
         </el-form-item>
         <el-form-item label="匹配词" prop="patternWords">
-          <el-input
-            v-model="addForm.patternWords"
-            placeholder="例：红包,hongbao,hb"
-          />
+          <el-input v-model="addForm.patternWords" placeholder="例：红包,hongbao,hb" />
           <div class="sub-title">匹配词间用逗号隔开</div>
         </el-form-item>
         <el-form-item label="审计范围" :required="true" :error="rangeErrorMsg">
-          <div class="tag-input" @click="openAuditUserRange">
+          <div class="tag-input" style="width:auto;" @click="openAuditUserRange">
             <span class="tag-place" v-if="!auditUserRange.length"
-              >请选择<span class="prompt-title"
-                >若不选择，则默认全体成员</span
-              ></span
+              >请选择<span class="prompt-title">若不选择，则默认全体成员</span></span
             >
             <template v-else>
-              <el-tag
-                type="info"
-                v-for="(unit, unique) in auditUserRange"
-                :key="unique"
-                >{{ unit.name }}</el-tag
-              >
+              <el-tag type="info" v-for="(unit, unique) in auditUserRange" :key="unique">{{ unit.name }}</el-tag>
             </template>
           </div>
         </el-form-item>
         <el-form-item label="审计人" :required="true" :error="errorMsg">
-          <div class="tag-input" @click="openAuditUser">
+          <div class="tag-input" style="width:auto;" @click="openAuditUser">
             <span class="tag-place" v-if="!auditUser.length"
               >请选择<span class="prompt-title">请选择部门负责人</span></span
             >
             <template v-else>
-              <el-tag
-                type="info"
-                v-for="(unit, unique) in auditUser"
-                :key="unique"
-                >{{ unit.name }}</el-tag
-              >
+              <el-tag type="info" v-for="(unit, unique) in auditUser" :key="unique">{{ unit.name }}</el-tag>
             </template>
           </div>
         </el-form-item>
         <el-form-item label="消息通知">
-          <el-switch
-            v-model="alertFlag"
-            :active-value="1"
-            :inactive-value="0"
-          ></el-switch>
+          <el-switch v-model="alertFlag" :active-value="1" :inactive-value="0"></el-switch>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -144,11 +84,7 @@
       </div>
     </el-dialog>
     <!-- 选择审计范围弹窗 -->
-    <SelectUser
-      :visible.sync="dialogVisibleSelectUser"
-      title="选择添加人"
-      @success="selectedUser"
-    ></SelectUser>
+    <SelectUser :visible.sync="dialogVisibleSelectUser" title="选择添加人" @success="selectedUser"></SelectUser>
     <!-- 选择审计人弹窗 -->
     <SelectUser
       :visible.sync="dialogVisibleSelectAuditUser"
@@ -163,18 +99,18 @@ import * as sensitiveApis from '@/api/conversation/security'
 import SelectUser from '@/components/SelectUser'
 export default {
   components: {
-    SelectUser,
+    SelectUser
   },
   data() {
     return {
       form: {
         pageSize: 10,
         pageNum: 1,
-        patternWords: '', // 关键词
+        patternWords: '' // 关键词
       },
       addForm: {
         strategyName: '', // 策略名称
-        patternWords: '', // 匹配词
+        patternWords: '' // 匹配词
       },
       alertFlag: 0, // 消息通知
       tableData: [], // 敏感词列表
@@ -182,7 +118,7 @@ export default {
       rangeErrorMsg: '', // 审计范围错误提示
       query: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 10
       },
       auditUserRange: [], // 审计范围
       auditUser: [], // 审计人
@@ -193,13 +129,9 @@ export default {
       submitFlag: '', // 添加或者修改
       rowId: '', // 修改的数据id
       rules: {
-        strategyName: [
-          { required: true, message: '敏感词策略不能为空', trigger: 'blur' },
-        ],
-        patternWords: [
-          { required: true, message: '匹配词不能为空', trigger: 'blur' },
-        ],
-      },
+        strategyName: [{ required: true, message: '敏感词策略不能为空', trigger: 'blur' }],
+        patternWords: [{ required: true, message: '匹配词不能为空', trigger: 'blur' }]
+      }
     }
   },
   mounted() {
@@ -237,9 +169,9 @@ export default {
           const params = this.addForm
           let auditUserScope = []
           const obj = {
-            scopeType: this.auditUserRange.map((d) => d.department) + '',
+            scopeType: 2, // this.auditUserRange.map((d) => d.department) + '',
             auditScopeId: this.auditUserRange.map((d) => d.userId) + '',
-            auditScopeName: this.auditUserRange.map((d) => d.name) + '',
+            auditScopeName: this.auditUserRange.map((d) => d.name) + ''
           }
           auditUserScope.push(obj)
           params.auditUserScope = auditUserScope
@@ -277,7 +209,7 @@ export default {
     resetForm() {
       this.addForm = {
         strategyName: '',
-        patternWords: '',
+        patternWords: ''
       }
       this.auditUserRange = [] // 审计范围
       this.auditUser = []
@@ -291,7 +223,6 @@ export default {
       this.open = true
     },
     selectedUser(list) {
-      debugger
       // console.log(list)
       this.auditUserRange = list
       // this.form.scopeType = list.map(d => d.department) + ""
@@ -313,15 +244,15 @@ export default {
           this.auditUser = [
             {
               name: res.data.auditUserName,
-              userId: res.data.auditUserId,
-            },
+              userId: res.data.auditUserId
+            }
           ]
           this.auditUserRange = [
             {
               name: res.data.auditUserScope[0].auditScopeName,
               userId: res.data.auditUserScope[0].auditScopeId,
-              department: res.data.auditUserScope[0].scopeType,
-            },
+              department: res.data.auditUserScope[0].scopeType
+            }
           ]
           this.alertFlag = res.data.alertFlag
         }
@@ -337,8 +268,8 @@ export default {
         }
       })
     },
-    handleStatusChange(row) {},
-  },
+    handleStatusChange(row) {}
+  }
 }
 </script>
 <style lang="scss" scoped>

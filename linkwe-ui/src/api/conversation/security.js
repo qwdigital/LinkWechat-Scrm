@@ -1,10 +1,15 @@
+/***
+ * @file:
+ * @author: qi.yeqing
+ * @Date: 2021-05-25 11:19:34
+ */
 import request from '@/utils/request'
 const service = window.CONFIG.services.wecom + '/sensitive'
 
 /**
  * 获取敏感词触发列表
- * @param {*} params 
- * 
+ * @param {*} params
+ *
  */
 export function getSecurityList(params) {
   return request({
@@ -16,8 +21,8 @@ export function getSecurityList(params) {
 
 /**
  * 获取敏感词设置列表
- * @param {*} params 
- * 
+ * @param {*} params
+ *
  */
 export function getSettingSensitiveList(params) {
   return request({
@@ -28,8 +33,8 @@ export function getSettingSensitiveList(params) {
 }
 /**
  * 添加敏感词设置
- * @param {*} params 
- * 
+ * @param {*} params
+ *
  */
 export function addSettingSensitive(data) {
   return request({
@@ -40,8 +45,8 @@ export function addSettingSensitive(data) {
 }
 /**
  * 修改敏感词设置
- * @param {*} params 
- * 
+ * @param {*} params
+ *
  */
 export function modifySettingSensitive(data) {
   return request({
@@ -52,8 +57,8 @@ export function modifySettingSensitive(data) {
 }
 /**
  * 获取敏感词详情
- * @param {*} params 
- * 
+ * @param {*} params
+ *
  */
 export function getSensitiveDetails(tableId) {
   return request({
@@ -63,8 +68,8 @@ export function getSensitiveDetails(tableId) {
 }
 /**
  * 删除敏感词
- * @param {*} params 
- * 
+ * @param {*} params
+ *
  */
 export function deleteSensitive(tableId) {
   return request({
@@ -74,20 +79,20 @@ export function deleteSensitive(tableId) {
 }
 /**
  * 获取敏感行为警告敏感记录列表
- * @param {*} params 
- * 
+ * @param {*} params
+ *
  */
 export function getSensitiveRecord(params) {
   return request({
-    url: service + '/act/hit/list',
+    url: service + '/list',
     method: 'get',
     params,
   })
 }
 /**
  * 获取敏感行为管理列表
- * @param {*} params 
- * 
+ * @param {*} params
+ *
  */
 export function getSensitiveManagement(params) {
   return request({

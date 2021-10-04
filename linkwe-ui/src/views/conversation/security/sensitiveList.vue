@@ -6,23 +6,12 @@
         <div class="tag-input" @click="dialogVisibleSelectUser = true">
           <span class="tag-place" v-if="!queryUser.length">请选择</span>
           <template v-else>
-            <el-tag
-              type="info"
-              v-for="(unit, unique) in queryUser"
-              :key="unique"
-              >{{ unit.name }}</el-tag
-            >
+            <el-tag type="info" v-for="(unit, unique) in queryUser" :key="unique">{{ unit.name }}</el-tag>
           </template>
         </div>
       </el-form-item>
       <el-form-item>
-        <el-input
-          v-model="form.keyword"
-          placeholder="搜索关键词"
-          style="width:300px"
-        >
-          <el-button slot="prepend" icon="el-icon-search"></el-button>
-        </el-input>
+        <el-input v-model="form.keyword" placeholder="搜索关键词" style="width:240px"> </el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="getSensitiveList">查询</el-button>
@@ -51,32 +40,25 @@
         </el-col>
       </el-row>
     </div>
-    <el-table
-      :data="tableData"
-      stripe
-      style="width: 100%"
-      :header-cell-style="{ background: '#fff' }"
-    >
-      <el-table-column prop="pattern_words" label="敏感词"> </el-table-column>
-      <el-table-column prop="content" label="内容"> </el-table-column>
-      <el-table-column prop="from" label="触发者"> </el-table-column>
+    <el-table :data="tableData" stripe style="width: 100%" :header-cell-style="{ background: '#fff' }">
+      <el-table-column prop="patternWords" label="敏感词"> </el-table-column>
+      <el-table-column prop="content" label="内容">
+        <template slot-scope="{ row }">
+          {{ row.content && JSON.parse(row.content).content }}
+        </template>
+        <ChatContent :message="row"></ChatContent>
+      </el-table-column>
+      <el-table-column prop="fromId" label="触发者"> </el-table-column>
       <el-table-column prop="status" label="消息状态">
-        <template slot="header">
+        <!-- <template slot="header">
           {{ floorRange }}
-          <el-select
-            size="mini"
-            v-model="floorRange"
-            class="noborder"
-            @change="chechName(floorRange)"
-          >
-            <el-option
-              v-for="item in displayOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
+          <el-select size="mini" v-model="floorRange" class="noborder" @change="chechName(floorRange)">
+            <el-option v-for="item in displayOptions" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
+        </template> -->
+        <template slot-scope="{ row }">
+          <el-tag size="medium">{{ displayOptions[row.status].label }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="msgtime" label="发送时间"> </el-table-column>
@@ -100,9 +82,12 @@
 <script>
 import * as sensitiveApis from '@/api/conversation/security'
 import SelectUser from '@/components/SelectUser'
+import ChatContent from '@/components/ChatContent'
+
 export default {
   components: {
     SelectUser,
+    ChatContent
   },
   data() {
     return {
@@ -111,7 +96,7 @@ export default {
         pageNum: 1,
         scopeType: '',
         auditScopeId: '',
-        keyword: '', // 关键词
+        keyword: '' // 关键词
       },
       selectDate: '',
       dateRangeValue: '', // 时间选择
@@ -119,7 +104,7 @@ export default {
       queryUser: [], // 搜索框选择的添加人
       query: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 10
       },
       total: 0,
       dialogVisibleSelectUser: false, // 选择添加人弹窗显隐
@@ -127,37 +112,36 @@ export default {
       displayOptions: [
         {
           value: '0',
-          label: '全部',
+          label: '全部'
         },
         {
           value: '1',
-          label: '已发送',
+          label: '已发送'
         },
         {
           value: '2',
-          label: '已撤回',
+          label: '已撤回'
         },
         {
           value: '3',
-          label: '已删除',
-        },
-      ],
+          label: '已删除'
+        }
+      ]
     }
+  },
+  created() {
+    this.getSensitiveList()
   },
   methods: {
     getSensitiveList() {
-      if (this.queryUser.length > 0) {
-        this.form.pageSize = this.query.pageSize
-        this.form.pageNum = this.query.pageNum
-        sensitiveApis.getSecurityList(this.form).then((res) => {
-          if (res.code === 200) {
-            this.tableData = res.rows
-            this.total = Number(res.total)
-          }
-        })
-      } else {
-        this.$message.warning('请选择人员！')
-      }
+      this.form.pageSize = this.query.pageSize
+      this.form.pageNum = this.query.pageNum
+      sensitiveApis.getSecurityList(this.form).then((res) => {
+        if (res.code === 200) {
+          this.tableData = res.rows
+          this.total = Number(res.total)
+        }
+      })
     },
     chechName(e) {
       if (e == 0) {
@@ -173,11 +157,12 @@ export default {
     selectedUser(list) {
       // console.log(list)
       this.queryUser = list
-      this.form.scopeType = list.map((d) => d.department) + ''
+      this.form.scopeType = 2 //list.map((d) => d.department) + ''
+      console.log(list, 'scopeType')
       this.form.auditScopeId = list.map((d) => d.userId) + ''
       this.getSensitiveList()
-    },
-  },
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>

@@ -6,16 +6,16 @@ export default {
     // 0: '图片', 1: '语音', 2: '视频', 3: '普通文件', 4: '文本', 5: '海报',
     type: {
       type: String,
-      default: '4',
+      default: '4'
     },
     multiple: {
       type: Boolean,
-      default: false,
+      default: false
     },
     selected: {
       type: Array,
-      default: () => [],
-    },
+      default: () => []
+    }
   },
   data() {
     return {
@@ -26,7 +26,7 @@ export default {
         pageSize: 10,
         categoryId: '',
         search: '',
-        mediaType: '4',
+        mediaType: '4'
       },
       list: [], // 列表
       total: 0, // 总条数
@@ -34,7 +34,7 @@ export default {
       // 树props
       treeProps: {
         children: 'children',
-        label: 'name',
+        label: 'name'
       },
       // 分组props
       groupProps: {
@@ -43,22 +43,22 @@ export default {
         children: 'children',
         label: 'name',
         value: 'id',
-        emitPath: false,
+        emitPath: false
       },
       radio: '',
 
       // 树props
       treeProps: {
         children: 'children',
-        label: 'name',
+        label: 'name'
       },
-      selectedx: [],
+      selectedx: []
     }
   },
   watch: {
     radio(val) {
       this.$emit('change', val)
-    },
+    }
   },
   computed: {},
   created() {
@@ -98,8 +98,8 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.$emit('update:selected', selection)
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -108,11 +108,7 @@ export default {
     <template v-if="false">
       <el-form ref="form" :model="query" label-width="80px">
         <el-form-item label="选择分组">
-          <el-cascader
-            v-model="query.categoryId"
-            :options="treeData"
-            :props="groupProps"
-          ></el-cascader>
+          <el-cascader v-model="query.categoryId" :options="treeData" :props="groupProps"></el-cascader>
           <el-input
             v-model="query.search"
             class="ml10 mr10"
@@ -138,12 +134,7 @@ export default {
       </el-form>
 
       <!-- 文本 -->
-      <el-table
-        v-if="type == 4"
-        v-loading="loading"
-        :data="list"
-        :show-header="false"
-      >
+      <el-table v-if="type == 4" v-loading="loading" :data="list" :show-header="false">
         <el-table-column width="30">
           <template slot-scope="scope">
             <el-radio v-model="radio" :label="scope.row">'</el-radio>
@@ -153,12 +144,7 @@ export default {
       </el-table>
 
       <!-- 图片 -->
-      <el-radio-group
-        v-if="type == 0"
-        v-loading="loading"
-        class="img-wrap"
-        v-model="radio"
-      >
+      <el-radio-group v-if="type == 0" v-loading="loading" class="img-wrap" v-model="radio">
         <el-radio v-for="(item, index) in list" :label="item" :key="index">
           <img class="img-li" :src="item.materialUrl" alt />
           <div class="ac mt5">{{ item.materialName }}</div>
@@ -192,48 +178,20 @@ export default {
             :total="total"
           ></el-pagination>
         </div>
-        <el-table
-          v-if="[1, 3, 4].includes(+type)"
-          :data="list"
-          @selection-change="handleSelectionChange"
-        >
+        <el-table v-if="[1, 3, 4].includes(+type)" :data="list" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" align="center" />
-          <el-table-column
-            v-if="type == 4"
-            prop="content"
-            label="文本内容"
-          ></el-table-column>
-          <el-table-column
-            v-else
-            prop="materialName"
-            label="素材名称"
-          ></el-table-column>
+          <el-table-column v-if="type == 4" prop="content" label="文本内容"></el-table-column>
+          <el-table-column v-else prop="materialName" label="素材名称"></el-table-column>
           <el-table-column prop="createTime" label="时间"></el-table-column>
         </el-table>
 
         <el-row v-else :gutter="20">
-          <el-checkbox-group
-            v-model="selectedx"
-            @change="handleSelectionChange"
-          >
-            <el-col
-              :span="6"
-              style="margin-bottom: 24px; min-width: 220px"
-              v-for="(item, index) in list"
-              :key="index"
-            >
+          <el-checkbox-group v-model="selectedx" @change="handleSelectionChange">
+            <el-col :span="6" style="margin-bottom: 24px; min-width: 220px" v-for="(item, index) in list" :key="index">
               <el-card shadow="hover" body-style="padding: 0px;">
                 <div class="img-wrap">
-                  <el-image
-                    v-if="type == 0"
-                    :src="item.materialUrl"
-                    fit="contain"
-                  ></el-image>
-                  <el-image
-                    v-else-if="type == 2"
-                    :src="item.coverUrl"
-                    fit="contain"
-                  ></el-image>
+                  <el-image v-if="[0, 5].includes(+type)" :src="item.materialUrl" fit="contain"></el-image>
+                  <el-image v-else-if="type == 2" :src="item.coverUrl" fit="contain"></el-image>
                 </div>
                 <div style="padding: 14px">
                   <el-checkbox :label="item">
