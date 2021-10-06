@@ -67,4 +67,51 @@
             </if>
         </where>
     </select>
+
+    <select id="findChatPostsItems" resultType="com.linkwechat.wecom.domain.vo.WeChatSideVo">
+        SELECT
+            wci.material_id,
+            wm.sample_img_path as material_url,
+            wc.`name` as material_name,
+            wm.title as content,
+            wc.media_type,
+            wm.sample_img_path as cover_url,
+            (
+                SELECT
+                    COUNT(1)
+                FROM
+                    we_chat_collection
+                WHERE
+                    material_id = wci.material_id
+                  AND user_id = #{userId}
+            ) collection,
+            wci.create_time
+        FROM
+            we_chat_item wci
+        LEFT JOIN we_poster wm ON wci.material_id = wm.id
+        LEFT JOIN we_category wc ON wm.category_id = wc.id
+        <where>
+            wci.side_id=#{sideId}
+            <if test="keyword!=null and keyword!=''">
+                <if test="mediaType!=null and mediaType=='0'.toString()">
+                    AND wm.title LIKE CONCAT('%',#{keyword},'%')
+                </if>
+                <if test="mediaType!=null and mediaType=='1'.toString()">
+                    AND wc.`name` LIKE CONCAT('%',#{keyword},'%')
+                </if>
+                <if test="mediaType!=null and mediaType=='2'.toString()">
+                    AND wc.`name` LIKE CONCAT('%',#{keyword},'%')
+                </if>
+                <if test="mediaType!=null and mediaType=='3'.toString()">
+                    AND wc.`name` LIKE CONCAT('%',#{keyword},'%')
+                </if>
+                <if test="mediaType!=null and mediaType=='4'.toString()">
+                    AND wm.title LIKE CONCAT('%',#{keyword},'%')
+                </if>
+                <if test="mediaType!=null and mediaType=='5'.toString()">
+                    AND wc.`name` LIKE CONCAT('%',#{keyword},'%')
+                </if>
+            </if>
+        </where>
+    </select>
 </mapper>

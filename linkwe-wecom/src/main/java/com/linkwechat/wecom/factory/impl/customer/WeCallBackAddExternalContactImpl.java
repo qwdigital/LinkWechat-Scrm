@@ -180,11 +180,17 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                     String codeUrl = weGroupCodeService.selectGroupCodeUrlByEmplCodeState(state);
                     if (StringUtils.isNotNull(codeUrl)) {
                         buildWelcomeMsgImg(weWelcomeMsgBuilder, codeUrl, FileUtil.getName(codeUrl));
+                    }else{
+
+                        WeEmpleCode weEmpleCode = weEmpleCodeService.selectWeEmpleCodeById(Long.valueOf(state));
+                        if(null != weEmpleCode){
+                            if(weEmpleCode.getWeMaterial() !=null && StringUtils.isNotEmpty(weEmpleCode.getWeMaterial().getMaterialUrl())){
+                                buildWelcomeMsgImg(weWelcomeMsgBuilder, weEmpleCode.getWeMaterial().getMaterialUrl(),
+                                        weEmpleCode.getWeMaterial().getMaterialName());
+                            }
+                        }
                     }
-                    // 普通员工活码欢迎语图片
-                    else if (StringUtils.isNotEmpty(messageMap.getCategoryId())) {
-                        buildWelcomeMsgImg(weWelcomeMsgBuilder, messageMap.getMaterialUrl(), messageMap.getMaterialName());
-                    }
+
                     weCustomerService.sendWelcomeMsg(weWelcomeMsgBuilder.build());
                 }
 

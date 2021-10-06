@@ -252,7 +252,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             if (CollectionUtil.isNotEmpty(weFlowerCustomerRels)) {
                 List<Long> weFlowerCustomerRelIds = weFlowerCustomerRels.stream().map(WeFlowerCustomerRel::getId).collect(Collectors.toList());
                 iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
-                        .in(WeFlowerCustomerTagRel::getFlowerCustomerRelId, weFlowerCustomerRelIds));
+                        .in(WeFlowerCustomerTagRel::getFlowerCustomerRelId, weFlowerCustomerRelIds)
+                        .ne(WeFlowerCustomerTagRel::getRelTagType,new Integer(1))
+                );
                 iWeFlowerCustomerRelService.removeByIds(weFlowerCustomerRelIds);
             }
 
