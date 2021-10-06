@@ -12,17 +12,17 @@ ruoyi:
   demoEnabled: true
   # 是否开启文件云上传（使用的是腾讯云，如果开启了，则需要配置腾讯云存储相关信息；如果关闭了则文件存储再本地，需要配置本地路径）
   file:
-    startCosUpload: false
+    startCosUpload: true
     #如果startCosUpload为false时必须设置，则文件资源放在本地服务器上，该配置为文件访问前缀,配置到nginx上可以直接访问
     imgUrlPrefix: /lwImg
     #腾讯云对象存储
     cos:
-      secretId:
-      secretKey:
+      secretId: AKIDQRCizIeUGl13vakkDQMH0VkjhPr1rBBv
+      secretKey: e3D8oFetseC0f8OX9XeV7UcTDiyyQ8cr
       #link-wechat-1251309172.cos.ap-nanjing.myqcloud.com
-      region:
-      bucketName:
-      cosImgUrlPrefix:
+      region: ap-nanjing
+      bucketName: link-wechat-1251309172
+      cosImgUrlPrefix: https://link-wechat-1251309172.cos.ap-nanjing.myqcloud.com/
   # 文件路径 示例（ Windows配置D:/ruoyi/uploadPath，Linux配置 /app/project/pic）
   #profile: /data/jenkins_home/app/project/
   # 获取ip地址开关
@@ -107,7 +107,7 @@ spring:
     druid:
       # 主库数据源
       master:
-        url: jdbc:mysql://127.0.0.1:10179/link-wechat-prod?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+        url: jdbc:mysql://127.0.0.1:10179/lww?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
         username: root
         password: root
       # 从库数据源
@@ -202,7 +202,7 @@ token:
   # 令牌密钥
   secret: abcdefghijklmnopqrstuvwxyz
   # 令牌有效期（默认30分钟）
-  expireTime: 30
+  expireTime: 600
 
 mybatis-plus:
   mapper-locations: classpath*:mapper/**/*Mapper.xml
@@ -249,16 +249,16 @@ xss:
   urlPatterns: /system/*,/monitor/*,/tool/*
 
 # elasticsearch配置
-#elasticsearch:
-#  schema: http
-#  address: 47.112.117.15:7200,47.112.117.15:7201,47.112.117.15:7202
-#  userName: "elastic"
-#  password: "0p-0p-0p-"
-#  connectTimeout: 10000
-#  socketTimeout: 10000
-#  connectionRequestTimeout: 10000
-#  maxConnectNum: 100
-#  maxConnectPerRoute: 100
+elasticsearch:
+  schema: http
+  address: 47.112.117.15:7200,47.112.117.15:7201,47.112.117.15:7202
+  userName: "elastic"
+  password: "0p-0p-0p-"
+  connectTimeout: 10000
+  socketTimeout: 10000
+  connectionRequestTimeout: 10000
+  maxConnectNum: 100
+  maxConnectPerRoute: 100
 
 # forest配置
 forest:
@@ -267,15 +267,19 @@ forest:
   max-retry-interval: 1000 #重试间隔时间
   connect-timeout: 3000 #链接超时时间
   timeout: 3000  # 请求超时时间
-  variables:   # 全局变量
+  variables:
     weComServerUrl: https://qyapi.weixin.qq.com/
     weComePrefix: cgi-bin
     wxServerUrl: https://api.weixin.qq.com/
     wxPrefix: sns
 
 wecome:
+  chatKey: finance_new
+  serverUrl: https://qyapi.weixin.qq.com/
+  weComePrefix: cgi-bin
   noAccessTokenUrl:
     - /gettoken
+    - /service/get_provider_token
     - /wecom/chat/side/list
     - /wecom/chat/item/list
     - /wecom/chat/collection/addCollection
@@ -306,6 +310,8 @@ wecome:
     - /externalcontact/groupchat/statistic
     - /externalcontact/groupchat/statistic_group_by_day
   fileUplodUrl:  /media/upload,/media/uploadimg
+  needProviderTokenUrl:
+    - /service/get_login_info
   needChatTokenUrl:
     - /msgaudit/get_permit_user_list
     - /msgaudit/check_single_agree
