@@ -45,7 +45,13 @@ public class WeChatItemController extends BaseController {
     public TableDataInfo list(@RequestParam(value = "sideId") Long sideId
             , @RequestParam(value = "keyword", required = false) String keyword,@RequestParam(value = "mediaType") String mediaType,@RequestParam(value = "userId") String userId) {
         startPage();
-        List<WeChatSideVo> weChatSideVos = weChatItemService.chatItems(sideId,keyword,mediaType,userId);
+        List<WeChatSideVo> weChatSideVos;
+        if(mediaType.equals("5")){
+            weChatSideVos=weChatItemService.findChatPostsItems(sideId,keyword,mediaType,userId);
+        }else{
+            weChatSideVos
+                    = weChatItemService.chatItems(sideId,keyword,mediaType,userId);
+        }
         return getDataTable(weChatSideVos);
     }
 

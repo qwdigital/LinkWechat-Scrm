@@ -320,6 +320,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 AND  date_format(wc.first_add_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
             </if>
         GROUP BY wc.external_userid
+        ORDER BY wc.first_add_time desc
     </select>
 
 
