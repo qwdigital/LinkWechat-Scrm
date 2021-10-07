@@ -15,9 +15,17 @@ const service = window.CONFIG.services.wecom + '/customer'
     status: 0 客户状态 0正常 1删除
 }
  */
-export function getList(params) {
+export function getListNew(params) {
   return request({
     url: service + '/findWeCustomerList',
+    method: 'get',
+    params
+  })
+}
+
+export function getList(params) {
+  return request({
+    url: service + '/list',
     method: 'get',
     params
   })
