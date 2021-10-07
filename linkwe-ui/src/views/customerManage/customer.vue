@@ -75,7 +75,7 @@ export default {
       page && (this.query.pageNum = page)
       this.loading = true
       api
-        .getList(this.query)
+        .getListNew(this.query)
         .then(({ rows, total }) => {
           this.list = rows
           this.total = +total
