@@ -64,6 +64,9 @@ public class WeMaterialController extends BaseController {
             list = materialService.findWeMaterials(categoryId, search,mediaType);
         }
 
+
+
+
         return getDataTable(list);
     }
 

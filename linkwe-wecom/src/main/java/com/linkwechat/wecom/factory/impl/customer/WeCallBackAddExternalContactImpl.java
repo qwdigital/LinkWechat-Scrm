@@ -7,10 +7,12 @@ import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.wecom.client.WeCustomerClient;
 import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
+import com.linkwechat.wecom.domain.dto.customer.CutomerTagEdit;
 import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 import com.linkwechat.wecom.factory.WeEventStrategy;
 import com.linkwechat.wecom.service.*;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author danmo
@@ -54,6 +57,10 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
 
     @Autowired
     private IWeGroupCodeService weGroupCodeService;
+
+
+    @Autowired
+    private WeCustomerClient weCustomerClient;
 
 
     @Override
@@ -165,8 +172,16 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
 
                         });
 
+                        if(weFlowerCustomerTagRelService.saveOrUpdateBatch(weFlowerCustomerTagRels)){
+                            //标签同步到企业微信端
+                            weCustomerClient.makeCustomerLabel(CutomerTagEdit.builder()
+                                            .external_userid(externalUserId)
+                                            .userid(userId)
+                                            .add_tag(weFlowerCustomerTagRels.stream()
+                                                    .map(WeFlowerCustomerTagRel::getTagId).toArray(String[]::new))
+                                    .build());
+                        }
 
-                        weFlowerCustomerTagRelService.saveOrUpdateBatch(weFlowerCustomerTagRels);
                     });
 
                     // 发送欢迎语
