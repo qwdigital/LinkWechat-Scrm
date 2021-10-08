@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import io.swagger.annotations.ApiModel;
@@ -60,5 +61,12 @@ public class WeMaterial extends BaseEntity {
      */
     @ApiModelProperty("音频时长")
     private String audioTime;
+
+
+    /**
+     * 素材是否被选中
+     */
+    @TableField(exist = false)
+    private Boolean isCheck=false;
 
 }
