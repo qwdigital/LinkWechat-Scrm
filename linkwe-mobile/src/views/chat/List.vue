@@ -1,31 +1,25 @@
 <script>
-import {
-  getMaterialList,
-  getCollectionList,
-  addCollection,
-  cancleCollection,
-  getMaterialMediaId,
-} from '@/api/chat'
+import { getMaterialList, getCollectionList, addCollection, cancleCollection, getMaterialMediaId } from '@/api/chat'
 export default {
   components: {},
   props: {
     sideId: {
       type: String,
-      default: '',
+      default: ''
     },
     // mediaType 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本 5 海报
     mediaType: {
       type: String,
-      default: '0',
+      default: '0'
     },
     userId: {
       type: String,
-      default: '',
+      default: ''
     },
     keyword: {
       type: String,
-      default: '',
-    },
+      default: ''
+    }
   },
   data() {
     return {
@@ -43,14 +37,14 @@ export default {
         '2': '视频',
         '3': '普通文件',
         '4': '文本',
-        '5': '海报',
-      },
+        '5': '海报'
+      }
     }
   },
   watch: {
     userId() {
       this.getList(1)
-    },
+    }
   },
   computed: {},
   created() {
@@ -60,10 +54,15 @@ export default {
   mounted() {},
   methods: {
     getList(page) {
-      let pageNum = page || this.pageNum++
+      this.loading = true
+      this.finished = false
+      let pageNum = page || this.pageNum
       let pageSize = this.pageSize
       let keyword = this.keyword
-      page == 1 && (this.list = [])
+      if (pageNum == 1) {
+        this.list = []
+        this.pageNum = 1
+      }
       ;(this.sideId
         ? getMaterialList({
             userId: this.userId,
@@ -71,7 +70,7 @@ export default {
             mediaType: this.mediaType,
             pageSize,
             pageNum,
-            keyword,
+            keyword
           })
         : getCollectionList({ userId: this.userId, pageSize, pageNum, keyword })
       )
@@ -90,6 +89,11 @@ export default {
           // 数据全部加载完成
           if (this.list.length >= +total) {
             this.finished = true
+          } else {
+            this.pageNum++
+          }
+          if (this.list.length == 0) {
+            this.pageNum = 1
           }
         })
         .catch(() => {
@@ -106,7 +110,7 @@ export default {
       this.$toast.loading({
         message: '正在发送...',
         duration: 0,
-        forbidClick: true,
+        forbidClick: true
       })
       let entry = undefined
       let _this = this
@@ -115,11 +119,7 @@ export default {
           entry = res.entry //返回进入H5页面的入口类型，目前 contact_profile、single_chat_tools、group_chat_tools
           let mes = {}
           try {
-            if (
-              !['single_chat_tools', 'group_chat_tools', 'normal'].includes(
-                entry
-              )
-            ) {
+            if (!['single_chat_tools', 'group_chat_tools', 'normal'].includes(entry)) {
               // _this.$toast.clear()
               _this.$toast('入口错误：' + entry)
               return
@@ -133,13 +133,13 @@ export default {
               2: 'video',
               3: 'file',
               4: 'text',
-              5: 'news',
+              5: 'news'
             }
             switch (data.mediaType) {
               case '4':
               default:
                 mes.text = {
-                  content: data.content, //文本内容
+                  content: data.content //文本内容
                 }
                 break
               case '0':
@@ -148,7 +148,7 @@ export default {
                 let dataMediaId = {
                   url: data.materialUrl,
                   type: msgtype[data.mediaType],
-                  name: data.materialName,
+                  name: data.materialName
                 }
                 let resMaterialId = await getMaterialMediaId(dataMediaId)
                 if (!resMaterialId.data) {
@@ -156,7 +156,7 @@ export default {
                   return
                 }
                 mes[msgtype[data.mediaType]] = {
-                  mediaid: resMaterialId.data.media_id, //
+                  mediaid: resMaterialId.data.media_id //
                 }
                 break
               case '5':
@@ -164,7 +164,7 @@ export default {
                   link: '', //H5消息页面url 必填
                   title: '', //H5消息标题
                   desc: '', //H5消息摘要
-                  imgUrl: '', //H5消息封面图片URL
+                  imgUrl: '' //H5消息封面图片URL
                 }
                 break
               // case '6':
@@ -203,23 +203,19 @@ export default {
       // collection 是否收藏 0未收藏 1 已收藏
       ;(data.collection == 1 ? cancleCollection : addCollection)({
         userId: this.userId,
-        materialId: data.materialId,
+        materialId: data.materialId
       }).then(() => {
         data.collection = [1, 0][data.collection]
         this.$toast('操作成功')
       })
-    },
-  },
+    }
+  }
 }
 </script>
 
 <template>
   <div>
-    <van-pull-refresh
-      v-model="refreshing"
-      success-text="刷新成功"
-      @refresh="getList(1)"
-    >
+    <van-pull-refresh v-model="refreshing" success-text="刷新成功" @refresh="getList(1)">
       <van-list
         v-model="loading"
         :finished="finished"
@@ -231,19 +227,9 @@ export default {
         <div v-for="(item, index) in list" class="list" :key="index">
           <div class="content bfc-o">
             <!-- 图片 -->
-            <van-image
-              v-if="item.mediaType == 0"
-              width="80"
-              height="80"
-              :src="item.materialUrl"
-            />
+            <van-image v-if="item.mediaType == 0" width="80" height="80" :src="item.materialUrl" />
             <!-- 视频 -->
-            <van-image
-              v-if="item.mediaType == 2"
-              width="80"
-              height="80"
-              :src="item.coverUrl"
-            />
+            <van-image v-if="item.mediaType == 2" width="80" height="80" :src="item.coverUrl" />
             <span class="title">
               {{ item.mediaType == 4 ? item.content : item.materialName }}
             </span>

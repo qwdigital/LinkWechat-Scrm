@@ -11,7 +11,7 @@ export default {
       list: [],
       loading: false,
       finished: false,
-      show: false,
+      show: false
       // userId: this.$store.state.userId,
     }
   },
@@ -19,7 +19,7 @@ export default {
   computed: {
     userId() {
       return this.$store.state.userId
-    },
+    }
   },
   beforeCreate() {},
   created() {
@@ -30,40 +30,38 @@ export default {
   methods: {
     getList() {
       getTypeList().then(({ rows, total }) => {
-        this.list = rows
+        this.userId &&
+          this.list.push({
+            sideName: '我的'
+          })
+        rows && this.list.push(...rows)
       })
     },
-    search() {
-      this.$refs['list' + this.active].getList(1)
+    search(pageNum) {
+      this.$refs['list' + this.active] && this.$refs['list' + this.active][0].getList(pageNum)
     },
-    add() {},
-  },
+    cancel() {
+      this.$nextTick(() => this.search(1))
+    },
+    add() {}
+  }
 }
 </script>
 
 <template>
   <div>
-    <van-search
-      v-model="keyword"
-      show-action
-      placeholder="请输入搜索关键词"
-      @search="search"
-    >
+    <van-search v-model="keyword" show-action placeholder="请输入搜索关键词" @cancel="cancel" @search="search(1)">
       <!-- <template #action>
         <van-icon name="plus" @click="add" />
       </template> -->
     </van-search>
     <van-tabs v-model="active">
-      <van-tab v-if="!!userId" title="我的">
+      <!-- <van-tab v-if="!!userId" title="我的">
         <List ref="list0" :userId="userId" :keyword="keyword"></List>
-      </van-tab>
-      <van-tab
-        :title="item.sideName"
-        v-for="(item, index) in list"
-        :key="index"
-      >
+      </van-tab> -->
+      <van-tab :title="item.sideName" v-for="(item, index) in list" :key="index">
         <List
-          :ref="'list' + (index + 1)"
+          :ref="'list' + index"
           :sideId="item.sideId"
           :mediaType="item.mediaType"
           :userId="userId"

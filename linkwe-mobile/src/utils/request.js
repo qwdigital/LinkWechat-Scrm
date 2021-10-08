@@ -5,9 +5,9 @@ function createAxios(baseURL) {
   const instance = axios.create({
     baseURL,
     headers: {
-      Auth_token: '',
+      Auth_token: ''
     },
-    timeout: 10000,
+    timeout: 10000
   })
   // 请求拦截
   instance.interceptors.request.use(
@@ -57,7 +57,7 @@ function createAxios(baseURL) {
       data,
       statusText,
       status,
-      request: { responseText, responseURL },
+      request: { responseText, responseURL }
     } = errorInfo
     // let info = {
     //   type: 'ajax',
@@ -77,4 +77,4 @@ function createAxios(baseURL) {
 
 // const httpRequest = createAxios()
 
-export default createAxios(process.env.VUE_APP_BASE_API)
+export default createAxios(process.env.NODE_ENV === 'development' ? '/api' : process.env.VUE_APP_BASE_API)
