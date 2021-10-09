@@ -24,7 +24,7 @@ public class WeAppController extends BaseController {
 
 
 
-    @PostMapping("/addWeapp")
+    @PostMapping("/addWeApp")
     public AjaxResult addWeApp(@RequestBody WeApp weApp){
 
         iWeAppService.addWeApp(weApp);
