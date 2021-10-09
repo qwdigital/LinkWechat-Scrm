@@ -31,9 +31,7 @@ export default {
     // this.$toast('agentId:' + this.agentId)
 
     this.$router.onReady(() => {
-      const noAuth = this.$router.app.$route.meta
-        ? this.$router.app.$route.meta.noAuth
-        : false
+      const noAuth = this.$router.app.$route.meta ? this.$router.app.$route.meta.noAuth : false
 
       if (!code && !noAuth) {
         this.$toast('未获得授权')
@@ -67,10 +65,7 @@ export default {
     async wxConfig() {
       this.$store.state.agentConfigStatus = false
       try {
-        let { data } = await getAgentTicket(
-          window.location.href.split('#')[0],
-          this.agentId
-        )
+        let { data } = await getAgentTicket(window.location.href.split('#')[0], this.agentId)
         let { timestamp, nonceStr, signature } = data
         wx.agentConfig({
           beta: true, // 必须这么写，否则wx.invoke调用形式的jsapi会有问题
@@ -90,7 +85,7 @@ export default {
           ], //必填
           success: (res) => {
             // 回调
-            this.$toast('agentId成功:')
+            // this.$toast('agentId成功:')
             this.$store.state.agentConfigStatus = true
           },
           fail: (res) => {

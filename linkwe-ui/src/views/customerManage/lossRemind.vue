@@ -1,10 +1,5 @@
 <script>
-import {
-  getList,
-  exportCustomer,
-  lossRemind,
-  getLossRemindStatus
-} from '@/api/customer'
+import { getListNew, exportCustomer, lossRemind, getLossRemindStatus } from '@/api/customer'
 import { getList as getListTag } from '@/api/customer/tag'
 import { getList as getListOrganization } from '@/api/organization'
 import SelectUser from '@/components/SelectUser'
@@ -24,7 +19,7 @@ export default {
         tagIds: '', // "标签id,多个标签，id使用逗号隔开",
         beginTime: '', // "开始时间",
         endTime: '', // "结束时间"
-        status: 1
+        delFlag: 1
       },
       queryTag: [], // 搜索框选择的标签
       queryUser: [], // 搜索框选择的添加人
@@ -80,7 +75,7 @@ export default {
       }
       page && (this.query.pageNum = page)
       this.loading = true
-      getList(this.query)
+      getListNew(this.query)
         .then(({ rows, total }) => {
           this.list = rows
           this.total = +total
@@ -169,14 +164,7 @@ export default {
 
 <template>
   <div>
-    <el-form
-      ref="queryForm"
-      :inline="true"
-      :model="query"
-      label-width="100px"
-      class="top-search"
-      size="small"
-    >
+    <el-form ref="queryForm" :inline="true" :model="query" label-width="100px" class="top-search" size="small">
       <el-form-item label="客户名称" prop="name">
         <el-input v-model="query.name" placeholder="请输入"></el-input>
       </el-form-item>
@@ -184,12 +172,7 @@ export default {
         <div class="tag-input" @click="dialogVisibleSelectUser = true">
           <span class="tag-place" v-if="!queryUser.length">请选择</span>
           <template v-else>
-            <el-tag
-              type="info"
-              v-for="(unit, unique) in queryUser"
-              :key="unique"
-              >{{ unit.name }}</el-tag
-            >
+            <el-tag type="info" v-for="(unit, unique) in queryUser" :key="unique">{{ unit.name }}</el-tag>
           </template>
         </div>
       </el-form-item>
@@ -209,32 +192,14 @@ export default {
         <div class="tag-input" @click="showTagDialog">
           <span class="tag-place" v-if="!queryTag.length">请选择</span>
           <template v-else>
-            <el-tag
-              type="info"
-              v-for="(unit, unique) in queryTag"
-              :key="unique"
-              >{{ unit.name }}</el-tag
-            >
+            <el-tag type="info" v-for="(unit, unique) in queryTag" :key="unique">{{ unit.name }}</el-tag>
           </template>
         </div>
       </el-form-item>
       <el-form-item label=" ">
-        <el-button
-          v-hasPermi="['customerManage:customer:query']"
-          type="primary"
-          @click="getList(1)"
-          >查询</el-button
-        >
-        <el-button
-          v-hasPermi="['customerManage:customer:query']"
-          type="success"
-          @click="resetForm()"
-          >重置</el-button
-        >
-        <el-button
-          v-hasPermi="['customerManage:customer:export']"
-          type="info"
-          @click="exportCustomer"
+        <el-button v-hasPermi="['customerManage:customer:query']" type="primary" @click="getList(1)">查询</el-button>
+        <el-button v-hasPermi="['customerManage:customer:query']" type="success" @click="resetForm()">重置</el-button>
+        <el-button v-hasPermi="['customerManage:customer:export']" type="info" @click="exportCustomer"
           >导出列表</el-button
         >
       </el-form-item>
@@ -264,53 +229,29 @@ export default {
       style="width: 100%"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column
-        type="selection"
-        align="center"
-        width="55"
-      ></el-table-column>
+      <el-table-column type="selection" align="center" width="55"></el-table-column>
       <el-table-column label="客户" prop="name" align="center">
         <template slot-scope="scope">
           {{ scope.row.name }}
-          <span
-            :style="{ color: scope.row.type === 1 ? '#4bde03' : '#f9a90b' }"
-            >{{ { 1: '@微信', 2: '@企业微信' }[scope.row.type] }}</span
-          >
-          <i
-            :class="[
-              'el-icon-s-custom',
-              { 1: 'man', 2: 'woman' }[scope.row.gender]
-            ]"
-          ></i>
+          <span :style="{ color: scope.row.type === 1 ? '#4bde03' : '#f9a90b' }">{{
+            { 1: '@微信', 2: '@企业微信' }[scope.row.type]
+          }}</span>
+          <i :class="['el-icon-s-custom', { 1: 'man', 2: 'woman' }[scope.row.gender]]"></i>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="corpName"
-        label="公司名称"
-        align="center"
-      ></el-table-column>
+      <el-table-column prop="corpName" label="公司名称" align="center"></el-table-column>
       <el-table-column prop="userName" label="添加人（首位）" align="center">
-        <template slot-scope="scope">{{
-          scope.row.weFlowerCustomerRels[0].userName
-        }}</template>
+        <template slot-scope="scope">{{ scope.row.weFlowerCustomerRels[0].userName }}</template>
       </el-table-column>
       <el-table-column prop="createTime" label="添加时间" align="center">
-        <template slot-scope="scope">{{
-          scope.row.weFlowerCustomerRels[0].createTime
-        }}</template>
+        <template slot-scope="scope">{{ scope.row.weFlowerCustomerRels[0].createTime }}</template>
       </el-table-column>
       <el-table-column prop="address" label="标签" align="center">
         <template slot-scope="scope">
-          <div
-            v-for="(item, index) in scope.row.weFlowerCustomerRels"
-            :key="index"
-          >
-            <el-tag
-              type="info"
-              v-for="(unit, unique) in item.weFlowerCustomerTagRels"
-              :key="unique"
-              >{{ unit.tagName }}</el-tag
-            >
+          <div v-for="(item, index) in scope.row.weFlowerCustomerRels" :key="index">
+            <el-tag type="info" v-for="(unit, unique) in item.weFlowerCustomerTagRels" :key="unique">{{
+              unit.tagName
+            }}</el-tag>
           </div>
         </template>
       </el-table-column>
@@ -352,11 +293,7 @@ export default {
     </SelectTag>
 
     <!-- 选择添加人弹窗 -->
-    <SelectUser
-      :visible.sync="dialogVisibleSelectUser"
-      title="选择添加人"
-      @success="selectedUser"
-    ></SelectUser>
+    <SelectUser :visible.sync="dialogVisibleSelectUser" title="选择添加人" @success="selectedUser"></SelectUser>
   </div>
 </template>
 

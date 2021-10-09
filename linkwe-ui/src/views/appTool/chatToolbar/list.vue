@@ -100,9 +100,7 @@ export default {
   <div>
     <div>
       配置聊天工具栏，方便成员在外部会话中查看和使用，提高服务效率。
-      <el-button type="text" @click="$router.push('explain')"
-        >图文详解</el-button
-      >
+      <el-button type="text" @click="$router.push('explain')">图文详解</el-button>
       <!-- <el-button type="text" @click="$router.push({ path: 'config' })"
         >查看已配置信息</el-button
       > -->
@@ -126,16 +124,8 @@ export default {
             {{ row.sideName }}
           </span>
 
-          <i
-            v-if="!row.isEdit"
-            class="row-icon el-icon-edit"
-            @click="$set(row, 'isEdit', true)"
-          ></i>
-          <i
-            v-else
-            class="row-icon el-icon-circle-check"
-            @click="update(row)"
-          ></i>
+          <i v-if="!row.isEdit" class="row-icon el-icon-edit" @click="$set(row, 'isEdit', true)"></i>
+          <i v-else class="row-icon el-icon-circle-check" @click="update(row)"></i>
         </template>
       </el-table-column>
       <el-table-column label="已抓取素材数量" align="center" prop="total" />
@@ -152,9 +142,7 @@ export default {
       </el-table-column>
       <el-table-column label="操作" align="center" prop="operId">
         <template slot-scope="scope">
-          <el-button type="text" @click="openDialog(scope.row)"
-            >抓取素材</el-button
-          >
+          <el-button type="text" @click="openDialog(scope.row)">抓取素材</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -213,11 +201,9 @@ export default {
       </el-row>
     </el-card> -->
 
-    <el-dialog
-      :title="`抓取${mediaType[metarialParams.mediaType]}类型素材库`"
-      :visible.sync="dialogVisible"
-    >
+    <el-dialog :title="`抓取${mediaType[metarialParams.mediaType]}类型素材库`" :visible.sync="dialogVisible">
       <SelectMaterialMult
+        isCheck
         :selected.sync="selectedMaterial"
         :type="metarialParams.mediaType"
         :key="metarialParams.mediaType"
