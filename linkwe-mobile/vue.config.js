@@ -17,7 +17,7 @@ const BASE_URL = process.env.NODE_ENV === 'development' ? '/' : '/mobile/'
 
 module.exports = {
   publicPath: BASE_URL,
-  outputDir: 'mobile', // 打包名称
+  outputDir: 'dist', // 打包名称
   // 打包时不生成.map文件
   productionSourceMap: false,
   // 如果你不需要使用eslint，把lintOnSave设为false即可
