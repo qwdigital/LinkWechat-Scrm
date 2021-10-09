@@ -217,9 +217,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     .eq(WeFlowerCustomerRel::getExternalUserid, weCustomer.getExternalUserid())
                     .eq(WeFlowerCustomerRel::getUserId,userId)));
 
-//            List<WeFlowerCustomerRel> weFlowerCustomerRels = iWeFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
-//                    .eq(WeFlowerCustomerRel::getExternalUserid, weCustomer.getExternalUserid())
-//                    .eq(WeFlowerCustomerRel::getUserId,userId));
         });
 
 
