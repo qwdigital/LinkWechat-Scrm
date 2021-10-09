@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.wecom.domain.WeMaterial;
 import com.linkwechat.wecom.domain.WePoster;
 
 import java.util.List;
@@ -34,5 +35,8 @@ public interface IWePosterService extends IService<WePoster> {
      * @return
      */
     public String generateSimpleImg(WePoster poster);
+
+
+    List<WeMaterial> findWePosterToWeMaterial(String categoryId,String name);
 
 }

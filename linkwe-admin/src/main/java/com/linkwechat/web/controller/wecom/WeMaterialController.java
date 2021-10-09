@@ -7,6 +7,7 @@ import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.wecom.domain.WeMaterial;
+import com.linkwechat.wecom.domain.WePoster;
 import com.linkwechat.wecom.domain.dto.ResetCategoryDto;
 import com.linkwechat.wecom.domain.dto.TemporaryMaterialDto;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,24 +52,11 @@ public class WeMaterialController extends BaseController {
     public TableDataInfo list(@RequestParam(value = "categoryId", required = false) String categoryId
             , @RequestParam(value = "search", required = false) String search,@RequestParam(value = "mediaType") String mediaType) {
         startPage();
-        List<WeMaterial> list;
-        if(StringUtils.isNotBlank(mediaType) && mediaType.equals(MediaType.POSTER.getType())){
-            list = wePosterService.list(StringUtils.isBlank(categoryId)?null:Long.valueOf(categoryId),search).stream().map(wePoster -> {
-                    WeMaterial weMaterial = new WeMaterial();
-                    weMaterial.setMaterialName(wePoster.getTitle());
-                    weMaterial.setMaterialUrl(wePoster.getSampleImgPath());
-                    weMaterial.setCategoryId(wePoster.getCategoryId());
-                    weMaterial.setId(wePoster.getId());
-                    return weMaterial;
-            }).collect(Collectors.toList());
-        }else {
-            list = materialService.findWeMaterials(categoryId, search,mediaType);
-        }
-
-
-
-
-        return getDataTable(list);
+        return getDataTable(
+                StringUtils.isNotBlank(mediaType) && mediaType.equals(MediaType.POSTER.getType())?
+                        wePosterService.findWePosterToWeMaterial(categoryId,search):
+                        materialService.findWeMaterials(categoryId, search,mediaType)
+        );
     }
 
 

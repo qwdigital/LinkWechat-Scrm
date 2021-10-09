@@ -2,4 +2,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WePosterMapper">
 
+
+    <select id="findWePosterToWeMaterial" resultType="com.linkwechat.wecom.domain.WeMaterial">
+        SELECT
+            title AS materialName,
+            sample_img_path AS materialUrl,
+            category_id,
+            id
+        FROM
+            we_poster
+        where
+              del_flag=0
+             <if test="categoryId !=null and categoryId !=''">
+                 AND category_id = #{categoryId}
+             </if>
+             <if test="name !=null and name !=''">
+                 AND title like concat('%',#{name,jdbcType=VARCHAR},'%')
+             </if>
+        ORDER BY  create_time DESC
+    </select>
+
+
 </mapper>
