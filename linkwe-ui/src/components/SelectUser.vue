@@ -73,25 +73,36 @@ export default {
           // });
         })
       } else {
-        getList({ department: node.data.id }).then(({ rows }) => {
-          rows.forEach((element) => {
-            element.key = createUniqueString()
-          })
-          node.data.children && rows.push(...node.data.children)
-          resolve(rows)
-        })
+        getList({ department: node.data.id, isActivate: 1 }).then(
+          ({ rows }) => {
+            rows.forEach((element) => {
+              element.key = createUniqueString()
+            })
+            node.data.children && rows.push(...node.data.children)
+            resolve(rows)
+          }
+        )
       }
     },
     // 选择变化
     handleCheckChange(data, checked, indeterminate) {
+      // debugger
       if (checked) {
         if (this.isSigleSelect) {
           // 单选情况
           this.$refs.tree.setCheckedKeys([data.key])
         }
-        this.userList.push(data)
+        if (this.isOnlyLeaf) {
+          if (data.userId) {
+            this.userList.push(data)
+          }
+        } else {
+          this.userList.push(data)
+        }
       } else {
-        this.userList.splice(this.userList.indexOf(data), 1)
+        let index = this.userList.indexOf(data)
+
+        index > -1 && this.userList.splice(index, 1)
       }
       // console.log(data, checked, indeterminate);
     },

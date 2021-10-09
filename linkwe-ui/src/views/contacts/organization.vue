@@ -1,9 +1,10 @@
 <script>
 import * as api from '@/api/organization'
+import SelectMaterial from '@/components/SelectMaterial/index'
 
 export default {
   name: 'Organization',
-  components: {},
+  components: { SelectMaterial },
   props: {},
   data() {
     return {
@@ -11,7 +12,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         isActivate: '',
-        department: '',
+        department: ''
       },
       dateRange: [],
       treeData: [],
@@ -19,72 +20,38 @@ export default {
       status: {
         0: '启用',
         1: '禁用',
-        6: '离职',
+        6: '离职'
       },
       statusActivate: {
         1: '已激活',
         2: '已禁用',
         4: '未激活',
         5: '退出企业',
-        6: '删除',
+        6: '删除'
       },
       total: 0,
       defaultProps: {
         label: 'name',
-        children: 'children',
+        children: 'children'
       },
       form: {},
       dialogVisible: false,
       disabled: false,
       loading: false,
-      pickerOptions: {
-        disabledDate(time) {
-          return time.getTime() > Date.now()
-        },
-        shortcuts: [
-          {
-            text: '最近一周',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-              picker.$emit('pick', [start, end])
-            },
-          },
-          {
-            text: '最近一个月',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-              picker.$emit('pick', [start, end])
-            },
-          },
-          {
-            text: '最近三个月',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-              picker.$emit('pick', [start, end])
-            },
-          },
-        ],
-      },
       multipleSelection: [],
       formDepart: {},
       dialogVisibleDepart: false,
       dialogVisibleAvatar: false,
       queryImg: {
         pageNum: 1,
-        pageSize: 20,
+        pageSize: 20
       },
       totalImg: 0,
       // 表单校验
       rules: Object.freeze({
         name: [{ required: true, message: '必填项', trigger: 'blur' }],
         userId: [{ required: true, message: '必填项', trigger: 'blur' }],
-        department: [{ required: true, message: '必填项', trigger: 'blur' }],
+        department: [{ required: true, message: '必填项', trigger: 'change' }],
         joinTime: [{ required: true, message: '必填项', trigger: 'blur' }],
         wxAccount: [{ required: true, message: '必填项', trigger: 'blur' }],
         email: [
@@ -92,18 +59,18 @@ export default {
           {
             type: 'email',
             message: "'请输入正确的邮箱地址",
-            trigger: ['blur', 'change'],
-          },
+            trigger: ['blur', 'change']
+          }
         ],
         mobile: [
           { required: true, message: '必填项', trigger: 'blur' },
           {
             pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
             message: '请输入正确的手机号码',
-            trigger: 'blur',
-          },
-        ],
-      }),
+            trigger: 'blur'
+          }
+        ]
+      })
     }
   },
   watch: {},
@@ -121,9 +88,12 @@ export default {
     },
     getList(page) {
       // console.log(this.dateRange);
-      if (this.dateRange[0]) {
+      if (this.dateRange) {
         this.query.beginTime = this.dateRange[0]
         this.query.endTime = this.dateRange[1]
+      } else {
+        this.query.beginTime = ''
+        this.query.endTime = ''
       }
       page && (this.query.pageNum = page)
       this.loading = true
@@ -143,6 +113,7 @@ export default {
       this.getList(1)
     },
     edit(data, type) {
+      this.$refs['form'] && this.$refs['form'].clearValidate()
       this.form = Object.assign({}, data || { _new: true })
       this.dialogVisible = true
       type || !data ? (this.disabled = false) : (this.disabled = true)
@@ -157,7 +128,7 @@ export default {
             .then(() => {
               this.msgSuccess('操作成功')
               this.dialogVisible = false
-              this.getList(!this.form.id && 1)
+              this.getList(form._new && 1)
             })
             .catch(() => {
               this.dialogVisible = false
@@ -169,7 +140,7 @@ export default {
       // 0: 启用，1：禁用
       let params = {
         userId: data.userId,
-        enable: data.enable == 1 ? 0 : 1,
+        enable: data.enable == 1 ? 0 : 1
       }
       api.startOrStop(params).then(() => {
         this.msgSuccess('操作成功')
@@ -180,7 +151,7 @@ export default {
     remove(id) {
       // const operIds = id || this.ids + "";
       this.$confirm('是否确认删除吗?', '警告', {
-        type: 'warning',
+        type: 'warning'
       })
         .then(function() {
           return api.remove(id)
@@ -198,7 +169,7 @@ export default {
         lock: true,
         text: 'Loading',
         spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.7)',
+        background: 'rgba(0, 0, 0, 0.7)'
       })
       api.syncUser().then(() => {
         loading.close()
@@ -216,7 +187,7 @@ export default {
     },
     departRemove(id) {
       this.$confirm('是否确认删除吗?', '警告', {
-        type: 'warning',
+        type: 'warning'
       })
         .then(function() {
           return api.removeDepart(id)
@@ -239,15 +210,13 @@ export default {
     },
     showAvatarDialog() {
       this.dialogVisibleAvatar = true
-      this.getImgList(1)
     },
-    getImgList() {
-      // todo get imgage list
-    },
-    submitAvatar() {
-      this.form.avatarMediaid = g
-    },
-  },
+    // 选择素材确认按钮
+    submitSelectMaterial(text, image, file) {
+      this.form.headImageUrl = image.materialUrl
+      // this.form.imageMessage._materialName = image.materialName
+    }
+  }
 }
 </script>
 
@@ -260,7 +229,7 @@ export default {
       :inline="true"
       label-width="100px"
     >
-      <el-form-item label="账号/姓名/手机号" label-width="120px" prop="title">
+      <el-form-item label="姓名" prop="title">
         <el-input v-model="query.name" placeholder="请输入" clearable />
       </el-form-item>
       <el-form-item label="入职时间">
@@ -277,15 +246,13 @@ export default {
       <el-form-item label="激活状态">
         <el-select v-model="query.isActivate">
           <el-option label="已激活" :value="1"></el-option>
-          <el-option label="未激活" :value="2"></el-option>
+          <el-option label="未激活" :value="4"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label>
         <el-button
           v-hasPermi="['contacts:organization:query']"
-          type="cyan"
-          icon="el-icon-search"
-          size="mini"
+          type="primary"
           @click="getList(1)"
           >查询</el-button
         >
@@ -296,39 +263,36 @@ export default {
       <el-button
         v-hasPermi="['contacts:organization:sync']"
         type="primary"
-        icon="el-icon-refresh"
-        size="mini"
         @click="syncUser"
         >同步成员</el-button
       >
       <el-button
         v-hasPermi="['contacts:organization:import']"
-        type="primary"
-        icon="el-icon-plus"
-        size="mini"
+        type="info"
         @click="batchImport"
         >批量导入</el-button
       >
-      <el-button
+      <!-- <el-button
         v-hasPermi="['contacts:organization:addMember']"
         type="primary"
         icon="el-icon-plus"
-        size="mini"
         @click="edit()"
         >添加成员</el-button
-      >
+      > -->
     </div>
-    <el-row :gutter="20">
+    <el-row type="flex" justify="space-between">
       <!--部门数据-->
-      <el-col :span="6" :xs="24">
+      <el-col :span="6">
         <div class="head-container">
           <!-- <div>部门架构</div> -->
           <!-- :filter-node-method="filterNode" -->
           <el-tree
+            class="left-tree"
             :data="treeData"
             :props="defaultProps"
             :expand-on-click-node="false"
             ref="tree"
+            highlight-current
             default-expand-all
             @node-click="handleNodeClick"
           >
@@ -336,20 +300,20 @@ export default {
               <span>{{ node.label }}</span>
               <span class="fr">
                 <i
-                  class="el-icon-edit"
+                  class="el-icon-edit-outline"
                   title="编辑"
                   v-hasPermi="['contacts:organization:editDep']"
                   v-if="node.level !== 1"
                   @click.stop="departEdit(data, 1)"
                 ></i>
                 <i
-                  class="el-icon-plus"
+                  class="el-icon-circle-plus-outline"
                   title="添加"
                   v-hasPermi="['contacts:organization:addDep']"
                   @click.stop="departEdit(data, 0)"
                 ></i>
                 <i
-                  class="el-icon-minus"
+                  class="el-icon-delete"
                   title="删除"
                   v-hasPermi="['contacts:organization:removeDep']"
                   v-if="node.level !== 1"
@@ -361,7 +325,7 @@ export default {
         </div>
       </el-col>
       <!--用户数据-->
-      <el-col :span="18" :xs="24">
+      <el-col :span="17">
         <el-table
           v-loading="loading"
           :data="userList"
@@ -446,20 +410,20 @@ export default {
 
     <!-- 人员弹窗 -->
     <el-dialog
-      :title="(form.id ? (disabled ? '查看' : '修改') : '添加') + '成员'"
+      :title="(form.userId ? (disabled ? '查看' : '修改') : '添加') + '成员'"
       :visible.sync="dialogVisible"
     >
       <el-row :gutter="10">
         <el-col :span="8">
           <!-- <el-upload action :show-file-list="false" :on-success="d" :before-upload="d">
-            <img v-if="form.avatarMediaid" :src="form.avatarMediaid" />
+            <img v-if="form.headImageUrl" :src="form.headImageUrl" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>-->
           <div class="avatar-wrap ac" @click="showAvatarDialog">
             <img
               class="avatar"
-              v-if="form.avatarMediaid"
-              :src="form.avatarMediaid"
+              v-if="form.headImageUrl"
+              :src="form.headImageUrl"
             />
             <i v-else class="el-icon-plus avatar-uploader-icon cc"></i>
           </div>
@@ -484,7 +448,7 @@ export default {
             </el-form-item>
             <el-form-item label="账号" prop="userId">
               <el-input
-                :disabled="form.id"
+                :disabled="!form._new"
                 v-model="form.userId"
                 placeholder="成员唯一标识，不支持更改，不支持中文"
               ></el-input>
@@ -495,7 +459,7 @@ export default {
                 <el-radio :label="2">女</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="手机号" prop="name">
+            <el-form-item label="手机号" prop="mobile">
               <el-input v-model="form.mobile"></el-input>
             </el-form-item>
             <el-form-item label="邮箱">
@@ -514,7 +478,7 @@ export default {
                   checkStrictly: true,
                   /** multiple: true,*/ emitPath: false,
                   value: 'id',
-                  label: 'name',
+                  label: 'name'
                 }"
               ></el-cascader>
             </el-form-item>
@@ -572,7 +536,7 @@ export default {
       :title="(formDepart.id ? '修改' : '添加') + '部门'"
       :visible.sync="dialogVisibleDepart"
     >
-      <el-form :model="formDepart" :label-width="80">
+      <el-form :model="formDepart" label-width="80px">
         <el-form-item label="部门名称">
           <el-input v-model="formDepart.name"></el-input>
         </el-form-item>
@@ -587,7 +551,7 @@ export default {
     </el-dialog>
 
     <!-- 选择头像弹窗 -->
-    <el-dialog :visible.sync="dialogVisibleAvatar">
+    <!-- <el-dialog :visible.sync="dialogVisibleAvatar">
       <div slot="title" class="fxbw aic">
         <span>选择头像</span>
         <el-pagination
@@ -599,7 +563,7 @@ export default {
           :total="totalImg"
         ></el-pagination>
       </div>
-      <el-radio-group class="img-wrap" v-model="form.avatarMediaid">
+      <el-radio-group class="img-wrap" v-model="form.headImageUrl">
         <el-radio :label="3" v-for="(item, index) in 20" :key="index">
           <img class="img-li" src="~@/assets/image/login-background.png" alt />
         </el-radio>
@@ -608,7 +572,14 @@ export default {
         <el-button @click="dialogVisibleAvatar = false">取 消</el-button>
         <el-button type="primary" @click="submitAvatar">确 定</el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
+
+    <SelectMaterial
+      :visible.sync="dialogVisibleAvatar"
+      type="1"
+      :showArr="[1]"
+      @success="submitSelectMaterial"
+    ></SelectMaterial>
   </div>
 </template>
 

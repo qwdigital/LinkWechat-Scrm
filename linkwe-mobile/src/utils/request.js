@@ -7,7 +7,7 @@ function createAxios(baseURL) {
     headers: {
       Auth_token: '',
     },
-    timeout: 3000,
+    timeout: 10000,
   })
   // 请求拦截
   instance.interceptors.request.use(

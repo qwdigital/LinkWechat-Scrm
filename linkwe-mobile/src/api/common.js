@@ -6,11 +6,12 @@ const service = config.services.wecom
  * 获取应用的jsapi_ticket
  * @param {*} url 页面url
  */
-export function getAgentTicket(url) {
+export function getAgentTicket(url, agentId) {
   return request({
     url: service + '/ticket/getAgentTicket',
     params: {
       url,
+      agentId,
     },
   })
 }
@@ -32,12 +33,12 @@ export function getAppTicket(url) {
  * 获取登录用户id
  * @param {*} url 页面url
  */
-export function getUserInfo(code) {
+export function getUserInfo(code, agentId) {
   return request({
     url: service + '/user/getUserInfo',
     params: {
       code,
-      agentId: '1000005',
+      agentId,
     },
   })
 }

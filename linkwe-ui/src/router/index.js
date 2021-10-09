@@ -1,10 +1,10 @@
-import Vue from "vue";
-import Router from "vue-router";
+import Vue from 'vue'
+import Router from 'vue-router'
 
-Vue.use(Router);
+Vue.use(Router)
 
 /* Layout */
-import Layout from "@/layout";
+import Layout from '@/layout'
 
 /**
  * Note: 路由配置项
@@ -27,43 +27,52 @@ import Layout from "@/layout";
 // 公共路由
 export const constantRoutes = [
   {
-    path: "/redirect",
+    path: '/redirect',
     component: Layout,
     hidden: true,
     children: [
       {
-        path: "/redirect/:path(.*)",
-        component: resolve => require(["@/views/redirect"], resolve)
-      }
-    ]
+        path: '/redirect/:path(.*)',
+        component: (resolve) => require(['@/views/redirect'], resolve),
+      },
+    ],
   },
   {
-    path: "",
+    path: '',
+    redirect: '/index',
+    hidden: true,
+  },
+  {
+    path: '/index',
     component: Layout,
-    redirect: "/index",
+    redirect: '/index',
+    name: '首页',
+    meta: { title: '首页' },
     children: [
       {
-        path: "/index",
-        component: resolve => require(["@/views/index"], resolve),
-        name: "首页",
+        path: '/index',
+        component: (resolve) => require(['@/views/index'], resolve),
+        name: '首页',
+        hidden: true,
         meta: {
-          title: "首页",
-          icon: "dashboard",
+          title: '首页',
+          icon: 'dashboard',
+          breadcrumb: false,
           noCache: true,
-          affix: true
-        }
-      }
-    ]
+          affix: true,
+        },
+      },
+    ],
   },
   {
-    path: "/login",
-    component: resolve => require(["@/views/login"], resolve),
-    hidden: true
+    path: '/login',
+    component: (resolve) => require(['@/views/login'], resolve),
+    hidden: true,
   },
   {
-    path: "/authCallback",
-    component: resolve => require(["@/views/authCallback"], resolve),
-    hidden: true
+    path: '/authCallback',
+    component: (resolve) => require(['@/views/authCallback'], resolve),
+    hidden: true,
   },
   // {
   //   path: '/customerManage',
@@ -75,7 +84,7 @@ export const constantRoutes = [
   //       path: 'customer',
   //       name: 'Customer',
   //       component: (resolve) => require(['@/views/customerManage/customer'], resolve),
-  //       meta: { title: '客户', icon: '' }
+  //       meta: { title: '企业客户', icon: '' }
   //     },
   //     {
   //       path: 'customerDetail',
@@ -87,7 +96,7 @@ export const constantRoutes = [
   //       path: 'group',
   //       name: 'CustomerGroup',
   //       component: (resolve) => require(['@/views/customerManage/group'], resolve),
-  //       meta: { title: '客户群', icon: '' }
+  //       meta: { title: '企业客群', icon: '' }
   //     },
   //     {
   //       path: 'groupDetail',
@@ -204,7 +213,7 @@ export const constantRoutes = [
   //   path: '/drainageCode',
   //   component: Layout,
   //   redirect: '/drainageCode/staff',
-  //   meta: { title: '引流码', icon: 'qrcode' },
+  //   meta: { title: '引流获客', icon: 'qrcode' },
   //   children: [
   //     {
   //       path: 'staff',
@@ -352,11 +361,18 @@ export const constantRoutes = [
   //   ],
   // },
   // {
-  //   path: "/appTool",
+  //   path: '/appTool',
   //   component: Layout,
-  //   redirect: "/appTool/text",
-  //   meta: { title: "应用工具", icon: "app" },
+  //   redirect: '/appTool/text',
+  //   meta: { title: '应用工具', icon: 'app' },
   //   children: [
+  //     {
+  //       path: 'selfApp',
+  //       name: 'selfApp',
+  //       component: (resolve) =>
+  //         require(['@/views/appTool/selfApp/list'], resolve),
+  //       meta: { title: '自建应用', icon: '' },
+  //     },
   //     {
   //       path: "chatToolbar",
   //       name: "ChatToolbar",
@@ -434,7 +450,7 @@ export const constantRoutes = [
   //         require(["@/views/appTool/groupFission/aev"], resolve),
   //       meta: { title: "群裂变", icon: "" }
   //     }
-  //   ]
+  //   ],
   // },
   // {
   //   path: '/contacts',
@@ -463,60 +479,114 @@ export const constantRoutes = [
   //     },
   //   ]
   // },
-
+  //    {
+  //       path: '/application',
+  //       component: Layout,
+  //       meta: { title: '', icon: 'wechat' },
+  //       children: [
+  //         {
+  //           path: 'taskGroup',
+  //           name: 'taskGroup',
+  //           component: (resolve) => require(['@/views/application/taskGroup'], resolve),
+  //           meta: { title: '任务宝', icon: '' }
+  //         },
+  //         {
+  //           path: 'taskDetail',
+  //           name: 'taskDetail',
+  //           hidden: true,
+  //           component: (resolve) => require(['@/views/application/taskDetail'], resolve),
+  //           meta: { title: '任务详情', icon: '' }
+  //         },
+  //         {
+  //           path: 'editTask',
+  //           name: 'editTask',
+  //           hidden: true,
+  //           component: (resolve) => require(['@/views/application/taskDetail/editTask'], resolve),
+  //           meta: { title: '编辑活动任务', icon: '' }
+  //         },
+  //         {
+  //           path: 'addTask',
+  //           name: 'addTask',
+  //           hidden: true,
+  //           component: (resolve) => require(['@/views/application/taskDetail/addTask'], resolve),
+  //           meta: { title: '新增活动任务', icon: '' }
+  //         },
+  //         {
+  //             path: 'groupFission',
+  //             name: 'groupFission',
+  //             component: (resolve) => require(['@/views/application/groupFission'], resolve),
+  //             meta: { title: '群裂变', icon: '' }
+  //         },
+  //         {
+  //             path: 'addFission',
+  //             name: 'addFission',
+  //             hidden: true,
+  //             component: (resolve) => require(['@/views/application/fissionDetail/addFission'], resolve),
+  //             meta: { title: '新增群裂变', icon: '' }
+  //           },
+  //           {
+  //             path: 'fissionDetail',
+  //             name: 'fissionDetail',
+  //             hidden: true,
+  //             component: (resolve) => require(['@/views/application/fissionDetail'], resolve),
+  //             meta: { title: '任务详情', icon: '' }
+  //           },
+  //       ]
+  //     },
   {
-    path: "/user",
+    path: '/user',
     component: Layout,
     hidden: true,
-    redirect: "noredirect",
+    redirect: 'noredirect',
     children: [
       {
-        path: "profile",
-        component: resolve =>
-          require(["@/views/system/user/profile/index"], resolve),
-        name: "Profile",
-        meta: { title: "个人中心", icon: "user" }
-      }
-    ]
+        path: 'profile',
+        component: (resolve) =>
+          require(['@/views/system/user/profile/index'], resolve),
+        name: 'Profile',
+        meta: { title: '个人中心', icon: 'user' },
+      },
+    ],
   },
   {
-    path: "/dict",
+    path: '/dict',
     component: Layout,
     hidden: true,
     children: [
       {
-        path: "type/data/:dictId(\\d+)",
-        component: resolve => require(["@/views/system/dict/data"], resolve),
-        name: "Data",
-        meta: { title: "字典数据", icon: "" }
-      }
-    ]
+        path: 'type/data/:dictId(\\d+)',
+        component: (resolve) => require(['@/views/system/dict/data'], resolve),
+        name: 'Data',
+        meta: { title: '字典数据', icon: '' },
+      },
+    ],
   },
   {
-    path: "/job",
+    path: '/job',
     component: Layout,
     hidden: true,
     children: [
       {
-        path: "log",
-        component: resolve => require(["@/views/monitor/job/log"], resolve),
-        name: "JobLog",
-        meta: { title: "调度日志" }
-      }
-    ]
+        path: 'log',
+        component: (resolve) => require(['@/views/monitor/job/log'], resolve),
+        name: 'JobLog',
+        meta: { title: '调度日志' },
+      },
+    ],
   },
   {
-    path: "/gen",
+    path: '/gen',
     component: Layout,
     hidden: true,
     children: [
       {
-        path: "edit/:tableId(\\d+)",
-        component: resolve => require(["@/views/tool/gen/editTable"], resolve),
-        name: "GenEdit",
-        meta: { title: "修改生成配置" }
-      }
-    ]
+        path: 'edit/:tableId(\\d+)',
+        component: (resolve) =>
+          require(['@/views/tool/gen/editTable'], resolve),
+        name: 'GenEdit',
+        meta: { title: '修改生成配置' },
+      },
+    ],
   },
   // {
   //   path: '/test',
@@ -524,19 +594,19 @@ export const constantRoutes = [
   //   hidden: true,
   // },
   {
-    path: "/404",
-    component: resolve => require(["@/views/error/404"], resolve),
-    hidden: true
+    path: '/404',
+    component: (resolve) => require(['@/views/error/404'], resolve),
+    hidden: true,
   },
   {
-    path: "/401",
-    component: resolve => require(["@/views/error/401"], resolve),
-    hidden: true
-  }
-];
+    path: '/401',
+    component: (resolve) => require(['@/views/error/401'], resolve),
+    hidden: true,
+  },
+]
 
 export default new Router({
   // mode: 'history',
   scrollBehavior: () => ({ y: 0 }),
-  routes: constantRoutes
-});
+  routes: constantRoutes,
+})

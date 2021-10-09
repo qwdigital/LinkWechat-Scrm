@@ -10,7 +10,7 @@ export default {
         let unit = data.expectSend == 1 ? '个群' : '人'
         return `预计发送${data.expectSend}${unit}，已成功发送${data.actualSend}${unit}`
       }
-    },
+    }
   },
   data() {
     return {
@@ -32,17 +32,17 @@ export default {
         content: undefined,
         pushType: undefined,
         beginTime: undefined,
-        endTime: undefined,
+        endTime: undefined
       },
       pushType: {
         0: '发给客户',
-        1: '发给客户群',
+        1: '发给客户群'
       },
       pickerOptions: {
         disabledDate(time) {
           return time.getTime() > Date.now() // 选当前时间之前的时间
-        },
-      },
+        }
+      }
     }
   },
   created() {
@@ -50,7 +50,7 @@ export default {
   },
   methods: {
     getList(page) {
-      if (this.dateRange[0]) {
+      if (this.dateRange) {
         this.query.beginTime = this.dateRange[0]
         this.query.endTime = this.dateRange[1]
       } else {
@@ -89,7 +89,7 @@ export default {
         {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          type: 'warning',
+          type: 'warning'
         }
       )
         .then(function() {})
@@ -100,11 +100,14 @@ export default {
         .catch(function() {})
     },
     goRoute(id, path) {
-      this.$router.push({ path: '/groupMessage/' + path, query: { id } })
+      this.$router.push({
+        path: path,
+        query: { id }
+      })
     },
     syncMsg(data) {
       let { msgid, messageId } = data
-      syncMsg({ msgid, messageId })
+      syncMsg({ msgids: [msgid], messageId })
         .then(({ data }) => {
           this.msgSuccess('同步成功')
           this.getList()
@@ -116,8 +119,8 @@ export default {
         .catch(() => {
           // this.loading = false
         })
-    },
-  },
+    }
+  }
 }
 </script>
 <template>
@@ -168,7 +171,7 @@ export default {
       </el-form-item>
       <el-form-item label=" ">
         <el-button type="primary" @click="getList(1)">查询</el-button>
-        <el-button @click="resetQuery">重置</el-button>
+        <el-button type="success" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -235,24 +238,4 @@ export default {
   </div>
 </template>
 
-<style lang="scss" scoped>
-.mid-action {
-  display: flex;
-  justify-content: space-between;
-  margin: 10px 0;
-  align-items: center;
-  .total {
-    background-color: rgba(65, 133, 244, 0.1);
-    border: 1px solid rgba(65, 133, 244, 0.2);
-    border-radius: 3px;
-    font-size: 14px;
-    min-height: 32px;
-    line-height: 32px;
-    padding: 0 12px;
-    color: #606266;
-  }
-  .num {
-    color: #00f;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

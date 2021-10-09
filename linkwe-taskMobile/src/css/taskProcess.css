@@ -1,0 +1,76 @@
+.title{
+    color: #000000;
+    font-size: 0.5rem;
+    padding: 1rem .5rem;
+    padding-bottom:.5rem;
+    background-color: #fff;
+}
+.container{
+    height: 100%;
+    background-color:rgb(239, 239, 244) ;
+}
+.generalFont{
+    color: #909399;
+    font-size: .3rem;
+    padding: 0 .5rem;
+    padding-bottom: .2rem;
+}
+.container>.generalFont{
+    background-color: #fff;
+}
+.generalBox{
+    background-color:rgb(246, 246, 249) ;
+    padding: .2rem
+}
+.listMsg{
+    display: flex;
+    margin-bottom: 20px;
+}
+.listMsg .generalFont{
+    width: 1.5rem;
+    margin-right: 30px;
+    text-align: right;
+}
+.codeDetail{
+    font-size: .3rem;
+    color: #000000;
+}
+.generalContent{
+    background-color: #fff;
+    padding: .5rem;
+    margin-bottom: .4rem;
+}
+.codeImg{
+    height: 1rem;
+}
+.customersList{
+    display: flex;
+    align-items: center;
+    font-size: .4rem;
+    background-color:rgb(246, 246, 249) ;
+    padding: .2rem;
+}
+.customersBox{
+    padding: .5rem;
+    background-color: #fff;
+}
+.customersSuccess{
+    flex:1;
+    text-align: right;
+    color: rgb(163, 269, 131);
+}
+.customersImg{
+    height: 1rem;
+    border-radius: 50%;
+    margin-right: .2rem;
+}
+.activityPoster{
+    padding:.5rem ;
+    font-size: .5rem;
+    background-color: #fff;
+    margin-top: .5rem;
+}
+.activityPosterImg{
+    width: 100%;
+    margin-top: .5rem;
+}

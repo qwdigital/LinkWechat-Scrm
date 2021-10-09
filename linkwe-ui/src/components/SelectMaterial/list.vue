@@ -5,8 +5,8 @@ export default {
   props: {
     type: {
       type: String,
-      default: '4',
-    },
+      default: '4'
+    }
   },
   data() {
     return {
@@ -17,7 +17,7 @@ export default {
         pageSize: 10,
         categoryId: '',
         search: '',
-        mediaType: '4',
+        mediaType: '4'
       },
       list: [], // 列表
       total: 0, // 总条数
@@ -25,7 +25,7 @@ export default {
       // 树props
       treeProps: {
         children: 'children',
-        label: 'name',
+        label: 'name'
       },
       // 分组props
       groupProps: {
@@ -34,15 +34,15 @@ export default {
         children: 'children',
         label: 'name',
         value: 'id',
-        emitPath: false,
+        emitPath: false
       },
-      radio: '',
+      radio: ''
     }
   },
   watch: {
     radio(val) {
       this.$emit('change', val)
-    },
+    }
   },
   computed: {},
   created() {
@@ -72,14 +72,14 @@ export default {
         .catch(() => {
           this.loading = false
         })
-    },
-  },
+    }
+  }
 }
 </script>
 
 <template>
   <div>
-    <el-form ref="form" :model="query" label-width="80px">
+    <el-form ref="form" :model="query" label-width="70px">
       <el-form-item label="选择分组">
         <el-cascader
           v-model="query.categoryId"
@@ -134,8 +134,19 @@ export default {
       v-model="radio"
     >
       <el-radio v-for="(item, index) in list" :label="item" :key="index">
-        <img class="img-li" :src="item.materialUrl" alt />
-        <div class="ac mt5">{{ item.materialName }}</div>
+        <div class="ma-img ac mb20">
+          <el-card shadow="hover" body-style="padding: 0px;">
+            <img
+              crossorigin="anonymous"
+              class="img-li"
+              :src="item.materialUrl"
+              alt
+            />
+          </el-card>
+          <div class="mt10 toe" :title="item.materialName">
+            {{ item.materialName }}
+          </div>
+        </div>
       </el-radio>
     </el-radio-group>
   </div>
@@ -150,8 +161,11 @@ export default {
 //     transform: translate(-50%, -50%);
 //   }
 // }
-.img-li {
+.ma-img {
   width: 160px;
+}
+.img-li {
+  max-width: 100%;
   height: 160px;
   border-radius: 8px;
   border: 1px solid #e6ebf5;

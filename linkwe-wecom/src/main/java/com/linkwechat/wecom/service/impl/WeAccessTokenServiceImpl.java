@@ -104,7 +104,7 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
         WeApp weApp=null;
         //首先表中查询提醒的appid
         WeCorpAccount weCorpAccount = iWxCorpAccountService.findValidWeCorpAccount();
-        if(weCorpAccount != null){
+        if(weCorpAccount != null && StringUtils.isNotEmpty(weCorpAccount.getAgentId())){
             if(weCorpAccount.getAgentId().equals(agentId)){
                 weApp=WeApp.builder()
                         .agentId(weCorpAccount.getAgentId())

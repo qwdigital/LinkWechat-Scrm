@@ -116,6 +116,7 @@
             AND wecusn.business_name like concat('%', #{useUserName}, '%')
         </if>
         group by wecode.id
+        order by  wecode.create_time desc
     </select>
 
     <select id="selectWeEmpleCodeById" parameterType="Long" resultMap="WeEmpleCodeResult">

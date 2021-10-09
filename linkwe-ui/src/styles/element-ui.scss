@@ -1,7 +1,8 @@
 // cover some element-ui styles
 
 .el-button {
-  [class^="el-icon-"], [class*=" el-icon-"] {
+  [class^='el-icon-'],
+  [class*=' el-icon-'] {
     vertical-align: top;
   }
 }
@@ -11,7 +12,6 @@
 }
 
 .top-search {
-
   .el-input,
   .el-select {
     width: 240px;
@@ -22,7 +22,10 @@
   }
 }
 
-.el-tag+.el-tag {
+.el-tag + .el-tag {
+  margin-right: 10px;
+}
+.el-tag:nth-of-type(2) {
   margin-left: 10px;
 }
 
@@ -32,7 +35,7 @@
 }
 
 .el-upload {
-  input[type="file"] {
+  input[type='file'] {
     display: none !important;
   }
 }
@@ -101,4 +104,39 @@
 // to fix el-date-picker css style
 .el-range-separator {
   box-sizing: content-box;
+}
+
+.el-table {
+  background-color: transparent;
+}
+.el-table__body {
+  border-spacing: 0 10px;
+}
+.el-table .el-table__header-wrapper th,
+.el-table .el-table__fixed-header-wrapper th,
+.el-table .el-table__header-wrapper tr {
+  background-color: transparent !important;
+}
+.el-table .el-table__body-wrapper tr {
+  box-shadow: 0px 0px 5px 0px rgba(195, 195, 195, 0.35);
+  height: 50px;
+}
+.el-table th.is-leaf,
+.el-table td {
+  border-bottom: 0;
+}
+.el-table tr td {
+  &:first-child,
+  &:last-child {
+    border-radius: 4px;
+  }
+}
+
+.el-form-item {
+  margin: 0 !important;
+  padding: 10px;
+  &:hover {
+    background: #e5f1fc;
+    border-radius: 10px;
+  }
 }

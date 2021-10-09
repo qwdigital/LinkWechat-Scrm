@@ -1,57 +1,80 @@
 <script>
-import * as api from '@/api/customer'
+import { getList, remove } from '@/api/communityOperating/keywords'
+import ClipboardJS from 'clipboard'
+import SelectUser from '@/components/SelectUser'
 
 export default {
-  components: {},
+  components: { SelectUser },
   props: {},
   data() {
     return {
+      h5Link: 'https://platform.wshoto.com/H5/?corpId=ww8e09372aff8d9190',
       query: {
         pageNum: 1,
         pageSize: 10,
-        name: '',
+        taskName: '', // 活码名称
+        createBy: '', // 创建人
+        keywords: '', // 关键词
+        beginTime: '', // 创建开始时间
+        endTime: '' // 创建结束时间
       },
+      queryCreateByName: '',
       dateRange: [], // 添加日期
-      total: 0,
-      form: {},
-      list: [],
+      total: 0, // 关键词拉群数据总量
+      list: [], // 关键词拉群数据
+      multiSelect: [], // 多选数据
       dialogVisible: false,
+      dialogHowToConfig: false,
       disabled: false,
       loading: false,
-      rules: Object.freeze({
-        name: [{ required: true, message: '必填项', trigger: 'blur' }],
-        corpId: [{ required: true, message: '必填项', trigger: 'blur' }],
-        corpSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
-        contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
-      }),
-      status: ['正常', '停用'],
-      pushType: {
-        0: '发给客户',
-        1: '发给客户群',
-      },
+      clipboard: null
     }
   },
-  watch: {},
-  computed: {},
-  created() {
-    this.getList()
-  },
-  mounted() {
-    // new clipboard(".copy-btn");
-  },
-  methods: {
-    getList(page) {
-      if (this.dateRange[0]) {
-        this.query.beginTime = this.dateRange[0]
-        this.query.endTime = this.dateRange[1]
-      } else {
+  watch: {
+    // 日期选择器数据同步至查询参数
+    dateRange(dateRange) {
+      if (!dateRange || dateRange.length !== 2) {
         this.query.beginTime = ''
         this.query.endTime = ''
+      } else {
+        ;[this.query.beginTime, this.query.endTime] = dateRange
       }
+    }
+  },
+  created() {
+    this.getList(1)
+    this.$store.dispatch(
+      'app/setBusininessDesc',
+      `
+        <div>当企业开通聊天工具栏后，用户可点击聊天工具栏中的【关键字群发】，搜索或选择某个关键词下的引导语及群活码，进行一键发送，客户手动扫码进群。</div>
+      `
+    )
+  },
+  mounted() {
+    this.clipboard = new ClipboardJS('.copy-btn')
+
+    this.clipboard.on('success', (e) => {
+      this.$notify({
+        title: '成功',
+        message: '链接已复制到剪切板，可粘贴。',
+        type: 'success'
+      })
+    })
+
+    this.clipboard.on('error', (e) => {
+      this.$message.error('链接复制失败')
+    })
+  },
+  destroyed() {
+    this.clipboard.destroy()
+  },
+  methods: {
+    // 获取关键词拉群数据
+    getList(page) {
       page && (this.query.pageNum = page)
       this.loading = true
-      api
-        .getList(this.query)
+
+      getList(this.query)
         .then(({ rows, total }) => {
           this.list = rows
           this.total = +total
@@ -61,87 +84,239 @@ export default {
           this.loading = false
         })
     },
-    edit(data, type) {
-      this.form = Object.assign({}, data || {})
-      this.dialogVisible = true
-      type || !data ? (this.disabled = false) : (this.disabled = true)
-    },
-    submit() {
-      this.$refs['form'].validate((valid) => {
-        if (valid) {
-          api[this.form.id ? 'update' : 'add'](this.form)
-            .then(() => {
-              this.msgSuccess('操作成功')
-              this.dialogVisible = false
-              this.getList(!this.form.id && 1)
-            })
-            .catch(() => {
-              this.dialogVisible = false
-            })
-        }
-      })
-    },
-    goRoute(id, path) {
+    // 新增/编辑关键词拉群
+    goRoute(id) {
       this.$router.push({
-        path: '/communityOperating/keywordsAev',
-        query: { id },
+        path: 'keywordsAev',
+        query: { id: id }
       })
     },
-  },
+    // 重置查询参数
+    resetQuery() {
+      this.dateRange = []
+      this.$refs['queryForm'].resetFields()
+
+      this.$nextTick(() => {
+        this.getList(1)
+      })
+    },
+    // 批量删除
+    handleBulkRemove() {
+      this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          const ids = this.multiSelect.map((t) => t.taskId)
+
+          remove(ids + '').then((res) => {
+            if (res.code === 200) {
+              this.getList()
+            } else {
+            }
+          })
+        })
+        .catch(() => {})
+    },
+    // 删除
+    handleRemove(id) {
+      this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          remove(id + '').then((res) => {
+            if (res.code === 200) {
+              this.getList()
+            } else {
+            }
+          })
+        })
+        .catch(() => {})
+    },
+    openHelpDialog() {
+      this.dialogHowToConfig = true
+    },
+    // 获取显示用keyword字符串
+    getDisplayKeywords(row) {
+      const keywordList = row.keywordList || []
+      const keywords = keywordList.map((k) => k.keyword)
+
+      return keywords.join(' ')
+    },
+    // 获取显示用实际群码字符串
+    getDisplayRealGroups(row) {
+      if (!row || !row.groupNameList) return ''
+      return row.groupNameList.join(' ')
+    },
+    // 处理多选
+    handleSelectionChange(val) {
+      this.multiSelect = val
+    }
+  }
 }
 </script>
 
 <template>
   <div>
-    <div class="fxbw mb10 aic">
-      <div class="total">
-        关键词拉群
-        配置聊天工具栏，管理员创建关键词拉群后，员工可在聊天功能栏使用。
+    <div class="link-info">
+      <div class="link-info__header">配置链接</div>
+      <div class="link-info__content">
+        请点击按钮复制该应用链接，并将应用页面配置到聊天工具栏，方便成员在与客户的聊天中查看和使用，提高服务效率
       </div>
-      <div>
-        <el-button type="primary" icon="el-icon-plus" @click="goRoute()"
-          >新建关键词拉群</el-button
-        >
-        <el-input
-          placeholder="请输入活动名称"
-          prefix-icon="el-icon-search"
-          v-model="query.welcomeMsg"
-          style="width: 240px; margin-left: 10px;"
-          @change="getList(0)"
-        ></el-input>
+      <div class="link">
+        <div class="link__content">
+          <span>
+            {{ h5Link }}
+          </span>
+        </div>
+        <div class="link__action">
+          <el-button
+            v-hasPermi="['customerManage:customer:query']"
+            type="primary"
+            plain
+            class="copy-btn"
+            :data-clipboard-text="h5Link"
+            >复制地址</el-button
+          >
+          <el-link type="info" @click="openHelpDialog">如何配置？</el-link>
+        </div>
       </div>
     </div>
-    <!-- <el-card shadow="never" :body-style="{padding: '20px 0 0'}">
-    </el-card>-->
 
-    <el-table v-loading="loading" :data="list">
-      <!-- <el-table-column type="selection" width="50" align="center" /> -->
+    <el-form
+      ref="queryForm"
+      :inline="true"
+      :model="query"
+      label-width="100px"
+      class="top-search"
+      size="small"
+    >
+      <el-form-item label="活码名称" prop="taskName">
+        <el-input v-model="query.taskName" placeholder="请输入"></el-input>
+      </el-form-item>
+      <el-form-item label="创建人" prop="createBy">
+        <el-input v-model="query.createBy" placeholder="请输入"></el-input>
+      </el-form-item>
+      <el-form-item label="关键词" prop="keywords">
+        <el-input v-model="query.keywords" placeholder="请输入"></el-input>
+      </el-form-item>
+      <el-form-item label="创建时间">
+        <el-date-picker
+          v-model="dateRange"
+          value-format="yyyy-MM-dd"
+          type="daterange"
+          :picker-options="pickerOptions"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          align="right"
+        ></el-date-picker>
+      </el-form-item>
+      <el-form-item label=" ">
+        <el-button
+          v-hasPermi="['customerManage:customer:query']"
+          type="primary"
+          @click="getList(1)"
+          >查询</el-button
+        >
+        <el-button
+          v-hasPermi="['customerManage:customer:query']"
+          type="success"
+          @click="resetQuery()"
+          >重置</el-button
+        >
+      </el-form-item>
+    </el-form>
+
+    <div class="mid-action">
+      <div>
+        <el-button type="primary" @click="goRoute()">新建关键词</el-button>
+      </div>
+      <div>
+        <!-- <el-button type="primary" @click="handleBulkDownload">批量下载</el-button> -->
+        <el-button
+          v-hasPermi="['customerManage:customer:export']"
+          :disabled="multiSelect.length === 0"
+          @click="handleBulkRemove"
+          type="cyan"
+          >批量删除</el-button
+        >
+      </div>
+    </div>
+
+    <el-table
+      v-loading="loading"
+      :data="list"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column type="selection" width="50" align="center" />
       <el-table-column
-        label="群活码"
+        label="活码名称"
         align="center"
-        prop="name"
+        prop="taskName"
         :show-overflow-tooltip="true"
       />
-      <el-table-column prop="createTime" label="活动名称" align="center">
-        <template slot-scope="scope">{{
-          Math.floor(Math.random() * 10000)
-        }}</template>
+      <el-table-column label="群活码" align="center" width="130">
+        <template #default="{ row }">
+          <el-popover placement="bottom" trigger="hover">
+            <el-image
+              slot="reference"
+              :src="(row.groupCodeInfo && row.groupCodeInfo.codeUrl) || ''"
+              class="code-image--small"
+            ></el-image>
+            <el-image
+              :src="(row.groupCodeInfo && row.groupCodeInfo.codeUrl) || ''"
+              class="code-image"
+            ></el-image>
+          </el-popover>
+        </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="关键词" align="center">
-        已结束
+      <el-table-column label="关键词" align="center" width="120">
+        <template #default="{ row }">
+          <el-popover
+            placement="bottom"
+            width="200"
+            trigger="hover"
+            :content="row.keywords"
+          >
+            <div slot="reference" class="table-desc overflow-ellipsis">
+              <!-- {{ getDisplayKeywords(row) }} -->
+              {{ row.keywords }}
+            </div>
+          </el-popover>
+        </template>
       </el-table-column>
+      <el-table-column label="实际群聊" align="center" width="120">
+        <template #default="{ row }">
+          <el-popover
+            placement="bottom"
+            width="200"
+            trigger="hover"
+            :content="row.groupNameList"
+          >
+            <div slot="reference" class="table-desc overflow-ellipsis">
+              <!-- {{ getDisplayRealGroups(row) }} -->
+              {{ row.groupNameList }}
+            </div>
+          </el-popover>
+        </template>
+      </el-table-column>
+
       <el-table-column
-        label="群聊"
+        label="创建人"
         align="center"
-        prop="createTime"
-        width="160"
+        prop="createBy"
       ></el-table-column>
+
       <el-table-column
         label="创建时间"
         align="center"
         prop="createTime"
-        width="160"
       ></el-table-column>
+
       <el-table-column
         label="操作"
         align="center"
@@ -150,20 +325,27 @@ export default {
       >
         <template slot-scope="scope">
           <el-button
+            v-hasPermi="['enterpriseWechat:edit']"
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            @click="goRoute(scope.row.taskId)"
+            >编辑</el-button
+          >
+          <!-- <el-button
             v-hasPermi="['enterpriseWechat:view']"
             size="mini"
             type="text"
             icon="el-icon-view"
-            @click="edit(scope.row, 0)"
-            >查看</el-button
-          >
+            >下载</el-button
+          > -->
           <el-button
             v-hasPermi="['enterpriseWechat:edit']"
             size="mini"
             type="text"
             icon="el-icon-edit"
-            @click="edit(scope.row, 1)"
-            >编辑</el-button
+            @click="handleRemove(scope.row.taskId)"
+            >删除</el-button
           >
         </template>
       </el-table-column>
@@ -177,73 +359,101 @@ export default {
       @pagination="getList()"
     />
 
-    <el-dialog title="查看企业微信号" :visible.sync="dialogVisible">
-      <el-form
-        ref="form"
-        label-position="right"
-        :model="form"
-        :rules="rules"
-        label-width="160px"
-        :disabled="disabled"
-      >
-        <el-form-item label="企业名称" prop="name">
-          <el-input v-model="form.name" :disabled="form.id"></el-input>
-        </el-form-item>
-        <el-form-item label="企业ID（CorpID）" prop="corpId">
-          <el-input
-            :disabled="form.id"
-            v-model="form.corpId"
-            style="width: 80%"
-            placeholder="可在新闻公告应用的生日祝福等场景使用"
-          ></el-input>
-          <el-link class="fr" type="primary">如何获取？</el-link>
-        </el-form-item>
-        <!-- <el-form-item label="Token">
-          <el-input disabled id="copy-input" v-model="form.name" placeholder="成员唯一标识，不支持更改，不支持中文"></el-input>
-          <el-button type="primary" class="copy-btn" data-clipboard-target="#copy-input">复制</el-button>
-        </el-form-item>
-        <el-form-item label="EncodingAESKey">
-          <el-input disabled id="copy-input1" v-model="form.name"></el-input>
-          <el-button type="primary" class="copy-btn" data-clipboard-target="#copy-input1">复制</el-button>
-        </el-form-item>-->
-        <el-form-item label="服务商secret" prop="providerSecret">
-          <el-input v-model="form.providerSecret" style="width: 80%"></el-input>
-          <el-link class="fr" type="primary">如何获取？</el-link>
-        </el-form-item>
-        <el-form-item label="通讯录管理secret" prop="corpSecret">
-          <el-input v-model="form.corpSecret" style="width: 80%"></el-input>
-          <el-link class="fr" type="primary">如何获取？</el-link>
-        </el-form-item>
-        <!-- <el-form-item label="通讯录事件服务">
-          <el-radio-group v-model="form.contactSecret">
-            <el-radio label="label">开启</el-radio>
-            <el-radio label="label">不开启</el-radio>
-          </el-radio-group>
-          <div>开启后，可以将成员、部门的增删改以及成员的标签变更实时的同步到仟微SCRM，无需手动更新同步。</div>
-        </el-form-item>-->
-        <el-form-item label="外部联系人管理secret" prop="contactSecret">
-          <el-input v-model="form.contactSecret"></el-input>
-        </el-form-item>
-        <!-- <el-form-item label="通讯录事件服务">
-          <el-radio-group v-model="form.model">
-            <el-radio label="label">开启</el-radio>
-            <el-radio label="label">不开启</el-radio>
-          </el-radio-group>
-          <div>开启后，可以将企业客户的添加、编辑以及主动删除客户和被动被客户删除实时的同步到仟微SCRM，无需手动更新同步。</div>
-        </el-form-item>-->
-        <el-form-item
-          label="企业微信扫码登陆回调地址"
-          prop="wxQrLoginRedirectUri"
-        >
-          <el-input v-model="form.wxQrLoginRedirectUri"></el-input>
-        </el-form-item>
-      </el-form>
+    <el-dialog
+      title="配置方法"
+      :visible.sync="dialogHowToConfig"
+      width="500px"
+      style="margin-bottom: 7vh;"
+    >
+      <div class="help">
+        <div class="step">
+          <p>
+            1、登录企业微信官方后台，进入应用管理，点击
+            LinkWeChat，再点击【配置到聊天工具栏】。
+          </p>
+          <el-image
+            :src="require('@/assets/example/keywordHelp1.png')"
+          ></el-image>
+        </div>
+        <div class="step">
+          <p>2、点击【配置】后，进入配置页面。</p>
+          <el-image
+            :src="require('@/assets/example/keywordHelp2.png')"
+          ></el-image>
+        </div>
+        <div class="step">
+          <p>
+            3、点击【配置页面】后，在弹窗中，输入页面名称及链接，并确定即可。进入配置页面。
+          </p>
+          <el-image
+            :src="require('@/assets/example/keywordHelp3.png')"
+          ></el-image>
+        </div>
+      </div>
       <div slot="footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submit" v-show="!disabled"
-          >确 定</el-button
-        >
+        <el-button type="primary" @click="dialogHowToConfig = false">
+          我知道了
+        </el-button>
       </div>
     </el-dialog>
   </div>
 </template>
+
+<style scoped lang="scss">
+.link-info {
+  .link-info__header {
+    padding-bottom: 10px;
+    font-size: 16px;
+  }
+  .link-info__content {
+    color: #aaaaaa;
+    padding: 5px 0;
+  }
+  .link {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+
+    .link__content {
+      background: #e0e0e0;
+      margin: 8px 10px 8px 0;
+      border-radius: 4px;
+      line-height: 32px;
+      padding: 0 12px;
+
+      span {
+        align-items: center;
+        height: 100%;
+        color: #aaaaaa;
+      }
+    }
+    .link__action {
+      :nth-child(n + 2) {
+        margin-left: 10px;
+      }
+    }
+  }
+}
+.help {
+  .step {
+    margin-bottom: 20px;
+  }
+}
+.code-image {
+  width: 200px;
+  height: 200px;
+}
+.code-image--small {
+  width: 50px;
+  height: 50px;
+}
+.overflow-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.table-desc {
+  max-width: 120px;
+}
+</style>

@@ -128,7 +128,7 @@ public class WeUser extends BaseEntity
     /** 是否激活（1:是；2:否）该字段主要表示当前信息是否同步微信 */
     /** 激活状态: 1=已激活，2=已禁用，4=未激活，5=退出企业,6=删除 */
     @ApiModelProperty("激活状态: 1=已激活，2=已禁用，4=未激活，5=退出企业,6=删除")
-    private Integer isActivate;
+    private Integer isActivate=new Integer(4);
 
     /** 离职是否分配(1:已分配;0:未分配;) */
     @ApiModelProperty("离职是否分配(1:已分配;0:未分配;)")

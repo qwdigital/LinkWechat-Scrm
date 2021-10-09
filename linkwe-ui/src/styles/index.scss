@@ -6,14 +6,14 @@
 
 ::-webkit-scrollbar {
   /*滚动条整体样式*/
-  width: 10px;
   /*高宽分别对应横竖滚动条的尺寸*/
-  height: 8px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
   /*滚动条里面小方块*/
-  border-radius: 10px;
+  border-radius: 5px;
   /*深色模式*/
   -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
   background: #eee;
@@ -86,7 +86,7 @@ div:focus {
     visibility: hidden;
     display: block;
     font-size: 0;
-    content: " ";
+    content: ' ';
     clear: both;
     height: 0;
   }
@@ -100,7 +100,8 @@ aside {
   display: block;
   line-height: 32px;
   font-size: 16px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   color: #2c3e50;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -126,7 +127,7 @@ aside {
 }
 
 .text-center {
-  text-align: center
+  text-align: center;
 }
 
 .sub-navbar {
@@ -137,7 +138,13 @@ aside {
   text-align: right;
   padding-right: 20px;
   transition: 600ms ease position;
-  background: linear-gradient(90deg, rgba(32, 182, 249, 1) 0%, rgba(32, 182, 249, 1) 0%, rgba(33, 120, 241, 1) 100%, rgba(33, 120, 241, 1) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(32, 182, 249, 1) 0%,
+    rgba(32, 182, 249, 1) 0%,
+    rgba(33, 120, 241, 1) 100%,
+    rgba(33, 120, 241, 1) 100%
+  );
 
   .subtitle {
     font-size: 20px;
@@ -187,7 +194,6 @@ aside {
 }
 
 .el-table {
-
   .el-table__header-wrapper,
   .el-table__fixed-header-wrapper {
     th {
@@ -206,22 +212,22 @@ aside {
   color: #6379bb;
   border-bottom: 1px solid #ddd;
   margin: 8px 10px 25px 10px;
-  padding-bottom: 5px
+  padding-bottom: 5px;
 }
 
 /** 表格布局 **/
 .el-table .fixed-width .el-button--mini {
-  color: #409EFF;
+  color: #409eff;
   padding-left: 0;
   padding-right: 0;
   width: inherit;
 }
 
-.el-tree-node__content>.el-checkbox {
+.el-tree-node__content > .el-checkbox {
   margin-right: 8px;
 }
 
-.list-group-striped>.list-group-item {
+.list-group-striped > .list-group-item {
   border-left: 0;
   border-right: 0;
   border-radius: 0;
@@ -264,22 +270,22 @@ aside {
 /* button color */
 .el-button--cyan.is-active,
 .el-button--cyan:active {
-  background: #20B2AA;
-  border-color: #20B2AA;
-  color: #FFFFFF;
+  background: #20b2aa;
+  border-color: #20b2aa;
+  color: #ffffff;
 }
 
 .el-button--cyan:focus,
 .el-button--cyan:hover {
-  background: #48D1CC;
-  border-color: #48D1CC;
-  color: #FFFFFF;
+  background: #48d1cc;
+  border-color: #48d1cc;
+  color: #ffffff;
 }
 
 .el-button--cyan {
-  background-color: #20B2AA;
-  border-color: #20B2AA;
-  color: #FFFFFF;
+  background-color: #20b2aa;
+  border-color: #20b2aa;
+  color: #ffffff;
 }
 
 /* text color */
@@ -334,7 +340,7 @@ aside {
 
 /* 拖拽列样式 */
 .sortable-ghost {
-  opacity: .8;
+  opacity: 0.8;
   color: #fff !important;
   background: #42b983 !important;
 }
@@ -342,4 +348,61 @@ aside {
 .top-right-btn {
   position: relative;
   float: right;
+}
+
+.tag-input {
+  width: 240px;
+  display: flex;
+  border-radius: 4px;
+  border: 1px solid #dcdfe6;
+  align-items: center;
+  padding: 0 15px;
+  overflow: hidden;
+  height: 32px;
+  background-color: #fff;
+  .tag-place {
+    color: #bbb;
+    font-size: 14px;
+  }
+}
+.mid-action {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  align-items: center;
+  .total {
+    background-color: rgba(65, 133, 244, 0.1);
+    border: 1px solid rgba(65, 133, 244, 0.2);
+    border-radius: 3px;
+    font-size: 14px;
+    min-height: 32px;
+    line-height: 32px;
+    padding: 0 12px;
+    color: #606266;
+  }
+  .num {
+    color: #00f;
+  }
+}
+
+.left-tree.el-tree {
+  background: transparent;
+  line-height: 30px;
+  .el-tree-node__content {
+    height: auto;
+  }
+  .fr {
+    [class^='el-icon-'] {
+      margin-left: 5px;
+    }
+    .el-icon-edit-outline {
+      color: $blue;
+    }
+    .el-icon-circle-plus-outline {
+      color: $green;
+    }
+    .el-icon-delete {
+      color: $red;
+    }
+  }
 }

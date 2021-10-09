@@ -17,9 +17,9 @@ const service = window.CONFIG.services.wecom + '/customer'
  */
 export function getList(params) {
   return request({
-    url: service + '/list',
+    url: service + '/findWeCustomerList',
     method: 'get',
-    params,
+    params
   })
 }
 
@@ -28,7 +28,7 @@ export function getList(params) {
  */
 export function sync() {
   return request({
-    url: service + '/synchWeCustomer',
+    url: service + '/synchWeCustomer'
   })
 }
 
@@ -48,7 +48,7 @@ export function makeLabel(data) {
   return request({
     url: service + '/makeLabel',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -68,7 +68,7 @@ export function removeLabel(data) {
   return request({
     url: service + '/removeLabel',
     method: 'DELETE',
-    data,
+    data
   })
 }
 
@@ -84,7 +84,7 @@ export function updateBirthday(data) {
   return request({
     url: service,
     method: 'PUT',
-    data,
+    data
   })
 }
 
@@ -93,7 +93,7 @@ export function exportCustomer(query) {
   return request({
     url: service + '/export',
     method: 'get',
-    params: query,
+    params: query
   })
 }
 
@@ -103,7 +103,7 @@ export function exportCustomer(query) {
  */
 export function getDetail(externalUserid) {
   return request({
-    url: service + '/getCustomersByUserId/' + externalUserid,
+    url: service + '/getCustomersByUserId/' + externalUserid
   })
 }
 
@@ -113,16 +113,13 @@ export function getDetail(externalUserid) {
  */
 export function lossRemind(status) {
   return request({
-    url:
-      window.CONFIG.services.wecom +
-      '/corp/startCustomerChurnNoticeSwitch/' +
-      status,
-    method: 'PUT',
+    url: window.CONFIG.services.wecom + '/corp/startCustomerChurnNoticeSwitch/' + status,
+    method: 'PUT'
   })
 }
 
 export function getLossRemindStatus(status) {
   return request({
-    url: window.CONFIG.services.wecom + '/corp/getCustomerChurnNoticeSwitch/',
+    url: window.CONFIG.services.wecom + '/corp/getCustomerChurnNoticeSwitch/'
   })
 }

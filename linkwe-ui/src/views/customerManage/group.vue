@@ -11,10 +11,45 @@ export default {
         pageSize: 10,
         groupName: undefined,
         beginTime: undefined,
-        endTime: undefined,
+        endTime: undefined
       },
       // 日期范围
       dateRange: [],
+      // 日期快捷选项
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now()
+        },
+        shortcuts: [
+          {
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+              picker.$emit('pick', [start, end])
+            },
+          },
+          {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+              picker.$emit('pick', [start, end])
+            },
+          },
+          {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+              picker.$emit('pick', [start, end])
+            },
+          },
+        ],
+      },
       // 遮罩层
       loading: false,
       // 选中数组
@@ -24,7 +59,7 @@ export default {
       // 总条数
       total: 0,
       // 表格数据
-      list: [],
+      list: []
     }
   },
   created() {
@@ -33,7 +68,7 @@ export default {
   methods: {
     /** 查询 */
     getList(page) {
-      if (this.dateRange[0]) {
+      if (this.dateRange) {
         this.query.beginTime = this.dateRange[0]
         this.query.endTime = this.dateRange[1]
       } else {
@@ -63,7 +98,7 @@ export default {
         lock: true,
         text: 'Loading',
         spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.7)',
+        background: 'rgba(0, 0, 0, 0.7)'
       })
       api.sync().then((r) => {
         loading.close()
@@ -90,8 +125,8 @@ export default {
       //     this.download(response.msg);
       //   })
       //   .catch(function () {});
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -123,6 +158,7 @@ export default {
           v-model="dateRange"
           value-format="yyyy-MM-dd"
           type="daterange"
+          :picker-options="pickerOptions"
           range-separator="-"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
@@ -143,7 +179,7 @@ export default {
         >
         <el-button
           v-hasPermi="['customerManage:group:export']"
-          type="cyan"
+          type="success"
           @click="handleExport"
           >导出列表</el-button
         >
@@ -165,8 +201,6 @@ export default {
         <el-button
           v-hasPermi="['customerManage:group:sync']"
           type="primary"
-          size="mini"
-          icon="el-icon-refresh"
           @click="sync"
           >同步客户群</el-button
         >
@@ -200,8 +234,8 @@ export default {
             icon="el-icon-view"
             @click="
               $router.push({
-                path: '/customerManage/groupDetail',
-                query: scope.row,
+                path: 'groupDetail',
+                query: scope.row
               })
             "
             v-hasPermi="['customerManage:group:view']"
@@ -221,24 +255,4 @@ export default {
   </div>
 </template>
 
-<style lang="scss" scoped>
-.mid-action {
-  display: flex;
-  justify-content: space-between;
-  margin: 10px 0;
-  align-items: center;
-  .total {
-    background-color: rgba(65, 133, 244, 0.1);
-    border: 1px solid rgba(65, 133, 244, 0.2);
-    border-radius: 3px;
-    font-size: 14px;
-    min-height: 32px;
-    line-height: 32px;
-    padding: 0 12px;
-    color: #606266;
-  }
-  .num {
-    color: #00f;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

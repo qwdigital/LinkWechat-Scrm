@@ -1,3 +1,26 @@
+<script>
+import BaseInfo from './baseInfo'
+
+export default {
+  components: { BaseInfo },
+  data() {
+    return {
+      groupCode: null,
+      groupCodeId: ''
+    }
+  },
+  created() {
+    this.groupCodeId = this.$route.query.groupCodeId
+  },
+  methods: {
+    save() {
+      this.$refs.baseInfo.submit()
+      this.$router.back()
+    }
+  }
+}
+</script>
+
 <template>
   <div class="page">
     <BaseInfo ref="baseInfo" :groupCodeId="groupCodeId"></BaseInfo>
@@ -8,35 +31,3 @@
     </div>
   </div>
 </template>
-
-<script>
-import BaseInfo from './baseInfo'
-
-export default {
-  components: {
-    BaseInfo
-  },
-
-  data () {
-    return {
-      groupCode: null,
-      groupCodeId: ''
-    }
-  },
-
-  methods: {
-    save () {
-      this.$refs.baseInfo.submit()
-      this.$router.back()
-    }
-  },
-
-  created () {
-    this.groupCodeId = this.$route.query.groupCodeId
-  }
-}
-</script>
-
-<style scoped lang="scss">
-
-</style>

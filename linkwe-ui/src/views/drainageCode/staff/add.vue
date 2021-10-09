@@ -22,6 +22,7 @@ export default {
         isJoinConfirmFriends: 0,
         weEmpleCodeTags: [],
         weEmpleCodeUseScops: [],
+        scenario: ''
       },
       materialSelected: '',
       welQuery: { welcomeMsg: '' },
@@ -156,9 +157,9 @@ export default {
           >客户添加时无需经过确认自动成为好友</el-checkbox
         >
       </el-form-item>
-      <el-form-item label="活动场景" prop="activityScene">
+      <el-form-item label="活动场景" prop="scenario">
         <el-input
-          v-model="form.activityScene"
+          v-model="form.scenario"
           maxlength="30"
           show-word-limit
           placeholder="请输入"
