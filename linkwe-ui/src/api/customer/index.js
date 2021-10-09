@@ -12,7 +12,7 @@ const service = window.CONFIG.services.wecom + '/customer'
     "tagIds": "标签id,多个标签，id使用逗号隔开",
     "beginTime": "开始时间",
     "endTime": "结束时间"
-    status: 0 客户状态 0正常 1删除
+    delFlag: 0 客户状态 0正常 1删除
 }
  */
 export function getListNew(params) {
@@ -23,6 +23,20 @@ export function getListNew(params) {
   })
 }
 
+/**
+ * 客户列表
+ * @param {*} params 
+ * {
+    "pageNum": "当前页",
+    "pageSize": "每页显示条数",
+    "name": "客户名称",
+    "userId": "添加人id",
+    "tagIds": "标签id,多个标签，id使用逗号隔开",
+    "beginTime": "开始时间",
+    "endTime": "结束时间"
+    status: 0 客户状态 0正常 1删除
+}
+ */
 export function getList(params) {
   return request({
     url: service + '/list',
