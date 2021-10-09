@@ -285,11 +285,11 @@
                 <version>${jsqlparser.version}</version>
             </dependency>
 
-            <!--<dependency>
+            <dependency>
                 <groupId>io.github.leejoker</groupId>
                 <artifactId>linkwechat-nacos-starter</artifactId>
                 <version>${nacos.starter.version}</version>
-            </dependency>-->
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

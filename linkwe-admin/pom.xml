@@ -79,10 +79,16 @@
             <artifactId>jaxb-api</artifactId>
         </dependency>
 
-        <!--<dependency>
+        <dependency>
             <groupId>io.github.leejoker</groupId>
             <artifactId>linkwechat-nacos-starter</artifactId>
-        </dependency>-->
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
