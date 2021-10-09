@@ -1,5 +1,6 @@
 <script>
 import { getTree, getList } from '@/api/material'
+import { getMaterialList } from '@/api/appTool/chatBar'
 export default {
   components: {},
   props: {
@@ -15,6 +16,11 @@ export default {
     selected: {
       type: Array,
       default: () => []
+    },
+    // 是否使用素材抓取回显选中
+    isCheck: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -78,11 +84,28 @@ export default {
     getList(page) {
       page && (this.query.pageNum = page)
       this.loading = true
-      getList(this.query)
+      ;(this.isCheck ? getMaterialList : getList)(this.query)
         .then(({ rows, total }) => {
           this.list = rows
           this.total = +total
           this.loading = false
+
+          if (this.isCheck) {
+            let selected = this.list.filter((d) => d.isCheck)
+            this.$emit('update:selected', selected)
+
+            // 选中回显
+            if ([1, 3, 4].includes(+this.type)) {
+              this.$nextTick(() => {
+                selected.forEach((row) => {
+                  this.$refs.table.toggleRowSelection(row, true)
+                })
+              })
+            } else {
+              this.selectedx = selected
+            }
+          }
+
           this.$emit('listChange', this.list)
         })
         .catch(() => {
@@ -178,7 +201,7 @@ export default {
             :total="total"
           ></el-pagination>
         </div>
-        <el-table v-if="[1, 3, 4].includes(+type)" :data="list" @selection-change="handleSelectionChange">
+        <el-table ref="table" v-if="[1, 3, 4].includes(+type)" :data="list" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" align="center" />
           <el-table-column v-if="type == 4" prop="content" label="文本内容"></el-table-column>
           <el-table-column v-else prop="materialName" label="素材名称"></el-table-column>

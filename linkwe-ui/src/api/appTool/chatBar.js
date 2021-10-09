@@ -7,8 +7,20 @@ const service = window.CONFIG.services.wecom + '/chat'
  */
 export function getList() {
   return request({
-    url: service + '/side/list',
+    url: service + '/side/list'
   })
+}
+
+/**
+ * 查询素材列表
+ * @param {*} params 
+ * { categoryId:类目id
+search:搜索的值
+mediaType: '' 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file), 4 文本
+ }
+ */
+export function getMaterialList(params) {
+  return request({ url: '/wecom/chat/item/mList', params })
 }
 
 /**
@@ -26,7 +38,7 @@ export function update(data) {
   return request({
     url: service + '/side',
     method: 'put',
-    data,
+    data
   })
 }
 
@@ -44,6 +56,6 @@ export function getMaterial(data) {
   return request({
     url: service + '/item',
     method: 'put',
-    data,
+    data
   })
 }
