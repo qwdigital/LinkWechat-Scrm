@@ -15,7 +15,11 @@ export default {
       // userId: this.$store.state.userId,
     }
   },
-  watch: {},
+  watch: {
+    userId() {
+      this.getList()
+    }
+  },
   computed: {
     userId() {
       return this.$store.state.userId
@@ -29,6 +33,7 @@ export default {
   mounted() {},
   methods: {
     getList() {
+      this.list = []
       getTypeList().then(({ rows, total }) => {
         this.userId &&
           this.list.push({
