@@ -4,6 +4,7 @@ import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.customer.CustomerGroupDetail;
 import com.linkwechat.wecom.domain.dto.customer.CustomerGroupList;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
+import com.linkwechat.wecom.retry.WeCommonRetryWhen;
 
 /**
  * @description: 客户群
@@ -11,6 +12,7 @@ import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
  * @create: 2020-10-20 21:50
  **/
 @BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
+@Retry(maxRetryCount = "3", maxRetryInterval = "1000", condition = WeCommonRetryWhen.class)
 public interface WeCustomerGroupClient {
 
 

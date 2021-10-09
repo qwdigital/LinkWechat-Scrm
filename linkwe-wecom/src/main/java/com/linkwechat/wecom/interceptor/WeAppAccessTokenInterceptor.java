@@ -8,6 +8,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.linkwechat.common.config.WeComeConfig;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
@@ -17,13 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * @description: 微信token拦截器
- * @author: HaoN
- * @create: 2020-08-27 22:36
+ * @description: 应用token拦截器
+ * @author: danmo
+ * @create: 2021-09-27 22:36
  **/
 @Slf4j
 @Component
-public class WeAccessTokenInterceptor implements Interceptor<WeResultDto> {
+public class WeAppAccessTokenInterceptor implements Interceptor<WeResultDto> {
 
 
     @Autowired
@@ -38,7 +39,7 @@ public class WeAccessTokenInterceptor implements Interceptor<WeResultDto> {
      */
     @Override
     public boolean beforeExecute(ForestRequest request) {
-        String token = iWeAccessTokenService.findContactAccessToken();
+        String token = iWeAccessTokenService.findThirdAppAccessToken(request.getHeaderValue(WeConstans.THIRD_APP_PARAM_TIP));
         request.replaceOrAddQuery("access_token", token);
         return true;
     }
@@ -85,16 +86,13 @@ public class WeAccessTokenInterceptor implements Interceptor<WeResultDto> {
      */
     @Override
     public void onRetry(ForestRequest request, ForestResponse response) {
-        log.info("url:{}, query:{},params:{}, 重试原因:{}, 当前重试次数:{}",request.getUrl(),request.getQueryString(), JSONObject.toJSONString(request.getArguments()),response.getContent(), request.getCurrentRetryCount());
+        log.info("url:{}, params:{}, 重试原因:{}, 当前重试次数:{}",request.getUrl(), JSONObject.toJSONString(request.getArguments()),response.getContent(), request.getCurrentRetryCount());
         WeResultDto weResultDto = JSONUtil.toBean(response.getContent(), WeResultDto.class);
         //当错误码符合重置token时，刷新token
         if(!ObjectUtil.equal(WeErrorCodeEnum.ERROR_CODE_OWE_1.getErrorCode(),weResultDto.getErrcode())
-                && weComeConfig.getWeNeedRetryErrorCodes().contains(weResultDto.getErrcode())){
-            //删除缓存
-            iWeAccessTokenService.removeContactAccessToken();
-            //重新查询token
+                && weComeConfig.getWeNeedRetryErrorCodes().contains(weResultDto.getErrmsg())){
+            iWeAccessTokenService.removeThirdAppAccessToken(request.getHeaderValue(WeConstans.THIRD_APP_PARAM_TIP));
             String token = iWeAccessTokenService.findContactAccessToken();
-
             request.replaceOrAddQuery("access_token", token);
         }
     }

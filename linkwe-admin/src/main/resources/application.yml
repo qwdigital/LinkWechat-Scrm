@@ -107,7 +107,7 @@ spring:
     druid:
       # 主库数据源
       master:
-        url: jdbc:mysql://127.0.0.1:10179/lww?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+        url: jdbc:mysql://127.0.0.1:3306/linkwechat?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
         username: root
         password: root
       # 从库数据源
@@ -249,34 +249,41 @@ xss:
   urlPatterns: /system/*,/monitor/*,/tool/*
 
 # elasticsearch配置
-elasticsearch:
-  schema: http
-  address: 47.112.117.15:7200,47.112.117.15:7201,47.112.117.15:7202
-  userName: "elastic"
-  password: "0p-0p-0p-"
-  connectTimeout: 10000
-  socketTimeout: 10000
-  connectionRequestTimeout: 10000
-  maxConnectNum: 100
-  maxConnectPerRoute: 100
+#elasticsearch:
+# schema: http
+# address: 47.112.117.15:7200,47.112.117.15:7201,47.112.117.15:7202
+# userName: "elastic"
+# password: "0p-0p-0p-"
+# connectTimeout: 10000
+# socketTimeout: 10000
+# connectionRequestTimeout: 10000
+# maxConnectNum: 100
+# maxConnectPerRoute: 100
 
 # forest配置
 forest:
   backend: httpclient
-  retry-count: 1 # 请求失败后重试次数，默认为0次不重试
+  max-retry-count:  3 # 请求失败后重试次数，默认为0次不重试
   max-retry-interval: 1000 #重试间隔时间
   connect-timeout: 3000 #链接超时时间
   timeout: 3000  # 请求超时时间
+  ## 日志总开关，打开/关闭Forest请求/响应日志（默认为 true）
+  log-enabled: true
+  ## 打开/关闭Forest请求日志（默认为 true）
+  log-request: true
+  ## 打开/关闭Forest响应状态日志（默认为 true）
+  log-response-status: true
+  ## 打开/关闭Forest响应内容日志（默认为 false）
+  log-response-content: true
   variables:
     weComServerUrl: https://qyapi.weixin.qq.com/
     weComePrefix: cgi-bin
     wxServerUrl: https://api.weixin.qq.com/
     wxPrefix: sns
 
+
 wecome:
-  chatKey: finance_new
-  serverUrl: https://qyapi.weixin.qq.com/
-  weComePrefix: cgi-bin
+  weNeedRetryErrorCodes: -1,42001,42009,40082,40014
   noAccessTokenUrl:
     - /gettoken
     - /service/get_provider_token
@@ -310,8 +317,6 @@ wecome:
     - /externalcontact/groupchat/statistic
     - /externalcontact/groupchat/statistic_group_by_day
   fileUplodUrl:  /media/upload,/media/uploadimg
-  needProviderTokenUrl:
-    - /service/get_login_info
   needChatTokenUrl:
     - /msgaudit/get_permit_user_list
     - /msgaudit/check_single_agree

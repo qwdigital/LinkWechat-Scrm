@@ -17,7 +17,18 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WeResultDto {
+    /**
+     * 泛指各种返回id
+     */
     private Long id;
+
+    /**
+     * 接口返回错误码
+     */
     private Integer errcode;
+
+    /**
+     * 接口返回错误信息
+     */
     private String errmsg;
 }

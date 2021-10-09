@@ -1,28 +1,23 @@
 package com.linkwechat.wecom.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeAppClient;
 import com.linkwechat.wecom.domain.WeApp;
-import com.linkwechat.wecom.domain.WeDepartment;
 import com.linkwechat.wecom.domain.dto.WeAppDetailDto;
-import com.linkwechat.wecom.domain.dto.WeAppDto;
 import com.linkwechat.wecom.mapper.WeAppMapper;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
 import com.linkwechat.wecom.service.IWeAppService;
 import com.linkwechat.wecom.service.IWeDepartmentService;
 import com.linkwechat.wecom.service.IWeUserService;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @description:
@@ -76,7 +71,6 @@ public class WeAppServiceImpl extends ServiceImpl<WeAppMapper, WeApp> implements
               weApp.setDescription(weAppDetailDto.getDescription());
               weApp.setAllowPartys(StringUtils.join(weAppDetailDto.getAllow_partys().getPartyid(),","));
               weApp.setAllowUserinfos(StringUtils.join(weAppDetailDto.getAllow_userinfos().getUser(),","));
-              System.out.println("============================================");
               this.updateById(weApp);
           }
       }

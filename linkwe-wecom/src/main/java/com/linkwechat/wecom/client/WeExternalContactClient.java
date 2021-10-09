@@ -1,11 +1,9 @@
 package com.linkwechat.wecom.client;
 
-import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.JSONBody;
-import com.dtflys.forest.annotation.Query;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.WeExternalContactDto;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
+import com.linkwechat.wecom.retry.WeCommonRetryWhen;
 
 /**
  * @description: 员工对外联系方式
@@ -13,6 +11,7 @@ import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
  * @create: 2020-10-13 10:39
  **/
 @BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
+@Retry(maxRetryCount = "3", maxRetryInterval = "1000", condition = WeCommonRetryWhen.class)
 public interface WeExternalContactClient {
 
     @Request(url = "/externalcontact/add_contact_way",

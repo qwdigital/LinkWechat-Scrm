@@ -6,6 +6,7 @@ import com.linkwechat.wecom.domain.dto.message.QueryCustomerMessageStatusResultD
 import com.linkwechat.wecom.domain.dto.message.SendMessageResultDto;
 import com.linkwechat.wecom.domain.dto.message.WeCustomerMessagePushDto;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
+import com.linkwechat.wecom.retry.WeCommonRetryWhen;
 
 /**
  * @description: 群发消息
@@ -13,6 +14,7 @@ import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
  * @create: 2020-10-25 21:34
  **/
 @BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
+@Retry(maxRetryCount = "3", maxRetryInterval = "1000", condition = WeCommonRetryWhen.class)
 public interface WeCustomerMessagePushClient {
 
 

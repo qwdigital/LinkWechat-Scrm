@@ -4,6 +4,7 @@ import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.domain.dto.tag.*;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
+import com.linkwechat.wecom.retry.WeCommonRetryWhen;
 
 /**
  * @description: 企业微信标签相关
@@ -11,6 +12,7 @@ import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
  * @create: 2020-10-17 11:00
  **/
 @BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
+@Retry(maxRetryCount = "3", maxRetryInterval = "1000", condition = WeCommonRetryWhen.class)
 public interface WeCropTagClient {
 
     /**
