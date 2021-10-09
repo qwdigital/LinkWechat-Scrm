@@ -11,7 +11,7 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeAccessTokenClient;
 import com.linkwechat.wecom.domain.WeApp;
 import com.linkwechat.common.core.domain.entity.WeCorpAccount;
-import com.linkwechat.wecom.domain.dto.WeAccessTokenDtoDto;
+import com.linkwechat.wecom.domain.dto.WeAccessTokenDto;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
 import com.linkwechat.wecom.service.IWeAppService;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
@@ -54,8 +54,6 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
      */
     @Override
     public String findCommonAccessToken() {
-
-
         return findAccessToken(WeConstans.WE_COMMON_ACCESS_TOKEN);
     }
 
@@ -66,8 +64,6 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
      */
     @Override
     public String findContactAccessToken() {
-
-
         return findAccessToken(WeConstans.WE_CONTACT_ACCESS_TOKEN);
     }
 
@@ -94,16 +90,13 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
 
 
     /**
-     * 获取第三方应用所需要的token
+     * 获取应用所需要的token
      * @param agentId
      * @return
      */
     @Override
     public String findThirdAppAccessToken(String agentId) {
-
-
         String token=redisCache.getCacheObject(WeConstans.WE_THIRD_APP_TOKEN+"::"+agentId);
-
         if(StringUtils.isNotEmpty(token)){
             return token;
         }
@@ -119,7 +112,6 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
                         .build();
             }
         }
-
         if(weApp==null){
             weApp = iWeAppService.getOne(new LambdaQueryWrapper<WeApp>()
                     .eq(WeApp::getAgentId, agentId)
@@ -146,16 +138,16 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
             throw new WeComException("无可用的corpid和secret");
         }
 
-        WeAccessTokenDtoDto weAccessTokenDtoDto
+        WeAccessTokenDto weAccessTokenDto
                 = accessTokenClient.getToken(wxCorpAccount.getCorpId(),weApp.getAgentSecret());
 
-        if(StringUtils.isNotEmpty(weAccessTokenDtoDto.getAccess_token())){
+        if(StringUtils.isNotEmpty(weAccessTokenDto.getAccessToken())){
 
-            redisCache.setCacheObject(WeConstans.WE_THIRD_APP_TOKEN+"::"+weApp.getAgentId(),weAccessTokenDtoDto.getAccess_token(),weAccessTokenDtoDto.getExpires_in().intValue(), TimeUnit.SECONDS);
+            redisCache.setCacheObject(WeConstans.WE_THIRD_APP_TOKEN+"::"+weApp.getAgentId(), weAccessTokenDto.getAccessToken(), weAccessTokenDto.getExpiresIn().intValue(), TimeUnit.SECONDS);
         }
 
 
-        return weAccessTokenDtoDto.getAccess_token();
+        return weAccessTokenDto.getAccessToken();
 
     }
 
@@ -193,19 +185,19 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
             String token="";
             Long expires_in=null;
             if(WeConstans.WE_COMMON_ACCESS_TOKEN.equals(accessTokenKey) || WeConstans.WE_CONTACT_ACCESS_TOKEN.equals(accessTokenKey)){
-                WeAccessTokenDtoDto weAccessTokenDtoDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),
+                WeAccessTokenDto weAccessTokenDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),
                         WeConstans.WE_COMMON_ACCESS_TOKEN.equals(accessTokenKey) ? wxCorpAccount.getCorpSecret() : wxCorpAccount.getContactSecret());
-                token=weAccessTokenDtoDto.getAccess_token();
-                expires_in=weAccessTokenDtoDto.getExpires_in();
+                token= weAccessTokenDto.getAccessToken();
+                expires_in= weAccessTokenDto.getExpiresIn();
 
             }else if (WeConstans.WE_CHAT_ACCESS_TOKEN.equals(accessTokenKey)){
-                WeAccessTokenDtoDto weAccessTokenDtoDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),wxCorpAccount.getChatSecret());
-                token=weAccessTokenDtoDto.getAccess_token();
-                expires_in=weAccessTokenDtoDto.getExpires_in();
+                WeAccessTokenDto weAccessTokenDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),wxCorpAccount.getChatSecret());
+                token= weAccessTokenDto.getAccessToken();
+                expires_in= weAccessTokenDto.getExpiresIn();
             }else if (WeConstans.WE_AGENT_ACCESS_TOKEN.equals(accessTokenKey)){
-                WeAccessTokenDtoDto weAccessTokenDtoDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),wxCorpAccount.getAgentSecret());
-                token=weAccessTokenDtoDto.getAccess_token();
-                expires_in=weAccessTokenDtoDto.getExpires_in();
+                WeAccessTokenDto weAccessTokenDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),wxCorpAccount.getAgentSecret());
+                token= weAccessTokenDto.getAccessToken();
+                expires_in= weAccessTokenDto.getExpiresIn();
             }
 
             if(StringUtils.isNotEmpty(token)){
@@ -235,27 +227,25 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
                 String token="";
                 Long expires_in=null;
                 if(WeConstans.WE_COMMON_ACCESS_TOKEN.equals(accessTokenKey) || WeConstans.WE_CONTACT_ACCESS_TOKEN.equals(accessTokenKey)){
-                    WeAccessTokenDtoDto weAccessTokenDtoDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),
+                    WeAccessTokenDto weAccessTokenDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),
                             WeConstans.WE_COMMON_ACCESS_TOKEN.equals(accessTokenKey) ? wxCorpAccount.getCorpSecret() : wxCorpAccount.getContactSecret());
-                    token=weAccessTokenDtoDto.getAccess_token();
-                    expires_in=weAccessTokenDtoDto.getExpires_in();
+                    token= weAccessTokenDto.getAccessToken();
+                    expires_in= weAccessTokenDto.getExpiresIn();
                 }else if (WeConstans.WE_CHAT_ACCESS_TOKEN.equals(accessTokenKey)){
-                    WeAccessTokenDtoDto weAccessTokenDtoDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),wxCorpAccount.getChatSecret());
-                    token=weAccessTokenDtoDto.getAccess_token();
-                    expires_in=weAccessTokenDtoDto.getExpires_in();
+                    WeAccessTokenDto weAccessTokenDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),wxCorpAccount.getChatSecret());
+                    token= weAccessTokenDto.getAccessToken();
+                    expires_in= weAccessTokenDto.getExpiresIn();
                 }else if (WeConstans.WE_AGENT_ACCESS_TOKEN.equals(accessTokenKey)){
-                    WeAccessTokenDtoDto weAccessTokenDtoDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),wxCorpAccount.getAgentSecret());
-                    token=weAccessTokenDtoDto.getAccess_token();
-                    expires_in=weAccessTokenDtoDto.getExpires_in();
+                    WeAccessTokenDto weAccessTokenDto = accessTokenClient.getToken(wxCorpAccount.getCorpId(),wxCorpAccount.getAgentSecret());
+                    token= weAccessTokenDto.getAccessToken();
+                    expires_in= weAccessTokenDto.getExpiresIn();
                 }
-
                 if(StringUtils.isNotEmpty(token)){
                     redisCache.setCacheObject(accessTokenKey,token,expires_in.intValue(), TimeUnit.SECONDS);
                     weAccessToken = token;
                 }
 
             }
-
             return weAccessToken;
     }
 
@@ -277,5 +267,18 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
 
     }
 
+    @Override
+    public void removeContactAccessToken() {
+        redisCache.deleteObject(WeConstans.WE_CONTACT_ACCESS_TOKEN);
+    }
 
+    @Override
+    public void removeChatAccessToken() {
+        redisCache.deleteObject(WeConstans.WE_CHAT_ACCESS_TOKEN);
+    }
+
+    @Override
+    public void removeThirdAppAccessToken(String agentId) {
+        redisCache.deleteObject(WeConstans.WE_THIRD_APP_TOKEN+"::"+agentId);
+    }
 }

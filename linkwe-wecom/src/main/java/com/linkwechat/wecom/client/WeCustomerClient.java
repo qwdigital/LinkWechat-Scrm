@@ -6,6 +6,7 @@ import com.linkwechat.wecom.domain.dto.customer.*;
 import com.linkwechat.wecom.domain.query.GroupChatStatisticQuery;
 import com.linkwechat.wecom.domain.query.UserBehaviorDataQuery;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
+import com.linkwechat.wecom.retry.WeCommonRetryWhen;
 
 
 import java.util.Map;
@@ -16,6 +17,7 @@ import java.util.Map;
  * @create: 2020-09-15 14:15
  **/
 @BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
+@Retry(maxRetryCount = "3", maxRetryInterval = "1000", condition = WeCommonRetryWhen.class)
 public interface WeCustomerClient {
 
     /**

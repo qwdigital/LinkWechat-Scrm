@@ -4,6 +4,8 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * @Author: Robin
  * @Description: 企业微信配置文件相关
@@ -39,4 +41,9 @@ public class WeComeConfig {
 
     /**多租户相关表*/
     private String[] needTenant=new String[]{};
+
+    /**
+     * 需要进行重试的企业微信请求错误码
+     */
+    private List<Integer> weNeedRetryErrorCodes;
 }

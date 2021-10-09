@@ -300,7 +300,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         LEFT JOIN we_user wu ON wc.first_user_id=wu.user_id
         LEFT JOIN we_flower_customer_tag_rel wfctr ON wfctr.external_userid=wc.external_userid AND  wfctr.user_id=wc.first_user_id
         LEFT JOIN we_tag wt ON wt.tag_id=wfctr.tag_id
-        where wc.del_flag=0
+        <where>
+            <if test="delFlag != null">
+                wc.del_flag = #{delFlag}
+            </if>
             <if test="name != null and name !=''">
                 AND  wc.`name` like concat('%',#{name,jdbcType=VARCHAR},'%')
             </if>
@@ -319,6 +322,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="beginTime !=null and beginTime != '' and endTime !='' and endTime != null">
                 AND  date_format(wc.first_add_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
             </if>
+        </where>
         GROUP BY wc.external_userid
         ORDER BY wc.first_add_time desc
     </select>

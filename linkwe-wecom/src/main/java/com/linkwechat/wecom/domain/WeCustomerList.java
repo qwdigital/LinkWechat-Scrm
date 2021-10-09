@@ -37,4 +37,7 @@ public class WeCustomerList {
     private String endTime;
     //查询标签id
     private String tagIds;
+
+    //0正常；1:删除;
+    private Integer delFlag=new Integer(0);
 }

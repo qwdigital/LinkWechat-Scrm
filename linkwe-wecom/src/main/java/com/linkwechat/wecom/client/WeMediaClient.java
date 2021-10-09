@@ -1,11 +1,9 @@
 package com.linkwechat.wecom.client;
 
-import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.DataFile;
-import com.dtflys.forest.annotation.Post;
-import com.dtflys.forest.annotation.Query;
+import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
+import com.linkwechat.wecom.retry.WeCommonRetryWhen;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -18,6 +16,7 @@ import java.io.InputStream;
  * @Date: create in 2020/9/24 0024 0:14
  */
 @BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
+@Retry(maxRetryCount = "3", maxRetryInterval = "1000", condition = WeCommonRetryWhen.class)
 public interface WeMediaClient {
     /**
      * 上传图片

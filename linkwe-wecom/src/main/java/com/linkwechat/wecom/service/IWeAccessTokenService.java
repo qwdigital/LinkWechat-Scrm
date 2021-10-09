@@ -26,5 +26,14 @@ public interface IWeAccessTokenService {
 
 
 
+
+
    public void removeToken(WeCorpAccount wxCorpAccount);
+
+
+   public void removeContactAccessToken();
+
+   public void removeChatAccessToken();
+
+   public void removeThirdAppAccessToken(String agentId);
 }
