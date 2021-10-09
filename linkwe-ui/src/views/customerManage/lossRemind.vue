@@ -232,27 +232,29 @@ export default {
       <el-table-column type="selection" align="center" width="55"></el-table-column>
       <el-table-column label="客户" prop="name" align="center">
         <template slot-scope="scope">
-          {{ scope.row.name }}
-          <span :style="{ color: scope.row.type === 1 ? '#4bde03' : '#f9a90b' }">{{
+          {{ scope.row.customerName }}
+          <!-- <span :style="{ color: scope.row.type === 1 ? '#4bde03' : '#f9a90b' }">{{
             { 1: '@微信', 2: '@企业微信' }[scope.row.type]
           }}</span>
-          <i :class="['el-icon-s-custom', { 1: 'man', 2: 'woman' }[scope.row.gender]]"></i>
+          <i :class="['el-icon-s-custom', { 1: 'man', 2: 'woman' }[scope.row.gender]]"></i> -->
         </template>
       </el-table-column>
-      <el-table-column prop="corpName" label="公司名称" align="center"></el-table-column>
+      <!-- <el-table-column prop="corpName" label="公司名称" align="center"></el-table-column> -->
       <el-table-column prop="userName" label="添加人（首位）" align="center">
-        <template slot-scope="scope">{{ scope.row.weFlowerCustomerRels[0].userName }}</template>
+        <!-- <template slot-scope="scope">{{ scope.row.weFlowerCustomerRels[0].userName }}</template> -->
       </el-table-column>
-      <el-table-column prop="createTime" label="添加时间" align="center">
-        <template slot-scope="scope">{{ scope.row.weFlowerCustomerRels[0].createTime }}</template>
+      <el-table-column prop="firstAddTime" label="添加时间" align="center">
+        <!-- <template slot-scope="scope">{{ scope.row.weFlowerCustomerRels[0].createTime }}</template> -->
       </el-table-column>
       <el-table-column prop="address" label="标签" align="center">
-        <template slot-scope="scope">
-          <div v-for="(item, index) in scope.row.weFlowerCustomerRels" :key="index">
+        <template slot-scope="{ row }" v-if="row.tagNames">
+          <el-tag type="info" v-for="(unit, unique) in row.tagNames.split(',')" :key="unique">{{ unit }}</el-tag>
+
+          <!-- <div v-for="(item, index) in row.weFlowerCustomerRels" :key="index">
             <el-tag type="info" v-for="(unit, unique) in item.weFlowerCustomerTagRels" :key="unique">{{
               unit.tagName
             }}</el-tag>
-          </div>
+          </div> -->
         </template>
       </el-table-column>
       <el-table-column label="操作" width="100">

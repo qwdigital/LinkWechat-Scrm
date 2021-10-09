@@ -45,7 +45,7 @@ export default {
       },
       list: [], // 列表
       total: 0, // 总条数
-      treeData: [], // 树
+      treeData: [{}], // 树
       // 树props
       treeProps: {
         children: 'children',
