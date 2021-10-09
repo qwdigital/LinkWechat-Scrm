@@ -69,7 +69,7 @@ public class WeChatItemController extends BaseController {
 
         if(CollectionUtil.isNotEmpty(list)){
             List<WeChatItem> weChatItems = weChatItemService.list(new LambdaQueryWrapper<WeChatItem>()
-                    .in(WeChatItem::getMaterialId));
+                    .in(WeChatItem::getMaterialId,list.stream().map(WeMaterial::getId).collect(Collectors.toList())));
             if(CollectionUtil.isNotEmpty(weChatItems)){
                 list.stream().forEach(k->{
                     k.setIsCheck(
