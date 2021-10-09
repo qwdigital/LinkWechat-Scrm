@@ -84,6 +84,7 @@ export default {
     getList(page) {
       page && (this.query.pageNum = page)
       this.loading = true
+      this.isCheck && (this.query.pageSize = 9999)
       ;(this.isCheck ? getMaterialList : getList)(this.query)
         .then(({ rows, total }) => {
           this.list = rows
