@@ -4,13 +4,16 @@ import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.msgaudit.WeMsgAuditDto;
 import com.linkwechat.wecom.domain.vo.WeMsgAuditVo;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
+import com.linkwechat.wecom.interceptor.WeChatAccessTokenInterceptor;
+import com.linkwechat.wecom.retry.WeCommonRetryWhen;
 
 /**
  * @author danmo
  * @description 会话存档接口
  * @date 2020/12/2 16:45
  **/
-@BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
+@BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeChatAccessTokenInterceptor.class)
+@Retry(maxRetryCount = "3", maxRetryInterval = "1000", condition = WeCommonRetryWhen.class)
 public interface WeMsgAuditClient {
 
     /**

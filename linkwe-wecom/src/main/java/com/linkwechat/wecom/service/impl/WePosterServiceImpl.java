@@ -7,6 +7,7 @@ import com.linkwechat.common.config.ServerConfig;
 import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.img.ImageUtils;
 import com.linkwechat.common.utils.img.NetFileUtils;
+import com.linkwechat.wecom.domain.WeMaterial;
 import com.linkwechat.wecom.domain.WePoster;
 import com.linkwechat.wecom.domain.WePosterFont;
 import com.linkwechat.wecom.domain.WePosterSubassembly;
@@ -16,6 +17,7 @@ import com.linkwechat.wecom.service.IWePosterFontService;
 import com.linkwechat.wecom.service.IWePosterService;
 import com.linkwechat.wecom.service.IWePosterSubassemblyService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -104,7 +106,6 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
     @Override
     public List<WePoster> list(Long categoryId, String name) {
         List<WePoster> fontList = this.lambdaQuery()
-                .eq(WePoster::getDelFlag, 0)
                 .eq(categoryId != null, WePoster::getCategoryId, categoryId)
                 .like(com.linkwechat.common.utils.StringUtils.isNotBlank(name), WePoster::getTitle, name)
                 .orderByDesc(WePoster::getCreateTime)
@@ -224,5 +225,10 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
             e.printStackTrace();
             throw new RuntimeException("图片生成错误");
         }
+    }
+
+    @Override
+    public List<WeMaterial> findWePosterToWeMaterial(String categoryId,String name) {
+        return this.baseMapper.findWePosterToWeMaterial(categoryId, name);
     }
 }

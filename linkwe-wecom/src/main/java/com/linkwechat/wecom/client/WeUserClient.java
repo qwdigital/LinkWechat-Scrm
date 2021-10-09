@@ -3,6 +3,8 @@ package com.linkwechat.wecom.client;
 import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.*;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
+import com.linkwechat.wecom.interceptor.WeAppAccessTokenInterceptor;
+import com.linkwechat.wecom.retry.WeCommonRetryWhen;
 
 /**
  * @description: 企业微信通讯录成员
@@ -10,6 +12,7 @@ import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
  * @create: 2020-08-27 16:42
  **/
 @BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
+@Retry(maxRetryCount = "3", maxRetryInterval = "1000", condition = WeCommonRetryWhen.class)
 public interface WeUserClient {
 
     /**
@@ -17,9 +20,7 @@ public interface WeUserClient {
      * @param weUserDto
      * @return
      */
-    @Request(url="/user/create",
-            type = "POST"
-    )
+    @Request(url="/user/create", type = "POST")
     WeResultDto createUser(@JSONBody WeUserDto weUserDto);
 
 
@@ -37,9 +38,7 @@ public interface WeUserClient {
      * @param weUserDto
      * @return
      */
-    @Request(url="/user/update",
-            type = "POST"
-    )
+    @Request(url="/user/update", type = "POST")
     WeResultDto updateUser(@JSONBody WeUserDto weUserDto);
 
 
@@ -66,9 +65,7 @@ public interface WeUserClient {
      * 分配客户
      * @return
      */
-    @Request(url="/externalcontact/transfer",
-            type = "POST"
-    )
+    @Request(url="/externalcontact/transfer", type = "POST")
     WeResultDto allocateCustomer(@JSONBody AllocateWeCustomerDto allocateWeCustomerDto);
 
 
@@ -76,9 +73,7 @@ public interface WeUserClient {
      * 分配成员群
      * @return
      */
-    @Request(url="/externalcontact/groupchat/transfer",
-            type = "POST"
-    )
+    @Request(url="/externalcontact/groupchat/transfer", type = "POST")
     WeResultDto allocateGroup(@JSONBody AllocateWeGroupDto allocateWeGroupDto);
 
 
@@ -86,10 +81,7 @@ public interface WeUserClient {
      * 获取离职员工列表
      * @return
      */
-    @Request(
-            url = "/externalcontact/get_unassigned_list",
-            type = "POST"
-    )
+    @Request(url = "/externalcontact/get_unassigned_list",type = "POST")
     LeaveWeUserListsDto  leaveWeUsers();
 
 
@@ -99,6 +91,6 @@ public interface WeUserClient {
      * @param agentId 应用的id,请求头中
      * @return
      */
-    @Request(url = "/user/getuserinfo")
+    @Request(url = "/user/getuserinfo",interceptor = WeAppAccessTokenInterceptor.class)
     WeUserInfoDto  getUserInfo(@Query("code")String code,@Header("agentId")String agentId);
 }

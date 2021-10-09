@@ -63,9 +63,6 @@ public class WeSensitiveServiceImpl implements IWeSensitiveService {
     @Autowired
     private WeChatContactSensitiveMsgMapper weChatContactSensitiveMsgMapper;
 
-    @Value("${wecome.chatKey}")
-    private String chartKey;
-
     /**
      * 查询敏感词设置
      *
