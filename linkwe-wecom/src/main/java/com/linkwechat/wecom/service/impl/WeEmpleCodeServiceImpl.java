@@ -169,6 +169,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateWeEmpleCode(WeEmpleCode weEmpleCode) {
+        weEmpleCode.setState(String.valueOf(weEmpleCode.getId()));
         WeExternalContactDto.WeContactWay weContactWay = getWeContactWay(weEmpleCode);
         try {
             weExternalContactClient.updateContactWay(weContactWay);
@@ -399,7 +400,9 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
      */
     public WeExternalContactDto getQrCode(WeExternalContactDto.WeContactWay weContactWay) {
         try {
-            return weExternalContactClient.addContactWay(weContactWay);
+            return StringUtils.isNotEmpty(weContactWay.getConfig_id())?
+                    weExternalContactClient.updateContactWay(weContactWay):
+                    weExternalContactClient.addContactWay(weContactWay);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -419,7 +422,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         weContactWay.setType(weEmpleCode.getCodeType());
         weContactWay.setScene(WeConstans.QR_CODE_EMPLE_CODE_SCENE);
         weContactWay.setSkip_verify(weEmpleCode.getIsJoinConfirmFriends().equals(new Integer(0))?false:true);
-        weContactWay.setState(weEmpleCode.getState());
+        weContactWay.setState(String.valueOf(weEmpleCode.getId()));
         if (CollectionUtil.isNotEmpty(weEmpleCodeUseScops)) {
             //员工列表
             String[] userIdArr = weEmpleCodeUseScops.stream().filter(itme ->
