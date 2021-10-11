@@ -28,22 +28,10 @@
           <div class="name pd15">{{ talkName }}</div>
           <el-tabs v-model="activeName" @tab-click="tabClick(true)">
             <el-tab-pane label="内部联系人" name="0">
-              <userList
-                v-if="activeName == 0"
-                :personList="personList"
-                :loading="loading"
-                @chatFn="chatFn"
-              >
-              </userList>
+              <userList v-if="activeName == 0" :personList="personList" :loading="loading" @chatFn="chatFn"> </userList>
             </el-tab-pane>
             <el-tab-pane label="外部联系人" name="1">
-              <userList
-                v-if="activeName == 1"
-                :personList="personList"
-                :loading="loading"
-                @chatFn="chatFn"
-              >
-              </userList>
+              <userList v-if="activeName == 1" :personList="personList" :loading="loading" @chatFn="chatFn"> </userList>
             </el-tab-pane>
             <el-tab-pane label="群聊" name="2">
               <grouplist
@@ -61,16 +49,9 @@
         <el-empty v-else :image-size="100" description="请选择员工"></el-empty>
       </el-col>
       <el-col :span="12">
-        <chatListClass
-          v-show="queryChat.receiveName"
-          :queryChat="queryChat"
-        ></chatListClass>
+        <chatListClass v-show="queryChat.receiveName" :queryChat="queryChat"></chatListClass>
 
-        <el-empty
-          v-if="!queryChat.receiveName"
-          description="请选择联系人"
-          :image-size="100"
-        ></el-empty>
+        <el-empty v-if="!queryChat.receiveName" description="请选择联系人" :image-size="100"></el-empty>
       </el-col>
     </el-row>
   </div>
@@ -134,7 +115,7 @@ export default {
     getTree() {
       apiOrg.getTree().then(({ data }) => {
         this.treeData = this.handleTree(data)
-        this.handleNodeClick(this.treeData[0], true)
+        // this.handleNodeClick(this.treeData[0], true)
       })
     },
     tabClick(flag) {
@@ -184,6 +165,7 @@ export default {
     },
 
     handleNodeClick(data, add) {
+      debugger
       if (!data.userId) {
         let querys = {
           pageNum: '1',
@@ -191,9 +173,11 @@ export default {
           department: data.id
         }
         apiOrg.getList(querys).then(({ rows }) => {
-          this.$set(data, 'children', [])
+          if (!data.children) {
+            this.$set(data, 'children', [])
+          }
 
-          data.children = rows
+          data.children.push(...rows)
         })
       } else {
         this.talkName = data.name
