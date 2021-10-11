@@ -205,6 +205,7 @@ export default {
       }
     },
     handleNodeClick(data, add) {
+      debugger
       if (!data.userId) {
       } else {
         this.talkName = data.name
