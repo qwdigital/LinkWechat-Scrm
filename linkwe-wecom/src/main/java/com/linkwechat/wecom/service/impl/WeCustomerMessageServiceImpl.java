@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ArrayUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -106,6 +108,7 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
             List<String> externalUserIds = customers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
 
             messagePushDto.setExternal_userid(externalUserIds);
+            messagePushDto.setSender(customerMessagePushDto.getStaffId());
             childMessage(messagePushDto, customerMessagePushDto);
             SendMessageResultDto sendMessageResultDto = weCustomerMessagePushClient.sendCustomerMessageToUser(messagePushDto);
             if (WeConstans.WE_SUCCESS_CODE.equals(sendMessageResultDto.getErrcode())) {

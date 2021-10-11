@@ -25,7 +25,7 @@ public interface WeCustomerMessagePushClient {
     @Request(url = "/externalcontact/add_msg_template",
             type = "POST"
     )
-    SendMessageResultDto sendCustomerMessageToUser(@Body WeCustomerMessagePushDto customerMessagePushDto);
+    SendMessageResultDto sendCustomerMessageToUser(@JSONBody WeCustomerMessagePushDto customerMessagePushDto);
 
     /**
      * 获取企业群发消息发送结果
@@ -36,7 +36,7 @@ public interface WeCustomerMessagePushClient {
     @Request(url = "/externalcontact/get_group_msg_result",
             type = "POST"
     )
-    QueryCustomerMessageStatusResultDto queryCustomerMessageStatus(@Body QueryCustomerMessageStatusResultDataObjectDto queryCustomerMessageStatusResultDataObjectDto);
+    QueryCustomerMessageStatusResultDto queryCustomerMessageStatus(@JSONBody QueryCustomerMessageStatusResultDataObjectDto queryCustomerMessageStatusResultDataObjectDto);
 
 
 

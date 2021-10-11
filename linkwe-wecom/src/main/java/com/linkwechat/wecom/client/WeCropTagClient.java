@@ -43,7 +43,7 @@ public interface WeCropTagClient {
     @Request(url = "/externalcontact/get_corp_tag_list",
             type = "POST"
     )
-    WeCropGroupTagListDto getCorpTagListByTagIds(@Body WeFindCropTagParam weFindCropTagParam);
+    WeCropGroupTagListDto getCorpTagListByTagIds(@JSONBody WeFindCropTagParam weFindCropTagParam);
 
 
     /**
