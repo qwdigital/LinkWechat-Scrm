@@ -13,13 +13,19 @@
           <el-tree
             ref="tree"
             class="filter-tree"
-            :data="treeData"
             :props="defaultProps"
             :filter-node-method="filterNode"
             highlight-current
+            node-key="id"
             @node-click="handleNodeClick"
-            :default-expand-all="true"
+            :default-expanded-keys="defaultExpandedKeys"
+            :load="loadNode"
+            lazy
           >
+            <!--
+            :data="treeData"
+            :default-expand-all="true"
+               :expand-on-click-node="false" -->
           </el-tree>
         </div>
       </el-col>
@@ -28,22 +34,10 @@
           <div class="name pd15">{{ talkName }}</div>
           <el-tabs v-model="activeName" @tab-click="tabClick(true)">
             <el-tab-pane label="内部联系人" name="0">
-              <userList
-                v-if="activeName == 0"
-                :personList="personList"
-                :loading="loading"
-                @chatFn="chatFn"
-              >
-              </userList>
+              <userList v-if="activeName == 0" :personList="personList" :loading="loading" @chatFn="chatFn"> </userList>
             </el-tab-pane>
             <el-tab-pane label="外部联系人" name="1">
-              <userList
-                v-if="activeName == 1"
-                :personList="personList"
-                :loading="loading"
-                @chatFn="chatFn"
-              >
-              </userList>
+              <userList v-if="activeName == 1" :personList="personList" :loading="loading" @chatFn="chatFn"> </userList>
             </el-tab-pane>
             <el-tab-pane label="群聊" name="2">
               <grouplist
@@ -61,16 +55,9 @@
         <el-empty v-else :image-size="100" description="请选择员工"></el-empty>
       </el-col>
       <el-col :span="12">
-        <chatListClass
-          v-show="queryChat.receiveName"
-          :queryChat="queryChat"
-        ></chatListClass>
+        <chatListClass v-show="queryChat.receiveName" :queryChat="queryChat"></chatListClass>
 
-        <el-empty
-          v-if="!queryChat.receiveName"
-          description="请选择联系人"
-          :image-size="100"
-        ></el-empty>
+        <el-empty v-if="!queryChat.receiveName" description="请选择联系人" :image-size="100"></el-empty>
       </el-col>
     </el-row>
   </div>
@@ -94,10 +81,12 @@ export default {
       fromId: '',
       // employName: '',
       talkName: '',
-      treeData: [],
+      // treeData: [],
+      defaultExpandedKeys: [],
       defaultProps: {
         label: 'name',
-        children: 'children'
+        children: 'children',
+        isLeaf: 'isLeaf'
       },
       activeName: '0',
       chat: {},
@@ -113,7 +102,7 @@ export default {
     // }
   },
   mounted() {
-    this.getTree()
+    // this.getTree()
     //this.getAmount()
   },
   methods: {
@@ -131,12 +120,12 @@ export default {
         roomId: data.receiver
       }
     },
-    getTree() {
-      apiOrg.getTree().then(({ data }) => {
-        this.treeData = this.handleTree(data)
-        this.handleNodeClick(this.treeData[0], true)
-      })
-    },
+    // getTree() {
+    //   apiOrg.getTree().then(({ data }) => {
+    //     let treeData = (this.treeData = this.handleTree(data))
+    //     this.handleNodeClick(this.treeData[0], true)
+    //   })
+    // },
     tabClick(flag) {
       this.personList = []
       if (!this.fromId) {
@@ -182,19 +171,41 @@ export default {
       if (!value) return true
       return data.name.indexOf(value) !== -1
     },
+    loadNode(node, resolve) {
+      if (node.level == 0) {
+        apiOrg.getTree().then(({ data }) => {
+          let treeData = this.handleTree(data)
+          // this.handleNodeClick(this.treeData[0], true)
+          treeData[0] && (this.defaultExpandedKeys = [treeData[0].id])
+          resolve(treeData)
+        })
+      } else {
+        if (node.data.userId) {
+          resolve([])
+        } else {
+          let querys = {
+            pageNum: '1',
+            pageSize: '999',
+            isActivate: '',
+            department: node.data.id
+          }
+          apiOrg.getList(querys).then(({ rows }) => {
+            // if (!data.children) {
+            //   this.$set(data, 'children', [])
+            // }
 
+            // data.children.push(...rows)
+            let arr = node.data.children ? node.data.children.concat(rows || []) : rows || []
+            arr.forEach((element) => {
+              element.isLeaf = !!element.userId
+            })
+            resolve(arr)
+          })
+        }
+      }
+    },
     handleNodeClick(data, add) {
       if (!data.userId) {
-        let querys = {
-          pageNum: '1',
-          pageSize: '999',
-          department: data.id
-        }
-        apiOrg.getList(querys).then(({ rows }) => {
-          this.$set(data, 'children', [])
-
-          data.children = rows
-        })
       } else {
         this.talkName = data.name
         this.fromId = data.userId
