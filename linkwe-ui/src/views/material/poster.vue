@@ -1,34 +1,29 @@
 <script>
-import {
-  getPosterInfo,
-  addPoster,
-  updatePoster,
-  removePoster,
-} from '@/api/material/poster.js'
+import { getPosterInfo, addPoster, updatePoster, removePoster } from '@/api/material/poster.js'
 import MaPage from '@/views/material/components/MaPage'
 import SelectMaterial from '@/components/SelectMaterial'
 // Load Style Code
-import "tui-image-editor/dist/tui-image-editor.css";
-import "tui-color-picker/dist/tui-color-picker.css";
+import 'tui-image-editor/dist/tui-image-editor.css'
+import 'tui-color-picker/dist/tui-color-picker.css'
 
-import PosterPage from "./components/PosterPage.vue";
-import bgpng from "@/assets/poster/img/bg.png";
+import PosterPage from './components/PosterPage.vue'
+import bgpng from '@/assets/poster/img/bg.png'
 
 var locale_ru_RU = {
-  "DeleteAll": "全部清空",
-  "Delete": "删除元素",
-  "Undo": "后退",
-  "Redo": "前进"
-};
+  DeleteAll: '全部清空',
+  Delete: '删除元素',
+  Undo: '后退',
+  Redo: '前进'
+}
 
 export default {
   name: 'Poster',
-  components: { 
+  components: {
     MaPage,
     SelectMaterial,
-    "tui-image-editor": PosterPage
+    'tui-image-editor': PosterPage
   },
-  data () {
+  data() {
     return {
       imgList: {},
       posterSubassemblyList: [],
@@ -51,7 +46,7 @@ export default {
         // sort: '', // 海报排序
         // jump: [], // 跳转页面
         delFlag: 0, // 是否启用
-        mediaId: '', // 图片id
+        mediaId: '' // 图片id
       },
       rules: {
         title: {
@@ -84,19 +79,19 @@ export default {
           //   path: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F171%2F106%2F1472%2F95744001.jpg&refer=http%3A%2F%2Fimg1.gtimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1612444990&t=6589254fe9669cc6a45fd3688f269612',
           //   name: "posterImage"
           // },
-          uiSize: {       
-              height: '700px' // 设置固定高度
+          uiSize: {
+            height: '700px' // 设置固定高度
           },
           usageStatistics: false,
-          menuBarPosition: "right",
-          menu: ['text'],  // FIXME 因为借用了CANVAS的UI  所以需要使用TEXT，需要额外注释,后面创建自己的UI在去掉
+          menuBarPosition: 'right',
+          menu: ['text'], // FIXME 因为借用了CANVAS的UI  所以需要使用TEXT，需要额外注释,后面创建自己的UI在去掉
           theme: {
-            "common.bi.image": "",
-            "common.bisize.width": "251px",
-            "common.bisize.height": "21px",
-            "common.backgroundImage": bgpng,
-            "common.backgroundColor": "#fff",
-            "common.border": "1px solid #c1c1c1",
+            'common.bi.image': '',
+            'common.bisize.width': '251px',
+            'common.bisize.height': '21px',
+            'common.backgroundImage': bgpng,
+            'common.backgroundColor': '#fff',
+            'common.border': '1px solid #c1c1c1',
 
             // header
             'header.backgroundImage': 'none',
@@ -127,7 +122,7 @@ export default {
 
             // colorpicker style
             'colorpicker.button.border': '1px solid #1e1e1e',
-            'colorpicker.title.color': '#fff',
+            'colorpicker.title.color': '#fff'
           }
           // {
           //   "common.bi.image": "",
@@ -151,35 +146,35 @@ export default {
     }
   },
   watch: {},
-  created () {
+  created() {
     console.log('created')
   },
   methods: {
-    listChange (data) {
+    listChange(data) {
       console.log('listChange', JSON.stringify(data))
       this.srcList = data.map((item) => item.materialUrl)
     },
-    preview (url) {
+    preview(url) {
       console.log(url)
       console.log('preview', url)
       this.previewImg = url || ''
       this.dialog.preview = true
     },
-    async edit (item) {
+    async edit(item) {
       console.log('edit!!!!!!!')
       try {
         const res = await getPosterInfo(item.id)
         const data = res.data || {}
-        console.log('getPosterInfo',data)
+        console.log('getPosterInfo', data)
         this.posterForm = {
           id: data.id,
           title: data.title,
           categoryId: data.categoryId,
           type: data.type,
-          delFlag: data.delFlag,
+          delFlag: data.delFlag
         }
-        this.posterSubassemblyList = [];
-        this.posterSubassemblyList = data.posterSubassemblyList || [];
+        this.posterSubassemblyList = []
+        this.posterSubassemblyList = data.posterSubassemblyList || []
         this.materialSelected = data.backgroundImgPath
         this.posterEdit.step = 0
         this.dialog.edit = true
@@ -187,17 +182,17 @@ export default {
         console.log(error)
       }
     },
-    ready () {
+    ready() {
       console.log('ready')
     },
     onAddText(pos) {
       this.$refs.tuiImageEditor.editorInstance
-      .addText('双击输入文字', {
-        position: pos.originPosition,
-      })
-      .then(function (objectProps) {
-        console.log(objectProps);
-      });
+        .addText('双击输入文字', {
+          position: pos.originPosition
+        })
+        .then(function(objectProps) {
+          console.log(objectProps)
+        })
     },
     //移动
     onObjectMoved(res) {
@@ -207,29 +202,29 @@ export default {
     //新增/选中
     objectActivated(obj) {
       console.log('objectActivated')
-      var imageEditor = this.$refs.tuiImageEditor;
-      imageEditor.activeObjectId = obj.id;
+      var imageEditor = this.$refs.tuiImageEditor
+      imageEditor.activeObjectId = obj.id
       if (obj.type === 'text') {
-        imageEditor.showSubMenu('text');
-        imageEditor.setTextToolbar(obj);
-        imageEditor.activateTextMode();
+        imageEditor.showSubMenu('text')
+        imageEditor.setTextToolbar(obj)
+        imageEditor.activateTextMode()
       }
     },
     //缩放
     onObjectScaled(obj) {
       console.log('onObjectScaled')
       if (obj.type === 'text') {
-        this.$refs.tuiImageEditor.inputFontSizeRange.setAttribute('value',obj.fontSize);        
+        this.$refs.tuiImageEditor.inputFontSizeRange.setAttribute('value', obj.fontSize)
       }
     },
     //重做
     onRedoStackChanged(length) {
       if (length) {
-        this.$refs.tuiImageEditor.btn_redo.remove('disabled');
+        this.$refs.tuiImageEditor.btn_redo.remove('disabled')
       } else {
-        this.$refs.tuiImageEditor.btn_redo.add('disabled');
+        this.$refs.tuiImageEditor.btn_redo.add('disabled')
       }
-      this.$refs.tuiImageEditor.resizeEditor();
+      this.$refs.tuiImageEditor.resizeEditor()
     },
     onUndoStackChanged(length) {
       if (length) {
@@ -237,40 +232,40 @@ export default {
       } else {
         this.$refs.tuiImageEditor.btn_undo.classList.add('disabled')
       }
-      this.$refs.tuiImageEditor.resizeEditor();
+      this.$refs.tuiImageEditor.resizeEditor()
     },
-    showSubMenu (type) {
+    showSubMenu(type) {
       switch (type) {
         case 'text':
-          document.getElementsByClassName('tui-image-editor-submenu')[0].display = 'block';
-          break;
+          document.getElementsByClassName('tui-image-editor-submenu')[0].display = 'block'
+          break
         default:
-          document.getElementsByClassName('tui-image-editor-submenu')[0].display = 'none';
+          document.getElementsByClassName('tui-image-editor-submenu')[0].display = 'none'
       }
     },
-    activateTextMode () {
-      let imageEditor = this.$refs.tuiImageEditor.editorInstance;
+    activateTextMode() {
+      let imageEditor = this.$refs.tuiImageEditor.editorInstance
       if (imageEditor.getDrawingMode() !== 'TEXT') {
-        imageEditor.stopDrawingMode();
-        imageEditor.startDrawingMode('TEXT');
+        imageEditor.stopDrawingMode()
+        imageEditor.startDrawingMode('TEXT')
       }
     },
-    checkState (obj) {
+    checkState(obj) {
       switch (obj.type) {
         case 'text':
-          this.showSubMenu('text');
-          this.activateTextMode();
-        break;
+          this.showSubMenu('text')
+          this.activateTextMode()
+          break
         default:
-          this.activateImageMode();
-        break;
+          this.activateImageMode()
+          break
       }
     },
-    activateImageMode () {
-      let imageEditor = this.$refs.tuiImageEditor.editorInstance;
-      imageEditor.stopDrawingMode();
+    activateImageMode() {
+      let imageEditor = this.$refs.tuiImageEditor.editorInstance
+      imageEditor.stopDrawingMode()
     },
-    toNextStep () {
+    toNextStep() {
       if (this.materialSelected === '') {
         this.rangeErrorMsg = '请选择背景图片'
         return
@@ -278,31 +273,31 @@ export default {
         this.rangeErrorMsg = ''
       }
       if (this.$refs.tuiImageEditor && this.$refs.tuiImageEditor.editorInstance) {
-        this.$refs.tuiImageEditor.editorInstance._invoker._redoStack = [];
-        this.$refs.tuiImageEditor.editorInstance._invoker._undoStack = [];
+        this.$refs.tuiImageEditor.editorInstance._invoker._redoStack = []
+        this.$refs.tuiImageEditor.editorInstance._invoker._undoStack = []
         this.$refs.tuiImageEditor.records = {}
-        this.imgList = {};
+        this.imgList = {}
       }
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.posterEdit.step = 1
-          this.$refs.tuiImageEditor.getBackgroundUrl(this.materialSelected, this.posterSubassemblyList);
+          this.$refs.tuiImageEditor.getBackgroundUrl(this.materialSelected, this.posterSubassemblyList)
         } else {
-          return false;
+          return false
         }
       })
     },
-    toPrevStep () {
+    toPrevStep() {
       this.posterEdit.step = 0
     },
-    beforeCloseDialog () {
+    beforeCloseDialog() {
       this.$refs.form.resetFields()
       this.posterForm.id = undefined
       this.dialog.edit = false
     },
-    remove (id) {
+    remove(id) {
       this.$confirm('是否确认删除吗?', '警告', {
-        type: 'warning',
+        type: 'warning'
       })
         .then(function() {
           return removePoster(id)
@@ -312,8 +307,8 @@ export default {
           this.msgSuccess('删除成功')
         })
     },
-    inputFontSizeRangeChange (e) {
-      this.$refs.tuiImageEditor.inputFontSizeRangeChange();
+    inputFontSizeRangeChange(e) {
+      this.$refs.tuiImageEditor.inputFontSizeRangeChange()
     },
     // getRecord(res){
     //   var flag = false;
@@ -360,17 +355,15 @@ export default {
     },
     //
     async save() {
-      let list =[];
-      let historys = [];
+      let list = []
+      let historys = []
       try {
-        let imageEditor = this.$refs.tuiImageEditor;
-        let deleteId = []; 
-        imageEditor.editorInstance._invoker._undoStack.forEach(element => {
-          if(element.name == "removeObject"){
+        let imageEditor = this.$refs.tuiImageEditor
+        let deleteId = []
+        imageEditor.editorInstance._invoker._undoStack.forEach((element) => {
+          if (element.name == 'removeObject') {
             deleteId.push(element.args[1])
-          } 
-          else 
-          {
+          } else {
             if (element.args[1] instanceof Array) {
               historys.push(element.args[1][0])
             } else {
@@ -378,75 +371,74 @@ export default {
             }
           }
         })
-        Object.values(imageEditor.records).forEach(item => {
-          if(deleteId.indexOf((item.id).toString())>=0){
-              console.log(" ")
-          }else{
+        Object.values(imageEditor.records).forEach((item) => {
+          if (deleteId.indexOf(item.id.toString()) >= 0) {
+            console.log(' ')
+          } else {
             list.push(item)
           }
-        });
-      
+        })
+
         // const image = this.$refs.tuiImageEditor.editorInstance.toDataURL();
         // res.url = image;
       } catch (error) {
         console.log(error)
       }
-      
-      // TODO 塞新建海报的数据 
-      let posterSubList = [];
-      let vo = null;
-      let i = 0, len = list.length;
+
+      // TODO 塞新建海报的数据
+      let posterSubList = []
+      let vo = null
+      let i = 0,
+        len = list.length
       while (i < len) {
-        vo = list[i];
+        vo = list[i]
         if (this.imgList[vo.id]) {
-          vo.objType =    this.imgList[vo.id].objType;
-          vo.url =        this.imgList[vo.id].url;
-          vo.randomId =   this.imgList[vo.id].randomId
+          vo.objType = this.imgList[vo.id].objType
+          vo.url = this.imgList[vo.id].url
+          vo.randomId = this.imgList[vo.id].randomId
         }
-        
-        let type = vo.type;
-        let isText = false;
+
+        let type = vo.type
+        let isText = false
         if (type === 'i-text' || type === 'text') {
           // 如果是文本需要对文字内容进行特殊处理
-          isText = true;
-          let targetData = this.getLastSelectData(vo.id, historys);
-          vo.text = targetData && targetData.text || vo.text || '';
+          isText = true
+          let targetData = this.getLastSelectData(vo.id, historys)
+          vo.text = (targetData && targetData.text) || vo.text || ''
 
           // 如果文本没有数据则移除
           if (!vo.text.length) {
-            i++;
-            continue;
+            i++
+            continue
           }
         }
 
-        let align = vo.textAlign && 
-                    (vo.textAlign === 'left' ? 1 : vo.textAlign === 'center' ? 2 : 3) 
-                    || 1; 
-        
+        let align = (vo.textAlign && (vo.textAlign === 'left' ? 1 : vo.textAlign === 'center' ? 2 : 3)) || 1
+
         let posData = {
-          id:           null,                     // 修改的时候后端默认没增删，沟通后让先传null
-          content:      vo.text || '',            // 文本内容 
-          delFlag:      0,                        // 1 启动  0 删除      FIXME 暂时写死
-          fontColor:    vo.fill || '#000000',
-          fontId:       null,                     // TODO 后端让传NULL  isText ? i : null,   // 字体ID   与imgPath互斥
-          fontSize:     parseInt(vo.fontSize),
-          fontTextAlign: align,                   // 1 2 3  left center right
-          left:         parseInt(vo.left) - (isText ? 0 : vo.width >> 1),   //  FIXME：显示偏移了
-          top:          parseInt(vo.top) - (isText ? 0 : vo.height >> 1),
-          width:        parseInt(vo.width + (isText ? vo.fontSize / 2 : 0)),
-          height:       parseInt(vo.height),
-          imgPath:      vo.url || '',
-          posterId:     null,
-          type:         isText ? 1 : vo.objType,  // 1 固定文本 2 固定图片 3 二维码图片
+          id: null, // 修改的时候后端默认没增删，沟通后让先传null
+          content: vo.text || '', // 文本内容
+          delFlag: 0, // 1 启动  0 删除      FIXME 暂时写死
+          fontColor: vo.fill || '#000000',
+          fontId: null, // TODO 后端让传NULL  isText ? i : null,   // 字体ID   与imgPath互斥
+          fontSize: parseInt(vo.fontSize),
+          fontTextAlign: align, // 1 2 3  left center right
+          left: parseInt(vo.left) - (isText ? 0 : vo.width >> 1), //  FIXME：显示偏移了
+          top: parseInt(vo.top) - (isText ? 0 : vo.height >> 1),
+          width: parseInt(vo.width + (isText ? vo.fontSize / 2 : 0)),
+          height: parseInt(vo.height),
+          imgPath: vo.url || '',
+          posterId: null,
+          type: isText ? 1 : vo.objType, // 1 固定文本 2 固定图片 3 二维码图片
           // alpha: vo.opacity,                   // 后端暂时不支持
-          fontStyle:    (vo.italic && vo.bold) ? 3 : vo.italic ? 2 : vo.bold ? 1 : 0, // 0 通常 1 粗体 2 斜体 3 粗 + 斜
-          rotate:       vo.angle,
-          order:        i,                        // 层级
+          fontStyle: vo.italic && vo.bold ? 3 : vo.italic ? 2 : vo.bold ? 1 : 0, // 0 通常 1 粗体 2 斜体 3 粗 + 斜
+          rotate: vo.angle,
+          order: i, // 层级
           // categoryId: 0,                       // 分类ID (不需要传了)
-          verticalType: 2                         // 居中方式后端让写死2
-        };
-        posterSubList.push(posData);
-        i++;
+          verticalType: 2 // 居中方式后端让写死2
+        }
+        posterSubList.push(posData)
+        i++
       }
 
       const posterForm = this.posterForm
@@ -454,17 +446,29 @@ export default {
       let res = {}
       if (posterForm.id) {
         // 编辑海报
-        res = await updatePoster(Object.assign({}, {
-          // backgroundImgPath: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg',
-          backgroundImgPath: this.materialSelected,
-          posterSubassemblyList: posterSubList
-        }, this.posterForm))
+        res = await updatePoster(
+          Object.assign(
+            {},
+            {
+              // backgroundImgPath: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg',
+              backgroundImgPath: this.materialSelected,
+              posterSubassemblyList: posterSubList
+            },
+            this.posterForm
+          )
+        )
       } else {
         // 新建海报
-        res = await addPoster(Object.assign({}, {
-          backgroundImgPath: this.materialSelected,
-          posterSubassemblyList: posterSubList
-        }, this.posterForm))
+        res = await addPoster(
+          Object.assign(
+            {},
+            {
+              backgroundImgPath: this.materialSelected,
+              posterSubassemblyList: posterSubList
+            },
+            this.posterForm
+          )
+        )
       }
       if (res.code === 200) {
         this.msgSuccess(res.msg)
@@ -472,105 +476,62 @@ export default {
         this.beforeCloseDialog()
       }
     },
-    getLastSelectData (id, arr) {
-      let index = arr.length - 1, len = 0;
-      let selectData = null;
+    getLastSelectData(id, arr) {
+      let index = arr.length - 1,
+        len = 0
+      let selectData = null
       try {
         while (index >= len) {
           // 类型转换对比
           if (arr[index].id == id) {
-            selectData = arr[index];
-            break;
+            selectData = arr[index]
+            break
           }
-          index --;
+          index--
         }
-      }catch (e) {
+      } catch (e) {
         console.log('getLastSelectData 循环出错')
       }
-      
-      return selectData;
+
+      return selectData
     }
   }
 }
 </script>
 
 <template>
-<div>
-  <MaPage
-    ref="page"
-    type="5"
-    @listChange="listChange"
-    :selected="ids"
-    v-slot="{ list }"
-  >
-    <el-row :gutter="20">
-      <el-col
-        :span="6"
-        style="margin-bottom: 24px; min-width: 220px"
-        v-for="(item, index) in list"
-        :key="index"
-      >
-        <el-card shadow="hover" body-style="padding: 0px;">
-          <div class="img-wrap">
-            <el-image
-              class="poster-img"
-              :src="item.materialUrl"
-              fit="contain"
-            ></el-image>
-            <div class="actions">
-              <el-tag
-                class="actions-btn"
-                type="success"
-                size="mini"
-                effect="dark"
-                @click="preview(item.materialUrl)"
-                >预览</el-tag
-              >
-              <el-tag
-                class="actions-btn"
-                type="success"
-                size="mini"
-                effect="dark"
-                @click="edit(item)"
-                >编辑</el-tag
-              >
-              <el-tag
-                class="actions-btn"
-                type="success"
-                size="mini"
-                effect="dark"
-                @click="remove(item.id)"
-                >删除</el-tag
-              >
+  <div>
+    <MaPage ref="page" type="5" @listChange="listChange" :selected="ids" v-slot="{ list }">
+      <el-row :gutter="20">
+        <el-col :span="6" style="margin-bottom: 24px; min-width: 220px" v-for="(item, index) in list" :key="index">
+          <el-card shadow="hover" body-style="padding: 0px;">
+            <div class="img-wrap">
+              <el-image class="poster-img" :src="item.materialUrl" fit="contain"></el-image>
+              <div class="actions">
+                <el-tag class="actions-btn" type="success" size="mini" effect="dark" @click="preview(item.materialUrl)"
+                  >预览</el-tag
+                >
+                <el-tag class="actions-btn" type="success" size="mini" effect="dark" @click="edit(item)">编辑</el-tag>
+                <el-tag class="actions-btn" type="success" size="mini" effect="dark" @click="remove(item.id)"
+                  >删除</el-tag
+                >
+              </div>
             </div>
-          </div>
-          <div style="padding: 14px">
-            <el-checkbox v-model="ids" :label="item.id">{{
-              item.materialName
-            }}</el-checkbox>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
+            <div style="padding: 14px">
+              <el-checkbox v-model="ids" :label="item.id">{{ item.materialName }}</el-checkbox>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
 
-    <el-dialog title="海报预览" width="30%" :visible.sync="dialog.preview">
-       <img class="preview-img" :src="previewImg" />
-    </el-dialog>
-    <el-dialog title="海报编辑" width="80%" :visible.sync="dialog.edit" :before-close="beforeCloseDialog">
-      <div class="poster-edit-dialog">
-        <el-steps :active="posterEdit.step" simple finish-status="success">
-          <el-step title="基本信息编辑"></el-step>
-          <el-step title="界面元素及内容编辑"></el-step>
-        </el-steps>
-        <br />
-        <div v-show="posterEdit.step === 0">
+      <el-dialog title="海报预览" width="30%" :visible.sync="dialog.preview">
+        <img class="preview-img" :src="previewImg" />
+      </el-dialog>
+      <el-dialog title="海报编辑" width="50%" :visible.sync="dialog.edit" :before-close="beforeCloseDialog">
+        <div class="poster-edit-dialog">
           <el-form ref="form" :rules="rules" :model="posterForm" label-width="120px">
             <el-form-item label="海报名称" prop="title">
-              <el-input
-                v-model="posterForm.title"
-                maxlength="10"
-                show-word-limit
-              ></el-input>
+              <el-input v-model="posterForm.title" maxlength="10" show-word-limit></el-input>
             </el-form-item>
             <el-form-item label="所属分类" prop="categoryId">
               <el-cascader
@@ -638,77 +599,21 @@ export default {
                 </el-image>
                 <i class="el-icon-error" @click="removeMaterial"></i>
               </div>
-              <el-button
-                icon="el-icon-plus"
-                size="mini"
-                @click="dialogVisibleSelectMaterial = true"
-                >添加图片</el-button>
+              <el-button icon="el-icon-plus" size="mini" @click="dialogVisibleSelectMaterial = true"
+                >添加图片</el-button
+              >
             </el-form-item>
             <el-form-item>
-              <el-button type="success" @click="toNextStep"
-                >前往设计海报</el-button
-              >
+              <el-button type="success" @click="save">保存</el-button>
             </el-form-item>
           </el-form>
         </div>
-        <div v-show="posterEdit.step === 1">
-          <div class="imageEditorApp">
-            <tui-image-editor
-              ref="tuiImageEditor"
-              :include-ui="useDefaultUI"
-              :options="options"    
-              @getImageData="getImgData"
-            ></tui-image-editor>
-          </div>
-          <div id="tbody-containerui-image-editor-controls">
-            <ul class="menu">
-              <li class="menu-item" id="btn-text">添加自定义文本</li>
-              <li class="menu-item" id="btn-image">添加图片</li>
-              <li class="menu-item" id="btn-qrCode">添加二维码</li>
-              <!-- <li class="menu-item" id="btn-nickName">添加客户昵称</li> -->
-            </ul>
-            <div class="sub-menu-container" id="text-sub-menu">
-              <ul class="menu">
-                <li class="menu-item">
-                  <div>
-                    <button class="btn-text-style" data-style-type="b">Bold</button>
-                    <button class="btn-text-style" data-style-type="i">Italic</button>
-                    <button class="btn-text-style" data-style-type="u">Underline</button>
-                  </div>
-                  <div>
-                    <button class="btn-text-style" data-style-type="l">Left</button>
-                    <button class="btn-text-style" data-style-type="c">Center</button>
-                    <button class="btn-text-style" data-style-type="r">Right</button>
-                  </div>
-                </li>
-                <li class="menu-item">
-                  <label class="no-pointer">
-                    <input id="input-font-size-range" @change="inputFontSizeRangeChange($event)" type="range" min="10" max="100" value="40" />
-                  </label>
-                </li>
-                <li class="menu-item">
-                  <div id="tui-text-color-picker">Text color</div>
-                </li>
-                <li class="menu-item close">Close</li>
-              </ul>
-            </div>
-          </div>
-          <el-button type="success" @click="save"
-            >保存</el-button>
-          <el-button @click="toPrevStep">返回上一步</el-button>
-        </div>
-      </div>
-    </el-dialog>
-  </MaPage>
-  <!-- 选择素材弹窗 -->
-  <SelectMaterial
-    :visible.sync="dialogVisibleSelectMaterial"
-    type="1"
-    :showArr="[1]"
-    @success="submitSelectMaterial"
-  >
-  </SelectMaterial>
-</div>
+      </el-dialog>
+    </MaPage>
+    <!-- 选择素材弹窗 -->
+    <SelectMaterial :visible.sync="dialogVisibleSelectMaterial" type="1" :showArr="[1]" @success="submitSelectMaterial">
+    </SelectMaterial>
+  </div>
 </template>
 
 <style lang="scss" scoped>

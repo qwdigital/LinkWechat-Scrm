@@ -36,26 +36,17 @@ export default {
         rewardRule: ''
       },
       rewardImageUrlTemp: '',
-      action:
-        process.env.VUE_APP_BASE_API +
-        window.CONFIG.services.wecom +
-        '/fission/upload',
+      action: process.env.VUE_APP_BASE_API + window.CONFIG.services.wecom + '/fission/upload',
       headers: window.CONFIG.headers,
       ruleForm: {
-        taskName: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' }
-        ],
+        taskName: [{ required: true, message: '请输入活动名称', trigger: 'blur' }],
         postersId: [{ required: true, message: '请输入海报', trigger: 'blur' }],
-        fissionTargetId: [
-          { required: true, message: '请选择员工', trigger: 'blur' }
-        ],
+        fissionTargetId: [{ required: true, message: '请选择员工', trigger: 'blur' }],
         fissNum: [
           { required: true, message: '请输入数量', trigger: 'blur' },
           { pattern: /^[1-9]+$/, message: '请输入数字', trigger: 'blur' }
         ],
-        dateRange: [
-          { required: true, message: '时间不可为空', trigger: 'blur' }
-        ]
+        dateRange: [{ required: true, message: '时间不可为空', trigger: 'blur' }]
       },
       dialogVisibleSelectUser: false,
       dialogVisibleSelectTag: false,
@@ -168,27 +159,14 @@ export default {
           taskName: res.data.taskName,
           fissInfo: res.data.fissInfo,
           fissNum: res.data.fissNum,
-          dateRange: [
-            res.data.startTime + ' 00:00:00',
-            res.data.overTime + ' 00:00:00'
-          ]
+          dateRange: [res.data.startTime + ' 00:00:00', res.data.overTime + ' 00:00:00']
         }
         this.query = query
         this.groupForm = {
           taskFissionStaffs: res.data.taskFissionStaffs,
-          sendType:
-            res.data.taskFissionStaffs.length &&
-            res.data.taskFissionStaffs[0].staffId
-              ? 1
-              : 0,
-          customerTag:
-            res.data.customerTagId == 'all'
-              ? ''
-              : res.data.customerTag.split(','),
-          customerTagId:
-            res.data.customerTagId == 'all'
-              ? 'all'
-              : res.data.customerTagId.split(','),
+          sendType: res.data.taskFissionStaffs.length && res.data.taskFissionStaffs[0].staffId ? 1 : 0,
+          customerTag: res.data.customerTagId == 'all' ? '' : res.data.customerTag.split(','),
+          customerTagId: res.data.customerTagId == 'all' ? 'all' : res.data.customerTagId.split(','),
           tagType: res.data.customerTagId == 'all' ? 0 : 1,
           postersId: res.data.postersId,
           postersUrl: res.data.postersUrl,
@@ -245,8 +223,7 @@ export default {
     },
     handleAvatarSuccess(res, file) {
       //   this.rewardImageUrlTemp = URL.createObjectURL(file.raw) //预览
-      this.rewardImageUrlTemp = this.groupForm.rewardImageUrl =
-        res.data.rewardImageUrl
+      this.rewardImageUrlTemp = this.groupForm.rewardImageUrl = res.data.rewardImageUrl
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === 'image/jpeg'
@@ -278,11 +255,7 @@ export default {
           <el-input v-model="query.taskName" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="裂变引导语" prop="fissInfo">
-          <el-input
-            v-model="query.fissInfo"
-            placeholder="请输入裂变引导语(最多255字)"
-            maxlength="255"
-          ></el-input>
+          <el-input v-model="query.fissInfo" placeholder="请输入裂变引导语(最多255字)" maxlength="255"></el-input>
         </el-form-item>
         <el-form-item label="裂变客户数量" prop="fissNum">
           <el-input v-model="query.fissNum"></el-input>
@@ -316,11 +289,7 @@ export default {
             <el-radio :label="1">选择成员</el-radio>
           </el-radio-group>
           <div v-if="groupForm.sendType">
-            <el-tag
-              v-for="item in groupForm.taskFissionStaffs"
-              :key="item.staffId"
-              >{{ item.staffName }}</el-tag
-            >
+            <el-tag v-for="item in groupForm.taskFissionStaffs" :key="item.staffId">{{ item.staffName }}</el-tag>
           </div>
         </el-form-item>
         <el-form-item label="" v-if="groupForm.sendType">
@@ -340,9 +309,7 @@ export default {
             <el-radio :label="1">选择标签</el-radio>
           </el-radio-group>
           <div v-if="groupForm.tagType">
-            <el-tag v-for="item in groupForm.customerTag" :key="item">{{
-              item
-            }}</el-tag>
+            <el-tag v-for="item in groupForm.customerTag" :key="item">{{ item }}</el-tag>
           </div>
         </el-form-item>
         <el-form-item label="" v-if="groupForm.tagType">
@@ -381,9 +348,7 @@ export default {
           >
           <div v-if="groupForm.postersId" class="changePosterBody">
             <img :src="groupForm.postersUrl" class="postersUrl" />
-            <span class="changeUrl" @click="dialogVisibleSelectPoster = true"
-              >修改</span
-            >
+            <span class="changeUrl" @click="dialogVisibleSelectPoster = true">修改</span>
           </div>
         </el-form-item>
 
@@ -400,30 +365,19 @@ export default {
           >
           <div v-if="groupForm.fissionTargetId" class="changePosterBody">
             <el-tag>{{ groupForm.fissionTarget }}</el-tag>
-            <span class="changeUrl" @click="dialogVisibleTargetStff = true"
-              >修改</span
-            >
+            <span class="changeUrl" @click="dialogVisibleTargetStff = true">修改</span>
           </div>
           <p class="targetTips">
-            选择员工，用于此次任务裂变的目标添加人。如不选择将默认使用本次活动下发员工的活码信息。
+            选择员工，用于此次任务裂变的目标添加人。如不选择将默认使用本次活动下发起员工的活码信息。
           </p>
         </el-form-item>
       </el-form>
     </div>
     <div class="edit-model">
       <h4 class="title">活动奖励</h4>
-      <el-form
-        :model="groupForm"
-        ref="reward"
-        label-width="120px"
-        class="top-search"
-        labelPosition="left"
-      >
+      <el-form :model="groupForm" ref="reward" label-width="120px" class="top-search" labelPosition="left">
         <el-form-item label="兑奖链接" prop="rewardUrl">
-          <el-input
-            v-model="groupForm.rewardUrl"
-            placeholder="请输入"
-          ></el-input>
+          <el-input v-model="groupForm.rewardUrl" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="兑奖图片" prop="rewardImageUrl">
           <el-upload
@@ -434,11 +388,7 @@ export default {
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
           >
-            <img
-              v-if="rewardImageUrlTemp"
-              :src="rewardImageUrlTemp"
-              class="avatar"
-            />
+            <img v-if="rewardImageUrlTemp" :src="rewardImageUrlTemp" class="avatar" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
@@ -455,19 +405,9 @@ export default {
     </div>
     <div class="edit-model">
       <h4 class="title">新客欢迎语</h4>
-      <el-form
-        :model="groupForm"
-        ref="welcomeTips"
-        label-width="150px"
-        class="top-search"
-      >
+      <el-form :model="groupForm" ref="welcomeTips" label-width="150px" class="top-search">
         <div class="welcomeBox">
-          <el-input
-            type="textarea"
-            style="border:none;resize:none"
-            v-model="groupForm.welcomeMsg"
-          >
-          </el-input>
+          <el-input type="textarea" style="border:none;resize:none" v-model="groupForm.welcomeMsg"> </el-input>
           <div class="insertCustomer" @click="insertCustomer">
             <i class="el-icon-user-solid"></i>
             插入客户
@@ -475,9 +415,7 @@ export default {
         </div>
       </el-form>
     </div>
-    <el-button type="primary" @click="submitForm()">{{
-      pageType == 'edit' ? '立即修改' : '立即创建'
-    }}</el-button>
+    <el-button type="primary" @click="submitForm()">{{ pageType == 'edit' ? '立即修改' : '立即创建' }}</el-button>
 
     <!-- 选择使用员工弹窗 -->
     <SelectUser
@@ -489,17 +427,9 @@ export default {
       @success="selectedUser"
     ></SelectUser>
     <!-- 选择标签弹窗 -->
-    <SelectTag
-      :visible.sync="dialogVisibleSelectTag"
-      :selected="groupForm.toTag"
-      @success="submitSelectTag"
-    >
+    <SelectTag :visible.sync="dialogVisibleSelectTag" :selected="groupForm.toTag" @success="submitSelectTag">
     </SelectTag>
-    <SelectPoster
-      :visible.sync="dialogVisibleSelectPoster"
-      :selected="groupForm.toTag"
-      @success="submitSelecPoster"
-    >
+    <SelectPoster :visible.sync="dialogVisibleSelectPoster" :selected="groupForm.toTag" @success="submitSelecPoster">
     </SelectPoster>
     <TargetSelectUser
       key="1"
