@@ -141,7 +141,6 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="codeType != null">code_type,</if>
-            <if test="skipVerify != null">skip_verify,</if>
             <if test="scenario != null">scenario,</if>
             <if test="welcomeMsg != null">welcome_msg,</if>
             <if test="createBy != null">create_by,</if>
@@ -156,7 +155,6 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
             <if test="codeType != null">#{codeType},</if>
-            <if test="skipVerify != null">#{skipVerify},</if>
             <if test="scenario != null">#{scenario},</if>
             <if test="welcomeMsg != null">#{welcomeMsg},</if>
             <if test="createBy != null">#{createBy},</if>

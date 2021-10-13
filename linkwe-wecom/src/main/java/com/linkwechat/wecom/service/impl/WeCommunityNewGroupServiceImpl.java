@@ -84,7 +84,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         weEmpleCode.setQrCode(weExternalContactDto.getQr_code());
 
         // 保存员工活码信息
-        if (weEmpleCodeMapper.insertWeEmpleCode(weEmpleCode) > 0) {
+        if (weEmpleCodeMapper.insert(weEmpleCode) > 0) {
 
             if (StringUtils.isNotEmpty(weEmpleCode.getWeEmpleCodeTags())) {
                 // 批量保存员工活码标签

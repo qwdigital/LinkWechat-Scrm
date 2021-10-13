@@ -225,7 +225,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             List<Long> weFlowerCustomerRelIds = oldWeFlowerCustomerRels.stream().map(WeFlowerCustomerRel::getId).collect(Collectors.toList());
             iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
                     .in(WeFlowerCustomerTagRel::getFlowerCustomerRelId, weFlowerCustomerRelIds)
-                    .ne(WeFlowerCustomerTagRel::getRelTagType,new Integer(1))
             );
             iWeFlowerCustomerRelService.removeByIds(weFlowerCustomerRelIds);
         }
@@ -472,10 +471,26 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             List<WeFlowerCustomerTagRel> tagRels = new ArrayList<>();
 
 
-            iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
-                    .eq(WeFlowerCustomerTagRel::getExternalUserid,weMakeCustomerTag.getExternalUserid())
-                    .eq(WeFlowerCustomerTagRel::getRelTagType,new Integer(1))
-            );
+            List<WeFlowerCustomerTagRel> tagRelList = iWeFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                    .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid())
+                    .eq(WeFlowerCustomerTagRel::getUserId,weMakeCustomerTag.getUserId()));
+
+            CutomerTagEdit cutomerTagEdit = CutomerTagEdit.builder()
+                    .userid(weMakeCustomerTag.getUserId())
+                    .external_userid(weMakeCustomerTag.getExternalUserid())
+                    .add_tag(ArrayUtil.toArray(addTags.stream().map(WeTag::getTagId).collect(Collectors.toList()), String.class))
+                    .build();
+
+            if(CollectionUtil.isNotEmpty(tagRelList)){
+
+                cutomerTagEdit.setRemove_tag(ArrayUtil.toArray(tagRelList.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList())
+                ,String.class));
+
+                iWeFlowerCustomerTagRelService.removeByIds(
+                        tagRelList.stream().map(WeFlowerCustomerTagRel::getId).collect(Collectors.toList())
+                );
+            }
+
 
             //后面在该表加一个字段标准一下标签关系类型，企业标签和企业微信类型标签
             addTags.stream().forEach(k->{
@@ -493,6 +508,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             iWeFlowerCustomerTagRelService.saveOrUpdateBatch(tagRels);
 
 
+            //标签同步企业微信端
+            if(StringUtils.isNotEmpty(cutomerTagEdit.getUserid())
+            &&StringUtils.isNotEmpty(cutomerTagEdit.getExternal_userid())){
+                weCustomerClient.makeCustomerLabel(cutomerTagEdit);
+            }
 
         }
 

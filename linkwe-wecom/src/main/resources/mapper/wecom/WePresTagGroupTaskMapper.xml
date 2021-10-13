@@ -39,10 +39,13 @@
                wptg.update_time,
                wgc.code_url,
                wgc.id                                     as group_code_id,
-               IFNULL((SELECT SUM(wgca.scan_code_times) AS scan_times
-                       FROM we_group_code_actual wgca
-                       GROUP BY group_code_id
-                       HAVING group_code_id = wgc.id), 0) as total_member
+               IFNULL(
+                       (SELECT COUNT(*)
+                        FROM
+                            we_group_code_actual wgca
+                                LEFT JOIN we_group_member wgm ON wgca.chat_id=wgm.chat_id WHERE wgca.group_code_id=wptg.group_code_id
+                       )
+                   ,0) AS total_member
         FROM we_pres_tag_group wptg
                  LEFT JOIN we_group_code wgc ON wgc.id = wptg.group_code_id
     </sql>
