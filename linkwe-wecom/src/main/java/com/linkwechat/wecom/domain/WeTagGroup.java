@@ -2,10 +2,12 @@ package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
+import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import lombok.Data;
@@ -25,7 +27,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName("we_tag_group")
-public class WeTagGroup
+public class WeTagGroup extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
@@ -38,20 +40,20 @@ public class WeTagGroup
     @TableField(exist = false)
     private List<WeTag> weTags;
 
-    /** 帐号状态（0正常 1删除） */
-    private String status=new String("0");
 
     /** 分组id */
     @TableId
     private String groupId;
 
 
-    /** 创建者 */
-    private String createBy;
+    @TableLogic
+    private Integer delFlag;
 
-    /** 创建时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime=new Date();
+
+    /**标签分组类型(1:客户标签;2:群标签)*/
+    private Integer groupTagType=new Integer(1);
+
+
 
 
 

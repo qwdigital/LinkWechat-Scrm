@@ -32,8 +32,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
           we_tag_group wtg
         LEFT JOIN we_tag wt ON wtg.group_id = wt.group_id
         where
-          wtg.status=0 and wt.status=0 or wt.status IS NULL
+          wtg.del_flag=0 and wt.del_flag=0
         <if test="gourpName != null  and gourpName != ''"> and gourp_name like concat('%', #{gourpName}, '%')</if>
+        <if test="groupTagType != null">and wtg.group_tag_type=#{groupTagType}</if>
     </select>
     
     <select id="getWeTagGroupByIds"  resultMap="WeTagGroupResult">

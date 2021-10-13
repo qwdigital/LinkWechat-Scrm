@@ -41,11 +41,11 @@ public class WeCropGroupTagDto {
                 .group_id(weTagGroup.getGroupId())
                 .group_name(weTagGroup.getGourpName())
                 .build();
-        List<WeTag> weTags = weTagGroup.getWeTags();
-        if(CollectionUtil.isNotEmpty(weTags)){
+        List<WeTag> newAddWeTag = weTagGroup.getWeTags();
+        if(CollectionUtil.isNotEmpty(newAddWeTag)){
             //新增的标签
-            List<WeTag> newAddWeTag
-                    = weTags.stream().filter(v -> StringUtils.isEmpty(v.getTagId())).collect(Collectors.toList());
+//            List<WeTag> newAddWeTag
+//                    = weTags.stream().filter(v -> StringUtils.isEmpty(v.getTagId())).collect(Collectors.toList());
 
 
             if(CollectionUtil.isNotEmpty(newAddWeTag)){

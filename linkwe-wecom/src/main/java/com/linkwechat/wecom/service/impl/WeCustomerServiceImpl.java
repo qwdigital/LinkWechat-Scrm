@@ -490,8 +490,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                 .build()
                 );
             });
-
             iWeFlowerCustomerTagRelService.saveOrUpdateBatch(tagRels);
+
 
 
         }
@@ -714,7 +714,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                         WeTagGroup.builder()
                                                 .groupId(tagGroup.getGroup_id())
                                                 .gourpName(tagGroup.getGroup_name())
-                                                .createBy(kk.getUserid())
                                                 .build()
                                 );
 

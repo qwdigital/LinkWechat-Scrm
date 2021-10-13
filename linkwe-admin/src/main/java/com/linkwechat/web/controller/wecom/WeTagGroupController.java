@@ -49,7 +49,6 @@ public class WeTagGroupController extends BaseController
     public TableDataInfo list(WeTagGroup weTagGroup)
     {
         startPage();
-        //synchWeTags();
         return getDataTable(
                 weTagGroupService.selectWeTagGroupList(weTagGroup)
         );
@@ -70,7 +69,6 @@ public class WeTagGroupController extends BaseController
         if(StrUtil.isNotBlank(weTagGroup.getGourpName())){
             List<WeTag> weTags = weTagGroup.getWeTags();
             if(CollectionUtil.isNotEmpty(weTags)){
-
                 if(weTags.stream().filter(m -> m.getName().equals(weTagGroup.getGourpName())).findAny().isPresent()){
                     return   AjaxResult.error("标签组名称与标签名不可重复");
                 }

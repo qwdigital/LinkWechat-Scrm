@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
@@ -28,21 +29,21 @@ public class WeTag implements Serializable
 {
 
     /** 标签组id */
-    private String groupId;
+     private String groupId;
 
-    /** 标签名 */
-    private String name;
+     /** 标签名 */
+     private String name;
 
-    /** 帐号状态（0正常 2删除） */
-    private String status;
 
      /** 微信端返回的id */
      @TableId
      private String tagId;
 
-    /** 创建时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime=new Date();
+
+     @TableLogic
+     private Integer delFlag;
+
+
 
 
 

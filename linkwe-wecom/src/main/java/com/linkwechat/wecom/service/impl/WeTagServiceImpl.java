@@ -72,7 +72,6 @@ public class WeTagServiceImpl extends ServiceImpl<WeTagMapper,WeTag> implements 
     @Override
     public int insertWeTag(WeTag weTag)
     {
-        weTag.setCreateTime(DateUtils.getNowDate());
         return weTagMapper.insertWeTag(weTag);
     }
 
