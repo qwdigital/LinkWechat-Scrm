@@ -27,6 +27,7 @@ import com.linkwechat.wecom.domain.dto.tag.WeCropGroupTagDto;
 import com.linkwechat.wecom.domain.dto.tag.WeCropGroupTagListDto;
 import com.linkwechat.wecom.domain.dto.tag.WeCropTagDto;
 import com.linkwechat.wecom.domain.dto.tag.WeFindCropTagParam;
+import com.linkwechat.wecom.domain.vo.WeCustomerDetailVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.mapper.WeCustomerMapper;
@@ -872,6 +873,22 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     public List<WeCustomerList> findWeCustomerList(WeCustomerList weCustomerList) {
 
         return this.baseMapper.findWeCustomerList(weCustomerList);
+    }
+
+
+
+
+    @Override
+    public WeCustomerDetailVo findWeCustomerDetail(String externalUserid) {
+        WeCustomerDetailVo weCustomerDetailVo=new WeCustomerDetailVo();
+        WeCustomer weCustomer
+                = this.getById(externalUserid);
+        BeanUtils.copyBeanProp(weCustomer,weCustomerDetailVo);
+        weCustomerDetailVo.setAddWeGroupNames(this.baseMapper.findAddWeUserNames(externalUserid));
+        weCustomerDetailVo.setAddWeuserNames(this.baseMapper.findAddWeUserNames(externalUserid));
+        weCustomerDetailVo.setGroupTags(this.baseMapper.findCustomerGroupTag(externalUserid));
+        weCustomerDetailVo.setBelongUserInfos(this.baseMapper.findCusertomerBelongUserInfo(externalUserid));
+        return weCustomerDetailVo;
     }
 
 

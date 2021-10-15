@@ -144,9 +144,11 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                                         .owner(kk.getOwner())
                                         .addTime(new Date(kk.getCreateTime() * 1000L))
                                         .status(k.getStatus())
+                                        .delFlag(new Integer(0))
                                         .adminUserId(Optional.ofNullable(kk.getAdminList()).orElseGet(ArrayList::new).stream().map(admin -> admin.getString("userid")).collect(Collectors.joining(",")))
                                         .build()
                         );
+
                         List<CustomerGroupMember> memberLists = kk.getMemberList();
                         if (CollectionUtil.isNotEmpty(memberLists)) {
                             memberLists.stream().forEach(member -> {
@@ -160,6 +162,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                                                 .unionId(member.getUnionId())
                                                 .groupNickName(member.getGroupNickName())
                                                 .name(member.getName())
+                                                .delFlag(new Integer(0))
                                                 .invitorUserId(member.getInvitor() == null ? null : member.getInvitor().getString("userid"))
                                                 .build()
                                 );
@@ -270,18 +273,46 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
      * @param weGroupMembers 群成员
      */
     private void insertBatchGroupAndMember(List<WeGroup> weGroups, List<WeGroupMember> weGroupMembers) {
+
         if (CollectionUtil.isNotEmpty(weGroups)) {
             List<List<WeGroup>> lists = Lists.partition(weGroups, 500);
             for (List<WeGroup> groupList : lists) {
                 this.baseMapper.insertBatch(groupList);
+                this.remove(new LambdaQueryWrapper<WeGroup>()
+                        .notIn(WeGroup::getChatId, groupList.stream().map(WeGroup::getChatId).collect(Collectors.toList())));
             }
+        }else{
+            List<WeGroup> oldWeGroups = this.list();
+            if(CollectionUtil.isNotEmpty(oldWeGroups)){
+                this.removeByIds(
+                        oldWeGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList())
+                );
+            }
+
+            //无群无人
+            List<WeGroupMember> oldWeGroupMembers = iWeGroupMemberService.list();
+            if(CollectionUtil.isNotEmpty(oldWeGroupMembers)){
+                iWeGroupMemberService.removeByIds(
+                        oldWeGroupMembers.stream().map(WeGroupMember::getId).collect(Collectors.toList())
+                );
+            }
+
         }
 
         if (CollectionUtil.isNotEmpty(weGroupMembers)) {
+
             List<List<WeGroupMember>> lists = Lists.partition(weGroupMembers, 500);
             for (List<WeGroupMember> groupMemberList : lists) {
+                iWeGroupMemberService.remove(
+                       new LambdaQueryWrapper<WeGroupMember>()
+                               .notIn(WeGroupMember::getUserId,groupMemberList.stream().map(WeGroupMember::getUserId).collect(Collectors.toList()))
+
+                );
                 iWeGroupMemberService.insertBatch(groupMemberList);
+
             }
+
+
         }
     }
 

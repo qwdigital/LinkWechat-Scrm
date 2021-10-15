@@ -512,5 +512,45 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 
 
+
+    <select id="findCusertomerBelongUserInfo" resultType="com.linkwechat.wecom.domain.vo.CusertomerBelongUserInfo">
+        SELECT
+            wu.user_name as belongUserName,
+            wu.user_name,
+            wfcr.create_time
+        FROM
+            we_flower_customer_rel  wfcr
+                LEFT JOIN   we_user wu ON wu.user_id=wfcr.user_id
+        WHERE wfcr.external_userid=#{externalUserId}
+        ORDER BY wfcr.create_time DESC
+            LIMIT 1
+    </select>
+
+
+    <select id="findCustomerGroupTag" resultType="string">
+        SELECT
+            GROUP_CONCAT(wt.`name`) AS wtName
+        FROM
+            we_group_member wgm
+                LEFT JOIN we_group_tag_rel wgtr ON wgtr.chat_id=wgm.chat_id
+                LEFT JOIN we_tag wt ON wt.tag_id=wgtr.tag_id
+        WHERE wgm.user_id=#{externalUserId}
+    </select>
+
+
+    <select id="findAddWeUserNames" resultType="string">
+        SELECT
+            GROUP_CONCAT(wu.user_name) as addWeUserNames
+        FROM
+            we_flower_customer_rel wfcr
+                LEFT JOIN we_user wu ON wu.user_id=wfcr.user_id
+        WHERE wfcr.external_userid=#{externalUserId}
+    </select>
+
+
+
+
+
+
     
 </mapper>

@@ -2,10 +2,12 @@ package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.linkwechat.common.core.domain.BaseEntity;
 import lombok.AllArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.sql.Time;
 import java.util.Date;
@@ -18,7 +20,7 @@ import java.util.Date;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WeCustomerTrajectory {
+public class WeCustomerTrajectory extends BaseEntity {
     @TableId
     private String id;
     //轨迹类型(1:信息动态;2:社交动态;3:活动规则;4:待办动态)
@@ -31,10 +33,14 @@ public class WeCustomerTrajectory {
     private Date createDate;
 
     //处理开始时间
-    private Time startTime;
+    private String startTime;
 
     //处理结束时间
-    private Time endTime;
+    private String endTime;
+
+
+    //文案子内容
+    private String contentSub;
 
 
 
@@ -49,9 +55,12 @@ public class WeCustomerTrajectory {
     private String agentId;
 
 
-    //创建时间
-    private Date createTime;
+    //1:跟踪中;2:待跟进;3:已拒绝;4:已成交;
+    private Integer trackState;
 
+    //跟进内容
+    private String trackContent;
 
-
+    //跟进时间
+    private Date trackTime;
 }

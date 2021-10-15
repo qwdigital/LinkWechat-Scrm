@@ -6,6 +6,7 @@ import com.linkwechat.wecom.domain.WeCustomerList;
 import com.linkwechat.wecom.domain.WeCustomerPortrait;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
+import com.linkwechat.wecom.domain.vo.WeCustomerDetailVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 
@@ -152,6 +153,10 @@ public interface IWeCustomerService extends IService<WeCustomer>
      * @return
      */
     List<WeCustomerList> findWeCustomerList(WeCustomerList weCustomerList);
+
+
+
+    WeCustomerDetailVo findWeCustomerDetail(String externalUserid);
 
 
 

@@ -84,7 +84,8 @@
         LEFT JOIN we_pres_tag_group_scope wptgs ON wptgs.task_id = wptg.task_id
         WHERE wptgs.we_user_id = #{emplId}
         AND wptgs.is_done = #{isDone}
-        AND wptg.send_type = 1 AND wptg.`del_flag` = 0;
+        AND wptg.send_type = 1 AND wptg.`del_flag` = 0
+        ORDER BY  wptg.create_time DESC
     </select>
 
     <select id="selectStaffList" parameterType="WePresTagGroupTask" resultType="String">

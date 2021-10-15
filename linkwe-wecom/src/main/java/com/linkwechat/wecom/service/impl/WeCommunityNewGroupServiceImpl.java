@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.enums.WeEmpleCodeType;
@@ -13,6 +14,7 @@ import com.linkwechat.wecom.domain.vo.WeCommunityNewGroupVo;
 import com.linkwechat.wecom.domain.vo.WeGroupCodeVo;
 import com.linkwechat.wecom.mapper.*;
 import com.linkwechat.wecom.service.IWeCommunityNewGroupService;
+import com.linkwechat.wecom.service.IWeGroupCodeActualService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +58,9 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
     @Autowired
     private WeUserMapper weUserMapper;
+
+    @Autowired
+    private IWeGroupCodeActualService weGroupCodeActualService;
 
 
     /**
@@ -299,6 +304,15 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         // 获取员工列表信息
         List<WeEmpleCodeUseScop> empleCodeUseScopList = empleCodeUseScopMapper.selectWeEmpleCodeUseScopListById(vo.getEmplCodeId());
         vo.setEmplList(empleCodeUseScopList);
+
+        List<WeGroupCodeActual> codeActuals = weGroupCodeActualService.list(new LambdaQueryWrapper<WeGroupCodeActual>()
+                .eq(WeGroupCodeActual::getGroupCodeId, vo.getGroupCodeId()));
+        if(CollectionUtil.isNotEmpty(codeActuals)){
+            vo.setActualGroupName(
+                    String.join(",", codeActuals.stream().map(WeGroupCodeActual::getGroupName).collect(Collectors.toList()))
+            );
+        }
+
 
         //  获取相关群聊信息
         List<WeGroup> groupList = weGroupCodeMapper.selectWeGroupListByGroupCodeId(vo.getGroupCodeId());

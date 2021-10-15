@@ -4,18 +4,17 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.annotation.Log;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.poi.ExcelUtil;
-import com.linkwechat.wecom.domain.WeCustomer;
-import com.linkwechat.wecom.domain.WeCustomerList;
-import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
-import com.linkwechat.wecom.domain.WeFlowerCustomerTagRel;
+import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.service.IWeCustomerService;
+import com.linkwechat.wecom.service.IWeCustomerTrajectoryService;
 import com.linkwechat.wecom.service.IWeFlowerCustomerRelService;
 import com.linkwechat.wecom.service.IWeFlowerCustomerTagRelService;
 import io.swagger.annotations.ApiOperation;
@@ -48,6 +47,9 @@ public class WeCustomerController extends BaseController
 
     @Autowired
     private IWeFlowerCustomerRelService weFlowerCustomerRelService;
+
+    @Autowired
+    private IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
 
 
 
@@ -198,24 +200,44 @@ public class WeCustomerController extends BaseController
     }
 
 
+    /*************************************************************************
+     ******************************客户详情相关*********************************
+     *************************************************************************/
 
     /**
-     * 查询企业微信客户列表(六感)
+     * 客户详情基础数据
+     * @return
      */
-    //  @PreAuthorize("@ss.hasPermi('customerManage:customer:list')")
-    @GetMapping("/listConcise")
-    public TableDataInfo listConcise(WeCustomer weCustomer)
-    {
-        startPage();
+    @ApiOperation("客户详情基础数据")
+    @GetMapping(value = "/findCustomerDetailBaseInfo")
+    public AjaxResult findCustomerDetailBaseInfo(String externalUserid){
 
-        List<WeCustomer> list = weCustomerService.selectWeCustomerList(weCustomer);
-        if(CollectionUtil.isNotEmpty(list)){
+        return AjaxResult.success(
+                weCustomerService.findWeCustomerDetail(externalUserid)
+        );
 
-            list.stream().forEach(k->{
-                k.setWeFlowerCustomerRels(new ArrayList<>());
-            });
-        }
-        return getDataTable(list);
     }
+
+
+    /**
+     * 获取客户轨迹信息
+     * @param trajectoryType
+     * @return
+     */
+    @GetMapping(value = "/findTrajectory")
+    @ApiOperation("获取客户轨迹信息")
+    public TableDataInfo findTrajectory(String userId,Integer trajectoryType){
+        startPage();
+        LambdaQueryWrapper<WeCustomerTrajectory> ne = new LambdaQueryWrapper<WeCustomerTrajectory>()
+                .ne(WeCustomerTrajectory::getStatus, Constants.DELETE_CODE)
+                .eq(WeCustomerTrajectory::getUserId,userId);
+        if(trajectoryType != null){
+            ne.eq(WeCustomerTrajectory::getTrajectoryType, trajectoryType);
+        }
+        return getDataTable(
+                iWeCustomerTrajectoryService.list(ne)
+        );
+    }
+
 
 }

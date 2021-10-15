@@ -83,11 +83,16 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
     @Transactional(rollbackFor = Exception.class)
     public void addWeCustomerMessagePush(CustomerMessagePushDto customerMessagePushDto) throws JsonProcessingException, ParseException, CloneNotSupportedException {
 
-        if(StrUtil.isNotBlank(customerMessagePushDto.getSettingTime())){
-            if(DateUtils.diffTime(new Date(), DateUtil.parse(customerMessagePushDto.getSettingTime(), "yyyy-MM-dd HH:mm")) > 0){
-                throw new WeComException("发送时间不能小于当前时间");
+        if(!customerMessagePushDto.isSendNow()){
+
+            if(StrUtil.isNotBlank(customerMessagePushDto.getSettingTime())){
+                if(DateUtils.diffTime(new Date(), DateUtil.parse(customerMessagePushDto.getSettingTime(), "yyyy-MM-dd HH:mm")) > 0){
+                    throw new WeComException("发送时间不能小于当前时间");
+                }
             }
+
         }
+
 
 
         if(customerMessagePushDto.getMessageType().equals("1")){//等于图片或者图文，根据图片URL，获取新的media_id

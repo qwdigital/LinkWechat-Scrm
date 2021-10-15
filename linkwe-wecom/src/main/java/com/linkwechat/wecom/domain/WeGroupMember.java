@@ -1,9 +1,6 @@
 package com.linkwechat.wecom.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -65,4 +62,8 @@ public class WeGroupMember extends BaseEntity{
 
     @ApiModelProperty("邀请人userId")
     private String invitorUserId;
+
+
+    @TableLogic
+    private Integer delFlag=new Integer(0);
 }

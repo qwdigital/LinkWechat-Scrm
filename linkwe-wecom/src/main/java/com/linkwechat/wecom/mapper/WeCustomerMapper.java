@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.*;
+import com.linkwechat.wecom.domain.vo.CusertomerBelongUserInfo;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -113,6 +114,27 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
      * @return
      */
     List<WeCustomerList> findWeCustomerList(WeCustomerList weCustomerList);
+
+
+    /**
+     * 客户添加的员工名称
+     * @return
+     */
+    String findAddWeUserNames(@Param("externalUserId") String externalUserId);
+
+
+    /**
+     * 客户添加的群标签
+     * @return
+     */
+    String findCustomerGroupTag(@Param("externalUserId") String externalUserId);
+
+
+    /**
+     * 客户所属员工相关
+     * @return
+     */
+    List<CusertomerBelongUserInfo> findCusertomerBelongUserInfo(@Param("externalUserId") String externalUserId);
 
 
 }

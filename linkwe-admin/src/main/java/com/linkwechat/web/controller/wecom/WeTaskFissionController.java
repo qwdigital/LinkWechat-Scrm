@@ -55,11 +55,10 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/wecom/fission")
 public class WeTaskFissionController extends BaseController {
+
     @Autowired
     private IWeTaskFissionService weTaskFissionService;
 
-    @Autowired
-    private CosConfig cosConfig;
 
     @Autowired
     private FileService fileService;

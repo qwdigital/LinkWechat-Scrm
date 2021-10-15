@@ -76,6 +76,12 @@ public class CustomerMessagePushDto implements Cloneable{
 
 
     /**
+     * 是否立即发送
+     */
+    private boolean isSendNow=false;
+
+
+    /**
      * 消息内容
      *
      * @param customerMessagePushDto

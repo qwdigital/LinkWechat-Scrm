@@ -82,6 +82,12 @@ public class WeCommunityNewGroupVo {
      */
     private String createBy;
 
+
+    /**
+     * 实际群名
+     */
+    private String actualGroupName;
+
     /**
      * 创建时间
      */

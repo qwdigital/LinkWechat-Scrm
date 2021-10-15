@@ -21,6 +21,7 @@
         we_group wg
         LEFT JOIN  we_user wu ON wg.`owner`=wu.user_id
         <where>
+            <if test="delFlag !=null"> wg.del_flag=#{delFlag}</if>
             <if test="groupName != null  and groupName != ''"> and wg.group_name like concat('%', #{groupName}, '%')</if>
             <if test="groupLeader != null  and groupLeader != ''"> and wu.user_name like concat('%', #{groupLeader}, '%')</if>
             <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
@@ -63,14 +64,14 @@
 
 
     <insert id="insertBatch">
-        insert into we_group (chat_id, group_name, owner, add_time, notice, status,admin_user_id, create_by, create_time,update_by, update_time)
+        insert into we_group (chat_id, group_name, owner, add_time, notice, status,admin_user_id, create_by, create_time,update_by, update_time,del_flag)
         values
         <foreach collection="weGroups" item="weGroup" index="index" separator=",">
             (#{weGroup.chatId},#{weGroup.groupName},#{weGroup.owner},#{weGroup.addTime},#{weGroup.notice},#{weGroup.status},#{weGroup.adminUserId},
-            #{weGroup.createBy},#{weGroup.createTime},#{weGroup.updateBy},#{weGroup.updateTime})
+            #{weGroup.createBy},#{weGroup.createTime},#{weGroup.updateBy},#{weGroup.updateTime},#{weGroup.delFlag})
         </foreach>
         on duplicate key update group_name= values(group_name),owner= values(owner),
         notice= values(notice),status= values(status),admin_user_id= values(admin_user_id),
-        update_by= values(update_by),update_time= values(update_time)
+        update_by= values(update_by),update_time= values(update_time),del_flag=values(del_flag)
     </insert>
 </mapper>
