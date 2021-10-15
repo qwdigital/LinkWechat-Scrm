@@ -7,16 +7,16 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeGroupMember;
+import com.linkwechat.wecom.domain.vo.WeMakeGroupTagVo;
 import com.linkwechat.wecom.service.IWeGroupMemberService;
 import com.linkwechat.wecom.service.IWeGroupService;
+import com.linkwechat.wecom.service.IWeGroupTagRelService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,6 +35,10 @@ public class WeGroupController extends BaseController {
 
     @Autowired
     private IWeGroupMemberService weGroupMemberService;
+
+
+    @Autowired
+    private IWeGroupTagRelService iWeGroupTagRelService;
 
     //  @PreAuthorize("@ss.hasPermi('customerManage:group:list')")
     @GetMapping({"/list"})
@@ -86,4 +90,19 @@ public class WeGroupController extends BaseController {
         return AjaxResult.success(weGroupService
                 .list(new LambdaQueryWrapper<WeGroup>().eq(WeGroup::getOwner,userId)));
     }
+
+
+    /**
+     * 编辑群标签
+     * @return
+     */
+    @PostMapping("/makeGroupTag")
+    @ApiOperation("编辑群标签")
+    public AjaxResult makeGroupTag(@RequestBody WeMakeGroupTagVo weMakeGroupTagVo){
+
+        iWeGroupTagRelService.makeGroupTag(weMakeGroupTagVo);
+
+        return AjaxResult.success();
+    }
+
 }

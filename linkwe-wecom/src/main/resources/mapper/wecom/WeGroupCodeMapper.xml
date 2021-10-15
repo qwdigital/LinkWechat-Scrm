@@ -45,7 +45,7 @@
         w.`update_time`,
         w.`remark`,
         IFNULL((SELECT count(1) FROM we_group_code_actual WHERE (SELECT IFNULL(scan_code_times, 0)) &lt; scan_code_times_limit AND group_code_id = w.`id` ), 0) AS available_codes,
-        IFNULL((SELECT SUM( scan_code_times ) AS scan_times FROM we_group_code_actual WHERE group_code_id = w.`id` GROUP BY group_code_id), 0) AS total_scan_times,
+        w.total_scan_times,
         IFNULL((SELECT count(1) FROM we_group_code_actual WHERE group_code_id = w.`id` AND TIMESTAMPDIFF(DAY, sysdate(), effect_time ) &lt; 3), 0) AS about_to_expire_codes
         FROM
         we_group_code w

@@ -7,16 +7,16 @@
 
     <select id="selectWeGroupList" parameterType="WeGroup" resultType="com.linkwechat.wecom.domain.WeGroup">
         SELECT
-            wg.chat_id,
-            if(wg.group_name = '' or wg.group_name is null,
-                (SELECT group_concat(name separator '、') FROM we_group_member wgm  WHERE wgm.chat_id = wg.chat_id limit 10),
-                wg.group_name) as group_name,
-            wg.add_time,
-            wg.notice,
-            wu.user_name as groupLeaderName,
-            (SELECT COUNT(*) FROM we_group_member wgm WHERE wgm.chat_id=wg.chat_id) as memberNum,
-            wg.status,
-            wg.`owner`
+        wg.chat_id,
+        wg.group_name,
+        wg.create_time,
+        wg.notice,
+        wu.user_name as groupLeaderName,
+        (SELECT COUNT(*) FROM we_group_member wgm WHERE wgm.chat_id=wg.chat_id) as memberNum,
+        wg.status,
+        wg.`owner`,
+        (SELECT GROUP_CONCAT(wt.`name`) FROM we_group_tag_rel wgtr LEFT JOIN we_tag  wt ON wt.tag_id=wgtr.tag_id WHERE  wg.chat_id=wgtr.chat_id) as tags,
+        (SELECT GROUP_CONCAT(wt.`tag_id`) FROM we_group_tag_rel wgtr LEFT JOIN we_tag  wt ON wt.tag_id=wgtr.tag_id WHERE  wg.chat_id=wgtr.chat_id) as tagIds
         FROM
         we_group wg
         LEFT JOIN  we_user wu ON wg.`owner`=wu.user_id
@@ -24,11 +24,11 @@
             <if test="groupName != null  and groupName != ''"> and wg.group_name like concat('%', #{groupName}, '%')</if>
             <if test="groupLeader != null  and groupLeader != ''"> and wu.user_name like concat('%', #{groupLeader}, '%')</if>
             <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
-                AND date_format(wg.add_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+                AND date_format(wg.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
             </if>
 
             <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
-                AND date_format(wg.add_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+                AND date_format(wg.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
             </if>
             <if test="userIds != null and userIds !=''">
                 <if test="userIds.indexOf(',') != -1">

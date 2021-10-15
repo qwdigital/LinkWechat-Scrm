@@ -111,8 +111,7 @@ public class WeGroupCode extends BaseEntity {
     /**
      * 实际码扫码次数之和
      */
-    @TableField(exist = false)
-    private Long totalScanTimes;
+    private Long totalScanTimes=new Long(0);
 
     /**
      * 即将过期实际码数量

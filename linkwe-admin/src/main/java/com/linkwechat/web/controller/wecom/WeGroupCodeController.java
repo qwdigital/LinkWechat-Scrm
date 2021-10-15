@@ -187,12 +187,16 @@ public class WeGroupCodeController extends BaseController {
     }
 
     /**
-     * 从群活码获取第一个可用的实际码
+     * 从群活码获取第一个可用的实际码(实际埋点记录扫码次数)
      */
     @ApiOperation(value = "从群活码获取第一个可用的实际码", httpMethod = "GET")
     @GetMapping("/getActualCode/{groupCodeId}")
     public AjaxResult getActual(@PathVariable("groupCodeId") String id) {
         WeGroupCode groupCode = groupCodeService.getById(id);
+
+        //统计扫码次数
+        groupCodeService.countScanTimes(groupCode);
+
         List<WeGroupCodeActual> actualCodeList = groupCodeService.selectActualList(groupCode.getId());
         WeGroupCodeActual groupCodeActual = null;
         for (WeGroupCodeActual item : actualCodeList) {

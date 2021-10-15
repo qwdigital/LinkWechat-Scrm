@@ -78,4 +78,7 @@ public interface IWeGroupCodeService extends IService<WeGroupCode> {
      */
     String selectGroupCodeUrlByEmplCodeState(String state);
 
+
+    void countScanTimes(WeGroupCode groupCode);
+
 }

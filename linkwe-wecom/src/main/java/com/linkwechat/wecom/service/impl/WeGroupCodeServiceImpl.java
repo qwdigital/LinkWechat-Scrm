@@ -18,6 +18,7 @@ import com.linkwechat.wecom.mapper.WeCommunityNewGroupMapper;
 import com.linkwechat.wecom.mapper.WeGroupCodeActualMapper;
 import com.linkwechat.wecom.service.IWeGroupCodeActualService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import com.linkwechat.wecom.mapper.WeGroupCodeMapper;
 import com.linkwechat.wecom.domain.WeGroupCode;
@@ -162,5 +163,25 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
     @Override
     public String selectGroupCodeUrlByEmplCodeState(String state) {
         return baseMapper.selectGroupCodeUrlByEmplCodeState(state);
+    }
+
+
+    /**
+     * 统计扫码次数
+     * @param groupCode
+     */
+    @Override
+    @Async
+    public void countScanTimes(WeGroupCode groupCode) {
+
+        if(groupCode !=null){
+            groupCode.setTotalScanTimes(
+                    groupCode.getTotalScanTimes()+1
+            );
+            this.updateById(groupCode);
+        }
+
+
+
     }
 }
