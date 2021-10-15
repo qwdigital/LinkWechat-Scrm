@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeCustomerClient;
 import com.linkwechat.wecom.client.WeCustomerGroupClient;
 import com.linkwechat.wecom.client.WeUserClient;
@@ -138,7 +139,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                         weGroups.add(
                                 WeGroup.builder()
                                         .chatId(kk.getChatId())
-                                        .groupName(kk.getName())
+                                        .groupName(StringUtils.isNotEmpty(kk.getName())? kk.getName() : "@微信群")
                                         .notice(kk.getNotice())
                                         .owner(kk.getOwner())
                                         .addTime(new Date(kk.getCreateTime() * 1000L))
