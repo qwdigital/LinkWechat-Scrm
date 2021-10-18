@@ -1,11 +1,5 @@
 <script>
-import {
-  getList,
-  remove,
-  batchAdd,
-  downloadBatch,
-  download
-} from '@/api/drainageCode/staff'
+import { getList, remove, batchAdd, downloadBatch, download } from '@/api/drainageCode/staff'
 import SelectUser from '@/components/SelectUser'
 import ClipboardJS from 'clipboard'
 export default {
@@ -55,17 +49,20 @@ export default {
     )
   },
   mounted() {
-    var clipboard = new ClipboardJS('.copy-btn')
-    clipboard.on('success', (e) => {
+    this.clipboard = new ClipboardJS('.copy-btn')
+    this.clipboard.on('success', (e) => {
       this.$notify({
         title: '成功',
         message: '链接已复制到剪切板，可粘贴。',
         type: 'success'
       })
     })
-    clipboard.on('error', (e) => {
+    this.clipboard.on('error', (e) => {
       this.$message.error('链接复制失败')
     })
+  },
+  destroyed() {
+    this.clipboard.destroy()
   },
   methods: {
     getList(page) {
@@ -179,20 +176,9 @@ export default {
 
 <template>
   <div>
-    <el-form
-      :model="query"
-      ref="queryForm"
-      :inline="true"
-      label-width="100px"
-      class="top-search"
-    >
+    <el-form :model="query" ref="queryForm" :inline="true" label-width="100px" class="top-search">
       <el-form-item label="使用员工" prop="useUserName">
-        <el-input
-          v-model="query.useUserName"
-          placeholder="请输入"
-          clearable
-          @keyup.enter.native="getList(1)"
-        />
+        <el-input v-model="query.useUserName" placeholder="请输入" clearable @keyup.enter.native="getList(1)" />
       </el-form-item>
       <!-- <el-form-item label="姓名">
         <el-input
@@ -203,28 +189,13 @@ export default {
         />
       </el-form-item> -->
       <el-form-item label="手机号" prop="mobile">
-        <el-input
-          v-model="query.mobile"
-          placeholder="请输入"
-          clearable
-          @keyup.enter.native="getList(1)"
-        />
+        <el-input v-model="query.mobile" placeholder="请输入" clearable @keyup.enter.native="getList(1)" />
       </el-form-item>
       <el-form-item label="活动场景" prop="scenario">
-        <el-input
-          v-model="query.scenario"
-          placeholder="请输入"
-          clearable
-          @keyup.enter.native="getList(1)"
-        />
+        <el-input v-model="query.scenario" placeholder="请输入" clearable @keyup.enter.native="getList(1)" />
       </el-form-item>
       <el-form-item label="创建人" prop="createBy">
-        <el-input
-          v-model="query.createBy"
-          placeholder="请输入"
-          clearable
-          @keyup.enter.native="getList(1)"
-        />
+        <el-input v-model="query.createBy" placeholder="请输入" clearable @keyup.enter.native="getList(1)" />
       </el-form-item>
       <el-form-item label="创建日期">
         <el-date-picker
@@ -237,12 +208,7 @@ export default {
         ></el-date-picker>
       </el-form-item>
       <el-form-item label=" ">
-        <el-button
-          v-hasPermi="['wecom:code:list']"
-          type="cyan"
-          @click="getList(1)"
-          >查询</el-button
-        >
+        <el-button v-hasPermi="['wecom:code:list']" type="cyan" @click="getList(1)">查询</el-button>
         <el-button @click="resetQuery">重置</el-button>
         <!-- <el-button @click="resetQuery">导出</el-button> -->
       </el-form-item>
@@ -256,11 +222,7 @@ export default {
         <span class="num">{{ total }}</span> 个
       </div> -->
       <div>
-        <el-button
-          v-hasPermi="['wecom:code:add']"
-          type="primary"
-          size="mini"
-          @click="goRoute('staffAdd')"
+        <el-button v-hasPermi="['wecom:code:add']" type="primary" size="mini" @click="goRoute('staffAdd')"
           >新建员工活码</el-button
         >
         <!-- <el-button
@@ -270,29 +232,14 @@ export default {
           @click="dialogVisible = true"
           >批量新建</el-button
         > -->
-        <el-button
-          v-hasPermi="['wecom:code:remove']"
-          type="primary"
-          size="mini"
-          @click="remove()"
-          >删除</el-button
-        >
-        <el-button
-          v-hasPermi="['wecom:code:downloadBatch']"
-          type="primary"
-          size="mini"
-          @click="downloadBatch()"
+        <el-button v-hasPermi="['wecom:code:remove']" type="primary" size="mini" @click="remove()">删除</el-button>
+        <el-button v-hasPermi="['wecom:code:downloadBatch']" type="primary" size="mini" @click="downloadBatch()"
           >批量下载</el-button
         >
       </div>
     </div>
 
-    <el-table
-      v-loading="loading"
-      :data="list"
-      @selection-change="handleSelectionChange"
-      max-height="600"
-    >
+    <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange" max-height="600">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="样式" align="center" prop="qrCode">
         <template slot-scope="{ row }">
@@ -305,37 +252,12 @@ export default {
         </template>
       </el-table-column>
       <!-- <el-table-column label="使用员工" align="center" prop="useUserName" /> -->
-      <el-table-column
-        label="姓名"
-        align="center"
-        prop="useUserName"
-        show-overflow-tooltip
-      />
-      <el-table-column
-        label="手机号"
-        align="center"
-        prop="mobile"
-        show-overflow-tooltip
-      />
-      <el-table-column
-        label="活动场景"
-        align="center"
-        prop="scenario"
-        show-overflow-tooltip
-      />
+      <el-table-column label="姓名" align="center" prop="useUserName" show-overflow-tooltip />
+      <el-table-column label="手机号" align="center" prop="mobile" show-overflow-tooltip />
+      <el-table-column label="活动场景" align="center" prop="scenario" show-overflow-tooltip />
       <el-table-column label="创建人" align="center" prop="createBy" />
-      <el-table-column
-        label="创建时间"
-        align="center"
-        prop="createTime"
-        width="180"
-      >
-      </el-table-column>
-      <el-table-column
-        label="操作"
-        align="center"
-        class-name="small-padding fixed-width"
-      >
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180"> </el-table-column>
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{ row }">
           <el-button
             type="text"
@@ -350,24 +272,11 @@ export default {
             v-hasPermi="['monitor:operlog:query']"
             >复制链接</el-button
           >
-          <el-button
-            type="text"
-            @click="goRoute('staffDetail', row.id)"
-            v-hasPermi="['drainageCode:staff:detail']"
+          <el-button type="text" @click="goRoute('staffDetail', row.id)" v-hasPermi="['drainageCode:staff:detail']"
             >查看详情</el-button
           >
-          <el-button
-            type="text"
-            @click="goRoute('staffAdd', row.id)"
-            v-hasPermi="['wecom:code:edit']"
-            >编辑</el-button
-          >
-          <el-button
-            type="text"
-            @click="remove(row.id)"
-            v-hasPermi="['wecom:code:remove']"
-            >删除</el-button
-          >
+          <el-button type="text" @click="goRoute('staffAdd', row.id)" v-hasPermi="['wecom:code:edit']">编辑</el-button>
+          <el-button type="text" @click="remove(row.id)" v-hasPermi="['wecom:code:remove']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -381,11 +290,7 @@ export default {
     />
 
     <!-- 批量新建弹窗 -->
-    <SelectUser
-      :visible.sync="dialogVisible"
-      title="组织架构"
-      @success="selectedUser"
-    ></SelectUser>
+    <SelectUser :visible.sync="dialogVisible" title="组织架构" @success="selectedUser"></SelectUser>
   </div>
 </template>
 
