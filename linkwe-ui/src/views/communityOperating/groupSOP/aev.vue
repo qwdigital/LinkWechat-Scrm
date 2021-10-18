@@ -5,7 +5,7 @@
         <el-input v-model="form.ruleName" maxlength="30" show-word-limit placeholder="请输入" clearable />
       </el-form-item>
 
-      <el-form-item label="执行群聊">
+      <el-form-item label="执行群聊" prop="chatIdList">
         <el-tag size="medium" v-for="(group, index) in customerGroups" :key="index">{{ group.groupName }}</el-tag>
         <el-button
           type="primary"
@@ -42,7 +42,7 @@
         ></el-date-picker>
       </el-form-item>
 
-      <el-form-item label="消息内容">
+      <el-form-item label="消息内容" prop="content">
         <div class="content-left">
           <el-button class="create" @click="goRoute">新建素材</el-button>
 
@@ -79,7 +79,7 @@
                 </el-button>
               </div>
 
-              <div v-for="url in form.picList" :key="url" class="image-wrapper">
+              <!-- <div v-for="url in form.picList" :key="url" class="image-wrapper">
                 <el-image :src="url" fit="fit"> </el-image>
 
                 <el-button icon="el-icon-close" class="remove-btn" size="mini" @click="removeImage(url)"> </el-button>
@@ -87,7 +87,7 @@
 
               <upload :fileUrl.sync="uploadImageUrl" class="image-uploader">
                 <i class="el-icon-plus uploader-icon"></i>
-              </upload>
+              </upload> -->
             </el-tab-pane>
 
             <el-button type="primary" class="mt20" @click="dialogVisibleSelectMaterial = true">从素材库选择</el-button>
@@ -194,10 +194,10 @@ export default {
         ruleName: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
         title: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
         chatIdList: [{ required: true, message: '该项为必填项', trigger: 'change' }],
-        startExeTime: [{ required: true, message: '该项为必填项', trigger: 'change' }],
+        startExeTime: [{ type: 'array', required: true, message: '该项为必填项', trigger: 'change' }],
         content: [
           // { required: true, message: '该项为必填项', trigger: 'change' },
-          { validator: checkContent, trigger: 'change' }
+          { required: true, validator: checkContent, trigger: 'change' }
         ]
       })
     }
@@ -210,6 +210,7 @@ export default {
         this.form.stopExeTime = ''
       } else {
         ;[this.form.startExeTime, this.form.stopExeTime] = dateRange
+        // this.$nextTick(() => this.$refs.form.validateField('startExeTime'))
       }
     },
     customerGroups(groups) {
@@ -290,6 +291,14 @@ export default {
     submit() {
       this.$refs.form.validate((valid) => {
         if (valid) {
+          if (!this.dateRange.length) {
+            this.msgError('执行时间不能为空')
+            return
+          }
+          if (!this.dateRange.length) {
+            this.msgError('执行时间不能为空')
+            return
+          }
           this.loading = true
           if (this.ruleId) {
             update(this.ruleId, this.form)
