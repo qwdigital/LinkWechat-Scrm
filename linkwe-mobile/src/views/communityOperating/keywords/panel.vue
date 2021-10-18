@@ -16,10 +16,7 @@
           {{ task.welcomeMsg }}
         </div>
         <div class="copy-wrapper" v-show="showCopy">
-          <van-button
-            :class="'copy-btn_' + task.taskId"
-            :data-clipboard-text="task.welcomeMsg"
-          >
+          <van-button :class="'copy-btn_' + task.taskId" :data-clipboard-text="task.welcomeMsg">
             复制
           </van-button>
         </div>
@@ -67,21 +64,33 @@ export default {
   },
   methods: {
     send() {
+      let _this = this
+      this.$toast.loading({
+        message: '正在发送...',
+        duration: 0,
+        forbidClick: true
+      })
       wx.invoke(
         'sendChatMessage',
         {
           msgtype: 'news',
           news: {
             link: this.groupCodeUrl,
-            title: '客户群活码',
-            desc: '客户群活码',
+            title: this.task.taskName,
+            desc: this.task.welcomeMsg,
             imgUrl: this.imgUrl
           }
         },
         function(res) {
           if (res.err_msg == 'sendChatMessage:ok') {
           } else {
+            if (res.err_code == 1) {
+              // 用户取消发送
+            } else {
+              _this.$dialog({ message: 'sendChatMessage失败：' + JSON.stringify(res) })
+            }
           }
+          _this.$toast.clear()
         }
       )
     },
@@ -105,26 +114,18 @@ export default {
       return keywords
     },
     groupCodeUrl() {
+      let groupCodeInfo = this.task.groupCodeInfo
       if (window.location.hash[0] === '#') {
         return (
-          window.location.origin +
-          window.location.pathname +
-          '#/groupCode?id=' +
-          this.task.groupCodeInfo.id
+          window.location.origin + window.location.pathname + '#/groupCode?id=' + (groupCodeInfo && groupCodeInfo.id)
         )
       }
 
-      return (
-        window.location.origin +
-        window.location.pathname +
-        'groupCode?id=' +
-        this.task.groupCodeInfo.id
-      )
+      return window.location.origin + window.location.pathname + '#/groupCode?id=' + (groupCodeInfo && groupCodeInfo.id)
     },
     imgUrl() {
-      if (this.task.groupCodeInfo && this.task.groupCodeInfo.codeUrl)
-        return this.task.groupCodeInfo.codeUrl
-      return ''
+      let groupCodeInfo = this.task.groupCodeInfo
+      return groupCodeInfo && groupCodeInfo.codeUrl ? groupCodeInfo.codeUrl : ''
     }
   },
   mounted() {

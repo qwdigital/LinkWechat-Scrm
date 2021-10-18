@@ -1,10 +1,5 @@
 <script>
-import {
-  getList,
-  remove,
-  download,
-  downloadBatch
-} from '@/api/communityOperating/newCustomer'
+import { getList, remove, download, downloadBatch } from '@/api/communityOperating/newCustomer'
 
 export default {
   components: {},
@@ -157,14 +152,7 @@ export default {
 
 <template>
   <div>
-    <el-form
-      ref="queryForm"
-      :inline="true"
-      :model="query"
-      label-width="100px"
-      class="top-search"
-      size="small"
-    >
+    <el-form ref="queryForm" :inline="true" :model="query" label-width="100px" class="top-search" size="small">
       <el-form-item label="活码名称" prop="emplCodeName">
         <el-input v-model="query.emplCodeName" placeholder="请输入"></el-input>
       </el-form-item>
@@ -184,18 +172,8 @@ export default {
         ></el-date-picker>
       </el-form-item>
       <el-form-item label=" ">
-        <el-button
-          v-hasPermi="['customerManage:customer:query']"
-          type="primary"
-          @click="getList(1)"
-          >查询</el-button
-        >
-        <el-button
-          v-hasPermi="['customerManage:customer:query']"
-          type="success"
-          @click="resetQuery()"
-          >重置</el-button
-        >
+        <el-button v-hasPermi="['customerManage:customer:query']" type="primary" @click="getList(1)">查询</el-button>
+        <el-button v-hasPermi="['customerManage:customer:query']" type="success" @click="resetQuery()">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -204,50 +182,20 @@ export default {
         <el-button type="primary" @click="goRoute()">新建自动拉群</el-button>
       </div>
       <div>
-        <el-button
-          type="primary"
-          :disabled="!ids.length"
-          @click="downloadBatch()"
-          >批量下载</el-button
-        >
-        <el-button
-          v-hasPermi="['customerManage:customer:export']"
-          :disabled="!ids.length"
-          type="cyan"
-          @click="remove()"
+        <el-button type="primary" :disabled="!ids.length" @click="downloadBatch()">批量下载</el-button>
+        <el-button v-hasPermi="['customerManage:customer:export']" :disabled="!ids.length" type="cyan" @click="remove()"
           >批量删除</el-button
         >
       </div>
     </div>
 
-    <el-table
-      v-loading="loading"
-      :data="list"
-      @selection-change="handleSelectionChange"
-    >
-      <el-table-column
-        type="selection"
-        width="50"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        prop="codeName"
-        label="活码名称"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        prop="emplList"
-        label="使用员工"
-        align="center"
-        width="130"
-      >
+    <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="50" align="center"></el-table-column>
+      <el-table-column prop="codeName" label="活码名称" align="center"></el-table-column>
+      <el-table-column prop="emplList" label="使用员工" align="center" width="130">
         <template #default="{ row }">
           <el-popover placement="bottom" trigger="hover">
-            <el-image
-              slot="reference"
-              :src="row.emplCodeUrl"
-              class="code-image--small"
-            ></el-image>
+            <el-image slot="reference" :src="row.emplCodeUrl" class="code-image--small"></el-image>
             <el-image :src="row.emplCodeUrl" class="code-image"></el-image>
           </el-popover>
         </template>
@@ -256,93 +204,35 @@ export default {
           </el-image>
         </template> -->
       </el-table-column>
-      <el-table-column
-        prop="emplList"
-        label="使用员工"
-        align="center"
-        :show-overflow-tooltip="true"
-      >
+      <el-table-column prop="emplList" label="使用员工" align="center" :show-overflow-tooltip="true">
         <template slot-scope="{ row }">
-          <el-tag
-            size="medium"
-            type="info"
-            v-for="(item, index) in row.emplList"
-            :key="index"
-            >{{ item.businessName }}</el-tag
-          >
+          <el-tag size="medium" type="info" v-for="(item, index) in row.emplList" :key="index">{{
+            item.businessName
+          }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column
-        label="客户标签"
-        align="center"
-        width="160"
-        :show-overflow-tooltip="true"
-      >
+      <el-table-column label="客户标签" align="center" width="160" :show-overflow-tooltip="true">
         <template slot-scope="{ row }">
-          <el-tag
-            size="medium"
-            type="info"
-            v-for="(item, index) in row.tagList"
-            :key="index"
-            >{{ item.tagName }}</el-tag
-          >
+          <el-tag size="medium" type="info" v-for="(item, index) in row.tagList" :key="index">{{
+            item.tagName
+          }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column
-        label="实际群聊"
-        align="center"
-        :show-overflow-tooltip="true"
-      >
+      <el-table-column label="实际群聊" align="center" :show-overflow-tooltip="true">
         <template slot-scope="{ row }">
-          <el-tag
-            size="medium"
-            v-for="(item, index) in row.groupList"
-            :key="index"
-            >{{ item.groupName }}</el-tag
-          >
+          <el-tag size="medium" v-for="(item, index) in (row.actualGroupName || '').split(',')" :key="index">{{
+            item
+          }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column
-        label="添加好友数"
-        align="center"
-        prop="cusNumber"
-      ></el-table-column>
-      <el-table-column
-        label="创建人"
-        align="center"
-        prop="createBy"
-      ></el-table-column>
-      <el-table-column
-        label="创建时间"
-        align="center"
-        prop="createTime"
-        width="160"
-      ></el-table-column>
-      <el-table-column
-        label="操作"
-        align="center"
-        width="180"
-        class-name="small-padding fixed-width"
-      >
+      <el-table-column label="添加好友数" align="center" prop="cusNumber"></el-table-column>
+      <el-table-column label="创建人" align="center" prop="createBy"></el-table-column>
+      <el-table-column label="创建时间" align="center" prop="createTime" width="160"></el-table-column>
+      <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
         <template slot-scope="{ row }">
-          <el-button
-            v-hasPermi="['enterpriseWechat:edit']"
-            type="text"
-            @click="goRoute(row.id)"
-            >编辑</el-button
-          >
-          <el-button
-            v-hasPermi="['enterpriseWechat:view']"
-            type="text"
-            @click="download(row)"
-            >下载</el-button
-          >
-          <el-button
-            v-hasPermi="['enterpriseWechat:edit']"
-            type="text"
-            @click="remove(row.id)"
-            >删除</el-button
-          >
+          <el-button v-hasPermi="['enterpriseWechat:edit']" type="text" @click="goRoute(row.id)">编辑</el-button>
+          <el-button v-hasPermi="['enterpriseWechat:view']" type="text" @click="download(row)">下载</el-button>
+          <el-button v-hasPermi="['enterpriseWechat:edit']" type="text" @click="remove(row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
