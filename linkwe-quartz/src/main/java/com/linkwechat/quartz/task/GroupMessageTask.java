@@ -1,15 +1,14 @@
 package com.linkwechat.quartz.task;
 
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.wecom.domain.WeCustomerMessageTimeTask;
 import com.linkwechat.wecom.mapper.WeCustomerMessageTimeTaskMapper;
 import com.linkwechat.wecom.service.IWeCustomerMessageService;
-import com.linkwechat.wecom.service.IWeCustomerService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 
 /**
@@ -27,13 +26,11 @@ public class GroupMessageTask {
     private IWeCustomerMessageService weCustomerMessageService;
 
     /**
-     * 扫描群发消息定时任务
+     * 扫描群发消息定时任务(只是处理当天的群发消息)
      */
     public void messageTask() {
         //获的当前时间的毫秒数
-        long currentTime = System.currentTimeMillis();
-        //customerMessageTimeTaskMapper
-        List<WeCustomerMessageTimeTask> weCustomerMessageTimeTasks = customerMessageTimeTaskMapper.selectWeCustomerMessageTimeTaskGteSettingTime(currentTime);
+        List<WeCustomerMessageTimeTask> weCustomerMessageTimeTasks = customerMessageTimeTaskMapper.selectWeCustomerMessageTimeTaskGteSettingTime(DateUtils.getDateTime().getTime(),System.currentTimeMillis());
 
         if (CollectionUtils.isNotEmpty(weCustomerMessageTimeTasks)) {
             weCustomerMessageTimeTasks.forEach(

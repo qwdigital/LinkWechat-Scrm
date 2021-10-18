@@ -223,5 +223,155 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     }
 
 
+    /**
+     * 获取当前时间的时间戳
+     */
+    public static int getCurrentTimeIntValue() {
+        return (int) (System.currentTimeMillis() / 1000);
+    }
+
+
+    /**
+     * 获取days天后的当前时间 时间戳
+     */
+    public static int addDaysTimeStamp(int days) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.DATE, days);
+        return (int) (cal.getTimeInMillis() / 1000);
+    }
+
+    /**
+     * 获取今日零点的时间戳
+     */
+    public static int getStartTimeStamp() {
+        Calendar todayStart = Calendar.getInstance();
+        todayStart.set(Calendar.HOUR_OF_DAY, 0);
+        todayStart.set(Calendar.MINUTE, 0);
+        todayStart.set(Calendar.SECOND, 0);
+        todayStart.set(Calendar.MILLISECOND, 0);
+        long time = todayStart.getTimeInMillis()/1000;
+        return (int)time;
+    }
+
+    /**
+     * 获取今日23：59：59的时间戳
+     */
+    public static int getEndTimeStamp() {
+        Calendar todayEnd = Calendar.getInstance();
+        todayEnd.set(Calendar.HOUR_OF_DAY, 23);
+        todayEnd.set(Calendar.MINUTE, 59);
+        todayEnd.set(Calendar.SECOND, 59);
+        todayEnd.set(Calendar.MILLISECOND, 999);
+        long time = todayEnd.getTimeInMillis() / 1000;
+        return (int) time;
+    }
+
+    /**
+     * 获取指定时间零点的时间戳
+     */
+    public static int getStartTimeStamp(Date date) {
+        Calendar todayStart = Calendar.getInstance();
+        todayStart.setTime(date);
+        todayStart.set(Calendar.HOUR_OF_DAY, 0);
+        todayStart.set(Calendar.MINUTE, 0);
+        todayStart.set(Calendar.SECOND, 0);
+        todayStart.set(Calendar.MILLISECOND, 0);
+        long time = todayStart.getTimeInMillis()/1000;
+        return (int)time;
+    }
+
+    /**
+     * 获取指定时间23：59：59的时间戳
+     */
+    public static int getEndTimeStamp(Date date) {
+        Calendar todayEnd = Calendar.getInstance();
+        todayEnd.setTime(date);
+        todayEnd.set(Calendar.HOUR_OF_DAY, 23);
+        todayEnd.set(Calendar.MINUTE, 59);
+        todayEnd.set(Calendar.SECOND, 59);
+        todayEnd.set(Calendar.MILLISECOND, 999);
+        long time = todayEnd.getTimeInMillis() / 1000;
+        return (int) time;
+    }
+
+    /**
+     * 获取昨天零点的时间（字符串）
+     */
+    public static String getYesterDayStartTimeStamp() {
+        SimpleDateFormat sdfYMD = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.SECOND,0); //这是将【秒】设置为0
+        calendar.set(Calendar.MINUTE,0); //这是将【分】设置为0
+        calendar.set(Calendar.HOUR_OF_DAY,0); //这是将【时】设置为0
+        calendar.add(Calendar.DATE,-1); //当前日期加一
+        String yesterday  = sdfYMD.format(calendar.getTime()); //获取昨天的时间 如2021-02-25 00:00:00
+        return yesterday;
+    }
+
+    /**
+     * 获取昨天零点的时间戳
+     */
+    public static Integer getBeforeStartTime(){
+        Calendar todayStart = Calendar.getInstance();
+        todayStart.set(Calendar.HOUR_OF_DAY, 0);
+        todayStart.set(Calendar.MINUTE, 0);
+        todayStart.set(Calendar.SECOND, 0);
+        todayStart.set(Calendar.MILLISECOND, 0);
+        long time = todayStart.getTimeInMillis()/1000;
+        return (int)time-86400;
+    }
+
+    /**
+     * 获取昨天23:59:59的时间（字符串）
+     */
+    public static String getYesterDayEndTimeStamp() {
+        SimpleDateFormat sdfYMD = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.SECOND,59); //这是将当天的【秒】设置为0
+        calendar.set(Calendar.MINUTE,59); //这是将当天的【分】设置为0
+        calendar.set(Calendar.HOUR_OF_DAY,23); //这是将当天的【时】设置为0
+        calendar.add(Calendar.DATE,-1); //当前日期加一
+        String yesterday  = sdfYMD.format(calendar.getTime()); //获取第二天的时间 2021-02-25 00:00:00
+        return yesterday;
+    }
+
+
+
+    /**
+     * 获取明天零点的时间戳
+     */
+    public static Integer getAfterStartime()
+    {
+        Calendar todayStart = Calendar.getInstance();
+        todayStart.set(Calendar.HOUR_OF_DAY, 0);
+        todayStart.set(Calendar.MINUTE, 0);
+        todayStart.set(Calendar.SECOND, 0);
+        todayStart.set(Calendar.MILLISECOND, 0);
+        long time = todayStart.getTimeInMillis()/1000;
+        return (int)time+86400;
+    }
+
+    /**
+     * 将昨天凌晨时间转换为Date类型（下面设置成这样 new simpleDateFormat("yyyy-MM-dd HH:mm:ss") 数据中对应的字段类型就是DateTime）　　　* 这个方法中调用了上面的getYesterDayStartTimeStamp()方法哦
+     */
+    public static Date getDateTime()
+    {
+        Date dateTime = null;
+        String yesterDayStartTimeStamp =  getYesterDayStartTimeStamp();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try
+        {
+            dateTime = formatter.parse(yesterDayStartTimeStamp);
+        }
+        catch (ParseException e)
+        {
+            e.printStackTrace();
+        }
+        //Sun May 09 00:00:00 CST 2021
+        return dateTime;
+    }
+
+
 
 }

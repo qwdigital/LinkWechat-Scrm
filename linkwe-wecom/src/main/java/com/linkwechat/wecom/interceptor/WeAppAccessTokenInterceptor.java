@@ -39,8 +39,10 @@ public class WeAppAccessTokenInterceptor implements Interceptor<WeResultDto> {
      */
     @Override
     public boolean beforeExecute(ForestRequest request) {
-        String token = iWeAccessTokenService.findThirdAppAccessToken(request.getHeaderValue(WeConstans.THIRD_APP_PARAM_TIP));
-        request.replaceOrAddQuery("access_token", token);
+//        String token = iWeAccessTokenService.findThirdAppAccessToken(request.getHeaderValue(WeConstans.THIRD_APP_PARAM_TIP));
+        request.replaceOrAddQuery("access_token",
+                iWeAccessTokenService.findThirdAppAccessToken()
+        );
         return true;
     }
 

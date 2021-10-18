@@ -57,9 +57,7 @@
         setting_time
         FROM
         we_customer_messageTimeTask
-        <where>
-            setting_time <![CDATA[<=]]> #{timeMillis} AND solved=0
-        </where>
+        WHERE solved=0 and setting_time BETWEEN #{beginTime} AND #{endTime}
     </select>
 
 </mapper>

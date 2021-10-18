@@ -33,6 +33,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @description: 群发消息服务类
@@ -168,7 +170,9 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
         //发送群发消息
         //调用微信api发送消息
         if (null == customerMessagePushDto.getSettingTime() || customerMessagePushDto.getSettingTime().equals("")) {
-            weCustomerMessageService.sendMessgae(customerMessagePushDto, messageId, customers, groups);
+
+            weCustomerMessageService.sendMessgae(customerMessagePushDto, messageId,customers, groups);
+
         } else {
             WeCustomerMessageTimeTask timeTask = new WeCustomerMessageTimeTask(messageId, customerMessagePushDto, customers, groups
                     , DateUtils.getMillionSceondsBydate(customerMessagePushDto.getSettingTime()));
