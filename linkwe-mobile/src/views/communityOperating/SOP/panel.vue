@@ -118,9 +118,9 @@ export default {
       })
       let mes = {
         title: this.task.title,
-        desc: this.task.content
-        // link: '', // 消息链接
-        // imgUrl: this.task.materialUrl && this.task.materialUrl[0] ? this.task.materialUrl[0].materialUrl : ''
+        desc: this.task.content,
+        link: (this.task.materialList && this.task.materialList[0] && this.task.materialList[0].materialUrl) || ' ' // 消息链接
+        // imgUrl: this.task.materialList && this.task.materialList[0] && this.task.materialList[0].materialUrl
       }
       // mes.link || delete mes.link
       // mes.imgUrl || delete mes.imgUrl
