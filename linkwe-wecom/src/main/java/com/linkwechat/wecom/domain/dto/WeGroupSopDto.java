@@ -36,7 +36,7 @@ public class WeGroupSopDto {
      * 消息内容
      */
     @Size(max = 255, message = "标题不可超过255字符")
-    @NotBlank(message = "内容不可为空")
+//    @NotBlank(message = "内容不可为空")
     private String content;
 
     /**
