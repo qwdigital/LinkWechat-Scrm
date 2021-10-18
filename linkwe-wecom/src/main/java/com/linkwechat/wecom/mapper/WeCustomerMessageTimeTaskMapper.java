@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeCustomerMessageTimeTask;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ public interface WeCustomerMessageTimeTaskMapper extends BaseMapper<WeCustomerMe
      * @param timeMillis 当前时间毫秒数
      * @return {@link WeCustomerMessageTimeTask}s
      */
-    List<WeCustomerMessageTimeTask> selectWeCustomerMessageTimeTaskGteSettingTime(@Param("timeMillis") long timeMillis);
+    List<WeCustomerMessageTimeTask> selectWeCustomerMessageTimeTaskGteSettingTime(@Param("beginTime") Long beginTime,@Param("endTime") Long endTime);
 
     /**
      * 保存群发任务

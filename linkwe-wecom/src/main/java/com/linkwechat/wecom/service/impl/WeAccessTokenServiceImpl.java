@@ -90,34 +90,38 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
 
 
     /**
-     * 获取应用所需要的token
-     * @param agentId
+     * 获取应用所需要的token(移除weapp,直接从account表中获取相关信息)
      * @return
      */
     @Override
-    public String findThirdAppAccessToken(String agentId) {
-        String token=redisCache.getCacheObject(WeConstans.WE_THIRD_APP_TOKEN+"::"+agentId);
-        if(StringUtils.isNotEmpty(token)){
-            return token;
-        }
+    public String findThirdAppAccessToken() {
+
 
         WeApp weApp=null;
         //首先表中查询提醒的appid
         WeCorpAccount weCorpAccount = iWxCorpAccountService.findValidWeCorpAccount();
         if(weCorpAccount != null && StringUtils.isNotEmpty(weCorpAccount.getAgentId())){
-            if(weCorpAccount.getAgentId().equals(agentId)){
+
+            String token=redisCache.getCacheObject(WeConstans.WE_THIRD_APP_TOKEN+"::"+weCorpAccount.getAgentId());
+            if(StringUtils.isNotEmpty(token)){
+                return token;
+            }else{
                 weApp=WeApp.builder()
                         .agentId(weCorpAccount.getAgentId())
                         .agentSecret(weCorpAccount.getAgentSecret())
                         .build();
             }
+
+//            if(weCorpAccount.getAgentId().equals(agentId)){
+//
+//            }
         }
-        if(weApp==null){
-            weApp = iWeAppService.getOne(new LambdaQueryWrapper<WeApp>()
-                    .eq(WeApp::getAgentId, agentId)
-                    .eq(WeApp::getDelFlag, Constants.NORMAL_CODE)
-                    .eq(WeApp::getStatus,  Constants.NORMAL_CODE));
-        }
+//        if(weApp==null){
+//            weApp = iWeAppService.getOne(new LambdaQueryWrapper<WeApp>()
+//                    .eq(WeApp::getAgentId, agentId)
+//                    .eq(WeApp::getDelFlag, Constants.NORMAL_CODE)
+//                    .eq(WeApp::getStatus,  Constants.NORMAL_CODE));
+//        }
 
 
         return findThirdAppAccessToken(weApp);

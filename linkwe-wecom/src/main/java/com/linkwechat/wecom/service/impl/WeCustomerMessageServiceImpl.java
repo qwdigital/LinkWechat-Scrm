@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ArrayUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -97,46 +99,58 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
     @Override
     public void sendMessgae(CustomerMessagePushDto customerMessagePushDto, long messageId,List<WeCustomer> customers,List<WeGroup> groups) throws JsonProcessingException {
         List<String> msgid = new ArrayList<>();
-        //发送群发消息
-        //发送类类型: 给单个客户发，群发
+
         //发给客户
-        if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_CUSTOMER)) {
+        if(CollectionUtils.isNotEmpty(customers)){
+            customers.stream().collect(Collectors.groupingBy(WeCustomer::getUserId)).forEach((k,v)->{
 
-            WeCustomerMessagePushDto messagePushDto = new WeCustomerMessagePushDto();
+                customerMessagePushDto.setStaffId(k);
+                //发送群发消息
+                //发送类类型: 给单个客户发，群发
+                if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_CUSTOMER)) {
 
-            messagePushDto.setChat_type(ChatType.of(customerMessagePushDto.getPushType()).getName());
-            List<String> externalUserIds = customers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
-
-            messagePushDto.setExternal_userid(externalUserIds);
-            messagePushDto.setSender(customerMessagePushDto.getStaffId());
-            childMessage(messagePushDto, customerMessagePushDto);
-            SendMessageResultDto sendMessageResultDto = weCustomerMessagePushClient.sendCustomerMessageToUser(messagePushDto);
-            if (WeConstans.WE_SUCCESS_CODE.equals(sendMessageResultDto.getErrcode())) {
-                msgid.add(sendMessageResultDto.getMsgid());
-            }
-
-        }
-
-        //发给客户群
-        if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_GROUP)) {
-
-            if (CollectionUtils.isNotEmpty(groups)) {
-                List<String> owners = groups.stream().map(WeGroup::getOwner).collect(Collectors.toList());
-                for (String owner : owners) {
                     WeCustomerMessagePushDto messagePushDto = new WeCustomerMessagePushDto();
+
                     messagePushDto.setChat_type(ChatType.of(customerMessagePushDto.getPushType()).getName());
-                    //客户群的员工id
-                    messagePushDto.setSender(owner);
+                    List<String> externalUserIds = v.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
+
+                    messagePushDto.setExternal_userid(externalUserIds);
+                    messagePushDto.setSender(customerMessagePushDto.getStaffId());
                     childMessage(messagePushDto, customerMessagePushDto);
+
                     SendMessageResultDto sendMessageResultDto = weCustomerMessagePushClient.sendCustomerMessageToUser(messagePushDto);
                     if (WeConstans.WE_SUCCESS_CODE.equals(sendMessageResultDto.getErrcode())) {
-                        //发送的msgId
                         msgid.add(sendMessageResultDto.getMsgid());
                     }
                 }
-            }
-
+            });
         }
+
+
+
+
+        //发给客户群
+        if(CollectionUtil.isNotEmpty(groups)){
+            if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_GROUP)) {
+                if (CollectionUtils.isNotEmpty(groups)) {
+                    Set<String> owners = groups.stream().map(WeGroup::getOwner).collect(Collectors.toSet());
+                    for (String owner : owners) {
+                        WeCustomerMessagePushDto messagePushDto = new WeCustomerMessagePushDto();
+                        messagePushDto.setChat_type(ChatType.of(customerMessagePushDto.getPushType()).getName());
+                        //客户群的员工id
+                        messagePushDto.setSender(owner);
+                        childMessage(messagePushDto, customerMessagePushDto);
+                        SendMessageResultDto sendMessageResultDto = weCustomerMessagePushClient.sendCustomerMessageToUser(messagePushDto);
+                        if (WeConstans.WE_SUCCESS_CODE.equals(sendMessageResultDto.getErrcode())) {
+                            //发送的msgId
+                            msgid.add(sendMessageResultDto.getMsgid());
+                        }
+                    }
+                }
+
+            }
+        }
+
 
 
         this.updateMsgId(messageId, msgid);
@@ -160,8 +174,8 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
         if (customerMessagePushDto.getMessageType().equals(GroupMessageType.IMAGE.getType())) {
             ImageMessageDto imageMessage = customerMessagePushDto.getImageMessage();
             try {
-                WeMediaDto weMediaDto = weMaterialService.uploadTemporaryMaterial(imageMessage.getPic_url(),
-                        FileUtil.getName(imageMessage.getPic_url()),GroupMessageType.IMAGE.getMessageType());
+                WeMediaDto weMediaDto = weMaterialService.uploadTemporaryMaterial(imageMessage.getPic_url(),GroupMessageType.IMAGE.getMessageType(),
+                        FileUtil.getName(imageMessage.getPic_url()));
                 imageMessage.setMedia_id(weMediaDto.getMedia_id());
             } catch (Exception e) {
             }
