@@ -108,46 +108,54 @@ export default {
     },
 
     send() {
-      const userId = this.$store.state.userId
-      const taskId = this.task.ruleId
-      let _this = this
-      this.$toast.loading({
-        message: '正在发送...',
-        duration: 0,
-        forbidClick: true
-      })
-      let mes = {
-        title: this.task.title,
-        desc: this.task.content,
-        link: (this.task.materialList && this.task.materialList[0] && this.task.materialList[0].materialUrl) || ' ' // 消息链接
-        // imgUrl: this.task.materialList && this.task.materialList[0] && this.task.materialList[0].materialUrl
-      }
-      // mes.link || delete mes.link
-      // mes.imgUrl || delete mes.imgUrl
-      wx.invoke('shareToExternalChat', mes, async function(res) {
-        if (res.err_msg == 'shareToExternalChat:ok') {
-          try {
-            await changeStatus(userId, taskId, 1)
-          } catch (error) {
+      try {
+        const userId = this.$store.state && this.$store.state.userId
+        const taskId = this.task.ruleId
+        let _this = this
+        this.$toast.loading({
+          message: '正在发送...',
+          duration: 0,
+          forbidClick: true
+        })
+
+        // mes.link || delete mes.link
+        // mes.imgUrl || delete mes.imgUrl
+        wx.invoke(
+          'shareToExternalChat',
+          {
+            title: this.task.title,
+            desc: this.task.content,
+            link: (this.task.materialList && this.task.materialList[0] && this.task.materialList[0].materialUrl) || ' ' // 消息链接
+            // imgUrl: this.task.materialList && this.task.materialList[0] && this.task.materialList[0].materialUrl
+          },
+          async function(res) {
+            if (res.err_msg == 'shareToExternalChat:ok') {
+              try {
+                await changeStatus(userId, taskId, 1)
+              } catch (error) {
+                _this.$toast.clear()
+                _this.$dialog({ message: '接口失败：' + JSON.stringify(error) })
+                return
+              }
+              // .then((res) => {
+              // }).catch(() => {
+              //   this.$emit('refresh')
+              // })
+              _this.$toast.clear()
+              this.$emit('refresh')
+            } else {
+              if (res.err_code == 1) {
+                // 用户取消发送
+              } else {
+                _this.$dialog({ message: 'shareToExternalChat失败：' + JSON.stringify(res) })
+              }
+            }
             _this.$toast.clear()
-            _this.$dialog({ message: '接口失败：' + JSON.stringify(error) })
-            return
           }
-          // .then((res) => {
-          // }).catch(() => {
-          //   this.$emit('refresh')
-          // })
-          _this.$toast.clear()
-          this.$emit('refresh')
-        } else {
-          if (res.err_code == 1) {
-            // 用户取消发送
-          } else {
-            _this.$dialog({ message: 'shareToExternalChat失败：' + JSON.stringify(res) })
-          }
-        }
-        _this.$toast.clear()
-      })
+        )
+      } catch (error) {
+        this.$dialog({ message: '代码错误：' + JSON.stringify(error.message) })
+      }
     },
 
     touchStart() {
