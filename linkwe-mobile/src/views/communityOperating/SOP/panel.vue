@@ -125,8 +125,9 @@ export default {
           {
             title: this.task.title,
             desc: this.task.content,
-            link: (this.task.materialList && this.task.materialList[0] && this.task.materialList[0].materialUrl) || ' ' // 消息链接
-            // imgUrl: this.task.materialList && this.task.materialList[0] && this.task.materialList[0].materialUrl
+            link: (this.task.materialList && this.task.materialList[0] && this.task.materialList[0].materialUrl) || ' ', // 消息链接
+            imgUrl:
+              (this.task.materialList && this.task.materialList[0] && this.task.materialList[0].materialUrl) || ' ' // 封面
           },
           async function(res) {
             if (res.err_msg == 'shareToExternalChat:ok') {
