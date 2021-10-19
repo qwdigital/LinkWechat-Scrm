@@ -46,7 +46,6 @@ public class WeMsgTlpController extends BaseController
     }
 
 
-
     /**
      * 新增欢迎语模板
      */
@@ -57,13 +56,6 @@ public class WeMsgTlpController extends BaseController
     {
 
         weMsgTlpService.addorUpdate(weMsgTlp);
-        return AjaxResult.success();
-    }
-
-
-    @PutMapping
-    public AjaxResult add(@RequestBody WeMsgTlp weMsgTlp){
-        weMsgTlpService.save(weMsgTlp);
         return AjaxResult.success();
     }
 

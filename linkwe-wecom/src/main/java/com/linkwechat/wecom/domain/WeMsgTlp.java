@@ -19,7 +19,7 @@ import java.util.List;
  * @date 2020-10-04
  */
 @Data
-@TableName(value = "we_msg_tlp",autoResultMap = true)
+@TableName("we_msg_tlp")
 public class WeMsgTlp extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
@@ -38,13 +38,13 @@ public class WeMsgTlp extends BaseEntity
 
     /**图文*/
     @TableField(typeHandler = GenericTypeHandler.class)
-    private List<ImageText> imageText;
+    private ImageText imageText;
 
 
 
     /**小程序*/
     @TableField(typeHandler = GenericTypeHandler.class)
-    private List<Applet> applet;
+    private Applet applet;
 
 
     /** 0:正常;1:删除; */
