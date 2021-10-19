@@ -4,9 +4,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 群发成员发送任务列表
- * @date 2021/10/3 16:56
+ * @date 2021/10/19 16:56
  **/
 @Data
 public class WeGroupMsgTaskDto {

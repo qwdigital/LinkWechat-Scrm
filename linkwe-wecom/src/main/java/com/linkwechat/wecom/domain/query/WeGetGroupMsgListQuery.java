@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 群发成员发送任务列表入参
  * @date 2021/10/19 16:49
  **/
@@ -14,10 +14,10 @@ import lombok.Data;
 public class WeGetGroupMsgListQuery {
 
     @ApiModelProperty("群发消息的id")
-    private String msgid;
+    private String msgId;
 
     @ApiModelProperty("发送成员userid")
-    private String userid;
+    private String userId;
 
     @ApiModelProperty("返回的最大记录数，整型，最大值1000，默认值500")
     private Integer limit;

@@ -24,7 +24,7 @@ public interface WeCustomerMessagePushClient {
      */
     @Deprecated
     @Request(url = "/externalcontact/add_msg_template", type = "POST")
-    SendMessageResultDto sendCustomerMessageToUser(@JSONBody WeCustomerMessagePushDto customerMessagePushDto);
+    SendMessageResultDto sendCustomerMessageToUser(@Body WeCustomerMessagePushDto customerMessagePushDto);
 
 
 
@@ -55,7 +55,7 @@ public interface WeCustomerMessagePushClient {
      * @return {@link WeGroupMsgListDto}
      */
     @Request(url = "/externalcontact/get_groupmsg_list_v2",type = "POST")
-    WeGroupMsgListDto getGroupMsgList(@JSONBody WeGroupMsgListQuery query);
+    WeGroupMsgListDto getGroupMsgResult(@JSONBody WeGroupMsgListQuery query);
 
     /**
      * 获取群发成员发送任务列表

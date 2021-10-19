@@ -27,7 +27,7 @@ public class WeGroupMsgDto {
     private Long createTime;
 
     @ApiModelProperty("群发消息创建来源。0：企业 1：个人")
-    private Integer createType;
+    private String createType;
 
     @ApiModelProperty("消息文本内容，最多4000个字节")
     private WeAddMsgTemplateQuery.Text text;
