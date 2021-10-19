@@ -1,4 +1,4 @@
-package com.linkwechat.framework.handler;
+package com.linkwechat.wecom.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -19,7 +19,7 @@ import java.sql.SQLException;
  * @param <T>
  */
 @SuppressWarnings("all")
-@MappedTypes(value = {JSONObject.class, CustomerMessagePushDto.class})
+@MappedTypes(value = {JSONObject.class, CustomerMessagePushDto.class, WeMsgTlp.Applet.class,WeMsgTlp.ImageText.class})
 @MappedJdbcTypes(value = {JdbcType.VARCHAR}, includeNullJdbcType = true)
 public class GenericTypeHandler<T extends Object> extends BaseTypeHandler<T> {
 

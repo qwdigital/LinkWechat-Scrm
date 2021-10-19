@@ -19,25 +19,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, welcome_msg, media_id, del_flag, welcome_msg_tpl_type,create_by,create_time from we_msg_tlp
     </sql>
 
-    <select id="selectWeMsgTlpList" parameterType="WeMsgTlp" resultMap="WeMsgTlpResult">
-        SELECT
-            wmt.id,
-            wmt.welcome_msg,
-            wmt.media_id,
-            wmt.del_flag,
-            wmt.welcome_msg_tpl_type,
-            wmt.create_by,
-            wmt.create_time,
-            wm.material_url
-        FROM
-        we_msg_tlp wmt
-        LEFT JOIN we_material wm ON wmt.media_id=wm.id
-        <where>  
-            <if test="welcomeMsg != null  and welcomeMsg != ''"> and wmt.welcome_msg like CONCAT('%',#{welcomeMsg,jdbcType=VARCHAR},'%') </if>
-            <if test="welcomeMsgTplType !=null "> and wmt.welcome_msg_tpl_type = #{welcomeMsgTplType}</if>
-            and wmt.del_flag = 0
-        </where>
-    </select>
+<!--    <select id="selectWeMsgTlpList" parameterType="WeMsgTlp" resultMap="WeMsgTlpResult">-->
+<!--        SELECT-->
+<!--            wmt.id,-->
+<!--            wmt.welcome_msg,-->
+<!--            wmt.media_id,-->
+<!--            wmt.del_flag,-->
+<!--            wmt.welcome_msg_tpl_type,-->
+<!--            wmt.create_by,-->
+<!--            wmt.create_time,-->
+<!--            wm.material_url-->
+<!--        FROM-->
+<!--        we_msg_tlp wmt-->
+<!--        LEFT JOIN we_material wm ON wmt.media_id=wm.id-->
+<!--        <where>  -->
+<!--            <if test="welcomeMsg != null  and welcomeMsg != ''"> and wmt.welcome_msg like CONCAT('%',#{welcomeMsg,jdbcType=VARCHAR},'%') </if>-->
+<!--            <if test="welcomeMsgTplType !=null "> and wmt.welcome_msg_tpl_type = #{welcomeMsgTplType}</if>-->
+<!--            and wmt.del_flag = 0-->
+<!--        </where>-->
+<!--    </select>-->
 
     
     <select id="selectWeMsgTlpById" parameterType="Long" resultMap="WeMsgTlpResult">
