@@ -55,7 +55,7 @@ public interface WeCustomerMessagePushClient {
      * @return {@link WeGroupMsgListDto}
      */
     @Request(url = "/externalcontact/get_groupmsg_list_v2",type = "POST")
-    WeGroupMsgListDto getGroupMsgResult(@JSONBody WeGroupMsgListQuery query);
+    WeGroupMsgListDto getGroupMsgList(@JSONBody WeGroupMsgListQuery query);
 
     /**
      * 获取群发成员发送任务列表
