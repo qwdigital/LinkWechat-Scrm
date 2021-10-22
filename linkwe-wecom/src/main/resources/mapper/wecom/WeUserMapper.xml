@@ -65,6 +65,7 @@
             <if test="birthday != null ">and birthday = #{birthday}</if>
             <if test="isActivate != null ">and is_activate = #{isActivate}</if>
             <if test="isOpenChat != null ">and is_open_chat = #{isOpenChat}</if>
+            and is_activate !=6
         </where>
     </select>
 

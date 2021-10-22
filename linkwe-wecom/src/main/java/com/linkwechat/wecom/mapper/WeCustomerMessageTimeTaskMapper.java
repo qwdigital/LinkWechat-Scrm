@@ -37,6 +37,6 @@ public interface WeCustomerMessageTimeTaskMapper extends BaseMapper<WeCustomerMe
      * @param taskId 任务id
      * @return int
      */
-    int updateTaskSolvedById(@Param("taskId") Long taskId);
+    int updateTaskSolvedById(@Param("taskId") Long taskId,@Param("solved") Integer solved,@Param("exceMsg") String exceMsg);
 
 }
