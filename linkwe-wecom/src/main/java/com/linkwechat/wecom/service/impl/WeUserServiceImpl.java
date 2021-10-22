@@ -1,11 +1,14 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.google.common.collect.Lists;
+import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.exception.wecom.WeComException;
@@ -51,6 +54,10 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper, WeUser> impleme
 
     @Autowired
     private WeMsgAuditClient weMsgAuditClient;
+
+
+    @Autowired
+    private RuoYiConfig  ruoYiConfig;
 
     @Override
     public List<WeUser> getListByIds(List<Long> idList) {
@@ -207,9 +214,21 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper, WeUser> impleme
         List<WeUser> weUsers = weUserClient.list(WeConstans.WE_ROOT_DEPARMENT_ID,
                 WeConstans.DEPARTMENT_SUB_WEUSER).getWeUsers();
         if (CollectionUtil.isNotEmpty(weUsers)) {
-            List<WeUser> collect
-                    = weUsers.stream().filter(o -> !o.getUserId().equals("45DuXiangShangQingXie")).collect(Collectors.toList());
-            List<List<WeUser>> lists = Lists.partition(collect, 500);
+            //不存在的客户设置为离职未分配状态
+            this.update(WeUser.builder()
+                            .isActivate(WeConstans.WE_USER_IS_LEAVE)
+                            .isAllocate(WeConstans.LEAVE_NO_ALLOCATE_STATE)
+                            .dimissionTime(new Date())
+                    .build(),new LambdaQueryWrapper<WeUser>()
+                    .notIn(WeUser::getUserId,weUsers.stream().map(WeUser::getUserId).collect(Collectors.toList())));
+
+
+            String[] noSyncWeUser = ruoYiConfig.getNoSyncWeUser();
+            if(ArrayUtil.isNotEmpty(noSyncWeUser)){
+                weUsers=weUsers.stream().filter(o -> !ListUtil.toList(noSyncWeUser).contains(o.getUserId())).collect(Collectors.toList());
+            }
+
+            List<List<WeUser>> lists = Lists.partition(weUsers, 500);
             for(List<WeUser> list : lists){
                 this.weUserMapper.insertBatch(list);
             }

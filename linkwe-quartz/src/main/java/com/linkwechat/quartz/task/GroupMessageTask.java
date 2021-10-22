@@ -35,17 +35,22 @@ public class GroupMessageTask {
         if (CollectionUtils.isNotEmpty(weCustomerMessageTimeTasks)) {
             weCustomerMessageTimeTasks.forEach(
                     s -> {
+                        Integer solved=new Integer(1);
+                        String exceMsg=null;
                         try {
                             if (s.getMessageInfo() != null && s.getMessageId() != null || (s.getMessageInfo().getPushType().equals(WeConstans.SEND_MESSAGE_CUSTOMER)
                                     && CollectionUtils.isNotEmpty(s.getCustomersInfo())) || (s.getMessageInfo().getPushType().equals(WeConstans.SEND_MESSAGE_GROUP)
                                     && CollectionUtils.isNotEmpty(s.getGroupsInfo()))) {
                                 weCustomerMessageService.sendMessgae(s.getMessageInfo(), s.getMessageId(), s.getCustomersInfo(), s.getGroupsInfo());
-                                //更新消息处理状态
-                                customerMessageTimeTaskMapper.updateTaskSolvedById(s.getTaskId());
+
                             }
                         } catch (Exception e) {
                             log.error("定时群发消息处理异常：ex:{}", e);
-                            e.printStackTrace();
+                            solved=new Integer(2);
+                            exceMsg=e.getMessage();
+                        }finally {
+                            //更新消息处理状态
+                            customerMessageTimeTaskMapper.updateTaskSolvedById(s.getTaskId(),solved,exceMsg);
                         }
                     }
             );

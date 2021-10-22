@@ -46,6 +46,10 @@ public class RuoYiConfig
     private boolean editPwd=true;
 
 
+    /**无需同步的用户*/
+    private String[] noSyncWeUser;
+
+
 
     /**匿名访问的URL*/
     private String[] anonUrl;
@@ -184,5 +188,14 @@ public class RuoYiConfig
 
     public void setEditPwd(boolean editPwd) {
         this.editPwd = editPwd;
+    }
+
+
+    public String[] getNoSyncWeUser() {
+        return noSyncWeUser;
+    }
+
+    public void setNoSyncWeUser(String[] noSyncWeUser) {
+        this.noSyncWeUser = noSyncWeUser;
     }
 }
