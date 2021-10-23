@@ -14,10 +14,10 @@ import lombok.Data;
 public class WeGetGroupMsgListQuery {
 
     @ApiModelProperty("群发消息的id")
-    private String msgId;
+    private String msgid;
 
     @ApiModelProperty("发送成员userid")
-    private String userId;
+    private String userid;
 
     @ApiModelProperty("返回的最大记录数，整型，最大值1000，默认值500")
     private Integer limit;
