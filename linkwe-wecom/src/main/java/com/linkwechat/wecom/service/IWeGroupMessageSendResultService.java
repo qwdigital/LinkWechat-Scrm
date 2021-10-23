@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service;
 
 import com.linkwechat.wecom.domain.WeGroupMessageSendResult;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.wecom.domain.WeGroupMessageTask;
 import com.linkwechat.wecom.domain.dto.message.WeGroupMsgListDto;
 
 import java.util.List;
@@ -28,4 +29,7 @@ public interface IWeGroupMessageSendResultService extends IService<WeGroupMessag
      * @return WeGroupMsgListDto 群成员发送结果列表
      */
     WeGroupMsgListDto getGroupMsgSendResult(String msgId, String userId, String cursor);
+
+
+    void addOrUpdateBatchByCondition(List<WeGroupMessageSendResult> taskList);
 }

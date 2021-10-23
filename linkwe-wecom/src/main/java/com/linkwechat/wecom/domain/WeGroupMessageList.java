@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -25,7 +26,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("we_group_message_list")
-public class WeGroupMessageList extends BaseEntity {
+public class WeGroupMessageList extends BaseEntity{
 
     /**
      * 主键id
@@ -76,4 +77,18 @@ public class WeGroupMessageList extends BaseEntity {
     @ApiModelProperty("是否定时任务 0 常规 1 定时发送")
     @Excel(name = "是否定时任务 0 常规 1 定时发送")
     private Integer isTask;
+
+    /**
+     * 是否执行 0 未执行 1 已执行
+     */
+    @ApiModelProperty("是否执行 0 未执行 1 已执行")
+    @Excel(name = "是否执行 0 未执行 1 已执行")
+    private Integer isExecute;
+
+    /**
+     * 群发消息创建者
+     */
+    @ApiModelProperty("群发消息创建者")
+    @TableField(exist = false)
+    private String userName;
 }

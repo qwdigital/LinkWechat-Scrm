@@ -12,6 +12,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="mediaId"    column="media_id"    />
         <result property="title"    column="title"    />
         <result property="description"    column="description"    />
+        <result property="fileUrl"    column="file_url"    />
         <result property="linkUrl"    column="link_url"    />
         <result property="picUrl"    column="pic_url"    />
         <result property="appId"    column="app_id"    />

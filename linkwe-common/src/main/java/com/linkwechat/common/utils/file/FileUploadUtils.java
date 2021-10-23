@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import cn.hutool.core.io.FileUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.config.RuoYiConfig;
@@ -73,6 +74,14 @@ public class FileUploadUtils {
         }
     }
 
+    public static final String upload(InputStream inputStream,String fileName) throws IOException {
+        try {
+            return upload(getDefaultBaseDir(), inputStream, fileName);
+        } catch (Exception e) {
+            throw new IOException(e.getMessage(), e);
+        }
+    }
+
 
     /**
      * 以默认配置进行文件上传
@@ -133,6 +142,12 @@ public class FileUploadUtils {
         file.transferTo(desc);
         String pathFileName = getPathFileName(baseDir, fileName);
         return pathFileName;
+    }
+
+    public static final String upload(String baseDir, InputStream inputStream, String fileName) throws IOException {
+        File desc = getAbsoluteFile(baseDir, fileName);
+        File file = FileUtil.writeFromStream(inputStream, desc);
+        return file.getAbsolutePath();
     }
 
     /**

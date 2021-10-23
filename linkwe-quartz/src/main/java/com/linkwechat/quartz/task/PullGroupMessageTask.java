@@ -1,6 +1,5 @@
 package com.linkwechat.quartz.task;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -11,11 +10,11 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.WeGroupMessageAttachments;
 import com.linkwechat.wecom.domain.WeGroupMessageList;
 import com.linkwechat.wecom.domain.WeGroupMessageSendResult;
+import com.linkwechat.wecom.domain.WeGroupMessageTask;
+import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.dto.message.WeGroupMsgListDto;
 import com.linkwechat.wecom.domain.query.WeAddMsgTemplateQuery;
-import com.linkwechat.wecom.service.IWeGroupMessageAttachmentsService;
-import com.linkwechat.wecom.service.IWeGroupMessageListService;
-import com.linkwechat.wecom.service.IWeGroupMessageSendResultService;
+import com.linkwechat.wecom.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -41,7 +40,13 @@ public class PullGroupMessageTask {
     private IWeGroupMessageAttachmentsService attachmentsService;
 
     @Autowired
+    private IWeGroupMessageTaskService groupMessageTaskService;
+
+    @Autowired
     private IWeGroupMessageSendResultService sendResultService;
+
+    @Autowired
+    private IWeMaterialService weMaterialService;
 
     /**
      * 同步开始时间
@@ -68,32 +73,34 @@ public class PullGroupMessageTask {
         } else if (ObjectUtil.equal("3", type)) {
             startTime = DateUtil.beginOfDay(DateUtil.offsetDay(new Date(), -30)).getTime() / 1000;
             endTime = DateUtil.endOfDay(DateUtil.offsetDay(new Date(), -1)).getTime() / 1000;
-            ThreadUtil.execAsync(this::pullSingleMsgList);
+            pullGroupMsgList();
             return;
         } else if (ObjectUtil.equal("4", type)) {
             startTime = DateUtil.beginOfDay(DateUtil.offsetDay(new Date(), -30)).getTime() / 1000;
             endTime = DateUtil.endOfDay(DateUtil.offsetDay(new Date(), -1)).getTime() / 1000;
-            ThreadUtil.execAsync(this::pullGroupMsgList);
+            pullGroupMsgList();
             return;
         } else if (ObjectUtil.equal("5", type)) {
             startTime = DateUtil.beginOfDay(DateUtil.offsetDay(new Date(), -1)).getTime() / 1000;
             endTime = DateUtil.endOfDay(DateUtil.offsetDay(new Date(), -1)).getTime() / 1000;
-            ThreadUtil.execAsync(this::pullSingleMsgList);
+            pullSingleMsgList();
             return;
         } else if (ObjectUtil.equal("6", type)) {
             startTime = DateUtil.beginOfDay(DateUtil.offsetDay(new Date(), -1)).getTime() / 1000;
             endTime = DateUtil.endOfDay(DateUtil.offsetDay(new Date(), -1)).getTime() / 1000;
-            ThreadUtil.execAsync(this::pullGroupMsgList);
+            pullGroupMsgList();
             return;
         }
-        ThreadUtil.execAsync(this::pullSingleMsgList);
-        ThreadUtil.execAsync(this::pullGroupMsgList);
+        //ThreadUtil.execAsync(this::pullSingleMsgList);
+        pullGroupMsgList();
+        pullSingleMsgList();
+        //ThreadUtil.execAsync(this::pullGroupMsgList);
     }
 
     //拉取发送给客户的群发消息
     private void pullSingleMsgList() {
         WeGroupMsgListDto singleMsgList = groupMessageListService.getGroupMsgList("single", startTime, endTime, null);
-        saveGroupMsg(singleMsgList);
+        saveGroupMsg(singleMsgList,"single");
         pullGroupMsgSendResult(singleMsgList);
 
     }
@@ -102,17 +109,23 @@ public class PullGroupMessageTask {
     private void pullGroupMsgList() {
         //拉取发送给客户的群发消息
         WeGroupMsgListDto groupMsgList = groupMessageListService.getGroupMsgList("group", startTime, endTime, null);
-        saveGroupMsg(groupMsgList);
+        saveGroupMsg(groupMsgList,"group");
         pullGroupMsgSendResult(groupMsgList);
     }
 
-    //保存消息入库
-    private void saveGroupMsg(WeGroupMsgListDto groupMsgList) {
+    /**
+     * 保存消息入库
+     * @param groupMsgList
+     * @param chatType
+     */
+    private void saveGroupMsg(WeGroupMsgListDto groupMsgList,String chatType) {
+        List<WeGroupMessageAttachments> attachmentList = new ArrayList<>();
+        List<WeGroupMessageList> saveGroupMessageList = new ArrayList<>();
         Optional.ofNullable(groupMsgList).map(WeGroupMsgListDto::getGroupMsgList)
                 .orElseGet(ArrayList::new).forEach(weGroupMsg -> {
             WeGroupMessageList weGroupMessageList = new WeGroupMessageList();
             weGroupMessageList.setMsgId(weGroupMsg.getMsgId());
-            weGroupMessageList.setChatType("single");
+            weGroupMessageList.setChatType(chatType);
             weGroupMessageList.setCreateType(weGroupMsg.getCreateType());
             weGroupMessageList.setSendTime(new Date(weGroupMsg.getCreateTime() * 1000));
             weGroupMessageList.setUserId(weGroupMsg.getCreator());
@@ -120,55 +133,77 @@ public class PullGroupMessageTask {
                     .eq(WeGroupMessageList::getMsgId, weGroupMsg.getMsgId()).last("limit 1"));
             if (weGroupMessage != null) {
                 weGroupMessageList.setId(weGroupMessage.getId());
-                groupMessageListService.updateById(weGroupMessageList);
+                saveGroupMessageList.add(weGroupMessageList);
             } else {
-                if (groupMessageListService.save(weGroupMessageList)) {
-                    List<WeGroupMessageAttachments> attachmentList = new ArrayList<>();
-                    String content = Optional.ofNullable(weGroupMsg.getText()).map(WeAddMsgTemplateQuery.Text::getContent).orElse("");
-                    if (StringUtils.isNotEmpty(content)) {
-                        WeGroupMessageAttachments attachment = new WeGroupMessageAttachments();
-                        attachment.setMsgType("text");
-                        attachment.setContent(content);
-                        attachmentList.add(attachment);
-                    }
-                    List<JSONObject> attachments = weGroupMsg.getAttachments();
-                    Optional.ofNullable(attachments).orElseGet(ArrayList::new).forEach(attachment -> {
-                        String msgtype = attachment.getString("msgtype");
-                        JSONObject msgObject = attachment.getJSONObject(msgtype);
-                        WeGroupMessageAttachments messageAttachment = new WeGroupMessageAttachments();
-                        messageAttachment.setMsgType(msgtype);
-
-                        MessageType messageType = MessageType.valueOf(msgtype);
-                        switch (messageType) {
-                            case IMAGE:
-                                messageAttachment.setMediaId(msgObject.getString("media_id"));
-                                messageAttachment.setPicUrl(msgObject.getString("pic_url"));
-                                break;
-                            case LINK:
-                                messageAttachment.setTitle(msgObject.getString("title"));
-                                messageAttachment.setPicUrl(msgObject.getString("picurl"));
-                                messageAttachment.setDescription(msgObject.getString("desc"));
-                                messageAttachment.setLinkUrl(msgObject.getString("url"));
-                                break;
-                            case MINIPROGRAM:
-                                messageAttachment.setTitle(msgObject.getString("title"));
-                                messageAttachment.setMediaId(msgObject.getString("pic_media_id"));
-                                messageAttachment.setAppId(msgObject.getString("appid"));
-                                messageAttachment.setLinkUrl(msgObject.getString("page"));
-                                break;
-                            case VIDEO:
-                            case FILE:
-                                messageAttachment.setMediaId(msgObject.getString("media_id"));
-                                break;
-                            default:
-                                break;
-                        }
-                        attachmentList.add(messageAttachment);
-                    });
-                    attachmentsService.saveBatch(attachmentList);
+                saveGroupMessageList.add(weGroupMessageList);
+                String content = Optional.ofNullable(weGroupMsg.getText()).map(WeAddMsgTemplateQuery.Text::getContent).orElse("");
+                if (StringUtils.isNotEmpty(content)) {
+                    WeGroupMessageAttachments attachment = new WeGroupMessageAttachments();
+                    attachment.setMsgId(weGroupMsg.getMsgId());
+                    attachment.setMsgType("text");
+                    attachment.setContent(content);
+                    attachmentList.add(attachment);
                 }
+                List<JSONObject> attachments = weGroupMsg.getAttachments();
+                Optional.ofNullable(attachments).orElseGet(ArrayList::new).forEach(attachment -> {
+                    String msgtype = attachment.getString("msgtype");
+                    JSONObject msgObject = attachment.getJSONObject(msgtype);
+                    WeGroupMessageAttachments messageAttachment = new WeGroupMessageAttachments();
+                    messageAttachment.setMsgId(weGroupMsg.getMsgId());
+                    messageAttachment.setMsgType(msgtype);
+                    String mediaId = msgObject.getString("media_id")==null ?msgObject.getString("pic_media_id")
+                            :msgObject.getString("media_id");
+                    WeMediaDto weMediaDto = null;
+                    if(StringUtils.isNotEmpty(mediaId)){
+                        try {
+                            weMediaDto = weMaterialService.getMediaToResponse(mediaId);
+                        } catch (Exception e) {
+                            log.info("获取素材信息失败.........."+e.getMessage());
+                        }
+                    }
+                    MessageType messageType = MessageType.messageTypeOf(msgtype);
+                    switch (messageType) {
+                        case IMAGE:
+                            //messageAttachment.setMediaId(msgObject.getString("media_id"));
+                            messageAttachment.setMediaId(mediaId);
+                            messageAttachment.setPicUrl(msgObject.getString("pic_url"));
+                            if(weMediaDto != null){
+                                messageAttachment.setPicUrl(weMediaDto.getUrl());
+                            }
+                            break;
+                        case LINK:
+                            messageAttachment.setTitle(msgObject.getString("title"));
+                            messageAttachment.setPicUrl(msgObject.getString("picurl"));
+                            messageAttachment.setDescription(msgObject.getString("desc"));
+                            messageAttachment.setLinkUrl(msgObject.getString("url"));
+                            break;
+                        case MINIPROGRAM:
+                            messageAttachment.setTitle(msgObject.getString("title"));
+                            //messageAttachment.setMediaId(msgObject.getString("pic_media_id"));
+                            messageAttachment.setMediaId(mediaId);
+                            messageAttachment.setAppId(msgObject.getString("appid"));
+                            messageAttachment.setLinkUrl(msgObject.getString("page"));
+                            if(weMediaDto != null){
+                                messageAttachment.setPicUrl(weMediaDto.getUrl());
+                            }
+                            break;
+                        case VIDEO:
+                        case FILE:
+                            //messageAttachment.setMediaId(msgObject.getString("media_id"));
+                            messageAttachment.setMediaId(mediaId);
+                            if(weMediaDto != null){
+                                messageAttachment.setFileUrl(weMediaDto.getUrl());
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    attachmentList.add(messageAttachment);
+                });
             }
         });
+        groupMessageListService.saveOrUpdateBatch(saveGroupMessageList);
+        attachmentsService.saveBatch(attachmentList);
     }
 
     /**
@@ -177,11 +212,21 @@ public class PullGroupMessageTask {
      * @param groupMsgList
      */
     public void pullGroupMsgSendResult(WeGroupMsgListDto groupMsgList) {
-        List<WeGroupMessageSendResult> list = new ArrayList<>();
+        List<WeGroupMessageTask> taskList = new ArrayList<>();
+        List<WeGroupMessageSendResult> sendResultlist = new ArrayList<>();
         Optional.ofNullable(groupMsgList).map(WeGroupMsgListDto::getGroupMsgList)
                 .orElseGet(ArrayList::new).forEach(weGroupMsg -> {
-            WeGroupMsgListDto groupMsgTask = groupMessageListService.getGroupMsgTask(weGroupMsg.getMsgId(), null);
+            WeGroupMsgListDto groupMsgTask = groupMessageTaskService.getGroupMsgTask(weGroupMsg.getMsgId(), null);
             Optional.ofNullable(groupMsgTask).map(WeGroupMsgListDto::getTaskList).orElseGet(ArrayList::new).forEach(msgTask -> {
+                WeGroupMessageTask messageTask = new WeGroupMessageTask();
+                messageTask.setMsgId(weGroupMsg.getMsgId());
+                messageTask.setUserId(msgTask.getUserId());
+                if(msgTask.getSendTime() != null){
+                    messageTask.setSendTime(new Date(msgTask.getSendTime() * 1000));
+                }
+                messageTask.setStatus(msgTask.getStatus());
+                taskList.add(messageTask);
+
                 WeGroupMsgListDto groupMsgSendResult = sendResultService.getGroupMsgSendResult(weGroupMsg.getMsgId(), msgTask.getUserId(), null);
                 Optional.ofNullable(groupMsgSendResult).map(WeGroupMsgListDto::getSendList).orElseGet(ArrayList::new).forEach(sendResult -> {
                     WeGroupMessageSendResult messageSendResult = new WeGroupMessageSendResult();
@@ -189,22 +234,15 @@ public class PullGroupMessageTask {
                     messageSendResult.setUserId(msgTask.getUserId());
                     messageSendResult.setChatId(sendResult.getChatId());
                     messageSendResult.setExternalUserid(sendResult.getExternalUserId());
-                    messageSendResult.setSendTime(new Date(sendResult.getSendTime() * 1000));
+                    if(sendResult.getSendTime() != null){
+                        messageSendResult.setSendTime(new Date(sendResult.getSendTime() * 1000));
+                    }
                     messageSendResult.setStatus(sendResult.getStatus());
-                    list.add(messageSendResult);
+                    sendResultlist.add(messageSendResult);
                 });
             });
         });
-        if (CollectionUtil.isNotEmpty(list)) {
-            list.forEach(item -> {
-                if (!sendResultService.update(item, new LambdaQueryWrapper<WeGroupMessageSendResult>()
-                        .eq(WeGroupMessageSendResult::getMsgId, item.getMsgId())
-                        .eq(WeGroupMessageSendResult::getExternalUserid, item.getExternalUserid())
-                        .eq(WeGroupMessageSendResult::getUserId, item.getUserId())
-                        .eq(WeGroupMessageSendResult::getChatId, item.getChatId()))) {
-                    sendResultService.save(item);
-                }
-            });
-        }
+        groupMessageTaskService.addOrUpdateBatchByCondition(taskList);
+        sendResultService.addOrUpdateBatchByCondition(sendResultlist);
     }
 }

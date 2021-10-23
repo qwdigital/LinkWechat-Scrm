@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
 import java.util.Date;
 
 /**
- * 群发消息成员执行结果对象 we_group_message_send_result
+ * 群发消息成员发送任务表 we_group_message_task
  *
  * @author ruoyi
  * @date 2021-10-19
@@ -25,8 +25,8 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@TableName("we_group_message_send_result")
-public class WeGroupMessageSendResult extends BaseEntity{
+@TableName("we_group_message_task")
+public class WeGroupMessageTask extends BaseEntity{
 
     /**
      * 主键id
@@ -50,24 +50,10 @@ public class WeGroupMessageSendResult extends BaseEntity{
     private String userId;
 
     /**
-     * 外部联系人userid
+     * 发送状态：0-未发送 2-已发送
      */
-    @ApiModelProperty("外部联系人userid")
-    @Excel(name = "外部联系人userid")
-    private String externalUserid;
-
-    /**
-     * 外部客户群id
-     */
-    @ApiModelProperty("外部客户群id")
-    @Excel(name = "外部客户群id")
-    private String chatId;
-
-    /**
-     * 发送状态：0-未发送 1-已发送 2-因客户不是好友导致发送失败 3-因客户已经收到其他群发消息导致发送失败
-     */
-    @ApiModelProperty("发送状态：0-未发送 1-已发送 2-因客户不是好友导致发送失败 3-因客户已经收到其他群发消息导致发送失败")
-    @Excel(name = "发送状态：0-未发送 1-已发送 2-因客户不是好友导致发送失败 3-因客户已经收到其他群发消息导致发送失败")
+    @ApiModelProperty("发送状态：0-未发送 2-已发送")
+    @Excel(name = "发送状态：0-未发送 2-已发送")
     private Integer status;
 
     /**
@@ -84,18 +70,4 @@ public class WeGroupMessageSendResult extends BaseEntity{
     @ApiModelProperty("企业服务人员名称")
     @TableField(exist = false)
     private String userName;
-
-    /**
-     * 外部联系人姓名
-     */
-    @ApiModelProperty("外部联系人姓名")
-    @TableField(exist = false)
-    private String customerName;
-
-    /**
-     * 外部客户群名称
-     */
-    @ApiModelProperty("外部客户群名称")
-    @TableField(exist = false)
-    private String chatName;
 }
