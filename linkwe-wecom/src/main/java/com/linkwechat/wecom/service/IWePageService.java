@@ -1,0 +1,1 @@
+package com.linkwechat.wecom.service;import com.linkwechat.wecom.domain.CorpBasicPageData;public interface IWePageService {    CorpBasicPageData getCcorpBasicData();}
