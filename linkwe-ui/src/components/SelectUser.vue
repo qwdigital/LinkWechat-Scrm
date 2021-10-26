@@ -8,22 +8,26 @@ export default {
     // 添加标签显隐
     visible: {
       type: Boolean,
-      default: false,
+      default: false
     },
     title: {
       type: String,
-      default: '组织架构',
+      default: '组织架构'
     },
     // 是否 只选择叶子节点（人员节点）/禁止选择父节点（部门节点）
     isOnlyLeaf: {
       type: Boolean,
-      default: true,
+      default: true
     },
     // 是否单选
     isSigleSelect: {
       type: Boolean,
-      default: false,
+      default: false
     },
+    defaultValues: {
+      type: Array,
+      default: () => []
+    }
   },
   data() {
     let isOnlyLeaf = this.isOnlyLeaf
@@ -38,8 +42,8 @@ export default {
         },
         isLeaf(data, node) {
           return !!data.userId
-        },
-      },
+        }
+      }
     }
   },
   watch: {},
@@ -51,15 +55,34 @@ export default {
       },
       set(val) {
         this.$emit('update:visible', val)
-      },
+      }
     },
+    defaultCheckedKeys() {
+      const checkedList = []
+      const checkedUserList = []
+      if (!Array.isArray(this.defaultValues) || this.defaultValues.length == 0) {
+        this.userList = []
+      } else {
+        this.defaultValues.forEach((i) => {
+          const id = this.isOnlyLeaf ? i.userId : i.userId || i.id
+          if (id) {
+            checkedList.push(id)
+            checkedUserList.push(i)
+          }
+        })
+        this.userList = checkedUserList
+      }
+      return checkedList
+    }
   },
   created() {},
   mounted() {},
   methods: {
     loadNode(node, resolve) {
       if (node.level === 0) {
-        this.userList = []
+        if (!Array.isArray(this.defaultValues) || this.defaultValues.length == 0) {
+          this.userList = []
+        }
         getTree().then(({ data }) => {
           data.forEach((element) => {
             element.key = createUniqueString()
@@ -73,15 +96,13 @@ export default {
           // });
         })
       } else {
-        getList({ department: node.data.id, isActivate: 1 }).then(
-          ({ rows }) => {
-            rows.forEach((element) => {
-              element.key = createUniqueString()
-            })
-            node.data.children && rows.push(...node.data.children)
-            resolve(rows)
-          }
-        )
+        getList({ department: node.data.id, isActivate: 1 }).then(({ rows }) => {
+          rows.forEach((element) => {
+            element.key = createUniqueString()
+          })
+          node.data.children && rows.push(...node.data.children)
+          resolve(rows)
+        })
       }
     },
     // 选择变化
@@ -114,8 +135,8 @@ export default {
     // 取消选择
     cancle(key) {
       this.$refs.tree.setChecked(key, false)
-    },
-  },
+    }
+  }
 }
 </script>
 setChecked
@@ -137,6 +158,7 @@ setChecked
             :expand-on-click-node="true"
             :load="loadNode"
             :props="defaultProps"
+            :default-checked-keys="defaultCheckedKeys"
             :check-strictly="!isOnlyLeaf"
             @check-change="handleCheckChange"
           ></el-tree>
@@ -148,11 +170,7 @@ setChecked
         <el-row v-for="(item, index) in userList" :key="index">
           <i class="el-icon-user-solid"></i>
           {{ item.name }}
-          <i
-            class="el-icon-minus fr cp"
-            title="取消选择"
-            @click="cancle(item.key)"
-          ></i>
+          <i class="el-icon-minus fr cp" title="取消选择" @click="cancle(item.key)"></i>
         </el-row>
       </el-col>
     </el-row>

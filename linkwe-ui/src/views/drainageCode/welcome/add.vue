@@ -1,25 +1,29 @@
 <script>
-import { update, add } from '@/api/drainageCode/welcome'
-import PhoneDialog from '@/components/PhoneDialog'
+import { addOrUpdate, getPreview } from '@/api/drainageCode/welcome'
 import SelectMaterial from '@/components/SelectMaterial'
-
+import WelcomeContent from '@/components/WelcomeContent.vue'
 export default {
-  components: { PhoneDialog, SelectMaterial },
+  components: {
+    SelectMaterial,
+    WelcomeContent
+  },
   props: {},
   data() {
     return {
+      materialData: {
+        welcomeMsg: '',
+        materialMsgList: []
+      },
       dialogVisible: false,
-      // dialogVisible1: false,
       dialogVisibleSelectMaterial: false,
       form: {
         // id: '',
-        mediaId: '',
         welcomeMsgTplType: '',
         welcomeMsg: '',
-        materialUrl: '',
+        materialUrl: ''
       },
       // 遮罩层
-      loading: false,
+      loading: false
     }
   },
   watch: {},
@@ -27,16 +31,62 @@ export default {
   created() {
     this.form = Object.assign(this.form, this.$route.query)
     this.$route.meta.title = (this.form.id ? '编辑' : '新建') + '欢迎语'
+    this.form.id && this.getData()
   },
   mounted() {},
   methods: {
-    getData() {},
+    getWelData(data) {
+      let form = this.form
+      form.welcomeMsg = data.welcomeMsg
+      // this.form.mediaId = data.mediaId
+      // this.form.materialMsgList = data.materialMsgList
+      data.materialMsgList.forEach((element) => {
+        // 0 图片；4文本；7图文；8小程序
+        if (element.msgType == 0) {
+          ;(form.picUrl || (form.picUrl = [])).push(element.materialUrl)
+        } else if (element.msgType == 7) {
+          ;(form.imageText || (form.imageText = [])).push({
+            imageTextTile: element.materialName, //图文标题
+            imageTextUrl: element.content //图文路径
+          })
+        } else if (element.msgType == 8) {
+          ;(form.applet || (form.applet = [])).push({
+            appTile: element.materialName, //小程序标题
+            appId: element.materialUrl, //小程序id
+            appPath: element.content, //小程序路径
+            appPic: element.coverUrl //小程序封面
+          })
+        }
+      })
+      if (form.welcomeMsgTplType === '1') {
+        form.userIds = data.users.map((e) => e.userId) + ''
+      }
+      form.picUrl += ''
+      this.submit()
+    },
+    getData() {
+      getPreview(this.form.id).then(({ data }) => {
+        this.materialData = {}
+        this.materialData = data
+        this.materialData.materialMsgList.forEach((item) => {
+          item.msgType = Number(item.msgType)
+        })
+      })
+    },
     submit() {
-      ;(this.form.id ? update : add)(this.form)
+      debugger
+      addOrUpdate(this.form)
         .then(({ data }) => {
           this.msgSuccess('操作成功')
           this.loading = false
-          this.$router.back()
+          // this.$router.back()
+          // console.log(form.welcomeMsgTplType === '1')
+          this.$router.push({
+            path: '/wechat/drainageCode/welcome/',
+            query: {
+              type: this.form.welcomeMsgTplType
+            }
+          })
         })
         .catch(() => {
           this.loading = false
@@ -54,157 +104,19 @@ export default {
     removeMaterial() {
       this.form.mediaId = ''
       this.form.materialUrl = ''
-    },
-  },
+    }
+  }
 }
 </script>
 
 <template>
-  <div class="flex page" v-loading="loading">
-    <el-form ref="form" :model="form" label-width="80px" class="form">
-      <el-form-item label="欢迎语">
-        <el-card shadow="never" class="card">
-          <div style="height: 200px;">
-            <el-input
-              type="textarea"
-              :autosize="{ minRows: 2, maxRows: 6 }"
-              maxlength="100"
-              show-word-limit
-              placeholder="请输入欢迎语"
-              v-model="form.welcomeMsg"
-            ></el-input>
-          </div>
-          <div class="bfc-o">
-            <div v-if="form.materialUrl">
-              <el-image
-                style="width: 100px; height: 100px; cursor: pointer;border-radius: 6px;"
-                :src="form.materialUrl"
-                fit="fit"
-              >
-              </el-image>
-              <i class="el-icon-error" @click="removeMaterial"></i>
-            </div>
-            <el-button
-              icon="el-icon-plus"
-              size="mini"
-              @click="dialogVisibleSelectMaterial = true"
-            >
-              添加图片
-            </el-button>
-
-            <el-button
-              type="default"
-              class="fr"
-              round
-              icon="el-icon-user-solid"
-              @click="insertName()"
-              >插入客户昵称</el-button
-            >
-          </div>
-
-          <!-- <el-popover placement="top-start" trigger="hover">
-            <div class="ac">
-              <Upload
-                ><el-button>
-                  <i class="el-icon-picture-outline"></i>
-                  <p>图片</p>
-                </el-button></Upload
-              >
-
-              <el-button @click="dialogVisible = true">
-                <i class="el-icon-link"></i>
-                <p>网页</p>
-              </el-button>
-              <el-button @click="dialogVisible1 = true">
-                <i class="el-icon-link"></i>
-                <p>小程序</p>
-              </el-button>
-            </div>
-            <el-button slot="reference" icon="el-icon-plus" size="mini"
-              >添加图片</el-button
-            >
-          </el-popover> -->
-        </el-card>
-      </el-form-item>
-      <el-form-item label=" " class="ar">
-        <el-button type="primary" @click="submit">保存</el-button>
-        <el-button @click="$router.back()">取消</el-button>
-      </el-form-item>
-    </el-form>
-
-    <PhoneDialog
-      style="margin-left: 10%;"
-      :message="form.welcomeMsg || '请输入欢迎语'"
-      :isOther="!!form.materialUrl"
-    >
-      <el-image style="border-radius: 6px;" :src="form.materialUrl" fit="fit">
-      </el-image
-    ></PhoneDialog>
-
-    <!-- 选择素材弹窗 -->
-    <SelectMaterial
-      :visible.sync="dialogVisibleSelectMaterial"
-      type="1"
-      :showArr="[1]"
-      @success="submitSelectMaterial"
-    >
-    </SelectMaterial>
-
-    <!-- <el-dialog title="添加网页消息" :visible.sync="dialogVisible" width="width">
-      <el-form :model="form" inline>
-        <el-form-item label="添加网页消息" label-width="200">
-          <el-input
-            style="width: 400px;"
-            v-model="j"
-            placeholder="以http或https开头"
-          ></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false"
-          >确 定</el-button
-        >
-      </div>
-    </el-dialog> -->
-
-    <!-- <el-dialog
-      title="添加小程序消息"
-      :visible.sync="dialogVisible1"
-      width="width"
-    >
-      <div class="flex filter-wrap">
-        <el-select v-model="model" placeholder="请选择分组">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
-        </el-select>
-        <el-input v-model="j" style="width: 240px;"></el-input>
-        <el-button type="primary">搜索</el-button>
-        <div class="filter-right">
-          <i class="el-icon-arrow-left"></i> 1/1
-          <i class="el-icon-arrow-right"></i>
-        </div>
-      </div>
-
-      <el-divider></el-divider>
-
-      <div class="flex list-wrap">
-        <el-card v-for="(item, index) in 5" :key="index">
-          <div>2020-20-02-02 20:20:20</div>
-          <div>标题标题标题</div>
-          <img src="@/assets/image/profile.jpg" alt />
-        </el-card>
-      </div>
-      <div slot="footer">
-        <el-button @click="dialogVisible1 = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible1 = false">确 定</el-button>
-      </div>
-    </el-dialog>-->
-  </div>
+  <welcome-content
+    :showTemplate="false"
+    :showMember="form.welcomeMsgTplType == 2"
+    :showMorMaterial="true"
+    :baseData="materialData"
+    @submit="getWelData"
+  ></welcome-content>
 </template>
 
 <style lang="scss" scoped>
