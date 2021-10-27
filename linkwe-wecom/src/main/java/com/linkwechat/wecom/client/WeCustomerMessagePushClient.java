@@ -24,7 +24,7 @@ public interface WeCustomerMessagePushClient {
      */
     @Deprecated
     @Request(url = "/externalcontact/add_msg_template", type = "POST")
-    SendMessageResultDto sendCustomerMessageToUser(@Body WeCustomerMessagePushDto customerMessagePushDto);
+    SendMessageResultDto sendCustomerMessageToUser(@JSONBody WeCustomerMessagePushDto customerMessagePushDto);
 
 
 

@@ -91,20 +91,26 @@ public class WeCustomerController extends BaseController
         List<WeCustomerList> list = weCustomerService.findWeCustomerList(weCustomerList);
         if(CollectionUtil.isNotEmpty(list)){
             list.stream().forEach(k->{
-                WeFlowerCustomerRel customerRel = weFlowerCustomerRelService.getOne(new LambdaQueryWrapper<WeFlowerCustomerRel>()
+                List<WeFlowerCustomerRel> relList = weFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
                         .eq(WeFlowerCustomerRel::getUserId, k.getFirstUserId())
                         .eq(WeFlowerCustomerRel::getExternalUserid, k.getExternalUserid()));
-                if(customerRel !=null){
-                    customerRel.setWeFlowerCustomerTagRels(
-                            weFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
-                                    .eq(WeFlowerCustomerTagRel::getUserId,k.getFirstUserId())
-                                    .eq(WeFlowerCustomerTagRel::getExternalUserid,k.getExternalUserid()))
-                    );
+                if(CollectionUtil.isNotEmpty(relList)){
+                    WeFlowerCustomerRel customerRel = relList.stream().findFirst().get();
+
+                    if(customerRel !=null){
+                        customerRel.setWeFlowerCustomerTagRels(
+                                weFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                                        .eq(WeFlowerCustomerTagRel::getUserId,k.getFirstUserId())
+                                        .eq(WeFlowerCustomerTagRel::getExternalUserid,k.getExternalUserid()))
+                        );
+                    }
+
+                    k.setWeFlowerCustomerRels(ListUtil.toList(
+                            customerRel
+                    ));
+
                 }
 
-                k.setWeFlowerCustomerRels(ListUtil.toList(
-                        customerRel
-                ));
             });
 
         }
