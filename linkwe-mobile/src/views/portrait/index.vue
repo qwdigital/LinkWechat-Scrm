@@ -20,20 +20,11 @@
             <div>
               <span
                 >{{
-                  form.remark
-                    ? form.remark
-                    : (form.name || '') +
-                      (form.remarkCorpName ? '-' + form.remarkCorpName : '')
+                  form.remark ? form.remark : (form.name || '') + (form.remarkCorpName ? '-' + form.remarkCorpName : '')
                 }}
                 &nbsp; &nbsp;</span
-              ><span
-                class="icon iconfont icon-man"
-                v-if="form.gender == 1"
-              ></span>
-              <span
-                class="icon iconfont icon-xingbie"
-                v-else-if="form.gender == 2"
-              ></span>
+              ><span class="icon iconfont icon-man" v-if="form.gender == 1"></span>
+              <span class="icon iconfont icon-xingbie" v-else-if="form.gender == 2"></span>
               <van-icon name="manager" color="#9c9c9c" v-else />
             </div>
             <div class="c9">
@@ -72,11 +63,7 @@
       </div>
       <div v-if="form.weTagGroupList" class="labelstyle mt10">
         <template v-for="item in form.weTagGroupList">
-          <div
-            class="label"
-            v-for="(unit, unique) in item.weTags"
-            :key="unique"
-          >
+          <div class="label" v-for="(unit, unique) in item.weTags" :key="unique">
             {{ unit.name }}
           </div>
         </template>
@@ -130,11 +117,7 @@
 
     <!-- 点击客户标签里的编辑触发弹出框开始 -->
     <van-action-sheet v-model="show">
-      <van-nav-bar
-        title="客户标签管理"
-        right-text="取消"
-        @click-right="show = false"
-      />
+      <van-nav-bar title="客户标签管理" right-text="取消" @click-right="show = false" />
       <div class="content">
         <div v-for="(item, index) in alllabel" :key="index">
           <div class="mb10 mt5">{{ item.gourpName }}：</div>
@@ -151,19 +134,13 @@
           </div>
         </div>
       </div>
-      <van-button type="info" class="saveinfo" round @click="saveInfo"
-        >保存</van-button
-      >
+      <van-button type="info" class="saveinfo" round @click="saveInfo">保存</van-button>
     </van-action-sheet>
     <!-- 点击客户标签里的编辑触发弹出框结束 -->
 
     <!-- 点击添加待办触发弹出框开始 -->
     <van-action-sheet v-model="usershow">
-      <van-nav-bar
-        title="客户待办"
-        right-text="取消"
-        @click-right="usershow = false"
-      />
+      <van-nav-bar title="客户待办" right-text="取消" @click-right="usershow = false" />
       <!-- 表单 -->
       <van-form @submit="onSubmit">
         <!-- 待办内容 -->
@@ -189,13 +166,7 @@
           required
           :rules="[{ required: true, message: '请输入待办日期' }]"
         />
-        <van-calendar
-          v-model="dateshow"
-          @confirm="onConfirm"
-          color="#1989fa"
-          :min-date="minDate"
-          :max-date="maxDate"
-        />
+        <van-calendar v-model="dateshow" @confirm="onConfirm" color="#1989fa" :min-date="minDate" :max-date="maxDate" />
         <!-- 待办时间 -->
         <van-field
           v-model="timeagency"
@@ -231,14 +202,7 @@
         </van-action-sheet>
         <!-- 保存 -->
         <div style="margin: 30px">
-          <van-button
-            round
-            block
-            type="info"
-            native-type="submit"
-            @click="saveInfo2"
-            >保存</van-button
-          >
+          <van-button round block type="info" native-type="submit" @click="saveInfo2">保存</van-button>
         </div>
       </van-form>
     </van-action-sheet>
@@ -294,7 +258,7 @@ export default {
       // 接口开始
       externalUserid: '',
       // externalUserid: 'wmiGuBCgAAoCBD1frD3hRplbsXoBLx6g', // 客户IdwmiGuBCgAAoCBD1frD3hRplbsXoBLx6g
-      // externalUserid: 'wmiGuBCgAAsQVuCR_zoXfnQsnCGG25rQ',
+      // externalUserid: 'wmiGuBCgAA617zOzAIg-0sZG3Vok7BUA',
       form: {
         name: '', // 昵称
         remarkMobiles: '', // 手机号
@@ -390,10 +354,7 @@ export default {
       const date = new Date()
       // console.log(timer.getFullYear());
       var Y = date.getFullYear() + '-'
-      var M =
-        (date.getMonth() + 1 < 10
-          ? '0' + (date.getMonth() + 1)
-          : date.getMonth() + 1) + '-'
+      var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
       var D = date.getDate() < 10 ? '0' + date.getDate() : date.getDate() + ''
       return Y + M + D
     },
@@ -402,13 +363,7 @@ export default {
       wx.invoke('getContext', {}, function(res) {
         if (res.err_msg == 'getContext:ok') {
           let entry = res.entry //返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
-          if (
-            ![
-              'single_chat_tools',
-              'group_chat_tools',
-              'contact_profile'
-            ].includes(entry)
-          ) {
+          if (!['single_chat_tools', 'group_chat_tools', 'contact_profile'].includes(entry)) {
             // _this.$toast.clear()
             _this.$toast('入口错误：' + entry)
             return
@@ -508,8 +463,7 @@ export default {
     },
     // 待办日期
     formatDate(dateagency) {
-      return `${dateagency.getFullYear()}-${dateagency.getMonth() +
-        1}-${dateagency.getDate()}`
+      return `${dateagency.getFullYear()}-${dateagency.getMonth() + 1}-${dateagency.getDate()}`
     },
     onConfirm(dateagency) {
       this.dateshow = false

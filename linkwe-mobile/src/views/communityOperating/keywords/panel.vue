@@ -70,29 +70,35 @@ export default {
         duration: 0,
         forbidClick: true
       })
-      wx.invoke(
-        'sendChatMessage',
-        {
-          msgtype: 'news',
-          news: {
-            link: this.groupCodeUrl,
-            title: this.task.taskName,
-            desc: this.task.welcomeMsg,
-            imgUrl: this.imgUrl
-          }
-        },
-        function(res) {
-          if (res.err_msg == 'sendChatMessage:ok') {
-          } else {
-            if (res.err_code == 1) {
-              // 用户取消发送
-            } else {
-              _this.$dialog({ message: 'sendChatMessage失败：' + JSON.stringify(res) })
-            }
-          }
-          _this.$toast.clear()
+      try {
+        let news = {
+          link: this.groupCodeUrl,
+          title: this.task.taskName,
+          desc: this.task.welcomeMsg,
+          imgUrl: this.imgUrl
         }
-      )
+        wx.invoke(
+          'sendChatMessage',
+          {
+            msgtype: 'news',
+            news
+          },
+          function(res) {
+            if (res.err_msg == 'sendChatMessage:ok') {
+            } else {
+              if (res.err_code == 1) {
+                // 用户取消发送
+              } else {
+                _this.$dialog({ message: 'sendChatMessage失败：' + JSON.stringify(res) })
+              }
+            }
+            _this.$toast.clear()
+          }
+        )
+      } catch (err) {
+        _this.$toast.clear()
+        _this.$dialog({ message: 'err' + JSON.stringify(err) })
+      }
     },
     touchStart() {
       clearTimeout(this.copyEvent)
