@@ -270,31 +270,35 @@ public class PullGroupMessageTask {
                     WeAddGroupMessageQuery query = JSONObject.parseObject(item.getValue(), WeAddGroupMessageQuery.class);
                     List<WeAddGroupMessageQuery.SenderInfo> senderList = query.getSenderList();
                     List<WeGroupMessageList> weGroupMessageLists = new ArrayList<>();
-                    senderList.forEach(sender ->{
-                        WeAddMsgTemplateQuery templateQuery = new WeAddMsgTemplateQuery();
-                        templateQuery.setChat_type(query.getChatType());
-                        templateQuery.setSender(sender.getUserId());
-                        if(ObjectUtil.equal(1,query.getChatType())){
-                            templateQuery.setExternal_userid(sender.getCustomerList());
-                        }
-                        templateQuery.setAttachments(query.getAttachmentsList());
-                        if(StringUtils.isNotEmpty(query.getContent())){
-                            WeAddMsgTemplateQuery.Text text = new WeAddMsgTemplateQuery.Text();
-                            text.setContent(query.getContent());
-                            templateQuery.setText(text);
-                        }
-                        SendMessageResultDto resultDto = customerMessagePushClient.addMsgTemplate(templateQuery);
-                        if(resultDto != null && ObjectUtil.equal(WeConstans.WE_SUCCESS_CODE,resultDto.getErrcode())){
-                            String msgid = resultDto.getMsgid();
-                            Long msgTemplateId = query.getId();
-                            WeGroupMessageList messageList = new WeGroupMessageList();
-                            messageList.setMsgId(msgid);
-                            weGroupMessageLists.add(messageList);
-                            groupMessageListService.update(messageList,new LambdaQueryWrapper<WeGroupMessageList>()
-                            .eq(WeGroupMessageList::getMsgTemplateId,msgTemplateId)
-                            .eq(WeGroupMessageList::getUserId,sender.getUserId()));
-                        }
-                    });
+                    WeGroupMessageList weGroupMessageList = groupMessageListService.getOne(new LambdaQueryWrapper<WeGroupMessageList>()
+                            .eq(WeGroupMessageList::getMsgTemplateId, query.getId()).last("limit 1"));
+                    if(weGroupMessageList != null && StringUtils.isEmpty(weGroupMessageList.getMsgId())){
+                        senderList.forEach(sender ->{
+                            WeAddMsgTemplateQuery templateQuery = new WeAddMsgTemplateQuery();
+                            templateQuery.setChat_type(query.getChatType());
+                            templateQuery.setSender(sender.getUserId());
+                            if(ObjectUtil.equal(1,query.getChatType())){
+                                templateQuery.setExternal_userid(sender.getCustomerList());
+                            }
+                            templateQuery.setAttachments(query.getAttachmentsList());
+                            if(StringUtils.isNotEmpty(query.getContent())){
+                                WeAddMsgTemplateQuery.Text text = new WeAddMsgTemplateQuery.Text();
+                                text.setContent(query.getContent());
+                                templateQuery.setText(text);
+                            }
+                            SendMessageResultDto resultDto = customerMessagePushClient.addMsgTemplate(templateQuery);
+                            if(resultDto != null && ObjectUtil.equal(WeConstans.WE_SUCCESS_CODE,resultDto.getErrcode())){
+                                String msgid = resultDto.getMsgid();
+                                Long msgTemplateId = query.getId();
+                                WeGroupMessageList messageList = new WeGroupMessageList();
+                                messageList.setMsgId(msgid);
+                                weGroupMessageLists.add(messageList);
+                                groupMessageListService.update(messageList,new LambdaQueryWrapper<WeGroupMessageList>()
+                                        .eq(WeGroupMessageList::getMsgTemplateId,msgTemplateId)
+                                        .eq(WeGroupMessageList::getUserId,sender.getUserId()));
+                            }
+                        });
+                    }
                 }
             });
         }
