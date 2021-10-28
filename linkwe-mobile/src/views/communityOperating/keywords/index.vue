@@ -1,13 +1,7 @@
 <template>
   <div>
     <div>
-      <van-search
-        v-model="keyword"
-        placeholder="搜索活码名或关键词"
-        shape="round"
-        @search="onSearch"
-        @clear="clear"
-      >
+      <van-search v-model="keyword" placeholder="搜索活码名或关键词" shape="round" @search="onSearch" @clear="clear">
       </van-search>
     </div>
 
@@ -43,7 +37,7 @@ import { getKeywordTasks } from '@/api/community'
 export default {
   components: { KeywordPanel },
 
-  data () {
+  data() {
     return {
       keyword: '',
       storageKey: 'keywords',
@@ -55,19 +49,22 @@ export default {
   },
 
   methods: {
-    getTasks () {
+    getTasks() {
       this.loading = true
-      getKeywordTasks(this.keyword).then((res) => {
-        if (res.code === 200) {
-          this.tasks = res.rows
-        }
-        this.loading = false
-      }).catch(() => {
-        this.loading = false
-      })
+      getKeywordTasks(this.keyword)
+        .then((res) => {
+          if (res.code === 200) {
+            let timeStamp = (dateString) => (dateString ? +new Date(dateString.replace(/-/g, '/')) : 0)
+            this.tasks = res.rows.sort((a, b) => timeStamp(b.updateTime) - timeStamp(a.updateTime))
+          }
+          this.loading = false
+        })
+        .catch(() => {
+          this.loading = false
+        })
     },
 
-    setHistory (keyword) {
+    setHistory(keyword) {
       if (!keyword) return
 
       if (!this.history.includes(keyword)) {
@@ -76,41 +73,42 @@ export default {
       }
     },
 
-    removeHistory (keyword) {
+    removeHistory(keyword) {
       if (this.history.includes(keyword)) {
         this.history.splice(this.history.indexOf(keyword), 1)
         localStorage.setItem(this.storageKey, JSON.stringify(this.history))
       }
     },
 
-    getHistory () {
+    getHistory() {
       this.history = JSON.parse(localStorage.getItem(this.storageKey)) || []
     },
 
-    onSearch () {
+    onSearch() {
       this.setHistory(this.keyword)
 
       this.getTasks()
     },
 
-    search (keyword) {
+    search(keyword) {
       this.keyword = keyword
 
       this.getTasks()
     },
 
-    clear () {
+    clear() {
+      this.keyword = ''
       this.getTasks()
     }
   },
 
   computed: {
-    url () {
+    url() {
       return window.location.href
     }
   },
 
-  created () {
+  created() {
     this.getHistory()
 
     this.getTasks()
@@ -119,25 +117,25 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .history-wrapper {
-    padding: 0 20px 20px;
+.history-wrapper {
+  padding: 0 20px 20px;
 
-    .van-tag {
-      margin: 10px 10px 0 0;
-    }
+  .van-tag {
+    margin: 10px 10px 0 0;
   }
+}
 
-  .bottom-line {
-    background-color: #f2f2f2;
-    height: 15px;
+.bottom-line {
+  background-color: #f2f2f2;
+  height: 15px;
+}
+
+.overlay {
+  display: flex;
+  align-items: center;
+
+  .van-loading {
+    margin: auto;
   }
-
-  .overlay {
-    display: flex;
-    align-items: center;
-
-    .van-loading {
-      margin: auto;
-    }
-  }
+}
 </style>
