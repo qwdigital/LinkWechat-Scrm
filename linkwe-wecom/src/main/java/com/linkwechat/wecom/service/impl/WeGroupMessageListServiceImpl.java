@@ -1,28 +1,21 @@
 package com.linkwechat.wecom.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
 import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.message.WeGroupMsgDto;
 import com.linkwechat.wecom.domain.dto.message.WeGroupMsgListDto;
 import com.linkwechat.wecom.domain.query.WeGroupMsgListQuery;
-import com.linkwechat.wecom.domain.vo.WeGroupMessageDetailVo;
 import com.linkwechat.wecom.domain.vo.WeGroupMessageListVo;
 import com.linkwechat.wecom.mapper.WeGroupMessageListMapper;
-import com.linkwechat.wecom.service.IWeGroupMessageListService;
-import com.linkwechat.wecom.service.IWeUserService;
+import com.linkwechat.wecom.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 群发消息列Service业务层处理
@@ -35,68 +28,6 @@ public class WeGroupMessageListServiceImpl extends ServiceImpl<WeGroupMessageLis
 
     @Autowired
     private WeCustomerMessagePushClient messagePushClient;
-
-    @Autowired
-    private IWeUserService weUserService;
-
-    @Override
-    public PageInfo<WeGroupMessageListVo> queryList(WeGroupMessageList weGroupMessageList) {
-        PageInfo<WeGroupMessageListVo> listPageInfo = new PageInfo<>();
-        LambdaQueryWrapper<WeGroupMessageList> lqw = Wrappers.lambdaQuery();
-        if (StringUtils.isNotBlank(weGroupMessageList.getMsgId())) {
-            lqw.eq(WeGroupMessageList::getMsgId, weGroupMessageList.getMsgId());
-        }
-        if (StringUtils.isNotBlank(weGroupMessageList.getChatType())) {
-            lqw.eq(WeGroupMessageList::getChatType, weGroupMessageList.getChatType());
-        }
-        if (StringUtils.isNotBlank(weGroupMessageList.getUserId())) {
-            lqw.eq(WeGroupMessageList::getUserId, weGroupMessageList.getUserId());
-        }
-        if (weGroupMessageList.getSendTime() != null) {
-            lqw.le(WeGroupMessageList::getSendTime, weGroupMessageList.getBeginTime());
-            lqw.gt(WeGroupMessageList::getSendTime, weGroupMessageList.getEndTime());
-        }
-        if (weGroupMessageList.getCreateType() != null) {
-            lqw.eq(WeGroupMessageList::getCreateType, weGroupMessageList.getCreateType());
-        }
-
-        List<WeGroupMessageList> list = this.list(lqw);
-        if (CollectionUtil.isNotEmpty(list)) {
-            List<String> msgIds = list.stream().map(WeGroupMessageList::getMsgId).collect(Collectors.toList());
-            List<String> userIds = list.stream().map(WeGroupMessageList::getUserId).filter(StringUtils::isNotEmpty).collect(Collectors.toList());
-            List<WeUser> userList = new ArrayList<>();
-            if(CollectionUtil.isNotEmpty(userIds)){
-                userList.addAll(weUserService.list(new LambdaQueryWrapper<WeUser>().in(WeUser::getUserId, userIds)));
-            }
-            List<WeGroupMessageDetailVo> groupMsgDetailList = this.baseMapper.getGroupMsgDetails(msgIds);
-            Map<String, WeGroupMessageDetailVo> groupMsgDetailMap = groupMsgDetailList.stream().collect(Collectors.toMap(WeGroupMessageDetailVo::getMsgId, item -> item));
-            List<WeGroupMessageListVo> resultList = list.stream().map(groupMessage -> {
-                WeGroupMessageDetailVo weGroupMessageDetailVo = groupMsgDetailMap.get(groupMessage.getMsgId());
-                WeGroupMessageListVo weGroupMessageListVo = new WeGroupMessageListVo();
-                BeanUtil.copyProperties(groupMessage, weGroupMessageListVo);
-                weGroupMessageListVo.setAttachments(weGroupMessageDetailVo.getAttachments());
-                weGroupMessageListVo.setSenderTotalNums(weGroupMessageDetailVo.getSenders().size());
-                List<WeGroupMessageTask> senderList = weGroupMessageDetailVo.getSenders().stream().filter(sender -> ObjectUtil.equal(0, sender.getStatus())).collect(Collectors.toList());
-                weGroupMessageListVo.setSenderNums(senderList.size());
-                weGroupMessageListVo.setServiceTotalMember(weGroupMessageDetailVo.getExtralInfos().size());
-                List<WeGroupMessageSendResult> sendResults = weGroupMessageDetailVo.getExtralInfos().stream().filter(item -> ObjectUtil.equal(0, item.getStatus())).collect(Collectors.toList());
-                weGroupMessageListVo.setServiceMember(sendResults.size());
-
-                if (StringUtils.isNotEmpty(groupMessage.getUserId()) && CollectionUtil.isNotEmpty(userList)) {
-                    userList.forEach(user -> {
-                        if (ObjectUtil.equal(user.getUserId(), groupMessage.getUserId())) {
-                            weGroupMessageListVo.setUserName(user.getName());
-                        }
-                    });
-                }
-                return weGroupMessageListVo;
-            }).collect(Collectors.toList());
-            listPageInfo.setList(resultList);
-        }
-        listPageInfo.setTotal(new PageInfo<>(list).getTotal());
-        return listPageInfo;
-    }
-
 
     @Override
     public WeGroupMsgListDto getGroupMsgList(String chatType, Long startTime, Long endTime, String cursor) {
@@ -119,18 +50,122 @@ public class WeGroupMessageListServiceImpl extends ServiceImpl<WeGroupMessageLis
     }
 
     @Override
-    public WeGroupMessageDetailVo getGroupMsgDetail(String msgId) {
-        WeGroupMessageDetailVo detailVo = new WeGroupMessageDetailVo();
-        WeGroupMessageList weGroupMessage = getOne(new LambdaQueryWrapper<WeGroupMessageList>().eq(WeGroupMessageList::getMsgId, msgId));
-        BeanUtil.copyProperties(weGroupMessage, detailVo);
-        if(StringUtils.isNotEmpty(detailVo.getUserId())){
-            WeUser weUser = weUserService.getOne(new LambdaQueryWrapper<WeUser>().eq(WeUser::getUserId, detailVo.getUserId()).last("limit 1"));
-            detailVo.setUserName(weUser.getName());
-        }
-        WeGroupMessageDetailVo groupMsgDetail = this.baseMapper.getGroupMsgDetail(msgId);
-        detailVo.setAttachments(groupMsgDetail.getAttachments());
-        detailVo.setSenders(groupMsgDetail.getSenders());
-        detailVo.setExtralInfos(groupMsgDetail.getExtralInfos());
-        return detailVo;
+    public List<WeGroupMessageListVo> getGroupMsgDetail(Long msgTemplateId) {
+        return this.baseMapper.getGroupMsgDetails(ListUtil.toList(msgTemplateId));
     }
+
+
+    /*@Override
+    public boolean saveGroupMessage(WeAddGroupMessageQuery query) {
+        //存一个假msgId
+        String msgId = IdUtils.simpleUUID();
+
+        WeGroupMessageList groupMessage = new WeGroupMessageList();
+        BeanUtil.copyProperties(query,groupMessage);
+        if(query.getSendTime() != null){
+            groupMessage.setIsTask(1);
+        }
+        groupMessage.setMsgId(msgId);
+        JSONObject condition = new JSONObject();
+        condition.put("toUser",query.getToUser());
+        condition.put("toParty",query.getToParty());
+        condition.put("toTag",query.getToTag());
+        groupMessage.setFilterCondition(condition.toJSONString());
+        groupMessage.setMsgId(msgId);
+
+        //保存消息
+        boolean groupMessageSaveResult = saveOrUpdate(groupMessage);
+
+        if(!groupMessageSaveResult){
+            throw new WeComException("创建失败");
+        }
+
+        //保存附件信息
+        List<WeGroupMessageAttachments> attachmentsList = query.getAttachmentsList().stream().map(attachment -> {
+            WeGroupMessageAttachments attachments = new WeGroupMessageAttachments();
+            BeanUtil.copyProperties(attachment, attachments);
+            attachments.setMsgId(msgId);
+            return attachments;
+        }).collect(Collectors.toList());
+        attachmentsService.saveBatch(attachmentsList);
+
+
+        WeAddMsgTemplateQuery templateQuery = new WeAddMsgTemplateQuery();
+        templateQuery.setAttachments(query.getAttachmentsList());
+        templateQuery.setChat_type(query.getChatType());
+        Set<String> userIdSet = new HashSet<>();
+        List<WeGroupMessageSendResult> sendResultList = new ArrayList<>();
+        if(StringUtils.isNotEmpty(query.getToUser())){
+            Set<String> toUser = Arrays.stream(query.getToUser().split(",")).collect(Collectors.toSet());
+            userIdSet.addAll(toUser);
+        }
+        if(StringUtils.isNotEmpty(query.getToParty())){
+            Arrays.stream(query.getToParty().split(",")).forEach(part ->{
+                WeUserListDto weUserListDto = weUserClient.simpleList(Long.parseLong(part), 1);
+                List<String> userIds = weUserListDto.getUserlist().stream().map(WeUserDto::getUserid).collect(Collectors.toList());
+                userIdSet.addAll(userIds);
+            });
+        }
+        if(ObjectUtil.equal("single",query.getChatType())){
+            //查询客户数据
+            WeCustomer weCustomer = new WeCustomer();
+            weCustomer.setUserIds(String.join(",", userIdSet));
+            weCustomer.setTagIds(query.getToTag());
+            weCustomer.setStatus(0);
+            List<WeCustomer> customerList = weCustomerService.selectWeCustomerAllList(weCustomer);
+            List<WeFlowerCustomerRel> customerRelList = customerList.stream().map(WeCustomer::getWeFlowerCustomerRels).flatMap(Collection::stream).collect(Collectors.toList());
+            Map<String, List<WeFlowerCustomerRel>> customerUserList = customerRelList.stream().collect(Collectors.groupingBy(WeFlowerCustomerRel::getUserId));
+            userIdSet.clear();
+            userIdSet.addAll(customerUserList.keySet());
+            List<String> eids = customerList.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
+            if(eids.size() > 10000){
+                throw new WeComException("最多可发送1万个客户");
+            }
+            templateQuery.setExternal_userid(eids);
+
+            if(CollectionUtil.isNotEmpty(customerRelList)){
+                customerRelList.forEach(customerRel ->{
+                    WeGroupMessageSendResult result = new WeGroupMessageSendResult();
+                    result.setMsgId(msgId);
+                    result.setStatus(0);
+                    result.setUserId(customerRel.getUserId());
+                    result.setExternalUserid(customerRel.getExternalUserid());
+                    sendResultList.add(result);
+                });
+            }
+        }else {
+            templateQuery.setSender(query.getToUser());
+            userIdSet.clear();
+            userIdSet.addAll(Arrays.asList(query.getToUser().split(",").clone()));
+            WeGroup weGroup = new WeGroup();
+            weGroup.setUserIds(query.getToUser());
+            List<WeGroup> weGroupList = weGroupService.selectWeGroupList(weGroup);
+            if(CollectionUtil.isNotEmpty(weGroupList)){
+                weGroupList.stream().map(WeGroup::getChatId).forEach(chatId ->{
+                    WeGroupMessageSendResult result = new WeGroupMessageSendResult();
+                    result.setMsgId(msgId);
+                    result.setStatus(0);
+                    result.setChatId(chatId);
+                    sendResultList.add(result);
+                });
+            }
+        }
+
+        //群发消息成员发送任务保存
+        List<WeGroupMessageTask> taskList = userIdSet.stream().map(userId -> {
+            WeGroupMessageTask messageTask = new WeGroupMessageTask();
+            messageTask.setMsgId(msgId);
+            messageTask.setUserId(userId);
+            messageTask.setStatus(0);
+            return messageTask;
+        }).collect(Collectors.toList());
+        groupMessageTaskService.saveBatch(taskList);
+
+        //群发消息成员执行结果保存
+        sendResultService.saveBatch(sendResultList);
+
+        //SendMessageResultDto resultDto = messagePushClient.addMsgTemplate(templateQuery);
+
+        return groupMessageSaveResult;
+    }*/
 }

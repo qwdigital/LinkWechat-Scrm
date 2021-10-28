@@ -1,8 +1,8 @@
 package com.linkwechat.wecom.domain.vo;
 
-import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.wecom.domain.WeGroupMessageAttachments;
-import com.linkwechat.wecom.domain.WeGroupMessageList;
+import com.linkwechat.wecom.domain.WeGroupMessageSendResult;
+import com.linkwechat.wecom.domain.WeGroupMessageTask;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -11,28 +11,31 @@ import java.util.List;
 
 /**
  * @author sxw
- * @description 群发列表出参
- * @date 2021/10/23 15:27
+ * @description 群发详情出参
+ * @date 2021/10/23 15:09
  **/
 @ApiModel
 @Data
-public class WeGroupMessageListVo extends WeGroupMessageList {
-    @ApiModelProperty("发送成员总数")
-    @Excel(name = "发送成员总数")
-    private Integer senderTotalNums;
+public class WeGroupMessageListVo {
 
-    @ApiModelProperty("待发送成员数")
-    @Excel(name = "待发送成员数")
-    private Integer senderNums;
+    private String msgTemplateId;
 
-    @ApiModelProperty("待发送客户数")
-    @Excel(name = "待发送客户数")
-    private Integer serviceMember;
 
-    @ApiModelProperty("发送客户总数")
-    @Excel(name = "发送客户总数")
-    private Integer serviceTotalMember;
-
+    /**
+     * 附件
+     */
     @ApiModelProperty("附件")
     private List<WeGroupMessageAttachments> attachments;
+
+    /**
+     * 发送者
+     */
+    @ApiModelProperty("发送者信息")
+    private List<WeGroupMessageTask> senders;
+
+    /**
+     * 发送客户
+     */
+    @ApiModelProperty("接收者信息")
+    private List<WeGroupMessageSendResult> extralInfos;
 }

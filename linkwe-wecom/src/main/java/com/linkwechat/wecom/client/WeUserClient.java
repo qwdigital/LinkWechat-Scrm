@@ -57,6 +57,15 @@ public interface WeUserClient {
      * @param fetchChild
      * @return
      */
+    @Request(url="/user/simplelist")
+    WeUserListDto  simpleList(@Query("department_id") Long departmentId,@Query("fetch_child") Integer fetchChild);
+
+    /**
+     *  获取部门成员
+     * @param departmentId
+     * @param fetchChild
+     * @return
+     */
     @Request(url="/user/list")
     WeUserListDto  list(@Query("department_id") Long departmentId,@Query("fetch_child") Integer fetchChild);
 

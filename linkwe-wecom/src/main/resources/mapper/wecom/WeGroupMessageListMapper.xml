@@ -6,21 +6,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <resultMap type="WeGroupMessageList" id="WeGroupMessageListResult">
         <result property="id"    column="id"    />
+        <result property="msgTemplateId"    column="msg_template_id"    />
         <result property="msgId"    column="msg_id"    />
         <result property="chatType"    column="chat_type"    />
         <result property="userId"    column="user_id"    />
         <result property="sendTime"    column="send_time"    />
         <result property="createType"    column="create_type"    />
-        <result property="isTask"    column="is_task"    />
-        <result property="isExecute"    column="is_execute"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
     </resultMap>
     
-    <resultMap id="groupMsgDetailResult" type="WeGroupMessageDetailVo">
-        <result property="msgId"    column="msg_id"    />
+    <resultMap id="groupMsgDetailResult" type="WeGroupMessageListVo">
+        <result property="msgTemplateId"    column="msg_template_id"    />
         <collection property="attachments" ofType="com.linkwechat.wecom.domain.WeGroupMessageAttachments">
             <result property="msgType" column="msg_type"/>
             <result property="content" column="content"/>
@@ -50,7 +49,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <sql id="getDetailVo">
         select
-        	wgml.msg_id,
+        	wgml.msg_template_id,
         	wgma.msg_type,
         	wgma.content,
         	wgma.app_id ,
@@ -74,11 +73,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         from
         	we_group_message_list wgml
         left join we_group_message_attachments wgma on
-        	wgma.msg_id = wgml.msg_id
+        	wgma.msg_template_id = wgml.msg_template_id
         left join we_group_message_task wgmt on
-        	wgmt.msg_id = wgml.msg_id
+        	wgmt.msg_template_id = wgml.msg_template_id
         left join we_group_message_send_result wgmsr on
-        	wgmsr.msg_id = wgml.msg_id
+        	wgmsr.msg_template_id = wgml.msg_template_id
         where
         	1 = 1
     </sql>
@@ -86,17 +85,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="getGroupMsgDetails" resultMap="groupMsgDetailResult">
         <include refid="getDetailVo"/>
         <if test="msgIds != null and msgIds.size > 0">
-            and wgml.msg_id in
-            <foreach collection="msgIds" index="index" item="msgId" open="(" separator="," close=")">
-                #{msgId}
+            and wgml.msg_template_id in
+            <foreach collection="msgTemplateIds" index="index" item="msgTemplateId" open="(" separator="," close=")">
+                #{msgTemplateId}
             </foreach>
-        </if>
-    </select>
-
-    <select id="getGroupMsgDetail" resultMap="groupMsgDetailResult">
-        <include refid="getDetailVo"/>
-        <if test="msgId != null and msgId != ''">
-            and wgml.msg_id = #{msgId}
         </if>
     </select>
 

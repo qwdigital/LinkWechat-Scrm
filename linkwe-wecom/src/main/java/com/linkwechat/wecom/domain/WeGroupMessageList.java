@@ -35,6 +35,14 @@ public class WeGroupMessageList extends BaseEntity{
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
+
+    /**
+     * 群发消息模板id
+     */
+    @ApiModelProperty("群发消息模板id")
+    @Excel(name = "群发消息模板id")
+    private Long msgTemplateId;
+
     /**
      * 企业群发消息的id
      */
@@ -52,7 +60,7 @@ public class WeGroupMessageList extends BaseEntity{
     /**
      * 群发消息创建者userid
      */
-    @ApiModelProperty("群发消息创建者userid")
+    @ApiModelProperty(value = "群发消息创建者userid", hidden = true)
     @Excel(name = "群发消息创建者userid")
     private String userId;
 
@@ -67,28 +75,14 @@ public class WeGroupMessageList extends BaseEntity{
     /**
      * 群发消息创建来源。0：企业 1：个人
      */
-    @ApiModelProperty("群发消息创建来源。0：企业 1：个人")
+    @ApiModelProperty(value = "群发消息创建来源。0：企业 1：个人",hidden = true)
     @Excel(name = "群发消息创建来源。0：企业 1：个人")
-    private Integer createType;
-
-    /**
-     * 是否定时任务 0 常规 1 定时发送
-     */
-    @ApiModelProperty("是否定时任务 0 常规 1 定时发送")
-    @Excel(name = "是否定时任务 0 常规 1 定时发送")
-    private Integer isTask;
-
-    /**
-     * 是否执行 0 未执行 1 已执行
-     */
-    @ApiModelProperty("是否执行 0 未执行 1 已执行")
-    @Excel(name = "是否执行 0 未执行 1 已执行")
-    private Integer isExecute;
+    private Integer createType = 0;
 
     /**
      * 群发消息创建者
      */
-    @ApiModelProperty("群发消息创建者")
+    @ApiModelProperty(value = "群发消息创建者",hidden = true)
     @TableField(exist = false)
     private String userName;
 }

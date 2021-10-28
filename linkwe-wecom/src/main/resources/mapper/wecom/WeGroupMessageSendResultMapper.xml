@@ -6,6 +6,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <resultMap type="WeGroupMessageSendResult" id="WeGroupMessageSendResultResult">
         <result property="id"    column="id"    />
+        <result property="msgTemplateId"    column="msg_template_id"    />
         <result property="msgId"    column="msg_id"    />
         <result property="userId"    column="user_id"    />
         <result property="externalUserid"    column="external_userid"    />

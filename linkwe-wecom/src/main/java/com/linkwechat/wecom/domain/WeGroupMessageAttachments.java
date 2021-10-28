@@ -28,6 +28,13 @@ public class WeGroupMessageAttachments extends BaseEntity{
     @TableId(value = "id",type = IdType.AUTO)
     private Long id;
 
+    /**
+     * 群发消息模板id
+     */
+    @ApiModelProperty("群发消息模板id")
+    @Excel(name = "群发消息模板id")
+    private Long msgTemplateId;
+
     /** 企业群发消息的id */
     @ApiModelProperty("企业群发消息的id")
     @Excel(name = "企业群发消息的id")

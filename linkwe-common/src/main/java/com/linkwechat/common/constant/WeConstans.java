@@ -408,4 +408,7 @@ public class WeConstans {
      * 会话消息订阅的频道
      */
     public static final String CONVERSATION_MSG_CHANNEL = "CONVERSATION_MSG_CHANNEL";
+
+
+    public static final String WEGROUPMSGTIMEDTASK_KEY = "weGroupMessageTimedTask";
 }

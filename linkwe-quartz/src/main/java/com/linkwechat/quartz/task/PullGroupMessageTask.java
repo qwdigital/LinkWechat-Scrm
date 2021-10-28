@@ -5,24 +5,28 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
 import com.linkwechat.wecom.domain.WeGroupMessageAttachments;
 import com.linkwechat.wecom.domain.WeGroupMessageList;
 import com.linkwechat.wecom.domain.WeGroupMessageSendResult;
 import com.linkwechat.wecom.domain.WeGroupMessageTask;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
+import com.linkwechat.wecom.domain.dto.message.SendMessageResultDto;
 import com.linkwechat.wecom.domain.dto.message.WeGroupMsgListDto;
+import com.linkwechat.wecom.domain.query.WeAddGroupMessageQuery;
 import com.linkwechat.wecom.domain.query.WeAddMsgTemplateQuery;
 import com.linkwechat.wecom.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author danmo
@@ -47,6 +51,12 @@ public class PullGroupMessageTask {
 
     @Autowired
     private IWeMaterialService weMaterialService;
+
+    @Autowired
+    private WeCustomerMessagePushClient customerMessagePushClient;
+
+    @Autowired
+    private RedisCache redisCache;
 
     /**
      * 同步开始时间
@@ -244,5 +254,49 @@ public class PullGroupMessageTask {
         });
         groupMessageTaskService.addOrUpdateBatchByCondition(taskList);
         sendResultService.addOrUpdateBatchByCondition(sendResultlist);
+    }
+
+
+    public void groupMessageTaskHandler(){
+        Long cacheZSetSize = redisCache.getCacheZSetSize(WeConstans.WEGROUPMSGTIMEDTASK_KEY);
+        if(cacheZSetSize > 0){
+            Set<ZSetOperations.TypedTuple<String>> typedTuples = redisCache.rangeWithScore(WeConstans.WEGROUPMSGTIMEDTASK_KEY, 0, 0);
+            typedTuples.forEach(item -> {
+                long score = Objects.requireNonNull(item.getScore()).longValue();
+                if(score < System.currentTimeMillis()){
+                    //当时间小于当前时间时删除第一个记录，并发送群发消息
+                    log.info("获取到消息,执行群发任务: {}",item.getValue());
+                    redisCache.removeCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY,item.getValue());
+                    WeAddGroupMessageQuery query = JSONObject.parseObject(item.getValue(), WeAddGroupMessageQuery.class);
+                    List<WeAddGroupMessageQuery.SenderInfo> senderList = query.getSenderList();
+                    List<WeGroupMessageList> weGroupMessageLists = new ArrayList<>();
+                    senderList.forEach(sender ->{
+                        WeAddMsgTemplateQuery templateQuery = new WeAddMsgTemplateQuery();
+                        templateQuery.setChat_type(query.getChatType());
+                        templateQuery.setSender(sender.getUserId());
+                        if(ObjectUtil.equal(1,query.getChatType())){
+                            templateQuery.setExternal_userid(sender.getCustomerList());
+                        }
+                        templateQuery.setAttachments(query.getAttachmentsList());
+                        if(StringUtils.isNotEmpty(query.getContent())){
+                            WeAddMsgTemplateQuery.Text text = new WeAddMsgTemplateQuery.Text();
+                            text.setContent(query.getContent());
+                            templateQuery.setText(text);
+                        }
+                        SendMessageResultDto resultDto = customerMessagePushClient.addMsgTemplate(templateQuery);
+                        if(resultDto != null && ObjectUtil.equal(WeConstans.WE_SUCCESS_CODE,resultDto.getErrcode())){
+                            String msgid = resultDto.getMsgid();
+                            Long msgTemplateId = query.getId();
+                            WeGroupMessageList messageList = new WeGroupMessageList();
+                            messageList.setMsgId(msgid);
+                            weGroupMessageLists.add(messageList);
+                            groupMessageListService.update(messageList,new LambdaQueryWrapper<WeGroupMessageList>()
+                            .eq(WeGroupMessageList::getMsgTemplateId,msgTemplateId)
+                            .eq(WeGroupMessageList::getUserId,sender.getUserId()));
+                        }
+                    });
+                }
+            });
+        }
     }
 }

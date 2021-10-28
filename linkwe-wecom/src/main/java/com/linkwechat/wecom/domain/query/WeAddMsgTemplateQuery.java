@@ -36,6 +36,17 @@ public class WeAddMsgTemplateQuery {
     @ApiModelProperty("附件，最多支持添加9个附件 ru")
     private List<Attachments> attachments;
 
+    public void setChat_type(String chat_type) {
+        this.chat_type = chat_type;
+    }
+
+    public void setChat_type(Integer chatType) {
+        if(ObjectUtil.equal(2,chatType)){
+            this.chat_type = "group";
+        }else {
+            this.chat_type = "single";
+        }
+    }
 
     public void setAttachments(List<WeMessageTemplate> messageTemplates) {
         final int size = 9;

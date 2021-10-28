@@ -1,7 +1,6 @@
 package com.linkwechat.wecom.domain.vo;
 
 import com.linkwechat.wecom.domain.WeGroupMessageAttachments;
-import com.linkwechat.wecom.domain.WeGroupMessageList;
 import com.linkwechat.wecom.domain.WeGroupMessageSendResult;
 import com.linkwechat.wecom.domain.WeGroupMessageTask;
 import io.swagger.annotations.ApiModel;
@@ -17,7 +16,7 @@ import java.util.List;
  **/
 @ApiModel
 @Data
-public class WeGroupMessageDetailVo extends WeGroupMessageList {
+public class WeGroupMessageDetailVo {
     /**
      * 附件
      */
@@ -25,14 +24,14 @@ public class WeGroupMessageDetailVo extends WeGroupMessageList {
     private List<WeGroupMessageAttachments> attachments;
 
     /**
-     * 发送者
+     * 待发送者列表
      */
-    @ApiModelProperty("发送者信息")
-    private List<WeGroupMessageTask> senders;
+    @ApiModelProperty("待发送者列表")
+    private List<WeGroupMessageTaskVo> toBeSentList;
 
     /**
-     * 发送客户
+     * 已发送者列表
      */
-    @ApiModelProperty("接收者信息")
-    private List<WeGroupMessageSendResult> extralInfos;
+    @ApiModelProperty("已发送者列表")
+    private List<WeGroupMessageTaskVo> alreadySentList;
 }

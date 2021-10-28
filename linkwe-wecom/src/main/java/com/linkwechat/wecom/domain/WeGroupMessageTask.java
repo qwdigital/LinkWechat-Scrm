@@ -36,6 +36,13 @@ public class WeGroupMessageTask extends BaseEntity{
     private Long id;
 
     /**
+     * 群发消息模板id
+     */
+    @ApiModelProperty("群发消息模板id")
+    @Excel(name = "群发消息模板id")
+    private Long msgTemplateId;
+
+    /**
      * 企业群发消息的id
      */
     @ApiModelProperty("企业群发消息的id")

@@ -1,10 +1,8 @@
 package com.linkwechat.wecom.service;
 
-import com.github.pagehelper.PageInfo;
-import com.linkwechat.wecom.domain.WeGroupMessageList;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.wecom.domain.WeGroupMessageList;
 import com.linkwechat.wecom.domain.dto.message.WeGroupMsgListDto;
-import com.linkwechat.wecom.domain.vo.WeGroupMessageDetailVo;
 import com.linkwechat.wecom.domain.vo.WeGroupMessageListVo;
 
 import java.util.List;
@@ -16,12 +14,6 @@ import java.util.List;
  * @date 2021-10-19
  */
 public interface IWeGroupMessageListService extends IService<WeGroupMessageList> {
-
-    /**
-     * 查询列表
-     */
-    PageInfo<WeGroupMessageListVo> queryList(WeGroupMessageList weGroupMessageList);
-
     /**
      * 获取群发记录列表
      *
@@ -34,9 +26,9 @@ public interface IWeGroupMessageListService extends IService<WeGroupMessageList>
     WeGroupMsgListDto getGroupMsgList(String chatType, Long startTime, Long endTime, String cursor);
 
     /**
-     * 群发消息详情
-     * @param msgId 消息id
-     * @return 详情
+     * 查询群发消息详情
+     * @param msgTemplateId 模板id
+     * @return
      */
-    WeGroupMessageDetailVo getGroupMsgDetail(String msgId);
+    List<WeGroupMessageListVo> getGroupMsgDetail(Long msgTemplateId);
 }

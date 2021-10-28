@@ -6,6 +6,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <resultMap type="WeGroupMessageAttachments" id="WeGroupMessageAttachmentsResult">
         <result property="id"    column="id"    />
+        <result property="msgTemplateId"    column="msg_template_id"    />
         <result property="msgId"    column="msg_id"    />
         <result property="msgType"    column="msg_type"    />
         <result property="content"    column="content"    />
