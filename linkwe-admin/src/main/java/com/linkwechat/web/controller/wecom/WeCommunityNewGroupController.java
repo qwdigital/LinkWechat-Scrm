@@ -1,14 +1,11 @@
 package com.linkwechat.web.controller.wecom;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
-import com.linkwechat.common.exception.wecom.WeComException;
-import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.wecom.domain.WeCommunityNewGroup;
 import com.linkwechat.wecom.domain.WeEmpleCode;

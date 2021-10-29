@@ -1,15 +1,14 @@
 package com.linkwechat.wecom.service.impl;
 
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
-import com.linkwechat.common.utils.SecurityUtils;
-import com.linkwechat.common.utils.SnowFlakeUtil;
-import com.linkwechat.wecom.domain.WeMsgTlpScope;
-import com.linkwechat.wecom.service.IWeMsgTlpScopeService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.service.IWeUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.linkwechat.wecom.mapper.WeMsgTlpMapper;
@@ -24,37 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
  * @date 2020-10-04
  */
 @Service
-public class WeMsgTlpServiceImpl implements IWeMsgTlpService 
+public class WeMsgTlpServiceImpl extends ServiceImpl<WeMsgTlpMapper,WeMsgTlp> implements IWeMsgTlpService
 {
-    @Autowired
-    private WeMsgTlpMapper weMsgTlpMapper;
+
 
     @Autowired
-    private IWeMsgTlpScopeService iWeMsgTlpScopeService;
-
-    /**
-     * 查询欢迎语模板
-     * 
-     * @param id 欢迎语模板ID
-     * @return 欢迎语模板
-     */
-    @Override
-    public WeMsgTlp selectWeMsgTlpById(Long id)
-    {
-        return weMsgTlpMapper.selectWeMsgTlpById(id);
-    }
-
-    /**
-     * 查询欢迎语模板列表
-     * 
-     * @param weMsgTlp 欢迎语模板
-     * @return 欢迎语模板
-     */
-    @Override
-    public List<WeMsgTlp> selectWeMsgTlpList(WeMsgTlp weMsgTlp)
-    {
-        return weMsgTlpMapper.selectWeMsgTlpList(weMsgTlp);
-    }
+    private IWeUserService iWeUserService;
 
     /**
      * 新增欢迎语模板
@@ -63,91 +37,34 @@ public class WeMsgTlpServiceImpl implements IWeMsgTlpService
      * @return 结果
      */
     @Override
-    public int insertWeMsgTlp(WeMsgTlp weMsgTlp)
-    {
-        weMsgTlp.setCreateBy(SecurityUtils.getUsername());
-        weMsgTlp.setCreateTime(new Date());
-
-        return weMsgTlpMapper.insertWeMsgTlp(weMsgTlp);
-
-//        if(returnCode>0){
-//            List<WeMsgTlpScope> weMsgTlpScopess = weMsgTlp.getWeMsgTlpScopes();
-//            if(CollectionUtil.isNotEmpty(weMsgTlpScopess)){
-//
-//                List<WeMsgTlpScope> weMsgTlpScopes=weMsgTlp.getWeMsgTlpScopes().stream().filter(c -> c.getUseUserId() != null).collect(Collectors.toList());
-//                if(CollectionUtil.isNotEmpty(weMsgTlpScopes)){
-//
-//                    weMsgTlpScopes.forEach(v->{
-//                        v.setMsgTlpId(weMsgTlp.getId());
-//                        v.setId(SnowFlakeUtil.nextId());
-//                    });
-//
-//                    iWeMsgTlpScopeService.batchInsetWeMsgTlpScope(weMsgTlpScopes);
-//                }
-//
-//            }
-//        }
-
-//        return returnCode;
-    }
-
-    /**
-     * 修改欢迎语模板
-     * 
-     * @param weMsgTlp 欢迎语模板
-     * @return 结果
-     */
-    @Override
-    public int updateWeMsgTlp(WeMsgTlp weMsgTlp)
+    @Transactional
+    public void addorUpdate(WeMsgTlp weMsgTlp)
     {
 
-//        int returnCode = weMsgTlpMapper.updateWeMsgTlp(weMsgTlp);
-//
-//        if(returnCode>0){
-//            iWeMsgTlpScopeService.batchRemoveWeMsgTlpScopesByMsgTlpIds(ListUtil.toList(weMsgTlp.getId()));
-//            List<WeMsgTlpScope> weMsgTlpScopes = weMsgTlp.getWeMsgTlpScopes().stream().filter(c -> c.getUseUserId() != null).collect(Collectors.toList());
-//
-//            if(CollectionUtil.isNotEmpty(weMsgTlpScopes)){
-//                weMsgTlpScopes.stream().forEach(v->v.setMsgTlpId(weMsgTlp.getId()));
-//                iWeMsgTlpScopeService.batchInsetWeMsgTlpScope(weMsgTlpScopes);
-//            }
-//
-//        }
-        return weMsgTlpMapper.updateWeMsgTlp(weMsgTlp);
-    }
 
-    /**
-     * 批量删除欢迎语模板
-     * 
-     * @param ids 需要删除的欢迎语模板ID
-     * @return 结果
-     */
-    @Override
-    public int deleteWeMsgTlpByIds(Long[] ids)
-    {
-        return weMsgTlpMapper.deleteWeMsgTlpByIds(ids);
-    }
+        if(weMsgTlp.getWelcomeMsgTplType()
+                .equals(new Integer(2))) {
 
-    /**
-     * 删除欢迎语模板信息
-     * 
-     * @param id 欢迎语模板ID
-     * @return 结果
-     */
-    @Override
-    public int deleteWeMsgTlpById(Long id)
-    {
-        return weMsgTlpMapper.deleteWeMsgTlpById(id);
+            String userIds = weMsgTlp.getUserIds();
+
+            if (StringUtils.isNotEmpty(userIds)) {
+
+                List<WeUser> weUsers = iWeUserService.listByIds(
+                        ListUtil.toList(userIds.split(","))
+                );
+
+                if (CollectionUtil.isNotEmpty(weUsers)) {
+                    weMsgTlp.setUserNames(String.join(",",
+                            weUsers.stream().map(WeUser::getName).collect(Collectors.toList())));
+                }
+            }
+        }
+
+            this.saveOrUpdate(weMsgTlp);
+
+
     }
 
 
-    /**
-     * 批量逻辑删除
-     * @param msgTlpIds
-     * @return
-     */
-    @Override
-    public int batchRemoveByids(List<Long> msgTlpIds) {
-        return weMsgTlpMapper.batchRemoveByids(msgTlpIds);
-    }
+
 }

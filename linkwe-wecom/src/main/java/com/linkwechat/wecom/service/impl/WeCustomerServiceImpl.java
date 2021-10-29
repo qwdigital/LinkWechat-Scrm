@@ -251,6 +251,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
         if(CollectionUtil.isNotEmpty(weCustomerList)){
 
+            //移除不存在的客户
+            this.remove(new LambdaQueryWrapper<WeCustomer>()
+                    .notIn(WeCustomer::getExternalUserid,weCustomerList.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList()))
+            );
             //移除，同一个客户不同首位添加人id客户，保留最早时间客户
             this.saveOrUpdateBatch(
                     weCustomerList.stream().collect(

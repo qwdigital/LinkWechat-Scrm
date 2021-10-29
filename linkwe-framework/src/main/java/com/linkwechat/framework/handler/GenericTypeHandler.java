@@ -2,6 +2,7 @@ package com.linkwechat.framework.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.wecom.domain.WeMsgTlp;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;

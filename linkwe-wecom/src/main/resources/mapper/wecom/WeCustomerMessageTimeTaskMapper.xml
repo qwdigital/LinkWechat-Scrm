@@ -38,10 +38,11 @@
              )
     </insert>
     <update id="updateTaskSolvedById">
-        UPDATE we_customer_messageTimeTask
-        <set>
-            solved=1
-        </set>
+        UPDATE we_customer_messageTimeTask set
+        solved=#{solved},
+        <if test="exceMsg != null and exceMsg !=''">
+            exce_msg=#{exceMsg}
+        </if>
         <where>
             task_id=#{taskId}
         </where>

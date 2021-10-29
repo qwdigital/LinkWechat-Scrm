@@ -1,0 +1,1 @@
+package com.linkwechat.wecom.mapper;import com.linkwechat.wecom.domain.CorpBasicPageData;public interface WePageMapper {    CorpBasicPageData getCcorpBasicData();}

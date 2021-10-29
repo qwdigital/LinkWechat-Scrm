@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeGroupMessageAttachmentsMapper">
+    
+    <resultMap type="WeGroupMessageAttachments" id="WeGroupMessageAttachmentsResult">
+        <result property="id"    column="id"    />
+        <result property="msgId"    column="msg_id"    />
+        <result property="msgType"    column="msg_type"    />
+        <result property="content"    column="content"    />
+        <result property="mediaId"    column="media_id"    />
+        <result property="title"    column="title"    />
+        <result property="description"    column="description"    />
+        <result property="linkUrl"    column="link_url"    />
+        <result property="picUrl"    column="pic_url"    />
+        <result property="appId"    column="app_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+
+</mapper>

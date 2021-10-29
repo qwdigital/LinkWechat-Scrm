@@ -21,7 +21,11 @@ export function param2Obj(url) {
 }
 
 // 日期时间格式化
-export function dateFormat(date = new Date(), fmt = 'yyyy-MM-dd hh:mm:ss') {
+export function dateFormat(dateString, fmt = 'yyyy-MM-dd hh:mm:ss') {
+  if (!dateString) {
+    return
+  }
+  var date = new Date(dateString.replace(/-/g, '/'))
   var o = {
     'M+': date.getMonth() + 1, //月份
     'd+': date.getDate(), //日
@@ -34,18 +38,12 @@ export function dateFormat(date = new Date(), fmt = 'yyyy-MM-dd hh:mm:ss') {
   }
 
   if (/(y+)/.test(fmt)) {
-    fmt = fmt.replace(
-      RegExp.$1,
-      (date.getFullYear() + '').substr(4 - RegExp.$1.length)
-    )
+    fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
   }
 
   for (var k in o) {
     if (new RegExp('(' + k + ')').test(fmt)) {
-      fmt = fmt.replace(
-        RegExp.$1,
-        RegExp.$1.length == 1 ? o[k] : ('00' + o[k]).substr(('' + o[k]).length)
-      )
+      fmt = fmt.replace(RegExp.$1, RegExp.$1.length == 1 || String(o[k]).length > 1 ? o[k] : '0' + o[k])
     }
   }
 

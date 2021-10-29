@@ -63,6 +63,16 @@ public enum MessageType {
      */
     TASKCARD("10", "taskcard"),
 
+    /**
+     * 群发图文消息
+     */
+    LINK("11", "link"),
+
+    /**
+     * 群发小程序
+     */
+    MINIPROGRAM("12", "miniprogram"),
+
     ;
     /**
      * 媒体类型
