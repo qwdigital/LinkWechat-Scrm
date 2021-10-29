@@ -236,6 +236,17 @@ public class RedisCache {
      * 删除元素 zrem
      *
      * @param key
+     * @param start
+     * @param end
+     */
+    public Long removeRangeCacheZSet(String key, long start, long end) {
+        return redisTemplate.opsForZSet().removeRange(key, start,end);
+    }
+
+    /**
+     * 删除元素 zrem
+     *
+     * @param key
      * @param value
      */
     public long removeCacheZSet(String key, String value) {

@@ -52,12 +52,6 @@ public class PullGroupMessageTask {
     @Autowired
     private IWeMaterialService weMaterialService;
 
-    @Autowired
-    private WeCustomerMessagePushClient customerMessagePushClient;
-
-    @Autowired
-    private RedisCache redisCache;
-
     /**
      * 同步开始时间
      */
@@ -254,53 +248,5 @@ public class PullGroupMessageTask {
         });
         groupMessageTaskService.addOrUpdateBatchByCondition(taskList);
         sendResultService.addOrUpdateBatchByCondition(sendResultlist);
-    }
-
-
-    public void groupMessageTaskHandler(){
-        Long cacheZSetSize = redisCache.getCacheZSetSize(WeConstans.WEGROUPMSGTIMEDTASK_KEY);
-        if(cacheZSetSize > 0){
-            Set<ZSetOperations.TypedTuple<String>> typedTuples = redisCache.rangeWithScore(WeConstans.WEGROUPMSGTIMEDTASK_KEY, 0, 0);
-            typedTuples.forEach(item -> {
-                long score = Objects.requireNonNull(item.getScore()).longValue();
-                if(score < System.currentTimeMillis()){
-                    //当时间小于当前时间时删除第一个记录，并发送群发消息
-                    log.info("获取到消息,执行群发任务: {}",item.getValue());
-                    redisCache.removeCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY,item.getValue());
-                    WeAddGroupMessageQuery query = JSONObject.parseObject(item.getValue(), WeAddGroupMessageQuery.class);
-                    List<WeAddGroupMessageQuery.SenderInfo> senderList = query.getSenderList();
-                    List<WeGroupMessageList> weGroupMessageLists = new ArrayList<>();
-                    WeGroupMessageList weGroupMessageList = groupMessageListService.getOne(new LambdaQueryWrapper<WeGroupMessageList>()
-                            .eq(WeGroupMessageList::getMsgTemplateId, query.getId()).last("limit 1"));
-                    if(weGroupMessageList != null && StringUtils.isEmpty(weGroupMessageList.getMsgId())){
-                        senderList.forEach(sender ->{
-                            WeAddMsgTemplateQuery templateQuery = new WeAddMsgTemplateQuery();
-                            templateQuery.setChat_type(query.getChatType());
-                            templateQuery.setSender(sender.getUserId());
-                            if(ObjectUtil.equal(1,query.getChatType())){
-                                templateQuery.setExternal_userid(sender.getCustomerList());
-                            }
-                            templateQuery.setAttachments(query.getAttachmentsList());
-                            if(StringUtils.isNotEmpty(query.getContent())){
-                                WeAddMsgTemplateQuery.Text text = new WeAddMsgTemplateQuery.Text();
-                                text.setContent(query.getContent());
-                                templateQuery.setText(text);
-                            }
-                            SendMessageResultDto resultDto = customerMessagePushClient.addMsgTemplate(templateQuery);
-                            if(resultDto != null && ObjectUtil.equal(WeConstans.WE_SUCCESS_CODE,resultDto.getErrcode())){
-                                String msgid = resultDto.getMsgid();
-                                Long msgTemplateId = query.getId();
-                                WeGroupMessageList messageList = new WeGroupMessageList();
-                                messageList.setMsgId(msgid);
-                                weGroupMessageLists.add(messageList);
-                                groupMessageListService.update(messageList,new LambdaQueryWrapper<WeGroupMessageList>()
-                                        .eq(WeGroupMessageList::getMsgTemplateId,msgTemplateId)
-                                        .eq(WeGroupMessageList::getUserId,sender.getUserId()));
-                            }
-                        });
-                    }
-                }
-            });
-        }
     }
 }

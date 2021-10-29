@@ -72,7 +72,7 @@ public class WeGroupMessageTemplateController extends BaseController {
      * 删除群发消息模板
      */
     //@PreAuthorize("@ss.hasPermi('linkwechat:template:remove')")
-    @ApiOperation(value = "删除群发消息模板", httpMethod = "DELETE")
+    @ApiOperation(value = "取消发送", httpMethod = "DELETE")
     @Log(title = "群发消息模板", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
