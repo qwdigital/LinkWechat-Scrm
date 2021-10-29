@@ -2,26 +2,15 @@
 import { getPosterInfo, addPoster, updatePoster, removePoster } from '@/api/material/poster.js'
 import MaPage from '@/views/material/components/MaPage'
 import SelectMaterial from '@/components/SelectMaterial'
-// Load Style Code
-import 'tui-image-editor/dist/tui-image-editor.css'
-import 'tui-color-picker/dist/tui-color-picker.css'
+import { fabric } from 'fabric'
 
-import PosterPage from './components/PosterPage.vue'
-import bgpng from '@/assets/poster/img/bg.png'
-
-var locale_ru_RU = {
-  DeleteAll: '全部清空',
-  Delete: '删除元素',
-  Undo: '后退',
-  Redo: '前进'
-}
+import qrCodeImage from '@/assets/poster/img/qrCodeImage.png'
 
 export default {
   name: 'Poster',
   components: {
     MaPage,
-    SelectMaterial,
-    'tui-image-editor': PosterPage
+    SelectMaterial
   },
   data() {
     return {
@@ -32,12 +21,9 @@ export default {
         preview: false, // 预览弹出显示隐藏
         edit: false // 编辑弹出显示隐藏
       },
-      posterEdit: {
-        step: 0
-      },
       materialSelected: '', // 图片url
       rangeErrorMsg: '',
-      posterForm: {
+      form: {
         title: '', // 海报名称
         categoryId: '', // 所属分类
         type: '1', // 海报类型
@@ -70,85 +56,13 @@ export default {
       srcList: [],
       ids: [], // 选中数组
       previewImg: '', // 预览图片地址
-      useDefaultUI: true,
-      options: {
-        includeUI: {
-          // initMenu: "text",
-          locale: locale_ru_RU,
-          // loadImage: {
-          //   path: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg1.gtimg.com%2Fsports%2Fpics%2Fhv1%2F171%2F106%2F1472%2F95744001.jpg&refer=http%3A%2F%2Fimg1.gtimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1612444990&t=6589254fe9669cc6a45fd3688f269612',
-          //   name: "posterImage"
-          // },
-          uiSize: {
-            height: '700px' // 设置固定高度
-          },
-          usageStatistics: false,
-          menuBarPosition: 'right',
-          menu: ['text'], // FIXME 因为借用了CANVAS的UI  所以需要使用TEXT，需要额外注释,后面创建自己的UI在去掉
-          theme: {
-            'common.bi.image': '',
-            'common.bisize.width': '251px',
-            'common.bisize.height': '21px',
-            'common.backgroundImage': bgpng,
-            'common.backgroundColor': '#fff',
-            'common.border': '1px solid #c1c1c1',
-
-            // header
-            'header.backgroundImage': 'none',
-            'header.backgroundColor': 'transparent',
-            'header.border': '0px',
-
-            // load button
-            'loadButton.backgroundColor': '#fff',
-            'loadButton.border': '1px solid #ddd',
-            'loadButton.color': '#222',
-            'loadButton.fontFamily': "'Noto Sans', sans-serif",
-            'loadButton.fontSize': '12px',
-
-            // download button
-            'downloadButton.backgroundColor': '#fdba3b',
-            'downloadButton.border': '1px solid #fdba3b',
-            'downloadButton.color': '#fff',
-            'downloadButton.fontFamily': "'Noto Sans', sans-serif",
-            'downloadButton.fontSize': '12px',
-
-            // main icons
-            'menu.normalIcon.color': '#8a8a8a',
-            'menu.activeIcon.color': '#555555',
-            'menu.disabledIcon.color': '#434343',
-            'menu.hoverIcon.color': '#e9e9e9',
-            'menu.iconSize.width': '24px',
-            'menu.iconSize.height': '24px',
-
-            // colorpicker style
-            'colorpicker.button.border': '1px solid #1e1e1e',
-            'colorpicker.title.color': '#fff'
-          }
-          // {
-          //   "common.bi.image": "",
-          //   "common.bisize.width": "251px",
-          //   "common.bisize.height": "21px",
-          //   "common.backgroundImage": bgpng,
-          //   "common.backgroundColor": "#fff",
-          //   "common.border": "1px solid #c1c1c1",
-
-          //   // header
-          //   "header.backgroundImage": "none",
-          //   "header.backgroundColor": "transparent",
-          //   "header.border": "0px",
-
-          //   // main icons
-          //   "menu.iconSize.width": "34px",
-          //   "menu.iconSize.height": "34px",
-          // }
-        }
-      }
+      activeObject: {},
+      a: ''
     }
   },
   watch: {},
-  created() {
-    console.log('created')
-  },
+  created() {},
+  mounted() {},
   methods: {
     listChange(data) {
       console.log('listChange', JSON.stringify(data))
@@ -161,138 +75,159 @@ export default {
       this.dialog.preview = true
     },
     async edit(item) {
-      console.log('edit!!!!!!!')
       try {
         const res = await getPosterInfo(item.id)
         const data = res.data || {}
         console.log('getPosterInfo', data)
-        this.posterForm = {
+        this.form = {
           id: data.id,
           title: data.title,
           categoryId: data.categoryId,
           type: data.type,
-          delFlag: data.delFlag
+          delFlag: data.delFlag,
+          posterJSON: data.posterJSON
         }
         this.posterSubassemblyList = []
         this.posterSubassemblyList = data.posterSubassemblyList || []
         this.materialSelected = data.backgroundImgPath
-        this.posterEdit.step = 0
         this.dialog.edit = true
+        this.initPoster()
       } catch (error) {
         console.log(error)
       }
     },
-    ready() {
-      console.log('ready')
-    },
-    onAddText(pos) {
-      this.$refs.tuiImageEditor.editorInstance
-        .addText('双击输入文字', {
-          position: pos.originPosition
-        })
-        .then(function(objectProps) {
-          console.log(objectProps)
-        })
-    },
-    //移动
-    onObjectMoved(res) {
-      console.log('onObjectMoved')
-      this.getRecord(res)
-    },
-    //新增/选中
-    objectActivated(obj) {
-      console.log('objectActivated')
-      var imageEditor = this.$refs.tuiImageEditor
-      imageEditor.activeObjectId = obj.id
-      if (obj.type === 'text') {
-        imageEditor.showSubMenu('text')
-        imageEditor.setTextToolbar(obj)
-        imageEditor.activateTextMode()
-      }
-    },
-    //缩放
-    onObjectScaled(obj) {
-      console.log('onObjectScaled')
-      if (obj.type === 'text') {
-        this.$refs.tuiImageEditor.inputFontSizeRange.setAttribute('value', obj.fontSize)
-      }
-    },
-    //重做
-    onRedoStackChanged(length) {
-      if (length) {
-        this.$refs.tuiImageEditor.btn_redo.remove('disabled')
-      } else {
-        this.$refs.tuiImageEditor.btn_redo.add('disabled')
-      }
-      this.$refs.tuiImageEditor.resizeEditor()
-    },
-    onUndoStackChanged(length) {
-      if (length) {
-        this.$refs.tuiImageEditor.btn_undo.classList.remove('disabled')
-      } else {
-        this.$refs.tuiImageEditor.btn_undo.classList.add('disabled')
-      }
-      this.$refs.tuiImageEditor.resizeEditor()
-    },
-    showSubMenu(type) {
-      switch (type) {
-        case 'text':
-          document.getElementsByClassName('tui-image-editor-submenu')[0].display = 'block'
-          break
-        default:
-          document.getElementsByClassName('tui-image-editor-submenu')[0].display = 'none'
-      }
-    },
-    activateTextMode() {
-      let imageEditor = this.$refs.tuiImageEditor.editorInstance
-      if (imageEditor.getDrawingMode() !== 'TEXT') {
-        imageEditor.stopDrawingMode()
-        imageEditor.startDrawingMode('TEXT')
-      }
-    },
-    checkState(obj) {
-      switch (obj.type) {
-        case 'text':
-          this.showSubMenu('text')
-          this.activateTextMode()
-          break
-        default:
-          this.activateImageMode()
-          break
-      }
-    },
-    activateImageMode() {
-      let imageEditor = this.$refs.tuiImageEditor.editorInstance
-      imageEditor.stopDrawingMode()
-    },
-    toNextStep() {
-      if (this.materialSelected === '') {
-        this.rangeErrorMsg = '请选择背景图片'
-        return
-      } else {
-        this.rangeErrorMsg = ''
-      }
-      if (this.$refs.tuiImageEditor && this.$refs.tuiImageEditor.editorInstance) {
-        this.$refs.tuiImageEditor.editorInstance._invoker._redoStack = []
-        this.$refs.tuiImageEditor.editorInstance._invoker._undoStack = []
-        this.$refs.tuiImageEditor.records = {}
-        this.imgList = {}
-      }
-      this.$refs.form.validate((valid) => {
-        if (valid) {
-          this.posterEdit.step = 1
-          this.$refs.tuiImageEditor.getBackgroundUrl(this.materialSelected, this.posterSubassemblyList)
+    // 初始化海报画布
+    initPoster() {
+      this.$nextTick(() => {
+        let canvas = (this.canvas = new fabric.Canvas('canvas'))
+
+        if (this.form.posterJSON) {
+          // 加载画布信息
+          canvas.loadFromJSON(JSON.parse(this.form.posterJSON), () => {
+            canvas.renderAll()
+          })
         } else {
-          return false
+          this.setPosterBackgroundImage()
         }
+
+        // 删除某个图层
+        var deleteBtn = document.getElementById('deleteBtn')
+        function addDeleteBtn(x, y) {
+          deleteBtn.style.display = 'none'
+          deleteBtn.style.left = x - 10 + 'px'
+          deleteBtn.style.top = y - 30 + 'px'
+          deleteBtn.style.display = 'block'
+        }
+
+        canvas.on('selection:created', function(e) {
+          addDeleteBtn(e.target.lineCoords.tr.x, e.target.lineCoords.tr.y)
+        })
+        canvas.on('selection:updated', function(e) {
+          addDeleteBtn(e.target.lineCoords.tr.x, e.target.lineCoords.tr.y)
+        })
+        canvas.on('mouse:down', (e) => {
+          console.log(canvas.getActiveObject())
+          this.activeObject = canvas.getActiveObject()
+          if (!this.activeObject) {
+            deleteBtn.style.display = 'none'
+          }
+        })
+
+        canvas.on('object:modified', function(e) {
+          addDeleteBtn(e.target.lineCoords.tr.x, e.target.lineCoords.tr.y)
+        })
+        canvas.on('object:scaling', function(e) {
+          deleteBtn.style.display = 'none'
+        })
+        canvas.on('object:moving', function(e) {
+          deleteBtn.style.display = 'none'
+        })
+        canvas.on('object:rotating', function(e) {
+          deleteBtn.style.display = 'none'
+        })
+        canvas.on('mouse:wheel', function(e) {
+          deleteBtn.style.display = 'none'
+        })
+        deleteBtn.addEventListener('click', () => {
+          let activeObject = canvas.getActiveObject()
+          if (activeObject) {
+            this.$confirm('是否确认删除吗?', '警告', {
+              type: 'warning'
+            }).then(() => {
+              canvas.remove(activeObject)
+              this.activeObject = null
+              deleteBtn.style.display = 'none'
+            })
+          }
+        })
       })
     },
-    toPrevStep() {
-      this.posterEdit.step = 0
+    // 设置海报背景
+    setPosterBackgroundImage() {
+      if (!this.materialSelected) {
+        return
+      }
+      let canvas = this.canvas
+      new fabric.Image.fromURL(this.materialSelected, (img) => {
+        img.set({
+          // 通过scale来设置图片大小，这里设置和画布一样大
+          scaleX: canvas.width / img.width,
+          scaleY: canvas.height / img.height
+        })
+        canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas))
+        canvas.renderAll()
+      })
+    },
+    // 设置文本对齐方式
+    setAttr(attr, type) {
+      this.activeObject.set(attr, type)
+      this.canvas.requestRenderAll()
+      // this.activeObject.set({
+      //   textAlign: type
+      // })
+    },
+    addObj(type, obj) {
+      let options = {
+        left: 100,
+        top: 100,
+        transparentCorners: false,
+        cornerColor: 'white',
+        cornerStrokeColor: 'white',
+        borderColor: 'white',
+        cornerSize: 12,
+        padding: 10,
+        cornerStyle: 'circle',
+        borderDashArray: [3, 3],
+        customType: { text: 1, image: 2, qrcode: 3 }[type] // 自定义类型 1 固定文本 2 固定图片 3 二维码图片
+      }
+      switch (type) {
+        case 'text':
+          let text = new fabric.IText('请输入', options)
+          this.canvas.add(text).setActiveObject(text)
+          break
+        case 'imageShow':
+          this.dialogVisibleSelectMaterial = true
+          this.isBackgroundImage = false
+          break
+
+        case 'image':
+        case 'qrcode':
+          new fabric.Image.fromURL(type == 'image' ? obj : qrCodeImage, (img) => {
+            img.set(options)
+            img.scale(this.canvas.width / img.width / 2)
+            // img.scaleToWidth(200)
+            this.canvas.add(img).setActiveObject(img)
+          })
+          break
+
+        default:
+          break
+      }
+      this.activeObject = this.canvas.getActiveObject()
     },
     beforeCloseDialog() {
       this.$refs.form.resetFields()
-      this.posterForm.id = undefined
+      this.form.id = undefined
       this.dialog.edit = false
     },
     remove(id) {
@@ -307,193 +242,85 @@ export default {
           this.msgSuccess('删除成功')
         })
     },
-    inputFontSizeRangeChange(e) {
-      this.$refs.tuiImageEditor.inputFontSizeRangeChange()
-    },
-    // getRecord(res){
-    //   var flag = false;
-    //   if (this.records && this.records.length) {
-    //     for (let index = 0; index < this.records.length; index++) {
-    //       const element ={
-    //         fill: this.records[index].fill,
-    //         height: this.records[index].height,
-    //         id: this.records[index].id,
-    //         left: this.records[index].left,
-    //         opacity: this.records[index].opacity,
-    //         stroke: this.records[index].stroke,
-    //         strokeWidth: this.records[index].strokeWidth,
-    //         top: this.records[index].top,
-    //         type: this.records[index].type,
-    //         width: this.records[index].width,
-    //       };
-    //       if(element.id == res.id){
-    //         // console.log(element)
-    //         this.records[index] = res;
-    //         flag = true;
-    //       }
-    //     }
-    //   } else {
-    //     this.records = [];
-    //   }
-    //   if(!flag){
-    //     this.records.push(res)
-    //   }
-    // },
-    // 获取子组件传来的数据
-    getImgData(data) {
-      this.imgList[data.randomId] = data
-    },
-    // 选择素材确认按钮
     submitSelectMaterial(text, image, file) {
-      this.posterForm.mediaId = image.id
-      this.materialSelected = image.materialUrl
-      this.dialogVisibleSelectMaterial = false
-    },
-    removeMaterial() {
-      this.posterForm.mediaId = ''
-      this.materialSelected = ''
+      if (this.isBackgroundImage) {
+        this.form.mediaId = image.id
+        this.materialSelected = image.materialUrl
+        this.setPosterBackgroundImage()
+        this.dialogVisibleSelectMaterial = false
+      } else {
+        this.addObj('image', image.materialUrl)
+      }
     },
     //
-    async save() {
-      let list = []
-      let historys = []
-      try {
-        let imageEditor = this.$refs.tuiImageEditor
-        let deleteId = []
-        imageEditor.editorInstance._invoker._undoStack.forEach((element) => {
-          if (element.name == 'removeObject') {
-            deleteId.push(element.args[1])
-          } else {
-            if (element.args[1] instanceof Array) {
-              historys.push(element.args[1][0])
-            } else {
-              historys.push(element.args[1])
-            }
-          }
-        })
-        Object.values(imageEditor.records).forEach((item) => {
-          if (deleteId.indexOf(item.id.toString()) >= 0) {
-            console.log(' ')
-          } else {
-            list.push(item)
-          }
-        })
-
-        // const image = this.$refs.tuiImageEditor.editorInstance.toDataURL();
-        // res.url = image;
-      } catch (error) {
-        console.log(error)
-      }
-
-      // TODO 塞新建海报的数据
-      let posterSubList = []
-      let vo = null
-      let i = 0,
-        len = list.length
-      while (i < len) {
-        vo = list[i]
-        if (this.imgList[vo.id]) {
-          vo.objType = this.imgList[vo.id].objType
-          vo.url = this.imgList[vo.id].url
-          vo.randomId = this.imgList[vo.id].randomId
-        }
-
-        let type = vo.type
-        let isText = false
-        if (type === 'i-text' || type === 'text') {
-          // 如果是文本需要对文字内容进行特殊处理
-          isText = true
-          let targetData = this.getLastSelectData(vo.id, historys)
-          vo.text = (targetData && targetData.text) || vo.text || ''
-
-          // 如果文本没有数据则移除
-          if (!vo.text.length) {
-            i++
-            continue
-          }
-        }
-
-        let align = (vo.textAlign && (vo.textAlign === 'left' ? 1 : vo.textAlign === 'center' ? 2 : 3)) || 1
-
-        let posData = {
-          id: null, // 修改的时候后端默认没增删，沟通后让先传null
-          content: vo.text || '', // 文本内容
-          delFlag: 0, // 1 启动  0 删除      FIXME 暂时写死
-          fontColor: vo.fill || '#000000',
-          fontId: null, // TODO 后端让传NULL  isText ? i : null,   // 字体ID   与imgPath互斥
-          fontSize: parseInt(vo.fontSize),
-          fontTextAlign: align, // 1 2 3  left center right
-          left: parseInt(vo.left) - (isText ? 0 : vo.width >> 1), //  FIXME：显示偏移了
-          top: parseInt(vo.top) - (isText ? 0 : vo.height >> 1),
-          width: parseInt(vo.width + (isText ? vo.fontSize / 2 : 0)),
-          height: parseInt(vo.height),
-          imgPath: vo.url || '',
-          posterId: null,
-          type: isText ? 1 : vo.objType, // 1 固定文本 2 固定图片 3 二维码图片
-          // alpha: vo.opacity,                   // 后端暂时不支持
-          fontStyle: vo.italic && vo.bold ? 3 : vo.italic ? 2 : vo.bold ? 1 : 0, // 0 通常 1 粗体 2 斜体 3 粗 + 斜
-          rotate: vo.angle,
-          order: i, // 层级
-          // categoryId: 0,                       // 分类ID (不需要传了)
-          verticalType: 2 // 居中方式后端让写死2
-        }
-        posterSubList.push(posData)
-        i++
-      }
-
-      const posterForm = this.posterForm
-      console.log('save', posterForm.id)
-      let res = {}
-      if (posterForm.id) {
-        // 编辑海报
-        res = await updatePoster(
-          Object.assign(
-            {},
-            {
-              // backgroundImgPath: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg',
-              backgroundImgPath: this.materialSelected,
-              posterSubassemblyList: posterSubList
-            },
-            this.posterForm
-          )
-        )
+    save(isBack) {
+      if (this.materialSelected === '') {
+        this.rangeErrorMsg = '请选择背景图片'
+        return
       } else {
-        // 新建海报
-        res = await addPoster(
-          Object.assign(
-            {},
-            {
-              backgroundImgPath: this.materialSelected,
-              posterSubassemblyList: posterSubList
-            },
-            this.posterForm
-          )
-        )
+        this.rangeErrorMsg = ''
       }
-      if (res.code === 200) {
-        this.msgSuccess(res.msg)
-        this.$refs.page.getList(1)
-        this.beforeCloseDialog()
-      }
-    },
-    getLastSelectData(id, arr) {
-      let index = arr.length - 1,
-        len = 0
-      let selectData = null
-      try {
-        while (index >= len) {
-          // 类型转换对比
-          if (arr[index].id == id) {
-            selectData = arr[index]
-            break
-          }
-          index--
-        }
-      } catch (e) {
-        console.log('getLastSelectData 循环出错')
-      }
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          const form = this.form
+          form.posterJSON = this.canvas.toJSON(['customType'])
+          console.log(form.posterJSON)
+          let list = form.posterJSON.objects
+          let posterSubList = []
+          let vo = null
+          let i = 0,
+            len = list.length
+          while (i < len) {
+            vo = list[i]
 
-      return selectData
+            let isText = vo.type == 'i-text'
+
+            let align = (vo.textAlign && (vo.textAlign === 'left' ? 1 : vo.textAlign === 'center' ? 2 : 3)) || 1
+
+            let posData = {
+              id: null, // 修改的时候后端默认没增删，沟通后让先传null
+              content: vo.text || '', // 文本内容
+              delFlag: 0, // 1 启动  0 删除       暂时写死
+              fontColor: vo.fill || 'rgb(0,0,0)',
+              fontId: null, // TODO 后端让传NULL  isText ? i : null,   // 字体ID   与imgPath互斥
+              fontSize: parseInt(vo.fontSize),
+              fontTextAlign: align, // 1 2 3  left center right
+              left: parseInt(vo.left) - (isText ? 0 : vo.width >> 1), //  FIXME：显示偏移了
+              top: parseInt(vo.top) - (isText ? 0 : vo.height >> 1),
+              width: parseInt(vo.width + (isText ? vo.fontSize / 2 : 0)),
+              height: parseInt(vo.height),
+              imgPath: vo.src || '',
+              posterId: null,
+              type: vo.customType, // 1 固定文本 2 固定图片 3 二维码图片
+              // alpha: vo.opacity,                   // 后端暂时不支持
+              fontStyle: vo.italic && vo.bold ? 3 : vo.italic ? 2 : vo.bold ? 1 : 0, // 0 通常 1 粗体 2 斜体 3 粗 + 斜
+              rotate: vo.angle,
+              order: i, // 层级
+              // categoryId: 0,                       // 分类ID (不需要传了)
+              verticalType: 2 // 居中方式后端让写死2
+            }
+            posterSubList.push(posData)
+            i++
+          }
+
+          ;(form.id ? updatePoster : addPoster)(
+            Object.assign(
+              {
+                // backgroundImgPath: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg',
+                backgroundImgPath: this.materialSelected,
+                posterSubassemblyList: posterSubList
+              },
+              form
+            )
+          ).then((res) => {
+            this.msgSuccess(res.msg)
+            if (isBack) {
+              this.$refs.page.getList(1)
+              this.beforeCloseDialog()
+            }
+          })
+        }
+      })
     }
   }
 }
@@ -527,86 +354,133 @@ export default {
       <el-dialog title="海报预览" width="30%" :visible.sync="dialog.preview">
         <img class="preview-img" :src="previewImg" />
       </el-dialog>
-      <el-dialog title="海报编辑" width="50%" :visible.sync="dialog.edit" :before-close="beforeCloseDialog">
-        <div class="poster-edit-dialog">
-          <el-form ref="form" :rules="rules" :model="posterForm" label-width="120px">
-            <el-form-item label="海报名称" prop="title">
-              <el-input v-model="posterForm.title" maxlength="10" show-word-limit></el-input>
-            </el-form-item>
-            <el-form-item label="所属分类" prop="categoryId">
-              <el-cascader
-                v-model="posterForm.categoryId"
-                :options="$refs.page.treeData[0].children"
-                :props="$refs.page.groupProps"
-              ></el-cascader>
-              <!-- <el-select
-                v-model="posterForm.categoryId"
+      <el-dialog
+        title="海报编辑"
+        width="80%"
+        :visible.sync="dialog.edit"
+        :before-close="beforeCloseDialog"
+        :close-on-click-modal="false"
+      >
+        <div class="poster-edit-dialog fxbw">
+          <div style="width: 30%;">
+            <el-form ref="form" :rules="rules" :model="form" label-width="120px">
+              <el-form-item label="海报名称" prop="title">
+                <el-input v-model="form.title" maxlength="10" show-word-limit></el-input>
+              </el-form-item>
+              <el-form-item label="所属分类" prop="categoryId">
+                <el-cascader
+                  v-if="$refs.page"
+                  v-model="form.categoryId"
+                  :options="$refs.page.treeData[0].children"
+                  :props="$refs.page.groupProps"
+                  style="width: 100%;"
+                ></el-cascader>
+                <!-- <el-select
+                v-model="form.categoryId"
                 placeholder="请选择分类"
               >
                 <el-option label="海报一" value="1"></el-option>
                 <el-option label="海报二" value="2"></el-option>
               </el-select> -->
-            </el-form-item>
-            <!-- <el-form-item label="所属二级分类">
+              </el-form-item>
+              <!-- <el-form-item label="所属二级分类">
               <el-select
-                v-model="posterForm.classifySecond"
+                v-model="form.classifySecond"
                 placeholder="请选择分类"
               >
                 <el-option label="海报一" value="poster1"></el-option>
                 <el-option label="海报二" value="poster2"></el-option>
               </el-select>
             </el-form-item> -->
-            <el-form-item label="海报类型" prop="type">
-              <el-radio-group v-model="posterForm.type">
-                <el-radio label="1">通用海报</el-radio>
-                <!-- <el-radio label="1">名片海报</el-radio>
+              <el-form-item label="海报类型" prop="type">
+                <el-radio-group v-model="form.type">
+                  <el-radio label="1">通用海报</el-radio>
+                  <!-- <el-radio label="1">名片海报</el-radio>
                 <el-radio label="2">专属海报</el-radio> -->
-                <!-- <el-radio label="4">案例海报</el-radio>
+                  <!-- <el-radio label="4">案例海报</el-radio>
                 <el-radio label="5">产品海报</el-radio> -->
-              </el-radio-group>
-            </el-form-item>
-            <!-- <el-form-item
-              :label="`${posterForm.type === '4' ? '案例' : '产品'}内容`"
-              v-if="posterForm.type === '4' || posterForm.type === '5'"
+                </el-radio-group>
+              </el-form-item>
+              <!-- <el-form-item
+              :label="`${form.type === '4' ? '案例' : '产品'}内容`"
+              v-if="form.type === '4' || form.type === '5'"
             >
-              <el-input v-model="posterForm.content"></el-input>
+              <el-input v-model="form.content"></el-input>
             </el-form-item> -->
-            <!-- <el-form-item label="虚拟次数">
-              <el-input v-model="posterForm.count" type="number"></el-input>
+              <!-- <el-form-item label="虚拟次数">
+              <el-input v-model="form.count" type="number"></el-input>
             </el-form-item>
             <el-form-item label="海报排序">
-              <el-input v-model="posterForm.sort" type="number"></el-input>
+              <el-input v-model="form.sort" type="number"></el-input>
             </el-form-item>
-            <el-form-item label="跳转页面" v-if="posterForm.type === '3'">
-              <el-checkbox-group v-model="posterForm.jump">
+            <el-form-item label="跳转页面" v-if="form.type === '3'">
+              <el-checkbox-group v-model="form.jump">
                 <el-checkbox label="首页" value="1"></el-checkbox>
                 <el-checkbox label="名片" value="2"></el-checkbox>
               </el-checkbox-group>
             </el-form-item> -->
-            <el-form-item label="是否启用" prop="delFlag">
-              <el-radio-group v-model="posterForm.delFlag">
-                <el-radio :label="1">是</el-radio>
-                <el-radio :label="0">否</el-radio>
-              </el-radio-group>
-            </el-form-item>
-            <el-form-item label="背景图片" :required="true" :error="rangeErrorMsg">
-              <div v-if="materialSelected !== ''">
-                <el-image
-                  style="width: 100px; height: 100px; cursor: pointer;border-radius: 6px;"
-                  :src="materialSelected"
-                  fit="fit"
+              <el-form-item label="是否启用" prop="delFlag">
+                <el-radio-group v-model="form.delFlag">
+                  <el-radio :label="1">是</el-radio>
+                  <el-radio :label="0">否</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item label="背景图片" :required="true" :error="rangeErrorMsg">
+                <div v-if="materialSelected !== ''">
+                  <el-image
+                    style="width: 100px; height: 100px; cursor: pointer;border-radius: 6px;"
+                    :src="materialSelected"
+                    fit="fit"
+                  >
+                  </el-image>
+                </div>
+                <el-button
+                  icon="el-icon-plus"
+                  size="mini"
+                  @click="isBackgroundImage = dialogVisibleSelectMaterial = true"
+                  >选择图片</el-button
                 >
-                </el-image>
-                <i class="el-icon-error" @click="removeMaterial"></i>
+              </el-form-item>
+              <el-form-item label="">
+                <el-button type="success" @click="save()">保存</el-button>
+                <el-button type="success" @click="save(1)">保存并返回</el-button>
+              </el-form-item>
+            </el-form>
+          </div>
+          <div style="">
+            <div class="canvas-wrap">
+              <i class="el-icon-close" id="deleteBtn"></i>
+              <canvas id="canvas" width="375" height="700" style="border: 1px solid #ddd;"> </canvas>
+            </div>
+            <div id="tbody-containerui-image-editor-controls">
+              <ul class="menu">
+                <li class="menu-item" id="btn-text" @click="addObj('text')">添加自定义文本</li>
+                <li class="menu-item" id="btn-image" @click="addObj('imageShow')">添加图片</li>
+                <li class="menu-item" id="btn-qrCode" @click="addObj('qrcode')">添加二维码</li>
+                <!-- <li class="menu-item" id="btn-nickName">添加客户昵称</li> -->
+              </ul>
+              <div class="sub-menu-container">
+                <ul class="menu" v-show="activeObject && activeObject.type == 'i-text'">
+                  <li class="menu-item">
+                    <!-- <div>
+                      <button class="btn-text-style" data-style-type="b">Bold</button>
+                      <button class="btn-text-style" data-style-type="i">Italic</button>
+                      <button class="btn-text-style" data-style-type="u">Underline</button>
+                    </div> -->
+                    <!-- <div> -->
+                    <div>
+                      <button class="btn-text-style" @click="setAttr('textAlign', 'left')">左对齐</button>
+                      <button class="btn-text-style" @click="setAttr('textAlign', 'center')">居中</button>
+                      <button class="btn-text-style" @click="setAttr('textAlign', 'right')">右对齐</button>
+                    </div>
+                  </li>
+                  <li class="menu-item">
+                    <el-color-picker @active-change="(rgb) => setAttr('fill', rgb)" show-alpha></el-color-picker>
+                  </li>
+                </ul>
               </div>
-              <el-button icon="el-icon-plus" size="mini" @click="dialogVisibleSelectMaterial = true"
-                >添加图片</el-button
-              >
-            </el-form-item>
-            <el-form-item>
-              <el-button type="success" @click="save">保存</el-button>
-            </el-form-item>
-          </el-form>
+            </div>
+          </div>
         </div>
       </el-dialog>
     </MaPage>
@@ -617,6 +491,16 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+.el-icon-close {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  cursor: pointer;
+  z-index: 9;
+  font-size: 24px;
+  color: #fff;
+  display: none;
+}
 .img-wrap {
   position: relative;
   height: 0;
@@ -642,9 +526,10 @@ export default {
   .actions-btn {
     display: inline-block;
     cursor: pointer;
-    & + .actions-btn {
-      margin-top: 10px;
-    }
+    margin: 10px 0 0 0;
+    // & + .actions-btn {
+    //   margin: 10px;
+    // }
   }
 }
 .poster-img {
@@ -656,34 +541,19 @@ export default {
 .preview-img {
   width: 100%;
 }
-.imageEditorApp {
-  width: 50%;
-  height: 700px;
-  // float: left;
+.canvas-wrap {
+  margin-right: 20px;
+  display: inline-block;
   position: relative;
+  vertical-align: top;
 }
 #tbody-containerui-image-editor-controls {
-  float: right;
-  width: 50%;
+  display: inline-block;
   position: relative;
-  margin-top: -700px;
-}
-.tui-image-editor-header-logo {
-  display: none !important;
-  border: 1px solid red;
-}
-.tui-image-editor-download-btn {
-  display: none !important;
 }
 
 .border {
   border: 1px solid black;
-}
-.body-container {
-  width: 1000px;
-}
-.tui-image-editor-controls {
-  min-height: 250px;
 }
 .menu {
   padding: 0;
@@ -717,51 +587,11 @@ export default {
   cursor: default;
   color: #bfbebe;
 }
-.align-left-top {
-  text-align: left;
-  vertical-align: top;
-}
-.range-narrow {
-  width: 80px;
-}
 .sub-menu-container {
   font-size: 14px;
   margin-bottom: 1em;
-  display: none;
 }
-/* .tui-image-editor {
-  height: 500px;
-}
-.tui-image-editor-canvas-container {
-  margin: 0 auto;
-  top: 50%;
-  transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  -moz-transform: translateY(-50%);
-  -webkit-transform: translateY(-50%);
-  border: 1px dashed black;
-  overflow: hidden;
-}
-.tui-colorpicker-container {
-  margin: 5px auto 0;
-}
-.tui-colorpicker-palette-toggle-slider {
-  display: none;
-} */
-.input-wrapper {
-  position: relative;
-}
-.input-wrapper input {
-  cursor: pointer;
-  position: absolute;
-  font-size: 999px;
-  left: 0;
-  top: 0;
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
+
 .btn-text-style {
   padding: 5px;
   margin: 3px 1px;
@@ -769,24 +599,5 @@ export default {
   outline: 0;
   background-color: #eee;
   cursor: pointer;
-}
-.icon-text {
-  font-size: 20px;
-}
-.select-line-type {
-  outline: 0;
-  vertical-align: middle;
-}
-#tui-color-picker {
-  display: inline-block;
-  vertical-align: middle;
-}
-#tui-text-palette {
-  display: none;
-  position: absolute;
-  padding: 10px;
-  border: 1px solid #bfbebe;
-  background-color: #fff;
-  z-index: 9999;
 }
 </style>

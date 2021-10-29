@@ -29,7 +29,7 @@
         />
       </el-form-item>
 
-      <el-form-item label="执行时间">
+      <el-form-item label="执行时间" required>
         <el-date-picker
           v-model="dateRange"
           value-format="yyyy-MM-dd"
@@ -295,10 +295,10 @@ export default {
             this.msgError('执行时间不能为空')
             return
           }
-          if (!this.dateRange.length) {
-            this.msgError('执行时间不能为空')
-            return
-          }
+          // if (!this.dateRange.length) {
+          //   this.msgError('执行时间不能为空')
+          //   return
+          // }
           this.loading = true
           if (this.ruleId) {
             update(this.ruleId, this.form)
