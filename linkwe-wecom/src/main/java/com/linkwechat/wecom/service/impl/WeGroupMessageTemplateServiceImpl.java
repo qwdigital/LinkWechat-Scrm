@@ -11,6 +11,7 @@ import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.wecom.domain.*;
+import com.linkwechat.wecom.domain.dto.message.WeGroupMsgListDto;
 import com.linkwechat.wecom.domain.query.WeAddGroupMessageQuery;
 import com.linkwechat.wecom.domain.vo.WeGroupMessageDetailVo;
 import com.linkwechat.wecom.domain.vo.WeGroupMessageListVo;
@@ -19,13 +20,11 @@ import com.linkwechat.wecom.mapper.WeGroupMessageTemplateMapper;
 import com.linkwechat.wecom.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -215,29 +214,62 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
             }
 
         }
-        /*senderList.forEach(sender ->{
-            WeAddMsgTemplateQuery templateQuery = new WeAddMsgTemplateQuery();
-            templateQuery.setChat_type(query.getChatType());
-            templateQuery.setSender(sender.getUserId());
-            if(ObjectUtil.equal(1,query.getChatType())){
-                templateQuery.setExternal_userid(sender.getCustomerList());
-            }
-            templateQuery.setAttachments(query.getAttachmentsList());
-            if(StringUtils.isNotEmpty(query.getContent())){
-                WeAddMsgTemplateQuery.Text text = new WeAddMsgTemplateQuery.Text();
-                text.setContent(query.getContent());
-                templateQuery.setText(text);
-            }
-            SendMessageResultDto resultDto = customerMessagePushClient.addMsgTemplate(templateQuery);
-            if(resultDto != null && ObjectUtil.equal(WeConstans.WE_SUCCESS_CODE,resultDto.getErrcode())){
-                String msgid = resultDto.getMsgid();
-                Long msgTemplateId = weGroupMessageTemplate.getId();
-                WeGroupMessageList messageList = new WeGroupMessageList();
-                messageList.setMsgId(msgid);
-                messageList.setMsgTemplateId(msgTemplateId);
-            }
-        });*/
     }
 
+    @Override
+    public void cancelByIds(List<Long> asList) {
+        List<WeGroupMessageTemplate> weGroupMessageTemplates = listByIds(asList);
+        if(CollectionUtil.isNotEmpty(weGroupMessageTemplates)){
+            weGroupMessageTemplates.forEach(weGroupMessageTemplate -> {
+                weGroupMessageTemplate.setStatus(2);
+                long time = weGroupMessageTemplate.getSendTime().getTime();
+                redisCache.removeRangeCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY,time,time);
+            });
+            updateBatchById(weGroupMessageTemplates);
+        }
+    }
+
+    @Async
+    @Override
+    public void syncGroupMsgSendResultByIds(List<Long> asList) {
+        List<WeGroupMessageList> weGroupMessageLists = weGroupMessageListService.list(new LambdaQueryWrapper<WeGroupMessageList>()
+                .in(WeGroupMessageList::getMsgTemplateId, asList));
+        List<WeGroupMessageTask> taskList = new ArrayList<>();
+        List<WeGroupMessageSendResult> sendResultlist = new ArrayList<>();
+        if(CollectionUtil.isNotEmpty(weGroupMessageLists)){
+            weGroupMessageLists.forEach(weGroupMessageList -> {
+                WeGroupMsgListDto groupMsgTask = messageTaskService.getGroupMsgTask(weGroupMessageList.getMsgId(), null);
+                Optional.ofNullable(groupMsgTask).map(WeGroupMsgListDto::getTaskList).orElseGet(ArrayList::new).forEach(msgTask -> {
+                    WeGroupMessageTask messageTask = new WeGroupMessageTask();
+                    messageTask.setMsgId(weGroupMessageList.getMsgId());
+                    messageTask.setUserId(msgTask.getUserId());
+                    if(msgTask.getSendTime() != null){
+                        messageTask.setSendTime(new Date(msgTask.getSendTime() * 1000));
+                    }
+                    messageTask.setMsgTemplateId(weGroupMessageList.getMsgTemplateId());
+                    messageTask.setStatus(msgTask.getStatus());
+                    taskList.add(messageTask);
+
+                    WeGroupMsgListDto groupMsgSendResult = messageSendResultService.getGroupMsgSendResult(weGroupMessageList.getMsgId(), msgTask.getUserId(), null);
+                    Optional.ofNullable(groupMsgSendResult).map(WeGroupMsgListDto::getSendList).orElseGet(ArrayList::new).forEach(sendResult -> {
+                        WeGroupMessageSendResult messageSendResult = new WeGroupMessageSendResult();
+                        messageSendResult.setMsgId(weGroupMessageList.getMsgId());
+                        messageSendResult.setUserId(msgTask.getUserId());
+                        messageSendResult.setChatId(sendResult.getChatId());
+                        messageSendResult.setExternalUserid(sendResult.getExternalUserId());
+                        if(sendResult.getSendTime() != null){
+                            messageSendResult.setSendTime(new Date(sendResult.getSendTime() * 1000));
+                        }
+                        messageSendResult.setStatus(sendResult.getStatus());
+                        messageSendResult.setMsgTemplateId(weGroupMessageList.getMsgTemplateId());
+                        sendResultlist.add(messageSendResult);
+                    });
+                });
+
+            });
+        }
+        messageTaskService.addOrUpdateBatchByCondition(taskList);
+        messageSendResultService.addOrUpdateBatchByCondition(sendResultlist);
+    }
 
 }

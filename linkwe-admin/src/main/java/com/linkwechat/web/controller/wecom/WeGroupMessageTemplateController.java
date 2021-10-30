@@ -8,7 +8,6 @@ import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.wecom.domain.WeGroupMessageTemplate;
 import com.linkwechat.wecom.domain.query.WeAddGroupMessageQuery;
 import com.linkwechat.wecom.domain.vo.WeGroupMessageDetailVo;
-import com.linkwechat.wecom.domain.vo.WeGroupMessageListVo;
 import com.linkwechat.wecom.service.IWeGroupMessageTemplateService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -67,15 +66,27 @@ public class WeGroupMessageTemplateController extends BaseController {
         return AjaxResult.success();
     }
 
-
     /**
-     * 删除群发消息模板
+     * 同步消息发送结果
      */
     //@PreAuthorize("@ss.hasPermi('linkwechat:template:remove')")
-    @ApiOperation(value = "取消发送", httpMethod = "DELETE")
-    @Log(title = "群发消息模板", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable Long[] ids) {
-        return toAjax(iWeGroupMessageTemplateService.removeByIds(Arrays.asList(ids)) ? 1 : 0);
+    @ApiOperation(value = "同步消息发送结果", httpMethod = "GET")
+    @Log(title = "群发消息模板", businessType = BusinessType.OTHER)
+    @GetMapping("/sync/{ids}")
+    public AjaxResult sync(@PathVariable Long[] ids) {
+        iWeGroupMessageTemplateService.syncGroupMsgSendResultByIds(Arrays.asList(ids));
+        return AjaxResult.success();
+    }
+
+    /**
+     * 取消定时发送
+     */
+    //@PreAuthorize("@ss.hasPermi('linkwechat:template:remove')")
+    @ApiOperation(value = "取消定时发送", httpMethod = "GET")
+    @Log(title = "群发消息模板", businessType = BusinessType.UPDATE)
+    @GetMapping("/cancel/{ids}")
+    public AjaxResult cancel(@PathVariable Long[] ids) {
+        iWeGroupMessageTemplateService.cancelByIds(Arrays.asList(ids));
+        return AjaxResult.success();
     }
 }

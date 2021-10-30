@@ -10,7 +10,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 添加群发消息入参
  * @date 2021/10/24 12:14
  **/

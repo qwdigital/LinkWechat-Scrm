@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.utils.StringUtils;
@@ -52,9 +53,12 @@ public class WeGroupMessageTaskServiceImpl extends ServiceImpl<WeGroupMessageTas
     public void addOrUpdateBatchByCondition(List<WeGroupMessageTask> taskList) {
         if (CollectionUtil.isNotEmpty(taskList)) {
             taskList.forEach(item -> {
-                if (!this.update(item, new LambdaQueryWrapper<WeGroupMessageTask>()
-                        .eq(WeGroupMessageTask::getMsgId, item.getMsgId())
-                        .eq(WeGroupMessageTask::getUserId, item.getUserId()))) {
+                LambdaQueryWrapper<WeGroupMessageTask> wrapper = new LambdaQueryWrapper<>();
+                if(item.getMsgTemplateId() != null){
+                    wrapper.eq(WeGroupMessageTask::getMsgTemplateId,item.getMsgTemplateId());
+                }
+                wrapper.eq(WeGroupMessageTask::getMsgId, item.getMsgId()).eq(WeGroupMessageTask::getUserId, item.getUserId());
+                if (!this.update(item,wrapper)){
                     this.save(item);
                 }
             });

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
 import com.linkwechat.wecom.domain.WeGroupMessageSendResult;
+import com.linkwechat.wecom.domain.WeGroupMessageTask;
 import com.linkwechat.wecom.domain.dto.message.WeGroupMsgListDto;
 import com.linkwechat.wecom.domain.dto.message.WeGroupMsgSendDto;
 import com.linkwechat.wecom.domain.query.WeGetGroupMsgListQuery;
@@ -78,11 +79,15 @@ public class WeGroupMessageSendResultServiceImpl extends ServiceImpl<WeGroupMess
     public void addOrUpdateBatchByCondition(List<WeGroupMessageSendResult> sendResultList) {
         if (CollectionUtil.isNotEmpty(sendResultList)) {
             sendResultList.forEach(item -> {
-                if (!this.update(item, new LambdaQueryWrapper<WeGroupMessageSendResult>()
-                        .eq(WeGroupMessageSendResult::getMsgId, item.getMsgId())
+                LambdaQueryWrapper<WeGroupMessageSendResult> wrapper = new LambdaQueryWrapper<>();
+                wrapper.eq(WeGroupMessageSendResult::getMsgId, item.getMsgId())
                         .eq(WeGroupMessageSendResult::getExternalUserid, item.getExternalUserid())
                         .eq(WeGroupMessageSendResult::getUserId, item.getUserId())
-                        .eq(WeGroupMessageSendResult::getChatId, item.getChatId()))) {
+                        .eq(WeGroupMessageSendResult::getChatId, item.getChatId());
+                if(item.getMsgTemplateId() != null){
+                    wrapper.eq(WeGroupMessageSendResult::getMsgTemplateId,item.getMsgTemplateId());
+                }
+                if (!this.update(item, wrapper)) {
                     this.save(item);
                 }
             });

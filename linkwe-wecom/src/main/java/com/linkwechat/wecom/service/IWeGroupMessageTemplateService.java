@@ -32,4 +32,16 @@ public interface IWeGroupMessageTemplateService extends IService<WeGroupMessageT
      * @param query
      */
     void addGroupMsgTemplate(WeAddGroupMessageQuery query);
+
+    /**
+     * 取消定时发送
+     * @param asList
+     */
+    void cancelByIds(List<Long> asList);
+
+    /**
+     * 同步消息发送结果
+     * @param asList
+     */
+    void syncGroupMsgSendResultByIds(List<Long> asList);
 }

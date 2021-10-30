@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 群发成员任务出参
  * @date 2021/10/23 15:09
  **/
