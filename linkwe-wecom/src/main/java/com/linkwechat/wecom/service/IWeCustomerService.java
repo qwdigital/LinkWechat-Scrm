@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeCustomerList;
@@ -158,8 +159,9 @@ public interface IWeCustomerService extends IService<WeCustomer>
 
     WeCustomerDetailVo findWeCustomerDetail(String externalUserid);
 
-
-
-
-
+    /**
+     * 客户条件检索
+     * @param params
+     */
+    void getCustomerByCondition(JSONObject params);
 }

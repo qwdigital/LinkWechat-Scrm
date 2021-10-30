@@ -60,7 +60,7 @@ public class WeGroupMessageTemplateController extends BaseController {
     //@PreAuthorize("@ss.hasPermi('linkwechat:template:add')")
     @ApiOperation(value = "新增群发消息模板", httpMethod = "POST")
     @Log(title = "群发消息模板", businessType = BusinessType.INSERT)
-    @PostMapping
+    @PostMapping("/add")
     public AjaxResult addGroupMsgTemplate(@RequestBody WeAddGroupMessageQuery query) {
         iWeGroupMessageTemplateService.addGroupMsgTemplate(query);
         return AjaxResult.success();

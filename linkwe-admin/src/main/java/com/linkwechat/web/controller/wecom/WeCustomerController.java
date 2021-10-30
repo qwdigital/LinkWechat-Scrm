@@ -2,6 +2,7 @@ package com.linkwechat.web.controller.wecom;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.constant.Constants;
@@ -245,5 +246,16 @@ public class WeCustomerController extends BaseController
         );
     }
 
+    /**
+     * 客户条件检索
+     * @param params 检索条件
+     * @return
+     */
+    @ApiOperation(value = "客户条件检索",httpMethod = "POST")
+    @PostMapping(value = "/getCustomerByCondition")
+    public AjaxResult getCustomerByCondition(@RequestBody JSONObject params){
+        weCustomerService.getCustomerByCondition(params);
+        return AjaxResult.success("");
+    }
 
 }

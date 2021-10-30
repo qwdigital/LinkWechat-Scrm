@@ -346,10 +346,21 @@ public class RedisCache {
      * @param max
      * @return
      */
-    public Set<String> sortRangeCacheZSet(String key, int min, int max) {
+    public Set<String> sortRangeCacheZSet(String key, double min, double max) {
         return redisTemplate.opsForZSet().rangeByScore(key, min, max);
     }
 
+    /**
+     * 根据score的值，来获取满足条件的集合
+     *
+     * @param key
+     * @param min
+     * @param max
+     * @return
+     */
+    public Set<ZSetOperations.TypedTuple<String>> sortRangeWithScoresCacheZSet(String key, double min, double max) {
+        return redisTemplate.opsForZSet().rangeByScoreWithScores(key, min, max);
+    }
 
 
 }

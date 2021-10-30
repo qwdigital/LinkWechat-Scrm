@@ -84,7 +84,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="getGroupMsgDetails" resultMap="groupMsgDetailResult">
         <include refid="getDetailVo"/>
-        <if test="msgIds != null and msgIds.size > 0">
+        <if test="msgTemplateIds != null and msgTemplateIds.size > 0">
             and wgml.msg_template_id in
             <foreach collection="msgTemplateIds" index="index" item="msgTemplateId" open="(" separator="," close=")">
                 #{msgTemplateId}

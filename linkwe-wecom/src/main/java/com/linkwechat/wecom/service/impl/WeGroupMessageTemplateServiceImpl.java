@@ -20,6 +20,7 @@ import com.linkwechat.wecom.mapper.WeGroupMessageTemplateMapper;
 import com.linkwechat.wecom.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,6 +82,9 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
         Integer msgTemplate = weGroupMessageTemplate.getChatType();
 
         WeGroupMessageDetailVo detailVo = new WeGroupMessageDetailVo();
+        detailVo.setChatType(msgTemplate);
+        detailVo.setSendTime(weGroupMessageTemplate.getSendTime());
+        detailVo.setContent(weGroupMessageTemplate.getContent());
         List<WeGroupMessageListVo> groupMsgDetail = weGroupMessageListService.getGroupMsgDetail(id);
         if (groupMsgDetail != null) {
             detailVo.setAttachments(groupMsgDetail.get(0).getAttachments());
@@ -91,7 +95,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
 
             //已发送人员列表
             List<WeGroupMessageTask> alreadySent = groupMsgDetail.stream().map(WeGroupMessageListVo::getSenders)
-                    .flatMap(Collection::stream).filter(item -> ObjectUtil.equal(0, item.getStatus())).collect(Collectors.toList());
+                    .flatMap(Collection::stream).filter(item -> ObjectUtil.equal(2, item.getStatus())).collect(Collectors.toList());
 
             //未发送查询每个人员对应客户信息
             if (CollectionUtil.isNotEmpty(toBeSent)) {
@@ -151,68 +155,75 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
         List<WeAddGroupMessageQuery.SenderInfo> senderList = query.getSenderList();
         WeGroupMessageTemplate weGroupMessageTemplate = new WeGroupMessageTemplate();
         BeanUtil.copyProperties(query, weGroupMessageTemplate);
-        if (save(weGroupMessageTemplate)) {
-            query.setId(weGroupMessageTemplate.getId());
-            //保存附件
-            List<WeGroupMessageAttachments> attachmentsList = Optional.ofNullable(query.getAttachmentsList()).orElseGet(ArrayList::new).stream().map(attachment -> {
-                WeGroupMessageAttachments attachments = new WeGroupMessageAttachments();
-                BeanUtil.copyProperties(attachment, attachments);
-                attachments.setMsgTemplateId(weGroupMessageTemplate.getId());
-                return attachments;
-            }).collect(Collectors.toList());
-
-            if (StringUtils.isNotEmpty(query.getContent())) {
-                WeGroupMessageAttachments attachments = new WeGroupMessageAttachments();
-                attachments.setMsgTemplateId(weGroupMessageTemplate.getId());
-                attachments.setContent(query.getContent());
-                attachments.setMsgType(MessageType.TEXT.getMessageType());
-                attachmentsList.add(attachments);
-            }
-            attachmentsService.saveBatch(attachmentsList);
-
-
-            List<WeGroupMessageList> weGroupMessageLists = new ArrayList<>();
-            List<WeGroupMessageTask> messageTaskList = new ArrayList<>();
-            List<WeGroupMessageSendResult> sendResultList = new ArrayList<>();
-            for (WeAddGroupMessageQuery.SenderInfo senderInfo :senderList ) {
-                WeGroupMessageList weGroupMessageList = new WeGroupMessageList();
-                weGroupMessageList.setMsgTemplateId(weGroupMessageTemplate.getId());
-                if(query.getChatType() == 1){
-                    weGroupMessageList.setChatType("single");
-                }else {
-                    weGroupMessageList.setChatType("group");
-                }
-                weGroupMessageList.setUserId(senderInfo.getUserId());
-                weGroupMessageLists.add(weGroupMessageList);
-
-                WeGroupMessageTask messageTask = new WeGroupMessageTask();
-                messageTask.setMsgTemplateId(weGroupMessageTemplate.getId());
-                messageTask.setUserId(senderInfo.getUserId());
-                messageTaskList.add(messageTask);
-
-                List<WeGroupMessageSendResult> messageSendResults = senderInfo.getCustomerList().stream().map(eid -> {
-                    WeGroupMessageSendResult messageSendResult = new WeGroupMessageSendResult();
-                    messageSendResult.setMsgTemplateId(weGroupMessageTemplate.getId());
-                    messageSendResult.setUserId(senderInfo.getUserId());
-                    messageSendResult.setExternalUserid(eid);
-                    return messageSendResult;
+        if(query.getSendTime() == null){
+            weGroupMessageTemplate.setSendTime(new Date());
+        }
+        try {
+            if (save(weGroupMessageTemplate)) {
+                query.setId(weGroupMessageTemplate.getId());
+                //保存附件
+                List<WeGroupMessageAttachments> attachmentsList = Optional.ofNullable(query.getAttachmentsList()).orElseGet(ArrayList::new).stream().map(attachment -> {
+                    WeGroupMessageAttachments attachments = new WeGroupMessageAttachments();
+                    BeanUtil.copyProperties(attachment, attachments);
+                    attachments.setMsgTemplateId(weGroupMessageTemplate.getId());
+                    return attachments;
                 }).collect(Collectors.toList());
-                sendResultList.addAll(messageSendResults);
+
+                if (StringUtils.isNotEmpty(query.getContent())) {
+                    WeGroupMessageAttachments attachments = new WeGroupMessageAttachments();
+                    attachments.setMsgTemplateId(weGroupMessageTemplate.getId());
+                    attachments.setContent(query.getContent());
+                    attachments.setMsgType(MessageType.TEXT.getMessageType());
+                    attachmentsList.add(attachments);
+                }
+                attachmentsService.saveBatch(attachmentsList);
+
+
+                List<WeGroupMessageList> weGroupMessageLists = new ArrayList<>();
+                List<WeGroupMessageTask> messageTaskList = new ArrayList<>();
+                List<WeGroupMessageSendResult> sendResultList = new ArrayList<>();
+                for (WeAddGroupMessageQuery.SenderInfo senderInfo :senderList ) {
+                    WeGroupMessageList weGroupMessageList = new WeGroupMessageList();
+                    weGroupMessageList.setMsgTemplateId(weGroupMessageTemplate.getId());
+                    if(query.getChatType() == 1){
+                        weGroupMessageList.setChatType("single");
+                    }else {
+                        weGroupMessageList.setChatType("group");
+                    }
+                    weGroupMessageList.setUserId(senderInfo.getUserId());
+                    weGroupMessageLists.add(weGroupMessageList);
+
+                    WeGroupMessageTask messageTask = new WeGroupMessageTask();
+                    messageTask.setMsgTemplateId(weGroupMessageTemplate.getId());
+                    messageTask.setUserId(senderInfo.getUserId());
+                    messageTaskList.add(messageTask);
+
+                    List<WeGroupMessageSendResult> messageSendResults = senderInfo.getCustomerList().stream().map(eid -> {
+                        WeGroupMessageSendResult messageSendResult = new WeGroupMessageSendResult();
+                        messageSendResult.setMsgTemplateId(weGroupMessageTemplate.getId());
+                        messageSendResult.setUserId(senderInfo.getUserId());
+                        messageSendResult.setExternalUserid(eid);
+                        return messageSendResult;
+                    }).collect(Collectors.toList());
+                    sendResultList.addAll(messageSendResults);
+                }
+
+                //保存发送任务
+                weGroupMessageListService.saveBatch(weGroupMessageLists);
+                //保存成员发送任务
+                messageTaskService.saveBatch(messageTaskList);
+                //保存发送客户或者客户群
+                messageSendResultService.saveBatch(sendResultList);
+
+                if (ObjectUtil.equal(0, query.getIsTask()) && query.getSendTime() == null) {
+                    redisCache.setCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY, JSONObject.toJSONString(query), System.currentTimeMillis());
+                } else {
+                    redisCache.setCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY, JSONObject.toJSONString(query), query.getSendTime().getTime());
+                }
+
             }
-
-            //保存发送任务
-            weGroupMessageListService.saveBatch(weGroupMessageLists);
-            //保存成员发送任务
-            messageTaskService.saveBatch(messageTaskList);
-            //保存发送客户或者客户群
-            messageSendResultService.saveBatch(sendResultList);
-
-            if (ObjectUtil.equal(0, query.getIsTask()) && query.getSendTime() == null) {
-                redisCache.setCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY, JSONObject.toJSONString(query), System.currentTimeMillis());
-            } else {
-                redisCache.setCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY, JSONObject.toJSONString(query), query.getSendTime().getTime());
-            }
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -223,7 +234,12 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
             weGroupMessageTemplates.forEach(weGroupMessageTemplate -> {
                 weGroupMessageTemplate.setStatus(2);
                 long time = weGroupMessageTemplate.getSendTime().getTime();
-                redisCache.removeRangeCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY,time,time);
+                Set<ZSetOperations.TypedTuple<String>> typedTuples = redisCache.sortRangeWithScoresCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY, time, time);
+                if(CollectionUtil.isNotEmpty(typedTuples)){
+                    typedTuples.forEach(typedTuple ->{
+                        redisCache.removeCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY,typedTuple.getValue());
+                    });
+                }
             });
             updateBatchById(weGroupMessageTemplates);
         }

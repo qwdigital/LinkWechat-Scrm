@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.wecom.domain.WeGroupMessageAttachments;
 import com.linkwechat.wecom.domain.WeGroupMessageSendResult;
 import com.linkwechat.wecom.domain.WeGroupMessageTask;
@@ -7,6 +8,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,6 +19,16 @@ import java.util.List;
 @ApiModel
 @Data
 public class WeGroupMessageDetailVo {
+
+    @ApiModelProperty("发送内容")
+    private String content;
+
+    @ApiModelProperty("发送类型")
+    private Integer chatType;
+
+    @ApiModelProperty("发送时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date sendTime;
     /**
      * 附件
      */

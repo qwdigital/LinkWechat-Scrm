@@ -5,6 +5,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
@@ -893,6 +894,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         weCustomerDetailVo.setGroupTags(this.baseMapper.findCustomerGroupTag(externalUserid));
         weCustomerDetailVo.setBelongUserInfos(this.baseMapper.findCusertomerBelongUserInfo(externalUserid));
         return weCustomerDetailVo;
+    }
+
+    @Override
+    public void getCustomerByCondition(JSONObject params) {
+
     }
 
 
