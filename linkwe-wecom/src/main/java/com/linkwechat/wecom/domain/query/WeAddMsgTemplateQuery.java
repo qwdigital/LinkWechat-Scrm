@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain.query;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.exception.wecom.WeComException;
@@ -49,9 +50,9 @@ public class WeAddMsgTemplateQuery {
     }
 
     public void setAttachments(List<WeMessageTemplate> messageTemplates) {
-        final int size = 9;
+        final int size = 10;
         this.attachments = new ArrayList<>(16);
-        if (messageTemplates != null && messageTemplates.size() <= size) {
+        if (CollectionUtil.isNotEmpty(messageTemplates) &&  messageTemplates.size() < size) {
             messageTemplates.forEach(messageTemplate -> {
                 if (ObjectUtil.equal(MessageType.IMAGE.getMessageType(), messageTemplate.getMsgType())) {
                     Attachments images = new Images(messageTemplate.getMsgType(), messageTemplate.getMediaId(),
