@@ -35,10 +35,7 @@
         <screenfull id="screenfull" class="right-menu-item hover-effect" />
       </template>
 
-      <el-dropdown
-        class="avatar-container right-menu-item hover-effect"
-        trigger="click"
-      >
+      <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
           仟微
           <!-- <img :src="avatar" class="user-avatar"> -->
@@ -99,16 +96,12 @@ export default {
         type: 'warning'
       }).then(() => {
         this.$store.dispatch('LogOut').then(() => {
-          location.href = '/'
+          location.href = process.env.VUE_APP_BASE_URL
         })
       })
     },
     goto(type) {
-      window.open(
-        type
-          ? 'https://www.yuque.com/linkwechat/help/dsatfs'
-          : 'https://gitee.com/LinkWeChat/link-wechat'
-      )
+      window.open(type ? 'https://www.yuque.com/linkwechat/help/dsatfs' : 'https://gitee.com/LinkWeChat/link-wechat')
     },
     goLink(path) {
       if (!isExternal(path)) {
