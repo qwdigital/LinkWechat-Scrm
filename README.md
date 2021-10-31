@@ -2,15 +2,17 @@
 <p></p>
 
 <p align="center">
-  <img alt="logo" src="https://images.gitee.com/uploads/images/2021/0107/210318_e1f66c96_1480777.png" width="120" style="margin-bottom: 0px;">
+  <img alt="logo" src="https://images.gitee.com/uploads/images/2021/1101/003621_4944da6c_1480777.png" style="margin-bottom: 0px;zoom: 25%">
 </p>
-<h2 align="center">LinkWeChat —— 让每个企业都是私域流量营销专家</h2>
+<h2 align="center">LinkWeChat —— 让每个企业都是私域营销管理专家</h2>
 
 <div align="center">
 
 [![star](https://gitee.com/LinkWeChat/link-wechat/badge/star.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/stargazers)
 [![fork](https://gitee.com/LinkWeChat/link-wechat/badge/fork.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/members)
+![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V1.5-brightgreen)
 ![license](http://img.shields.io/badge/license-GPL%203.0-green)
+
 
 </div>
 
@@ -19,7 +21,8 @@
 <p></p>
 <p></p>
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/233450_65d03349_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_00.png")
+
+![输入图片说明](https://images.gitee.com/uploads/images/2021/1101/004534_26805958_1480777.png)
 
 ---
 
