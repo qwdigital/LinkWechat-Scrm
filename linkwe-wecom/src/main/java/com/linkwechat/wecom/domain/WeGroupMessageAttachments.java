@@ -1,7 +1,6 @@
 package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.annotation.Excel;
@@ -11,11 +10,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-
-import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 群发消息附件对象 we_group_message_attachments
@@ -33,6 +27,13 @@ public class WeGroupMessageAttachments extends BaseEntity{
     @ApiModelProperty("id")
     @TableId(value = "id",type = IdType.AUTO)
     private Long id;
+
+    /**
+     * 群发消息模板id
+     */
+    @ApiModelProperty("群发消息模板id")
+    @Excel(name = "群发消息模板id")
+    private Long msgTemplateId;
 
     /** 企业群发消息的id */
     @ApiModelProperty("企业群发消息的id")
@@ -63,6 +64,11 @@ public class WeGroupMessageAttachments extends BaseEntity{
     @ApiModelProperty("消息描述")
     @Excel(name = "消息描述")
     private String description;
+
+    /** 文件路径 */
+    @ApiModelProperty("文件路径")
+    @Excel(name = "文件路径")
+    private String fileUrl;
 
     /** 消息链接 */
     @ApiModelProperty("消息链接")

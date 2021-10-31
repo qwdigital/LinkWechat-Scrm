@@ -1,6 +1,8 @@
 package com.linkwechat.wecom.domain.query;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.wecom.domain.WeMessageTemplate;
 import io.swagger.annotations.ApiModel;
@@ -35,28 +37,39 @@ public class WeAddMsgTemplateQuery {
     @ApiModelProperty("附件，最多支持添加9个附件 ru")
     private List<Attachments> attachments;
 
+    public void setChat_type(String chat_type) {
+        this.chat_type = chat_type;
+    }
+
+    public void setChat_type(Integer chatType) {
+        if(ObjectUtil.equal(2,chatType)){
+            this.chat_type = "group";
+        }else {
+            this.chat_type = "single";
+        }
+    }
 
     public void setAttachments(List<WeMessageTemplate> messageTemplates) {
-        final int size = 9;
+        final int size = 10;
         this.attachments = new ArrayList<>(16);
-        if (messageTemplates != null && messageTemplates.size() <= size) {
+        if (CollectionUtil.isNotEmpty(messageTemplates) &&  messageTemplates.size() < size) {
             messageTemplates.forEach(messageTemplate -> {
-                if (ObjectUtil.equal("image", messageTemplate.getMsgType())) {
+                if (ObjectUtil.equal(MessageType.IMAGE.getMessageType(), messageTemplate.getMsgType())) {
                     Attachments images = new Images(messageTemplate.getMsgType(), messageTemplate.getMediaId(),
                             messageTemplate.getPicUrl());
                     attachments.add(images);
-                } else if (ObjectUtil.equal("link", messageTemplate.getMsgType())) {
+                } else if (ObjectUtil.equal(MessageType.LINK.getMessageType(), messageTemplate.getMsgType())) {
                     Attachments links = new Links(messageTemplate.getMsgType(), messageTemplate.getTitle(),
                             messageTemplate.getPicUrl(), messageTemplate.getDescription(), messageTemplate.getLinkUrl());
                     attachments.add(links);
-                } else if (ObjectUtil.equal("miniprogram", messageTemplate.getMsgType())) {
+                } else if (ObjectUtil.equal(MessageType.MINIPROGRAM.getMessageType(), messageTemplate.getMsgType())) {
                     Attachments miniprograms = new Miniprograms(messageTemplate.getMsgType(), messageTemplate.getTitle(),
                             messageTemplate.getMediaId(), messageTemplate.getAppId(), messageTemplate.getLinkUrl());
                     attachments.add(miniprograms);
-                } else if (ObjectUtil.equal("video", messageTemplate.getMsgType())) {
+                } else if (ObjectUtil.equal(MessageType.VIDEO.getMessageType(), messageTemplate.getMsgType())) {
                     Attachments videos = new Videos(messageTemplate.getMsgType(), messageTemplate.getMediaId());
                     attachments.add(videos);
-                } else if (ObjectUtil.equal("file", messageTemplate.getMsgType())) {
+                } else if (ObjectUtil.equal(MessageType.FILE.getMessageType(), messageTemplate.getMsgType())) {
                     Attachments files = new Files(messageTemplate.getMsgType(), messageTemplate.getMediaId());
                     attachments.add(files);
                 }

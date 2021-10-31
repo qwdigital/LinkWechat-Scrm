@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeCustomerList;
@@ -67,11 +68,11 @@ public interface IWeCustomerService extends IService<WeCustomer>
     public void makeLabel(WeMakeCustomerTag weMakeCustomerTag);
 
 
-    /**
-     * 移除客户标签
-     * @param weMakeCustomerTag
-     */
-    public void removeLabel(WeMakeCustomerTag weMakeCustomerTag);
+//    /**
+//     * 移除客户标签
+//     * @param weMakeCustomerTag
+//     */
+//    public void removeLabel(WeMakeCustomerTag weMakeCustomerTag);
 
 
     /**
@@ -88,11 +89,7 @@ public interface IWeCustomerService extends IService<WeCustomer>
      */
     public void getCustomersInfoAndSynchWeCustomer(String externalUserid,String userId);
 
-    /**
-     * 删除客户
-     * @param externalUserid
-     */
-    public void deleteCustomersByEid(String externalUserid);
+
 
     /**
      * 向客户发送欢迎语
@@ -106,12 +103,7 @@ public interface IWeCustomerService extends IService<WeCustomer>
      */
     public boolean updateCustomerChatStatus(String externalUserId);
 
-    /**
-     * 通过标签查询客户列表
-     * @param ids 标签id
-     * @return
-     */
-    public List<WeUser> getCustomerByTag(List<String> ids);
+
 
 
 
@@ -158,8 +150,9 @@ public interface IWeCustomerService extends IService<WeCustomer>
 
     WeCustomerDetailVo findWeCustomerDetail(String externalUserid);
 
-
-
-
-
+    /**
+     * 客户条件检索
+     * @param params
+     */
+    void getCustomerByCondition(JSONObject params);
 }

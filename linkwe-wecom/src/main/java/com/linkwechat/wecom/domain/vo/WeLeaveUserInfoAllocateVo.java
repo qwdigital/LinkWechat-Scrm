@@ -9,7 +9,8 @@ import lombok.Data;
  */
 @Data
 public class WeLeaveUserInfoAllocateVo {
+    //移交人
     private String handoverUserid;
-
+    //接管人
     private String takeoverUserid;
 }

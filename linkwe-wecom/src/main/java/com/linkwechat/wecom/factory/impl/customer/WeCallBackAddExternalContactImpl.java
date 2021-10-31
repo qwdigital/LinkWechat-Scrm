@@ -1,9 +1,9 @@
 package com.linkwechat.wecom.factory.impl.customer;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.utils.StringUtils;
@@ -19,12 +19,10 @@ import com.linkwechat.wecom.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author danmo
@@ -40,8 +38,7 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
     private IWeEmpleCodeTagService weEmpleCodeTagService;
     @Autowired
     private IWeEmpleCodeService weEmpleCodeService;
-    @Autowired
-    private IWeFlowerCustomerRelService weFlowerCustomerRelService;
+
     @Autowired
     private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
     @Autowired
@@ -66,10 +63,6 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
     @Override
     public void eventHandle(WxCpXmlMessageVO message) {
         if (message.getExternalUserId() != null) {
-            WeFlowerCustomerRel weFlowerCustomerRel = weFlowerCustomerRelService.getOne(new LambdaQueryWrapper<WeFlowerCustomerRel>()
-                    .eq(WeFlowerCustomerRel::getExternalUserid, message.getExternalUserId())
-                    .eq(WeFlowerCustomerRel::getUserId,message.getUserId()));
-            weFlowerCustomerRelThreadLocal.set(weFlowerCustomerRel);
             weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId(),message.getUserId());
         }
 
@@ -146,43 +139,33 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                     //查询活码对应标签
                     List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.list(new LambdaQueryWrapper<WeEmpleCodeTag>()
                             .eq(WeEmpleCodeTag::getEmpleCodeId, messageMap.getEmpleCodeId()));
+                    if(CollectionUtil.isNotEmpty(tagList)){
 
-                    //查询外部联系人与通讯录关系数据
-                    WeFlowerCustomerRel weFlowerCustomerRel = weFlowerCustomerRelService
-                            .getOne(new LambdaQueryWrapper<WeFlowerCustomerRel>()
-                                    .eq(WeFlowerCustomerRel::getUserId, userId)
-                                    .eq(WeFlowerCustomerRel::getExternalUserid, externalUserId));
+                        List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
 
-                    //为外部联系人添加员工活码标签
-                    List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
-                    Optional.ofNullable(weFlowerCustomerRel).ifPresent(weFlowerCustomerRel1 -> {
-                        Optional.ofNullable(tagList).orElseGet(ArrayList::new).forEach(tag -> {
-
-
+                        tagList.stream().forEach(k->{
                             weFlowerCustomerTagRels.add(
                                     WeFlowerCustomerTagRel.builder()
-                                            .flowerCustomerRelId(weFlowerCustomerRel.getId())
-                                            .userId(userId)
+                                            .tagId(k.getTagId())
                                             .externalUserid(externalUserId)
-                                            .tagId(tag.getTagId())
+                                            .userId(userId)
                                             .createTime(new Date())
-                                            .relTagType(new Integer(1))
                                             .build()
                             );
-
                         });
 
                         if(weFlowerCustomerTagRelService.saveOrUpdateBatch(weFlowerCustomerTagRels)){
                             //标签同步到企业微信端
                             weCustomerClient.makeCustomerLabel(CutomerTagEdit.builder()
-                                            .external_userid(externalUserId)
-                                            .userid(userId)
-                                            .add_tag(weFlowerCustomerTagRels.stream()
-                                                    .map(WeFlowerCustomerTagRel::getTagId).toArray(String[]::new))
+                                    .external_userid(externalUserId)
+                                    .userid(userId)
+                                    .add_tag(weFlowerCustomerTagRels.stream()
+                                            .map(WeFlowerCustomerTagRel::getTagId).toArray(String[]::new))
                                     .build());
                         }
+                    }
 
-                    });
+
 
                     // 发送欢迎语
                     log.debug(">>>>>>>>>欢迎语查询结果：{}", JSONObject.toJSONString(messageMap));

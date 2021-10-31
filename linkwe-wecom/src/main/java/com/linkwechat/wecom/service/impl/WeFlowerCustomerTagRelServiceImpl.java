@@ -105,4 +105,9 @@ public class WeFlowerCustomerTagRelServiceImpl extends ServiceImpl<WeFlowerCusto
     public int batchInsetWeFlowerCustomerTagRel(List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels) {
         return weFlowerCustomerTagRelMapper.batchInsetWeFlowerCustomerTagRel(weFlowerCustomerTagRels);
     }
+
+    @Override
+    public void batchAddOrUpdate(List<WeFlowerCustomerTagRel> tagRels) {
+        this.baseMapper.batchAddOrUpdate(tagRels);
+    }
 }

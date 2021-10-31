@@ -2,6 +2,7 @@ package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
@@ -29,12 +30,7 @@ public class WeFlowerCustomerTagRel
 {
     private static final long serialVersionUID = 1L;
 
-    /** $column.columnComment */
-    @TableId
-    private Long id;
 
-    /** 添加客户的企业微信用户 */
-    private Long flowerCustomerRelId;
 
 
     /**外部联系人id(客户id) */
@@ -54,4 +50,7 @@ public class WeFlowerCustomerTagRel
     private Date createTime;
 
     private String userId;
+
+    @TableLogic
+    private Integer delFlag;
 }

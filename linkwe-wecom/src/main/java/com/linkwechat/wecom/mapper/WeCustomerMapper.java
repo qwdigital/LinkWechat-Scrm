@@ -137,4 +137,8 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
     List<CusertomerBelongUserInfo> findCusertomerBelongUserInfo(@Param("externalUserId") String externalUserId);
 
 
+
+    void batchAddOrUpdate(@Param("weCustomers") List<WeCustomer> weCustomer);
+
+
 }

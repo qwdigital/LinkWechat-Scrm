@@ -29,6 +29,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -114,7 +115,7 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
     }
 
     /**
-     * 生成海报图片地址
+     * 生成海报图片地址(合成图片+文字)
      *
      * @param poster
      * @return
@@ -125,6 +126,7 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
             poster.setSampleImgPath(poster.getBackgroundImgPath());
             return poster.getBackgroundImgPath();
         }
+
         Set<String> existFontId = new HashSet<>();
 
 
@@ -158,7 +160,15 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
 
         Map<String, BufferedImage> bufferedImageMap = fileCallableMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, stringFileCallableEntry -> {
             try {
-                return ImageUtils.copyBufferedImage(ImageIO.read(new ByteArrayInputStream(Objects.requireNonNull(NetFileUtils.getByteArrayOutputStream(stringFileCallableEntry.getValue(), false)).toByteArray())),
+
+
+
+                ByteArrayOutputStream byteArrayOutputStream = NetFileUtils.getByteArrayOutputStream(stringFileCallableEntry.getValue(), false);
+
+
+
+
+                return ImageUtils.copyBufferedImage(ImageIO.read(new ByteArrayInputStream(Objects.requireNonNull(byteArrayOutputStream).toByteArray())),
                         BufferedImage.TYPE_INT_ARGB);
             } catch (IOException e) {
                 e.printStackTrace();

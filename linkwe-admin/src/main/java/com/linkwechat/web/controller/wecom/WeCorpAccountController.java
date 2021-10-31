@@ -1,6 +1,5 @@
 package com.linkwechat.web.controller.wecom;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.constant.Constants;
@@ -20,7 +19,7 @@ import java.util.List;
 
 /**
  * 企业id相关配置Controller
- *
+ * 
  * @author ruoyi
  * @date 2020-08-24
  */
@@ -40,54 +39,10 @@ public class WeCorpAccountController extends BaseController
     {
         startPage();
         List<WeCorpAccount> list = weCorpAccountService.list(new LambdaQueryWrapper<WeCorpAccount>()
-                .eq(WeCorpAccount::getDelFlag,Constants.NORMAL_CODE)
-                .like(WeCorpAccount::getCompanyName,weCorpAccount.getCompanyName()));
+        .eq(WeCorpAccount::getDelFlag,Constants.NORMAL_CODE)
+        .like(WeCorpAccount::getCompanyName,weCorpAccount.getCompanyName()));
         return getDataTable(list);
     }
-
-
-    /******************************************************
-     *************************Lw2.0相关start****************
-     *****************************************************/
-
-    /**
-     * 获取当前可用企业相关配置
-     * @return
-     */
-    @GetMapping("/findCurrentCorpAccount")
-    public AjaxResult findCurrentCorpAccount(){
-
-        WeCorpAccount weCorpAccount=new WeCorpAccount();
-
-        List<WeCorpAccount> weCorpAccounts = weCorpAccountService.list(new LambdaQueryWrapper<WeCorpAccount>()
-                .eq(WeCorpAccount::getDelFlag,Constants.NORMAL_CODE));
-
-        if(CollectionUtil.isNotEmpty(weCorpAccounts)){
-            weCorpAccount=weCorpAccounts.stream().findFirst().get();
-        }
-
-        return AjaxResult.success(weCorpAccount);
-
-    }
-
-
-    /**
-     * 新增或编辑企业配置相关
-     * @param weCorpAccount
-     * @return
-     */
-    @PostMapping("/addOrUpdate")
-    public AjaxResult addOrUpdate(@RequestBody WeCorpAccount weCorpAccount){
-
-        weCorpAccountService.saveOrUpdate(weCorpAccount);
-
-        return AjaxResult.success();
-    }
-
-
-    /******************************************************
-     *************************Lw2.0相关end****************
-     *****************************************************/
 
 
 
@@ -116,7 +71,7 @@ public class WeCorpAccountController extends BaseController
 
     //  @PreAuthorize("@ss.hasPermi('wechat:corp:startVailWeCorpAccount')")
     @Log(title = "启用有效企业微信账号", businessType = BusinessType.DELETE)
-    @PutMapping("/startVailWeCorpAccount/{corpId}")
+	@PutMapping("/startVailWeCorpAccount/{corpId}")
     @ApiOperation("启用有效企业微信账号")
     public AjaxResult startWeCorpAccount(@PathVariable String corpId)
     {

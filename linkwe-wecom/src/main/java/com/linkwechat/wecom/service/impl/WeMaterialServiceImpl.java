@@ -2,17 +2,23 @@ package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
+import com.alibaba.fastjson.JSONObject;
+import com.dtflys.forest.http.ForestResponse;
 import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.config.ServerConfig;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUploadUtils;
+import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.wecom.client.WeMediaClient;
 import com.linkwechat.wecom.domain.WeMaterial;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
+import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.domain.vo.WeMaterialFileVO;
 import com.linkwechat.wecom.mapper.WeMaterialMapper;
 import com.linkwechat.wecom.service.IWeMaterialService;
@@ -23,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
@@ -155,6 +162,35 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
     @Override
     public WeMediaDto uploadImg(MultipartFile file) {
         return weMediaClient.uploadimg(file);
+    }
+
+    @Override
+    public WeMediaDto getMediaToResponse(String mediaId) {
+        WeMediaDto weMediaDto = new WeMediaDto();
+        weMediaDto.setErrcode(0);
+        ForestResponse forestResponse = weMediaClient.getMediaToResponse(mediaId);
+        if (forestResponse != null) {
+            try {
+                String fixedName =new String(forestResponse.getFilename().getBytes("ISO8859-1"),"UTF-8");
+                fixedName = fixedName.replace("\"", "");
+                weMediaDto.setFileName(fixedName);
+                if(ruoYiConfig.getFile().isStartCosUpload()) {
+                    String fileFullName = FileUploadUtils.upload2Cos(forestResponse.getInputStream(), FileUtil.getSuffix(fixedName), ruoYiConfig.getFile().getCos());
+                    String imgUrlPrefix = ruoYiConfig.getFile().getCos().getCosImgUrlPrefix();
+                    weMediaDto.setUrl(imgUrlPrefix + fileFullName);
+                }else {
+                    String filePath = FileUploadUtils.upload(forestResponse.getInputStream(), fixedName);
+                    weMediaDto.setUrl(filePath);
+                }
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+                weMediaDto.setErrcode(-1);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new WeComException("文件下载异常");
+            }
+        }
+        return weMediaDto;
     }
 
 }

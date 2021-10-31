@@ -1,13 +1,11 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
-import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.TaskFissionType;
 import com.linkwechat.common.exception.wecom.WeComException;
@@ -15,7 +13,6 @@ import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.QREncode;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.file.FileUtil;
 import com.linkwechat.common.utils.img.NetFileUtils;
 import com.linkwechat.wecom.client.WeExternalContactClient;
@@ -73,8 +70,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
     private IWeGroupCodeService weGroupCodeService;
     @Autowired
     private IWeCustomerService weCustomerService;
-    @Autowired
-    private IWeFlowerCustomerRelService weFlowerCustomerRelService;
+
     @Autowired
     private IWeTaskFissionCompleteRecordService weTaskFissionCompleteRecordService;
 
@@ -310,16 +306,16 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                 });
             }
         } else {
-            WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService
-                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), unionId);
-            Optional.ofNullable(weTaskFissionRecord).orElseThrow(() -> new WeComException("任务记录信息不存在"));
-            List<WeFlowerCustomerRel> list = weFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
-                    .eq(WeFlowerCustomerRel::getState, WeConstans.FISSION_PREFIX + weTaskFissionRecord.getId()));
-            List<String> eidList = Optional.ofNullable(list).orElseGet(ArrayList::new).stream()
-                    .map(WeFlowerCustomerRel::getExternalUserid).collect(Collectors.toList());
-            if (CollectionUtil.isNotEmpty(eidList)) {
-                customerList.addAll(weCustomerService.listByIds(eidList));
-            }
+//            WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService
+//                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), unionId);
+//            Optional.ofNullable(weTaskFissionRecord).orElseThrow(() -> new WeComException("任务记录信息不存在"));
+//            List<WeFlowerCustomerRel> list = weFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
+//                    .eq(WeFlowerCustomerRel::getState, WeConstans.FISSION_PREFIX + weTaskFissionRecord.getId()));
+//            List<String> eidList = Optional.ofNullable(list).orElseGet(ArrayList::new).stream()
+//                    .map(WeFlowerCustomerRel::getExternalUserid).collect(Collectors.toList());
+//            if (CollectionUtil.isNotEmpty(eidList)) {
+//                customerList.addAll(weCustomerService.listByIds(eidList));
+//            }
         }
         return customerList;
     }

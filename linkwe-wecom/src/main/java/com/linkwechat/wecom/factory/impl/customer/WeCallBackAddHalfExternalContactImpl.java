@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.factory.impl.customer;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.enums.MediaType;
@@ -37,8 +38,7 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
     private IWeEmpleCodeTagService weEmpleCodeTagService;
     @Autowired
     private IWeEmpleCodeService weEmpleCodeService;
-    @Autowired
-    private IWeFlowerCustomerRelService weFlowerCustomerRelService;
+
     @Autowired
     private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
     @Autowired
@@ -59,24 +59,25 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
                 //查询活码对应标签
                 List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.list(new LambdaQueryWrapper<WeEmpleCodeTag>()
                         .eq(WeEmpleCodeTag::getEmpleCodeId, empleCodeId));
-                //查询外部联系人与通讯录关系数据
-                WeFlowerCustomerRel weFlowerCustomerRel = weFlowerCustomerRelService.getOne(new LambdaQueryWrapper<WeFlowerCustomerRel>()
-                        .eq(WeFlowerCustomerRel::getUserId, message.getUserId())
-                        .eq(WeFlowerCustomerRel::getExternalUserid, message.getExternalUserId()));
-                //为外部联系人添加员工活码标签
-                List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
-                Optional.ofNullable(weFlowerCustomerRel).ifPresent(weFlowerCustomerRel1 -> {
-                    Optional.ofNullable(tagList).orElseGet(ArrayList::new).forEach(tag ->{
+                //客户添加活码标签
+                if(CollectionUtil.isNotEmpty(tagList)){
+                    List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
+                    tagList.stream().forEach(k->{
                         weFlowerCustomerTagRels.add(
                                 WeFlowerCustomerTagRel.builder()
-                                        .flowerCustomerRelId(weFlowerCustomerRel.getId())
-                                        .tagId(tag.getTagId())
+                                        .tagId(k.getTagId())
+                                        .externalUserid( message.getUserId())
+                                        .userId(message.getExternalUserId())
                                         .createTime(new Date())
                                         .build()
                         );
+
                     });
                     weFlowerCustomerTagRelService.saveOrUpdateBatch(weFlowerCustomerTagRels);
-                });
+                }
+
+
+
                 log.debug(">>>>>>>>>欢迎语查询结果：{}", JSONObject.toJSONString(messageMap));
                 if (messageMap != null) {
                     if (StringUtils.isNotEmpty(messageMap.getWelcomeMsg())){

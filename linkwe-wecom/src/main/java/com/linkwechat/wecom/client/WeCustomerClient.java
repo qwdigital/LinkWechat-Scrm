@@ -45,13 +45,22 @@ public interface WeCustomerClient {
     @Request(url = "/externalcontact/get")
     ExternalUserDetail get(@Query("external_userid") String externalUserid);
 
+//    /**
+//     * 根据企业成员id批量获取客户详情
+//     * @param query
+//     * @return
+//     */
+//    @Request(url = "/externalcontact/batch/get_by_user", type = "POST")
+//    ExternalUserList getByUser(@JSONBody Map<String,Object> query);
+
+
     /**
      * 根据企业成员id批量获取客户详情
-     * @param query
+     * @param param
      * @return
      */
     @Request(url = "/externalcontact/batch/get_by_user", type = "POST")
-    ExternalUserList getByUser(@JSONBody Map<String,Object> query);
+    ExternalUserList getByUser(@JSONBody WeCustomerDto.BatchCustomerParam param);
 
 
     /**

@@ -100,4 +100,11 @@ public interface IWeMaterialService {
      * @return
      */
     WeMediaDto uploadImg(MultipartFile file);
+
+    /**
+     * 获取素材
+     * @param mediaId 素材id
+     * @return
+     */
+    WeMediaDto getMediaToResponse(String mediaId);
 }

@@ -20,12 +20,12 @@ public class AllocateWeCustomerDto{
     private String handover_userid;
 
     /**原跟进成员的userid*/
-    private String external_userid;
+    private String[] external_userid;
 
     /**接替成员的userid*/
     private String takeover_userid;
 
-    /**转移成功后发给客户的消息，最多200个字符，不填则使用默认文案，目前只对在职成员分配客户的情况生效*/
-    private String transfer_success_msg;
+//    /**转移成功后发给客户的消息，最多200个字符，不填则使用默认文案，目前只对在职成员分配客户的情况生效*/
+//    private String transfer_success_msg;
 
 }

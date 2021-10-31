@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -25,7 +26,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("we_group_message_list")
-public class WeGroupMessageList extends BaseEntity {
+public class WeGroupMessageList extends BaseEntity{
 
     /**
      * 主键id
@@ -33,6 +34,14 @@ public class WeGroupMessageList extends BaseEntity {
     @ApiModelProperty("id")
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
+
+
+    /**
+     * 群发消息模板id
+     */
+    @ApiModelProperty("群发消息模板id")
+    @Excel(name = "群发消息模板id")
+    private Long msgTemplateId;
 
     /**
      * 企业群发消息的id
@@ -51,7 +60,7 @@ public class WeGroupMessageList extends BaseEntity {
     /**
      * 群发消息创建者userid
      */
-    @ApiModelProperty("群发消息创建者userid")
+    @ApiModelProperty(value = "群发消息创建者userid", hidden = true)
     @Excel(name = "群发消息创建者userid")
     private String userId;
 
@@ -66,14 +75,14 @@ public class WeGroupMessageList extends BaseEntity {
     /**
      * 群发消息创建来源。0：企业 1：个人
      */
-    @ApiModelProperty("群发消息创建来源。0：企业 1：个人")
+    @ApiModelProperty(value = "群发消息创建来源。0：企业 1：个人",hidden = true)
     @Excel(name = "群发消息创建来源。0：企业 1：个人")
-    private Integer createType;
+    private Integer createType = 0;
 
     /**
-     * 是否定时任务 0 常规 1 定时发送
+     * 群发消息创建者
      */
-    @ApiModelProperty("是否定时任务 0 常规 1 定时发送")
-    @Excel(name = "是否定时任务 0 常规 1 定时发送")
-    private Integer isTask;
+    @ApiModelProperty(value = "群发消息创建者",hidden = true)
+    @TableField(exist = false)
+    private String userName;
 }

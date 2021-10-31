@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.client;
 
 import com.dtflys.forest.annotation.*;
+import com.dtflys.forest.http.ForestResponse;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 import com.linkwechat.wecom.retry.WeCommonRetryWhen;
@@ -35,4 +36,12 @@ public interface WeMediaClient {
     @Post(url = "/media/upload")
     WeMediaDto upload(@DataFile(value = "media", fileName = "${1}") InputStream file, String filename, @Query("type") String type);
 
+    /**
+     * 获取临时素材
+     *
+     * @param mediaId 素材id
+     * @return
+     */
+    @GetRequest(url = "/media/get")
+    ForestResponse getMediaToResponse(@Query("media_id") String mediaId);
 }
