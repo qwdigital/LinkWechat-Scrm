@@ -1,5 +1,3 @@
-<style lang="scss" scoped></style>
-
 <template>
   <div>
     <el-tabs :value="active">
@@ -28,7 +26,7 @@ export default {
       active: '1',
       total1: 0,
       total2: 0,
-      total3: 0,
+      total3: 0
     }
   },
   watch: {},
@@ -52,7 +50,9 @@ export default {
   methods: {
     totalChange([type, total]) {
       this['total' + type] = total
-    },
-  },
+    }
+  }
 }
 </script>
+
+<style lang="scss" scoped></style>

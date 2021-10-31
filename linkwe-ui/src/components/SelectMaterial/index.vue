@@ -16,7 +16,7 @@ export default {
     // },
     // 素材类型  0:'文本', 1：'图片'
     type: {
-      type: String,
+      type: String | Number,
       default: '0'
     },
     // 显示哪些素材类型标签
@@ -69,12 +69,7 @@ export default {
 </script>
 
 <template>
-  <el-dialog
-    title="选择素材"
-    :visible.sync="Pvisible"
-    width="680px"
-    append-to-body
-  >
+  <el-dialog title="选择素材" :visible.sync="Pvisible" width="680px" append-to-body>
     <div>
       <el-tabs v-model="Ptype">
         <el-tab-pane name="0" v-if="showArr.includes(0)">

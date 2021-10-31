@@ -77,6 +77,19 @@ export default {
       api
         .getListNew(this.query)
         .then(({ rows, total }) => {
+          rows.forEach((element) => {
+            if (element.tagIds && element.tagNames) {
+              element.tagIds = element.tagIds.split(',')
+              element.tagNames = element.tagNames.split(',')
+              rows.tags = []
+              element.tagIds.forEach((unit, index) => {
+                rows.tags.push({
+                  tagId: unit,
+                  tagId: element.tagNames[index]
+                })
+              })
+            }
+          })
           this.list = rows
           this.total = +total
           this.loading = false
@@ -130,31 +143,30 @@ export default {
       let hasErrorTag = []
       let repeat = []
       this.multipleSelection.forEach((element) => {
-        element.weFlowerCustomerRels.forEach((child) => {
-          child.weFlowerCustomerTagRels.forEach((grandchild) => {
+        element.tags &&
+          element.tags.split(',').forEach((unit) => {
             // 判断是否有重复标签
             let isRepeat = this.selectedTag.some((d) => {
-              return d.tagId === grandchild.tagId
+              return d.tagId === unit.tagId
             })
             // 去重
             if (isRepeat) {
-              repeat.push(grandchild.tagName)
+              repeat.push(unit.tagName)
               return
             }
 
             let filter = this.listTagOneArray.find((d) => {
-              return d.tagId === grandchild.tagId
+              return d.tagId === unit.tagId
             })
             // 如果没有匹配到，则说明该便签处于异常状态，可能已被删除或破坏
             if (!filter) {
-              hasErrorTag.push(grandchild.tagName)
+              hasErrorTag.push(unit.tagName)
               isError = true
               return
             }
 
             this.selectedTag.push(filter)
           })
-        })
       })
       if (hasErrorTag.length > 0) {
         this.msgError('已有标签[' + hasErrorTag + ']不在标签库中，或存在异常')
@@ -219,7 +231,8 @@ export default {
       } else {
         let data = {
           externalUserid: this.multipleSelection[0].externalUserid,
-          addTag: selected
+          addTag: selected,
+          userId: this.multipleSelection[0].firstUserId
         }
         let apiType = {
           add: 'makeLabel',
@@ -355,7 +368,7 @@ export default {
         </template>
       </el-table-column>
       <!-- <el-table-column prop="corpName" label="公司名称" align="center"></el-table-column> -->
-      <el-table-column prop="userName" label="添加人（首位）" align="center">
+      <el-table-column prop="firstUserId" label="添加人（首位）" align="center">
         <!-- <template slot-scope="{ row }">{{
           row.weFlowerCustomerRels[0] ? row.weFlowerCustomerRels[0].userName : ''
         }}</template> -->
@@ -366,14 +379,15 @@ export default {
         }}</template> -->
       </el-table-column>
       <el-table-column prop="tagNames" label="标签" align="center">
-        <template slot-scope="{ row }" v-if="row.tagNames">
-          <el-tag type="info" v-for="(unit, unique) in row.tagNames.split(',')" :key="unique">{{ unit }}</el-tag>
+        <div v-if="row.tagNames" slot-scope="{ row }">
+          <el-tag type="info" v-for="(unit, unique) in row.tagNames" :key="unique">{{ unit }}</el-tag>
           <!-- <div v-for="(item, index) in row.weFlowerCustomerRels" :key="index">
             <el-tag type="info" v-for="(unit, unique) in item.weFlowerCustomerTagRels" :key="unique">{{
               unit.tagName
             }}</el-tag>
           </div> -->
-        </template>
+        </div>
+        <span v-else>无标签</span>
       </el-table-column>
       <el-table-column label="操作" width="100">
         <template slot-scope="{ row }">
