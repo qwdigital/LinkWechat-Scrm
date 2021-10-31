@@ -70,7 +70,7 @@
 
     <!--  底部  -->
     <div class="el-login-footer">
-      <span>Copyright © 2018-2019 LinkWeChat All Rights Reserved.</span>
+      <span>Copyright © 2018-2021 LinkWeChat All Rights Reserved.</span>
     </div>
 
     <!-- <el-dialog
