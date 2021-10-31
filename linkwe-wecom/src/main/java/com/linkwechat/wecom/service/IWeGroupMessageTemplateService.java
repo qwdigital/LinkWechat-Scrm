@@ -1,6 +1,8 @@
 package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.wecom.domain.WeGroupMessageSendResult;
+import com.linkwechat.wecom.domain.WeGroupMessageTask;
 import com.linkwechat.wecom.domain.WeGroupMessageTemplate;
 import com.linkwechat.wecom.domain.query.WeAddGroupMessageQuery;
 import com.linkwechat.wecom.domain.vo.WeGroupMessageDetailVo;
@@ -27,6 +29,7 @@ public interface IWeGroupMessageTemplateService extends IService<WeGroupMessageT
      */
     WeGroupMessageDetailVo getGroupMsgTemplateDetail(Long id);
 
+
     /**
      * 创建群发消息
      * @param query
@@ -44,4 +47,16 @@ public interface IWeGroupMessageTemplateService extends IService<WeGroupMessageT
      * @param asList
      */
     void syncGroupMsgSendResultByIds(List<Long> asList);
+
+    /**
+     * 群发成员发送任务列表
+     * @param task
+     */
+    List<WeGroupMessageTask> groupMsgTaskList(WeGroupMessageTask task);
+
+    /**
+     * 企业群发成员执行结果
+     * @param sendResult
+     */
+    List<WeGroupMessageSendResult> groupMsgSendResultList(WeGroupMessageSendResult sendResult);
 }

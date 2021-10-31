@@ -32,4 +32,6 @@ public interface IWeGroupMessageSendResultService extends IService<WeGroupMessag
 
 
     void addOrUpdateBatchByCondition(List<WeGroupMessageSendResult> taskList);
+
+    List<WeGroupMessageSendResult> groupMsgSendResultList(WeGroupMessageSendResult sendResult);
 }
