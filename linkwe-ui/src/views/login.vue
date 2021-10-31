@@ -5,25 +5,11 @@
       <img class="login-bg2" src="@/assets/image/login_bg2.png" alt="" />
       <img class="login-bg3" src="@/assets/image/login_bg3.png" alt="" />
       <div class="login-form-wrap">
-        <el-form
-          ref="loginForm"
-          :model="loginForm"
-          :rules="loginRules"
-          class="login-form"
-        >
+        <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
           <h3 class="title">LinkWeChat</h3>
           <el-form-item prop="username">
-            <el-input
-              v-model="loginForm.username"
-              type="text"
-              auto-complete="off"
-              placeholder="账号"
-            >
-              <svg-icon
-                slot="prefix"
-                icon-class="user"
-                class="el-input__icon input-icon"
-              />
+            <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
+              <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
             </el-input>
           </el-form-item>
           <el-form-item prop="password">
@@ -34,11 +20,7 @@
               placeholder="密码"
               @keyup.enter.native="handleLogin"
             >
-              <svg-icon
-                slot="prefix"
-                icon-class="password"
-                class="el-input__icon input-icon"
-              />
+              <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
             </el-input>
           </el-form-item>
           <el-form-item prop="code">
@@ -49,26 +31,14 @@
               style="width: 63%"
               @keyup.enter.native="handleLogin"
             >
-              <svg-icon
-                slot="prefix"
-                icon-class="validCode"
-                class="el-input__icon input-icon"
-              />
+              <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon" />
             </el-input>
             <div class="login-code">
               <img :src="codeUrl" @click="getCode" class="login-code-img" />
             </div>
           </el-form-item>
-          <el-checkbox
-            class="fr"
-            v-model="loginForm.rememberMe"
-            style="margin:0px 0px 25px 0px;"
-            >记住密码</el-checkbox
-          >
-          <el-checkbox
-            v-model="isDemonstrationLogin"
-            @change="changeDemonAccount"
-            style="margin:0px 0px 25px 0px;"
+          <el-checkbox class="fr" v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
+          <el-checkbox v-model="isDemonstrationLogin" @change="changeDemonAccount" style="margin:0px 0px 25px 0px;"
             >演示账号登录</el-checkbox
           >
           <el-form-item style="width:100%;">
@@ -100,7 +70,7 @@
 
     <!--  底部  -->
     <div class="el-login-footer">
-      <span>Copyright © 2018-2019 LinkWechat All Rights Reserved.</span>
+      <span>Copyright © 2018-2019 LinkWeChat All Rights Reserved.</span>
     </div>
 
     <!-- <el-dialog
@@ -150,24 +120,18 @@ export default {
         password: '',
         rememberMe: false,
         code: '',
-        uuid: '',
+        uuid: ''
       },
       loginRules: {
-        username: [
-          { required: true, trigger: 'blur', message: '用户名不能为空' },
-        ],
-        password: [
-          { required: true, trigger: 'blur', message: '密码不能为空' },
-        ],
-        code: [
-          { required: true, trigger: 'change', message: '验证码不能为空' },
-        ],
+        username: [{ required: true, trigger: 'blur', message: '用户名不能为空' }],
+        password: [{ required: true, trigger: 'blur', message: '密码不能为空' }],
+        code: [{ required: true, trigger: 'change', message: '验证码不能为空' }]
       },
       loading: false,
       redirect: undefined,
       authLink: '',
       dialogVisible: true,
-      isDemonstrationLogin: false,
+      isDemonstrationLogin: false
     }
   },
   watch: {
@@ -175,8 +139,8 @@ export default {
       handler: function(route) {
         this.redirect = route.query && route.query.redirect
       },
-      immediate: true,
-    },
+      immediate: true
+    }
   },
   created() {
     // data.wxQrLoginRedirectUri http://192.168.0.101/#/authCallback
@@ -185,7 +149,7 @@ export default {
         appid: data.corpId, // * 服务商的CorpID
         redirect_uri: encodeURIComponent(data.wxQrLoginRedirectUri), // * 授权登录之后目的跳转网址，需要做urlencode处理。所在域名需要与授权完成回调域名一致
         state: '', // ? 用于企业或服务商自行校验session，防止跨域攻击
-        usertype: 'admin', // ? 支持登录的类型。admin代表管理员登录（使用微信扫码）,member代表成员登录（使用企业微信扫码），默认为admin
+        usertype: 'admin' // ? 支持登录的类型。admin代表管理员登录（使用微信扫码）,member代表成员登录（使用企业微信扫码），默认为admin
       }
       this.authLink = `https://open.work.weixin.qq.com/wwopen/sso/3rd_qrConnect?appid=${authParams.appid}&redirect_uri=${authParams.redirect_uri}&state=${authParams.state}&usertype=${authParams.usertype}`
     })
@@ -206,9 +170,8 @@ export default {
       const rememberMe = Cookies.get('rememberMe')
       this.loginForm = {
         username: username === undefined ? this.loginForm.username : username,
-        password:
-          password === undefined ? this.loginForm.password : decrypt(password),
-        rememberMe: rememberMe === undefined ? false : Boolean(rememberMe),
+        password: password === undefined ? this.loginForm.password : decrypt(password),
+        rememberMe: rememberMe === undefined ? false : Boolean(rememberMe)
       }
     },
     handleLogin() {
@@ -218,10 +181,10 @@ export default {
           if (this.loginForm.rememberMe) {
             Cookies.set('username', this.loginForm.username, { expires: 30 })
             Cookies.set('password', encrypt(this.loginForm.password), {
-              expires: 30,
+              expires: 30
             })
             Cookies.set('rememberMe', this.loginForm.rememberMe, {
-              expires: 30,
+              expires: 30
             })
           } else {
             Cookies.remove('username')
@@ -246,8 +209,8 @@ export default {
     changeDemonAccount(val) {
       this.loginForm.username = val ? 'Wecome' : ''
       this.loginForm.password = val ? '123456' : ''
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -306,7 +269,7 @@ export default {
   bottom: 0;
   width: 100%;
   text-align: center;
-  color: #fff;
+  // color: #fff;
   font-family: Arial;
   font-size: 12px;
   letter-spacing: 1px;
