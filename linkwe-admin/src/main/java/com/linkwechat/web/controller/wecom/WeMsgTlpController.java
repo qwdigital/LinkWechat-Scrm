@@ -61,6 +61,13 @@ public class WeMsgTlpController extends BaseController
     }
 
 
+    @PutMapping
+    public AjaxResult add(@RequestBody WeMsgTlp weMsgTlp){
+        weMsgTlpService.save(weMsgTlp);
+        return AjaxResult.success();
+    }
+
+
     /**
      * 删除欢迎语模板
      */

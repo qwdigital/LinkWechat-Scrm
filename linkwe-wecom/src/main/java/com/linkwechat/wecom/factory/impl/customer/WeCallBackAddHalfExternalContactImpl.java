@@ -41,7 +41,6 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
 
     @Autowired
     private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
-
     @Autowired
     private IWeMaterialService weMaterialService;
 
@@ -74,7 +73,7 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
                         );
 
                     });
-                    weFlowerCustomerTagRelService.batchAddOrUpdate(weFlowerCustomerTagRels);
+                    weFlowerCustomerTagRelService.saveOrUpdateBatch(weFlowerCustomerTagRels);
                 }
 
 

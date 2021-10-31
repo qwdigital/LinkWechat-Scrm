@@ -52,10 +52,7 @@ public class WeCallBackDelExternalContactImpl extends WeEventStrategy {
                     WeUser user = weUserService.getById(message.getUserId());
                     weSensitiveActHit.setOperator(user.getName());
 
-                    WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>()
-                            .eq(WeCustomer::getExternalUserid,message.getExternalUserId())
-                            .eq(WeCustomer::getFirstUserId,message.getUserId()));
-
+                    WeCustomer weCustomer = weCustomerService.selectWeCustomerById(message.getExternalUserId());
                     weSensitiveActHit.setOperateTargetId(weCustomer.getUserId());
                     weSensitiveActHit.setOperateTarget(weCustomer.getName());
                     weSensitiveActHitService.insertWeSensitiveActHit(weSensitiveActHit);
