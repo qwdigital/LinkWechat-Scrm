@@ -25,7 +25,7 @@ public class WeCustomerList {
     private String tagNames;
 
 
-    private List<WeFlowerCustomerRel> weFlowerCustomerRels;
+//    private List<WeFlowerCustomerRel> weFlowerCustomerRels;
 
     //查询条件客户姓名
     private String name;

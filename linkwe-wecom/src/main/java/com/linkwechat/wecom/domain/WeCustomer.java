@@ -2,13 +2,11 @@ package com.linkwechat.wecom.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.core.domain.BaseEntity;
-import com.linkwechat.common.utils.SnowFlakeUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -40,10 +38,16 @@ public class WeCustomer extends BaseEntity {
     /**
      * 外部联系人的userid
      */
-    @TableId
     @NotBlank(message = "外部联系人的id不可为空")
     @ApiModelProperty("外部联系人的userid")
     private String externalUserid;
+
+
+    /**
+     * 首位添加人
+     */
+    private String firstUserId;
+
 
     /**
      * 外部联系人名称
@@ -167,10 +171,6 @@ public class WeCustomer extends BaseEntity {
     private String updateBy;
 
 
-    /**
-     * 首位添加人
-     */
-    private String firstUserId;
 
 
     /**

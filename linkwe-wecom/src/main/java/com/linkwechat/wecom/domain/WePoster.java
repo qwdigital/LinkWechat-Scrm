@@ -72,6 +72,10 @@ public class WePoster extends BaseEntity {
     @ApiModelProperty("分类id")
     private Long categoryId;
 
+
+    @ApiModelProperty("其他字段")
+    private String otherField;
+
     /**
      * 海报组件数组
      */

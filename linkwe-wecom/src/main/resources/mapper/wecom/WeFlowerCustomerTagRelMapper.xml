@@ -5,14 +5,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.linkwechat.wecom.mapper.WeFlowerCustomerTagRelMapper">
     
     <resultMap type="WeFlowerCustomerTagRel" id="WeFlowerCustomerTagRelResult">
-        <result property="id"    column="id"    />
-        <result property="flowerCustomerRelId"    column="flower_customer_rel_id"    />
         <result property="tagId"    column="tag_id"    />
         <result property="createTime"    column="create_time"    />
     </resultMap>
 
     <sql id="selectWeFlowerCustomerTagRelVo">
-        select id, flower_customer_rel_id, tag_id, create_time from we_flower_customer_tag_rel
+        select id,tag_id, create_time from we_flower_customer_tag_rel
     </sql>
 
     <select id="selectWeFlowerCustomerTagRelList" parameterType="WeFlowerCustomerTagRel" resultMap="WeFlowerCustomerTagRelResult">
@@ -31,14 +29,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <insert id="insertWeFlowerCustomerTagRel" parameterType="WeFlowerCustomerTagRel">
         insert into we_flower_customer_tag_rel
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">id,</if>
-            <if test="flowerCustomerRelId != null">flower_customer_rel_id,</if>
+
             <if test="tagId != null">tag_id,</if>
             <if test="createTime != null">create_time,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">#{id},</if>
-            <if test="flowerCustomerRelId != null">#{flowerCustomerRelId},</if>
+
             <if test="tagId != null">#{tagId},</if>
             <if test="createTime != null">#{createTime},</if>
          </trim>
@@ -72,6 +68,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <foreach collection="list" item="tag" index="index" separator=",">
             (#{tag.id},#{tag.flowerCustomerRelId},#{tag.tagId},#{tag.createTime})
         </foreach>
+    </insert>
+
+
+
+    <insert id="batchAddOrUpdate">
+        INSERT INTO we_flower_customer_tag_rel(
+        user_id,
+        external_userid,
+        tag_id,
+        create_time
+        ) values
+        <foreach collection="tagRels" item="item" index="index" separator=",">
+            (#{item.userId},#{item.externalUserid},#{item.tagId},NOW())
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        user_id=IF(we_flower_customer_tag_rel.user_id != null, VALUES(user_id), we_flower_customer_tag_rel.user_id),
+        external_userid=IF(we_flower_customer_tag_rel.external_userid != null, VALUES(external_userid), we_flower_customer_tag_rel.external_userid),
+        tag_id=IF(we_flower_customer_tag_rel.tag_id != null, VALUES(tag_id), we_flower_customer_tag_rel.tag_id);
     </insert>
     
 </mapper>

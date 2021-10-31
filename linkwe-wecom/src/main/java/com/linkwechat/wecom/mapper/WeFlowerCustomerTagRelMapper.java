@@ -3,7 +3,9 @@ package com.linkwechat.wecom.mapper;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeFlowerCustomerTagRel;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 客户标签关系Mapper接口
@@ -68,4 +70,7 @@ public interface WeFlowerCustomerTagRelMapper  extends BaseMapper<WeFlowerCustom
      * @return
      */
     public int batchInsetWeFlowerCustomerTagRel(List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels);
+
+
+    void batchAddOrUpdate(@Param("tagRels") List<WeFlowerCustomerTagRel> tagRels);
 }

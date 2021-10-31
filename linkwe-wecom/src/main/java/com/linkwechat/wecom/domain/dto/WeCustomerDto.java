@@ -5,6 +5,7 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -61,6 +62,18 @@ public class WeCustomerDto extends WeResultDto{
         private String remark_company;
         private String[] remark_mobiles;
         private String remark_pic_mediaid;
+    }
+
+
+    /**
+     * 批量获取客户参数
+     */
+    @Data
+    @Builder
+    public static class  BatchCustomerParam{
+        private String[] userid_list;
+        private String cursor;
+        private Integer limit;
     }
 
 

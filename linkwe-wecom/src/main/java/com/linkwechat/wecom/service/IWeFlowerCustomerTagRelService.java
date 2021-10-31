@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeFlowerCustomerTagRel;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 客户标签关系Service接口
@@ -70,4 +71,7 @@ public interface IWeFlowerCustomerTagRelService extends IService<WeFlowerCustome
      * @return
      */
     public int batchInsetWeFlowerCustomerTagRel(List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels);
+
+
+    void batchAddOrUpdate(List<WeFlowerCustomerTagRel> tagRels);
 }

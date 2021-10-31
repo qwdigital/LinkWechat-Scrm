@@ -14,19 +14,14 @@ import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
 import com.linkwechat.wecom.service.IWeEmpleCodeService;
 import com.linkwechat.wecom.service.IWeFlowerCustomerRelService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 /**
  * 员工活码Controller
@@ -39,6 +34,8 @@ import java.util.zip.ZipOutputStream;
 public class WeEmpleCodeController extends BaseController {
     @Autowired
     private IWeEmpleCodeService weEmpleCodeService;
+
+
     @Autowired
     private IWeFlowerCustomerRelService weFlowerCustomerRelService;
 

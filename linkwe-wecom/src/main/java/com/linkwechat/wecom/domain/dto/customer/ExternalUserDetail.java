@@ -75,6 +75,8 @@ public class ExternalUserDetail extends WeResultDto {
 
     @Data
     public class FollowInfo{
+        /**添加人id*/
+        private String userid;
         /**该成员对此外部联系人的备注*/
         private String remark;
         /**该成员对此外部联系人的描述*/

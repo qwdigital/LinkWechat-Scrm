@@ -68,11 +68,11 @@ public interface IWeCustomerService extends IService<WeCustomer>
     public void makeLabel(WeMakeCustomerTag weMakeCustomerTag);
 
 
-    /**
-     * 移除客户标签
-     * @param weMakeCustomerTag
-     */
-    public void removeLabel(WeMakeCustomerTag weMakeCustomerTag);
+//    /**
+//     * 移除客户标签
+//     * @param weMakeCustomerTag
+//     */
+//    public void removeLabel(WeMakeCustomerTag weMakeCustomerTag);
 
 
     /**
@@ -89,11 +89,7 @@ public interface IWeCustomerService extends IService<WeCustomer>
      */
     public void getCustomersInfoAndSynchWeCustomer(String externalUserid,String userId);
 
-    /**
-     * 删除客户
-     * @param externalUserid
-     */
-    public void deleteCustomersByEid(String externalUserid);
+
 
     /**
      * 向客户发送欢迎语
@@ -107,12 +103,7 @@ public interface IWeCustomerService extends IService<WeCustomer>
      */
     public boolean updateCustomerChatStatus(String externalUserId);
 
-    /**
-     * 通过标签查询客户列表
-     * @param ids 标签id
-     * @return
-     */
-    public List<WeUser> getCustomerByTag(List<String> ids);
+
 
 
 
