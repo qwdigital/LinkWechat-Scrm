@@ -57,10 +57,14 @@ export default {
       ids: [], // 选中数组
       previewImg: '', // 预览图片地址
       activeObject: {},
-      a: ''
+      fontColor: ''
     }
   },
-  watch: {},
+  watch: {
+    fontColor(hex) {
+      this.setAttr('fill', hex)
+    }
+  },
   created() {},
   mounted() {},
   methods: {
@@ -85,7 +89,7 @@ export default {
           categoryId: data.categoryId,
           type: data.type,
           delFlag: data.delFlag,
-          posterJSON: data.posterJSON
+          posterJSON: JSON.parse(data.otherField)
         }
         this.posterSubassemblyList = []
         this.posterSubassemblyList = data.posterSubassemblyList || []
@@ -101,9 +105,38 @@ export default {
       this.$nextTick(() => {
         let canvas = (this.canvas = new fabric.Canvas('canvas'))
 
+        canvas.on({
+          //通用事件
+          'mouse:down': function(e) {
+            if (e.target != undefined) {
+              var ob = canvas.getActiveObject()
+              if (ob) {
+                var i = e.transform.corner
+                if (i == 'tr') {
+                  this.del()
+                }
+                ob.set({
+                  transparentCorners: false,
+                  cornerColor: 'white',
+                  cornerStrokeColor: 'blue',
+                  borderColor: 'blue',
+                  cornerSize: 12,
+                  // rotatingPointOffset: 15,
+                  padding: 10,
+                  cornerStyle: 'circle',
+                  borderDashArray: [3, 3],
+                  snapAngle: 45, //在45度时自动保持到45的倍数
+                  snapThreshold: 5,
+                  centeredRotation: true
+                })
+              }
+            }
+          }
+        })
+
         if (this.form.posterJSON) {
           // 加载画布信息
-          canvas.loadFromJSON(JSON.parse(this.form.posterJSON), () => {
+          canvas.loadFromJSON(this.form.posterJSON, () => {
             canvas.renderAll()
           })
         } else {
@@ -190,13 +223,6 @@ export default {
       let options = {
         left: 100,
         top: 100,
-        transparentCorners: false,
-        cornerColor: 'white',
-        cornerStrokeColor: 'white',
-        borderColor: 'white',
-        cornerSize: 12,
-        padding: 10,
-        cornerStyle: 'circle',
         borderDashArray: [3, 3],
         customType: { text: 1, image: 2, qrcode: 3 }[type] // 自定义类型 1 固定文本 2 固定图片 3 二维码图片
       }
@@ -264,12 +290,13 @@ export default {
         if (valid) {
           const form = this.form
           form.posterJSON = this.canvas.toJSON(['customType'])
-          console.log(form.posterJSON)
           let list = form.posterJSON.objects
+          form.otherField = JSON.stringify(form.posterJSON)
+          delete form.posterJSON
           let posterSubList = []
           let vo = null
-          let i = 0,
-            len = list.length
+          let i = 0
+          let len = list.length
           while (i < len) {
             vo = list[i]
 
@@ -281,7 +308,7 @@ export default {
               id: null, // 修改的时候后端默认没增删，沟通后让先传null
               content: vo.text || '', // 文本内容
               delFlag: 0, // 1 启动  0 删除       暂时写死
-              fontColor: vo.fill || 'rgb(0,0,0)',
+              fontColor: vo.fill || '#000000',
               fontId: null, // TODO 后端让传NULL  isText ? i : null,   // 字体ID   与imgPath互斥
               fontSize: parseInt(vo.fontSize),
               fontTextAlign: align, // 1 2 3  left center right
@@ -357,6 +384,7 @@ export default {
       <el-dialog
         title="海报编辑"
         width="80%"
+        v-if="dialog.edit"
         :visible.sync="dialog.edit"
         :before-close="beforeCloseDialog"
         :close-on-click-modal="false"
@@ -449,7 +477,7 @@ export default {
           </div>
           <div style="">
             <div class="canvas-wrap">
-              <i class="el-icon-close" id="deleteBtn"></i>
+              <i class="el-icon-error" id="deleteBtn"></i>
               <canvas id="canvas" width="375" height="700" style="border: 1px solid #ddd;"> </canvas>
             </div>
             <div id="tbody-containerui-image-editor-controls">
@@ -475,7 +503,7 @@ export default {
                     </div>
                   </li>
                   <li class="menu-item">
-                    <el-color-picker @active-change="(rgb) => setAttr('fill', rgb)" show-alpha></el-color-picker>
+                    <el-color-picker v-model="fontColor" color-format="hex"></el-color-picker>
                   </li>
                 </ul>
               </div>
@@ -491,7 +519,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.el-icon-close {
+.el-icon-error {
   position: absolute;
   top: 0px;
   left: 0px;
