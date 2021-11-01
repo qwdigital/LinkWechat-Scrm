@@ -7,7 +7,7 @@ export default {
     return {
       datePickerVisible: false,
       customer: {
-        weFlowerCustomerRels: [{}]
+        // weFlowerCustomerRels: [{}]
       },
       birthday: '',
       pickerOptions: {
@@ -32,8 +32,9 @@ export default {
       }
       updateBirthday(data).then((response) => {
         this.msgSuccess('操作成功')
-        this.getDetail()
-        this.datePickerVisible = false
+        // this.getDetail()
+        this.$set(this.customer, 'birthday', this.birthday)
+        // this.datePickerVisible = false
       })
     },
     getDetail() {
@@ -56,14 +57,14 @@ export default {
 
     <el-card shadow="never" :body-style="{ width: '410px', lineHeight: '30px' }">
       <div class="flex aic mt20">
-        <el-avatar :size="50" :src="customer.avatar"></el-avatar>
+        <el-avatar style="flex: none;" :size="50" :src="customer.avatar"></el-avatar>
         <div class="info-wrap">
           <div class="mb10">
             {{ customer.name }}
-            <span :style="{ color: customer.type == 1 ? '#4bde03' : '#f9a90b' }">{{
+            <!-- <span :style="{ color: customer.type == 1 ? '#4bde03' : '#f9a90b' }">{{
               { 1: '@微信', 2: '@企业微信' }[customer.type]
             }}</span>
-            <i :class="['el-icon-s-custom', { 1: 'man', 2: 'woman' }[customer.gender]]"></i>
+            <i :class="['el-icon-s-custom', { 1: 'man', 2: 'woman' }[customer.gender]]"></i> -->
           </div>
           <div class="info">
             出生日期：{{ customer.birthday }}
