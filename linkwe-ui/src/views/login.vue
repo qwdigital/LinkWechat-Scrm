@@ -273,6 +273,7 @@ export default {
   font-family: Arial;
   font-size: 12px;
   letter-spacing: 1px;
+  z-index: 90;
 }
 .login-code-img {
   height: 38px;

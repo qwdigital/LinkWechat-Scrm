@@ -69,31 +69,34 @@ export default {
   mounted() {},
   methods: {
     listChange(data) {
-      console.log('listChange', JSON.stringify(data))
       this.srcList = data.map((item) => item.materialUrl)
     },
     preview(url) {
-      console.log(url)
-      console.log('preview', url)
       this.previewImg = url || ''
       this.dialog.preview = true
     },
     async edit(item) {
       try {
-        const res = await getPosterInfo(item.id)
-        const data = res.data || {}
-        console.log('getPosterInfo', data)
-        this.form = {
-          id: data.id,
-          title: data.title,
-          categoryId: data.categoryId,
-          type: data.type,
-          delFlag: data.delFlag,
-          posterJSON: JSON.parse(data.otherField)
+        if (item) {
+          // 编辑
+          const res = await getPosterInfo(item.id)
+          const data = res.data || {}
+          // console.log('getPosterInfo', data)
+          this.form = {
+            id: data.id,
+            title: data.title,
+            categoryId: data.categoryId,
+            type: data.type,
+            delFlag: data.delFlag,
+            posterJSON: JSON.parse(data.otherField)
+          }
+          this.posterSubassemblyList = data.posterSubassemblyList || []
+          this.materialSelected = data.backgroundImgPath
+        } else {
+          // 新增，清除编辑的数据
+          this.form = {}
+          this.posterSubassemblyList = []
         }
-        this.posterSubassemblyList = []
-        this.posterSubassemblyList = data.posterSubassemblyList || []
-        this.materialSelected = data.backgroundImgPath
         this.dialog.edit = true
         this.initPoster()
       } catch (error) {
@@ -105,8 +108,34 @@ export default {
       this.$nextTick(() => {
         let canvas = (this.canvas = new fabric.Canvas('canvas'))
 
+        if (this.form.posterJSON) {
+          // 加载画布信息
+          this.setPosterBackgroundImage()
+          canvas.loadFromJSON(this.form.posterJSON, () => {
+            canvas.renderAll()
+          })
+        } else {
+          this.setPosterBackgroundImage()
+        }
+
+        // 删除某个图层
+        var deleteBtn = document.getElementById('deleteBtn')
+        function addDeleteBtn(x, y) {
+          deleteBtn.style.display = 'none'
+          deleteBtn.style.left = x - 10 + 'px'
+          deleteBtn.style.top = y - 30 + 'px'
+          deleteBtn.style.display = 'block'
+        }
+
+        canvas.on('selection:created', function(e) {
+          addDeleteBtn(e.target.lineCoords.tr.x, e.target.lineCoords.tr.y)
+        })
+        canvas.on('selection:updated', function(e) {
+          addDeleteBtn(e.target.lineCoords.tr.x, e.target.lineCoords.tr.y)
+        })
+
+        //通用事件另外写法
         canvas.on({
-          //通用事件
           'mouse:down': function(e) {
             if (e.target != undefined) {
               var ob = canvas.getActiveObject()
@@ -134,37 +163,34 @@ export default {
           }
         })
 
-        if (this.form.posterJSON) {
-          // 加载画布信息
-          canvas.loadFromJSON(this.form.posterJSON, () => {
-            canvas.renderAll()
-          })
-        } else {
-          this.setPosterBackgroundImage()
-        }
+        //是否拖动
+        // let panning = false
+        // canvas.on('mouse:down', (e) => {
+        //   this.activeObject = canvas.getActiveObject()
+        //   if (!this.activeObject) {
+        //     deleteBtn.style.display = 'none'
+        //   }
+        //   //按住alt键可拖动画布
+        //   if (e.e.altKey) {
+        //     panning = true
+        //     canvas.selection = false
+        //   }
+        // })
 
-        // 删除某个图层
-        var deleteBtn = document.getElementById('deleteBtn')
-        function addDeleteBtn(x, y) {
-          deleteBtn.style.display = 'none'
-          deleteBtn.style.left = x - 10 + 'px'
-          deleteBtn.style.top = y - 30 + 'px'
-          deleteBtn.style.display = 'block'
-        }
+        // //鼠标抬起
+        // canvas.on('mouse:up', function(e) {
+        //   panning = false
+        //   canvas.selection = true
+        // })
 
-        canvas.on('selection:created', function(e) {
-          addDeleteBtn(e.target.lineCoords.tr.x, e.target.lineCoords.tr.y)
-        })
-        canvas.on('selection:updated', function(e) {
-          addDeleteBtn(e.target.lineCoords.tr.x, e.target.lineCoords.tr.y)
-        })
-        canvas.on('mouse:down', (e) => {
-          console.log(canvas.getActiveObject())
-          this.activeObject = canvas.getActiveObject()
-          if (!this.activeObject) {
-            deleteBtn.style.display = 'none'
-          }
-        })
+        // //鼠标移动
+        // canvas.on('mouse:move', function(e) {
+        //   if (panning && e && e.e) {
+        //     let delta = new fabric.Point(e.e.movementX, e.e.movementY)
+        //     canvas.relativePan(delta)
+        //     console.log(e)
+        //   }
+        // })
 
         canvas.on('object:modified', function(e) {
           addDeleteBtn(e.target.lineCoords.tr.x, e.target.lineCoords.tr.y)
@@ -181,6 +207,21 @@ export default {
         canvas.on('mouse:wheel', function(e) {
           deleteBtn.style.display = 'none'
         })
+
+        // alt键缩放
+        document.getElementById('canvas-wrap').addEventListener('wheel', (e) => {
+          // e.stopPropagation()
+          if (e.altKey) {
+            e.preventDefault()
+            console.log(e)
+            let zoom = (e.deltaY > 0 ? 0.1 : -0.1) + canvas.getZoom()
+            zoom = Math.max(0.1, zoom) //最小为原来的1/10
+            zoom = Math.min(5, zoom) //最大是原来的5倍
+            let zoomPoint = new fabric.Point(e.offsetX, e.offsetY)
+            canvas.zoomToPoint(zoomPoint, zoom)
+          }
+        })
+
         deleteBtn.addEventListener('click', () => {
           let activeObject = canvas.getActiveObject()
           if (activeObject) {
@@ -202,11 +243,13 @@ export default {
       }
       let canvas = this.canvas
       new fabric.Image.fromURL(this.materialSelected, (img) => {
-        img.set({
-          // 通过scale来设置图片大小，这里设置和画布一样大
-          scaleX: canvas.width / img.width,
-          scaleY: canvas.height / img.height
-        })
+        // img.set({
+        //   // 通过scale来设置图片大小，这里设置和画布一样大
+        //   // scaleX: canvas.width / img.width,
+        //   // scaleY: canvas.height / img.height
+        // })
+        canvas.setWidth(img.width)
+        canvas.setHeight(img.height)
         canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas))
         canvas.renderAll()
       })
@@ -254,6 +297,7 @@ export default {
     beforeCloseDialog() {
       this.$refs.form.resetFields()
       this.form.id = undefined
+      this.form.posterJSON = undefined
       this.dialog.edit = false
     },
     remove(id) {
@@ -288,6 +332,7 @@ export default {
       }
       this.$refs.form.validate((valid) => {
         if (valid) {
+          let laoding = this.$loading()
           const form = this.form
           form.posterJSON = this.canvas.toJSON(['customType'])
           let list = form.posterJSON.objects
@@ -312,8 +357,8 @@ export default {
               fontId: null, // TODO 后端让传NULL  isText ? i : null,   // 字体ID   与imgPath互斥
               fontSize: parseInt(vo.fontSize),
               fontTextAlign: align, // 1 2 3  left center right
-              left: parseInt(vo.left) - (isText ? 0 : vo.width >> 1), //  FIXME：显示偏移了
-              top: parseInt(vo.top) - (isText ? 0 : vo.height >> 1),
+              left: parseInt(vo.left), // - (isText ? 0 : vo.width >> 1), // 显示偏移了
+              top: parseInt(vo.top), // - (isText ? 0 : vo.height >> 1),
               width: parseInt(vo.width + (isText ? vo.fontSize / 2 : 0)),
               height: parseInt(vo.height),
               imgPath: vo.src || '',
@@ -339,13 +384,18 @@ export default {
               },
               form
             )
-          ).then((res) => {
-            this.msgSuccess(res.msg)
-            if (isBack) {
-              this.$refs.page.getList(1)
-              this.beforeCloseDialog()
-            }
-          })
+          )
+            .then((res) => {
+              laoding.close()
+              this.msgSuccess(res.msg)
+              if (isBack) {
+                this.$refs.page.getList(1)
+                this.beforeCloseDialog()
+              }
+            })
+            .catch(() => {
+              laoding.close()
+            })
         }
       })
     }
@@ -378,7 +428,7 @@ export default {
         </el-col>
       </el-row>
 
-      <el-dialog title="海报预览" width="30%" :visible.sync="dialog.preview">
+      <el-dialog title="海报预览" width="50%" :visible.sync="dialog.preview">
         <img class="preview-img" :src="previewImg" />
       </el-dialog>
       <el-dialog
@@ -471,14 +521,14 @@ export default {
               </el-form-item>
               <el-form-item label="">
                 <el-button type="success" @click="save()">保存</el-button>
-                <el-button type="success" @click="save(1)">保存并返回</el-button>
+                <el-button type="success" @click="save(1)">保存并关闭</el-button>
               </el-form-item>
             </el-form>
           </div>
           <div style="">
-            <div class="canvas-wrap">
+            <div id="canvas-wrap">
               <i class="el-icon-error" id="deleteBtn"></i>
-              <canvas id="canvas" width="375" height="700" style="border: 1px solid #ddd;"> </canvas>
+              <canvas id="canvas" width="300" height="500" style="border: 1px solid #ddd;"> </canvas>
             </div>
             <div id="tbody-containerui-image-editor-controls">
               <ul class="menu">
@@ -569,11 +619,14 @@ export default {
 .preview-img {
   width: 100%;
 }
-.canvas-wrap {
+#canvas-wrap {
   margin-right: 20px;
   display: inline-block;
   position: relative;
   vertical-align: top;
+  overflow: auto;
+  max-width: 500px;
+  max-height: 700px;
 }
 #tbody-containerui-image-editor-controls {
   display: inline-block;
