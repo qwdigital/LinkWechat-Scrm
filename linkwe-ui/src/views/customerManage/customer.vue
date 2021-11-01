@@ -266,7 +266,7 @@ export default {
     goRoute(row) {
       this.$router.push({
         path: 'customerDetail',
-        query: { id: row.externalUserid }
+        query: { data: JSON.stringify(row) }
       })
     }
   }
@@ -368,7 +368,7 @@ export default {
         </template>
       </el-table-column>
       <!-- <el-table-column prop="corpName" label="公司名称" align="center"></el-table-column> -->
-      <el-table-column prop="firstUserId" label="添加人（首位）" align="center">
+      <el-table-column prop="userName" label="添加人（首位）" align="center">
         <!-- <template slot-scope="{ row }">{{
           row.weFlowerCustomerRels[0] ? row.weFlowerCustomerRels[0].userName : ''
         }}</template> -->
