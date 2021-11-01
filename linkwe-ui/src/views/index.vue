@@ -9,12 +9,7 @@
           <el-row type="flex" class="row-bg" justify="space-between">
             <el-col :span="24" class="title_name">数据总览</el-col>
           </el-row>
-          <el-row
-            type="flex"
-            class="row-bg"
-            justify="space-between"
-            style="margin-top:35px; text-align: center;"
-          >
+          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:35px; text-align: center;">
             <el-col :span="6" class="col_style">企业成员总数</el-col>
             <el-col :span="6" class="col_style">客户总人数</el-col>
             <el-col :span="6" class="col_style">客户群总数</el-col>
@@ -40,29 +35,18 @@
               >实时数据 <span class=" fontgay">更新于{{ uptime }}</span></el-col
             >
             <el-col :span="10" style="text-align:right">
-              <el-radio-group
-                v-model="timeType"
-                style="margin-top: 20px;"
-                @change="timeTypeCheck"
-              >
+              <el-radio-group v-model="timeType" style="margin-top: 20px;" @change="timeTypeCheck">
                 <el-radio-button label="today">今日</el-radio-button>
                 <el-radio-button label="week">本周</el-radio-button>
                 <el-radio-button label="month">本月</el-radio-button>
-                <el-radio-button label="reset"
-                  ><i class="el-icon-refresh"> </i
-                ></el-radio-button>
+                <el-radio-button label="reset"><i class="el-icon-refresh"> </i></el-radio-button>
               </el-radio-group>
             </el-col>
           </el-row>
 
-          <el-row
-            type="flex"
-            class="row-bg"
-            justify="space-between"
-            style="margin-top:30px; text-align: center;"
-          >
-            <el-col :span="6">发起申请数</el-col>
+          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:30px; text-align: center;">
             <el-col :span="6">新增客户数</el-col>
+            <el-col :span="6">新增客群数</el-col>
             <el-col :span="6">群新增人数</el-col>
             <el-col :span="6">流失客户数</el-col>
           </el-row>
@@ -74,17 +58,10 @@
           >
             <el-col :span="6">{{ erchatsTable.newApplyCnt }}</el-col>
             <el-col :span="6">{{ erchatsTable.newContactCnt }}</el-col>
-            <el-col :span="6">{{
-              erchatsTable.newMemberCnt ? erchatsTable.newMemberCnt : 0
-            }}</el-col>
+            <el-col :span="6">{{ erchatsTable.newMemberCnt ? erchatsTable.newMemberCnt : 0 }}</el-col>
             <el-col :span="6">{{ erchatsTable.negativeFeedbackCnt }}</el-col>
           </el-row>
-          <el-row
-            type="flex"
-            class="row-bg"
-            justify="space-between"
-            style="margin-top:10px; text-align: center;"
-          >
+          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:10px; text-align: center;">
             <el-col
               :span="6"
               :class="{
@@ -110,11 +87,7 @@
                 redicon: Number(erchatsTable.newMemberCntDiff) < 0
               }"
               >较{{ time }}
-              <span>{{
-                erchatsTable.newMemberCntDiff
-                  ? erchatsTable.newMemberCntDiff
-                  : 0
-              }}</span>
+              <span>{{ erchatsTable.newMemberCntDiff ? erchatsTable.newMemberCntDiff : 0 }}</span>
             </el-col>
             <el-col
               :span="6"
@@ -127,41 +100,28 @@
             </el-col>
           </el-row>
         </div>
+        <div id="fatherbox">
+          <div id="echart" ref="views"></div>
+        </div>
       </div>
-      <div class="erchatsdiv" style="margin-top:10px">
+
+      <div class="car">
+        <el-row type="flex" class="row-bg" justify="space-between">
+          <el-col
+            :span="24"
+            style="font-size: 24px; line-height:80px
+"
+            >功能直通车
+          </el-col>
+        </el-row>
         <el-row :gutter="20">
-          <el-col :span="12" class="erchats">
-            <el-row type="flex" class="row-bg" justify="space-between">
-              <div id="fatherbox">
-                <div id="main" ref="views"></div>
-              </div>
-            </el-row>
-          </el-col>
-          <el-col :span="12" class="erchats">
-            <el-row type="flex" class="row-bg" justify="space-between">
-              <div id="fatherbox">
-                <div id="main2" ref="views"></div>
-              </div>
-            </el-row>
-          </el-col>
-          <el-col :span="12" class="erchats">
-            <el-row type="flex" class="row-bg" justify="space-between">
-              <div id="fatherbox">
-                <div id="main3" ref="views"></div>
-              </div>
-            </el-row>
-          </el-col>
-          <el-col :span="12" class="erchats">
-            <el-row type="flex" class="row-bg" justify="space-between">
-              <div id="fatherbox">
-                <div id="main4" ref="views"></div>
-              </div>
-            </el-row>
+          <el-col :span="4" v-for="(index, i) in car" :key="i">
+            <div class="grid-content" @click="$router.push(index.url)">
+              <span class="fl"> <img :src="index.img" alt="" /> </span><span class="fl craname">{{ index.name }}</span>
+            </div>
           </el-col>
         </el-row>
       </div>
-
-      <!-- -->
     </div>
     <div class="index_r whitebg">
       <div class="qy_R">
@@ -169,39 +129,21 @@
           <p class="p1">{{ $store.state.user.companyName }}，欢迎登陆本系统</p>
           <p class="p2">登录时间：{{ parseTime(new Date()) }}</p>
           <p class="p1 p3 margint20">LinkWechat 企业微信SCRM</p>
-          <p class="p2 p4">
-            版本信息：开源 <span class="fr">可用期限：永久</span>
-          </p>
-          <el-row
-            :gutter="20"
-            type="flex"
-            class="row-bg"
-            justify="center"
-            style="text-align:center"
-          >
+          <p class="p2 p4">版本信息：开源 <span class="fr">可用期限：永久</span></p>
+          <el-row :gutter="20" type="flex" class="row-bg" justify="center" style="text-align:center">
             <el-col :span="10" class="flexspan">
               <img src="../assets/index/bzwd.png" />
               <a href="https://www.yuque.com/linkwechat/help"> 帮助手册</a>
             </el-col>
             <el-col :span="2"></el-col>
-            <el-col
-              :span="10"
-              class="flexspan"
-              @click.native="msgInfo('《使用手册》正在加急上线中，敬请关注…')"
+            <el-col :span="10" class="flexspan" @click.native="msgInfo('《使用手册》正在加急上线中，敬请关注…')"
               ><img src="../assets/index/kfsc.png" /> 开发文档</el-col
             >
           </el-row>
         </div>
         <div class="inedx_r_top_bottom">
-          <span class="inedx_r_top_bottomp1"
-            ><img src="../assets/index/gxrz.png" /> 更新日志</span
-          >
-          <span
-            class="fr"
-            style="color:#0079DE"
-            @click="msgInfo('《更新日志》正在加急上线中，敬请关注…')"
-            >更多</span
-          >
+          <span class="inedx_r_top_bottomp1"><img src="../assets/index/gxrz.png" /> 更新日志</span>
+          <span class="fr" style="color:#0079DE" @click="msgInfo('《更新日志》正在加急上线中，敬请关注…')">更多</span>
           <ul>
             <li v-for="(index, i) in 3" :key="i" @click="msgInfo('暂无内容')">
               即将上线，敬请期待 <span class="fr">03-26</span>
@@ -209,9 +151,7 @@
           </ul>
         </div>
         <div class="inedx_r_top_bottom">
-          <span class="inedx_r_top_bottomp1"
-            ><img src="../assets/index/qyxy.png" /> 私域学院</span
-          >
+          <span class="inedx_r_top_bottomp1"><img src="../assets/index/qyxy.png" /> 私域学院</span>
           <span class="fr" style="color:#0079DE">更多</span>
           <ul>
             <li v-for="(index, i) in 3" :key="i" @click="msgInfo('暂无内容')">
@@ -221,52 +161,28 @@
         </div>
         <div class="inedx_r_top_bottom" style="text-align:center">
           <p style="text-align:left">
-            <span class="inedx_r_top_bottomp1">
-              <img src="../assets/index/kfq.png" /> 官方交流</span
-            >
+            <span class="inedx_r_top_bottomp1"> <img src="../assets/index/kfq.png" /> 官方交流</span>
           </p>
           <img :src="bossImg" class="img" />
         </div>
         <div class="inedx_r_top_bottom" style="text-align:center">
           <p style="text-align:left">
-            <span class="inedx_r_top_bottomp1">
-              <img src="../assets/index/khq.png" /> 联系客服</span
-            >
+            <span class="inedx_r_top_bottomp1"> <img src="../assets/index/khq.png" /> 联系客服</span>
           </p>
           <img :src="bossImg" class="img" />
         </div>
       </div>
     </div>
-    <div class="car">
-      <el-row type="flex" class="row-bg" justify="space-between">
-        <el-col
-          :span="24"
-          style="font-size: 24px; line-height:80px
-"
-          >功能直通车
-        </el-col>
-      </el-row>
-      <el-row :gutter="20">
-        <el-col :span="4" v-for="(index, i) in car" :key="i">
-          <div class="grid-content" @click="$router.push(index.url)">
-            <span class="fl"> <img :src="index.img" alt="" /> </span
-            ><span class="fl craname">{{ index.name }}</span>
-          </div>
-        </el-col>
-      </el-row>
-    </div>
   </div>
 </template>
 <script>
-var elementResizeDetectorMaker = require('element-resize-detector')
-import { content } from '@/api/conversation/content.js'
+import { content as api } from '@/api/conversation/content.js'
 import echarts from 'echarts'
 export default {
   name: 'Index',
   components: {},
   data() {
     return {
-      nowTime: new Date(),
       bossImg: require('@/assets/index/boss.png'),
       car: [
         {
@@ -302,20 +218,15 @@ export default {
       ],
       table: {},
       erchatsTable: {},
-      xAxis: ['1', '2', '3', '4', '5'],
       allData: {},
       time: '昨天',
       uptime: '',
-      timeType: 'today',
-      charts: '',
-      opinionData: {
-        opinionData1: [],
-        opinionData2: [],
-        opinionData3: [],
-        opinionData4: []
-      },
-      charts: null
+      timeType: 'today'
     }
+  },
+  mounted() {
+    this.erchatInfo()
+    this.tableInfo()
   },
   methods: {
     timeTypeCheck(type) {
@@ -340,12 +251,12 @@ export default {
       }
     },
     tableInfo() {
-      content.indexTable().then((res) => {
+      api.indexTable().then((res) => {
         this.table = res.data
       })
     },
     erchatInfo() {
-      content.indexEchart().then((res) => {
+      api.indexEchart().then((res) => {
         this.allData = res.data
         this.uptime = res.data.updateTime
         this.erchatsTable = this.allData.today
@@ -358,33 +269,54 @@ export default {
         arr2: [],
         arr3: [],
         arr4: [],
-        time: []
+        xData: []
       }
+      let series = []
+      let colors = ['#088AEE', '#E74E59', '#14BF48', '#FA7216']
       this.erchatsTable.dataList.forEach((a) => {
+        data.xData.push(a.xtime)
         data.arr1.push(a.newApplyCnt)
-        data.time.push(a.xtime)
         data.arr3.push(a.newMemberCnt)
         data.arr2.push(a.newContactCnt)
         data.arr4.push(a.negativeFeedbackCnt)
       })
-      this.xAxis = data.time
-      this.drawLine('main', ['发起申请数'], data.arr1, '#088AEE')
-      this.drawLine('main2', ['新增客户数'], data.arr2, '#E74E59')
-      this.drawLine('main3', ['群新增人数'], data.arr3, '#14BF48')
-      this.drawLine('main4', ['流失客户数'], data.arr4, '#FA7216')
+
+      for (let index = 0; index < 4; index++) {
+        series.push({
+          name: data['arr' + index],
+          type: 'line',
+          stack: '总量',
+          smooth: true,
+          data: data,
+          itemStyle: {
+            normal: {
+              lineStyle: {
+                color: colors[index]
+              }
+            }
+          },
+          textStyle: {
+            color: '#fff' // 主标题文字的颜色。
+          }
+        })
+      }
+      this.drawLine(data.xData, series)
     },
-    drawLine(id, arrData, data, color) {
-      let obj = document.getElementById(id)
+    drawLine(xData, series) {
+      let obj = document.getElementById('echart')
       obj.style.width = '100%'
       obj.style.height = '380px'
-      this.charts = echarts.init(obj)
-      this.charts.setOption({
-        color: [color],
+      let charts = echarts.init(obj)
+      window.onresize = function() {
+        charts.resize()
+      }
+      charts.setOption({
+        // color: [color],
         tooltip: {
           trigger: 'axis'
         },
         legend: {
-          data: arrData
+          data: ['发起申请数', '新增客户数', '群新增人数', '流失客户数']
         },
         grid: {
           left: '3%',
@@ -395,7 +327,7 @@ export default {
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: this.xAxis,
+          data: xData,
           axisLine: {
             lineStyle: {
               color: '#ccc'
@@ -410,43 +342,9 @@ export default {
             }
           }
         },
-        series: [
-          {
-            name: arrData,
-            type: 'line',
-            stack: '总量',
-            smooth: true,
-            data: data,
-            itemStyle: {
-              normal: {
-                lineStyle: {
-                  color: color
-                }
-              }
-            },
-            textStyle: {
-              color: '#fff' // 主标题文字的颜色。
-            }
-          }
-        ]
+        series
       })
     }
-  },
-  //调用
-  mounted() {
-    this.erchatInfo()
-    this.tableInfo()
-    var erd = elementResizeDetectorMaker()
-    let that = this
-    erd.listenTo(document.getElementById('fatherbox'), function(element) {
-      var width = element.offsetWidth
-      that.$nextTick(function() {
-        this.drawLine('main')
-        this.drawLine('main2')
-        this.drawLine('main3')
-        this.drawLine('main4')
-      })
-    })
   }
 }
 </script>
@@ -482,9 +380,13 @@ export default {
     width: 100%;
     height: 380px;
     overflow-y: scroll;
+    overflow: hidden;
+    border-radius: 5px;
+    font-size: 16px;
+    background: #fff;
   }
 
-  #main {
+  #echart {
     width: 100%;
     height: 380px;
   }
@@ -647,31 +549,10 @@ export default {
 
   .dataall {
     width: 100%;
-    height: 238px;
     background: #fff;
     border-radius: 5px;
     padding: 20px;
     font-size: 16px;
-  }
-
-  .erchatsdiv {
-    width: 100%;
-    height: auto;
-    overflow: hidden;
-    border-radius: 5px;
-    font-size: 16px;
-
-    /deep/ .el-col-12 {
-      width: 49%;
-    }
-
-    .erchats {
-      margin: 0 5px;
-      height: 400px;
-      border-radius: 4px;
-      margin-bottom: 10px;
-      background: #fff;
-    }
   }
 
   .car {
