@@ -309,6 +309,7 @@ export default {
       let charts = echarts.init(obj)
       window.onresize = function() {
         charts.resize()
+        // test
       }
       charts.setOption({
         // color: [color],
