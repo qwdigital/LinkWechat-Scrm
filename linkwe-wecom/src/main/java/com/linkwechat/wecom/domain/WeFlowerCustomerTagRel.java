@@ -43,8 +43,8 @@ public class WeFlowerCustomerTagRel
     @TableField(exist = false)
     private String tagName;
 
-    /**0:移动端打的标签;1:pc端打的标签**/
-    private Integer relTagType;
+//    /**0:移动端打的标签;1:pc端打的标签**/
+//    private Integer relTagType;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;

@@ -9,15 +9,66 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="msgTemplateId"    column="msg_template_id"    />
         <result property="msgId"    column="msg_id"    />
         <result property="userId"    column="user_id"    />
+        <result property="userName"    column="user_name"    />
         <result property="externalUserid"    column="external_userid"    />
+        <result property="customerName"    column="customer_name"    />
         <result property="chatId"    column="chat_id"    />
+        <result property="chatName"    column="chat_name"    />
         <result property="status"    column="status"    />
         <result property="sendTime"    column="send_time"    />
-        <result property="createBy"    column="create_by"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="updateBy"    column="update_by"    />
-        <result property="updateTime"    column="update_time"    />
     </resultMap>
+
+    <select id="groupMsgSendResultList" resultMap="WeGroupMessageSendResultResult">
+        select
+            wgmsr.id,
+            wgmsr.msg_id,
+            wgmsr.msg_template_id,
+            wgmsr.external_userid,
+            wc.name as customer_name,
+            wgmsr.user_id,
+            wu.user_name,
+            wgmsr.chat_id,
+            wg.group_name as chat_name,
+            wgmsr.status,
+            wgmsr.send_time
+        from
+            we_group_message_send_result wgmsr
+        left join we_user wu on
+            wu.user_id = wgmsr.user_id
+        left join we_customer wc on
+            wc.external_userid = wgmsr.external_userid
+        left join we_group wg on
+            wg.chat_id = wgmsr.chat_id
+        <where>
+            <if test="id !=null">
+                and wgmsr.id = #{id}
+            </if>
+            <if test="msgTemplateId != null and msgTemplateId != ''">
+                and wgmsr.msg_template_id = #{msgTemplateId}
+            </if>
+            <if test="msgId != null and msgId != ''">
+                and wgmsr.msg_id = #{msgId}
+            </if>
+            <if test="status != null and status != ''">
+                and wgmsr.status = #{status}
+            </if>
+            <if test="customerName != null and customerName != ''">
+                and wc.name like concat('%', #{customerName}, '%')
+            </if>
+            <if test="userName != null and userName != ''">
+                and wu.user_name like concat('%', #{userName}, '%')
+            </if>
+            <if test="chatName != null and chatName != ''">
+                and wg.group_name like concat('%', #{chatName}, '%')
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(wgmsr.send_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(wgmsr.send_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+        </where>
+    </select>
 
 
 </mapper>

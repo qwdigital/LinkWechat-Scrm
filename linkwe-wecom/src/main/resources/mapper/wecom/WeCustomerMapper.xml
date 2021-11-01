@@ -129,23 +129,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="userName"    column="user_name"    />
         <result property="userId"    column="user_id"    />
         <result property="isOpenChat"    column="is_open_chat" jdbcType="INTEGER"  />
-        <collection property="weFlowerCustomerRels" ofType="com.linkwechat.wecom.domain.WeFlowerCustomerRel">
-            <result property="id"    column="wfcrId"    />
-            <result property="userId"    column="user_id"    />
-            <result property="remark"    column="remark"    />
-            <result property="description"    column="description"    />
-            <result property="createTime"    column="create_time"    />
-            <result property="remarkCorpName"    column="remark_corp_name"    />
-            <result property="operUserid"    column="oper_userid"    />
-            <result property="addWay"    column="add_way"    />
-            <result property="state"    column="state"    />
-            <result property="status"    column="status"    />
-            <result property="userName" column="user_name"/>
-            <result property="department" column="department"/>
-            <collection property="weFlowerCustomerTagRels" javaType="ArrayList"
-                        column="{id = wfcrId}" select="selectWeCustomerTags">
-            </collection>
-        </collection>
+<!--        <collection property="weFlowerCustomerRels" ofType="com.linkwechat.wecom.domain.WeFlowerCustomerRel">-->
+<!--            <result property="id"    column="wfcrId"    />-->
+<!--            <result property="userId"    column="user_id"    />-->
+<!--            <result property="remark"    column="remark"    />-->
+<!--            <result property="description"    column="description"    />-->
+<!--            <result property="createTime"    column="create_time"    />-->
+<!--            <result property="remarkCorpName"    column="remark_corp_name"    />-->
+<!--            <result property="operUserid"    column="oper_userid"    />-->
+<!--            <result property="addWay"    column="add_way"    />-->
+<!--            <result property="state"    column="state"    />-->
+<!--            <result property="status"    column="status"    />-->
+<!--            <result property="userName" column="user_name"/>-->
+<!--            <result property="department" column="department"/>-->
+<!--            <collection property="weFlowerCustomerTagRels" javaType="ArrayList"-->
+<!--                        column="{id = wfcrId}" select="selectWeCustomerTags">-->
+<!--            </collection>-->
+<!--        </collection>-->
     </resultMap>
     
     
@@ -298,7 +298,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         FROM
         we_customer wc
         LEFT JOIN we_user wu ON wc.first_user_id=wu.user_id
-        LEFT JOIN we_flower_customer_tag_rel wfctr ON wfctr.external_userid=wc.external_userid AND  wfctr.user_id=wc.first_user_id
+        LEFT JOIN we_flower_customer_tag_rel wfctr ON wfctr.del_flag=0 AND wfctr.external_userid=wc.external_userid AND  wfctr.user_id=wc.first_user_id
         LEFT JOIN we_tag wt ON wt.tag_id=wfctr.tag_id
         <where>
             <if test="delFlag != null">
@@ -407,44 +407,33 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 
     <select id="getCustomersByUserId" resultMap="WeCustomerResult">
-          SELECT
-                  wc.external_userid,
-                  wc.`name`,
-                  wc.avatar,
-                  wc.type,
-                  wc.gender,
-                  wc.unionid,
-                  wc.birthday,
-                  wc.corp_name,
-                  wc.corp_full_name,
-                  wc.position,
-                  wc.is_open_chat,
-                  wfcr.id as wfcrId,
-                  wfcr.user_id,
-                  wfcr.remark,
-                  wfcr.description,
-                  wfcr.create_time,
-                  wfcr.remark_corp_name,
-                  wfcr.oper_userid,
-                  wfcr.add_way,
-                  wfcr.state,
-                  wu.user_name,
-                  wfcrf.flower_customer_rel_id,
-                  wt.tag_id,
-                  wt.create_time,
-                  wt.`name` as tagName,
-                  (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department
+        SELECT
+            wc.external_userid,
+            wc.`name`,
+            wc.avatar,
+            wc.type,
+            wc.gender,
+            wc.unionid,
+            wc.birthday,
+            wc.corp_name,
+            wc.corp_full_name,
+            wc.position,
+            wc.is_open_chat,
+            wu.user_name,
+            wt.tag_id,
+            wt.create_time,
+            wt.`name` as tagName,
+            (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department
         FROM
-            we_customer wc
-        LEFT JOIN we_flower_customer_rel wfcr ON wc.first_user_id=wfcr.user_id
-        LEFT JOIN we_user wu ON wu.user_id=wfcr.user_id
-        LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.flower_customer_rel_id = wfcr.id
+        we_customer wc
+        LEFT JOIN we_user wu ON wu.user_id=wc.first_user_id
+        LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.user_id = wc.first_user_id
         LEFT JOIN we_tag wt ON wt.tag_id = wfcrf.tag_id
         WHERE wc.external_userid=#{externalUserid}
         <if test="userId != null and userId !=''">
-          AND wfcr.user_id=#{userId}
+          AND wc.first_user_id=#{userId}
         </if>
-        ORDER BY wfcr.create_time ASC limit 1
+        ORDER BY wc.create_time ASC limit 1
     </select>
 
 

@@ -16,6 +16,7 @@ import com.linkwechat.wecom.domain.query.WeAddMsgTemplateQuery;
 import com.linkwechat.wecom.service.IWeGroupMessageAttachmentsService;
 import com.linkwechat.wecom.service.IWeGroupMessageListService;
 import com.linkwechat.wecom.service.IWeGroupMessageSendResultService;
+import com.linkwechat.wecom.service.IWeGroupMessageTaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,9 @@ public class PullGroupMessageTask {
 
     @Autowired
     private IWeGroupMessageSendResultService sendResultService;
+
+    @Autowired
+    private IWeGroupMessageTaskService iWeGroupMessageTaskService;
 
     /**
      * 同步开始时间
@@ -180,7 +184,7 @@ public class PullGroupMessageTask {
         List<WeGroupMessageSendResult> list = new ArrayList<>();
         Optional.ofNullable(groupMsgList).map(WeGroupMsgListDto::getGroupMsgList)
                 .orElseGet(ArrayList::new).forEach(weGroupMsg -> {
-            WeGroupMsgListDto groupMsgTask = groupMessageListService.getGroupMsgTask(weGroupMsg.getMsgId(), null);
+            WeGroupMsgListDto groupMsgTask = iWeGroupMessageTaskService.getGroupMsgTask(weGroupMsg.getMsgId(), null);
             Optional.ofNullable(groupMsgTask).map(WeGroupMsgListDto::getTaskList).orElseGet(ArrayList::new).forEach(msgTask -> {
                 WeGroupMsgListDto groupMsgSendResult = sendResultService.getGroupMsgSendResult(weGroupMsg.getMsgId(), msgTask.getUserId(), null);
                 Optional.ofNullable(groupMsgSendResult).map(WeGroupMsgListDto::getSendList).orElseGet(ArrayList::new).forEach(sendResult -> {

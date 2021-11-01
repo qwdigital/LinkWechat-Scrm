@@ -3,6 +3,8 @@ package com.linkwechat.wecom.mapper;
 import com.linkwechat.wecom.domain.WeGroupMessageSendResult;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 /**
  * 群发消息成员执行结果Mapper接口
  *
@@ -11,4 +13,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface WeGroupMessageSendResultMapper extends BaseMapper<WeGroupMessageSendResult> {
 
+    List<WeGroupMessageSendResult> groupMsgSendResultList(WeGroupMessageSendResult sendResult);
 }

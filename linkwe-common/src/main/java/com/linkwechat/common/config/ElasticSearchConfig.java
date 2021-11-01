@@ -1,4 +1,4 @@
-/*
+package com.linkwechat.common.config;/*
 package com.linkwechat.common.config;
 
 import org.apache.http.HttpHost;

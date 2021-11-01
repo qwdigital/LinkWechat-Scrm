@@ -9,13 +9,45 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="msgTemplateId"    column="msg_template_id"    />
         <result property="msgId"    column="msg_id"    />
         <result property="userId"    column="user_id"    />
+        <result property="userName"    column="user_name"    />
         <result property="status"    column="status"    />
         <result property="sendTime"    column="send_time"    />
-        <result property="createBy"    column="create_by"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="updateBy"    column="update_by"    />
-        <result property="updateTime"    column="update_time"    />
     </resultMap>
+    <select id="groupMsgTaskList" resultMap="WeGroupMessageTaskResult">
+        select
+            wgmt.id,
+            wgmt.msg_template_id,
+            wgmt.msg_id,
+            wgmt.user_id,
+            wu.user_name,
+            wgmt.status,
+            wgmt.send_time
+        from we_group_message_task wgmt
+            left join we_user wu on wu.user_id = wgmt.user_id
+        <where>
+            <if test="id != null">
+                and wgmt.id = #{id}
+            </if>
+            <if test="msgId != null and msgId != ''">
+                and wgmt.msg_id = #{msgId}
+            </if>
+            <if test="msgTemplateId != null and msgTemplateId != ''">
+                and wgmt.msg_template_id = #{msgTemplateId}
+            </if>
+            <if test="userName != null and userName != ''">
+                and wu.user_name like concat('%', #{userName}, '%')
+            </if>
+            <if test="status != null">
+                and wgmt.status = #{status}
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(wgmt.send_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(wgmt.send_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+        </where>
+    </select>
 
 
 </mapper>

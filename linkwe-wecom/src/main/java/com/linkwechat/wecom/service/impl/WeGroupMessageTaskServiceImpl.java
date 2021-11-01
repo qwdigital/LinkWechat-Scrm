@@ -64,4 +64,9 @@ public class WeGroupMessageTaskServiceImpl extends ServiceImpl<WeGroupMessageTas
             });
         }
     }
+
+    @Override
+    public List<WeGroupMessageTask> groupMsgTaskList(WeGroupMessageTask task) {
+        return this.baseMapper.groupMsgTaskList(task);
+    }
 }

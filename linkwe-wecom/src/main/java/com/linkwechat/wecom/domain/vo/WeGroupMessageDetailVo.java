@@ -2,8 +2,6 @@ package com.linkwechat.wecom.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.wecom.domain.WeGroupMessageAttachments;
-import com.linkwechat.wecom.domain.WeGroupMessageSendResult;
-import com.linkwechat.wecom.domain.WeGroupMessageTask;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -29,21 +27,25 @@ public class WeGroupMessageDetailVo {
     @ApiModelProperty("发送时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date sendTime;
-    /**
-     * 附件
-     */
+
     @ApiModelProperty("附件")
     private List<WeGroupMessageAttachments> attachments;
 
-    /**
-     * 待发送者列表
-     */
-    @ApiModelProperty("待发送者列表")
-    private List<WeGroupMessageTaskVo> toBeSentList;
+    @ApiModelProperty("待发送者数")
+    private Integer toBeSendNum;
 
-    /**
-     * 已发送者列表
-     */
+    @ApiModelProperty("待发送者列表")
+    private List<WeGroupMessageTaskVo> toBeSendList;
+
+    @ApiModelProperty("已发送者数量")
+    private Integer alreadySendNum;
+
     @ApiModelProperty("已发送者列表")
-    private List<WeGroupMessageTaskVo> alreadySentList;
+    private List<WeGroupMessageTaskVo> alreadySendList;
+
+    @ApiModelProperty("已送达客户数")
+    private Integer alreadySendCustomerNum;
+
+    @ApiModelProperty("未送达客户数")
+    private Integer toBeSendCustomerNum;
 }

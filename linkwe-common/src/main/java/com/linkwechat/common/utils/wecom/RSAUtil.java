@@ -64,7 +64,7 @@ public class RSAUtil {
      */
     public static String decryptRSA(String str, PrivateKey privateKey) throws NoSuchPaddingException,
             NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException {
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        Security.addProvider(new BouncyCastleProvider());
         Cipher rsa = Cipher.getInstance("RSA/ECB/PKCS1Padding", "BC");
         rsa.init(Cipher.DECRYPT_MODE, privateKey);
         byte[] utf8 = rsa.doFinal(Base64.getDecoder().decode(str));

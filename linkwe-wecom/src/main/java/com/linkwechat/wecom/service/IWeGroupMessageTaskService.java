@@ -28,4 +28,6 @@ public interface IWeGroupMessageTaskService extends IService<WeGroupMessageTask>
      * @param taskList
      */
     void addOrUpdateBatchByCondition(List<WeGroupMessageTask> taskList);
+
+    List<WeGroupMessageTask> groupMsgTaskList(WeGroupMessageTask task);
 }
