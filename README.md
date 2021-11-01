@@ -2,15 +2,16 @@
 <p></p>
 
 <p align="center">
-  <img alt="logo" src="https://images.gitee.com/uploads/images/2021/0107/210318_e1f66c96_1480777.png" width="120" style="margin-bottom: 0px;">
+  <img alt="logo" src="https://images.gitee.com/uploads/images/2021/1101/010135_60061e4a_1480777.png" style="margin-bottom: 0px;">
 </p>
-<h2 align="center">LinkWeChat —— 让每个企业都是私域流量营销专家</h2>
 
 <div align="center">
 
 [![star](https://gitee.com/LinkWeChat/link-wechat/badge/star.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/stargazers)
 [![fork](https://gitee.com/LinkWeChat/link-wechat/badge/fork.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/members)
-![license](http://img.shields.io/badge/license-GPL%203.0-green)
+![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V1.5-brightgreen)
+![license](http://img.shields.io/badge/license-GPL%203.0-orange)
+
 
 </div>
 
@@ -19,36 +20,35 @@
 <p></p>
 <p></p>
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/233450_65d03349_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_00.png")
-
 ---
 
- **如果您觉得我们的开源项目很有帮助，请帮忙点击右上方的  :star: Star ，您的认可就是我们最大的动力，谢谢支持！:heart:** 
+ **<p align="center">如果您觉得我们的开源项目很有帮助，请帮忙点击右上方的  :star: Star ，您的认可就是我们最大的动力，谢谢支持！:heart:</p>** 
 
 ---
 
 [LinkWeChat 官方帮助手册——语雀](https://www.yuque.com/linkwechat/help)
 
-### 平台简介
+### 产品简介
 
-> LinkWeChat, Link to WeChat
+> LinkWeChat, Link to WeChat.
 
-LinkWeChat 是一款基于人工智能的企业微信 SCRM 系统，为企业构建私域流量营销系统的综合解决方案，助力企业提高社交客户运营效率。
+基于人工智能的企业微信 SCRM 系统——LinkWeChat基于企业微信开放能力，不仅集成了企微基础的客户管理和后台管理功能，而且通过引流获客、客情维系、社群运营等灵活高效的客户运营模块，让客户与企业之间建立强链接关系，同时进一步通过多元化的客户营销工具，帮助企业提高客户运营效率，强化营销能力，拓展盈利空间，是企业私域流量管理与营销的综合解决方案。
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/234154_394dea33_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_12.png")
-
-#### 应用场景
-
-主要应用与泛零售、电商、金融等行业企业微信用户，提供多种工具、多渠道、多方式添加客户为企业微信好友，并通过营销互动与客户标签管理等建立强连接。
+![输入图片说明](https://images.gitee.com/uploads/images/2021/1101/012040_64b8b918_1480777.png "仟微助手企业微信SCRM智能营销系统-V1.5_13.png")
 
 #### 功能特性
 
-四大模块助力企业营销能力升级：
+系统分为八大模块：
 
-* 客户管理：搭建私域流量池，高效运营客户
-* 引流获客：多渠道引流，实现精准获客
-* 会话存档：会话合规存档，提供多重服务保障
-* 营销中心：多类型营销工具，实现场景化营销
+*   **运营中心** ：客户、客群、会话等全功能数据报表，数据一目了然；
+*   **引流获客** ：活码、群活码、公海、客服等多渠道引流，实现精准获客；
+*   **客户中心** ：助力企业搭建私域流量池，高效运营客户；
+*   **客情维系** ：企业客户运营精细化，朋友圈、红包工具提高客户活跃度；
+*   **社群运营** ：客群运营场景全覆盖，快速拉群；
+*   **全能营销** ：提供多类型、多场景客户营销工具；
+*   **企业风控** ：会话合规存档，敏感内容全局风控；
+*   **企业管理** ：组织架构、自建应用全融合，实现“一个后台”；
+
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/232207_6a0f4a67_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_13.png")
 
