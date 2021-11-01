@@ -254,14 +254,12 @@ export default {
       time: '昨天',
       uptime: '',
       timeType: 'today',
-      charts: '',
       opinionData: {
         opinionData1: [],
         opinionData2: [],
         opinionData3: [],
         opinionData4: []
-      },
-      charts: null
+      }
     }
   },
   methods: {
@@ -315,6 +313,7 @@ export default {
         data.arr4.push(a.negativeFeedbackCnt)
       })
       this.xAxis = data.time
+      this.resizeArr = []
       this.drawLine('main', ['发起申请数'], data.arr1, '#088AEE')
       this.drawLine('main2', ['新增客户数'], data.arr2, '#E74E59')
       this.drawLine('main3', ['群新增人数'], data.arr3, '#14BF48')
@@ -324,12 +323,22 @@ export default {
       let obj = document.getElementById(id)
       obj.style.width = '100%'
       obj.style.height = '380px'
-      this.charts = echarts.init(obj)
-      window.onresize = function() {
-        charts.resize()
-        // test
+      let charts = echarts.init(obj)
+      this.resizeArr.push(charts)
+
+      let resize = function() {
+        this.resizeArr.forEach((element) => {
+          element.resize()
+        })
       }
-      this.charts.setOption({
+      function debounce(method, context) {
+        clearTimeout(method.tId)
+        method.tId = setTimeout(function() {
+          method.call(context)
+        }, 100)
+      }
+      window.onresize = debounce.bind(this, resize, this)
+      charts.setOption({
         color: [color],
         tooltip: {
           trigger: 'axis'
