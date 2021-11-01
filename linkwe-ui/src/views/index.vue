@@ -7,7 +7,10 @@
       <div class="tables">
         <div style="text-align:left">
           <el-row type="flex" class="row-bg" justify="space-between">
-            <el-col :span="24" class="title_name">数据总览</el-col>
+            <el-col :span="24" class="title_name"
+              >数据总览
+              <span class=" fontgay">最近更新：{{ uptime }}</span>
+            </el-col>
           </el-row>
           <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:35px; text-align: center;">
             <el-col :span="6" class="col_style">企业成员总数</el-col>
@@ -31,9 +34,7 @@
       <div class="dataall" style="margin-top:10px">
         <div style="text-align:left">
           <el-row type="flex" class="row-bg" justify="space-between">
-            <el-col :span="10" class="title_name"
-              >实时数据 <span class=" fontgay">更新于{{ uptime }}</span></el-col
-            >
+            <el-col :span="10" class="title_name">数据趋势</el-col>
             <el-col :span="10" style="text-align:right">
               <el-radio-group v-model="timeType" style="margin-top: 20px;" @change="timeTypeCheck">
                 <el-radio-button label="today">今日</el-radio-button>
@@ -105,24 +106,26 @@
         </div>
       </div>
 
-      <div class="car">
-        <el-row type="flex" class="row-bg" justify="space-between">
+      <div class="car card">
+        <el-row type="flex" justify="space-between">
           <el-col
             :span="24"
             style="font-size: 24px; line-height:80px
 "
-            >功能直通车
+            >快捷功能
           </el-col>
         </el-row>
         <el-row :gutter="20">
-          <el-col :span="4" v-for="(index, i) in car" :key="i">
+          <el-col :span="6" v-for="(index, i) in car" :key="i">
             <div class="grid-content" @click="$router.push(index.url)">
-              <span class="fl"> <img :src="index.img" alt="" /> </span><span class="fl craname">{{ index.name }}</span>
+              <div class="ac"><img :src="index.img" alt="" /></div>
+              <div class="ac craname">{{ index.name }}</div>
             </div>
           </el-col>
         </el-row>
       </div>
     </div>
+
     <div class="index_r whitebg">
       <div class="qy_R">
         <div class="inedx_r_top_t">
@@ -186,32 +189,42 @@ export default {
       bossImg: require('@/assets/index/boss.png'),
       car: [
         {
-          name: '客户管理',
+          name: '企业客户',
           url: '/customerManage/customer',
           img: require('@/assets/index/kehgl.png')
         },
         {
-          name: '内容存档',
+          name: '员工活码',
           url: '/conversation/content',
           img: require('@/assets/index/neircd.png')
         },
         {
-          name: '任务宝',
+          name: '新增群发',
           url: '/appTool/task',
           img: require('@/assets/index/renwb.png')
         },
         {
-          name: '消息群发',
+          name: '任务宝',
           url: '/groupMessage/add',
           img: require('@/assets/index/xiaoxqf.png')
         },
         {
-          name: '员工活码',
+          name: '新客拉群',
           url: '/drainageCode/staff',
           img: require('@/assets/index/yuanghm.png')
         },
         {
-          name: '字典管理',
+          name: '素材中心',
+          url: '/system/dict',
+          img: require('@/assets/index/zidgl.png')
+        },
+        {
+          name: '关键词群',
+          url: '/drainageCode/staff',
+          img: require('@/assets/index/yuanghm.png')
+        },
+        {
+          name: '任务宝',
           url: '/system/dict',
           img: require('@/assets/index/zidgl.png')
         }
@@ -557,32 +570,34 @@ export default {
   }
 
   .car {
-    height: 200px;
-    margin-top: 40px;
-    width: 100%;
-    overflow: hidden;
     line-height: 70px;
 
     .grid-content {
       overflow: hidden;
-      height: 70px;
       background: #fff;
       border-radius: 5px;
       padding: 10px 30px;
 
       .craname {
-        height: 50px;
         line-height: 50px;
         font-size: 16px;
-        display: block;
-        text-indent: 1em;
       }
 
       img {
-        width: 30px;
-        height: 30px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #eee;
       }
     }
   }
+}
+
+.card {
+  margin-top: 40px;
+  background: #fff;
+  border-radius: 5px;
+  padding: 20px;
+  font-size: 16px;
 }
 </style>
