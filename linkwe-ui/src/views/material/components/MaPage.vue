@@ -163,10 +163,7 @@ export default {
     edit(data, type) {
       switch (type) {
         case 5:
-          // 清除编辑的数据
-          this.$parent.posterSubassemblyList = []
-          this.$parent.dialog.edit = true
-          this.$parent.initPoster()
+          this.$parent.edit()
           break
         default:
           this.form = Object.assign({}, data || { categoryId: this.query.categoryId })
