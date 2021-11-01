@@ -371,9 +371,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Override
     public List<WeUser> getCustomersByUserId(String externalUserid) {
         String userId=null;
-        if(Constants.USER_TYPE_WECOME.equals(SecurityUtils.getLoginUser().getUser().getUserType())){
-             userId=SecurityUtils.getLoginUser().getUser().getWeUserId();
-        }
+//        if(Constants.USER_TYPE_WECOME.equals(SecurityUtils.getLoginUser().getUser().getUserType())){
+//             userId=SecurityUtils.getLoginUser().getUser().getWeUserId();
+//        }
         return this.baseMapper.getCustomersByUserId(externalUserid,userId);
     }
 
