@@ -9,12 +9,7 @@
           <el-row type="flex" class="row-bg" justify="space-between">
             <el-col :span="24" class="title_name">数据总览</el-col>
           </el-row>
-          <el-row
-            type="flex"
-            class="row-bg"
-            justify="space-between"
-            style="margin-top:35px; text-align: center;"
-          >
+          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:35px; text-align: center;">
             <el-col :span="6" class="col_style">企业成员总数</el-col>
             <el-col :span="6" class="col_style">客户总人数</el-col>
             <el-col :span="6" class="col_style">客户群总数</el-col>
@@ -40,27 +35,16 @@
               >实时数据 <span class=" fontgay">更新于{{ uptime }}</span></el-col
             >
             <el-col :span="10" style="text-align:right">
-              <el-radio-group
-                v-model="timeType"
-                style="margin-top: 20px;"
-                @change="timeTypeCheck"
-              >
+              <el-radio-group v-model="timeType" style="margin-top: 20px;" @change="timeTypeCheck">
                 <el-radio-button label="today">今日</el-radio-button>
                 <el-radio-button label="week">本周</el-radio-button>
                 <el-radio-button label="month">本月</el-radio-button>
-                <el-radio-button label="reset"
-                  ><i class="el-icon-refresh"> </i
-                ></el-radio-button>
+                <el-radio-button label="reset"><i class="el-icon-refresh"> </i></el-radio-button>
               </el-radio-group>
             </el-col>
           </el-row>
 
-          <el-row
-            type="flex"
-            class="row-bg"
-            justify="space-between"
-            style="margin-top:30px; text-align: center;"
-          >
+          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:30px; text-align: center;">
             <el-col :span="6">发起申请数</el-col>
             <el-col :span="6">新增客户数</el-col>
             <el-col :span="6">群新增人数</el-col>
@@ -74,17 +58,10 @@
           >
             <el-col :span="6">{{ erchatsTable.newApplyCnt }}</el-col>
             <el-col :span="6">{{ erchatsTable.newContactCnt }}</el-col>
-            <el-col :span="6">{{
-              erchatsTable.newMemberCnt ? erchatsTable.newMemberCnt : 0
-            }}</el-col>
+            <el-col :span="6">{{ erchatsTable.newMemberCnt ? erchatsTable.newMemberCnt : 0 }}</el-col>
             <el-col :span="6">{{ erchatsTable.negativeFeedbackCnt }}</el-col>
           </el-row>
-          <el-row
-            type="flex"
-            class="row-bg"
-            justify="space-between"
-            style="margin-top:10px; text-align: center;"
-          >
+          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:10px; text-align: center;">
             <el-col
               :span="6"
               :class="{
@@ -110,11 +87,7 @@
                 redicon: Number(erchatsTable.newMemberCntDiff) < 0
               }"
               >较{{ time }}
-              <span>{{
-                erchatsTable.newMemberCntDiff
-                  ? erchatsTable.newMemberCntDiff
-                  : 0
-              }}</span>
+              <span>{{ erchatsTable.newMemberCntDiff ? erchatsTable.newMemberCntDiff : 0 }}</span>
             </el-col>
             <el-col
               :span="6"
@@ -169,39 +142,21 @@
           <p class="p1">{{ $store.state.user.companyName }}，欢迎登陆本系统</p>
           <p class="p2">登录时间：{{ parseTime(new Date()) }}</p>
           <p class="p1 p3 margint20">LinkWechat 企业微信SCRM</p>
-          <p class="p2 p4">
-            版本信息：开源 <span class="fr">可用期限：永久</span>
-          </p>
-          <el-row
-            :gutter="20"
-            type="flex"
-            class="row-bg"
-            justify="center"
-            style="text-align:center"
-          >
+          <p class="p2 p4">版本信息：开源 <span class="fr">可用期限：永久</span></p>
+          <el-row :gutter="20" type="flex" class="row-bg" justify="center" style="text-align:center">
             <el-col :span="10" class="flexspan">
               <img src="../assets/index/bzwd.png" />
               <a href="https://www.yuque.com/linkwechat/help"> 帮助手册</a>
             </el-col>
             <el-col :span="2"></el-col>
-            <el-col
-              :span="10"
-              class="flexspan"
-              @click.native="msgInfo('《使用手册》正在加急上线中，敬请关注…')"
+            <el-col :span="10" class="flexspan" @click.native="msgInfo('《使用手册》正在加急上线中，敬请关注…')"
               ><img src="../assets/index/kfsc.png" /> 开发文档</el-col
             >
           </el-row>
         </div>
         <div class="inedx_r_top_bottom">
-          <span class="inedx_r_top_bottomp1"
-            ><img src="../assets/index/gxrz.png" /> 更新日志</span
-          >
-          <span
-            class="fr"
-            style="color:#0079DE"
-            @click="msgInfo('《更新日志》正在加急上线中，敬请关注…')"
-            >更多</span
-          >
+          <span class="inedx_r_top_bottomp1"><img src="../assets/index/gxrz.png" /> 更新日志</span>
+          <span class="fr" style="color:#0079DE" @click="msgInfo('《更新日志》正在加急上线中，敬请关注…')">更多</span>
           <ul>
             <li v-for="(index, i) in 3" :key="i" @click="msgInfo('暂无内容')">
               即将上线，敬请期待 <span class="fr">03-26</span>
@@ -209,9 +164,7 @@
           </ul>
         </div>
         <div class="inedx_r_top_bottom">
-          <span class="inedx_r_top_bottomp1"
-            ><img src="../assets/index/qyxy.png" /> 私域学院</span
-          >
+          <span class="inedx_r_top_bottomp1"><img src="../assets/index/qyxy.png" /> 私域学院</span>
           <span class="fr" style="color:#0079DE">更多</span>
           <ul>
             <li v-for="(index, i) in 3" :key="i" @click="msgInfo('暂无内容')">
@@ -221,17 +174,13 @@
         </div>
         <div class="inedx_r_top_bottom" style="text-align:center">
           <p style="text-align:left">
-            <span class="inedx_r_top_bottomp1">
-              <img src="../assets/index/kfq.png" /> 官方交流</span
-            >
+            <span class="inedx_r_top_bottomp1"> <img src="../assets/index/kfq.png" /> 官方交流</span>
           </p>
           <img :src="bossImg" class="img" />
         </div>
         <div class="inedx_r_top_bottom" style="text-align:center">
           <p style="text-align:left">
-            <span class="inedx_r_top_bottomp1">
-              <img src="../assets/index/khq.png" /> 联系客服</span
-            >
+            <span class="inedx_r_top_bottomp1"> <img src="../assets/index/khq.png" /> 联系客服</span>
           </p>
           <img :src="bossImg" class="img" />
         </div>
@@ -249,8 +198,7 @@
       <el-row :gutter="20">
         <el-col :span="4" v-for="(index, i) in car" :key="i">
           <div class="grid-content" @click="$router.push(index.url)">
-            <span class="fl"> <img :src="index.img" alt="" /> </span
-            ><span class="fl craname">{{ index.name }}</span>
+            <span class="fl"> <img :src="index.img" alt="" /> </span><span class="fl craname">{{ index.name }}</span>
           </div>
         </el-col>
       </el-row>
@@ -258,7 +206,6 @@
   </div>
 </template>
 <script>
-var elementResizeDetectorMaker = require('element-resize-detector')
 import { content } from '@/api/conversation/content.js'
 import echarts from 'echarts'
 export default {
@@ -436,17 +383,6 @@ export default {
   mounted() {
     this.erchatInfo()
     this.tableInfo()
-    var erd = elementResizeDetectorMaker()
-    let that = this
-    erd.listenTo(document.getElementById('fatherbox'), function(element) {
-      var width = element.offsetWidth
-      that.$nextTick(function() {
-        this.drawLine('main')
-        this.drawLine('main2')
-        this.drawLine('main3')
-        this.drawLine('main4')
-      })
-    })
   }
 }
 </script>
