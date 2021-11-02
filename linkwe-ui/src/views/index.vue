@@ -24,10 +24,10 @@
             justify="space-between"
             style="margin-top:10px;font-size:35px;font-weight:bold;color:#0079DE; text-align: center;"
           >
-            <el-col :span="6">{{ table.customerCount }}</el-col>
-            <el-col :span="6">{{ table.groupMemberCount }}</el-col>
-            <el-col :span="6">{{ table.groupCount }}</el-col>
             <el-col :span="6">{{ table.userCount }}</el-col>
+            <el-col :span="6">{{ table.customerCount }}</el-col>
+            <el-col :span="6">{{ table.groupCount }}</el-col>
+            <el-col :span="6">{{ table.groupMemberCount }}</el-col>
           </el-row>
         </div>
       </div>

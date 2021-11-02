@@ -93,4 +93,8 @@ public enum MessageType {
         return Stream.of(values()).filter(s -> s.type.equals(type)).findFirst();
     }
 
+    public static MessageType messageTypeOf(String messageType) {
+        return Stream.of(values()).filter(s -> s.messageType.equals(messageType)).findFirst().get();
+    }
+
 }

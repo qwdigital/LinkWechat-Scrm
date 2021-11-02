@@ -97,6 +97,14 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
             List<WeGroupMessageTask> alreadySent = groupMsgDetail.stream().map(WeGroupMessageListVo::getSenders)
                     .flatMap(Collection::stream).filter(item -> ObjectUtil.equal(2, item.getStatus())).collect(Collectors.toList());
 
+            //未发送客户数
+            Long toBeCustomerNum = groupMsgDetail.stream().map(WeGroupMessageListVo::getExtralInfos).flatMap(Collection::stream)
+                    .filter(item -> ObjectUtil.equal(0, item.getStatus())).count();
+            detailVo.setToBeSendCustomerNum(toBeCustomerNum.intValue());
+            //已发送客户数
+            Long alreadyCustomerNum = groupMsgDetail.stream().map(WeGroupMessageListVo::getExtralInfos).flatMap(Collection::stream)
+                    .filter(item -> !ObjectUtil.equal(1, item.getStatus())).count();
+            detailVo.setAlreadySendCustomerNum(alreadyCustomerNum.intValue());
             //未发送查询每个人员对应客户信息
             if (CollectionUtil.isNotEmpty(toBeSent)) {
                 List<WeGroupMessageTaskVo> toBeSentList = toBeSent.stream().map(userInfo -> {
@@ -118,7 +126,8 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                     }
                     return weGroupMessageTaskVo;
                 }).collect(Collectors.toList());
-                detailVo.setToBeSentList(toBeSentList);
+                detailVo.setToBeSendList(toBeSentList);
+                detailVo.setToBeSendNum(toBeSentList.size());
             }
             //已发送查询每个人员对应客户信息
             if (CollectionUtil.isNotEmpty(alreadySent)) {
@@ -142,7 +151,8 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                     }
                     return weGroupMessageTaskVo;
                 }).collect(Collectors.toList());
-                detailVo.setAlreadySentList(alreadySentList);
+                detailVo.setAlreadySendList(alreadySentList);
+                detailVo.setAlreadySendNum(alreadySentList.size());
             }
         }
         return detailVo;
@@ -288,4 +298,13 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
         messageSendResultService.addOrUpdateBatchByCondition(sendResultlist);
     }
 
+    @Override
+    public List<WeGroupMessageTask> groupMsgTaskList(WeGroupMessageTask task) {
+        return messageTaskService.groupMsgTaskList(task);
+    }
+
+    @Override
+    public List<WeGroupMessageSendResult> groupMsgSendResultList(WeGroupMessageSendResult sendResult) {
+        return messageSendResultService.groupMsgSendResultList(sendResult);
+    }
 }

@@ -93,4 +93,9 @@ public class WeGroupMessageSendResultServiceImpl extends ServiceImpl<WeGroupMess
             });
         }
     }
+
+    @Override
+    public List<WeGroupMessageSendResult> groupMsgSendResultList(WeGroupMessageSendResult sendResult) {
+        return this.baseMapper.groupMsgSendResultList(sendResult);
+    }
 }
