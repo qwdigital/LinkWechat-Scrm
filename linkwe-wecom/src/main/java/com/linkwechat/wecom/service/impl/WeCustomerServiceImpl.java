@@ -56,11 +56,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
 
-    @Autowired
-    private WeCropTagClient weCropTagClient;
-
-    @Autowired
-    private IWeTagService iWeTagService;
 
 
     @Autowired
@@ -242,10 +237,17 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         List<WeCustomer> allocateWeCustomers = this.list(new LambdaQueryWrapper<WeCustomer>()
                 .eq(WeCustomer::getFirstUserId, weLeaveUserInfoAllocateVo.getHandoverUserid()));
         if(CollectionUtil.isNotEmpty(allocateWeCustomers)){
-            if(this.update(WeCustomer.builder()
-                    .firstUserId(weLeaveUserInfoAllocateVo.getTakeoverUserid())
-                    .build(),new LambdaQueryWrapper<WeCustomer>()
-                    .eq(WeCustomer::getFirstUserId,weLeaveUserInfoAllocateVo.getHandoverUserid()))){//接手客户
+            //删除原有的
+            this.baseMapper.deleteWeCustomerByUserIds(
+                    new String[]{weLeaveUserInfoAllocateVo.getHandoverUserid()}
+            );
+            allocateWeCustomers.stream().forEach(k->{
+                k.setFirstUserId(weLeaveUserInfoAllocateVo.getTakeoverUserid());
+            });
+            //新增
+            this.baseMapper.batchAddOrUpdate(
+                    allocateWeCustomers
+            );
                 //记录接受离职表
                 List<WeAllocateCustomer> weAllocateCustomers = new ArrayList<>();
                 allocateWeCustomers.stream().forEach(k->{
@@ -271,12 +273,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                 .build());
                 }
 
-
-
             }
-
-
-        }
 
 
     }
@@ -331,13 +328,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 );
             });
 
-            if(iWeFlowerCustomerTagRelService.saveBatch(newTagRels)){
+                iWeFlowerCustomerTagRelService.batchAddOrUpdate(newTagRels);
 
                 weCustomerClient.makeCustomerLabel(
                         cutomerTagEdit
                 );
 
-            }
         }else{//为空，取消当前客户所有标签
             List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = iWeFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
                     .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid())

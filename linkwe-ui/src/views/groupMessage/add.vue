@@ -58,19 +58,21 @@ export default {
   computed: {
     // 是否显示选择的客户标签
     isOnlyTag() {
-      return this.form.tag[0] && this.form.pushType == 0
+      return this.form.tag[0] && this.form.pushType == 0 && this.form.pushRange == 1
     },
     // 是否显示选择范围后的文字说明
     isSelectedText() {
-      return this.userParty[0] || this.isOnlyTag
+      return this.userParty[0] || this.isOnlyTag || this.form.pushRange == 0
     },
     // 选择范围后的文字说明
     selectedText() {
-      return `将发送消息给${
-        this.userParty[0] ? this.userParty[0].name + '等部门或成员的' : ''
-      }${this.userParty[0] && this.isOnlyTag ? '，且' : ''}${
-        this.isOnlyTag ? '满足' + this.form.tag[0].name + '等标签的' : ''
-      }${this.form.pushType == 0 ? '客户' : '客户群'}`
+      return this.form.pushType == 0 && this.form.pushRange == 0
+        ? '全部客户'
+        : `将发送消息给${this.userParty[0] ? this.userParty[0].name + '等部门或成员的' : ''}${
+            this.userParty[0] && this.isOnlyTag ? '，且' : ''
+          }${this.isOnlyTag ? '满足' + this.form.tag[0].name + '等标签的' : ''}${
+            this.form.pushType == 0 ? '客户' : '客户群'
+          }`
     }
   },
   created() {
@@ -108,11 +110,7 @@ export default {
   methods: {
     // 显示选择客户范围弹窗
     showRangeDialog() {
-      this[
-        this.form.pushType == 0
-          ? 'dialogVisibleSelectCustomer'
-          : 'dialogVisibleSelectUser'
-      ] = true
+      this[this.form.pushType == 0 ? 'dialogVisibleSelectCustomer' : 'dialogVisibleSelectUser'] = true
     },
     // 选择添加人确认按钮
     selectedUser(users) {
@@ -191,31 +189,16 @@ export default {
 <template>
   <div v-loading="loading">
     <div class="flex content-wrap">
-      <el-form
-        style="margin-right: 170px;"
-        ref="form"
-        :model="form"
-        :rules="rules"
-        label-width="80px"
-      >
+      <el-form style="margin-right: 170px;" ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="群发类型" prop="pushType">
           <el-radio-group v-model="form.pushType">
-            <el-radio
-              v-for="dict in statusOptions"
-              :key="dict.value"
-              :label="dict.value"
-              >{{ dict.label }}</el-radio
-            >
+            <el-radio v-for="dict in statusOptions" :key="dict.value" :label="dict.value">{{ dict.label }}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="发送范围" prop="pushRange">
           <span v-show="isSelectedText">{{ selectedText }}</span>
           <el-button type="text" size="medium" @click="showRangeDialog()">{{
-            isSelectedText
-              ? '修改'
-              : form.pushType == 0
-              ? '选择发送客户'
-              : '按群主选择客户群'
+            isSelectedText ? '修改' : form.pushType == 0 ? '选择发送客户' : '按群主选择客户群'
           }}</el-button>
         </el-form-item>
         <el-form-item label="发送时间" prop="settingTime">
@@ -255,10 +238,7 @@ export default {
               <!-- <el-tab-pane name="2">
                 <span slot="label"> <i class="el-icon-date"></i> 文件 </span>
               </el-tab-pane> -->
-              <el-button
-                type="primary"
-                class="mt20"
-                @click="dialogVisibleSelectMaterial = true"
+              <el-button type="primary" class="mt20" @click="dialogVisibleSelectMaterial = true"
                 >从素材库选择</el-button
               >
               <!-- <el-tab-pane label="配置管理" name="second">
@@ -275,16 +255,8 @@ export default {
         </el-form-item>
       </el-form>
       <!-- 预览 -->
-      <PhoneDialog
-        :message="form.textMessage.content || '请输入欢迎语'"
-        :isOther="!!form.imageMessage.pic_url"
-      >
-        <el-image
-          style="border-radius: 6px;"
-          :src="form.imageMessage.pic_url"
-          fit="fit"
-        >
-        </el-image>
+      <PhoneDialog :message="form.textMessage.content || '请输入欢迎语'" :isOther="!!form.imageMessage.pic_url">
+        <el-image style="border-radius: 6px;" :src="form.imageMessage.pic_url" fit="fit"> </el-image>
       </PhoneDialog>
     </div>
     <div class="mt15" style="margin-left: 40px;">
@@ -308,12 +280,7 @@ export default {
             <div class="input-wrap" @click="dialogVisibleSelectUser = true">
               <span class="placeholder" v-if="!userParty.length">请选择</span>
               <template v-else>
-                <el-tag
-                  type="info"
-                  v-for="(unit, unique) in userParty"
-                  :key="unique"
-                  >{{ unit.name }}</el-tag
-                >
+                <el-tag type="info" v-for="(unit, unique) in userParty" :key="unique">{{ unit.name }}</el-tag>
               </template>
             </div>
           </el-form-item>
@@ -321,24 +288,15 @@ export default {
             <div class="input-wrap" @click="dialogVisibleSelectTag = true">
               <span class="placeholder" v-if="!form.tag.length">请选择</span>
               <template v-else>
-                <el-tag
-                  type="info"
-                  v-for="(unit, unique) in form.tag"
-                  :key="unique"
-                  >{{ unit.name }}</el-tag
-                >
+                <el-tag type="info" v-for="(unit, unique) in form.tag" :key="unique">{{ unit.name }}</el-tag>
               </template>
             </div>
           </el-form-item>
         </div>
       </el-form>
       <div slot="footer">
-        <el-button @click="dialogVisibleSelectCustomer = false"
-          >取 消</el-button
-        >
-        <el-button type="primary" @click="dialogVisibleSelectCustomer = false"
-          >确 定</el-button
-        >
+        <el-button @click="dialogVisibleSelectCustomer = false">取 消</el-button>
+        <el-button type="primary" @click="dialogVisibleSelectCustomer = false">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -351,12 +309,7 @@ export default {
     ></SelectUser>
 
     <!-- 选择标签弹窗 -->
-    <SelectTag
-      :visible.sync="dialogVisibleSelectTag"
-      title="选择标签"
-      :selected="form.tag"
-      @success="submitSelectTag"
-    >
+    <SelectTag :visible.sync="dialogVisibleSelectTag" title="选择标签" :selected="form.tag" @success="submitSelectTag">
     </SelectTag>
 
     <SelectMaterial

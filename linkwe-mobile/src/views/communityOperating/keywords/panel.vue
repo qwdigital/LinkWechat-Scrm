@@ -97,7 +97,7 @@ export default {
         )
       } catch (err) {
         _this.$toast.clear()
-        _this.$dialog({ message: 'err' + JSON.stringify(err) })
+        _this.$dialog({ message: 'err:' + err.name + ',' + err.message })
       }
     },
     touchStart() {

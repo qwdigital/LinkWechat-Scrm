@@ -1,6 +1,5 @@
 package com.linkwechat.wecom.factory.impl.user;
 
-import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 import com.linkwechat.wecom.factory.WeEventStrategy;
 import com.linkwechat.wecom.service.IWeUserService;

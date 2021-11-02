@@ -24,6 +24,9 @@ public class WeCustomerList {
     //标签名称，使用逗号隔开
     private String tagNames;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date birthday;
+
 
 //    private List<WeFlowerCustomerRel> weFlowerCustomerRels;
 

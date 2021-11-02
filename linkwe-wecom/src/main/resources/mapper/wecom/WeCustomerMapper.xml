@@ -18,6 +18,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="position"    column="position"    />
         <result property="userName"    column="user_name"    />
         <result property="userId"    column="user_id"    />
+        <result property="firstUserId" column="first_user_id"></result>
         <result property="isOpenChat"    column="is_open_chat" jdbcType="INTEGER"  />
     </resultMap>
 
@@ -32,26 +33,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         wc.unionid,
         wc.birthday,
         wc.corp_name,
+        wc.first_user_id,
         wc.corp_full_name,
         wc.position,
         wc.is_open_chat,
-        wfcr.id as wfcrId,
-        wfcr.user_id,
-        wfcr.remark,
-        wfcr.description,
-        wfcr.create_time,
-        wfcr.remark_corp_name,
-        wfcr.oper_userid,
-        wfcr.add_way,
-        wfcr.state,
-        wfcr.status,
         wu.user_name,
         (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department
         FROM
         we_customer wc
-        LEFT JOIN we_flower_customer_rel wfcr ON wc.external_userid=wfcr.external_userid
-        LEFT JOIN we_user wu ON wu.user_id=wfcr.user_id
-        LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.flower_customer_rel_id = wfcr.id
+        LEFT JOIN we_user wu ON wc.first_user_id=wu.user_id
+        LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.external_userid = wc.external_userid
         LEFT JOIN we_tag wt ON wt.tag_id = wfcrf.tag_id
         <where>
             <if test="name != null and name !=''">
@@ -59,21 +50,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             </if>
             <if test="userIds != null and userIds !=''">
                 <if test="userIds.indexOf(',') != -1">
-                    AND  wfcr.user_id in
+                    AND  wu.user_id in
                     <foreach item="item" index="index" collection="userIds.split(',')" open="(" separator="," close=")">
                         #{item}
                     </foreach>
                 </if>
                 <if test="userIds.indexOf(',') == -1">
-                    AND  wfcr.user_id=#{userIds}
+                    AND  wu.user_id=#{userIds}
                 </if>
             </if>
             <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
-                AND date_format(wfcr.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+                AND date_format(wc.first_add_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
             </if>
 
             <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
-                AND date_format(wfcr.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+                AND date_format(wc.first_add_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
             </if>
             <if test="tagIds != null and tagIds !=''">
                 <if test="tagIds.indexOf(',') != -1">
@@ -98,13 +89,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 </if>
             </if>
             <if test="status !=null and status !=''">
-                AND wfcr.status=#{status}
+                AND wc.del_flag=#{status}
             </if>
             <if test="isOpenChat !=null ">
                 AND wc.is_open_chat=#{isOpenChat}
             </if>
         </where>
-        ORDER BY wfcr.create_time DESC
+        ORDER BY wc.first_add_time DESC
     </select>
 
 
@@ -199,23 +190,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wc.corp_full_name,
             wc.position,
             wc.is_open_chat,
-            wfcr.id as wfcrId,
-            wfcr.user_id,
-            wfcr.remark,
-            wfcr.description,
-            wfcr.create_time,
-            wfcr.remark_corp_name,
-            wfcr.oper_userid,
-            wfcr.add_way,
-            wfcr.state,
-            wfcr.status,
             wu.user_name,
             (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department
             FROM
             we_customer wc
-        LEFT JOIN we_flower_customer_rel wfcr ON wc.external_userid=wfcr.external_userid
-        LEFT JOIN we_user wu ON wu.user_id=wfcr.user_id
-        LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.flower_customer_rel_id = wfcr.id
+        LEFT JOIN we_user wu ON wu.user_id=wc.first_user_id
+        LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.external_userid = wc.external_userid
         LEFT JOIN we_tag wt ON wt.tag_id = wfcrf.tag_id
         <where>
             <if test="name != null and name !=''">
@@ -223,21 +203,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             </if>
             <if test="userIds != null and userIds !=''">
                 <if test="userIds.indexOf(',') != -1">
-                    AND  wfcr.user_id in
+                    AND  wc.user_id in
                     <foreach item="item" index="index" collection="userIds.split(',')" open="(" separator="," close=")">
                         #{item}
                     </foreach>
                 </if>
                 <if test="userIds.indexOf(',') == -1">
-                    AND  wfcr.user_id=#{userIds}
+                    AND  wc.user_id=#{userIds}
                 </if>
             </if>
             <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
-                    AND date_format(wfcr.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+                    AND date_format(wc.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
             </if>
 
              <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
-                   AND date_format(wfcr.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+                   AND date_format(wc.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
              </if>
              <if test="tagIds != null and tagIds !=''">
                    <if test="tagIds.indexOf(',') != -1">
@@ -262,13 +242,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 </if>
             </if>
              <if test="status !=null and status !=''">
-                  AND wfcr.status=#{status}
+                  AND wc.del_flag=#{status}
              </if>
             <if test="isOpenChat !=null ">
                 AND wc.is_open_chat=#{isOpenChat}
             </if>
         </where>
-        ORDER BY wfcr.create_time DESC
+        ORDER BY wc.first_add_time DESC
     </select>
 
 
@@ -294,7 +274,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         wu.user_name,
         wc.first_add_time,
         GROUP_CONCAT(wt.`name`)	 as tagNames,
-        GROUP_CONCAT(wt.`tag_id`) as tagIds
+        GROUP_CONCAT(wt.`tag_id`) as tagIds,
+        wc.birthday
         FROM
         we_customer wc
         LEFT JOIN we_user wu ON wc.first_user_id=wu.user_id
@@ -323,7 +304,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 AND  date_format(wc.first_add_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
             </if>
         </where>
-        GROUP BY wc.external_userid
+        GROUP BY wc.external_userid,wc.first_user_id
         ORDER BY wc.first_add_time desc
     </select>
 
@@ -397,6 +378,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <delete id="deleteWeCustomerById" parameterType="String">
         delete from we_customer where external_userid = #{externalUserId}
     </delete>
+
+    <delete id="deleteWeCustomerByUserIds">
+        delete from we_customer where first_user_id in
+        <foreach item="item" collection="array" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
 
     <delete id="deleteWeCustomerByIds">
         delete from we_customer where external_userid in
@@ -560,6 +549,47 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                  #{item.corpName},#{item.corpFullName},#{item.position},#{item.isOpenChat}, #{item.createTime},
                  #{item.createBy},#{item.firstUserId},#{item.firstAddTime}
                  )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        NAME=IF(we_customer.NAME != null, VALUES(NAME), we_customer.NAME),
+        avatar=IF(we_customer.avatar != null, VALUES(avatar), we_customer.avatar),
+        type=IF(we_customer.type != null, VALUES(type), we_customer.type),
+        gender=IF(we_customer.gender != null, VALUES(gender), we_customer.gender),
+        unionid=IF(we_customer.unionid != null, VALUES(unionid), we_customer.unionid),
+        birthday=IF(we_customer.birthday != null,VALUES(birthday), we_customer.birthday),
+        corp_name=IF(we_customer.corp_name != null, VALUES(corp_name), we_customer.corp_name),
+        corp_full_name=IF(we_customer.corp_full_name != null, VALUES(corp_full_name), we_customer.corp_full_name),
+        position=IF(we_customer.position != null, VALUES(position), we_customer.position),
+        is_open_chat=IF(we_customer.is_open_chat != null, VALUES(is_open_chat), we_customer.is_open_chat),
+        first_user_id=IF(we_customer.first_user_id != null, VALUES(first_user_id), we_customer.first_user_id),
+        first_add_time=IF(we_customer.first_add_time != null, VALUES(first_add_time), we_customer.first_add_time);
+    </insert>
+
+
+
+    <insert id="batchAddOrUpdate">
+        INSERT INTO we_customer(
+        external_userid,
+        NAME,
+        avatar,
+        type,
+        gender,
+        unionid,
+        birthday,
+        corp_name,
+        corp_full_name,
+        position,
+        is_open_chat,
+        create_time,
+        create_by,
+        first_user_id,
+        first_add_time
+        ) values
+        <foreach collection="weCustomers" item="item" index="index" separator=",">
+            (#{item.externalUserid},#{item.name},#{item.avatar},#{item.type},#{item.gender}, #{item.unionid},#{item.birthday},
+            #{item.corpName},#{item.corpFullName},#{item.position},#{item.isOpenChat}, #{item.createTime},
+            #{item.createBy},#{item.firstUserId},#{item.firstAddTime}
+            )
         </foreach>
         ON DUPLICATE KEY UPDATE
         NAME=IF(we_customer.NAME != null, VALUES(NAME), we_customer.NAME),

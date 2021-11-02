@@ -108,7 +108,7 @@
         wu.user_name,
         wu.dimission_time,
         (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department,
-        (SELECT COUNT(*) FROM we_flower_customer_rel wfcr WHERE wfcr.user_id=wu.user_id) as allocateCustomerNum,
+        (SELECT COUNT(*) FROM we_customer wc WHERE wc.first_user_id=wu.user_id) as allocateCustomerNum,
         (SELECT COUNT(*) FROM we_group wg WHERE wg.`owner`=wu.user_id) as allocateGroupNum
         FROM
         we_user wu
@@ -123,7 +123,7 @@
             <if test="isActivate != null ">and wu.is_activate = #{isActivate}</if>
             <if test="isAllocate != null ">and wu.is_allocate = #{isAllocate}</if>
         </where>
-        )wuu WHERE allocateCustomerNum >0 and allocateGroupNum>0
+        )wuu WHERE allocateCustomerNum >0 or allocateGroupNum>0
     </select>
 
 

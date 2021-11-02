@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component("transfer_fail")
 public class WeCallbackTransferFailImpl extends WeEventStrategy {
+
     @Autowired
     private IWeAllocateCustomerService iWeAllocateCustomerService;
 
@@ -31,4 +32,5 @@ public class WeCallbackTransferFailImpl extends WeEventStrategy {
         iWeAllocateCustomerService.update(weAllocateCustomer,new LambdaQueryWrapper<WeAllocateCustomer>().eq(WeAllocateCustomer::getTakeoverUserid,userId)
                 .eq(WeAllocateCustomer::getExternalUserid,externalUserId));
     }
+
 }

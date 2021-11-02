@@ -97,7 +97,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
             if (CollectionUtil.isNotEmpty(weAllocateGroups)) {
                 if (iWeAllocateGroupService.saveOrUpdateBatch(weAllocateGroups)) {
 
-                    //同步企业微信端
+//                    //同步企业微信端
                     weUserClient.allocateGroup(
                             AllocateWeGroupDto.builder()
                                     .chat_id_list(ArrayUtil.toArray(weAllocateGroups.stream().map(WeAllocateGroup::getChatId).collect(Collectors.toList()), String.class))

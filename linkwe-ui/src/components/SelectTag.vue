@@ -8,20 +8,21 @@ export default {
     // 添加标签显隐
     visible: {
       type: Boolean,
-      default: false,
+      default: false
     },
     title: {
       type: String,
-      default: '选择标签',
+      default: '选择标签'
     },
     selected: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
+    // add: 打标签，remove: 移除标签
     type: {
       type: String,
-      default: 'add',
-    },
+      default: 'add'
+    }
   },
   data() {
     return {
@@ -29,7 +30,7 @@ export default {
       listOneArray: [],
       selectedGroup: '', // 选择的标签分组
       removeTag: [],
-      Pselected: [],
+      Pselected: []
     }
   },
   watch: {
@@ -51,7 +52,7 @@ export default {
       }
       // this.list = JSON.parse(JSON.stringify(this.list))
     },
-    list (val) {
+    list(val) {
       if (this.type === 'add') {
         this.Pselected = []
         this.selected.forEach((element) => {
@@ -74,8 +75,8 @@ export default {
       },
       set(val) {
         this.$emit('update:visible', val)
-      },
-    },
+      }
+    }
   },
   created() {
     this.getList()
@@ -110,8 +111,8 @@ export default {
     },
     toJson(data) {
       return JSON.stringify(data)
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -121,40 +122,25 @@ export default {
       <span class="mr20">选择分组</span>
       <el-select v-model="selectedGroup" placeholder="请选择">
         <el-option label="所有标签" value></el-option>
-        <el-option
-          v-for="(item, index) in list"
-          :key="index"
-          :label="item.gourpName"
-          :value="item.groupId"
-        ></el-option>
+        <el-option v-for="(item, index) in list" :key="index" :label="item.gourpName" :value="item.groupId"></el-option>
       </el-select>
       <div class="mt20" v-if="Pvisible">
         <el-checkbox-group v-if="type !== 'remove'" v-model="Pselected">
           <template v-for="(item, index) in list">
-            <div
-              class="bfc-d mr30"
-              v-if="item.groupId === selectedGroup || !selectedGroup"
-              :key="index"
-            >
+            <div class="bfc-d mr30 mb10" v-if="item.groupId === selectedGroup || !selectedGroup" :key="index">
               <template v-for="(unit, unique) in item.weTags">
-                <el-checkbox
-                  v-if="unit.name.trim()"
-                  :label="unit"
-                  :key="index + '' + unique"
-                  >{{ unit.name }}</el-checkbox
-                >
+                <el-checkbox v-if="unit.name.trim()" :label="unit" :key="index + '' + unique">{{
+                  unit.name
+                }}</el-checkbox>
               </template>
             </div>
           </template>
         </el-checkbox-group>
         <el-checkbox-group v-else v-model="Pselected">
           <template v-for="(item, index) in removeTag">
-            <el-checkbox
-              v-if="item.groupId === selectedGroup || !selectedGroup"
-              :label="item"
-              :key="index"
-              >{{ item.name.trim() || '(空的无效标签，请移除)' }}</el-checkbox
-            >
+            <el-checkbox v-if="item.groupId === selectedGroup || !selectedGroup" :label="item" :key="index">{{
+              item.name.trim() || '(空的无效标签，请移除)'
+            }}</el-checkbox>
           </template>
         </el-checkbox-group>
       </div>

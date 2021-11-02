@@ -21,7 +21,6 @@ export default {
         preview: false, // 预览弹出显示隐藏
         edit: false // 编辑弹出显示隐藏
       },
-      materialSelected: '', // 图片url
       rangeErrorMsg: '',
       form: {
         title: '', // 海报名称
@@ -32,6 +31,7 @@ export default {
         // sort: '', // 海报排序
         // jump: [], // 跳转页面
         delFlag: 0, // 是否启用
+        backgroundImgPath: '', // 图片url
         mediaId: '' // 图片id
       },
       rules: {
@@ -88,10 +88,10 @@ export default {
             categoryId: data.categoryId,
             type: data.type,
             delFlag: data.delFlag,
+            backgroundImgPath: data.backgroundImgPath,
             posterJSON: JSON.parse(data.otherField)
           }
           this.posterSubassemblyList = data.posterSubassemblyList || []
-          this.materialSelected = data.backgroundImgPath
         } else {
           // 新增，清除编辑的数据
           this.form = {}
@@ -238,11 +238,11 @@ export default {
     },
     // 设置海报背景
     setPosterBackgroundImage() {
-      if (!this.materialSelected) {
+      if (!this.form.backgroundImgPath) {
         return
       }
       let canvas = this.canvas
-      new fabric.Image.fromURL(this.materialSelected, (img) => {
+      new fabric.Image.fromURL(this.form.backgroundImgPath, (img) => {
         // img.set({
         //   // 通过scale来设置图片大小，这里设置和画布一样大
         //   // scaleX: canvas.width / img.width,
@@ -315,7 +315,7 @@ export default {
     submitSelectMaterial(text, image, file) {
       if (this.isBackgroundImage) {
         this.form.mediaId = image.id
-        this.materialSelected = image.materialUrl
+        this.form.backgroundImgPath = image.materialUrl
         this.setPosterBackgroundImage()
         this.dialogVisibleSelectMaterial = false
       } else {
@@ -324,7 +324,7 @@ export default {
     },
     //
     save(isBack) {
-      if (this.materialSelected === '') {
+      if (!this.form.backgroundImgPath) {
         this.rangeErrorMsg = '请选择背景图片'
         return
       } else {
@@ -379,7 +379,6 @@ export default {
             Object.assign(
               {
                 // backgroundImgPath: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg',
-                backgroundImgPath: this.materialSelected,
                 posterSubassemblyList: posterSubList
               },
               form
@@ -433,7 +432,7 @@ export default {
       </el-dialog>
       <el-dialog
         title="海报编辑"
-        width="80%"
+        width="1180px"
         v-if="dialog.edit"
         :visible.sync="dialog.edit"
         :before-close="beforeCloseDialog"
@@ -504,10 +503,10 @@ export default {
                 </el-radio-group>
               </el-form-item>
               <el-form-item label="背景图片" :required="true" :error="rangeErrorMsg">
-                <div v-if="materialSelected !== ''">
+                <div v-if="form.backgroundImgPath">
                   <el-image
                     style="width: 100px; height: 100px; cursor: pointer;border-radius: 6px;"
-                    :src="materialSelected"
+                    :src="form.backgroundImgPath"
                     fit="fit"
                   >
                   </el-image>
@@ -625,7 +624,7 @@ export default {
   position: relative;
   vertical-align: top;
   overflow: auto;
-  max-width: 500px;
+  max-width: 450px;
   max-height: 700px;
 }
 #tbody-containerui-image-editor-controls {
