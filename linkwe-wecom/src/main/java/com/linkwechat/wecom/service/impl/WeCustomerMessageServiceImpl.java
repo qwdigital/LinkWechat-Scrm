@@ -25,10 +25,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -102,7 +99,8 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
 
         //发给客户
         if(CollectionUtils.isNotEmpty(customers)){
-            customers.stream().collect(Collectors.groupingBy(WeCustomer::getUserId)).forEach((k,v)->{
+
+            customers.stream().collect(Collectors.groupingBy(WeCustomer::getFirstUserId)).forEach((k,v)->{
 
                 customerMessagePushDto.setStaffId(k);
                 //发送群发消息

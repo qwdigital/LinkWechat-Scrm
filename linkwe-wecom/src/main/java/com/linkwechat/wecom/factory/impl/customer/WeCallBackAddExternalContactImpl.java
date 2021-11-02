@@ -41,6 +41,7 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
 
     @Autowired
     private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
+
     @Autowired
     private IWeMaterialService weMaterialService;
     @Autowired
@@ -154,7 +155,8 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                             );
                         });
 
-                        if(weFlowerCustomerTagRelService.saveOrUpdateBatch(weFlowerCustomerTagRels)){
+                            weFlowerCustomerTagRelService.batchAddOrUpdate(weFlowerCustomerTagRels);
+
                             //标签同步到企业微信端
                             weCustomerClient.makeCustomerLabel(CutomerTagEdit.builder()
                                     .external_userid(externalUserId)
@@ -162,7 +164,7 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                                     .add_tag(weFlowerCustomerTagRels.stream()
                                             .map(WeFlowerCustomerTagRel::getTagId).toArray(String[]::new))
                                     .build());
-                        }
+
                     }
 
 

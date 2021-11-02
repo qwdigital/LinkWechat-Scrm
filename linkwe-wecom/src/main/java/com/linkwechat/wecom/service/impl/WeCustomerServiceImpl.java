@@ -56,11 +56,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
 
-    @Autowired
-    private WeCropTagClient weCropTagClient;
-
-    @Autowired
-    private IWeTagService iWeTagService;
 
 
     @Autowired
@@ -331,13 +326,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 );
             });
 
-            if(iWeFlowerCustomerTagRelService.saveBatch(newTagRels)){
+                iWeFlowerCustomerTagRelService.batchAddOrUpdate(newTagRels);
 
                 weCustomerClient.makeCustomerLabel(
                         cutomerTagEdit
                 );
 
-            }
         }else{//为空，取消当前客户所有标签
             List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = iWeFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
                     .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid())
