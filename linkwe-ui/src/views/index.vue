@@ -320,9 +320,12 @@ export default {
       obj.style.width = '100%'
       obj.style.height = '380px'
       let charts = echarts.init(obj)
+      let timer = 0
       window.onresize = function() {
-        charts.resize()
-        // test
+        clearTimeout(timer)
+        timer = setTimeout(() => {
+          charts.resize()
+        }, 200)
       }
       charts.setOption({
         // color: [color],
