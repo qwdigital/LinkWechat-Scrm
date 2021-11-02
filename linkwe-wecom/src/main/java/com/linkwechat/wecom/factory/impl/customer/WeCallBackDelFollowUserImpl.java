@@ -51,7 +51,9 @@ public class WeCallBackDelFollowUserImpl extends WeEventStrategy {
                     Optional.ofNullable(validWeCorpAccount).ifPresent(weCorpAccount -> {
                         String customerChurnNoticeSwitch = weCorpAccount.getCustomerChurnNoticeSwitch();
                         if (WeConstans.DEL_FOLLOW_USER_SWITCH_OPEN.equals(customerChurnNoticeSwitch)) {
-                            WeCustomer weCustomer = weCustomerService.selectWeCustomerById(message.getExternalUserId());
+                            WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getFirstUserId,message.getUserId())
+                                    .eq(WeCustomer::getExternalUserid,message.getExternalUserId()));
+
                             String content = "您已经被客户@" + weCustomer.getName() + "删除!";
                             TextMessageDto textMessageDto = new TextMessageDto();
                             textMessageDto.setContent(content);
