@@ -38,11 +38,15 @@
              )
     </insert>
     <update id="updateTaskSolvedById">
-        UPDATE we_customer_messageTimeTask set
-        solved=#{solved},
-        <if test="exceMsg != null and exceMsg !=''">
-            exce_msg=#{exceMsg}
-        </if>
+        UPDATE we_customer_messageTimeTask
+        <trim prefix="set" suffixOverrides=",">
+            <if test="solved !=null">
+             solved=#{solved},
+            </if>
+            <if test="exceMsg != null and exceMsg !=''">
+                exce_msg=#{exceMsg},
+            </if>
+        </trim>
         <where>
             task_id=#{taskId}
         </where>

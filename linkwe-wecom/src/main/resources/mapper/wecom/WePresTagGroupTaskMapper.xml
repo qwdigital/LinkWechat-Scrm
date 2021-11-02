@@ -123,12 +123,11 @@
         <if test="hasTag">
             AND customer.external_userid in (
             SELECT
-            t3.external_userid
+            t2.external_userid
             FROM
             we_pres_tag_group task
             LEFT JOIN we_pres_tag_group_tag t1 ON t1.task_id = task.task_id
             LEFT JOIN we_flower_customer_tag_rel t2 ON t2.tag_id = t1.tag_id
-            LEFT JOIN we_flower_customer_rel t3 ON t2.flower_customer_rel_id = t3.id
             WHERE
             task.task_id = #{taskId}
             )
@@ -137,12 +136,11 @@
         <if test="hasScope">
             AND customer.external_userid in (
             SELECT
-            t3.external_userid
+            customer.external_userid
             FROM
             we_pres_tag_group task
             LEFT JOIN we_pres_tag_group_scope scope ON scope.task_id = task.task_id
-            LEFT JOIN we_flower_customer_rel t3 ON t3.user_id = scope.we_user_id
-            LEFT JOIN we_customer customer ON customer.external_userid = t3.external_userid
+            LEFT JOIN we_customer customer ON customer.first_user_id = scope.we_user_id
             WHERE
             task.task_id = #{taskId}
             )

@@ -55,6 +55,15 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
      */
     public int deleteWeCustomerById(String externalUserId);
 
+
+    /**
+     * 批量删除企业微信客户
+     *
+     * @param userIds 需要删除的数据ID
+     * @return 结果
+     */
+    public int deleteWeCustomerByUserIds(String[] userIds);
+
     /**
      * 批量删除企业微信客户
      * 
