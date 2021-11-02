@@ -81,11 +81,11 @@ export default {
             if (element.tagIds && element.tagNames) {
               element.tagIds = element.tagIds.split(',')
               element.tagNames = element.tagNames.split(',')
-              rows.tags = []
+              element.tags = []
               element.tagIds.forEach((unit, index) => {
-                rows.tags.push({
+                element.tags.push({
                   tagId: unit,
-                  tagId: element.tagNames[index]
+                  tagNames: element.tagNames[index]
                 })
               })
             }
@@ -144,7 +144,7 @@ export default {
       let repeat = []
       this.multipleSelection.forEach((element) => {
         element.tags &&
-          element.tags.split(',').forEach((unit) => {
+          element.tags.forEach((unit) => {
             // 判断是否有重复标签
             let isRepeat = this.selectedTag.some((d) => {
               return d.tagId === unit.tagId
@@ -154,14 +154,12 @@ export default {
               repeat.push(unit.tagName)
               return
             }
-
             let filter = this.listTagOneArray.find((d) => {
               return d.tagId === unit.tagId
             })
             // 如果没有匹配到，则说明该便签处于异常状态，可能已被删除或破坏
             if (!filter) {
               hasErrorTag.push(unit.tagName)
-              isError = true
               return
             }
 
@@ -178,7 +176,7 @@ export default {
       }
 
       this.tagDialogType = {
-        title: (type === 'add' ? '增加标签' : '移出标签') + (repeat.length ? '（重复的标签已去重显示）' : ''),
+        title: '标签管理' + (repeat.length ? '（重复的标签已去重显示）' : ''),
         type: type
       }
       this.dialogVisible = true
@@ -234,11 +232,11 @@ export default {
           addTag: selected,
           userId: this.multipleSelection[0].firstUserId
         }
-        let apiType = {
-          add: 'makeLabel',
-          remove: 'removeLabel'
-        }
-        api[apiType[this.tagDialogType.type]](data).then(() => {
+        // let apiType = {
+        //   add: 'makeLabel',
+        //   remove: 'removeLabel'
+        // }
+        api.makeLabel(data).then(() => {
           this.msgSuccess('操作成功')
           this.dialogVisible = false
           this.getList()
@@ -260,7 +258,7 @@ export default {
     handleSelection(selection, row) {
       this.$nextTick(() => {
         this.$refs.table.clearSelection()
-        this.$refs.table.toggleRowSelection(row, true)
+        this.$refs.table.toggleRowSelection(row)
       })
     },
     goRoute(row) {
@@ -333,17 +331,17 @@ export default {
         <el-button
           v-hasPermi="['customerManage/customer:makeTag']"
           type="primary"
-          @click="makeTag('add')"
+          @click="makeTag()"
           :disabled="multipleSelection.length !== 1"
-          >打标签</el-button
+          >标签管理</el-button
         >
-        <el-button
+        <!-- <el-button
           v-hasPermi="['customerManage:customer:removeTag']"
           type="primary"
           @click="makeTag('remove')"
           :disabled="multipleSelection.length !== 1"
           >移除标签</el-button
-        >
+        > -->
       </div>
     </div>
 
@@ -355,7 +353,7 @@ export default {
       @select="handleSelection"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" align="center" width="55"></el-table-column>
+      <el-table-column type="selection" align="center" width="55"> </el-table-column>
       <el-table-column label="客户" prop="name" align="center">
         <template slot-scope="{ row }">
           <div class="cp" @click="goRoute(row)">
