@@ -4,8 +4,6 @@ import MaPage from '@/views/material/components/MaPage'
 import SelectMaterial from '@/components/SelectMaterial'
 import { fabric } from 'fabric'
 
-import qrCodeImage from '@/assets/poster/img/qrCodeImage.png'
-
 export default {
   name: 'Poster',
   components: {
@@ -22,18 +20,7 @@ export default {
         edit: false // 编辑弹出显示隐藏
       },
       rangeErrorMsg: '',
-      form: {
-        title: '', // 海报名称
-        categoryId: '', // 所属分类
-        type: '1', // 海报类型
-        // content: '', // 内容
-        // count: '', // 虚拟次数
-        // sort: '', // 海报排序
-        // jump: [], // 跳转页面
-        delFlag: 0, // 是否启用
-        backgroundImgPath: '', // 图片url
-        mediaId: '' // 图片id
-      },
+      form: {},
       rules: {
         title: {
           required: true,
@@ -94,7 +81,14 @@ export default {
           this.posterSubassemblyList = data.posterSubassemblyList || []
         } else {
           // 新增，清除编辑的数据
-          this.form = {}
+          this.form = {
+            title: '', // 海报名称
+            categoryId: '', // 所属分类
+            type: '1', // 海报类型
+            delFlag: 0, // 是否启用
+            backgroundImgPath: '', // 图片url
+            mediaId: '' // 图片id
+          }
           this.posterSubassemblyList = []
         }
         this.dialog.edit = true
@@ -264,6 +258,7 @@ export default {
     },
     addObj(type, obj) {
       let options = {
+        fill: '#333333',
         left: 100,
         top: 100,
         borderDashArray: [3, 3],
@@ -281,10 +276,10 @@ export default {
 
         case 'image':
         case 'qrcode':
-          new fabric.Image.fromURL(type == 'image' ? obj : qrCodeImage, (img) => {
+          new fabric.Image.fromURL(type == 'image' ? obj : 'http://demo.linkwechat.cn/lib/qrCode.png', (img) => {
             img.set(options)
-            img.scale(this.canvas.width / img.width / 2)
-            // img.scaleToWidth(200)
+            // img.scale(this.canvas.width / img.width / 2)
+            img.scaleToWidth(200)
             this.canvas.add(img).setActiveObject(img)
           })
           break
@@ -338,15 +333,16 @@ export default {
           let list = form.posterJSON.objects
           form.otherField = JSON.stringify(form.posterJSON)
           delete form.posterJSON
+
           let posterSubList = []
           let vo = null
           let i = 0
           let len = list.length
+
           while (i < len) {
             vo = list[i]
 
             let isText = vo.type == 'i-text'
-
             let align = (vo.textAlign && (vo.textAlign === 'left' ? 1 : vo.textAlign === 'center' ? 2 : 3)) || 1
 
             let posData = {
@@ -359,8 +355,8 @@ export default {
               fontTextAlign: align, // 1 2 3  left center right
               left: parseInt(vo.left), // - (isText ? 0 : vo.width >> 1), // 显示偏移了
               top: parseInt(vo.top), // - (isText ? 0 : vo.height >> 1),
-              width: parseInt(vo.width + (isText ? vo.fontSize / 2 : 0)),
-              height: parseInt(vo.height),
+              width: parseInt(vo.width * vo.scaleX + (isText ? vo.fontSize / 2 : 0)),
+              height: parseInt(vo.height * vo.scaleY),
               imgPath: vo.src || '',
               posterId: null,
               type: vo.customType, // 1 固定文本 2 固定图片 3 二维码图片
@@ -378,7 +374,6 @@ export default {
           ;(form.id ? updatePoster : addPoster)(
             Object.assign(
               {
-                // backgroundImgPath: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg',
                 posterSubassemblyList: posterSubList
               },
               form

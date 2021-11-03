@@ -4,7 +4,7 @@ const serviceCategory = window.CONFIG.services.wecom + '/poster'
 
 /**
  * 查询海报列表
- * @param {*} params 
+ * @param {*} params
  */
 export function getList(params) {
   return request({ url: service + '/list', params })
@@ -16,7 +16,7 @@ export function getList(params) {
  */
 export function updatePoster(data) {
   console.log('poster change:', JSON.stringify(data))
- return request({ url: serviceCategory + '/update', method: 'put', data })
+  return request({ url: serviceCategory + '/update', method: 'put', data })
 }
 
 /**
@@ -24,7 +24,6 @@ export function updatePoster(data) {
  * @param {*} data
  */
 export function addPoster(data) {
-  console.log('poster add:', JSON.stringify(data))
   return request({ url: serviceCategory + '/insert', method: 'post', data })
 }
 
