@@ -272,6 +272,12 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
     }
 
     @Override
+    public void removeCommonAccessToken() {
+        redisCache.deleteObject(WeConstans.WE_COMMON_ACCESS_TOKEN);
+    }
+
+
+    @Override
     public void removeContactAccessToken() {
         redisCache.deleteObject(WeConstans.WE_CONTACT_ACCESS_TOKEN);
     }

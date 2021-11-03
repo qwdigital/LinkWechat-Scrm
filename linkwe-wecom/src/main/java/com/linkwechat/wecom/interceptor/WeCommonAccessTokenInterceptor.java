@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  **/
 @Slf4j
 @Component
-public class WeAccessTokenInterceptor implements Interceptor<WeResultDto> {
+public class WeCommonAccessTokenInterceptor implements Interceptor<WeResultDto> {
 
 
     @Autowired
@@ -38,7 +38,7 @@ public class WeAccessTokenInterceptor implements Interceptor<WeResultDto> {
      */
     @Override
     public boolean beforeExecute(ForestRequest request) {
-        String token = iWeAccessTokenService.findContactAccessToken();
+        String token = iWeAccessTokenService.findCommonAccessToken();
         request.replaceOrAddQuery("access_token", token);
         return true;
     }
@@ -91,9 +91,9 @@ public class WeAccessTokenInterceptor implements Interceptor<WeResultDto> {
         if(!ObjectUtil.equal(WeErrorCodeEnum.ERROR_CODE_OWE_1.getErrorCode(),weResultDto.getErrcode())
                 && weComeConfig.getWeNeedRetryErrorCodes().contains(weResultDto.getErrcode())){
             //删除缓存
-            iWeAccessTokenService.removeContactAccessToken();
+            iWeAccessTokenService.removeCommonAccessToken();
             //重新查询token
-            String token = iWeAccessTokenService.findContactAccessToken();
+            String token = iWeAccessTokenService.findCommonAccessToken();
 
             request.replaceOrAddQuery("access_token", token);
         }

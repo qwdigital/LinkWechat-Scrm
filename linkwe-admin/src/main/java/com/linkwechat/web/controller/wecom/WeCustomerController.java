@@ -111,14 +111,17 @@ public class WeCustomerController extends BaseController
 
 
     /**
-     * 修改企业微信客户
+     * 修改企业微信客户(目前只更新生日)
      */
     //   @PreAuthorize("@ss.hasPermi('wecom:customer:edit')")
     @Log(title = "企业微信客户", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody WeCustomer weCustomer)
     {
-        weCustomerService.saveOrUpdate(weCustomer);
+        weCustomerService.update(weCustomer,new LambdaQueryWrapper<WeCustomer>()
+                .eq(WeCustomer::getExternalUserid,weCustomer.getExternalUserid())
+                .eq(WeCustomer::getFirstUserId,weCustomer.getFirstUserId()));
+
         return AjaxResult.success();
     }
 

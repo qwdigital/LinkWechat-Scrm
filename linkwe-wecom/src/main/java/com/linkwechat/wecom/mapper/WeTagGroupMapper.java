@@ -66,10 +66,11 @@ public interface WeTagGroupMapper  extends BaseMapper<WeTagGroup>
 
     /**
      * 根据企业员工与添加客户关系id给客户打标签
-     * @param flowerCustomerRelId
+     * @param externalUserid
+     * @param userid
      * @return
      */
-    public List<WeTagGroup> findCustomerTagByFlowerCustomerRelId(@Param("flowerCustomerRelId") String flowerCustomerRelId);
+    public List<WeTagGroup> findCustomerTagByFlowerCustomerRelId(@Param("externalUserid") String externalUserid, @Param("userid") String userid);
 
 
 

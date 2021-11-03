@@ -1,8 +1,6 @@
 package com.linkwechat.wecom.mapper;
 
 import java.util.List;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeMsgTlp;
 import org.apache.ibatis.annotations.Param;
 
@@ -12,7 +10,7 @@ import org.apache.ibatis.annotations.Param;
  * @author ruoyi
  * @date 2020-10-04
  */
-public interface WeMsgTlpMapper  extends BaseMapper<WeMsgTlp>
+public interface WeMsgTlpMapper 
 {
     /**
      * 查询欢迎语模板
@@ -22,13 +20,13 @@ public interface WeMsgTlpMapper  extends BaseMapper<WeMsgTlp>
      */
     public WeMsgTlp selectWeMsgTlpById(Long id);
 
-//    /**
-//     * 查询欢迎语模板列表
-//     *
-//     * @param weMsgTlp 欢迎语模板
-//     * @return 欢迎语模板集合
-//     */
-//    public List<WeMsgTlp> selectWeMsgTlpList(WeMsgTlp weMsgTlp);
+    /**
+     * 查询欢迎语模板列表
+     * 
+     * @param weMsgTlp 欢迎语模板
+     * @return 欢迎语模板集合
+     */
+    public List<WeMsgTlp> selectWeMsgTlpList(WeMsgTlp weMsgTlp);
 
     /**
      * 新增欢迎语模板

@@ -56,11 +56,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
 
-    @Autowired
-    private WeCropTagClient weCropTagClient;
-
-    @Autowired
-    private IWeTagService iWeTagService;
 
 
     @Autowired
@@ -242,10 +237,17 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         List<WeCustomer> allocateWeCustomers = this.list(new LambdaQueryWrapper<WeCustomer>()
                 .eq(WeCustomer::getFirstUserId, weLeaveUserInfoAllocateVo.getHandoverUserid()));
         if(CollectionUtil.isNotEmpty(allocateWeCustomers)){
-            if(this.update(WeCustomer.builder()
-                    .firstUserId(weLeaveUserInfoAllocateVo.getTakeoverUserid())
-                    .build(),new LambdaQueryWrapper<WeCustomer>()
-                    .eq(WeCustomer::getFirstUserId,weLeaveUserInfoAllocateVo.getHandoverUserid()))){//接手客户
+            //删除原有的
+            this.baseMapper.deleteWeCustomerByUserIds(
+                    new String[]{weLeaveUserInfoAllocateVo.getHandoverUserid()}
+            );
+            allocateWeCustomers.stream().forEach(k->{
+                k.setFirstUserId(weLeaveUserInfoAllocateVo.getTakeoverUserid());
+            });
+            //新增
+            this.baseMapper.batchAddOrUpdate(
+                    allocateWeCustomers
+            );
                 //记录接受离职表
                 List<WeAllocateCustomer> weAllocateCustomers = new ArrayList<>();
                 allocateWeCustomers.stream().forEach(k->{
@@ -271,12 +273,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                 .build());
                 }
 
-
-
             }
-
-
-        }
 
 
     }
@@ -331,13 +328,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 );
             });
 
-            if(iWeFlowerCustomerTagRelService.saveBatch(newTagRels)){
+                iWeFlowerCustomerTagRelService.batchAddOrUpdate(newTagRels);
 
                 weCustomerClient.makeCustomerLabel(
                         cutomerTagEdit
                 );
 
-            }
         }else{//为空，取消当前客户所有标签
             List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = iWeFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
                     .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid())
@@ -603,7 +599,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             //获取当前客户拥有得标签
             weCustomerPortrait.setWeTagGroupList(
                     iWeTagGroupService.findCustomerTagByFlowerCustomerRelId(
-                            weCustomerPortrait.getFlowerCustomerRelId()
+                            externalUserid,userid
                     )
             );
 
@@ -625,12 +621,22 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         WeCustomer weCustomer
                 = WeCustomer.builder().build();
         BeanUtils.copyBeanProp(weCustomer,weCustomerPortrait);
+        //手机号
+        weCustomer.setPhone(weCustomerPortrait.getRemarkMobiles());
+        weCustomer.setCorpName(weCustomerPortrait.getRemarkCorpName());
+        weCustomer.setFirstUserId(weCustomerPortrait.getUserId());
+
+
+        this.update(weCustomer,new LambdaQueryWrapper<WeCustomer>()
+                .eq(WeCustomer::getFirstUserId,weCustomerPortrait.getUserId())
+                .eq(WeCustomer::getExternalUserid,weCustomerPortrait.getExternalUserid()));
         //更新用户基本信息表
-        this.updateById(
-                weCustomer
-        );
-        WeFlowerCustomerRel weFlowerCustomerRel = WeFlowerCustomerRel.builder().build();
-        BeanUtils.copyBeanProp(weFlowerCustomerRel,weCustomerPortrait);
+//        this.baseMapper.batchAddOrUpdate(ListUtil.toList(weCustomer));
+//        this.updateById(
+//                weCustomer
+//        );
+//        WeFlowerCustomerRel weFlowerCustomerRel = WeFlowerCustomerRel.builder().build();
+//        BeanUtils.copyBeanProp(weFlowerCustomerRel,weCustomerPortrait);
         //添加轨迹内容(信息动态)
         iWeCustomerTrajectoryService.inforMationNews(weCustomerPortrait.getUserId(),weCustomerPortrait.getExternalUserid(), TrajectorySceneType.TRAJECTORY_TYPE_XXDT_BCZL.getKey());
     }
