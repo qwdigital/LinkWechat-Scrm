@@ -85,7 +85,7 @@ export default {
               element.tagIds.forEach((unit, index) => {
                 element.tags.push({
                   tagId: unit,
-                  tagNames: element.tagNames[index]
+                  tagName: element.tagNames[index]
                 })
               })
             }

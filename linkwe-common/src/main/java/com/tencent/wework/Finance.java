@@ -120,7 +120,7 @@ public class Finance {
             System.loadLibrary("libcurl");
             System.loadLibrary("WeWorkFinanceSdk");
         } else {
-            System.load("/Users/robin/work/sr_project/sdk/libWeWorkFinanceSdk_Java.so");
+            System.load("/app/projects/libWeWorkFinanceSdk_Java.so");
         }
 
     }

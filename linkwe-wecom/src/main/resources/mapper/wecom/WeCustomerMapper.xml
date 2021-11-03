@@ -438,26 +438,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     
     <select id="findCustomerByOperUseridAndCustomerId" resultType="com.linkwechat.wecom.domain.WeCustomerPortrait">
-            SELECT
-                  wc.`name`,
-                  wfcr.remark,
-                  wfcr.remark_mobiles,
-                  wc.birthday,
-                  wfcr.email,
-                  wfcr.address,
-                  wfcr.qq,
-                  wc.position,
-                  wfcr.remark_corp_name,
-                  wfcr.description,
-                  wfcr.id as flowerCustomerRelId,
-                  wfcr.user_id,
-                  wc.avatar,
-                  wfcr.external_userid,
-                  wc.gender
-            FROM
-                we_customer wc
-            LEFT JOIN we_flower_customer_rel wfcr on wc.external_userid=wfcr.external_userid
-            WHERE wc.external_userid=#{externalUserid} and wfcr.user_id=#{userid}
+        SELECT
+            wc.`name`,
+            wc.other_descr as remark,
+            wc.phone as remark_mobiles,
+            wc.birthday,
+            wc.email,
+            wc.address,
+            wc.qq,
+            wc.position,
+            wc.corp_name as remark_corp_name,
+            wc.other_descr as description,
+            wc.first_user_id as user_id,
+            wc.avatar,
+            wc.external_userid,
+            wc.gender,
+            GROUP_CONCAT(wt.`name`)	 as tagNames,
+            GROUP_CONCAT(wt.`tag_id`) as tagIds
+        FROM
+            we_customer wc
+       LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.user_id = wc.first_user_id
+       LEFT JOIN we_tag wt ON wt.tag_id = wfcrf.tag_id
+        WHERE wc.external_userid=#{externalUserid} and  wc.first_user_id=#{userid}
     </select>
 
 
@@ -467,7 +469,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                         SELECT
                             count(*)
                         FROM
-                            we_flower_customer_rel wfcr WHERE wfcr.external_userid=wc.external_userid
+                            we_customer wfcr WHERE wfcr.external_userid=wc.external_userid
                     ) AS addEmployeNum,
                     (
                       SELECT
@@ -485,7 +487,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                                 `we_group_member` where union_id=wc.external_userid
                             ) and user_id=#{userid}
                     ) AS commonGroupNum
-                    FROM we_customer wc WHERE wc.external_userid=#{externalUserid}
+                    FROM we_customer wc WHERE wc.external_userid=#{externalUserid}  and wc.first_user_id=#{userid}
     </select>
 
 
@@ -526,44 +528,44 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
 
-    <insert id="batchAddOrUpdate">
-        INSERT INTO we_customer(
-                    external_userid,
-                    NAME,
-                    avatar,
-                    type,
-                    gender,
-                    unionid,
-                    birthday,
-                    corp_name,
-                    corp_full_name,
-                    position,
-                    is_open_chat,
-                    create_time,
-                    create_by,
-                    first_user_id,
-                    first_add_time
-        ) values
-        <foreach collection="weCustomers" item="item" index="index" separator=",">
-                (#{item.externalUserid},#{item.name},#{item.avatar},#{item.type},#{item.gender}, #{item.unionid},#{item.birthday},
-                 #{item.corpName},#{item.corpFullName},#{item.position},#{item.isOpenChat}, #{item.createTime},
-                 #{item.createBy},#{item.firstUserId},#{item.firstAddTime}
-                 )
-        </foreach>
-        ON DUPLICATE KEY UPDATE
-        NAME=IF(we_customer.NAME != null, VALUES(NAME), we_customer.NAME),
-        avatar=IF(we_customer.avatar != null, VALUES(avatar), we_customer.avatar),
-        type=IF(we_customer.type != null, VALUES(type), we_customer.type),
-        gender=IF(we_customer.gender != null, VALUES(gender), we_customer.gender),
-        unionid=IF(we_customer.unionid != null, VALUES(unionid), we_customer.unionid),
-        birthday=IF(we_customer.birthday != null,VALUES(birthday), we_customer.birthday),
-        corp_name=IF(we_customer.corp_name != null, VALUES(corp_name), we_customer.corp_name),
-        corp_full_name=IF(we_customer.corp_full_name != null, VALUES(corp_full_name), we_customer.corp_full_name),
-        position=IF(we_customer.position != null, VALUES(position), we_customer.position),
-        is_open_chat=IF(we_customer.is_open_chat != null, VALUES(is_open_chat), we_customer.is_open_chat),
-        first_user_id=IF(we_customer.first_user_id != null, VALUES(first_user_id), we_customer.first_user_id),
-        first_add_time=IF(we_customer.first_add_time != null, VALUES(first_add_time), we_customer.first_add_time);
-    </insert>
+<!--    <insert id="batchAddOrUpdate">-->
+<!--        INSERT INTO we_customer(-->
+<!--                    external_userid,-->
+<!--                    NAME,-->
+<!--                    avatar,-->
+<!--                    type,-->
+<!--                    gender,-->
+<!--                    unionid,-->
+<!--                    birthday,-->
+<!--                    corp_name,-->
+<!--                    corp_full_name,-->
+<!--                    position,-->
+<!--                    is_open_chat,-->
+<!--                    create_time,-->
+<!--                    create_by,-->
+<!--                    first_user_id,-->
+<!--                    first_add_time-->
+<!--        ) values-->
+<!--        <foreach collection="weCustomers" item="item" index="index" separator=",">-->
+<!--                (#{item.externalUserid},#{item.name},#{item.avatar},#{item.type},#{item.gender}, #{item.unionid},#{item.birthday},-->
+<!--                 #{item.corpName},#{item.corpFullName},#{item.position},#{item.isOpenChat}, #{item.createTime},-->
+<!--                 #{item.createBy},#{item.firstUserId},#{item.firstAddTime}-->
+<!--                 )-->
+<!--        </foreach>-->
+<!--        ON DUPLICATE KEY UPDATE-->
+<!--        NAME=IF(we_customer.NAME != null, VALUES(NAME), we_customer.NAME),-->
+<!--        avatar=IF(we_customer.avatar != null, VALUES(avatar), we_customer.avatar),-->
+<!--        type=IF(we_customer.type != null, VALUES(type), we_customer.type),-->
+<!--        gender=IF(we_customer.gender != null, VALUES(gender), we_customer.gender),-->
+<!--        unionid=IF(we_customer.unionid != null, VALUES(unionid), we_customer.unionid),-->
+<!--        birthday=IF(we_customer.birthday != null,VALUES(birthday), we_customer.birthday),-->
+<!--        corp_name=IF(we_customer.corp_name != null, VALUES(corp_name), we_customer.corp_name),-->
+<!--        corp_full_name=IF(we_customer.corp_full_name != null, VALUES(corp_full_name), we_customer.corp_full_name),-->
+<!--        position=IF(we_customer.position != null, VALUES(position), we_customer.position),-->
+<!--        is_open_chat=IF(we_customer.is_open_chat != null, VALUES(is_open_chat), we_customer.is_open_chat),-->
+<!--        first_user_id=IF(we_customer.first_user_id != null, VALUES(first_user_id), we_customer.first_user_id),-->
+<!--        first_add_time=IF(we_customer.first_add_time != null, VALUES(first_add_time), we_customer.first_add_time);-->
+<!--    </insert>-->
 
 
 
@@ -583,12 +585,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         create_time,
         create_by,
         first_user_id,
-        first_add_time
+        first_add_time,
+        qq,
+        email,
+        address,
+        phone
         ) values
         <foreach collection="weCustomers" item="item" index="index" separator=",">
             (#{item.externalUserid},#{item.name},#{item.avatar},#{item.type},#{item.gender}, #{item.unionid},#{item.birthday},
             #{item.corpName},#{item.corpFullName},#{item.position},#{item.isOpenChat}, #{item.createTime},
-            #{item.createBy},#{item.firstUserId},#{item.firstAddTime}
+            #{item.createBy},#{item.firstUserId},#{item.firstAddTime},#{item.qq},#{item.email},#{item.address},#{item.phone}
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
@@ -603,7 +609,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         position=IF(we_customer.position != null, VALUES(position), we_customer.position),
         is_open_chat=IF(we_customer.is_open_chat != null, VALUES(is_open_chat), we_customer.is_open_chat),
         first_user_id=IF(we_customer.first_user_id != null, VALUES(first_user_id), we_customer.first_user_id),
-        first_add_time=IF(we_customer.first_add_time != null, VALUES(first_add_time), we_customer.first_add_time);
+        first_add_time=IF(we_customer.first_add_time != null, VALUES(first_add_time), we_customer.first_add_time),
+        qq=IF(we_customer.qq != null, VALUES(qq), we_customer.qq),
+        email=IF(we_customer.email != null, VALUES(email), we_customer.email),
+        address=IF(we_customer.address != null, VALUES(address), we_customer.address),
+        phone=IF(we_customer.phone != null, VALUES(phone), we_customer.phone);
     </insert>
 
 

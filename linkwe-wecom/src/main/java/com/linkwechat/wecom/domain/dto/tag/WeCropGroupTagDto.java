@@ -41,7 +41,7 @@ public class WeCropGroupTagDto {
                 .group_id(weTagGroup.getGroupId())
                 .group_name(weTagGroup.getGourpName())
                 .build();
-        List<WeTag> newAddWeTag = weTagGroup.getWeTags();
+        List<WeTag> newAddWeTag = weTagGroup.getAddWeTags();
         if(CollectionUtil.isNotEmpty(newAddWeTag)){
             //新增的标签
 //            List<WeTag> newAddWeTag

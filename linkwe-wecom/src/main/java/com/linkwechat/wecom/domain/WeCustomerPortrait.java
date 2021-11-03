@@ -55,4 +55,8 @@ public class WeCustomerPortrait {
     //客户社交关系
     private WeCustomerSocialConn socialConn;
 
+    private String tagNames;
+
+    private String tagIds;
+
 }

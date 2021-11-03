@@ -61,12 +61,10 @@
         <div>客户标签</div>
         <div class="data" is-link @click="labelEdit">编辑</div>
       </div>
-      <div v-if="form.weTagGroupList" class="labelstyle mt10">
-        <template v-for="item in form.weTagGroupList">
-          <div class="label" v-for="(unit, unique) in item.weTags" :key="unique">
-            {{ unit.name }}
-          </div>
-        </template>
+      <div v-if="form.tags" class="labelstyle mt10">
+        <div class="label" v-for="(unit, unique) in form.tags" :key="unique">
+          {{ unit.name }}
+        </div>
       </div>
     </div>
     <div class="divider"></div>
@@ -332,20 +330,12 @@ export default {
     let hash = param2Obj(window.location.hash)
     query = Object.assign(query, hash)
     this.agentId = query.agentId
-    console.log(agentId)
 
     // this.findAddaddEmployes()
     // this.findAddGroupNum()
     // this.getCustomerInfo()
     // this.findTrajectory()
-
-    // getAllTags()
-    //   .then(({ data }) => {
-    //     this.alllabel = data
-    //   })
-    //   .catch((err) => {
-    //     console.log(err)
-    //   })
+    // this.getAllTags()
   },
 
   methods: {
@@ -376,13 +366,7 @@ export default {
               _this.findAddGroupNum()
               _this.getCustomerInfo()
               _this.findTrajectory()
-              getAllTags()
-                .then(({ data }) => {
-                  _this.alllabel = data
-                })
-                .catch((err) => {
-                  console.log(err)
-                })
+              _this.getAllTags()
             } else {
               //错误处理
               _this.$dialog({ message: '进入失败：' + JSON.stringify(res) })
@@ -395,6 +379,22 @@ export default {
           _this.$dialog({ message: '进入失败：' + JSON.stringify(res) })
         }
       })
+    },
+    getAllTags() {
+      getAllTags()
+        .then(({ data }) => {
+          this.alllabel = data
+
+          this.listTagOneArray = []
+          data.forEach((element) => {
+            element.weTags.forEach((d) => {
+              this.listTagOneArray.push(d)
+            })
+          })
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
     //   客户待办点击保存事件
     saveInfo2() {},
@@ -548,12 +548,31 @@ export default {
     },
     // 点击编辑按钮
     labelEdit() {
-      this.show = true
-      if (this.form.weTagGroupList) {
-        this.form.weTagGroupList.forEach((ele) => {
-          this.addTag.push(...ele.weTags)
+      let tags = this.form.tags
+      let hasErrorTag = [] // 异常活已经删除的标签
+      let repeat = [] // 重复的标签
+      tags.forEach((unit) => {
+        // 判断是否有重复标签
+        let isRepeat = this.addTag.some((d) => {
+          return d.tagId === unit.tagId
         })
-      }
+        // 去重
+        if (isRepeat) {
+          repeat.push(unit.name)
+          return
+        }
+        let filter = this.listTagOneArray.find((d) => {
+          return d.tagId === unit.tagId
+        })
+        // 如果没有匹配到，则说明该便签处于异常状态，可能已被删除或破坏
+        if (!filter) {
+          hasErrorTag.push(unit.name)
+          return
+        }
+
+        this.addTag.push(filter)
+      })
+      this.show = true
       // 获取用户当前的lable,将当前用户的lable与所有lable进行对比，相同的弹框内蓝色展示
       // 弹框内的标签组选中时蓝色展示
       // 弹框内的子标签与选中时蓝色展示，点击时
@@ -597,6 +616,17 @@ export default {
       })
         .then(({ data }) => {
           // console.log(data);
+          if (data.tagIds && data.tagNames) {
+            data.tagIds = data.tagIds.split(',')
+            data.tagNames = data.tagNames.split(',')
+            data.tags = []
+            data.tagIds.forEach((unit, index) => {
+              data.tags.push({
+                tagId: unit,
+                name: data.tagNames[index]
+              })
+            })
+          }
           this.form = data
           // console.log(this.form);
         })

@@ -30,7 +30,7 @@ public interface IWeAccessTokenService {
 
    public void removeToken(WeCorpAccount wxCorpAccount);
 
-
+   public void removeCommonAccessToken();
    public void removeContactAccessToken();
 
    public void removeChatAccessToken();

@@ -215,6 +215,8 @@ mybatis-plus:
       logic-delete-field: delFlag
       logic-delete-value: 1
       logic-not-delete-value: 0
+mpp:
+  entityBasePath: com.linkwechat.**.domain
 
 ## MyBatis配置
 #mybatis:

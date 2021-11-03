@@ -179,6 +179,19 @@ public class WeCustomer extends BaseEntity {
     private Date firstAddTime;
 
 
+
+    //qq
+    private String qq;
+
+    //邮箱
+    private String email;
+    //地址
+    private String address;
+
+    //手机号
+    private String phone;
+
+
     /**
      * 0:正常;1:删除
      */

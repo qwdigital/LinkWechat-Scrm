@@ -35,6 +35,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
           wtg.del_flag=0 and wt.del_flag=0
         <if test="gourpName != null  and gourpName != ''"> and gourp_name like concat('%', #{gourpName}, '%')</if>
         <if test="groupTagType != null">and wtg.group_tag_type=#{groupTagType}</if>
+        ORDER BY wtg.create_time DESC
     </select>
     
     <select id="getWeTagGroupByIds"  resultMap="WeTagGroupResult">
@@ -113,7 +114,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 we_flower_customer_tag_rel wfctr
             INNER JOIN we_tag wt ON wfctr.tag_id = wt.tag_id
             INNER JOIN we_tag_group wtg ON wt.group_id = wtg.group_id
-            WHERE wt.`status`=0 and wtg.`status`=0 and wfctr.flower_customer_rel_id=#{flowerCustomerRelId}
+            WHERE wt.`status`=0 and wtg.`status`=0 and wfctr.user_id=#{userid} and wfctr.external_userid=#{externalUserid}
     </select>
 
     
