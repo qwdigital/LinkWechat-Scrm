@@ -124,10 +124,16 @@ export default {
         <el-option label="所有标签" value></el-option>
         <el-option v-for="(item, index) in list" :key="index" :label="item.gourpName" :value="item.groupId"></el-option>
       </el-select>
-      <div class="mt20" v-if="Pvisible">
+      <slot></slot>
+      <div v-if="Pvisible">
         <el-checkbox-group v-if="type !== 'remove'" v-model="Pselected">
           <template v-for="(item, index) in list">
-            <div class="bfc-d mr30 mb10" v-if="item.groupId === selectedGroup || !selectedGroup" :key="index">
+            <div
+              style="padding: 20px 0;border-bottom: 1px solid #ddd;"
+              v-if="item.groupId === selectedGroup || !selectedGroup"
+              :key="index"
+            >
+              <div style="font-size: 16px;margin-bottom: 15px; color:#aaa;">{{ item.gourpName }}</div>
               <template v-for="(unit, unique) in item.weTags">
                 <el-checkbox v-if="unit.name.trim()" :label="unit" :key="index + '' + unique">{{
                   unit.name
@@ -136,7 +142,7 @@ export default {
             </div>
           </template>
         </el-checkbox-group>
-        <el-checkbox-group v-else v-model="Pselected">
+        <el-checkbox-group class="mt20" v-else v-model="Pselected">
           <template v-for="(item, index) in removeTag">
             <el-checkbox v-if="item.groupId === selectedGroup || !selectedGroup" :label="item" :key="index">{{
               item.name.trim() || '(空的无效标签，请移除)'
@@ -144,7 +150,6 @@ export default {
           </template>
         </el-checkbox-group>
       </div>
-      <slot></slot>
     </div>
     <div slot="footer">
       <el-button @click="Pvisible = false">取 消</el-button>
