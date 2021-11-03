@@ -256,7 +256,7 @@ export default {
       // 接口开始
       externalUserid: '',
       // externalUserid: 'wmiGuBCgAAoCBD1frD3hRplbsXoBLx6g', // 客户IdwmiGuBCgAAoCBD1frD3hRplbsXoBLx6g
-      externalUserid: 'wmiGuBCgAA617zOzAIg-0sZG3Vok7BUA',
+      // externalUserid: 'wmiGuBCgAA617zOzAIg-0sZG3Vok7BUA',
       form: {
         name: '', // 昵称
         remarkMobiles: '', // 手机号
@@ -305,7 +305,8 @@ export default {
   },
   computed: {
     userId() {
-      return this.$store.state.userId || 'FengJuZhuDeJieDao'
+      return this.$store.state.userId
+      // || 'FengJuZhuDeJieDao'
     },
     //   activeLabel : () => {
     //       this.addTag.forEach((value) => {
@@ -325,16 +326,16 @@ export default {
       forbidClick: true
     })
     // 获取agentId
-    // let query = param2Obj(window.location.search)
-    // let hash = param2Obj(window.location.hash)
-    // query = Object.assign(query, hash)
-    // this.agentId = query.agentId
+    let query = param2Obj(window.location.search)
+    let hash = param2Obj(window.location.hash)
+    query = Object.assign(query, hash)
+    this.agentId = query.agentId
 
-    this.findAddaddEmployes()
-    this.findAddGroupNum()
-    this.getCustomerInfo()
-    this.findTrajectory()
-    this.getAllTags()
+    // this.findAddaddEmployes()
+    // this.findAddGroupNum()
+    // this.getCustomerInfo()
+    // this.findTrajectory()
+    // this.getAllTags()
   },
 
   methods: {
