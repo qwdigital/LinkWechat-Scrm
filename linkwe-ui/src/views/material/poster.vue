@@ -333,17 +333,16 @@ export default {
           let list = form.posterJSON.objects
           form.otherField = JSON.stringify(form.posterJSON)
           delete form.posterJSON
+
           let posterSubList = []
           let vo = null
           let i = 0
           let len = list.length
-          console.log(form.posterJSON)
+
           while (i < len) {
             vo = list[i]
-            debugger
 
             let isText = vo.type == 'i-text'
-
             let align = (vo.textAlign && (vo.textAlign === 'left' ? 1 : vo.textAlign === 'center' ? 2 : 3)) || 1
 
             let posData = {
@@ -375,7 +374,6 @@ export default {
           ;(form.id ? updatePoster : addPoster)(
             Object.assign(
               {
-                // backgroundImgPath: 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2980445260,41238050&fm=26&gp=0.jpg',
                 posterSubassemblyList: posterSubList
               },
               form
