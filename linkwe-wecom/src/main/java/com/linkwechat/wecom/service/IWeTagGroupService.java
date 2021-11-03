@@ -46,7 +46,7 @@ public interface IWeTagGroupService  extends IService<WeTagGroup>
      * @param ids 需要删除的标签组ID
      * @return 结果
      */
-    public int deleteWeTagGroupByIds(String[] ids);
+    public void deleteWeTagGroupByIds(String[] ids);
 
 
 
@@ -77,5 +77,5 @@ public interface IWeTagGroupService  extends IService<WeTagGroup>
      * @param flowerCustomerRelId
      * @return
      */
-    public List<WeTagGroup> findCustomerTagByFlowerCustomerRelId(String flowerCustomerRelId);
+    public List<WeTagGroup> findCustomerTagByFlowerCustomerRelId(String externalUserid, String userid);
 }

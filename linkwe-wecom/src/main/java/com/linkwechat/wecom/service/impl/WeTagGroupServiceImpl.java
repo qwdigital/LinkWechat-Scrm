@@ -101,47 +101,103 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
     public void updateWeTagGroup(WeTagGroup weTagGroup) {
 
         List<WeTag> weTags = weTagGroup.getWeTags();
-        //获取新增的集合
-        if (CollectionUtil.isNotEmpty(weTags)) {
-            List<WeTag> filterWeTags = weTags.stream().filter(v -> StringUtils.isEmpty(v.getTagId())).collect(Collectors.toList());
 
-            //同步新增标签到微信端
-            if (CollectionUtil.isNotEmpty(WeCropGroupTagDto.transformAddTag(weTagGroup).getTag())) {
-                WeCropGropTagDtlDto
+        List<WeTag> removeWeTags =new ArrayList<>();
+
+        if(CollectionUtil.isNotEmpty(weTags)){
+            //新增的标签
+            List<WeTag> addWeTags = weTags.stream().filter(v -> StringUtils.isEmpty(v.getTagId())).collect(Collectors.toList());
+            if(CollectionUtil.isNotEmpty(addWeTags)){
+                weTagGroup.setAddWeTags(addWeTags);
+
+                  WeCropGropTagDtlDto
                         weCropGropTagDtlDto = weCropTagClient.addCorpTag(WeCropGroupTagDto.transformAddTag(weTagGroup));
                 if (weCropGropTagDtlDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)) {
                     //微信端返回的标签主键,设置到weTags中
                     Map<String, String> weCropTagMap = weCropGropTagDtlDto.getTag_group().getTag().stream()
                             .collect(Collectors.toMap(weCropTagDto -> weCropTagDto.getName(), weCropTagDto -> weCropTagDto.getId()));
-                    filterWeTags.stream().forEach(tag -> {
+                    addWeTags.stream().forEach(tag -> {
                         tag.setTagId(weCropTagMap.get(tag.getName()));
                     });
+
+                    addWeTags.stream().forEach(v -> v.setGroupId(weTagGroup.getGroupId()));
+                    iWeTagService.saveBatch(addWeTags);
                 }
+
             }
+            removeWeTags.addAll(
+                    iWeTagService.list(new LambdaQueryWrapper<WeTag>().notIn(WeTag::getTagId,
+                                    weTags.stream().map(WeTag::getTagId).collect(Collectors.toList()))
+                            .eq(WeTag::getGroupId, weTagGroup.getGroupId()))
+            );
+        }else{//删除所有标签
+            removeWeTags.addAll(
+                    iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                            .eq(WeTag::getGroupId, weTagGroup.getGroupId()))
+            );
+        }
 
-
-            //获取需要删除的数据
-            List<WeTag> removeWeTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>().notIn(WeTag::getTagId,
-                    weTags.stream().map(WeTag::getTagId).collect(Collectors.toList())).eq(WeTag::getGroupId, weTagGroup.getGroupId()));
-
-            if (CollectionUtil.isNotEmpty(removeWeTags)) {
-                //同步删除微信端的标签
+        if(CollectionUtil.isNotEmpty(removeWeTags)){
+               //同步删除微信端的标签
+            try {
                 weCropTagClient.delCorpTag(
                         WeCropDelDto.builder()
                                 .group_id(ArrayUtil.toArray(ListUtil.toList(weTagGroup.getGroupId()), String.class))
                                 .tag_id(ArrayUtil.toArray(removeWeTags.stream().map(WeTag::getTagId).collect(Collectors.toList()), String.class))
                                 .build());
-
+            }catch (Exception e){
+              log.error(e.getMessage());
+            } finally {
                 //移除本地
                 iWeTagService.removeByIds(removeWeTags.stream().map(WeTag::getTagId).collect(Collectors.toList()));
             }
-
-
-            //保存或更新wetag
-            filterWeTags.stream().forEach(v -> v.setGroupId(weTagGroup.getGroupId()));
-            iWeTagService.saveOrUpdateBatch(filterWeTags);
-
         }
+
+
+
+
+
+        //获取新增的集合
+//        if (CollectionUtil.isNotEmpty(weTags)) {
+//            List<WeTag> filterWeTags = weTags.stream().filter(v -> StringUtils.isEmpty(v.getTagId())).collect(Collectors.toList());
+//
+//            //同步新增标签到微信端
+//            if (CollectionUtil.isNotEmpty(WeCropGroupTagDto.transformAddTag(weTagGroup).getTag())) {
+//                WeCropGropTagDtlDto
+//                        weCropGropTagDtlDto = weCropTagClient.addCorpTag(WeCropGroupTagDto.transformAddTag(weTagGroup));
+//                if (weCropGropTagDtlDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)) {
+//                    //微信端返回的标签主键,设置到weTags中
+//                    Map<String, String> weCropTagMap = weCropGropTagDtlDto.getTag_group().getTag().stream()
+//                            .collect(Collectors.toMap(weCropTagDto -> weCropTagDto.getName(), weCropTagDto -> weCropTagDto.getId()));
+//                    filterWeTags.stream().forEach(tag -> {
+//                        tag.setTagId(weCropTagMap.get(tag.getName()));
+//                    });
+//                }
+//            }
+//
+//
+//            //获取需要删除的数据
+//            List<WeTag> removeWeTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>().notIn(WeTag::getTagId,
+//                    weTags.stream().map(WeTag::getTagId).collect(Collectors.toList())).eq(WeTag::getGroupId, weTagGroup.getGroupId()));
+//
+//            if (CollectionUtil.isNotEmpty(removeWeTags)) {
+//                //同步删除微信端的标签
+//                weCropTagClient.delCorpTag(
+//                        WeCropDelDto.builder()
+//                                .group_id(ArrayUtil.toArray(ListUtil.toList(weTagGroup.getGroupId()), String.class))
+//                                .tag_id(ArrayUtil.toArray(removeWeTags.stream().map(WeTag::getTagId).collect(Collectors.toList()), String.class))
+//                                .build());
+//
+//                //移除本地
+//                iWeTagService.removeByIds(removeWeTags.stream().map(WeTag::getTagId).collect(Collectors.toList()));
+//            }
+//
+//
+//            //保存或更新wetag
+//            filterWeTags.stream().forEach(v -> v.setGroupId(weTagGroup.getGroupId()));
+//            iWeTagService.saveOrUpdateBatch(filterWeTags);
+//
+//        }
 
     }
 
@@ -154,27 +210,26 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
      */
     @Override
     @Transactional
-    public int deleteWeTagGroupByIds(String[] ids) {
+    public void deleteWeTagGroupByIds(String[] ids) {
 
-
-        int returnCode = weTagGroupMapper.deleteWeTagGroupByIds(ids);
-
-        if (returnCode > Constants.SERVICE_RETURN_SUCCESS_CODE) {
-
+        if (this.removeByIds(CollectionUtil.toList(ids))) {
             List<WeTag> weTags
                     = iWeTagService.list(new LambdaQueryWrapper<WeTag>().in(WeTag::getGroupId, ids));
             if (CollectionUtil.isNotEmpty(weTags)) {
-                weCropTagClient.delCorpTag(
-                        WeCropDelDto.builder()
-                                .group_id(ids)
-                                .tag_id(weTags.stream().map(WeTag::getTagId).toArray(String[]::new))
-                                .build()
-                );
+                try {
+                    weCropTagClient.delCorpTag(
+                            WeCropDelDto.builder()
+                                    .group_id(ids)
+                                    .tag_id(weTags.stream().map(WeTag::getTagId).toArray(String[]::new))
+                                    .build()
+                    );
+                }catch (Exception e){//防止数据不同步产生的错误
+                    log.error(e.getMessage());
+                }
+
             }
 
         }
-
-        return returnCode;
     }
 
 
@@ -336,8 +391,8 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
     }
 
     @Override
-    public List<WeTagGroup> findCustomerTagByFlowerCustomerRelId(String flowerCustomerRelId) {
-        return this.baseMapper.findCustomerTagByFlowerCustomerRelId(flowerCustomerRelId);
+    public List<WeTagGroup> findCustomerTagByFlowerCustomerRelId(String externalUserid, String userid) {
+        return this.baseMapper.findCustomerTagByFlowerCustomerRelId(externalUserid, userid);
     }
 
 

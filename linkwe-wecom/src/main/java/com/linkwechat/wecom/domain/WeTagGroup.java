@@ -40,6 +40,10 @@ public class WeTagGroup extends BaseEntity
     @TableField(exist = false)
     private List<WeTag> weTags;
 
+    /**新增标签 */
+    @TableField(exist = false)
+    private List<WeTag> addWeTags;
+
 
     /** 分组id */
     @TableId

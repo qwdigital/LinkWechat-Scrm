@@ -255,6 +255,13 @@
                 <version>${mybatis-plus.version}</version>
             </dependency>
 
+
+
+
+
+
+
+
             <dependency>
                 <groupId>io.vertx</groupId>
                 <artifactId>vertx-core</artifactId>
@@ -298,6 +305,15 @@
                 <artifactId>protobuf-java</artifactId>
                 <version>${protobuf.vaersion}</version>
             </dependency>
+
+
+            <dependency>
+                <groupId>com.github.jeffreyning</groupId>
+                <artifactId>mybatisplus-plus</artifactId>
+                <version>1.5.1-RELEASE</version>
+
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

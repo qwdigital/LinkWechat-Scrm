@@ -120,7 +120,7 @@ public class SysJobController extends BaseController
     /**
      * 定时任务立即执行一次
      */
-    @PreAuthorize("@ss.hasPermi('monitor:job:changeStatus')")
+    //@PreAuthorize("@ss.hasPermi('monitor:job:changeStatus')")
     @Log(title = "定时任务", businessType = BusinessType.UPDATE)
     @PutMapping("/run")
     public AjaxResult run(@RequestBody SysJob job) throws SchedulerException

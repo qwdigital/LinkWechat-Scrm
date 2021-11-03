@@ -100,7 +100,8 @@ public class WeTagGroupController extends BaseController
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable String[] ids)
     {
-        return toAjax(weTagGroupService.deleteWeTagGroupByIds(ids));
+        weTagGroupService.deleteWeTagGroupByIds(ids);
+        return AjaxResult.success();
     }
 
 
