@@ -589,12 +589,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         qq,
         email,
         address,
-        phone
+        phone,
+        add_method
         ) values
         <foreach collection="weCustomers" item="item" index="index" separator=",">
             (#{item.externalUserid},#{item.name},#{item.avatar},#{item.type},#{item.gender}, #{item.unionid},#{item.birthday},
             #{item.corpName},#{item.corpFullName},#{item.position},#{item.isOpenChat}, #{item.createTime},
-            #{item.createBy},#{item.firstUserId},#{item.firstAddTime},#{item.qq},#{item.email},#{item.address},#{item.phone}
+            #{item.createBy},#{item.firstUserId},#{item.firstAddTime},#{item.qq},#{item.email},#{item.address},#{item.phone},#{item.addMethod}
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
@@ -613,7 +614,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         qq=IF(we_customer.qq != null, VALUES(qq), we_customer.qq),
         email=IF(we_customer.email != null, VALUES(email), we_customer.email),
         address=IF(we_customer.address != null, VALUES(address), we_customer.address),
-        phone=IF(we_customer.phone != null, VALUES(phone), we_customer.phone);
+        phone=IF(we_customer.phone != null, VALUES(phone), we_customer.phone),
+        add_method=IF(we_customer.add_method != null, VALUES(add_method), we_customer.add_method);
     </insert>
 
 
