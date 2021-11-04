@@ -1,0 +1,36 @@
+.container{
+    height: 100%;
+    background-color:rgb(239, 239, 244) ;
+    display: flex;
+    align-items: center;
+}
+
+.qrcode {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.qrcode-tip {
+    text-align: left;
+    font-size: 40px;
+    padding: 20px;
+    text-indent: 15%;
+}
+
+.qrcode-content {
+    width: 100%;
+    text-align: center;
+}
+
+.qrcode-content > img {
+    width: 70%;
+}
+
+.error-content {
+    text-align: center;
+    font-size: 40px;
+    width: 100%;
+    display: none;
+}
