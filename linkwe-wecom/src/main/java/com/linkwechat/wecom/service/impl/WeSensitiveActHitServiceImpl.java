@@ -118,10 +118,15 @@ public class WeSensitiveActHitServiceImpl extends ServiceImpl<WeSensitiveActHitM
             }
         } else if (WeConstans.ID_TYPE_EX.equals(type)) {
             //获取外部联系人信息
-            WeCustomer weCustomer = weCustomerMapper.selectWeCustomerById(userId);
-            if (weCustomer != null) {
-                return weCustomer.getName();
+//            WeCustomer weCustomer = weCustomerMapper.selectWeCustomerById(userId);
+            List<WeCustomer> weCustomers = weCustomerMapper.selectList(new LambdaQueryWrapper<WeCustomer>()
+                    .eq(WeCustomer::getExternalUserid, userId));
+            if(CollectionUtils.isNotEmpty(weCustomers)){
+                return weCustomers.stream().findFirst().get().getName();
             }
+//            if (weCustomer != null) {
+//                return weCustomer.getName();
+//            }
         } else if (WeConstans.ID_TYPE_MACHINE.equals(type)) {
             //拉去机器人信息暂不处理
         }

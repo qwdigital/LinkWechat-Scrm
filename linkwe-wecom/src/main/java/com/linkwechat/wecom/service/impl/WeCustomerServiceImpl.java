@@ -79,16 +79,16 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
 
-    /**
-     * 查询企业微信客户
-     *
-     * @param externalUserId 企业微信客户ID
-     * @return 企业微信客户
-     */
-    @Override
-    public WeCustomer selectWeCustomerById(String externalUserId) {
-        return this.baseMapper.selectWeCustomerById(externalUserId);
-    }
+//    /**
+//     * 查询企业微信客户
+//     *
+//     * @param externalUserId 企业微信客户ID
+//     * @return 企业微信客户
+//     */
+//    @Override
+//    public WeCustomer selectWeCustomerById(String externalUserId) {
+//        return this.baseMapper.selectWeCustomerById(externalUserId);
+//    }
 
     /**
      * 查询企业微信客户列表
