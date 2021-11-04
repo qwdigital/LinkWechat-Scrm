@@ -21,13 +21,13 @@ import java.util.List;
  */
 public interface IWeCustomerService extends IService<WeCustomer>
 {
-    /**
-     * 查询企业微信客户
-     * 
-     * @param externalUserId 企业微信客户ID
-     * @return 企业微信客户
-     */
-    public WeCustomer selectWeCustomerById(String externalUserId);
+//    /**
+//     * 查询企业微信客户
+//     *
+//     * @param externalUserId 企业微信客户ID
+//     * @return 企业微信客户
+//     */
+//    public WeCustomer selectWeCustomerById(String externalUserId);
 
 //    /**
 //     * 新增/修改企业微信客户

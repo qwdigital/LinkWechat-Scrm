@@ -301,8 +301,13 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
             List<WeTaskFissionRecord> weTaskFissionRecords = weTaskFissionRecordService.list(new LambdaQueryWrapper<WeTaskFissionRecord>().eq(WeTaskFissionRecord::getTaskFissionId, fissionId));
             if(CollectionUtil.isNotEmpty(weTaskFissionRecords)){
                 weTaskFissionRecords.forEach(record -> {
-                    WeCustomer weCustomer = weCustomerService.selectWeCustomerById(record.getCustomerId());
-                    customerList.add(weCustomer);
+//                    WeCustomer weCustomer = weCustomerService.selectWeCustomerById(record.getCustomerId());
+//                    customerList.add(weCustomer);
+
+                    customerList.addAll(
+                            weCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
+                                    .eq(WeCustomer::getExternalUserid,record.getCustomerId()))
+                    );
                 });
             }
         } else {

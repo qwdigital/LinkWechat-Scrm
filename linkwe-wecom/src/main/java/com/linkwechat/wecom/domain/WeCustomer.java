@@ -197,4 +197,7 @@ public class WeCustomer extends BaseEntity {
      */
     @TableLogic
     private Integer delFlag;
+
+    //添加方式
+    private Integer addMethod;
 }
