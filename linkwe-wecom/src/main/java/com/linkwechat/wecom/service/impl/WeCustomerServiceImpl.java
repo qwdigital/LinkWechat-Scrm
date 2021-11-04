@@ -165,6 +165,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             Optional.ofNullable(userDetail.getFollow_info()).ifPresent(followInfo -> {
                 weCustomer.setFirstUserId(followInfo.getUserid());
                 weCustomer.setFirstAddTime(new Date(followInfo.getCreatetime() * 1000L));
+                weCustomer.setAddMethod(followInfo.getAdd_way());
                 weCustomerList.add(weCustomer);
                 List<String> tags = Stream.of(followInfo.getTag_id()).collect(Collectors.toList());
                 if (CollectionUtil.isNotEmpty(tags)) {
