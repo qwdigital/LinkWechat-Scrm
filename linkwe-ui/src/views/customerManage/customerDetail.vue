@@ -70,7 +70,7 @@ export default {
       </div>
     </div>
 
-    <el-card style="width:100%;">
+    <el-card shadow="never">
       <div slot="header">社交关系</div>
       <el-tabs value="1">
         <el-tab-pane :label="`跟进员工(${1})`" name="1">
@@ -97,7 +97,7 @@ export default {
         <el-row :gutter="10">
           <el-col :span="14">
             <div class="left">
-              <el-card style="width:100%;">
+              <el-card shadow="never">
                 <div slot="header">企业标签</div>
                 <div>
                   张三：
@@ -109,7 +109,7 @@ export default {
                 </div>
               </el-card>
 
-              <el-card style="width:100%;">
+              <el-card shadow="never">
                 <div slot="header">个人标签</div>
                 <div>
                   张三：
@@ -121,7 +121,7 @@ export default {
                 </div>
               </el-card>
 
-              <el-card style="width:100%;">
+              <el-card shadow="never">
                 <div slot="header">跟进状态</div>
                 <div>
                   张三：
@@ -141,7 +141,7 @@ export default {
                 </div>
               </el-card>
 
-              <el-card style="width:100%;">
+              <el-card shadow="never">
                 <div slot="header">跟进记录</div>
                 <el-tabs value="1">
                   <el-tab-pane :label="`张三(${1})`" name="1">
@@ -186,7 +186,48 @@ export default {
             </div>
           </el-col>
           <el-col :span="10">
-            <div class="right"></div>
+            <div class="right">
+              <div>
+                <span>客户轨迹</span>
+                <el-button type="text">同步</el-button>
+              </div>
+              <div class="flex">
+                <div>
+                  全部
+                </div>
+                <div>
+                  全部
+                </div>
+                <div>
+                  全部
+                </div>
+              </div>
+              <ul class="infinite-list" v-infinite-scroll="load" style="overflow:auto">
+                <li v-for="i in count" class="infinite-list-item">
+                  <div>2021-02-16 星期二</div>
+                  <el-timeline>
+                    <el-timeline-item timestamp="2018/4/12" placement="top">
+                      <el-card>
+                        <h4>更新 Github 模板</h4>
+                        <p>王小虎 提交于 2018/4/12 20:46</p>
+                      </el-card>
+                    </el-timeline-item>
+                    <el-timeline-item timestamp="2018/4/3" placement="top">
+                      <el-card>
+                        <h4>更新 Github 模板</h4>
+                        <p>王小虎 提交于 2018/4/3 20:46</p>
+                      </el-card>
+                    </el-timeline-item>
+                    <el-timeline-item timestamp="2018/4/2" placement="top">
+                      <el-card>
+                        <h4>更新 Github 模板</h4>
+                        <p>王小虎 提交于 2018/4/2 20:46</p>
+                      </el-card>
+                    </el-timeline-item>
+                  </el-timeline>
+                </li>
+              </ul>
+            </div>
           </el-col>
         </el-row>
       </el-tab-pane>
@@ -277,7 +318,6 @@ export default {
 }
 
 .el-card {
-  display: inline-block;
   margin: 20px 20px 0 0;
   .el-row {
     color: #666;

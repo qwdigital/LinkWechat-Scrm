@@ -21,33 +21,14 @@ export default {
 </script>
 
 <template>
-  <MaPage
-    ref="page"
-    type="0"
-    @listChange="listChange"
-    :selected="ids"
-    v-slot="{ list }"
-  >
+  <MaPage ref="page" type="0" @listChange="listChange" :selected="ids" v-slot="{ list }">
     <el-row :gutter="20">
-      <el-col
-        :span="6"
-        style="margin-bottom: 24px;min-width: 220px;"
-        v-for="(item, index) in list"
-        :key="index"
-      >
+      <el-col :span="6" style="margin-bottom: 24px;min-width: 220px;" v-for="(item, index) in list" :key="index">
         <el-card shadow="hover" body-style="padding: 0px;">
           <div class="img-wrap">
-            <el-image
-              :src="item.materialUrl"
-              :preview-src-list="srcList"
-              fit="contain"
-            ></el-image>
+            <el-image :src="item.materialUrl" :preview-src-list="srcList" fit="contain"></el-image>
             <div class="actions">
-              <i
-                v-hasPermi="['wechat:material:edit']"
-                class="el-icon-edit cp"
-                @click="$refs.page.edit(item)"
-              ></i>
+              <i v-hasPermi="['wechat:material:edit']" class="el-icon-edit cp" @click="$refs.page.edit(item)"></i>
               <i
                 v-hasPermi="['wechat:material:remove']"
                 class="el-icon-delete cp"
@@ -56,9 +37,7 @@ export default {
             </div>
           </div>
           <div style="padding: 14px;">
-            <el-checkbox v-model="ids" :label="item.id">{{
-              item.materialName
-            }}</el-checkbox>
+            <el-checkbox v-model="ids" :label="item.id">{{ item.materialName }}</el-checkbox>
           </div>
         </el-card>
       </el-col>

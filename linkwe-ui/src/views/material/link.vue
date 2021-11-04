@@ -2,7 +2,7 @@
 import MaPage from '@/views/material/components/MaPage'
 
 export default {
-  name: 'Text',
+  name: 'File',
   components: { MaPage },
   data() {
     return {
@@ -10,7 +10,6 @@ export default {
     }
   },
   watch: {},
-  computed: {},
   created() {},
   methods: {
     // 多选框选中数据
@@ -22,16 +21,14 @@ export default {
 </script>
 
 <template>
-  <MaPage ref="page" type="4" :selected="ids" v-slot="{ list }">
+  <MaPage ref="page" type="9" :selected="ids" v-slot="{ list }">
     <el-table :data="list" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" align="center" />
-      <el-table-column label="文本内容" align="center" prop="content" :show-overflow-tooltip="true" />
-      <el-table-column label="创建时间" align="center" prop="createTime">
-        <!-- <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
-        </template> -->
-      </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="图文标题" align="center" prop="materialName" :show-overflow-tooltip="true" />
+      <el-table-column label="图文链接" align="center" prop="userName" />
+
+      <el-table-column label="最近更新时间" align="center" prop="createTime"> </el-table-column>
+      <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="text" @click="$refs.page.edit(scope.row)" v-hasPermi="['wechat:material:edit']"
             >修改</el-button

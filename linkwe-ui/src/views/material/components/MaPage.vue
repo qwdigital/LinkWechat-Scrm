@@ -360,7 +360,7 @@ export default {
       append-to-body
     >
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="分类" prop="categoryId">
+        <el-form-item label="选择分组" prop="categoryId">
           <el-cascader v-model="form.categoryId" :options="treeData[0].children" :props="groupProps"></el-cascader>
         </el-form-item>
 
@@ -391,6 +391,75 @@ export default {
           </el-form-item>
           <el-form-item label="名称" prop="materialName">
             <el-input v-model="form.materialName" placeholder="请输入"></el-input>
+          </el-form-item>
+        </template>
+
+        <template v-else-if="type === '7'">
+          <el-form-item label="图文标题" prop="materialName">
+            <el-input
+              v-model="form.materialName"
+              type="text"
+              :maxlength="64"
+              show-word-limit
+              placeholder="请输入图文标题"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="图文摘要" prop="content">
+            <el-input
+              v-model="form.content"
+              type="textarea"
+              :maxlength="200"
+              show-word-limit
+              :autosize="{ minRows: 2, maxRows: 50 }"
+              placeholder="请输入"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="上传封面" prop="materialUrl">
+            <upload :fileUrl.sync="form.materialUrl" :fileName.sync="form.materialName" :type="type">
+              <div slot="tip">
+                支持JPG,PNG格式，图片大小不超过2M，建议上传宽高1:1的图片
+              </div>
+            </upload>
+          </el-form-item>
+          <el-form-item label="label">
+            <!-- 富文本 -->
+          </el-form-item>
+        </template>
+
+        <template v-else-if="type === '8'">
+          <el-form-item label="小程序标题" prop="materialName">
+            <el-input v-model="form.materialName" placeholder="请输入小程序标题"></el-input>
+          </el-form-item>
+          <el-form-item label="小程序AppID" prop="materialUrl">
+            <el-input v-model="form.materialUrl" placeholder="小程序AppID"></el-input>
+            <div class="sub-des">必须是审核通过，正常发布，且关联到企业的小程序应用</div>
+          </el-form-item>
+          <el-form-item label="小程序路径" prop="content">
+            <el-input v-model="form.content" placeholder="请输入小程序路径"></el-input>
+            <div class="sub-des">必须以 html 作为后缀</div>
+          </el-form-item>
+          <el-form-item label="小程序封面" prop="materialUrl">
+            <upload :fileUrl.sync="form.coverUrl" type="0">
+              <div slot="tip">
+                建议大小 2M 以内，建议尺寸 520*416仅支持 png/jpg 等图片类型
+              </div>
+            </upload>
+          </el-form-item>
+        </template>
+
+        <template v-else-if="type === '9'">
+          <el-form-item label="链接标题" prop="materialName">
+            <el-input
+              v-model="form.materialName"
+              type="text"
+              :maxlength="64"
+              show-word-limit
+              placeholder="请输入链接标题"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="链接" prop="content">
+            <el-input v-model="form.content" placeholder="请输入链接"></el-input>
+            <div class="sub-des">必须以 http://或 https://开头</div>
           </el-form-item>
         </template>
 
