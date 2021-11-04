@@ -186,6 +186,12 @@
             <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>p6spy</groupId>
+            <artifactId>p6spy</artifactId>
+            <version>3.9.1</version>
+        </dependency>
+
         <!--动态添加属性和方法开始-->
         <dependency>
             <groupId>commons-beanutils</groupId>

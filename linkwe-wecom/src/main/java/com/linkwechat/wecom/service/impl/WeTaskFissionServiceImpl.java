@@ -303,6 +303,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                 weTaskFissionRecords.forEach(record -> {
 //                    WeCustomer weCustomer = weCustomerService.selectWeCustomerById(record.getCustomerId());
 //                    customerList.add(weCustomer);
+
                     customerList.addAll(
                             weCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
                                     .eq(WeCustomer::getExternalUserid,record.getCustomerId()))

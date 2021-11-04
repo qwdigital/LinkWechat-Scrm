@@ -82,12 +82,8 @@ server:
 
 # 日志配置
 logging:
-  level:
-    com.ruoyi: debug
-    org.springframework: warn
-  path: ./logs
-path:
-  log: ./logs
+  path:
+    log: ./logs
 
 #H5地址路径
 H5:
@@ -103,11 +99,11 @@ spring:
     basename: i18n/messages
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    driverClassName: com.mysql.cj.jdbc.Driver
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
     druid:
       # 主库数据源
       master:
-        url: jdbc:mysql://127.0.0.1:3306/linkwechat?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+        url: jdbc:p6spy:mysql://127.0.0.1:3306/linkwechat?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
         username: root
         password: root
       # 从库数据源
@@ -208,8 +204,6 @@ mybatis-plus:
   mapper-locations: classpath*:mapper/**/*Mapper.xml
   type-aliases-package: com.linkwechat.**.domain
   type-handlers-package: com.linkwechat.framework.handler.GenericTypeHandler,com.linkwechat.framework.handler.StringArrayJoinTypeHandler
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
       logic-delete-field: delFlag
