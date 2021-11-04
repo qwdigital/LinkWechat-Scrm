@@ -128,7 +128,7 @@ export default {
     // 获取显示用tag字符串
     getDisplayTags(row) {
       if (!(row && row.length > 0)) return ''
-      const tags = row.tagList.map((t) => t && t.name ? t.name : '')
+      const tags = row.tagList.map((t) => (t && t.name ? t.name : ''))
 
       return tags.join(' ')
     },
@@ -183,21 +183,10 @@ export default {
     customerFilter() {
       const l = []
       for (let data of this.customerList) {
-        if (
-          this.customerQuery.customerName !== '' &&
-          !this.customerQuery.customerName.includes(data.customerName)
-        )
+        if (this.customerQuery.customerName !== '' && !this.customerQuery.customerName.includes(data.customerName))
           continue
-        if (
-          this.customerQuery.isInGroup !== '' &&
-          this.customerQuery.isInGroup !== data.isInGroup
-        )
-          continue
-        if (
-          this.customerQuery.isSent !== '' &&
-          this.customerQuery.isSent !== data.isSent
-        )
-          continue
+        if (this.customerQuery.isInGroup !== '' && this.customerQuery.isInGroup !== data.isInGroup) continue
+        if (this.customerQuery.isSent !== '' && this.customerQuery.isSent !== data.isSent) continue
 
         l.push(data)
       }
@@ -226,13 +215,7 @@ export default {
 <template>
   <div>
     <div class="top-search">
-      <el-form
-        inline
-        label-position="right"
-        :model="query"
-        label-width="100px"
-        ref="queryForm"
-      >
+      <el-form inline label-position="right" :model="query" label-width="100px" ref="queryForm">
         <el-form-item label="任务名称" prop="taskName">
           <el-input v-model="query.taskName" placeholder="请输入"></el-input>
         </el-form-item>
@@ -270,41 +253,20 @@ export default {
 
     <div class="mid-action">
       <div>
-        <el-button
-          type="primary"
-          v-hasPermi="['enterpriseWechat:add']"
-          @click="goRoute()"
-        >
+        <el-button type="primary" v-hasPermi="['enterpriseWechat:add']" @click="goRoute()">
           新建任务
         </el-button>
       </div>
       <div>
-        <el-button
-          :disabled="multiSelect.length === 0"
-          @click="handleBulkRemove"
-          type="cyan"
-        >
+        <el-button :disabled="multiSelect.length === 0" @click="handleBulkRemove" type="cyan">
           批量删除
         </el-button>
       </div>
     </div>
 
-    <el-table
-      v-loading="loading"
-      :data="list"
-      @selection-change="handleSelectionChange"
-    >
-      <el-table-column
-        type="selection"
-        width="50"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        label="任务名称"
-        align="center"
-        prop="taskName"
-        :show-overflow-tooltip="true"
-      ></el-table-column>
+    <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="50" align="center"></el-table-column>
+      <el-table-column label="任务名称" align="center" prop="taskName" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column prop="sendType" label="发送方式" align="center">
         <template #default="{ row }">
           {{ parseInt(row.sendType) === 0 ? '企业群发' : '个人群发' }}
@@ -319,12 +281,7 @@ export default {
       </el-table-column>
       <el-table-column label="客户标签" align="center" width="120">
         <template #default="{ row }">
-          <el-popover
-            placement="bottom"
-            width="200"
-            trigger="hover"
-            :content="getDisplayTags(row)"
-          >
+          <el-popover placement="bottom" width="200" trigger="hover" :content="getDisplayTags(row)">
             <div slot="reference" class="table-desc overflow-ellipsis">
               {{ getDisplayTags(row) }}
             </div>
@@ -332,39 +289,19 @@ export default {
         </template>
       </el-table-column>
 
-      <el-table-column
-        prop="createBy"
-        label="创建人"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        label="创建时间"
-        align="center"
-        prop="createTime"
-        width="160"
-      ></el-table-column>
+      <el-table-column prop="createBy" label="创建人" align="center"></el-table-column>
+      <el-table-column label="创建时间" align="center" prop="createTime" width="160"></el-table-column>
 
-      <el-table-column
-        label="操作"
-        align="center"
-        width="180"
-        class-name="small-padding fixed-width"
-      >
+      <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             v-hasPermi="['enterpriseWechat:view']"
             size="mini"
             type="text"
-            icon="el-icon-view"
             @click="handleRemove(scope.row.taskId)"
             >删除</el-button
           >
-          <el-button
-            v-hasPermi="['enterpriseWechat:edit']"
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="goRoute(scope.row.taskId)"
+          <el-button v-hasPermi="['enterpriseWechat:edit']" size="mini" type="text" @click="goRoute(scope.row.taskId)"
             >编辑</el-button
           >
         </template>
@@ -382,25 +319,12 @@ export default {
     <el-dialog title="客户统计" :visible.sync="dialogVisible">
       <div>
         <div class="top-search">
-          <el-form
-            inline
-            label-position="right"
-            :model="customerQuery"
-            label-width="80px"
-            ref="customerForm"
-          >
+          <el-form inline label-position="right" :model="customerQuery" label-width="80px" ref="customerForm">
             <el-form-item prop="customerName">
-              <el-input
-                v-model="customerQuery.customerName"
-                placeholder="请输入客户名称"
-              ></el-input>
+              <el-input v-model="customerQuery.customerName" placeholder="请输入客户名称"></el-input>
             </el-form-item>
             <el-form-item prop="isInGroup">
-              <el-select
-                v-model="customerQuery.isInGroup"
-                placeholder="全部"
-                size="small"
-              >
+              <el-select v-model="customerQuery.isInGroup" placeholder="全部" size="small">
                 <el-option
                   v-for="(inGroup, index) in inGroupOptions"
                   :label="inGroup.label"
@@ -410,11 +334,7 @@ export default {
               </el-select>
             </el-form-item>
             <el-form-item prop="isSent">
-              <el-select
-                v-model="customerQuery.isSent"
-                placeholder="全部状态"
-                size="small"
-              >
+              <el-select v-model="customerQuery.isSent" placeholder="全部状态" size="small">
                 <el-option
                   v-for="(status, index) in sendStatusOptions"
                   :label="status.label"
@@ -430,11 +350,7 @@ export default {
           </el-form>
         </div>
         <el-table v-loading="customerLoading" :data="customerList">
-          <el-table-column
-            label="客户名"
-            align="center"
-            prop="customerName"
-          ></el-table-column>
+          <el-table-column label="客户名" align="center" prop="customerName"></el-table-column>
           <el-table-column prop="sent" label="送达状态" align="center">
             <template #default="{ row }">
               <template v-if="row.sent">

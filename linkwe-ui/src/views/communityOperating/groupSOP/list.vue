@@ -193,16 +193,10 @@ export default {
             v-hasPermi="['enterpriseWechat:view']"
             size="mini"
             type="text"
-            icon="el-icon-view"
             @click="handleRemove(scope.row.ruleId)"
             >删除</el-button
           >
-          <el-button
-            v-hasPermi="['enterpriseWechat:edit']"
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="goRoute(scope.row.ruleId)"
+          <el-button v-hasPermi="['enterpriseWechat:edit']" size="mini" type="text" @click="goRoute(scope.row.ruleId)"
             >编辑</el-button
           >
         </template>
