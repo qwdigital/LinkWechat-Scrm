@@ -100,7 +100,8 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
         //发给客户
         if(CollectionUtils.isNotEmpty(customers)){
 
-            customers.stream().collect(Collectors.groupingBy(WeCustomer::getFirstUserId)).forEach((k,v)->{
+            customers.stream().filter(customer -> StringUtils.isNotEmpty(customer.getFirstUserId()))
+                    .collect(Collectors.groupingBy(WeCustomer::getFirstUserId)).forEach((k,v)->{
 
                 customerMessagePushDto.setStaffId(k);
                 //发送群发消息
