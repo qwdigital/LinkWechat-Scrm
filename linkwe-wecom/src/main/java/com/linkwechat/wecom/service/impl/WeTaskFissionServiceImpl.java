@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -210,10 +211,9 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
         linkMessageDto.setUrl(pageUrlBuilder.toString());
 
         CustomerMessagePushDto customerMessagePushDto = new CustomerMessagePushDto();
-//        if (weTaskFission.getStartTime() != null) {
-//            customerMessagePushDto.setSettingTime(DateUtil.formatDateTime(weTaskFission.getStartTime()));
-//        }
-        customerMessagePushDto.setSendNow(true);
+        if (weTaskFission.getStartTime() != null) {
+            customerMessagePushDto.setSettingTime(DateUtil.formatDateTime(weTaskFission.getStartTime()));
+        }
         customerMessagePushDto.setLinkMessage(linkMessageDto);
         customerMessagePushDto.setPushType("0");
         customerMessagePushDto.setPushRange("1");
@@ -301,8 +301,13 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
             List<WeTaskFissionRecord> weTaskFissionRecords = weTaskFissionRecordService.list(new LambdaQueryWrapper<WeTaskFissionRecord>().eq(WeTaskFissionRecord::getTaskFissionId, fissionId));
             if(CollectionUtil.isNotEmpty(weTaskFissionRecords)){
                 weTaskFissionRecords.forEach(record -> {
-                    WeCustomer weCustomer = weCustomerService.selectWeCustomerById(record.getCustomerId());
-                    customerList.add(weCustomer);
+//                    WeCustomer weCustomer = weCustomerService.selectWeCustomerById(record.getCustomerId());
+//                    customerList.add(weCustomer);
+
+                    customerList.addAll(
+                            weCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
+                                    .eq(WeCustomer::getExternalUserid,record.getCustomerId()))
+                    );
                 });
             }
         } else {

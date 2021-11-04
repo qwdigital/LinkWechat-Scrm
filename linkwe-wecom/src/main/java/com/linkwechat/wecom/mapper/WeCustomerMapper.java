@@ -21,11 +21,11 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
      * @param externalUserId 企业微信客户ID
      * @return 企业微信客户
      */
-    public WeCustomer selectWeCustomerById(String externalUserId);
+    public WeCustomer selectWeCustomerById(@Param("externalUserId") String externalUserId,@Param("userId") String userId);
 
     /**
      * 查询企业微信客户列表
-     * 
+     *
      * @param weCustomer 企业微信客户
      * @return 企业微信客户集合
      */

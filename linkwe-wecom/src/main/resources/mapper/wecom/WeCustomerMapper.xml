@@ -268,20 +268,29 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="findWeCustomerList" resultType="com.linkwechat.wecom.domain.WeCustomerList">
         SELECT
-        wc.external_userid,
-        wc.`name` as customerName,
-        wc.first_user_id,
-        wu.user_name,
-        wc.first_add_time,
-        GROUP_CONCAT(wt.`name`)	 as tagNames,
-        GROUP_CONCAT(wt.`tag_id`) as tagIds,
-        wc.birthday
+            wc.avatar,
+            wc.`name` as customerName,
+            wc.customer_type,
+            GROUP_CONCAT(wt.`tag_id`) as tagIds,
+            GROUP_CONCAT(wt.`name`)	 as tagNames,
+            wu.user_name,
+            wc.external_userid,
+            wc.first_user_id,
+            wc.track_state,
+            wc.add_method,
+            wc.first_add_time,
+            wc.birthday,
+            wc.gender,
+           (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id in (wu.department)) as departmentName
         FROM
         we_customer wc
         LEFT JOIN we_user wu ON wc.first_user_id=wu.user_id
         LEFT JOIN we_flower_customer_tag_rel wfctr ON wfctr.del_flag=0 AND wfctr.external_userid=wc.external_userid AND  wfctr.user_id=wc.first_user_id
         LEFT JOIN we_tag wt ON wt.tag_id=wfctr.tag_id
         <where>
+            <if test="gender !=null">
+                wc.gender=#{gender}
+            </if>
             <if test="delFlag != null">
                 wc.del_flag = #{delFlag}
             </if>
@@ -323,7 +332,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <select id="selectWeCustomerById" parameterType="String" resultType="WeCustomer">
         <include refid="selectWeCustomerVo"/>
-        where external_userid = #{externalUserId}
+        where external_userid = #{externalUserId} and  first_user_id=#{userId}
     </select>
         
     <insert id="insertWeCustomer" parameterType="WeCustomer">
@@ -589,12 +598,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         qq,
         email,
         address,
-        phone
+        phone,
+        add_method
         ) values
         <foreach collection="weCustomers" item="item" index="index" separator=",">
             (#{item.externalUserid},#{item.name},#{item.avatar},#{item.type},#{item.gender}, #{item.unionid},#{item.birthday},
             #{item.corpName},#{item.corpFullName},#{item.position},#{item.isOpenChat}, #{item.createTime},
-            #{item.createBy},#{item.firstUserId},#{item.firstAddTime},#{item.qq},#{item.email},#{item.address},#{item.phone}
+            #{item.createBy},#{item.firstUserId},#{item.firstAddTime},#{item.qq},#{item.email},#{item.address},#{item.phone},#{item.addMethod}
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
@@ -613,7 +623,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         qq=IF(we_customer.qq != null, VALUES(qq), we_customer.qq),
         email=IF(we_customer.email != null, VALUES(email), we_customer.email),
         address=IF(we_customer.address != null, VALUES(address), we_customer.address),
-        phone=IF(we_customer.phone != null, VALUES(phone), we_customer.phone);
+        phone=IF(we_customer.phone != null, VALUES(phone), we_customer.phone),
+        add_method=IF(we_customer.add_method != null, VALUES(add_method), we_customer.add_method);
     </insert>
 
 

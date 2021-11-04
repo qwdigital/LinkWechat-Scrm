@@ -256,7 +256,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
             if (StringUtils.isNotEmpty(resultDto.getDetail_list())) {
                 for (DetailMessageStatusResultDto detail : resultDto.getDetail_list()) {
                     WePresTagGroupTaskStatVo statVo = new WePresTagGroupTaskStatVo();
-                    WeCustomer customer = customerMapper.selectWeCustomerById(detail.getExternal_userid());
+                    WeCustomer customer = customerMapper.selectWeCustomerById(detail.getExternal_userid(),detail.getUserid());
                     statVo.setCustomerName(customer.getName());
                     statVo.setStatus(detail.getStatus());
                     statVo.setInGroup(externalIdList.contains(detail.getExternal_userid()));

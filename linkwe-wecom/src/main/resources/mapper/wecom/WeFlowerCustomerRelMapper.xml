@@ -120,20 +120,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="getUserAddCustomerStat" parameterType="WeFlowerCustomerRel" resultType="java.util.HashMap">
         select
-		left(wfcr.create_time,10) as createTime , count(1) as total
-	from
-		we_flower_customer_rel wfcr
-	<where>
-        <if test="userId != null and userId != ''">and wfcr.user_id = #{userId}</if>
-        <if test="addWay != null and addWay != ''">and wfcr.add_way = #{addWay}</if>
-        <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
-            AND date_format(wfcr.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
-        </if>
-        <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
-            AND date_format(wfcr.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
-        </if>
-    </where>
-	group by
-		left(wfcr.create_time,10)
+        left(wfcr.first_add_time,10) as createTime , count(1) as total
+        from
+        we_customer wfcr
+        <where>
+            <if test="userId != null and userId != ''">and wfcr.first_user_id = #{userId}</if>
+            <if test="addWay != null and addWay != ''">and wfcr.add_method  = #{addWay}</if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(wfcr.first_add_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(wfcr.first_add_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+        </where>
+        group by
+        left(wfcr.first_add_time,10)
     </select>
 </mapper>

@@ -58,6 +58,24 @@ public class WeCustomerController extends BaseController
 
 
     /**
+     * 查询企业微信客户列表
+     */
+    //  @PreAuthorize("@ss.hasPermi('customerManage:customer:list')")
+    @GetMapping("/findWeCustomerList")
+    @ApiOperation("查询企业微信客户列表(重构版)")
+    public TableDataInfo findWeCustomerList(WeCustomerList weCustomerList)
+    {
+        startPage();
+        List<WeCustomerList> list = weCustomerService.findWeCustomerList(weCustomerList);
+
+        return getDataTable(list);
+    }
+
+
+
+
+
+    /**
      * 根据员工ID获取客户
      * @return
      */
@@ -70,19 +88,7 @@ public class WeCustomerController extends BaseController
     }
 
 
-    /**
-     * 查询企业微信客户列表(重构版)
-     */
-    //  @PreAuthorize("@ss.hasPermi('customerManage:customer:list')")
-    @GetMapping("/findWeCustomerList")
-    @ApiOperation("查询企业微信客户列表(重构版)")
-    public TableDataInfo findWeCustomerList(WeCustomerList weCustomerList)
-    {
-        startPage();
-        List<WeCustomerList> list = weCustomerService.findWeCustomerList(weCustomerList);
 
-        return getDataTable(list);
-    }
 
 
 //    /**
@@ -98,15 +104,15 @@ public class WeCustomerController extends BaseController
 //        return util.exportExcel(list, "customer");
 //    }
 
-    /**
-     * 获取企业微信客户详细信息
-     */
-    //  @PreAuthorize("@ss.hasPermi('customerManage:customer:view')")
-    @GetMapping(value = "/{externalUserId}")
-    public AjaxResult getInfo(@PathVariable("externalUserId") String externalUserId)
-    {
-        return AjaxResult.success(weCustomerService.selectWeCustomerById(externalUserId));
-    }
+//    /**
+//     * 获取企业微信客户详细信息
+//     */
+//    //  @PreAuthorize("@ss.hasPermi('customerManage:customer:view')")
+//    @GetMapping(value = "/{externalUserId}")
+//    public AjaxResult getInfo(@PathVariable("externalUserId") String externalUserId)
+//    {
+//        return AjaxResult.success(weCustomerService.selectWeCustomerById(externalUserId));
+//    }
 
 
 

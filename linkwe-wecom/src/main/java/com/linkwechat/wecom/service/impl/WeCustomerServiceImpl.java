@@ -79,16 +79,16 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
 
-    /**
-     * 查询企业微信客户
-     *
-     * @param externalUserId 企业微信客户ID
-     * @return 企业微信客户
-     */
-    @Override
-    public WeCustomer selectWeCustomerById(String externalUserId) {
-        return this.baseMapper.selectWeCustomerById(externalUserId);
-    }
+//    /**
+//     * 查询企业微信客户
+//     *
+//     * @param externalUserId 企业微信客户ID
+//     * @return 企业微信客户
+//     */
+//    @Override
+//    public WeCustomer selectWeCustomerById(String externalUserId) {
+//        return this.baseMapper.selectWeCustomerById(externalUserId);
+//    }
 
     /**
      * 查询企业微信客户列表
@@ -165,6 +165,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             Optional.ofNullable(userDetail.getFollow_info()).ifPresent(followInfo -> {
                 weCustomer.setFirstUserId(followInfo.getUserid());
                 weCustomer.setFirstAddTime(new Date(followInfo.getCreatetime() * 1000L));
+                weCustomer.setAddMethod(followInfo.getAdd_way());
                 weCustomerList.add(weCustomer);
                 List<String> tags = Stream.of(followInfo.getTag_id()).collect(Collectors.toList());
                 if (CollectionUtil.isNotEmpty(tags)) {
@@ -230,7 +231,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
      * @param weLeaveUserInfoAllocateVo
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void allocateWeCustomer(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
 
         //所需分配的客户
