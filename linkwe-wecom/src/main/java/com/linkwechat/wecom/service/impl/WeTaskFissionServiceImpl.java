@@ -211,7 +211,11 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
         linkMessageDto.setUrl(pageUrlBuilder.toString());
 
         CustomerMessagePushDto customerMessagePushDto = new CustomerMessagePushDto();
-        if (weTaskFission.getStartTime() != null) {
+        if (weTaskFission.getStartTime() != null && weTaskFission.getStartTime().getTime() <= System.currentTimeMillis()) {
+            customerMessagePushDto.setSendNow(true);
+            customerMessagePushDto.setSettingTime(null);
+        }else {
+            customerMessagePushDto.setSendNow(false);
             customerMessagePushDto.setSettingTime(DateUtil.formatDateTime(weTaskFission.getStartTime()));
         }
         customerMessagePushDto.setLinkMessage(linkMessageDto);
