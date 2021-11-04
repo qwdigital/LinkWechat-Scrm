@@ -98,15 +98,15 @@ public class WeCustomerController extends BaseController
 //        return util.exportExcel(list, "customer");
 //    }
 
-    /**
-     * 获取企业微信客户详细信息
-     */
-    //  @PreAuthorize("@ss.hasPermi('customerManage:customer:view')")
-    @GetMapping(value = "/{externalUserId}")
-    public AjaxResult getInfo(@PathVariable("externalUserId") String externalUserId)
-    {
-        return AjaxResult.success(weCustomerService.selectWeCustomerById(externalUserId));
-    }
+//    /**
+//     * 获取企业微信客户详细信息
+//     */
+//    //  @PreAuthorize("@ss.hasPermi('customerManage:customer:view')")
+//    @GetMapping(value = "/{externalUserId}")
+//    public AjaxResult getInfo(@PathVariable("externalUserId") String externalUserId)
+//    {
+//        return AjaxResult.success(weCustomerService.selectWeCustomerById(externalUserId));
+//    }
 
 
 

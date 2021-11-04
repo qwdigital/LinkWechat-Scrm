@@ -72,6 +72,7 @@ public class WeSensitiveActHitServiceImpl extends ServiceImpl<WeSensitiveActHitM
                     String operatorTargetId = chatJson.getString("tolist");
                     weSensitiveActHit.setOperatorId(operatorId);
                     weSensitiveActHit.setOperateTargetId(operatorTargetId);
+
                     setUserOrCustomerInfo(weSensitiveActHit);
                     saveOrUpdate(weSensitiveActHit);
                 }
@@ -102,6 +103,7 @@ public class WeSensitiveActHitServiceImpl extends ServiceImpl<WeSensitiveActHitM
     }
 
     private void setUserOrCustomerInfo(WeSensitiveActHit weSensitiveActHit) {
+
         int operatorType = StringUtils.weCustomTypeJudgment(weSensitiveActHit.getOperatorId());
         int operatorTargetType = StringUtils.weCustomTypeJudgment(weSensitiveActHit.getOperateTargetId());
         weSensitiveActHit.setOperator(getUserOrCustomerName(operatorType, weSensitiveActHit.getOperatorId()));
@@ -118,10 +120,15 @@ public class WeSensitiveActHitServiceImpl extends ServiceImpl<WeSensitiveActHitM
             }
         } else if (WeConstans.ID_TYPE_EX.equals(type)) {
             //获取外部联系人信息
-            WeCustomer weCustomer = weCustomerMapper.selectWeCustomerById(userId);
-            if (weCustomer != null) {
-                return weCustomer.getName();
+//            WeCustomer weCustomer = weCustomerMapper.selectWeCustomerById(userId);
+            List<WeCustomer> weCustomers = weCustomerMapper.selectList(new LambdaQueryWrapper<WeCustomer>()
+                    .eq(WeCustomer::getExternalUserid, userId));
+
+            if(CollectionUtils.isNotEmpty(weCustomers)){
+                return weCustomers.stream().findFirst().get().getName();
             }
+
+
         } else if (WeConstans.ID_TYPE_MACHINE.equals(type)) {
             //拉去机器人信息暂不处理
         }

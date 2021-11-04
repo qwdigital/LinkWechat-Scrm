@@ -27,7 +27,7 @@ public interface IWeCustomerService extends IService<WeCustomer>
      * @param externalUserId 企业微信客户ID
      * @return 企业微信客户
      */
-    public WeCustomer selectWeCustomerById(String externalUserId);
+    public WeCustomer selectWeCustomerById(String externalUserId,String userId);
 
 //    /**
 //     * 新增/修改企业微信客户
