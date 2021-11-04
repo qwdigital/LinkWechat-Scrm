@@ -323,7 +323,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <select id="selectWeCustomerById" parameterType="String" resultType="WeCustomer">
         <include refid="selectWeCustomerVo"/>
-        where external_userid = #{externalUserId}
+        where external_userid = #{externalUserId} and  first_user_id=#{userId}
     </select>
         
     <insert id="insertWeCustomer" parameterType="WeCustomer">
