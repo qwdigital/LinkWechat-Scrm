@@ -231,7 +231,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
      * @param weLeaveUserInfoAllocateVo
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void allocateWeCustomer(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
 
         //所需分配的客户

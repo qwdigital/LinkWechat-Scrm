@@ -12,7 +12,7 @@ import com.linkwechat.wecom.retry.WeCommonRetryWhen;
  * @author: HaoN
  * @create: 2020-08-27 16:42
  **/
-@BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeCommonAccessTokenInterceptor.class)
+@BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
 @Retry(maxRetryCount = "3", maxRetryInterval = "1000", condition = WeCommonRetryWhen.class)
 public interface WeUserClient {
 
