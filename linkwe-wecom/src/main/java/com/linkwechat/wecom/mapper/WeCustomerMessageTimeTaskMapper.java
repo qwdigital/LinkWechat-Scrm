@@ -21,7 +21,7 @@ public interface WeCustomerMessageTimeTaskMapper extends BaseMapper<WeCustomerMe
      * @param timeMillis 当前时间毫秒数
      * @return {@link WeCustomerMessageTimeTask}s
      */
-    List<WeCustomerMessageTimeTask> selectWeCustomerMessageTimeTaskGteSettingTime(@Param("beginTime") Long beginTime,@Param("endTime") Long endTime);
+    List<WeCustomerMessageTimeTask> selectWeCustomerMessageTimeTaskGteSettingTime(@Param("timeMillis") long timeMillis);
 
     /**
      * 保存群发任务

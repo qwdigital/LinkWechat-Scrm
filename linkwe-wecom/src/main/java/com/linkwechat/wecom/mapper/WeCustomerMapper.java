@@ -122,7 +122,7 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
      * @param weCustomerList
      * @return
      */
-    List<WeCustomerList> findWeCustomerList(WeCustomerList weCustomerList);
+    List<WeCustomerList> findWeCustomerList(@Param("weCustomerList") WeCustomerList weCustomerList);
 
 
     /**

@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeCustomer;
+import com.linkwechat.wecom.domain.WeCustomerList;
 import com.linkwechat.wecom.domain.WeCustomerMessgaeResult;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
@@ -34,6 +35,6 @@ public interface IWeCustomerMessgaeResultService extends IService<WeCustomerMess
      * @param messageId
      * @return
      */
-    int workerMappingCustomer(CustomerMessagePushDto customerMessagePushDto, long messageId, List<WeCustomer> customers, List<WeGroup> groups);
+    int workerMappingCustomer(CustomerMessagePushDto customerMessagePushDto, long messageId, List<WeCustomerList> customers, List<WeGroup> groups);
 
 }

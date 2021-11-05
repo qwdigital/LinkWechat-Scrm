@@ -23,7 +23,7 @@ public class WeEmpleCodeTag
 
     /** $column.columnComment */
     @TableId
-    private Long id;
+    private Long id=SnowFlakeUtil.nextId();
 
     /** 标签id */
     @ApiModelProperty("标签id")

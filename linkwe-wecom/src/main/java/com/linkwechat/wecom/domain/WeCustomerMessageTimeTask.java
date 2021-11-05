@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ import java.util.List;
 @TableName("we_customer_messageTimeTask")
 public class WeCustomerMessageTimeTask extends BaseEntity {
 
-    public WeCustomerMessageTimeTask(Long messageId, CustomerMessagePushDto messageInfo, List<WeCustomer> customersInfo, List<WeGroup> groupsInfo, Long settingTime) {
+    public WeCustomerMessageTimeTask(Long messageId, CustomerMessagePushDto messageInfo, List<WeCustomerList> customersInfo, List<WeGroup> groupsInfo, Long settingTime) {
         this.messageId = messageId;
         this.messageInfo = messageInfo;
         this.customersInfo = customersInfo;
@@ -46,7 +47,7 @@ public class WeCustomerMessageTimeTask extends BaseEntity {
     /**
      * 客户信息列表
      */
-    private List<WeCustomer> customersInfo;
+    private List<WeCustomerList> customersInfo;
 
     /**
      * 客户群组信息列表

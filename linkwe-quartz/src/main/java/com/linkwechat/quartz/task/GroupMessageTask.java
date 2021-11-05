@@ -30,8 +30,8 @@ public class GroupMessageTask {
      */
     public void messageTask() {
         //获的当前时间的毫秒数
-        List<WeCustomerMessageTimeTask> weCustomerMessageTimeTasks = customerMessageTimeTaskMapper.selectWeCustomerMessageTimeTaskGteSettingTime(DateUtils.getDateTime().getTime(),System.currentTimeMillis());
-
+        //customerMessageTimeTaskMapper
+        List<WeCustomerMessageTimeTask> weCustomerMessageTimeTasks = customerMessageTimeTaskMapper.selectWeCustomerMessageTimeTaskGteSettingTime(System.currentTimeMillis());
         if (CollectionUtils.isNotEmpty(weCustomerMessageTimeTasks)) {
             weCustomerMessageTimeTasks.forEach(
                     s -> {

@@ -288,29 +288,40 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         LEFT JOIN we_flower_customer_tag_rel wfctr ON wfctr.del_flag=0 AND wfctr.external_userid=wc.external_userid AND  wfctr.user_id=wc.first_user_id
         LEFT JOIN we_tag wt ON wt.tag_id=wfctr.tag_id
         <where>
-            <if test="gender !=null">
-                wc.gender=#{gender}
+            <if test="weCustomerList.gender !=null">
+                AND wc.gender=#{weCustomerList.gender}
             </if>
-            <if test="delFlag != null">
-                wc.del_flag = #{delFlag}
+
+            <if test="weCustomerList.departmentIds != null and weCustomerList.departmentIds !=''">
+                <if test="weCustomerList.departmentIds.indexOf(',') != -1">
+                    OR wu.department in
+                    <foreach item="item" index="index" collection="weCustomerList.departmentIds.split(',')" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
             </if>
-            <if test="name != null and name !=''">
-                AND  wc.`name` like concat('%',#{name,jdbcType=VARCHAR},'%')
+
+            <if test="weCustomerList.delFlag != null">
+                wc.del_flag = #{weCustomerList.delFlag}
             </if>
-            <if test="userIds !=null and userIds !=''">
+            <if test="weCustomerList.name != null and weCustomerList.name !=''">
+                AND  wc.`name` like concat('%',#{weCustomerList.name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="weCustomerList.userIds !=null and weCustomerList.userIds !=''">
                 AND wc.first_user_id in
-                <foreach collection="userIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                <foreach collection="weCustomerList.userIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
-            <if test="tagIds !=null and tagIds !=''">
+            <if test="weCustomerList.tagIds !=null and weCustomerList.tagIds !=''">
                 AND wt.tag_id in
-                <foreach collection="tagIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                <foreach collection="weCustomerList.tagIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
-            <if test="beginTime !=null and beginTime != '' and endTime !='' and endTime != null">
-                AND  date_format(wc.first_add_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
+            <if test="weCustomerList.beginTime !=null and weCustomerList.beginTime != '' and weCustomerList.endTime !='' and weCustomerList.endTime != null">
+                AND  date_format(wc.first_add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.beginTime.endTime}
             </if>
         </where>
         GROUP BY wc.external_userid,wc.first_user_id

@@ -291,6 +291,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
         List<WeTag> addTag = weMakeCustomerTag.getAddTag();
         if(CollectionUtil.isNotEmpty(addTag)){
+            //校验是否有标签在库里不存在
+
+
 
             CutomerTagEdit cutomerTagEdit = CutomerTagEdit.builder()
                     .external_userid(weMakeCustomerTag.getExternalUserid())
