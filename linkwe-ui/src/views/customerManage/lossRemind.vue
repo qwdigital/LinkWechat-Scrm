@@ -258,13 +258,13 @@ export default {
         </template>
       </el-table-column>
       <el-table-column label="操作" width="100">
-        <template slot-scope="scope">
+        <template slot-scope="{ row }">
           <el-button
             v-hasPermi="['customerManage:customer:view']"
             @click="
               $router.push({
                 path: 'customerDetail',
-                query: { id: scope.row.externalUserid }
+                query: { data: JSON.stringify(row) }
               })
             "
             type="text"
