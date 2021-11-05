@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.TrajectorySceneType;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -76,6 +77,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
     @Autowired
     private  IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
+
+    @Autowired
+    private IWeTagService iWeTagService;
 
 
 
@@ -292,6 +296,18 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         List<WeTag> addTag = weMakeCustomerTag.getAddTag();
         if(CollectionUtil.isNotEmpty(addTag)){
             //校验是否有标签在库里不存在
+
+            List<WeTag> weTagList = iWeTagService.list(
+                    new LambdaQueryWrapper<WeTag>()
+                            .in(WeTag::getTagId, addTag.stream().map(WeTag::getTagId).collect(Collectors.toList()))
+            );
+            if(CollectionUtil.isNotEmpty(weTagList)){
+                if(addTag.size()!=weTagList.size()){
+                    new WeComException("部门标签不存在");
+                }
+            }else{
+                 new WeComException("部门标签不存在");
+            }
 
 
 
