@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -26,6 +27,7 @@ public class WeEmpleCode extends BaseEntity {
     /**
      * $column.columnComment
      */
+    @TableId
     private Long id = SnowFlakeUtil.nextId();
 
     /**

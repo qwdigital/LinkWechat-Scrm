@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.enums.WeEmpleCodeType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.WeCommunityNewGroupDto;
@@ -215,6 +216,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
         WeEmpleCode weEmpleCode = new WeEmpleCode();
 
+        weEmpleCode.setId(SnowFlakeUtil.nextId());
         // 设置员工和扫码标签
         setScopsAndTags(weEmpleCode, communityNewGroupDto);
 

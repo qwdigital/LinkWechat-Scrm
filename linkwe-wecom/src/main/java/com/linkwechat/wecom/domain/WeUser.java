@@ -87,6 +87,7 @@ public class WeUser extends BaseEntity
     @ApiModelProperty("用户所属部门")
     private String department;
 
+
     /** 职务 */
     @ApiModelProperty("职务")
     private String position;

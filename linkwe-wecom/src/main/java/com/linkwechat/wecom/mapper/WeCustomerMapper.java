@@ -25,7 +25,7 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
 
     /**
      * 查询企业微信客户列表
-     * 
+     *
      * @param weCustomer 企业微信客户
      * @return 企业微信客户集合
      */
@@ -122,7 +122,7 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
      * @param weCustomerList
      * @return
      */
-    List<WeCustomerList> findWeCustomerList(WeCustomerList weCustomerList);
+    List<WeCustomerList> findWeCustomerList(@Param("weCustomerList") WeCustomerList weCustomerList);
 
 
     /**

@@ -52,6 +52,7 @@
         </where>
     </update>
 
+
     <select id="selectWeCustomerMessageTimeTaskGteSettingTime" resultMap="tasks">
         SELECT
         task_id,
@@ -62,7 +63,9 @@
         setting_time
         FROM
         we_customer_messageTimeTask
-        WHERE solved=0 and setting_time BETWEEN #{beginTime} AND #{endTime}
+        <where>
+            setting_time <![CDATA[<=]]> #{timeMillis} AND solved=0
+        </where>
     </select>
 
 </mapper>

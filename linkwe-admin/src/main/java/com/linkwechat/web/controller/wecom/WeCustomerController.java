@@ -58,6 +58,24 @@ public class WeCustomerController extends BaseController
 
 
     /**
+     * 查询企业微信客户列表
+     */
+    //  @PreAuthorize("@ss.hasPermi('customerManage:customer:list')")
+    @GetMapping("/findWeCustomerList")
+    @ApiOperation("查询企业微信客户列表(重构版)")
+    public TableDataInfo findWeCustomerList(WeCustomerList weCustomerList)
+    {
+        startPage();
+        List<WeCustomerList> list = weCustomerService.findWeCustomerList(weCustomerList);
+
+        return getDataTable(list);
+    }
+
+
+
+
+
+    /**
      * 根据员工ID获取客户
      * @return
      */
@@ -70,19 +88,7 @@ public class WeCustomerController extends BaseController
     }
 
 
-    /**
-     * 查询企业微信客户列表(重构版)
-     */
-    //  @PreAuthorize("@ss.hasPermi('customerManage:customer:list')")
-    @GetMapping("/findWeCustomerList")
-    @ApiOperation("查询企业微信客户列表(重构版)")
-    public TableDataInfo findWeCustomerList(WeCustomerList weCustomerList)
-    {
-        startPage();
-        List<WeCustomerList> list = weCustomerService.findWeCustomerList(weCustomerList);
 
-        return getDataTable(list);
-    }
 
 
 //    /**
