@@ -144,6 +144,7 @@
     },
     methods: {
       getList (page) {
+        console.log(222)
         if (this.dateRange) {
           this.query.beginTime = this.dateRange[0]
           this.query.endTime = this.dateRange[1]
@@ -153,7 +154,7 @@
         }
         page && (this.query.pageNum = page)
         this.loading = true
-        getList(this, this.query)
+        getList(this.query)
           .then(({
             rows,
             total
@@ -229,7 +230,7 @@
           })
       },
       cancelSend (data) {
-        cancelSend(this, data.messageId).then(res => {
+        cancelSend(data.id).then(res => {
           if (res.code == 200) {
             this.getList()
             this.msgSuccess('操作成功')

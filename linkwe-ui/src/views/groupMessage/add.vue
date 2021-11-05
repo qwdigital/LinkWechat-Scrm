@@ -1,84 +1,240 @@
-<script>
-import { add } from '@/api/groupMessage'
-import { getMaterialMediaId } from '@/api/material'
-import PhoneDialog from '@/components/PhoneDialog'
-import SelectUser from '@/components/SelectUser'
-import SelectTag from '@/components/SelectTag'
-import SelectMaterial from '@/components/SelectMaterial/index'
+<template>
+  <div>
+    <div class="crumb-title">
+      <div class="crumb">
+        当前位置：
+        <el-breadcrumb separator=">">
+          <el-breadcrumb-item>
+            <a href="/wechat/customerMaintain/groupMessage">消息群发</a>
+          </el-breadcrumb-item>
+          <el-breadcrumb-item>新建群发</el-breadcrumb-item>
+        </el-breadcrumb>
+      </div>
+      <div>新建群发</div>
+    </div>
+    <div class="tab">
+      <el-steps style="margin-top:10px;" :active="currentActive" align-center>
+        <el-step title="基础信息"></el-step>
+        <el-step title="群发内容"></el-step>
+      </el-steps>
+    </div>
+    <div class="g-card g-pad20" v-if="currentActive === 1">
+      <el-form style="width: 60%;" ref="form" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="群发类型" required prop="chatType">
+          <el-radio-group v-model="form.chatType">
+            <el-radio label="1">群发客户</el-radio>
+            <el-radio label="2">群发客户群</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <template v-if="form.chatType == 2">
+          <el-form-item label="群发客户群" required prop="clientGroup">
+            <el-radio-group v-model="form.clientGroup">
+              <el-radio :label="0">全部群</el-radio>
+              <el-radio :label="1">部分群</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item v-if="form.clientGroup == 1">
+            <div class="content-border">
+              <div class="item-magin aic">
+                <div class="item-name">选择群主：</div>
+                <el-tag v-for="(unit, unique) in selectCustomerGroupList" :key="unique">
+                  {{ unit.groupLeaderName }}
+                </el-tag>
+                <el-button type="primary" size="mini" :class="selectCustomerGroupList.length == 1 && 'ml10'" icon="el-icon-circle-plus-outline" plain @click="onSelectCustomerGroup">选择群主</el-button>
+              </div>
+            </div>
+          </el-form-item>
 
-export default {
-  components: { PhoneDialog, SelectTag, SelectUser, SelectMaterial },
-  props: {},
-  data() {
-    return {
-      loading: false,
-      // 表单参数
-      form: {
-        pushType: '0',
-        pushRange: '0',
-        tag: [],
-        department: [],
-        staffId: [],
-        settingTime: '',
-        messageType: '0',
-        imageMessage: {
-          media_id: '', // '图片的media_id',
-          pic_url: '' // '图片的链接',
+        </template>
+        <template v-if="form.chatType == 1">
+          <el-form-item label="群发客户" required prop="pushRange">
+            <el-radio-group v-model="form.pushRange">
+              <el-radio label="0">全部客户</el-radio>
+              <el-radio label="1">部分客户</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item v-if="form.pushRange == 1">
+            <div class="content-border">
+              <div class="item-magin">
+                <div class="item-name">发送性别</div>
+                <el-select v-model="form.gender">
+                  <el-option label="全部" value=""></el-option>
+                  <el-option label="未知" :value="0"></el-option>
+                  <el-option label="男性" :value="1"></el-option>
+                  <el-option label="女性" :value="2"></el-option>
+                </el-select>
+              </div>
+              <div class="item-magin">
+                <div class="item-name">添加时间</div>
+                <el-date-picker v-model="form.rangeTime" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
+                </el-date-picker>
+              </div>
+              <div class="item-magin aic">
+                <div class="item-name">客户标签</div>
+                <el-button class="mr10" size="mini" icon="el-icon-circle-plus-outline" type="primary" plain @click="onSelectTag">选择标签</el-button>
+                <el-tag v-for="item in form.sendClientTagList" :key="item.tagId">{{ item.name }}</el-tag>
+              </div>
+              <div class="item-magin aic">
+                <div class="item-name">添加人</div>
+                <el-button class="mr10" size="mini" icon="el-icon-circle-plus-outline" type="primary" plain @click="onSelectUser(2)">选择添加人</el-button>
+                <el-tag v-for="item in form.sendClientUserList" :key="item.userId">{{ item.name }}</el-tag>
+              </div>
+              <div class="item-magin">
+                <div class="item-name">跟进状态</div>
+                <el-select v-model="form.trackState">
+                  <el-option label="全部" value=""></el-option>
+                  <el-option label="跟进中" :value="1"></el-option>
+                  <el-option label="待跟进" :value="2"></el-option>
+                  <el-option label="已拒绝" :value="3"></el-option>
+                  <el-option label="已成交" :value="4"></el-option>
+                </el-select>
+              </div>
+            </div>
+          </el-form-item>
+        </template>
+        <el-form-item label="发送类型" required prop="settingTimeType">
+          <el-radio-group v-model="form.isTask">
+            <el-radio :label="0">立即发送</el-radio>
+            <el-radio :label="1">定时发送</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item v-if="form.isTask == 1">
+          <div class="content-border">
+            <div class="item-magin">
+              <div class="item-name">发送时间</div>
+              <el-date-picker v-model="form.sendTime" format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择日期时间" :picker-options="pickerOptions"></el-date-picker>
+            </div>
+          </div>
+        </el-form-item>
+        <el-form-item label-width="0">
+          <!-- <el-button @click="currentActive = 1">取消</el-button> -->
+          <el-button type="primary" @click="nextStep">下一步</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+    <div v-if="currentActive === 2">
+      <welcome-detail showBack :currentActive.sync="currentActive" @submit="save"></welcome-detail>
+    </div>
+    <!-- 选择添加人弹窗 -->
+    <SelectUser :visible.sync="dialogVisibleSelectUser" title="选择添加人" :isOnlyLeaf="false" destroyOnClose :defaultValues="selectedUserList" @success="selectedUser"></SelectUser>
+
+    <!-- 选择标签弹窗 -->
+    <SelectTag :visible.sync="dialogVisibleSelectTag" title="选择标签" :defaultValues="form.tag" @success="submitSelectTag">
+    </SelectTag>
+
+    <!-- 选择客户群聊 -->
+    <SelectCustomerGroup :visible.sync="dialogVisibleSelectCustomerGroup" @success="submitSelectCustomerGroup" :multiSelect="true"></SelectCustomerGroup>
+
+    <SelectMaterial :visible.sync="dialogVisibleSelectMaterial" :type.sync="activeName" @success="submitSelectMaterial"></SelectMaterial>
+  </div>
+</template>
+
+<script>
+  import {
+    add
+  } from '@/api/groupMessage'
+  import {
+    getMaterialMediaId
+  } from '@/api/material'
+  import PhoneDialog from '@/components/PhoneDialog'
+  import SelectUser from '@/components/SelectUser'
+  import SelectTag from '@/components/SelectTag'
+  import SelectMaterial from '@/components/SelectMaterial/index'
+  import WelcomeDetail from '@/components/WelcomeContent.vue'
+  import { parseTime } from '@/utils/common'
+  export default {
+    components: {
+      PhoneDialog,
+      SelectTag,
+      SelectUser,
+      SelectMaterial,
+      WelcomeDetail
+    },
+    props: {},
+    data () {
+      return {
+        currentActive: 1,
+
+        loading: false,
+        // 表单参数
+        form: {
+          // pushUserRange: 0,	// 群发员工
+          chatType: '0',
+          pushRange: '0',
+          clientGroup: 0,	// 群发客户群
+          gender: '',	// 发送客户-性别
+          trackState: '',	// 发送客户-跟进状态
+          rangeTime: [],	// 发送客户-添加时间
+          sendClientTagList: [],	// 发送客户标签
+          sendClientUserList: [],	// 发送客户添加人
+          tag: [],
+          department: [],
+          staffId: [],
+          settingTimeType: 0,
+          settingTime: '',
         },
-        linkMessage: {
-          title: '', // '图文消息标题',
-          picurl: '', // '图文消息封面的url',
-          desc: '', // '图文消息的描述，最多512个字节',
-          url: '' // '图文消息的链接',
+        userParty: [],
+        rules: {
+          clientGroup: [{ validator: this.validateClientGroup, trigger: 'blur' }],
+          settingTimeType: [{ validator: this.validateSettingTimeType, trigger: 'blur' }],
         },
-        textMessage: {
-          content: '' //'消息文本内容，最多4000个字节',
+        statusOptions: Object.freeze([{
+          label: '发送给客户',
+          value: '0'
         },
-        miniprogramMessage: {
-          title: '', // '小程序消息标题，最多64个字节',
-          pic_media_id: '', // '小程序消息封面的mediaid，封面图建议尺寸为520*416',
-          appid: '', // '小程序appid，必须是关联到企业的小程序应用',
-          page: '' // '小程序page路径',
+        {
+          label: '发送给客户群',
+          value: '1'
         }
+        ]),
+        activeName: '0',
+        dialogVisibleSelectCustomer: false,
+        dialogVisibleSelectUser: false,
+        selectedUserList: [],	// 选中回显员工
+        dialogVisibleSelectTag: false,
+        dialogVisibleSelectMaterial: false,
+        dialogVisibleSelectCustomerGroup: false,
+        selectCustomerGroupList: [],
+        pickerOptions: {
+          disabledDate (time) {
+            var date = new Date()
+            date.setFullYear(date.getFullYear() + 2)
+            date.setDate(date.getDate() - 1)
+            return (time.getTime() < Date.now() - 8.64e7) || (time.getTime() > date.getTime())
+          },
+          selectableRange: (() => {
+            let data = new Date()
+            let hour = data.getHours()
+            let minute = data.getMinutes()
+            let second = data.getSeconds()
+            return [`${hour}:${minute}:${second} - 23:59:59`]
+          })(),
+        }
+      }
+    },
+    watch: {},
+    computed: {
+      // 是否显示选择的客户标签
+      isOnlyTag () {
+        return this.form.tag[0] && this.form.chatType == 0
       },
-      userParty: [],
-      rules: {},
-      statusOptions: Object.freeze([
-        { label: '发送给客户', value: '0' },
-        { label: '发送给客户群', value: '1' }
-      ]),
-      activeName: '0',
-      dialogVisibleSelectCustomer: false,
-      dialogVisibleSelectUser: false,
-      dialogVisibleSelectTag: false,
-      dialogVisibleSelectMaterial: false
-    }
-  },
-  watch: {},
-  computed: {
-    // 是否显示选择的客户标签
-    isOnlyTag() {
-      return this.form.tag[0] && this.form.pushType == 0 && this.form.pushRange == 1
+      // 是否显示选择范围后的文字说明
+      isSelectedText () {
+        return this.userParty[0] || this.isOnlyTag
+      },
+      // 选择范围后的文字说明
+      selectedText () {
+        return `将发送消息给${
+          this.userParty[0] ? this.userParty[0].name + '等部门或成员的' : ''
+          }${this.userParty[0] && this.isOnlyTag ? '，且' : ''}${
+          this.isOnlyTag ? '满足' + this.form.tag[0].name + '等标签的' : ''
+          }${this.form.chatType == 0 ? '客户' : '客户群'}`
+      }
     },
-    // 是否显示选择范围后的文字说明
-    isSelectedText() {
-      return this.userParty[0] || this.isOnlyTag || this.form.pushRange == 0
-    },
-    // 选择范围后的文字说明
-    selectedText() {
-      return this.form.pushType == 0 && this.form.pushRange == 0
-        ? '全部客户'
-        : `将发送消息给${this.userParty[0] ? this.userParty[0].name + '等部门或成员的' : ''}${
-            this.userParty[0] && this.isOnlyTag ? '，且' : ''
-          }${this.isOnlyTag ? '满足' + this.form.tag[0].name + '等标签的' : ''}${
-            this.form.pushType == 0 ? '客户' : '客户群'
-          }`
-    }
-  },
-  created() {
-    this.$store.dispatch(
-      'app/setBusininessDesc',
-      `
+    created () {
+      this.$store.dispatch(
+        'app/setBusininessDesc',
+        `
         <div>
           <h5>一、什么是群发助手？</h5>
           <p>
@@ -104,260 +260,261 @@ export default {
           </p>
         </div>
       `
-    )
-  },
-  mounted() {},
-  methods: {
-    // 显示选择客户范围弹窗
-    showRangeDialog() {
-      this[this.form.pushType == 0 ? 'dialogVisibleSelectCustomer' : 'dialogVisibleSelectUser'] = true
+      )
     },
-    // 选择添加人确认按钮
-    selectedUser(users) {
-      users.map((d) => {
-        d.userId && this.form.staffId.push(d.userId)
-        d.id && this.form.department.push(d.id)
-      })
-      this.userParty = users
-    },
-    // 选择标签确认按钮
-    submitSelectTag(data) {
-      this.form.tag = data
-    },
-    // 新建素材按钮
-    goRoute() {
-      let contentType = ['text', 'image', 'file']
-      window.open('#/customerMaintain/material/' + contentType[this.activeName])
-    },
-    // 选择素材确认按钮
-    submitSelectMaterial(text, image, file) {
-      if (this.activeName == 0) {
-        this.form.textMessage.content = text.content
-      } else if (this.activeName == 1) {
-        this.form.imageMessage.pic_url = image.materialUrl
-        this.form.imageMessage._materialName = image.materialName
-      }
-    },
-    submit() {
-      this.loading = true
-      let form = JSON.parse(JSON.stringify(this.form))
-      Promise.resolve()
-        .then(() => {
-          if (form.imageMessage.pic_url) {
-            // debugger
-            let dataMediaId = {
-              url: form.imageMessage.pic_url,
-              type: '0',
-              name: form.imageMessage._materialName
-            }
-            return getMaterialMediaId(dataMediaId).then((res) => {
-              // debugger
-              form.imageMessage.media_id = res.data.media_id
-            })
-          }
+    mounted () { },
+    methods: {
+      // validatePushUserRange(rule, value, callback) {
+      // 	if(value == 1 && this.userParty.length == 0) {
+      // 		callback('请选择员工')
+      // 	} else {
+      // 		callback()
+      // 	}
+      // },
+      validateClientGroup (rule, value, callback) {
+        if (
+          this.form.chatType == 1 &&
+          this.form.clientGroup == 1 &&
+          this.selectCustomerGroupList.length == 0
+        ) {
+          callback('请选择群主')
+        } else {
+          callback()
+        }
+      },
+      validateSettingTimeType (rule, value, callback) {
+        if (
+          this.form.settingTimeType == 1 &&
+          !this.form.settingTime
+        ) {
+          callback('请选择发送时间')
+        } else {
+          callback()
+        }
+      },
+      // 下一步
+      // 校验数据
+      nextStep () {
+        this.$refs.form.validate(validate => {
+          if (!validate) return
+          this.currentActive = 2
         })
-        .then(() => {
-          if (form.imageMessage.pic_url && form.textMessage.content) {
-            form.messageType = '4'
-          } else if (form.imageMessage.pic_url) {
-            form.messageType = '1'
-          } else if (form.textMessage.content) {
-            form.messageType = '0'
+      },
+      save (materialData) {
+        let data = Object.assign({}, this.form, {
+          welcomeMsg: materialData.welcomeMsg,
+          attachmentsList: materialData.materialList
+        })
+        data = JSON.parse(JSON.stringify(data))
+        // 员工id
+        // 部分群
+        if (data.chatType == 1 && data.clientGroup == 1) {
+          data.staffId = this.selectCustomerGroupList.map(i => i.owner).join(',')
+          data.tag = 'all'
+        } else if (data.chatType == 0 && data.pushRange == 1) {
+          // 部分客户
+          data.staffId = data.sendClientUserList.map(i => i.userId).join(',')
+          data.tag = data.sendClientTagList.map(i => i.tagId).join(',')
+          data.beginTime = data.rangeTime[0] ? parseTime(new Date(data.rangeTime[0])) : ''
+          data.endTime = data.rangeTime[1] ? parseTime(new Date(data.rangeTime[1])) : ''
+        } else {
+          data.staffId = ''
+          data.tag = 'all'
+        }
+        // 发送类型
+        data.settingTime = data.settingTimeType == 1 ? parseTime(new Date(data.settingTime)) : ''
+        data.department = data.department.join(',')
+
+        delete data.clientGroup
+        delete data.settingTimeType
+        delete data.rangeTime
+        delete data.sendClientUserList
+        delete data.sendClientTagList
+        add(data).then(res => {
+          if (res.code == 200) {
+            this.$router.go(-1)
+            this.msgSuccess('操作成功')
           } else {
-            this.msgInfo('消息内容不能为空')
-            return Promise.reject()
+            this.msgSuccess(res.msg || '操作失败')
           }
-          // debugger
-          form.tag = form.tag.map((d) => d.tagId) + ''
-          form.department += ''
-          form.staffId += ''
-          return add(form)
         })
-        .then(({ data }) => {
-          this.msgSuccess('操作成功')
-          this.loading = false
-          this.$router.push('record')
-        })
-        .catch(() => {
-          this.loading = false
-        })
+      },
+      onSelectCustomerGroup () {
+        this.dialogVisibleSelectCustomerGroup = true
+      },
+      // 选择群主
+      submitSelectCustomerGroup (data) {
+        let newData = []
+        if (data && data.length > 0) {
+          let keyMap = new Set()
+          data.forEach(i => {
+            if (!keyMap.has(i.owner)) {
+              newData.push(i)
+              keyMap.add(i.owner)
+            }
+          })
+        }
+        this.selectCustomerGroupList = newData
+        this.$refs.form.clearValidate('clientGroup')
+      },
+      onSelectTag () {
+        this.selectTagType = 1
+        this.selectedTagList = this.form.sendClientTagList
+        this.dialogVisibleSelectTag = true
+      },
+			/**
+			 * @param {Number} type 1:群发员工 2: 群发客户-部分客户-添加人
+			 */
+      onSelectUser (type) {
+        if (type == 1) {
+          this.selectedUserList = this.userParty
+        } else if (type == 2) {
+          this.selectedUserList = this.form.sendClientUserList
+        }
+
+        this.selectUserType = type
+        this.dialogVisibleSelectUser = true
+      },
+      // 显示选择客户范围弹窗
+      showRangeDialog () {
+        this[
+          this.form.chatType == 0 ?
+            'dialogVisibleSelectCustomer' :
+            'dialogVisibleSelectUser'
+        ] = true
+      },
+      // 选择添加人确认按钮
+      selectedUser (users) {
+        // 选择员工
+        if (this.selectUserType == 1) {
+          users.forEach((d) => {
+            d.userId && this.form.staffId.push(d.userId)
+            d.id && this.form.department.push(d.id)
+          })
+          this.userParty = users
+          // this.$refs.form.clearValidate('pushUserRange')
+        } else if (this.selectUserType == 2) {
+          this.form.sendClientUserList = users
+        }
+      },
+      // 选择标签确认按钮
+      submitSelectTag (data) {
+        console.log(data)
+        if (this.selectTagType == 1) {
+          this.form.sendClientTagList = data
+        } else {
+          this.form.tag = data
+        }
+        this.selectTagType = ''
+      },
+      // 新建素材按钮
+      goRoute () {
+        let contentType = ['text', 'image', 'file']
+        window.open('#/customerMaintain/material/' + contentType[this.activeName])
+      },
+      // 选择素材确认按钮
+      submitSelectMaterial (text, image, file) {
+        if (this.activeName == 0) {
+          // this.form.textMessage.content = text.content
+        } else if (this.activeName == 1) {
+          // this.form.imageMessage.pic_url = image.materialUrl
+          // this.form.imageMessage._materialName = image.materialName
+        }
+      },
     }
   }
-}
 </script>
 
-<template>
-  <div v-loading="loading">
-    <div class="flex content-wrap">
-      <el-form style="margin-right: 170px;" ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="群发类型" prop="pushType">
-          <el-radio-group v-model="form.pushType">
-            <el-radio v-for="dict in statusOptions" :key="dict.value" :label="dict.value">{{ dict.label }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="发送范围" prop="pushRange">
-          <span v-show="isSelectedText">{{ selectedText }}</span>
-          <el-button type="text" size="medium" @click="showRangeDialog()">{{
-            isSelectedText ? '修改' : form.pushType == 0 ? '选择发送客户' : '按群主选择客户群'
-          }}</el-button>
-        </el-form-item>
-        <el-form-item label="发送时间" prop="settingTime">
-          <el-date-picker
-            v-model="form.settingTime"
-            style="width: 240px"
-            value-format="yyyy-MM-dd HH:mm:ss"
-            type="datetime"
-            placeholder="选择日期时间"
-          ></el-date-picker>
-          <span class="small-tip">设置时间定时发送，不设置立即发送</span>
-        </el-form-item>
-        <el-form-item label-width="0">
-          <div class="content-left">
-            <el-button class="create" @click="goRoute">新建素材</el-button>
-            <el-tabs v-model="activeName">
-              <el-tab-pane name="0">
-                <span slot="label"> <i class="el-icon-date"></i> 文本 </span>
-                <el-input
-                  v-model="form.textMessage.content"
-                  type="textarea"
-                  maxlength="220"
-                  show-word-limit
-                  :autosize="{ minRows: 10, maxRows: 50 }"
-                  placeholder="请输入"
-                ></el-input>
-              </el-tab-pane>
-              <el-tab-pane name="1">
-                <span slot="label"> <i class="el-icon-date"></i> 图片 </span>
-                <el-image
-                  v-if="form.imageMessage.pic_url"
-                  style="width: 200px;"
-                  :src="form.imageMessage.pic_url"
-                  fit="fit"
-                ></el-image>
-              </el-tab-pane>
-              <!-- <el-tab-pane name="2">
-                <span slot="label"> <i class="el-icon-date"></i> 文件 </span>
-              </el-tab-pane> -->
-              <el-button type="primary" class="mt20" @click="dialogVisibleSelectMaterial = true"
-                >从素材库选择</el-button
-              >
-              <!-- <el-tab-pane label="配置管理" name="second">
-                <span slot="label"> <i class="el-icon-date"></i> 网页 </span>
-                配置管理
-              </el-tab-pane> -->
-
-              <!-- <el-tab-pane label="定时任务补偿" name="fourth">
-                <span slot="label"> <i class="el-icon-date"></i> 海报 </span>
-                定时任务补偿
-              </el-tab-pane> -->
-            </el-tabs>
-          </div>
-        </el-form-item>
-      </el-form>
-      <!-- 预览 -->
-      <PhoneDialog :message="form.textMessage.content || '请输入欢迎语'" :isOther="!!form.imageMessage.pic_url">
-        <el-image style="border-radius: 6px;" :src="form.imageMessage.pic_url" fit="fit"> </el-image>
-      </PhoneDialog>
-    </div>
-    <div class="mt15" style="margin-left: 40px;">
-      <el-button type="info" @click="submit">通知成员发送</el-button>
-      <span class="small-tip">
-        通知成员，向选中的客户发送以上企业消息
-      </span>
-    </div>
-
-    <!-- 选择发送客户弹窗 -->
-    <el-dialog title="选择发送客户" :visible.sync="dialogVisibleSelectCustomer">
-      <el-form :model="form" label-width="80px">
-        <el-form-item label="发送消息">
-          <el-radio-group v-model="form.pushRange">
-            <el-radio label="0">全部客户</el-radio>
-            <el-radio label="1">按条件筛选客户</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <div v-show="form.pushRange == 1">
-          <el-form-item label="添加人">
-            <div class="input-wrap" @click="dialogVisibleSelectUser = true">
-              <span class="placeholder" v-if="!userParty.length">请选择</span>
-              <template v-else>
-                <el-tag type="info" v-for="(unit, unique) in userParty" :key="unique">{{ unit.name }}</el-tag>
-              </template>
-            </div>
-          </el-form-item>
-          <el-form-item label="标签">
-            <div class="input-wrap" @click="dialogVisibleSelectTag = true">
-              <span class="placeholder" v-if="!form.tag.length">请选择</span>
-              <template v-else>
-                <el-tag type="info" v-for="(unit, unique) in form.tag" :key="unique">{{ unit.name }}</el-tag>
-              </template>
-            </div>
-          </el-form-item>
-        </div>
-      </el-form>
-      <div slot="footer">
-        <el-button @click="dialogVisibleSelectCustomer = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisibleSelectCustomer = false">确 定</el-button>
-      </div>
-    </el-dialog>
-
-    <!-- 选择添加人弹窗 -->
-    <SelectUser
-      :visible.sync="dialogVisibleSelectUser"
-      title="选择添加人"
-      :isOnlyLeaf="false"
-      @success="selectedUser"
-    ></SelectUser>
-
-    <!-- 选择标签弹窗 -->
-    <SelectTag :visible.sync="dialogVisibleSelectTag" title="选择标签" :selected="form.tag" @success="submitSelectTag">
-    </SelectTag>
-
-    <SelectMaterial
-      :visible.sync="dialogVisibleSelectMaterial"
-      :type.sync="activeName"
-      @success="submitSelectMaterial"
-    ></SelectMaterial>
-  </div>
-</template>
 
 <style lang="scss" scoped>
-.small-tip {
-  font-size: 12px;
-  color: #999;
-  margin-left: 12px;
-}
-.content-wrap {
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 20px;
-}
-.content-left {
-  position: relative;
-  .create {
-    position: absolute;
-    right: 10px;
-    top: 14px;
-    z-index: 1;
+  .content-border {
+    padding: 10px 20px;
+    background: #ffffff;
+    border: 1px solid #f1f1f1;
+    .item-name {
+      width: 100px;
+    }
+    .item-magin {
+      display: flex;
+      margin: 10px 0;
+    }
   }
 
-  .el-tabs {
-    height: 90%;
-    border-radius: 8px;
-    padding: 10px;
+  .crumb- {
+    // 一级 页面标题
+    &title {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 90px; // line-height: 90px;
+      font-size: 18px;
+      font-weight: 500;
+      color: #333;
+      padding: 0 20px;
+      background: #fff;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+    }
   }
-}
-.input-wrap {
-  width: 240px;
-  display: inline-flex;
-  border-radius: 4px;
-  border: 1px solid #dcdfe6;
-  align-items: center;
-  padding: 0 15px;
-  overflow: hidden;
-  height: 32px;
-  .placeholder {
-    color: #bbb;
-    font-size: 14px;
+
+  .tab {
+    height: 68px;
+    background: #fff;
+    border-top: 1px solid #f1f1f1;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
   }
-}
+
+  .crumb {
+    font-size: 12px;
+    font-family: PingFangSC-Regular, PingFang SC;
+    font-weight: 400;
+    color: #666666;
+    display: flex;
+  }
+
+  .small-tip {
+    font-size: 12px;
+    color: #999;
+    margin-left: 12px;
+  }
+
+  .content-wrap {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+  }
+
+  .content-left {
+    position: relative;
+
+    .create {
+      position: absolute;
+      right: 10px;
+      top: 14px;
+      z-index: 1;
+    }
+
+    .el-tabs {
+      height: 90%;
+      border-radius: 8px;
+      padding: 10px;
+    }
+  }
+
+  .input-wrap {
+    width: 240px;
+    display: inline-flex;
+    border-radius: 4px;
+    border: 1px solid #dcdfe6;
+    align-items: center;
+    padding: 0 15px;
+    overflow: hidden;
+    height: 32px;
+
+    .placeholder {
+      color: #bbb;
+      font-size: 14px;
+    }
+  }
 </style>
