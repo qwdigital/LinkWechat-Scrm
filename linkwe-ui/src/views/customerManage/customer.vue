@@ -174,8 +174,17 @@ export default {
       // this.multipleSelection.forEach((element) => {
       // })
       if (hasErrorTag.length > 0) {
-        this.msgError('已有标签[' + hasErrorTag + ']不在标签库中，或存在异常')
-        return
+        this.$notify({
+          // title: '标题名称',
+          message: this.$createElement(
+            'i',
+            { style: 'color: red' },
+            '已有标签[' + hasErrorTag + ']不在标签库中，已被删除或存在异常'
+          ),
+          type: 'warning',
+          customClass: 'mzindex'
+        })
+        // this.msgError('已有标签[' + hasErrorTag + ']不在标签库中，已被删除或存在异常')
       }
 
       this.tagDialogType = {
@@ -459,5 +468,10 @@ export default {
 }
 .bfc-d + .bfc-d .el-checkbox:first-child {
   margin-left: 10px;
+}
+</style>
+<style>
+.mzindex {
+  z-index: 5000 !important;
 }
 </style>
