@@ -19,7 +19,11 @@ export default {
         userIds: '', // "添加人id",
         tagIds: '', // "标签id,多个标签，id使用逗号隔开",
         beginTime: '', // "开始时间",
-        endTime: '' // "结束时间"
+        endTime: '', // "结束时间"
+        customerType: '', //客户类型  1:微信客户;2:企业客户
+        trackState: '', //跟进状态 1:待跟进;2:跟进中;3:已成交;4:无意向;5:已流失
+        addMethod: '', //添加方式 0:未知来源;1:扫描二维码;2:搜索手机号;3:名片分享;4:群聊;5:手机通讯录;6:微信联系人;7:来自微信好友的添加申请;8:安装第三方应用时自动添加的客服人员;9:搜索邮箱;10:视频号主页添加;11:员工活码;12:新客拉群;13:活动裂变;201:内部成员共享;202:管理员/负责人分配
+        gender: '' //0-未知 1-男性 2-女性
       },
       queryTag: [], // 搜索框选择的标签
       queryUser: [], // 搜索框选择的添加人
@@ -43,15 +47,32 @@ export default {
         title: '', // 选择标签弹窗标题
         type: '' // 弹窗类型
       },
-      dictCustomerType: { 1: '微信客户', 2: '企业客户' },
-      dictAddType: { 1: '员工活码', 2: '新客拉群', 2: '活动裂变', 2: '手机号' },
-      dictStatus: [
-        { name: '待跟进', code: 0, color: '' },
-        { name: '跟进中', code: 0, color: '' },
-        { name: '已成交', code: 0, color: '' },
-        { name: '无意向', code: 0, color: '' },
-        { name: '已流失', code: 0, color: '' }
-      ]
+      dictCustomerType: Object.freeze({ 1: '微信客户', 2: '企业客户' }),
+      dictAddType: Object.freeze({
+        0: '未知来源',
+        1: '扫描二维码',
+        2: '搜索手机号',
+        3: '名片分享',
+        4: '群聊',
+        5: '手机通讯录',
+        6: '微信联系人',
+        7: '来自微信好友的添加申请',
+        8: '安装第三方应用时自动添加的客服人员',
+        9: '搜索邮箱',
+        10: '视频号主页添加',
+        11: '员工活码',
+        12: '新客拉群',
+        13: '活动裂变',
+        201: '内部成员共享',
+        202: '管理员/负责人分配'
+      }),
+      dictStatus: Object.freeze({
+        1: { name: '待跟进', color: '' },
+        2: { name: '跟进中', color: '' },
+        3: { name: '已成交', color: '' },
+        4: { name: '无意向', color: '' },
+        5: { name: '已流失', color: '' }
+      })
     }
   },
   watch: {},
@@ -80,10 +101,12 @@ export default {
         this.query.endTime = ''
       }
       page && (this.query.pageNum = page)
+      this.query.tagIds = this.queryTag + ''
+      this.query.userIds = this.queryUser + ''
       this.loading = true
       api
         .getListNew(this.query)
-        .then(({ rows, total }) => {
+        .then(({ rows, total, lastSyncTime, noRepeatCustomerTotal }) => {
           rows.forEach((element) => {
             if (element.tagIds && element.tagNames) {
               element.tagIds = element.tagIds.split(',')
@@ -99,6 +122,8 @@ export default {
           })
           this.list = rows
           this.total = +total
+          this.lastSyncTime = lastSyncTime
+          this.noRepeatCustomerTotal = +noRepeatCustomerTotal
           this.loading = false
           this.multipleSelection = []
         })
@@ -290,7 +315,7 @@ export default {
       </el-form-item>
       <el-form-item label="客户类型" prop="name">
         <el-select v-model="model" placeholder="请选择">
-          <el-option v-for="(item, index) in dictCustomerType" :key="index" label="item" value="index"></el-option>
+          <el-option v-for="(item, index) in dictCustomerType" :key="index" :label="item" :value="index"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="客户标签">
@@ -311,7 +336,7 @@ export default {
       </el-form-item>
       <el-form-item label="跟进状态" prop="name">
         <el-select v-model="model" placeholder="请选择">
-          <el-option v-for="(item, index) in dictStatus" :key="index" :label="item.name" :value="item.code"></el-option>
+          <el-option v-for="(item, index) in dictStatus" :key="index" :label="item.name" :value="index"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="添加方式">
@@ -350,13 +375,11 @@ export default {
           >同步客户</el-button
         >
         <!-- <el-button v-hasPermi="['customerManage:customer:checkRepeat']" type="primary">查看重复客户</el-button> -->
-        <span>
-          最近同步：2021-05-17 15:05:43
-        </span>
+        <span> 最近同步：{{ lastSyncTime }} </span>
       </div>
     </div>
 
-    <div>客户总数(去重)：234</div>
+    <div>客户总数(去重)：{{ noRepeatCustomerTotal }}</div>
 
     <el-table
       ref="table"
@@ -367,16 +390,16 @@ export default {
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" align="center" width="55"> </el-table-column>
-      <el-table-column label="客户" prop="name" align="center">
+      <el-table-column label="客户" prop="customerName" align="center">
         <template slot-scope="{ row }">
           <div class="cp flex aic" @click="goRoute(row)">
-            <el-image style="width: 50px; height: 50px;" :src="url" fit="fit"></el-image>
+            <el-image style="width: 50px; height: 50px;" :src="row.avatar" fit="fit"></el-image>
             <div class="ml10">
               {{ row.customerName }}
-              <!-- <span :style="{ color: row.type === 1 ? '#4bde03' : '#f9a90b' }">{{
-              { 1: '@微信', 2: '@企业微信' }[row.type]
-            }}</span>
-            <i :class="['el-icon-s-custom', { 1: 'man', 2: 'woman' }[row.gender]]"></i> -->
+              <span :style="{ color: row.customerType === 1 ? '#4bde03' : '#f9a90b' }">{{
+                { 1: '@微信', 2: '@企业微信' }[row.type]
+              }}</span>
+              <!-- <i :class="['el-icon-s-custom', { 1: 'man', 2: 'woman' }[row.gender]]"></i> -->
             </div>
           </div>
         </template>
@@ -400,13 +423,11 @@ export default {
       </el-table-column>
       <el-table-column prop="firstAddTime" label="跟进状态" align="center">
         <template slot-scope="{ row }">
-          <el-tag type="success">{{}}</el-tag>
+          <el-tag type="success">{{ dictStatus[row.trackState + ''].name }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="firstAddTime" label="添加方式" align="center">
-        <!-- <template slot-scope="{ row }">{{
-          row.weFlowerCustomerRels[0] ? row.weFlowerCustomerRels[0].createTime : ''
-        }}</template> -->
+      <el-table-column prop="trackState" label="添加方式" align="center">
+        <template slot-scope="{ row }">{{ dictAddType[row.addMethod + ''] }}</template>
       </el-table-column>
       <el-table-column prop="firstAddTime" label="添加时间" align="center">
         <!-- <template slot-scope="{ row }">{{
@@ -422,7 +443,7 @@ export default {
           <el-button v-hasPermi="['customerManage/customer:makeTag']" type="text" @click="makeTag(row)"
             >标签管理</el-button
           >
-          <el-button type="text" size="small">在职继承 </el-button>
+          <el-button type="text" size="small" :disabled="row.isTransfer">在职继承 </el-button>
         </template>
       </el-table-column>
     </el-table>
