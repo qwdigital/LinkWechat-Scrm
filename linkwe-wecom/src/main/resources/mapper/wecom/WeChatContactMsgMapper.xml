@@ -37,7 +37,7 @@
                         where FIND_IN_SET(#{fromId}, to_list) and is_external = 0 and room_id = ''
                         order by msg_time desc
                 ) as msg group by receiver order by msg.msg_time desc) t
-        inner join we_customer wc on t.receiver = wc.external_userid;
+        inner join we_customer wc on t.receiver = wc.external_userid  and wc.first_user_id=#{fromId};
     </select>
 
     <select id="selectAloneChatList" resultType="com.linkwechat.wecom.domain.vo.WeChatContactMsgVo">
