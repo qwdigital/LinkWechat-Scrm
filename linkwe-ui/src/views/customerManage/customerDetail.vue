@@ -1,8 +1,10 @@
 <script>
 import { updateBirthday, getDetail } from '@/api/customer'
-
+import record from './customer/record'
+import ctrack from './customer/track'
 export default {
-  // name: 'CustomerDetail',
+  name: 'CustomerDetail',
+  components: { record, ctrack },
   data() {
     return {
       datePickerVisible: false,
@@ -14,7 +16,9 @@ export default {
         disabledDate(time) {
           return time.getTime() > Date.now()
         }
-      }
+      },
+      listStaff: [],
+      listGroup: []
     }
   },
   created() {
@@ -54,35 +58,40 @@ export default {
 <template>
   <div>
     <!-- <el-button slot="append" circle icon="el-icon-back" @click="$router.back()"></el-button>返回 -->
-    <div class=" flex aic" @click="goRoute(customer)">
+    <div class=" flex aic mb20" @click="goRoute(customer)">
       <el-image style="width: 80px; height: 80px;" :src="customer.url" fit="fit"></el-image>
-      <div>
-        <div class="ml10">
+      <div class="ml10">
+        <div>
           {{ customer.customerName }}
           <span :style="{ color: customer.type === 1 ? '#4bde03' : '#f9a90b' }">{{
             { 1: '@微信', 2: '@企业微信' }[customer.type]
           }}</span>
           <i :class="['el-icon-s-custom', { 1: 'man', 2: 'woman' }[customer.gender]]"></i>
         </div>
-        <div>
-          <el-tag type="info" v-for="(unit, unique) in customer.tagNames" :key="unique">{{ unit }}</el-tag>
+        <div class="mt10">
+          <template v-if="customer.tagNames && customer.tagNames.length">
+            <el-tag type="info" v-for="(unit, unique) in customer.tagNames" :key="unique">{{ unit }}</el-tag>
+          </template>
+          <div>
+            暂无标签
+          </div>
         </div>
       </div>
     </div>
 
     <el-card shadow="never">
-      <div slot="header">社交关系</div>
+      <div slot="header" class="card-title">社交关系</div>
       <el-tabs value="1">
-        <el-tab-pane :label="`跟进员工(${1})`" name="1">
-          <el-table :data="list">
+        <el-tab-pane :label="`跟进员工(${listStaff.length})`" name="1">
+          <el-table :data="listStaff">
             <el-table-column label="员工" align="center" prop="welcomeMsg" />
             <el-table-column label="添加方式" align="center" prop="createBy" />
             <el-table-column label="添加时间" align="center" prop="createTime" />
             <el-table-column label="跟进状态" align="center" prop="createTime" />
           </el-table>
         </el-tab-pane>
-        <el-tab-pane :label="`所在客群(${2})`" name="2">
-          <el-table :data="list">
+        <el-tab-pane :label="`所在客群(${listGroup.length})`" name="2">
+          <el-table :data="listGroup">
             <el-table-column label="群名" align="center" prop="welcomeMsg" />
             <el-table-column label="群主" align="center" prop="createBy" />
             <el-table-column label="入群时间" align="center" prop="createTime" />
@@ -97,89 +106,55 @@ export default {
         <el-row :gutter="10">
           <el-col :span="14">
             <div class="left">
-              <el-card shadow="never">
-                <div slot="header">企业标签</div>
-                <div>
-                  张三：
-                  <el-tag type="info" v-for="(unit, unique) in customer.tagNames" :key="unique">{{ unit }}</el-tag>
-                </div>
-                <div>
-                  张三：
-                  <el-tag type="info" v-for="(unit, unique) in customer.tagNames" :key="unique">{{ unit }}</el-tag>
-                </div>
-              </el-card>
-
-              <el-card shadow="never">
-                <div slot="header">个人标签</div>
-                <div>
-                  张三：
-                  <el-tag type="info" v-for="(unit, unique) in customer.tagNames" :key="unique">{{ unit }}</el-tag>
-                </div>
-                <div>
-                  张三：
-                  <el-tag type="info" v-for="(unit, unique) in customer.tagNames" :key="unique">{{ unit }}</el-tag>
+              <el-card class="mb10" shadow="never">
+                <div slot="header" class="card-title">企业标签</div>
+                <div class="flex mb20" v-for="item of 3" :key="item">
+                  <div style="width:60px;flex: none;">
+                    张三：
+                  </div>
+                  <template v-if="customer.tagNames && customer.tagNames.length">
+                    <el-tag type="info" v-for="(unit, unique) in customer.tagNames" :key="unique">{{ unit }}</el-tag>
+                  </template>
+                  <div>
+                    暂无标签
+                  </div>
                 </div>
               </el-card>
 
-              <el-card shadow="never">
-                <div slot="header">跟进状态</div>
-                <div>
-                  张三：
-                  <el-steps :active="active" finish-status="success">
+              <el-card class="mb10" shadow="never">
+                <div slot="header" class="card-title">个人标签</div>
+                <div class="flex mb20" v-for="item of 3" :key="item">
+                  <div style="width:60px;flex: none;">
+                    张三：
+                  </div>
+                  <template v-if="customer.tagNames && customer.tagNames.length">
+                    <el-tag type="info" v-for="(unit, unique) in customer.tagNames" :key="unique">{{ unit }}</el-tag>
+                  </template>
+                  <div>
+                    暂无标签
+                  </div>
+                </div>
+              </el-card>
+
+              <el-card class="mb10" shadow="never">
+                <div slot="header" class="card-title">跟进状态</div>
+                <div class="fxbw mb20" v-for="item of 3" :key="item">
+                  <div style="width:60px;flex: none;">
+                    张三：
+                  </div>
+                  <el-steps style="flex:auto;" :active="active" finish-status="success">
                     <el-step title="步骤 1"></el-step>
                     <el-step title="步骤 2"></el-step>
                     <el-step title="步骤 3"></el-step>
                   </el-steps>
                 </div>
-                <div>
-                  张三：
-                  <el-steps :active="active" finish-status="success">
-                    <el-step title="步骤 1"></el-step>
-                    <el-step title="步骤 2"></el-step>
-                    <el-step title="步骤 3"></el-step>
-                  </el-steps>
-                </div>
               </el-card>
 
               <el-card shadow="never">
-                <div slot="header">跟进记录</div>
-                <el-tabs value="1">
-                  <el-tab-pane :label="`张三(${1})`" name="1">
-                    <el-table :data="list">
-                      <el-table-column label="员工" align="center" prop="welcomeMsg" />
-                      <el-table-column label="跟进记录" align="center" prop="createBy" />
-                      <el-table-column label="跟进状态" align="center" prop="createTime" />
-                      <el-table-column label="跟进记录时间" align="center" prop="createTime" />
-                    </el-table>
-
-                    <el-pagination
-                      @size-change="handleSizeChange"
-                      @current-change="handleCurrentChange"
-                      :current-page="pageNum"
-                      :page-sizes="[10, 20, 50]"
-                      :page-size="pageSize"
-                      layout="total, sizes, prev, pager, next, jumper"
-                      :total="totalCount"
-                    >
-                    </el-pagination>
-                  </el-tab-pane>
-                  <el-tab-pane :label="`张三(${2})`" name="2">
-                    <el-table :data="list">
-                      <el-table-column label="员工" align="center" prop="welcomeMsg" />
-                      <el-table-column label="跟进记录" align="center" prop="createBy" />
-                      <el-table-column label="跟进状态" align="center" prop="createTime" />
-                      <el-table-column label="跟进记录时间" align="center" prop="createTime" />
-                    </el-table>
-                    <el-pagination
-                      @size-change="handleSizeChange"
-                      @current-change="handleCurrentChange"
-                      :current-page="pageNum"
-                      :page-sizes="[10, 20, 50]"
-                      :page-size="pageSize"
-                      layout="total, sizes, prev, pager, next, jumper"
-                      :total="totalCount"
-                    >
-                    </el-pagination>
+                <div slot="header" class="card-title">跟进记录</div>
+                <el-tabs value="0">
+                  <el-tab-pane v-for="(item, index) in 3" :key="index" :label="item" :name="index + ''">
+                    <record></record>
                   </el-tab-pane>
                 </el-tabs>
               </el-card>
@@ -187,62 +162,43 @@ export default {
           </el-col>
           <el-col :span="10">
             <div class="right">
-              <div>
-                <span>客户轨迹</span>
-                <el-button type="text">同步</el-button>
-              </div>
-              <div class="flex">
-                <div>
-                  全部
+              <el-card>
+                <div slot="header">
+                  <span class="card-title">客户轨迹</span>
+                  <span style=" color: #13a2e8;" class="fr">同步</span>
                 </div>
-                <div>
-                  全部
+                <div class="flex track-tab-wrap">
+                  <div class="track-tab active">
+                    全部
+                  </div>
+                  <div class="track-tab">
+                    全部
+                  </div>
+                  <div class="track-tab">
+                    全部
+                  </div>
+                  <div class="track-tab">
+                    全部
+                  </div>
                 </div>
-                <div>
-                  全部
-                </div>
-              </div>
-              <ul class="infinite-list" v-infinite-scroll="load" style="overflow:auto">
-                <li v-for="i in count" class="infinite-list-item">
-                  <div>2021-02-16 星期二</div>
-                  <el-timeline>
-                    <el-timeline-item timestamp="2018/4/12" placement="top">
-                      <el-card>
-                        <h4>更新 Github 模板</h4>
-                        <p>王小虎 提交于 2018/4/12 20:46</p>
-                      </el-card>
-                    </el-timeline-item>
-                    <el-timeline-item timestamp="2018/4/3" placement="top">
-                      <el-card>
-                        <h4>更新 Github 模板</h4>
-                        <p>王小虎 提交于 2018/4/3 20:46</p>
-                      </el-card>
-                    </el-timeline-item>
-                    <el-timeline-item timestamp="2018/4/2" placement="top">
-                      <el-card>
-                        <h4>更新 Github 模板</h4>
-                        <p>王小虎 提交于 2018/4/2 20:46</p>
-                      </el-card>
-                    </el-timeline-item>
-                  </el-timeline>
-                </li>
-              </ul>
+                <ctrack></ctrack>
+              </el-card>
             </div>
           </el-col>
         </el-row>
       </el-tab-pane>
     </el-tabs>
 
-    <el-card shadow="never" :body-style="{ width: '410px', lineHeight: '30px' }">
+    <!-- <el-card shadow="never" :body-style="{ width: '410px', lineHeight: '30px' }">
       <div class="flex aic mt20">
         <el-avatar style="flex: none;" :size="50" :src="customer.avatar"></el-avatar>
         <div class="info-wrap">
           <div class="mb10">
             {{ customer.name }}
-            <!-- <span :style="{ color: customer.type == 1 ? '#4bde03' : '#f9a90b' }">{{
+            <span :style="{ color: customer.type == 1 ? '#4bde03' : '#f9a90b' }">{{
               { 1: '@微信', 2: '@企业微信' }[customer.type]
             }}</span>
-            <i :class="['el-icon-s-custom', { 1: 'man', 2: 'woman' }[customer.gender]]"></i> -->
+            <i :class="['el-icon-s-custom', { 1: 'man', 2: 'woman' }[customer.gender]]"></i>
           </div>
           <div class="info">
             出生日期：{{ customer.birthday }}
@@ -304,7 +260,7 @@ export default {
         <el-col :span="10">添加时间：</el-col>
         <el-col :span="12">{{ customer.firstAddTime }}</el-col>
       </el-row>
-    </el-card>
+    </el-card> -->
   </div>
 </template>
 
@@ -318,7 +274,6 @@ export default {
 }
 
 .el-card {
-  margin: 20px 20px 0 0;
   .el-row {
     color: #666;
     margin-bottom: 10px;
@@ -330,6 +285,9 @@ export default {
   .el-tag {
     margin-bottom: 5px;
   }
+  /deep/.el-card__header {
+    border: 0;
+  }
 }
 .el-icon-s-custom {
   font-size: 16px;
@@ -340,6 +298,26 @@ export default {
   }
   &.woman {
     color: #f753b2;
+  }
+}
+
+.card-title {
+  font-weight: 600;
+}
+
+.track-tab-wrap {
+  .track-tab {
+    background: #ddd;
+    border-radius: 50px;
+    padding: 5px 20px;
+    cursor: pointer;
+    & + .track-tab {
+      margin-left: 10px;
+    }
+    &.active {
+      background: $blue;
+      color: #fff;
+    }
   }
 }
 </style>

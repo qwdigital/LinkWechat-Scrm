@@ -90,7 +90,7 @@ export default {
 </script>
 
 <template>
-  <div class="app-container">
+  <div class="">
     <!-- <el-button slot="append" circle icon="el-icon-back" @click="$router.back()"></el-button>返回 -->
     <div class="flex mt10">
       <div class="left g-card g-pad20">
@@ -118,31 +118,31 @@ export default {
           </div>
         </div>
 
-        <div class="flex aic">
+        <div class="flex aic ac mt10 overview">
           <div>
-            <div>
+            <div class="value">
               {{ group.groupLeaderName }}
             </div>
             <div class="key">群主</div>
           </div>
-          <span class="line">|</span>
+          <span class="line"></span>
           <div>
-            <div>
-              {{ group.memberNum }}
+            <div class="value">
+              {{ group.memberNum || 0 }}
             </div>
             <div class="key">群总人数</div>
           </div>
-          <span class="line">|</span>
+          <span class="line"></span>
           <div>
-            <div>
-              {{ group.customerNum }}
+            <div class="value">
+              {{ group.customerNum || 0 }}
             </div>
             <div class="key">客户总数</div>
           </div>
-          <span class="line">|</span>
+          <span class="line"></span>
           <div>
-            <div>
-              {{ group.joinGroupMemberNum }}
+            <div class="value">
+              {{ group.joinGroupMemberNum || 0 }}
             </div>
             <div class="key">今日进群数</div>
           </div>
@@ -162,7 +162,7 @@ export default {
 
     <el-input class="mt20" placeholder="请输入群成员" v-model="query.name" clearable>
       <el-button type="primary" slot="append" @click="getList(1)">
-        <span class="key">查询</span>
+        <span>查询</span>
       </el-button>
     </el-input>
     <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
@@ -200,14 +200,23 @@ export default {
   .info {
     color: #666;
   }
-
-  .line {
-    padding: 15px;
-    color: #dbdbdb;
-  }
 }
-.key {
-  color: $blue;
+.overview {
+  justify-content: space-around;
+  line-height: 30px;
+  .key {
+    color: #999;
+  }
+  .value {
+    color: #333;
+    font-weight: 600;
+    font-size: 16px;
+  }
+  .line {
+    width: 1px;
+    height: 30px;
+    background: #ddd;
+  }
 }
 .left {
   width: 70%;
@@ -217,11 +226,5 @@ export default {
 }
 .el-input {
   width: 30%;
-}
-
-.card-blue {
-  flex: 1;
-  width: unset;
-  max-width: 200px;
 }
 </style>

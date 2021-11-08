@@ -161,7 +161,7 @@ export default {
 </script>
 
 <template>
-  <div class="app-container">
+  <div class="">
     <el-form :model="query" ref="queryForm" :inline="true" class="top-search" label-width="80px">
       <el-form-item label="群名" prop="groupName">
         <el-input v-model="query.groupName" placeholder="请输入群名" clearable />

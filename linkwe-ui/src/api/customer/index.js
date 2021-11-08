@@ -149,3 +149,20 @@ export function getLossRemindStatus(status) {
     url: window.CONFIG.services.wecom + '/corp/getCustomerChurnNoticeSwitch/'
   })
 }
+/**
+ * 在职继承
+ * @param {*} data
+{
+        handoverUserId: '', //移交人
+        takeoverUserId: '', //接受人
+        externalUserid: '' //客户id，多个客户使用逗号隔开
+      }
+ * @returns
+ */
+export function jobExtends(data) {
+  return request({
+    url: service + '/jobExtends',
+    method: 'POST',
+    data
+  })
+}

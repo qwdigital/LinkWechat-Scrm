@@ -1,7 +1,7 @@
 <script>
 import * as api from '@/api/customer'
 import { getList as getListTag } from '@/api/customer/tag'
-import { getList as getListOrganization } from '@/api/organization'
+import { getAllStaff } from '@/api/organization'
 import AddTag from '@/components/AddTag'
 import SelectUser from '@/components/SelectUser'
 import SelectTag from '@/components/SelectTag'
@@ -29,19 +29,23 @@ export default {
       queryUser: [], // 搜索框选择的添加人
       dateRange: [], // 添加日期
       loading: false,
-      isMoreFilter: false,
       total: 0,
+      lastSyncTime: '',
+      noRepeatCustomerTotal: 0,
       // 添加标签表单
       form: {
         gourpName: '',
         weTags: []
       },
       list: [], // 客户列表
-      listOrganization: [], // 组织架构列表
+      staffList: [], // 所有员工列表
       multipleSelection: [], // 多选数组
       dialogVisible: false, // 选择标签弹窗显隐
       dialogVisibleSelectUser: false, // 选择添加人弹窗显隐
       dialogVisibleAddTag: false, // 添加标签弹窗显隐
+      dialogVisibleExtend: false, // 在职继承弹窗显隐
+      extendStaff: '', // 在职继承选择的员工
+      currentEidt: '', // 当前编辑项
       selectedTag: [], // 选择的标签
       tagDialogType: {
         title: '', // 选择标签弹窗标题
@@ -68,10 +72,10 @@ export default {
       }),
       dictStatus: Object.freeze({
         1: { name: '待跟进', color: '' },
-        2: { name: '跟进中', color: '' },
-        3: { name: '已成交', color: '' },
-        4: { name: '无意向', color: '' },
-        5: { name: '已流失', color: '' }
+        2: { name: '跟进中', color: 'warning' },
+        3: { name: '已成交', color: 'success' },
+        4: { name: '无意向', color: 'info' },
+        5: { name: '已流失', color: 'danger' }
       })
     }
   },
@@ -80,7 +84,7 @@ export default {
   created() {
     this.getList()
     this.getListTag()
-    this.getListOrganization()
+    this.getAllStaff()
 
     this.$store.dispatch(
       'app/setBusininessDesc',
@@ -148,9 +152,9 @@ export default {
         }
       })
     },
-    getListOrganization() {
-      getListOrganization().then(({ rows }) => {
-        this.listOrganization = Object.freeze(rows)
+    getAllStaff() {
+      getAllStaff().then(({ data }) => {
+        this.staffList = Object.freeze(data)
       })
     },
     showTagDialog() {
@@ -163,6 +167,7 @@ export default {
       // this.$refs.selectTag.$forceUpdate()
     },
     makeTag(row) {
+      this.currentEidt = row
       // if (!this.multipleSelection.length) {
       //   this.msgInfo('请选择一位客户')
       //   return
@@ -264,9 +269,9 @@ export default {
         this.dialogVisible = false
       } else {
         let data = {
-          externalUserid: this.multipleSelection[0].externalUserid,
+          externalUserid: this.currentEidt.externalUserid,
           addTag: selected,
-          userId: this.multipleSelection[0].firstUserId
+          userId: this.currentEidt.firstUserId
         }
         // let apiType = {
         //   add: 'makeLabel',
@@ -302,6 +307,24 @@ export default {
         path: 'customerDetail',
         query: { data: JSON.stringify(row) }
       })
+    },
+
+    // 在职继承
+    transfer(row) {
+      if (!this.extendStaff) {
+        this.msgError('请选择员工')
+        return
+      }
+      let data = {
+        handoverUserId: this.currentEidt.firstUserId, //移交人
+        takeoverUserId: this.extendStaff, //接受人
+        externalUserid: this.currentEidt.externalUserid //客户id，多个客户使用逗号隔开
+      }
+      api.jobExtends(data).then((res) => {
+        this.msgSuccess('操作成功')
+        this.dialogVisibleExtend = false
+        this.getList()
+      })
     }
   }
 }
@@ -314,7 +337,7 @@ export default {
         <el-input v-model="query.name" placeholder="请输入"></el-input>
       </el-form-item>
       <el-form-item label="客户类型" prop="name">
-        <el-select v-model="model" placeholder="请选择">
+        <el-select v-model="query.customerType" placeholder="请选择">
           <el-option v-for="(item, index) in dictCustomerType" :key="index" :label="item" :value="index"></el-option>
         </el-select>
       </el-form-item>
@@ -335,12 +358,12 @@ export default {
         </div>
       </el-form-item>
       <el-form-item label="跟进状态" prop="name">
-        <el-select v-model="model" placeholder="请选择">
+        <el-select v-model="query.trackState" placeholder="请选择">
           <el-option v-for="(item, index) in dictStatus" :key="index" :label="item.name" :value="index"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="添加方式">
-        <el-select v-model="model" placeholder="请选择">
+        <el-select v-model="query.addMethod" placeholder="请选择">
           <el-option v-for="(item, index) in dictAddType" :key="index" :label="item" :value="index"></el-option>
         </el-select>
       </el-form-item>
@@ -423,7 +446,9 @@ export default {
       </el-table-column>
       <el-table-column prop="firstAddTime" label="跟进状态" align="center">
         <template slot-scope="{ row }">
-          <el-tag type="success">{{ dictStatus[row.trackState + ''].name }}</el-tag>
+          <el-tag v-if="row.trackState" :type="dictStatus[~~row.trackState + ''].color">{{
+            dictStatus[~~row.trackState + ''].name
+          }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="trackState" label="添加方式" align="center">
@@ -443,7 +468,16 @@ export default {
           <el-button v-hasPermi="['customerManage/customer:makeTag']" type="text" @click="makeTag(row)"
             >标签管理</el-button
           >
-          <el-button type="text" size="small" :disabled="row.isTransfer">在职继承 </el-button>
+          <el-button
+            type="text"
+            size="small"
+            :disabled="row.isTransfer"
+            @click="
+              dialogVisibleExtend = true
+              currentEidt = row
+            "
+            >在职继承
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -472,6 +506,22 @@ export default {
 
     <!-- 添加标签弹窗 -->
     <AddTag :visible.sync="dialogVisibleAddTag" :form="form" @success="getListTag(true)" />
+
+    <!-- 在职继承弹窗 -->
+    <el-dialog title="选择员工" :visible.sync="dialogVisibleExtend" :close-on-click-modal="false">
+      <el-form ref="formExtend" inline>
+        <el-form-item prop="extendStaff" label="选择员工">
+          <el-select v-model="extendStaff" placeholder="">
+            <el-option v-for="item in staffList" :key="item.userId" :label="item.name" :value="item.userId">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button @click="dialogVisibleExtend = false">取 消</el-button>
+        <el-button type="primary" @click="transfer">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
