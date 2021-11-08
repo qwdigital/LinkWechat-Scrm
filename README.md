@@ -325,7 +325,7 @@ LinkWeChat 开源团队将目前所收项目捐赠全额捐出，仅尽绵薄之
 
 # 八、版权声明
 
-LinkWeChat 开源版遵循 [GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE) 开源协议发布，并提供免费使用，但 **绝不允许修改后和衍生的代码做为闭源的商业软件发布和销售！** 
+LinkWeChat 开源版遵循 [GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE) 开源协议发布，并提供技术交流学习，但**绝不允许修改后和衍生的代码做为闭源的商业软件发布和销售！** 
 
 LinkWeChat 开源团队拥有对本开源协议的最终解释权。
 
