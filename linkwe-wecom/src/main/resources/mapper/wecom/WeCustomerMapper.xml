@@ -610,12 +610,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         email,
         address,
         phone,
-        add_method
+        add_method,
+        del_flag
         ) values
         <foreach collection="weCustomers" item="item" index="index" separator=",">
             (#{item.externalUserid},#{item.name},#{item.avatar},#{item.type},#{item.gender}, #{item.unionid},#{item.birthday},
             #{item.corpName},#{item.corpFullName},#{item.position},#{item.isOpenChat}, #{item.createTime},
-            #{item.createBy},#{item.firstUserId},#{item.firstAddTime},#{item.qq},#{item.email},#{item.address},#{item.phone},#{item.addMethod}
+            #{item.createBy},#{item.firstUserId},#{item.firstAddTime},#{item.qq},#{item.email},#{item.address},#{item.phone},#{item.addMethod},
+             #{item.delFlag}
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
@@ -635,7 +637,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         email=IF(we_customer.email != null, VALUES(email), we_customer.email),
         address=IF(we_customer.address != null, VALUES(address), we_customer.address),
         phone=IF(we_customer.phone != null, VALUES(phone), we_customer.phone),
-        add_method=IF(we_customer.add_method != null, VALUES(add_method), we_customer.add_method);
+        add_method=IF(we_customer.add_method != null, VALUES(add_method), we_customer.add_method),
+        del_flag=IF(we_customer.del_flag != null, VALUES(del_flag), we_customer.del_flag);
     </insert>
 
 

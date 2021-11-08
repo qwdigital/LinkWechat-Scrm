@@ -203,30 +203,13 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
      */
     public List<WeCustomerList> externalUserIds(String pushRange, String staffId, String department, String tag) {
         if (pushRange.equals(WeConstans.SEND_MESSAGE_CUSTOMER_ALL)) {
-            //从redis中读取数据
-//            List<WeCustomer> customers = redisCache.getCacheList(WeConstans.WECUSTOMERS_KEY);
-//            if (CollectionUtils.isEmpty(customers)) {
-//                WeCustomer weCustomer = new WeCustomer();
-//                weCustomer.setUserIds(staffId);
-//                weCustomer.setDepartmentIds(department);
-//                customers = weCustomerService.selectWeCustomerAllList(weCustomer);
-//                redisCache.setCacheList(WeConstans.WECUSTOMERS_KEY, customers);
-//                redisCache.expire(WeConstans.WECUSTOMERS_KEY,2 * 60L);
-//            }else{
-//                return customers;
-//            }
-//
-//            WeCustomer weCustomer = new WeCustomer();
-//            weCustomer.setUserIds(staffId);
-//            weCustomer.setDepartmentIds(department);
-//            return weCustomerService.selectWeCustomerListNoRel(weCustomer);
+
 
 
             return  weCustomerService.findWeCustomerList(WeCustomerList.builder()
                     .userIds(staffId)
                     .departmentIds(department)
                     .build());
-
 
         } else {
 
@@ -240,14 +223,6 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
                     .departmentIds(department)
                     .build());
 
-//            WeCustomer weCustomer = new WeCustomer();
-//            weCustomer.setUserIds(staffId);
-//            weCustomer.setTagIds(tag);
-//            weCustomer.setDepartmentIds(department);
-//
-//
-//
-//            return weCustomerService.selectWeCustomerListNoRel(weCustomer);
         }
     }
 

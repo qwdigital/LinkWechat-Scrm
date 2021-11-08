@@ -85,7 +85,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         ON DUPLICATE KEY UPDATE
         user_id=IF(we_flower_customer_tag_rel.user_id != null, VALUES(user_id), we_flower_customer_tag_rel.user_id),
         external_userid=IF(we_flower_customer_tag_rel.external_userid != null, VALUES(external_userid), we_flower_customer_tag_rel.external_userid),
-        tag_id=IF(we_flower_customer_tag_rel.tag_id != null, VALUES(tag_id), we_flower_customer_tag_rel.tag_id);
+        tag_id=IF(we_flower_customer_tag_rel.tag_id != null, VALUES(tag_id), we_flower_customer_tag_rel.tag_id),
+        create_time=IF(we_flower_customer_tag_rel.create_time != null, VALUES(create_time), we_flower_customer_tag_rel.create_time);
     </insert>
     
 </mapper>

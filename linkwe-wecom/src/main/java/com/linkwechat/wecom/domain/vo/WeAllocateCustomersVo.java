@@ -28,4 +28,35 @@ public class WeAllocateCustomersVo extends BaseEntity {
 
     /**原拥有着*/
     private String handoverUserId;
+
+
+
+
+
+
+    private String avatar;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date birthday;
+
+
+    //0-未知 1-男性 2-女性
+    private Integer gender;
+
+
+    //查询标签id
+    private String tagIds;
+
+    //标签名称，使用逗号隔开
+    private String tagNames;
+
+    //跟进人名称
+    private String userName;
+
+
+    //添加时间
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date firstAddTime;
+
+
 }

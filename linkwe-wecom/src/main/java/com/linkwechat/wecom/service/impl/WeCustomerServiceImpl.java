@@ -170,6 +170,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 weCustomer.setFirstUserId(followInfo.getUserid());
                 weCustomer.setFirstAddTime(new Date(followInfo.getCreatetime() * 1000L));
                 weCustomer.setAddMethod(followInfo.getAdd_way());
+                weCustomer.setState(followInfo.getState());
+                weCustomer.setDelFlag(new Integer(0));
                 weCustomerList.add(weCustomer);
                 List<String> tags = Stream.of(followInfo.getTag_id()).collect(Collectors.toList());
                 if (CollectionUtil.isNotEmpty(tags)) {
@@ -303,10 +305,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             );
             if(CollectionUtil.isNotEmpty(weTagList)){
                 if(addTag.size()!=weTagList.size()){
-                    new WeComException("部门标签不存在");
+                   throw  new WeComException("部门标签不存在");
                 }
             }else{
-                 new WeComException("部门标签不存在");
+                throw  new WeComException("部门标签不存在");
             }
 
 
@@ -374,6 +376,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 }
             }
         }
+
+
+
+
     }
 
 
@@ -417,7 +423,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
                 if(null != followUser){
                     weCustomer.setFirstAddTime(new Date(followUser.getCreatetime() * 1000L));
-
+                    weCustomer.setState(followUser.getState());
+                    weCustomer.setAddMethod(followUser.getAddWay());
+                    weCustomer.setDelFlag(new Integer(0));
                     this.baseMapper.batchAddOrUpdate(
                             ListUtil.toList(weCustomer)
                     );

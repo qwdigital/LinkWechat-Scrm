@@ -68,6 +68,8 @@ public class WeCustomerList {
 
 
 
+
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthday;
 
