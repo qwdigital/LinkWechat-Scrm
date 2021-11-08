@@ -56,6 +56,7 @@ export default {
     </el-table>
 
     <el-pagination
+      small
       @current-change="getList"
       :current-page="query.pageNum"
       :page-sizes="[10, 20, 50]"

@@ -17,6 +17,20 @@ import {
 //   getList
 // } from '@/api/material/poster'
 
+var validateHtml = (rule, value, callback) => {
+  if (/\.html$/gi.test(value)) {
+    callback()
+  } else {
+    callback(new Error('必须以 html 作为后缀'))
+  }
+}
+var validateHttp = (rule, value, callback) => {
+  if (/^https?:\/\//gi.test(value)) {
+    callback()
+  } else {
+    callback(new Error('必须以 http://或 https://开头'))
+  }
+}
 export default {
   name: 'MaPage',
   components: {},
@@ -76,7 +90,11 @@ export default {
         materialUrl: [{ required: true, message: '不能为空', trigger: 'change' }],
         materialName: [{ required: true, message: '不能为空', trigger: 'blur' }],
         digest: [{ required: true, message: '不能为空', trigger: 'blur' }],
-        coverUrl: [{ required: true, message: '不能为空', trigger: 'blur' }]
+        coverUrl: [{ required: true, message: '不能为空', trigger: 'blur' }],
+        coUrl: [
+          { required: true, message: '不能为空', trigger: 'blur' },
+          { validator: validateHtml, trigger: 'blur' }
+        ]
       })
     }
   },
@@ -427,18 +445,18 @@ export default {
         </template>
 
         <template v-else-if="type === '8'">
-          <el-form-item label="小程序标题" prop="materialName">
+          <el-form-item label="标题" prop="materialName">
             <el-input v-model="form.materialName" placeholder="请输入小程序标题"></el-input>
           </el-form-item>
-          <el-form-item label="小程序AppID" prop="materialUrl">
+          <el-form-item label="AppID" prop="materialUrl">
             <el-input v-model="form.materialUrl" placeholder="小程序AppID"></el-input>
             <div class="sub-des">必须是审核通过，正常发布，且关联到企业的小程序应用</div>
           </el-form-item>
-          <el-form-item label="小程序路径" prop="content">
+          <el-form-item label="路径" prop="content">
             <el-input v-model="form.content" placeholder="请输入小程序路径"></el-input>
             <div class="sub-des">必须以 html 作为后缀</div>
           </el-form-item>
-          <el-form-item label="小程序封面" prop="materialUrl">
+          <el-form-item label="封面" prop="materialUrl">
             <upload :fileUrl.sync="form.coverUrl" type="0">
               <div slot="tip">
                 建议大小 2M 以内，建议尺寸 520*416仅支持 png/jpg 等图片类型
@@ -532,5 +550,10 @@ export default {
   justify-content: space-between;
   font-size: 14px;
   padding-right: 8px;
+}
+
+.sub-des {
+  color: #aaa;
+  font-size: 12px;
 }
 </style>

@@ -23,7 +23,19 @@ export default {
   },
   data() {
     return {
-      activeName: 'text'
+      activeName: 'text',
+      list: [
+        { label: '文本', name: 'text', component: Mtext },
+        { label: '图片', name: 'image', component: Mimage },
+        { label: '图文', name: 'imageText', component: MimageText },
+        { label: '链接', name: 'link', component: Mlink },
+        { label: '语音', name: 'audio', component: Maudio },
+        { label: '视频', name: 'video', component: Mvideo },
+        { label: '文件', name: 'file', component: Mfile },
+        { label: '小程序', name: 'applet', component: Mapplet },
+        { label: '海报', name: 'poster', component: Mposter }
+      ],
+      opened: ['text']
     }
   },
   computed: {},
@@ -36,11 +48,11 @@ export default {
 
 <template>
   <div>
-    <el-tabs v-model="activeName">
-      <el-tab-pane label="文本" name="text">
-        <Mtext></Mtext>
+    <el-tabs v-model="activeName" @tab-click="(v) => opened.includes(v.name) || opened.push(v.name)">
+      <el-tab-pane v-for="(item, index) in list" :key="index" :label="item.label" :name="item.name">
+        <component v-if="opened.includes(item.name)" :is="item.component"></component>
       </el-tab-pane>
-      <el-tab-pane label="图片" name="image">
+      <!-- <el-tab-pane label="图片" name="image">
         <Mimage></Mimage>
       </el-tab-pane>
       <el-tab-pane label="图文" name="imageText">
@@ -63,14 +75,9 @@ export default {
       </el-tab-pane>
       <el-tab-pane label="海报" name="poster">
         <Mposter></Mposter>
-      </el-tab-pane>
+      </el-tab-pane> -->
     </el-tabs>
   </div>
 </template>
 
-<style lang="scss" scoped>
-/deep/.el-tabs__header {
-  margin-bottom: 0;
-  background: #fff;
-}
-</style>
+<style lang="scss" scoped></style>

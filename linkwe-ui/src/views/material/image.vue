@@ -36,7 +36,7 @@ export default {
               ></i>
             </div>
           </div>
-          <div style="padding: 14px;">
+          <div style="margin: 14px;overflow: hidden;">
             <el-checkbox v-model="ids" :label="item.id">{{ item.materialName }}</el-checkbox>
           </div>
         </el-card>
