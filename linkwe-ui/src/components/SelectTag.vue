@@ -118,7 +118,7 @@ export default {
 
 <template>
   <el-dialog :title="title" :visible.sync="Pvisible">
-    <div>
+    <div class="dialog-content">
       <span class="mr20">选择分组</span>
       <el-select v-model="selectedGroup" placeholder="请选择">
         <el-option label="所有标签" value></el-option>
@@ -128,12 +128,8 @@ export default {
       <div v-if="Pvisible">
         <el-checkbox-group v-if="type !== 'remove'" v-model="Pselected">
           <template v-for="(item, index) in list">
-            <div
-              style="padding: 20px 0;border-bottom: 1px solid #ddd;"
-              v-if="item.groupId === selectedGroup || !selectedGroup"
-              :key="index"
-            >
-              <div style="font-size: 16px;margin-bottom: 15px; color:#aaa;">{{ item.gourpName }}</div>
+            <div class="checkbox-li" v-if="item.groupId === selectedGroup || !selectedGroup" :key="index">
+              <div class="checkbox-group-title">{{ item.gourpName }}</div>
               <template v-for="(unit, unique) in item.weTags">
                 <el-checkbox v-if="unit.name.trim()" :label="unit" :key="index + '' + unique">{{
                   unit.name
@@ -166,5 +162,21 @@ export default {
 }
 .mr30 {
   margin-right: 30px;
+}
+.dialog-content {
+  overflow: auto;
+  max-height: calc(85vh - 150px);
+}
+
+.checkbox-li {
+  .checkbox-group-title {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #aaa;
+  }
+  padding: 20px 0 15px 0;
+  & + .checkbox-li {
+    border-top: 1px solid #eee;
+  }
 }
 </style>
