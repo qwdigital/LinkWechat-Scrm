@@ -60,6 +60,11 @@ public class WeConstans {
 
     public static final String WE_EMPLE_CODE_KEY = "we_emple_code_key";
 
+    /**
+     * 活码前缀
+     */
+    public static final String WE_QR_CODE_PREFIX = "we_qr";
+
 
     /**
      * 企业微信接口返回成功code

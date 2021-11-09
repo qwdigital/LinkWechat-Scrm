@@ -25,7 +25,7 @@ public class WeCategory extends BaseEntity {
     private Long id;
 
 
-    @ApiModelProperty("素材分类：0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本")
+    @ApiModelProperty("素材分类：0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本 5 海报 6 活码")
     private String mediaType;
 
 
@@ -38,7 +38,8 @@ public class WeCategory extends BaseEntity {
     @ApiModelProperty("素材上级父节点id")
     private Long parentId;
 
-
+    @ApiModelProperty("可删除标识 0 可删除 1 不可删除")
+    private Integer flag;
 
     @ApiModelProperty("素材状态:0 未删除 2 已删除")
     private String delFlag;

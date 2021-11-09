@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeTag;
+import com.linkwechat.wecom.domain.vo.tag.WeTagVo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -79,4 +80,11 @@ public interface WeTagMapper  extends BaseMapper<WeTag>
      * @return
      */
     public int batchUpdateWeTag(List<WeTag> weTags);
+
+    /**
+     * 根据标签id批量查询
+     * @param tagIds
+     * @return
+     */
+    List<WeTagVo> selectWeTagByIds(List<String> tagIds);
 }

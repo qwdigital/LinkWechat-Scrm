@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeQrScopeMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.wecom.domain.WeQrScope" id="WeQrScopeResult">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="qrId" column="qr_id" jdbcType="INTEGER"/>
+        <result property="scopeId" column="scope_id" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="INTEGER"/>
+        <result property="scopeType" column="scope_type" jdbcType="INTEGER"/>
+        <result property="party" column="party" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="workCycle" column="work_cycle" jdbcType="VARCHAR"/>
+        <result property="beginTime" column="begin_time" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="selectWeQrScopeVo">
+        select id, qr_id, scope_id, type, scope_type, party, user_id, work_cycle, begin_time, end_time, create_by, create_time, update_by, update_time, del_flag from we_qr_scope
+    </sql>
+
+</mapper>

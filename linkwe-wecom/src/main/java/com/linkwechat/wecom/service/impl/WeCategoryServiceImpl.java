@@ -68,6 +68,7 @@ public class WeCategoryServiceImpl extends ServiceImpl<WeCategoryMapper,WeCatego
             WeCategoryVo weCategoryVo = new WeCategoryVo();
             weCategoryVo.setId(c.getId());
             weCategoryVo.setName(c.getName());
+            weCategoryVo.setFlag(c.getFlag());
             weCategoryVo.setParentId(c.getParentId());
             weCategoryVos.add(weCategoryVo);
         });

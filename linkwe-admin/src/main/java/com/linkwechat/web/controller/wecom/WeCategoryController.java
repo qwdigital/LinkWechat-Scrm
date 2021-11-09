@@ -8,6 +8,7 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.Tree;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.wecom.domain.WeCategory;
+import com.linkwechat.wecom.domain.vo.WeCategoryVo;
 import com.linkwechat.wecom.service.IWeCategoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/wecom/category")
-@Api("企业微信素材分类")
+@Api(tags = "企业微信素材分类")
 public class WeCategoryController extends BaseController {
 
     @Autowired
@@ -37,7 +38,7 @@ public class WeCategoryController extends BaseController {
 //    @PreAuthorize("@ss.hasPermi('wechat:category:list')")
     @GetMapping("/list")
     @ApiOperation("类目树")
-    public AjaxResult list(@RequestParam("mediaType") String mediaType) {
+    public AjaxResult<WeCategoryVo> list(@RequestParam("mediaType") String mediaType) {
         return AjaxResult.success(weCategoryService.findWeCategoryByMediaType(mediaType));
     }
 
@@ -47,7 +48,7 @@ public class WeCategoryController extends BaseController {
 //    @PreAuthorize("@ss.hasPermi('wechat:category:query')")
     @GetMapping(value = "/{id}")
     @ApiOperation("通过id查询类目详细信息")
-    public AjaxResult getInfo(@PathVariable("id") Long id) {
+    public AjaxResult<WeCategoryVo> getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(weCategoryService.getById(id));
     }
 
@@ -98,5 +99,7 @@ public class WeCategoryController extends BaseController {
 
         return AjaxResult.success();
     }
+
+
 
 }
