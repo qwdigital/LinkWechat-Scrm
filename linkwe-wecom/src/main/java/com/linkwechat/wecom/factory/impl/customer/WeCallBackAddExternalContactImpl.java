@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.factory.impl.customer;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -122,7 +123,7 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
     }
 
     /**
-     * 活码欢迎语发送
+     * 活码欢迎语发送(扫码回掉)
      *
      * @param state          渠道
      * @param wecomCode      欢迎语code
@@ -137,6 +138,7 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                 WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(wecomCode);
                 WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByState(state);
                 if (StringUtils.isNotNull(messageMap)) {
+
                     //查询活码对应标签
                     List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.list(new LambdaQueryWrapper<WeEmpleCodeTag>()
                             .eq(WeEmpleCodeTag::getEmpleCodeId, messageMap.getEmpleCodeId()));

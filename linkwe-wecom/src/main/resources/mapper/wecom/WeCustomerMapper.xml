@@ -592,7 +592,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <insert id="batchAddOrUpdate">
         INSERT INTO we_customer(
         external_userid,
-        NAME,
+        `name`,
         avatar,
         type,
         gender,
@@ -611,34 +611,37 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         address,
         phone,
         add_method,
-        del_flag
+        del_flag,
+        state,
+        scan_code_add_times
         ) values
         <foreach collection="weCustomers" item="item" index="index" separator=",">
             (#{item.externalUserid},#{item.name},#{item.avatar},#{item.type},#{item.gender}, #{item.unionid},#{item.birthday},
             #{item.corpName},#{item.corpFullName},#{item.position},#{item.isOpenChat}, #{item.createTime},
             #{item.createBy},#{item.firstUserId},#{item.firstAddTime},#{item.qq},#{item.email},#{item.address},#{item.phone},#{item.addMethod},
-             #{item.delFlag}
+             #{item.delFlag},#{item.state},#{item.scanCodeAddTimes}
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
-        NAME=IF(we_customer.NAME != null, VALUES(NAME), we_customer.NAME),
-        avatar=IF(we_customer.avatar != null, VALUES(avatar), we_customer.avatar),
-        type=IF(we_customer.type != null, VALUES(type), we_customer.type),
-        gender=IF(we_customer.gender != null, VALUES(gender), we_customer.gender),
-        unionid=IF(we_customer.unionid != null, VALUES(unionid), we_customer.unionid),
-        birthday=IF(we_customer.birthday != null,VALUES(birthday), we_customer.birthday),
-        corp_name=IF(we_customer.corp_name != null, VALUES(corp_name), we_customer.corp_name),
-        corp_full_name=IF(we_customer.corp_full_name != null, VALUES(corp_full_name), we_customer.corp_full_name),
-        position=IF(we_customer.position != null, VALUES(position), we_customer.position),
-        is_open_chat=IF(we_customer.is_open_chat != null, VALUES(is_open_chat), we_customer.is_open_chat),
-        first_user_id=IF(we_customer.first_user_id != null, VALUES(first_user_id), we_customer.first_user_id),
-        first_add_time=IF(we_customer.first_add_time != null, VALUES(first_add_time), we_customer.first_add_time),
-        qq=IF(we_customer.qq != null, VALUES(qq), we_customer.qq),
-        email=IF(we_customer.email != null, VALUES(email), we_customer.email),
-        address=IF(we_customer.address != null, VALUES(address), we_customer.address),
-        phone=IF(we_customer.phone != null, VALUES(phone), we_customer.phone),
-        add_method=IF(we_customer.add_method != null, VALUES(add_method), we_customer.add_method),
-        del_flag=IF(we_customer.del_flag != null, VALUES(del_flag), we_customer.del_flag);
+        NAME=IF(VALUES(NAME)=null and VALUES(NAME)='',we_customer.NAME,VALUES(NAME)),
+        avatar=IF( VALUES(avatar)=null and VALUES(avatar)='', we_customer.avatar,VALUES(avatar)),
+        type=IF(VALUES(type),we_customer.type,VALUES(type)),
+        gender=IF(VALUES(gender) , we_customer.gender,VALUES(gender)),
+        unionid=IF(VALUES(unionid)=null and VALUES(unionid)='',we_customer.unionid,VALUES(unionid)),
+        birthday=IF(VALUES(birthday), we_customer.birthday,VALUES(birthday)),
+        corp_name=IF(VALUES(corp_name)=null and VALUES(corp_name)='',we_customer.corp_name,VALUES(corp_name)),
+        corp_full_name=IF(VALUES(corp_full_name)=null and VALUES(corp_full_name)='', we_customer.corp_full_name,VALUES(corp_full_name)),
+        position=IF(VALUES(position)=null and VALUES(position)='',we_customer.position,VALUES(position)),
+        is_open_chat=IF(VALUES(is_open_chat),we_customer.is_open_chat,VALUES(is_open_chat)),
+        first_user_id=IF(VALUES(first_user_id)=null and VALUES(first_user_id)='', we_customer.first_user_id,VALUES(first_user_id)),
+        first_add_time=IF(VALUES(first_add_time)=null ,we_customer.first_add_time,VALUES(first_add_time)),
+        qq=IF(VALUES(qq)=null and VALUES(qq)='', we_customer.qq,VALUES(qq)),
+        email=IF(VALUES(email)=null and VALUES(email)='',we_customer.email,VALUES(email)),
+        address=IF(VALUES(address)=null and VALUES(address)='',we_customer.address,VALUES(address)),
+        phone=IF( VALUES(phone)=null and  VALUES(phone)='', we_customer.phone, VALUES(phone)),
+        add_method=IF(VALUES(add_method),we_customer.add_method,VALUES(add_method)),
+        del_flag=IF(VALUES(del_flag), we_customer.del_flag, VALUES(del_flag)),
+        state=IF( VALUES(state)=null and  VALUES(state)='', we_customer.state, VALUES(state));
     </insert>
 
 

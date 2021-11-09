@@ -712,5 +712,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
     }
 
+    @Override
+    public void batchAddOrUpdate(List<WeCustomer> weCustomer) {
+        this.baseMapper.batchAddOrUpdate(weCustomer);
+    }
+
 
 }

@@ -1,10 +1,12 @@
 package com.linkwechat.wecom.factory.impl.customer;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeEmpleCodeTag;
 import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
 import com.linkwechat.wecom.domain.WeFlowerCustomerTagRel;
@@ -53,6 +55,8 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
             }
             //向扫码客户发送欢迎语
             if (message.getState() != null && message.getWelcomeCode() != null) {
+
+
                 log.info("执行发送欢迎语>>>>>>>>>>>>>>>");
                 WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(message.getWelcomeCode());
                 WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByScenario(message.getState(),message.getUserId());

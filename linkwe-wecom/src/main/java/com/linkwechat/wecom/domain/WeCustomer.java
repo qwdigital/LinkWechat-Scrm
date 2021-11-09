@@ -205,4 +205,5 @@ public class WeCustomer extends BaseEntity {
 
     //添加方式
     private Integer addMethod;
+
 }
