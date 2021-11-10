@@ -612,14 +612,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         phone,
         add_method,
         del_flag,
-        state,
-        scan_code_add_times
+        state
         ) values
         <foreach collection="weCustomers" item="item" index="index" separator=",">
             (#{item.externalUserid},#{item.name},#{item.avatar},#{item.type},#{item.gender}, #{item.unionid},#{item.birthday},
             #{item.corpName},#{item.corpFullName},#{item.position},#{item.isOpenChat}, #{item.createTime},
             #{item.createBy},#{item.firstUserId},#{item.firstAddTime},#{item.qq},#{item.email},#{item.address},#{item.phone},#{item.addMethod},
-             #{item.delFlag},#{item.state},#{item.scanCodeAddTimes}
+             #{item.delFlag},#{item.state}
             )
         </foreach>
         ON DUPLICATE KEY UPDATE

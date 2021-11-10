@@ -62,6 +62,10 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
     private WeCustomerClient weCustomerClient;
 
 
+    @Autowired
+    private IWeScanEmpleCodeCountService iWeScanEmpleCodeCountService;
+
+
     @Override
     public void eventHandle(WxCpXmlMessageVO message) {
         if (message.getExternalUserId() != null) {
@@ -139,6 +143,14 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                 WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByState(state);
                 if (StringUtils.isNotNull(messageMap)) {
 
+                    //扫码统计记录入库
+                    iWeScanEmpleCodeCountService.save(
+                            WeScanEmpleCodeCount.builder()
+                                    .empleCodeId(Long.valueOf(state))
+                                    .createTime(new Date())
+                                    .userId(userId)
+                                    .externalUserid(externalUserId)
+                                    .build());
                     //查询活码对应标签
                     List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.list(new LambdaQueryWrapper<WeEmpleCodeTag>()
                             .eq(WeEmpleCodeTag::getEmpleCodeId, messageMap.getEmpleCodeId()));
