@@ -50,9 +50,7 @@ public class WeAddMsgTemplateQuery {
     }
 
     public void setAttachments(List<WeMessageTemplate> messageTemplates) {
-        final int size = 10;
-        this.attachments = new ArrayList<>(16);
-        if (CollectionUtil.isNotEmpty(messageTemplates) &&  messageTemplates.size() < size) {
+        if (CollectionUtil.isNotEmpty(messageTemplates)) {
             messageTemplates.forEach(messageTemplate -> {
                 if (ObjectUtil.equal(MessageType.IMAGE.getMessageType(), messageTemplate.getMsgType())) {
                     Attachments images = new Images(messageTemplate.getMsgType(), messageTemplate.getMediaId(),
@@ -74,8 +72,6 @@ public class WeAddMsgTemplateQuery {
                     attachments.add(files);
                 }
             });
-        } else {
-            throw new WeComException("仅支持最多同时发送9个附件");
         }
     }
 
