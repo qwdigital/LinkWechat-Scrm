@@ -30,4 +30,11 @@ public interface IWeQrAttachmentsService extends IService<WeQrAttachments> {
      * @return
      */
     Boolean delBatchByQrIds(List<Long> qrIds);
+
+    /**
+     * 通过活码id批量修改活码欢迎语素材
+     * @param qrId 活码id
+     * @param attachments 素材列表
+     */
+    void updateBatchByQrId(Long qrId, List<WeMessageTemplate> attachments);
 }

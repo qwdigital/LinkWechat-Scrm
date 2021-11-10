@@ -18,8 +18,8 @@ public interface IWeQrTagRelService extends IService<WeQrTagRel> {
 
     /**
      * 通过活码id批量保存活码标签
-     * @param qrId
-     * @param qrTags
+     * @param qrId 活码id
+     * @param qrTags 标签id
      */
     void saveBatchByQrId(Long qrId, List<String> qrTags);
 
@@ -28,4 +28,11 @@ public interface IWeQrTagRelService extends IService<WeQrTagRel> {
      * @param qrIds
      */
     Boolean delBatchByQrIds(List<Long> qrIds);
+
+    /**
+     * 通过活码id批量修改活码标签
+     * @param qrId 活码id
+     * @param qrTags 标签id
+     */
+    void updateBatchByQrId(Long qrId, List<String> qrTags);
 }

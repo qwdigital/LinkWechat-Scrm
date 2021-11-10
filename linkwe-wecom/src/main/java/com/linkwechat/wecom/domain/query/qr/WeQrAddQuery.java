@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.wecom.domain.WeMessageTemplate;
 import com.linkwechat.wecom.domain.WeQrCode;
@@ -13,6 +14,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -24,6 +26,9 @@ import java.util.List;
 @ApiModel
 @Data
 public class WeQrAddQuery {
+
+    @ApiModelProperty("活码Id")
+    private Long qrId;
 
     @ApiModelProperty("名称")
     private String qrName;
@@ -50,12 +55,8 @@ public class WeQrAddQuery {
     private List<WeMessageTemplate> attachments;
 
     @ApiModelProperty(value = "渠道",hidden = true)
-    private static String state;
+    private String state;
 
-    static {
-        Snowflake snowflake = IdUtil.getSnowflake(RandomUtil.randomLong(6), RandomUtil.randomInt(6));
-        state = snowflake.nextIdStr();
-    }
 
 
     /**
@@ -64,13 +65,16 @@ public class WeQrAddQuery {
      * @return 企微接口参数实体类
      */
     public WeExternalContactDto.WeContactWay getWeContactWay() {
-
+        Snowflake snowflake = IdUtil.getSnowflake(RandomUtil.randomLong(6), RandomUtil.randomInt(6));
+        this.state = snowflake.nextIdStr();
         WeExternalContactDto.WeContactWay weContactWay = new WeExternalContactDto.WeContactWay();
         //根据类型生成相应的活码
+        if(this.qrId == null){
+            weContactWay.setState(WeConstans.WE_QR_CODE_PREFIX + "_" + state);
+        }
         weContactWay.setType(this.qrType);
         weContactWay.setScene(WeConstans.QR_CODE_EMPLE_CODE_SCENE);
         weContactWay.setSkip_verify(BooleanUtils.toBoolean(this.qrAutoAdd));
-        weContactWay.setState(WeConstans.WE_QR_CODE_PREFIX + "_" + state);
         if (CollectionUtil.isNotEmpty(qrUserInfos)) {
             //员工列表
             String[] userIdArr = qrUserInfos.stream().filter(item ->
@@ -97,12 +101,15 @@ public class WeQrAddQuery {
      */
     public WeQrCode getWeQrCodeEntity(String configId, String qrCode){
         WeQrCode weQrCode = new WeQrCode();
+        weQrCode.setId(this.qrId);
         weQrCode.setName(this.qrName);
         weQrCode.setAutoAdd(this.qrAutoAdd);
         weQrCode.setGroupId(this.getQrGroupId());
         weQrCode.setType(this.qrType);
         weQrCode.setRuleType(this.qrRuleType);
-        weQrCode.setState(state);
+        if(this.qrId == null){
+            weQrCode.setState(state);
+        }
         weQrCode.setConfigId(configId);
         weQrCode.setQrCode(qrCode);
         return weQrCode;

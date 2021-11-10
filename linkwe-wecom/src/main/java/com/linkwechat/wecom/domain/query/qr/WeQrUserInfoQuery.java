@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain.query.qr;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,6 +15,9 @@ import java.util.List;
 @ApiModel
 @Data
 public class WeQrUserInfoQuery {
+
+    @ApiModelProperty(value = "排期分组id(修改接口时传)")
+    private String scopeId;
 
     @ApiModelProperty("排班员工类型 1-默认 2-自定义")
     private Integer type;

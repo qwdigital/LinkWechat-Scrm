@@ -30,4 +30,11 @@ public interface IWeQrScopeService extends IService<WeQrScope> {
      * @return
      */
     Boolean delBatchByQrIds(List<Long> qrIds);
+
+    /**
+     * 通过活码id批量修改适用范围
+     * @param qrId  活码id
+     * @param qrUserInfos 适用范围列表
+     */
+    void updateBatchByQrId(Long qrId, List<WeQrUserInfoQuery> qrUserInfos);
 }

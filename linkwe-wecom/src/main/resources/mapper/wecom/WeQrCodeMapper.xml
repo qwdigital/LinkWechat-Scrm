@@ -123,4 +123,26 @@
         </if>
     </select>
 
+    <select id="getQrCodeList" resultType="java.lang.Long">
+        select
+            wqc.id
+        from we_qr_code wqc
+            left join we_qr_tag_rel wqtr on wqtr.qr_id = wqc.id and wqtr.del_flag = 0
+            left join we_qr_scope wqs on wqs.qr_id = wqc.id and wqs.del_flag = 0
+            left join we_qr_attachments wqa on wqa.qr_id = wqc.id and wqs.del_flag = 0
+            where 1=1
+        <if test="qrName != null and qrName != ''">
+            and wqc.name like concat('%', #{qrName}, '%')
+        </if>
+        <if test="qrUserName != null and qrUserName != ''">
+            and exists (select 1 from we_user wu where wu.user_id = wqs.user_id and wu.user_name like concat('%', #{qrUserName}, '%'))
+        </if>
+        <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(wqc.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+        </if>
+        <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(wqc.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+        </if>
+    </select>
+
 </mapper>

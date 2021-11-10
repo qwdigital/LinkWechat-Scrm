@@ -1,8 +1,11 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.query.qr.WeQrUserInfoQuery;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -73,5 +76,13 @@ public class IWeQrScopeServiceImpl extends ServiceImpl<WeQrScopeMapper, WeQrScop
         WeQrScope weQrScope = new WeQrScope();
         weQrScope.setDelFlag(1);
         return this.update(weQrScope,new LambdaQueryWrapper<WeQrScope>().in(WeQrScope::getQrId,qrIds));
+    }
+
+    @Override
+    public void updateBatchByQrId(Long qrId, List<WeQrUserInfoQuery> qrUserInfos) {
+        if(CollectionUtil.isNotEmpty(qrUserInfos)){
+            delBatchByQrIds(ListUtil.toList(qrId));
+            this.saveBatchByQrId(qrId,qrUserInfos);
+        }
     }
 }

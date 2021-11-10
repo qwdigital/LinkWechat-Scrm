@@ -5,25 +5,27 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeExternalContactClient;
+import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeQrCode;
-import com.linkwechat.wecom.domain.WeQrScope;
 import com.linkwechat.wecom.domain.dto.WeExternalContactDto;
 import com.linkwechat.wecom.domain.query.qr.WeQrAddQuery;
+import com.linkwechat.wecom.domain.query.qr.WeQrCodeListQuery;
 import com.linkwechat.wecom.domain.query.qr.WeQrUserInfoQuery;
 import com.linkwechat.wecom.domain.vo.qr.WeQrCodeDetailVo;
-import com.linkwechat.wecom.domain.vo.qr.WeQrScopeVo;
-import com.linkwechat.wecom.domain.vo.tag.WeTagVo;
+import com.linkwechat.wecom.domain.vo.qr.WeQrCodeScanCountVo;
 import com.linkwechat.wecom.mapper.WeQrCodeMapper;
 import com.linkwechat.wecom.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -48,7 +50,8 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
     private IWeQrAttachmentsService attachmentsService;
 
     @Autowired
-    private IWeTagService weTagService;
+    private IWeCustomerService weCustomerService;
+
 
     /**
      * 新增员工活码
@@ -75,8 +78,43 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
     }
 
     @Override
+    public void updateQrCode(WeQrAddQuery weQrAddQuery) {
+        //校验排期是否存在冲突
+        checkScope(weQrAddQuery.getQrUserInfos());
+        WeExternalContactDto.WeContactWay weContactWay = weQrAddQuery.getWeContactWay();
+        WeExternalContactDto resultDto = externalContactClient.updateContactWay(weContactWay);
+        if (resultDto != null && ObjectUtil.equal(0, resultDto.getErrcode())) {
+            WeQrCode weQrCode = weQrAddQuery.getWeQrCodeEntity(null, null);
+            if (updateById(weQrCode)) {
+                //修改标签数据
+                tagRelService.updateBatchByQrId(weQrCode.getId(), weQrAddQuery.getQrTags());
+                //修改活码范围数据
+                scopeService.updateBatchByQrId(weQrCode.getId(), weQrAddQuery.getQrUserInfos());
+                //修改活码素材
+                attachmentsService.updateBatchByQrId(weQrCode.getId(), weQrAddQuery.getAttachments());
+            }
+        }
+    }
+
+    @Override
     public WeQrCodeDetailVo getQrDetail(Long qrId) {
         return this.baseMapper.getQrDetailByQrId(qrId);
+    }
+
+    @Override
+    public PageInfo<WeQrCodeDetailVo> getQrCodeList(WeQrCodeListQuery qrCodeListQuery) {
+        List<WeQrCodeDetailVo> weQrCodeList = new ArrayList<>();
+        List<Long> qrCodeIdList = this.baseMapper.getQrCodeList(qrCodeListQuery);
+        if(CollectionUtil.isNotEmpty(qrCodeIdList)){
+            List<WeQrCodeDetailVo> qrDetailByQrIds = this.baseMapper.getQrDetailByQrIds(qrCodeIdList);
+            weQrCodeList.addAll(qrDetailByQrIds);
+        }
+        PageInfo<Long> pageIdInfo = new PageInfo<>(qrCodeIdList);
+        PageInfo<WeQrCodeDetailVo> pageInfo = new PageInfo<>(weQrCodeList);
+        pageInfo.setTotal(pageIdInfo.getTotal());
+        pageInfo.setPageNum(pageIdInfo.getPageNum());
+        pageInfo.setPageSize(pageIdInfo.getPageSize());
+        return pageInfo;
     }
 
 
@@ -100,6 +138,18 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
                 }
             }));
         }
+    }
+
+    @Override
+    public WeQrCodeScanCountVo getWeQrCodeScanCount(WeQrCodeListQuery qrCodeListQuery) {
+        Long qrId = qrCodeListQuery.getQrId();
+        String beginTime = qrCodeListQuery.getBeginTime();
+        String endTime = qrCodeListQuery.getEndTime();
+        WeQrCode weQrCode = getById(qrId);
+        String state = weQrCode.getState();
+        //todo 计算
+        //weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getStatus))
+        return null;
     }
 
     /**

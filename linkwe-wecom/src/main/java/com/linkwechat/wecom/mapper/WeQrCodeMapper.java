@@ -3,6 +3,7 @@ package com.linkwechat.wecom.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeQrCode;
+import com.linkwechat.wecom.domain.query.qr.WeQrCodeListQuery;
 import com.linkwechat.wecom.domain.vo.qr.WeQrCodeDetailVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
@@ -32,5 +33,12 @@ public interface WeQrCodeMapper extends BaseMapper<WeQrCode> {
      * @return
      */
     List<WeQrCodeDetailVo> getQrDetailByQrIds(List<Long> qrIds);
+
+    /**
+     * 查询活码列表id
+     * @param qrCodeListQuery
+     * @return
+     */
+    List<Long> getQrCodeList(WeQrCodeListQuery qrCodeListQuery);
 }
 

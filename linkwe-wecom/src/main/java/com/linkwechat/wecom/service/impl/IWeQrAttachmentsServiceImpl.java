@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.wecom.domain.WeMessageTemplate;
@@ -41,5 +42,11 @@ public class IWeQrAttachmentsServiceImpl extends ServiceImpl<WeQrAttachmentsMapp
         WeQrAttachments weQrAttachments = new WeQrAttachments();
         weQrAttachments.setDelFlag(1);
         return this.update(weQrAttachments,new LambdaQueryWrapper<WeQrAttachments>().in(WeQrAttachments::getQrId,qrIds));
+    }
+
+    @Override
+    public void updateBatchByQrId(Long qrId, List<WeMessageTemplate> attachments) {
+        delBatchByQrIds(ListUtil.toList(qrId));
+        saveBatchByQrId(qrId,attachments);
     }
 }

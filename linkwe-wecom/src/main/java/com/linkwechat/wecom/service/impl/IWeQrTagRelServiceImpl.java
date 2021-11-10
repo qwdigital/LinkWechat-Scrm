@@ -1,5 +1,8 @@
 package com.linkwechat.wecom.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -39,5 +42,11 @@ public class IWeQrTagRelServiceImpl extends ServiceImpl<WeQrTagRelMapper, WeQrTa
         WeQrTagRel weQrTagRel = new WeQrTagRel();
         weQrTagRel.setDelFlag(1);
         return this.update(weQrTagRel, new LambdaQueryWrapper<WeQrTagRel>().in(WeQrTagRel::getQrId,qrIds));
+    }
+
+    @Override
+    public void updateBatchByQrId(Long qrId, List<String> qrTags) {
+        this.delBatchByQrIds(ListUtil.toList(qrId));
+        this.saveBatchByQrId(qrId,qrTags);
     }
 }
