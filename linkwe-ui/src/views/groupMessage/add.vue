@@ -1,40 +1,28 @@
 <template>
   <div>
-    <div class="crumb-title">
-      <div class="crumb">
-        当前位置：
-        <el-breadcrumb separator=">">
-          <el-breadcrumb-item>
-            <a href="/wechat/customerMaintain/groupMessage">消息群发</a>
-          </el-breadcrumb-item>
-          <el-breadcrumb-item>新建群发</el-breadcrumb-item>
-        </el-breadcrumb>
-      </div>
-      <div>新建群发</div>
-    </div>
     <div class="tab">
       <el-steps style="margin-top:10px;" :active="currentActive" align-center>
         <el-step title="基础信息"></el-step>
         <el-step title="群发内容"></el-step>
       </el-steps>
     </div>
-    <div class="g-card g-pad20" v-if="currentActive === 1">
+    <div v-if="currentActive === 1">
       <el-form style="width: 60%;" ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="群发类型" required prop="chatType">
           <el-radio-group v-model="form.chatType">
-            <el-radio label="1">群发客户</el-radio>
-            <el-radio label="2">群发客户群</el-radio>
+            <el-radio :label=1>群发客户</el-radio>
+            <el-radio :label=2>群发客户群</el-radio>
           </el-radio-group>
         </el-form-item>
         <template v-if="form.chatType == 2">
           <el-form-item label="群发客户群" required prop="clientGroup">
             <el-radio-group v-model="form.clientGroup">
-              <el-radio :label="0">全部群</el-radio>
-              <el-radio :label="1">部分群</el-radio>
+              <el-radio :label=0>全部群</el-radio>
+              <el-radio :label=1>部分群</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item v-if="form.clientGroup == 1">
-            <div class="content-border">
+            <div>
               <div class="item-magin aic">
                 <div class="item-name">选择群主：</div>
                 <el-tag v-for="(unit, unique) in selectCustomerGroupList" :key="unique">
@@ -49,19 +37,24 @@
         <template v-if="form.chatType == 1">
           <el-form-item label="群发客户" required prop="pushRange">
             <el-radio-group v-model="form.pushRange">
-              <el-radio label="0">全部客户</el-radio>
-              <el-radio label="1">部分客户</el-radio>
+              <el-radio :label=0>全部客户</el-radio>
+              <el-radio :label=1>部分客户</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item v-if="form.pushRange == 1">
-            <div class="content-border">
+            <div>
+              <div class="item-magin aic">
+                <div class="item-name">添加人</div>
+                <el-button class="mr10" size="mini" icon="el-icon-circle-plus-outline" type="primary" plain @click="onSelectUser(2)">选择添加人</el-button>
+                <el-tag v-for="item in form.sendClientUserList" :key="item.userId">{{ item.name }}</el-tag>
+              </div>
               <div class="item-magin">
                 <div class="item-name">发送性别</div>
                 <el-select v-model="form.gender">
                   <el-option label="全部" value=""></el-option>
-                  <el-option label="未知" :value="0"></el-option>
-                  <el-option label="男性" :value="1"></el-option>
-                  <el-option label="女性" :value="2"></el-option>
+                  <el-option label="未知" :value=0></el-option>
+                  <el-option label="男性" :value=1></el-option>
+                  <el-option label="女性" :value=2></el-option>
                 </el-select>
               </div>
               <div class="item-magin">
@@ -74,32 +67,28 @@
                 <el-button class="mr10" size="mini" icon="el-icon-circle-plus-outline" type="primary" plain @click="onSelectTag">选择标签</el-button>
                 <el-tag v-for="item in form.sendClientTagList" :key="item.tagId">{{ item.name }}</el-tag>
               </div>
-              <div class="item-magin aic">
-                <div class="item-name">添加人</div>
-                <el-button class="mr10" size="mini" icon="el-icon-circle-plus-outline" type="primary" plain @click="onSelectUser(2)">选择添加人</el-button>
-                <el-tag v-for="item in form.sendClientUserList" :key="item.userId">{{ item.name }}</el-tag>
-              </div>
               <div class="item-magin">
                 <div class="item-name">跟进状态</div>
                 <el-select v-model="form.trackState">
                   <el-option label="全部" value=""></el-option>
-                  <el-option label="跟进中" :value="1"></el-option>
-                  <el-option label="待跟进" :value="2"></el-option>
-                  <el-option label="已拒绝" :value="3"></el-option>
-                  <el-option label="已成交" :value="4"></el-option>
+                  <el-option label="跟进中" :value=2></el-option>
+                  <el-option label="待跟进" :value=1></el-option>
+                  <el-option label="无意向" :value=4></el-option>
+                  <el-option label="已成交" :value=3></el-option>
+                  <el-option label="已流失" :value=5></el-option>
                 </el-select>
               </div>
             </div>
           </el-form-item>
         </template>
-        <el-form-item label="发送类型" required prop="settingTimeType">
+        <el-form-item label="发送类型" required prop="isTask">
           <el-radio-group v-model="form.isTask">
-            <el-radio :label="0">立即发送</el-radio>
-            <el-radio :label="1">定时发送</el-radio>
+            <el-radio :label=0>立即发送</el-radio>
+            <el-radio :label=1>定时发送</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item v-if="form.isTask == 1">
-          <div class="content-border">
+          <div>
             <div class="item-magin">
               <div class="item-name">发送时间</div>
               <el-date-picker v-model="form.sendTime" format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择日期时间" :picker-options="pickerOptions"></el-date-picker>
@@ -113,7 +102,7 @@
       </el-form>
     </div>
     <div v-if="currentActive === 2">
-      <welcome-detail showBack :currentActive.sync="currentActive" @submit="save"></welcome-detail>
+      <welcome-detail showBack :currentActive.sync="currentActive" @update="currentActive = 1" @submit="save"></welcome-detail>
     </div>
     <!-- 选择添加人弹窗 -->
     <SelectUser :visible.sync="dialogVisibleSelectUser" title="选择添加人" :isOnlyLeaf="false" destroyOnClose :defaultValues="selectedUserList" @success="selectedUser"></SelectUser>
@@ -125,13 +114,12 @@
     <!-- 选择客户群聊 -->
     <SelectCustomerGroup :visible.sync="dialogVisibleSelectCustomerGroup" @success="submitSelectCustomerGroup" :multiSelect="true"></SelectCustomerGroup>
 
-    <SelectMaterial :visible.sync="dialogVisibleSelectMaterial" :type.sync="activeName" @success="submitSelectMaterial"></SelectMaterial>
   </div>
 </template>
 
 <script>
   import {
-    add
+    add, getCustomerList
   } from '@/api/groupMessage'
   import {
     getMaterialMediaId
@@ -139,28 +127,26 @@
   import PhoneDialog from '@/components/PhoneDialog'
   import SelectUser from '@/components/SelectUser'
   import SelectTag from '@/components/SelectTag'
-  import SelectMaterial from '@/components/SelectMaterial/index'
   import WelcomeDetail from '@/components/WelcomeContent.vue'
+  import SelectCustomerGroup from '@/components/SelectCustomerGroup'
   import { parseTime } from '@/utils/common'
   export default {
     components: {
       PhoneDialog,
       SelectTag,
       SelectUser,
-      SelectMaterial,
-      WelcomeDetail
+      WelcomeDetail,
+      SelectCustomerGroup
     },
     props: {},
     data () {
       return {
         currentActive: 1,
-
         loading: false,
         // 表单参数
         form: {
-          // pushUserRange: 0,	// 群发员工
-          chatType: '0',
-          pushRange: '0',
+          chatType: 1,
+          pushRange: 0,
           clientGroup: 0,	// 群发客户群
           gender: '',	// 发送客户-性别
           trackState: '',	// 发送客户-跟进状态
@@ -170,13 +156,14 @@
           tag: [],
           department: [],
           staffId: [],
-          settingTimeType: 0,
-          settingTime: '',
+          isTask: 0,
+          sendTime: '',
+          customerList: [], // 客户列表 临时存储
         },
         userParty: [],
         rules: {
           clientGroup: [{ validator: this.validateClientGroup, trigger: 'blur' }],
-          settingTimeType: [{ validator: this.validateSettingTimeType, trigger: 'blur' }],
+          isTask: [{ validator: this.validateSettingTimeType, trigger: 'blur' }],
         },
         statusOptions: Object.freeze([{
           label: '发送给客户',
@@ -192,7 +179,6 @@
         dialogVisibleSelectUser: false,
         selectedUserList: [],	// 选中回显员工
         dialogVisibleSelectTag: false,
-        dialogVisibleSelectMaterial: false,
         dialogVisibleSelectCustomerGroup: false,
         selectCustomerGroupList: [],
         pickerOptions: {
@@ -284,8 +270,8 @@
       },
       validateSettingTimeType (rule, value, callback) {
         if (
-          this.form.settingTimeType == 1 &&
-          !this.form.settingTime
+          this.form.isTask == 1 &&
+          !this.form.sendTime
         ) {
           callback('请选择发送时间')
         } else {
@@ -297,42 +283,98 @@
       nextStep () {
         this.$refs.form.validate(validate => {
           if (!validate) return
-          this.currentActive = 2
+
+          if (this.form.chatType === 1) {
+            let data = {
+              userIds: '',
+              tagIds: '',
+              beginTime: '',
+              endTime: '',
+              gender: '',
+              trackState: ''
+            }
+            if (this.form.pushRange == 1) {
+              data.userIds = this.form.sendClientUserList.map(i => i.userId).join(',')
+              data.tagIds = this.form.sendClientTagList.map(i => i.tagId).join(',')
+              data.beginTime = this.form.rangeTime[0] ? parseTime(new Date(this.form.rangeTime[0])) : ''
+              data.endTime = this.form.rangeTime[1] ? parseTime(new Date(this.form.rangeTime[1])) : ''
+              data.gender = this.form.gender
+              data.trackState = this.form.trackState
+              getCustomerList(data).then(res => {
+                this.form.customerList = res.data
+                this.currentActive = 2
+              })
+            } else {
+              this.currentActive = 2
+            }
+          } else {
+            this.currentActive = 2
+          }
         })
+      },
+      newArryById (arr) {
+        let map = {}
+        let dest = []
+        for (let i = 0; i < arr.length; i++) {
+          let ai = arr[i]
+          if (!map[ai.firstUserId]) {
+            dest.push({
+              userId: ai.firstUserId,
+              customerList: [ai.externalUserid]
+            })
+            map[ai.firstUserId] = ai
+          } else {
+            for (let j = 0; j < dest.length; j++) {
+              let dj = dest[j]
+              if (dj.userId == ai.firstUserId) {
+                dj.customerList.push(ai.externalUserid)
+                break
+              }
+            }
+          }
+        }
+        return dest
       },
       save (materialData) {
         let data = Object.assign({}, this.form, {
-          welcomeMsg: materialData.welcomeMsg,
-          attachmentsList: materialData.materialList
+          content: materialData.welcomeMsg,
+          attachmentsList: materialData.materialMsgList
         })
         data = JSON.parse(JSON.stringify(data))
-        // 员工id
-        // 部分群
-        if (data.chatType == 1 && data.clientGroup == 1) {
-          data.staffId = this.selectCustomerGroupList.map(i => i.owner).join(',')
-          data.tag = 'all'
-        } else if (data.chatType == 0 && data.pushRange == 1) {
-          // 部分客户
-          data.staffId = data.sendClientUserList.map(i => i.userId).join(',')
-          data.tag = data.sendClientTagList.map(i => i.tagId).join(',')
-          data.beginTime = data.rangeTime[0] ? parseTime(new Date(data.rangeTime[0])) : ''
-          data.endTime = data.rangeTime[1] ? parseTime(new Date(data.rangeTime[1])) : ''
+        if (data.chatType === 1) {
+          if (data.pushRange === 1) {
+            data.senderList = this.newArryById(this.form.customerList)
+          } else {
+            data.senderList = data.sendClientUserList.map((i) => { return { userId: i.userId } })
+          }
         } else {
-          data.staffId = ''
-          data.tag = 'all'
+          if (data.clientGroup === 1) {
+            data.senderList = this.selectCustomerGroupList.map((i) => { return { userId: i.owner } })
+          } else {
+            data.senderList = []
+          }
         }
+        // data.sendClientUserList.map(i => i.userId)
         // 发送类型
-        data.settingTime = data.settingTimeType == 1 ? parseTime(new Date(data.settingTime)) : ''
-        data.department = data.department.join(',')
-
+        data.sendTime = data.isTask == 1 ? parseTime(new Date(data.sendTime)) : ''
+        // data.department = data.department.join(',')
+        delete data.department
         delete data.clientGroup
-        delete data.settingTimeType
+        delete data.pushRange
         delete data.rangeTime
         delete data.sendClientUserList
         delete data.sendClientTagList
+        delete data.customerList
+        delete data.tag
+        delete data.trackState
+        delete data.gender
+        delete data.staffId
         add(data).then(res => {
           if (res.code == 200) {
-            this.$router.go(-1)
+            // this.$router.go(-1)
+            this.$router.push({
+              path: '/customerMaintain/groupMessage/record'
+            })
             this.msgSuccess('操作成功')
           } else {
             this.msgSuccess(res.msg || '操作失败')
@@ -362,16 +404,15 @@
         this.selectedTagList = this.form.sendClientTagList
         this.dialogVisibleSelectTag = true
       },
-			/**
-			 * @param {Number} type 1:群发员工 2: 群发客户-部分客户-添加人
-			 */
+      /**
+       * @param {Number} type 1:群发员工 2: 群发客户-部分客户-添加人
+       */
       onSelectUser (type) {
         if (type == 1) {
           this.selectedUserList = this.userParty
         } else if (type == 2) {
           this.selectedUserList = this.form.sendClientUserList
         }
-
         this.selectUserType = type
         this.dialogVisibleSelectUser = true
       },
@@ -399,28 +440,13 @@
       },
       // 选择标签确认按钮
       submitSelectTag (data) {
-        console.log(data)
         if (this.selectTagType == 1) {
           this.form.sendClientTagList = data
         } else {
           this.form.tag = data
         }
         this.selectTagType = ''
-      },
-      // 新建素材按钮
-      goRoute () {
-        let contentType = ['text', 'image', 'file']
-        window.open('#/customerMaintain/material/' + contentType[this.activeName])
-      },
-      // 选择素材确认按钮
-      submitSelectMaterial (text, image, file) {
-        if (this.activeName == 0) {
-          // this.form.textMessage.content = text.content
-        } else if (this.activeName == 1) {
-          // this.form.imageMessage.pic_url = image.materialUrl
-          // this.form.imageMessage._materialName = image.materialName
-        }
-      },
+      }
     }
   }
 </script>
@@ -459,8 +485,6 @@
 
   .tab {
     height: 68px;
-    background: #fff;
-    border-top: 1px solid #f1f1f1;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
   }
