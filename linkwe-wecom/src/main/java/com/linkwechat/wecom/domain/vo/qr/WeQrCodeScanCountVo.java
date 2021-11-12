@@ -16,10 +16,10 @@ import java.util.List;
 public class WeQrCodeScanCountVo {
 
     @ApiModelProperty("今日扫码次数")
-    private Integer today;
+    private Integer today = 0;
 
     @ApiModelProperty("累计扫码次数")
-    private Integer total;
+    private Integer total = 0;
 
     @ApiModelProperty("时间横坐标")
     private List<String> xAxis;

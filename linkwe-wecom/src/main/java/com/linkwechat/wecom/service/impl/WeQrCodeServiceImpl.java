@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeExternalContactClient;
 import com.linkwechat.wecom.domain.WeCustomer;
@@ -24,8 +25,7 @@ import com.linkwechat.wecom.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -105,7 +105,7 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
     public PageInfo<WeQrCodeDetailVo> getQrCodeList(WeQrCodeListQuery qrCodeListQuery) {
         List<WeQrCodeDetailVo> weQrCodeList = new ArrayList<>();
         List<Long> qrCodeIdList = this.baseMapper.getQrCodeList(qrCodeListQuery);
-        if(CollectionUtil.isNotEmpty(qrCodeIdList)){
+        if (CollectionUtil.isNotEmpty(qrCodeIdList)) {
             List<WeQrCodeDetailVo> qrDetailByQrIds = this.baseMapper.getQrDetailByQrIds(qrCodeIdList);
             weQrCodeList.addAll(qrDetailByQrIds);
         }
@@ -121,9 +121,9 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
     @Override
     public void delQrCode(List<Long> qrIds) {
         List<WeQrCode> weQrCodes = this.listByIds(qrIds);
-        if(CollectionUtil.isNotEmpty(weQrCodes)){
+        if (CollectionUtil.isNotEmpty(weQrCodes)) {
             weQrCodes.forEach(item -> item.setDelFlag(1));
-            if(this.updateBatchById(weQrCodes)){
+            if (this.updateBatchById(weQrCodes)) {
                 //删除标签数据
                 tagRelService.delBatchByQrIds(qrIds);
                 //删除活码范围数据
@@ -132,8 +132,8 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
                 attachmentsService.delBatchByQrIds(qrIds);
             }
             //异步删除企微活码---最好使用mq
-            ThreadUtil.execute(() -> weQrCodes.forEach(item ->{
-                if(StringUtils.isNotEmpty(item.getConfigId())){
+            ThreadUtil.execute(() -> weQrCodes.forEach(item -> {
+                if (StringUtils.isNotEmpty(item.getConfigId())) {
                     externalContactClient.delContactWay(item.getConfigId());
                 }
             }));
@@ -142,14 +142,34 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
 
     @Override
     public WeQrCodeScanCountVo getWeQrCodeScanCount(WeQrCodeListQuery qrCodeListQuery) {
+        WeQrCodeScanCountVo scanCountVo = new WeQrCodeScanCountVo();
+        List<String> xAxis = new ArrayList<>();
+        List<Integer> yAxis = new ArrayList<>();
         Long qrId = qrCodeListQuery.getQrId();
-        String beginTime = qrCodeListQuery.getBeginTime();
-        String endTime = qrCodeListQuery.getEndTime();
+        Date beginTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD, qrCodeListQuery.getBeginTime());
+        Date endTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD, qrCodeListQuery.getEndTime());
         WeQrCode weQrCode = getById(qrId);
-        String state = weQrCode.getState();
-        //todo 计算
-        //weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getStatus))
-        return null;
+        Map<String, List<WeCustomer>> customerMap = new HashMap<>();
+        List<WeCustomer> customerList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getState, weQrCode.getState()));
+        if (CollectionUtil.isNotEmpty(customerList)) {
+            scanCountVo.setTotal(customerList.size());
+            long count = customerList.stream().filter(item -> ObjectUtil.equal(DateUtils.getDate(), DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getFirstAddTime()))).count();
+            scanCountVo.setToday(Long.valueOf(count).intValue());
+            Map<String, List<WeCustomer>> listMap = customerList.stream().collect(Collectors.groupingBy(item -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getFirstAddTime())));
+            customerMap.putAll(listMap);
+        }
+        DateUtils.findDates(beginTime, endTime).stream().map(d -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, d))
+                .forEach(date -> {
+                    xAxis.add(date);
+                    if (CollectionUtil.isNotEmpty(customerMap.get(date))) {
+                        yAxis.add(customerMap.get(date).size());
+                    } else {
+                        yAxis.add(0);
+                    }
+                });
+        scanCountVo.setXAxis(xAxis);
+        scanCountVo.setYAxis(yAxis);
+        return scanCountVo;
     }
 
     /**
