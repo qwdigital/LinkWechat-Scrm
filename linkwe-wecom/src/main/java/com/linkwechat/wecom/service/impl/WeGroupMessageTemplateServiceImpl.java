@@ -279,6 +279,10 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     @Async
     @Override
     public void syncGroupMsgSendResultByIds(List<Long> asList) {
+        WeGroupMessageTemplate weGroupMessageTemplate = new WeGroupMessageTemplate();
+        weGroupMessageTemplate.setRefreshTime(new Date());
+        update(weGroupMessageTemplate,new LambdaQueryWrapper<WeGroupMessageTemplate>().in(WeGroupMessageTemplate::getId,asList));
+
         List<WeGroupMessageList> weGroupMessageLists = weGroupMessageListService.list(new LambdaQueryWrapper<WeGroupMessageList>()
                 .in(WeGroupMessageList::getMsgTemplateId, asList));
         List<WeGroupMessageTask> taskList = new ArrayList<>();
