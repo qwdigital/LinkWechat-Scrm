@@ -48,4 +48,8 @@ public class WeGroupMessageDetailVo {
 
     @ApiModelProperty("未送达客户数")
     private Integer toBeSendCustomerNum;
+
+    @ApiModelProperty("同步时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date refreshTime;
 }

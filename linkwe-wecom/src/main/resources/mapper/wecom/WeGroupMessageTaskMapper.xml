@@ -12,6 +12,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="userName"    column="user_name"    />
         <result property="status"    column="status"    />
         <result property="sendTime"    column="send_time"    />
+        <result property="total"    column="total"    />
+        <result property="already"    column="already"    />
     </resultMap>
     <select id="groupMsgTaskList" resultMap="WeGroupMessageTaskResult">
         select
@@ -21,7 +23,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wgmt.user_id,
             wu.user_name,
             wgmt.status,
-            wgmt.send_time
+            wgmt.send_time,
+        (select count(1) from we_group_message_send_result wgmsr where wgmsr.msg_template_id = wgmt.msg_template_id) as total,
+        (select count(1) from we_group_message_send_result wgmsr where wgmsr.msg_template_id = wgmt.msg_template_id and wgmsr.status = 1) as already
         from we_group_message_task wgmt
             left join we_user wu on wu.user_id = wgmt.user_id
         <where>
