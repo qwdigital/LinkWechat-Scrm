@@ -18,7 +18,7 @@ const service = window.CONFIG.services.wecom + '/code'
 export function getList(params) {
   return request({
     url: service + '/list',
-    params,
+    params
   })
 }
 
@@ -28,7 +28,7 @@ export function getList(params) {
  */
 export function getDetail(id) {
   return request({
-    url: service + '/' + id,
+    url: service + '/' + id
   })
 }
 
@@ -59,7 +59,7 @@ export function update(data) {
   return request({
     url: service + '/update',
     method: 'put',
-    data,
+    data
   })
 }
 
@@ -87,7 +87,7 @@ export function add(data) {
   return request({
     url: service + '/add',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -99,7 +99,7 @@ export function batchAdd(data) {
   return request({
     url: service + '/batchAdd',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -110,7 +110,7 @@ export function batchAdd(data) {
 export function remove(id) {
   return request({
     url: service + '/delete/' + id,
-    method: 'delete',
+    method: 'delete'
   })
 }
 
@@ -125,7 +125,7 @@ export function remove(id) {
 export function getQrcode(params) {
   return request({
     url: service + '/getQrcode',
-    params,
+    params
   })
 }
 
@@ -137,7 +137,7 @@ export function downloadBatch(ids) {
   return request({
     url: service + '/downloadBatch',
     params: {
-      ids,
+      ids
     },
     responseType: 'blob'
   })
@@ -147,7 +147,7 @@ export function download(id) {
   return request({
     url: service + '/download',
     params: {
-      id,
+      id
     },
     responseType: 'blob'
   })
@@ -156,11 +156,11 @@ export function download(id) {
 /**
  * 成员添加客户统计
  * @param {*} params
- * userId=成员id&addWay=添加类型，二维码：1&beginTime=开始时间&endTime=结束时间
+ * codeId=活码id&beginTime=开始时间&endTime=结束时间
  */
 export function getUserAddCustomerStat(params) {
   return request({
     url: service + '/getUserAddCustomerStat',
-    params,
+    params
   })
 }
