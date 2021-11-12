@@ -54,7 +54,7 @@ public class WeCallBackDelFollowUserImpl extends WeEventStrategy {
                             WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getFirstUserId,message.getUserId())
                                     .eq(WeCustomer::getExternalUserid,message.getExternalUserId()));
 
-                            String content = "您已经被客户@" + weCustomer.getName() + "删除!";
+                            String content = "您已经被客户@" + weCustomer.getCustomerName() + "删除!";
                             TextMessageDto textMessageDto = new TextMessageDto();
                             textMessageDto.setContent(content);
                             WeMessagePushDto weMessagePushDto = new WeMessagePushDto();
@@ -77,8 +77,8 @@ public class WeCallBackDelFollowUserImpl extends WeEventStrategy {
                                 weSensitiveActHit.setCreateTime(new Date(message.getCreateTime()));
                                 weSensitiveActHit.setCreateBy("admin");
                                 WeUser user = weUserService.getById(message.getUserId());
-                                weSensitiveActHit.setOperatorId(weCustomer.getUserId());
-                                weSensitiveActHit.setOperator(weCustomer.getName());
+                                weSensitiveActHit.setOperatorId(weCustomer.getFirstUserId());
+                                weSensitiveActHit.setOperator(weCustomer.getCustomerName());
                                 weSensitiveActHit.setOperateTargetId(user.getUserId());
                                 weSensitiveActHit.setOperateTarget(user.getName());
                                 weSensitiveActHitService.insertWeSensitiveActHit(weSensitiveActHit);

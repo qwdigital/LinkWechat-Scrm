@@ -257,7 +257,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                 .eq(WeCustomer::getUnionid, weTaskFissionPosterDTO.getUnionId()));
         if (weCustomer != null) {
             //任务表添加当前客户任务
-            WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), weCustomer.getUnionid(), weCustomer.getName());
+            WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), weCustomer.getUnionid(), weCustomer.getCustomerName());
             String posterUrl = record.getPoster();
             if (StringUtils.isBlank(posterUrl)) {
                 String qrcode = getPosterQRCode(weTaskFissionPosterDTO.getFissionTargetId(), record, weCustomer);
@@ -379,7 +379,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                     WeCustomer weCustomer = new WeCustomer();
                     weCustomer.setAvatar(completeRecord.getCustomerAvatar());
                     weCustomer.setUnionid(completeRecord.getCustomerId());
-                    weCustomer.setName(completeRecord.getCustomerName());
+                    weCustomer.setCustomerName(completeRecord.getCustomerName());
                     list.add(weCustomer);
                 });
             }

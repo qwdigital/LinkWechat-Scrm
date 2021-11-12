@@ -24,4 +24,5 @@ public class WeCustomerAddGroup {
 
     //是否共同群 0:不是共同群；1:是共同群
     private Integer commonGroup;
+
 }

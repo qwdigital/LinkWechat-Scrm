@@ -63,15 +63,15 @@ public interface WeTagGroupMapper  extends BaseMapper<WeTagGroup>
      */
     public int batchInsetWeTagGroup(@Param("weTagGroups") List<WeTagGroup> weTagGroups);
 
-
-    /**
-     * 根据企业员工与添加客户关系id给客户打标签
-     * @param externalUserid
-     * @param userid
-     * @return
-     */
-    public List<WeTagGroup> findCustomerTagByFlowerCustomerRelId(@Param("externalUserid") String externalUserid, @Param("userid") String userid);
-
+//
+//    /**
+//     * 根据企业员工与添加客户关系id给客户打标签
+//     * @param externalUserid
+//     * @param userid
+//     * @return
+//     */
+//    public List<WeTagGroup> findCustomerTagByFlowerCustomerRelId(@Param("externalUserid") String externalUserid, @Param("userid") String userid);
+//
 
 
 

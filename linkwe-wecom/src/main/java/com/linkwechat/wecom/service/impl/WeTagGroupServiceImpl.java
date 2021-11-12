@@ -393,10 +393,10 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
         }
     }
 
-    @Override
-    public List<WeTagGroup> findCustomerTagByFlowerCustomerRelId(String externalUserid, String userid) {
-        return this.baseMapper.findCustomerTagByFlowerCustomerRelId(externalUserid, userid);
-    }
+//    @Override
+//    public List<WeTagGroup> findCustomerTagByFlowerCustomerRelId(String externalUserid, String userid) {
+//        return this.baseMapper.findCustomerTagByFlowerCustomerRelId(externalUserid, userid);
+//    }
 
 
 }

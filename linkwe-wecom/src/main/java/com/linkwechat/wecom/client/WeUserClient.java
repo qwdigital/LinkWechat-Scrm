@@ -72,11 +72,23 @@ public interface WeUserClient {
 
 
     /**
-     * 分配客户
+     * 分配客户(离职继承分配客户)
      * @return
      */
     @Request(url="/externalcontact/resigned/transfer_customer", type = "POST")
     WeResultDto allocateCustomer(@JSONBody AllocateWeCustomerDto allocateWeCustomerDto);
+
+
+
+    /**
+     * 在职继承分配客户(在职继承)
+     * @param allocateWeCustomerDto
+     * @return
+     */
+    @Request(url = "/externalcontact/transfer_customer", type = "POST")
+    WeResultDto transferCustomer(@JSONBody AllocateWeCustomerDto allocateWeCustomerDto);
+
+
 
 
     /**

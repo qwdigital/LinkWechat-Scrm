@@ -373,5 +373,20 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     }
 
 
+    /**
+     * 当前时间向推几小时
+     * @param ihour 小时
+     * @return String
+     */
+    public static String getBeforeByHourTime(int ihour){
+        String returnstr = "";
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) - ihour);
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        returnstr = df.format(calendar.getTime());
+        return returnstr;
+    }
+
+
 
 }

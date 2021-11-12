@@ -13,7 +13,7 @@ import java.util.List;
  * @Date: create in 2020/9/21 0021 23:58
  */
 public interface WeGroupMemberMapper extends BaseMapper<WeGroupMember> {
-//    WeGroupMember selectWeGroupMemberById(Long paramLong);
+
 
     List<WeGroupMember> selectWeGroupMemberList(WeGroupMember paramWeGroupMember);
 
@@ -21,11 +21,4 @@ public interface WeGroupMemberMapper extends BaseMapper<WeGroupMember> {
 
     void insertBatch(@Param("weGroupMembers") List<WeGroupMember> weGroupMembers);
 
-//    int insertWeGroupMember(WeGroupMember paramWeGroupMember);
-//
-//    int updateWeGroupMember(WeGroupMember paramWeGroupMember);
-//
-//    int deleteWeGroupMemberById(Long paramLong);
-//
-//    int deleteWeGroupMemberByIds(Long[] paramArrayOfLong);
 }

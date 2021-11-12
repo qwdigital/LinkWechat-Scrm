@@ -104,18 +104,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </insert>
 
 
-    <select id="findCustomerTagByFlowerCustomerRelId" resultMap="WeTagGroupResult">
-           SELECT
-                wt.tag_id,
-                wt.`name`,
-                wtg.gourp_name,
-                wtg.group_id
-            FROM
-                we_flower_customer_tag_rel wfctr
-            INNER JOIN we_tag wt ON wfctr.tag_id = wt.tag_id
-            INNER JOIN we_tag_group wtg ON wt.group_id = wtg.group_id
-            WHERE wt.`status`=0 and wtg.`status`=0 and wfctr.user_id=#{userid} and wfctr.external_userid=#{externalUserid}
-    </select>
+<!--    <select id="findCustomerTagByFlowerCustomerRelId" resultMap="WeTagGroupResult">-->
+<!--           SELECT-->
+<!--                wt.tag_id,-->
+<!--                wt.`name`,-->
+<!--                wtg.gourp_name,-->
+<!--                wtg.group_id-->
+<!--            FROM-->
+<!--                we_flower_customer_tag_rel wfctr-->
+<!--            INNER JOIN we_tag wt ON wfctr.tag_id = wt.tag_id-->
+<!--            INNER JOIN we_tag_group wtg ON wt.group_id = wtg.group_id-->
+<!--            WHERE wt.`status`=0 and wtg.`status`=0 and wfctr.user_id=#{userid} and wfctr.external_userid=#{externalUserid}-->
+<!--    </select>-->
 
     
 </mapper>

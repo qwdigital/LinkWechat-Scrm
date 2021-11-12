@@ -15,6 +15,7 @@ import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.bean.BeanUtils;
+import com.linkwechat.wecom.annotation.SynchRecord;
 import com.linkwechat.wecom.client.WeCropTagClient;
 import com.linkwechat.wecom.client.WeCustomerClient;
 import com.linkwechat.wecom.client.WeUserClient;
@@ -81,35 +82,24 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Autowired
     private IWeTagService iWeTagService;
 
+    @Autowired
+    private IWeGroupService iWeGroupService;
 
 
-//    /**
-//     * 查询企业微信客户
-//     *
-//     * @param externalUserId 企业微信客户ID
-//     * @return 企业微信客户
-//     */
-//    @Override
-//    public WeCustomer selectWeCustomerById(String externalUserId) {
-//        return this.baseMapper.selectWeCustomerById(externalUserId);
-//    }
+
 
     /**
-     * 查询企业微信客户列表
-     *
-     * @param weCustomer 企业微信客户
-     * @return 企业微信客户
+     * 重构版客户列表
+     * @param weCustomerList
+     * @return
      */
     @Override
-    public List<WeCustomer> selectWeCustomerList(WeCustomer weCustomer) {
-        //当前登录用户为企业用户
-        if(Constants.USER_TYPE_WECOME
-                .equals(SecurityUtils.getLoginUser().getUser().getUserType())){
-            weCustomer.setUserIds((SecurityUtils.getLoginUser().getUser().getWeUserId()));
-        }
+    public List<WeCustomerList> findWeCustomerList(WeCustomerList weCustomerList) {
 
-        return this.baseMapper.selectWeCustomerList(weCustomer);
+        return this.baseMapper.findWeCustomerList(weCustomerList);
     }
+
+
 
 
     /**
@@ -120,30 +110,26 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Override
     @Async
     @Transactional(rollbackFor = Exception.class)
+    @SynchRecord
     public void synchWeCustomer() {
         //获取所有可以添加客户的企业员工
-        FollowUserList followUserList = weCustomerClient.getFollowUserList();
-        if (WeConstans.WE_SUCCESS_CODE.equals(followUserList.getErrcode())
-                && ArrayUtil.isNotEmpty(followUserList.getFollow_user())) {
-            String[] follow_user = followUserList.getFollow_user();
-            if(ArrayUtil.isNotEmpty(follow_user)){
-
-                List<ExternalUserDetail> externalUserDetails = new ArrayList<>();
-                getByUser(follow_user, null, externalUserDetails);
-
-                if(CollectionUtil.isNotEmpty(externalUserDetails)){
-                    this.weFlowerCustomerHandle(
-                            externalUserDetails
-                    );
-                }
-
-            }
-
-
-
-
-        }
-
+        log.warn("客户同步");
+//        FollowUserList followUserList = weCustomerClient.getFollowUserList();
+//        if (WeConstans.WE_SUCCESS_CODE.equals(followUserList.getErrcode())
+//                && ArrayUtil.isNotEmpty(followUserList.getFollow_user())) {
+//            String[] follow_user = followUserList.getFollow_user();
+//            if(ArrayUtil.isNotEmpty(follow_user)){
+//
+//                List<ExternalUserDetail> externalUserDetails = new ArrayList<>();
+//                getByUser(follow_user, null, externalUserDetails);
+//
+//                if(CollectionUtil.isNotEmpty(externalUserDetails)){
+//                    this.weFlowerCustomerHandle(
+//                            externalUserDetails
+//                    );
+//                }
+//            }
+//        }
 
     }
 
@@ -164,9 +150,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             //客户入库
             WeCustomer weCustomer = new WeCustomer();
             BeanUtils.copyPropertiesignoreOther(userDetail.getExternal_contact(), weCustomer);
-
-
+            weCustomer.setCustomerType(userDetail.getExternal_contact().getType());
             Optional.ofNullable(userDetail.getFollow_info()).ifPresent(followInfo -> {
+
                 weCustomer.setFirstUserId(followInfo.getUserid());
                 weCustomer.setFirstAddTime(new Date(followInfo.getCreatetime() * 1000L));
                 weCustomer.setAddMethod(followInfo.getAdd_way());
@@ -242,17 +228,19 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         List<WeCustomer> allocateWeCustomers = this.list(new LambdaQueryWrapper<WeCustomer>()
                 .eq(WeCustomer::getFirstUserId, weLeaveUserInfoAllocateVo.getHandoverUserid()));
         if(CollectionUtil.isNotEmpty(allocateWeCustomers)){
+            //同步记录,放入员工同意或者24小时自动变更(回调)
+
             //删除原有的
-            this.baseMapper.deleteWeCustomerByUserIds(
-                    new String[]{weLeaveUserInfoAllocateVo.getHandoverUserid()}
-            );
-            allocateWeCustomers.stream().forEach(k->{
-                k.setFirstUserId(weLeaveUserInfoAllocateVo.getTakeoverUserid());
-            });
+//            this.baseMapper.deleteWeCustomerByUserIds(
+//                    new String[]{weLeaveUserInfoAllocateVo.getHandoverUserid()}
+//            );
+//            allocateWeCustomers.stream().forEach(k->{
+//                k.setFirstUserId(weLeaveUserInfoAllocateVo.getTakeoverUserid());
+//            });
             //新增
-            this.baseMapper.batchAddOrUpdate(
-                    allocateWeCustomers
-            );
+//            this.baseMapper.batchAddOrUpdate(
+//                    allocateWeCustomers
+//            );
                 //记录接受离职表
                 List<WeAllocateCustomer> weAllocateCustomers = new ArrayList<>();
                 allocateWeCustomers.stream().forEach(k->{
@@ -262,20 +250,41 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                 .externalUserid(k.getExternalUserid())
                                 .handoverUserid(weLeaveUserInfoAllocateVo.getHandoverUserid())
                                 .takeoverUserid(weLeaveUserInfoAllocateVo.getTakeoverUserid())
+                                .extentType(weLeaveUserInfoAllocateVo.getExtentType())
                                 .build()
                     );
                 });
 
                 if(CollectionUtil.isNotEmpty(weAllocateCustomers)
                 &&iWeAllocateCustomerService.saveBatch(weAllocateCustomers)){
-                    //同步企业微信
-                   weUserClient.allocateCustomer(AllocateWeCustomerDto.builder()
+
+                    if(weLeaveUserInfoAllocateVo.getExtentType().equals(new Integer(0))){//离职员工客户继承
+                        //同步企业微信
+                        weUserClient.allocateCustomer(AllocateWeCustomerDto.builder()
                                 .external_userid(
                                         ArrayUtil.toArray(allocateWeCustomers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList()), String.class)
                                 )
                                 .handover_userid(weLeaveUserInfoAllocateVo.getHandoverUserid())
                                 .takeover_userid(weLeaveUserInfoAllocateVo.getTakeoverUserid())
                                 .build());
+
+                    }else{//在职员工客户继承
+                        weUserClient.transferCustomer(
+                                AllocateWeCustomerDto.builder()
+                                        .external_userid(
+                                                weLeaveUserInfoAllocateVo.getExternalUserid().split(",")
+                                        )
+                                        .handover_userid(weLeaveUserInfoAllocateVo.getHandoverUserid())
+                                        .takeover_userid(weLeaveUserInfoAllocateVo.getTakeoverUserid())
+                                        .build()
+                        );
+
+                    }
+
+
+
+
+
                 }
 
             }
@@ -308,9 +317,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             }else{
                  new WeComException("部门标签不存在");
             }
-
-
-
             CutomerTagEdit cutomerTagEdit = CutomerTagEdit.builder()
                     .external_userid(weMakeCustomerTag.getExternalUserid())
                     .userid(weMakeCustomerTag.getUserId())
@@ -378,20 +384,20 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
 
-    /**
-     * 根据员工ID获取客户
-     *
-     * @param externalUserid
-     * @return
-     */
-    @Override
-    public List<WeUser> getCustomersByUserId(String externalUserid) {
-        String userId=null;
+//    /**
+//     * 根据员工ID获取客户
+//     *
+//     * @param externalUserid
+//     * @return
+//     */
+//    @Override
+//    public List<WeUser> getCustomersByUserId(String externalUserid) {
+//        String userId=null;
 //        if(Constants.USER_TYPE_WECOME.equals(SecurityUtils.getLoginUser().getUser().getUserType())){
 //             userId=SecurityUtils.getLoginUser().getUser().getWeUserId();
 //        }
-        return this.baseMapper.getCustomersByUserId(externalUserid,userId);
-    }
+//        return this.baseMapper.getCustomersByUserId(externalUserid,userId);
+//    }
 
 
     /**
@@ -595,10 +601,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
     @Override
     public boolean updateCustomerChatStatus(String externalUserId) {
-        WeCustomer weCustomer = new WeCustomer();
-        weCustomer.setExternalUserid(externalUserId);
-        weCustomer.setIsOpenChat(1);
-        return this.baseMapper.updateWeCustomer(weCustomer) == 1;
+
+        return this.update(WeCustomer.builder()
+                .isOpenChat(1)
+                .build(),new LambdaQueryWrapper<WeCustomer>()
+                .eq(WeCustomer::getExternalUserid,externalUserId));
     }
 
 
@@ -607,26 +614,21 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
     @Override
     public WeCustomerPortrait findCustomerByOperUseridAndCustomerId(String externalUserid, String userid) throws Exception {
+
+
         WeCustomerPortrait weCustomerPortrait
                 = this.baseMapper.findCustomerByOperUseridAndCustomerId(externalUserid, userid);
 
         if(null != weCustomerPortrait){
+            if(weCustomerPortrait.getBirthday() != null){
+                weCustomerPortrait.setAge(DateUtils.getAge(weCustomerPortrait.getBirthday()));
+            }
 
-          if(weCustomerPortrait.getBirthday() != null){
-                        weCustomerPortrait.setAge(DateUtils.getAge(weCustomerPortrait.getBirthday()));
-          }
-
-            //获取当前客户拥有得标签
-            weCustomerPortrait.setWeTagGroupList(
-                    iWeTagGroupService.findCustomerTagByFlowerCustomerRelId(
-                            externalUserid,userid
-                    )
-            );
-
-           //客户社交关系
+            //客户社交关系
             weCustomerPortrait.setSocialConn(
-                   this.baseMapper.countSocialConn(externalUserid,userid)
+                    this.baseMapper.countSocialConn(externalUserid,userid)
             );
+
         }else {
             weCustomerPortrait=new WeCustomerPortrait();
         }
@@ -650,58 +652,163 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         this.update(weCustomer,new LambdaQueryWrapper<WeCustomer>()
                 .eq(WeCustomer::getFirstUserId,weCustomerPortrait.getUserId())
                 .eq(WeCustomer::getExternalUserid,weCustomerPortrait.getExternalUserid()));
-        //更新用户基本信息表
-//        this.baseMapper.batchAddOrUpdate(ListUtil.toList(weCustomer));
-//        this.updateById(
-//                weCustomer
-//        );
-//        WeFlowerCustomerRel weFlowerCustomerRel = WeFlowerCustomerRel.builder().build();
-//        BeanUtils.copyBeanProp(weFlowerCustomerRel,weCustomerPortrait);
+
         //添加轨迹内容(信息动态)
         iWeCustomerTrajectoryService.inforMationNews(weCustomerPortrait.getUserId(),weCustomerPortrait.getExternalUserid(), TrajectorySceneType.TRAJECTORY_TYPE_XXDT_BCZL.getKey());
     }
 
-    @Override
-    public List<WeCustomer> selectWeCustomerAllList(WeCustomer weCustomer) {
-        return this.baseMapper.selectWeCustomerList(weCustomer);
-    }
+
 
     @Override
-    public List<WeCustomer> selectWeCustomerListNoRel(WeCustomer weCustomer) {
-        return this.baseMapper.selectWeCustomerListNoRel(weCustomer);
+    public WeCustomerDetail findWeCustomerDetail(String externalUserid,String userId) {
+        WeCustomerDetail weCustomerDetail=new WeCustomerDetail();
+
+        List<WeCustomerList> weCustomerList = this.findWeCustomerList(
+                WeCustomerList.builder()
+                        .externalUserid(externalUserid)
+                        .build()
+        );
+        if(CollectionUtil.isNotEmpty(weCustomerList)){
+            BeanUtils.copyBeanProp(
+                    weCustomerList.stream().findFirst().get()
+                    ,weCustomerDetail);
+            List<WeCustomerDetail.TrackUser> trackUsers=new ArrayList<>();
+            weCustomerList.stream().forEach(k->{
+                trackUsers.add(WeCustomerDetail.TrackUser.builder()
+                                .addMethod(k.getAddMethod())
+                                .firstAddTime(k.getFirstAddTime())
+                                .trackState(k.getTrackState())
+                                .userName(k.getUserName())
+                        .build());
+            });
+            weCustomerDetail.setTrackUsers(
+                    trackUsers
+            );
+
+            weCustomerDetail.setGroups(
+                    (List<WeCustomerDetail.Groups>) this.baseMapper.findWecustomerGroups(externalUserid)
+            );
+
+
+
+
+        }
+
+
+        return weCustomerDetail;
     }
 
 
     /**
-     * 重构版客户列表
-     * @param weCustomerList
+     * 客户画像汇总
+     * @param externalUserid
      * @return
      */
     @Override
-    public List<WeCustomerList> findWeCustomerList(WeCustomerList weCustomerList) {
+    public WeCustomerDetail findWeCustomerInfoSummary(String externalUserid,String userId) {
 
-        return this.baseMapper.findWeCustomerList(weCustomerList);
+        WeCustomerDetail weCustomerDetail=new WeCustomerDetail();
+
+        List<WeCustomerList> weCustomerList = this.findWeCustomerList(WeCustomerList.builder()
+                .externalUserid(externalUserid)
+                        .userIds(userId)
+                        .delFlag(new Integer(0))
+                .build());
+
+        if(CollectionUtil.isNotEmpty(weCustomerList)){
+            List<WeCustomerDetail.CompanyOrPersonTag> companyTags=new ArrayList<>();
+
+            List<WeCustomerDetail.CompanyOrPersonTag> personTags=new ArrayList<>();
+
+            List<WeCustomerDetail.TrackUser>  trackUsers=new ArrayList<>();
+
+            weCustomerList.stream().forEach(k->{
+
+                trackUsers.add(
+                        WeCustomerDetail.TrackUser.builder()
+                                .userName(k.getUserName())
+                                .addMethod(k.getAddMethod())
+                                .trackState(k.getTrackState())
+                                .firstAddTime(k.getFirstAddTime())
+                                .build()
+                );
+
+                companyTags.add(
+                        WeCustomerDetail.CompanyOrPersonTag.builder()
+                                .tagIds(k.getTagIds())
+                                .tagsNames(k.getTagNames())
+                                .userName(k.getUserName())
+                                .build()
+                );
+
+                personTags.add(
+                        WeCustomerDetail.CompanyOrPersonTag.builder()
+                                .tagIds(k.getPersonTagIds())
+                                .tagsNames(k.getPersonTagNames())
+                                .userName(k.getUserName())
+                                .build()
+                );
+
+            });
+
+            weCustomerDetail.setCompanyTags(companyTags);
+            weCustomerDetail.setPersonTags(personTags);
+            weCustomerDetail.setTrackUsers(trackUsers);
+        }
+
+
+
+
+
+
+
+        return weCustomerDetail;
     }
 
 
-
-
+    /**
+     * 单个跟进人客户
+     * @param externalUserid
+     * @param userId
+     * @return
+     */
     @Override
-    public WeCustomerDetailVo findWeCustomerDetail(String externalUserid) {
-        WeCustomerDetailVo weCustomerDetailVo=new WeCustomerDetailVo();
-        WeCustomer weCustomer
-                = this.getById(externalUserid);
-        BeanUtils.copyBeanProp(weCustomer,weCustomerDetailVo);
-        weCustomerDetailVo.setAddWeGroupNames(this.baseMapper.findAddWeUserNames(externalUserid));
-        weCustomerDetailVo.setAddWeuserNames(this.baseMapper.findAddWeUserNames(externalUserid));
-        weCustomerDetailVo.setGroupTags(this.baseMapper.findCustomerGroupTag(externalUserid));
-        weCustomerDetailVo.setBelongUserInfos(this.baseMapper.findCusertomerBelongUserInfo(externalUserid));
-        return weCustomerDetailVo;
+    public WeCustomerDetail findWeCustomerInfoByUserId(String externalUserid, String userId) {
+
+        WeCustomerDetail weCustomerDetail
+                = this.findWeCustomerInfoSummary(externalUserid, userId);
+
+        WeCustomer weCustomer = this.getOne(new LambdaQueryWrapper<WeCustomer>()
+                .eq(WeCustomer::getExternalUserid, externalUserid)
+                .eq(WeCustomer::getFirstUserId, userId));
+        if(null != weCustomer){
+            BeanUtils.copyBeanProp(weCustomerDetail,weCustomer);
+        }
+
+        List<WeCustomerAddGroup> groups
+                = iWeGroupService.findWeGroupByCustomer(userId, externalUserid);
+        if(CollectionUtil.isNotEmpty(groups)){
+            List<WeCustomerAddGroup> commonGroup
+                    = groups.stream().filter(e -> e.getCommonGroup().equals(new Integer(0))).collect(Collectors.toList());
+            weCustomerDetail.setCommonGroupChat(
+                  CollectionUtil.isNotEmpty(commonGroup)?
+                          commonGroup.stream().map(WeCustomerAddGroup::getGroupName).collect(Collectors.joining(","))
+                 :null
+            );
+        }
+
+        return weCustomerDetail;
     }
 
-    @Override
-    public void getCustomerByCondition(JSONObject params) {
 
+    /**
+     * 去重统计
+     * @return
+     */
+    @Override
+    public long noRepeatCountCustomer() {
+
+        return this.baseMapper.noRepeatCountCustomer();
     }
 
 
