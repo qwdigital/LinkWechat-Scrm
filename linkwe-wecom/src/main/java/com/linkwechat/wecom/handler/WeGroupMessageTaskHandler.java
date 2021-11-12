@@ -122,9 +122,9 @@ public class WeGroupMessageTaskHandler implements ApplicationRunner {
     void getMediaId(List<WeMessageTemplate> messageTemplates){
         Optional.ofNullable(messageTemplates).orElseGet(ArrayList::new).forEach(messageTemplate -> {
             if (ObjectUtil.equal(MessageType.IMAGE.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
+                WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getPicUrl()
                         ,MessageType.IMAGE.getMessageType()
-                        ,FileUtil.getName(messageTemplate.getMediaId()));
+                        ,FileUtil.getName(messageTemplate.getPicUrl()));
                 messageTemplate.setMediaId(weMedia.getMedia_id());
             }else if (ObjectUtil.equal(MessageType.MINIPROGRAM.getMessageType(), messageTemplate.getMsgType())) {
                 WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()

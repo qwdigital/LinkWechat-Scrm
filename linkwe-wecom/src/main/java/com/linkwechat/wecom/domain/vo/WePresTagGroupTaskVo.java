@@ -1,26 +1,25 @@
 package com.linkwechat.wecom.domain.vo;
 
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.linkwechat.common.enums.CommunityTaskType;
 import com.linkwechat.wecom.domain.WeTag;
 import lombok.Data;
 
-import java.util.Date;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * 老客标签建群任务Vo
  */
 @Data
-public class WePresTagGroupTaskVo {
+public class WePresTagGroupTaskVo implements Serializable {
 
+    private static final long serialVersionUID = 1110810083969589691L;
     /**
      * 类型。该属性仅用于H5页面与SOP混合列表的任务类型判断
      */
-    @TableField(exist = false)
     private final Integer type = CommunityTaskType.TAG.getType();
 
     /**
@@ -39,7 +38,7 @@ public class WePresTagGroupTaskVo {
     private String welcomeMsg;
 
     /**
-     * 群活吗id
+     * 群活码id
      */
     @JsonIgnore
     private Long codeId;
@@ -50,7 +49,6 @@ public class WePresTagGroupTaskVo {
     @JsonIgnore
     private String codeUrl;
 
-    @TableField(exist = false)
     private WeGroupCodeVo groupCodeInfo;
 
     /**
@@ -66,13 +64,11 @@ public class WePresTagGroupTaskVo {
     /**
      * 使用员工
      */
-    @TableField(exist = false)
     private List<WeCommunityTaskEmplVo> scopeList;
 
     /**
      * 标签
      */
-    @TableField(exist = false)
     private List<WeTag> tagList;
 
     /**
@@ -96,11 +92,6 @@ public class WePresTagGroupTaskVo {
     private String cusEndTime;
 
     /**
-     * msgid
-     */
-    private String msgid;
-
-    /**
      * 创建者
      */
     private String createBy;
@@ -109,7 +100,7 @@ public class WePresTagGroupTaskVo {
      * 创建时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
+    private String createTime;
 
     /**
      * 更新人
@@ -122,11 +113,4 @@ public class WePresTagGroupTaskVo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private String updateTime;
 
-    /**
-     * 设置群活码信息
-     */
-    public void fillGroupCodeVo() {
-        WeGroupCodeVo groupCodeVo = new WeGroupCodeVo(this.getCodeId(),this.getCodeUrl());
-        this.setGroupCodeInfo(groupCodeVo);
-    }
 }
