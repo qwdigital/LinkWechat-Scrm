@@ -91,9 +91,10 @@ export function remove(ids) {
  * @param {*} params
  * id: 老客标签建群任务ID
  */
- export function getStat(id) {
+ export function getStat(id, params) {
   return request({
     url: service + '/stat/' + id,
     method: 'get',
+    params
   })
 }

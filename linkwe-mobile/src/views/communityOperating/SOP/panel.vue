@@ -9,10 +9,13 @@
       <div class="group">
         <van-cell class="group-tags" title="发送给客户群">
           <template #default>
-            <template v-for="group of task.groupList.slice(0, 2)">
+            <!-- <template v-for="group of task.groupList.slice(0, 2)">
               <van-tag :key="group.chatId" size="large"> {{ group.groupName }} </van-tag>
+            </template> -->
+            <template v-if="task.groupList && task.groupList.length > 0">
+              <van-tag v-for="group of task.groupList.slice(0, 2)" :key="group.chatId" size="large"> {{ group.groupName }} </van-tag>
             </template>
-            <template v-if="task.groupList.length > 2">
+            <template v-if="task.groupList && task.groupList.length > 2">
               <van-tag size="large"> ... </van-tag>
             </template>
           </template>
@@ -195,7 +198,8 @@ export default {
     showTodo() {
       if (this.todoMembers.length === 0) return '无'
 
-      const names = this.todoMembers.map((m) => m.name)
+      const namesMap = this.todoMembers.map((m) => m.name || '')
+      const names = namesMap.filter(m => m !== '')
 
       if (this.todoMembers.length <= 2) return names.join('、')
       return names[0] + '、' + names[1] + '等' + this.todoMembers.length + '人'
@@ -215,7 +219,8 @@ export default {
     showDone() {
       if (this.doneMembers.length === 0) return '无'
 
-      const names = this.doneMembers.map((m) => m.name)
+      const namesMap = this.doneMembers.map((m) => m.name || '')
+      const names = namesMap.filter(m => m !== '')
 
       if (this.doneMembers.length <= 2) return names.join('、')
       return names[0] + '、' + names[1] + '等' + this.doneMembers.length + '人'
