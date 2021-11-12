@@ -35,7 +35,6 @@ export default {
         rewardImageUrl: '',
         rewardRule: ''
       },
-      rewardImageUrlTemp: '',
       action: process.env.VUE_APP_BASE_API + window.CONFIG.services.wecom + '/fission/upload',
       headers: window.CONFIG.headers,
       ruleForm: {
@@ -223,7 +222,7 @@ export default {
     },
     handleAvatarSuccess(res, file) {
       //   this.rewardImageUrlTemp = URL.createObjectURL(file.raw) //预览
-      this.rewardImageUrlTemp = this.groupForm.rewardImageUrl = res.data.rewardImageUrl
+      this.groupForm.rewardImageUrl = res.data.rewardImageUrl
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === 'image/jpeg'
@@ -388,7 +387,7 @@ export default {
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
           >
-            <img v-if="rewardImageUrlTemp" :src="rewardImageUrlTemp" class="avatar" />
+            <img v-if="groupForm.rewardImageUrl" :src="groupForm.rewardImageUrl" class="avatar" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>

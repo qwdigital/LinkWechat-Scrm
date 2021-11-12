@@ -20,8 +20,8 @@ export default {
       form: {},
       // 查询参数
       query: {
-        userId: undefined,
-        addWay: undefined,
+        codeId: undefined,
+        // addWay: undefined,
         beginTime: undefined,
         endTime: undefined
       },
@@ -30,9 +30,12 @@ export default {
     }
   },
   created() {
-    let id = this.$route.query.id
-    id && this.getDetail(id)
-    // this.getList()
+    let id = (this.query.codeId = this.$route.query.id)
+    if (id) {
+      this.getDetail(id)
+      this.setTime(7)
+      this.getList()
+    }
   },
   mounted() {
     this.clipboard = new ClipboardJS('.copy-btn')
@@ -57,11 +60,8 @@ export default {
       getDetail(id).then(({ data }) => {
         this.form = data
         this.loading = false
-        this.query.userId = data.weEmpleCodeUseScops[0].businessId
-        this.query.addWay = 1
-
-        this.setTime(7)
-        this.getList()
+        // this.query.userId = data.weEmpleCodeUseScops[0].businessId
+        // this.query.addWay = 1
       })
     },
     /**  */
