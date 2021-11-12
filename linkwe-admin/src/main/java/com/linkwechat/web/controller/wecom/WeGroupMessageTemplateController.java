@@ -106,10 +106,10 @@ public class WeGroupMessageTemplateController extends BaseController {
     }
 
     /**
-     * 群发成员发送任务列表
+     * 群发成员执行结果列表
      */
     //@PreAuthorize("@ss.hasPermi('linkwechat:template:remove')")
-    @ApiOperation(value = "群发成员发送任务列表", httpMethod = "GET")
+    @ApiOperation(value = "群发成员执行结果列表", httpMethod = "GET")
     @Log(title = "群发消息模板", businessType = BusinessType.SELECT)
     @GetMapping("/send/result/list")
     public TableDataInfo<WeGroupMessageSendResult> groupMsgSendResultList(WeGroupMessageSendResult sendResult) {
