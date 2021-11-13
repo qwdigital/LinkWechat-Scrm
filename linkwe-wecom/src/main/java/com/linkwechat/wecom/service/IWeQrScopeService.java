@@ -42,4 +42,12 @@ public interface IWeQrScopeService extends IService<WeQrScope> {
      * @return
      */
     List<WeQrScopeVo> getWeQrScopeByQrIds(List<Long> qrIds);
+
+    /**
+     * 查询当前时间使用范围活码数据
+     * @param value
+     * @param formatTime
+     * @return
+     */
+    List<WeQrScopeVo> getWeQrScopeByTime(Integer value, String formatTime);
 }

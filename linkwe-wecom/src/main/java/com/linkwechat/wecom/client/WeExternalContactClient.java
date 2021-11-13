@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.client;
 
 import com.dtflys.forest.annotation.*;
+import com.linkwechat.wecom.domain.dto.WeContactWayDto;
 import com.linkwechat.wecom.domain.dto.WeExternalContactDto;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 import com.linkwechat.wecom.retry.WeCommonRetryWhen;
@@ -26,5 +27,5 @@ public interface WeExternalContactClient {
     WeExternalContactDto delContactWay(@Query("configId") String configId);
 
     @Request(url = "/externalcontact/get_contact_way", type = "POST")
-    WeExternalContactDto getContactWay(@Query("configId") String configId);
+    WeContactWayDto getContactWay(@Query("configId") String configId);
 }

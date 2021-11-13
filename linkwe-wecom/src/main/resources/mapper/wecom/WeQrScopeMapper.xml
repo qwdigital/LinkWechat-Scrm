@@ -66,4 +66,23 @@
         </where>
 
     </select>
+
+    <select id="getWeQrScopeByTime" resultMap="QrScopeResult">
+        select
+        wqs.qr_id,
+        wqs.scope_id,
+        wqs.scope_type,
+        wqs.`type`,
+        wqs.begin_time,
+        wqs.end_time,
+        wqs.work_cycle,
+        wqs.user_id,
+        wqs.party
+        from we_qr_scope wqs
+        where  find_in_set(#{value},wqs.work_cycle)
+        and str_to_date(wqs.begin_time,'%H:%i:%S') &lt;= str_to_date(#{formatTime},'%H:%i:%S')
+        and str_to_date(wqs.end_time ,'%H:%i:%S') &gt;= str_to_date(#{formatTime},'%H:%i:%S')
+        and wqs.`type` = 1
+        and wqs.del_flag = 0
+    </select>
 </mapper>

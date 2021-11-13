@@ -91,4 +91,9 @@ public class IWeQrScopeServiceImpl extends ServiceImpl<WeQrScopeMapper, WeQrScop
     public List<WeQrScopeVo> getWeQrScopeByQrIds(List<Long> qrIds) {
         return this.baseMapper.getWeQrScopeByQrIds(qrIds);
     }
+
+    @Override
+    public List<WeQrScopeVo> getWeQrScopeByTime(Integer value, String formatTime) {
+       return this.baseMapper.getWeQrScopeByTime(value,formatTime);
+    }
 }
