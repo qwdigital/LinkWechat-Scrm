@@ -16,6 +16,7 @@ import com.linkwechat.wecom.domain.dto.customer.CutomerTagEdit;
 import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 import com.linkwechat.wecom.factory.WeEventStrategy;
 import com.linkwechat.wecom.service.*;
+import com.linkwechat.wecom.service.event.WeEventPublisherService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -54,11 +55,7 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
     private ThreadLocal<WeFlowerCustomerRel> weFlowerCustomerRelThreadLocal = new ThreadLocal<>();
 
     @Autowired
-    private IWeGroupCodeService weGroupCodeService;
-
-
-    @Autowired
-    private WeCustomerClient weCustomerClient;
+    private WeEventPublisherService weEventPublisherService;
 
 
     @Override
@@ -132,8 +129,8 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
     private void empleCodeHandle(String state, String wecomCode, String userId, String externalUserId) {
         if(StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(externalUserId)){
             try {
-
-                log.info("执行发送欢迎语>>>>>>>>>>>>>>>");
+                weEventPublisherService.register(externalUserId,userId,wecomCode,state);
+                /*log.info("执行发送欢迎语>>>>>>>>>>>>>>>");
                 WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(wecomCode);
                 WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByState(state);
                 if (StringUtils.isNotNull(messageMap)) {
@@ -192,7 +189,7 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                     }
 
                     weCustomerService.sendWelcomeMsg(weWelcomeMsgBuilder.build());
-                }
+                }*/
 
             } catch (Exception e) {
                 log.error("执行发送欢迎语失败！", e.getMessage());

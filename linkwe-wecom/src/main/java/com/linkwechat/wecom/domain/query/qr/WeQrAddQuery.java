@@ -16,6 +16,8 @@ import lombok.Data;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -31,18 +33,21 @@ public class WeQrAddQuery {
     private Long qrId;
 
     @ApiModelProperty("名称")
+    @NotEmpty(message = "活码名称不能为空")
     private String qrName;
 
     @ApiModelProperty("分组id")
+    @NotNull(message = "分组ID不能为空")
     private Long qrGroupId;
 
-    @ApiModelProperty("是否自动添加 1-是 0-否")
-    private Integer qrAutoAdd;
+    @ApiModelProperty("是否自动添加 1-是 0-否 默认是 1")
+    private Integer qrAutoAdd = 1;
 
     @ApiModelProperty("标签id列表")
     private List<String> qrTags;
 
     @ApiModelProperty("活码类型  1-单人, 2-多人")
+    @NotNull(message = "活码类型不能为空")
     private Integer qrType;
 
     @ApiModelProperty("排班类型  1-全天 2-自动")
@@ -52,6 +57,7 @@ public class WeQrAddQuery {
     private List<WeQrUserInfoQuery> qrUserInfos;
 
     @ApiModelProperty("欢迎语素材列表")
+    @NotNull(message = "欢迎语素材列表不能为空")
     private List<WeMessageTemplate> attachments;
 
     @ApiModelProperty(value = "渠道",hidden = true)

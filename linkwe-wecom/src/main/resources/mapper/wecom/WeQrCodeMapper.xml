@@ -20,45 +20,31 @@
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
-<!--    <resultMap type="com.linkwechat.wecom.domain.vo.qr.WeQrCodeDetailVo" id="WeQrCodeDetailResult">-->
-<!--        <result property="id" column="id" jdbcType="INTEGER"/>-->
-<!--        <result property="name" column="name" jdbcType="VARCHAR"/>-->
-<!--        <result property="groupId" column="group_id" jdbcType="INTEGER"/>-->
-<!--        <result property="autoAdd" column="auto_add" jdbcType="INTEGER"/>-->
-<!--        <result property="type" column="type" jdbcType="INTEGER"/>-->
-<!--        <result property="ruleType" column="rule_type" jdbcType="INTEGER"/>-->
-<!--        <result property="state" column="state" jdbcType="VARCHAR"/>-->
-<!--        <result property="configId" column="config_id" jdbcType="VARCHAR"/>-->
-<!--        <result property="qrCode" column="qr_code" jdbcType="VARCHAR"/>-->
-<!--        <collection property="qrTags" ofType="com.linkwechat.wecom.domain.vo.tag.WeTagVo">-->
-<!--            <result property="tagId" column="tag_id" jdbcType="INTEGER"/>-->
-<!--        </collection>-->
-<!--        <collection property="qrUserInfos" ofType="com.linkwechat.wecom.domain.vo.qr.WeQrScopeVo">-->
-<!--            <result property="type" column="type" jdbcType="INTEGER"/>-->
-<!--            <result property="beginTime" column="begin_time" jdbcType="VARCHAR"/>-->
-<!--            <result property="endTime" column="end_time" jdbcType="VARCHAR"/>-->
-<!--            <result property="workCycle" column="work_cycle" jdbcType="VARCHAR"/>-->
-<!--            <collection property="qrUserInfos" ofType="com.linkwechat.wecom.domain.vo.qr.WeQrScopeUserVo">-->
-<!--                <result property="userId" column="user_id" jdbcType="VARCHAR"/>-->
-<!--                <result property="userName" column="user_name" jdbcType="VARCHAR"/>-->
-<!--            </collection>-->
-<!--            <collection property="qrUserInfos" ofType="com.linkwechat.wecom.domain.vo.qr.WeQrScopePartyVo">-->
-<!--                <result property="party" column="party" jdbcType="VARCHAR"/>-->
-<!--                <result property="partyName" column="party_name" jdbcType="VARCHAR"/>-->
-<!--            </collection>-->
-<!--        </collection>-->
-<!--        <collection property="qrAttachments" ofType="com.linkwechat.wecom.domain.WeQrAttachments">-->
-<!--            <result property="msgType" column="msg_type" jdbcType="VARCHAR"/>-->
-<!--            <result property="content" column="content" jdbcType="VARCHAR"/>-->
-<!--            <result property="title" column="title" jdbcType="VARCHAR"/>-->
-<!--            <result property="description" column="description" jdbcType="VARCHAR"/>-->
-<!--            <result property="picUrl" column="pic_url" jdbcType="VARCHAR"/>-->
-<!--            <result property="linkUrl" column="link_url" jdbcType="VARCHAR"/>-->
-<!--            <result property="mediaId" column="media_id" jdbcType="VARCHAR"/>-->
-<!--            <result property="fileUrl" column="file_url" jdbcType="VARCHAR"/>-->
-<!--            <result property="appId" column="app_id" jdbcType="VARCHAR"/>-->
-<!--        </collection>-->
-<!--    </resultMap>-->
+    <resultMap type="com.linkwechat.wecom.domain.vo.qr.WeQrCodeDetailVo" id="WeQrCodeDetailResult">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="groupId" column="group_id" jdbcType="INTEGER"/>
+        <result property="autoAdd" column="auto_add" jdbcType="INTEGER"/>
+        <result property="type" column="type" jdbcType="INTEGER"/>
+        <result property="ruleType" column="rule_type" jdbcType="INTEGER"/>
+        <result property="state" column="state" jdbcType="VARCHAR"/>
+        <result property="configId" column="config_id" jdbcType="VARCHAR"/>
+        <result property="qrCode" column="qr_code" jdbcType="VARCHAR"/>
+        <collection property="qrTags" ofType="com.linkwechat.wecom.domain.vo.tag.WeTagVo">
+            <result property="tagId" column="tag_id" jdbcType="INTEGER"/>
+        </collection>
+        <collection property="qrAttachments" ofType="com.linkwechat.wecom.domain.WeQrAttachments">
+            <result property="msgType" column="msg_type" jdbcType="VARCHAR"/>
+            <result property="content" column="content" jdbcType="VARCHAR"/>
+            <result property="title" column="title" jdbcType="VARCHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="picUrl" column="pic_url" jdbcType="VARCHAR"/>
+            <result property="linkUrl" column="link_url" jdbcType="VARCHAR"/>
+            <result property="mediaId" column="media_id" jdbcType="VARCHAR"/>
+            <result property="fileUrl" column="file_url" jdbcType="VARCHAR"/>
+            <result property="appId" column="app_id" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
 
     <sql id="selectWeQrCodeVo">
         select id, name, group_id, auto_add, type, rule_type, state, scan_num, config_id, qr_code, create_by, create_time, update_by, update_time, del_flag from we_qr_code
@@ -79,16 +65,6 @@
             wqc.qr_code,
             wqtr.tag_id,
             (select name from we_tag wt where wt.tag_id = wqtr.tag_id limit 1) as tag_name,
-            wqs.scope_id,
-            wqs.scope_type,
-            wqs.`type`,
-            wqs.begin_time,
-            wqs.end_time,
-            wqs.work_cycle,
-            wqs.user_id,
-            if(wqs.user_id is null,null,(select wu.user_name from we_user wu where wu.user_id = wqs.user_id limit 1)) as user_name,
-            wqs.party,
-            if(wqs.party is null,null,(select wd.name from we_department wd where wd.id= wqs.party limit 1)) as party_name,
             wqa.msg_type,
             wqa.content,
             wqa.title,
@@ -106,22 +82,22 @@
         where 1=1
     </sql>
 
-<!--    <select id="getQrDetailByQrId" resultMap="WeQrCodeDetailResult">-->
-<!--        <include refid="selectWeQrCodeDetailVo"/>-->
-<!--        <if test="qrId != null">-->
-<!--            and wqc.id = #{qrId}-->
-<!--        </if>-->
-<!--    </select>-->
+    <select id="getQrDetailByQrId" resultMap="WeQrCodeDetailResult">
+        <include refid="selectWeQrCodeDetailVo"/>
+        <if test="qrId != null">
+            and wqc.id = #{qrId}
+        </if>
+    </select>
 
-<!--    <select id="getQrDetailByQrIds" resultMap="WeQrCodeDetailResult">-->
-<!--        <include refid="selectWeQrCodeDetailVo"/>-->
-<!--        <if test="qrIds != null and qrIds.size > 0">-->
-<!--            and wqc.id in-->
-<!--            <foreach item="qrId" collection="qrIds" index="index" open="(" separator="," close=")">-->
-<!--                #{qrId}-->
-<!--            </foreach>-->
-<!--        </if>-->
-<!--    </select>-->
+    <select id="getQrDetailByQrIds" resultMap="WeQrCodeDetailResult">
+        <include refid="selectWeQrCodeDetailVo"/>
+        <if test="qrIds != null and qrIds.size > 0">
+            and wqc.id in
+            <foreach item="qrId" collection="qrIds" index="index" open="(" separator="," close=")">
+                #{qrId}
+            </foreach>
+        </if>
+    </select>
 
     <select id="getQrCodeList" resultType="java.lang.Long">
         select

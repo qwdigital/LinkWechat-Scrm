@@ -6,6 +6,7 @@ import com.linkwechat.wecom.domain.WeQrCode;
 import com.linkwechat.wecom.domain.query.qr.WeQrCodeListQuery;
 import com.linkwechat.wecom.domain.vo.qr.WeQrCodeDetailVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,14 +26,14 @@ public interface WeQrCodeMapper extends BaseMapper<WeQrCode> {
      * @param qrId 活码id
      * @return
      */
-    WeQrCodeDetailVo getQrDetailByQrId(Long qrId);
+    WeQrCodeDetailVo getQrDetailByQrId(@Param("qrId") Long qrId);
 
     /**
      * 根据活码id批量查询详情
      * @param qrIds 活码id
      * @return
      */
-    List<WeQrCodeDetailVo> getQrDetailByQrIds(List<Long> qrIds);
+    List<WeQrCodeDetailVo> getQrDetailByQrIds(@Param("qrIds") List<Long> qrIds);
 
     /**
      * 查询活码列表id

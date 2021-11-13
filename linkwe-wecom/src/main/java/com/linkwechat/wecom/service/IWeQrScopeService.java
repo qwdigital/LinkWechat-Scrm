@@ -1,11 +1,9 @@
 package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.linkwechat.wecom.domain.query.qr.WeQrUserInfoQuery;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.linkwechat.wecom.domain.WeQrScope;
+import com.linkwechat.wecom.domain.query.qr.WeQrUserInfoQuery;
+import com.linkwechat.wecom.domain.vo.qr.WeQrScopeVo;
 
 import java.util.List;
 
@@ -37,4 +35,11 @@ public interface IWeQrScopeService extends IService<WeQrScope> {
      * @param qrUserInfos 适用范围列表
      */
     void updateBatchByQrId(Long qrId, List<WeQrUserInfoQuery> qrUserInfos);
+
+    /**
+     * 根据活码id查询适用范围
+     * @param qrIds 活码id
+     * @return
+     */
+    List<WeQrScopeVo> getWeQrScopeByQrIds(List<Long> qrIds);
 }

@@ -2,6 +2,7 @@ package com.linkwechat.wecom.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.annotation.SqlParser;
+import com.linkwechat.wecom.domain.vo.qr.WeQrScopeVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -21,5 +22,6 @@ import com.linkwechat.wecom.domain.WeQrScope;
 public interface WeQrScopeMapper extends BaseMapper<WeQrScope> {
 
 
+    List<WeQrScopeVo> getWeQrScopeByQrIds(@Param("qrIds") List<Long> qrIds);
 }
 

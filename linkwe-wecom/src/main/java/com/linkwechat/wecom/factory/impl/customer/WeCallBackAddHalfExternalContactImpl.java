@@ -14,6 +14,7 @@ import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
 import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 import com.linkwechat.wecom.factory.WeEventStrategy;
 import com.linkwechat.wecom.service.*;
+import com.linkwechat.wecom.service.event.WeEventPublisherService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -45,15 +46,22 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
     @Autowired
     private IWeMaterialService weMaterialService;
 
+    @Autowired
+    private WeEventPublisherService weEventPublisherService;
+
     @Override
     public void eventHandle(WxCpXmlMessageVO message) {
         try {
             if (message.getExternalUserId() != null) {
                 weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId(),message.getUserId());
             }
-            //向扫码客户发送欢迎语
             if (message.getState() != null && message.getWelcomeCode() != null) {
+                weEventPublisherService.register(message.getExternalUserId(),message.getUserId(),message.getWelcomeCode(),message.getState());
+            }
+            //向扫码客户发送欢迎语
+            /*if (message.getState() != null && message.getWelcomeCode() != null) {
                 log.info("执行发送欢迎语>>>>>>>>>>>>>>>");
+                weEventPublisherService.register(message.getExternalUserId(),message.getUserId(),message.getWelcomeCode(),message.getState());
                 WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(message.getWelcomeCode());
                 WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByScenario(message.getState(),message.getUserId());
                 String empleCodeId = messageMap.getEmpleCodeId();
@@ -95,7 +103,7 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
                     }
                     weCustomerService.sendWelcomeMsg(weWelcomeMsgBuilder.build());
                 }
-            }
+            }*/
         } catch (Exception e) {
             e.printStackTrace();
             log.error("执行发送欢迎语失败！",e);

@@ -54,6 +54,4 @@ public interface IWeQrCodeService extends IService<WeQrCode> {
      * @return WeQrCodeScanCountVo
      */
     WeQrCodeScanCountVo getWeQrCodeScanCount(WeQrCodeListQuery qrCodeListQuery);
-
-
-} 
+}

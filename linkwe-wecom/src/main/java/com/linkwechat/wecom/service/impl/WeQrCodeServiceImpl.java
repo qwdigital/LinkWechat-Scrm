@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ThreadUtil;
@@ -20,6 +21,7 @@ import com.linkwechat.wecom.domain.query.qr.WeQrCodeListQuery;
 import com.linkwechat.wecom.domain.query.qr.WeQrUserInfoQuery;
 import com.linkwechat.wecom.domain.vo.qr.WeQrCodeDetailVo;
 import com.linkwechat.wecom.domain.vo.qr.WeQrCodeScanCountVo;
+import com.linkwechat.wecom.domain.vo.qr.WeQrScopeVo;
 import com.linkwechat.wecom.mapper.WeQrCodeMapper;
 import com.linkwechat.wecom.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,6 +100,9 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
 
     @Override
     public WeQrCodeDetailVo getQrDetail(Long qrId) {
+        WeQrCodeDetailVo weQrCodeDetailVo = this.baseMapper.getQrDetailByQrId(qrId);
+        List<WeQrScopeVo> weQrScopeVoList = scopeService.getWeQrScopeByQrIds(ListUtil.toList(qrId));
+        weQrCodeDetailVo.setQrUserInfos(weQrScopeVoList);
         return this.baseMapper.getQrDetailByQrId(qrId);
     }
 
@@ -107,6 +112,13 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
         List<Long> qrCodeIdList = this.baseMapper.getQrCodeList(qrCodeListQuery);
         if (CollectionUtil.isNotEmpty(qrCodeIdList)) {
             List<WeQrCodeDetailVo> qrDetailByQrIds = this.baseMapper.getQrDetailByQrIds(qrCodeIdList);
+            List<WeQrScopeVo> weQrScopeVoList = scopeService.getWeQrScopeByQrIds(qrCodeIdList);
+            Map<Long, List<WeQrScopeVo>> weQrScopeMap = Optional.ofNullable(weQrScopeVoList).orElseGet(ArrayList::new).stream().collect(Collectors.groupingBy(WeQrScopeVo::getQrId));
+            for (WeQrCodeDetailVo qrCodeDetail: qrDetailByQrIds) {
+                if(weQrScopeMap.get(qrCodeDetail.getId()) != null){
+                    qrCodeDetail.setQrUserInfos(weQrScopeMap.get(qrCodeDetail.getId()));
+                }
+            }
             weQrCodeList.addAll(qrDetailByQrIds);
         }
         PageInfo<Long> pageIdInfo = new PageInfo<>(qrCodeIdList);

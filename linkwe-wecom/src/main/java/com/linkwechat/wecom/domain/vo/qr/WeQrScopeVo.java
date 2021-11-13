@@ -7,13 +7,16 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 活码适用范围出参
  * @date 2021/11/8 22:33
  **/
 @ApiModel
 @Data
 public class WeQrScopeVo {
+
+    @ApiModelProperty(value = "活码id")
+    private Long qrId;
 
     @ApiModelProperty(value = "消息类型 0 默认排期 1 自定义排期")
     private Integer type;
