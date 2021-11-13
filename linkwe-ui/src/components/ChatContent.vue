@@ -27,10 +27,15 @@ export default {
         video: 'attachment',
         voice: 'attachment',
         location: 'address',
-        weapp: 'title',
-        card: 'corpname'
+        weapp: 'title'
+        // card: 'corpname'
       }
-      return JSON.parse(this.message.contact)[typeDict[this.message.msgType]]
+      let attr = typeDict[this.message.msgType]
+      if (attr) {
+        return JSON.parse(this.message.contact)[typeDict[this.message.msgType]]
+      } else {
+        return JSON.parse(this.message.contact)
+      }
     }
   },
   watch: {},
@@ -65,13 +70,7 @@ export default {
       {{ content }}
     </template>
     <template v-else-if="'image,emotion'.includes(message.msgType)">
-      <el-image
-        style="width: 100px; height: 100px"
-        :src="content"
-        fit="fit"
-        :preview-src-list="[content]"
-      >
-      </el-image>
+      <el-image style="width: 100px; height: 100px" :src="content" fit="fit" :preview-src-list="[content]"> </el-image>
     </template>
     <a
       v-else-if="'file'.includes(message.msgType)"
@@ -90,11 +89,7 @@ export default {
       {{ content }}
     </a>
     <div v-else-if="message.msgType === 'voice'">
-      <i
-        class="el-icon-microphone"
-        style=" font-size: 40px; color: #199ed8;"
-        @click="playAudio('attachment')"
-      ></i>
+      <i class="el-icon-microphone" style=" font-size: 40px; color: #199ed8;" @click="playAudio('attachment')"></i>
     </div>
     <template v-else-if="message.msgType === 'video'">
       <video
@@ -137,44 +132,50 @@ export default {
       ></video-player> -->
     </template>
     <div v-else-if="message.msgType === 'location'" class="msgtypecard">
-      <div class="card_name">
+      <div class="card-content">
         <el-amap
           ref="map"
           vid="amapDemo"
-          :center="[
-            JSON.parse(message.contact).longitude,
-            JSON.parse(message.contact).latitude
-          ]"
+          :center="[JSON.parse(message.contact).longitude, JSON.parse(message.contact).latitude]"
           :zoom="15"
           class="amap-demo"
           style="pointer-events: none;"
         >
           <el-amap-marker
-            :position="[
-              JSON.parse(message.contact).longitude,
-              JSON.parse(message.contact).latitude
-            ]"
+            :position="[JSON.parse(message.contact).longitude, JSON.parse(message.contact).latitude]"
           ></el-amap-marker>
         </el-amap>
       </div>
-      <div class="card_foot">{{ content }}</div>
+      <div class="card-foot">{{ content }}</div>
     </div>
     <div v-else-if="message.msgType === 'weapp'" class="msgtypecard">
-      <div class="card_name">{{ content }}</div>
-      <div class="card_foot">小程序</div>
+      <div class="card-content">{{ content }}</div>
+      <div class="card-foot">小程序</div>
     </div>
     <div v-else-if="message.msgType === 'card'" class="msgtypecard ">
-      <div class="card_name">{{ content }}</div>
-      <div class="card_foot">个人名片</div>
+      <div class="card-content">
+        <span style="flex: none;"> {{ content.corpname }}： </span>
+        <span>
+          {{ content.userid }}
+        </span>
+      </div>
+      <div class="card-foot">个人名片</div>
+    </div>
+    <!-- 图文链接 -->
+    <div v-else-if="message.msgType === 'link'" class="msgtypecard ">
+      <a :href="content.link_url">
+        <div class="card-content fxbw">
+          <div>
+            <div class="card--link-title">{{ content.title }}</div>
+            <div class="card--link-desc">{{ content.description }}</div>
+          </div>
+          <el-image style="width: 50px; height: 50px" :src="content.image_url" fit="fit"></el-image>
+        </div>
+      </a>
     </div>
     <div v-else>不支持的消息类型：{{ message.msgType }}</div>
 
-    <el-dialog
-      v-if="audioSrc[0]"
-      :visible.sync="dialogVisible"
-      width="30%"
-      @close="close"
-    >
+    <el-dialog v-if="audioSrc[0]" :visible.sync="dialogVisible" width="30%" @close="close">
       <div class="shabowboxvidoe shabowboxaudio">
         <!-- <AudioPlayer
           :audio-list="audioSrc"
@@ -223,23 +224,45 @@ export default {
 
 .msgtypecard {
   width: 320px;
-  height: 140px;
+  // height: 140px;
   margin: 10px 5px;
   border-radius: 8px;
-  -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
-    0 6px 8px 0 rgba(0, 0, 0, 0.19);
+  -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 8px 0 rgba(0, 0, 0, 0.19);
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 8px 0 rgba(0, 0, 0, 0.19);
   position: relative;
   background: #f8f8f8;
   overflow: hidden;
 
-  .card_name {
+  .card-content {
     width: 320px;
-    height: 105px;
-    line-height: 80px;
-    text-indent: 10px;
+    min-height: 105px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    line-height: 1.5;
+    // text-indent: 10px;
+    color: #333;
+    .card--link-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 5px;
+      text-overflow: -o-ellipsis-lastline;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      word-break: break-all;
+      display: -webkit-box;
+      white-space: pre-wrap;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .card--link-desc {
+      font-size: 14px;
+      color: #aaa;
+    }
   }
-  .card_foot {
+  .card-foot {
     position: absolute;
     height: 20px;
     border-top: 1px solid #efefef;

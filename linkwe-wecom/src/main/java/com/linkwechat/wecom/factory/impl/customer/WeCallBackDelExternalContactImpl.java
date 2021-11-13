@@ -1,10 +1,8 @@
 package com.linkwechat.wecom.factory.impl.customer;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.linkwechat.wecom.domain.WeCustomer;
-import com.linkwechat.wecom.domain.WeSensitiveAct;
-import com.linkwechat.wecom.domain.WeSensitiveActHit;
-import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 import com.linkwechat.wecom.factory.WeEventStrategy;
 import com.linkwechat.wecom.service.IWeCustomerService;
@@ -15,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author danmo
@@ -52,13 +51,26 @@ public class WeCallBackDelExternalContactImpl extends WeEventStrategy {
                     WeUser user = weUserService.getById(message.getUserId());
                     weSensitiveActHit.setOperator(user.getName());
 
-                    WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>()
-                            .eq(WeCustomer::getExternalUserid,message.getExternalUserId())
-                            .eq(WeCustomer::getFirstUserId,message.getUserId()));
 
-                    weSensitiveActHit.setOperateTargetId(weCustomer.getUserId());
-                    weSensitiveActHit.setOperateTarget(weCustomer.getName());
-                    weSensitiveActHitService.insertWeSensitiveActHit(weSensitiveActHit);
+                    List<WeCustomerList> weCustomerList = weCustomerService.findWeCustomerList(WeCustomerList.builder()
+                            .externalUserid(message.getExternalUserId())
+                            .firstUserId(message.getUserId())
+                            .delFlag(new Integer(1))
+                            .build());
+
+
+                    if(CollectionUtil.isNotEmpty(weCustomerList)) {
+
+                        WeCustomerList weCustomer = weCustomerList.stream().findFirst().get();
+                        weSensitiveActHit.setOperateTargetId(weCustomer.getFirstUserId());
+                        weSensitiveActHit.setOperateTarget(weCustomer.getCustomerName());
+                        weSensitiveActHitService.insertWeSensitiveActHit(weSensitiveActHit);
+
+                    }
+
+
+
+
                 }
 
             }

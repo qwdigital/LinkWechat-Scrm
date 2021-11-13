@@ -23,9 +23,9 @@ public interface IWeFlowerCustomerRelService extends IService<WeFlowerCustomerRe
 
     /**
      * 成员添加客户统计
-     * @param weFlowerCustomerRel
+     * @param
      * @return Map
      */
-    public Map<String,Object> getUserAddCustomerStat(WeFlowerCustomerRel weFlowerCustomerRel);
+    public Map<String,Object> getUserAddCustomerStat(String codeId,String beginTime,String endTime);
 
 }

@@ -190,7 +190,7 @@ public class WeEmpleCodeController extends BaseController {
     //   @PreAuthorize("@ss.hasPermi('wecom:code:getUserAddCustomerStat')")
     @Log(title = "成员添加客户统计", businessType = BusinessType.OTHER)
     @GetMapping("/getUserAddCustomerStat")
-    public AjaxResult getUserAddCustomerStat(WeFlowerCustomerRel weFlowerCustomerRel){
-        return AjaxResult.success(weFlowerCustomerRelService.getUserAddCustomerStat(weFlowerCustomerRel));
+    public AjaxResult getUserAddCustomerStat(String codeId,String beginTime,String endTime){
+        return AjaxResult.success(weFlowerCustomerRelService.getUserAddCustomerStat(codeId, beginTime, endTime));
     }
 }

@@ -10,6 +10,7 @@ import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
 import com.linkwechat.wecom.domain.vo.WeCustomerDetailVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -155,4 +156,7 @@ public interface IWeCustomerService extends IService<WeCustomer>
      * @param params
      */
     void getCustomerByCondition(JSONObject params);
+
+
+    void batchAddOrUpdate(List<WeCustomer> weCustomer);
 }

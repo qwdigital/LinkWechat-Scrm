@@ -1,9 +1,7 @@
 <p></p>
 <p></p>
 
-<p align="center">
-  <img alt="logo" src="https://images.gitee.com/uploads/images/2021/1101/010135_60061e4a_1480777.png" style="margin-bottom: 0px;">
-</p>
+![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/132836_bcaf4618_1480777.png "Snipaste_2021-11-08_13-28-16.png")
 
 <div align="center">
 
@@ -12,6 +10,7 @@
 ![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V1.5-brightgreen)
 ![license](http://img.shields.io/badge/license-GPL%203.0-orange)
 
+[官方网站](https://www.linkwechat.cn/#/d) | [演示系统](http://demo.linkwechat.cn/) | [帮助手册](https://www.yuque.com/linkwechat/help) | 用户手册(待开放)
 
 </div>
 
@@ -22,23 +21,27 @@
 
 ---
 
- **<p align="center">如果您觉得我们的开源项目很有帮助，请帮忙点击右上方的  :star: Star ，您的认可就是我们最大的动力，谢谢支持！:heart:</p>** 
+ **<p align="center">如果您觉得我们的开源项目很有帮助，请点击右上方的  :star: Star 支持 LinkWeChat 开源团队:heart:</p>** 
 
 ---
 
-[LinkWeChat 官方帮助手册——语雀](https://www.yuque.com/linkwechat/help)
+# 一、 关于 LinkWeChat
 
-### 产品简介
+## 1.1 介绍
 
 > LinkWeChat, Link to WeChat.
 
 基于人工智能的企业微信 SCRM 系统——LinkWeChat基于企业微信开放能力，不仅集成了企微基础的客户管理和后台管理功能，而且通过引流获客、客情维系、社群运营等灵活高效的客户运营模块，让客户与企业之间建立强链接关系，同时进一步通过多元化的客户营销工具，帮助企业提高客户运营效率，强化营销能力，拓展盈利空间，是企业私域流量管理与营销的综合解决方案。
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/1101/012040_64b8b918_1480777.png "仟微助手企业微信SCRM智能营销系统-V1.5_13.png")
+[更多 LinkWeChat 的故事](https://www.yuque.com/linkwechat/help/dsatfs)
 
-#### 功能特性
+## 1.2 能力
 
-系统分为八大模块：
+LinkWeChat SCRM 基于企业私域流量营销闭环，遵从获取新客到管理并维护客户，再到建立社群进行客户营销，最后在营销过程中再次获取新客的循环流程。
+
+![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/134011_bd2745e6_1480777.png "仟微助手企业微信SCRM智能营销系统-V1.5_13.png")
+
+整个系统共分为八大模块：
 
 *   **运营中心** ：客户、客群、会话等全功能数据报表，数据一目了然；
 *   **引流获客** ：活码、群活码、公海、客服等多渠道引流，实现精准获客；
@@ -49,102 +52,69 @@
 *   **企业风控** ：会话合规存档，敏感内容全局风控；
 *   **企业管理** ：组织架构、自建应用全融合，实现“一个后台”；
 
+V1.5 详细功能清单：
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/232207_6a0f4a67_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_13.png")
+[LinkWeChat-社区版V1.5-功能清单](https://docs.qq.com/sheet/DZXlLdmRjSWlzd2R6)
 
-### 环境部署
+## 1.3 优势
 
-#### 准备工作
+LinkWeChat 基于企业微信从服务内部到对外全面开放能力，可为电商、零售、教育、金融等垂直场景提供企微私域管理基础架构，主要优势有：
 
+* 全面对接企微开放 API，无需重复对接，快速上手
+* 二次整合封装企微 API，避免重复踩坑
+* 采用主流 Java 架构，具备高拓展性、灵活性，避免 PHP 架构的缺点
+* 对外提供内部 API，低成本二次开发
+* 基于 NLP 对会话内容进行智能语义分析，实现标签自动化、告警自动化
 
-```java
-JDK >= 1.8 (推荐1.8版本)
-Mysql >= 5.7.0 (推荐5.7版本)
-Mysql >= 5.7.0 (推荐5.7版本)
-Redis >= 3.0
-Maven >= 3.0
-Node >= 10
-```
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/232301_2dcf24b2_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_22.png")
 
-#### 运行系统
+## 1.4 愿景
 
-##### 后端运行
+LinkWeChat 不做私域营销专家，而是通过开源让每个企业都是自己的私域流量营销专家：
 
+* 集成企业微信基础能力，拿来即用
+* 针对垂直行业提供一站式营销解决方案
+* 开放自身平台能力，让更多的开发者参与进来
+* 与企业微信共同助力企业数字化转型
 
-- 导入 `IDEA` 中 
-- 创建数据库 `LW-vue` 并导入数据脚本
-- 打开运行 `com.linkwechat.LinkWeChatApplication.java`
+# 二、关于项目
 
-##### 前端运行
+## 2.1 在线体验
 
+演示地址：[http://demo.linkwechat.cn/](http://demo.linkwechat.cn/)
 
-```bash
-# 进入项目目录
-cd linkwe-ui
+演示账号/密码：Wecome/123456
 
-# 安装依赖
-npm install
+ _（注意：演示环境已屏蔽管理权限和相关操作）_ 
 
-# 强烈建议不要用直接使用 cnpm 安装，会有各种诡异的 bug，可以通过重新指定 registry 来解决 npm 安装速度慢的问题。
-npm install --registry=https://registry.npm.taobao.org
+## 2.2 技术栈
 
-# 本地开发 启动项目
-npm  run serve
-```
+本项目基于 [RuoYi-Vue](https://gitee.com/y_project/RuoYi-Vue?_from=gitee_search) 后台开发框架，感谢 [RuoYi-Vue](https://gitee.com/y_project/RuoYi-Vue?_from=gitee_search) 的开源。
 
-打开浏览器，输入 `http://localhost:80  `，默认账密为：`admin/admin123` 。
+ **前端技术栈** 
 
-若能正确展示登录页面，并能成功登录，菜单及页面展示正常，则表明环境搭建成功。
-
-##### 必要配置
-
-1、修改数据库连接
-
-- 编辑 `resources` 目录下的 `application-druid.yml`
-- `url` : 服务器地址
-- `username` : 账号
-- `password `: 密码
-
-数据库脚本：[https://gitee.com/LinkWeChat_admin/link-we-chat-db/tree/master](https://gitee.com/LinkWeChat_admin/link-we-chat-db/tree/master)
+| 技术栈 | 介绍 | 地址 |
+|:-:|:-:|:-:|
+| Vue | 渐进式 JavaScript 框架  |  https://cn.vuejs.org/  |
+|  Vuex	|专为 Vue.js 应用程序开发的状态管理模式	|https://vuex.vuejs.org/zh/  |
+|Vue Router|	Vue.js 官方的路由管理器|	https://router.vuejs.org/zh/
+|Vue CLI	|基于 Vue.js 进行快速开发的完整系统	|https://cli.vuejs.org/zh/guide/
+|axios|	易用、简洁且高效的 Http 库	|http://www.axios-js.com/zh-cn/
+|Element-UI	|基于 Vue 2.0 的桌面端组件库|	https://element.eleme.io/#/zh-CN
+|ES6|	JavaScript 语言的下一代标准|	https://es6.ruanyifeng.com/
 
 
-2、开发环境配置
+ **后端技术栈** 
+| 技术栈 | 介绍 | 地址 |
+|:-:|:-:|:-:|
+|Spring Boot	|快捷创建基于 Spring 的生产级应用程序|	https://spring.io/projects/spring-boot
+|MyBatis-Plus|	MyBatis 增强工具	|https://mp.baomidou.com/
+|JWT|	轻量级身份认证规范|	https://jwt.io/introduction
+|Spring Security	|基于 Spring 的强大且高度可定制的身份验证和访问控制框架	|https://spring.io/projects/spring-security/
 
-- 编辑 `resources` 目录下的 `application.yml`
-- `port` : 端口
-- `context-path` : 部署路径
+## 2.3 项目结构
 
-#### 部署系统
-
-##### 后端部署
-
-
-- `bin/package.bat` 在项目的目录下执行
-- 然后会在项目下生成 ` target` 文件夹包含 `war`  或 `jar `（多模块生成在 `linkwe-admin`）
-- `jar` 部署方式：使用命令行执行 `java –jar LinkWeChat.jar`
-- `war` 部署方式：`pom.xml packaging` 修改为 `war`  放入 `tomcat` 服务器 `webapps`
-
-##### 前端部署
-
-当项目开发完毕，只需要运行一行命令就可以打包你的应用
-
-```bash
-# 打包正式环境
-npm run build:prod
-
-# 打包预发布环境
-npm run build:stage
-```
-
-构建打包成功之后，会在根目录生成 `dist` 文件夹，里面就是构建打包好的文件，通常是 `.js` 、`.css`、`index.html` 等静态文件。
-
-通常情况下 `dist` 文件夹的静态文件发布到你的 `nginx` 或者静态服务器即可，其中的 `index.html` 是后台服务的入口页面。
-
-### 项目介绍
-
-#### 文件结构
-
-##### 后端结构
+**后端结构** 
 
 ```
 com.linkwechat     
@@ -174,8 +144,7 @@ com.linkwechat
 
 ```
 
-##### 前端结构
-
+**前端结构** 
 
 ```
 ├── build                      // 构建相关  
@@ -209,59 +178,86 @@ com.linkwechat
 └── vue.config.js              // vue.config.js
 ```
 
+## 2.4 项目部署
 
-#### 核心技术
+点击下方链接进入官方语雀帮助手册查看项目部署方式：
 
-- 前端技术栈 `ES6`、`vue`、`vuex`、`vue-router`、`vue-cli`、`axios`、`element-ui`
+[如何快速部署 LinkWeChat](https://www.yuque.com/linkwechat/help/gpod7i)
 
-- 后端技术栈 `SpringBoot`、`MyBatis-plus`、`Spring Security`、`Jwt`
+# 三、常见问题
 
-#### 业务架构
+由于 LinkWeChat 项目基于企业微信官方第三方应用开发文档，所以请各位小伙伴在学习和使用 LinkWeChat 之前， **务必仔细了解并熟悉** 官方 API 已有功能。
 
-利用 NLP 技术对聊天记录进行智能语义分析，实现敏感词自动告警及自动打标签功能。
+[企业微信-企业内部开发-API 文档](https://open.work.weixin.qq.com/api/doc/90000/90003/90556)
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/232301_2dcf24b2_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_22.png")
+**常见问题列表** 
 
-#### 在线体验
+[1.有哪几种部署方式？](https://www.yuque.com/linkwechat/help/bww8vd)
 
-演示地址：http://demo.linkwechat.cn/  
+[2.数据库为什么 Group By 查询报错？](https://www.yuque.com/linkwechat/help/babnva)
 
-演示账号/密码：Wecome/123456
+[3.项目每个分支的作用是什么？](https://www.yuque.com/linkwechat/help/ztbre1)
 
-#### 开发进度
+[4、运行项目必须配置 Nacos 吗？](https://www.yuque.com/linkwechat/help/yivnfb)
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0521/161235_092f96cb_1480777.png "LinkWeChat 1.0.png")
+[5、项目启动时为什么报错？](https://www.yuque.com/linkwechat/help/cepvgv)
 
-### 联系作者加入群
+[6、如何使用 Docker 进行部署？](https://www.yuque.com/linkwechat/help/ffi7bu)
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0414/093533_899b0110_1480777.png "江冬勤-linkwechat咨询.png")
+[7、图片为什么不显示或者裂开？](https://www.yuque.com/linkwechat/help/ggqnhb)
 
-### 特别鸣谢
+点击下方链接进入官方语雀帮助手册查看常见问题的相关描述及更多帮助：
 
-感谢[RuoYi-Vue](https://gitee.com/y_project/RuoYi-Vue?_from=gitee_search)提供框架代码。
+[帮助手册——常见问题](https://www.yuque.com/linkwechat/help/qk5gl6)
 
-### 部分演示图，持续更新
+# 四、最近规划
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1014/092211_447d288e_409467.png "屏幕截图.png")
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1014/092227_74c199cf_409467.png "屏幕截图.png")
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1014/092322_df5e338b_409467.png "屏幕截图.png")
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1014/092306_99975664_409467.png "屏幕截图.png")
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1014/092338_503e44f7_409467.png "屏幕截图.png")
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1014/092358_e465cb54_409467.png "屏幕截图.png")
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1109/094122_dfd73b9e_409467.png "屏幕截图.png")
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1109/094154_e5052872_409467.png "屏幕截图.png")
+LinkWeChat 团队目前在完成 LinkWeChat V2.0 大版本升级，主要围绕引流获客、客户中心、客情维系等模块进行升级，预计 12 月中旬整体上线。
 
-### 合作伙伴
+V2.0 主要的升级内容如下：
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/234054_ede1ef54_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_33.png")
+- [ ] 系统菜单重新整合，结构更加清晰；
+- [ ] 引流获客-员工活码支持分组；
+- [ ] 引流获客-员工活码支持自动排班；
+- [ ] 引流获客-员工活码支持多类型欢迎语；
+- [ ] 引流获客新增客户公海模块，支持一键分配自主添加；
+- [ ] 引流获客-欢迎语升级为欢迎语模板，支持多类型欢迎语个性化配置；
+- [ ] 客户中心-企业客户全新改版，支持查看多人跟进内容；
+- [ ] 客户中心-企业客群支持标签管理；
+- [ ] 客户中心-企业标签支持客群标签管理；
+- [ ] 客情维系-消息群发全新改版，支持多类型群发类型；
+- [ ] 客情维系-消息群发支持查看员工、客户维度的群发详情；
+- [ ] 客情维系-素材中心新增链接、小程序等多类型；
+- [ ] 客情维系-新增朋友圈模块，支持查看企业/个人动态；
+- [ ] 客情维系-支持企业发表朋友圈；
+- [ ] 社群运营-各模块细节调优；
+- [ ] 企业管理-企微配置全新改版，支持多种配置方式。
 
-### 版权声明
+![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/144937_7940336b_1480777.png "屏幕截图.png")
 
-LinkWeChat 开源版遵循 [GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE) 开源协议发布，并提供免费使用，但 **绝不允许修改后和衍生的代码做为闭源的商业软件发布和销售！** 
+# 五、奖项荣誉
 
-### 捐赠支持
+凭借着出色的产品能力和专业的技术能力，LinkWeChat 在 Gitee 开源社区年度评选活动中荣获“2020 年度 GVP最有价值开源项目”、“2020 年开源中国最佳人气项目”两个重量级奖项。
 
-#### 来一杯卡布奇诺
+![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/150243_3899c77e_1480777.png "仟微助手企业微信SCRM智能营销系统-V1.5_39.png")
+
+目前 LinkWeChat 已成功加入木兰开源社区孵化项目，得到了更加专业的技术支持与相关知识产权扶持，未来将会以更加严谨规范的专业能力服务各企业与行业。
+
+![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/150256_14f4ba8d_1480777.png "仟微助手企业微信SCRM智能营销系统-V1.5_40.png")
+
+# 六、联系我们
+
+如果你想加入我们的开源交流群，请扫码添加 LinkWeChat 项目作者，加入群聊：
+
+![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/145406_89fb9c20_1480777.png "屏幕截图.png")
+
+如果你有任何 LinkWeChat 产品上的想法、意见或建议，或商务上的合作需求，请扫码添加 LinkWeChat 项目团队进一步沟通：
+
+![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/145220_ddd9d2ef_1480777.png "屏幕截图.png")
+
+# 七、捐赠支持
+
+## 7.1 来一杯卡布奇洛
 
 如果您觉得我们的开源项目 `LinkWeChat` 对您有帮助，那就请项目开发者们来一杯卡布奇诺吧！当前我们接受来自于**微信**、**支付宝**或者**码云**的捐赠，请在捐赠时备注自己的昵称或附言。
 
@@ -269,7 +265,7 @@ LinkWeChat 开源版遵循 [GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/bl
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/0222/221344_727a0e80_1480777.png "image-20210222214357456.png")
 
-#### 长期捐赠
+## 7.2 长期捐赠
 
 如果您是企业的经营者并且有计划将 `LinkWeChat` 用在公司的经营产品中，欢迎进行长期捐赠。长期捐赠有商业上的益处有：
 
@@ -279,7 +275,8 @@ LinkWeChat 开源版遵循 [GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/bl
 
 如果您对长期赞助 `LinkWeChat` 团队感兴趣，或者有其他好想法，欢迎联系开发团队微信 `sxjiangdongqin`，或发送邮件到 iamxiarui@foxmail.com。
 
-#### 捐赠记录
+## 7.3 捐赠记录
+
 
 `LinkWeChat` 全体开发团队感谢以下全部小伙伴们的赞助（排名不分先后）：
 
@@ -321,17 +318,24 @@ LinkWeChat 开源版遵循 [GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/bl
 |    Happy   | 两核 8G 服务器一台 |
 |  平山阑槛倚晴空    | 两核 4G 服务器一台 |
 
-
-#### 捐赠用途
-
-患难与共，风雨同舟。
+## 7.4 社会价值
 
 LinkWeChat 开源团队将目前所收项目捐赠全额捐出，仅尽绵薄之力，在此我们也感谢大家的捐赠和支持，希望河南尽早渡过难关。
 
 同时也希望 LinkWeChat 不仅能为国内开源社区建设做一点贡献，也能为社会产生一些价值。
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0722/233536_67c02015_1480777.png "屏幕截图.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/150157_2762cfc4_1480777.png "屏幕截图.png")
+
+# 八、版权声明
+
+LinkWeChat 开源版遵循 [GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE) 开源协议发布，并提供技术交流学习，但**绝不允许修改后和衍生的代码做为闭源的商业软件发布和销售！** 
+
+LinkWeChat 开源团队拥有对本开源协议的最终解释权。
+
+[点击查看 LinkWeChat LICENSE 详细说明](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
 
 ---
 
- **如果您觉得我们的开源项目很有帮助，请帮忙点击右上方的  :star: Star ，您的认可就是我们最大的动力，谢谢支持！:heart:** 
+ **<p align="center">如果您觉得我们的开源项目很有帮助，请点击右上方的  :star: Star 支持 LinkWeChat 开源团队:heart:</p>** 
+
+---

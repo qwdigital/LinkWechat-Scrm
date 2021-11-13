@@ -315,16 +315,21 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                 });
             }
         } else {
-//            WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService
-//                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), unionId);
-//            Optional.ofNullable(weTaskFissionRecord).orElseThrow(() -> new WeComException("任务记录信息不存在"));
-//            List<WeFlowerCustomerRel> list = weFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
-//                    .eq(WeFlowerCustomerRel::getState, WeConstans.FISSION_PREFIX + weTaskFissionRecord.getId()));
-//            List<String> eidList = Optional.ofNullable(list).orElseGet(ArrayList::new).stream()
-//                    .map(WeFlowerCustomerRel::getExternalUserid).collect(Collectors.toList());
-//            if (CollectionUtil.isNotEmpty(eidList)) {
-//                customerList.addAll(weCustomerService.listByIds(eidList));
-//            }
+            WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService
+                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), unionId);
+            Optional.ofNullable(weTaskFissionRecord).orElseThrow(() -> new WeComException("任务记录信息不存在"));
+
+
+            List<WeCustomer> weCustomers = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
+                    .eq(WeCustomer::getState, WeConstans.FISSION_PREFIX + weTaskFissionRecord.getId()));
+
+
+            List<String> eidList = Optional.ofNullable(weCustomers).orElseGet(ArrayList::new).stream()
+                    .map(WeCustomer::getExternalUserid).collect(Collectors.toList());
+
+            if (CollectionUtil.isNotEmpty(eidList)) {
+                customerList.addAll(weCustomerService.listByIds(eidList));
+            }
         }
         return customerList;
     }

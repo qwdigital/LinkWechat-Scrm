@@ -1,13 +1,12 @@
 package com.linkwechat.wecom.factory.impl.customer;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.wecom.domain.WeEmpleCodeTag;
-import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
-import com.linkwechat.wecom.domain.WeFlowerCustomerTagRel;
+import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
@@ -45,6 +44,9 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
     @Autowired
     private IWeMaterialService weMaterialService;
 
+    @Autowired
+    private IWeScanEmpleCodeCountService iWeScanEmpleCodeCountService;
+
     @Override
     public void eventHandle(WxCpXmlMessageVO message) {
         try {
@@ -53,6 +55,15 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
             }
             //向扫码客户发送欢迎语
             if (message.getState() != null && message.getWelcomeCode() != null) {
+                //扫码统计记录入库
+                iWeScanEmpleCodeCountService.save(
+                        WeScanEmpleCodeCount.builder()
+                                .empleCodeId(Long.valueOf(message.getState()))
+                                .createTime(new Date())
+                                .userId(message.getUserId())
+                                .externalUserid(message.getExternalUserId())
+                                .build());
+
                 log.info("执行发送欢迎语>>>>>>>>>>>>>>>");
                 WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(message.getWelcomeCode());
                 WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByScenario(message.getState(),message.getUserId());

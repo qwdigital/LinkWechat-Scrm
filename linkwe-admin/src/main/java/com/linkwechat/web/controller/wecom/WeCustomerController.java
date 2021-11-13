@@ -150,6 +150,13 @@ public class WeCustomerController extends BaseController
     }
 
 
+    @GetMapping("/getCustomersInfoAndSynch")
+    public AjaxResult getCustomersInfoAndSynchWeCustomer(String externalUserid,String userId){
+        weCustomerService.getCustomersInfoAndSynchWeCustomer(externalUserid,userId);
+        return AjaxResult.success();
+    }
+
+
     /**
      * 客户打标签
      * @param weMakeCustomerTag
