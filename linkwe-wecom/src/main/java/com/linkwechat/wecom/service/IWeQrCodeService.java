@@ -32,10 +32,17 @@ public interface IWeQrCodeService extends IService<WeQrCode> {
 
     /**
      * 获取活码详情
-     * @param qrId
+     * @param qrId 活码id
      * @return
      */
     WeQrCodeDetailVo getQrDetail(Long qrId);
+
+    /**
+     * 获取活码详情
+     * @param qrIds 活码id
+     * @return
+     */
+    List<WeQrCodeDetailVo> getQrDetailByQrIds(List<Long> qrIds);
 
     /**
      * 获取活码列表
@@ -54,4 +61,5 @@ public interface IWeQrCodeService extends IService<WeQrCode> {
      * @return WeQrCodeScanCountVo
      */
     WeQrCodeScanCountVo getWeQrCodeScanCount(WeQrCodeListQuery qrCodeListQuery);
+
 }

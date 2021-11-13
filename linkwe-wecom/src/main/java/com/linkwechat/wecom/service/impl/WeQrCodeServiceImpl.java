@@ -107,6 +107,11 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
     }
 
     @Override
+    public List<WeQrCodeDetailVo> getQrDetailByQrIds(List<Long> qrIds) {
+        return this.baseMapper.getQrDetailByQrIds(qrIds);
+    }
+
+    @Override
     public PageInfo<WeQrCodeDetailVo> getQrCodeList(WeQrCodeListQuery qrCodeListQuery) {
         List<WeQrCodeDetailVo> weQrCodeList = new ArrayList<>();
         List<Long> qrCodeIdList = this.baseMapper.getQrCodeList(qrCodeListQuery);
