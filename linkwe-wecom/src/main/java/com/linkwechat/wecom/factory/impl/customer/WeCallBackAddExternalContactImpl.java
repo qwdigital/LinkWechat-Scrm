@@ -36,14 +36,6 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
     @Autowired
     private IWeCustomerService weCustomerService;
     @Autowired
-    private IWeEmpleCodeTagService weEmpleCodeTagService;
-    @Autowired
-    private IWeEmpleCodeService weEmpleCodeService;
-
-    @Autowired
-    private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
-
-    @Autowired
     private IWeMaterialService weMaterialService;
     @Autowired
     private IWeTaskFissionRecordService weTaskFissionRecordService;
@@ -64,12 +56,11 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
             weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId(),message.getUserId());
         }
 
-
         if (message.getState() != null && message.getWelcomeCode() != null) {
             if (isFission(message.getState())) {
                 taskFissionRecordHandle(message.getState(), message.getWelcomeCode(), message.getUserId(), message.getExternalUserId());
             } else {
-                empleCodeHandle(message.getState(), message.getWelcomeCode(), message.getUserId(), message.getExternalUserId());
+                weEventPublisherService.register(message.getState(), message.getWelcomeCode(), message.getUserId(), message.getExternalUserId());
             }
         }
 
@@ -118,84 +109,6 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
         }
     }
 
-    /**
-     * 活码欢迎语发送
-     *
-     * @param state          渠道
-     * @param wecomCode      欢迎语code
-     * @param userId         成员id
-     * @param externalUserId 客户id
-     */
-    private void empleCodeHandle(String state, String wecomCode, String userId, String externalUserId) {
-        if(StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(externalUserId)){
-            try {
-                weEventPublisherService.register(externalUserId,userId,wecomCode,state);
-                /*log.info("执行发送欢迎语>>>>>>>>>>>>>>>");
-                WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(wecomCode);
-                WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByState(state);
-                if (StringUtils.isNotNull(messageMap)) {
-                    //查询活码对应标签
-                    List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.list(new LambdaQueryWrapper<WeEmpleCodeTag>()
-                            .eq(WeEmpleCodeTag::getEmpleCodeId, messageMap.getEmpleCodeId()));
-                    if(CollectionUtil.isNotEmpty(tagList)){
-
-                        List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
-
-                        tagList.stream().forEach(k->{
-                            weFlowerCustomerTagRels.add(
-                                    WeFlowerCustomerTagRel.builder()
-                                            .tagId(k.getTagId())
-                                            .externalUserid(externalUserId)
-                                            .userId(userId)
-                                            .createTime(new Date())
-                                            .build()
-                            );
-                        });
-
-                            weFlowerCustomerTagRelService.batchAddOrUpdate(weFlowerCustomerTagRels);
-
-                            //标签同步到企业微信端
-                            weCustomerClient.makeCustomerLabel(CutomerTagEdit.builder()
-                                    .external_userid(externalUserId)
-                                    .userid(userId)
-                                    .add_tag(weFlowerCustomerTagRels.stream()
-                                            .map(WeFlowerCustomerTagRel::getTagId).toArray(String[]::new))
-                                    .build());
-
-                    }
-
-
-
-                    // 发送欢迎语
-                    log.debug(">>>>>>>>>欢迎语查询结果：{}", JSONObject.toJSONString(messageMap));
-                    // 设定欢迎语文字
-                    if (StringUtils.isNotEmpty(messageMap.getWelcomeMsg())) {
-                        weWelcomeMsgBuilder.text(WeWelcomeMsg.Text.builder().content(messageMap.getWelcomeMsg()).build());
-                    }
-                    // 设置欢迎语图片
-                    // 新客拉群创建的员工活码欢迎语图片(群活码图片)
-                    String codeUrl = weGroupCodeService.selectGroupCodeUrlByEmplCodeState(state);
-                    if (StringUtils.isNotNull(codeUrl)) {
-                        buildWelcomeMsgImg(weWelcomeMsgBuilder, codeUrl, FileUtil.getName(codeUrl));
-                    }else{
-
-                        WeEmpleCode weEmpleCode = weEmpleCodeService.selectWeEmpleCodeById(Long.valueOf(state));
-                        if(null != weEmpleCode){
-                            if(weEmpleCode.getWeMaterial() !=null && StringUtils.isNotEmpty(weEmpleCode.getWeMaterial().getMaterialUrl())){
-                                buildWelcomeMsgImg(weWelcomeMsgBuilder, weEmpleCode.getWeMaterial().getMaterialUrl(),
-                                        weEmpleCode.getWeMaterial().getMaterialName());
-                            }
-                        }
-                    }
-
-                    weCustomerService.sendWelcomeMsg(weWelcomeMsgBuilder.build());
-                }*/
-
-            } catch (Exception e) {
-                log.error("执行发送欢迎语失败！", e.getMessage());
-            }
-        }
-    }
 
     private boolean isFission(String str) {
         return str.contains(WeConstans.FISSION_PREFIX);
