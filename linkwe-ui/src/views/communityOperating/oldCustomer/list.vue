@@ -99,7 +99,7 @@ export default {
       page && (this.customerQuery.pageNum = page)
       this.customerLoading = true
 
-      getStat(this.customerSearchId)
+      getStat(this.customerSearchId, this.customerQuery)
         .then(({ rows, total }) => {
           this.customerList = rows
           this.customerTotal = +total
@@ -127,10 +127,9 @@ export default {
     },
     // 获取显示用tag字符串
     getDisplayTags(row) {
-      if (!(row && row.length > 0)) return ''
-      const tags = row.tagList.map((t) => (t && t.name ? t.name : ''))
+      if (!(row && row.tagList.length > 0)) return ''
 
-      return tags.join(' ')
+      return row.tagList.join(' ')
     },
     // 批量删除
     handleBulkRemove() {
@@ -198,15 +197,15 @@ export default {
     },
     // 客户统计查询
     customerSearch() {
-      // this.getStat()
-      this.customerFilter()
+      this.getStat()
+      // this.customerFilter()
     },
     // 客户统计重置
     resetCustomerQuery() {
       this.$refs['customerForm'].resetFields()
 
-      // this.getStat(1)
-      this.customerFilter()
+      this.getStat(1)
+      // this.customerFilter()
     }
   }
 }
@@ -378,7 +377,7 @@ export default {
           :total="customerTotal"
           :page.sync="customerQuery.pageNum"
           :limit.sync="customerQuery.pageSize"
-          @pagination="customerFilter"
+          @pagination="customerSearch"
         />
       </div>
     </el-dialog>
