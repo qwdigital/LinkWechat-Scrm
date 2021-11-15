@@ -252,6 +252,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                 }
                 senderList.add(senderInfo);
             });
+            messageQuery.setSenderList(senderList);
         }
         weGroupMessageTemplateService.addGroupMsgTemplate(messageQuery);
     }
