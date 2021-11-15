@@ -89,7 +89,7 @@ logging:
 H5:
   domainPrefix: http://linkwechat.cn/
   url: http://h5.linkwechat.cn/index.html
-  fissionUrl: http://h5.linkwechat.cn/index.html
+  fissionUrl: http://h5.linkwechat.cn/index.html?fissionId={}&fissionTargetId={}&posterId={}
   fissionGroupUrl: http://h5.linkwechat.cn/fission.html
 # Spring配置
 spring:
