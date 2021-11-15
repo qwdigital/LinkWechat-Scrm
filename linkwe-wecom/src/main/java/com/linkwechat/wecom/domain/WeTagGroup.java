@@ -55,7 +55,7 @@ public class WeTagGroup extends BaseEntity
 
 
     /**标签分组类型(1:客户标签;2:群标签)*/
-    private Integer groupTagType=new Integer(1);
+    private Integer groupTagType;
 
 
 

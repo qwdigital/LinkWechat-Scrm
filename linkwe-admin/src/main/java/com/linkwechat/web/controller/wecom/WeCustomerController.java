@@ -9,11 +9,13 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.wecom.constants.SynchRecordConstants;
 import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.service.IWeCustomerService;
 import com.linkwechat.wecom.service.IWeCustomerTrajectoryService;
+import com.linkwechat.wecom.service.IWeSynchRecordService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -41,6 +43,10 @@ public class WeCustomerController extends BaseController
     private IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
 
 
+    @Autowired
+    private IWeSynchRecordService iWeSynchRecordService;
+
+
     /**********************************************************************************
      **************************************客户列表*************************************
      *********************************************************************************/
@@ -55,7 +61,9 @@ public class WeCustomerController extends BaseController
         startPage();
         List<WeCustomerList> list = weCustomerService.findWeCustomerList(weCustomerList);
         TableDataInfo dataTable = getDataTable(list);
-        dataTable.setLastSyncTime(new Date());//最近同步时间
+        dataTable.setLastSyncTime(
+                iWeSynchRecordService.findUpdateLatestTime(SynchRecordConstants.SYNCH_CUSTOMER)
+        );//最近同步时间
         dataTable.setNoRepeatCustomerTotal(
                 weCustomerService.noRepeatCountCustomer()
         );//去重客户数

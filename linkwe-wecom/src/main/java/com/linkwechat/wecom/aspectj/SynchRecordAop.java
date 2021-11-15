@@ -40,6 +40,7 @@ public class SynchRecordAop {
         SynchRecord annotationLog = getAnnotationLog(joinPoint);
         if(null != annotationLog){
             List<WeSynchRecord> weSynchRecords = iWeSynchRecordService.list(new LambdaQueryWrapper<WeSynchRecord>()
+                    .eq(WeSynchRecord::getSynchType,annotationLog.synchType())
                     .apply("date_format (synch_time,'%Y-%m-%d HH:mm:ss') >= date_format('" + DateUtils.getBeforeByHourTime(2) + "','%Y-%m-%d HH:mm:ss')")
                     .apply("date_format (synch_time,'%Y-%m-%d HH:mm:ss') <= date_format('" + DateUtils.getBeforeByHourTime(0) + "','%Y-%m-%d HH:mm:ss')"));
             if(CollectionUtil.isEmpty(weSynchRecords)||weSynchRecords.size()<=1){

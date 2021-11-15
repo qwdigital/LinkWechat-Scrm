@@ -3,32 +3,24 @@ package com.linkwechat.wecom.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ArrayUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
-import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.TrajectorySceneType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
-import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.wecom.annotation.SynchRecord;
-import com.linkwechat.wecom.client.WeCropTagClient;
 import com.linkwechat.wecom.client.WeCustomerClient;
 import com.linkwechat.wecom.client.WeUserClient;
+import com.linkwechat.wecom.constants.SynchRecordConstants;
 import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.AllocateWeCustomerDto;
 import com.linkwechat.wecom.domain.dto.WeCustomerDto;
 import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
 import com.linkwechat.wecom.domain.dto.customer.*;
-import com.linkwechat.wecom.domain.dto.tag.WeCropGroupTagDto;
-import com.linkwechat.wecom.domain.dto.tag.WeCropGroupTagListDto;
-import com.linkwechat.wecom.domain.dto.tag.WeCropTagDto;
-import com.linkwechat.wecom.domain.dto.tag.WeFindCropTagParam;
-import com.linkwechat.wecom.domain.vo.WeCustomerDetailVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.mapper.WeCustomerMapper;
@@ -37,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -55,13 +46,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
     @Autowired
     private WeCustomerClient weCustomerClient;
-
-
-
-
-
-    @Autowired
-    private IWeTagGroupService iWeTagGroupService;
 
 
     @Autowired
@@ -110,26 +94,25 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Override
     @Async
     @Transactional(rollbackFor = Exception.class)
-    @SynchRecord
+    @SynchRecord(synchType = SynchRecordConstants.SYNCH_CUSTOMER)
     public void synchWeCustomer() {
         //获取所有可以添加客户的企业员工
-        log.warn("客户同步");
-//        FollowUserList followUserList = weCustomerClient.getFollowUserList();
-//        if (WeConstans.WE_SUCCESS_CODE.equals(followUserList.getErrcode())
-//                && ArrayUtil.isNotEmpty(followUserList.getFollow_user())) {
-//            String[] follow_user = followUserList.getFollow_user();
-//            if(ArrayUtil.isNotEmpty(follow_user)){
-//
-//                List<ExternalUserDetail> externalUserDetails = new ArrayList<>();
-//                getByUser(follow_user, null, externalUserDetails);
-//
-//                if(CollectionUtil.isNotEmpty(externalUserDetails)){
-//                    this.weFlowerCustomerHandle(
-//                            externalUserDetails
-//                    );
-//                }
-//            }
-//        }
+        FollowUserList followUserList = weCustomerClient.getFollowUserList();
+        if (WeConstans.WE_SUCCESS_CODE.equals(followUserList.getErrcode())
+                && ArrayUtil.isNotEmpty(followUserList.getFollow_user())) {
+            String[] follow_user = followUserList.getFollow_user();
+            if(ArrayUtil.isNotEmpty(follow_user)){
+
+                List<ExternalUserDetail> externalUserDetails = new ArrayList<>();
+                getByUser(follow_user, null, externalUserDetails);
+
+                if(CollectionUtil.isNotEmpty(externalUserDetails)){
+                    this.weFlowerCustomerHandle(
+                            externalUserDetails
+                    );
+                }
+            }
+        }
 
     }
 

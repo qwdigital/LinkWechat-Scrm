@@ -42,7 +42,7 @@ public class WeTagGroupController extends BaseController
     private IWeTagGroupService weTagGroupService;
 
     /**
-     * 查询标签组列表
+     * 查询标签组列表(分页)
      */
     //  @PreAuthorize("@ss.hasPermi('customerManage:tag:list')")
     @GetMapping("/list")
@@ -54,6 +54,19 @@ public class WeTagGroupController extends BaseController
         );
     }
 
+
+    /**
+     *  查询标签组列表(不分页)
+     * @param weTagGroup
+     * @return
+     */
+    @GetMapping("/allList")
+    public AjaxResult allList(WeTagGroup weTagGroup)
+    {
+        return AjaxResult.success(
+                weTagGroupService.selectWeTagGroupList(weTagGroup)
+        );
+    }
 
 
     /**

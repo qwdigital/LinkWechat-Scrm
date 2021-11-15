@@ -11,6 +11,6 @@ import java.lang.annotation.*;
 @Documented
 public @interface SynchRecord {
 
-    int synchType() default 1; //1：默认客户模块;2:员工与部门;
+    int synchType(); //1：默认客户模块;2:通讯录(员工与部门);3:客户群
 
 }
