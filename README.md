@@ -22,7 +22,7 @@
 
 ---
 
- **<p align="center">如果您觉得我们的开源项目很有帮助，请点击右上方的  :star: Star 支持 LinkWeChat 开源团队:heart:</p>** 
+ **<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>** 
 
 ---
 
@@ -337,6 +337,6 @@ LinkWeChat 开源团队拥有对本开源协议的最终解释权。
 
 ---
 
- **<p align="center">如果您觉得我们的开源项目很有帮助，请点击右上方的  :star: Star 支持 LinkWeChat 开源团队:heart:</p>** 
+ **<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>** 
 
 ---
