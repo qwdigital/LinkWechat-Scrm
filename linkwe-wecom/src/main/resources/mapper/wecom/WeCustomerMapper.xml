@@ -622,25 +622,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
-        NAME=IF(VALUES(NAME)=null and VALUES(NAME)='',we_customer.NAME,VALUES(NAME)),
-        avatar=IF( VALUES(avatar)=null and VALUES(avatar)='', we_customer.avatar,VALUES(avatar)),
-        type=IF(VALUES(type),we_customer.type,VALUES(type)),
-        gender=IF(VALUES(gender) , we_customer.gender,VALUES(gender)),
-        unionid=IF(VALUES(unionid)=null and VALUES(unionid)='',we_customer.unionid,VALUES(unionid)),
-        birthday=IF(VALUES(birthday), we_customer.birthday,VALUES(birthday)),
-        corp_name=IF(VALUES(corp_name)=null and VALUES(corp_name)='',we_customer.corp_name,VALUES(corp_name)),
-        corp_full_name=IF(VALUES(corp_full_name)=null and VALUES(corp_full_name)='', we_customer.corp_full_name,VALUES(corp_full_name)),
-        position=IF(VALUES(position)=null and VALUES(position)='',we_customer.position,VALUES(position)),
-        is_open_chat=IF(VALUES(is_open_chat),we_customer.is_open_chat,VALUES(is_open_chat)),
-        first_user_id=IF(VALUES(first_user_id)=null and VALUES(first_user_id)='', we_customer.first_user_id,VALUES(first_user_id)),
-        first_add_time=IF(VALUES(first_add_time)=null ,we_customer.first_add_time,VALUES(first_add_time)),
-        qq=IF(VALUES(qq)=null and VALUES(qq)='', we_customer.qq,VALUES(qq)),
-        email=IF(VALUES(email)=null and VALUES(email)='',we_customer.email,VALUES(email)),
-        address=IF(VALUES(address)=null and VALUES(address)='',we_customer.address,VALUES(address)),
-        phone=IF( VALUES(phone)=null and  VALUES(phone)='', we_customer.phone, VALUES(phone)),
-        add_method=IF(VALUES(add_method),we_customer.add_method,VALUES(add_method)),
-        del_flag=IF(VALUES(del_flag), we_customer.del_flag, VALUES(del_flag)),
-        state=IF( VALUES(state)=null and  VALUES(state)='', we_customer.state, VALUES(state));
+        NAME=IF(ISNULL(VALUES(NAME))=0 and LENGTH(trim(VALUES(NAME))),VALUES(NAME),we_customer.NAME),
+        avatar=IF(ISNULL(VALUES(avatar))=0 and LENGTH(trim(VALUES(avatar))),VALUES(avatar), we_customer.avatar),
+        type=IF(VALUES(type),VALUES(type),we_customer.type),
+        gender=IF(VALUES(gender) ,VALUES(gender), we_customer.gender),
+        unionid=IF(ISNULL(VALUES(unionid))=0 and LENGTH(trim(VALUES(unionid))),VALUES(unionid),we_customer.unionid),
+        birthday=IF(VALUES(birthday),VALUES(birthday), we_customer.birthday),
+        corp_name=IF(ISNULL(VALUES(corp_name))=0 and LENGTH(trim(VALUES(corp_name))),VALUES(corp_name),we_customer.corp_name),
+        corp_full_name=IF(ISNULL(VALUES(corp_full_name))=0 and LENGTH(trim(VALUES(corp_full_name))),VALUES(corp_full_name),we_customer.corp_full_name),
+        position=IF(ISNULL(VALUES(position))=0 and LENGTH(trim(VALUES(position))),VALUES(position),we_customer.position),
+        is_open_chat=IF(VALUES(is_open_chat),VALUES(is_open_chat),we_customer.is_open_chat),
+        first_user_id=IF(ISNULL(VALUES(first_user_id))=0 and LENGTH(trim(VALUES(first_user_id))),VALUES(first_user_id), we_customer.first_user_id),
+        first_add_time=IF(VALUES(first_add_time) ,VALUES(first_add_time),we_customer.first_add_time),
+        qq=IF(ISNULL(VALUES(qq))=0 and LENGTH(trim(VALUES(qq))),VALUES(qq), we_customer.qq),
+        email=IF(ISNULL(VALUES(email))=0 and LENGTH(trim(VALUES(email))),VALUES(email),we_customer.email),
+        address=IF(ISNULL(VALUES(address))=0 and LENGTH(trim(VALUES(address))),VALUES(address),we_customer.address),
+        phone=IF(ISNULL(VALUES(phone))=0 and LENGTH(trim(VALUES(phone))),VALUES(phone), we_customer.phone),
+        add_method=IF(VALUES(add_method),VALUES(add_method),we_customer.add_method),
+        del_flag=IF(VALUES(del_flag),we_customer.del_flag, VALUES(del_flag)),
+        state=IF(ISNULL(VALUES(state))=0 and LENGTH(trim(VALUES(state))), we_customer.state, VALUES(state));
     </insert>
 
 
