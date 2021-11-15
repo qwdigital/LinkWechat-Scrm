@@ -18,6 +18,7 @@ import com.linkwechat.wecom.domain.vo.WeGroupMessageListVo;
 import com.linkwechat.wecom.domain.vo.WeGroupMessageTaskVo;
 import com.linkwechat.wecom.mapper.WeGroupMessageTemplateMapper;
 import com.linkwechat.wecom.service.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
  * @author ruoyi
  * @date 2021-10-27
  */
+@Slf4j
 @Service
 public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessageTemplateMapper, WeGroupMessageTemplate> implements IWeGroupMessageTemplateService {
 
@@ -162,6 +164,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void addGroupMsgTemplate(WeAddGroupMessageQuery query) {
+        log.info("addGroupMsgTemplate 入参：query:{}",JSONObject.toJSONString(query));
         List<WeAddGroupMessageQuery.SenderInfo> senderList = query.getSenderList();
         WeGroupMessageTemplate weGroupMessageTemplate = new WeGroupMessageTemplate();
         BeanUtil.copyProperties(query, weGroupMessageTemplate);
@@ -208,7 +211,8 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                     messageTask.setUserId(senderInfo.getUserId());
                     messageTaskList.add(messageTask);
 
-                    List<WeGroupMessageSendResult> messageSendResults = senderInfo.getCustomerList().stream().map(eid -> {
+                    List<WeGroupMessageSendResult> messageSendResults = Optional.ofNullable(senderInfo.getCustomerList())
+                            .orElseGet(ArrayList::new).stream().map(eid -> {
                         WeGroupMessageSendResult messageSendResult = new WeGroupMessageSendResult();
                         messageSendResult.setMsgTemplateId(weGroupMessageTemplate.getId());
                         messageSendResult.setUserId(senderInfo.getUserId());
