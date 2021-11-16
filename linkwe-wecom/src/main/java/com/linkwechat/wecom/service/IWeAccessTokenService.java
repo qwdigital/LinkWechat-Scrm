@@ -1,7 +1,6 @@
 package com.linkwechat.wecom.service;
 
 import com.linkwechat.common.core.domain.entity.WeCorpAccount;
-import com.linkwechat.wecom.domain.WeApp;
 
 /**
  * @description: 微信token相关接口

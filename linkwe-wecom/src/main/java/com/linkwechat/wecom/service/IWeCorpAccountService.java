@@ -13,13 +13,7 @@ public interface IWeCorpAccountService extends IService<WeCorpAccount>
 {
 
 
-    /**
-     * 修改企业id相关配置
-     * 
-     * @param wxCorpAccount 企业id相关配置
-     * @return 结果
-     */
-     void updateWeCorpAccount(WeCorpAccount wxCorpAccount);
+
 
 
 
@@ -31,11 +25,7 @@ public interface IWeCorpAccountService extends IService<WeCorpAccount>
      WeCorpAccount findValidWeCorpAccount();
 
 
-    /**
-     * 启用有效的企业微信账号
-     * @param corpId
-     */
-     int startVailWeCorpAccount(String corpId);
+
 
     /**
      * 客户流失通知开关

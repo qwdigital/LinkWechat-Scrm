@@ -135,76 +135,76 @@ public class SysLoginController
         return AjaxResult.success(menuService.buildMenus(menus));
     }
 
-    /**
-     * 获取企业扫码登录相关参数
-     * @return
-     */
-    @GetMapping("/findWxQrLoginInfo")
-    public AjaxResult findQrLoginParm(){
-
-        WeCorpAccount validWeCorpAccount
-                = iWxCorpAccountService.findValidWeCorpAccount();
-        if(null != validWeCorpAccount){
-            validWeCorpAccount.setContactSecret(null);
-            validWeCorpAccount.setCorpSecret(null);
-            validWeCorpAccount.setProviderSecret(null);
-        }
-
-        return AjaxResult.success(validWeCorpAccount);
-    }
-
-
-
-    /**
-     * 扫码登录微信端回调
-     * @param auth_code 授权code
-     * @param agentId 应用id
-     * @return
-     */
-    @GetMapping("/wxQrLogin")
-    public AjaxResult wxQrLogin(String auth_code, String agentId){
-
-        AjaxResult ajax = AjaxResult.success();
-
-        WeUserInfoDto userInfo = weUserClient.getUserInfo(auth_code, agentId);
-        if( null != userInfo){
-            SysUser sysUser = sysUserService.selectUserByCorpUserId(userInfo.getUserId());
-            if (null != sysUser){
-                String token = loginService.noPwdLogin(sysUser.getUserName());
-                ajax.put(Constants.TOKEN, token);
-            }else {
-                return AjaxResult.error("请绑定后再登录");
-            }
-        }
-        return ajax;
-    }
+//    /**
+//     * 获取企业扫码登录相关参数
+//     * @return
+//     */
+//    @GetMapping("/findWxQrLoginInfo")
+//    public AjaxResult findQrLoginParm(){
+//
+//        WeCorpAccount validWeCorpAccount
+//                = iWxCorpAccountService.findValidWeCorpAccount();
+//        if(null != validWeCorpAccount){
+//            validWeCorpAccount.setContactSecret(null);
+//            validWeCorpAccount.setCorpSecret(null);
+//            validWeCorpAccount.setProviderSecret(null);
+//        }
+//
+//        return AjaxResult.success(validWeCorpAccount);
+//    }
 
 
 
-    /**
-     * 通过企业id和企业密钥登录
-     * @param corpId
-     * @param corpSecret
-     * @return
-     */
-    @GetMapping("/corpLogin")
-    public AjaxResult corpLogin(String corpId,String corpSecret){
+//    /**
+//     * 扫码登录微信端回调
+//     * @param auth_code 授权code
+//     * @param agentId 应用id
+//     * @return
+//     */
+//    @GetMapping("/wxQrLogin")
+//    public AjaxResult wxQrLogin(String auth_code, String agentId){
+//
+//        AjaxResult ajax = AjaxResult.success();
+//
+//        WeUserInfoDto userInfo = weUserClient.getUserInfo(auth_code, agentId);
+//        if( null != userInfo){
+//            SysUser sysUser = sysUserService.selectUserByCorpUserId(userInfo.getUserId());
+//            if (null != sysUser){
+//                String token = loginService.noPwdLogin(sysUser.getUserName());
+//                ajax.put(Constants.TOKEN, token);
+//            }else {
+//                return AjaxResult.error("请绑定后再登录");
+//            }
+//        }
+//        return ajax;
+//    }
 
-        WeCorpAccount weCorpAccount = iWxCorpAccountService.getOne(new LambdaQueryWrapper<WeCorpAccount>()
-                .eq(WeCorpAccount::getCorpId, corpId)
-                .eq(WeCorpAccount::getCorpSecret, corpSecret)
-                .eq(WeCorpAccount::getDelFlag, Constants.NORMAL_CODE));
 
 
-        if(weCorpAccount == null){
-
-            return AjaxResult.error("当前企业id与企业密码不匹配或不存在");
-        }
-
-        return AjaxResult.success(
-                loginService.noPwdLogin(weCorpAccount.getCorpAccount())
-        );
-    }
+//    /**
+//     * 通过企业id和企业密钥登录
+//     * @param corpId
+//     * @param corpSecret
+//     * @return
+//     */
+//    @GetMapping("/corpLogin")
+//    public AjaxResult corpLogin(String corpId,String corpSecret){
+//
+//        WeCorpAccount weCorpAccount = iWxCorpAccountService.getOne(new LambdaQueryWrapper<WeCorpAccount>()
+//                .eq(WeCorpAccount::getCorpId, corpId)
+//                .eq(WeCorpAccount::getCorpSecret, corpSecret)
+//                .eq(WeCorpAccount::getDelFlag, Constants.NORMAL_CODE));
+//
+//
+//        if(weCorpAccount == null){
+//
+//            return AjaxResult.error("当前企业id与企业密码不匹配或不存在");
+//        }
+//
+//        return AjaxResult.success(
+//                loginService.noPwdLogin(weCorpAccount.getCorpAccount())
+//        );
+//    }
 
 
 }
