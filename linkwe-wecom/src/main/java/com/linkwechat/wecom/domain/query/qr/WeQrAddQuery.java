@@ -7,6 +7,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.WeMessageTemplate;
 import com.linkwechat.wecom.domain.WeQrCode;
 import com.linkwechat.wecom.domain.dto.WeExternalContactDto;
@@ -14,11 +15,12 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author danmo
@@ -84,13 +86,15 @@ public class WeQrAddQuery {
         if (CollectionUtil.isNotEmpty(qrUserInfos)) {
             //员工列表
             String[] userIdArr = qrUserInfos.stream().filter(item ->
-                    ObjectUtil.equal(1, item.getType())).map(WeQrUserInfoQuery::getUserIds).toArray(String[]::new);
+                    ObjectUtil.equal(1, item.getType()) && CollectionUtil.isNotEmpty(item.getUserIds()))
+                    .map(WeQrUserInfoQuery::getUserIds).flatMap(Collection::stream).toArray(String[]::new);
             if (userIdArr.length > 0) {
                 weContactWay.setUser(userIdArr);
             }
             //部门列表
             Long[] partyArr = qrUserInfos.stream().filter(item ->
-                    ObjectUtil.equal(1, item.getType())).map(WeQrUserInfoQuery::getPartys).toArray(Long[]::new);
+                    ObjectUtil.equal(1, item.getType()) && CollectionUtil.isNotEmpty(item.getPartys()))
+                    .map(WeQrUserInfoQuery::getPartys).flatMap(Collection::stream).toArray(Long[]::new);
             if (partyArr.length > 0) {
                 weContactWay.setParty(partyArr);
             }
