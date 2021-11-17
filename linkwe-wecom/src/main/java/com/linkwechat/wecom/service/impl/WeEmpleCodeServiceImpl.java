@@ -241,7 +241,9 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
     public int deleteWeEmpleCodeById(Long id) {
         WeEmpleCode weEmpleCode = getById(id);
         if (weEmpleCode != null && weEmpleCode.getConfigId() != null) {
-            weExternalContactClient.delContactWay(weEmpleCode.getConfigId());
+            WeExternalContactDto externalContactDto = new WeExternalContactDto();
+            externalContactDto.setConfig_id(weEmpleCode.getConfigId());
+            weExternalContactClient.delContactWay(externalContactDto);
         }
         // 删除对应的新科拉群信息
         communityNewGroupMapper.removeWeCommunityNewGroupByEmplCodeId(id);

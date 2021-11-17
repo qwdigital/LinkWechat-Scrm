@@ -48,7 +48,9 @@ public class IWeQrScopeServiceImpl extends ServiceImpl<WeQrScopeMapper, WeQrScop
                     weQrScope.setScopeId(uuId);
                     weQrScope.setUserId(userId);
                     weQrScope.setScopeType(1);
-                    weQrScope.setWorkCycle(userInfo.getWorkCycle().stream().map(String::valueOf).collect(Collectors.joining(",")));
+                    if(CollectionUtil.isNotEmpty(userInfo.getWorkCycle())){
+                        weQrScope.setWorkCycle(userInfo.getWorkCycle().stream().map(String::valueOf).collect(Collectors.joining(",")));
+                    }
                     weQrScope.setBeginTime(userInfo.getBeginTime());
                     weQrScope.setEndTime(userInfo.getEndTime());
                     return weQrScope;
@@ -61,7 +63,9 @@ public class IWeQrScopeServiceImpl extends ServiceImpl<WeQrScopeMapper, WeQrScop
                     weQrScope.setScopeId(uuId);
                     weQrScope.setParty(String.valueOf(party));
                     weQrScope.setScopeType(2);
-                    weQrScope.setWorkCycle(userInfo.getWorkCycle().stream().map(String::valueOf).collect(Collectors.joining(",")));
+                    if(CollectionUtil.isNotEmpty(userInfo.getWorkCycle())){
+                        weQrScope.setWorkCycle(userInfo.getWorkCycle().stream().map(String::valueOf).collect(Collectors.joining(",")));
+                    }
                     weQrScope.setBeginTime(userInfo.getBeginTime());
                     weQrScope.setEndTime(userInfo.getEndTime());
                     return weQrScope;

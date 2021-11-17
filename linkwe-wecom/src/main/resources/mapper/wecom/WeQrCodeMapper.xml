@@ -24,14 +24,17 @@
         <result property="id" column="id" jdbcType="INTEGER"/>
         <result property="name" column="name" jdbcType="VARCHAR"/>
         <result property="groupId" column="group_id" jdbcType="INTEGER"/>
+        <result property="qrGroupName" column="group_name" jdbcType="INTEGER"/>
         <result property="autoAdd" column="auto_add" jdbcType="INTEGER"/>
         <result property="type" column="type" jdbcType="INTEGER"/>
         <result property="ruleType" column="rule_type" jdbcType="INTEGER"/>
         <result property="state" column="state" jdbcType="VARCHAR"/>
         <result property="configId" column="config_id" jdbcType="VARCHAR"/>
         <result property="qrCode" column="qr_code" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
         <collection property="qrTags" ofType="com.linkwechat.wecom.domain.vo.tag.WeTagVo">
             <result property="tagId" column="tag_id" jdbcType="INTEGER"/>
+            <result property="tagName" column="tag_name" jdbcType="VARCHAR"/>
         </collection>
         <collection property="qrAttachments" ofType="com.linkwechat.wecom.domain.WeQrAttachments">
             <result property="msgType" column="msg_type" jdbcType="VARCHAR"/>
@@ -63,6 +66,7 @@
             wqc.scan_num,
             wqc.config_id,
             wqc.qr_code,
+            wqc.update_time,
             wqtr.tag_id,
             (select name from we_tag wt where wt.tag_id = wqtr.tag_id limit 1) as tag_name,
             wqa.msg_type,
@@ -108,7 +112,7 @@
             left join we_qr_attachments wqa on wqa.qr_id = wqc.id and wqs.del_flag = 0
             where 1=1
         <if test="groupId != null and groupId != ''">
-            and wqc.group_id = groupId
+            and wqc.group_id = #{groupId}
         </if>
         <if test="qrName != null and qrName != ''">
             and wqc.name like concat('%', #{qrName}, '%')

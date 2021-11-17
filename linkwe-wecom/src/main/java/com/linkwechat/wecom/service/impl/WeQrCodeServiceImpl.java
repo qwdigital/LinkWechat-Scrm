@@ -108,7 +108,15 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
 
     @Override
     public List<WeQrCodeDetailVo> getQrDetailByQrIds(List<Long> qrIds) {
-        return this.baseMapper.getQrDetailByQrIds(qrIds);
+        List<WeQrCodeDetailVo> qrDetailByQrIds = this.baseMapper.getQrDetailByQrIds(qrIds);
+        List<WeQrScopeVo> weQrScopeVoList = scopeService.getWeQrScopeByQrIds(qrIds);
+        Map<Long, List<WeQrScopeVo>> weQrScopeMap = Optional.ofNullable(weQrScopeVoList).orElseGet(ArrayList::new).stream().collect(Collectors.groupingBy(WeQrScopeVo::getQrId));
+        for (WeQrCodeDetailVo qrCodeDetail: qrDetailByQrIds) {
+            if(weQrScopeMap.get(qrCodeDetail.getId()) != null){
+                qrCodeDetail.setQrUserInfos(weQrScopeMap.get(qrCodeDetail.getId()));
+            }
+        }
+        return qrDetailByQrIds ;
     }
 
     @Override
@@ -151,7 +159,9 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
             //异步删除企微活码---最好使用mq
             ThreadUtil.execute(() -> weQrCodes.forEach(item -> {
                 if (StringUtils.isNotEmpty(item.getConfigId())) {
-                    externalContactClient.delContactWay(item.getConfigId());
+                    WeExternalContactDto externalContactDto = new WeExternalContactDto();
+                    externalContactDto.setConfig_id(item.getConfigId());
+                    externalContactClient.delContactWay(externalContactDto);
                 }
             }));
         }
@@ -203,10 +213,10 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
                     long userSum = qrUserInfoList.get(i).getUserIds().stream()
                             .filter(one -> qrUserInfoList.get(finalJ).getUserIds().stream()
                                     .anyMatch(two -> ObjectUtil.equal(two, one))).count();
-                    long partySum = qrUserInfoList.get(i).getPartys().stream()
+                    /*long partySum = qrUserInfoList.get(i).getPartys().stream()
                             .filter(one -> qrUserInfoList.get(finalJ).getPartys().stream()
-                                    .anyMatch(two -> ObjectUtil.equal(two, one))).count();
-                    if (userSum > 0 || partySum > 0) {
+                                    .anyMatch(two -> ObjectUtil.equal(two, one))).count();*/
+                    if (userSum > 0 /*|| partySum > 0*/) {
                         long workCycleSum = qrUserInfoList.get(i).getWorkCycle().stream()
                                 .filter(one -> qrUserInfoList.get(finalJ).getWorkCycle().stream()
                                         .anyMatch(two -> ObjectUtil.equal(two, one))).count();

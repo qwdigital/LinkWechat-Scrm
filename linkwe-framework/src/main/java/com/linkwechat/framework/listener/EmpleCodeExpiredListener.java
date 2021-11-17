@@ -28,7 +28,7 @@ public class EmpleCodeExpiredListener extends KeyExpirationEventMessageListener 
     public void onMessage(Message message, byte[] pattern) {
         System.out.println("过期key:" + message.toString());
         if(message.toString().contains(WeConstans.WE_EMPLE_CODE_KEY)){
-            weExternalContactClient.delContactWay(message.toString().split(":")[1]);
+            //weExternalContactClient.delContactWay(message.toString().split(":")[1]);
         }
     }
 }
