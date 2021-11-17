@@ -11,7 +11,8 @@
 [![license](http://img.shields.io/badge/license-GPL%203.0-orange)](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
 [![木兰社区](https://img.shields.io/badge/Mulan-incubating-blue)](https://portal.mulanos.cn//)
 
-[官方网站](https://www.linkwechat.cn/#/d) | [演示系统](http://demo.linkwechat.cn/) | [帮助手册](https://www.yuque.com/linkwechat/help) | 用户手册(待开放)
+[官方网站](https://www.linkwechat.cn/#/d) | [演示系统](http://demo.linkwechat.cn/) | [帮助手册](https://www.yuque.com/linkwechat/help) | [V1.0 用户手册（V1.5待开放）](https://docs.qq.com/pdf/DZUNma3lVWW5Wb0po)
+
 
 </div>
 
