@@ -1,1 +1,1 @@
-package com.linkwechat.wecom.domain;import lombok.Data;@Datapublic class CorpBasicPageData {    private Long customerCount;    private Long groupMemberCount;    private Long groupCount;    private Long userCount;}
+package com.linkwechat.wecom.domain;import lombok.Data;@Datapublic class CorpBasicPageData {    private Long customerCount;    private Long groupMemberCount;    private Long groupCount;    private Long userCount;}

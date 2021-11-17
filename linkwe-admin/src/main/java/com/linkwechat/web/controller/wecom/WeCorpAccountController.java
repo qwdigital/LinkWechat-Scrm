@@ -11,10 +11,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "/wecom/corp")
 public class WeCorpAccountController {
+
     @Autowired
     private IWeCorpAccountService iWeCorpAccountService;
-
-
 
 
     /**
