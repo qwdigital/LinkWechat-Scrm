@@ -14,8 +14,13 @@ import lombok.Data;
 @Data
 public class WeQrCodeListQuery extends BaseEntity {
 
+
+
     @ApiModelProperty("活码Id")
     private Long qrId;
+
+    @ApiModelProperty("分组id")
+    private String groupId;
 
     @ApiModelProperty("活码名称")
     private String qrName;

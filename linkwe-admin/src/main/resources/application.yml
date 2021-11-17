@@ -148,7 +148,7 @@ spring:
           # 慢SQL记录
           log-slow-sql: true
           slow-sql-millis: 1000
-          merge-sql: true
+          merge-sql: false
         wall:
           config:
             multi-statement-allow: true
@@ -204,11 +204,11 @@ mybatis-plus:
   mapper-locations: classpath*:mapper/**/*Mapper.xml
   type-aliases-package: com.linkwechat.**.domain
   type-handlers-package: com.linkwechat.framework.handler.GenericTypeHandler,com.linkwechat.framework.handler.StringArrayJoinTypeHandler
-  global-config:
-    db-config:
-      logic-delete-field: delFlag
-      logic-delete-value: 1
-      logic-not-delete-value: 0
+  #global-config:
+    #db-config:
+      #logic-delete-field: delFlag
+      #logic-delete-value: 1
+      #logic-not-delete-value: 0
 mpp:
   entityBasePath: com.linkwechat.**.domain
 

@@ -107,6 +107,9 @@
             left join we_qr_scope wqs on wqs.qr_id = wqc.id and wqs.del_flag = 0
             left join we_qr_attachments wqa on wqa.qr_id = wqc.id and wqs.del_flag = 0
             where 1=1
+        <if test="groupId != null and groupId != ''">
+            and wqc.group_id = groupId
+        </if>
         <if test="qrName != null and qrName != ''">
             and wqc.name like concat('%', #{qrName}, '%')
         </if>
