@@ -319,16 +319,11 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                     .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), unionId);
             Optional.ofNullable(weTaskFissionRecord).orElseThrow(() -> new WeComException("任务记录信息不存在"));
 
-
             List<WeCustomer> weCustomers = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
                     .eq(WeCustomer::getState, WeConstans.FISSION_PREFIX + weTaskFissionRecord.getId()));
 
-
-            List<String> eidList = Optional.ofNullable(weCustomers).orElseGet(ArrayList::new).stream()
-                    .map(WeCustomer::getExternalUserid).collect(Collectors.toList());
-
-            if (CollectionUtil.isNotEmpty(eidList)) {
-                customerList.addAll(weCustomerService.listByIds(eidList));
+            if (CollectionUtil.isNotEmpty(weCustomers)) {
+                customerList.addAll(weCustomers);
             }
         }
         return customerList;
