@@ -254,7 +254,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
     @Transactional
     public String fissionPosterGenerate(WeTaskFissionPosterDTO weTaskFissionPosterDTO) {
         WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>()
-                .eq(WeCustomer::getUnionid, weTaskFissionPosterDTO.getUnionId()));
+                .eq(WeCustomer::getUnionid, weTaskFissionPosterDTO.getUnionId()).last("limit 1"));
         if (weCustomer != null) {
             //任务表添加当前客户任务
             WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), weCustomer.getUnionid(), weCustomer.getName());
@@ -380,6 +380,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                     weCustomer.setAvatar(completeRecord.getCustomerAvatar());
                     weCustomer.setUnionid(completeRecord.getCustomerId());
                     weCustomer.setName(completeRecord.getCustomerName());
+                    weCustomer.setFirstAddTime(completeRecord.getCreateTime());
                     list.add(weCustomer);
                 });
             }

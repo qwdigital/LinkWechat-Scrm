@@ -181,6 +181,7 @@ public class WeCustomer extends BaseEntity {
     /**
      * 首位添加时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date firstAddTime;
 
 
