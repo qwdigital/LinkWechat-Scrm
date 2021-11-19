@@ -9,17 +9,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.linkwechat.common.utils.StringUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
@@ -54,6 +48,12 @@ import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.DictUtils;
 import com.linkwechat.common.utils.reflect.ReflectUtils;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.ResourceLoader;
+
+import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Excel相关处理
@@ -732,7 +732,8 @@ public class ExcelUtil<T>
      */
     public String encodingFilename(String filename)
     {
-        filename = UUID.randomUUID().toString() + "_" + filename + ".xlsx";
+//        filename = UUID.randomUUID().toString() + "_" + filename + ".xlsx";
+        filename = filename + ".xlsx";
         return filename;
     }
 
@@ -933,4 +934,26 @@ public class ExcelUtil<T>
         }
         return val;
     }
+
+    public static void  downloadExcel(HttpServletResponse httpServletResponse,String fileName) throws Exception {
+
+        InputStream inputStream = new ClassPathResource("/excel/seas.xlsx").getInputStream();
+
+        //设置响应类型
+        httpServletResponse.setContentType("multipart/form-data;charset=utf-8");
+        httpServletResponse.addHeader("Content-Disposition",
+                " attachment;filename=" + new String(fileName.getBytes(), "iso-8859-1"));
+
+        if(Objects.nonNull(inputStream)){
+            try(ServletOutputStream servletOutputStream = httpServletResponse.getOutputStream()){
+                IOUtils.copy(inputStream, servletOutputStream);
+                httpServletResponse.flushBuffer();
+            }catch (Exception e){
+                log.error("模版下载失败"+fileName+":"+e.getMessage());
+            }
+        }
+
+
+    }
+
 }

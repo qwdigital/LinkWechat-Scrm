@@ -3,6 +3,7 @@ package com.linkwechat.wecom.domain;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.core.domain.BaseEntity;
 import lombok.Data;
 
@@ -17,9 +18,11 @@ public class WeCustomerSeas extends BaseEntity {
     private Long id;
 
     //手机号
+    @Excel(name = "手机号")
     private String phone;
 
     //客户备注名称
+    @Excel(name = "客户名称")
     private String customerName;
 
     //标签名，多个使用逗号隔开
@@ -45,4 +48,6 @@ public class WeCustomerSeas extends BaseEntity {
 
     @TableLogic
     private Integer delFlag;
+
+
 }

@@ -7,19 +7,25 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.enums.MediaType;
+import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
+import com.linkwechat.wecom.client.WeMessagePushClient;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeCustomerList;
 import com.linkwechat.wecom.domain.WeCustomerMessageTimeTask;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
+import com.linkwechat.wecom.domain.dto.WeMessagePushDto;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
 import com.linkwechat.wecom.domain.dto.message.ImageMessageDto;
+import com.linkwechat.wecom.domain.dto.message.TextMessageDto;
 import com.linkwechat.wecom.domain.vo.CustomerMessagePushVo;
 import com.linkwechat.wecom.mapper.WeCustomerMessageTimeTaskMapper;
 import com.linkwechat.wecom.service.*;
@@ -31,10 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -81,6 +84,13 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
 
     @Autowired
     private IWeMaterialService materialService;
+
+
+    @Autowired
+    private IWeCorpAccountService weCorpAccountService;
+
+    @Autowired
+    private WeMessagePushClient weMessagePushClient;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -192,6 +202,8 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
         return weCustomerMessageOriginalService.customerMessagePushs(sender, content, pushType, beginTime, endTime);
     }
 
+
+
     /**
      * 客户的外部联系人id列表，仅在chat_type为single时有效，不可与sender同时为空，最多可传入1万个客户
      *
@@ -248,6 +260,31 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
 //
 //
 //            return weCustomerService.selectWeCustomerListNoRel(weCustomer);
+        }
+    }
+
+
+    /**
+     * 员工推送文字消息
+     * @param messageRemindContent
+     * @param toUserId
+     */
+    @Override
+    public void messagePushRemind(String messageRemindContent,String toUserId) {
+        WeCorpAccount validWeCorpAccount = weCorpAccountService.findValidWeCorpAccount();
+        if(null != weCorpAccountService){
+            if(StringUtils.isNotEmpty(validWeCorpAccount.getAgentId())&&
+            StringUtils.isNotEmpty(validWeCorpAccount.getAgentSecret())){
+                TextMessageDto textMessageDto = new TextMessageDto();
+                textMessageDto.setContent(messageRemindContent);
+                WeMessagePushDto weMessagePushDto = new WeMessagePushDto();
+                weMessagePushDto.setMsgtype(MessageType.TEXT.getMessageType());
+                weMessagePushDto.setTouser(toUserId);
+                weMessagePushDto.setText(textMessageDto);
+                weMessagePushDto.setAgentid(Integer.valueOf(validWeCorpAccount.getAgentId()));
+                weMessagePushClient.sendMessageToUser(weMessagePushDto,weMessagePushDto.getAgentid().toString());
+            }
+
         }
     }
 
