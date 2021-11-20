@@ -12,7 +12,12 @@
               <span class=" fontgay">最近更新：{{ uptime }}</span>
             </el-col>
           </el-row>
-          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:35px; text-align: center;">
+          <el-row
+            type="flex"
+            class="row-bg"
+            justify="space-between"
+            style="margin-top:35px; text-align: center;"
+          >
             <el-col :span="6" class="col_style">企业成员总数</el-col>
             <el-col :span="6" class="col_style">客户总人数</el-col>
             <el-col :span="6" class="col_style">客户群总数</el-col>
@@ -45,7 +50,12 @@
             </el-col>
           </el-row>
 
-          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:30px; text-align: center;">
+          <el-row
+            type="flex"
+            class="row-bg"
+            justify="space-between"
+            style="margin-top:30px; text-align: center;"
+          >
             <el-col :span="6">新增客户数</el-col>
             <el-col :span="6">新增客群数</el-col>
             <el-col :span="6">群新增人数</el-col>
@@ -57,20 +67,27 @@
             justify="space-between"
             style="margin-top:10px;font-size:35px;font-weight:bold;color: #0079DE; text-align: center;"
           >
-            <el-col :span="6">{{ erchatsTable.newApplyCnt }}</el-col>
+            <el-col :span="6">{{ erchatsTable.newChatCnt }}</el-col>
             <el-col :span="6">{{ erchatsTable.newContactCnt }}</el-col>
-            <el-col :span="6">{{ erchatsTable.newMemberCnt ? erchatsTable.newMemberCnt : 0 }}</el-col>
+            <el-col :span="6">{{
+              erchatsTable.newMemberCnt ? erchatsTable.newMemberCnt : 0
+            }}</el-col>
             <el-col :span="6">{{ erchatsTable.negativeFeedbackCnt }}</el-col>
           </el-row>
-          <el-row type="flex" class="row-bg" justify="space-between" style="margin-top:10px; text-align: center;">
+          <el-row
+            type="flex"
+            class="row-bg"
+            justify="space-between"
+            style="margin-top:10px; text-align: center;"
+          >
             <el-col
               :span="6"
               :class="{
-                greenicon: Number(erchatsTable.newApplyCntDiff) >= 1,
-                redicon: Number(erchatsTable.newApplyCntDiff) < 0
+                greenicon: Number(erchatsTable.newChatCntDiff) >= 1,
+                redicon: Number(erchatsTable.newChatCntDiff) < 0
               }"
               >较{{ time }}
-              <span>{{ erchatsTable.newApplyCntDiff }}</span>
+              <span>{{ erchatsTable.newChatCntDiff }}</span>
             </el-col>
             <el-col
               :span="6"
@@ -133,20 +150,34 @@
           <p class="p2">登录时间：{{ parseTime(new Date()) }}</p>
           <p class="p1 p3 margint20">LinkWechat 企业微信SCRM</p>
           <p class="p2 p4">版本信息：开源 <span class="fr">可用期限：永久</span></p>
-          <el-row :gutter="20" type="flex" class="row-bg" justify="center" style="text-align:center">
+          <el-row
+            :gutter="20"
+            type="flex"
+            class="row-bg"
+            justify="center"
+            style="text-align:center"
+          >
             <el-col :span="10" class="flexspan">
               <img src="../assets/index/bzwd.png" />
               <a href="https://www.yuque.com/linkwechat/help"> 帮助手册</a>
             </el-col>
             <el-col :span="2"></el-col>
-            <el-col :span="10" class="flexspan" @click.native="msgInfo('《使用手册》正在加急上线中，敬请关注…')"
+            <el-col
+              :span="10"
+              class="flexspan"
+              @click.native="msgInfo('《使用手册》正在加急上线中，敬请关注…')"
               ><img src="../assets/index/kfsc.png" /> 开发文档</el-col
             >
           </el-row>
         </div>
         <div class="inedx_r_top_bottom">
           <span class="inedx_r_top_bottomp1"><img src="../assets/index/gxrz.png" /> 更新日志</span>
-          <span class="fr" style="color:#0079DE" @click="msgInfo('《更新日志》正在加急上线中，敬请关注…')">更多</span>
+          <span
+            class="fr"
+            style="color:#0079DE"
+            @click="msgInfo('《更新日志》正在加急上线中，敬请关注…')"
+            >更多</span
+          >
           <ul>
             <li v-for="(index, i) in 3" :key="i" @click="msgInfo('暂无内容')">
               即将上线，敬请期待 <span class="fr">03-26</span>
@@ -164,13 +195,17 @@
         </div>
         <div class="inedx_r_top_bottom" style="text-align:center">
           <p style="text-align:left">
-            <span class="inedx_r_top_bottomp1"> <img src="../assets/index/kfq.png" /> 官方交流</span>
+            <span class="inedx_r_top_bottomp1">
+              <img src="../assets/index/kfq.png" /> 官方交流</span
+            >
           </p>
           <img :src="bossImg" class="img" />
         </div>
         <div class="inedx_r_top_bottom" style="text-align:center">
           <p style="text-align:left">
-            <span class="inedx_r_top_bottomp1"> <img src="../assets/index/khq.png" /> 联系客服</span>
+            <span class="inedx_r_top_bottomp1">
+              <img src="../assets/index/khq.png" /> 联系客服</span
+            >
           </p>
           <img :src="bossImg" class="img" />
         </div>
@@ -179,7 +214,7 @@
   </div>
 </template>
 <script>
-import { content as api } from '@/api/conversation/content.js'
+import * as api from '@/api/index'
 import echarts from 'echarts'
 export default {
   name: 'Index',
@@ -260,16 +295,17 @@ export default {
         default:
           this.time = '昨天'
           this.timeType = 'today'
+          this.refresh()
           break
       }
     },
     tableInfo() {
-      api.indexTable().then((res) => {
+      api.indexTable().then(res => {
         this.table = res.data
       })
     },
     erchatInfo() {
-      api.indexEchart().then((res) => {
+      api.indexEchart().then(res => {
         this.allData = res.data
         this.uptime = res.data.updateTime
         this.erchatsTable = this.allData.today
@@ -278,29 +314,29 @@ export default {
     },
     serErchat() {
       let data = {
+        arr0: [],
         arr1: [],
         arr2: [],
         arr3: [],
-        arr4: [],
         xData: []
       }
       let series = []
       let colors = ['#088AEE', '#E74E59', '#14BF48', '#FA7216']
-      this.erchatsTable.dataList.forEach((a) => {
+      this.erchatsTable.dataList.forEach(a => {
         data.xData.push(a.xtime)
-        data.arr1.push(a.newApplyCnt)
+        data.arr1.push(a.newContactCnt)
         data.arr3.push(a.newMemberCnt)
         data.arr2.push(a.newContactCnt)
-        data.arr4.push(a.negativeFeedbackCnt)
+        data.arr0.push(a.negativeFeedbackCnt)
       })
 
       for (let index = 0; index < 4; index++) {
         series.push({
-          name: data['arr' + index],
+          name: ['新增客户数', '新增客群数', '群新增人数', '流失客户数'][index],
           type: 'line',
           stack: '总量',
           smooth: true,
-          data: data,
+          data: data['arr' + index],
           itemStyle: {
             normal: {
               lineStyle: {
@@ -317,8 +353,6 @@ export default {
     },
     drawLine(xData, series) {
       let obj = document.getElementById('echart')
-      obj.style.width = '100%'
-      obj.style.height = '380px'
       let charts = echarts.init(obj)
       let timer = 0
       window.onresize = function() {
@@ -333,7 +367,7 @@ export default {
           trigger: 'axis'
         },
         legend: {
-          data: ['发起申请数', '新增客户数', '群新增人数', '流失客户数']
+          data: ['新增客户数', '新增客群数', '群新增人数', '流失客户数']
         },
         grid: {
           left: '3%',
@@ -360,6 +394,11 @@ export default {
           }
         },
         series
+      })
+    },
+    refresh() {
+      api.refresh().then(res => {
+        this.erchatInfo()
       })
     }
   }
@@ -394,7 +433,7 @@ export default {
   }
 
   #fatherbox {
-    width: 100%;
+    padding-top: 30px;
     height: 380px;
     overflow-y: scroll;
     overflow: hidden;
@@ -405,7 +444,7 @@ export default {
 
   #echart {
     width: 100%;
-    height: 380px;
+    height: 100%;
   }
 
   .fr {

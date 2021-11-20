@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 // 外部联系人 会话列表
-const getExternalChatList = (fromId) => {
+const getExternalChatList = fromId => {
   return request({
     url: '/chat/msg/selectExternalChatList/' + fromId,
     method: 'get'
@@ -9,7 +9,7 @@ const getExternalChatList = (fromId) => {
 }
 
 // 单聊 会话列表
-const selectAloneChatList = (params) => {
+const selectAloneChatList = params => {
   return request({
     url: '/chat/msg/selectAloneChatList',
     method: 'get',
@@ -18,14 +18,14 @@ const selectAloneChatList = (params) => {
 }
 
 // 内部联系人列表
-const getInternalChatList = (fromId) => {
+const getInternalChatList = fromId => {
   return request({
     url: '/chat/msg/selectInternalChatList/' + fromId,
     method: 'get'
   })
 }
 
-const getGroupChatList = (fromId) => {
+const getGroupChatList = fromId => {
   return request({
     url: '/chat/msg/selectGroupChatList/' + fromId,
     method: 'get'
@@ -40,21 +40,8 @@ const getGroupChatList = (fromId) => {
 //   })
 // }
 
-const indexTable = () => {
-  return request({
-    url: '/wecom/page/getCorpBasicData',
-    method: 'get'
-  })
-}
-const indexEchart = () => {
-  return request({
-    url: '/wecom/page/getCorpRealTimeData',
-    method: 'get'
-  })
-}
-
 // 全文检索 会话列表
-export const getChatList = (params) => {
+export const getChatList = params => {
   return request({
     url: '/chat/msg/selectFullSearchChatList',
     method: 'get',
@@ -63,7 +50,7 @@ export const getChatList = (params) => {
 }
 
 // 全文检索 导出列表
-export const exportList = (params) => {
+export const exportList = params => {
   return request({
     url: '/chat/msg/selectFullSearchChatList/export',
     method: 'get',
@@ -73,8 +60,6 @@ export const exportList = (params) => {
 }
 //
 export const content = {
-  indexEchart,
-  indexTable,
   getExternalChatList,
   selectAloneChatList,
   getInternalChatList,
