@@ -16,30 +16,13 @@
             <!-- 欢迎语 -->
             <div class="my-cord">
               <div v-if="showTemplate" class="operation" @click="getWelList(), (dialogVisibleSelectWel = true)">
-                <img
-                  style="margin-right: 3px"
-                  :src="require('@/assets/drainageCode/code-add.png')"
-                  alt=""
-                />从模板库中选择
+                <img style="margin-right: 3px" :src="require('@/assets/drainageCode/code-add.png')" alt="" />从模板库中选择
               </div>
               <div v-if="!showTemplate" class="operation" @click="onChooseMaterialWel()">
-                <img
-                  style="margin-right: 3px"
-                  :src="require('@/assets/drainageCode/code-add.png')"
-                  alt=""
-                />从素材中选择
+                <img style="margin-right: 3px" :src="require('@/assets/drainageCode/code-add.png')" alt="" />从素材中选择
               </div>
               <el-form-item label="欢迎语" required style="width: 50%; margin-bottom: 0" :error="welcomeMsgError">
-                <el-input
-                  ref="msgTextarea"
-                  type="textarea"
-                  v-model="form.welcomeMsg"
-                  maxlength="2000"
-                  show-word-limit
-                  placeholder="请输入"
-                  :autosize="{ minRows: 5, maxRows: 20 }"
-                  clearable
-                />
+                <el-input ref="msgTextarea" type="textarea" v-model="form.welcomeMsg" maxlength="2000" show-word-limit placeholder="请输入" :autosize="{ minRows: 5, maxRows: 20 }" clearable />
               </el-form-item>
               <el-form-item style="margin-bottom: 0">
                 <el-checkbox @change="onInsert">插入客户昵称</el-checkbox>
@@ -53,18 +36,10 @@
             <div class="my-cord" v-if="item.msgType == 4">
               <div class="operation">
                 <div v-if="showMorMaterial" class="algin" @click="onChooseMaterial(item.msgType, index)">
-                  <img
-                    style="margin-right: 3px"
-                    :src="require('@/assets/drainageCode/code-add.png')"
-                    alt=""
-                  />从素材中选择
+                  <img style="margin-right: 3px" :src="require('@/assets/drainageCode/code-add.png')" alt="" />从素材中选择
                 </div>
                 <div class="algin" @click="onRemoveMaterial(index)">
-                  <img
-                    style="margin-right: 3px; height: 12px; width: 12px"
-                    :src="require('@/assets/drainageCode/delete.png')"
-                    alt=""
-                  />删除
+                  <img style="margin-right: 3px; height: 12px; width: 12px" :src="require('@/assets/drainageCode/delete.png')" alt="" />删除
                 </div>
               </div>
               <el-form-item label="文本" required style="width: 50%; margin-bottom: 0" :error="item.contentError">
@@ -75,18 +50,10 @@
             <div class="my-cord" v-else-if="item.msgType == 0">
               <div class="operation">
                 <div v-if="showMorMaterial" class="algin" @click="onChooseMaterial(item.msgType, index)">
-                  <img
-                    style="margin-right: 3px"
-                    :src="require('@/assets/drainageCode/code-add.png')"
-                    alt=""
-                  />从素材中选择
+                  <img style="margin-right: 3px" :src="require('@/assets/drainageCode/code-add.png')" alt="" />从素材中选择
                 </div>
                 <div class="algin" @click="onRemoveMaterial(index)">
-                  <img
-                    style="margin-right: 3px; height: 12px; width: 12px"
-                    :src="require('@/assets/drainageCode/delete.png')"
-                    alt=""
-                  />删除
+                  <img style="margin-right: 3px; height: 12px; width: 12px" :src="require('@/assets/drainageCode/delete.png')" alt="" />删除
                 </div>
               </div>
               <el-form-item label="图片上传" required :error="item.materialUrlError">
@@ -97,28 +64,14 @@
             <div class="my-cord" v-else-if="item.msgType == 7">
               <div class="operation">
                 <div v-if="showMorMaterial" class="algin" @click="onChooseMaterial(item.msgType, index)">
-                  <img
-                    style="margin-right: 3px"
-                    :src="require('@/assets/drainageCode/code-add.png')"
-                    alt=""
-                  />从素材中选择
+                  <img style="margin-right: 3px" :src="require('@/assets/drainageCode/code-add.png')" alt="" />从素材中选择
                 </div>
                 <div class="algin" @click="onRemoveMaterial(index)">
-                  <img
-                    style="margin-right: 3px; height: 12px; width: 12px"
-                    :src="require('@/assets/drainageCode/delete.png')"
-                    alt=""
-                  />删除
+                  <img style="margin-right: 3px; height: 12px; width: 12px" :src="require('@/assets/drainageCode/delete.png')" alt="" />删除
                 </div>
               </div>
               <el-form-item label="图文标题" style="width: 50%" required :error="item.materialNameError">
-                <el-input
-                  v-model="item.materialName"
-                  placeholder="请输入图文标题"
-                  maxlength="64"
-                  show-word-limit
-                  clearable
-                ></el-input>
+                <el-input v-model="item.materialName" placeholder="请输入图文标题" maxlength="64" show-word-limit clearable></el-input>
               </el-form-item>
               <el-form-item label="图文链接" style="width: 50%" required :error="item.contentError">
                 <el-input v-model="item.content" placeholder="请输入图文链接"></el-input>
@@ -131,28 +84,14 @@
             <div class="my-cord" v-else-if="item.msgType == 8">
               <div class="operation">
                 <div v-if="showMorMaterial" class="algin" @click="onChooseMaterial(item.msgType, index)">
-                  <img
-                    style="margin-right: 3px"
-                    :src="require('@/assets/drainageCode/code-add.png')"
-                    alt=""
-                  />从素材中选择
+                  <img style="margin-right: 3px" :src="require('@/assets/drainageCode/code-add.png')" alt="" />从素材中选择
                 </div>
                 <div class="algin" @click="onRemoveMaterial(index)">
-                  <img
-                    style="margin-right: 3px; height: 12px; width: 12px"
-                    :src="require('@/assets/drainageCode/delete.png')"
-                    alt=""
-                  />删除
+                  <img style="margin-right: 3px; height: 12px; width: 12px" :src="require('@/assets/drainageCode/delete.png')" alt="" />删除
                 </div>
               </div>
               <el-form-item label="小程序标题" style="width: 50%" required :error="item.materialNameError">
-                <el-input
-                  v-model="item.materialName"
-                  placeholder="请输入小程序标题"
-                  maxlength="64"
-                  show-word-limit
-                  clearable
-                ></el-input>
+                <el-input v-model="item.materialName" placeholder="请输入小程序标题" maxlength="64" show-word-limit clearable></el-input>
               </el-form-item>
               <el-form-item label="小程序AppID" style="width: 50%" required :error="item.materialUrlError">
                 <el-input v-model="item.materialUrl" placeholder="请输入小程序AppID"></el-input>
@@ -174,11 +113,7 @@
           <div class="g-card g-pad20 add-continue" v-show="form.materialMsgList.length <= 8">
             <el-dropdown style="margin-left: 10px" @command="onInsertMaterial">
               <div style="display: flex; align-items: center">
-                <img
-                  style="margin-right: 5px"
-                  :src="require('@/assets/drainageCode/plus-circle.png')"
-                  alt=""
-                />继续添加附件
+                <img style="margin-right: 5px" :src="require('@/assets/drainageCode/plus-circle.png')" alt="" />继续添加附件
               </div>
               <el-dropdown-menu slot="dropdown" trigger="click">
                 <!-- <el-dropdown-item :command="4">
@@ -208,39 +143,19 @@
         </div>
       </el-col>
     </el-row>
-    <SelectMaterial
-      :visible.sync="dialogVisibleSelectMaterial"
-      :type="materialType"
-      @success="submitSelectMaterial"
-    ></SelectMaterial>
-    <SelectMaterial
-      :visible.sync="dialogVisibleSelectMaterialWel"
-      type="4"
-      @success="submitSelectMaterialWel"
-    ></SelectMaterial>
+    <SelectMaterial :visible.sync="dialogVisibleSelectMaterial" :type="materialType" @success="submitSelectMaterial"></SelectMaterial>
+    <SelectMaterial :visible.sync="dialogVisibleSelectMaterialWel" type="4" @success="submitSelectMaterialWel"></SelectMaterial>
 
     <el-dialog key="a" title="选择欢迎语" :visible.sync="dialogVisibleSelectWel" width="500">
       <div>
         <el-input class="welcome-input" placeholder="请输入关键字" v-model="welQuery.welcomeMsg">
           <el-button slot="append" @click="getWelList">查询</el-button>
         </el-input>
-        <el-table
-          ref="table"
-          v-loading="welLoading"
-          :data="welList"
-          :max-height="300"
-          :show-header="false"
-          highlight-current-row
-          @current-change="(val) => (welSelected = val)"
-        >
+        <el-table ref="table" v-loading="welLoading" :data="welList" :max-height="300" :show-header="false" highlight-current-row @current-change="(val) => (welSelected = val)">
           <el-table-column property="welcomeMsg" show-overflow-tooltip></el-table-column>
           <el-table-column width="60">
             <template slot-scope="{ row }">
-              <i
-                v-if="welSelected.id === row.id"
-                class="el-icon-check"
-                style="color: rgb(65, 133, 244); font-size: 25px"
-              ></i>
+              <i v-if="welSelected.id === row.id" class="el-icon-check" style="color: rgb(65, 133, 244); font-size: 25px"></i>
             </template>
           </el-table-column>
         </el-table>
@@ -251,356 +166,351 @@
       </div>
     </el-dialog>
 
-    <SelectUser
-      :defaultValues="selectedUserList"
-      :visible.sync="dialogVisibleSelectUser"
-      title="选择使用员工"
-      @success="selectedUser"
-    ></SelectUser>
+    <SelectUser :defaultValues="selectedUserList" :visible.sync="dialogVisibleSelectUser" title="选择使用员工" @success="selectedUser"></SelectUser>
   </div>
 </template>
 
 <script>
-import SelectMaterial from '@/components/SelectMaterial'
-import SelectUser from '@/components/SelectUser'
-import { getList } from '@/api/drainageCode/welcome'
-import PreviewClient from '@/components/previewInMobileClient.vue'
-import upload from '@/components/Upload'
-const materialField = {
-  audioTime: '', // 音频时长
-  content: '', // 内容 小程序路径
-  coverUrl: '', // 封面图
-  digest: '', // 摘要
-  materialName: '', // 图片名称、7图文标题、8小程序标题
-  materialUrl: '', // 本地资源文件地址、小程序AppID
-  contentError: '', // 表单校验
-  materialUrlError: '',
-  materialNameError: '',
-  coverUrlError: ''
-}
-export default {
-  name: 'welcome-detail',
-  components: {
-    SelectMaterial,
-    PreviewClient,
-    upload,
-    SelectUser
-  },
-  props: {
-    baseData: {
-      type: Object,
-      default: () => {
-        return {
-          welcomeMsg: '',
-          materialMsgList: []
-        }
-      }
+  import SelectMaterial from '@/components/SelectMaterial'
+  import SelectUser from '@/components/SelectUser'
+  import { getList } from '@/api/drainageCode/welcome'
+  import PreviewClient from '@/components/previewInMobileClient.vue'
+  import upload from '@/components/Upload'
+  const materialField = {
+    audioTime: '', // 音频时长
+    content: '', // 内容 小程序路径
+    coverUrl: '', // 封面图
+    digest: '', // 摘要
+    materialName: '', // 图片名称、7图文标题、8小程序标题
+    materialUrl: '', // 本地资源文件地址、小程序AppID
+    contentError: '', // 表单校验
+    materialUrlError: '',
+    materialNameError: '',
+    coverUrlError: ''
+  }
+  export default {
+    name: 'welcome-detail',
+    components: {
+      SelectMaterial,
+      PreviewClient,
+      upload,
+      SelectUser
     },
-    showTemplate: {
-      type: Boolean,
-      default: true
-    },
-    showMember: {
-      type: Boolean,
-      default: false
-    },
-    showBack: {
-      type: Boolean,
-      default: false
-    },
-    showMorMaterial: {
-      type: Boolean,
-      default: false
-    },
-    currentActive: {
-      type: Number
-    }
-  },
-  watch: {
-    baseData(val) {
-      if (val.welcomeMsg) {
-        this.form = val
-      }
-    }
-  },
-  data() {
-    return {
-      form: {
-        welcomeMsg: '',
-        materialMsgList: [],
-        users: []
-      },
-      welcomeMsgError: '',
-      dialogVisibleSelectMaterial: false,
-      materialType: '',
-      dialogVisibleSelectWel: false,
-      dialogVisibleSelectMaterialWel: false,
-      // 遮罩层
-      loading: false,
-      welQuery: {
-        welcomeMsg: ''
-      },
-      welLoading: false,
-      welList: [],
-      welSelected: {},
-      selectedUserList: [],
-      dialogVisibleSelectUser: false
-    }
-  },
-  mounted() {
-    if (this.baseData.welcomeMsg) {
-      this.form = this.baseData
-    }
-  },
-  methods: {
-    onSelectUser() {
-      this.selectedUserList = []
-      let arr = []
-      if (this.form.users) {
-        arr = this.form.users.map((dd) => {
+    props: {
+      baseData: {
+        type: Object,
+        default: () => {
           return {
-            userId: dd.useUserId,
-            name: dd.useUserName
+            welcomeMsg: '',
+            materialMsgList: []
+          }
+        }
+      },
+      showTemplate: {
+        type: Boolean,
+        default: true
+      },
+      showMember: {
+        type: Boolean,
+        default: false
+      },
+      showBack: {
+        type: Boolean,
+        default: false
+      },
+      showMorMaterial: {
+        type: Boolean,
+        default: false
+      },
+      currentActive: {
+        type: Number
+      }
+    },
+    watch: {
+      baseData (val) {
+        if (val.welcomeMsg) {
+          this.form = val
+        }
+      }
+    },
+    data () {
+      return {
+        form: {
+          welcomeMsg: '',
+          materialMsgList: [],
+          users: []
+        },
+        welcomeMsgError: '',
+        dialogVisibleSelectMaterial: false,
+        materialType: '',
+        dialogVisibleSelectWel: false,
+        dialogVisibleSelectMaterialWel: false,
+        // 遮罩层
+        loading: false,
+        welQuery: {
+          welcomeMsg: ''
+        },
+        welLoading: false,
+        welList: [],
+        welSelected: {},
+        selectedUserList: [],
+        dialogVisibleSelectUser: false
+      }
+    },
+    mounted () {
+      if (this.baseData.welcomeMsg) {
+        this.form = this.baseData
+      }
+    },
+    methods: {
+      onSelectUser () {
+        this.selectedUserList = []
+        let arr = []
+        if (this.form.users) {
+          arr = this.form.users.map((dd) => {
+            return {
+              userId: dd.useUserId,
+              name: dd.useUserName
+            }
+          })
+        }
+        this.selectedUserList = arr
+        this.dialogVisibleSelectUser = true
+      },
+      selectedUser (users) {
+        const selectedUserList = users.map((d) => {
+          return {
+            userId: d.id || d.userId,
+            userName: d.name
           }
         })
-      }
-      this.selectedUserList = arr
-      this.dialogVisibleSelectUser = true
-    },
-    selectedUser(users) {
-      const selectedUserList = users.map((d) => {
-        return {
-          userId: d.id || d.userId,
-          userName: d.name
-        }
-      })
-      this.form.users = selectedUserList
-    },
-    // 插入客户昵称
-    onInsert(val) {
-      const $textarea = this.$refs.msgTextarea.$el.children[0]
-      const msg = this.form.welcomeMsg
-      if (val) {
-        const textIndex = $textarea.selectionStart
-        if (textIndex == 0 && document.activeElement != $textarea) {
-          this.form.welcomeMsg += '#客户昵称#'
-        } else {
-          this.form.welcomeMsg = msg.slice(0, textIndex) + '#客户昵称#' + msg.slice(textIndex)
-        }
-      } else {
-        this.form.welcomeMsg = msg.replace(/\#客户昵称\#/, '')
-      }
-    },
-    onChooseMaterial(materialType, rowIndex) {
-      this.materialType = materialType
-      this.rowIndex = rowIndex
-      this.dialogVisibleSelectMaterial = true
-    },
-    submitSelectMaterial(data) {
-      this.form.materialMsgList.splice(
-        this.rowIndex,
-        1,
-        Object.assign({}, this.form.materialMsgList[this.rowIndex], data)
-      )
-    },
-    onChooseMaterialWel() {
-      this.dialogVisibleSelectMaterialWel = true
-    },
-    submitSelectMaterialWel(data) {
-      this.form.welcomeMsg = data.content
-    },
-    onInsertMaterial(e) {
-      this.form.materialMsgList.push({
-        msgType: e,
-        ...materialField
-      })
-    },
-    onRemoveMaterial(index) {
-      this.form.materialMsgList.splice(index, 1)
-    },
-    // 上一步
-    onBackStep() {
-      this.$emit('update')
-    },
-    validateMaterial() {
-      let materialList = this.form.materialMsgList
-
-      const validateFields = {
-        4: [
-          {
-            checkField: 'content',
-            errorField: 'contentError',
-            errorMsg: '请输入文本'
-          }
-        ],
-        0: [
-          {
-            checkField: 'materialUrl',
-            errorField: 'materialUrlError',
-            errorMsg: '请上传图片'
-          }
-        ],
-        7: [
-          {
-            checkField: 'materialName',
-            errorField: 'materialNameError',
-            errorMsg: '请输入图文标题'
-          },
-          {
-            checkField: 'content',
-            errorField: 'contentError',
-            errorMsg: '请输入图文链接'
-          }
-        ],
-        8: [
-          {
-            checkField: 'materialName',
-            errorField: 'materialNameError',
-            errorMsg: '请输入小程序标题'
-          },
-          {
-            checkField: 'materialUrl',
-            errorField: 'materialUrlError',
-            errorMsg: '请输入小程序AppID'
-          },
-          {
-            checkField: 'content',
-            errorField: 'contentError',
-            errorMsg: '请输入小程序路径'
-          },
-          {
-            checkField: 'coverUrl',
-            errorField: 'coverUrlError',
-            errorMsg: '请上传小程序封面'
-          }
-        ]
-      }
-
-      return materialList.every((i) => {
-        let validateList = validateFields[i.msgType]
-        let goto = true
-        validateList.forEach((validate) => {
-          if (!i[validate.checkField]) {
-            i[validate.errorField] = validate.errorMsg
-            goto = false
+        this.form.users = selectedUserList
+      },
+      // 插入客户昵称
+      onInsert (val) {
+        const $textarea = this.$refs.msgTextarea.$el.children[0]
+        const msg = this.form.welcomeMsg
+        if (val) {
+          const textIndex = $textarea.selectionStart
+          if (textIndex == 0 && document.activeElement != $textarea) {
+            this.form.welcomeMsg += '#客户昵称#'
           } else {
-            i[validate.errorField] = ''
+            this.form.welcomeMsg = msg.slice(0, textIndex) + '#客户昵称#' + msg.slice(textIndex)
           }
+        } else {
+          this.form.welcomeMsg = msg.replace(/\#客户昵称\#/, '')
+        }
+      },
+      onChooseMaterial (materialType, rowIndex) {
+        this.materialType = materialType
+        this.rowIndex = rowIndex
+        this.dialogVisibleSelectMaterial = true
+      },
+      submitSelectMaterial (data) {
+        this.form.materialMsgList.splice(
+          this.rowIndex,
+          1,
+          Object.assign({}, this.form.materialMsgList[this.rowIndex], data)
+        )
+      },
+      onChooseMaterialWel () {
+        this.dialogVisibleSelectMaterialWel = true
+      },
+      submitSelectMaterialWel (data) {
+        this.form.welcomeMsg = data.content
+      },
+      onInsertMaterial (e) {
+        this.form.materialMsgList.push({
+          msgType: e,
+          ...materialField
         })
-        return goto
-      })
-    },
-    /** 获取欢迎语列表 */
-    getWelList() {
-      this.welLoading = true
-      getList(this, this.welQuery).then(({ rows }) => {
-        this.welList = rows
-        this.$refs.table.$forceUpdate()
-        this.welLoading = false
-      })
-    },
-    // 欢迎语确认按钮
-    selectWelcome() {
-      this.form.welcomeMsg = this.welSelected.welcomeMsg
-      this.dialogVisibleSelectWel = false
-    },
-    submit() {
-      if (!this.form.welcomeMsg) {
-        this.welcomeMsgError = '请输入欢迎语'
-        return
-      } else {
-        this.welcomeMsgError = ''
-      }
-      const checkMaterialResult = this.validateMaterial()
-      console.log(this.form)
+      },
+      onRemoveMaterial (index) {
+        this.form.materialMsgList.splice(index, 1)
+      },
+      // 上一步
+      onBackStep () {
+        this.$emit('update')
+      },
+      validateMaterial () {
+        let materialList = this.form.materialMsgList
 
-      if (checkMaterialResult) {
-        let goto = true
-        this.form.materialMsgList.forEach((dd) => {
-          if (dd.msgType === 7) {
-            let reUrl = /(http|https):\/\/([\w.]+\/?)\S*/
-            if (!reUrl.test(dd.content)) {
-              goto = false
-              dd.contentError = '必须以 http://或 https://开头'
+        const validateFields = {
+          4: [
+            {
+              checkField: 'content',
+              errorField: 'contentError',
+              errorMsg: '请输入文本'
             }
-          }
-          if (dd.msgType === 8) {
-            let htm = /^.*html$/
-            if (!htm.test(dd.content)) {
-              goto = false
-              dd.contentError = '必须以 html 作为后缀'
+          ],
+          0: [
+            {
+              checkField: 'materialUrl',
+              errorField: 'materialUrlError',
+              errorMsg: '请上传图片'
             }
-          }
+          ],
+          7: [
+            {
+              checkField: 'materialName',
+              errorField: 'materialNameError',
+              errorMsg: '请输入图文标题'
+            },
+            {
+              checkField: 'content',
+              errorField: 'contentError',
+              errorMsg: '请输入图文链接'
+            }
+          ],
+          8: [
+            {
+              checkField: 'materialName',
+              errorField: 'materialNameError',
+              errorMsg: '请输入小程序标题'
+            },
+            {
+              checkField: 'materialUrl',
+              errorField: 'materialUrlError',
+              errorMsg: '请输入小程序AppID'
+            },
+            {
+              checkField: 'content',
+              errorField: 'contentError',
+              errorMsg: '请输入小程序路径'
+            },
+            {
+              checkField: 'coverUrl',
+              errorField: 'coverUrlError',
+              errorMsg: '请上传小程序封面'
+            }
+          ]
+        }
+
+        return materialList.every((i) => {
+          let validateList = validateFields[i.msgType]
+          let goto = true
+          validateList.forEach((validate) => {
+            if (!i[validate.checkField]) {
+              i[validate.errorField] = validate.errorMsg
+              goto = false
+            } else {
+              i[validate.errorField] = ''
+            }
+          })
+          return goto
         })
-        if (goto) {
-          // this.msgInfo('校验通过')
-          this.$emit('submit', this.form)
+      },
+      /** 获取欢迎语列表 */
+      getWelList () {
+        this.welLoading = true
+        getList(this, this.welQuery).then(({ rows }) => {
+          this.welList = rows
+          this.$refs.table.$forceUpdate()
+          this.welLoading = false
+        })
+      },
+      // 欢迎语确认按钮
+      selectWelcome () {
+        this.form.welcomeMsg = this.welSelected.welcomeMsg
+        this.dialogVisibleSelectWel = false
+      },
+      submit () {
+        if (!this.form.welcomeMsg) {
+          this.welcomeMsgError = '请输入欢迎语'
+          return
+        } else {
+          this.welcomeMsgError = ''
+        }
+        const checkMaterialResult = this.validateMaterial()
+        console.log(this.form)
+
+        if (checkMaterialResult) {
+          let goto = true
+          this.form.materialMsgList.forEach((dd) => {
+            if (dd.msgType === 7) {
+              let reUrl = /(http|https):\/\/([\w.]+\/?)\S*/
+              if (!reUrl.test(dd.content)) {
+                goto = false
+                dd.contentError = '必须以 http://或 https://开头'
+              }
+            }
+            if (dd.msgType === 8) {
+              let htm = /^.*html$/
+              if (!htm.test(dd.content)) {
+                goto = false
+                dd.contentError = '必须以 html 作为后缀'
+              }
+            }
+          })
+          if (goto) {
+            // this.msgInfo('校验通过')
+            this.$emit('submit', this.form)
+          }
         }
       }
     }
   }
-}
 </script>
 
 <style lang="scss" scoped>
-/deep/ .image-uploader {
-  .uploader-icon {
-    width: 120px;
-    height: 114px;
-    line-height: 114px;
+  /deep/ .image-uploader {
+    .uploader-icon {
+      width: 120px;
+      height: 114px;
+      line-height: 114px;
+    }
+    .upload-img {
+      width: 100px;
+      height: 94px;
+    }
   }
-  .upload-img {
-    width: 100px;
-    height: 94px;
-  }
-}
-.sub-des {
-  font-size: 12px;
-  font-family: PingFangSC-Regular, PingFang SC;
-  font-weight: 400;
-  color: #999999;
-}
-
-.add-continue {
-  cursor: pointer;
-  font-size: 14px;
-  font-family: PingFangSC-Regular, PingFang SC;
-  font-weight: 400;
-  color: #3c88f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    opacity: 0.8;
-  }
-}
-
-.my-cord {
-  position: relative;
-
-  .operation {
-    z-index: 100;
-    cursor: pointer;
-    position: absolute;
-    top: 0;
-    right: 0;
+  .sub-des {
     font-size: 12px;
     font-family: PingFangSC-Regular, PingFang SC;
     font-weight: 400;
-    color: #1785ff;
+    color: #999999;
+  }
+
+  .add-continue {
+    cursor: pointer;
+    font-size: 14px;
+    font-family: PingFangSC-Regular, PingFang SC;
+    font-weight: 400;
+    color: #3c88f0;
     display: flex;
     align-items: center;
-
-    .algin {
-      margin-left: 20px;
-      display: flex;
-      align-items: center;
-    }
+    justify-content: center;
 
     &:hover {
       opacity: 0.8;
     }
   }
-}
+
+  .my-cord {
+    position: relative;
+
+    .operation {
+      z-index: 100;
+      cursor: pointer;
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-size: 12px;
+      font-family: PingFangSC-Regular, PingFang SC;
+      font-weight: 400;
+      color: #1785ff;
+      display: flex;
+      align-items: center;
+
+      .algin {
+        margin-left: 20px;
+        display: flex;
+        align-items: center;
+      }
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
 </style>

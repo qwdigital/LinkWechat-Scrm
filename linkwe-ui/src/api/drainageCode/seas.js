@@ -18,9 +18,9 @@ let
     "pageSize": "每页显示条数",
 }
  */
-export function getList (context, params) {
-  return request(context, {
-    url: seas_list,
+export function getList (params) {
+  return request({
+    url: '/wecom/seas/list',
     method: "GET",
     params
   })
@@ -30,28 +30,34 @@ export function getList (context, params) {
  * 删除
  * @param {*} ids
  */
-export function remove (context, ids) {
-  return request(context, {
-    url: seas_remove,
-    method: 'DELETE',
-    params: { seasIds: ids }
+export function remove (ids) {
+  return request({
+    url: "/wecom/seas/" + ids,
+    method: 'DELETE'
+  })
+}
+
+// 提醒
+export function alertFn (ids) {
+  return request({
+    url: "/wecom/seas/remidUser/" + ids,
+    method: 'POST'
   })
 }
 
 // 下载模板
-export function download (context) {
-  return request(context, {
-    url: seas_download_template,
-    responseType: 'blob'
+export function downloadTemplate () {
+  return request({
+    url: '/wecom/seas/importTemplate',
   })
 }
 
 // 数据导入
-export function upload (context, data) {
-  return request(context, {
-    url: seas_upload,
+export function upload (data) {
+  return request({
+    url: '/wecom/seas/importData',
     method: 'POST',
-    params: data
+    data: data
   })
 }
 
@@ -63,28 +69,19 @@ export function detail (context, id) {
 }
 
 // 公海统计  抬头
-export function getTotal (context, params) {
-  return request(context, {
-    url: seas_total_list,
+export function getTotal () {
+  return request({
+    url: '/wecom/seas/countCustomerSeas',
+    method: "GET",
+  })
+}
+
+// 公海统计 导入记录 员工记录  groupByType 1导入 2员工
+export function getImportAndStaffList (params) {
+  return request({
+    url: '/wecom/seas/findSeasRecord',
     method: "GET",
     params
   })
 }
 
-// 公海统计 导入记录
-export function getImportList (context, params) {
-  return request(context, {
-    url: seas_import_list,
-    method: "GET",
-    params
-  })
-}
-
-// 公海统计 员工记录
-export function getStaffList (context, params) {
-  return request(context, {
-    url: seas_staff_list,
-    method: "GET",
-    params
-  })
-}
