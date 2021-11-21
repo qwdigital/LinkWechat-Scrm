@@ -103,7 +103,7 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
         WeQrCodeDetailVo weQrCodeDetailVo = this.baseMapper.getQrDetailByQrId(qrId);
         List<WeQrScopeVo> weQrScopeVoList = scopeService.getWeQrScopeByQrIds(ListUtil.toList(qrId));
         weQrCodeDetailVo.setQrUserInfos(weQrScopeVoList);
-        return this.baseMapper.getQrDetailByQrId(qrId);
+        return weQrCodeDetailVo;
     }
 
     @Override
