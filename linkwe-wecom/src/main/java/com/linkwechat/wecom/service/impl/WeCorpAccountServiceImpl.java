@@ -5,10 +5,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.entity.WeCorpAccount;
+import com.linkwechat.common.core.redis.RedisCache;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.mapper.WeCorpAccountMapper;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 企业id相关配置Service业务层处理
@@ -19,12 +23,8 @@ import java.util.Optional;
 @Service
 public class WeCorpAccountServiceImpl extends ServiceImpl<WeCorpAccountMapper,WeCorpAccount> implements IWeCorpAccountService {
 
-
-
-    public WeCorpAccountServiceImpl(){
-        System.out.println("nihaoya");
-    }
-
+    @Autowired
+    private RedisCache redisCache;
 
     /**
      * 获取有效的企业id
@@ -58,6 +58,27 @@ public class WeCorpAccountServiceImpl extends ServiceImpl<WeCorpAccountMapper,We
         return noticeSwitch;
     }
 
+    /**
+     * 通过企业id查询配置信息  ** 修改或者删除配置时记得删除缓存  **
+     *
+     * @param corpId 企业id
+     * @return
+     */
+    @Override
+    public WeCorpAccount getCorpAccountByCorpId(String corpId) {
+        String key = StringUtils.format(WeConstans.corpAccountKey,corpId);
+        WeCorpAccount corpAccount = redisCache.getCacheObject(key);
+        if(corpAccount == null){
+            WeCorpAccount weCorpAccount = this.getOne(new LambdaQueryWrapper<WeCorpAccount>()
+                    .eq(WeCorpAccount::getCorpId,corpId)
+                    .eq(WeCorpAccount::getDelFlag, Constants.NORMAL_CODE).last("limit 1"));
+            if(weCorpAccount != null){
+                redisCache.setCacheObject(key,weCorpAccount,2 * 60 * 60, TimeUnit.SECONDS);
+                corpAccount = weCorpAccount;
+            }
+        }
+        return corpAccount;
+    }
 
 
 }

@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service.event;
 
+import com.linkwechat.wecom.domain.callback.WeCallBackEvent;
 import com.linkwechat.wecom.domain.query.WeCustomerWelcomeQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -20,6 +21,15 @@ public class WeEventPublisherService implements ApplicationEventPublisherAware {
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
         this.applicationEventPublisher = applicationEventPublisher;
+    }
+
+
+    /**
+     * 回调事件推送
+     */
+    public void register(String message) {
+        log.info("回调事件推送：message:{}",message);
+        applicationEventPublisher.publishEvent(new WeCallBackEvent(this,message));
     }
 
     /**

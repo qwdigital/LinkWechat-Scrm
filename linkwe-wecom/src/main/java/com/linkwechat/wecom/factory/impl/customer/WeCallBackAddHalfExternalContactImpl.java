@@ -2,12 +2,13 @@ package com.linkwechat.wecom.factory.impl.customer;
 
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
+import com.linkwechat.wecom.domain.callback.WeBackCustomerVo;
 import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
 import com.linkwechat.wecom.domain.WeTaskFission;
 import com.linkwechat.wecom.domain.WeTaskFissionRecord;
 import com.linkwechat.wecom.domain.WeTaskFissionReward;
 import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 import com.linkwechat.wecom.factory.WeEventStrategy;
 import com.linkwechat.wecom.service.IWeCustomerService;
 import com.linkwechat.wecom.service.IWeTaskFissionRecordService;
@@ -47,16 +48,17 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
 
 
     @Override
-    public void eventHandle(WxCpXmlMessageVO message) {
-        if (message.getExternalUserId() != null) {
-            weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId(),message.getUserId());
+    public void eventHandle(WeBackBaseVo message) {
+        WeBackCustomerVo customerInfo = (WeBackCustomerVo) message;
+        if (customerInfo.getExternalUserID() != null) {
+            weCustomerService.getCustomersInfoAndSynchWeCustomer(customerInfo.getExternalUserID(),customerInfo.getUserID());
         }
 
-        if (message.getState() != null && message.getWelcomeCode() != null) {
-            if (isFission(message.getState())) {
-                taskFissionRecordHandle(message.getState(), message.getWelcomeCode(), message.getUserId(), message.getExternalUserId());
+        if (customerInfo.getState() != null && customerInfo.getWelcomeCode() != null) {
+            if (isFission(customerInfo.getState())) {
+                taskFissionRecordHandle(customerInfo.getState(), customerInfo.getWelcomeCode(), customerInfo.getUserID(), customerInfo.getExternalUserID());
             } else {
-                weEventPublisherService.register(message.getExternalUserId(),message.getUserId(),message.getWelcomeCode(),message.getState());
+                weEventPublisherService.register(customerInfo.getExternalUserID(),customerInfo.getUserID(),customerInfo.getWelcomeCode(),customerInfo.getState());
             }
         }
     }

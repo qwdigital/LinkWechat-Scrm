@@ -1,6 +1,6 @@
 package com.linkwechat.wecom.factory;
 
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
+import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +18,10 @@ public class WeStrategyBeanFactory {
     private final Map<String, WeEventStrategy> eventStrategyMap = new ConcurrentHashMap<>();
 
     public WeStrategyBeanFactory(Map<String, WeEventStrategy> strategyMap) {
-        this.eventStrategyMap.clear();
-        strategyMap.forEach((k, v) -> this.eventStrategyMap.put(k, v));
+        this.eventStrategyMap.putAll(strategyMap);
     }
 
-    public void getResource(String type, WxCpXmlMessageVO message) {
+    public void getResource(String type, WeBackBaseVo message) {
         eventStrategyMap.get(type).eventHandle(message);
     }
 }

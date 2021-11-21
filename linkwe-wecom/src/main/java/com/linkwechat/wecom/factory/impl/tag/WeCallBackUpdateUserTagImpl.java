@@ -2,9 +2,10 @@ package com.linkwechat.wecom.factory.impl.tag;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
+import com.linkwechat.wecom.domain.callback.WeBackUserTagVo;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeFlowerCustomerTagRel;
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 import com.linkwechat.wecom.factory.WeEventStrategy;
 import com.linkwechat.wecom.service.IWeCustomerService;
 import com.linkwechat.wecom.service.IWeFlowerCustomerTagRelService;
@@ -31,11 +32,12 @@ public class WeCallBackUpdateUserTagImpl extends WeEventStrategy {
 
 
     @Override
-    public void eventHandle(WxCpXmlMessageVO message) {
+    public void eventHandle(WeBackBaseVo message) {
+        WeBackUserTagVo userTagInfo = (WeBackUserTagVo) message;
         try {
-            String tagId = message.getTagId();
+            String tagId = userTagInfo.getTagId();
             //标签中新增的成员userid列表，用逗号分隔
-            List<String> addUserItemsList = Arrays.stream(Optional.ofNullable(message.getAddUserItems())
+            List<String> addUserItemsList = Arrays.stream(Optional.ofNullable(userTagInfo.getAddUserItems())
                     .orElse("").split(",")).collect(Collectors.toList());
             if(CollectionUtil.isNotEmpty(addUserItemsList)){
 
@@ -61,7 +63,7 @@ public class WeCallBackUpdateUserTagImpl extends WeEventStrategy {
 
 
             //标签中删除的成员userid列表，用逗号分隔
-            List<String> delUserItemsList = Arrays.stream(Optional.ofNullable(message.getDelUserItems())
+            List<String> delUserItemsList = Arrays.stream(Optional.ofNullable(userTagInfo.getDelUserItems())
                     .orElse("").split(",")).collect(Collectors.toList());
 
             if(CollectionUtil.isNotEmpty(delUserItemsList)){

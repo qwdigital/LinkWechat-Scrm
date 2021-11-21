@@ -281,23 +281,7 @@ public class WeConstans {
     public static final String AppTicketKey = "ticket:AppGet";
     public static final String AgentTicketKey = "ticket:AgentGet";
 
-    /**
-     * 企微回调事件类型路由
-     */
-    public final static Map<String, String> eventRoute = new HashMap<String, String>() {
-        {
-            //成员事件
-            put("change_contact", "weEventChangeContactImpl");
-            //异步任务完成通知
-            put("batch_job_result", "weEventBatchJobResultImpl");
-            //外部联系人事件
-            put("change_external_contact", "weEventChangeExternalContactImpl");
-            //客户群事件
-            put("change_external_chat", "weEventChangeExternalChatImpl");
-            //客户标签事件
-            put("change_external_tag", "weEventChangeExternalTagImpl");
-        }
-    };
+    public static final String corpAccountKey = "we:corpAccount:{}";
 
     //性别，1表示男性，2表示女性
     //表示所在部门是否为上级，0-否，1-是，顺序与Department字段的部门逐一对应

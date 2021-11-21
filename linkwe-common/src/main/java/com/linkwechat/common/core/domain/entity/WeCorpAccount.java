@@ -110,7 +110,7 @@ public class WeCorpAccount extends BaseEntity
      **********************************************/
 
      /**回调url*/
-     private String backOffUrl;
+     //private String backOffUrl;
 
      /**回调token*/
      private String token;

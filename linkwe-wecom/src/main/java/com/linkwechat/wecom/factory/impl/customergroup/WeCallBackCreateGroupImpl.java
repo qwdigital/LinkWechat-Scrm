@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.factory.impl.customergroup;
 
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
+import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
+import com.linkwechat.wecom.domain.callback.WeBackCustomerGroupVo;
 import com.linkwechat.wecom.factory.WeEventStrategy;
 import com.linkwechat.wecom.service.IWeGroupService;
 import lombok.extern.slf4j.Slf4j;
@@ -20,12 +21,13 @@ public class WeCallBackCreateGroupImpl extends WeEventStrategy {
     private IWeGroupService weGroupService;
 
     @Override
-    public void eventHandle(WxCpXmlMessageVO message) {
+    public void eventHandle(WeBackBaseVo message) {
+        WeBackCustomerGroupVo customerGroupInfo = (WeBackCustomerGroupVo) message;
         try {
-            weGroupService.createWeGroup(message.getChatId());
+            weGroupService.createWeGroup(customerGroupInfo.getChatId());
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("create>>>>>>>>>param:{},ex:{}",message.getChatId(),e);
+            log.error("create>>>>>>>>>param:{},ex:{}",customerGroupInfo.getChatId(),e);
         }
     }
 }

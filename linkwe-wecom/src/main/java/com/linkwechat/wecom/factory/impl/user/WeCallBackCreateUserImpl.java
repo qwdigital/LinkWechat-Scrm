@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.factory.impl.user;
 
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
+import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
+import com.linkwechat.wecom.domain.callback.WeBackUserVo;
 import com.linkwechat.wecom.factory.WeEventStrategy;
 import com.linkwechat.wecom.service.IWeUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +20,10 @@ public class WeCallBackCreateUserImpl extends WeEventStrategy {
     private IWeUserService weUserService;
 
     @Override
-    public void eventHandle(WxCpXmlMessageVO message) {
+    public void eventHandle(WeBackBaseVo message) {
+        WeBackUserVo userInfo = (WeBackUserVo) message;
         try {
-            weUserService.insert2Data(setWeUserData(message));
+            weUserService.insert2Data(setWeUserData(userInfo));
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

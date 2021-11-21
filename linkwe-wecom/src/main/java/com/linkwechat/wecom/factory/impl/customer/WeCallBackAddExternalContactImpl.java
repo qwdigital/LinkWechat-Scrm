@@ -1,26 +1,20 @@
 package com.linkwechat.wecom.factory.impl.customer;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.MediaType;
-import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.wecom.client.WeCustomerClient;
+import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
+import com.linkwechat.wecom.domain.callback.WeBackCustomerVo;
 import com.linkwechat.wecom.domain.*;
-import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
-import com.linkwechat.wecom.domain.dto.customer.CutomerTagEdit;
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 import com.linkwechat.wecom.factory.WeEventStrategy;
 import com.linkwechat.wecom.service.*;
 import com.linkwechat.wecom.service.event.WeEventPublisherService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import java.util.ArrayList;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -51,16 +45,17 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
 
 
     @Override
-    public void eventHandle(WxCpXmlMessageVO message) {
-        if (message.getExternalUserId() != null) {
-            weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId(),message.getUserId());
+    public void eventHandle(WeBackBaseVo message) {
+        WeBackCustomerVo customerInfo = (WeBackCustomerVo) message;
+        if (customerInfo.getExternalUserID() != null) {
+            weCustomerService.getCustomersInfoAndSynchWeCustomer(customerInfo.getExternalUserID(),customerInfo.getUserID());
         }
 
-        if (message.getState() != null && message.getWelcomeCode() != null) {
-            if (isFission(message.getState())) {
-                taskFissionRecordHandle(message.getState(), message.getWelcomeCode(), message.getUserId(), message.getExternalUserId());
+        if (customerInfo.getState() != null && customerInfo.getWelcomeCode() != null) {
+            if (isFission(customerInfo.getState())) {
+                taskFissionRecordHandle(customerInfo.getState(), customerInfo.getWelcomeCode(), customerInfo.getUserID(), customerInfo.getExternalUserID());
             } else {
-                weEventPublisherService.register(message.getState(), message.getWelcomeCode(), message.getUserId(), message.getExternalUserId());
+                weEventPublisherService.register(customerInfo.getState(), customerInfo.getWelcomeCode(), customerInfo.getUserID(), customerInfo.getExternalUserID());
             }
         }
 
