@@ -38,8 +38,6 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
     @Autowired
     private IWeTaskFissionService weTaskFissionService;
 
-    private ThreadLocal<WeFlowerCustomerRel> weFlowerCustomerRelThreadLocal = new ThreadLocal<>();
-
     @Autowired
     private WeEventPublisherService weEventPublisherService;
 
@@ -72,10 +70,8 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
             WeTaskFission weTaskFission = weTaskFissionService
                     .selectWeTaskFissionById(weTaskFissionRecord.getTaskFissionId());
             Long fissNum = weTaskFissionRecord.getFissNum();
-            if (weFlowerCustomerRelThreadLocal.get() == null){
-                fissNum++;
-                weTaskFissionRecord.setFissNum(fissNum);
-            }
+            fissNum = fissNum + 1;
+            weTaskFissionRecord.setFissNum(fissNum);
             log.info("查询裂变任务详情  >>>>>>>>>>{}",JSONObject.toJSONString(weTaskFissionRecord));
             if (weTaskFission != null){
                 //发送欢迎语
