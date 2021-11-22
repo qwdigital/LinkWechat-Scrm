@@ -34,6 +34,9 @@ public class WeQrAddQuery {
     @ApiModelProperty("活码Id")
     private Long qrId;
 
+    @ApiModelProperty("活码Id")
+    private String configId;
+
     @ApiModelProperty("名称")
     @NotEmpty(message = "活码名称不能为空")
     private String qrName;
@@ -73,12 +76,13 @@ public class WeQrAddQuery {
      * @return 企微接口参数实体类
      */
     public WeExternalContactDto.WeContactWay getWeContactWay() {
-        Snowflake snowflake = IdUtil.getSnowflake(RandomUtil.randomLong(6), RandomUtil.randomInt(6));
-        this.state = snowflake.nextIdStr();
         WeExternalContactDto.WeContactWay weContactWay = new WeExternalContactDto.WeContactWay();
         //根据类型生成相应的活码
         if(this.qrId == null){
+            Snowflake snowflake = IdUtil.getSnowflake(RandomUtil.randomLong(6), RandomUtil.randomInt(6));
+            this.state = snowflake.nextIdStr();
             weContactWay.setState(WeConstans.WE_QR_CODE_PREFIX + "_" + state);
+            weContactWay.setConfig_id(this.configId);
         }
         weContactWay.setType(this.qrType);
         weContactWay.setScene(WeConstans.QR_CODE_EMPLE_CODE_SCENE);
