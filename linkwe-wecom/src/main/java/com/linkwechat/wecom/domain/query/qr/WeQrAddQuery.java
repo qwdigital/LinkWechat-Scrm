@@ -82,8 +82,8 @@ public class WeQrAddQuery {
             Snowflake snowflake = IdUtil.getSnowflake(RandomUtil.randomLong(6), RandomUtil.randomInt(6));
             this.state = snowflake.nextIdStr();
             weContactWay.setState(WeConstans.WE_QR_CODE_PREFIX + "_" + state);
-            weContactWay.setConfig_id(this.configId);
         }
+        weContactWay.setConfig_id(this.configId);
         weContactWay.setType(this.qrType);
         weContactWay.setScene(WeConstans.QR_CODE_EMPLE_CODE_SCENE);
         weContactWay.setSkip_verify(BooleanUtils.toBoolean(this.qrAutoAdd));
