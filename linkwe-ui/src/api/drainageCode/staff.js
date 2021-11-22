@@ -24,13 +24,13 @@ const service = '/wecom/category'
     }]
 }
  */
-export function update (data) {
-  return request({
-    url: service + '/update',
-    method: 'put',
-    data
-  })
-}
+// export function update (data) {
+//   return request({
+//     url: service + '/update',
+//     method: 'put',
+//     data
+//   })
+// }
 
 
 /**
@@ -134,6 +134,14 @@ export function add (data) {
   return request({
     url: "/wecom/qr/add",
     method: 'post',
+    data
+  })
+}
+
+export function update (data) {
+  return request({
+    url: '/wecom/qr/update',
+    method: 'put',
     data
   })
 }

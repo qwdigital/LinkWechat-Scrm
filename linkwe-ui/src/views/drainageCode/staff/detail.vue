@@ -79,10 +79,16 @@
                       <el-checkbox label="7" disabled>周日</el-checkbox>
                     </el-checkbox-group>
                   </el-form-item>
-                  <el-form-item style="margin-bottom: 10px" label="在线时间">
+                  <el-form-item v-if="unit.type === 1" v-model="checkList" style="margin-bottom: 10px" label="在线时间">
                     <el-time-select disabled value="00:00" placeholder="任意时间点">
                     </el-time-select>
-                    <el-time-select arrow-control disabled value="23:59" placeholder="任意时间点">
+                    <el-time-select disabled value="23:59" placeholder="任意时间点">
+                    </el-time-select>
+                  </el-form-item>
+                  <el-form-item v-else style="margin-bottom: 10px" label="在线时间">
+                    <el-time-select disabled :value="unit.beginTime" placeholder="任意时间点">
+                    </el-time-select>
+                    <el-time-select disabled :value="unit.endTime" placeholder="任意时间点">
                     </el-time-select>
                   </el-form-item>
                 </el-form>
@@ -235,10 +241,13 @@
         this.loading = true
         getDetail(id).then(res => {
           this.form = res.data
-          if (this.form.qrAttachments) {
+          if (this.form.qrAttachments && this.form.qrAttachments.length) {
             this.form.welcomeMsg = this.form.qrAttachments[0].content
             this.form.materialMsgList = this.form.qrAttachments.slice(1)
           }
+          this.form.qrUserInfos.forEach(dd => {
+            dd.weekday = dd.workCycle.split(',')
+          })
           this.loading = false
           this.setTime(7)
         })

@@ -78,7 +78,7 @@
               <div v-if="codeForm.weEmpleCodeUseScops.length > 0">
                 <el-tag size="medium" v-for="(item, index) in codeForm.weEmpleCodeUseScops" :key="index">{{ item.businessName }}</el-tag>
               </div>
-              <el-button type="primary" plain size="mini" @click="onSelectUser">{{ codeForm.weEmpleCodeUseScops.length ? '修改' : '选择' }}员工</el-button>
+              <el-button style="margin-left:10px;" type="primary" plain size="mini" @click="onSelectUser">{{ codeForm.weEmpleCodeUseScops.length ? '修改' : '选择' }}员工</el-button>
               <div class="sub-des">单人活码只能选择一个员工，多人活码支持选择多个员工</div>
             </el-form-item>
             <el-form-item v-if="codeForm.qrRuleType == 2" label="活码排班" prop="empleCodeRosterDto">
@@ -86,7 +86,7 @@
                 <el-card class="box-card roster-card" :key="item.id">
                   <el-form-item label="排班员工">
                     <el-tag size="medium" v-for="(tag, key) in item.weEmpleCodeUseScops" :key="key">{{tag.businessName}}</el-tag>
-                    <el-button size="mini" type="primary" plain @click="onSelectUser(index)">{{ item.weEmpleCodeUseScops.length ? '修改' : '选择' }}员工</el-button>
+                    <el-button style="margin-left:10px;" size="mini" type="primary" plain @click="onSelectUser(index)">{{ item.weEmpleCodeUseScops.length ? '修改' : '选择' }}员工</el-button>
                   </el-form-item>
                   <el-form-item label="工作周期">
                     <el-checkbox-group v-model="item.weekday" @change="checkStartEnd($event, index)">
@@ -288,7 +288,6 @@
             }
           })
         })
-
         // 重复人员下的时间校验
         let repeatWeek = []
         let currentWeekday = this.codeForm.empleCodeRosterDto[this.operationIndex].weekday
@@ -457,26 +456,69 @@
           this.formTemp = res.data
           let base = JSON.parse(JSON.stringify(res.data))
           this.baseForm = {
-            qrName: base.qrName,
-            qrGroupId: base.qrGroupId,
-            qrAutoAdd: base.qrAutoAdd, // 自动通过
+            qrName: base.name,
+            qrGroupId: base.groupId,
+            qrAutoAdd: base.autoAdd, // 自动通过
             weEmpleCodeTags: base.qrTags,  // 标签
           }
-          this.codeForm.qrType = base.qrType
-          this.codeForm.qrRuleType = base.qrRuleType
-          if (base.qrRuleType === 1) {
-            this.codeForm.weEmpleCodeUseScops = base.weEmpleCodeUseScops
+          this.codeForm.qrType = base.type
+          this.codeForm.qrRuleType = base.ruleType
+
+          // if (this.codeForm.qrRuleType === 1) {
+          //   let obj = {
+          //     type: 1,
+          //     userIds: this.codeForm.weEmpleCodeUseScops.map(dd => dd.businessId)
+          //   }
+          //   this.codeForm.qrUserInfos = [obj]
+          // } else {
+          //   this.codeForm.qrUserInfos = []
+          //   this.codeForm.empleCodeRosterDto.forEach(fff => {
+          //     let obj = {
+          //       type: fff.type,
+          //       beginTime: fff.startDate,
+          //       endTime: fff.endDate,
+          //       userIds: fff.weEmpleCodeUseScops.map(dd => dd.businessId),
+          //       workCycle: fff.weekday
+          //     }
+          //     this.codeForm.qrUserInfos.push(obj)
+          //   })
+          // }
+
+
+          if (base.ruleType === 1) {
+            let arr = []
+            base.qrUserInfos[0].weQrUserList.forEach(dd => {
+              let obj = {
+                scopeId: base.qrUserInfos[0].scopeId,
+                businessId: dd.userId,
+                businessName: dd.userName
+              }
+              arr.push(obj)
+            })
+            this.codeForm.weEmpleCodeUseScops = arr
           } else {
-            this.codeForm.empleCodeRosterDto = base.empleCodeRosterDto
+            let arr = []
+            base.qrUserInfos.forEach(dd => {
+              let obj = {
+                type: dd.type,
+                startDate: dd.beginTime,
+                endDate: dd.endTime,
+                weekday: dd.workCycle ? dd.workCycle.split(',').map(i => parseInt(i, 0)) : [],
+                scopeId: dd.scopeId,
+                weEmpleCodeUseScops: dd.weQrUserList.map(ff => { return { businessId: ff.userId, businessName: ff.userName } })
+              }
+              arr.push(obj)
+              console.log(obj)
+            })
+            this.codeForm.empleCodeRosterDto = arr
           }
           this.materialData = {
-            welcomeMsg: base.welcomeMsg,
-            mediaId: base.mediaId,
-            materialMsgList: base.materialMsgList ? base.materialMsgList : []
+            welcomeMsg: base.qrAttachments ? base.qrAttachments[0].content : '',
+            materialMsgList: base.qrAttachments ? base.qrAttachments.slice(1) : []
           }
-          this.materialData.materialMsgList.forEach(ddd => {
-            ddd.msgType = Number(ddd.msgType)
-          })
+          // this.materialData.materialMsgList.forEach(ddd => {
+          //   ddd.msgType = Number(ddd.msgType)
+          // })
           this.loading = false
         })
       },
@@ -591,6 +633,7 @@
           console.log(this.codeForm)
           let obj = {
             type: 1,
+            scopeId: this.codeForm.weEmpleCodeUseScops[0].scopeId ? this.codeForm.weEmpleCodeUseScops[0].scopeId : '',
             userIds: this.codeForm.weEmpleCodeUseScops.map(dd => dd.businessId)
           }
           this.codeForm.qrUserInfos = [obj]
@@ -598,6 +641,7 @@
           this.codeForm.qrUserInfos = []
           this.codeForm.empleCodeRosterDto.forEach(fff => {
             let obj = {
+              scopeId: fff.scopeId ? fff.scopeId : '',
               type: fff.type,
               beginTime: fff.startDate,
               endTime: fff.endDate,
@@ -613,7 +657,8 @@
         delete obj.weEmpleCodeUseScops
         delete obj.empleCodeRosterDto
         if (this.formTemp.id) {
-          obj.id = this.formTemp.id
+          obj.qrId = this.formTemp.id
+          obj.configId = this.formTemp.configId
         }
         (this.formTemp.id ? update : add)(obj)
           .then(({
