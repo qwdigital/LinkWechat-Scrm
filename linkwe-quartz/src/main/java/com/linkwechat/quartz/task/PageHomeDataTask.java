@@ -139,11 +139,11 @@ public class PageHomeDataTask {
         /**
          * 本月
          */
-        String nowMonth = DateUtil.format(new Date(), "yyyy-MM");
-        String lastMonth = DateUtil.format(DateUtil.lastMonth(), "yyyy-MM");
+        //String nowMonth = DateUtil.format(new Date(), "yyyy-MM");
+        //String lastMonth = DateUtil.format(DateUtil.lastMonth(), "yyyy-MM");
         WePageStateQuery wePageStateQuery = new WePageStateQuery();
         wePageStateQuery.setFew(5);
-        List<WePageCountDto> pageCountList = wePageStatisticsService.getWeekCountData(wePageStateQuery);
+        List<WePageCountDto> pageCountList = wePageStatisticsService.getMonthCountData(wePageStateQuery);
         WePageCountDto nowPageCount = pageCountList.get(pageCountList.size()-1);
         WePageCountDto lastPageCount = pageCountList.get(pageCountList.size()-2);
         WePageStaticDataDto.PageStaticData pageStaticData = setPageStaticData(nowPageCount, lastPageCount);
