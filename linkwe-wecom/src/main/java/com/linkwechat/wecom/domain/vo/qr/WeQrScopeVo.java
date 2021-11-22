@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain.vo.qr;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,6 +18,9 @@ public class WeQrScopeVo {
 
     @ApiModelProperty(value = "活码id")
     private Long qrId;
+
+    @ApiModelProperty(value = "排期分组id")
+    private String scopeId;
 
     @ApiModelProperty(value = "消息类型 0 默认排期 1 自定义排期")
     private Integer type;

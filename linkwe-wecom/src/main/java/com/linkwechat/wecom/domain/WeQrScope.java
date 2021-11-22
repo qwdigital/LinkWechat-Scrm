@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -28,7 +29,7 @@ import lombok.Data;
 @Data
 @SuppressWarnings("serial")
 @TableName("we_qr_scope")
-public class WeQrScope extends BaseEntity implements Serializable {
+public class WeQrScope implements Serializable {
 
     private static final long serialVersionUID = 1L; //1
 
@@ -95,6 +96,15 @@ public class WeQrScope extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "周期时间")
     @TableField("work_cycle")
     private String workCycle;
+
+
+    /** 开始时间 */
+    @ApiModelProperty("开始时间")
+    private String beginTime;
+
+    /** 结束时间 */
+    @ApiModelProperty("结束时间")
+    private String endTime;
 
     /**
      * 删除标识 0 有效 1删除

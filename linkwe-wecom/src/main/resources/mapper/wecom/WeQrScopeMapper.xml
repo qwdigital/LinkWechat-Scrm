@@ -15,15 +15,12 @@
         <result property="workCycle" column="work_cycle" jdbcType="VARCHAR"/>
         <result property="beginTime" column="begin_time" jdbcType="TIMESTAMP"/>
         <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
-        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
-        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
-        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <resultMap id="QrScopeResult" type="com.linkwechat.wecom.domain.vo.qr.WeQrScopeVo">
         <result property="qrId" column="qr_id" jdbcType="INTEGER"/>
         <result property="type" column="type" jdbcType="INTEGER"/>
+        <result property="scopeId" column="scope_id" jdbcType="VARCHAR"/>
         <result property="beginTime" column="begin_time" jdbcType="VARCHAR"/>
         <result property="endTime" column="end_time" jdbcType="VARCHAR"/>
         <result property="workCycle" column="work_cycle" jdbcType="VARCHAR"/>
