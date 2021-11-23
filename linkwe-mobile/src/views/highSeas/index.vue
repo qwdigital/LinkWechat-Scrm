@@ -11,7 +11,7 @@
                   {{unit.customerName}}
                 </div>
                 <div>
-                  <van-button plain size="mini" round type="info" @click="copyFn($event, unit.phone)">复制</van-button>
+                  <van-button plain round type="info" @click="copyFn($event, unit.phone)">复制</van-button>
                 </div>
               </div>
             </template>
