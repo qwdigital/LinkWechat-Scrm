@@ -36,7 +36,7 @@ $(function () {
         item.avatar +
         " class='customersImg'/>" +
         "<span class=''>" +
-        item.createTime +
+        item.firstAddTime +
         '</span>' +
         "<span class='customersSuccess'>邀请成功</span>" +
         '</div>'

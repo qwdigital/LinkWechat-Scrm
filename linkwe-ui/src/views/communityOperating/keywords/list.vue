@@ -161,31 +161,6 @@ export default {
 
 <template>
   <div>
-    <div class="link-info">
-      <div class="link-info__header">配置链接</div>
-      <div class="link-info__content">
-        请点击按钮复制该应用链接，并将应用页面配置到聊天工具栏，方便成员在与客户的聊天中查看和使用，提高服务效率
-      </div>
-      <div class="link">
-        <div class="link__content">
-          <span>
-            {{ h5Link }}
-          </span>
-        </div>
-        <div class="link__action">
-          <el-button
-            v-hasPermi="['customerManage:customer:query']"
-            type="primary"
-            plain
-            class="copy-btn"
-            :data-clipboard-text="h5Link"
-            >复制地址</el-button
-          >
-          <el-link type="info" @click="openHelpDialog">如何配置？</el-link>
-        </div>
-      </div>
-    </div>
-
     <el-form ref="queryForm" :inline="true" :model="query" label-width="100px" class="top-search" size="small">
       <el-form-item label="活码名称" prop="taskName">
         <el-input v-model="query.taskName" placeholder="请输入"></el-input>
@@ -330,41 +305,6 @@ export default {
 </template>
 
 <style scoped lang="scss">
-.link-info {
-  .link-info__header {
-    padding-bottom: 10px;
-    font-size: 16px;
-  }
-  .link-info__content {
-    color: #aaaaaa;
-    padding: 5px 0;
-  }
-  .link {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 14px;
-
-    .link__content {
-      background: #e0e0e0;
-      margin: 8px 10px 8px 0;
-      border-radius: 4px;
-      line-height: 32px;
-      padding: 0 12px;
-
-      span {
-        align-items: center;
-        height: 100%;
-        color: #aaaaaa;
-      }
-    }
-    .link__action {
-      :nth-child(n + 2) {
-        margin-left: 10px;
-      }
-    }
-  }
-}
 .help {
   .step {
     margin-bottom: 20px;
