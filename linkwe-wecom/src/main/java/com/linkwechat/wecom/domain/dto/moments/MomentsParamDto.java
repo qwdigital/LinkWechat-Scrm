@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,13 @@ public class MomentsParamDto {
     private VisibleRange visible_range;
 
 
+    private String moment_id;
+
+    private String userid;
+
+    private String cursor;
+
+
 
 
 
@@ -43,8 +51,7 @@ public class MomentsParamDto {
      */
     @Data
     public static  class  BaseAttachments{
-        //类型:image:图片;video:视频;link:图文;
-        private String msgtype;
+
     }
 
 
@@ -54,7 +61,7 @@ public class MomentsParamDto {
     @Data
     @Builder
     public static  class  ImageAttachments extends BaseAttachments {
-
+        private String msgtype;
         private  Image image;
 
 
@@ -67,6 +74,7 @@ public class MomentsParamDto {
     @Data
     @Builder
     public static  class VideoAttachments extends BaseAttachments{
+        public String msgtype;
         private Video video;
     }
 
@@ -77,6 +85,7 @@ public class MomentsParamDto {
     @Data
     @Builder
     public static class LinkAttachments extends BaseAttachments{
+        public String msgtype;
         private Link link;
     }
 
@@ -84,16 +93,16 @@ public class MomentsParamDto {
 
 
     @Data
-    @Builder
+    @SuperBuilder
     public static class Image{
-        private String mediaId;
+        private String media_id;
     }
 
 
     @Data
     @Builder
     public static  class Video{
-        private String mediaId;
+        private String media_id;
     }
 
 
@@ -103,7 +112,7 @@ public class MomentsParamDto {
     public static class  Link{
         private String title;
         private String url;
-        private String mediaId;
+        private String media_id;
     }
 
 

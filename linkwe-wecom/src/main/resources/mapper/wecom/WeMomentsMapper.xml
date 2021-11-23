@@ -3,4 +3,35 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeMomentsMapper">
+
+    <select id="findMoments" resultType="com.linkwechat.wecom.domain.WeMoments">
+        SELECT
+            content,
+            content_type,
+            IFNULL((SELECT wu.user_name FROM we_user wu WHERE wu.user_id=wm.creator),creator) as creator,
+            (SELECT GROUP_CONCAT(wu.user_name) FROM we_user wu WHERE FIND_IN_SET(wu.user_id,wm.no_add_user)) as noAddUserName,
+            (SELECT GROUP_CONCAT(wu.user_id) FROM we_user wu WHERE FIND_IN_SET(wu.user_id,wm.no_add_user)) as noAddUser,
+            (SELECT GROUP_CONCAT(wu.user_name) FROM we_user wu WHERE FIND_IN_SET(wu.user_id,wm.add_user)) as addUserName,
+            (SELECT GROUP_CONCAT(wu.user_id) FROM we_user wu WHERE FIND_IN_SET(wu.user_id,wm.add_user)) as addUser,
+            create_time,
+            moment_id,
+            (SELECT count(*) FROM we_moments_interacte wmi WHERE wmi.moment_id=wm.moment_id and wmi.interacte_type=0) as commentNum,
+            (SELECT count(*) FROM we_moments_interacte wmi WHERE wmi.moment_id=wm.moment_id and wmi.interacte_type=1) as pointNum
+        FROM
+            we_moments wm
+        <where>
+            <if test="type !=null">
+                   AND wm.type=#{type}
+            </if>
+            <if test="creator !=null and creator !=''">
+                AND  wm.creator=#{creator}
+            </if>
+            <if test="beginTime !=null and beginTime !='' and endTime !=null and endTime !='' ">
+                AND  date_format(wm.create_time ,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
+            </if>
+        </where>
+        order by  wm.create_time desc
+    </select>
+
+
 </mapper>

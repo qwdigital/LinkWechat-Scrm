@@ -1,5 +1,7 @@
 package com.linkwechat.wecom.interceptor;
 
+import cn.hutool.core.io.FileTypeUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -12,6 +14,7 @@ import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -76,6 +79,8 @@ public class WeAccessTokenInterceptor implements Interceptor<WeResultDto> {
                 && !weComeConfig.getWeNeedRetryErrorCodes().contains(resultDto.getErrcode())) {
             throw new ForestRuntimeException(WeErrorCodeEnum.parseEnum(resultDto.getErrcode()).getErrorMsg());
         }
+
+
     }
 
     /**

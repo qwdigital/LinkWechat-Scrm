@@ -38,7 +38,12 @@ public enum MediaType {
     /**
      * 小程序
      */
-    APPLET("9","applet");
+    APPLET("9","applet"),
+
+    /**
+     * 文字
+     */
+    TEXT("10","text");
 
     /**
      * 媒体类型
