@@ -9,4 +9,6 @@ import java.util.List;
 public interface WeMomentsMapper extends BaseMapper<WeMoments> {
 
     List<WeMoments>  findMoments(WeMoments weMoments);
+
+    WeMoments findMomentsDetail(@Param("momentId") String momentId);
 }

@@ -1,19 +1,15 @@
 package com.linkwechat.web.controller.wecom;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
-import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.constants.SynchRecordConstants;
-import com.linkwechat.wecom.domain.WeMessagePush;
 import com.linkwechat.wecom.domain.WeMoments;
 import com.linkwechat.wecom.service.IWeMomentsService;
 import com.linkwechat.wecom.service.IWeSynchRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 
@@ -50,6 +46,20 @@ public class WeMomentsController extends BaseController {
         return dataTable;
     }
 
+
+    /**
+     * 获取朋友圈详情
+     * @param momentId
+     * @return
+     */
+    @GetMapping("/findMomentsDetail/{momentId}")
+    public AjaxResult findMomentsDetail(@PathVariable String momentId){
+
+
+        return AjaxResult.success(
+                iWeMomentsService.findMomentsDetail(momentId)
+        );
+    }
 
     /**
      * 新增或者编辑朋友圈

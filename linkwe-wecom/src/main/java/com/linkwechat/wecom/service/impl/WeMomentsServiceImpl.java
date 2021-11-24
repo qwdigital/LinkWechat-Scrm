@@ -267,9 +267,19 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
 
 
     /**
+     * 朋友圈详情
+     * @param momentId
+     * @return
+     */
+    @Override
+    public WeMoments findMomentsDetail(String momentId) {
+        return this.baseMapper.findMomentsDetail(momentId);
+    }
+
+
+    /**
      * 同步朋友圈
      */
-
 
     private void synchMoments(Integer filterType) {
 

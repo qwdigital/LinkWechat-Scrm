@@ -34,4 +34,42 @@
     </select>
 
 
+    <resultMap id="MomentsDetailMapper" type="com.linkwechat.wecom.domain.WeMoments">
+         <result column="content" property="content"></result>
+         <result column="other_content" property="otherContent" typeHandler="com.linkwechat.wecom.handler.GenericTypeHandler"></result>
+         <result column="noAddUserName" property="noAddUserName"></result>
+         <result column="addUserName" property="addUserName"></result>
+         <result column="momentUserName" property="momentUserName"></result>
+         <result column="pointUserName" property="pointUserName"></result>
+         <result column="momentCustomerName" property="momentCustomerName"></result>
+         <result column="pointCustomerName" property="pointCustomerName"></result>
+    </resultMap>
+    <select id="findMomentsDetail" resultMap="MomentsDetailMapper">
+        SELECT
+            wm.content,
+            wm.other_content,
+            (SELECT GROUP_CONCAT(wu.user_name) FROM we_user wu WHERE FIND_IN_SET(wu.user_id,wm.no_add_user)) as noAddUserName,
+            (SELECT GROUP_CONCAT(wu.user_name) FROM we_user wu WHERE FIND_IN_SET(wu.user_id,wm.add_user)) as addUserName,
+            (SELECT GROUP_CONCAT(wu.user_name) FROM we_user wu
+                                                        LEFT JOIN we_moments_interacte wmi ON wu.user_id=wmi.interacte_user_id WHERE wmi.interacte_type=0 and wmi.interacte_user_type=0
+                                                                                                                                 and wmi.moment_id=wm.moment_id
+            ) as momentUserName,
+            (SELECT GROUP_CONCAT(wu.user_name) FROM we_user wu
+                                                        LEFT JOIN we_moments_interacte wmi ON wu.user_id=wmi.interacte_user_id WHERE wmi.interacte_type=1 and wmi.interacte_user_type=0
+                                                                                                                                 and wmi.moment_id=wm.moment_id
+            ) as pointUserName,
+            (SELECT GROUP_CONCAT(DISTINCT wu.`name`) FROM we_customer wu
+                                                              LEFT JOIN we_moments_interacte wmi ON wu.external_userid=wmi.interacte_user_id WHERE wmi.interacte_type=0 and wmi.interacte_user_type=1
+                                                                                                                                               and wmi.moment_id=wm.moment_id
+            ) as momentCustomerName,
+            (SELECT GROUP_CONCAT(DISTINCT wu.`name`) FROM we_customer wu
+                                                              LEFT JOIN we_moments_interacte wmi ON wu.external_userid=wmi.interacte_user_id WHERE wmi.interacte_type=1 and wmi.interacte_user_type=1
+                                                                                                                                               and wmi.moment_id=wm.moment_id
+            ) as pointCustomerName
+        FROM
+            we_moments wm
+        where wm.moment_id=#{momentId}
+    </select>
+
+
 </mapper>

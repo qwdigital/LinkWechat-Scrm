@@ -18,7 +18,7 @@ import java.util.List;
  * 朋友圈
  */
 @Data
-@TableName("we_moments")
+@TableName(value ="we_moments",autoResultMap = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
@@ -77,6 +77,23 @@ public class WeMoments extends BaseEntity {
     /**点赞数*/
     @TableField(exist = false)
     private Integer pointNum;
+
+
+     //评论员工名
+    @TableField(exist = false)
+    private  String momentUserName;
+
+    //点赞员工名
+    @TableField(exist = false)
+    private String pointUserName;
+
+    //评论客户名
+    @TableField(exist = false)
+    private String momentCustomerName;
+
+    //点赞客户名
+    @TableField(exist = false)
+    private String pointCustomerName;
 
 
 
