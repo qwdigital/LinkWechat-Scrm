@@ -189,6 +189,12 @@ spring:
         max-active: 8
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
+      cluster:
+        refresh:
+          #自适应拓扑刷新
+          adaptive: true
+          #定时拓扑刷新
+          period: 10
 
 
 # token配置
