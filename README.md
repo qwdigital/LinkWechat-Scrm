@@ -337,6 +337,10 @@ LinkWeChat 开源团队拥有对本开源协议的最终解释权。
 
 [点击查看 LinkWeChat LICENSE 详细说明](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
 
+需要注意的是，目前在国内 GPL 协议 **具备合同特征，是一种民事法律行为** ，属于我国《合同法》调整的范围。LinkWeChat 项目团队保留诉讼权利。
+
+[相关案例：违反 GPL 协议赔偿 50 万，国内首例!](https://mp.weixin.qq.com/s/YQ6sNjbDS-P7BViLZIsaoA)
+
 ---
 
  **<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>** 
