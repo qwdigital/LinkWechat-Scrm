@@ -47,6 +47,9 @@ public class WeCustomerDetail {
 
     private String otherDescr;
 
+    //0-未知 1-男性 2-女性
+    private Integer gender;
+
 
     private List<CompanyOrPersonTag> companyTags;
 
@@ -85,6 +88,9 @@ public class WeCustomerDetail {
 
         //加入时间
         private Date joinTime;
+
+        //群主
+        private String leaderName;
 
 
 

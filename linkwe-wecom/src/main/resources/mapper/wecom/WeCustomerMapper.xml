@@ -36,6 +36,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 AND wc.external_userid=#{weCustomerList.externalUserid}
             </if>
 
+            <if test="weCustomerList.firstUserId !=null">
+                AND wc.first_user_id=#{weCustomerList.firstUserId}
+            </if>
+
             <if test="weCustomerList.departmentIds != null and weCustomerList.departmentIds !=''">
                 <if test="weCustomerList.departmentIds.indexOf(',') != -1">
                     OR wu.department in
@@ -78,11 +82,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wg.chat_id,
             wg.group_name,
             wgm.join_time,
-            wgm.join_scene
+            wgm.join_scene,
+            (SELECT wu.user_name FROM we_user wu WHERE wu.user_id=wg.owner) as leaderName
         FROM
             we_group_member wgm
-                LEFT JOIN we_group wg ON wg.chat_id = wgm.chat_id
-        WHERE wgm.del_flag=0 and wg.del_flag=0. AND wgm.user_id=#{userId}
+            LEFT JOIN we_group wg ON wg.chat_id = wgm.chat_id
+        WHERE wgm.del_flag=0 and wg.del_flag=0 AND wgm.user_id=#{userId}
     </select>
 
 

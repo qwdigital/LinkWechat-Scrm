@@ -1,5 +1,7 @@
 package com.linkwechat.common.core.page;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +28,7 @@ public class TableDataInfo<T> implements Serializable
     private String msg;
 
     /**最后同步时间*/
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date lastSyncTime;
 
     /**去重复客户数*/

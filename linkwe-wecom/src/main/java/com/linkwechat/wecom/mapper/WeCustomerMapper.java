@@ -30,7 +30,7 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
      * @param userId
      * @return
      */
-    WeCustomerDetail.Groups findWecustomerGroups(@Param("userId") String userId);
+    List<WeCustomerDetail.Groups> findWecustomerGroups(@Param("userId") String userId);
 
 
 

@@ -646,15 +646,18 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     public WeCustomerDetail findWeCustomerDetail(String externalUserid,String userId) {
         WeCustomerDetail weCustomerDetail=new WeCustomerDetail();
 
+
         List<WeCustomerList> weCustomerList = this.findWeCustomerList(
                 WeCustomerList.builder()
                         .externalUserid(externalUserid)
+                        .firstUserId(userId)
                         .build()
         );
         if(CollectionUtil.isNotEmpty(weCustomerList)){
             BeanUtils.copyBeanProp(
+                    weCustomerDetail,
                     weCustomerList.stream().findFirst().get()
-                    ,weCustomerDetail);
+                    );
             List<WeCustomerDetail.TrackUser> trackUsers=new ArrayList<>();
             weCustomerList.stream().forEach(k->{
                 trackUsers.add(WeCustomerDetail.TrackUser.builder()
@@ -669,7 +672,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             );
 
             weCustomerDetail.setGroups(
-                    (List<WeCustomerDetail.Groups>) this.baseMapper.findWecustomerGroups(externalUserid)
+                  this.baseMapper.findWecustomerGroups(externalUserid)
             );
 
 
