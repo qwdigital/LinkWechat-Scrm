@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.enums.WeEmpleCodeType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.WeCommunityNewGroupDto;
@@ -215,6 +216,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
         WeEmpleCode weEmpleCode = new WeEmpleCode();
 
+        weEmpleCode.setId(SnowFlakeUtil.nextId());
         // 设置员工和扫码标签
         setScopsAndTags(weEmpleCode, communityNewGroupDto);
 
@@ -286,7 +288,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         Optional.ofNullable(empleCode).ifPresent(e -> {
             vo.setEmplCodeUrl(e.getQrCode());
             vo.setWelcomeMsg(e.getWelcomeMsg());
-            vo.setSkipVerify(e.getIsJoinConfirmFriends().equals(new Integer(1))?true:false);
+            vo.setSkipVerify(e.getIsJoinConfirmFriends().equals(1));
         });
 
         // 设置群活码信息
@@ -309,7 +311,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
                 .eq(WeGroupCodeActual::getGroupCodeId, vo.getGroupCodeId()));
         if(CollectionUtil.isNotEmpty(codeActuals)){
             vo.setActualGroupName(
-                    String.join(",", codeActuals.stream().map(WeGroupCodeActual::getGroupName).collect(Collectors.toList()))
+                    codeActuals.stream().map(WeGroupCodeActual::getGroupName).collect(Collectors.joining(","))
             );
         }
 

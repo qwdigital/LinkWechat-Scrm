@@ -171,11 +171,17 @@ public class WeCustomer extends BaseEntity {
     private String updateBy;
 
 
+    /** 企业自定义的state参数，用于区分客户具体是通过哪个「联系我」添加，由企业通过创建「联系我」方式指定 */
+    private String state;
+
+
+
 
 
     /**
      * 首位添加时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date firstAddTime;
 
 
@@ -195,9 +201,10 @@ public class WeCustomer extends BaseEntity {
     /**
      * 0:正常;1:删除
      */
-    @TableLogic
+//    @TableLogic
     private Integer delFlag;
 
     //添加方式
     private Integer addMethod;
+
 }

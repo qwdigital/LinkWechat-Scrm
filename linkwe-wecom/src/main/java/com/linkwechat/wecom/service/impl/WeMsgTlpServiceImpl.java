@@ -29,8 +29,6 @@ public class WeMsgTlpServiceImpl implements IWeMsgTlpService
     @Autowired
     private WeMsgTlpMapper weMsgTlpMapper;
 
-    @Autowired
-    private IWeMsgTlpScopeService iWeMsgTlpScopeService;
 
     /**
      * 查询欢迎语模板

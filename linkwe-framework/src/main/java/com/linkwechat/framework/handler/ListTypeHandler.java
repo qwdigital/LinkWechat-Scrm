@@ -2,9 +2,8 @@ package com.linkwechat.framework.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.wecom.domain.WeCustomer;
+import com.linkwechat.wecom.domain.WeCustomerList;
 import com.linkwechat.wecom.domain.WeGroup;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -22,7 +21,7 @@ import java.util.List;
 //支持的java对象
 @SuppressWarnings("all")
 @Slf4j
-@MappedTypes(value = {WeCustomer.class,WeGroup.class})
+@MappedTypes(value = {WeGroup.class, WeCustomerList.class})
 @MappedJdbcTypes({JdbcType.VARCHAR})
 public class ListTypeHandler<T extends Object> implements TypeHandler<List<T>> {
 
@@ -33,7 +32,7 @@ public class ListTypeHandler<T extends Object> implements TypeHandler<List<T>> {
         }
 
         if(filedName!=null && "customers_info".equals(filedName)){
-            return JSONObject.parseArray(content, WeCustomer.class);
+            return JSONObject.parseArray(content, WeCustomerList.class);
         }
 
         if(filedName!=null && "groups_info".equals(filedName)){

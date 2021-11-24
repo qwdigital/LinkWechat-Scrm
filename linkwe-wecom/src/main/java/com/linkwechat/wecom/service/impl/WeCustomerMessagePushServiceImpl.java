@@ -14,6 +14,7 @@ import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
 import com.linkwechat.wecom.domain.WeCustomer;
+import com.linkwechat.wecom.domain.WeCustomerList;
 import com.linkwechat.wecom.domain.WeCustomerMessageTimeTask;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
@@ -114,7 +115,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
 
         }
 
-        List<WeCustomer> customers = Lists.newArrayList();
+        List<WeCustomerList> customers = Lists.newArrayList();
         List<WeGroup> groups = new ArrayList<>();
         // 0 发给客户
         if (customerMessagePushDto.getPushType().equals(WeConstans.SEND_MESSAGE_CUSTOMER)) {
@@ -165,7 +166,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
 
 
 
-    private void sendMessage(CustomerMessagePushDto customerMessagePushDto, long messageId,  List<WeCustomer> customers,List<WeGroup> groups ) throws ParseException, JsonProcessingException {
+    private void sendMessage(CustomerMessagePushDto customerMessagePushDto, long messageId,  List<WeCustomerList> customers,List<WeGroup> groups ) throws ParseException, JsonProcessingException {
 
         //发送群发消息
         //调用微信api发送消息
@@ -176,6 +177,9 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
         } else {
             WeCustomerMessageTimeTask timeTask = new WeCustomerMessageTimeTask(messageId, customerMessagePushDto, customers, groups
                     , DateUtils.getMillionSceondsBydate(customerMessagePushDto.getSettingTime()));
+
+
+
             customerMessageTimeTaskMapper.saveWeCustomerMessageTimeTask(timeTask);
         }
 
@@ -197,34 +201,28 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
      * @param tag        客户标签id列表
      * @return {@link List}s 客户的外部联系人id列表
      */
-    public List<WeCustomer> externalUserIds(String pushRange, String staffId, String department, String tag) {
+    public List<WeCustomerList> externalUserIds(String pushRange, String staffId, String department, String tag) {
         if (pushRange.equals(WeConstans.SEND_MESSAGE_CUSTOMER_ALL)) {
-            //从redis中读取数据
-            List<WeCustomer> customers = redisCache.getCacheList(WeConstans.WECUSTOMERS_KEY);
-            if (CollectionUtils.isEmpty(customers)) {
-                WeCustomer weCustomer = new WeCustomer();
-                weCustomer.setUserIds(staffId);
-                weCustomer.setDepartmentIds(department);
-                customers = weCustomerService.selectWeCustomerAllList(weCustomer);
-                redisCache.setCacheList(WeConstans.WECUSTOMERS_KEY, customers);
-                redisCache.expire(WeConstans.WECUSTOMERS_KEY,2 * 60L);
-            }else{
-                return customers;
-            }
 
-            WeCustomer weCustomer = new WeCustomer();
-            weCustomer.setUserIds(staffId);
-            weCustomer.setDepartmentIds(department);
-            return weCustomerService.selectWeCustomerListNoRel(weCustomer);
+
+
+            return  weCustomerService.findWeCustomerList(WeCustomerList.builder()
+                    .userIds(staffId)
+                    .departmentIds(department)
+                    .build());
+
         } else {
+
             //按条件查询客户
             //通过部门id查询所有的员工
             //通过员工列表查询该员工的外部联系人列表
-            WeCustomer weCustomer = new WeCustomer();
-            weCustomer.setUserIds(staffId);
-            weCustomer.setTagIds(tag);
-            weCustomer.setDepartmentIds(department);
-            return weCustomerService.selectWeCustomerListNoRel(weCustomer);
+
+            return  weCustomerService.findWeCustomerList(WeCustomerList.builder()
+                    .userIds(staffId)
+                    .tagIds(tag)
+                    .departmentIds(department)
+                    .build());
+
         }
     }
 

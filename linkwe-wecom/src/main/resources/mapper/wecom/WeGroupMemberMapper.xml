@@ -50,18 +50,18 @@
     <insert id="insertBatch">
         insert into we_group_member (chat_id, user_id, union_id, join_time, join_scene, `type`,
         group_nick_name,`name`,invitor_user_id,
-        create_by, create_time,update_by, update_time,del_flag)
+        create_by, create_time,update_by, update_time)
         values
         <foreach collection="weGroupMembers" item="weGroupMember" index="index" separator=",">
             (#{weGroupMember.chatId},#{weGroupMember.userId},#{weGroupMember.unionId},
             #{weGroupMember.joinTime},#{weGroupMember.joinScene},#{weGroupMember.type},
             #{weGroupMember.groupNickName},#{weGroupMember.name},#{weGroupMember.invitorUserId},
             #{weGroupMember.createBy},#{weGroupMember.createTime},
-            #{weGroupMember.updateBy},#{weGroupMember.updateTime},#{weGroupMember.delFlag})
+            #{weGroupMember.updateBy},#{weGroupMember.updateTime})
         </foreach>
         on duplicate key update
         join_time= values(join_time),join_scene= values(join_scene),
         group_nick_name= values(group_nick_name),`name`= values(`name`),invitor_user_id= values(invitor_user_id),
-        `type`= values(`type`),update_by= values(update_by),update_time= values(update_time),del_flag=values(del_flag)
+        `type`= values(`type`),update_by= values(update_by),update_time= values(update_time)
     </insert>
 </mapper>

@@ -73,9 +73,9 @@ public class WeGroupCodeActualController extends BaseController {
     @PostMapping
     public AjaxResult add(@Validated @RequestBody WeGroupCodeActual weGroupCodeActual) {
         // 唯一性检查
-        if (!weGroupCodeActualService.checkChatIdUnique(weGroupCodeActual)) {
-            return AjaxResult.error("新增实际群码失败， 该群聊二维码已存在");
-        }
+//        if (!weGroupCodeActualService.checkChatIdUnique(weGroupCodeActual)) {
+//            return AjaxResult.error("新增实际群码失败， 该群聊二维码已存在");
+//        }
         return toAjax(weGroupCodeActualService.insertWeGroupCodeActual(weGroupCodeActual));
     }
 
@@ -86,15 +86,15 @@ public class WeGroupCodeActualController extends BaseController {
     @Log(title = "实际群码", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody WeGroupCodeActual weGroupCodeActual) {
-        WeGroupCodeActual original = weGroupCodeActualService.selectWeGroupCodeActualById(weGroupCodeActual.getId());
-        if (StringUtils.isNull(original)) {
-            return AjaxResult.error(HttpStatus.NOT_FOUND, "数据不存在");
-        }
-        // 实际码对应客户群变化时，检查其唯一性
-        if (!original.getChatId().equals(weGroupCodeActual.getChatId()) &&
-                !weGroupCodeActualService.checkChatIdUnique(weGroupCodeActual)) {
-            return AjaxResult.error("修改实际群码失败， 该群聊二维码已存在");
-        }
+//        WeGroupCodeActual original = weGroupCodeActualService.selectWeGroupCodeActualById(weGroupCodeActual.getId());
+//        if (StringUtils.isNull(original)) {
+//            return AjaxResult.error(HttpStatus.NOT_FOUND, "数据不存在");
+//        }
+//        // 实际码对应客户群变化时，检查其唯一性
+//        if (!original.getChatId().equals(weGroupCodeActual.getChatId()) &&
+//                !weGroupCodeActualService.checkChatIdUnique(weGroupCodeActual)) {
+//            return AjaxResult.error("修改实际群码失败， 该群聊二维码已存在");
+//        }
         return toAjax(weGroupCodeActualService.updateWeGroupCodeActual(weGroupCodeActual));
     }
 

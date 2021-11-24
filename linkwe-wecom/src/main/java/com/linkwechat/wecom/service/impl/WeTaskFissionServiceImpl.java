@@ -211,7 +211,11 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
         linkMessageDto.setUrl(pageUrlBuilder.toString());
 
         CustomerMessagePushDto customerMessagePushDto = new CustomerMessagePushDto();
-        if (weTaskFission.getStartTime() != null) {
+        if (weTaskFission.getStartTime() != null && weTaskFission.getStartTime().getTime() <= System.currentTimeMillis()) {
+            customerMessagePushDto.setSendNow(true);
+            customerMessagePushDto.setSettingTime(null);
+        }else {
+            customerMessagePushDto.setSendNow(false);
             customerMessagePushDto.setSettingTime(DateUtil.formatDateTime(weTaskFission.getStartTime()));
         }
         customerMessagePushDto.setLinkMessage(linkMessageDto);
@@ -250,7 +254,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
     @Transactional
     public String fissionPosterGenerate(WeTaskFissionPosterDTO weTaskFissionPosterDTO) {
         WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>()
-                .eq(WeCustomer::getUnionid, weTaskFissionPosterDTO.getUnionId()));
+                .eq(WeCustomer::getUnionid, weTaskFissionPosterDTO.getUnionId()).last("limit 1"));
         if (weCustomer != null) {
             //任务表添加当前客户任务
             WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), weCustomer.getUnionid(), weCustomer.getName());
@@ -311,16 +315,16 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                 });
             }
         } else {
-//            WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService
-//                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), unionId);
-//            Optional.ofNullable(weTaskFissionRecord).orElseThrow(() -> new WeComException("任务记录信息不存在"));
-//            List<WeFlowerCustomerRel> list = weFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
-//                    .eq(WeFlowerCustomerRel::getState, WeConstans.FISSION_PREFIX + weTaskFissionRecord.getId()));
-//            List<String> eidList = Optional.ofNullable(list).orElseGet(ArrayList::new).stream()
-//                    .map(WeFlowerCustomerRel::getExternalUserid).collect(Collectors.toList());
-//            if (CollectionUtil.isNotEmpty(eidList)) {
-//                customerList.addAll(weCustomerService.listByIds(eidList));
-//            }
+            WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService
+                    .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), unionId);
+            Optional.ofNullable(weTaskFissionRecord).orElseThrow(() -> new WeComException("任务记录信息不存在"));
+
+            List<WeCustomer> weCustomers = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
+                    .eq(WeCustomer::getState, WeConstans.FISSION_PREFIX + weTaskFissionRecord.getId()));
+
+            if (CollectionUtil.isNotEmpty(weCustomers)) {
+                customerList.addAll(weCustomers);
+            }
         }
         return customerList;
     }
@@ -376,6 +380,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                     weCustomer.setAvatar(completeRecord.getCustomerAvatar());
                     weCustomer.setUnionid(completeRecord.getCustomerId());
                     weCustomer.setName(completeRecord.getCustomerName());
+                    weCustomer.setFirstAddTime(completeRecord.getCreateTime());
                     list.add(weCustomer);
                 });
             }

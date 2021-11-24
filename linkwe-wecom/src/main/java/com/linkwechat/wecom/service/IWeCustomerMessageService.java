@@ -3,6 +3,7 @@ package com.linkwechat.wecom.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.linkwechat.wecom.domain.WeCustomer;
+import com.linkwechat.wecom.domain.WeCustomerList;
 import com.linkwechat.wecom.domain.WeCustomerMessage;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
@@ -50,6 +51,6 @@ public interface IWeCustomerMessageService extends IService<WeCustomerMessage> {
      * @param messageId
      * @throws JsonProcessingException
      */
-    public void sendMessgae(CustomerMessagePushDto customerMessagePushDto, long messageId,List<WeCustomer> customers,List<WeGroup> groups) throws JsonProcessingException;
+    public void sendMessgae(CustomerMessagePushDto customerMessagePushDto, long messageId, List<WeCustomerList> customers, List<WeGroup> groups) throws JsonProcessingException;
 
 }

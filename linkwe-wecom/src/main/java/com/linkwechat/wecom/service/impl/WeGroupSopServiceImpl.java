@@ -330,7 +330,7 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
      * 消息推送(企微API 消息推送 - 发送应用消息)
      */
     @Override
-//    @Async
+    @Async
     public void sendMessage(List<String> groupIdList) {
 
         // 构造请求参数

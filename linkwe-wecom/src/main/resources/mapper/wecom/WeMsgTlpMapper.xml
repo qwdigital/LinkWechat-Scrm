@@ -37,6 +37,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="welcomeMsgTplType !=null "> and wmt.welcome_msg_tpl_type = #{welcomeMsgTplType}</if>
             and wmt.del_flag = 0
         </where>
+       ORDER BY wmt.create_time DESC
     </select>
 
     
@@ -54,6 +55,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="delFlag != null">del_flag,</if>
             <if test="welcomeMsgTplType != null">welcome_msg_tpl_type,</if>
             <if test="createBy != null ">create_by,</if>
+            <if test="createTime !=null">create_time,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -62,6 +64,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="delFlag != null">#{delFlag},</if>
             <if test="welcomeMsgTplType != null">#{welcomeMsgTplType},</if>
             <if test="createBy != null ">#{createBy},</if>
+            <if test="createTime !=null">#{createTime},</if>
          </trim>
     </insert>
 

@@ -50,6 +50,9 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     private IWeGroupMessageSendResultService messageSendResultService;
 
     @Autowired
+    private IWeCustomerService weCustomerService;
+
+    @Autowired
     private RedisCache redisCache;
 
     @Override
@@ -163,6 +166,24 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     @Override
     public void addGroupMsgTemplate(WeAddGroupMessageQuery query) {
         List<WeAddGroupMessageQuery.SenderInfo> senderList = query.getSenderList();
+        //当发送为空时，默认发送所有客户
+        if(CollectionUtil.isEmpty(senderList)){
+            List<Map<String, Object>> customerList = weCustomerService.listMaps(new LambdaQueryWrapper<WeCustomer>()
+                    .select(WeCustomer::getExternalUserid, WeCustomer::getFirstUserId)
+                    .eq(WeCustomer::getDelFlag, 0).groupBy(WeCustomer::getExternalUserid, WeCustomer::getFirstUserId));
+            if(CollectionUtil.isNotEmpty(customerList)){
+                Map<String, List<Map<String, Object>>> customerMap = customerList.stream().collect(Collectors.groupingBy(item -> String.valueOf(item.get("first_user_id"))));
+                List<WeAddGroupMessageQuery.SenderInfo> senders = new ArrayList<>();
+                customerMap.forEach((userId, customers) ->{
+                    WeAddGroupMessageQuery.SenderInfo senderInfo = new WeAddGroupMessageQuery.SenderInfo();
+                    senderInfo.setUserId(userId);
+                    List<String> externalUserIds = customers.stream().map(customer -> String.valueOf(customer.get("external_userid"))).collect(Collectors.toList());
+                    senderInfo.setCustomerList(externalUserIds);
+                    senders.add(senderInfo);
+                });
+                query.setSenderList(senders);
+            }
+        }
         WeGroupMessageTemplate weGroupMessageTemplate = new WeGroupMessageTemplate();
         BeanUtil.copyProperties(query, weGroupMessageTemplate);
         if(query.getSendTime() == null){
@@ -192,7 +213,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                 List<WeGroupMessageList> weGroupMessageLists = new ArrayList<>();
                 List<WeGroupMessageTask> messageTaskList = new ArrayList<>();
                 List<WeGroupMessageSendResult> sendResultList = new ArrayList<>();
-                for (WeAddGroupMessageQuery.SenderInfo senderInfo :senderList ) {
+                for (WeAddGroupMessageQuery.SenderInfo senderInfo : senderList ) {
                     WeGroupMessageList weGroupMessageList = new WeGroupMessageList();
                     weGroupMessageList.setMsgTemplateId(weGroupMessageTemplate.getId());
                     if(query.getChatType() == 1){
@@ -258,6 +279,10 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     @Async
     @Override
     public void syncGroupMsgSendResultByIds(List<Long> asList) {
+        WeGroupMessageTemplate weGroupMessageTemplate = new WeGroupMessageTemplate();
+        weGroupMessageTemplate.setRefreshTime(new Date());
+        update(weGroupMessageTemplate,new LambdaQueryWrapper<WeGroupMessageTemplate>().in(WeGroupMessageTemplate::getId,asList));
+
         List<WeGroupMessageList> weGroupMessageLists = weGroupMessageListService.list(new LambdaQueryWrapper<WeGroupMessageList>()
                 .in(WeGroupMessageList::getMsgTemplateId, asList));
         List<WeGroupMessageTask> taskList = new ArrayList<>();

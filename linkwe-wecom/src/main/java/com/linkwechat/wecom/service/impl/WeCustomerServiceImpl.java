@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.TrajectorySceneType;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -76,6 +77,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
     @Autowired
     private  IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
+
+    @Autowired
+    private IWeTagService iWeTagService;
 
 
 
@@ -166,6 +170,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 weCustomer.setFirstUserId(followInfo.getUserid());
                 weCustomer.setFirstAddTime(new Date(followInfo.getCreatetime() * 1000L));
                 weCustomer.setAddMethod(followInfo.getAdd_way());
+                weCustomer.setState(followInfo.getState());
+                weCustomer.setDelFlag(new Integer(0));
                 weCustomerList.add(weCustomer);
                 List<String> tags = Stream.of(followInfo.getTag_id()).collect(Collectors.toList());
                 if (CollectionUtil.isNotEmpty(tags)) {
@@ -291,6 +297,21 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
         List<WeTag> addTag = weMakeCustomerTag.getAddTag();
         if(CollectionUtil.isNotEmpty(addTag)){
+            //校验是否有标签在库里不存在
+
+            List<WeTag> weTagList = iWeTagService.list(
+                    new LambdaQueryWrapper<WeTag>()
+                            .in(WeTag::getTagId, addTag.stream().map(WeTag::getTagId).collect(Collectors.toList()))
+            );
+            if(CollectionUtil.isNotEmpty(weTagList)){
+                if(addTag.size()!=weTagList.size()){
+                   throw  new WeComException("部门标签不存在");
+                }
+            }else{
+                throw  new WeComException("部门标签不存在");
+            }
+
+
 
             CutomerTagEdit cutomerTagEdit = CutomerTagEdit.builder()
                     .external_userid(weMakeCustomerTag.getExternalUserid())
@@ -355,6 +376,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 }
             }
         }
+
+
+
+
     }
 
 
@@ -398,7 +423,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
                 if(null != followUser){
                     weCustomer.setFirstAddTime(new Date(followUser.getCreatetime() * 1000L));
-
+                    weCustomer.setState(followUser.getState());
+                    weCustomer.setAddMethod(followUser.getAddWay());
+                    weCustomer.setDelFlag(new Integer(0));
                     this.baseMapper.batchAddOrUpdate(
                             ListUtil.toList(weCustomer)
                     );
@@ -683,6 +710,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Override
     public void getCustomerByCondition(JSONObject params) {
 
+    }
+
+    @Override
+    public void batchAddOrUpdate(List<WeCustomer> weCustomer) {
+        this.baseMapper.batchAddOrUpdate(weCustomer);
     }
 
 

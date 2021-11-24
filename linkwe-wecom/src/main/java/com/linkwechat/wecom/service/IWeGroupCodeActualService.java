@@ -74,7 +74,7 @@ public interface IWeGroupCodeActualService extends IService<WeGroupCodeActual>
      * @param weGroupCodeActual 实际码
      * @return 结果
      */
-    public boolean checkChatIdUnique(WeGroupCodeActual weGroupCodeActual);
+//    public boolean checkChatIdUnique(WeGroupCodeActual weGroupCodeActual);
 
     /**
      * 通过群id递增其实际群活码扫码次数

@@ -64,14 +64,14 @@
 
 
     <insert id="insertBatch">
-        insert into we_group (chat_id, group_name, owner, add_time, notice, status,admin_user_id, create_by, create_time,update_by, update_time,del_flag)
+        insert into we_group (chat_id, group_name, owner, add_time, notice, status,admin_user_id, create_by, create_time,update_by, update_time)
         values
         <foreach collection="weGroups" item="weGroup" index="index" separator=",">
             (#{weGroup.chatId},#{weGroup.groupName},#{weGroup.owner},#{weGroup.addTime},#{weGroup.notice},#{weGroup.status},#{weGroup.adminUserId},
-            #{weGroup.createBy},#{weGroup.createTime},#{weGroup.updateBy},#{weGroup.updateTime},#{weGroup.delFlag})
+            #{weGroup.createBy},#{weGroup.createTime},#{weGroup.updateBy},#{weGroup.updateTime})
         </foreach>
         on duplicate key update group_name= values(group_name),owner= values(owner),
         notice= values(notice),status= values(status),admin_user_id= values(admin_user_id),
-        update_by= values(update_by),update_time= values(update_time),del_flag=values(del_flag)
+        update_by= values(update_by),update_time= values(update_time)
     </insert>
 </mapper>

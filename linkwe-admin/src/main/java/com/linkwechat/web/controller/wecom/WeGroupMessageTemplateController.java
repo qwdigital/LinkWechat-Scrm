@@ -5,6 +5,8 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.wecom.domain.WeGroupMessageSendResult;
+import com.linkwechat.wecom.domain.WeGroupMessageTask;
 import com.linkwechat.wecom.domain.WeGroupMessageTemplate;
 import com.linkwechat.wecom.domain.query.WeAddGroupMessageQuery;
 import com.linkwechat.wecom.domain.vo.WeGroupMessageDetailVo;
@@ -88,5 +90,31 @@ public class WeGroupMessageTemplateController extends BaseController {
     public AjaxResult cancel(@PathVariable Long[] ids) {
         iWeGroupMessageTemplateService.cancelByIds(Arrays.asList(ids));
         return AjaxResult.success();
+    }
+
+    /**
+     * 群发成员发送任务列表
+     */
+    //@PreAuthorize("@ss.hasPermi('linkwechat:template:remove')")
+    @ApiOperation(value = "群发成员发送任务列表", httpMethod = "GET")
+    @Log(title = "群发消息模板", businessType = BusinessType.SELECT)
+    @GetMapping("/task/list")
+    public TableDataInfo<WeGroupMessageTask> groupMsgTaskList(WeGroupMessageTask task) {
+        startPage();
+        List<WeGroupMessageTask> messageTaskList = iWeGroupMessageTemplateService.groupMsgTaskList(task);
+        return getDataTable(messageTaskList);
+    }
+
+    /**
+     * 群发成员执行结果列表
+     */
+    //@PreAuthorize("@ss.hasPermi('linkwechat:template:remove')")
+    @ApiOperation(value = "群发成员执行结果列表", httpMethod = "GET")
+    @Log(title = "群发消息模板", businessType = BusinessType.SELECT)
+    @GetMapping("/send/result/list")
+    public TableDataInfo<WeGroupMessageSendResult> groupMsgSendResultList(WeGroupMessageSendResult sendResult) {
+        startPage();
+        List<WeGroupMessageSendResult> sendResultList = iWeGroupMessageTemplateService.groupMsgSendResultList(sendResult);
+        return getDataTable(sendResultList);
     }
 }

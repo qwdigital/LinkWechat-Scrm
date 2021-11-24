@@ -14,6 +14,7 @@ import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
 import com.linkwechat.wecom.domain.WeCustomer;
+import com.linkwechat.wecom.domain.WeCustomerList;
 import com.linkwechat.wecom.domain.WeCustomerMessage;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
@@ -94,14 +95,15 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
     }
 
     @Override
-    public void sendMessgae(CustomerMessagePushDto customerMessagePushDto, long messageId,List<WeCustomer> customers,List<WeGroup> groups) throws JsonProcessingException {
+    public void sendMessgae(CustomerMessagePushDto customerMessagePushDto, long messageId, List<WeCustomerList> customers, List<WeGroup> groups) throws JsonProcessingException {
+
         List<String> msgid = new ArrayList<>();
 
         //发给客户
         if(CollectionUtils.isNotEmpty(customers)){
 
             customers.stream().filter(customer -> StringUtils.isNotEmpty(customer.getFirstUserId()))
-                    .collect(Collectors.groupingBy(WeCustomer::getFirstUserId)).forEach((k,v)->{
+                    .collect(Collectors.groupingBy(WeCustomerList::getFirstUserId)).forEach((k,v)->{
 
                 customerMessagePushDto.setStaffId(k);
                 //发送群发消息
@@ -111,16 +113,23 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
                     WeCustomerMessagePushDto messagePushDto = new WeCustomerMessagePushDto();
 
                     messagePushDto.setChat_type(ChatType.of(customerMessagePushDto.getPushType()).getName());
-                    List<String> externalUserIds = v.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
+                    List<String> externalUserIds = v.stream().map(WeCustomerList::getExternalUserid).collect(Collectors.toList());
 
                     messagePushDto.setExternal_userid(externalUserIds);
                     messagePushDto.setSender(customerMessagePushDto.getStaffId());
                     childMessage(messagePushDto, customerMessagePushDto);
 
-                    SendMessageResultDto sendMessageResultDto = weCustomerMessagePushClient.sendCustomerMessageToUser(messagePushDto);
-                    if (WeConstans.WE_SUCCESS_CODE.equals(sendMessageResultDto.getErrcode())) {
-                        msgid.add(sendMessageResultDto.getMsgid());
+                    try {
+                        SendMessageResultDto sendMessageResultDto = weCustomerMessagePushClient.sendCustomerMessageToUser(messagePushDto);
+                        if (WeConstans.WE_SUCCESS_CODE.equals(sendMessageResultDto.getErrcode())) {
+                            msgid.add(sendMessageResultDto.getMsgid());
+                        }
+                    }catch (Exception e){
+                        log.error("消息发送失败:"+e.getMessage());
                     }
+
+
+
                 }
             });
         }

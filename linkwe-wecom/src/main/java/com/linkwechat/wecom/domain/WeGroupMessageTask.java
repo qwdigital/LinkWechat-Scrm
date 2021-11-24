@@ -77,4 +77,18 @@ public class WeGroupMessageTask extends BaseEntity{
     @ApiModelProperty("企业服务人员名称")
     @TableField(exist = false)
     private String userName;
+
+    /**
+     * 预计发送数量
+     */
+    @ApiModelProperty("预计发送数量")
+    @TableField(exist = false)
+    private Integer total;
+
+    /**
+     * 实际发送数量
+     */
+    @ApiModelProperty("实际发送数量")
+    @TableField(exist = false)
+    private Integer already;
 }

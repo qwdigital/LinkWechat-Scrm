@@ -1,12 +1,18 @@
 package com.linkwechat.wecom.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeCustomerList {
 
 
@@ -59,6 +65,11 @@ public class WeCustomerList {
 
 
 
+
+
+
+
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthday;
 
@@ -73,6 +84,9 @@ public class WeCustomerList {
     private String beginTime;
     //查询结束时间
     private String endTime;
+
+    //所属部门id，多个用逗号隔开
+    private String departmentIds;
 
 
     //0正常；1:删除;

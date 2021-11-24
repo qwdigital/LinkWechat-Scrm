@@ -32,6 +32,7 @@ import com.linkwechat.wecom.service.IWeTaskFissionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -51,6 +52,7 @@ import java.util.Objects;
  * @author leejoker
  * @date 2021-01-20
  */
+@Slf4j
 @Api("任务宝Controller")
 @RestController
 @RequestMapping("/wecom/fission")
@@ -218,6 +220,7 @@ public class WeTaskFissionController extends BaseController {
     @Log(title = "生成带二维码的海报", businessType = BusinessType.OTHER)
     @PostMapping("/poster")
     public AjaxResult<JSONObject> posterGenerate(@RequestBody WeTaskFissionPosterDTO weTaskFissionPosterDTO) {
+        log.info("获取任务所有参与客户的完成情况 入参params:{}",JSONObject.toJSONString(weTaskFissionPosterDTO));
         String posterUrl = weTaskFissionService.fissionPosterGenerate(weTaskFissionPosterDTO);
         JSONObject json = new JSONObject();
         json.put("posterUrl", posterUrl);
@@ -250,6 +253,7 @@ public class WeTaskFissionController extends BaseController {
     @Log(title = "根据任务id获取参与任务客户列表", businessType = BusinessType.OTHER)
     @GetMapping("/getCustomerListById/{id}")
     public AjaxResult<List<WeCustomer>> getCustomerListById(@ApiParam("任务id") @PathVariable("id") String id) {
+        log.info("根据任务id获取参与任务客户列表 入参id:{}",id);
         return AjaxResult.success(weTaskFissionService.getCustomerListById(null, id));
     }
 
@@ -263,6 +267,7 @@ public class WeTaskFissionController extends BaseController {
     @GetMapping("/{id}/progress/{unionId}")
     public AjaxResult<WeTaskFissionProgressVO> getCustomerProgress(@ApiParam("任务id") @PathVariable("id") Long id
             , @PathVariable("unionId") @ApiParam("客户id") String unionId) {
+        log.info("获取客户邀请列表和任务进度 入参id:{},unionId:{}",id,unionId);
         WeTaskFission weTaskFission = weTaskFissionService.selectWeTaskFissionById(id);
         if (weTaskFission != null) {
             return AjaxResult.success(weTaskFissionService.getCustomerTaskProgress(weTaskFission, unionId));
@@ -279,6 +284,7 @@ public class WeTaskFissionController extends BaseController {
     @Log(title = "获取任务所有参与客户的完成情况", businessType = BusinessType.OTHER)
     @GetMapping("/{id}/progress")
     public AjaxResult<List<WeTaskFissionTotalProgressVO>> getAllCustomerProgress(@ApiParam("任务id") @PathVariable("id") Long id) {
+        log.info("获取任务所有参与客户的完成情况 入参id:{}",id);
         WeTaskFission weTaskFission = weTaskFissionService.selectWeTaskFissionById(id);
         List<WeTaskFissionTotalProgressVO> list = Lists.newArrayList();
         if (weTaskFission != null) {

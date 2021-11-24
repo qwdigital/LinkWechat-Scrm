@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.wecom.domain.WeCustomer;
+import com.linkwechat.wecom.domain.WeCustomerList;
 import com.linkwechat.wecom.domain.WeCustomerMessgaeResult;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
@@ -36,7 +37,7 @@ public class WeCustomerMessgaeResultServiceImpl extends ServiceImpl<WeCustomerMe
     }
 
     @Override
-    public int workerMappingCustomer(CustomerMessagePushDto customerMessagePushDto, long messageId,List<WeCustomer> customers,List<WeGroup> groups) {
+    public int workerMappingCustomer(CustomerMessagePushDto customerMessagePushDto, long messageId, List<WeCustomerList> customers, List<WeGroup> groups) {
 
         int size = 0;
         // 0 发给客户
@@ -56,8 +57,8 @@ public class WeCustomerMessgaeResultServiceImpl extends ServiceImpl<WeCustomerMe
                     customerMessgaeResult.setSendTime(null);
                     customerMessgaeResult.setSendType(customerMessgaeResult.getSettingTime() == null ? customerMessagePushDto.getPushType() : "2");
                     customerMessgaeResult.setExternalUserid(customer.getExternalUserid());
-                    customerMessgaeResult.setExternalName(customer.getName());
-                    customerMessgaeResult.setUserid(customer.getUserId());
+                    customerMessgaeResult.setExternalName(customer.getCustomerName());
+                    customerMessgaeResult.setUserid(customer.getFirstUserId());
                     customerMessgaeResult.setUserName(customer.getUserName());
                     customerMessgaeResult.setStatus("0");
                     customerMessgaeResult.setSettingTime(customerMessagePushDto.getSettingTime());
