@@ -278,7 +278,6 @@
       },
       getList () {
         this.loading = true
-        console.log(this.query)
         getList(this.query)
           .then(({ rows, total }) => {
             this.list = rows
