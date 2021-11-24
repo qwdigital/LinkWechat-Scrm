@@ -91,7 +91,10 @@ export function getList(params) {
 export function getAllStaff(params) {
   return request({
     url: serviceUser + '/findAllWeUser',
-    params
+    params: {
+      isActivate: 1, //1=已激活，2=已禁用，4=未激活，5=退出企业,
+      isConfigCustomerContact: 0 //1:是;0:否
+    }
   })
 }
 

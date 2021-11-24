@@ -24,6 +24,7 @@ export default {
       // 非多个禁用
       multiple: true,
       // 总条数
+      lastSyncTime: '',
       total: 0,
       // 表格数据
       list: [],
@@ -54,8 +55,8 @@ export default {
       this.loading = true
       api
         .getList(this.query)
-        .then(({ rows, total }) => {
-          this.list = rows.map((i) => {
+        .then(({ rows, lastSyncTime, total }) => {
+          this.list = rows.map(i => {
             // 处理标签
             if (i.tags && typeof i.tags == 'string') {
               i.tags = i.tags.split(',')
@@ -65,6 +66,7 @@ export default {
             }
             return i
           })
+          this.lastSyncTime = lastSyncTime
           this.total = +total
           this.loading = false
         })
@@ -97,23 +99,26 @@ export default {
     },
     submitSelectTag(selected) {
       if (this.tagDialogType.type === 'query') {
-        this.query.tagIds = selected.map((d) => d.tagId) + ''
+        this.query.tagIds = selected.map(d => d.tagId) + ''
         this.queryTag = selected
         this.dialogVisible = false
       } else {
+        this.loading = true
         let data = {
           chatId: this.makeLabelCustomerList[0].chatId,
           weeGroupTagRel: selected
         }
         api
           .makeGroupTag(data)
-          .then((res) => {
+          .then(res => {
             if (res.code == 200) {
               this.msgSuccess('操作成功')
               this.getList()
+              this.loading = false
             }
           })
           .finally(() => {
+            this.loading = false
             this.dialogVisible = false
           })
       }
@@ -130,14 +135,14 @@ export default {
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
       })
-      api.sync().then((r) => {
+      api.sync().then(r => {
         loading.close()
         this.msgSuccess('后台开始同步数据，请稍后关注进度')
       })
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map((item) => item.id)
+      this.ids = selection.map(item => item.id)
       this.multiple = !selection.length
     },
     /** 导出按钮操作 */
@@ -161,19 +166,21 @@ export default {
 </script>
 
 <template>
-  <div class="">
+  <div class="" v-loading="loading">
     <el-form :model="query" ref="queryForm" :inline="true" class="top-search" label-width="80px">
       <el-form-item label="群名" prop="groupName">
         <el-input v-model="query.groupName" placeholder="请输入群名" clearable />
       </el-form-item>
       <el-form-item label="群主" prop="groupLeader">
-        <el-input v-model="query.groupLeader" placeholder="请输入群主" clearable />
+        <el-input v-model="query.userIds" placeholder="请输入群主" clearable />
       </el-form-item>
       <el-form-item label="群标签">
         <div class="tag-input" @click="showTagDialog">
           <span class="tag-place" v-if="!queryTag.length">请选择</span>
           <template v-else>
-            <el-tag type="info" v-for="(unit, unique) in queryTag" :key="unique">{{ unit.name }}</el-tag>
+            <el-tag type="info" v-for="(unit, unique) in queryTag" :key="unique">{{
+              unit.name
+            }}</el-tag>
           </template>
         </div>
       </el-form-item>
@@ -189,8 +196,12 @@ export default {
         ></el-date-picker>
       </el-form-item>
       <el-form-item label=" ">
-        <el-button v-hasPermi="['customerManage:group:query']" type="primary" @click="getList(1)">查询</el-button>
-        <el-button v-hasPermi="['customerManage:group:query']" type="info" @click="resetQuery">重置</el-button>
+        <el-button v-hasPermi="['customerManage:group:query']" type="primary" @click="getList(1)"
+          >查询</el-button
+        >
+        <el-button v-hasPermi="['customerManage:group:query']" type="info" @click="resetQuery"
+          >重置</el-button
+        >
         <el-button v-hasPermi="['customerManage:group:export']" type="success" @click="handleExport"
           >导出列表</el-button
         >
@@ -201,9 +212,11 @@ export default {
       <div class="">
         <!-- 己选
         <span class="num">{{total}}</span> 个客户群-->
-        <el-button v-hasPermi="['customerManage:group:sync']" type="primary" @click="sync">同步客户群</el-button>
+        <el-button v-hasPermi="['customerManage:group:sync']" type="primary" @click="sync"
+          >同步客户群</el-button
+        >
         <span>
-          最近同步：2020-08-25 06:35:00
+          最近同步：{{ lastSyncTime }}
           <!-- <span class="num">{{total}}</span> 条信息 ，
           共
           <span class="num">{{ total }}</span> 个客户群 -->
@@ -216,7 +229,7 @@ export default {
       </div>
     </div>
 
-    <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
+    <el-table :data="list" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="群名" align="center" prop="groupName" />
       <el-table-column label="群主" align="center" prop="groupLeaderName" />
@@ -239,7 +252,12 @@ export default {
           <span v-else>无标签</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180"></el-table-column>
+      <el-table-column
+        label="创建时间"
+        align="center"
+        prop="createTime"
+        width="180"
+      ></el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -253,7 +271,10 @@ export default {
             v-hasPermi="['customerManage:group:view']"
             >查看详情</el-button
           >
-          <el-button v-hasPermi="['customerManage/customer:makeTag']" type="text" @click="makeTag(scope.row)"
+          <el-button
+            v-hasPermi="['customerManage/customer:makeTag']"
+            type="text"
+            @click="makeTag(scope.row)"
             >标签管理</el-button
           >
         </template>

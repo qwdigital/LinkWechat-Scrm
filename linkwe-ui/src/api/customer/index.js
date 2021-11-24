@@ -124,16 +124,6 @@ export function exportCustomer(query) {
 }
 
 /**
- *客户详情
- * @param {*} externalUserid
- */
-export function getDetail(externalUserid) {
-  return request({
-    url: service + '/getCustomersByUserId/' + externalUserid
-  })
-}
-
-/**
  * 客户流失通知开关
  * @param {*} status [string]	是	客户流失通知开关 0:关闭 1:开启
  */
@@ -164,5 +154,45 @@ export function jobExtends(data) {
     url: service + '/jobExtends',
     method: 'POST',
     data
+  })
+}
+
+/**
+ *客户详情基础(基础信息+社交关系)
+ * @param {*}
+ * externalUserid	是	当前客户id
+ * userId	是	当前跟进人id
+ */
+export function getDetail(params) {
+  return request({
+    url: service + '/findWeCustomerBaseInfo',
+    params
+  })
+}
+
+/**
+ *客户画像汇总
+ * @param {*}
+ * externalUserid	是	当前客户id
+ */
+export function getSummary(params) {
+  return request({
+    url: service + '/findWeCustomerInfoSummary',
+    params
+  })
+}
+
+/**
+ *跟进记录
+ * @param {*}
+ * externalUserid	是	当前客户id
+ * userId	是	当前跟进人id
+ * pageNum: 1,
+        pageSize: 10,
+ */
+export function getFollowUpRecord(params) {
+  return request({
+    url: service + '/followUpRecord',
+    params
   })
 }

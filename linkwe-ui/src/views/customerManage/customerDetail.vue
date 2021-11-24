@@ -1,7 +1,8 @@
 <script>
-import { updateBirthday, getDetail } from '@/api/customer'
+import { updateBirthday, getDetail, getSummary } from '@/api/customer'
 import record from './customer/record'
 import ctrack from './customer/track'
+import { dictAddType, dictJoinGroupType, dictTrackState } from '@/utils/dictionary'
 export default {
   name: 'CustomerDetail',
   components: { record, ctrack },
@@ -11,14 +12,16 @@ export default {
       customer: {
         // weFlowerCustomerRels: [{}]
       },
+      portrayalSum: { companyTags: [], personTags: [], trackStates: [] }, // 客户画像汇总
       birthday: '',
       pickerOptions: {
         disabledDate(time) {
           return time.getTime() > Date.now()
         }
       },
-      listStaff: [],
-      listGroup: []
+      dictAddType,
+      dictJoinGroupType,
+      dictTrackState
     }
   },
   created() {
@@ -34,23 +37,64 @@ export default {
         birthday: this.birthday,
         firstUserId: this.customer.firstUserId
       }
-      updateBirthday(data).then((response) => {
+      updateBirthday(data).then(response => {
         this.msgSuccess('操作成功')
         // this.getDetail()
         this.$set(this.customer, 'birthday', this.birthday)
         // this.datePickerVisible = false
       })
     },
+    /**
+     *客户详情基础(基础信息+社交关系)
+     * @param {*}
+     * externalUserid	是	当前客户id
+     * userId	是	当前跟进人id
+     */
     getDetail() {
-      this.customer = JSON.parse(this.$route.query.data)
-      // getDetail(this.$route.query.id).then(({ data }) => {
-      //   this.customer = data[0]
-      //   this.birthday = this.customer.birthday
-      // })
+      getDetail(this.$route.query).then(({ data }) => {
+        data.companyTags && (data.companyTags = data.companyTags.split(','))
+        this.customer = data
+        this.birthday = data.birthday
+      })
     },
-    remark(item) {
-      return item.remark || this.customer.customerName + (item.remarkCorpName ? '-' + item.remarkCorpName : '')
+    /**
+     *客户画像汇总
+     * @param {*}
+     * externalUserid	是	当前客户id
+     */
+    getSummary() {
+      getSummary(this.$route.query.externalUserid).then(({ data }) => {
+        data.companyTags && (data.companyTags = data.companyTags.split(','))
+        //          {
+        //   'companyTags':[{ //企业标签
+        //      'userName':'',//添加人
+        //      'tagsNames':'',//标签名多个标签使用逗号隔开
+        //      'tagIds':''//多个标签id使用逗号隔开
+        // }],
+        // 'personTags':[{ //个人标签
+        //      'userName':'',//添加人
+        //      'tagsNames':'',//标签名多个标签使用逗号隔开
+        //      'tagIds':''//多个标签id使用逗号隔开
+        // }],
+        // 'trackStates':[{
+        //       'userName':'',//跟进人
+        //       'trackStateList':[{ //跟进状态列表
+        //       'trackState':'',//跟进状态
+        //       'trackTime':''//跟进时间
+        // }]
+        // }]
+        // }
+        this.portrayalSum = data
+        this.birthday = data.birthday
+      })
     }
+
+    // remark(item) {
+    //   return (
+    //     item.remark ||
+    //     this.customer.customerName + (item.remarkCorpName ? '-' + item.remarkCorpName : '')
+    //   )
+    // }
   }
 }
 </script>
@@ -59,18 +103,20 @@ export default {
   <div>
     <!-- <el-button slot="append" circle icon="el-icon-back" @click="$router.back()"></el-button>返回 -->
     <div class=" flex aic mb20" @click="goRoute(customer)">
-      <el-image style="width: 80px; height: 80px;" :src="customer.url" fit="fit"></el-image>
+      <el-image style="width: 80px; height: 80px;" :src="customer.avatar" fit="fit"></el-image>
       <div class="ml10">
         <div>
-          {{ customer.customerName }}
-          <span :style="{ color: customer.type === 1 ? '#4bde03' : '#f9a90b' }">{{
-            { 1: '@微信', 2: '@企业微信' }[customer.type]
+          {{ customer.customerName + (customer.corpName ? '-' + customer.corpName : '') }}
+          <span :style="{ color: customer.customerType === 1 ? '#4bde03' : '#f9a90b' }">{{
+            { 1: '@微信', 2: '@企业微信' }[customer.customerType]
           }}</span>
           <i :class="['el-icon-s-custom', { 1: 'man', 2: 'woman' }[customer.gender]]"></i>
         </div>
         <div class="mt10">
-          <template v-if="customer.tagNames && customer.tagNames.length">
-            <el-tag type="info" v-for="(unit, unique) in customer.tagNames" :key="unique">{{ unit }}</el-tag>
+          <template v-if="customer.companyTags">
+            <el-tag type="info" v-for="(unit, unique) in customer.companyTags" :key="unique">{{
+              unit
+            }}</el-tag>
           </template>
           <div>
             暂无标签
@@ -82,20 +128,33 @@ export default {
     <el-card shadow="never">
       <div slot="header" class="card-title">社交关系</div>
       <el-tabs value="1">
-        <el-tab-pane :label="`跟进员工(${listStaff.length})`" name="1">
-          <el-table :data="listStaff">
-            <el-table-column label="员工" align="center" prop="welcomeMsg" />
-            <el-table-column label="添加方式" align="center" prop="createBy" />
-            <el-table-column label="添加时间" align="center" prop="createTime" />
-            <el-table-column label="跟进状态" align="center" prop="createTime" />
+        <el-tab-pane
+          :label="`跟进员工(${customer.trackUsers ? customer.trackUsers.length : 0})`"
+          name="1"
+        >
+          <el-table :data="customer.trackUsers">
+            <el-table-column label="员工" align="center" prop="userName" />
+            <el-table-column prop="addMethod" label="添加方式" align="center">
+              <template slot-scope="{ row }">{{ dictAddType[row.addMethod + ''] }}</template>
+            </el-table-column>
+            <el-table-column label="添加时间" align="center" prop="firstAddTime" />
+            <el-table-column prop="trackState" label="跟进状态" align="center">
+              <template slot-scope="{ row }">
+                <el-tag v-if="row.trackState" :type="dictTrackState[~~row.trackState + ''].color">{{
+                  dictTrackState[~~row.trackState + ''].name
+                }}</el-tag>
+              </template>
+            </el-table-column>
           </el-table>
         </el-tab-pane>
-        <el-tab-pane :label="`所在客群(${listGroup.length})`" name="2">
-          <el-table :data="listGroup">
-            <el-table-column label="群名" align="center" prop="welcomeMsg" />
-            <el-table-column label="群主" align="center" prop="createBy" />
-            <el-table-column label="入群时间" align="center" prop="createTime" />
-            <el-table-column label="入群方式" align="center" prop="createTime" />
+        <el-tab-pane :label="`所在客群(${customer.groups ? customer.groups.length : 0})`" name="2">
+          <el-table :data="customer.groups">
+            <el-table-column label="群名" align="center" prop="groupName" />
+            <el-table-column label="群主" align="center" prop="leaderName" />
+            <el-table-column label="入群时间" align="center" prop="joinTime" />
+            <el-table-column prop="joinScene" label="入群方式" align="center">
+              <template slot-scope="{ row }">{{ dictJoinGroupType[row.joinScene + ''] }}</template>
+            </el-table-column>
           </el-table>
         </el-tab-pane>
       </el-tabs>
@@ -108,12 +167,19 @@ export default {
             <div class="left">
               <el-card class="mb10" shadow="never">
                 <div slot="header" class="card-title">企业标签</div>
-                <div class="flex mb20" v-for="item of 3" :key="item">
-                  <div style="width:60px;flex: none;">
-                    张三：
-                  </div>
-                  <template v-if="customer.tagNames && customer.tagNames.length">
-                    <el-tag type="info" v-for="(unit, unique) in customer.tagNames" :key="unique">{{ unit }}</el-tag>
+                <div
+                  class="flex mb20"
+                  v-for="(item, index) of portrayalSum.companyTags"
+                  :key="index"
+                >
+                  <div style="width:60px;flex: none;">{{ item.userName }}：</div>
+                  <template v-if="item.tagNames">
+                    <el-tag
+                      type="info"
+                      v-for="(unit, unique) in item.tagNames.split(',')"
+                      :key="unique"
+                      >{{ unit }}</el-tag
+                    >
                   </template>
                   <div>
                     暂无标签
@@ -123,12 +189,19 @@ export default {
 
               <el-card class="mb10" shadow="never">
                 <div slot="header" class="card-title">个人标签</div>
-                <div class="flex mb20" v-for="item of 3" :key="item">
-                  <div style="width:60px;flex: none;">
-                    张三：
-                  </div>
-                  <template v-if="customer.tagNames && customer.tagNames.length">
-                    <el-tag type="info" v-for="(unit, unique) in customer.tagNames" :key="unique">{{ unit }}</el-tag>
+                <div
+                  class="flex mb20"
+                  v-for="(item, index) of portrayalSum.personTags"
+                  :key="index"
+                >
+                  <div style="width:60px;flex: none;">{{ item.userName }}：</div>
+                  <template v-if="item.tagNames">
+                    <el-tag
+                      type="info"
+                      v-for="(unit, unique) in item.tagNames.split(',')"
+                      :key="unique"
+                      >{{ unit }}</el-tag
+                    >
                   </template>
                   <div>
                     暂无标签
@@ -138,14 +211,23 @@ export default {
 
               <el-card class="mb10" shadow="never">
                 <div slot="header" class="card-title">跟进状态</div>
-                <div class="fxbw mb20" v-for="item of 3" :key="item">
-                  <div style="width:60px;flex: none;">
-                    张三：
-                  </div>
-                  <el-steps style="flex:auto;" :active="active" finish-status="success">
-                    <el-step title="步骤 1"></el-step>
-                    <el-step title="步骤 2"></el-step>
-                    <el-step title="步骤 3"></el-step>
+                <div
+                  class="fxbw mb20"
+                  v-for="(item, index) of portrayalSum.trackStates"
+                  :key="index"
+                >
+                  <div style="width:60px;flex: none;">{{ item.userName }}：</div>
+                  <el-steps
+                    style="flex:auto;"
+                    :active="item.trackStateList.length"
+                    finish-status="success"
+                  >
+                    <el-step
+                      v-for="(unit, unique) of item.trackStateList"
+                      :key="unique"
+                      :title="dictTrackState[~~unit.trackState + ''].name"
+                      :description="unit.trackTime"
+                    ></el-step>
                   </el-steps>
                 </div>
               </el-card>
@@ -153,8 +235,16 @@ export default {
               <el-card shadow="never">
                 <div slot="header" class="card-title">跟进记录</div>
                 <el-tabs value="0">
-                  <el-tab-pane v-for="(item, index) in 3" :key="index" :label="item" :name="index + ''">
-                    <record></record>
+                  <el-tab-pane
+                    v-for="(item, index) in customer.trackUsers"
+                    :key="index"
+                    :label="item.userName"
+                    :name="index + ''"
+                  >
+                    <record
+                      :userId="item.userId"
+                      :externalUserid="$route.query.externalUserid"
+                    ></record>
                   </el-tab-pane>
                 </el-tabs>
               </el-card>
