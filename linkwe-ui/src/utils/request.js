@@ -8,16 +8,13 @@ axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 // 创建axios实例
 const service = axios.create({
   // axios中请求配置有baseURL选项，表示请求URL公共部分
-  baseURL:
-    process.env.NODE_ENV === 'development'
-      ? '/api'
-      : process.env.VUE_APP_BASE_API,
+  baseURL: process.env.NODE_ENV === 'development' ? '/api' : process.env.VUE_APP_BASE_API,
   // 超时
   timeout: 10000
 })
 // request拦截器
 service.interceptors.request.use(
-  (config) => {
+  config => {
     // 是否需要设置 token
     const isToken = (config.headers || {}).isToken === false
     if (getToken() && !isToken) {
@@ -25,7 +22,7 @@ service.interceptors.request.use(
     }
     return config
   },
-  (error) => {
+  error => {
     console.log(error)
     Promise.reject(error)
   }
@@ -33,7 +30,7 @@ service.interceptors.request.use(
 
 // 响应拦截器
 service.interceptors.response.use(
-  (res) => {
+  res => {
     // 未设置状态码则默认成功状态
     const code = res.data.code || 200
     // 获取错误信息
@@ -41,15 +38,11 @@ service.interceptors.response.use(
     if (code === 200) {
       return res.data
     } else if (code === 401) {
-      MessageBox.confirm(
-        '登录状态已过期，您可以继续留在该页面，或者重新登录',
-        '系统提示',
-        {
-          confirmButtonText: '重新登录',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      ).then(() => {
+      MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', {
+        confirmButtonText: '重新登录',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
         store.dispatch('LogOut').then(() => {
           location.href = '/'
         })
@@ -62,13 +55,21 @@ service.interceptors.response.use(
       // return Promise.reject(new Error(msg))
       return Promise.reject()
     } else {
-      Notification.error({
-        title: msg
-      })
+      // let errMsg = response.data.msg || response.data.errMsg || data.msg || data.errMsg
+      if (process.env.NODE_ENV === 'development') {
+        Message({
+          message: `后端错误：接口：${response.config.url}，${code}错误：${msg}`,
+          type: 'error'
+        })
+      } else {
+        Notification.error({
+          title: msg
+        })
+      }
       return Promise.reject()
     }
   },
-  (error) => {
+  error => {
     console.log('err' + error)
     let { message, response, config } = error
     if (message == 'Network Error') {

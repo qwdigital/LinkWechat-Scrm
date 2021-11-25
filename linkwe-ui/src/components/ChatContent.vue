@@ -1,6 +1,7 @@
 <script>
 // import { AMapManager } from 'vue-amap'
 // import Video from 'video.js'
+import Voice from '@/components/Voice'
 export default {
   name: 'ChatContent',
   props: {
@@ -9,12 +10,9 @@ export default {
       default: () => ({})
     }
   },
-  components: {},
+  components: { Voice },
   data() {
-    return {
-      dialogVisible: false,
-      audioSrc: []
-    }
+    return {}
   },
   computed: {
     content() {
@@ -42,18 +40,6 @@ export default {
   created() {},
   mounted() {},
   methods: {
-    close() {
-      this.dialogVisible = false
-      const mp3 = this.$refs.AudioPlayer
-      mp3.pause()
-    },
-    playAudio(type) {
-      this.audioSrc = [JSON.parse(this.message.contact)[type]]
-      this.dialogVisible = true
-    },
-    onBeforePlay(next) {
-      next() // 开始播放
-    },
     play(e) {
       this.dia = true
       const player = this.$refs.videoPlayer.player
@@ -70,7 +56,13 @@ export default {
       {{ content }}
     </template>
     <template v-else-if="'image,emotion'.includes(message.msgType)">
-      <el-image style="width: 100px; height: 100px" :src="content" fit="fit" :preview-src-list="[content]"> </el-image>
+      <el-image
+        style="width: 100px; height: 100px"
+        :src="content"
+        fit="fit"
+        :preview-src-list="[content]"
+      >
+      </el-image>
     </template>
     <a
       v-else-if="'file'.includes(message.msgType)"
@@ -89,7 +81,7 @@ export default {
       {{ content }}
     </a>
     <div v-else-if="message.msgType === 'voice'">
-      <i class="el-icon-microphone" style=" font-size: 40px; color: #199ed8;" @click="playAudio('attachment')"></i>
+      <voice :amrUrl="JSON.parse(message.contact)['attachment']"></voice>
     </div>
     <template v-else-if="message.msgType === 'video'">
       <video
@@ -142,7 +134,10 @@ export default {
           style="pointer-events: none;"
         >
           <el-amap-marker
-            :position="[JSON.parse(message.contact).longitude, JSON.parse(message.contact).latitude]"
+            :position="[
+              JSON.parse(message.contact).longitude,
+              JSON.parse(message.contact).latitude
+            ]"
           ></el-amap-marker>
         </el-amap>
       </div>
@@ -174,20 +169,6 @@ export default {
       </a>
     </div>
     <div v-else>不支持的消息类型：{{ message.msgType }}</div>
-
-    <el-dialog v-if="audioSrc[0]" :visible.sync="dialogVisible" width="30%" @close="close">
-      <div class="shabowboxvidoe shabowboxaudio">
-        <!-- <AudioPlayer
-          :audio-list="audioSrc"
-          ref="AudioPlayer"
-          :before-play="onBeforePlay"
-        /> -->
-        <audio controls>
-          <source :src="audioSrc[0]" type="audio/mpeg" />
-        </audio>
-      </div>
-      <span slot="footer" class="dialog-footer"> </span>
-    </el-dialog>
   </div>
 </template>
 
