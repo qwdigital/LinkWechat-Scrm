@@ -32,25 +32,15 @@
                   <span style="line-height:40px">{{ item.name }}</span>
                 </el-col>
                 <el-col :span="10" class="ar">
-                  <span
-                    :style="{ color: item.type === 1 ? '#4bde03' : '#f9a90b' }"
+                  <span :style="{ color: item.type === 1 ? '#4bde03' : '#f9a90b' }"
                     >{{ { 1: '@微信', 2: '@企业微信' }[item.type] }}
                   </span>
-                  <i
-                    :class="[
-                      'el-icon-s-custom',
-                      { 1: 'man', 2: 'woman' }[item.gender]
-                    ]"
-                  ></i>
+                  <i :class="['el-icon-s-custom', { 1: 'man', 2: 'woman' }[item.gender]]"></i>
                 </el-col>
               </el-row>
 
               <div class="ac mt10 mb15">
-                {{
-                  customerList.length != customerTotal
-                    ? '下拉加载更多'
-                    : '看到底了～'
-                }}
+                {{ customerList.length != customerTotal ? '下拉加载更多' : '看到底了～' }}
               </div>
             </template>
             <el-empty v-else :image-size="100"></el-empty>
@@ -93,10 +83,7 @@
         <el-empty v-else :image-size="100" description="请选择客户"></el-empty>
       </el-col>
       <el-col :span="12">
-        <chatListClass
-          v-show="queryChat.receiveName"
-          :queryChat="queryChat"
-        ></chatListClass>
+        <chatListClass v-show="queryChat.receiveName" :queryChat="queryChat"></chatListClass>
 
         <el-empty
           v-if="!queryChat.receiveName"
@@ -111,7 +98,7 @@
 import chatListClass from './component/chatListClass.vue'
 import userList from './component/userList.vue'
 import grouplist from './component/groupList.vue'
-import api from '@/api/conversation/content.js'
+import * as api from '@/api/conversation/content.js'
 import * as apiCustomer from '@/api/customer/index'
 export default {
   components: {
@@ -183,7 +170,7 @@ export default {
             this.loading = false
             this.personList = data
           })
-          .catch((err) => {
+          .catch(err => {
             this.loading = false
           })
       } else {
@@ -193,7 +180,7 @@ export default {
             this.loading = false
             this.personList = data
           })
-          .catch((err) => {
+          .catch(err => {
             this.loading = false
           })
       }
@@ -205,7 +192,7 @@ export default {
         this.customerList = []
       }
       page && (this.customerQuery.pageNum = page)
-      apiCustomer.getList(this.customerQuery).then((res) => {
+      apiCustomer.getList(this.customerQuery).then(res => {
         this.customerList.push(...res.rows)
         this.customerTotal = ~~res.total
         this.customerQuery.pageNum++
