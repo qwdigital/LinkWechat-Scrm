@@ -650,7 +650,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         List<WeCustomerList> weCustomerList = this.findWeCustomerList(
                 WeCustomerList.builder()
                         .externalUserid(externalUserid)
-                        .firstUserId(userId)
                         .build()
         );
         if(CollectionUtil.isNotEmpty(weCustomerList)){
@@ -662,6 +661,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             weCustomerList.stream().forEach(k->{
                 trackUsers.add(WeCustomerDetail.TrackUser.builder()
                                 .addMethod(k.getAddMethod())
+                                .trackUserId(k.getFirstUserId())
                                 .firstAddTime(k.getFirstAddTime())
                                 .trackState(k.getTrackState())
                                 .userName(k.getUserName())

@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 import java.util.Date;
@@ -37,6 +38,7 @@ public class WeCustomerDetail {
 
     private String qq;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthday;
 
     private String position;
@@ -69,7 +71,11 @@ public class WeCustomerDetail {
         //添加方式
         private Integer addMethod;
 
+        //跟进人id
+        private String trackUserId;
+
         //添加时间
+        @JsonFormat(pattern = "yyyy-MM-dd")
         private Date firstAddTime;
 
         //跟进状态
@@ -87,6 +93,7 @@ public class WeCustomerDetail {
         private String groupName;
 
         //加入时间
+        @JsonFormat(pattern = "yyyy-MM-dd")
         private Date joinTime;
 
         //群主
