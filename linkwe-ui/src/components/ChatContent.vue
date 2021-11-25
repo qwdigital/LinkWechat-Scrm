@@ -55,6 +55,9 @@ export default {
     <template v-if="message.msgType === 'text'">
       {{ content }}
     </template>
+    <template v-else-if="message.msgType === 'revoke'">
+      已撤回
+    </template>
     <template v-else-if="'image,emotion'.includes(message.msgType)">
       <el-image
         style="width: 100px; height: 100px"
