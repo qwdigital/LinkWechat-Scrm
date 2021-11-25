@@ -6,16 +6,8 @@
         <span class="fr download" @click="exportList()">下载会话</span>
       </div>
     </div>
-    <el-tabs
-      v-model="activeTab"
-      @tab-click="(v) => opened.includes(v.name) || opened.push(v.name)"
-    >
-      <el-tab-pane
-        v-for="(item, index) of list"
-        :key="index"
-        :label="item.label"
-        :name="item.type"
-      >
+    <el-tabs v-model="activeTab" @tab-click="v => opened.includes(v.name) || opened.push(v.name)">
+      <el-tab-pane v-for="(item, index) of list" :key="index" :label="item.label" :name="item.type">
         <chatListClassTab
           v-if="opened.includes(item.type)"
           :queryChat="queryChat"
@@ -28,7 +20,7 @@
 
 <script>
 import chatListClassTab from './chatListClassTab.vue'
-import api from '@/api/conversation/content.js'
+import * as api from '@/api/conversation/content.js'
 export default {
   components: { chatListClassTab },
   props: {
@@ -81,10 +73,12 @@ export default {
         .then(() => {
           return api.exportList(this.queryChat)
         })
-        .then((response) => {
+        .then(response => {
           this.download(response.msg)
         })
-        .catch(function() {})
+        .catch(function(err) {
+          console.log(err)
+        })
     }
   }
 }

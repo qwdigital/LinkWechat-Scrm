@@ -101,7 +101,7 @@
 
 <script>
 import chatList from './chatList.vue'
-import api from '@/api/conversation/content.js'
+import * as api from '@/api/conversation/content.js'
 import Voice from '@/components/Voice'
 export default {
   name: '',

@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 // 外部联系人 会话列表
-const getExternalChatList = (fromId) => {
+export const getExternalChatList = fromId => {
   return request({
     url: '/chat/msg/selectExternalChatList/' + fromId,
     method: 'get'
@@ -9,7 +9,7 @@ const getExternalChatList = (fromId) => {
 }
 
 // 单聊 会话列表
-const selectAloneChatList = (params) => {
+export const selectAloneChatList = params => {
   return request({
     url: '/chat/msg/selectAloneChatList',
     method: 'get',
@@ -18,21 +18,21 @@ const selectAloneChatList = (params) => {
 }
 
 // 内部联系人列表
-const getInternalChatList = (fromId) => {
+export const getInternalChatList = fromId => {
   return request({
     url: '/chat/msg/selectInternalChatList/' + fromId,
     method: 'get'
   })
 }
 
-const getGroupChatList = (fromId) => {
+export const getGroupChatList = fromId => {
   return request({
     url: '/chat/msg/selectGroupChatList/' + fromId,
     method: 'get'
   })
 }
 
-// const chatList = (params) => {
+// export const chatList = (params) => {
 //   return request({
 //     url: '/chat/msg/list',
 //     method: 'get',
@@ -40,13 +40,13 @@ const getGroupChatList = (fromId) => {
 //   })
 // }
 
-const indexTable = () => {
+export const indexTable = () => {
   return request({
     url: '/wecom/page/getCorpBasicData',
     method: 'get'
   })
 }
-const indexEchart = () => {
+export const indexEchart = () => {
   return request({
     url: '/wecom/page/getCorpRealTimeData',
     method: 'get'
@@ -54,7 +54,7 @@ const indexEchart = () => {
 }
 
 // 全文检索 会话列表
-export const getChatList = (params) => {
+export const getChatList = params => {
   return request({
     url: '/chat/msg/selectFullSearchChatList',
     method: 'get',
@@ -63,7 +63,7 @@ export const getChatList = (params) => {
 }
 
 // 全文检索 导出列表
-export const exportList = (params) => {
+export const exportList = params => {
   return request({
     url: '/chat/msg/selectFullSearchChatList/export',
     method: 'get',
@@ -71,16 +71,3 @@ export const exportList = (params) => {
     // responseType: 'blob'
   })
 }
-//
-export const content = {
-  indexEchart,
-  indexTable,
-  getExternalChatList,
-  selectAloneChatList,
-  getInternalChatList,
-  getGroupChatList,
-  // chatList,
-  getChatList
-}
-
-export default content

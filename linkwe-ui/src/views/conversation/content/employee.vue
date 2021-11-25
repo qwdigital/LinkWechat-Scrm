@@ -34,10 +34,22 @@
           <div class="name pd15">{{ talkName }}</div>
           <el-tabs v-model="activeName" @tab-click="tabClick(true)">
             <el-tab-pane label="内部联系人" name="0">
-              <userList v-if="activeName == 0" :personList="personList" :loading="loading" @chatFn="chatFn"> </userList>
+              <userList
+                v-if="activeName == 0"
+                :personList="personList"
+                :loading="loading"
+                @chatFn="chatFn"
+              >
+              </userList>
             </el-tab-pane>
             <el-tab-pane label="外部联系人" name="1">
-              <userList v-if="activeName == 1" :personList="personList" :loading="loading" @chatFn="chatFn"> </userList>
+              <userList
+                v-if="activeName == 1"
+                :personList="personList"
+                :loading="loading"
+                @chatFn="chatFn"
+              >
+              </userList>
             </el-tab-pane>
             <el-tab-pane label="群聊" name="2">
               <grouplist
@@ -57,7 +69,11 @@
       <el-col :span="12">
         <chatListClass v-show="queryChat.receiveName" :queryChat="queryChat"></chatListClass>
 
-        <el-empty v-if="!queryChat.receiveName" description="请选择联系人" :image-size="100"></el-empty>
+        <el-empty
+          v-if="!queryChat.receiveName"
+          description="请选择联系人"
+          :image-size="100"
+        ></el-empty>
       </el-col>
     </el-row>
   </div>
@@ -67,7 +83,7 @@ import chatListClass from './component/chatListClass.vue'
 import userList from './component/userList.vue'
 import grouplist from './component/groupList.vue'
 import * as apiOrg from '@/api/organization'
-import api from '@/api/conversation/content.js'
+import * as api from '@/api/conversation/content.js'
 
 export default {
   components: {
@@ -141,7 +157,7 @@ export default {
             this.loading = false
             this.personList = data
           })
-          .catch((err) => {
+          .catch(err => {
             this.loading = false
           })
       } else if (this.activeName == 1) {
@@ -151,7 +167,7 @@ export default {
             this.loading = false
             this.personList = data
           })
-          .catch((err) => {
+          .catch(err => {
             this.loading = false
           })
       } else {
@@ -161,7 +177,7 @@ export default {
             this.loading = false
             this.personList = data
           })
-          .catch((err) => {
+          .catch(err => {
             this.loading = false
           })
       }
@@ -196,7 +212,7 @@ export default {
 
             // data.children.push(...rows)
             let arr = node.data.children ? node.data.children.concat(rows || []) : rows || []
-            arr.forEach((element) => {
+            arr.forEach(element => {
               element.isLeaf = !!element.userId
             })
             resolve(arr)
