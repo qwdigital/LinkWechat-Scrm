@@ -14,10 +14,7 @@
     </el-date-picker>
     <div class="list">
       <template v-if="list.length">
-        <chatList
-          v-if="'all,image,link'.includes(type)"
-          :data="list"
-        ></chatList>
+        <chatList v-if="'all,image,link'.includes(type)" :data="list"></chatList>
 
         <el-table
           v-else-if="type == 'file'"
@@ -44,9 +41,7 @@
           </el-table-column>
           <el-table-column prop="action" label="操作">
             <template slot-scope="{ row }">
-              <el-button type="text" size="small" @click="downloadFile(row)"
-                >下载</el-button
-              >
+              <el-button type="text" size="small" @click="downloadFile(row)">下载</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -68,9 +63,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="address" label="时长" min-width="50">
-            <template slot-scope="{ row }">
-              {{ JSON.parse(row.contact).play_length }}s
-            </template>
+            <template slot-scope="{ row }"> {{ JSON.parse(row.contact).play_length }}s </template>
           </el-table-column>
           <el-table-column prop="address" min-width="150" label="操作">
             <template slot-scope="{ row }">
@@ -84,12 +77,10 @@
                 :audio-list="[JSON.parse(row.contact).attachment]"
                 ref="AudioPlayer"
               /> -->
-              <audio controls>
-                <source
-                  :src="JSON.parse(row.contact).attachment"
-                  type="audio/mpeg"
-                />
-              </audio>
+              <voice :amrUrl="JSON.parse(row.contact)['attachment']"></voice>
+              <!-- <audio controls>
+                <source :src="JSON.parse(row.contact).attachment" type="audio/mpeg" />
+              </audio> -->
             </template>
           </el-table-column>
         </el-table>
@@ -111,9 +102,10 @@
 <script>
 import chatList from './chatList.vue'
 import api from '@/api/conversation/content.js'
+import Voice from '@/components/Voice'
 export default {
   name: '',
-  components: { chatList },
+  components: { chatList, Voice },
   props: {
     // 消息收发者
     queryChat: {
@@ -168,12 +160,12 @@ export default {
       Object.assign(query, this.queryChat)
       api
         .getChatList(query)
-        .then((res) => {
+        .then(res => {
           this.total = ~~res.total
           this.list = res.rows
           this.loading = false
         })
-        .catch((err) => {
+        .catch(err => {
           this.loading = false
         })
     },
@@ -195,7 +187,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       })
-        .then((response) => {
+        .then(response => {
           this.download(JSON.parse(row.contact).attachment)
         })
         .catch(function() {})
