@@ -37,7 +37,7 @@ export default {
         birthday: this.birthday,
         firstUserId: this.customer.firstUserId
       }
-      updateBirthday(data).then(response => {
+      updateBirthday(data).then((response) => {
         this.msgSuccess('操作成功')
         // this.getDetail()
         this.$set(this.customer, 'birthday', this.birthday)

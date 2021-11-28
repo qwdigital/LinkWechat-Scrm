@@ -1,9 +1,8 @@
 <script>
-import customer from './tag/customer'
-import group from './tag/group'
+import List from './tag/list'
 export default {
   name: '',
-  components: { customer, group },
+  components: { List },
   data() {
     return {
       activeName: 'customer'
@@ -21,10 +20,10 @@ export default {
   <div>
     <el-tabs v-model="activeName">
       <el-tab-pane label="客户标签" name="customer">
-        <customer></customer>
+        <List type="1"></List>
       </el-tab-pane>
       <el-tab-pane label="客群标签" name="group">
-        <group></group>
+        <List type="2"></List>
       </el-tab-pane>
     </el-tabs>
   </div>

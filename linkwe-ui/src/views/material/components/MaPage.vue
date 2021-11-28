@@ -149,7 +149,10 @@ export default {
     },
     // 类目树节点添加/编辑 0: 添加， 1：编辑
     treeEdit(data, type) {
-      this.treeForm = Object.assign({}, type ? data : { parentId: data.id || '0', mediaType: this.type })
+      this.treeForm = Object.assign(
+        {},
+        type ? data : { parentId: data.id || '0', mediaType: this.type }
+      )
       this.treeDialogVisible = true
     },
     // 类目树节点提交
@@ -247,7 +250,11 @@ export default {
     <el-row type="flex" justify="space-between">
       <el-col :span="6">
         <div>
-          <el-button v-hasPermi="['wechat:category:add']" slot="reference" type="primary" @click="treeEdit({}, 0)"
+          <el-button
+            v-hasPermi="['wechat:category:add']"
+            slot="reference"
+            type="primary"
+            @click="treeEdit({}, 0)"
             >添加分类</el-button
           >
         </div>
@@ -305,14 +312,23 @@ export default {
             prefix-icon="el-icon-search"
             style="width: 300px;"
           />
-          <el-button class="ml10" @click="getList(1)" v-hasPermi="['wecom:material:list']">搜索</el-button>
-          <el-button v-hasPermi="['wechat:material:remove']" @click="remove()" :disabled="selected.length === 0"
+          <el-button class="ml10" @click="getList(1)" v-hasPermi="['wecom:material:list']"
+            >搜索</el-button
+          >
+          <el-button
+            v-hasPermi="['wechat:material:remove']"
+            @click="remove()"
+            :disabled="selected.length === 0"
             >删除</el-button
           >
           <el-popover placement="top" width="260" v-model="groupDialogVisible">
             <div>选择分组</div>
             <div style="position: relative; margin: 10px 0;">
-              <el-cascader v-model="group" :options="treeData[0].children" :props="groupProps"></el-cascader>
+              <el-cascader
+                v-model="group"
+                :options="treeData[0].children"
+                :props="groupProps"
+              ></el-cascader>
             </div>
             <div style="text-align: right;">
               <el-button size="mini" @click="groupDialogVisible = false">取消</el-button>
@@ -349,7 +365,11 @@ export default {
     </el-row>
 
     <!-- 分类树添加/编辑弹窗 -->
-    <el-dialog :title="(treeForm.id ? '修改' : '添加') + '分类'" :visible.sync="treeDialogVisible" width="400px">
+    <el-dialog
+      :title="(treeForm.id ? '修改' : '添加') + '分类'"
+      :visible.sync="treeDialogVisible"
+      width="400px"
+    >
       <el-form ref="treeForm" :model="treeForm">
         <el-form-item>
           <el-input
@@ -379,7 +399,11 @@ export default {
     >
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="选择分组" prop="categoryId">
-          <el-cascader v-model="form.categoryId" :options="treeData[0].children" :props="groupProps"></el-cascader>
+          <el-cascader
+            v-model="form.categoryId"
+            :options="treeData[0].children"
+            :props="groupProps"
+          ></el-cascader>
         </el-form-item>
 
         <el-form-item label="文本内容" prop="content" v-if="type === '4'">
@@ -401,7 +425,11 @@ export default {
             ></el-input>
           </el-form-item>
           <el-form-item label="图片" prop="materialUrl">
-            <upload :fileUrl.sync="form.materialUrl" :fileName.sync="form.materialName" :type="type">
+            <upload
+              :fileUrl.sync="form.materialUrl"
+              :fileName.sync="form.materialName"
+              :type="type"
+            >
               <div slot="tip">
                 支持JPG,PNG格式，图片大小不超过2M，建议上传宽高1:1的图片
               </div>
@@ -433,13 +461,17 @@ export default {
             ></el-input>
           </el-form-item>
           <el-form-item label="上传封面" prop="materialUrl">
-            <upload :fileUrl.sync="form.materialUrl" :fileName.sync="form.materialName" :type="type">
+            <upload
+              :fileUrl.sync="form.materialUrl"
+              :fileName.sync="form.materialName"
+              :type="type"
+            >
               <div slot="tip">
                 支持JPG,PNG格式，图片大小不超过2M，建议上传宽高1:1的图片
               </div>
             </upload>
           </el-form-item>
-          <el-form-item label="label">
+          <el-form-item label="内容">
             <!-- 富文本 -->
           </el-form-item>
         </template>
@@ -483,7 +515,11 @@ export default {
 
         <template v-else-if="type === '1'">
           <el-form-item label="语音" prop="materialUrl">
-            <upload :fileUrl.sync="form.materialUrl" :fileName.sync="form.materialName" :type="type">
+            <upload
+              :fileUrl.sync="form.materialUrl"
+              :fileName.sync="form.materialName"
+              :type="type"
+            >
               <div slot="tip">
                 只能上传amr格式的语音文件。单个文件大小不超过2M，时长不超过1分钟
               </div>
@@ -496,7 +532,11 @@ export default {
 
         <template v-else-if="type === '2'">
           <el-form-item label="视频" prop="materialUrl">
-            <upload :fileUrl.sync="form.materialUrl" :fileName.sync="form.materialName" :type="type">
+            <upload
+              :fileUrl.sync="form.materialUrl"
+              :fileName.sync="form.materialName"
+              :type="type"
+            >
               <div slot="tip">
                 不超过10M, 文件格式: mp4
               </div>
@@ -523,7 +563,11 @@ export default {
 
         <template v-else-if="type === '3'">
           <el-form-item label="文件" prop="materialUrl">
-            <upload :fileUrl.sync="form.materialUrl" :fileName.sync="form.materialName" :type="type">
+            <upload
+              :fileUrl.sync="form.materialUrl"
+              :fileName.sync="form.materialName"
+              :type="type"
+            >
               <div slot="tip">
                 单个文件大小不超过20M
               </div>

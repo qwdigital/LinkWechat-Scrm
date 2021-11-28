@@ -1,4 +1,5 @@
 <script>
+import { dictJoinGroupType } from '@/utils/dictionary'
 import * as api from '@/api/customer/group'
 
 export default {
@@ -24,11 +25,7 @@ export default {
         groupId: undefined,
         name: undefined
       },
-      joinScene: {
-        1: '由成员邀请入群（直接邀请入群）',
-        2: '由成员邀请入群（通过邀请链接入群）',
-        3: '通过扫描群二维码入群'
-      },
+      dictJoinGroupType,
       dialogVisible: false,
       selectedTag: []
     }
@@ -36,12 +33,12 @@ export default {
   created() {
     this.group = this.$route.query
     this.query.chatId = this.group.chatId
-    this.getDetail()
+    // this.getDetail()
     this.getList()
   },
   methods: {
     getDetail() {
-      api.getDetail(this, this.query.chatId).then((res) => {
+      api.getDetail(this.query.chatId).then((res) => {
         if (res.code == 200) {
           this.group = Object.assign({}, this.group, res.data)
           // console.log(this.group)
@@ -69,7 +66,18 @@ export default {
       this.ids = selection.map((item) => item.operId)
       this.multiple = !selection.length
     },
-    onEditTag() {
+    makeTag(data) {
+      this.makeLabelCustomerList = data ? [data] : this.ids
+      this.tagDialogType.type = ''
+      let curTags = []
+      if (data.tags && data.tagIds) {
+        curTags = data.tags.map((i, idx) => ({
+          name: i,
+          tagName: i,
+          tagId: data.tagIds[idx]
+        }))
+      }
+      this.selectedTag = curTags
       this.dialogVisible = true
     },
     submitSelectTag(data) {
@@ -109,11 +117,19 @@ export default {
             <div class="info">
               <span class="">客群标签：</span>
               <template v-if="group.tags">
-                <el-tag style="margin-bottom: 10px;" v-for="(tag, index) in group.tags.split(',')" :key="index">{{
-                  tag
-                }}</el-tag>
+                <el-tag
+                  style="margin-bottom: 10px;"
+                  v-for="(tag, index) in group.tags.split(',')"
+                  :key="index"
+                  >{{ tag }}</el-tag
+                >
               </template>
-              <el-button type="text">编辑标签</el-button>
+              <el-button
+                type="text"
+                v-hasPermi="['customerManage/customer:makeTag']"
+                @click="makeTag(scope.row)"
+                >编辑标签</el-button
+              >
             </div>
           </div>
         </div>
@@ -179,7 +195,7 @@ export default {
       <el-table-column label="进群时间" prop="joinTime"></el-table-column>
       <el-table-column label="进群方式" prop="joinScene">
         <template slot-scope="scope">
-          <span>{{ joinScene[scope.row.joinScene] }}</span>
+          <span>{{ dictJoinGroupType[scope.row.joinScene] }}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -191,6 +207,16 @@ export default {
       :limit.sync="query.pageSize"
       @pagination="getList()"
     />
+
+    <!-- 选择标签弹窗 -->
+    <SelectTag
+      ref="selectTag"
+      :visible.sync="dialogVisible"
+      :title="tagDialogType.title"
+      :selected="selectedTag"
+      @success="submitSelectTag"
+    >
+    </SelectTag>
   </div>
 </template>
 

@@ -1,5 +1,6 @@
 <script>
 import * as api from '@/api/customer/group'
+// import * as api from '@/api/customer/tag'
 import SelectTag from '@/components/SelectTag'
 
 export default {
@@ -32,7 +33,7 @@ export default {
       dialogVisible: false, // 选择标签弹窗显隐
       selectedTag: [], // 选择的标签
       tagDialogType: {
-        title: '', // 选择标签弹窗标题
+        title: '选择标签', // 选择标签弹窗标题
         type: '' // 弹窗类型
       },
       makeLabelCustomerList: []
@@ -56,7 +57,7 @@ export default {
       api
         .getList(this.query)
         .then(({ rows, lastSyncTime, total }) => {
-          this.list = rows.map(i => {
+          this.list = rows.map((i) => {
             // 处理标签
             if (i.tags && typeof i.tags == 'string') {
               i.tags = i.tags.split(',')
@@ -84,6 +85,7 @@ export default {
       // this.$refs.selectTag.$forceUpdate()
     },
     makeTag(data) {
+      debugger
       this.makeLabelCustomerList = data ? [data] : this.ids
       this.tagDialogType.type = ''
       let curTags = []
@@ -99,7 +101,7 @@ export default {
     },
     submitSelectTag(selected) {
       if (this.tagDialogType.type === 'query') {
-        this.query.tagIds = selected.map(d => d.tagId) + ''
+        this.query.tagIds = selected.map((d) => d.tagId) + ''
         this.queryTag = selected
         this.dialogVisible = false
       } else {
@@ -110,7 +112,7 @@ export default {
         }
         api
           .makeGroupTag(data)
-          .then(res => {
+          .then((res) => {
             if (res.code == 200) {
               this.msgSuccess('操作成功')
               this.getList()
@@ -135,14 +137,14 @@ export default {
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
       })
-      api.sync().then(r => {
+      api.sync().then((r) => {
         loading.close()
         this.msgSuccess('后台开始同步数据，请稍后关注进度')
       })
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.id)
+      this.ids = selection.map((item) => item.id)
       this.multiple = !selection.length
     },
     /** 导出按钮操作 */
@@ -166,7 +168,7 @@ export default {
 </script>
 
 <template>
-  <div class="" v-loading="loading">
+  <div class="">
     <el-form :model="query" ref="queryForm" :inline="true" class="top-search" label-width="80px">
       <el-form-item label="群名" prop="groupName">
         <el-input v-model="query.groupName" placeholder="请输入群名" clearable />
@@ -223,13 +225,13 @@ export default {
         </span>
       </div>
       <div>
-        <el-button v-hasPermi="['customerManage:group:sync']" type="primary" plain @click="sync"
+        <!-- <el-button v-hasPermi="['customerManage:group:sync']" type="primary" plain @click="sync"
           >批量标签设置</el-button
-        >
+        > -->
       </div>
     </div>
 
-    <el-table :data="list" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="群名" align="center" prop="groupName" />
       <el-table-column label="群主" align="center" prop="groupLeaderName" />

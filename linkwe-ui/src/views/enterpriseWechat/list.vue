@@ -7,15 +7,15 @@ export default {
   props: {},
   data() {
     return {
-      query: {
-        pageNum: 1,
-        pageSize: 10,
-        companyName: ''
-      },
-      total: 0,
+      // query: {
+      //   pageNum: 1,
+      //   pageSize: 10,
+      //   companyName: ''
+      // },
+      // total: 0,
       form: {},
-      list: [],
-      dialogVisible: false,
+      // list: [],
+      // dialogVisible: false,
       disabled: false,
       loading: false,
       rules: Object.freeze({
@@ -23,49 +23,63 @@ export default {
         corpId: [{ required: true, message: '必填项', trigger: 'blur' }],
         corpSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
         contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }]
-      }),
-      status: ['正常', '停用']
+      })
+      // status: ['正常', '停用']
     }
   },
   watch: {},
   computed: {},
   created() {
-    this.getList()
+    this.getDetail()
   },
   mounted() {
     // new clipboard(".copy-btn");
   },
   methods: {
-    getList(page) {
-      page && (this.query.pageNum = page)
+    // getList(page) {
+    //   page && (this.query.pageNum = page)
+    //   this.loading = true
+    //   api
+    //     .getList(this.query)
+    //     .then(({ rows, total }) => {
+    //       this.list = rows
+    //       this.total = +total
+    //       this.loading = false
+    //     })
+    //     .catch(() => {
+    //       this.loading = false
+    //     })
+    // },
+    // edit(data, type) {
+    //   this.form = Object.assign({}, data || {})
+    //   this.dialogVisible = true
+    //   type || !data ? (this.disabled = false) : (this.disabled = true)
+    // },
+
+    getDetail() {
       this.loading = true
       api
-        .getList(this.query)
-        .then(({ rows, total }) => {
-          this.list = rows
-          this.total = +total
+        .getDetail()
+        .then(({ data }) => {
+          this.form = data
           this.loading = false
         })
         .catch(() => {
           this.loading = false
         })
     },
-    edit(data, type) {
-      this.form = Object.assign({}, data || {})
-      this.dialogVisible = true
-      type || !data ? (this.disabled = false) : (this.disabled = true)
-    },
     submit() {
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          api[this.form.id ? 'update' : 'add'](this.form)
+          api
+            .addOrUpdate(this.form)
             .then(() => {
               this.msgSuccess('操作成功')
-              this.dialogVisible = false
-              this.getList(!this.form.id && 1)
+              // this.dialogVisible = false
+              this.getDetail()
             })
             .catch(() => {
-              this.dialogVisible = false
+              // this.dialogVisible = false
             })
         }
       })
@@ -82,24 +96,26 @@ export default {
 
 <template>
   <div>
-    <div class="fxbw">
+    <!--  <div class="fxbw">
       <div class="top-search">
         <el-form inline label-position="right" :model="form" label-width="80px">
           <el-form-item label="企业名称">
             <el-input v-model="query.companyName" placeholder="请输入"></el-input>
           </el-form-item>
           <el-form-item label>
-            <el-button v-hasPermi="['enterpriseWechat:query']" type="primary" @click="getList(1)">查询</el-button>
+            <el-button v-hasPermi="['enterpriseWechat:query']" type="primary" @click="getList(1)"
+              >查询</el-button
+            >
           </el-form-item>
         </el-form>
       </div>
-      <el-button v-hasPermi="['enterpriseWechat:add']" type="primary" @click="edit()">添加</el-button>
+      <el-button v-hasPermi="['enterpriseWechat:add']" type="primary" @click="edit()"
+        >添加</el-button
+      >
     </div>
-    <!-- <el-card shadow="never" :body-style="{padding: '20px 0 0'}">
-    </el-card>-->
 
-    <el-table v-loading="loading" :data="list">
-      <!-- <el-table-column type="selection" width="50" align="center" /> -->
+
+   <el-table v-loading="loading" :data="list">
       <el-table-column label="企业名称" align="center" prop="companyName" :show-overflow-tooltip="true" />
       <el-table-column label="企业ID" align="center" prop="corpId" :show-overflow-tooltip="true" />
       <el-table-column label="应用秘钥" align="center" prop="corpSecret" :show-overflow-tooltip="true" />
@@ -124,7 +140,7 @@ export default {
           >
         </template>
       </el-table-column>
-    </el-table>
+    </el-table> 
 
     <pagination
       v-show="total > 0"
@@ -132,9 +148,9 @@ export default {
       :page.sync="query.pageNum"
       :limit.sync="query.pageSize"
       @pagination="getList()"
-    />
+    />  -->
 
-    <el-dialog title="配置企业微信号" :visible.sync="dialogVisible">
+    <el-card shadow="never" :body-style="{ padding: '10px 0 0 10px' }">
       <el-form
         ref="form"
         label-suffix=":"
@@ -154,9 +170,9 @@ export default {
           <div class="tips">根据企业 ID 配置后回显，不可编辑</div>
         </el-form-item>
 
-        <el-form-item label="服务商secret" prop="providerSecret">
+        <!-- <el-form-item label="服务商secret" prop="providerSecret">
           <el-input v-model="form.providerSecret"></el-input>
-        </el-form-item>
+        </el-form-item> -->
 
         <el-form-item label="客户联系 Secret" prop="contactSecret">
           <el-input v-model="form.contactSecret"></el-input>
@@ -189,15 +205,12 @@ export default {
             <el-radio label="label">不开启</el-radio>
           </el-radio-group>
           <div>开启后，可以将企业客户的添加、编辑以及主动删除客户和被动被客户删除实时的同步到仟微SCRM，无需手动更新同步。</div>
-        </el-form-item>-->
+        </el-form-item>
         <el-form-item label="企业微信扫码登陆回调地址" prop="wxQrLoginRedirectUri">
           <el-input v-model="form.wxQrLoginRedirectUri"></el-input>
-        </el-form-item>
-        <el-form-item label="应用回调token密钥" prop="token">
-          <el-input v-model="form.token"></el-input>
-        </el-form-item>
+        </el-form-item>-->
 
-        <el-form-item label="应用回调消息体加密密钥" prop="encodingAesKey">
+        <!-- <el-form-item label="应用回调消息体加密密钥" prop="encodingAesKey">
           <el-input v-model="form.encodingAesKey"></el-input>
         </el-form-item>
         <el-form-item label="微信公众号APPID" prop="appld">
@@ -214,14 +227,14 @@ export default {
         </el-form-item>
         <el-form-item label="H5域名" prop="h5DoMainName">
           <el-input v-model="form.h5DoMainName"></el-input>
-        </el-form-item>
+        </el-form-item> -->
 
         <el-form-item label="消息提醒agentId" prop="agentId">
           <el-input v-model="form.agentId"></el-input>
           <div class="tips">用于接收应用消息，在企微后台->应用工具->自建应用中配置并获取</div>
         </el-form-item>
         <el-form-item label="消息应用Secret" prop="agentId">
-          <el-input v-model="form.agentId"></el-input>
+          <el-input v-model="form.agentSecret"></el-input>
           <div class="tips">用于接收应用消息，在企微后台->应用工具->自建应用中配置并获取</div>
         </el-form-item>
 
@@ -235,21 +248,26 @@ export default {
         </el-form-item>
 
         <div>接收事件服务器</div>
-        <el-form-item label="URL" prop="fissionUrl">
-          <el-input v-model="form.fissionUrl"></el-input>
+        <el-form-item label="URL" prop="backOffUrl">
+          <el-input v-model="form.backOffUrl" placeholder="回调url"></el-input>
         </el-form-item>
-        <el-form-item label="Token" prop="fissionGroupUr">
-          <el-input v-model="form.fissionGroupUr"></el-input>
+        <el-form-item label="Token" prop="token">
+          <el-input v-model="form.token" placeholder="应用回调token密钥"></el-input>
         </el-form-item>
-        <el-form-item label="EncodingAESKey" prop="h5DoMainName">
-          <el-input v-model="form.h5DoMainName"></el-input>
+        <el-form-item label="EncodingAESKey" prop="encodingAesKey">
+          <el-input v-model="form.encodingAesKey" placeholder="应用回调消息体加密密钥"></el-input>
+        </el-form-item>
+        <el-form-item label="" class="ar">
+          <el-button type="primary" @click="submit" v-show="!disabled">保存配置</el-button>
         </el-form-item>
       </el-form>
-      <div slot="footer">
+    </el-card>
+    <!-- <el-dialog title="配置企业微信号" :visible.sync="dialogVisible">
+       <div slot="footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="submit" v-show="!disabled">确 定</el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 

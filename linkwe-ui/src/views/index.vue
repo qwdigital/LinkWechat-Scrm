@@ -29,10 +29,22 @@
             justify="space-between"
             style="margin-top:10px;font-size:35px;font-weight:bold;color:#0079DE; text-align: center;"
           >
-            <el-col :span="6">{{ table.userCount }}</el-col>
-            <el-col :span="6">{{ table.customerCount }}</el-col>
-            <el-col :span="6">{{ table.groupCount }}</el-col>
-            <el-col :span="6">{{ table.groupMemberCount }}</el-col>
+            <el-col :span="6">
+              <count-to :start-val="0" :end-val="table.userCount" :duration="durationCount" />
+            </el-col>
+            <el-col :span="6">
+              <count-to :start-val="0" :end-val="table.customerCount" :duration="durationCount" />
+            </el-col>
+            <el-col :span="6">
+              <count-to :start-val="0" :end-val="table.groupCount" :duration="durationCount" />
+            </el-col>
+            <el-col :span="6">
+              <count-to
+                :start-val="0"
+                :end-val="table.groupMemberCount"
+                :duration="durationCount"
+              />
+            </el-col>
           </el-row>
         </div>
       </div>
@@ -133,10 +145,10 @@
           </el-col>
         </el-row>
         <el-row :gutter="20">
-          <el-col :span="6" v-for="(index, i) in car" :key="i">
-            <div class="grid-content" @click="$router.push(index.url)">
-              <div class="ac"><img :src="index.img" alt="" /></div>
-              <div class="ac craname">{{ index.name }}</div>
+          <el-col :span="6" v-for="(item, i) in car" :key="i">
+            <div class="grid-content" @click="$router.push(item.url)">
+              <div class="ac"><img :src="item.img" alt="" /></div>
+              <div class="ac craname">{{ item.name }}</div>
             </div>
           </el-col>
         </el-row>
@@ -216,9 +228,10 @@
 <script>
 import * as api from '@/api/index'
 import echarts from 'echarts'
+import CountTo from 'vue-count-to'
 export default {
   name: 'Index',
-  components: {},
+  components: { CountTo },
   data() {
     return {
       bossImg: require('@/assets/index/boss.png'),
@@ -230,46 +243,52 @@ export default {
         },
         {
           name: '员工活码',
-          url: '/conversation/content',
+          url: '/drainageCode/staff',
           img: require('@/assets/index/neircd.png')
         },
         {
           name: '新增群发',
-          url: '/appTool/task',
+          url: '/customerMaintain/groupMessage/add',
           img: require('@/assets/index/renwb.png')
         },
         {
           name: '任务宝',
-          url: '/groupMessage/add',
+          url: '/application/taskGroup',
           img: require('@/assets/index/xiaoxqf.png')
         },
         {
           name: '新客拉群',
-          url: '/drainageCode/staff',
+          url: '/communityOperating/newCustomer',
           img: require('@/assets/index/yuanghm.png')
         },
         {
           name: '素材中心',
-          url: '/system/dict',
+          url: '/customerMaintain/material',
           img: require('@/assets/index/zidgl.png')
         },
         {
           name: '关键词群',
-          url: '/drainageCode/staff',
+          url: '/communityOperating/keywords',
           img: require('@/assets/index/yuanghm.png')
         },
         {
-          name: '任务宝',
-          url: '/system/dict',
+          name: '会话存档',
+          url: '/riskControl/conversation/content',
           img: require('@/assets/index/zidgl.png')
         }
       ],
-      table: {},
+      table: {
+        userCount: 0,
+        customerCount: 0,
+        groupCount: 0,
+        groupMemberCount: 0
+      },
       erchatsTable: {},
       allData: {},
       time: '昨天',
       uptime: '',
-      timeType: 'today'
+      timeType: 'today',
+      durationCount: 2600
     }
   },
   mounted() {
@@ -300,12 +319,12 @@ export default {
       }
     },
     tableInfo() {
-      api.indexTable().then(res => {
+      api.indexTable().then((res) => {
         this.table = res.data
       })
     },
     erchatInfo() {
-      api.indexEchart().then(res => {
+      api.indexEchart().then((res) => {
         this.allData = res.data
         this.uptime = res.data.updateTime
         this.erchatsTable = this.allData.today
@@ -322,7 +341,7 @@ export default {
       }
       let series = []
       let colors = ['#088AEE', '#E74E59', '#14BF48', '#FA7216']
-      this.erchatsTable.dataList.forEach(a => {
+      this.erchatsTable.dataList.forEach((a) => {
         data.xData.push(a.xtime)
         data.arr1.push(a.newContactCnt)
         data.arr3.push(a.newMemberCnt)
@@ -397,7 +416,7 @@ export default {
       })
     },
     refresh() {
-      api.refresh().then(res => {
+      api.refresh().then((res) => {
         this.erchatInfo()
       })
     }

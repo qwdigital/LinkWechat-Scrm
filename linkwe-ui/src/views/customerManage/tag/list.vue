@@ -3,14 +3,21 @@ import * as api from '@/api/customer/tag'
 import AddTag from '@/components/AddTag'
 
 export default {
-  name: 'CustomerTag',
+  name: 'GroupTag',
   components: { AddTag },
+  props: {
+    // "标签分组类型(1:客户标签;2:群标签)"
+    type: {
+      type: String,
+      default: '1'
+    }
+  },
   data() {
     return {
       query: {
         pageNum: 1,
         pageSize: 10,
-        groupTagType: 1
+        groupTagType: this.type
       },
       // 遮罩层
       loading: false,
@@ -39,6 +46,7 @@ export default {
     }
   },
   created() {
+    this.query.groupTagType = this.type
     this.getList()
   },
   methods: {
@@ -57,7 +65,9 @@ export default {
         })
     },
     edit(data, type) {
-      this.form = JSON.parse(JSON.stringify(Object.assign({ weTags: [] }, data || {})))
+      this.form = JSON.parse(
+        JSON.stringify(Object.assign({ groupTagType: this.type, weTags: [] }, data || {}))
+      )
       this.dialogVisible = true
     },
     syncTag() {
@@ -99,11 +109,24 @@ export default {
   <div class="">
     <div class="mid-action">
       <div>
-        <el-button v-hasPermi="['customerManage:tag:add']" type="primary" @click="edit()">新建标签组</el-button>
-        <el-button v-hasPermi="['customerManage:tag:sync']" type="primary" plain @click="syncTag">同步标签组</el-button>
+        <el-button v-hasPermi="['customerManage:tag:add']" type="primary" @click="edit()"
+          >新建标签组</el-button
+        >
+        <el-button
+          v-if="type == 1"
+          v-hasPermi="['customerManage:tag:sync']"
+          type="primary"
+          plain
+          @click="syncTag"
+          >同步企微标签</el-button
+        >
       </div>
       <div>
-        <el-button v-hasPermi="['customerManage:tag:remove']" :disabled="!ids.length" type="danger" @click="remove()"
+        <el-button
+          v-hasPermi="['customerManage:tag:remove']"
+          :disabled="!ids.length"
+          type="danger"
+          @click="remove()"
           >批量删除</el-button
         >
       </div>
@@ -135,10 +158,16 @@ export default {
       </el-table-column>-->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button v-hasPermi="['customerManage:tag:edit']" type="text" @click="edit(scope.row, scope.index)"
+          <el-button
+            v-hasPermi="['customerManage:tag:edit']"
+            type="text"
+            @click="edit(scope.row, scope.index)"
             >编辑</el-button
           >
-          <el-button v-hasPermi="['customerManage:tag:remove']" @click="remove(scope.row.groupId)" type="text"
+          <el-button
+            v-hasPermi="['customerManage:tag:remove']"
+            @click="remove(scope.row.groupId)"
+            type="text"
             >删除</el-button
           >
         </template>
