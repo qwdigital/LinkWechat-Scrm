@@ -7,11 +7,11 @@ export default {
     // 选择客户群聊显隐
     visible: {
       type: Boolean,
-      default: false,
+      default: false
     },
     title: {
       type: String,
-      default: '选择客户群聊',
+      default: '选择客户群聊'
     },
     // 多选
     multiSelect: {
@@ -20,8 +20,8 @@ export default {
     },
     selected: {
       type: Array,
-      default: () => [],
-    },
+      default: () => []
+    }
   },
   data() {
     return {
@@ -32,19 +32,19 @@ export default {
         groupLeader: '',
         groupName: '',
         beginTime: '',
-        endTime: '',
+        endTime: ''
       },
       list: [], // 列表
       total: 0, // 总条数
       selectedGroup: '',
-      multiSelectedGroups: [],
+      multiSelectedGroups: []
     }
   },
   watch: {
-    selected (val) {
+    selected(val) {
       this.setSelected()
     },
-    list (val) {
+    list(val) {
       this.setSelected()
     }
   },
@@ -55,8 +55,8 @@ export default {
       },
       set(val) {
         this.$emit('update:visible', val)
-      },
-    },
+      }
+    }
   },
   created() {
     this.getList()
@@ -83,7 +83,7 @@ export default {
       this.$emit('success', this.multiSelect ? this.multiSelectedGroups : this.selectedGroup)
     },
 
-    setSelected () {
+    setSelected() {
       if (!this.selected.length) return
 
       this.list.forEach((code) => {
@@ -93,10 +93,10 @@ export default {
       })
     },
 
-    handleSelectionChange (val) {
+    handleSelectionChange(val) {
       this.multiSelectedGroups = val
     }
-  },
+  }
 }
 </script>
 
@@ -106,6 +106,7 @@ export default {
     :visible.sync="Pvisible"
     width="650px"
     append-to-body
+    :close-on-click-modal="false"
   >
     <div>
       <el-form ref="form" :model="query" label-width="">
@@ -138,37 +139,20 @@ export default {
       </el-form>
 
       <el-table :data="list" v-loading="loading" @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="50" align="center" v-if="multiSelect"/>
+        <el-table-column type="selection" width="50" align="center" v-if="multiSelect" />
         <el-table-column width="30" v-else>
           <template slot-scope="scope">
             <el-radio v-model="selectedGroup" :label="scope.row">'</el-radio>
           </template>
         </el-table-column>
 
-        <el-table-column
-          prop="groupName"
-          label="群名"
-          align="center"
-        ></el-table-column>
+        <el-table-column prop="groupName" label="群名" align="center"></el-table-column>
 
-        <el-table-column
-          prop="memberNum"
-          label="群人数"
-          align="center"
-        >
-        </el-table-column>
+        <el-table-column prop="memberNum" label="群人数" align="center"> </el-table-column>
 
-        <el-table-column
-          prop="groupLeaderName"
-          label="群主"
-          align="center"
-        ></el-table-column>
+        <el-table-column prop="groupLeaderName" label="群主" align="center"></el-table-column>
 
-        <el-table-column
-          prop="createTime"
-          label="创建时间"
-          align="center"
-        ></el-table-column>
+        <el-table-column prop="createTime" label="创建时间" align="center"></el-table-column>
       </el-table>
     </div>
     <div slot="footer">

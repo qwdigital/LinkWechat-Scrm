@@ -25,11 +25,16 @@ export default {
 </script>
 
 <template>
-  <MaPage ref="page" type="8" @listChange="listChange" :selected="ids" v-slot="{ list }">
+  <MaPage ref="page" type="9" @listChange="listChange" :selected="ids" v-slot="{ list }">
     <el-table :data="list" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" align="center" />
       <el-table-column label="小程序标题" align="center" prop="materialName"> </el-table-column>
-      <el-table-column label="小程序 AppID" align="center" prop="materialUrl" :show-overflow-tooltip="true" />
+      <el-table-column
+        label="小程序 AppID"
+        align="center"
+        prop="digest"
+        :show-overflow-tooltip="true"
+      />
       <el-table-column label="发送次数" align="center" prop="num" :show-overflow-tooltip="true" />
       <el-table-column label="最近更新时间" align="center" prop="updateTime"> </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">

@@ -8,7 +8,7 @@ export default {
     // 添加标签显隐
     visible: {
       type: Boolean,
-      default: false,
+      default: false
     },
     // title: {
     //   type: String,
@@ -17,19 +17,19 @@ export default {
     // 素材类型  0:'文本', 1：'图片'
     type: {
       type: String,
-      default: '0',
+      default: '0'
     },
     // 显示哪些素材类型标签
     showArr: {
       type: Array,
-      default: () => [0, 1],
-    },
+      default: () => [0, 1]
+    }
   },
   data() {
     return {
       text: {},
       image: {},
-      file: {},
+      file: {}
     }
   },
   watch: {},
@@ -40,7 +40,7 @@ export default {
       },
       set(val) {
         this.$emit('update:visible', val)
-      },
+      }
     },
     Ptype: {
       get() {
@@ -48,8 +48,8 @@ export default {
       },
       set(val) {
         this.$emit('update:type', val)
-      },
-    },
+      }
+    }
   },
   created() {},
   mounted() {},
@@ -63,13 +63,13 @@ export default {
     },
     changeImage(data) {
       this.image = data
-    },
-  },
+    }
+  }
 }
 </script>
 
 <template>
-  <el-dialog title="选择素材" :visible.sync="Pvisible" width="650px">
+  <el-dialog title="选择素材" :visible.sync="Pvisible" width="650px" :close-on-click-modal="false">
     <div>
       <el-tabs v-model="Ptype">
         <el-tab-pane name="0" v-if="showArr.includes(0)">

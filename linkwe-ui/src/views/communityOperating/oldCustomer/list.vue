@@ -182,9 +182,13 @@ export default {
     customerFilter() {
       const l = []
       for (let data of this.customerList) {
-        if (this.customerQuery.customerName !== '' && !this.customerQuery.customerName.includes(data.customerName))
+        if (
+          this.customerQuery.customerName !== '' &&
+          !this.customerQuery.customerName.includes(data.customerName)
+        )
           continue
-        if (this.customerQuery.isInGroup !== '' && this.customerQuery.isInGroup !== data.isInGroup) continue
+        if (this.customerQuery.isInGroup !== '' && this.customerQuery.isInGroup !== data.isInGroup)
+          continue
         if (this.customerQuery.isSent !== '' && this.customerQuery.isSent !== data.isSent) continue
 
         l.push(data)
@@ -265,7 +269,12 @@ export default {
 
     <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" align="center"></el-table-column>
-      <el-table-column label="任务名称" align="center" prop="taskName" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column
+        label="任务名称"
+        align="center"
+        prop="taskName"
+        :show-overflow-tooltip="true"
+      ></el-table-column>
       <el-table-column prop="sendType" label="发送方式" align="center">
         <template #default="{ row }">
           {{ parseInt(row.sendType) === 0 ? '企业群发' : '个人群发' }}
@@ -289,9 +298,19 @@ export default {
       </el-table-column>
 
       <el-table-column prop="createBy" label="创建人" align="center"></el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="160"></el-table-column>
+      <el-table-column
+        label="创建时间"
+        align="center"
+        prop="createTime"
+        width="160"
+      ></el-table-column>
 
-      <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
+      <el-table-column
+        label="操作"
+        align="center"
+        width="180"
+        class-name="small-padding fixed-width"
+      >
         <template slot-scope="scope">
           <el-button
             v-hasPermi="['enterpriseWechat:view']"
@@ -300,7 +319,11 @@ export default {
             @click="handleRemove(scope.row.taskId)"
             >删除</el-button
           >
-          <el-button v-hasPermi="['enterpriseWechat:edit']" size="mini" type="text" @click="goRoute(scope.row.taskId)"
+          <el-button
+            v-hasPermi="['enterpriseWechat:edit']"
+            size="mini"
+            type="text"
+            @click="goRoute(scope.row.taskId)"
             >编辑</el-button
           >
         </template>
@@ -315,12 +338,21 @@ export default {
       @pagination="getList()"
     />
 
-    <el-dialog title="客户统计" :visible.sync="dialogVisible">
+    <el-dialog title="客户统计" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <div>
         <div class="top-search">
-          <el-form inline label-position="right" :model="customerQuery" label-width="80px" ref="customerForm">
+          <el-form
+            inline
+            label-position="right"
+            :model="customerQuery"
+            label-width="80px"
+            ref="customerForm"
+          >
             <el-form-item prop="customerName">
-              <el-input v-model="customerQuery.customerName" placeholder="请输入客户名称"></el-input>
+              <el-input
+                v-model="customerQuery.customerName"
+                placeholder="请输入客户名称"
+              ></el-input>
             </el-form-item>
             <el-form-item prop="isInGroup">
               <el-select v-model="customerQuery.isInGroup" placeholder="全部" size="small">

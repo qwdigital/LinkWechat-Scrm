@@ -3,7 +3,9 @@
   <div class="add-sensitive-word">
     <el-form :inline="true" :model="form" class="demo-form-inline">
       <el-form-item label="">
-        <el-button type="primary" class="add-btn" icon="el-icon-plus" @click="addSensitive">添加敏感词</el-button>
+        <el-button type="primary" class="add-btn" icon="el-icon-plus" @click="addSensitive"
+          >添加敏感词</el-button
+        >
       </el-form-item>
       <el-form-item>
         <el-input v-model="form.patternWords" placeholder="搜索关键词" style="width:300px">
@@ -11,7 +13,12 @@
         </el-input>
       </el-form-item>
     </el-form>
-    <el-table :data="tableData" stripe style="width: 100%" :header-cell-style="{ background: '#fff' }">
+    <el-table
+      :data="tableData"
+      stripe
+      style="width: 100%"
+      :header-cell-style="{ background: '#fff' }"
+    >
       <el-table-column prop="strategyName" label="策略名称"> </el-table-column>
       <el-table-column prop="patternWords" label="匹配词"> </el-table-column>
       <el-table-column prop="auditScopeName" label="审计范围">
@@ -32,8 +39,12 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)">修改</el-button>
-          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)">删除</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)"
+            >修改</el-button
+          >
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)"
+            >删除</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -45,7 +56,13 @@
       @pagination="getSettingList()"
     />
     <!-- 添加敏感词 -->
-    <el-dialog title="添加敏感词" :visible.sync="open" width="600px" append-to-body>
+    <el-dialog
+      title="添加敏感词"
+      :visible.sync="open"
+      width="600px"
+      append-to-body
+      :close-on-click-modal="false"
+    >
       <el-form ref="addForm" :model="addForm" :rules="rules" label-width="130px">
         <el-form-item label="敏感词策略名称" prop="strategyName">
           <el-input v-model="addForm.strategyName" placeholder="例：红包" />
@@ -60,7 +77,9 @@
               >请选择<span class="prompt-title">若不选择，则默认全体成员</span></span
             >
             <template v-else>
-              <el-tag type="info" v-for="(unit, unique) in auditUserRange" :key="unique">{{ unit.name }}</el-tag>
+              <el-tag type="info" v-for="(unit, unique) in auditUserRange" :key="unique">{{
+                unit.name
+              }}</el-tag>
             </template>
           </div>
         </el-form-item>
@@ -70,7 +89,9 @@
               >请选择<span class="prompt-title">请选择部门负责人</span></span
             >
             <template v-else>
-              <el-tag type="info" v-for="(unit, unique) in auditUser" :key="unique">{{ unit.name }}</el-tag>
+              <el-tag type="info" v-for="(unit, unique) in auditUser" :key="unique">{{
+                unit.name
+              }}</el-tag>
             </template>
           </div>
         </el-form-item>
@@ -84,7 +105,11 @@
       </div>
     </el-dialog>
     <!-- 选择审计范围弹窗 -->
-    <SelectUser :visible.sync="dialogVisibleSelectUser" title="选择添加人" @success="selectedUser"></SelectUser>
+    <SelectUser
+      :visible.sync="dialogVisibleSelectUser"
+      title="选择添加人"
+      @success="selectedUser"
+    ></SelectUser>
     <!-- 选择审计人弹窗 -->
     <SelectUser
       :visible.sync="dialogVisibleSelectAuditUser"

@@ -141,7 +141,7 @@ export default {
 </script>
 setChecked
 <template>
-  <el-dialog :title="title" :visible.sync="Pvisible">
+  <el-dialog :title="title" :visible.sync="Pvisible" :close-on-click-modal="false">
     <el-row :gutter="20">
       <!--部门数据-->
       <el-col :span="12" :xs="24">

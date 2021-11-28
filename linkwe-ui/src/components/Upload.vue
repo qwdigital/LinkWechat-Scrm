@@ -17,6 +17,11 @@ export default {
     type: {
       type: String,
       default: '0'
+    },
+    // 上传文件大小不能超过 maxSize MB
+    maxSize: {
+      type: Number,
+      default: 2
     }
     // beforeUpload: {
     //   type: Function,
@@ -33,7 +38,7 @@ export default {
       //   ? '/wecom/material/uploadimg'
       //   : '/common/uploadFile2Cos'),
       headers: window.CONFIG.headers,
-      domain: process.env.VUE_APP_BASE_API,
+      domain: process.env.VUE_APP_BASE_API
     }
   },
   watch: {},
@@ -52,7 +57,7 @@ export default {
       if (this.type === '0') {
         // 图片
         isFormat = file.type === 'image/jpeg' || file.type === 'image/png'
-        isSize = file.size / 1024 / 1024 < 2
+        isSize = file.size / 1024 / 1024 < this.maxSize
 
         if (!isFormat) {
           this.$message.error('上传文件只能是 JPG 格式!')

@@ -124,7 +124,11 @@ export default {
             {{ row.sideName }}
           </span>
 
-          <i v-if="!row.isEdit" class="row-icon el-icon-edit" @click="$set(row, 'isEdit', true)"></i>
+          <i
+            v-if="!row.isEdit"
+            class="row-icon el-icon-edit"
+            @click="$set(row, 'isEdit', true)"
+          ></i>
           <i v-else class="row-icon el-icon-circle-check" @click="update(row)"></i>
         </template>
       </el-table-column>
@@ -201,7 +205,11 @@ export default {
       </el-row>
     </el-card> -->
 
-    <el-dialog :title="`抓取${mediaType[metarialParams.mediaType]}类型素材库`" :visible.sync="dialogVisible">
+    <el-dialog
+      :title="`抓取${mediaType[metarialParams.mediaType]}类型素材库`"
+      :visible.sync="dialogVisible"
+      :close-on-click-modal="false"
+    >
       <SelectMaterialMult
         isCheck
         :selected.sync="selectedMaterial"

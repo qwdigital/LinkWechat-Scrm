@@ -7,7 +7,7 @@ const serviceCategory = window.CONFIG.services.wecom + '/category'
  * @param {*} params 
  * { categoryId:类目id
 search:搜索的值
-mediaType: '' 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file), 4 文本
+mediaType: ''  0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file)， 4 文本， 5 海报， 6 海报字体"， 7 图文， 8 链接，9 小程序
  }
  */
 export function getList(params) {
@@ -74,7 +74,7 @@ export function upload(data) {
   return request({
     url: service + '/upload',
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -92,8 +92,8 @@ export function moveGroup(categoryId, materials) {
     method: 'put',
     data: {
       categoryId,
-      materials,
-    },
+      materials
+    }
   })
 }
 
@@ -146,7 +146,7 @@ export function updateTree(data) {
 export function removeTree(ids) {
   return request({
     url: serviceCategory + '/' + ids,
-    method: 'DELETE',
+    method: 'DELETE'
   })
 }
 
@@ -161,6 +161,6 @@ export function getMaterialMediaId(data) {
   return request({
     url: service + '/temporaryMaterialMediaIdForWeb',
     method: 'POST',
-    data,
+    data
   })
 }

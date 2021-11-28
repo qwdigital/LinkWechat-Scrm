@@ -13,6 +13,12 @@ import {
   moveGroup
 } from '@/api/material'
 
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+
+import { quillEditor } from 'vue-quill-editor'
+
 // import {
 //   getList
 // } from '@/api/material/poster'
@@ -33,9 +39,9 @@ var validateHttp = (rule, value, callback) => {
 }
 export default {
   name: 'MaPage',
-  components: {},
+  components: { quillEditor },
   props: {
-    // "0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本 5 海报 6 海报字体",
+    // 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file)， 4 文本， 5 海报， 6 海报字体"， 7 图文， 8 链接，9 小程序
     type: {
       type: String,
       default: '0'
@@ -80,7 +86,18 @@ export default {
         emitPath: false
       },
 
-      typeTitle: ['图片', '语音', '视频', '文件', '文本', '海报', '海报字体'],
+      typeTitle: [
+        '图片',
+        '语音',
+        '视频',
+        '文件',
+        '文本',
+        '海报',
+        '海报字体',
+        '图文',
+        '链接',
+        '小程序'
+      ],
       form: {}, // 素材表单
       dialogVisible: false, // 素材表格对话框显隐
       // 表单校验
@@ -91,9 +108,13 @@ export default {
         materialName: [{ required: true, message: '不能为空', trigger: 'blur' }],
         digest: [{ required: true, message: '不能为空', trigger: 'blur' }],
         coverUrl: [{ required: true, message: '不能为空', trigger: 'blur' }],
-        coUrl: [
+        html: [
           { required: true, message: '不能为空', trigger: 'blur' },
           { validator: validateHtml, trigger: 'blur' }
+        ],
+        http: [
+          { required: true, message: '不能为空', trigger: 'blur' },
+          { validator: validateHttp, trigger: 'blur' }
         ]
       })
     }
@@ -369,6 +390,7 @@ export default {
       :title="(treeForm.id ? '修改' : '添加') + '分类'"
       :visible.sync="treeDialogVisible"
       width="400px"
+      :close-on-click-modal="false"
     >
       <el-form ref="treeForm" :model="treeForm">
         <el-form-item>
@@ -396,6 +418,7 @@ export default {
       :visible.sync="dialogVisible"
       width="600px"
       append-to-body
+      :close-on-click-modal="false"
     >
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="选择分组" prop="categoryId">
@@ -415,6 +438,7 @@ export default {
           ></el-input>
         </el-form-item>
 
+        <!-- 图片 -->
         <template v-else-if="type === '0'">
           <el-form-item label="文案" prop="content">
             <el-input
@@ -425,11 +449,7 @@ export default {
             ></el-input>
           </el-form-item>
           <el-form-item label="图片" prop="materialUrl">
-            <upload
-              :fileUrl.sync="form.materialUrl"
-              :fileName.sync="form.materialName"
-              :type="type"
-            >
+            <upload :fileUrl.sync="form.materialUrl" :fileName.sync="form.materialName" type="0">
               <div slot="tip">
                 支持JPG,PNG格式，图片大小不超过2M，建议上传宽高1:1的图片
               </div>
@@ -440,6 +460,7 @@ export default {
           </el-form-item>
         </template>
 
+        <!-- 图文 -->
         <template v-else-if="type === '7'">
           <el-form-item label="图文标题" prop="materialName">
             <el-input
@@ -450,9 +471,9 @@ export default {
               placeholder="请输入图文标题"
             ></el-input>
           </el-form-item>
-          <el-form-item label="图文摘要" prop="content">
+          <el-form-item label="图文摘要" prop="digest">
             <el-input
-              v-model="form.content"
+              v-model="form.digest"
               type="textarea"
               :maxlength="200"
               show-word-limit
@@ -460,44 +481,21 @@ export default {
               placeholder="请输入"
             ></el-input>
           </el-form-item>
-          <el-form-item label="上传封面" prop="materialUrl">
-            <upload
-              :fileUrl.sync="form.materialUrl"
-              :fileName.sync="form.materialName"
-              :type="type"
-            >
+          <el-form-item label="上传封面" prop="coverUrl">
+            <upload :fileUrl.sync="form.coverUrl" type="0">
               <div slot="tip">
                 支持JPG,PNG格式，图片大小不超过2M，建议上传宽高1:1的图片
               </div>
             </upload>
           </el-form-item>
           <el-form-item label="内容">
-            <!-- 富文本 -->
+            <!-- 富文本content -->
+            <quill-editor v-model="form.content" ref="myQuillEditor"> </quill-editor>
           </el-form-item>
         </template>
 
+        <!-- 链接 -->
         <template v-else-if="type === '8'">
-          <el-form-item label="标题" prop="materialName">
-            <el-input v-model="form.materialName" placeholder="请输入小程序标题"></el-input>
-          </el-form-item>
-          <el-form-item label="AppID" prop="materialUrl">
-            <el-input v-model="form.materialUrl" placeholder="小程序AppID"></el-input>
-            <div class="sub-des">必须是审核通过，正常发布，且关联到企业的小程序应用</div>
-          </el-form-item>
-          <el-form-item label="路径" prop="content">
-            <el-input v-model="form.content" placeholder="请输入小程序路径"></el-input>
-            <div class="sub-des">必须以 html 作为后缀</div>
-          </el-form-item>
-          <el-form-item label="封面" prop="materialUrl">
-            <upload :fileUrl.sync="form.coverUrl" type="0">
-              <div slot="tip">
-                建议大小 2M 以内，建议尺寸 520*416仅支持 png/jpg 等图片类型
-              </div>
-            </upload>
-          </el-form-item>
-        </template>
-
-        <template v-else-if="type === '9'">
           <el-form-item label="链接标题" prop="materialName">
             <el-input
               v-model="form.materialName"
@@ -507,9 +505,31 @@ export default {
               placeholder="请输入链接标题"
             ></el-input>
           </el-form-item>
-          <el-form-item label="链接" prop="content">
-            <el-input v-model="form.content" placeholder="请输入链接"></el-input>
+          <el-form-item label="链接" prop="materialUrl" :rules="rules.http">
+            <el-input v-model="form.materialUrl" placeholder="请输入链接"></el-input>
             <div class="sub-des">必须以 http://或 https://开头</div>
+          </el-form-item>
+        </template>
+
+        <!-- 小程序标题 -->
+        <template v-else-if="type === '9'">
+          <el-form-item label="标题" prop="materialName">
+            <el-input v-model="form.materialName" placeholder="请输入小程序标题"></el-input>
+          </el-form-item>
+          <el-form-item label="AppID" prop="digest">
+            <el-input v-model="form.digest" placeholder="小程序AppID"></el-input>
+            <div class="sub-des">必须是审核通过，正常发布，且关联到企业的小程序应用</div>
+          </el-form-item>
+          <el-form-item label="路径" prop="materialUrl" :rules="rules.html">
+            <el-input v-model="form.materialUrl" placeholder="请输入小程序路径"></el-input>
+            <div class="sub-des">必须以 html 作为后缀</div>
+          </el-form-item>
+          <el-form-item label="封面" prop="coverUrl">
+            <upload :fileUrl.sync="form.coverUrl" type="0">
+              <div slot="tip">
+                建议大小 2M 以内，建议尺寸 520*416，仅支持 png/jpg 等图片类型
+              </div>
+            </upload>
           </el-form-item>
         </template>
 
@@ -561,6 +581,7 @@ export default {
           </el-form-item>
         </template>
 
+        <!-- 文件 -->
         <template v-else-if="type === '3'">
           <el-form-item label="文件" prop="materialUrl">
             <upload
@@ -599,5 +620,9 @@ export default {
 .sub-des {
   color: #aaa;
   font-size: 12px;
+}
+
+::v-deep .ql-editor {
+  height: 300px;
 }
 </style>
