@@ -49,7 +49,6 @@ export default {
     },
     //停止播放
     stop(noset) {
-      console.log(1)
       if (this.$playRec && this.$playRec.isPlaying()) {
         this.$playRec.stop()
         if (!noset || this.__proto__.$playRecSymbole === this.amrUrl) {
