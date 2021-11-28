@@ -8,7 +8,12 @@
         <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
           <h3 class="title">LinkWeChat</h3>
           <el-form-item prop="username">
-            <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
+            <el-input
+              v-model="loginForm.username"
+              type="text"
+              auto-complete="off"
+              placeholder="账号"
+            >
               <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
             </el-input>
           </el-form-item>
@@ -37,8 +42,13 @@
               <img :src="codeUrl" @click="getCode" class="login-code-img" />
             </div>
           </el-form-item>
-          <el-checkbox class="fr" v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
-          <el-checkbox v-model="isDemonstrationLogin" @change="changeDemonAccount" style="margin:0px 0px 25px 0px;"
+          <el-checkbox class="fr" v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;"
+            >记住密码</el-checkbox
+          >
+          <el-checkbox
+            v-model="isDemonstrationLogin"
+            @change="changeDemonAccount"
+            style="margin:0px 0px 25px 0px;"
             >演示账号登录</el-checkbox
           >
           <el-form-item style="width:100%;">
@@ -53,7 +63,7 @@
               <span v-else>登 录 中...</span>
             </el-button>
           </el-form-item>
-          <el-form-item class="ac" v-if="authLink">
+          <!-- <el-form-item class="ac" v-if="authLink">
             <a :href="authLink">
               <img
                 src="//wwcdn.weixin.qq.com/node/wwopen/wwopenmng/style/images/independent/brand/300x40_white$4dab5411.png"
@@ -63,7 +73,7 @@
                 alt="企业微信登录"
               />
             </a>
-          </el-form-item>
+          </el-form-item> -->
         </el-form>
       </div>
     </div>
@@ -159,7 +169,7 @@ export default {
   },
   methods: {
     getCode() {
-      getCodeImg().then((res) => {
+      getCodeImg().then(res => {
         this.codeUrl = 'data:image/gif;base64,' + res.img
         this.loginForm.uuid = res.uuid
       })
@@ -175,7 +185,7 @@ export default {
       }
     },
     handleLogin() {
-      this.$refs.loginForm.validate((valid) => {
+      this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
           if (this.loginForm.rememberMe) {
