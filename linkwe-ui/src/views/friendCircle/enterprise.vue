@@ -85,6 +85,36 @@
     </el-table>
     <pagination :total="total" :page.sync="query.pageNum" :limit.sync="query.pageSize" @pagination="getList()" />
     <SelectUser :visible.sync="dialogVisible" title="组织架构" :defaultValues="userArray" @success="getSelectUser"></SelectUser>
+    <el-dialog title="详情" :visible.sync="detailDialogVisible" width="40%">
+      <el-form label-position="right" label-width="100px">
+        <el-form-item label="内容：">
+          {{detail.content}}
+        </el-form-item>
+        <el-form-item v-if="detail.otherContent" label=" ">
+          <template v-for="(data, index) in detail.otherContent">
+            <div style="display:inline-block;margin-right:10px;" v-if="data.annexType === 'image'">
+              <el-image style="width: 100px; height: 100px" :src="data.annexUrl"></el-image>
+            </div>
+            <div style="display:inline-block;margin-right:10px;" v-else-if="data.annexType === 'video'">
+              <video style="width: 100px; height: 100px" :src="data.annexUrl"></video>
+            </div>
+            <div style="display:inline-block;margin-right:10px;" v-else-if="data.annexType === 'link'">
+              <video style="width: 100px; height: 100px" :src="data.annexUrl"></video>
+            </div>
+          </template>
+        </el-form-item>
+        <el-form-item label="已发送员工" v-if="detail.addUserName">
+          <el-tag v-for="(data, key) in detail.addUserName.split(',')" :key="key">{{data}}</el-tag>
+        </el-form-item>
+        <el-form-item label="未发送员工" v-if="detail.noAddUserName">
+          <el-tag v-for="(data, key) in detail.noAddUserName.split(',')" :key="key">{{data}}</el-tag>
+        </el-form-item>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="detailDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="detailDialogVisible = false">确 定</el-button>
+        </span>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -112,7 +142,9 @@
         loading: false,
         tableData: [],
         total: 0,
-        lastSyncTime: ''
+        lastSyncTime: '',
+        detailDialogVisible: false,
+        detail: {}
       }
     },
     methods: {
@@ -121,7 +153,12 @@
         this.query.endTime = moment(e[1]).format('YYYY-MM-DD')
       },
       detailFn (id) {
-        getDetail(id)
+        this.detailDialogVisible = true
+        getDetail(id).then(dd => {
+          if (dd.code === 200) {
+            this.detail = dd.data
+          }
+        })
       },
       syncFn () {
         syncHMoments({ filterType: 0 }).then(res => {

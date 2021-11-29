@@ -33,7 +33,7 @@
           <!-- 附件 -->
           <div class="g-card g-pad20" v-for="(item, index) in form.materialMsgList" :key="index">
             <!-- 文本 -->
-            <div class="my-cord" v-if="item.msgType == 4">
+            <div class="my-cord" v-if="item.msgType == '4'">
               <div class="operation">
                 <div v-if="showMorMaterial" class="algin" @click="onChooseMaterial(item.msgType, index)">
                   <img style="margin-right: 3px" :src="require('@/assets/drainageCode/code-add.png')" alt="" />从素材中选择
@@ -47,7 +47,7 @@
               </el-form-item>
             </div>
             <!-- 图片上传 -->
-            <div class="my-cord" v-else-if="item.msgType == 0">
+            <div class="my-cord" v-else-if="item.msgType == '0'">
               <div class="operation">
                 <div v-if="showMorMaterial" class="algin" @click="onChooseMaterial(item.msgType, index)">
                   <img style="margin-right: 3px" :src="require('@/assets/drainageCode/code-add.png')" alt="" />从素材中选择
@@ -61,7 +61,7 @@
               </el-form-item>
             </div>
             <!-- 图文 -->
-            <div class="my-cord" v-else-if="item.msgType == 7">
+            <div class="my-cord" v-else-if="item.msgType == '7'">
               <div class="operation">
                 <div v-if="showMorMaterial" class="algin" @click="onChooseMaterial(item.msgType, index)">
                   <img style="margin-right: 3px" :src="require('@/assets/drainageCode/code-add.png')" alt="" />从素材中选择
@@ -81,7 +81,7 @@
               </el-form-item>
             </div>
             <!-- 小程序 -->
-            <div class="my-cord" v-else-if="item.msgType == 8">
+            <div class="my-cord" v-else-if="item.msgType == '8'">
               <div class="operation">
                 <div v-if="showMorMaterial" class="algin" @click="onChooseMaterial(item.msgType, index)">
                   <img style="margin-right: 3px" :src="require('@/assets/drainageCode/code-add.png')" alt="" />从素材中选择
@@ -119,13 +119,13 @@
                 <!-- <el-dropdown-item :command="4">
                   <el-button type="text">文字</el-button>
                 </el-dropdown-item> -->
-                <el-dropdown-item :command="0">
+                <el-dropdown-item :command="'0'">
                   <el-button type="text">图片</el-button>
                 </el-dropdown-item>
-                <el-dropdown-item :command="7">
+                <el-dropdown-item :command="'7'">
                   <el-button type="text">图文</el-button>
                 </el-dropdown-item>
-                <el-dropdown-item :command="8">
+                <el-dropdown-item :command="'8'">
                   <el-button type="text">小程序</el-button>
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -165,7 +165,6 @@
         <el-button type="primary" @click="selectWelcome">确 定</el-button>
       </div>
     </el-dialog>
-
     <SelectUser :defaultValues="selectedUserList" :visible.sync="dialogVisibleSelectUser" title="选择使用员工" @success="selectedUser"></SelectUser>
   </div>
 </template>
@@ -228,6 +227,7 @@
     },
     watch: {
       baseData (val) {
+        console.log(2222)
         if (val.welcomeMsg) {
           this.form = val
         }
@@ -336,21 +336,21 @@
         let materialList = this.form.materialMsgList
 
         const validateFields = {
-          4: [
+          '4': [
             {
               checkField: 'content',
               errorField: 'contentError',
               errorMsg: '请输入文本'
             }
           ],
-          0: [
+          '0': [
             {
               checkField: 'materialUrl',
               errorField: 'materialUrlError',
               errorMsg: '请上传图片'
             }
           ],
-          7: [
+          '7': [
             {
               checkField: 'materialName',
               errorField: 'materialNameError',
@@ -362,7 +362,7 @@
               errorMsg: '请输入图文链接'
             }
           ],
-          8: [
+          '8': [
             {
               checkField: 'materialName',
               errorField: 'materialNameError',
@@ -427,14 +427,14 @@
         if (checkMaterialResult) {
           let goto = true
           this.form.materialMsgList.forEach((dd) => {
-            if (dd.msgType === 7) {
+            if (dd.msgType === '7') {
               let reUrl = /(http|https):\/\/([\w.]+\/?)\S*/
               if (!reUrl.test(dd.content)) {
                 goto = false
                 dd.contentError = '必须以 http://或 https://开头'
               }
             }
-            if (dd.msgType === 8) {
+            if (dd.msgType === '8') {
               let htm = /^.*html$/
               if (!htm.test(dd.content)) {
                 goto = false

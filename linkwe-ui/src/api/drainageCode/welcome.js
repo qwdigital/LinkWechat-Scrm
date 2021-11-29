@@ -4,16 +4,10 @@ const service = window.CONFIG.services.wecom + '/tlp'
 /**
  * 获取欢迎语列表
  * @param {*} params 
-{
-    "pageNum": "当前页",
-    "pageSize": "每页显示条数",
-    "welcomeMsg": "欢迎语关键词",
-    "welcomeMsgTplType": " 欢迎语模板类型:1:员工欢迎语;2:部门员工欢迎语;3:客户群欢迎语"
-}
  */
-export function getList(params) {
+export function getList (params) {
   return request({
-    url: service + '/list',
+    url: '/wecom/tlp/list',
     params
   })
 }
@@ -22,7 +16,7 @@ export function getList(params) {
  * 根据欢迎语模板id获取模板使用范围
  * @param {*} id
  */
-export function getScop(id) {
+export function getScop (id) {
   return request({
     url: service + '/scop/' + id
   })
@@ -49,9 +43,9 @@ export function getScop(id) {
 "userIds":"ShengXiYong,SunXiWang" //员工欢迎语使用范围，员工id用逗号隔开
 }
  */
-export function addOrUpdate(data) {
+export function addOrUpdate (data) {
   return request({
-    url: service + '/addorUpdate',
+    url: '/wecom/tlp/addorUpdate',
     method: 'POST',
     data
   })
@@ -81,17 +75,17 @@ export function addOrUpdate(data) {
  * 删除欢迎语
  * @param {*} ids
  */
-export function remove(ids) {
+export function remove (ids) {
   return request({
-    url: service + '/' + ids,
+    url: '/wecom/tlp/remove/' + ids,
     method: 'DELETE'
   })
 }
 
 // 预览数据
-export function getPreview(id) {
+export function getPreview (id) {
   return request({
-    url: service + '/tlp/preview',
+    url: '/wecom/tlp/preview',
     params: {
       id
     }
