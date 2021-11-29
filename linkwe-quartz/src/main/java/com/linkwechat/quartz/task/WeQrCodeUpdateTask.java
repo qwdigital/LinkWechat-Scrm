@@ -49,44 +49,53 @@ public class WeQrCodeUpdateTask {
         List<WeQrScopeVo> weQrScopeList = weQrScopeService.getWeQrScopeByTime(week.getValue(), formatTime);
 
         if (CollectionUtil.isNotEmpty(weQrScopeList)) {
-            for (WeQrScopeVo weQrScope : weQrScopeList) {
-                WeQrCode weQrCode = weQrCodeService.getById(weQrScope.getQrId());
-                String configId = weQrCode.getConfigId();
-                WeContactWayDto contactWay = externalContactClient.getContactWay(configId);
-                if (contactWay != null && ObjectUtil.equal(0, contactWay.getErrcode())) {
-                    String userIds = "";
-                    String partys = "";
-                    String qrUserIds = "";
-                    String qrPartys = "";
-                    if (CollectionUtil.isNotEmpty(contactWay.getContactWay().getUser())) {
-                        userIds = String.join(",", contactWay.getContactWay().getUser());
-                    }
-                    if (CollectionUtil.isNotEmpty(contactWay.getContactWay().getParty())) {
-                        partys = contactWay.getContactWay().getParty().stream().map(String::valueOf).collect(Collectors.joining(","));
-                    }
-                    if (CollectionUtil.isNotEmpty(weQrScope.getWeQrUserList())) {
-                        qrUserIds = weQrScope.getWeQrUserList().stream().map(WeQrScopeUserVo::getUserId).collect(Collectors.joining(","));
-                    }
-                    if (CollectionUtil.isNotEmpty(weQrScope.getWeQrPartyList())) {
-                        qrPartys = weQrScope.getWeQrPartyList().stream().map(WeQrScopePartyVo::getParty).collect(Collectors.joining(","));
-                    }
-
-                    if (!ObjectUtil.equal(qrUserIds, userIds) || !ObjectUtil.equal(qrPartys, partys)) {
-                        WeExternalContactDto.WeContactWay weContactWay = new WeExternalContactDto.WeContactWay();
-                        weContactWay.setConfig_id(configId);
-                        if (StringUtils.isNotEmpty(qrUserIds)) {
-                            weContactWay.setUser(qrUserIds.split(","));
-                        }
-                        if (StringUtils.isNotEmpty(qrPartys)) {
-                            Long[] qrPartyList = Arrays.stream(qrPartys.split(","))
-                                    .map(s -> Long.parseLong(s.trim())).toArray(Long[]::new);
-                            weContactWay.setParty(qrPartyList);
-                        }
-                        externalContactClient.updateContactWay(weContactWay);
-                    }
+            List<WeQrScopeVo> weCustomizeQrScopeList = weQrScopeList.stream().filter(item -> ObjectUtil.equal(1, item.getType())).collect(Collectors.toList());
+            if (CollectionUtil.isNotEmpty(weCustomizeQrScopeList)) {
+                weCustomizeQrScopeList.forEach(this::extracted);
+            } else {
+                WeQrScopeVo weDefaultQrScope = weQrScopeList.stream().filter(item -> ObjectUtil.equal(0, item.getType())).findFirst().orElse(null);
+                if (weDefaultQrScope != null) {
+                    extracted(weDefaultQrScope);
                 }
             }
+        }
+    }
 
+    private void extracted(WeQrScopeVo weQrScope) {
+        WeQrCode weQrCode = weQrCodeService.getById(weQrScope.getQrId());
+        String configId = weQrCode.getConfigId();
+        WeContactWayDto contactWay = externalContactClient.getContactWay(configId);
+        if (contactWay != null && ObjectUtil.equal(0, contactWay.getErrcode())) {
+            String userIds = "";
+            String partys = "";
+            String qrUserIds = "";
+            String qrPartys = "";
+            if (CollectionUtil.isNotEmpty(contactWay.getContactWay().getUser())) {
+                userIds = String.join(",", contactWay.getContactWay().getUser());
+            }
+            if (CollectionUtil.isNotEmpty(contactWay.getContactWay().getParty())) {
+                partys = contactWay.getContactWay().getParty().stream().map(String::valueOf).collect(Collectors.joining(","));
+            }
+            if (CollectionUtil.isNotEmpty(weQrScope.getWeQrUserList())) {
+                qrUserIds = weQrScope.getWeQrUserList().stream().map(WeQrScopeUserVo::getUserId).collect(Collectors.joining(","));
+            }
+            if (CollectionUtil.isNotEmpty(weQrScope.getWeQrPartyList())) {
+                qrPartys = weQrScope.getWeQrPartyList().stream().map(WeQrScopePartyVo::getParty).collect(Collectors.joining(","));
+            }
+
+            if (!ObjectUtil.equal(qrUserIds, userIds) || !ObjectUtil.equal(qrPartys, partys)) {
+                WeExternalContactDto.WeContactWay weContactWay = new WeExternalContactDto.WeContactWay();
+                weContactWay.setConfig_id(configId);
+                if (StringUtils.isNotEmpty(qrUserIds)) {
+                    weContactWay.setUser(qrUserIds.split(","));
+                }
+                if (StringUtils.isNotEmpty(qrPartys)) {
+                    Long[] qrPartyList = Arrays.stream(qrPartys.split(","))
+                            .map(s -> Long.parseLong(s.trim())).toArray(Long[]::new);
+                    weContactWay.setParty(qrPartyList);
+                }
+                externalContactClient.updateContactWay(weContactWay);
+            }
         }
     }
 }
