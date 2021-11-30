@@ -30,10 +30,7 @@
           id: '',
           welcomeMsgTplType: '',
           welcomeMsg: '',
-          picUrl: '',
-          applet: [],
-          imageText: [],
-          userIds: ''
+          materialMsgList: []
         },
         // 遮罩层
         loading: false,
@@ -46,6 +43,7 @@
       this.form.id = this.$route.query.id
       let data = JSON.parse(localStorage.getItem('obj'))
       this.form = Object.assign(this.form, data)
+      this.form.welcomeMsgTplType = this.form.welcomeMsgTplType.toString()
       this.name = this.form.welcomeMsgTplType === '1' ? '活码' : this.form.welcomeMsgTplType === '2' ? '员工' : '入群'
       this.type = this.form.id ? '编辑' : '新建'
       this.$route.meta.title = (this.form.id ? '编辑' : '新建') + '欢迎语'
@@ -107,6 +105,18 @@
         // getPreview(this.form.id).then(({ data }) => {
         this.materialData = this.form
         console.log(this.materialData)
+        this.materialData.users = []
+        if (this.materialData.userIds) {
+          let name = this.materialData.userNames.split(',')
+          this.materialData.userIds.split(',').forEach((ddd, index) => {
+            let obj = {
+              useUserId: ddd,
+              userName: name[index]
+            }
+            this.materialData.users.push(obj)
+          })
+        }
+        console.log(this.materialData.users)
         this.materialData.materialMsgList = []
         let img = []
         let imgText = []

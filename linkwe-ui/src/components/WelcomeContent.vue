@@ -227,7 +227,6 @@
     },
     watch: {
       baseData (val) {
-        console.log(2222)
         if (val.welcomeMsg) {
           this.form = val
         }
@@ -422,8 +421,6 @@
           this.welcomeMsgError = ''
         }
         const checkMaterialResult = this.validateMaterial()
-        console.log(this.form)
-
         if (checkMaterialResult) {
           let goto = true
           this.form.materialMsgList.forEach((dd) => {
@@ -442,6 +439,7 @@
               }
             }
           })
+          this.$forceUpdate()
           if (goto) {
             // this.msgInfo('校验通过')
             this.$emit('submit', this.form)
