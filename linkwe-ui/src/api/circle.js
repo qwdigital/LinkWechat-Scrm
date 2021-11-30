@@ -23,3 +23,12 @@ export function getDetail (id) {
   })
 }
 
+// 朋友圈  企业  发布动态
+export function gotoPublish (data) {
+  return request({
+    url: '/wecom/moments/addOrUpdate',
+    method: 'post',
+    data: data
+  })
+}
+

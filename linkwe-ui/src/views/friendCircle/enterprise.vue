@@ -18,7 +18,7 @@
     </div>
     <div>
       <div style="margin:10px 0;display:flex;">
-        <el-button type="primary" size="mini">发表动态</el-button>
+        <el-button type="primary" size="mini" @click="gotoRoute">发表动态</el-button>
         <el-button type="primary" size="mini" @click="syncFn">同步朋友圈</el-button>
         <div class="time" v-if="lastSyncTime">{{lastSyncTime}}</div>
         <div class="time" v-else>暂无记录，请手动点击同步</div>
@@ -148,6 +148,11 @@
       }
     },
     methods: {
+      gotoRoute () {
+        this.$router.push({
+          path: '/customerMaintain/enterprise/publish'
+        })
+      },
       setTimeChange (e) {
         this.query.beginTime = moment(e[0]).format('YYYY-MM-DD')
         this.query.endTime = moment(e[1]).format('YYYY-MM-DD')
