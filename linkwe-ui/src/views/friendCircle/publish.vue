@@ -38,7 +38,7 @@
                   <img style="margin-right: 3px; height: 12px; width: 12px" :src="require('@/assets/drainageCode/delete.png')" alt="" />删除
                 </div>
               </div>
-              <el-form-item label="图片上传" required>
+              <el-form-item label="图片上传" required :error="item.contentError">
                 <upload class="image-uploader" :fileUrl.sync="item.annexUrl" type="0"></upload>
               </el-form-item>
             </div>
@@ -49,7 +49,7 @@
                   <img style="margin-right: 3px; height: 12px; width: 12px" :src="require('@/assets/drainageCode/delete.png')" alt="" />删除
                 </div>
               </div>
-              <el-form-item label="图文链接" style="width: 50%" required>
+              <el-form-item label="图文链接" style="width: 50%" required :error="item.contentError">
                 <el-input v-model="item.annexUrl" placeholder="请输入图文链接"></el-input>
                 <div class="sub-des">
                   仅支持公众号图文链接，且必须以 http://或 https://开头
@@ -62,7 +62,7 @@
                   <img style="margin-right: 3px; height: 12px; width: 12px" :src="require('@/assets/drainageCode/delete.png')" alt="" />删除
                 </div>
               </div>
-              <el-form-item label="视频上传" required>
+              <el-form-item label="视频上传" required :error="item.contentError">
                 <upload class="image-uploader" :fileUrl.sync="item.annexUrl" type="2"></upload>
               </el-form-item>
             </div>
@@ -108,10 +108,6 @@ import { gotoPublish } from '@/api/circle'
   import SelectTag from '@/components/SelectTag'
   import SelectUser from '@/components/SelectUser'
   import upload from '@/components/Upload'
-  const materialField = {
-    annexType: "",
-    annexUrl: ""
-  }
   export default {
     name: 'publish-detail',
     components: {
@@ -158,7 +154,8 @@ import { gotoPublish } from '@/api/circle'
         this.form.contentType = e
         this.form.otherContent.push({
           annexType: e,
-          annexUrl: ''
+          annexUrl: '',
+          contentError:''
         })
       },
       onRemoveMaterial (index) {
@@ -171,7 +168,18 @@ import { gotoPublish } from '@/api/circle'
       onBackStep () {
         this.$router.go(-1)
       },
-
+      validateMaterial () {
+        let goto = true
+        this.form.otherContent.forEach(dd => {
+          if (!dd.annexUrl) {
+            dd.contentError = '内容不能为空'
+            goto = false
+          } else {
+            dd.contentError =''
+          }
+        })
+        return goto
+      },
       submit () {
         if (!this.form.content) {
           this.welcomeMsgError = '请输入动态内容'
@@ -187,24 +195,28 @@ import { gotoPublish } from '@/api/circle'
             return dd.userId
           }).join(',')
         }
-        let goto = true
-        this.form.otherContent.forEach((dd) => {
-          if (dd.annexType === 'link') {
-            let reUrl = /(http|https):\/\/([\w.]+\/?)\S*/
-            if (!reUrl.test(dd.content)) {
-              goto = false
-              dd.contentError = '必须以 http://或 https://开头'
-            }
-          }
-        })
-        this.$forceUpdate()
-        if (goto) {
-          gotoPublish(this.form).then(res => {
-            if (res.code === 200) {
-               this.msgSuccess('操作成功')
-               this.$router.go(-1)
+        const checkMaterialResult = this.validateMaterial()
+        if (checkMaterialResult) {
+          let goto = true
+          this.form.otherContent.forEach((dd) => {
+            delete dd.contentError
+            if (dd.annexType === 'link') {
+              let reUrl = /(http|https):\/\/([\w.]+\/?)\S*/
+              if (!reUrl.test(dd.content)) {
+                goto = false
+                dd.contentError = '必须以 http://或 https://开头'
+              }
             }
           })
+          this.$forceUpdate()
+          if (goto) {
+            gotoPublish(this.form).then(res => {
+              if (res.code === 200) {
+                this.msgSuccess('操作成功')
+                this.$router.go(-1)
+              }
+            })
+          }
         }
         
       }
