@@ -63,8 +63,6 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
     @Autowired
     private WeCustomerMessagePushClient customerMessagePushClient;
 
-    @Autowired
-    private WeMessagePushClient messagePushClient;
 
     @Autowired
     private IWeMaterialService materialService;
@@ -72,20 +70,14 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
     @Autowired
     private WeGroupCodeMapper groupCodeMapper;
 
-    @Autowired
-    private IWeCorpAccountService corpAccountService;
 
     @Autowired
     private WeCustomerMapper customerMapper;
 
-    @Value("${wecome.authorizeUrl}")
-    private String authorizeUrl;
-
-    @Value("${wecome.authorizeRedirectUrl}")
-    private String authorizeRedirectUrl;
-
     @Autowired
-    private IWeCustomerMessagePushService weCustomerMessagePushService;
+    private IWeMessagePushService weMessagePushService;
+
+
 
     /**
      * 添加新标签建群任务
@@ -440,34 +432,19 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
      * @param task 建群任务信息
      */
     private void sendEmployeeMessage(WePresTagGroupTask task) {
-        WeMessagePushDto pushDto = new WeMessagePushDto();
         // 设置toUser参数
         List<WeCommunityTaskEmplVo> employeeList = taskScopeMapper.getScopeListByTaskId(task.getTaskId());
-        String toUser = employeeList.stream().map(WeCommunityTaskEmplVo::getUserId).collect(Collectors.joining("|"));
-        pushDto.setTouser(toUser);
 
-        // 获取agentId
-        WeCorpAccount validWeCorpAccount = corpAccountService.findValidWeCorpAccount();
-        String agentId = validWeCorpAccount.getAgentId();
-        String corpId = validWeCorpAccount.getCorpId();
-        if (StringUtils.isEmpty(agentId)) {
-            throw new WeComException("当前agentId不可用或不存在");
+        if(CollectionUtil.isNotEmpty(employeeList)){
+
+            weMessagePushService.pushMessageSelfH5(
+                    employeeList.stream().map(WeCommunityTaskEmplVo::getUserId).collect(Collectors.toList()),
+                    "你有一个新任务，",
+                    CommunityTaskType.TAG.getType()
+            );
         }
-        pushDto.setAgentid(Integer.valueOf(agentId));
 
-        // 设置文本消息
-        TextMessageDto text = new TextMessageDto();
-        String REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s", authorizeRedirectUrl, corpId, agentId, CommunityTaskType.TAG.getType()));
-        String context = String.format(
-                "你有一个新任务，<a href='%s?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'>请点击此链接查看</a>",
-                authorizeUrl, corpId, REDIRECT_URI);
-        text.setContent(context);
-        pushDto.setText(text);
 
-        pushDto.setMsgtype("text");
 
-        // 请求消息推送接口，获取结果 [消息推送 - 发送应用消息]
-        log.debug("发送个人群发信息 ============> ");
-        messagePushClient.sendMessageToUser(pushDto, agentId);
     }
 }

@@ -36,6 +36,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments> implements IWeMomentsService {
@@ -92,90 +93,99 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
             List<WeMoments.OtherContent> otherContent = weMoments.getOtherContent();
             if(CollectionUtil.isNotEmpty(otherContent)){
 
-                List<MomentsParamDto.BaseAttachments> attachments=new ArrayList<>();
-
-                //图片
-                if(weMoments.getContentType().equals(MediaType.IMAGE.getMediaType())){
-                    otherContent.stream().forEach(image->{
-                        String media_id = iWeMaterialService.uploadAttachmentMaterial(image.getAnnexUrl(),
-                                MediaType.IMAGE.getMediaType(),
-                                1
-                                , SnowFlakeUtil.nextId().toString()).getMedia_id();
+                List<WeMoments.OtherContent> otherContents = otherContent.stream().filter(s -> StringUtils.isNotEmpty(s.getAnnexType()) && StringUtils.isNotEmpty(s.getAnnexUrl()))
+                        .collect(Collectors.toList());
 
 
-                        if(StringUtils.isNotEmpty(media_id)){
+                if(CollectionUtil.isNotEmpty(otherContents)){
+
+                    List<MomentsParamDto.BaseAttachments> attachments=new ArrayList<>();
+
+                    //图片
+                    if(weMoments.getContentType().equals(MediaType.IMAGE.getMediaType())){
+                        otherContents.stream().forEach(image->{
+                            String media_id = iWeMaterialService.uploadAttachmentMaterial(image.getAnnexUrl(),
+                                    MediaType.IMAGE.getMediaType(),
+                                    1
+                                    , SnowFlakeUtil.nextId().toString()).getMedia_id();
+
+
+                            if(StringUtils.isNotEmpty(media_id)){
+                                attachments.add(
+                                        MomentsParamDto.ImageAttachments.builder()
+                                                .msgtype(MediaType.IMAGE.getMediaType())
+                                                .image(
+                                                        MomentsParamDto.Image.builder()
+                                                                .media_id(
+                                                                        media_id
+                                                                )
+                                                                .build()
+                                                ).build()
+                                );
+                            }
+
+
+
+                        });
+                    }
+
+                    //视频
+                    if(weMoments.getContentType().equals(MediaType.VIDEO.getMediaType())){
+                        otherContents.stream().forEach(video->{
+
+                            String media_id = iWeMaterialService.uploadAttachmentMaterial(video.getAnnexUrl(),
+                                    MediaType.VIDEO.getMediaType(),
+                                    1
+                                    , SnowFlakeUtil.nextId().toString()).getMedia_id();
+
+
+                            if(StringUtils.isNotEmpty(media_id)){
+                                attachments.add(
+                                        MomentsParamDto.VideoAttachments.builder()
+                                                .msgtype(MediaType.VIDEO.getMediaType())
+                                                .video(
+                                                        MomentsParamDto.Video.builder()
+                                                                .media_id(
+                                                                        media_id
+                                                                )
+                                                                .build()
+                                                ).build()
+                                );
+                            }
+
+                        });
+                    }
+
+
+                    //图文
+                    if(weMoments.getContentType().equals(MediaType.LINK.getMediaType())){
+                        otherContents.stream().forEach(link->{
                             attachments.add(
-                                    MomentsParamDto.ImageAttachments.builder()
-                                            .msgtype(MediaType.IMAGE.getMediaType())
-                                            .image(
-                                                    MomentsParamDto.Image.builder()
+                                    MomentsParamDto.LinkAttachments.builder()
+                                            .msgtype(MediaType.LINK.getMediaType())
+                                            .link(
+                                                    MomentsParamDto.Link.builder()
+                                                            .url(link.getAnnexUrl())
                                                             .media_id(
-                                                                    media_id
+                                                                    iWeMaterialService.uploadTemporaryMaterial(link.getAnnexUrl(),
+                                                                            MediaType.IMAGE.getMediaType()
+                                                                            ,SnowFlakeUtil.nextId().toString()).getMedia_id()
                                                             )
                                                             .build()
                                             ).build()
                             );
-                        }
+                        });
 
 
 
-                    });
-                }
+                    }
 
-                //视频
-                if(weMoments.getContentType().equals(MediaType.VIDEO.getMediaType())){
-                    otherContent.stream().forEach(video->{
-
-                        String media_id = iWeMaterialService.uploadAttachmentMaterial(video.getAnnexUrl(),
-                                MediaType.VIDEO.getMediaType(),
-                                1
-                                , SnowFlakeUtil.nextId().toString()).getMedia_id();
-
-
-                        if(StringUtils.isNotEmpty(media_id)){
-                               attachments.add(
-                                       MomentsParamDto.VideoAttachments.builder()
-                                                    .msgtype(MediaType.VIDEO.getMediaType())
-                                                    .video(
-                                                            MomentsParamDto.Video.builder()
-                                                                    .media_id(
-                                                                            media_id
-                                                                    )
-                                                                    .build()
-                                       ).build()
-                              );
-                       }
-
-                    });
-                }
-
-
-                //图文
-                if(weMoments.getContentType().equals(MediaType.LINK.getMediaType())){
-                    otherContent.stream().forEach(link->{
-                        attachments.add(
-                                MomentsParamDto.LinkAttachments.builder()
-                                        .msgtype(MediaType.LINK.getMediaType())
-                                        .link(
-                                        MomentsParamDto.Link.builder()
-                                                .url(link.getAnnexUrl())
-                                                .media_id(
-                                                        iWeMaterialService.uploadTemporaryMaterial(link.getAnnexUrl(),
-                                                                MediaType.IMAGE.getMediaType()
-                                                                ,SnowFlakeUtil.nextId().toString()).getMedia_id()
-                                                )
-                                                .build()
-                                ).build()
-                        );
-                    });
-
-
+                    momentsParamDto.setAttachments(
+                            attachments
+                    );
 
                 }
 
-                momentsParamDto.setAttachments(
-                        attachments
-                );
 
 
             }
@@ -217,18 +227,21 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
                //入库
                if(weResultDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
                    weMoments.setJobId(weResultDto.getJobid());
-                   //根据任务id,获取朋友圈主键
-                   MomentsCreateResultDto momentTaskResult
-                           = weMomentsClient.getMomentTaskResult(weResultDto.getJobid());
-                   if(momentTaskResult.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
-                       if(StringUtils.isNotEmpty(momentTaskResult.getResult().getMoment_id())){
-                           weMoments.setMomentId(
-                                   momentTaskResult.getResult().getMoment_id()
-                           );
-                           this.saveOrUpdate(weMoments);
-                       }
-
-                   }
+                   weMoments.setMomentId(weResultDto.getJobid());
+                   this.saveOrUpdate(weMoments);
+//                   //根据任务id,获取朋友圈主键
+//                   MomentsCreateResultDto momentTaskResult
+//                           = weMomentsClient.getMomentTaskResult(weResultDto.getJobid());
+//                   if(momentTaskResult.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
+//
+//                       if(StringUtils.isNotEmpty(momentTaskResult.getResult().getMoment_id())){
+//                           weMoments.setMomentId(
+//                                   momentTaskResult.getResult().getMoment_id()
+//                           );
+//                           this.saveOrUpdate(weMoments);
+//                       }
+//
+//                   }
                }
 
 

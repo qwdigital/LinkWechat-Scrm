@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.core.domain.entity.WeCorpAccount;
@@ -17,6 +18,7 @@ import com.linkwechat.wecom.domain.vo.WeMaterialVo;
 import com.linkwechat.wecom.mapper.*;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import com.linkwechat.wecom.service.IWeGroupSopService;
+import com.linkwechat.wecom.service.IWeMessagePushService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,17 +56,11 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
     @Autowired
     private WeGroupSopPicMapper sopPicMapper;
 
-    @Autowired
-    private IWeCorpAccountService corpAccountService;
 
     @Autowired
-    private WeMessagePushClient messagePushClient;
+    private IWeMessagePushService weMessagePushService;
 
-    @Value("${wecome.authorizeUrl}")
-    private String authorizeUrl;
 
-    @Value("${wecome.authorizeRedirectUrl}")
-    private String authorizeRedirectUrl;
 
     /**
      * 通过规则id获取sop规则
@@ -332,41 +328,57 @@ public class WeGroupSopServiceImpl extends ServiceImpl<WeGroupSopMapper, WeGroup
     @Override
 //    @Async
     public void sendMessage(List<String> groupIdList) {
-
-        // 构造请求参数
-        WeMessagePushDto pushDto = new WeMessagePushDto();
         // 查询群聊列表，获取群主列表
         LambdaQueryWrapper<WeGroup> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.in(WeGroup::getChatId, groupIdList);
         List<WeGroup> groupList = groupMapper.selectList(queryWrapper);
-        String toUser = groupList
-                .stream()
-                .map(WeGroup::getOwner)
-                .collect(Collectors.joining("|"));
-        pushDto.setTouser(toUser);
+        if(CollectionUtil.isNotEmpty(groupList)){
 
-        // 获取agentId
-        WeCorpAccount validWeCorpAccount = corpAccountService.findValidWeCorpAccount();
-        String agentId = validWeCorpAccount.getAgentId();
-        String corpId = validWeCorpAccount.getCorpId();
-        if (StringUtils.isEmpty(agentId)) {
-            throw new WeComException("当前agentId不可用或不存在");
+            weMessagePushService.pushMessageSelfH5(
+                    groupList.stream().map(WeGroup::getOwner).collect(Collectors.toList()),
+                   "你有新的SOP待发送，",
+                    CommunityTaskType.SOP.getType()
+            );
+
         }
-        pushDto.setAgentid(Integer.valueOf(agentId));
 
-        // 设置消息内容
-        pushDto.setMsgtype("text");
 
-        TextMessageDto text = new TextMessageDto();
-        String REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s", authorizeRedirectUrl, corpId, agentId, CommunityTaskType.SOP.getType()));
-        String context = String.format(
-                "你有新的SOP待发送，<a href='%s?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'>请点击此链接查看</a>",
-                authorizeUrl, corpId, REDIRECT_URI);
-        text.setContent(context);
-        pushDto.setText(text);
 
-        // 请求消息推送接口，获取结果 [消息推送 - 发送应用消息]
-        messagePushClient.sendMessageToUser(pushDto, agentId);
+
+//        // 构造请求参数
+//        WeMessagePushDto pushDto = new WeMessagePushDto();
+//        // 查询群聊列表，获取群主列表
+//        LambdaQueryWrapper<WeGroup> queryWrapper = new LambdaQueryWrapper<>();
+//        queryWrapper.in(WeGroup::getChatId, groupIdList);
+//        List<WeGroup> groupList = groupMapper.selectList(queryWrapper);
+//        String toUser = groupList
+//                .stream()
+//                .map(WeGroup::getOwner)
+//                .collect(Collectors.joining("|"));
+//        pushDto.setTouser(toUser);
+//
+//        // 获取agentId
+//        WeCorpAccount validWeCorpAccount = corpAccountService.findValidWeCorpAccount();
+//        String agentId = validWeCorpAccount.getAgentId();
+//        String corpId = validWeCorpAccount.getCorpId();
+//        if (StringUtils.isEmpty(agentId)) {
+//            throw new WeComException("当前agentId不可用或不存在");
+//        }
+//        pushDto.setAgentid(Integer.valueOf(agentId));
+//
+//        // 设置消息内容
+//        pushDto.setMsgtype("text");
+//
+//        TextMessageDto text = new TextMessageDto();
+//        String REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s", authorizeRedirectUrl, corpId, agentId, CommunityTaskType.SOP.getType()));
+//        String context = String.format(
+//                "你有新的SOP待发送，<a href='%s?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'>请点击此链接查看</a>",
+//                authorizeUrl, corpId, REDIRECT_URI);
+//        text.setContent(context);
+//        pushDto.setText(text);
+//
+//        // 请求消息推送接口，获取结果 [消息推送 - 发送应用消息]
+//        messagePushClient.sendMessageToUser(pushDto, agentId);
 
     }
 }

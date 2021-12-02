@@ -4,8 +4,10 @@ import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.wecom.client.WeMomentsClient;
 import com.linkwechat.wecom.constants.SynchRecordConstants;
 import com.linkwechat.wecom.domain.WeMoments;
+import com.linkwechat.wecom.domain.dto.moments.MomentsCreateResultDto;
 import com.linkwechat.wecom.service.IWeMomentsService;
 import com.linkwechat.wecom.service.IWeSynchRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,11 @@ public class WeMomentsController extends BaseController {
 
     @Autowired
     IWeSynchRecordService iWeSynchRecordService;
+
+
+    @Autowired
+    WeMomentsClient weMomentsClient;
+
 
 
     /**

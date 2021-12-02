@@ -46,4 +46,6 @@ public class WeComeConfig {
      * 需要进行重试的企业微信请求错误码
      */
     private List<Integer> weNeedRetryErrorCodes;
+
+
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.enums.CommunityTaskType;
 import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -15,6 +16,7 @@ import com.linkwechat.wecom.domain.WeCustomerSeas;
 import com.linkwechat.wecom.domain.vo.CustomerSeasRecordVo;
 import com.linkwechat.wecom.service.IWeCustomerMessagePushService;
 import com.linkwechat.wecom.service.IWeCustomerSeasService;
+import com.linkwechat.wecom.service.IWeMessagePushService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,8 +35,10 @@ public class WeCustomerSeasController extends BaseController {
     private IWeCustomerSeasService iWeCustomerSeasService;
 
 
+
+
     @Autowired
-    private IWeCustomerMessagePushService iWeCustomerMessagePushService;
+    private IWeMessagePushService iWeMessagePushService;
 
     /**
      * 客户公海模版下载
@@ -140,7 +144,7 @@ public class WeCustomerSeasController extends BaseController {
      * @param ids
      * @return
      */
-    @PostMapping("/remidUser/{ids}")
+    @GetMapping("/remidUser/{ids}")
     public AjaxResult remidUser(@PathVariable Long[] ids){
 
         List<WeCustomerSeas> weCustomerSeas
@@ -149,8 +153,9 @@ public class WeCustomerSeasController extends BaseController {
         if(CollectionUtil.isNotEmpty(weCustomerSeas)){
             weCustomerSeas.stream().collect(Collectors.groupingBy(WeCustomerSeas::getAddUserId)).forEach((k,v)->{
 
-                String messageRemindContent="管理员给你分配了"+v.size()+"个客户还未添加,快去复制电话号码添加客户吧,<a href='%s?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'>点击查看详情</a>";
-                iWeCustomerMessagePushService.messagePushRemind(messageRemindContent,k);
+                iWeMessagePushService.pushMessageSelfH5(ListUtil.toList(k),
+                        "管理员给你分配了"+v.size()+"个客户还未添加,快去复制电话号码添加客户吧,", CommunityTaskType.SEAS.getType());
+
 
             });
 

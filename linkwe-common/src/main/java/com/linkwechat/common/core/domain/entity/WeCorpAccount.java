@@ -124,6 +124,28 @@ public class WeCorpAccount extends BaseEntity
      **********************************************/
 
 
+    /***********************************************
+     *******************H5跳转start******************
+     **********************************************/
+
+     /**JS SDK 身份校验url*/
+     private String authorizeUrl;
+
+
+     /**群sop和老客标签建群，跳转链接*/
+     private String sopTagRedirectUrl;
+
+
+     /**客户公海，跳转链接*/
+     private  String seasRedirectUrl;
+
+
+
+    /***********************************************
+     *******************H5跳转end*******************
+     **********************************************/
+
+
 
         /**客服密钥*/
         private String kfSecret;
@@ -134,6 +156,10 @@ public class WeCorpAccount extends BaseEntity
 
         /**客户流失通知开关 0:关闭 1:开启*/
         private String customerChurnNoticeSwitch = Constants.NORMAL_CODE;
+
+
+
+
 
 
 }
