@@ -1,97 +1,101 @@
 <script>
-import * as api from '@/api/enterpriseId'
-// import clipboard from "clipboard";
+  import * as api from '@/api/enterpriseId'
+  // import clipboard from "clipboard";
 
-export default {
-  components: {},
-  props: {},
-  data() {
-    return {
-      // query: {
-      //   pageNum: 1,
-      //   pageSize: 10,
-      //   companyName: ''
+  export default {
+    components: {},
+    props: {},
+    data () {
+      return {
+        // query: {
+        //   pageNum: 1,
+        //   pageSize: 10,
+        //   companyName: ''
+        // },
+        // total: 0,
+        form: {},
+        // list: [],
+        // dialogVisible: false,
+        disabled: false,
+        loading: false,
+        rules: Object.freeze({
+          companyName: [{ required: true, message: '必填项', trigger: 'blur' }],
+          corpId: [{ required: true, message: '必填项', trigger: 'blur' }],
+          corpSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
+          agentId: [{ required: true, message: '必填项', trigger: 'blur' }],
+          agentSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
+          contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
+          seasRedirectUrl: [{ required: true, message: '必填项', trigger: 'blur' }],
+          sopTagRedirectUrl: [{ required: true, message: '必填项', trigger: 'blur' }]
+        })
+        // status: ['正常', '停用']
+      }
+    },
+    watch: {},
+    computed: {},
+    created () {
+      this.getDetail()
+    },
+    mounted () {
+      // new clipboard(".copy-btn");
+    },
+    methods: {
+      // getList(page) {
+      //   page && (this.query.pageNum = page)
+      //   this.loading = true
+      //   api
+      //     .getList(this.query)
+      //     .then(({ rows, total }) => {
+      //       this.list = rows
+      //       this.total = +total
+      //       this.loading = false
+      //     })
+      //     .catch(() => {
+      //       this.loading = false
+      //     })
       // },
-      // total: 0,
-      form: {},
-      // list: [],
-      // dialogVisible: false,
-      disabled: false,
-      loading: false,
-      rules: Object.freeze({
-        companyName: [{ required: true, message: '必填项', trigger: 'blur' }],
-        corpId: [{ required: true, message: '必填项', trigger: 'blur' }],
-        corpSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
-        contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }]
-      })
-      // status: ['正常', '停用']
-    }
-  },
-  watch: {},
-  computed: {},
-  created() {
-    this.getDetail()
-  },
-  mounted() {
-    // new clipboard(".copy-btn");
-  },
-  methods: {
-    // getList(page) {
-    //   page && (this.query.pageNum = page)
-    //   this.loading = true
-    //   api
-    //     .getList(this.query)
-    //     .then(({ rows, total }) => {
-    //       this.list = rows
-    //       this.total = +total
-    //       this.loading = false
-    //     })
-    //     .catch(() => {
-    //       this.loading = false
-    //     })
-    // },
-    // edit(data, type) {
-    //   this.form = Object.assign({}, data || {})
-    //   this.dialogVisible = true
-    //   type || !data ? (this.disabled = false) : (this.disabled = true)
-    // },
+      // edit(data, type) {
+      //   this.form = Object.assign({}, data || {})
+      //   this.dialogVisible = true
+      //   type || !data ? (this.disabled = false) : (this.disabled = true)
+      // },
 
-    getDetail() {
-      this.loading = true
-      api
-        .getDetail()
-        .then(({ data }) => {
-          this.form = data
-          this.loading = false
+      getDetail () {
+        this.loading = true
+        api
+          .getDetail()
+          .then(({ data }) => {
+            this.form = data
+            this.loading = false
+          })
+          .catch(() => {
+            this.loading = false
+          })
+      },
+      submit () {
+        this.$refs['form'].validate((valid) => {
+          if (valid) {
+            api
+              .addOrUpdate(this.form)
+              .then(() => {
+                this.msgSuccess('操作成功')
+                // this.dialogVisible = false
+                this.getDetail()
+              })
+              .catch(() => {
+                // this.dialogVisible = false
+              })
+          }
         })
-        .catch(() => {
-          this.loading = false
+      },
+      start (corpId) {
+        api.start(corpId).then(({ rows, total }) => {
+          this.msgSuccess('操作成功')
+          this.getList()
         })
-    },
-    submit() {
-      this.$refs['form'].validate((valid) => {
-        if (valid) {
-          api
-            .addOrUpdate(this.form)
-            .then(() => {
-              this.msgSuccess('操作成功')
-              // this.dialogVisible = false
-              this.getDetail()
-            })
-            .catch(() => {
-              // this.dialogVisible = false
-            })
-        }
-      })
-    },
-    start(corpId) {
-      api.start(corpId).then(({ rows, total }) => {
-        this.msgSuccess('操作成功')
-        this.getList()
-      })
+      }
     }
   }
-}
 </script>
 
 <template>
@@ -151,16 +155,7 @@ export default {
     />  -->
 
     <el-card shadow="never" :body-style="{ padding: '10px 0 0 10px' }">
-      <el-form
-        ref="form"
-        label-suffix=":"
-        label-position="right"
-        :model="form"
-        :rules="rules"
-        size="small"
-        label-width="160px"
-        :disabled="disabled"
-      >
+      <el-form ref="form" label-suffix=":" label-position="right" :model="form" :rules="rules" size="small" label-width="160px" :disabled="disabled">
         <el-form-item label="企业ID" prop="corpId">
           <el-input :disabled="form.id" v-model="form.corpId" placeholder=""></el-input>
           <div class="tips">企业ID即CorpID，在企微后台->我的企业中获取</div>
@@ -229,15 +224,6 @@ export default {
           <el-input v-model="form.h5DoMainName"></el-input>
         </el-form-item> -->
 
-        <el-form-item label="消息提醒agentId" prop="agentId">
-          <el-input v-model="form.agentId"></el-input>
-          <div class="tips">用于接收应用消息，在企微后台->应用工具->自建应用中配置并获取</div>
-        </el-form-item>
-        <el-form-item label="消息应用Secret" prop="agentId">
-          <el-input v-model="form.agentSecret"></el-input>
-          <div class="tips">用于接收应用消息，在企微后台->应用工具->自建应用中配置并获取</div>
-        </el-form-item>
-
         <el-form-item label="会话私钥" prop="financePrivateKey">
           <el-input v-model="form.financePrivateKey"></el-input>
           <div class="tips"></div>
@@ -257,6 +243,28 @@ export default {
         <el-form-item label="EncodingAESKey" prop="encodingAesKey">
           <el-input v-model="form.encodingAesKey" placeholder="应用回调消息体加密密钥"></el-input>
         </el-form-item>
+        <div>应用配置</div>
+        <el-form-item label="消息提醒agentId" prop="agentId">
+          <el-input v-model="form.agentId"></el-input>
+          <div class="tips">用于接收应用消息，在企微后台->应用工具->自建应用中配置并获取</div>
+        </el-form-item>
+        <el-form-item label="消息应用Secret" prop="agentSecret">
+          <el-input v-model="form.agentSecret"></el-input>
+          <div class="tips">用于接收应用消息，在企微后台->应用工具->自建应用中配置并获取</div>
+        </el-form-item>
+        <el-form-item label="JS-SDK校验URL">
+          <el-input disabled v-model="form.authorizeUrl"></el-input>
+          <div class="tips">用于校验可信域名，满足跳转 H5 页面的场景</div>
+        </el-form-item>
+        <el-form-item label="客户公海 URL" prop="seasRedirectUrl">
+          <el-input v-model="form.seasRedirectUrl"></el-input>
+          <div class="tips">用于配置客户公海 H5，让员工在移动端利用手机号添加客户</div>
+        </el-form-item>
+        <el-form-item label="社群运营URL" prop="sopTagRedirectUrl">
+          <el-input v-model="form.sopTagRedirectUrl"></el-input>
+          <div class="tips">用于配置社群运营中群SOP、标签建群的 H5</div>
+        </el-form-item>
+
         <el-form-item label="" class="ar">
           <el-button type="primary" @click="submit" v-show="!disabled">保存配置</el-button>
         </el-form-item>
@@ -272,8 +280,8 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.tips {
-  color: #aaa;
-  font-size: 12px;
-}
+  .tips {
+    color: #aaa;
+    font-size: 12px;
+  }
 </style>
