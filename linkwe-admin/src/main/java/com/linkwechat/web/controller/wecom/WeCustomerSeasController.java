@@ -144,7 +144,7 @@ public class WeCustomerSeasController extends BaseController {
      * @param ids
      * @return
      */
-    @GetMapping("/remidUser/{ids}")
+    @PostMapping("/remidUser/{ids}")
     public AjaxResult remidUser(@PathVariable Long[] ids){
 
         List<WeCustomerSeas> weCustomerSeas
