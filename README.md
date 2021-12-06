@@ -23,6 +23,9 @@
 
 ---
 
+ **<p align="center">LinkWeChat 正在参与开源中国2021年度评选，请小伙伴[点击此处](https://www.oschina.net/project/top_cn_2021/)搜索 LinkWeChat 进行投票，谢谢！</p>** 
+
+
  **<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>** 
 
 ---
