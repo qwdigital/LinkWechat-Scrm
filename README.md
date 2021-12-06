@@ -30,6 +30,18 @@
 
 ---
 
+# 版权声明
+
+LinkWeChat 开源版遵循 [GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE) 开源协议发布，并提供技术交流学习，但**绝不允许修改后和衍生的代码做为闭源的商业软件发布和销售！** 
+
+LinkWeChat 开源团队拥有对本开源协议的最终解释权。
+
+[点击查看 LinkWeChat LICENSE 详细说明](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
+
+需要注意的是，目前在国内 GPL 协议**具备合同特征，是一种民事法律行为** ，属于我国《合同法》调整的范围。LinkWeChat 项目团队保留诉讼权利。
+
+[相关案例：违反 GPL 协议赔偿 50 万，国内首例!](https://mp.weixin.qq.com/s/YQ6sNjbDS-P7BViLZIsaoA)
+
 # 一、 关于 LinkWeChat
 
 ## 1.1 介绍
@@ -331,18 +343,6 @@ LinkWeChat 开源团队将目前所收项目捐赠全额捐出，仅尽绵薄之
 同时也希望 LinkWeChat 不仅能为国内开源社区建设做一点贡献，也能为社会产生一些价值。
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/150157_2762cfc4_1480777.png "屏幕截图.png")
-
-# 八、版权声明
-
-LinkWeChat 开源版遵循 [GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE) 开源协议发布，并提供技术交流学习，但**绝不允许修改后和衍生的代码做为闭源的商业软件发布和销售！** 
-
-LinkWeChat 开源团队拥有对本开源协议的最终解释权。
-
-[点击查看 LinkWeChat LICENSE 详细说明](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
-
-需要注意的是，目前在国内 GPL 协议 **具备合同特征，是一种民事法律行为** ，属于我国《合同法》调整的范围。LinkWeChat 项目团队保留诉讼权利。
-
-[相关案例：违反 GPL 协议赔偿 50 万，国内首例!](https://mp.weixin.qq.com/s/YQ6sNjbDS-P7BViLZIsaoA)
 
 ---
 
