@@ -101,6 +101,7 @@
                 #{qrId}
             </foreach>
         </if>
+        and wqc.del_flag = 0
     </select>
 
     <select id="getQrCodeList" resultType="java.lang.Long">
@@ -126,6 +127,7 @@
         <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
             AND date_format(wqc.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
         </if>
+        and wqc.del_flag = 0
     </select>
 
 </mapper>
