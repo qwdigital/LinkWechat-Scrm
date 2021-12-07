@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * @date 2021/11/13 23:02
  **/
 @Slf4j
-@Component()
+@Component("weQrCodeUpdateTask")
 public class WeQrCodeUpdateTask {
 
     @Autowired
@@ -41,7 +41,7 @@ public class WeQrCodeUpdateTask {
     @Autowired
     private WeExternalContactClient externalContactClient;
 
-    private void qrCodeUpdateTask() {
+    public void qrCodeUpdateTask() {
         Date date = new Date();
         Week week = DateUtil.dayOfWeekEnum(date);
         String formatTime = DateUtil.formatTime(date);
