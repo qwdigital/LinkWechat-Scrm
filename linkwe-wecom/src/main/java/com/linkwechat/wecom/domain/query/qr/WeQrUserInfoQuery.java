@@ -19,7 +19,7 @@ public class WeQrUserInfoQuery {
     @ApiModelProperty(value = "排期分组id(修改接口时传)")
     private String scopeId;
 
-    @ApiModelProperty("排班员工类型 1-默认 2-自定义")
+    @ApiModelProperty("排班员工类型 0 默认排期 1 自定义排期")
     private Integer type;
 
     @ApiModelProperty("部门id列表")
