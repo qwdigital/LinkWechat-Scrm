@@ -6,8 +6,8 @@
         <el-step title="群发内容"></el-step>
       </el-steps>
     </div>
-    <div v-if="currentActive === 1">
-      <el-form style="width: 60%;" ref="form" :model="form" :rules="rules" label-width="100px">
+    <div class="g-card g-pad20" v-if="currentActive === 1">
+      <el-form style="width: 60%;margin:0 auto;" ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="群发类型" required prop="chatType">
           <el-radio-group v-model="form.chatType">
             <el-radio :label=1>群发客户</el-radio>
@@ -283,7 +283,6 @@
       nextStep () {
         this.$refs.form.validate(validate => {
           if (!validate) return
-
           if (this.form.chatType === 1) {
             let data = {
               userIds: '',
@@ -302,7 +301,11 @@
               data.trackState = this.form.trackState
               getCustomerList(data).then(res => {
                 this.form.customerList = res.data
-                this.currentActive = 2
+                if (res.data && res.data.length) {
+                  this.currentActive = 2
+                } else {
+                  this.msgError('未找到可发送客户！')
+                }
               })
             } else {
               this.currentActive = 2

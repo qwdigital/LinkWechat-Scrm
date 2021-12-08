@@ -168,14 +168,14 @@
         },
         queryMember: {
           userName: '',
-          msgId: '',
+          msgTemplateId: '',
           pageNum: 1,
           pageSize: 10,
           status: ''
         },
         queryCustomer: {
           customerName: '',
-          msgId: '',
+          msgTemplateId: '',
           status: '',
           pageNum: 1,
           pageSize: 10
@@ -201,8 +201,8 @@
     computed: {},
     created () {
       this.msgId = this.$route.query.id
-      this.queryMember.msgId = this.msgId
-      this.queryCustomer.msgId = this.msgId
+      this.queryMember.msgTemplateId = this.msgId
+      this.queryCustomer.msgTemplateId = this.msgId
       this.getDetail()
       this.getMemberList()
       this.getCustomerList()

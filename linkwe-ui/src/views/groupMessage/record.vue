@@ -14,7 +14,7 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="发送类型" prop="timedTask">
+        <el-form-item label="发送类型" prop="isTask">
           <el-select v-model="query.isTask" placeholder="请选择发送类型" size="mini">
             <el-option v-for="(value, key, index) in timedTask" :label="value" :value="key" :key="index">
             </el-option>
@@ -46,8 +46,8 @@
           <template slot-scope="scope">
             <!-- v-hasPermi="['enterpriseWechat:view']" -->
             <el-button size="mini" type="text" @click="goRoute(scope.row.id, 'detail')">详情</el-button>
-            <el-divider v-if="scope.row.isTask === 1" direction="vertical"></el-divider>
-            <el-button size="mini" v-if="scope.row.isTask === 1" type="text" @click="cancelSend(scope.row)">取消发送</el-button>
+            <el-divider v-if="scope.row.isTask === 1 && scope.row.status === 0" direction="vertical"></el-divider>
+            <el-button size="mini" v-if="scope.row.isTask === 1 && scope.row.status === 0" type="text" @click="cancelSend(scope.row)">取消发送</el-button>
             <!-- <el-button v-hasPermi="['enterpriseWechat:edit']" size="mini" type="text" disabled=""
 							@click="goRoute(scope.row, 1)">编辑</el-button>
 						<el-button v-hasPermi="['enterpriseWechat:edit']" size="mini" type="text"
@@ -89,7 +89,9 @@
           pageSize: 10,
           content: undefined,
           chatType: undefined,
-          isTask: undefined
+          isTask: undefined,
+          orderByColumn: 'create_time',
+          isAsc: 'desc'
         },
         pushType: {
           1: '发给客户',
