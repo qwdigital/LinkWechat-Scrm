@@ -134,6 +134,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             WeCustomer weCustomer = new WeCustomer();
             BeanUtils.copyPropertiesignoreOther(userDetail.getExternal_contact(), weCustomer);
             weCustomer.setCustomerType(userDetail.getExternal_contact().getType());
+            weCustomer.setCustomerName(userDetail.getExternal_contact().getName());
             Optional.ofNullable(userDetail.getFollow_info()).ifPresent(followInfo -> {
 
                 weCustomer.setFirstUserId(followInfo.getUserid());
@@ -792,9 +793,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
      * @return
      */
     @Override
-    public long noRepeatCountCustomer() {
+    public long noRepeatCountCustomer(WeCustomerList weCustomerList) {
 
-        return this.baseMapper.noRepeatCountCustomer();
+        return this.baseMapper.noRepeatCountCustomer(weCustomerList);
     }
 
 

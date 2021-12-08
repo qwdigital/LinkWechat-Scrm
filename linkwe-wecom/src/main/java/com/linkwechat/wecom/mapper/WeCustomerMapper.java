@@ -74,7 +74,7 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
      * 去重复统计
      * @return
      */
-    long noRepeatCountCustomer();
+    long noRepeatCountCustomer(@Param("weCustomerList") WeCustomerList weCustomerList);
 
 
 }

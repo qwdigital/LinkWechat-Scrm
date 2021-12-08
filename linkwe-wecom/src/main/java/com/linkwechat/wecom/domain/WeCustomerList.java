@@ -21,7 +21,7 @@ public class WeCustomerList {
     //客户名称
     private String customerName;
 
-    //客户类型
+    //客户类型 1:微信用户，2:企业用户
     private Integer customerType;
 
     //查询标签id(企业标签id)

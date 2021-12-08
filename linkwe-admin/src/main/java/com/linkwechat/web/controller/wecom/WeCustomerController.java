@@ -65,7 +65,7 @@ public class WeCustomerController extends BaseController
                 iWeSynchRecordService.findUpdateLatestTime(SynchRecordConstants.SYNCH_CUSTOMER)
         );//最近同步时间
         dataTable.setNoRepeatCustomerTotal(
-                weCustomerService.noRepeatCountCustomer()
+                weCustomerService.noRepeatCountCustomer(weCustomerList)
         );//去重客户数
 
         return dataTable;
