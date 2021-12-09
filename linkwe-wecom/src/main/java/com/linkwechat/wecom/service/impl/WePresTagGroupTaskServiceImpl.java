@@ -251,7 +251,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
                     WeCustomer customer =customerMapper.selectOne(new LambdaQueryWrapper<WeCustomer>()
                             .eq(WeCustomer::getExternalUserid,detail.getExternal_userid())
                             .eq(WeCustomer::getFirstUserId,detail.getUserid()));
-                    statVo.setCustomerName(customer.getCustomerName());
+                    statVo.setCustomerName(customer.getCustomerName()== null?"":customer.getCustomerName());
                     statVo.setStatus(detail.getStatus());
                     statVo.setInGroup(externalIdList.contains(detail.getExternal_userid()));
                     statVoList.add(statVo);
