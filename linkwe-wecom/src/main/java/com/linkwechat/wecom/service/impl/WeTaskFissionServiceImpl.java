@@ -197,7 +197,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
 
 
     @Override
-    public void sendWeTaskFission(Long id) {
+    public void sendWeTaskFission(Long id) throws Exception {
         WeTaskFission weTaskFission = selectWeTaskFissionById(id);
         //海报路径
         String postersPath = weTaskFission.getPostersUrl();
@@ -209,6 +209,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
 
         WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
         messageQuery.setChatType(1);
+        messageQuery.setIsAll(false);
         WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
         weMessageTemplate.setMsgType(MessageType.LINK.getMessageType());
         weMessageTemplate.setMediaId(postersPath);

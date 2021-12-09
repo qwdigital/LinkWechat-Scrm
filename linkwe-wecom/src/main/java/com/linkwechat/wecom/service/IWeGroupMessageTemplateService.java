@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.wecom.domain.WeGroupMessageSendResult;
 import com.linkwechat.wecom.domain.WeGroupMessageTask;
 import com.linkwechat.wecom.domain.WeGroupMessageTemplate;
@@ -34,7 +35,7 @@ public interface IWeGroupMessageTemplateService extends IService<WeGroupMessageT
      * 创建群发消息
      * @param query
      */
-    void addGroupMsgTemplate(WeAddGroupMessageQuery query);
+    void addGroupMsgTemplate(WeAddGroupMessageQuery query) throws Exception;
 
     /**
      * 取消定时发送

@@ -187,7 +187,7 @@ public class WeTaskFissionController extends BaseController {
     //    @PreAuthorize("@ss.hasPermi('wecom:fission:send')")
     @Log(title = "发送裂变任务", businessType = BusinessType.OTHER)
     @GetMapping("/send/{id}")
-    public AjaxResult send(@PathVariable Long id) {
+    public AjaxResult send(@PathVariable Long id) throws Exception {
         weTaskFissionService.sendWeTaskFission(id);
         return AjaxResult.success();
     }

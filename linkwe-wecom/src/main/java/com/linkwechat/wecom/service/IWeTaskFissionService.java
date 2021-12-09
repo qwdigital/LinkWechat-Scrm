@@ -72,7 +72,7 @@ public interface IWeTaskFissionService extends IService<WeTaskFission> {
      *
      * @param id 任务id
      */
-    public void sendWeTaskFission(Long id);
+    public void sendWeTaskFission(Long id) throws Exception;
 
     /**
      * 生成裂变任务海报

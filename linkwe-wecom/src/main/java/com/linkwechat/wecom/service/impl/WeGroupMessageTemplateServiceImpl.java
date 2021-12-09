@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.enums.MessageType;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.message.WeGroupMsgListDto;
 import com.linkwechat.wecom.domain.query.WeAddGroupMessageQuery;
@@ -50,6 +51,12 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
 
     @Autowired
     private IWeGroupMessageSendResultService messageSendResultService;
+
+    @Autowired
+    private IWeCustomerService weCustomerService;
+
+    @Autowired
+    private IWeGroupService weGroupService;
 
     @Autowired
     private RedisCache redisCache;
@@ -163,9 +170,11 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void addGroupMsgTemplate(WeAddGroupMessageQuery query) {
+    public void addGroupMsgTemplate(WeAddGroupMessageQuery query) throws Exception{
         log.info("addGroupMsgTemplate 入参：query:{}",JSONObject.toJSONString(query));
         List<WeAddGroupMessageQuery.SenderInfo> senderList = query.getSenderList();
+
+        checkSenderList(query, senderList);
         WeGroupMessageTemplate weGroupMessageTemplate = new WeGroupMessageTemplate();
         BeanUtil.copyProperties(query, weGroupMessageTemplate);
         if(query.getSendTime() == null){
@@ -238,6 +247,38 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void checkSenderList(WeAddGroupMessageQuery query, List<WeAddGroupMessageQuery.SenderInfo> senderList) {
+        if(query.getIsAll() && CollectionUtil.isEmpty(senderList)){
+            if(query.getChatType() == 1){
+                List<WeCustomer> customerList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().select(WeCustomer::getExternalUserid)
+                        .eq(WeCustomer::getDelFlag, 0).groupBy(WeCustomer::getExternalUserid));
+                if(CollectionUtil.isNotEmpty(customerList)){
+                    List<String> eids = customerList.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
+                    WeAddGroupMessageQuery.SenderInfo senderInfo = new WeAddGroupMessageQuery.SenderInfo();
+                    senderInfo.setCustomerList(eids);
+                    senderList.add(senderInfo);
+                }else {
+                    throw new WeComException("暂无客户可发送");
+                }
+            }else {
+                List<WeGroup> groupList = weGroupService.list(new LambdaQueryWrapper<WeGroup>()
+                        .select(WeGroup::getAdminUserId).eq(WeGroup::getDelFlag, 0).groupBy(WeGroup::getAdminUserId));
+                if(CollectionUtil.isNotEmpty(groupList)){
+                    groupList.forEach(group ->{
+                        WeAddGroupMessageQuery.SenderInfo senderInfo = new WeAddGroupMessageQuery.SenderInfo();
+                        senderInfo.setUserId(group.getAdminUserId());
+                        senderList.add(senderInfo);
+                    });
+
+                }else {
+                    throw new WeComException("暂无客户群可发送");
+                }
+            }
+        }else {
+            throw new WeComException("无指定接收消息的成员及对应客户列表");
         }
     }
 
