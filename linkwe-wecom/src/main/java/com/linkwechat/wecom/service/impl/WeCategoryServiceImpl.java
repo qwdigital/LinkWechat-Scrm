@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.core.domain.Tree;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -62,7 +63,7 @@ public class WeCategoryServiceImpl extends ServiceImpl<WeCategoryMapper,WeCatego
     public List<? extends Tree<?>> findWeCategoryByMediaType(String mediaType) {
         List<WeCategory> weCategories = this.list(new LambdaQueryWrapper<WeCategory>()
         .eq(WeCategory::getMediaType,mediaType)
-        .eq(WeCategory::getDelFlag,Constants.NORMAL_CODE));
+        .eq(WeCategory::getDelFlag,Constants.NORMAL_CODE).orderByDesc(BaseEntity::getCreateTime));
         List<WeCategoryVo> weCategoryVos = new ArrayList<>();
         weCategories.forEach(c -> {
             WeCategoryVo weCategoryVo = new WeCategoryVo();

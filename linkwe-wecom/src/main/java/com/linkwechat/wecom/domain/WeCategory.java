@@ -11,6 +11,8 @@ import lombok.experimental.SuperBuilder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotEmpty;
+
 @Data
 @TableName("we_category")
 @SuperBuilder
@@ -31,6 +33,7 @@ public class WeCategory extends BaseEntity {
 
 
     @ApiModelProperty("分类名称")
+    @NotEmpty(message = "分类名称不能为空")
     private String name;
 
 

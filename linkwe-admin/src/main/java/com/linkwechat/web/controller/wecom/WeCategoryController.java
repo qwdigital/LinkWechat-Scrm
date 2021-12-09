@@ -14,6 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -59,7 +60,7 @@ public class WeCategoryController extends BaseController {
     @Log(title = "添加类目", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("添加类目")
-    public AjaxResult add(@RequestBody WeCategory category) {
+    public AjaxResult add(@Validated @RequestBody WeCategory category) {
         weCategoryService.insertWeCategory(category);
         return AjaxResult.success();
     }
@@ -71,7 +72,7 @@ public class WeCategoryController extends BaseController {
     @Log(title = "更新目录", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("更新目录")
-    public AjaxResult edit(@RequestBody WeCategory category) {
+    public AjaxResult edit(@Validated @RequestBody WeCategory category) {
         weCategoryService.updateWeCategory(category);
         return AjaxResult.success();
     }
