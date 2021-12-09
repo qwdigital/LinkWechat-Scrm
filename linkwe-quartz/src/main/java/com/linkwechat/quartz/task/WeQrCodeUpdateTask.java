@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.Week;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeExternalContactClient;
 import com.linkwechat.wecom.domain.WeQrCode;
@@ -47,7 +48,7 @@ public class WeQrCodeUpdateTask {
         String formatTime = DateUtil.formatTime(date);
 
         List<WeQrScopeVo> weQrScopeList = weQrScopeService.getWeQrScopeByTime(week.getValue(), formatTime);
-
+        log.info("活码使用范围修改任务 weQrScopeList {}", JSONObject.toJSONString(weQrScopeList));
         if (CollectionUtil.isNotEmpty(weQrScopeList)) {
             List<WeQrScopeVo> weCustomizeQrScopeList = weQrScopeList.stream().filter(item -> ObjectUtil.equal(1, item.getType())).collect(Collectors.toList());
             if (CollectionUtil.isNotEmpty(weCustomizeQrScopeList)) {

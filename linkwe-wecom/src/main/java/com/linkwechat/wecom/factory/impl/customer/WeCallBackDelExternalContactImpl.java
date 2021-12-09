@@ -37,34 +37,31 @@ public class WeCallBackDelExternalContactImpl extends WeEventStrategy {
     public void eventHandle(WeBackBaseVo message) {
         WeBackCustomerVo customerInfo = (WeBackCustomerVo) message;
         if (customerInfo.getExternalUserID() != null) {
-
-            //删除客户
-            if(weCustomerService.remove(new LambdaQueryWrapper<WeCustomer>()
-                    .eq(WeCustomer::getExternalUserid,customerInfo.getExternalUserID())
-                    .eq(WeCustomer::getFirstUserId,customerInfo.getUserID()))){
-                //增加敏感行为记录，员工删除客户
-                WeSensitiveAct weSensitiveAct = weSensitiveActHitService.getSensitiveActType("拉黑/删除好友");
-                if (weSensitiveAct != null && weSensitiveAct.getEnableFlag() == 1) {
-                    WeSensitiveActHit weSensitiveActHit = new WeSensitiveActHit();
-                    weSensitiveActHit.setSensitiveActId(weSensitiveAct.getId());
-                    weSensitiveActHit.setSensitiveAct(weSensitiveAct.getActName());
-                    weSensitiveActHit.setCreateTime(new Date(customerInfo.getCreateTime()));
-                    weSensitiveActHit.setCreateBy("admin");
-                    weSensitiveActHit.setOperatorId(customerInfo.getUserID());
-                    WeUser user = weUserService.getById(customerInfo.getUserID());
-                    weSensitiveActHit.setOperator(user.getName());
-
-                    WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>()
-                            .eq(WeCustomer::getExternalUserid,customerInfo.getExternalUserID())
-                            .eq(WeCustomer::getFirstUserId,customerInfo.getUserID()));
-
-                    weSensitiveActHit.setOperateTargetId(weCustomer.getFirstUserId());
-                    weSensitiveActHit.setOperateTarget(weCustomer.getCustomerName());
-                    weSensitiveActHitService.insertWeSensitiveActHit(weSensitiveActHit);
-                }
-
+            WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getFirstUserId,customerInfo.getUserID())
+                    .eq(WeCustomer::getExternalUserid,customerInfo.getExternalUserID()).eq(WeCustomer::getDelFlag,0).last("limit 1"));
+            if(weCustomer == null){
+                return;
             }
-
+            //删除客户
+            WeCustomer customer = new WeCustomer();
+            customer.setDelFlag(1);
+            weCustomerService.update(customer,new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getFirstUserId,customerInfo.getUserID())
+                    .eq(WeCustomer::getExternalUserid,customerInfo.getExternalUserID()).eq(WeCustomer::getDelFlag,0));
+            //增加敏感行为记录，员工删除客户
+            WeSensitiveAct weSensitiveAct = weSensitiveActHitService.getSensitiveActType("拉黑/删除好友");
+            if (weSensitiveAct != null && weSensitiveAct.getEnableFlag() == 1) {
+                WeSensitiveActHit weSensitiveActHit = new WeSensitiveActHit();
+                weSensitiveActHit.setSensitiveActId(weSensitiveAct.getId());
+                weSensitiveActHit.setSensitiveAct(weSensitiveAct.getActName());
+                weSensitiveActHit.setCreateTime(new Date(customerInfo.getCreateTime()));
+                weSensitiveActHit.setCreateBy("admin");
+                weSensitiveActHit.setOperatorId(customerInfo.getUserID());
+                WeUser user = weUserService.getById(customerInfo.getUserID());
+                weSensitiveActHit.setOperator(user.getName());
+                weSensitiveActHit.setOperateTargetId(weCustomer.getFirstUserId());
+                weSensitiveActHit.setOperateTarget(weCustomer.getCustomerName());
+                weSensitiveActHitService.insertWeSensitiveActHit(weSensitiveActHit);
+            }
         }
     }
 }

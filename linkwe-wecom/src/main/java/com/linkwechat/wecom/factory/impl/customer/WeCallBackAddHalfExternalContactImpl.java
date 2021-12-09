@@ -2,6 +2,7 @@ package com.linkwechat.wecom.factory.impl.customer;
 
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
 import com.linkwechat.wecom.domain.callback.WeBackCustomerVo;
 import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
@@ -54,12 +55,9 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
             weCustomerService.getCustomersInfoAndSynchWeCustomer(customerInfo.getExternalUserID(),customerInfo.getUserID());
         }
 
-        if (customerInfo.getState() != null && customerInfo.getWelcomeCode() != null) {
-            if (isFission(customerInfo.getState())) {
-                taskFissionRecordHandle(customerInfo.getState(), customerInfo.getWelcomeCode(), customerInfo.getUserID(), customerInfo.getExternalUserID());
-            } else {
-                weEventPublisherService.register(customerInfo.getExternalUserID(),customerInfo.getUserID(),customerInfo.getWelcomeCode(),customerInfo.getState());
-            }
+        weEventPublisherService.register(customerInfo.getExternalUserID(),customerInfo.getUserID(),customerInfo.getWelcomeCode(),customerInfo.getState());
+        if (StringUtils.isNotEmpty(customerInfo.getState()) && isFission(customerInfo.getState())) {
+            taskFissionRecordHandle(customerInfo.getState(), customerInfo.getWelcomeCode(), customerInfo.getUserID(), customerInfo.getExternalUserID());
         }
     }
 

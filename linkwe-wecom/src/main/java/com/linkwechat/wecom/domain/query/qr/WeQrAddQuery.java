@@ -80,8 +80,8 @@ public class WeQrAddQuery {
         //根据类型生成相应的活码
         if(this.qrId == null){
             Snowflake snowflake = IdUtil.getSnowflake(RandomUtil.randomLong(6), RandomUtil.randomInt(6));
-            this.state = snowflake.nextIdStr();
-            weContactWay.setState(WeConstans.WE_QR_CODE_PREFIX + "_" + state);
+            this.state = WeConstans.WE_QR_CODE_PREFIX + snowflake.nextIdStr();
+            weContactWay.setState(state);
         }
         weContactWay.setConfig_id(this.configId);
         weContactWay.setType(this.qrType);
@@ -90,14 +90,14 @@ public class WeQrAddQuery {
         if (CollectionUtil.isNotEmpty(qrUserInfos)) {
             //员工列表
             String[] userIdArr = qrUserInfos.stream().filter(item ->
-                    ObjectUtil.equal(1, item.getType()) && CollectionUtil.isNotEmpty(item.getUserIds()))
+                    ObjectUtil.equal(0, item.getType()) && CollectionUtil.isNotEmpty(item.getUserIds()))
                     .map(WeQrUserInfoQuery::getUserIds).flatMap(Collection::stream).toArray(String[]::new);
             if (userIdArr.length > 0) {
                 weContactWay.setUser(userIdArr);
             }
             //部门列表
             Long[] partyArr = qrUserInfos.stream().filter(item ->
-                    ObjectUtil.equal(1, item.getType()) && CollectionUtil.isNotEmpty(item.getPartys()))
+                    ObjectUtil.equal(0, item.getType()) && CollectionUtil.isNotEmpty(item.getPartys()))
                     .map(WeQrUserInfoQuery::getPartys).flatMap(Collection::stream).toArray(Long[]::new);
             if (partyArr.length > 0) {
                 weContactWay.setParty(partyArr);

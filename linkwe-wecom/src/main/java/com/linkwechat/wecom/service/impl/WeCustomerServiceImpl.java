@@ -401,6 +401,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             WeCustomer weCustomer = new WeCustomer();
             BeanUtils.copyPropertiesASM(externalUserDetail.getExternal_contact(), weCustomer);
             weCustomer.setFirstUserId(userId);
+            weCustomer.setCustomerName(externalUserDetail.getExternal_contact().getName());
             List<ExternalUserDetail.FollowUser> follow_user = externalUserDetail.getFollow_user();
             if(CollectionUtil.isNotEmpty(follow_user)){
                 ExternalUserDetail.FollowUser followUser = follow_user.stream().filter(e -> e.getUserid().equals(userId)).findFirst().get();
@@ -428,152 +429,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                         });
                         iWeFlowerCustomerTagRelService.batchAddOrUpdate(tagRels);
                     }
-
-
                 }
-
-
             }
-
         }
-
-
-//            //判断该客户是否存在
-//            if(this.baseMapper.selectWeCustomerById(externalUserid) != null){//直接更新无需修改首位添加人和时间
-//                weCustomer.setDelFlag(new Integer(0));
-//                this.baseMapper.updateWeCustomer(weCustomer);
-//            }else {
-//                weCustomer.setFirstUserId(userId);
-//                weCustomer.setFirstAddTime(new Date());
-//                this.save(weCustomer);
-//            }
-//
-//            //客户与通讯录客户关系
-//            List<WeTag> weTags = new ArrayList<>();
-//            List<WeTagGroup> weGroups = new ArrayList<>();
-//            List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
-//            List<WeFlowerCustomerRel> weFlowerCustomerRel = new ArrayList<>();
-//            externalUserDetail.getFollow_user().stream().forEach(kk -> {
-//
-//                Long weFlowerCustomerRelId = SnowFlakeUtil.nextId();
-//                weFlowerCustomerRel.add(WeFlowerCustomerRel.builder()
-//                        .id(weFlowerCustomerRelId)
-//                        .userId(kk.getUserid())
-//                        .description(kk.getDescription())
-//                        .remarkCorpName(kk.getRemarkCorpName())
-//                        .remarkMobiles(Arrays.stream(kk.getRemarkMobiles()).collect(Collectors.joining(",")))
-//                        .operUserid(kk.getUserid())
-//                        .addWay(kk.getAddWay())
-//                        .state(kk.getState())
-//                        .status("0")
-//                        .externalUserid(weCustomer.getExternalUserid())
-//                        .createTime(new Date(kk.getCreatetime() * 1000L))
-//                        .build());
-//
-//                List<ExternalUserTag> tags = kk.getTags();
-//                if (CollectionUtil.isNotEmpty(tags)) {
-//
-//                    //获取相关标签组
-//                    WeCropGroupTagListDto weCropGroupTagListDto = weCropTagClient.getCorpTagListByTagIds(WeFindCropTagParam.builder()
-//                            .tag_id(ArrayUtil.toArray(tags.stream().map(ExternalUserTag::getTag_id).collect(Collectors.toList()), String.class))
-//                            .build());
-//
-//                    if (weCropGroupTagListDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)) {
-//                        List<WeCropGroupTagDto> tagGroups = weCropGroupTagListDto.getTag_group();
-//                        if (CollectionUtil.isNotEmpty(tagGroups)) {
-//                            tagGroups.stream().forEach(tagGroup -> {
-//                                weGroups.add(
-//                                        WeTagGroup.builder()
-//                                                .groupId(tagGroup.getGroup_id())
-//                                                .gourpName(tagGroup.getGroup_name())
-//                                                .build()
-//                                );
-//
-//                                List<WeCropTagDto> weCropTagDtos = tagGroup.getTag();
-//
-//                                if (CollectionUtil.isNotEmpty(weCropTagDtos)) {
-//                                    Set<String> tagIdsSet = weCropTagDtos.stream().map(WeCropTagDto::getId).collect(Collectors.toSet());
-//
-//                                    tags.stream().forEach(tag -> {
-//
-//                                        if (tagIdsSet.contains(tag.getTag_id())) {
-//
-//                                            weTags.add(
-//                                                    WeTag.builder()
-//                                                            .groupId(tagGroup.getGroup_id())
-//                                                            .tagId(tag.getTag_id())
-//                                                            .name(tag.getTag_name())
-//                                                            .build()
-//                                            );
-//
-//                                            weFlowerCustomerTagRels.add(
-//                                                    WeFlowerCustomerTagRel.builder()
-//                                                            .tagId(tag.getTag_id())
-//                                                            .createTime(new Date())
-//                                                            .build()
-//                                            );
-//
-//
-//                                        }
-//
-//
-//                                    });
-//
-//
-//                                }
-//
-//
-//                            });
-//
-//
-//                        }
-//                    }
-//
-//
-//                }
-//            });
-//
-//
-//            List<WeFlowerCustomerRel> weFlowerCustomerRels = iWeFlowerCustomerRelService.list(new LambdaQueryWrapper<WeFlowerCustomerRel>()
-//                    .eq(WeFlowerCustomerRel::getExternalUserid, weCustomer.getExternalUserid()));
-//
-//            try {
-//                if (CollectionUtil.isNotEmpty(weFlowerCustomerRels)) {
-//                    List<Long> weFlowerCustomerRelIds = weFlowerCustomerRels.stream().map(WeFlowerCustomerRel::getId).collect(Collectors.toList());
-//
-//                    iWeFlowerCustomerRelService.removeByIds(
-//                            weFlowerCustomerRelIds
-//                    );
-//                }
-//
-//
-//                iWeFlowerCustomerRelService.saveBatch(weFlowerCustomerRel);
-//
-//                //设置标签跟客户关系，标签和标签组,saveOrUpdate，建立标签与添加人关系
-//                if (CollectionUtil.isNotEmpty(weTags) && CollectionUtil.isNotEmpty(weGroups)) {
-//                    iWeTagService.saveOrUpdateBatch(weTags);
-//                    iWeTagGroupService.saveOrUpdateBatch(weGroups);
-//
-//
-//                    List<WeFlowerCustomerTagRel> tagRels
-//                            = weFlowerCustomerTagRels.stream().filter(rel -> Objects.nonNull(rel.getUserId())).collect(Collectors.toList());
-//
-//                    if(CollectionUtil.isNotEmpty(tagRels)){
-//
-//                        iWeFlowerCustomerTagRelService.saveOrUpdateBatch(tagRels);
-//
-//                    }
-//
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                log.error("Exception:【{}】",e);
-//                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-//            }
-
-//        }
-
-
     }
 
 

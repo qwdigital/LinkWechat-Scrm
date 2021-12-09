@@ -50,12 +50,9 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
             weCustomerService.getCustomersInfoAndSynchWeCustomer(customerInfo.getExternalUserID(),customerInfo.getUserID());
         }
 
-        if (StringUtils.isNotEmpty(customerInfo.getState()) && StringUtils.isNotEmpty(customerInfo.getWelcomeCode())) {
-            if (isFission(customerInfo.getState())) {
-                taskFissionRecordHandle(customerInfo.getState(), customerInfo.getWelcomeCode(), customerInfo.getUserID(), customerInfo.getExternalUserID());
-            } else {
-                weEventPublisherService.register(customerInfo.getState(), customerInfo.getWelcomeCode(), customerInfo.getUserID(), customerInfo.getExternalUserID());
-            }
+        weEventPublisherService.register(customerInfo.getExternalUserID(),customerInfo.getUserID(),customerInfo.getWelcomeCode(),customerInfo.getState());
+        if (StringUtils.isNotEmpty(customerInfo.getState()) && isFission(customerInfo.getState())) {
+            taskFissionRecordHandle(customerInfo.getState(), customerInfo.getWelcomeCode(), customerInfo.getUserID(), customerInfo.getExternalUserID());
         }
 
     }

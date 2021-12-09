@@ -50,54 +50,58 @@ public class WeCallBackDelFollowUserImpl extends WeEventStrategy {
         WeBackCustomerVo customerInfo = (WeBackCustomerVo) message;
         try {
             if (customerInfo.getUserID() != null && customerInfo.getExternalUserID() != null) {
-
-                if(weCustomerService.remove(new LambdaQueryWrapper<WeCustomer>()
-                        .eq(WeCustomer::getExternalUserid,customerInfo.getExternalUserID())
-                        .eq(WeCustomer::getFirstUserId,customerInfo.getUserID()))){
-
-                    WeCorpAccount validWeCorpAccount = weCorpAccountService.findValidWeCorpAccount();
-                    Optional.ofNullable(validWeCorpAccount).ifPresent(weCorpAccount -> {
-                        String customerChurnNoticeSwitch = weCorpAccount.getCustomerChurnNoticeSwitch();
-                        if (WeConstans.DEL_FOLLOW_USER_SWITCH_OPEN.equals(customerChurnNoticeSwitch)) {
-                            WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getFirstUserId,customerInfo.getUserID())
-                                    .eq(WeCustomer::getExternalUserid,customerInfo.getExternalUserID()));
-
-                            String content = "您已经被客户@" + weCustomer.getCustomerName() + "删除!";
-                            TextMessageDto textMessageDto = new TextMessageDto();
-                            textMessageDto.setContent(content);
-                            WeMessagePushDto weMessagePushDto = new WeMessagePushDto();
-                            weMessagePushDto.setMsgtype(MessageType.TEXT.getMessageType());
-                            weMessagePushDto.setTouser(customerInfo.getUserID());
-                            weMessagePushDto.setText(textMessageDto);
-
-                            Optional.ofNullable(validWeCorpAccount).map(WeCorpAccount::getAgentId).ifPresent(agentId -> {
-                                weMessagePushDto.setAgentid(Integer.valueOf(agentId));
-                            });
-
-                            weMessagePushClient.sendMessageToUser(weMessagePushDto,weMessagePushDto.getAgentid().toString());
-
-                            //增加敏感行为记录，客户删除员工
-                            WeSensitiveAct weSensitiveAct = weSensitiveActHitService.getSensitiveActType("拉黑/删除好友");
-                            if (weSensitiveAct != null && weSensitiveAct.getEnableFlag() == 1) {
-                                WeSensitiveActHit weSensitiveActHit = new WeSensitiveActHit();
-                                weSensitiveActHit.setSensitiveActId(weSensitiveAct.getId());
-                                weSensitiveActHit.setSensitiveAct(weSensitiveAct.getActName());
-                                weSensitiveActHit.setCreateTime(new Date(message.getCreateTime()));
-                                weSensitiveActHit.setCreateBy("admin");
-                                WeUser user = weUserService.getById(customerInfo.getUserID());
-                                weSensitiveActHit.setOperatorId(weCustomer.getFirstUserId());
-                                weSensitiveActHit.setOperator(weCustomer.getCustomerName());
-                                weSensitiveActHit.setOperateTargetId(user.getUserId());
-                                weSensitiveActHit.setOperateTarget(user.getName());
-                                weSensitiveActHitService.insertWeSensitiveActHit(weSensitiveActHit);
-                            }
-                        }
-                    });
-
+                WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getFirstUserId,customerInfo.getUserID())
+                        .eq(WeCustomer::getExternalUserid,customerInfo.getExternalUserID()).eq(WeCustomer::getDelFlag,0).last("limit 1"));
+                if(weCustomer == null){
+                    return;
                 }
+                WeCustomer customer = new WeCustomer();
+                customer.setDelFlag(1);
+                weCustomerService.update(customer,new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getFirstUserId,customerInfo.getUserID())
+                        .eq(WeCustomer::getExternalUserid,customerInfo.getExternalUserID()).eq(WeCustomer::getDelFlag,0));
+
+                WeCorpAccount validWeCorpAccount = weCorpAccountService.findValidWeCorpAccount();
+                Optional.ofNullable(validWeCorpAccount).ifPresent(weCorpAccount -> {
+                    String customerChurnNoticeSwitch = weCorpAccount.getCustomerChurnNoticeSwitch();
+                    if (WeConstans.DEL_FOLLOW_USER_SWITCH_OPEN.equals(customerChurnNoticeSwitch)) {
+                        String content = "您已经被客户@" + weCustomer.getCustomerName() + "删除!";
+                        TextMessageDto textMessageDto = new TextMessageDto();
+                        textMessageDto.setContent(content);
+                        WeMessagePushDto weMessagePushDto = new WeMessagePushDto();
+                        weMessagePushDto.setMsgtype(MessageType.TEXT.getMessageType());
+                        weMessagePushDto.setTouser(customerInfo.getUserID());
+                        weMessagePushDto.setText(textMessageDto);
+
+                        Optional.ofNullable(validWeCorpAccount).map(WeCorpAccount::getAgentId).ifPresent(agentId -> {
+                            weMessagePushDto.setAgentid(Integer.valueOf(agentId));
+                        });
+
+                        weMessagePushClient.sendMessageToUser(weMessagePushDto,weMessagePushDto.getAgentid().toString());
+                    }
+                });
+
+                extracted(message, customerInfo, weCustomer);
             }
         } catch (Exception e) {
             log.error("删除跟进成员事件>>>>>>>>>>>>>param:{},ex:{}", JSONObject.toJSONString(message), e);
+        }
+    }
+
+    private void extracted(WeBackBaseVo message, WeBackCustomerVo customerInfo, WeCustomer weCustomer) {
+        //增加敏感行为记录，客户删除员工
+        WeSensitiveAct weSensitiveAct = weSensitiveActHitService.getSensitiveActType("拉黑/删除好友");
+        if (weSensitiveAct != null && weSensitiveAct.getEnableFlag() == 1) {
+            WeSensitiveActHit weSensitiveActHit = new WeSensitiveActHit();
+            weSensitiveActHit.setSensitiveActId(weSensitiveAct.getId());
+            weSensitiveActHit.setSensitiveAct(weSensitiveAct.getActName());
+            weSensitiveActHit.setCreateTime(new Date(message.getCreateTime()));
+            weSensitiveActHit.setCreateBy("admin");
+            WeUser user = weUserService.getById(customerInfo.getUserID());
+            weSensitiveActHit.setOperatorId(weCustomer.getFirstUserId());
+            weSensitiveActHit.setOperator(weCustomer.getCustomerName());
+            weSensitiveActHit.setOperateTargetId(user.getUserId());
+            weSensitiveActHit.setOperateTarget(user.getName());
+            weSensitiveActHitService.insertWeSensitiveActHit(weSensitiveActHit);
         }
     }
 }

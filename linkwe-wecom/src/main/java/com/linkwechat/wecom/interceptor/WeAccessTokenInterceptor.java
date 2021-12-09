@@ -75,12 +75,10 @@ public class WeAccessTokenInterceptor implements Interceptor<WeResultDto> {
     @Override
     public void onSuccess(WeResultDto resultDto, ForestRequest forestRequest, ForestResponse forestResponse) {
         log.info("url:{},result:{}", forestRequest.getUrl(), forestResponse.getContent());
-        if (null != resultDto.getErrcode() && !ObjectUtil.equal(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode(), resultDto.getErrcode())
+        /*if (null != resultDto.getErrcode() && !ObjectUtil.equal(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode(), resultDto.getErrcode())
                 && !weComeConfig.getWeNeedRetryErrorCodes().contains(resultDto.getErrcode())) {
             throw new ForestRuntimeException(WeErrorCodeEnum.parseEnum(resultDto.getErrcode()).getErrorMsg());
-        }
-
-
+        }*/
     }
 
     /**

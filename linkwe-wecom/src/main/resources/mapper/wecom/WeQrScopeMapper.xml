@@ -79,7 +79,6 @@
         where  find_in_set(#{value},wqs.work_cycle)
         and str_to_date(wqs.begin_time,'%H:%i:%S') &lt;= str_to_date(#{formatTime},'%H:%i:%S')
         and str_to_date(wqs.end_time ,'%H:%i:%S') &gt;= str_to_date(#{formatTime},'%H:%i:%S')
-        /*and wqs.`type` = 1*/
         and wqs.del_flag = 0
     </select>
 </mapper>

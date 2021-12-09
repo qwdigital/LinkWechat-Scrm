@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.wecom.client.WeCustomerClient;
+import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeQrAttachments;
 import com.linkwechat.wecom.domain.WeQrCode;
 import com.linkwechat.wecom.domain.WeTag;
@@ -107,19 +108,25 @@ public class WelcomeService implements ApplicationListener<WeCustomerWelcomeQuer
      * @return
      */
     private WeResultDto sendWelcomeMsg(WeCustomerWelcomeQuery query, List<WeQrAttachments> qrAttachments) {
+        String welcomText = "默认欢迎语";
         WeWelcomeMsg welcomeMsg = WeWelcomeMsg.builder().welcome_code(query.getWelcomeCode()).build();
         if(CollectionUtil.isNotEmpty(qrAttachments)){
             WeQrAttachments weQrAttachments = qrAttachments.stream()
                     .filter(qrAttachment -> ObjectUtil.equal(MessageType.TEXT.getMessageType(), qrAttachment.getMsgType()))
                     .findFirst().orElseGet(null);
             if(weQrAttachments != null){
-                welcomeMsg.setText(WeWelcomeMsg.Text.builder().content(weQrAttachments.getContent()).build());
+                welcomText = weQrAttachments.getContent();
             }
             getMediaId(qrAttachments);
             welcomeMsg.setAttachments(qrAttachments);
-        }else {
-            welcomeMsg.setText(WeWelcomeMsg.Text.builder().content("默认欢迎语").build());
         }
+        WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getFirstUserId,query.getUserId())
+                .eq(WeCustomer::getExternalUserid,query.getExternalUserId()).eq(WeCustomer::getDelFlag,0).last("limit 1"));
+        if(weCustomer != null){
+            String customerName = weCustomer.getCustomerName();
+            welcomText = welcomText.replaceAll("#客户昵称#",customerName);
+        }
+        welcomeMsg.setText(WeWelcomeMsg.Text.builder().content(welcomText).build());
         return weCustomerClient.sendWelcomeMsg(welcomeMsg);
     }
 
