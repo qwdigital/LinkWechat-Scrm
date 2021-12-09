@@ -37,8 +37,7 @@ public class WeCustomerSeasController extends BaseController {
 
 
 
-    @Autowired
-    private IWeMessagePushService iWeMessagePushService;
+
 
     /**
      * 客户公海模版下载
@@ -75,26 +74,62 @@ public class WeCustomerSeasController extends BaseController {
             if(CollectionUtil.isEmpty(deduplicationSeas)){
                 return AjaxResult.error("导入用户数据不能为空！");
             }
-            //跟根据手机号去重
+            //根据手机号去重(去除excel中重复的号码)
             List<WeCustomerSeas> deduplicationSeasNoRepeat=deduplicationSeas.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() ->
                     new TreeSet<>(Comparator.comparing(WeCustomerSeas :: getPhone))), ArrayList::new));
-            Long tabaleExcelId= SnowFlakeUtil.nextId();
 
-            List<String> userIds = ListUtil.toList(weCustomerSea.getAddUserId().split(","));
-            List<String> userNames = ListUtil.toList(weCustomerSea.getAddUserName().split(","));
 
-            IntStream.range(0,deduplicationSeasNoRepeat.size()).forEach(i->{
-                WeCustomerSeas k = deduplicationSeasNoRepeat.get(i);
-                if(Objects.nonNull(k)){
-                    k.setTagIds(weCustomerSea.getTagIds());
-                    k.setTagNames(weCustomerSea.getTagNames());
-                    k.setAddUserId( userIds.get(Math.floorMod(i, userIds.size())));
-                    k.setAddUserName(userNames.get(Math.floorMod(i, userNames.size())));
-                    k.setTableExcelName(file.getOriginalFilename());
-                    k.setTableExcelId(tabaleExcelId);
-                }
-            });
-            iWeCustomerSeasService.saveBatch(deduplicationSeasNoRepeat);
+            //根据手机号去除数据库与excel中重复号码
+            List<WeCustomerSeas> dbExist = iWeCustomerSeasService.list(new LambdaQueryWrapper<WeCustomerSeas>()
+                    .in(WeCustomerSeas::getPhone, deduplicationSeasNoRepeat.stream()
+                            .map(WeCustomerSeas::getPhone).collect(Collectors.toList())));
+            if(CollectionUtil.isNotEmpty(dbExist)){
+                List<WeCustomerSeas> noRepetWeCustomerSeas
+                        = deduplicationSeasNoRepeat.stream().filter(item ->
+                        !dbExist.stream().map(e->e.getPhone()).collect(Collectors.toList())
+                                .contains(item.getPhone())).collect(Collectors.toList());
+                deduplicationSeasNoRepeat.clear();
+                deduplicationSeasNoRepeat.addAll(
+                        noRepetWeCustomerSeas
+                );
+            }
+
+
+          if(CollectionUtil.isNotEmpty(deduplicationSeasNoRepeat)){
+
+              Long tabaleExcelId= SnowFlakeUtil.nextId();
+
+              List<String> userIds = ListUtil.toList(weCustomerSea.getAddUserId().split(","));
+              List<String> userNames = ListUtil.toList(weCustomerSea.getAddUserName().split(","));
+
+              IntStream.range(0,deduplicationSeasNoRepeat.size()).forEach(i->{
+                  WeCustomerSeas k = deduplicationSeasNoRepeat.get(i);
+                  if(Objects.nonNull(k)){
+                      k.setTagIds(weCustomerSea.getTagIds());
+                      k.setTagNames(weCustomerSea.getTagNames());
+                      k.setAddUserId( userIds.get(Math.floorMod(i, userIds.size())));
+                      k.setAddUserName(userNames.get(Math.floorMod(i, userNames.size())));
+                      k.setTableExcelName(file.getOriginalFilename());
+                      k.setTableExcelId(tabaleExcelId);
+                  }
+              });
+              if(iWeCustomerSeasService.saveBatch(deduplicationSeasNoRepeat)){
+                  //发送提醒
+                  deduplicationSeasNoRepeat.stream().collect(Collectors.groupingBy(WeCustomerSeas::getAddUserId)).forEach((k,v)->{
+
+                      iWeCustomerSeasService.remidUser(ListUtil.toList(k),v.size());
+
+
+                  });
+
+              }
+
+          }
+
+
+
+
+
         }else{
             return AjaxResult.error("导入用户数据不能为空！");
         }
@@ -114,10 +149,11 @@ public class WeCustomerSeasController extends BaseController {
         startPage();
         List<WeCustomerSeas> weCustomerSeas = iWeCustomerSeasService.list(
                 new LambdaQueryWrapper<WeCustomerSeas>()
-                        .eq(StringUtils.isNotEmpty(weCustomerSea.getPhone()),WeCustomerSeas::getPhone,weCustomerSea.getPhone())
+                        .like(StringUtils.isNotEmpty(weCustomerSea.getPhone()),WeCustomerSeas::getPhone,weCustomerSea.getPhone())
                         .like(StringUtils.isNotEmpty(weCustomerSea.getCustomerName()),WeCustomerSeas::getCustomerName,weCustomerSea.getCustomerName())
                         .like(StringUtils.isNotEmpty(weCustomerSea.getAddUserName()),WeCustomerSeas::getAddUserName,weCustomerSea.getAddUserName())
                         .eq(weCustomerSea.getAddState() !=null ,WeCustomerSeas::getAddState,weCustomerSea.getAddState())
+                        .orderByDesc(WeCustomerSeas::getCreateTime)
         );
 
         return getDataTable(weCustomerSeas);
@@ -152,9 +188,8 @@ public class WeCustomerSeasController extends BaseController {
 
         if(CollectionUtil.isNotEmpty(weCustomerSeas)){
             weCustomerSeas.stream().collect(Collectors.groupingBy(WeCustomerSeas::getAddUserId)).forEach((k,v)->{
+                iWeCustomerSeasService.remidUser(ListUtil.toList(k),v.size());
 
-                iWeMessagePushService.pushMessageSelfH5(ListUtil.toList(k),
-                        "管理员给你分配了"+v.size()+"个客户还未添加,快去复制电话号码添加客户吧,", CommunityTaskType.SEAS.getType());
 
 
             });

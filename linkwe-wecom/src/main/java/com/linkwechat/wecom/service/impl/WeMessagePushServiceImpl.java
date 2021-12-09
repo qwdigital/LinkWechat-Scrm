@@ -125,7 +125,7 @@ public class WeMessagePushServiceImpl implements IWeMessagePushService {
             if(StringUtils.isEmpty( validWeCorpAccount.getSeasRedirectUrl())){
                 throw new WeComException("客户公海H5跳转链接不可为空");
             }
-            URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s",
+            REDIRECT_URI=URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s",
                             validWeCorpAccount.getSeasRedirectUrl()
                     , corpId, agentId));
         }else{//群sop与老客标签建群

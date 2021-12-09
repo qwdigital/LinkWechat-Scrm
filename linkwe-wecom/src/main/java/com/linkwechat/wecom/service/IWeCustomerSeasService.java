@@ -14,4 +14,7 @@ public interface IWeCustomerSeasService extends IService<WeCustomerSeas> {
 
     List<CustomerSeasRecordVo> findSeasRecord(Integer groupByType);
 
+
+    void remidUser(List<String> addUserIds,Integer customerNum);
+
 }

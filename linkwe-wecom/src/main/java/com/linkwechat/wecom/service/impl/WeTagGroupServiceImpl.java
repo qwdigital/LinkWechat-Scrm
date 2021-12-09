@@ -69,24 +69,37 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
 
         List<WeTag> weTags = weTagGroup.getWeTags();
 
-        if (CollectionUtil.isEmpty(weTags)) {
-            this.save(weTagGroup);
-        } else {
+        if(this.save(weTagGroup)){
+            if(CollectionUtil.isNotEmpty(weTags)){
+                weTags.stream().forEach(k->{
+                    k.setGroupId(weTagGroup.getGroupId());
+                });
 
-            //个人标签同步，企业微信
-            if(weTagGroup.getGroupTagType().equals(new Integer(1))){
-                weTagGroup.setAddWeTags(
-                        weTags
-                );
-                WeCropGropTagDtlDto weCropGropTagDtlDto = weCropTagClient.addCorpTag(WeCropGroupTagDto.transformAddTag(weTagGroup));
-                if (weCropGropTagDtlDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)) {
-                    this.batchSaveOrUpdateTagGroupAndTag(ListUtil.toList(weCropGropTagDtlDto.getTag_group()), false);
+                //客户标签
+                if(weTagGroup.getGroupTagType().equals(new Integer(1))){
+                    weTagGroup.setAddWeTags(
+                            weTags
+                    );
+                    WeCropGropTagDtlDto weCropGropTagDtlDto = weCropTagClient.addCorpTag(WeCropGroupTagDto.transformAddTag(weTagGroup));
+                    if (weCropGropTagDtlDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)) {
+                        this.batchSaveOrUpdateTagGroupAndTag(ListUtil.toList(weCropGropTagDtlDto.getTag_group()), false);
+                    }
+                }else{
+
+                    iWeTagService.saveBatch(weTags);
                 }
-            }else{
-                iWeTagService.saveBatch(weTags);
+
+
             }
-            
+
         }
+//        if (CollectionUtil.isEmpty(weTags)) {
+//            this.save(weTagGroup);
+//        } else {
+//
+//
+//
+//        }
 
 
 

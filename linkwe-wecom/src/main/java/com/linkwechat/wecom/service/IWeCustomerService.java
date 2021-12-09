@@ -128,7 +128,7 @@ public interface IWeCustomerService extends IService<WeCustomer>
      * 去重统计
      * @return
      */
-    long noRepeatCountCustomer();
+    long noRepeatCountCustomer(WeCustomerList weCustomerList);
 
 
 }
