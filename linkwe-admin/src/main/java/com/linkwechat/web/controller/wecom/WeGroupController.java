@@ -5,6 +5,7 @@ import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.wecom.constants.SynchRecordConstants;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeGroupMember;
@@ -87,7 +88,12 @@ public class WeGroupController extends BaseController {
     //   @PreAuthorize("@ss.hasPermi('customerManage:group:sync')")
     @GetMapping({"/synchWeGroup"})
     public AjaxResult synchWeGroup(){
-        weGroupService.synchWeGroup();
+
+        try {
+            weGroupService.synchWeGroup();
+        }catch (CustomException e){
+            return AjaxResult.error(e.getMessage());
+        }
         return  AjaxResult.success(WeConstans.SYNCH_TIP);
     }
 

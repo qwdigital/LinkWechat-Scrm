@@ -4,6 +4,7 @@ import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.wecom.client.WeMomentsClient;
 import com.linkwechat.wecom.constants.SynchRecordConstants;
 import com.linkwechat.wecom.domain.WeMoments;
@@ -90,11 +91,17 @@ public class WeMomentsController extends BaseController {
     @GetMapping("/synchMoments")
     public AjaxResult synchMoments(@RequestParam(defaultValue = "0") Integer filterType){
 
-        if(filterType.equals(new Integer(0))){
-            iWeMomentsService.synchEnterpriseMoments(filterType);
-        }else if(filterType.equals(new Integer(1))){
-            iWeMomentsService.synchPersonMoments(filterType);
+        try {
+            if(filterType.equals(new Integer(0))){
+                iWeMomentsService.synchEnterpriseMoments(filterType);
+            }else if(filterType.equals(new Integer(1))){
+                iWeMomentsService.synchPersonMoments(filterType);
+            }
+        }catch (CustomException e){
+            return AjaxResult.error(e.getMessage());
         }
+
+
         return AjaxResult.success(WeConstans.SYNCH_TIP);
     }
 

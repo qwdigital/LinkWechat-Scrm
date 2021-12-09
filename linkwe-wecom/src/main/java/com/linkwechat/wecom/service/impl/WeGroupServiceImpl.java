@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.Threads;
 import com.linkwechat.wecom.annotation.SynchRecord;
 import com.linkwechat.wecom.client.WeCustomerClient;
 import com.linkwechat.wecom.client.WeCustomerGroupClient;
@@ -17,9 +18,7 @@ import com.linkwechat.wecom.domain.WeCustomerAddGroup;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeGroupMember;
 import com.linkwechat.wecom.domain.dto.AllocateWeGroupDto;
-import com.linkwechat.wecom.domain.dto.customer.CustomerGroupDetail;
-import com.linkwechat.wecom.domain.dto.customer.CustomerGroupList;
-import com.linkwechat.wecom.domain.dto.customer.CustomerGroupMember;
+import com.linkwechat.wecom.domain.dto.customer.*;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.mapper.WeGroupMapper;
 import com.linkwechat.wecom.service.IWeAllocateGroupService;
@@ -27,6 +26,8 @@ import com.linkwechat.wecom.service.IWeGroupMemberService;
 import com.linkwechat.wecom.service.IWeGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -118,67 +119,80 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
      * 客户群同步
      */
     @Override
-    @Async
     @Transactional(rollbackFor = Exception.class)
     @SynchRecord(synchType = SynchRecordConstants.SYNCH_CUSTOMER_GROUP)
     public void synchWeGroup() {
 
-        CustomerGroupList customerGroupList =
-                weCustomerGroupClient.groupChatLists(new CustomerGroupList().new Params());
-        if (customerGroupList.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)
-                && CollectionUtil.isNotEmpty(customerGroupList.getGroupChatList())) {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
 
-            List<WeGroup> weGroups = new ArrayList<>();
-            List<WeGroupMember> weGroupMembers = new ArrayList<>();
-            customerGroupList.getGroupChatList().stream().forEach(k -> {
-                CustomerGroupDetail customerGroupDetail = weCustomerGroupClient.groupChatDetail(
-                        new CustomerGroupDetail().new Params(k.getChatId(), 1)
-                );
+        //异步同步一下标签库,解决标签不同步问题
+        Threads.SINGLE_THREAD_POOL.execute(new Runnable() {
+            @Override
+            public void run() {
+                SecurityContextHolder.setContext(securityContext);
 
-                if (customerGroupDetail.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)
-                        && CollectionUtil.isNotEmpty(customerGroupDetail.getGroupChat())) {
+                CustomerGroupList customerGroupList =
+                        weCustomerGroupClient.groupChatLists(new CustomerGroupList().new Params());
+                if (customerGroupList.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)
+                        && CollectionUtil.isNotEmpty(customerGroupList.getGroupChatList())) {
 
-                    customerGroupDetail.getGroupChat().stream().forEach(kk -> {
-                        weGroups.add(
-                                WeGroup.builder()
-                                        .chatId(kk.getChatId())
-                                        .groupName(StringUtils.isNotEmpty(kk.getName())? kk.getName() : "@微信群")
-                                        .notice(kk.getNotice())
-                                        .owner(kk.getOwner())
-                                        .addTime(new Date(kk.getCreateTime() * 1000L))
-                                        .status(k.getStatus())
-                                        .delFlag(new Integer(0))
-                                        .adminUserId(Optional.ofNullable(kk.getAdminList()).orElseGet(ArrayList::new).stream().map(admin -> admin.getString("userid")).collect(Collectors.joining(",")))
-                                        .build()
+                    List<WeGroup> weGroups = new ArrayList<>();
+                    List<WeGroupMember> weGroupMembers = new ArrayList<>();
+                    customerGroupList.getGroupChatList().stream().forEach(k -> {
+                        CustomerGroupDetail customerGroupDetail = weCustomerGroupClient.groupChatDetail(
+                                new CustomerGroupDetail().new Params(k.getChatId(), 1)
                         );
 
-                        List<CustomerGroupMember> memberLists = kk.getMemberList();
-                        if (CollectionUtil.isNotEmpty(memberLists)) {
-                            memberLists.stream().forEach(member -> {
-                                weGroupMembers.add(
-                                        WeGroupMember.builder()
+                        if (customerGroupDetail.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)
+                                && CollectionUtil.isNotEmpty(customerGroupDetail.getGroupChat())) {
+
+                            customerGroupDetail.getGroupChat().stream().forEach(kk -> {
+                                weGroups.add(
+                                        WeGroup.builder()
                                                 .chatId(kk.getChatId())
-                                                .userId(member.getUserId())
-                                                .joinTime(new Date(member.getJoinTime() * 1000L))
-                                                .joinScene(member.getJoinScene())
-                                                .type(member.getType())
-                                                .unionId(member.getUnionId())
-                                                .groupNickName(member.getGroupNickName())
-                                                .name(member.getName())
+                                                .groupName(StringUtils.isNotEmpty(kk.getName())? kk.getName() : "@微信群")
+                                                .notice(kk.getNotice())
+                                                .owner(kk.getOwner())
+                                                .addTime(new Date(kk.getCreateTime() * 1000L))
+                                                .status(k.getStatus())
                                                 .delFlag(new Integer(0))
-                                                .invitorUserId(member.getInvitor() == null ? null : member.getInvitor().getString("userid"))
+                                                .adminUserId(Optional.ofNullable(kk.getAdminList()).orElseGet(ArrayList::new).stream().map(admin -> admin.getString("userid")).collect(Collectors.joining(",")))
                                                 .build()
                                 );
+
+                                List<CustomerGroupMember> memberLists = kk.getMemberList();
+                                if (CollectionUtil.isNotEmpty(memberLists)) {
+                                    memberLists.stream().forEach(member -> {
+                                        weGroupMembers.add(
+                                                WeGroupMember.builder()
+                                                        .chatId(kk.getChatId())
+                                                        .userId(member.getUserId())
+                                                        .joinTime(new Date(member.getJoinTime() * 1000L))
+                                                        .joinScene(member.getJoinScene())
+                                                        .type(member.getType())
+                                                        .unionId(member.getUnionId())
+                                                        .groupNickName(member.getGroupNickName())
+                                                        .name(member.getName())
+                                                        .delFlag(new Integer(0))
+                                                        .invitorUserId(member.getInvitor() == null ? null : member.getInvitor().getString("userid"))
+                                                        .build()
+                                        );
+                                    });
+                                }
+
+
                             });
+
                         }
-
-
                     });
-
+                    insertBatchGroupAndMember(weGroups, weGroupMembers);
                 }
-            });
-            insertBatchGroupAndMember(weGroups, weGroupMembers);
-        }
+
+            }
+
+        });
+
+
 
 
     }

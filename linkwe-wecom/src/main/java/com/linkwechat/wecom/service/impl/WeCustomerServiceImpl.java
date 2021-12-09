@@ -11,6 +11,7 @@ import com.linkwechat.common.enums.TrajectorySceneType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.Threads;
 import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.wecom.annotation.SynchRecord;
 import com.linkwechat.wecom.client.WeCustomerClient;
@@ -21,12 +22,15 @@ import com.linkwechat.wecom.domain.dto.AllocateWeCustomerDto;
 import com.linkwechat.wecom.domain.dto.WeCustomerDto;
 import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
 import com.linkwechat.wecom.domain.dto.customer.*;
+import com.linkwechat.wecom.domain.dto.tag.WeCropGroupTagListDto;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.mapper.WeCustomerMapper;
 import com.linkwechat.wecom.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
@@ -92,29 +96,41 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
      * @return
      */
     @Override
-    @Async
     @Transactional(rollbackFor = Exception.class)
     @SynchRecord(synchType = SynchRecordConstants.SYNCH_CUSTOMER)
-    public void synchWeCustomer() {
-        //获取所有可以添加客户的企业员工
-        FollowUserList followUserList = weCustomerClient.getFollowUserList();
-        if (WeConstans.WE_SUCCESS_CODE.equals(followUserList.getErrcode())
-                && ArrayUtil.isNotEmpty(followUserList.getFollow_user())) {
-            String[] follow_user = followUserList.getFollow_user();
-            if(ArrayUtil.isNotEmpty(follow_user)){
+    public void  synchWeCustomer() {
 
-                List<ExternalUserDetail> externalUserDetails = new ArrayList<>();
-                getByUser(follow_user, null, externalUserDetails);
+        SecurityContext securityContext = SecurityContextHolder.getContext();
 
-                if(CollectionUtil.isNotEmpty(externalUserDetails)){
-                    this.weFlowerCustomerHandle(
-                            externalUserDetails
-                    );
+        //异步同步一下标签库,解决标签不同步问题
+        Threads.SINGLE_THREAD_POOL.execute(new Runnable() {
+            @Override
+            public void run() {
+                SecurityContextHolder.setContext(securityContext);
+
+                //获取所有可以添加客户的企业员工
+                FollowUserList followUserList = weCustomerClient.getFollowUserList();
+                if (WeConstans.WE_SUCCESS_CODE.equals(followUserList.getErrcode())
+                        && ArrayUtil.isNotEmpty(followUserList.getFollow_user())) {
+                    String[] follow_user = followUserList.getFollow_user();
+                    if(ArrayUtil.isNotEmpty(follow_user)){
+
+                        List<ExternalUserDetail> externalUserDetails = new ArrayList<>();
+                        getByUser(follow_user, null, externalUserDetails);
+
+                        if(CollectionUtil.isNotEmpty(externalUserDetails)){
+                           weFlowerCustomerHandle(
+                                    externalUserDetails
+                            );
+                        }
+                    }
                 }
+
             }
-        }
+        });
 
     }
+
 
 
     /**

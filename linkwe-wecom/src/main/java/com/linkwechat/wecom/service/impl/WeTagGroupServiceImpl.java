@@ -9,7 +9,10 @@ import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.Threads;
+import com.linkwechat.wecom.annotation.SynchRecord;
 import com.linkwechat.wecom.client.WeCropTagClient;
+import com.linkwechat.wecom.constants.SynchRecordConstants;
 import com.linkwechat.wecom.domain.WeTag;
 import com.linkwechat.wecom.domain.WeTagGroup;
 import com.linkwechat.wecom.domain.dto.tag.*;
@@ -17,6 +20,9 @@ import com.linkwechat.wecom.mapper.WeTagGroupMapper;
 import com.linkwechat.wecom.service.IWeTagGroupService;
 import com.linkwechat.wecom.service.IWeTagService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -253,16 +259,30 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
      * 同步标签
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
+    @SynchRecord(synchType = SynchRecordConstants.SYNCH_CUSTOMER_TAG)
     public void synchWeTags() {
 
-        WeCropGroupTagListDto weCropGroupTagListDto = weCropTagClient.getAllCorpTagList();
+        SecurityContext securityContext = SecurityContextHolder.getContext();
 
-        if (weCropGroupTagListDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)) {
-            this.batchSaveOrUpdateTagGroupAndTag(weCropGroupTagListDto.getTag_group(), true);
-        }
+        //异步同步一下标签库,解决标签不同步问题
+        Threads.SINGLE_THREAD_POOL.execute(new Runnable() {
+            @Override
+            public void run() {
+                SecurityContextHolder.setContext(securityContext);
+                WeCropGroupTagListDto weCropGroupTagListDto = weCropTagClient.getAllCorpTagList();
+
+                if (weCropGroupTagListDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)) {
+                   batchSaveOrUpdateTagGroupAndTag(weCropGroupTagListDto.getTag_group(), true);
+                }
+
+            }
+        });
+
 
     }
+
+
 
 
     /**

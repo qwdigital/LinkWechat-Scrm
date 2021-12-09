@@ -267,8 +267,8 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
 
         };
         try {
-
-            return  this.uploadWeMaterialFile(file1,fileType).getMaterialUrl();
+            WeMaterialFileVO weMaterialFileVO = this.uploadWeMaterialFile(file1, fileType);
+            return weMaterialFileVO.getMaterialUrl()+weMaterialFileVO.getMaterialName();
         }catch (Exception e){
           log.error("朋友圈资源获取失败:"+e.getMessage());
         }

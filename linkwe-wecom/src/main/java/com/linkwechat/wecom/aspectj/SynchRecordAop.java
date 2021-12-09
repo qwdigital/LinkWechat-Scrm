@@ -2,6 +2,7 @@ package com.linkwechat.wecom.aspectj;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.wecom.annotation.SynchRecord;
 import com.linkwechat.wecom.domain.WeSynchRecord;
@@ -41,10 +42,12 @@ public class SynchRecordAop {
         if(null != annotationLog){
             List<WeSynchRecord> weSynchRecords = iWeSynchRecordService.list(new LambdaQueryWrapper<WeSynchRecord>()
                     .eq(WeSynchRecord::getSynchType,annotationLog.synchType())
-                    .apply("date_format (synch_time,'%Y-%m-%d HH:mm:ss') >= date_format('" + DateUtils.getBeforeByHourTime(2) + "','%Y-%m-%d HH:mm:ss')")
-                    .apply("date_format (synch_time,'%Y-%m-%d HH:mm:ss') <= date_format('" + DateUtils.getBeforeByHourTime(0) + "','%Y-%m-%d HH:mm:ss')"));
+                            .between(WeSynchRecord::getSynchTime,DateUtils.getBeforeByHourTime(2)
+                                    ,DateUtils.getBeforeByHourTime(0)));
             if(CollectionUtil.isEmpty(weSynchRecords)||weSynchRecords.size()<=1){
                  joinPoint.proceed();
+            }else{
+                throw new CustomException("由于企业微信开放平台的限制，两小时内不得重复同步操作");
             }
 
         }

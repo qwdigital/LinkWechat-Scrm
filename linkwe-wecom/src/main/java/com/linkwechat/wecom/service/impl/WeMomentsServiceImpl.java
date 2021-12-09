@@ -12,6 +12,7 @@ import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.Threads;
 import com.linkwechat.wecom.annotation.SynchRecord;
 import com.linkwechat.wecom.client.WeMomentsClient;
 import com.linkwechat.wecom.constants.SynchRecordConstants;
@@ -20,6 +21,8 @@ import com.linkwechat.wecom.domain.WeMomentsInteracte;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
+import com.linkwechat.wecom.domain.dto.customer.ExternalUserDetail;
+import com.linkwechat.wecom.domain.dto.customer.FollowUserList;
 import com.linkwechat.wecom.domain.dto.moments.*;
 import com.linkwechat.wecom.mapper.WeMomentsMapper;
 import com.linkwechat.wecom.service.IWeMaterialService;
@@ -28,6 +31,8 @@ import com.linkwechat.wecom.service.IWeUserService;
 import com.linkwechat.wecom.service.WeMomentsInteracteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -258,11 +263,13 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
      * @param filterType
      */
     @Override
-    @Async
     @Transactional
     @SynchRecord(synchType = SynchRecordConstants.SYNCH_CUSTOMER_PERSON_MOMENTS)
     public void synchPersonMoments(Integer filterType) {
-         this.synchMoments(filterType);
+
+        this.synchMoments(filterType);
+
+
     }
 
 
@@ -271,7 +278,6 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
      * @param filterType
      */
     @Override
-    @Async
     @Transactional
     @SynchRecord(synchType = SynchRecordConstants.SYNCH_CUSTOMER_ENTERPRISE_MOMENTS)
     public void synchEnterpriseMoments(Integer filterType) {
@@ -296,150 +302,167 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
 
     private void synchMoments(Integer filterType) {
 
-        List<MomentsListDetailResultDto.Moment> moments=new ArrayList<>();
-        this.getByMoment(null,moments,filterType);
+        SecurityContext securityContext = SecurityContextHolder.getContext();
 
-        if(CollectionUtil.isNotEmpty(moments)){
+        //异步同步一下标签库,解决标签不同步问题
+        Threads.SINGLE_THREAD_POOL.execute(new Runnable() {
+            @Override
+            public void run() {
+                SecurityContextHolder.setContext(securityContext);
 
-            List<WeMoments> weMoments=new ArrayList<>();
 
-            List<WeMomentsInteracte> interactes=new ArrayList<>();
+                List<MomentsListDetailResultDto.Moment> moments=new ArrayList<>();
+                getByMoment(null,moments,filterType);
 
-            moments.stream().forEach(moment -> {
+                if(CollectionUtil.isNotEmpty(moments)){
 
-                if(moment.getCreate_type().equals(new Integer(1))){//个人,获取互动数据
-                    MomentsInteracteResultDto momentComments = weMomentsClient.get_moment_comments(MomentsInteracteParamDto.builder()
-                            .moment_id(moment.getMoment_id())
-                            .userid(moment.getCreator())
-                            .build());
-                    if(momentComments.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
-                        List<MomentsInteracteResultDto.Interacte> comment_list
-                                = momentComments.getComment_list();
+                    List<WeMoments> weMoments=new ArrayList<>();
 
-                        if(CollectionUtil.isNotEmpty(comment_list)){//评论
-                            comment_list.stream().forEach(k->{
-                                interactes.add(
-                                        WeMomentsInteracte.builder()
-                                                .interacteUserType(StringUtils.isNotEmpty(k.getUserid())?new Integer(0):new Integer(1))
-                                                .interacteType(new Integer(0))
-                                                .interacteUserId(StringUtils.isNotEmpty(k.getUserid())?k.getUserid():k.getExternal_userid())
-                                                .interacteTime(new Date(k.getCreate_time()* 1000L))
-                                                .momentId(moment.getMoment_id())
-                                                .build()
-                                );
-                            });
+                    List<WeMomentsInteracte> interactes=new ArrayList<>();
 
+                    moments.stream().forEach(moment -> {
+
+                        if(moment.getCreate_type().equals(new Integer(1))){//个人,获取互动数据
+                            MomentsInteracteResultDto momentComments = weMomentsClient.get_moment_comments(MomentsInteracteParamDto.builder()
+                                    .moment_id(moment.getMoment_id())
+                                    .userid(moment.getCreator())
+                                    .build());
+                            if(momentComments.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
+                                List<MomentsInteracteResultDto.Interacte> comment_list
+                                        = momentComments.getComment_list();
+
+                                if(CollectionUtil.isNotEmpty(comment_list)){//评论
+                                    comment_list.stream().forEach(k->{
+                                        interactes.add(
+                                                WeMomentsInteracte.builder()
+                                                        .interacteUserType(StringUtils.isNotEmpty(k.getUserid())?new Integer(0):new Integer(1))
+                                                        .interacteType(new Integer(0))
+                                                        .interacteUserId(StringUtils.isNotEmpty(k.getUserid())?k.getUserid():k.getExternal_userid())
+                                                        .interacteTime(new Date(k.getCreate_time()* 1000L))
+                                                        .momentId(moment.getMoment_id())
+                                                        .build()
+                                        );
+                                    });
+
+                                }
+
+                                List<MomentsInteracteResultDto.Interacte> like_list
+                                        = momentComments.getLike_list();
+
+                                if(CollectionUtil.isNotEmpty(like_list)){ //点赞
+                                    like_list.stream().forEach(k->{
+                                        interactes.add(
+                                                WeMomentsInteracte.builder()
+                                                        .interacteUserType(StringUtils.isNotEmpty(k.getUserid())?new Integer(0):new Integer(1))
+                                                        .interacteType(new Integer(1))
+                                                        .interacteUserId(StringUtils.isNotEmpty(k.getUserid())?k.getUserid():k.getExternal_userid())
+                                                        .interacteTime(new Date(k.getCreate_time()* 1000L))
+                                                        .momentId(moment.getMoment_id())
+                                                        .build()
+                                        );
+                                    });
+                                }
+                            }
                         }
 
-                        List<MomentsInteracteResultDto.Interacte> like_list
-                                = momentComments.getLike_list();
 
-                        if(CollectionUtil.isNotEmpty(like_list)){ //点赞
-                            like_list.stream().forEach(k->{
-                                interactes.add(
-                                        WeMomentsInteracte.builder()
-                                                .interacteUserType(StringUtils.isNotEmpty(k.getUserid())?new Integer(0):new Integer(1))
-                                                .interacteType(new Integer(1))
-                                                .interacteUserId(StringUtils.isNotEmpty(k.getUserid())?k.getUserid():k.getExternal_userid())
-                                                .interacteTime(new Date(k.getCreate_time()* 1000L))
-                                                .momentId(moment.getMoment_id())
-                                                .build()
-                                );
-                            });
+
+
+
+
+
+
+                        WeMoments weMoment=WeMoments.builder()
+                                .type(moment.getCreate_type())
+                                .scopeType(moment.getVisible_type())
+                                .createTime(moment.getCreate_time())
+                                .addUser(moment.getCreator())
+                                .momentId(moment.getMoment_id())
+                                .creator(moment.getCreator())
+                                .build();
+
+                        //设置发表范围
+                        if(moment.getCreate_type().equals(new Integer(0))){
+                            getSendResult(weMoment);
                         }
-                    }
-                }
 
 
 
 
 
 
+                        //文本
+                        Optional.ofNullable(moment.getText()).ifPresent(k->{
+
+                            if(StringUtils.isNotEmpty(k.getContent())){
+                                weMoment.setContent(k.getContent());
+                                weMoment.setContentType(MediaType.TEXT.getMediaType());
+                            }
+
+                        });
+
+                        List<WeMoments.OtherContent> otherContents=new ArrayList<>();
+
+                        //图片
+                        Optional.ofNullable(moment.getImage()).ifPresent(k->{
+                            if(CollectionUtil.isNotEmpty(k)){
+                                k.stream().forEach(image->{
+
+                                    if(StringUtils.isNotEmpty(weMoment.getContent())){
+                                        weMoment.setContent(iWeMaterialService.mediaGet(image.getMedia_id(), MediaType.IMAGE.getType(),"jpg"));
+                                    }
+
+                                    otherContents.add(
+                                            WeMoments.OtherContent.builder()
+                                                    .annexType(MediaType.IMAGE.getMediaType())
+                                                    .annexUrl(iWeMaterialService.mediaGet(image.getMedia_id(), MediaType.IMAGE.getType(),"jpg"))
+                                                    .build()
+                                    );
+                                });
+                                weMoment.setContentType(MediaType.IMAGE.getMediaType());
+                            }
 
 
-                WeMoments weMoment=WeMoments.builder()
-                        .type(moment.getCreate_type())
-                        .scopeType(moment.getVisible_type())
-                        .addUser(moment.getCreator())
-                        .momentId(moment.getMoment_id())
-                        .creator(moment.getCreator())
-                        .build();
+                        });
 
-                //设置发表范围
-                if(moment.getCreate_type().equals(new Integer(0))){
-                    getSendResult(weMoment);
-                }
+                        //视频
+                        Optional.ofNullable(moment.getVideo()).ifPresent(k->{
+                            if(StringUtils.isNotEmpty(weMoment.getContent())){
+                                weMoment.setContent(iWeMaterialService.mediaGet(k.getThumb_media_id(), MediaType.IMAGE.getType(),"jpg"));
+                            }
 
-
-
-
-
-
-                //文本
-                Optional.ofNullable(moment.getText()).ifPresent(k->{
-                    weMoment.setContent(k.getContent());
-                    weMoment.setContentType(MediaType.TEXT.getMediaType());
-                });
-
-                List<WeMoments.OtherContent> otherContents=new ArrayList<>();
-
-                //图片
-                Optional.ofNullable(moment.getImage()).ifPresent(k->{
-
-                   k.stream().forEach(image->{
-
-                       if(StringUtils.isNotEmpty(weMoment.getContent())){
-                           weMoment.setContent(iWeMaterialService.mediaGet(image.getMedia_id(), MediaType.IMAGE.getType(),"jpg"));
-                       }
-
-                       otherContents.add(
-                               WeMoments.OtherContent.builder()
-                                       .annexType(MediaType.IMAGE.getMediaType())
-                                       .annexUrl(iWeMaterialService.mediaGet(image.getMedia_id(), MediaType.IMAGE.getType(),"jpg"))
-                                       .build()
-                       );
-                   });
-                   weMoment.setContentType(MediaType.IMAGE.getMediaType());
-               });
-
-               //视频
-               Optional.ofNullable(moment.getVideo()).ifPresent(k->{
-                   if(StringUtils.isNotEmpty(weMoment.getContent())){
-                       weMoment.setContent(iWeMaterialService.mediaGet(k.getThumb_media_id(), MediaType.IMAGE.getType(),"jpg"));
-                   }
-
-                   otherContents.add(
-                           WeMoments.OtherContent.builder()
-                                   .annexType(MediaType.VIDEO.getMediaType())
-                                   .annexUrl(iWeMaterialService.mediaGet(k.getMedia_id(), MediaType.VIDEO.getType(),"mp4"))
-                                   .other(iWeMaterialService.mediaGet(k.getThumb_media_id(), MediaType.IMAGE.getType(),"jpg"))
-                                   .build()
-                   );
-                   weMoment.setContentType(MediaType.VIDEO.getMediaType());
-               });
+                            otherContents.add(
+                                    WeMoments.OtherContent.builder()
+                                            .annexType(MediaType.VIDEO.getMediaType())
+                                            .annexUrl(iWeMaterialService.mediaGet(k.getMedia_id(), MediaType.VIDEO.getType(),"mp4"))
+                                            .other(iWeMaterialService.mediaGet(k.getThumb_media_id(), MediaType.IMAGE.getType(),"jpg"))
+                                            .build()
+                            );
+                            weMoment.setContentType(MediaType.VIDEO.getMediaType());
+                        });
 
 
-               //链接
-               Optional.ofNullable(moment.getLink()).ifPresent(k->{
-                   if(StringUtils.isNotEmpty(weMoment.getContent())){
-                       weMoment.setContent(k.getTitle());
-                   }
+                        //链接
+                        Optional.ofNullable(moment.getLink()).ifPresent(k->{
+                            if(StringUtils.isNotEmpty(weMoment.getContent())){
+                                weMoment.setContent(k.getTitle());
+                            }
 
-                   otherContents.add(
-                           WeMoments.OtherContent.builder()
-                                   .annexType(MediaType.LINK.getMediaType())
-                                   .annexUrl(k.getUrl())
-                                   .other(k.getTitle())
-                                   .build()
-                   );
-                   weMoment.setContentType(MediaType.LINK.getMediaType());
-               });
+                            otherContents.add(
+                                    WeMoments.OtherContent.builder()
+                                            .annexType(MediaType.LINK.getMediaType())
+                                            .annexUrl(k.getUrl())
+                                            .other(k.getTitle())
+                                            .build()
+                            );
+                            weMoment.setContentType(MediaType.LINK.getMediaType());
+                        });
 
-               if(CollectionUtil.isNotEmpty(otherContents)){
-                   weMoment.setOtherContent(otherContents);
-               }
+                        if(CollectionUtil.isNotEmpty(otherContents)){
+                            weMoment.setOtherContent(otherContents);
+                        }
 
-                weMoments.add(weMoment);
+                        weMoments.add(weMoment);
 
 //               //经纬度
 //               Optional.ofNullable(moment.getLocation()).ifPresent(k->{
@@ -447,16 +470,22 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
 //               });
 
 
-            });
+                    });
 
 
-            this.saveOrUpdateBatch(weMoments);
-            if(CollectionUtil.isNotEmpty(interactes)){
-                weMomentsInteracteService.batchAddOrUpdate(interactes);
+                     saveOrUpdateBatch(weMoments);
+                    if(CollectionUtil.isNotEmpty(interactes)){
+                        weMomentsInteracteService.batchAddOrUpdate(interactes);
+                    }
+
+
+                }
+
             }
+        });
 
 
-        }
+
 
     }
 
@@ -509,7 +538,8 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
         MomentsListDetailResultDto moment_list = weMomentsClient.get_moment_list(MomentsListDetailParamDto.builder()
                 .start_time(startTime)
                 .end_time(endTime)
-                        .filter_type(filterType)
+                .cursor(nextCursor)
+                 .filter_type(filterType)
                 .build());
         if (WeConstans.WE_SUCCESS_CODE.equals(moment_list.getErrcode())
                 || WeConstans.NOT_EXIST_CONTACT.equals(moment_list.getErrcode())

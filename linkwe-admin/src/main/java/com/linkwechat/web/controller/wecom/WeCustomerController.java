@@ -8,6 +8,7 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.constants.SynchRecordConstants;
 import com.linkwechat.wecom.domain.*;
@@ -93,7 +94,12 @@ public class WeCustomerController extends BaseController
     @GetMapping("/synchWeCustomer")
     public AjaxResult synchWeCustomer() {
 
-        weCustomerService.synchWeCustomer();
+        try {
+            weCustomerService.synchWeCustomer();
+        }catch (CustomException e){
+           return AjaxResult.error(e.getMessage());
+        }
+
 
         return AjaxResult.success(WeConstans.SYNCH_TIP);
 
