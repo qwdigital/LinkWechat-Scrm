@@ -230,6 +230,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                                         .unionId(member.getUnionId())
                                         .groupNickName(member.getGroupNickName())
                                         .name(member.getName())
+                                        .delFlag(0)
                                         .invitorUserId(member.getInvitor() == null ? null : member.getInvitor().getString("userid"))
                                         .build()
                         );
@@ -273,6 +274,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                                         .unionId(member.getUnionId())
                                         .groupNickName(member.getGroupNickName())
                                         .name(member.getName())
+                                        .delFlag(0)
                                         .invitorUserId(member.getInvitor() == null ? null : member.getInvitor().getString("userid"))
                                         .build()
                         );
