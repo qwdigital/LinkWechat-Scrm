@@ -215,6 +215,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                                 .owner(kk.getOwner())
                                 .addTime(new Date(kk.getCreateTime() * 1000L))
                                 .adminUserId(Optional.ofNullable(kk.getAdminList()).orElseGet(ArrayList::new).stream().map(admin -> admin.getString("userid")).collect(Collectors.joining(",")))
+                                .delFlag(0)
                                 .build()
                 );
                 List<CustomerGroupMember> memberLists = kk.getMemberList();
@@ -259,6 +260,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                                 .owner(kk.getOwner())
                                 .addTime(new Date(kk.getCreateTime() * 1000L))
                                 .adminUserId(Optional.ofNullable(kk.getAdminList()).orElseGet(ArrayList::new).stream().map(admin -> admin.getString("userid")).collect(Collectors.joining(",")))
+                                .delFlag(0)
                                 .build()
                 );
                 List<CustomerGroupMember> memberLists = kk.getMemberList();
