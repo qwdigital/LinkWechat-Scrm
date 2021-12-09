@@ -88,7 +88,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
         detailVo.setSendTime(weGroupMessageTemplate.getSendTime());
         detailVo.setContent(weGroupMessageTemplate.getContent());
         List<WeGroupMessageListVo> groupMsgDetail = weGroupMessageListService.getGroupMsgDetail(id);
-        if (groupMsgDetail != null) {
+        if (CollectionUtil.isNotEmpty(groupMsgDetail)) {
             detailVo.setAttachments(groupMsgDetail.get(0).getAttachments());
 
             //待发送人员列表

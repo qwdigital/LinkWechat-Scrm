@@ -3,6 +3,7 @@ package com.linkwechat.wecom.factory.impl.customer;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.MediaType;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
 import com.linkwechat.wecom.domain.callback.WeBackCustomerVo;
 import com.linkwechat.wecom.domain.*;
@@ -49,7 +50,7 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
             weCustomerService.getCustomersInfoAndSynchWeCustomer(customerInfo.getExternalUserID(),customerInfo.getUserID());
         }
 
-        if (customerInfo.getState() != null && customerInfo.getWelcomeCode() != null) {
+        if (StringUtils.isNotEmpty(customerInfo.getState()) && StringUtils.isNotEmpty(customerInfo.getWelcomeCode())) {
             if (isFission(customerInfo.getState())) {
                 taskFissionRecordHandle(customerInfo.getState(), customerInfo.getWelcomeCode(), customerInfo.getUserID(), customerInfo.getExternalUserID());
             } else {
