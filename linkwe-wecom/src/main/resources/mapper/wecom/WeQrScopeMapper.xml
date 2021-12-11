@@ -76,9 +76,9 @@
         wqs.user_id,
         wqs.party
         from we_qr_scope wqs
-        where  find_in_set(#{value},wqs.work_cycle)
-        and str_to_date(wqs.begin_time,'%H:%i:%S') &lt;= str_to_date(#{formatTime},'%H:%i:%S')
-        and str_to_date(wqs.end_time ,'%H:%i:%S') &gt;= str_to_date(#{formatTime},'%H:%i:%S')
+        where  find_in_set(dayofweek(curdate())-1,wqs.work_cycle)
+        and date_format(concat(date_format(curdate(),'%Y-%m-%d '),wqs.begin_time), '%H:%i:%s') &lt;= date_format(#{formatTime},'%H:%i:%s')
+        and date_format(concat(date_format(curdate(),'%Y-%m-%d '),wqs.end_time), '%H:%i:%s') &gt;= date_format(#{formatTime},'%H:%i:%s')
         and wqs.del_flag = 0
     </select>
 </mapper>

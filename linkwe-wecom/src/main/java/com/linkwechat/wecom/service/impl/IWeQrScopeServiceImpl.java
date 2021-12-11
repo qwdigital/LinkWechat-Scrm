@@ -66,6 +66,7 @@ public class IWeQrScopeServiceImpl extends ServiceImpl<WeQrScopeMapper, WeQrScop
                     if(CollectionUtil.isNotEmpty(userInfo.getWorkCycle())){
                         weQrScope.setWorkCycle(userInfo.getWorkCycle().stream().map(String::valueOf).collect(Collectors.joining(",")));
                     }
+                    weQrScope.setType(userInfo.getType());
                     weQrScope.setBeginTime(userInfo.getBeginTime());
                     weQrScope.setEndTime(userInfo.getEndTime());
                     return weQrScope;
@@ -97,7 +98,7 @@ public class IWeQrScopeServiceImpl extends ServiceImpl<WeQrScopeMapper, WeQrScop
     }
 
     @Override
-    public List<WeQrScopeVo> getWeQrScopeByTime(Integer value, String formatTime) {
-       return this.baseMapper.getWeQrScopeByTime(value,formatTime);
+    public List<WeQrScopeVo> getWeQrScopeByTime(String formatTime) {
+       return this.baseMapper.getWeQrScopeByTime(formatTime);
     }
 }

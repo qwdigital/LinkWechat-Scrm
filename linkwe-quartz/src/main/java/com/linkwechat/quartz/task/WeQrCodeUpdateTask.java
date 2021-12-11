@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -43,29 +44,30 @@ public class WeQrCodeUpdateTask {
     private WeExternalContactClient externalContactClient;
 
     public void qrCodeUpdateTask() {
-        Date date = new Date();
-        Week week = DateUtil.dayOfWeekEnum(date);
-        String formatTime = DateUtil.formatTime(date);
-
-        List<WeQrScopeVo> weQrScopeList = weQrScopeService.getWeQrScopeByTime(week.getValue(), formatTime);
+        List<WeQrScopeVo> weQrScopeList = weQrScopeService.getWeQrScopeByTime(DateUtil.formatDateTime(new Date()));
         log.info("活码使用范围修改任务 weQrScopeList {}", JSONObject.toJSONString(weQrScopeList));
         if (CollectionUtil.isNotEmpty(weQrScopeList)) {
-            List<WeQrScopeVo> weCustomizeQrScopeList = weQrScopeList.stream().filter(item -> ObjectUtil.equal(1, item.getType())).collect(Collectors.toList());
-            if (CollectionUtil.isNotEmpty(weCustomizeQrScopeList)) {
-                weCustomizeQrScopeList.forEach(this::extracted);
-            } else {
-                WeQrScopeVo weDefaultQrScope = weQrScopeList.stream().filter(item -> ObjectUtil.equal(0, item.getType())).findFirst().orElse(null);
-                if (weDefaultQrScope != null) {
-                    extracted(weDefaultQrScope);
+            Map<Long, List<WeQrScopeVo>> qrCodeMap = weQrScopeList.stream().collect(Collectors.groupingBy(WeQrScopeVo::getQrId));
+            qrCodeMap.forEach((qrId,scopeList) ->{
+                WeQrCode weQrCode = weQrCodeService.getById(qrId);
+                WeQrScopeVo weCustomizeQrScope = weQrScopeList.stream()
+                        .filter(item -> ObjectUtil.equal(1, item.getType())).findFirst().orElse(null);
+                if(weCustomizeQrScope != null){
+                    extracted(weCustomizeQrScope,weQrCode.getConfigId());
+                }else {
+                    WeQrScopeVo weDefaultQrScope = weQrScopeList.stream()
+                            .filter(item -> ObjectUtil.equal(0, item.getType())).findFirst().orElse(null);
+                    extracted(weDefaultQrScope,weQrCode.getConfigId());
                 }
-            }
+            });
         }
     }
 
-    private void extracted(WeQrScopeVo weQrScope) {
-        WeQrCode weQrCode = weQrCodeService.getById(weQrScope.getQrId());
-        String configId = weQrCode.getConfigId();
-        WeContactWayDto contactWay = externalContactClient.getContactWay(configId);
+    private void extracted(WeQrScopeVo weQrScope, String configId) {
+        log.info("extracted ->>>>>>>>>>weQrScope:{}",JSONObject.toJSONString(weQrScope));
+        WeExternalContactDto query = new WeExternalContactDto();
+        query.setConfig_id(configId);
+        WeContactWayDto contactWay = externalContactClient.getContactWay(query);
         if (contactWay != null && ObjectUtil.equal(0, contactWay.getErrcode())) {
             String userIds = "";
             String partys = "";

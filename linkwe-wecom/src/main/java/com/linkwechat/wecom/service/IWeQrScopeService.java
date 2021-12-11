@@ -45,9 +45,7 @@ public interface IWeQrScopeService extends IService<WeQrScope> {
 
     /**
      * 查询当前时间使用范围活码数据
-     * @param value
-     * @param formatTime
      * @return
      */
-    List<WeQrScopeVo> getWeQrScopeByTime(Integer value, String formatTime);
+    List<WeQrScopeVo> getWeQrScopeByTime(String formatTime);
 }

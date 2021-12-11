@@ -27,5 +27,5 @@ public interface WeExternalContactClient {
     WeExternalContactDto delContactWay(@JSONBody WeExternalContactDto query);
 
     @Request(url = "/externalcontact/get_contact_way", type = "POST")
-    WeContactWayDto getContactWay(@Query("configId") String configId);
+    WeContactWayDto getContactWay(@JSONBody WeExternalContactDto query);
 }
