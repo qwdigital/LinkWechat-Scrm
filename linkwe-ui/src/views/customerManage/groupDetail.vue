@@ -1,9 +1,11 @@
 <script>
 import { dictJoinGroupType } from '@/utils/dictionary'
 import * as api from '@/api/customer/group'
+import SelectTag from '@/components/SelectTag'
 
 export default {
   // name: 'GroupDetail',
+  components: { SelectTag },
   data() {
     return {
       // 遮罩层
@@ -27,7 +29,8 @@ export default {
       },
       dictJoinGroupType,
       dialogVisible: false,
-      selectedTag: []
+      selectedTag: [],
+      tagDialogType: {}
     }
   },
   created() {
@@ -66,8 +69,8 @@ export default {
       this.ids = selection.map((item) => item.operId)
       this.multiple = !selection.length
     },
-    makeTag(data) {
-      this.makeLabelCustomerList = data ? [data] : this.ids
+    makeTag() {
+      let data = this.group
       this.tagDialogType.type = ''
       let curTags = []
       if (data.tags && data.tagIds) {
@@ -81,16 +84,25 @@ export default {
       this.dialogVisible = true
     },
     submitSelectTag(data) {
+      this.loading = true
       api
         .makeGroupTag(this, {
           chatId: this.query.chatId,
-          weeGroupTagRel: data
+          weeGroupTagRel: data.map((row) => ({
+            chatId: this.query.chatId,
+            tagId: row.tagId
+          }))
         })
         .then((res) => {
           if (res.code == 200) {
-            this.getGroupDetail()
+            this.loading = false
+            // this.getGroupDetail()
             this.msgSuccess('操作成功')
           }
+        })
+        .finally(() => {
+          this.loading = false
+          this.dialogVisible = false
         })
     }
   }
@@ -98,7 +110,7 @@ export default {
 </script>
 
 <template>
-  <div class="">
+  <div v-loading="loading">
     <!-- <el-button slot="append" circle icon="el-icon-back" @click="$router.back()"></el-button>返回 -->
     <div class="flex mt10">
       <div class="left g-card g-pad20">
@@ -114,20 +126,19 @@ export default {
               {{ group.groupName }}
             </div>
             <div class="info"><span class="">创建时间：</span>{{ group.createTime }}</div>
-            <div class="info">
+            <div class="info" style="flex: 1;">
               <span class="">客群标签：</span>
-              <template v-if="group.tags">
-                <el-tag
-                  style="margin-bottom: 10px;"
-                  v-for="(tag, index) in group.tags.split(',')"
-                  :key="index"
-                  >{{ tag }}</el-tag
-                >
-              </template>
+              <div style="display:inline-flex;">
+                <template v-if="group.tags">
+                  <el-tag class="" v-for="(tag, index) in group.tags" :key="index">{{
+                    tag
+                  }}</el-tag>
+                </template>
+              </div>
               <el-button
                 type="text"
                 v-hasPermi="['customerManage/customer:makeTag']"
-                @click="makeTag(scope.row)"
+                @click="makeTag()"
                 >编辑标签</el-button
               >
             </div>
@@ -171,7 +182,7 @@ export default {
         </div>
         <div style="padding:0 20px 20px;">
           {{ group.notice || '未设置' }}
-          <!-- 为更好的服务广大客户，我行将于2021年5月9日晚22:00至22:30进行系统升级维护。敬请您妥善安排业务办理时间。由此给您带来的不便，我们深表歉意，并将尽快恢复对您的服务，衷心感谢您对我行的理解和支持！ -->
+          <!-- 为更好的服务广大客户，我司将于2021年5月9日晚22:00至22:30进行系统升级维护。敬请您妥善安排业务办理时间。由此给您带来的不便，我们深表歉意，并将尽快恢复对您的服务，衷心感谢您对我行的理解和支持！ -->
         </div>
       </div>
     </div>
@@ -181,7 +192,7 @@ export default {
         <span>查询</span>
       </el-button>
     </el-input>
-    <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
+    <el-table :data="list" @selection-change="handleSelectionChange">
       <el-table-column width="55" />
       <el-table-column label="群成员" prop="name">
         <template slot-scope="scope">

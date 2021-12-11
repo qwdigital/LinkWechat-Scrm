@@ -47,3 +47,26 @@ export function sync() {
     url: service + '/chat/synchWeGroup'
   })
 }
+
+/**
+ * 编辑群标签
+ * {
+  "chatId": "ad cillum",
+  "weeGroupTagRel": [
+    {
+      "chatId": "consectetur deserunt eu in",
+      "id": "Ut sed ullamco non",
+      "tagId": "Lorem"
+    }
+  ]
+}
+ * @param {*} data 
+ * @returns 
+ */
+export function makeGroupTag(data) {
+  return request({
+    url: service + '/chat/makeGroupTag',
+    method: 'post',
+    data
+  })
+}

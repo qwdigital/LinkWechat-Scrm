@@ -85,8 +85,7 @@ export default {
       // this.$refs.selectTag.$forceUpdate()
     },
     makeTag(data) {
-      debugger
-      this.makeLabelCustomerList = data ? [data] : this.ids
+      this.makeLabelCustomerList = data || this.ids
       this.tagDialogType.type = ''
       let curTags = []
       if (data.tags && data.tagIds) {
@@ -107,8 +106,11 @@ export default {
       } else {
         this.loading = true
         let data = {
-          chatId: this.makeLabelCustomerList[0].chatId,
-          weeGroupTagRel: selected
+          chatId: this.makeLabelCustomerList.chatId,
+          weeGroupTagRel: selected.map((row) => ({
+            chatId: this.makeLabelCustomerList.chatId,
+            tagId: row.tagId
+          }))
         }
         api
           .makeGroupTag(data)
