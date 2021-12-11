@@ -199,7 +199,7 @@
           weEmpleCodeUseScops: [],
           empleCodeRosterDto: [
             {
-              type: 1,
+              type: 0,
               weEmpleCodeUseScops: [],  // 员工
               weekday: [1, 2, 3, 4, 5, 6, 7],  // 周期
               qrRuleType: 2,
@@ -590,7 +590,7 @@
         this.codeForm.empleCodeRosterDto.push({
           weEmpleCodeUseScops: [],  // 员工
           weekday: [],  // 周期
-          type: 2,
+          type: 1,
           startDate: '',  // 开始时间
           endDate: '',  // 结束时间
         })
@@ -630,9 +630,8 @@
         }
         myObj.attachments.push(...data.materialMsgList)
         if (this.codeForm.qrRuleType === 1) {
-          console.log(this.codeForm)
           let obj = {
-            type: 1,
+            type: 0,
             scopeId: this.codeForm.weEmpleCodeUseScops[0].scopeId ? this.codeForm.weEmpleCodeUseScops[0].scopeId : '',
             userIds: this.codeForm.weEmpleCodeUseScops.map(dd => dd.businessId)
           }

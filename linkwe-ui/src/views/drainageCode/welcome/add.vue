@@ -41,9 +41,13 @@
     computed: {},
     created () {
       this.form.id = this.$route.query.id
-      let data = JSON.parse(localStorage.getItem('obj'))
-      this.form = Object.assign(this.form, data)
-      this.form.welcomeMsgTplType = this.form.welcomeMsgTplType.toString()
+      if (this.form.id) {
+        let data = JSON.parse(localStorage.getItem('obj'))
+        this.form = Object.assign(this.form, data)
+        this.form.welcomeMsgTplType = this.form.welcomeMsgTplType.toString()
+      } else {
+        this.form.welcomeMsgTplType = this.$route.query.welcomeMsgTplType
+      }
       this.name = this.form.welcomeMsgTplType === '1' ? '活码' : this.form.welcomeMsgTplType === '2' ? '员工' : '入群'
       this.type = this.form.id ? '编辑' : '新建'
       this.$route.meta.title = (this.form.id ? '编辑' : '新建') + '欢迎语'

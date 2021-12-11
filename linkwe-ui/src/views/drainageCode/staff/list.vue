@@ -14,7 +14,7 @@
           <div class="item-list">
             <div class="item" :class="{'active': groupIndex == key}" v-for="(group, key) in groupList" :key="group.id" @click="switchGroup(key, group)">
               <div class="name">{{ group.name }}</div>
-              <el-dropdown v-if="groupIndex == key" class="dropdown" @command="onGroupCommand($event, group)">
+              <el-dropdown v-if="groupIndex == key && group.flag === 0" class="dropdown" @command="onGroupCommand($event, group)">
                 <span class="dot">
                   <!-- <img :src="require('@/assets/drainageCode/more.png')" alt=""> -->
                   <i class="el-icon-more"></i>
@@ -177,6 +177,8 @@
           groupId: '',
           qrName: '', // 活码名称
           qrUserName: undefined,
+          orderByColumn: 'wqc.create_time',
+          isAsc: 'desc'
         },
         userArray: [], // 选择人员
         userArrayStr: "",

@@ -402,7 +402,7 @@
       /** 获取欢迎语列表 */
       getWelList () {
         this.welLoading = true
-        getList(this, this.welQuery).then(({ rows }) => {
+        getList(this.welQuery).then(({ rows }) => {
           this.welList = rows
           this.$refs.table.$forceUpdate()
           this.welLoading = false

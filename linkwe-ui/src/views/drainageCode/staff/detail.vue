@@ -230,7 +230,7 @@
     methods: {
       editFn () {
         this.$router.push({
-          path: '/wechat/drainageCode/staff/' + 'add',
+          path: '/drainageCode/' + 'staffAdd',
           query: {
             id: this.form.id
           }

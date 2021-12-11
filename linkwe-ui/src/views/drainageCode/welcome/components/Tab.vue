@@ -24,6 +24,7 @@
       <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="欢迎语" align="center" prop="welcomeMsg" min-width="250" show-overflow-tooltip/>
+        <el-table-column v-if="type === '2'" label="员工" prop="userNames" align="center"></el-table-column>
         <el-table-column label="创建人" align="center" prop="createBy" />
         <el-table-column label="创建时间" align="center" prop="createTime" />
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -148,11 +149,11 @@
       goRoute (data) {
         let query = {}
         if (data) {
+          localStorage.setItem('obj', JSON.stringify(data))
           query.id = data.id
         } else {
           query.welcomeMsgTplType = this.type
         }
-        localStorage.setItem('obj', JSON.stringify(data))
         this.$router.push({
           path: '/drainageCode/welcomeAdd',
           query: query
