@@ -32,7 +32,6 @@
               </div>
             </div>
           </el-form-item>
-
         </template>
         <template v-if="form.chatType == 1">
           <el-form-item label="群发客户" required prop="pushRange">
@@ -308,6 +307,7 @@
                 }
               })
             } else {
+
               this.currentActive = 2
             }
           } else {
@@ -343,12 +343,13 @@
           content: materialData.welcomeMsg,
           attachmentsList: materialData.materialMsgList
         })
+        data.senderList = []
         data = JSON.parse(JSON.stringify(data))
         if (data.chatType === 1) {
           if (data.pushRange === 1) {
             data.senderList = this.newArryById(this.form.customerList)
           } else {
-            data.senderList = data.sendClientUserList.map((i) => { return { userId: i.userId } })
+            data.senderList = []
           }
         } else {
           if (data.clientGroup === 1) {
@@ -356,6 +357,7 @@
           } else {
             data.senderList = []
           }
+          data.isAll = data.clientGroup === 0 ? true : false
         }
         // data.sendClientUserList.map(i => i.userId)
         // 发送类型

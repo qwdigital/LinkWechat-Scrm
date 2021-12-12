@@ -60,7 +60,7 @@
                     <el-tag v-for="(data, key) in unit.weQrUserList" :key="key">{{data.userName}}</el-tag>
                   </el-form-item>
                   <el-form-item style="margin-bottom: 10px" label="工作周期">
-                    <el-checkbox-group v-if="unit.type === 1" v-model="checkList">
+                    <el-checkbox-group v-if="unit.type === 0" v-model="checkList">
                       <el-checkbox label="周一" disabled></el-checkbox>
                       <el-checkbox label="周二" disabled></el-checkbox>
                       <el-checkbox label="周三" disabled></el-checkbox>
@@ -79,7 +79,7 @@
                       <el-checkbox label="7" disabled>周日</el-checkbox>
                     </el-checkbox-group>
                   </el-form-item>
-                  <el-form-item v-if="unit.type === 1" v-model="checkList" style="margin-bottom: 10px" label="在线时间">
+                  <el-form-item v-if="unit.type === 0" v-model="checkList" style="margin-bottom: 10px" label="在线时间">
                     <el-time-select disabled value="00:00" placeholder="任意时间点">
                     </el-time-select>
                     <el-time-select disabled value="23:59" placeholder="任意时间点">
@@ -246,7 +246,11 @@
             this.form.materialMsgList = this.form.qrAttachments.slice(1)
           }
           this.form.qrUserInfos.forEach(dd => {
-            dd.weekday = dd.workCycle.split(',')
+            if (dd.workCycle) {
+              dd.weekday = dd.workCycle.split(',')
+            } else {
+              dd.weekday = []
+            }
           })
           this.loading = false
           this.setTime(7)

@@ -177,7 +177,7 @@
           groupId: '',
           qrName: '', // 活码名称
           qrUserName: undefined,
-          orderByColumn: 'wqc.create_time',
+          orderByColumn: 'wqc.update_time',
           isAsc: 'desc'
         },
         userArray: [], // 选择人员

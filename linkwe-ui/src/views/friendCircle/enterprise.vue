@@ -2,9 +2,9 @@
   <div>
     <div>
       <el-form :model="query" label-position="left" ref="queryForm" :inline="true" label-width="100px" class="top-search">
-        <el-form-item label="选择创建人" prop="creator">
+        <!-- <el-form-item label="选择创建人" prop="creator">
           <el-input :value="query.creator" readonly @focus="dialogVisible = true" placeholder="请选择员工" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="时间范围">
           <el-date-picker v-model="value1" format="yyyy-MM-dd" @change="setTimeChange" type="daterange" range-separator="——" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
         </el-form-item>
@@ -39,7 +39,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column show-overflow-tooltip prop="creator" label="创建人"></el-table-column>
+      <!-- <el-table-column show-overflow-tooltip prop="creator" label="创建人"></el-table-column> -->
       <el-table-column show-overflow-tooltip prop="addUserName" min-width='140px' label="已发送员工">
         <template slot-scope="{ row }">
           <div v-if="row.addUserName">
