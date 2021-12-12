@@ -545,9 +545,9 @@ export default {
       :selected="selectedTag"
       @success="submitSelectTag"
     >
-      <el-button class="ml20" type="primary" @click="dialogVisibleAddTag = true"
+      <!-- <el-button class="ml20" type="primary" @click="dialogVisibleAddTag = true"
         >添加标签</el-button
-      >
+      > -->
     </SelectTag>
 
     <!-- 选择添加人弹窗 -->

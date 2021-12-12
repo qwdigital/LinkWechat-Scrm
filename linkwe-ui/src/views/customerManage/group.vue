@@ -53,6 +53,7 @@ export default {
         this.query.endTime = ''
       }
       page && (this.query.pageNum = page)
+      this.query.tagIds = this.queryTag.map((d) => d.tagId) + ''
       this.loading = true
       api
         .getList(this.query)
@@ -100,7 +101,6 @@ export default {
     },
     submitSelectTag(selected) {
       if (this.tagDialogType.type === 'query') {
-        this.query.tagIds = selected.map((d) => d.tagId) + ''
         this.queryTag = selected
         this.dialogVisible = false
       } else {
@@ -130,7 +130,10 @@ export default {
     /** 重置按钮操作 */
     resetQuery() {
       this.dateRange = []
+      this.queryTag = []
+      this.queryUser = []
       this.$refs['queryForm'].resetFields()
+      this.getList(1)
     },
     sync() {
       const loading = this.$loading({
