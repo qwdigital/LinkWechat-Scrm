@@ -426,7 +426,6 @@ export default {
 <style lang="scss" scoped>
 .index {
   margin: 0;
-  padding: 0.5% 1%;
   width: 100%;
   background: #f1f1f1;
 
@@ -494,7 +493,7 @@ export default {
   }
 
   .index_l {
-    width: 75%;
+    width: 76%;
   }
 
   .circle {
@@ -513,7 +512,7 @@ export default {
 
   .index_r {
     width: 23%;
-    margin-left: 2%;
+    margin-left: 1%;
 
     .qy_R {
       background: #fff;

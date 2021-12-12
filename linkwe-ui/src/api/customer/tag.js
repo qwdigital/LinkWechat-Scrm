@@ -9,12 +9,13 @@ const service = window.CONFIG.services.wecom + '/group'
     "pageNum": "当前页",
     "pageSize": "每页显示条数",
     "gourpName": "标签组名"
+    "groupTagType": "标签分组类型(1:客户标签;2:群标签)"
 }
  */
 export function getList(params) {
   return request({
     url: service + '/list',
-    params,
+    params
   })
 }
 
@@ -32,7 +33,7 @@ export function add(data) {
   return request({
     url: service,
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -54,7 +55,7 @@ export function update(data) {
   return request({
     url: service,
     method: 'put',
-    data,
+    data
   })
 }
 
@@ -65,7 +66,7 @@ export function update(data) {
 export function remove(ids) {
   return request({
     url: service + '/' + ids,
-    method: 'DELETE',
+    method: 'DELETE'
   })
 }
 
@@ -74,6 +75,6 @@ export function remove(ids) {
  */
 export function syncTag() {
   return request({
-    url: service + '/synchWeTags',
+    url: service + '/synchWeTags'
   })
 }

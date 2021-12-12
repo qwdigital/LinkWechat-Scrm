@@ -27,10 +27,14 @@ export default {
   <MaPage ref="page" type="7" @listChange="listChange" :selected="ids" v-slot="{ list }">
     <el-table :data="list" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" align="center" />
-      <el-table-column label="图文标题" align="center" prop="materialName"> </el-table-column>
-      <el-table-column label="图文链接" align="center" prop="content" :show-overflow-tooltip="true" />
-      <el-table-column label="发送次数" align="center" prop="num" :show-overflow-tooltip="true" />
-      <el-table-column label="最近更新时间" align="center" prop="createTime"> </el-table-column>
+      <el-table-column label="文章标题" align="center" prop="materialName"> </el-table-column>
+      <el-table-column
+        label="文章摘要"
+        align="center"
+        prop="digest"
+        :show-overflow-tooltip="true"
+      />
+      <el-table-column label="最近更新时间" align="center" prop="updateTime"> </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="text" @click="$refs.page.edit(scope.row)">编辑</el-button>

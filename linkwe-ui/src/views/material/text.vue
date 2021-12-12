@@ -25,18 +25,29 @@ export default {
   <MaPage ref="page" type="4" :selected="ids" v-slot="{ list }">
     <el-table :data="list" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" align="center" />
-      <el-table-column label="文本内容" align="center" prop="content" :show-overflow-tooltip="true" />
-      <el-table-column label="创建时间" align="center" prop="createTime">
+      <el-table-column
+        label="文本内容"
+        align="center"
+        prop="content"
+        :show-overflow-tooltip="true"
+      />
+      <el-table-column label="最近更新时间" align="center" prop="updateTime">
         <!-- <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template> -->
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="text" @click="$refs.page.edit(scope.row)" v-hasPermi="['wechat:material:edit']"
+          <el-button
+            type="text"
+            @click="$refs.page.edit(scope.row)"
+            v-hasPermi="['wechat:material:edit']"
             >修改</el-button
           >
-          <el-button type="text" @click="$refs.page.remove(scope.row.id)" v-hasPermi="['wechat:material:remove']"
+          <el-button
+            type="text"
+            @click="$refs.page.remove(scope.row.id)"
+            v-hasPermi="['wechat:material:remove']"
             >删除</el-button
           >
         </template>

@@ -87,8 +87,8 @@ export default {
         this.query.endTime = ''
       }
       page && (this.query.pageNum = page)
-      this.query.tagIds = this.queryTag + ''
-      this.query.userIds = this.queryUser + ''
+      this.query.tagIds = this.queryTag.map((d) => d.tagId) + ''
+      this.query.userIds = this.queryUser.map((d) => d.userId) + ''
       this.loading = true
       api
         .getListNew(this.query)
@@ -241,12 +241,9 @@ export default {
     },
     selectedUser(list) {
       this.queryUser = list
-      this.query.userIds = list.map((d) => d.userId) + ''
     },
     submitSelectTag(selected) {
       if (this.tagDialogType.type === 'query') {
-        this.query.tagIds = selected.map((d) => d.tagId) + ''
-        // debugger;
         this.queryTag = selected
         this.dialogVisible = false
       } else {
@@ -333,7 +330,7 @@ export default {
       <el-form-item label="客户名称" prop="name">
         <el-input v-model="query.name" placeholder="请输入"></el-input>
       </el-form-item>
-      <el-form-item label="客户类型" prop="name">
+      <el-form-item label="客户类型" prop="customerType">
         <el-select v-model="query.customerType" placeholder="请选择">
           <el-option
             v-for="(item, index) in dictCustomerType"
@@ -343,7 +340,7 @@ export default {
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="客户标签">
+      <el-form-item label="客户标签" prop="customerType">
         <div class="tag-input" @click="showTagDialog">
           <span class="tag-place" v-if="!queryTag.length">请选择</span>
           <template v-else>
@@ -353,7 +350,7 @@ export default {
           </template>
         </div>
       </el-form-item>
-      <el-form-item label="跟进员工">
+      <el-form-item label="跟进员工" prop="customerType">
         <div class="tag-input" @click="dialogVisibleSelectUser = true">
           <span class="tag-place" v-if="!queryUser.length">请选择</span>
           <template v-else>
@@ -363,7 +360,7 @@ export default {
           </template>
         </div>
       </el-form-item>
-      <el-form-item label="跟进状态" prop="name">
+      <el-form-item label="跟进状态" prop="trackState">
         <el-select v-model="query.trackState" placeholder="请选择">
           <el-option
             v-for="(item, index) in dictTrackState"
@@ -373,7 +370,7 @@ export default {
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="添加方式">
+      <el-form-item label="添加方式" prop="addMethod">
         <el-select v-model="query.addMethod" placeholder="请选择">
           <el-option
             v-for="(item, index) in dictAddType"
@@ -467,14 +464,19 @@ export default {
       </el-table-column>
       <el-table-column prop="tagNames" label="客户标签" align="center">
         <div v-if="row.tagNames" slot-scope="{ row }">
-          <el-tag type="info" v-for="(unit, unique) in row.tagNames" :key="unique">{{
-            unit
-          }}</el-tag>
-          <!-- <div v-for="(item, index) in row.weFlowerCustomerRels" :key="index">
-            <el-tag type="info" v-for="(unit, unique) in item.weFlowerCustomerTagRels" :key="unique">{{
-              unit.tagName
-            }}</el-tag>
-          </div> -->
+          <el-popover placement="bottom" trigger="hover" :disabled="row.tagNames.length < 3">
+            <div>
+              <el-tag type="info" v-for="(unit, unique) in row.tagNames" :key="unique">
+                {{ unit }}
+              </el-tag>
+            </div>
+            <div slot="reference">
+              <el-tag type="info" v-for="(unit, unique) in row.tagNames.slice(0, 2)" :key="unique">
+                {{ unit }}
+              </el-tag>
+              <el-tag type="info" key="a" v-if="row.tagNames.length > 2">...</el-tag>
+            </div>
+          </el-popover>
         </div>
         <span v-else>无标签</span>
       </el-table-column>
@@ -542,7 +544,7 @@ export default {
       ref="selectTag"
       :visible.sync="dialogVisible"
       :title="tagDialogType.title"
-      :selected="selectedTag"
+      :defaultValues="selectedTag"
       @success="submitSelectTag"
     >
       <!-- <el-button class="ml20" type="primary" @click="dialogVisibleAddTag = true"

@@ -18,9 +18,10 @@ export default {
     //   type: Array,
     //   default: () => [],
     // },
+    // "标签分组类型(1:客户标签;2:群标签)"
     type: {
       type: String,
-      default: 'add'
+      default: '1'
     },
     destroyOnClose: Boolean,
     defaultValues: {
@@ -33,44 +34,10 @@ export default {
       list: [],
       listOneArray: [],
       selectedGroup: '', // 选择的标签分组
-      removeTag: [],
-      Pselected: [],
       selectedList: []
     }
   },
   watch: {
-    // type(val) {
-    //   val === 'remove' && (this.removeTag = this.selected.slice())
-    // },
-    // selected(val) {
-    //   if (this.type === 'add') {
-    //     this.Pselected = []
-    //     val.forEach((element) => {
-    //       let find = this.listOneArray.find((d) => {
-    //         return element.tagId === d.tagId
-    //       })
-    //       this.Pselected.push(find)
-    //     })
-    //   } else if (this.type === 'remove') {
-    //     this.removeTag = val.slice()
-    //     this.Pselected = val.slice()
-    //   }
-    //   // this.list = JSON.parse(JSON.stringify(this.list))
-    // },
-    // list (val) {
-    //   if (this.type === 'add') {
-    //     this.Pselected = []
-    //     this.selected.forEach((element) => {
-    //       let find = this.listOneArray.find((d) => {
-    //         return element.tagId === d.tagId
-    //       })
-    //       this.Pselected.push(find)
-    //     })
-    //   } else if (this.type === 'remove') {
-    //     this.removeTag = this.selected.slice()
-    //     this.Pselected = this.selected.slice()
-    //   }
-    // },
     defaultValues: {
       handler(val = []) {
         this.selectedList = [...val]
@@ -107,7 +74,7 @@ export default {
     //   })
     // },
     getList() {
-      getList().then(({ rows }) => {
+      getList({ groupTagType: this.type }).then(({ rows }) => {
         // this.list = Object.freeze(rows)
         this.list = rows
         this.listOneArray = []
@@ -157,37 +124,7 @@ export default {
           :value="item.groupId"
         ></el-option>
       </el-select>
-      <div class="mt20" v-if="Pvisible">
-        <el-checkbox-group v-if="type !== 'remove'" v-model="Pselected">
-          <template v-for="(item, index) in list">
-            <div
-              class="bfc-d mr30"
-              v-if="item.groupId === selectedGroup || !selectedGroup"
-              :key="index"
-            >
-              <template v-for="(unit, unique) in item.weTags">
-                <el-checkbox
-                  v-if="unit.name.trim()"
-                  :label="unit"
-                  :key="index + '' + unique"
-                  border
-                  >{{ unit.name }}</el-checkbox
-                >
-              </template>
-            </div>
-          </template>
-        </el-checkbox-group>
-        <el-checkbox-group v-else v-model="Pselected">
-          <template v-for="(item, index) in removeTag">
-            <el-checkbox
-              v-if="item.groupId === selectedGroup || !selectedGroup"
-              :label="item"
-              :key="index"
-              >{{ item.name.trim() || '(空的无效标签，请移除)' }}</el-checkbox
-            >
-          </template>
-        </el-checkbox-group>
-      </div> -->
+-->
       <section class="label-group">
         <div v-for="item in list" :key="item.groupId" class="label-group-item">
           <div class="label-group-item-title">{{ item.gourpName }}</div>

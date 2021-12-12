@@ -29,7 +29,7 @@
                   <img v-if="item.avatar" :src="item.avatar" alt="头像" />
                 </el-col>
                 <el-col :span="10" v-if="item" class="toe">
-                  <span style="line-height:40px">{{ item.name }}</span>
+                  <span style="line-height:40px">{{ item.customerName }}</span>
                 </el-col>
                 <el-col :span="10" class="ar">
                   <span :style="{ color: item.type === 1 ? '#4bde03' : '#f9a90b' }"
@@ -148,7 +148,7 @@ export default {
     },
     choiceCustomer(data, index) {
       this.personIndex = index
-      this.talkName = data.name
+      this.talkName = data.customerName
       this.fromId = data.externalUserid
       this.getChatList()
     },
@@ -170,7 +170,7 @@ export default {
             this.loading = false
             this.personList = data
           })
-          .catch(err => {
+          .catch((err) => {
             this.loading = false
           })
       } else {
@@ -180,7 +180,7 @@ export default {
             this.loading = false
             this.personList = data
           })
-          .catch(err => {
+          .catch((err) => {
             this.loading = false
           })
       }
@@ -192,7 +192,7 @@ export default {
         this.customerList = []
       }
       page && (this.customerQuery.pageNum = page)
-      apiCustomer.getList(this.customerQuery).then(res => {
+      apiCustomer.getListNew(this.customerQuery).then((res) => {
         this.customerList.push(...res.rows)
         this.customerTotal = ~~res.total
         this.customerQuery.pageNum++

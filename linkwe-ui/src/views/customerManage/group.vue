@@ -13,6 +13,8 @@ export default {
         pageNum: 1,
         pageSize: 10,
         groupName: undefined,
+        groupLeaderName: undefined,
+        tagIds: undefined,
         beginTime: undefined,
         endTime: undefined
       },
@@ -178,8 +180,8 @@ export default {
       <el-form-item label="群名" prop="groupName">
         <el-input v-model="query.groupName" placeholder="请输入群名" clearable />
       </el-form-item>
-      <el-form-item label="群主" prop="groupLeader">
-        <el-input v-model="query.userIds" placeholder="请输入群主" clearable />
+      <el-form-item label="群主" prop="groupLeaderName">
+        <el-input v-model="query.groupLeaderName" placeholder="请输入群主" clearable />
       </el-form-item>
       <el-form-item label="群标签">
         <div class="tag-input" @click="showTagDialog">
@@ -300,8 +302,9 @@ export default {
     <SelectTag
       ref="selectTag"
       :visible.sync="dialogVisible"
+      type="2"
       :title="tagDialogType.title"
-      :selected="selectedTag"
+      :defaultValues="selectedTag"
       @success="submitSelectTag"
     >
     </SelectTag>

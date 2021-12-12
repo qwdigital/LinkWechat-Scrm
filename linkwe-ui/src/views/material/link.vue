@@ -32,7 +32,7 @@ export default {
       />
       <el-table-column label="图文链接" align="center" prop="materialUrl" />
 
-      <el-table-column label="最近更新时间" align="center" prop="createTime"> </el-table-column>
+      <el-table-column label="最近更新时间" align="center" prop="updateTime"> </el-table-column>
       <el-table-column
         label="操作"
         align="center"

@@ -126,11 +126,11 @@ export default {
       })
     },
     // 获取显示用tag字符串
-    getDisplayTags(row) {
-      if (!(row && row.tagList.length > 0)) return ''
+    // getDisplayTags(row) {
+    //   if (!(row && row.tagList.length > 0)) return ''
 
-      return row.tagList.join(' ')
-    },
+    //   return row.tagList.map((d) => d.name).join(' ')
+    // },
     // 批量删除
     handleBulkRemove() {
       this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
@@ -280,21 +280,38 @@ export default {
           {{ parseInt(row.sendType) === 0 ? '企业群发' : '个人群发' }}
         </template>
       </el-table-column>
-      <el-table-column label="当前群人数" align="center">
+      <el-table-column label="当前群人数" align="center" width="100">
         <template #default="{ row }">
           <el-button type="text" @click="openCustomerDialog(row.taskId)">
             {{ row.totalMember }}
           </el-button>
         </template>
       </el-table-column>
-      <el-table-column label="客户标签" align="center" width="120">
-        <template #default="{ row }">
+      <el-table-column label="客户标签" align="center">
+        <div v-if="row.tagList" slot-scope="{ row }">
+          <el-popover placement="bottom" trigger="hover" :disabled="row.tagList.length < 3">
+            <div>
+              <el-tag type="info" v-for="(unit, unique) in row.tagList" :key="unique">
+                {{ unit.name }}
+              </el-tag>
+            </div>
+            <div slot="reference">
+              <el-tag type="info" v-for="(unit, unique) in row.tagList.slice(0, 2)" :key="unique">
+                {{ unit.name }}
+              </el-tag>
+              <el-tag type="info" key="a" v-if="row.tagList.length > 2">...</el-tag>
+            </div>
+          </el-popover>
+        </div>
+        <span v-else>无标签</span>
+
+        <!-- <template #default="{ row }">
           <el-popover placement="bottom" width="200" trigger="hover" :content="getDisplayTags(row)">
             <div slot="reference" class="table-desc overflow-ellipsis">
               {{ getDisplayTags(row) }}
             </div>
           </el-popover>
-        </template>
+        </template> -->
       </el-table-column>
 
       <el-table-column prop="createBy" label="创建人" align="center"></el-table-column>
@@ -417,13 +434,13 @@ export default {
 </template>
 
 <style scoped lang="scss">
-.overflow-ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+// .overflow-ellipsis {
+//   white-space: nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+// }
 
-.table-desc {
-  max-width: 120px;
-}
+// .table-desc {
+//   max-width: 120px;
+// }
 </style>

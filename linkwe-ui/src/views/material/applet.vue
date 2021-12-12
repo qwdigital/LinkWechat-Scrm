@@ -35,7 +35,6 @@ export default {
         prop="digest"
         :show-overflow-tooltip="true"
       />
-      <el-table-column label="发送次数" align="center" prop="num" :show-overflow-tooltip="true" />
       <el-table-column label="最近更新时间" align="center" prop="updateTime"> </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">

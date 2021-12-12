@@ -8,7 +8,7 @@ const service = window.CONFIG.services.wecom + '/group'
 pageNum	是	当前页
 pageSize	是	每页显示条数
 groupName	是	群名
-userIds	是	群主id,多个使用逗号隔开
+groupLeaderName	是	群主,多个使用逗号隔开
 tagIds	是	标签id,多个使用逗号隔开
 beginTime:
 endTime:

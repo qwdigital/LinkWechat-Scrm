@@ -46,7 +46,7 @@ export default {
     }
   },
   created() {
-    this.query.groupTagType = this.type
+    // this.query.groupTagType = this.type
     this.getList()
   },
   methods: {
