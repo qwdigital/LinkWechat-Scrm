@@ -1,18 +1,23 @@
 <script>
-import { updateBirthday, getDetail, getSummary } from '@/api/customer'
-import record from './customer/record'
-import ctrack from './customer/track'
+import {
+  updateBirthday,
+  getDetail,
+  getSummary,
+  getFollowUpRecord,
+  getCustomerInfoByUserId
+} from '@/api/customer'
+
 import { dictAddType, dictJoinGroupType, dictTrackState } from '@/utils/dictionary'
+import InfoTab from './customer/infoTab.vue'
 export default {
   name: 'CustomerDetail',
-  components: { record, ctrack },
+  components: { InfoTab },
   data() {
     return {
       datePickerVisible: false,
       customer: {
         // weFlowerCustomerRels: [{}]
       },
-      portrayalSum: { companyTags: [], personTags: [], trackStates: [] }, // 客户画像汇总
       birthday: '',
       pickerOptions: {
         disabledDate(time) {
@@ -21,7 +26,9 @@ export default {
       },
       dictAddType,
       dictJoinGroupType,
-      dictTrackState
+      dictTrackState,
+
+      active: 0
     }
   },
   created() {
@@ -54,37 +61,6 @@ export default {
       getDetail(this.$route.query).then(({ data }) => {
         data.companyTags && (data.companyTags = data.companyTags.split(','))
         this.customer = data
-        this.birthday = data.birthday
-      })
-    },
-    /**
-     *客户画像汇总
-     * @param {*}
-     * externalUserid	是	当前客户id
-     */
-    getSummary() {
-      getSummary(this.$route.query.externalUserid).then(({ data }) => {
-        data.companyTags && (data.companyTags = data.companyTags.split(','))
-        //          {
-        //   'companyTags':[{ //企业标签
-        //      'userName':'',//添加人
-        //      'tagsNames':'',//标签名多个标签使用逗号隔开
-        //      'tagIds':''//多个标签id使用逗号隔开
-        // }],
-        // 'personTags':[{ //个人标签
-        //      'userName':'',//添加人
-        //      'tagsNames':'',//标签名多个标签使用逗号隔开
-        //      'tagIds':''//多个标签id使用逗号隔开
-        // }],
-        // 'trackStates':[{
-        //       'userName':'',//跟进人
-        //       'trackStateList':[{ //跟进状态列表
-        //       'trackState':'',//跟进状态
-        //       'trackTime':''//跟进时间
-        // }]
-        // }]
-        // }
-        this.portrayalSum = data
         this.birthday = data.birthday
       })
     }
@@ -125,7 +101,7 @@ export default {
       </div>
     </div>
 
-    <el-card shadow="never">
+    <el-card shadow="never" style="background-color: transparent;border:none;">
       <div slot="header" class="card-title">社交关系</div>
       <el-tabs value="1">
         <el-tab-pane
@@ -160,122 +136,12 @@ export default {
       </el-tabs>
     </el-card>
 
-    <el-tabs value="1" @tab-click="handleClick">
-      <el-tab-pane label="客户画像汇总" name="1">
-        <el-row :gutter="10">
-          <el-col :span="14">
-            <div class="left">
-              <el-card class="mb10" shadow="never">
-                <div slot="header" class="card-title">企业标签</div>
-                <div
-                  class="flex mb20"
-                  v-for="(item, index) of portrayalSum.companyTags"
-                  :key="index"
-                >
-                  <div style="width:60px;flex: none;">{{ item.userName }}：</div>
-                  <template v-if="item.tagNames">
-                    <el-tag
-                      type="info"
-                      v-for="(unit, unique) in item.tagNames.split(',')"
-                      :key="unique"
-                      >{{ unit }}</el-tag
-                    >
-                  </template>
-                  <div>
-                    暂无标签
-                  </div>
-                </div>
-              </el-card>
-
-              <el-card class="mb10" shadow="never">
-                <div slot="header" class="card-title">个人标签</div>
-                <div
-                  class="flex mb20"
-                  v-for="(item, index) of portrayalSum.personTags"
-                  :key="index"
-                >
-                  <div style="width:60px;flex: none;">{{ item.userName }}：</div>
-                  <template v-if="item.tagNames">
-                    <el-tag
-                      type="info"
-                      v-for="(unit, unique) in item.tagNames.split(',')"
-                      :key="unique"
-                      >{{ unit }}</el-tag
-                    >
-                  </template>
-                  <div>
-                    暂无标签
-                  </div>
-                </div>
-              </el-card>
-
-              <el-card class="mb10" shadow="never">
-                <div slot="header" class="card-title">跟进状态</div>
-                <div
-                  class="fxbw mb20"
-                  v-for="(item, index) of portrayalSum.trackStates"
-                  :key="index"
-                >
-                  <div style="width:60px;flex: none;">{{ item.userName }}：</div>
-                  <el-steps
-                    style="flex:auto;"
-                    :active="item.trackStateList.length"
-                    finish-status="success"
-                  >
-                    <el-step
-                      v-for="(unit, unique) of item.trackStateList"
-                      :key="unique"
-                      :title="dictTrackState[~~unit.trackState + ''].name"
-                      :description="unit.trackTime"
-                    ></el-step>
-                  </el-steps>
-                </div>
-              </el-card>
-
-              <el-card shadow="never">
-                <div slot="header" class="card-title">跟进记录</div>
-                <el-tabs value="0">
-                  <el-tab-pane
-                    v-for="(item, index) in customer.trackUsers"
-                    :key="index"
-                    :label="item.userName"
-                    :name="index + ''"
-                  >
-                    <record
-                      :userId="item.userId"
-                      :externalUserid="$route.query.externalUserid"
-                    ></record>
-                  </el-tab-pane>
-                </el-tabs>
-              </el-card>
-            </div>
-          </el-col>
-          <el-col :span="10">
-            <div class="right">
-              <el-card>
-                <div slot="header">
-                  <span class="card-title">客户轨迹</span>
-                  <span style=" color: #13a2e8;" class="fr">同步</span>
-                </div>
-                <div class="flex track-tab-wrap">
-                  <div class="track-tab active">
-                    全部
-                  </div>
-                  <div class="track-tab">
-                    全部
-                  </div>
-                  <div class="track-tab">
-                    全部
-                  </div>
-                  <div class="track-tab">
-                    全部
-                  </div>
-                </div>
-                <ctrack></ctrack>
-              </el-card>
-            </div>
-          </el-col>
-        </el-row>
+    <el-tabs value="0">
+      <el-tab-pane label="客户画像汇总">
+        <info-tab></info-tab>
+      </el-tab-pane>
+      <el-tab-pane v-for="(item, index) of customer.trackUsers" :key="index" :label="item.userName">
+        <info-tab :userId="item.trackUserId"></info-tab>
       </el-tab-pane>
     </el-tabs>
 
@@ -372,9 +238,9 @@ export default {
     width: 100px;
     text-align: right;
   }
-  .el-tag {
-    margin-bottom: 5px;
-  }
+  // .el-tag {
+  //   margin-bottom: 5px;
+  // }
   /deep/.el-card__header {
     border: 0;
   }
@@ -393,21 +259,5 @@ export default {
 
 .card-title {
   font-weight: 600;
-}
-
-.track-tab-wrap {
-  .track-tab {
-    background: #ddd;
-    border-radius: 50px;
-    padding: 5px 20px;
-    cursor: pointer;
-    & + .track-tab {
-      margin-left: 10px;
-    }
-    &.active {
-      background: $blue;
-      color: #fff;
-    }
-  }
 }
 </style>

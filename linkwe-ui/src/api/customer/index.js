@@ -175,20 +175,40 @@ export function getDetail(params) {
  * @param {*}
  * externalUserid	是	当前客户id
  */
-export function getSummary(params) {
+export function getSummary(externalUserid) {
   return request({
     url: service + '/findWeCustomerInfoSummary',
-    params
+    params: {
+      externalUserid
+    }
+  })
+}
+/**
+ * 客户画像(单个跟进人) 获取单个跟进人的客户信息
+ * @param {*} params
+ * externalUserid	是	当前客户id
+ * userId	是	当前跟进人id
+ * @returns
+ */
+export function getCustomerInfoByUserId(externalUserid, userId) {
+  return request({
+    url: service + '/findWeCustomerInfoByUserId',
+    params: {
+      externalUserid,
+      userId
+    }
   })
 }
 
 /**
- *跟进记录
- * @param {*}
+ *跟进记录(客户轨迹)
+ userId  trajectoryType 二个值得默认传null，则返回所有
+ * @param {*} 
  * externalUserid	是	当前客户id
- * userId	是	当前跟进人id
+ * userId		当前跟进人id
  * pageNum: 1,
         pageSize: 10,
+        trajectoryType		1:信息动态;2:社交动态;3:跟进动态;4:待办动态
  */
 export function getFollowUpRecord(params) {
   return request({

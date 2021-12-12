@@ -2,7 +2,7 @@
 export default {
   name: '',
   props: {
-    user: {
+    userId: {
       type: String,
       default: ''
     }
@@ -51,7 +51,12 @@ export default {
     <li v-for="i in list" class="infinite-list-item" :key="i">
       <div>2021-02-16 星期二</div>
       <el-timeline>
-        <el-timeline-item v-for="(activity, index) in 6" :key="index" timestamp="2018/4/12" placement="top">
+        <el-timeline-item
+          v-for="(activity, index) in 6"
+          :key="index"
+          timestamp="2018/4/12"
+          placement="top"
+        >
           <p>更新 Github 模板</p>
           <p>王小虎 提交于 2018/4/12 20:46</p>
         </el-timeline-item>
