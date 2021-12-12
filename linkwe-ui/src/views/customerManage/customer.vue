@@ -58,7 +58,11 @@ export default {
     }
   },
   watch: {},
-  computed: {},
+  computed: {
+    isSync() {
+      return (+new Date() - +new Date(this.lastSyncTime)) / 3600000 < 2
+    }
+  },
   created() {
     this.getList()
     this.getListTag()
@@ -89,7 +93,7 @@ export default {
       api
         .getListNew(this.query)
         .then(({ rows, total, lastSyncTime, noRepeatCustomerTotal }) => {
-          rows.forEach(element => {
+          rows.forEach((element) => {
             if (element.tagIds && element.tagNames) {
               element.tagIds = element.tagIds.split(',')
               element.tagNames = element.tagNames.split(',')
@@ -116,8 +120,8 @@ export default {
     getListTag(refresh) {
       getListTag().then(({ rows }) => {
         this.listTagOneArray = []
-        rows.forEach(element => {
-          element.weTags.forEach(d => {
+        rows.forEach((element) => {
+          element.weTags.forEach((d) => {
             this.listTagOneArray.push(d)
           })
         })
@@ -158,9 +162,9 @@ export default {
       let hasErrorTag = []
       let repeat = []
       row.tags &&
-        row.tags.forEach(unit => {
+        row.tags.forEach((unit) => {
           // 判断是否有重复标签
-          let isRepeat = this.selectedTag.some(d => {
+          let isRepeat = this.selectedTag.some((d) => {
             return d.tagId === unit.tagId
           })
           // 去重
@@ -168,7 +172,7 @@ export default {
             repeat.push(unit.tagName)
             return
           }
-          let filter = this.listTagOneArray.find(d => {
+          let filter = this.listTagOneArray.find((d) => {
             return d.tagId === unit.tagId
           })
           // 如果没有匹配到，则说明该便签处于异常状态，可能已被删除或破坏
@@ -214,7 +218,7 @@ export default {
           loading.close()
           this.msgSuccess('后台开始同步数据，请稍后关注进度')
         })
-        .catch(fail => {
+        .catch((fail) => {
           loading.close()
           console.log(fail)
         })
@@ -230,18 +234,18 @@ export default {
         .then(function() {
           return api.exportCustomer(queryParams)
         })
-        .then(response => {
+        .then((response) => {
           this.download(response.msg)
         })
         .catch(function() {})
     },
     selectedUser(list) {
       this.queryUser = list
-      this.query.userIds = list.map(d => d.userId) + ''
+      this.query.userIds = list.map((d) => d.userId) + ''
     },
     submitSelectTag(selected) {
       if (this.tagDialogType.type === 'query') {
-        this.query.tagIds = selected.map(d => d.tagId) + ''
+        this.query.tagIds = selected.map((d) => d.tagId) + ''
         // debugger;
         this.queryTag = selected
         this.dialogVisible = false
@@ -306,7 +310,7 @@ export default {
         takeoverUserId: this.extendStaff, //接受人
         externalUserid: this.currentEidt.externalUserid //客户id，多个客户使用逗号隔开
       }
-      api.jobExtends(data).then(res => {
+      api.jobExtends(data).then((res) => {
         this.msgSuccess('操作成功')
         this.dialogVisibleExtend = false
         this.getList()
@@ -416,13 +420,21 @@ export default {
         <!-- 共
         <span class="num">{{ total }}</span> 位客户，实际客户
         <span class="num">{{ total }}</span> 位。 -->
-        <el-button
-          v-hasPermi="['customerManage:customer:sync']"
-          v-preventReClick
-          type="primary"
-          @click="sync"
-          >同步客户</el-button
+        <el-tooltip
+          :disabled="isSync"
+          class="item"
+          content="由于企业微信开放平台的限制，两小时内不得重复同步操作"
+          placement="top-start"
         >
+          <el-button
+            v-hasPermi="['customerManage:customer:sync']"
+            v-preventReClick
+            :disabled="isSync"
+            type="primary"
+            @click="sync"
+            >同步客户</el-button
+          >
+        </el-tooltip>
         <!-- <el-button v-hasPermi="['customerManage:customer:checkRepeat']" type="primary">查看重复客户</el-button> -->
         <span> 最近同步：{{ lastSyncTime }} </span>
       </div>
