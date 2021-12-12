@@ -20,7 +20,9 @@
             <div>
               <span
                 >{{
-                  form.remark ? form.remark : (form.name || '') + (form.remarkCorpName ? '-' + form.remarkCorpName : '')
+                  form.remark
+                    ? form.remark
+                    : (form.name || '') + (form.remarkCorpName ? '-' + form.remarkCorpName : '')
                 }}
                 &nbsp; &nbsp;</span
               ><span class="icon iconfont icon-man" v-if="form.gender == 1"></span>
@@ -32,7 +34,7 @@
             </div>
           </div>
         </div>
-        <div class="data" @click="goRoute('/customerDetail')">详细资料></div>
+        <div class="data" @click="usershow = true">添加待办</div>
       </div>
       <div class="detail">
         <div class="c9">手机号</div>
@@ -52,6 +54,11 @@
       <div class="detail">
         <div class="c9">邮箱</div>
         <div>{{ form.email }}</div>
+      </div>
+      <van-divider />
+      <div class="detail">
+        <div></div>
+        <div class="data" @click="goRoute('/customerDetail')">更多详细资料></div>
       </div>
     </div>
     <div class="divider"></div>
@@ -95,7 +102,7 @@
     <div class="addwaiting">
       <div class="detail">
         <div>客户轨迹</div>
-        <div class="data" is-link @click="usershow = true">添加待办></div>
+        <div class="data" is-link @click="usershow = true">同步</div>
       </div>
 
       <van-tabs v-model="query.trajectoryType" @change="changeInfo">
@@ -138,9 +145,23 @@
 
     <!-- 点击添加待办触发弹出框开始 -->
     <van-action-sheet v-model="usershow">
-      <van-nav-bar title="客户待办" right-text="取消" @click-right="usershow = false" />
+      <van-nav-bar title="跟进记录" right-text="X" @click-right="usershow = false">
+        <!-- <template #right>
+          <van-icon name="cross" size="18" />
+        </template> -->
+      </van-nav-bar>
       <!-- 表单 -->
       <van-form @submit="onSubmit">
+        <van-field name="radio" label="单选框">
+          <template #input>
+            <van-radio-group v-model="radio" direction="horizontal">
+              <van-radio name="1">跟进中</van-radio>
+              <van-radio name="2">已成交</van-radio>
+              <van-radio name="3">无意向</van-radio>
+            </van-radio-group>
+          </template>
+        </van-field>
+
         <!-- 待办内容 -->
         <van-field
           v-model="conagency"
@@ -154,7 +175,7 @@
         />
 
         <!-- 待办日期 -->
-        <van-field
+        <!-- <van-field
           v-model="dateagency"
           is-link
           readonly
@@ -164,8 +185,13 @@
           required
           :rules="[{ required: true, message: '请输入待办日期' }]"
         />
-        <van-calendar v-model="dateshow" @confirm="onConfirm" color="#1989fa" :min-date="minDate" :max-date="maxDate" />
-        <!-- 待办时间 -->
+        <van-calendar
+          v-model="dateshow"
+          @confirm="onConfirm"
+          color="#1989fa"
+          :min-date="minDate"
+          :max-date="maxDate"
+        />
         <van-field
           v-model="timeagency"
           is-link
@@ -197,10 +223,12 @@
             @cancel="timecancel"
             @confirm="endtimeconfirm"
           />
-        </van-action-sheet>
+        </van-action-sheet> -->
         <!-- 保存 -->
         <div style="margin: 30px">
-          <van-button round block type="info" native-type="submit" @click="saveInfo2">保存</van-button>
+          <van-button round block type="info" native-type="submit" @click="saveInfo2"
+            >保存</van-button
+          >
         </div>
       </van-form>
     </van-action-sheet>
