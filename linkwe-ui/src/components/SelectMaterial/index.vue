@@ -1,103 +1,90 @@
 <script>
-import { getList } from '@/api/customer/tag'
-import list from './list'
+  import { getList } from '@/api/customer/tag'
+  import list from './list'
 
-export default {
-  components: { list },
-  props: {
-    // 添加标签显隐
-    visible: {
-      type: Boolean,
-      default: false
-    },
-    // title: {
-    //   type: String,
-    //   default: '',
-    // },
-    // 素材类型  0:'文本', 1：'图片'
-    type: {
-      type: String | Number,
-      default: '0'
-    },
-    // 显示哪些素材类型标签
-    showArr: {
-      type: Array,
-      default: () => [0, 1]
-    }
-  },
-  data() {
-    return {
-      text: {},
-      image: {},
-      file: {}
-    }
-  },
-  watch: {},
-  computed: {
-    Pvisible: {
-      get() {
-        return this.visible
+  export default {
+    components: { list },
+    props: {
+      // 添加标签显隐
+      visible: {
+        type: Boolean,
+        default: false
       },
-      set(val) {
-        this.$emit('update:visible', val)
+      // title: {
+      //   type: String,
+      //   default: '',
+      // },
+      type: {
+        type: String | Number,
+        default: '4'
+      },
+      // 显示哪些素材类型标签
+      showArr: {
+        type: Array,
+        default: () => []
       }
     },
-    Ptype: {
-      get() {
-        return this.type
-      },
-      set(val) {
-        this.$emit('update:type', val)
+    data () {
+      return {
+        text: {},
+        image: {},
+        file: {}
       }
-    }
-  },
-  created() {},
-  mounted() {},
-  methods: {
-    submit() {
-      this.Pvisible = false
-      this.$emit('success', this.text, this.image, this.file)
     },
-    changeText(data) {
-      this.text = data
+    watch: {},
+    computed: {
+      title () {
+        const titleMap = {
+          4: '文本',
+          0: '图片',
+          7: '图文',
+          8: '小程序'
+        }
+        return titleMap[this.type] || '素材'
+      },
+      Pvisible: {
+        get () {
+          return this.visible
+        },
+        set (val) {
+          this.$emit('update:visible', val)
+        }
+      },
+      Ptype: {
+        get () {
+          return this.type
+        },
+        set (val) {
+          this.$emit('update:type', val)
+        }
+      }
     },
-    changeImage(data) {
-      this.image = data
+    created () { },
+    mounted () { },
+    methods: {
+      submit () {
+        this.Pvisible = false
+        this.$emit('success', this.selectedData)
+      },
+      onChange (data) {
+        this.selectedData = data
+      }
     }
   }
-}
 </script>
 
 <template>
-  <el-dialog
-    title="选择素材"
-    :visible.sync="Pvisible"
-    width="680px"
-    append-to-body
-    :close-on-click-modal="false"
-  >
+  <el-dialog :title="`选择${title}`" :visible.sync="Pvisible" width="680px" append-to-body destroy-on-close>
     <div>
-      <el-tabs v-model="Ptype">
-        <el-tab-pane name="0" v-if="showArr.includes(0)">
+      <list v-if="showArr.length <= 1" :type="showArr[0] || type" @change="onChange"> </list>
+      <el-tabs v-else-if="showArr.length > 1" v-model="Ptype">
+        <!-- <el-tab-pane name="0" v-if="showArr.includes(0)">
           <span slot="label"> <i class="el-icon-date"></i> 文本 </span>
-          <list type="4" @change="changeText"> </list>
+          <list type="4" @change="onChange"> </list>
         </el-tab-pane>
         <el-tab-pane name="1" v-if="showArr.includes(1)">
           <span slot="label"> <i class="el-icon-date"></i> 图片 </span>
-          <list type="0" @change="changeImage"> </list>
-        </el-tab-pane>
-        <!-- <el-tab-pane name="2">
-          <span slot="label"> <i class="el-icon-date"></i> 文件 </span>
-          <list>
-            <el-table :data="list" style="width: 100%">
-              <el-table-column width="50">
-                <template slot-scope="scope">
-                  <el-radio v-model="radio" :label="scope.row.id"></el-radio>
-                </template>
-              </el-table-column>
-              <el-table-column prop="content"> </el-table-column>
-            </el-table>
-          </list>
+          <list type="0" @change="onChange"> </list>
         </el-tab-pane> -->
       </el-tabs>
     </div>
@@ -109,18 +96,18 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.user-list {
-  .el-row {
-    line-height: 26px;
+  .user-list {
+    .el-row {
+      line-height: 26px;
+    }
   }
-}
-.mr30 {
-  margin-right: 30px;
-}
+  .mr30 {
+    margin-right: 30px;
+  }
 
-/deep/.el-dialog__body {
-  padding: 5px 20px;
-  height: 76vh;
-  overflow: auto;
-}
+  /deep/.el-dialog__body {
+    padding: 5px 20px;
+    height: 76vh;
+    overflow: auto;
+  }
 </style>

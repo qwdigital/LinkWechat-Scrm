@@ -2,8 +2,8 @@
   <div>
     <div>
       <el-form :model="query" label-position="left" ref="queryForm" :inline="true" label-width="100px" class="top-search">
-        <el-form-item label="选择创建人" prop="creator">
-          <el-input :value="query.creator" readonly @focus="dialogVisible = true" placeholder="请选择员工" />
+        <el-form-item label="选择创建人">
+          <el-input :value="name" readonly @focus="dialogVisible = true" placeholder="请选择员工" />
         </el-form-item>
         <el-form-item label="时间范围">
           <el-date-picker v-model="value1" format="yyyy-MM-dd" @change="setTimeChange" type="daterange" range-separator="——" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
@@ -96,6 +96,7 @@
         value1: [],
         dialogVisible: false,
         userArray: [],
+        name: '',
         query: {
           pageSize: 10,
           pageNum: 1,
@@ -136,10 +137,14 @@
       getSelectUser (data) {
         this.userArray = data
         this.query.creator = this.userArray.map(function (obj, index) {
+          return obj.userId
+        }).join(",")
+        this.name = this.userArray.map(function (obj, index) {
           return obj.name
         }).join(",")
       },
       resetQuery () {
+        this.name = ''
         this.query = {
           pageSize: 10,
           pageNum: 1,
