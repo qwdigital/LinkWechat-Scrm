@@ -230,17 +230,6 @@ export default {
 }
 
 .el-card {
-  .el-row {
-    color: #666;
-    margin-bottom: 10px;
-  }
-  .el-col-10 {
-    width: 100px;
-    text-align: right;
-  }
-  // .el-tag {
-  //   margin-bottom: 5px;
-  // }
   /deep/.el-card__header {
     border: 0;
   }

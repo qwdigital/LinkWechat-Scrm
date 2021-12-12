@@ -93,7 +93,11 @@ export default {
         <div class="left">
           <el-card class="mb10" shadow="never">
             <div slot="header" class="card-title">企业标签</div>
-            <div class="flex mb20" v-for="(item, index) of portrayalSum.companyTags" :key="index">
+            <div
+              v-for="(item, index) of portrayalSum.companyTags"
+              :key="index"
+              :class="['flex', index && 'mt20']"
+            >
               <div style="width:60px;flex: none;">{{ item.userName }}：</div>
               <template v-if="item.tagNames">
                 <el-tag
@@ -111,7 +115,11 @@ export default {
 
           <el-card class="mb10" shadow="never">
             <div slot="header" class="card-title">个人标签</div>
-            <div class="flex mb20" v-for="(item, index) of portrayalSum.personTags" :key="index">
+            <div
+              v-for="(item, index) of portrayalSum.personTags"
+              :key="index"
+              :class="['flex', index && 'mt20']"
+            >
               <div style="width:60px;flex: none;">{{ item.userName }}：</div>
               <template v-if="item.tagNames">
                 <el-tag
@@ -191,6 +199,19 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+.el-card {
+  .el-row {
+    color: #666;
+    margin-bottom: 10px;
+  }
+  .el-col-10 {
+    width: 100px;
+    text-align: right;
+  }
+  .el-tag {
+    margin-bottom: 5px;
+  }
+}
 .track-tab-wrap {
   .track-tab {
     background: #ddd;
