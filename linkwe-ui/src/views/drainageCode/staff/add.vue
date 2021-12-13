@@ -246,6 +246,10 @@
     },
     created () {
       let id = this.$route.query.id
+      let groupId = this.$route.query.groupId
+      if (groupId) {
+        this.baseForm.qrGroupId = groupId
+      }
       this.getCodeCategoryList()
       if (id) {
         this.title = '编辑'
@@ -463,28 +467,6 @@
           }
           this.codeForm.qrType = base.type
           this.codeForm.qrRuleType = base.ruleType
-
-          // if (this.codeForm.qrRuleType === 1) {
-          //   let obj = {
-          //     type: 1,
-          //     userIds: this.codeForm.weEmpleCodeUseScops.map(dd => dd.businessId)
-          //   }
-          //   this.codeForm.qrUserInfos = [obj]
-          // } else {
-          //   this.codeForm.qrUserInfos = []
-          //   this.codeForm.empleCodeRosterDto.forEach(fff => {
-          //     let obj = {
-          //       type: fff.type,
-          //       beginTime: fff.startDate,
-          //       endTime: fff.endDate,
-          //       userIds: fff.weEmpleCodeUseScops.map(dd => dd.businessId),
-          //       workCycle: fff.weekday
-          //     }
-          //     this.codeForm.qrUserInfos.push(obj)
-          //   })
-          // }
-
-
           if (base.ruleType === 1) {
             let arr = []
             base.qrUserInfos[0].weQrUserList.forEach(dd => {
@@ -508,13 +490,12 @@
                 weEmpleCodeUseScops: dd.weQrUserList.map(ff => { return { businessId: ff.userId, businessName: ff.userName } })
               }
               arr.push(obj)
-              console.log(obj)
             })
             this.codeForm.empleCodeRosterDto = arr
           }
           this.materialData = {
             welcomeMsg: base.qrAttachments ? base.qrAttachments[0].content : '',
-            materialMsgList: base.qrAttachments ? base.qrAttachments.slice(1) : []
+            materialMsgList: base.qrAttachments ? this.setEditList(base.qrAttachments.slice(1)) : []
           }
           // this.materialData.materialMsgList.forEach(ddd => {
           //   ddd.msgType = Number(ddd.msgType)
@@ -522,7 +503,37 @@
           this.loading = false
         })
       },
-
+      setEditList (list) {
+        let arr = []
+        if (list && list.length) {
+          list.forEach(dd => {
+            if (dd.msgType === 'image') {
+              let obj = {
+                msgType: '0',
+                materialUrl: dd.picUrl
+              }
+              arr.push(obj)
+            } else if (dd.msgType === 'link') {
+              let ob = {
+                msgType: '7',
+                materialName: dd.title,
+                content: dd.linkUrl
+              }
+              arr.push(ob)
+            } else if (dd.msgType === 'miniprogram') {
+              let ff = {
+                msgType: '8',
+                materialUrl: dd.appId,
+                materialName: dd.title,
+                coverUrl: dd.picUrl,
+                content: dd.linkUrl
+              }
+              arr.push(ff)
+            }
+          })
+        }
+        return arr
+      },
       // 获取活码分组
       getCodeCategoryList () {
         getCodeCategoryList({ mediaType: 6 }).then(res => {
@@ -621,14 +632,46 @@
           tagName: d.name,
         }))
       },
+      resetData (list) {
+        let arr = []
+        if (list && list.length) {
+          list.forEach(dd => {
+            if (dd.msgType === '0') {
+              let obj = {
+                msgType: 'image',
+                picUrl: dd.materialUrl
+              }
+              arr.push(obj)
+            } else if (dd.msgType === '7') {
+              let ob = {
+                msgType: 'link',
+                title: dd.materialName,
+                linkUrl: dd.content
+              }
+              arr.push(ob)
+            } else if (dd.msgType === '8') {
+              let ff = {
+                msgType: 'miniprogram',
+                appId: dd.materialUrl,
+                title: dd.materialName,
+                picUrl: dd.coverUrl,
+                linkUrl: dd.content
+              }
+              arr.push(ff)
+            }
+          })
+        }
+        return arr
+      },
       submit (data) {
+        let list = this.resetData(data.materialMsgList)
         let myObj = {
           attachments: [{
             content: data.welcomeMsg,
             msgType: 'text'
           }]
         }
-        myObj.attachments.push(...data.materialMsgList)
+        myObj.attachments.push(...list)
         if (this.codeForm.qrRuleType === 1) {
           let obj = {
             type: 0,

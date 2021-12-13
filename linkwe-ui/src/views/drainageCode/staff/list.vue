@@ -300,7 +300,7 @@
         this.search()
       },
       goRoute (path, id) {
-        this.$router.push({ path: path, query: { id } })
+        this.$router.push({ path: path, query: { id, groupId: this.query.groupId } })
       },
       // 多选框选中数据
       handleSelectionChange (selection) {

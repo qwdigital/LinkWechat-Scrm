@@ -265,11 +265,11 @@
       onSelectUser () {
         this.selectedUserList = []
         let arr = []
-        if (this.form.users) {
-          arr = this.form.users.map((dd) => {
+        if (this.form.userIds) {
+          arr = this.form.userIds.split(',').map((dd, index) => {
             return {
-              userId: dd.useUserId,
-              name: dd.useUserName
+              userId: dd,
+              name: this.form.userNames.split(',')[index]
             }
           })
         }

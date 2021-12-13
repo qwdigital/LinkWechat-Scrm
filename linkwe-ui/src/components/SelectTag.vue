@@ -14,6 +14,10 @@ export default {
       type: String,
       default: '选择标签'
     },
+    // selected: {
+    //   type: Array,
+    //   default: () => [],
+    // },
     // "标签分组类型(1:客户标签;2:群标签)"
     type: {
       type: String,
@@ -156,7 +160,13 @@ export default {
     </div>
   </el-dialog>
 </template>
-
+<style>
+.el-tag.el-tag--info {
+  background-color: #f4f4f5;
+  border-color: #e9e9eb;
+  color: #909399;
+}
+</style>
 <style lang="scss" scoped>
 .user-list {
   .el-row {

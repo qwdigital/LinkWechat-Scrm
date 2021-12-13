@@ -42,6 +42,8 @@
         </el-table-column>
         <el-table-column label="发送时间" align="center" prop="sendTime" width="180">
         </el-table-column>
+        <el-table-column label="最近更新时间" align="center" prop="createTime" width="180">
+        </el-table-column>
         <el-table-column label="操作" align="center" width="180">
           <template slot-scope="scope">
             <!-- v-hasPermi="['enterpriseWechat:view']" -->
