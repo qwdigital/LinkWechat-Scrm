@@ -201,6 +201,16 @@ com.linkwechat
 
 [如何快速部署 LinkWeChat](https://www.yuque.com/linkwechat/help/gpod7i)
 
+建议服务器最低配置：
+
+| 类型 | 配置 |
+|:-:|:-:|
+|操作系统|CentOS8.2|
+|CPU|4核|
+|内存|8G|
+|带宽|5M|
+|硬盘|100G|
+
 # 三、常见问题
 
 由于 LinkWeChat 项目基于企业微信官方第三方应用开发文档，所以请各位小伙伴在学习和使用 LinkWeChat 之前， **务必仔细了解并熟悉** 官方 API 已有功能。
