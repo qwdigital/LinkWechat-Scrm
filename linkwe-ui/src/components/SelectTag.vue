@@ -14,16 +14,18 @@ export default {
       type: String,
       default: '选择标签'
     },
-    // selected: {
-    //   type: Array,
-    //   default: () => [],
-    // },
     // "标签分组类型(1:客户标签;2:群标签)"
     type: {
       type: String,
       default: '1'
     },
     destroyOnClose: Boolean,
+    // 已选中的标签，一般用于回显
+    selected: {
+      type: Array,
+      default: () => []
+    },
+    // 已选中的标签，一般用于回显，(下一主版本弃用)
     defaultValues: {
       type: Array,
       default: () => []
@@ -38,6 +40,13 @@ export default {
     }
   },
   watch: {
+    selected: {
+      handler(val = []) {
+        this.selectedList = [...val]
+      },
+      immediate: true
+    },
+    // 下一主版本弃用
     defaultValues: {
       handler(val = []) {
         this.selectedList = [...val]

@@ -206,6 +206,10 @@ export default {
       // this.$refs.selectTag.$forceUpdate()
     },
     sync() {
+      if (this.isSync) {
+        this.msgError('由于企业微信开放平台的限制，两小时内不得重复同步操作')
+        return
+      }
       const loading = this.$loading({
         lock: true,
         text: 'Loading',
@@ -216,6 +220,7 @@ export default {
         .sync()
         .then(() => {
           loading.close()
+          this.getList(1)
           this.msgSuccess('后台开始同步数据，请稍后关注进度')
         })
         .catch((fail) => {
@@ -344,9 +349,7 @@ export default {
         <div class="tag-input" @click="showTagDialog">
           <span class="tag-place" v-if="!queryTag.length">请选择</span>
           <template v-else>
-            <el-tag type="info" v-for="(unit, unique) in queryTag" :key="unique">{{
-              unit.name
-            }}</el-tag>
+            <el-tag v-for="(unit, unique) in queryTag" :key="unique">{{ unit.name }}</el-tag>
           </template>
         </div>
       </el-form-item>
@@ -354,9 +357,7 @@ export default {
         <div class="tag-input" @click="dialogVisibleSelectUser = true">
           <span class="tag-place" v-if="!queryUser.length">请选择</span>
           <template v-else>
-            <el-tag type="info" v-for="(unit, unique) in queryUser" :key="unique">{{
-              unit.name
-            }}</el-tag>
+            <el-tag v-for="(unit, unique) in queryUser" :key="unique">{{ unit.name }}</el-tag>
           </template>
         </div>
       </el-form-item>
@@ -418,7 +419,8 @@ export default {
         <span class="num">{{ total }}</span> 位客户，实际客户
         <span class="num">{{ total }}</span> 位。 -->
         <el-tooltip
-          :disabled="isSync"
+          effect="light"
+          :disabled="!isSync"
           class="item"
           content="由于企业微信开放平台的限制，两小时内不得重复同步操作"
           placement="top-start"
@@ -426,18 +428,17 @@ export default {
           <el-button
             v-hasPermi="['customerManage:customer:sync']"
             v-preventReClick
-            :disabled="isSync"
             type="primary"
             @click="sync"
             >同步客户</el-button
           >
         </el-tooltip>
         <!-- <el-button v-hasPermi="['customerManage:customer:checkRepeat']" type="primary">查看重复客户</el-button> -->
-        <span> 最近同步：{{ lastSyncTime }} </span>
+        <span class="sub-text-color"> 最近同步：{{ lastSyncTime }} </span>
       </div>
     </div>
 
-    <div>客户总数(去重)：{{ noRepeatCustomerTotal }}</div>
+    <div class="sub-text-color">客户总数(去重)：{{ noRepeatCustomerTotal }}</div>
 
     <el-table
       ref="table"
@@ -451,7 +452,11 @@ export default {
       <el-table-column label="客户" prop="customerName" align="center">
         <template slot-scope="{ row }">
           <div class="cp flex aic" @click="goRoute(row)">
-            <el-image style="width: 50px; height: 50px;" :src="row.avatar" fit="fit"></el-image>
+            <el-image
+              style="width: 50px; height: 50px; flex:none;"
+              :src="row.avatar"
+              fit="fit"
+            ></el-image>
             <div class="ml10">
               {{ row.customerName }}
               <span :style="{ color: row.customerType === 1 ? '#4bde03' : '#f9a90b' }">{{
@@ -462,19 +467,19 @@ export default {
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="tagNames" label="客户标签" align="center">
+      <el-table-column prop="tagNames" label="客户标签" align="center" width="220">
         <div v-if="row.tagNames" slot-scope="{ row }">
           <el-popover placement="bottom" trigger="hover" :disabled="row.tagNames.length < 3">
             <div>
-              <el-tag type="info" v-for="(unit, unique) in row.tagNames" :key="unique">
+              <el-tag v-for="(unit, unique) in row.tagNames" :key="unique">
                 {{ unit }}
               </el-tag>
             </div>
             <div slot="reference">
-              <el-tag type="info" v-for="(unit, unique) in row.tagNames.slice(0, 2)" :key="unique">
+              <el-tag v-for="(unit, unique) in row.tagNames.slice(0, 2)" :key="unique">
                 {{ unit }}
               </el-tag>
-              <el-tag type="info" key="a" v-if="row.tagNames.length > 2">...</el-tag>
+              <el-tag key="a" v-if="row.tagNames.length > 2">...</el-tag>
             </div>
           </el-popover>
         </div>
@@ -502,7 +507,7 @@ export default {
         }}</template> -->
       </el-table-column>
 
-      <el-table-column label="操作" width="160" align="center">
+      <el-table-column label="操作" width="200" align="center">
         <template slot-scope="{ row }">
           <el-button
             v-hasPermi="['customerManage:customer:view']"

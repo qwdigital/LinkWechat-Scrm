@@ -222,9 +222,10 @@ export default {
     <!-- 选择标签弹窗 -->
     <SelectTag
       ref="selectTag"
+      type="2"
       :visible.sync="dialogVisible"
       :title="tagDialogType.title"
-      :selected="selectedTag"
+      :defaultValues="selectedTag"
       @success="submitSelectTag"
     >
     </SelectTag>

@@ -83,16 +83,16 @@ export default {
       <div class="ml10">
         <div>
           {{ customer.customerName + (customer.corpName ? '-' + customer.corpName : '') }}
-          <span :style="{ color: customer.customerType === 1 ? '#4bde03' : '#f9a90b' }">{{
-            { 1: '@微信', 2: '@企业微信' }[customer.customerType]
-          }}</span>
+          <span :style="{ color: customer.customerType === 1 ? '#4bde03' : '#f9a90b' }">
+            {{ { 1: '@微信', 2: '@企业微信' }[customer.customerType] }}
+          </span>
           <i :class="['el-icon-s-custom', { 1: 'man', 2: 'woman' }[customer.gender]]"></i>
         </div>
         <div class="mt10">
           <template v-if="customer.tagNames">
-            <el-tag v-for="(unit, unique) in customer.tagNames.split(',')" :key="unique">{{
-              unit
-            }}</el-tag>
+            <el-tag v-for="(unit, unique) in customer.tagNames.split(',')" :key="unique">
+              {{ unit }}
+            </el-tag>
           </template>
           <div v-else>
             暂无标签

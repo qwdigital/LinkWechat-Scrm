@@ -42,7 +42,13 @@ export default {
       // 总条数
       total: 0,
       // 表格数据
-      list: []
+      list: [],
+      lastSyncTime: 0
+    }
+  },
+  computed: {
+    isSync() {
+      return (+new Date() - +new Date(this.lastSyncTime)) / 3600000 < 2
     }
   },
   created() {
@@ -55,9 +61,10 @@ export default {
       this.loading = true
       api
         .getList(this.query)
-        .then(({ rows, total }) => {
+        .then(({ rows, total, lastSyncTime }) => {
           this.list = rows
           this.total = +total
+          this.lastSyncTime = lastSyncTime
           this.loading = false
         })
         .catch(() => {
@@ -71,17 +78,26 @@ export default {
       this.dialogVisible = true
     },
     syncTag() {
+      if (this.isSync) {
+        this.msgError('由于企业微信开放平台的限制，两小时内不得重复同步操作')
+        return
+      }
       const loading = this.$loading({
         lock: true,
         text: 'Loading',
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
       })
-      api.syncTag().then(() => {
-        loading.close()
-        this.msgSuccess('操作成功')
-        this.getList()
-      })
+      api
+        .syncTag()
+        .then(() => {
+          loading.close()
+          this.msgSuccess('后台开始同步数据，请稍后关注进度')
+          this.getList()
+        })
+        .catch(() => {
+          loading.close()
+        })
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
@@ -112,14 +128,17 @@ export default {
         <el-button v-hasPermi="['customerManage:tag:add']" type="primary" @click="edit()"
           >新建标签组</el-button
         >
-        <el-button
-          v-if="type == 1"
-          v-hasPermi="['customerManage:tag:sync']"
-          type="primary"
-          plain
-          @click="syncTag"
-          >同步企微标签</el-button
+        <el-tooltip
+          effect="light"
+          :disabled="!isSync"
+          class="item"
+          content="由于企业微信开放平台的限制，两小时内不得重复同步操作"
+          placement="top-start"
         >
+          <el-button v-if="type == 1" v-preventReClick type="primary" plain @click="syncTag">
+            同步企微标签
+          </el-button>
+        </el-tooltip>
       </div>
       <div>
         <el-button
@@ -136,19 +155,22 @@ export default {
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="标签组" align="center" prop="gourpName" />
       <el-table-column label="标签" align="center" prop="weTags">
-        <template slot-scope="scope">
-          <template v-for="(item, index) in scope.row.weTags">
-            <el-tag v-if="index < 3" type="primary" :key="index">{{ item.name }}</el-tag>
-          </template>
-          <el-popover trigger="hover" width="200">
-            <template v-for="(unit, index) in scope.row.weTags">
-              <el-tag :key="index" v-if="index >= 3" size="mini">{{ unit.name }}</el-tag>
-            </template>
-            <div style="display:inline;" slot="reference">
-              <el-tag v-if="scope.row.weTags.length > 3" size="mini">...</el-tag>
+        <div v-if="row.weTags" slot-scope="{ row }">
+          <el-popover placement="bottom" trigger="hover" :disabled="row.weTags.length < 3">
+            <div>
+              <el-tag v-for="(unit, unique) in row.weTags" :key="unique">
+                {{ unit.name }}
+              </el-tag>
+            </div>
+            <div slot="reference">
+              <el-tag v-for="(unit, unique) in row.weTags.slice(0, 2)" :key="unique">
+                {{ unit.name }}
+              </el-tag>
+              <el-tag key="a" v-if="row.weTags.length > 2">...</el-tag>
             </div>
           </el-popover>
-        </template>
+        </div>
+        <span v-else>无标签</span>
       </el-table-column>
       <!-- <el-table-column label="创建人" align="center" prop="createBy" /> -->
       <!-- <el-table-column label="创建时间" align="center" prop="operTime" width="180">

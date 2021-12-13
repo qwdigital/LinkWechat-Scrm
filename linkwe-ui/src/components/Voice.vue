@@ -40,9 +40,10 @@ export default {
             this.$playRec.onEnded(() => {
               this.actived = false
             })
+            console.log('amr 时长：' + this.$playRec.getDuration())
           })
-          .catch(e => {
-            this.$message.error('播放录音失败')
+          .catch((e) => {
+            this.$message.error('播放录音失败，或文件损坏')
           })
       }
       // this.audioSrc = [JSON.parse(this.message.contact)[type]]

@@ -193,7 +193,7 @@ export default {
 
     <div class="mid-action">
       <div>
-        <el-button type="primary" @click="goRoute()">新建自动拉群</el-button>
+        <el-button type="primary" @click="goRoute()">新建活码</el-button>
       </div>
       <div>
         <el-button type="primary" :disabled="!ids.length" @click="downloadBatch()"
@@ -224,28 +224,20 @@ export default {
           </el-image>
         </template> -->
       </el-table-column>
-      <el-table-column
-        prop="emplList"
-        label="使用员工"
-        align="center"
-        :show-overflow-tooltip="true"
-      >
-        <div v-if="row.emplList" slot-scope="{ row }">
-          <el-popover placement="bottom" trigger="hover" :disabled="row.emplList.length < 3">
-            <div>
-              <el-tag v-for="(unit, unique) in row.emplList" :key="unique">
-                {{ unit.businessName }}
-              </el-tag>
-            </div>
-            <div slot="reference">
-              <el-tag v-for="(unit, unique) in row.emplList.slice(0, 2)" :key="unique">
-                {{ unit.businessName }}
-              </el-tag>
-              <el-tag key="a" v-if="row.emplList.length > 2">...</el-tag>
+      <el-table-column prop="emplList" label="使用员工" align="center">
+        <template #default="{ row }">
+          <el-popover
+            v-if="row.emplList"
+            placement="bottom"
+            trigger="hover"
+            :content="row.emplList.map((d) => d.businessName).join()"
+          >
+            <div slot="reference" class="table-desc toe">
+              <!-- {{ getDisplayRealGroups(row) }} -->
+              {{ row.emplList.map((d) => d.businessName).join() }}
             </div>
           </el-popover>
-        </div>
-        <span v-else>无</span>
+        </template>
       </el-table-column>
       <el-table-column label="客户标签" align="center">
         <div v-if="row.tagList" slot-scope="{ row }">

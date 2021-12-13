@@ -26,8 +26,8 @@ export default {
       ids: [],
       // 非多个禁用
       multiple: true,
-      // 总条数
       lastSyncTime: '',
+      // 总条数
       total: 0,
       // 表格数据
       list: [],
@@ -39,6 +39,11 @@ export default {
         type: '' // 弹窗类型
       },
       makeLabelCustomerList: []
+    }
+  },
+  computed: {
+    isSync() {
+      return (+new Date() - +new Date(this.lastSyncTime)) / 3600000 < 2
     }
   },
   created() {
@@ -138,6 +143,10 @@ export default {
       this.getList(1)
     },
     sync() {
+      if (this.isSync) {
+        this.msgError('由于企业微信开放平台的限制，两小时内不得重复同步操作')
+        return
+      }
       const loading = this.$loading({
         lock: true,
         text: 'Loading',
@@ -187,9 +196,7 @@ export default {
         <div class="tag-input" @click="showTagDialog">
           <span class="tag-place" v-if="!queryTag.length">请选择</span>
           <template v-else>
-            <el-tag type="info" v-for="(unit, unique) in queryTag" :key="unique">{{
-              unit.name
-            }}</el-tag>
+            <el-tag v-for="(unit, unique) in queryTag" :key="unique">{{ unit.name }}</el-tag>
           </template>
         </div>
       </el-form-item>
@@ -224,7 +231,7 @@ export default {
         <el-button v-hasPermi="['customerManage:group:sync']" type="primary" @click="sync"
           >同步客户群</el-button
         >
-        <span>
+        <span class="sub-text-color">
           最近同步：{{ lastSyncTime }}
           <!-- <span class="num">{{total}}</span> 条信息 ，
           共
@@ -244,22 +251,22 @@ export default {
       <el-table-column label="群主" align="center" prop="groupLeaderName" />
       <el-table-column label="群人数" align="center" prop="memberNum" />
       <el-table-column prop="tagNames" label="群标签" align="center">
-        <template slot-scope="{ row }">
-          <template v-if="row.tags">
-            <template v-for="(item, index) in row.tags">
-              <el-tag size="mini" v-if="index < 2" :key="index">{{ item }}</el-tag>
-            </template>
-            <el-popover trigger="hover" width="200" v-if="row.tags.length > 2">
-              <template v-for="(unit, index) in row.tags">
-                <el-tag class="mb5" :key="index" v-if="index > 1" size="mini">{{ unit }}</el-tag>
-              </template>
-              <div style="display:inline;" slot="reference">
-                <el-tag size="mini">...</el-tag>
-              </div>
-            </el-popover>
-          </template>
-          <span v-else>无标签</span>
-        </template>
+        <div v-if="row.tagNames" slot-scope="{ row }">
+          <el-popover placement="bottom" trigger="hover">
+            <div>
+              <el-tag v-for="(unit, unique) in row.tags" :key="unique">
+                {{ unit }}
+              </el-tag>
+            </div>
+            <div slot="reference">
+              <el-tag v-for="(unit, unique) in row.tags.slice(0, 2)" :key="unique">
+                {{ unit }}
+              </el-tag>
+              <el-tag key="a" v-if="row.tags.length > 2">...</el-tag>
+            </div>
+          </el-popover>
+        </div>
+        <span v-else>无标签</span>
       </el-table-column>
       <el-table-column
         label="创建时间"

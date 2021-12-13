@@ -291,15 +291,15 @@ export default {
         <div v-if="row.tagList" slot-scope="{ row }">
           <el-popover placement="bottom" trigger="hover" :disabled="row.tagList.length < 3">
             <div>
-              <el-tag type="info" v-for="(unit, unique) in row.tagList" :key="unique">
+              <el-tag v-for="(unit, unique) in row.tagList" :key="unique">
                 {{ unit.name }}
               </el-tag>
             </div>
             <div slot="reference">
-              <el-tag type="info" v-for="(unit, unique) in row.tagList.slice(0, 2)" :key="unique">
+              <el-tag v-for="(unit, unique) in row.tagList.slice(0, 2)" :key="unique">
                 {{ unit.name }}
               </el-tag>
-              <el-tag type="info" key="a" v-if="row.tagList.length > 2">...</el-tag>
+              <el-tag key="a" v-if="row.tagList.length > 2">...</el-tag>
             </div>
           </el-popover>
         </div>

@@ -25,10 +25,15 @@ export default {
       },
       recod: [],
       active: '0',
-      openTrack: ['0']
+      openTrack: ['0'],
+      lastSyncTime: 0
     }
   },
-  computed: {},
+  computed: {
+    isSync() {
+      return (+new Date() - +new Date(this.lastSyncTime)) / 3600000 < 2
+    }
+  },
   watch: {},
   created() {
     this.userId ? this.getCustomerInfoByUserId() : this.getSummary()
@@ -77,8 +82,13 @@ export default {
       this.active = type
     },
     sync() {
-      this.openTrack = [null]
+      if (this.isSync) {
+        this.msgError('由于企业微信开放平台的限制，两小时内不得重复同步操作')
+        return
+      }
+      this.openTrack = ['0']
       this.active = '0'
+      this.$refs['record'][0].$forceUpdate()
     }
   }
 }
@@ -96,7 +106,8 @@ export default {
               :key="index"
               :class="['flex', index && 'mt20']"
             >
-              <div style="width:60px;flex: none;">{{ item.userName }}：</div>
+              <div class="name oe">{{ item.userName }}</div>
+              ：
               <template v-if="item.tagNames">
                 <el-tag
                   type="info"
@@ -105,7 +116,7 @@ export default {
                   >{{ unit }}</el-tag
                 >
               </template>
-              <div v-else>
+              <div v-else class="sub-text-color">
                 暂无标签
               </div>
             </div>
@@ -118,7 +129,8 @@ export default {
               :key="index"
               :class="['flex', index && 'mt20']"
             >
-              <div style="width:60px;flex: none;">{{ item.userName }}：</div>
+              <div class="name oe">{{ item.userName }}</div>
+              ：
               <template v-if="item.tagNames">
                 <el-tag
                   type="info"
@@ -127,7 +139,7 @@ export default {
                   >{{ unit }}</el-tag
                 >
               </template>
-              <div v-else>
+              <div v-else class="sub-text-color">
                 暂无标签
               </div>
             </div>
@@ -135,26 +147,30 @@ export default {
 
           <el-card class="mb10" shadow="never">
             <div slot="header" class="card-title">跟进状态</div>
-            <div class="fxbw mb20" v-for="(item, index) of portrayalSum.trackStates" :key="index">
-              <div style="width:60px;flex: none;">{{ item.userName }}：</div>
-              <el-steps
-                style="flex:auto;"
-                :active="item.trackStateList.length"
-                finish-status="success"
-              >
-                <el-step
-                  v-for="(unit, unique) of item.trackStateList"
-                  :key="unique"
-                  :title="dictTrackState[~~unit.trackState + ''].name"
-                  :description="unit.trackTime"
-                ></el-step>
-              </el-steps>
-            </div>
+            <template v-if="portrayalSum.trackStates && portrayalSum.trackStates.length">
+              <div class="fxbw mb20" v-for="(item, index) of portrayalSum.trackStates" :key="index">
+                <div class="name oe">{{ item.userName }}</div>
+                ：
+                <el-steps
+                  style="flex:auto;"
+                  :active="item.trackStateList.length"
+                  finish-status="success"
+                >
+                  <el-step
+                    v-for="(unit, unique) of item.trackStateList"
+                    :key="unique"
+                    :title="dictTrackState[~~unit.trackState + ''].name"
+                    :description="unit.trackTime"
+                  ></el-step>
+                </el-steps>
+              </div>
+            </template>
+            <div v-else class="ac sub-text-color">暂无数据</div>
           </el-card>
 
           <el-card shadow="never">
             <div slot="header" class="card-title">跟进记录</div>
-            <el-tabs value="0">
+            <el-tabs v-if="portrayalSum.trackStates && portrayalSum.trackStates.length" value="0">
               <el-tab-pane
                 v-for="(item, index) in portrayalSum.trackStates"
                 :key="index"
@@ -163,15 +179,32 @@ export default {
                 <record :userId="item.userId" viewType="1"></record>
               </el-tab-pane>
             </el-tabs>
+            <div v-else class="ac sub-text-color">暂无数据</div>
           </el-card>
         </div>
       </el-col>
+
       <el-col :span="10">
         <div class="right">
           <el-card>
             <div slot="header">
               <span class="card-title">客户轨迹</span>
-              <span style=" color: #13a2e8;" class="fr cp" @click="sync">同步</span>
+              <el-tooltip
+                effect="light"
+                :disabled="!isSync"
+                class="item"
+                content="由于企业微信开放平台的限制，两小时内不得重复同步操作"
+                placement="top-start"
+              >
+                <el-button
+                  v-preventReClick
+                  style="color: #13a2e8;padding: 0;"
+                  class="fr cp"
+                  type="text"
+                  @click="sync"
+                  >同步</el-button
+                >
+              </el-tooltip>
             </div>
             <div class="flex track-tab-wrap mb15">
               <div
@@ -185,6 +218,7 @@ export default {
             </div>
             <template v-for="(item, index) in openTrack">
               <record
+                ref="record"
                 v-show="item === active"
                 :key="index"
                 :userId="userId"
@@ -199,6 +233,11 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+.name {
+  width: 65px;
+  flex: none;
+  text-align: right;
+}
 .el-card {
   .el-row {
     color: #666;

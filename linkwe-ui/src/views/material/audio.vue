@@ -1,9 +1,10 @@
 <script>
 import MaPage from '@/views/material/components/MaPage'
+import Voice from '@/components/Voice'
 
 export default {
   name: 'Audio',
-  components: { MaPage },
+  components: { MaPage, Voice },
   data() {
     return {
       ids: [] // 选中数组
@@ -24,7 +25,11 @@ export default {
   <MaPage ref="page" type="1" :selected="ids" v-slot="{ list }">
     <el-table :data="list" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" align="center" />
-      <el-table-column label="语音" align="center" prop="materialName" />
+      <el-table-column label="语音" align="center" prop="materialUrl">
+        <template slot-scope="{ row }">
+          <Voice :amrUrl="row.materialUrl"></Voice>
+        </template>
+      </el-table-column>
       <el-table-column label="时长" align="center" prop="audioTime" />
       <el-table-column label="最近更新时间" align="center" prop="updateTime" width="160">
       </el-table-column>

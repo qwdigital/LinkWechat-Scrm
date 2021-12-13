@@ -18,6 +18,7 @@ import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 
 import { quillEditor } from 'vue-quill-editor'
+import Voice from '@/components/Voice'
 
 // import {
 //   getList
@@ -39,7 +40,7 @@ var validateHttp = (rule, value, callback) => {
 }
 export default {
   name: 'MaPage',
-  components: { quillEditor },
+  components: { quillEditor, Voice },
   props: {
     // 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file)， 4 文本， 5 海报， 6 海报字体"， 7 图文， 8 链接，9 小程序
     type: {
@@ -149,7 +150,7 @@ export default {
       this.loading = true
       getList(this.query)
         .then(({ rows, total }) => {
-          this.list = rows
+          this.list = rows.sort((a, b) => +new Date(b.updateTime) - +new Date(a.updateTime))
           this.total = +total
           this.loading = false
           this.$emit('listChange', this.list)
@@ -535,6 +536,7 @@ export default {
 
         <template v-else-if="type === '1'">
           <el-form-item label="语音" prop="materialUrl">
+            <Voice v-if="form.materialUrl" :amrUrl="form.materialUrl"></Voice>
             <upload
               :fileUrl.sync="form.materialUrl"
               :fileName.sync="form.materialName"

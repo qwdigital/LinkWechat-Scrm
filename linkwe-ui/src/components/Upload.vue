@@ -1,6 +1,7 @@
 <script>
 import { upload } from '@/api/material'
 import Video from 'video.js'
+import BenzAMRRecorder from 'benz-amr-recorder'
 export default {
   name: 'Upload',
   components: {},
@@ -50,7 +51,7 @@ export default {
   created() {},
   mounted() {},
   methods: {
-    handleBeforeUpload(file) {
+    async handleBeforeUpload(file) {
       this.loading = true
       let isFormat = true,
         isSize = true
@@ -75,6 +76,17 @@ export default {
         }
         if (!isSize) {
           this.$message.error('上传文件大小不能超过 2MB!')
+        }
+        let amr = new BenzAMRRecorder()
+        try {
+          await amr.initWithBlob(file)
+          isSize = amr.getDuration() <= 60
+          if (!isSize) {
+            this.$message.error('上传文件时长不能超过 60秒!')
+          }
+        } catch (error) {
+          console.log(error)
+          this.$message.error('文件损坏')
         }
       } else if (this.type === '2') {
         // 视频
