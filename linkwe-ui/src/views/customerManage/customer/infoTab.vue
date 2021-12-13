@@ -1,7 +1,6 @@
 <script>
 import { getSummary, getFollowUpRecord, getCustomerInfoByUserId } from '@/api/customer'
 import record from './record'
-import ctrack from './track'
 export default {
   name: '',
   props: {
@@ -12,8 +11,7 @@ export default {
     }
   },
   components: {
-    record,
-    ctrack
+    record
   },
   data() {
     return {
@@ -27,7 +25,7 @@ export default {
       },
       recod: [],
       active: '0',
-      openTrack: [null]
+      openTrack: ['0']
     }
   },
   computed: {},
@@ -175,7 +173,7 @@ export default {
               <span class="card-title">客户轨迹</span>
               <span style=" color: #13a2e8;" class="fr cp" @click="sync">同步</span>
             </div>
-            <div class="flex track-tab-wrap">
+            <div class="flex track-tab-wrap mb15">
               <div
                 v-for="(value, type) of trajectoryType"
                 :key="type"
@@ -185,12 +183,14 @@ export default {
                 {{ value }}
               </div>
             </div>
-            <record
-              v-for="(item, index) in openTrack"
-              :key="index"
-              :userId="userId"
-              :trajectoryType="item"
-            ></record>
+            <template v-for="(item, index) in openTrack">
+              <record
+                v-show="item === active"
+                :key="index"
+                :userId="userId"
+                :trajectoryType="item == 0 ? null : item"
+              ></record>
+            </template>
           </el-card>
         </div>
       </el-col>

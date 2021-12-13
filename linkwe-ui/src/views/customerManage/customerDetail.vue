@@ -89,12 +89,12 @@ export default {
           <i :class="['el-icon-s-custom', { 1: 'man', 2: 'woman' }[customer.gender]]"></i>
         </div>
         <div class="mt10">
-          <template v-if="customer.companyTags">
-            <el-tag type="info" v-for="(unit, unique) in customer.companyTags" :key="unique">{{
+          <template v-if="customer.tagNames">
+            <el-tag v-for="(unit, unique) in customer.tagNames.split(',')" :key="unique">{{
               unit
             }}</el-tag>
           </template>
-          <div>
+          <div v-else>
             暂无标签
           </div>
         </div>

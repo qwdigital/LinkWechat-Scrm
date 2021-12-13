@@ -74,7 +74,7 @@ export default {
 </script>
 
 <template>
-  <div>
+  <div v-loading="loading">
     <template v-if="viewType">
       <el-table :data="list" v-loading="loading">
         <el-table-column label="员工" align="center" prop="userName" />
@@ -105,20 +105,21 @@ export default {
     </template>
 
     <ul v-else class="infinite-list" v-infinite-scroll="getList" style="overflow:auto">
-      <li v-for="i in list" class="infinite-list-item" :key="i">
+      <!-- <li v-for="i in list" class="infinite-list-item" :key="i">
         <div>2021-02-16 星期二</div>
-        <el-timeline>
-          <el-timeline-item
-            v-for="(item, index) in 6"
-            :key="index"
-            :timestamp="item.trackTime"
-            placement="top"
-          >
-            <p>{{ item.title }}</p>
-            <p>{{ item.trackContent }}</p>
-          </el-timeline-item>
-        </el-timeline>
-      </li>
+      </li> -->
+      <el-timeline v-if="list.length">
+        <el-timeline-item
+          v-for="(item, index) in list"
+          :key="index"
+          :timestamp="item.trackTime"
+          placement="top"
+        >
+          <p>{{ item.title }}</p>
+          <p>{{ item.trackContent }}</p>
+        </el-timeline-item>
+      </el-timeline>
+      <el-empty v-else :image-size="150"></el-empty>
     </ul>
   </div>
 </template>
