@@ -243,7 +243,7 @@
           this.form = res.data
           if (this.form.qrAttachments && this.form.qrAttachments.length) {
             this.form.welcomeMsg = this.form.qrAttachments[0].content
-            this.form.materialMsgList = this.form.qrAttachments.slice(1)
+            this.form.materialMsgList = this.setEditList(this.form.qrAttachments.slice(1))
           }
           this.form.qrUserInfos.forEach(dd => {
             if (dd.workCycle) {
@@ -255,6 +255,37 @@
           this.loading = false
           this.setTime(7)
         })
+      },
+      setEditList (list) {
+        let arr = []
+        if (list && list.length) {
+          list.forEach(dd => {
+            if (dd.msgType === 'image') {
+              let obj = {
+                msgType: '0',
+                materialUrl: dd.picUrl
+              }
+              arr.push(obj)
+            } else if (dd.msgType === 'link') {
+              let ob = {
+                msgType: '7',
+                materialName: dd.title,
+                content: dd.linkUrl
+              }
+              arr.push(ob)
+            } else if (dd.msgType === 'miniprogram') {
+              let ff = {
+                msgType: '8',
+                materialUrl: dd.appId,
+                materialName: dd.title,
+                coverUrl: dd.picUrl,
+                content: dd.linkUrl
+              }
+              arr.push(ff)
+            }
+          })
+        }
+        return arr
       },
       getList () {
         this.query.beginTime = this.dateRange[0]

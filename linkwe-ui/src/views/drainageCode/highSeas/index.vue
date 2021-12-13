@@ -222,7 +222,7 @@
 				upload(this.toFormData(obj))
 					.then((res) => {
 						if (res.code === 200) {
-							this.msgSuccess('导入成功！')
+							this.msgSuccess(res.msg)
 							this.form = {
 								file: {},
 								customerSeasTags: [],

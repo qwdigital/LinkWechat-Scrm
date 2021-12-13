@@ -86,6 +86,32 @@
     created () { },
     mounted () { },
     methods: {
+      treeFormat (list) {
+        let dealOptions = []
+        list.forEach(one => {
+          let findIndex = list.findIndex(item => {
+            return item.id === one.parentId
+          })
+          if ((!one.parentId && one.parentId !== 0 && one.parentId !== false) || findIndex === -1) {
+            dealOptions.push(one)
+          } else {
+            if (!list[findIndex].children) {
+              list[findIndex].children = []
+              list[findIndex].children.push(one)
+            } else {
+              list[findIndex].children.push(one)
+            }
+          }
+        })
+        return dealOptions
+      },
+      setData () {
+        if (this.$refs.tree) this.$refs.tree.setCheckedKeys([])
+        this.userList.forEach(dd => {
+          this.$refs.tree.setCheckedKeys([dd.userId])
+        })
+        this.$forceUpdate()
+      },
       loadNode (node, resolve) {
         if (node.level === 0) {
           if (!Array.isArray(this.defaultValues) ||
@@ -98,7 +124,7 @@
             //   element.key = createUniqueString()
             // })
             let _data = this.handleTree(data)
-            resolve(_data)
+            resolve(this.treeFormat(_data))
             // api.getList({ department: _data[0].id }).then(({ rows, total }) => {
             //   _data && rows.unshift(..._data);
             //   resolve(rows);
@@ -112,6 +138,8 @@
               // })
               node.data.children && rows.push(...node.data.children)
               resolve(rows)
+              console.log(222)
+              this.setData()
             }
           )
         }
@@ -129,10 +157,10 @@
       handleCheckChange (data, checked, indeterminate) {
         // console.log(arguments)
         if (checked) {
-          if (this.isSigleSelect) {
-            // 单选情况
-            this.$refs.tree.setCheckedKeys([data.userId])
-          }
+          // if (this.isSigleSelect) {
+          //   // 单选情况
+          //   this.$refs.tree.setCheckedKeys([data.userId])
+          // }
           if (this.isOnlyLeaf) {
             if (data.userId && !data.isParty) {
               this.userList.push(data)
@@ -146,6 +174,7 @@
           let index = this.userList.findIndex(i => i.userId === data.userId)
           index > -1 && this.userList.splice(index, 1)
         }
+        this.setData()
         // console.log(data, checked, indeterminate);
       },
       // 确 定
@@ -160,6 +189,7 @@
         index > -1 && this.userList.splice(index, 1)
         let order = this.defaultValues.findIndex(i => i.userId === key)
         order > -1 && this.defaultValues.splice(order, 1)
+        this.setData()
       },
     },
   }

@@ -79,6 +79,8 @@
           pageSize: 10,
           welcomeMsg: undefined,
           welcomeMsgTplType: 1,
+          orderByColumn: 'create_time',
+          isAsc: 'desc'
         },
         loading: false,
         total: 0,

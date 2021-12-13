@@ -133,7 +133,6 @@
         <el-table-column prop="materialUrl" label="小程序AppID"></el-table-column>
       </template>
 
-      <el-table-column prop="num" label="发送次数"></el-table-column>
       <el-table-column prop="updateTime" label="最近更新时间"></el-table-column>
     </el-table>
 
