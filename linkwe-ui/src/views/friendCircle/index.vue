@@ -18,7 +18,7 @@
     </div>
     <div>
       <div style="margin:10px 0;display:flex;">
-        <el-button type="primary" size="mini" @click="syncFn">同步朋友圈</el-button>
+        <el-button type="primary" :disabled="disable" size="mini" @click="syncFn">同步朋友圈</el-button>
         <div class="time" v-if="lastSyncTime">最近同步：{{lastSyncTime}}</div>
         <div class="time" v-else>暂无记录，请手动点击同步</div>
       </div>
@@ -93,6 +93,7 @@
     },
     data () {
       return {
+        disable: false,
         value1: [],
         dialogVisible: false,
         userArray: [],
@@ -164,6 +165,7 @@
           .then(res => {
             this.tableData = res.rows
             this.lastSyncTime = res.lastSyncTime
+            this.setTimeDiff()
             this.total = Number(res.total)
             this.loading = false
           })
@@ -171,6 +173,20 @@
             this.loading = false
           })
       },
+      setTimeDiff () {
+        if (this.lastSyncTime) {
+          let date1 = moment(this.lastSyncTime)
+          let date2 = moment()
+          let date3 =  date2.diff(date1,'minute')
+          const h = Math.floor(date3/60)
+          console.log(h)
+          if (h >= 2) {
+            this.disable = false
+          } else {
+            this.disable = true
+          }
+        }
+      }
     },
     mounted () {
       this.query.beginTime = moment(this.value1[0]).format('YYYY-MM-DD')
