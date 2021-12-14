@@ -78,7 +78,7 @@
               <div v-if="codeForm.weEmpleCodeUseScops.length > 0">
                 <el-tag size="medium" v-for="(item, index) in codeForm.weEmpleCodeUseScops" :key="index">{{ item.businessName }}</el-tag>
               </div>
-              <el-button style="margin-left:10px;" type="primary" plain size="mini" @click="onSelectUser">{{ codeForm.weEmpleCodeUseScops.length ? '修改' : '选择' }}员工</el-button>
+              <el-button type="primary" plain size="mini" @click="onSelectUser">{{ codeForm.weEmpleCodeUseScops.length ? '修改' : '选择' }}员工</el-button>
               <div class="sub-des">单人活码只能选择一个员工，多人活码支持选择多个员工</div>
             </el-form-item>
             <el-form-item v-if="codeForm.qrRuleType == 2" label="活码排班" prop="empleCodeRosterDto">

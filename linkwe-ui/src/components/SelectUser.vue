@@ -105,13 +105,6 @@
         })
         return dealOptions
       },
-      setData () {
-        if (this.$refs.tree) this.$refs.tree.setCheckedKeys([])
-        this.userList.forEach(dd => {
-          this.$refs.tree.setCheckedKeys([dd.userId])
-        })
-        this.$forceUpdate()
-      },
       loadNode (node, resolve) {
         if (node.level === 0) {
           if (!Array.isArray(this.defaultValues) ||
@@ -138,8 +131,6 @@
               // })
               node.data.children && rows.push(...node.data.children)
               resolve(rows)
-              console.log(222)
-              this.setData()
             }
           )
         }
@@ -157,10 +148,10 @@
       handleCheckChange (data, checked, indeterminate) {
         // console.log(arguments)
         if (checked) {
-          // if (this.isSigleSelect) {
-          //   // 单选情况
-          //   this.$refs.tree.setCheckedKeys([data.userId])
-          // }
+          if (this.isSigleSelect) {
+            // 单选情况
+            this.$refs.tree.setCheckedKeys([data.userId])
+          }
           if (this.isOnlyLeaf) {
             if (data.userId && !data.isParty) {
               this.userList.push(data)
@@ -174,8 +165,19 @@
           let index = this.userList.findIndex(i => i.userId === data.userId)
           index > -1 && this.userList.splice(index, 1)
         }
-        this.setData()
         // console.log(data, checked, indeterminate);
+        this.userList = this.unique(this.userList)
+      },
+      unique(arr){            
+        for(var i=0; i<arr.length; i++){
+            for(var j=i+1; j<arr.length; j++){
+                if(arr[i].userId.split('_')[0] == arr[j].userId.split('_')[0]){
+                    arr.splice(j,1);
+                    j--;
+                }
+            }
+        }
+        return arr;
       },
       // 确 定
       submit () {
@@ -189,7 +191,6 @@
         index > -1 && this.userList.splice(index, 1)
         let order = this.defaultValues.findIndex(i => i.userId === key)
         order > -1 && this.defaultValues.splice(order, 1)
-        this.setData()
       },
     },
   }
