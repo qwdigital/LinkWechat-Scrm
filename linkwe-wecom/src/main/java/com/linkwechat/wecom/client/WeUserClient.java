@@ -2,6 +2,7 @@ package com.linkwechat.wecom.client;
 
 import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.*;
+import com.linkwechat.wecom.domain.dto.customer.JobExtendsCustomer;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 import com.linkwechat.wecom.interceptor.WeAppAccessTokenInterceptor;
 import com.linkwechat.wecom.interceptor.WeCommonAccessTokenInterceptor;
@@ -86,7 +87,16 @@ public interface WeUserClient {
      * @return
      */
     @Request(url = "/externalcontact/transfer_customer", type = "POST")
-    WeResultDto transferCustomer(@JSONBody AllocateWeCustomerDto allocateWeCustomerDto);
+    JobExtendsCustomer transferCustomer(@JSONBody AllocateWeCustomerDto allocateWeCustomerDto);
+
+
+    /**
+     * 查询客户接替状态
+     * @param jobExtendsParam
+     * @return
+     */
+    @Post(url = "externalcontact/transfer_result")
+    JobExtendsCustomer transferResult(@JSONBody JobExtendsCustomer.JobExtendsParam jobExtendsParam);
 
 
 

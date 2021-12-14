@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.domain.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.experimental.SuperBuilder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,5 +28,7 @@ public class AllocateWeCustomerDto{
 
     /**转移成功后发给客户的消息，最多200个字符，不填则使用默认文案，目前只对在职成员分配客户的情况生效*/
     private String transfer_success_msg;
+
+
 
 }

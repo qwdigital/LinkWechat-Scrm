@@ -59,6 +59,9 @@ public class WeCustomerDetail {
     private List<CompanyOrPersonTag> personTags;
 
 
+    private List<TrackStates> trackStates;
+
+
 
 
     @Data
@@ -99,6 +102,12 @@ public class WeCustomerDetail {
         //群主
         private String leaderName;
 
+        //入群方式入群方式。
+        //1 - 由群成员邀请入群（直接邀请入群）
+        //2 - 由群成员邀请入群（通过邀请链接入群）
+        //3 - 通过扫描群二维码入群
+        private Integer joinScene;
+
 
 
     }
@@ -120,6 +129,7 @@ public class WeCustomerDetail {
     }
 
     @Data
+    @Builder
     public  static class  TrackStates{
         //跟进人
         private String userName;

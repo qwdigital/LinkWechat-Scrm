@@ -20,6 +20,8 @@ import com.linkwechat.wecom.service.IWeMessagePushService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -63,6 +65,7 @@ public class WeCustomerSeasController extends BaseController {
     public AjaxResult  importData(MultipartFile file, WeCustomerSeas weCustomerSea) throws Exception {
         ExcelUtil<WeCustomerSeas> util = new ExcelUtil<WeCustomerSeas>(WeCustomerSeas.class);
         List<WeCustomerSeas> weCustomerSeas = util.importExcel(file.getInputStream());
+        String tip=new String("成功导入{0}条，去重复{1}条");
         if(CollectionUtil.isNotEmpty(weCustomerSeas)){
 
             if(StringUtils.isEmpty(weCustomerSea.getAddUserName())&&StringUtils.isEmpty(weCustomerSea.getAddUserId())){
@@ -124,17 +127,20 @@ public class WeCustomerSeasController extends BaseController {
 
               }
 
+              tip = MessageFormat.format(tip, new Object[]{new Integer(deduplicationSeasNoRepeat.size()).toString(),
+                      new Integer( weCustomerSeas.size()-deduplicationSeasNoRepeat.size()).toString()});
+
+          }else{
+              tip = MessageFormat.format(tip, new Object[] { "0",weCustomerSeas.size() });
           }
 
 
-
-
-
+           ;
         }else{
             return AjaxResult.error("导入用户数据不能为空！");
         }
 
-        return AjaxResult.success();
+        return AjaxResult.success(tip);
     }
 
 

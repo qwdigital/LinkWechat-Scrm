@@ -207,7 +207,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         ON DUPLICATE KEY UPDATE
         NAME=IF(we_customer.NAME != null,we_customer.NAME, VALUES(NAME)),
         avatar=IF(we_customer.avatar != null, VALUES(avatar), we_customer.avatar),
-        customer_type=IF(we_customer.customer_type != null, VALUES(customer_type), we_customer.customer_type),
+        customer_type=IF(we_customer.customer_type != null, we_customer.customer_type,VALUES(customer_type)),
         gender=IF(we_customer.gender != null, VALUES(gender), we_customer.gender),
         unionid=IF(we_customer.unionid != null, VALUES(unionid), we_customer.unionid),
         birthday=IF(we_customer.birthday != null,VALUES(birthday), we_customer.birthday),
@@ -220,7 +220,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         email=IF(we_customer.email != null, VALUES(email), we_customer.email),
         address=IF(we_customer.address != null, VALUES(address), we_customer.address),
         phone=IF(we_customer.phone != null, VALUES(phone), we_customer.phone),
-        add_method=IF(we_customer.add_method != null, VALUES(add_method), we_customer.add_method);
+        add_method=IF(we_customer.add_method != null, we_customer.add_method, VALUES(add_method));
     </insert>
 
 

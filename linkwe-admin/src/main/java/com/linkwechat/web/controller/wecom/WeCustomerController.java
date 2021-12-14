@@ -14,6 +14,7 @@ import com.linkwechat.wecom.constants.SynchRecordConstants;
 import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
+import com.linkwechat.wecom.domain.vo.WeOnTheJobCustomerVo;
 import com.linkwechat.wecom.service.IWeCustomerService;
 import com.linkwechat.wecom.service.IWeCustomerTrajectoryService;
 import com.linkwechat.wecom.service.IWeSynchRecordService;
@@ -124,17 +125,21 @@ public class WeCustomerController extends BaseController
 
     /**
      * 在职继承
-     * @param weLeaveUserInfoAllocateVo
+     * @param weOnTheJobCustomerVo
      * @return
      */
     @Log(title="在职继承",businessType = BusinessType.UPDATE)
     @PostMapping("/jobExtends")
-    public AjaxResult jobExtends(@RequestBody WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo){
+    public AjaxResult jobExtends(@RequestBody WeOnTheJobCustomerVo weOnTheJobCustomerVo){
 
-        weLeaveUserInfoAllocateVo.setExtentType(new Integer(1));
-        weCustomerService.allocateWeCustomer(
-                weLeaveUserInfoAllocateVo
-        );
+        try {
+            weCustomerService.allocateOnTheJobCustomer(
+                    weOnTheJobCustomerVo
+            );
+        }catch (Exception e){
+            return AjaxResult.error(e.getMessage());
+        }
+
 
         return AjaxResult.success();
     }
@@ -198,14 +203,17 @@ public class WeCustomerController extends BaseController
      * @return
      */
     @GetMapping("/followUpRecord")
-    public TableDataInfo followUpRecord(String externalUserid,String userId){
+    public TableDataInfo followUpRecord(String externalUserid,String userId,Integer trajectoryType){
 
          startPage();
 
          List<WeCustomerTrajectory> weCustomerTrajectories = iWeCustomerTrajectoryService
                  .list(new LambdaQueryWrapper<WeCustomerTrajectory>()
+                         .eq(trajectoryType !=null,WeCustomerTrajectory::getTrajectoryType,trajectoryType)
                 .eq(StringUtils.isNotEmpty(externalUserid),WeCustomerTrajectory::getExternalUserid, externalUserid)
-                .eq(StringUtils.isNotEmpty(userId),WeCustomerTrajectory::getUserId, userId));
+                .eq(StringUtils.isNotEmpty(userId),WeCustomerTrajectory::getUserId, userId)
+                                 .orderByDesc(WeCustomerTrajectory::getTrackTime)
+                 );
 
         return getDataTable(weCustomerTrajectories);
     }

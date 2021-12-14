@@ -3,6 +3,8 @@ package com.linkwechat.common.utils;
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -388,5 +390,15 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     }
 
 
+    /**
+     * 当前时间向推N天
+     * @param day 小时
+     * @return String
+     */
+    public static String getBeforeByDayTime(int day){
+        LocalDateTime now = LocalDateTime.now();
+        now = now.minus(-day, ChronoUnit.DAYS);
+        return now.toString();
+    }
 
 }

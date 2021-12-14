@@ -7,7 +7,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.enums.AllocateCustomerStatus;
 import com.linkwechat.common.enums.TrajectorySceneType;
+import com.linkwechat.common.enums.WeExceptionTip;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -20,11 +22,13 @@ import com.linkwechat.wecom.constants.SynchRecordConstants;
 import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.AllocateWeCustomerDto;
 import com.linkwechat.wecom.domain.dto.WeCustomerDto;
+import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
 import com.linkwechat.wecom.domain.dto.customer.*;
 import com.linkwechat.wecom.domain.dto.tag.WeCropGroupTagListDto;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
+import com.linkwechat.wecom.domain.vo.WeOnTheJobCustomerVo;
 import com.linkwechat.wecom.mapper.WeCustomerMapper;
 import com.linkwechat.wecom.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +51,6 @@ import java.util.stream.Stream;
 public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCustomer> implements IWeCustomerService {
 
 
-
     @Autowired
     private WeCustomerClient weCustomerClient;
 
@@ -65,7 +68,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
     @Autowired
-    private  IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
+    private IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
 
     @Autowired
     private IWeTagService iWeTagService;
@@ -73,11 +76,13 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Autowired
     private IWeGroupService iWeGroupService;
 
-
+    @Autowired
+    private IWeUserService iWeUserService;
 
 
     /**
      * 重构版客户列表
+     *
      * @param weCustomerList
      * @return
      */
@@ -88,8 +93,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     }
 
 
-
-
     /**
      * 客户同步接口
      *
@@ -98,7 +101,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Override
     @Transactional(rollbackFor = Exception.class)
     @SynchRecord(synchType = SynchRecordConstants.SYNCH_CUSTOMER)
-    public void  synchWeCustomer() {
+    public void synchWeCustomer() {
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
@@ -113,13 +116,13 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 if (WeConstans.WE_SUCCESS_CODE.equals(followUserList.getErrcode())
                         && ArrayUtil.isNotEmpty(followUserList.getFollow_user())) {
                     String[] follow_user = followUserList.getFollow_user();
-                    if(ArrayUtil.isNotEmpty(follow_user)){
+                    if (ArrayUtil.isNotEmpty(follow_user)) {
 
                         List<ExternalUserDetail> externalUserDetails = new ArrayList<>();
                         getByUser(follow_user, null, externalUserDetails);
 
-                        if(CollectionUtil.isNotEmpty(externalUserDetails)){
-                           weFlowerCustomerHandle(
+                        if (CollectionUtil.isNotEmpty(externalUserDetails)) {
+                            weFlowerCustomerHandle(
                                     externalUserDetails
                             );
                         }
@@ -132,15 +135,13 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     }
 
 
-
     /**
      * 客户同步业务处理
-     *
      */
     private void weFlowerCustomerHandle(List<ExternalUserDetail> list) {
 
 
-        List<WeCustomer> weCustomerList=new ArrayList<>();
+        List<WeCustomer> weCustomerList = new ArrayList<>();
 
         List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
 
@@ -159,7 +160,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 weCustomerList.add(weCustomer);
                 List<String> tags = Stream.of(followInfo.getTag_id()).collect(Collectors.toList());
                 if (CollectionUtil.isNotEmpty(tags)) {
-                    tags.stream().forEach(tag->{
+                    tags.stream().forEach(tag -> {
                         weFlowerCustomerTagRels.add(
                                 WeFlowerCustomerTagRel.builder()
                                         .userId(followInfo.getUserid())
@@ -173,16 +174,16 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         });
 
 
-        if(CollectionUtil.isNotEmpty(weFlowerCustomerTagRels)){
+        if (CollectionUtil.isNotEmpty(weFlowerCustomerTagRels)) {
             List<List<WeFlowerCustomerTagRel>> tagRels = Lists.partition(weFlowerCustomerTagRels, 500);
-            for(List<WeFlowerCustomerTagRel> tagRelss:tagRels){
+            for (List<WeFlowerCustomerTagRel> tagRelss : tagRels) {
                 iWeFlowerCustomerTagRelService.batchAddOrUpdate(tagRelss);
             }
         }
 
-        if(CollectionUtil.isNotEmpty(weCustomerList)){
+        if (CollectionUtil.isNotEmpty(weCustomerList)) {
             List<List<WeCustomer>> weCustomers = Lists.partition(weCustomerList, 500);
-            for(List<WeCustomer> weCustomer : weCustomers){
+            for (List<WeCustomer> weCustomer : weCustomers) {
                 this.baseMapper.batchAddOrUpdate(weCustomer);
             }
 
@@ -190,11 +191,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     }
 
 
-
     /**
      * 批量获取客户详情
      *
-     * @param userIds     企业成员的userid
+     * @param userIds    企业成员的userid
      * @param nextCursor 用于分页查询的游标
      * @param list       返回结果
      */
@@ -227,7 +227,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         //所需分配的客户
         List<WeCustomer> allocateWeCustomers = this.list(new LambdaQueryWrapper<WeCustomer>()
                 .eq(WeCustomer::getFirstUserId, weLeaveUserInfoAllocateVo.getHandoverUserid()));
-        if(CollectionUtil.isNotEmpty(allocateWeCustomers)){
+        if (CollectionUtil.isNotEmpty(allocateWeCustomers)) {
             //同步记录,放入员工同意或者24小时自动变更(回调)
 
             //删除原有的
@@ -241,10 +241,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 //            this.baseMapper.batchAddOrUpdate(
 //                    allocateWeCustomers
 //            );
-                //记录接受离职表
-                List<WeAllocateCustomer> weAllocateCustomers = new ArrayList<>();
-                allocateWeCustomers.stream().forEach(k->{
-                    weAllocateCustomers.add(
+            //记录接受离职表
+            List<WeAllocateCustomer> weAllocateCustomers = new ArrayList<>();
+            allocateWeCustomers.stream().forEach(k -> {
+                weAllocateCustomers.add(
                         WeAllocateCustomer.builder()
                                 .allocateTime(new Date())
                                 .externalUserid(k.getExternalUserid())
@@ -252,47 +252,153 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                 .takeoverUserid(weLeaveUserInfoAllocateVo.getTakeoverUserid())
                                 .extentType(weLeaveUserInfoAllocateVo.getExtentType())
                                 .build()
-                    );
-                });
+                );
+            });
 
-                if(CollectionUtil.isNotEmpty(weAllocateCustomers)
-                &&iWeAllocateCustomerService.saveBatch(weAllocateCustomers)){
+            if (CollectionUtil.isNotEmpty(weAllocateCustomers)
+                    && iWeAllocateCustomerService.saveBatch(weAllocateCustomers)) {
 
-                    if(weLeaveUserInfoAllocateVo.getExtentType().equals(new Integer(0))){//离职员工客户继承
-                        //同步企业微信
-                        weUserClient.allocateCustomer(AllocateWeCustomerDto.builder()
-                                .external_userid(
-                                        ArrayUtil.toArray(allocateWeCustomers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList()), String.class)
-                                )
-                                .handover_userid(weLeaveUserInfoAllocateVo.getHandoverUserid())
-                                .takeover_userid(weLeaveUserInfoAllocateVo.getTakeoverUserid())
-                                .build());
-
-                    }else{//在职员工客户继承
-                        weUserClient.transferCustomer(
-                                AllocateWeCustomerDto.builder()
-                                        .external_userid(
-                                                weLeaveUserInfoAllocateVo.getExternalUserid().split(",")
-                                        )
-                                        .handover_userid(weLeaveUserInfoAllocateVo.getHandoverUserid())
-                                        .takeover_userid(weLeaveUserInfoAllocateVo.getTakeoverUserid())
-                                        .build()
-                        );
-
-                    }
-
-
-
-
+                if (weLeaveUserInfoAllocateVo.getExtentType().equals(new Integer(0))) {//离职员工客户继承
+                    //同步企业微信
+                    weUserClient.allocateCustomer(AllocateWeCustomerDto.builder()
+                            .external_userid(
+                                    ArrayUtil.toArray(allocateWeCustomers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList()), String.class)
+                            )
+                            .handover_userid(weLeaveUserInfoAllocateVo.getHandoverUserid())
+                            .takeover_userid(weLeaveUserInfoAllocateVo.getTakeoverUserid())
+                            .build());
 
                 }
 
+
             }
+
+        }
 
 
     }
 
 
+    /**
+     * 在职员工客户分配
+     *
+     * @param weOnTheJobCustomerVo
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void allocateOnTheJobCustomer(WeOnTheJobCustomerVo weOnTheJobCustomerVo) {
+
+
+        if (this.getOne(
+                new LambdaQueryWrapper<WeCustomer>()
+                        .eq(WeCustomer::getExternalUserid, weOnTheJobCustomerVo.getExternalUserid())
+                        .eq(WeCustomer::getFirstUserId, weOnTheJobCustomerVo.getTakeoverUserId())
+                        .eq(WeCustomer::getDelFlag, new Integer(0))) != null) {
+
+            throw new WeComException("当前接手人已经拥有此客户,不可继承");
+        }
+
+        List<WeAllocateCustomer> weAllocateCustomers = iWeAllocateCustomerService.list(new LambdaQueryWrapper<WeAllocateCustomer>()
+                .eq(WeAllocateCustomer::getExternalUserid, weOnTheJobCustomerVo.getExternalUserid())
+                .between(WeAllocateCustomer::getAllocateTime,DateUtils.getBeforeByDayTime(-90)
+                        ,DateUtils.getBeforeByDayTime(0))
+        );
+
+        if (CollectionUtil.isNotEmpty(weAllocateCustomers)
+                && weAllocateCustomers.size() >= 2) {
+            throw new WeComException("当前客户在90个自然日内已被转接2次,暂时无法操作");
+        }
+
+
+        //修改库中关系
+        WeCustomer weCustomer = this.getOne(
+                new LambdaQueryWrapper<WeCustomer>()
+                        .eq(WeCustomer::getExternalUserid, weOnTheJobCustomerVo.getExternalUserid())
+                        .eq(WeCustomer::getFirstUserId, weOnTheJobCustomerVo.getHandoverUserId())
+                        .eq(WeCustomer::getDelFlag, new Integer(0))
+        );
+
+        if (null != weCustomer) {
+
+            if (StringUtils.isEmpty(weCustomer.getTakeoverUserId())) { //首次被继承
+
+                this.extentCustomer(weCustomer, weOnTheJobCustomerVo);
+
+            } else { //非首次继承(二个情况)
+
+                //校验上一个人的移交状态
+                List<JobExtendsCustomer.ExtendsCustomer> extendsCustomers = weUserClient.transferResult(JobExtendsCustomer.JobExtendsParam.builder()
+                        .handover_userid(weCustomer.getFirstUserId())
+                        .takeover_userid(weCustomer.getTakeoverUserId())
+                        .build()).getCustomer();
+
+                if (CollectionUtil.isNotEmpty(extendsCustomers)) {
+                    JobExtendsCustomer.ExtendsCustomer extendsCustomer
+                            = extendsCustomers.stream().collect(Collectors.toMap(JobExtendsCustomer.ExtendsCustomer::getExternal_userid
+                            , ExtendsCustomer -> ExtendsCustomer)).get(weOnTheJobCustomerVo.getExternalUserid());
+                    if (null != extendsCustomer) {
+
+                        if (extendsCustomer.getStatus().equals(AllocateCustomerStatus.JOB_EXTENDS_DDJT.getCode())) {
+                            WeUser weUser
+                                    = iWeUserService.getById(weCustomer.getTakeoverUserId());
+                            if (weUser != null) {
+                                throw new WeComException(
+                                        "当前客户:" + weCustomer.getCustomerName() + ",已被:" + weUser.getName() + "接替,暂时不可被继承"
+                                );
+                            }
+                        } else { //可继续被新用户接替
+
+                             this.extentCustomer(weCustomer, weOnTheJobCustomerVo);
+
+                        }
+
+
+                    }
+
+                }
+            }
+
+
+        }
+    }
+
+
+
+    //接替客户
+    private void extentCustomer(WeCustomer weCustomer,WeOnTheJobCustomerVo weOnTheJobCustomerVo){
+        weCustomer.setTakeoverUserId(weOnTheJobCustomerVo.getTakeoverUserId());
+
+        if(this.update(
+                weCustomer,new LambdaQueryWrapper<WeCustomer>()
+                        .eq(WeCustomer::getExternalUserid,weCustomer.getExternalUserid())
+                        .eq(WeCustomer::getFirstUserId,weCustomer.getFirstUserId()))){
+            JobExtendsCustomer jobExtendsCustomer = weUserClient.transferCustomer(
+                    AllocateWeCustomerDto.builder()
+                            .external_userid(
+                                    weOnTheJobCustomerVo.getExternalUserid().split(",")
+                            )
+                            .handover_userid(weOnTheJobCustomerVo.getHandoverUserId())
+                            .takeover_userid(weOnTheJobCustomerVo.getTakeoverUserId())
+                            .build()
+            );
+
+            if(jobExtendsCustomer.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
+                iWeAllocateCustomerService.save(
+                        WeAllocateCustomer.builder()
+                                .allocateTime(new Date())
+                                .extentType(new Integer(1))
+                                .externalUserid(weOnTheJobCustomerVo.getExternalUserid())
+                                .handoverUserid(weOnTheJobCustomerVo.getHandoverUserId())
+                                .takeoverUserid(weOnTheJobCustomerVo.getTakeoverUserId())
+                                .failReason("在职继承")
+                                .build()
+                );
+            }
+
+
+        }
+
+    }
     /**
      * 编辑客户标签
      *
@@ -525,6 +631,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         List<WeCustomerList> weCustomerList = this.findWeCustomerList(
                 WeCustomerList.builder()
                         .externalUserid(externalUserid)
+                        .delFlag(new Integer(0))
                         .build()
         );
         if(CollectionUtil.isNotEmpty(weCustomerList)){
@@ -583,7 +690,20 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
             List<WeCustomerDetail.TrackUser>  trackUsers=new ArrayList<>();
 
+            List<WeCustomerDetail.TrackStates>  trackStates=new ArrayList<>();
+
+
             weCustomerList.stream().forEach(k->{
+
+                iWeCustomerTrajectoryService.list(new LambdaQueryWrapper<WeCustomerTrajectory>()
+                        .eq(WeCustomerTrajectory::getExternalUserid,k.getExternalUserid())
+                        .eq(WeCustomerTrajectory::getUserId,k.getFirstUserId()));
+
+                trackStates.add(WeCustomerDetail.TrackStates
+                        .builder()
+                        .userName(k.getUserName())
+
+                        .build());
 
                 trackUsers.add(
                         WeCustomerDetail.TrackUser.builder()
@@ -615,6 +735,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             weCustomerDetail.setCompanyTags(companyTags);
             weCustomerDetail.setPersonTags(personTags);
             weCustomerDetail.setTrackUsers(trackUsers);
+            weCustomerDetail.setTrackStates(trackStates);
         }
 
 

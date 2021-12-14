@@ -23,7 +23,7 @@ import java.util.Date;
 public class WeCustomerTrajectory extends BaseEntity {
     @TableId
     private String id;
-    //轨迹类型(1:信息动态;2:社交动态;3:活动规则;4:待办动态)
+    //轨迹类型(1:信息动态;2:社交动态;3:跟进动态;4:待办动态)
     private Integer trajectoryType;
     //外部联系人id
     private String externalUserid;

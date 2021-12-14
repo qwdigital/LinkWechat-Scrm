@@ -6,6 +6,8 @@ import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
 import com.linkwechat.wecom.domain.vo.WeCustomerDetailVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
+import com.linkwechat.wecom.domain.vo.WeOnTheJobCustomerVo;
+
 import java.util.List;
 
 /**
@@ -34,6 +36,15 @@ public interface IWeCustomerService extends IService<WeCustomer>
 
 
     /**
+     * 在职员工客户分配
+     * @param weOnTheJobCustomerVo
+     */
+     void allocateOnTheJobCustomer(WeOnTheJobCustomerVo weOnTheJobCustomerVo);
+
+
+
+
+    /**
      * 客户打标签
      * @param weMakeCustomerTag
      */
@@ -42,12 +53,6 @@ public interface IWeCustomerService extends IService<WeCustomer>
 
 
 
-//    /**
-//     * 根据员工ID获取客户
-//     * @param externalUserid
-//     * @return
-//     */
-//     List<WeUser> getCustomersByUserId(String externalUserid);
 
     /**
      * 获取客户详情并同步客户数据

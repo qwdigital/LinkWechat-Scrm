@@ -27,7 +27,7 @@
         <where>
             <if test="delFlag !=null"> wg.del_flag=#{delFlag}</if>
             <if test="groupName != null  and groupName != ''"> and wg.group_name like concat('%', #{groupName}, '%')</if>
-            <if test="groupLeader != null  and groupLeader != ''"> and wu.user_name like concat('%', #{groupLeaderName}, '%')</if>
+            <if test="groupLeaderName != null  and groupLeaderName != ''"> and wu.user_name like concat('%', #{groupLeaderName}, '%')</if>
             <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
                 AND date_format(wg.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
             </if>

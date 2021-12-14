@@ -99,6 +99,9 @@ public class WeCustomer extends BaseEntity {
 
     private String state;
 
+    private String takeoverUserId;
+
+
 
 
 

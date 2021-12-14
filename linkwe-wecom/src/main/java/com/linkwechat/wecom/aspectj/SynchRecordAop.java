@@ -44,7 +44,7 @@ public class SynchRecordAop {
                     .eq(WeSynchRecord::getSynchType,annotationLog.synchType())
                             .between(WeSynchRecord::getSynchTime,DateUtils.getBeforeByHourTime(2)
                                     ,DateUtils.getBeforeByHourTime(0)));
-            if(CollectionUtil.isEmpty(weSynchRecords)||weSynchRecords.size()<=1){
+            if(CollectionUtil.isEmpty(weSynchRecords)||weSynchRecords.size()<1){
                  joinPoint.proceed();
             }else{
                 throw new CustomException("由于企业微信开放平台的限制，两小时内不得重复同步操作");
