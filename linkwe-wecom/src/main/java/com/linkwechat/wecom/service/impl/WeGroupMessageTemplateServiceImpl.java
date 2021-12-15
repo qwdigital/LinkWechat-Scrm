@@ -180,6 +180,10 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
         if(query.getSendTime() == null){
             weGroupMessageTemplate.setSendTime(new Date());
         }
+        if(StringUtils.isEmpty(query.getContent()) && CollectionUtil.isNotEmpty(query.getAttachmentsList())){
+            String msgContent = query.getAttachmentsList().stream().map(item -> MessageType.messageTypeOf(item.getMsgType()).getName()).collect(Collectors.joining(","));
+            weGroupMessageTemplate.setContent(msgContent);
+        }
         try {
             if (save(weGroupMessageTemplate)) {
                 query.setId(weGroupMessageTemplate.getId());
