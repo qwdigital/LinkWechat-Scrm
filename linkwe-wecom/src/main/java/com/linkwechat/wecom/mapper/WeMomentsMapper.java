@@ -11,4 +11,6 @@ public interface WeMomentsMapper extends BaseMapper<WeMoments> {
     List<WeMoments>  findMoments(WeMoments weMoments);
 
     WeMoments findMomentsDetail(@Param("momentId") String momentId);
+
+    void removePushLwPush();
 }

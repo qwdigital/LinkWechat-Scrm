@@ -8,7 +8,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT
             wc.avatar,
             wc.`name` as customerName,
-            wc.customer_type,
+            wc.customer_type as customerType,
             if(wt.tag_type=1,GROUP_CONCAT(wt.`tag_id`),null ) as tagIds,
             if(wt.tag_type=1,GROUP_CONCAT(wt.`name`),null ) as tagNames,
             if(wt.tag_type=3,GROUP_CONCAT(wt.`tag_id`),null ) as personTagIds,

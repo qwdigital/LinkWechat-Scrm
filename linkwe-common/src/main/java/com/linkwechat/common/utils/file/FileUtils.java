@@ -1,6 +1,7 @@
 package com.linkwechat.common.utils.file;
 
 import com.linkwechat.common.utils.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -240,5 +241,48 @@ public class FileUtils extends org.apache.commons.io.FileUtils
             filename = URLEncoder.encode(filename, "utf-8");
         }
         return filename;
+    }
+
+
+    /**
+     * MultipartFile 转化为file
+     * @param multiFile
+     * @return
+     */
+    public static File MultipartFileToFile(MultipartFile multiFile) {
+        // 获取文件名
+        String fileName = multiFile.getOriginalFilename();
+        // 获取文件后缀
+        String prefix = fileName.substring(fileName.lastIndexOf("."));
+        // 若需要防止生成的临时文件重复,可以在文件名后添加随机码
+
+        try {
+            File file = File.createTempFile(fileName, prefix);
+            multiFile.transferTo(file);
+            return file;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    /**
+     * 获取视频或者语音时长
+     * @param multiFile
+     * @return
+     * @throws IOException
+     */
+    public static long getVideoOrVoice(MultipartFile multiFile) throws IOException {
+        long duration_new =0;
+        // 将MultipartFile file转换成为File
+        File f_file = MultipartFileToFile(multiFile);
+        String path = f_file.getCanonicalPath();
+         duration_new = VideoUtil.getDuration(path);
+        f_file.delete();
+
+        return duration_new;
+
+
     }
 }

@@ -13,10 +13,10 @@
             (SELECT GROUP_CONCAT(wu.user_id) FROM we_user wu WHERE FIND_IN_SET(wu.user_id,wm.no_add_user)) as noAddUser,
             (SELECT GROUP_CONCAT(wu.user_name) FROM we_user wu WHERE FIND_IN_SET(wu.user_id,wm.add_user)) as addUserName,
             (SELECT GROUP_CONCAT(wu.user_id) FROM we_user wu WHERE FIND_IN_SET(wu.user_id,wm.add_user)) as addUser,
-            create_time,
+            push_time as createTime,
             moment_id,
             (SELECT count(*) FROM we_moments_interacte wmi WHERE wmi.moment_id=wm.moment_id and wmi.interacte_type=0) as commentNum,
-            (SELECT count(*) FROM we_moments_interacte wmi WHERE wmi.moment_id=wm.moment_id and wmi.interacte_type=1) as pointNum
+            (SELECT count(*) FROM we_moments_interacte wmi WHERE wmi.moment_id=wm.moment_id and wmi.interacte_user_type=1 and wmi.interacte_type=1) as pointNum
         FROM
             we_moments wm
         <where>
@@ -27,10 +27,10 @@
                 AND  wm.creator=#{creator}
             </if>
             <if test="beginTime !=null and beginTime !='' and endTime !=null and endTime !='' ">
-                AND  date_format(wm.create_time ,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
+                AND  date_format(wm.push_time ,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
             </if>
         </where>
-        order by  wm.create_time desc
+        order by  wm.push_time desc
     </select>
 
 
@@ -69,6 +69,10 @@
         FROM
             we_moments wm
         where wm.moment_id=#{momentId}
+    </select>
+
+    <select id="removePushLwPush">
+        DELETE FROM we_moments WHERE is_lw_push=1
     </select>
 
 

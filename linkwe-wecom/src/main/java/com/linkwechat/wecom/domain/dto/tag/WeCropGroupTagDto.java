@@ -38,7 +38,7 @@ public class WeCropGroupTagDto {
      */
     public static WeCropGroupTagDto transformAddTag(WeTagGroup weTagGroup){
         WeCropGroupTagDto weCropGroupTagDto=WeCropGroupTagDto.builder()
-                .group_id(weTagGroup.getGroupId())
+//                .group_id(weTagGroup.getGroupId())
                 .group_name(weTagGroup.getGourpName())
                 .build();
         List<WeTag> newAddWeTag = weTagGroup.getAddWeTags();

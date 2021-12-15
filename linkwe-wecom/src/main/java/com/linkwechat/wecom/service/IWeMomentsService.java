@@ -11,7 +11,7 @@ public interface IWeMomentsService extends IService<WeMoments> {
 
     List<WeMoments> findMoments(WeMoments weMoments);
 
-    void addOrUpdateMoments(WeMoments weMoments);
+    void addOrUpdateMoments(WeMoments weMoments) throws InterruptedException;
 
     void synchPersonMoments(Integer filterType);
 

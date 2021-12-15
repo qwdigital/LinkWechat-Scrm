@@ -74,7 +74,7 @@ public class WeMomentsController extends BaseController {
      * @return
      */
     @PostMapping("/addOrUpdate")
-    public AjaxResult addOrUpdate(@RequestBody WeMoments weMoments){
+    public AjaxResult addOrUpdate(@RequestBody WeMoments weMoments) throws InterruptedException {
 
         iWeMomentsService.addOrUpdateMoments(weMoments);
 

@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -63,11 +64,16 @@ public class WeMoments extends BaseEntity {
     @TableLogic
     private Integer delFlag;
 
-    /**异步任务id，最大长度为64字节，24小时有效；可使用获取发表朋友圈任务结果查询任务状态*/
-    private String jobId;
+
+    /**是否是在lw平台发布的:1:是;0:否; */
+    private Boolean isLwPush;
 
     @TableId
     private String momentId;
+
+
+    //发布时间
+    private Date pushTime;
 
 
     /**评论数*/
@@ -98,13 +104,16 @@ public class WeMoments extends BaseEntity {
 
 
 
+
+
+
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class  OtherContent{
 
-        //附件类型：1:image 2:video 3:link
+        //附件类型：1:image 2:video 3:link  4:text
         private String annexType;
 
         //资源url
@@ -113,7 +122,7 @@ public class WeMoments extends BaseEntity {
         //资源id
 //        private String annexMediaid;
 
-        //如视频封面,图文标题
+        //如视频封面,图文标题,文字内容
         private String other;
     }
 

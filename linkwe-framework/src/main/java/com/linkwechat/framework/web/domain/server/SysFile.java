@@ -64,4 +64,10 @@ public class SysFile
     private String imgUrlPrefix;
 
 
+    /**
+     * 语音或者视频时长
+     */
+    private Long timeLong;
+
+
 }

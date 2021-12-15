@@ -4,6 +4,7 @@ import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -398,7 +399,22 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     public static String getBeforeByDayTime(int day){
         LocalDateTime now = LocalDateTime.now();
         now = now.minus(-day, ChronoUnit.DAYS);
+
+
         return now.toString();
     }
 
+    /**
+     * 当前时间向推N天
+     * 获取时间戳
+     * @param day 小时
+     * @return String
+     */
+    public static Long getBeforeByDayLongTime(int day){
+        LocalDateTime now = LocalDateTime.now();
+        now = now.minus(-day, ChronoUnit.DAYS);
+
+
+        return now.toEpochSecond(ZoneOffset.of("+8"));
+    }
 }

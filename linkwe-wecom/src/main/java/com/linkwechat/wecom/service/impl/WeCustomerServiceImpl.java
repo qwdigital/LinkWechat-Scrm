@@ -514,7 +514,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void getCustomersInfoAndSynchWeCustomer(String externalUserid,String userId) {
-
         //获取指定客户的详情
         ExternalUserDetail externalUserDetail = weCustomerClient.get(externalUserid);
 
@@ -524,6 +523,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             BeanUtils.copyPropertiesASM(externalUserDetail.getExternal_contact(), weCustomer);
             weCustomer.setFirstUserId(userId);
             weCustomer.setCustomerName(externalUserDetail.getExternal_contact().getName());
+            weCustomer.setCustomerType(externalUserDetail.getExternal_contact().getType());
             List<ExternalUserDetail.FollowUser> follow_user = externalUserDetail.getFollow_user();
             if(CollectionUtil.isNotEmpty(follow_user)){
                 ExternalUserDetail.FollowUser followUser = follow_user.stream().filter(e -> e.getUserid().equals(userId)).findFirst().get();

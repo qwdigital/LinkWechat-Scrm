@@ -1,6 +1,8 @@
 package com.linkwechat.wecom.client;
 
 import com.dtflys.forest.annotation.*;
+import com.linkwechat.wecom.domain.dto.GroupWelcomeTplDto;
+import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.domain.dto.customer.CustomerGroupDetail;
 import com.linkwechat.wecom.domain.dto.customer.CustomerGroupList;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
@@ -36,4 +38,22 @@ public interface WeCustomerGroupClient {
             type = "POST"
     )
     CustomerGroupDetail groupChatDetail(@JSONBody CustomerGroupDetail.Params params);
+
+    /**
+     * 添加入群欢迎语模版
+     * @param groupWelcomeTplDto
+     * @return
+     */
+    @Post(url = "/externalcontact/group_welcome_template/add")
+    GroupWelcomeTplDto addGroupWelcomeTpl(@JSONBody GroupWelcomeTplDto groupWelcomeTplDto);
+
+
+    /**
+     * 编辑入群欢迎语模版
+     * @param groupWelcomeTplDto
+     * @return
+     */
+    @Post(url = "/externalcontact/group_welcome_template/edit")
+    WeResultDto updateGroupWelcomeTpl(@JSONBody GroupWelcomeTplDto groupWelcomeTplDto);
+
 }

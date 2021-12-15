@@ -1,6 +1,13 @@
 package com.linkwechat.common.utils.img;
 
 
+import com.qcloud.cos.utils.IOUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
@@ -8,14 +15,17 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
 
+@Slf4j
 public class ImageUtils {
 
     private final static JLabel J_LABEL = new JLabel();
@@ -676,6 +686,93 @@ public class ImageUtils {
         public void setValue(Character value) {
             this.value = value;
         }
+    }
+
+    /**
+     * 根据url 拉取文件
+     * @param url
+     * @return
+     * @throws Exception
+     */
+    public static File getFile(String url) throws Exception {
+        //对本地文件命名
+        String fileName = url.substring(url.lastIndexOf("."),url.length());
+        File file = null;
+
+        URL urlfile;
+        InputStream inStream = null;
+        OutputStream os = null;
+        try {
+            file = File.createTempFile("fwj_url", fileName);
+            //下载
+            urlfile = new URL(url);
+            inStream = urlfile.openStream();
+            os = new FileOutputStream(file);
+
+            int bytesRead = 0;
+            byte[] buffer = new byte[8192];
+            while ((bytesRead = inStream.read(buffer, 0, 8192)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (null != os) {
+                    os.close();
+                }
+                if (null != inStream) {
+                    inStream.close();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return file;
+    }
+
+
+    /**
+     * 根据url获取图片并转换为multipartFile类型
+     * @param url
+     * @return
+     */
+    public static MultipartFile getMultipartFile(String url) {
+        FileInputStream inputStream = null;
+        OutputStream outputStream = null;
+        try {
+            File file = getFile(url);
+            System.out.println(file.toPath());
+            FileItem fileItem = new DiskFileItem("formFieldName",//form表单文件控件的名字随便起
+                    Files.probeContentType(file.toPath()),//文件类型
+                    false, //是否是表单字段
+                    file.getName(),//原始文件名
+                    (int) file.length(),//Interger的最大值可以存储两部1G的电影
+                    file.getParentFile());//文件会在哪个目录创建
+            //为DiskFileItem的OutputStream赋值
+            inputStream = new FileInputStream(file);
+            outputStream = fileItem.getOutputStream();
+            IOUtils.copy(inputStream, outputStream);
+            return new CommonsMultipartFile(fileItem);
+        } catch (Exception e) {
+            log.error("文件类型转换失败" + e.getMessage());
+            return null;
+        } finally {
+            try {
+                if (null != inputStream) {
+                    inputStream.close();
+                }
+
+                if (null != outputStream) {
+                    outputStream.close();
+                }
+            } catch (IOException e) {
+                log.error(">>文件流关闭失败" + e.getMessage());
+            }
+        }
+
     }
 }
 

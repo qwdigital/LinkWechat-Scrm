@@ -53,6 +53,7 @@
             </if>
         </where>
        GROUP BY  wg.chat_id
+       ORDER BY  wg.create_time DESC
     </select>
 
 

@@ -16,6 +16,7 @@ import com.linkwechat.common.utils.Threads;
 import com.linkwechat.wecom.annotation.SynchRecord;
 import com.linkwechat.wecom.client.WeMomentsClient;
 import com.linkwechat.wecom.constants.SynchRecordConstants;
+import com.linkwechat.wecom.domain.WeAllocateCustomer;
 import com.linkwechat.wecom.domain.WeMoments;
 import com.linkwechat.wecom.domain.WeMomentsInteracte;
 import com.linkwechat.wecom.domain.WeUser;
@@ -81,12 +82,18 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
      * @param weMoments
      */
     @Override
-    public void addOrUpdateMoments(WeMoments weMoments) {
+    public void addOrUpdateMoments(WeMoments weMoments) throws InterruptedException {
 
         if(weMoments.getType().equals(new Integer(0))){//企业动态
             MomentsParamDto momentsParamDto=new MomentsParamDto();
-
+            weMoments.setIsLwPush(true);
             if(StringUtils.isNotEmpty(weMoments.getContent())){
+                weMoments.getOtherContent().add(
+                        WeMoments.OtherContent.builder()
+                                .annexType(MediaType.TEXT.getMediaType())
+                                .other(weMoments.getContent())
+                                .build()
+                );
                 momentsParamDto.setText(
                         MomentsParamDto.Text.builder()
                                 .content(weMoments.getContent())
@@ -127,6 +134,8 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
                                                                 .build()
                                                 ).build()
                                 );
+                                weMoments.setContent(image.getAnnexUrl());
+
                             }
 
 
@@ -156,13 +165,14 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
                                                                 .build()
                                                 ).build()
                                 );
+                                weMoments.setContent(video.getAnnexUrl());
                             }
 
                         });
                     }
 
 
-                    //图文
+                    //网页链接
                     if(weMoments.getContentType().equals(MediaType.LINK.getMediaType())){
                         otherContents.stream().forEach(link->{
                             attachments.add(
@@ -171,14 +181,15 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
                                             .link(
                                                     MomentsParamDto.Link.builder()
                                                             .url(link.getAnnexUrl())
-                                                            .media_id(
-                                                                    iWeMaterialService.uploadTemporaryMaterial(link.getAnnexUrl(),
-                                                                            MediaType.IMAGE.getMediaType()
-                                                                            ,SnowFlakeUtil.nextId().toString()).getMedia_id()
-                                                            )
+//                                                            .media_id(
+//                                                                    iWeMaterialService.uploadTemporaryMaterial(link.getAnnexUrl(),
+//                                                                            MediaType.IMAGE.getMediaType()
+//                                                                            ,SnowFlakeUtil.nextId().toString()).getMedia_id()
+//                                                            )
                                                             .build()
                                             ).build()
                             );
+                            weMoments.setContent(link.getAnnexUrl());
                         });
 
 
@@ -195,13 +206,14 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
 
             }
 
+            MomentsParamDto.VisibleRange visibleRange
+                    = MomentsParamDto.VisibleRange.builder().build();
 
                 //设置可见范围
             if(weMoments.getScopeType().equals(new Integer(0))){ //部分
 
 
-                   MomentsParamDto.VisibleRange visibleRange
-                           = MomentsParamDto.VisibleRange.builder().build();
+
 
                    if(StringUtils.isNotEmpty(weMoments.getCustomerTag())){ //客户标签
                        visibleRange.setExternal_contact_list(
@@ -219,44 +231,48 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
                         );
                    }
 
-                momentsParamDto.setVisible_range(
-                        visibleRange
-                );
 
-               }
+
+               }else{ //全部
+
+                List<WeUser> weUsers = iWeUserService.list();
+                if(CollectionUtil.isNotEmpty(weUsers)){
+                    visibleRange.setSender_list(
+                            MomentsParamDto.SenderList.builder()
+                                    .user_list(
+                                            weUsers.stream().map(WeUser::getUserId).collect(Collectors.toList()).stream().toArray(String[]::new)
+                                    )
+                                    .build()
+                    );
+                    weMoments.setNoAddUser(
+                            StringUtils.join(weUsers.stream().map(WeUser::getUserId).collect(Collectors.toList()).toArray(), ",")
+                    );
+                }
+
+
+            }
+
+            momentsParamDto.setVisible_range(
+                    visibleRange
+            );
+
+
             MomentsResultDto weResultDto = weMomentsClient.addMomentTask(
                        momentsParamDto
-               );
+            );
 
-
-               //入库
-               if(weResultDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
-                   weMoments.setJobId(weResultDto.getJobid());
+            //入库
+            if(weResultDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
                    weMoments.setMomentId(weResultDto.getJobid());
                    this.saveOrUpdate(weMoments);
-//                   //根据任务id,获取朋友圈主键
-//                   MomentsCreateResultDto momentTaskResult
-//                           = weMomentsClient.getMomentTaskResult(weResultDto.getJobid());
-//                   if(momentTaskResult.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
-//
-//                       if(StringUtils.isNotEmpty(momentTaskResult.getResult().getMoment_id())){
-//                           weMoments.setMomentId(
-//                                   momentTaskResult.getResult().getMoment_id()
-//                           );
-//                           this.saveOrUpdate(weMoments);
-//                       }
-//
-//                   }
-               }
-
-
-
-
+           }
 
         }
 
 
     }
+
+
 
     /**
      * 同步个人朋友圈
@@ -281,6 +297,10 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
     @Transactional
     @SynchRecord(synchType = SynchRecordConstants.SYNCH_CUSTOMER_ENTERPRISE_MOMENTS)
     public void synchEnterpriseMoments(Integer filterType) {
+
+
+        this.baseMapper.removePushLwPush();
+        //入库未同步过的数据
         this.synchMoments(filterType);
     }
 
@@ -322,7 +342,7 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
 
                     moments.stream().forEach(moment -> {
 
-                        if(moment.getCreate_type().equals(new Integer(1))){//个人,获取互动数据
+                    if(moment.getCreate_type().equals(new Integer(1))){//个人,获取互动数据
                             MomentsInteracteResultDto momentComments = weMomentsClient.get_moment_comments(MomentsInteracteParamDto.builder()
                                     .moment_id(moment.getMoment_id())
                                     .userid(moment.getCreator())
@@ -362,6 +382,9 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
                                         );
                                     });
                                 }
+
+
+
                             }
                         }
 
@@ -375,8 +398,8 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
                         WeMoments weMoment=WeMoments.builder()
                                 .type(moment.getCreate_type())
                                 .scopeType(moment.getVisible_type())
-                                .createTime(moment.getCreate_time())
                                 .addUser(moment.getCreator())
+                                .pushTime(new Date(moment.getCreate_time().getTime()* 1000L))
                                 .momentId(moment.getMoment_id())
                                 .creator(moment.getCreator())
                                 .build();
@@ -387,35 +410,39 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
                         }
 
 
-
-
-
+                        List<WeMoments.OtherContent> otherContents=new ArrayList<>();
 
                         //文本
                         Optional.ofNullable(moment.getText()).ifPresent(k->{
 
                             if(StringUtils.isNotEmpty(k.getContent())){
+                                otherContents.add(
+                                        WeMoments.OtherContent.builder()
+                                                .other(k.getContent())
+                                                .annexType(MediaType.TEXT.getMediaType())
+                                                .build()
+                                );
                                 weMoment.setContent(k.getContent());
                                 weMoment.setContentType(MediaType.TEXT.getMediaType());
                             }
 
                         });
 
-                        List<WeMoments.OtherContent> otherContents=new ArrayList<>();
+
 
                         //图片
                         Optional.ofNullable(moment.getImage()).ifPresent(k->{
                             if(CollectionUtil.isNotEmpty(k)){
                                 k.stream().forEach(image->{
 
-                                    if(StringUtils.isNotEmpty(weMoment.getContent())){
-                                        weMoment.setContent(iWeMaterialService.mediaGet(image.getMedia_id(), MediaType.IMAGE.getType(),"jpg"));
-                                    }
+
+                                String jpg = iWeMaterialService.mediaGet(image.getMedia_id(), MediaType.IMAGE.getType(), "jpg");
+                                 weMoment.setContent(jpg);
 
                                     otherContents.add(
                                             WeMoments.OtherContent.builder()
                                                     .annexType(MediaType.IMAGE.getMediaType())
-                                                    .annexUrl(iWeMaterialService.mediaGet(image.getMedia_id(), MediaType.IMAGE.getType(),"jpg"))
+                                                    .annexUrl(jpg)
                                                     .build()
                                     );
                                 });
@@ -427,15 +454,16 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
 
                         //视频
                         Optional.ofNullable(moment.getVideo()).ifPresent(k->{
-                            if(StringUtils.isNotEmpty(weMoment.getContent())){
-                                weMoment.setContent(iWeMaterialService.mediaGet(k.getThumb_media_id(), MediaType.IMAGE.getType(),"jpg"));
-                            }
+
+                            String video = iWeMaterialService.mediaGet(k.getMedia_id(), MediaType.VIDEO.getType(), "mp4");
+
+                            weMoment.setContent(video);
 
                             otherContents.add(
                                     WeMoments.OtherContent.builder()
                                             .annexType(MediaType.VIDEO.getMediaType())
-                                            .annexUrl(iWeMaterialService.mediaGet(k.getMedia_id(), MediaType.VIDEO.getType(),"mp4"))
-                                            .other(iWeMaterialService.mediaGet(k.getThumb_media_id(), MediaType.IMAGE.getType(),"jpg"))
+                                            .annexUrl(video)
+//                                            .other(iWeMaterialService.mediaGet(k.getThumb_media_id(), MediaType.IMAGE.getType(),"jpg"))
                                             .build()
                             );
                             weMoment.setContentType(MediaType.VIDEO.getMediaType());
@@ -444,9 +472,7 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
 
                         //链接
                         Optional.ofNullable(moment.getLink()).ifPresent(k->{
-                            if(StringUtils.isNotEmpty(weMoment.getContent())){
-                                weMoment.setContent(k.getTitle());
-                            }
+                            weMoment.setContent(k.getUrl());
 
                             otherContents.add(
                                     WeMoments.OtherContent.builder()
@@ -464,10 +490,7 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
 
                         weMoments.add(weMoment);
 
-//               //经纬度
-//               Optional.ofNullable(moment.getLocation()).ifPresent(k->{
-//
-//               });
+
 
 
                     });
@@ -504,16 +527,21 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
             List<MomentsResultDto.TaskList> task_list = moment_task.getTask_list();
             if(CollectionUtil.isNotEmpty(task_list)){
                 task_list.stream().collect(Collectors.groupingBy(MomentsResultDto.TaskList::getPublish_status)).forEach((k,v)->{
-
                         if(k.equals(new Integer(0))){//未发表
-                          weMoments.setNoAddUser(v.stream().map(MomentsResultDto.TaskList::getUserid).collect(Collectors.joining(",")));
+                           weMoments.setNoAddUser(v.stream().map(MomentsResultDto.TaskList::getUserid).collect(Collectors.joining(",")));
                         }else if(k.equals(new Integer(1))){//已发表
                             weMoments.setAddUser(
                                     v.stream().map(MomentsResultDto.TaskList::getUserid).collect(Collectors.joining(","))
                             );
                         }
-
                 });
+            }else{
+                List<WeUser> weUsers = iWeUserService.list();
+                if(CollectionUtil.isNotEmpty(weUsers)){
+                    weMoments.setNoAddUser(weUsers.stream().map(WeUser::getUserId).collect(Collectors.joining(",")));
+                }
+
+
             }
         }
 
@@ -524,7 +552,7 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
 
 
     /**
-     * 批量获取企业朋友圈
+     * 批量获取企业朋友圈(30天内数据)
      *
      * @param nextCursor
      * @param list
@@ -532,12 +560,9 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
     private void getByMoment(String nextCursor,List<MomentsListDetailResultDto.Moment> list,Integer filterType) {
 
 
-        Long startTime = strToDate(-29, 0);
-
-        Long endTime = strToDate(0, 1);
         MomentsListDetailResultDto moment_list = weMomentsClient.get_moment_list(MomentsListDetailParamDto.builder()
-                .start_time(startTime)
-                .end_time(endTime)
+                .start_time(DateUtils.getBeforeByDayLongTime(-30))
+                .end_time(DateUtils.getBeforeByDayLongTime(0))
                 .cursor(nextCursor)
                  .filter_type(filterType)
                 .build());
@@ -549,32 +574,11 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
                 getByMoment(moment_list.getNext_cursor(), list,filterType);
             }
         }
+
     }
 
 
-    private Long strToDate(int days, Integer type) {
-        Long time = null;
-        DateFormat format2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = null;
-        Calendar cale = Calendar.getInstance();
-        cale.add(Calendar.DATE, days);
-        String tarday = new SimpleDateFormat("yyyy-MM-dd").format(cale.getTime());
-        if (type.equals(0)) {
-            tarday += " 00:00:00";
-        } else {
-            tarday += " 23:59:59";
-        }
-        // String转Date
-        try {
-            date = format2.parse(tarday);
-            System.out.println(date.getTime());
-            time = date.getTime() / 1000;
-            System.out.println(time.toString());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return time;
-    }
+
 
 
 
