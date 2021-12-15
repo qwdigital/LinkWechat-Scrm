@@ -4,11 +4,11 @@
       <el-col>
         <el-form label-width="110px" label-position="right">
           <div class="g-card g-pad20">
-             <el-form-item label="可见客户" required>
-             <el-radio-group v-model="form.scopeType">
-              <el-radio :label="1">全部可见</el-radio>
-              <el-radio :label="0">部分可见</el-radio>
-            </el-radio-group>
+            <el-form-item label="可见客户" required>
+              <el-radio-group v-model="form.scopeType">
+                <el-radio :label="1">全部可见</el-radio>
+                <el-radio :label="0">部分可见</el-radio>
+              </el-radio-group>
             </el-form-item>
             <el-form-item label="客户标签" v-if="form.scopeType === 0">
               <el-tag sizi="mini" v-for="(unit, key) in  selectedTagList" :key="key">{{ unit.name }}</el-tag>
@@ -67,44 +67,44 @@
               </el-form-item>
             </div>
           </div>
-            <!-- 添加附件 -->
-            <div class="g-card g-pad20 add-continue" v-show="form.otherContent.length <= 8 && form.contentType !== 'video' && form.contentType !== 'link'">
-              <el-dropdown style="margin-left: 10px" @command="onInsertMaterial">
-                <div style="display: flex; align-items: center">
-                  <img style="margin-right: 5px" :src="require('@/assets/drainageCode/plus-circle.png')" alt="" />继续添加附件
-                </div>
-                <el-dropdown-menu slot="dropdown" trigger="click">
-                  <!-- <el-dropdown-item :command="4">
+          <!-- 添加附件 -->
+          <div class="g-card g-pad20 add-continue" v-show="form.otherContent.length <= 8 && form.contentType !== 'video' && form.contentType !== 'link'">
+            <el-dropdown style="margin-left: 10px" @command="onInsertMaterial">
+              <div style="display: flex; align-items: center">
+                <img style="margin-right: 5px" :src="require('@/assets/drainageCode/plus-circle.png')" alt="" />继续添加附件
+              </div>
+              <el-dropdown-menu slot="dropdown" trigger="click">
+                <!-- <el-dropdown-item :command="4">
                   <el-button type="text">文字</el-button>
                 </el-dropdown-item> -->
-                  <el-dropdown-item v-if="form.contentType === 'image' || form.otherContent.length === 0" :command="'image'">
-                    <el-button type="text">图片</el-button>
-                  </el-dropdown-item>
-                  <el-dropdown-item v-if="form.otherContent.length === 0" :command="'video'">
-                    <el-button type="text">视频</el-button>
-                  </el-dropdown-item>
-                  <el-dropdown-item v-if="form.otherContent.length === 0" :command="'link'">
-                    <el-button type="text">网页</el-button>
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </div>
-            <el-form-item label-width="0" style="margin-top: 20px; margin-bottom: 0">
-              <el-button @click="onBackStep">取消</el-button>
-              <el-button type="primary" @click="submit">保存</el-button>
-            </el-form-item>
+                <el-dropdown-item v-if="form.contentType === 'image' || form.otherContent.length === 0" :command="'image'">
+                  <el-button type="text">图片</el-button>
+                </el-dropdown-item>
+                <el-dropdown-item v-if="form.otherContent.length === 0" :command="'video'">
+                  <el-button type="text">视频</el-button>
+                </el-dropdown-item>
+                <el-dropdown-item v-if="form.otherContent.length === 0" :command="'link'">
+                  <el-button type="text">网页</el-button>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
+          <el-form-item label-width="0" style="margin-top: 20px; margin-bottom: 0">
+            <el-button @click="onBackStep">取消</el-button>
+            <el-button type="primary" @click="submit">保存</el-button>
+          </el-form-item>
         </el-form>
       </el-col>
     </el-row>
-     <!-- 选择标签弹窗 -->
+    <!-- 选择标签弹窗 -->
     <SelectTag :visible.sync="dialogVisibleSelectTag" :defaultValues="selectedTagList" @success="submitSelectTag">
     </SelectTag>
     <SelectUser :defaultValues="selectedUserList" :visible.sync="dialogVisibleSelectUser" title="选择使用员工" @success="selectedUser"></SelectUser>
-    </div>
+  </div>
 </template>
 
 <script>
-import { gotoPublish } from '@/api/circle'
+  import { gotoPublish } from '@/api/circle'
   import SelectTag from '@/components/SelectTag'
   import SelectUser from '@/components/SelectUser'
   import upload from '@/components/Upload'
@@ -130,14 +130,14 @@ import { gotoPublish } from '@/api/circle'
         loading: false,
         selectedUserList: [],
         dialogVisibleSelectUser: false,
-        dialogVisibleSelectTag:false,
-        selectedTagList:[]
+        dialogVisibleSelectTag: false,
+        selectedTagList: []
       }
     },
     mounted () {
     },
     methods: {
-       selectedFn () {
+      selectedFn () {
         this.dialogVisibleSelectTag = true
       },
       submitSelectTag (data) {
@@ -155,7 +155,7 @@ import { gotoPublish } from '@/api/circle'
         this.form.otherContent.push({
           annexType: e,
           annexUrl: '',
-          contentError:''
+          contentError: ''
         })
       },
       onRemoveMaterial (index) {
@@ -175,7 +175,7 @@ import { gotoPublish } from '@/api/circle'
             dd.contentError = '内容不能为空'
             goto = false
           } else {
-            dd.contentError =''
+            dd.contentError = ''
           }
         })
         return goto
@@ -202,7 +202,8 @@ import { gotoPublish } from '@/api/circle'
             delete dd.contentError
             if (dd.annexType === 'link') {
               let reUrl = /(http|https):\/\/([\w.]+\/?)\S*/
-              if (!reUrl.test(dd.content)) {
+              if (!reUrl.test(dd.annexUrl)) {
+                console.log(123)
                 goto = false
                 dd.contentError = '必须以 http://或 https://开头'
               }
@@ -218,7 +219,7 @@ import { gotoPublish } from '@/api/circle'
             })
           }
         }
-        
+
       }
     }
   }

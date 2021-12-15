@@ -28,6 +28,7 @@
       <el-table-column show-overflow-tooltip prop="content" label="朋友圈内容">
         <template slot-scope="{ row }">
           <el-image v-if="row.contentType === 'image'" :src="row.content" fit="fit" :preview-src-list="[row.content]" style="width: 100px; height: 100px"></el-image>
+          <video v-else-if="row.contentType === 'video'" style="width: 100px; height: 100px;" :src="row.content"></video>
           <div v-else>{{row.content}}</div>
         </template>
       </el-table-column>
@@ -87,22 +88,27 @@
     <SelectUser :visible.sync="dialogVisible" title="组织架构" :defaultValues="userArray" @success="getSelectUser"></SelectUser>
     <el-dialog title="详情" :visible.sync="detailDialogVisible" width="40%">
       <el-form label-position="right" label-width="100px">
-        <el-form-item label="内容：">
-          {{detail.content}}
-        </el-form-item>
-        <el-form-item v-if="detail.otherContent" label=" ">
-          <template v-for="(data, index) in detail.otherContent">
-            <div style="display:inline-block;margin-right:10px;" v-if="data.annexType === 'image'">
+        <template v-for="(data, index) in detail.otherContent">
+          <el-form-item label="内容：" v-if="data.annexType === 'text'">
+            {{data.other}}
+          </el-form-item>
+          <el-form-item label=" " v-if="data.annexType === 'image'">
+            <div style="display:inline-block;margin-right:10px;">
               <el-image style="width: 100px; height: 100px" :src="data.annexUrl"></el-image>
             </div>
-            <div style="display:inline-block;margin-right:10px;" v-else-if="data.annexType === 'video'">
-              <video style="width: 100px; height: 100px" :src="data.annexUrl"></video>
+          </el-form-item>
+          <el-form-item label=" " v-if="data.annexType === 'video'">
+            <div style="display:inline-block;margin-right:10px;" v-else-if="">
+              <video style="width: 200px; height: 200px" :src="data.annexUrl" controls></video>
             </div>
-            <div style="display:inline-block;margin-right:10px;" v-else-if="data.annexType === 'link'">
-              <video style="width: 100px; height: 100px" :src="data.annexUrl"></video>
+          </el-form-item>
+          <el-form-item label=" " v-if="data.annexType === 'link'">
+            <div style="display:inline-block;margin-right:10px;">
+              <span style="width: 100px; height: 100px">{{data.annexUrl}}</span>
             </div>
-          </template>
-        </el-form-item>
+          </el-form-item>
+        </template>
+
         <el-form-item label="已发送员工" v-if="detail.addUserName">
           <el-tag v-for="(data, key) in detail.addUserName.split(',')" :key="key">{{data}}</el-tag>
         </el-form-item>
@@ -212,8 +218,8 @@
         if (this.lastSyncTime) {
           let date1 = moment(this.lastSyncTime)
           let date2 = moment()
-          let date3 =  date2.diff(date1,'minute')
-          const h = Math.floor(date3/60)
+          let date3 = date2.diff(date1, 'minute')
+          const h = Math.floor(date3 / 60)
           console.log(h)
           if (h >= 2) {
             this.disable = false
