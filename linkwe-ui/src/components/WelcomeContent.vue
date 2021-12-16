@@ -119,13 +119,13 @@
                 <!-- <el-dropdown-item :command="4">
                   <el-button type="text">文字</el-button>
                 </el-dropdown-item> -->
-                <el-dropdown-item :command="'0'">
+                <el-dropdown-item :command="'0'" v-if="showType('0')">
                   <el-button type="text">图片</el-button>
                 </el-dropdown-item>
-                <el-dropdown-item :command="'7'">
+                <el-dropdown-item :command="'7'" v-if="showType('7')">
                   <el-button type="text">图文</el-button>
                 </el-dropdown-item>
-                <el-dropdown-item :command="'8'">
+                <el-dropdown-item :command="'8'" v-if="showType('8')">
                   <el-button type="text">小程序</el-button>
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -223,6 +223,10 @@
       },
       currentActive: {
         type: Number
+      },
+      isSingle: {
+        type: Boolean,
+        default: false
       }
     },
     watch: {
@@ -262,6 +266,26 @@
       }
     },
     methods: {
+      showType (type) {
+        let exit = true
+        if (this.isSingle) {
+          this.form.materialMsgList.forEach(dd => {
+            if (dd.msgType === type) {
+              exit = false
+            }
+          })
+        }
+        return exit
+      },
+      showMore () {
+        let exit = true
+        if (this.isSingle) {
+          if (this.form.materialMsgList.length === 3) {
+            exit = false
+          }
+        }
+        return exit
+      },
       onSelectUser () {
         this.selectedUserList = []
         let arr = []
