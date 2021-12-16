@@ -79,8 +79,8 @@
             justify="space-between"
             style="margin-top:10px;font-size:35px;font-weight:bold;color: #0079DE; text-align: center;"
           >
-            <el-col :span="6">{{ erchatsTable.newChatCnt }}</el-col>
             <el-col :span="6">{{ erchatsTable.newContactCnt }}</el-col>
+            <el-col :span="6">{{ erchatsTable.newChatCnt }}</el-col>
             <el-col :span="6">{{
               erchatsTable.newMemberCnt ? erchatsTable.newMemberCnt : 0
             }}</el-col>
@@ -95,20 +95,20 @@
             <el-col
               :span="6"
               :class="{
-                greenicon: Number(erchatsTable.newChatCntDiff) >= 1,
-                redicon: Number(erchatsTable.newChatCntDiff) < 0
-              }"
-              >较{{ time }}
-              <span>{{ erchatsTable.newChatCntDiff }}</span>
-            </el-col>
-            <el-col
-              :span="6"
-              :class="{
                 greenicon: Number(erchatsTable.newContactCntDiff) >= 1,
                 redicon: Number(erchatsTable.newContactCntDiff) < 0
               }"
               >较{{ time }}
               <span>{{ erchatsTable.newContactCntDiff }}</span>
+            </el-col>
+            <el-col
+              :span="6"
+              :class="{
+                greenicon: Number(erchatsTable.newChatCntDiff) >= 1,
+                redicon: Number(erchatsTable.newChatCntDiff) < 0
+              }"
+              >较{{ time }}
+              <span>{{ erchatsTable.newChatCntDiff }}</span>
             </el-col>
             <el-col
               :span="6"
@@ -342,10 +342,10 @@ export default {
       let series = []
       let colors = this.erchatsTable.dataList.forEach((a) => {
         data.xData.push(a.xtime)
-        data.arr1.push(a.newContactCnt)
-        data.arr3.push(a.newMemberCnt)
-        data.arr2.push(a.newContactCnt)
-        data.arr0.push(a.negativeFeedbackCnt)
+        data.arr0.push(a.newContactCnt)
+        data.arr2.push(a.newMemberCnt)
+        data.arr1.push(a.newChatCnt)
+        data.arr3.push(a.negativeFeedbackCnt)
       })
 
       for (let index = 0; index < 4; index++) {
