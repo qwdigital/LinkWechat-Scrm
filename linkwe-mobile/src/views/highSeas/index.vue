@@ -137,7 +137,7 @@
     mounted () {
     },
     created () {
-      this.userId = this.$route.query.userId
+      this.userId = this.$store.state.userId
       this.getData()
       this.getData2()
       this.getData1()
