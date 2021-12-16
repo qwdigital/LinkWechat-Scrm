@@ -250,8 +250,8 @@ export default {
       <el-table-column label="群名" align="center" prop="groupName" />
       <el-table-column label="群主" align="center" prop="groupLeaderName" />
       <el-table-column label="群人数" align="center" prop="memberNum" />
-      <el-table-column prop="tagNames" label="群标签" align="center">
-        <div v-if="row.tagNames" slot-scope="{ row }">
+      <el-table-column prop="tags" label="群标签" align="center">
+        <div v-if="row.tags" slot-scope="{ row }">
           <el-popover placement="bottom" trigger="hover">
             <div>
               <el-tag v-for="(unit, unique) in row.tags" :key="unique">
