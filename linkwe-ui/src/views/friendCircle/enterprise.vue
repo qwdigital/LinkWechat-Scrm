@@ -92,11 +92,6 @@
           <el-form-item label="内容：" v-if="data.annexType === 'text'">
             {{data.other}}
           </el-form-item>
-          <el-form-item label=" " v-if="data.annexType === 'image'">
-            <div style="display:inline-block;margin-right:10px;">
-              <el-image style="width: 100px; height: 100px" :src="data.annexUrl"></el-image>
-            </div>
-          </el-form-item>
           <el-form-item label=" " v-if="data.annexType === 'video'">
             <div style="display:inline-block;margin-right:10px;" v-else-if="">
               <video style="width: 200px; height: 200px" :src="data.annexUrl" controls></video>
@@ -108,7 +103,15 @@
             </div>
           </el-form-item>
         </template>
-
+        <el-row :gutter="10">
+          <el-form-item label=" ">
+            <template v-for="(data, index) in detail.otherContent">
+              <el-col span="7">
+                <el-image style="width: 100px; height: 100px" v-if="data.annexType === 'image'" :src="data.annexUrl"></el-image>
+              </el-col>
+            </template>
+          </el-form-item>
+        </el-row>
         <el-form-item label="已发送员工" v-if="detail.addUserName">
           <el-tag v-for="(data, key) in detail.addUserName.split(',')" :key="key">{{data}}</el-tag>
         </el-form-item>
