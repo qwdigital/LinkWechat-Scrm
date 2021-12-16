@@ -32,8 +32,8 @@
                   <span style="line-height:40px">{{ item.customerName }}</span>
                 </el-col>
                 <el-col :span="10" class="ar">
-                  <span :style="{ color: item.type === 1 ? '#4bde03' : '#f9a90b' }"
-                    >{{ { 1: '@微信', 2: '@企业微信' }[item.type] }}
+                  <span :style="{ color: item.customerType === 1 ? '#4bde03' : '#f9a90b' }"
+                    >{{ { 1: '@微信', 2: '@企业微信' }[item.customerType] }}
                   </span>
                   <i :class="['el-icon-s-custom', { 1: 'man', 2: 'woman' }[item.gender]]"></i>
                 </el-col>

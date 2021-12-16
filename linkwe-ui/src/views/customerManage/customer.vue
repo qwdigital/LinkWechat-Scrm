@@ -449,7 +449,7 @@ export default {
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" align="center" width="55"> </el-table-column>
-      <el-table-column label="客户" prop="customerName" align="center">
+      <el-table-column label="客户" prop="customerName" header-align="center" align="" width="180">
         <template slot-scope="{ row }">
           <div class="cp flex aic" @click="goRoute(row)">
             <el-image
@@ -458,11 +458,11 @@ export default {
               fit="fit"
             ></el-image>
             <div class="ml10">
-              {{ row.customerName }}
-              <span :style="{ color: row.customerType === 1 ? '#4bde03' : '#f9a90b' }">{{
-                { 1: '@微信', 2: '@企业微信' }[row.type]
-              }}</span>
+              <p>{{ row.customerName }}</p>
               <i :class="['el-icon-s-custom', { 1: 'man', 2: 'woman' }[row.gender]]"></i>
+              <span :style="{ color: row.customerType === 1 ? '#4bde03' : '#f9a90b' }">
+                {{ { 1: '@微信', 2: '@企业微信' }[row.customerType] }}
+              </span>
             </div>
           </div>
         </template>
@@ -593,7 +593,7 @@ export default {
 <style lang="scss" scoped>
 .el-icon-s-custom {
   font-size: 16px;
-  margin-left: 4px;
+  // margin-left: 4px;
   color: #999;
   &.man {
     color: #13a2e8;

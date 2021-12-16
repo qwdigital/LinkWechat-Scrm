@@ -1,7 +1,7 @@
 <script>
 import { getListNew, exportCustomer, lossRemind, getLossRemindStatus } from '@/api/customer'
-import { getList as getListTag } from '@/api/customer/tag'
-import { getList as getListOrganization } from '@/api/organization'
+// import { getList as getListTag } from '@/api/customer/tag'
+// import { getList as getListOrganization } from '@/api/organization'
 import SelectUser from '@/components/SelectUser'
 import SelectTag from '@/components/SelectTag'
 
@@ -51,8 +51,8 @@ export default {
   computed: {},
   created() {
     this.getList()
-    this.getListTag()
-    this.getListOrganization()
+    // this.getListTag()
+    // this.getListOrganization()
     this.getLossRemindStatus()
 
     this.$store.dispatch(
@@ -86,21 +86,21 @@ export default {
           this.loading = false
         })
     },
-    getListTag() {
-      getListTag().then(({ rows }) => {
-        this.listTagOneArray = []
-        rows.forEach((element) => {
-          element.weTags.forEach((d) => {
-            this.listTagOneArray.push(d)
-          })
-        })
-      })
-    },
-    getListOrganization() {
-      getListOrganization().then(({ rows }) => {
-        this.listOrganization = Object.freeze(rows)
-      })
-    },
+    // getListTag() {
+    //   getListTag().then(({ rows }) => {
+    //     this.listTagOneArray = []
+    //     rows.forEach((element) => {
+    //       element.weTags.forEach((d) => {
+    //         this.listTagOneArray.push(d)
+    //       })
+    //     })
+    //   })
+    // },
+    // getListOrganization() {
+    //   getListOrganization().then(({ rows }) => {
+    //     this.listOrganization = Object.freeze(rows)
+    //   })
+    // },
     getLossRemindStatus() {
       getLossRemindStatus().then(({ data }) => {
         this.isNotice = data
@@ -164,7 +164,14 @@ export default {
 
 <template>
   <div>
-    <el-form ref="queryForm" :inline="true" :model="query" label-width="100px" class="top-search" size="small">
+    <el-form
+      ref="queryForm"
+      :inline="true"
+      :model="query"
+      label-width="100px"
+      class="top-search"
+      size="small"
+    >
       <el-form-item label="客户名称" prop="name">
         <el-input v-model="query.name" placeholder="请输入"></el-input>
       </el-form-item>
@@ -172,7 +179,9 @@ export default {
         <div class="tag-input" @click="dialogVisibleSelectUser = true">
           <span class="tag-place" v-if="!queryUser.length">请选择</span>
           <template v-else>
-            <el-tag type="info" v-for="(unit, unique) in queryUser" :key="unique">{{ unit.name }}</el-tag>
+            <el-tag type="info" v-for="(unit, unique) in queryUser" :key="unique">{{
+              unit.name
+            }}</el-tag>
           </template>
         </div>
       </el-form-item>
@@ -192,14 +201,26 @@ export default {
         <div class="tag-input" @click="showTagDialog">
           <span class="tag-place" v-if="!queryTag.length">请选择</span>
           <template v-else>
-            <el-tag type="info" v-for="(unit, unique) in queryTag" :key="unique">{{ unit.name }}</el-tag>
+            <el-tag type="info" v-for="(unit, unique) in queryTag" :key="unique">{{
+              unit.name
+            }}</el-tag>
           </template>
         </div>
       </el-form-item>
       <el-form-item label=" ">
-        <el-button v-hasPermi="['customerManage:customer:query']" type="primary" @click="getList(1)">查询</el-button>
-        <el-button v-hasPermi="['customerManage:customer:query']" type="success" @click="resetForm()">重置</el-button>
-        <el-button v-hasPermi="['customerManage:customer:export']" type="info" @click="exportCustomer"
+        <el-button v-hasPermi="['customerManage:customer:query']" type="primary" @click="getList(1)"
+          >查询</el-button
+        >
+        <el-button
+          v-hasPermi="['customerManage:customer:query']"
+          type="success"
+          @click="resetForm()"
+          >重置</el-button
+        >
+        <el-button
+          v-hasPermi="['customerManage:customer:export']"
+          type="info"
+          @click="exportCustomer"
           >导出列表</el-button
         >
       </el-form-item>
@@ -248,7 +269,9 @@ export default {
       </el-table-column>
       <el-table-column prop="address" label="标签" align="center">
         <template slot-scope="{ row }" v-if="row.tagNames">
-          <el-tag type="info" v-for="(unit, unique) in row.tagNames.split(',')" :key="unique">{{ unit }}</el-tag>
+          <el-tag type="info" v-for="(unit, unique) in row.tagNames.split(',')" :key="unique">{{
+            unit
+          }}</el-tag>
 
           <!-- <div v-for="(item, index) in row.weFlowerCustomerRels" :key="index">
             <el-tag type="info" v-for="(unit, unique) in item.weFlowerCustomerTagRels" :key="unique">{{
@@ -264,7 +287,7 @@ export default {
             @click="
               $router.push({
                 path: 'customerDetail',
-                query: { data: JSON.stringify(row) }
+                query: { externalUserid: row.externalUserid, userId: row.firstUserId }
               })
             "
             type="text"
@@ -295,7 +318,11 @@ export default {
     </SelectTag>
 
     <!-- 选择添加人弹窗 -->
-    <SelectUser :visible.sync="dialogVisibleSelectUser" title="选择添加人" @success="selectedUser"></SelectUser>
+    <SelectUser
+      :visible.sync="dialogVisibleSelectUser"
+      title="选择添加人"
+      @success="selectedUser"
+    ></SelectUser>
   </div>
 </template>
 

@@ -64,10 +64,21 @@ export default {
 <template>
   <div class="page">
     <el-table ref="multipleTable" :data="list" tooltip-effect="dark" style="width: 100%">
-      <el-table-column v-if="type === 'customer'" prop="customerName" label="客户名称"></el-table-column>
+      <el-table-column
+        v-if="type === 'customer'"
+        prop="customerName"
+        label="客户名称"
+      ></el-table-column>
       <el-table-column v-else prop="groupName" label="群名称"></el-table-column>
-      <el-table-column :prop="type === 'customer' ? 'takeUserName' : 'newOwnerName'" label="接替员工"></el-table-column>
-      <el-table-column prop="department" label="接替员工所属部门" show-overflow-tooltip></el-table-column>
+      <el-table-column
+        :prop="type === 'customer' ? 'takeUserName' : 'newOwnerName'"
+        label="接替员工"
+      ></el-table-column>
+      <el-table-column
+        prop="department"
+        label="接替员工所属部门"
+        show-overflow-tooltip
+      ></el-table-column>
       <el-table-column prop="allocateTime" label="分配时间" show-overflow-tooltip></el-table-column>
       <el-table-column label="操作" width="100">
         <template slot-scope="{ row }">
@@ -76,7 +87,7 @@ export default {
             @click="
               $router.push({
                 path: 'customerDetail',
-                query: { data: JSON.stringify(row) }
+                query: { externalUserid: row.externalUserid, userId: row.firstUserId }
               })
             "
             type="text"

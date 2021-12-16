@@ -340,8 +340,7 @@ export default {
         xData: []
       }
       let series = []
-      let colors = ['#088AEE', '#E74E59', '#14BF48', '#FA7216']
-      this.erchatsTable.dataList.forEach((a) => {
+      let colors = this.erchatsTable.dataList.forEach((a) => {
         data.xData.push(a.xtime)
         data.arr1.push(a.newContactCnt)
         data.arr3.push(a.newMemberCnt)
@@ -356,13 +355,13 @@ export default {
           stack: '总量',
           smooth: true,
           data: data['arr' + index],
-          itemStyle: {
-            normal: {
-              lineStyle: {
-                color: colors[index]
-              }
-            }
-          },
+          // itemStyle: {
+          //   normal: {
+          //     lineStyle: {
+          //       color: colors[index]
+          //     }
+          //   }
+          // },
           textStyle: {
             color: '#fff' // 主标题文字的颜色。
           }
@@ -381,7 +380,7 @@ export default {
         }, 200)
       }
       charts.setOption({
-        // color: [color],
+        color: ['#088AEE', '#E74E59', '#14BF48', '#FA7216'],
         tooltip: {
           trigger: 'axis'
         },

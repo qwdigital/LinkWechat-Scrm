@@ -441,14 +441,14 @@ export default {
 
         <!-- 图片 -->
         <template v-else-if="type === '0'">
-          <el-form-item label="文案" prop="content">
+          <!-- <el-form-item label="文案" prop="content">
             <el-input
               v-model="form.content"
               type="textarea"
               :autosize="{ minRows: 2, maxRows: 50 }"
               placeholder="请输入"
             ></el-input>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="图片" prop="materialUrl">
             <upload :fileUrl.sync="form.materialUrl" :fileName.sync="form.materialName" type="0">
               <div slot="tip">
@@ -456,9 +456,9 @@ export default {
               </div>
             </upload>
           </el-form-item>
-          <el-form-item label="名称" prop="materialName">
+          <!-- <el-form-item label="名称" prop="materialName">
             <el-input v-model="form.materialName" placeholder="请输入"></el-input>
-          </el-form-item>
+          </el-form-item> -->
         </template>
 
         <!-- 图文 -->

@@ -33,46 +33,46 @@ export const constantRoutes = [
     children: [
       {
         path: '/redirect/:path(.*)',
-        component: (resolve) => require(['@/views/redirect'], resolve),
-      },
-    ],
+        component: (resolve) => require(['@/views/redirect'], resolve)
+      }
+    ]
   },
   {
     path: '',
     redirect: '/index',
-    hidden: true,
+    hidden: true
   },
   {
     path: '/index',
     component: Layout,
     redirect: '/index',
-    name: '首页',
-    meta: { title: '首页' },
+    name: '运营中心',
+    meta: { title: '运营中心' },
     children: [
       {
         path: '/index',
         component: (resolve) => require(['@/views/index'], resolve),
-        name: '首页',
+        name: '运营中心',
         hidden: true,
         meta: {
-          title: '首页',
+          title: '运营中心',
           icon: 'dashboard',
           breadcrumb: false,
           noCache: true,
-          affix: true,
-        },
-      },
-    ],
+          affix: true
+        }
+      }
+    ]
   },
   {
     path: '/login',
     component: (resolve) => require(['@/views/login'], resolve),
-    hidden: true,
+    hidden: true
   },
   {
     path: '/authCallback',
     component: (resolve) => require(['@/views/authCallback'], resolve),
-    hidden: true,
+    hidden: true
   },
   // {
   //   path: '/customerManage',
@@ -541,12 +541,11 @@ export const constantRoutes = [
     children: [
       {
         path: 'profile',
-        component: (resolve) =>
-          require(['@/views/system/user/profile/index'], resolve),
+        component: (resolve) => require(['@/views/system/user/profile/index'], resolve),
         name: 'Profile',
-        meta: { title: '个人中心', icon: 'user' },
-      },
-    ],
+        meta: { title: '个人中心', icon: 'user' }
+      }
+    ]
   },
   {
     path: '/dict',
@@ -557,9 +556,9 @@ export const constantRoutes = [
         path: 'type/data/:dictId(\\d+)',
         component: (resolve) => require(['@/views/system/dict/data'], resolve),
         name: 'Data',
-        meta: { title: '字典数据', icon: '' },
-      },
-    ],
+        meta: { title: '字典数据', icon: '' }
+      }
+    ]
   },
   {
     path: '/job',
@@ -570,9 +569,9 @@ export const constantRoutes = [
         path: 'log',
         component: (resolve) => require(['@/views/monitor/job/log'], resolve),
         name: 'JobLog',
-        meta: { title: '调度日志' },
-      },
-    ],
+        meta: { title: '调度日志' }
+      }
+    ]
   },
   {
     path: '/gen',
@@ -581,12 +580,11 @@ export const constantRoutes = [
     children: [
       {
         path: 'edit/:tableId(\\d+)',
-        component: (resolve) =>
-          require(['@/views/tool/gen/editTable'], resolve),
+        component: (resolve) => require(['@/views/tool/gen/editTable'], resolve),
         name: 'GenEdit',
-        meta: { title: '修改生成配置' },
-      },
-    ],
+        meta: { title: '修改生成配置' }
+      }
+    ]
   },
   // {
   //   path: '/test',
@@ -596,17 +594,17 @@ export const constantRoutes = [
   {
     path: '/404',
     component: (resolve) => require(['@/views/error/404'], resolve),
-    hidden: true,
+    hidden: true
   },
   {
     path: '/401',
     component: (resolve) => require(['@/views/error/401'], resolve),
-    hidden: true,
-  },
+    hidden: true
+  }
 ]
 
 export default new Router({
   // mode: 'history',
   scrollBehavior: () => ({ y: 0 }),
-  routes: constantRoutes,
+  routes: constantRoutes
 })
