@@ -81,7 +81,7 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
                     k.setGroupId(weTagGroup.getGroupId());
                 });
 
-                //客户标签
+                //客户企业标签
                 if(weTagGroup.getGroupTagType().equals(new Integer(1))){
                     weTagGroup.setAddWeTags(
                             weTags
@@ -90,7 +90,7 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
                     if (weCropGropTagDtlDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)) {
                         this.batchSaveOrUpdateTagGroupAndTag(ListUtil.toList(weCropGropTagDtlDto.getTag_group()), false);
                     }
-                }else{
+                }else{//群标签或者个人标签
 
                     iWeTagService.saveBatch(weTags);
                 }
@@ -99,13 +99,7 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
             }
 
         }
-//        if (CollectionUtil.isEmpty(weTags)) {
-//            this.save(weTagGroup);
-//        } else {
-//
-//
-//
-//        }
+
 
 
 
@@ -326,7 +320,9 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
 
             if (isSync) {
                 List<WeTagGroup> noExist
-                        = this.list(new LambdaQueryWrapper<WeTagGroup>().notIn(WeTagGroup::getGroupId, weTagGroups.stream().map(WeTagGroup::getGroupId).collect(Collectors.toList())));
+                        = this.list(new LambdaQueryWrapper<WeTagGroup>()
+                                .eq(WeTagGroup::getGroupTagType,new Integer(1))
+                        .notIn(WeTagGroup::getGroupId, weTagGroups.stream().map(WeTagGroup::getGroupId).collect(Collectors.toList())));
                 //企业微信端删除得标签
                 if (CollectionUtil.isNotEmpty(noExist)) {
                     this.removeByIds(noExist.stream().map(WeTagGroup::getGroupId).collect(Collectors.toList()));
@@ -344,7 +340,9 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
                 if (isSync) {
 
                     List<WeTag> noExistWeTags
-                            = iWeTagService.list(new LambdaQueryWrapper<WeTag>().notIn(WeTag::getTagId, weTags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
+                            = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                                    .eq(WeTag::getTagType,new Integer(1))
+                            .notIn(WeTag::getTagId, weTags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
                     if (CollectionUtil.isNotEmpty(noExistWeTags)) {
                         iWeTagService.removeByIds(
                                 noExistWeTags.stream().map(WeTag::getTagId).collect(Collectors.toList())

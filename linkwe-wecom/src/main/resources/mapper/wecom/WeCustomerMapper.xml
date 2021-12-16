@@ -9,10 +9,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wc.avatar,
             wc.`name` as customerName,
             wc.customer_type as customerType,
-            if(wt.tag_type=1,GROUP_CONCAT(wt.`tag_id`),null ) as tagIds,
-            if(wt.tag_type=1,GROUP_CONCAT(wt.`name`),null ) as tagNames,
-            if(wt.tag_type=3,GROUP_CONCAT(wt.`tag_id`),null ) as personTagIds,
-            if(wt.tag_type=3,GROUP_CONCAT(wt.`name`),null ) as personTagNames,
+            GROUP_CONCAT(if(wt.tag_type=1,wt.`tag_id`,null )) as tagIds,
+            GROUP_CONCAT(if(wt.tag_type=1,wt.`name`,null )) as tagNames,
+            GROUP_CONCAT(if(wt.tag_type=3,wt.`tag_id`,null )) as personTagIds,
+            GROUP_CONCAT(if(wt.tag_type=3,wt.`name`,null )) as personTagNames,
             wu.user_name,
             wc.external_userid,
             wc.first_user_id,
@@ -109,20 +109,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT
             wc.`name`,
             wc.other_descr as remark,
-            wc.phone as remark_mobiles,
+            wc.phone as remarkMobiles,
             wc.birthday,
             wc.email,
             wc.address,
             wc.qq,
             wc.position,
-            wc.corp_name as remark_corp_name,
+            wc.corp_name as remarkCorpName,
             wc.other_descr as description,
             wc.first_user_id as user_id,
             wc.avatar,
             wc.external_userid,
             wc.gender,
-            GROUP_CONCAT(wt.`name`)	 as tagNames,
-            GROUP_CONCAT(wt.`tag_id`) as tagIds
+            wc.track_state,
+            wc.customer_type,
+            GROUP_CONCAT(if(wt.tag_type=1,wt.`tag_id`,null )) as tagIds,
+            GROUP_CONCAT(if(wt.tag_type=1,wt.`name`,null )) as tagNames,
+            GROUP_CONCAT(if(wt.tag_type=3,wt.`tag_id`,null )) as personTagIds,
+            GROUP_CONCAT(if(wt.tag_type=3,wt.`name`,null )) as personTagNames
         FROM
             we_customer wc
        LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.user_id = wc.first_user_id AND wfcrf.del_flag=0

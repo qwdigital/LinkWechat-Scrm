@@ -53,4 +53,7 @@ public class WeFlowerCustomerTagRel
 
     @TableLogic
     private Integer delFlag;
+
+    //是否是企业标签:1:是;0:否
+    private Boolean isCompanyTag;
 }

@@ -1,14 +1,13 @@
 package com.linkwechat.web.controller.wecom;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
-import com.linkwechat.wecom.domain.WeCustomerPortrait;
-import com.linkwechat.wecom.domain.WeCustomerTrajectory;
-import com.linkwechat.wecom.domain.WeFlowerCustomerTagRel;
-import com.linkwechat.wecom.domain.WeTagGroup;
+import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.service.*;
 import org.aspectj.weaver.loadtime.Aj;
@@ -33,6 +32,10 @@ public class WeCustomerPortraitController extends BaseController {
 
     @Autowired
     private IWeTagGroupService weTagGroupService;
+
+
+    @Autowired
+    private IWeTagService iWeTagService;
 
 
     @Autowired
@@ -81,21 +84,63 @@ public class WeCustomerPortraitController extends BaseController {
 
 
 
+
+
+
     /**
      * 获取当前系统所有可用标签
+     * @param groupTagType 标签分组类型(1:客户标签;2:群标签)
+     * @param userId 员工id
      * @return
      */
     @GetMapping(value = "/findAllTags")
-    public AjaxResult findAllTags(){
+    public AjaxResult findAllTags(Integer groupTagType,String userId){
 
         return AjaxResult.success(
                 weTagGroupService.selectWeTagGroupList(
                         WeTagGroup.builder()
+                                .groupTagType(groupTagType)
+                                .owner(userId)
                                 .build()
                 )
         );
-
     }
+
+
+    /**
+     * 客户画像个人标签库新增
+     * @param weTagGroup
+     * @return
+     */
+    @PostMapping("/addOrUpdatePersonTags")
+    public AjaxResult addOrUpdatePersonTags(@RequestBody WeTagGroup weTagGroup){
+        if(weTagGroupService.saveOrUpdate(weTagGroup)){
+            List<WeTag> weTags = weTagGroup.getWeTags();
+            if(CollectionUtil.isNotEmpty(weTags)){
+                weTags.stream().forEach(k->{
+                    k.setGroupId(weTagGroup.getGroupId());
+                    k.setTagType(new Integer(3));
+                });
+                iWeTagService.saveOrUpdateBatch(weTags);
+            }
+        }
+        return AjaxResult.success();
+    }
+
+
+    /**
+     * 个人标签删除
+     * @param ids
+     * @return
+     */
+    @DeleteMapping("/deletePersonTag/{ids}")
+    public AjaxResult deletePersonTag(@PathVariable String[] ids){
+        iWeTagService.removeByIds(CollectionUtil.newArrayList(ids));
+
+        return AjaxResult.success();
+    }
+
+
 
 
     /**

@@ -77,15 +77,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         user_id,
         external_userid,
         tag_id,
-        create_time
+        create_time,
+        is_company_tag,
+        del_flag
         ) values
         <foreach collection="tagRels" item="item" index="index" separator=",">
-            (#{item.userId},#{item.externalUserid},#{item.tagId},NOW())
+            (#{item.userId},#{item.externalUserid},#{item.tagId},NOW(),#{item.isCompanyTag},#{item.delFlag})
         </foreach>
         ON DUPLICATE KEY UPDATE
         user_id=IF(we_flower_customer_tag_rel.user_id != null, VALUES(user_id), we_flower_customer_tag_rel.user_id),
         external_userid=IF(we_flower_customer_tag_rel.external_userid != null, VALUES(external_userid), we_flower_customer_tag_rel.external_userid),
-        tag_id=IF(we_flower_customer_tag_rel.tag_id != null, VALUES(tag_id), we_flower_customer_tag_rel.tag_id);
+        tag_id=IF(we_flower_customer_tag_rel.tag_id != null, VALUES(tag_id), we_flower_customer_tag_rel.tag_id),
+        del_flag=IF(we_flower_customer_tag_rel.del_flag != null, we_flower_customer_tag_rel.del_flag, VALUES(del_flag));
     </insert>
     
 </mapper>

@@ -54,12 +54,12 @@ public class WeTagGroup extends BaseEntity
     private Integer delFlag;
 
 
-    /**标签分组类型(1:客户标签;2:群标签)*/
+    /**标签分组类型(1:企业客户标签;2:群标签；3:个人标签)*/
     private Integer groupTagType;
 
 
-
-
+    /**所属人*/
+    private String owner;
 
 
 

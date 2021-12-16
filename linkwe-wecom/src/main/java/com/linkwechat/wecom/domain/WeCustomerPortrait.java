@@ -57,4 +57,17 @@ public class WeCustomerPortrait {
 
     private String tagIds;
 
+
+    //个人标签名
+    private String personTagNames;
+
+    //个人标签id
+    private String personTagIds;
+
+    //当前跟进状态:1:待跟进;2:跟进中;3:已成交;4:无意向;5:已流失
+    private Integer trackState;
+
+    //客户类型 1表示该外部联系人是微信用户，2表示该外部联系人是企业微信用户
+    private Integer customerType;
+
 }

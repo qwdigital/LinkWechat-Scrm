@@ -433,6 +433,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             List<WeFlowerCustomerTagRel> tagRels = iWeFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
                     .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid())
                     .eq(WeFlowerCustomerTagRel::getUserId, weMakeCustomerTag.getUserId())
+                    .eq(WeFlowerCustomerTagRel::getIsCompanyTag,weMakeCustomerTag.getIsCompanyTag())
+                     .eq(WeFlowerCustomerTagRel::getDelFlag,WeConstans.WE_SUCCESS_CODE)
                     .notIn(WeFlowerCustomerTagRel::getTagId, addTag.stream().map(WeTag::getTagId).collect(Collectors.toList()))
             );
             if(CollectionUtil.isNotEmpty(tagRels)){
@@ -441,6 +443,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                         new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
                                 .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid())
                                 .eq(WeFlowerCustomerTagRel::getUserId, weMakeCustomerTag.getUserId())
+                                .eq(WeFlowerCustomerTagRel::getIsCompanyTag,weMakeCustomerTag.getIsCompanyTag())
                                 .notIn(WeFlowerCustomerTagRel::getTagId, addTag.stream().map(WeTag::getTagId).collect(Collectors.toList())
                  ))){
                     cutomerTagEdit.setRemove_tag(
@@ -454,17 +457,21 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 newTagRels.add(
                         WeFlowerCustomerTagRel.builder()
                                 .userId(weMakeCustomerTag.getUserId())
+                                .isCompanyTag(weMakeCustomerTag.getIsCompanyTag())
                                 .externalUserid(weMakeCustomerTag.getExternalUserid())
                                 .tagId(k.getTagId())
+                                .delFlag(WeConstans.WE_SUCCESS_CODE)
                                 .build()
                 );
             });
 
                 iWeFlowerCustomerTagRelService.batchAddOrUpdate(newTagRels);
 
-                weCustomerClient.makeCustomerLabel(
-                        cutomerTagEdit
-                );
+                if(weMakeCustomerTag.getIsCompanyTag()){
+                    weCustomerClient.makeCustomerLabel(
+                            cutomerTagEdit
+                    );
+                }
 
         }else{//为空，取消当前客户所有标签
             List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = iWeFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
@@ -475,14 +482,17 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                         new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
                                 .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid())
                                 .eq(WeFlowerCustomerTagRel::getUserId, weMakeCustomerTag.getUserId()))){
-                    //同步企业微信端
-                    weCustomerClient.makeCustomerLabel(
-                            CutomerTagEdit.builder()
-                                      .external_userid(weMakeCustomerTag.getExternalUserid())
-                                      .userid(weMakeCustomerTag.getUserId())
-                                      .remove_tag(ArrayUtil.toArray(weFlowerCustomerTagRels.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList()), String.class))
-                                      .build()
-                   );
+                    if(weMakeCustomerTag.getIsCompanyTag()){
+                        //同步企业微信端
+                        weCustomerClient.makeCustomerLabel(
+                                CutomerTagEdit.builder()
+                                        .external_userid(weMakeCustomerTag.getExternalUserid())
+                                        .userid(weMakeCustomerTag.getUserId())
+                                        .remove_tag(ArrayUtil.toArray(weFlowerCustomerTagRels.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList()), String.class))
+                                        .build()
+                        );
+                    }
+
                 }
             }
         }
@@ -524,6 +534,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             weCustomer.setFirstUserId(userId);
             weCustomer.setCustomerName(externalUserDetail.getExternal_contact().getName());
             weCustomer.setCustomerType(externalUserDetail.getExternal_contact().getType());
+            weCustomer.setAddMethod(externalUserDetail.getFollow_info().getAdd_way());
             List<ExternalUserDetail.FollowUser> follow_user = externalUserDetail.getFollow_user();
             if(CollectionUtil.isNotEmpty(follow_user)){
                 ExternalUserDetail.FollowUser followUser = follow_user.stream().filter(e -> e.getUserid().equals(userId)).findFirst().get();
@@ -611,6 +622,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         weCustomer.setPhone(weCustomerPortrait.getRemarkMobiles());
         weCustomer.setCorpName(weCustomerPortrait.getRemarkCorpName());
         weCustomer.setFirstUserId(weCustomerPortrait.getUserId());
+        weCustomer.setOtherDescr(weCustomerPortrait.getDescription());
 
 
         this.update(weCustomer,new LambdaQueryWrapper<WeCustomer>()
@@ -695,14 +707,13 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
             weCustomerList.stream().forEach(k->{
 
-                iWeCustomerTrajectoryService.list(new LambdaQueryWrapper<WeCustomerTrajectory>()
-                        .eq(WeCustomerTrajectory::getExternalUserid,k.getExternalUserid())
-                        .eq(WeCustomerTrajectory::getUserId,k.getFirstUserId()));
 
                 trackStates.add(WeCustomerDetail.TrackStates
                         .builder()
                         .userName(k.getUserName())
-
+                        .trackStateList(iWeCustomerTrajectoryService.list(new LambdaQueryWrapper<WeCustomerTrajectory>()
+                                .eq(WeCustomerTrajectory::getExternalUserid, k.getExternalUserid())
+                                .eq(WeCustomerTrajectory::getUserId, k.getFirstUserId())))
                         .build());
 
                 trackUsers.add(
@@ -714,21 +725,27 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                 .build()
                 );
 
-                companyTags.add(
-                        WeCustomerDetail.CompanyOrPersonTag.builder()
-                                .tagIds(k.getTagIds())
-                                .tagsNames(k.getTagNames())
-                                .userName(k.getUserName())
-                                .build()
-                );
+                if(StringUtils.isNotEmpty(k.getTagIds()) && StringUtils.isNotEmpty(k.getTagNames())){
+                    companyTags.add(
+                            WeCustomerDetail.CompanyOrPersonTag.builder()
+                                    .tagIds(k.getTagIds())
+                                    .tagsNames(k.getTagNames())
+                                    .userName(k.getUserName())
+                                    .build()
+                    );
+                }
 
-                personTags.add(
-                        WeCustomerDetail.CompanyOrPersonTag.builder()
-                                .tagIds(k.getPersonTagIds())
-                                .tagsNames(k.getPersonTagNames())
-                                .userName(k.getUserName())
-                                .build()
-                );
+
+                if(StringUtils.isNotEmpty(k.getPersonTagIds()) && StringUtils.isNotEmpty(k.getPersonTagNames())){
+                    personTags.add(
+                            WeCustomerDetail.CompanyOrPersonTag.builder()
+                                    .tagIds(k.getPersonTagIds())
+                                    .tagsNames(k.getPersonTagNames())
+                                    .userName(k.getUserName())
+                                    .build()
+                    );
+                }
+
 
             });
 
