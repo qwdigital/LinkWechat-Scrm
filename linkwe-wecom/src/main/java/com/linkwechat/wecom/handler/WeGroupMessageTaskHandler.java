@@ -100,6 +100,10 @@ public class WeGroupMessageTaskHandler implements ApplicationRunner {
                                                 .eq(WeGroupMessageList::getUserId, sender.getUserId()));
                                     }
                                 });
+                                WeGroupMessageTemplate template = new WeGroupMessageTemplate();
+                                template.setId(templateId.get());
+                                template.setStatus(1);
+                                groupMessageTemplateService.updateById(template);
                             }
                         } finally {
                             redisCache.removeRangeCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY, 0, 0);
