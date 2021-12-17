@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.wecom;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
@@ -58,6 +59,22 @@ public class WeGroupController extends BaseController {
         return dataTable;
     }
 
+
+    /**
+     * 群详情
+     * @param chatId
+     * @return
+     */
+    @GetMapping("/chatDetail/{chatId}")
+    public AjaxResult chatDetail(@PathVariable String chatId){
+        List<WeGroup> weGroups = this.weGroupService.selectWeGroupList(WeGroup.builder()
+                        .chatId(chatId)
+                .build());
+        if(CollectionUtil.isNotEmpty(weGroups)){
+            return AjaxResult.success(weGroups.stream().findFirst().get());
+        }
+        return AjaxResult.success();
+    }
 
     /**
      * 获取所有群接口(不分页)

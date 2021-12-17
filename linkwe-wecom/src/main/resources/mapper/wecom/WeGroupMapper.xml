@@ -25,6 +25,7 @@
         LEFT JOIN we_group_tag_rel wgtr  ON wg.chat_id=wgtr.chat_id
         LEFT JOIN we_tag  wt  ON wt.tag_id=wgtr.tag_id
         <where>
+            <if test="chatId !=null and chatId !=''">wg.chat_id=#{chatId}</if>
             <if test="delFlag !=null"> wg.del_flag=#{delFlag}</if>
             <if test="groupName != null  and groupName != ''"> and wg.group_name like concat('%', #{groupName}, '%')</if>
             <if test="groupLeaderName != null  and groupLeaderName != ''"> and wu.user_name like concat('%', #{groupLeaderName}, '%')</if>
