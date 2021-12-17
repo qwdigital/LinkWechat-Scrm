@@ -24,21 +24,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wgmsr.msg_id,
             wgmsr.msg_template_id,
             wgmsr.external_userid,
-            wc.name as customer_name,
+        (select wc.name from we_customer wc where wc.external_userid = wgmsr.external_userid limit 1) as customer_name,
             wgmsr.user_id,
-            wu.user_name,
+        (select wu.user_name from we_user wu where wu.user_id = wgmsr.user_id limit 1) as user_name,
             wgmsr.chat_id,
-            wg.group_name as chat_name,
+        (select wg.group_name from we_group wg where wg.chat_id = wgmsr.chat_id limit 1) as chat_name,
             wgmsr.status,
             wgmsr.send_time
         from
             we_group_message_send_result wgmsr
-        left join we_user wu on
-            wu.user_id = wgmsr.user_id
-        left join we_customer wc on
-            wc.external_userid = wgmsr.external_userid
-        left join we_group wg on
-            wg.chat_id = wgmsr.chat_id
         <where>
             <if test="id !=null">
                 and wgmsr.id = #{id}
