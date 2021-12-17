@@ -534,14 +534,14 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             weCustomer.setFirstUserId(userId);
             weCustomer.setCustomerName(externalUserDetail.getExternal_contact().getName());
             weCustomer.setCustomerType(externalUserDetail.getExternal_contact().getType());
-            weCustomer.setAddMethod(externalUserDetail.getFollow_info().getAdd_way());
+            weCustomer.setDelFlag(new Integer(0));
             List<ExternalUserDetail.FollowUser> follow_user = externalUserDetail.getFollow_user();
             if(CollectionUtil.isNotEmpty(follow_user)){
                 ExternalUserDetail.FollowUser followUser = follow_user.stream().filter(e -> e.getUserid().equals(userId)).findFirst().get();
 
                 if(null != followUser){
                     weCustomer.setFirstAddTime(new Date(followUser.getCreatetime() * 1000L));
-
+                    weCustomer.setAddMethod(followUser.getAddWay());
                     this.baseMapper.batchAddOrUpdate(
                             ListUtil.toList(weCustomer)
                     );
@@ -636,14 +636,14 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
     @Override
-    public WeCustomerDetail findWeCustomerDetail(String externalUserid,String userId) {
+    public WeCustomerDetail findWeCustomerDetail(String externalUserid,String userId,Integer delFlag) {
         WeCustomerDetail weCustomerDetail=new WeCustomerDetail();
 
 
         List<WeCustomerList> weCustomerList = this.findWeCustomerList(
                 WeCustomerList.builder()
                         .externalUserid(externalUserid)
-                        .delFlag(new Integer(0))
+                        .delFlag(delFlag)
                         .build()
         );
         if(CollectionUtil.isNotEmpty(weCustomerList)){
@@ -685,14 +685,14 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
      * @return
      */
     @Override
-    public WeCustomerDetail findWeCustomerInfoSummary(String externalUserid,String userId) {
+    public WeCustomerDetail findWeCustomerInfoSummary(String externalUserid,String userId,Integer delFlag) {
 
         WeCustomerDetail weCustomerDetail=new WeCustomerDetail();
 
         List<WeCustomerList> weCustomerList = this.findWeCustomerList(WeCustomerList.builder()
                 .externalUserid(externalUserid)
                         .userIds(userId)
-                        .delFlag(new Integer(0))
+                        .delFlag(delFlag)
                 .build());
 
         if(CollectionUtil.isNotEmpty(weCustomerList)){
@@ -772,10 +772,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
      * @return
      */
     @Override
-    public WeCustomerDetail findWeCustomerInfoByUserId(String externalUserid, String userId) {
+    public WeCustomerDetail findWeCustomerInfoByUserId(String externalUserid, String userId,Integer delFlag) {
 
         WeCustomerDetail weCustomerDetail
-                = this.findWeCustomerInfoSummary(externalUserid, userId);
+                = this.findWeCustomerInfoSummary(externalUserid, userId,delFlag);
 
         WeCustomer weCustomer = this.getOne(new LambdaQueryWrapper<WeCustomer>()
                 .eq(WeCustomer::getExternalUserid, externalUserid)

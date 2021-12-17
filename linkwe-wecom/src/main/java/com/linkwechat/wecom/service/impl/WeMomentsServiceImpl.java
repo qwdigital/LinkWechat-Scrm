@@ -84,8 +84,10 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
     @Override
     public void addOrUpdateMoments(WeMoments weMoments) throws InterruptedException {
 
+
         if(weMoments.getType().equals(new Integer(0))){//企业动态
             MomentsParamDto momentsParamDto=new MomentsParamDto();
+            weMoments.setPushTime(new Date());
             weMoments.setIsLwPush(true);
             if(StringUtils.isNotEmpty(weMoments.getContent())){
                 weMoments.getOtherContent().add(
@@ -299,8 +301,7 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
     public void synchEnterpriseMoments(Integer filterType) {
 
 
-        this.baseMapper.removePushLwPush();
-        //入库未同步过的数据
+
         this.synchMoments(filterType);
     }
 
@@ -496,6 +497,9 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
                     });
 
 
+                    if(filterType.equals(new Integer(0))){
+                        baseMapper.removePushLwPush();
+                    }
                      saveOrUpdateBatch(weMoments);
                     if(CollectionUtil.isNotEmpty(interactes)){
                         weMomentsInteracteService.batchAddOrUpdate(interactes);

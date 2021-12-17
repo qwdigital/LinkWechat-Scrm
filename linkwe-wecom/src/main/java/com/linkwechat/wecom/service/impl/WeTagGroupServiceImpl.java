@@ -73,13 +73,10 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
     public void insertWeTagGroup(WeTagGroup weTagGroup) {
 
 
-        List<WeTag> weTags = weTagGroup.getWeTags();
+            List<WeTag> weTags = weTagGroup.getWeTags();
 
-        if(this.save(weTagGroup)){
             if(CollectionUtil.isNotEmpty(weTags)){
-                weTags.stream().forEach(k->{
-                    k.setGroupId(weTagGroup.getGroupId());
-                });
+
 
                 //客户企业标签
                 if(weTagGroup.getGroupTagType().equals(new Integer(1))){
@@ -91,12 +88,14 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
                         this.batchSaveOrUpdateTagGroupAndTag(ListUtil.toList(weCropGropTagDtlDto.getTag_group()), false);
                     }
                 }else{//群标签或者个人标签
-
-                    iWeTagService.saveBatch(weTags);
+                    if(this.save(weTagGroup)) {
+                        weTags.stream().forEach(k->{
+                            k.setGroupId(weTagGroup.getGroupId());
+                        });
+                        iWeTagService.saveBatch(weTags);
+                    }
                 }
 
-
-            }
 
         }
 
@@ -328,9 +327,9 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
                     this.removeByIds(noExist.stream().map(WeTagGroup::getGroupId).collect(Collectors.toList()));
                 }
             }
-
-
             this.saveOrUpdateBatch(weTagGroups);
+
+
 
             List<WeTag> weTags =
                     weTagGroups.stream().map(WeTagGroup::getWeTags).collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);

@@ -111,14 +111,14 @@ public interface IWeCustomerService extends IService<WeCustomer>
      * @param userId
      * @return
      */
-    WeCustomerDetail findWeCustomerDetail(String externalUserid,String userId);
+    WeCustomerDetail findWeCustomerDetail(String externalUserid,String userId,Integer delFlag);
 
 
     /**
      * 客户画像汇总
      * @return
      */
-    WeCustomerDetail findWeCustomerInfoSummary(String externalUserid,String userId);
+    WeCustomerDetail findWeCustomerInfoSummary(String externalUserid,String userId,Integer delFlag);
 
 
 
@@ -126,7 +126,7 @@ public interface IWeCustomerService extends IService<WeCustomer>
      * 单个跟进人客户
      * @return
      */
-    WeCustomerDetail findWeCustomerInfoByUserId(String externalUserid,String userId);
+    WeCustomerDetail findWeCustomerInfoByUserId(String externalUserid,String userId,Integer delFlag);
 
 
     /**

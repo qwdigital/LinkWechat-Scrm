@@ -153,13 +153,14 @@ public class WeCustomerController extends BaseController
      *  客户详情基础(基础信息+社交关系)
      * @param externalUserid
      * @param userId
+     * @param
      * @return
      */
     @GetMapping("/findWeCustomerBaseInfo")
-    public AjaxResult findWeCustomerBaseInfo(String externalUserid,String userId){
+    public AjaxResult findWeCustomerBaseInfo(String externalUserid,String userId,@RequestParam(defaultValue = "0") Integer delFlag){
 
         return AjaxResult.success(
-                weCustomerService.findWeCustomerDetail(externalUserid,userId)
+                weCustomerService.findWeCustomerDetail(externalUserid,userId,delFlag)
         );
     }
 
@@ -170,11 +171,11 @@ public class WeCustomerController extends BaseController
      * @return
      */
     @GetMapping("/findWeCustomerInfoSummary")
-    public AjaxResult findWeCustomerInfoSummary(String externalUserid){
+    public AjaxResult findWeCustomerInfoSummary(String externalUserid,@RequestParam(defaultValue = "0") Integer delFlag){
 
 
         return AjaxResult.success(
-                weCustomerService.findWeCustomerInfoSummary(externalUserid,null)
+                weCustomerService.findWeCustomerInfoSummary(externalUserid,null,delFlag)
         );
     }
 
@@ -186,12 +187,12 @@ public class WeCustomerController extends BaseController
      * @return
      */
     @GetMapping("/findWeCustomerInfoByUserId")
-    public AjaxResult findWeCustomerInfoByUserId(String externalUserid,String userId){
+    public AjaxResult findWeCustomerInfoByUserId(String externalUserid,String userId,@RequestParam(defaultValue = "0") Integer delFlag){
 
 
 
         return AjaxResult.success(
-                weCustomerService.findWeCustomerInfoByUserId(externalUserid,userId)
+                weCustomerService.findWeCustomerInfoByUserId(externalUserid,userId,delFlag)
         );
     }
 
