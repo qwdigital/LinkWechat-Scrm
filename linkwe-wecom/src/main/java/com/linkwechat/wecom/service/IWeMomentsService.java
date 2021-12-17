@@ -18,4 +18,6 @@ public interface IWeMomentsService extends IService<WeMoments> {
     void synchEnterpriseMoments(Integer filterType);
 
     WeMoments findMomentsDetail(String momentId);
+
+    void synchMomentsInteracte(List<String> userIds);
 }

@@ -318,6 +318,44 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
 
 
     /**
+     * 同步指定员工个人朋友圈互动情况
+     * @param userIds
+     */
+    @Override
+    @Async
+    public void synchMomentsInteracte(List<String> userIds) {
+
+        if(CollectionUtil.isNotEmpty(userIds)){
+            userIds.stream().forEach(userId->{
+
+
+                List<WeMoments> weMoments = this.list(new LambdaQueryWrapper<WeMoments>()
+                        .apply(StringUtils.isNotEmpty(userId), "FIND_IN_SET('" + userId + "',add_user)")
+                        .eq(WeMoments::getType,1)
+                        .eq(WeMoments::getDelFlag, WeConstans.WE_SUCCESS_CODE));
+                if(CollectionUtil.isNotEmpty(weMoments)){
+                    List<WeMomentsInteracte> interactes=new ArrayList<>();
+                    weMoments.stream().forEach(moment->{
+                        interactes.addAll(
+                                getInteracte(moment.getMomentId(), moment.getCreator())
+                        );
+                    });
+                    if(CollectionUtil.isNotEmpty(interactes)){
+                        weMomentsInteracteService.batchAddOrUpdate(interactes);
+                    }
+                }
+
+
+
+            });
+
+        }
+
+
+    }
+
+
+    /**
      * 同步朋友圈
      */
 
@@ -344,49 +382,53 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
                     moments.stream().forEach(moment -> {
 
                     if(moment.getCreate_type().equals(new Integer(1))){//个人,获取互动数据
-                            MomentsInteracteResultDto momentComments = weMomentsClient.get_moment_comments(MomentsInteracteParamDto.builder()
-                                    .moment_id(moment.getMoment_id())
-                                    .userid(moment.getCreator())
-                                    .build());
-                            if(momentComments.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
-                                List<MomentsInteracteResultDto.Interacte> comment_list
-                                        = momentComments.getComment_list();
 
-                                if(CollectionUtil.isNotEmpty(comment_list)){//评论
-                                    comment_list.stream().forEach(k->{
-                                        interactes.add(
-                                                WeMomentsInteracte.builder()
-                                                        .interacteUserType(StringUtils.isNotEmpty(k.getUserid())?new Integer(0):new Integer(1))
-                                                        .interacteType(new Integer(0))
-                                                        .interacteUserId(StringUtils.isNotEmpty(k.getUserid())?k.getUserid():k.getExternal_userid())
-                                                        .interacteTime(new Date(k.getCreate_time()* 1000L))
-                                                        .momentId(moment.getMoment_id())
-                                                        .build()
-                                        );
-                                    });
-
-                                }
-
-                                List<MomentsInteracteResultDto.Interacte> like_list
-                                        = momentComments.getLike_list();
-
-                                if(CollectionUtil.isNotEmpty(like_list)){ //点赞
-                                    like_list.stream().forEach(k->{
-                                        interactes.add(
-                                                WeMomentsInteracte.builder()
-                                                        .interacteUserType(StringUtils.isNotEmpty(k.getUserid())?new Integer(0):new Integer(1))
-                                                        .interacteType(new Integer(1))
-                                                        .interacteUserId(StringUtils.isNotEmpty(k.getUserid())?k.getUserid():k.getExternal_userid())
-                                                        .interacteTime(new Date(k.getCreate_time()* 1000L))
-                                                        .momentId(moment.getMoment_id())
-                                                        .build()
-                                        );
-                                    });
-                                }
+                        interactes.addAll(getInteracte(moment.getMoment_id(),moment.getCreator()));
 
 
-
-                            }
+//                            MomentsInteracteResultDto momentComments = weMomentsClient.get_moment_comments(MomentsInteracteParamDto.builder()
+//                                    .moment_id(moment.getMoment_id())
+//                                    .userid(moment.getCreator())
+//                                    .build());
+//                            if(momentComments.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
+//                                List<MomentsInteracteResultDto.Interacte> comment_list
+//                                        = momentComments.getComment_list();
+//
+//                                if(CollectionUtil.isNotEmpty(comment_list)){//评论
+//                                    comment_list.stream().forEach(k->{
+//                                        interactes.add(
+//                                                WeMomentsInteracte.builder()
+//                                                        .interacteUserType(StringUtils.isNotEmpty(k.getUserid())?new Integer(0):new Integer(1))
+//                                                        .interacteType(new Integer(0))
+//                                                        .interacteUserId(StringUtils.isNotEmpty(k.getUserid())?k.getUserid():k.getExternal_userid())
+//                                                        .interacteTime(new Date(k.getCreate_time()* 1000L))
+//                                                        .momentId(moment.getMoment_id())
+//                                                        .build()
+//                                        );
+//                                    });
+//
+//                                }
+//
+//                                List<MomentsInteracteResultDto.Interacte> like_list
+//                                        = momentComments.getLike_list();
+//
+//                                if(CollectionUtil.isNotEmpty(like_list)){ //点赞
+//                                    like_list.stream().forEach(k->{
+//                                        interactes.add(
+//                                                WeMomentsInteracte.builder()
+//                                                        .interacteUserType(StringUtils.isNotEmpty(k.getUserid())?new Integer(0):new Integer(1))
+//                                                        .interacteType(new Integer(1))
+//                                                        .interacteUserId(StringUtils.isNotEmpty(k.getUserid())?k.getUserid():k.getExternal_userid())
+//                                                        .interacteTime(new Date(k.getCreate_time()* 1000L))
+//                                                        .momentId(moment.getMoment_id())
+//                                                        .build()
+//                                        );
+//                                    });
+//                                }
+//
+//
+//
+//                            }
                         }
 
 
@@ -513,6 +555,60 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
 
 
 
+
+    }
+
+
+    //获取互动数据
+    private List<WeMomentsInteracte> getInteracte(String momentId,String creator){
+        List<WeMomentsInteracte> interactes=new ArrayList<>();
+
+        MomentsInteracteResultDto momentComments = weMomentsClient.get_moment_comments(MomentsInteracteParamDto.builder()
+                .moment_id(momentId)
+                .userid(creator)
+                .build());
+
+        if(momentComments.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
+            List<MomentsInteracteResultDto.Interacte> comment_list
+                    = momentComments.getComment_list();
+
+            if(CollectionUtil.isNotEmpty(comment_list)){//评论
+                comment_list.stream().forEach(k->{
+                    interactes.add(
+                            WeMomentsInteracte.builder()
+                                    .interacteUserType(StringUtils.isNotEmpty(k.getUserid())?new Integer(0):new Integer(1))
+                                    .interacteType(new Integer(0))
+                                    .interacteUserId(StringUtils.isNotEmpty(k.getUserid())?k.getUserid():k.getExternal_userid())
+                                    .interacteTime(new Date(k.getCreate_time()* 1000L))
+                                    .momentId(momentId)
+                                    .build()
+                    );
+                });
+
+            }
+
+            List<MomentsInteracteResultDto.Interacte> like_list
+                    = momentComments.getLike_list();
+
+            if(CollectionUtil.isNotEmpty(like_list)){ //点赞
+                like_list.stream().forEach(k->{
+                    interactes.add(
+                            WeMomentsInteracte.builder()
+                                    .interacteUserType(StringUtils.isNotEmpty(k.getUserid())?new Integer(0):new Integer(1))
+                                    .interacteType(new Integer(1))
+                                    .interacteUserId(StringUtils.isNotEmpty(k.getUserid())?k.getUserid():k.getExternal_userid())
+                                    .interacteTime(new Date(k.getCreate_time()* 1000L))
+                                    .momentId(momentId)
+                                    .build()
+                    );
+                });
+            }
+
+
+
+        }
+
+        return interactes;
 
     }
 

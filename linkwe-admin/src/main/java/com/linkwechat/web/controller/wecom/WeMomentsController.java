@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.wecom;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -105,6 +106,19 @@ public class WeMomentsController extends BaseController {
         return AjaxResult.success(WeConstans.SYNCH_TIP);
     }
 
+
+    /**
+     * 个人朋友圈互动数据同步
+     * @param userIds
+     * @return
+     */
+    @GetMapping("/synchMomentsInteracte/{userIds}")
+    public AjaxResult synchMomentsInteracte(@PathVariable String[] userIds){
+
+        iWeMomentsService.synchMomentsInteracte(CollectionUtil.newArrayList(userIds));
+
+        return AjaxResult.success(WeConstans.SYNCH_TIP);
+    }
 
 
 
