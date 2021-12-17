@@ -287,7 +287,11 @@ export default {
             @click="
               $router.push({
                 path: 'customerDetail',
-                query: { externalUserid: row.externalUserid, userId: row.firstUserId }
+                query: {
+                  externalUserid: row.externalUserid,
+                  userId: row.firstUserId,
+                  delFlag: row.delFlag
+                }
               })
             "
             type="text"

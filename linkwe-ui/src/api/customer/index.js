@@ -3,7 +3,7 @@ const service = window.CONFIG.services.wecom + '/customer'
 
 /**
  * 客户列表
- * @param {*} params 
+ * @param {*} params
  * {
     "pageNum": "当前页",
     "pageSize": "每页显示条数",
@@ -29,7 +29,7 @@ export function getListNew(params) {
 
 /**
  * 客户列表
- * @param {*} params 
+ * @param {*} params
  * {
     "pageNum": "当前页",
     "pageSize": "每页显示条数",
@@ -60,7 +60,7 @@ export function sync() {
 
 /**
  * 编辑客户标签
- * @param {*} data 
+ * @param {*} data
  * {
     "externalUserid": "外部联系人userid",
     "addTag": [{
@@ -80,7 +80,7 @@ export function makeLabel(data) {
 
 /**
  * 移除客户标签
- * @param {*} data 
+ * @param {*} data
  * {
     "externalUserid": "外部联系人userid",
     "addTag": [{
@@ -100,7 +100,7 @@ export function removeLabel(data) {
 
 /**
  * 客户生日编辑
- * @param {*} data 
+ * @param {*} data
  * {
   "externalUserid": "",
   "birthday": ""
@@ -162,8 +162,10 @@ export function jobExtends(data) {
  * @param {*}
  * externalUserid	是	当前客户id
  * userId	是	当前跟进人id
+ * delFlag: 1 用户是否流失 0 未流失，1流失
  */
 export function getDetail(params) {
+  params.delFlag = 1
   return request({
     url: service + '/findWeCustomerBaseInfo',
     params
@@ -174,12 +176,14 @@ export function getDetail(params) {
  *客户画像汇总
  * @param {*}
  * externalUserid	是	当前客户id
+ * delFlag: 1 用户是否流失 0 未流失，1流失
  */
 export function getSummary(externalUserid) {
   return request({
     url: service + '/findWeCustomerInfoSummary',
     params: {
-      externalUserid
+      externalUserid,
+      delFlag: 1
     }
   })
 }
@@ -188,6 +192,7 @@ export function getSummary(externalUserid) {
  * @param {*} params
  * externalUserid	是	当前客户id
  * userId	是	当前跟进人id
+ * delFlag: 1 用户是否流失 0 未流失，1流失
  * @returns
  */
 export function getCustomerInfoByUserId(externalUserid, userId) {
@@ -195,7 +200,8 @@ export function getCustomerInfoByUserId(externalUserid, userId) {
     url: service + '/findWeCustomerInfoByUserId',
     params: {
       externalUserid,
-      userId
+      userId,
+      delFlag: 1
     }
   })
 }
@@ -203,7 +209,7 @@ export function getCustomerInfoByUserId(externalUserid, userId) {
 /**
  *跟进记录(客户轨迹)
  userId  trajectoryType 二个值得默认传null，则返回所有
- * @param {*} 
+ * @param {*}
  * externalUserid	是	当前客户id
  * userId		当前跟进人id
  * pageNum: 1,
