@@ -46,11 +46,7 @@ export default {
       lastSyncTime: 0
     }
   },
-  computed: {
-    isSync() {
-      return (+new Date() - +new Date(this.lastSyncTime)) / 3600000 < 2
-    }
-  },
+  computed: {},
   created() {
     // this.query.groupTagType = this.type
     this.getList()
@@ -78,10 +74,6 @@ export default {
       this.dialogVisible = true
     },
     syncTag() {
-      if (this.isSync) {
-        this.msgError('由于企业微信开放平台的限制，两小时内不得重复同步操作')
-        return
-      }
       const loading = this.$loading({
         lock: true,
         text: 'Loading',
@@ -125,20 +117,16 @@ export default {
   <div class="">
     <div class="mid-action">
       <div>
-        <el-button v-hasPermi="['customerManage:tag:add']" type="primary" @click="edit()"
+        <el-button
+          v-hasPermi="['customerManage:tag:add']"
+          type="primary"
+          class="mr10"
+          @click="edit()"
           >新建标签组</el-button
         >
-        <el-tooltip
-          effect="light"
-          :disabled="!isSync"
-          class="item"
-          content="由于企业微信开放平台的限制，两小时内不得重复同步操作"
-          placement="top-start"
-        >
-          <el-button v-if="type == 1" v-preventReClick type="primary" plain @click="syncTag">
-            同步企微标签
-          </el-button>
-        </el-tooltip>
+        <ButtonSync v-if="type == 1" :lastSyncTime="lastSyncTime" @click="syncTag">
+          同步企微标签
+        </ButtonSync>
       </div>
       <div>
         <el-button

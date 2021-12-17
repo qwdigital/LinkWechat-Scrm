@@ -41,11 +41,7 @@ export default {
       makeLabelCustomerList: []
     }
   },
-  computed: {
-    isSync() {
-      return (+new Date() - +new Date(this.lastSyncTime)) / 3600000 < 2
-    }
-  },
+  computed: {},
   created() {
     this.getList()
   },
@@ -143,10 +139,6 @@ export default {
       this.getList(1)
     },
     sync() {
-      if (this.isSync) {
-        this.msgError('由于企业微信开放平台的限制，两小时内不得重复同步操作')
-        return
-      }
       const loading = this.$loading({
         lock: true,
         text: 'Loading',
@@ -228,9 +220,8 @@ export default {
       <div class="">
         <!-- 己选
         <span class="num">{{total}}</span> 个客户群-->
-        <el-button v-hasPermi="['customerManage:group:sync']" type="primary" @click="sync"
-          >同步客户群</el-button
-        >
+
+        <ButtonSync :lastSyncTime="lastSyncTime" @click="sync">同步客户群</ButtonSync>
         <span class="sub-text-color">
           最近同步：{{ lastSyncTime }}
           <!-- <span class="num">{{total}}</span> 条信息 ，

@@ -30,7 +30,7 @@ export default {
     }
   },
   computed: {
-    isSync() {
+    disabled() {
       return (+new Date() - +new Date(this.lastSyncTime)) / 3600000 < 2
     }
   },
@@ -82,10 +82,6 @@ export default {
       this.active = type
     },
     sync() {
-      if (this.isSync) {
-        this.msgError('由于企业微信开放平台的限制，两小时内不得重复同步操作')
-        return
-      }
       this.openTrack = ['0']
       this.active = '0'
       this.$refs['record'][0].$forceUpdate()
@@ -189,22 +185,10 @@ export default {
           <el-card>
             <div slot="header">
               <span class="card-title">客户轨迹</span>
-              <el-tooltip
-                effect="light"
-                :disabled="!isSync"
-                class="item"
-                content="由于企业微信开放平台的限制，两小时内不得重复同步操作"
-                placement="top-start"
+
+              <ButtonSync class="btn-sync" :lastSyncTime="lastSyncTime" @click="sync"
+                >同步</ButtonSync
               >
-                <el-button
-                  v-preventReClick
-                  style="color: #13a2e8;padding: 0;"
-                  class="fr cp"
-                  type="text"
-                  @click="sync"
-                  >同步</el-button
-                >
-              </el-tooltip>
             </div>
             <div class="flex track-tab-wrap mb15">
               <div
@@ -265,5 +249,10 @@ export default {
       color: #fff;
     }
   }
+}
+.btn-sync {
+  position: relative;
+  float: right;
+  top: -11px;
 }
 </style>

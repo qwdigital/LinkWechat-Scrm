@@ -58,11 +58,7 @@ export default {
     }
   },
   watch: {},
-  computed: {
-    isSync() {
-      return (+new Date() - +new Date(this.lastSyncTime)) / 3600000 < 2
-    }
-  },
+  computed: {},
   created() {
     this.getList()
     this.getListTag()
@@ -206,10 +202,6 @@ export default {
       // this.$refs.selectTag.$forceUpdate()
     },
     sync() {
-      if (this.isSync) {
-        this.msgError('由于企业微信开放平台的限制，两小时内不得重复同步操作')
-        return
-      }
       const loading = this.$loading({
         lock: true,
         text: 'Loading',
@@ -418,21 +410,7 @@ export default {
         <!-- 共
         <span class="num">{{ total }}</span> 位客户，实际客户
         <span class="num">{{ total }}</span> 位。 -->
-        <el-tooltip
-          effect="light"
-          :disabled="!isSync"
-          class="item"
-          content="由于企业微信开放平台的限制，两小时内不得重复同步操作"
-          placement="top-start"
-        >
-          <el-button
-            v-hasPermi="['customerManage:customer:sync']"
-            v-preventReClick
-            type="primary"
-            @click="sync"
-            >同步客户</el-button
-          >
-        </el-tooltip>
+        <ButtonSync :lastSyncTime="lastSyncTime" @click="sync">同步客户</ButtonSync>
         <!-- <el-button v-hasPermi="['customerManage:customer:checkRepeat']" type="primary">查看重复客户</el-button> -->
         <span class="sub-text-color"> 最近同步：{{ lastSyncTime }} </span>
       </div>

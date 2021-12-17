@@ -160,13 +160,6 @@ export default {
     </div>
   </el-dialog>
 </template>
-<style>
-.el-tag.el-tag--info {
-  background-color: #f4f4f5;
-  border-color: #e9e9eb;
-  color: #909399;
-}
-</style>
 <style lang="scss" scoped>
 .user-list {
   .el-row {
