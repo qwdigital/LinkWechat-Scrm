@@ -184,86 +184,87 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
             String msgContent = query.getAttachmentsList().stream().map(item -> MessageType.messageTypeOf(item.getMsgType()).getName()).collect(Collectors.joining(","));
             weGroupMessageTemplate.setContent(msgContent);
         }
-        try {
-            if (save(weGroupMessageTemplate)) {
-                query.setId(weGroupMessageTemplate.getId());
-                //保存附件
-                List<WeGroupMessageAttachments> attachmentsList = Optional.ofNullable(query.getAttachmentsList()).orElseGet(ArrayList::new).stream().map(attachment -> {
-                    WeGroupMessageAttachments attachments = new WeGroupMessageAttachments();
-                    BeanUtil.copyProperties(attachment, attachments);
-                    attachments.setMsgTemplateId(weGroupMessageTemplate.getId());
-                    return attachments;
-                }).collect(Collectors.toList());
+        if (save(weGroupMessageTemplate)) {
+            query.setId(weGroupMessageTemplate.getId());
+            //保存附件
+            List<WeGroupMessageAttachments> attachmentsList = Optional.ofNullable(query.getAttachmentsList()).orElseGet(ArrayList::new).stream().map(attachment -> {
+                WeGroupMessageAttachments attachments = new WeGroupMessageAttachments();
+                BeanUtil.copyProperties(attachment, attachments);
+                attachments.setMsgTemplateId(weGroupMessageTemplate.getId());
+                return attachments;
+            }).collect(Collectors.toList());
 
-                if (StringUtils.isNotEmpty(query.getContent())) {
-                    WeGroupMessageAttachments attachments = new WeGroupMessageAttachments();
-                    attachments.setMsgTemplateId(weGroupMessageTemplate.getId());
-                    attachments.setContent(query.getContent());
-                    attachments.setMsgType(MessageType.TEXT.getMessageType());
-                    attachmentsList.add(attachments);
-                }
-                attachmentsService.saveBatch(attachmentsList);
-
-
-                List<WeGroupMessageList> weGroupMessageLists = new ArrayList<>();
-                List<WeGroupMessageTask> messageTaskList = new ArrayList<>();
-                List<WeGroupMessageSendResult> sendResultList = new ArrayList<>();
-                for (WeAddGroupMessageQuery.SenderInfo senderInfo :senderList ) {
-                    WeGroupMessageList weGroupMessageList = new WeGroupMessageList();
-                    weGroupMessageList.setMsgTemplateId(weGroupMessageTemplate.getId());
-                    if(query.getChatType() == 1){
-                        weGroupMessageList.setChatType("single");
-                    }else {
-                        weGroupMessageList.setChatType("group");
-                    }
-                    weGroupMessageList.setUserId(senderInfo.getUserId());
-                    weGroupMessageLists.add(weGroupMessageList);
-
-                    WeGroupMessageTask messageTask = new WeGroupMessageTask();
-                    messageTask.setMsgTemplateId(weGroupMessageTemplate.getId());
-                    messageTask.setUserId(senderInfo.getUserId());
-                    messageTaskList.add(messageTask);
-
-                    List<WeGroupMessageSendResult> messageSendResults = Optional.ofNullable(senderInfo.getCustomerList())
-                            .orElseGet(ArrayList::new).stream().map(eid -> {
-                        WeGroupMessageSendResult messageSendResult = new WeGroupMessageSendResult();
-                        messageSendResult.setMsgTemplateId(weGroupMessageTemplate.getId());
-                        messageSendResult.setUserId(senderInfo.getUserId());
-                        messageSendResult.setExternalUserid(eid);
-                        return messageSendResult;
-                    }).collect(Collectors.toList());
-                    sendResultList.addAll(messageSendResults);
-                }
-
-                //保存发送任务
-                weGroupMessageListService.saveBatch(weGroupMessageLists);
-                //保存成员发送任务
-                messageTaskService.saveBatch(messageTaskList);
-                //保存发送客户或者客户群
-                messageSendResultService.saveBatch(sendResultList);
-
-                if (ObjectUtil.equal(0, query.getIsTask()) && query.getSendTime() == null) {
-                    redisCache.setCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY, JSONObject.toJSONString(query), System.currentTimeMillis());
-                } else {
-                    redisCache.setCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY, JSONObject.toJSONString(query), query.getSendTime().getTime());
-                }
-
+            if (StringUtils.isNotEmpty(query.getContent())) {
+                WeGroupMessageAttachments attachments = new WeGroupMessageAttachments();
+                attachments.setMsgTemplateId(weGroupMessageTemplate.getId());
+                attachments.setContent(query.getContent());
+                attachments.setMsgType(MessageType.TEXT.getMessageType());
+                attachmentsList.add(attachments);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            attachmentsService.saveBatch(attachmentsList);
+
+
+            List<WeGroupMessageList> weGroupMessageLists = new ArrayList<>();
+            List<WeGroupMessageTask> messageTaskList = new ArrayList<>();
+            List<WeGroupMessageSendResult> sendResultList = new ArrayList<>();
+            for (WeAddGroupMessageQuery.SenderInfo senderInfo :senderList ) {
+                WeGroupMessageList weGroupMessageList = new WeGroupMessageList();
+                weGroupMessageList.setMsgTemplateId(weGroupMessageTemplate.getId());
+                if(query.getChatType() == 1){
+                    weGroupMessageList.setChatType("single");
+                }else {
+                    weGroupMessageList.setChatType("group");
+                }
+                weGroupMessageList.setUserId(senderInfo.getUserId());
+                weGroupMessageLists.add(weGroupMessageList);
+
+                WeGroupMessageTask messageTask = new WeGroupMessageTask();
+                messageTask.setMsgTemplateId(weGroupMessageTemplate.getId());
+                messageTask.setUserId(senderInfo.getUserId());
+                messageTaskList.add(messageTask);
+
+                List<WeGroupMessageSendResult> messageSendResults = Optional.ofNullable(senderInfo.getCustomerList())
+                        .orElseGet(ArrayList::new).stream().map(eid -> {
+                            WeGroupMessageSendResult messageSendResult = new WeGroupMessageSendResult();
+                            messageSendResult.setMsgTemplateId(weGroupMessageTemplate.getId());
+                            messageSendResult.setUserId(senderInfo.getUserId());
+                            messageSendResult.setExternalUserid(eid);
+                            return messageSendResult;
+                        }).collect(Collectors.toList());
+                sendResultList.addAll(messageSendResults);
+            }
+
+            //保存发送任务
+            weGroupMessageListService.saveBatch(weGroupMessageLists);
+            //保存成员发送任务
+            messageTaskService.saveBatch(messageTaskList);
+            //保存发送客户或者客户群
+            messageSendResultService.saveBatch(sendResultList);
+
+            if (ObjectUtil.equal(0, query.getIsTask()) && query.getSendTime() == null) {
+                redisCache.setCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY, JSONObject.toJSONString(query), System.currentTimeMillis());
+            } else {
+                redisCache.setCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY, JSONObject.toJSONString(query), query.getSendTime().getTime());
+            }
+
         }
     }
 
     private void checkSenderList(WeAddGroupMessageQuery query, List<WeAddGroupMessageQuery.SenderInfo> senderList) {
         if(query.getIsAll() && CollectionUtil.isEmpty(senderList)){
             if(query.getChatType() == 1){
-                List<WeCustomer> customerList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().select(WeCustomer::getExternalUserid)
-                        .eq(WeCustomer::getDelFlag, 0).groupBy(WeCustomer::getExternalUserid));
+                List<WeCustomer> customerList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
+                        .select(WeCustomer::getExternalUserid,WeCustomer::getFirstUserId)
+                        .eq(WeCustomer::getDelFlag, 0).groupBy(WeCustomer::getExternalUserid,WeCustomer::getFirstUserId));
                 if(CollectionUtil.isNotEmpty(customerList)){
-                    List<String> eids = customerList.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
-                    WeAddGroupMessageQuery.SenderInfo senderInfo = new WeAddGroupMessageQuery.SenderInfo();
-                    senderInfo.setCustomerList(eids);
-                    senderList.add(senderInfo);
+                    Map<String, List<WeCustomer>> customerMap = customerList.stream().collect(Collectors.groupingBy(WeCustomer::getFirstUserId));
+                    customerMap.forEach((userId, customers) ->{
+                        List<String> eids = customers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
+                        WeAddGroupMessageQuery.SenderInfo senderInfo = new WeAddGroupMessageQuery.SenderInfo();
+                        senderInfo.setCustomerList(eids);
+                        senderInfo.setUserId(userId);
+                        senderList.add(senderInfo);
+                    });
                 }else {
                     throw new WeComException("暂无客户可发送");
                 }
