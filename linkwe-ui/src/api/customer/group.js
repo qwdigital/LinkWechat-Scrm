@@ -1,6 +1,13 @@
 import request from '@/utils/request'
 const service = window.CONFIG.services.wecom + '/group'
 
+export function getDetail(chatId) {
+  return request({
+    url: service + `/chat/chatDetail/${chatId}`,
+    method: 'get'
+  })
+}
+
 /**
  * 客户群列表
  * @param {*} data
@@ -24,10 +31,10 @@ export function getList(params) {
 
 /**
  * 群成员列表
- * @param {*} params 
+ * @param {*} params
  * {
-  "groupId": "群id",
-  "memberName": "成员名称",
+  "chatId": "群id",
+  "name": "成员名称",
   "pageNum": "",
   "pageSize": ""
 }
@@ -60,8 +67,8 @@ export function sync() {
     }
   ]
 }
- * @param {*} data 
- * @returns 
+ * @param {*} data
+ * @returns
  */
 export function makeGroupTag(data) {
   return request({

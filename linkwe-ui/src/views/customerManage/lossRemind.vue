@@ -290,7 +290,7 @@ export default {
                 query: {
                   externalUserid: row.externalUserid,
                   userId: row.firstUserId,
-                  delFlag: row.delFlag
+                  delFlag: 1
                 }
               })
             "

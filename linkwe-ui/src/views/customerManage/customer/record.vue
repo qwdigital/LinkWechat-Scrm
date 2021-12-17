@@ -1,5 +1,5 @@
 <script>
-import { getFollowUpRecord } from '@/api/customer'
+import { getFollowUpRecord, syncTrack } from '@/api/customer'
 import { dictTrackState } from '@/utils/dictionary'
 export default {
   name: '',
@@ -68,6 +68,18 @@ export default {
         .catch(() => {
           this.loading = false
         })
+    },
+    sync() {
+      this.loading = true
+      syncTrack(this.userId)
+        .then(() => {
+          this.getList(1)
+          this.msgSuccess('后台开始同步数据，请稍后关注进度')
+        })
+        .catch((fail) => {
+          this.loading = false
+          console.error(fail)
+        })
     }
   }
 }
@@ -76,7 +88,7 @@ export default {
 <template>
   <div v-loading="loading">
     <template v-if="viewType">
-      <el-table :data="list" v-loading="loading">
+      <el-table :data="list">
         <el-table-column label="员工" align="center" prop="userName" />
         <el-table-column label="跟进记录" align="center" prop="trackContent" />
         <el-table-column prop="trackState" label="跟进状态" align="center">

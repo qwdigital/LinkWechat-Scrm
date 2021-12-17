@@ -207,7 +207,7 @@ export default {
         <el-button v-hasPermi="['customerManage:group:query']" type="primary" @click="getList(1)"
           >查询</el-button
         >
-        <el-button v-hasPermi="['customerManage:group:query']" type="info" @click="resetQuery"
+        <el-button v-hasPermi="['customerManage:group:query']" type="success" @click="resetQuery"
           >重置</el-button
         >
         <!-- <el-button v-hasPermi="['customerManage:group:export']" type="success" @click="handleExport"
@@ -272,7 +272,7 @@ export default {
             @click="
               $router.push({
                 path: 'groupDetail',
-                query: scope.row
+                query: { chatId: scope.row.chatId }
               })
             "
             v-hasPermi="['customerManage:group:view']"

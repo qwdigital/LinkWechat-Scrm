@@ -36,22 +36,22 @@ export default {
     this.getDetail()
   },
   methods: {
-    updateBirthday() {
-      if (!this.birthday || this.birthday == this.customer.birthday) {
-        return
-      }
-      let data = {
-        externalUserid: this.customer.externalUserid,
-        birthday: this.birthday,
-        firstUserId: this.customer.firstUserId
-      }
-      updateBirthday(data).then((response) => {
-        this.msgSuccess('操作成功')
-        // this.getDetail()
-        this.$set(this.customer, 'birthday', this.birthday)
-        // this.datePickerVisible = false
-      })
-    },
+    // updateBirthday() {
+    //   if (!this.birthday || this.birthday == this.customer.birthday) {
+    //     return
+    //   }
+    //   let data = {
+    //     externalUserid: this.customer.externalUserid,
+    //     birthday: this.birthday,
+    //     firstUserId: this.customer.firstUserId
+    //   }
+    //   updateBirthday(data).then((response) => {
+    //     this.msgSuccess('操作成功')
+    //     // this.getDetail()
+    //     this.$set(this.customer, 'birthday', this.birthday)
+    //     // this.datePickerVisible = false
+    //   })
+    // },
     /**
      *客户详情基础(基础信息+社交关系)
      * @param {*}

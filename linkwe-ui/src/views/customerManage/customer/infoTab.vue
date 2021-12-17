@@ -47,7 +47,7 @@ export default {
      * externalUserid	是	当前客户id
      */
     getSummary() {
-      getSummary(this.$route.query.externalUserid).then(({ data }) => {
+      getSummary(this.$route.query).then(({ data }) => {
         //          {
         //   'companyTags':[{ //企业标签
         //      'userName':'',//添加人
@@ -74,7 +74,7 @@ export default {
      *客户画像单个跟进人
      */
     getCustomerInfoByUserId() {
-      getCustomerInfoByUserId(this.$route.query.externalUserid, this.userId).then(({ data }) => {
+      getCustomerInfoByUserId(this.$route.query).then(({ data }) => {
         this.portrayalSum = data
       })
     },
@@ -86,9 +86,7 @@ export default {
       this.active = type
     },
     sync() {
-      this.openTrack = ['0']
-      this.active = '0'
-      this.$refs['record'][0].$forceUpdate()
+      this.$refs['record'][this.active].sync()
     }
   }
 }
@@ -211,7 +209,7 @@ export default {
         <div class="right">
           <el-card>
             <div slot="header">
-              <span class="card-title">客户轨迹</span>
+              <span class="card-title" @click="sync">客户轨迹</span>
 
               <ButtonSync class="btn-sync" :lastSyncTime="lastSyncTime" @click="sync"
                 >同步</ButtonSync

@@ -1,5 +1,6 @@
 import request from '@/utils/request'
-const service = window.CONFIG.services.wecom + '/customer'
+let getway = window.CONFIG.services.wecom
+const service = getway + '/customer'
 
 /**
  * 客户列表
@@ -165,7 +166,6 @@ export function jobExtends(data) {
  * delFlag: 1 用户是否流失 0 未流失，1流失
  */
 export function getDetail(params) {
-  params.delFlag = 1
   return request({
     url: service + '/findWeCustomerBaseInfo',
     params
@@ -178,12 +178,12 @@ export function getDetail(params) {
  * externalUserid	是	当前客户id
  * delFlag: 1 用户是否流失 0 未流失，1流失
  */
-export function getSummary(externalUserid) {
+export function getSummary({ externalUserid, delFlag }) {
   return request({
     url: service + '/findWeCustomerInfoSummary',
     params: {
       externalUserid,
-      delFlag: 1
+      delFlag
     }
   })
 }
@@ -195,13 +195,13 @@ export function getSummary(externalUserid) {
  * delFlag: 1 用户是否流失 0 未流失，1流失
  * @returns
  */
-export function getCustomerInfoByUserId(externalUserid, userId) {
+export function getCustomerInfoByUserId({ externalUserid, userId, delFlag }) {
   return request({
     url: service + '/findWeCustomerInfoByUserId',
     params: {
       externalUserid,
       userId,
-      delFlag: 1
+      delFlag
     }
   })
 }
@@ -220,5 +220,16 @@ export function getFollowUpRecord(params) {
   return request({
     url: service + '/followUpRecord',
     params
+  })
+}
+
+/**
+ * 客户轨迹同步/同步指定客户个人朋友圈互动数据
+ * @param {*} userIds 指定员工id,多个用逗号隔开
+ * @returns
+ */
+export function syncTrack(userIds) {
+  return request({
+    url: getway + `/moments/synchMomentsInteracte`
   })
 }

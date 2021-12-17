@@ -24,7 +24,7 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        groupId: undefined,
+        chatId: undefined,
         name: undefined
       },
       dictJoinGroupType,
@@ -34,25 +34,21 @@ export default {
     }
   },
   created() {
-    this.group = this.$route.query
-    this.query.chatId = this.group.chatId
-    // this.getDetail()
+    this.query.chatId = this.$route.query.chatId
+    this.getDetail()
     this.getList()
   },
   methods: {
     getDetail() {
-      api.getDetail(this.query.chatId).then((res) => {
-        if (res.code == 200) {
-          this.group = Object.assign({}, this.group, res.data)
-          // console.log(this.group)
-          this.group.createTime = moment(this.group.createTime).format('YYYY-MM-DD HH:mm:SS')
-          if (this.group.tagIds) {
-            let arr = this.group.tagIds.split(',')
-            this.selectedTag = arr.map((dd) => {
-              return { tagId: dd }
-            })
-          }
+      api.getDetail(this.query.chatId).then(({ data }) => {
+        // this.group = Object.assign({}, this.group, res.data)
+        // console.log(this.group)
+        // this.group.createTime = moment(this.group.createTime).format('YYYY-MM-DD HH:mm:SS')
+        if (data.tagIds) {
+          data.tagIds = data.tagIds.split(',')
+          data.tags = data.tags.split(',')
         }
+        this.group = data
       })
     },
     getList(page) {
@@ -86,7 +82,7 @@ export default {
     submitSelectTag(data) {
       this.loading = true
       api
-        .makeGroupTag(this, {
+        .makeGroupTag({
           chatId: this.query.chatId,
           weeGroupTagRel: data.map((row) => ({
             chatId: this.query.chatId,
@@ -96,7 +92,7 @@ export default {
         .then((res) => {
           if (res.code == 200) {
             this.loading = false
-            // this.getGroupDetail()
+            this.getDetail()
             this.msgSuccess('操作成功')
           }
         })
@@ -169,7 +165,7 @@ export default {
           <span class="line"></span>
           <div>
             <div class="value">
-              {{ group.joinGroupMemberNum || 0 }}
+              {{ group.toDayMemberNum || 0 }}
             </div>
             <div class="key">今日进群数</div>
           </div>
