@@ -110,7 +110,7 @@
           </div>
 
           <!-- 添加附件 -->
-          <div class="g-card g-pad20 add-continue" v-show="form.materialMsgList.length <= 8">
+          <div class="g-card g-pad20 add-continue" v-show="form.materialMsgList.length <= 8 && showMore()">
             <el-dropdown style="margin-left: 10px" @command="onInsertMaterial">
               <div style="display: flex; align-items: center">
                 <img style="margin-right: 5px" :src="require('@/assets/drainageCode/plus-circle.png')" alt="" />继续添加附件

@@ -103,15 +103,13 @@
             </div>
           </el-form-item>
         </template>
-        <el-row :gutter="10">
-          <el-form-item label=" ">
-            <template v-for="(data, index) in detail.otherContent">
-              <el-col span="7">
-                <el-image style="width: 100px; height: 100px" v-if="data.annexType === 'image'" :src="data.annexUrl"></el-image>
-              </el-col>
-            </template>
-          </el-form-item>
-        </el-row>
+        <el-form-item label=" ">
+          <div class="img_list">
+            <div v-for="(data, index) in detail.otherContent">
+              <el-image class="item" style="width: 100px; height: 100px" :preview-src-list="[data.annexUrl]" v-if="data.annexType === 'image'" :src="data.annexUrl"></el-image>
+            </div>
+          </div>
+        </el-form-item>
         <el-form-item label="已发送员工" v-if="detail.addUserName">
           <el-tag v-for="(data, key) in detail.addUserName.split(',')" :key="key">{{data}}</el-tag>
         </el-form-item>
@@ -249,5 +247,16 @@
     color: #999;
     font-size: 12px;
     align-self: flex-end;
+  }
+  .img_list {
+    display: flex;
+    flex-wrap: wrap;
+    width: 330px;
+    .item {
+      flex: 1;
+      width: 110px;
+      height: 100px;
+      margin-right: 5px;
+    }
   }
 </style>
