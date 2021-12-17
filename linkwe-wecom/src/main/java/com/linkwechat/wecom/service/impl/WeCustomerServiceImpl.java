@@ -152,6 +152,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             BeanUtils.copyPropertiesignoreOther(userDetail.getExternal_contact(), weCustomer);
             weCustomer.setCustomerType(userDetail.getExternal_contact().getType());
             weCustomer.setCustomerName(userDetail.getExternal_contact().getName());
+            weCustomer.setDelFlag(new Integer(0));
             Optional.ofNullable(userDetail.getFollow_info()).ifPresent(followInfo -> {
 
                 weCustomer.setFirstUserId(followInfo.getUserid());
