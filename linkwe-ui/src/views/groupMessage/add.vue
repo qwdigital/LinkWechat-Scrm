@@ -351,6 +351,7 @@
           } else {
             data.senderList = []
           }
+          data.isAll = data.pushRange === 0 ? true : false
         } else {
           if (data.clientGroup === 1) {
             data.senderList = this.selectCustomerGroupList.map((i) => { return { userId: i.owner } })
@@ -382,7 +383,7 @@
             })
             this.msgSuccess('操作成功')
           } else {
-            this.msgSuccess(res.msg || '操作失败')
+            this.msgError(res.msg || '操作失败')
           }
         })
       },
