@@ -109,7 +109,6 @@
               <el-image class="item" style="width: 100px; height: 100px" :preview-src-list="[data.annexUrl]" v-if="data.annexType === 'image'" :src="data.annexUrl"></el-image>
             </div>
           </div>
-
         </el-form-item>
         <el-form-item label="已发送员工" v-if="detail.addUserName">
           <el-tag v-for="(data, key) in detail.addUserName.split(',')" :key="key">{{data}}</el-tag>
