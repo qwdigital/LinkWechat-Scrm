@@ -60,11 +60,6 @@ export default {
     getDetail() {
       getDetail(this.$route.query).then(({ data }) => {
         data.companyTags && (data.companyTags = data.companyTags.split(','))
-        if (data.trackUsers && data.trackUsers.length > 1) {
-          data.trackUsers.unshift({
-            userName: '客户画像汇总'
-          })
-        }
         this.customer = data
         this.birthday = data.birthday
       })
@@ -142,6 +137,12 @@ export default {
     </el-card>
 
     <el-tabs value="0">
+      <el-tab-pane
+        v-if="customer.trackUsers && customer.trackUsers.length > 1"
+        label="客户画像汇总"
+      >
+        <info-tab></info-tab>
+      </el-tab-pane>
       <el-tab-pane v-for="(item, index) of customer.trackUsers" :key="index" :label="item.userName">
         <info-tab :userId="item.trackUserId"></info-tab>
       </el-tab-pane>
