@@ -220,22 +220,22 @@ export default {
           console.log(fail)
         })
     },
-    /** 导出按钮操作 */
-    exportCustomer() {
-      const queryParams = this.query
-      this.$confirm('是否确认导出所有客户数据项?', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(function() {
-          return api.exportCustomer(queryParams)
-        })
-        .then((response) => {
-          this.download(response.msg)
-        })
-        .catch(function() {})
-    },
+    // /** 导出按钮操作 */
+    // exportCustomer() {
+    //   const queryParams = this.query
+    //   this.$confirm('是否确认导出所有客户数据项?', '警告', {
+    //     confirmButtonText: '确定',
+    //     cancelButtonText: '取消',
+    //     type: 'warning'
+    //   })
+    //     .then(function() {
+    //       return api.exportCustomer(queryParams)
+    //     })
+    //     .then((response) => {
+    //       this.download(response.msg)
+    //     })
+    //     .catch(function() {})
+    // },
     selectedUser(list) {
       this.queryUser = list
     },
@@ -396,12 +396,12 @@ export default {
           @click="resetForm()"
           >重置</el-button
         >
-        <el-button
+        <!-- <el-button
           v-hasPermi="['customerManage:customer:export']"
           type="info"
           @click="exportCustomer"
           >导出列表</el-button
-        >
+        > -->
       </el-form-item>
     </el-form>
 

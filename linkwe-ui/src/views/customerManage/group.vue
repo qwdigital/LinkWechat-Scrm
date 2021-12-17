@@ -154,23 +154,23 @@ export default {
     handleSelectionChange(selection) {
       this.ids = selection.map((item) => item.id)
       this.multiple = !selection.length
-    },
-    /** 导出按钮操作 */
-    handleExport() {
-      // const query = this.query;
-      // this.$confirm("是否确认导出所有数据项?", "警告", {
-      //   confirmButtonText: "确定",
-      //   cancelButtonText: "取消",
-      //   type: "warning",
-      // })
-      //   .then(function () {
-      //     return exportOperlog(query);
-      //   })
-      //   .then((response) => {
-      //     this.download(response.msg);
-      //   })
-      //   .catch(function () {});
     }
+    // /** 导出按钮操作 */
+    // handleExport() {
+    //   const query = this.query;
+    //   this.$confirm("是否确认导出所有数据项?", "警告", {
+    //     confirmButtonText: "确定",
+    //     cancelButtonText: "取消",
+    //     type: "warning",
+    //   })
+    //     .then(function () {
+    //       return exportOperlog(query);
+    //     })
+    //     .then((response) => {
+    //       this.download(response.msg);
+    //     })
+    //     .catch(function () {});
+    // }
   }
 }
 </script>
@@ -210,9 +210,9 @@ export default {
         <el-button v-hasPermi="['customerManage:group:query']" type="info" @click="resetQuery"
           >重置</el-button
         >
-        <el-button v-hasPermi="['customerManage:group:export']" type="success" @click="handleExport"
+        <!-- <el-button v-hasPermi="['customerManage:group:export']" type="success" @click="handleExport"
           >导出列表</el-button
-        >
+        > -->
       </el-form-item>
     </el-form>
 
