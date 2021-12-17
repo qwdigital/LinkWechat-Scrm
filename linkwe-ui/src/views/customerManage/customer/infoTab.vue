@@ -25,6 +25,7 @@ export default {
       },
       recod: [],
       active: '0',
+      openedTabs: ['0'],
       openTrack: ['0'],
       lastSyncTime: 0
     }
@@ -77,6 +78,9 @@ export default {
         this.portrayalSum = data
       })
     },
+    changeTab(tab) {
+      this.openedTabs.includes(tab.index) || this.openedTabs.push(tab.index)
+    },
     changeTrack(type) {
       this.openTrack.includes(type) || this.openTrack.push(type)
       this.active = type
@@ -97,85 +101,108 @@ export default {
         <div class="left">
           <el-card class="mb10" shadow="never">
             <div slot="header" class="card-title">企业标签</div>
-            <div
-              v-for="(item, index) of portrayalSum.companyTags"
-              :key="index"
-              :class="['flex', index && 'mt20']"
-            >
-              <div class="name oe">{{ item.userName }}</div>
-              ：
-              <template v-if="item.tagNames">
-                <el-tag
-                  type="info"
-                  v-for="(unit, unique) in item.tagNames.split(',')"
-                  :key="unique"
-                  >{{ unit }}</el-tag
-                >
-              </template>
-              <div v-else class="sub-text-color">
-                暂无标签
+            <template v-if="portrayalSum.companyTags && portrayalSum.companyTags.length">
+              <div
+                v-for="(item, index) of portrayalSum.companyTags"
+                :key="index"
+                :class="['flex', index && 'mt20']"
+              >
+                <div class="name oe">{{ item.userName }}</div>
+                ：
+                <template v-if="item.tagNames">
+                  <el-tag
+                    type="info"
+                    v-for="(unit, unique) in item.tagNames.split(',')"
+                    :key="unique"
+                    >{{ unit }}</el-tag
+                  >
+                </template>
+                <div v-else class="sub-text-color ac">
+                  暂无标签
+                </div>
               </div>
+            </template>
+            <div v-else class="sub-text-color ac">
+              暂无标签
             </div>
           </el-card>
 
           <el-card class="mb10" shadow="never">
             <div slot="header" class="card-title">个人标签</div>
-            <div
-              v-for="(item, index) of portrayalSum.personTags"
-              :key="index"
-              :class="['flex', index && 'mt20']"
-            >
-              <div class="name oe">{{ item.userName }}</div>
-              ：
-              <template v-if="item.tagNames">
-                <el-tag
-                  type="info"
-                  v-for="(unit, unique) in item.tagNames.split(',')"
-                  :key="unique"
-                  >{{ unit }}</el-tag
-                >
-              </template>
-              <div v-else class="sub-text-color">
-                暂无标签
+            <template v-if="portrayalSum.personTags && portrayalSum.personTags.length">
+              <div
+                v-for="(item, index) of portrayalSum.personTags"
+                :key="index"
+                :class="['flex', index && 'mt20']"
+              >
+                <div class="name oe">{{ item.userName }}</div>
+                ：
+                <template v-if="item.tagNames">
+                  <el-tag
+                    type="info"
+                    v-for="(unit, unique) in item.tagNames.split(',')"
+                    :key="unique"
+                    >{{ unit }}</el-tag
+                  >
+                </template>
+                <div v-else class="sub-text-color ac">
+                  暂无标签
+                </div>
               </div>
+            </template>
+            <div v-else class="sub-text-color ac">
+              暂无标签
             </div>
           </el-card>
 
           <el-card class="mb10" shadow="never">
             <div slot="header" class="card-title">跟进状态</div>
             <template v-if="portrayalSum.trackStates && portrayalSum.trackStates.length">
-              <div class="fxbw mb20" v-for="(item, index) of portrayalSum.trackStates" :key="index">
+              <div class="flex mb20" v-for="(item, index) of portrayalSum.trackStates" :key="index">
                 <div class="name oe">{{ item.userName }}</div>
                 ：
-                <el-steps
-                  style="flex:auto;"
-                  :active="item.trackStateList.length"
-                  finish-status="success"
-                >
-                  <el-step
-                    v-for="(unit, unique) of item.trackStateList"
-                    :key="unique"
-                    :title="dictTrackState[~~unit.trackState + ''].name"
-                    :description="unit.trackTime"
-                  ></el-step>
-                </el-steps>
+                <template v-if="item.trackStateList.length">
+                  <el-steps
+                    style="flex:auto;"
+                    :active="item.trackStateList.length"
+                    finish-status="success"
+                  >
+                    <el-step
+                      v-for="(unit, unique) of item.trackStateList"
+                      :key="unique"
+                      :title="dictTrackState[~~unit.trackState + ''].name"
+                      :description="unit.trackTime"
+                    ></el-step>
+                  </el-steps>
+                </template>
+                <div v-else class="sub-text-color ac">
+                  暂无数据
+                </div>
               </div>
             </template>
-            <div v-else class="ac sub-text-color">暂无数据</div>
+            <div v-else class="sub-text-color ac">暂无数据</div>
           </el-card>
 
           <el-card shadow="never">
             <div slot="header" class="card-title">跟进记录</div>
-            <el-tabs v-if="portrayalSum.trackStates && portrayalSum.trackStates.length" value="0">
+            <el-tabs
+              v-if="portrayalSum.trackStates && portrayalSum.trackStates.length"
+              value="0"
+              @tab-click="changeTab"
+            >
               <el-tab-pane
                 v-for="(item, index) in portrayalSum.trackStates"
                 :key="index"
                 :label="item.userName"
               >
-                <record :userId="item.userId" viewType="1"></record>
+                <record
+                  v-if="openedTabs.includes(index + '')"
+                  :userId="item.userId"
+                  viewType="1"
+                ></record>
               </el-tab-pane>
             </el-tabs>
-            <div v-else class="ac sub-text-color">暂无数据</div>
+            <div v-else class="sub-text-color ac">暂无数据</div>
           </el-card>
         </div>
       </el-col>
