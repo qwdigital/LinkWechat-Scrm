@@ -126,11 +126,11 @@ export default {
       })
     },
     // 获取显示用tag字符串
-    getDisplayTags(row) {
-      if (!(row && row.tagList.length > 0)) return ''
+    // getDisplayTags(row) {
+    //   if (!(row && row.tagList.length > 0)) return ''
 
-      return row.tagList.join(' ')
-    },
+    //   return row.tagList.map((d) => d.name).join(' ')
+    // },
     // 批量删除
     handleBulkRemove() {
       this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
@@ -182,9 +182,13 @@ export default {
     customerFilter() {
       const l = []
       for (let data of this.customerList) {
-        if (this.customerQuery.customerName !== '' && !this.customerQuery.customerName.includes(data.customerName))
+        if (
+          this.customerQuery.customerName !== '' &&
+          !this.customerQuery.customerName.includes(data.customerName)
+        )
           continue
-        if (this.customerQuery.isInGroup !== '' && this.customerQuery.isInGroup !== data.isInGroup) continue
+        if (this.customerQuery.isInGroup !== '' && this.customerQuery.isInGroup !== data.isInGroup)
+          continue
         if (this.customerQuery.isSent !== '' && this.customerQuery.isSent !== data.isSent) continue
 
         l.push(data)
@@ -265,33 +269,65 @@ export default {
 
     <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" align="center"></el-table-column>
-      <el-table-column label="任务名称" align="center" prop="taskName" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column
+        label="任务名称"
+        align="center"
+        prop="taskName"
+        :show-overflow-tooltip="true"
+      ></el-table-column>
       <el-table-column prop="sendType" label="发送方式" align="center">
         <template #default="{ row }">
           {{ parseInt(row.sendType) === 0 ? '企业群发' : '个人群发' }}
         </template>
       </el-table-column>
-      <el-table-column label="当前群人数" align="center">
+      <el-table-column label="当前群人数" align="center" width="100">
         <template #default="{ row }">
           <el-button type="text" @click="openCustomerDialog(row.taskId)">
             {{ row.totalMember }}
           </el-button>
         </template>
       </el-table-column>
-      <el-table-column label="客户标签" align="center" width="120">
-        <template #default="{ row }">
+      <el-table-column label="客户标签" align="center">
+        <div v-if="row.tagList" slot-scope="{ row }">
+          <el-popover placement="bottom" trigger="hover" :disabled="row.tagList.length < 3">
+            <div>
+              <el-tag v-for="(unit, unique) in row.tagList" :key="unique">
+                {{ unit.name }}
+              </el-tag>
+            </div>
+            <div slot="reference">
+              <el-tag v-for="(unit, unique) in row.tagList.slice(0, 2)" :key="unique">
+                {{ unit.name }}
+              </el-tag>
+              <el-tag key="a" v-if="row.tagList.length > 2">...</el-tag>
+            </div>
+          </el-popover>
+        </div>
+        <span v-else>无标签</span>
+
+        <!-- <template #default="{ row }">
           <el-popover placement="bottom" width="200" trigger="hover" :content="getDisplayTags(row)">
             <div slot="reference" class="table-desc overflow-ellipsis">
               {{ getDisplayTags(row) }}
             </div>
           </el-popover>
-        </template>
+        </template> -->
       </el-table-column>
 
       <el-table-column prop="createBy" label="创建人" align="center"></el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="160"></el-table-column>
+      <el-table-column
+        label="创建时间"
+        align="center"
+        prop="createTime"
+        width="160"
+      ></el-table-column>
 
-      <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
+      <el-table-column
+        label="操作"
+        align="center"
+        width="180"
+        class-name="small-padding fixed-width"
+      >
         <template slot-scope="scope">
           <el-button
             v-hasPermi="['enterpriseWechat:view']"
@@ -300,7 +336,11 @@ export default {
             @click="handleRemove(scope.row.taskId)"
             >删除</el-button
           >
-          <el-button v-hasPermi="['enterpriseWechat:edit']" size="mini" type="text" @click="goRoute(scope.row.taskId)"
+          <el-button
+            v-hasPermi="['enterpriseWechat:edit']"
+            size="mini"
+            type="text"
+            @click="goRoute(scope.row.taskId)"
             >编辑</el-button
           >
         </template>
@@ -315,12 +355,21 @@ export default {
       @pagination="getList()"
     />
 
-    <el-dialog title="客户统计" :visible.sync="dialogVisible">
+    <el-dialog title="客户统计" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <div>
         <div class="top-search">
-          <el-form inline label-position="right" :model="customerQuery" label-width="80px" ref="customerForm">
+          <el-form
+            inline
+            label-position="right"
+            :model="customerQuery"
+            label-width="80px"
+            ref="customerForm"
+          >
             <el-form-item prop="customerName">
-              <el-input v-model="customerQuery.customerName" placeholder="请输入客户名称"></el-input>
+              <el-input
+                v-model="customerQuery.customerName"
+                placeholder="请输入客户名称"
+              ></el-input>
             </el-form-item>
             <el-form-item prop="isInGroup">
               <el-select v-model="customerQuery.isInGroup" placeholder="全部" size="small">
@@ -385,13 +434,13 @@ export default {
 </template>
 
 <style scoped lang="scss">
-.overflow-ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+// .overflow-ellipsis {
+//   white-space: nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+// }
 
-.table-desc {
-  max-width: 120px;
-}
+// .table-desc {
+//   max-width: 120px;
+// }
 </style>

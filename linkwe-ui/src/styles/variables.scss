@@ -9,6 +9,10 @@ $yellow: #ffcf0e;
 $panGreen: #30b08f;
 $grayBg: #efeff4;
 
+$sub-text-color: #999;
+.sub-text-color {
+  color: $sub-text-color;
+}
 // sidebar
 $menuText: #333;
 $menuActiveText: #333;

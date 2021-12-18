@@ -141,6 +141,15 @@ const routes = [
     meta: {
       title: ''
     }
+  },
+  // 客户公海
+  {
+    path: '/highSeas',
+    name: 'highSeas',
+    component: () => import('../views/highSeas/index'),
+    meta: {
+      title: '客户公海'
+    }
   }
 ]
 

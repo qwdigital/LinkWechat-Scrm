@@ -2,25 +2,13 @@
   <div>
     <el-form :inline="true" :model="query" class="top-serach">
       <el-form-item label="员工名称">
-        <el-input
-          v-model="query.userName"
-          clearable
-          placeholder="客户名称"
-        ></el-input>
+        <el-input v-model="query.userName" clearable placeholder="客户名称"></el-input>
       </el-form-item>
       <el-form-item label="客户名称">
-        <el-input
-          v-model="query.customerName"
-          clearable
-          placeholder="客户名称"
-        ></el-input>
+        <el-input v-model="query.customerName" clearable placeholder="客户名称"></el-input>
       </el-form-item>
       <el-form-item label="查找内容">
-        <el-input
-          v-model="query.contact"
-          clearable
-          placeholder="查找内容"
-        ></el-input>
+        <el-input v-model="query.contact" clearable placeholder="查找内容"></el-input>
       </el-form-item>
       <el-form-item label="时间范围">
         <el-date-picker
@@ -45,11 +33,7 @@
       </el-form-item>
     </el-form>
     <div>
-      <el-table
-        v-loading="loading"
-        :data="fileData"
-        :header-cell-style="{ background: '#fff' }"
-      >
+      <el-table v-loading="loading" :data="fileData" :header-cell-style="{ background: '#fff' }">
         <el-table-column prop="date" label="发送者" width="180">
           <template slot-scope="scope">
             <p v-if="scope.row">{{ scope.row.name }}</p>
@@ -128,7 +112,9 @@ export default {
         beginTime: '',
         endTime: '',
         pageNum: 1,
-        pageSize: 10
+        pageSize: 10,
+        orderByColumn: 't.msg_time',
+        isAsc: 'desc' // asc 升序 desc 降序
       },
       dateRange: [],
       total: 0,

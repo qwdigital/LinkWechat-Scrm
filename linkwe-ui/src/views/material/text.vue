@@ -31,16 +31,12 @@ export default {
         prop="content"
         :show-overflow-tooltip="true"
       />
-      <el-table-column label="创建时间" align="center" prop="createTime">
+      <el-table-column label="最近更新时间" align="center" prop="updateTime">
         <!-- <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template> -->
       </el-table-column>
-      <el-table-column
-        label="操作"
-        align="center"
-        class-name="small-padding fixed-width"
-      >
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             type="text"

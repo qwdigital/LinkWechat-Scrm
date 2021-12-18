@@ -14,7 +14,7 @@ const serviceUser = window.CONFIG.services.wecom + '/user'
 export function getTree(params) {
   return request({
     url: service + '/list',
-    params,
+    params
   })
 }
 
@@ -31,7 +31,7 @@ export function updateDepart(data) {
   return request({
     url: service,
     method: 'put',
-    data,
+    data
   })
 }
 
@@ -47,14 +47,14 @@ export function addDepart(data) {
   return request({
     url: service,
     method: 'post',
-    data,
+    data
   })
 }
 
 export function removeDepart(ids) {
   return request({
     url: service + '/' + ids,
-    method: 'DELETE',
+    method: 'DELETE'
   })
 }
 
@@ -76,7 +76,25 @@ export function removeDepart(ids) {
 export function getList(params) {
   return request({
     url: serviceUser + '/list',
-    params,
+    params
+  })
+}
+
+/**
+ * 获取所有员工的接口(不分页)
+{
+  “isActivate” //1=已激活，2=已禁用，4=未激活，5=退出企业,
+ “isConfigCustomerContact”//1:是;0:否
+}
+ * @returns
+ */
+export function getAllStaff(params) {
+  return request({
+    url: serviceUser + '/findAllWeUser',
+    params: {
+      isActivate: 1, //1=已激活，2=已禁用，4=未激活，5=退出企业,
+      isConfigCustomerContact: 0 //1:是;0:否
+    }
   })
 }
 
@@ -86,7 +104,7 @@ export function getList(params) {
  */
 export function getUserDetail(id) {
   return request({
-    url: serviceUser + '/' + id,
+    url: serviceUser + '/' + id
   })
 }
 
@@ -98,7 +116,7 @@ export function addUser(data) {
   return request({
     url: serviceUser,
     method: 'post',
-    data,
+    data
   })
 }
 
@@ -132,7 +150,7 @@ export function updateUser(data) {
   return request({
     url: serviceUser,
     method: 'put',
-    data,
+    data
   })
 }
 
@@ -148,7 +166,7 @@ export function startOrStop(data) {
   return request({
     url: serviceUser + '/startOrStop',
     method: 'put',
-    data,
+    data
   })
 }
 
@@ -159,7 +177,7 @@ export function startOrStop(data) {
 export function remove(userId) {
   return request({
     url: serviceUser + '/' + userId,
-    method: 'DELETE',
+    method: 'DELETE'
   })
 }
 
@@ -168,6 +186,6 @@ export function remove(userId) {
  */
 export function syncUser() {
   return request({
-    url: serviceUser + '/synchWeUser',
+    url: serviceUser + '/synchWeUser'
   })
 }

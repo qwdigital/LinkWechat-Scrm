@@ -18,12 +18,12 @@ import router from './router'
 import store from './store'
 
 import VConsole from 'vconsole'
-process.env.NODE_ENV === 'production' && new VConsole()
+process.env.NODE_ENV === 'test' && new VConsole()
 
 Vue.config.productionTip = false
 
 new Vue({
   router,
   store,
-  render: (h) => h(App),
+  render: (h) => h(App)
 }).$mount('#app')

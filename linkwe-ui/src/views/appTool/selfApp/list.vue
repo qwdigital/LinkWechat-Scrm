@@ -127,12 +127,7 @@ export default {
     </div> -->
 
     <ul v-loading="loading" class="list-wrap">
-      <li
-        v-for="(item, index) of list"
-        :key="index"
-        class="list"
-        @click="edit(item)"
-      >
+      <li v-for="(item, index) of list" :key="index" class="list" @click="edit(item)">
         <el-image :src="item.squareLogoUrl" fit="fit"></el-image>
         <div>
           <div class="title">{{ item.agentName }}</div>
@@ -156,25 +151,16 @@ export default {
       @pagination="getList()"
     /> -->
 
-    <el-dialog :title="form.id ? '查看' : '新增'" :visible.sync="dialogVisible">
-      <el-form
-        ref="form"
-        label-position="right"
-        :model="form"
-        :rules="rules"
-        label-width="100px"
-      >
+    <el-dialog
+      :title="form.id ? '查看' : '新增'"
+      :visible.sync="dialogVisible"
+      :close-on-click-modal="false"
+    >
+      <el-form ref="form" label-position="right" :model="form" :rules="rules" label-width="100px">
         <el-row :gutter="10">
           <el-col :span="4">
-            <div
-              class="avatar-wrap ac"
-              @click="dialogVisibleSelectMaterial = true"
-            >
-              <img
-                class="avatar"
-                v-if="form.squareLogoUrl"
-                :src="form.squareLogoUrl"
-              />
+            <div class="avatar-wrap ac" @click="dialogVisibleSelectMaterial = true">
+              <img class="avatar" v-if="form.squareLogoUrl" :src="form.squareLogoUrl" />
               <i v-else class="el-icon-plus avatar-uploader-icon cc"></i>
             </div>
             <!-- <el-image
@@ -185,16 +171,10 @@ export default {
           </el-col>
           <el-col :span="20">
             <el-form-item label="应用标题" prop="agentName">
-              <el-input
-                v-model="form.agentName"
-                placeholder="请输入应用标题"
-              ></el-input>
+              <el-input v-model="form.agentName" placeholder="请输入应用标题"></el-input>
             </el-form-item>
             <el-form-item label="应用描述" prop="description">
-              <el-input
-                v-model="form.description"
-                placeholder="请输入应用描述"
-              ></el-input>
+              <el-input v-model="form.description" placeholder="请输入应用描述"></el-input>
             </el-form-item>
             <el-form-item label="应用Id" prop="agentId">
               <el-input
@@ -213,16 +193,10 @@ export default {
             </el-form-item>
             <el-form-item label="可见范围" v-if="form.id">
               <div class="flex">
-                <div
-                  v-for="(item, index) of form.allowPartys.split(',')"
-                  :key="index"
-                >
+                <div v-for="(item, index) of form.allowPartys.split(',')" :key="index">
                   <i class="el-icon-folder-opened" v-if="item"></i>{{ item }}
                 </div>
-                <div
-                  v-for="(item, index) of form.allowUserinfos.split(',')"
-                  :key="'1' + index"
-                >
+                <div v-for="(item, index) of form.allowUserinfos.split(',')" :key="'1' + index">
                   <i class="el-icon-s-custom" v-if="item"></i>{{ item }}
                 </div>
               </div>

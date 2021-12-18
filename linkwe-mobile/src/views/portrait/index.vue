@@ -18,12 +18,14 @@
           <div class="img"><img :src="form.avatar" alt="" /></div>
           <div class="right">
             <div>
-              <span
-                >{{
-                  form.remark ? form.remark : (form.name || '') + (form.remarkCorpName ? '-' + form.remarkCorpName : '')
+              <span>
+                {{
+                  form.remark
+                    ? form.remark
+                    : (form.name || '') + (form.remarkCorpName ? '-' + form.remarkCorpName : '')
                 }}
-                &nbsp; &nbsp;</span
-              ><span class="icon iconfont icon-man" v-if="form.gender == 1"></span>
+              </span>
+              <span class="icon iconfont icon-man" v-if="form.gender == 1"></span>
               <span class="icon iconfont icon-xingbie" v-else-if="form.gender == 2"></span>
               <van-icon name="manager" color="#9c9c9c" v-else />
             </div>
@@ -32,7 +34,13 @@
             </div>
           </div>
         </div>
-        <div class="data" @click="goRoute('/customerDetail')">详细资料></div>
+        <van-button
+          v-if="form.trackState"
+          :type="dictTrackState[form.trackState].color"
+          size="small"
+          @click="usershow = true"
+          >{{ dictTrackState[form.trackState].name || '待跟进' }}</van-button
+        >
       </div>
       <div class="detail">
         <div class="c9">手机号</div>
@@ -53,12 +61,17 @@
         <div class="c9">邮箱</div>
         <div>{{ form.email }}</div>
       </div>
+      <van-divider />
+      <div class="detail">
+        <div></div>
+        <div class="data" @click="goRoute('/customerDetail')">更多详细资料></div>
+      </div>
     </div>
     <div class="divider"></div>
-    <!-- 客户标签 -->
+    <!-- 企业标签 -->
     <div class="userlabel">
       <div class="detail">
-        <div>客户标签</div>
+        <div>企业标签</div>
         <div class="data" is-link @click="labelEdit">编辑</div>
       </div>
       <div v-if="form.tags" class="labelstyle mt10">
@@ -66,6 +79,22 @@
           {{ unit.name }}
         </div>
       </div>
+      <van-empty v-else image-size="50" description="暂无数据" />
+    </div>
+    <div class="divider"></div>
+
+    <!-- 个人标签 -->
+    <div class="userlabel">
+      <div class="detail">
+        <div>个人标签</div>
+        <div class="data" is-link @click="labelEdit">编辑</div>
+      </div>
+      <div v-if="form.tags" class="labelstyle mt10">
+        <div class="label" v-for="(unit, unique) in form.personTags" :key="unique">
+          {{ unit.name }}
+        </div>
+      </div>
+      <van-empty v-else image-size="50" description="暂无数据" />
     </div>
     <div class="divider"></div>
 
@@ -77,15 +106,15 @@
       </div>
       <div class="detail">
         <div class="boxnumber">
-          <p>添加的员工</p>
+          <p>跟进员工</p>
           <div class="number">{{ staff.length }}</div>
         </div>
         <div class="boxnumber">
-          <p>添加的群聊</p>
+          <p>所在群聊</p>
           <div class="number">{{ groupChat.length }}</div>
         </div>
         <div class="boxnumber">
-          <p>共同的群聊</p>
+          <p>共同群聊</p>
           <div class="number">{{ commonGroup.length }}</div>
         </div>
       </div>
@@ -95,7 +124,7 @@
     <div class="addwaiting">
       <div class="detail">
         <div>客户轨迹</div>
-        <div class="data" is-link @click="usershow = true">添加待办></div>
+        <div class="data" is-link @click="usershow = true">同步</div>
       </div>
 
       <van-tabs v-model="query.trajectoryType" @change="changeInfo">
@@ -138,9 +167,23 @@
 
     <!-- 点击添加待办触发弹出框开始 -->
     <van-action-sheet v-model="usershow">
-      <van-nav-bar title="客户待办" right-text="取消" @click-right="usershow = false" />
+      <van-nav-bar title="跟进记录" right-text="X" @click-right="usershow = false">
+        <!-- <template #right>
+          <van-icon name="cross" size="18" />
+        </template> -->
+      </van-nav-bar>
       <!-- 表单 -->
       <van-form @submit="onSubmit">
+        <van-field name="radio" label="单选框">
+          <template #input>
+            <van-radio-group v-model="radio" direction="horizontal">
+              <van-radio name="1">跟进中</van-radio>
+              <van-radio name="2">已成交</van-radio>
+              <van-radio name="3">无意向</van-radio>
+            </van-radio-group>
+          </template>
+        </van-field>
+
         <!-- 待办内容 -->
         <van-field
           v-model="conagency"
@@ -154,7 +197,7 @@
         />
 
         <!-- 待办日期 -->
-        <van-field
+        <!-- <van-field
           v-model="dateagency"
           is-link
           readonly
@@ -164,8 +207,13 @@
           required
           :rules="[{ required: true, message: '请输入待办日期' }]"
         />
-        <van-calendar v-model="dateshow" @confirm="onConfirm" color="#1989fa" :min-date="minDate" :max-date="maxDate" />
-        <!-- 待办时间 -->
+        <van-calendar
+          v-model="dateshow"
+          @confirm="onConfirm"
+          color="#1989fa"
+          :min-date="minDate"
+          :max-date="maxDate"
+        />
         <van-field
           v-model="timeagency"
           is-link
@@ -197,10 +245,12 @@
             @cancel="timecancel"
             @confirm="endtimeconfirm"
           />
-        </van-action-sheet>
+        </van-action-sheet> -->
         <!-- 保存 -->
         <div style="margin: 30px">
-          <van-button round block type="info" native-type="submit" @click="saveInfo2">保存</van-button>
+          <van-button round block type="info" native-type="submit" @click="saveInfo2"
+            >保存</van-button
+          >
         </div>
       </van-form>
     </van-action-sheet>
@@ -295,7 +345,14 @@ export default {
       finished: false,
       list: [],
       agentId: '', // 1000012,
-      loadingStep: false
+      loadingStep: false,
+      dictTrackState: Object.freeze({
+        1: { name: '待跟进', color: '' },
+        2: { name: '跟进中', color: 'info' },
+        3: { name: '已成交', color: 'primary' },
+        4: { name: '无意向', color: 'warning' },
+        5: { name: '已流失', color: 'danger' }
+      })
     }
   },
   watch: {
@@ -619,13 +676,19 @@ export default {
           if (data.tagIds && data.tagNames) {
             data.tagIds = data.tagIds.split(',')
             data.tagNames = data.tagNames.split(',')
-            data.tags = []
-            data.tagIds.forEach((unit, index) => {
-              data.tags.push({
-                tagId: unit,
-                name: data.tagNames[index]
-              })
-            })
+            data.tags = data.tagIds.forEach((unit, index) => ({
+              tagId: unit,
+              name: data.tagNames[index]
+            }))
+          }
+
+          if (data.personTagIds && data.personTagNames) {
+            data.personTagIds = data.personTagIds.split(',')
+            data.personTagNames = data.personTagNames.split(',')
+            data.personTags = data.personTagIds.map((unit, index) => ({
+              tagId: unit,
+              name: data.personTagNames[index]
+            }))
           }
           this.form = data
           // console.log(this.form);
@@ -739,6 +802,7 @@ export default {
   height: 60px;
   width: 100%;
   margin: 20px;
+  text-align: center;
   p {
     font-size: 12px;
   }

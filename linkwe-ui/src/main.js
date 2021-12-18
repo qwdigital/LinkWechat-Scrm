@@ -9,7 +9,7 @@ import Element from 'element-ui'
 import './styles/element-variables.scss'
 
 Vue.use(Element, {
-  size: Cookies.get('size') || 'small', // set element-ui default size
+  size: Cookies.get('size') || 'small' // set element-ui default size
 })
 
 import '@/styles/common.scss' // common css
@@ -33,13 +33,14 @@ import {
   selectDictLabel,
   selectDictLabels,
   download,
-  handleTree,
+  handleTree
 } from '@/utils/common'
 
 import Pagination from '@/components/Pagination'
 //自定义表格工具扩展
 import RightToolbar from '@/components/RightToolbar'
 import Upload from '@/components/Upload'
+import ButtonSync from '@/components/ButtonSync'
 
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
@@ -86,14 +87,15 @@ VueAMap.initAMapApiLoader({
     'AMap.ToolBar',
     'AMap.MapType',
     'AMap.PolyEditor',
-    'AMap.CircleEditor',
+    'AMap.CircleEditor'
   ],
-  v: '1.4.4',
+  v: '1.4.4'
 })
 // 全局组件挂载
 Vue.component('Pagination', Pagination)
 Vue.component('RightToolbar', RightToolbar)
 Vue.component('Upload', Upload)
+Vue.component('ButtonSync', ButtonSync)
 
 Vue.use(directive)
 
@@ -112,5 +114,5 @@ new Vue({
   el: '#app',
   router,
   store,
-  render: (h) => h(App),
+  render: (h) => h(App)
 })

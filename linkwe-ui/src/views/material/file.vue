@@ -30,10 +30,8 @@ export default {
         prop="materialName"
         :show-overflow-tooltip="true"
       />
-      <el-table-column label="大小" align="center" prop="userName" />
 
-      <el-table-column label="创建时间" align="center" prop="createTime">
-      </el-table-column>
+      <el-table-column label="最近更新时间" align="center" prop="updateTime"> </el-table-column>
       <el-table-column
         label="操作"
         align="center"
@@ -41,9 +39,7 @@ export default {
         class-name="small-padding fixed-width"
       >
         <template slot-scope="scope">
-          <el-button type="text" @click="$refs.page.download(scope.row)"
-            >下载</el-button
-          >
+          <el-button type="text" @click="$refs.page.download(scope.row)">下载</el-button>
           <el-button
             type="text"
             @click="$refs.page.edit(scope.row)"

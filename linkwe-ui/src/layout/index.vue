@@ -15,10 +15,7 @@
           <div v-show="$route.name !== '首页'">
             <hamburger id="hamburger-container" class="hamburger-container" />
             <span class="slogan">仟微科技 |</span>
-            <breadcrumb
-              id="breadcrumb-container"
-              class="breadcrumb-container"
-            />
+            <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
           </div>
 
           <!-- <div :class="{ 'fixed-header': fixedHeader }">
@@ -54,7 +51,7 @@ export default {
     RightPanel,
     Settings,
     Sidebar,
-    TagsView,
+    TagsView
   },
   mixins: [ResizeMixin],
   computed: {
@@ -62,24 +59,24 @@ export default {
     ...mapState({
       sidebar: (state) => state.app.sidebar,
       device: (state) => state.app.device,
-      showSettings: (state) => state.settings.showSettings,
+      showSettings: (state) => state.settings.showSettings
       // needTagsView: (state) => state.settings.tagsView,
       // fixedHeader: (state) => state.settings.fixedHeader,
     }),
     classObj() {
       return {
-        hideSidebar: !this.sidebar.opened,
-        openSidebar: this.sidebar.opened,
+        hideSidebar: !this.sidebar.opened || this.$route.path == '/index',
+        openSidebar: this.sidebar.opened && this.$route.path !== '/index',
         withoutAnimation: this.sidebar.withoutAnimation,
-        mobile: this.device === 'mobile',
+        mobile: this.device === 'mobile'
       }
-    },
+    }
   },
   methods: {
     handleClickOutside() {
       this.$store.dispatch('app/closeSideBar', { withoutAnimation: false })
-    },
-  },
+    }
+  }
 }
 </script>
 

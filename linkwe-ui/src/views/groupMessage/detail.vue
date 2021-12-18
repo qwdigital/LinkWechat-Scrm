@@ -1,68 +1,348 @@
-<script>
-import { getDetail } from '@/api/groupMessage'
-import TabContent from './TabContent'
-
-export default {
-  components: {
-    TabContent
-  },
-  props: {},
-  data() {
-    return {
-      data: {},
-      activeName: '0',
-      total1: 0,
-      total0: 0
-    }
-  },
-  watch: {},
-  computed: {},
-  created() {
-    getDetail(this.$route.query.id).then(({ data }) => {
-      this.data = data
-    })
-  },
-  mounted() {},
-  methods: {
-    notice() {}
-  }
-}
-</script>
-
 <template>
   <div>
-    <el-card shadow="hover" class="mb10">
-      <span class="label">创建人：</span>
-      {{ data.sender }}
-      <div class="mt10 flex aic">
-        <span class="label">消息内容：</span>
-        <el-image
-          v-if="/^http.*\.(png|jpeg|jpg|gif)$/gi.test(data.content)"
-          style="width: 80px; height: 80px;border-radius:6px"
-          :src="data.content"
-          fit="fit"
-        ></el-image>
-        <span v-else>{{ data.content }}</span>
-      </div>
-    </el-card>
-    <!-- <el-button class="notice" type="primary" @click="notice"
-      >通知员工发送</el-button
-    > -->
-    <el-tabs v-model="activeName">
-      <el-tab-pane :label="`待发送(${total0})`" name="0">
-        <TabContent type="0" :total.sync="total0"></TabContent>
-      </el-tab-pane>
-      <el-tab-pane :label="`已发送(${total1})`" name="1">
-        <TabContent type="1" :total.sync="total1"></TabContent>
-      </el-tab-pane>
-    </el-tabs>
+    <el-row style="margin-top: 10px;" type="flex" :gutter="10">
+      <el-col :span="18">
+        <div class="g-card g-pad20">
+          <div class="title">
+            <div class="name">
+              群发统计
+            </div>
+            <div class="operation" v-if="data.refreshTime">
+              最近同步时间：{{data.refreshTime}}
+              <el-button style="margin-left:20px;" type="primary" size="mini" @click="setFn">同步</el-button>
+            </div>
+          </div>
+          <div class="total_list">
+            <div class="item">
+              <div>
+                已发送员工
+              </div>
+              <div style="font-size:18px;color: #000;">
+                {{data.alreadySendNum}}
+              </div>
+            </div>
+            <div class="item">
+              <div>
+                未发送员工
+              </div>
+              <div style="font-size:18px;color: #000;">
+                {{data.toBeSendNum}}
+              </div>
+            </div>
+            <div class="item">
+              <div>
+                已送达客户
+              </div>
+              <div style="font-size:18px;color: #000;">
+                {{data.alreadySendCustomerNum}}
+              </div>
+            </div>
+            <div class="item">
+              <div>
+                未送达客户
+              </div>
+              <div style="font-size:18px;color: #000;">
+                {{data.toBeSendCustomerNum}}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="g-card g-pad20">
+          <div class="title">
+            <div class="name">
+              员工详情
+            </div>
+          </div>
+          <div class="search">
+            <el-form :model="queryMember" ref="queryMemberForm" :inline="true" label-position="left" class="top-search" label-width="70px">
+              <el-form-item label="发送员工" prop="userName">
+                <el-input size="mini" v-model="queryMember.userName" style="width:150px;" placeholder="请输入发送员工" />
+              </el-form-item>
+              <el-form-item label="发送状态" prop="status">
+                <el-select v-model="queryMember.status" placeholder="请选择发送状态" size="mini">
+                  <el-option label="全部" value=''></el-option>
+                  <el-option v-for="(value, key, index) in memberState" :label="value" :value="key" :key="index">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label-width="0">
+                <el-button type="primary" size="mini" @click="getMemberList(1)">查询</el-button>
+                <el-button type="info" size="mini" plain @click="resetMemberQuery">清空</el-button>
+              </el-form-item>
+            </el-form>
+          </div>
+          <div>
+            <el-table v-loading="member.loading" :data="member.list">
+              <el-table-column label="发送员工" align="center" prop="userName" />
+              <el-table-column label="预计发送客户" align="center" prop="total" />
+              <el-table-column label="实际发送客户" align="center" prop="already" />
+              <el-table-column label="发送状态" align="center" prop="status">
+                <template slot-scope="scope">
+                  {{ memberState[scope.row.status] }}
+                </template>
+              </el-table-column>
+            </el-table>
+            <pagination v-show="member.total > 0" :total="member.total" :page.sync="queryMember.pageNum" :limit.sync="queryMember.pageSize" @pagination="getMemberPage" />
+          </div>
+        </div>
+        <div class="g-card g-pad20">
+          <div class="title">
+            <div class="name">
+              客户详情
+            </div>
+          </div>
+          <div class="search">
+            <el-form :model="queryCustomer" ref="queryForm" :inline="true" label-position="left" class="top-search" label-width="70px">
+              <el-form-item label="发送客户" prop="customerName">
+                <el-input size="mini" v-model="queryCustomer.customerName" style="width:150px;" placeholder="请输入发送客户" />
+              </el-form-item>
+              <el-form-item label="发送状态" prop="status">
+                <el-select v-model="queryCustomer.status" placeholder="请选择发送状态" size="mini">
+                  <el-option label="全部" value=''></el-option>
+                  <el-option v-for="(value, key, index) in customerState" :label="value" :value="key" :key="index">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label-width="0">
+                <el-button type="primary" size="mini" @click="getCustomerList(1)">查询</el-button>
+                <el-button type="info" size="mini" plain @click="resetCustomerQuery">清空</el-button>
+              </el-form-item>
+            </el-form>
+          </div>
+          <div>
+            <el-table v-loading="customer.loading" :data="customer.list">
+              <el-table-column label="客户" align="center" prop="customerName" />
+              <el-table-column label="所属员工" align="center" prop="userName" />
+              <el-table-column label="送达时间" align="center" prop="sendTime" width="180"></el-table-column>
+              <el-table-column label="送达状态" align="center" prop="status">
+                <template slot-scope="scope">
+                  {{ customerState[scope.row.status] }}
+                </template>
+              </el-table-column>
+            </el-table>
+            <pagination v-show="customer.total > 0" :total="customer.total" :page.sync="queryCustomer.pageNum" :limit.sync="queryCustomer.pageSize" @pagination="getCustomerPage" />
+          </div>
+        </div>
+      </el-col>
+      <el-col style="width: 350px">
+        <div class="g-card g-pad20" style="height: 100%">
+          <preview-client :list="form"></preview-client>
+        </div>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
+<script>
+  import {
+    getDetail, memberList, resultList, syncMsg
+  } from '@/api/groupMessage'
+  import PreviewClient from '@/components/previewInMobileClient.vue'
+
+  export default {
+    components: {
+      PreviewClient
+    },
+    props: {},
+    data () {
+      return {
+        customerState: {
+          0: '未送达',
+          1: '已送达',
+          2: '非好友',
+          3: '接收达上限'
+        },
+        memberState: {
+          0: '未发送',
+          1: '已发送'
+        },
+        member: {
+          loading: false,
+          total: 0,
+          list: []
+        },
+        customer: {
+          loading: false,
+          total: 0,
+          list: []
+        },
+        queryMember: {
+          userName: '',
+          msgTemplateId: '',
+          pageNum: 1,
+          pageSize: 10,
+          status: ''
+        },
+        queryCustomer: {
+          customerName: '',
+          msgTemplateId: '',
+          status: '',
+          pageNum: 1,
+          pageSize: 10
+        },
+        form: {
+          welcomeMsg: '',
+          materialMsgList: [],
+        },
+        data: {
+          alreadySendCustomerNum: 0,
+          alreadySendNum: 0,
+          toBeSendCustomerNum: 0,
+          toBeSendNum: 0,
+          refreshTime: ''
+        },
+        activeName: '0',
+        total1: 0,
+        total0: 0,
+        msgId: ''
+      }
+    },
+    watch: {},
+    computed: {},
+    created () {
+      this.msgId = this.$route.query.id
+      this.queryMember.msgTemplateId = this.msgId
+      this.queryCustomer.msgTemplateId = this.msgId
+      this.getDetail()
+      this.getMemberList()
+      this.getCustomerList()
+    },
+    mounted () { },
+    methods: {
+      setFn () {
+        this.$confirm('确定同步？', '提示', {
+          confirmButtonText: '确认同步',
+          cancelButtonText: '放弃',
+          type: 'warning'
+        }).then(() => {
+          syncMsg(this.msgId).then(fdfd => {
+            this.getDetail()
+            this.$message({
+              type: 'success',
+              message: '同步成功!'
+            })
+          })
+        }, () => {
+          this.$message({
+            type: 'info',
+            message: '已取消同步！'
+          })
+        }).catch(() => {
+
+        })
+      },
+      resetCustomerQuery () {
+        this.queryCustomer.customerName = ''
+        this.queryCustomer.status = ''
+      },
+      resetMemberQuery () {
+        this.queryMember.userName = ''
+        this.queryMember.status = ''
+      },
+      getMemberList (page) {
+        page && (this.queryMember.pageNum = page)
+        this.member.loading = true
+        memberList(this.queryMember).then(res => {
+          this.member.loading = false
+          this.member.total = Number(res.total)
+          this.member.list = res.rows
+        })
+      },
+      getCustomerList (page) {
+        page && (this.queryCustomer.pageNum = page)
+        this.customer.loading = true
+        resultList(this.queryCustomer).then(res => {
+          this.customer.loading = false
+          this.customer.total = Number(res.total)
+          this.customer.list = res.rows
+        })
+      },
+      getCustomerPage (e) {
+        this.queryCustomer.pageNum = e.page
+        this.getCustomerList()
+      },
+      getMemberPage (e) {
+        this.queryMember.pageNum = e.page
+        this.getMemberList()
+      },
+      getDetail () {
+        getDetail(this.msgId).then(res => {
+          if (res.code == 200) {
+            this.data = res.data
+            this.form.welcomeMsg = res.data.content
+            this.form.materialMsgList = res.data.attachments
+          } else {
+            this.msgError(res.msg || '获取失败')
+          }
+        })
+      }
+    }
+  }
+</script>
+
 <style lang="scss" scoped>
-.label {
-  width: 70px;
-  display: inline-block;
-  text-align: right;
-}
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .name {
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+    }
+    .operation {
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      color: #999;
+    }
+  }
+  .total_list {
+    width: 100%;
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .item {
+      height: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
+    }
+  }
+  .search {
+    margin: 20px 0;
+  }
+  .label {
+    width: 70px;
+    display: inline-block;
+    text-align: right;
+  }
+
+  .crumb {
+    font-size: 12px;
+    font-family: PingFangSC-Regular, PingFang SC;
+    font-weight: 400;
+    color: #666666;
+    display: flex;
+  }
+
+  .crumb- {
+    // 一级 页面标题
+    &title {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 90px; // line-height: 90px;
+      font-size: 18px;
+      font-weight: 500;
+      color: #333;
+      padding: 0 20px;
+      background: #fff;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+    }
+  }
 </style>

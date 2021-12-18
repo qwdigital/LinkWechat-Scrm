@@ -14,7 +14,7 @@ const service = axios.create({
 })
 // request拦截器
 service.interceptors.request.use(
-  config => {
+  (config) => {
     // 是否需要设置 token
     const isToken = (config.headers || {}).isToken === false
     if (getToken() && !isToken) {
@@ -22,7 +22,7 @@ service.interceptors.request.use(
     }
     return config
   },
-  error => {
+  (error) => {
     console.log(error)
     Promise.reject(error)
   }
@@ -30,7 +30,7 @@ service.interceptors.request.use(
 
 // 响应拦截器
 service.interceptors.response.use(
-  res => {
+  (res) => {
     // 未设置状态码则默认成功状态
     const code = res.data.code || 200
     // 获取错误信息
@@ -69,7 +69,7 @@ service.interceptors.response.use(
       return Promise.reject()
     }
   },
-  error => {
+  (error) => {
     console.log('err' + error)
     let { message, response, config } = error
     if (message == 'Network Error') {

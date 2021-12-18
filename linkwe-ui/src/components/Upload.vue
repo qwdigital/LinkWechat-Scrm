@@ -1,6 +1,7 @@
 <script>
 import { upload } from '@/api/material'
 import Video from 'video.js'
+import BenzAMRRecorder from 'benz-amr-recorder'
 export default {
   name: 'Upload',
   components: {},
@@ -17,6 +18,11 @@ export default {
     type: {
       type: String,
       default: '0'
+    },
+    // 上传文件大小不能超过 maxSize MB
+    maxSize: {
+      type: Number,
+      default: 2
     }
     // beforeUpload: {
     //   type: Function,
@@ -33,7 +39,7 @@ export default {
       //   ? '/wecom/material/uploadimg'
       //   : '/common/uploadFile2Cos'),
       headers: window.CONFIG.headers,
-      domain: process.env.VUE_APP_BASE_API,
+      domain: process.env.VUE_APP_BASE_API
     }
   },
   watch: {},
@@ -45,14 +51,14 @@ export default {
   created() {},
   mounted() {},
   methods: {
-    handleBeforeUpload(file) {
+    async handleBeforeUpload(file) {
       this.loading = true
       let isFormat = true,
         isSize = true
       if (this.type === '0') {
         // 图片
         isFormat = file.type === 'image/jpeg' || file.type === 'image/png'
-        isSize = file.size / 1024 / 1024 < 2
+        isSize = file.size / 1024 / 1024 < this.maxSize
 
         if (!isFormat) {
           this.$message.error('上传文件只能是 JPG 格式!')
@@ -70,6 +76,17 @@ export default {
         }
         if (!isSize) {
           this.$message.error('上传文件大小不能超过 2MB!')
+        }
+        let amr = new BenzAMRRecorder()
+        try {
+          await amr.initWithBlob(file)
+          isSize = amr.getDuration() <= 60
+          if (!isSize) {
+            this.$message.error('上传文件时长不能超过 60秒!')
+          }
+        } catch (error) {
+          console.log(error)
+          this.$message.error('文件损坏')
         }
       } else if (this.type === '2') {
         // 视频
