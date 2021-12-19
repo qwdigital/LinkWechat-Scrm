@@ -28,14 +28,36 @@ export function getWeCustomerInfo(data) {
     }
   })
 }
-//   获取当前系统所有可用标签
+//
+/**
+ * 获取当前系统所有可用标签
+ * @param {*} params
+ * groupTagType	是	1:企业客户标签;3:个人标签
+userId	员工的id	当groupTagType为3的时候需要传该字段
+ * @returns
+ */
 export function getAllTags(params) {
   return request({
     url: service + '/findAllTags',
     params
   })
 }
-// 更新客户画像标签
+//
+/**
+ * 更新客户画像标签
+ * @param {*} data
+ * {
+    "externalUserid": "wmiGuBCgAApTcSW-3caqljFmKhm0r-bQ",//客户id
+    "userId": "ShengXiYong",//当前员工id
+    "isCompanyTag": false,//是否是企业标签true是;false:不是
+    "addTag": [
+        {
+            "tagId": "1471332704915922947"//标签id
+        }
+    ]
+}
+ * @returns
+ */
 export function updateWeCustomerPorTraitTag(data) {
   return request({
     url: service + '/updateWeCustomerPorTraitTag',
@@ -58,8 +80,8 @@ export function findAddGroupNum(params) {
 }
 //  获取轨迹信息
 /**
- * 
- * @param {*} 
+ *
+ * @param {*}
   {
     pageNum:
 pageSize:
@@ -67,7 +89,7 @@ trajectoryType: 轨迹类型(1:信息动态;2:社交动态;3:活动规则;4:待�
 userId: 员工的id
 externalUserid: 客户id
   }
- * @returns 
+ * @returns
  */
 export function findTrajectory(params) {
   return request({
@@ -94,6 +116,42 @@ export function removeTrajectory(params) {
 export function handleWait(params) {
   return request({
     url: service + '/handleWait/' + params,
+    method: 'delete'
+  })
+}
+
+/**
+ * 客户画像个人标签新增或更新
+ * @param {*} params
+ * {
+    "gourpName": "个人标签分组", //标签组名
+    "groupId": "1471327408994738177",//标签组id,新增的时候没有则传 null
+    "weTags": [
+        {
+            "groupId": "1471327408994738177",//标签组id,新增的时候没有则传 null
+            "name": "个人标签3",//标签名
+            "tagId": "1471327409208647681"//标签id,新增的时候没有则传 null
+        }
+    ]
+}
+ * @returns
+ */
+export function addOrUpdatePersonTags(data) {
+  return request({
+    url: service + '/addOrUpdatePersonTags/',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 删除个人标签
+ * @ids {*} ids	标签id,多个用逗号隔开
+ * @returns
+ */
+export function deletePersonTag(ids) {
+  return request({
+    url: service + '/deletePersonTag/' + ids,
     method: 'delete'
   })
 }

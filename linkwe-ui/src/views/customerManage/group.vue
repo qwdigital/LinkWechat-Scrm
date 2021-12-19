@@ -147,6 +147,7 @@ export default {
       })
       api.sync().then((r) => {
         loading.close()
+        this.getList(1)
         this.msgSuccess('后台开始同步数据，请稍后关注进度')
       })
     },
