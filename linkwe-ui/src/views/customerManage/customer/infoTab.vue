@@ -9,6 +9,10 @@ export default {
       type: String,
       default: ''
     }
+    // trackUsers: {
+    //   type: Array,
+    //   default: ''
+    // }
   },
   components: {
     record
@@ -105,7 +109,8 @@ export default {
                 :key="index"
                 :class="['flex', index && 'mt20']"
               >
-                <div class="name oe">{{ item.userName }}</div>
+                <!-- 汇总的场景显示名字 -->
+                <div v-if="!userId" class="name oe">{{ item.userName }}</div>
                 ：
                 <template v-if="item.tagNames">
                   <el-tag
@@ -133,7 +138,8 @@ export default {
                 :key="index"
                 :class="['flex', index && 'mt20']"
               >
-                <div class="name oe">{{ item.userName }}</div>
+                <!-- 汇总的场景显示名字 -->
+                <div v-if="!userId" class="name oe">{{ item.userName }}</div>
                 ：
                 <template v-if="item.tagNames">
                   <el-tag
@@ -157,7 +163,8 @@ export default {
             <div slot="header" class="card-title">跟进状态</div>
             <template v-if="portrayalSum.trackStates && portrayalSum.trackStates.length">
               <div class="flex mb20" v-for="(item, index) of portrayalSum.trackStates" :key="index">
-                <div class="name oe">{{ item.userName }}</div>
+                <!-- 汇总的场景显示名字 -->
+                <div class="name oe" v-if="!userId">{{ item.userName }}</div>
                 ：
                 <template v-if="item.trackStateList.length">
                   <el-steps
@@ -183,19 +190,22 @@ export default {
 
           <el-card shadow="never">
             <div slot="header" class="card-title">跟进记录</div>
+            <!-- 单个人的场景 -->
+            <record v-if="userId" :userId="userId" viewType="1"></record>
+            <!-- 汇总的场景 -->
             <el-tabs
-              v-if="portrayalSum.trackStates && portrayalSum.trackStates.length"
+              v-else-if="portrayalSum.trackUsers && portrayalSum.trackUsers.length"
               value="0"
               @tab-click="changeTab"
             >
               <el-tab-pane
-                v-for="(item, index) in portrayalSum.trackStates"
+                v-for="(item, index) in portrayalSum.trackUsers"
                 :key="index"
                 :label="item.userName"
               >
                 <record
                   v-if="openedTabs.includes(index + '')"
-                  :userId="item.userId"
+                  :userId="item.trackUserId"
                   viewType="1"
                 ></record>
               </el-tab-pane>

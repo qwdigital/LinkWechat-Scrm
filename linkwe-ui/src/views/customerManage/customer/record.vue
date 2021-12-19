@@ -14,6 +14,7 @@ export default {
       type: String,
       default: null
     },
+    // 视图展示类型 1:表格展示，2:轨迹时间线展示
     viewType: {
       type: String,
       default: ''
@@ -23,7 +24,7 @@ export default {
   data() {
     return {
       query: {
-        pageNum: 1,
+        pageNum: 0,
         pageSize: 10,
         externalUserid: '', //	是	当前客户id
         userId: null, //		当前跟进人id,
@@ -38,7 +39,7 @@ export default {
   computed: {},
   watch: {},
   created() {
-    this.viewType && this.getList()
+    this.viewType && this.getList(1)
   },
   mounted() {},
   methods: {
@@ -60,7 +61,9 @@ export default {
           if (this.viewType) {
             this.list = rows
           } else {
+            debugger
             this.list = this.list.concat(rows)
+            console.log(this.list)
           }
           this.total = +total
           this.loading = false

@@ -62,11 +62,15 @@ export default {
       getDetail(this.$route.query).then(({ data }) => {
         data.companyTags && (data.companyTags = data.companyTags.split(','))
         this.customer = data
+
+        if (data.trackUsers && data.trackUsers.length === 1) {
+          this.openedTabs = [data.trackUsers[0].trackUserId]
+        }
         this.birthday = data.birthday
       })
     },
     changeTab(tab) {
-      this.openedTabs.includes(tab.id) || this.openedTabs.push(tab.id)
+      this.openedTabs.includes(tab.$attrs.id) || this.openedTabs.push(tab.$attrs.id)
     }
 
     // remark(item) {
