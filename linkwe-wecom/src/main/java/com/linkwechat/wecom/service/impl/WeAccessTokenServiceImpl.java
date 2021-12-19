@@ -1,23 +1,18 @@
 package com.linkwechat.wecom.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.config.RuoYiConfig;
-import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeAccessTokenClient;
-import com.linkwechat.wecom.domain.WeApp;
 import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.wecom.domain.dto.WeAccessTokenDto;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
-import com.linkwechat.wecom.service.IWeAppService;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,8 +35,7 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
     private RedisCache redisCache;
 
 
-    @Autowired
-    private IWeAppService iWeAppService;
+
 
 
     @Autowired
@@ -97,57 +91,33 @@ public class WeAccessTokenServiceImpl implements IWeAccessTokenService {
     public String findThirdAppAccessToken() {
 
 
-        WeApp weApp=null;
         //首先表中查询提醒的appid
         WeCorpAccount weCorpAccount = iWxCorpAccountService.findValidWeCorpAccount();
-        if(weCorpAccount != null && StringUtils.isNotEmpty(weCorpAccount.getAgentId())){
-
-            String token=redisCache.getCacheObject(WeConstans.WE_THIRD_APP_TOKEN+"::"+weCorpAccount.getAgentId());
-            if(StringUtils.isNotEmpty(token)){
-                return token;
-            }else{
-                weApp=WeApp.builder()
-                        .agentId(weCorpAccount.getAgentId())
-                        .agentSecret(weCorpAccount.getAgentSecret())
-                        .build();
-            }
-
-//            if(weCorpAccount.getAgentId().equals(agentId)){
-//
-//            }
+        if(null == weCorpAccount){
+            throw new WeComException("无可用的corpid和secret");
         }
-//        if(weApp==null){
-//            weApp = iWeAppService.getOne(new LambdaQueryWrapper<WeApp>()
-//                    .eq(WeApp::getAgentId, agentId)
-//                    .eq(WeApp::getDelFlag, Constants.NORMAL_CODE)
-//                    .eq(WeApp::getStatus,  Constants.NORMAL_CODE));
-//        }
+
+        if(StringUtils.isEmpty(weCorpAccount.getAgentId())&&StringUtils.isEmpty(weCorpAccount.getAgentSecret())){
+            throw new WeComException("请确保应用id与应用密钥可用");
+        }
+        String token=redisCache.getCacheObject(WeConstans.WE_THIRD_APP_TOKEN+"::"+weCorpAccount.getAgentId());
 
 
-        return findThirdAppAccessToken(weApp);
+        return StringUtils.isNotEmpty(token)
+                ?token:findThirdAppAccessToken(weCorpAccount);
 
     }
 
 
-    private String findThirdAppAccessToken(WeApp weApp){
+    private String findThirdAppAccessToken(WeCorpAccount weCorpAccount){
 
-
-        if(weApp == null){
-            throw new WeComException("当前agentId不可用或不存在");
-        }
-
-        WeCorpAccount wxCorpAccount
-                = iWxCorpAccountService.findValidWeCorpAccount();
-        if(wxCorpAccount == null){
-            throw new WeComException("无可用的corpid和secret");
-        }
 
         WeAccessTokenDto weAccessTokenDto
-                = accessTokenClient.getToken(wxCorpAccount.getCorpId(),weApp.getAgentSecret());
+                = accessTokenClient.getToken(weCorpAccount.getCorpId(),weCorpAccount.getAgentSecret());
 
         if(StringUtils.isNotEmpty(weAccessTokenDto.getAccessToken())){
 
-            redisCache.setCacheObject(WeConstans.WE_THIRD_APP_TOKEN+"::"+weApp.getAgentId(), weAccessTokenDto.getAccessToken(), weAccessTokenDto.getExpiresIn().intValue(), TimeUnit.SECONDS);
+            redisCache.setCacheObject(WeConstans.WE_THIRD_APP_TOKEN+"::"+weCorpAccount.getAgentId(), weAccessTokenDto.getAccessToken(), weAccessTokenDto.getExpiresIn().intValue(), TimeUnit.SECONDS);
         }
 
 

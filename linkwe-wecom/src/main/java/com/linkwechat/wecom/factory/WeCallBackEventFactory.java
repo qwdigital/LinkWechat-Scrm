@@ -10,5 +10,5 @@ import org.springframework.stereotype.Service;
  **/
 @Service
 public interface WeCallBackEventFactory {
-    public void eventHandle(WxCpXmlMessageVO message);
+    public void eventHandle(String message);
 }

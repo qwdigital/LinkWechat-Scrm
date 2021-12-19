@@ -21,14 +21,20 @@ public class WeCustomerList {
     //客户名称
     private String customerName;
 
-    //客户类型
+    //客户类型 1:微信用户，2:企业用户
     private Integer customerType;
 
-    //查询标签id
+    //查询标签id(企业标签id)
     private String tagIds;
 
-    //标签名称，使用逗号隔开
+    //标签名称，使用逗号隔开(企业标签名)
     private String tagNames;
+
+    //个人标签id
+    private String personTagIds;
+
+    //个人标签名
+    private String personTagNames;
 
     //跟进人名称
     private String userName;
@@ -68,8 +74,6 @@ public class WeCustomerList {
 
 
 
-
-
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthday;
 
@@ -87,6 +91,8 @@ public class WeCustomerList {
 
     //所属部门id，多个用逗号隔开
     private String departmentIds;
+
+
 
 
     //0正常；1:删除;

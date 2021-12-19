@@ -94,6 +94,17 @@ public interface IWeMaterialService {
      */
     public WeMediaDto uploadTemporaryMaterial(String url, String type,String name);
 
+
+    /**
+     * 获取附件mediaid
+     * @param url
+     * @param type
+     * @param attachmentType 1：朋友圈；2:商品图册
+     * @param name
+     * @return
+     */
+    public WeMediaDto uploadAttachmentMaterial(String url, String type,Integer attachmentType, String name);
+
     /**
      * 上传素材图片
      * @param file
@@ -107,4 +118,6 @@ public interface IWeMaterialService {
      * @return
      */
     WeMediaDto getMediaToResponse(String mediaId);
+
+    public String mediaGet(String media_id, String fileType,String extentType);
 }

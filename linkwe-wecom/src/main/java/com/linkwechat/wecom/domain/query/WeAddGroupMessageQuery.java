@@ -18,6 +18,8 @@ import java.util.List;
 @Data
 public class WeAddGroupMessageQuery extends WeGroupMessageTemplate {
 
+    @ApiModelProperty("是否全部发送")
+    private Boolean isAll;
     /**
      * 指定接收消息的成员及对应客户列表
      */

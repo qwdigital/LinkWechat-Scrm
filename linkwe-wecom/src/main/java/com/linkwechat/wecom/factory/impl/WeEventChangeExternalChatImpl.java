@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.factory.impl;
 
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
+import cn.hutool.core.util.XmlUtil;
+import com.linkwechat.wecom.domain.callback.WeBackCustomerGroupVo;
 import com.linkwechat.wecom.factory.WeCallBackEventFactory;
 import com.linkwechat.wecom.factory.WeStrategyBeanFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +21,9 @@ public class WeEventChangeExternalChatImpl implements WeCallBackEventFactory {
     private WeStrategyBeanFactory weStrategyBeanFactory;
 
     @Override
-    public void eventHandle(WxCpXmlMessageVO message) {
-        String changeType = message.getChangeType();
-        weStrategyBeanFactory.getResource(changeType,message);
+    public void eventHandle(String message) {
+        WeBackCustomerGroupVo weBackCustomerGroupVo = XmlUtil.xmlToBean(XmlUtil.parseXml(message).getFirstChild(), WeBackCustomerGroupVo.class);
+        String changeType = weBackCustomerGroupVo.getChangeType();
+        weStrategyBeanFactory.getResource(changeType,weBackCustomerGroupVo);
     }
 }

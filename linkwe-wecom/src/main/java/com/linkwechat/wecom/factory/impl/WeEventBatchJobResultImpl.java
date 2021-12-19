@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.factory.impl;
 
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
+import cn.hutool.core.util.XmlUtil;
+import com.linkwechat.wecom.domain.callback.WeBackAsynTaskVo;
 import com.linkwechat.wecom.factory.WeCallBackEventFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,9 @@ import org.springframework.stereotype.Service;
 public class WeEventBatchJobResultImpl implements WeCallBackEventFactory {
 
     @Override
-    public void eventHandle(WxCpXmlMessageVO message) {
-        String jobType = message.getBatchJob().getJobType();
+    public void eventHandle(String message) {
+        WeBackAsynTaskVo weBackAsynTaskVo = XmlUtil.xmlToBean(XmlUtil.parseXml(message).getFirstChild(), WeBackAsynTaskVo.class);
+        String jobType = weBackAsynTaskVo.getBatchJob().getJobType();
         switch (jobType){
             case "sync_user"://增量更新成员)
                 break;

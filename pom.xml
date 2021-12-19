@@ -43,6 +43,7 @@
         <jsqlparser.version>4.0</jsqlparser.version>
         <nacos.starter.version>1.0.2</nacos.starter.version>
         <protobuf.vaersion>3.18.0</protobuf.vaersion>
+        <log4j2.version>2.16.0</log4j2.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -300,10 +301,25 @@
             </dependency>
 
 
+
             <dependency>
                 <groupId>com.google.protobuf</groupId>
                 <artifactId>protobuf-java</artifactId>
                 <version>${protobuf.vaersion}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-to-slf4j</artifactId>
+                <version>${log4j2.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${log4j2.version}</version>
             </dependency>
 
 

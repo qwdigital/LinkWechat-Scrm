@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
-    <artifactId>linkwe-admin</artifactId>
+    <artifactId>linkwe-admin-dev</artifactId>
 
     <description>
         web服务入口
@@ -87,6 +87,8 @@
             <groupId>io.github.leejoker</groupId>
             <artifactId>linkwechat-nacos-starter</artifactId>
         </dependency>
+
+
 
 
         <dependency>

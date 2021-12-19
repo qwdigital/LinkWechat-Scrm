@@ -10,7 +10,7 @@ import java.util.List;
  * @author danmo
  */
 @Data
-public class UserBehaviorDataDto{
+public class UserBehaviorDataDto extends WeResultDto{
 
     private List<BehaviorData> behaviorData;
 

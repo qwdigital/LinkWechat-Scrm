@@ -72,14 +72,11 @@
     <select id="customerMessagePushs" resultType="com.linkwechat.wecom.domain.vo.WeCustomerMessageResultVo">
         SELECT
         user_name,
-        GROUP_CONCAT(IFNULL(external_name,chat_name)) customers
+        GROUP_CONCAT(IFNULL(external_name,chat_name) SEPARATOR '、') customers
         FROM
         we_customer_messgaeResult
         <where>
-            <if test="messageId !=null">
-                AND message_id=#{messageId}
-            </if>
-
+            message_id=#{messageId}
             <if test="status!=null">
                 AND `status`=#{status}
             </if>

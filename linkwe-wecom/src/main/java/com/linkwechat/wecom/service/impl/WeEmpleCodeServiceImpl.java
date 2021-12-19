@@ -241,7 +241,9 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
     public int deleteWeEmpleCodeById(Long id) {
         WeEmpleCode weEmpleCode = getById(id);
         if (weEmpleCode != null && weEmpleCode.getConfigId() != null) {
-            weExternalContactClient.delContactWay(weEmpleCode.getConfigId());
+            WeExternalContactDto externalContactDto = new WeExternalContactDto();
+            externalContactDto.setConfig_id(weEmpleCode.getConfigId());
+            weExternalContactClient.delContactWay(externalContactDto);
         }
         // 删除对应的新科拉群信息
         communityNewGroupMapper.removeWeCommunityNewGroupByEmplCodeId(id);
@@ -422,7 +424,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         weContactWay.setType(weEmpleCode.getCodeType());
         weContactWay.setScene(WeConstans.QR_CODE_EMPLE_CODE_SCENE);
         weContactWay.setSkip_verify(weEmpleCode.getIsJoinConfirmFriends().equals(new Integer(0))?false:true);
-        weContactWay.setState(String.valueOf(weEmpleCode.getState()));
+        weContactWay.setState(String.valueOf(weEmpleCode.getId()));
         if (CollectionUtil.isNotEmpty(weEmpleCodeUseScops)) {
             //员工列表
             String[] userIdArr = weEmpleCodeUseScops.stream().filter(itme ->

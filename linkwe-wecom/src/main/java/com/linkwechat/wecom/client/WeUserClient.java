@@ -2,6 +2,7 @@ package com.linkwechat.wecom.client;
 
 import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.*;
+import com.linkwechat.wecom.domain.dto.customer.JobExtendsCustomer;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 import com.linkwechat.wecom.interceptor.WeAppAccessTokenInterceptor;
 import com.linkwechat.wecom.interceptor.WeCommonAccessTokenInterceptor;
@@ -12,7 +13,7 @@ import com.linkwechat.wecom.retry.WeCommonRetryWhen;
  * @author: HaoN
  * @create: 2020-08-27 16:42
  **/
-@BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeCommonAccessTokenInterceptor.class)
+@BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
 @Retry(maxRetryCount = "3", maxRetryInterval = "1000", condition = WeCommonRetryWhen.class)
 public interface WeUserClient {
 
@@ -72,11 +73,32 @@ public interface WeUserClient {
 
 
     /**
-     * 分配客户
+     * 分配客户(离职继承分配客户)
      * @return
      */
     @Request(url="/externalcontact/resigned/transfer_customer", type = "POST")
     WeResultDto allocateCustomer(@JSONBody AllocateWeCustomerDto allocateWeCustomerDto);
+
+
+
+    /**
+     * 在职继承分配客户(在职继承)
+     * @param allocateWeCustomerDto
+     * @return
+     */
+    @Request(url = "/externalcontact/transfer_customer", type = "POST")
+    JobExtendsCustomer transferCustomer(@JSONBody AllocateWeCustomerDto allocateWeCustomerDto);
+
+
+    /**
+     * 查询客户接替状态
+     * @param jobExtendsParam
+     * @return
+     */
+    @Post(url = "externalcontact/transfer_result")
+    JobExtendsCustomer transferResult(@JSONBody JobExtendsCustomer.JobExtendsParam jobExtendsParam);
+
+
 
 
     /**

@@ -50,4 +50,10 @@ public interface IWeMessagePushService {
      * @return 结果
      */
     public int deleteWeMessagePushById(Long messagePushId);
+
+
+    /**
+     * 推送信息给员工附带自己的url链接，跳转H5
+     */
+    public void pushMessageSelfH5(List<String> toUser,String textContent,Integer taskType);
 }

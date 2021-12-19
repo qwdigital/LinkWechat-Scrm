@@ -1,16 +1,20 @@
 package com.linkwechat.web.controller.wecom;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.exception.CustomException;
+import com.linkwechat.wecom.constants.SynchRecordConstants;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeGroupMember;
 import com.linkwechat.wecom.domain.vo.WeMakeGroupTagVo;
 import com.linkwechat.wecom.service.IWeGroupMemberService;
 import com.linkwechat.wecom.service.IWeGroupService;
 import com.linkwechat.wecom.service.IWeGroupTagRelService;
+import com.linkwechat.wecom.service.IWeSynchRecordService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,14 +44,50 @@ public class WeGroupController extends BaseController {
     @Autowired
     private IWeGroupTagRelService iWeGroupTagRelService;
 
+    @Autowired
+    private IWeSynchRecordService iWeSynchRecordService;
+
     //  @PreAuthorize("@ss.hasPermi('customerManage:group:list')")
     @GetMapping({"/list"})
     public TableDataInfo list(WeGroup weGroup) {
         startPage();
         List<WeGroup> list = this.weGroupService.selectWeGroupList(weGroup);
-        return getDataTable(list);
+        TableDataInfo dataTable = getDataTable(list);
+        dataTable.setLastSyncTime(
+                iWeSynchRecordService.findUpdateLatestTime(SynchRecordConstants.SYNCH_CUSTOMER_GROUP)
+        );//最近同步时间
+        return dataTable;
     }
 
+
+    /**
+     * 群详情
+     * @param chatId
+     * @return
+     */
+    @GetMapping("/chatDetail/{chatId}")
+    public AjaxResult chatDetail(@PathVariable String chatId){
+        List<WeGroup> weGroups = this.weGroupService.selectWeGroupList(WeGroup.builder()
+                        .chatId(chatId)
+                .build());
+        if(CollectionUtil.isNotEmpty(weGroups)){
+            return AjaxResult.success(weGroups.stream().findFirst().get());
+        }
+        return AjaxResult.success();
+    }
+
+    /**
+     * 获取所有群接口(不分页)
+     * @param weGroup
+     * @return
+     */
+    @GetMapping({"/allList"})
+    public AjaxResult allList(WeGroup weGroup) {
+
+        return AjaxResult.success(
+                this.weGroupService.selectWeGroupList(weGroup)
+        );
+    }
 
 
     //   @PreAuthorize("@ss.hasPermi('customerManage:group:view')")
@@ -65,13 +105,11 @@ public class WeGroupController extends BaseController {
     //   @PreAuthorize("@ss.hasPermi('customerManage:group:sync')")
     @GetMapping({"/synchWeGroup"})
     public AjaxResult synchWeGroup(){
+
         try {
-            SecurityContext context = SecurityContextHolder.getContext();
-            SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
-            SecurityContextHolder.setContext(context);
             weGroupService.synchWeGroup();
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (CustomException e){
+            return AjaxResult.error(e.getMessage());
         }
         return  AjaxResult.success(WeConstans.SYNCH_TIP);
     }

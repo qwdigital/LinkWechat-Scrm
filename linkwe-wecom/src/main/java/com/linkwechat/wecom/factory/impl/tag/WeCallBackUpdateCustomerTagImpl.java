@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.factory.impl.tag;
 
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
+import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
+import com.linkwechat.wecom.domain.callback.WeBackCustomerTagVo;
 import com.linkwechat.wecom.factory.WeEventStrategy;
 import com.linkwechat.wecom.service.IWeTagGroupService;
 import com.linkwechat.wecom.service.IWeTagService;
@@ -21,21 +22,22 @@ public class WeCallBackUpdateCustomerTagImpl extends WeEventStrategy {
     @Autowired
     private IWeTagService weTagService;
     @Override
-    public void eventHandle(WxCpXmlMessageVO message) {
+    public void eventHandle(WeBackBaseVo message) {
+        WeBackCustomerTagVo customerTagInfo = (WeBackCustomerTagVo) message;
         try {
-            switch (message.getTagType()){
+            switch (customerTagInfo.getTagType()){
                 case tagGroup:
-                    weTagGroupService.updateTagGroup(message.getId());
+                    weTagGroupService.updateTagGroup(customerTagInfo.getId());
                     break;
                 case tag:
-                    weTagService.updateTag(message.getId());
+                    weTagService.updateTag(customerTagInfo.getId());
                     break;
                 default:
                     break;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("updateCustomerTag>>>>>>>>>param:{},ex:{}",message.getId(),e);
+            log.error("updateCustomerTag>>>>>>>>>param:{},ex:{}",customerTagInfo.getId(),e);
         }
     }
 }

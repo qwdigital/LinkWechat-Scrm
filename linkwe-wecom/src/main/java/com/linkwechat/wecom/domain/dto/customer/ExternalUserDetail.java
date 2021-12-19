@@ -93,9 +93,6 @@ public class ExternalUserDetail extends WeResultDto {
         private String oper_userid;
         /**标签**/
         private String[] tag_id;
-
-        /** 企业自定义的state参数，用于区分客户具体是通过哪个「联系我」添加，由企业通过创建「联系我」方式指定 */
-        private String state;
     }
 
 }

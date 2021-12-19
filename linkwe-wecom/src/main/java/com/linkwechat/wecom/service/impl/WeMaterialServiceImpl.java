@@ -22,14 +22,13 @@ import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.domain.vo.WeMaterialFileVO;
 import com.linkwechat.wecom.mapper.WeMaterialMapper;
 import com.linkwechat.wecom.service.IWeMaterialService;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
@@ -55,6 +54,7 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
     @Autowired
     private RuoYiConfig ruoYiConfig;
 
+
     @Override
     public WeMaterialFileVO uploadWeMaterialFile(MultipartFile file, String type) {
         if (null == file) {
@@ -62,32 +62,14 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
         }
         try {
 
-
-//            /**
-//             * 当前上传腾讯云
-//             */
-//            String s = FileUploadUtils.upload2Cos(file, cosConfig);
-//            //上传文件到文件服务器
-//            // 上传文件路径
-//            String filePath = RuoYiConfig.getUploadPath();
-//            String fileName = "";
-//            if (com.linkwechat.common.enums.MediaType .FILE.getType().equals(type)) {
-//                fileName = FileUploadUtils.uploadFile(file);
-//            } else {
-//                // 上传并返回新文件名称
-//                fileName = FileUploadUtils.upload(filePath, file);
-//            }
-//            String url =  fileName;
 //            //上传临时素材
             Optional<com.linkwechat.common.enums.MediaType > mediaType = com.linkwechat.common.enums.MediaType .of(type);
             if (!mediaType.isPresent()) {
                 throw new WeComException("媒体类型出错！");
             }
             //构造返回结果
-//            return WeMaterialFileVO.builder().materialUrl(url).materialName(file.getOriginalFilename()).build();
             return WeMaterialFileVO.builder().materialUrl(ruoYiConfig.getFile().getCos().getCosImgUrlPrefix()).materialName(FileUploadUtils.upload2Cos(file, ruoYiConfig.getFile().getCos())).build();
 
-//            return WeMaterialFileVO.builder().materialUrl(ruoYiConfig.getFile().getCos().getCosImgUrlPrefix()+"/common/findImage?fileName=/").materialName(FileUploadUtils.upload2Cos(file, ruoYiConfig.getFile().getCos())).build();
         } catch (Exception e) {
             throw new WeComException(e.getMessage());
         }
@@ -159,6 +141,41 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
         return null;
     }
 
+
+    /**
+     * 获取附件mediaId
+     * @param url
+     * @param type
+     * @param attachmentType
+     * @param name
+     * @return
+     */
+    @Override
+    public WeMediaDto uploadAttachmentMaterial(String url, String type,Integer attachmentType, String name) {
+        HttpURLConnection conn = null;
+        try{
+            URL materialUrl = new URL(url);
+            conn = (HttpURLConnection) materialUrl.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(20 * 1000);
+            InputStream inputStream = conn.getInputStream();
+            return weMediaClient.uploadAttachment(inputStream, name, type,attachmentType);
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("上传临时文件失败......url:{},type:{},name:{},ex:{},st:{}",url,type,name,e.getMessage(),e.getStackTrace());
+        }finally {
+            if (conn !=null){
+                conn = null;
+            }
+        }
+        return null;
+    }
+
+
+
+
+
+
     @Override
     public WeMediaDto uploadImg(MultipartFile file) {
         return weMediaClient.uploadimg(file);
@@ -191,6 +208,72 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
             }
         }
         return weMediaDto;
+    }
+
+
+
+
+    /**
+     * 下载服务器素材
+     * @param media_id
+     * @param fileType
+     * @return
+     */
+    @Override
+    public String mediaGet(String media_id, String fileType,String extentType) {
+        InputStream file = weMediaClient.mediaGet(media_id);
+
+        MultipartFile file1=new MultipartFile() {
+
+            @Override
+            public String getName() {
+                return SnowFlakeUtil.nextId()+"";
+            }
+
+            @Override
+            public String getOriginalFilename() {
+                return SnowFlakeUtil.nextId()+"."+ extentType;
+            }
+
+            @Override
+            public String getContentType() {
+                return  extentType;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+
+            @SneakyThrows
+            @Override
+            public long getSize() {
+                return  file.available();
+            }
+
+            @Override
+            public byte[] getBytes() throws IOException {
+                return new byte[0];
+            }
+
+            @Override
+            public InputStream getInputStream() throws IOException {
+                return file;
+            }
+
+            @Override
+            public void transferTo(File file) throws IOException, IllegalStateException {
+            }
+
+        };
+        try {
+            WeMaterialFileVO weMaterialFileVO = this.uploadWeMaterialFile(file1, fileType);
+            return weMaterialFileVO.getMaterialUrl()+weMaterialFileVO.getMaterialName();
+        }catch (Exception e){
+          log.error("朋友圈资源获取失败:"+e.getMessage());
+        }
+
+        return null;
     }
 
 }

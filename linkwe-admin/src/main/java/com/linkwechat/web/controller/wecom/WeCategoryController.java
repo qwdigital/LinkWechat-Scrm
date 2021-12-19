@@ -8,11 +8,13 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.Tree;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.wecom.domain.WeCategory;
+import com.linkwechat.wecom.domain.vo.WeCategoryVo;
 import com.linkwechat.wecom.service.IWeCategoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -26,7 +28,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/wecom/category")
-@Api("企业微信素材分类")
+@Api(tags = "企业微信素材分类")
 public class WeCategoryController extends BaseController {
 
     @Autowired
@@ -37,7 +39,7 @@ public class WeCategoryController extends BaseController {
 //    @PreAuthorize("@ss.hasPermi('wechat:category:list')")
     @GetMapping("/list")
     @ApiOperation("类目树")
-    public AjaxResult list(@RequestParam("mediaType") String mediaType) {
+    public AjaxResult<WeCategoryVo> list(@RequestParam("mediaType") String mediaType) {
         return AjaxResult.success(weCategoryService.findWeCategoryByMediaType(mediaType));
     }
 
@@ -47,7 +49,7 @@ public class WeCategoryController extends BaseController {
 //    @PreAuthorize("@ss.hasPermi('wechat:category:query')")
     @GetMapping(value = "/{id}")
     @ApiOperation("通过id查询类目详细信息")
-    public AjaxResult getInfo(@PathVariable("id") Long id) {
+    public AjaxResult<WeCategoryVo> getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(weCategoryService.getById(id));
     }
 
@@ -58,7 +60,7 @@ public class WeCategoryController extends BaseController {
     @Log(title = "添加类目", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("添加类目")
-    public AjaxResult add(@RequestBody WeCategory category) {
+    public AjaxResult add(@Validated @RequestBody WeCategory category) {
         weCategoryService.insertWeCategory(category);
         return AjaxResult.success();
     }
@@ -70,7 +72,7 @@ public class WeCategoryController extends BaseController {
     @Log(title = "更新目录", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("更新目录")
-    public AjaxResult edit(@RequestBody WeCategory category) {
+    public AjaxResult edit(@Validated @RequestBody WeCategory category) {
         weCategoryService.updateWeCategory(category);
         return AjaxResult.success();
     }
@@ -98,5 +100,7 @@ public class WeCategoryController extends BaseController {
 
         return AjaxResult.success();
     }
+
+
 
 }

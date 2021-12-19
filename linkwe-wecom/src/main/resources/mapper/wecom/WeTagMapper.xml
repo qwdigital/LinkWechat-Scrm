@@ -5,10 +5,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.linkwechat.wecom.mapper.WeTagMapper">
     
     <resultMap type="WeTag" id="WeTagResult">
-        <result property="id"    column="id"    />
+        <result property="tagId"    column="id"    />
         <result property="groupId"    column="group_id"    />
         <result property="name"    column="name"    />
-        <result property="createTime"    column="create_time"    />
     </resultMap>
 
     <sql id="selectWeTagVo">
@@ -27,7 +26,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectWeTagVo"/>
         where id = #{id} and  status=0
     </select>
-        
+
+
+    <select id="selectWeTagByIds" resultType="com.linkwechat.wecom.domain.vo.tag.WeTagVo">
+        select tag_id, `name` as tag_name from we_tag
+        <where>
+           <if test="tagIds != null and tagIds.size() > 0">
+               and tag_id in
+               <foreach item="tagId" collection="tagIds" index="index" open="(" separator="," close=")">
+                   #{id}
+               </foreach>
+           </if>
+        </where>
+
+    </select>
+
     <insert id="insertWeTag" parameterType="WeTag">
         insert into we_tag
         <trim prefix="(" suffix=")" suffixOverrides=",">

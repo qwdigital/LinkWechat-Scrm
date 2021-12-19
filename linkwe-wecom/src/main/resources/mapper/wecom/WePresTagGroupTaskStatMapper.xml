@@ -4,81 +4,52 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WePresTagGroupTaskStatMapper">
 
+    <resultMap type="WePresTagGroupTaskStatVo" id="WePresTagGroupTaskStatResult">
+        <result property="customerName"    column="customer_name"    />
+        <result property="isSent"    column="is_sent"    />
+        <result property="isInGroup"    column="is_in_group"    />
+    </resultMap>
 
-    <insert id="batchSave">
-        insert into we_pres_tag_group_stat (task_id, user_id, external_userid, sent, create_by, create_time) values
-        <foreach item="item" index="index" collection="list" separator=",">
-            (#{item.taskId}, #{item.userId}, #{item.externalUserId}, #{item.sent}, #{item.createBy}, #{item.createTime})
-        </foreach>
-    </insert>
+    <delete id="removeStatByTaskId" parameterType="Long">
+        delete from we_pres_tag_group_stat where task_id = #{taskId}
+    </delete>
 
-    <select id="cropSendResultList" parameterType="com.linkwechat.wecom.domain.WePresTagGroupTaskStat" resultType="com.linkwechat.wecom.domain.WePresTagGroupTaskStat">
-        select distinct
-            wc.name as customerName,
-            (case wgmsr.`status` when 0 then 0 when 1 then 1 when 2 then 0 when 3 then 1 else 0 end) as sent,
-            (
-            select count(*) > 0
-            from
-                we_group_member wgm
-                left join we_group_code_actual ac on ac.chat_id =  wgm.chat_id and ac.del_flag = 0
-            where ac.group_code_id = task.group_code_id and wgm.user_id = wgmsr.external_userid
-            ) as inGroup
-        from
-            we_group_message_send_result wgmsr
-            left join we_customer wc on wc.external_userid = wgmsr.external_userid
-            left join we_pres_tag_group task on task.message_template_id = wgmsr.msg_template_id
-        where
-            wgmsr.del_flag = 0
-            and task.task_id = #{taskId}
-        <if test="customerName != null and customerName != ''">
-            and wc.name like concat('%', #{customerName}, '%')
-        </if>
-        <if test="(sent != null and sent != '') or sent == 0">
-            and (case wgmsr.`status` when 0 then 0 when 1 then 1 when 2 then 0 when 3 then 1 else 0 end) = #{sent}
-        </if>
-        <if test="(inGroup != null and inGroup != '') or inGroup == 0">
-            and  (
-            select count(*) > 0
-            from
-            we_group_member wgm
-            left join we_group_code_actual ac on ac.chat_id =  wgm.chat_id and ac.del_flag = 0
-            where ac.group_code_id = task.group_code_id and wgm.user_id = wgmsr.external_userid
-            ) = #{inGroup}
-        </if>
-
-    </select>
-
-    <select id="singleSendResultList" parameterType="com.linkwechat.wecom.domain.WePresTagGroupTaskStat" resultType="com.linkwechat.wecom.domain.WePresTagGroupTaskStat">
+    <select id="getAllExternalIdByTaskId" parameterType="Long" resultType="String">
         SELECT DISTINCT
-            cu.`name` AS customerName,
-            (
-                SELECT count(*) > 0
-                FROM we_group_member wgm
-                    LEFT JOIN we_group_code_actual ac ON ac.chat_id = wgm.chat_id AND ac.del_flag = 0
-                    LEFt JOIn we_pres_tag_group task On ac.group_code_id = task.group_code_id
-                WHERE
-                    task.task_id = st.task_id AND wgm.user_id = st.external_userid
-            ) AS inGroup,
-            st.sent
+            wc.external_userid
         FROM
-            we_pres_tag_group_stat st
-            left join we_customer cu on cu.external_userid = st.external_userid and cu.del_flag = 0
-            where st.del_flag = 0 and st.task_id = #{taskId}
-        <if test="customerName != null and customerName != ''">
-            and cu.`name` like concat('%', #{customerName}, '%')
-        </if>
-        <if test="(sent != null and sent != '') or sent == 0">
-            and st.sent = #{sent}
-        </if>
-        <if test="(inGroup != null and inGroup != '') or inGroup == 0">
-            and (
-            SELECT count(*) > 0
-            FROM we_group_member wgm
-            LEFT JOIN we_group_code_actual ac ON ac.chat_id = wgm.chat_id AND ac.del_flag = 0
-            LEFt JOIn we_pres_tag_group task On ac.group_code_id = task.group_code_id
-            WHERE
-            task.task_id = st.task_id AND wgm.user_id = st.external_userid
-            ) = #{inGroup}
-        </if>
+            we_customer wc
+                LEFT JOIN we_group_member wgm ON wgm.user_id = wc.external_userid
+                LEFT JOIN we_group wg ON wg.chat_id = wgm.chat_id
+                LEFT JOIN we_group_code_actual wgca ON wgca.chat_id = wg.chat_id
+                LEFT JOIN we_pres_tag_group wptg ON wptg.group_code_id = wgca.group_code_id
+        WHERE
+            wptg.task_id = #{taskId}
+    </select>
+    
+    <select id="selectStatInfoByTaskId" parameterType="Long" resultMap="WePresTagGroupTaskStatResult">
+        SELECT
+            wc.`name`,
+            0 AS is_sent,
+            (
+                SELECT
+                    count(1) > 0
+                FROM
+                    we_customer wc1
+                        LEFT JOIN we_group_member wgm ON wgm.user_id = wc1.external_userid
+                        LEFT JOIN we_group wg ON wg.chat_id = wgm.chat_id
+                        LEFT JOIN we_group_code_actual wgca ON wgca.chat_id = wg.chat_id
+                        LEFT JOIN we_pres_tag_group wptg1 ON wptg1.group_code_id = wgca.group_code_id
+                WHERE
+                    wc1.external_userid = wptgs.external_userid
+            ) AS is_in_group
+        FROM
+            we_pres_tag_group_stat wptgs
+                LEFT JOIN we_pres_tag_group wptg ON wptgs.task_id = wptg.task_id
+                LEFT JOIN we_customer wc ON wc.external_userid = wptgs.external_userid
+        WHERE
+            wptgs.task_id = #{taskId}
+
+
     </select>
 </mapper>

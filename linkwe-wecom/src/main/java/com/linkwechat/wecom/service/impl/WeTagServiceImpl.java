@@ -16,6 +16,7 @@ import com.linkwechat.wecom.domain.dto.tag.WeCropGroupTagDto;
 import com.linkwechat.wecom.domain.dto.tag.WeCropGroupTagListDto;
 import com.linkwechat.wecom.domain.dto.tag.WeCropTagDto;
 import com.linkwechat.wecom.domain.dto.tag.WeFindCropTagParam;
+import com.linkwechat.wecom.domain.vo.tag.WeTagVo;
 import com.linkwechat.wecom.service.IWeTagGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -187,5 +188,10 @@ public class WeTagServiceImpl extends ServiceImpl<WeTagMapper,WeTag> implements 
                 });
             }
         }
+    }
+
+    @Override
+    public List<WeTagVo> selectWeTagByIds(List<String> tagIds) {
+        return this.baseMapper.selectWeTagByIds(tagIds);
     }
 }

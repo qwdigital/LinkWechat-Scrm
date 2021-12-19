@@ -17,21 +17,23 @@ ruoyi:
     imgUrlPrefix: /lwImg
     #腾讯云对象存储
     cos:
-      secretId: AKIDQRCizIeUGl13vakkDQMH0VkjhPr1rBBv
-      secretKey: e3D8oFetseC0f8OX9XeV7UcTDiyyQ8cr
+      secretId:
+      secretKey:
       #link-wechat-1251309172.cos.ap-nanjing.myqcloud.com
-      region: ap-nanjing
-      bucketName: link-wechat-1251309172
-      cosImgUrlPrefix: https://link-wechat-1251309172.cos.ap-nanjing.myqcloud.com/
+      region:
+      bucketName:
+      cosImgUrlPrefix:
   # 文件路径 示例（ Windows配置D:/ruoyi/uploadPath，Linux配置 /app/project/pic）
-  #profile: /data/jenkins_home/app/project/
+  profile: /app/pic
   # 获取ip地址开关
   addressEnabled: true
   # 验证码类型 math 数组计算 char 字符验证
   captchaType: math
   # 企业微信用户首次登录系统默认密码
   weUserDefaultPwd: 123456
-  #匿名访问的URL
+  noSyncWeUser:
+    - 45DuXiangShangQingXie
+    #匿名访问的URL
   anonUrl:
     - /login
     - /captchaImage
@@ -64,11 +66,14 @@ ruoyi:
     - /weixin/auth/**
     - /wecom/material/temporaryMaterialMediaId
     - /common/findFile
+    - /wecom/seas/findEmployeeCustomer
+
+
 
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为8090
-  port: 8090
+  port: 8070
   servlet:
     # 应用的访问路径
     context-path: /
@@ -103,7 +108,7 @@ spring:
     druid:
       # 主库数据源
       master:
-        url: jdbc:p6spy:mysql://127.0.0.1:3306/linkwechat?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+        url: jdbc:p6spy:mysql://127.0.0.1:10179/link-wechat-dev2.0?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&rewriteBatchedStatements=true
         username: root
         password: root
       # 从库数据源
@@ -148,7 +153,7 @@ spring:
           # 慢SQL记录
           log-slow-sql: true
           slow-sql-millis: 1000
-          merge-sql: true
+          merge-sql: false
         wall:
           config:
             multi-statement-allow: true
@@ -204,11 +209,11 @@ mybatis-plus:
   mapper-locations: classpath*:mapper/**/*Mapper.xml
   type-aliases-package: com.linkwechat.**.domain
   type-handlers-package: com.linkwechat.framework.handler.GenericTypeHandler,com.linkwechat.framework.handler.StringArrayJoinTypeHandler
-  global-config:
-    db-config:
-      logic-delete-field: delFlag
-      logic-delete-value: 1
-      logic-not-delete-value: 0
+    #global-config:
+    #db-config:
+    #logic-delete-field: delFlag
+    #logic-delete-value: 1
+  #logic-not-delete-value: 0
 mpp:
   entityBasePath: com.linkwechat.**.domain
 
@@ -245,41 +250,34 @@ xss:
   urlPatterns: /system/*,/monitor/*,/tool/*
 
 # elasticsearch配置
-#elasticsearch:
-# schema: http
-# address: 47.112.117.15:7200,47.112.117.15:7201,47.112.117.15:7202
-# userName: "elastic"
-# password: "0p-0p-0p-"
-# connectTimeout: 10000
-# socketTimeout: 10000
-# connectionRequestTimeout: 10000
-# maxConnectNum: 100
-# maxConnectPerRoute: 100
+elasticsearch:
+  schema: http
+  address:
+  userName: "elastic"
+  password: "0p-0p-0p-"
+  connectTimeout: 10000
+  socketTimeout: 10000
+  connectionRequestTimeout: 10000
+  maxConnectNum: 100
+  maxConnectPerRoute: 100
 
 # forest配置
 forest:
   backend: httpclient
-  max-retry-count:  3 # 请求失败后重试次数，默认为0次不重试
+  retry-count: 1 # 请求失败后重试次数，默认为0次不重试
   max-retry-interval: 1000 #重试间隔时间
   connect-timeout: 3000 #链接超时时间
   timeout: 3000  # 请求超时时间
-  ## 日志总开关，打开/关闭Forest请求/响应日志（默认为 true）
-  log-enabled: true
-  ## 打开/关闭Forest请求日志（默认为 true）
-  log-request: true
-  ## 打开/关闭Forest响应状态日志（默认为 true）
-  log-response-status: true
-  ## 打开/关闭Forest响应内容日志（默认为 false）
-  log-response-content: true
   variables:
     weComServerUrl: https://qyapi.weixin.qq.com/
     weComePrefix: cgi-bin
     wxServerUrl: https://api.weixin.qq.com/
     wxPrefix: sns
 
-
 wecome:
-  weNeedRetryErrorCodes: -1,42001,42009,40082,40014
+  chatKey: finance_new
+  serverUrl: https://qyapi.weixin.qq.com/
+  weComePrefix: cgi-bin
   noAccessTokenUrl:
     - /gettoken
     - /service/get_provider_token
@@ -313,6 +311,8 @@ wecome:
     - /externalcontact/groupchat/statistic
     - /externalcontact/groupchat/statistic_group_by_day
   fileUplodUrl:  /media/upload,/media/uploadimg
+  needProviderTokenUrl:
+    - /service/get_login_info
   needChatTokenUrl:
     - /msgaudit/get_permit_user_list
     - /msgaudit/check_single_agree
@@ -338,14 +338,14 @@ wecome:
     - we_tag
   #企微回调通知配置
   callBack:
-    appIdOrCorpId: ww38152475d1bca752
-    token: Fm05d6n0NpuFrvOlgVxIbeSXtjgz
-    encodingAesKey: laevP8xCEG7BUqv5GuYXfg9HaRecxe4MU5F5cmnAI7n
+    appIdOrCorpId:
+    token:
+    encodingAesKey:
   # JS SDK 身份校验url
-  authorizeUrl: https://open.weixin.qq.com/connect/oauth2/authorize
+  #authorizeUrl: https://open.weixin.qq.com/connect/oauth2/authorize
   # JS SDK身份校验成功后的redirect url
-  authorizeRedirectUrl: http://linkwechat.cn/mobile/#/task
+  #authorizeRedirectUrl: http://www.linkwechat.cn/mobile/#/task
 
 weixin:
-  appid: wxa57479bcd3f15461
-  secret: f23f4becdcac9819f292a3754fd8f84e
+  appid:
+  secret:

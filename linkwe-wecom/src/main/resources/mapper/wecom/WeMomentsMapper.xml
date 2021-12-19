@@ -3,4 +3,77 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeMomentsMapper">
+
+    <select id="findMoments" resultType="com.linkwechat.wecom.domain.WeMoments">
+        SELECT
+            content,
+            content_type,
+            IFNULL((SELECT wu.user_name FROM we_user wu WHERE wu.user_id=wm.creator),creator) as creator,
+            (SELECT GROUP_CONCAT(wu.user_name) FROM we_user wu WHERE FIND_IN_SET(wu.user_id,wm.no_add_user)) as noAddUserName,
+            (SELECT GROUP_CONCAT(wu.user_id) FROM we_user wu WHERE FIND_IN_SET(wu.user_id,wm.no_add_user)) as noAddUser,
+            (SELECT GROUP_CONCAT(wu.user_name) FROM we_user wu WHERE FIND_IN_SET(wu.user_id,wm.add_user)) as addUserName,
+            (SELECT GROUP_CONCAT(wu.user_id) FROM we_user wu WHERE FIND_IN_SET(wu.user_id,wm.add_user)) as addUser,
+            push_time as createTime,
+            moment_id,
+            (SELECT count(*) FROM we_moments_interacte wmi WHERE wmi.moment_id=wm.moment_id and wmi.interacte_type=0) as commentNum,
+            (SELECT count(*) FROM we_moments_interacte wmi WHERE wmi.moment_id=wm.moment_id and wmi.interacte_user_type=1 and wmi.interacte_type=1) as pointNum
+        FROM
+            we_moments wm
+        <where>
+            <if test="type !=null">
+                   AND wm.type=#{type}
+            </if>
+            <if test="creator !=null and creator !=''">
+                AND  wm.creator=#{creator}
+            </if>
+            <if test="beginTime !=null and beginTime !='' and endTime !=null and endTime !='' ">
+                AND  date_format(wm.push_time ,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
+            </if>
+        </where>
+        order by  wm.push_time desc
+    </select>
+
+
+    <resultMap id="MomentsDetailMapper" type="com.linkwechat.wecom.domain.WeMoments">
+         <result column="content" property="content"></result>
+         <result column="other_content" property="otherContent" typeHandler="com.linkwechat.wecom.handler.GenericTypeHandler"></result>
+         <result column="noAddUserName" property="noAddUserName"></result>
+         <result column="addUserName" property="addUserName"></result>
+         <result column="momentUserName" property="momentUserName"></result>
+         <result column="pointUserName" property="pointUserName"></result>
+         <result column="momentCustomerName" property="momentCustomerName"></result>
+         <result column="pointCustomerName" property="pointCustomerName"></result>
+    </resultMap>
+    <select id="findMomentsDetail" resultMap="MomentsDetailMapper">
+        SELECT
+            wm.content,
+            wm.other_content,
+            (SELECT GROUP_CONCAT(wu.user_name) FROM we_user wu WHERE FIND_IN_SET(wu.user_id,wm.no_add_user)) as noAddUserName,
+            (SELECT GROUP_CONCAT(wu.user_name) FROM we_user wu WHERE FIND_IN_SET(wu.user_id,wm.add_user)) as addUserName,
+            (SELECT GROUP_CONCAT(wu.user_name) FROM we_user wu
+                                                        LEFT JOIN we_moments_interacte wmi ON wu.user_id=wmi.interacte_user_id WHERE wmi.interacte_type=0 and wmi.interacte_user_type=0
+                                                                                                                                 and wmi.moment_id=wm.moment_id
+            ) as momentUserName,
+            (SELECT GROUP_CONCAT(wu.user_name) FROM we_user wu
+                                                        LEFT JOIN we_moments_interacte wmi ON wu.user_id=wmi.interacte_user_id WHERE wmi.interacte_type=1 and wmi.interacte_user_type=0
+                                                                                                                                 and wmi.moment_id=wm.moment_id
+            ) as pointUserName,
+            (SELECT GROUP_CONCAT(DISTINCT wu.`name`) FROM we_customer wu
+                                                              LEFT JOIN we_moments_interacte wmi ON wu.external_userid=wmi.interacte_user_id WHERE wmi.interacte_type=0 and wmi.interacte_user_type=1
+                                                                                                                                               and wmi.moment_id=wm.moment_id
+            ) as momentCustomerName,
+            (SELECT GROUP_CONCAT(DISTINCT wu.`name`) FROM we_customer wu
+                                                              LEFT JOIN we_moments_interacte wmi ON wu.external_userid=wmi.interacte_user_id WHERE wmi.interacte_type=1 and wmi.interacte_user_type=1
+                                                                                                                                               and wmi.moment_id=wm.moment_id
+            ) as pointCustomerName
+        FROM
+            we_moments wm
+        where wm.moment_id=#{momentId}
+    </select>
+
+    <select id="removePushLwPush">
+        DELETE FROM we_moments WHERE is_lw_push=1
+    </select>
+
+
 </mapper>

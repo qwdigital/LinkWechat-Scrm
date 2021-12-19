@@ -119,17 +119,17 @@ public class WeGroupCodeActualServiceImpl extends ServiceImpl<WeGroupCodeActualM
      * @param weGroupCodeActual 实际码
      * @return 结果
      */
-//    @Override
-//    public boolean checkChatIdUnique(WeGroupCodeActual weGroupCodeActual) {
-//        // 不指定群聊时，不用检测唯一性
-//        String chatId = weGroupCodeActual.getChatId();
-//        if (StringUtils.isNull(chatId) | StringUtils.isEmpty(chatId))
-//        {
-//            return true;
-//        }
-//        int rows = weGroupCodeActualMapper.checkChatIdUnique(chatId);
-//        return rows == 0;
-//    }
+    @Override
+    public boolean checkChatIdUnique(WeGroupCodeActual weGroupCodeActual) {
+        // 不指定群聊时，不用检测唯一性
+        String chatId = weGroupCodeActual.getChatId();
+        if (StringUtils.isNull(chatId) | StringUtils.isEmpty(chatId))
+        {
+            return true;
+        }
+        int rows = weGroupCodeActualMapper.checkChatIdUnique(chatId);
+        return rows == 0;
+    }
 
     /**
      * 通过群id递增其实际群活码扫码次数

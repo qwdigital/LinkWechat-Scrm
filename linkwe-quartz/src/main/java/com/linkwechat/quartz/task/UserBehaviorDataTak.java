@@ -1,6 +1,7 @@
 package com.linkwechat.quartz.task;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.linkwechat.common.constant.WeConstans;
@@ -58,8 +59,8 @@ public class UserBehaviorDataTak {
                 List<WeUserBehaviorData> dataList = new ArrayList<>();
                 UserBehaviorDataQuery query = new UserBehaviorDataQuery();
                 //前一天的数据
-                Long startTime = strToDate(-1, 0);
-                Long endTime = strToDate(-1, 1);
+                Long startTime = DateUtil.beginOfDay(DateUtil.offsetDay(new Date(),-1)).getTime()/1000;
+                Long endTime = DateUtil.endOfDay(DateUtil.offsetDay(new Date(),-1)).getTime()/1000;
                 query.setStart_time(startTime);
                 query.setEnd_time(endTime);
                 list.forEach(weUser -> {
@@ -85,29 +86,5 @@ public class UserBehaviorDataTak {
             temp += offset;
         }
 
-    }
-
-    private Long strToDate(int days, Integer type) {
-        Long time = null;
-        DateFormat format2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = null;
-        Calendar cale = Calendar.getInstance();
-        cale.add(Calendar.DATE, days);
-        String tarday = new SimpleDateFormat("yyyy-MM-dd").format(cale.getTime());
-        if (type.equals(0)) {
-            tarday += " 00:00:00";
-        } else {
-            tarday += " 23:59:59";
-        }
-        // String转Date
-        try {
-            date = format2.parse(tarday);
-            System.out.println(date.getTime());
-            time = date.getTime() / 1000;
-            System.out.println(time.toString());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return time;
     }
 }

@@ -212,6 +212,7 @@ public class FileUploadUtils {
 
         // 指定要上传到 COS 上对象键
         ObjectMetadata objectMetadata = new ObjectMetadata();
+        InputStream inputStream = file.getInputStream();
         PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.getBucketName(), fileName,file.getInputStream(),objectMetadata);
         PutObjectResult putObjectResult = cosClient.putObject(putObjectRequest);
         log.info("{}",cosConfig.getCosImgUrlPrefix()+fileName);

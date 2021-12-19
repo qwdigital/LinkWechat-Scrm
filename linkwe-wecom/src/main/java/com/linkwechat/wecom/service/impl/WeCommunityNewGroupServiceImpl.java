@@ -288,7 +288,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         Optional.ofNullable(empleCode).ifPresent(e -> {
             vo.setEmplCodeUrl(e.getQrCode());
             vo.setWelcomeMsg(e.getWelcomeMsg());
-            vo.setSkipVerify(e.getIsJoinConfirmFriends().equals(1));
+            vo.setSkipVerify(e.getIsJoinConfirmFriends().equals(new Integer(1))?true:false);
         });
 
         // 设置群活码信息
@@ -311,7 +311,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
                 .eq(WeGroupCodeActual::getGroupCodeId, vo.getGroupCodeId()));
         if(CollectionUtil.isNotEmpty(codeActuals)){
             vo.setActualGroupName(
-                    codeActuals.stream().map(WeGroupCodeActual::getGroupName).collect(Collectors.joining(","))
+                    String.join(",", codeActuals.stream().map(WeGroupCodeActual::getGroupName).collect(Collectors.toList()))
             );
         }
 

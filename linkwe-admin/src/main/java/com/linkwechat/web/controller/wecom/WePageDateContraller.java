@@ -2,6 +2,7 @@ package com.linkwechat.web.controller.wecom;
 
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.redis.RedisCache;
+import com.linkwechat.quartz.task.PageHomeDataTask;
 import com.linkwechat.wecom.domain.dto.WePageStaticDataDto;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import com.linkwechat.wecom.service.IWeUserService;
@@ -21,13 +22,15 @@ import java.util.List;
  * @description 首页统计
  * @date 2021/2/23 15:30
  **/
-@Api(description = "首页统计contraller")
+@Api(tags = "首页统计")
 @Slf4j
 @RestController
 @RequestMapping("wecom/page/")
 public class WePageDateContraller {
    @Autowired
    private RedisCache redisCache;
+   @Autowired
+   private PageHomeDataTask pageHomeDataTask;
 
     /**
      *
@@ -42,8 +45,15 @@ public class WePageDateContraller {
     @ApiOperation(value = "实时数据controller",httpMethod = "GET")
     //  @PreAuthorize("@ss.hasPermi('wecom:page:getCorpRealTimeData')")
     @GetMapping("/getCorpRealTimeData")
-    public AjaxResult getCorpRealTimeData(){
+    public AjaxResult<WePageStaticDataDto> getCorpRealTimeData(){
         WePageStaticDataDto wePageStaticDataDto = redisCache.getCacheObject("getCorpRealTimeData");
         return AjaxResult.success(wePageStaticDataDto);
+    }
+
+    @ApiOperation(value = "实时数据刷新",httpMethod = "GET")
+    @GetMapping("/refresh")
+    public AjaxResult refresh(){
+        pageHomeDataTask.getPageHomeDataData();
+        return AjaxResult.success();
     }
 }

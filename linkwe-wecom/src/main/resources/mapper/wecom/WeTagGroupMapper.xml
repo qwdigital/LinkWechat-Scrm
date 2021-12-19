@@ -3,39 +3,53 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeTagGroupMapper">
-    
-    <resultMap type="WeTagGroup" id="WeTagGroupResult">
-        <result property="gourpName"    column="gourp_name"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="createBy" column="create_by" />
-        <result property="groupId"    column="group_id"    />
-        <collection property="weTags" column="weTags.id" ofType="com.linkwechat.wecom.domain.WeTag">
-            <id property="tagId" column="tag_id"/>
-            <result property="groupId"    column="tag_group_id"    />
-            <result property="name"    column="name"    />
-        </collection>
-    </resultMap>
+
 
     <sql id="selectWeTagGroupVo">
         select  gourp_name, create_time from we_tag_group
     </sql>
 
+
+    <resultMap type="WeTagGroup" id="WeTagGroupResult">
+        <result property="gourpName"    column="gourp_name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy" column="create_by" />
+        <result property="groupId"    column="group_id"    />
+        <collection property="weTags"
+                     select="findWeTag"
+                    column="{groupId=group_id}">
+        </collection>
+    </resultMap>
+
+
+    <resultMap id="WeTagBaseMapper" type="com.linkwechat.wecom.domain.WeTag">
+        <id property="tagId" column="tag_id"/>
+        <result property="groupId"    column="group_id" />
+        <result property="name"    column="name"    />
+    </resultMap>
+
+
     <select id="selectWeTagGroupList" parameterType="WeTagGroup" resultMap="WeTagGroupResult">
         SELECT
-           wtg.*,
-           wt.tag_id ,
-           wt.group_id,
-           wt.name,
-           wtg.create_by,
-           wtg.group_id as tag_group_id
+           wtg.*
         FROM
           we_tag_group wtg
-        LEFT JOIN we_tag wt ON wtg.group_id = wt.group_id
         where
-          wtg.del_flag=0 and wt.del_flag=0
-        <if test="gourpName != null  and gourpName != ''"> and gourp_name like concat('%', #{gourpName}, '%')</if>
+          wtg.del_flag=0
         <if test="groupTagType != null">and wtg.group_tag_type=#{groupTagType}</if>
+        <if test="owner !=null and owner !=''">and wtg.owner=#{owner}</if>
         ORDER BY wtg.create_time DESC
+    </select>
+
+    <select id="findWeTag" resultMap="WeTagBaseMapper">
+        SELECT
+            wt.tag_id ,
+            wt.group_id,
+            wt.name
+        FROM
+        we_tag wt
+        where
+            wt.group_id = #{groupId} and wt.del_flag=0
     </select>
     
     <select id="getWeTagGroupByIds"  resultMap="WeTagGroupResult">
@@ -104,18 +118,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </insert>
 
 
-    <select id="findCustomerTagByFlowerCustomerRelId" resultMap="WeTagGroupResult">
-           SELECT
-                wt.tag_id,
-                wt.`name`,
-                wtg.gourp_name,
-                wtg.group_id
-            FROM
-                we_flower_customer_tag_rel wfctr
-            INNER JOIN we_tag wt ON wfctr.tag_id = wt.tag_id
-            INNER JOIN we_tag_group wtg ON wt.group_id = wtg.group_id
-            WHERE wt.`status`=0 and wtg.`status`=0 and wfctr.user_id=#{userid} and wfctr.external_userid=#{externalUserid}
-    </select>
+<!--    <select id="findCustomerTagByFlowerCustomerRelId" resultMap="WeTagGroupResult">-->
+<!--           SELECT-->
+<!--                wt.tag_id,-->
+<!--                wt.`name`,-->
+<!--                wtg.gourp_name,-->
+<!--                wtg.group_id-->
+<!--            FROM-->
+<!--                we_flower_customer_tag_rel wfctr-->
+<!--            INNER JOIN we_tag wt ON wfctr.tag_id = wt.tag_id-->
+<!--            INNER JOIN we_tag_group wtg ON wt.group_id = wtg.group_id-->
+<!--            WHERE wt.`status`=0 and wtg.`status`=0 and wfctr.user_id=#{userid} and wfctr.external_userid=#{externalUserid}-->
+<!--    </select>-->
 
     
 </mapper>

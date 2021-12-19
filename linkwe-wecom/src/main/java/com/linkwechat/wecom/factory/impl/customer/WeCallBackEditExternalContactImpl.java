@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.factory.impl.customer;
 
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
+import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
+import com.linkwechat.wecom.domain.callback.WeBackCustomerVo;
 import com.linkwechat.wecom.factory.WeEventStrategy;
 import com.linkwechat.wecom.service.IWeCustomerService;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +20,10 @@ public class WeCallBackEditExternalContactImpl extends WeEventStrategy {
     private IWeCustomerService weCustomerService;
 
     @Override
-    public void eventHandle(WxCpXmlMessageVO message) {
-        if (message.getExternalUserId() != null) {
-            weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId(),message.getUserId());
+    public void eventHandle(WeBackBaseVo message) {
+        WeBackCustomerVo customerInfo = (WeBackCustomerVo) message;
+        if (customerInfo.getExternalUserID() != null) {
+            weCustomerService.getCustomersInfoAndSynchWeCustomer(customerInfo.getExternalUserID(),customerInfo.getUserID());
         }
     }
 }

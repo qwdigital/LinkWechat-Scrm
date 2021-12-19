@@ -22,7 +22,28 @@ public enum MediaType {
     /**
      * 海报字体
      */
-    POSTER_FONT("6", "poster_font");
+    POSTER_FONT("6", "poster_font"),
+
+
+    /**
+     * 图文
+     */
+    IMAGE_TEXT("7","image_text"),
+
+    /**
+     * 链接
+     */
+    LINK("8","link"),
+
+    /**
+     * 小程序
+     */
+    APPLET("9","applet"),
+
+    /**
+     * 文字
+     */
+    TEXT("10","text");
 
     /**
      * 媒体类型
@@ -30,7 +51,7 @@ public enum MediaType {
     String mediaType;
 
     /**
-     * 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本 5 海报 6 海报字体
+     * 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本 5 海报 6 海报字体 7 图文 8 链接 9 小程序
      */
     String type;
 

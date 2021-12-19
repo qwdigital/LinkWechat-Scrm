@@ -27,7 +27,9 @@ public class WeGroupTagRelServiceImpl extends ServiceImpl<WeGroupTagRelMapper,We
                     .eq(WeGroupTagRel::getChatId,weMakeGroupTagVo.getChatId()));
 
             this.saveBatch(addWeGroupTagRel);
-
+        }else{//移除所有标签
+            this.remove(new LambdaQueryWrapper<WeGroupTagRel>()
+                    .eq(WeGroupTagRel::getChatId,weMakeGroupTagVo.getChatId()));
         }
 
     }

@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.factory.impl.customer;
 
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
+import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
+import com.linkwechat.wecom.domain.callback.WeBackCustomerVo;
 import com.linkwechat.wecom.factory.WeEventStrategy;
 import com.linkwechat.wecom.service.IWeCustomerService;
 import lombok.extern.slf4j.Slf4j;
@@ -20,9 +21,10 @@ public class WeCallBackMsgAuditApprovedImpl extends WeEventStrategy {
 
 
     @Override
-    public void eventHandle(WxCpXmlMessageVO message) {
-        String userId = message.getUserId();
-        String externalUserId = message.getExternalUserId();
+    public void eventHandle(WeBackBaseVo message) {
+        WeBackCustomerVo customerInfo = (WeBackCustomerVo) message;
+        String userId = customerInfo.getUserID();
+        String externalUserId = customerInfo.getExternalUserID();
         weCustomerService.updateCustomerChatStatus(externalUserId);
     }
 }

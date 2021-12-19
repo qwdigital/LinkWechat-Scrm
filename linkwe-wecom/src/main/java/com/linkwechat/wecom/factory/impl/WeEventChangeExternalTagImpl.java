@@ -1,5 +1,9 @@
 package com.linkwechat.wecom.factory.impl;
 
+import cn.hutool.core.util.XmlUtil;
+import com.linkwechat.wecom.domain.callback.WeBackCustomerGroupVo;
+import com.linkwechat.wecom.domain.callback.WeBackCustomerTagVo;
+import com.linkwechat.wecom.domain.callback.WeBackCustomerVo;
 import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 import com.linkwechat.wecom.factory.WeCallBackEventFactory;
 import com.linkwechat.wecom.factory.WeStrategyBeanFactory;
@@ -19,8 +23,9 @@ public class WeEventChangeExternalTagImpl implements WeCallBackEventFactory {
     private WeStrategyBeanFactory weStrategyBeanFactory;
 
     @Override
-    public void eventHandle(WxCpXmlMessageVO message) {
-        String changeType = message.getChangeType()+"CustomerTag";
-        weStrategyBeanFactory.getResource(changeType,message);
+    public void eventHandle(String message) {
+        WeBackCustomerTagVo weBackCustomerTagVo = XmlUtil.xmlToBean(XmlUtil.parseXml(message).getFirstChild(), WeBackCustomerTagVo.class);
+        String changeType = weBackCustomerTagVo.getChangeType()+"CustomerTag";
+        weStrategyBeanFactory.getResource(changeType,weBackCustomerTagVo);
     }
 }

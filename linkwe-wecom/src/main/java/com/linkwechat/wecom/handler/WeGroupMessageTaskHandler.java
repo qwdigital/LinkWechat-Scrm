@@ -100,6 +100,10 @@ public class WeGroupMessageTaskHandler implements ApplicationRunner {
                                                 .eq(WeGroupMessageList::getUserId, sender.getUserId()));
                                     }
                                 });
+                                WeGroupMessageTemplate template = new WeGroupMessageTemplate();
+                                template.setId(templateId.get());
+                                template.setStatus(1);
+                                groupMessageTemplateService.updateById(template);
                             }
                         } finally {
                             redisCache.removeRangeCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY, 0, 0);
@@ -122,9 +126,9 @@ public class WeGroupMessageTaskHandler implements ApplicationRunner {
     void getMediaId(List<WeMessageTemplate> messageTemplates){
         Optional.ofNullable(messageTemplates).orElseGet(ArrayList::new).forEach(messageTemplate -> {
             if (ObjectUtil.equal(MessageType.IMAGE.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getPicUrl()
+                WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
                         ,MessageType.IMAGE.getMessageType()
-                        ,FileUtil.getName(messageTemplate.getPicUrl()));
+                        ,FileUtil.getName(messageTemplate.getMediaId()));
                 messageTemplate.setMediaId(weMedia.getMedia_id());
             }else if (ObjectUtil.equal(MessageType.MINIPROGRAM.getMessageType(), messageTemplate.getMsgType())) {
                 WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()

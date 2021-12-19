@@ -5,6 +5,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeTag;
 import com.linkwechat.wecom.domain.dto.WeTagDto;
+import com.linkwechat.wecom.domain.vo.tag.WeTagVo;
 
 /**
  * 企业微信标签Service接口
@@ -75,4 +76,12 @@ public interface IWeTagService  extends IService<WeTag>
     void deleteTag(String tagId);
 
     void updateTag(String tagId);
+
+    /**
+     * 根据标签id查询企业微信标签
+     *
+     * @param ids 企业微信标签ID
+     * @return WeTagVo
+     */
+    List<WeTagVo> selectWeTagByIds(List<String> ids);
 }

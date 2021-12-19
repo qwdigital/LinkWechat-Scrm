@@ -4,33 +4,39 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WePresTagGroupTaskScopeMapper">
 
-    <resultMap type="com.linkwechat.wecom.domain.vo.WeCommunityTaskEmplVo" id="WeEmplVoResult">
+    <resultMap type="WeCommunityTaskEmplVo" id="WeEmplVoResult">
         <result property="userId" column="user_id"/>
         <result property="name" column="user_name"/>
         <result property="avatar" column="head_image_url"/>
-        <result property="isDone" column="sent"/>
+        <result property="isDone" column="is_done"/>
     </resultMap>
 
     <select id="getScopeListByTaskId" parameterType="Long" resultMap="WeEmplVoResult">
-        SELECT DISTINCT
+        SELECT
             wu.user_id,
             wu.user_name,
             wu.head_image_url,
-            st.sent
+            wptgs.is_done
         FROM
-            we_user wu
-        LEFT JOIN we_pres_tag_group_stat st ON st.user_id = wu.user_id
-        AND st.del_flag = 0
+            we_pres_tag_group_scope wptgs
+        LEFT JOIN we_pres_tag_group wcog ON wcog.task_id = wptgs.task_id
+        LEFT JOIN we_user wu ON wu.user_id = wptgs.we_user_id
         WHERE
-            st.task_id = #{taskId}
+            wptgs.task_id = #{taskId}
     </select>
 
     <insert id="batchBindsTaskScopes">
-        insert into we_pres_tag_group_scope(task_id, we_user_id, create_by, create_time) values
+        insert into we_pres_tag_group_scope(task_id, we_user_id, is_done) values
         <foreach item="item" index="index" collection="list" separator=",">
-            (#{item.taskId},#{item.weUserId}, #{item.createBy}, #{item.createTime})
+            (#{item.taskId},#{item.weUserId},#{item.isDone})
         </foreach>
     </insert>
 
+    <update id="updateEmplTaskStatus">
+        UPDATE we_pres_tag_group_scope
+        SET is_done = TRUE
+        WHERE
+            task_id = #{taskId} AND we_user_id = #{emplId}
+    </update>
 
 </mapper>

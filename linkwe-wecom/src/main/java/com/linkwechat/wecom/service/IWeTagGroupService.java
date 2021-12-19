@@ -72,10 +72,10 @@ public interface IWeTagGroupService  extends IService<WeTagGroup>
 
 
 
-    /**
-     * 根据企业员工与添加客户关系id给客户打标签
-     * @param flowerCustomerRelId
-     * @return
-     */
-    public List<WeTagGroup> findCustomerTagByFlowerCustomerRelId(String externalUserid, String userid);
+//    /**
+//     * 根据企业员工与添加客户关系id给客户打标签
+//     * @param flowerCustomerRelId
+//     * @return
+//     */
+//    public List<WeTagGroup> findCustomerTagByFlowerCustomerRelId(String externalUserid, String userid);
 }

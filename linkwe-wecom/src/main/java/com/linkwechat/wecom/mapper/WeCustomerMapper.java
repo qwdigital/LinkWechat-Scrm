@@ -15,81 +15,28 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
 {
-    /**
-     * 查询企业微信客户
-     * 
-     * @param externalUserId 企业微信客户ID
-     * @return 企业微信客户
-     */
-    public WeCustomer selectWeCustomerById(@Param("externalUserId") String externalUserId,@Param("userId") String userId);
-
-    /**
-     * 查询企业微信客户列表
-     *
-     * @param weCustomer 企业微信客户
-     * @return 企业微信客户集合
-     */
-    public List<WeCustomer> selectWeCustomerList(WeCustomer weCustomer);
-
-    /**
-     * 新增企业微信客户
-     * 
-     * @param weCustomer 企业微信客户
-     * @return 结果
-     */
-    public int insertWeCustomer(WeCustomer weCustomer);
-
-    /**
-     * 修改企业微信客户
-     * 
-     * @param weCustomer 企业微信客户
-     * @return 结果
-     */
-    public int updateWeCustomer(WeCustomer weCustomer);
-
-    /**
-     * 删除企业微信客户
-     * 
-     * @param externalUserId 企业微信客户ID
-     * @return 结果
-     */
-    public int deleteWeCustomerById(String externalUserId);
 
 
     /**
-     * 批量删除企业微信客户
-     *
-     * @param userIds 需要删除的数据ID
-     * @return 结果
-     */
-    public int deleteWeCustomerByUserIds(String[] userIds);
-
-    /**
-     * 批量删除企业微信客户
-     * 
-     * @param externalUserIds 需要删除的数据ID
-     * @return 结果
-     */
-    public int deleteWeCustomerByIds(String[] externalUserIds);
-
-
-    /**
-     * 根据员工ID获取客户
-     * @param externalUserid
+     * 重构版客户列表接口
+     * @param weCustomerList
      * @return
      */
-    public List<WeUser> getCustomersByUserId(@Param("externalUserid") String externalUserid,@Param("userId") String userId);
+    List<WeCustomerList> findWeCustomerList(@Param("weCustomerList") WeCustomerList weCustomerList);
+
 
     /**
-     * 通过标签查询客户列表
-     * @param ids 标签id
+     * 获取客户所在群
+     * @param userId
      * @return
      */
-    List<WeUser> getCustomerByTag(List<String> ids);
+    List<WeCustomerDetail.Groups> findWecustomerGroups(@Param("userId") String userId);
+
+
 
 
     /**
-     * 根据外部联系人ID和企业员工ID获取当前客户信息
+     * 根据外部联系人ID和企业员工ID获取当前客户信息(客户画像)
      * @param externalUserid
      * @param userid
      * @return
@@ -107,36 +54,6 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
 
 
 
-    /**
-     * 查询企业微信客户列表,不查询一对多关系相关数据
-     *
-     * @param weCustomer 企业微信客户
-     * @return 企业微信客户集合
-     */
-    public List<WeCustomer> selectWeCustomerListNoRel(WeCustomer weCustomer);
-
-
-
-    /**
-     * 重构版客户列表接口
-     * @param weCustomerList
-     * @return
-     */
-    List<WeCustomerList> findWeCustomerList(@Param("weCustomerList") WeCustomerList weCustomerList);
-
-
-    /**
-     * 客户添加的员工名称
-     * @return
-     */
-    String findAddWeUserNames(@Param("externalUserId") String externalUserId);
-
-
-    /**
-     * 客户添加的群标签
-     * @return
-     */
-    String findCustomerGroupTag(@Param("externalUserId") String externalUserId);
 
 
     /**
@@ -146,8 +63,18 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
     List<CusertomerBelongUserInfo> findCusertomerBelongUserInfo(@Param("externalUserId") String externalUserId);
 
 
-
+    /**
+     * 批量更新或新增
+     * @param weCustomer
+     */
     void batchAddOrUpdate(@Param("weCustomers") List<WeCustomer> weCustomer);
+
+
+    /**
+     * 去重复统计
+     * @return
+     */
+    long noRepeatCountCustomer(@Param("weCustomerList") WeCustomerList weCustomerList);
 
 
 }

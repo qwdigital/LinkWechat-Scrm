@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.factory.impl;
 
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
+import cn.hutool.core.util.XmlUtil;
+import com.linkwechat.wecom.domain.callback.WeBackUserVo;
 import com.linkwechat.wecom.factory.WeCallBackEventFactory;
 import com.linkwechat.wecom.factory.WeStrategyBeanFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +20,10 @@ public class WeEventChangeContactImpl implements WeCallBackEventFactory {
     private WeStrategyBeanFactory weStrategyBeanFactory;
 
     @Override
-    public void eventHandle(WxCpXmlMessageVO message) {
+    public void eventHandle(String message) {
         //新增: create_user 更新: update_user 删除:delete_user
-        String changeType = message.getChangeType();
-        weStrategyBeanFactory.getResource(changeType, message);
+        WeBackUserVo weBackUserVo = XmlUtil.xmlToBean(XmlUtil.parseXml(message).getFirstChild(), WeBackUserVo.class);
+        String changeType = weBackUserVo.getChangeType();
+        weStrategyBeanFactory.getResource(changeType, weBackUserVo);
     }
 }

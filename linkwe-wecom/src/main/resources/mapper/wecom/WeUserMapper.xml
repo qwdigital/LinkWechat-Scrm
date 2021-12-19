@@ -156,20 +156,11 @@
         wc.`name` as customerName,
         wu.user_name as takeUserName,
         wac.allocate_time,
-        (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id in (wu.department)) as department,
-        wc.avatar,
-        wc.birthday,
-        wc.gender,
-        GROUP_CONCAT(wt.`tag_id`) as tagIds,
-        GROUP_CONCAT(wt.`name`)	 as tagNames,
-        wu.user_name,
-        wc.first_add_time
+        (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department
         FROM
         we_allocate_customer wac
-        LEFT JOIN we_customer wc ON wac.external_userid=wc.external_userid and wac.takeover_userid=wc.first_user_id
+        LEFT JOIN we_customer wc ON wac.external_userid=wc.external_userid
         LEFT JOIN we_user wu ON wu.user_id=wac.takeover_userid
-        LEFT JOIN we_flower_customer_tag_rel wfctr ON wfctr.del_flag=0 AND wfctr.external_userid=wc.external_userid AND  wfctr.user_id=wc.first_user_id
-        LEFT JOIN we_tag wt ON wt.tag_id=wfctr.tag_id
         <where>
             <if test="handoverUserId != null and handoverUserId !=''">and wac.handover_userid=#{handoverUserId}</if>
             <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">

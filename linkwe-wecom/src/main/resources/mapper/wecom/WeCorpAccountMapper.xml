@@ -6,11 +6,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 
 
-    <update id="startVailWeCorpAccount">
-          UPDATE we_corp_account
-          SET `status` = (CASE WHEN corp_id = #{corpId} THEN 0 ELSE 1 END)
-    </update>
-
 
 
 

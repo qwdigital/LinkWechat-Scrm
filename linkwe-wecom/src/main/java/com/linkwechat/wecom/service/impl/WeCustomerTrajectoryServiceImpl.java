@@ -73,7 +73,7 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
                                 .msgtype(MessageType.TEXT.getMessageType())
                                 .agentid(Integer.parseInt(k.getAgentId()))
                                 .text(TextMessageDto.builder()
-                                        .content("您有一项关于客户"+weCustomerMap.get(k.getExternalUserid()).getName()+"的待办任务提醒，请尽快处理，\n<a href="+url+">点击查看客户详情。</a>")
+                                        .content("您有一项关于客户"+weCustomerMap.get(k.getExternalUserid()).getCustomerName()+"的待办任务提醒，请尽快处理，\n<a href="+url+">点击查看客户详情。</a>")
                                         .build())
                                 .build(),
                         String.valueOf(1000012)

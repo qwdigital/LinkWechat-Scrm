@@ -3,7 +3,7 @@ package com.linkwechat.common.enums;
 import lombok.Getter;
 
 /**
- * 社群运营H5列表页数据类型
+ * H5列表页数据类型
  * @Author Hang
  * @Date 2021/3/24 11:02
  */
@@ -11,6 +11,8 @@ import lombok.Getter;
 public enum CommunityTaskType {
 
     TAG(1, "老客标签建群"),
+
+    SEAS(3, "客户公海"),
 
     SOP(2, "群sop");
 

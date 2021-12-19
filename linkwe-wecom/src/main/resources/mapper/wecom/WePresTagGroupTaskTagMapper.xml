@@ -4,10 +4,43 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WePresTagGroupTaskTagMapper">
 
+    <resultMap type="WeTag" id="WeTagResult">
+        <result property="id"    column="id"    />
+        <result property="groupId"    column="group_id"    />
+        <result property="name"    column="name"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <select id="getTagListByTaskId" parameterType="Long" resultMap="WeTagResult">
+	    SELECT
+            wt.*
+        FROM
+            we_pres_tag_group_tag wogt
+            LEFT JOIN we_pres_tag_group wcog ON wcog.task_id = wogt.task_id
+            LEFT JOIN we_tag wt ON wt.tag_id = wogt.tag_id
+        WHERE
+            wcog.task_id = #{taskId}
+	</select>
+
+    <select id="getExternalUserIdListByTaskId" parameterType="Long" resultType="String">
+        SELECT DISTINCT
+            wc.external_userid
+        FROM
+            we_pres_tag_group_tag wptgt
+                LEFT JOIN
+            we_flower_customer_tag_rel wfctr ON wfctr.tag_id = wptgt.tag_id
+                LEFT JOIN
+            we_flower_customer_rel wfcr ON wfcr.id = wfctr.flower_customer_rel_id
+                LEFT JOIN
+            we_customer wc ON wc.external_userid = wfcr.external_userid
+        WHERE
+            wptgt.task_id = #{taskId}
+    </select>
+
     <insert id="batchBindsTaskTags">
-        insert into we_pres_tag_group_tag(task_id, tag_id, create_by, create_time) values
+        insert into we_pres_tag_group_tag(task_id, tag_id) values
         <foreach item="item" index="index" collection="list" separator=",">
-            (#{item.taskId},#{item.tagId}, #{item.createBy}, #{item.createTime})
+            (#{item.taskId},#{item.tagId})
         </foreach>
     </insert>
 </mapper>

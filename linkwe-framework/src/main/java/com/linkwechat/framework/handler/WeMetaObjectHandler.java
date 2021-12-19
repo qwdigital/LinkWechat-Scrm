@@ -32,6 +32,7 @@ public class WeMetaObjectHandler implements MetaObjectHandler {
         String userName = getUserName();
         this.setFieldValByName(CREATE_BY, userName, metaObject);
         this.setFieldValByName(UPDATE_BY, userName, metaObject);
+
     }
 
     @Override
@@ -43,6 +44,7 @@ public class WeMetaObjectHandler implements MetaObjectHandler {
     }
 
     private String getUserName() {
+
         String userName;
         try {
             userName = SecurityUtils.getUsername();

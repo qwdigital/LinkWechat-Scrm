@@ -69,14 +69,14 @@ public class WeFlowerCustomerRelServiceImpl extends ServiceImpl<WeFlowerCustomer
     }
 
     @Override
-    public Map<String, Object> getUserAddCustomerStat(String codeId,String beginTime,String endTime) {
+    public Map<String, Object> getUserAddCustomerStat(WeFlowerCustomerRel weFlowerCustomerRel) {
         Map<String, Object> resultMap = new HashMap<>(16);
         List<String> dateList = new ArrayList<>();
         List<Long> statList = new ArrayList<>();
         Long resultTotal = 0L;
-        List<Map<String, Object>> userAddCustomerStatList = this.baseMapper.getUserAddCustomerStat(codeId, beginTime, endTime);
-//        String beginTime = weFlowerCustomerRel.getBeginTime();
-//        String endTime = weFlowerCustomerRel.getEndTime();
+        List<Map<String, Object>> userAddCustomerStatList = this.baseMapper.getUserAddCustomerStat(weFlowerCustomerRel);
+        String beginTime = weFlowerCustomerRel.getBeginTime();
+        String endTime = weFlowerCustomerRel.getEndTime();
         if (beginTime != null && endTime != null) {
             Date beginDate = DateUtils.dateTime(DateUtils.YYYY_MM_DD, beginTime);
             Date endDate = DateUtils.dateTime(DateUtils.YYYY_MM_DD, endTime);

@@ -55,4 +55,10 @@ public class WeAllocateCustomer
      * 失败原因
      */
     private String failReason;
+
+
+    /**
+     * 0:离职继承;1:在职继承;
+     */
+    private  Integer extentType;
 }
