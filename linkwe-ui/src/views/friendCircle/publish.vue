@@ -210,6 +210,9 @@
             }
           })
           this.$forceUpdate()
+          if (this.form.otherContent.length) {
+            this.form.contentType = 'text'
+          }
           if (goto) {
             gotoPublish(this.form).then(res => {
               if (res.code === 200) {
