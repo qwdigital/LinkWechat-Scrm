@@ -138,7 +138,7 @@ export function handleWait(params) {
  */
 export function addOrUpdatePersonTags(data) {
   return request({
-    url: service + '/addOrUpdatePersonTags/',
+    url: service + '/addOrUpdatePersonTags',
     method: 'post',
     data
   })
