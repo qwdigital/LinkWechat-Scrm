@@ -123,14 +123,12 @@ export function handleWait(params) {
 /**
  * 客户画像个人标签新增或更新
  * @param {*} params
- * {
-    "gourpName": "个人标签分组", //标签组名
-    "groupId": "1471327408994738177",//标签组id,新增的时候没有则传 null
+{
     "weTags": [
         {
-            "groupId": "1471327408994738177",//标签组id,新增的时候没有则传 null
-            "name": "个人标签3",//标签名
-            "tagId": "1471327409208647681"//标签id,新增的时候没有则传 null
+            "name": "个人标签4",//标签名
+            "tagId": "1471327409208647681",//标签id，新增不存在则不传，更新则传
+            "owner":"shengxiyong"//标签所属人id
         }
     ]
 }

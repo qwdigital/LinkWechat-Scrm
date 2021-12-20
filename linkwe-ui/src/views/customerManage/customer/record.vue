@@ -152,7 +152,7 @@ export default {
       <ul class="infinite-list" v-infinite-scroll="getList" style="overflow:auto">
         <template v-if="list.length">
           <li v-for="(unit, i) in list" class="infinite-list-item" :key="i">
-            <div class="timeline-time">{{ dateFormat(unit[0].createTime, 'yyyy-MM-dd w') }}</div>
+            <div class="timeline-time">{{ dateFormat(unit[0].trackTime, 'yyyy-MM-dd w') }}</div>
             <el-timeline class="timeline-box">
               <el-timeline-item
                 v-for="(item, index) in unit"

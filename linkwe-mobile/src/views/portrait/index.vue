@@ -35,11 +35,11 @@
           </div>
         </div>
         <van-button
-          v-if="form.trackState"
-          :type="dictTrackState[form.trackState].color"
+          v-if="dictTrackState[form.trackState || 1]"
+          :type="dictTrackState[form.trackState || 1].color"
           size="small"
           @click="usershow = true"
-          >{{ dictTrackState[form.trackState].name || '待跟进' }}</van-button
+          >{{ dictTrackState[form.trackState || 1].name }}</van-button
         >
       </div>
       <div class="detail">
@@ -373,7 +373,7 @@ export default {
       agentId: '', // 1000012,
       loadingStep: false,
       dictTrackState: Object.freeze({
-        1: { name: '待跟进', color: '' },
+        1: { name: '待跟进', color: 'info' },
         2: { name: '跟进中', color: 'info' },
         3: { name: '已成交', color: 'primary' },
         4: { name: '无意向', color: 'warning' },
@@ -730,8 +730,13 @@ export default {
     },
     // 添加个人标签
     submitNewPersonTag() {
-      addOrUpdatePersonTags(this.submitNewPersonTag)
+      let params = {
+        weTags: [{ name: this.newPersonTag, owner: this.userId }]
+      }
+      addOrUpdatePersonTags(params)
         .then((res) => {
+          this.$toast.success('添加成功')
+
           this.getAllTags('person')
         })
         .catch((err) => {
