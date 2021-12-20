@@ -168,14 +168,14 @@
         // console.log(data, checked, indeterminate);
         this.userList = this.unique(this.userList)
       },
-      unique(arr){            
-        for(var i=0; i<arr.length; i++){
-            for(var j=i+1; j<arr.length; j++){
-                if(arr[i].userId.split('_')[0] == arr[j].userId.split('_')[0]){
-                    arr.splice(j,1);
-                    j--;
-                }
+      unique (arr) {
+        for (var i = 0; i < arr.length; i++) {
+          for (var j = i + 1; j < arr.length; j++) {
+            if (arr[i].userId.split('_')[0] == arr[j].userId.split('_')[0]) {
+              arr.splice(j, 1);
+              j--;
             }
+          }
         }
         return arr;
       },
@@ -200,7 +200,7 @@
     <el-row :gutter="20">
       <el-col :span="12" :xs="24">
         <div class="head-container">
-          <el-tree node-key="userId" ref="tree" lazy accordion show-checkbox :check-on-click-node="false" :expand-on-click-node="true" :default-checked-keys="defaultCheckedKeys" :load="loadNode" :props="defaultProps" :check-strictly="!isOnlyLeaf" @check-change="handleCheckChange"></el-tree>
+          <el-tree node-key="userId" ref="tree" lazy accordion show-checkbox :check-on-click-node="false" :expand-on-click-node="true" :default-checked-keys="defaultCheckedKeys" :load="loadNode" :props="defaultProps" :check-strictly="isOnlyLeaf" @check-change="handleCheckChange"></el-tree>
         </div>
       </el-col>
       <el-col :span="12" :xs="24" class="user-list">

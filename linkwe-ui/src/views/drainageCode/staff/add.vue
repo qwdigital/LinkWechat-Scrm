@@ -138,7 +138,7 @@
     </SelectTag>
 
     <!-- 选择使用员工弹窗 -->
-    <SelectUser :key="codeForm.qrType" :defaultValues="selectedUserList" :visible.sync="dialogVisibleSelectUser" title="选择使用员工" :isOnlyLeaf="codeForm.qrType !== 2" :isSigleSelect="codeForm.qrType == 1" @success="selectedUser"></SelectUser>
+    <SelectUser :key="codeForm.qrType" :defaultValues="selectedUserList" :visible.sync="dialogVisibleSelectUser" title="选择使用员工" :isOnlyLeaf="true" :isSigleSelect="codeForm.qrType == 1" @success="selectedUser"></SelectUser>
 
   </div>
 </template>

@@ -195,7 +195,7 @@ export default {
       syncHMoments({ filterType: 1 }).then((res) => {
         if (res.code === 200) {
           this.msgSuccess(res.msg)
-          this.getList()
+          this.getList(1)
         }
       })
     },
@@ -224,7 +224,7 @@ export default {
       }),
         (this.userArray = [])
       this.value1 = []
-      this.getList()
+      this.getList(1)
     },
     getList(type) {
       type && (this.query.pageNum = type)

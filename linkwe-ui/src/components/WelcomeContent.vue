@@ -280,7 +280,7 @@
       showMore () {
         let exit = true
         if (this.isSingle) {
-          if (this.form.materialMsgList.length === 3) {
+          if (this.form.materialMsgList.length === 1) {
             exit = false
           }
         }
@@ -316,12 +316,12 @@
         if (val) {
           const textIndex = $textarea.selectionStart
           if (textIndex == 0 && document.activeElement != $textarea) {
-            this.form.welcomeMsg += '#客户昵称#'
+            this.form.welcomeMsg += '%客户昵称%'
           } else {
-            this.form.welcomeMsg = msg.slice(0, textIndex) + '#客户昵称#' + msg.slice(textIndex)
+            this.form.welcomeMsg = msg.slice(0, textIndex) + '%客户昵称%' + msg.slice(textIndex)
           }
         } else {
-          this.form.welcomeMsg = msg.replace(/\#客户昵称\#/, '')
+          this.form.welcomeMsg = msg.replace(/\%客户昵称\%/, '')
         }
       },
       onChooseMaterial (materialType, rowIndex) {

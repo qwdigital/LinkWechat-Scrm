@@ -72,7 +72,7 @@
     <div class="userlabel">
       <div class="detail">
         <div>企业标签</div>
-        <div class="data" is-link @click="labelEdit">编辑</div>
+        <div class="data" is-link @click="labelEdit()">编辑</div>
       </div>
       <div v-if="form.tags" class="labelstyle mt10">
         <div class="label" v-for="(unit, unique) in form.tags" :key="unique">
@@ -87,7 +87,7 @@
     <div class="userlabel">
       <div class="detail">
         <div>个人标签</div>
-        <div class="data" is-link @click="labelEdit">编辑</div>
+        <div class="data" is-link @click="labelEdit('person')">编辑</div>
       </div>
       <div v-if="form.tags" class="labelstyle mt10">
         <div class="label" v-for="(unit, unique) in form.personTags" :key="unique">
@@ -154,15 +154,33 @@
               :key="unique"
               class="label"
               :style="addTag.some((e) => e.tagId == unit.tagId) ? isActive : ''"
-              @click="userLabel(unit)"
+              @click="clickLabel(unit)"
             >
               {{ unit.name }}
             </div>
           </div>
         </div>
       </div>
-      <van-button type="info" class="saveinfo" round @click="saveInfo">保存</van-button>
+      <div v-if="editLabelType === 'person'" class="ac" @click="showAddTag = true">
+        添加标签
+      </div>
+      <van-button type="info" class="saveinfo" round @click="saveCustomerTag">保存</van-button>
     </van-action-sheet>
+
+    <van-dialog
+      v-model="showAddTag"
+      title="添加标签"
+      show-cancel-button
+      @confirm="submitNewPersonTag"
+    >
+      <van-field
+        v-model="newPersonTag"
+        placeholder="请输入标签(不超过15字)"
+        required
+        :rules="[{ required: true, message: '请输入标签(不超过15字)' }]"
+        class="conagency"
+      />
+    </van-dialog>
     <!-- 点击客户标签里的编辑触发弹出框结束 -->
 
     <!-- 点击添加待办触发弹出框开始 -->
@@ -248,9 +266,7 @@
         </van-action-sheet> -->
         <!-- 保存 -->
         <div style="margin: 30px">
-          <van-button round block type="info" native-type="submit" @click="saveInfo2"
-            >保存</van-button
-          >
+          <van-button round block type="info" native-type="submit">保存</van-button>
         </div>
       </van-form>
     </van-action-sheet>
@@ -318,7 +334,8 @@ export default {
         position: '', // 职业
         remarkCorpName: '', // 公司
         description: '', // 其他描述
-        weTagGroupList: [] // 客户标签合集
+        tags: [], // 企业标签合集
+        personTags: [] // 个人标签合集
       },
       alllabel: [], // 标签组
       // 点击测试组标签获取的变量
@@ -352,7 +369,10 @@ export default {
         3: { name: '已成交', color: 'primary' },
         4: { name: '无意向', color: 'warning' },
         5: { name: '已流失', color: 'danger' }
-      })
+      }),
+      editLabelType: '', // 编辑标签类型
+      showAddTag: false,
+      newPersonTag: ''
     }
   },
   watch: {
@@ -423,7 +443,6 @@ export default {
               _this.findAddGroupNum()
               _this.getCustomerInfo()
               _this.findTrajectory()
-              _this.getAllTags()
             } else {
               //错误处理
               _this.$dialog({ message: '进入失败：' + JSON.stringify(res) })
@@ -437,8 +456,17 @@ export default {
         }
       })
     },
-    getAllTags() {
-      getAllTags()
+    getAllTags(type) {
+      let params = {
+        groupTagType: 1
+      }
+      if (type === 'person') {
+        params = {
+          groupTagType: 3,
+          userId: this.userId
+        }
+      }
+      getAllTags(params)
         .then(({ data }) => {
           this.alllabel = data
 
@@ -453,8 +481,6 @@ export default {
           console.log(err)
         })
     },
-    //   客户待办点击保存事件
-    saveInfo2() {},
     // 添加或编辑轨迹
     addOrEditWaitHandle(form) {
       addOrEditWaitHandle(form)
@@ -498,7 +524,7 @@ export default {
       this.findTrajectory()
     },
     // 添加代办
-    // 表单提交
+    //   客户待办点击保存事件
     onSubmit() {
       let form = {
         trajectoryType: 4,
@@ -564,8 +590,8 @@ export default {
         }
       })
     },
-    // 第一层标签
-    userLabel(item) {
+    // 点击选择标签
+    clickLabel(item) {
       let index = this.addTag.findIndex((e) => {
         return item.tagId == e.tagId
       })
@@ -581,12 +607,13 @@ export default {
         this.addTag.splice(index, 1)
       }
     },
-    saveInfo() {
+    saveCustomerTag() {
       // 更新客户画像标签 [{ groupId: this.groupId, name: this.name, tagId: this.tagId }]
       updateWeCustomerPorTraitTag({
         externalUserid: this.externalUserid,
         userId: this.userId,
-        addTag: this.addTag
+        isCompanyTag: this.editLabelType !== 'person', //是否是企业标签true是;false:不是
+        addTag: this.addTag.map((e) => ({ tagId: e.tagId }))
       })
         .then((res) => {
           //   console.log(res);
@@ -604,13 +631,17 @@ export default {
         })
     },
     // 点击编辑按钮
-    labelEdit() {
-      let tags = this.form.tags
+    async labelEdit(type) {
+      this.editLabelType = type
+      await this.getAllTags(type)
+      this.addTag = []
+
+      let tags = this.form[type === 'person' ? 'personTags' : 'tags']
       let hasErrorTag = [] // 异常活已经删除的标签
       let repeat = [] // 重复的标签
       tags.forEach((unit) => {
         // 判断是否有重复标签
-        let isRepeat = this.addTag.some((d) => {
+        let isRepeat = this.listTagOneArray.some((d) => {
           return d.tagId === unit.tagId
         })
         // 去重
@@ -696,7 +727,10 @@ export default {
         .catch((err) => {
           console.log(err)
         })
-    }
+    },
+
+    // 添加个人标签
+    submitNewPersonTag() {}
   }
 }
 </script>

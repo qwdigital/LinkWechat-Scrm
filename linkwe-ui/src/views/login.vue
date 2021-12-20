@@ -169,7 +169,7 @@ export default {
   },
   methods: {
     getCode() {
-      getCodeImg().then(res => {
+      getCodeImg().then((res) => {
         this.codeUrl = 'data:image/gif;base64,' + res.img
         this.loginForm.uuid = res.uuid
       })
@@ -185,7 +185,7 @@ export default {
       }
     },
     handleLogin() {
-      this.$refs.loginForm.validate(valid => {
+      this.$refs.loginForm.validate((valid) => {
         if (valid) {
           this.loading = true
           if (this.loginForm.rememberMe) {
@@ -204,7 +204,7 @@ export default {
           this.$store
             .dispatch('Login', this.loginForm)
             .then(() => {
-              this.$router.push({ path: this.redirect || '/' })
+              this.$router.push({ path: this.redirect || process.env.VUE_APP_BASE_URL })
             })
             .catch(() => {
               this.loading = false

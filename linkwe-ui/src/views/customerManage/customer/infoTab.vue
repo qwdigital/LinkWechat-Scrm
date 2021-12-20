@@ -1,5 +1,6 @@
 <script>
 import { getSummary, getFollowUpRecord, getCustomerInfoByUserId } from '@/api/customer'
+import { dictTrackState } from '@/utils/dictionary'
 import record from './record'
 export default {
   name: '',
@@ -9,6 +10,10 @@ export default {
       type: String,
       default: ''
     }
+    // trackUsers: {
+    //   type: Array,
+    //   default: ''
+    // }
   },
   components: {
     record
@@ -27,14 +32,11 @@ export default {
       active: '0',
       openedTabs: ['0'],
       openTrack: ['0'],
-      lastSyncTime: 0
+      lastSyncTime: null,
+      dictTrackState
     }
   },
-  computed: {
-    disabled() {
-      return (+new Date() - +new Date(this.lastSyncTime)) / 3600000 < 2
-    }
-  },
+  computed: {},
   watch: {},
   created() {
     this.userId ? this.getCustomerInfoByUserId() : this.getSummary()
@@ -105,15 +107,15 @@ export default {
                 :key="index"
                 :class="['flex', index && 'mt20']"
               >
-                <div class="name oe">{{ item.userName }}</div>
-                ：
+                <!-- 汇总的场景显示名字 -->
+                <template v-if="!userId">
+                  <div class="name oe">{{ item.userName }}</div>
+                  ：
+                </template>
                 <template v-if="item.tagNames">
-                  <el-tag
-                    type="info"
-                    v-for="(unit, unique) in item.tagNames.split(',')"
-                    :key="unique"
-                    >{{ unit }}</el-tag
-                  >
+                  <el-tag v-for="(unit, unique) in item.tagNames.split(',')" :key="unique">{{
+                    unit
+                  }}</el-tag>
                 </template>
                 <div v-else class="sub-text-color ac">
                   暂无标签
@@ -133,8 +135,11 @@ export default {
                 :key="index"
                 :class="['flex', index && 'mt20']"
               >
-                <div class="name oe">{{ item.userName }}</div>
-                ：
+                <!-- 汇总的场景显示名字 -->
+                <template v-if="!userId">
+                  <div class="name oe">{{ item.userName }}</div>
+                  ：
+                </template>
                 <template v-if="item.tagNames">
                   <el-tag
                     type="info"
@@ -156,19 +161,23 @@ export default {
           <el-card class="mb10" shadow="never">
             <div slot="header" class="card-title">跟进状态</div>
             <template v-if="portrayalSum.trackStates && portrayalSum.trackStates.length">
-              <div class="flex mb20" v-for="(item, index) of portrayalSum.trackStates" :key="index">
-                <div class="name oe">{{ item.userName }}</div>
-                ：
+              <div
+                v-for="(item, index) of portrayalSum.trackStates"
+                :key="index"
+                :class="['flex', index && 'mt20']"
+              >
+                <!-- 汇总的场景显示名字 -->
+                <template v-if="!userId">
+                  <div class="name oe">{{ item.userName }}</div>
+                  ：
+                </template>
                 <template v-if="item.trackStateList.length">
-                  <el-steps
-                    style="flex:auto;"
-                    :active="item.trackStateList.length"
-                    finish-status="success"
-                  >
+                  <el-steps style="flex:auto;" :active="item.trackStateList.length">
                     <el-step
                       v-for="(unit, unique) of item.trackStateList"
                       :key="unique"
                       :title="dictTrackState[~~unit.trackState + ''].name"
+                      :status="dictTrackState[~~unit.trackState + ''].color"
                       :description="unit.trackTime"
                     ></el-step>
                   </el-steps>
@@ -183,19 +192,22 @@ export default {
 
           <el-card shadow="never">
             <div slot="header" class="card-title">跟进记录</div>
+            <!-- 单个人的场景 -->
+            <record v-if="userId" :userId="userId" viewType="1"></record>
+            <!-- 汇总的场景 -->
             <el-tabs
-              v-if="portrayalSum.trackStates && portrayalSum.trackStates.length"
+              v-else-if="portrayalSum.trackUsers && portrayalSum.trackUsers.length"
               value="0"
               @tab-click="changeTab"
             >
               <el-tab-pane
-                v-for="(item, index) in portrayalSum.trackStates"
+                v-for="(item, index) in portrayalSum.trackUsers"
                 :key="index"
                 :label="item.userName"
               >
                 <record
                   v-if="openedTabs.includes(index + '')"
-                  :userId="item.userId"
+                  :userId="item.trackUserId"
                   viewType="1"
                 ></record>
               </el-tab-pane>
@@ -231,6 +243,7 @@ export default {
                 v-show="item === active"
                 :key="index"
                 :userId="userId"
+                :lastSyncTime.sync="lastSyncTime"
                 :trajectoryType="item == 0 ? null : item"
               ></record>
             </template>
@@ -279,5 +292,8 @@ export default {
   position: relative;
   float: right;
   top: -11px;
+}
+.sub-text-color {
+  flex: auto;
 }
 </style>
