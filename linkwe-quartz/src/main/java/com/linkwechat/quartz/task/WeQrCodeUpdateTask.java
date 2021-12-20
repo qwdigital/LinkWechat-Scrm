@@ -50,12 +50,12 @@ public class WeQrCodeUpdateTask {
             Map<Long, List<WeQrScopeVo>> qrCodeMap = weQrScopeList.stream().collect(Collectors.groupingBy(WeQrScopeVo::getQrId));
             qrCodeMap.forEach((qrId,scopeList) ->{
                 WeQrCode weQrCode = weQrCodeService.getById(qrId);
-                WeQrScopeVo weCustomizeQrScope = weQrScopeList.stream()
+                WeQrScopeVo weCustomizeQrScope = scopeList.stream()
                         .filter(item -> ObjectUtil.equal(1, item.getType())).findFirst().orElse(null);
                 if(weCustomizeQrScope != null){
                     extracted(weCustomizeQrScope,weQrCode.getConfigId());
                 }else {
-                    WeQrScopeVo weDefaultQrScope = weQrScopeList.stream()
+                    WeQrScopeVo weDefaultQrScope = scopeList.stream()
                             .filter(item -> ObjectUtil.equal(0, item.getType())).findFirst().orElse(null);
                     extracted(weDefaultQrScope,weQrCode.getConfigId());
                 }
