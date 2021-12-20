@@ -20,7 +20,7 @@ export default {
   },
   data() {
     return {
-      portrayalSum: { companyTags: [], personTags: [], trackStates: [] }, // 客户画像汇总
+      portrayalSum: { companyTags: [], personTags: [], trackStates: [], trackUsers: [] }, // 客户画像汇总
       trajectoryType: {
         0: '全部',
         1: '信息动态',
@@ -243,6 +243,7 @@ export default {
                 v-show="item === active"
                 :key="index"
                 :userId="userId"
+                :userIdAll="portrayalSum.trackUsers.map((e) => e.trackUserId).join()"
                 :lastSyncTime.sync="lastSyncTime"
                 :trajectoryType="item == 0 ? null : item"
               ></record>

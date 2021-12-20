@@ -10,6 +10,11 @@ export default {
       type: String,
       default: null
     },
+    // 所有跟进人id（用于客户画像汇总的同步）
+    userIdAll: {
+      type: String,
+      default: null
+    },
     // 	1:信息动态;2:社交动态;3:跟进动态;4:待办动态
     trajectoryType: {
       type: String,
@@ -98,7 +103,7 @@ export default {
     },
     sync() {
       this.loading = true
-      syncTrack(this.userId)
+      syncTrack(this.userId || this.userIdAll)
         .then(() => {
           this.getList(1)
           this.msgSuccess('后台开始同步数据，请稍后关注进度')

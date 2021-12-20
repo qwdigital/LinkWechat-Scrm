@@ -213,8 +213,8 @@ export function getCustomerInfoByUserId({ externalUserid, userId, delFlag }) {
  * externalUserid	是	当前客户id
  * userId		当前跟进人id
  * pageNum: 1,
-        pageSize: 10,
-        trajectoryType		1:信息动态;2:社交动态;3:跟进动态;4:待办动态
+   pageSize: 10,
+   trajectoryType		1:信息动态;2:社交动态;3:跟进动态;4:待办动态
  */
 export function getFollowUpRecord(params) {
   return request({
@@ -230,6 +230,6 @@ export function getFollowUpRecord(params) {
  */
 export function syncTrack(userIds) {
   return request({
-    url: getway + `/moments/synchMomentsInteracte`
+    url: getway + `/moments/synchMomentsInteracte/${userIds}`
   })
 }
