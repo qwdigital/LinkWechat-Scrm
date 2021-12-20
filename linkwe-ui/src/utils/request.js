@@ -44,7 +44,7 @@ service.interceptors.response.use(
         type: 'warning'
       }).then(() => {
         store.dispatch('LogOut').then(() => {
-          location.href = '/'
+          location.href = process.env.VUE_APP_BASE_URL
         })
       })
     } else if (code === 500) {

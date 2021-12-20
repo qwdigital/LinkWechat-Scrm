@@ -17,7 +17,7 @@ export default {
   },
   computed: {
     disabled() {
-      return this.lastSyncTime ? (+new Date() - +new Date(this.lastSyncTime)) / 3600000 < 2 : true
+      return this.lastSyncTime ? (+new Date() - +new Date(this.lastSyncTime)) / 3600000 < 2 : false
     }
   },
   watch: {},
@@ -36,18 +36,24 @@ export default {
 </script>
 
 <template>
-  <el-tooltip
-    effect="light"
-    :disabled="!disabled"
-    class="item"
-    content="由于企业微信开放平台的限制，两小时内不得重复同步操作"
-    placement="top-start"
-  >
-    <el-tag v-if="disabled" type="info" size="default"><slot></slot></el-tag>
+  <div class="button-sync">
+    <el-tooltip
+      v-if="disabled"
+      effect="light"
+      class="item"
+      content="由于企业微信开放平台的限制，两小时内不得重复同步操作"
+      placement="top-start"
+    >
+      <el-tag type="info" size="default"><slot></slot></el-tag>
+    </el-tooltip>
     <el-button v-else v-preventReClick type="primary" @click="sync">
       <slot></slot>
     </el-button>
-  </el-tooltip>
+  </div>
 </template>
 
-<style lang="less" scoped></style>
+<style lang="scss" scoped>
+.button-sync {
+  display: inline-block;
+}
+</style>
