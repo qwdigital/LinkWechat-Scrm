@@ -13,7 +13,8 @@
             wu.user_id,
             wu.user_name,
             wct.track_time,
-            wct.track_state
+            wct.track_state,
+            wct.title
         FROM
             we_customer_trajectory wct
         LEFT JOIN we_user wu ON wu.user_id = wct.user_id

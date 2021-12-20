@@ -322,34 +322,44 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
      * @param userIds
      */
     @Override
-    @Async
+    @SynchRecord(synchType = SynchRecordConstants.SYNCH_MOMENTS_INTERACTE)
     public void synchMomentsInteracte(List<String> userIds) {
 
-        if(CollectionUtil.isNotEmpty(userIds)){
-            userIds.stream().forEach(userId->{
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        //异步同步一下标签库,解决标签不同步问题
+        Threads.SINGLE_THREAD_POOL.execute(new Runnable() {
+            @Override
+            public void run() {
+                if(CollectionUtil.isNotEmpty(userIds)){
+                    userIds.stream().forEach(userId->{
 
 
-                List<WeMoments> weMoments = this.list(new LambdaQueryWrapper<WeMoments>()
-                        .apply(StringUtils.isNotEmpty(userId), "FIND_IN_SET('" + userId + "',add_user)")
-                        .eq(WeMoments::getType,1)
-                        .eq(WeMoments::getDelFlag, WeConstans.WE_SUCCESS_CODE));
-                if(CollectionUtil.isNotEmpty(weMoments)){
-                    List<WeMomentsInteracte> interactes=new ArrayList<>();
-                    weMoments.stream().forEach(moment->{
-                        interactes.addAll(
-                                getInteracte(moment.getMomentId(), moment.getCreator())
-                        );
+                        List<WeMoments> weMoments = list(new LambdaQueryWrapper<WeMoments>()
+                                .apply(StringUtils.isNotEmpty(userId), "FIND_IN_SET('" + userId + "',add_user)")
+                                .eq(WeMoments::getType,1)
+                                .eq(WeMoments::getDelFlag, WeConstans.WE_SUCCESS_CODE));
+                        if(CollectionUtil.isNotEmpty(weMoments)){
+                            List<WeMomentsInteracte> interactes=new ArrayList<>();
+                            weMoments.stream().forEach(moment->{
+                                interactes.addAll(
+                                        getInteracte(moment.getMomentId(), moment.getCreator())
+                                );
+                            });
+                            if(CollectionUtil.isNotEmpty(interactes)){
+                                weMomentsInteracteService.batchAddOrUpdate(interactes);
+                            }
+                        }
+
+
+
                     });
-                    if(CollectionUtil.isNotEmpty(interactes)){
-                        weMomentsInteracteService.batchAddOrUpdate(interactes);
-                    }
+
                 }
 
+            }
+        });
 
-
-            });
-
-        }
 
 
     }
