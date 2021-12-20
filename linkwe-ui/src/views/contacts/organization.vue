@@ -1,220 +1,221 @@
 <script>
-import * as api from '@/api/organization'
-import SelectMaterial from '@/components/SelectMaterial/index'
+  import * as api from '@/api/organization'
+  import SelectMaterial from '@/components/SelectMaterial/index'
 
-export default {
-  name: 'Organization',
-  components: { SelectMaterial },
-  props: {},
-  data() {
-    return {
-      query: {
-        pageNum: 1,
-        pageSize: 10,
-        isActivate: '',
-        department: ''
-      },
-      dateRange: [],
-      treeData: [],
-      userList: [],
-      status: {
-        0: '启用',
-        1: '禁用',
-        6: '离职'
-      },
-      statusActivate: {
-        1: '已激活',
-        2: '已禁用',
-        4: '未激活',
-        5: '退出企业',
-        6: '删除'
-      },
-      total: 0,
-      defaultProps: {
-        label: 'name',
-        children: 'children'
-      },
-      form: {},
-      dialogVisible: false,
-      disabled: false,
-      loading: false,
-      multipleSelection: [],
-      formDepart: {},
-      dialogVisibleDepart: false,
-      dialogVisibleAvatar: false,
-      queryImg: {
-        pageNum: 1,
-        pageSize: 20
-      },
-      totalImg: 0,
-      // 表单校验
-      rules: Object.freeze({
-        name: [{ required: true, message: '必填项', trigger: 'blur' }],
-        userId: [{ required: true, message: '必填项', trigger: 'blur' }],
-        department: [{ required: true, message: '必填项', trigger: 'change' }],
-        joinTime: [{ required: true, message: '必填项', trigger: 'blur' }],
-        wxAccount: [{ required: true, message: '必填项', trigger: 'blur' }],
-        email: [
-          { required: true, message: '必填项', trigger: 'blur' },
-          {
-            type: 'email',
-            message: "'请输入正确的邮箱地址",
-            trigger: ['blur', 'change']
-          }
-        ],
-        mobile: [
-          { required: true, message: '必填项', trigger: 'blur' },
-          {
-            pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
-            message: '请输入正确的手机号码',
-            trigger: 'blur'
-          }
-        ]
-      })
-    }
-  },
-  watch: {},
-  computed: {},
-  created() {
-    this.getTree()
-    this.getList()
-  },
-  mounted() {},
-  methods: {
-    getTree() {
-      api.getTree().then(({ data }) => {
-        this.treeData = this.handleTree(data)
-      })
-    },
-    getList(page) {
-      // console.log(this.dateRange);
-      if (this.dateRange) {
-        this.query.beginTime = this.dateRange[0]
-        this.query.endTime = this.dateRange[1]
-      } else {
-        this.query.beginTime = ''
-        this.query.endTime = ''
+  export default {
+    name: 'Organization',
+    components: { SelectMaterial },
+    props: {},
+    data () {
+      return {
+        query: {
+          pageNum: 1,
+          pageSize: 10,
+          isActivate: '',
+          department: ''
+        },
+        dateRange: [],
+        treeData: [],
+        userList: [],
+        status: {
+          0: '启用',
+          1: '禁用',
+          6: '离职'
+        },
+        statusActivate: {
+          1: '已激活',
+          2: '已禁用',
+          4: '未激活',
+          5: '退出企业',
+          6: '删除'
+        },
+        total: 0,
+        defaultProps: {
+          label: 'name',
+          children: 'children'
+        },
+        form: {},
+        dialogVisible: false,
+        disabled: false,
+        loading: false,
+        multipleSelection: [],
+        formDepart: {},
+        dialogVisibleDepart: false,
+        dialogVisibleAvatar: false,
+        queryImg: {
+          pageNum: 1,
+          pageSize: 20
+        },
+        totalImg: 0,
+        // 表单校验
+        rules: Object.freeze({
+          name: [{ required: true, message: '必填项', trigger: 'blur' }],
+          userId: [{ required: true, message: '必填项', trigger: 'blur' }],
+          department: [{ required: true, message: '必填项', trigger: 'change' }],
+          joinTime: [{ required: true, message: '必填项', trigger: 'blur' }],
+          wxAccount: [{ required: true, message: '必填项', trigger: 'blur' }],
+          email: [
+            { required: true, message: '必填项', trigger: 'blur' },
+            {
+              type: 'email',
+              message: "'请输入正确的邮箱地址",
+              trigger: ['blur', 'change']
+            }
+          ],
+          mobile: [
+            { required: true, message: '必填项', trigger: 'blur' },
+            {
+              pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
+              message: '请输入正确的手机号码',
+              trigger: 'blur'
+            }
+          ]
+        })
       }
-      page && (this.query.pageNum = page)
-      this.loading = true
-      api
-        .getList(this.query)
-        .then(({ rows, total }) => {
-          this.userList = rows
-          this.total = +total
-          this.loading = false
+    },
+    watch: {},
+    computed: {},
+    created () {
+      this.getTree()
+      this.getList()
+    },
+    mounted () { },
+    methods: {
+      getTree () {
+        api.getTree().then(({ data }) => {
+          this.treeData = this.handleTree(data)
         })
-        .catch(() => {
-          this.loading = false
-        })
-    },
-    handleNodeClick(data) {
-      this.query.department = data.id == 1 ? '' : data.id
-      this.getList(1)
-    },
-    edit(data, type) {
-      this.$refs['form'] && this.$refs['form'].clearValidate()
-      this.form = Object.assign({}, data || { _new: true })
-      this.dialogVisible = true
-      type || !data ? (this.disabled = false) : (this.disabled = true)
-    },
-    submit() {
-      this.$refs['form'].validate((valid) => {
-        if (valid) {
-          let form = JSON.parse(JSON.stringify(this.form))
-          form.department += ''
-          form.isLeaderInDept += ''
-          api[form._new ? 'addUser' : 'updateUser'](form)
-            .then(() => {
-              this.msgSuccess('操作成功')
-              this.dialogVisible = false
-              this.getList(form._new && 1)
-            })
-            .catch(() => {
-              this.dialogVisible = false
-            })
+      },
+      getList (page) {
+        // console.log(this.dateRange);
+        if (this.dateRange) {
+          this.query.beginTime = this.dateRange[0]
+          this.query.endTime = this.dateRange[1]
+        } else {
+          this.query.beginTime = ''
+          this.query.endTime = ''
         }
-      })
-    },
-    startOrStop(data) {
-      // 0: 启用，1：禁用
-      let params = {
-        userId: data.userId,
-        enable: data.enable == 1 ? 0 : 1
-      }
-      api.startOrStop(params).then(() => {
-        this.msgSuccess('操作成功')
-        this.getList()
-      })
-    },
-    /** 删除按钮操作 */
-    remove(id) {
-      // const operIds = id || this.ids + "";
-      this.$confirm('是否确认删除吗?', '警告', {
-        type: 'warning'
-      })
-        .then(function() {
-          return api.remove(id)
+        page && (this.query.pageNum = page)
+        this.loading = true
+        api
+          .getList(this.query)
+          .then(({ rows, total }) => {
+            this.userList = rows
+            this.total = +total
+            this.loading = false
+          })
+          .catch(() => {
+            this.loading = false
+          })
+      },
+      handleNodeClick (data) {
+        this.query.department = data.id == 1 ? '' : data.id
+        this.getList(1)
+      },
+      edit (data, type) {
+        this.$refs['form'] && this.$refs['form'].clearValidate()
+        this.form = Object.assign({}, data || { _new: true })
+        this.dialogVisible = true
+        type || !data ? (this.disabled = false) : (this.disabled = true)
+      },
+      submit () {
+        this.$refs['form'].validate((valid) => {
+          if (valid) {
+            let form = JSON.parse(JSON.stringify(this.form))
+            form.department += ''
+            form.isLeaderInDept += ''
+            api[form._new ? 'addUser' : 'updateUser'](form)
+              .then(() => {
+                this.msgSuccess('操作成功')
+                this.dialogVisible = false
+                this.getList(form._new && 1)
+              })
+              .catch(() => {
+                this.dialogVisible = false
+              })
+          }
         })
-        .then(() => {
-          this.getList()
-          this.msgSuccess('删除成功')
-        })
-    },
-    handleSelectionChange(val) {
-      this.multipleSelection = val
-    },
-    syncUser() {
-      const loading = this.$loading({
-        lock: true,
-        text: 'Loading',
-        spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.7)'
-      })
-      api.syncUser().then(() => {
-        loading.close()
-        this.msgSuccess('操作成功')
-        this.getList()
-      })
-    },
-    batchImport() {},
-    departEdit(data, type) {
-      this.formDepart = Object.assign({}, type ? data : { parentId: data.id, pName: data.name })
-      this.dialogVisibleDepart = true
-    },
-    departRemove(id) {
-      this.$confirm('是否确认删除吗?', '警告', {
-        type: 'warning'
-      })
-        .then(function() {
-          return api.removeDepart(id)
-        })
-        .then(() => {
-          this.getTree()
-          this.msgSuccess('删除成功')
-        })
-    },
-    departSubmit() {
-      api[this.formDepart.id ? 'updateDepart' : 'addDepart'](this.formDepart)
-        .then(() => {
+      },
+      startOrStop (data) {
+        // 0: 启用，1：禁用
+        let params = {
+          userId: data.userId,
+          enable: data.enable == 1 ? 0 : 1
+        }
+        api.startOrStop(params).then(() => {
           this.msgSuccess('操作成功')
-          this.dialogVisibleDepart = false
-          this.getTree()
+          this.getList()
         })
-        .catch(() => {
-          this.dialogVisibleDepart = false
+      },
+      /** 删除按钮操作 */
+      remove (id) {
+        // const operIds = id || this.ids + "";
+        this.$confirm('是否确认删除吗?', '警告', {
+          type: 'warning'
         })
-    },
-    showAvatarDialog() {
-      this.dialogVisibleAvatar = true
-    },
-    // 选择素材确认按钮
-    submitSelectMaterial(text, image, file) {
-      this.form.headImageUrl = image.materialUrl
-      // this.form.imageMessage._materialName = image.materialName
+          .then(function () {
+            return api.remove(id)
+          })
+          .then(() => {
+            this.getList()
+            this.msgSuccess('删除成功')
+          })
+      },
+      handleSelectionChange (val) {
+        this.multipleSelection = val
+      },
+      syncUser () {
+        // const loading = this.$loading({
+        //   lock: false,
+        //   text: 'Loading',
+        //   spinner: 'el-icon-loading',
+        //   background: 'rgba(0, 0, 0, 0.7)'
+        // })
+        api.syncUser().then(() => {
+          // console.log(1111)
+          loading.close()
+          this.msgSuccess('操作成功')
+          this.getList()
+        })
+      },
+      batchImport () { },
+      departEdit (data, type) {
+        this.formDepart = Object.assign({}, type ? data : { parentId: data.id, pName: data.name })
+        this.dialogVisibleDepart = true
+      },
+      departRemove (id) {
+        this.$confirm('是否确认删除吗?', '警告', {
+          type: 'warning'
+        })
+          .then(function () {
+            return api.removeDepart(id)
+          })
+          .then(() => {
+            this.getTree()
+            this.msgSuccess('删除成功')
+          })
+      },
+      departSubmit () {
+        api[this.formDepart.id ? 'updateDepart' : 'addDepart'](this.formDepart)
+          .then(() => {
+            this.msgSuccess('操作成功')
+            this.dialogVisibleDepart = false
+            this.getTree()
+          })
+          .catch(() => {
+            this.dialogVisibleDepart = false
+          })
+      },
+      showAvatarDialog () {
+        this.dialogVisibleAvatar = true
+      },
+      // 选择素材确认按钮
+      submitSelectMaterial (text, image, file) {
+        this.form.headImageUrl = image.materialUrl
+        // this.form.imageMessage._materialName = image.materialName
+      }
     }
   }
-}
 </script>
 
 <template>
@@ -224,15 +225,7 @@ export default {
         <el-input v-model="query.name" placeholder="请输入" clearable />
       </el-form-item>
       <el-form-item label="入职时间">
-        <el-date-picker
-          v-model="dateRange"
-          value-format="yyyy-MM-dd"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          :picker-options="pickerOptions"
-        ></el-date-picker>
+        <el-date-picker v-model="dateRange" value-format="yyyy-MM-dd" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :picker-options="pickerOptions"></el-date-picker>
       </el-form-item>
       <el-form-item label="激活状态">
         <el-select v-model="query.isActivate">
@@ -241,19 +234,13 @@ export default {
         </el-select>
       </el-form-item>
       <el-form-item label>
-        <el-button v-hasPermi="['contacts:organization:query']" type="primary" @click="getList(1)"
-          >查询</el-button
-        >
+        <el-button v-hasPermi="['contacts:organization:query']" type="primary" @click="getList(1)">查询</el-button>
       </el-form-item>
     </el-form>
 
     <div class="ar mb15">
-      <el-button v-hasPermi="['contacts:organization:sync']" type="primary" @click="syncUser"
-        >同步成员</el-button
-      >
-      <el-button v-hasPermi="['contacts:organization:import']" type="info" @click="batchImport"
-        >批量导入</el-button
-      >
+      <el-button v-hasPermi="['contacts:organization:sync']" type="primary" @click="syncUser">同步成员</el-button>
+      <el-button v-hasPermi="['contacts:organization:import']" type="info" @click="batchImport">批量导入</el-button>
       <!-- <el-button
         v-hasPermi="['contacts:organization:addMember']"
         type="primary"
@@ -268,39 +255,13 @@ export default {
         <div class="head-container">
           <!-- <div>部门架构</div> -->
           <!-- :filter-node-method="filterNode" -->
-          <el-tree
-            class="left-tree"
-            :data="treeData"
-            :props="defaultProps"
-            :expand-on-click-node="false"
-            ref="tree"
-            highlight-current
-            default-expand-all
-            @node-click="handleNodeClick"
-          >
+          <el-tree class="left-tree" :data="treeData" :props="defaultProps" :expand-on-click-node="false" ref="tree" highlight-current default-expand-all @node-click="handleNodeClick">
             <div class="custom-tree-node" slot-scope="{ node, data }">
               <span>{{ node.label }}</span>
               <span class="fr">
-                <i
-                  class="el-icon-edit-outline"
-                  title="编辑"
-                  v-hasPermi="['contacts:organization:editDep']"
-                  v-if="node.level !== 1"
-                  @click.stop="departEdit(data, 1)"
-                ></i>
-                <i
-                  class="el-icon-circle-plus-outline"
-                  title="添加"
-                  v-hasPermi="['contacts:organization:addDep']"
-                  @click.stop="departEdit(data, 0)"
-                ></i>
-                <i
-                  class="el-icon-delete"
-                  title="删除"
-                  v-hasPermi="['contacts:organization:removeDep']"
-                  v-if="node.level !== 1"
-                  @click.stop="departRemove(data.id)"
-                ></i>
+                <i class="el-icon-edit-outline" title="编辑" v-hasPermi="['contacts:organization:editDep']" v-if="node.level !== 1" @click.stop="departEdit(data, 1)"></i>
+                <i class="el-icon-circle-plus-outline" title="添加" v-hasPermi="['contacts:organization:addDep']" @click.stop="departEdit(data, 0)"></i>
+                <i class="el-icon-delete" title="删除" v-hasPermi="['contacts:organization:removeDep']" v-if="node.level !== 1" @click.stop="departRemove(data.id)"></i>
               </span>
             </div>
           </el-tree>
@@ -324,60 +285,22 @@ export default {
           <el-table-column label="状态" align="center" prop="isActivate">
             <template slot-scope="scope">{{ statusActivate[scope.row.isActivate] }}</template>
           </el-table-column>
-          <el-table-column
-            label="操作"
-            align="center"
-            width="180"
-            class-name="small-padding fixed-width"
-          >
+          <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
             <template slot-scope="scope">
-              <el-button
-                v-hasPermi="['contacts:organization:view']"
-                type="text"
-                @click="edit(scope.row, 0)"
-                >查看</el-button
-              >
-              <el-button
-                v-hasPermi="['contacts:organization:setStatus']"
-                v-if="scope.row.userId !== 1 && scope.row.enable < 2"
-                type="text"
-                @click="startOrStop(scope.row)"
-                >{{ status[scope.row.enable] }}</el-button
-              >
-              <el-button
-                v-if="scope.row.enable < 2"
-                v-hasPermi="['contacts:organization:edit']"
-                type="text"
-                @click="edit(scope.row, 1)"
-                >编辑</el-button
-              >
-              <el-button
-                v-if="scope.row.enable < 2"
-                v-hasPermi="['contacts:organization:remove']"
-                @click="remove(scope.row.userId)"
-                type="text"
-                >删除</el-button
-              >
+              <el-button v-hasPermi="['contacts:organization:view']" type="text" @click="edit(scope.row, 0)">查看</el-button>
+              <el-button v-hasPermi="['contacts:organization:setStatus']" v-if="scope.row.userId !== 1 && scope.row.enable < 2" type="text" @click="startOrStop(scope.row)">{{ status[scope.row.enable] }}</el-button>
+              <el-button v-if="scope.row.enable < 2" v-hasPermi="['contacts:organization:edit']" type="text" @click="edit(scope.row, 1)">编辑</el-button>
+              <el-button v-if="scope.row.enable < 2" v-hasPermi="['contacts:organization:remove']" @click="remove(scope.row.userId)" type="text">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
 
-        <pagination
-          v-show="total > 0"
-          :total="total"
-          :page.sync="query.pageNum"
-          :limit.sync="query.pageSize"
-          @pagination="getList()"
-        />
+        <pagination v-show="total > 0" :total="total" :page.sync="query.pageNum" :limit.sync="query.pageSize" @pagination="getList()" />
       </el-col>
     </el-row>
 
     <!-- 人员弹窗 -->
-    <el-dialog
-      :title="(form.userId ? (disabled ? '查看' : '修改') : '添加') + '成员'"
-      :visible.sync="dialogVisible"
-      :close-on-click-modal="false"
-    >
+    <el-dialog :title="(form.userId ? (disabled ? '查看' : '修改') : '添加') + '成员'" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <el-row :gutter="10">
         <el-col :span="8">
           <!-- <el-upload action :show-file-list="false" :on-success="d" :before-upload="d">
@@ -390,29 +313,15 @@ export default {
           </div>
         </el-col>
         <el-col :span="16">
-          <el-form
-            ref="form"
-            label-position="right"
-            :model="form"
-            :rules="rules"
-            label-width="80px"
-            :disabled="disabled"
-          >
+          <el-form ref="form" label-position="right" :model="form" :rules="rules" label-width="80px" :disabled="disabled">
             <el-form-item label="姓名" prop="name">
               <el-input v-model="form.name"></el-input>
             </el-form-item>
             <el-form-item label="昵称">
-              <el-input
-                v-model="form.alias"
-                placeholder="可在新闻公告应用的生日祝福等场景使用"
-              ></el-input>
+              <el-input v-model="form.alias" placeholder="可在新闻公告应用的生日祝福等场景使用"></el-input>
             </el-form-item>
             <el-form-item label="账号" prop="userId">
-              <el-input
-                :disabled="!form._new"
-                v-model="form.userId"
-                placeholder="成员唯一标识，不支持更改，不支持中文"
-              ></el-input>
+              <el-input :disabled="!form._new" v-model="form.userId" placeholder="成员唯一标识，不支持更改，不支持中文"></el-input>
             </el-form-item>
             <el-form-item label="性别">
               <el-radio-group v-model="form.gender">
@@ -430,18 +339,13 @@ export default {
               <el-input v-model="form.wxAccount"></el-input>
             </el-form-item>
             <el-form-item label="所属部门" prop="department">
-              <el-cascader
-                v-model="form.department"
-                :options="treeData"
-                :show-all-levels="false"
-                :props="{
+              <el-cascader v-model="form.department" :options="treeData" :show-all-levels="false" :props="{
                   expandTrigger: 'hover',
                   checkStrictly: true,
                   /** multiple: true,*/ emitPath: false,
                   value: 'id',
                   label: 'name'
-                }"
-              ></el-cascader>
+                }"></el-cascader>
             </el-form-item>
             <el-form-item label="职位">
               <el-input v-model="form.position"></el-input>
@@ -453,12 +357,7 @@ export default {
               </el-radio-group>
             </el-form-item>
             <el-form-item label="入职时间">
-              <el-date-picker
-                v-model="form.joinTime"
-                value-format="yyyy-MM-dd"
-                type="date"
-                placeholder
-              ></el-date-picker>
+              <el-date-picker v-model="form.joinTime" value-format="yyyy-MM-dd" type="date" placeholder></el-date-picker>
             </el-form-item>
             <el-form-item label="身份证">
               <el-input v-model="form.idCard"></el-input>
@@ -473,12 +372,7 @@ export default {
               <el-input v-model="form.address"></el-input>
             </el-form-item>
             <el-form-item label="生日">
-              <el-date-picker
-                v-model="form.birthday"
-                value-format="yyyy-MM-dd"
-                type="date"
-                placeholder
-              ></el-date-picker>
+              <el-date-picker v-model="form.birthday" value-format="yyyy-MM-dd" type="date" placeholder></el-date-picker>
             </el-form-item>
             <!-- <el-form-item label="备注">
               <el-input type="textarea" v-model="model"></el-input>
@@ -493,11 +387,7 @@ export default {
     </el-dialog>
 
     <!-- 部门弹窗 -->
-    <el-dialog
-      :title="(formDepart.id ? '修改' : '添加') + '部门'"
-      :visible.sync="dialogVisibleDepart"
-      :close-on-click-modal="false"
-    >
+    <el-dialog :title="(formDepart.id ? '修改' : '添加') + '部门'" :visible.sync="dialogVisibleDepart" :close-on-click-modal="false">
       <el-form :model="formDepart" label-width="80px">
         <el-form-item label="部门名称">
           <el-input v-model="formDepart.name"></el-input>
@@ -536,48 +426,43 @@ export default {
       </div>
     </el-dialog> -->
 
-    <SelectMaterial
-      :visible.sync="dialogVisibleAvatar"
-      type="1"
-      :showArr="[1]"
-      @success="submitSelectMaterial"
-    ></SelectMaterial>
+    <SelectMaterial :visible.sync="dialogVisibleAvatar" type="1" :showArr="[1]" @success="submitSelectMaterial"></SelectMaterial>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.custom-tree-node {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 14px;
-  padding-right: 8px;
-}
-.avatar-wrap {
-  height: 200px;
-  border: 1px solid #eee;
-  border-radius: 5px;
-  position: relative;
-  overflow: hidden;
-}
-.avatar {
-  height: 100%;
-}
-.avatar-uploader-icon {
-  font-size: 58px;
-  color: #ddd;
-}
-.img-wrap {
-  height: 340px;
-  overflow: auto;
-  /deep/.el-radio__input {
-    position: absolute;
-    right: 0;
+  .custom-tree-node {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    padding-right: 8px;
   }
-}
-.img-li {
-  width: 115px;
-  height: 160px;
-}
+  .avatar-wrap {
+    height: 200px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar {
+    height: 100%;
+  }
+  .avatar-uploader-icon {
+    font-size: 58px;
+    color: #ddd;
+  }
+  .img-wrap {
+    height: 340px;
+    overflow: auto;
+    /deep/.el-radio__input {
+      position: absolute;
+      right: 0;
+    }
+  }
+  .img-li {
+    width: 115px;
+    height: 160px;
+  }
 </style>

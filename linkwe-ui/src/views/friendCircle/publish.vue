@@ -203,14 +203,13 @@
             if (dd.annexType === 'link') {
               let reUrl = /(http|https):\/\/([\w.]+\/?)\S*/
               if (!reUrl.test(dd.annexUrl)) {
-                console.log(123)
                 goto = false
                 dd.contentError = '必须以 http://或 https://开头'
               }
             }
           })
           this.$forceUpdate()
-          if (this.form.otherContent.length) {
+          if (!this.form.otherContent.length) {
             this.form.contentType = 'text'
           }
           if (goto) {
