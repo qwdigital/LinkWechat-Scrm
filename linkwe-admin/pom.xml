@@ -83,10 +83,10 @@
 
 
 
-        <dependency>
-            <groupId>io.github.leejoker</groupId>
-            <artifactId>linkwechat-nacos-starter</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.github.leejoker</groupId>-->
+<!--            <artifactId>linkwechat-nacos-starter</artifactId>-->
+<!--        </dependency>-->
 
 
 

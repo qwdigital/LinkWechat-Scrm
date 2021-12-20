@@ -2,6 +2,7 @@ package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -62,5 +63,12 @@ public class WeCustomerTrajectory extends BaseEntity {
     private String trackContent;
 
     //跟进时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Date trackTime;
+
+    //是否来自同步:1是;0否
+    private  Boolean isSynch;
+
+    //标题
+    private String title;
 }

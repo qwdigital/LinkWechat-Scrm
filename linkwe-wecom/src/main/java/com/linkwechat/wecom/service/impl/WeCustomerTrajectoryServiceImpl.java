@@ -108,5 +108,10 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
         }
     }
 
+    @Override
+    public void deleteSynchTrajectory() {
+        this.baseMapper.deleteSynchTrajectory();
+    }
+
 
 }

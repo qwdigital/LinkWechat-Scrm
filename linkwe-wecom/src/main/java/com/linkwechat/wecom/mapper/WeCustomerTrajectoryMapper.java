@@ -5,5 +5,7 @@ import com.linkwechat.wecom.domain.WeCustomerTrajectory;
 
 public interface WeCustomerTrajectoryMapper extends BaseMapper<WeCustomerTrajectory> {
 
+    void deleteSynchTrajectory();
+
 
 }

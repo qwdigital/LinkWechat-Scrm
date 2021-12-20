@@ -45,7 +45,7 @@ public class WeCustomerList {
     //跟进人id
     private String firstUserId;
 
-    //跟踪状态
+    //跟踪状态 1:待跟进;2:跟进中;3:已成交;4:无意向;5:已流失
     private Integer trackState;
 
     //添加方式

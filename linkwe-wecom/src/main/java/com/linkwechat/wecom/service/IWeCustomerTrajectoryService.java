@@ -10,4 +10,7 @@ public interface IWeCustomerTrajectoryService extends IService<WeCustomerTraject
 
     void inforMationNews(String userId,String externalUserid,Integer trajectoryType);
 
+
+    void deleteSynchTrajectory();
+
 }

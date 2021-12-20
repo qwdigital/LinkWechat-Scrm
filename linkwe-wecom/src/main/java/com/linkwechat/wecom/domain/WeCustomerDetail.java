@@ -122,7 +122,7 @@ public class WeCustomerDetail {
     public static class  CompanyOrPersonTag{
 
         private String userName;
-        private String tagsNames;
+        private String tagNames;
         private String tagIds;
 
 

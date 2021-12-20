@@ -7,9 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
-import com.linkwechat.common.enums.AllocateCustomerStatus;
-import com.linkwechat.common.enums.TrajectorySceneType;
-import com.linkwechat.common.enums.WeExceptionTip;
+import com.linkwechat.common.enums.*;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -145,6 +143,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
         List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
 
+        List<WeCustomerTrajectory> trajectories=new ArrayList<>();
 
         list.forEach(userDetail -> {
             //客户入库
@@ -154,6 +153,19 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             weCustomer.setCustomerName(userDetail.getExternal_contact().getName());
             weCustomer.setDelFlag(new Integer(0));
             Optional.ofNullable(userDetail.getFollow_info()).ifPresent(followInfo -> {
+                trajectories.add(
+                        WeCustomerTrajectory.builder()
+                                .trajectoryType(TrajectoryType.TRAJECTORY_TYPE_DBDT.getType())
+                                .externalUserid(weCustomer.getExternalUserid())
+                                .trackState(TrackState.STATE_DGJ.getType())
+                                .isSynch(false)
+                                .content("待跟进状态")
+                                .title("同步客户设置跟进状态")
+                                .trackTime(new Date(followInfo.getCreatetime() * 1000L))
+                                .userId(followInfo.getUserid())
+                                .build()
+                );
+
 
                 weCustomer.setFirstUserId(followInfo.getUserid());
                 weCustomer.setFirstAddTime(new Date(followInfo.getCreatetime() * 1000L));
@@ -167,6 +179,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                         .userId(followInfo.getUserid())
                                         .externalUserid(weCustomer.getExternalUserid())
                                         .tagId(tag)
+                                        .delFlag(new Integer(0))
+                                        .isCompanyTag(true)
                                         .build()
                         );
                     });
@@ -174,6 +188,17 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             });
         });
 
+
+        if(CollectionUtil.isNotEmpty(trajectories)){
+            iWeCustomerTrajectoryService.deleteSynchTrajectory();
+            List<List<WeCustomerTrajectory>> traJectorys = Lists.partition(trajectories, 500);
+            for(List<WeCustomerTrajectory> traJectory: traJectorys){
+
+                //清空状态为等待跟进的数据
+                iWeCustomerTrajectoryService.saveBatch(traJectory);
+
+            }
+        }
 
         if (CollectionUtil.isNotEmpty(weFlowerCustomerTagRels)) {
             List<List<WeFlowerCustomerTagRel>> tagRels = Lists.partition(weFlowerCustomerTagRels, 500);
@@ -722,6 +747,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                 .userName(k.getUserName())
                                 .addMethod(k.getAddMethod())
                                 .trackState(k.getTrackState())
+                                .trackUserId(k.getFirstUserId())
                                 .firstAddTime(k.getFirstAddTime())
                                 .build()
                 );
@@ -730,7 +756,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     companyTags.add(
                             WeCustomerDetail.CompanyOrPersonTag.builder()
                                     .tagIds(k.getTagIds())
-                                    .tagsNames(k.getTagNames())
+                                    .tagNames(k.getTagNames())
                                     .userName(k.getUserName())
                                     .build()
                     );
@@ -741,7 +767,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     personTags.add(
                             WeCustomerDetail.CompanyOrPersonTag.builder()
                                     .tagIds(k.getPersonTagIds())
-                                    .tagsNames(k.getPersonTagNames())
+                                    .tagNames(k.getPersonTagNames())
                                     .userName(k.getUserName())
                                     .build()
                     );

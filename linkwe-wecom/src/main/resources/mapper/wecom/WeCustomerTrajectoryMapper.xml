@@ -4,6 +4,9 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeCustomerTrajectoryMapper">
 
+    <delete id="deleteSynchTrajectory">
+        DELETE FROM we_customer_trajectory where is_synch=true
+    </delete>
 
 
 </mapper>
