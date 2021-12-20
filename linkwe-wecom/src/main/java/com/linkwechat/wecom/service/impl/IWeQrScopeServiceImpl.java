@@ -48,6 +48,7 @@ public class IWeQrScopeServiceImpl extends ServiceImpl<WeQrScopeMapper, WeQrScop
                     weQrScope.setScopeId(uuId);
                     weQrScope.setUserId(userId);
                     weQrScope.setScopeType(1);
+                    weQrScope.setType(userInfo.getType());
                     if(CollectionUtil.isNotEmpty(userInfo.getWorkCycle())){
                         weQrScope.setWorkCycle(userInfo.getWorkCycle().stream().map(String::valueOf).collect(Collectors.joining(",")));
                     }
