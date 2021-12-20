@@ -152,20 +152,34 @@
         </template>
       </van-nav-bar>
       <div class="content">
-        <div v-for="(item, index) in alllabel" :key="index">
-          <div class="mb10 mt5">{{ item.gourpName }}：</div>
-          <div class="labelstyle">
-            <div
-              v-for="(unit, unique) in item.weTags"
-              :key="unique"
-              class="label"
-              :style="addTag.some((e) => e.tagId == unit.tagId) ? isActive : ''"
-              @click="clickLabel(unit)"
-            >
-              {{ unit.name }}
-            </div>
+        <div v-if="editLabelType === 'person'" class="labelstyle">
+          <div
+            v-for="(unit, unique) in alllabel"
+            :key="unique"
+            class="label"
+            :style="addTag.some((e) => e.tagId == unit.tagId) ? isActive : ''"
+            @click="clickLabel(unit)"
+          >
+            {{ unit.name }}
           </div>
         </div>
+
+        <template v-else>
+          <div v-for="(item, index) in alllabel" :key="index">
+            <div class="mb10 mt5">{{ item.gourpName }}：</div>
+            <div class="labelstyle">
+              <div
+                v-for="(unit, unique) in item.weTags"
+                :key="unique"
+                class="label"
+                :style="addTag.some((e) => e.tagId == unit.tagId) ? isActive : ''"
+                @click="clickLabel(unit)"
+              >
+                {{ unit.name }}
+              </div>
+            </div>
+          </div>
+        </template>
       </div>
       <div class="saveinfo">
         <van-button type="info" class="mt10 mb15" size="small" block round @click="saveCustomerTag">
@@ -501,13 +515,14 @@ export default {
       getAllTags(params)
         .then(({ data }) => {
           this.alllabel = data
-
-          this.listTagOneArray = []
-          data.forEach((element) => {
-            element.weTags.forEach((d) => {
-              this.listTagOneArray.push(d)
+          if (this.editLabelType !== 'person') {
+            this.listTagOneArray = []
+            data.forEach((element) => {
+              element.weTags.forEach((d) => {
+                this.listTagOneArray.push(d)
+              })
             })
-          })
+          }
         })
         .catch((err) => {
           console.log(err)
@@ -622,6 +637,42 @@ export default {
         }
       })
     },
+    // 点击编辑按钮
+    async labelEdit(type) {
+      this.editLabelType = type
+      await this.getAllTags(type)
+      this.addTag = []
+
+      let tags = this.form[type === 'person' ? 'personTags' : 'tags']
+      let hasErrorTag = [] // 异常活已经删除的标签
+      let repeat = [] // 重复的标签
+      tags &&
+        tags.forEach((unit) => {
+          // 判断是否有重复标签
+          let isRepeat = this.listTagOneArray.some((d) => {
+            return d.tagId === unit.tagId
+          })
+          // 去重
+          if (isRepeat) {
+            repeat.push(unit.name)
+            return
+          }
+          let filter = this.listTagOneArray.find((d) => {
+            return d.tagId === unit.tagId
+          })
+          // 如果没有匹配到，则说明该便签处于异常状态，可能已被删除或破坏
+          if (!filter) {
+            hasErrorTag.push(unit.name)
+            return
+          }
+
+          this.addTag.push(filter)
+        })
+      this.show = true
+      // 获取用户当前的lable,将当前用户的lable与所有lable进行对比，相同的弹框内蓝色展示
+      // 弹框内的标签组选中时蓝色展示
+      // 弹框内的子标签与选中时蓝色展示，点击时
+    },
     // 点击选择标签
     clickLabel(item) {
       let index = this.addTag.findIndex((e) => {
@@ -662,42 +713,7 @@ export default {
           console.log(err)
         })
     },
-    // 点击编辑按钮
-    async labelEdit(type) {
-      this.editLabelType = type
-      await this.getAllTags(type)
-      this.addTag = []
 
-      let tags = this.form[type === 'person' ? 'personTags' : 'tags']
-      let hasErrorTag = [] // 异常活已经删除的标签
-      let repeat = [] // 重复的标签
-      tags &&
-        tags.forEach((unit) => {
-          // 判断是否有重复标签
-          let isRepeat = this.listTagOneArray.some((d) => {
-            return d.tagId === unit.tagId
-          })
-          // 去重
-          if (isRepeat) {
-            repeat.push(unit.name)
-            return
-          }
-          let filter = this.listTagOneArray.find((d) => {
-            return d.tagId === unit.tagId
-          })
-          // 如果没有匹配到，则说明该便签处于异常状态，可能已被删除或破坏
-          if (!filter) {
-            hasErrorTag.push(unit.name)
-            return
-          }
-
-          this.addTag.push(filter)
-        })
-      this.show = true
-      // 获取用户当前的lable,将当前用户的lable与所有lable进行对比，相同的弹框内蓝色展示
-      // 弹框内的标签组选中时蓝色展示
-      // 弹框内的子标签与选中时蓝色展示，点击时
-    },
     findAddaddEmployes() {
       findAddaddEmployes(this.externalUserid)
         .then(({ data }) => {
