@@ -514,7 +514,8 @@ export default {
       }
       getAllTags(params)
         .then(({ data }) => {
-          this.alllabel = data
+          this.alllabel = this.listTagOneArray = data
+
           if (this.editLabelType !== 'person') {
             this.listTagOneArray = []
             data.forEach((element) => {
