@@ -1,6 +1,11 @@
 <template>
   <div>
-    <van-list v-model="loading" :finished="finished" finished-text="没有更多了" loading-text="上划加载更多">
+    <van-list
+      v-model="loading"
+      :finished="finished"
+      finished-text="没有更多了"
+      loading-text="上划加载更多"
+    >
       <van-cell v-for="(item, index) in wList" :key="index">
         <!-- 时间 -->
         <p class="f12" style="position:relative; ">
@@ -16,12 +21,16 @@
           :key="index"
         >
           <van-step class="msg">
-            <span class="f12 po"> {{ dateFormat(item[0].createTime, 'hh:mm') }}</span>
+            <span class="f12 po"> {{ dateFormat(item1.createTime, 'hh:mm') }}</span>
             <span class="fs14">{{ chargeType(item1.trajectoryType) }}</span>
             <span class="finish-box">
-              <span class="finish" v-if="item1.trajectoryType == 4 && item1.status != 3" @click="finDynamic(item1.id)"
-                >完成</span
+              <span
+                class="finish"
+                v-if="item1.trajectoryType == 4 && item1.status != 3"
+                @click="finDynamic(item1.id)"
               >
+                完成
+              </span>
               <span class="deldynamic" @click="delDynamic(item1.id)">删除</span>
             </span>
 

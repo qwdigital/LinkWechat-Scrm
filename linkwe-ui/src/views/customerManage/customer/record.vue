@@ -69,7 +69,7 @@ export default {
 
             // 提取天
             rows.forEach((ele) => {
-              let date = this.dateFormat(ele.createTime, 'yyyyMMdd')
+              let date = this.dateFormat(ele.trackTime, 'yyyyMMdd')
               dayList.includes(date) || dayList.push(date)
             })
             dayList.sort((a, b) => b - a)
@@ -79,7 +79,7 @@ export default {
               let timeList = []
               for (let j = 0; j < rows.length; j++) {
                 // console.log(rows[j].createTime);
-                if (dayList[i] == this.dateFormat(rows[j].createTime, 'yyyyMMdd')) {
+                if (dayList[i] == this.dateFormat(rows[j].trackTime, 'yyyyMMdd')) {
                   timeList.push(rows[j])
                 }
               }
@@ -153,12 +153,12 @@ export default {
                 v-for="(item, index) in unit"
                 :key="index"
                 class="timeline-box-item"
-                :timestamp="item.trackTime"
+                :timestamp="item.trackTime.slice(10, 16)"
                 placement="top"
                 type="primary"
               >
-                <p class="timeline-box-item-title">{{ item.title || '无数据' }}</p>
-                <p>{{ item.trackContent || '无数据' }}</p>
+                <p class="timeline-box-item-title">{{ item.title || '无标题' }}</p>
+                <p>{{ item.trackContent || '无内容' }}</p>
               </el-timeline-item>
             </el-timeline>
           </li>
