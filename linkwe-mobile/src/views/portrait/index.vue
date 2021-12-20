@@ -144,7 +144,13 @@
 
     <!-- 点击客户标签里的编辑触发弹出框开始 -->
     <van-action-sheet v-model="show">
-      <van-nav-bar title="客户标签管理" right-text="取消" @click-right="show = false" />
+      <van-nav-bar title="客户标签管理" right-text="取消" @click-right="show = false">
+        <template v-if="editLabelType === 'person'" slot="left">
+          <van-button type="primary" size="mini" @click="showAddTag = true">
+            添加标签
+          </van-button>
+        </template>
+      </van-nav-bar>
       <div class="content">
         <div v-for="(item, index) in alllabel" :key="index">
           <div class="mb10 mt5">{{ item.gourpName }}：</div>
@@ -161,10 +167,11 @@
           </div>
         </div>
       </div>
-      <div v-if="editLabelType === 'person'" class="ac" @click="showAddTag = true">
-        添加标签
+      <div class="saveinfo">
+        <van-button type="info" class="mt10 mb15" size="small" block round @click="saveCustomerTag">
+          保存
+        </van-button>
       </div>
-      <van-button type="info" class="saveinfo" round @click="saveCustomerTag">保存</van-button>
     </van-action-sheet>
 
     <van-dialog
@@ -283,7 +290,8 @@ import {
   findAddaddEmployes,
   findAddGroupNum,
   findTrajectory,
-  addOrEditWaitHandle
+  addOrEditWaitHandle,
+  addOrUpdatePersonTags
 } from '@/api/portrait'
 // import { getUserInfo } from "@/api/common";
 import StepList from '@/components/StepList.vue'
@@ -320,7 +328,8 @@ export default {
       // 待办动态
       todonewsshow: false,
       // 接口开始
-      externalUserid: '',
+      externalUserid:
+        process.env.NODE_ENV === 'production' ? '' : 'wmiGuBCgAA617zOzAIg-0sZG3Vok7BUA',
       // externalUserid: 'wmiGuBCgAAoCBD1frD3hRplbsXoBLx6g', // 客户IdwmiGuBCgAAoCBD1frD3hRplbsXoBLx6g
       // externalUserid: 'wmiGuBCgAA617zOzAIg-0sZG3Vok7BUA',
       form: {
@@ -382,49 +391,41 @@ export default {
   },
   computed: {
     userId() {
-      return this.$store.state.userId
-      // || 'FengJuZhuDeJieDao'
-    },
+      return process.env.NODE_ENV === 'production' ? this.$store.state.userId : 'FengJuZhuDeJieDao'
+    }
     //   activeLabel : () => {
     //       this.addTag.forEach((value) => {
     //           value.name == this.name
     //       })
     //       return this.activelabel
     //   }
-    minHour() {
-      let date = new Date()
-      return this.dateagency == this.getTime() ? date.getHours() : 0
-    }
+    // minHour() {
+    //   let date = new Date()
+    //   return this.dateagency == this.getTime() ? date.getHours() : 0
+    // }
   },
   created() {
-    this.$toast.loading({
-      message: 'loading...',
-      duration: 0,
-      forbidClick: true
-    })
-    // 获取agentId
-    let query = param2Obj(window.location.search)
-    let hash = param2Obj(window.location.hash)
-    query = Object.assign(query, hash)
-    this.agentId = query.agentId
-
-    // this.findAddaddEmployes()
-    // this.findAddGroupNum()
-    // this.getCustomerInfo()
-    // this.findTrajectory()
-    // this.getAllTags()
+    if (process.env.NODE_ENV === 'production') {
+      this.$toast.loading({
+        message: 'loading...',
+        duration: 0,
+        forbidClick: true
+      })
+      // 获取agentId
+      let query = param2Obj(window.location.search)
+      let hash = param2Obj(window.location.hash)
+      query = Object.assign(query, hash)
+      this.agentId = query.agentId
+    } else {
+      this.findAddaddEmployes()
+      this.findAddGroupNum()
+      this.getCustomerInfo()
+      this.findTrajectory()
+      this.getAllTags()
+    }
   },
 
   methods: {
-    // 时间处理器
-    getTime(data) {
-      const date = new Date()
-      // console.log(timer.getFullYear());
-      var Y = date.getFullYear() + '-'
-      var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
-      var D = date.getDate() < 10 ? '0' + date.getDate() : date.getDate() + ''
-      return Y + M + D
-    },
     init() {
       let _this = this
       wx.invoke('getContext', {}, function(res) {
@@ -455,6 +456,37 @@ export default {
           _this.$dialog({ message: '进入失败：' + JSON.stringify(res) })
         }
       })
+    },
+    getCustomerInfo() {
+      // this.$toast('userId:' + this.userId)
+      getCustomerInfo({
+        externalUserid: this.externalUserid,
+        userId: this.userId
+      })
+        .then(({ data }) => {
+          if (data.tagIds && data.tagNames) {
+            data.tagIds = data.tagIds.split(',')
+            data.tagNames = data.tagNames.split(',')
+            data.tags = data.tagIds.map((unit, index) => ({
+              tagId: unit,
+              name: data.tagNames[index]
+            }))
+          }
+
+          if (data.personTagIds && data.personTagNames) {
+            data.personTagIds = data.personTagIds.split(',')
+            data.personTagNames = data.personTagNames.split(',')
+            data.personTags = data.personTagIds.map((unit, index) => ({
+              tagId: unit,
+              name: data.personTagNames[index]
+            }))
+          }
+          this.form = data
+          // console.log(this.form);
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
     getAllTags(type) {
       let params = {
@@ -639,27 +671,28 @@ export default {
       let tags = this.form[type === 'person' ? 'personTags' : 'tags']
       let hasErrorTag = [] // 异常活已经删除的标签
       let repeat = [] // 重复的标签
-      tags.forEach((unit) => {
-        // 判断是否有重复标签
-        let isRepeat = this.listTagOneArray.some((d) => {
-          return d.tagId === unit.tagId
-        })
-        // 去重
-        if (isRepeat) {
-          repeat.push(unit.name)
-          return
-        }
-        let filter = this.listTagOneArray.find((d) => {
-          return d.tagId === unit.tagId
-        })
-        // 如果没有匹配到，则说明该便签处于异常状态，可能已被删除或破坏
-        if (!filter) {
-          hasErrorTag.push(unit.name)
-          return
-        }
+      tags &&
+        tags.forEach((unit) => {
+          // 判断是否有重复标签
+          let isRepeat = this.listTagOneArray.some((d) => {
+            return d.tagId === unit.tagId
+          })
+          // 去重
+          if (isRepeat) {
+            repeat.push(unit.name)
+            return
+          }
+          let filter = this.listTagOneArray.find((d) => {
+            return d.tagId === unit.tagId
+          })
+          // 如果没有匹配到，则说明该便签处于异常状态，可能已被删除或破坏
+          if (!filter) {
+            hasErrorTag.push(unit.name)
+            return
+          }
 
-        this.addTag.push(filter)
-      })
+          this.addTag.push(filter)
+        })
       this.show = true
       // 获取用户当前的lable,将当前用户的lable与所有lable进行对比，相同的弹框内蓝色展示
       // 弹框内的标签组选中时蓝色展示
@@ -695,42 +728,16 @@ export default {
           console.log(err)
         })
     },
-
-    getCustomerInfo() {
-      // this.$toast('userId:' + this.userId)
-      getCustomerInfo({
-        externalUserid: this.externalUserid,
-        userId: this.userId
-      })
-        .then(({ data }) => {
-          // console.log(data);
-          if (data.tagIds && data.tagNames) {
-            data.tagIds = data.tagIds.split(',')
-            data.tagNames = data.tagNames.split(',')
-            data.tags = data.tagIds.forEach((unit, index) => ({
-              tagId: unit,
-              name: data.tagNames[index]
-            }))
-          }
-
-          if (data.personTagIds && data.personTagNames) {
-            data.personTagIds = data.personTagIds.split(',')
-            data.personTagNames = data.personTagNames.split(',')
-            data.personTags = data.personTagIds.map((unit, index) => ({
-              tagId: unit,
-              name: data.personTagNames[index]
-            }))
-          }
-          this.form = data
-          // console.log(this.form);
+    // 添加个人标签
+    submitNewPersonTag() {
+      addOrUpdatePersonTags(this.submitNewPersonTag)
+        .then((res) => {
+          this.getAllTags('person')
         })
         .catch((err) => {
           console.log(err)
         })
-    },
-
-    // 添加个人标签
-    submitNewPersonTag() {}
+    }
   }
 }
 </script>
@@ -825,10 +832,9 @@ export default {
 .saveinfo {
   position: absolute;
   width: 90%;
-  height: 30px;
   left: 50%;
   bottom: 0;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, 0%);
 }
 
 //  社交关系

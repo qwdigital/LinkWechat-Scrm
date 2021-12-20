@@ -40,8 +40,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB,
-    Microsoft YaHei, Arial, sans-serif;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial,
+    sans-serif;
   overflow: hidden;
 }
 
@@ -245,6 +245,7 @@ li {
 }
 
 .main-size {
+  min-width: 1366px;
   max-width: 1920px;
   margin: 0 auto;
 }
