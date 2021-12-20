@@ -30,8 +30,6 @@ public class WeCustomerPortraitController extends BaseController {
     private IWeCustomerService iWeCustomerService;
 
 
-    @Autowired
-    private IWeTagGroupService weTagGroupService;
 
 
     @Autowired
@@ -89,20 +87,19 @@ public class WeCustomerPortraitController extends BaseController {
 
     /**
      * 获取当前系统所有可用标签
-     * @param groupTagType 标签分组类型(1:客户标签;2:群标签)
      * @param userId 员工id
      * @return
      */
     @GetMapping(value = "/findAllTags")
-    public AjaxResult findAllTags(Integer groupTagType,String userId){
+    public AjaxResult findAllTags(String userId){
 
         return AjaxResult.success(
-                weTagGroupService.selectWeTagGroupList(
-                        WeTagGroup.builder()
-                                .groupTagType(groupTagType)
-                                .owner(userId)
-                                .build()
+                iWeTagService.list(
+                        new LambdaQueryWrapper<WeTag>()
+                                .eq(WeTag::getDelFlag,new Integer(0))
+                                .eq(WeTag::getOwner,userId)
                 )
+
         );
     }
 
@@ -114,7 +111,6 @@ public class WeCustomerPortraitController extends BaseController {
      */
     @PostMapping("/addOrUpdatePersonTags")
     public AjaxResult addOrUpdatePersonTags(@RequestBody WeTagGroup weTagGroup){
-        if(weTagGroupService.saveOrUpdate(weTagGroup)){
             List<WeTag> weTags = weTagGroup.getWeTags();
             if(CollectionUtil.isNotEmpty(weTags)){
                 weTags.stream().forEach(k->{
@@ -123,7 +119,6 @@ public class WeCustomerPortraitController extends BaseController {
                 });
                 iWeTagService.saveOrUpdateBatch(weTags);
             }
-        }
         return AjaxResult.success();
     }
 

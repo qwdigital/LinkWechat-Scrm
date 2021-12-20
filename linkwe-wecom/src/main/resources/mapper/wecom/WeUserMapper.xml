@@ -161,12 +161,12 @@
         we_allocate_customer wac
         LEFT JOIN we_customer wc ON wac.external_userid=wc.external_userid
         LEFT JOIN we_user wu ON wu.user_id=wac.takeover_userid
-        <where>
+        WHERE wc.del_flag=1
+            <if test="handoverUserId != null and handoverUserId !=''">and wc.first_user_id=#{handoverUserId}</if>
             <if test="handoverUserId != null and handoverUserId !=''">and wac.handover_userid=#{handoverUserId}</if>
             <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
                 DATE_FORMAT(wu.dimission_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
             </if>
-        </where>
     </select>
 
 

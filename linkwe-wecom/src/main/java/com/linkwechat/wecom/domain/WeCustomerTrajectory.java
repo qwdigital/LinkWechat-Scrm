@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -60,6 +61,7 @@ public class WeCustomerTrajectory extends BaseEntity {
     private Integer trackState;
 
     //跟进内容
+    @TableField(exist = false)
     private String trackContent;
 
     //跟进时间
@@ -71,4 +73,7 @@ public class WeCustomerTrajectory extends BaseEntity {
 
     //标题
     private String title;
+
+    @TableField(exist = false)
+    private String userName;
 }

@@ -113,5 +113,10 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
         this.baseMapper.deleteSynchTrajectory();
     }
 
+    @Override
+    public List<WeCustomerTrajectory> followUpRecord(String externalUserid, String userId, Integer trajectoryType) {
+        return this.baseMapper.followUpRecord(externalUserid,userId,trajectoryType);
+    }
+
 
 }

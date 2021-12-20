@@ -11,7 +11,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectWeTagVo">
-        select id, group_id, name, create_time from we_tag
+        select group_id, name, create_time from we_tag
     </sql>
 
     <select id="selectWeTagList" parameterType="WeTag" resultMap="WeTagResult">

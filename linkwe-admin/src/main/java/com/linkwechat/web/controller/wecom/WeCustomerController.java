@@ -209,12 +209,7 @@ public class WeCustomerController extends BaseController
          startPage();
 
          List<WeCustomerTrajectory> weCustomerTrajectories = iWeCustomerTrajectoryService
-                 .list(new LambdaQueryWrapper<WeCustomerTrajectory>()
-                         .eq(trajectoryType !=null,WeCustomerTrajectory::getTrajectoryType,trajectoryType)
-                .eq(StringUtils.isNotEmpty(externalUserid),WeCustomerTrajectory::getExternalUserid, externalUserid)
-                .eq(StringUtils.isNotEmpty(userId),WeCustomerTrajectory::getUserId, userId)
-                                 .orderByDesc(WeCustomerTrajectory::getTrackTime)
-                 );
+                 .followUpRecord(externalUserid, userId, trajectoryType);
 
         return getDataTable(weCustomerTrajectories);
     }

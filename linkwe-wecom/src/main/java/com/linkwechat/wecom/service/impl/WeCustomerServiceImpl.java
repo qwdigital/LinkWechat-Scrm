@@ -114,6 +114,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 if (WeConstans.WE_SUCCESS_CODE.equals(followUserList.getErrcode())
                         && ArrayUtil.isNotEmpty(followUserList.getFollow_user())) {
                     String[] follow_user = followUserList.getFollow_user();
+
+
                     if (ArrayUtil.isNotEmpty(follow_user)) {
 
                         List<ExternalUserDetail> externalUserDetails = new ArrayList<>();
@@ -144,6 +146,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
 
         List<WeCustomerTrajectory> trajectories=new ArrayList<>();
+        List<WeUser> weUsers = iWeUserService.list();
+
+
 
         list.forEach(userDetail -> {
             //客户入库
@@ -174,6 +179,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 List<String> tags = Stream.of(followInfo.getTag_id()).collect(Collectors.toList());
                 if (CollectionUtil.isNotEmpty(tags)) {
                     tags.stream().forEach(tag -> {
+
                         weFlowerCustomerTagRels.add(
                                 WeFlowerCustomerTagRel.builder()
                                         .userId(followInfo.getUserid())
@@ -254,37 +260,27 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         List<WeCustomer> allocateWeCustomers = this.list(new LambdaQueryWrapper<WeCustomer>()
                 .eq(WeCustomer::getFirstUserId, weLeaveUserInfoAllocateVo.getHandoverUserid()));
         if (CollectionUtil.isNotEmpty(allocateWeCustomers)) {
-            //同步记录,放入员工同意或者24小时自动变更(回调)
 
-            //删除原有的
-//            this.baseMapper.deleteWeCustomerByUserIds(
-//                    new String[]{weLeaveUserInfoAllocateVo.getHandoverUserid()}
-//            );
-//            allocateWeCustomers.stream().forEach(k->{
-//                k.setFirstUserId(weLeaveUserInfoAllocateVo.getTakeoverUserid());
-//            });
-            //新增
-//            this.baseMapper.batchAddOrUpdate(
-//                    allocateWeCustomers
-//            );
-            //记录接受离职表
-            List<WeAllocateCustomer> weAllocateCustomers = new ArrayList<>();
-            allocateWeCustomers.stream().forEach(k -> {
-                weAllocateCustomers.add(
-                        WeAllocateCustomer.builder()
-                                .allocateTime(new Date())
-                                .externalUserid(k.getExternalUserid())
-                                .handoverUserid(weLeaveUserInfoAllocateVo.getHandoverUserid())
-                                .takeoverUserid(weLeaveUserInfoAllocateVo.getTakeoverUserid())
-                                .extentType(weLeaveUserInfoAllocateVo.getExtentType())
-                                .build()
-                );
-            });
 
-            if (CollectionUtil.isNotEmpty(weAllocateCustomers)
-                    && iWeAllocateCustomerService.saveBatch(weAllocateCustomers)) {
+            if(this.remove(new LambdaQueryWrapper<WeCustomer>()
+                    .eq(WeCustomer::getFirstUserId,weLeaveUserInfoAllocateVo.getHandoverUserid()))){//删除表中相应客户
+                //记录接受离职表
+                List<WeAllocateCustomer> weAllocateCustomers = new ArrayList<>();
+                allocateWeCustomers.stream().forEach(k -> {
+                    weAllocateCustomers.add(
+                            WeAllocateCustomer.builder()
+                                    .allocateTime(new Date())
+                                    .externalUserid(k.getExternalUserid())
+                                    .handoverUserid(weLeaveUserInfoAllocateVo.getHandoverUserid())
+                                    .takeoverUserid(weLeaveUserInfoAllocateVo.getTakeoverUserid())
+                                    .extentType(weLeaveUserInfoAllocateVo.getExtentType())
+                                    .build()
+                    );
+                });
 
-                if (weLeaveUserInfoAllocateVo.getExtentType().equals(new Integer(0))) {//离职员工客户继承
+                if (CollectionUtil.isNotEmpty(weAllocateCustomers)
+                        && iWeAllocateCustomerService.saveBatch(weAllocateCustomers)) {
+
                     //同步企业微信
                     weUserClient.allocateCustomer(AllocateWeCustomerDto.builder()
                             .external_userid(
@@ -294,10 +290,13 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                             .takeover_userid(weLeaveUserInfoAllocateVo.getTakeoverUserid())
                             .build());
 
+
                 }
 
-
             }
+
+
+
 
         }
 
