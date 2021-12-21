@@ -127,13 +127,6 @@ public class FileUtils extends org.apache.commons.io.FileUtils
 
     }
 
-    public static void main(String[] args) {
-        String image = "123.img";
-        String tempName = FileUtil.getPrefix(image) + "(" + 1 + ")";
-        image = image.replaceAll(FileUtil.getPrefix(image),tempName);
-        System.out.println(image);
-    }
-
     /**
      *
      * @param urlPath 下载路径
