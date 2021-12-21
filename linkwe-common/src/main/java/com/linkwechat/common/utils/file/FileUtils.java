@@ -99,8 +99,8 @@ public class FileUtils extends org.apache.commons.io.FileUtils
                 if(fileNameCountMap.containsKey(fileName)){
                     Integer count = fileNameCountMap.get(fileName);
                     if(count > 0){
-                        String tempName = FileUtil.getName(fileName) + "(" + count + ")";
-                        fileName = fileName.replaceAll(FileUtil.getName(fileName),tempName);
+                        String tempName = FileUtil.getPrefix(fileName) + "(" + count + ")";
+                        fileName = fileName.replaceAll(FileUtil.getPrefix(fileName),tempName);
                     }
                     fileNameCountMap.put(fileName,count+1);
                 }
@@ -125,6 +125,13 @@ public class FileUtils extends org.apache.commons.io.FileUtils
             e.printStackTrace();
         }
 
+    }
+
+    public static void main(String[] args) {
+        String image = "123.img";
+        String tempName = FileUtil.getPrefix(image) + "(" + 1 + ")";
+        image = image.replaceAll(FileUtil.getPrefix(image),tempName);
+        System.out.println(image);
     }
 
     /**
