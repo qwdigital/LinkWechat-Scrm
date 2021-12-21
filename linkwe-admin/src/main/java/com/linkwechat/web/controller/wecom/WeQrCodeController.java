@@ -113,7 +113,7 @@ public class WeQrCodeController extends BaseController {
                 Map<String, String> fileMap = new HashMap<>();
                 List<WeQrScopeUserVo> userVoList = item.getQrUserInfos().stream().map(WeQrScopeVo::getWeQrUserList).flatMap(Collection::stream).collect(Collectors.toList());
                 String fileName = userVoList.stream().map(WeQrScopeUserVo::getUserName).collect(Collectors.joining(","));
-                fileMap.put("fileName", fileName + ".jpg");
+                fileMap.put("fileName", fileName + "-" + item.getName() + ".jpg");
                 fileMap.put("url", item.getQrCode());
                 return fileMap;
             }).collect(Collectors.toList());
