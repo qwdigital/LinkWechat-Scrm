@@ -1,5 +1,7 @@
 package com.linkwechat.common.utils.file;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.linkwechat.common.utils.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -8,8 +10,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -86,10 +90,20 @@ public class FileUtils extends org.apache.commons.io.FileUtils
      */
     public static void batchDownloadFile(List<Map<String, String>> fileList, OutputStream os) {
         try {
+            Map<String, Integer> fileNameCountMap = fileList.stream().collect(Collectors
+                    .toMap(item -> item.get("fileName"), item -> 0, (key, value) -> key));
             ZipOutputStream zos = new ZipOutputStream(os);
             for (Map<String, String> fileInfo: fileList) {
                 String fileName = fileInfo.get("fileName");
                 String url = fileInfo.get("url");
+                if(fileNameCountMap.containsKey(fileName)){
+                    Integer count = fileNameCountMap.get(fileName);
+                    if(count > 0){
+                        String tempName = FileUtil.getName(fileName) + "(" + count + ")";
+                        fileName = fileName.replaceAll(FileUtil.getName(fileName),tempName);
+                    }
+                    fileNameCountMap.put(fileName,count+1);
+                }
                 // 跳过不包含指定键位的对象
                 if (StringUtils.isEmpty(url) || StringUtils.isEmpty(fileName)){
                     continue;
