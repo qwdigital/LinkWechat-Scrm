@@ -227,6 +227,10 @@
       isSingle: {
         type: Boolean,
         default: false
+      },
+      strType: {
+        type: Boolean,
+        default: false
       }
     },
     watch: {
@@ -257,7 +261,9 @@
         welList: [],
         welSelected: {},
         selectedUserList: [],
-        dialogVisibleSelectUser: false
+        dialogVisibleSelectUser: false,
+        strTemplate1: '%客户昵称%',
+        strTemplate2: '#客户昵称#'
       }
     },
     mounted () {
@@ -316,12 +322,13 @@
         if (val) {
           const textIndex = $textarea.selectionStart
           if (textIndex == 0 && document.activeElement != $textarea) {
-            this.form.welcomeMsg += '%客户昵称%'
+            this.form.welcomeMsg += this.strType ? this.strTemplate1 : this.strTemplate2
           } else {
-            this.form.welcomeMsg = msg.slice(0, textIndex) + '%客户昵称%' + msg.slice(textIndex)
+            let str = this.strType ? this.strTemplate1 : this.strTemplate2
+            this.form.welcomeMsg = msg.slice(0, textIndex) + str + msg.slice(textIndex)
           }
         } else {
-          this.form.welcomeMsg = msg.replace(/\%客户昵称\%/, '')
+          this.form.welcomeMsg = this.strType ? msg.replace(/\%客户昵称\%/, '') : msg.replace(/\#客户昵称\#/, '')
         }
       },
       onChooseMaterial (materialType, rowIndex) {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <welcome-content v-if="show" :isSingle="form.welcomeMsgTplType === '3'" :showTemplate="false" :showMember="form.welcomeMsgTplType === '2'" :showMorMaterial="true" :baseData="materialData" @submit="getWelData"></welcome-content>
+    <welcome-content v-if="show" :strType="form.welcomeMsgTplType === '3'" :isSingle="form.welcomeMsgTplType === '3'" :showTemplate="false" :showMember="form.welcomeMsgTplType === '2'" :showMorMaterial="true" :baseData="materialData" @submit="getWelData"></welcome-content>
   </div>
 </template>
 
