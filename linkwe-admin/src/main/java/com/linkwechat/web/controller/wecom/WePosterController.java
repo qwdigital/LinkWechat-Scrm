@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.wecom;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -45,21 +46,13 @@ public class WePosterController extends BaseController {
 
     @PostMapping(value = "insert")
     @ApiOperation("创建海报")
-    //   @PreAuthorize("@ss.hasAnyPermi('wecom:poster:insert')")
     @Transactional(rollbackFor = RuntimeException.class)
     public AjaxResult insert(@RequestBody WePoster poster) {
         wePosterService.generateSimpleImg(poster);
-        poster.setId(SnowFlakeUtil.nextId());
-        poster.setDelFlag(0);
         poster.setMediaType(MediaType.POSTER.getType());
-        /*if(poster.getCategoryId() == null){
-            return AjaxResult.error("请选择海报分类");
-        }*/
         wePosterService.saveOrUpdate(poster);
-        if(!CollectionUtils.isEmpty(poster.getPosterSubassemblyList())) {
+        if(CollectionUtil.isNotEmpty(poster.getPosterSubassemblyList())) {
             poster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {
-                wePosterSubassembly.setDelFlag(0);
-                wePosterSubassembly.setId(SnowFlakeUtil.nextId());
                 wePosterSubassembly.setPosterId(poster.getId());
             });
             wePosterSubassemblyService.saveBatch(poster.getPosterSubassemblyList());
@@ -86,9 +79,7 @@ public class WePosterController extends BaseController {
             List<WePosterSubassembly> updateList = new ArrayList<>();
             poster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {
                 if (wePosterSubassembly.getId() == null) {
-                    wePosterSubassembly.setId(SnowFlakeUtil.nextId());
                     wePosterSubassembly.setPosterId(poster.getId());
-                    wePosterSubassembly.setDelFlag(0);
                     insertList.add(wePosterSubassembly);
                 } else {
                     posterSubassemblyMap.remove(wePosterSubassembly.getId());
@@ -109,17 +100,7 @@ public class WePosterController extends BaseController {
         return AjaxResult.success("修改成功");
     }
 
-    /*@GetMapping(value = "list")
-    @ApiOperation("列表查询海报")
-    public AjaxResult list(Long categoryId,String name){
-        List<WePoster> fontList = wePosterService.lambdaQuery()
-                .eq(WePoster::getDelFlag,0)
-                .eq(categoryId != null,WePoster::getCategoryId,categoryId)
-                .like(StringUtils.isNotBlank(name),WePoster::getTitle,name)
-                .orderByDesc(WePoster::getCreateTime)
-                .list();
-        return AjaxResult.success(fontList);
-    }*/
+
 
     @GetMapping(value = "entity/{id}")
     //    @PreAuthorize("@ss.hasAnyPermi('wecom:poster:entity')")

@@ -41,7 +41,7 @@ public interface IWeTaskFissionService extends IService<WeTaskFission> {
      * @param weTaskFission 任务宝
      * @return 结果
      */
-    public Long insertWeTaskFission(WeTaskFission weTaskFission);
+    public void insertWeTaskFission(WeTaskFission weTaskFission);
 
     /**
      * 修改任务宝
@@ -70,9 +70,9 @@ public interface IWeTaskFissionService extends IService<WeTaskFission> {
     /**
      * 发送任务
      *
-     * @param id 任务id
+     * @param weTaskFission 任务
      */
-    public void sendWeTaskFission(Long id) throws Exception;
+    public void sendWeTaskFission(WeTaskFission weTaskFission) throws Exception;
 
     /**
      * 生成裂变任务海报

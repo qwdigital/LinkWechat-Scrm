@@ -31,8 +31,6 @@ public class WePosterFontController extends BaseController {
     @ApiOperation("创建海报字体")
     @Transactional(rollbackFor = RuntimeException.class)
     public AjaxResult insertPosterFont(@RequestBody WePosterFont posterFont) {
-        posterFont.setId(SnowFlakeUtil.nextId());
-        posterFont.setDelFlag(0);
         posterFont.setMediaType(MediaType.POSTER_FONT.getType());
         wePosterFontService.save(posterFont);
         return AjaxResult.success("创建成功");

@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -8,10 +9,12 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import java.util.List;
 
 /**
  * 海报
+ *
  * @author ws
  */
 @EqualsAndHashCode(callSuper = true)
@@ -20,7 +23,7 @@ import java.util.List;
 @ApiModel(value = "海报")
 public class WePoster extends BaseEntity {
 
-    @TableId
+    @TableId(type = IdType.AUTO)
     @ApiModelProperty(value = "id")
     private Long id;
 
@@ -53,10 +56,6 @@ public class WePoster extends BaseEntity {
     private Long type;
 
     @TableField
-    @ApiModelProperty(value = "海报状态 0 启用 1 关闭")
-    private Integer delFlag;
-
-    @TableField
     @ApiModelProperty(value = "海报背景宽度")
     private Integer width;
 
@@ -76,11 +75,16 @@ public class WePoster extends BaseEntity {
     @ApiModelProperty("其他字段")
     private String otherField;
 
+    @ApiModelProperty("状态 0-启用 1-不启用")
+    private Integer status;
+
+    @ApiModelProperty(value = "删除状态 0-正常 1-删除")
+    private Integer delFlag;
     /**
      * 海报组件数组
      */
     @TableField(exist = false)
     private List<WePosterSubassembly> posterSubassemblyList;
-    
-    
+
+
 }

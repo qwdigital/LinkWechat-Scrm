@@ -1,9 +1,9 @@
 package com.linkwechat.wecom.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.config.RuoYiConfig;
-import com.linkwechat.common.config.ServerConfig;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.img.ImageUtils;
 import com.linkwechat.common.utils.img.NetFileUtils;
@@ -12,24 +12,20 @@ import com.linkwechat.wecom.domain.WePoster;
 import com.linkwechat.wecom.domain.WePosterFont;
 import com.linkwechat.wecom.domain.WePosterSubassembly;
 import com.linkwechat.wecom.mapper.WePosterMapper;
-import com.linkwechat.wecom.service.IWeCategoryService;
 import com.linkwechat.wecom.service.IWePosterFontService;
 import com.linkwechat.wecom.service.IWePosterService;
 import com.linkwechat.wecom.service.IWePosterSubassemblyService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -72,22 +68,15 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
      */
     @Override
     public WePoster selectOne(Long id) {
-        WePoster poster = this.lambdaQuery()
-                .eq(WePoster::getId, id)
-                .eq(WePoster::getDelFlag, 0)
-                .list().get(0);
-        if (poster == null) {
-            return null;
-        }
-        poster.setPosterSubassemblyList(posterSubassemblyService.lambdaQuery().eq(WePosterSubassembly::getPosterId, poster.getId()).list());
-        if (!CollectionUtils.isEmpty(poster.getPosterSubassemblyList())) {
-
-            List<Long> fontIdList = poster.getPosterSubassemblyList().stream().filter(wePosterSubassembly -> wePosterSubassembly.getFontId() != null).map(WePosterSubassembly::getFontId).distinct().collect(Collectors.toList());
-            if (!CollectionUtils.isEmpty(fontIdList)) {
+        WePoster poster = this.getById(id);
+        List<WePosterSubassembly> subassemblyList = posterSubassemblyService.lambdaQuery().eq(WePosterSubassembly::getPosterId, id).list();
+        if (CollectionUtil.isNotEmpty(subassemblyList)) {
+            List<Long> fontIdList = subassemblyList.stream().filter(wePosterSubassembly -> wePosterSubassembly.getFontId() != null).map(WePosterSubassembly::getFontId).distinct().collect(Collectors.toList());
+            if (CollectionUtil.isNotEmpty(fontIdList)) {
                 List<WePosterFont> fontList = posterFontService.lambdaQuery().in(WePosterFont::getId, fontIdList).list();
-                if (!CollectionUtils.isEmpty(fontList)) {
+                if (CollectionUtil.isNotEmpty(fontList)) {
                     Map<Long, WePosterFont> fontMap = fontList.stream().collect(Collectors.toMap(WePosterFont::getId, f -> f));
-                    poster.getPosterSubassemblyList().stream().filter(wePosterSubassembly -> wePosterSubassembly.getFontId() != null).forEach(wePosterSubassembly -> {
+                    subassemblyList.stream().filter(wePosterSubassembly -> wePosterSubassembly.getFontId() != null).forEach(wePosterSubassembly -> {
                         WePosterFont font = fontMap.get(wePosterSubassembly.getFontId());
                         if (font != null) {
                             wePosterSubassembly.setFont(font);
@@ -95,11 +84,8 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
                     });
                 }
             }
+            poster.setPosterSubassemblyList(subassemblyList);
         }
-        /*if(poster.getCategoryId() != null){
-            weCategoryService.findWeCategoryById(poster.getId());
-        }*/
-
         return poster;
     }
 
@@ -147,27 +133,14 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
                 .collect(Collectors.toMap(wePosterSubassembly -> {
                     return wePosterSubassembly.getFontId() + "_" + wePosterSubassembly.getFontSize() + "_" + wePosterSubassembly.getFontStyle();
                 }, wePosterSubassembly -> posterFontService.getFont(wePosterSubassembly.getFontId(), wePosterSubassembly.getFontSize(), wePosterSubassembly.getFontStyle())));
-
-
         Map<String, NetFileUtils.FileCallable> fileCallableMap = poster.getPosterSubassemblyList().stream().map(WePosterSubassembly::getImgPath).filter(StringUtils::isNotBlank).distinct().collect(Collectors.toMap(s -> s, NetFileUtils::getNetFile));
         if (CollectionUtils.isEmpty(fileCallableMap)) {
             fileCallableMap = new HashMap<>();
         }
         fileCallableMap.put(poster.getBackgroundImgPath(), NetFileUtils.getNetFile(poster.getBackgroundImgPath()));
-
-
-
-
         Map<String, BufferedImage> bufferedImageMap = fileCallableMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, stringFileCallableEntry -> {
             try {
-
-
-
                 ByteArrayOutputStream byteArrayOutputStream = NetFileUtils.getByteArrayOutputStream(stringFileCallableEntry.getValue(), false);
-
-
-
-
                 return ImageUtils.copyBufferedImage(ImageIO.read(new ByteArrayInputStream(Objects.requireNonNull(byteArrayOutputStream).toByteArray())),
                         BufferedImage.TYPE_INT_ARGB);
             } catch (IOException e) {
@@ -176,13 +149,9 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
             }
         }));
 
-
         BufferedImage backgroundImg = bufferedImageMap.get(poster.getBackgroundImgPath());
         poster.setWidth(backgroundImg.getWidth());
         poster.setHeight(backgroundImg.getHeight());
-
-
-
 
 
         poster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {
@@ -233,12 +202,12 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
             return poster.getSampleImgPath();
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException("图片生成错误");
+            throw new WeComException("图片生成错误");
         }
     }
 
     @Override
-    public List<WeMaterial> findWePosterToWeMaterial(String categoryId,String name) {
+    public List<WeMaterial> findWePosterToWeMaterial(String categoryId, String name) {
         return this.baseMapper.findWePosterToWeMaterial(categoryId, name);
     }
 }

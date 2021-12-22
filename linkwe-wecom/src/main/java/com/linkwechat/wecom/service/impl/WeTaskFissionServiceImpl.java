@@ -125,8 +125,8 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
      * @return 结果
      */
     @Override
-    @Transactional
-    public Long insertWeTaskFission(WeTaskFission weTaskFission) {
+    @Transactional(rollbackFor = {Exception.class,WeComException.class})
+    public void insertWeTaskFission(WeTaskFission weTaskFission) {
         weTaskFission.setCreateBy(SecurityUtils.getUsername());
         weTaskFission.setCreateTime(DateUtils.getNowDate());
         groupQrcodeHandler(weTaskFission);
@@ -140,8 +140,12 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                     weTaskFissionStaffService.insertWeTaskFissionStaffList(weTaskFission.getTaskFissionStaffs());
                 }
             }
+            try {
+                sendWeTaskFission(weTaskFission);
+            } catch (Exception e) {
+                throw new WeComException(e.getMessage());
+            }
         }
-        return weTaskFission.getId();
     }
 
     /**
@@ -197,15 +201,13 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
 
 
     @Override
-    public void sendWeTaskFission(Long id) throws Exception {
-        WeTaskFission weTaskFission = selectWeTaskFissionById(id);
+    public void sendWeTaskFission(WeTaskFission weTaskFission) throws Exception {
         //海报路径
         String postersPath = weTaskFission.getPostersUrl();
         //目标员工id
         String fissStaffId = weTaskFission.getFissionTargetId();
         //H5生成海报页面路径
-        String pageUrlStr = StringUtils.format(pageUrl,id,fissStaffId,weTaskFission.getPostersId());
-
+        String pageUrlStr = StringUtils.format(pageUrl,weTaskFission.getId(),fissStaffId,weTaskFission.getPostersId());
 
         WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
         messageQuery.setChatType(1);
@@ -219,16 +221,13 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
         weMessageTemplate.setPicUrl(postersPath);
         messageQuery.setAttachmentsList(ListUtil.toList(weMessageTemplate));
 
-
         if (weTaskFission.getStartTime() != null && weTaskFission.getStartTime().getTime() <= System.currentTimeMillis()) {
             messageQuery.setIsTask(0);
         }else {
             messageQuery.setIsTask(1);
             messageQuery.setSendTime(weTaskFission.getStartTime());
         }
-
-        //查询发起成员
-        List<WeTaskFissionStaff> weTaskFissionStaffList = weTaskFissionStaffService.selectWeTaskFissionStaffByTaskId(id);
+        List<WeTaskFissionStaff> weTaskFissionStaffList = weTaskFission.getTaskFissionStaffs();
         //获取部门id
         String departmentIds = Optional.ofNullable(weTaskFissionStaffList).orElseGet(ArrayList::new).stream().filter(weTaskFissionStaff ->
                 WeConstans.USE_SCOP_BUSINESSID_TYPE_ORG.equals(weTaskFissionStaff.getStaffType()))
