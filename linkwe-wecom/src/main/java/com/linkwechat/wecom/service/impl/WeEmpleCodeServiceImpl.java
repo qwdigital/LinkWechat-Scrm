@@ -424,7 +424,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         weContactWay.setType(weEmpleCode.getCodeType());
         weContactWay.setScene(WeConstans.QR_CODE_EMPLE_CODE_SCENE);
         weContactWay.setSkip_verify(weEmpleCode.getIsJoinConfirmFriends().equals(new Integer(0))?false:true);
-        weContactWay.setState(String.valueOf(weEmpleCode.getId()));
+        weContactWay.setState(weEmpleCode.getState()==null?String.valueOf(weEmpleCode.getId()):weEmpleCode.getState());
         if (CollectionUtil.isNotEmpty(weEmpleCodeUseScops)) {
             //员工列表
             String[] userIdArr = weEmpleCodeUseScops.stream().filter(itme ->
