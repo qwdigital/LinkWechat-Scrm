@@ -64,6 +64,10 @@ public class WeConstans {
      * 活码前缀
      */
     public static final String WE_QR_CODE_PREFIX = "we_qr";
+    /**
+     * 新客拉群
+     */
+    public static final String WE_QR_XKLQ_PREFIX = "we_xklq";
 
 
     /**

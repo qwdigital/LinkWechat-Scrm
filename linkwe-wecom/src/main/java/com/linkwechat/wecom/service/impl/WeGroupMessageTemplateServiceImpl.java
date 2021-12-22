@@ -283,7 +283,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                     throw new WeComException("暂无客户群可发送");
                 }
             }
-        }else {
+        }else if(!query.getIsAll() && CollectionUtil.isEmpty(senderList)){
             throw new WeComException("无指定接收消息的成员及对应客户列表");
         }
     }

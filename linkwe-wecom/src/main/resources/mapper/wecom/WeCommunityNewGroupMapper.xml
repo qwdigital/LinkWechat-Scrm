@@ -80,4 +80,24 @@
         UPDATE we_community_new_group SET del_flag = 1 WHERE empl_code_id = #{emplCodeId}
     </update>
 
+    <select id="getWelcomeMsgByState" parameterType="String" resultMap="WelcomeMsgResult">
+        select wec.id,wgc.code_url, wec.welcome_msg,wect.tag_id,wect.tag_name
+        from we_emple_code wec
+                 left join we_emple_code_tag wect on wec.id = wect.emple_code_id and wect.del_flag = 0
+                 left join we_community_new_group wcng on wec.id = wcng.empl_code_id
+                 left join we_group_code wgc on wcng.group_code_id = wgc.id
+        where 1=1
+          and wec.state = #{state}
+          and wec.del_flag = 0
+    </select>
+
+    <resultMap type="WeCommunityWeComeMsgVo" id="WelcomeMsgResult">
+        <result property="id" column="id"/>
+        <result property="welcomeMsg" column="qr_code"/>
+        <result property="welcomeMsg" column="welcome_msg"/>
+        <collection property="tagList" ofType="com.linkwechat.wecom.domain.vo.tag.WeTagVo">
+            <result property="tagId" column="tag_id"/>
+            <result property="tagName" column="tag_name"/>
+        </collection>
+    </resultMap>
 </mapper>
