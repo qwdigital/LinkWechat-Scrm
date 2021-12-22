@@ -11,6 +11,7 @@ import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.ValidateUtils;
 import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.wecom.domain.WeCustomerSeas;
 import com.linkwechat.wecom.domain.vo.CustomerSeasRecordVo;
@@ -71,8 +72,16 @@ public class WeCustomerSeasController extends BaseController {
             if(StringUtils.isEmpty(weCustomerSea.getAddUserName())&&StringUtils.isEmpty(weCustomerSea.getAddUserId())){
                 return AjaxResult.error("分配人不可为空！");
             }
+            //过滤不符合规范的手机号
+            List<WeCustomerSeas> noRuleWeCustomerSeas
+                    = weCustomerSeas.stream().filter(s -> ValidateUtils.isMobile(s.getPhone())).collect(Collectors.toList());
+
+            if(CollectionUtil.isEmpty(noRuleWeCustomerSeas)){
+                return AjaxResult.error("请传入合法手机号！");
+            }
+
             //过滤字段为空的数据
-            List<WeCustomerSeas> deduplicationSeas = weCustomerSeas.stream().filter(s -> StringUtils.isNotEmpty(s.getCustomerName())
+            List<WeCustomerSeas> deduplicationSeas = noRuleWeCustomerSeas.stream().filter(s -> StringUtils.isNotEmpty(s.getCustomerName())
                     || StringUtils.isNotEmpty(s.getPhone())).collect(Collectors.toList());
             if(CollectionUtil.isEmpty(deduplicationSeas)){
                 return AjaxResult.error("导入用户数据不能为空！");
@@ -98,41 +107,41 @@ public class WeCustomerSeasController extends BaseController {
             }
 
 
-          if(CollectionUtil.isNotEmpty(deduplicationSeasNoRepeat)){
+              if(CollectionUtil.isNotEmpty(deduplicationSeasNoRepeat)){
 
-              Long tabaleExcelId= SnowFlakeUtil.nextId();
+                  Long tabaleExcelId= SnowFlakeUtil.nextId();
 
-              List<String> userIds = ListUtil.toList(weCustomerSea.getAddUserId().split(","));
-              List<String> userNames = ListUtil.toList(weCustomerSea.getAddUserName().split(","));
+                  List<String> userIds = ListUtil.toList(weCustomerSea.getAddUserId().split(","));
+                  List<String> userNames = ListUtil.toList(weCustomerSea.getAddUserName().split(","));
 
-              IntStream.range(0,deduplicationSeasNoRepeat.size()).forEach(i->{
-                  WeCustomerSeas k = deduplicationSeasNoRepeat.get(i);
-                  if(Objects.nonNull(k)){
-                      k.setTagIds(weCustomerSea.getTagIds());
-                      k.setTagNames(weCustomerSea.getTagNames());
-                      k.setAddUserId( userIds.get(Math.floorMod(i, userIds.size())));
-                      k.setAddUserName(userNames.get(Math.floorMod(i, userNames.size())));
-                      k.setTableExcelName(file.getOriginalFilename());
-                      k.setTableExcelId(tabaleExcelId);
-                  }
-              });
-              if(iWeCustomerSeasService.saveBatch(deduplicationSeasNoRepeat)){
-                  //发送提醒
-                  deduplicationSeasNoRepeat.stream().collect(Collectors.groupingBy(WeCustomerSeas::getAddUserId)).forEach((k,v)->{
-
-                      iWeCustomerSeasService.remidUser(ListUtil.toList(k),v.size());
-
-
+                  IntStream.range(0,deduplicationSeasNoRepeat.size()).forEach(i->{
+                      WeCustomerSeas k = deduplicationSeasNoRepeat.get(i);
+                      if(Objects.nonNull(k)){
+                          k.setTagIds(weCustomerSea.getTagIds());
+                          k.setTagNames(weCustomerSea.getTagNames());
+                          k.setAddUserId( userIds.get(Math.floorMod(i, userIds.size())));
+                          k.setAddUserName(userNames.get(Math.floorMod(i, userNames.size())));
+                          k.setTableExcelName(file.getOriginalFilename());
+                          k.setTableExcelId(tabaleExcelId);
+                      }
                   });
+                  if(iWeCustomerSeasService.saveBatch(deduplicationSeasNoRepeat)){
+                      //发送提醒
+                      deduplicationSeasNoRepeat.stream().collect(Collectors.groupingBy(WeCustomerSeas::getAddUserId)).forEach((k,v)->{
 
+                          iWeCustomerSeasService.remidUser(ListUtil.toList(k),v.size());
+
+
+                      });
+
+                  }
+
+                  tip = MessageFormat.format(tip, new Object[]{new Integer(deduplicationSeasNoRepeat.size()).toString(),
+                          new Integer( weCustomerSeas.size()-deduplicationSeasNoRepeat.size()).toString()});
+
+              }else{
+                  tip = MessageFormat.format(tip, new Object[] { "0",weCustomerSeas.size() });
               }
-
-              tip = MessageFormat.format(tip, new Object[]{new Integer(deduplicationSeasNoRepeat.size()).toString(),
-                      new Integer( weCustomerSeas.size()-deduplicationSeasNoRepeat.size()).toString()});
-
-          }else{
-              tip = MessageFormat.format(tip, new Object[] { "0",weCustomerSeas.size() });
-          }
 
 
            ;

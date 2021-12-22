@@ -2,6 +2,7 @@ package com.linkwechat.wecom.client;
 
 import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.*;
+import com.linkwechat.wecom.domain.dto.customer.AllocateGroupDto;
 import com.linkwechat.wecom.domain.dto.customer.JobExtendsCustomer;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 import com.linkwechat.wecom.interceptor.WeAppAccessTokenInterceptor;
@@ -106,7 +107,7 @@ public interface WeUserClient {
      * @return
      */
     @Request(url="/externalcontact/groupchat/transfer", type = "POST")
-    WeResultDto allocateGroup(@JSONBody AllocateWeGroupDto allocateWeGroupDto);
+    AllocateGroupDto allocateGroup(@JSONBody AllocateWeGroupDto allocateWeGroupDto);
 
 
     /**

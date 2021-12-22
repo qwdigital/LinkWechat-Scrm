@@ -41,5 +41,11 @@ public class WeAllocateGroup
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date allocateTime;
 
+    //0:被接替成功 1:待接替 2:接替失败 3:正常状态
+    private Integer status;
+
+
+    private String errMsg;
+
 
 }

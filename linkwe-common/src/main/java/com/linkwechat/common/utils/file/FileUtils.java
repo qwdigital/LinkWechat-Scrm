@@ -281,22 +281,5 @@ public class FileUtils extends org.apache.commons.io.FileUtils
     }
 
 
-    /**
-     * 获取视频或者语音时长
-     * @param multiFile
-     * @return
-     * @throws IOException
-     */
-    public static long getVideoOrVoice(MultipartFile multiFile) throws IOException {
-        long duration_new =0;
-        // 将MultipartFile file转换成为File
-        File f_file = MultipartFileToFile(multiFile);
-        String path = f_file.getCanonicalPath();
-         duration_new = VideoUtil.getDuration(path);
-        f_file.delete();
 
-        return duration_new;
-
-
-    }
 }

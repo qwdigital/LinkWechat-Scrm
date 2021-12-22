@@ -235,41 +235,43 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 .eq(WeCustomer::getFirstUserId, weLeaveUserInfoAllocateVo.getHandoverUserid()));
         if (CollectionUtil.isNotEmpty(allocateWeCustomers)) {
 
+            //设置客户的接手人
+            allocateWeCustomers.stream().forEach(k->{
+                k.setTakeoverUserId(weLeaveUserInfoAllocateVo.getTakeoverUserid());
+            });
 
-            if(this.remove(new LambdaQueryWrapper<WeCustomer>()
-                    .eq(WeCustomer::getFirstUserId,weLeaveUserInfoAllocateVo.getHandoverUserid()))){//删除表中相应客户
-                //记录接受离职表
-                List<WeAllocateCustomer> weAllocateCustomers = new ArrayList<>();
-                allocateWeCustomers.stream().forEach(k -> {
-                    weAllocateCustomers.add(
-                            WeAllocateCustomer.builder()
-                                    .allocateTime(new Date())
-                                    .externalUserid(k.getExternalUserid())
-                                    .handoverUserid(weLeaveUserInfoAllocateVo.getHandoverUserid())
-                                    .takeoverUserid(weLeaveUserInfoAllocateVo.getTakeoverUserid())
-                                    .extentType(weLeaveUserInfoAllocateVo.getExtentType())
-                                    .build()
-                    );
-                });
 
-                if (CollectionUtil.isNotEmpty(weAllocateCustomers)
-                        && iWeAllocateCustomerService.saveBatch(weAllocateCustomers)) {
-
-                    //同步企业微信
-                    weUserClient.allocateCustomer(AllocateWeCustomerDto.builder()
+            JobExtendsCustomer jobExtendsCustomer = weUserClient.transferCustomer(
+                    AllocateWeCustomerDto.builder()
                             .external_userid(
-                                    ArrayUtil.toArray(allocateWeCustomers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList()), String.class)
+                                    (String[]) allocateWeCustomers.stream().map(WeCustomer::getExternalUserid).toArray()
                             )
                             .handover_userid(weLeaveUserInfoAllocateVo.getHandoverUserid())
                             .takeover_userid(weLeaveUserInfoAllocateVo.getTakeoverUserid())
-                            .build());
+                            .build()
+            );
 
+            if(jobExtendsCustomer.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
+                this.baseMapper.batchAddOrUpdate(allocateWeCustomers);
+                List<WeAllocateCustomer> weAllocateCustomers=new ArrayList<>();
+                allocateWeCustomers.stream().forEach(k->{
+                    weAllocateCustomers.add(
+                            WeAllocateCustomer.builder()
+                                    .allocateTime(new Date())
+                                    .extentType(new Integer(1))
+                                    .externalUserid(k.getExternalUserid())
+                                    .handoverUserid(weLeaveUserInfoAllocateVo.getHandoverUserid())
+                                    .takeoverUserid(weLeaveUserInfoAllocateVo.getTakeoverUserid())
+                                    .failReason("离职继承")
+                                    .build()
 
-                }
+                    );
+
+                    iWeAllocateCustomerService.saveBatch(weAllocateCustomers);
+
+                });
 
             }
-
-
 
 
         }

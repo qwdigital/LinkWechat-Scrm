@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.enums.AllocateGroupStatus;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.Threads;
 import com.linkwechat.wecom.annotation.SynchRecord;
@@ -18,6 +19,7 @@ import com.linkwechat.wecom.domain.WeCustomerAddGroup;
 import com.linkwechat.wecom.domain.WeGroup;
 import com.linkwechat.wecom.domain.WeGroupMember;
 import com.linkwechat.wecom.domain.dto.AllocateWeGroupDto;
+import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.domain.dto.customer.*;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.mapper.WeGroupMapper;
@@ -80,10 +82,20 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
     @Override
     @Transactional
     public void allocateWeGroup(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
-
         List<WeGroup> weGroups
                 = this.list(new LambdaQueryWrapper<WeGroup>().eq(WeGroup::getOwner, weLeaveUserInfoAllocateVo.getHandoverUserid()));
-        if (CollectionUtil.isNotEmpty(weGroups)) {
+
+        if(CollectionUtil.isNotEmpty(weGroups)){
+
+            //同步企业微信端
+            AllocateGroupDto allocateGroup = weUserClient.allocateGroup(
+                    AllocateWeGroupDto.builder()
+                            .chat_id_list(ArrayUtil.toArray(weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList()), String.class))
+                            .new_owner(weLeaveUserInfoAllocateVo.getTakeoverUserid())
+                            .build()
+            );
+
+            //构建分配记录
             List<WeAllocateGroup> weAllocateGroups = new ArrayList<>();
             //更改本地群主
             weGroups.stream().forEach(k -> {
@@ -91,27 +103,39 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                 weAllocateGroups.add(WeAllocateGroup.builder()
                         .allocateTime(new Date())
                         .chatId(k.getChatId())
+                        .status(AllocateGroupStatus.ALLOCATE_GROUP_STATUS_BJTCG.getKey())
                         .newOwner(weLeaveUserInfoAllocateVo.getTakeoverUserid())
                         .oldOwner(weLeaveUserInfoAllocateVo.getHandoverUserid())
                         .build());
             });
-            this.saveOrUpdateBatch(weGroups);
-            //分配记录保存
-            if (CollectionUtil.isNotEmpty(weAllocateGroups)) {
-                if (iWeAllocateGroupService.saveOrUpdateBatch(weAllocateGroups)) {
 
-//                    //同步企业微信端
-                    weUserClient.allocateGroup(
-                            AllocateWeGroupDto.builder()
-                                    .chat_id_list(ArrayUtil.toArray(weAllocateGroups.stream().map(WeAllocateGroup::getChatId).collect(Collectors.toList()), String.class))
-                                    .new_owner(weLeaveUserInfoAllocateVo.getTakeoverUserid())
-                                    .build()
-                    );
 
+                //处理接替失败的群
+                List<AllocateGroupDto.FailedChatList> failedChatList = allocateGroup.getFailed_chat_list();
+                if(CollectionUtil.isNotEmpty(failedChatList)){
+
+                    failedChatList.stream().forEach(k->{
+
+                        weGroups.stream()
+                                .filter(kk->kk.getChatId().equals(k.getChat_id())).findFirst().get()
+                                .setOwner(weLeaveUserInfoAllocateVo.getHandoverUserid());
+
+                        WeAllocateGroup weAllocateGroup
+                                = weAllocateGroups.stream().filter(kk -> kk.getChatId().equals(k.getChat_id())).findFirst().get();
+                        if(null != weAllocateGroup){
+                            weAllocateGroup.setStatus(AllocateGroupStatus.ALLOCATE_GROUP_STATUS_JTSB.getKey());
+                            weAllocateGroup.setErrMsg(weAllocateGroup.getErrMsg());
+                        }
+
+                    });
                 }
-            }
 
+            if(this.saveOrUpdateBatch(weGroups)){
+                iWeAllocateGroupService
+                        .saveOrUpdateBatch(weAllocateGroups);
+            }
         }
+
     }
 
 
@@ -299,8 +323,8 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
             List<List<WeGroup>> lists = Lists.partition(weGroups, 500);
             for (List<WeGroup> groupList : lists) {
                 this.baseMapper.insertBatch(groupList);
-                this.remove(new LambdaQueryWrapper<WeGroup>()
-                        .notIn(WeGroup::getChatId, groupList.stream().map(WeGroup::getChatId).collect(Collectors.toList())));
+//                this.remove(new LambdaQueryWrapper<WeGroup>()
+//                        .notIn(WeGroup::getChatId, groupList.stream().map(WeGroup::getChatId).collect(Collectors.toList())));
             }
         }else{
             List<WeGroup> oldWeGroups = this.list();
@@ -324,12 +348,14 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
 
             List<List<WeGroupMember>> lists = Lists.partition(weGroupMembers, 500);
             for (List<WeGroupMember> groupMemberList : lists) {
-                iWeGroupMemberService.remove(
-                       new LambdaQueryWrapper<WeGroupMember>()
-                               .notIn(WeGroupMember::getUserId,groupMemberList.stream().map(WeGroupMember::getUserId).collect(Collectors.toList()))
 
-                );
                 iWeGroupMemberService.insertBatch(groupMemberList);
+
+//                iWeGroupMemberService.remove(
+//                        new LambdaQueryWrapper<WeGroupMember>()
+//                                .notIn(WeGroupMember::getUserId,groupMemberList.stream().map(WeGroupMember::getUserId).collect(Collectors.toList()))
+//
+//                );
 
             }
 
