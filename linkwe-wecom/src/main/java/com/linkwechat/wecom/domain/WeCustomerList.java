@@ -93,8 +93,23 @@ public class WeCustomerList {
     private String departmentIds;
 
 
+    private String remark;
+
+    private String phone;
+
+    private String email;
+
+    private String address;
+
+    private String qq;
+
+    private String position;
+
+    private String corpName;
+
+    private String otherDescr;
 
 
     //0正常；1:删除;
-    private Integer delFlag=new Integer(0);
+    private Integer delFlag;
 }

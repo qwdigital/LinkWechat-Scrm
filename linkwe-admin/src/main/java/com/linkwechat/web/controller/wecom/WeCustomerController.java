@@ -210,10 +210,10 @@ public class WeCustomerController extends BaseController
 
          List<WeCustomerTrajectory> weCustomerTrajectories = iWeCustomerTrajectoryService
                  .followUpRecord(externalUserid, userId, trajectoryType);
-         TableDataInfo dataTable = getDataTable(weCustomerTrajectories);
-         dataTable.setLastSyncTime(
-                iWeSynchRecordService.findUpdateLatestTime(SynchRecordConstants.SYNCH_MOMENTS_INTERACTE)
-         );//最近同步时间
+//         TableDataInfo dataTable = getDataTable(weCustomerTrajectories);
+//         dataTable.setLastSyncTime(
+//                iWeSynchRecordService.findUpdateLatestTime(SynchRecordConstants.SYNCH_MOMENTS_INTERACTE)
+//         );//最近同步时间
 
         return getDataTable(weCustomerTrajectories);
     }

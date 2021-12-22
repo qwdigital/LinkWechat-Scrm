@@ -145,9 +145,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
         List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
 
-        List<WeCustomerTrajectory> trajectories=new ArrayList<>();
-        List<WeUser> weUsers = iWeUserService.list();
-
 
 
         list.forEach(userDetail -> {
@@ -158,20 +155,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             weCustomer.setCustomerName(userDetail.getExternal_contact().getName());
             weCustomer.setDelFlag(new Integer(0));
             Optional.ofNullable(userDetail.getFollow_info()).ifPresent(followInfo -> {
-                trajectories.add(
-                        WeCustomerTrajectory.builder()
-                                .trajectoryType(TrajectoryType.TRAJECTORY_TYPE_DBDT.getType())
-                                .externalUserid(weCustomer.getExternalUserid())
-                                .trackState(TrackState.STATE_DGJ.getType())
-                                .isSynch(false)
-                                .content("待跟进状态")
-                                .title("同步客户设置跟进状态")
-                                .trackTime(new Date(followInfo.getCreatetime() * 1000L))
-                                .userId(followInfo.getUserid())
-                                .build()
-                );
-
-
+                weCustomer.setState(followInfo.getState());
                 weCustomer.setFirstUserId(followInfo.getUserid());
                 weCustomer.setFirstAddTime(new Date(followInfo.getCreatetime() * 1000L));
                 weCustomer.setAddMethod(followInfo.getAdd_way());
@@ -195,16 +179,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         });
 
 
-        if(CollectionUtil.isNotEmpty(trajectories)){
-            iWeCustomerTrajectoryService.deleteSynchTrajectory();
-            List<List<WeCustomerTrajectory>> traJectorys = Lists.partition(trajectories, 500);
-            for(List<WeCustomerTrajectory> traJectory: traJectorys){
-
-                //清空状态为等待跟进的数据
-                iWeCustomerTrajectoryService.saveBatch(traJectory);
-
-            }
-        }
 
         if (CollectionUtil.isNotEmpty(weFlowerCustomerTagRels)) {
             List<List<WeFlowerCustomerTagRel>> tagRels = Lists.partition(weFlowerCustomerTagRels, 500);
@@ -434,6 +408,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     public void makeLabel(WeMakeCustomerTag weMakeCustomerTag) {
 
         List<WeTag> addTag = weMakeCustomerTag.getAddTag();
+        List<WeTag> lodAddTag = weMakeCustomerTag.getAddTag();
         if(CollectionUtil.isNotEmpty(addTag)){
             //校验是否有标签在库里不存在
 
@@ -448,6 +423,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             }else{
                  new WeComException("部门标签不存在");
             }
+            lodAddTag=weTagList;
+
             CutomerTagEdit cutomerTagEdit = CutomerTagEdit.builder()
                     .external_userid(weMakeCustomerTag.getExternalUserid())
                     .userid(weMakeCustomerTag.getUserId())
@@ -498,6 +475,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     );
                 }
 
+
+
+
+
         }else{//为空，取消当前客户所有标签
             List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = iWeFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
                     .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid())
@@ -521,6 +502,23 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 }
             }
         }
+
+
+        iWeCustomerTrajectoryService.createTrajectory(
+                ListUtil.toList(WeCustomerTrajectory.TrajectRel.builder()
+                        .customerId(weMakeCustomerTag.getExternalUserid())
+                        .userId(weMakeCustomerTag.getUserId())
+                        .build()),TrajectoryType.TRAJECTORY_TYPE_SJDT.getType(),
+                weMakeCustomerTag.getIsCompanyTag()?
+                        TrajectorySceneType.TRAJECTORY_TITLE_GXQYBQ.getType():
+                        TrajectorySceneType.TRAJECTORY_TITLE_GXGRBQ.getType(),
+                CollectionUtil.isNotEmpty(lodAddTag)?
+                String.join(",",lodAddTag.stream().map(WeTag::getName).collect(Collectors.toList())):"暂无标签",null);
+
+
+
+
+
     }
 
 
@@ -560,11 +558,13 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             weCustomer.setCustomerName(externalUserDetail.getExternal_contact().getName());
             weCustomer.setCustomerType(externalUserDetail.getExternal_contact().getType());
             weCustomer.setDelFlag(new Integer(0));
+
             List<ExternalUserDetail.FollowUser> follow_user = externalUserDetail.getFollow_user();
             if(CollectionUtil.isNotEmpty(follow_user)){
                 ExternalUserDetail.FollowUser followUser = follow_user.stream().filter(e -> e.getUserid().equals(userId)).findFirst().get();
 
                 if(null != followUser){
+                    weCustomer.setState(followUser.getState());
                     weCustomer.setFirstAddTime(new Date(followUser.getCreatetime() * 1000L));
                     weCustomer.setAddMethod(followUser.getAddWay());
                     this.baseMapper.batchAddOrUpdate(
@@ -587,6 +587,18 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                         });
                         iWeFlowerCustomerTagRelService.batchAddOrUpdate(tagRels);
                     }
+
+
+
+                    //生成轨迹
+                    iWeCustomerTrajectoryService.createTrajectory(ListUtil.toList(
+                            WeCustomerTrajectory.TrajectRel.builder()
+                                    .userId(externalUserid)
+                                    .customerId(externalUserid)
+                                    .build()
+                    ),TrajectoryType.TRAJECTORY_TYPE_XXDT.getType(),TrajectorySceneType.TRAJECTORY_TITLE_TJYG.getType(),
+                            CustomerAddWay.of(followUser.getAddWay()).getVal()
+                            ,null);
                 }
             }
         }
@@ -650,12 +662,19 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         weCustomer.setOtherDescr(weCustomerPortrait.getDescription());
 
 
-        this.update(weCustomer,new LambdaQueryWrapper<WeCustomer>()
+        if(this.update(weCustomer,new LambdaQueryWrapper<WeCustomer>()
                 .eq(WeCustomer::getFirstUserId,weCustomerPortrait.getUserId())
-                .eq(WeCustomer::getExternalUserid,weCustomerPortrait.getExternalUserid()));
+                .eq(WeCustomer::getExternalUserid,weCustomerPortrait.getExternalUserid()))){
 
-        //添加轨迹内容(信息动态)
-        iWeCustomerTrajectoryService.inforMationNews(weCustomerPortrait.getUserId(),weCustomerPortrait.getExternalUserid(), TrajectorySceneType.TRAJECTORY_TYPE_XXDT_BCZL.getKey());
+
+            iWeCustomerTrajectoryService.createTrajectory( ListUtil.toList(WeCustomerTrajectory.TrajectRel.builder()
+                    .customerId(weCustomer.getExternalUserid())
+                    .userId(weCustomer.getFirstUserId())
+                    .build()),TrajectoryType.TRAJECTORY_TYPE_SJDT.getType(),TrajectorySceneType.TRAJECTORY_TITLE_BJBQ.getType(),null,null);
+        }
+
+//        //添加轨迹内容(信息动态)
+//        iWeCustomerTrajectoryService.inforMationNews(weCustomerPortrait.getUserId(),weCustomerPortrait.getExternalUserid(), TrajectorySceneType.TRAJECTORY_TYPE_XXDT_BCZL.getKey());
     }
 
 
@@ -677,6 +696,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     weCustomerList.stream().findFirst().get()
                     );
             List<WeCustomerDetail.TrackUser> trackUsers=new ArrayList<>();
+
             weCustomerList.stream().forEach(k->{
                 trackUsers.add(WeCustomerDetail.TrackUser.builder()
                                 .addMethod(k.getAddMethod())
@@ -834,6 +854,42 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     public long noRepeatCountCustomer(WeCustomerList weCustomerList) {
 
         return this.baseMapper.noRepeatCountCustomer(weCustomerList);
+    }
+
+
+    /**
+     * 客户跟进记录
+     * @param trajectory
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addOrEditWaitHandle(WeCustomerTrajectory trajectory) {
+
+
+            WeCustomer weCustomer = this.getOne(new LambdaQueryWrapper<WeCustomer>()
+                    .eq(WeCustomer::getExternalUserid, trajectory.getExternalUserid())
+                    .eq(WeCustomer::getFirstUserId, trajectory.getUserId()));
+            if(weCustomer != null){
+                weCustomer.setTrackState(trajectory.getTrackState());
+                weCustomer.setTrackContent(trajectory.getContent());
+                weCustomer.setTrackTime(new Date());
+                if(this.update(weCustomer,new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getFirstUserId,
+                                weCustomer.getFirstUserId())
+                        .eq(WeCustomer::getExternalUserid,weCustomer.getExternalUserid()))){
+
+                    iWeCustomerTrajectoryService.createTrajectory(
+                            ListUtil.toList(WeCustomerTrajectory.TrajectRel.builder()
+                                    .customerId(trajectory.getExternalUserid())
+                                    .userId(trajectory.getUserId())
+                                    .build()),TrajectoryType.TRAJECTORY_TYPE_DBDT.getType(),
+                            TrajectorySceneType.TRAJECTORY_TITLE_TJGJ.getType(),trajectory.getContent(),trajectory.getTrackState());
+
+                }
+            }
+
+
+
+
     }
 
 

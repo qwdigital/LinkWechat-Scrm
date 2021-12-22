@@ -11,12 +11,12 @@ import java.util.stream.Stream;
 public enum TrajectoryType {
 
 
-    TRAJECTORY_TYPE_XXDT(1,"信息动态"),
-    TRAJECTORY_TYPE_SJDT(2,"社交动态"),
+    TRAJECTORY_TYPE_XXDT(1,"客户动态"),
+    TRAJECTORY_TYPE_SJDT(2,"员工动态"),
 
-    TRAJECTORY_TYPE_HDGZ(3,"活动规则"),
+    TRAJECTORY_TYPE_HDGZ(3,"互动动态"),
 
-    TRAJECTORY_TYPE_DBDT(4,"待办动态");
+    TRAJECTORY_TYPE_DBDT(4,"跟进动态");
 
     private String name;
 

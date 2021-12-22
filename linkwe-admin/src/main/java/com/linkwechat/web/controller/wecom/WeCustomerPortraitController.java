@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
@@ -35,6 +36,9 @@ public class WeCustomerPortraitController extends BaseController {
     @Autowired
     private IWeTagService iWeTagService;
 
+    @Autowired
+    private IWeTagGroupService iWeTagGroupService;
+
 
     @Autowired
     private IWeUserService iWeUserService;
@@ -47,6 +51,11 @@ public class WeCustomerPortraitController extends BaseController {
 
     @Autowired
     private IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
+
+
+    @Autowired
+    IWeMomentsService iWeMomentsService;
+
 
 
     /**
@@ -91,8 +100,17 @@ public class WeCustomerPortraitController extends BaseController {
      * @return
      */
     @GetMapping(value = "/findAllTags")
-    public AjaxResult findAllTags(String userId){
+    public AjaxResult findAllTags(Integer groupTagType,String userId){
 
+        if(groupTagType.equals(new Integer(1))){//企业标签
+            return AjaxResult.success(
+                    iWeTagGroupService.selectWeTagGroupList(
+                            WeTagGroup.builder()
+                                    .groupTagType(1)
+                                    .build()
+                    )
+            );
+        }
         return AjaxResult.success(
                 iWeTagService.list(
                         new LambdaQueryWrapper<WeTag>()
@@ -101,6 +119,7 @@ public class WeCustomerPortraitController extends BaseController {
                 )
 
         );
+
     }
 
 
@@ -205,7 +224,7 @@ public class WeCustomerPortraitController extends BaseController {
 
 
     /**
-     * 添加或编辑轨迹
+     *编辑跟进动态
      * @param trajectory
      * @return
      */
@@ -213,7 +232,7 @@ public class WeCustomerPortraitController extends BaseController {
     public AjaxResult addOrEditWaitHandle(@RequestBody WeCustomerTrajectory trajectory){
 
 
-        iWeCustomerTrajectoryService.saveOrUpdate(trajectory);
+        iWeCustomerService.addOrEditWaitHandle(trajectory);
 
         return AjaxResult.success();
     }
@@ -249,6 +268,19 @@ public class WeCustomerPortraitController extends BaseController {
     }
 
 
+
+    /**
+     * 个人朋友圈互动数据同步
+     * @param userId
+     * @return
+     */
+    @GetMapping("/synchMomentsInteracte/{userId}")
+    public AjaxResult synchMomentsInteracte(@PathVariable String userId){
+
+        iWeMomentsService.synchMomentsInteracte(CollectionUtil.newArrayList(userId));
+
+        return AjaxResult.success(WeConstans.SYNCH_TIP);
+    }
 
 
 

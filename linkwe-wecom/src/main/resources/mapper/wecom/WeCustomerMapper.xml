@@ -21,7 +21,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wc.first_add_time,
             wc.birthday,
             wc.gender,
-           (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id in (wu.department)) as departmentName
+           (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id in (wu.department)) as departmentName,
+            wc.phone,
+            wc.email,
+            wc.address,
+            wc.qq,
+            wc.position,
+            wc.corp_name as corpName,
+            wc.other_descr as otherDescr
         FROM
         we_customer wc
         LEFT JOIN we_user wu ON wc.first_user_id=wu.user_id
@@ -126,7 +133,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             GROUP_CONCAT(if(wt.tag_type=1,wt.`tag_id`,null )) as tagIds,
             GROUP_CONCAT(if(wt.tag_type=1,wt.`name`,null )) as tagNames,
             GROUP_CONCAT(if(wt.tag_type=3,wt.`tag_id`,null )) as personTagIds,
-            GROUP_CONCAT(if(wt.tag_type=3,wt.`name`,null )) as personTagNames
+            GROUP_CONCAT(if(wt.tag_type=3,wt.`name`,null )) as personTagNames,
+            wc.track_content as content
         FROM
             we_customer wc
        LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.user_id = wc.first_user_id AND wfcrf.del_flag=0
@@ -201,12 +209,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         address,
         phone,
         add_method,
-        del_flag
+        del_flag,
+        state
         ) values
         <foreach collection="weCustomers" item="item" index="index" separator=",">
             (#{item.externalUserid},#{item.customerName},#{item.avatar},#{item.customerType},#{item.gender}, #{item.unionid},#{item.birthday},
             #{item.corpName},#{item.position},#{item.isOpenChat}, #{item.createTime},
-            #{item.createBy},#{item.firstUserId},#{item.firstAddTime},#{item.qq},#{item.email},#{item.address},#{item.phone},#{item.addMethod},#{item.delFlag}
+            #{item.createBy},#{item.firstUserId},#{item.firstAddTime},#{item.qq},#{item.email},#{item.address},#{item.phone},#{item.addMethod},#{item.delFlag},
+             #{item.state}
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
@@ -226,7 +236,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         address=IF(we_customer.address != null, VALUES(address), we_customer.address),
         phone=IF(we_customer.phone != null, VALUES(phone), we_customer.phone),
         add_method=IF(we_customer.add_method != null, we_customer.add_method, VALUES(add_method)),
-        del_flag=IF(we_customer.del_flag != null, we_customer.del_flag, VALUES(del_flag));
+        del_flag=IF(we_customer.del_flag != null, we_customer.del_flag, VALUES(del_flag)),
+        state=IF(we_customer.state != null and we_customer.state !='',we_customer.state, VALUES(state));
     </insert>
 
 

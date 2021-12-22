@@ -9,6 +9,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.base.Joiner;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.MediaType;
+import com.linkwechat.common.enums.TrajectorySceneType;
+import com.linkwechat.common.enums.TrajectoryType;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
@@ -16,20 +18,14 @@ import com.linkwechat.common.utils.Threads;
 import com.linkwechat.wecom.annotation.SynchRecord;
 import com.linkwechat.wecom.client.WeMomentsClient;
 import com.linkwechat.wecom.constants.SynchRecordConstants;
-import com.linkwechat.wecom.domain.WeAllocateCustomer;
-import com.linkwechat.wecom.domain.WeMoments;
-import com.linkwechat.wecom.domain.WeMomentsInteracte;
-import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.domain.dto.customer.ExternalUserDetail;
 import com.linkwechat.wecom.domain.dto.customer.FollowUserList;
 import com.linkwechat.wecom.domain.dto.moments.*;
 import com.linkwechat.wecom.mapper.WeMomentsMapper;
-import com.linkwechat.wecom.service.IWeMaterialService;
-import com.linkwechat.wecom.service.IWeMomentsService;
-import com.linkwechat.wecom.service.IWeUserService;
-import com.linkwechat.wecom.service.WeMomentsInteracteService;
+import com.linkwechat.wecom.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContext;
@@ -62,6 +58,9 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
 
     @Autowired
     WeMomentsInteracteService weMomentsInteracteService;
+
+    @Autowired
+    IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
 
 
 
@@ -322,7 +321,6 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
      * @param userIds
      */
     @Override
-    @SynchRecord(synchType = SynchRecordConstants.SYNCH_MOMENTS_INTERACTE)
     public void synchMomentsInteracte(List<String> userIds) {
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
@@ -341,14 +339,48 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
                                 .eq(WeMoments::getDelFlag, WeConstans.WE_SUCCESS_CODE));
                         if(CollectionUtil.isNotEmpty(weMoments)){
                             List<WeMomentsInteracte> interactes=new ArrayList<>();
+                            //点赞集合
+                            List<WeCustomerTrajectory.TrajectRel> dzTrajectrels=new ArrayList<>();
+
+
+                            List<WeCustomerTrajectory.TrajectRel> plTrajectrels=new ArrayList<>();
+
                             weMoments.stream().forEach(moment->{
                                 interactes.addAll(
                                         getInteracte(moment.getMomentId(), moment.getCreator())
                                 );
+                                interactes.stream().forEach(k->{
+
+                                    WeCustomerTrajectory.TrajectRel trajectRel = WeCustomerTrajectory.TrajectRel.builder()
+                                            .userId(moment.getCreator())
+                                            .build();
+
+                                    if(k.getInteracteUserType().equals(new Integer(1))){//客户
+                                        trajectRel.setCustomerId(k.getInteracteUserId());
+                                    }
+
+                                    if(k.getInteracteType().equals(new Integer(0))){//评论
+                                        plTrajectrels.add(trajectRel);
+                                    }else{//点赞
+                                        dzTrajectrels.add(trajectRel);
+                                    }
+                                });
+
+
                             });
                             if(CollectionUtil.isNotEmpty(interactes)){
                                 weMomentsInteracteService.batchAddOrUpdate(interactes);
                             }
+
+                            if(CollectionUtil.isNotEmpty(dzTrajectrels)){//点赞
+                                iWeCustomerTrajectoryService.createTrajectory(dzTrajectrels, TrajectoryType.TRAJECTORY_TYPE_HDGZ.getType(), TrajectorySceneType.TRAJECTORY_TITLE_DZPYQ.getType(),null,null);
+                            }
+
+                            if(CollectionUtil.isNotEmpty(plTrajectrels)){//评论
+                                iWeCustomerTrajectoryService.createTrajectory(plTrajectrels, TrajectoryType.TRAJECTORY_TYPE_HDGZ.getType(), TrajectorySceneType.TRAJECTORY_TITLE_PLPYQ.getType(),null,null);
+
+                            }
+
                         }
 
 

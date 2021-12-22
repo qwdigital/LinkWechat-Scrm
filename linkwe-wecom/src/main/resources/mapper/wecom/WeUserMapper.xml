@@ -194,15 +194,15 @@
 
 
     <select id="findWeUserByCutomerId" resultType="com.linkwechat.wecom.domain.WeCustomerAddUser">
-            SELECT
-                wu.user_name,
-                wu.user_id,
-                wu.head_image_url,
-                wfcr.create_time
-            FROM
-                `we_flower_customer_rel` wfcr
-            INNER JOIN we_user wu ON wfcr.user_id = wu.user_id
-            WHERE wfcr.external_userid=#{externalUserid}
+        SELECT
+            wu.user_name,
+            wu.user_id,
+            wu.head_image_url,
+            wc.first_add_time as createTime
+        FROM
+            we_customer wc
+                INNER JOIN we_user wu ON wc.first_user_id = wu.user_id
+        WHERE wc.external_userid=#{externalUserid}
     </select>
 
 

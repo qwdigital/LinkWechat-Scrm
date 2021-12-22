@@ -10,6 +10,7 @@
     <select id="followUpRecord"  resultType="com.linkwechat.wecom.domain.WeCustomerTrajectory">
         SELECT
             wct.content as trackContent,
+            wct.content,
             wu.user_id,
             wu.user_name,
             wct.track_time,
