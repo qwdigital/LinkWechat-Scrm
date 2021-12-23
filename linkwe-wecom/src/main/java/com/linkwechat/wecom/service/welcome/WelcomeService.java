@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.MessageType;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeCustomerClient;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeQrAttachments;
@@ -62,7 +63,7 @@ public class WelcomeService implements ApplicationListener<WeCustomerWelcomeQuer
     public void onApplicationEvent(WeCustomerWelcomeQuery query) {
         log.info("开始发送欢迎语：query:{}", JSONObject.toJSONString(query));
         List<WeQrAttachments> qrAttachments = new ArrayList<>();
-        if(query.getState().startsWith(WeConstans.WE_QR_CODE_PREFIX)){
+        if(StringUtils.isNotEmpty(query.getState()) && query.getState().startsWith(WeConstans.WE_QR_CODE_PREFIX)){
             WeQrCode weQrCode = weQrCodeService.getOne(new LambdaQueryWrapper<WeQrCode>()
                     .eq(WeQrCode::getState, query.getState())
                     .eq(WeQrCode::getDelFlag, 0).last("limit 1"));
@@ -73,7 +74,7 @@ public class WelcomeService implements ApplicationListener<WeCustomerWelcomeQuer
             } else {
                 log.warn("未查询到对应员工活码信息");
             }
-        }else  if(query.getState().startsWith(WeConstans.WE_QR_XKLQ_PREFIX)){
+        }else  if(StringUtils.isNotEmpty(query.getState()) && query.getState().startsWith(WeConstans.WE_QR_XKLQ_PREFIX)){
             WeCommunityWeComeMsgVo welcomeMsgByState = weCommunityNewGroupService.getWelcomeMsgByState(query.getState());
             if(welcomeMsgByState != null){
                 WeQrAttachments textAtt = new WeQrAttachments();

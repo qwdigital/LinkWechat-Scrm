@@ -80,9 +80,7 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
                         .trackState(trackState)
                         .build();
 
-                if(TrajectorySceneType.TRAJECTORY_TITLE_TJYG.getType().equals(trajectorySence)
-                        ||TrajectorySceneType.TRAJECTORY_TITLE_SCYG.getType().equals(trajectorySence)
-                        ||TrajectorySceneType.TRAJECTORY_TITLE_DZPYQ.getType().equals(trajectorySence)
+                if(TrajectorySceneType.TRAJECTORY_TITLE_DZPYQ.getType().equals(trajectorySence)
                         ||TrajectorySceneType.TRAJECTORY_TITLE_PLPYQ.getType().equals(trajectorySence)
                 ||TrajectorySceneType.TRAJECTORY_TITLE_BJBQ.getType().equals(trajectorySence)){
                     trajectory.setContent(
