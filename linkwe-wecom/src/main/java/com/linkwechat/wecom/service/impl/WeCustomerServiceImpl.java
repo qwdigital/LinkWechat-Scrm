@@ -595,7 +595,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     //生成轨迹
                     iWeCustomerTrajectoryService.createTrajectory(ListUtil.toList(
                             WeCustomerTrajectory.TrajectRel.builder()
-                                    .userId(externalUserid)
+                                    .userId(userId)
                                     .customerId(externalUserid)
                                     .build()
                     ),TrajectoryType.TRAJECTORY_TYPE_XXDT.getType(),TrajectorySceneType.TRAJECTORY_TITLE_TJYG.getType(),

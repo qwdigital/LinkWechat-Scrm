@@ -93,7 +93,7 @@
 
     <resultMap type="WeCommunityWeComeMsgVo" id="WelcomeMsgResult">
         <result property="id" column="id"/>
-        <result property="welcomeMsg" column="qr_code"/>
+        <result property="codeUrl" column="code_url"/>
         <result property="welcomeMsg" column="welcome_msg"/>
         <collection property="tagList" ofType="com.linkwechat.wecom.domain.vo.tag.WeTagVo">
             <result property="tagId" column="tag_id"/>

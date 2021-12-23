@@ -76,11 +76,13 @@ public class WelcomeService implements ApplicationListener<WeCustomerWelcomeQuer
         }else  if(query.getState().startsWith(WeConstans.WE_QR_XKLQ_PREFIX)){
             WeCommunityWeComeMsgVo welcomeMsgByState = weCommunityNewGroupService.getWelcomeMsgByState(query.getState());
             if(welcomeMsgByState != null){
-                WeQrAttachments textAtt = WeQrAttachments.builder().msgType(MessageType.TEXT.getMessageType())
-                        .content(welcomeMsgByState.getWelcomeMsg()).build();
-                WeQrAttachments imageAtt = WeQrAttachments.builder().msgType(MessageType.IMAGE.getMessageType())
-                        .mediaId(welcomeMsgByState.getCodeUrl()).build();
+                WeQrAttachments textAtt = new WeQrAttachments();
+                textAtt.setMsgType(MessageType.TEXT.getMessageType());
+                textAtt.setContent(welcomeMsgByState.getWelcomeMsg());
                 qrAttachments.add(textAtt);
+                WeQrAttachments imageAtt = new WeQrAttachments();
+                imageAtt.setMsgType(MessageType.IMAGE.getMessageType());
+                imageAtt.setMediaId(welcomeMsgByState.getCodeUrl());
                 qrAttachments.add(imageAtt);
                 makeCustomerTag(query.getExternalUserId(), query.getUserId(), welcomeMsgByState.getTagList());
             }

@@ -27,7 +27,6 @@ import lombok.Data;
  */
 @ApiModel
 @Data
-@Builder
 @SuppressWarnings("serial")
 @TableName("we_qr_attachments")
 public class WeQrAttachments extends BaseEntity implements Serializable {
