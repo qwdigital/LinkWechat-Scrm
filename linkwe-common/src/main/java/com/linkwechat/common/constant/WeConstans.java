@@ -127,7 +127,7 @@ public class WeConstans {
     /**
      * 已离职
      */
-    public static final Integer WE_USER_IS_LEAVE = 6;
+    public static final Integer WE_USER_IS_LEAVE = 5;
 
 
     /**

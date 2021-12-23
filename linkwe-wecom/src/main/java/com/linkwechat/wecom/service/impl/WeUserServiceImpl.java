@@ -99,6 +99,7 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper, WeUser> impleme
                         "date_format (create_time,'%Y-%m-%d') >= date_format('" + weUser.getBeginTime() + "','%Y-%m-%d')")
                 .apply(StringUtils.isNotBlank(weUser.getEndTime()),
                         "date_format (create_time,'%Y-%m-%d') <= date_format('" + weUser.getEndTime() + "','%Y-%m-%d')")
+               .orderByDesc(WeUser::getCreateTime)
         );
     }
 

@@ -244,7 +244,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             JobExtendsCustomer jobExtendsCustomer = weUserClient.transferCustomer(
                     AllocateWeCustomerDto.builder()
                             .external_userid(
-                                    (String[]) allocateWeCustomers.stream().map(WeCustomer::getExternalUserid).toArray()
+                                    allocateWeCustomers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList()).stream().toArray(String[]::new)
                             )
                             .handover_userid(weLeaveUserInfoAllocateVo.getHandoverUserid())
                             .takeover_userid(weLeaveUserInfoAllocateVo.getTakeoverUserid())

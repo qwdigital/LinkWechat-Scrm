@@ -14,7 +14,7 @@ import com.linkwechat.wecom.retry.WeCommonRetryWhen;
  * @author: HaoN
  * @create: 2020-08-27 16:42
  **/
-@BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
+@BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeCommonAccessTokenInterceptor.class)
 @Retry(maxRetryCount = "3", maxRetryInterval = "1000", condition = WeCommonRetryWhen.class)
 public interface WeUserClient {
 
@@ -87,7 +87,7 @@ public interface WeUserClient {
      * @param allocateWeCustomerDto
      * @return
      */
-    @Request(url = "/externalcontact/transfer_customer", type = "POST")
+    @Request(url = "/externalcontact/transfer_customer", type = "POST",interceptor = WeAccessTokenInterceptor.class)
     JobExtendsCustomer transferCustomer(@JSONBody AllocateWeCustomerDto allocateWeCustomerDto);
 
 
@@ -96,7 +96,7 @@ public interface WeUserClient {
      * @param jobExtendsParam
      * @return
      */
-    @Post(url = "externalcontact/transfer_result")
+    @Post(url = "externalcontact/transfer_result",interceptor = WeAccessTokenInterceptor.class)
     JobExtendsCustomer transferResult(@JSONBody JobExtendsCustomer.JobExtendsParam jobExtendsParam);
 
 
@@ -106,7 +106,7 @@ public interface WeUserClient {
      * 分配成员群
      * @return
      */
-    @Request(url="/externalcontact/groupchat/transfer", type = "POST")
+    @Request(url="/externalcontact/groupchat/transfer", type = "POST",interceptor = WeAccessTokenInterceptor.class)
     AllocateGroupDto allocateGroup(@JSONBody AllocateWeGroupDto allocateWeGroupDto);
 
 
