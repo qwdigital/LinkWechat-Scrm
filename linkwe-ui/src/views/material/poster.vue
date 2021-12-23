@@ -35,7 +35,7 @@ export default {
           required: true,
           message: '请选择海报类型'
         },
-        delFlag: {
+        status: {
           required: true,
           message: '请选择是否启用'
         }
@@ -74,7 +74,7 @@ export default {
             title: data.title,
             categoryId: data.categoryId,
             type: data.type,
-            delFlag: data.delFlag,
+            status: data.status,
             backgroundImgPath: data.backgroundImgPath,
             posterJSON: JSON.parse(data.otherField)
           }
@@ -85,7 +85,7 @@ export default {
             title: '', // 海报名称
             categoryId: '', // 所属分类
             type: '1', // 海报类型
-            delFlag: 0, // 是否启用
+            status: 0, // 是否启用
             backgroundImgPath: '', // 图片url
             mediaId: '' // 图片id
           }
@@ -276,12 +276,15 @@ export default {
 
         case 'image':
         case 'qrcode':
-          new fabric.Image.fromURL(type == 'image' ? obj : 'http://demo.linkwechat.cn/lib/qrCode.png', (img) => {
-            img.set(options)
-            // img.scale(this.canvas.width / img.width / 2)
-            img.scaleToWidth(200)
-            this.canvas.add(img).setActiveObject(img)
-          })
+          new fabric.Image.fromURL(
+            type == 'image' ? obj : 'http://demo.linkwechat.cn/lib/qrCode.png',
+            (img) => {
+              img.set(options)
+              // img.scale(this.canvas.width / img.width / 2)
+              img.scaleToWidth(200)
+              this.canvas.add(img).setActiveObject(img)
+            }
+          )
           break
 
         default:
@@ -343,12 +346,14 @@ export default {
             vo = list[i]
 
             let isText = vo.type == 'i-text'
-            let align = (vo.textAlign && (vo.textAlign === 'left' ? 1 : vo.textAlign === 'center' ? 2 : 3)) || 1
+            let align =
+              (vo.textAlign && (vo.textAlign === 'left' ? 1 : vo.textAlign === 'center' ? 2 : 3)) ||
+              1
 
             let posData = {
               id: null, // 修改的时候后端默认没增删，沟通后让先传null
               content: vo.text || '', // 文本内容
-              delFlag: 0, // 1 启动  0 删除       暂时写死
+              status: 0, // 1 启动  0 删除       暂时写死
               fontColor: vo.fill || '#000000',
               fontId: null, // TODO 后端让传NULL  isText ? i : null,   // 字体ID   与imgPath互斥
               fontSize: parseInt(vo.fontSize),
@@ -401,16 +406,38 @@ export default {
   <div>
     <MaPage ref="page" type="5" @listChange="listChange" :selected="ids" v-slot="{ list }">
       <el-row :gutter="20">
-        <el-col :span="6" style="margin-bottom: 24px; min-width: 220px" v-for="(item, index) in list" :key="index">
+        <el-col
+          :span="6"
+          style="margin-bottom: 24px; min-width: 220px"
+          v-for="(item, index) in list"
+          :key="index"
+        >
           <el-card shadow="hover" body-style="padding: 0px;">
             <div class="img-wrap">
               <el-image class="poster-img" :src="item.materialUrl" fit="contain"></el-image>
               <div class="actions">
-                <el-tag class="actions-btn" type="success" size="mini" effect="dark" @click="preview(item.materialUrl)"
+                <el-tag
+                  class="actions-btn"
+                  type="success"
+                  size="mini"
+                  effect="dark"
+                  @click="preview(item.materialUrl)"
                   >预览</el-tag
                 >
-                <el-tag class="actions-btn" type="success" size="mini" effect="dark" @click="edit(item)">编辑</el-tag>
-                <el-tag class="actions-btn" type="success" size="mini" effect="dark" @click="remove(item.id)"
+                <el-tag
+                  class="actions-btn"
+                  type="success"
+                  size="mini"
+                  effect="dark"
+                  @click="edit(item)"
+                  >编辑</el-tag
+                >
+                <el-tag
+                  class="actions-btn"
+                  type="success"
+                  size="mini"
+                  effect="dark"
+                  @click="remove(item.id)"
                   >删除</el-tag
                 >
               </div>
@@ -491,8 +518,8 @@ export default {
                 <el-checkbox label="名片" value="2"></el-checkbox>
               </el-checkbox-group>
             </el-form-item> -->
-              <el-form-item label="是否启用" prop="delFlag">
-                <el-radio-group v-model="form.delFlag">
+              <el-form-item label="是否启用" prop="status">
+                <el-radio-group v-model="form.status">
                   <el-radio :label="1">是</el-radio>
                   <el-radio :label="0">否</el-radio>
                 </el-radio-group>
@@ -522,7 +549,8 @@ export default {
           <div style="">
             <div id="canvas-wrap">
               <i class="el-icon-error" id="deleteBtn"></i>
-              <canvas id="canvas" width="300" height="500" style="border: 1px solid #ddd;"> </canvas>
+              <canvas id="canvas" width="300" height="500" style="border: 1px solid #ddd;">
+              </canvas>
             </div>
             <div id="tbody-containerui-image-editor-controls">
               <ul class="menu">
@@ -541,9 +569,15 @@ export default {
                     </div> -->
                     <!-- <div> -->
                     <div>
-                      <button class="btn-text-style" @click="setAttr('textAlign', 'left')">左对齐</button>
-                      <button class="btn-text-style" @click="setAttr('textAlign', 'center')">居中</button>
-                      <button class="btn-text-style" @click="setAttr('textAlign', 'right')">右对齐</button>
+                      <button class="btn-text-style" @click="setAttr('textAlign', 'left')">
+                        左对齐
+                      </button>
+                      <button class="btn-text-style" @click="setAttr('textAlign', 'center')">
+                        居中
+                      </button>
+                      <button class="btn-text-style" @click="setAttr('textAlign', 'right')">
+                        右对齐
+                      </button>
                     </div>
                   </li>
                   <li class="menu-item">
@@ -557,7 +591,12 @@ export default {
       </el-dialog>
     </MaPage>
     <!-- 选择素材弹窗 -->
-    <SelectMaterial :visible.sync="dialogVisibleSelectMaterial" type="1" :showArr="[1]" @success="submitSelectMaterial">
+    <SelectMaterial
+      :visible.sync="dialogVisibleSelectMaterial"
+      type="0"
+      :showArr="[0]"
+      @success="submitSelectMaterial"
+    >
     </SelectMaterial>
   </div>
 </template>

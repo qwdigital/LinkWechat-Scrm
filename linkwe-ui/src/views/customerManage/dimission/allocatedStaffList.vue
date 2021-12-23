@@ -50,9 +50,10 @@ export default {
           this.loading = false
         })
     },
-    resetForm(formName) {
+    resetForm() {
       this.dateRange = []
       this.$refs['queryForm'].resetFields()
+      this.getList(1)
     }
   }
 }
@@ -60,13 +61,7 @@ export default {
 
 <template>
   <div class="page">
-    <el-form
-      ref="queryForm"
-      :inline="true"
-      :model="query"
-      label-width="100px"
-      class="top-search"
-    >
+    <el-form ref="queryForm" :inline="true" :model="query" label-width="100px" class="top-search">
       <el-form-item label="已离职员工" prop="userName">
         <el-input v-model="query.userName" placeholder="请输入"></el-input>
       </el-form-item>
@@ -92,19 +87,14 @@ export default {
         >
         <el-button
           v-hasPermi="['customerManage:dimission:query']"
-          type="info"
+          type="success"
           @click="resetForm('queryForm')"
           >重置</el-button
         >
       </el-form-item>
     </el-form>
 
-    <el-table
-      ref="multipleTable"
-      :data="list"
-      tooltip-effect="dark"
-      style="width: 100%"
-    >
+    <el-table ref="multipleTable" :data="list" tooltip-effect="dark" style="width: 100%">
       <el-table-column type="index" label="序号" width="55"></el-table-column>
       <el-table-column prop="userName" label="已离职员工"></el-table-column>
       <el-table-column prop="department" label="所属部门"></el-table-column>
@@ -118,11 +108,7 @@ export default {
         label="已分配群聊数"
         show-overflow-tooltip
       ></el-table-column>
-      <el-table-column
-        prop="dimissionTime"
-        label="离职时间"
-        show-overflow-tooltip
-      >
+      <el-table-column prop="dimissionTime" label="离职时间" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.dimissionTime }}</template>
       </el-table-column>
       <el-table-column label="操作" width="100">

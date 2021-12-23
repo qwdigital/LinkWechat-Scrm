@@ -158,6 +158,73 @@ export default {
             </div>
           </el-card>
 
+          <template v-if="userId">
+            <el-card class="mb10" shadow="never">
+              <div slot="header" class="card-title">共同群聊</div>
+              <template v-if="portrayalSum.commonGroupChat">
+                <el-tag
+                  type="info"
+                  v-for="(unit, unique) in portrayalSum.commonGroupChat.split(',')"
+                  :key="unique"
+                  >{{ unit }}</el-tag
+                >
+              </template>
+              <div v-else class="sub-text-color ac">
+                暂无标签
+              </div>
+            </el-card>
+
+            <el-card class="mb10" shadow="never">
+              <div slot="header" class="card-title">详细资料</div>
+              <el-row :gutter="20" type="type" class="pad10" justify="space-between">
+                <el-col :span="12">
+                  <el-row class="baseinfo-row">
+                    <el-col :span="6"> 手机号 </el-col>
+                    <el-col :span="18">{{ portrayalSum.phone || '无' }}</el-col>
+                  </el-row>
+                  <el-row class="baseinfo-row">
+                    <el-col :span="6"> 年龄 </el-col>
+                    <el-col :span="18">{{ portrayalSum.age || '无' }}</el-col>
+                  </el-row>
+                  <el-row class="baseinfo-row">
+                    <el-col :span="6"> 生日 </el-col>
+                    <el-col :span="18">{{ portrayalSum.birthday || '无' }}</el-col>
+                  </el-row>
+                  <el-row class="baseinfo-row">
+                    <el-col :span="6"> 邮箱 </el-col>
+                    <el-col :span="18">{{ portrayalSum.email || '无' }}</el-col>
+                  </el-row>
+                </el-col>
+                <el-col :span="12">
+                  <el-row class="baseinfo-row">
+                    <el-col :span="6"> 地址 </el-col>
+                    <el-col :span="18">{{ portrayalSum.address || '无' }}</el-col>
+                  </el-row>
+                  <el-row class="baseinfo-row">
+                    <el-col :span="6"> QQ </el-col>
+                    <el-col :span="18">{{ portrayalSum.qq || '无' }}</el-col>
+                  </el-row>
+                  <el-row class="baseinfo-row">
+                    <el-col :span="6"> 职业 </el-col>
+                    <el-col :span="18">{{ portrayalSum.position || '无' }}</el-col>
+                  </el-row>
+                  <el-row class="baseinfo-row">
+                    <el-col :span="6"> 公司 </el-col>
+                    <el-col :span="18">{{ portrayalSum.corpName || '无' }}</el-col>
+                  </el-row>
+                </el-col>
+                <el-col>
+                  <el-row class="baseinfo-row">
+                    <el-col :span="6"> 其他描述</el-col>
+                    <el-col :span="18">
+                      {{ portrayalSum.otherDescr || '无' }}
+                    </el-col>
+                  </el-row>
+                </el-col>
+              </el-row>
+            </el-card>
+          </template>
+
           <el-card class="mb10" shadow="never">
             <div slot="header" class="card-title">跟进状态</div>
             <template v-if="portrayalSum.trackStates && portrayalSum.trackStates.length">
@@ -262,14 +329,6 @@ export default {
   text-align: right;
 }
 .el-card {
-  .el-row {
-    color: #666;
-    margin-bottom: 10px;
-  }
-  .el-col-10 {
-    width: 100px;
-    text-align: right;
-  }
   .el-tag {
     margin-bottom: 5px;
   }
@@ -296,5 +355,30 @@ export default {
 }
 .sub-text-color {
   flex: auto;
+}
+
+.baseinfo-row {
+  position: relative;
+  padding-left: 10px;
+  line-height: 50px;
+  .el-col {
+    box-shadow: 0px 1px 0px 0px #f1f1f1;
+    &:first-child {
+      color: #999;
+    }
+  }
+  &::before {
+    content: '';
+    position: absolute;
+    top: 22.5px;
+    left: 0;
+    width: 5px;
+    height: 5px;
+    background: #76abf4;
+    border-radius: 50%;
+  }
+  > .el-col:last-child {
+    text-align: right;
+  }
 }
 </style>

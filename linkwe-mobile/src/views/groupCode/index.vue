@@ -24,7 +24,12 @@
         <van-button type="danger" @click="dialog = true">无法加群?</van-button>
       </div>
 
-      <van-dialog v-model="dialog" class="service-dialog" :showConfirmButton="false" :closeOnClickOverlay="true">
+      <van-dialog
+        v-model="dialog"
+        class="service-dialog"
+        :showConfirmButton="false"
+        :closeOnClickOverlay="true"
+      >
         <div>
           <van-image :src="code.serviceQrCode" width="200"> </van-image>
 
@@ -72,6 +77,8 @@ export default {
       getDetail(this.groupCodeUUID)
         .then(({ data, msg }) => {
           this.code = Object.assign(this.code, data)
+          document.title = data.activityName
+
           if (msg) this.message = msg
         })
         .catch(() => {})
@@ -79,7 +86,6 @@ export default {
   },
 
   created() {
-    document.title = '群活码'
     this.groupCodeUUID = this.$route.query.id
 
     this.getDetail()

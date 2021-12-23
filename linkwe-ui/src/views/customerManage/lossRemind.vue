@@ -142,11 +142,12 @@ export default {
         this.dialogVisible = false
       }
     },
-    resetForm(formName) {
+    resetForm() {
       this.dateRange = []
       this.queryTag = []
       this.queryUser = []
       this.$refs['queryForm'].resetFields()
+      this.getList(1)
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
