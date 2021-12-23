@@ -140,21 +140,23 @@
     </div>
 
     <!-- 选择素材弹窗 -->
+    <!-- 文本 -->
     <SelectMaterial
       v-if="activeName === '0'"
       :key="0"
       :visible.sync="dialogVisibleSelectMaterial"
       type="4"
-      @success="submitSelectMaterial"
+      @success="(data) => submitSelectMaterial(data, 4)"
     >
     </SelectMaterial>
 
+    <!-- 图片 -->
     <SelectMaterial
       v-else
       :key="1"
       :visible.sync="dialogVisibleSelectMaterial"
       type="0"
-      @success="submitSelectMaterial"
+      @success="(data) => submitSelectMaterial(data, 0)"
     >
     </SelectMaterial>
 
@@ -299,17 +301,17 @@ export default {
       })
     },
     // 选择素材确认按钮
-    submitSelectMaterial(text, image, file) {
-      text &&
-        text.id &&
-        !this.form.materialIdList.includes(text.id) &&
-        this.form.materialIdList.push(text.id) &&
-        this.textMaterialList.push(text)
-      image &&
-        image.id &&
-        !this.form.materialIdList.includes(image.id) &&
-        this.form.materialIdList.push(image.id) &&
-        this.imageMaterialList.push(image)
+    submitSelectMaterial(data, type) {
+      data.id &&
+        !this.form.materialIdList.includes(data.id) &&
+        this.form.materialIdList.push(data.id)
+
+      type == 4 && this.textMaterialList.push(data)
+
+      type == 0 && this.imageMaterialList.push(data)
+      // !this.form.materialIdList.includes(image.id) &&
+      // this.form.materialIdList.push(image.id) &&
+
       this.$refs.form.validateField('content')
     },
     // 选择客户群聊确认

@@ -310,7 +310,7 @@ export default {
           this.msgSuccess('删除成功')
         })
     },
-    submitSelectMaterial(text, image, file) {
+    submitSelectMaterial(image) {
       if (this.isBackgroundImage) {
         this.form.mediaId = image.id
         this.form.backgroundImgPath = image.materialUrl

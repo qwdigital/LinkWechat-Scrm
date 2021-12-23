@@ -210,7 +210,7 @@ export default {
       this.dialogVisibleAvatar = true
     },
     // 选择素材确认按钮
-    submitSelectMaterial(text, image, file) {
+    submitSelectMaterial(image) {
       this.form.headImageUrl = image.materialUrl
       // this.form.imageMessage._materialName = image.materialName
     }
