@@ -594,7 +594,6 @@ export default {
     <SelectMaterial
       :visible.sync="dialogVisibleSelectMaterial"
       type="0"
-      :showArr="[0]"
       @success="submitSelectMaterial"
     >
     </SelectMaterial>

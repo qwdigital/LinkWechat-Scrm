@@ -2,11 +2,19 @@
   <div class="wrap" v-loading="loading">
     <el-form :model="form" ref="form" :rules="rules" label-width="100px">
       <el-form-item label="规则名称" prop="ruleName">
-        <el-input v-model="form.ruleName" maxlength="30" show-word-limit placeholder="请输入" clearable />
+        <el-input
+          v-model="form.ruleName"
+          maxlength="30"
+          show-word-limit
+          placeholder="请输入"
+          clearable
+        />
       </el-form-item>
 
       <el-form-item label="执行群聊" prop="chatIdList">
-        <el-tag size="medium" v-for="(group, index) in customerGroups" :key="index">{{ group.groupName }}</el-tag>
+        <el-tag size="medium" v-for="(group, index) in customerGroups" :key="index">{{
+          group.groupName
+        }}</el-tag>
         <el-button
           type="primary"
           plain
@@ -64,7 +72,12 @@
                   {{ text.content }}
                 </div>
 
-                <el-button icon="el-icon-close" class="remove-btn" size="mini" @click="removeTextMaterial(text)">
+                <el-button
+                  icon="el-icon-close"
+                  class="remove-btn"
+                  size="mini"
+                  @click="removeTextMaterial(text)"
+                >
                 </el-button>
               </div>
             </el-tab-pane>
@@ -75,7 +88,12 @@
               <div v-for="image in imageMaterialList" :key="image.id" class="image-wrapper">
                 <el-image :src="image.materialUrl" fit="fit"> </el-image>
 
-                <el-button icon="el-icon-close" class="remove-btn" size="mini" @click="removeImageMaterial(image)">
+                <el-button
+                  icon="el-icon-close"
+                  class="remove-btn"
+                  size="mini"
+                  @click="removeImageMaterial(image)"
+                >
                 </el-button>
               </div>
 
@@ -90,7 +108,9 @@
               </upload> -->
             </el-tab-pane>
 
-            <el-button type="primary" class="mt20" @click="dialogVisibleSelectMaterial = true">从素材库选择</el-button>
+            <el-button type="primary" class="mt20" @click="dialogVisibleSelectMaterial = true"
+              >从素材库选择</el-button
+            >
           </el-tabs>
         </div>
       </el-form-item>
@@ -105,7 +125,11 @@
       <!-- 预览 -->
       <div class="tip">欢迎语样式</div>
 
-      <PhoneDialog :message="form.content || '请输入加群引导语'" :imageList="imageList" :messageList="messageList">
+      <PhoneDialog
+        :message="form.content || '请输入加群引导语'"
+        :imageList="imageList"
+        :messageList="messageList"
+      >
         <template #image="{ image }">
           <el-image style="border-radius: 6px;  width: 100px;" :src="image" fit="fit"> </el-image>
         </template>
@@ -120,8 +144,7 @@
       v-if="activeName === '0'"
       :key="0"
       :visible.sync="dialogVisibleSelectMaterial"
-      type="0"
-      :showArr="[0]"
+      type="4"
       @success="submitSelectMaterial"
     >
     </SelectMaterial>
@@ -130,8 +153,7 @@
       v-else
       :key="1"
       :visible.sync="dialogVisibleSelectMaterial"
-      type="1"
-      :showArr="[1]"
+      type="0"
       @success="submitSelectMaterial"
     >
     </SelectMaterial>
@@ -156,7 +178,11 @@ export default {
   components: { PhoneDialog, SelectMaterial, SelectCustomerGroup },
   data() {
     const checkContent = (rule, value, callback) => {
-      if (!this.form.content && this.form.picList.length === 0 && this.form.materialIdList.length === 0) {
+      if (
+        !this.form.content &&
+        this.form.picList.length === 0 &&
+        this.form.materialIdList.length === 0
+      ) {
         callback(new Error('该项为必填项'))
       } else {
         callback()
@@ -194,7 +220,9 @@ export default {
         ruleName: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
         title: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
         chatIdList: [{ required: true, message: '该项为必填项', trigger: 'change' }],
-        startExeTime: [{ type: 'array', required: true, message: '该项为必填项', trigger: 'change' }],
+        startExeTime: [
+          { type: 'array', required: true, message: '该项为必填项', trigger: 'change' }
+        ],
         content: [
           // { required: true, message: '该项为必填项', trigger: 'change' },
           { required: true, validator: checkContent, trigger: 'change' }
