@@ -74,10 +74,10 @@ public interface WeUserClient {
 
 
     /**
-     * 分配客户(离职继承分配客户)
+     * 离职继承分配客户
      * @return
      */
-    @Request(url="/externalcontact/resigned/transfer_customer", type = "POST")
+    @Request(url="/externalcontact/resigned/transfer_customer", type = "POST",interceptor = WeAccessTokenInterceptor.class)
     WeResultDto allocateCustomer(@JSONBody AllocateWeCustomerDto allocateWeCustomerDto);
 
 

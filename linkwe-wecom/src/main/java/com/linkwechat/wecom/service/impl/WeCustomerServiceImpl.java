@@ -241,7 +241,17 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             });
 
 
-            JobExtendsCustomer jobExtendsCustomer = weUserClient.transferCustomer(
+//            JobExtendsCustomer jobExtendsCustomer = weUserClient.transferCustomer(
+//                    AllocateWeCustomerDto.builder()
+//                            .external_userid(
+//                                    allocateWeCustomers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList()).stream().toArray(String[]::new)
+//                            )
+//                            .handover_userid(weLeaveUserInfoAllocateVo.getHandoverUserid())
+//                            .takeover_userid(weLeaveUserInfoAllocateVo.getTakeoverUserid())
+//                            .build()
+//            );
+
+            WeResultDto weResultDto = weUserClient.allocateCustomer(
                     AllocateWeCustomerDto.builder()
                             .external_userid(
                                     allocateWeCustomers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList()).stream().toArray(String[]::new)
@@ -251,7 +261,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                             .build()
             );
 
-            if(jobExtendsCustomer.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
+            if(weResultDto.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
                 this.baseMapper.batchAddOrUpdate(allocateWeCustomers);
                 List<WeAllocateCustomer> weAllocateCustomers=new ArrayList<>();
                 allocateWeCustomers.stream().forEach(k->{
