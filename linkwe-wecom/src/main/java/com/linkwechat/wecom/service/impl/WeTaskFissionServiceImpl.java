@@ -211,6 +211,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
 
         WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
         messageQuery.setChatType(1);
+        messageQuery.setSource(1);
         messageQuery.setIsAll(false);
         WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
         weMessageTemplate.setMsgType(MessageType.LINK.getMessageType());

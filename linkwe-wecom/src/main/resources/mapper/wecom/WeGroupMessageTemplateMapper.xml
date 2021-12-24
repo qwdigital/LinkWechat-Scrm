@@ -12,6 +12,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="filterCondition"    column="filter_condition"    />
         <result property="isTask"    column="is_task"    />
         <result property="status"    column="status"    />
+        <result property="source"    column="source"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
