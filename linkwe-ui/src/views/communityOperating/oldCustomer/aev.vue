@@ -23,7 +23,7 @@
         />
       </el-form-item>
 
-      <el-form-item label="选择群活码">
+      <el-form-item label="选择群活码" prop="groupCodeId">
         <el-image
           v-if="groupQrCode && groupQrCode.codeUrl"
           :src="groupQrCode.codeUrl"
@@ -229,13 +229,13 @@ export default {
       }
     },
     users(users) {
-      this.form.scopeList = users.map(user => {
+      this.form.scopeList = users.map((user) => {
         return user.userId
       })
       this.$refs.form.validateField('scopeList')
     },
     tags(tags) {
-      this.form.tagList = tags.map(tag => {
+      this.form.tagList = tags.map((tag) => {
         return tag.tagId
       })
       this.$refs.form.validateField('tagList')
@@ -288,7 +288,7 @@ export default {
       this.$refs.form.validateField('groupCodeId')
     },
     submit() {
-      this.$refs.form.validate(valid => {
+      this.$refs.form.validate((valid) => {
         if (valid) {
           this.loading = true
           if (this.taskId) {
