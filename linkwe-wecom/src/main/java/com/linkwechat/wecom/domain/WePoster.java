@@ -7,8 +7,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -21,6 +21,9 @@ import java.util.List;
 @Data
 @TableName(value = "we_poster")
 @ApiModel(value = "海报")
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WePoster extends BaseEntity {
 
     @TableId(type = IdType.AUTO)

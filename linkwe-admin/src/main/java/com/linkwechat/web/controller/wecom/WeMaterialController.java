@@ -42,7 +42,7 @@ public class WeMaterialController extends BaseController {
     @Autowired
     private IWeMaterialService materialService;
 
-    @Resource
+    @Autowired
     private IWePosterService wePosterService;
 
 
