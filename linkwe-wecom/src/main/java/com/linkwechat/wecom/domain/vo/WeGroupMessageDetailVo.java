@@ -28,6 +28,10 @@ public class WeGroupMessageDetailVo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date sendTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty("刷新时间")
+    private Date refreshTime;
+
     @ApiModelProperty("附件")
     private List<WeGroupMessageAttachments> attachments;
 

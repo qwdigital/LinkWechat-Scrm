@@ -77,4 +77,11 @@ public class WeGroupMessageTemplate extends BaseEntity {
      */
     @ApiModelProperty("来源 0 群发 1 其他")
     private Integer source;
+
+    /**
+     * 刷新时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty("刷新时间")
+    private Date refreshTime;
 }

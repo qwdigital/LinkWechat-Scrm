@@ -93,30 +93,30 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
 
         WeGroupMessageDetailVo detailVo = new WeGroupMessageDetailVo();
         detailVo.setChatType(msgTemplate);
+        detailVo.setRefreshTime(weGroupMessageTemplate.getRefreshTime());
         detailVo.setSendTime(weGroupMessageTemplate.getSendTime());
         detailVo.setContent(weGroupMessageTemplate.getContent());
         List<WeGroupMessageListVo> groupMsgDetail = weGroupMessageListService.getGroupMsgDetail(id);
         if (CollectionUtil.isNotEmpty(groupMsgDetail)) {
             detailVo.setAttachments(groupMsgDetail.get(0).getAttachments());
-
             //待发送人员列表
-            List<WeGroupMessageTask> toBeSent = groupMsgDetail.stream().map(WeGroupMessageListVo::getSenders)
-                    .flatMap(Collection::stream).filter(item -> ObjectUtil.equal(0, item.getStatus())).collect(Collectors.toList());
-
+            Long toBeSent = groupMsgDetail.stream().map(WeGroupMessageListVo::getSenders)
+                    .flatMap(Collection::stream).filter(item -> ObjectUtil.equal(0, item.getStatus())).count();
+            detailVo.setToBeSendNum(toBeSent.intValue());
             //已发送人员列表
-            List<WeGroupMessageTask> alreadySent = groupMsgDetail.stream().map(WeGroupMessageListVo::getSenders)
-                    .flatMap(Collection::stream).filter(item -> ObjectUtil.equal(2, item.getStatus())).collect(Collectors.toList());
-
+            Long alreadySent = groupMsgDetail.stream().map(WeGroupMessageListVo::getSenders)
+                    .flatMap(Collection::stream).filter(item -> ObjectUtil.equal(2, item.getStatus())).count();
+            detailVo.setAlreadySendNum(alreadySent.intValue());
             //未发送客户数
             Long toBeCustomerNum = groupMsgDetail.stream().map(WeGroupMessageListVo::getExtralInfos).flatMap(Collection::stream)
                     .filter(item -> ObjectUtil.equal(0, item.getStatus())).count();
             detailVo.setToBeSendCustomerNum(toBeCustomerNum.intValue());
             //已发送客户数
             Long alreadyCustomerNum = groupMsgDetail.stream().map(WeGroupMessageListVo::getExtralInfos).flatMap(Collection::stream)
-                    .filter(item -> !ObjectUtil.equal(1, item.getStatus())).count();
+                    .filter(item -> ObjectUtil.equal(1, item.getStatus())).count();
             detailVo.setAlreadySendCustomerNum(alreadyCustomerNum.intValue());
             //未发送查询每个人员对应客户信息
-            if (CollectionUtil.isNotEmpty(toBeSent)) {
+            /*if (CollectionUtil.isNotEmpty(toBeSent)) {
                 List<WeGroupMessageTaskVo> toBeSentList = toBeSent.stream().map(userInfo -> {
                     WeGroupMessageTaskVo weGroupMessageTaskVo = new WeGroupMessageTaskVo();
                     weGroupMessageTaskVo.setUserId(userInfo.getUserId());
@@ -138,9 +138,9 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                 }).collect(Collectors.toList());
                 detailVo.setToBeSendList(toBeSentList);
                 detailVo.setToBeSendNum(toBeSentList.size());
-            }
+            }*/
             //已发送查询每个人员对应客户信息
-            if (CollectionUtil.isNotEmpty(alreadySent)) {
+            /*if (CollectionUtil.isNotEmpty(alreadySent)) {
                 List<WeGroupMessageTaskVo> alreadySentList = alreadySent.stream().map(userInfo -> {
                     WeGroupMessageTaskVo weGroupMessageTaskVo = new WeGroupMessageTaskVo();
                     weGroupMessageTaskVo.setUserId(userInfo.getUserId());
@@ -163,7 +163,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                 }).collect(Collectors.toList());
                 detailVo.setAlreadySendList(alreadySentList);
                 detailVo.setAlreadySendNum(alreadySentList.size());
-            }
+            }*/
         }
         return detailVo;
     }
@@ -309,6 +309,9 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     @Async
     @Override
     public void syncGroupMsgSendResultByIds(List<Long> asList) {
+        WeGroupMessageTemplate template = new WeGroupMessageTemplate();
+        template.setRefreshTime(new Date());
+        this.update(template,new LambdaQueryWrapper<WeGroupMessageTemplate>().in(WeGroupMessageTemplate::getId,asList));
         List<WeGroupMessageList> weGroupMessageLists = weGroupMessageListService.list(new LambdaQueryWrapper<WeGroupMessageList>()
                 .in(WeGroupMessageList::getMsgTemplateId, asList));
         List<WeGroupMessageTask> taskList = new ArrayList<>();

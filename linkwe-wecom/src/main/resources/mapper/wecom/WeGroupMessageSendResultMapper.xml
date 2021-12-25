@@ -47,13 +47,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 and wgmsr.status = #{status}
             </if>
             <if test="customerName != null and customerName != ''">
-                and wc.name like concat('%', #{customerName}, '%')
+                and exists
+                (select 1 from we_customer wc where
+                wc.external_userid = wgmsr.external_userid
+                and wc.name like concat('%', #{customerName}, '%'))
             </if>
             <if test="userName != null and userName != ''">
-                and wu.user_name like concat('%', #{userName}, '%')
+                and exists
+                (select 1 from we_user wu where
+                wu.user_id = wgmsr.user_id
+                and wu.user_name like concat('%', #{userName}, '%'))
             </if>
             <if test="chatName != null and chatName != ''">
-                and wg.group_name like concat('%', #{chatName}, '%')
+                and exists
+                (select 1 from we_group wg where wg.chat_id = wgmsr.chat_id
+                and wg.group_name like concat('%', #{chatName}, '%'))
             </if>
             <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
                 AND date_format(wgmsr.send_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
