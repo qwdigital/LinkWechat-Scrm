@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
@@ -96,7 +97,27 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
         detailVo.setRefreshTime(weGroupMessageTemplate.getRefreshTime());
         detailVo.setSendTime(weGroupMessageTemplate.getSendTime());
         detailVo.setContent(weGroupMessageTemplate.getContent());
-        List<WeGroupMessageListVo> groupMsgDetail = weGroupMessageListService.getGroupMsgDetail(id);
+        List<WeGroupMessageAttachments> attachmentsList = attachmentsService.lambdaQuery().eq(WeGroupMessageAttachments::getMsgTemplateId, id).list();
+        detailVo.setAttachments(attachmentsList);
+        List<WeGroupMessageTask> taskList = messageTaskService.lambdaQuery().eq(WeGroupMessageTask::getMsgTemplateId, id).list();
+        if(CollectionUtil.isNotEmpty(taskList)){
+            //待发送人员列表
+            Long toBeSent = taskList.stream().filter(item -> ObjectUtil.equal(0, item.getStatus())).count();
+            detailVo.setToBeSendNum(toBeSent.intValue());
+            //已发送人员列表
+            Long alreadySent = taskList.stream().filter(item -> ObjectUtil.equal(2, item.getStatus())).count();
+            detailVo.setAlreadySendNum(alreadySent.intValue());
+        }
+        List<WeGroupMessageSendResult> resultList = messageSendResultService.lambdaQuery().eq(WeGroupMessageSendResult::getMsgTemplateId, id).list();
+        if(CollectionUtil.isNotEmpty(resultList)){
+            //未发送客户数
+            Long toBeCustomerNum = resultList.stream().filter(item -> ObjectUtil.equal(0, item.getStatus())).count();
+            detailVo.setToBeSendCustomerNum(toBeCustomerNum.intValue());
+            //已发送客户数
+            Long alreadyCustomerNum = resultList.stream().filter(item -> ObjectUtil.equal(1, item.getStatus())).count();
+            detailVo.setAlreadySendCustomerNum(alreadyCustomerNum.intValue());
+        }
+        /*List<WeGroupMessageListVo> groupMsgDetail = weGroupMessageListService.getGroupMsgDetail(id);
         if (CollectionUtil.isNotEmpty(groupMsgDetail)) {
             detailVo.setAttachments(groupMsgDetail.get(0).getAttachments());
             //待发送人员列表
@@ -116,7 +137,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                     .filter(item -> ObjectUtil.equal(1, item.getStatus())).count();
             detailVo.setAlreadySendCustomerNum(alreadyCustomerNum.intValue());
             //未发送查询每个人员对应客户信息
-            /*if (CollectionUtil.isNotEmpty(toBeSent)) {
+            if (CollectionUtil.isNotEmpty(toBeSent)) {
                 List<WeGroupMessageTaskVo> toBeSentList = toBeSent.stream().map(userInfo -> {
                     WeGroupMessageTaskVo weGroupMessageTaskVo = new WeGroupMessageTaskVo();
                     weGroupMessageTaskVo.setUserId(userInfo.getUserId());
@@ -163,8 +184,8 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                 }).collect(Collectors.toList());
                 detailVo.setAlreadySendList(alreadySentList);
                 detailVo.setAlreadySendNum(alreadySentList.size());
-            }*/
-        }
+            }
+        }*/
         return detailVo;
     }
 
