@@ -24,9 +24,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             (select wu.user_name from we_user wu where wu.user_id = wgmt.user_id limit 1) as user_name,
             wgmt.status,
             wgmt.send_time,
-            (select group_concat((select wc.name from we_customer wc where wc.external_userid = wgmsr.external_userid limit 1)) as customer_name
+            (select group_concat(distinct (select wc.name from we_customer wc where wc.external_userid = wgmsr.external_userid limit 1)) as customer_name
             from we_group_message_send_result wgmsr where wgmsr.user_id = wgmt.user_id and wgmsr.status = 0) as to_be_customer_name ,
-            (select group_concat((select wc.name from we_customer wc where wc.external_userid = wgmsr.external_userid limit 1)) as customer_name
+            (select group_concat(distinct (select wc.name from we_customer wc where wc.external_userid = wgmsr.external_userid limit 1)) as customer_name
             from we_group_message_send_result wgmsr where wgmsr.user_id = wgmt.user_id and wgmsr.status = 1) as already_customer_name
         from we_group_message_task wgmt
         <where>
