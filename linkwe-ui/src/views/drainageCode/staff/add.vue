@@ -103,13 +103,13 @@
                     <el-time-select v-model="item.startDate" :disabled="index === 0" :picker-options="{
                       start: '00:00',
                       end: '23:59',
-                      step:'00:05'
+                      step:'00:30'
                     }" :end="item.endDate" @change="checkStartEnd($event, index)" placeholder="任意时间点">
                     </el-time-select>
                     <el-time-select :picker-options="{
                       start: '00:00',
                       end: '23:59',
-                      step:'00:05'
+                      step:'00:30'
                     }" :start="item.startDate" @change="checkStartEnd($event, index)" v-model="item.endDate" :disabled="index === 0" placeholder="任意时间点">
                     </el-time-select>
                   </el-form-item>
