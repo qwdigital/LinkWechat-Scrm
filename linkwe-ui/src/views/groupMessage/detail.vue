@@ -7,8 +7,8 @@
             <div class="name">
               群发统计
             </div>
-            <div class="operation" v-if="data.refreshTime">
-              最近同步时间：{{data.refreshTime}}
+            <div class="operation">
+              <span v-if="data.refreshTime">最近同步时间：{{data.refreshTime}}</span>    
               <el-button style="margin-left:20px;" type="primary" size="mini" @click="setFn">同步</el-button>
             </div>
           </div>
@@ -18,7 +18,7 @@
                 已发送员工
               </div>
               <div style="font-size:18px;color: #000;">
-                {{data.alreadySendNum}}
+                {{data.alreadySendNum ? data.alreadySendNum: 0}}
               </div>
             </div>
             <div class="item">
@@ -26,7 +26,7 @@
                 未发送员工
               </div>
               <div style="font-size:18px;color: #000;">
-                {{data.toBeSendNum}}
+                {{data.toBeSendNum ? data.toBeSendNum : 0}}
               </div>
             </div>
             <div class="item">
@@ -34,7 +34,7 @@
                 已送达客户
               </div>
               <div style="font-size:18px;color: #000;">
-                {{data.alreadySendCustomerNum}}
+                {{data.alreadySendCustomerNum ? data.alreadySendCustomerNum: 0}}
               </div>
             </div>
             <div class="item">
@@ -42,7 +42,7 @@
                 未送达客户
               </div>
               <div style="font-size:18px;color: #000;">
-                {{data.toBeSendCustomerNum}}
+                {{data.toBeSendCustomerNum ? data.toBeSendCustomerNum: 0}}
               </div>
             </div>
           </div>
@@ -74,8 +74,16 @@
           <div>
             <el-table v-loading="member.loading" :data="member.list">
               <el-table-column label="发送员工" align="center" prop="userName" />
-              <el-table-column label="预计发送客户" align="center" prop="total" />
-              <el-table-column label="实际发送客户" align="center" prop="already" />
+              <el-table-column label="预计发送客户" align="center" prop="total">
+                 <template slot-scope="scope">
+                  {{ scope.row.total ? scope.row.total: 0 }}
+                </template>
+              </el-table-column>
+              <el-table-column label="实际发送客户" align="center" prop="already" >
+              <template slot-scope="scope">
+                  {{ scope.row.already ? scope.row.already: 0 }}
+                </template>
+              </el-table-column>
               <el-table-column label="发送状态" align="center" prop="status">
                 <template slot-scope="scope">
                   {{ memberState[scope.row.status] }}
