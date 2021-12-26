@@ -25,9 +25,10 @@
             <div>
               <div class="item-magin aic">
                 <div class="item-name">选择群主：</div>
-                <el-tag v-for="(unit, unique) in selectCustomerGroupList" :key="unique">
+                <!-- <el-tag v-for="(unit, unique) in selectCustomerGroupList" :key="unique">
                   {{ unit.groupLeaderName }}
-                </el-tag>
+                </el-tag> -->
+                <el-tag v-for="item in selectCustomerGroupList" :key="item.userId">{{ item.name }}</el-tag>
                 <el-button type="primary" size="mini" :class="selectCustomerGroupList.length == 1 && 'ml10'" icon="el-icon-circle-plus-outline" plain @click="onSelectCustomerGroup">选择群主</el-button>
               </div>
             </div>
@@ -111,7 +112,8 @@
     </SelectTag>
 
     <!-- 选择客户群聊 -->
-    <SelectCustomerGroup :visible.sync="dialogVisibleSelectCustomerGroup" @success="submitSelectCustomerGroup" :multiSelect="true"></SelectCustomerGroup>
+    <!-- <SelectCustomerGroup :visible.sync="dialogVisibleSelectCustomerGroup" @success="submitSelectCustomerGroup" :multiSelect="true"></SelectCustomerGroup> -->
+    <SelectUser :visible.sync="dialogVisibleSelectCustomerGroup" title="选择添加人" :isOnlyLeaf="false" destroyOnClose :defaultValues="selectCustomerGroupList" @success="submitSelectCustomerGroup"></SelectUser>
 
   </div>
 </template>
@@ -354,7 +356,7 @@
           data.isAll = data.pushRange === 0 ? true : false
         } else {
           if (data.clientGroup === 1) {
-            data.senderList = this.selectCustomerGroupList.map((i) => { return { userId: i.owner } })
+            data.senderList = this.selectCustomerGroupList.map((i) => { return { userId: i.userId } })
           } else {
             data.senderList = []
           }
@@ -392,17 +394,18 @@
       },
       // 选择群主
       submitSelectCustomerGroup (data) {
-        let newData = []
-        if (data && data.length > 0) {
-          let keyMap = new Set()
-          data.forEach(i => {
-            if (!keyMap.has(i.owner)) {
-              newData.push(i)
-              keyMap.add(i.owner)
-            }
-          })
-        }
-        this.selectCustomerGroupList = newData
+        this.selectCustomerGroupList = data
+        // let newData = []
+        // if (data && data.length > 0) {
+        //   let keyMap = new Set()
+        //   data.forEach(i => {
+        //     if (!keyMap.has(i.owner)) {
+        //       newData.push(i)
+        //       keyMap.add(i.owner)
+        //     }
+        //   })
+        // }
+        // this.selectCustomerGroupList = newData
         this.$refs.form.clearValidate('clientGroup')
       },
       onSelectTag () {

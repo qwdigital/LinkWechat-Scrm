@@ -159,7 +159,7 @@
     methods: {
       gotoRoute () {
         this.$router.push({
-          path: '/customerMaintain/enterprise/publish'
+          path: '/customerMaintain/friendCircle/publish'
         })
       },
       setTimeChange (e) {
