@@ -8,14 +8,14 @@
               群发统计
             </div>
             <div class="operation">
-              <span v-if="data.refreshTime">最近同步时间：{{data.refreshTime}}</span>    
+              <span v-if="data.refreshTime">最近同步时间：{{data.refreshTime}}</span>
               <el-button style="margin-left:20px;" type="primary" size="mini" @click="setFn">同步</el-button>
             </div>
           </div>
           <div class="total_list">
             <div class="item">
               <div>
-                已发送员工
+                已发送{{data.chatType === 1 ? '员工':'群主'}}
               </div>
               <div style="font-size:18px;color: #000;">
                 {{data.alreadySendNum ? data.alreadySendNum: 0}}
@@ -23,7 +23,7 @@
             </div>
             <div class="item">
               <div>
-                未发送员工
+                未发送{{data.chatType === 1 ? '员工':'群主'}}
               </div>
               <div style="font-size:18px;color: #000;">
                 {{data.toBeSendNum ? data.toBeSendNum : 0}}
@@ -31,7 +31,7 @@
             </div>
             <div class="item">
               <div>
-                已送达客户
+                已送达{{data.chatType === 1 ? '客户':'客户群'}}
               </div>
               <div style="font-size:18px;color: #000;">
                 {{data.alreadySendCustomerNum ? data.alreadySendCustomerNum: 0}}
@@ -39,7 +39,7 @@
             </div>
             <div class="item">
               <div>
-                未送达客户
+                未送达{{data.chatType === 1 ? '客户':'客户群'}}
               </div>
               <div style="font-size:18px;color: #000;">
                 {{data.toBeSendCustomerNum ? data.toBeSendCustomerNum: 0}}
@@ -50,13 +50,13 @@
         <div class="g-card g-pad20">
           <div class="title">
             <div class="name">
-              员工详情
+              {{data.chatType === 1 ? '员工':'群主'}}详情
             </div>
           </div>
           <div class="search">
             <el-form :model="queryMember" ref="queryMemberForm" :inline="true" label-position="left" class="top-search" label-width="70px">
-              <el-form-item label="发送员工" prop="userName">
-                <el-input size="mini" v-model="queryMember.userName" style="width:150px;" placeholder="请输入发送员工" />
+              <el-form-item :label="data.chatType === 1 ? '发送员工':'发送群主'" prop="userName">
+                <el-input size="mini" v-model="queryMember.userName" style="width:150px;" placeholder="请输入" />
               </el-form-item>
               <el-form-item label="发送状态" prop="status">
                 <el-select v-model="queryMember.status" placeholder="请选择发送状态" size="mini">
@@ -73,15 +73,15 @@
           </div>
           <div>
             <el-table v-loading="member.loading" :data="member.list">
-              <el-table-column label="发送员工" align="center" prop="userName" />
-              <el-table-column label="预计发送客户" align="center" prop="total">
-                 <template slot-scope="scope">
-                  {{ scope.row.total ? scope.row.total: 0 }}
+              <el-table-column :label="data.chatType === 1 ? '发送员工':'发送群主'" align="center" prop="userName" />
+              <el-table-column :label="data.chatType === 1 ? '预计发送客户':'预计发送客户群'" align="center" prop="total">
+                <template slot-scope="scope">
+                  {{ scope.row.toBeCustomerName ? scope.row.toBeCustomerName: 0}}
                 </template>
               </el-table-column>
-              <el-table-column label="实际发送客户" align="center" prop="already" >
-              <template slot-scope="scope">
-                  {{ scope.row.already ? scope.row.already: 0 }}
+              <el-table-column :label="data.chatType === 1 ? '实际发送客户':'实际发送客户群'" align="center" prop="already">
+                <template slot-scope="scope">
+                  {{ scope.row.alreadyCustomerName ? scope.row.alreadyCustomerName: 0 }}
                 </template>
               </el-table-column>
               <el-table-column label="发送状态" align="center" prop="status">
@@ -96,13 +96,13 @@
         <div class="g-card g-pad20">
           <div class="title">
             <div class="name">
-              客户详情
+              {{data.chatType === 1 ? '客户':'客户群'}}详情
             </div>
           </div>
           <div class="search">
-            <el-form :model="queryCustomer" ref="queryForm" :inline="true" label-position="left" class="top-search" label-width="70px">
-              <el-form-item label="发送客户" prop="customerName">
-                <el-input size="mini" v-model="queryCustomer.customerName" style="width:150px;" placeholder="请输入发送客户" />
+            <el-form :model="queryCustomer" ref="queryForm" :inline="true" label-position="left" class="top-search" label-width="90px">
+              <el-form-item :label="data.chatType === 1 ? '发送客户':'发送客户群'" prop="customerName">
+                <el-input size="mini" v-model="queryCustomer.customerName" style="width:150px;" placeholder="请输入" />
               </el-form-item>
               <el-form-item label="发送状态" prop="status">
                 <el-select v-model="queryCustomer.status" placeholder="请选择发送状态" size="mini">
@@ -119,8 +119,8 @@
           </div>
           <div>
             <el-table v-loading="customer.loading" :data="customer.list">
-              <el-table-column label="客户" align="center" prop="customerName" />
-              <el-table-column label="所属员工" align="center" prop="userName" />
+              <el-table-column :label="data.chatType === 1 ? '客户':'客户群'" align="center" prop="customerName" />
+              <el-table-column :label="data.chatType === 1 ? '所属员工':'所属群主'" align="center" prop="userName" />
               <el-table-column label="送达时间" align="center" prop="sendTime" width="180"></el-table-column>
               <el-table-column label="送达状态" align="center" prop="status">
                 <template slot-scope="scope">
@@ -193,6 +193,7 @@
           materialMsgList: [],
         },
         data: {
+          chatType: 1,
           alreadySendCustomerNum: 0,
           alreadySendNum: 0,
           toBeSendCustomerNum: 0,
@@ -273,12 +274,46 @@
         this.queryMember.pageNum = e.page
         this.getMemberList()
       },
+      setEditList (list) {
+        let arr = []
+        if (list && list.length) {
+          list.forEach(dd => {
+            if (dd.msgType === 'image') {
+              let obj = {
+                msgType: '0',
+                materialUrl: dd.picUrl
+              }
+              arr.push(obj)
+            } else if (dd.msgType === 'link') {
+              let ob = {
+                msgType: '7',
+                materialName: dd.title,
+                content: dd.linkUrl
+              }
+              arr.push(ob)
+            } else if (dd.msgType === 'miniprogram') {
+              let ff = {
+                msgType: '8',
+                materialUrl: dd.appId,
+                materialName: dd.title,
+                coverUrl: dd.picUrl,
+                content: dd.linkUrl
+              }
+              arr.push(ff)
+            }
+          })
+        }
+        return arr
+      },
       getDetail () {
         getDetail(this.msgId).then(res => {
           if (res.code == 200) {
             this.data = res.data
             this.form.welcomeMsg = res.data.content
-            this.form.materialMsgList = res.data.attachments
+            // this.form.materialMsgList = res.data.attachments
+            // this.form.welcomeMsg = res.data.attachments ? res.data.attachments[0].content : '',
+            this.form.materialMsgList = res.data.attachments ? this.setEditList(res.data.attachments) : []
+            this.$forceUpdate()
           } else {
             this.msgError(res.msg || '获取失败')
           }
@@ -300,7 +335,7 @@
     }
     .operation {
       display: flex;
-      align-items: center;
+      align-items: end;
       font-size: 12px;
       color: #999;
     }
