@@ -27,16 +27,16 @@ import java.util.List;
 public class WeCommunityH5Controller extends BaseController {
 
     @Autowired
-    private IWePresTagGroupTaskService tagGroupTaskService;
+    IWePresTagGroupTaskService tagGroupTaskService;
 
     @Autowired
-    private IWeGroupSopService sopService;
+    IWeGroupSopService sopService;
 
     @Autowired
-    private IWeCommunityKeywordToGroupService keywordToGroupService;
+    IWeCommunityKeywordToGroupService keywordToGroupService;
 
     @Autowired
-    private ISysUserService userService;
+    ISysUserService userService;
 
     /**
      * 获取任务对应的执行人列表
@@ -65,8 +65,8 @@ public class WeCommunityH5Controller extends BaseController {
         AjaxResult res = AjaxResult.success();
         if (type.equals(CommunityTaskType.TAG.getType())) {
             // 老客标签建群数据
-            res.put("todo", tagGroupTaskService.getEmplTaskList(emplId, false));
-            res.put("done", tagGroupTaskService.getEmplTaskList(emplId, true));
+            res.put("todo", tagGroupTaskService.getFollowerTaskList(emplId, 0));
+            res.put("done", tagGroupTaskService.getFollowerTaskList(emplId, 1));
         } else if (type.equals(CommunityTaskType.SOP.getType())) {
             // 群SOP数据
             res.put("todo", sopService.getEmplTaskList(emplId, false));
@@ -75,10 +75,10 @@ public class WeCommunityH5Controller extends BaseController {
             // 全部数据
             List todoList = new ArrayList();
             List doneList = new ArrayList();
-            todoList.addAll(tagGroupTaskService.getEmplTaskList(emplId, false));
+            todoList.addAll(tagGroupTaskService.getFollowerTaskList(emplId, 0));
             todoList.addAll(sopService.getEmplTaskList(emplId, false));
             res.put("todo", todoList);
-            doneList.addAll(tagGroupTaskService.getEmplTaskList(emplId, true));
+            doneList.addAll(tagGroupTaskService.getFollowerTaskList(emplId, 1));
             doneList.addAll(sopService.getEmplTaskList(emplId, true));
             res.put("done", doneList);
         }
@@ -99,11 +99,11 @@ public class WeCommunityH5Controller extends BaseController {
     @GetMapping("/changeStatus")
     public AjaxResult changeStatus(@RequestParam("taskId") Long taskId, @RequestParam("emplId") String emplId, @RequestParam("type") Integer type) {
         if (type.equals(0)) {
-            return toAjax(tagGroupTaskService.updateEmplTaskStatus(taskId, emplId));
+
+            return toAjax(tagGroupTaskService.updateFollowerTaskStatus(taskId, emplId));
         } else {
             return toAjax(sopService.updateChatSopStatus(taskId, emplId));
         }
-
     }
 
     /**

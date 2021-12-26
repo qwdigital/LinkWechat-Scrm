@@ -18,7 +18,6 @@ import com.linkwechat.common.utils.Threads;
 import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.wecom.annotation.SynchRecord;
 import com.linkwechat.wecom.client.WeCustomerClient;
-import com.linkwechat.wecom.client.WeMsgAuditClient;
 import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.constants.SynchRecordConstants;
 import com.linkwechat.wecom.domain.WeCustomerAddUser;
