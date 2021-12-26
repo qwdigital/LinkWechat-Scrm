@@ -26,7 +26,7 @@ export default {
         1: '信息动态',
         2: '社交动态',
         3: '跟进动态',
-        4: '待办动态'
+        4: '互动动态'
       },
       recod: [],
       active: '0',
@@ -243,8 +243,14 @@ export default {
                     <el-step
                       v-for="(unit, unique) of item.trackStateList"
                       :key="unique"
-                      :title="dictTrackState[~~unit.trackState + ''].name"
-                      :status="dictTrackState[~~unit.trackState + ''].color"
+                      :title="
+                        dictTrackState[+unit.trackState + ''] &&
+                          dictTrackState[+unit.trackState + ''].name
+                      "
+                      :status="
+                        dictTrackState[+unit.trackState + ''] &&
+                          dictTrackState[+unit.trackState + ''].color
+                      "
                       :description="unit.trackTime"
                     ></el-step>
                   </el-steps>

@@ -8,13 +8,13 @@ export default {
     // 实际群活码
     groupCodeId: {
       type: String,
-      default: '',
+      default: ''
     },
     // 检索状态
     status: {
       type: Number,
-      default: -1,
-    },
+      default: -1
+    }
   },
   data() {
     const checkScanTimes = (rule, value, callback) => {
@@ -33,13 +33,13 @@ export default {
         // 当前页码
         pageNum: 1,
         // 每页数据量
-        pageSize: 10,
+        pageSize: 10
       },
       // 可选状态
       statusOptions: [
         { label: '全部状态', value: -1 },
         { label: '使用中', value: 0 },
-        { label: '已使用', value: 1 },
+        { label: '已使用', value: 1 }
       ],
       // 加载状态
       loading: false,
@@ -60,7 +60,7 @@ export default {
         effectTime: '',
         scanCodeTimesLimit: '',
         chatId: '',
-        chatGroupName: '',
+        chatGroupName: ''
       },
       // 当前编辑的实际群码
       editedRealCodeId: null,
@@ -70,31 +70,25 @@ export default {
       total: 0,
       // 表单验证
       rules: {
-        groupName: [
-          { required: true, message: '请输入群名称', trigger: 'blur' },
-        ],
-        actualGroupQrCode: [
-          { required: true, message: '请上传实际群码', trigger: 'blur' },
-        ],
-        effectTime: [
-          { required: true, message: '请选择有效期', trigger: 'blur' },
-        ],
+        groupName: [{ required: true, message: '请输入群名称', trigger: 'blur' }],
+        actualGroupQrCode: [{ required: true, message: '请上传实际群码', trigger: 'blur' }],
+        effectTime: [{ required: true, message: '请选择有效期', trigger: 'blur' }],
         scanCodeTimesLimit: [
           { required: true, message: '请输入扫码次数', trigger: 'blur' },
           {
             pattern: /^[1-9][0-9]*$/,
             message: '扫码次数必须为正整数',
-            trigger: 'blur',
+            trigger: 'blur'
           },
-          { validator: checkScanTimes, trigger: 'blur' },
-        ],
+          { validator: checkScanTimes, trigger: 'blur' }
+        ]
       },
       // 日期选择器选项
       datePickerOptions: {
         disabledDate(time) {
           return time.getTime() <= Date.now() - 8.64e7
-        },
-      },
+        }
+      }
     }
   },
   watch: {
@@ -105,7 +99,7 @@ export default {
         this.form.chatGroupName = ''
         this.editedRealCodeId = null
       }
-    },
+    }
   },
   created() {
     this.query.status = this.status
@@ -116,7 +110,7 @@ export default {
     // 获取所有实际群码
     getRealCodes() {
       let params = {
-        groupCodeId: this.groupCodeId,
+        groupCodeId: this.groupCodeId
       }
 
       if (this.query.status !== -1) {
@@ -124,7 +118,7 @@ export default {
       } else {
         params = Object.assign(params, {
           pageNum: this.query.pageNum,
-          pageSize: this.query.pageSize,
+          pageSize: this.query.pageSize
         })
       }
 
@@ -149,14 +143,13 @@ export default {
         if (!valid) return
 
         const data = Object.assign({}, this.form, {
-          groupCodeId: this.groupCodeId,
+          groupCodeId: this.groupCodeId
         })
 
-        add(data)
-          .then((res) => {
-            this.dialog = false
-            this.getRealCodes()
-          })
+        add(data).then((res) => {
+          this.dialog = false
+          this.getRealCodes()
+        })
       })
     },
     // 编辑
@@ -169,7 +162,7 @@ export default {
         effectTime: realCode.effectTime,
         scanCodeTimesLimit: realCode.scanCodeTimesLimit,
         chatId: realCode.chatId,
-        chatGroupName: realCode.chatGroupName,
+        chatGroupName: realCode.chatGroupName
       }
 
       this.dialog = true
@@ -181,16 +174,15 @@ export default {
 
         const data = Object.assign(
           {
-            id: this.editedRealCodeId,
+            id: this.editedRealCodeId
           },
           this.form
         )
 
-        update(data)
-          .then((res) => {
-            this.dialog = false
-            this.getRealCodes()
-          })
+        update(data).then((res) => {
+          this.dialog = false
+          this.getRealCodes()
+        })
       })
     },
     handleSubmit() {
@@ -200,47 +192,37 @@ export default {
     },
     // 批量删除
     handleBulkRemove() {
-      this.$confirm(
-        '确认删除当前实际群码?删除操作无法撤销，请谨慎操作。',
-        '提示',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
-        }
-      )
+      this.$confirm('确认删除当前实际群码?删除操作无法撤销，请谨慎操作。', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
         .then(() => {
           const ids = this.multiRealCode.map((code) => code.id)
 
-          remove(ids + '')
-            .then((res) => {
-              if (res.code === 200) {
-                this.getRealCodes()
-              } else {
-              }
-            })
+          remove(ids + '').then((res) => {
+            if (res.code === 200) {
+              this.getRealCodes()
+            } else {
+            }
+          })
         })
         .catch(() => {})
     },
     // 删除
     handleRemove(id) {
-      this.$confirm(
-        '确认删除当前实际群码?删除操作无法撤销，请谨慎操作。',
-        '提示',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
-        }
-      )
+      this.$confirm('确认删除当前实际群码?删除操作无法撤销，请谨慎操作。', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
         .then(() => {
-          remove(id)
-            .then((res) => {
-              if (res.code === 200) {
-                this.getRealCodes()
-              } else {
-              }
-            })
+          remove(id).then((res) => {
+            if (res.code === 200) {
+              this.getRealCodes()
+            } else {
+            }
+          })
         })
         .catch(() => {})
     },
@@ -257,7 +239,7 @@ export default {
       this.form.chatId = customerGroup ? customerGroup.chatId : ''
       this.form.chatGroupName = customerGroup ? customerGroup.groupName : ''
       this.customerDialog = false
-    },
+    }
   }
 }
 </script>
@@ -269,11 +251,7 @@ export default {
         <el-button type="primary" @click="dialog = true">
           新建实际群码
         </el-button>
-        <el-select
-          v-model="query.status"
-          class="ml10"
-          @change="getRealCodes"
-        >
+        <el-select v-model="query.status" class="ml10" @change="getRealCodes">
           <el-option
             v-for="option in statusOptions"
             :key="option.value"
@@ -283,36 +261,16 @@ export default {
         </el-select>
       </div>
       <div>
-        <el-button
-          :disabled="multiRealCode.length === 0"
-          @click="handleBulkRemove"
-        >
+        <el-button :disabled="multiRealCode.length === 0" @click="handleBulkRemove">
           批量删除
         </el-button>
       </div>
     </div>
 
-    <el-table
-      :data="realCodes"
-      v-loading="loading"
-      @selection-change="handleSelectionChange"
-    >
-      <el-table-column
-        type="selection"
-        width="55"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        prop="groupName"
-        label="群名称"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        prop="actualGroupQrCode"
-        label="实际群码"
-        align="center"
-        width="80"
-      >
+    <el-table :data="realCodes" v-loading="loading" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" align="center"></el-table-column>
+      <el-table-column prop="groupName" label="群名称" align="center"></el-table-column>
+      <el-table-column prop="actualGroupQrCode" label="实际群码" align="center" width="80">
         <template #default="{ row }">
           <el-popover placement="bottom" trigger="hover">
             <el-image
@@ -324,31 +282,15 @@ export default {
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="chatGroupName"
-        label="客户群"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        prop="effectTime"
-        label="有效期"
-        align="center"
-      ></el-table-column>
+      <el-table-column prop="chatGroupName" label="客户群" align="center"></el-table-column>
+      <el-table-column prop="effectTime" label="有效期" align="center"></el-table-column>
       <el-table-column
         prop="scanCodeTimesLimit"
         label="扫码次数限制"
         align="center"
       ></el-table-column>
-      <el-table-column
-        prop="scanCodeTimes"
-        label="已扫码次数"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        prop="status"
-        label="使用状态"
-        align="center"
-      >
+      <el-table-column prop="scanCodeTimes" label="已扫码入群数" align="center"></el-table-column>
+      <el-table-column prop="status" label="使用状态" align="center">
         <template #default="{ row }">
           <div v-if="parseInt(row.status) === 0" class="green-text">使用中</div>
           <div v-else class="red-text">已使用</div>
@@ -356,34 +298,16 @@ export default {
       </el-table-column>
       <el-table-column label="操作" align="center">
         <template #default="{ row }">
-          <el-button
-            type="text"
-            size="mini"
-            @click="edit(row)"
-            >编辑</el-button
-          >
-          <el-button
-            type="text"
-            size="mini"
-            @click="handleRemove(row.id)"
-            >删除</el-button
-          >
+          <el-button type="text" size="mini" @click="edit(row)">编辑</el-button>
+          <el-button type="text" size="mini" @click="handleRemove(row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <el-dialog title="实际群码" :visible.sync="dialog" append-to-body>
-      <el-form
-        :model="form"
-        ref="form"
-        label-width="120px"
-        :rules="rules"
-      >
+      <el-form :model="form" ref="form" label-width="120px" :rules="rules">
         <el-form-item label="群名称" prop="groupName">
-          <el-input
-            v-model="form.groupName"
-            placeholder="请输入群名称"
-          ></el-input>
+          <el-input v-model="form.groupName" placeholder="请输入群名称"></el-input>
         </el-form-item>
         <el-form-item label="实际群码" prop="actualGroupQrCode">
           <upload :fileUrl.sync="form.actualGroupQrCode" class="image-uploader">
@@ -434,11 +358,7 @@ export default {
         </el-form-item>
       </el-form>
 
-      <el-dialog
-        title="选择客户群"
-        append-to-body
-        :visible.sync="customerDialog"
-      >
+      <el-dialog title="选择客户群" append-to-body :visible.sync="customerDialog">
         <Customer
           v-if="customerDialog"
           ref="customer"
@@ -452,11 +372,7 @@ export default {
         </div>
       </el-dialog>
 
-      <el-dialog
-        :visible.sync="exampleDialog"
-        append-to-body
-        width="250px"
-      >
+      <el-dialog :visible.sync="exampleDialog" append-to-body width="250px">
         <div class="example-code-box">
           <div class="example-text">
             如图所示为标准的微信群二维码:
@@ -466,8 +382,7 @@ export default {
             实际群名称
           </div>
           <div class="code-content">
-            <el-image :src="require('@/assets/example/groupCode.png')">
-            </el-image>
+            <el-image :src="require('@/assets/example/groupCode.png')"> </el-image>
           </div>
         </div>
       </el-dialog>
