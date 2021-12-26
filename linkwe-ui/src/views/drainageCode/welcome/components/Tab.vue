@@ -181,8 +181,8 @@
           data.imageText.forEach(dd => {
             let obj = {
               materialName: dd.imageTextTile,
-              content: dd.imageTextUrl,
-              msgType: '7'
+              materialUrl: dd.imageTextUrl,
+              msgType: '8'
             }
             imgText.push(obj)
           })
@@ -191,10 +191,10 @@
           data.applet.forEach(cc => {
             let obj = {
               materialName: cc.appTile,
-              materialUrl: cc.appId,
-              content: cc.appPath,
+              digest: cc.appId,
+              materialUrl: cc.appPath,
               coverUrl: cc.appPic,
-              msgType: '8'
+              msgType: '9'
             }
             applet.push(obj)
           })

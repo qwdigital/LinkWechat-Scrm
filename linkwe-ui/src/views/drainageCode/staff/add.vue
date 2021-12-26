@@ -495,7 +495,7 @@
           }
           this.materialData = {
             welcomeMsg: base.qrAttachments ? base.qrAttachments[0].content : '',
-            materialMsgList: base.qrAttachments ? this.setEditList(base.qrAttachments.slice(1)) : []
+            materialMsgList: base.qrAttachments ? this.setEditList(base.qrAttachments) : []
           }
           // this.materialData.materialMsgList.forEach(ddd => {
           //   ddd.msgType = Number(ddd.msgType)
@@ -515,18 +515,18 @@
               arr.push(obj)
             } else if (dd.msgType === 'link') {
               let ob = {
-                msgType: '7',
+                msgType: '8',
                 materialName: dd.title,
-                content: dd.linkUrl
+                materialUrl: dd.linkUrl
               }
               arr.push(ob)
             } else if (dd.msgType === 'miniprogram') {
               let ff = {
-                msgType: '8',
-                materialUrl: dd.appId,
+                msgType: '9',
+                digest: dd.appId,
                 materialName: dd.title,
                 coverUrl: dd.picUrl,
-                content: dd.linkUrl
+                materialUrl: dd.linkUrl
               }
               arr.push(ff)
             }
@@ -642,20 +642,20 @@
                 picUrl: dd.materialUrl
               }
               arr.push(obj)
-            } else if (dd.msgType === '7') {
+            } else if (dd.msgType === '8') {
               let ob = {
                 msgType: 'link',
                 title: dd.materialName,
-                linkUrl: dd.content
+                linkUrl: dd.materialUrl
               }
               arr.push(ob)
-            } else if (dd.msgType === '8') {
+            } else if (dd.msgType === '9') {
               let ff = {
                 msgType: 'miniprogram',
-                appId: dd.materialUrl,
+                appId: dd.digest,
                 title: dd.materialName,
                 picUrl: dd.coverUrl,
-                linkUrl: dd.content
+                linkUrl: dd.materialUrl
               }
               arr.push(ff)
             }

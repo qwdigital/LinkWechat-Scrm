@@ -243,7 +243,7 @@
           this.form = res.data
           if (this.form.qrAttachments && this.form.qrAttachments.length) {
             this.form.welcomeMsg = this.form.qrAttachments[0].content
-            this.form.materialMsgList = this.setEditList(this.form.qrAttachments.slice(1))
+            this.form.materialMsgList = this.setEditList(this.form.qrAttachments)
           }
           this.form.qrUserInfos.forEach(dd => {
             if (dd.workCycle) {
@@ -268,18 +268,18 @@
               arr.push(obj)
             } else if (dd.msgType === 'link') {
               let ob = {
-                msgType: '7',
+                msgType: '8',
                 materialName: dd.title,
-                content: dd.linkUrl
+                materialUrl: dd.linkUrl
               }
               arr.push(ob)
             } else if (dd.msgType === 'miniprogram') {
               let ff = {
-                msgType: '8',
-                materialUrl: dd.appId,
+                msgType: '9',
+                digest: dd.appId,
                 materialName: dd.title,
                 coverUrl: dd.picUrl,
-                content: dd.linkUrl
+                materialUrl: dd.linkUrl
               }
               arr.push(ff)
             }

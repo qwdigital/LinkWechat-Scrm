@@ -66,18 +66,18 @@
           if (unit.msgType === '0') {
             img.push(unit.materialUrl)
           }
-          if (unit.msgType === '7') {
+          if (unit.msgType === '8') {
             let obj = {
               imageTextTile: unit.materialName,
-              imageTextUrl: unit.content
+              imageTextUrl: unit.materialUrl
             }
             imgText.push(obj)
           }
-          if (unit.msgType === '8') {
+          if (unit.msgType === '9') {
             let oob = {
               appTile: unit.materialName,
-              appId: unit.materialUrl,
-              appPath: unit.content,
+              appId: unit.digest,
+              appPath: unit.materialUrl,
               appPic: unit.coverUrl
             }
             applet.push(oob)
@@ -108,7 +108,6 @@
       getData () {
         // getPreview(this.form.id).then(({ data }) => {
         this.materialData = this.form
-        console.log(this.materialData)
         this.materialData.users = []
         if (this.materialData.userIds) {
           let name = this.materialData.userNames.split(',')
@@ -120,7 +119,6 @@
             this.materialData.users.push(obj)
           })
         }
-        console.log(this.materialData.users)
         this.materialData.materialMsgList = []
         let img = []
         let imgText = []
@@ -138,8 +136,8 @@
           this.form.imageText.forEach(dd => {
             let obj = {
               materialName: dd.imageTextTile,
-              content: dd.imageTextUrl,
-              msgType: '7'
+              materialUrl: dd.imageTextUrl,
+              msgType: '8'
             }
             imgText.push(obj)
           })
@@ -148,10 +146,10 @@
           this.form.applet.forEach(cc => {
             let obj = {
               materialName: cc.appTile,
-              materialUrl: cc.appId,
-              content: cc.appPath,
+              digest: cc.appId,
+              materialUrl: cc.appPath,
               coverUrl: cc.appPic,
-              msgType: '8'
+              msgType: '9'
             }
             applet.push(obj)
           })

@@ -37,8 +37,8 @@
         const titleMap = {
           4: '文本',
           0: '图片',
-          7: '图文',
-          8: '小程序'
+          8: '图文',
+          9: '小程序'
         }
         return titleMap[this.type] || '素材'
       },

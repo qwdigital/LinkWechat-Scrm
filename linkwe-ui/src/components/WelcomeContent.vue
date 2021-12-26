@@ -61,7 +61,7 @@
               </el-form-item>
             </div>
             <!-- 图文 -->
-            <div class="my-cord" v-else-if="item.msgType == '7'">
+            <div class="my-cord" v-else-if="item.msgType == '8'">
               <div class="operation">
                 <div v-if="showMorMaterial" class="algin" @click="onChooseMaterial(item.msgType, index)">
                   <img style="margin-right: 3px" :src="require('@/assets/drainageCode/code-add.png')" alt="" />从素材中选择
@@ -73,15 +73,15 @@
               <el-form-item label="图文标题" style="width: 50%" required :error="item.materialNameError">
                 <el-input v-model="item.materialName" placeholder="请输入图文标题" maxlength="64" show-word-limit clearable></el-input>
               </el-form-item>
-              <el-form-item label="图文链接" style="width: 50%" required :error="item.contentError">
-                <el-input v-model="item.content" placeholder="请输入图文链接"></el-input>
+              <el-form-item label="图文链接" style="width: 50%" required :error="item.materialUrlError">
+                <el-input v-model="item.materialUrl" placeholder="请输入图文链接"></el-input>
                 <div class="sub-des">
                   仅支持公众号图文链接，且必须以 http://或 https://开头
                 </div>
               </el-form-item>
             </div>
             <!-- 小程序 -->
-            <div class="my-cord" v-else-if="item.msgType == '8'">
+            <div class="my-cord" v-else-if="item.msgType == '9'">
               <div class="operation">
                 <div v-if="showMorMaterial" class="algin" @click="onChooseMaterial(item.msgType, index)">
                   <img style="margin-right: 3px" :src="require('@/assets/drainageCode/code-add.png')" alt="" />从素材中选择
@@ -93,14 +93,14 @@
               <el-form-item label="小程序标题" style="width: 50%" required :error="item.materialNameError">
                 <el-input v-model="item.materialName" placeholder="请输入小程序标题" maxlength="64" show-word-limit clearable></el-input>
               </el-form-item>
-              <el-form-item label="小程序AppID" style="width: 50%" required :error="item.materialUrlError">
-                <el-input v-model="item.materialUrl" placeholder="请输入小程序AppID"></el-input>
+              <el-form-item label="小程序AppID" style="width: 50%" required :error="item.digestError">
+                <el-input v-model="item.digest" placeholder="请输入小程序AppID"></el-input>
                 <div class="sub-des">
                   必须是审核通过，正常发布，且关联到企业的小程序应用
                 </div>
               </el-form-item>
-              <el-form-item label="小程序路径" style="width: 50%" required :error="item.contentError">
-                <el-input v-model="item.content" placeholder="请输入小程序路径"></el-input>
+              <el-form-item label="小程序路径" style="width: 50%" required :error="item.materialUrlError">
+                <el-input v-model="item.materialUrl" placeholder="请输入小程序路径"></el-input>
                 <div class="sub-des">必须以 html 作为后缀</div>
               </el-form-item>
               <el-form-item label="小程序封面" required :error="item.coverUrlError">
@@ -122,10 +122,10 @@
                 <el-dropdown-item :command="'0'" v-if="showType('0')">
                   <el-button type="text">图片</el-button>
                 </el-dropdown-item>
-                <el-dropdown-item :command="'7'" v-if="showType('7')">
+                <el-dropdown-item :command="'8'" v-if="showType('8')">
                   <el-button type="text">图文</el-button>
                 </el-dropdown-item>
-                <el-dropdown-item :command="'8'" v-if="showType('8')">
+                <el-dropdown-item :command="'9'" v-if="showType('9')">
                   <el-button type="text">小程序</el-button>
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -380,32 +380,32 @@
               errorMsg: '请上传图片'
             }
           ],
-          '7': [
+          '8': [
             {
               checkField: 'materialName',
               errorField: 'materialNameError',
               errorMsg: '请输入图文标题'
             },
             {
-              checkField: 'content',
-              errorField: 'contentError',
+              checkField: 'materialUrl',
+              errorField: 'materialUrlError',
               errorMsg: '请输入图文链接'
             }
           ],
-          '8': [
+          '9': [
             {
               checkField: 'materialName',
               errorField: 'materialNameError',
               errorMsg: '请输入小程序标题'
             },
             {
-              checkField: 'materialUrl',
-              errorField: 'materialUrlError',
+              checkField: 'digest',
+              errorField: 'digestError',
               errorMsg: '请输入小程序AppID'
             },
             {
-              checkField: 'content',
-              errorField: 'contentError',
+              checkField: 'materialUrl',
+              errorField: 'materialUrlError',
               errorMsg: '请输入小程序路径'
             },
             {
@@ -455,18 +455,18 @@
         if (checkMaterialResult) {
           let goto = true
           this.form.materialMsgList.forEach((dd) => {
-            if (dd.msgType === '7') {
+            if (dd.msgType === '8') {
               let reUrl = /(http|https):\/\/([\w.]+\/?)\S*/
-              if (!reUrl.test(dd.content)) {
+              if (!reUrl.test(dd.materialUrl)) {
                 goto = false
-                dd.contentError = '必须以 http://或 https://开头'
+                dd.materialUrlError = '必须以 http://或 https://开头'
               }
             }
-            if (dd.msgType === '8') {
+            if (dd.msgType === '9') {
               let htm = /^.*html$/
-              if (!htm.test(dd.content)) {
+              if (!htm.test(dd.materialUrl)) {
                 goto = false
-                dd.contentError = '必须以 html 作为后缀'
+                dd.materialUrlError = '必须以 html 作为后缀'
               }
             }
           })

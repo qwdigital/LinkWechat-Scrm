@@ -122,15 +122,21 @@
       <el-table-column prop="materialUrl" v-if="type == 0" label="图片地址"></el-table-column>
 
       <!-- 图文 -->
-      <template v-if="type == 7">
-        <el-table-column prop="materialName" label="图片标题"></el-table-column>
-        <el-table-column prop="content" label="图文链接"></el-table-column>
+      <!-- <template v-if="type == 7">
+        <el-table-column prop="materialName" label="图文标题"></el-table-column>
+        <el-table-column prop="materialUrl" label="图文链接"></el-table-column>
+      </template> -->
+
+      <!-- 链接 -->
+      <template v-if="type == 8">
+        <el-table-column prop="materialName" label="图文标题"></el-table-column>
+        <el-table-column prop="materialUrl" label="图文链接"></el-table-column>
       </template>
 
       <!-- 小程序 -->
-      <template v-if="type == 8">
+      <template v-if="type == 9">
         <el-table-column prop="materialName" label="小程序标题"></el-table-column>
-        <el-table-column prop="materialUrl" label="小程序AppID"></el-table-column>
+        <el-table-column prop="digest" label="小程序AppID"></el-table-column>
       </template>
 
       <el-table-column prop="updateTime" label="最近更新时间"></el-table-column>

@@ -22,14 +22,14 @@
 						<img :src="data.materialUrl" />
 					</div>
 				</div>
-				<div class="msg" v-if="data.msgType === '7'">
+				<div class="msg" v-if="data.msgType === '8'">
 					<div class="word-and-image">
 						<div>
 							{{data.materialName}}
 						</div>
 						<div class="sub-content">
 							<div>
-								{{data.digest}}
+								<!-- {{data.materialUrl}} -->
 							</div>
 							<div>
 								<img src="../assets/drainageCode/default_icon.png" />
@@ -37,7 +37,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="msg" v-if="data.msgType === '8'">
+				<div class="msg" v-if="data.msgType === '9'">
 					<div class="miniprogram">
 						<div class="mini-header">
 							<img src="../assets/drainageCode/miniprogram-icon.png" alt=""> {{data.materialName}}
