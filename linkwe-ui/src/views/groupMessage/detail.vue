@@ -7,7 +7,7 @@
             <div class="name">
               群发统计
             </div>
-            <div class="operation">
+            <div class="operation" v-if="isTask">
               <span v-if="data.refreshTime">最近同步时间：{{data.refreshTime}}</span>
               <el-button style="margin-left:20px;" type="primary" size="mini" @click="setFn">同步</el-button>
             </div>
@@ -203,12 +203,14 @@
         activeName: '0',
         total1: 0,
         total0: 0,
-        msgId: ''
+        msgId: '',
+        isTask: 0
       }
     },
     watch: {},
     computed: {},
     created () {
+      this.isTask = this.$route.query.isTask
       this.msgId = this.$route.query.id
       this.queryMember.msgTemplateId = this.msgId
       this.queryCustomer.msgTemplateId = this.msgId
@@ -226,6 +228,8 @@
         }).then(() => {
           syncMsg(this.msgId).then(fdfd => {
             this.getDetail()
+            this.getMemberList()
+            this.getCustomerList()
             this.$message({
               type: 'success',
               message: '同步成功!'
@@ -286,18 +290,18 @@
               arr.push(obj)
             } else if (dd.msgType === 'link') {
               let ob = {
-                msgType: '7',
+                msgType: '8',
                 materialName: dd.title,
-                content: dd.linkUrl
+                materialUrl: dd.linkUrl
               }
               arr.push(ob)
             } else if (dd.msgType === 'miniprogram') {
               let ff = {
-                msgType: '8',
-                materialUrl: dd.appId,
+                msgType: '9',
+                digest: dd.appId,
                 materialName: dd.title,
                 coverUrl: dd.picUrl,
-                content: dd.linkUrl
+                materialUrl: dd.linkUrl
               }
               arr.push(ff)
             }

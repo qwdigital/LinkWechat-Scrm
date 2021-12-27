@@ -373,7 +373,6 @@
         return arr
       },
       save (materialData) {
-        console.log(materialData)
         let list = this.resetData(materialData.materialMsgList)
         let myObj = {
           content: materialData.welcomeMsg,
