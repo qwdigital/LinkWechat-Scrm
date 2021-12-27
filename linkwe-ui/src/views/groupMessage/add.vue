@@ -341,11 +341,49 @@
         }
         return dest
       },
+      resetData (list) {
+        let arr = []
+        if (list && list.length) {
+          list.forEach(dd => {
+            if (dd.msgType === '0') {
+              let obj = {
+                msgType: 'image',
+                picUrl: dd.materialUrl
+              }
+              arr.push(obj)
+            } else if (dd.msgType === '8') {
+              let ob = {
+                msgType: 'link',
+                title: dd.materialName,
+                linkUrl: dd.materialUrl
+              }
+              arr.push(ob)
+            } else if (dd.msgType === '9') {
+              let ff = {
+                msgType: 'miniprogram',
+                appId: dd.digest,
+                title: dd.materialName,
+                picUrl: dd.coverUrl,
+                linkUrl: dd.materialUrl
+              }
+              arr.push(ff)
+            }
+          })
+        }
+        return arr
+      },
       save (materialData) {
-        let data = Object.assign({}, this.form, {
+        console.log(materialData)
+        let list = this.resetData(materialData.materialMsgList)
+        let myObj = {
           content: materialData.welcomeMsg,
-          attachmentsList: materialData.materialMsgList
-        })
+          attachments: [{
+            content: materialData.welcomeMsg,
+            msgType: 'text'
+          }]
+        }
+        myObj.attachments.push(...list)
+        let data = Object.assign({}, this.form, myObj)
         data.senderList = []
         data = JSON.parse(JSON.stringify(data))
         if (data.chatType === 1) {
