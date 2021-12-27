@@ -130,6 +130,7 @@
   import SelectTag from '@/components/SelectTag'
   import WelcomeDetail from '@/components/WelcomeContent.vue'
   import SelectCustomerGroup from '@/components/SelectCustomerGroup'
+  import moment from 'moment'
   import { parseTime } from '@/utils/common'
   export default {
     components: {
@@ -296,8 +297,8 @@
             if (this.form.pushRange == 1) {
               data.userIds = this.form.sendClientUserList.map(i => i.userId).join(',')
               data.tagIds = this.form.sendClientTagList.map(i => i.tagId).join(',')
-              data.beginTime = this.form.rangeTime[0] ? parseTime(new Date(this.form.rangeTime[0])) : ''
-              data.endTime = this.form.rangeTime[1] ? parseTime(new Date(this.form.rangeTime[1])) : ''
+              data.beginTime = this.form.rangeTime[0] ? moment(this.form.rangeTime[0]).format("YYYY-MM-DD") : ''
+              data.endTime = this.form.rangeTime[1] ? moment(this.form.rangeTime[1]).format("YYYY-MM-DD") : ''
               data.gender = this.form.gender
               data.trackState = this.form.trackState
               getCustomerList(data).then(res => {
