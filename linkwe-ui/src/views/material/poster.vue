@@ -85,7 +85,7 @@ export default {
             title: '', // 海报名称
             categoryId: '', // 所属分类
             type: '1', // 海报类型
-            status: 0, // 是否启用
+            status: 0, // 是否启用  0 启用 1 不启用
             backgroundImgPath: '', // 图片url
             mediaId: '' // 图片id
           }
@@ -520,8 +520,8 @@ export default {
             </el-form-item> -->
               <el-form-item label="是否启用" prop="status">
                 <el-radio-group v-model="form.status">
-                  <el-radio :label="1">是</el-radio>
-                  <el-radio :label="0">否</el-radio>
+                  <el-radio :label="0">是</el-radio>
+                  <el-radio :label="1">否</el-radio>
                 </el-radio-group>
               </el-form-item>
               <el-form-item label="背景图片" :required="true" :error="rangeErrorMsg">

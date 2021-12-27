@@ -95,9 +95,20 @@ export default {
           loading.close()
         })
     },
-    // 选中数据
-    handleCurrentChange(val) {
-      this.currentRow = val
+    // // 选中数据
+    // handleCurrentChange(val) {
+    //   this.currentRow = val
+    // },
+    // 多选框选中数据
+    handleSelectionChange(selection) {
+      this.currentRow = selection[0]
+    },
+    // 用于多选变单选
+    handleSelection(selection, row) {
+      this.$nextTick(() => {
+        this.$refs.table.clearSelection()
+        this.$refs.table.toggleRowSelection(row)
+      })
     }
   }
 }
@@ -123,8 +134,16 @@ export default {
       </el-form-item>
 
       <el-form-item label>
-        <el-button v-hasPermi="['customerManage:dimission:query']" type="primary" @click="getList(1)">查询</el-button>
-        <el-button v-hasPermi="['customerManage:dimission:query']" type="success" @click="resetForm('queryForm')"
+        <el-button
+          v-hasPermi="['customerManage:dimission:query']"
+          type="primary"
+          @click="getList(1)"
+          >查询</el-button
+        >
+        <el-button
+          v-hasPermi="['customerManage:dimission:query']"
+          type="success"
+          @click="resetForm('queryForm')"
           >重置</el-button
         >
       </el-form-item>
@@ -139,7 +158,10 @@ export default {
           @click="$router.push({ path: 'allocatedStaffList' })"
           >已分配的离职员工</el-button
         >
-        <el-button v-hasPermi="['customerManage:dimission:allocate']" type="info" @click="showSelectDialog"
+        <el-button
+          v-hasPermi="['customerManage:dimission:allocate']"
+          type="info"
+          @click="showSelectDialog"
           >分配给其他员工</el-button
         >
       </div>
@@ -152,13 +174,23 @@ export default {
       tooltip-effect="dark"
       style="width: 100%"
       highlight-current-row
-      @current-change="handleCurrentChange"
+      @select="handleSelection"
+      @selection-change="handleSelectionChange"
     >
+      <el-table-column type="selection" align="center" width="55"> </el-table-column>
       <el-table-column type="index" label="序号" width="55"></el-table-column>
       <el-table-column prop="userName" label="已离职员工"></el-table-column>
       <el-table-column prop="department" label="所属部门"></el-table-column>
-      <el-table-column prop="allocateCustomerNum" label="待分配客户数" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="allocateGroupNum" label="待分配群聊数" show-overflow-tooltip></el-table-column>
+      <el-table-column
+        prop="allocateCustomerNum"
+        label="待分配客户数"
+        show-overflow-tooltip
+      ></el-table-column>
+      <el-table-column
+        prop="allocateGroupNum"
+        label="待分配群聊数"
+        show-overflow-tooltip
+      ></el-table-column>
       <el-table-column prop="dimissionTime" label="离职时间" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.dimissionTime }}</template>
       </el-table-column>
@@ -178,7 +210,11 @@ export default {
     />
 
     <!-- 选择添加人弹窗 -->
-    <SelectUser :visible.sync="dialogVisibleSelectUser" title="选择分配人" @success="allocate"></SelectUser>
+    <SelectUser
+      :visible.sync="dialogVisibleSelectUser"
+      title="选择分配人"
+      @success="allocate"
+    ></SelectUser>
   </div>
 </template>
 

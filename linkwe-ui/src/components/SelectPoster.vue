@@ -37,7 +37,8 @@ export default {
         pageNum: 1,
         pageSize: 10,
         categoryId: '',
-        search: ''
+        search: '',
+        status: 0 //  0 启用 1 不启用
       },
       selectPoster: {}
     }
