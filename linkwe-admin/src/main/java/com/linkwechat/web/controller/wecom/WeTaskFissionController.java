@@ -69,7 +69,7 @@ public class WeTaskFissionController extends BaseController {
     @ApiOperation(value = "查询任务宝列表", httpMethod = "GET")
     //    @PreAuthorize("@ss.hasPermi('wecom:fission:list')")
     @GetMapping("/list")
-    public TableDataInfo<List<WeTaskFission>> list(WeTaskFission weTaskFission) throws ParseException {
+    public TableDataInfo<List<WeTaskFission>> list(WeTaskFission weTaskFission){
         startPage();
         List<WeTaskFission> list = weTaskFissionService.selectWeTaskFissionList(weTaskFission);
         return getDataTable(list);
@@ -106,7 +106,7 @@ public class WeTaskFissionController extends BaseController {
     //    @PreAuthorize("@ss.hasPermi('wecom:fission:export')")
     @Log(title = "任务宝", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
-    public AjaxResult export(WeTaskFission weTaskFission) throws ParseException {
+    public AjaxResult export(WeTaskFission weTaskFission) {
         List<WeTaskFission> list = weTaskFissionService.selectWeTaskFissionList(weTaskFission);
         ExcelUtil<WeTaskFission> util = new ExcelUtil<WeTaskFission>(WeTaskFission.class);
         return util.exportExcel(list, "fission");

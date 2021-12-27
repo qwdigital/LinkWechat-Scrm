@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.event;
 
 import com.linkwechat.wecom.domain.callback.WeCallBackEvent;
 import com.linkwechat.wecom.domain.query.WeCustomerWelcomeQuery;
+import com.linkwechat.wecom.domain.query.WeTaskEventQuery;
 import com.linkwechat.wecom.domain.query.qr.WeQrCodeEventQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -47,5 +48,13 @@ public class WeEventPublisherService implements ApplicationEventPublisherAware {
     public void refreshQrCode(String qrId) {
         log.info("刷新活码任务：qrId:{}", qrId);
         applicationEventPublisher.publishEvent(new WeQrCodeEventQuery(this, qrId));
+    }
+
+    /**
+     * 群发任务回调
+     */
+    public void callBackTask(Long businessId,Integer source, Integer resultCode) {
+        log.info("群发任务回调：businessId:{},source:{},resultCode:{}", businessId,source,resultCode);
+        applicationEventPublisher.publishEvent(new WeTaskEventQuery(this, businessId,source,resultCode));
     }
 }

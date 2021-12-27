@@ -108,13 +108,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
      * @return 任务宝
      */
     @Override
-    public List<WeTaskFission> selectWeTaskFissionList(WeTaskFission weTaskFission) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        SimpleDateFormat sdf_day = new SimpleDateFormat("yyyy-MM-dd");
-        if (weTaskFission.getStartTime() != null && weTaskFission.getOverTime() != null) {
-            weTaskFission.setStartTime(sdf.parse(sdf_day.format(weTaskFission.getStartTime()) + " 00:00:00"));
-            weTaskFission.setOverTime(sdf.parse(sdf_day.format(weTaskFission.getOverTime()) + " 23:59:59"));
-        }
+    public List<WeTaskFission> selectWeTaskFissionList(WeTaskFission weTaskFission){
         return weTaskFissionMapper.selectWeTaskFissionList(weTaskFission);
     }
 
@@ -127,8 +121,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
     @Override
     @Transactional(rollbackFor = {Exception.class,WeComException.class})
     public void insertWeTaskFission(WeTaskFission weTaskFission) {
-        weTaskFission.setCreateBy(SecurityUtils.getUsername());
-        weTaskFission.setCreateTime(DateUtils.getNowDate());
+        weTaskFission.setFissStatus(0);
         groupQrcodeHandler(weTaskFission);
         int insertResult = weTaskFissionMapper.insertWeTaskFission(weTaskFission);
         if (insertResult > 0) {
@@ -210,6 +203,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
         String pageUrlStr = StringUtils.format(pageUrl,weTaskFission.getId(),fissStaffId,weTaskFission.getPostersId());
 
         WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
+        messageQuery.setBusinessId(weTaskFission.getId());
         messageQuery.setChatType(1);
         messageQuery.setSource(1);
         messageQuery.setIsAll(false);

@@ -20,6 +20,7 @@ import com.linkwechat.wecom.domain.query.WeAddMsgTemplateQuery;
 import com.linkwechat.wecom.service.IWeGroupMessageListService;
 import com.linkwechat.wecom.service.IWeGroupMessageTemplateService;
 import com.linkwechat.wecom.service.IWeMaterialService;
+import com.linkwechat.wecom.service.event.WeEventPublisherService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -52,9 +53,13 @@ public class WeGroupMessageTaskHandler implements ApplicationRunner {
     private IWeMaterialService weMaterialService;
 
     @Autowired
+    private WeEventPublisherService weEventPublisherService;
+
+    @Autowired
     private RedisCache redisCache;
 
-    private AtomicLong templateId;
+    private WeAddGroupMessageQuery query;
+
 
     @Override
     public void run(ApplicationArguments args) {
@@ -72,9 +77,8 @@ public class WeGroupMessageTaskHandler implements ApplicationRunner {
                         try {
                             //当时间小于当前时间时删除第一个记录，并发送群发消息
                             log.info("获取到消息,执行群发任务: {}", item.getValue());
-                            WeAddGroupMessageQuery query = JSONObject.parseObject(item.getValue(), WeAddGroupMessageQuery.class);
+                            query = JSONObject.parseObject(item.getValue(), WeAddGroupMessageQuery.class);
                             if (query != null) {
-                                templateId = new AtomicLong(query.getId());
                                 Optional.of(query).map(WeAddGroupMessageQuery::getSenderList).orElseGet(ArrayList::new).forEach(sender -> {
                                     WeAddMsgTemplateQuery templateQuery = new WeAddMsgTemplateQuery();
                                     templateQuery.setChat_type(query.getChatType());
@@ -101,9 +105,12 @@ public class WeGroupMessageTaskHandler implements ApplicationRunner {
                                     }
                                 });
                                 WeGroupMessageTemplate template = new WeGroupMessageTemplate();
-                                template.setId(templateId.get());
+                                template.setId(query.getId());
                                 template.setStatus(1);
                                 groupMessageTemplateService.updateById(template);
+                                if(!ObjectUtil.equal(0,query.getSource())){
+                                    weEventPublisherService.callBackTask(query.getBusinessId(),query.getSource(),1);
+                                }
                             }
                         } finally {
                             redisCache.removeRangeCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY, 0, 0);
@@ -113,11 +120,14 @@ public class WeGroupMessageTaskHandler implements ApplicationRunner {
             } catch (Exception e) {
                 e.printStackTrace();
                 //任务异常修改模板状态为失败
-                if (templateId != null) {
+                if (query.getId() != null) {
                     WeGroupMessageTemplate template = new WeGroupMessageTemplate();
-                    template.setId(templateId.get());
+                    template.setId(query.getId());
                     template.setStatus(-1);
                     groupMessageTemplateService.updateById(template);
+                }
+                if(!ObjectUtil.equal(0,query.getSource())){
+                    weEventPublisherService.callBackTask(query.getBusinessId(),query.getSource(),-1);
                 }
             }
         }

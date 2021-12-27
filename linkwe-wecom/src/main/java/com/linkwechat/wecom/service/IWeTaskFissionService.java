@@ -33,7 +33,7 @@ public interface IWeTaskFissionService extends IService<WeTaskFission> {
      * @param weTaskFission 任务宝
      * @return 任务宝集合
      */
-    public List<WeTaskFission> selectWeTaskFissionList(WeTaskFission weTaskFission) throws ParseException;
+    public List<WeTaskFission> selectWeTaskFissionList(WeTaskFission weTaskFission);
 
     /**
      * 新增任务宝
