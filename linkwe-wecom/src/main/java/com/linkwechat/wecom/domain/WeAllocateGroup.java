@@ -25,8 +25,6 @@ public class WeAllocateGroup
 {
     private static final long serialVersionUID = 1L;
 
-    /** $column.columnComment */
-    private Long id= SnowFlakeUtil.nextId();
 
     /** 分配的群id */
     private String chatId;

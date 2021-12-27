@@ -3,7 +3,23 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.wecom.mapper.WeAllocateGroupMapper">
-    
 
+    <insert id="batchAddOrUpdate" >
+        INSERT INTO we_allocate_group(
+        chat_id,
+        new_owner,
+        err_msg,
+        status,
+        old_owner,
+        allocate_time
+        ) values
+        <foreach collection="weAllocateGroupList" item="item" index="index" separator=",">
+            (#{item.chatId},#{item.newOwner},#{item.errMsg},#{item.status},#{item.oldOwner},#{item.allocateTime})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        new_owner=IF(TRIM(VALUES(new_owner))  !=  '',VALUES(new_owner), we_allocate_group.new_owner),
+        allocate_time=IF(VALUES(allocate_time),VALUES(allocate_time),we_allocate_group.allocate_time),
+        status=IF(VALUES(status), VALUES(status), we_allocate_group.status);
+    </insert>
     
 </mapper>

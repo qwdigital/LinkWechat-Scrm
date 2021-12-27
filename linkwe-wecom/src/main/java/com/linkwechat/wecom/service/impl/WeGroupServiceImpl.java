@@ -82,32 +82,32 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
     @Override
     @Transactional
     public void allocateWeGroup(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
-        List<WeGroup> weGroups
-                = this.list(new LambdaQueryWrapper<WeGroup>().eq(WeGroup::getOwner, weLeaveUserInfoAllocateVo.getHandoverUserid()));
 
-        if(CollectionUtil.isNotEmpty(weGroups)){
+        List<WeAllocateGroup> weAllocateGroupList = iWeAllocateGroupService.list(new LambdaQueryWrapper<WeAllocateGroup>()
+                .eq(WeAllocateGroup::getOldOwner, weLeaveUserInfoAllocateVo.getHandoverUserid()));
 
-            //同步企业微信端
-            AllocateGroupDto allocateGroup = weUserClient.allocateGroup(
-                    AllocateWeGroupDto.builder()
-                            .chat_id_list(ArrayUtil.toArray(weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList()), String.class))
-                            .new_owner(weLeaveUserInfoAllocateVo.getTakeoverUserid())
-                            .build()
-            );
+        if(CollectionUtil.isNotEmpty(weAllocateGroupList)){
+            List<WeGroup> weGroups
+                    = this.list(new LambdaQueryWrapper<WeGroup>().in(WeGroup::getChatId,
+                    weAllocateGroupList.stream().map(WeAllocateGroup::getChatId).collect(Collectors.toList())));
 
-            //构建分配记录
-            List<WeAllocateGroup> weAllocateGroups = new ArrayList<>();
-            //更改本地群主
-            weGroups.stream().forEach(k -> {
-                k.setOwner(weLeaveUserInfoAllocateVo.getTakeoverUserid());
-                weAllocateGroups.add(WeAllocateGroup.builder()
-                        .allocateTime(new Date())
-                        .chatId(k.getChatId())
-                        .status(AllocateGroupStatus.ALLOCATE_GROUP_STATUS_BJTCG.getKey())
-                        .newOwner(weLeaveUserInfoAllocateVo.getTakeoverUserid())
-                        .oldOwner(weLeaveUserInfoAllocateVo.getHandoverUserid())
-                        .build());
-            });
+            if(CollectionUtil.isNotEmpty(weGroups)){
+
+                //同步企业微信端
+                AllocateGroupDto allocateGroup = weUserClient.allocateGroup(
+                        AllocateWeGroupDto.builder()
+                                .chat_id_list(ArrayUtil.toArray(weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList()), String.class))
+                                .new_owner(weLeaveUserInfoAllocateVo.getTakeoverUserid())
+                                .build()
+                );
+
+                //更改本地群主
+                weAllocateGroupList.stream().forEach(kk->{
+
+                    kk.setAllocateTime(new Date());
+                    kk.setNewOwner(weLeaveUserInfoAllocateVo.getTakeoverUserid());
+                });
+
 
 
                 //处理接替失败的群
@@ -121,7 +121,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                                 .setOwner(weLeaveUserInfoAllocateVo.getHandoverUserid());
 
                         WeAllocateGroup weAllocateGroup
-                                = weAllocateGroups.stream().filter(kk -> kk.getChatId().equals(k.getChat_id())).findFirst().get();
+                                = weAllocateGroupList.stream().filter(kk -> kk.getChatId().equals(k.getChat_id())).findFirst().get();
                         if(null != weAllocateGroup){
                             weAllocateGroup.setStatus(AllocateGroupStatus.ALLOCATE_GROUP_STATUS_JTSB.getKey());
                             weAllocateGroup.setErrMsg(weAllocateGroup.getErrMsg());
@@ -130,11 +130,18 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                     });
                 }
 
-            if(this.saveOrUpdateBatch(weGroups)){
-                iWeAllocateGroupService
-                        .saveOrUpdateBatch(weAllocateGroups);
+                if(this.saveOrUpdateBatch(weGroups)){
+                    iWeAllocateGroupService
+                            .batchAddOrUpdate(weAllocateGroupList);
+                }
             }
+
         }
+
+
+
+
+
 
     }
 
@@ -156,7 +163,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                 SecurityContextHolder.setContext(securityContext);
 
                 CustomerGroupList customerGroupList =
-                        weCustomerGroupClient.groupChatLists(new CustomerGroupList().new Params());
+                        weCustomerGroupClient.groupChatLists(CustomerGroupList.Params.builder().build());
                 if (customerGroupList.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)
                         && CollectionUtil.isNotEmpty(customerGroupList.getGroupChatList())) {
 
@@ -164,7 +171,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                     List<WeGroupMember> weGroupMembers = new ArrayList<>();
                     customerGroupList.getGroupChatList().stream().forEach(k -> {
                         CustomerGroupDetail customerGroupDetail = weCustomerGroupClient.groupChatDetail(
-                                new CustomerGroupDetail().new Params(k.getChatId(), 1)
+                                CustomerGroupDetail.Params.builder().chat_id(k.getChatId()).need_name(1).build()
                         );
 
                         if (customerGroupDetail.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)
@@ -227,7 +234,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
         List<WeGroup> weGroups = new ArrayList<>();
         List<WeGroupMember> weGroupMembers = new ArrayList<>();
         CustomerGroupDetail customerGroupDetail = weCustomerGroupClient.groupChatDetail(
-                new CustomerGroupDetail().new Params(chatId, 1)
+                CustomerGroupDetail.Params.builder().chat_id(chatId).need_name(1).build()
         );
         if (CollectionUtil.isNotEmpty(customerGroupDetail.getGroupChat())) {
             customerGroupDetail.getGroupChat().stream().forEach(kk -> {
@@ -272,7 +279,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
         List<WeGroup> weGroups = new ArrayList<>();
         List<WeGroupMember> weGroupMembers = new ArrayList<>();
         CustomerGroupDetail customerGroupDetail = weCustomerGroupClient.groupChatDetail(
-                new CustomerGroupDetail().new Params(chatId, 1)
+                CustomerGroupDetail.Params.builder().chat_id(chatId).need_name(1).build()
         );
         if (CollectionUtil.isNotEmpty(customerGroupDetail.getGroupChat())) {
             customerGroupDetail.getGroupChat().stream().forEach(kk -> {
@@ -323,8 +330,6 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
             List<List<WeGroup>> lists = Lists.partition(weGroups, 500);
             for (List<WeGroup> groupList : lists) {
                 this.baseMapper.insertBatch(groupList);
-//                this.remove(new LambdaQueryWrapper<WeGroup>()
-//                        .notIn(WeGroup::getChatId, groupList.stream().map(WeGroup::getChatId).collect(Collectors.toList())));
             }
         }else{
             List<WeGroup> oldWeGroups = this.list();
@@ -350,12 +355,6 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
             for (List<WeGroupMember> groupMemberList : lists) {
 
                 iWeGroupMemberService.insertBatch(groupMemberList);
-
-//                iWeGroupMemberService.remove(
-//                        new LambdaQueryWrapper<WeGroupMember>()
-//                                .notIn(WeGroupMember::getUserId,groupMemberList.stream().map(WeGroupMember::getUserId).collect(Collectors.toList()))
-//
-//                );
 
             }
 

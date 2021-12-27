@@ -108,8 +108,10 @@
         wu.user_name,
         wu.dimission_time,
         (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department,
-        (SELECT COUNT(*) FROM we_customer wc WHERE wc.first_user_id=wu.user_id) as allocateCustomerNum,
-        (SELECT COUNT(*) FROM we_group wg WHERE wg.`owner`=wu.user_id) as allocateGroupNum
+        (SELECT count(*) FROM we_allocate_customer wac
+        INNER  JOIN we_customer wc ON wac.external_userid=wc.external_userid
+        and wac.handover_userid=wc.first_user_id  WHERE wac.handover_userid=wu.user_id) as allocateCustomerNum,
+        (SELECT COUNT(*) FROM we_allocate_group wg WHERE wg.old_owner=wu.user_id) as allocateGroupNum
         FROM
         we_user wu
         <where>
@@ -156,6 +158,8 @@
         wc.`name` as customerName,
         wu.user_name as takeUserName,
         wac.allocate_time,
+        wc.external_userid as externalUserid,
+        wc.first_user_id as userId,
         (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department
         FROM
         we_allocate_customer wac
@@ -175,7 +179,7 @@
         SELECT
         wu.user_name as newOwnerName,
         wg.chat_id,
-        wg.group_name,
+        IF(wg.group_name,wg.group_name,"群聊")  as group_name,
         (SELECT count(*) FROM we_group_member wgm WHERE wgm.chat_id=wg.chat_id) as memberNum,
         (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department,
         wag.allocate_time

@@ -126,4 +126,13 @@ public interface WeUserClient {
      */
     @Request(url = "/user/getuserinfo",interceptor = WeAppAccessTokenInterceptor.class)
     WeUserInfoDto  getUserInfo(@Query("code")String code,@Header("agentId")String agentId);
+
+
+    /**
+     * 获取离职成员待分配客户
+     * @param checkParm
+     * @return
+     */
+    @Post(url = "/externalcontact/get_unassigned_list",interceptor = WeAccessTokenInterceptor.class)
+    AllocateWeCustomerDto getUnassignedList(@JSONBody AllocateWeCustomerDto.CheckParm checkParm);
 }

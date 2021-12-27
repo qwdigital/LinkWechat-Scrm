@@ -1,7 +1,10 @@
 package com.linkwechat.wecom.domain.dto.customer;
 
 import com.linkwechat.wecom.domain.dto.WeResultDto;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
@@ -19,12 +22,17 @@ public class CustomerGroupList extends WeResultDto {
      */
     private List<GroupChat> groupChatList;
 
+    private String next_cursor;
+
 
     /**
      * 请求参数
      */
     @Data
-    public class Params{
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Params{
 
 
         /**群状态过滤: 0 - 所有列表;1 - 离职待继承;2 - 离职继承中;3 - 离职继承完成; */
@@ -35,6 +43,10 @@ public class CustomerGroupList extends WeResultDto {
 
          /**分页，预期请求的数据量，取值范围 1 ~ 1000 */
         private Integer limit=new Integer(1000);
+
+        private String cursor;
+
+        private String owner_filter;
 
     }
 

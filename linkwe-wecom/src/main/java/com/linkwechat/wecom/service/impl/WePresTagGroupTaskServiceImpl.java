@@ -199,6 +199,23 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
         return rows;
     }
 
+
+    /**
+     * 更新任务同时推送消息
+     * @param task
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateTaskAndSendMsg(WePresTagGroupTask task) throws WeComException {
+        try {
+            this.updateTask(task);
+            this.sendMessage(task);
+        }catch (WeComException e){
+            throw e;
+        }
+
+    }
+
     @Override
     public List<WePresTagGroupTaskStat> getTaskStat(Long id, String customerName, Integer isInGroup, Integer isSent, Integer sendType) {
 
@@ -245,8 +262,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
     }
 
     @Override
-    @Async
-    public void sendMessage(WePresTagGroupTask task) {
+    public void sendMessage(WePresTagGroupTask task) throws  WeComException{
         Integer sendType = task.getSendType();
         try {
             // 企业群发逻辑
@@ -334,6 +350,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
         } catch (Exception e) {
             log.error("============> 老客标签建群任务发送失败, 任务明细: {}", task);
             log.error("错误信息: {}", e.getMessage());
+            throw new WeComException(e.getMessage());
         }
     }
 

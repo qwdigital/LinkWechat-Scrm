@@ -18,7 +18,9 @@
              <if test="name !=null and name !=''">
                  AND title like concat('%',#{name,jdbcType=VARCHAR},'%')
              </if>
-        and status = 0
+            <if test="status !=null">
+                AND status = #{status}
+            </if>
         and del_flag=0
         ORDER BY  create_time DESC
     </select>

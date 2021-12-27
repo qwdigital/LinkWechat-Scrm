@@ -304,12 +304,12 @@
             END
           AND CASE
                   WHEN ( SELECT cus_begin_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
-                      THEN cu.first_add_time &gt;= ( SELECT t.cus_begin_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                      THEN cu.first_add_time &gt;= ( SELECT t.cus_begin_time  FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
                   ELSE 1 = 1
             END
           AND CASE
                   WHEN ( SELECT cus_end_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
-                      THEN cu.first_add_time &lt;= (SELECT t.cus_end_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                      THEN cu.first_add_time &lt;= (SELECT t.cus_begin_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
                   WHEN (SELECT update_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})
                       THEN cu.first_add_time &lt;= ( SELECT t.update_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
                   WHEN (SELECT create_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})

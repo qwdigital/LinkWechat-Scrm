@@ -50,11 +50,11 @@ public class WeMaterialController extends BaseController {
     @GetMapping("/list")
     @ApiOperation("查询素材列表")
     public TableDataInfo list(@RequestParam(value = "categoryId", required = false) String categoryId
-            , @RequestParam(value = "search", required = false) String search,@RequestParam(value = "mediaType") String mediaType) {
+            , @RequestParam(value = "search", required = false) String search,@RequestParam(value = "mediaType") String mediaType,Integer status) {
         startPage();
         return getDataTable(
                 StringUtils.isNotBlank(mediaType) && mediaType.equals(MediaType.POSTER.getType())?
-                        wePosterService.findWePosterToWeMaterial(categoryId,search):
+                        wePosterService.findWePosterToWeMaterial(categoryId,search,status):
                         materialService.findWeMaterials(categoryId, search,mediaType)
         );
     }

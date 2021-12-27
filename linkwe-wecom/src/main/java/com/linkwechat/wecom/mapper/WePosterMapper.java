@@ -13,5 +13,5 @@ import java.util.List;
  * @author ws
  */
 public interface WePosterMapper extends BaseMapper<WePoster> {
-    List<WeMaterial> findWePosterToWeMaterial(@Param("categoryId") String categoryId,@Param("name") String name);
+    List<WeMaterial> findWePosterToWeMaterial(@Param("categoryId") String categoryId,@Param("name") String name,@Param("status") Integer status);
 }

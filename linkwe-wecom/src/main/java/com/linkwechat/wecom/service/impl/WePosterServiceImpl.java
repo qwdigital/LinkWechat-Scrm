@@ -207,7 +207,7 @@ public class WePosterServiceImpl extends ServiceImpl<WePosterMapper, WePoster> i
     }
 
     @Override
-    public List<WeMaterial> findWePosterToWeMaterial(String categoryId, String name) {
-        return this.baseMapper.findWePosterToWeMaterial(categoryId, name);
+    public List<WeMaterial> findWePosterToWeMaterial(String categoryId, String name,Integer status) {
+        return this.baseMapper.findWePosterToWeMaterial(categoryId, name,status);
     }
 }
