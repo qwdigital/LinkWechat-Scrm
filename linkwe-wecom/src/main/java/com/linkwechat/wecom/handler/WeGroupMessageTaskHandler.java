@@ -88,11 +88,11 @@ public class WeGroupMessageTaskHandler implements ApplicationRunner {
                                     }
                                     getMediaId(query.getAttachmentsList());
                                     templateQuery.setAttachments(query.getAttachmentsList());
-                                    if (StringUtils.isNotEmpty(query.getContent())) {
+                                    /*if (StringUtils.isNotEmpty(query.getContent())) {
                                         WeAddMsgTemplateQuery.Text text = new WeAddMsgTemplateQuery.Text();
                                         text.setContent(query.getContent());
                                         templateQuery.setText(text);
-                                    }
+                                    }*/
                                     SendMessageResultDto resultDto = customerMessagePushClient.addMsgTemplate(templateQuery);
                                     if (resultDto != null && ObjectUtil.equal(WeConstans.WE_SUCCESS_CODE, resultDto.getErrcode())) {
                                         String msgid = resultDto.getMsgid();

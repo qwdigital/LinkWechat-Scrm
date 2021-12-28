@@ -207,6 +207,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
         messageQuery.setChatType(1);
         messageQuery.setSource(1);
         messageQuery.setIsAll(false);
+        messageQuery.setContent(weTaskFission.getTaskName());
         WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
         weMessageTemplate.setMsgType(MessageType.LINK.getMessageType());
         weMessageTemplate.setMediaId(postersPath);

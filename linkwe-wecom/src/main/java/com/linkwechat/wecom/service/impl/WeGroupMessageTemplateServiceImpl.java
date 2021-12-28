@@ -216,13 +216,13 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                 return attachments;
             }).collect(Collectors.toList());
 
-            if (StringUtils.isNotEmpty(query.getContent())) {
+            /*if (StringUtils.isNotEmpty(query.getContent())) {
                 WeGroupMessageAttachments attachments = new WeGroupMessageAttachments();
                 attachments.setMsgTemplateId(weGroupMessageTemplate.getId());
                 attachments.setContent(query.getContent());
                 attachments.setMsgType(MessageType.TEXT.getMessageType());
                 attachmentsList.add(attachments);
-            }
+            }*/
             attachmentsService.saveBatch(attachmentsList);
 
 
