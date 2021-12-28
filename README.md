@@ -7,11 +7,11 @@
 
 [![star](https://gitee.com/LinkWeChat/link-wechat/badge/star.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/stargazers)
 [![fork](https://gitee.com/LinkWeChat/link-wechat/badge/fork.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/members)
-[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V1.5-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
+[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V2.0beta-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
 [![license](http://img.shields.io/badge/license-GPL%203.0-orange)](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
 [![木兰社区](https://img.shields.io/badge/Mulan-incubating-blue)](https://portal.mulanos.cn//)
 
-[官方网站](https://www.linkwechat.cn/#/d) | [演示系统](http://demo.linkwechat.cn/) | [帮助手册](https://www.yuque.com/linkwechat/help) | [用户手册(V1.5 待开放)](https://docs.qq.com/pdf/DZUNma3lVWW5Wb0po)
+[官方网站](https://www.linkwechat.cn/#/d) | [在线演示](http://demo.linkwechat.cn/) | [项目手册](https://www.yuque.com/linkwechat/help) | [用户手册V1.5](https://docs.qq.com/pdf/DZXFPdEN4ckVBVU1H) | [需求收集表](https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV)
 
 
 </div>
@@ -23,17 +23,11 @@
 
 ---
 
+ **<p align="center">LinkWeChat 2021 年度数据报告来啦，[快来查阅吧](https://gitee.com/LinkWeChat/link-wechat/blob/master/2021%E5%B9%B4%E6%8A%A5%E6%9C%80%E7%BB%88V2.jpg)~</p>** 
+
  **<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>** 
 
 ---
-
-# 年度报告
-
-2021年度 LinkWeChat 开源数据报告来啦~！
-
-[点击查看2021年度 LinkWeChat 开源数据报告](https://gitee.com/LinkWeChat/link-wechat/blob/master/2021%E5%B9%B4%E6%8A%A5%E6%9C%80%E7%BB%88V2.jpg)
-
-![输入图片说明](https://www.iamxiarui.com/wp-content/uploads/2021/12/CleanShot-2021-12-28-at-09.45.34.png)
 
 # 版权声明
 
@@ -46,6 +40,26 @@ LinkWeChat 开源团队拥有对本开源协议的最终解释权。
 需要注意的是，目前在国内 GPL 协议**具备合同特征，是一种民事法律行为** ，属于我国《合同法》调整的范围。LinkWeChat 项目团队保留诉讼权利。
 
 [相关案例：违反 GPL 协议赔偿 50 万，国内首例!](https://mp.weixin.qq.com/s/YQ6sNjbDS-P7BViLZIsaoA)
+
+# 最新动态
+
+ **1.发布LinkWeChat 2021年度开源数据报告** 
+
+[点击查看2021年度 LinkWeChat 开源数据报告](https://gitee.com/LinkWeChat/link-wechat/blob/master/2021%E5%B9%B4%E6%8A%A5%E6%9C%80%E7%BB%88V2.jpg)
+
+![输入图片说明](https://www.iamxiarui.com/wp-content/uploads/2021/12/CleanShot-2021-12-28-at-09.45.34.png)
+
+ **2.LinkWeChat V2.0 Beta 已发布** 
+
+LinkWeChat V2.0 在经过开源团队一个多月的封闭开发，已经发布 Beta 包，供开发者尝鲜，预计月底合并到主分支，开放演示环境体验。
+
+[点击获取 LinkWeChat V2.0 Beta 包](https://gitee.com/LinkWeChat/link-wechat/releases/v2.0.0.beta.3)
+
+ **3.LinkWeChat 试运行需求收集表** 
+
+LinkWeChat V2.0 正在加急上线，V2.1 版本已在研发中。后续需求大家有需要的产品功能、技术支持、文档说明以及友好的意见或建议，可以通过需求表直接提给我们，产品负责人会定时处理。
+
+[点击此处进入需求收集表，随时提需求](https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV)
 
 # 一、 关于 LinkWeChat
 
