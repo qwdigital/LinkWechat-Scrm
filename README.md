@@ -27,6 +27,14 @@
 
 ---
 
+# 年度报告
+
+2021年度 LinkWeChat 开源数据报告来啦~！
+
+[点击查看2021年度 LinkWeChat 开源数据报告](https://gitee.com/LinkWeChat/link-wechat/blob/master/2021%E5%B9%B4%E6%8A%A5%E6%9C%80%E7%BB%88.jpeg)
+
+![输入图片说明](https://www.iamxiarui.com/wp-content/uploads/2021/12/CleanShot-2021-12-28-at-09.42.28.png)
+
 # 版权声明
 
 LinkWeChat 开源版遵循 [GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE) 开源协议发布，并提供技术交流学习，但**绝不允许修改后和衍生的代码做为闭源的商业软件发布和销售！** 
