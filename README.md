@@ -287,7 +287,7 @@ V2.0 主要的升级内容如下：
 
 如果你有任何 LinkWeChat 产品上的想法、意见或建议，或商务上的合作需求，请扫码添加 LinkWeChat 项目团队进一步沟通：
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/145220_ddd9d2ef_1480777.png "屏幕截图.png")
+![输入图片说明](readme_pic/contact_us.png)
 
 # 七、捐赠支持
 
