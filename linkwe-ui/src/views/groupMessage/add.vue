@@ -105,7 +105,7 @@
       <welcome-detail showBack showMorMaterial :currentActive.sync="currentActive" @update="currentActive = 1" @submit="save"></welcome-detail>
     </div>
     <!-- 选择添加人弹窗 -->
-    <SelectUser :visible.sync="dialogVisibleSelectUser" title="选择添加人" :isOnlyLeaf="false" destroyOnClose :defaultValues="selectedUserList" @success="selectedUser"></SelectUser>
+    <SelectUser :visible.sync="dialogVisibleSelectUser" title="选择添加人" destroyOnClose :defaultValues="selectedUserList" @success="selectedUser"></SelectUser>
 
     <!-- 选择标签弹窗 -->
     <SelectTag :visible.sync="dialogVisibleSelectTag" title="选择标签" :defaultValues="form.tag" @success="submitSelectTag">
@@ -113,7 +113,7 @@
 
     <!-- 选择客户群聊 -->
     <!-- <SelectCustomerGroup :visible.sync="dialogVisibleSelectCustomerGroup" @success="submitSelectCustomerGroup" :multiSelect="true"></SelectCustomerGroup> -->
-    <SelectUser :visible.sync="dialogVisibleSelectCustomerGroup" title="选择添加人" :isOnlyLeaf="false" destroyOnClose :defaultValues="selectCustomerGroupList" @success="submitSelectCustomerGroup"></SelectUser>
+    <SelectUser :visible.sync="dialogVisibleSelectCustomerGroup" title="选择添加人" destroyOnClose :defaultValues="selectCustomerGroupList" @success="submitSelectCustomerGroup"></SelectUser>
 
   </div>
 </template>
