@@ -376,12 +376,12 @@
         let list = this.resetData(materialData.materialMsgList)
         let myObj = {
           content: materialData.welcomeMsg,
-          attachments: [{
+          attachmentsList: [{
             content: materialData.welcomeMsg,
             msgType: 'text'
           }]
         }
-        myObj.attachments.push(...list)
+        myObj.attachmentsList.push(...list)
         let data = Object.assign({}, this.form, myObj)
         data.senderList = []
         data = JSON.parse(JSON.stringify(data))

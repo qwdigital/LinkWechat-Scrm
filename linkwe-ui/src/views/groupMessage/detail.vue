@@ -7,7 +7,7 @@
             <div class="name">
               群发统计
             </div>
-            <div class="operation" v-if="isTask">
+            <div class="operation" v-if="isTask !== 1">
               <span v-if="data.refreshTime">最近同步时间：{{data.refreshTime}}</span>
               <el-button style="margin-left:20px;" type="primary" size="mini" @click="setFn">同步</el-button>
             </div>
@@ -204,13 +204,15 @@
         total1: 0,
         total0: 0,
         msgId: '',
-        isTask: 0
+        isTask: 0,
+        status: 0
       }
     },
     watch: {},
     computed: {},
     created () {
       this.isTask = this.$route.query.isTask
+      this.status = this.$route.query.status
       this.msgId = this.$route.query.id
       this.queryMember.msgTemplateId = this.msgId
       this.queryCustomer.msgTemplateId = this.msgId

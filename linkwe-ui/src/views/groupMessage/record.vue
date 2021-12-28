@@ -2,7 +2,7 @@
   <div>
     <div>
       <div>
-        <el-button type="primary" style="margin-bottom: 20px;" @click="goRoute('', '', 'add')">新建群发</el-button>
+        <el-button type="primary" style="margin-bottom: 20px;" @click="goRoute('', '', '','add')">新建群发</el-button>
       </div>
       <el-form :model="query" ref="queryForm" :inline="true" label-position="left" class="top-search" label-width="70px">
         <el-form-item label="群发内容" prop="content">
@@ -47,7 +47,7 @@
         <el-table-column label="操作" align="center" width="180">
           <template slot-scope="scope">
             <!-- v-hasPermi="['enterpriseWechat:view']" -->
-            <el-button size="mini" type="text" @click="goRoute(scope.row.id, scope.row.isTask, 'detail')">详情</el-button>
+            <el-button size="mini" type="text" @click="goRoute(scope.row.id, scope.row.isTask, scope.row.status, 'detail')">详情</el-button>
             <el-divider v-if="scope.row.isTask === 1 && scope.row.status === 0" direction="vertical"></el-divider>
             <el-button size="mini" v-if="scope.row.isTask === 1 && scope.row.status === 0" type="text" @click="cancelSend(scope.row)">取消发送</el-button>
             <!-- <el-button v-hasPermi="['enterpriseWechat:edit']" size="mini" type="text" disabled=""
@@ -166,13 +166,16 @@
           })
           .catch(function () { })
       },
-      goRoute (id, isTask, path) {
+      goRoute (id, isTask, status,path) {
         const query = {}
         if (id) {
           query.id = id
         }
         if (isTask) {
           query.isTask = isTask
+        }
+        if (status) {
+          query.status = status
         }
         this.$router.push({
           path: '/customerMaintain/groupMessage/' + path,
