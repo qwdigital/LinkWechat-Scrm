@@ -33,7 +33,7 @@
 
 [点击查看2021年度 LinkWeChat 开源数据报告](https://gitee.com/LinkWeChat/link-wechat/blob/master/2021%E5%B9%B4%E6%8A%A5%E6%9C%80%E7%BB%88.jpeg)
 
-![输入图片说明](https://www.iamxiarui.com/wp-content/uploads/2021/12/CleanShot-2021-12-28-at-09.42.28.png)
+![输入图片说明](https://www.iamxiarui.com/wp-content/uploads/2021/12/CleanShot-2021-12-28-at-09.45.34.png)
 
 # 版权声明
 
