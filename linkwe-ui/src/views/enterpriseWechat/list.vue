@@ -1,101 +1,101 @@
 <script>
-  import * as api from '@/api/enterpriseId'
-  // import clipboard from "clipboard";
+import * as api from '@/api/enterpriseId'
+// import clipboard from "clipboard";
 
-  export default {
-    components: {},
-    props: {},
-    data () {
-      return {
-        // query: {
-        //   pageNum: 1,
-        //   pageSize: 10,
-        //   companyName: ''
-        // },
-        // total: 0,
-        form: {},
-        // list: [],
-        // dialogVisible: false,
-        disabled: false,
-        loading: false,
-        rules: Object.freeze({
-          companyName: [{ required: true, message: '必填项', trigger: 'blur' }],
-          corpId: [{ required: true, message: '必填项', trigger: 'blur' }],
-          corpSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
-          agentId: [{ required: true, message: '必填项', trigger: 'blur' }],
-          agentSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
-          contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
-          seasRedirectUrl: [{ required: true, message: '必填项', trigger: 'blur' }],
-          sopTagRedirectUrl: [{ required: true, message: '必填项', trigger: 'blur' }]
-        })
-        // status: ['正常', '停用']
-      }
-    },
-    watch: {},
-    computed: {},
-    created () {
-      this.getDetail()
-    },
-    mounted () {
-      // new clipboard(".copy-btn");
-    },
-    methods: {
-      // getList(page) {
-      //   page && (this.query.pageNum = page)
-      //   this.loading = true
-      //   api
-      //     .getList(this.query)
-      //     .then(({ rows, total }) => {
-      //       this.list = rows
-      //       this.total = +total
-      //       this.loading = false
-      //     })
-      //     .catch(() => {
-      //       this.loading = false
-      //     })
+export default {
+  components: {},
+  props: {},
+  data() {
+    return {
+      // query: {
+      //   pageNum: 1,
+      //   pageSize: 10,
+      //   companyName: ''
       // },
-      // edit(data, type) {
-      //   this.form = Object.assign({}, data || {})
-      //   this.dialogVisible = true
-      //   type || !data ? (this.disabled = false) : (this.disabled = true)
-      // },
+      // total: 0,
+      form: {},
+      // list: [],
+      // dialogVisible: false,
+      disabled: false,
+      loading: false,
+      rules: Object.freeze({
+        // companyName: [{ required: true, message: '必填项', trigger: 'blur' }],
+        corpId: [{ required: true, message: '必填项', trigger: 'blur' }],
+        corpSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
+        agentId: [{ required: true, message: '必填项', trigger: 'blur' }],
+        agentSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
+        contactSecret: [{ required: true, message: '必填项', trigger: 'blur' }],
+        seasRedirectUrl: [{ required: true, message: '必填项', trigger: 'blur' }],
+        sopTagRedirectUrl: [{ required: true, message: '必填项', trigger: 'blur' }]
+      })
+      // status: ['正常', '停用']
+    }
+  },
+  watch: {},
+  computed: {},
+  created() {
+    this.getDetail()
+  },
+  mounted() {
+    // new clipboard(".copy-btn");
+  },
+  methods: {
+    // getList(page) {
+    //   page && (this.query.pageNum = page)
+    //   this.loading = true
+    //   api
+    //     .getList(this.query)
+    //     .then(({ rows, total }) => {
+    //       this.list = rows
+    //       this.total = +total
+    //       this.loading = false
+    //     })
+    //     .catch(() => {
+    //       this.loading = false
+    //     })
+    // },
+    // edit(data, type) {
+    //   this.form = Object.assign({}, data || {})
+    //   this.dialogVisible = true
+    //   type || !data ? (this.disabled = false) : (this.disabled = true)
+    // },
 
-      getDetail () {
-        this.loading = true
-        api
-          .getDetail()
-          .then(({ data }) => {
-            this.form = data
-            this.loading = false
-          })
-          .catch(() => {
-            this.loading = false
-          })
-      },
-      submit () {
-        this.$refs['form'].validate((valid) => {
-          if (valid) {
-            api
-              .addOrUpdate(this.form)
-              .then(() => {
-                this.msgSuccess('操作成功')
-                // this.dialogVisible = false
-                this.getDetail()
-              })
-              .catch(() => {
-                // this.dialogVisible = false
-              })
-          }
+    getDetail() {
+      this.loading = true
+      api
+        .getDetail()
+        .then(({ data }) => {
+          this.form = data
+          this.loading = false
         })
-      },
-      start (corpId) {
-        api.start(corpId).then(({ rows, total }) => {
-          this.msgSuccess('操作成功')
-          this.getList()
+        .catch(() => {
+          this.loading = false
         })
-      }
+    },
+    submit() {
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          api
+            .addOrUpdate(this.form)
+            .then(() => {
+              this.msgSuccess('操作成功')
+              // this.dialogVisible = false
+              this.getDetail()
+            })
+            .catch(() => {
+              // this.dialogVisible = false
+            })
+        }
+      })
+    },
+    start(corpId) {
+      api.start(corpId).then(({ rows, total }) => {
+        this.msgSuccess('操作成功')
+        this.getList()
+      })
     }
   }
+}
 </script>
 
 <template>
@@ -144,7 +144,7 @@
           >
         </template>
       </el-table-column>
-    </el-table> 
+    </el-table>
 
     <pagination
       v-show="total > 0"
@@ -155,12 +155,21 @@
     />  -->
 
     <el-card shadow="never" :body-style="{ padding: '10px 0 0 10px' }">
-      <el-form ref="form" label-suffix=":" label-position="right" :model="form" :rules="rules" size="small" label-width="160px" :disabled="disabled">
+      <el-form
+        ref="form"
+        label-suffix=":"
+        label-position="right"
+        :model="form"
+        :rules="rules"
+        size="small"
+        label-width="160px"
+        :disabled="disabled"
+      >
         <el-form-item label="企业ID" prop="corpId">
           <el-input :disabled="form.id" v-model="form.corpId" placeholder=""></el-input>
           <div class="tips">企业ID即CorpID，在企微后台->我的企业中获取</div>
         </el-form-item>
-        <el-form-item label="企业名称" prop="companyName">
+        <el-form-item label="企业名称">
           <el-input v-model="form.companyName" disabled placeholder="企业名称"></el-input>
           <div class="tips">根据企业 ID 配置后回显，不可编辑</div>
         </el-form-item>
@@ -280,8 +289,8 @@
 </template>
 
 <style lang="scss" scoped>
-  .tips {
-    color: #aaa;
-    font-size: 12px;
-  }
+.tips {
+  color: #aaa;
+  font-size: 12px;
+}
 </style>
