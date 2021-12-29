@@ -25,6 +25,8 @@
 
 ---
 
+ **<p align="center">【📣最新动态】LinkWeChat V2.0 正式公测啦，如有问题欢迎提交 Issue，项目组将光速修复，<a href="http://demo.linkwechat.cn/" target="_blank">点击立即体验~</a></p>** 
+
  **<p align="center">【📣最新动态】LinkWeChat V2.0 Beta 包已经发布啦，<a href="https://gitee.com/LinkWeChat/link-wechat/releases/v2.0.0.beta.3" target="_blank">点击尝鲜全新功能~</a></p>** 
 
  **<p align="center">【📣最新动态】LinkWeChat 2021 年度开源数据报告来啦，<a href="https://gitee.com/LinkWeChat/link-wechat/blob/master/readme_pic/2021%E5%B9%B4%E6%8A%A5%E6%9C%80%E7%BB%88V2.jpg" target="_blank">点击查阅~</a></p>** 
@@ -75,9 +77,9 @@ LinkWeChat SCRM 基于企业私域流量营销闭环，遵从获取新客到管�
 *   **企业风控** ：会话合规存档，敏感内容全局风控；
 *   **企业管理** ：组织架构、自建应用全融合，实现“一个后台”；
 
-V1.5 详细功能清单：
+V2.0 详细功能清单：
 
-[LinkWeChat-社区版V1.5-功能清单](https://docs.qq.com/sheet/DZXlLdmRjSWlzd2R6)
+[LinkWeChat 社区版 V2.0 详细功能清单](https://docs.qq.com/sheet/DZUZhVkZybUVLWEZV)
 
 ## 1.3 优势
 
