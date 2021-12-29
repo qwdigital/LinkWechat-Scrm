@@ -236,6 +236,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         address=IF(TRIM(VALUES(address)) != '', VALUES(address), we_customer.address),
         phone=IF(TRIM(VALUES(phone)) != '', VALUES(phone), we_customer.phone),
         add_method=IF(VALUES(add_method), VALUES(add_method), we_customer.add_method),
+        del_flag=IFNULL(VALUES(del_flag),we_customer.del_flag),
         del_flag=IF(VALUES(del_flag),VALUES(del_flag),we_customer.del_flag),
         state=IF(TRIM(VALUES(state)) != '',VALUES(state),we_customer.state);
     </insert>
