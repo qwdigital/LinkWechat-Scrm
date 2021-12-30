@@ -5,13 +5,20 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.core.domain.BaseEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
  * 客户公海实体
  */
 @Data
 @TableName("we_customer_seas")
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeCustomerSeas extends BaseEntity {
     //主键
     @TableId

@@ -259,7 +259,20 @@ public class WeCustomerSeasController extends BaseController {
     }
 
 
+    /**
+     * 设置公海客户状态
+     * @return
+     */
+    @PostMapping("/setState")
+    public AjaxResult setState(@RequestBody WeCustomerSeas weCustomerSea){
+        if(StringUtils.isEmpty(weCustomerSea.getPhone())){
+            return AjaxResult.error("手机号不可为空");
+        }
+        iWeCustomerSeasService.update(WeCustomerSeas.builder().addState(new Integer(1)).build()
+                ,new LambdaQueryWrapper<WeCustomerSeas>().eq(WeCustomerSeas::getPhone,weCustomerSea.getPhone()));
 
+        return AjaxResult.success();
+    }
 
 
 

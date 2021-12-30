@@ -79,6 +79,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     private IWeUserService iWeUserService;
 
 
+
+
     /**
      * 重构版客户列表
      *
@@ -609,6 +611,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     ),TrajectoryType.TRAJECTORY_TYPE_XXDT.getType(),TrajectorySceneType.TRAJECTORY_TITLE_TJYG.getType(),
                             CustomerAddWay.of(followUser.getAddWay()).getVal()
                             ,null);
+
+
+
                 }
             }
         }
