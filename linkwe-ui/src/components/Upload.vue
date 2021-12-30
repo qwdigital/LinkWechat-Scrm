@@ -114,7 +114,7 @@ export default {
       // if (beforeUpload) {
       //   return beforeUpload(file)
       // }
-      return isFormat && isSize
+      return (isFormat && isSize) || Promise.reject()
     },
     onSuccess(res, file) {
       if (res.code === 200) {
