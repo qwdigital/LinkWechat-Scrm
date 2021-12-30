@@ -73,7 +73,17 @@
         list2: []
       }
     },
+     watch: {
+    '$store.state.agentConfigStatus'(val) {
+      val && this.init()
+    }
+  },
     methods: {
+      init() {
+        this.getData()
+        this.getData1()
+      },
+    
       getData () {
         let obj = {
           pageSize: 500,
@@ -142,16 +152,15 @@
       }
     },
     mounted () {
+      // this.init()
     },
     computed: {
-    userId() {
-      return this.$store.state.userId // 员工Id
+      userId() {
+        return this.$store.state.userId // 员工Id
       }
     },
     created () {
-      this.getData()
-      this.getData2()
-      this.getData1()
+      
     }
   }
 </script>
@@ -161,6 +170,8 @@
     background: #f6f6f6;
   }
   .content {
+    font-size: 15px;
+    font-weight: 500;
     display: flex;
     justify-content: space-between;
     align-items: center;
