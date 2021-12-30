@@ -18,7 +18,7 @@
           </van-cell>
         </van-cell-group>
       </van-tab>
-      <van-tab :title="'待通过（' + total2 + '）'">
+      <!-- <van-tab :title="'待通过（' + total2 + '）'">
         <van-cell-group>
           <van-cell>
             <template v-for="(unit, key) in list2">
@@ -31,7 +31,7 @@
             </template>
           </van-cell>
         </van-cell-group>
-      </van-tab>
+      </van-tab> -->
       <van-tab :title="'已添加（' + total2 + '）'">
         <van-cell-group>
           <van-cell>
@@ -52,7 +52,7 @@
  <script src="https://open.work.weixin.qq.com/wwopen/js/jwxwork-1.0.0.js"></script>
 <script>
   import ClipboardJS from 'clipboard'
-  import { getTypeList } from '@/api/seas.js'
+  import { getTypeList, setState } from '@/api/seas.js'
 
   export default {
     name: 'highSeas-index',
@@ -114,10 +114,12 @@
         const clipboard = new ClipboardJS(e.target, { text: () => text })
         clipboard.on('success', e => {
           this.$toast({ type: 'success', message: '复制成功' })
-          wx.invoke('navigateToAddCustomer',
-            {},
-            function (res) {
-            })
+          setState({ phone: text }).then(res => {
+            wx.invoke('navigateToAddCustomer',
+              {},
+              function (res) {
+              })
+          })
           // 释放内存
           clipboard.off('error')
           clipboard.off('success')
