@@ -30,9 +30,9 @@
                 </span>
                 <!-- <span class="icon iconfont icon-man" v-if="user.gender == 1"> </span>
                 <span class="icon iconfont icon-xingbie" v-else-if="user.gender == 2"></span>
-                <van-icon name="manager" color="#9c9c9c" v-else />
+                <van-icon name="manager" color="#9c9c9c" v-else /> -->
               </div>
-              <div class="c9">
+              <!-- <div class="c9">
                 <span>昵称：</span><span>{{ user.name }}</span>
               </div> -->
             </div>

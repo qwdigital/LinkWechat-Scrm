@@ -73,7 +73,7 @@
         <div>企业标签</div>
         <div class="data" is-link @click="labelEdit()">编辑</div>
       </div>
-      <div v-if="form.tags" class="labelstyle mt10">
+      <div v-if="form.tags" class="labelstyle mt15">
         <div class="label" v-for="(unit, unique) in form.tags" :key="unique">
           {{ unit.name }}
         </div>
@@ -88,7 +88,7 @@
         <div>个人标签</div>
         <div class="data" is-link @click="labelEdit('person')">编辑</div>
       </div>
-      <div v-if="form.personTags" class="labelstyle mt10">
+      <div v-if="form.personTags" class="labelstyle mt15">
         <div class="label" v-for="(unit, unique) in form.personTags" :key="unique">
           {{ unit.name }}
         </div>
