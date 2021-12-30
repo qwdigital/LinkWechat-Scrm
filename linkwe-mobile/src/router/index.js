@@ -111,13 +111,20 @@ const routes = [
     name: 'highSeas',
     component: () => import('../views/highSeas/index'),
     meta: {
-      title: '客户公海'
+      title: '公海分配'
     }
   }
 ]
 
 const router = new VueRouter({
   routes
+})
+router.beforeEach((to, from, next) => {
+  /* 路由发生变化修改页面title */
+  if (to.meta.title) {
+    document.title = to.meta.title
+  }
+  next()
 })
 
 export default router

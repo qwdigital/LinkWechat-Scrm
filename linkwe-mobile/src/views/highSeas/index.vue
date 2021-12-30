@@ -32,10 +32,10 @@
           </van-cell>
         </van-cell-group>
       </van-tab> -->
-      <van-tab :title="'已添加（' + total2 + '）'">
+      <van-tab :title="'已添加（' + total1 + '）'">
         <van-cell-group>
           <van-cell>
-            <template v-for="(unit, key) in list2">
+            <template v-for="(unit, key) in list1">
               <div class="content" :key="key">
                 <div>{{unit.phone}}</div>
                 <div>
@@ -73,7 +73,17 @@
         list2: []
       }
     },
+     watch: {
+    '$store.state.agentConfigStatus'(val) {
+      val && this.init()
+    }
+  },
     methods: {
+      init() {
+        this.getData()
+        this.getData1()
+      },
+    
       getData () {
         let obj = {
           pageSize: 500,
@@ -110,16 +120,21 @@
           this.list3 = res.rows
         })
       },
+      setGoto (text) {
+        setState({ phone: text }).then(res => {
+          this.getData()
+          this.getData1()
+          wx.invoke('navigateToAddCustomer',
+            {},
+            function (res) {
+            });
+        })
+      },
       copyFn (e, text) {
         const clipboard = new ClipboardJS(e.target, { text: () => text })
         clipboard.on('success', e => {
+          this.setGoto(text)
           this.$toast({ type: 'success', message: '复制成功' })
-          setState({ phone: text }).then(res => {
-            wx.invoke('navigateToAddCustomer',
-              {},
-              function (res) {
-              })
-          })
           // 释放内存
           clipboard.off('error')
           clipboard.off('success')
@@ -137,12 +152,15 @@
       }
     },
     mounted () {
+      // this.init()
+    },
+    computed: {
+      userId() {
+        return this.$store.state.userId // 员工Id
+      }
     },
     created () {
-      this.userId = this.$store.state.userId
-      this.getData()
-      this.getData2()
-      this.getData1()
+      
     }
   }
 </script>
@@ -152,6 +170,8 @@
     background: #f6f6f6;
   }
   .content {
+    font-size: 15px;
+    font-weight: 500;
     display: flex;
     justify-content: space-between;
     align-items: center;
