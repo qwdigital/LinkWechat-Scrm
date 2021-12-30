@@ -6,11 +6,25 @@
     </van-tabs>
 
     <div class="type-area">
-      <van-button round size="small" @click="taskType = 0" :type="taskType === 0 ? 'info' : 'default'">全部</van-button>
-      <van-button round size="small" @click="taskType = 1" :type="taskType === 1 ? 'info' : 'default'"
-        >老客标签建群</van-button
+      <van-button
+        round
+        size="small"
+        @click="taskType = 0"
+        :type="taskType === 0 ? 'info' : 'default'"
+        >全部</van-button
       >
-      <van-button round size="small" @click="taskType = 2" :type="taskType === 2 ? 'info' : 'default'"
+      <van-button
+        round
+        size="small"
+        @click="taskType = 1"
+        :type="taskType === 1 ? 'info' : 'default'"
+        >标签建群</van-button
+      >
+      <van-button
+        round
+        size="small"
+        @click="taskType = 2"
+        :type="taskType === 2 ? 'info' : 'default'"
         >群SOP</van-button
       >
     </div>
@@ -29,7 +43,12 @@
           ></OldCustomerPanel>
         </template>
         <template v-else>
-          <SOPPanel :key="task.ruleId" :task="task" :state="isDone ? true : false" @refresh="getTasks"></SOPPanel>
+          <SOPPanel
+            :key="task.ruleId"
+            :task="task"
+            :state="isDone ? true : false"
+            @refresh="getTasks"
+          ></SOPPanel>
         </template>
       </template>
     </template>
