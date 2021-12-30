@@ -85,7 +85,7 @@ export function findAddGroupNum(params) {
   {
     pageNum:
 pageSize:
-trajectoryType: 轨迹类型(1:信息动态;2:社交动态;3:活动规则;4:待办动态)
+trajectoryType: 轨迹类型(1:客户动态;2:员工动态;3:跟进动态;4:互动动态)
 userId: 员工的id
 externalUserid: 客户id
   }
@@ -97,7 +97,19 @@ export function findTrajectory(params) {
     params
   })
 }
-//  添加或编辑轨迹
+
+/**
+ * 编辑跟进动态
+ * @param {*} data
+ * {
+    "externalUserid":"客户id",
+    "trackState":1,//1:待跟进;2:跟进中;3:已成交;4:无意向;5:已流失
+    "content":"根据内容",
+    "userId":"员工id"
+
+}
+ * @returns
+ */
 export function addOrEditWaitHandle(data) {
   return request({
     url: service + '/addOrEditWaitHandle',
@@ -151,5 +163,17 @@ export function deletePersonTag(ids) {
   return request({
     url: service + '/deletePersonTag/' + ids,
     method: 'delete'
+  })
+}
+
+/**
+ * 同步轨迹动态
+ * @param {*} userId
+ * @returns
+ */
+export function sync(userId) {
+  return request({
+    url: service + '/synchMomentsInteracte/' + userId,
+    method: 'get'
   })
 }

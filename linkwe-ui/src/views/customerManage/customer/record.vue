@@ -15,7 +15,7 @@ export default {
       type: String,
       default: null
     },
-    // 	1:信息动态;2:社交动态;3:跟进动态;4:待办动态
+    // 1:客户动态;2:员工动态;3:跟进动态;4:互动动态
     trajectoryType: {
       type: String,
       default: null
@@ -35,7 +35,7 @@ export default {
         pageSize: 10,
         externalUserid: '', //	是	当前客户id
         userId: null, //		当前跟进人id,
-        trajectoryType: null //		1:信息动态;2:社交动态;3:跟进动态;4:待办动态
+        trajectoryType: null //	1:客户动态;2:员工动态;3:跟进动态;4:互动动态
       },
       loading: false,
       total: 0,

@@ -38,7 +38,8 @@ const routes = [
     component: () => import('../views/portrait/customerDetail.vue'),
     hidden: true,
     meta: {
-      title: ''
+      title: '',
+      noAuth: true
     }
   },
   // 社群关系

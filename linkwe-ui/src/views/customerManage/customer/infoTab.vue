@@ -23,8 +23,8 @@ export default {
       portrayalSum: { companyTags: [], personTags: [], trackStates: [], trackUsers: [] }, // 客户画像汇总
       trajectoryType: {
         0: '全部',
-        1: '信息动态',
-        2: '社交动态',
+        1: '客户动态',
+        2: '员工动态',
         3: '跟进动态',
         4: '互动动态'
       },

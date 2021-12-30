@@ -18,7 +18,7 @@ import router from './router'
 import store from './store'
 
 import VConsole from 'vconsole'
-process.env.NODE_ENV === 'test' && new VConsole()
+process.env.NODE_ENV === 'production' && new VConsole()
 
 Vue.config.productionTip = false
 
