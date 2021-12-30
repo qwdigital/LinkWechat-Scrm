@@ -22,13 +22,20 @@
                 {{ form.name || '' }}
                 <!-- {{ (form.name || '') + (form.remarkCorpName ? '-' + form.remarkCorpName : '') }} -->
               </div>
-              <van-icon
-                name="manager"
-                :class="['gender', { 1: 'man', 2: 'woman' }[form.gender]]"
-              ></van-icon>
-              <span :style="{ color: form.customerType === 1 ? '#4bde03' : '#f9a90b' }">
-                {{ { 1: '@微信', 2: '@企业微信' }[form.customerType] }}
-              </span>
+              <div class="flex aic">
+                <van-icon
+                  name="manager"
+                  :class="['gender', { 1: 'man', 2: 'woman' }[form.gender]]"
+                ></van-icon>
+                <span
+                  :style="{
+                    color: form.customerType === 1 ? '#4bde03' : '#f9a90b',
+                    'font-size': '12px'
+                  }"
+                >
+                  {{ { 1: '@微信', 2: '@企业微信' }[form.customerType] }}
+                </span>
+              </div>
             </div>
           </div>
         </div>

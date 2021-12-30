@@ -1,5 +1,11 @@
 <script>
-import { getMaterialList, getCollectionList, addCollection, cancleCollection, getMaterialMediaId } from '@/api/chat'
+import {
+  getMaterialList,
+  getCollectionList,
+  addCollection,
+  cancleCollection,
+  getMaterialMediaId
+} from '@/api/chat'
 export default {
   components: {},
   props: {
@@ -133,7 +139,7 @@ export default {
               2: 'video',
               3: 'file',
               4: 'text',
-              5: 'news'
+              5: 'image'
             }
             switch (data.mediaType) {
               case '4':
@@ -145,6 +151,7 @@ export default {
               case '0':
               case '2':
               case '3':
+              case '5':
                 let dataMediaId = {
                   url: data.materialUrl,
                   type: msgtype[data.mediaType],
@@ -159,14 +166,14 @@ export default {
                   mediaid: resMaterialId.data.media_id //
                 }
                 break
-              case '5':
-                mes.news = {
-                  link: '', //H5消息页面url 必填
-                  title: '', //H5消息标题
-                  desc: '', //H5消息摘要
-                  imgUrl: '' //H5消息封面图片URL
-                }
-                break
+              // case '5':
+              //   mes.news = {
+              //     link: '', //H5消息页面url 必填
+              //     title: '', //H5消息标题
+              //     desc: '', //H5消息摘要
+              //     imgUrl: '' //H5消息封面图片URL
+              //   }
+              //   break
               // case '6':
               //   mes.miniprogram = {
               //     appid: 'wx8bd80126147df384', //小程序的appid
@@ -200,14 +207,25 @@ export default {
       })
     },
     collect(data) {
+      this.$toast.loading({
+        message: 'loading...',
+        duration: 0,
+        forbidClick: true
+      })
       // collection 是否收藏 0未收藏 1 已收藏
       ;(data.collection == 1 ? cancleCollection : addCollection)({
         userId: this.userId,
         materialId: data.materialId
-      }).then(() => {
-        data.collection = [1, 0][data.collection]
-        this.$toast('操作成功')
       })
+        .then(() => {
+          data.collection = [1, 0][data.collection]
+          this.$toast('操作成功')
+          this.$emit('collect')
+        })
+        .catch((err) => {
+          this.$toast('操作失败')
+          console.log(err)
+        })
     }
   }
 }
@@ -227,7 +245,12 @@ export default {
         <div v-for="(item, index) in list" class="list" :key="index">
           <div class="content bfc-o">
             <!-- 图片 -->
-            <van-image v-if="item.mediaType == 0" width="80" height="80" :src="item.materialUrl" />
+            <van-image
+              v-if="[0, 5].includes(+item.mediaType)"
+              width="80"
+              height="80"
+              :src="item.materialUrl"
+            />
             <!-- 视频 -->
             <van-image v-if="item.mediaType == 2" width="80" height="80" :src="item.coverUrl" />
             <span class="title">

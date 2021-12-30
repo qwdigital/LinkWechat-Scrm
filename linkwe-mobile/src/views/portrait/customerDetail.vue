@@ -21,13 +21,20 @@
                 <p>
                   {{ user.name || '' }}
                 </p>
-                <van-icon
-                  name="manager"
-                  :class="['gender', { 1: 'man', 2: 'woman' }[form.gender]]"
-                ></van-icon>
-                <span :style="{ color: form.customerType === 1 ? '#4bde03' : '#f9a90b' }">
-                  {{ { 1: '@微信', 2: '@企业微信' }[form.customerType] }}
-                </span>
+                <div class="flex aic">
+                  <van-icon
+                    name="manager"
+                    :class="['gender', { 1: 'man', 2: 'woman' }[form.gender]]"
+                  ></van-icon>
+                  <span
+                    :style="{
+                      color: form.customerType === 1 ? '#4bde03' : '#f9a90b',
+                      'font-size': '12px'
+                    }"
+                  >
+                    {{ { 1: '@微信', 2: '@企业微信' }[form.customerType] }}
+                  </span>
+                </div>
                 <!-- <span class="icon iconfont icon-man" v-if="user.gender == 1"> </span>
                 <span class="icon iconfont icon-xingbie" v-else-if="user.gender == 2"></span>
                 <van-icon name="manager" color="#9c9c9c" v-else /> -->

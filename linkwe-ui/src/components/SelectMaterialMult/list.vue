@@ -1,6 +1,7 @@
 <script>
 import { getTree, getList } from '@/api/material'
 import { getMaterialList } from '@/api/appTool/chatBar'
+import Video from 'video.js'
 export default {
   components: {},
   props: {
@@ -129,7 +130,7 @@ export default {
 
 <template>
   <div>
-    <template v-if="false">
+    <!-- <template v-if="false">
       <el-form ref="form" :model="query" label-width="80px">
         <el-form-item label="选择分组">
           <el-cascader v-model="query.categoryId" :options="treeData" :props="groupProps"></el-cascader>
@@ -157,7 +158,7 @@ export default {
         </el-form-item>
       </el-form>
 
-      <!-- 文本 -->
+      文本
       <el-table v-if="type == 4" v-loading="loading" :data="list" :show-header="false">
         <el-table-column width="30">
           <template slot-scope="scope">
@@ -167,14 +168,14 @@ export default {
         <el-table-column prop="content"> </el-table-column>
       </el-table>
 
-      <!-- 图片 -->
+      图片
       <el-radio-group v-if="type == 0" v-loading="loading" class="img-wrap" v-model="radio">
         <el-radio v-for="(item, index) in list" :label="item" :key="index">
           <img class="img-li" :src="item.materialUrl" alt />
           <div class="ac mt5">{{ item.materialName }}</div>
         </el-radio>
       </el-radio-group>
-    </template>
+    </template> -->
 
     <el-row :gutter="10">
       <el-col :span="6">
@@ -202,7 +203,12 @@ export default {
             :total="total"
           ></el-pagination>
         </div>
-        <el-table ref="table" v-if="[1, 3, 4].includes(+type)" :data="list" @selection-change="handleSelectionChange">
+        <el-table
+          ref="table"
+          v-if="[1, 3, 4].includes(+type)"
+          :data="list"
+          @selection-change="handleSelectionChange"
+        >
           <el-table-column type="selection" width="55" align="center" />
           <el-table-column v-if="type == 4" prop="content" label="文本内容"></el-table-column>
           <el-table-column v-else prop="materialName" label="素材名称"></el-table-column>
@@ -211,11 +217,32 @@ export default {
 
         <el-row v-else :gutter="20">
           <el-checkbox-group v-model="selectedx" @change="handleSelectionChange">
-            <el-col :span="6" style="margin-bottom: 24px; min-width: 220px" v-for="(item, index) in list" :key="index">
+            <el-col
+              :span="6"
+              style="margin-bottom: 24px; min-width: 220px"
+              v-for="(item, index) in list"
+              :key="index"
+            >
               <el-card shadow="hover" body-style="padding: 0px;">
                 <div class="img-wrap">
-                  <el-image v-if="[0, 5].includes(+type)" :src="item.materialUrl" fit="contain"></el-image>
-                  <el-image v-else-if="type == 2" :src="item.coverUrl" fit="contain"></el-image>
+                  <el-image
+                    v-if="[0, 5].includes(+type)"
+                    :src="item.materialUrl"
+                    fit="contain"
+                  ></el-image>
+                  <video
+                    v-else-if="type == 2"
+                    id="video"
+                    class="video-js vjs-default-skin vjs-big-play-centered"
+                    controls
+                    webkit-playsinline="true"
+                    playsinline="true"
+                    :autoplay="false"
+                    preload="auto"
+                    :poster="item.coverUrl"
+                  >
+                    <source :src="item.materialUrl" type="video/mp4" />
+                  </video>
                 </div>
                 <div style="padding: 14px">
                   <el-checkbox :label="item">
@@ -254,7 +281,8 @@ export default {
   height: 0;
   padding: 70% 0 0 0;
   border-bottom: 1px solid #e6ebf5;
-  .el-image {
+  .el-image,
+  #video {
     position: absolute;
     width: 100%;
     height: 100%;
