@@ -143,8 +143,12 @@
     },
     mounted () {
     },
+    computed: {
+    userId() {
+      return this.$store.state.userId // 员工Id
+      }
+    },
     created () {
-      this.userId = this.$store.state.userId
       this.getData()
       this.getData2()
       this.getData1()

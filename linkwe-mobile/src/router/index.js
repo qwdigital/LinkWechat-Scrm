@@ -110,7 +110,7 @@ const routes = [
     name: 'highSeas',
     component: () => import('../views/highSeas/index'),
     meta: {
-      title: '客户公海'
+      title: '公海分配'
     }
   }
 ]
