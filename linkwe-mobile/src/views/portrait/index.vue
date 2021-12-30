@@ -19,7 +19,8 @@
           <div class="right">
             <div>
               <div>
-                {{ (form.name || '') + (form.remarkCorpName ? '-' + form.remarkCorpName : '') }}
+                {{ form.name || '' }}
+                <!-- {{ (form.name || '') + (form.remarkCorpName ? '-' + form.remarkCorpName : '') }} -->
               </div>
               <van-icon
                 name="manager"

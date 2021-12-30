@@ -18,16 +18,23 @@
             <div class="img"><img :src="form.avatar" alt="" /></div>
             <div class="right">
               <div>
-                <span>
-                  {{ (user.name || '') + (user.remarkCorpName ? '-' + user.remarkCorpName : '') }}
+                <p>
+                  {{ user.name || '' }}
+                </p>
+                <van-icon
+                  name="manager"
+                  :class="['gender', { 1: 'man', 2: 'woman' }[form.gender]]"
+                ></van-icon>
+                <span :style="{ color: form.customerType === 1 ? '#4bde03' : '#f9a90b' }">
+                  {{ { 1: '@微信', 2: '@企业微信' }[form.customerType] }}
                 </span>
-                <span class="icon iconfont icon-man" v-if="user.gender == 1"> </span>
+                <!-- <span class="icon iconfont icon-man" v-if="user.gender == 1"> </span>
                 <span class="icon iconfont icon-xingbie" v-else-if="user.gender == 2"></span>
                 <van-icon name="manager" color="#9c9c9c" v-else />
               </div>
               <div class="c9">
                 <span>昵称：</span><span>{{ user.name }}</span>
-              </div>
+              </div> -->
             </div>
           </div>
         </div>
@@ -206,11 +213,13 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.iconfont {
+.gender {
+  color: #9c9c9c;
+}
+.man {
   color: #2c8cf0;
 }
-
-.icon-xingbie {
+.woman {
   color: pink;
 }
 .header {

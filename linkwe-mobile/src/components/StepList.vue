@@ -22,7 +22,7 @@
         >
           <van-step class="msg">
             <span class="f12 po"> {{ dateFormat(item1.createTime, 'hh:mm') }}</span>
-            <span class="fs14">{{ chargeType(item1.trajectoryType) }}</span>
+            <span class="fs14">{{ item1.title }}</span>
             <span class="finish-box">
               <span
                 class="finish"
@@ -117,17 +117,17 @@ export default {
       // }, 1000)
     },
     //   根据数字判断类型
-    chargeType(num) {
-      if (num == 1) {
-        return (this.type = '信息动态')
-      } else if (num == 2) {
-        return (this.type = '社交动态')
-      } else if (num == 3) {
-        return (this.type = '活动规则')
-      } else if (num == 4) {
-        return (this.type = '待办动态')
-      }
-    },
+    // chargeType(num) {
+    //   if (num == 1) {
+    //     return (this.type = '客户动态')
+    //   } else if (num == 2) {
+    //     return (this.type = '员工动态')
+    //   } else if (num == 3) {
+    //     return (this.type = '跟进动态')
+    //   } else if (num == 4) {
+    //     return (this.type = '互动动态')
+    //   }
+    // },
 
     // 删除轨迹
     delDynamic(id) {
