@@ -70,18 +70,18 @@ service.interceptors.response.use(
     }
   },
   (error) => {
-    console.log('err' + error)
-    let { message, response, config } = error
-    if (message == 'Network Error') {
-      message = '后端接口连接异常'
-    } else if (message.includes('timeout')) {
-      message = '系统接口请求超时'
+    console.log('err: ' + error)
+    let { message: msg, response, config } = error
+    if (msg == 'Network Error') {
+      msg = '后端接口连接异常'
+    } else if (msg.includes('timeout')) {
+      msg = '系统接口请求超时'
     } else if (response) {
       let status = response.status
-      mes = '系统接口:' + status + '异常'
+      msg = '系统接口:' + status + '异常'
     }
     Message({
-      message: `${message}:${config.url}`,
+      message: `${msg}:${config.url}`,
       type: 'error',
       duration: 5 * 1000
     })
