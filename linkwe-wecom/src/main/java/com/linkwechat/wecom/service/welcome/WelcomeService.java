@@ -25,6 +25,7 @@ import com.linkwechat.wecom.domain.vo.tag.WeTagVo;
 import com.linkwechat.wecom.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -57,6 +58,9 @@ public class WelcomeService implements ApplicationListener<WeCustomerWelcomeQuer
 
     @Autowired
     private IWeMaterialService weMaterialService;
+
+    @Value("${wecome.welcome-msg-default}")
+    private String welcomMsgDefault;
 
     @Override
     @Async
@@ -127,7 +131,7 @@ public class WelcomeService implements ApplicationListener<WeCustomerWelcomeQuer
      * @return
      */
     private WeResultDto sendWelcomeMsg(WeCustomerWelcomeQuery query, List<WeQrAttachments> qrAttachments) {
-        String welcomText = "默认欢迎语";
+        String welcomText = welcomMsgDefault;
         WeWelcomeMsg welcomeMsg = WeWelcomeMsg.builder().welcome_code(query.getWelcomeCode()).build();
         if(CollectionUtil.isNotEmpty(qrAttachments)){
             WeQrAttachments weQrAttachments = qrAttachments.stream()

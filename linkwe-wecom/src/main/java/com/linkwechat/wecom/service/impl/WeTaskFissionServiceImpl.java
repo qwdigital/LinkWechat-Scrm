@@ -453,13 +453,8 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
     private String getGroupFissionQrcode(Long taskFissionId, WeTaskFissionRecord record, WeCustomer weCustomer) {
         if (weCustomer != null) {
             String avatarUrl = weCustomer.getAvatar();
-            StringBuilder contentBuilder = new StringBuilder(pageGroupUrl);
-            contentBuilder.append("?")
-                    .append("fissionId=")
-                    .append(taskFissionId)
-                    .append("&recordId=")
-                    .append(record.getId());
-            BufferedImage bufferedImage = QREncode.crateQRCode(contentBuilder.toString(), avatarUrl);
+            String content = StringUtils.format(pageGroupUrl, taskFissionId, record.getId());
+            BufferedImage bufferedImage = QREncode.crateQRCode(content, avatarUrl);
             if (bufferedImage != null) {
                 try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
                     ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
