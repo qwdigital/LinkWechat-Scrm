@@ -137,7 +137,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wc.track_content as content
         FROM
             we_customer wc
-       LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.user_id = wc.first_user_id AND wfcrf.del_flag=0
+       LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.user_id = wc.first_user_id  AND wfcrf.external_userid=wc.external_userid AND wfcrf.del_flag=0
        LEFT JOIN we_tag wt ON wt.tag_id = wfcrf.tag_id
         WHERE wc.external_userid=#{externalUserid} and  wc.first_user_id=#{userid}
     </select>

@@ -494,12 +494,14 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         }else{//为空，取消当前客户所有标签
             List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = iWeFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
                     .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid())
-                    .eq(WeFlowerCustomerTagRel::getUserId, weMakeCustomerTag.getUserId()));
+                    .eq(WeFlowerCustomerTagRel::getUserId, weMakeCustomerTag.getUserId())
+                    .eq(WeFlowerCustomerTagRel::getIsCompanyTag,weMakeCustomerTag.getIsCompanyTag()));
             if(CollectionUtil.isNotEmpty(weFlowerCustomerTagRels)){
                 if(iWeFlowerCustomerTagRelService.remove(
                         new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
                                 .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid())
-                                .eq(WeFlowerCustomerTagRel::getUserId, weMakeCustomerTag.getUserId()))){
+                                .eq(WeFlowerCustomerTagRel::getUserId, weMakeCustomerTag.getUserId())
+                                .eq(WeFlowerCustomerTagRel::getIsCompanyTag,weMakeCustomerTag.getIsCompanyTag()))){
                     if(weMakeCustomerTag.getIsCompanyTag()){
                         //同步企业微信端
                         weCustomerClient.makeCustomerLabel(
@@ -767,13 +769,37 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
             weCustomerList.stream().forEach(k->{
 
+                //检索当前员工对应的客户有没有带跟进状态，如果没有插入
+                List<WeCustomerTrajectory> weCustomerTrajectories = iWeCustomerTrajectoryService.list(new LambdaQueryWrapper<WeCustomerTrajectory>()
+                        .eq(WeCustomerTrajectory::getExternalUserid, k.getExternalUserid())
+                        .eq(WeCustomerTrajectory::getUserId, k.getFirstUserId())
+                        .eq(WeCustomerTrajectory::getTrajectoryType, TrajectoryType.TRAJECTORY_TYPE_DBDT.getType())
+                        .eq(WeCustomerTrajectory::getTrackState,TrackState.STATE_DGJ.getType()));
+
+                if(CollectionUtil.isEmpty(weCustomerTrajectories)){
+                    iWeCustomerTrajectoryService.save(
+                            WeCustomerTrajectory.builder()
+                                    .externalUserid(k.getExternalUserid())
+                                    .trajectoryType(TrajectoryType.TRAJECTORY_TYPE_DBDT.getType())
+                                    .userId(k.getFirstUserId())
+                                    .trackState(TrackState.STATE_DGJ.getType())
+                                    .trackTime(k.getFirstAddTime())
+                                    .title("新增成员")
+                                    .content("新增待跟进")
+                                    .build()
+                    );
+                }
+
+
 
                 trackStates.add(WeCustomerDetail.TrackStates
                         .builder()
                         .userName(k.getUserName())
                         .trackStateList(iWeCustomerTrajectoryService.list(new LambdaQueryWrapper<WeCustomerTrajectory>()
                                 .eq(WeCustomerTrajectory::getExternalUserid, k.getExternalUserid())
-                                .eq(WeCustomerTrajectory::getUserId, k.getFirstUserId())))
+                                .eq(WeCustomerTrajectory::getUserId, k.getFirstUserId())
+                                .eq(WeCustomerTrajectory::getTrajectoryType, TrajectoryType.TRAJECTORY_TYPE_DBDT.getType())
+                                .orderByAsc(WeCustomerTrajectory::getTrackTime)))
                         .build());
 
                 trackUsers.add(

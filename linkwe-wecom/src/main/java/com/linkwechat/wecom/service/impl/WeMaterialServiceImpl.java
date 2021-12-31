@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dtflys.forest.http.ForestResponse;
 import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.config.RuoYiConfig;
@@ -46,7 +47,7 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
-public class WeMaterialServiceImpl implements IWeMaterialService {
+public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper,WeMaterial> implements IWeMaterialService {
 
     @Autowired
     private WeMaterialMapper weMaterialMapper;

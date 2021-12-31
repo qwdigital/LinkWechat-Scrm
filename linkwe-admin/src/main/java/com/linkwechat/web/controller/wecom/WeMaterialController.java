@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.wecom;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -132,10 +134,11 @@ public class WeMaterialController extends BaseController {
     @Log(title = "获取素材media_id", businessType = BusinessType.OTHER)
     @GetMapping("/temporaryMaterialMediaId")
     @ApiOperation("H5端发送获取素材media_id")
-    public AjaxResult temporaryMaterialMediaId(String url,String type,String name){
+    public AjaxResult temporaryMaterialMediaId(String url,String type,String name) throws UnsupportedEncodingException {
+
         WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(url,
                 type
-                ,name);
+                ,new String(name.getBytes(),"UTF-8"));
         return AjaxResult.success(weMediaDto);
     }
 
