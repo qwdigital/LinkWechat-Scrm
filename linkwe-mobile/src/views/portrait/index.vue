@@ -134,6 +134,7 @@
       </div>
 
       <van-tabs v-model="query.trajectoryType" @change="changeInfo">
+        <van-tab :name="0" title="全部"></van-tab>
         <van-tab :name="1" title="客户动态"></van-tab>
         <van-tab :name="2" title="员工动态"></van-tab>
         <van-tab :name="3" title="跟进动态"></van-tab>
@@ -393,7 +394,7 @@ export default {
       //   客户轨迹
       query: {
         page: 1,
-        trajectoryType: 1
+        trajectoryType: null
       },
 
       loading: false,
@@ -560,6 +561,7 @@ export default {
         externalUserid: this.externalUserid
       }
       Object.assign(query, this.query)
+      query.trajectoryType == 0 && (query.trajectoryType = null)
       findTrajectory(query)
         .then((data) => {
           //   console.log(data.total);

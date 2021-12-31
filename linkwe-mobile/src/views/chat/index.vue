@@ -33,8 +33,8 @@ export default {
   mounted() {},
   methods: {
     getList() {
-      this.list = []
       getTypeList().then(({ rows, total }) => {
+        this.list = []
         this.userId &&
           this.list.push({
             sideName: '我的'

@@ -23,7 +23,7 @@
           <van-step class="msg">
             <span class="f12 po"> {{ dateFormat(item1.createTime, 'hh:mm') }}</span>
             <span class="fs14">{{ item1.title }}</span>
-            <span class="finish-box">
+            <!-- <span class="finish-box">
               <span
                 class="finish"
                 v-if="item1.trajectoryType == 4 && item1.status != 3"
@@ -32,7 +32,7 @@
                 完成
               </span>
               <span class="deldynamic" @click="delDynamic(item1.id)">删除</span>
-            </span>
+            </span> -->
 
             <p class="fs14 con ">{{ item1.content }}</p>
           </van-step>
@@ -115,7 +115,7 @@ export default {
       //     this.finished = true
       //   }
       // }, 1000)
-    },
+    }
     //   根据数字判断类型
     // chargeType(num) {
     //   if (num == 1) {
@@ -130,34 +130,34 @@ export default {
     // },
 
     // 删除轨迹
-    delDynamic(id) {
-      this.$dialog
-        .confirm({
-          title: '警告',
-          message: '确定要删除吗？'
-        })
-        .then(() => {
-          return removeTrajectory(id)
-        })
-        .then((data) => {
-          this.$toast.success('删除成功')
-          // 重新获取全部数据
-          this.$emit('reload')
-        })
-        .catch(() => {
-          // on cancel
-        })
-    },
+    // delDynamic(id) {
+    //   this.$dialog
+    //     .confirm({
+    //       title: '警告',
+    //       message: '确定要删除吗？'
+    //     })
+    //     .then(() => {
+    //       return removeTrajectory(id)
+    //     })
+    //     .then((data) => {
+    //       this.$toast.success('删除成功')
+    //       // 重新获取全部数据
+    //       this.$emit('reload')
+    //     })
+    //     .catch(() => {
+    //       // on cancel
+    //     })
+    // },
     // 点击完成
-    finDynamic(id) {
-      handleWait(id)
-        .then((data) => {
-          this.$emit('reload')
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    }
+    // finDynamic(id) {
+    //   handleWait(id)
+    //     .then((data) => {
+    //       this.$emit('reload')
+    //     })
+    //     .catch((err) => {
+    //       console.log(err)
+    //     })
+    // }
   }
 }
 </script>
@@ -182,21 +182,21 @@ export default {
   position: relative;
   left: 20px;
 }
-.deldynamic {
-  float: right;
-  color: #9c9c9c;
-  font-size: 12px;
-  font-weight: 600;
-}
+// .deldynamic {
+//   float: right;
+//   color: #9c9c9c;
+//   font-size: 12px;
+//   font-weight: 600;
+// }
 .con {
   left: 51px;
   margin-top: 20px;
 }
-.finish-box {
-  float: right;
-  position: relative;
-  width: 80px;
-}
+// .finish-box {
+//   float: right;
+//   position: relative;
+//   width: 80px;
+// }
 .finish {
   position: absolute;
   color: #2c8cf0;
