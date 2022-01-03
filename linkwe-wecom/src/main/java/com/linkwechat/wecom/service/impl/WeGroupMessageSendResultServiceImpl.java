@@ -80,8 +80,7 @@ public class WeGroupMessageSendResultServiceImpl extends ServiceImpl<WeGroupMess
         if (CollectionUtil.isNotEmpty(sendResultList)) {
             sendResultList.forEach(item -> {
                 LambdaQueryWrapper<WeGroupMessageSendResult> wrapper = new LambdaQueryWrapper<>();
-                wrapper.eq(WeGroupMessageSendResult::getMsgId, item.getMsgId())
-                        .eq(WeGroupMessageSendResult::getUserId, item.getUserId());
+                wrapper.eq(WeGroupMessageSendResult::getUserId, item.getUserId());
                 if(item.getMsgTemplateId() != null){
                     wrapper.eq(WeGroupMessageSendResult::getMsgTemplateId,item.getMsgTemplateId());
                 }
