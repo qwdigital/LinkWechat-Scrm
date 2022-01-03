@@ -102,7 +102,7 @@
       </el-form>
     </div>
     <div v-if="currentActive === 2">
-      <welcome-detail showBack showMorMaterial :currentActive.sync="currentActive" @update="currentActive = 1" @submit="save"></welcome-detail>
+      <welcome-detail showBack showMorMaterial isgroup :currentActive.sync="currentActive" @update="currentActive = 1" @submit="save"></welcome-detail>
     </div>
     <!-- 选择添加人弹窗 -->
     <SelectUser :visible.sync="dialogVisibleSelectUser" title="选择添加人" destroyOnClose :defaultValues="selectedUserList" @success="selectedUser"></SelectUser>

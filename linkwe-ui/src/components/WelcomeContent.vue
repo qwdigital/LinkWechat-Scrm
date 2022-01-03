@@ -21,10 +21,10 @@
               <div v-if="!showTemplate" class="operation" @click="onChooseMaterialWel()">
                 <img style="margin-right: 3px" :src="require('@/assets/drainageCode/code-add.png')" alt="" />从素材中选择
               </div>
-              <el-form-item label="欢迎语" required style="width: 50%; margin-bottom: 0" :error="welcomeMsgError">
+              <el-form-item :label="isgroup ? '消息内容': '欢迎语'" required style="width: 50%; margin-bottom: 0" :error="welcomeMsgError">
                 <el-input ref="msgTextarea" type="textarea" v-model="form.welcomeMsg" maxlength="2000" show-word-limit placeholder="请输入" :autosize="{ minRows: 5, maxRows: 20 }" clearable />
               </el-form-item>
-              <el-form-item style="margin-bottom: 0">
+              <el-form-item style="margin-bottom: 0" v-if="!isgroup">
                 <el-checkbox @change="onInsert">插入客户昵称</el-checkbox>
               </el-form-item>
             </div>
@@ -205,6 +205,10 @@
           }
         }
       },
+      isgroup: {
+        type: Boolean,
+        default: false
+      },
       showTemplate: {
         type: Boolean,
         default: true
@@ -262,7 +266,7 @@
         welSelected: {},
         selectedUserList: [],
         dialogVisibleSelectUser: false,
-        strTemplate1: '%客户昵称%',
+        strTemplate1: '%NICKNAME%',
         strTemplate2: '#客户昵称#'
       }
     },
@@ -328,7 +332,7 @@
             this.form.welcomeMsg = msg.slice(0, textIndex) + str + msg.slice(textIndex)
           }
         } else {
-          this.form.welcomeMsg = this.strType ? msg.replace(/\%客户昵称\%/, '') : msg.replace(/\#客户昵称\#/, '')
+          this.form.welcomeMsg = this.strType ? msg.replace(/\%NICKNAME\%/, '') : msg.replace(/\#客户昵称\#/, '')
         }
       },
       onChooseMaterial (materialType, rowIndex) {
