@@ -23,6 +23,16 @@ export default {
     maxSize: {
       type: Number,
       default: 2
+    },
+    // 图片的宽高像素限制 [width(number), height(number)],默认null不限制
+    maxImgPx: {
+      type: Array,
+      default: null // () => [100, 100]
+    },
+    // 限制允许上传的文件格式 eg:["bmp", "jpg", "png", "jpeg", "gif"]
+    format: {
+      type: Array,
+      default: null
     }
     // beforeUpload: {
     //   type: Function,
@@ -53,8 +63,19 @@ export default {
   methods: {
     async handleBeforeUpload(file) {
       this.loading = true
-      let isFormat = true,
-        isSize = true
+      let isFormat = true
+      let isSize = true
+
+      if (this.format && this.format.length) {
+        // 校验格式
+        let reg = /\.(\w+)$/g
+        let match = file.name.match(reg)
+        let fileFormat = match && match[0].replace('.', '').toLowerCase()
+        if (!(isFormat = this.format.includes(fileFormat))) {
+          this.$message.error('文件格式不正确，请重新选择')
+        }
+      }
+
       if (this.type === '0') {
         // 图片
         isFormat = file.type === 'image/jpeg' || file.type === 'image/png'
@@ -65,6 +86,34 @@ export default {
         }
         if (!isSize) {
           this.$message.error('上传文件大小不能超过 2MB!')
+        }
+
+        if (this.maxImgPx) {
+          await new Promise((resolve) => {
+            let width, height
+            let image = new Image()
+            //加载图片获取图片真实宽度和高度
+            image.onload = () => {
+              width = image.width
+              height = image.height
+              if (width > this.maxImgPx[0]) {
+                isSize = false
+                this.$message.error('图片“宽”度超限，请重新选择')
+              } else if (height > this.maxImgPx[1]) {
+                this.$message.error('图片“高”度超限，请重新选择')
+                isSize = false
+              }
+              resolve()
+            }
+            if (window.FileReader) {
+              let reader = new FileReader()
+              reader.onload = function(e) {
+                let data = e.target.result
+                image.src = data
+              }
+              reader.readAsDataURL(file)
+            }
+          })
         }
       } else if (this.type === '1') {
         // 语音

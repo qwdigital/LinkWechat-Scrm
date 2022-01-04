@@ -2,7 +2,7 @@
 import MaPage from '@/views/material/components/MaPage'
 
 export default {
-  name: 'Text',
+  name: 'Mtext',
   components: { MaPage },
   data() {
     return {
