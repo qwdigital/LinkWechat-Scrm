@@ -89,35 +89,39 @@ export default {
         }
 
         if (this.maxImgPx) {
-          await new Promise((resolve) => {
-            let width, height
-            let image = new Image()
-            //加载图片获取图片真实宽度和高度
-            image.onload = () => {
-              width = image.width
-              height = image.height
-              if (width > this.maxImgPx[0]) {
-                isSize = false
-                this.$message.error('图片“宽”度超限，请重新选择')
-              } else if (height > this.maxImgPx[1]) {
-                this.$message.error('图片“高”度超限，请重新选择')
-                isSize = false
+          try {
+            await new Promise((resolve) => {
+              let width, height
+              let image = new Image()
+              //加载图片获取图片真实宽度和高度
+              image.onload = () => {
+                width = image.width
+                height = image.height
+                if (width > this.maxImgPx[0]) {
+                  isSize = false
+                  this.$message.error('图片“宽”度超限，请重新选择')
+                } else if (height > this.maxImgPx[1]) {
+                  this.$message.error('图片“高”度超限，请重新选择')
+                  isSize = false
+                }
+                window.URL && window.URL.revokeObjectURL(image.src)
+                resolve()
               }
-              window.URL && window.URL.revokeObjectURL(image.src)
-              resolve()
-            }
-            if (window.URL) {
-              url = window.URL.createObjectURL(file)
-              image.src = url
-            } else if (window.FileReader) {
-              let reader = new FileReader()
-              reader.onload = function(e) {
-                let data = e.target.result
-                image.src = data
+              if (window.URL) {
+                let url = window.URL.createObjectURL(file)
+                image.src = url
+              } else if (window.FileReader) {
+                let reader = new FileReader()
+                reader.onload = function(e) {
+                  let data = e.target.result
+                  image.src = data
+                }
+                reader.readAsDataURL(file)
               }
-              reader.readAsDataURL(file)
-            }
-          })
+            })
+          } catch (e) {
+            console.error(e)
+          }
         }
       } else if (this.type === '1') {
         // 语音
