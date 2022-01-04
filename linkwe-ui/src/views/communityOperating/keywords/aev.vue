@@ -32,7 +32,7 @@
         />
       </el-form-item>
 
-      <el-form-item label="选择群活码">
+      <el-form-item label="选择群活码" prop="groupCodeId">
         <el-image
           v-if="groupQrCode && groupQrCode.codeUrl"
           :src="groupQrCode.codeUrl"
@@ -138,7 +138,7 @@ export default {
       })
     },
     submit() {
-      this.$refs.form.validate(valid => {
+      this.$refs.form.validate((valid) => {
         if (valid) {
           this.loading = true
           if (this.taskId) {

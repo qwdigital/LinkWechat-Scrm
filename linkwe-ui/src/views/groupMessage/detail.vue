@@ -162,7 +162,7 @@
         },
         memberState: {
           0: '未发送',
-          1: '已发送'
+          2: '已发送'
         },
         member: {
           loading: false,

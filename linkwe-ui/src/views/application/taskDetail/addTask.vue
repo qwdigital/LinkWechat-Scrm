@@ -416,7 +416,7 @@ export default {
         </el-form-item>
       </el-form>
     </div>
-    <div class="edit-model">
+    <!-- <div class="edit-model">
       <h4 class="title">新客欢迎语</h4>
       <el-form :model="groupForm" ref="welcomeTips" label-width="150px" class="top-search">
         <div class="welcomeBox">
@@ -428,7 +428,7 @@ export default {
           </div>
         </div>
       </el-form>
-    </div>
+    </div> -->
     <el-button type="primary" @click="submitForm()">{{
       pageType == 'edit' ? '立即修改' : '立即创建'
     }}</el-button>

@@ -3,12 +3,7 @@
     <!-- 头部 -->
     <div class="header">
       <span class="title"> 社群关系 </span>
-      <van-icon
-        name="cross"
-        color="#9c9c9c"
-        size="16"
-        @click="$router.back()"
-      />
+      <van-icon name="cross" color="#9c9c9c" size="16" @click="$router.back()" />
     </div>
     <van-divider />
     <!-- 标签页 -->
@@ -22,58 +17,69 @@
       >
         <van-tab :title="'添加的员工(' + staff.length + ')'">
           <van-list v-model="loading" :finished="finished" @load="onLoad">
-            <van-cell v-for="(item, index) in staff" :key="index">
-              <div class="details">
-                <div class="detail">
-                  <div class="left">
-                    <div class="img">
-                      <img :src="item.headImageUrl" alt="" />
-                    </div>
-                    <div class="right">
-                      <div>
-                        <span>{{ item.userName }} &nbsp; &nbsp;</span>
+            <template v-if="staff.length">
+              <van-cell v-for="(item, index) in staff" :key="index">
+                <div class="details">
+                  <div class="detail">
+                    <div class="left">
+                      <div class="img">
+                        <img :src="item.headImageUrl" alt="" />
                       </div>
-                      <div class="c9">
-                        <span>添加时间：</span>
-                        <span>{{ getTime(item.createTime) }}</span>
+                      <div class="right">
+                        <div>
+                          <span>{{ item.userName }} &nbsp; &nbsp;</span>
+                        </div>
+                        <div class="c9">
+                          <span>添加时间：</span>
+                          <span>{{ getTime(item.createTime) }}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </van-cell>
+              </van-cell>
+            </template>
+            <van-empty v-else image-size="50" description="暂无数据" />
           </van-list>
         </van-tab>
         <van-tab :title="'添加的群聊(' + groupChat.length + ')'">
-          <div class="groupchat1" @click="conGroup">只看与我共同的群聊</div>
           <van-list v-model="loading" :finished="finished" @load="onLoad">
-            <van-cell v-for="(item, index) in groupChat" :key="index">
-              <div class="details">
-                <div class="detail">
-                  <div class="left">
-                    <div class="img">
-                      <img src="@/assets/avatar.jpg" alt="" />
+            <template v-if="groupChat.length">
+              <van-button
+                size="mini"
+                :type="commonActive ? 'info' : 'default'"
+                class="ml20 mt10"
+                @click="conGroup"
+                >只看与我共同的群聊</van-button
+              >
+              <van-cell v-for="(item, index) in groupChat" :key="index">
+                <div class="details">
+                  <div class="detail">
+                    <div class="left">
+                      <div class="img">
+                        <img src="@/assets/avatar.jpg" alt="" />
+                      </div>
+                      <div class="right">
+                        <div>
+                          {{ item.groupName + '(' + item.groupMemberNum + ')' }}
+                        </div>
+                        <div>
+                          <span class="c9">群主：</span>
+                          <span class="c9">{{ item.ownerName }}</span>
+                        </div>
+                        <div class="c9">
+                          <span>入群时间：</span><span>{{ getTime(item.joinTime) }}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div class="right">
-                      <div>
-                        {{ item.groupName + '(' + item.groupMemberNum + ')' }}
-                      </div>
-                      <div>
-                        <span class="c9">群主：</span>
-                        <span class="c9">{{ item.ownerName }}</span>
-                      </div>
-                      <div class="c9">
-                        <span>入群时间：</span
-                        ><span>{{ getTime(item.joinTime) }}</span>
-                      </div>
+                    <div class="groupchat2" v-if="!item.commonGroup">
+                      共同群聊
                     </div>
-                  </div>
-                  <div class="groupchat2" v-if="!item.commonGroup">
-                    共同群聊
                   </div>
                 </div>
-              </div>
-            </van-cell>
+              </van-cell>
+            </template>
+            <van-empty v-else image-size="50" description="暂无数据" />
           </van-list>
         </van-tab>
       </van-tabs>
@@ -92,8 +98,10 @@ export default {
       loading: false,
       finished: false,
       staff: [], // 添加的员工
+      allGroup: [], // 添加的群聊
       groupChat: [], // 添加的群聊
       commonGroup: [], // 共同的群聊
+      commonActive: false,
       //   externalUserid: "wmiGuBCgAAIH-T9ekaE-Q52N2lKWeInw",
       externalUserid: ''
     }
@@ -110,7 +118,8 @@ export default {
   },
   methods: {
     conGroup() {
-      this.groupChat = this.commonGroup
+      this.commonActive = !this.commonActive
+      this.groupChat = this.commonActive ? this.commonGroup : this.allGroup
       //    console.log(123);
     },
     onLoad() {
@@ -146,8 +155,8 @@ export default {
         .then(({ data }) => {
           //   console.log(data);
           //   debugger
-          this.groupChat = data
-          this.commonGroup = this.groupChat.filter((ele) => {
+          this.groupChat = this.allGroup = data
+          this.commonGroup = data.filter((ele) => {
             //   debugger
             return ele.groupMemberNum == 1
           })
@@ -161,16 +170,10 @@ export default {
       const date = new Date(data)
       // console.log(timer.getFullYear());
       var Y = date.getFullYear() + '-'
-      var M =
-        (date.getMonth() + 1 < 10
-          ? '0' + (date.getMonth() + 1)
-          : date.getMonth() + 1) + '-'
-      var D =
-        date.getDate() < 10 ? '0' + date.getDate() : date.getDate() + '   '
-      var h =
-        (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
-      var m =
-        date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+      var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
+      var D = date.getDate() < 10 ? '0' + date.getDate() : date.getDate() + '   '
+      var h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
+      var m = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
       return Y + M + D + h + m
     }
   }
@@ -185,7 +188,7 @@ export default {
 .labelPge {
   width: 100%;
   height: 100%;
-  background-color: #f2f2f2;
+  // background-color: #f2f2f2;
 }
 .header {
   margin: 20px 20px 10px;
@@ -229,21 +232,12 @@ export default {
   }
 }
 // 添加的群聊
-.groupchat1 {
-  width: 120px;
-  height: 20px;
-  font-size: 12px;
-  background-color: #fff;
-  border-radius: 20px;
-  text-align: center;
-  line-height: 20px;
-  margin: 10px 20px;
-}
+
 .groupchat2 {
   width: 60px;
   height: 20px;
   font-size: 12px;
-  background-color: #fff;
+  background-color: #9fc9f7;
   border-radius: 5px;
   text-align: center;
   line-height: 20px;

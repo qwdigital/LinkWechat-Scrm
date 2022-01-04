@@ -13,13 +13,11 @@ const routes = [
       title: '首页'
     }
   },
+  // 聊天素材
   {
     path: '/chat',
     name: 'chat',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/chat'),
+    component: () => import('../views/chat'),
     meta: {
       title: 'chat'
     }
@@ -28,11 +26,7 @@ const routes = [
   {
     path: '/portrait',
     name: 'portrait',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ '../views/portrait/index'),
+    component: () => import('../views/portrait/index'),
     meta: {
       title: 'portrait'
     }
@@ -41,27 +35,18 @@ const routes = [
   {
     path: '/customerDetail',
     name: 'customerDetail',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(
-        /* webpackChunkName: "about" */ '../views/portrait/customerDetail.vue'
-      ),
+    component: () => import('../views/portrait/customerDetail.vue'),
     hidden: true,
     meta: {
-      title: ''
+      title: '',
+      noAuth: true
     }
   },
   // 社群关系
   {
     path: '/community',
     name: 'community',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ '../views/portrait/community.vue'),
+    component: () => import('../views/portrait/community.vue'),
     hidden: true,
     meta: {
       title: ''
@@ -71,35 +56,22 @@ const routes = [
   {
     path: '/groupCode',
     name: 'groupCode',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ '../views/groupCode/index'),
+    component: () => import('../views/groupCode/index'),
     hidden: true,
     meta: {
       title: '',
       noAuth: true
     }
   },
-  // 群活码扫描跳转页面
+  // 标签建群+群sop
   {
     path: '/task',
     // name: 'task',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(
-        /* webpackChunkName: "about" */ '../views/communityOperating/task/index'
-      ),
+    component: () => import('../views/communityOperating/task/index'),
     children: [
       {
         path: '',
-        component: () =>
-          import(
-            /* webpackChunkName: "about" */ '../views/communityOperating/task/list'
-          ),
+        component: () => import('../views/communityOperating/task/list'),
         hidden: true,
         meta: {
           title: ''
@@ -109,10 +81,7 @@ const routes = [
       {
         path: 'state',
         name: 'taskState',
-        component: () =>
-          import(
-            /* webpackChunkName: "about" */ '../views/communityOperating/task/state.vue'
-          ),
+        component: () => import('../views/communityOperating/task/state.vue'),
         hidden: true,
         meta: {
           title: '',
@@ -126,17 +95,11 @@ const routes = [
       noAuth: true
     }
   },
-  // 群活码扫描跳转页面
+  // 关键词群
   {
     path: '/keywords',
     name: 'keywords',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(
-        /* webpackChunkName: "about" */ '../views/communityOperating/keywords/index'
-      ),
+    component: () => import('../views/communityOperating/keywords/index'),
     hidden: true,
     meta: {
       title: ''
@@ -148,13 +111,20 @@ const routes = [
     name: 'highSeas',
     component: () => import('../views/highSeas/index'),
     meta: {
-      title: '客户公海'
+      title: '公海分配'
     }
   }
 ]
 
 const router = new VueRouter({
   routes
+})
+router.beforeEach((to, from, next) => {
+  /* 路由发生变化修改页面title */
+  if (to.meta.title) {
+    document.title = to.meta.title
+  }
+  next()
 })
 
 export default router

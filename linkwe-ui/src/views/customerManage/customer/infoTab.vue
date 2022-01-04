@@ -23,8 +23,8 @@ export default {
       portrayalSum: { companyTags: [], personTags: [], trackStates: [], trackUsers: [] }, // 客户画像汇总
       trajectoryType: {
         0: '全部',
-        1: '信息动态',
-        2: '社交动态',
+        1: '客户动态',
+        2: '员工动态',
         3: '跟进动态',
         4: '互动动态'
       },
@@ -141,12 +141,9 @@ export default {
                   ：
                 </template>
                 <template v-if="item.tagNames">
-                  <el-tag
-                    type="info"
-                    v-for="(unit, unique) in item.tagNames.split(',')"
-                    :key="unique"
-                    >{{ unit }}</el-tag
-                  >
+                  <el-tag v-for="(unit, unique) in item.tagNames.split(',')" :key="unique">{{
+                    unit
+                  }}</el-tag>
                 </template>
                 <div v-else class="sub-text-color ac">
                   暂无标签
@@ -281,6 +278,7 @@ export default {
                 <record
                   v-if="openedTabs.includes(index + '')"
                   :userId="item.trackUserId"
+                  trajectoryType="4"
                   viewType="1"
                 ></record>
               </el-tab-pane>

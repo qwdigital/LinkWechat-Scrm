@@ -114,7 +114,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import { getCodeImg, findWxQrLoginInfo } from '@/api/login'
 import Cookies from 'js-cookie'
 import { encrypt, decrypt } from '@/utils/jsencrypt'
@@ -154,15 +153,15 @@ export default {
   },
   created() {
     // data.wxQrLoginRedirectUri http://192.168.0.101/#/authCallback
-    findWxQrLoginInfo().then(({ data }) => {
-      let authParams = {
-        appid: data.corpId, // * 服务商的CorpID
-        redirect_uri: encodeURIComponent(data.wxQrLoginRedirectUri), // * 授权登录之后目的跳转网址，需要做urlencode处理。所在域名需要与授权完成回调域名一致
-        state: '', // ? 用于企业或服务商自行校验session，防止跨域攻击
-        usertype: 'admin' // ? 支持登录的类型。admin代表管理员登录（使用微信扫码）,member代表成员登录（使用企业微信扫码），默认为admin
-      }
-      this.authLink = `https://open.work.weixin.qq.com/wwopen/sso/3rd_qrConnect?appid=${authParams.appid}&redirect_uri=${authParams.redirect_uri}&state=${authParams.state}&usertype=${authParams.usertype}`
-    })
+    // findWxQrLoginInfo().then(({ data }) => {
+    //   let authParams = {
+    //     appid: data.corpId, // * 服务商的CorpID
+    //     redirect_uri: encodeURIComponent(data.wxQrLoginRedirectUri), // * 授权登录之后目的跳转网址，需要做urlencode处理。所在域名需要与授权完成回调域名一致
+    //     state: '', // ? 用于企业或服务商自行校验session，防止跨域攻击
+    //     usertype: 'admin' // ? 支持登录的类型。admin代表管理员登录（使用微信扫码）,member代表成员登录（使用企业微信扫码），默认为admin
+    //   }
+    //   this.authLink = `https://open.work.weixin.qq.com/wwopen/sso/3rd_qrConnect?appid=${authParams.appid}&redirect_uri=${authParams.redirect_uri}&state=${authParams.state}&usertype=${authParams.usertype}`
+    // })
 
     this.getCode()
     this.getCookie()
