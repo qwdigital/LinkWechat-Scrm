@@ -85,7 +85,7 @@ export function findAddGroupNum(params) {
   {
     pageNum:
 pageSize:
-trajectoryType: 轨迹类型(1:客户动态;2:员工动态;3:跟进动态;4:互动动态)
+trajectoryType: 轨迹类型(1:客户动态;2:员工动态;3:互动动态;4:跟进动态)
 userId: 员工的id
 externalUserid: 客户id
   }

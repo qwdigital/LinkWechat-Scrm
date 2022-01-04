@@ -42,7 +42,7 @@
         >
       </el-form-item>
 
-      <el-form-item label="发送方式" prop="sendType">
+      <!-- <el-form-item label="发送方式" prop="sendType">
         <el-radio-group v-model="form.sendType">
           <el-radio
             v-for="(sendType, index) in sendTypeOptions"
@@ -55,7 +55,7 @@
             注：客户每天只能接收来自一名成员的一条群发消息，每月最多接收来自同一企业的四条群发消息。
           </div>
         </el-radio-group>
-      </el-form-item>
+      </el-form-item> -->
 
       <el-form-item label="发送范围" prop="sendScope">
         <el-radio-group v-model="form.sendScope">
@@ -193,10 +193,10 @@ export default {
       codes: [],
       groupQrCode: {}, // 选择的群活码链接
       dateRange: [],
-      sendTypeOptions: [
-        { label: '企业群发', value: 0 },
-        { label: '个人群发', value: 1 }
-      ],
+      // sendTypeOptions: [
+      //   { label: '企业群发', value: 0 },
+      //   { label: '个人群发', value: 1 }
+      // ],
       sendGenderOptions: [
         { label: '全部', value: 0 },
         { label: '男', value: 1 },
@@ -211,7 +211,7 @@ export default {
         taskName: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
         welcomeMsg: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
         groupCodeId: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
-        sendType: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
+        // sendType: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
         sendScope: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
         tagListValidate: [{ required: true, message: '该项为必填项', trigger: 'change' }],
         scopeListValidate: [{ required: true, message: '该项为必填项', trigger: 'change' }]

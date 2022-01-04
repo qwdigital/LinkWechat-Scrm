@@ -2,7 +2,7 @@
 import MaPage from '@/views/material/components/MaPage'
 
 export default {
-  name: 'Image',
+  name: 'Mimage',
   components: { MaPage },
   data() {
     return {
@@ -15,18 +15,26 @@ export default {
   methods: {
     listChange(data) {
       this.srcList = data.map((item) => item.materialUrl)
+    },
+    // 多选框选中数据
+    handleSelectionChange(selection) {
+      this.ids = selection.map((item) => item.id)
     }
   }
 }
 </script>
 
 <template>
-  <MaPage ref="page" type="0" @listChange="listChange" :selected="ids" v-slot="{ list }">
+  <MaPage ref="page" type="0" :selected="ids" v-slot="{ list }">
     <el-table :data="list" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" align="center" />
       <el-table-column label="图片" align="center" prop="materialUrl" width="150">
         <template slot-scope="{ row }">
-          <el-image :src="row.materialUrl" :preview-src-list="srcList" fit="contain"></el-image>
+          <el-image
+            :src="row.materialUrl"
+            :preview-src-list="list.map((item) => item.materialUrl)"
+            fit="contain"
+          ></el-image>
         </template>
       </el-table-column>
       <el-table-column label="图片地址" align="center" prop="materialUrl" />

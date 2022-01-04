@@ -137,8 +137,8 @@
         <van-tab :name="0" title="全部"></van-tab>
         <van-tab :name="1" title="客户动态"></van-tab>
         <van-tab :name="2" title="员工动态"></van-tab>
-        <van-tab :name="3" title="跟进动态"></van-tab>
-        <van-tab :name="4" title="互动动态"></van-tab>
+        <van-tab :name="4" title="跟进动态"></van-tab>
+        <van-tab :name="3" title="互动动态"></van-tab>
       </van-tabs>
 
       <!-- 步骤条 -->

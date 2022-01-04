@@ -123,9 +123,9 @@ export default {
     //   } else if (num == 2) {
     //     return (this.type = '员工动态')
     //   } else if (num == 3) {
-    //     return (this.type = '跟进动态')
-    //   } else if (num == 4) {
     //     return (this.type = '互动动态')
+    //   } else if (num == 4) {
+    //     return (this.type = '跟进动态')
     //   }
     // },
 
