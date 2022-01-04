@@ -10,21 +10,16 @@ ruoyi:
   editPwd: false
   # 实例演示开关
   demoEnabled: true
-  # 是否开启文件云上传（使用的是腾讯云，如果开启了，则需要配置腾讯云存储相关信息；如果关闭了则文件存储再本地，需要配置本地路径）
+  # 目前只支持腾讯云上传
   file:
     startCosUpload: true
-    #如果startCosUpload为false时必须设置，则文件资源放在本地服务器上，该配置为文件访问前缀,配置到nginx上可以直接访问
-    imgUrlPrefix: /lwImg
     #腾讯云对象存储
     cos:
-      secretId: AKIDQRCizIeUGl13vakkDQMH0VkjhPr1rBBv
-      secretKey: e3D8oFetseC0f8OX9XeV7UcTDiyyQ8cr
-      #link-wechat-1251309172.cos.ap-nanjing.myqcloud.com
-      region: ap-nanjing
-      bucketName: link-wechat-1251309172
-      cosImgUrlPrefix: https://link-wechat-1251309172.cos.ap-nanjing.myqcloud.com/
-  # 文件路径 示例（ Windows配置D:/ruoyi/uploadPath，Linux配置 /app/project/pic）
-  profile: /app/pic
+      secretId:
+      secretKey:
+      region:
+      bucketName:
+      cosImgUrlPrefix:
   # 获取ip地址开关
   addressEnabled: true
   # 验证码类型 math 数组计算 char 字符验证
@@ -93,10 +88,10 @@ logging:
 
 #H5地址路径
 H5:
-  domainPrefix: http://linkwechat.cn/
+  domainPrefix: http://demo.linkwechat.cn/
   url: http://h5.linkwechat.cn/index.html
-  fissionUrl: http://h5.linkwechat.cn/index.html?fissionId={}&fissionTargetId={}&posterId={} #任务宝访问链
-  fissionGroupUrl: http://h5.linkwechat.cn/fission.html
+  fissionUrl: http://demo.linkwechat.cn/taskMobile/index.html?fissionId={}&fissionTargetId={}&posterId={} #任务宝
+  fissionGroupUrl: http://demo.linkwechat.cn/taskMobile/fission.html?fissionId={}&recordId={} #群裂变
 # Spring配置
 spring:
   # 资源信息
@@ -271,5 +266,5 @@ wecome:
   welcome-msg-default: "您好，欢迎关注LinkWechat,如果对您有帮助，麻烦在码云上帮我们点个star，谢谢！"
 
 weixin:
-  appid:
-  secret:
+  appid: #公众号appid
+  secret:  #公众号密钥

@@ -40,6 +40,7 @@ public interface WeMediaClient {
 
 
 
+
     /**
      * 上传附件资源
      * Inputstream 对象

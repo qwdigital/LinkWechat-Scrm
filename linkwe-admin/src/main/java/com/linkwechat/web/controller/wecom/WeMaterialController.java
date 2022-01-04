@@ -25,7 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -136,9 +139,13 @@ public class WeMaterialController extends BaseController {
     @ApiOperation("H5端发送获取素材media_id")
     public AjaxResult temporaryMaterialMediaId(String url,String type,String name) throws UnsupportedEncodingException {
 
+//        Base64.Encoder encoder = Base64.getEncoder();
+//        byte[] textByte = name.getBytes("UTF-8");
+//        String encodedText = encoder.encodeToString(textByte);
+
         WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(url,
                 type
-                ,new String(name.getBytes(),"UTF-8"));
+                , name+"."+url .substring( url .lastIndexOf(".") + 1, url.length()));
         return AjaxResult.success(weMediaDto);
     }
 

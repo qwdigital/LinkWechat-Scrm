@@ -207,10 +207,12 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
 
             }
 
+
+
             MomentsParamDto.VisibleRange visibleRange
                     = MomentsParamDto.VisibleRange.builder().build();
 
-                //设置可见范围
+            //设置可见范围
             if(weMoments.getScopeType().equals(new Integer(0))){ //部分
 
 
