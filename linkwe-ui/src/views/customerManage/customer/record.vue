@@ -175,9 +175,13 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.timeline-time-wrap {
-  display: flex;
-  justify-content: center;
+// .timeline-time-wrap {
+// }
+.infinite-list-item {
+  border-bottom: 1px solid #eee;
+  &:last-child {
+    border: 0;
+  }
 }
 .timeline-time {
   font-size: 14px;
