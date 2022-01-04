@@ -136,4 +136,11 @@ public interface IWeCustomerService extends IService<WeCustomer>
     long noRepeatCountCustomer(WeCustomerList weCustomerList);
 
 
+    /**
+     * 客户跟进记录
+     * @param trajectory
+     */
+    void addOrEditWaitHandle(WeCustomerTrajectory trajectory);
+
+
 }

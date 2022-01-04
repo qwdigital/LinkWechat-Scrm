@@ -28,4 +28,9 @@ public class WeAllocateCustomersVo extends BaseEntity {
 
     /**原拥有着*/
     private String handoverUserId;
+
+
+    private String externalUserid;
+
+    private String userId;
 }

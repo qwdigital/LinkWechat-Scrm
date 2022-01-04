@@ -71,6 +71,10 @@ public class WeAddMsgTemplateQuery {
                 } else if (ObjectUtil.equal(MessageType.FILE.getMessageType(), messageTemplate.getMsgType())) {
                     Attachments files = new Files(messageTemplate.getMsgType(), messageTemplate.getMediaId());
                     attachments.add(files);
+                }else if (ObjectUtil.equal(MessageType.TEXT.getMessageType(), messageTemplate.getMsgType())) {
+                    Text text = new Text();
+                    text.setContent(messageTemplate.getContent());
+                    this.text = text;
                 }
             });
         }

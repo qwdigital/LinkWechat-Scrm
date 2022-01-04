@@ -2,6 +2,7 @@ package com.linkwechat.wecom.client;
 
 import com.dtflys.forest.annotation.*;
 import com.linkwechat.wecom.domain.dto.*;
+import com.linkwechat.wecom.domain.dto.customer.AllocateGroupDto;
 import com.linkwechat.wecom.domain.dto.customer.JobExtendsCustomer;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 import com.linkwechat.wecom.interceptor.WeAppAccessTokenInterceptor;
@@ -13,7 +14,7 @@ import com.linkwechat.wecom.retry.WeCommonRetryWhen;
  * @author: HaoN
  * @create: 2020-08-27 16:42
  **/
-@BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeAccessTokenInterceptor.class)
+@BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeCommonAccessTokenInterceptor.class)
 @Retry(maxRetryCount = "3", maxRetryInterval = "1000", condition = WeCommonRetryWhen.class)
 public interface WeUserClient {
 
@@ -73,10 +74,10 @@ public interface WeUserClient {
 
 
     /**
-     * 分配客户(离职继承分配客户)
+     * 离职继承分配客户
      * @return
      */
-    @Request(url="/externalcontact/resigned/transfer_customer", type = "POST")
+    @Request(url="/externalcontact/resigned/transfer_customer", type = "POST",interceptor = WeAccessTokenInterceptor.class)
     WeResultDto allocateCustomer(@JSONBody AllocateWeCustomerDto allocateWeCustomerDto);
 
 
@@ -86,7 +87,7 @@ public interface WeUserClient {
      * @param allocateWeCustomerDto
      * @return
      */
-    @Request(url = "/externalcontact/transfer_customer", type = "POST")
+    @Request(url = "/externalcontact/transfer_customer", type = "POST",interceptor = WeAccessTokenInterceptor.class)
     JobExtendsCustomer transferCustomer(@JSONBody AllocateWeCustomerDto allocateWeCustomerDto);
 
 
@@ -95,7 +96,7 @@ public interface WeUserClient {
      * @param jobExtendsParam
      * @return
      */
-    @Post(url = "externalcontact/transfer_result")
+    @Post(url = "externalcontact/transfer_result",interceptor = WeAccessTokenInterceptor.class)
     JobExtendsCustomer transferResult(@JSONBody JobExtendsCustomer.JobExtendsParam jobExtendsParam);
 
 
@@ -105,8 +106,8 @@ public interface WeUserClient {
      * 分配成员群
      * @return
      */
-    @Request(url="/externalcontact/groupchat/transfer", type = "POST")
-    WeResultDto allocateGroup(@JSONBody AllocateWeGroupDto allocateWeGroupDto);
+    @Request(url="/externalcontact/groupchat/transfer", type = "POST",interceptor = WeAccessTokenInterceptor.class)
+    AllocateGroupDto allocateGroup(@JSONBody AllocateWeGroupDto allocateWeGroupDto);
 
 
     /**
@@ -125,4 +126,13 @@ public interface WeUserClient {
      */
     @Request(url = "/user/getuserinfo",interceptor = WeAppAccessTokenInterceptor.class)
     WeUserInfoDto  getUserInfo(@Query("code")String code,@Header("agentId")String agentId);
+
+
+    /**
+     * 获取离职成员待分配客户
+     * @param checkParm
+     * @return
+     */
+    @Post(url = "/externalcontact/get_unassigned_list",interceptor = WeAccessTokenInterceptor.class)
+    AllocateWeCustomerDto getUnassignedList(@JSONBody AllocateWeCustomerDto.CheckParm checkParm);
 }

@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.handler;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -8,7 +9,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisCache;
 import com.linkwechat.common.enums.MessageType;
-import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeCustomerMessagePushClient;
 import com.linkwechat.wecom.domain.WeGroupMessageList;
 import com.linkwechat.wecom.domain.WeGroupMessageTemplate;
@@ -20,6 +20,7 @@ import com.linkwechat.wecom.domain.query.WeAddMsgTemplateQuery;
 import com.linkwechat.wecom.service.IWeGroupMessageListService;
 import com.linkwechat.wecom.service.IWeGroupMessageTemplateService;
 import com.linkwechat.wecom.service.IWeMaterialService;
+import com.linkwechat.wecom.service.event.WeEventPublisherService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -28,7 +29,7 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author danmo
@@ -52,9 +53,13 @@ public class WeGroupMessageTaskHandler implements ApplicationRunner {
     private IWeMaterialService weMaterialService;
 
     @Autowired
+    private WeEventPublisherService weEventPublisherService;
+
+    @Autowired
     private RedisCache redisCache;
 
-    private AtomicLong templateId;
+    private WeAddGroupMessageQuery query;
+
 
     @Override
     public void run(ApplicationArguments args) {
@@ -64,86 +69,91 @@ public class WeGroupMessageTaskHandler implements ApplicationRunner {
 
     public void groupMessageTaskHandler() {
         while (WeConstans.WEGROUPMSGTIMEDTASK_SWITCH) {
-            try {
-                Set<ZSetOperations.TypedTuple<String>> typedTuples = redisCache.rangeWithScore(WeConstans.WEGROUPMSGTIMEDTASK_KEY, 0, 0);
-                Optional.ofNullable(typedTuples).orElseGet(HashSet::new).forEach(item -> {
-                    long score = Objects.requireNonNull(item.getScore()).longValue();
-                    if (score < System.currentTimeMillis()) {
-                        try {
-                            //当时间小于当前时间时删除第一个记录，并发送群发消息
-                            log.info("获取到消息,执行群发任务: {}", item.getValue());
-                            WeAddGroupMessageQuery query = JSONObject.parseObject(item.getValue(), WeAddGroupMessageQuery.class);
-                            if (query != null) {
-                                templateId = new AtomicLong(query.getId());
-                                Optional.of(query).map(WeAddGroupMessageQuery::getSenderList).orElseGet(ArrayList::new).forEach(sender -> {
-                                    WeAddMsgTemplateQuery templateQuery = new WeAddMsgTemplateQuery();
-                                    templateQuery.setChat_type(query.getChatType());
-                                    templateQuery.setSender(sender.getUserId());
-                                    if (ObjectUtil.equal(1, query.getChatType())) {
-                                        templateQuery.setExternal_userid(sender.getCustomerList());
-                                    }
-                                    getMediaId(query.getAttachmentsList());
-                                    templateQuery.setAttachments(query.getAttachmentsList());
-                                    if (StringUtils.isNotEmpty(query.getContent())) {
-                                        WeAddMsgTemplateQuery.Text text = new WeAddMsgTemplateQuery.Text();
-                                        text.setContent(query.getContent());
-                                        templateQuery.setText(text);
-                                    }
-                                    SendMessageResultDto resultDto = customerMessagePushClient.addMsgTemplate(templateQuery);
-                                    if (resultDto != null && ObjectUtil.equal(WeConstans.WE_SUCCESS_CODE, resultDto.getErrcode())) {
-                                        String msgid = resultDto.getMsgid();
-                                        Long msgTemplateId = query.getId();
-                                        WeGroupMessageList messageList = new WeGroupMessageList();
-                                        messageList.setMsgId(msgid);
-                                        groupMessageListService.update(messageList, new LambdaQueryWrapper<WeGroupMessageList>()
-                                                .eq(WeGroupMessageList::getMsgTemplateId, msgTemplateId)
-                                                .eq(WeGroupMessageList::getUserId, sender.getUserId()));
-                                    }
-                                });
-                                WeGroupMessageTemplate template = new WeGroupMessageTemplate();
-                                template.setId(templateId.get());
-                                template.setStatus(1);
-                                groupMessageTemplateService.updateById(template);
-                            }
-                        } finally {
-                            redisCache.removeRangeCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY, 0, 0);
-                        }
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-                //任务异常修改模板状态为失败
-                if (templateId != null) {
-                    WeGroupMessageTemplate template = new WeGroupMessageTemplate();
-                    template.setId(templateId.get());
-                    template.setStatus(-1);
-                    groupMessageTemplateService.updateById(template);
+            Set<ZSetOperations.TypedTuple<String>> typedTuples = redisCache.rangeWithScore(WeConstans.WEGROUPMSGTIMEDTASK_KEY, 0, 0);
+            if (CollectionUtil.isEmpty(typedTuples)) {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
+            typedTuples.forEach(item -> {
+                long score = Objects.requireNonNull(item.getScore()).longValue();
+                if (score < System.currentTimeMillis()) {
+                    try {
+                        //当时间小于当前时间时删除第一个记录，并发送群发消息
+                        log.info("获取到消息,执行群发任务: {}", item.getValue());
+                        query = JSONObject.parseObject(item.getValue(), WeAddGroupMessageQuery.class);
+                        if (query != null) {
+                            Optional.of(query).map(WeAddGroupMessageQuery::getSenderList).orElseGet(ArrayList::new).forEach(sender -> {
+                                WeAddMsgTemplateQuery templateQuery = new WeAddMsgTemplateQuery();
+                                templateQuery.setChat_type(query.getChatType());
+                                templateQuery.setSender(sender.getUserId());
+                                if (ObjectUtil.equal(1, query.getChatType())) {
+                                    templateQuery.setExternal_userid(sender.getCustomerList());
+                                }
+                                getMediaId(query.getAttachmentsList());
+                                templateQuery.setAttachments(query.getAttachmentsList());
+                                SendMessageResultDto resultDto = customerMessagePushClient.addMsgTemplate(templateQuery);
+                                if (resultDto != null && ObjectUtil.equal(WeConstans.WE_SUCCESS_CODE, resultDto.getErrcode())) {
+                                    String msgid = resultDto.getMsgid();
+                                    Long msgTemplateId = query.getId();
+                                    WeGroupMessageList messageList = new WeGroupMessageList();
+                                    messageList.setMsgId(msgid);
+                                    groupMessageListService.update(messageList, new LambdaQueryWrapper<WeGroupMessageList>()
+                                            .eq(WeGroupMessageList::getMsgTemplateId, msgTemplateId)
+                                            .eq(WeGroupMessageList::getUserId, sender.getUserId()));
+                                }
+                            });
+                            WeGroupMessageTemplate template = new WeGroupMessageTemplate();
+                            template.setId(query.getId());
+                            template.setStatus(1);
+                            groupMessageTemplateService.updateById(template);
+                            if (!ObjectUtil.equal(0, query.getSource())) {
+                                weEventPublisherService.callBackTask(query.getBusinessId(), query.getSource(), 1);
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        //任务异常修改模板状态为失败
+                        if (query.getId() != null) {
+                            WeGroupMessageTemplate template = new WeGroupMessageTemplate();
+                            template.setId(query.getId());
+                            template.setStatus(-1);
+                            groupMessageTemplateService.updateById(template);
+                        }
+                        if (!ObjectUtil.equal(0, query.getSource())) {
+                            weEventPublisherService.callBackTask(query.getBusinessId(), query.getSource(), -1);
+                        }
+                    } finally {
+                        redisCache.removeRangeCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY, 0, 0);
+                    }
+                }
+            });
         }
     }
 
-    void getMediaId(List<WeMessageTemplate> messageTemplates){
+    void getMediaId(List<WeMessageTemplate> messageTemplates) {
         Optional.ofNullable(messageTemplates).orElseGet(ArrayList::new).forEach(messageTemplate -> {
             if (ObjectUtil.equal(MessageType.IMAGE.getMessageType(), messageTemplate.getMsgType())) {
                 WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
-                        ,MessageType.IMAGE.getMessageType()
-                        ,FileUtil.getName(messageTemplate.getMediaId()));
+                        , MessageType.IMAGE.getMessageType()
+                        , FileUtil.getName(messageTemplate.getMediaId()));
                 messageTemplate.setMediaId(weMedia.getMedia_id());
-            }else if (ObjectUtil.equal(MessageType.MINIPROGRAM.getMessageType(), messageTemplate.getMsgType())) {
+            } else if (ObjectUtil.equal(MessageType.MINIPROGRAM.getMessageType(), messageTemplate.getMsgType())) {
                 WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
-                        ,MessageType.IMAGE.getMessageType()
-                        ,FileUtil.getName(messageTemplate.getMediaId()));
+                        , MessageType.IMAGE.getMessageType()
+                        , FileUtil.getName(messageTemplate.getMediaId()));
                 messageTemplate.setMediaId(weMedia.getMedia_id());
             } else if (ObjectUtil.equal(MessageType.VIDEO.getMessageType(), messageTemplate.getMsgType())) {
                 WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
-                        ,MessageType.IMAGE.getMessageType()
-                        ,FileUtil.getName(messageTemplate.getMediaId()));
+                        , MessageType.IMAGE.getMessageType()
+                        , FileUtil.getName(messageTemplate.getMediaId()));
                 messageTemplate.setMediaId(weMedia.getMedia_id());
             } else if (ObjectUtil.equal(MessageType.FILE.getMessageType(), messageTemplate.getMsgType())) {
                 WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
-                        ,MessageType.IMAGE.getMessageType()
-                        ,FileUtil.getName(messageTemplate.getMediaId()));
+                        , MessageType.IMAGE.getMessageType()
+                        , FileUtil.getName(messageTemplate.getMediaId()));
                 messageTemplate.setMediaId(weMedia.getMedia_id());
             }
         });

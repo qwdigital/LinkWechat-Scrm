@@ -21,7 +21,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wc.first_add_time,
             wc.birthday,
             wc.gender,
-           (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id in (wu.department)) as departmentName
+           (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id in (wu.department)) as departmentName,
+            wc.phone,
+            wc.email,
+            wc.address,
+            wc.qq,
+            wc.position,
+            wc.corp_name as corpName,
+            wc.other_descr as otherDescr
         FROM
         we_customer wc
         LEFT JOIN we_user wu ON wc.first_user_id=wu.user_id
@@ -126,10 +133,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             GROUP_CONCAT(if(wt.tag_type=1,wt.`tag_id`,null )) as tagIds,
             GROUP_CONCAT(if(wt.tag_type=1,wt.`name`,null )) as tagNames,
             GROUP_CONCAT(if(wt.tag_type=3,wt.`tag_id`,null )) as personTagIds,
-            GROUP_CONCAT(if(wt.tag_type=3,wt.`name`,null )) as personTagNames
+            GROUP_CONCAT(if(wt.tag_type=3,wt.`name`,null )) as personTagNames,
+            wc.track_content as content
         FROM
             we_customer wc
-       LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.user_id = wc.first_user_id AND wfcrf.del_flag=0
+       LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.user_id = wc.first_user_id  AND wfcrf.external_userid=wc.external_userid AND wfcrf.del_flag=0
        LEFT JOIN we_tag wt ON wt.tag_id = wfcrf.tag_id
         WHERE wc.external_userid=#{externalUserid} and  wc.first_user_id=#{userid}
     </select>
@@ -201,32 +209,36 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         address,
         phone,
         add_method,
-        del_flag
+        del_flag,
+        state
         ) values
         <foreach collection="weCustomers" item="item" index="index" separator=",">
             (#{item.externalUserid},#{item.customerName},#{item.avatar},#{item.customerType},#{item.gender}, #{item.unionid},#{item.birthday},
             #{item.corpName},#{item.position},#{item.isOpenChat}, #{item.createTime},
-            #{item.createBy},#{item.firstUserId},#{item.firstAddTime},#{item.qq},#{item.email},#{item.address},#{item.phone},#{item.addMethod},#{item.delFlag}
+            #{item.createBy},#{item.firstUserId},#{item.firstAddTime},#{item.qq},#{item.email},#{item.address},#{item.phone},#{item.addMethod},#{item.delFlag},
+             #{item.state}
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
-        NAME=IF(we_customer.NAME != null,we_customer.NAME, VALUES(NAME)),
-        avatar=IF(we_customer.avatar != null, VALUES(avatar), we_customer.avatar),
-        customer_type=IF(we_customer.customer_type != null, we_customer.customer_type,VALUES(customer_type)),
-        gender=IF(we_customer.gender != null, VALUES(gender), we_customer.gender),
-        unionid=IF(we_customer.unionid != null, VALUES(unionid), we_customer.unionid),
-        birthday=IF(we_customer.birthday != null,VALUES(birthday), we_customer.birthday),
-        corp_name=IF(we_customer.corp_name != null, VALUES(corp_name), we_customer.corp_name),
-        position=IF(we_customer.position != null, VALUES(position), we_customer.position),
-        is_open_chat=IF(we_customer.is_open_chat != null, VALUES(is_open_chat), we_customer.is_open_chat),
-        first_user_id=IF(we_customer.first_user_id != null, VALUES(first_user_id), we_customer.first_user_id),
-        first_add_time=IF(we_customer.first_add_time != null, VALUES(first_add_time), we_customer.first_add_time),
-        qq=IF(we_customer.qq != null, VALUES(qq), we_customer.qq),
-        email=IF(we_customer.email != null, VALUES(email), we_customer.email),
-        address=IF(we_customer.address != null, VALUES(address), we_customer.address),
-        phone=IF(we_customer.phone != null, VALUES(phone), we_customer.phone),
-        add_method=IF(we_customer.add_method != null, we_customer.add_method, VALUES(add_method)),
-        del_flag=IF(we_customer.del_flag != null, we_customer.del_flag, VALUES(del_flag));
+        NAME=IF(TRIM(VALUES(NAME)) !='',VALUES(NAME),we_customer.NAME),
+        avatar=IF(TRIM(VALUES(avatar)) !='', VALUES(avatar), we_customer.avatar),
+        customer_type=IF(VALUES(customer_type),VALUES(customer_type),we_customer.customer_type),
+        gender=IF(VALUES(gender), VALUES(gender), we_customer.gender),
+        unionid=IF(TRIM(VALUES(unionid)) !='', VALUES(unionid), we_customer.unionid),
+        birthday=IF(VALUES(birthday),VALUES(birthday), we_customer.birthday),
+        corp_name=IF(TRIM(VALUES(corp_name)) !='', VALUES(corp_name), we_customer.corp_name),
+        position=IF(TRIM(VALUES(position)) != '',VALUES(position) , we_customer.position),
+        is_open_chat=IF(VALUES(is_open_chat), VALUES(is_open_chat), we_customer.is_open_chat),
+        first_user_id=IF(TRIM(VALUES(first_user_id)) !='', VALUES(first_user_id), we_customer.first_user_id),
+        first_add_time=IF(VALUES(first_add_time), VALUES(first_add_time), we_customer.first_add_time),
+        qq=IF(TRIM(VALUES(qq)) !='', VALUES(qq), we_customer.qq),
+        email=IF(TRIM(VALUES(email)) != '', VALUES(email), we_customer.email),
+        address=IF(TRIM(VALUES(address)) != '', VALUES(address), we_customer.address),
+        phone=IF(TRIM(VALUES(phone)) != '', VALUES(phone), we_customer.phone),
+        add_method=IF(VALUES(add_method), VALUES(add_method), we_customer.add_method),
+        del_flag=IFNULL(VALUES(del_flag),we_customer.del_flag),
+        del_flag=IF(VALUES(del_flag),VALUES(del_flag),we_customer.del_flag),
+        state=IF(TRIM(VALUES(state)) != '',VALUES(state),we_customer.state);
     </insert>
 
 

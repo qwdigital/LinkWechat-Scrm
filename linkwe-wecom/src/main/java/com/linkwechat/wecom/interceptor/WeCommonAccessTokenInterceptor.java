@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * @description: 微信token拦截器(外部联系人)
+ * @description: 微信token拦截器(通讯录，等相关常用的)
  * @author: HaoN
  * @create: 2020-08-27 22:36
  **/

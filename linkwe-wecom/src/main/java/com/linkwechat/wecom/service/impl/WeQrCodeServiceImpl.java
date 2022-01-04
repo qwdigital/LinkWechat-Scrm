@@ -12,6 +12,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.core.page.TableSupport;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -28,6 +29,7 @@ import com.linkwechat.wecom.domain.vo.qr.WeQrCodeScanCountVo;
 import com.linkwechat.wecom.domain.vo.qr.WeQrScopeVo;
 import com.linkwechat.wecom.mapper.WeQrCodeMapper;
 import com.linkwechat.wecom.service.*;
+import com.linkwechat.wecom.service.event.WeEventPublisherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +60,8 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
     @Autowired
     private IWeCustomerService weCustomerService;
 
-
+    @Autowired
+    private WeEventPublisherService weEventPublisherService;
     /**
      * 新增员工活码
      *
@@ -80,6 +83,9 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
                 //保存活码素材
                 attachmentsService.saveBatchByQrId(weQrCode.getId(), weQrAddQuery.getAttachments());
             }
+            weEventPublisherService.refreshQrCode(String.valueOf(weQrCode.getId()));
+        }else {
+            throw new WeComException(resultDto.getErrcode(), WeErrorCodeEnum.parseEnum(resultDto.getErrcode()).getErrorMsg());
         }
     }
 
@@ -99,6 +105,9 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
                 //修改活码素材
                 attachmentsService.updateBatchByQrId(weQrCode.getId(), weQrAddQuery.getAttachments());
             }
+            weEventPublisherService.refreshQrCode(String.valueOf(weQrCode.getId()));
+        }else {
+            throw new WeComException(resultDto.getErrcode(), WeErrorCodeEnum.parseEnum(resultDto.getErrcode()).getErrorMsg());
         }
     }
 

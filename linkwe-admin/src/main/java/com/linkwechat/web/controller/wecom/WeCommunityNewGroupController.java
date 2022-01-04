@@ -100,7 +100,7 @@ public class WeCommunityNewGroupController extends BaseController {
                 .map(e -> {
                     WeEmpleCode code = weEmpleCodeService.getById(e.getEmplCodeId());
                     Map<String, String> fileMap = new HashMap<>();
-                    fileMap.put("fileName", code.getUseUserName() + "-" + code.getScenario()+".jpg");
+                    fileMap.put("fileName", code.getScenario()+".jpg");
                     fileMap.put("url", code.getQrCode());
                     return fileMap;
                 })

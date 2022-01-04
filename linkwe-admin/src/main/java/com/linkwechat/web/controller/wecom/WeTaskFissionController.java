@@ -69,7 +69,7 @@ public class WeTaskFissionController extends BaseController {
     @ApiOperation(value = "查询任务宝列表", httpMethod = "GET")
     //    @PreAuthorize("@ss.hasPermi('wecom:fission:list')")
     @GetMapping("/list")
-    public TableDataInfo<List<WeTaskFission>> list(WeTaskFission weTaskFission) throws ParseException {
+    public TableDataInfo<List<WeTaskFission>> list(WeTaskFission weTaskFission){
         startPage();
         List<WeTaskFission> list = weTaskFissionService.selectWeTaskFissionList(weTaskFission);
         return getDataTable(list);
@@ -106,7 +106,7 @@ public class WeTaskFissionController extends BaseController {
     //    @PreAuthorize("@ss.hasPermi('wecom:fission:export')")
     @Log(title = "任务宝", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
-    public AjaxResult export(WeTaskFission weTaskFission) throws ParseException {
+    public AjaxResult export(WeTaskFission weTaskFission) {
         List<WeTaskFission> list = weTaskFissionService.selectWeTaskFissionList(weTaskFission);
         ExcelUtil<WeTaskFission> util = new ExcelUtil<WeTaskFission>(WeTaskFission.class);
         return util.exportExcel(list, "fission");
@@ -130,13 +130,8 @@ public class WeTaskFissionController extends BaseController {
     @Log(title = "任务宝", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     public AjaxResult add(@RequestBody WeTaskFission weTaskFission) {
-        Long fissionTaskId = weTaskFissionService.insertWeTaskFission(weTaskFission);
-        if (fissionTaskId != null) {
-            JSONObject json = new JSONObject();
-            json.put("id", fissionTaskId);
-            return AjaxResult.success(json.toJSONString());
-        }
-        return AjaxResult.error();
+        weTaskFissionService.insertWeTaskFission(weTaskFission);
+        return AjaxResult.success();
     }
 
     /**
@@ -183,14 +178,13 @@ public class WeTaskFissionController extends BaseController {
     /**
      * 发送裂变任务
      */
-    @ApiOperation(value = "发送裂变任务", httpMethod = "GET")
-    //    @PreAuthorize("@ss.hasPermi('wecom:fission:send')")
+    /*@ApiOperation(value = "发送裂变任务", httpMethod = "GET")
     @Log(title = "发送裂变任务", businessType = BusinessType.OTHER)
     @GetMapping("/send/{id}")
     public AjaxResult send(@PathVariable Long id) throws Exception {
         weTaskFissionService.sendWeTaskFission(id);
         return AjaxResult.success();
-    }
+    }*/
 
     /**
      * 添加群裂变完成记录

@@ -138,7 +138,7 @@ public class WeMessagePushServiceImpl implements IWeMessagePushService {
 
         if(StringUtils.isNotEmpty(REDIRECT_URI)){
             String context = String.format(
-                    textContent+"<a href='%s?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'>请点击此链接查看</a>",
+                    textContent+"<br><a href='%s?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'>请点击此链接查看</a>",
                     validWeCorpAccount.getAuthorizeUrl(), corpId, REDIRECT_URI);
             text.setContent(context);
             pushDto.setText(text);

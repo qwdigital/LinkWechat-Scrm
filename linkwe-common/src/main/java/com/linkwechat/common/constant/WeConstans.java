@@ -64,6 +64,10 @@ public class WeConstans {
      * 活码前缀
      */
     public static final String WE_QR_CODE_PREFIX = "we_qr";
+    /**
+     * 新客拉群
+     */
+    public static final String WE_QR_XKLQ_PREFIX = "we_xklq";
 
 
     /**
@@ -123,7 +127,7 @@ public class WeConstans {
     /**
      * 已离职
      */
-    public static final Integer WE_USER_IS_LEAVE = 6;
+    public static final Integer WE_USER_IS_LEAVE = 5;
 
 
     /**
@@ -407,4 +411,10 @@ public class WeConstans {
      * 群发消息任务开关
      */
     public static Boolean WEGROUPMSGTIMEDTASK_SWITCH = true;
+
+    /**
+     * 老客标签建群企业群发消息模板
+     */
+    public static final String MSG_TEMPLATE = "你有一个新社群运营任务，<a href='%s?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'>请点击此链接查看详情</a>";
+
 }

@@ -2,7 +2,6 @@ package com.linkwechat.quartz.task;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.date.Week;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.utils.StringUtils;
@@ -10,6 +9,7 @@ import com.linkwechat.wecom.client.WeExternalContactClient;
 import com.linkwechat.wecom.domain.WeQrCode;
 import com.linkwechat.wecom.domain.dto.WeContactWayDto;
 import com.linkwechat.wecom.domain.dto.WeExternalContactDto;
+import com.linkwechat.wecom.domain.query.qr.WeQrCodeEventQuery;
 import com.linkwechat.wecom.domain.vo.qr.WeQrScopePartyVo;
 import com.linkwechat.wecom.domain.vo.qr.WeQrScopeUserVo;
 import com.linkwechat.wecom.domain.vo.qr.WeQrScopeVo;
@@ -17,7 +17,10 @@ import com.linkwechat.wecom.service.IWeQrCodeService;
 import com.linkwechat.wecom.service.IWeQrScopeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -43,19 +46,19 @@ public class WeQrCodeUpdateTask {
     @Autowired
     private WeExternalContactClient externalContactClient;
 
-    public void qrCodeUpdateTask() {
-        List<WeQrScopeVo> weQrScopeList = weQrScopeService.getWeQrScopeByTime(DateUtil.formatDateTime(new Date()));
+    public void qrCodeUpdateTask(String qrCodeId) {
+        List<WeQrScopeVo> weQrScopeList = weQrScopeService.getWeQrScopeByTime(DateUtil.formatDateTime(new Date()),qrCodeId);
         log.info("活码使用范围修改任务 weQrScopeList {}", JSONObject.toJSONString(weQrScopeList));
         if (CollectionUtil.isNotEmpty(weQrScopeList)) {
             Map<Long, List<WeQrScopeVo>> qrCodeMap = weQrScopeList.stream().collect(Collectors.groupingBy(WeQrScopeVo::getQrId));
             qrCodeMap.forEach((qrId,scopeList) ->{
                 WeQrCode weQrCode = weQrCodeService.getById(qrId);
-                WeQrScopeVo weCustomizeQrScope = weQrScopeList.stream()
+                WeQrScopeVo weCustomizeQrScope = scopeList.stream()
                         .filter(item -> ObjectUtil.equal(1, item.getType())).findFirst().orElse(null);
                 if(weCustomizeQrScope != null){
                     extracted(weCustomizeQrScope,weQrCode.getConfigId());
                 }else {
-                    WeQrScopeVo weDefaultQrScope = weQrScopeList.stream()
+                    WeQrScopeVo weDefaultQrScope = scopeList.stream()
                             .filter(item -> ObjectUtil.equal(0, item.getType())).findFirst().orElse(null);
                     extracted(weDefaultQrScope,weQrCode.getConfigId());
                 }
@@ -99,6 +102,19 @@ public class WeQrCodeUpdateTask {
                 }
                 externalContactClient.updateContactWay(weContactWay);
             }
+        }
+    }
+
+
+    @Service
+    public static class RefreshQrCodeHandle implements ApplicationListener<WeQrCodeEventQuery>{
+        @Autowired
+        private WeQrCodeUpdateTask weQrCodeUpdateTask;
+
+        @Async
+        @Override
+        public void onApplicationEvent(WeQrCodeEventQuery weQrCodeEventQuery) {
+            weQrCodeUpdateTask.qrCodeUpdateTask(weQrCodeEventQuery.getQrId());
         }
     }
 }

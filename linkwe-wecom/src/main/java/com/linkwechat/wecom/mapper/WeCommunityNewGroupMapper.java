@@ -3,6 +3,7 @@ package com.linkwechat.wecom.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.wecom.domain.WeCommunityNewGroup;
 import com.linkwechat.wecom.domain.vo.WeCommunityNewGroupVo;
+import com.linkwechat.wecom.domain.vo.WeCommunityWeComeMsgVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -22,10 +23,10 @@ public interface WeCommunityNewGroupMapper extends BaseMapper<WeCommunityNewGrou
     /**
      * 查询新客自动拉群列表
      *
-     * @param emplCodeName 员工名称
-     * @param createBy     创建人
-     * @param beginTime    开始时间
-     * @param endTime      结束时间
+     * @param /emplCodeName 员工名称
+     * @param /createBy     创建人
+     * @param /beginTime    开始时间
+     * @param /endTime      结束时间
      * @return {WeCommunityNewGroupVo}s 列表
      */
 //    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(@Param("emplCodeName") String emplCodeName, @Param("createBy") String createBy
@@ -61,4 +62,6 @@ public interface WeCommunityNewGroupMapper extends BaseMapper<WeCommunityNewGrou
      * @return 结果
      */
     int removeWeCommunityNewGroupByEmplCodeId(@Param("emplCodeId") Long emplCodeId);
+
+    WeCommunityWeComeMsgVo getWelcomeMsgByState(@Param("state") String state);
 }

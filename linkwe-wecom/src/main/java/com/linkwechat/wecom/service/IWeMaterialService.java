@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeMaterial;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.vo.WeMaterialFileVO;
@@ -15,7 +16,7 @@ import java.util.List;
  * @author KEWEN
  * @date 2020-10-08
  */
-public interface IWeMaterialService {
+public interface IWeMaterialService extends IService<WeMaterial> {
 
     /**
      * 上传素材信息

@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import io.swagger.annotations.ApiModel;
@@ -14,6 +15,7 @@ import lombok.Data;
  **/
 @ApiModel
 @Data
+@TableName("we_material")
 public class WeMaterial extends BaseEntity {
 
     private static final long serialVersionUID = 1L;

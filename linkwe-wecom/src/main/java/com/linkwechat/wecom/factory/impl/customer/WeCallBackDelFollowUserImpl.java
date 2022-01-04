@@ -1,24 +1,22 @@
 package com.linkwechat.wecom.factory.impl.customer;
 
+import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.common.enums.MessageType;
+import com.linkwechat.common.enums.TrackState;
+import com.linkwechat.common.enums.TrajectorySceneType;
+import com.linkwechat.common.enums.TrajectoryType;
+import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
 import com.linkwechat.wecom.domain.callback.WeBackCustomerVo;
 import com.linkwechat.wecom.client.WeMessagePushClient;
-import com.linkwechat.wecom.domain.WeCustomer;
-import com.linkwechat.wecom.domain.WeSensitiveAct;
-import com.linkwechat.wecom.domain.WeSensitiveActHit;
-import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.dto.WeMessagePushDto;
 import com.linkwechat.wecom.domain.dto.message.TextMessageDto;
 import com.linkwechat.wecom.factory.WeEventStrategy;
-import com.linkwechat.wecom.service.IWeCorpAccountService;
-import com.linkwechat.wecom.service.IWeCustomerService;
-import com.linkwechat.wecom.service.IWeSensitiveActHitService;
-import com.linkwechat.wecom.service.IWeUserService;
+import com.linkwechat.wecom.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -45,6 +43,9 @@ public class WeCallBackDelFollowUserImpl extends WeEventStrategy {
     @Autowired
     private IWeUserService weUserService;
 
+    @Autowired
+    private IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
+
     @Override
     public void eventHandle(WeBackBaseVo message) {
         WeBackCustomerVo customerInfo = (WeBackCustomerVo) message;
@@ -57,30 +58,48 @@ public class WeCallBackDelFollowUserImpl extends WeEventStrategy {
                 }
                 WeCustomer customer = new WeCustomer();
                 customer.setDelFlag(1);
-                weCustomerService.update(customer,new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getFirstUserId,customerInfo.getUserID())
-                        .eq(WeCustomer::getExternalUserid,customerInfo.getExternalUserID()).eq(WeCustomer::getDelFlag,0));
+                customer.setTrackState(TrackState.STATE_YLS.getType());
+                if(weCustomerService.update(customer,new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getFirstUserId,customerInfo.getUserID())
+                        .eq(WeCustomer::getExternalUserid,customerInfo.getExternalUserID()).eq(WeCustomer::getDelFlag,0))){
 
-                WeCorpAccount validWeCorpAccount = weCorpAccountService.findValidWeCorpAccount();
-                Optional.ofNullable(validWeCorpAccount).ifPresent(weCorpAccount -> {
-                    String customerChurnNoticeSwitch = weCorpAccount.getCustomerChurnNoticeSwitch();
-                    if (WeConstans.DEL_FOLLOW_USER_SWITCH_OPEN.equals(customerChurnNoticeSwitch)) {
-                        String content = "您已经被客户@" + weCustomer.getCustomerName() + "删除!";
-                        TextMessageDto textMessageDto = new TextMessageDto();
-                        textMessageDto.setContent(content);
-                        WeMessagePushDto weMessagePushDto = new WeMessagePushDto();
-                        weMessagePushDto.setMsgtype(MessageType.TEXT.getMessageType());
-                        weMessagePushDto.setTouser(customerInfo.getUserID());
-                        weMessagePushDto.setText(textMessageDto);
 
-                        Optional.ofNullable(validWeCorpAccount).map(WeCorpAccount::getAgentId).ifPresent(agentId -> {
-                            weMessagePushDto.setAgentid(Integer.valueOf(agentId));
-                        });
+                    //添加跟进动态
+                    iWeCustomerTrajectoryService.createTrajectory(  ListUtil.toList(WeCustomerTrajectory.TrajectRel.builder()
+                            .customerId(weCustomer.getExternalUserid())
+                            .userId(weCustomer.getFirstUserId())
+                            .build()), TrajectoryType.TRAJECTORY_TYPE_XXDT.getType(), TrajectorySceneType.TRAJECTORY_TITLE_SCYG.getType(),null,
+                            null
+                    );
 
-                        weMessagePushClient.sendMessageToUser(weMessagePushDto,weMessagePushDto.getAgentid().toString());
-                    }
-                });
+                    WeCorpAccount validWeCorpAccount = weCorpAccountService.findValidWeCorpAccount();
+                    Optional.ofNullable(validWeCorpAccount).ifPresent(weCorpAccount -> {
+                        String customerChurnNoticeSwitch = weCorpAccount.getCustomerChurnNoticeSwitch();
+                        if (WeConstans.DEL_FOLLOW_USER_SWITCH_OPEN.equals(customerChurnNoticeSwitch)) {
+                            String content = "您已经被客户@" + weCustomer.getCustomerName() + "删除!";
+                            TextMessageDto textMessageDto = new TextMessageDto();
+                            textMessageDto.setContent(content);
+                            WeMessagePushDto weMessagePushDto = new WeMessagePushDto();
+                            weMessagePushDto.setMsgtype(MessageType.TEXT.getMessageType());
+                            weMessagePushDto.setTouser(customerInfo.getUserID());
+                            weMessagePushDto.setText(textMessageDto);
 
-                extracted(message, customerInfo, weCustomer);
+                            Optional.ofNullable(validWeCorpAccount).map(WeCorpAccount::getAgentId).ifPresent(agentId -> {
+                                weMessagePushDto.setAgentid(Integer.valueOf(agentId));
+                            });
+
+                            weMessagePushClient.sendMessageToUser(weMessagePushDto,weMessagePushDto.getAgentid().toString());
+                        }
+                    });
+
+                    extracted(message, customerInfo, weCustomer);
+
+
+                }
+
+
+
+
+
             }
         } catch (Exception e) {
             log.error("删除跟进成员事件>>>>>>>>>>>>>param:{},ex:{}", JSONObject.toJSONString(message), e);

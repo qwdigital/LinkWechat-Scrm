@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.wecom.annotation.SynchRecord;
+import com.linkwechat.wecom.constants.SynchRecordConstants;
 import com.linkwechat.wecom.domain.WeSynchRecord;
 import com.linkwechat.wecom.service.IWeSynchRecordService;
 import org.aspectj.lang.JoinPoint;
@@ -40,6 +41,7 @@ public class SynchRecordAop {
     public void doBefore(ProceedingJoinPoint joinPoint) throws Throwable {
         SynchRecord annotationLog = getAnnotationLog(joinPoint);
         if(null != annotationLog){
+
             List<WeSynchRecord> weSynchRecords = iWeSynchRecordService.list(new LambdaQueryWrapper<WeSynchRecord>()
                     .eq(WeSynchRecord::getSynchType,annotationLog.synchType())
                             .between(WeSynchRecord::getSynchTime,DateUtils.getBeforeByHourTime(2)

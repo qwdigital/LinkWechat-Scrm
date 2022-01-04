@@ -158,7 +158,7 @@ public class WeUserController extends BaseController {
     @Log(title = "离职分配", businessType = BusinessType.UPDATE)
     @PutMapping({"/allocateLeaveUserAboutData"})
     public AjaxResult allocateLeaveUserAboutData(@RequestBody WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
-        weLeaveUserInfoAllocateVo.setExtentType(new Integer(0));
+
         weUserService.allocateLeaveUserAboutData(weLeaveUserInfoAllocateVo);
 
         return AjaxResult.success("离职分配成功");

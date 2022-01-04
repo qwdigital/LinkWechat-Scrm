@@ -24,6 +24,6 @@ public interface WeQrScopeMapper extends BaseMapper<WeQrScope> {
 
     List<WeQrScopeVo> getWeQrScopeByQrIds(@Param("qrIds") List<Long> qrIds);
 
-    List<WeQrScopeVo> getWeQrScopeByTime(@Param("formatTime") String formatTime);
+    List<WeQrScopeVo> getWeQrScopeByTime(@Param("formatTime") String formatTime,@Param("qrId") String qrId);
 }
 

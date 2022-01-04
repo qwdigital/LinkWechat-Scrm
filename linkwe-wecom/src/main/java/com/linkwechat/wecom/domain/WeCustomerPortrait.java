@@ -70,4 +70,7 @@ public class WeCustomerPortrait {
     //客户类型 1表示该外部联系人是微信用户，2表示该外部联系人是企业微信用户
     private Integer customerType;
 
+    //跟进动态
+    private String content;
+
 }

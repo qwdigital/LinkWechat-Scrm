@@ -1,6 +1,7 @@
 package com.linkwechat.web.controller.wecom;
 
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.constant.WeConstans;
@@ -8,6 +9,8 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.enums.TrackState;
+import com.linkwechat.common.enums.TrajectoryType;
 import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.constants.SynchRecordConstants;
@@ -209,14 +212,9 @@ public class WeCustomerController extends BaseController
          startPage();
 
          List<WeCustomerTrajectory> weCustomerTrajectories = iWeCustomerTrajectoryService
-                 .list(new LambdaQueryWrapper<WeCustomerTrajectory>()
-                         .eq(trajectoryType !=null,WeCustomerTrajectory::getTrajectoryType,trajectoryType)
-                .eq(StringUtils.isNotEmpty(externalUserid),WeCustomerTrajectory::getExternalUserid, externalUserid)
-                .eq(StringUtils.isNotEmpty(userId),WeCustomerTrajectory::getUserId, userId)
-                                 .orderByDesc(WeCustomerTrajectory::getTrackTime)
-                 );
+                 .followUpRecord(externalUserid, userId, trajectoryType);
 
-        return getDataTable(weCustomerTrajectories);
+         return getDataTable(weCustomerTrajectories);
     }
 
 

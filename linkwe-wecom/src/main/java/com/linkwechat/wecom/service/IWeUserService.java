@@ -150,4 +150,8 @@ public interface IWeUserService extends IService<WeUser>
     List<WeCustomerAddUser> findWeUserByCustomerId(String externalUserid);
 
 
+
+    void synchLeaveUserData();
+
+
 }

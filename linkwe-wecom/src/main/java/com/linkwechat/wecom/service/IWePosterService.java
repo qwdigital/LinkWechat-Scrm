@@ -37,6 +37,6 @@ public interface IWePosterService extends IService<WePoster> {
     public String generateSimpleImg(WePoster poster);
 
 
-    List<WeMaterial> findWePosterToWeMaterial(String categoryId,String name);
+    List<WeMaterial> findWePosterToWeMaterial(String categoryId,String name,Integer status);
 
 }

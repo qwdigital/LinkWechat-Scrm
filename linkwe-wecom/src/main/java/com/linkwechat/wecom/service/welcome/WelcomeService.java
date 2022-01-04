@@ -5,24 +5,27 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.MessageType;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.client.WeCustomerClient;
 import com.linkwechat.wecom.domain.WeCustomer;
 import com.linkwechat.wecom.domain.WeQrAttachments;
 import com.linkwechat.wecom.domain.WeQrCode;
 import com.linkwechat.wecom.domain.WeTag;
+import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
 import com.linkwechat.wecom.domain.query.WeCustomerWelcomeQuery;
+import com.linkwechat.wecom.domain.vo.WeCommunityWeComeMsgVo;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.domain.vo.qr.WeQrCodeDetailVo;
 import com.linkwechat.wecom.domain.vo.tag.WeTagVo;
-import com.linkwechat.wecom.service.IWeCustomerService;
-import com.linkwechat.wecom.service.IWeMaterialService;
-import com.linkwechat.wecom.service.IWeQrCodeService;
+import com.linkwechat.wecom.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -45,6 +48,9 @@ public class WelcomeService implements ApplicationListener<WeCustomerWelcomeQuer
     private IWeQrCodeService weQrCodeService;
 
     @Autowired
+    private IWeCommunityNewGroupService weCommunityNewGroupService;
+
+    @Autowired
     private IWeCustomerService weCustomerService;
 
     @Autowired
@@ -53,21 +59,38 @@ public class WelcomeService implements ApplicationListener<WeCustomerWelcomeQuer
     @Autowired
     private IWeMaterialService weMaterialService;
 
+    @Value("${wecome.welcome-msg-default}")
+    private String welcomMsgDefault;
+
     @Override
     @Async
     public void onApplicationEvent(WeCustomerWelcomeQuery query) {
         log.info("开始发送欢迎语：query:{}", JSONObject.toJSONString(query));
-
-        WeQrCode weQrCode = weQrCodeService.getOne(new LambdaQueryWrapper<WeQrCode>()
-                .eq(WeQrCode::getState, query.getState())
-                .eq(WeQrCode::getDelFlag, 0).last("limit 1"));
         List<WeQrAttachments> qrAttachments = new ArrayList<>();
-        if (weQrCode != null) {
-            WeQrCodeDetailVo qrDetail = weQrCodeService.getQrDetail(weQrCode.getId());
-            qrAttachments.addAll(qrDetail.getQrAttachments());
-            makeCustomerTag(query.getExternalUserId(), query.getUserId(), qrDetail.getQrTags());
-        } else {
-            log.info("未查询到对应活码信息");
+        if(StringUtils.isNotEmpty(query.getState()) && query.getState().startsWith(WeConstans.WE_QR_CODE_PREFIX)){
+            WeQrCode weQrCode = weQrCodeService.getOne(new LambdaQueryWrapper<WeQrCode>()
+                    .eq(WeQrCode::getState, query.getState())
+                    .eq(WeQrCode::getDelFlag, 0).last("limit 1"));
+            if (weQrCode != null) {
+                WeQrCodeDetailVo qrDetail = weQrCodeService.getQrDetail(weQrCode.getId());
+                qrAttachments.addAll(qrDetail.getQrAttachments());
+                makeCustomerTag(query.getExternalUserId(), query.getUserId(), qrDetail.getQrTags());
+            } else {
+                log.warn("未查询到对应员工活码信息");
+            }
+        }else  if(StringUtils.isNotEmpty(query.getState()) && query.getState().startsWith(WeConstans.WE_QR_XKLQ_PREFIX)){
+            WeCommunityWeComeMsgVo welcomeMsgByState = weCommunityNewGroupService.getWelcomeMsgByState(query.getState());
+            if(welcomeMsgByState != null){
+                WeQrAttachments textAtt = new WeQrAttachments();
+                textAtt.setMsgType(MessageType.TEXT.getMessageType());
+                textAtt.setContent(welcomeMsgByState.getWelcomeMsg());
+                qrAttachments.add(textAtt);
+                WeQrAttachments imageAtt = new WeQrAttachments();
+                imageAtt.setMsgType(MessageType.IMAGE.getMessageType());
+                imageAtt.setMediaId(welcomeMsgByState.getCodeUrl());
+                qrAttachments.add(imageAtt);
+                makeCustomerTag(query.getExternalUserId(), query.getUserId(), welcomeMsgByState.getTagList());
+            }
         }
         WeResultDto resultDto = sendWelcomeMsg(query, qrAttachments);
         log.info("结束发送欢迎语：result:{}", JSONObject.toJSONString(resultDto));
@@ -108,7 +131,7 @@ public class WelcomeService implements ApplicationListener<WeCustomerWelcomeQuer
      * @return
      */
     private WeResultDto sendWelcomeMsg(WeCustomerWelcomeQuery query, List<WeQrAttachments> qrAttachments) {
-        String welcomText = "默认欢迎语";
+        String welcomText = welcomMsgDefault;
         WeWelcomeMsg welcomeMsg = WeWelcomeMsg.builder().welcome_code(query.getWelcomeCode()).build();
         if(CollectionUtil.isNotEmpty(qrAttachments)){
             WeQrAttachments weQrAttachments = qrAttachments.stream()
