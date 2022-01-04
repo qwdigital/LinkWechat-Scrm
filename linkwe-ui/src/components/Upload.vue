@@ -103,9 +103,13 @@ export default {
                 this.$message.error('图片“高”度超限，请重新选择')
                 isSize = false
               }
+              window.URL && window.URL.revokeObjectURL(image.src)
               resolve()
             }
-            if (window.FileReader) {
+            if (window.URL) {
+              url = window.URL.createObjectURL(file)
+              image.src = url
+            } else if (window.FileReader) {
               let reader = new FileReader()
               reader.onload = function(e) {
                 let data = e.target.result
