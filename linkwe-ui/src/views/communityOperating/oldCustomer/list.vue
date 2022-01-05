@@ -11,7 +11,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         taskName: '', // 任务名称
-        sendType: '', // 发送方式
+        // sendType: '', // 发送方式
         createBy: '', // 创建人
         beginTime: '', // 创建开始时间
         endTime: '' // 创建结束时间
@@ -20,10 +20,10 @@ export default {
       loading: false, // 主页table加载状态
       list: [], // 老客标签建群数据
       // 可用的发送方式数据
-      sendTypeOptions: [
-        { label: '企业群发', value: 0 },
-        { label: '个人群发', value: 1 }
-      ],
+      // sendTypeOptions: [
+      //   { label: '企业群发', value: 0 },
+      //   { label: '个人群发', value: 1 }
+      // ],
       dateRange: [], // 创建日期[开始时间, 结束时间]
       multiSelect: [], // 多选数据
       customerSearchId: '', // 客户统计所查询的任务ID
@@ -222,7 +222,7 @@ export default {
         <el-form-item label="任务名称" prop="taskName">
           <el-input v-model="query.taskName" placeholder="请输入"></el-input>
         </el-form-item>
-        <el-form-item label="发送方式" prop="sendType">
+        <!-- <el-form-item label="发送方式" prop="sendType">
           <el-select v-model="query.sendType" placeholder="请选择" size="small">
             <el-option
               v-for="(sendType, index) in sendTypeOptions"
@@ -231,7 +231,7 @@ export default {
               :key="index"
             ></el-option>
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="创建人" prop="createBy">
           <el-input v-model="query.createBy" placeholder="请输入"></el-input>
         </el-form-item>
@@ -275,11 +275,11 @@ export default {
         prop="taskName"
         :show-overflow-tooltip="true"
       ></el-table-column>
-      <el-table-column prop="sendType" label="发送方式" align="center">
+      <!-- <el-table-column prop="sendType" label="发送方式" align="center">
         <template #default="{ row }">
           {{ parseInt(row.sendType) === 0 ? '企业群发' : '个人群发' }}
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="当前群人数" align="center" width="100">
         <template #default="{ row }">
           <el-button type="text" @click="openCustomerDialog(row.taskId)">
