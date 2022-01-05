@@ -81,8 +81,15 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
                         .build();
 
                 if(TrajectorySceneType.TRAJECTORY_TITLE_DZPYQ.getType().equals(trajectorySence)
-                        ||TrajectorySceneType.TRAJECTORY_TITLE_PLPYQ.getType().equals(trajectorySence)
-                ||TrajectorySceneType.TRAJECTORY_TITLE_BJBQ.getType().equals(trajectorySence)){
+                        ||TrajectorySceneType.TRAJECTORY_TITLE_PLPYQ.getType().equals(trajectorySence)){
+                    trajectory.setContent(
+                            String.format(TrajectorySceneType.of(trajectorySence).getMsgTpl(),
+                                    iWeCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>()
+                                            .eq(WeCustomer::getFirstUserId, k.getUserId())
+                                            .eq(WeCustomer::getExternalUserid, k.getCustomerId())).getCustomerName(),
+                                    iWeUserService.getById(k.getUserId()).getName())
+                    );
+                }else if(TrajectorySceneType.TRAJECTORY_TITLE_BJBQ.getType().equals(trajectorySence)){
                     trajectory.setContent(
                             String.format(TrajectorySceneType.of(trajectorySence).getMsgTpl(),
                                     iWeUserService.getById(k.getUserId()).getName(),
