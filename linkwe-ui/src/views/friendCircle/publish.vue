@@ -39,7 +39,7 @@
                 </div>
               </div>
               <el-form-item label="图片上传" required :error="item.contentError">
-                <upload class="image-uploader" :fileUrl.sync="item.annexUrl" type="0"></upload>
+                <upload :maxImgPx="limit" class="image-uploader" :fileUrl.sync="item.annexUrl" type="0"></upload>
               </el-form-item>
             </div>
             <!-- 图文 -->
@@ -131,7 +131,8 @@
         selectedUserList: [],
         dialogVisibleSelectUser: false,
         dialogVisibleSelectTag: false,
-        selectedTagList: []
+        selectedTagList: [],
+        limit: [1440, 1080]
       }
     },
     mounted () {
