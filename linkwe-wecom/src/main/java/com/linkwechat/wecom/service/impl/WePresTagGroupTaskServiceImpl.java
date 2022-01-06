@@ -278,7 +278,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
                 WeMessageTemplate template = new WeMessageTemplate();
                 template.setMsgType(MessageType.IMAGE.getMessageType());
 //                template.setMediaId(media.getMedia_id());
-                template.setPicUrl(codeUrl);
+                template.setMediaId(codeUrl);
                 attachmentList.add(template);
 
                 List<WeAddGroupMessageQuery.SenderInfo> senderList = senderInfoList.stream()
@@ -293,6 +293,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
                 query.setSenderList(senderList);
                 query.setChatType(1);
                 query.setIsTask(0);
+                query.setSource(2);
                 query.setAttachmentsList(attachmentList);
 
                 iWeGroupMessageTemplateService.addGroupMsgTemplate(query);
