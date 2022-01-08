@@ -193,7 +193,7 @@ export default {
 
 .nav-scrollbar {
   width: calc(100% - 450px);
-  /deep/.el-scrollbar__view {
+  ::v-deep.el-scrollbar__view {
     white-space: nowrap;
     line-height: 58px;
   }

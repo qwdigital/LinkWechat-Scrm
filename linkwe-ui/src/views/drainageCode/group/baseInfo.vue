@@ -121,9 +121,7 @@ export default {
                   class="image-uploader"
                   @update:file="handleUploadedHeadImage"
                 >
-                  <div slot="tip">
-                    注: 只支持2M以内的jpg/png格式图片
-                  </div>
+                  <div slot="tip">注: 只支持2M以内的jpg/png格式图片</div>
                 </upload>
               </el-form-item>
             </el-col>
@@ -156,9 +154,7 @@ export default {
               <el-col v-show="form.showTip === 1" :sm="24" :md="12">
                 <el-form-item label="客服二维码">
                   <upload :fileUrl.sync="form.customerServerQrCode" class="image-uploader">
-                    <div slot="tip">
-                      注: 只支持2M以内的jpg/png格式图片
-                    </div>
+                    <div slot="tip">注: 只支持2M以内的jpg/png格式图片</div>
                   </upload>
                 </el-form-item>
               </el-col>
@@ -180,17 +176,13 @@ export default {
               <template v-if="form.activityName">
                 {{ form.activityName }}
               </template>
-              <template v-else>
-                活码名称
-              </template>
+              <template v-else> 活码名称 </template>
             </div>
             <div class="preview-guide">
               <template v-if="form.guide">
                 {{ form.guide }}
               </template>
-              <template v-else>
-                这是加群引导语
-              </template>
+              <template v-else> 这是加群引导语 </template>
             </div>
             <div class="preview-code-box">
               <div class="code-box-title">
@@ -214,7 +206,7 @@ export default {
 </template>
 
 <style scoped lang="scss">
-/deep/ .image-uploader {
+::v-deep .image-uploader {
   .uploader-icon {
     width: 80px;
     height: 80px;

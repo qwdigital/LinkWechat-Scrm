@@ -179,7 +179,7 @@ export default {
       form: {
         taskName: '', // 任务名称
         welcomeMsg: '', // 加群引导语
-        sendType: 0, // 发送方式
+        sendType: 1, // 发送方式
         groupCodeId: '', // 群活码ID
         tagList: [], // 标签
         scopeList: [], // 员工
@@ -252,7 +252,7 @@ export default {
       getDetail(id).then(({ data }) => {
         this.form.taskName = data.taskName || ''
         this.form.welcomeMsg = data.welcomeMsg || ''
-        this.form.sendType = data.sendType || 0
+        this.form.sendType = data.sendType || 1
         this.form.sendScope = data.sendScope || 0
         this.form.sendGender = data.sendGender || 0
 

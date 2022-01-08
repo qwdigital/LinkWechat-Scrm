@@ -1,80 +1,86 @@
 <script>
-  import { getList } from '@/api/customer/tag'
-  import list from './list'
+import { getList } from '@/api/customer/tag'
+import list from './list'
 
-  export default {
-    components: { list },
-    props: {
-      // 添加标签显隐
-      visible: {
-        type: Boolean,
-        default: false
+export default {
+  components: { list },
+  props: {
+    // 添加标签显隐
+    visible: {
+      type: Boolean,
+      default: false
+    },
+    // title: {
+    //   type: String,
+    //   default: '',
+    // },
+    type: {
+      type: String | Number,
+      default: '4'
+    },
+    // 显示哪些素材类型标签
+    showArr: {
+      type: Array,
+      default: () => []
+    }
+  },
+  data() {
+    return {
+      text: {},
+      image: {},
+      file: {}
+    }
+  },
+  watch: {},
+  computed: {
+    title() {
+      const titleMap = {
+        4: '文本',
+        0: '图片',
+        8: '图文',
+        9: '小程序'
+      }
+      return titleMap[this.type] || '素材'
+    },
+    Pvisible: {
+      get() {
+        return this.visible
       },
-      // title: {
-      //   type: String,
-      //   default: '',
-      // },
-      type: {
-        type: String | Number,
-        default: '4'
-      },
-      // 显示哪些素材类型标签
-      showArr: {
-        type: Array,
-        default: () => []
+      set(val) {
+        this.$emit('update:visible', val)
       }
     },
-    data () {
-      return {
-        text: {},
-        image: {},
-        file: {}
-      }
-    },
-    watch: {},
-    computed: {
-      title () {
-        const titleMap = {
-          4: '文本',
-          0: '图片',
-          8: '图文',
-          9: '小程序'
-        }
-        return titleMap[this.type] || '素材'
+    Ptype: {
+      get() {
+        return this.type
       },
-      Pvisible: {
-        get () {
-          return this.visible
-        },
-        set (val) {
-          this.$emit('update:visible', val)
-        }
-      },
-      Ptype: {
-        get () {
-          return this.type
-        },
-        set (val) {
-          this.$emit('update:type', val)
-        }
-      }
-    },
-    created () { },
-    mounted () { },
-    methods: {
-      submit () {
-        this.Pvisible = false
-        this.$emit('success', this.selectedData)
-      },
-      onChange (data) {
-        this.selectedData = data
+      set(val) {
+        this.$emit('update:type', val)
       }
     }
+  },
+  created() {},
+  mounted() {},
+  methods: {
+    submit() {
+      this.Pvisible = false
+      this.$emit('success', this.selectedData)
+    },
+    onChange(data) {
+      this.selectedData = data
+    }
   }
+}
 </script>
 
 <template>
-  <el-dialog :title="`选择${title}`" :visible.sync="Pvisible" width="680px" append-to-body destroy-on-close>
+  <el-dialog
+    :title="`选择${title}`"
+    :visible.sync="Pvisible"
+    width="680px"
+    append-to-body
+    destroy-on-close
+  >
     <div>
       <list v-if="showArr.length <= 1" :type="showArr[0] || type" @change="onChange"> </list>
       <el-tabs v-else-if="showArr.length > 1" v-model="Ptype">
@@ -96,18 +102,18 @@
 </template>
 
 <style lang="scss" scoped>
-  .user-list {
-    .el-row {
-      line-height: 26px;
-    }
+.user-list {
+  .el-row {
+    line-height: 26px;
   }
-  .mr30 {
-    margin-right: 30px;
-  }
+}
+.mr30 {
+  margin-right: 30px;
+}
 
-  /deep/.el-dialog__body {
-    padding: 5px 20px;
-    height: 76vh;
-    overflow: auto;
-  }
+::v-deep.el-dialog__body {
+  padding: 5px 20px;
+  height: 76vh;
+  overflow: auto;
+}
 </style>

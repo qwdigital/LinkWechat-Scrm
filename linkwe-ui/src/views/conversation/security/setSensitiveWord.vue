@@ -8,7 +8,7 @@
         >
       </el-form-item>
       <el-form-item>
-        <el-input v-model="form.patternWords" placeholder="搜索关键词" style="width:300px">
+        <el-input v-model="form.patternWords" placeholder="搜索关键词" style="width: 300px">
           <el-button slot="prepend" icon="el-icon-search" @click="getSettingList"></el-button>
         </el-input>
       </el-form-item>
@@ -72,7 +72,7 @@
           <div class="sub-title">匹配词间用逗号隔开</div>
         </el-form-item>
         <el-form-item label="审计范围" :required="true" :error="rangeErrorMsg">
-          <div class="tag-input" style="width:auto;" @click="openAuditUserRange">
+          <div class="tag-input" style="width: auto" @click="openAuditUserRange">
             <span class="tag-place" v-if="!auditUserRange.length"
               >请选择<span class="prompt-title">若不选择，则默认全体成员</span></span
             >
@@ -84,7 +84,7 @@
           </div>
         </el-form-item>
         <el-form-item label="审计人" :required="true" :error="errorMsg">
-          <div class="tag-input" style="width:auto;" @click="openAuditUser">
+          <div class="tag-input" style="width: auto" @click="openAuditUser">
             <span class="tag-place" v-if="!auditUser.length"
               >请选择<span class="prompt-title">请选择部门负责人</span></span
             >
@@ -302,7 +302,7 @@ export default {
   background: #efefef;
   padding: 18px 10px 0 10px;
 }
-/deep/ .add-btn {
+::v-deep .add-btn {
   margin-right: 10px;
 }
 .content {
