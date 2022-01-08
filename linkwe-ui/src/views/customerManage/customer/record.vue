@@ -149,7 +149,7 @@ export default {
     </template>
 
     <div v-else class="timeline-time-wrap">
-      <ul class="infinite-list" v-infinite-scroll="getList" style="overflow:auto">
+      <ul class="infinite-list" v-infinite-scroll="getList" style="overflow: auto">
         <template v-if="list.length">
           <li v-for="(unit, i) in list" class="infinite-list-item" :key="i">
             <div class="timeline-time">{{ dateFormat(unit[0].trackTime, 'yyyy-MM-dd w') }}</div>
@@ -188,13 +188,13 @@ export default {
   color: #999999;
   line-height: 48px;
 }
-.el-timeline > .timeline-box-item:first-child /deep/ .el-timeline-item__node {
+.el-timeline > .timeline-box-item:first-child ::v-deep .el-timeline-item__node {
   border-radius: 0 !important;
 }
 .timeline-box {
   padding-left: 70px;
   &-item {
-    /deep/ .el-timeline-item__timestamp {
+    ::v-deep .el-timeline-item__timestamp {
       position: absolute;
       top: 4px;
       left: -45px;
@@ -208,7 +208,7 @@ export default {
   }
 }
 
-/deep/ .el-timeline-item__tail {
+::v-deep .el-timeline-item__tail {
   border-left-color: #3c88f0;
 }
 </style>

@@ -53,7 +53,7 @@ export default {
     display: none;
   }
 
-  /deep/ .el-loading-spinner {
+  ::v-deep .el-loading-spinner {
     margin-top: 20px;
   }
 

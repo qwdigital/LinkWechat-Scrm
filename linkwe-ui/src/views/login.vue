@@ -42,21 +42,21 @@
               <img :src="codeUrl" @click="getCode" class="login-code-img" />
             </div>
           </el-form-item>
-          <el-checkbox class="fr" v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;"
+          <el-checkbox class="fr" v-model="loginForm.rememberMe" style="margin: 0px 0px 25px 0px"
             >记住密码</el-checkbox
           >
           <el-checkbox
             v-model="isDemonstrationLogin"
             @change="changeDemonAccount"
-            style="margin:0px 0px 25px 0px;"
+            style="margin: 0px 0px 25px 0px"
             >演示账号登录</el-checkbox
           >
-          <el-form-item style="width:100%;">
+          <el-form-item style="width: 100%">
             <el-button
               :loading="loading"
               size="medium"
               type="primary"
-              style="width:100%;"
+              style="width: 100%"
               @click.native.prevent="handleLogin"
             >
               <span v-if="!loading">登 录</span>
@@ -145,7 +145,7 @@ export default {
   },
   watch: {
     $route: {
-      handler: function(route) {
+      handler: function (route) {
         this.redirect = route.query && route.query.redirect
       },
       immediate: true
@@ -296,7 +296,7 @@ export default {
 .login-code-img {
   height: 38px;
 }
-.login /deep/.el-dialog {
+.login ::v-deep.el-dialog {
   position: absolute;
   top: 50%;
   left: 50%;

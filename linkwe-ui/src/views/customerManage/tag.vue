@@ -30,7 +30,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-/deep/.el-tabs__header {
+::v-deep.el-tabs__header {
   margin-bottom: 0;
 }
 </style>

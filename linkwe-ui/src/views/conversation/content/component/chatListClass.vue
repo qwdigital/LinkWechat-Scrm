@@ -6,7 +6,7 @@
         <span class="fr download" @click="exportList()">下载会话</span>
       </div>
     </div>
-    <el-tabs v-model="activeTab" @tab-click="v => opened.includes(v.name) || opened.push(v.name)">
+    <el-tabs v-model="activeTab" @tab-click="(v) => opened.includes(v.name) || opened.push(v.name)">
       <el-tab-pane v-for="(item, index) of list" :key="index" :label="item.label" :name="item.type">
         <chatListClassTab
           v-if="opened.includes(item.type)"
@@ -73,10 +73,10 @@ export default {
         .then(() => {
           return api.exportList(this.queryChat)
         })
-        .then(response => {
+        .then((response) => {
           this.download(response.msg)
         })
-        .catch(function(err) {
+        .catch(function (err) {
           console.log(err)
         })
     }
@@ -84,7 +84,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-/deep/ .el-tabs__header {
+::v-deep .el-tabs__header {
   margin: 0;
 }
 

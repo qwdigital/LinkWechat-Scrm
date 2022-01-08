@@ -29,7 +29,7 @@
                   <img v-if="item.avatar" :src="item.avatar" alt="头像" />
                 </el-col>
                 <el-col :span="10" v-if="item" class="toe">
-                  <span style="line-height:40px">{{ item.customerName }}</span>
+                  <span style="line-height: 40px">{{ item.customerName }}</span>
                 </el-col>
                 <el-col :span="10" class="ar">
                   <span :style="{ color: item.customerType === 1 ? '#4bde03' : '#f9a90b' }"
@@ -203,7 +203,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-/deep/.el-tabs__nav-scroll {
+::v-deep.el-tabs__nav-scroll {
   padding-left: 15px;
 }
 
@@ -217,7 +217,7 @@ export default {
   .el-tabs {
     background: #fff;
   }
-  /deep/ .el-tabs__header {
+  ::v-deep .el-tabs__header {
     margin: 0;
   }
 

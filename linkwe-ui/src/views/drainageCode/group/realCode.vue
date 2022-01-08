@@ -248,9 +248,7 @@ export default {
   <div>
     <div class="mid-action">
       <div>
-        <el-button type="primary" @click="dialog = true">
-          新建实际群码
-        </el-button>
+        <el-button type="primary" @click="dialog = true"> 新建实际群码 </el-button>
         <el-select v-model="query.status" class="ml10" @change="getRealCodes">
           <el-option
             v-for="option in statusOptions"
@@ -311,14 +309,10 @@ export default {
         </el-form-item>
         <el-form-item label="实际群码" prop="actualGroupQrCode">
           <upload :fileUrl.sync="form.actualGroupQrCode" class="image-uploader">
-            <div slot="tip">
-              注: 只支持2M以内的jpg/png格式图片
-            </div>
+            <div slot="tip">注: 只支持2M以内的jpg/png格式图片</div>
           </upload>
           <div>
-            <el-button type="text" @click="exampleDialog = true">
-              查看示例
-            </el-button>
+            <el-button type="text" @click="exampleDialog = true"> 查看示例 </el-button>
           </div>
         </el-form-item>
         <el-form-item label="有效期" prop="effectTime">
@@ -337,9 +331,7 @@ export default {
             placeholder="请输入次数"
             type="Number"
           ></el-input>
-          <div class="tip">
-            注: 不超过190
-          </div>
+          <div class="tip">注: 不超过190</div>
         </el-form-item>
         <el-form-item label="客户群">
           <template v-if="form.chatId">
@@ -348,13 +340,9 @@ export default {
             </el-button>
           </template>
           <template v-else>
-            <el-button icon="el-icon-plus" @click="customerDialog = true">
-              选择客户群
-            </el-button>
+            <el-button icon="el-icon-plus" @click="customerDialog = true"> 选择客户群 </el-button>
           </template>
-          <div class="tip">
-            注: 主要用于老客标签建群
-          </div>
+          <div class="tip">注: 主要用于老客标签建群</div>
         </el-form-item>
       </el-form>
 
@@ -374,9 +362,7 @@ export default {
 
       <el-dialog :visible.sync="exampleDialog" append-to-body width="250px">
         <div class="example-code-box">
-          <div class="example-text">
-            如图所示为标准的微信群二维码:
-          </div>
+          <div class="example-text">如图所示为标准的微信群二维码:</div>
           <div class="code-box-title">
             <svg-icon icon-class="user" class="code-user"></svg-icon>
             实际群名称
@@ -412,7 +398,7 @@ export default {
   width: 50px;
   height: 50px;
 }
-/deep/ .image-uploader {
+::v-deep .image-uploader {
   .uploader-icon {
     width: 80px;
     height: 80px;

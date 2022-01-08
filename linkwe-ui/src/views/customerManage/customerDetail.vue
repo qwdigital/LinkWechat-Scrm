@@ -86,8 +86,8 @@ export default {
 <template>
   <div>
     <!-- <el-button slot="append" circle icon="el-icon-back" @click="$router.back()"></el-button>返回 -->
-    <div class=" flex aic mb20" @click="goRoute(customer)">
-      <el-image style="width: 80px; height: 80px;" :src="customer.avatar" fit="fit"></el-image>
+    <div class="flex aic mb20" @click="goRoute(customer)">
+      <el-image style="width: 80px; height: 80px" :src="customer.avatar" fit="fit"></el-image>
       <div class="ml10">
         <div>
           {{ customer.customerName + (customer.corpName ? '-' + customer.corpName : '') }}
@@ -102,14 +102,12 @@ export default {
               {{ unit }}
             </el-tag>
           </template>
-          <div v-else>
-            暂无标签
-          </div>
+          <div v-else>暂无标签</div>
         </div>
       </div>
     </div>
 
-    <el-card shadow="never" style="background-color: transparent;border:none;">
+    <el-card shadow="never" style="background-color: transparent; border: none">
       <div slot="header" class="card-title">社交关系</div>
       <el-tabs value="1">
         <el-tab-pane
@@ -177,7 +175,7 @@ export default {
 }
 
 .el-card {
-  /deep/.el-card__header {
+  ::v-deep.el-card__header {
     border: 0;
   }
 }

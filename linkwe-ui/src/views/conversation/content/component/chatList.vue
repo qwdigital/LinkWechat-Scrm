@@ -5,10 +5,9 @@
         <!-- <span v-if="item.fromInfo.name">{{item.fromInfo.name}}</span> -->
         <div class="mb15">
           <span class="mr20">{{ item.name }}</span>
-          <span
-            :style="{ color: item.action == 'send' ? '#199ed8' : '#999' }"
-            >{{ item.msgTime }}</span
-          >
+          <span :style="{ color: item.action == 'send' ? '#199ed8' : '#999' }">{{
+            item.msgTime
+          }}</span>
         </div>
 
         <ChatContent :message="item"></ChatContent>
@@ -37,7 +36,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-#videoPlayer /deep/ .vjs-tech {
+#videoPlayer ::v-deep .vjs-tech {
   height: 450px;
 }
 

@@ -1,5 +1,10 @@
 <template>
-  <el-scrollbar ref="scrollContainer" :vertical="false" class="scroll-container" @wheel.native.prevent="handleScroll">
+  <el-scrollbar
+    ref="scrollContainer"
+    :vertical="false"
+    class="scroll-container"
+    @wheel.native.prevent="handleScroll"
+  >
     <slot />
   </el-scrollbar>
 </template>
@@ -55,12 +60,13 @@ export default {
         $scrollWrapper.scrollLeft = $scrollWrapper.scrollWidth - $containerWidth
       } else {
         // find preTag and nextTag
-        const currentIndex = tagList.findIndex(item => item === currentTag)
+        const currentIndex = tagList.findIndex((item) => item === currentTag)
         const prevTag = tagList[currentIndex - 1]
         const nextTag = tagList[currentIndex + 1]
 
         // the tag's offsetLeft after of nextTag
-        const afterNextTagOffsetLeft = nextTag.$el.offsetLeft + nextTag.$el.offsetWidth + tagAndTagSpacing
+        const afterNextTagOffsetLeft =
+          nextTag.$el.offsetLeft + nextTag.$el.offsetWidth + tagAndTagSpacing
 
         // the tag's offsetLeft before of prevTag
         const beforePrevTagOffsetLeft = prevTag.$el.offsetLeft - tagAndTagSpacing
@@ -82,7 +88,7 @@ export default {
   position: relative;
   overflow: hidden;
   width: 100%;
-  /deep/ {
+  ::v-deep {
     .el-scrollbar__bar {
       bottom: 0px;
     }

@@ -153,7 +153,7 @@ export default {
       this.$confirm('是否确认删除吗?', '警告', {
         type: 'warning'
       })
-        .then(function() {
+        .then(function () {
           return api.remove(id)
         })
         .then(() => {
@@ -187,7 +187,7 @@ export default {
       this.$confirm('是否确认删除吗?', '警告', {
         type: 'warning'
       })
-        .then(function() {
+        .then(function () {
           return api.removeDepart(id)
         })
         .then(() => {
@@ -571,7 +571,7 @@ export default {
 .img-wrap {
   height: 340px;
   overflow: auto;
-  /deep/.el-radio__input {
+  ::v-deep.el-radio__input {
     position: absolute;
     right: 0;
   }

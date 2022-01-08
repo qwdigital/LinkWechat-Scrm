@@ -6,12 +6,14 @@
         <div class="tag-input" @click="dialogVisibleSelectUser = true">
           <span class="tag-place" v-if="!queryUser.length">请选择</span>
           <template v-else>
-            <el-tag type="info" v-for="(unit, unique) in queryUser" :key="unique">{{ unit.name }}</el-tag>
+            <el-tag type="info" v-for="(unit, unique) in queryUser" :key="unique">{{
+              unit.name
+            }}</el-tag>
           </template>
         </div>
       </el-form-item>
       <el-form-item>
-        <el-input v-model="form.keyword" placeholder="搜索关键词" style="width:240px"> </el-input>
+        <el-input v-model="form.keyword" placeholder="搜索关键词" style="width: 240px"> </el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="getSensitiveList">查询</el-button>
@@ -22,7 +24,7 @@
         <el-col :span="8">
           <div class="left-title">触发记录</div>
         </el-col>
-        <el-col :span="16" style="text-align: right;">
+        <el-col :span="16" style="text-align: right">
           <el-radio-group v-model="selectDate" size="small">
             <el-radio-button label="昨日"></el-radio-button>
             <el-radio-button label="7日"></el-radio-button>
@@ -40,7 +42,12 @@
         </el-col>
       </el-row>
     </div>
-    <el-table :data="tableData" stripe style="width: 100%" :header-cell-style="{ background: '#fff' }">
+    <el-table
+      :data="tableData"
+      stripe
+      style="width: 100%"
+      :header-cell-style="{ background: '#fff' }"
+    >
       <el-table-column prop="patternWords" label="敏感词"> </el-table-column>
       <el-table-column prop="content" label="内容">
         <template slot-scope="{ row }">
@@ -185,7 +192,7 @@ export default {
   }
 }
 .noborder {
-  /deep/ .el-input--mini .el-input__inner {
+  ::v-deep .el-input--mini .el-input__inner {
     width: 2px;
     border: none;
   }

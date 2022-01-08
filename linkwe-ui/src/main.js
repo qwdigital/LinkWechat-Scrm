@@ -53,15 +53,15 @@ Vue.prototype.selectDictLabels = selectDictLabels
 Vue.prototype.download = download
 Vue.prototype.handleTree = handleTree
 
-Vue.prototype.msgSuccess = function(msg) {
+Vue.prototype.msgSuccess = function (msg) {
   this.$message({ showClose: true, message: msg, type: 'success' })
 }
 
-Vue.prototype.msgError = function(msg) {
+Vue.prototype.msgError = function (msg) {
   this.$message({ showClose: true, message: msg, type: 'error' })
 }
 
-Vue.prototype.msgInfo = function(msg) {
+Vue.prototype.msgInfo = function (msg) {
   this.$message.info(msg)
 }
 
@@ -69,10 +69,10 @@ import { pickerOptions } from '@/utils/index'
 Vue.prototype.pickerOptions = pickerOptions
 import VideoPlayer from 'vue-video-player'
 Vue.use(VideoPlayer)
-import AudioPlayer from '@liripeng/vue-audio-player'
-import '@liripeng/vue-audio-player/lib/vue-audio-player.css'
+// import AudioPlayer from '@liripeng/vue-audio-player'
+// import '@liripeng/vue-audio-player/lib/vue-audio-player.css'
 
-Vue.use(AudioPlayer)
+// Vue.use(AudioPlayer)
 import VueAMap from 'vue-amap'
 
 Vue.use(VueAMap)

@@ -217,7 +217,7 @@ export default {
         .then((response) => {
           this.download(response.msg)
         })
-        .catch(function() {})
+        .catch(function () {})
     }
   }
 }
@@ -268,13 +268,13 @@ export default {
 }
 
 .noborder {
-  /deep/ .el-input--mini .el-input__inner {
+  ::v-deep .el-input--mini .el-input__inner {
     width: 2px;
     border: none;
   }
 }
 
-.emcode /deep/ em {
+.emcode ::v-deep em {
   color: #ff0000;
 }
 </style>

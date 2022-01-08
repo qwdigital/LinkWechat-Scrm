@@ -262,7 +262,7 @@ export default {
 
 <style lang="scss" scoped>
 // .img-wrap {
-//   /deep/.el-radio__input {
+//   ::v-deep.el-radio__input {
 //     position: absolute;
 //     left: 50%;
 //     top: 50%;
@@ -289,7 +289,7 @@ export default {
     top: 0;
   }
 }
-/deep/ .el-checkbox__label {
+::v-deep .el-checkbox__label {
   vertical-align: text-top;
 }
 .label {
