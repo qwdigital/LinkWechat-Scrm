@@ -80,7 +80,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 </foreach>
             </if>
             <if test="weCustomerList.tagIds !=null and weCustomerList.tagIds !=''">
-                AND wcr.tag_id in
+                AND wcr.tag_ids in
                 <foreach collection="weCustomerList.tagIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
@@ -138,7 +138,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 </foreach>
             </if>
             <if test="weCustomerList.tagIds !=null and weCustomerList.tagIds !=''">
-                AND wcr.tag_id in
+                AND wcr.tag_ids in
                 <foreach collection="weCustomerList.tagIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
@@ -304,9 +304,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
            COUNT(DISTINCT  wc.external_userid)
         FROM
         we_customer wc
-        LEFT JOIN we_user wu ON wc.first_user_id=wu.user_id
-        LEFT JOIN we_flower_customer_tag_rel wfctr ON wfctr.del_flag=0 AND wfctr.external_userid=wc.external_userid AND  wfctr.user_id=wc.first_user_id
-        LEFT JOIN we_tag wt ON wt.tag_id=wfctr.tag_id
         <where>
             <if test="weCustomerList.gender !=null">
                 AND wc.gender=#{weCustomerList.gender}
@@ -330,15 +327,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 AND wc.first_user_id=#{weCustomerList.firstUserId}
             </if>
 
-            <if test="weCustomerList.departmentIds != null and weCustomerList.departmentIds !=''">
-                <if test="weCustomerList.departmentIds.indexOf(',') != -1">
-                    OR wu.department in
-                    <foreach item="item" index="index" collection="weCustomerList.departmentIds.split(',')" open="(" separator="," close=")">
-                        #{item}
-                    </foreach>
-                </if>
-
-            </if>
 
             <if test="weCustomerList.delFlag != null">
                 AND wc.del_flag = #{weCustomerList.delFlag}
@@ -353,7 +341,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 </foreach>
             </if>
             <if test="weCustomerList.tagIds !=null and weCustomerList.tagIds !=''">
-                AND wt.tag_id in
+                AND wc.tag_ids in
                 <foreach collection="weCustomerList.tagIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
