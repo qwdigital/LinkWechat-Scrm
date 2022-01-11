@@ -5,9 +5,11 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.enums.*;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
@@ -32,11 +34,15 @@ import com.linkwechat.wecom.mapper.WeCustomerMapper;
 import com.linkwechat.wecom.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -80,6 +86,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
 
+    @Autowired
+    private ThreadPoolTaskExecutor taskExecutor;
+
+
+
 
     /**
      * 重构版客户列表
@@ -88,9 +99,20 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
      * @return
      */
     @Override
-    public List<WeCustomerList> findWeCustomerList(WeCustomerList weCustomerList) {
+    public List<WeCustomerList> findWeCustomerList(WeCustomerList weCustomerList, PageDomain pageDomain) {
 
-        return this.baseMapper.findWeCustomerList(weCustomerList);
+        return this.baseMapper.findWeCustomerList(weCustomerList,pageDomain);
+    }
+
+
+    /**
+     * 客户总数统计
+     * @param weCustomerList
+     * @return
+     */
+    @Override
+    public long countWeCustomerList(WeCustomerList weCustomerList) {
+        return this.baseMapper.countWeCustomerList(weCustomerList);
     }
 
 
@@ -100,40 +122,40 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
      * @return
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     @SynchRecord(synchType = SynchRecordConstants.SYNCH_CUSTOMER)
-    public void synchWeCustomer() {
+    @Async
+    public void synchWeCustomer(){
 
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-
-        //异步同步一下标签库,解决标签不同步问题
-        Threads.SINGLE_THREAD_POOL.execute(new Runnable() {
-            @Override
-            public void run() {
-                SecurityContextHolder.setContext(securityContext);
-
-                //获取所有可以添加客户的企业员工
-                FollowUserList followUserList = weCustomerClient.getFollowUserList();
-                if (WeConstans.WE_SUCCESS_CODE.equals(followUserList.getErrcode())
-                        && ArrayUtil.isNotEmpty(followUserList.getFollow_user())) {
-                    String[] follow_user = followUserList.getFollow_user();
-
-
-                    if (ArrayUtil.isNotEmpty(follow_user)) {
-
-                        List<ExternalUserDetail> externalUserDetails = new ArrayList<>();
-                        getByUser(follow_user, null, externalUserDetails);
-
-                        if (CollectionUtil.isNotEmpty(externalUserDetails)) {
+        //获取所有可以添加客户的企业员工
+        FollowUserList followUserList = weCustomerClient.getFollowUserList();
+        if (WeConstans.WE_SUCCESS_CODE.equals(followUserList.getErrcode())
+                && ArrayUtil.isNotEmpty(followUserList.getFollow_user())) {
+            List<List<String>> partition = Lists.partition(Arrays.asList(followUserList.getFollow_user()), 100);
+            //此处逻辑,根据分片的数据，每片从线程池获取线程，然后启动不同线程处理下面的逻辑
+            for(List<String> follow_user:partition) {
+                List<ExternalUserDetail> externalUserDetails = new ArrayList<>();
+                getByUser(follow_user.stream().toArray(String[]::new), null, externalUserDetails);
+                if (CollectionUtil.isNotEmpty(externalUserDetails)) {
+                    List<List<ExternalUserDetail>> userDetailPartition = Lists.partition(externalUserDetails, 1000);
+                    for(List<ExternalUserDetail> details:userDetailPartition){
+                        taskExecutor.submit(()->{
+                            //此处也可多线程数据分片处理
                             weFlowerCustomerHandle(
-                                    externalUserDetails,true
+                                    details,true
                             );
-                        }
+
+                        });
                     }
                 }
 
             }
-        });
+
+
+
+
+
+        }
+
 
     }
 
@@ -162,12 +184,14 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 weCustomer.setFirstUserId(followInfo.getUserid());
                 weCustomer.setFirstAddTime(new Date(followInfo.getCreatetime() * 1000L));
                 weCustomer.setAddMethod(followInfo.getAdd_way());
-                weCustomerList.add(weCustomer);
+
                 if(isSynchCustomerTagRel){
                     List<String> tags = Stream.of(followInfo.getTag_id()).collect(Collectors.toList());
                     if (CollectionUtil.isNotEmpty(tags)) {
-                        tags.stream().forEach(tag -> {
+                        //获取标签
+                        weCustomer.setTagIds(Joiner.on(",").join(tags));
 
+                        tags.stream().forEach(tag -> {
                             weFlowerCustomerTagRels.add(
                                     WeFlowerCustomerTagRel.builder()
                                             .userId(followInfo.getUserid())
@@ -180,6 +204,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                         });
                     }
                 }
+
+                weCustomerList.add(weCustomer);
 
             });
 
@@ -528,11 +554,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                         TrajectorySceneType.TRAJECTORY_TITLE_GXGRBQ.getType(),
                 CollectionUtil.isNotEmpty(lodAddTag)?
                 String.join(",",lodAddTag.stream().map(WeTag::getName).collect(Collectors.toList())):"暂无标签",null);
-
-
-
-
-
     }
 
 
@@ -581,13 +602,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     weCustomer.setState(followUser.getState());
                     weCustomer.setFirstAddTime(new Date(followUser.getCreatetime() * 1000L));
                     weCustomer.setAddMethod(followUser.getAddWay());
-                    this.baseMapper.batchAddOrUpdate(
-                            ListUtil.toList(weCustomer)
-                    );
+
 
                     //设置标签
                     List<ExternalUserTag> tags = followUser.getTags();
                     if(CollectionUtil.isNotEmpty(tags)){
+                        weCustomer.setTagIds(Joiner.on(",").join(tags));
                         List<WeFlowerCustomerTagRel> tagRels=new ArrayList<>();
                         tags.stream().forEach(k->{
                             tagRels.add(
@@ -602,7 +622,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                         iWeFlowerCustomerTagRelService.batchAddOrUpdate(tagRels);
                     }
 
-
+                    this.baseMapper.batchAddOrUpdate(
+                            ListUtil.toList(weCustomer)
+                    );
 
                     //生成轨迹
                     iWeCustomerTrajectoryService.createTrajectory(ListUtil.toList(
@@ -705,7 +727,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 WeCustomerList.builder()
                         .externalUserid(externalUserid)
                         .delFlag(delFlag)
-                        .build()
+                        .build(),
+                       null
         );
         if(CollectionUtil.isNotEmpty(weCustomerList)){
             BeanUtils.copyBeanProp(
@@ -755,7 +778,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 .externalUserid(externalUserid)
                         .userIds(userId)
                         .delFlag(delFlag)
-                .build());
+                .build(),null);
 
         if(CollectionUtil.isNotEmpty(weCustomerList)){
             List<WeCustomerDetail.CompanyOrPersonTag> companyTags=new ArrayList<>();

@@ -236,7 +236,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                 .userIds(userIds)
                 .tagIds(weTaskFission.getCustomerTagId().replaceAll("all",""))
                 .departmentIds(departmentIds)
-                .build());
+                .build(),null);
         if(weCustomerList != null){
             Map<String, Set<String>> userAndCustomerMap = weCustomerList.stream().collect(Collectors.groupingBy(WeCustomerList::getFirstUserId, Collectors.mapping(WeCustomerList::getExternalUserid, Collectors.toSet())));
             List<WeAddGroupMessageQuery.SenderInfo> senderList = new ArrayList<>();
