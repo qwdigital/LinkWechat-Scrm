@@ -80,10 +80,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 </foreach>
             </if>
             <if test="weCustomerList.tagIds !=null and weCustomerList.tagIds !=''">
-                AND wcr.tag_ids in
-                <foreach collection="weCustomerList.tagIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
+                AND   FIND_IN_SET(#{weCustomerList.tagIds},wcr.tag_ids)
             </if>
             <if test="weCustomerList.beginTime !=null and weCustomerList.beginTime != '' and weCustomerList.endTime !='' and weCustomerList.endTime != null">
                 AND  date_format(wcr.first_add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
@@ -138,10 +135,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 </foreach>
             </if>
             <if test="weCustomerList.tagIds !=null and weCustomerList.tagIds !=''">
-                AND wcr.tag_ids in
-                <foreach collection="weCustomerList.tagIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
+                AND   FIND_IN_SET(#{weCustomerList.tagIds},wcr.tag_ids)
             </if>
             <if test="weCustomerList.beginTime !=null and weCustomerList.beginTime != '' and weCustomerList.endTime !='' and weCustomerList.endTime != null">
                 AND  date_format(wcr.first_add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
@@ -341,10 +335,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 </foreach>
             </if>
             <if test="weCustomerList.tagIds !=null and weCustomerList.tagIds !=''">
-                AND wc.tag_ids in
-                <foreach collection="weCustomerList.tagIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
+                AND   FIND_IN_SET(#{weCustomerList.tagIds},wc.tag_ids)
             </if>
             <if test="weCustomerList.beginTime !=null and weCustomerList.beginTime != '' and weCustomerList.endTime !='' and weCustomerList.endTime != null">
                 AND  date_format(wc.first_add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}

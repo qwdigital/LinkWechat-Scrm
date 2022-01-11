@@ -449,7 +449,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         List<WeTag> lodAddTag = weMakeCustomerTag.getAddTag();
         if(CollectionUtil.isNotEmpty(addTag)){
             //校验是否有标签在库里不存在
-
             List<WeTag> weTagList = iWeTagService.list(
                     new LambdaQueryWrapper<WeTag>()
                             .in(WeTag::getTagId, addTag.stream().map(WeTag::getTagId).collect(Collectors.toList()))
