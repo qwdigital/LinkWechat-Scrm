@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeCommunityNewGroup;
 import com.linkwechat.wecom.domain.dto.WeCommunityNewGroupDto;
 import com.linkwechat.wecom.domain.vo.WeCommunityNewGroupVo;
+import com.linkwechat.wecom.domain.vo.WeCommunityWeComeMsgVo;
 
 import java.util.List;
 import java.util.Optional;
@@ -73,4 +74,5 @@ public interface IWeCommunityNewGroupService extends IService<WeCommunityNewGrou
      */
     List<WeCommunityNewGroupVo> selectWeCommunityNewGroupByIds(List<Long> ids);
 
+    WeCommunityWeComeMsgVo getWelcomeMsgByState(String state);
 }

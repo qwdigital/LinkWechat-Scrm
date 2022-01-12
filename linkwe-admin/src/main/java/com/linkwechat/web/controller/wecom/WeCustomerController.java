@@ -6,13 +6,14 @@ import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.core.page.TableSupport;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.constants.SynchRecordConstants;
 import com.linkwechat.wecom.domain.*;
-import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.domain.vo.WeOnTheJobCustomerVo;
 import com.linkwechat.wecom.service.IWeCustomerService;
@@ -22,7 +23,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -54,15 +54,19 @@ public class WeCustomerController extends BaseController
      *********************************************************************************/
 
     /**
-     * 查询企业微信客户列表(分页)
+     * 查询企业微信客户列表(分页)，优化百万数据分页查询，没有用框架自带分页
      */
     @GetMapping("/findWeCustomerList")
     @ApiOperation("查询企业微信客户列表")
     public TableDataInfo findWeCustomerList(WeCustomerList weCustomerList)
     {
-        startPage();
-        List<WeCustomerList> list = weCustomerService.findWeCustomerList(weCustomerList);
+
+        List<WeCustomerList> list = weCustomerService.findWeCustomerList(weCustomerList,TableSupport.buildPageRequest());
         TableDataInfo dataTable = getDataTable(list);
+        //设置总条数
+        dataTable.setTotal(
+                weCustomerService.countWeCustomerList(weCustomerList)
+        );
         dataTable.setLastSyncTime(
                 iWeSynchRecordService.findUpdateLatestTime(SynchRecordConstants.SYNCH_CUSTOMER)
         );//最近同步时间
@@ -82,7 +86,7 @@ public class WeCustomerController extends BaseController
     public AjaxResult findAllWeCustomerList(WeCustomerList weCustomerList)
     {
         return AjaxResult.success(
-                weCustomerService.findWeCustomerList(weCustomerList)
+                weCustomerService.findWeCustomerList(weCustomerList,null)
         );
     }
 
@@ -209,14 +213,9 @@ public class WeCustomerController extends BaseController
          startPage();
 
          List<WeCustomerTrajectory> weCustomerTrajectories = iWeCustomerTrajectoryService
-                 .list(new LambdaQueryWrapper<WeCustomerTrajectory>()
-                         .eq(trajectoryType !=null,WeCustomerTrajectory::getTrajectoryType,trajectoryType)
-                .eq(StringUtils.isNotEmpty(externalUserid),WeCustomerTrajectory::getExternalUserid, externalUserid)
-                .eq(StringUtils.isNotEmpty(userId),WeCustomerTrajectory::getUserId, userId)
-                                 .orderByDesc(WeCustomerTrajectory::getTrackTime)
-                 );
+                 .followUpRecord(externalUserid, userId, trajectoryType);
 
-        return getDataTable(weCustomerTrajectories);
+         return getDataTable(weCustomerTrajectories);
     }
 
 

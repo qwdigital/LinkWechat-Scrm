@@ -237,7 +237,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
             return  weCustomerService.findWeCustomerList(WeCustomerList.builder()
                     .userIds(staffId)
                     .departmentIds(department)
-                    .build());
+                    .build(),null);
 
 
         } else {
@@ -250,7 +250,7 @@ public class WeCustomerMessagePushServiceImpl implements IWeCustomerMessagePushS
                     .userIds(staffId)
                     .tagIds(tag)
                     .departmentIds(department)
-                    .build());
+                    .build(),null);
 
 //            WeCustomer weCustomer = new WeCustomer();
 //            weCustomer.setUserIds(staffId);

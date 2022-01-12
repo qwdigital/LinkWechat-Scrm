@@ -28,12 +28,4 @@ public interface WePresTagGroupTaskScopeMapper extends BaseMapper<WePresTagGroup
      */
     int batchBindsTaskScopes(List<WePresTagGroupTaskScope> taskScopeList);
 
-    /**
-     * 员工发送信息后，变更其任务状态为 "完成"
-     *
-     * @param taskId 任务id
-     * @param emplId 员工id
-     * @return 结果
-     */
-    int updateEmplTaskStatus(@Param("taskId") Long taskId, @Param("emplId") String emplId);
 }

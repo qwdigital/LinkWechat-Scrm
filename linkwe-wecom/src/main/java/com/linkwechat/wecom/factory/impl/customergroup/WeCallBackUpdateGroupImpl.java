@@ -41,19 +41,22 @@ public class WeCallBackUpdateGroupImpl extends WeEventStrategy {
     @Autowired
     private IWeGroupMemberService groupMemberService;
 
+
+
     @Override
     public void eventHandle(WeBackBaseVo message) {
         WeBackCustomerGroupVo customerGroupInfo = (WeBackCustomerGroupVo) message;
         try {
             weGroupService.updateWeGroup(customerGroupInfo.getChatId());
             String updateDetail = customerGroupInfo.getUpdateDetail();
-            if (updateDetail.equals(CallbackEventUpdateDetail.ADD_MEMBER.getType())) {
+            if (updateDetail.equals(CallbackEventUpdateDetail.ADD_MEMBER.getType())) { //成员入群
                 // 添加成员，该群的实际群活码扫码次数需要加1
                 groupCodeActualService.updateScanTimesByChatId(customerGroupInfo.getChatId());
                 ThreadUtil.execAsync(() ->{
                     groupFissionEnterCheck(customerGroupInfo.getChatId());
                 });
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             log.error("update>>>>>>>>>param:{},ex:{}",customerGroupInfo.getChatId(),e);

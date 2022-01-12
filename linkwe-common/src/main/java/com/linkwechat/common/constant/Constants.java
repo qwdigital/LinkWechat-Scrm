@@ -167,6 +167,18 @@ public class Constants
 
 
 
+    /**
+     * 正常状态(未删除)
+     */
+    public static final Integer COMMON_STATE = 0;
+
+
+    /**
+     * 删除移除状态
+     */
+    public static final Integer DELETE_STATE = 1;
+
+
 
 
 

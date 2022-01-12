@@ -3,6 +3,7 @@ package com.linkwechat.wecom.mapper;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.vo.CusertomerBelongUserInfo;
 import org.apache.ibatis.annotations.Param;
@@ -22,8 +23,15 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
      * @param weCustomerList
      * @return
      */
-    List<WeCustomerList> findWeCustomerList(@Param("weCustomerList") WeCustomerList weCustomerList);
+    List<WeCustomerList> findWeCustomerList(@Param("weCustomerList") WeCustomerList weCustomerList,@Param("pageDomain") PageDomain pageDomain);
 
+
+    /**
+     * 客户总数统计
+     * @param weCustomerList
+     * @return
+     */
+    long countWeCustomerList(@Param("weCustomerList") WeCustomerList weCustomerList);
 
     /**
      * 获取客户所在群
@@ -75,6 +83,9 @@ public interface WeCustomerMapper  extends BaseMapper<WeCustomer>
      * @return
      */
     long noRepeatCountCustomer(@Param("weCustomerList") WeCustomerList weCustomerList);
+
+
+
 
 
 }

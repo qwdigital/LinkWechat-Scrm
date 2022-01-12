@@ -6,6 +6,8 @@ import com.linkwechat.wecom.mapper.WeAllocateCustomerMapper;
 import com.linkwechat.wecom.service.IWeAllocateCustomerService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * 离职分配的客户列Service业务层处理
  * 
@@ -16,4 +18,8 @@ import org.springframework.stereotype.Service;
 public class WeAllocateCustomerServiceImpl extends ServiceImpl<WeAllocateCustomerMapper,WeAllocateCustomer> implements IWeAllocateCustomerService
 {
 
+    @Override
+    public void batchAddOrUpdate(List<WeAllocateCustomer> weAllocateCustomer) {
+        this.baseMapper.batchAddOrUpdate(weAllocateCustomer);
+    }
 }

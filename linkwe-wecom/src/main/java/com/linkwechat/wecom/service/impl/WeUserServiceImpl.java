@@ -18,21 +18,23 @@ import com.linkwechat.common.utils.Threads;
 import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.wecom.annotation.SynchRecord;
 import com.linkwechat.wecom.client.WeCustomerClient;
-import com.linkwechat.wecom.client.WeMsgAuditClient;
+import com.linkwechat.wecom.client.WeCustomerGroupClient;
 import com.linkwechat.wecom.client.WeUserClient;
 import com.linkwechat.wecom.constants.SynchRecordConstants;
+import com.linkwechat.wecom.domain.WeAllocateCustomer;
+import com.linkwechat.wecom.domain.WeAllocateGroup;
 import com.linkwechat.wecom.domain.WeCustomerAddUser;
 import com.linkwechat.wecom.domain.WeUser;
+import com.linkwechat.wecom.domain.dto.AllocateWeCustomerDto;
 import com.linkwechat.wecom.domain.dto.WeUserInfoDto;
+import com.linkwechat.wecom.domain.dto.customer.CustomerGroupDetail;
+import com.linkwechat.wecom.domain.dto.customer.CustomerGroupList;
 import com.linkwechat.wecom.domain.dto.customer.ExternalUserDetail;
 import com.linkwechat.wecom.domain.dto.customer.FollowUserList;
 import com.linkwechat.wecom.domain.dto.msgaudit.WeMsgAuditDto;
 import com.linkwechat.wecom.domain.vo.*;
 import com.linkwechat.wecom.mapper.WeUserMapper;
-import com.linkwechat.wecom.service.IWeCustomerService;
-import com.linkwechat.wecom.service.IWeDepartmentService;
-import com.linkwechat.wecom.service.IWeGroupService;
-import com.linkwechat.wecom.service.IWeUserService;
+import com.linkwechat.wecom.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContext;
@@ -71,7 +73,17 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper, WeUser> impleme
     @Autowired
     private WeCustomerClient weCustomerClient;
 
+    @Autowired
+    private IWeAllocateCustomerService iWeAllocateCustomerService;
 
+    @Autowired
+    private WeCustomerGroupClient weCustomerGroupClient;
+
+    @Autowired
+    private IWeAllocateGroupService iWeAllocateGroupService;
+
+    @Autowired
+    private IWeGroupService iWeGroupService;
 
     @Override
     public WeUser getById(Long id) {
@@ -99,6 +111,7 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper, WeUser> impleme
                         "date_format (create_time,'%Y-%m-%d') >= date_format('" + weUser.getBeginTime() + "','%Y-%m-%d')")
                 .apply(StringUtils.isNotBlank(weUser.getEndTime()),
                         "date_format (create_time,'%Y-%m-%d') <= date_format('" + weUser.getEndTime() + "','%Y-%m-%d')")
+               .orderByDesc(WeUser::getCreateTime)
         );
     }
 
@@ -196,7 +209,7 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper, WeUser> impleme
     public void allocateLeaveUserAboutData(WeLeaveUserInfoAllocateVo weLeaveUserInfoAllocateVo) {
         try {
             //分配客户
-            SpringUtils.getBean(IWeCustomerService.class).allocateWeCustomer(weLeaveUserInfoAllocateVo);
+//            SpringUtils.getBean(IWeCustomerService.class).allocateWeCustomer(weLeaveUserInfoAllocateVo);
             //分配群组
             SpringUtils.getBean(IWeGroupService.class).allocateWeGroup(weLeaveUserInfoAllocateVo);
             //更新员工状态为已分配
@@ -282,6 +295,7 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper, WeUser> impleme
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @Async
     public void deleteUser(String[] userIds) {
         List<WeUser> weUsers=new ArrayList<>();
         CollectionUtil.newArrayList(userIds).forEach(userId-> {
@@ -307,6 +321,8 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper, WeUser> impleme
        );
         if(this.updateBatchById(weUsers)){
             weUsers.forEach(k-> weUserClient.deleteUserByUserId(k.getUserId()));
+            //同步离职成员相关信息分配
+            this.synchLeaveUserData();
         }
 
     }
@@ -363,6 +379,106 @@ public class WeUserServiceImpl extends ServiceImpl<WeUserMapper, WeUser> impleme
     public List<WeCustomerAddUser> findWeUserByCustomerId(String externalUserid) {
         return this.baseMapper.findWeUserByCutomerId(externalUserid);
     }
+
+
+    /**
+     * 同步离职成员的相关数据(待分配客户，待分配群)。
+     */
+    @Override
+    @Async
+    public void synchLeaveUserData() {
+
+        //同步所需要分配的客户
+        List<AllocateWeCustomerDto.Info> infos=new ArrayList<>();
+        getLeaveUserCustomer(null,infos);
+        if(CollectionUtil.isNotEmpty(infos)){
+            //过滤掉不存在的外部联系人
+            List<WeAllocateCustomer> allocateCustomers=new ArrayList<>();
+            infos.stream().forEach(kk->{
+                allocateCustomers.add(
+                        WeAllocateCustomer.builder()
+                                .allocateTime(new Date())
+                                .extentType(new Integer(1))
+                                .externalUserid(kk.getExternal_userid())
+                                .handoverUserid(kk.getHandover_userid())
+                                .status(new Integer(2))
+                                .failReason("离职继承")
+                                .build()
+                );
+
+            });
+            iWeAllocateCustomerService.batchAddOrUpdate(allocateCustomers);
+        }
+
+
+
+        //同步所需分配的客户群
+        List<CustomerGroupList.GroupChat> groupChats=new ArrayList<>();
+        getLeaveUserGroup(null,groupChats);
+        if(CollectionUtil.isNotEmpty(groupChats)){
+            List<WeAllocateGroup> weAllocateGroups=new ArrayList<>();
+            groupChats.stream().forEach(k->{
+                CustomerGroupDetail customerGroupDetail = weCustomerGroupClient.groupChatDetail(CustomerGroupDetail.Params.builder()
+                        .chat_id(k.getChatId())
+                        .need_name(new Integer(0))
+                        .build());
+
+                if(WeConstans.WE_SUCCESS_CODE.equals(customerGroupDetail.getErrcode())
+                &&ArrayUtil.isNotEmpty(customerGroupDetail.getGroupChat())){
+                    weAllocateGroups.add(WeAllocateGroup.builder()
+                            .chatId(k.getChatId())
+                            .oldOwner(customerGroupDetail.getGroupChat().stream().findFirst().get().getOwner())
+                            .status(new Integer(3))
+                            .build());
+                }
+
+
+            });
+            iWeAllocateGroupService.batchAddOrUpdate(weAllocateGroups);
+        }
+
+
+
+
+
+
+    }
+
+    private void getLeaveUserCustomer(String nextCursor, List<AllocateWeCustomerDto.Info> list){
+        AllocateWeCustomerDto unassignedList = weUserClient.getUnassignedList(AllocateWeCustomerDto.CheckParm.builder()
+                        .cursor(nextCursor)
+                .build());
+
+        if (WeConstans.WE_SUCCESS_CODE.equals(unassignedList.getErrcode())
+                && ArrayUtil.isNotEmpty(unassignedList.getInfo())) {
+            list.addAll(unassignedList.getInfo());
+            if (StringUtils.isNotEmpty(unassignedList.getNext_cursor())) {
+                getLeaveUserCustomer(unassignedList.getNext_cursor(),list);
+            }
+
+        }
+
+    }
+
+
+    private void getLeaveUserGroup(String nextCursor,List<CustomerGroupList.GroupChat> groupChats){
+        CustomerGroupList customerGroupList =
+                weCustomerGroupClient.groupChatLists(CustomerGroupList.Params.builder()
+                        .status_filter(new Integer(1))
+                        .cursor(nextCursor)
+                                .limit(new Integer(1000))
+                        .build());
+        if (WeConstans.WE_SUCCESS_CODE.equals(customerGroupList.getErrcode())
+                && ArrayUtil.isNotEmpty(customerGroupList.getGroupChatList())) {
+            groupChats.addAll(customerGroupList.getGroupChatList());
+            if (StringUtils.isNotEmpty(customerGroupList.getNext_cursor())) {
+                getLeaveUserGroup(customerGroupList.getNext_cursor(),groupChats);
+            }
+        }
+
+    }
+
+
 
 
 }

@@ -289,19 +289,7 @@ export default {
       </el-table-column>
       <el-table-column label="客户标签" align="center">
         <div v-if="row.tagList" slot-scope="{ row }">
-          <el-popover placement="bottom" trigger="hover" :disabled="row.tagList.length < 3">
-            <div>
-              <el-tag v-for="(unit, unique) in row.tagList" :key="unique">
-                {{ unit.name }}
-              </el-tag>
-            </div>
-            <div slot="reference">
-              <el-tag v-for="(unit, unique) in row.tagList.slice(0, 2)" :key="unique">
-                {{ unit.name }}
-              </el-tag>
-              <el-tag key="a" v-if="row.tagList.length > 2">...</el-tag>
-            </div>
-          </el-popover>
+          <TagEllipsis :list="row.tagList"></TagEllipsis>
         </div>
         <span v-else>无标签</span>
 
@@ -401,22 +389,14 @@ export default {
           <el-table-column label="客户名" align="center" prop="customerName"></el-table-column>
           <el-table-column prop="sent" label="送达状态" align="center">
             <template #default="{ row }">
-              <template v-if="row.sent">
-                已送达
-              </template>
-              <template v-else>
-                未送达
-              </template>
+              <template v-if="row.sent"> 已送达 </template>
+              <template v-else> 未送达 </template>
             </template>
           </el-table-column>
           <el-table-column prop="inGroup" label="是否在群" align="center">
             <template #default="{ row }">
-              <template v-if="row.inGroup">
-                在群
-              </template>
-              <template v-else>
-                不在群
-              </template>
+              <template v-if="row.inGroup"> 在群 </template>
+              <template v-else> 不在群 </template>
             </template>
           </el-table-column>
         </el-table>

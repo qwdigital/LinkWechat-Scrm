@@ -57,7 +57,7 @@ public class WeGroupMessageTaskServiceImpl extends ServiceImpl<WeGroupMessageTas
                 if(item.getMsgTemplateId() != null){
                     wrapper.eq(WeGroupMessageTask::getMsgTemplateId,item.getMsgTemplateId());
                 }
-                wrapper.eq(WeGroupMessageTask::getMsgId, item.getMsgId()).eq(WeGroupMessageTask::getUserId, item.getUserId());
+                wrapper.eq(WeGroupMessageTask::getUserId, item.getUserId());
                 if (!this.update(item,wrapper)){
                     this.save(item);
                 }

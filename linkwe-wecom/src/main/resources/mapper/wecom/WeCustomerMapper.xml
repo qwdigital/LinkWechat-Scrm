@@ -9,11 +9,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wc.avatar,
             wc.`name` as customerName,
             wc.customer_type as customerType,
-            GROUP_CONCAT(if(wt.tag_type=1,wt.`tag_id`,null )) as tagIds,
-            GROUP_CONCAT(if(wt.tag_type=1,wt.`name`,null )) as tagNames,
-            GROUP_CONCAT(if(wt.tag_type=3,wt.`tag_id`,null )) as personTagIds,
-            GROUP_CONCAT(if(wt.tag_type=3,wt.`name`,null )) as personTagNames,
-            wu.user_name,
+            wc.tag_ids as tagIds,
             wc.external_userid,
             wc.first_user_id,
             wc.track_state,
@@ -21,71 +17,131 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wc.first_add_time,
             wc.birthday,
             wc.gender,
-           (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id in (wu.department)) as departmentName
+            wc.phone,
+            wc.email,
+            wc.address,
+            wc.qq,
+            wc.position,
+            wc.corp_name as corpName,
+            wc.other_descr as otherDescr,
+            (SELECT GROUP_CONCAT(wu.user_name) FROM we_user wu WHERE wu.user_id=wc.first_user_id) as userName,
+            (SELECT GROUP_CONCAT(wt.tag_id) FROM we_flower_customer_tag_rel wfctr
+            LEFT JOIN we_tag wt ON wt.tag_id= wfctr.tag_id
+            WHERE wfctr.external_userid=wc.external_userid AND wc.first_user_id=wfctr.user_id AND wt.tag_type=3
+            )  as personTagIds,
+            (SELECT GROUP_CONCAT(wt.name) FROM we_flower_customer_tag_rel wfctr
+            LEFT JOIN we_tag wt ON wt.tag_id= wfctr.tag_id
+            WHERE wfctr.external_userid=wc.external_userid AND wc.first_user_id=wfctr.user_id AND wt.tag_type=3
+            )  as personTagNames,
+            (SELECT GROUP_CONCAT(wt.name) FROM we_flower_customer_tag_rel wfctr
+            LEFT JOIN we_tag wt ON wt.tag_id= wfctr.tag_id
+            WHERE wfctr.external_userid=wc.external_userid AND wc.first_user_id=wfctr.user_id AND wt.tag_type=1
+            )  as tagNames
         FROM
         we_customer wc
-        LEFT JOIN we_user wu ON wc.first_user_id=wu.user_id
-        LEFT JOIN we_flower_customer_tag_rel wfctr ON wfctr.del_flag=0 AND wfctr.external_userid=wc.external_userid AND  wfctr.user_id=wc.first_user_id
-        LEFT JOIN we_tag wt ON wt.tag_id=wfctr.tag_id
+        JOIN
+        (
+        SELECT wcr.external_userid,wcr.first_user_id FROM we_customer wcr
         <where>
             <if test="weCustomerList.gender !=null">
-                AND wc.gender=#{weCustomerList.gender}
+                AND wcr.gender=#{weCustomerList.gender}
             </if>
 
             <if test="weCustomerList.trackState !=null">
-                AND wc.track_state=#{weCustomerList.trackState}
+                AND wcr.track_state=#{weCustomerList.trackState}
             </if>
 
             <if test="weCustomerList.addMethod !=null">
-                AND wc.add_method=#{weCustomerList.addMethod}
+                AND wcr.add_method=#{weCustomerList.addMethod}
             </if>
 
             <if test="weCustomerList.customerType !=null">
-                AND wc.customer_type=#{weCustomerList.customerType}
+                AND wcr.customer_type=#{weCustomerList.customerType}
             </if>
 
             <if test="weCustomerList.externalUserid !=null">
-                AND wc.external_userid=#{weCustomerList.externalUserid}
+                AND wcr.external_userid=#{weCustomerList.externalUserid}
             </if>
 
             <if test="weCustomerList.firstUserId !=null">
-                AND wc.first_user_id=#{weCustomerList.firstUserId}
-            </if>
-
-            <if test="weCustomerList.departmentIds != null and weCustomerList.departmentIds !=''">
-                <if test="weCustomerList.departmentIds.indexOf(',') != -1">
-                    OR wu.department in
-                    <foreach item="item" index="index" collection="weCustomerList.departmentIds.split(',')" open="(" separator="," close=")">
-                        #{item}
-                    </foreach>
-                </if>
-
+                AND wcr.first_user_id=#{weCustomerList.firstUserId}
             </if>
 
             <if test="weCustomerList.delFlag != null">
-                AND wc.del_flag = #{weCustomerList.delFlag}
+                AND wcr.del_flag = #{weCustomerList.delFlag}
             </if>
             <if test="weCustomerList.name != null and weCustomerList.name !=''">
-                AND  wc.`name` like concat('%',#{weCustomerList.name,jdbcType=VARCHAR},'%')
+                AND  wcr.`name` like concat('%',#{weCustomerList.name,jdbcType=VARCHAR},'%')
             </if>
             <if test="weCustomerList.userIds !=null and weCustomerList.userIds !=''">
-                AND wc.first_user_id in
+                AND wcr.first_user_id in
                 <foreach collection="weCustomerList.userIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
             <if test="weCustomerList.tagIds !=null and weCustomerList.tagIds !=''">
-                AND wt.tag_id in
-                <foreach collection="weCustomerList.tagIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                AND   FIND_IN_SET(#{weCustomerList.tagIds},wcr.tag_ids)
+            </if>
+            <if test="weCustomerList.beginTime !=null and weCustomerList.beginTime != '' and weCustomerList.endTime !='' and weCustomerList.endTime != null">
+                AND  date_format(wcr.first_add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
+            </if>
+        </where>
+        ORDER BY wcr.first_add_time desc
+        <if test="pageDomain !=null">
+            <if test="pageDomain.pageNum !=null and pageDomain.pageSize !=null">
+                limit #{pageDomain.pageNum} , #{pageDomain.pageSize}
+            </if>
+        </if>
+        ) a ON a.external_userid=wc.external_userid AND a.first_user_id=wc.first_user_id
+    </select>
+
+    <select id="countWeCustomerList" resultType="long">
+        SELECT count(0) FROM we_customer wcr
+        <where>
+            <if test="weCustomerList.gender !=null">
+                AND wcr.gender=#{weCustomerList.gender}
+            </if>
+
+            <if test="weCustomerList.trackState !=null">
+                AND wcr.track_state=#{weCustomerList.trackState}
+            </if>
+
+            <if test="weCustomerList.addMethod !=null">
+                AND wcr.add_method=#{weCustomerList.addMethod}
+            </if>
+
+            <if test="weCustomerList.customerType !=null">
+                AND wcr.customer_type=#{weCustomerList.customerType}
+            </if>
+
+            <if test="weCustomerList.externalUserid !=null">
+                AND wcr.external_userid=#{weCustomerList.externalUserid}
+            </if>
+
+            <if test="weCustomerList.firstUserId !=null">
+                AND wcr.first_user_id=#{weCustomerList.firstUserId}
+            </if>
+
+            <if test="weCustomerList.delFlag != null">
+                AND wcr.del_flag = #{weCustomerList.delFlag}
+            </if>
+            <if test="weCustomerList.name != null and weCustomerList.name !=''">
+                AND  wcr.`name` like concat('%',#{weCustomerList.name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="weCustomerList.userIds !=null and weCustomerList.userIds !=''">
+                AND wcr.first_user_id in
+                <foreach collection="weCustomerList.userIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
+            <if test="weCustomerList.tagIds !=null and weCustomerList.tagIds !=''">
+                AND   FIND_IN_SET(#{weCustomerList.tagIds},wcr.tag_ids)
+            </if>
             <if test="weCustomerList.beginTime !=null and weCustomerList.beginTime != '' and weCustomerList.endTime !='' and weCustomerList.endTime != null">
-                AND  date_format(wc.first_add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
+                AND  date_format(wcr.first_add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
             </if>
         </where>
-        GROUP BY wc.external_userid,wc.first_user_id
-        ORDER BY wc.first_add_time desc
+        ORDER BY wcr.first_add_time desc
     </select>
 
 
@@ -126,10 +182,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             GROUP_CONCAT(if(wt.tag_type=1,wt.`tag_id`,null )) as tagIds,
             GROUP_CONCAT(if(wt.tag_type=1,wt.`name`,null )) as tagNames,
             GROUP_CONCAT(if(wt.tag_type=3,wt.`tag_id`,null )) as personTagIds,
-            GROUP_CONCAT(if(wt.tag_type=3,wt.`name`,null )) as personTagNames
+            GROUP_CONCAT(if(wt.tag_type=3,wt.`name`,null )) as personTagNames,
+            wc.track_content as content
         FROM
             we_customer wc
-       LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.user_id = wc.first_user_id AND wfcrf.del_flag=0
+       LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.user_id = wc.first_user_id  AND wfcrf.external_userid=wc.external_userid AND wfcrf.del_flag=0
        LEFT JOIN we_tag wt ON wt.tag_id = wfcrf.tag_id
         WHERE wc.external_userid=#{externalUserid} and  wc.first_user_id=#{userid}
     </select>
@@ -201,32 +258,38 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         address,
         phone,
         add_method,
-        del_flag
+        del_flag,
+        state,
+        tag_ids
         ) values
         <foreach collection="weCustomers" item="item" index="index" separator=",">
             (#{item.externalUserid},#{item.customerName},#{item.avatar},#{item.customerType},#{item.gender}, #{item.unionid},#{item.birthday},
             #{item.corpName},#{item.position},#{item.isOpenChat}, #{item.createTime},
-            #{item.createBy},#{item.firstUserId},#{item.firstAddTime},#{item.qq},#{item.email},#{item.address},#{item.phone},#{item.addMethod},#{item.delFlag}
+            #{item.createBy},#{item.firstUserId},#{item.firstAddTime},#{item.qq},#{item.email},#{item.address},#{item.phone},#{item.addMethod},#{item.delFlag},
+             #{item.state},#{item.tagIds}
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
-        NAME=IF(we_customer.NAME != null,we_customer.NAME, VALUES(NAME)),
-        avatar=IF(we_customer.avatar != null, VALUES(avatar), we_customer.avatar),
-        customer_type=IF(we_customer.customer_type != null, we_customer.customer_type,VALUES(customer_type)),
-        gender=IF(we_customer.gender != null, VALUES(gender), we_customer.gender),
-        unionid=IF(we_customer.unionid != null, VALUES(unionid), we_customer.unionid),
-        birthday=IF(we_customer.birthday != null,VALUES(birthday), we_customer.birthday),
-        corp_name=IF(we_customer.corp_name != null, VALUES(corp_name), we_customer.corp_name),
-        position=IF(we_customer.position != null, VALUES(position), we_customer.position),
-        is_open_chat=IF(we_customer.is_open_chat != null, VALUES(is_open_chat), we_customer.is_open_chat),
-        first_user_id=IF(we_customer.first_user_id != null, VALUES(first_user_id), we_customer.first_user_id),
-        first_add_time=IF(we_customer.first_add_time != null, VALUES(first_add_time), we_customer.first_add_time),
-        qq=IF(we_customer.qq != null, VALUES(qq), we_customer.qq),
-        email=IF(we_customer.email != null, VALUES(email), we_customer.email),
-        address=IF(we_customer.address != null, VALUES(address), we_customer.address),
-        phone=IF(we_customer.phone != null, VALUES(phone), we_customer.phone),
-        add_method=IF(we_customer.add_method != null, we_customer.add_method, VALUES(add_method)),
-        del_flag=IF(we_customer.del_flag != null, we_customer.del_flag, VALUES(del_flag));
+        NAME=IFNULL(VALUES(NAME),we_customer.NAME),
+        avatar=IFNULL(VALUES(avatar), we_customer.avatar),
+        customer_type=IFNULL(VALUES(customer_type),we_customer.customer_type),
+        gender=IFNULL(VALUES(gender), we_customer.gender),
+        unionid=IFNULL(VALUES(unionid), we_customer.unionid),
+        birthday=IFNULL(VALUES(birthday), we_customer.birthday),
+        corp_name=IFNULL(VALUES(corp_name), we_customer.corp_name),
+        position=IFNULL(VALUES(position), we_customer.position),
+        is_open_chat=IFNULL(VALUES(is_open_chat), we_customer.is_open_chat),
+        first_user_id=IFNULL(VALUES(first_user_id), we_customer.first_user_id),
+        first_add_time=IFNULL(VALUES(first_add_time),we_customer.first_add_time),
+        qq=IFNULL(VALUES(qq), we_customer.qq),
+        email=IFNULL(VALUES(email), we_customer.email),
+        address=IFNULL(VALUES(address), we_customer.address),
+        phone=IFNULL(VALUES(phone), we_customer.phone),
+        add_method=IFNULL(VALUES(add_method), we_customer.add_method),
+        del_flag=IFNULL(VALUES(del_flag),we_customer.del_flag),
+        del_flag=IFNULL(VALUES(del_flag),we_customer.del_flag),
+        state=IFNULL(VALUES(state),we_customer.state),
+        tag_ids=IFNULL(VALUES(tag_ids),we_customer.tag_ids);
     </insert>
 
 
@@ -235,9 +298,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
            COUNT(DISTINCT  wc.external_userid)
         FROM
         we_customer wc
-        LEFT JOIN we_user wu ON wc.first_user_id=wu.user_id
-        LEFT JOIN we_flower_customer_tag_rel wfctr ON wfctr.del_flag=0 AND wfctr.external_userid=wc.external_userid AND  wfctr.user_id=wc.first_user_id
-        LEFT JOIN we_tag wt ON wt.tag_id=wfctr.tag_id
         <where>
             <if test="weCustomerList.gender !=null">
                 AND wc.gender=#{weCustomerList.gender}
@@ -261,15 +321,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 AND wc.first_user_id=#{weCustomerList.firstUserId}
             </if>
 
-            <if test="weCustomerList.departmentIds != null and weCustomerList.departmentIds !=''">
-                <if test="weCustomerList.departmentIds.indexOf(',') != -1">
-                    OR wu.department in
-                    <foreach item="item" index="index" collection="weCustomerList.departmentIds.split(',')" open="(" separator="," close=")">
-                        #{item}
-                    </foreach>
-                </if>
-
-            </if>
 
             <if test="weCustomerList.delFlag != null">
                 AND wc.del_flag = #{weCustomerList.delFlag}
@@ -284,10 +335,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 </foreach>
             </if>
             <if test="weCustomerList.tagIds !=null and weCustomerList.tagIds !=''">
-                AND wt.tag_id in
-                <foreach collection="weCustomerList.tagIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
+                AND   FIND_IN_SET(#{weCustomerList.tagIds},wc.tag_ids)
             </if>
             <if test="weCustomerList.beginTime !=null and weCustomerList.beginTime != '' and weCustomerList.endTime !='' and weCustomerList.endTime != null">
                 AND  date_format(wc.first_add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}

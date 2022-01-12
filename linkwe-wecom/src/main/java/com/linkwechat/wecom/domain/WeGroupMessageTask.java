@@ -77,4 +77,14 @@ public class WeGroupMessageTask extends BaseEntity{
     @ApiModelProperty("企业服务人员名称")
     @TableField(exist = false)
     private String userName;
+
+
+    @ApiModelProperty(value = "待发送客户",hidden = true)
+    @TableField(exist = false)
+    private String toBeCustomerName;
+
+
+    @ApiModelProperty(value = "已发送客户",hidden = true)
+    @TableField(exist = false)
+    private String alreadyCustomerName;
 }

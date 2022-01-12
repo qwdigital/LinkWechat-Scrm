@@ -41,8 +41,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="taskName != null  and taskName != ''"> and task_name like concat('%', #{taskName}, '%')</if>
             <if test="fissInfo != null  and fissInfo != ''"> and fiss_info = #{fissInfo}</if>
             <if test="fissNum != null "> and fiss_num = #{fissNum}</if>
-            <if test="startTime != null "> and start_time >= #{startTime}</if>
-            <if test="overTime != null "> <![CDATA[and over_time <= #{overTime}]]></if>
+            <if test="startTime != null"><!-- 开始时间检索 -->
+                and date_format(start_time,'%Y-%m-%d %H:%i:%S') &gt;= date_format(#{startTime},'%Y-%m-%d %H:%i:%S')
+            </if>
+            <if test="overTime != null"><!-- 结束时间检索 -->
+                and date_format(over_time,'%Y-%m-%d %H:%i:%S') &lt;= date_format(#{overTime},'%Y-%m-%d %H:%i:%S')
+            </if>
             <if test="customerTagId != null  and customerTagId != ''"> and customer_tag_id = #{customerTagId}</if>
             <if test="customerTag != null  and customerTag != ''"> and customer_tag = #{customerTag}</if>
             <if test="postersId != null "> and posters_id = #{postersId}</if>

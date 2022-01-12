@@ -1,14 +1,17 @@
 package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
 import com.linkwechat.wecom.domain.vo.WeCustomerDetailVo;
 import com.linkwechat.wecom.domain.vo.WeLeaveUserInfoAllocateVo;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.domain.vo.WeOnTheJobCustomerVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 企业微信客户Service接口
@@ -102,7 +105,14 @@ public interface IWeCustomerService extends IService<WeCustomer>
      * @param weCustomerList
      * @return
      */
-    List<WeCustomerList> findWeCustomerList(WeCustomerList weCustomerList);
+    List<WeCustomerList> findWeCustomerList(WeCustomerList weCustomerList, PageDomain pageDomain);
+
+    /**
+     * 客户总数统计
+     * @param weCustomerList
+     * @return
+     */
+    long countWeCustomerList(@Param("weCustomerList") WeCustomerList weCustomerList);
 
 
     /**
@@ -134,6 +144,13 @@ public interface IWeCustomerService extends IService<WeCustomer>
      * @return
      */
     long noRepeatCountCustomer(WeCustomerList weCustomerList);
+
+
+    /**
+     * 客户跟进记录
+     * @param trajectory
+     */
+    void addOrEditWaitHandle(WeCustomerTrajectory trajectory);
 
 
 }

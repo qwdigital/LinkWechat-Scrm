@@ -58,8 +58,7 @@ public class WeTagGroup extends BaseEntity
     private Integer groupTagType;
 
 
-    /**所属人*/
-    private String owner;
+
 
 
 

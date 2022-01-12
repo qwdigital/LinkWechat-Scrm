@@ -1,6 +1,5 @@
 package com.linkwechat.wecom.service.impl;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -10,14 +9,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.exception.wecom.WeComException;
-import com.linkwechat.common.utils.QREncode;
-import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.WeCommunityNewGroup;
 import com.linkwechat.wecom.domain.WeGroupCodeActual;
 import com.linkwechat.wecom.mapper.WeCommunityNewGroupMapper;
 import com.linkwechat.wecom.mapper.WeGroupCodeActualMapper;
 import com.linkwechat.wecom.service.IWeGroupCodeActualService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import com.linkwechat.wecom.mapper.WeGroupCodeMapper;

@@ -5,22 +5,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.linkwechat.wecom.mapper.WeAllocateCustomerMapper">
 
 
-<!--    <select id="getAllocateCustomers" resultType="com.linkwechat.wecom.domain.vo.WeAllocateCustomer">-->
-<!--         -->
-<!--         SELECT-->
-<!--            wc.`name` as customerName,-->
-<!--            wu.user_name as userName,-->
-<!--           (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department,-->
-<!--           wac.allocate_time-->
-<!--    FROM-->
-<!--        we_allocate_customer wac-->
-<!--    INNER JOIN we_customer wc ON wc.external_userid=wac.external_userid-->
-<!--    INNER JOIN we_user wu ON wu.user_id=wac.takeover_userid-->
-<!--    WHERE wac.handover_userid=1232-->
-<!--    AND -->
-
-<!--        -->
-<!--    </select>-->
+    <insert id="batchAddOrUpdate" >
+        INSERT INTO we_allocate_customer(
+        takeover_userid,
+        external_userid,
+        allocate_time,
+        handover_userid,
+        status,
+        takeover_time,
+        fail_reason
+        ) values
+        <foreach collection="weAllocateCustomers" item="item" index="index" separator=",">
+            (#{item.takeoverUserid},#{item.externalUserid},#{item.allocateTime},#{item.handoverUserid},#{item.status},#{item.takeoverTime},#{item.failReason})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        takeover_userid=IF(TRIM(VALUES(takeover_userid)) != '',VALUES(takeover_userid),we_allocate_customer.takeover_userid),
+        allocate_time=IF(VALUES(allocate_time), VALUES(allocate_time), we_allocate_customer.allocate_time),
+        takeover_time=IF(VALUES(takeover_time), VALUES(takeover_time), we_allocate_customer.takeover_time),
+        status=IF(VALUES(status), VALUES(status),we_allocate_customer.status),
+        fail_reason=IF(TRIM(VALUES(fail_reason)) !='',VALUES(fail_reason),we_allocate_customer.fail_reason);
+    </insert>
     
 
     

@@ -129,6 +129,9 @@ public class WeGroup extends BaseEntity{
     @TableField(exist = false)
     private Integer toDayMemberNum;
 
+
+
+
     @TableLogic
     private Integer delFlag=new Integer(0);
 }

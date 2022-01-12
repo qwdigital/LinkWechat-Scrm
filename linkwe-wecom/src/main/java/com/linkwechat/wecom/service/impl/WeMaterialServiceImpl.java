@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dtflys.forest.http.ForestResponse;
 import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.config.RuoYiConfig;
@@ -17,17 +18,20 @@ import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.wecom.client.WeMediaClient;
 import com.linkwechat.wecom.domain.WeMaterial;
+import com.linkwechat.wecom.domain.WePoster;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.domain.vo.WeMaterialFileVO;
 import com.linkwechat.wecom.mapper.WeMaterialMapper;
 import com.linkwechat.wecom.service.IWeMaterialService;
+import com.linkwechat.wecom.service.IWePosterService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -43,7 +47,7 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
-public class WeMaterialServiceImpl implements IWeMaterialService {
+public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper,WeMaterial> implements IWeMaterialService {
 
     @Autowired
     private WeMaterialMapper weMaterialMapper;
@@ -53,6 +57,10 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
 
     @Autowired
     private RuoYiConfig ruoYiConfig;
+
+
+    @Autowired
+    private IWePosterService wePosterService;
 
 
     @Override
@@ -115,7 +123,16 @@ public class WeMaterialServiceImpl implements IWeMaterialService {
         List<String> materialList = Arrays.asList(StringUtils.splitByWholeSeparatorPreserveAllTokens(materials, WeConstans.COMMA));
         if (CollectionUtil.isNotEmpty(materialList)) {
             materialList.forEach(s -> {
-                weMaterialMapper.resetCategory(categoryId, s);
+                WeMaterial weMaterial = weMaterialMapper.findWeMaterialById(new Long(s));
+                if(null != weMaterial){
+                    weMaterialMapper.resetCategory(categoryId, s);
+                }else{
+                    wePosterService.updateById(WePoster.builder()
+                                    .categoryId(new Long(categoryId))
+                                    .id(new Long(s))
+                            .build());
+                }
+
             });
         }
     }

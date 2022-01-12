@@ -101,6 +101,11 @@ public class WeCustomer extends BaseEntity {
 
     private String takeoverUserId;
 
+    private String tagIds;
+
+
+
+
 
 
 

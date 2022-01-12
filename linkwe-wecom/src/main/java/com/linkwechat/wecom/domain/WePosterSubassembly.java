@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -19,7 +20,7 @@ import lombok.EqualsAndHashCode;
 @ApiModel(value = "海报组成部件")
 public class WePosterSubassembly extends BaseEntity {
 
-    @TableId
+    @TableId(type = IdType.AUTO)
     @ApiModelProperty(value = "id")
     private Long id;
 

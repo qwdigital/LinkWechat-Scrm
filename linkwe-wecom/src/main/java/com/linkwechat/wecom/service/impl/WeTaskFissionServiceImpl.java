@@ -108,13 +108,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
      * @return 任务宝
      */
     @Override
-    public List<WeTaskFission> selectWeTaskFissionList(WeTaskFission weTaskFission) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        SimpleDateFormat sdf_day = new SimpleDateFormat("yyyy-MM-dd");
-        if (weTaskFission.getStartTime() != null && weTaskFission.getOverTime() != null) {
-            weTaskFission.setStartTime(sdf.parse(sdf_day.format(weTaskFission.getStartTime()) + " 00:00:00"));
-            weTaskFission.setOverTime(sdf.parse(sdf_day.format(weTaskFission.getOverTime()) + " 23:59:59"));
-        }
+    public List<WeTaskFission> selectWeTaskFissionList(WeTaskFission weTaskFission){
         return weTaskFissionMapper.selectWeTaskFissionList(weTaskFission);
     }
 
@@ -125,10 +119,9 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
      * @return 结果
      */
     @Override
-    @Transactional
-    public Long insertWeTaskFission(WeTaskFission weTaskFission) {
-        weTaskFission.setCreateBy(SecurityUtils.getUsername());
-        weTaskFission.setCreateTime(DateUtils.getNowDate());
+    @Transactional(rollbackFor = {Exception.class,WeComException.class})
+    public void insertWeTaskFission(WeTaskFission weTaskFission) {
+        weTaskFission.setFissStatus(0);
         groupQrcodeHandler(weTaskFission);
         int insertResult = weTaskFissionMapper.insertWeTaskFission(weTaskFission);
         if (insertResult > 0) {
@@ -140,8 +133,12 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                     weTaskFissionStaffService.insertWeTaskFissionStaffList(weTaskFission.getTaskFissionStaffs());
                 }
             }
+            try {
+                sendWeTaskFission(weTaskFission);
+            } catch (Exception e) {
+                throw new WeComException(e.getMessage());
+            }
         }
-        return weTaskFission.getId();
     }
 
     /**
@@ -197,19 +194,20 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
 
 
     @Override
-    public void sendWeTaskFission(Long id) throws Exception {
-        WeTaskFission weTaskFission = selectWeTaskFissionById(id);
+    public void sendWeTaskFission(WeTaskFission weTaskFission) throws Exception {
         //海报路径
         String postersPath = weTaskFission.getPostersUrl();
         //目标员工id
         String fissStaffId = weTaskFission.getFissionTargetId();
         //H5生成海报页面路径
-        String pageUrlStr = StringUtils.format(pageUrl,id,fissStaffId,weTaskFission.getPostersId());
-
+        String pageUrlStr = StringUtils.format(pageUrl,weTaskFission.getId(),fissStaffId,weTaskFission.getPostersId());
 
         WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
+        messageQuery.setBusinessId(weTaskFission.getId());
         messageQuery.setChatType(1);
+        messageQuery.setSource(1);
         messageQuery.setIsAll(false);
+        messageQuery.setContent(weTaskFission.getTaskName());
         WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
         weMessageTemplate.setMsgType(MessageType.LINK.getMessageType());
         weMessageTemplate.setMediaId(postersPath);
@@ -219,16 +217,13 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
         weMessageTemplate.setPicUrl(postersPath);
         messageQuery.setAttachmentsList(ListUtil.toList(weMessageTemplate));
 
-
         if (weTaskFission.getStartTime() != null && weTaskFission.getStartTime().getTime() <= System.currentTimeMillis()) {
             messageQuery.setIsTask(0);
         }else {
             messageQuery.setIsTask(1);
             messageQuery.setSendTime(weTaskFission.getStartTime());
         }
-
-        //查询发起成员
-        List<WeTaskFissionStaff> weTaskFissionStaffList = weTaskFissionStaffService.selectWeTaskFissionStaffByTaskId(id);
+        List<WeTaskFissionStaff> weTaskFissionStaffList = weTaskFission.getTaskFissionStaffs();
         //获取部门id
         String departmentIds = Optional.ofNullable(weTaskFissionStaffList).orElseGet(ArrayList::new).stream().filter(weTaskFissionStaff ->
                 WeConstans.USE_SCOP_BUSINESSID_TYPE_ORG.equals(weTaskFissionStaff.getStaffType()))
@@ -241,7 +236,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                 .userIds(userIds)
                 .tagIds(weTaskFission.getCustomerTagId().replaceAll("all",""))
                 .departmentIds(departmentIds)
-                .build());
+                .build(),null);
         if(weCustomerList != null){
             Map<String, Set<String>> userAndCustomerMap = weCustomerList.stream().collect(Collectors.groupingBy(WeCustomerList::getFirstUserId, Collectors.mapping(WeCustomerList::getExternalUserid, Collectors.toSet())));
             List<WeAddGroupMessageQuery.SenderInfo> senderList = new ArrayList<>();
@@ -458,13 +453,8 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
     private String getGroupFissionQrcode(Long taskFissionId, WeTaskFissionRecord record, WeCustomer weCustomer) {
         if (weCustomer != null) {
             String avatarUrl = weCustomer.getAvatar();
-            StringBuilder contentBuilder = new StringBuilder(pageGroupUrl);
-            contentBuilder.append("?")
-                    .append("fissionId=")
-                    .append(taskFissionId)
-                    .append("&recordId=")
-                    .append(record.getId());
-            BufferedImage bufferedImage = QREncode.crateQRCode(contentBuilder.toString(), avatarUrl);
+            String content = StringUtils.format(pageGroupUrl, taskFissionId, record.getId());
+            BufferedImage bufferedImage = QREncode.crateQRCode(content, avatarUrl);
             if (bufferedImage != null) {
                 try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
                     ImageIO.write(bufferedImage, "png", byteArrayOutputStream);

@@ -101,7 +101,7 @@
 
     <select id="filterByNameOrKeyword" parameterType="String" resultMap="WeKeywordGroupTaskResult">
         <include refid="selectTaskVo" />
-        WHERE wkg.task_name LIKE CONCAT("%",#{word},"%")
+        WHERE wkg.del_flag=0 and wkg.task_name LIKE CONCAT("%",#{word},"%")
         OR FIND_IN_SET(#{word}, wkg.keywords)
         GROUP BY wkg.task_id
     </select>

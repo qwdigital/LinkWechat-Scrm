@@ -11,6 +11,7 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.linkwechat.common.config.WeComeConfig;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
@@ -75,10 +76,10 @@ public class WeAccessTokenInterceptor implements Interceptor<WeResultDto> {
     @Override
     public void onSuccess(WeResultDto resultDto, ForestRequest forestRequest, ForestResponse forestResponse) {
         log.info("url:{},result:{}", forestRequest.getUrl(), forestResponse.getContent());
-        /*if (null != resultDto.getErrcode() && !ObjectUtil.equal(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode(), resultDto.getErrcode())
+        if (null != resultDto.getErrcode() && !ObjectUtil.equal(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode(), resultDto.getErrcode())
                 && !weComeConfig.getWeNeedRetryErrorCodes().contains(resultDto.getErrcode())) {
-            throw new ForestRuntimeException(WeErrorCodeEnum.parseEnum(resultDto.getErrcode()).getErrorMsg());
-        }*/
+            throw new WeComException(WeErrorCodeEnum.parseEnum(resultDto.getErrcode()).getErrorMsg());
+        }
     }
 
     /**
