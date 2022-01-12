@@ -1,4 +1,4 @@
-// import vconsole from 'vconsole'
+import vconsole from 'vconsole'
 $(function () {
   var dpr, rem, scale
   var docEl = document.documentElement
@@ -31,6 +31,5 @@ $(function () {
 
   window.dpr = dpr
   window.rem = rem
-  // var myConsole = new vconsole()
-  console.log('hello')
+  new vconsole()
 })
