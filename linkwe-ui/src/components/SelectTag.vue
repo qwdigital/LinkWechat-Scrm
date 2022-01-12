@@ -93,7 +93,7 @@ export default {
         this.listOneArray = []
         this.list.forEach((element) => {
           element.weTags.forEach((d) => {
-            this.listOneArray.push(d)
+            this.listOneArray.push({ tagId: d.tagId, name: d.name })
           })
         })
       })
@@ -103,7 +103,11 @@ export default {
       //   this.msgError('请至少选择一个标签')
       //   return
       // }
-      this.$emit('success', JSON.parse(JSON.stringify(this.selectedList)))
+      // 统一数据格式
+      let selected = this.listOneArray.filter((i) =>
+        this.selectedList.some((e) => e.tagId === i.tagId)
+      )
+      this.$emit('success', selected)
       this.Pvisible = false
     },
     onSelectTag(tag) {
@@ -114,11 +118,8 @@ export default {
         this.selectedList.push(tag)
       }
     },
-    toJson(data) {
-      return JSON.stringify(data)
-    },
     setTagSelect(data) {
-      return this.checkedTagMap.has(data.tagId) || this.checkedTagMap.has(data.tagName)
+      return this.checkedTagMap.has(data.tagId) || this.checkedTagMap.has(data.name)
     }
   }
 }

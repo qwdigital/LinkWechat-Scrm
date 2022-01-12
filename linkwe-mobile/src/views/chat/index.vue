@@ -28,7 +28,7 @@ export default {
   beforeCreate() {},
   created() {
     // this.$toast('userId:' + this.$store.state.userId)
-    this.getList()
+    this.userId && this.getList()
   },
   mounted() {},
   methods: {
@@ -79,7 +79,6 @@ export default {
           ref="list"
           :sideId="item.sideId"
           :mediaType="item.mediaType"
-          :userId="userId"
           :keyword="keyword"
           @collect="refreshCollect"
         ></List>

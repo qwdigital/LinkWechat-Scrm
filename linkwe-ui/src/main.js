@@ -20,7 +20,6 @@ import config from '@/config'
 import App from './App'
 import store from './store'
 import router from './router'
-import directive from './directive'
 
 import './assets/icons' // icon
 import './permission' // permission control
@@ -37,10 +36,19 @@ import {
 } from '@/utils/common'
 
 import Pagination from '@/components/Pagination'
-//自定义表格工具扩展
-import RightToolbar from '@/components/RightToolbar'
+import RightToolbar from '@/components/RightToolbar' //自定义表格工具扩展
 import Upload from '@/components/Upload'
 import ButtonSync from '@/components/ButtonSync'
+import TagEllipsis from '@/components/TagEllipsis'
+// 全局组件挂载
+Vue.component('Pagination', Pagination)
+Vue.component('RightToolbar', RightToolbar)
+Vue.component('Upload', Upload)
+Vue.component('ButtonSync', ButtonSync)
+Vue.component(TagEllipsis.name, TagEllipsis)
+
+import directive from './directive'
+Vue.use(directive)
 
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
@@ -91,13 +99,6 @@ VueAMap.initAMapApiLoader({
   ],
   v: '1.4.4'
 })
-// 全局组件挂载
-Vue.component('Pagination', Pagination)
-Vue.component('RightToolbar', RightToolbar)
-Vue.component('Upload', Upload)
-Vue.component('ButtonSync', ButtonSync)
-
-Vue.use(directive)
 
 /**
  * If you don't want to use mock-server

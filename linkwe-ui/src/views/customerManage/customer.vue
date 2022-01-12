@@ -431,7 +431,7 @@ export default {
         <template slot-scope="{ row }">
           <div class="cp flex aic" @click="goRoute(row)">
             <el-image
-              style="width: 50px; height: 50px; flex:none;"
+              style="width: 50px; height: 50px; flex: none"
               :src="row.avatar"
               fit="fit"
             ></el-image>
@@ -447,19 +447,7 @@ export default {
       </el-table-column>
       <el-table-column prop="tagNames" label="客户标签" align="center" width="220">
         <div v-if="row.tagNames" slot-scope="{ row }">
-          <el-popover placement="bottom" trigger="hover" :disabled="row.tagNames.length < 3">
-            <div>
-              <el-tag v-for="(unit, unique) in row.tagNames" :key="unique">
-                {{ unit }}
-              </el-tag>
-            </div>
-            <div slot="reference">
-              <el-tag v-for="(unit, unique) in row.tagNames.slice(0, 2)" :key="unique">
-                {{ unit }}
-              </el-tag>
-              <el-tag key="a" v-if="row.tagNames.length > 2">...</el-tag>
-            </div>
-          </el-popover>
+          <TagEllipsis :list="row.tagNames"></TagEllipsis>
         </div>
         <span v-else>无标签</span>
       </el-table-column>
