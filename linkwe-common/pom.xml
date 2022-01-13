@@ -133,7 +133,7 @@
         <dependency>
             <groupId>com.dtflys.forest</groupId>
             <artifactId>forest-spring-boot-starter</artifactId>
-            <version>1.5.5</version>
+            <version>1.5.16</version>
         </dependency>
 
         <dependency>

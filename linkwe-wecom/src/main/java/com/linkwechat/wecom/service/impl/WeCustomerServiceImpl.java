@@ -420,15 +420,17 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             );
 
             if(jobExtendsCustomer.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
-                iWeAllocateCustomerService.save(
-                        WeAllocateCustomer.builder()
-                                .allocateTime(new Date())
-                                .extentType(new Integer(1))
-                                .externalUserid(weOnTheJobCustomerVo.getExternalUserid())
-                                .handoverUserid(weOnTheJobCustomerVo.getHandoverUserId())
-                                .takeoverUserid(weOnTheJobCustomerVo.getTakeoverUserId())
-                                .failReason("在职继承")
-                                .build()
+                iWeAllocateCustomerService.batchAddOrUpdate(
+                        ListUtil.toList(
+                                WeAllocateCustomer.builder()
+                                        .allocateTime(new Date())
+                                        .extentType(new Integer(1))
+                                        .externalUserid(weOnTheJobCustomerVo.getExternalUserid())
+                                        .handoverUserid(weOnTheJobCustomerVo.getHandoverUserId())
+                                        .takeoverUserid(weOnTheJobCustomerVo.getTakeoverUserId())
+                                        .failReason("在职继承")
+                                        .build()
+                        )
                 );
             }
 
@@ -593,6 +595,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             weCustomer.setCustomerType(externalUserDetail.getExternal_contact().getType());
             weCustomer.setDelFlag(new Integer(0));
 
+
+
             List<ExternalUserDetail.FollowUser> follow_user = externalUserDetail.getFollow_user();
             if(CollectionUtil.isNotEmpty(follow_user)){
                 ExternalUserDetail.FollowUser followUser = follow_user.stream().filter(e -> e.getUserid().equals(userId)).findFirst().get();
@@ -601,6 +605,22 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     weCustomer.setState(followUser.getState());
                     weCustomer.setFirstAddTime(new Date(followUser.getCreatetime() * 1000L));
                     weCustomer.setAddMethod(followUser.getAddWay());
+
+                    //添加方式为管理员分配，则继承处理以前客户信息
+//                    if(followUser.getState().equals(CustomerAddWay
+//                            .ADD_WAY_GLYFP.getKey().toString())){
+
+//                        WeCustomer oldWecustomer = this.getOne(new LambdaQueryWrapper<WeCustomer>()
+//                                .eq(WeCustomer::getExternalUserid, externalUserid)
+//                                .eq(WeCustomer::getTakeoverUserId, userId));
+//                        if(null != oldWecustomer){
+//
+//                        }
+//
+//
+//
+//
+//                    }
 
 
                     //设置标签
@@ -639,6 +659,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
                 }
             }
+
+
+
+
+
+
         }
     }
 

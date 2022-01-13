@@ -242,7 +242,7 @@ xss:
 
 # forest配置
 forest:
-  backend: httpclient
+  backend: okhttp3
   max-retry-count:  3 # 请求失败后重试次数，默认为0次不重试
   max-retry-interval: 1000 #重试间隔时间
   connect-timeout: 3000 #链接超时时间

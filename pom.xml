@@ -31,7 +31,7 @@
         <poi.version>3.17</poi.version>
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.0</jwt.version>
-        <forest.version>1.5.5</forest.version>
+        <forest.version>1.5.16</forest.version>
         <lombok.version>1.18.16</lombok.version>
         <reflectasm.version>1.11.9</reflectasm.version>
         <hutool.version>5.4.1</hutool.version>
