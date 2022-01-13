@@ -75,7 +75,7 @@ public class WeGroupMessageTemplate extends BaseEntity {
     /**
      * 来源 0 群发 1 其他
      */
-    @ApiModelProperty("来源 0 群发 1 其他")
+    @ApiModelProperty("来源 0 群发 1-任务宝 2-标签建群")
     private Integer source;
 
     /**

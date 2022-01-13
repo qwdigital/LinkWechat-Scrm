@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.wecom;
 
+import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
@@ -138,14 +139,10 @@ public class WeMaterialController extends BaseController {
     @GetMapping("/temporaryMaterialMediaId")
     @ApiOperation("H5端发送获取素材media_id")
     public AjaxResult temporaryMaterialMediaId(String url,String type,String name) throws UnsupportedEncodingException {
-
-//        Base64.Encoder encoder = Base64.getEncoder();
-//        byte[] textByte = name.getBytes("UTF-8");
-//        String encodedText = encoder.encodeToString(textByte);
-
-        WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(url,
-                type
-                , name+"."+url .substring( url .lastIndexOf(".") + 1, url.length()));
+        String suffix = FileUtil.getSuffix(url);
+        String prefixName = FileUtil.getPrefix(name);
+        String tempFileName = prefixName+"."+suffix;
+        WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(url, type,tempFileName);
         return AjaxResult.success(weMediaDto);
     }
 

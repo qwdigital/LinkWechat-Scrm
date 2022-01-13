@@ -134,28 +134,32 @@ public class WeGroupMessageTaskHandler implements ApplicationRunner {
     }
 
     void getMediaId(List<WeMessageTemplate> messageTemplates) {
-        Optional.ofNullable(messageTemplates).orElseGet(ArrayList::new).forEach(messageTemplate -> {
-            if (ObjectUtil.equal(MessageType.IMAGE.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
-                        , MessageType.IMAGE.getMessageType()
-                        , FileUtil.getName(messageTemplate.getMediaId()));
-                messageTemplate.setMediaId(weMedia.getMedia_id());
-            } else if (ObjectUtil.equal(MessageType.MINIPROGRAM.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
-                        , MessageType.IMAGE.getMessageType()
-                        , FileUtil.getName(messageTemplate.getMediaId()));
-                messageTemplate.setMediaId(weMedia.getMedia_id());
-            } else if (ObjectUtil.equal(MessageType.VIDEO.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
-                        , MessageType.IMAGE.getMessageType()
-                        , FileUtil.getName(messageTemplate.getMediaId()));
-                messageTemplate.setMediaId(weMedia.getMedia_id());
-            } else if (ObjectUtil.equal(MessageType.FILE.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
-                        , MessageType.IMAGE.getMessageType()
-                        , FileUtil.getName(messageTemplate.getMediaId()));
-                messageTemplate.setMediaId(weMedia.getMedia_id());
-            }
-        });
+        try {
+            Optional.ofNullable(messageTemplates).orElseGet(ArrayList::new).forEach(messageTemplate -> {
+                if (ObjectUtil.equal(MessageType.IMAGE.getMessageType(), messageTemplate.getMsgType())) {
+                    WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
+                            , MessageType.IMAGE.getMessageType()
+                            , FileUtil.getName(messageTemplate.getMediaId()));
+                    messageTemplate.setMediaId(weMedia.getMedia_id());
+                } else if (ObjectUtil.equal(MessageType.MINIPROGRAM.getMessageType(), messageTemplate.getMsgType())) {
+                    WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
+                            , MessageType.IMAGE.getMessageType()
+                            , FileUtil.getName(messageTemplate.getMediaId()));
+                    messageTemplate.setMediaId(weMedia.getMedia_id());
+                } else if (ObjectUtil.equal(MessageType.VIDEO.getMessageType(), messageTemplate.getMsgType())) {
+                    WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
+                            , MessageType.IMAGE.getMessageType()
+                            , FileUtil.getName(messageTemplate.getMediaId()));
+                    messageTemplate.setMediaId(weMedia.getMedia_id());
+                } else if (ObjectUtil.equal(MessageType.FILE.getMessageType(), messageTemplate.getMsgType())) {
+                    WeMediaDto weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
+                            , MessageType.IMAGE.getMessageType()
+                            , FileUtil.getName(messageTemplate.getMediaId()));
+                    messageTemplate.setMediaId(weMedia.getMedia_id());
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
