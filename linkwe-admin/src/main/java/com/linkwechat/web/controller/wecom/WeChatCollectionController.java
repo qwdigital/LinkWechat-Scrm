@@ -1,13 +1,18 @@
 package com.linkwechat.web.controller.wecom;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.enums.MediaType;
+import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.wecom.domain.WePoster;
 import com.linkwechat.wecom.domain.dto.WeChatCollectionDto;
 import com.linkwechat.wecom.domain.vo.WeChatSideVo;
 import com.linkwechat.wecom.service.IWeChatCollectionService;
+import com.linkwechat.wecom.service.IWePosterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +31,9 @@ public class WeChatCollectionController extends BaseController {
 
     @Autowired
     private IWeChatCollectionService weChatCollectionService;
+
+    @Autowired
+    private IWePosterService iWePosterService;
 
 
     /**
@@ -62,6 +70,18 @@ public class WeChatCollectionController extends BaseController {
     public TableDataInfo list(@RequestParam(value = "userId") String userId,@RequestParam(value = "keyword",required = false) String keyword) {
         startPage();
         List<WeChatSideVo> collections = weChatCollectionService.collections(userId,keyword);
+        if(CollectionUtil.isNotEmpty(collections)){
+            collections.stream().forEach(k->{
+                if(StringUtils.isEmpty(k.getMediaType())){//为空则为海报
+                    WePoster wePoster = iWePosterService.getById(k.getMaterialId());
+                    if(null != wePoster){
+                        k.setMediaType(MediaType.POSTER.getType());
+                        k.setMaterialName(wePoster.getTitle());
+                        k.setMaterialUrl(wePoster.getSampleImgPath());
+                    }
+                }
+            });
+        }
         return getDataTable(collections);
     }
 
