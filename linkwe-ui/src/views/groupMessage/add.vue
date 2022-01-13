@@ -44,7 +44,8 @@
           <el-form-item v-if="form.pushRange == 1">
             <div>
               <div class="item-magin aic">
-                <div class="item-name">添加人</div>
+                <div class="item-name">
+                  <span style="color:red;">*</span> 添加人</div>
                 <el-button class="mr10" size="mini" icon="el-icon-circle-plus-outline" type="primary" plain @click="onSelectUser(2)">选择添加人</el-button>
                 <el-tag v-for="item in form.sendClientUserList" :key="item.userId">{{ item.name }}</el-tag>
               </div>
@@ -58,7 +59,8 @@
                 </el-select>
               </div>
               <div class="item-magin">
-                <div class="item-name">添加时间</div>
+                <div class="item-name">
+                  <span style="color:red;">* </span>添加时间</div>
                 <el-date-picker v-model="form.rangeTime" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
                 </el-date-picker>
               </div>
@@ -295,6 +297,14 @@
               trackState: ''
             }
             if (this.form.pushRange == 1) {
+              if (!this.form.sendClientUserList.length) {
+                this.msgError('请选择添加人！')
+                return
+              }
+              if (!this.form.rangeTime[0] || !this.form.rangeTime[1]) {
+                this.msgError('请选择添加时间！')
+                return
+              }
               data.userIds = this.form.sendClientUserList.map(i => i.userId).join(',')
               data.tagIds = this.form.sendClientTagList.map(i => i.tagId).join(',')
               data.beginTime = this.form.rangeTime[0] ? moment(this.form.rangeTime[0]).format("YYYY-MM-DD") : ''
@@ -302,15 +312,18 @@
               data.gender = this.form.gender
               data.trackState = this.form.trackState
               getCustomerList(data).then(res => {
-                this.form.customerList = res.data
-                if (res.data && res.data.length) {
-                  this.currentActive = 2
+                if (res.code === 200) {
+                  this.form.customerList = res.data
+                  if (res.data && res.data.length) {
+                    this.currentActive = 2
+                  } else {
+                    this.msgError('未找到可发送客户！')
+                  }
                 } else {
-                  this.msgError('未找到可发送客户！')
+                  this.msgError(res.msg)
                 }
               })
             } else {
-
               this.currentActive = 2
             }
           } else {
