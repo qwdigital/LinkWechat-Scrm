@@ -19,11 +19,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             (#{item.takeoverUserid},#{item.externalUserid},#{item.allocateTime},#{item.handoverUserid},#{item.status},#{item.takeoverTime},#{item.failReason})
         </foreach>
         ON DUPLICATE KEY UPDATE
-        takeover_userid=IF(TRIM(VALUES(takeover_userid)) != '',VALUES(takeover_userid),we_allocate_customer.takeover_userid),
-        allocate_time=IF(VALUES(allocate_time), VALUES(allocate_time), we_allocate_customer.allocate_time),
-        takeover_time=IF(VALUES(takeover_time), VALUES(takeover_time), we_allocate_customer.takeover_time),
-        status=IF(VALUES(status), VALUES(status),we_allocate_customer.status),
-        fail_reason=IF(TRIM(VALUES(fail_reason)) !='',VALUES(fail_reason),we_allocate_customer.fail_reason);
+        takeover_userid=IFNULL(VALUES(takeover_userid),we_allocate_customer.takeover_userid),
+        allocate_time=IFNULL(VALUES(allocate_time) , we_allocate_customer.allocate_time),
+        takeover_time=IFNULL(VALUES(takeover_time), we_allocate_customer.takeover_time),
+        status=IFNULL(VALUES(status),we_allocate_customer.status),
+        fail_reason=IFNULL(VALUES(fail_reason),we_allocate_customer.fail_reason);
     </insert>
     
 

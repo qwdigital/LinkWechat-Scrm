@@ -420,15 +420,17 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             );
 
             if(jobExtendsCustomer.getErrcode().equals(WeConstans.WE_SUCCESS_CODE)){
-                iWeAllocateCustomerService.save(
-                        WeAllocateCustomer.builder()
-                                .allocateTime(new Date())
-                                .extentType(new Integer(1))
-                                .externalUserid(weOnTheJobCustomerVo.getExternalUserid())
-                                .handoverUserid(weOnTheJobCustomerVo.getHandoverUserId())
-                                .takeoverUserid(weOnTheJobCustomerVo.getTakeoverUserId())
-                                .failReason("在职继承")
-                                .build()
+                iWeAllocateCustomerService.batchAddOrUpdate(
+                        ListUtil.toList(
+                                WeAllocateCustomer.builder()
+                                        .allocateTime(new Date())
+                                        .extentType(new Integer(1))
+                                        .externalUserid(weOnTheJobCustomerVo.getExternalUserid())
+                                        .handoverUserid(weOnTheJobCustomerVo.getHandoverUserId())
+                                        .takeoverUserid(weOnTheJobCustomerVo.getTakeoverUserId())
+                                        .failReason("在职继承")
+                                        .build()
+                        )
                 );
             }
 
