@@ -78,7 +78,10 @@ public class WeAccessTokenInterceptor implements Interceptor<WeResultDto> {
         log.info("url:{},result:{}", forestRequest.getUrl(), forestResponse.getContent());
         if (null != resultDto.getErrcode() && !ObjectUtil.equal(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode(), resultDto.getErrcode())
                 && !weComeConfig.getWeNeedRetryErrorCodes().contains(resultDto.getErrcode())) {
-            throw new WeComException(WeErrorCodeEnum.parseEnum(resultDto.getErrcode()).getErrorMsg());
+            if(!WeErrorCodeEnum.ERROR_CODE_90501.getErrorCode().equals(resultDto.getErrcode())){
+                throw new WeComException(WeErrorCodeEnum.parseEnum(resultDto.getErrcode()).getErrorMsg());
+            }
+
         }
     }
 
