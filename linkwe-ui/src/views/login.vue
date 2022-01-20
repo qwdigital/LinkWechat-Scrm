@@ -166,13 +166,9 @@ export default {
     this.getCode()
     this.getCookie()
 
-    this.$confirm(
-      'LinkWeChat V2.0 正式发布公测，遇到使用上的问题欢迎提交 Issue，我们将光速修复。',
-      '提示',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消'
-      }
+    this.$alert(
+      'LinkWeChat V2.0 已正式发布，遇到使用上的问题欢迎提交 Issue，我们将光速修复。',
+      '提示'
     )
   },
   methods: {

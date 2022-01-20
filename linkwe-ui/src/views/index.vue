@@ -5,18 +5,18 @@
         <p>{{ parseTime(nowTime) }}</p>
       </div> -->
       <div class="tables">
-        <div style="text-align:left">
+        <div style="text-align: left">
           <el-row type="flex" class="row-bg" justify="space-between">
             <el-col :span="24" class="title_name"
               >数据总览
-              <span class=" fontgay">最近更新：{{ uptime }}</span>
+              <span class="fontgay">最近更新：{{ uptime }}</span>
             </el-col>
           </el-row>
           <el-row
             type="flex"
             class="row-bg"
             justify="space-between"
-            style="margin-top:35px; text-align: center;"
+            style="margin-top: 35px; text-align: center"
           >
             <el-col :span="6" class="col_style">企业成员总数</el-col>
             <el-col :span="6" class="col_style">客户总人数</el-col>
@@ -27,7 +27,13 @@
             type="flex"
             class="row-bg"
             justify="space-between"
-            style="margin-top:10px;font-size:35px;font-weight:bold;color:#0079DE; text-align: center;"
+            style="
+              margin-top: 10px;
+              font-size: 35px;
+              font-weight: bold;
+              color: #0079de;
+              text-align: center;
+            "
           >
             <el-col :span="6">
               <count-to :start-val="0" :end-val="table.userCount" :duration="durationCount" />
@@ -48,12 +54,12 @@
           </el-row>
         </div>
       </div>
-      <div class="dataall" style="margin-top:10px">
-        <div style="text-align:left">
+      <div class="dataall" style="margin-top: 10px">
+        <div style="text-align: left">
           <el-row type="flex" class="row-bg" justify="space-between">
             <el-col :span="10" class="title_name">数据趋势</el-col>
-            <el-col :span="10" style="text-align:right">
-              <el-radio-group v-model="timeType" style="margin-top: 20px;" @change="timeTypeCheck">
+            <el-col :span="10" style="text-align: right">
+              <el-radio-group v-model="timeType" style="margin-top: 20px" @change="timeTypeCheck">
                 <el-radio-button label="today">今日</el-radio-button>
                 <el-radio-button label="week">本周</el-radio-button>
                 <el-radio-button label="month">本月</el-radio-button>
@@ -68,7 +74,7 @@
             type="flex"
             class="row-bg"
             justify="space-between"
-            style="margin-top:30px; text-align: center;"
+            style="margin-top: 30px; text-align: center"
           >
             <el-col :span="6">新增客户数</el-col>
             <el-col :span="6">新增客群数</el-col>
@@ -79,7 +85,13 @@
             type="flex"
             class="row-bg"
             justify="space-between"
-            style="margin-top:10px;font-size:35px;font-weight:bold;color: #0079DE; text-align: center;"
+            style="
+              margin-top: 10px;
+              font-size: 35px;
+              font-weight: bold;
+              color: #0079de;
+              text-align: center;
+            "
           >
             <el-col :span="6">{{ erchatsTable.newContactCnt }}</el-col>
             <el-col :span="6">{{ erchatsTable.newChatCnt }}</el-col>
@@ -90,7 +102,7 @@
             type="flex"
             class="row-bg"
             justify="space-between"
-            style="margin-top:10px; text-align: center;"
+            style="margin-top: 10px; text-align: center"
           >
             <el-col :span="6">
               比{{ time }}
@@ -129,12 +141,7 @@
 
       <div class="car card">
         <el-row type="flex" justify="space-between">
-          <el-col
-            :span="24"
-            style="font-size: 24px; line-height:80px
-"
-            >快捷功能
-          </el-col>
+          <el-col :span="24" style="font-size: 24px; line-height: 80px">快捷功能 </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="6" v-for="(item, i) in car" :key="i">
@@ -154,7 +161,7 @@
           <p class="p2">登录时间：{{ parseTime(new Date()) }}</p>
           <p class="p1 p3 margint20">LinkWechat 企业微信SCRM</p>
           <p class="p2 p4">
-            版本信息：开源
+            版本信息：V2.x开源
             <span class="fr">可用期限：永久</span>
           </p>
           <el-row
@@ -162,7 +169,7 @@
             type="flex"
             class="row-bg"
             justify="center"
-            style="text-align:center"
+            style="text-align: center"
           >
             <el-col :span="10" class="flexspan">
               <img src="../assets/index/bzwd.png" />
@@ -181,7 +188,7 @@
           <span class="inedx_r_top_bottomp1"><img src="../assets/index/gxrz.png" /> 更新日志</span>
           <span
             class="fr"
-            style="color:#0079DE"
+            style="color: #0079de"
             @click="msgInfo('《更新日志》正在加急上线中，敬请关注…')"
             >更多</span
           >
@@ -194,7 +201,7 @@
         </div>
         <div class="inedx_r_top_bottom">
           <span class="inedx_r_top_bottomp1"><img src="../assets/index/qyxy.png" /> 私域学院</span>
-          <span class="fr" style="color:#0079DE">更多</span>
+          <span class="fr" style="color: #0079de">更多</span>
           <ul>
             <li v-for="(index, i) in 3" :key="i" @click="msgInfo('暂无内容')">
               即将上线，敬请期待
@@ -202,16 +209,16 @@
             </li>
           </ul>
         </div>
-        <div class="inedx_r_top_bottom" style="text-align:center">
-          <p style="text-align:left">
+        <div class="inedx_r_top_bottom" style="text-align: center">
+          <p style="text-align: left">
             <span class="inedx_r_top_bottomp1">
               <img src="../assets/index/kfq.png" /> 官方交流</span
             >
           </p>
           <img :src="bossImg" class="img" />
         </div>
-        <div class="inedx_r_top_bottom" style="text-align:center">
-          <p style="text-align:left">
+        <div class="inedx_r_top_bottom" style="text-align: center">
+          <p style="text-align: left">
             <span class="inedx_r_top_bottomp1">
               <img src="../assets/index/khq.png" /> 联系客服</span
             >
@@ -370,7 +377,7 @@ export default {
       let obj = document.getElementById('echart')
       let charts = echarts.init(obj)
       let timer = 0
-      window.onresize = function() {
+      window.onresize = function () {
         clearTimeout(timer)
         timer = setTimeout(() => {
           charts.resize()
