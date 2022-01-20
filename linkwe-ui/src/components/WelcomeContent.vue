@@ -254,11 +254,11 @@
               </el-dropdown-menu>
             </el-dropdown>
           </div>
-          <el-form-item label-width="0" style="margin-top: 20px; margin-bottom: 0">
-            <el-button @click="onBackStep" v-if="showBack">上一步</el-button>
-            <el-button type="primary" @click="submit">保存</el-button>
-          </el-form-item>
         </el-form>
+        <div style="margin-top: 10px">
+          <el-button @click="onBackStep" v-if="showBack">上一步</el-button>
+          <el-button type="primary" @click="submit">保存</el-button>
+        </div>
       </el-col>
       <el-col style="width: 350px">
         <div class="g-card g-pad20" style="height: 100%">
