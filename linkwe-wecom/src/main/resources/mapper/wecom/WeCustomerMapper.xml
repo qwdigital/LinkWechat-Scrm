@@ -89,7 +89,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         ORDER BY wcr.first_add_time desc
         <if test="pageDomain !=null">
             <if test="pageDomain.pageNum !=null and pageDomain.pageSize !=null">
-                limit #{pageDomain.pageNum} , #{pageDomain.pageSize}
+                limit ${pageDomain.pageSize * (pageDomain.pageNum-1)}, #{pageDomain.pageSize}
             </if>
         </if>
         ) a ON a.external_userid=wc.external_userid AND a.first_user_id=wc.first_user_id
