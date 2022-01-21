@@ -151,7 +151,7 @@
                     and wc.name like concat('%', #{customerName}, '%')
                 </if>
             </where>
-        ) t
+        ) t group by t.from_id, t.msg_time, t.`action`, t.msg_type, t.contact, t.name, t.avatar
         <where>
 
         </where>
