@@ -20,7 +20,7 @@ export default {
         taskName: '',
         fissInfo: '',
         fissNum: '',
-        dateRange: '',
+        dateRange: ''
       },
       groupForm: {
         taskFissionStaffs: [],
@@ -35,28 +35,21 @@ export default {
         welcomeMsg: '',
         rewardUrl: '',
         rewardImageUrl: '',
-        rewardRule: '',
+        rewardRule: ''
       },
       // rewardImageUrlTemp: '',
-      action:
-        process.env.VUE_APP_BASE_API +
-        window.CONFIG.services.wecom +
-        '/fission/upload',
+      action: process.env.VUE_APP_BASE_API + window.CONFIG.services.wecom + '/fission/upload',
       headers: window.CONFIG.headers,
       ruleForm: {
-        taskName: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' },
-        ],
+        taskName: [{ required: true, message: '请输入活动名称', trigger: 'blur' }],
         postersId: [{ required: true, message: '请选择海报', trigger: 'blur' }],
         fissionTargetId: [{ required: true, message: '请选择群活码', trigger: 'blur' }],
         fissNum: [
           { required: true, message: '请输入数量', trigger: 'blur' },
           // { pattern: /^[1-9]+$/, message: '请输入数字', trigger: 'blur' },
-          { pattern: /^[1-9]\d*$/, message: '请输入数字', trigger: 'blur' },
+          { pattern: /^[1-9]\d*$/, message: '请输入数字', trigger: 'blur' }
         ],
-        dateRange: [
-          { required: true, message: '时间不可为空', trigger: 'blur' },
-        ],
+        dateRange: [{ required: true, message: '时间不可为空', trigger: 'blur' }]
       },
       dialogVisibleSelectUser: false,
       dialogVisibleSelectTag: false,
@@ -64,7 +57,7 @@ export default {
       dialogVisibleSelectGroupCode: false,
       selectTagType: '',
       pageType: 'add',
-      taskDetail: {},
+      taskDetail: {}
     }
   },
   created() {
@@ -91,7 +84,7 @@ export default {
           console.log('验证通过,提交表单')
           let params = {
             ...this.query,
-            ...this.groupForm,
+            ...this.groupForm
           }
           params.startTime = params.dateRange[0]
           params.overTime = params.dateRange[1]
@@ -102,8 +95,8 @@ export default {
               {
                 staffId: '',
                 staffName: '',
-                staffType: 3,
-              },
+                staffType: 3
+              }
             ]
           }
           delete params.sendType
@@ -131,11 +124,11 @@ export default {
         if (res.code == 200) {
           this.$message({
             message: '新增成功',
-            type: 'success',
+            type: 'success'
           })
-          taskApi.sendFission(JSON.parse(res.msg).id)
+          // taskApi.sendFission(JSON.parse(res.msg).id)
           this.$router.push({
-            path: '/application/groupFission',
+            path: '/application/groupFission'
           })
         }
         //
@@ -146,10 +139,10 @@ export default {
         if (res.code == 200) {
           this.$message({
             message: '修改成功',
-            type: 'success',
+            type: 'success'
           })
           this.$router.push({
-            path: '/application/groupFission',
+            path: '/application/groupFission'
           })
           // taskApi.sendFission(JSON.parse(res.msg).id)
         }
@@ -168,27 +161,16 @@ export default {
           taskName: res.data.taskName,
           fissInfo: res.data.fissInfo,
           fissNum: res.data.fissNum,
-          dateRange: [
-            res.data.startTime + ' 00:00:00',
-            res.data.overTime + ' 00:00:00',
-          ],
+          dateRange: [res.data.startTime + ' 00:00:00', res.data.overTime + ' 00:00:00']
         }
         this.query = query
         this.groupForm = {
           taskFissionStaffs: res.data.taskFissionStaffs,
           sendType:
-            res.data.taskFissionStaffs.length &&
-            res.data.taskFissionStaffs[0].staffId
-              ? 1
-              : 0,
-          customerTag:
-            res.data.customerTagId == 'all'
-              ? ''
-              : res.data.customerTag.split(','),
+            res.data.taskFissionStaffs.length && res.data.taskFissionStaffs[0].staffId ? 1 : 0,
+          customerTag: res.data.customerTagId == 'all' ? '' : res.data.customerTag.split(','),
           customerTagId:
-            res.data.customerTagId == 'all'
-              ? 'all'
-              : res.data.customerTagId.split(','),
+            res.data.customerTagId == 'all' ? 'all' : res.data.customerTagId.split(','),
           tagType: res.data.customerTagId == 'all' ? 0 : 1,
           postersId: res.data.postersId,
           postersUrl: res.data.postersUrl,
@@ -197,7 +179,7 @@ export default {
           welcomeMsg: res.data.welcomeMsg,
           rewardUrl: res.data.rewardUrl,
           rewardImageUrl: res.data.rewardImageUrl,
-          rewardRule: res.data.rewardRule,
+          rewardRule: res.data.rewardRule
         }
       })
     },
@@ -209,13 +191,13 @@ export default {
           selectParam = {
             staffId: item.userId,
             staffName: item.name,
-            staffType: 2,
+            staffType: 2
           }
         } else {
           selectParam = {
             staffId: item.id,
             staffName: item.name,
-            staffType: 1,
+            staffType: 1
           }
         }
         return selectParam
@@ -256,13 +238,12 @@ export default {
       }
 
       return isJPG || isPNG
-    },
+    }
   },
-  computed:{
-      arrayTarget(){
-        
-          return [].concat({id:this.groupForm.fissionTargetId})
-      }
+  computed: {
+    arrayTarget() {
+      return [].concat({ id: this.groupForm.fissionTargetId })
+    }
   }
 }
 </script>
@@ -321,11 +302,9 @@ export default {
             <el-radio :label="1">选择群主</el-radio>
           </el-radio-group>
           <div v-if="groupForm.sendType">
-            <el-tag
-              v-for="item in groupForm.taskFissionStaffs"
-              :key="item.staffId"
-              >{{ item.staffName }}</el-tag
-            >
+            <el-tag v-for="item in groupForm.taskFissionStaffs" :key="item.staffId">{{
+              item.staffName
+            }}</el-tag>
           </div>
         </el-form-item>
         <el-form-item label="" v-if="groupForm.sendType">
@@ -386,9 +365,7 @@ export default {
           >
           <div v-if="groupForm.postersId" class="changePosterBody">
             <img :src="groupForm.postersUrl" class="postersUrl" />
-            <span class="changeUrl" @click="dialogVisibleSelectPoster = true"
-              >修改</span
-            >
+            <span class="changeUrl" @click="dialogVisibleSelectPoster = true">修改</span>
           </div>
         </el-form-item>
 
@@ -404,10 +381,8 @@ export default {
             >选择群活码</el-button
           >
           <div v-if="groupForm.fissionTargetId" class="changePosterBody">
-               <img :src="groupForm.fissionTarget" class="postersUrl" />
-            <span class="changeUrl" @click="dialogVisibleSelectGroupCode = true"
-              >修改</span
-            >
+            <img :src="groupForm.fissionTarget" class="postersUrl" />
+            <span class="changeUrl" @click="dialogVisibleSelectGroupCode = true">修改</span>
           </div>
         </el-form-item>
       </el-form>
@@ -422,10 +397,7 @@ export default {
         labelPosition="left"
       >
         <el-form-item label="兑奖链接" prop="rewardUrl">
-          <el-input
-            v-model="groupForm.rewardUrl"
-            placeholder="请输入"
-          ></el-input>
+          <el-input v-model="groupForm.rewardUrl" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="兑奖图片" prop="rewardImageUrl">
           <el-upload
@@ -436,11 +408,7 @@ export default {
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
           >
-            <img
-              v-if="groupForm.rewardImageUrl"
-              :src="groupForm.rewardImageUrl"
-              class="avatar"
-            />
+            <img v-if="groupForm.rewardImageUrl" :src="groupForm.rewardImageUrl" class="avatar" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
@@ -455,7 +423,7 @@ export default {
         </el-form-item>
       </el-form>
     </div>
-    <div class="edit-model">
+    <!-- <div class="edit-model">
       <h4 class="title">新客欢迎语</h4>
       <el-form
         :model="groupForm"
@@ -465,11 +433,7 @@ export default {
         labelPosition="left"
       >
         <div class="welcomeBox">
-          <el-input
-            type="textarea"
-            style="border:none;resize:none"
-            v-model="groupForm.welcomeMsg"
-          >
+          <el-input type="textarea" style="border:none;resize:none" v-model="groupForm.welcomeMsg">
           </el-input>
           <div class="insertCustomer" @click="insertCustomer">
             <i class="el-icon-user-solid"></i>
@@ -477,7 +441,7 @@ export default {
           </div>
         </div>
       </el-form>
-    </div>
+    </div> -->
     <el-button type="primary" @click="submitForm()">{{
       pageType == 'edit' ? '立即修改' : '立即创建'
     }}</el-button>
@@ -513,7 +477,7 @@ export default {
       @success="tagetSelect"
     >
     </TargetSelectUser> -->
-        <!-- 选择群活码弹窗 -->
+    <!-- 选择群活码弹窗 -->
     <SelectQrCode
       :visible.sync="dialogVisibleSelectGroupCode"
       @success="tagetSelect"

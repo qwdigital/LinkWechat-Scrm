@@ -1,5 +1,7 @@
 package com.linkwechat.wecom.interceptor;
 
+import cn.hutool.core.io.FileTypeUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -9,9 +11,11 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.linkwechat.common.config.WeComeConfig;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import com.linkwechat.wecom.service.IWeAccessTokenService;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -74,7 +78,10 @@ public class WeAccessTokenInterceptor implements Interceptor<WeResultDto> {
         log.info("url:{},result:{}", forestRequest.getUrl(), forestResponse.getContent());
         if (null != resultDto.getErrcode() && !ObjectUtil.equal(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode(), resultDto.getErrcode())
                 && !weComeConfig.getWeNeedRetryErrorCodes().contains(resultDto.getErrcode())) {
-            throw new ForestRuntimeException(WeErrorCodeEnum.parseEnum(resultDto.getErrcode()).getErrorMsg());
+            if(!WeErrorCodeEnum.ERROR_CODE_90501.getErrorCode().equals(resultDto.getErrcode())){
+                throw new WeComException(WeErrorCodeEnum.parseEnum(resultDto.getErrcode()).getErrorMsg());
+            }
+
         }
     }
 

@@ -54,9 +54,8 @@ public class WeTagGroup extends BaseEntity
     private Integer delFlag;
 
 
-    /**标签分组类型(1:客户标签;2:群标签)*/
-    private Integer groupTagType=new Integer(1);
-
+    /**标签分组类型(1:企业客户标签;2:群标签；3:个人标签)*/
+    private Integer groupTagType;
 
 
 

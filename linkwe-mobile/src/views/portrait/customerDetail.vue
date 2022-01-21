@@ -2,13 +2,10 @@
   <div>
     <!-- 头部 -->
     <div class="header">
-      <van-icon
-        name="arrow-left"
-        color="#9c9c9c"
-        size="16"
-        @click="$router.back()"
-      />
-      <span class="title"> 客户资料 </span>
+      <div style="display:inline-flex;align-items: center;">
+        <van-icon name="arrow-left" color="#9c9c9c" size="16" @click="$router.back()" />
+        <span class="title ml5">客户资料</span>
+      </div>
       <div class="data" v-if="flage" @click="edit">编辑</div>
       <div class="data" v-else @click="saveUserInformation">保存</div>
     </div>
@@ -21,24 +18,30 @@
             <div class="img"><img :src="form.avatar" alt="" /></div>
             <div class="right">
               <div>
-                <span
-                  >{{
-                    user.remark
-                      ? user.remark
-                      : (user.name || '') + '-' + (user.remarkCorpName || '')
-                  }}
-                </span>
-                <span class="icon iconfont icon-man" v-if="user.gender == 1">
-                </span>
-                <span
-                  class="icon iconfont icon-xingbie"
-                  v-else-if="user.gender == 2"
-                ></span>
-                <van-icon name="manager" color="#9c9c9c" v-else />
+                <p>
+                  {{ user.name || '' }}
+                </p>
+                <div class="flex aic">
+                  <van-icon
+                    name="manager"
+                    :class="['gender', { 1: 'man', 2: 'woman' }[form.gender]]"
+                  ></van-icon>
+                  <span
+                    :style="{
+                      color: form.customerType === 1 ? '#4bde03' : '#f9a90b',
+                      'font-size': '12px'
+                    }"
+                  >
+                    {{ { 1: '@微信', 2: '@企业微信' }[form.customerType] }}
+                  </span>
+                </div>
+                <!-- <span class="icon iconfont icon-man" v-if="user.gender == 1"> </span>
+                <span class="icon iconfont icon-xingbie" v-else-if="user.gender == 2"></span>
+                <van-icon name="manager" color="#9c9c9c" v-else /> -->
               </div>
-              <div class="c9">
+              <!-- <div class="c9">
                 <span>昵称：</span><span>{{ user.name }}</span>
-              </div>
+              </div> -->
             </div>
           </div>
         </div>
@@ -67,12 +70,7 @@
         input-align="right"
         @click="!flage ? (show = true) : ''"
       />
-      <van-popup
-        v-model="show"
-        position="bottom"
-        round
-        :style="{ height: '60%' }"
-      >
+      <van-popup v-model="show" position="bottom" round :style="{ height: '60%' }">
         <van-datetime-picker
           v-model="currentDate"
           type="date"
@@ -97,13 +95,7 @@
         placeholder="地址"
         input-align="right"
       />
-      <van-field
-        v-model="form.qq"
-        name="QQ"
-        label="QQ"
-        placeholder="QQ"
-        input-align="right"
-      />
+      <van-field v-model="form.qq" name="QQ" label="QQ" placeholder="QQ" input-align="right" />
       <van-field
         v-model="form.position"
         name="职业"
@@ -198,12 +190,8 @@ export default {
       const date = new Date(data)
       // console.log(timer.getFullYear());
       var Y = date.getFullYear() + '-'
-      var M =
-        (date.getMonth() + 1 < 10
-          ? '0' + (date.getMonth() + 1)
-          : date.getMonth() + 1) + '-'
-      var D =
-        date.getDate() < 10 ? '0' + date.getDate() : date.getDate() + '   '
+      var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
+      var D = date.getDate() < 10 ? '0' + date.getDate() : date.getDate() + '   '
       //   var h =
       //     (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
       //   var m =
@@ -232,11 +220,13 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.iconfont {
+.gender {
+  color: #9c9c9c;
+}
+.man {
   color: #2c8cf0;
 }
-
-.icon-xingbie {
+.woman {
   color: pink;
 }
 .header {
@@ -251,6 +241,7 @@ export default {
 .title {
   text-align: center;
   font-size: 14px;
+  vertical-align: middle;
 }
 //  详细资料
 .details {

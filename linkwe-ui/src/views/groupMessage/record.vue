@@ -1,17 +1,117 @@
+<template>
+  <div>
+    <div>
+      <div>
+        <el-button type="primary" style="margin-bottom: 20px" @click="goRoute('add')"
+          >新建群发</el-button
+        >
+      </div>
+      <el-form
+        :model="query"
+        ref="queryForm"
+        :inline="true"
+        label-position="left"
+        class="top-search"
+        label-width="70px"
+      >
+        <el-form-item label="群发内容" prop="content">
+          <el-input
+            size="mini"
+            v-model="query.content"
+            placeholder="请输入群发内容"
+            clearable
+            @keyup.enter.native="getList(1)"
+          />
+        </el-form-item>
+        <el-form-item label="群发类型" prop="chatType">
+          <el-select v-model="query.chatType" placeholder="请选择群发类型" size="mini">
+            <el-option
+              v-for="(value, key, index) in pushType"
+              :label="value"
+              :value="key"
+              :key="index"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="发送类型" prop="isTask">
+          <el-select v-model="query.isTask" placeholder="请选择发送类型" size="mini">
+            <el-option
+              v-for="(value, key, index) in timedTask"
+              :label="value"
+              :value="key"
+              :key="index"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label-width="0">
+          <el-button type="primary" size="mini" @click="getList(1)">查询</el-button>
+          <el-button type="info" size="mini" plain @click="resetQuery">清空</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+
+    <div>
+      <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
+        <el-table-column label="群发内容" align="center" prop="content" />
+        <el-table-column label="群发类型" align="center">
+          <template slot-scope="scope">
+            {{ pushType[scope.row.chatType] }}
+          </template>
+        </el-table-column>
+        <el-table-column label="发送类型" align="center">
+          <template slot-scope="scope">
+            {{ timedTask[scope.row.isTask] }}
+          </template>
+        </el-table-column>
+        <el-table-column label="发送时间" align="center" prop="sendTime" width="180">
+        </el-table-column>
+        <el-table-column label="最近更新时间" align="center" prop="createTime" width="180">
+        </el-table-column>
+        <el-table-column label="操作" align="center" width="180">
+          <template slot-scope="scope">
+            <!-- v-hasPermi="['enterpriseWechat:view']" -->
+            <el-button
+              size="mini"
+              type="text"
+              @click="goRoute('detail', scope.row.id, scope.row.isTask, scope.row.status)"
+              >详情</el-button
+            >
+            <el-divider
+              v-if="scope.row.isTask === 1 && scope.row.status === 0"
+              direction="vertical"
+            ></el-divider>
+            <el-button
+              size="mini"
+              v-if="scope.row.isTask === 1 && scope.row.status === 0"
+              type="text"
+              @click="cancelSend(scope.row)"
+              >取消发送</el-button
+            >
+            <!-- <el-button v-hasPermi="['enterpriseWechat:edit']" size="mini" type="text" disabled=""
+							@click="goRoute(scope.row, 1)">编辑</el-button>
+						<el-button v-hasPermi="['enterpriseWechat:edit']" size="mini" type="text"
+							@click="syncMsg(scope.row)">同步</el-button> -->
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <pagination
+        v-show="total > 0"
+        :total="total"
+        :page.sync="query.pageNum"
+        :limit.sync="query.pageSize"
+        @pagination="getList()"
+      />
+    </div>
+  </div>
+</template>
+
 <script>
-import { getList, syncMsg } from '@/api/groupMessage'
+import { getList, syncMsg, cancelSend } from '@/api/groupMessage'
 export default {
   name: 'Operlog',
-  filters: {
-    sendInfo(data) {
-      if (data.timedTask == 1) {
-        return '定时任务 发送时间:' + data.settingTime
-      } else {
-        let unit = data.expectSend == 1 ? '个群' : '人'
-        return `预计发送${data.expectSend}${unit}，已成功发送${data.actualSend}${unit}`
-      }
-    }
-  },
   data() {
     return {
       // 遮罩层
@@ -28,15 +128,19 @@ export default {
       query: {
         pageNum: 1,
         pageSize: 10,
-        sender: undefined,
         content: undefined,
-        pushType: undefined,
-        beginTime: undefined,
-        endTime: undefined
+        chatType: undefined,
+        isTask: undefined,
+        orderByColumn: 'create_time',
+        isAsc: 'desc'
       },
       pushType: {
-        0: '发给客户',
-        1: '发给客户群'
+        1: '发给客户',
+        2: '发给客户群'
+      },
+      timedTask: {
+        0: '立即发送',
+        1: '定时发送'
       },
       pickerOptions: {
         disabledDate(time) {
@@ -62,7 +166,7 @@ export default {
       getList(this.query)
         .then(({ rows, total }) => {
           this.list = rows
-          this.total = +total
+          this.total = Number(total)
           this.loading = false
           this.ids = []
         })
@@ -83,31 +187,40 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const operIds = row.operId || this.ids
-      this.$confirm(
-        '是否确认删除日志编号为"' + operIds + '"的数据项?',
-        '警告',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      )
-        .then(function() {})
+      this.$confirm('是否确认删除日志编号为"' + operIds + '"的数据项?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(function () {})
         .then(() => {
           this.getList()
           this.msgSuccess('删除成功')
         })
-        .catch(function() {})
+        .catch(function () {})
     },
-    goRoute(id, path) {
+    goRoute(path, id, isTask, status) {
+      const query = {}
+      if (id) {
+        query.id = id
+      }
+      if (isTask) {
+        query.isTask = isTask
+      }
+      if (status) {
+        query.status = status
+      }
       this.$router.push({
-        path: path,
-        query: { id }
+        path: '/customerMaintain/groupMessage/' + path,
+        query
       })
     },
     syncMsg(data) {
       let { msgid, messageId } = data
-      syncMsg({ msgids: [msgid], messageId })
+      syncMsg(this, {
+        msgids: [msgid],
+        messageId
+      })
         .then(({ data }) => {
           this.msgSuccess('同步成功')
           this.getList()
@@ -119,123 +232,26 @@ export default {
         .catch(() => {
           // this.loading = false
         })
+    },
+    cancelSend(data) {
+      cancelSend(data.id).then((res) => {
+        if (res.code == 200) {
+          this.getList()
+          this.msgSuccess('操作成功')
+        } else {
+          this.msgError(res.msg || '操作失败')
+        }
+      })
     }
   }
 }
 </script>
-<template>
-  <div>
-    <el-form
-      :model="query"
-      ref="queryForm"
-      :inline="true"
-      class="top-search"
-      label-width="100px"
-    >
-      <el-form-item label="创建人" prop="sender">
-        <el-input
-          v-model="query.sender"
-          placeholder="请输入"
-          clearable
-          @keyup.enter.native="getList(1)"
-        />
-      </el-form-item>
-      <el-form-item label="内容消息" prop="content">
-        <el-input
-          v-model="query.content"
-          placeholder="请输入"
-          clearable
-          @keyup.enter.native="getList(1)"
-        />
-      </el-form-item>
-      <el-form-item label="群发类型" prop="pushType">
-        <el-select v-model="query.pushType" placeholder="请选择" size="small">
-          <el-option
-            v-for="(value, key, index) in pushType"
-            :label="value"
-            :value="key"
-            :key="index"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="创建日期">
-        <el-date-picker
-          :picker-options="pickerOptions"
-          v-model="dateRange"
-          value-format="yyyy-MM-dd"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        ></el-date-picker>
-      </el-form-item>
-      <el-form-item label=" ">
-        <el-button type="primary" @click="getList(1)">查询</el-button>
-        <el-button type="success" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
 
-    <el-table
-      v-loading="loading"
-      :data="list"
-      @selection-change="handleSelectionChange"
-    >
-      <!-- <el-table-column type="selection" width="55" align="center" /> -->
-      <el-table-column label="消息内容" align="center" prop="content" />
-      <el-table-column label="群发类型" align="center">
-        <template slot-scope="scope">
-          {{ pushType[scope.row.pushType] }}
-        </template>
-      </el-table-column>
-      <el-table-column label="创建人" align="center" prop="sender" />
-      <el-table-column
-        label="创建时间"
-        align="center"
-        prop="sendTime"
-        width="180"
-      >
-      </el-table-column>
-      <el-table-column label="发送情况" align="center" prop="sendInfo">
-        <template slot-scope="scope">
-          {{ scope.row | sendInfo }}
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" align="center" width="180">
-        <template slot-scope="scope">
-          <el-button
-            v-hasPermi="['enterpriseWechat:view']"
-            size="mini"
-            type="text"
-            @click="goRoute(scope.row.messageId, 'detail')"
-            >查看</el-button
-          >
-          <el-button
-            v-hasPermi="['enterpriseWechat:edit']"
-            size="mini"
-            type="text"
-            disabled=""
-            @click="goRoute(scope.row, 1)"
-            >编辑</el-button
-          >
-          <el-button
-            v-hasPermi="['enterpriseWechat:edit']"
-            size="mini"
-            type="text"
-            @click="syncMsg(scope.row)"
-            >同步</el-button
-          >
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <pagination
-      v-show="total > 0"
-      :total="total"
-      :page.sync="query.pageNum"
-      :limit.sync="query.pageSize"
-      @pagination="getList()"
-    />
-  </div>
-</template>
-
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.my-divider {
+  display: block;
+  height: 1px;
+  width: 100%;
+  background-color: #dcdfe6;
+}
+</style>

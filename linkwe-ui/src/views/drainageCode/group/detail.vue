@@ -25,7 +25,7 @@ export default {
   <div class="page">
     <BaseInfo ref="baseInfo" :groupCodeId="groupCodeId"></BaseInfo>
 
-    <div class="fr">
+    <div class="ac">
       <el-button @click="$router.back()"> 取消 </el-button>
       <el-button type="primary" @click="save"> 保存 </el-button>
     </div>

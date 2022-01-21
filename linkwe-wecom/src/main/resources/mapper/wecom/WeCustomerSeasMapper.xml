@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeCustomerSeasMapper">
+
+
+    <select id="countCustomerSeas" resultType="com.linkwechat.wecom.domain.vo.CustomerSeasCountVo">
+        SELECT
+            COUNT(*) AS importCustomerTotalNum,
+            COUNT(IF(add_state=1,true,NULL)) AS addCustomerNum,
+            IFNULL(ROUND(COUNT(IF(add_state=1,true,NULL))/COUNT(*)*100,2),0) AS completionRate,
+            COUNT(IF(add_state=0,true,NULL)) AS waitAddCustomerNum,
+            COUNT(IF(add_state=3,true,NULL)) AS waitPassCustomerNum
+        FROM
+            we_customer_seas
+    </select>
+
+    <select id="findSeasRecord" resultType="com.linkwechat.wecom.domain.vo.CustomerSeasRecordVo">
+        SELECT
+            table_excel_name,
+            count(*) as cutomerTotalNum,
+            create_time,
+            GROUP_CONCAT(DISTINCT add_user_name) as addUserName,
+            COUNT(IF(add_state=1,true,NULL)) AS addCustomerNum,
+            COUNT(IF(add_state=0,true,NULL)) AS waitAddCustomerNum,
+            COUNT(IF(add_state=3,true,NULL)) AS waitPassCustomerNum,
+            IFNULL(ROUND(COUNT(IF(add_state=1,true,NULL))/COUNT(*)*100,2),0) AS completionRate
+        FROM
+            we_customer_seas
+        GROUP BY
+        <choose>
+            <when test="groupByType==1">
+                table_excel_id
+            </when>
+            <otherwise>
+                add_user_id
+            </otherwise>
+        </choose>
+        ORDER BY create_time DESC
+    </select>
+
+
+
+</mapper>

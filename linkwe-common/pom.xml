@@ -133,7 +133,7 @@
         <dependency>
             <groupId>com.dtflys.forest</groupId>
             <artifactId>forest-spring-boot-starter</artifactId>
-            <version>1.5.5</version>
+            <version>1.5.16</version>
         </dependency>
 
         <dependency>
@@ -275,6 +275,21 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
         </dependency>
+
+        <!-- mp3文件支持(如语音时长)-->
+        <dependency>
+            <groupId>org</groupId>
+            <artifactId>jaudiotagger</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+
+        <!-- mp4文件支持(如语音时长)-->
+        <dependency>
+            <groupId>com.googlecode.mp4parser</groupId>
+            <artifactId>isoparser</artifactId>
+            <version>1.1.22</version>
+        </dependency>
+
 
     </dependencies>
 

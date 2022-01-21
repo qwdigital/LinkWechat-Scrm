@@ -2,17 +2,17 @@ package com.linkwechat.wecom.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.linkwechat.common.config.RuoYiConfig;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.entity.WeCorpAccount;
+import com.linkwechat.common.core.redis.RedisCache;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.wecom.mapper.WeCorpAccountMapper;
-import com.linkwechat.wecom.service.IWeAccessTokenService;
 import com.linkwechat.wecom.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 企业id相关配置Service业务层处理
@@ -23,35 +23,8 @@ import java.util.Optional;
 @Service
 public class WeCorpAccountServiceImpl extends ServiceImpl<WeCorpAccountMapper,WeCorpAccount> implements IWeCorpAccountService {
 
-
-
-
     @Autowired
-    private IWeAccessTokenService iWeAccessTokenService;
-
-    @Autowired
-    private RuoYiConfig ruoYiConfig;
-
-
-    /**
-     * 修改企业id相关配置
-     * 
-     * @param wxCorpAccount 企业id相关配置
-     * @return 结果
-     */
-    @Override
-    public void updateWeCorpAccount(WeCorpAccount wxCorpAccount)
-    {
-
-        if(this.updateById(wxCorpAccount)){
-
-            iWeAccessTokenService.removeToken(wxCorpAccount);
-
-        }
-
-    }
-
-
+    private RedisCache redisCache;
 
     /**
      * 获取有效的企业id
@@ -61,36 +34,20 @@ public class WeCorpAccountServiceImpl extends ServiceImpl<WeCorpAccountMapper,We
     @Override
     public WeCorpAccount findValidWeCorpAccount() {
 
-        return ruoYiConfig.isStartTenant()? WeCorpAccount.builder().build():this.getOne(new LambdaQueryWrapper<WeCorpAccount>()
-                .eq(WeCorpAccount::getDelFlag,Constants.NORMAL_CODE)
-                .eq(WeCorpAccount::getStatus,Constants.NORMAL_CODE));
+        WeCorpAccount weCorpAccount = this.getOne(new LambdaQueryWrapper<WeCorpAccount>()
+                .eq(WeCorpAccount::getDelFlag, Constants.NORMAL_CODE));
+
+        return weCorpAccount!=null?weCorpAccount:WeCorpAccount.builder().build();
     }
 
 
-    /**
-     * 启用有效的企业微信账号
-     * @param corpId
-     */
-    @Override
-    public int startVailWeCorpAccount(String corpId) {
 
-        int returnCode = this.baseMapper.startVailWeCorpAccount(corpId);
-
-        if(Constants.SERVICE_RETURN_SUCCESS_CODE<returnCode){
-
-            iWeAccessTokenService.removeToken(WeCorpAccount.builder().build());
-
-        }
-
-
-        return returnCode;
-    }
 
     @Override
     public void startCustomerChurnNoticeSwitch(String status) {
         WeCorpAccount validWeCorpAccount = findValidWeCorpAccount();
         validWeCorpAccount.setCustomerChurnNoticeSwitch(status);
-        this.updateWeCorpAccount(validWeCorpAccount);
+        this.updateById(validWeCorpAccount);
     }
 
     @Override
@@ -101,6 +58,27 @@ public class WeCorpAccountServiceImpl extends ServiceImpl<WeCorpAccountMapper,We
         return noticeSwitch;
     }
 
+    /**
+     * 通过企业id查询配置信息  ** 修改或者删除配置时记得删除缓存  **
+     *
+     * @param corpId 企业id
+     * @return
+     */
+    @Override
+    public WeCorpAccount getCorpAccountByCorpId(String corpId) {
+        String key = StringUtils.format(WeConstans.corpAccountKey,corpId);
+        WeCorpAccount corpAccount = redisCache.getCacheObject(key);
+        if(corpAccount == null){
+            WeCorpAccount weCorpAccount = this.getOne(new LambdaQueryWrapper<WeCorpAccount>()
+                    .eq(WeCorpAccount::getCorpId,corpId)
+                    .eq(WeCorpAccount::getDelFlag, Constants.NORMAL_CODE).last("limit 1"));
+            if(weCorpAccount != null){
+                redisCache.setCacheObject(key,weCorpAccount,2 * 60 * 60, TimeUnit.SECONDS);
+                corpAccount = weCorpAccount;
+            }
+        }
+        return corpAccount;
+    }
 
 
 }

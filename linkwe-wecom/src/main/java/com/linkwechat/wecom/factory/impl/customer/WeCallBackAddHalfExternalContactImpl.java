@@ -1,26 +1,27 @@
 package com.linkwechat.wecom.factory.impl.customer;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.linkwechat.common.enums.MediaType;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.wecom.domain.*;
-import com.linkwechat.wecom.domain.dto.WeEmpleCodeDto;
-import com.linkwechat.wecom.domain.dto.WeMediaDto;
+import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
+import com.linkwechat.wecom.domain.callback.WeBackCustomerVo;
+import com.linkwechat.wecom.domain.WeFlowerCustomerRel;
+import com.linkwechat.wecom.domain.WeTaskFission;
+import com.linkwechat.wecom.domain.WeTaskFissionRecord;
+import com.linkwechat.wecom.domain.WeTaskFissionReward;
 import com.linkwechat.wecom.domain.dto.WeWelcomeMsg;
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 import com.linkwechat.wecom.factory.WeEventStrategy;
-import com.linkwechat.wecom.service.*;
+import com.linkwechat.wecom.service.IWeCustomerService;
+import com.linkwechat.wecom.service.IWeTaskFissionRecordService;
+import com.linkwechat.wecom.service.IWeTaskFissionRewardService;
+import com.linkwechat.wecom.service.IWeTaskFissionService;
+import com.linkwechat.wecom.service.event.WeEventPublisherService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author danmo
@@ -33,83 +34,77 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
 
     @Autowired
     private IWeCustomerService weCustomerService;
-    @Autowired
-    private IWeEmpleCodeTagService weEmpleCodeTagService;
-    @Autowired
-    private IWeEmpleCodeService weEmpleCodeService;
 
     @Autowired
-    private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
+    private IWeTaskFissionRecordService weTaskFissionRecordService;
+    @Autowired
+    private IWeTaskFissionRewardService weTaskFissionRewardService;
+    @Autowired
+    private IWeTaskFissionService weTaskFissionService;
 
     @Autowired
-    private IWeMaterialService weMaterialService;
+    private WeEventPublisherService weEventPublisherService;
 
-    @Autowired
-    private IWeScanEmpleCodeCountService iWeScanEmpleCodeCountService;
+    private ThreadLocal<WeFlowerCustomerRel> weFlowerCustomerRelThreadLocal = new ThreadLocal<>();
+
 
     @Override
-    public void eventHandle(WxCpXmlMessageVO message) {
-        try {
-            if (message.getExternalUserId() != null) {
-                weCustomerService.getCustomersInfoAndSynchWeCustomer(message.getExternalUserId(),message.getUserId());
-            }
-            //向扫码客户发送欢迎语
-            if (message.getState() != null && message.getWelcomeCode() != null) {
-                //扫码统计记录入库
-                iWeScanEmpleCodeCountService.save(
-                        WeScanEmpleCodeCount.builder()
-                                .empleCodeId(Long.valueOf(message.getState()))
-                                .createTime(new Date())
-                                .userId(message.getUserId())
-                                .externalUserid(message.getExternalUserId())
-                                .build());
-
-                log.info("执行发送欢迎语>>>>>>>>>>>>>>>");
-                WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(message.getWelcomeCode());
-                WeEmpleCodeDto messageMap = weEmpleCodeService.selectWelcomeMsgByScenario(message.getState(),message.getUserId());
-                String empleCodeId = messageMap.getEmpleCodeId();
-                //查询活码对应标签
-                List<WeEmpleCodeTag> tagList = weEmpleCodeTagService.list(new LambdaQueryWrapper<WeEmpleCodeTag>()
-                        .eq(WeEmpleCodeTag::getEmpleCodeId, empleCodeId));
-                //客户添加活码标签
-                if(CollectionUtil.isNotEmpty(tagList)){
-                    List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
-                    tagList.stream().forEach(k->{
-                        weFlowerCustomerTagRels.add(
-                                WeFlowerCustomerTagRel.builder()
-                                        .tagId(k.getTagId())
-                                        .externalUserid( message.getUserId())
-                                        .userId(message.getExternalUserId())
-                                        .createTime(new Date())
-                                        .build()
-                        );
-
-                    });
-                    weFlowerCustomerTagRelService.batchAddOrUpdate(weFlowerCustomerTagRels);
-                }
-
-
-
-                log.debug(">>>>>>>>>欢迎语查询结果：{}", JSONObject.toJSONString(messageMap));
-                if (messageMap != null) {
-                    if (StringUtils.isNotEmpty(messageMap.getWelcomeMsg())){
-                        weWelcomeMsgBuilder.text(WeWelcomeMsg.Text.builder()
-                                .content(messageMap.getWelcomeMsg()).build());
-                    }
-                    if(StringUtils.isNotEmpty(messageMap.getCategoryId())){
-                        WeMediaDto weMediaDto = weMaterialService
-                                .uploadTemporaryMaterial(messageMap.getMaterialUrl(),messageMap.getMaterialName(), MediaType.IMAGE.getMediaType());
-                        Optional.ofNullable(weMediaDto).ifPresent(media ->{
-                            weWelcomeMsgBuilder.image(WeWelcomeMsg.Image.builder().media_id(media.getMedia_id())
-                                    .pic_url(media.getUrl()).build());
-                        });
-                    }
-                    weCustomerService.sendWelcomeMsg(weWelcomeMsgBuilder.build());
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error("执行发送欢迎语失败！",e);
+    public void eventHandle(WeBackBaseVo message) {
+        WeBackCustomerVo customerInfo = (WeBackCustomerVo) message;
+        if (customerInfo.getExternalUserID() != null) {
+            weCustomerService.getCustomersInfoAndSynchWeCustomer(customerInfo.getExternalUserID(),customerInfo.getUserID());
         }
+
+        weEventPublisherService.register(customerInfo.getExternalUserID(),customerInfo.getUserID(),customerInfo.getWelcomeCode(),customerInfo.getState());
+        if (StringUtils.isNotEmpty(customerInfo.getState()) && isFission(customerInfo.getState())) {
+            taskFissionRecordHandle(customerInfo.getState(), customerInfo.getWelcomeCode(), customerInfo.getUserID(), customerInfo.getExternalUserID());
+        }
+    }
+
+    //裂变任务处理
+    private void taskFissionRecordHandle(String state, String wecomCode, String userId, String externalUserId) {
+        log.info("裂变任务处理  >>>>>>>>>>start");
+        //查询裂变客户任务记录
+        String fissionRecordId = state.substring(WeConstans.FISSION_PREFIX.length());
+        WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService.selectWeTaskFissionRecordById(Long.valueOf(fissionRecordId));
+        if (weTaskFissionRecord != null) {
+            //查询裂变任务详情
+            WeTaskFission weTaskFission = weTaskFissionService
+                    .selectWeTaskFissionById(weTaskFissionRecord.getTaskFissionId());
+            Long fissNum = weTaskFissionRecord.getFissNum();
+            if (weFlowerCustomerRelThreadLocal.get() == null){
+                fissNum++;
+                weTaskFissionRecord.setFissNum(fissNum);
+            }
+            log.info("查询裂变任务详情  >>>>>>>>>>{}",JSONObject.toJSONString(weTaskFissionRecord));
+            if (weTaskFission != null){
+                //发送欢迎语
+                WeWelcomeMsg.WeWelcomeMsgBuilder weWelcomeMsgBuilder = WeWelcomeMsg.builder().welcome_code(wecomCode);
+                weWelcomeMsgBuilder.text(WeWelcomeMsg.Text.builder()
+                        .content(weTaskFission.getWelcomeMsg()).build());
+                weCustomerService.sendWelcomeMsg(weWelcomeMsgBuilder.build());
+            }
+
+            //裂变数量完成任务处理,消费兑换码
+            if (fissNum >= weTaskFission.getFissNum()){
+                log.info("裂变数量完成任务处理,消费兑换码  >>>>>>>>>>{}",fissNum);
+                weTaskFissionRecord.setCompleteTime(new Date());
+                WeTaskFissionReward reward = new WeTaskFissionReward();
+                reward.setTaskFissionId(weTaskFissionRecord.getTaskFissionId());
+                reward.setRewardCodeStatus(0);
+                List<WeTaskFissionReward> weTaskFissionRewardList = weTaskFissionRewardService.selectWeTaskFissionRewardList(reward);
+                WeTaskFissionReward fissionReward = weTaskFissionRewardList.get(0);
+                fissionReward.setRewardUser(weTaskFissionRecord.getCustomerName());
+                fissionReward.setRewardUserId(weTaskFissionRecord.getCustomerId());
+                weTaskFissionRewardService.updateWeTaskFissionReward(fissionReward);
+            }
+            log.info("裂变任务处理变更  >>>>>>>>>>{}",JSONObject.toJSONString(weTaskFissionRecord));
+            weTaskFissionRecordService.updateWeTaskFissionRecord(weTaskFissionRecord);
+            log.info("裂变任务处理  >>>>>>>>>>end");
+        }
+    }
+
+    private boolean isFission(String str) {
+        return str.contains(WeConstans.FISSION_PREFIX);
     }
 }

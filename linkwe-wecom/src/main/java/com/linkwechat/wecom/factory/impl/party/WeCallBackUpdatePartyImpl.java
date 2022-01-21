@@ -1,7 +1,7 @@
 package com.linkwechat.wecom.factory.impl.party;
 
-import com.linkwechat.wecom.domain.WeDepartment;
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
+import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
+import com.linkwechat.wecom.domain.callback.WeBackDeptVo;
 import com.linkwechat.wecom.factory.WeEventStrategy;
 import com.linkwechat.wecom.service.IWeDepartmentService;
 import lombok.extern.slf4j.Slf4j;
@@ -20,9 +20,10 @@ public class WeCallBackUpdatePartyImpl extends WeEventStrategy {
     private IWeDepartmentService weDepartmentService;
 
     @Override
-    public void eventHandle(WxCpXmlMessageVO message) {
+    public void eventHandle(WeBackBaseVo message) {
+        WeBackDeptVo deptInfo = (WeBackDeptVo) message;
         try {
-            weDepartmentService.updateById(setWeDepartMent(message));
+            weDepartmentService.updateById(setWeDepartMent(deptInfo));
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

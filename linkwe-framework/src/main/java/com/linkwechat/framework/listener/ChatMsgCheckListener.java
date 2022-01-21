@@ -96,12 +96,12 @@ public class ChatMsgCheckListener implements MessageListener {
             allSensitiveRules.forEach(weSensitive -> {
                 List<String> patternWords = Arrays.asList(weSensitive.getPatternWords().split(","));
                 List<String> users = weSensitiveService.getScopeUsers(weSensitive.getAuditUserScope());
-                log.info("handleSensitiveHit: >>>>>>>>>>>>>>>>>>>>>>finalContent:{}, patternWords:{},users:{},from:{}", finalContent, JSONObject.toJSONString(patternWords),  JSONObject.toJSONString(users), fromId);
+                //log.info("handleSensitiveHit: >>>>>>>>>>>>>>>>>>>>>>finalContent:{}, patternWords:{},users:{},from:{}", finalContent, JSONObject.toJSONString(patternWords),  JSONObject.toJSONString(users), fromId);
                 if (StringUtils.isNotBlank(finalContent)
                         && !CollectionUtils.isEmpty(users)
                         && users.stream().anyMatch(fromId::equals)) {
                     WeChatContactSensitiveMsg wccsm = hitSensitive(patternWords, fromId, finalContent);
-                    log.info("handleSensitiveHit: >>>>>>>>>>>>>>>>>>>>>> wccsm:{}",JSONObject.toJSONString(wccsm));
+                    //log.info("handleSensitiveHit: >>>>>>>>>>>>>>>>>>>>>> wccsm:{}",JSONObject.toJSONString(wccsm));
                     if (wccsm != null) {
                         wccsm.setMsgId(msgId);
                         wccsm.setFromId(fromId);
@@ -119,7 +119,7 @@ public class ChatMsgCheckListener implements MessageListener {
     private WeChatContactSensitiveMsg hitSensitive(List<String> patternWords, String user, String content) {
         WeChatContactSensitiveMsg weChatContactSensitiveMsg = new WeChatContactSensitiveMsg();
         String patternWordStr = patternWords.stream().filter(content.trim()::contains).collect(Collectors.joining(","));
-        log.info("hitSensitive: >>>>>>>>>>>>>>>>>>>>>> patternWordStr:{}",patternWordStr);
+        //log.info("hitSensitive: >>>>>>>>>>>>>>>>>>>>>> patternWordStr:{}",patternWordStr);
         if (StringUtils.isNotEmpty(patternWordStr)) {
             weChatContactSensitiveMsg.setContent(content);
             weChatContactSensitiveMsg.setSendStatus(0);

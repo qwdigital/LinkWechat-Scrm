@@ -18,19 +18,19 @@
 <script>
 export default {
   name: 'Hamburger',
-  watch: {
-    $route(route) {
-      // if you go to the redirect page, do not update the breadcrumbs
-      if (route.name == '首页') {
-        this.$store.state.app.sidebar.opened = 0
-      }
-    },
-  },
+  // watch: {
+  //   $route(route) {
+  //     // if you go to the redirect page, do not update the breadcrumbs
+  //     if (route.name == '首页') {
+  //       this.$store.state.app.sidebar.opened = 0
+  //     }
+  //   },
+  // },
   methods: {
     toggleClick() {
       this.$store.dispatch('app/toggleSideBar')
-    },
-  },
+    }
+  }
 }
 </script>
 

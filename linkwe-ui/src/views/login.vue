@@ -42,21 +42,21 @@
               <img :src="codeUrl" @click="getCode" class="login-code-img" />
             </div>
           </el-form-item>
-          <el-checkbox class="fr" v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;"
+          <el-checkbox class="fr" v-model="loginForm.rememberMe" style="margin: 0px 0px 25px 0px"
             >记住密码</el-checkbox
           >
           <el-checkbox
             v-model="isDemonstrationLogin"
             @change="changeDemonAccount"
-            style="margin:0px 0px 25px 0px;"
+            style="margin: 0px 0px 25px 0px"
             >演示账号登录</el-checkbox
           >
-          <el-form-item style="width:100%;">
+          <el-form-item style="width: 100%">
             <el-button
               :loading="loading"
               size="medium"
               type="primary"
-              style="width:100%;"
+              style="width: 100%"
               @click.native.prevent="handleLogin"
             >
               <span v-if="!loading">登 录</span>
@@ -114,7 +114,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import { getCodeImg, findWxQrLoginInfo } from '@/api/login'
 import Cookies from 'js-cookie'
 import { encrypt, decrypt } from '@/utils/jsencrypt'
@@ -146,7 +145,7 @@ export default {
   },
   watch: {
     $route: {
-      handler: function(route) {
+      handler: function (route) {
         this.redirect = route.query && route.query.redirect
       },
       immediate: true
@@ -154,22 +153,27 @@ export default {
   },
   created() {
     // data.wxQrLoginRedirectUri http://192.168.0.101/#/authCallback
-    findWxQrLoginInfo().then(({ data }) => {
-      let authParams = {
-        appid: data.corpId, // * 服务商的CorpID
-        redirect_uri: encodeURIComponent(data.wxQrLoginRedirectUri), // * 授权登录之后目的跳转网址，需要做urlencode处理。所在域名需要与授权完成回调域名一致
-        state: '', // ? 用于企业或服务商自行校验session，防止跨域攻击
-        usertype: 'admin' // ? 支持登录的类型。admin代表管理员登录（使用微信扫码）,member代表成员登录（使用企业微信扫码），默认为admin
-      }
-      this.authLink = `https://open.work.weixin.qq.com/wwopen/sso/3rd_qrConnect?appid=${authParams.appid}&redirect_uri=${authParams.redirect_uri}&state=${authParams.state}&usertype=${authParams.usertype}`
-    })
+    // findWxQrLoginInfo().then(({ data }) => {
+    //   let authParams = {
+    //     appid: data.corpId, // * 服务商的CorpID
+    //     redirect_uri: encodeURIComponent(data.wxQrLoginRedirectUri), // * 授权登录之后目的跳转网址，需要做urlencode处理。所在域名需要与授权完成回调域名一致
+    //     state: '', // ? 用于企业或服务商自行校验session，防止跨域攻击
+    //     usertype: 'admin' // ? 支持登录的类型。admin代表管理员登录（使用微信扫码）,member代表成员登录（使用企业微信扫码），默认为admin
+    //   }
+    //   this.authLink = `https://open.work.weixin.qq.com/wwopen/sso/3rd_qrConnect?appid=${authParams.appid}&redirect_uri=${authParams.redirect_uri}&state=${authParams.state}&usertype=${authParams.usertype}`
+    // })
 
     this.getCode()
     this.getCookie()
+
+    this.$alert(
+      'LinkWeChat V2.0 已正式发布，遇到使用上的问题欢迎提交 Issue，我们将光速修复。',
+      '提示'
+    )
   },
   methods: {
     getCode() {
-      getCodeImg().then(res => {
+      getCodeImg().then((res) => {
         this.codeUrl = 'data:image/gif;base64,' + res.img
         this.loginForm.uuid = res.uuid
       })
@@ -185,7 +189,7 @@ export default {
       }
     },
     handleLogin() {
-      this.$refs.loginForm.validate(valid => {
+      this.$refs.loginForm.validate((valid) => {
         if (valid) {
           this.loading = true
           if (this.loginForm.rememberMe) {
@@ -204,7 +208,7 @@ export default {
           this.$store
             .dispatch('Login', this.loginForm)
             .then(() => {
-              this.$router.push({ path: this.redirect || '/' })
+              this.$router.push({ path: this.redirect || process.env.VUE_APP_BASE_URL })
             })
             .catch(() => {
               this.loading = false
@@ -288,7 +292,7 @@ export default {
 .login-code-img {
   height: 38px;
 }
-.login /deep/.el-dialog {
+.login ::v-deep.el-dialog {
   position: absolute;
   top: 50%;
   left: 50%;

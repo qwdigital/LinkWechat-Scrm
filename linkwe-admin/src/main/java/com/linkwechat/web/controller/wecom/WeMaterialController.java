@@ -1,5 +1,7 @@
 package com.linkwechat.web.controller.wecom;
 
+import cn.hutool.core.io.FileUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -23,7 +25,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,7 +48,7 @@ public class WeMaterialController extends BaseController {
     @Autowired
     private IWeMaterialService materialService;
 
-    @Resource
+    @Autowired
     private IWePosterService wePosterService;
 
 
@@ -50,11 +56,11 @@ public class WeMaterialController extends BaseController {
     @GetMapping("/list")
     @ApiOperation("查询素材列表")
     public TableDataInfo list(@RequestParam(value = "categoryId", required = false) String categoryId
-            , @RequestParam(value = "search", required = false) String search,@RequestParam(value = "mediaType") String mediaType) {
+            , @RequestParam(value = "search", required = false) String search,@RequestParam(value = "mediaType") String mediaType,Integer status) {
         startPage();
         return getDataTable(
                 StringUtils.isNotBlank(mediaType) && mediaType.equals(MediaType.POSTER.getType())?
-                        wePosterService.findWePosterToWeMaterial(categoryId,search):
+                        wePosterService.findWePosterToWeMaterial(categoryId,search,status):
                         materialService.findWeMaterials(categoryId, search,mediaType)
         );
     }
@@ -132,10 +138,11 @@ public class WeMaterialController extends BaseController {
     @Log(title = "获取素材media_id", businessType = BusinessType.OTHER)
     @GetMapping("/temporaryMaterialMediaId")
     @ApiOperation("H5端发送获取素材media_id")
-    public AjaxResult temporaryMaterialMediaId(String url,String type,String name){
-        WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(url,
-                type
-                ,name);
+    public AjaxResult temporaryMaterialMediaId(String url,String type,String name) throws UnsupportedEncodingException {
+        String suffix = FileUtil.getSuffix(url);
+        String prefixName = FileUtil.getPrefix(name);
+        String tempFileName = prefixName+"."+suffix;
+        WeMediaDto weMediaDto = materialService.uploadTemporaryMaterial(url, type,tempFileName);
         return AjaxResult.success(weMediaDto);
     }
 

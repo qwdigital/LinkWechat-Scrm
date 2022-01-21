@@ -96,7 +96,6 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
 
     @Override
     public void sendMessgae(CustomerMessagePushDto customerMessagePushDto, long messageId, List<WeCustomerList> customers, List<WeGroup> groups) throws JsonProcessingException {
-
         List<String> msgid = new ArrayList<>();
 
         //发给客户
@@ -119,17 +118,10 @@ public class WeCustomerMessageServiceImpl extends ServiceImpl<WeCustomerMessageM
                     messagePushDto.setSender(customerMessagePushDto.getStaffId());
                     childMessage(messagePushDto, customerMessagePushDto);
 
-                    try {
-                        SendMessageResultDto sendMessageResultDto = weCustomerMessagePushClient.sendCustomerMessageToUser(messagePushDto);
-                        if (WeConstans.WE_SUCCESS_CODE.equals(sendMessageResultDto.getErrcode())) {
-                            msgid.add(sendMessageResultDto.getMsgid());
-                        }
-                    }catch (Exception e){
-                        log.error("消息发送失败:"+e.getMessage());
+                    SendMessageResultDto sendMessageResultDto = weCustomerMessagePushClient.sendCustomerMessageToUser(messagePushDto);
+                    if (WeConstans.WE_SUCCESS_CODE.equals(sendMessageResultDto.getErrcode())) {
+                        msgid.add(sendMessageResultDto.getMsgid());
                     }
-
-
-
                 }
             });
         }

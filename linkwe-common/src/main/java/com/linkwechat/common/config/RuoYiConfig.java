@@ -100,7 +100,7 @@ public class RuoYiConfig
             return "D:/linkWeChat/uploadPath";
 
         }
-        return "/linkWeChat/uploadPath";
+        return "/Users/robin/work/sr_project/lw";
     }
 
     public void setProfile(String profile)

@@ -17,13 +17,7 @@ import java.util.List;
 public interface IWeUserService extends IService<WeUser>
 {
 
-    /**
-     * 根据id查询通讯录相关客户
-     *
-     * @param idList id列表
-     * @return 通讯录相关客户
-     */
-    public List<WeUser> getListByIds(List<Long> idList);
+
 
     /**
      * 根据id查询通讯录相关客户
@@ -32,13 +26,6 @@ public interface IWeUserService extends IService<WeUser>
      */
     public WeUser getById(Long id);
 
-    /**
-     * 查询通讯录相关客户
-     *
-     * @param userId 通讯录相关客户ID
-     * @return 通讯录相关客户
-     */
-    public WeUser getByUserId(String userId);
 
     /**
      * 查询通讯录相关客户列表
@@ -145,11 +132,6 @@ public interface IWeUserService extends IService<WeUser>
      List<WeAllocateGroupsVo>  getAllocateGroups(WeAllocateGroupsVo weAllocateGroupsVo);
 
 
-    /**
-     * 获取会话内容存档开启成员列表
-     * @return
-     */
-    List<WeUser> getPermitUserList(WeMsgAuditDto msgAuditDto);
 
 
     /**
@@ -166,6 +148,10 @@ public interface IWeUserService extends IService<WeUser>
      * @return
      */
     List<WeCustomerAddUser> findWeUserByCustomerId(String externalUserid);
+
+
+
+    void synchLeaveUserData();
 
 
 }

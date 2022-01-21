@@ -72,7 +72,22 @@ public class WeGroupMessageTemplate extends BaseEntity {
     @Excel(name = "是否执行 -1：失败  0：未执行 1：完成 2：取消")
     private Integer status;
 
-    @ApiModelProperty("同步时间")
+    /**
+     * 来源 0 群发 1 其他
+     */
+    @ApiModelProperty("来源 0 群发 1-任务宝 2-标签建群")
+    private Integer source;
+
+    /**
+     * 业务id
+     */
+    @ApiModelProperty("业务id")
+    private Long businessId;
+
+    /**
+     * 刷新时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty("刷新时间")
     private Date refreshTime;
 }

@@ -10,10 +10,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="msgId"    column="msg_id"    />
         <result property="userId"    column="user_id"    />
         <result property="userName"    column="user_name"    />
+        <result property="toBeCustomerName"    column="to_be_customer_name"    />
+        <result property="alreadyCustomerName"    column="already_customer_name"    />
         <result property="status"    column="status"    />
         <result property="sendTime"    column="send_time"    />
-        <result property="total"    column="total"    />
-        <result property="already"    column="already"    />
     </resultMap>
     <select id="groupMsgTaskList" resultMap="WeGroupMessageTaskResult">
         select
@@ -21,13 +21,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             wgmt.msg_template_id,
             wgmt.msg_id,
             wgmt.user_id,
-            wu.user_name,
+            (select wu.user_name from we_user wu where wu.user_id = wgmt.user_id limit 1) as user_name,
             wgmt.status,
             wgmt.send_time,
-        (select count(1) from we_group_message_send_result wgmsr where wgmsr.msg_template_id = wgmt.msg_template_id) as total,
-        (select count(1) from we_group_message_send_result wgmsr where wgmsr.msg_template_id = wgmt.msg_template_id and wgmsr.status = 1) as already
+            (select count(1) from we_group_message_send_result wgmsr where wgmsr.user_id = wgmt.user_id and wgmsr.msg_template_id = wgmt.msg_template_id and wgmsr.status = 0) as to_be_customer_name,
+            (select count(1) from we_group_message_send_result wgmsr where wgmsr.user_id = wgmt.user_id and wgmsr.msg_template_id = wgmt.msg_template_id and wgmsr.status = 1) as already_customer_name
         from we_group_message_task wgmt
-            left join we_user wu on wu.user_id = wgmt.user_id
         <where>
             <if test="id != null">
                 and wgmt.id = #{id}
@@ -39,7 +38,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 and wgmt.msg_template_id = #{msgTemplateId}
             </if>
             <if test="userName != null and userName != ''">
-                and wu.user_name like concat('%', #{userName}, '%')
+                and exists
+                (select 1 from we_user wu where wu.user_id = wgmt.user_id  and wu.user_name like concat('%', #{userName}, '%'))
             </if>
             <if test="status != null">
                 and wgmt.status = #{status}

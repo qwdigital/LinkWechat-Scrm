@@ -14,22 +14,22 @@
 
     <select id="cropSendResultList" parameterType="com.linkwechat.wecom.domain.WePresTagGroupTaskStat" resultType="com.linkwechat.wecom.domain.WePresTagGroupTaskStat">
         select distinct
-            wc.name as customerName,
-            (case wgmsr.`status` when 0 then 0 when 1 then 1 when 2 then 0 when 3 then 1 else 0 end) as sent,
-            (
-            select count(*) > 0
-            from
-                we_group_member wgm
-                left join we_group_code_actual ac on ac.chat_id =  wgm.chat_id and ac.del_flag = 0
-            where ac.group_code_id = task.group_code_id and wgm.user_id = wgmsr.external_userid
-            ) as inGroup
+        wc.name as customerName,
+        (case wgmsr.`status` when 0 then 0 when 1 then 1 when 2 then 0 when 3 then 1 else 0 end) as sent,
+        (
+        select count(*) > 0
         from
-            we_group_message_send_result wgmsr
-            left join we_customer wc on wc.external_userid = wgmsr.external_userid
-            left join we_pres_tag_group task on task.message_template_id = wgmsr.msg_template_id
+        we_group_member wgm
+        left join we_group_code_actual ac on ac.chat_id =  wgm.chat_id and ac.del_flag = 0
+        where ac.group_code_id = task.group_code_id and wgm.user_id = wgmsr.external_userid
+        ) as inGroup
+        from
+        we_group_message_send_result wgmsr
+        left join we_customer wc on wc.external_userid = wgmsr.external_userid
+        left join we_pres_tag_group task on task.message_template_id = wgmsr.msg_template_id
         where
-            wgmsr.del_flag = 0
-            and task.task_id = #{taskId}
+        wgmsr.del_flag = 0
+        and task.task_id = #{taskId}
         <if test="customerName != null and customerName != ''">
             and wc.name like concat('%', #{customerName}, '%')
         </if>
@@ -50,20 +50,20 @@
 
     <select id="singleSendResultList" parameterType="com.linkwechat.wecom.domain.WePresTagGroupTaskStat" resultType="com.linkwechat.wecom.domain.WePresTagGroupTaskStat">
         SELECT DISTINCT
-            cu.`name` AS customerName,
-            (
-                SELECT count(*) > 0
-                FROM we_group_member wgm
-                    LEFT JOIN we_group_code_actual ac ON ac.chat_id = wgm.chat_id AND ac.del_flag = 0
-                    LEFt JOIn we_pres_tag_group task On ac.group_code_id = task.group_code_id
-                WHERE
-                    task.task_id = st.task_id AND wgm.user_id = st.external_userid
-            ) AS inGroup,
-            st.sent
+        cu.`name` AS customerName,
+        (
+        SELECT count(*) > 0
+        FROM we_group_member wgm
+        LEFT JOIN we_group_code_actual ac ON ac.chat_id = wgm.chat_id AND ac.del_flag = 0
+        LEFt JOIn we_pres_tag_group task On ac.group_code_id = task.group_code_id
+        WHERE
+        task.task_id = st.task_id AND wgm.user_id = st.external_userid
+        ) AS inGroup,
+        st.sent
         FROM
-            we_pres_tag_group_stat st
-            left join we_customer cu on cu.external_userid = st.external_userid and cu.del_flag = 0
-            where st.del_flag = 0 and st.task_id = #{taskId}
+        we_pres_tag_group_stat st
+        left join we_customer cu on cu.external_userid = st.external_userid and cu.del_flag = 0
+        where st.del_flag = 0 and st.task_id = #{taskId}
         <if test="customerName != null and customerName != ''">
             and cu.`name` like concat('%', #{customerName}, '%')
         </if>

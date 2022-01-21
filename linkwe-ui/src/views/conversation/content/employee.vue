@@ -157,7 +157,7 @@ export default {
             this.loading = false
             this.personList = data
           })
-          .catch(err => {
+          .catch((err) => {
             this.loading = false
           })
       } else if (this.activeName == 1) {
@@ -167,7 +167,7 @@ export default {
             this.loading = false
             this.personList = data
           })
-          .catch(err => {
+          .catch((err) => {
             this.loading = false
           })
       } else {
@@ -177,7 +177,7 @@ export default {
             this.loading = false
             this.personList = data
           })
-          .catch(err => {
+          .catch((err) => {
             this.loading = false
           })
       }
@@ -212,7 +212,7 @@ export default {
 
             // data.children.push(...rows)
             let arr = node.data.children ? node.data.children.concat(rows || []) : rows || []
-            arr.forEach(element => {
+            arr.forEach((element) => {
               element.isLeaf = !!element.userId
             })
             resolve(arr)
@@ -236,14 +236,14 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-/deep/.el-tabs__nav-scroll {
+::v-deep.el-tabs__nav-scroll {
   padding-left: 15px;
 }
 
 .borderR {
   border-right: 2px solid #ccc;
 }
-/deep/ .el-tabs__header {
+::v-deep .el-tabs__header {
   margin: 0;
 }
 .employ {

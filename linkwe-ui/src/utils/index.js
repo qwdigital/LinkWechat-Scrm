@@ -1,23 +1,36 @@
 import { parseTime } from './common'
 
-/**
- * 表格时间格式化
- */
-export function formatDate(cellValue) {
-  if (cellValue == null || cellValue == '') return ''
-  var date = new Date(cellValue)
-  var year = date.getFullYear()
-  var month =
-    date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
-  var day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
-  var hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
-  var minutes =
-    date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
-  var seconds =
-    date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
-  return (
-    year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds
-  )
+// 日期时间格式化
+export function dateFormat(dateString, fmt = 'yyyy-MM-dd hh:mm:ss') {
+  if (!dateString) {
+    return
+  }
+  var date = new Date(dateString.replace(/-/g, '/'))
+  var o = {
+    'M+': date.getMonth() + 1, //月份
+    'd+': date.getDate(), //日
+    'h+': date.getHours(), //小时
+    'm+': date.getMinutes(), //分
+    's+': date.getSeconds(), //秒
+    'q+': Math.floor((date.getMonth() + 3) / 3), //季度
+    'S+': date.getMilliseconds(), //毫秒
+    'w+': '星期' + '日一二三四五六'.charAt(date.getDay()) //星期
+  }
+
+  if (/(y+)/.test(fmt)) {
+    fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
+  }
+
+  for (var k in o) {
+    if (new RegExp('(' + k + ')').test(fmt)) {
+      fmt = fmt.replace(
+        RegExp.$1,
+        RegExp.$1.length == 1 || String(o[k]).length > 1 ? o[k] : '0' + o[k]
+      )
+    }
+  }
+
+  return fmt
 }
 
 /**
@@ -50,15 +63,7 @@ export function formatTime(time, option) {
     return parseTime(time, option)
   } else {
     return (
-      d.getMonth() +
-      1 +
-      '月' +
-      d.getDate() +
-      '日' +
-      d.getHours() +
-      '时' +
-      d.getMinutes() +
-      '分'
+      d.getMonth() + 1 + '月' + d.getDate() + '日' + d.getHours() + '时' + d.getMinutes() + '分'
     )
   }
 }
@@ -196,8 +201,7 @@ export function toggleClass(element, className) {
     classString += '' + className
   } else {
     classString =
-      classString.substr(0, nameIndex) +
-      classString.substr(nameIndex + className.length)
+      classString.substr(0, nameIndex) + classString.substr(nameIndex + className.length)
   }
   element.className = classString
 }
@@ -354,7 +358,7 @@ export const beautifierConf = {
     indent_inner_html: true,
     comma_first: false,
     e4x: true,
-    indent_empty_lines: true,
+    indent_empty_lines: true
   },
   js: {
     indent_size: '2',
@@ -373,8 +377,8 @@ export const beautifierConf = {
     indent_inner_html: true,
     comma_first: false,
     e4x: true,
-    indent_empty_lines: true,
-  },
+    indent_empty_lines: true
+  }
 }
 
 // 首字母大小
@@ -404,7 +408,7 @@ export const pickerOptions = {
         const start = new Date()
         start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
         picker.$emit('pick', [start, end])
-      },
+      }
     },
     {
       text: '最近一个月',
@@ -413,7 +417,7 @@ export const pickerOptions = {
         const start = new Date()
         start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
         picker.$emit('pick', [start, end])
-      },
+      }
     },
     {
       text: '最近三个月',
@@ -422,7 +426,7 @@ export const pickerOptions = {
         const start = new Date()
         start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
         picker.$emit('pick', [start, end])
-      },
-    },
-  ],
+      }
+    }
+  ]
 }

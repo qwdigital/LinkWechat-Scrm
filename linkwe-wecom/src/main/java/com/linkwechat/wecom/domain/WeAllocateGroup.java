@@ -25,8 +25,6 @@ public class WeAllocateGroup
 {
     private static final long serialVersionUID = 1L;
 
-    /** $column.columnComment */
-    private Long id= SnowFlakeUtil.nextId();
 
     /** 分配的群id */
     private String chatId;
@@ -40,6 +38,12 @@ public class WeAllocateGroup
     /** 分配时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date allocateTime;
+
+    //0:被接替成功 1:待接替 2:接替失败 3:正常状态
+    private Integer status;
+
+
+    private String errMsg;
 
 
 }

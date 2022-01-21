@@ -30,6 +30,27 @@ export default {
     )
   },
   methods: {
+    setChange(e) {
+      if (e) {
+        this.query.startTime = e[0]
+        this.query.overTime = e[1]
+      } else {
+        this.query.startTime = ''
+        this.query.overTime = ''
+      }
+    },
+    resetFn() {
+      this.query = {
+        pageNum: 1,
+        pageSize: 10,
+        taskName: '',
+        startTime: '',
+        overTime: '',
+        fissionType: 1
+      }
+      this.dateRange = []
+      this.getList()
+    },
     getList(data) {
       this.loading = true
       let params = Object.assign({}, this.query, data)
@@ -61,19 +82,14 @@ export default {
 
 <template>
   <div class="app-container">
-    <el-form
-      ref="queryForm"
-      :inline="true"
-      :model="query"
-      class="top-search"
-      size="small"
-    >
+    <el-form ref="queryForm" :inline="true" :model="query" class="top-search" size="small">
       <el-form-item label="裂变名" prop="taskName">
         <el-input v-model="query.taskName" placeholder="请输入"></el-input>
       </el-form-item>
       <el-form-item label="添加日期">
         <el-date-picker
           v-model="dateRange"
+          @change="setChange"
           type="daterange"
           range-separator="至"
           start-placeholder="开始日期"
@@ -89,6 +105,7 @@ export default {
           :loading="loading"
           >查询</el-button
         >
+        <el-button @click="resetFn" type="success">清空</el-button>
         <el-button
           v-hasPermi="['customerManage:customer:query']"
           type="primary"

@@ -20,11 +20,6 @@ public class WeAppDto extends WeResultDto{
         private String name;
         //企业应用方形头像url
         private String  square_logo_url;
-
-
-
-
-
     }
 
 

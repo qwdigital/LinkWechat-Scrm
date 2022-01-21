@@ -15,11 +15,7 @@
               </li>
             </ul>
           </div>
-          <div
-            style="margin-left:8px;line-height:60px"
-            class="toe"
-            :title="item.name"
-          >
+          <div style="margin-left: 8px; line-height: 60px" class="toe" :title="item.name">
             {{ item.name }}
             <!-- <p>
               <span class="fr gray">{{ item.msgTime }}</span>
@@ -95,7 +91,7 @@ export default {
     display: none;
   }
 
-  /deep/ .el-loading-spinner {
+  ::v-deep .el-loading-spinner {
     margin-top: 20px;
   }
 

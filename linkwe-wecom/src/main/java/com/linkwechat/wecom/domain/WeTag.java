@@ -44,6 +44,12 @@ public class WeTag implements Serializable
      private Integer delFlag;
 
 
+     private Integer tagType;
+
+     /**所属人*/
+     private String owner;
+
+
 
 
 

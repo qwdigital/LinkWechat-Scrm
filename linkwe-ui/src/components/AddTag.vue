@@ -105,6 +105,7 @@ export default {
     :visible.sync="Pvisible"
     width="500px"
     append-to-body
+    :close-on-click-modal="false"
   >
     <el-form ref="form" :model="form" :rules="rules" label-width="100px">
       <el-form-item label="标签组名称" prop="gourpName">
@@ -140,21 +141,13 @@ export default {
           @keyup.enter.native="newInputConfirm"
           @blur="newInputConfirm"
         ></el-input>
-        <el-button
-          v-else
-          type="primary"
-          plain
-          class="button-new-tag"
-          size="mini"
-          @click="showInput"
+        <el-button v-else type="primary" plain class="button-new-tag" size="mini" @click="showInput"
           >+ 添加标签</el-button
         >
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button type="primary" @click="submit" v-preventReClick="1000"
-        >确 定</el-button
-      >
+      <el-button type="primary" @click="submit" v-preventReClick="1000">确 定</el-button>
       <el-button @click="Pvisible = false">取 消</el-button>
     </div>
   </el-dialog>

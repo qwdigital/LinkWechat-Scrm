@@ -23,7 +23,7 @@
         />
       </el-form-item>
 
-      <el-form-item label="选择群活码">
+      <el-form-item label="选择群活码" prop="groupCodeId">
         <el-image
           v-if="groupQrCode && groupQrCode.codeUrl"
           :src="groupQrCode.codeUrl"
@@ -42,7 +42,7 @@
         >
       </el-form-item>
 
-      <el-form-item label="发送方式" prop="sendType">
+      <!-- <el-form-item label="发送方式" prop="sendType">
         <el-radio-group v-model="form.sendType">
           <el-radio
             v-for="(sendType, index) in sendTypeOptions"
@@ -55,7 +55,7 @@
             注：客户每天只能接收来自一名成员的一条群发消息，每月最多接收来自同一企业的四条群发消息。
           </div>
         </el-radio-group>
-      </el-form-item>
+      </el-form-item> -->
 
       <el-form-item label="发送范围" prop="sendScope">
         <el-radio-group v-model="form.sendScope">
@@ -179,7 +179,7 @@ export default {
       form: {
         taskName: '', // 任务名称
         welcomeMsg: '', // 加群引导语
-        sendType: 0, // 发送方式
+        sendType: 1, // 发送方式
         groupCodeId: '', // 群活码ID
         tagList: [], // 标签
         scopeList: [], // 员工
@@ -193,10 +193,10 @@ export default {
       codes: [],
       groupQrCode: {}, // 选择的群活码链接
       dateRange: [],
-      sendTypeOptions: [
-        { label: '企业群发', value: 0 },
-        { label: '个人群发', value: 1 }
-      ],
+      // sendTypeOptions: [
+      //   { label: '企业群发', value: 0 },
+      //   { label: '个人群发', value: 1 }
+      // ],
       sendGenderOptions: [
         { label: '全部', value: 0 },
         { label: '男', value: 1 },
@@ -211,7 +211,7 @@ export default {
         taskName: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
         welcomeMsg: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
         groupCodeId: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
-        sendType: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
+        // sendType: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
         sendScope: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
         tagListValidate: [{ required: true, message: '该项为必填项', trigger: 'change' }],
         scopeListValidate: [{ required: true, message: '该项为必填项', trigger: 'change' }]
@@ -229,13 +229,13 @@ export default {
       }
     },
     users(users) {
-      this.form.scopeList = users.map(user => {
+      this.form.scopeList = users.map((user) => {
         return user.userId
       })
       this.$refs.form.validateField('scopeList')
     },
     tags(tags) {
-      this.form.tagList = tags.map(tag => {
+      this.form.tagList = tags.map((tag) => {
         return tag.tagId
       })
       this.$refs.form.validateField('tagList')
@@ -252,7 +252,7 @@ export default {
       getDetail(id).then(({ data }) => {
         this.form.taskName = data.taskName || ''
         this.form.welcomeMsg = data.welcomeMsg || ''
-        this.form.sendType = data.sendType || 0
+        this.form.sendType = data.sendType || 1
         this.form.sendScope = data.sendScope || 0
         this.form.sendGender = data.sendGender || 0
 
@@ -288,7 +288,7 @@ export default {
       this.$refs.form.validateField('groupCodeId')
     },
     submit() {
-      this.$refs.form.validate(valid => {
+      this.$refs.form.validate((valid) => {
         if (valid) {
           this.loading = true
           if (this.taskId) {

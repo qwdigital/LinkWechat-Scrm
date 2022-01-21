@@ -1,6 +1,7 @@
 package com.linkwechat.quartz.task;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.utils.bean.BeanUtils;
@@ -46,8 +47,8 @@ public class GroupChatStatisticTask {
             List<WeGroupStatistic> weGroupStatisticList = new ArrayList<>();
             GroupChatStatisticQuery query = new GroupChatStatisticQuery();
             //前一天的数据
-            Long startTime = strToDate(-1, 0);
-            Long endTime = strToDate(-1, 1);
+            Long startTime = DateUtil.beginOfDay(DateUtil.offsetDay(new Date(),-1)).getTime()/1000;
+            Long endTime = DateUtil.endOfDay(DateUtil.offsetDay(new Date(),-1)).getTime()/1000;
             query.setDay_begin_time(startTime);
             query.setDay_end_time(endTime);
             weGroupList.forEach(weGroup -> {

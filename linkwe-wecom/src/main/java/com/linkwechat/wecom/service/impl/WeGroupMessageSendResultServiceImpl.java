@@ -80,12 +80,15 @@ public class WeGroupMessageSendResultServiceImpl extends ServiceImpl<WeGroupMess
         if (CollectionUtil.isNotEmpty(sendResultList)) {
             sendResultList.forEach(item -> {
                 LambdaQueryWrapper<WeGroupMessageSendResult> wrapper = new LambdaQueryWrapper<>();
-                wrapper.eq(WeGroupMessageSendResult::getMsgId, item.getMsgId())
-                        .eq(WeGroupMessageSendResult::getExternalUserid, item.getExternalUserid())
-                        .eq(WeGroupMessageSendResult::getUserId, item.getUserId())
-                        .eq(WeGroupMessageSendResult::getChatId, item.getChatId());
+                wrapper.eq(WeGroupMessageSendResult::getUserId, item.getUserId());
                 if(item.getMsgTemplateId() != null){
                     wrapper.eq(WeGroupMessageSendResult::getMsgTemplateId,item.getMsgTemplateId());
+                }
+                if(item.getExternalUserid() != null){
+                    wrapper.eq(WeGroupMessageSendResult::getExternalUserid,item.getExternalUserid());
+                }
+                if(item.getChatId() != null){
+                    wrapper.eq(WeGroupMessageSendResult::getChatId,item.getChatId());
                 }
                 if (!this.update(item, wrapper)) {
                     this.save(item);

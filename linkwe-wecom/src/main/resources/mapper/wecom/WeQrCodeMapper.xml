@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeQrCodeMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.wecom.domain.WeQrCode" id="WeQrCodeResult">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="groupId" column="group_id" jdbcType="INTEGER"/>
+        <result property="autoAdd" column="auto_add" jdbcType="INTEGER"/>
+        <result property="type" column="type" jdbcType="INTEGER"/>
+        <result property="ruleType" column="rule_type" jdbcType="INTEGER"/>
+        <result property="state" column="state" jdbcType="VARCHAR"/>
+        <result property="configId" column="config_id" jdbcType="VARCHAR"/>
+        <result property="qrCode" column="qr_code" jdbcType="VARCHAR"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap type="com.linkwechat.wecom.domain.vo.qr.WeQrCodeDetailVo" id="WeQrCodeDetailResult">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="groupId" column="group_id" jdbcType="INTEGER"/>
+        <result property="qrGroupName" column="group_name" jdbcType="INTEGER"/>
+        <result property="autoAdd" column="auto_add" jdbcType="INTEGER"/>
+        <result property="type" column="type" jdbcType="INTEGER"/>
+        <result property="ruleType" column="rule_type" jdbcType="INTEGER"/>
+        <result property="state" column="state" jdbcType="VARCHAR"/>
+        <result property="configId" column="config_id" jdbcType="VARCHAR"/>
+        <result property="qrCode" column="qr_code" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <collection property="qrTags" ofType="com.linkwechat.wecom.domain.vo.tag.WeTagVo">
+            <result property="tagId" column="tag_id" jdbcType="INTEGER"/>
+            <result property="tagName" column="tag_name" jdbcType="VARCHAR"/>
+        </collection>
+        <collection property="qrAttachments" ofType="com.linkwechat.wecom.domain.WeQrAttachments">
+            <result property="msgType" column="msg_type" jdbcType="VARCHAR"/>
+            <result property="content" column="content" jdbcType="VARCHAR"/>
+            <result property="title" column="title" jdbcType="VARCHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="picUrl" column="pic_url" jdbcType="VARCHAR"/>
+            <result property="linkUrl" column="link_url" jdbcType="VARCHAR"/>
+            <result property="mediaId" column="media_id" jdbcType="VARCHAR"/>
+            <result property="fileUrl" column="file_url" jdbcType="VARCHAR"/>
+            <result property="appId" column="app_id" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+
+    <sql id="selectWeQrCodeVo">
+        select id, name, group_id, auto_add, type, rule_type, state, scan_num, config_id, qr_code, create_by, create_time, update_by, update_time, del_flag from we_qr_code
+    </sql>
+
+    <sql id="selectWeQrCodeDetailVo">
+        select
+            wqc.id,
+            wqc.name,
+            wqc.group_id,
+            (select wc.name from we_category wc where wc.id = wqc.group_id limit 1) as group_name,
+            wqc.auto_add,
+            wqc.type,
+            wqc.rule_type,
+            wqc.state,
+            wqc.scan_num,
+            wqc.config_id,
+            wqc.qr_code,
+            wqc.update_time,
+            wqtr.tag_id,
+            (select name from we_tag wt where wt.tag_id = wqtr.tag_id limit 1) as tag_name,
+            wqa.msg_type,
+            wqa.content,
+            wqa.title,
+            wqa.description,
+            wqa.pic_url,
+            wqa.link_url,
+            wqa.media_id,
+            wqa.file_url,
+            wqa.app_id
+        from
+            we_qr_code wqc
+        left join we_qr_tag_rel wqtr on wqtr.qr_id = wqc.id and wqtr.del_flag = 0
+        left join we_qr_scope wqs on wqs.qr_id = wqc.id and wqs.del_flag = 0
+        left join we_qr_attachments wqa on wqa.qr_id = wqc.id and wqs.del_flag = 0
+        where 1=1
+    </sql>
+
+    <select id="getQrDetailByQrId" resultMap="WeQrCodeDetailResult">
+        <include refid="selectWeQrCodeDetailVo"/>
+        <if test="qrId != null">
+            and wqc.id = #{qrId}
+        </if>
+    </select>
+
+    <select id="getQrDetailByQrIds" resultMap="WeQrCodeDetailResult">
+        <include refid="selectWeQrCodeDetailVo"/>
+        <if test="qrIds != null and qrIds.size > 0">
+            and wqc.id in
+            <foreach item="qrId" collection="qrIds" index="index" open="(" separator="," close=")">
+                #{qrId}
+            </foreach>
+        </if>
+        and wqc.del_flag = 0
+    </select>
+
+    <select id="getQrCodeList" resultType="java.lang.Long">
+        select
+            distinct wqc.id
+        from we_qr_code wqc
+            left join we_qr_tag_rel wqtr on wqtr.qr_id = wqc.id and wqtr.del_flag = 0
+            left join we_qr_scope wqs on wqs.qr_id = wqc.id and wqs.del_flag = 0
+            left join we_qr_attachments wqa on wqa.qr_id = wqc.id and wqs.del_flag = 0
+            where 1=1
+        <if test="groupId != null and groupId != ''">
+            and wqc.group_id = #{groupId}
+        </if>
+        <if test="qrName != null and qrName != ''">
+            and wqc.name like concat('%', #{qrName}, '%')
+        </if>
+        <if test="qrUserName != null and qrUserName != ''">
+            and exists (select 1 from we_user wu where wu.user_id = wqs.user_id and wu.user_name like concat('%', #{qrUserName}, '%'))
+        </if>
+        <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(wqc.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+        </if>
+        <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(wqc.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+        </if>
+        and wqc.del_flag = 0
+    </select>
+
+</mapper>

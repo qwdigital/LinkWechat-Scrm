@@ -1,13 +1,16 @@
 package com.linkwechat.wecom.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.enums.TaskFissionType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
@@ -23,6 +26,7 @@ import com.linkwechat.wecom.domain.dto.WeExternalContactDto;
 import com.linkwechat.wecom.domain.dto.WeTaskFissionPosterDTO;
 import com.linkwechat.wecom.domain.dto.message.CustomerMessagePushDto;
 import com.linkwechat.wecom.domain.dto.message.LinkMessageDto;
+import com.linkwechat.wecom.domain.query.WeAddGroupMessageQuery;
 import com.linkwechat.wecom.domain.vo.WeTaskFissionDailyDataVO;
 import com.linkwechat.wecom.domain.vo.WeTaskFissionProgressVO;
 import com.linkwechat.wecom.domain.vo.WeTaskFissionStatisticVO;
@@ -75,6 +79,9 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
     @Autowired
     private IWeTaskFissionCompleteRecordService weTaskFissionCompleteRecordService;
 
+    @Autowired
+    private IWeGroupMessageTemplateService weGroupMessageTemplateService;
+
     @Value("${H5.fissionUrl}")
     private String pageUrl;
     @Value("${H5.fissionGroupUrl}")
@@ -101,13 +108,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
      * @return 任务宝
      */
     @Override
-    public List<WeTaskFission> selectWeTaskFissionList(WeTaskFission weTaskFission) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        SimpleDateFormat sdf_day = new SimpleDateFormat("yyyy-MM-dd");
-        if (weTaskFission.getStartTime() != null && weTaskFission.getOverTime() != null) {
-            weTaskFission.setStartTime(sdf.parse(sdf_day.format(weTaskFission.getStartTime()) + " 00:00:00"));
-            weTaskFission.setOverTime(sdf.parse(sdf_day.format(weTaskFission.getOverTime()) + " 23:59:59"));
-        }
+    public List<WeTaskFission> selectWeTaskFissionList(WeTaskFission weTaskFission){
         return weTaskFissionMapper.selectWeTaskFissionList(weTaskFission);
     }
 
@@ -118,10 +119,9 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
      * @return 结果
      */
     @Override
-    @Transactional
-    public Long insertWeTaskFission(WeTaskFission weTaskFission) {
-        weTaskFission.setCreateBy(SecurityUtils.getUsername());
-        weTaskFission.setCreateTime(DateUtils.getNowDate());
+    @Transactional(rollbackFor = {Exception.class,WeComException.class})
+    public void insertWeTaskFission(WeTaskFission weTaskFission) {
+        weTaskFission.setFissStatus(0);
         groupQrcodeHandler(weTaskFission);
         int insertResult = weTaskFissionMapper.insertWeTaskFission(weTaskFission);
         if (insertResult > 0) {
@@ -133,8 +133,12 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                     weTaskFissionStaffService.insertWeTaskFissionStaffList(weTaskFission.getTaskFissionStaffs());
                 }
             }
+            try {
+                sendWeTaskFission(weTaskFission);
+            } catch (Exception e) {
+                throw new WeComException(e.getMessage());
+            }
         }
-        return weTaskFission.getId();
     }
 
     /**
@@ -190,64 +194,63 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
 
 
     @Override
-    public void sendWeTaskFission(Long id) {
-        WeTaskFission weTaskFission = selectWeTaskFissionById(id);
+    public void sendWeTaskFission(WeTaskFission weTaskFission) throws Exception {
         //海报路径
         String postersPath = weTaskFission.getPostersUrl();
         //目标员工id
         String fissStaffId = weTaskFission.getFissionTargetId();
         //H5生成海报页面路径
-        StringBuilder pageUrlBuilder = new StringBuilder(pageUrl);
-        pageUrlBuilder.append("?")
-                .append("fissionId=").append(id)
-                .append("&")
-                .append("fissionTargetId=").append(fissStaffId)
-                .append("&")
-                .append("posterId=").append(weTaskFission.getPostersId());
-        LinkMessageDto linkMessageDto = new LinkMessageDto();
-        linkMessageDto.setPicurl(postersPath);
-        linkMessageDto.setDesc(weTaskFission.getFissInfo());
-        linkMessageDto.setTitle(weTaskFission.getTaskName());
-        linkMessageDto.setUrl(pageUrlBuilder.toString());
+        String pageUrlStr = StringUtils.format(pageUrl,weTaskFission.getId(),fissStaffId,weTaskFission.getPostersId());
 
-        CustomerMessagePushDto customerMessagePushDto = new CustomerMessagePushDto();
+        WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
+        messageQuery.setBusinessId(weTaskFission.getId());
+        messageQuery.setChatType(1);
+        messageQuery.setSource(1);
+        messageQuery.setIsAll(false);
+        messageQuery.setContent(weTaskFission.getTaskName());
+        WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
+        weMessageTemplate.setMsgType(MessageType.LINK.getMessageType());
+        weMessageTemplate.setMediaId(postersPath);
+        weMessageTemplate.setDescription(weTaskFission.getFissInfo());
+        weMessageTemplate.setLinkUrl(pageUrlStr);
+        weMessageTemplate.setTitle(weTaskFission.getTaskName());
+        weMessageTemplate.setPicUrl(postersPath);
+        messageQuery.setAttachmentsList(ListUtil.toList(weMessageTemplate));
+
         if (weTaskFission.getStartTime() != null && weTaskFission.getStartTime().getTime() <= System.currentTimeMillis()) {
-            customerMessagePushDto.setSendNow(true);
-            customerMessagePushDto.setSettingTime(null);
+            messageQuery.setIsTask(0);
         }else {
-            customerMessagePushDto.setSendNow(false);
-            customerMessagePushDto.setSettingTime(DateUtil.formatDateTime(weTaskFission.getStartTime()));
+            messageQuery.setIsTask(1);
+            messageQuery.setSendTime(weTaskFission.getStartTime());
         }
-        customerMessagePushDto.setLinkMessage(linkMessageDto);
-        customerMessagePushDto.setPushType("0");
-        customerMessagePushDto.setPushRange("1");
-        customerMessagePushDto.setMessageType("2");
-        customerMessagePushDto.setTag(weTaskFission.getCustomerTagId());
-        //查询发起成员
-        List<WeTaskFissionStaff> weTaskFissionStaffList = weTaskFissionStaffService.selectWeTaskFissionStaffByTaskId(id);
-        if (CollectionUtil.isNotEmpty(weTaskFissionStaffList)) {
-            //获取部门id
-            String departmentIds = weTaskFissionStaffList.stream().filter(weTaskFissionStaff ->
-                    WeConstans.USE_SCOP_BUSINESSID_TYPE_ORG.equals(weTaskFissionStaff.getStaffType()))
-                    .map(WeTaskFissionStaff::getStaffId).collect(Collectors.joining(","));
-            //获取成员id
-            String userIds = weTaskFissionStaffList.stream().filter(weTaskFissionStaff ->
-                    WeConstans.USE_SCOP_BUSINESSID_TYPE_USER.equals(weTaskFissionStaff.getStaffType()))
-                    .map(WeTaskFissionStaff::getStaffId).collect(Collectors.joining(","));
-            customerMessagePushDto.setStaffId(userIds);
-            customerMessagePushDto.setDepartment(departmentIds);
+        List<WeTaskFissionStaff> weTaskFissionStaffList = weTaskFission.getTaskFissionStaffs();
+        //获取部门id
+        String departmentIds = Optional.ofNullable(weTaskFissionStaffList).orElseGet(ArrayList::new).stream().filter(weTaskFissionStaff ->
+                WeConstans.USE_SCOP_BUSINESSID_TYPE_ORG.equals(weTaskFissionStaff.getStaffType()))
+                .map(WeTaskFissionStaff::getStaffId).collect(Collectors.joining(","));
+        //获取成员id
+        String userIds = Optional.ofNullable(weTaskFissionStaffList).orElseGet(ArrayList::new).stream().filter(weTaskFissionStaff ->
+                WeConstans.USE_SCOP_BUSINESSID_TYPE_USER.equals(weTaskFissionStaff.getStaffType()))
+                .map(WeTaskFissionStaff::getStaffId).collect(Collectors.joining(","));
+        List<WeCustomerList> weCustomerList = weCustomerService.findWeCustomerList(WeCustomerList.builder()
+                .userIds(userIds)
+                .tagIds(weTaskFission.getCustomerTagId().replaceAll("all",""))
+                .departmentIds(departmentIds)
+                .build(),null);
+        if(weCustomerList != null){
+            Map<String, Set<String>> userAndCustomerMap = weCustomerList.stream().collect(Collectors.groupingBy(WeCustomerList::getFirstUserId, Collectors.mapping(WeCustomerList::getExternalUserid, Collectors.toSet())));
+            List<WeAddGroupMessageQuery.SenderInfo> senderList = new ArrayList<>();
+            userAndCustomerMap.forEach((userId,customerIds) ->{
+                WeAddGroupMessageQuery.SenderInfo senderInfo = new WeAddGroupMessageQuery.SenderInfo();
+                senderInfo.setUserId(userId);
+                if (!ObjectUtil.equal("all",weTaskFission.getCustomerTagId())) {
+                    senderInfo.setCustomerList(new ArrayList<>(customerIds));
+                }
+                senderList.add(senderInfo);
+            });
+            messageQuery.setSenderList(senderList);
         }
-        try {
-            SecurityContext context = SecurityContextHolder.getContext();
-            SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
-            SecurityContextHolder.setContext(context);
-            weCustomerMessagePushService.addWeCustomerMessagePush(customerMessagePushDto);
-        } catch (JsonProcessingException | ParseException | CloneNotSupportedException e) {
-            e.printStackTrace();
-            log.error("发送任务失败》》》》》》》》》》》params:{},ex:{}", JSONObject.toJSONString(customerMessagePushDto), e);
-        }
-
-
+        weGroupMessageTemplateService.addGroupMsgTemplate(messageQuery);
     }
 
     @Override
@@ -257,7 +260,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                 .eq(WeCustomer::getUnionid, weTaskFissionPosterDTO.getUnionId()).last("limit 1"));
         if (weCustomer != null) {
             //任务表添加当前客户任务
-            WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), weCustomer.getUnionid(), weCustomer.getName());
+            WeTaskFissionRecord record = getTaskFissionRecordId(weTaskFissionPosterDTO.getTaskFissionId(), weCustomer.getUnionid(), weCustomer.getCustomerName());
             String posterUrl = record.getPoster();
             if (StringUtils.isBlank(posterUrl)) {
                 String qrcode = getPosterQRCode(weTaskFissionPosterDTO.getFissionTargetId(), record, weCustomer);
@@ -319,11 +322,16 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                     .selectWeTaskFissionRecordByIdAndCustomerId(Long.valueOf(fissionId), unionId);
             Optional.ofNullable(weTaskFissionRecord).orElseThrow(() -> new WeComException("任务记录信息不存在"));
 
+
             List<WeCustomer> weCustomers = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
                     .eq(WeCustomer::getState, WeConstans.FISSION_PREFIX + weTaskFissionRecord.getId()));
 
-            if (CollectionUtil.isNotEmpty(weCustomers)) {
-                customerList.addAll(weCustomers);
+
+            List<String> eidList = Optional.ofNullable(weCustomers).orElseGet(ArrayList::new).stream()
+                    .map(WeCustomer::getExternalUserid).collect(Collectors.toList());
+
+            if (CollectionUtil.isNotEmpty(eidList)) {
+                customerList.addAll(weCustomerService.listByIds(eidList));
             }
         }
         return customerList;
@@ -379,8 +387,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                     WeCustomer weCustomer = new WeCustomer();
                     weCustomer.setAvatar(completeRecord.getCustomerAvatar());
                     weCustomer.setUnionid(completeRecord.getCustomerId());
-                    weCustomer.setName(completeRecord.getCustomerName());
-                    weCustomer.setFirstAddTime(completeRecord.getCreateTime());
+                    weCustomer.setCustomerName(completeRecord.getCustomerName());
                     list.add(weCustomer);
                 });
             }
@@ -446,13 +453,8 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
     private String getGroupFissionQrcode(Long taskFissionId, WeTaskFissionRecord record, WeCustomer weCustomer) {
         if (weCustomer != null) {
             String avatarUrl = weCustomer.getAvatar();
-            StringBuilder contentBuilder = new StringBuilder(pageGroupUrl);
-            contentBuilder.append("?")
-                    .append("fissionId=")
-                    .append(taskFissionId)
-                    .append("&recordId=")
-                    .append(record.getId());
-            BufferedImage bufferedImage = QREncode.crateQRCode(contentBuilder.toString(), avatarUrl);
+            String content = StringUtils.format(pageGroupUrl, taskFissionId, record.getId());
+            BufferedImage bufferedImage = QREncode.crateQRCode(content, avatarUrl);
             if (bufferedImage != null) {
                 try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
                     ImageIO.write(bufferedImage, "png", byteArrayOutputStream);

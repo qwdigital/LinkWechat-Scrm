@@ -14,15 +14,14 @@ export default {
     //   type: String,
     //   default: '',
     // },
-    // 素材类型  0:'文本', 1：'图片'
     type: {
-      type: String,
-      default: '0'
+      type: String | Number,
+      default: '4'
     },
     // 显示哪些素材类型标签
     showArr: {
       type: Array,
-      default: () => [0, 1]
+      default: () => []
     }
   },
   data() {
@@ -34,6 +33,15 @@ export default {
   },
   watch: {},
   computed: {
+    title() {
+      const titleMap = {
+        4: '文本',
+        0: '图片',
+        8: '图文',
+        9: '小程序'
+      }
+      return titleMap[this.type] || '素材'
+    },
     Pvisible: {
       get() {
         return this.visible
@@ -56,13 +64,10 @@ export default {
   methods: {
     submit() {
       this.Pvisible = false
-      this.$emit('success', this.text, this.image, this.file)
+      this.$emit('success', this.selectedData)
     },
-    changeText(data) {
-      this.text = data
-    },
-    changeImage(data) {
-      this.image = data
+    onChange(data) {
+      this.selectedData = data
     }
   }
 }
@@ -70,33 +75,22 @@ export default {
 
 <template>
   <el-dialog
-    title="选择素材"
+    :title="`选择${title}`"
     :visible.sync="Pvisible"
     width="680px"
     append-to-body
+    destroy-on-close
   >
     <div>
-      <el-tabs v-model="Ptype">
-        <el-tab-pane name="0" v-if="showArr.includes(0)">
+      <list v-if="showArr.length <= 1" :type="showArr[0] || type" @change="onChange"> </list>
+      <el-tabs v-else-if="showArr.length > 1" v-model="Ptype">
+        <!-- <el-tab-pane name="0" v-if="showArr.includes(0)">
           <span slot="label"> <i class="el-icon-date"></i> 文本 </span>
-          <list type="4" @change="changeText"> </list>
+          <list type="4" @change="onChange"> </list>
         </el-tab-pane>
         <el-tab-pane name="1" v-if="showArr.includes(1)">
           <span slot="label"> <i class="el-icon-date"></i> 图片 </span>
-          <list type="0" @change="changeImage"> </list>
-        </el-tab-pane>
-        <!-- <el-tab-pane name="2">
-          <span slot="label"> <i class="el-icon-date"></i> 文件 </span>
-          <list>
-            <el-table :data="list" style="width: 100%">
-              <el-table-column width="50">
-                <template slot-scope="scope">
-                  <el-radio v-model="radio" :label="scope.row.id"></el-radio>
-                </template>
-              </el-table-column>
-              <el-table-column prop="content"> </el-table-column>
-            </el-table>
-          </list>
+          <list type="0" @change="onChange"> </list>
         </el-tab-pane> -->
       </el-tabs>
     </div>
@@ -117,7 +111,7 @@ export default {
   margin-right: 30px;
 }
 
-/deep/.el-dialog__body {
+::v-deep.el-dialog__body {
   padding: 5px 20px;
   height: 76vh;
   overflow: auto;

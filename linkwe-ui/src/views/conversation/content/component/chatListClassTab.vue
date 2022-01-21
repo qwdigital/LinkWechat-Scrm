@@ -145,9 +145,9 @@ export default {
       this.loading = true
       let query = {
         msgType: this.type == 'all' ? '' : this.type,
-        pageSize: '10'
-        // orderByColumn: 'msg_time',
-        // isAsc: 'asc'
+        pageSize: '10',
+        orderByColumn: 't.msg_time',
+        isAsc: 'desc'
       }
       if (this.dateRange) {
         query.beginTime = this.dateRange[0]
@@ -160,12 +160,12 @@ export default {
       Object.assign(query, this.queryChat)
       api
         .getChatList(query)
-        .then(res => {
+        .then((res) => {
           this.total = ~~res.total
           this.list = res.rows
           this.loading = false
         })
-        .catch(err => {
+        .catch((err) => {
           this.loading = false
         })
     },
@@ -187,7 +187,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       })
-        .then(response => {
+        .then((response) => {
           this.download(JSON.parse(row.contact).attachment)
         })
         .catch(function() {})

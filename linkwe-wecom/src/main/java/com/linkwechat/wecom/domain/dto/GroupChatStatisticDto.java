@@ -12,7 +12,7 @@ import java.util.List;
  * @author danmo
  */
 @Data
-public class GroupChatStatisticDto {
+public class GroupChatStatisticDto extends WeResultDto{
 
 
     private List<GroupchatStatisticData> items;

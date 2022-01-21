@@ -9,8 +9,11 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.Threads;
+import com.linkwechat.wecom.constants.SynchRecordConstants;
 import com.linkwechat.wecom.domain.WeTag;
+import com.linkwechat.wecom.service.IWeSynchRecordService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContext;
@@ -41,19 +44,39 @@ public class WeTagGroupController extends BaseController
     @Autowired
     private IWeTagGroupService weTagGroupService;
 
+    @Autowired
+    private IWeSynchRecordService iWeSynchRecordService;
+
     /**
-     * 查询标签组列表
+     * 查询标签组列表(分页)
      */
     //  @PreAuthorize("@ss.hasPermi('customerManage:tag:list')")
     @GetMapping("/list")
     public TableDataInfo list(WeTagGroup weTagGroup)
     {
         startPage();
-        return getDataTable(
+
+        TableDataInfo dataTable = getDataTable(weTagGroupService.selectWeTagGroupList(weTagGroup));
+        dataTable.setLastSyncTime(
+                iWeSynchRecordService.findUpdateLatestTime(SynchRecordConstants.SYNCH_CUSTOMER)
+        );//最近同步时间
+
+        return dataTable;
+    }
+
+
+    /**
+     *  查询标签组列表(不分页)
+     * @param weTagGroup
+     * @return
+     */
+    @GetMapping("/allList")
+    public AjaxResult allList(WeTagGroup weTagGroup)
+    {
+        return AjaxResult.success(
                 weTagGroupService.selectWeTagGroupList(weTagGroup)
         );
     }
-
 
 
     /**
@@ -113,16 +136,12 @@ public class WeTagGroupController extends BaseController
     @GetMapping("/synchWeTags")
     public AjaxResult synchWeTags(){
 
-        SecurityContext securityContext = SecurityContextHolder.getContext();
+        try {
+            weTagGroupService.synchWeTags();
+        }catch (CustomException e){
+            return AjaxResult.error(e.getMessage());
+        }
 
-        //异步同步一下标签库,解决标签不同步问题
-        Threads.SINGLE_THREAD_POOL.execute(new Runnable() {
-            @Override
-            public void run() {
-                SecurityContextHolder.setContext(securityContext);
-                weTagGroupService.synchWeTags();
-            }
-        });
 
         return  AjaxResult.success(WeConstans.SYNCH_TIP);
     }

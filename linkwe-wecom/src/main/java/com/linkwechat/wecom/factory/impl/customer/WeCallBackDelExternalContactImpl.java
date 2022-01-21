@@ -1,9 +1,12 @@
 package com.linkwechat.wecom.factory.impl.customer;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.linkwechat.wecom.domain.*;
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
+import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
+import com.linkwechat.wecom.domain.callback.WeBackCustomerVo;
+import com.linkwechat.wecom.domain.WeCustomer;
+import com.linkwechat.wecom.domain.WeSensitiveAct;
+import com.linkwechat.wecom.domain.WeSensitiveActHit;
+import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.factory.WeEventStrategy;
 import com.linkwechat.wecom.service.IWeCustomerService;
 import com.linkwechat.wecom.service.IWeSensitiveActHitService;
@@ -13,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author danmo
@@ -32,49 +34,34 @@ public class WeCallBackDelExternalContactImpl extends WeEventStrategy {
     private IWeUserService weUserService;
 
     @Override
-    public void eventHandle(WxCpXmlMessageVO message) {
-        if (message.getExternalUserId() != null) {
-
-            //删除客户
-            if(weCustomerService.remove(new LambdaQueryWrapper<WeCustomer>()
-                    .eq(WeCustomer::getExternalUserid,message.getExternalUserId())
-                    .eq(WeCustomer::getFirstUserId,message.getUserId()))){
-                //增加敏感行为记录，员工删除客户
-                WeSensitiveAct weSensitiveAct = weSensitiveActHitService.getSensitiveActType("拉黑/删除好友");
-                if (weSensitiveAct != null && weSensitiveAct.getEnableFlag() == 1) {
-                    WeSensitiveActHit weSensitiveActHit = new WeSensitiveActHit();
-                    weSensitiveActHit.setSensitiveActId(weSensitiveAct.getId());
-                    weSensitiveActHit.setSensitiveAct(weSensitiveAct.getActName());
-                    weSensitiveActHit.setCreateTime(new Date(message.getCreateTime()));
-                    weSensitiveActHit.setCreateBy("admin");
-                    weSensitiveActHit.setOperatorId(message.getUserId());
-                    WeUser user = weUserService.getById(message.getUserId());
-                    weSensitiveActHit.setOperator(user.getName());
-
-
-                    List<WeCustomerList> weCustomerList = weCustomerService.findWeCustomerList(WeCustomerList.builder()
-                            .externalUserid(message.getExternalUserId())
-                            .firstUserId(message.getUserId())
-                            .delFlag(new Integer(1))
-                            .build());
-
-
-                    if(CollectionUtil.isNotEmpty(weCustomerList)) {
-
-                        WeCustomerList weCustomer = weCustomerList.stream().findFirst().get();
-                        weSensitiveActHit.setOperateTargetId(weCustomer.getFirstUserId());
-                        weSensitiveActHit.setOperateTarget(weCustomer.getCustomerName());
-                        weSensitiveActHitService.insertWeSensitiveActHit(weSensitiveActHit);
-
-                    }
-
-
-
-
-                }
-
+    public void eventHandle(WeBackBaseVo message) {
+        WeBackCustomerVo customerInfo = (WeBackCustomerVo) message;
+        if (customerInfo.getExternalUserID() != null) {
+            WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getFirstUserId,customerInfo.getUserID())
+                    .eq(WeCustomer::getExternalUserid,customerInfo.getExternalUserID()).eq(WeCustomer::getDelFlag,0).last("limit 1"));
+            if(weCustomer == null){
+                return;
             }
-
+            //删除客户
+            WeCustomer customer = new WeCustomer();
+            customer.setDelFlag(1);
+            weCustomerService.update(customer,new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getFirstUserId,customerInfo.getUserID())
+                    .eq(WeCustomer::getExternalUserid,customerInfo.getExternalUserID()).eq(WeCustomer::getDelFlag,0));
+            //增加敏感行为记录，员工删除客户
+            WeSensitiveAct weSensitiveAct = weSensitiveActHitService.getSensitiveActType("拉黑/删除好友");
+            if (weSensitiveAct != null && weSensitiveAct.getEnableFlag() == 1) {
+                WeSensitiveActHit weSensitiveActHit = new WeSensitiveActHit();
+                weSensitiveActHit.setSensitiveActId(weSensitiveAct.getId());
+                weSensitiveActHit.setSensitiveAct(weSensitiveAct.getActName());
+                weSensitiveActHit.setCreateTime(new Date(customerInfo.getCreateTime()));
+                weSensitiveActHit.setCreateBy("admin");
+                weSensitiveActHit.setOperatorId(customerInfo.getUserID());
+                WeUser user = weUserService.getById(customerInfo.getUserID());
+                weSensitiveActHit.setOperator(user.getName());
+                weSensitiveActHit.setOperateTargetId(weCustomer.getFirstUserId());
+                weSensitiveActHit.setOperateTarget(weCustomer.getCustomerName());
+                weSensitiveActHitService.insertWeSensitiveActHit(weSensitiveActHit);
+            }
         }
     }
 }

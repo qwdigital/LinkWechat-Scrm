@@ -1,6 +1,7 @@
 <script>
 import { upload } from '@/api/material'
 import Video from 'video.js'
+import BenzAMRRecorder from 'benz-amr-recorder'
 export default {
   name: 'Upload',
   components: {},
@@ -17,6 +18,21 @@ export default {
     type: {
       type: String,
       default: '0'
+    },
+    // 上传文件大小不能超过 maxSize MB
+    maxSize: {
+      type: Number,
+      default: 2
+    },
+    // 图片的宽高像素限制 [width(number), height(number)],默认null不限制
+    maxImgPx: {
+      type: Array,
+      default: null // () => [100, 100]
+    },
+    // 限制允许上传的文件格式 eg:["bmp", "jpg", "png", "jpeg", "gif"]
+    format: {
+      type: Array,
+      default: null
     }
     // beforeUpload: {
     //   type: Function,
@@ -33,7 +49,7 @@ export default {
       //   ? '/wecom/material/uploadimg'
       //   : '/common/uploadFile2Cos'),
       headers: window.CONFIG.headers,
-      domain: process.env.VUE_APP_BASE_API,
+      domain: process.env.VUE_APP_BASE_API
     }
   },
   watch: {},
@@ -45,20 +61,67 @@ export default {
   created() {},
   mounted() {},
   methods: {
-    handleBeforeUpload(file) {
+    async handleBeforeUpload(file) {
       this.loading = true
-      let isFormat = true,
-        isSize = true
+      let isFormat = true
+      let isSize = true
+
+      if (this.format && this.format.length) {
+        // 校验格式
+        let reg = /\.(\w+)$/g
+        let match = file.name.match(reg)
+        let fileFormat = match && match[0].replace('.', '').toLowerCase()
+        if (!(isFormat = this.format.includes(fileFormat))) {
+          this.$message.error('文件格式不正确，请重新选择')
+        }
+      }
+
       if (this.type === '0') {
         // 图片
         isFormat = file.type === 'image/jpeg' || file.type === 'image/png'
-        isSize = file.size / 1024 / 1024 < 2
+        isSize = file.size / 1024 / 1024 < this.maxSize
 
         if (!isFormat) {
           this.$message.error('上传文件只能是 JPG 格式!')
         }
         if (!isSize) {
           this.$message.error('上传文件大小不能超过 2MB!')
+        }
+
+        if (this.maxImgPx) {
+          try {
+            await new Promise((resolve) => {
+              let width, height
+              let image = new Image()
+              //加载图片获取图片真实宽度和高度
+              image.onload = () => {
+                width = image.width
+                height = image.height
+                if (width > this.maxImgPx[0]) {
+                  isSize = false
+                  this.$message.error('图片“宽”度超限，请重新选择')
+                } else if (height > this.maxImgPx[1]) {
+                  this.$message.error('图片“高”度超限，请重新选择')
+                  isSize = false
+                }
+                window.URL && window.URL.revokeObjectURL(image.src)
+                resolve()
+              }
+              if (window.URL) {
+                let url = window.URL.createObjectURL(file)
+                image.src = url
+              } else if (window.FileReader) {
+                let reader = new FileReader()
+                reader.onload = function (e) {
+                  let data = e.target.result
+                  image.src = data
+                }
+                reader.readAsDataURL(file)
+              }
+            })
+          } catch (e) {
+            console.error(e)
+          }
         }
       } else if (this.type === '1') {
         // 语音
@@ -70,6 +133,17 @@ export default {
         }
         if (!isSize) {
           this.$message.error('上传文件大小不能超过 2MB!')
+        }
+        let amr = new BenzAMRRecorder()
+        try {
+          await amr.initWithBlob(file)
+          isSize = amr.getDuration() <= 60
+          if (!isSize) {
+            this.$message.error('上传文件时长不能超过 60秒!')
+          }
+        } catch (error) {
+          console.log(error)
+          this.$message.error('文件损坏')
         }
       } else if (this.type === '2') {
         // 视频
@@ -97,7 +171,7 @@ export default {
       // if (beforeUpload) {
       //   return beforeUpload(file)
       // }
-      return isFormat && isSize
+      return (isFormat && isSize) || Promise.reject()
     },
     onSuccess(res, file) {
       if (res.code === 200) {
@@ -147,8 +221,7 @@ export default {
           <div v-else-if="type === '2'">
             <video
               id="myVideo"
-              class="video-js vjs-default-skin
-            vjs-big-play-centered"
+              class="video-js vjs-default-skin vjs-big-play-centered"
               width="100%"
               controls
               webkit-playsinline="true"
@@ -171,7 +244,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-/deep/.uploader {
+::v-deep.uploader {
   display: inline-block;
   .el-upload {
     border-radius: 6px;

@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.wecom.domain.WePresTagGroupTask;
 import com.linkwechat.wecom.domain.WePresTagGroupTaskStat;
 import com.linkwechat.wecom.domain.vo.WeCommunityTaskEmplVo;
@@ -58,6 +59,10 @@ public interface IWePresTagGroupTaskService extends IService<WePresTagGroupTask>
      */
     int updateTask(WePresTagGroupTask task);
 
+
+
+    void updateTaskAndSendMsg(WePresTagGroupTask task) throws WeComException;
+
     /**
      * 根据查询条件获取任务的统计结果
      *
@@ -101,7 +106,7 @@ public interface IWePresTagGroupTaskService extends IService<WePresTagGroupTask>
      *
      * @param task 标签建群任务id
      */
-    void sendMessage(WePresTagGroupTask task);
+    void sendMessage(WePresTagGroupTask task) throws WeComException;
 
     /**
      * 任务名是否已占用

@@ -127,8 +127,8 @@ public class WeUser extends BaseEntity
     private Date birthday;
 
     /** 是否激活（1:是；2:否）该字段主要表示当前信息是否同步微信 */
-    /** 激活状态: 1=已激活，2=已禁用，4=未激活，5=退出企业,6=删除 */
-    @ApiModelProperty("激活状态: 1=已激活，2=已禁用，4=未激活，5=退出企业,6=删除")
+    /** 激活状态: 1=已激活，2=已禁用，4=未激活，5=退出企业*/
+    @ApiModelProperty("激活状态: 1=已激活，2=已禁用，4=未激活，5=退出企业")
     private Integer isActivate=new Integer(4);
 
     /** 离职是否分配(1:已分配;0:未分配;) */
@@ -145,6 +145,10 @@ public class WeUser extends BaseEntity
 
     @ApiModelProperty("是否开启会话存档 0：关闭 1：开启")
     private Integer isOpenChat;
+
+
+    @ApiModelProperty("是否配置客户联系人功能 1:是;0:否")
+    private Integer isConfigCustomerContact;
 
 
     /** 转化成企业微信需要的dto对象 */

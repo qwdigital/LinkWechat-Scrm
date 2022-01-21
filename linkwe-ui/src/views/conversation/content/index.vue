@@ -32,7 +32,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-/deep/.pd15 {
+::v-deep.pd15 {
   padding: 15px;
 }
 </style>

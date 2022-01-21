@@ -23,7 +23,7 @@ const request = (url, params, method = 'get') => {
       },
       error(err) {
         // console.log(err.status)
-        alert(url + err.status)
+        alert(url + '，错误码：' + err.status)
         reject(err)
       }
     })

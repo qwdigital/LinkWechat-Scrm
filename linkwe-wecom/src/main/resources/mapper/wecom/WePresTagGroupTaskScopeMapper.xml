@@ -19,8 +19,8 @@
             st.sent
         FROM
             we_user wu
-        LEFT JOIN we_pres_tag_group_stat st ON st.user_id = wu.user_id
-        AND st.del_flag = 0
+                LEFT JOIN we_pres_tag_group_stat st ON st.user_id = wu.user_id
+                AND st.del_flag = 0
         WHERE
             st.task_id = #{taskId}
     </select>

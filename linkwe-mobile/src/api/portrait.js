@@ -28,14 +28,36 @@ export function getWeCustomerInfo(data) {
     }
   })
 }
-//   获取当前系统所有可用标签
+//
+/**
+ * 获取当前系统所有可用标签
+ * @param {*} params
+ * groupTagType	是	1:企业客户标签;3:个人标签
+userId	员工的id	当groupTagType为3的时候需要传该字段
+ * @returns
+ */
 export function getAllTags(params) {
   return request({
     url: service + '/findAllTags',
     params
   })
 }
-// 更新客户画像标签
+//
+/**
+ * 更新客户画像标签
+ * @param {*} data
+ * {
+    "externalUserid": "wmiGuBCgAApTcSW-3caqljFmKhm0r-bQ",//客户id
+    "userId": "ShengXiYong",//当前员工id
+    "isCompanyTag": false,//是否是企业标签true是;false:不是
+    "addTag": [
+        {
+            "tagId": "1471332704915922947"//标签id
+        }
+    ]
+}
+ * @returns
+ */
 export function updateWeCustomerPorTraitTag(data) {
   return request({
     url: service + '/updateWeCustomerPorTraitTag',
@@ -58,16 +80,16 @@ export function findAddGroupNum(params) {
 }
 //  获取轨迹信息
 /**
- * 
- * @param {*} 
+ *
+ * @param {*}
   {
     pageNum:
 pageSize:
-trajectoryType: 轨迹类型(1:信息动态;2:社交动态;3:活动规则;4:待办动态)
+trajectoryType: 轨迹类型(1:客户动态;2:员工动态;3:互动动态;4:跟进动态)
 userId: 员工的id
 externalUserid: 客户id
   }
- * @returns 
+ * @returns
  */
 export function findTrajectory(params) {
   return request({
@@ -75,7 +97,19 @@ export function findTrajectory(params) {
     params
   })
 }
-//  添加或编辑轨迹
+
+/**
+ * 编辑跟进动态
+ * @param {*} data
+ * {
+    "externalUserid":"客户id",
+    "trackState":1,//1:待跟进;2:跟进中;3:已成交;4:无意向;5:已流失
+    "content":"根据内容",
+    "userId":"员工id"
+
+}
+ * @returns
+ */
 export function addOrEditWaitHandle(data) {
   return request({
     url: service + '/addOrEditWaitHandle',
@@ -95,5 +129,51 @@ export function handleWait(params) {
   return request({
     url: service + '/handleWait/' + params,
     method: 'delete'
+  })
+}
+
+/**
+ * 客户画像个人标签新增或更新
+ * @param {*} params
+{
+    "weTags": [
+        {
+            "name": "个人标签4",//标签名
+            "tagId": "1471327409208647681",//标签id，新增不存在则不传，更新则传
+            "owner":"shengxiyong"//标签所属人id
+        }
+    ]
+}
+ * @returns
+ */
+export function addOrUpdatePersonTags(data) {
+  return request({
+    url: service + '/addOrUpdatePersonTags',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 删除个人标签
+ * @ids {*} ids	标签id,多个用逗号隔开
+ * @returns
+ */
+export function deletePersonTag(ids) {
+  return request({
+    url: service + '/deletePersonTag/' + ids,
+    method: 'delete'
+  })
+}
+
+/**
+ * 同步轨迹动态
+ * @param {*} userId
+ * @returns
+ */
+export function sync(userId) {
+  return request({
+    url: service + '/synchMomentsInteracte/' + userId,
+    method: 'get'
   })
 }

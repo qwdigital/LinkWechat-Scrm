@@ -3,8 +3,9 @@ package com.linkwechat.wecom.factory.impl.customergroup;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import com.linkwechat.common.enums.CallbackEventUpdateDetail;
+import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
+import com.linkwechat.wecom.domain.callback.WeBackCustomerGroupVo;
 import com.linkwechat.wecom.domain.*;
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 import com.linkwechat.wecom.factory.WeEventStrategy;
 import com.linkwechat.wecom.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -40,21 +41,25 @@ public class WeCallBackUpdateGroupImpl extends WeEventStrategy {
     @Autowired
     private IWeGroupMemberService groupMemberService;
 
+
+
     @Override
-    public void eventHandle(WxCpXmlMessageVO message) {
+    public void eventHandle(WeBackBaseVo message) {
+        WeBackCustomerGroupVo customerGroupInfo = (WeBackCustomerGroupVo) message;
         try {
-            weGroupService.updateWeGroup(message.getChatId());
-            String updateDetail = message.getUpdateDetail();
-            if (updateDetail.equals(CallbackEventUpdateDetail.ADD_MEMBER.getType())) {
+            weGroupService.updateWeGroup(customerGroupInfo.getChatId());
+            String updateDetail = customerGroupInfo.getUpdateDetail();
+            if (updateDetail.equals(CallbackEventUpdateDetail.ADD_MEMBER.getType())) { //成员入群
                 // 添加成员，该群的实际群活码扫码次数需要加1
-                groupCodeActualService.updateScanTimesByChatId(message.getChatId());
+                groupCodeActualService.updateScanTimesByChatId(customerGroupInfo.getChatId());
                 ThreadUtil.execAsync(() ->{
-                    groupFissionEnterCheck(message.getChatId());
+                    groupFissionEnterCheck(customerGroupInfo.getChatId());
                 });
             }
+
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("update>>>>>>>>>param:{},ex:{}",message.getChatId(),e);
+            log.error("update>>>>>>>>>param:{},ex:{}",customerGroupInfo.getChatId(),e);
         }
     }
 

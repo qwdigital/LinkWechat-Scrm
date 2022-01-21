@@ -18,7 +18,11 @@
     <div class="right-menu">
       <template v-if="device !== 'mobile'">
         <!-- <search id="header-search" class="right-menu-item" /> -->
-
+        <el-tooltip content="企业微信-管理后台" effect="dark" placement="bottom">
+          <div class="right-menu-item hover-effect">
+            <img  @click="goLink2()" style="height:20px;width:24px;margin-top:4px;" src="@/assets/image/wechat-logo.png"></img>
+          </div>
+        </el-tooltip>
         <el-tooltip content="源码地址" effect="dark" placement="bottom">
           <div class="right-menu-item hover-effect">
             <svg-icon icon-class="github" @click="goto(0)" />
@@ -103,6 +107,9 @@ export default {
     goto(type) {
       window.open(type ? 'https://www.yuque.com/linkwechat/help/dsatfs' : 'https://gitee.com/LinkWeChat/link-wechat')
     },
+    goLink2 () {
+      window.open("https://work.weixin.qq.com/wework_admin/loginpage_wx?from=myhome_baidu", '_blank')
+    },
     goLink(path) {
       if (!isExternal(path)) {
         this.$router.push({ path })
@@ -186,7 +193,7 @@ export default {
 
 .nav-scrollbar {
   width: calc(100% - 450px);
-  /deep/.el-scrollbar__view {
+  ::v-deep.el-scrollbar__view {
     white-space: nowrap;
     line-height: 58px;
   }

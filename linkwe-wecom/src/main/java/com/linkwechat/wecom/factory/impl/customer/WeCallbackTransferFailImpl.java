@@ -2,8 +2,9 @@ package com.linkwechat.wecom.factory.impl.customer;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.enums.TransferFailReason;
+import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
+import com.linkwechat.wecom.domain.callback.WeBackCustomerVo;
 import com.linkwechat.wecom.domain.WeAllocateCustomer;
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
 import com.linkwechat.wecom.factory.WeEventStrategy;
 import com.linkwechat.wecom.service.IWeAllocateCustomerService;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +24,11 @@ public class WeCallbackTransferFailImpl extends WeEventStrategy {
     private IWeAllocateCustomerService iWeAllocateCustomerService;
 
     @Override
-    public void eventHandle(WxCpXmlMessageVO message) {
-        String userId = message.getUserId();
-        String externalUserId = message.getExternalUserId();
-        String failReason = message.getFailReason();
+    public void eventHandle(WeBackBaseVo message) {
+        WeBackCustomerVo customerInfo = (WeBackCustomerVo) message;
+        String userId = customerInfo.getUserID();
+        String externalUserId = customerInfo.getExternalUserID();
+        String failReason = customerInfo.getFailReason();
         WeAllocateCustomer weAllocateCustomer = WeAllocateCustomer.builder().failReason(TransferFailReason.getReason(failReason))
                 .status(TransferFailReason.getNum(failReason)).build();
         iWeAllocateCustomerService.update(weAllocateCustomer,new LambdaQueryWrapper<WeAllocateCustomer>().eq(WeAllocateCustomer::getTakeoverUserid,userId)

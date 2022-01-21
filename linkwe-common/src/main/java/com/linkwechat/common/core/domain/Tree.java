@@ -1,12 +1,14 @@
 package com.linkwechat.common.core.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@ApiModel
 @Data
 public class Tree<T> {
 
@@ -18,6 +20,12 @@ public class Tree<T> {
      */
     @ApiModelProperty(name = "label", value = "名称")
     private String name;
+
+    /**
+     * 名称
+     */
+    @ApiModelProperty("可删除标识 0 可删除 1 不可删除")
+    private Integer flag;
 
     /**
      * 父的叶子信息

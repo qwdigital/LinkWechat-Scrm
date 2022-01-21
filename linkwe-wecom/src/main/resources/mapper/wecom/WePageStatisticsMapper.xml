@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WePageStatisticsMapper">
+
+    <select id="getDayCountData" resultType="com.linkwechat.wecom.domain.dto.WePageCountDto">
+        SELECT
+        tbl._date AS x_time,
+        IFNULL(tbr.new_contact_cnt, 0)    as new_contact_cnt,
+        IFNULL(tbr.new_chat_cnt, 0)       as new_chat_cnt,
+        IFNULL(tbr.new_member_cnt, 0)     as new_member_cnt,
+        IFNULL(tbr.negative_feedback_cnt, 0) as negative_feedback_cnt
+        FROM (SELECT (@s:=@s+1) AS _index,STR_TO_DATE(DATE(DATE_SUB(CURRENT_DATE,INTERVAL @s DAY)),'%Y-%m-%d') AS _date
+        FROM information_schema.CHARACTER_SETS,(SELECT @s:=-1) AS init WHERE
+        @s &lt; #{few}
+        ORDER BY _date) AS tbl
+        LEFT JOIN(SELECT
+        sum(ifnull(wps.new_contact_cnt, 0)) new_contact_cnt,
+        sum(ifnull(wps.new_chat_cnt, 0)) new_chat_cnt,
+        sum(ifnull(wps.new_member_cnt, 0))  new_member_cnt,
+        sum(ifnull(wps.negative_feedback_cnt, 0))  negative_feedback_cnt,
+        STR_TO_DATE(DATE_FORMAT(wps.refresh_time, '%Y-%m-%d'), '%Y-%m-%d') AS finish_date
+        FROM we_page_statistics wps
+        where
+        STR_TO_DATE(DATE_FORMAT(wps.refresh_time,'%Y-%m-%d'),'%Y-%m-%d') &gt;= #{startTime}
+        AND STR_TO_DATE(DATE_FORMAT(wps.refresh_time,'%Y-%m-%d'),'%Y-%m-%d') &lt;= #{endTime}
+        GROUP BY finish_date
+        ORDER BY finish_date
+        ) AS tbr ON tbl._date = tbr.finish_date GROUP BY tbl._date;
+    </select>
+
+    <select id="getWeekCountData" resultType="com.linkwechat.wecom.domain.dto.WePageCountDto">
+        select CONCAT(left(tbl._date,4),'年',right(tbl._date,2),'周') as x_time,
+        IFNULL(tbr.new_contact_cnt, 0)    as new_contact_cnt,
+	    IFNULL(tbr.new_chat_cnt, 0)       as new_chat_cnt,
+	    IFNULL(tbr.new_member_cnt, 0)     as new_member_cnt,
+	    IFNULL(tbr.negative_feedback_cnt, 0) as negative_feedback_cnt
+        from (select (@s := @s + 1) as _index,
+        yearweek(date(date_sub(date_format(current_date, '%Y-%m-%d'), interval @s week))) as _date
+        from information_schema.character_sets,
+        (select @s := -1) as init
+        where @s  &lt; #{few}
+        order by _date)
+        as tbl
+        left join(select
+        sum(ifnull(wps.new_contact_cnt, 0)) new_contact_cnt,
+	    sum(ifnull(wps.new_chat_cnt, 0)) new_chat_cnt,
+	    sum(ifnull(wps.new_member_cnt, 0))  new_member_cnt,
+	    sum(ifnull(wps.negative_feedback_cnt, 0))  negative_feedback_cnt,
+        yearweek(date_format(wps.refresh_time, '%Y-%m-%d')) as finish_date
+        from we_page_statistics wps
+        where yearweek(date_format(wps.refresh_time, '%Y-%m-%d')) &gt;=
+        yearweek(date(date_sub(date_format(current_date, '%Y-%m-%d'), interval #{few} week)))
+        and yearweek(date_format(wps.refresh_time, '%Y-%m-%d')) &lt;=
+        yearweek(date_format(current_date, '%Y-%m-%d'))
+        group by finish_date
+        order by finish_date
+        ) as tbr on tbl._date = tbr.finish_date
+        group by tbl._date;
+    </select>
+
+    <select id="getMonthCountData" resultType="com.linkwechat.wecom.domain.dto.WePageCountDto">
+        select tbl._date as x_time,
+        IFNULL(tbr.new_contact_cnt, 0)    as new_contact_cnt,
+	    IFNULL(tbr.new_chat_cnt, 0)       as new_chat_cnt,
+	    IFNULL(tbr.new_member_cnt, 0)     as new_member_cnt,
+	    IFNULL(tbr.negative_feedback_cnt, 0) as negative_feedback_cnt
+        from (select (@s := @s + 1) as _index, date_format(date_sub(current_date, interval @s month), '%Y-%m') as _date
+        from information_schema.character_sets,
+        (select @s := -1) as init
+        where @s &lt; #{few}
+        order by _date) as tbl
+        left join(select
+        sum(ifnull(wps.new_contact_cnt, 0)) new_contact_cnt,
+		sum(ifnull(wps.new_chat_cnt, 0)) new_chat_cnt,
+		sum(ifnull(wps.new_member_cnt, 0))  new_member_cnt,
+		sum(ifnull(wps.negative_feedback_cnt, 0))  negative_feedback_cnt,
+        date_format(wps.refresh_time, '%Y-%m') as finish_date
+        from we_page_statistics wps
+        group by finish_date
+        order by finish_date
+        ) as tbr on tbl._date = tbr.finish_date
+        group by tbl._date;
+    </select>
+
+</mapper>

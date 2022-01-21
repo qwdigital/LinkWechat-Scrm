@@ -82,8 +82,8 @@ public interface WeFlowerCustomerRelMapper extends BaseMapper<WeFlowerCustomerRe
 
     /**
      * 成员添加客户统计
-     * @param
+     * @param weFlowerCustomerRel
      * @return
      */
-    public List<Map<String,Object>> getUserAddCustomerStat(@Param("codeId") String codeId,@Param("beginTime") String beginTime,@Param("endTime") String endTime);
+    public List<Map<String,Object>> getUserAddCustomerStat(WeFlowerCustomerRel weFlowerCustomerRel);
 }

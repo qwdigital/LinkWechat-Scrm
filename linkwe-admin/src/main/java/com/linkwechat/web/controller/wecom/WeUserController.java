@@ -6,6 +6,7 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.wecom.domain.WeUser;
 import com.linkwechat.wecom.domain.vo.*;
 import com.linkwechat.wecom.service.IWeUserService;
@@ -13,11 +14,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 
@@ -39,15 +37,29 @@ public class WeUserController extends BaseController {
     /**
      * 查询通讯录相关客户列表
      */
-    //@PreAuthorize("@ss.hasPermi('contacts:organization:query')")
     @Log(title = "查询通讯录相关客户列表", businessType = BusinessType.SELECT)
     @GetMapping("/list")
     @ApiOperation(value = "获取通讯录人员列表", httpMethod = "GET")
     public TableDataInfo<List<WeUser>> list(WeUser weUser) {
         startPage();
-        List<WeUser> list = weUserService.getList(weUser);
-        return getDataTable(list);
+        return getDataTable(weUserService.getList(weUser));
     }
+
+
+    /**
+     * 获取所有员工接口(不分页)
+     * @param weUser
+     * @return
+     */
+    @GetMapping("/findAllWeUser")
+    public AjaxResult findAllWeUser(WeUser weUser){
+
+        return AjaxResult.success(
+                weUserService.getList(weUser)
+        );
+    }
+
+
 
 
     /**
@@ -55,7 +67,6 @@ public class WeUserController extends BaseController {
      *
      * @return
      */
-    //@PreAuthorize("@ss.hasPermi('contacts:organization:view')")
     @Log(title = "获取通讯录相关客户详细信息", businessType = BusinessType.SELECT)
     @GetMapping(value = "/{id}")
     @ApiOperation(value = "获取通讯录相关客户详细信息", httpMethod = "GET")
@@ -66,7 +77,6 @@ public class WeUserController extends BaseController {
     /**
      * 新增通讯录相关客户
      */
-    //@PreAuthorize("@ss.hasPermi('contacts:organization:addMember')")
     @Log(title = "通讯录相关客户", businessType = BusinessType.INSERT)
     @PostMapping
     @ApiOperation("新增通讯录客户")
@@ -78,7 +88,6 @@ public class WeUserController extends BaseController {
     /**
      * 修改通讯录相关客户
      */
-    //@PreAuthorize("@ss.hasPermi('contacts:organization:edit')")
     @Log(title = "更新通讯录客户", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation("更新通讯录客户")
@@ -94,7 +103,6 @@ public class WeUserController extends BaseController {
      * @param weUser
      * @return
      */
-    //@PreAuthorize("@ss.hasPermi('contacts:organization:forbidden')")
     @Log(title = "启用禁用用户", businessType = BusinessType.UPDATE)
     @PutMapping("/startOrStop")
     @ApiOperation("是否启用(1表示启用成员，0表示禁用成员)")
@@ -110,13 +118,12 @@ public class WeUserController extends BaseController {
      * @param weLeaveUserVo
      * @return
      */
-    //    @PreAuthorize("@ss.hasPermi('customerManage:dimission:filter')")
     @ApiOperation("离职已分配")
     @Log(title = "离职已分配", businessType = BusinessType.SELECT)
     @GetMapping({"/leaveUserAllocateList"})
     public TableDataInfo<List<WeLeaveUserVo>> leaveUserAllocateList(WeLeaveUserVo weLeaveUserVo) {
         startPage();
-        weLeaveUserVo.setIsActivate(WeConstans.WE_USER_IS_LEAVE);
+        weLeaveUserVo.setIsActivate(WeConstans.corpUserEnum.ACTIVE_STATE_FIVE.getKey());
         weLeaveUserVo.setIsAllocate(WeConstans.LEAVE_ALLOCATE_STATE);
         List<WeLeaveUserVo> list = this.weUserService.leaveAllocateUserList(weLeaveUserVo);
         return getDataTable(list);
@@ -129,13 +136,12 @@ public class WeUserController extends BaseController {
      * @param weLeaveUserVo
      * @return
      */
-    //    @PreAuthorize("@ss.hasPermi('customerManage:dimission:query')")
     @ApiOperation("离职未分配")
     @Log(title = "离职未分配", businessType = BusinessType.SELECT)
     @GetMapping({"/leaveUserNoAllocateList"})
     public TableDataInfo<List<WeLeaveUserVo>> leaveUserNoAllocateList(WeLeaveUserVo weLeaveUserVo) {
         startPage();
-        weLeaveUserVo.setIsActivate(WeConstans.WE_USER_IS_LEAVE);
+        weLeaveUserVo.setIsActivate(WeConstans.corpUserEnum.ACTIVE_STATE_FIVE.getKey());
         weLeaveUserVo.setIsAllocate(WeConstans.LEAVE_NO_ALLOCATE_STATE);
         List<WeLeaveUserVo> list = weUserService.leaveNoAllocateUserList(weLeaveUserVo);
         return getDataTable(list);
@@ -148,7 +154,6 @@ public class WeUserController extends BaseController {
      * @param weLeaveUserInfoAllocateVo
      * @return
      */
-    //   @PreAuthorize("@ss.hasPermi('customerManage:dimission:allocate')")
     @ApiOperation("离职分配")
     @Log(title = "离职分配", businessType = BusinessType.UPDATE)
     @PutMapping({"/allocateLeaveUserAboutData"})
@@ -165,15 +170,16 @@ public class WeUserController extends BaseController {
      *
      * @return
      */
-    //   @PreAuthorize("@ss.hasPermi('contacts:organization:sync')")
     @ApiOperation("同步成员")
     @Log(title = "同步成员", businessType = BusinessType.OTHER)
     @GetMapping({"/synchWeUser"})
     public AjaxResult synchWeUser() {
-        SecurityContext context = SecurityContextHolder.getContext();
-        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
-        SecurityContextHolder.setContext(context);
-        weUserService.synchWeUser();
+        try {
+            weUserService.synchWeUser();
+        }catch (CustomException e){
+            return AjaxResult.error(e.getMessage());
+        }
+
         return AjaxResult.success(WeConstans.SYNCH_TIP);
     }
 
@@ -182,7 +188,6 @@ public class WeUserController extends BaseController {
      *
      * @return
      */
-    //   @PreAuthorize("@ss.hasPermi('contacts:organization:removeMember')")
     @ApiOperation("删除用户")
     @Log(title = "删除用户", businessType = BusinessType.DELETE)
     @DeleteMapping({"/{ids}"})

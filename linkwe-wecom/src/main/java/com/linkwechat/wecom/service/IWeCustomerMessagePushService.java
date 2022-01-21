@@ -34,4 +34,12 @@ public interface IWeCustomerMessagePushService {
      */
     public List<CustomerMessagePushVo> customerMessagePushs(String sender,String content,String pushType,String beginTime,String endTime);
 
+
+    /**
+     * 消息推送提醒
+     * @param messageRemindContent
+     * @param toUserId
+     */
+    public void messagePushRemind(String messageRemindContent,String toUserId);
+
 }

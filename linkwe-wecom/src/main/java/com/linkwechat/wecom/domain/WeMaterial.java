@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.domain;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import io.swagger.annotations.ApiModel;
@@ -14,6 +15,7 @@ import lombok.Data;
  **/
 @ApiModel
 @Data
+@TableName("we_material")
 public class WeMaterial extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
@@ -39,15 +41,15 @@ public class WeMaterial extends BaseEntity {
     private String content;
 
     /**
-     * 图片名称
+     * 素材标题
      */
-    @ApiModelProperty("图片名称")
+    @ApiModelProperty("素材标题【小程序标题】")
     private String materialName;
 
     /**
      * 摘要
      */
-    @ApiModelProperty("摘要")
+    @ApiModelProperty("摘要【小程序id用改字段】")
     private String digest;
 
     /**
@@ -68,5 +70,7 @@ public class WeMaterial extends BaseEntity {
      */
     @TableField(exist = false)
     private Boolean isCheck=false;
+
+
 
 }

@@ -81,7 +81,8 @@ export default {
             'getCurExternalContact',
             'openEnterpriseChat',
             'shareToExternalContact',
-            'shareToExternalChat'
+            'shareToExternalChat',
+            'navigateToAddCustomer'
           ], //必填
           success: (res) => {
             // 回调

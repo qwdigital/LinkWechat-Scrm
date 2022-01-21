@@ -108,8 +108,10 @@
         wu.user_name,
         wu.dimission_time,
         (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department,
-        (SELECT COUNT(*) FROM we_customer wc WHERE wc.first_user_id=wu.user_id) as allocateCustomerNum,
-        (SELECT COUNT(*) FROM we_group wg WHERE wg.`owner`=wu.user_id) as allocateGroupNum
+        (SELECT count(*) FROM we_allocate_customer wac
+        INNER  JOIN we_customer wc ON wac.external_userid=wc.external_userid
+        and wac.handover_userid=wc.first_user_id  WHERE wac.handover_userid=wu.user_id) as allocateCustomerNum,
+        (SELECT COUNT(*) FROM we_allocate_group wg WHERE wg.old_owner=wu.user_id) as allocateGroupNum
         FROM
         we_user wu
         <where>
@@ -156,26 +158,19 @@
         wc.`name` as customerName,
         wu.user_name as takeUserName,
         wac.allocate_time,
-        (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id in (wu.department)) as department,
-        wc.avatar,
-        wc.birthday,
-        wc.gender,
-        GROUP_CONCAT(wt.`tag_id`) as tagIds,
-        GROUP_CONCAT(wt.`name`)	 as tagNames,
-        wu.user_name,
-        wc.first_add_time
+        wc.external_userid as externalUserid,
+        wc.first_user_id as userId,
+        (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department
         FROM
         we_allocate_customer wac
-        LEFT JOIN we_customer wc ON wac.external_userid=wc.external_userid and wac.takeover_userid=wc.first_user_id
+        LEFT JOIN we_customer wc ON wac.external_userid=wc.external_userid
         LEFT JOIN we_user wu ON wu.user_id=wac.takeover_userid
-        LEFT JOIN we_flower_customer_tag_rel wfctr ON wfctr.del_flag=0 AND wfctr.external_userid=wc.external_userid AND  wfctr.user_id=wc.first_user_id
-        LEFT JOIN we_tag wt ON wt.tag_id=wfctr.tag_id
-        <where>
+        WHERE wc.del_flag=1
+            <if test="handoverUserId != null and handoverUserId !=''">and wc.first_user_id=#{handoverUserId}</if>
             <if test="handoverUserId != null and handoverUserId !=''">and wac.handover_userid=#{handoverUserId}</if>
             <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
                 DATE_FORMAT(wu.dimission_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
             </if>
-        </where>
     </select>
 
 
@@ -184,7 +179,7 @@
         SELECT
         wu.user_name as newOwnerName,
         wg.chat_id,
-        wg.group_name,
+        IF(wg.group_name,wg.group_name,"群聊")  as group_name,
         (SELECT count(*) FROM we_group_member wgm WHERE wgm.chat_id=wg.chat_id) as memberNum,
         (SELECT GROUP_CONCAT(wd.`name`) FROM we_department wd WHERE wd.id=wu.department) as department,
         wag.allocate_time
@@ -203,15 +198,15 @@
 
 
     <select id="findWeUserByCutomerId" resultType="com.linkwechat.wecom.domain.WeCustomerAddUser">
-            SELECT
-                wu.user_name,
-                wu.user_id,
-                wu.head_image_url,
-                wfcr.create_time
-            FROM
-                `we_flower_customer_rel` wfcr
-            INNER JOIN we_user wu ON wfcr.user_id = wu.user_id
-            WHERE wfcr.external_userid=#{externalUserid}
+        SELECT
+            wu.user_name,
+            wu.user_id,
+            wu.head_image_url,
+            wc.first_add_time as createTime
+        FROM
+            we_customer wc
+                INNER JOIN we_user wu ON wc.first_user_id = wu.user_id
+        WHERE wc.external_userid=#{externalUserid}
     </select>
 
 

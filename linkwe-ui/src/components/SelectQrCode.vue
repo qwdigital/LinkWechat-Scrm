@@ -7,16 +7,16 @@ export default {
     // 添加标签显隐
     visible: {
       type: Boolean,
-      default: false,
+      default: false
     },
     title: {
       type: String,
-      default: '选择群活码',
+      default: '选择群活码'
     },
     selected: {
       type: Array,
-      default: () => [],
-    },
+      default: () => []
+    }
   },
   data() {
     return {
@@ -27,18 +27,18 @@ export default {
         activityName: '',
         createBy: '',
         beginTime: '',
-        endTime: '',
+        endTime: ''
       },
       list: [], // 列表
       total: 0, // 总条数
-      radio: '',
+      radio: ''
     }
   },
   watch: {
-    selected (val) {
+    selected(val) {
       this.setSelected()
     },
-    list (val) {
+    list(val) {
       this.setSelected()
     }
   },
@@ -49,8 +49,8 @@ export default {
       },
       set(val) {
         this.$emit('update:visible', val)
-      },
-    },
+      }
+    }
   },
   created() {
     this.getList()
@@ -75,7 +75,7 @@ export default {
       this.Pvisible = false
       this.$emit('success', this.radio)
     },
-    setSelected () {
+    setSelected() {
       if (!this.selected.length) return
 
       this.list.forEach((code) => {
@@ -84,7 +84,7 @@ export default {
         }
       })
     }
-  },
+  }
 }
 </script>
 
@@ -94,6 +94,7 @@ export default {
     :visible.sync="Pvisible"
     width="650px"
     append-to-body
+    :close-on-click-modal="false"
   >
     <div>
       <el-form ref="form" :model="query" label-width="">
@@ -129,25 +130,11 @@ export default {
           </template>
         </el-table-column>
 
-        <el-table-column
-          prop="activityName"
-          label="活码名称"
-          align="center"
-        ></el-table-column>
+        <el-table-column prop="activityName" label="活码名称" align="center"></el-table-column>
 
-        <el-table-column
-          prop="activityDesc"
-          label="活码描述"
-          align="center"
-          width="160"
-        >
+        <el-table-column prop="activityDesc" label="活码描述" align="center" width="160">
           <template #default="{ row }">
-            <el-popover
-              placement="bottom"
-              width="200"
-              trigger="hover"
-              :content="row.activityDesc"
-            >
+            <el-popover placement="bottom" width="200" trigger="hover" :content="row.activityDesc">
               <div slot="reference" class="table-desc overflow-ellipsis">
                 {{ row.activityDesc }}
               </div>
@@ -155,19 +142,10 @@ export default {
           </template>
         </el-table-column>
 
-        <el-table-column
-          prop="codeUrl"
-          label="活码样式"
-          align="center"
-          width="130"
-        >
+        <el-table-column prop="codeUrl" label="活码样式" align="center" width="130">
           <template #default="{ row }">
             <el-popover placement="bottom" trigger="hover">
-              <el-image
-                slot="reference"
-                :src="row.codeUrl"
-                class="code-image--small"
-              ></el-image>
+              <el-image slot="reference" :src="row.codeUrl" class="code-image--small"></el-image>
               <el-image :src="row.codeUrl" class="code-image"> </el-image>
             </el-popover>
           </template>
@@ -179,11 +157,7 @@ export default {
           </template>
         </el-table-column>
 
-        <el-table-column
-          prop="availableCodes"
-          label="可用实际群码数"
-          align="center"
-        >
+        <el-table-column prop="availableCodes" label="可用实际群码数" align="center">
           <template #default="{ row }">
             <el-popover
               v-if="row.aboutToExpireCodes > 0"

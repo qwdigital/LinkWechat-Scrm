@@ -13,7 +13,9 @@
               <van-tag :key="group.chatId" size="large"> {{ group.groupName }} </van-tag>
             </template> -->
             <template v-if="task.groupList && task.groupList.length > 0">
-              <van-tag v-for="group of task.groupList.slice(0, 2)" :key="group.chatId" size="large"> {{ group.groupName }} </van-tag>
+              <van-tag v-for="group of task.groupList.slice(0, 2)" :key="group.chatId" size="large">
+                {{ group.groupName }}
+              </van-tag>
             </template>
             <template v-if="task.groupList && task.groupList.length > 2">
               <van-tag size="large"> ... </van-tag>
@@ -24,11 +26,14 @@
       </div>
 
       <div class="content">
-        <div @touchstart.prevent="touchStart" @touchend="touchEnd">
+        <!-- <div @touchstart.prevent="touchStart" @touchend="touchEnd"> -->
+        <div>
           {{ task.content }}
         </div>
-        <div class="copy-wrapper" v-show="showCopy">
-          <van-button :class="'copy-btn_' + task.ruleId" :data-clipboard-text="task.content"> 复制 </van-button>
+        <div class="copy-wrapper">
+          <van-button :class="'copy-btn_' + task.ruleId" :data-clipboard-text="task.content">
+            复制
+          </van-button>
         </div>
       </div>
 
@@ -89,10 +94,10 @@ export default {
 
   data() {
     return {
-      showCopy: false, // 展示复制按钮
-      touchDelay: 750, // 触发显示按钮的长按时常
-      copyEvent: null,
-      touch: false
+      // showCopy: false, // 展示复制按钮
+      // touchDelay: 750, // 触发显示按钮的长按时常
+      // copyEvent: null,
+      // touch: false
     }
   },
 
@@ -128,9 +133,16 @@ export default {
           {
             title: this.task.title,
             desc: this.task.content,
-            link: (this.task.materialList && this.task.materialList[0] && this.task.materialList[0].materialUrl) || ' ', // 消息链接
+            link:
+              (this.task.materialList &&
+                this.task.materialList[0] &&
+                this.task.materialList[0].materialUrl) ||
+              ' ', // 消息链接
             imgUrl:
-              (this.task.materialList && this.task.materialList[0] && this.task.materialList[0].materialUrl) || ' ' // 封面
+              (this.task.materialList &&
+                this.task.materialList[0] &&
+                this.task.materialList[0].materialUrl) ||
+              ' ' // 封面
           },
           async function(res) {
             if (res.err_msg == 'shareToExternalChat:ok') {
@@ -160,21 +172,21 @@ export default {
       } catch (error) {
         this.$dialog({ message: '代码错误：' + JSON.stringify(error.message) })
       }
-    },
-
-    touchStart() {
-      clearTimeout(this.copyEvent)
-
-      this.copyEvent = setTimeout(() => {
-        this.touch = true
-      }, this.touchDelay)
-    },
-
-    touchEnd() {
-      clearTimeout(this.copyEvent)
-      if (this.touch) this.showCopy = true
-      this.touch = false
     }
+
+    // touchStart() {
+    //   clearTimeout(this.copyEvent)
+
+    //   this.copyEvent = setTimeout(() => {
+    //     this.touch = true
+    //   }, this.touchDelay)
+    // },
+
+    // touchEnd() {
+    //   clearTimeout(this.copyEvent)
+    //   if (this.touch) this.showCopy = true
+    //   this.touch = false
+    // }
   },
 
   computed: {
@@ -199,7 +211,7 @@ export default {
       if (this.todoMembers.length === 0) return '无'
 
       const namesMap = this.todoMembers.map((m) => m.name || '')
-      const names = namesMap.filter(m => m !== '')
+      const names = namesMap.filter((m) => m !== '')
 
       if (this.todoMembers.length <= 2) return names.join('、')
       return names[0] + '、' + names[1] + '等' + this.todoMembers.length + '人'
@@ -220,7 +232,7 @@ export default {
       if (this.doneMembers.length === 0) return '无'
 
       const namesMap = this.doneMembers.map((m) => m.name || '')
-      const names = namesMap.filter(m => m !== '')
+      const names = namesMap.filter((m) => m !== '')
 
       if (this.doneMembers.length <= 2) return names.join('、')
       return names[0] + '、' + names[1] + '等' + this.doneMembers.length + '人'

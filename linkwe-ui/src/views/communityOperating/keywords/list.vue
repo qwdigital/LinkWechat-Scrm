@@ -161,7 +161,14 @@ export default {
 
 <template>
   <div>
-    <el-form ref="queryForm" :inline="true" :model="query" label-width="100px" class="top-search" size="small">
+    <el-form
+      ref="queryForm"
+      :inline="true"
+      :model="query"
+      label-width="100px"
+      class="top-search"
+      size="small"
+    >
       <el-form-item label="活码名称" prop="taskName">
         <el-input v-model="query.taskName" placeholder="请输入"></el-input>
       </el-form-item>
@@ -184,8 +191,15 @@ export default {
         ></el-date-picker>
       </el-form-item>
       <el-form-item label=" ">
-        <el-button v-hasPermi="['customerManage:customer:query']" type="primary" @click="getList(1)">查询</el-button>
-        <el-button v-hasPermi="['customerManage:customer:query']" type="success" @click="resetQuery()">重置</el-button>
+        <el-button v-hasPermi="['customerManage:customer:query']" type="primary" @click="getList(1)"
+          >查询</el-button
+        >
+        <el-button
+          v-hasPermi="['customerManage:customer:query']"
+          type="success"
+          @click="resetQuery()"
+          >重置</el-button
+        >
       </el-form-item>
     </el-form>
 
@@ -207,7 +221,12 @@ export default {
 
     <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" align="center" />
-      <el-table-column label="活码名称" align="center" prop="taskName" :show-overflow-tooltip="true" />
+      <el-table-column
+        label="活码名称"
+        align="center"
+        prop="taskName"
+        :show-overflow-tooltip="true"
+      />
       <el-table-column label="群活码" align="center" width="130">
         <template #default="{ row }">
           <el-popover placement="bottom" trigger="hover">
@@ -216,7 +235,10 @@ export default {
               :src="(row.groupCodeInfo && row.groupCodeInfo.codeUrl) || ''"
               class="code-image--small"
             ></el-image>
-            <el-image :src="(row.groupCodeInfo && row.groupCodeInfo.codeUrl) || ''" class="code-image"></el-image>
+            <el-image
+              :src="(row.groupCodeInfo && row.groupCodeInfo.codeUrl) || ''"
+              class="code-image"
+            ></el-image>
           </el-popover>
         </template>
       </el-table-column>
@@ -245,9 +267,18 @@ export default {
 
       <el-table-column label="创建时间" align="center" prop="createTime"></el-table-column>
 
-      <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
+      <el-table-column
+        label="操作"
+        align="center"
+        width="180"
+        class-name="small-padding fixed-width"
+      >
         <template slot-scope="scope">
-          <el-button v-hasPermi="['enterpriseWechat:edit']" size="mini" type="text" @click="goRoute(scope.row.taskId)"
+          <el-button
+            v-hasPermi="['enterpriseWechat:edit']"
+            size="mini"
+            type="text"
+            @click="goRoute(scope.row.taskId)"
             >编辑</el-button
           >
           <!-- <el-button
@@ -276,7 +307,13 @@ export default {
       @pagination="getList()"
     />
 
-    <el-dialog title="配置方法" :visible.sync="dialogHowToConfig" width="500px" style="margin-bottom: 7vh;">
+    <el-dialog
+      title="配置方法"
+      :visible.sync="dialogHowToConfig"
+      width="500px"
+      style="margin-bottom: 7vh;"
+      :close-on-click-modal="false"
+    >
       <div class="help">
         <div class="step">
           <p>

@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -22,7 +23,7 @@ public class WePosterFont extends BaseEntity {
     /**
      * id
      */
-    @TableId
+    @TableId(type = IdType.AUTO)
     @ApiModelProperty(value = "id")
     private Long id;
 

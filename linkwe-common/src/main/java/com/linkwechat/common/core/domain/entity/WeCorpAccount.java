@@ -24,7 +24,6 @@ import javax.validation.constraints.NotBlank;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@ApiModel("企业id配置相关实体")
 @TableName("we_corp_account")
 public class WeCorpAccount extends BaseEntity
 {
@@ -32,59 +31,135 @@ public class WeCorpAccount extends BaseEntity
 
     /** $column.columnComment */
     @TableId
-    @ApiModelProperty("主键")
-    private Long id= SnowFlakeUtil.nextId();
+    private Long id;
 
-    /** 企业名称 */
-    @ApiModelProperty("企业名称")
-    @NotBlank(message = "企业名称不能为空")
-    private String companyName;
+    /***********************************************
+     *******************企业配置start****************
+     **********************************************/
 
     /** 企业ID */
-    @ApiModelProperty("企业corpId")
     @NotBlank(message = "企业ID不能为空")
     private String corpId;
 
-    /** 应用的密钥凭证 */
-    @ApiModelProperty("企业为corpSecret")
-    @NotBlank(message = "应用的密钥凭证不能为空")
+
+    /** 企业名称 */
+    @NotBlank(message = "企业名称不能为空")
+    private String companyName;
+
+    /***********************************************
+     *******************企业配置end****************
+     **********************************************/
+
+
+
+    /***********************************************
+     *******************通讯录配置start**************
+     **********************************************/
+
+    /** 通讯录Secret */
+    @NotBlank(message = "通讯录Secret不可为空")
     private String corpSecret;
 
-    /** 帐号状态（0正常 1停用) */
-    @ApiModelProperty("帐号状态（0正常 1停用)")
-    private String status;
-
-    /** 删除标志（0代表存在 2代表删除） */
-    @ApiModelProperty("删除标志（0代表存在 2代表删除)")
-    private String delFlag=new String("0");
+    /***********************************************
+     *******************通讯录配置end****************
+     **********************************************/
 
 
-    @ApiModelProperty("外部联系人密钥")
-    @NotBlank(message = "外部联系人密钥凭证不能为空")
-    private String contactSecret;
 
-    @ApiModelProperty("应用id")
-    private String agentId;
-
-    @ApiModelProperty("应用密钥")
-    private String agentSecret;
-
-    @ApiModelProperty("服务商密钥")
-    private String providerSecret;
-
-    @ApiModelProperty("会话存档密钥")
-    private String chatSecret;
+    /***********************************************
+     *******************客户联系配置start*************
+     **********************************************/
 
 
-    @ApiModelProperty("企业微信扫码登陆回调地址")
-    private String wxQrLoginRedirectUri;
+     @NotBlank(message = "客户联系Secret不可为空")
+     private String contactSecret;
 
-    @ApiModelProperty("客户流失通知开关 0:关闭 1:开启")
-    private String customerChurnNoticeSwitch = Constants.NORMAL_CODE;
 
-    @ApiModelProperty("会话存档私钥")
-    private String financePrivateKey;
+    /***********************************************
+     *******************客户联系配置end***************
+     **********************************************/
 
-    @ApiModelProperty("企业管理员账号")
-    private String corpAccount;
+
+
+    /***********************************************
+     *******************应用配置start****************
+     **********************************************/
+         /**消息应用ID*/
+        @NotBlank(message = "消息应用ID不可为空")
+        private String agentId;
+
+        /**消息应用Secret*/
+        @NotBlank(message = "消息应用Secret不可为空")
+        private String agentSecret;
+
+
+        /**会话私钥Secret*/
+        private String chatSecret;
+
+
+        /**会话存档密钥*/
+        private String financePrivateKey;
+
+    /***********************************************
+     *******************应用配置end****************
+     **********************************************/
+
+
+    /***********************************************
+     *******************接收事件服务器start***********
+     **********************************************/
+
+     /**回调url*/
+     //private String backOffUrl;
+
+     /**回调token*/
+     private String token;
+
+     /**回调EncodingAESKey*/
+     private String encodingAesKey;
+
+
+    /***********************************************
+     *******************接收事件服务器end*************
+     **********************************************/
+
+
+    /***********************************************
+     *******************H5跳转start******************
+     **********************************************/
+
+     /**JS SDK 身份校验url*/
+     private String authorizeUrl;
+
+
+     /**群sop和老客标签建群，跳转链接*/
+     private String sopTagRedirectUrl;
+
+
+     /**客户公海，跳转链接*/
+     private  String seasRedirectUrl;
+
+
+
+    /***********************************************
+     *******************H5跳转end*******************
+     **********************************************/
+
+
+
+        /**客服密钥*/
+        private String kfSecret;
+
+        /** 删除标志（0代表存在 1代表删除） */
+        private Integer delFlag;
+
+
+        /**客户流失通知开关 0:关闭 1:开启*/
+        private String customerChurnNoticeSwitch = Constants.NORMAL_CODE;
+
+
+
+
+
+
 }

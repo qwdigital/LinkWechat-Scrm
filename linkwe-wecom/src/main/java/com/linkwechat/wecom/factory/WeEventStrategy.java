@@ -1,11 +1,10 @@
 package com.linkwechat.wecom.factory;
 
+import com.linkwechat.wecom.domain.callback.WeBackBaseVo;
+import com.linkwechat.wecom.domain.callback.WeBackDeptVo;
+import com.linkwechat.wecom.domain.callback.WeBackUserVo;
 import com.linkwechat.wecom.domain.WeDepartment;
 import com.linkwechat.wecom.domain.WeUser;
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 /**
  * @author danmo
@@ -16,11 +15,11 @@ public abstract class WeEventStrategy {
     protected final String tag = "tag";
     protected final String tagGroup = "tag_group";
 
-    public abstract void eventHandle(WxCpXmlMessageVO message);
+    public abstract void eventHandle(WeBackBaseVo message);
 
     //生成成员数据
-    public WeUser setWeUserData(WxCpXmlMessageVO message) {
-        WeUser weUser = WeUser.builder().userId(message.getUserId())
+    public WeUser setWeUserData(WeBackUserVo message) {
+        WeUser weUser = WeUser.builder().userId(message.getUserID())
                 .email(message.getEmail())
                 .name(message.getName())
                 .alias(message.getAlias())
@@ -32,23 +31,19 @@ public abstract class WeEventStrategy {
                 .position(message.getPosition())
                 .build();
         if (message.getStatus() != null) {
-            weUser.setIsActivate(Integer.valueOf(message.getStatus()));
+            weUser.setIsActivate(message.getStatus());
         }
         if (message.getIsLeaderInDept() != null) {
-            String isLeaderInDeptStr = Arrays.stream(message.getIsLeaderInDept())
-                    .map(String::valueOf).collect(Collectors.joining(","));
-            weUser.setIsLeaderInDept(isLeaderInDeptStr);
+            weUser.setIsLeaderInDept(message.getIsLeaderInDept());
         }
-        if (message.getDepartments() != null) {
-            String departmentsStr = Arrays.stream(message.getDepartments())
-                    .map(String::valueOf).collect(Collectors.joining(","));
-            weUser.setDepartment(departmentsStr);
+        if (message.getDepartment() != null) {
+            weUser.setDepartment(message.getDepartment());
         }
         return weUser;
     }
 
     //部门信息
-    public WeDepartment setWeDepartMent(WxCpXmlMessageVO message){
+    public WeDepartment setWeDepartMent(WeBackDeptVo message){
         WeDepartment weDepartment = new WeDepartment();
         if (message.getId() != null) {
             weDepartment.setId(Long.parseLong(message.getId()));

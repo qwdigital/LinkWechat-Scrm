@@ -86,13 +86,18 @@ public class WeCommunityPresTagGroupController extends BaseController {
     @PutMapping(path = "/{id}")
     @ApiOperation(value = "更新任务信息", httpMethod = "PUT")
     public AjaxResult update(@PathVariable("id") Long id, @RequestBody @Validated WePresTagGroupTask task) {
-        // 保存新任务
-        task.setTaskId(id);
-        task.setUpdateBy(SecurityUtils.getUsername());
-        task.setUpdateTime(new Date());
-        int rows = taskService.updateTask(task);
-        if (rows > 0) taskService.sendMessage(task);
-        return toAjax(rows);
+
+        try {
+            // 保存新任务
+            task.setTaskId(id);
+            task.setUpdateBy(SecurityUtils.getUsername());
+            task.setUpdateTime(new Date());
+            taskService.updateTaskAndSendMsg(task);
+        }catch (Exception e){
+            return AjaxResult.error(e.getMessage());
+        }
+
+        return AjaxResult.success();
     }
 
     /**

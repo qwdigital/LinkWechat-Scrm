@@ -11,7 +11,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         taskName: '', // 任务名称
-        sendType: '', // 发送方式
+        // sendType: '', // 发送方式
         createBy: '', // 创建人
         beginTime: '', // 创建开始时间
         endTime: '' // 创建结束时间
@@ -20,10 +20,10 @@ export default {
       loading: false, // 主页table加载状态
       list: [], // 老客标签建群数据
       // 可用的发送方式数据
-      sendTypeOptions: [
-        { label: '企业群发', value: 0 },
-        { label: '个人群发', value: 1 }
-      ],
+      // sendTypeOptions: [
+      //   { label: '企业群发', value: 0 },
+      //   { label: '个人群发', value: 1 }
+      // ],
       dateRange: [], // 创建日期[开始时间, 结束时间]
       multiSelect: [], // 多选数据
       customerSearchId: '', // 客户统计所查询的任务ID
@@ -126,11 +126,11 @@ export default {
       })
     },
     // 获取显示用tag字符串
-    getDisplayTags(row) {
-      if (!(row && row.tagList.length > 0)) return ''
+    // getDisplayTags(row) {
+    //   if (!(row && row.tagList.length > 0)) return ''
 
-      return row.tagList.join(' ')
-    },
+    //   return row.tagList.map((d) => d.name).join(' ')
+    // },
     // 批量删除
     handleBulkRemove() {
       this.$confirm('确认删除当前数据?删除操作无法撤销，请谨慎操作。', '提示', {
@@ -182,9 +182,13 @@ export default {
     customerFilter() {
       const l = []
       for (let data of this.customerList) {
-        if (this.customerQuery.customerName !== '' && !this.customerQuery.customerName.includes(data.customerName))
+        if (
+          this.customerQuery.customerName !== '' &&
+          !this.customerQuery.customerName.includes(data.customerName)
+        )
           continue
-        if (this.customerQuery.isInGroup !== '' && this.customerQuery.isInGroup !== data.isInGroup) continue
+        if (this.customerQuery.isInGroup !== '' && this.customerQuery.isInGroup !== data.isInGroup)
+          continue
         if (this.customerQuery.isSent !== '' && this.customerQuery.isSent !== data.isSent) continue
 
         l.push(data)
@@ -218,7 +222,7 @@ export default {
         <el-form-item label="任务名称" prop="taskName">
           <el-input v-model="query.taskName" placeholder="请输入"></el-input>
         </el-form-item>
-        <el-form-item label="发送方式" prop="sendType">
+        <!-- <el-form-item label="发送方式" prop="sendType">
           <el-select v-model="query.sendType" placeholder="请选择" size="small">
             <el-option
               v-for="(sendType, index) in sendTypeOptions"
@@ -227,7 +231,7 @@ export default {
               :key="index"
             ></el-option>
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="创建人" prop="createBy">
           <el-input v-model="query.createBy" placeholder="请输入"></el-input>
         </el-form-item>
@@ -265,33 +269,53 @@ export default {
 
     <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" align="center"></el-table-column>
-      <el-table-column label="任务名称" align="center" prop="taskName" :show-overflow-tooltip="true"></el-table-column>
-      <el-table-column prop="sendType" label="发送方式" align="center">
+      <el-table-column
+        label="任务名称"
+        align="center"
+        prop="taskName"
+        :show-overflow-tooltip="true"
+      ></el-table-column>
+      <!-- <el-table-column prop="sendType" label="发送方式" align="center">
         <template #default="{ row }">
           {{ parseInt(row.sendType) === 0 ? '企业群发' : '个人群发' }}
         </template>
-      </el-table-column>
-      <el-table-column label="当前群人数" align="center">
+      </el-table-column> -->
+      <el-table-column label="当前群人数" align="center" width="100">
         <template #default="{ row }">
           <el-button type="text" @click="openCustomerDialog(row.taskId)">
             {{ row.totalMember }}
           </el-button>
         </template>
       </el-table-column>
-      <el-table-column label="客户标签" align="center" width="120">
-        <template #default="{ row }">
+      <el-table-column label="客户标签" align="center">
+        <div v-if="row.tagList" slot-scope="{ row }">
+          <TagEllipsis :list="row.tagList"></TagEllipsis>
+        </div>
+        <span v-else>无标签</span>
+
+        <!-- <template #default="{ row }">
           <el-popover placement="bottom" width="200" trigger="hover" :content="getDisplayTags(row)">
             <div slot="reference" class="table-desc overflow-ellipsis">
               {{ getDisplayTags(row) }}
             </div>
           </el-popover>
-        </template>
+        </template> -->
       </el-table-column>
 
       <el-table-column prop="createBy" label="创建人" align="center"></el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="160"></el-table-column>
+      <el-table-column
+        label="创建时间"
+        align="center"
+        prop="createTime"
+        width="160"
+      ></el-table-column>
 
-      <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
+      <el-table-column
+        label="操作"
+        align="center"
+        width="180"
+        class-name="small-padding fixed-width"
+      >
         <template slot-scope="scope">
           <el-button
             v-hasPermi="['enterpriseWechat:view']"
@@ -300,7 +324,11 @@ export default {
             @click="handleRemove(scope.row.taskId)"
             >删除</el-button
           >
-          <el-button v-hasPermi="['enterpriseWechat:edit']" size="mini" type="text" @click="goRoute(scope.row.taskId)"
+          <el-button
+            v-hasPermi="['enterpriseWechat:edit']"
+            size="mini"
+            type="text"
+            @click="goRoute(scope.row.taskId)"
             >编辑</el-button
           >
         </template>
@@ -315,12 +343,21 @@ export default {
       @pagination="getList()"
     />
 
-    <el-dialog title="客户统计" :visible.sync="dialogVisible">
+    <el-dialog title="客户统计" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <div>
         <div class="top-search">
-          <el-form inline label-position="right" :model="customerQuery" label-width="80px" ref="customerForm">
+          <el-form
+            inline
+            label-position="right"
+            :model="customerQuery"
+            label-width="80px"
+            ref="customerForm"
+          >
             <el-form-item prop="customerName">
-              <el-input v-model="customerQuery.customerName" placeholder="请输入客户名称"></el-input>
+              <el-input
+                v-model="customerQuery.customerName"
+                placeholder="请输入客户名称"
+              ></el-input>
             </el-form-item>
             <el-form-item prop="isInGroup">
               <el-select v-model="customerQuery.isInGroup" placeholder="全部" size="small">
@@ -352,22 +389,14 @@ export default {
           <el-table-column label="客户名" align="center" prop="customerName"></el-table-column>
           <el-table-column prop="sent" label="送达状态" align="center">
             <template #default="{ row }">
-              <template v-if="row.sent">
-                已送达
-              </template>
-              <template v-else>
-                未送达
-              </template>
+              <template v-if="row.sent"> 已送达 </template>
+              <template v-else> 未送达 </template>
             </template>
           </el-table-column>
           <el-table-column prop="inGroup" label="是否在群" align="center">
             <template #default="{ row }">
-              <template v-if="row.inGroup">
-                在群
-              </template>
-              <template v-else>
-                不在群
-              </template>
+              <template v-if="row.inGroup"> 在群 </template>
+              <template v-else> 不在群 </template>
             </template>
           </el-table-column>
         </el-table>
@@ -385,13 +414,13 @@ export default {
 </template>
 
 <style scoped lang="scss">
-.overflow-ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+// .overflow-ellipsis {
+//   white-space: nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+// }
 
-.table-desc {
-  max-width: 120px;
-}
+// .table-desc {
+//   max-width: 120px;
+// }
 </style>

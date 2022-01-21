@@ -116,6 +116,22 @@ public class WeGroup extends BaseEntity{
      */
     private String adminUserId;
 
+
+    /**
+     * 客户数量
+     */
+    @TableField(exist = false)
+    private Integer customerNum;
+
+    /**
+     * 今日进群数
+     */
+    @TableField(exist = false)
+    private Integer toDayMemberNum;
+
+
+
+
     @TableLogic
     private Integer delFlag=new Integer(0);
 }

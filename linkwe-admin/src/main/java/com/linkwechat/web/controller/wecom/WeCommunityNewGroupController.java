@@ -37,7 +37,7 @@ import java.util.zip.ZipOutputStream;
  * @author kewen
  * @date 2021-02-19
  */
-@Api(description = "新客自动拉群 Controller")
+@Api(tags = "新客自动拉群 Controller")
 @RestController
 @RequestMapping(value = "/wecom/communityNewGroup")
 public class WeCommunityNewGroupController extends BaseController {
@@ -100,7 +100,7 @@ public class WeCommunityNewGroupController extends BaseController {
                 .map(e -> {
                     WeEmpleCode code = weEmpleCodeService.getById(e.getEmplCodeId());
                     Map<String, String> fileMap = new HashMap<>();
-                    fileMap.put("fileName", code.getUseUserName() + "-" + code.getScenario()+".jpg");
+                    fileMap.put("fileName", code.getScenario()+".jpg");
                     fileMap.put("url", code.getQrCode());
                     return fileMap;
                 })

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeMomentsInteracteMapper">
+    <insert id="batchAddOrUpdate">
+        REPLACE INTO we_moments_interacte(
+        interacte_user_id,
+        interacte_type,
+        moment_id,
+        interacte_user_type,
+        interacte_time
+        ) values
+        <foreach collection="weMomentsInteracte" item="item" index="index" separator=",">
+            (#{item.interacteUserId},#{item.interacteType},#{item.momentId},#{item.interacteUserType},#{item.interacteTime})
+        </foreach>
+    </insert>
+</mapper>

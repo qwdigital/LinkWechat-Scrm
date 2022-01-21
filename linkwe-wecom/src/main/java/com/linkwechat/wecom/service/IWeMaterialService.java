@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.wecom.domain.WeMaterial;
 import com.linkwechat.wecom.domain.dto.WeMediaDto;
 import com.linkwechat.wecom.domain.vo.WeMaterialFileVO;
@@ -15,7 +16,7 @@ import java.util.List;
  * @author KEWEN
  * @date 2020-10-08
  */
-public interface IWeMaterialService {
+public interface IWeMaterialService extends IService<WeMaterial> {
 
     /**
      * 上传素材信息
@@ -94,6 +95,17 @@ public interface IWeMaterialService {
      */
     public WeMediaDto uploadTemporaryMaterial(String url, String type,String name);
 
+
+    /**
+     * 获取附件mediaid
+     * @param url
+     * @param type
+     * @param attachmentType 1：朋友圈；2:商品图册
+     * @param name
+     * @return
+     */
+    public WeMediaDto uploadAttachmentMaterial(String url, String type,Integer attachmentType, String name);
+
     /**
      * 上传素材图片
      * @param file
@@ -107,4 +119,6 @@ public interface IWeMaterialService {
      * @return
      */
     WeMediaDto getMediaToResponse(String mediaId);
+
+    public String mediaGet(String media_id, String fileType,String extentType);
 }

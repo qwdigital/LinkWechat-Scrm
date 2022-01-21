@@ -51,39 +51,39 @@
 
     <sql id="selectVO">
         SELECT wptg.task_id,
-        wptg.task_name,
-        wptg.welcome_msg,
-        wptg.send_type,
-        wptg.send_scope,
-        wptg.send_gender,
-        wptg.cus_begin_time,
-        wptg.cus_end_time,
-        wptg.create_by,
-        wptg.create_time,
-        wptg.update_by,
-        wptg.update_time,
-        wgc.code_url,
-        wgc.id as code_id,
-        IFNULL(
-        (
-        SELECT COUNT(*)
+               wptg.task_name,
+               wptg.welcome_msg,
+               wptg.send_type,
+               wptg.send_scope,
+               wptg.send_gender,
+               wptg.cus_begin_time,
+               wptg.cus_end_time,
+               wptg.create_by,
+               wptg.create_time,
+               wptg.update_by,
+               wptg.update_time,
+               wgc.code_url,
+               wgc.id as code_id,
+               IFNULL(
+                       (
+                           SELECT COUNT(*)
+                           FROM
+                               we_group_code_actual wgca
+                                   LEFT JOIN we_group_member wgm ON wgca.chat_id=wgm.chat_id
+                           WHERE wgca.group_code_id=wptg.group_code_id
+                       )
+                   ,0) AS total_member,
+               u.user_name,
+               u.user_id as user_id,
+               wt.`name` as tag_name,
+               wt.tag_id
         FROM
-        we_group_code_actual wgca
-        LEFT JOIN we_group_member wgm ON wgca.chat_id=wgm.chat_id
-        WHERE wgca.group_code_id=wptg.group_code_id
-        )
-        ,0) AS total_member,
-        u.user_name,
-        u.user_id as user_id,
-        wt.`name` as tag_name,
-        wt.tag_id
-        FROM
-        we_pres_tag_group wptg
-        LEFT JOIN we_pres_tag_group_tag gt ON gt.task_id = wptg.task_id and gt.del_flag = 0
-        LEFT JOIN we_group_code wgc ON wgc.id = wptg.group_code_id  and wgc.del_flag = 0
-        LEFT JOIN we_tag wt on wt.tag_id =gt.tag_id and wt.del_flag = 0
-        LEFT JOIN we_pres_tag_group_scope sc on sc.task_id = wptg.task_id and sc.del_flag = 0
-        LEFT JOIN we_user u on u.user_id = sc.we_user_id
+            we_pres_tag_group wptg
+                LEFT JOIN we_pres_tag_group_tag gt ON gt.task_id = wptg.task_id and gt.del_flag = 0
+                LEFT JOIN we_group_code wgc ON wgc.id = wptg.group_code_id  and wgc.del_flag = 0
+                LEFT JOIN we_tag wt on wt.tag_id =gt.tag_id and wt.del_flag = 0
+                LEFT JOIN we_pres_tag_group_scope sc on sc.task_id = wptg.task_id and sc.del_flag = 0
+                LEFT JOIN we_user u on u.user_id = sc.we_user_id
     </sql>
 
     <select id="selectListVO" resultMap="WePresTagGroupTaskListResult">
@@ -186,50 +186,50 @@
             cu.external_userid
         FROM
             we_customer cu
-            LEFT JOIN we_flower_customer_tag_rel tr ON tr.external_userid = cu.external_userid and tr.del_flag = 0
+                LEFT JOIN we_flower_customer_tag_rel tr ON tr.external_userid = cu.external_userid and tr.del_flag = 0
         WHERE
-        CASE
-            WHEN ( SELECT count(*) > 0 FROM we_pres_tag_group_tag WHERE task_id = #{taskId} and del_flag = 0)
-            THEN tr.tag_id IN ( SELECT tag_id FROM we_pres_tag_group_tag WHERE task_id = #{taskId}  and del_flag = 0)
-            ELSE 1 = 1
-        END
-        AND CASE
-            WHEN ( SELECT count(*) > 0 FROM we_pres_tag_group_scope WHERE task_id = #{taskId}  and del_flag = 0)
-            THEN cu.first_user_id IN ( SELECT we_user_id FROM we_pres_tag_group_scope WHERE task_id = #{taskId}  and del_flag = 0)
-            ELSE 1 = 1
-        END
-        AND CASE
-            WHEN ( SELECT cus_begin_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
-            THEN cu.first_add_time &gt;= ( SELECT t.cus_begin_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
-            ELSE 1 = 1
-        END
-        AND CASE
-            WHEN ( SELECT cus_end_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
-            THEN cu.first_add_time &lt;= (SELECT t.cus_end_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
-            WHEN (SELECT update_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})
-            THEN cu.first_add_time &lt;= ( SELECT t.update_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
-            WHEN (SELECT create_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})
-            THEN cu.first_add_time &lt;= ( SELECT t.create_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
-            ELSE 1 = 1
-        END
-        AND NOT EXISTS (
-            SELECT
-                *
-            FROM
-                we_group_member wgm
-                INNER JOIN we_group_code_actual ac USING ( chat_id )
-                INNER JOIN we_pres_tag_group task ON task.group_code_id = ac.group_code_id
-            WHERE
-                wgm.user_id = cu.external_userid
-                AND task.task_id = #{taskId}
-        )
-        AND CASE ( SELECT t.send_gender  FROM we_pres_tag_group t WHERE t.task_id = #{taskId})
-            WHEN 0 THEN 1 = 1
-            WHEN '1' THEN cu.gender = '1'
-            WHEN '2' THEN cu.gender = '2'
-            ELSE cu.gender = '0'
-        END
-        AND cu.del_flag = '0'
+            CASE
+                WHEN ( SELECT count(*) > 0 FROM we_pres_tag_group_tag WHERE task_id = #{taskId} and del_flag = 0)
+                    THEN tr.tag_id IN ( SELECT tag_id FROM we_pres_tag_group_tag WHERE task_id = #{taskId}  and del_flag = 0)
+                ELSE 1 = 1
+                END
+          AND CASE
+                  WHEN ( SELECT count(*) > 0 FROM we_pres_tag_group_scope WHERE task_id = #{taskId}  and del_flag = 0)
+                      THEN cu.first_user_id IN ( SELECT we_user_id FROM we_pres_tag_group_scope WHERE task_id = #{taskId}  and del_flag = 0)
+                  ELSE 1 = 1
+            END
+          AND CASE
+                  WHEN ( SELECT cus_begin_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
+                      THEN cu.first_add_time &gt;= ( SELECT t.cus_begin_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                  ELSE 1 = 1
+            END
+          AND CASE
+                  WHEN ( SELECT cus_end_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
+                      THEN cu.first_add_time &lt;= (SELECT t.cus_end_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                  WHEN (SELECT update_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})
+                      THEN cu.first_add_time &lt;= ( SELECT t.update_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                  WHEN (SELECT create_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})
+                      THEN cu.first_add_time &lt;= ( SELECT t.create_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                  ELSE 1 = 1
+            END
+          AND NOT EXISTS (
+                SELECT
+                    *
+                FROM
+                    we_group_member wgm
+                        INNER JOIN we_group_code_actual ac USING ( chat_id )
+                        INNER JOIN we_pres_tag_group task ON task.group_code_id = ac.group_code_id
+                WHERE
+                    wgm.user_id = cu.external_userid
+                  AND task.task_id = #{taskId}
+            )
+          AND CASE ( SELECT t.send_gender  FROM we_pres_tag_group t WHERE t.task_id = #{taskId})
+                  WHEN 0 THEN 1 = 1
+                  WHEN '1' THEN cu.gender = '1'
+                  WHEN '2' THEN cu.gender = '2'
+                  ELSE cu.gender = '0'
+            END
+          AND cu.del_flag = '0'
     </select>
 
     <select id="selectSenderInfo" resultType="com.linkwechat.wecom.domain.vo.SenderInfo">
@@ -238,50 +238,50 @@
             GROUP_CONCAT(DISTINCT cu.external_userid) as customerList
         FROM
             we_customer cu
-            LEFT JOIN we_flower_customer_tag_rel tr ON tr.external_userid = cu.external_userid and tr.del_flag = 0
+                LEFT JOIN we_flower_customer_tag_rel tr ON tr.external_userid = cu.external_userid and tr.del_flag = 0
         WHERE
-        CASE
-            WHEN ( SELECT count(*) > 0 FROM we_pres_tag_group_tag WHERE task_id = #{taskId}  and del_flag = 0)
-            THEN tr.tag_id IN ( SELECT tag_id FROM we_pres_tag_group_tag WHERE task_id = #{taskId} and del_flag = 0 )
-            ELSE 1 = 1
-        END
-        AND CASE
-            WHEN ( SELECT count(*) > 0 FROM we_pres_tag_group_scope WHERE task_id = #{taskId} and del_flag = 0 )
-            THEN cu.first_user_id IN ( SELECT we_user_id FROM we_pres_tag_group_scope WHERE task_id = #{taskId} and del_flag = 0 )
-            ELSE 1 = 1
-        END
-        AND CASE
-            WHEN ( SELECT cus_begin_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
-            THEN cu.first_add_time &gt;= ( SELECT t.cus_begin_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
-            ELSE 1 = 1
-        END
-        AND CASE
-            WHEN ( SELECT cus_end_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
-            THEN cu.first_add_time &lt;= (SELECT t.cus_end_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
-            WHEN (SELECT update_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})
-            THEN cu.first_add_time &lt;= ( SELECT t.update_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
-            WHEN (SELECT create_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})
-            THEN cu.first_add_time &lt;= ( SELECT t.create_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
-            ELSE 1 = 1
-        END
-        AND NOT EXISTS (
-            SELECT
-                *
-            FROM
-                we_group_member wgm
-                INNER JOIN we_group_code_actual ac USING ( chat_id )
-                INNER JOIN we_pres_tag_group task ON task.group_code_id = ac.group_code_id
-            WHERE
-                wgm.user_id = cu.external_userid
-                AND task.task_id = #{taskId}
-        )
-        AND CASE ( SELECT t.send_gender  FROM we_pres_tag_group t WHERE t.task_id = #{taskId})
-            WHEN 0 THEN 1 = 1
-            WHEN '1' THEN cu.gender = '1'
-            WHEN '2' THEN cu.gender = '2'
-            ELSE cu.gender = '0'
-        END
-        AND cu.del_flag = '0'
+            CASE
+                WHEN ( SELECT count(*) > 0 FROM we_pres_tag_group_tag WHERE task_id = #{taskId}  and del_flag = 0)
+                    THEN tr.tag_id IN ( SELECT tag_id FROM we_pres_tag_group_tag WHERE task_id = #{taskId} and del_flag = 0 )
+                ELSE 1 = 1
+                END
+          AND CASE
+                  WHEN ( SELECT count(*) > 0 FROM we_pres_tag_group_scope WHERE task_id = #{taskId} and del_flag = 0 )
+                      THEN cu.first_user_id IN ( SELECT we_user_id FROM we_pres_tag_group_scope WHERE task_id = #{taskId} and del_flag = 0 )
+                  ELSE 1 = 1
+            END
+          AND CASE
+                  WHEN ( SELECT cus_begin_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
+                      THEN cu.first_add_time &gt;= ( SELECT t.cus_begin_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                  ELSE 1 = 1
+            END
+          AND CASE
+                  WHEN ( SELECT cus_end_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
+                      THEN cu.first_add_time &lt;= (SELECT t.cus_end_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                  WHEN (SELECT update_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})
+                      THEN cu.first_add_time &lt;= ( SELECT t.update_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                  WHEN (SELECT create_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})
+                      THEN cu.first_add_time &lt;= ( SELECT t.create_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                  ELSE 1 = 1
+            END
+          AND NOT EXISTS (
+                SELECT
+                    *
+                FROM
+                    we_group_member wgm
+                        INNER JOIN we_group_code_actual ac USING ( chat_id )
+                        INNER JOIN we_pres_tag_group task ON task.group_code_id = ac.group_code_id
+                WHERE
+                    wgm.user_id = cu.external_userid
+                  AND task.task_id = #{taskId}
+            )
+          AND CASE ( SELECT t.send_gender  FROM we_pres_tag_group t WHERE t.task_id = #{taskId})
+                  WHEN 0 THEN 1 = 1
+                  WHEN '1' THEN cu.gender = '1'
+                  WHEN '2' THEN cu.gender = '2'
+                  ELSE cu.gender = '0'
+            END
+          AND cu.del_flag = '0'
         GROUP BY cu.first_user_id
     </select>
 
@@ -290,50 +290,50 @@
             cu.first_user_id
         FROM
             we_customer cu
-            LEFT JOIN we_flower_customer_tag_rel tr ON tr.external_userid = cu.external_userid and tr.del_flag = 0
+                LEFT JOIN we_flower_customer_tag_rel tr ON tr.external_userid = cu.external_userid and tr.del_flag = 0
         WHERE
-        CASE
-            WHEN ( SELECT count(*) > 0 FROM we_pres_tag_group_tag WHERE task_id = #{taskId} and del_flag = 0 )
-            THEN tr.tag_id IN ( SELECT tag_id FROM we_pres_tag_group_tag WHERE task_id = #{taskId} and del_flag = 0 )
-            ELSE 1 = 1
-        END
-        AND CASE
-            WHEN ( SELECT count(*) > 0 FROM we_pres_tag_group_scope WHERE task_id = #{taskId} and del_flag = 0 )
-            THEN cu.first_user_id IN ( SELECT we_user_id FROM we_pres_tag_group_scope WHERE task_id = #{taskId} and del_flag = 0 )
-            ELSE 1 = 1
-        END
-        AND CASE
-            WHEN ( SELECT cus_begin_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
-            THEN cu.first_add_time &gt;= ( SELECT t.cus_begin_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
-            ELSE 1 = 1
-        END
-        AND CASE
-            WHEN ( SELECT cus_end_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
-            THEN cu.first_add_time &lt;= (SELECT t.cus_end_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
-            WHEN (SELECT update_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})
-            THEN cu.first_add_time &lt;= ( SELECT t.update_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
-            WHEN (SELECT create_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})
-            THEN cu.first_add_time &lt;= ( SELECT t.create_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
-            ELSE 1 = 1
-        END
-            AND NOT EXISTS (
+            CASE
+                WHEN ( SELECT count(*) > 0 FROM we_pres_tag_group_tag WHERE task_id = #{taskId} and del_flag = 0 )
+                    THEN tr.tag_id IN ( SELECT tag_id FROM we_pres_tag_group_tag WHERE task_id = #{taskId} and del_flag = 0 )
+                ELSE 1 = 1
+                END
+          AND CASE
+                  WHEN ( SELECT count(*) > 0 FROM we_pres_tag_group_scope WHERE task_id = #{taskId} and del_flag = 0 )
+                      THEN cu.first_user_id IN ( SELECT we_user_id FROM we_pres_tag_group_scope WHERE task_id = #{taskId} and del_flag = 0 )
+                  ELSE 1 = 1
+            END
+          AND CASE
+                  WHEN ( SELECT cus_begin_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
+                      THEN cu.first_add_time &gt;= ( SELECT t.cus_begin_time  FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                  ELSE 1 = 1
+            END
+          AND CASE
+                  WHEN ( SELECT cus_end_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
+                      THEN cu.first_add_time &lt;= (SELECT t.cus_begin_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                  WHEN (SELECT update_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})
+                      THEN cu.first_add_time &lt;= ( SELECT t.update_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                  WHEN (SELECT create_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})
+                      THEN cu.first_add_time &lt;= ( SELECT t.create_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                  ELSE 1 = 1
+            END
+          AND NOT EXISTS (
                 SELECT
                     *
                 FROM
                     we_group_member wgm
-                    INNER JOIN we_group_code_actual ac USING ( chat_id )
-                    INNER JOIN we_pres_tag_group task ON task.group_code_id = ac.group_code_id
+                        INNER JOIN we_group_code_actual ac USING ( chat_id )
+                        INNER JOIN we_pres_tag_group task ON task.group_code_id = ac.group_code_id
                 WHERE
                     wgm.user_id = cu.external_userid
-                    AND task.task_id = #{taskId}
+                  AND task.task_id = #{taskId}
             )
-        AND CASE ( SELECT t.send_gender  FROM we_pres_tag_group t WHERE t.task_id = #{taskId})
-            WHEN 0 THEN 1 = 1
-            WHEN '1' THEN cu.gender = '1'
-            WHEN '2' THEN cu.gender = '2'
-            ELSE cu.gender = '0'
-        END
-        AND cu.del_flag = '0'
+          AND CASE ( SELECT t.send_gender  FROM we_pres_tag_group t WHERE t.task_id = #{taskId})
+                  WHEN 0 THEN 1 = 1
+                  WHEN '1' THEN cu.gender = '1'
+                  WHEN '2' THEN cu.gender = '2'
+                  ELSE cu.gender = '0'
+            END
+          AND cu.del_flag = '0'
     </select>
 
     <select id="selectTaskExternalByFollowerId" resultType="String">
@@ -341,46 +341,46 @@
             cu.external_userid
         FROM
             we_customer cu
-            LEFT JOIN we_flower_customer_tag_rel tr ON tr.external_userid = cu.external_userid and tr.del_flag =0
+                LEFT JOIN we_flower_customer_tag_rel tr ON tr.external_userid = cu.external_userid and tr.del_flag =0
         WHERE
             CASE
                 WHEN ( SELECT count(*) > 0 FROM we_pres_tag_group_tag WHERE task_id = #{taskId} and del_flag = 0 )
-                THEN tr.tag_id IN ( SELECT tag_id FROM we_pres_tag_group_tag WHERE task_id = #{taskId}  and del_flag = 0)
+                    THEN tr.tag_id IN ( SELECT tag_id FROM we_pres_tag_group_tag WHERE task_id = #{taskId}  and del_flag = 0)
                 ELSE 1 = 1
+                END
+          AND CASE
+                  WHEN ( SELECT cus_begin_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
+                      THEN cu.first_add_time &gt;= ( SELECT t.cus_begin_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                  ELSE 1 = 1
             END
-            AND CASE
-                WHEN ( SELECT cus_begin_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
-                THEN cu.first_add_time &gt;= ( SELECT t.cus_begin_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
-                ELSE 1 = 1
+          AND CASE
+                  WHEN ( SELECT cus_end_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
+                      THEN cu.first_add_time &lt;= (SELECT t.cus_end_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                  WHEN (SELECT update_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})
+                      THEN cu.first_add_time &lt;= ( SELECT t.update_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                  WHEN (SELECT create_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})
+                      THEN cu.first_add_time &lt;= ( SELECT t.create_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
+                  ELSE 1 = 1
             END
-            AND CASE
-                WHEN ( SELECT cus_end_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId} )
-                THEN cu.first_add_time &lt;= (SELECT t.cus_end_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
-                WHEN (SELECT update_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})
-                THEN cu.first_add_time &lt;= ( SELECT t.update_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
-                WHEN (SELECT create_time is not null FROM we_pres_tag_group WHERE task_id = #{taskId})
-                THEN cu.first_add_time &lt;= ( SELECT t.create_time FROM we_pres_tag_group t WHERE t.task_id = #{taskId} )
-                ELSE 1 = 1
-            END
-            AND NOT EXISTS (
+          AND NOT EXISTS (
                 SELECT
                     *
                 FROM
                     we_group_member wgm
-                    INNER JOIN we_group_code_actual ac USING ( chat_id )
-                    INNER JOIN we_pres_tag_group task ON task.group_code_id = ac.group_code_id
+                        INNER JOIN we_group_code_actual ac USING ( chat_id )
+                        INNER JOIN we_pres_tag_group task ON task.group_code_id = ac.group_code_id
                 WHERE
                     wgm.user_id = cu.external_userid
-                    AND task.task_id = #{taskId}
+                  AND task.task_id = #{taskId}
             )
-            AND CASE ( SELECT t.send_gender  FROM we_pres_tag_group t WHERE t.task_id = #{taskId})
-                WHEN 0 THEN 1 = 1
-                WHEN '1' THEN cu.gender = '1'
-                WHEN '2' THEN cu.gender = '2'
-                ELSE cu.gender = '0'
+          AND CASE ( SELECT t.send_gender  FROM we_pres_tag_group t WHERE t.task_id = #{taskId})
+                  WHEN 0 THEN 1 = 1
+                  WHEN '1' THEN cu.gender = '1'
+                  WHEN '2' THEN cu.gender = '2'
+                  ELSE cu.gender = '0'
             END
-            AND cu.del_flag = '0'
-            AND tr.user_id = #{followerId}
+          AND cu.del_flag = '0'
+          AND tr.user_id = #{followerId}
     </select>
 
     <select id="getGroupMemberExternalIdsByTaskId" parameterType="Long" resultType="String">
@@ -388,9 +388,9 @@
             wc.external_userid
         FROM
             we_customer wc
-            LEFT JOIN we_group_member wgm ON wgm.user_id = wc.external_userid AND wgm.del_flag = 0
-            LEFT JOIN we_group_code_actual wgca ON wgca.chat_id = wgm.chat_id AND wgca.del_flag = 0
-            LEFT JOIN we_pres_tag_group wptg ON wptg.group_code_id = wgca.group_code_id
+                LEFT JOIN we_group_member wgm ON wgm.user_id = wc.external_userid AND wgm.del_flag = 0
+                LEFT JOIN we_group_code_actual wgca ON wgca.chat_id = wgm.chat_id AND wgca.del_flag = 0
+                LEFT JOIN we_pres_tag_group wptg ON wptg.group_code_id = wgca.group_code_id
         WHERE
             wptg.task_id = #{taskId}
     </select>

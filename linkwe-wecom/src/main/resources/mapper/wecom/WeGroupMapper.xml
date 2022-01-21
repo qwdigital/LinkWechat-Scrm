@@ -12,22 +12,26 @@
         wg.create_time,
         wg.notice,
         wu.user_name as groupLeaderName,
-        (SELECT COUNT(*) FROM we_group_member wgm WHERE wgm.chat_id=wg.chat_id) as memberNum,
+        (SELECT COUNT(*) FROM we_group_member wgm WHERE wgm.chat_id=wg.chat_id and wgm.del_flag=0) as memberNum,
+        (SELECT COUNT(*) FROM we_group_member wgm WHERE wgm.chat_id=wg.chat_id and wgm.type=2 and wgm.del_flag=0) as customerNum,
+        (SELECT COUNT(*) FROM we_group_member wgm WHERE wgm.chat_id=wg.chat_id and wgm.del_flag=0 and to_days(wgm.join_time) = to_days(now())) as toDayMemberNum,
         wg.status,
         wg.`owner`,
-        (SELECT GROUP_CONCAT(wt.`name`) FROM we_group_tag_rel wgtr LEFT JOIN we_tag  wt ON wt.tag_id=wgtr.tag_id WHERE  wg.chat_id=wgtr.chat_id) as tags,
-        (SELECT GROUP_CONCAT(wt.`tag_id`) FROM we_group_tag_rel wgtr LEFT JOIN we_tag  wt ON wt.tag_id=wgtr.tag_id WHERE  wg.chat_id=wgtr.chat_id) as tagIds
+        GROUP_CONCAT(wt.`name`) as tags,
+        GROUP_CONCAT(wt.`tag_id`) as tagIds
         FROM
         we_group wg
         LEFT JOIN  we_user wu ON wg.`owner`=wu.user_id
+        LEFT JOIN we_group_tag_rel wgtr  ON wg.chat_id=wgtr.chat_id
+        LEFT JOIN we_tag  wt  ON wt.tag_id=wgtr.tag_id
         <where>
+            <if test="chatId !=null and chatId !=''">wg.chat_id=#{chatId}</if>
             <if test="delFlag !=null"> wg.del_flag=#{delFlag}</if>
             <if test="groupName != null  and groupName != ''"> and wg.group_name like concat('%', #{groupName}, '%')</if>
-            <if test="groupLeader != null  and groupLeader != ''"> and wu.user_name like concat('%', #{groupLeader}, '%')</if>
+            <if test="groupLeaderName != null  and groupLeaderName != ''"> and wu.user_name like concat('%', #{groupLeaderName}, '%')</if>
             <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
                 AND date_format(wg.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
             </if>
-
             <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
                 AND date_format(wg.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
             </if>
@@ -42,7 +46,15 @@
                     AND wg.`owner`=#{userIds}
                 </if>
             </if>
+            <if test="tagIds !=null and tagIds !=''">
+                AND wt.tag_id in
+                <foreach item="item" index="index" collection="tagIds.split(',')" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
         </where>
+       GROUP BY  wg.chat_id
+       ORDER BY  wg.create_time DESC
     </select>
 
 
@@ -64,14 +76,14 @@
 
 
     <insert id="insertBatch">
-        insert into we_group (chat_id, group_name, owner, add_time, notice, status,admin_user_id, create_by, create_time,update_by, update_time)
+        insert into we_group (chat_id, group_name, owner, add_time, notice, status,admin_user_id, create_by, create_time,update_by, update_time,del_flag)
         values
         <foreach collection="weGroups" item="weGroup" index="index" separator=",">
             (#{weGroup.chatId},#{weGroup.groupName},#{weGroup.owner},#{weGroup.addTime},#{weGroup.notice},#{weGroup.status},#{weGroup.adminUserId},
-            #{weGroup.createBy},#{weGroup.createTime},#{weGroup.updateBy},#{weGroup.updateTime})
+            #{weGroup.createBy},#{weGroup.createTime},#{weGroup.updateBy},#{weGroup.updateTime},#{weGroup.delFlag})
         </foreach>
         on duplicate key update group_name= values(group_name),owner= values(owner),
         notice= values(notice),status= values(status),admin_user_id= values(admin_user_id),
-        update_by= values(update_by),update_time= values(update_time)
+        update_by= values(update_by),update_time= values(update_time),del_flag=values(del_flag)
     </insert>
 </mapper>

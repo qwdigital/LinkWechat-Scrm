@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.wecom.mapper.WeQrScopeMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.wecom.domain.WeQrScope" id="WeQrScopeResult">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="qrId" column="qr_id" jdbcType="INTEGER"/>
+        <result property="scopeId" column="scope_id" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="INTEGER"/>
+        <result property="scopeType" column="scope_type" jdbcType="INTEGER"/>
+        <result property="party" column="party" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="workCycle" column="work_cycle" jdbcType="VARCHAR"/>
+        <result property="beginTime" column="begin_time" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="QrScopeResult" type="com.linkwechat.wecom.domain.vo.qr.WeQrScopeVo">
+        <result property="qrId" column="qr_id" jdbcType="INTEGER"/>
+        <result property="type" column="type" jdbcType="INTEGER"/>
+        <result property="scopeId" column="scope_id" jdbcType="VARCHAR"/>
+        <result property="beginTime" column="begin_time" jdbcType="VARCHAR"/>
+        <result property="endTime" column="end_time" jdbcType="VARCHAR"/>
+        <result property="workCycle" column="work_cycle" jdbcType="VARCHAR"/>
+        <collection property="weQrUserList" ofType="com.linkwechat.wecom.domain.vo.qr.WeQrScopeUserVo">
+            <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+            <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+        </collection>
+        <collection property="weQrPartyList" ofType="com.linkwechat.wecom.domain.vo.qr.WeQrScopePartyVo">
+            <result property="party" column="party" jdbcType="VARCHAR"/>
+            <result property="partyName" column="party_name" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+
+    <sql id="selectWeQrScopeVo">
+        select id, qr_id, scope_id, type, scope_type, party, user_id, work_cycle, begin_time, end_time, create_by, create_time, update_by, update_time, del_flag from we_qr_scope
+    </sql>
+
+    <select id="getWeQrScopeByQrIds" resultMap="QrScopeResult">
+        select
+        wqs.qr_id,
+        wqs.scope_id,
+        wqs.scope_type,
+        wqs.`type`,
+        wqs.begin_time,
+        wqs.end_time,
+        wqs.work_cycle,
+        wqs.user_id,
+        if(wqs.user_id is null,null,(select wu.user_name from we_user wu where wu.user_id = wqs.user_id limit 1)) as user_name,
+        wqs.party,
+        if(wqs.party is null,null,(select wd.name from we_department wd where wd.id= wqs.party limit 1)) as party_name
+        from we_qr_scope wqs
+        <where>
+            <if test="qrIds != null and qrIds.size > 0">
+                and wqs.qr_id in
+                <foreach item="qrId" collection="qrIds" index="index" open="(" separator="," close=")">
+                    #{qrId}
+                </foreach>
+            </if>
+            and wqs.del_flag = 0
+        </where>
+
+    </select>
+
+    <select id="getWeQrScopeByTime" resultMap="QrScopeResult">
+        select
+        wqs.qr_id,
+        wqs.scope_id,
+        wqs.scope_type,
+        wqs.`type`,
+        wqs.begin_time,
+        wqs.end_time,
+        wqs.work_cycle,
+        wqs.user_id,
+        wqs.party
+        from we_qr_scope wqs
+        where  find_in_set(dayofweek(curdate())-1,wqs.work_cycle)
+        and date_format(concat(date_format(curdate(),'%Y-%m-%d '),wqs.begin_time), '%H:%i:%s') &lt;= date_format(#{formatTime},'%H:%i:%s')
+        and date_format(concat(date_format(curdate(),'%Y-%m-%d '),wqs.end_time), '%H:%i:%s') &gt;= date_format(#{formatTime},'%H:%i:%s')
+        <if test="qrId != null and qrId != ''">
+            and wqs.qr_id = #{qrId}
+        </if>
+        and wqs.del_flag = 0
+    </select>
+</mapper>

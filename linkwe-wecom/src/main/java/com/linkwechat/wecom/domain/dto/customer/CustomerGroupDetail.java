@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.wecom.domain.dto.WeResultDto;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
@@ -53,11 +55,13 @@ public class CustomerGroupDetail extends WeResultDto {
      */
     @AllArgsConstructor
     @Data
-    public class Params{
+    @Builder
+    @NoArgsConstructor
+    public static class Params{
 
 
         private String chat_id;
-
+//是否需要返回群成员的名字group_chat.member_list.name。0-不返回；1-返回。默认不返回
         private Integer need_name;
 
     }

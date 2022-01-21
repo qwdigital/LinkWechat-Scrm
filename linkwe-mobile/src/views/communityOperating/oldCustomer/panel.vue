@@ -2,7 +2,7 @@
   <div>
     <div class="task-wrapper">
       <div class="header">
-        <span> 老客标签建群 </span>
+        <span> 标签建群 </span>
         <div>{{ task.createTime }}</div>
       </div>
 
@@ -11,7 +11,9 @@
           {{ task.welcomeMsg }}
         </div>
         <div class="copy-wrapper" v-show="showCopy">
-          <van-button :class="'copy-btn_' + task.taskId" :data-clipboard-text="task.welcomeMsg"> 复制 </van-button>
+          <van-button :class="'copy-btn_' + task.taskId" :data-clipboard-text="task.welcomeMsg">
+            复制
+          </van-button>
         </div>
       </div>
 
@@ -187,11 +189,19 @@ export default {
       let groupCodeInfo = this.task.groupCodeInfo
       if (window.location.hash[0] === '#') {
         return (
-          window.location.origin + window.location.pathname + '#/groupCode?id=' + (groupCodeInfo && groupCodeInfo.id)
+          window.location.origin +
+          window.location.pathname +
+          '#/groupCode?id=' +
+          (groupCodeInfo && groupCodeInfo.id)
         )
       }
 
-      return window.location.origin + window.location.pathname + 'groupCode?id=' + (groupCodeInfo && groupCodeInfo.id)
+      return (
+        window.location.origin +
+        window.location.pathname +
+        'groupCode?id=' +
+        (groupCodeInfo && groupCodeInfo.id)
+      )
     }
   },
 

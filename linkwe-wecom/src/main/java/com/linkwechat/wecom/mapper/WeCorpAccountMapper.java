@@ -14,12 +14,6 @@ public interface WeCorpAccountMapper extends BaseMapper<WeCorpAccount>
 {
 
 
-    /**
-     * 启用有效的企业微信账号
-     * @param corpId
-     * @return
-     */
-     int startVailWeCorpAccount(@Param("corpId") String corpId);
 
 
 }

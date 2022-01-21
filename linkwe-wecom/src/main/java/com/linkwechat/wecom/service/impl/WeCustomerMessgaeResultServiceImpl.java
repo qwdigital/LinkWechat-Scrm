@@ -57,7 +57,7 @@ public class WeCustomerMessgaeResultServiceImpl extends ServiceImpl<WeCustomerMe
                     customerMessgaeResult.setSendTime(null);
                     customerMessgaeResult.setSendType(customerMessgaeResult.getSettingTime() == null ? customerMessagePushDto.getPushType() : "2");
                     customerMessgaeResult.setExternalUserid(customer.getExternalUserid());
-                    customerMessgaeResult.setExternalName(customer.getCustomerName());
+                    customerMessgaeResult.setExternalName(customer.getName());
                     customerMessgaeResult.setUserid(customer.getFirstUserId());
                     customerMessgaeResult.setUserName(customer.getUserName());
                     customerMessgaeResult.setStatus("0");

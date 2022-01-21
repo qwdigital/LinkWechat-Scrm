@@ -1,11 +1,6 @@
 <script>
 import RealCode from './realCode'
-import {
-  getList,
-  remove,
-  downloadBatch,
-  download
-} from '@/api/drainageCode/group'
+import { getList, remove, downloadBatch, download } from '@/api/drainageCode/group'
 import ClipboardJS from 'clipboard'
 
 export default {
@@ -132,15 +127,11 @@ export default {
     },
     // 批量删除
     handleBulkRemove() {
-      this.$confirm(
-        '确认删除当前群活码?删除操作无法撤销，请谨慎操作。',
-        '提示',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      )
+      this.$confirm('确认删除当前群活码?删除操作无法撤销，请谨慎操作。', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
         .then(() => {
           const ids = this.multiGroupCode.map((group) => group.id)
 
@@ -171,15 +162,11 @@ export default {
     },
     // 删除
     handleRemove(codeId) {
-      this.$confirm(
-        '确认删除当前群活码?删除操作无法撤销，请谨慎操作。',
-        '提示',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      )
+      this.$confirm('确认删除当前群活码?删除操作无法撤销，请谨慎操作。', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
         .then(() => {
           remove(codeId).then((res) => {
             if (res.code === 200) {
@@ -206,24 +193,12 @@ export default {
 
 <template>
   <div class="page">
-    <el-form
-      ref="queryForm"
-      :model="query"
-      inline
-      class="top-search"
-      label-width="100px"
-    >
+    <el-form ref="queryForm" :model="query" inline class="top-search" label-width="100px">
       <el-form-item label="活码名称" prop="activityName">
-        <el-input
-          v-model="query.activityName"
-          placeholder="请输入活码名称"
-        ></el-input>
+        <el-input v-model="query.activityName" placeholder="请输入活码名称"></el-input>
       </el-form-item>
       <el-form-item label="创建人" prop="createBy">
-        <el-input
-          v-model="query.createBy"
-          placeholder="请输入创建人"
-        ></el-input>
+        <el-input v-model="query.createBy" placeholder="请输入创建人"></el-input>
       </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
@@ -244,73 +219,36 @@ export default {
 
     <div class="mid-action">
       <div>
-        <el-button
-          type="primary"
-          @click="$router.push('/drainageCode/groupAdd')"
+        <el-button type="primary" @click="$router.push('/drainageCode/groupAdd')"
           >新建群活码</el-button
         >
       </div>
       <div>
-        <el-button
-          :disabled="multiGroupCode.length === 0"
-          @click="handleBulkDownload"
+        <el-button :disabled="multiGroupCode.length === 0" @click="handleBulkDownload"
           >批量下载</el-button
         >
-        <el-button
-          :disabled="multiGroupCode.length === 0"
-          @click="handleBulkRemove"
+        <el-button :disabled="multiGroupCode.length === 0" @click="handleBulkRemove"
           >批量删除</el-button
         >
       </div>
     </div>
 
-    <el-table
-      :data="groupCodes"
-      v-loading="loading"
-      @selection-change="handleSelectionChange"
-    >
-      <el-table-column
-        type="selection"
-        width="55"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        prop="activityName"
-        label="活码名称"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        prop="activityDesc"
-        label="活码描述"
-        align="center"
-        width="160"
-      >
+    <el-table :data="groupCodes" v-loading="loading" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" align="center"></el-table-column>
+      <el-table-column prop="activityName" label="活码名称" align="center"></el-table-column>
+      <el-table-column prop="activityDesc" label="活码描述" align="center" width="160">
         <template #default="{ row }">
-          <el-popover
-            placement="bottom"
-            width="200"
-            trigger="hover"
-            :content="row.activityDesc"
-          >
+          <el-popover placement="bottom" width="200" trigger="hover" :content="row.activityDesc">
             <div slot="reference" class="table-desc overflow-ellipsis">
               {{ row.activityDesc }}
             </div>
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="codeUrl"
-        label="活码样式"
-        align="center"
-        width="130"
-      >
+      <el-table-column prop="codeUrl" label="活码样式" align="center" width="130">
         <template #default="{ row }">
           <el-popover placement="bottom" trigger="hover">
-            <el-image
-              slot="reference"
-              :src="row.codeUrl"
-              class="code-image--small"
-            ></el-image>
+            <el-image slot="reference" :src="row.codeUrl" class="code-image--small"></el-image>
             <el-image :src="row.codeUrl" class="code-image"> </el-image>
           </el-popover>
         </template>
@@ -322,11 +260,7 @@ export default {
           </el-button>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="availableCodes"
-        label="可用实际群码数"
-        align="center"
-      >
+      <el-table-column prop="availableCodes" label="可用实际群码数" align="center">
         <template #default="{ row }">
           <el-popover
             v-if="row.aboutToExpireCodes > 0"
@@ -342,21 +276,9 @@ export default {
           </el-button>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="totalScanTimes"
-        label="扫码总次数"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        prop="createBy"
-        label="创建人"
-        align="center"
-      ></el-table-column>
-      <el-table-column
-        prop="createTime"
-        label="创建时间"
-        align="center"
-      ></el-table-column>
+      <el-table-column prop="totalScanTimes" label="已扫码入群数" align="center"></el-table-column>
+      <el-table-column prop="createBy" label="创建人" align="center"></el-table-column>
+      <el-table-column prop="createTime" label="创建时间" align="center"></el-table-column>
       <el-table-column label="操作" align="center">
         <template #default="{ row }">
           <el-button
@@ -370,22 +292,13 @@ export default {
             "
             >编辑</el-button
           >
-          <el-button
-            type="text"
-            size="mini"
-            @click="handleDownload(row.id, row.activityName)"
+          <el-button type="text" size="mini" @click="handleDownload(row.id, row.activityName)"
             >下载</el-button
           >
-          <el-button
-            type="text"
-            size="mini"
-            class="copy-btn"
-            :data-clipboard-text="row.codeUrl"
+          <el-button type="text" size="mini" class="copy-btn" :data-clipboard-text="row.codeUrl"
             >复制</el-button
           >
-          <el-button type="text" size="mini" @click="handleRemove(row.id)"
-            >删除</el-button
-          >
+          <el-button type="text" size="mini" @click="handleRemove(row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

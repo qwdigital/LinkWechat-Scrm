@@ -27,21 +27,11 @@ export default {
       codes: [],
       groupQrCode: {},
       rules: Object.freeze({
-        codeName: [
-          { required: true, message: '该项为必填项', trigger: 'blur' }
-        ],
-        emplList: [
-          { required: true, message: '该项为必填项', trigger: 'blur' }
-        ],
-        tagList: [
-          { required: true, message: '该项为必填项', trigger: 'change' }
-        ],
-        groupCodeId: [
-          { required: true, message: '该项为必填项', trigger: 'blur' }
-        ],
-        welcomeMsg: [
-          { required: true, message: '该项为必填项', trigger: 'blur' }
-        ]
+        codeName: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
+        emplList: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
+        tagList: [{ required: true, message: '该项为必填项', trigger: 'change' }],
+        groupCodeId: [{ required: true, message: '该项为必填项', trigger: 'blur' }],
+        welcomeMsg: [{ required: true, message: '该项为必填项', trigger: 'blur' }]
       })
     }
   },
@@ -57,8 +47,7 @@ export default {
   created() {
     this.newGroupId = this.$route.query.id
     this.newGroupId && this.getDetail(this.newGroupId)
-    this.$route.meta.title =
-      (this.newGroupId ? '编辑' : '新建') + '新客自动拉群'
+    this.$route.meta.title = (this.newGroupId ? '编辑' : '新建') + '新客自动拉群'
   },
   methods: {
     /** 获取详情 */
@@ -199,9 +188,7 @@ export default {
       </el-form-item>
       <el-form-item label="新客户标签" prop="tags">
         <!-- closable -->
-        <el-tag size="medium" v-for="(tag, index) in tags" :key="index">{{
-          tag.tagName
-        }}</el-tag>
+        <el-tag size="medium" v-for="(tag, index) in tags" :key="index">{{ tag.tagName }}</el-tag>
         <el-button
           type="primary"
           :class="tags.length > 0 ? 'ml10' : ''"
@@ -233,11 +220,7 @@ export default {
         :message="form.welcomeMsg || '请输入加群引导语'"
         :isOther="groupQrCode && groupQrCode.codeUrl ? true : false"
       >
-        <el-image
-          class="phone-dialog-image"
-          :src="groupQrCode.codeUrl"
-          fit="fit"
-        ></el-image>
+        <el-image class="phone-dialog-image" :src="groupQrCode.codeUrl" fit="fit"></el-image>
       </PhoneDialog>
     </div>
 

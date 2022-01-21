@@ -122,7 +122,7 @@ public class WeSensitiveActHitServiceImpl extends ServiceImpl<WeSensitiveActHitM
             List<WeCustomer> weCustomers = weCustomerMapper.selectList(new LambdaQueryWrapper<WeCustomer>()
                     .eq(WeCustomer::getExternalUserid, userId));
             if(CollectionUtils.isNotEmpty(weCustomers)){
-                return weCustomers.stream().findFirst().get().getName();
+                return weCustomers.stream().findFirst().get().getCustomerName();
             }
 //            if (weCustomer != null) {
 //                return weCustomer.getName();

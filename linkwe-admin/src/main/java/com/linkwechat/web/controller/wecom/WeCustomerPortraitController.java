@@ -1,14 +1,14 @@
 package com.linkwechat.web.controller.wecom;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
-import com.linkwechat.wecom.domain.WeCustomerPortrait;
-import com.linkwechat.wecom.domain.WeCustomerTrajectory;
-import com.linkwechat.wecom.domain.WeFlowerCustomerTagRel;
-import com.linkwechat.wecom.domain.WeTagGroup;
+import com.linkwechat.wecom.domain.*;
 import com.linkwechat.wecom.domain.vo.WeMakeCustomerTag;
 import com.linkwechat.wecom.service.*;
 import org.aspectj.weaver.loadtime.Aj;
@@ -31,8 +31,13 @@ public class WeCustomerPortraitController extends BaseController {
     private IWeCustomerService iWeCustomerService;
 
 
+
+
     @Autowired
-    private IWeTagGroupService weTagGroupService;
+    private IWeTagService iWeTagService;
+
+    @Autowired
+    private IWeTagGroupService iWeTagGroupService;
 
 
     @Autowired
@@ -46,6 +51,11 @@ public class WeCustomerPortraitController extends BaseController {
 
     @Autowired
     private IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
+
+
+    @Autowired
+    IWeMomentsService iWeMomentsService;
+
 
 
     /**
@@ -81,21 +91,70 @@ public class WeCustomerPortraitController extends BaseController {
 
 
 
+
+
+
     /**
      * 获取当前系统所有可用标签
+     * @param userId 员工id
      * @return
      */
     @GetMapping(value = "/findAllTags")
-    public AjaxResult findAllTags(){
+    public AjaxResult findAllTags(Integer groupTagType,String userId){
 
+        if(groupTagType.equals(new Integer(1))){//企业标签
+            return AjaxResult.success(
+                    iWeTagGroupService.selectWeTagGroupList(
+                            WeTagGroup.builder()
+                                    .groupTagType(1)
+                                    .build()
+                    )
+            );
+        }
         return AjaxResult.success(
-                weTagGroupService.selectWeTagGroupList(
-                        WeTagGroup.builder()
-                                .build()
+                iWeTagService.list(
+                        new LambdaQueryWrapper<WeTag>()
+                                .eq(WeTag::getDelFlag,new Integer(0))
+                                .eq(WeTag::getOwner,userId)
                 )
+
         );
 
     }
+
+
+    /**
+     * 客户画像个人标签库新增
+     * @param weTagGroup
+     * @return
+     */
+    @PostMapping("/addOrUpdatePersonTags")
+    public AjaxResult addOrUpdatePersonTags(@RequestBody WeTagGroup weTagGroup){
+            List<WeTag> weTags = weTagGroup.getWeTags();
+            if(CollectionUtil.isNotEmpty(weTags)){
+                weTags.stream().forEach(k->{
+                    k.setGroupId(weTagGroup.getGroupId());
+                    k.setTagType(new Integer(3));
+                });
+                iWeTagService.saveOrUpdateBatch(weTags);
+            }
+        return AjaxResult.success();
+    }
+
+
+    /**
+     * 个人标签删除
+     * @param ids
+     * @return
+     */
+    @DeleteMapping("/deletePersonTag/{ids}")
+    public AjaxResult deletePersonTag(@PathVariable String[] ids){
+        iWeTagService.removeByIds(CollectionUtil.newArrayList(ids));
+
+        return AjaxResult.success();
+    }
+
+
 
 
     /**
@@ -165,7 +224,7 @@ public class WeCustomerPortraitController extends BaseController {
 
 
     /**
-     * 添加或编辑轨迹
+     *编辑跟进动态
      * @param trajectory
      * @return
      */
@@ -173,7 +232,7 @@ public class WeCustomerPortraitController extends BaseController {
     public AjaxResult addOrEditWaitHandle(@RequestBody WeCustomerTrajectory trajectory){
 
 
-        iWeCustomerTrajectoryService.saveOrUpdate(trajectory);
+        iWeCustomerService.addOrEditWaitHandle(trajectory);
 
         return AjaxResult.success();
     }
@@ -209,6 +268,19 @@ public class WeCustomerPortraitController extends BaseController {
     }
 
 
+
+    /**
+     * 个人朋友圈互动数据同步
+     * @param userId
+     * @return
+     */
+    @GetMapping("/synchMomentsInteracte/{userId}")
+    public AjaxResult synchMomentsInteracte(@PathVariable String userId){
+
+        iWeMomentsService.synchMomentsInteracte(CollectionUtil.newArrayList(userId));
+
+        return AjaxResult.success(WeConstans.SYNCH_TIP);
+    }
 
 
 

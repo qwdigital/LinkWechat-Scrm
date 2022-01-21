@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.domain;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -24,8 +25,6 @@ public class WeAllocateCustomer
 {
     private static final long serialVersionUID = 1L;
 
-    /** $column.columnComment */
-    private Long id;
 
     /** 接替成员的userid */
     private String takeoverUserid;
@@ -55,4 +54,10 @@ public class WeAllocateCustomer
      * 失败原因
      */
     private String failReason;
+
+
+    /**
+     * 0:离职继承;1:在职继承;
+     */
+    private  Integer extentType;
 }

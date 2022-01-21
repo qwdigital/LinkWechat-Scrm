@@ -67,10 +67,7 @@ export default {
     resetQuery() {
       this.dateRange = []
       this.$refs['queryForm'].resetFields()
-
-      this.$$nextTick(() => {
-        this.getList(1)
-      })
+      this.getList(1)
     },
     // 批量删除
     handleBulkRemove() {
@@ -146,8 +143,16 @@ export default {
           ></el-date-picker>
         </el-form-item>
         <el-form-item label=" ">
-          <el-button v-hasPermi="['customerManage:customer:query']" type="primary" @click="getList(1)">查询</el-button>
-          <el-button v-hasPermi="['customerManage:customer:query']" type="success" @click="resetQuery()"
+          <el-button
+            v-hasPermi="['customerManage:customer:query']"
+            type="primary"
+            @click="getList(1)"
+            >查询</el-button
+          >
+          <el-button
+            v-hasPermi="['customerManage:customer:query']"
+            type="success"
+            @click="resetQuery()"
             >重置</el-button
           >
         </el-form-item>
@@ -171,10 +176,20 @@ export default {
 
     <el-table v-loading="loading" :data="list" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" align="center"></el-table-column>
-      <el-table-column label="规则名称" align="center" prop="ruleName" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column
+        label="规则名称"
+        align="center"
+        prop="ruleName"
+        :show-overflow-tooltip="true"
+      ></el-table-column>
       <el-table-column label="执行群聊" align="center" width="120">
         <template #default="{ row }">
-          <el-popover placement="bottom" width="200" trigger="hover" :content="getDisplayGroups(row)">
+          <el-popover
+            placement="bottom"
+            width="200"
+            trigger="hover"
+            :content="getDisplayGroups(row)"
+          >
             <div slot="reference" class="table-desc overflow-ellipsis">
               {{ getDisplayGroups(row) }}
             </div>
@@ -196,7 +211,11 @@ export default {
             @click="handleRemove(scope.row.ruleId)"
             >删除</el-button
           >
-          <el-button v-hasPermi="['enterpriseWechat:edit']" size="mini" type="text" @click="goRoute(scope.row.ruleId)"
+          <el-button
+            v-hasPermi="['enterpriseWechat:edit']"
+            size="mini"
+            type="text"
+            @click="goRoute(scope.row.ruleId)"
             >编辑</el-button
           >
         </template>

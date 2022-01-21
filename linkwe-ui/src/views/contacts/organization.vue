@@ -153,7 +153,7 @@ export default {
       this.$confirm('是否确认删除吗?', '警告', {
         type: 'warning'
       })
-        .then(function() {
+        .then(function () {
           return api.remove(id)
         })
         .then(() => {
@@ -165,13 +165,14 @@ export default {
       this.multipleSelection = val
     },
     syncUser() {
-      const loading = this.$loading({
-        lock: true,
-        text: 'Loading',
-        spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.7)'
-      })
+      // const loading = this.$loading({
+      //   lock: false,
+      //   text: 'Loading',
+      //   spinner: 'el-icon-loading',
+      //   background: 'rgba(0, 0, 0, 0.7)'
+      // })
       api.syncUser().then(() => {
+        // console.log(1111)
         loading.close()
         this.msgSuccess('操作成功')
         this.getList()
@@ -179,17 +180,14 @@ export default {
     },
     batchImport() {},
     departEdit(data, type) {
-      this.formDepart = Object.assign(
-        {},
-        type ? data : { parentId: data.id, pName: data.name }
-      )
+      this.formDepart = Object.assign({}, type ? data : { parentId: data.id, pName: data.name })
       this.dialogVisibleDepart = true
     },
     departRemove(id) {
       this.$confirm('是否确认删除吗?', '警告', {
         type: 'warning'
       })
-        .then(function() {
+        .then(function () {
           return api.removeDepart(id)
         })
         .then(() => {
@@ -212,7 +210,7 @@ export default {
       this.dialogVisibleAvatar = true
     },
     // 选择素材确认按钮
-    submitSelectMaterial(text, image, file) {
+    submitSelectMaterial(image) {
       this.form.headImageUrl = image.materialUrl
       // this.form.imageMessage._materialName = image.materialName
     }
@@ -222,13 +220,7 @@ export default {
 
 <template>
   <div>
-    <el-form
-      class="top-search"
-      :model="query"
-      ref="queryForm"
-      :inline="true"
-      label-width="100px"
-    >
+    <el-form class="top-search" :model="query" ref="queryForm" :inline="true" label-width="100px">
       <el-form-item label="姓名" prop="title">
         <el-input v-model="query.name" placeholder="请输入" clearable />
       </el-form-item>
@@ -250,26 +242,17 @@ export default {
         </el-select>
       </el-form-item>
       <el-form-item label>
-        <el-button
-          v-hasPermi="['contacts:organization:query']"
-          type="primary"
-          @click="getList(1)"
+        <el-button v-hasPermi="['contacts:organization:query']" type="primary" @click="getList(1)"
           >查询</el-button
         >
       </el-form-item>
     </el-form>
 
     <div class="ar mb15">
-      <el-button
-        v-hasPermi="['contacts:organization:sync']"
-        type="primary"
-        @click="syncUser"
+      <el-button v-hasPermi="['contacts:organization:sync']" type="primary" @click="syncUser"
         >同步成员</el-button
       >
-      <el-button
-        v-hasPermi="['contacts:organization:import']"
-        type="info"
-        @click="batchImport"
+      <el-button v-hasPermi="['contacts:organization:import']" type="info" @click="batchImport"
         >批量导入</el-button
       >
       <!-- <el-button
@@ -326,39 +309,21 @@ export default {
       </el-col>
       <!--用户数据-->
       <el-col :span="17">
-        <el-table
-          v-loading="loading"
-          :data="userList"
-          @selection-change="handleSelectionChange"
-        >
+        <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" align="center" />
-          <el-table-column
-            label="姓名"
-            align="center"
-            prop="name"
-            :show-overflow-tooltip="true"
-          />
+          <el-table-column label="姓名" align="center" prop="name" :show-overflow-tooltip="true" />
           <el-table-column label="性别" align="center" prop="gender">
-            <template slot-scope="scope">{{
-              scope.row.gender === 1 ? '男' : '女'
-            }}</template>
+            <template slot-scope="scope">{{ scope.row.gender === 1 ? '男' : '女' }}</template>
           </el-table-column>
           <el-table-column label="职务" align="center" prop="position" />
           <el-table-column label="手机号" align="center" prop="mobile" />
-          <el-table-column
-            label="入职时间"
-            align="center"
-            prop="joinTime"
-            width="160"
-          >
+          <el-table-column label="入职时间" align="center" prop="joinTime" width="160">
             <!-- <template slot-scope="scope">
               <span>{{ parseTime(scope.row.createTime) }}</span>
             </template>-->
           </el-table-column>
           <el-table-column label="状态" align="center" prop="isActivate">
-            <template slot-scope="scope">{{
-              statusActivate[scope.row.isActivate]
-            }}</template>
+            <template slot-scope="scope">{{ statusActivate[scope.row.isActivate] }}</template>
           </el-table-column>
           <el-table-column
             label="操作"
@@ -412,6 +377,7 @@ export default {
     <el-dialog
       :title="(form.userId ? (disabled ? '查看' : '修改') : '添加') + '成员'"
       :visible.sync="dialogVisible"
+      :close-on-click-modal="false"
     >
       <el-row :gutter="10">
         <el-col :span="8">
@@ -420,11 +386,7 @@ export default {
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>-->
           <div class="avatar-wrap ac" @click="showAvatarDialog">
-            <img
-              class="avatar"
-              v-if="form.headImageUrl"
-              :src="form.headImageUrl"
-            />
+            <img class="avatar" v-if="form.headImageUrl" :src="form.headImageUrl" />
             <i v-else class="el-icon-plus avatar-uploader-icon cc"></i>
           </div>
         </el-col>
@@ -535,6 +497,7 @@ export default {
     <el-dialog
       :title="(formDepart.id ? '修改' : '添加') + '部门'"
       :visible.sync="dialogVisibleDepart"
+      :close-on-click-modal="false"
     >
       <el-form :model="formDepart" label-width="80px">
         <el-form-item label="部门名称">
@@ -576,8 +539,7 @@ export default {
 
     <SelectMaterial
       :visible.sync="dialogVisibleAvatar"
-      type="1"
-      :showArr="[1]"
+      type="0"
       @success="submitSelectMaterial"
     ></SelectMaterial>
   </div>
@@ -609,7 +571,7 @@ export default {
 .img-wrap {
   height: 340px;
   overflow: auto;
-  /deep/.el-radio__input {
+  ::v-deep.el-radio__input {
     position: absolute;
     right: 0;
   }

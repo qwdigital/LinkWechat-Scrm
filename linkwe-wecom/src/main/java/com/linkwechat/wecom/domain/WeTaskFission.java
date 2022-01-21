@@ -161,7 +161,7 @@ public class WeTaskFission extends BaseEntity {
      * 任务裂变活动状态，1 进行中 2 已结束
      */
     @Excel(name = "任务裂变活动状态，1 进行中 2 已结束")
-    @ApiModelProperty(value = "任务裂变活动状态，1 进行中 2 已结束")
+    @ApiModelProperty(value = "任务裂变活动状态，-1-发送失败 0-待发送 1-进行中 2-已结束")
     private Integer fissStatus;
 
     /**

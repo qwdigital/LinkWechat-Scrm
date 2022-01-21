@@ -15,8 +15,8 @@ export default {
     },
     key() {
       return this.$route.path
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -28,7 +28,7 @@ export default {
   position: relative;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-top: 15px;
+  // padding-top: 15px;
   // background-color: #fff;
 }
 

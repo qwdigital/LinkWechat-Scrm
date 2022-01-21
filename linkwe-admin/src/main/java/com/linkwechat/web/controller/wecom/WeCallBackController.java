@@ -1,25 +1,18 @@
 package com.linkwechat.web.controller.wecom;
 
-import com.alibaba.fastjson.JSONObject;
-import com.linkwechat.common.utils.Threads;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.core.domain.entity.WeCorpAccount;
 import com.linkwechat.common.utils.wecom.WxCryptUtil;
 import com.linkwechat.web.controller.common.CommonController;
-import com.linkwechat.wecom.domain.vo.WxCpXmlMessageVO;
-import com.linkwechat.wecom.factory.WeCallBackEventFactory;
-import com.linkwechat.wecom.factory.WeEventHandle;
-import com.linkwechat.wecom.factory.impl.customer.WeCallBackAddExternalContactImpl;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.security.AnyTypePermission;
+import com.linkwechat.wecom.service.IWeCorpAccountService;
+import com.linkwechat.wecom.service.event.WeEventPublisherService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.extern.slf4j.Slf4j;
-import me.chanjar.weixin.common.util.xml.XStreamInitializer;
-import me.chanjar.weixin.cp.bean.message.WxCpXmlMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -33,36 +26,20 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/wecom/callback")
 public class WeCallBackController extends CommonController {
     @Autowired
-    private WeEventHandle weEventHandle;
+    private WeEventPublisherService weEventPublisherService;
 
-    @Value("${wecome.callBack.appIdOrCorpId}")
-    private String appIdOrCorpId;
-    @Value("${wecome.callBack.token}")
-    private String token;
-    @Value("${wecome.callBack.encodingAesKey}")
-    private String encodingAesKey;
-
-
-
+    @Autowired
+    private IWeCorpAccountService weCorpAccountService;
 
     @ApiModelProperty("post数据接收")
-    @PostMapping(value = "/recive")
+    @PostMapping(value = "/recive/{corpId}")
     public String recive(@RequestBody String msg, @RequestParam(name = "msg_signature") String signature,
-                         String timestamp, String nonce) {
-        WxCryptUtil wxCryptUtil = new WxCryptUtil(token, encodingAesKey, appIdOrCorpId);
+                         String timestamp, String nonce,@PathVariable("corpId") String corpId) {
+        WeCorpAccount corpAccount = weCorpAccountService.getCorpAccountByCorpId(corpId);
+        WxCryptUtil wxCryptUtil = new WxCryptUtil(corpAccount.getToken(), corpAccount.getEncodingAesKey(), corpId);
         try {
             String decrypt = wxCryptUtil.decrypt(signature, timestamp, nonce, msg);
-            WxCpXmlMessageVO wxCpXmlMessage = StrXmlToBean(decrypt);
-            log.info("企微回调通知接口 wxCpXmlMessage:{}", JSONObject.toJSONString(wxCpXmlMessage));
-            try {
-//                ;
-                WeCallBackEventFactory factory = weEventHandle.factory(wxCpXmlMessage.getEvent());
-                if (factory !=null){
-                    Threads.SINGLE_THREAD_POOL.submit(() -> factory.eventHandle(wxCpXmlMessage));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            weEventPublisherService.register(decrypt);
             return decrypt;
         } catch (Exception e) {
             e.printStackTrace();;
@@ -72,8 +49,8 @@ public class WeCallBackController extends CommonController {
     }
 
     @ApiModelProperty("get数据校验")
-    @GetMapping(value = "/recive")
-    public String recive(HttpServletRequest request) {
+    @GetMapping(value = "/recive/{corpId}")
+    public String recive(HttpServletRequest request,@PathVariable("corpId") String corpId) {
         // 微信加密签名
         String sVerifyMsgSig = request.getParameter("msg_signature");
         // 时间戳
@@ -83,25 +60,12 @@ public class WeCallBackController extends CommonController {
         // 随机字符串
         String sVerifyEchoStr = request.getParameter("echostr");
 
-        WxCryptUtil wxCryptUtil = new WxCryptUtil(token, encodingAesKey, appIdOrCorpId);
+        WeCorpAccount corpAccount =  weCorpAccountService.getCorpAccountByCorpId(corpId);
+        WxCryptUtil wxCryptUtil = new WxCryptUtil(corpAccount.getToken(), corpAccount.getEncodingAesKey(), corpId);
         try {
             return wxCryptUtil.verifyURL(sVerifyMsgSig, sVerifyTimeStamp, sVerifyNonce, sVerifyEchoStr);
         } catch (Exception e) {
             return "error";
         }
-    }
-
-    private WxCpXmlMessageVO StrXmlToBean(String xmlStr){
-        XStream xstream = XStreamInitializer.getInstance();
-        xstream.addPermission(AnyTypePermission.ANY);
-        xstream.processAnnotations(WxCpXmlMessage.class);
-        xstream.processAnnotations(WxCpXmlMessageVO.class);
-        xstream.processAnnotations(WxCpXmlMessageVO.ScanCodeInfo.class);
-        xstream.processAnnotations(WxCpXmlMessageVO.SendPicsInfo.class);
-        xstream.processAnnotations(WxCpXmlMessageVO.SendPicsInfo.Item.class);
-        xstream.processAnnotations(WxCpXmlMessageVO.SendLocationInfo.class);
-        xstream.processAnnotations(WxCpXmlMessageVO.BatchJob.class);
-        WxCpXmlMessageVO wxCpXmlMessage = (WxCpXmlMessageVO)xstream.fromXML(xmlStr);
-        return wxCpXmlMessage;
     }
 }

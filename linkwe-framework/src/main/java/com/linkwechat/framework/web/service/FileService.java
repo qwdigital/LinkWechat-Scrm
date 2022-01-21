@@ -3,6 +3,7 @@ package com.linkwechat.framework.web.service;
 
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.config.RuoYiConfig;
+import com.linkwechat.common.exception.file.InvalidExtensionException;
 import com.linkwechat.common.utils.OsUtils;
 import com.linkwechat.common.utils.file.FileUploadUtils;
 import com.linkwechat.common.utils.file.FileUtils;
@@ -43,7 +44,7 @@ public class FileService {
      * @return
      * @throws IOException
      */
-     public SysFile upload(MultipartFile file) throws Exception {
+     public SysFile upload(MultipartFile file) throws IOException, InvalidExtensionException {
 
          try {
              FileUploadUtils.assertAllowed(file, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION);
@@ -61,9 +62,15 @@ public class FileService {
                  fileName = FileUploadUtils.upload(osFile.getPath(), file);
                  imgUrlPrefix = ruoYiConfig.getFile().getImgUrlPrefix();
              }
+
              return SysFile.builder()
                      .fileName(fileName)
                      .imgUrlPrefix(imgUrlPrefix)
+//                     .timeLong(
+//                             FileUploadUtils.isAllowedExtension(FileUploadUtils.getExtension(file),
+//                                     MimeTypeUtils.MEDIA_EXTENSION
+//                             )?FileUtils.getVideoOrVoice(file):new Long(0)
+//                     )
                      .build();
 
          }catch (Exception e){

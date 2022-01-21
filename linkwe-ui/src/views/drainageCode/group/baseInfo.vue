@@ -18,17 +18,13 @@ export default {
         guide: '',
         showTip: 0,
         tipMsg: '',
-        customerServerQrCode: '',
+        customerServerQrCode: ''
       },
       // 活码头像数据
       headImage: null,
       rules: {
-        activityName: [
-          { required: true, message: '请输入活码名称', trigger: 'blur' }
-        ],
-        activityDesc: [
-          { required: true, message: '请输入活码描述', trigger: 'blur' }
-        ]
+        activityName: [{ required: true, message: '请输入活码名称', trigger: 'blur' }],
+        activityDesc: [{ required: true, message: '请输入活码描述', trigger: 'blur' }]
       }
     }
   },
@@ -42,10 +38,9 @@ export default {
         if (!valid) return
 
         // 新增群活码数据至数据库
-        add(this.form)
-          .then((res) => {
-            this.$emit('next', res.id)
-          })
+        add(this.form).then((res) => {
+          this.$emit('next', res.id)
+        })
       })
     },
     // 获取上传的头像数据
@@ -62,33 +57,31 @@ export default {
       this.$refs.form.validate((valid) => {
         if (!valid) return
 
-        update(this.groupCodeId, this.form)
-          .then((res) => {
-            this.$emit('next', this.groupCodeId)
-          })
+        update(this.groupCodeId, this.form).then((res) => {
+          this.$emit('next', this.groupCodeId)
+        })
       })
     },
     // 获取群活码信息
     getGroupDetail() {
       if (!this.groupCodeId) return
 
-      getDetail(this.groupCodeId)
-        .then((res) => {
-          if (res.code === 200) {
-            this.form = {
-              activityName: res.data.activityName,
-              activityDesc: res.data.activityDesc,
-              avatarUrl: res.data.avatarUrl,
-              guide: res.data.guide,
-              showTip: parseInt(res.data.showTip),
-              tipMsg: res.data.tipMsg,
-              customerServerQrCode: res.data.customerServerQrCode,
-              uuid: res.data.uuid,
-              codeUrl: res.data.codeUrl
-            }
-          } else {
+      getDetail(this.groupCodeId).then((res) => {
+        if (res.code === 200) {
+          this.form = {
+            activityName: res.data.activityName,
+            activityDesc: res.data.activityDesc,
+            avatarUrl: res.data.avatarUrl,
+            guide: res.data.guide,
+            showTip: parseInt(res.data.showTip),
+            tipMsg: res.data.tipMsg,
+            customerServerQrCode: res.data.customerServerQrCode,
+            uuid: res.data.uuid,
+            codeUrl: res.data.codeUrl
           }
-        })
+        } else {
+        }
+      })
     },
     // 提交
     submit() {
@@ -104,17 +97,8 @@ export default {
 <template>
   <div>
     <el-row>
-      <el-col
-        :sm="24"
-        :md="16"
-        :lg="14"
-      >
-        <el-form
-          :model="form"
-          :rules="rules"
-          ref="form"
-          label-width="100px"
-        >
+      <el-col :sm="24" :md="16" :lg="14">
+        <el-form :model="form" :rules="rules" ref="form" label-width="100px">
           <el-row>
             <el-col :sm="24" :md="12">
               <el-form-item label="活码名称" prop="activityName">
@@ -123,7 +107,11 @@ export default {
             </el-col>
             <el-col :sm="24" :md="12">
               <el-form-item label="活码描述" prop="activityDesc">
-                <el-input v-model="form.activityDesc" type="textarea" placeholder="请输入描述"></el-input>
+                <el-input
+                  v-model="form.activityDesc"
+                  type="textarea"
+                  placeholder="请输入描述"
+                ></el-input>
               </el-form-item>
             </el-col>
             <el-col :sm="24" :md="12">
@@ -133,9 +121,7 @@ export default {
                   class="image-uploader"
                   @update:file="handleUploadedHeadImage"
                 >
-                  <div slot="tip">
-                    注: 只支持2M以内的jpg/png格式图片
-                  </div>
+                  <div slot="tip">注: 只支持2M以内的jpg/png格式图片</div>
                 </upload>
               </el-form-item>
             </el-col>
@@ -148,44 +134,27 @@ export default {
                 ></el-input>
               </el-form-item>
             </el-col>
-            <el-col :span="24">
+            <!-- <el-col :span="24">
               <el-divider></el-divider>
-            </el-col>
-            <el-col :span="24">
               <el-form-item label="无法加群提示">
-                <el-switch
-                  v-model="form.showTip"
-                  :active-value="1"
-                  :inactive-value="0"
-                ></el-switch>
-                <div class="el-upload__tip">开启后, 页面底部显示无法进群按钮, 点击可查看提示内容</div>
+                <el-switch v-model="form.showTip" :active-value="1" :inactive-value="0"></el-switch>
+                <div class="el-upload__tip">
+                  开启后, 页面底部显示无法进群按钮, 点击可查看提示内容
+                </div>
               </el-form-item>
-            </el-col>
+            </el-col> -->
             <transition name="el-fade-in-linear">
-              <el-col
-                v-show="form.showTip === 1"
-                :sm="24"
-                :md="12"
-              >
+              <el-col v-show="form.showTip === 1" :sm="24" :md="12">
                 <el-form-item label="提示语">
                   <el-input v-model="form.tipMsg" placeholder="请输入提示语"></el-input>
                 </el-form-item>
               </el-col>
             </transition>
             <transition name="el-fade-in-linear">
-              <el-col
-                v-show="form.showTip === 1"
-                :sm="24"
-                :md="12"
-              >
+              <el-col v-show="form.showTip === 1" :sm="24" :md="12">
                 <el-form-item label="客服二维码">
-                  <upload
-                    :fileUrl.sync="form.customerServerQrCode"
-                    class="image-uploader"
-                  >
-                    <div slot="tip">
-                      注: 只支持2M以内的jpg/png格式图片
-                    </div>
+                  <upload :fileUrl.sync="form.customerServerQrCode" class="image-uploader">
+                    <div slot="tip">注: 只支持2M以内的jpg/png格式图片</div>
                   </upload>
                 </el-form-item>
               </el-col>
@@ -194,16 +163,12 @@ export default {
         </el-form>
       </el-col>
 
-      <el-col
-        :sm="24"
-        :md="8"
-        :lg="10"
-      >
+      <el-col :sm="24" :md="8" :lg="10">
         <div class="preview">
           <div class="preview-content">
             <div class="preview-header">
               <i class="el-icon-close"></i>
-              <div> 群活码 </div>
+              <div>群活码</div>
               <i class="el-icon-more"></i>
             </div>
             <el-divider></el-divider>
@@ -211,17 +176,13 @@ export default {
               <template v-if="form.activityName">
                 {{ form.activityName }}
               </template>
-              <template v-else>
-                活码名称
-              </template>
+              <template v-else> 活码名称 </template>
             </div>
             <div class="preview-guide">
               <template v-if="form.guide">
                 {{ form.guide }}
               </template>
-              <template v-else>
-                这是加群引导语
-              </template>
+              <template v-else> 这是加群引导语 </template>
             </div>
             <div class="preview-code-box">
               <div class="code-box-title">
@@ -245,7 +206,7 @@ export default {
 </template>
 
 <style scoped lang="scss">
-/deep/ .image-uploader {
+::v-deep .image-uploader {
   .uploader-icon {
     width: 80px;
     height: 80px;
@@ -317,7 +278,7 @@ export default {
         }
       }
     }
-    
+
     .preview-customer-service {
       text-align: center;
       padding: 20px 10px;
