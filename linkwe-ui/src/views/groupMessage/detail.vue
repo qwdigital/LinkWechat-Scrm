@@ -341,7 +341,7 @@
     }
     .operation {
       display: flex;
-      align-items: end;
+      align-items: flex-end;
       font-size: 12px;
       color: #999;
     }
