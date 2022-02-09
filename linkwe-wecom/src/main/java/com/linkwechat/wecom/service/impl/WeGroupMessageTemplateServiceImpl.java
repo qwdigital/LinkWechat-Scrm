@@ -319,7 +319,10 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                 Set<ZSetOperations.TypedTuple<String>> typedTuples = redisCache.sortRangeWithScoresCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY, time, time);
                 if(CollectionUtil.isNotEmpty(typedTuples)){
                     typedTuples.forEach(typedTuple ->{
-                        redisCache.removeCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY,typedTuple.getValue());
+                        WeAddGroupMessageQuery  query = JSONObject.parseObject(typedTuple.getValue(), WeAddGroupMessageQuery.class);
+                        if(query != null && ObjectUtil.equal(weGroupMessageTemplate.getId(),query.getId())){
+                            redisCache.removeCacheZSet(WeConstans.WEGROUPMSGTIMEDTASK_KEY,typedTuple.getValue());
+                        }
                     });
                 }
             });
