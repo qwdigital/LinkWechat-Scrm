@@ -203,7 +203,7 @@ public class FinanceService{
     private void setMediaMeetingVoiceCallData(JSONObject realJsonData, String msgType) {
         JSONObject meetingVoiceCall = Optional.ofNullable(realJsonData.getJSONObject(msgType))
                 .orElse(realJsonData.getJSONObject("content"));
-        String fileName = meetingVoiceCall.getString("filename") + IdUtils.simpleUUID();
+        String fileName = IdUtils.simpleUUID() + meetingVoiceCall.getString("filename");
         getPath(realJsonData, msgType, fileName);
     }
 
@@ -218,7 +218,7 @@ public class FinanceService{
     private void setMediaFileData(JSONObject realJsonData, String msgType) {
         JSONObject emotionData = Optional.ofNullable(realJsonData.getJSONObject(msgType))
                 .orElse(realJsonData.getJSONObject("content"));
-        String filename = emotionData.getString("filename")+IdUtils.simpleUUID();
+        String filename = IdUtils.simpleUUID()+ emotionData.getString("filename");
         //String fileext = emotionData.getString("fileext");
         //String fileName = filename+"."+fileext;
         getPath(realJsonData, msgType, filename);
