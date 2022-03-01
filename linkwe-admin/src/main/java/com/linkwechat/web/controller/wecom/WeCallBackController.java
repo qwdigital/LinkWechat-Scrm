@@ -35,7 +35,7 @@ public class WeCallBackController extends CommonController {
     @PostMapping(value = "/recive/{corpId}")
     public String recive(@RequestBody String msg, @RequestParam(name = "msg_signature") String signature,
                          String timestamp, String nonce,@PathVariable("corpId") String corpId) {
-        WeCorpAccount corpAccount = weCorpAccountService.getCorpAccountByCorpId(corpId);
+        WeCorpAccount corpAccount = weCorpAccountService.findValidWeCorpAccount();
         WxCryptUtil wxCryptUtil = new WxCryptUtil(corpAccount.getToken(), corpAccount.getEncodingAesKey(), corpId);
         try {
             String decrypt = wxCryptUtil.decrypt(signature, timestamp, nonce, msg);
