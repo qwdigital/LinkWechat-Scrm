@@ -74,9 +74,9 @@ LinkWeChat SCRM 基于企业私域流量营销闭环，遵从获取新客到管�
 *   **企业风控** ：会话合规存档，敏感内容全局风控；
 *   **企业管理** ：组织架构、自建应用全融合，实现“一个后台”；
 
-V2.5 详细功能清单：
-
 [LinkWeChat 社区版 V2.5 详细功能清单](https://docs.qq.com/sheet/DZWNkTXFNS0FLYWdu)
+
+![输入图片说明](readme_pic/v2.5.png)
 
 ## 1.3 优势
 
