@@ -7,7 +7,7 @@
 
 [![star](https://gitee.com/LinkWeChat/link-wechat/badge/star.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/stargazers)
 [![fork](https://gitee.com/LinkWeChat/link-wechat/badge/fork.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/members)
-[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V2.0beta-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
+[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V2.5beta-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
 [![license](http://img.shields.io/badge/license-GPL%203.0-orange)](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
 [![木兰社区](https://img.shields.io/badge/Mulan-incubating-blue)](https://portal.mulanos.cn//)
 
@@ -25,9 +25,9 @@
 
 ---
 
- **<p align="center">【📣最新动态】LinkWeChat V2.0 正式公测啦，如有问题欢迎提交 Issue，项目组将光速修复，<a href="http://demo.linkwechat.cn/" target="_blank">点击立即体验~</a></p>** 
+ **<p align="center">【📣最近更新】LinkWeChat V2.5 正式公测啦，新增运营中心、微信客服、红包工具功能，如有问题欢迎提交 Issue，项目组将光速修复，<a href="http://demo.linkwechat.cn/" target="_blank">点击立即体验~</a></p>** 
 
- **<p align="center">【📣最新动态】LinkWeChat V2.0 Beta 包已经发布啦，<a href="https://gitee.com/LinkWeChat/link-wechat/releases/v2.0.0.beta.3" target="_blank">点击尝鲜全新功能~</a></p>** 
+ **<p align="center">【📣特别说明】V2.5 版本中红包工具模板涉及企业支付，需要多轮封闭测试后逐步开放，具体源码是否开源酌情而定</p>** 
 
  **<p align="center">【📣最新动态】LinkWeChat 2021 年度开源数据报告来啦，<a href="https://gitee.com/LinkWeChat/link-wechat/blob/master/readme_pic/2021%E5%B9%B4%E6%8A%A5%E6%9C%80%E7%BB%88V2.jpg" target="_blank">点击查阅~</a></p>** 
 
@@ -242,32 +242,53 @@ com.linkwechat
 
 [帮助手册——常见问题](https://www.yuque.com/linkwechat/help/qk5gl6)
 
-# 四、最近规划
+# 四、最近更新
 
-LinkWeChat 团队目前在完成 LinkWeChat V2.0 大版本升级，主要围绕引流获客、客户中心、客情维系等模块进行升级，预计 12 月中旬整体上线。
+## V2.5 更新日志
 
-V2.0 主要的升级内容如下：
+LinkWeChat V2.5 版本主要围绕运营中心、引流获客、客情维系等模块进行升级，主要的升级内容如下：
 
-- [ ] 系统菜单重新整合，结构更加清晰；
-- [ ] 引流获客-员工活码支持分组；
-- [ ] 引流获客-员工活码支持自动排班；
-- [ ] 引流获客-员工活码支持多类型欢迎语；
-- [ ] 引流获客新增客户公海模块，支持一键分配自主添加；
-- [ ] 引流获客-欢迎语升级为欢迎语模板，支持多类型欢迎语个性化配置；
-- [ ] 客户中心-企业客户全新改版，支持查看多人跟进内容；
-- [ ] 客户中心-企业客群支持标签管理；
-- [ ] 客户中心-企业标签支持客群标签管理；
-- [ ] 客情维系-消息群发全新改版，支持多类型群发类型；
-- [ ] 客情维系-消息群发支持查看员工、客户维度的群发详情；
-- [ ] 客情维系-素材中心新增链接、小程序等多类型；
-- [ ] 客情维系-新增朋友圈模块，支持查看企业/个人动态；
-- [ ] 客情维系-支持企业发表朋友圈；
-- [ ] 社群运营-各模块细节调优；
-- [ ] 企业管理-企微配置全新改版，支持多种配置方式。
+- [x] 首页全新升级为运营中心，各项运营数据快捷查看；
+- [x] 运营中心-新增客户分析，全维度查看客户数据；
+- [x] 运营中心-新增客群分析，全维度查看客群成员数据；
+- [x] 运营中心-新增会话分析，全维度查看客户联系、客群联系以及会话存档数据分析；
+- [x] 引流获客-新增微信客服，打通微信全渠道客服生态；
+- [x] 微信客服-新增客服管理，快捷创建客服，支持智能助手；
+- [x] 微信客服-新增场景管理，快捷接入多渠道客服；
+- [x] 微信客服-新增咨询记录，查看各渠道客服咨询客户及咨询记录；
+- [x] 微信客服-新增客服统计，支持场景及咨询分析，多维度查看客服数据；
+- [x] 客情维系-新增红包工具，侧边栏快捷发送企业红包；
+- [x] 红包工具-新增企业红包，快捷创建客户/客群红包模板，一键发送；
+- [x] 红包工具-新增员工管理，快捷设置员工限额，查看员工发送数据；
+- [x] 红包工具-新增发放记录，查看企业员工发放红包数据统计；
+- [x] 红包工具-新增支出分析，查看企业红包支出统计数据；
+- [x] 企业管理-企微配置升级，新增微信客服及微信支付配置；
+- [x] 其余各模块细节调优。
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/144937_7940336b_1480777.png "屏幕截图.png")
+ **【特别说明：V2.5版本中红包工具模板涉及企业支付，需要多轮封闭测试后开放。具体源码是否开源酌情而定】** 
 
-其中微信客服及数据分析模块酌情开源。
+![输入图片说明](readme_pic/v2.5.png)
+
+## V2.0 更新日志
+
+LinkWeChat V2.0 主要围绕引流获客、客户中心、客情维系等模块进行升级，主要的升级内容如下：
+
+- [x] 系统菜单重新整合，结构更加清晰；
+- [x] 引流获客-员工活码支持分组；
+- [x] 引流获客-员工活码支持自动排班；
+- [x] 引流获客-员工活码支持多类型欢迎语；
+- [x] 引流获客新增客户公海模块，支持一键分配自主添加；
+- [x] 引流获客-欢迎语升级为欢迎语模板，支持多类型欢迎语个性化配置；
+- [x] 客户中心-企业客户全新改版，支持查看多人跟进内容；
+- [x] 客户中心-企业客群支持标签管理；
+- [x] 客户中心-企业标签支持客群标签管理；
+- [x] 客情维系-消息群发全新改版，支持多类型群发类型；
+- [x] 客情维系-消息群发支持查看员工、客户维度的群发详情；
+- [x] 客情维系-素材中心新增链接、小程序等多类型；
+- [x] 客情维系-新增朋友圈模块，支持查看企业/个人动态；
+- [x] 客情维系-支持企业发表朋友圈；
+- [x] 社群运营-各模块细节调优；
+- [x] 企业管理-企微配置全新改版，支持多种配置方式。
 
 # 五、奖项荣誉
 
