@@ -27,8 +27,6 @@
 
  **<p align="center">【📣最近更新】LinkWeChat V2.5 正式公测啦，新增运营中心、微信客服、红包工具功能，如有问题欢迎提交 Issue，项目组将光速修复，<a href="http://demo.linkwechat.cn/" target="_blank">点击立即体验~</a></p>** 
 
- **<p align="center">【📣特别说明】V2.5 版本中红包工具涉及企业支付，需要多轮封闭测试后逐步开放，具体源码是否开源酌情而定</p>** 
-
  **<p align="center">【📣最新动态】LinkWeChat 2021 年度开源数据报告来啦，<a href="https://gitee.com/LinkWeChat/link-wechat/blob/master/readme_pic/2021%E5%B9%B4%E6%8A%A5%E6%9C%80%E7%BB%88V2.jpg" target="_blank">点击查阅~</a></p>** 
 
  **<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>** 
