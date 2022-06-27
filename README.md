@@ -98,7 +98,9 @@ LinkWeChat 不做私域营销专家，而是通过开源让每个企业都是自
 
 ## 2.1 在线体验
 
-演示地址：[http://demo.linkwechat.cn/](http://demo.linkwechat.cn/)
+SAAS体验地址：http://saas.linkwechat.cn/  
+
+开源演示地址：[http://demo.linkwechat.cn/](http://demo.linkwechat.cn/)
 
 演示账号/密码：Wecome/123456
 
