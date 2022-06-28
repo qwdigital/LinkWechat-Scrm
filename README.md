@@ -24,6 +24,7 @@
 <p></p>
 
 ---
+ **<p align="center">【📣最近更新】LinkWeChat SAAS版 正式公测啦，如有问题欢迎提交 Issue，项目组将光速修复，<a href="http://saas.linkwechat.cn/" target="_blank">点击立即体验~</a></p>** 
 
  **<p align="center">【📣最近更新】LinkWeChat V2.5 正式公测啦，新增运营中心、微信客服、红包工具功能，如有问题欢迎提交 Issue，项目组将光速修复，<a href="http://demo.linkwechat.cn/" target="_blank">点击立即体验~</a></p>** 
 
