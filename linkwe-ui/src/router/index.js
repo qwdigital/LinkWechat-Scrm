@@ -52,13 +52,9 @@ export const constantRoutes = [
         path: '/index',
         name: 'Index',
         component: (resolve) => require(['@/views/index'], resolve),
-        hidden: true,
         meta: {
           title: '数据分析',
           icon: 'dashboard',
-          breadcrumb: false,
-          noCache: true,
-          affix: true
         }
       }
     ]
