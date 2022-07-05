@@ -4,6 +4,7 @@ package com.linkwechat.web.controller.wecom;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.PageDomain;
@@ -61,6 +62,9 @@ public class WeCustomerController extends BaseController
     public TableDataInfo findWeCustomerList(WeCustomerList weCustomerList)
     {
 
+         if(weCustomerList.getDelFlag() ==null){
+            weCustomerList.setDelFlag(Constants.COMMON_STATE);
+        }
         List<WeCustomerList> list = weCustomerService.findWeCustomerList(weCustomerList,TableSupport.buildPageRequest());
         TableDataInfo dataTable = getDataTable(list);
         //设置总条数

@@ -287,7 +287,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         phone=IFNULL(VALUES(phone), we_customer.phone),
         add_method=IFNULL(VALUES(add_method), we_customer.add_method),
         del_flag=IFNULL(VALUES(del_flag),we_customer.del_flag),
-        del_flag=IFNULL(VALUES(del_flag),we_customer.del_flag),
         state=IFNULL(VALUES(state),we_customer.state),
         tag_ids=IFNULL(VALUES(tag_ids),we_customer.tag_ids);
     </insert>
