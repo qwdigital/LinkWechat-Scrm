@@ -20,7 +20,10 @@ const permission = {
       return new Promise((resolve) => {
         // 向后端请求路由数据
         getRouters().then((res) => {
+          // 删除2.0错误路由
+          if(res.data[0].path == '/operateCenter') {
             res.data.shift()
+          }
           const accessedRoutes = filterAsyncRouter(res.data)
           accessedRoutes.push({ path: '*', redirect: '/404', hidden: true })
           commit('SET_ROUTES', accessedRoutes)
