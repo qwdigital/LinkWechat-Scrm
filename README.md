@@ -297,11 +297,11 @@ LinkWeChat V2.0 主要围绕引流获客、客户中心、客情维系等模块�
 
 如果你想加入我们的开源交流群，请扫码添加 LinkWeChat 项目作者，加入群聊：
 
-![输入图片说明](readme_pic/111.png)
+![输入图片说明](readme_pic/333.png)
 
 如果你有任何 LinkWeChat 产品上的想法、意见或建议，或商务上的合作需求，请扫码添加 LinkWeChat 项目团队进一步沟通：
 
-![输入图片说明](readme_pic/222.png)
+![输入图片说明](readme_pic/444.png)
 
 # 七、捐赠支持
 
