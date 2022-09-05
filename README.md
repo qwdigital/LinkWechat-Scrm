@@ -24,7 +24,7 @@
 <p></p>
 
 ---
- **<p align="center">【📣最近更新】LinkWeChat SAAS版 正式公测啦，如有问题欢迎提交 Issue，项目组将光速修复，<a href="http://saas.linkwechat.cn/" target="_blank">点击立即体验~</a></p>** 
+ **<p align="center">【📣最近更新】LinkWeChat SAAS版 正式公测啦，如有问题欢迎提交 Issue，项目组将光速修复，<a href="https://saas.pardigital.cn/#/probation" target="_blank">点击立即体验~</a></p>** 
 
  **<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>** 
 
@@ -95,7 +95,7 @@ LinkWeChat 不做私域营销专家，而是通过开源让每个企业都是自
 
 ## 2.1 在线体验
 
-SAAS体验地址：http://saas.linkwechat.cn/  
+SAAS体验地址：https://saas.pardigital.cn/#/probation 
 
 开源演示地址：[http://demo.linkwechat.cn/](http://demo.linkwechat.cn/)
 
