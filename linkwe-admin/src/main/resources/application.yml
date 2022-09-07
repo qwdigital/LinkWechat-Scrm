@@ -105,8 +105,8 @@ spring:
       # 主库数据源
       master:
         url: jdbc:p6spy:mysql://127.0.0.1:10179/link-wechat-prod?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&rewriteBatchedStatements=true
-        username: root
-        password: root
+        username: root001
+        password: root001
       # 从库数据源
       slave:
         # 从数据源开关/默认关闭
