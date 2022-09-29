@@ -24,7 +24,7 @@
 <p></p>
 
 ---
- **<p align="center">【📣最近更新】LinkWeChat 微服务版 正式公测啦，国庆节后择日开放微服务版，欢迎大家提前体验！<a href="http://cloud.linkwechat.cn/" target="_blank">点击立即体验~</a></p>** 
+ **<p align="center">【📣最近更新】LinkWeChat 微服务版 正式公测啦，国庆节后择日开放微服务版，欢迎大家提前体验！<a href="http://demo.linkwechat.net/" target="_blank">点击立即体验~</a></p>** 
 
  **<p align="center">LinkWeChat SAAS版 正式公测啦，如有问题欢迎提交 Issue，项目组将光速修复，<a href="https://saas.pardigital.cn/#/probation" target="_blank">点击立即体验~</a></p>** 
 
