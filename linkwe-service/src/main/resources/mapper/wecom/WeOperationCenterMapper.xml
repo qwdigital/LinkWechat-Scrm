@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeOperationCenterMapper">
+
+
+    <select id="getCustomerAnalysis"
+            resultType="com.linkwechat.domain.operation.vo.WeCustomerAnalysisVo">
+        select
+                (select count(1) from we_customer where del_flag = 0 ) total_cnt,
+                (select count(1) from we_customer where  track_state=2 and date_format(add_time,'%y%m%d') = date_format(curdate(),'%y%m%d') ) as td_gj_cnt,
+                (select count(1) from (select external_userid from we_customer where del_flag = 0  group by external_userid having count(1)>1) as aa) as repeat_cnt,
+                (select count(1) from we_customer where date_format(add_time,'%y%m%d') = date_format(curdate(),'%y%m%d') ) as td_cnt,
+                (select count(1) from we_customer where date_format(add_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d') ) as yd_cnt,
+                (select count(1) from we_customer where date_format(update_time,'%y%m%d') = date_format(curdate(),'%y%m%d')  and track_state= 5 ) as td_lost_cnt,
+                (select count(1) from we_customer where date_format(update_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')  and track_state= 5 ) as yd_lost_cnt,
+                (select count(distinct external_userid) from we_customer where date_format(add_time,'%y%m%d') = date_format(curdate(),'%y%m%d')  and del_flag = 0 ) as td_net_cnt,
+                (select count(distinct external_userid) from we_customer where date_format(add_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')  and del_flag = 0 ) as yd_net_cnt,
+                (select sum(new_apply_cnt) from we_user_behavior_data where date_format(stat_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d') ) as yd_new_apply_cnt,
+                (select sum(new_apply_cnt) from we_user_behavior_data where date_format(stat_time,'%y%m%d') = date_format(date_sub(curdate(),interval 2 day),'%y%m%d') ) as byd_new_apply_cnt
+    </select>
+
+
+
+
+
+    <select id="getCustomerTotalCnt"
+            resultType="com.linkwechat.domain.operation.vo.WeCustomerTotalCntVo">
+        select x_time, @total := @total + pure_add_cnt AS total_cnt
+        from (select date_list.`date`                   as x_time,
+        IFNULL(real_data.pure_add_num, 0) as pure_add_cnt
+        from (
+            select `date`
+            from sys_dim_date
+            where `date` &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            and `date` &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        ) as date_list
+        left join (select DATE_FORMAT(wc.add_time, '%Y-%m-%d') day,
+        count(1) as                                pure_add_num
+        from we_customer wc
+        WHERE wc.del_flag = 0
+        <if test="userIds != null and userIds.size() > 0" >
+            and wc.add_user_id in
+            <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+        <if test="deptIds != null and deptIds.size() > 0" >
+            and exists(select 1 from sys_user su where wc.add_user_id = su.we_user_id and su.dept_id in
+            <foreach item="deptId" collection="deptIds" index="index" open="(" separator="," close=")">
+                #{deptId}
+            </foreach>
+            )
+        </if>
+        and DATE_FORMAT(wc.add_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime}, '%Y-%m-%d')
+        and DATE_FORMAT(wc.add_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+        group by day,
+        (SELECT @total := (select count(1)
+        from we_customer wct
+        where wct.del_flag = 0
+        <if test="userIds != null and userIds.size() > 0" >
+            and wct.add_user_id in
+            <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+        <if test="deptIds != null and deptIds.size() > 0" >
+            and exists(select 1 from sys_user su where wct.add_user_id = su.we_user_id and su.dept_id in
+            <foreach item="deptId" collection="deptIds" index="index" open="(" separator="," close=")">
+                #{deptId}
+            </foreach>
+            )
+        </if>
+        and DATE_FORMAT(wct.add_time, '%Y-%m-%d') &lt; DATE_FORMAT(#{beginTime}, '%Y-%m-%d')))) as real_data
+        on date_list.`date` = real_data.day
+        order by day asc) as result order by x_time asc
+    </select>
+
+    <select id="getCustomerRealCnt" resultType="com.linkwechat.domain.operation.vo.WeCustomerRealCntVo">
+        select
+        x_time,
+        @total := @total + pure_add_cnt AS total_cnt,
+        add_cnt,
+        net_cnt,
+        apply_cnt,
+        gjCnt
+        from (
+        select date_list.`date` as x_time ,
+        IFNULL(real_data.add_num, 0) as add_cnt,
+        IFNULL(real_data.pure_add_num, 0)  as pure_add_cnt,
+        IFNULL(real_data.net_num, 0) as net_cnt,
+        IFNULL( real_data.gjCnt, 0 ) AS gjCnt,
+        0 as apply_cnt
+        from
+        (
+            select `date`
+            from sys_dim_date
+            where `date` &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            and `date` &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        ) as date_list
+        left join
+        (select DATE_FORMAT(wc.add_time, '%Y-%m-%d') day,
+        count(1) as add_num,
+        count(if(wc.track_state=2,1,0)) AS gjCnt,
+        sum(case when wc.del_flag = 0 then 1 else 0 end)  as pure_add_num,
+        count(distinct case when wc.del_flag = 0 then wc.external_userid end) as net_num
+        from we_customer wc
+        <where>
+            <if test="userIds != null and userIds.size() > 0" >
+                and wc.add_user_id in
+                <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                    #{userId}
+                </foreach>
+            </if>
+            <if test="deptIds != null and deptIds.size() > 0" >
+                and exists(select 1 from sys_user su where wc.add_user_id = su.we_user_id and su.dept_id in
+                <foreach item="deptId" collection="deptIds" index="index" open="(" separator="," close=")">
+                    #{deptId}
+                </foreach>
+                )
+            </if>
+            and DATE_FORMAT(wc.add_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            and DATE_FORMAT(wc.add_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        </where>
+        group by day
+        ,(SELECT @total := (select count(1) from we_customer wct
+        where wct.del_flag = 0
+        and
+        DATE_FORMAT(wct.add_time,'%Y-%m-%d') &lt; DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        <if test="userIds != null and userIds.size() > 0" >
+            and wct.add_user_id in
+            <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+        <if test="deptIds != null and deptIds.size() > 0" >
+            and exists(select 1 from sys_user su where wct.add_user_id = su.we_user_id and su.dept_id in
+            <foreach item="deptId" collection="deptIds" index="index" open="(" separator="," close=")">
+                #{deptId}
+            </foreach>
+            )
+        </if>
+        )))
+        as real_data on date_list.`date` = real_data.day order by day asc
+        ) as result order by x_time asc
+    </select>
+
+    <select id="getCustomerLostCnt" resultType="com.linkwechat.domain.operation.vo.WeCustomerRealCntVo">
+        select
+        x_time,
+        lost_cnt
+        from (
+        select date_list.`date` as x_time ,
+        IFNULL(real_data.lost_num, 0) as lost_cnt
+        from
+        (
+        select `date`
+        from sys_dim_date
+        where `date` &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        and `date` &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        ) as date_list
+        left join
+        (select DATE_FORMAT(wc.update_time, '%Y-%m-%d') day,
+        sum(case when wc.track_state = 5 then 1 else 0 end) as lost_num
+        from we_customer wc
+        <where>
+            <if test="userIds != null and userIds.size() > 0" >
+                and wc.add_user_id in
+                <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                    #{userId}
+                </foreach>
+            </if>
+            <if test="deptIds != null and deptIds.size() > 0" >
+                and exists(select 1 from sys_user su where wc.add_user_id = su.we_user_id and su.dept_id in
+                <foreach item="deptId" collection="deptIds" index="index" open="(" separator="," close=")">
+                    #{deptId}
+                </foreach>
+                )
+            </if>
+            and DATE_FORMAT(wc.update_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            and DATE_FORMAT(wc.update_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        </where>
+        group by day) as real_data on date_list.`date` = real_data.day order by day asc
+        ) as result order by x_time asc
+    </select>
+
+    <select id="getCustomerRank" resultType="com.linkwechat.domain.operation.vo.WeUserCustomerRankVo">
+        select (select su.user_name from sys_user su where wc.add_user_id = su.we_user_id limit 1) user_name,
+               count(1) as total_cnt
+        from we_customer wc where del_flag = 0
+        and DATE_FORMAT(wc.add_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        and DATE_FORMAT(wc.add_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        group by wc.add_user_id order by total_cnt desc limit 10
+    </select>
+
+    <select id="getGroupAnalysis" resultType="com.linkwechat.domain.operation.vo.WeGroupAnalysisVo">
+        select
+                (select count(1) from we_group where del_flag = 0 ) total_cnt,
+                (select count(1) from we_group where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_group_add_cnt,
+                (select count(1) from we_group where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')) as yd_group_add_cnt,
+                (select count(1) from we_group where date_format(update_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d')  and del_flag = 1 ) as td_group_dissolve_cnt,
+                (select count(1) from we_group where date_format(update_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')  and del_flag = 1 ) as yd_group_dissolve_cnt,
+                (select count(1) from we_group_member where del_flag = 0 ) as member_total_cnt,
+                (select count(1) from we_group_member where type = 1 and del_flag = 0 ) as member_user_cnt,
+                (select count(1) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_member_add_cnt,
+                (select count(1) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_member_add_cnt,
+                (select count(1) from we_group_member where date_format(quit_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') and del_flag = 1 ) as td_member_quit_cnt,
+                (select count(1) from we_group_member where date_format(quit_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') and del_flag = 1 ) as yd_member_quit_cnt;
+    </select>
+
+
+
+
+    <select id="getGroupTotalCnt" resultType="com.linkwechat.domain.operation.vo.WeGroupTotalCntVo">
+        select
+        x_time,
+        @total := @total + add_cnt AS total_cnt
+        from (
+        select date_list.`date` as x_time ,
+        IFNULL(real_data.add_num, 0) as add_cnt
+        from
+        (
+            select `date`
+            from sys_dim_date
+            where `date` &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            and `date` &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        ) as date_list
+        left join
+        (select DATE_FORMAT(wg.create_time, '%Y-%m-%d') day,
+        count(1) as add_num
+        from we_group wg  where 1=1
+        and wg.del_flag = 0
+        <if test="ownerIds != null and ownerIds.size() > 0" >
+            and wg.owner in
+            <foreach item="ownerId" collection="ownerIds" index="index" open="(" separator="," close=")">
+                #{ownerId}
+            </foreach>
+        </if>
+        and DATE_FORMAT(wg.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        and DATE_FORMAT(wg.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        group by day
+        ,(SELECT @total := (select count(1) from we_group wgt
+        where
+        wgt.del_flag = 0
+        and date_format(wgt.create_time,'%Y-%m-%d') &lt; DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        <if test="ownerIds != null and ownerIds.size() > 0" >
+            and wgt.owner in
+            <foreach item="ownerId" collection="ownerIds" index="index" open="(" separator="," close=")">
+                #{ownerId}
+            </foreach>
+        </if>
+        )))
+        as real_data on date_list.`date` = real_data.day order by x_time asc
+        ) as result order by x_time asc
+    </select>
+    <select id="getGroupMemberTotalCnt"
+            resultType="com.linkwechat.domain.operation.vo.WeGroupTotalCntVo">
+        select
+        x_time,
+        @total := @total + add_cnt AS total_cnt
+        from (
+        select date_list.`date` as x_time ,
+        IFNULL(real_data.add_num, 0) as add_cnt
+        from
+        (
+            select `date`
+            from sys_dim_date
+            where `date` &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            and `date` &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        ) as date_list
+        left join
+        (select DATE_FORMAT(wgm.create_time, '%Y-%m-%d') day,
+        count(1) as add_num
+        from we_group_member wgm  where 1=1
+        and wgm.del_flag = 0
+        <if test="chatIds != null and chatIds.size() > 0" >
+            and wgm.chat_id in
+            <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                #{chatId}
+            </foreach>
+        </if>
+        <if test="ownerIds != null and ownerIds.size() > 0" >
+            and exists (select 1 from we_group wg where wg.chat_id = wgm.chat_id and wg.del_flag = 0 and wg.owner in
+            <foreach item="ownerId" collection="ownerIds" index="index" open="(" separator="," close=")">
+                #{ownerId}
+            </foreach>
+            )
+        </if>
+        and DATE_FORMAT(wgm.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        and DATE_FORMAT(wgm.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        group by day
+        ,(SELECT @total := (select count(1) from we_group_member wgmt
+        where
+        wgmt.del_flag = 0
+        and date_format(wgmt.create_time,'%Y-%m-%d') &lt; DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        <if test="chatIds != null and chatIds.size() > 0" >
+            and wgmt.chat_id in
+            <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                #{chatId}
+            </foreach>
+        </if>
+        <if test="ownerIds != null and ownerIds.size() > 0" >
+            and exists (select 1 from we_group wg where wg.chat_id = wgmt.chat_id and wg.del_flag = 0  and wg.owner in
+            <foreach item="ownerId" collection="ownerIds" index="index" open="(" separator="," close=")">
+                #{ownerId}
+            </foreach>
+            )
+        </if>
+        )))
+        as real_data on date_list.`date` = real_data.day order by x_time asc
+        ) as result order by x_time asc
+    </select>
+
+    <select id="getGroupRealCnt" resultType="com.linkwechat.domain.operation.vo.WeGroupRealCntVo">
+        select
+        x_time,
+        @total := @total + add_cnt AS total_cnt,
+        add_cnt,
+        dissolve_cnt
+        from (
+        select date_list.`date` as x_time ,
+        IFNULL(real_data.add_num, 0) as add_cnt,
+        IFNULL(real_data.dissolve_num, 0) as dissolve_cnt
+        from
+        (
+            select `date`
+            from sys_dim_date
+            where `date` &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            and `date` &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        ) as date_list
+        left join
+        (select DATE_FORMAT(wg.create_time, '%Y-%m-%d') day,
+        count(1) as add_num,
+        sum(case when wg.del_flag = 1 then 1 else 0 end) as dissolve_num
+        from we_group wg  where 1=1
+        <if test="ownerIds != null and ownerIds.size() > 0" >
+            and wg.owner in
+            <foreach item="ownerId" collection="ownerIds" index="index" open="(" separator="," close=")">
+                #{ownerId}
+            </foreach>
+        </if>
+        and DATE_FORMAT(wg.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        and DATE_FORMAT(wg.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        group by day
+        ,(SELECT @total := (select count(1) from we_group wgt
+        where
+        wgt.del_flag = 0
+        and date_format(wgt.create_time,'%Y-%m-%d') &lt; DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        <if test="ownerIds != null and ownerIds.size() > 0" >
+            and wgt.owner in
+            <foreach item="ownerId" collection="ownerIds" index="index" open="(" separator="," close=")">
+                #{ownerId}
+            </foreach>
+        </if>
+        )))
+        as real_data on date_list.`date` = real_data.day order by x_time asc
+        ) as result order by x_time asc
+    </select>
+
+    <select id="getGroupMemberRealCnt"
+            resultType="com.linkwechat.domain.operation.vo.WeGroupMemberRealCntVo">
+        select
+        x_time,
+        @total := @total + add_cnt - quit_cnt AS total_cnt,
+        add_cnt,
+        quit_cnt
+        from (
+        select date_list.`date` as x_time ,
+        IFNULL(real_data.add_num, 0) as add_cnt,
+        IFNULL(quit_data.quit_num, 0) as quit_cnt
+        from
+        (
+            select `date`
+            from sys_dim_date
+            where `date` &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            and `date` &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        ) as date_list
+        left join
+        (select DATE_FORMAT(wgm.create_time, '%Y-%m-%d') day,
+        count(1) as add_num
+        from we_group_member wgm  where 1=1
+        <if test="chatIds != null and chatIds.size() > 0" >
+            and wgm.chat_id in
+            <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                #{chatId}
+            </foreach>
+        </if>
+        <if test="ownerIds != null and ownerIds.size() > 0" >
+            and exists (select 1 from we_group wg where wg.chat_id = wgm.chat_id and wg.del_flag = 0 and wg.owner in
+            <foreach item="ownerId" collection="ownerIds" index="index" open="(" separator="," close=")">
+                #{ownerId}
+            </foreach>
+            )
+        </if>
+        and DATE_FORMAT(wgm.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        and DATE_FORMAT(wgm.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        group by day
+        ,(SELECT @total := (select count(1) from we_group_member wgmt
+        where
+        wgmt.del_flag = 0
+        and date_format(wgmt.create_time,'%Y-%m-%d') &lt; DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        <if test="chatIds != null and chatIds.size() > 0" >
+            and wgmt.chat_id in
+            <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                #{chatId}
+            </foreach>
+        </if>
+        <if test="ownerIds != null and ownerIds.size() > 0" >
+            and exists (select 1 from we_group wg where wg.chat_id = wgmt.chat_id and wg.del_flag = 0 and wg.owner in
+            <foreach item="ownerId" collection="ownerIds" index="index" open="(" separator="," close=")">
+                #{ownerId}
+            </foreach>
+            )
+        </if>
+        )))
+        as real_data on date_list.`date` = real_data.day
+        left join
+        (select DATE_FORMAT(wgm.quit_time, '%Y-%m-%d') day,
+        sum(case when wgm.del_flag = 1 then 1 else 0 end) as quit_num
+        from we_group_member wgm  where 1=1
+        <if test="chatIds != null and chatIds.size() > 0" >
+            and wgm.chat_id in
+            <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                #{chatId}
+            </foreach>
+        </if>
+        <if test="ownerIds != null and ownerIds.size() > 0" >
+            and exists (select 1 from we_group wg where wg.chat_id = wgm.chat_id and wg.del_flag = 0 and wg.owner in
+            <foreach item="ownerId" collection="ownerIds" index="index" open="(" separator="," close=")">
+                #{ownerId}
+            </foreach>
+            )
+        </if>
+        and DATE_FORMAT(wgm.quit_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        and DATE_FORMAT(wgm.quit_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        group by day) as quit_data on date_list.`date` = quit_data.day
+        ) as result order by x_time asc
+    </select>
+    <select id="getCustomerSessionAnalysis"
+            resultType="com.linkwechat.domain.operation.vo.WeSessionCustomerAnalysisVo">
+        select
+            (select sum(chat_cnt) from we_user_behavior_data where date_format(stat_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')) as yd_chat_cnt,
+            (select sum(chat_cnt) from we_user_behavior_data where date_format(stat_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 2 day),'%Y-%m-%d')) as byd_chat_cnt,
+            (select sum(message_cnt) from we_user_behavior_data where date_format(stat_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_message_cnt,
+            (select sum(message_cnt) from we_user_behavior_data where date_format(stat_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 2 day),'%Y-%m-%d') ) as byd_message_cnt,
+            (select avg(reply_percentage) from we_user_behavior_data where date_format(stat_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')) as yd_reply_percentage,
+            (select avg(reply_percentage) from we_user_behavior_data where date_format(stat_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 2 day),'%Y-%m-%d') ) as byd_reply_percentage,
+            (select avg(avg_reply_time) from we_user_behavior_data where date_format(stat_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_avg_reply_time,
+            (select avg(avg_reply_time) from we_user_behavior_data where date_format(stat_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 2 day),'%Y-%m-%d') ) as byd_avg_reply_time;
+    </select>
+
+    <select id="getCustomerSessionTotalCnt"
+            resultType="com.linkwechat.domain.operation.vo.WeSessionCustomerTotalCntVo">
+        select
+        date_format(stat_time,'%Y-%m-%d') as x_time,
+        sum(wubd.chat_cnt) as chat_cnt,
+        sum(wubd.message_cnt) as message_cnt,
+        avg(wubd.reply_percentage) as reply_percentage,
+        avg(wubd.avg_reply_time) as avg_reply_time
+        from we_user_behavior_data wubd
+        <where>
+            <if test="userIds != null and userIds.size() > 0" >
+                and wubd.user_id in
+                <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                    #{userId}
+                </foreach>
+            </if>
+            <if test="deptIds != null and deptIds.size() > 0" >
+                and exists (select 1 from sys_user wu where wu.we_user_id = wubd.user_id and wu.department in
+                <foreach item="deptId" collection="deptIds" index="index" open="(" separator="," close=")">
+                    #{deptId}
+                </foreach>
+                )
+            </if>
+            and date_format(stat_time,'%Y-%m-%d') &gt;= date_format(#{beginTime},'%Y-%m-%d')
+            and date_format(stat_time,'%Y-%m-%d') &lt;= date_format(#{endTime},'%Y-%m-%d')
+        </where>
+        group by wubd.stat_time
+        order by x_time
+    </select>
+
+    <select id="getUserChatRank" resultType="com.linkwechat.domain.operation.vo.WeSessionUserChatRankVo">
+        select (select su.user_name from sys_user su where wubd.user_id = su.we_user_id limit 1) user_name,
+               sum(wubd.chat_cnt) as chat_cnt
+        from we_user_behavior_data wubd
+        <where>
+            and date_format(wubd.stat_time,'%Y-%m-%d') &gt;= date_format(#{beginTime},'%Y-%m-%d')
+            and date_format(wubd.stat_time,'%Y-%m-%d') &lt;= date_format(#{endTime},'%Y-%m-%d')
+        </where>
+        group by user_id order by chat_cnt desc limit 5
+    </select>
+    <select id="getUserAvgReplyTimeRank"
+            resultType="com.linkwechat.domain.operation.vo.WeSessionUserAvgReplyTimeRankVo">
+        select (select su.user_name from sys_user su where wubd.user_id = su.we_user_id limit 1) user_name,
+               avg(wubd.avg_reply_time) as avg_reply_time
+        from we_user_behavior_data wubd
+        <where>
+            and date_format(wubd.stat_time,'%Y-%m-%d') &gt;= date_format(#{beginTime},'%Y-%m-%d')
+            and date_format(wubd.stat_time,'%Y-%m-%d') &lt;= date_format(#{endTime},'%Y-%m-%d')
+        </where>
+        group by user_id order by avg_reply_time desc limit 5
+    </select>
+    <select id="getGroupSessionAnalysis"
+            resultType="com.linkwechat.domain.operation.vo.WeSessionGroupAnalysisVo">
+        select
+            (select sum(chat_total) from we_group_statistic where date_format(stat_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')) as yd_chat_total,
+            (select sum(chat_total) from we_group_statistic where date_format(stat_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 2 day),'%Y-%m-%d') ) as byd_chat_total,
+            (select sum(msg_total) from we_group_statistic where date_format(stat_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_msg_total,
+            (select sum(msg_total) from we_group_statistic where date_format(stat_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 2 day),'%Y-%m-%d') ) as byd_msg_total,
+            (select sum(member_has_msg) from we_group_statistic where date_format(stat_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_member_has_msg,
+            (select sum(member_has_msg) from we_group_statistic where date_format(stat_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 2 day),'%Y-%m-%d')) as byd_member_has_msg;
+    </select>
+    <select id="getGroupSessionTotalCnt"
+            resultType="com.linkwechat.domain.operation.vo.WeSessionGroupTotalCntVo">
+        select
+        date_format(wgs.stat_time,'%Y-%m-%d') as x_time,
+        sum(wgs.chat_total) as chat_total,
+        sum(wgs.msg_total) as msg_total,
+        avg(wgs.member_has_msg) as member_has_msg
+        from we_group_user_statistic wgs
+        <where>
+            <if test="chatIds != null and chatIds.size() > 0" >
+                and wgs.chat_id in
+                <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                    #{chatId}
+                </foreach>
+            </if>
+            <if test="ownerIds != null and ownerIds.size() > 0" >
+                and wgs.user_id in
+                <foreach item="ownerId" collection="ownerIds" index="index" open="(" separator="," close=")">
+                    #{ownerId}
+                </foreach>
+            </if>
+            and date_format(wgs.stat_time,'%Y-%m-%d') &gt;= date_format(#{beginTime},'%Y-%m-%d')
+            and date_format(wgs.stat_time,'%Y-%m-%d') &lt;= date_format(#{endTime},'%Y-%m-%d')
+        </where>
+        group by wgs.stat_time
+        order by x_time asc
+    </select>
+
+    <select id="getSessionArchiveAnalysis"
+            resultType="com.linkwechat.domain.operation.vo.WeSessionArchiveAnalysisVo">
+        select
+            (select count(1) from sys_user su where su.is_open_chat = 1 and su.del_flag = 0 ) as open_user_cnt,
+            (select count(1) from sys_user su where su.is_open_chat = 0 and su.del_flag = 0 ) as not_open_user_cnt,
+            (select count(1) from we_customer wc where wc.is_open_chat = 1 and wc.del_flag = 0 ) as open_customer_cnt,
+            (select count(1) from we_customer wc where wc.is_open_chat = 0 and wc.del_flag = 0 ) as not_open_customer_cnt
+    </select>
+
+    <select id="getSessionArchiveDetails"
+            resultType="com.linkwechat.domain.operation.vo.WeSessionArchiveDetailVo">
+        select
+            wc.external_userid as custoemr_id,
+            wc.customer_name,
+            wc.avatar as customer_avatar,
+            wc.add_user_id as user_id,
+            (select su.user_name from sys_user su where su.we_user_id = wc.add_user_id and su.del_flag = 0 limit 1) as user_name,
+            wc.open_chat_time
+        from we_customer wc
+        where is_open_chat = 1 and del_flag = 0
+        <if test="beginTime != null">
+            and date_format(wc.open_chat_time,'%Y-%m-%d') &gt;= date_format(#{beginTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null">
+            and date_format(wc.open_chat_time,'%Y-%m-%d') &lt;= date_format(#{endTime},'%Y-%m-%d')
+        </if>
+    </select>
+
+    <select id="findWeCustomerRemindAnalysis" resultType="com.linkwechat.domain.operation.vo.WeCustomerRemindAnalysisVo">
+        select
+        (select count(1) from we_customer where del_flag = 0 and date_format(add_time,'%y%m%d') &lt;= date_format(date_sub(curdate(),interval 1 day),'%y%m%d') )  as ydTotalCnt,
+        (select count(1) from we_customer where date_format(add_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d') ) as ydCnt,
+        (select count(1) from we_customer where del_flag = 0 and track_state=1 AND date_format(add_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d') ) ydFollowUpCustomer,
+        (select count(distinct external_userid) from we_customer where date_format(add_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')  and del_flag = 0 ) as ydNetCnt,
+        (select count(1) from we_customer where date_format(add_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')  and del_flag = 1 ) as ydLostCnt,
+        (select sum(new_apply_cnt) from we_user_behavior_data where date_format(stat_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d') ) as ydNewApplyCnt
+    </select>
+
+    <select id="findWeGroupRemindAnalysis" resultType="com.linkwechat.domain.operation.vo.WeGroupRemindAnalysisVo">
+        select
+        (select count(1) from we_group where del_flag = 0 and date_format(add_time,'%Y-%m-%d') &lt;= date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')) as ydGroupTotalCnt,
+        (select count(1) from we_group where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as ydGroupAddCnt,
+        (select count(1) from we_group where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')  and del_flag = 1 ) as ydGroupDissolveCnt,
+        (select count(1) from we_group_member where type=1 and date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')) AS ydMemberTotalCnt,
+        (select count(1) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as ydMemberAddCnt,
+        (select count(1) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') and del_flag = 1 ) as ydMemberQuitCnt
+    </select>
+
+
+</mapper>

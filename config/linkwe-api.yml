@@ -1,0 +1,8 @@
+server:
+  port: 6091
+  servlet:
+    # 应用的访问路径
+    context-path: /open
+  tomcat:
+    # tomcat的URI编码
+    uri-encoding: UTF-8

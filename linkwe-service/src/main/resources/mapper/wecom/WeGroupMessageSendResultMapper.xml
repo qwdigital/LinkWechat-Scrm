@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeGroupMessageSendResultMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeGroupMessageSendResult" id="WeGroupMessageSendResultResult">
+        <result property="id"    column="id"    />
+        <result property="msgTemplateId"    column="msg_template_id"    />
+        <result property="msgId"    column="msg_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="externalUserid"    column="external_userid"    />
+        <result property="customerName"    column="customer_name"    />
+        <result property="chatId"    column="chat_id"    />
+        <result property="chatName"    column="chat_name"    />
+        <result property="status"    column="status"    />
+        <result property="sendTime"    column="send_time"    />
+    </resultMap>
+
+    <select id="groupMsgSendResultList" resultMap="WeGroupMessageSendResultResult">
+        select
+            wgmsr.id,
+            wgmsr.msg_id,
+            wgmsr.msg_template_id,
+            wgmsr.external_userid,
+            substring_index(group_concat(wc.customer_name),',',1)  AS customer_name,
+            wgmsr.user_id,
+            substring_index(group_concat(su.user_name),',',1)  AS user_name,
+            wgmsr.chat_id,
+            substring_index(group_concat(wg.group_name),',',1)  AS chat_name,
+            wgmsr.status,
+            wgmsr.send_time
+        FROM we_group_message_send_result wgmsr
+        left join we_customer wc on wc.external_userid = wgmsr.external_userid and wc.del_flag = 0
+        left join sys_user su on su.we_user_id = wgmsr.user_id and su.del_flag = 0
+        left join we_group wg on wg.chat_id = wgmsr.chat_id and wg.del_flag = 0
+        <where>
+            <if test="id !=null">
+                and wgmsr.id = #{id}
+            </if>
+            <if test="msgTemplateId != null and msgTemplateId != ''">
+                and wgmsr.msg_template_id = #{msgTemplateId}
+            </if>
+            <if test="msgTemplateIds != null and msgTemplateIds != ''">
+                and wgmsr.msg_template_id in
+                <foreach item="item" index="index" collection="msgTemplateIds" open="(" separator=","
+                         close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="msgId != null and msgId != ''">
+                and wgmsr.msg_id = #{msgId}
+            </if>
+            <if test="status != null and status != ''">
+                and wgmsr.status = #{status}
+            </if>
+            <if test="customerName != null and customerName != ''">
+                and wc.customer_name like concat('%', #{customerName}, '%')
+            </if>
+            <if test="userName != null and userName != ''">
+                wu.user_name like concat('%', #{userName}, '%')
+            </if>
+            <if test="chatName != null and chatName != ''">
+                wg.group_name like concat('%', #{chatName}, '%')
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(wgmsr.send_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(wgmsr.send_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+        </where>
+        group by wgmsr.id
+    </select>
+
+</mapper>

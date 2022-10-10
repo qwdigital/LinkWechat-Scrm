@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeStoreCodeCountMapper">
+
+    <select id="countWeStoreShopGuideTab" resultType="com.linkwechat.domain.storecode.vo.tab.WeStoreShopGuideTabVo">
+        SELECT (
+                   SELECT
+                       COUNT(DISTINCT unionid)
+                   from
+                       we_store_code_count where source=1
+               )  as totalShopGuideScannNumber,
+               (
+                   SELECT count(DISTINCT external_userid) from we_customer where state in (
+                       SELECT state from we_store_code
+                   )
+
+               ) as customerTotalNumber,
+               (
+                   SELECT
+                       COUNT(DISTINCT if(date_format(create_time,'%y%m%d') = date_format(curdate(),'%y%m%d'),unionid,0))
+                   from
+                       we_store_code_count where source=1
+               ) as tdShopGuideScannNumber,
+               (
+                   SELECT
+                       COUNT(DISTINCT if(date_format(create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d'),unionid,0))
+                   from
+                       we_store_code_count where source=1
+               ) as ydShopGuideScannNumber,
+               (
+                   SELECT count(DISTINCT external_userid) from we_customer where state in (
+                       SELECT state from we_store_code
+                   ) AND  date_format(add_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
+               ) as ydCustomerNumber,
+               (
+                   SELECT count(DISTINCT external_userid) from we_customer where state in (
+                       SELECT state from we_store_code
+                   ) AND  date_format(create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
+               ) as tdCustomerNumber
+    </select>
+
+
+    <select id="countWeStoreTab" resultType="com.linkwechat.domain.storecode.vo.tab.WeStoreTabVo">
+        SELECT
+            (
+                SELECT
+                    COUNT(DISTINCT unionid)
+                from
+                    we_store_code_count where source=1
+                <if test="storeCodeId !=null">and store_code_id=#{storeCodeId}</if>
+            )  as totalShopGuideScannNumber,
+            (
+                SELECT
+                    COUNT(DISTINCT if(date_format(create_time,'%y%m%d') = date_format(curdate(),'%y%m%d'),unionid,0))
+                from
+                    we_store_code_count where source=1
+                <if test="storeCodeId !=null">and store_code_id=#{storeCodeId}</if>
+            ) as tdShopGuideScannNumber,
+
+            (
+                SELECT count(DISTINCT external_userid) from we_customer where state in (
+                    SELECT state from we_store_code
+                    <where>
+                        <if test="storeCodeId !=null">id=#{storeCodeId}</if>
+                    </where>
+                )
+            ) as customerTotalNumber,
+            (
+                SELECT count(DISTINCT external_userid) from we_customer where state in (
+                    SELECT state from we_store_code
+                <where>
+                    <if test="storeCodeId !=null">id=#{storeCodeId}</if>
+                </where>
+                ) AND  date_format(add_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
+            ) as ydCustomerNumber,
+
+            (
+                SELECT
+                    COUNT(DISTINCT unionid)
+                from
+                    we_store_code_count where source=2
+                <if test="storeCodeId !=null">and store_code_id=#{storeCodeId}</if>
+        )  as totalStoreGroupScannNumber,
+            (
+                SELECT
+                    COUNT(DISTINCT if(date_format(create_time,'%y%m%d') = date_format(curdate(),'%y%m%d'),unionid,0))
+                from
+                    we_store_code_count where source=2
+               <if test="storeCodeId !=null">and store_code_id=#{storeCodeId}</if>
+        ) as tdStoreGroupScannNumber,
+
+            (
+                SELECT COUNT(*)
+                FROM we_group_member wgm
+                where wgm.state in (
+                    SELECT state from we_group_code
+                    <where>
+                        <if test="groupCodeId !=null">id=#{groupCodeId}</if>
+                    </where>
+                )
+                AND wgm.del_flag=0
+
+            ) as totalJoinGroupMemberNumber,
+
+            (
+                SELECT COUNT(if(date_format(create_time,'%y%m%d') = date_format(curdate(),'%y%m%d'),wgm.id,0))
+                FROM we_group_member wgm
+                where wgm.state in (
+                    SELECT state from we_group_code
+                    <where>
+                        <if test="groupCodeId !=null">id=#{groupCodeId}</if>
+                    </where>
+            )
+                  AND wgm.del_flag=0
+
+            ) as tdJoinGroupMemberNumber,
+
+            (
+                SELECT COUNT(*)
+                FROM we_group_member wgm
+                where wgm.state in (
+                SELECT state from we_group_code
+                    <where>
+                        <if test="groupCodeId !=null">id=#{groupCodeId}</if>
+                    </where>
+            ) 	AND wgm.del_flag=1
+
+            ) as totalExitGroupMemberNumber,
+
+            (
+                SELECT COUNT(if(date_format(create_time,'%y%m%d') = date_format(curdate(),'%y%m%d'),wgm.id,0))
+                FROM we_group_member wgm
+                where wgm.state in (
+                    SELECT state from we_group_code
+                    <where>
+                        <if test="groupCodeId !=null">id=#{groupCodeId}</if>
+                    </where>
+                )  	AND wgm.del_flag=1
+            ) as tdExitGroupMemberNumber
+    </select>
+
+
+    <select id="countWeStoreGroupTab" resultType="com.linkwechat.domain.storecode.vo.tab.WeStoreGroupTabVo">
+        SELECT
+            (
+                SELECT
+                    COUNT(DISTINCT unionid)
+                from
+                    we_store_code_count where source=2
+        ) as totalStoreGroupScannNumber,
+
+        (
+        SELECT COUNT(*)
+        FROM we_group_member wgm
+        where wgm.state in (
+                SELECT state from we_group_code
+            )
+
+        and wgm.del_flag=0
+        ) as totalJoinGroupMemberNumber,
+
+        (
+        SELECT COUNT(*)
+        FROM we_group_member wgm
+        where wgm.state in (
+            SELECT state from we_group_code
+        )
+        and wgm.del_flag=1
+        ) as totalExitGroupMemberNumber,
+
+        (
+        SELECT
+        COUNT(DISTINCT if(date_format(create_time,'%y%m%d') = date_format(curdate(),'%y%m%d'),unionid,0))
+        from
+        we_store_code_count where source=2
+            ) as tdStoreGroupScannNumber,
+            (
+                SELECT COUNT(if(date_format(create_time,'%y%m%d') = date_format(curdate(),'%y%m%d'),wgm.id,0))
+                FROM we_group_member wgm
+                where wgm.state in (
+                    SELECT state from we_group_code
+            ) and wgm.del_flag=0
+            ) as tdJoinGroupMemberNumber,
+            (
+                SELECT COUNT(if(date_format(create_time,'%y%m%d') = date_format(curdate(),'%y%m%d'),wgm.id,0))
+                FROM we_group_member wgm
+                where wgm.state in (
+                    SELECT state from we_group_code
+        )  and wgm.del_flag=1
+            ) as tdExitGroupMemberNumber,
+            (
+                SELECT
+                    COUNT(if(date_format(create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d'),id,0))
+                from
+                    we_store_code_count where source=2
+            ) as ydStoreGroupScannNumber,
+            (
+                SELECT COUNT(if(date_format(create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d'),wgm.id,0))
+                FROM we_group_member wgm
+                where wgm.state in (
+                    SELECT state from we_group_code
+            )  and wgm.del_flag=0
+            ) as ydJoinGroupMemberNumber,
+            (
+                SELECT COUNT(if(date_format(create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d'),wgm.id,0))
+                FROM we_group_member wgm
+                where wgm.state in (
+                    SELECT state from we_store_code
+            ) and wgm.del_flag=1
+            ) as ydExitGroupMemberNumber
+    </select>
+
+
+    <select id="countStoreShopGuideDrum" resultType="com.linkwechat.domain.storecode.vo.drum.WeStoreShopGuideDrumVo">
+        SELECT
+            a.store_name,
+            a.customerNumber
+        FROM
+            (
+                SELECT
+                    wsc.store_name,
+                    (
+                        SELECT
+                            COUNT( DISTINCT wc.external_userid )
+                        FROM
+                            we_customer wc
+                        WHERE
+                            wc.state = wsc.state
+                          AND date_format( wc.add_time, '%Y-%m-%d' ) BETWEEN #{beginTime}
+                            AND #{endTime}
+                    ) AS customerNumber
+                FROM
+                    we_store_code wsc
+                where  wsc.del_flag=0
+                GROUP BY
+                    wsc.id
+            ) a
+        ORDER BY
+            customerNumber DESC
+            LIMIT 10
+    </select>
+
+    <select id="countStoreShopGroupDrum" resultType="com.linkwechat.domain.storecode.vo.drum.WeStoreGroupDrumVo">
+        SELECT
+            a.store_name,
+            a.customerNumber
+        FROM
+            (
+                SELECT
+                    wsc.store_name,
+                    (
+                        SELECT
+                            COUNT( DISTINCT wgm.user_id )
+                        FROM
+                            we_group_member wgm
+                        WHERE
+                            wgm.state = wsc.state AND wgm.quit_scene IS NULL
+                          AND date_format( wgm.join_time, '%Y-%m-%d' ) BETWEEN #{beginTime}
+                            AND #{endTime}
+                    ) AS customerNumber
+                FROM
+                    we_store_code wsc
+                where  wsc.del_flag=0
+                GROUP BY
+                    wsc.id
+            ) a
+        ORDER BY
+            customerNumber DESC
+            LIMIT 10
+    </select>
+
+
+    <select id="countShopGuideReport" resultType="com.linkwechat.domain.storecode.vo.datareport.WeStoreShopGuideReportVo">
+        SELECT
+            wscc.store_code_id,
+            date_format(wsc.create_time,'%Y-%m-%d') as createTime,
+            wsc.area,
+            wsc.store_name,
+            COUNT(IF(date_format( wscc.create_time, '%Y-%m-%d' ) BETWEEN #{weStoreCode.beginTime} AND #{weStoreCode.endTime},unionid,0)) as totalScannNumber,
+            (SELECT COUNT(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.state=wsc.state
+                                                                             AND date_format(wc.add_time, '%Y-%m-%d' ) BETWEEN #{weStoreCode.beginTime} AND #{weStoreCode.endTime}
+            ) as customerTotalNumber,
+            COUNT(DISTINCT if(date_format(wscc.create_time,'%y%m%d') = date_format(curdate(),'%y%m%d'),unionid,0)) as tdScannNumber,
+            (SELECT COUNT(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.state=wsc.state
+                                                                             AND date_format(wc.add_time, '%Y-%m-%d' )  = date_format(curdate(),'%Y-%m-%d')
+            ) as tdCustomerNumber
+        FROM
+            we_store_code_count wscc
+                LEFT JOIN we_store_code wsc ON wscc.store_code_id=wsc.id
+        WHERE wscc.source=1 and wsc.del_flag=0
+        <if test="weStoreCode.area !=null  and weStoreCode.area !=''">and wsc.area = #{weStoreCode.area}</if>
+        <if test="weStoreCode.storeName != null and weStoreCode.storeName != ''">and wsc.store_name = #{weStoreCode.storeName}</if>
+        <if test="weStoreCode.storeCodeId !=null"> and wsc.id=#{weStoreCode.storeCodeId}</if>
+        GROUP BY date_format(wsc.create_time,'%Y-%m-%d')
+    </select>
+
+
+    <select id="countStoreGroupReport" resultType="com.linkwechat.domain.storecode.vo.datareport.WeStoreGroupReportVo">
+        SELECT
+            wscc.store_code_id,
+            date_format(wsc.create_time,'%Y-%m-%d') as createTime,
+            wsc.address,
+            wsc.area,
+            wsc.store_name,
+            COUNT(IF(date_format( wscc.create_time, '%Y-%m-%d' ) BETWEEN #{weStoreCode.beginTime} AND #{weStoreCode.endTime},unionid,0)) as totalStoreGroupScannNumber,
+            (SELECT COUNT(DISTINCT wgm.user_id) FROM we_group_member wgm WHERE wgm.state=wsc.state and wgm.quit_scene IS NULL
+                                                                           AND date_format(wgm.create_time, '%Y-%m-%d' ) BETWEEN #{weStoreCode.beginTime} AND #{weStoreCode.endTime}
+            ) as totalJoinGroupMemberNumber,
+
+            (SELECT COUNT(DISTINCT wgm.user_id) FROM we_group_member wgm WHERE wgm.state=wsc.state and wgm.quit_scene IS NOT NULL
+                                                                           AND date_format(wgm.create_time, '%Y-%m-%d' ) BETWEEN #{weStoreCode.beginTime} AND #{weStoreCode.endTime}
+            ) as totalExitGroupMemberNumber,
+
+            COUNT(DISTINCT if(date_format(wscc.create_time,'%y%m%d') = date_format(curdate(),'%y%m%d'),unionid,0)) as tdStoreGroupScannNumber,
+
+            (SELECT COUNT(DISTINCT wgm.user_id) FROM we_group_member wgm WHERE wgm.state=wsc.state  and wgm.quit_scene IS NULL
+                                                                           AND date_format(wgm.create_time, '%Y-%m-%d' )  = date_format(curdate(),'%Y-%m-%d')
+            ) as tdJoinGroupMemberNumber,
+
+            (SELECT COUNT(DISTINCT wgm.user_id) FROM we_group_member wgm WHERE wgm.state=wsc.state  and wgm.quit_scene IS NOT NULL
+                                                                           AND date_format(wgm.create_time, '%Y-%m-%d' )  = date_format(curdate(),'%Y-%m-%d')
+            ) as tdExitGroupMemberNumber
+
+        FROM
+            we_store_code_count wscc
+                LEFT JOIN we_store_code wsc ON wscc.store_code_id=wsc.id
+        WHERE wscc.source=2 and wsc.del_flag=0
+        <if test="weStoreCode.area !=null  and weStoreCode.area !=''">and wsc.area = #{weStoreCode.area}</if>
+        <if test="weStoreCode.storeName != null and weStoreCode.storeName != ''">and wsc.store_name = #{weStoreCode.storeName}</if>
+        <if test="weStoreCode.storeCodeId !=null"> and wsc.id=#{weStoreCode.storeCodeId}</if>
+        GROUP BY date_format(wsc.create_time,'%Y-%m-%d')
+    </select>
+
+    <select id="countStoreShopGuideTrend" resultType="com.linkwechat.domain.storecode.vo.trend.WeStoreShopGuideTrendVo">
+        SELECT _date as dataTime,IFNULL(totalShopGuideScannNumber,0) as totalShopGuideScannNumber,IFNULL(customerTotalNumber,0) as customerTotalNumber
+        FROM
+        (
+        SELECT
+        (@s := @s + 1 ) AS _index,
+        STR_TO_DATE(
+        DATE(
+        DATE_SUB( DATE_FORMAT( #{weStoreCode.endTime}, '%Y-%m-%d' ), INTERVAL @s DAY )),
+        '%Y-%m-%d'
+        ) AS _date
+        FROM
+        information_schema.CHARACTER_SETS,(
+        SELECT
+        @s :=- 1
+        ) AS init
+        WHERE
+        @s &lt; datediff(
+        DATE_FORMAT( #{weStoreCode.endTime}, '%Y-%m-%d' ),
+        DATE_FORMAT( #{weStoreCode.beginTime}, '%Y-%m-%d' ))
+        ORDER BY
+        _date
+        ) tmp
+        LEFT JOIN
+        (
+        SELECT
+        DATE_FORMAT(wscc.create_time, '%Y-%m-%d' ) AS dateTime,
+        count(DISTINCT unionid) as totalShopGuideScannNumber,
+        (SELECT count(DISTINCT wc.external_userid) from we_customer wc where wc.state=wsc.state) as customerTotalNumber
+        FROM
+        we_store_code_count 	wscc
+        LEFT JOIN we_store_code wsc	ON wscc.store_code_id=wsc.id and wsc.del_flag=0
+        WHERE    date_format(wscc.create_time,'%Y-%m-%d') BETWEEN #{weStoreCode.beginTime} AND #{weStoreCode.endTime} AND wscc.source=1
+        <if test="weStoreCode.storeCodeId !=null"> and wsc.id=#{weStoreCode.storeCodeId}</if>
+        <if test="weStoreCode.area !=null  and weStoreCode.area !=''">and wsc.area = #{weStoreCode.area}</if>
+        <if test="weStoreCode.storeName != null and weStoreCode.storeName != ''">and wsc.store_name = #{weStoreCode.storeName}</if>
+        GROUP BY
+        DATE_FORMAT(wscc.create_time, '%Y-%m-%d' )
+        ) tmpp  on tmp._date=tmpp.dateTime
+
+        ORDER BY _date ASC
+    </select>
+
+
+    <select id="countStoreGroupTrend" resultType="com.linkwechat.domain.storecode.vo.trend.WeStoreGroupTrendVo">
+        SELECT _date as dataTime,IFNULL(totalStoreGroupScannNumber,0) as totalStoreGroupScannNumber,IFNULL(totalJoinGroupMemberNumber,0) as totalJoinGroupMemberNumber,
+        IFNULL(totalExitGroupMemberNumber,0) as totalExitGroupMemberNumber
+        FROM
+        (
+        SELECT
+        (@s := @s + 1 ) AS _index,
+        STR_TO_DATE(
+        DATE(
+        DATE_SUB( DATE_FORMAT( #{weStoreCode.endTime}, '%Y-%m-%d' ), INTERVAL @s DAY )),
+        '%Y-%m-%d'
+        ) AS _date
+        FROM
+        information_schema.CHARACTER_SETS,(
+        SELECT
+        @s :=- 1
+        ) AS init
+        WHERE
+        @s  &lt; datediff(
+        DATE_FORMAT( #{weStoreCode.endTime}, '%Y-%m-%d' ),
+        DATE_FORMAT( #{weStoreCode.beginTime}, '%Y-%m-%d' ))
+        ORDER BY
+        _date
+        ) tmp
+        LEFT JOIN
+        (
+        SELECT
+        DATE_FORMAT(wscc.create_time, '%Y-%m-%d' ) AS dateTime,
+        count(DISTINCT unionid) as totalStoreGroupScannNumber,
+        (SELECT count(DISTINCT wgm.user_id) from we_group_member wgm where wgm.state=wgc.state and wgm.del_flag=0) as totalJoinGroupMemberNumber,
+        (SELECT count(DISTINCT wgm.user_id) from we_group_member wgm where wgm.state=wgc.state and wgm.del_flag=1) as totalExitGroupMemberNumber
+        FROM
+        we_store_code_count 	wscc
+        LEFT JOIN we_store_code wsc	ON wscc.store_code_id=wsc.id and wsc.del_flag=0
+        LEFT JOIN we_group_code wgc ON wgc.id=wsc.group_code_id
+        WHERE    date_format(wscc.create_time,'%Y-%m-%d') BETWEEN #{weStoreCode.beginTime} AND #{weStoreCode.endTime} AND wscc.source=2
+        <if test="weStoreCode.storeCodeId !=null"> and wsc.id=#{weStoreCode.storeCodeId}</if>
+        <if test="weStoreCode.area !=null  and weStoreCode.area !=''">and wsc.area = #{weStoreCode.area}</if>
+        <if test="weStoreCode.storeName != null and weStoreCode.storeName != ''">and wsc.store_name = #{weStoreCode.storeName}</if>
+        GROUP BY
+        DATE_FORMAT(wscc.create_time, '%Y-%m-%d' )
+        ) tmpp  on tmp._date=tmpp.dateTime
+        ORDER BY _date ASC
+    </select>
+
+
+</mapper>

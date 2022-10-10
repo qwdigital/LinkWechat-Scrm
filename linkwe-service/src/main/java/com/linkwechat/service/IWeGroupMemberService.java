@@ -1,0 +1,50 @@
+package com.linkwechat.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.domain.WeGroupMember;
+import com.linkwechat.domain.groupchat.vo.WeGroupMemberVo;
+
+import java.util.List;
+
+/**
+ * 企业微信群成员(WeGroupMember)
+ *
+ * @author danmo
+ * @since 2022-04-02 13:35:14
+ */
+public interface IWeGroupMemberService extends IService<WeGroupMember> {
+
+    /**
+     * 获取群成员列表（分页）
+     * @param weGroupMember
+     * @return
+     */
+    List<WeGroupMember> getPageList(WeGroupMember weGroupMember);
+
+    /**
+     * 插入客户
+     * @param weGroupMembers
+     */
+    void insertBatch(List<WeGroupMember> weGroupMembers);
+
+    /**
+     * 获取群成员列表
+     * @param chatId 群聊ID
+     * @return
+     */
+    List<WeGroupMemberVo> selectGroupMemberListByChatId(String chatId);
+
+    /**
+     * 获取群成员列表
+     * @param chatIds 群聊ID
+     * @return
+     */
+    List<WeGroupMemberVo> selectGroupMemberListByChatIds(List<String> chatIds);
+
+    /**
+     * 退群数据更新
+     * @param userId
+     * @param chatId
+     */
+    void quitGroup(Integer quitScene,String userId,String chatId);
+}

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeLeaveUserMapper">
+
+    <select id="leaveNoAllocateUserList" parameterType="com.linkwechat.domain.WeLeaveUser"
+            resultType="com.linkwechat.domain.WeLeaveUser">
+        SELECT
+         *
+        FROM
+        (
+        SELECT
+            wu.user_id,
+            wu.user_name,
+            wu.dimission_time as dimissionTime,
+            (SELECT GROUP_CONCAT(wd.dept_name) FROM sys_dept wd WHERE wd.dept_id=wu.dept_id) as department,
+            (SELECT count(*) FROM we_allocate_customer wac
+            INNER  JOIN we_customer wc ON wac.external_userid=wc.external_userid
+            and wac.handover_userid=wc.add_user_id  WHERE wac.handover_userid=wu.we_user_id) as allocateCustomerNum,
+            (SELECT COUNT(*) FROM we_allocate_group wg WHERE wg.old_owner=wu.we_user_id) as allocateGroupNum
+        FROM
+        sys_user wu
+        WHERE
+          wu.del_flag=1
+            <if test="userName != null and userName !=''">and wu.user_name like concat('%', #{userName}, '%')</if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(wu.update_time,'%Y-%m-%d') &gt;= date_format(#{beginTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(wu.update_time,'%Y-%m-%d') &lt;= date_format(#{endTime},'%Y-%m-%d')
+            </if>
+            <if test="isAllocate != null ">and wu.is_allocate = #{isAllocate}</if>
+        )wuu WHERE allocateCustomerNum >0 or allocateGroupNum>0
+    </select>
+
+    <select id="leaveAllocateUserList" parameterType="com.linkwechat.domain.WeLeaveUser"
+            resultType="com.linkwechat.domain.WeLeaveUser">
+        SELECT
+            wu.user_id,
+            wu.user_name,
+            wu.update_time as dimissionTime,
+            (SELECT GROUP_CONCAT(wd.dept_name) FROM sys_dept wd WHERE wd.dept_id=wu.dept_id) as department,
+            (SELECT COUNT(*) FROM we_allocate_customer wac WHERE wac.handover_userid=wu.we_user_id) as allocateCustomerNum,
+            (SELECT COUNT(*) FROM we_allocate_group wag WHERE wag.old_owner=wu.we_user_id) as allocateGroupNum
+        FROM sys_user wu
+        <where>
+            <if test="userName != null and userName !=''">and wu.user_name like concat('%', #{userName}, '%')</if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(wu.update_time,'%Y-%m-%d') &gt;= date_format(#{beginTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(wu.update_time,'%Y-%m-%d') &lt;= date_format(#{endTime},'%Y-%m-%d')
+            </if>
+            <if test="isAllocate != null ">and wu.is_allocate = #{isAllocate}</if>
+        </where>
+    </select>
+
+    <select id="getAllocateCustomers" parameterType="com.linkwechat.domain.WeAllocateCustomer"
+            resultType="com.linkwechat.domain.WeAllocateCustomer">
+        SELECT
+            wc.customer_name,
+            wu.user_name as takeUserName,
+            wac.allocate_time,
+            wc.external_userid as externalUserid,
+            wc.add_user_id as userId,
+            (SELECT GROUP_CONCAT(wd.dept_name) FROM sys_dept wd WHERE wd.dept_id=wu.dept_id) as department
+            FROM
+            we_allocate_customer wac
+        LEFT JOIN we_customer wc ON wac.external_userid=wc.external_userid
+        LEFT JOIN sys_user wu ON wu.user_id=wac.takeover_userid
+        WHERE wc.del_flag=1
+        <if test="handoverUserId != null and handoverUserId !=''">and wc.add_user_id=#{handoverUserId}</if>
+        <if test="handoverUserId != null and handoverUserId !=''">and wac.handover_userid=#{handoverUserId}</if>
+        <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
+            DATE_FORMAT(wu.update_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
+        </if>
+    </select>
+
+
+    <select id="getAllocateGroups" parameterType="com.linkwechat.domain.WeAllocateGroups"
+            resultType="com.linkwechat.domain.WeAllocateGroups">
+        SELECT
+            wu.user_name as newOwnerName,
+            wg.chat_id,
+            IF(wg.group_name,wg.group_name,"群聊")  as group_name,
+            (SELECT count(*) FROM we_group_member wgm WHERE wgm.chat_id=wg.chat_id) as memberNum,
+            (SELECT GROUP_CONCAT(wd.dept_name) FROM sys_dept wd WHERE wd.dept_id=wu.dept_id) as department,
+            wag.allocate_time
+        FROM
+        we_allocate_group wag
+        LEFT JOIN we_group wg ON wag.chat_id=wg.chat_id
+        LEFT JOIN sys_user wu ON wu.user_id=wag.new_owner
+        <where>
+            <if test="oldOwner != null and oldOwner !=''">and wag.old_owner=#{oldOwner}</if>
+            <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
+                DATE_FORMAT(wu.update_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateWeUserIsAllocate">
+        UPDATE sys_user
+        SET is_allocate = 1
+        WHERE
+            we_user_id = #{weUserId}
+    </update>
+
+
+
+
+</mapper>

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeRedEnvelopesRecordMapper">
+
+
+    <select id="findRedEnveForUser" resultType="com.linkwechat.domain.envelopes.vo.WeCutomerRedEnvelopesVo">
+        SELECT
+        DISTINCT wre.open_id,
+        (SELECT wu.user_name FROM sys_user wu WHERE wu.we_user_id=wre.we_user_id) as userName,
+        wre.receive_name as customerName,
+        wre.avatar,
+        IFNULL(Round(wre.red_envelope_money/100,2),0.00) as redEnvelopeMoney,
+        wre.create_time,
+        wre.send_state,
+        wre.order_no
+        FROM
+        we_red_envelopes_record wre
+        WHERE wre.receive_type=1 and wre.chat_id IS  NULL
+        <if test="userId !=null and userId !=''">
+            AND wre.we_user_id in
+            <foreach collection="userId.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="sendState !=null">
+            AND wre.send_state=#{sendState}
+        </if>
+        <if test="beginTime != null and beginTime !='' and endTime !=null and endTime !=''">
+            AND DATE_FORMAT(wre.create_time,'%Y-%m-%d') BETWEEN #{beginTime}  AND #{endTime}
+        </if>
+        <if test="customerName !=null and customerName !=''">
+            AND wre.receive_name like concat('%',#{customerName},'%')
+        </if>
+        ORDER BY  wre.create_time DESC
+    </select>
+
+
+    <select id="findRedEnveForGroup" resultType="com.linkwechat.domain.envelopes.vo.WeGroupRedEnvelopesVo">
+        SELECT
+        (SELECT wu.user_name FROM sys_user wu WHERE wu.we_user_id=wre.we_user_id) as userName,
+        wg.group_name as groupName,
+        wre.red_envelope_type,
+        wre.red_envelope_num,
+        IFNULL(Round(wre.red_envelope_money/100,2),0.00) as redEnvelopeMoney,
+        wre.create_time,
+        wre.chat_id,
+        wre.order_no,
+        wu.user_name as groupLeaderName,
+        (select count(*) from we_red_envelopes_record wred where wred.chat_id=wre.chat_id and wred.source=2  and  wre.order_no=wred.order_no  and wred.open_id is not null ) as receiveNum,
+        (wre.red_envelope_num-(select count(*) from we_red_envelopes_record wred where wred.chat_id=wre.chat_id and wred.source=2 and  wre.order_no=wred.order_no  and wred.open_id is not null )) as surplusNum
+        FROM
+        we_red_envelopes_record wre
+        LEFT JOIN we_group wg ON wg.chat_id=wre.chat_id
+        LEFT JOIN sys_user wu on wu.we_user_id=wg.owner
+        WHERE wre.receive_type=2 and wre.source=1
+
+        <if test="userId !=null and userId !=''">
+            AND wre.we_user_id in
+            <foreach collection="userId.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+
+
+        <if test="groupName !=null and groupName !=''">
+            AND wg.group_name like concat('%',#{groupName},'%')
+        </if>
+
+        <if test="redEnvelopeType !=null">
+            AND wre.red_envelope_type=#{redEnvelopeType}
+        </if>
+
+        <if test="beginTime != null and beginTime !='' and endTime !=null and endTime !=''">
+            AND DATE_FORMAT(wre.create_time,'%Y-%m-%d') BETWEEN #{beginTime}  AND #{endTime}
+        </if>
+        ORDER BY  wre.create_time DESC
+    </select>
+
+    <select id="findRedEnveForGroupUser" resultType="com.linkwechat.domain.envelopes.vo.WeCutomerRedEnvelopesVo">
+        SELECT
+        DISTINCT wre.open_id,
+        wre.receive_name as customerName,
+        IFNULL(Round(wre.red_envelope_money/100,2),0.00) as redEnvelopeMoney,
+        wre.create_time,
+        wre.receive_order_no as orderNo
+        FROM
+        we_red_envelopes_record wre
+        where wre.open_id is not null  and wre.source=2 and wre.send_state=2
+        <if test="chatId !=null and chatId !=''">
+            AND wre.chat_id=#{chatId}
+        </if>
+        <if test="orderNo !=null and orderNo !=''">
+            and wre.order_no=#{orderNo}
+        </if>
+    </select>
+
+
+    <select id="countTab" resultType="com.linkwechat.domain.envelopes.vo.WeRedEnvelopesCountVo">
+        SELECT
+            IFNULL(SUM(red_envelope_money),0) as totalMoney,
+            COUNT(1) as totalNum,
+            IFNULL(SUM(if(TO_DAYS(create_time)=TO_DAYS(NOW()),red_envelope_money,0)),0) as currentMoney,
+            COUNT(IF(TO_DAYS(create_time)=TO_DAYS(NOW()),1,0)) as currentNum
+        FROM
+            we_red_envelopes_record
+        WHERE send_state=2
+    </select>
+
+
+    <select id="countLineChart" resultType="com.linkwechat.domain.envelopes.vo.WeRedEnvelopesCountVo">
+        SELECT
+        wr.*
+        FROM
+        (
+        SELECT
+        IFNULL(COUNT(0),0) as totalNum,
+        IFNULL(SUM(wre.red_envelope_money),0) as totalMoney,
+        DATE_FORMAT(wre.create_time,'%Y-%m-%d') as createTime
+        FROM
+        we_red_envelopes_record wre
+        WHERE wre.send_state=2 and  DATE_FORMAT(wre.create_time,'%Y-%m-%d') between #{startTime} and #{endTime}
+        GROUP BY DATE_FORMAT(wre.create_time,'%Y-%m-%d')
+        <foreach collection="dates" item="date" >
+            UNION(SELECT 0,0,#{date})
+        </foreach>
+        ) AS wr
+        GROUP BY wr.createTime
+        ORDER BY wr.createTime ASC
+    </select>
+
+
+    <select id="findRecordGroupByUserId" resultType="com.linkwechat.domain.envelopes.vo.WeRedEnvelopesCountVo">
+        SELECT
+        (SELECT wu.user_name FROM sys_user wu WHERE wu.we_user_id=wre.we_user_id) as userName,
+        wre.receive_type,
+        wre.create_time,
+        SUM(wre.red_envelope_money) as totalMoney
+        FROM
+        we_red_envelopes_record wre
+        WHERE wre.send_state=2
+        <if test="startTime !=null and startTime !='' and endTime != null and endTime !=''">
+            and  DATE_FORMAT(wre.create_time,'%Y-%m-%d') between #{startTime} and #{endTime}
+        </if>
+        GROUP BY wre.we_user_id,wre.receive_type
+    </select>
+
+    <select id="findAccpectMoney" resultType="int">
+        SELECT
+        IFNULL(sum(wrer.red_envelope_money),0) AS accpectMoney
+        FROM
+        we_red_envelopes_record wrer
+        WHERE
+        wrer.open_id IS NOT NULL
+        <if test="orderNo !=null and orderNo !=''">
+            and wrer.order_no=#{orderNo}
+        </if>
+        and wrer.send_state=2
+    </select>
+
+    <select id="findAccpectCustomers" resultType="com.linkwechat.domain.envelopes.dto.H5RedEnvelopesDetailDto$AccpestCustomer">
+        SELECT
+        wrer.red_envelope_money as accpectMoney,
+        wrer.update_time as accpectTime,
+        wrer.avatar,
+        wrer.receive_name as customerName
+        FROM
+        we_red_envelopes_record wrer
+        WHERE wrer.open_id IS NOT NULL and wrer.send_state=2
+        <if test="orderNo !=null and orderNo !=''">
+            and wrer.order_no=#{orderNo}
+        </if>
+    </select>
+
+
+</mapper>

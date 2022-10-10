@@ -475,6 +475,10 @@
         <!--开发环境默认激活-->
         <profile>
             <id>dev</id>
+            <activation>
+                <!--默认激活-->
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
                 <spring.profiles.active>dev</spring.profiles.active>
             </properties>
@@ -483,10 +487,6 @@
         <!--测试环境-->
         <profile>
             <id>test</id>
-            <activation>
-                <!--默认激活-->
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <spring.profiles.active>test</spring.profiles.active>
             </properties>

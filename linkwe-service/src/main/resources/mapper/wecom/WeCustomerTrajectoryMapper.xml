@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeCustomerTrajectoryMapper">
+
+    <delete id="deleteSynchTrajectory">
+        DELETE FROM we_customer_trajectory where is_synch=true
+    </delete>
+<!--    <select id="followUpRecord"  resultType="com.linkwechat.domain.WeCustomerTrajectory">-->
+<!--        SELECT-->
+<!--        wct.content as trackContent,-->
+<!--        wct.content,-->
+<!--        wu.we_user_id as userId,-->
+<!--        wu.user_name,-->
+<!--        wct.track_time,-->
+<!--        wct.track_state,-->
+<!--        wct.title-->
+<!--        FROM-->
+<!--        we_customer_trajectory wct-->
+<!--        LEFT JOIN sys_user wu ON wu.we_user_id = wct.user_id-->
+<!--        WHERE-->
+<!--             wu.del_flag=0-->
+<!--            <if test="externalUserid !=null and externalUserid !=''">-->
+<!--                and wct.external_userid=#{externalUserid}-->
+<!--            </if>-->
+<!--            <if test="userId !=null and userId !=''">-->
+<!--                and wct.user_id=#{userId}-->
+<!--            </if>-->
+<!--            <if test="trajectoryType !=null">-->
+<!--                and wct.trajectory_type=#{trajectoryType}-->
+<!--            </if>-->
+<!--        ORDER BY wct.track_time desc-->
+<!--    </select>-->
+
+
+</mapper>

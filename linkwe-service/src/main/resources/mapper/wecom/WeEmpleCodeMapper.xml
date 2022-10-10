@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeEmpleCodeMapper">
+
+
+    <resultMap id="communityNewGroupResult" type="com.linkwechat.domain.community.vo.WeCommunityNewGroupVo">
+        <result property="id" column="id" />
+        <result property="groupCodeId" column="group_code_id" />
+        <result property="codeName" column="empl_code_name" />
+        <result property="emplCodeId" column="empl_code_id" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+    </resultMap>
+
+    <resultMap type="com.linkwechat.domain.community.WeEmpleCode" id="WeEmpleCodeResult">
+        <result property="id" column="id"/>
+        <result property="codeType" column="code_type"/>
+        <result property="isJoinConfirmFriends" column="is_join_confirm_friends"/>
+        <result property="scenario" column="scenario"/>
+        <result property="welcomeMsg" column="welcome_msg"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="configId" column="config_id"/>
+        <result property="qrCode" column="qr_code"/>
+        <result property="mediaId" column="media_id"/>
+        <result property="scanTimes" column="scan_times" />
+        <result property="state" column="state" />
+        <collection property="weEmpleCodeUseScops" ofType="com.linkwechat.domain.community.WeEmpleCodeUseScop">
+            <result property="id" column="scopeId"/>
+            <result property="businessId" column="business_id"/>
+            <result property="businessName" column="business_name"/>
+            <result property="mobile" column="mobile"/>
+        </collection>
+        <collection property="weEmpleCodeTags" ofType="com.linkwechat.domain.community.WeEmpleCodeTag">
+            <result property="tagId" column="tag_id"/>
+            <result property="tagName" column="tag_name"/>
+        </collection>
+    </resultMap>
+
+
+
+    <sql id="selectWeEmpleCodeLsit">
+        select
+            wecode.id,
+            wecode.code_type,
+            wecode.media_id,
+            wecode.is_join_confirm_friends,
+            wecode.scenario,
+            wecode.welcome_msg,
+            wecode.create_by,
+            wecode.create_time,
+            wecode.del_flag,
+            wecode.config_id,
+            wecode.qr_code,
+            wecode.state,
+            wecode.scan_times,
+            wecusn.business_id,
+            wecusn.business_name,
+            wecusn.phone_number as mobile,
+            wect.tag_id,
+            wect.tag_name
+        from
+            we_emple_code wecode
+                left join (
+                SELECT
+                    wecus.emple_code_id, wecus.business_id, wecus.business_name,wu.phone_number
+                FROM
+                    we_emple_code_use_scop wecus
+                        LEFT JOIN sys_user wu ON
+                        wu.user_id = wecus.business_id
+                WHERE
+                    wecus.del_flag = 0
+            ) as wecusn on
+                wecode.id = wecusn.emple_code_id
+                left join we_emple_code_tag wect on
+                wecode.id = wect.emple_code_id
+        where 1=1 and wecode.del_flag = 0
+    </sql>
+
+
+    <select id="selectWeEmpleCodeById" parameterType="Long" resultMap="WeEmpleCodeResult">
+        <include refid="selectWeEmpleCodeLsit"/>
+        <if test="id != null and id !=''">
+            and wecode.id = #{id}
+        </if>
+    </select>
+
+
+
+
+</mapper>

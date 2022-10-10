@@ -1,0 +1,9 @@
+server:
+  # 服务器的HTTP端口，默认为8090
+  port: 6094
+  servlet:
+    # 应用的访问路径
+    context-path: /wx-api
+  tomcat:
+    # tomcat的URI编码
+    uri-encoding: UTF-8

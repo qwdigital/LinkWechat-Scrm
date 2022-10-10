@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WxUserMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WxUser" id="WxUserResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="openId" column="open_id" jdbcType="VARCHAR"/>
+                <result property="unionId" column="union_id" jdbcType="VARCHAR"/>
+                <result property="nickName" column="nick_name" jdbcType="VARCHAR"/>
+                <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
+                <result property="sex" column="sex" jdbcType="INTEGER"/>
+                <result property="phone" column="phone" jdbcType="VARCHAR"/>
+                <result property="province" column="province" jdbcType="VARCHAR"/>
+                <result property="city" column="city" jdbcType="VARCHAR"/>
+                <result property="country" column="country" jdbcType="VARCHAR"/>
+                <result property="privilege" column="privilege" jdbcType="VARCHAR"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            </resultMap>
+
+    <sql id="selectWxUserVo">
+        select id, open_id, union_id, nick_name, avatar, sex, phone, province, city, country, privilege, del_flag, create_by, create_by_id, create_time, update_by, update_by_id, update_time from wx_user
+    </sql>
+
+</mapper>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeTagGroupMapper">
+
+    <resultMap type="com.linkwechat.domain.WeTagGroup" id="WeTagGroupResult">
+        <id property="id" column="id"></id>
+        <result property="groupName"    column="group_name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy" column="create_by" />
+        <result property="groupId"    column="group_id"    />
+    </resultMap>
+
+
+    <resultMap type="com.linkwechat.domain.WeTagGroup" id="WeTagGroupListResult">
+        <id property="id" column="id"></id>
+        <result property="groupName" column="group_name"/>
+        <result property="groupId" column="group_id"/>
+        <result property="groupTagType" column="group_tag_type"/>
+        <result property="owner" column="owner"/>
+        <collection property="weTags" ofType="com.linkwechat.domain.WeTag">
+            <result property="id" column="t_id"/>
+            <result property="tagId" column="tag_id"/>
+            <result property="name" column="tag_name"/>
+            <result property="tagType" column="tag_type"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectWeTagGroupList" parameterType="com.linkwechat.domain.WeTagGroup" resultMap="WeTagGroupResult">
+        SELECT
+            wtg.id,
+            wtg.group_id,
+            wtg.group_name,
+            wtg.group_tag_type,
+            wtg.create_by,
+            wtg.create_by_id,
+            wtg.create_time,
+            wtg.update_by,
+            wtg.update_by_id,
+            wtg.update_time,
+            wtg.del_flag,
+            wtg.owner
+        FROM
+        we_tag_group wtg
+        where
+        wtg.del_flag=0
+        <if test="groupTagType != null">and wtg.group_tag_type=#{groupTagType}</if>
+        ORDER BY wtg.create_time DESC
+    </select>
+
+
+    <insert id="batchAddOrUpdate">
+        INSERT INTO we_tag_group (id,group_id,group_name,create_by,create_time,update_by,update_time,create_by_id,update_by_id) VALUES
+        <foreach collection="weTagGroups" item="item" index="index" separator=",">
+        (#{item.id},#{item.groupId},#{item.groupName},#{item.createBy},#{item.createTime},#{item.updateBy},#{item.updateTime},#{item.createById},#{item.updateById})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        group_name = IFNULL(VALUES(group_name), we_tag_group.group_name),
+        update_by = IFNULL(VALUES(update_by), we_tag_group.update_by),
+        update_by_id = IFNULL(VALUES(update_by_id), we_tag_group.update_by_id),
+        update_time = IFNULL(VALUES(update_time), we_tag_group.update_time),
+        del_flag = IFNULL(VALUES(del_flag), we_tag_group.del_flag);
+    </insert>
+
+
+    <select id="getTagGroupIds" resultType="java.lang.Long">
+        select
+            distinct wtg.id
+        from we_tag_group wtg
+        left join we_tag wt on wtg.group_id = wt.group_id and wt.del_flag = 0
+        <where>
+            <if test="groupTagType != null">and wtg.group_tag_type=#{groupTagType}</if>
+        </where>
+        and wtg.del_flag = 0
+        order by wtg.create_time desc
+    </select>
+
+
+    <select id="getTagGroupList" resultMap="WeTagGroupListResult">
+        SELECT wtg.id,
+               wtg.group_id,
+               wtg.group_name,
+               wtg.group_tag_type,
+               wtg.owner,
+               wt.id as t_id,
+               wt.tag_id,
+               wt.name as tag_name,
+               wt.tag_type
+        FROM we_tag_group wtg
+        left join we_tag wt on wtg.group_id = wt.group_id and wt.del_flag = 0
+        <where>
+            <if test="groupId != null and groupId != ''">
+                and wtg.group_id = #{groupId}
+            </if>
+            <if test="groupTagType != null">
+                and wtg.group_tag_type=#{groupTagType}
+            </if>
+        </where>
+        and wtg.del_flag = 0
+        order by wtg.create_time desc
+    </select>
+
+
+</mapper>

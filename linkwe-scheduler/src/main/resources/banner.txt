@@ -1,0 +1,9 @@
+Spring Boot Version: ${spring-boot.version}
+Spring Application Name: ${spring.application.name}
+  _____   __  __ __    ___  ___    __ __  _        ___  ____
+ / ___/  /  ]|  T  T  /  _]|   \  |  T  T| T      /  _]|    \
+(   \_  /  / |  l  | /  [_ |    \ |  |  || |     /  [_ |  D  )
+ \__  T/  /  |  _  |Y    _]|  D  Y|  |  || l___ Y    _]|    /
+ /  \ /   \_ |  |  ||   [_ |     ||  :  ||     T|   [_ |    \
+ \    \     ||  |  ||     T|     |l     ||     ||     T|  .  Y
+  \___j\____jl__j__jl_____jl_____j \__,_jl_____jl_____jl__j\_j

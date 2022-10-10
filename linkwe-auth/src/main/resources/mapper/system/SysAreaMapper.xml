@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.web.mapper.SysAreaMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.web.domain.SysArea" id="SysAreaResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="parentId" column="parent_id" jdbcType="INTEGER"/>
+                <result property="level" column="level" jdbcType="INTEGER"/>
+                <result property="name" column="name" jdbcType="VARCHAR"/>
+                <result property="ePrefix" column="e_prefix" jdbcType="VARCHAR"/>
+                <result property="eName" column="e_name" jdbcType="VARCHAR"/>
+                <result property="extId" column="ext_id" jdbcType="INTEGER"/>
+                <result property="extName" column="ext_name" jdbcType="VARCHAR"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectSysAreaVo">
+        select id, parent_id, level, name, e_prefix, e_name, ext_id, ext_name, create_time, create_by, create_by_id, update_time, update_by, update_by_id, del_flag from sys_area
+    </sql>
+
+</mapper>

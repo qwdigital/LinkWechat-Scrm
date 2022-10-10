@@ -1,0 +1,29 @@
+server:
+  # 服务器的HTTP端口，默认为8090
+  port: 6093
+  servlet:
+    # 应用的访问路径
+    context-path: /
+  tomcat:
+    # tomcat的URI编码
+    uri-encoding: UTF-8
+
+# forest配置
+forest:
+  backend: okhttp3
+  max-retry-count:  3 # 请求失败后重试次数，默认为0次不重试
+  max-retry-interval: 1000 #重试间隔时间
+  connect-timeout: 3000 #链接超时时间
+  timeout: 3000  # 请求超时时间
+  ## 日志总开关，打开/关闭Forest请求/响应日志（默认为 true）
+  log-enabled: true
+  ## 打开/关闭Forest请求日志（默认为 true）
+  log-request: true
+  ## 打开/关闭Forest响应状态日志（默认为 true）
+  log-response-status: true
+  ## 打开/关闭Forest响应内容日志（默认为 false）
+  log-response-content: true
+  variables:
+    weComServerUrl: https://qyapi.weixin.qq.com/cgi-bin
+    wxServerUrl: https://api.weixin.qq.com/sns
+    wxCommonServerUrl: https://api.weixin.qq.com/cgi-bin

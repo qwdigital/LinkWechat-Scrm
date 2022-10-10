@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeUserRedEnvelopsLimitMapper">
+
+
+    <select id="findLimitUserRedEnvelops" resultType="com.linkwechat.domain.envelopes.WeUserRedEnvelopsLimit">
+        SELECT
+        a.id,
+        a.weUserId,
+        a.userName,
+        a.single_customer_receive_money,
+        a.single_customer_receive_num,
+        a.totalIssuedAmount,
+        a.todayIssuedAmount,
+        a.totalIssuedNum,
+        a.todayIssuedNum,
+        (a.single_customer_receive_num-a.todayIssuedNum) as todayNoIssuedNum,
+        (a.single_customer_receive_money-a.todayIssuedAmount) as todayNoIssuedAmount
+        FROM
+        (
+        SELECT
+        el.id,
+        el.we_user_id as weUserId,
+        (SELECT GROUP_CONCAT(wu.user_name) FROM sys_user wu WHERE FIND_IN_SET(wu.we_user_id,el.we_user_id) and wu.del_flag=0) as userName,
+        el.single_customer_receive_num,
+        el.single_customer_receive_money,
+        (SELECT IFNULL(SUM(er.red_envelope_money),0) FROM we_red_envelopes_record er WHERE er.we_user_id=el.we_user_id) as totalIssuedAmount,
+        (SELECT IFNULL(SUM(er.red_envelope_money),0) FROM we_red_envelopes_record er WHERE er.we_user_id=el.we_user_id and TO_DAYS(er.create_time)=TO_DAYS(NOW())) as todayIssuedAmount,
+        (SELECT IFNULL(COUNT(0),0) FROM we_red_envelopes_record er WHERE er.we_user_id=el.we_user_id) as totalIssuedNum,
+        (SELECT IFNULL(COUNT(0),0) FROM we_red_envelopes_record er WHERE er.we_user_id=el.we_user_id and TO_DAYS(er.create_time)=TO_DAYS(NOW())) as todayIssuedNum
+        FROM
+        we_user_red_envelops_limit el
+        where
+        el.del_flag=0
+        <if test="userId !=null and userId !=''">
+            and el.we_user_id=#{userId}
+        </if>
+        )a
+    </select>
+
+
+</mapper>
