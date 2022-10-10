@@ -127,7 +127,7 @@ LinkWeChat V3.0 架构升级，全面升级为微服务架构，整体系统架�
 
 本项目基于 [RuoYi-Cloud](https://gitee.com/y_project/RuoYi-Cloud) 后台开发框架，感谢 [RuoYi-Cloud](https://gitee.com/y_project/RuoYi-Cloud) 的开源。
 
-* 前端技术栈：ES6、vue、vuex、vue-router、vue-cli、axios、element-ui；
+* 前端技术栈：ES6、Vue、Vuex、Vue-router、Vue-cli、Axios、Element-ui；
 * 后端技术栈：Spring Boot、Spring Cloud & Alibaba、Nacos、Mybatis-plus、xxljob、RabbitMQ、Forest；
 
 ## 2.4 项目结构
