@@ -7,13 +7,13 @@
 
 [![star](https://gitee.com/LinkWeChat/link-wechat/badge/star.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/stargazers)
 [![fork](https://gitee.com/LinkWeChat/link-wechat/badge/fork.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/members)
-[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V2.5beta-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
+[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V3.0-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
 [![license](http://img.shields.io/badge/license-GPL%203.0-orange)](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
 [![木兰社区](https://img.shields.io/badge/Mulan-incubating-blue)](https://portal.mulanos.cn//)
 
-[官方网站](https://www.pardigital.cn/) | [在线演示](http://demo.linkwechat.cn/) | [V2.5功能清单](https://docs.qq.com/sheet/DZWNkTXFNS0FLYWdu)  | [最新动态](https://www.yuque.com/linkwechat/help/ozzxus)
+[官方网站](https://www.pardigital.cn/) | [在线演示](http://demo.linkwechat.cn/) | [V3.0功能清单](https://docs.qq.com/sheet/DZW9HSHpHdWlOYWh2?tab=BB08J3)  | [最新动态](https://www.yuque.com/linkwechat/help/ozzxus)
 
-[项目手册](https://www.yuque.com/linkwechat/help) | [用户手册](https://docs.qq.com/pdf/DZUNsTkZiall3aWJz) | [常见问题](https://www.yuque.com/linkwechat/help/qk5gl6) | [需求收集表](https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV)
+[项目手册](https://www.yuque.com/linkwechat/help) | [用户手册](https://docs.qq.com/pdf/DZXR0ZUJub29wTldS?) | [常见问题](https://www.yuque.com/linkwechat/help/qk5gl6) | [需求收集表](https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV)
 
 
 </div>
@@ -24,7 +24,7 @@
 <p></p>
 
 ---
-**<p align="center">【📣最近更新】LinkWeChat 微服务版 正式公测啦，国庆节后择日开放微服务版，欢迎大家提前体验！<a href="http://demo.linkwechat.net/" target="_blank">点击立即体验~</a></p>**
+**<p align="center">【📣最近更新】LinkWeChat V3.0 正式发布啦，架构升级，全面焕新，欢迎大家提前体验！<a href="http://demo.linkwechat.net/" target="_blank">点击立即体验~</a></p>**
 
 **<p align="center">LinkWeChat SAAS版 正式公测啦，如有问题欢迎提交 Issue，项目组将光速修复，<a href="https://saas.pardigital.cn/#/probation" target="_blank">点击立即体验~</a></p>**
 
@@ -50,7 +50,11 @@ LinkWeChat 开源团队拥有对本开源协议的最终解释权。
 
 > LinkWeChat, Link to WeChat.
 
-基于人工智能的企业微信 SCRM 系统——LinkWeChat基于企业微信开放能力，不仅集成了企微基础的客户管理和后台管理功能，而且通过引流获客、客情维系、社群运营等灵活高效的客户运营模块，让客户与企业之间建立强链接关系，同时进一步通过多元化的客户营销工具，帮助企业提高客户运营效率，强化营销能力，拓展盈利空间，是企业私域流量管理与营销的综合解决方案。
+LinkWeChat 是基于企业微信的开源 SCRM 系统，是企业私域流量管理与营销的综合解决方案。
+
+LinkWeChat 基于企业微信开放能力，不仅集成了企微强大的后台管理及基础的客户管理功能，而且提供了多种渠道、多个方式连接微信客户。并通过客情维系、聊天增强等灵活高效的客户运营模块，让客户与企业之间建立强链接，从而进一步通过多元化的营销工具，帮助企业提高客户运营效率，强化营销能力，拓展盈利空间。
+
+主要运用于电商、零售、教育、金融、政务等服务行业领域。
 
 [更多 LinkWeChat 的故事](https://www.yuque.com/linkwechat/help/dsatfs)
 
@@ -60,20 +64,21 @@ LinkWeChat SCRM 基于企业私域流量营销闭环，遵从获取新客到管�
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/134011_bd2745e6_1480777.png "仟微助手企业微信SCRM智能营销系统-V1.5_13.png")
 
-整个系统共分为八大模块：
+整个系统共分为九大模块：
 
 *   **运营中心** ：客户、客群、会话等全功能数据报表，数据一目了然；
 *   **引流获客** ：活码、群活码、公海、客服等多渠道引流，实现精准获客；
 *   **客户中心** ：助力企业搭建私域流量池，高效运营客户；
+*   **客群中心** ：客群运营场景全覆盖；
 *   **客情维系** ：企业客户运营精细化，朋友圈、红包工具提高客户活跃度；
-*   **社群运营** ：客群运营场景全覆盖，快速拉群；
+*   **内容中心** ：搭建企业自有内容库，多类型素材一键调用；
 *   **全能营销** ：提供多类型、多场景客户营销工具；
 *   **企业风控** ：会话合规存档，敏感内容全局风控；
 *   **企业管理** ：组织架构、自建应用全融合，实现“一个后台”；
 
-[LinkWeChat 社区版 V2.5 详细功能清单](https://docs.qq.com/sheet/DZWNkTXFNS0FLYWdu)
+[LinkWeChat 社区版 V3.0 详细功能清单](https://docs.qq.com/sheet/DZW9HSHpHdWlOYWh2?tab=BB08J3)
 
-![输入图片说明](readme_pic/v2.5.png)
+![输入图片说明](readme-pic/V3.x.jpeg)
 
 ## 1.3 优势
 
@@ -97,13 +102,16 @@ LinkWeChat 不做私域营销专家，而是通过开源让每个企业都是自
 
 ## 2.1 在线体验
 
-SAAS体验地址：https://saas.pardigital.cn/#/probation
+开源演示地址：[http://demo.linkwechat.net/](http://demo.linkwechat.net/)
 
-开源演示地址：[http://demo.linkwechat.cn/](http://demo.linkwechat.cn/)
+目前支持两种方式体验：
 
-演示账号/密码：Wecome/123456
+* 在首页扫码二维码申请加入测试企业，申请通过后即可扫码登录，体验系统的完整功能；
+* 点击账密登录并勾选`演示账号登录`即可在线体验后台系统，但不支持体验移动端相关功能；
 
 _（注意：演示环境已屏蔽管理权限和相关操作）_
+
+SAAS体验地址：https://saas.pardigital.cn/#/probation
 
 ## 2.2 技术栈
 
