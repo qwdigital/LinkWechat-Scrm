@@ -7,13 +7,11 @@
 
 [![star](https://gitee.com/LinkWeChat/link-wechat/badge/star.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/stargazers)
 [![fork](https://gitee.com/LinkWeChat/link-wechat/badge/fork.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/members)
-[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V2.5beta-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
+[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V1.5-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
 [![license](http://img.shields.io/badge/license-GPL%203.0-orange)](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
 [![木兰社区](https://img.shields.io/badge/Mulan-incubating-blue)](https://portal.mulanos.cn//)
 
-[官方网站](https://www.pardigital.cn/) | [在线演示](http://demo.linkwechat.cn/) | [V2.5功能清单](https://docs.qq.com/sheet/DZWNkTXFNS0FLYWdu)  | [最新动态](https://www.yuque.com/linkwechat/help/ozzxus) 
-
-[项目手册](https://www.yuque.com/linkwechat/help) | [用户手册](https://docs.qq.com/pdf/DZUNsTkZiall3aWJz) | [常见问题](https://www.yuque.com/linkwechat/help/qk5gl6) | [需求收集表](https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV)
+[官方网站](https://www.linkwechat.cn/#/d) | [演示系统](http://demo.linkwechat.cn/) | [帮助手册](https://www.yuque.com/linkwechat/help) | [用户手册(V1.5 待开放)](https://docs.qq.com/pdf/DZUNma3lVWW5Wb0po)
 
 
 </div>
@@ -24,25 +22,25 @@
 <p></p>
 
 ---
- **<p align="center">【📣最近更新】LinkWeChat 微服务版 正式公测啦，国庆节后择日开放微服务版，欢迎大家提前体验！<a href="http://demo.linkwechat.net/" target="_blank">点击立即体验~</a></p>** 
 
- **<p align="center">LinkWeChat SAAS版 正式公测啦，如有问题欢迎提交 Issue，项目组将光速修复，<a href="https://saas.pardigital.cn/#/probation" target="_blank">点击立即体验~</a></p>** 
+ **<p align="center">LinkWeChat 正在参与开源中国2021年度评选，请小伙伴[点击此处](https://www.oschina.net/project/top_cn_2021/)搜索 LinkWeChat 进行投票，谢谢！</p>** 
+
 
  **<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>** 
-
- **<p align="center">还有什么想要的产品功能/技术支持/说明文档/友好的建议或意见，<a href="https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV" target="_blank">点击告诉我们~</a></p>** 
 
 ---
 
 # 版权声明
 
-开源不代表免费，LinkWeChat 遵循 [GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE) 开源协议发布，并提供技术交流学习，但**绝不允许修改后和衍生的代码做为闭源的商业软件发布和销售！** 如果需要将本产品在本地进行任何附带商业化性质行为使用，**请联系项目负责人进行商业授权**，以遵守 GPL 协议保证您的正常使用。
-
-目前在国内 GPL 协议**具备合同特征，是一种民事法律行为** ，属于我国《合同法》调整的范围。LinkWeChat 项目团队保留一切诉讼权利。
-
-[相关案例：违反 GPL 协议赔偿 50 万，国内首例!](https://mp.weixin.qq.com/s/YQ6sNjbDS-P7BViLZIsaoA)
+LinkWeChat 开源版遵循 [GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE) 开源协议发布，并提供技术交流学习，但**绝不允许修改后和衍生的代码做为闭源的商业软件发布和销售！** 
 
 LinkWeChat 开源团队拥有对本开源协议的最终解释权。
+
+[点击查看 LinkWeChat LICENSE 详细说明](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
+
+需要注意的是，目前在国内 GPL 协议**具备合同特征，是一种民事法律行为** ，属于我国《合同法》调整的范围。LinkWeChat 项目团队保留诉讼权利。
+
+[相关案例：违反 GPL 协议赔偿 50 万，国内首例!](https://mp.weixin.qq.com/s/YQ6sNjbDS-P7BViLZIsaoA)
 
 # 一、 关于 LinkWeChat
 
@@ -71,9 +69,9 @@ LinkWeChat SCRM 基于企业私域流量营销闭环，遵从获取新客到管�
 *   **企业风控** ：会话合规存档，敏感内容全局风控；
 *   **企业管理** ：组织架构、自建应用全融合，实现“一个后台”；
 
-[LinkWeChat 社区版 V2.5 详细功能清单](https://docs.qq.com/sheet/DZWNkTXFNS0FLYWdu)
+V1.5 详细功能清单：
 
-![输入图片说明](readme_pic/v2.5.png)
+[LinkWeChat-社区版V1.5-功能清单](https://docs.qq.com/sheet/DZXlLdmRjSWlzd2R6)
 
 ## 1.3 优势
 
@@ -83,6 +81,9 @@ LinkWeChat 基于企业微信从服务内部到对外全面开放能力，可为
 * 二次整合封装企微 API，避免重复踩坑
 * 采用主流 Java 架构，具备高拓展性、灵活性，避免 PHP 架构的缺点
 * 对外提供内部 API，低成本二次开发
+* 基于 NLP 对会话内容进行智能语义分析，实现标签自动化、告警自动化
+
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1231/232301_2dcf24b2_1480777.png "LinkWeChat 企业微信私域流量营销专家-V1.0.4_22.png")
 
 ## 1.4 愿景
 
@@ -97,9 +98,7 @@ LinkWeChat 不做私域营销专家，而是通过开源让每个企业都是自
 
 ## 2.1 在线体验
 
-SAAS体验地址：https://saas.pardigital.cn/#/probation 
-
-开源演示地址：[http://demo.linkwechat.cn/](http://demo.linkwechat.cn/)
+演示地址：[http://demo.linkwechat.cn/](http://demo.linkwechat.cn/)
 
 演示账号/密码：Wecome/123456
 
@@ -238,52 +237,32 @@ com.linkwechat
 
 [帮助手册——常见问题](https://www.yuque.com/linkwechat/help/qk5gl6)
 
-# 四、最近更新
+# 四、最近规划
 
-## V2.5 更新日志
+LinkWeChat 团队目前在完成 LinkWeChat V2.0 大版本升级，主要围绕引流获客、客户中心、客情维系等模块进行升级，预计 12 月中旬整体上线。
 
-LinkWeChat V2.5 版本主要围绕运营中心、引流获客、客情维系等模块进行升级，主要的升级内容如下：
+V2.0 主要的升级内容如下：
 
-- [x] 首页全新升级为运营中心，各项运营数据快捷查看；
-- [x] 运营中心-新增客户分析，全维度查看客户数据；
-- [x] 运营中心-新增客群分析，全维度查看客群成员数据；
-- [x] 运营中心-新增会话分析，全维度查看客户联系、客群联系以及会话存档数据分析；
-- [x] 引流获客-新增微信客服，打通微信全渠道客服生态；
-- [x] 微信客服-新增客服管理，快捷创建客服，支持智能助手；
-- [x] 微信客服-新增场景管理，快捷接入多渠道客服；
-- [x] 微信客服-新增咨询记录，查看各渠道客服咨询客户及咨询记录；
-- [x] 微信客服-新增客服统计，支持场景及咨询分析，多维度查看客服数据；
-- [x] 客情维系-新增红包工具，侧边栏快捷发送企业红包；
-- [x] 红包工具-新增企业红包，快捷创建客户/客群红包模板，一键发送；
-- [x] 红包工具-新增员工管理，快捷设置员工限额，查看员工发送数据；
-- [x] 红包工具-新增发放记录，查看企业员工发放红包数据统计；
-- [x] 红包工具-新增支出分析，查看企业红包支出统计数据；
-- [x] 企业管理-企微配置升级，新增微信客服及微信支付配置；
-- [x] 其余各模块细节调优。
+- [ ] 系统菜单重新整合，结构更加清晰；
+- [ ] 引流获客-员工活码支持分组；
+- [ ] 引流获客-员工活码支持自动排班；
+- [ ] 引流获客-员工活码支持多类型欢迎语；
+- [ ] 引流获客新增客户公海模块，支持一键分配自主添加；
+- [ ] 引流获客-欢迎语升级为欢迎语模板，支持多类型欢迎语个性化配置；
+- [ ] 客户中心-企业客户全新改版，支持查看多人跟进内容；
+- [ ] 客户中心-企业客群支持标签管理；
+- [ ] 客户中心-企业标签支持客群标签管理；
+- [ ] 客情维系-消息群发全新改版，支持多类型群发类型；
+- [ ] 客情维系-消息群发支持查看员工、客户维度的群发详情；
+- [ ] 客情维系-素材中心新增链接、小程序等多类型；
+- [ ] 客情维系-新增朋友圈模块，支持查看企业/个人动态；
+- [ ] 客情维系-支持企业发表朋友圈；
+- [ ] 社群运营-各模块细节调优；
+- [ ] 企业管理-企微配置全新改版，支持多种配置方式。
 
- **【特别说明：V2.5版本中红包工具涉及企业支付，需要多轮封闭测试后逐步开放。具体源码是否开源酌情而定】** 
+![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/144937_7940336b_1480777.png "屏幕截图.png")
 
-
-## V2.0 更新日志
-
-LinkWeChat V2.0 主要围绕引流获客、客户中心、客情维系等模块进行升级，主要的升级内容如下：
-
-- [x] 系统菜单重新整合，结构更加清晰；
-- [x] 引流获客-员工活码支持分组；
-- [x] 引流获客-员工活码支持自动排班；
-- [x] 引流获客-员工活码支持多类型欢迎语；
-- [x] 引流获客新增客户公海模块，支持一键分配自主添加；
-- [x] 引流获客-欢迎语升级为欢迎语模板，支持多类型欢迎语个性化配置；
-- [x] 客户中心-企业客户全新改版，支持查看多人跟进内容；
-- [x] 客户中心-企业客群支持标签管理；
-- [x] 客户中心-企业标签支持客群标签管理；
-- [x] 客情维系-消息群发全新改版，支持多类型群发类型；
-- [x] 客情维系-消息群发支持查看员工、客户维度的群发详情；
-- [x] 客情维系-素材中心新增链接、小程序等多类型；
-- [x] 客情维系-新增朋友圈模块，支持查看企业/个人动态；
-- [x] 客情维系-支持企业发表朋友圈；
-- [x] 社群运营-各模块细节调优；
-- [x] 企业管理-企微配置全新改版，支持多种配置方式。
+其中微信客服及数据分析模块酌情开源。
 
 # 五、奖项荣誉
 
@@ -299,11 +278,11 @@ LinkWeChat V2.0 主要围绕引流获客、客户中心、客情维系等模块�
 
 如果你想加入我们的开源交流群，请扫码添加 LinkWeChat 项目作者，加入群聊：
 
-![输入图片说明](readme_pic/333.png)
+![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/145406_89fb9c20_1480777.png "屏幕截图.png")
 
 如果你有任何 LinkWeChat 产品上的想法、意见或建议，或商务上的合作需求，请扫码添加 LinkWeChat 项目团队进一步沟通：
 
-![输入图片说明](readme_pic/444.png)
+![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/145220_ddd9d2ef_1480777.png "屏幕截图.png")
 
 # 七、捐赠支持
 
@@ -359,7 +338,6 @@ LinkWeChat V2.0 主要围绕引流获客、客户中心、客情维系等模块�
 |     J*s     |   ￥  10.00      |  微信     |       2021-05-19 17:33:10      |   感谢您的开源       |
 |     *茶     |   ￥  10.00      |  微信     |       2021-05-17 20:46:05      |   感谢您的开源       |
 |     悟空     |   ￥   500.00      |   支付宝     |       2021- 11-17 11:05:05      |   感谢您的开源       |
-|     羊一只     |   ￥   20.00      |   微信     |       2022-09-05 11:10:22      |   感谢您的开源       |
 
 
 `LinkWeChat` 全体开发团队感谢以下全部合作伙伴的服务器赞助（排名不分先后）：

@@ -5,50 +5,82 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.linkwechat</groupId>
-    <artifactId>linkwechat</artifactId>
+    <artifactId>linkwechat-cloud</artifactId>
     <version>3.1.0</version>
-
-    <name>linkwechat</name>
-    <url>http://www.ruoyi.vip</url>
-    <description>若依管理系统</description>
+    <name>linkwechat-cloud</name>
 
     <properties>
-        <springboot.version>2.3.7.RELEASE</springboot.version>
+        <spring-cloud.version>2021.0.1</spring-cloud.version>
+        <spring-cloud-alibaba.version>2021.0.1.0</spring-cloud-alibaba.version>
+        <springboot.version>2.6.6</springboot.version>
         <linkwe.version>3.1.0</linkwe.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <!--        <mybatis.boot.version>1.3.2</mybatis.boot.version>-->
-        <druid.version>1.1.14</druid.version>
+        <druid.version>1.2.8</druid.version>
         <bitwalker.version>1.19</bitwalker.version>
         <swagger.version>2.9.2</swagger.version>
         <kaptcha.version>2.3.2</kaptcha.version>
-        <pagehelper.boot.version>1.3.0</pagehelper.boot.version>
+        <pagehelper.boot.version>1.4.2</pagehelper.boot.version>
         <fastjson.version>1.2.73</fastjson.version>
-        <oshi.version>3.9.1</oshi.version>
-        <commons.io.version>2.5</commons.io.version>
+        <oshi.version>6.2.2</oshi.version>
+        <commons.lang3.version>3.12.0</commons.lang3.version>
+        <commons.io.version>2.11.0</commons.io.version>
         <commons.fileupload.version>1.3.3</commons.fileupload.version>
-        <poi.version>3.17</poi.version>
+        <poi.version>4.1.2</poi.version>
         <velocity.version>1.7</velocity.version>
         <jwt.version>0.9.0</jwt.version>
-        <forest.version>1.5.16</forest.version>
+        <forest.version>1.5.24</forest.version>
         <lombok.version>1.18.16</lombok.version>
         <reflectasm.version>1.11.9</reflectasm.version>
-        <hutool.version>5.4.1</hutool.version>
+        <hutool.version>5.8.6</hutool.version>
         <zxing.version>3.3.3</zxing.version>
         <mybatis-plus.version>3.4.0</mybatis-plus.version>
         <vertx.version>4.0.0</vertx.version>
-        <netty-version>4.1.49.Final</netty-version>
+        <netty-version>4.1.69.Final</netty-version>
         <jaxb.version>2.3.1</jaxb.version>
         <jsqlparser.version>4.0</jsqlparser.version>
         <nacos.starter.version>1.0.2</nacos.starter.version>
         <protobuf.vaersion>3.18.0</protobuf.vaersion>
-        <log4j2.version>2.16.0</log4j2.version>
+        <transmittable-thread-local.version>2.12.2</transmittable-thread-local.version>
+        <liquibase.version>4.8.0</liquibase.version>
+        <rabbit.mq.version>2.6.1</rabbit.mq.version>
     </properties>
 
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
+            <!-- SpringCloud 微服务 -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework.cloud</groupId>
+                        <artifactId>spring-cloud-gateway-dependencies</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-gateway-dependencies</artifactId>
+                <version>3.0.7</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- SpringCloud Alibaba 微服务 -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
             <dependency>
                 <groupId>io.netty</groupId>
@@ -86,12 +118,6 @@
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
                 <version>${pagehelper.boot.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.mybatis.spring.boot</groupId>
-                        <artifactId>mybatis-spring-boot-starter</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <!-- 获取系统信息 -->
@@ -125,6 +151,12 @@
                 <version>${swagger.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons.lang3.version}</version>
+            </dependency>
+
             <!--io常用工具类 -->
             <dependency>
                 <groupId>commons-io</groupId>
@@ -142,7 +174,7 @@
             <!-- excel工具 -->
             <dependency>
                 <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml</artifactId>
+                <artifactId>poi-ooxml-schemas</artifactId>
                 <version>${poi.version}</version>
             </dependency>
 
@@ -174,19 +206,6 @@
                 <version>${kaptcha.version}</version>
             </dependency>
 
-            <!-- 定时任务-->
-            <dependency>
-                <groupId>com.linkwechat</groupId>
-                <artifactId>linkwe-quartz</artifactId>
-                <version>${linkwe.version}</version>
-            </dependency>
-
-            <!-- 代码生成-->
-            <dependency>
-                <groupId>com.linkwechat</groupId>
-                <artifactId>linkwe-generator</artifactId>
-                <version>${linkwe.version}</version>
-            </dependency>
 
             <!-- 核心模块-->
             <dependency>
@@ -195,17 +214,16 @@
                 <version>${linkwe.version}</version>
             </dependency>
 
-            <!-- 系统模块-->
-            <dependency>
-                <groupId>com.linkwechat</groupId>
-                <artifactId>linkwe-system</artifactId>
-                <version>${linkwe.version}</version>
-            </dependency>
-
             <!-- 通用工具-->
             <dependency>
                 <groupId>com.linkwechat</groupId>
                 <artifactId>linkwe-common</artifactId>
+                <version>${linkwe.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.linkwechat</groupId>
+                <artifactId>linkwe-service</artifactId>
                 <version>${linkwe.version}</version>
             </dependency>
 
@@ -257,12 +275,6 @@
             </dependency>
 
 
-
-
-
-
-
-
             <dependency>
                 <groupId>io.vertx</groupId>
                 <artifactId>vertx-core</artifactId>
@@ -294,12 +306,21 @@
                 <version>${jsqlparser.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>io.github.leejoker</groupId>
-                <artifactId>linkwechat-nacos-starter</artifactId>
-                <version>${nacos.starter.version}</version>
-            </dependency>
-
+<!--            <dependency>-->
+<!--                <groupId>io.github.leejoker</groupId>-->
+<!--                <artifactId>linkwechat-nacos-starter</artifactId>-->
+<!--                <version>${nacos.starter.version}</version>-->
+<!--                <exclusions>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>com.alibaba.cloud</groupId>-->
+<!--                        <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>-->
+<!--                    </exclusion>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>com.alibaba.cloud</groupId>-->
+<!--                        <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>-->
+<!--                    </exclusion>-->
+<!--                </exclusions>-->
+<!--            </dependency>-->
 
 
             <dependency>
@@ -308,47 +329,117 @@
                 <version>${protobuf.vaersion}</version>
             </dependency>
 
-
+            <!-- bootstrap 启动器 -->
             <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-to-slf4j</artifactId>
-                <version>${log4j2.version}</version>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-bootstrap</artifactId>
             </dependency>
 
-
+            <!-- 线程传递值 -->
             <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>${log4j2.version}</version>
+                <groupId>com.alibaba</groupId>
+                <artifactId>transmittable-thread-local</artifactId>
+                <version>${transmittable-thread-local.version}</version>
             </dependency>
 
+            <!-- 数据库版本管理 -->
+            <dependency>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-core</artifactId>
+                <version>${liquibase.version}</version>
+            </dependency>
 
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-amqp</artifactId>
+                <version>${rabbit.mq.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.11</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>easyexcel</artifactId>
+                <version>3.1.1</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
 
-    <modules>
-        <module>linkwe-admin</module>
-        <module>linkwe-framework</module>
-        <module>linkwe-system</module>
-        <module>linkwe-quartz</module>
-        <module>linkwe-generator</module>
-        <module>linkwe-common</module>
-        <module>linkwe-wecom</module>
-    </modules>
-
     <packaging>pom</packaging>
 
+    <dependencies>
+        <!-- bootstrap 启动器 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+            <version>3.0.4</version>
+        </dependency>
+    </dependencies>
+
+    <modules>
+        <module>linkwe-auth</module>
+        <module>linkwe-common</module>
+        <module>linkwe-wecom</module>
+         <module>linkwe-api</module>
+         <module>linkwe-wx-api</module>
+        <module>linkwe-event-task</module>
+        <module>linkwe-gateway</module>
+        <module>linkwe-fileservice</module>
+        <module>linkwe-scheduler</module>
+        <module>linkwe-framework</module>
+        <module>linkwe-service</module>
+    </modules>
+
+
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <!-- 处理文件时替换文件中的变量 -->
+                <filtering>true</filtering>
+                <excludes>
+                    <!-- 打包时排除文件-->
+                    <exclude>bootstrap.yml</exclude>
+                    <exclude>bootstrap-dev.yml</exclude>
+                    <exclude>bootstrap-test.yml</exclude>
+                    <exclude>bootstrap-prod.yml</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <!-- 打包时所包含得文件 -->
+                <includes>
+                    <include>bootstrap.yml</include>
+                    <include>bootstrap-${spring.profiles.active}.yml</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.6.2</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>woff</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
                 </configuration>
             </plugin>
         </plugins>
@@ -378,5 +469,36 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
+
+    <profiles>
+
+        <!--开发环境默认激活-->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+            </properties>
+        </profile>
+
+        <!--测试环境-->
+        <profile>
+            <id>test</id>
+            <activation>
+                <!--默认激活-->
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <spring.profiles.active>test</spring.profiles.active>
+            </properties>
+        </profile>
+
+        <!--生产环境-->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
