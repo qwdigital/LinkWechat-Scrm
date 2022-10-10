@@ -1,19 +1,20 @@
-package com.linkwechat.web.service.impl;
+package com.linkwechat.gateway.service.impl;
 
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSONObject;
 import com.google.code.kaptcha.Producer;
-import com.linkwechat.common.config.CaptchaProperties;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.exception.user.CaptchaException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.uuid.IdUtils;
-import com.linkwechat.web.service.ValidateCodeService;
+import com.linkwechat.gateway.config.properties.CaptchaProperties;
+import com.linkwechat.gateway.service.ValidateCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FastByteArrayOutputStream;
+
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
