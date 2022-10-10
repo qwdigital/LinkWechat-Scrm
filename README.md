@@ -26,11 +26,13 @@
 ---
 **<p align="center">【📣最近更新】LinkWeChat V3.0 正式发布啦，架构升级，全面焕新，欢迎大家提前体验！<a href="http://demo.linkwechat.net/" target="_blank">点击立即体验~</a></p>**
 
+**<p align="center">【📣最近更新】LinkWeChat V3.0 采用前后端分离架构，前端项目请点击<a href="https://gitee.com/LinkWeChat/link-we-chat-front" target="_blank">LinkWeChat-Front</a></p>**
+
 **<p align="center">LinkWeChat SAAS版 正式公测啦，如有问题欢迎提交 Issue，项目组将光速修复，<a href="https://saas.pardigital.cn/#/probation" target="_blank">点击立即体验~</a></p>**
 
-**<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>**
-
 **<p align="center">还有什么想要的产品功能/技术支持/说明文档/友好的建议或意见，<a href="https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV" target="_blank">点击告诉我们~</a></p>**
+
+**<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>**
 
 ---
 
