@@ -1,4 +1,4 @@
-package com.linkwechat.web.service;
+package com.linkwechat.gateway.service;
 
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.exception.user.CaptchaException;

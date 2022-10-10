@@ -28,8 +28,3 @@ mybatis-plus:
   mapper-locations: classpath*:mapper/**/*Mapper.xml
   type-aliases-package: com.linkwechat.**.domain
   type-handlers-package: com.linkwechat.common.handler.GenericTypeHandler
-
-security:
-  captcha:
-    enabled: true
-    type: math  

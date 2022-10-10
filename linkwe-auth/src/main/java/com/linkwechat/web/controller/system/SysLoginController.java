@@ -15,12 +15,9 @@ import com.linkwechat.fegin.QwUserClient;
 import com.linkwechat.service.IWeCorpAccountService;
 import com.linkwechat.web.domain.vo.LoginParamVo;
 import com.linkwechat.web.service.SysLoginService;
-import com.linkwechat.web.service.ValidateCodeService;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
@@ -55,9 +52,6 @@ public class SysLoginController {
 
     @Autowired
     private RedisService redisService;
-
-    @Autowired
-    private ValidateCodeService validateCodeService;
 
 
     /**
@@ -174,13 +168,4 @@ public class SysLoginController {
         return AjaxResult.success(map);
     }
 
-    /**
-     * 获取验证码
-     * @return
-     */
-    @GetMapping("/code")
-    public AjaxResult getValidateCode() throws IOException {
-
-        return validateCodeService.createCapcha();
-    }
 }

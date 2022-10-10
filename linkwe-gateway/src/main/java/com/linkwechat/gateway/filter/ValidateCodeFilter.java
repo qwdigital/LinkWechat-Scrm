@@ -3,7 +3,7 @@ package com.linkwechat.gateway.filter;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.common.config.CaptchaProperties;
+import com.linkwechat.gateway.config.properties.CaptchaProperties;
 import com.linkwechat.gateway.service.ValidateCodeService;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
