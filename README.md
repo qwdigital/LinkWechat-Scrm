@@ -123,7 +123,7 @@ LinkWeChat V3.0 架构升级，全面升级为微服务架构，整体系统架�
 
 ## 2.3 技术栈
 
-本项目基于 [RuoYi-Vue](https://gitee.com/y_project/RuoYi-Vue?_from=gitee_search) 后台开发框架，感谢 [RuoYi-Vue](https://gitee.com/y_project/RuoYi-Vue?_from=gitee_search) 的开源。
+本项目基于 [RuoYi-Cloud](https://gitee.com/y_project/RuoYi-Cloud) 后台开发框架，感谢 [RuoYi-Cloud](https://gitee.com/y_project/RuoYi-Cloud) 的开源。
 
 **前端技术栈**
 
@@ -245,11 +245,11 @@ LinkWeChat V3.0 主要围绕系统架构、引流获客、客情维系、内容�
 
 如果你想加入我们的开源交流群，请扫码添加 LinkWeChat 项目作者，加入群聊：
 
-![输入图片说明](readme_pic/333.png)
+![输入图片说明](readme-pic/contact1.png)
 
 如果你有任何 LinkWeChat 产品上的想法、意见或建议，或商务上的合作需求，请扫码添加 LinkWeChat 项目团队进一步沟通：
 
-![输入图片说明](readme_pic/444.png)
+![输入图片说明](readme-pic/contact2.png)
 
 # 七、捐赠支持
 
