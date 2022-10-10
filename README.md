@@ -144,8 +144,8 @@ LinkWeChat V3.0 架构升级，全面升级为微服务架构，整体系统架�
 ├── linkwe-gateway            // 网关服务
 ├── linkwe-scheduler	      // 定时任务相关模块
 ├── linkwe-service            // 系统service层抽取,与数据库相关交互
-├── linkwe-wecome	      // 企微接口实现
-├── linkwe-wx-api	      // 系统中设计微信公众号相关接口模块
+├── linkwe-wecome             // 企微接口实现
+├── linkwe-wx-api             // 系统中设计微信公众号相关接口模块
 
 ```
 
@@ -153,8 +153,7 @@ LinkWeChat V3.0 架构升级，全面升级为微服务架构，整体系统架�
 
 ```
 ├── linkwe-pc			// 后台项目
-├── linkwe-mobile		// 移动端主体项目
-├── linkwe-taskMobile		// 移动端任务宝、群裂变页面
+├── linkwe-mobile		// 移动端项目包含移动工作台、任务宝、群裂变等H5）
 ```
 
 ## 2.5 项目部署
