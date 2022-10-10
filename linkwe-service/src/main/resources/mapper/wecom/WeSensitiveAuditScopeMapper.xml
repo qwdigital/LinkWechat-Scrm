@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeSensitiveAuditScopeMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeSensitiveAuditScope" id="WeSensitiveAuditScopeResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="sensitiveId" column="sensitive_id" jdbcType="INTEGER"/>
+                <result property="scopeType" column="scope_type" jdbcType="INTEGER"/>
+                <result property="auditScopeId" column="audit_scope_id" jdbcType="VARCHAR"/>
+                <result property="auditScopeName" column="audit_scope_name" jdbcType="VARCHAR"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeSensitiveAuditScopeVo">
+        select id, sensitive_id, scope_type, audit_scope_id, audit_scope_name, create_time, create_by, create_by_id, update_time, update_by, update_by_id, del_flag from we_sensitive_audit_scope
+    </sql>
+
+</mapper>

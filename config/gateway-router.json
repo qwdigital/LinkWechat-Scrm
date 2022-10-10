@@ -1,0 +1,77 @@
+[{
+  "id": "linkwe-auth",
+  "order": 0,
+  "predicates": [{
+    "args": {
+      "pattern": "/auth/**"
+    },
+    "name": "Path"
+  }],
+  "uri": "lb://linkwe-auth"
+},{
+  "id": "linkwe-auth-system",
+  "order": 0,
+  "predicates": [{
+    "args": {
+      "pattern": "/system/**"
+    },
+    "name": "Path"
+  }],
+  "uri": "lb://linkwe-auth"
+},{
+  "id": "linkwe-wecom",
+  "order": 2,
+  "predicates": [{
+    "args": {
+      "pattern": "/wecom/**"
+    },
+    "name": "Path"
+  }],
+  "filters":[{
+    "args": {
+      "_genkey_0":"1"
+    },
+    "name":"StripPrefix"
+  }],
+  "uri": "lb://linkwe-wecom"
+},{
+  "id": "linkwe-api",
+  "order": 3,
+  "predicates": [{
+    "args": {
+      "pattern": "/open/**"
+    },
+    "name": "Path"
+  }],
+  "uri": "lb://linkwe-api"
+},{
+  "id": "linkwe-file",
+  "order": 4,
+  "predicates": [{
+    "args": {
+      "pattern": "/file/**"
+    },
+    "name": "Path"
+  }],
+  "uri": "lb://linkwe-file"
+},{
+  "id": "linkwe-auth-common",
+  "order": 0,
+  "predicates": [{
+    "args": {
+      "pattern": "/common/**"
+    },
+    "name": "Path"
+  }],
+  "uri": "lb://linkwe-auth"
+},{
+  "id": "linkwe-wx-api",
+  "order": 3,
+  "predicates": [{
+    "args": {
+      "pattern": "/wx-api/**"
+    },
+    "name": "Path"
+  }],
+  "uri": "lb://linkwe-wx-api"
+}]

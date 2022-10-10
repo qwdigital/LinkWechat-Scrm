@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeFlowerCustomerTagRelMapper">
+
+    <insert id="batchAddOrUpdate">
+        INSERT INTO we_flower_customer_tag_rel(
+        id,
+        user_id,
+        external_userid,
+        tag_id,
+        is_company_tag,
+        del_flag,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        create_by_id,
+        update_by_id
+        ) values
+        <foreach collection="tagRels" item="item" index="index" separator=",">
+            (#{item.id},#{item.userId},#{item.externalUserid},#{item.tagId},#{item.isCompanyTag},#{item.delFlag},#{item.createBy},#{item.createTime},#{item.updateBy},#{item.updateTime}
+            ,#{item.createById},#{item.updateById})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        user_id=IFNULL(VALUES(user_id),we_flower_customer_tag_rel.user_id),
+        external_userid=IFNULL(VALUES(external_userid),we_flower_customer_tag_rel.external_userid),
+        tag_id=IFNULL(VALUES(tag_id),we_flower_customer_tag_rel.tag_id),
+        update_by=IFNULL(VALUES(update_by),we_flower_customer_tag_rel.update_by),
+        update_by_id=IFNULL(VALUES(update_by_id),we_flower_customer_tag_rel.update_by_id),
+        update_time=IFNULL(VALUES(update_time),we_flower_customer_tag_rel.update_time),
+        del_flag=IFNULL(VALUES(del_flag),we_flower_customer_tag_rel.del_flag);
+    </insert>
+
+    <select id="findNowAddWeFlowerCustomerTagRel" resultType="com.linkwechat.domain.WeFlowerCustomerTagRel">
+        SELECT
+            *
+        FROM
+            we_flower_customer_tag_rel
+        WHERE
+          external_userid = #{externalUserId}
+          AND is_company_tag=1
+          AND user_id = #{userId}
+          AND del_flag =0
+    </select>
+
+    <select id="findRemoveWeFlowerCustomerTagRel" resultType="com.linkwechat.domain.WeFlowerCustomerTagRel">
+        SELECT
+            *
+        FROM
+            we_flower_customer_tag_rel
+        WHERE
+            external_userid = #{externalUserId}
+          AND user_id = #{userId}
+          AND is_company_tag=1
+          AND del_flag =1
+    </select>
+
+
+</mapper>

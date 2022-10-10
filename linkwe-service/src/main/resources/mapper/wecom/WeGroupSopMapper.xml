@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeGroupSopMapper">
+    <select id="getChatIdListByRuleId" resultType="String">
+        SELECT
+            wg.chat_id
+        FROM
+            we_group_sop wgs
+                LEFT JOIN we_group_sop_chat wgsc ON wgs.id = wgsc.rule_id
+                LEFT JOIN we_group wg ON wg.chat_id = wgsc.chat_id
+        WHERE wgs.id = #{ruleId}
+    </select>
+
+    <select id="getMaterialIdListByRuleId" resultType="Long">
+        SELECT
+            wm.id
+        FROM
+            we_group_sop wgs
+                LEFT JOIN we_group_sop_material wgsm ON wgs.id = wgsm.rule_id
+                LEFT JOIN we_material wm ON wm.id = wgsm.material_id
+        WHERE wgs.id = #{ruleId}
+    </select>
+
+    <select id="getGroupSopList" resultType="com.linkwechat.domain.community.vo.WeGroupSopVo">
+        SELECT
+            id as ruleId,
+            rule_name,
+            title,
+            content,
+            start_time,
+            end_time,
+            create_by,
+            create_time,
+            update_by,
+            update_time
+        FROM
+        we_group_sop
+        <where>
+            del_flag = 0
+            <if test="ruleName != null and ruleName!=''">
+                AND rule_name LIKE CONCAT("%",#{ruleName},"%")
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+            <if test="createBy!=null and createBy!=''">
+                AND create_by LIKE CONCAT("%",#{createBy},"%")
+            </if>
+        </where>
+        order by create_time DESC
+    </select>
+
+
+    <select id="getEmplTaskList" resultType="com.linkwechat.domain.community.vo.WeGroupSopVo">
+        SELECT
+            wgs.id as ruleId,
+            wgs.rule_name,
+            wgs.title,
+            wgs.content,
+            wgs.start_time,
+            wgs.end_time,
+            wgs.create_by,
+            wgs.create_time,
+            wgs.update_by,
+            wgs.update_time
+        FROM
+            sys_user wu
+                LEFT JOIN we_group wg ON wu.we_user_id = wg.`owner`
+                LEFT JOIN we_group_sop_chat wgsc ON wg.chat_id = wgsc.chat_id
+                LEFT JOIN we_group_sop wgs ON wgs.id = wgsc.rule_id
+        WHERE
+            wu.we_user_id = #{emplId} AND wgsc.is_done = #{isDone}
+    </select>
+
+    <update id="updateChatSopStatus">
+        update we_group_sop_chat wgsc
+            inner join we_group wg on wgsc.chat_id = wg.chat_id
+            set wgsc.is_done = TRUE
+        where wgsc.rule_id = #{ruleId}
+          and wg.owner = #{emplId}
+    </update>
+
+
+
+    <select id="getScopeListByRuleId" resultType="com.linkwechat.domain.community.vo.WeCommunityTaskEmplVo">
+        SELECT
+            wu.we_user_id as userId,
+            wu.user_name as name,
+            wu.avatar,
+            wgsc.is_done
+        FROM
+            we_group_sop_chat wgsc
+                LEFT JOIN we_group_sop wgs ON wgsc.rule_id = wgs.id
+                LEFT JOIN we_group wg ON wg.chat_id = wgsc.chat_id
+                LEFT JOIN sys_user wu ON wu.we_user_id = wg.`owner`
+        WHERE
+            wgsc.rule_id = #{ruleId}
+    </select>
+
+
+</mapper>

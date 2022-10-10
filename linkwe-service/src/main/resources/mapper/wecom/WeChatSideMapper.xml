@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeChatSideMapper">
+    <update id="updateWeChatSideById">
+        UPDATE
+        we_chat_side
+        <set>
+            <if test="sideName!=null and sideName!=''">
+                side_name=#{sideName},
+            </if>
+            <if test="using!=null">
+                `using`=#{using}
+            </if>
+        </set>
+        <where>
+            id=#{id}
+        </where>
+    </update>
+
+    <select id="selectWeChatSides" resultType="com.linkwechat.domain.side.WeChatSide">
+        SELECT
+        wcs.id,
+        wcs.media_type,
+        wcs.side_name,
+        (SELECT count(*) FROM we_chat_item wci WHERE wcs.id=wci.side_id
+        ) as total,
+        wcs.`using`
+        FROM
+        we_chat_side wcs
+        <where>
+            wcs.del_flag=0
+            <if test="h5!=null and h5!='' and h5=='1'.toString()">
+                AND wcs.`using`=0
+            </if>
+        </where>
+    </select>
+
+</mapper>

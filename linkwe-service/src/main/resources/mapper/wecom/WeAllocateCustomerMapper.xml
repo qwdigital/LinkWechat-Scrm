@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeAllocateCustomerMapper">
+
+
+    <insert id="batchAddOrUpdate" >
+        INSERT INTO we_allocate_customer(
+        id,
+        takeover_userid,
+        external_userid,
+        allocate_time,
+        handover_userid,
+        status,
+        takeover_time,
+        fail_reason
+        ) values
+        <foreach collection="weAllocateCustomers" item="item" index="index" separator=",">
+            (#{item.id},#{item.takeoverUserid},#{item.externalUserid},#{item.allocateTime},#{item.handoverUserid},#{item.status},#{item.takeoverTime},#{item.failReason})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        takeover_userid=IF(TRIM(VALUES(takeover_userid)) != '',VALUES(takeover_userid),we_allocate_customer.takeover_userid),
+        allocate_time=IF(VALUES(allocate_time), VALUES(allocate_time), we_allocate_customer.allocate_time),
+        takeover_time=IF(VALUES(takeover_time), VALUES(takeover_time), we_allocate_customer.takeover_time),
+        status=IF(VALUES(status), VALUES(status),we_allocate_customer.status),
+        fail_reason=IF(TRIM(VALUES(fail_reason)) !='',VALUES(fail_reason),we_allocate_customer.fail_reason);
+    </insert>
+
+
+
+</mapper>

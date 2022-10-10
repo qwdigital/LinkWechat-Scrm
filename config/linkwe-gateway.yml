@@ -1,0 +1,44 @@
+# Tomcat
+server:
+  port: 6180
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+security:
+  ignore:
+    whites:
+      - /auth/**
+      - /open/wecom/**
+      - /open/groupCode/getActualCode/**
+  captcha:
+    enabled: true
+    type: math
+
+spring:
+  application:
+    name: linkwechat-gateway
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+          filters:
+            - StripPrefix=1
+
+nacos:
+  gateway:
+    route:
+      config:
+        data-id: gateway-router
+        group: DEFAULT_GROUP

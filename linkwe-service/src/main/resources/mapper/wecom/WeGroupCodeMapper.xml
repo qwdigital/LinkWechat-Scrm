@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeGroupCodeMapper">
+
+    <select id="findWeGroupCodeList" resultType="com.linkwechat.domain.groupcode.entity.WeGroupCode">
+       SELECT a.*
+       FROM
+         (
+        SELECT
+            wgc.*,
+            GROUP_CONCAT(distinct wt.`name`) as tags,
+            GROUP_CONCAT(distinct wt.id) as tagIds,
+            (SELECT GROUP_CONCAT(wg.group_name) FROM we_group wg WHERE FIND_IN_SET(wg.chat_id,wgc.chat_id_list)) as groupNames
+        FROM
+            we_group_code  wgc
+                LEFT JOIN we_group_code_tag_rel wgctr ON wgc.id = wgctr.group_code_id
+                LEFT JOIN we_tag wt ON wt.tag_id=wgctr.tag_id
+        WHERE wgc.del_flag=0 and wt.del_flag=0
+        <if test="activityName != null  and activityName != ''">
+         AND wgc.activity_name  like concat('%', #{activityName}, '%')
+        </if>
+        GROUP BY wgc.id
+        ORDER BY wgc.create_time DESC
+        ) a
+        <where>
+                <if test="tagIds !=null and tagIds !=''">
+                    <foreach item="tagId" index="index" collection="tagIds.split(',')">
+                        AND FIND_IN_SET(#{tagId},tagIds)
+                    </foreach>
+                </if>
+        </where>
+    </select>
+
+    <select id="findWeGroupChatInfoVo" resultType="com.linkwechat.domain.groupcode.vo.WeGroupChatInfoVo">
+        SELECT
+        COUNT(if(wgm.del_flag=0,wgm.user_id,NULL)) as chatGroupMemberTotalNum,
+
+        COUNT(IF(TO_DAYS(wgm.join_time)&lt;TO_DAYS(NOW()) AND wgm.del_flag=0,wgm.user_id,null)) as oldChatGroupMemberTotalNum,
+
+        COUNT(DISTINCT(IF(wgm.del_flag=1 AND wgm.state = #{state} ,wgm.user_id,null))) as exitChatGroupTotalMemberNum,
+
+        COUNT(DISTINCT(IF(TO_DAYS(wgm.update_time)&lt;TO_DAYS(NOW()) and wgm.del_flag=1 AND wgm.state = #{state} ,wgm.user_id,null))) as oldExitChatGroupTotalMemberNum,
+
+        COUNT(DISTINCT(IF(wgm.del_flag=0 AND wgm.state =#{state},wgm.user_id,null))) as joinChatGroupTotalMemberNum,
+
+        COUNT(DISTINCT(IF(TO_DAYS(wgm.update_time)&lt;TO_DAYS(NOW()) and wgm.del_flag=0 AND wgm.state =#{state},wgm.user_id,null))) as oldJoinChatGroupTotalMemberNum,
+
+        COUNT(DISTINCT(IF(TO_DAYS(wgm.update_time)&lt;=TO_DAYS(NOW()) and wgm.del_flag=0 AND wgm.state =#{state},wgm.user_id,null))) as newJoinChatGroupTotalMemberNum,
+
+        (SELECT GROUP_CONCAT(su.user_name) FROM sys_user su where su.we_user_id=wg.owner) as groupOwner,
+        wg.group_name,
+        wg.chat_id
+        FROM
+        we_group_member wgm
+        LEFT JOIN we_group wg ON  wgm.chat_id=wg.chat_id
+        where
+        FIND_IN_SET(wg.chat_id,#{chatIds})
+        GROUP BY wg.chat_id
+    </select>
+
+    <select id="findWeGroupCodeCountTrend" resultType="com.linkwechat.domain.groupcode.vo.WeGroupCodeCountTrendVo">
+        SELECT
+            date as dateTime,
+            IFNULL(exitChatGroupTotalMemberNum,0) as exitChatGroupTotalMemberNum,
+            IFNULL(joinChatGroupTotalMemberNum,0) as joinChatGroupTotalMemberNum
+        FROM
+            (
+            SELECT
+            date_format( sdd.date, '%Y-%m-%d' ) AS  date
+            FROM
+            sys_dim_date sdd
+            WHERE
+            date_format( sdd.date, '%Y-%m-%d' ) BETWEEN  #{beginTime} AND #{endTime}
+            ) a
+            LEFT JOIN
+            (
+            SELECT
+            DATE_FORMAT( wgm.update_time, '%Y-%m-%d' ) AS dateTime,
+            COUNT(
+            IF
+            (
+            wgm.del_flag = 1,
+            wgm.user_id,
+            NULL
+            )) AS exitChatGroupTotalMemberNum,
+            COUNT(
+            IF
+            (
+            wgm.del_flag = 0,
+            wgm.user_id,
+            NULL
+            )) AS joinChatGroupTotalMemberNum
+            FROM
+            we_group_member wgm
+            WHERE
+            wgm.state = #{state}
+            AND date_format( wgm.update_time, '%Y-%m-%d' ) BETWEEN  #{beginTime} AND #{endTime}
+            group by dateTime) b on a.date=b.dateTime
+        ORDER BY date ASC
+    </select>
+</mapper>

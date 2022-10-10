@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeTagMapper">
+
+
+    <insert id="batchAddOrUpdate">
+        INSERT INTO we_tag (id,tag_id,group_id,name,create_time,create_by,update_time,update_by,create_by_id,update_by_id) VALUES
+        <foreach collection="weTags" item="item" index="index" separator=",">
+        (#{item.id},#{item.tagId},#{item.groupId},#{item.name},#{item.createTime},#{item.createBy}
+         ,#{item.updateTime},#{item.updateBy},#{item.createById},#{item.updateById})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        name = IFNULL(VALUES(name),we_tag.name),
+        update_time = IFNULL(VALUES(update_time),we_tag.update_time),
+        update_by = IFNULL(VALUES(update_by),we_tag.update_by),
+        update_by_id = IFNULL(VALUES(update_by_id),we_tag.update_by_id),
+        del_flag = IFNULL(VALUES(del_flag), we_tag.del_flag);
+    </insert>
+
+
+
+
+
+
+
+</mapper>

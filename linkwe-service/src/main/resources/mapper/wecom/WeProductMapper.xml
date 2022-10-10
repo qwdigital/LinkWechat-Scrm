@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeProductMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeProduct" id="WeProductResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="productId" column="product_id" jdbcType="VARCHAR"/>
+                <result property="picture" column="picture" jdbcType="VARCHAR"/>
+                <result property="describe" column="describe" jdbcType="VARCHAR"/>
+                <result property="price" column="price" jdbcType="VARCHAR"/>
+                <result property="productSn" column="product_sn" jdbcType="VARCHAR"/>
+                <result property="attachments" column="attachments" jdbcType="VARCHAR"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeProductVo">
+        select id,product_id,  picture, `describe`, price, product_sn, attachments, create_time, create_by, create_by_id, update_time, update_by, update_by_id from we_product
+    </sql>
+
+</mapper>

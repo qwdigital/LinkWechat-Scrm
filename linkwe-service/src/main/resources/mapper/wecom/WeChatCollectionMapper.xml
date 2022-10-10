@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeChatCollectionMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeChatCollection" id="WeChatCollectionResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="materialId" column="material_id" jdbcType="INTEGER"/>
+                <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeChatCollectionVo">
+        select id, material_id,user_id, create_time, create_by, create_by_id, update_time, update_by, update_by_id, del_flag from we_chat_collection
+    </sql>
+
+    <select id="findCollections" resultType="com.linkwechat.domain.side.vo.WeChatSideVo">
+        SELECT
+        wcc.material_id,
+        wm.material_name,
+        wm.material_url,
+        wm.content,
+        wc.media_type,
+        wcc.create_time,
+        wm.cover_url
+        FROM
+        we_chat_collection wcc
+        LEFT JOIN we_material wm ON wcc.material_id = wm.id
+        LEFT JOIN we_category wc ON wm.category_id = wc.id
+        where wcc.del_flag=0 and
+            wcc.user_id = #{userId}
+            <if test="keyword!=null and keyword!=''">
+                AND wm.material_name LIKE CONCAT('%',#{keyword},'%')
+            </if>
+    </select>
+
+</mapper>

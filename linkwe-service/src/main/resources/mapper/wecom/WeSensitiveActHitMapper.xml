@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeSensitiveActHitMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeSensitiveActHit" id="WeSensitiveActHitResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="operatorId" column="operator_id" jdbcType="VARCHAR"/>
+                <result property="operator" column="operator" jdbcType="VARCHAR"/>
+                <result property="operateTargetId" column="operate_target_id" jdbcType="VARCHAR"/>
+                <result property="operateTarget" column="operate_target" jdbcType="VARCHAR"/>
+                <result property="sensitiveActId" column="sensitive_act_id" jdbcType="INTEGER"/>
+                <result property="sensitiveAct" column="sensitive_act" jdbcType="VARCHAR"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeSensitiveActHitVo">
+        select id, operator_id, operator, operate_target_id, operate_target, sensitive_act_id, sensitive_act, create_time, create_by, create_by_id, update_time, update_by, update_by_id, del_flag from we_sensitive_act_hit
+    </sql>
+
+</mapper>

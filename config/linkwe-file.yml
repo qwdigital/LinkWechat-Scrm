@@ -1,0 +1,23 @@
+# Tomcat
+server:
+  port: 6181
+  servlet:
+    # 应用的访问路径
+    context-path: /file
+
+# 项目相关配置
+linkwechat:
+  # 腾讯云存储
+  file:
+    #单个数据大小,单位MB
+    maxFileSize: 50
+    #总上传数据大小,单位MB
+    maxRequestSize: 100
+    #腾讯云对象存储
+    object: tencentOss
+    cos:
+      secretId:
+      secretKey:
+      region:
+      bucketName:
+      cosImgUrlPrefix:

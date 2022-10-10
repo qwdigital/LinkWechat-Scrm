@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeTaskFissionCompleteRecordMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeTaskFissionCompleteRecord" id="WeTaskFissionCompleteRecordResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="taskFissionId" column="task_fission_id" jdbcType="INTEGER"/>
+                <result property="fissionRecordId" column="fission_record_id" jdbcType="INTEGER"/>
+                <result property="customerId" column="customer_id" jdbcType="VARCHAR"/>
+                <result property="customerName" column="customer_name" jdbcType="VARCHAR"/>
+                <result property="status" column="status" jdbcType="INTEGER"/>
+                <result property="customerAvatar" column="customer_avatar" jdbcType="VARCHAR"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeTaskFissionCompleteRecordVo">
+        select id, task_fission_id, fission_record_id, customer_id, customer_name, status, customer_avatar, create_time, create_by, create_by_id, update_time, update_by, update_by_id, del_flag from we_task_fission_complete_record
+    </sql>
+
+</mapper>

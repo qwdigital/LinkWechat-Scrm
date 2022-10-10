@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeStoreCodeConfigMapper">
+
+    <select id="getWeStoreCodeConfig" resultType="com.linkwechat.domain.storecode.entity.WeStoreCodeConfig">
+        SELECT * from we_store_code_config
+        <where>
+           <if test="storeCodeType != null">
+              and store_code_type = #{storeCodeType}
+           </if>
+        </where>
+    </select>
+
+
+</mapper>

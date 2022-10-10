@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeUserBehaviorDataMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+    <select id="getDayCountDataByTime" resultType="com.linkwechat.domain.operation.vo.WePageCountVo">
+        SELECT
+        tbl.`date` AS x_time,
+        IFNULL(tbr.new_apply_cnt,0) as new_apply_cnt
+        FROM ( select `date`
+               from sys_dim_date
+               where `date` &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+                 and `date` &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')) AS tbl
+        LEFT JOIN(SELECT
+        sum(ifnull(wubd.new_apply_cnt, 0)) new_apply_cnt,
+        DATE_FORMAT(wubd.stat_time,'%Y-%m-%d') AS finish_date
+
+        FROM we_user_behavior_data wubd
+        where
+        DATE_FORMAT(wubd.stat_time,'%Y-%m-%d') &gt;= #{startTime}
+
+        AND DATE_FORMAT(wubd.stat_time,'%Y-%m-%d') &lt;= #{endTime}
+
+        GROUP BY finish_date
+
+        ORDER BY finish_date
+
+        ) AS tbr ON tbl.`date` = tbr.finish_date GROUP BY tbl.`date`
+    </select>
+
+</mapper>
