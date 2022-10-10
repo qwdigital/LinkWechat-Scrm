@@ -115,7 +115,13 @@ _（注意：演示环境已屏蔽管理权限和相关操作）_
 
 SAAS体验地址：https://saas.pardigital.cn/#/probation
 
-## 2.2 技术栈
+## 2.2 系统架构
+
+LinkWeChat V3.0 架构升级，全面升级为微服务架构，整体系统架构如下：
+
+![系统架构](readme-pic/jiagou.png)
+
+## 2.3 技术栈
 
 本项目基于 [RuoYi-Vue](https://gitee.com/y_project/RuoYi-Vue?_from=gitee_search) 后台开发框架，感谢 [RuoYi-Vue](https://gitee.com/y_project/RuoYi-Vue?_from=gitee_search) 的开源。
 
@@ -140,7 +146,7 @@ SAAS体验地址：https://saas.pardigital.cn/#/probation
 |JWT|	轻量级身份认证规范|	https://jwt.io/introduction
 |Spring Security	|基于 Spring 的强大且高度可定制的身份验证和访问控制框架	|https://spring.io/projects/spring-security/
 
-## 2.3 项目结构
+## 2.4 项目结构
 
 **后端结构**
 
@@ -167,7 +173,7 @@ SAAS体验地址：https://saas.pardigital.cn/#/probation
 ├── linkwe-taskMobile		// 移动端任务宝、群裂变页面
 ```
 
-## 2.4 项目部署
+## 2.5 项目部署
 
 点击下方链接进入官方语雀帮助手册查看项目部署方式：
 
