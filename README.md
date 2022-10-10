@@ -143,72 +143,33 @@ SAAS体验地址：https://saas.pardigital.cn/#/probation
 **后端结构**
 
 ```
-com.linkwechat     
-├── common            // 工具类
-│       └── annotation                    // 自定义注解
-│       └── config                        // 全局配置
-│       └── constant                      // 通用常量
-│       └── core                          // 核心控制
-│       └── enums                         // 通用枚举
-│       └── exception                     // 通用异常
-│       └── filter                        // 过滤器处理
-│       └── utils                         // 通用类处理
-├── framework         // 框架核心
-│       └── aspectj                       // 注解实现
-│       └── config                        // 系统配置
-│       └── datasource                    // 数据权限
-│       └── interceptor                   // 拦截器
-│       └── manager                       // 异步处理
-│       └── security                      // 权限控制
-│       └── web                           // 前端控制
-├── linkwe-generator   // 代码生成
-├── linkwe-quartz      // 定时任务
-├── linkwe-system      // 系统代码
-├── linkwe-admin       // 后台服务
-├── linkwe-ui          // 页面前端代码
-├── linkwe--wecom      // 企业微信功能
+├── linkwe-api                // 系统业务接口模块
+├── linkwe-auth               // 角色权限部门用户认证等模块
+├── linkwe-common             // 公共组件模块
+├── linkwe-event-task	      // 企微回调任务
+├── linkwe-fileservice	      // 文件服务模块
+├── linkwe-framework	      // 框架配置
+├── linkwe-gateway            // 网关服务
+├── linkwe-scheduler	      // 定时任务相关模块
+├── linkwe-service            // 系统service层抽取,与数据库相关交互
+├── linkwe-wecome	      // 企微接口实现
+├── linkwe-wx-api	      // 系统中设计微信公众号相关接口模块
 
 ```
 
 **前端结构**
 
 ```
-├── build                      // 构建相关  
-├── bin                        // 执行脚本
-├── public                     // 公共文件
-│   ├── favicon.ico            // favicon图标
-│   └── index.html             // html模板
-├── src                        // 源代码
-│   ├── api                    // 所有请求
-│   ├── assets                 // 主题 字体等静态资源
-│   ├── components             // 全局公用组件
-│   ├── directive              // 全局指令
-│   ├── layout                 // 布局
-│   ├── router                 // 路由
-│   ├── store                  // 全局 store管理
-│   ├── utils                  // 全局公用方法
-│   ├── views                  // view
-│   ├── App.vue                // 入口页面
-│   ├── main.js                // 入口 加载组件 初始化等
-│   ├── permission.js          // 权限管理
-│   └── settings.js            // 系统配置
-├── .editorconfig              // 编码格式
-├── .env.development           // 开发环境配置
-├── .env.production            // 生产环境配置
-├── .env.staging               // 测试环境配置
-├── .eslintignore              // 忽略语法检查
-├── .eslintrc.js               // eslint 配置项
-├── .gitignore                 // git 忽略项
-├── babel.config.js            // babel.config.js
-├── package.json               // package.json
-└── vue.config.js              // vue.config.js
+├── linkwe-pc			// 后台项目
+├── linkwe-mobile		// 移动端主体项目
+├── linkwe-taskMobile		// 移动端任务宝、群裂变页面
 ```
 
 ## 2.4 项目部署
 
 点击下方链接进入官方语雀帮助手册查看项目部署方式：
 
-[如何快速部署 LinkWeChat](https://www.yuque.com/linkwechat/help/gpod7i)
+[如何快速部署 LinkWeChat](https://www.yuque.com/linkwechat/help/gt1myw)
 
 建议服务器最低配置：
 
@@ -216,7 +177,7 @@ com.linkwechat
 |:-:|:-:|
 |操作系统|CentOS8.2|
 |CPU|4核|
-|内存|8G|
+|内存|16G|
 |带宽|5M|
 |硬盘|100G|
 
@@ -226,72 +187,41 @@ com.linkwechat
 
 [企业微信-企业内部开发-API 文档](https://open.work.weixin.qq.com/api/doc/90000/90003/90556)
 
-**常见问题列表**
-
-[1.有哪几种部署方式？](https://www.yuque.com/linkwechat/help/bww8vd)
-
-[2.数据库为什么 Group By 查询报错？](https://www.yuque.com/linkwechat/help/babnva)
-
-[3.项目每个分支的作用是什么？](https://www.yuque.com/linkwechat/help/ztbre1)
-
-[4、运行项目必须配置 Nacos 吗？](https://www.yuque.com/linkwechat/help/yivnfb)
-
-[5、项目启动时为什么报错？](https://www.yuque.com/linkwechat/help/cepvgv)
-
-[6、如何使用 Docker 进行部署？](https://www.yuque.com/linkwechat/help/ffi7bu)
-
-[7、图片为什么不显示或者裂开？](https://www.yuque.com/linkwechat/help/ggqnhb)
-
 点击下方链接进入官方语雀帮助手册查看常见问题的相关描述及更多帮助：
 
 [帮助手册——常见问题](https://www.yuque.com/linkwechat/help/qk5gl6)
 
 # 四、最近更新
 
-## V2.5 更新日志
+## V3.0 更新日志
 
-LinkWeChat V2.5 版本主要围绕运营中心、引流获客、客情维系等模块进行升级，主要的升级内容如下：
+LinkWeChat V3.0 主要围绕系统架构、引流获客、客情维系、内容中心及移动端等模块进行升级。
 
-- [x] 首页全新升级为运营中心，各项运营数据快捷查看；
-- [x] 运营中心-新增客户分析，全维度查看客户数据；
-- [x] 运营中心-新增客群分析，全维度查看客群成员数据；
-- [x] 运营中心-新增会话分析，全维度查看客户联系、客群联系以及会话存档数据分析；
-- [x] 引流获客-新增微信客服，打通微信全渠道客服生态；
-- [x] 微信客服-新增客服管理，快捷创建客服，支持智能助手；
-- [x] 微信客服-新增场景管理，快捷接入多渠道客服；
-- [x] 微信客服-新增咨询记录，查看各渠道客服咨询客户及咨询记录；
-- [x] 微信客服-新增客服统计，支持场景及咨询分析，多维度查看客服数据；
-- [x] 客情维系-新增红包工具，侧边栏快捷发送企业红包；
-- [x] 红包工具-新增企业红包，快捷创建客户/客群红包模板，一键发送；
-- [x] 红包工具-新增员工管理，快捷设置员工限额，查看员工发送数据；
-- [x] 红包工具-新增发放记录，查看企业员工发放红包数据统计；
-- [x] 红包工具-新增支出分析，查看企业红包支出统计数据；
-- [x] 企业管理-企微配置升级，新增微信客服及微信支付配置；
-- [x] 其余各模块细节调优。
+主要的升级内容如下：
 
-**【特别说明：V2.5版本中红包工具涉及企业支付，需要多轮封闭测试后逐步开放。具体源码是否开源酌情而定】**
+- [x] 架构调整，升级微服务架构；
+- [x] 拆分客户与客群中心，原素材中心升级为内容中心；
+- [x] 新增门店活码：基于客户实时位置，引导客户快捷添加门店导购或专属群；
+- [x] 新增内容中心，支持多种类型素材、话术及内容模板；
+- [x] 客群活码重新设计，支持群满自动建群；
+- [x] 新增客群画像，支持在侧边栏中快捷查看及跟进客群详情；
+- [x] 新增角色与菜单管理，快捷设置企业员工数据与菜单权限；
+- [x] 新增移动工作台，支持在移动端快捷查看企业数据与动态；支持查看客户与客群画像详情，一键联系；工作台快捷使用小工具；
+- [x] 新增公众号配置，用于快捷绑定公众号；
+- [x] 新增扫码登录，企业员工快捷加入；
+- [x] 新增企业动态，全局洞察企业各维度进展；
+- [x] 优化系统首页相关模块及数据统计逻辑；
+- [x] 优化组织管理相关逻辑；
+- [x] 优化微信客服分配逻辑；
+- [x] 优化会话存档相关解密逻辑，UI页面调优；
+- [x] 优化新客拉群相关数据统计逻辑；
+- [x] 优化全局菜单结构，业务流程更加清晰；
+- [x] 修复了一些已知问题；
+- [x] 其余各模块UI细节调优。
 
+点击下方链接进入官方语雀帮助手册查看历史版本更新日志：
 
-## V2.0 更新日志
-
-LinkWeChat V2.0 主要围绕引流获客、客户中心、客情维系等模块进行升级，主要的升级内容如下：
-
-- [x] 系统菜单重新整合，结构更加清晰；
-- [x] 引流获客-员工活码支持分组；
-- [x] 引流获客-员工活码支持自动排班；
-- [x] 引流获客-员工活码支持多类型欢迎语；
-- [x] 引流获客新增客户公海模块，支持一键分配自主添加；
-- [x] 引流获客-欢迎语升级为欢迎语模板，支持多类型欢迎语个性化配置；
-- [x] 客户中心-企业客户全新改版，支持查看多人跟进内容；
-- [x] 客户中心-企业客群支持标签管理；
-- [x] 客户中心-企业标签支持客群标签管理；
-- [x] 客情维系-消息群发全新改版，支持多类型群发类型；
-- [x] 客情维系-消息群发支持查看员工、客户维度的群发详情；
-- [x] 客情维系-素材中心新增链接、小程序等多类型；
-- [x] 客情维系-新增朋友圈模块，支持查看企业/个人动态；
-- [x] 客情维系-支持企业发表朋友圈；
-- [x] 社群运营-各模块细节调优；
-- [x] 企业管理-企微配置全新改版，支持多种配置方式。
+[帮助手册——历史更新](https://www.yuque.com/linkwechat/help/pcmd0o)
 
 # 五、奖项荣誉
 
