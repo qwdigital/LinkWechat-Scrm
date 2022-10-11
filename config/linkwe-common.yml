@@ -1,29 +1,16 @@
 linkwechat:
   # 获取ip地址开关
-  addressEnabled: false
+  addressEnabled: true
   #扫码登陆url
-  wecomeLoginUrl: https://open.work.weixin.qq.com/wwopen/sso/qrConnect?appid=ww622fc852f79c3f13&agentid=1000002&redirect_uri=http%3A%2F%2Fdemo.linkwechat.net%2F%23%2FauthRedirect&state=web_login
-  weSideBarConfig:
-    material:
-      materialName: 聊天素材
-      materialUrl: http://demo.linkwechat.net/mobile/#/chat
-    customerPortrait:
-      customerPortraitName: 客户画像
-      customerPortraitUrl: http://demo.linkwechat.net/mobile/#/portrait
-    wordGroup:
-      wordGroupName: 关键词群
-      wordGroupUrl: http://demo.linkwechat.net/mobile/#/keywords
-    redEnvelopes:
-      redEnvelopesName: 红包
-      redEnvelopesUrl: http://demo.linkwechat.net/mobile/#/redPacket
-  taskFissionUrl: http://demo.linkwechat.net/mobile/#/taskTreasure?taskId={} #任务宝链接配置
+  wecomeLoginUrl: https://open.work.weixin.qq.com/wwopen/sso/qrConnect?appid={0}&agentid={1}&redirect_uri=REDIRECT_URI&state=STATE
+  taskFissionUrl: http://demo.linkwechat.cn/mobile/#/taskTreasure?taskId={} #任务宝链接配置
   baiduMapsAk: edGc5mIugVxx7lwUx9YpraKeWmExG64o #百度地图开发者ak
-  guideCodeUrl:  http://demo.linkwechat.net/mobile/#/guideCode #导购码
-  guideGroupUrl: http://demo.linkwechat.net/mobile/#/storeCode #导购群码
-  lostCustomerRedirectUrl: http://demo.linkwechat.net/mobile/#/lostCustomers #客户流失
+  guideCodeUrl: http://demo.linkwechat.cn/mobile/#/guideCode #导购码
+  guideGroupUrl: http://demo.linkwechat.cn/mobile/#/storeCode #导购群码
+  lostCustomerRedirectUrl: http://demo.linkwechat.cn/mobile/#/lostCustomers #客户流失
   authorizeUrl: https://open.weixin.qq.com/connect/oauth2/authorize #js sdk身份认证url，不变
-  seasRedirectUrl: http://demo.linkwechat.net/mobile/#/highSeas #客户公海链接
-  sopTagRedirectUrl: http://demo.linkwechat.net/mobile/#/task #群sop和老客标签建群链接
+  seasRedirectUrl: http://demo.linkwechat.cn/mobile/#/highSeas #客户公海链接
+  sopTagRedirectUrl: http://demo.linkwechat.cn/mobile/#/task #群sop和老客标签建群链接
 
 # Spring配置
 spring:
@@ -40,9 +27,9 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.p6spy.engine.spy.P6SpyDriver
     druid:
-      url: jdbc:p6spy:mysql://127.0.0.1:3306/lw-cloud-ky?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=Asia/Shanghai
+      url: jdbc:p6spy:mysql://cdb-gvebaa90.bj.tencentcdb.com:10179/lw_cloud?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=Asia/Shanghai
       username: root
-      password: root
+      password: lwhf@2021##$$
       # 初始连接数
       initialSize: 5
       # 最小连接池数量
@@ -62,6 +49,16 @@ spring:
       testWhileIdle: true
       testOnBorrow: false
       testOnReturn: false
+      webStatFilter:
+        enabled: true
+      statViewServlet:
+        enabled: true
+        # 设置白名单，不填则允许所有访问
+        allow:
+        url-pattern: /druid/*
+        # 控制台管理用户名和密码
+        login-username:
+        login-password:
       filter:
         stat:
           enabled: true
@@ -78,7 +75,6 @@ spring:
     host: 127.0.0.1
     # 端口，默认为6379
     port: 6379
-    database: 5
     # 密码
     password:
     # 连接超时时间
@@ -97,11 +93,11 @@ spring:
         refresh:
           adaptive: true
   rabbitmq:
-    host: 127.0.0.1
+    host: 120.79.64.17
     port: 5672
     username: admin
-    password: 123456
-    virtual-host: vh
+    password: admin@123
+    virtual-host: linkWeChat
     #publisher-confirm-type: correlated #消息确认机制
     listener:
       simple:
@@ -114,6 +110,11 @@ spring:
         acknowledge-mode: manual
         retry:
           enabled: true
+
+
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*Mapper.xml
+  type-aliases-package: com.linkwechat.**.domain
 
 
 swagger:
@@ -132,7 +133,7 @@ feign:
     refresh-enabled: true
 
 wecom:
-  welcome-msg-default: 您好，欢迎关注LinkWechat,如果对您有帮助，麻烦在码云上帮我们点个star，谢谢！
+  welcome-msg-default: 你好，我是LinkWechat运营。我将协助您完成工具配置上线。
   error-code-retry: -1,42001,42009,40082,40014
   mq:
     exchange:
@@ -155,6 +156,7 @@ wecom:
       app-msg: Rk_AppMsg
     queue:
       callback: Qu_CallBack
+      third-callback: Qu_Third_CallBack
       sync:
         group-chat: Qu_GroupChat
         wecustomer: Qu_WeCustomer

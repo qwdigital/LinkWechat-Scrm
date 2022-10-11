@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
- * @author danmo
+ * @author sxw
  * @date 2022/4/18 21:46
  **/
 @Api(tags = "商品图册接口管理")

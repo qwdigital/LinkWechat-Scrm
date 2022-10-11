@@ -1,6 +1,6 @@
 server:
   # 服务器的HTTP端口，默认为8090
-  port: 6094
+  port: 8094
   servlet:
     # 应用的访问路径
     context-path: /wx-api

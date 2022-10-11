@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * @author danmo
+ * @author sxw
  * @date 2022/3/29 23:00
  */
 @FeignClient(value = "${wecom.serve.linkwe-wecom}", fallback = QwKfFallbackFactory.class, contextId = "linkwe-wecom-kf")

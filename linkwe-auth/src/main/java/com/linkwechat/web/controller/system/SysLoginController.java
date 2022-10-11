@@ -112,15 +112,19 @@ public class SysLoginController {
         );
     }
 
-    @GetMapping("/getTestToken")
-    public AjaxResult<Map<String, Object>> getTestToken() {
 
-        return AjaxResult.success(
-                sysLoginService.login("admin","linkwechat@123")
-        );
+
+    /**
+     * 移动端应用登陆
+     *
+     * @param auth_code
+     * @return
+     */
+    @GetMapping("/linkLogin")
+    public AjaxResult<Map<String, Object>> linkLogin(String auth_code) {
+        Map<String, Object> map = sysLoginService.linkLogin(auth_code);
+        return AjaxResult.success(map);
     }
-
-
 
 
     /**
@@ -167,5 +171,4 @@ public class SysLoginController {
         Map<String, Object> map = sysLoginService.wxLogin(code);
         return AjaxResult.success(map);
     }
-
 }

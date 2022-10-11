@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import java.util.Map;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 素材入参
  * @date 2022/4/30 18:25
  **/

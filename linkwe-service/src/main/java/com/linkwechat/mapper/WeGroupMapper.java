@@ -33,6 +33,7 @@ public interface WeGroupMapper extends BaseMapper<WeGroup> {
     @DataScope(type = "2", value = @DataColumn(alias = "wg", name = "owner", userid = "we_user_id"))
     List<LinkGroupChatListVo> selectWeGroupList(WeGroupChatQuery query);
 
+    List<LinkGroupChatListVo> selectWeGroupListByApp(WeGroupChatQuery query);
 
     List<WeCustomerAddGroupVo> findWeGroupByCustomer(@Param("userId") String userId, @Param("externalUserid") String externalUserid);
 

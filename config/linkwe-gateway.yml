@@ -1,6 +1,6 @@
 # Tomcat
 server:
-  port: 6180
+  port: 8180
 
 management:
   endpoints:
@@ -35,6 +35,7 @@ spring:
           lower-case-service-id: true
           filters:
             - StripPrefix=1
+
 
 nacos:
   gateway:

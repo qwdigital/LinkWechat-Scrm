@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 企微应用消息监听
  * @date 2022/4/3 15:39
  **/

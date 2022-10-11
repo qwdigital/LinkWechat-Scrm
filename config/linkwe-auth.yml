@@ -9,7 +9,8 @@ linkwechat:
 
 # 开发环境配置
 server:
-  port: 6880
+  # 服务器的HTTP端口，默认为8090
+  port: 8880
   servlet:
     # 应用的访问路径
     context-path: /
@@ -23,8 +24,3 @@ pagehelper:
   reasonable: true
   supportMethodsArguments: true
   params: count=countSql
-
-mybatis-plus:
-  mapper-locations: classpath*:mapper/**/*Mapper.xml
-  type-aliases-package: com.linkwechat.**.domain
-  type-handlers-package: com.linkwechat.common.handler.GenericTypeHandler
