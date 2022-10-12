@@ -149,4 +149,14 @@ public class QwKfServiceImpl implements IQwKfService {
         weKfMsgQuery.setContext(null);
         return weKfClient.sendMsgOnEvent(weKfMsgQuery);
     }
+
+    @Override
+    public WeKfStatisticListVo getCorpStatistic(WeKfGetStatisticQuery query) {
+        return weKfClient.getCorpStatistic(query);
+    }
+
+    @Override
+    public WeKfStatisticListVo getServicerStatistic(WeKfGetStatisticQuery query) {
+        return weKfClient.getServicerStatistic(query);
+    }
 }
