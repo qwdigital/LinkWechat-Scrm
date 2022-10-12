@@ -235,4 +235,28 @@ public class QwKfController {
         WeKfMsgVo kfMsgVo = kfService.sendMsgOnEvent(query);
         return AjaxResult.success(kfMsgVo);
     }
+
+    /**
+     * 获取「客户数据统计」企业汇总数据
+     * @param query
+     * @return
+     */
+    @ApiOperation(value = "获取「客户数据统计」企业汇总数据",httpMethod = "POST")
+    @PostMapping("/getCorpStatistic")
+    public AjaxResult<WeKfStatisticListVo> getCorpStatistic(@RequestBody WeKfGetStatisticQuery query) {
+        WeKfStatisticListVo weKfStatisticList = kfService.getCorpStatistic(query);
+        return AjaxResult.success(weKfStatisticList);
+    }
+
+    /**
+     * 获取「客户数据统计」接待人员明细数据
+     * @param query
+     * @return
+     */
+    @ApiOperation(value = "获取「客户数据统计」接待人员明细数据",httpMethod = "POST")
+    @PostMapping("/getServicerStatistic")
+    public AjaxResult<WeKfStatisticListVo> getServicerStatistic(@RequestBody WeKfGetStatisticQuery query) {
+        WeKfStatisticListVo weKfStatisticList = kfService.getServicerStatistic(query);
+        return AjaxResult.success(weKfStatisticList);
+    }
 }

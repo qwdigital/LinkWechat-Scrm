@@ -130,4 +130,18 @@ public interface IQwKfService {
      * @return
      */
     WeKfMsgVo sendMsgOnEvent(WeKfMsgQuery query);
+
+    /**
+     * 获取「客户数据统计」企业汇总数据
+     * @param query
+     * @return
+     */
+    WeKfStatisticListVo getCorpStatistic(WeKfGetStatisticQuery query);
+
+    /**
+     * 获取「客户数据统计」接待人员明细数据
+     * @param query
+     * @return
+     */
+    WeKfStatisticListVo getServicerStatistic(WeKfGetStatisticQuery query);
 }
