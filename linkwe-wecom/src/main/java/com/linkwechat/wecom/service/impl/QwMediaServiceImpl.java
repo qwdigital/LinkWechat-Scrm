@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.util.Objects;
 
 /**
  * @author danmo
@@ -103,5 +104,19 @@ public class QwMediaServiceImpl implements IQwMediaService {
         query.setType(type);
         query.setAttachmentType(attachmentType);
         return weMediaClient.uploadAttachment(file.getInputStream(),file.getName(), query);
+    }
+
+    @Override
+    public WeMediaVo uploadAttachment2(WeMediaQuery query) {
+        if (Objects.isNull(query.getFile())) {
+            throw new WeComException("附件不能为空!");
+        }
+        InputStream inputStream = null;
+        try {
+            inputStream = query.getFile().getInputStream();
+        } catch (IOException e) {
+            log.error("上传文件失败......query:{}", JSONObject.toJSONString(query), e);
+        }
+        return weMediaClient.uploadAttachment(inputStream, query.getName(), query);
     }
 }

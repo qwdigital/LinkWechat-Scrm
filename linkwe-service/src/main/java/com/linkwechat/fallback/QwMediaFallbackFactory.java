@@ -43,4 +43,9 @@ public class QwMediaFallbackFactory implements QwMediaClient {
     public AjaxResult<WeMediaVo> getMedia(WeGetMediaQuery query) {
         return null;
     }
+
+    @Override
+    public AjaxResult<WeMediaVo> uploadAttachment2(WeMediaQuery query) {
+        return null;
+    }
 }
