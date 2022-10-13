@@ -1,6 +1,7 @@
 package com.linkwechat.fegin;
 
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.domain.R;
 import com.linkwechat.domain.wecom.query.media.WeGetMediaQuery;
 import com.linkwechat.domain.wecom.query.media.WeMediaQuery;
 import com.linkwechat.domain.wecom.vo.media.WeMediaVo;
@@ -32,5 +33,8 @@ public interface QwMediaClient {
     AjaxResult<byte[]> mediaGet(@SpringQueryMap WeMediaQuery query);
 
     @PostMapping("/media/getMedia")
-     AjaxResult<WeMediaVo> getMedia(@RequestBody WeGetMediaQuery query);
+    AjaxResult<WeMediaVo> getMedia(@RequestBody WeGetMediaQuery query);
+
+    @PostMapping("/media/uploadAttachment2")
+    AjaxResult<WeMediaVo> uploadAttachment2(@RequestBody WeMediaQuery query);
 }

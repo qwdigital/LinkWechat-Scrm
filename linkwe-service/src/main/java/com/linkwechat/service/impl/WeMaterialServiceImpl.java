@@ -435,4 +435,24 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
         weMediaVo.setUrl(data.getUrl());
         return weMediaVo;
     }
+
+    @Override
+    public WeMaterialFileVo uploadAttachment(MultipartFile file, String mediaType, Integer attachmentType, Integer needMediaId) {
+        WeMaterialFileVo weMaterialFileVo = WeMaterialFileVo.builder().build();
+        AjaxResult<FileEntity> result = fileClient.upload(file);
+        if (result != null && result.getData() != null) {
+            FileEntity entity = result.getData();
+            weMaterialFileVo.setMaterialUrl(entity.getUrl());
+            weMaterialFileVo.setMaterialName(entity.getName());
+        }
+        if(needMediaId != null && Objects.equals(needMediaId,1)){
+            WeMediaQuery weMediaQuery = new WeMediaQuery();
+            weMediaQuery.setFile(file);
+            weMediaQuery.setType(mediaType);
+            weMediaQuery.setAttachmentType(attachmentType);
+            weMediaQuery.setName(file.getOriginalFilename());
+            WeMediaVo weMedia = mediaClient.uploadAttachment2(weMediaQuery).getData();
+        }
+        return weMaterialFileVo;
+    }
 }

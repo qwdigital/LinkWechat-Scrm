@@ -22,6 +22,7 @@ import com.linkwechat.domain.material.vo.WePosterVo;
 import com.linkwechat.domain.wecom.vo.media.WeMediaVo;
 import com.linkwechat.service.IWeMaterialService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -244,5 +245,23 @@ public class WeMaterialController extends BaseController {
         return AjaxResult.success("删除成功");
     }
 
+
+    /**
+     * 上传附件素材
+     * @param file 文件
+     * @param mediaType 图片（image）、视频（video）、普通文件（file）
+     * @param attachmentType 附件类型，1：朋友圈；2:商品图册
+     * @param needMediaId 是否需要mediaId 1需要 0不需要
+     * @return
+     */
+    @PostMapping("/material/attachment/upload")
+    @ApiOperation("上传附件素材")
+    public AjaxResult<WeMaterialFileVo> uploadAttachment(@RequestParam(value = "file") MultipartFile file,
+                             @RequestParam(value = "mediaType") @ApiParam("图片（image）、视频（video）、普通文件（file）") String mediaType,
+                             @RequestParam("attachmentType") @ApiParam("附件类型，1：朋友圈；2:商品图册") Integer attachmentType,
+                            @RequestParam("needMediaId") @ApiParam("是否需要mediaId 1需要 0不需要") Integer needMediaId) {
+        WeMaterialFileVo weMaterialFileVo = materialService.uploadAttachment(file, mediaType,attachmentType,needMediaId);
+        return AjaxResult.success(weMaterialFileVo);
+    }
 
 }
