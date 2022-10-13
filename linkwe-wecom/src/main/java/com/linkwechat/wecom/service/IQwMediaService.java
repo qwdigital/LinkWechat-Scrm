@@ -54,4 +54,11 @@ public interface IQwMediaService {
      * @return
      */
     WeMediaVo uploadAttachment(MultipartFile file, String type, Integer attachmentType) throws IOException;
+
+    /**
+     * 上传附件素材
+     * @param query
+     * @return
+     */
+    WeMediaVo uploadAttachment2(WeMediaQuery query);
 }

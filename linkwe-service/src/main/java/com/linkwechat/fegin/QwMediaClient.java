@@ -32,5 +32,8 @@ public interface QwMediaClient {
     AjaxResult<byte[]> mediaGet(@SpringQueryMap WeMediaQuery query);
 
     @PostMapping("/media/getMedia")
-     AjaxResult<WeMediaVo> getMedia(@RequestBody WeGetMediaQuery query);
+    AjaxResult<WeMediaVo> getMedia(@RequestBody WeGetMediaQuery query);
+
+    @PostMapping("/media/uploadAttachment2")
+    AjaxResult<WeMediaVo> uploadAttachment2(@RequestBody WeMediaQuery query);
 }

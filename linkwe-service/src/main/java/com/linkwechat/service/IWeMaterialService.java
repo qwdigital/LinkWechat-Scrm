@@ -81,4 +81,14 @@ public interface IWeMaterialService extends IService<WeMaterial> {
      * @return
      */
     WeMediaVo getMediaToResponse(String mediaId);
+
+    /**
+     * 上传附件素材
+     * @param file 文件
+     * @param mediaType 图片（image）、视频（video）、普通文件（file）
+     * @param attachmentType 附件类型，1：朋友圈；2:商品图册
+     * @param needMediaId 是否需要mediaId
+     * @return
+     */
+    WeMaterialFileVo uploadAttachment(MultipartFile file, String mediaType, Integer attachmentType, Integer needMediaId);
 }
