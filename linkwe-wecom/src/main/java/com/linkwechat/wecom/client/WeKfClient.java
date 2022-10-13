@@ -1,12 +1,16 @@
 package com.linkwechat.wecom.client;
 
 import com.dtflys.forest.annotation.*;
+import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.kf.*;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.kf.*;
 import com.linkwechat.wecom.interceptor.WeKfAccessTokenInterceptor;
 import com.linkwechat.wecom.retry.WeCommonRetryWhen;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * @author danmo
@@ -191,4 +195,36 @@ public interface WeKfClient {
     @Post(url = "/kf/get_servicer_statistic")
     WeKfStatisticListVo getServicerStatistic(@JSONBody WeKfGetStatisticQuery query);
 
+    /**
+     * 知识库新增分组
+     * @param query
+     * @return
+     */
+    @Post(url = "/kf/knowledge/add_group")
+    WeKfAddKnowledgeGroupVo addKnowledgeGroup(@JSONBody WeKfAddKnowledgeGroupQuery query);
+
+
+    /**
+     * 知识库删除分组
+     * @param query
+     * @return
+     */
+    @Post(url = "/kf/knowledge/del_group")
+    WeResultVo delKnowledgeGroup(@JSONBody WeKfKnowledgeGroupQuery query);
+
+    /**
+     * 知识库修改分组
+     * @param query
+     * @return
+     */
+    @Post(url = "/kf/knowledge/mod_group")
+    WeResultVo modKnowledgeGroup(@JSONBody WeKfKnowledgeGroupQuery query);
+
+    /**
+     * 知识库分组列表
+     * @param query
+     * @return
+     */
+    @Post(url = "/kf/knowledge/list_group")
+    WeKfKnowledgeGroupListVo getKnowledgeGroupList(@JSONBody WeKfKnowledgeGroupQuery query);
 }

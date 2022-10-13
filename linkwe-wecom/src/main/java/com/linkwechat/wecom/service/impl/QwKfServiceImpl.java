@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ import java.util.Map;
 @Slf4j
 public class QwKfServiceImpl implements IQwKfService {
 
-    @Autowired
+    @Resource
     private WeKfClient weKfClient;
 
     @Override
@@ -158,5 +159,25 @@ public class QwKfServiceImpl implements IQwKfService {
     @Override
     public WeKfStatisticListVo getServicerStatistic(WeKfGetStatisticQuery query) {
         return weKfClient.getServicerStatistic(query);
+    }
+
+    @Override
+    public WeKfAddKnowledgeGroupVo addKnowledgeGroup(WeKfAddKnowledgeGroupQuery query) {
+        return weKfClient.addKnowledgeGroup(query);
+    }
+
+    @Override
+    public WeResultVo delKnowledgeGroup(WeKfKnowledgeGroupQuery query) {
+        return weKfClient.delKnowledgeGroup(query);
+    }
+
+    @Override
+    public WeResultVo modKnowledgeGroup(WeKfKnowledgeGroupQuery query) {
+        return weKfClient.modKnowledgeGroup(query);
+    }
+
+    @Override
+    public WeKfKnowledgeGroupListVo getKnowledgeGroupList(WeKfKnowledgeGroupQuery query) {
+        return weKfClient.getKnowledgeGroupList(query);
     }
 }
