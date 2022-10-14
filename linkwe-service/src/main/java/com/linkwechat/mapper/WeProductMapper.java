@@ -3,8 +3,12 @@ package com.linkwechat.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.domain.WeProduct;
+import com.linkwechat.domain.product.query.WeProductQuery;
+import com.linkwechat.domain.product.vo.WeProductListVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * 商品信息表(WeProduct)
@@ -17,5 +21,6 @@ import org.springframework.stereotype.Repository;
 public interface WeProductMapper extends BaseMapper<WeProduct> {
 
 
+    List<WeProductListVo> queryProductList(WeProductQuery query);
 }
 
