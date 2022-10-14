@@ -31,7 +31,7 @@ public class WeAddProductQuery {
     @ApiModelProperty("商品价格")
     private String price;
 
-    @Size(max = 8,message = "商品附件最多8个")
+    @Size(min = 1, max = 8,message = "商品附件最少1个最多8个")
     @ApiModelProperty("商品附件")
     private List<WeMessageTemplate> attachments;
 
