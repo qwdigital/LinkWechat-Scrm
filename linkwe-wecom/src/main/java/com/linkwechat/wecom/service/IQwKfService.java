@@ -130,4 +130,46 @@ public interface IQwKfService {
      * @return
      */
     WeKfMsgVo sendMsgOnEvent(WeKfMsgQuery query);
+
+    /**
+     * 获取「客户数据统计」企业汇总数据
+     * @param query
+     * @return
+     */
+    WeKfStatisticListVo getCorpStatistic(WeKfGetStatisticQuery query);
+
+    /**
+     * 获取「客户数据统计」接待人员明细数据
+     * @param query
+     * @return
+     */
+    WeKfStatisticListVo getServicerStatistic(WeKfGetStatisticQuery query);
+
+    /**
+     * 知识库新增分组
+     * @param query
+     * @return
+     */
+    WeKfAddKnowledgeGroupVo addKnowledgeGroup(WeKfAddKnowledgeGroupQuery query);
+
+    /**
+     * 知识库删除分组
+     * @param query
+     * @return
+     */
+    WeResultVo delKnowledgeGroup(WeKfKnowledgeGroupQuery query);
+
+    /**
+     * 知识库修改分组
+     * @param query
+     * @return
+     */
+    WeResultVo modKnowledgeGroup(WeKfKnowledgeGroupQuery query);
+
+    /**
+     * 知识库分组列表
+     * @param query
+     * @return
+     */
+    WeKfKnowledgeGroupListVo getKnowledgeGroupList(WeKfKnowledgeGroupQuery query);
 }

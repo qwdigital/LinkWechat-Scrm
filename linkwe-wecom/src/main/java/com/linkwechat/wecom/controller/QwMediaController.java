@@ -40,6 +40,10 @@ public class QwMediaController {
         return AjaxResult.success(iQwMediaService.uploadAttachment(query));
     }
 
+    @PostMapping("/uploadAttachment2")
+    public AjaxResult<WeMediaVo> uploadAttachment2(@RequestBody WeMediaQuery query) {
+        return AjaxResult.success(iQwMediaService.uploadAttachment2(query));
+    }
 
     @GetMapping("/mediaGet")
     public AjaxResult<byte[]> mediaGet(WeMediaQuery query) throws IOException {

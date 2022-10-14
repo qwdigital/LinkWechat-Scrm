@@ -170,4 +170,23 @@ public interface QwKfClient {
     @ApiOperation(value = "发送欢迎语等事件响应消息",httpMethod = "POST")
     @PostMapping("/kf/sendMsgOnEvent")
     public AjaxResult<WeKfMsgVo> sendMsgOnEvent(@RequestBody WeKfMsgQuery query);
+
+
+    /**
+     * 获取「客户数据统计」企业汇总数据
+     * @param query
+     * @return
+     */
+    @ApiOperation(value = "获取「客户数据统计」企业汇总数据",httpMethod = "POST")
+    @PostMapping("/kf/getCorpStatistic")
+    AjaxResult<WeKfStatisticListVo> getCorpStatistic(@RequestBody WeKfGetStatisticQuery query);
+
+    /**
+     * 获取「客户数据统计」接待人员明细数据
+     * @param query
+     * @return
+     */
+    @ApiOperation(value = "获取「客户数据统计」接待人员明细数据",httpMethod = "POST")
+    @PostMapping("/kf/getServicerStatistic")
+    AjaxResult<WeKfStatisticListVo> getServicerStatistic(@RequestBody WeKfGetStatisticQuery query);
 }

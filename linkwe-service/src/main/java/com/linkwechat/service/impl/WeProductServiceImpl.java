@@ -71,12 +71,14 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
         //获取附件媒体ID
         if (CollectionUtil.isNotEmpty(query.getAttachments())) {
             for (WeMessageTemplate attachment : query.getAttachments()) {
-                String mediaId = iWeMaterialService.uploadAttachmentMaterial(attachment.getPicUrl(),
-                        MediaType.IMAGE.getMediaType(), 2, SnowFlakeUtil.nextId().toString()).getMediaId();
-                if (StringUtils.isNotEmpty(mediaId)) {
-                    attachment.setMediaId(mediaId);
-                } else {
-                    throw new WeComException(12003, "获取附件素材ID失败");
+                if(StringUtils.isEmpty(attachment.getMediaId())){
+                    String mediaId = iWeMaterialService.uploadAttachmentMaterial(attachment.getPicUrl(),
+                            MediaType.IMAGE.getMediaType(), 2, SnowFlakeUtil.nextId().toString()).getMediaId();
+                    if (StringUtils.isNotEmpty(mediaId)) {
+                        attachment.setMediaId(mediaId);
+                    } else {
+                        throw new WeComException(12003, "获取附件素材ID失败");
+                    }
                 }
             }
         }
