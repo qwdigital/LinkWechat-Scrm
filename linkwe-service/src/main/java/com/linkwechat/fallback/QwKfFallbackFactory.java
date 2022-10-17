@@ -101,4 +101,14 @@ public class QwKfFallbackFactory implements QwKfClient {
     public AjaxResult<WeKfMsgVo> sendMsgOnEvent(WeKfMsgQuery query) {
         return null;
     }
+
+    @Override
+    public AjaxResult<WeKfStatisticListVo> getCorpStatistic(WeKfGetStatisticQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<WeKfStatisticListVo> getServicerStatistic(WeKfGetStatisticQuery query) {
+        return null;
+    }
 }

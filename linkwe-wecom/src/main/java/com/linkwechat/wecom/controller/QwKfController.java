@@ -235,4 +235,76 @@ public class QwKfController {
         WeKfMsgVo kfMsgVo = kfService.sendMsgOnEvent(query);
         return AjaxResult.success(kfMsgVo);
     }
+
+    /**
+     * 获取「客户数据统计」企业汇总数据
+     * @param query
+     * @return
+     */
+    @ApiOperation(value = "获取「客户数据统计」企业汇总数据",httpMethod = "POST")
+    @PostMapping("/getCorpStatistic")
+    public AjaxResult<WeKfStatisticListVo> getCorpStatistic(@RequestBody WeKfGetStatisticQuery query) {
+        WeKfStatisticListVo weKfStatisticList = kfService.getCorpStatistic(query);
+        return AjaxResult.success(weKfStatisticList);
+    }
+
+    /**
+     * 获取「客户数据统计」接待人员明细数据
+     * @param query
+     * @return
+     */
+    @ApiOperation(value = "获取「客户数据统计」接待人员明细数据",httpMethod = "POST")
+    @PostMapping("/getServicerStatistic")
+    public AjaxResult<WeKfStatisticListVo> getServicerStatistic(@RequestBody WeKfGetStatisticQuery query) {
+        WeKfStatisticListVo weKfStatisticList = kfService.getServicerStatistic(query);
+        return AjaxResult.success(weKfStatisticList);
+    }
+
+    /**
+     * 知识库新增分组
+     * @param query
+     * @return
+     */
+    @ApiOperation(value = "知识库新增分组",httpMethod = "POST")
+    @PostMapping("/addKnowledgeGroup")
+    public AjaxResult<WeKfAddKnowledgeGroupVo> addKnowledgeGroup(@RequestBody WeKfAddKnowledgeGroupQuery query) {
+        WeKfAddKnowledgeGroupVo groupVo = kfService.addKnowledgeGroup(query);
+        return AjaxResult.success(groupVo);
+    }
+
+    /**
+     * 知识库删除分组
+     * @param query
+     * @return
+     */
+    @ApiOperation(value = "知识库删除分组",httpMethod = "POST")
+    @PostMapping("/delKnowledgeGroup")
+    public AjaxResult<WeResultVo> delKnowledgeGroup(@RequestBody WeKfKnowledgeGroupQuery query) {
+        WeResultVo weResult = kfService.delKnowledgeGroup(query);
+        return AjaxResult.success(weResult);
+    }
+
+    /**
+     * 知识库修改分组
+     * @param query
+     * @return
+     */
+    @ApiOperation(value = "知识库修改分组",httpMethod = "POST")
+    @PostMapping("/modKnowledgeGroup")
+    public AjaxResult<WeResultVo> modKnowledgeGroup(@RequestBody WeKfKnowledgeGroupQuery query) {
+        WeResultVo weResult = kfService.modKnowledgeGroup(query);
+        return AjaxResult.success(weResult);
+    }
+
+    /**
+     * 知识库分组列表
+     * @param query
+     * @return
+     */
+    @ApiOperation(value = "知识库修改分组",httpMethod = "POST")
+    @PostMapping("/getKnowledgeGroupList")
+    public AjaxResult<WeKfKnowledgeGroupListVo> getKnowledgeGroupList(@RequestBody WeKfKnowledgeGroupQuery query) {
+        WeKfKnowledgeGroupListVo weKfKnowledgeGroupList = kfService.getKnowledgeGroupList(query);
+        return AjaxResult.success(weKfKnowledgeGroupList);
+    }
 }
