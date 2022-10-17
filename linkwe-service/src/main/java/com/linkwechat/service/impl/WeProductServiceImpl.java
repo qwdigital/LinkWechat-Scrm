@@ -166,7 +166,8 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
 
     @Override
     public List<WeProductListVo> productList(WeProductQuery query) {
-        return null;
+        List<WeProductListVo> list = this.baseMapper.queryProductList(query);
+        return list;
     }
 
 

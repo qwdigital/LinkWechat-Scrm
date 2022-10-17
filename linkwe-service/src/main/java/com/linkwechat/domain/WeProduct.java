@@ -50,7 +50,7 @@ public class WeProduct extends BaseEntity implements Serializable {
      * 描述
      */
     @ApiModelProperty(value = "描述")
-    @TableField("describe")
+    @TableField("`describe`")
     private String describe;
 
 
