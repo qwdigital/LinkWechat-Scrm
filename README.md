@@ -108,6 +108,8 @@ LinkWeChat 不做私域营销专家，而是通过开源让每个企业都是自
 
 开源演示地址：[http://demo.linkwechat.net/](http://demo.linkwechat.net/)
 
+默认账号密码：admin，123456
+
 目前支持两种方式体验：
 
 * 在首页扫码二维码申请加入测试企业，申请通过后即可扫码登录，体验系统的完整功能；
@@ -115,7 +117,6 @@ LinkWeChat 不做私域营销专家，而是通过开源让每个企业都是自
 
 _（注意：演示环境已屏蔽管理权限和相关操作）_
 
-SAAS体验地址：https://saas.pardigital.cn/#/probation
 
 ## 2.2 系统架构
 
