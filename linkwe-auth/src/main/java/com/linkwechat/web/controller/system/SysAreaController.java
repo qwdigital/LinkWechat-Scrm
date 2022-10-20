@@ -6,6 +6,7 @@ import cn.hutool.core.lang.tree.TreeNode;
 import cn.hutool.core.lang.tree.TreeUtil;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.vo.SysAreaVo;
 import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.web.domain.SysArea;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,5 +60,11 @@ public class SysAreaController extends BaseController {
         }
 
         return AjaxResult.success(treeList);
+    }
+
+    @GetMapping("/getChildListById")
+    public AjaxResult<SysAreaVo> getChildListById(@NotNull(message = "ID不允许为空") Integer id) {
+        List<SysAreaVo> list = sysAreaService.getChildListById(id);
+        return AjaxResult.success(list);
     }
 }
