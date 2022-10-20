@@ -1,0 +1,21 @@
+package com.linkwechat.fegin;
+
+import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.vo.SysAreaVo;
+import com.linkwechat.fallback.QwSysAreaFallbackFactory;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
+
+/**
+ * @author danmo
+ * @date 2022/4/29 22:58
+ */
+@FeignClient(value = "${wecom.serve.linkwe-auth}", fallback = QwSysAreaFallbackFactory.class, contextId = "linkwe-auth-user")
+public interface QwSysAreaClient {
+
+    @GetMapping("/system/area/getChildListById")
+    AjaxResult<List<SysAreaVo>> getChildListById(Integer id);
+
+}
