@@ -1,6 +1,6 @@
 # Tomcat
 server:
-  port: 6181
+  port: 8181
   servlet:
     # 应用的访问路径
     context-path: /file
@@ -16,8 +16,8 @@ linkwechat:
     #腾讯云对象存储
     object: tencentOss
     cos:
-      secretId:
-      secretKey:
-      region:
-      bucketName:
-      cosImgUrlPrefix:
+      secretId: AKIDQRCizIeUGl13vakkDQMH0VkjhPr1rBBv
+      secretKey: e3D8oFetseC0f8OX9XeV7UcTDiyyQ8cr
+      region: ap-nanjing
+      bucketName: link-wechat-1251309172
+      cosImgUrlPrefix: https://link-wechat-1251309172.cos.ap-nanjing.myqcloud.com/

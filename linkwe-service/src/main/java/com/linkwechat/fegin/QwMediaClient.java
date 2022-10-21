@@ -1,6 +1,7 @@
 package com.linkwechat.fegin;
 
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.domain.R;
 import com.linkwechat.domain.wecom.query.media.WeGetMediaQuery;
 import com.linkwechat.domain.wecom.query.media.WeMediaQuery;
 import com.linkwechat.domain.wecom.vo.media.WeMediaVo;

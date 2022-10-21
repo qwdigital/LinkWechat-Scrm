@@ -25,6 +25,12 @@ public interface IWeGroupService extends IService<WeGroup> {
      */
     List<LinkGroupChatListVo> getPageList(WeGroupChatQuery query);
 
+    /**
+     *  应用获取客群数据
+     * @param query
+     * @return
+     */
+    List<LinkGroupChatListVo> selectWeGroupListByApp(WeGroupChatQuery query);
 
     /**
      * 获取群详情

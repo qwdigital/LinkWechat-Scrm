@@ -2,6 +2,6 @@ common:
   nacos:
     config:
       #Nacos 服务地址
-      server: 127.0.0.1:8848
+      server: 120.79.64.17:10848
       #Nacos 命名空间
       namespace: 4e237601-cea8-414d-b7b9-d7adc8cbcf95

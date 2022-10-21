@@ -27,6 +27,13 @@ public interface IWeCustomerService extends IService<WeCustomer> {
     List<WeCustomersVo> findWeCustomerList(WeCustomersQuery weCustomersQuery, PageDomain pageDomain);
 
 
+    /**
+     * 应用客户列表
+     * @param weCustomersQuery
+     * @param pageDomain
+     * @return
+     */
+    TableDataInfo<List<WeCustomersVo>> findWeCustomerListByApp(WeCustomersQuery weCustomersQuery, PageDomain pageDomain);
 
     /**
      * 客户总数统计

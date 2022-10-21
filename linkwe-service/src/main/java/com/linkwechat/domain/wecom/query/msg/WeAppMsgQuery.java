@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author danmo
+ * @author sxw
  */
 @Data
 public class WeAppMsgQuery extends WeBaseQuery {

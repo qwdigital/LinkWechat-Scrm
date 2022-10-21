@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeKfServicerMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+    <select id="getServicerByKfId" resultType="com.linkwechat.domain.kf.WeKfUser">
+        select user_id,
+               (select su.user_name from sys_user su where su.we_user_id = wks.user_id and su.del_flag = 0 limit 1) as user_name,
+        status
+        from we_kf_servicer wks where kf_id = #{kfId} and del_flag = 0;
+    </select>
+
+
+    <select id="getKfServicerList" resultType="com.linkwechat.domain.kf.vo.WeKfServicerListVo">
+        select
+        id,
+        kf_id,
+        open_kf_id,
+        user_id,
+        (select su.user_name from sys_user su where su.we_user_id = wks.user_id and su.del_flag=0  limit 1) as user_name,
+        (select group_concat(wd.dept_name) from sys_user wu,sys_dept wd where find_in_set(wd.dept_id,wu.dept_id) and
+        wu.we_user_id = wks.user_id and wd.del_flag = 0) as dept_name,
+        status
+        from we_kf_servicer wks
+        <where>
+            <if test="kfId != null">
+                and wks.kf_id = #{kfId}
+            </if>
+            <if test="openKfId != null and openKfId != ''">
+                and wks.open_kf_id = #{openKfId}
+            </if>
+            <if test="status != null">
+                and wks.status = #{status}
+            </if>
+            <if test="userIds != null and userIds.size() > 0">
+                and wks.user_id in
+                <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                    #{userId}
+                </foreach>
+            </if>
+            <if test="beginTime != null">
+                and DATE_FORMAT(wks.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null">
+                and DATE_FORMAT(wks.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            </if>
+            and wks.del_flag = 0
+        </where>
+    </select>
+
+</mapper>

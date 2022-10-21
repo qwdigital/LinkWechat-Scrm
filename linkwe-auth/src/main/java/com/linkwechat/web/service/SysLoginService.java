@@ -143,7 +143,29 @@ public class SysLoginService {
     }
 
 
+    public Map<String, Object> linkLogin(String authCode) {
+        //调用企业微信接口获取用户信息
+        WeUserQuery query = new WeUserQuery();
+        query.setCode(authCode);
+        WeLoginUserVo weLoginUserVo = qwUserClient.getLoginUser(query).getData();
 
+        if (weLoginUserVo == null) {
+            throw new WeComException(CommonErrorCodeEnum.ERROR_CODE_10001.getErrorCode(),
+                    CommonErrorCodeEnum.ERROR_CODE_10001.getErrorMsg());
+        }
+        if (weLoginUserVo.getErrCode() != null && weLoginUserVo.getErrCode() != 0) {
+            throw new WeComException(weLoginUserVo.getErrCode(),
+                    WeErrorCodeEnum.parseEnum(weLoginUserVo.getErrCode()).getErrorMsg());
+        }
+
+        SysUser sysUser = sysUserService.selectUserByWeUserId(weLoginUserVo.getUserId());
+        LoginUser sysUserVo = findLoginUser(sysUser);
+        //获取员工共头像等信息
+        if(StringUtils.isNotEmpty(weLoginUserVo.getUserTicket())){
+            sysUserService.getUserSensitiveInfo(sysUser.getUserId(),weLoginUserVo.getUserTicket());
+        }
+        return tokenService.createToken(sysUserVo);
+    }
 
     public Map<String, Object> wxLogin(String authCode) {
         WxTokenVo wxTokenVo = wxAuthClient.getToken(authCode).getData();
