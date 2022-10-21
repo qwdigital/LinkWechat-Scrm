@@ -6,6 +6,7 @@ import com.linkwechat.common.constant.SecurityConstants;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.core.domain.model.WxLoginUser;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
 import org.springframework.stereotype.Component;
@@ -36,8 +37,8 @@ public class RequestContextInterceptor implements HandlerInterceptor {
         SecurityContextHolder.setUserType(ServletUtils.getHeader(request, SecurityConstants.USER_TYPE));
         SecurityContextHolder.setUserKey(ServletUtils.getHeader(request, SecurityConstants.USER_KEY));
         String loginType = ServletUtils.getHeader(request, SecurityConstants.LOGIN_TYPE);
-        if(ObjectUtil.notEqual("LinkWeChatAPI",loginType)){
-            return false;
+        if(StringUtils.isNotEmpty(loginType) && ObjectUtil.notEqual("LinkWeChatAPI",loginType)){
+           throw new WeComException("token不合法");
         }
         String loginUserStr = ServletUtils.getHeader(request, SecurityConstants.LOGIN_USER);
         if(StringUtils.isNotEmpty(loginUserStr)){
