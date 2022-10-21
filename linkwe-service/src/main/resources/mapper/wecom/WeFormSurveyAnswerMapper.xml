@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeFormSurveyAnswerMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeFormSurveyAnswer" id="WeFormSurveyAnswerResult">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="mobile" column="mobile" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
+        <result property="addr" column="addr" jdbcType="VARCHAR"/>
+        <result property="city" column="city" jdbcType="VARCHAR"/>
+        <result property="openId" column="open_id" jdbcType="VARCHAR"/>
+        <result property="unionId" column="union_id" jdbcType="VARCHAR"/>
+        <result property="anTime" column="an_time" jdbcType="TIMESTAMP"/>
+        <result property="totalTime" column="total_time" jdbcType="NUMERIC"/>
+        <result property="ipAddr" column="ip_addr" jdbcType="VARCHAR"/>
+        <result property="answer" column="answer" jdbcType="VARCHAR"/>
+        <result property="belongId" column="belong_id" jdbcType="INTEGER"/>
+        <result property="anEffective" column="an_effective" jdbcType="INTEGER"/>
+        <result property="quNum" column="qu_num" jdbcType="INTEGER"/>
+        <result property="dataSource" column="data_source" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+        <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="selectWeFormSurveyAnswerVo">
+        select id,
+               mobile,
+               name,
+               avatar,
+               addr,
+               city,
+               open_id,
+               union_id,
+               an_time,
+               total_time,
+               ip_addr,
+               answer,
+               belong_id,
+               an_effective,
+               qu_num,
+               data_source,
+               create_time,
+               create_by,
+               create_by_id,
+               update_time,
+               update_by,
+               update_by_id,
+               del_flag
+        from we_form_survey_answer
+    </sql>
+
+
+
+</mapper>

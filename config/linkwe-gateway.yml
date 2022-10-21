@@ -14,6 +14,11 @@ security:
       - /auth/**
       - /open/wecom/**
       - /open/groupCode/getActualCode/**
+      - /open/form/survey/getInfo/**
+      - /open/form/answer/add
+      - /open/form/answer/isCompleteSurvey
+      - /open/form/statistic/insertPieValue
+      - /open/form/statistic/siteStas
   captcha:
     enabled: true
     type: math

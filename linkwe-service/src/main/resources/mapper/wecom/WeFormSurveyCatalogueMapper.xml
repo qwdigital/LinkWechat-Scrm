@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeFormSurveyCatalogueMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeFormSurveyCatalogue" id="WeFormSurveyCatalogueResult">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="answerNum" column="answer_num" jdbcType="INTEGER"/>
+        <result property="anShare" column="an_share" jdbcType="INTEGER"/>
+        <result property="anAuth" column="an_auth" jdbcType="INTEGER"/>
+        <result property="sid" column="sid" jdbcType="VARCHAR"/>
+        <result property="surveyName" column="survey_name" jdbcType="VARCHAR"/>
+        <result property="surveyQuNum" column="survey_qu_num" jdbcType="INTEGER"/>
+        <result property="surveyState" column="survey_state" jdbcType="INTEGER"/>
+        <result property="visibility" column="visibility" jdbcType="INTEGER"/>
+        <result property="groupId" column="group_id" jdbcType="INTEGER"/>
+        <result property="formDescription" column="form_description" jdbcType="VARCHAR"/>
+        <result property="formLogo" column="form_logo" jdbcType="VARCHAR"/>
+        <result property="anTiming" column="an_timing" jdbcType="INTEGER"/>
+        <result property="timingStart" column="timing_start" jdbcType="TIMESTAMP"/>
+        <result property="timingEnd" column="timing_end" jdbcType="TIMESTAMP"/>
+        <result property="fillingRules" column="filling_rules" jdbcType="INTEGER"/>
+        <result property="htmlPath" column="html_path" jdbcType="VARCHAR"/>
+        <result property="anChannels" column="an_channels" jdbcType="INTEGER"/>
+        <result property="channelsPath" column="channels_path" jdbcType="VARCHAR"/>
+        <result property="styles" column="styles" jdbcType="OTHER"/>
+        <result property="qrCode" column="qr_code" jdbcType="VARCHAR"/>
+        <result property="channelsName" column="channels_name" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+        <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="selectWeFormSurveyCatalogueVo">
+        select id,
+               answer_num,
+               an_share,
+               an_auth,
+               sid,
+               survey_name,
+               survey_qu_num,
+               survey_state,
+               visibility,
+               group_id,
+               form_description,
+               form_logo,
+               an_timing,
+               timing_start,
+               timing_end,
+               filling_rules,
+               html_path,
+               an_channels,
+               channels_path,
+               styles,
+               qr_code,
+               channels_name,
+               create_time,
+               create_by,
+               create_by_id,
+               update_time,
+               update_by,
+               update_by_id,
+               del_flag
+        from we_form_survey_catalogue
+    </sql>
+
+    <select id="getWeFormSurveyCatalogueById" resultType="com.linkwechat.domain.WeFormSurveyCatalogue">
+        <include refid="selectWeFormSurveyCatalogueVo"></include>
+        where id = #{id}
+    </select>
+
+    <select id="getListIgnoreTenantId" resultType="com.linkwechat.domain.WeFormSurveyCatalogue">
+        <include refid="selectWeFormSurveyCatalogueVo"></include>
+        where del_flag = 0
+    </select>
+
+
+</mapper>
