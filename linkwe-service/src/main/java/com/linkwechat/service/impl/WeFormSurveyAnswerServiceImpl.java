@@ -1,0 +1,147 @@
+package com.linkwechat.service.impl;
+
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.WeFormSurveyAnswer;
+import com.linkwechat.domain.WeFormSurveyCatalogue;
+import com.linkwechat.domain.form.query.WeAddFormSurveyAnswerQuery;
+import com.linkwechat.domain.form.query.WeFormSurveyAnswerQuery;
+import com.linkwechat.domain.form.query.WeFormSurveyStatisticQuery;
+import com.linkwechat.mapper.WeFormSurveyAnswerMapper;
+import com.linkwechat.service.IWeFormSurveyAnswerService;
+import com.linkwechat.service.IWeFormSurveyCatalogueService;
+import com.linkwechat.service.IWeFormSurveyStatisticsService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * 答题-用户主表(WeFormSurveyAnswer)
+ *
+ * @author danmo
+ * @since 2022-09-20 18:02:56
+ */
+@Service
+public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswerMapper, WeFormSurveyAnswer> implements IWeFormSurveyAnswerService {
+
+    @Autowired
+    private IWeFormSurveyStatisticsService weFormSurveyStatisticsService;
+    @Autowired
+    private IWeFormSurveyCatalogueService weFormSurveyCatalogueService;
+    @Resource
+    private WeFormSurveyAnswerMapper weFormSurveyAnswerMapper;
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addAnswer(WeAddFormSurveyAnswerQuery query) {
+        WeFormSurveyCatalogue formSurveyCatalogue = weFormSurveyCatalogueService.getWeFormSurveyCatalogueById(query.getBelongId());
+        Long rules = formSurveyCatalogue.getFillingRules().longValue();
+        if (rules != null && rules == 0) {
+            int count = count(new LambdaQueryWrapper<WeFormSurveyAnswer>()
+                    .eq(WeFormSurveyAnswer::getBelongId, query.getBelongId())
+                    .eq(WeFormSurveyAnswer::getIpAddr, query.getIpAddr())
+                    .eq(WeFormSurveyAnswer::getDataSource, query.getDataSource())
+                    .eq(WeFormSurveyAnswer::getAnEffective, 0)
+                    .eq(WeFormSurveyAnswer::getDelFlag, 0));
+            if (count > 0) {
+                throw new WeComException("该用户已填写");
+            }
+        }
+        if (rules != null && rules == 1) {
+            int count = count(new LambdaQueryWrapper<WeFormSurveyAnswer>()
+                    .eq(WeFormSurveyAnswer::getBelongId, query.getBelongId())
+                    .eq(WeFormSurveyAnswer::getIpAddr, query.getIpAddr())
+                    .eq(WeFormSurveyAnswer::getDataSource, query.getDataSource())
+                    .eq(WeFormSurveyAnswer::getAnEffective, 0)
+                    .eq(WeFormSurveyAnswer::getDelFlag, 0)
+                    .apply("date_format (create_time,'%Y-%m-%d') = '" + DateUtil.today() + "'")
+            );
+            if (count > 0) {
+                throw new WeComException("该用户今天已填写");
+            }
+        }
+        WeFormSurveyAnswer weFormSurveyAnswer = new WeFormSurveyAnswer();
+        BeanUtil.copyProperties(query, weFormSurveyAnswer);
+        weFormSurveyAnswer.setIpAddr(query.getIpAddr());
+        save(weFormSurveyAnswer);
+
+//        WeFormSurveyStatistics surveyStatistics = new WeFormSurveyStatistics();
+//        surveyStatistics.setBelongId(weFormSurveyAnswer.getBelongId());
+//        surveyStatistics.setDataSource(weFormSurveyAnswer.getDataSource());
+//        surveyStatistics.setCollectionRate(weFormSurveyAnswer.getIpAddr());
+//        weFormSurveyStatisticsService.delStatistics(surveyStatistics);
+//        weFormSurveyStatisticsService.addStatistics(surveyStatistics);
+
+
+    }
+
+    @Override
+    public List<WeFormSurveyAnswer> getAnswerList(WeFormSurveyAnswerQuery query) {
+        LambdaQueryWrapper<WeFormSurveyAnswer> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(WeFormSurveyAnswer::getBelongId, query.getBelongId());
+        queryWrapper.eq(WeFormSurveyAnswer::getAnEffective, 0);
+        queryWrapper.eq(StringUtils.isNotBlank(query.getDataSource()), WeFormSurveyAnswer::getDataSource, query.getDataSource());
+        queryWrapper.apply(Objects.nonNull(query.getStartDate()), "DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) >= '" + DateUtil.formatDate(query.getStartDate()) + "'");
+        queryWrapper.apply(Objects.nonNull(query.getEndDate()), "DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) <= '" + DateUtil.formatDate(query.getEndDate()) + "'");
+        queryWrapper.isNotNull(WeFormSurveyAnswer::getMobile);
+        return list(queryWrapper);
+    }
+
+    @Override
+    public Integer isCompleteSurvey(WeFormSurveyAnswerQuery query) {
+        //获取表单信息
+        WeFormSurveyCatalogue weFormSurveyCatalogue = weFormSurveyCatalogueService.getInfo(query.getBelongId());
+        //判断表单填写规则
+        Integer fillingRules = weFormSurveyCatalogue.getFillingRules();
+        if (fillingRules.equals(2)) {
+            //不限制填写次数
+            return 0;
+        }
+        LambdaQueryWrapper<WeFormSurveyAnswer> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(WeFormSurveyAnswer::getBelongId, query.getBelongId());
+        queryWrapper.eq(WeFormSurveyAnswer::getIpAddr, query.getIpAddr());
+        queryWrapper.eq(WeFormSurveyAnswer::getDataSource, query.getDataSource());
+        queryWrapper.eq(WeFormSurveyAnswer::getAnEffective, 0);
+        queryWrapper.eq(WeFormSurveyAnswer::getDelFlag, 0);
+        if (fillingRules.equals(0)) {
+            //每人填写一次
+            int count = count(queryWrapper);
+            if (count > 0) {
+                throw new WeComException("该用户已填写");
+            }
+        } else if (fillingRules.equals(1)) {
+            //每人每天填写一次
+            queryWrapper.apply("date_format (create_time,'%Y-%m-%d') = '" + DateUtil.today() + "'");
+            int count = count(queryWrapper);
+            if (count > 0) {
+                throw new WeComException("该用户今天已填写");
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public List<WeFormSurveyAnswer> selectCustomerList(WeFormSurveyStatisticQuery query) {
+        QueryWrapper<WeFormSurveyAnswer> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("distinct mobile,name,avatar,addr,city,open_id,union_id,create_Time,COUNT(DISTINCT mobile)");
+        queryWrapper.eq("belong_id", query.getBelongId());
+        queryWrapper.eq(StringUtils.isNotBlank(query.getDataSource()), "data_source", query.getDataSource());
+        queryWrapper.apply(Objects.nonNull(query.getStartDate()), "DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) >= '" + DateUtil.formatDate(query.getStartDate()) + "'");
+        queryWrapper.apply(Objects.nonNull(query.getEndDate()), "DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) <= '" + DateUtil.formatDate(query.getEndDate()) + "'");
+        queryWrapper.apply("mobile is not null");
+        queryWrapper.groupBy("mobile");
+        return list(queryWrapper);
+    }
+
+
+}
