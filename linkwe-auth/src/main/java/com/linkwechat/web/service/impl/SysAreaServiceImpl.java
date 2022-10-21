@@ -1,13 +1,16 @@
 package com.linkwechat.web.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.core.domain.vo.SysAreaVo;
 import com.linkwechat.web.domain.SysArea;
 import com.linkwechat.web.mapper.SysAreaMapper;
 import com.linkwechat.web.service.ISysAreaService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 行政区划(SysArea)
@@ -34,5 +37,18 @@ public class SysAreaServiceImpl extends ServiceImpl<SysAreaMapper, SysArea> impl
         }
         wrapper.eq(SysArea::getDelFlag,0);
         return list(wrapper);
+    }
+
+    @Override
+    public List<SysAreaVo> getChildListById(Integer id) {
+        List<SysArea> list = list(new LambdaQueryWrapper<SysArea>()
+                .eq(SysArea::getParentId, id)
+                .eq(SysArea::getDelFlag, 0)
+                .orderByAsc(SysArea::getExtId));
+        return list.stream().map(sysArea -> {
+            SysAreaVo sysAreaVo = new SysAreaVo();
+            BeanUtil.copyProperties(sysArea,sysAreaVo);
+            return sysAreaVo;
+        }).collect(Collectors.toList());
     }
 }

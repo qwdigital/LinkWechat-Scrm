@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeFormSurveyStatisticsMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeFormSurveyStatistics" id="WeFormSurveyStatisticsResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="belongId" column="belong_id" jdbcType="INTEGER"/>
+                <result property="totalVisits" column="total_visits" jdbcType="INTEGER"/>
+                <result property="totalUser" column="total_user" jdbcType="INTEGER"/>
+                <result property="collectionVolume" column="collection_volume" jdbcType="INTEGER"/>
+                <result property="collectionRate" column="collection_rate" jdbcType="VARCHAR"/>
+                <result property="averageTime" column="average_time" jdbcType="INTEGER"/>
+                <result property="yesTotalVisits" column="yes_total_visits" jdbcType="INTEGER"/>
+                <result property="yesTotalUser" column="yes_total_user" jdbcType="INTEGER"/>
+                <result property="yesCollectionVolume" column="yes_collection_volume" jdbcType="INTEGER"/>
+                <result property="dataSource" column="data_source" jdbcType="VARCHAR"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeFormSurveyStatisticsVo">
+        select id, belong_id, total_visits, total_user, collection_volume, collection_rate, average_time, yes_total_visits, yes_total_user, yes_collection_volume, data_source, create_time, create_by, create_by_id, update_time, update_by, update_by_id, del_flag from we_form_survey_statistics
+    </sql>
+
+</mapper>

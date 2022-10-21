@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeFormSurveyRadioMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeFormSurveyRadio" id="WeFormSurveyRadioResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="formCodeId" column="form_code_id" jdbcType="VARCHAR"/>
+                <result property="label" column="label" jdbcType="VARCHAR"/>
+                <result property="formId" column="form_id" jdbcType="VARCHAR"/>
+                <result property="defaultValue" column="default_value" jdbcType="VARCHAR"/>
+                <result property="options" column="options" jdbcType="VARCHAR"/>
+                <result property="dataSource" column="data_source" jdbcType="VARCHAR"/>
+                <result property="questionNumber" column="question_number" jdbcType="VARCHAR"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeFormSurveyRadioVo">
+        select id, form_code_id, label, form_id, default_value, options, data_source, question_number, create_time, create_by, create_by_id, update_time, update_by, update_by_id, del_flag from we_form_survey_radio
+    </sql>
+
+</mapper>

@@ -1,6 +1,7 @@
 package com.linkwechat.web.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.common.core.domain.vo.SysAreaVo;
 import com.linkwechat.web.domain.SysArea;
 
 import java.util.List;
@@ -14,4 +15,6 @@ import java.util.List;
 public interface ISysAreaService extends IService<SysArea> {
 
     List<SysArea> getList(SysArea sysArea);
+
+    List<SysAreaVo> getChildListById(Integer id);
 }
