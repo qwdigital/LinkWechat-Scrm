@@ -387,7 +387,6 @@
         <module>linkwe-wecom</module>
          <module>linkwe-api</module>
          <module>linkwe-wx-api</module>
-        <module>linkwe-event-task</module>
         <module>linkwe-gateway</module>
         <module>linkwe-fileservice</module>
         <module>linkwe-scheduler</module>
