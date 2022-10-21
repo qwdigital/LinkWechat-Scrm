@@ -65,11 +65,20 @@ public class SysLoginController {
             return AjaxResult.error(HttpStatus.NOT_TO_CONFIG,"请使用超管账号登陆系统做相关配置");
         }
 
-        String joinCorpQr = redisService.getCacheObject(WeConstans.JOINCORPQR);
-        if(StringUtils.isEmpty(joinCorpQr)){
-            joinCorpQr=qwUserClient.getJoinQrcode(new WeCorpQrQuery()).getData().getJoinQrcode();
-            redisService.setCacheObject(WeConstans.JOINCORPQR,joinCorpQr, WeConstans.JOINCORPQR_EFFETC_TIME , TimeUnit.SECONDS);
+
+
+        String joinCorpQr="";
+
+        if(!linkWeChatConfig.isDemoEnviron()){
+            joinCorpQr = redisService.getCacheObject(WeConstans.JOINCORPQR);
+            if(StringUtils.isEmpty(joinCorpQr)){
+                joinCorpQr=qwUserClient.getJoinQrcode(new WeCorpQrQuery()).getData().getJoinQrcode();
+                redisService.setCacheObject(WeConstans.JOINCORPQR,joinCorpQr, WeConstans.JOINCORPQR_EFFETC_TIME , TimeUnit.SECONDS);
+            }
+        }else{
+            joinCorpQr=linkWeChatConfig.getCustomerServiceQrUrl();
         }
+
 
 
         return AjaxResult.success(

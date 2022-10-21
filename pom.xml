@@ -475,10 +475,7 @@
         <!--开发环境默认激活-->
         <profile>
             <id>dev</id>
-            <activation>
-                <!--默认激活-->
-                <activeByDefault>true</activeByDefault>
-            </activation>
+
             <properties>
                 <spring.profiles.active>dev</spring.profiles.active>
             </properties>
@@ -495,6 +492,10 @@
         <!--生产环境-->
         <profile>
             <id>prod</id>
+            <activation>
+                <!--默认激活-->
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
                 <spring.profiles.active>prod</spring.profiles.active>
             </properties>

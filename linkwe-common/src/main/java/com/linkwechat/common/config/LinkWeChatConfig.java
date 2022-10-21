@@ -35,6 +35,11 @@ public class LinkWeChatConfig {
      * 是否可以修改密码
      */
     private boolean editPwd = true;
+
+    /**
+     * 是否是演示环境 true:是 false:不是
+     */
+    private boolean demoEnviron=false;
     /**
      * 上传路径
      */
