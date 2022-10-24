@@ -189,4 +189,41 @@ public interface QwKfClient {
     @ApiOperation(value = "获取「客户数据统计」接待人员明细数据",httpMethod = "POST")
     @PostMapping("/kf/getServicerStatistic")
     AjaxResult<WeKfStatisticListVo> getServicerStatistic(@RequestBody WeKfGetStatisticQuery query);
+
+
+    /**
+     * 知识库新增分组
+     * @param query
+     * @return
+     */
+    @ApiOperation(value = "知识库新增分组",httpMethod = "POST")
+    @PostMapping("/kf/addKnowledgeGroup")
+    AjaxResult<WeKfAddKnowledgeGroupVo> addKnowledgeGroup(@RequestBody WeKfAddKnowledgeGroupQuery query);
+
+    /**
+     * 知识库删除分组
+     * @param query
+     * @return
+     */
+    @ApiOperation(value = "知识库删除分组",httpMethod = "POST")
+    @PostMapping("/kf/delKnowledgeGroup")
+    AjaxResult<WeResultVo> delKnowledgeGroup(@RequestBody WeKfKnowledgeGroupQuery query);
+
+    /**
+     * 知识库修改分组
+     * @param query
+     * @return
+     */
+    @ApiOperation(value = "知识库修改分组",httpMethod = "POST")
+    @PostMapping("/kf/modKnowledgeGroup")
+    AjaxResult<WeResultVo> modKnowledgeGroup(@RequestBody WeKfKnowledgeGroupQuery query);
+
+    /**
+     * 知识库分组列表
+     * @param query
+     * @return
+     */
+    @ApiOperation(value = "知识库修改分组",httpMethod = "POST")
+    @PostMapping("/kf/getKnowledgeGroupList")
+    AjaxResult<WeKfKnowledgeGroupListVo> getKnowledgeGroupList(@RequestBody WeKfKnowledgeGroupQuery query);
 }
