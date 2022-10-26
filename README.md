@@ -108,7 +108,7 @@ LinkWeChat 不做私域营销专家，而是通过开源让每个企业都是自
 
 开源演示地址：[http://demo.linkwechat.net/](http://demo.linkwechat.net/)
 
-默认账号密码：demo，123456
+默认账号密码：lw，123456
 
 目前支持两种方式体验：
 
