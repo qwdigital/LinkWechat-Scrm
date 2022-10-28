@@ -7,7 +7,7 @@
 
 [![star](https://gitee.com/LinkWeChat/link-wechat/badge/star.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/stargazers)
 [![fork](https://gitee.com/LinkWeChat/link-wechat/badge/fork.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/members)
-[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V3.0-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
+[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V3.1-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
 [![license](http://img.shields.io/badge/license-GPL%203.0-orange)](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
 [![木兰社区](https://img.shields.io/badge/Mulan-incubating-blue)](https://portal.mulanos.cn//)
 
@@ -108,7 +108,7 @@ LinkWeChat 不做私域营销专家，而是通过开源让每个企业都是自
 
 开源演示地址：[http://demo.linkwechat.net/](http://demo.linkwechat.net/)
 
-默认账号密码：admin，123456
+默认账号密码：lw，123456
 
 目前支持两种方式体验：
 
@@ -139,7 +139,6 @@ LinkWeChat V3.0 架构升级，全面升级为微服务架构，整体系统架�
 ├── linkwe-api                // 系统业务接口模块
 ├── linkwe-auth               // 角色权限部门用户认证等模块
 ├── linkwe-common             // 公共组件模块
-├── linkwe-event-task	      // 企微回调任务
 ├── linkwe-fileservice	      // 文件服务模块
 ├── linkwe-framework	      // 框架配置
 ├── linkwe-gateway            // 网关服务
