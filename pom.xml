@@ -396,53 +396,70 @@
     </modules>
 
 
+<!--    <build>-->
+<!--        <resources>-->
+<!--            <resource>-->
+<!--                <directory>src/main/resources</directory>-->
+<!--                &lt;!&ndash; 处理文件时替换文件中的变量 &ndash;&gt;-->
+<!--                <filtering>true</filtering>-->
+<!--                <excludes>-->
+<!--                    &lt;!&ndash; 打包时排除文件&ndash;&gt;-->
+<!--                    <exclude>bootstrap.yml</exclude>-->
+<!--                    <exclude>bootstrap-dev.yml</exclude>-->
+<!--                    <exclude>bootstrap-test.yml</exclude>-->
+<!--                    <exclude>bootstrap-prod.yml</exclude>-->
+<!--                </excludes>-->
+<!--            </resource>-->
+<!--            <resource>-->
+<!--                <directory>src/main/resources</directory>-->
+<!--                <filtering>true</filtering>-->
+<!--                &lt;!&ndash; 打包时所包含得文件 &ndash;&gt;-->
+<!--                <includes>-->
+<!--                    <include>bootstrap.yml</include>-->
+<!--                    <include>bootstrap-${spring.profiles.active}.yml</include>-->
+<!--                </includes>-->
+<!--            </resource>-->
+<!--        </resources>-->
+<!--        <plugins>-->
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-compiler-plugin</artifactId>-->
+<!--                <version>3.6.2</version>-->
+<!--                <configuration>-->
+<!--                    <source>8</source>-->
+<!--                    <target>8</target>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
+
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-resources-plugin</artifactId>-->
+<!--                <configuration>-->
+<!--                    <nonFilteredFileExtensions>-->
+<!--                        <nonFilteredFileExtension>ttf</nonFilteredFileExtension>-->
+<!--                        <nonFilteredFileExtension>woff</nonFilteredFileExtension>-->
+<!--                        <nonFilteredFileExtension>woff2</nonFilteredFileExtension>-->
+<!--                    </nonFilteredFileExtensions>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
+<!--        </plugins>-->
+<!--    </build>-->
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-                <!-- 处理文件时替换文件中的变量 -->
-                <filtering>true</filtering>
-                <excludes>
-                    <!-- 打包时排除文件-->
-                    <exclude>bootstrap.yml</exclude>
-                    <exclude>bootstrap-dev.yml</exclude>
-                    <exclude>bootstrap-test.yml</exclude>
-                    <exclude>bootstrap-prod.yml</exclude>
-                </excludes>
             </resource>
+            <!-- 引用外部文件，打包上传服务器是将此段注释 -->
             <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <!-- 打包时所包含得文件 -->
-                <includes>
-                    <include>bootstrap.yml</include>
-                    <include>bootstrap-${spring.profiles.active}.yml</include>
-                </includes>
+                <directory>../config/run</directory>
             </resource>
         </resources>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.2</version>
-                <configuration>
-                    <source>8</source>
-                    <target>8</target>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <configuration>
-                    <nonFilteredFileExtensions>
-                        <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>woff</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
-                    </nonFilteredFileExtensions>
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
 
     <repositories>
@@ -469,36 +486,5 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
-
-    <profiles>
-
-        <!--开发环境默认激活-->
-        <profile>
-            <id>dev</id>
-            <activation>
-                <!--默认激活-->
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <spring.profiles.active>dev</spring.profiles.active>
-            </properties>
-        </profile>
-
-        <!--测试环境-->
-        <profile>
-            <id>test</id>
-            <properties>
-                <spring.profiles.active>test</spring.profiles.active>
-            </properties>
-        </profile>
-
-        <!--生产环境-->
-        <profile>
-            <id>prod</id>
-            <properties>
-                <spring.profiles.active>prod</spring.profiles.active>
-            </properties>
-        </profile>
-    </profiles>
 
 </project>
