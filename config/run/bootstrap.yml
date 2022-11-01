@@ -1,16 +1,15 @@
 spring:
-  profiles:
-    active: @spring.profiles.active@
-  application:
-    name: linkwe-file
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
   cloud:
     nacos:
       # 配置中心
       config:
         # 命名空间id(此处不用public,因public初始化的空间, id为空)
-        namespace: ${common.nacos.config.namespace}
-        # nacos的ip地址和端口
-        server-addr: ${common.nacos.config.server}
+        namespace: 4e237601-cea8-414d-b7b9-d7adc8cbcf95
+        # nacos的ip地址和端口 120.79.64.17:10848
+        server-addr: 127.0.0.1:8848
         # 这个就表示 在我们nacos命名空间id为 dev中 有一个data-id 为 demo-service.yml 的配置文件 读取这个里面的配置
         file-extension: yml
         config-retry-time: 300000
@@ -18,10 +17,9 @@ spring:
         shared-configs[0]:
           dataId: linkwe-common.yml
           refresh: true
-
       # 发布到注册中心 （如果没有使用可以不配）
       discovery:
         # 命名空间id(此处不用public,因public初始化的空间, id为空)
-        namespace: ${common.nacos.config.namespace}
+        namespace: 4e237601-cea8-414d-b7b9-d7adc8cbcf95
         # nacos的ip地址和端口
-        server-addr: ${common.nacos.config.server}
+        server-addr: 127.0.0.1:8848

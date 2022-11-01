@@ -1,6 +1,5 @@
 package com.linkwechat;
 
-import com.github.pagehelper.autoconfigure.PageHelperAutoConfiguration;
 import com.linkwechat.config.fegin.FeginConfig;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -10,16 +9,16 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @MapperScan("com.linkwechat.**.mapper")
-@SpringBootApplication(exclude = {PageHelperAutoConfiguration.class})
+@SpringBootApplication
+@EnableFeignClients(basePackages="com.linkwechat.**",defaultConfiguration = FeginConfig.class)
 @EnableAsync
-@EnableFeignClients(defaultConfiguration = FeginConfig.class)
-public class LinkWeWxApiApplication {
+public class LinkWeEventTaskApplication {
     public static void main(String[] args) {
-        new SpringApplicationBuilder(LinkWeWxApiApplication.class)
+        new SpringApplicationBuilder(LinkWeEventTaskApplication.class)
                 .properties("spring.config.name:bootstrap", "config/run/bootstrap.yml")
-                .properties("spring.application.name=linkwe-wx-api")
+                .properties("spring.application.name=linkwe-event-task")
                 .build().run(args);
-        System.out.println("(♥◠‿◠)ﾉﾞ  Linkwe-wx-api启动成功   ლ(´ڡ`ლ)ﾞ ");
+        System.out.println("(♥◠‿◠)ﾉﾞ  LinkWe-event-task启动成功   ლ(´ڡ`ლ)ﾞ ");
     }
 
 }
