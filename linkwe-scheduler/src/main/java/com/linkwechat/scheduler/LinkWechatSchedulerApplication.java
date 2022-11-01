@@ -4,6 +4,7 @@ import com.linkwechat.config.fegin.FeginConfig;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -15,7 +16,10 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication
 public class LinkWechatSchedulerApplication {
     public static void main(String[] args) {
-        SpringApplication.run(LinkWechatSchedulerApplication.class, args);
-        System.out.println("(♥◠‿◠)ﾉﾞ  LinkWechat任务调度服务启动成功   ლ(´ڡ`ლ)ﾞ  \n");
+        new SpringApplicationBuilder(LinkWechatSchedulerApplication.class)
+                .properties("spring.config.name:bootstrap", "config/run/bootstrap.yml")
+                .properties("spring.application.name=linkwe-scheduler")
+                .build().run(args);
+        System.out.println("(♥◠‿◠)ﾉﾞ  LinkWe-scheduler启动成功   ლ(´ڡ`ლ)ﾞ ");
     }
 }

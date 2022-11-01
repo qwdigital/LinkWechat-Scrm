@@ -5,6 +5,7 @@ import com.linkwechat.config.fegin.FeginConfig;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableAsync;
 
@@ -14,8 +15,11 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableFeignClients(defaultConfiguration = FeginConfig.class)
 public class LinkWeWxApiApplication {
     public static void main(String[] args) {
-        SpringApplication.run(LinkWeWxApiApplication.class, args);
-        System.out.println("(♥◠‿◠)ﾉﾞ  LinkWechat微信服务启动成功   ლ(´ڡ`ლ)ﾞ  \n");
+        new SpringApplicationBuilder(LinkWeWxApiApplication.class)
+                .properties("spring.config.name:bootstrap", "config/run/bootstrap.yml")
+                .properties("spring.application.name=linkwe-wx-api")
+                .build().run(args);
+        System.out.println("(♥◠‿◠)ﾉﾞ  Linkwe-wx-api启动成功   ლ(´ڡ`ლ)ﾞ ");
     }
 
 }
