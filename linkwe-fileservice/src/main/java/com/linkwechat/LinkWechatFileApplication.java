@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
@@ -22,8 +23,11 @@ import javax.servlet.MultipartConfigElement;
         HibernateJpaAutoConfiguration.class})
 public class LinkWechatFileApplication {
     public static void main(String[] args) {
-        SpringApplication.run(LinkWechatFileApplication.class, args);
-        System.out.println("(♥◠‿◠)ﾉﾞ  文件服务模块启动成功   ლ(´ڡ`ლ)ﾞ  \n");
+        new SpringApplicationBuilder(LinkWechatFileApplication.class)
+                .properties("spring.config.name:bootstrap", "config/run/bootstrap.yml")
+                .properties("spring.application.name=linkwe-file")
+                .build().run(args);
+        System.out.println("(♥◠‿◠)ﾉﾞ  LinkWe-file启动成功   ლ(´ڡ`ლ)ﾞ ");
     }
 
 
