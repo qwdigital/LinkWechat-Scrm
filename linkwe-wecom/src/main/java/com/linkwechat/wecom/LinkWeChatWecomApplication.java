@@ -4,6 +4,7 @@ import com.dtflys.forest.springboot.annotation.ForestScan;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -17,7 +18,10 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 public class LinkWeChatWecomApplication {
     public static void main(String[] args) {
-        SpringApplication.run(LinkWeChatWecomApplication.class, args);
-        System.out.println("(♥◠‿◠)ﾉﾞ  LinkWecha wecom启动成功   ლ(´ڡ`ლ)ﾞ  \n");
+        new SpringApplicationBuilder(LinkWeChatWecomApplication.class)
+                .properties("spring.config.name:bootstrap", "config/run/bootstrap.yml")
+                .properties("spring.application.name=linkwe-wecom")
+                .build().run(args);
+        System.out.println("(♥◠‿◠)ﾉﾞ  linkwe-wecom启动成功   ლ(´ڡ`ლ)ﾞ ");
     }
 }
