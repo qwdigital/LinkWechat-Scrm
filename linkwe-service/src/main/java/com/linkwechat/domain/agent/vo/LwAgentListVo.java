@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @ApiModel
 @Data
-public class WeAgentListVo {
+public class LwAgentListVo {
 
     @ApiModelProperty("ID")
     private Integer id;

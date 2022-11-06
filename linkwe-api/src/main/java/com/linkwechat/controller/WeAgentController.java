@@ -7,7 +7,7 @@ import com.linkwechat.domain.agent.query.WeAgentAddQuery;
 import com.linkwechat.domain.agent.query.WeAgentEditQuery;
 import com.linkwechat.domain.agent.query.WeAgentMsgAddQuery;
 import com.linkwechat.domain.agent.query.WeAgentMsgListQuery;
-import com.linkwechat.domain.agent.vo.WeAgentListVo;
+import com.linkwechat.domain.agent.vo.LwAgentListVo;
 import com.linkwechat.domain.agent.vo.WeAgentMsgListVo;
 import com.linkwechat.domain.agent.vo.WeAgentMsgVo;
 import com.linkwechat.service.IWeAgentInfoService;
@@ -57,15 +57,15 @@ public class WeAgentController extends BaseController {
 
     @ApiOperation(value = "获取应用列表", httpMethod = "GET")
     @GetMapping("/list")
-    public AjaxResult<WeAgentListVo> getList() {
+    public AjaxResult<LwAgentListVo> getList() {
         log.info("获取应用列表接口调用");
-        List<WeAgentListVo> list = weAgentInfoService.getList();
+        List<LwAgentListVo> list = weAgentInfoService.getList();
         return AjaxResult.success(list);
     }
 
     @ApiOperation(value = "删除应用", httpMethod = "DELETE")
     @DeleteMapping("/delete/{id}")
-    public AjaxResult<WeAgentListVo> deleteAgent(@PathVariable("id") Integer id) {
+    public AjaxResult<LwAgentListVo> deleteAgent(@PathVariable("id") Integer id) {
         log.info("删除应用入参query:{}", id);
         weAgentInfoService.deleteAgent(id);
         return AjaxResult.success();
