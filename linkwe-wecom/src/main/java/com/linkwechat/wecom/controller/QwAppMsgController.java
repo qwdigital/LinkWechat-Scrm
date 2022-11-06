@@ -3,6 +3,8 @@ package com.linkwechat.wecom.controller;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.wecom.query.department.WeDeptQuery;
 import com.linkwechat.domain.wecom.query.msg.WeAppMsgQuery;
+import com.linkwechat.domain.wecom.query.msg.WeRecallMsgQuery;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.department.WeDeptVo;
 import com.linkwechat.domain.wecom.vo.msg.WeAppMsgVo;
 import com.linkwechat.wecom.service.IQwAppMsgService;
@@ -37,5 +39,18 @@ public class QwAppMsgController {
     public AjaxResult<WeAppMsgVo> sendAppMsg(@RequestBody WeAppMsgQuery query) {
         WeAppMsgVo weAppMsgVo = qwAppMsgService.sendAppMsg(query);
         return AjaxResult.success(weAppMsgVo);
+    }
+
+    @PostMapping("/recall")
+    public AjaxResult<WeResultVo> recallAppMsg(@RequestBody WeRecallMsgQuery query) {
+        WeResultVo resultVo = qwAppMsgService.recallAppMsg(query);
+        return AjaxResult.success(resultVo);
+    }
+
+
+    @PostMapping("/agent/recall")
+    public AjaxResult<WeResultVo> recallAgentAppMsg(@RequestBody WeRecallMsgQuery query) {
+        WeResultVo resultVo = qwAppMsgService.recallAgentAppMsg(query);
+        return AjaxResult.success(resultVo);
     }
 }

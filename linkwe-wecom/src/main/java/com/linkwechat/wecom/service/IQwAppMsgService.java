@@ -1,6 +1,8 @@
 package com.linkwechat.wecom.service;
 
 import com.linkwechat.domain.wecom.query.msg.WeAppMsgQuery;
+import com.linkwechat.domain.wecom.query.msg.WeRecallMsgQuery;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.msg.WeAppMsgVo;
 
 /**
@@ -16,4 +18,8 @@ public interface IQwAppMsgService {
      * @return
      */
     WeAppMsgVo sendAppMsg(WeAppMsgQuery query);
+
+    WeResultVo recallAppMsg(WeRecallMsgQuery query);
+
+    WeResultVo recallAgentAppMsg(WeRecallMsgQuery query);
 }

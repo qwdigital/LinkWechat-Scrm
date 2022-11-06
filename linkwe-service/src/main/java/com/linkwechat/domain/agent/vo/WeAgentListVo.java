@@ -12,6 +12,8 @@ import lombok.Data;
 @Data
 public class WeAgentListVo {
 
+    @ApiModelProperty("ID")
+    private Integer id;
     //企业应用id
     @ApiModelProperty("企业应用id")
     private Integer agentId;
@@ -35,7 +37,7 @@ public class WeAgentListVo {
     private Integer reportLocationFlag;
     //是否上报用户进入应用事件。0：不接收；1：接收
     @ApiModelProperty("是否上报用户进入应用事件。0：不接收；1：接收")
-    private Integer isreportenter;
+    private Integer isReporter;
     //应用主页url
     @ApiModelProperty("应用主页url")
     private String homeUrl;
@@ -47,12 +49,21 @@ public class WeAgentListVo {
     @ApiModelProperty("企业应用可见范围（人员）")
     private String allowUserinfoId;
 
+    @ApiModelProperty("企业应用可见范围（人员）")
+    private String allowUserinfoName;
+
     //企业应用可见范围（部门）
     @ApiModelProperty("企业应用可见范围（部门）")
     private String allowPartyId;
 
+    @ApiModelProperty("企业应用可见范围（部门）")
+    private String allowPartyName;
+
     @ApiModelProperty("企业应用可见范围（标签）")
     private String allowTagId;
+
+    @ApiModelProperty("企业应用可见范围（标签）")
+    private String allowTagName;
 
 
 }

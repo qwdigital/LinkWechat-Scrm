@@ -33,4 +33,27 @@
         select id, agent_id, secret, name, logo_url, description, allow_userinfo_id, allow_party_id, allow_tag_id, close, redirect_domain, report_location_flag, is_reporter, home_url, customized_publish_status, create_time, create_by, create_by_id, update_time, update_by, update_by_id, del_flag from we_agent_info
     </sql>
 
+    <select id="getList" resultType="com.linkwechat.domain.agent.vo.WeAgentListVo">
+        select
+            id,
+            agent_id,
+            `name`,
+            logo_url,
+            description,
+            `close`,
+            redirect_domain,
+            report_location_flag,
+            is_reporter,
+            home_url,
+            customized_publish_status,
+            wgi.allow_userinfo_id,
+            group_concat(distinct su.user_name) as allow_userinfo_name,
+            wgi.allow_party_id,
+            group_concat(distinct sd.dept_name) as allow_party_name,
+            allow_tag_id
+        from we_agent_info wgi
+                 left join sys_dept sd on find_in_set(sd.dept_id,wgi.allow_party_id) and sd.del_flag = 0
+                 left join sys_user su on find_in_set(su.we_user_id,wgi.allow_userinfo_id) and su.del_flag = 0
+    </select>
+
 </mapper>

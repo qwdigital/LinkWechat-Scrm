@@ -25,6 +25,9 @@ public class WeAppMsgVo extends WeResultVo {
     @ApiModelProperty("不合法的标签id")
     private String invalidTag;
 
+    @ApiModelProperty("没有基础接口许可(包含已过期)的userid")
+    private String unlicenseduser;
+
     @ApiModelProperty("消息id，用于撤回应用消息")
     private String msgId;
 

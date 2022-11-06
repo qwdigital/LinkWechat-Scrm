@@ -37,7 +37,14 @@ public class WeAgentMsg extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "主键ID")
     @TableId(type = IdType.AUTO)
     @TableField("id")
-    private Integer id;
+    private Long id;
+
+    /**
+     * 应用消息标题
+     */
+    @ApiModelProperty(value = "应用消息标题")
+    @TableField("msg_title")
+    private String msgTitle;
 
     @ApiModelProperty(value = "应用ID")
     @TableField("agent_id")

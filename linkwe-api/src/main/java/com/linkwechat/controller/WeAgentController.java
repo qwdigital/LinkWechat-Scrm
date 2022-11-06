@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @author danmo
  * @description 应用管理
@@ -56,7 +58,9 @@ public class WeAgentController extends BaseController {
     @ApiOperation(value = "获取应用列表", httpMethod = "GET")
     @GetMapping("/list")
     public AjaxResult<WeAgentListVo> getList() {
-        return AjaxResult.success();
+        log.info("获取应用列表接口调用");
+        List<WeAgentListVo> list = weAgentInfoService.getList();
+        return AjaxResult.success(list);
     }
 
     @ApiOperation(value = "删除应用", httpMethod = "DELETE")
@@ -73,24 +77,20 @@ public class WeAgentController extends BaseController {
         return AjaxResult.success();
     }
 
-    @ApiOperation(value = "保存应用消息", httpMethod = "POST")
-    @PostMapping("/msg/save")
-    public AjaxResult saveMsg(@RequestBody WeAgentMsgAddQuery query) {
-        log.info("保存应用消息入参query:{}", JSONObject.toJSONString(query));
-        return AjaxResult.success();
-    }
-
     @ApiOperation(value = "新增应用消息", httpMethod = "POST")
     @PostMapping("/msg/add")
     public AjaxResult addMsg(@RequestBody WeAgentMsgAddQuery query) {
         log.info("新增应用消息入参query:{}", JSONObject.toJSONString(query));
+        weAgentMsgService.addMsg(query);
         return AjaxResult.success();
     }
 
     @ApiOperation(value = "修改应用消息", httpMethod = "PUT")
     @PutMapping("/msg/update/{id}")
     public AjaxResult updateMsg(@PathVariable("id") Long id, @RequestBody WeAgentMsgAddQuery query) {
+        query.setId(id);
         log.info("修改应用消息入参query:{}", JSONObject.toJSONString(query));
+        weAgentMsgService.updateMsg(query);
         return AjaxResult.success();
     }
 
@@ -98,6 +98,7 @@ public class WeAgentController extends BaseController {
     @DeleteMapping("/msg/delete/{id}")
     public AjaxResult deleteMsg(@PathVariable("id") Long id) {
         log.info("删除应用消息入参query:{}", id);
+        weAgentMsgService.deleteMsg(id);
         return AjaxResult.success();
     }
 
@@ -105,6 +106,7 @@ public class WeAgentController extends BaseController {
     @GetMapping("/msg/get/{id}")
     public AjaxResult<WeAgentMsgVo> getMsgInfo(@PathVariable("id") Long id) {
         log.info("应用消息详情入参query:{}", id);
+        weAgentMsgService.getMsgInfo(id);
         return AjaxResult.success();
     }
 
@@ -112,6 +114,7 @@ public class WeAgentController extends BaseController {
     @GetMapping("/msg/revoke/{id}")
     public AjaxResult revokeMsgInfo(@PathVariable("id") Long id) {
         log.info("撤销消息详情入参query:{}", id);
+        weAgentMsgService.revokeMsgInfo(id);
         return AjaxResult.success();
     }
 

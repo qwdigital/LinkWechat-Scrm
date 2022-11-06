@@ -1,5 +1,6 @@
 package com.linkwechat.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -10,6 +11,7 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeAgentInfo;
 import com.linkwechat.domain.agent.query.WeAgentAddQuery;
 import com.linkwechat.domain.agent.query.WeAgentEditQuery;
+import com.linkwechat.domain.agent.vo.WeAgentListVo;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.agent.query.WeAgentQuery;
 import com.linkwechat.domain.wecom.vo.agent.vo.WeAgentDetailVo;
@@ -22,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -126,5 +128,10 @@ public class WeAgentInfoServiceImpl extends ServiceImpl<WeAgentInfoMapper, WeAge
         weAgentInfo.setId(id);
         weAgentInfo.setDelFlag(1);
         updateById(weAgentInfo);
+    }
+
+    @Override
+    public List<WeAgentListVo> getList() {
+        return this.baseMapper.getList();
     }
 }

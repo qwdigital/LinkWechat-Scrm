@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.WeAgentInfo;
 import com.linkwechat.domain.agent.query.WeAgentAddQuery;
 import com.linkwechat.domain.agent.query.WeAgentEditQuery;
+import com.linkwechat.domain.agent.vo.WeAgentListVo;
+
+import java.util.List;
 
 /**
  * 应用信息表(WeAgentInfo)
@@ -25,11 +28,18 @@ public interface IWeAgentInfoService extends IService<WeAgentInfo> {
      */
     void update(WeAgentEditQuery query);
 
-    WeAgentInfo getAgentInfoByAgentId(Integer agentId);
-
     /**
      * 删除应用
      * @param id
      */
     void deleteAgent(Integer id);
+
+    /**
+     * 获取应用列表
+     * @return
+     */
+    List<WeAgentListVo> getList();
+
+
+    WeAgentInfo getAgentInfoByAgentId(Integer agentId);
 }

@@ -3,6 +3,7 @@ package com.linkwechat.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.annotation.SqlParser;
+import com.linkwechat.domain.agent.vo.WeAgentMsgVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -22,5 +23,6 @@ import com.linkwechat.domain.WeAgentMsg;
 public interface WeAgentMsgMapper extends BaseMapper<WeAgentMsg> {
 
 
+    WeAgentMsgVo getMsgInfo(@Param("id") Long id);
 }
 
