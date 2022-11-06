@@ -28,7 +28,7 @@ public class CommonAppMsgServiceImpl extends AbstractAppMsgService {
         if(CollectionUtil.isNotEmpty(appMsgBody.getCorpUserIds())){
             query.setTouser(String.join("|", appMsgBody.getCorpUserIds()));
         }else if(CollectionUtil.isNotEmpty(appMsgBody.getDeptIds())){
-            query.setToparty(appMsgBody.getDeptIds().stream().map(String::valueOf).collect(Collectors.joining("|")));
+            query.setToparty(String.join("|", appMsgBody.getDeptIds()));
         }else if(CollectionUtil.isNotEmpty(appMsgBody.getTagIds())){
             query.setTotag(String.join("|", appMsgBody.getTagIds()));
         }

@@ -1,5 +1,6 @@
 package com.linkwechat.scheduler.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.msg.QwAppMsgBody;
 import com.linkwechat.domain.wecom.query.msg.WeAppMsgQuery;
@@ -10,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+
 /**
  * @author sxw
  * @description 消息发送抽象模板类
@@ -19,7 +22,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public abstract class AbstractAppMsgService {
 
-    @Autowired
+    @Resource
     private QwAppMsgClient qwAppMsgClient;
 
     @Autowired
@@ -47,5 +50,21 @@ public abstract class AbstractAppMsgService {
         weAppMsg.setAgentid(corpAccountVo.getAgentId());
         WeAppMsgVo data = qwAppMsgClient.sendAppMsg(weAppMsg).getData();
         callBackResult(data);
+    }
+
+
+    public void sendAgentMsg(QwAppMsgBody appMsgBody) {
+        try {
+            WeAppMsgQuery weAppMsg = getWeAppMsg(appMsgBody);
+            WeAppMsgVo data = qwAppMsgClient.sendAppMsg(weAppMsg).getData();
+            callBackResult(data);
+        } catch (Exception e) {
+            log.error("sendAgentMsg 执行异常: query:{}",JSONObject.toJSONString(appMsgBody),e);
+            WeAppMsgVo errorBody = new WeAppMsgVo();
+            errorBody.setErrMsg(e.getMessage());
+            errorBody.setErrCode(-1);
+            callBackResult(errorBody);
+        }
+
     }
 }

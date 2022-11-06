@@ -266,6 +266,16 @@ public class WeAppMsgQuery extends WeBaseQuery {
          * 图文消息的图片链接，支持JPG、PNG格式，较好的效果为大图 1068*455，小图150*150。
          */
         private String picurl;
+
+        /**
+         * 小程序appid，必须是与当前应用关联的小程序，appid和pagepath必须同时填写，填写后会忽略url字段
+         */
+        private String appid;
+
+        /**
+         * 点击消息卡片后的小程序页面，最长128字节，仅限本小程序内的页面。appid和pagepath必须同时填写，填写后会忽略url字段
+         */
+        private String pagepath;
         /**
          * 图文消息缩略图的media_id, 可以通过素材管理接口获得。此处thumb_media_id即上传接口返回的media_id
          */

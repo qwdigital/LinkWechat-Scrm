@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeAgentInfoMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeAgentInfo" id="WeAgentInfoResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="agentId" column="agent_id" jdbcType="INTEGER"/>
+                <result property="secret" column="secret" jdbcType="VARCHAR"/>
+                <result property="name" column="name" jdbcType="VARCHAR"/>
+                <result property="logoUrl" column="logo_url" jdbcType="VARCHAR"/>
+                <result property="description" column="description" jdbcType="VARCHAR"/>
+                <result property="allowUserinfoId" column="allow_userinfo_id" jdbcType="VARCHAR"/>
+                <result property="allowPartyId" column="allow_party_id" jdbcType="VARCHAR"/>
+                <result property="allowTagId" column="allow_tag_id" jdbcType="VARCHAR"/>
+                <result property="close" column="close" jdbcType="INTEGER"/>
+                <result property="redirectDomain" column="redirect_domain" jdbcType="VARCHAR"/>
+                <result property="reportLocationFlag" column="report_location_flag" jdbcType="INTEGER"/>
+                <result property="isReporter" column="is_reporter" jdbcType="INTEGER"/>
+                <result property="homeUrl" column="home_url" jdbcType="VARCHAR"/>
+                <result property="customizedPublishStatus" column="customized_publish_status" jdbcType="INTEGER"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeAgentInfoVo">
+        select id, agent_id, secret, name, logo_url, description, allow_userinfo_id, allow_party_id, allow_tag_id, close, redirect_domain, report_location_flag, is_reporter, home_url, customized_publish_status, create_time, create_by, create_by_id, update_time, update_by, update_by_id, del_flag from we_agent_info
+    </sql>
+
+    <select id="getList" resultType="com.linkwechat.domain.agent.vo.WeAgentListVo">
+        select
+            id,
+            agent_id,
+            `name`,
+            logo_url,
+            description,
+            `close`,
+            redirect_domain,
+            report_location_flag,
+            is_reporter,
+            home_url,
+            customized_publish_status,
+            wgi.allow_userinfo_id,
+            group_concat(distinct su.user_name) as allow_userinfo_name,
+            wgi.allow_party_id,
+            group_concat(distinct sd.dept_name) as allow_party_name,
+            allow_tag_id
+        from we_agent_info wgi
+                 left join sys_dept sd on find_in_set(sd.dept_id,wgi.allow_party_id) and sd.del_flag = 0
+                 left join sys_user su on find_in_set(su.we_user_id,wgi.allow_userinfo_id) and su.del_flag = 0
+    </select>
+
+</mapper>

@@ -10,6 +10,7 @@ import lombok.Getter;
 public enum QwAppMsgBusinessTypeEnum {
 
     COMMON(1, "CommonAppMsgService", "默认通知任务"),
+    AGENT(2, "WeAgentMsgService", "应用通知任务"),
     ;
 
 

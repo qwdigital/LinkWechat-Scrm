@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeAgentMsgMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeAgentMsg" id="WeAgentMsgResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="msgTitle" column="msg_title" jdbcType="VARCHAR"/>
+                <result property="agentId" column="agent_id" jdbcType="INTEGER"/>
+                <result property="scopeType" column="scope_type" jdbcType="INTEGER"/>
+                <result property="toUser" column="to_user" jdbcType="VARCHAR"/>
+                <result property="toParty" column="to_party" jdbcType="VARCHAR"/>
+                <result property="toTag" column="to_tag" jdbcType="VARCHAR"/>
+                <result property="sendType" column="send_type" jdbcType="INTEGER"/>
+                <result property="sendTime" column="send_time" jdbcType="TIMESTAMP"/>
+                <result property="planSendTime" column="plan_send_time" jdbcType="TIMESTAMP"/>
+                <result property="status" column="status" jdbcType="INTEGER"/>
+                <result property="invalidUser" column="invalid_user" jdbcType="VARCHAR"/>
+                <result property="invalidParty" column="invalid_party" jdbcType="VARCHAR"/>
+                <result property="invalidTag" column="invalid_tag" jdbcType="VARCHAR"/>
+                <result property="unlicensedUser" column="unlicensed_user" jdbcType="VARCHAR"/>
+                <result property="msgId" column="msg_id" jdbcType="VARCHAR"/>
+                <result property="responseCode" column="response_code" jdbcType="VARCHAR"/>
+                <result property="msgType" column="msg_type" jdbcType="VARCHAR"/>
+                <result property="content" column="content" jdbcType="VARCHAR"/>
+                <result property="title" column="title" jdbcType="VARCHAR"/>
+                <result property="description" column="description" jdbcType="VARCHAR"/>
+                <result property="fileUrl" column="file_url" jdbcType="VARCHAR"/>
+                <result property="linkUrl" column="link_url" jdbcType="VARCHAR"/>
+                <result property="picUrl" column="pic_url" jdbcType="VARCHAR"/>
+                <result property="appId" column="app_id" jdbcType="VARCHAR"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeAgentMsgVo">
+        select id, msg_title, agent_id, scope_type, to_user, to_party, to_tag, send_type, send_time, plan_send_time, status, invalid_user, invalid_party, invalid_tag, unlicensed_user, msg_id, response_code, msg_type, content, title, description, file_url, link_url, pic_url, app_id, create_time, create_by, create_by_id, update_time, update_by, update_by_id, del_flag from we_agent_msg
+    </sql>
+
+    <resultMap type="com.linkwechat.domain.agent.vo.WeAgentMsgVo" id="WeAgentMsgInfoResult">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="msgTitle" column="msg_title" jdbcType="VARCHAR"/>
+        <result property="scopeType" column="scope_type" jdbcType="INTEGER"/>
+        <result property="sendType" column="send_type" jdbcType="INTEGER"/>
+        <result property="sendTime" column="send_time" jdbcType="TIMESTAMP"/>
+        <result property="planSendTime" column="plan_send_time" jdbcType="TIMESTAMP"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="invalidUser" column="invalid_user" jdbcType="VARCHAR"/>
+        <result property="invalidParty" column="invalid_party" jdbcType="VARCHAR"/>
+        <result property="invalidTag" column="invalid_tag" jdbcType="VARCHAR"/>
+        <result property="unlicensedUser" column="unlicensed_user" jdbcType="VARCHAR"/>
+        <result property="msgId" column="msg_id" jdbcType="VARCHAR"/>
+        <result property="responseCode" column="response_code" jdbcType="VARCHAR"/>
+        <result property="toUser" column="to_user" jdbcType="VARCHAR"/>
+        <result property="toUserName" column="to_user_name" jdbcType="VARCHAR"/>
+        <result property="toParty" column="to_party" jdbcType="VARCHAR"/>
+        <result property="toPartyName" column="to_party_name" jdbcType="VARCHAR"/>
+        <collection property="weMessageTemplate" ofType="com.linkwechat.domain.media.WeMessageTemplate">
+            <result property="msgType" column="msg_type" jdbcType="VARCHAR"/>
+            <result property="content" column="content" jdbcType="VARCHAR"/>
+            <result property="title" column="title" jdbcType="VARCHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="fileUrl" column="file_url" jdbcType="VARCHAR"/>
+            <result property="linkUrl" column="link_url" jdbcType="VARCHAR"/>
+            <result property="picUrl" column="pic_url" jdbcType="VARCHAR"/>
+            <result property="appId" column="app_id" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+    
+    <sql id="MsgInfoResult">
+        select
+            wgm.id,
+            wgm.msg_title,
+            wgm.scope_type,
+            wgm.send_type,
+            wgm.send_time,
+            wgm.plan_send_time,
+            wgm.status,
+            wgm.invalid_user,
+            wgm.invalid_party,
+            wgm.invalid_tag,
+            wgm.unlicensed_user,
+            wgm.response_code,
+            wgm.msg_type,
+            wgm.content,
+            wgm.title,
+            wgm.description,
+            wgm.file_url,
+            wgm.link_url,
+            wgm.pic_url,
+            wgm.app_id,
+            wgm.to_user,
+            group_concat(distinct su.user_name) as to_user_name,
+            wgm.to_party,
+            group_concat(distinct sd.dept_name) as to_party_name
+        from we_agent_msg wgm
+                 left join sys_dept sd on find_in_set(sd.dept_id,wgm.to_party) and sd.del_flag = 0
+                 left join sys_user su on find_in_set(su.we_user_id,wgm.to_user) and su.del_flag = 0
+    </sql>
+
+    <select id="getMsgInfo" resultMap="WeAgentMsgInfoResult">
+        <include refid="MsgInfoResult"/>
+        <where>
+            <if test="id != null">
+                and wgm.id = #{id}
+            </if>
+        </where>
+    </select>
+
+</mapper>
