@@ -33,7 +33,7 @@
         select id, agent_id, secret, name, logo_url, description, allow_userinfo_id, allow_party_id, allow_tag_id, close, redirect_domain, report_location_flag, is_reporter, home_url, customized_publish_status, create_time, create_by, create_by_id, update_time, update_by, update_by_id, del_flag from we_agent_info
     </sql>
 
-    <select id="getList" resultType="com.linkwechat.domain.agent.vo.WeAgentListVo">
+    <select id="getList" resultType="com.linkwechat.domain.agent.vo.LwAgentListVo">
         select
             id,
             agent_id,

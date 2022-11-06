@@ -2,10 +2,8 @@ package com.linkwechat.mapper;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.annotation.SqlParser;
-import com.linkwechat.domain.agent.vo.WeAgentListVo;
+import com.linkwechat.domain.agent.vo.LwAgentListVo;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,6 +21,6 @@ import com.linkwechat.domain.WeAgentInfo;
 public interface WeAgentInfoMapper extends BaseMapper<WeAgentInfo> {
 
 
-    List<WeAgentListVo> getList();
+    List<LwAgentListVo> getList();
 }
 
