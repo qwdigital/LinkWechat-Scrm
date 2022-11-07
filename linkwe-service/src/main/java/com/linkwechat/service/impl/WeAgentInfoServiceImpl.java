@@ -3,6 +3,7 @@ package com.linkwechat.service.impl;
 import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
@@ -50,7 +51,11 @@ public class WeAgentInfoServiceImpl extends ServiceImpl<WeAgentInfoMapper, WeAge
             WeAgentQuery weAgentQuery = new WeAgentQuery();
             weAgentQuery.setAgentid(String.valueOf(query.getAgentId()));
             weAgentQuery.setCorpid(SecurityUtils.getCorpId());
-            WeAgentDetailVo weAgentDetail = qwAgentClient.getAgentDetail(weAgentQuery).getData();
+            AjaxResult<WeAgentDetailVo> ajaxResult = qwAgentClient.getAgentDetail(weAgentQuery);
+            WeAgentDetailVo weAgentDetail = ajaxResult.getData();
+            if(Objects.isNull(weAgentDetail)){
+                throw new WeComException(ajaxResult.getCode(),ajaxResult.getMsg());
+            }
             if (Objects.nonNull(weAgentDetail) && Objects.nonNull(weAgentDetail.getAgentId())) {
                 String userId = weAgentDetail.getAllowUserinfos().getUser().stream().map(WeAgentDetailVo.AllowUser::getUserId).collect(Collectors.joining(","));
                 weAgentInfo.setAllowUserinfoId(userId);
@@ -108,8 +113,12 @@ public class WeAgentInfoServiceImpl extends ServiceImpl<WeAgentInfoMapper, WeAge
                 weAgentQuery.setLogo_mediaid(query.getLogoUrl());
             }
         }
-        WeResultVo resultVo = qwAgentClient.updateAgent(weAgentQuery).getData();
-        if (Objects.nonNull(resultVo) && Objects.equals(0, resultVo.getErrCode())) {
+        AjaxResult<WeResultVo> ajaxResult = qwAgentClient.updateAgent(weAgentQuery);
+        WeResultVo resultVo = ajaxResult.getData();
+        if(Objects.isNull(resultVo)){
+            throw new WeComException(ajaxResult.getCode(),ajaxResult.getMsg());
+        }
+        if (Objects.equals(0, resultVo.getErrCode())) {
             updateById(weAgentInfo);
         } else {
             throw new WeComException(resultVo.getErrCode(), "更新失败");
