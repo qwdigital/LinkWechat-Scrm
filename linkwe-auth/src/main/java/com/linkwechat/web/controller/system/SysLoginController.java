@@ -8,11 +8,13 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.model.LoginBody;
 import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.wecom.query.WeCorpQrQuery;
 import com.linkwechat.fegin.QwUserClient;
 import com.linkwechat.service.IWeCorpAccountService;
+import com.linkwechat.web.domain.Sys;
 import com.linkwechat.web.domain.vo.LoginParamVo;
 import com.linkwechat.web.service.SysLoginService;
 import io.swagger.annotations.ApiParam;
@@ -121,6 +123,10 @@ public class SysLoginController {
         );
     }
 
+    public static void main(String[] args) {
+        ;
+        System.out.println(SecurityUtils.encryptPassword("linkwechat@321"));
+    }
 
 
     /**
