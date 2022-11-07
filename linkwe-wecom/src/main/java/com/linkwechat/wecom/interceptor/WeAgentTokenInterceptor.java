@@ -12,14 +12,13 @@ import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.spring.SpringUtils;
+import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
-import com.linkwechat.service.IWeAgentInfoService;
 import com.linkwechat.wecom.service.IQwAccessTokenService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
+import java.util.Objects;
 
 /**
  * @description: 应用token
@@ -38,13 +37,20 @@ public class WeAgentTokenInterceptor extends WeForestInterceptor implements Inte
         if (iQwAccessTokenService == null) {
             iQwAccessTokenService = SpringUtils.getBean(IQwAccessTokenService.class);
         }
-
-        Map<String, Object> baseQuery = request.getBody().nameValuesMapWithObject();
-
-        Integer agentId = (Integer) baseQuery.get("agentid");
-        String corpId = (String) baseQuery.get("corpid");
-
-        String token = iQwAccessTokenService.findAgentAccessToken(corpId,agentId);
+        String corpId = "";
+        Integer agentId = null;
+        Object[] arguments = request.getArguments();
+        for (Object argument : arguments) {
+            if (argument instanceof WeBaseQuery) {
+                WeBaseQuery query = (WeBaseQuery) argument;
+                corpId = query.getCorpid();
+                agentId = Integer.valueOf(query.getAgentid());
+            }
+        }
+        if (StringUtils.isEmpty(corpId) && Objects.isNull(agentId)) {
+            throw new WeComException("未获取入参中的信息");
+        }
+        String token = iQwAccessTokenService.findAgentAccessToken(corpId, agentId);
         request.replaceOrAddQuery("access_token", token);
         return true;
     }
@@ -98,12 +104,23 @@ public class WeAgentTokenInterceptor extends WeForestInterceptor implements Inte
         if (!ObjectUtil.equal(WeErrorCodeEnum.ERROR_CODE_OWE_1.getErrorCode(), weResultVo.getErrCode())
                 && Lists.newArrayList(errorCodeRetry).contains(weResultVo.getErrCode())) {
             //删除缓存
-            Map<String, Object> baseQuery = request.getBody().nameValuesMapWithObject();
-            Integer agentId = (Integer) baseQuery.get("agentid");
-            String corpId = (String) baseQuery.get("corpid");
-            iQwAccessTokenService.removeAgentAccessToken(corpId,agentId);
-            String token = iQwAccessTokenService.findAgentAccessToken(corpId,agentId);
+            String corpId = "";
+            Integer agentId = null;
+            Object[] arguments = request.getArguments();
+            for (Object argument : arguments) {
+                if (argument instanceof WeBaseQuery) {
+                    WeBaseQuery query = (WeBaseQuery) argument;
+                    corpId = query.getCorpid();
+                    agentId = Integer.valueOf(query.getAgentid());
+                }
+            }
+            if (StringUtils.isEmpty(corpId) && Objects.isNull(agentId)) {
+                throw new WeComException("未获取入参中的信息");
+            }
+            iQwAccessTokenService.removeAgentAccessToken(corpId, agentId);
+            String token = iQwAccessTokenService.findAgentAccessToken(corpId, agentId);
             request.replaceOrAddQuery("access_token", token);
+
         }
     }
 
