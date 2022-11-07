@@ -1,10 +1,12 @@
 package com.linkwechat.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.enums.MessageType;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -54,15 +56,22 @@ public class WeAgentInfoServiceImpl extends ServiceImpl<WeAgentInfoMapper, WeAge
             AjaxResult<WeAgentDetailVo> ajaxResult = qwAgentClient.getAgentDetail(weAgentQuery);
             WeAgentDetailVo weAgentDetail = ajaxResult.getData();
             if(Objects.isNull(weAgentDetail)){
+                removeById(weAgentInfo.getId());
                 throw new WeComException(ajaxResult.getCode(),ajaxResult.getMsg());
             }
-            if (Objects.nonNull(weAgentDetail) && Objects.nonNull(weAgentDetail.getAgentId())) {
-                String userId = weAgentDetail.getAllowUserinfos().getUser().stream().map(WeAgentDetailVo.AllowUser::getUserId).collect(Collectors.joining(","));
-                weAgentInfo.setAllowUserinfoId(userId);
-                String partyIds = String.join(",", weAgentDetail.getAllowPartys().getPartyId());
-                weAgentInfo.setAllowPartyId(partyIds);
-                String tagIds = String.join(",", weAgentDetail.getAllowTags().getTagId());
-                weAgentInfo.setAllowTagId(tagIds);
+            if (Objects.nonNull(weAgentDetail.getAgentId())) {
+                if(CollectionUtil.isNotEmpty(weAgentDetail.getAllowUserinfos().getUser())){
+                    String userId = weAgentDetail.getAllowUserinfos().getUser().stream().map(WeAgentDetailVo.AllowUser::getUserId).collect(Collectors.joining(","));
+                    weAgentInfo.setAllowUserinfoId(userId);
+                }
+               if(CollectionUtil.isNotEmpty(weAgentDetail.getAllowPartys().getPartyId())){
+                   String partyIds = String.join(",", weAgentDetail.getAllowPartys().getPartyId());
+                   weAgentInfo.setAllowPartyId(partyIds);
+               }
+                if(CollectionUtil.isNotEmpty(weAgentDetail.getAllowTags().getTagId())){
+                    String tagIds = String.join(",", weAgentDetail.getAllowTags().getTagId());
+                    weAgentInfo.setAllowTagId(tagIds);
+                }
                 weAgentInfo.setClose(weAgentDetail.getClose());
                 weAgentInfo.setCustomizedPublishStatus(weAgentDetail.getCustomizedPublishStatus());
                 weAgentInfo.setDescription(weAgentDetail.getDescription());
@@ -73,6 +82,9 @@ public class WeAgentInfoServiceImpl extends ServiceImpl<WeAgentInfoMapper, WeAge
                 weAgentInfo.setRedirectDomain(weAgentDetail.getRedirectDomain());
                 weAgentInfo.setReportLocationFlag(weAgentDetail.getReportLocationFlag());
                 updateById(weAgentInfo);
+            }else {
+                removeById(weAgentInfo.getId());
+                throw new WeComException(weAgentDetail.getErrCode(), WeErrorCodeEnum.parseEnum(weAgentDetail.getErrCode()).getErrorMsg());
             }
         }
     }
