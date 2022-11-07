@@ -16,11 +16,12 @@ import java.util.List;
  */
 public interface IWeAgentInfoService extends IService<WeAgentInfo> {
 
+    Integer addAgent(WeAgentAddQuery query);
     /**
      * 拉取应用信息
-     * @param query
+     * @param id
      */
-    void pullAgent(WeAgentAddQuery query);
+    void pullAgent(Integer id);
 
     /**
      * 编辑应用信息
@@ -42,4 +43,6 @@ public interface IWeAgentInfoService extends IService<WeAgentInfo> {
 
 
     WeAgentInfo getAgentInfoByAgentId(Integer agentId);
+
+
 }

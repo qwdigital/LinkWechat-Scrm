@@ -1,10 +1,12 @@
 package com.linkwechat.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.enums.MessageType;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -43,37 +45,50 @@ public class WeAgentInfoServiceImpl extends ServiceImpl<WeAgentInfoMapper, WeAge
     private IWeMaterialService weMaterialService;
 
     @Override
-    public void pullAgent(WeAgentAddQuery query) {
+    public Integer addAgent(WeAgentAddQuery query) {
         WeAgentInfo weAgentInfo = new WeAgentInfo();
         weAgentInfo.setAgentId(query.getAgentId());
         weAgentInfo.setSecret(query.getSecret());
-        if (save(weAgentInfo)) {
-            WeAgentQuery weAgentQuery = new WeAgentQuery();
-            weAgentQuery.setAgentid(String.valueOf(query.getAgentId()));
-            weAgentQuery.setCorpid(SecurityUtils.getCorpId());
-            AjaxResult<WeAgentDetailVo> ajaxResult = qwAgentClient.getAgentDetail(weAgentQuery);
-            WeAgentDetailVo weAgentDetail = ajaxResult.getData();
-            if(Objects.isNull(weAgentDetail)){
-                throw new WeComException(ajaxResult.getCode(),ajaxResult.getMsg());
-            }
-            if (Objects.nonNull(weAgentDetail) && Objects.nonNull(weAgentDetail.getAgentId())) {
+        save(weAgentInfo);
+        return weAgentInfo.getId();
+    }
+
+    @Override
+    public void pullAgent(Integer id) {
+        WeAgentInfo weAgentInfo = getById(id);
+        WeAgentQuery weAgentQuery = new WeAgentQuery();
+        weAgentQuery.setAgentid(String.valueOf(weAgentInfo.getAgentId()));
+        weAgentQuery.setCorpid(SecurityUtils.getCorpId());
+        AjaxResult<WeAgentDetailVo> ajaxResult = qwAgentClient.getAgentDetail(weAgentQuery);
+        WeAgentDetailVo weAgentDetail = ajaxResult.getData();
+        if(Objects.isNull(weAgentDetail)){
+            throw new WeComException(ajaxResult.getCode(),ajaxResult.getMsg());
+        }
+        if (Objects.nonNull(weAgentDetail.getAgentId())) {
+            if(CollectionUtil.isNotEmpty(weAgentDetail.getAllowUserinfos().getUser())){
                 String userId = weAgentDetail.getAllowUserinfos().getUser().stream().map(WeAgentDetailVo.AllowUser::getUserId).collect(Collectors.joining(","));
                 weAgentInfo.setAllowUserinfoId(userId);
+            }
+            if(CollectionUtil.isNotEmpty(weAgentDetail.getAllowPartys().getPartyId())){
                 String partyIds = String.join(",", weAgentDetail.getAllowPartys().getPartyId());
                 weAgentInfo.setAllowPartyId(partyIds);
+            }
+            if(CollectionUtil.isNotEmpty(weAgentDetail.getAllowTags().getTagId())){
                 String tagIds = String.join(",", weAgentDetail.getAllowTags().getTagId());
                 weAgentInfo.setAllowTagId(tagIds);
-                weAgentInfo.setClose(weAgentDetail.getClose());
-                weAgentInfo.setCustomizedPublishStatus(weAgentDetail.getCustomizedPublishStatus());
-                weAgentInfo.setDescription(weAgentDetail.getDescription());
-                weAgentInfo.setHomeUrl(weAgentDetail.getHomeUrl());
-                weAgentInfo.setIsReporter(weAgentDetail.getIsreportenter());
-                weAgentInfo.setLogoUrl(weAgentDetail.getSquareLogoUrl());
-                weAgentInfo.setName(weAgentDetail.getName());
-                weAgentInfo.setRedirectDomain(weAgentDetail.getRedirectDomain());
-                weAgentInfo.setReportLocationFlag(weAgentDetail.getReportLocationFlag());
-                updateById(weAgentInfo);
             }
+            weAgentInfo.setClose(weAgentDetail.getClose());
+            weAgentInfo.setCustomizedPublishStatus(weAgentDetail.getCustomizedPublishStatus());
+            weAgentInfo.setDescription(weAgentDetail.getDescription());
+            weAgentInfo.setHomeUrl(weAgentDetail.getHomeUrl());
+            weAgentInfo.setIsReporter(weAgentDetail.getIsreportenter());
+            weAgentInfo.setLogoUrl(weAgentDetail.getSquareLogoUrl());
+            weAgentInfo.setName(weAgentDetail.getName());
+            weAgentInfo.setRedirectDomain(weAgentDetail.getRedirectDomain());
+            weAgentInfo.setReportLocationFlag(weAgentDetail.getReportLocationFlag());
+            updateById(weAgentInfo);
+        }else {
+            throw new WeComException(weAgentDetail.getErrCode(), WeErrorCodeEnum.parseEnum(weAgentDetail.getErrCode()).getErrorMsg());
         }
     }
 

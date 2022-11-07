@@ -38,11 +38,19 @@ public class WeAgentController extends BaseController {
     @Autowired
     private IWeAgentMsgService weAgentMsgService;
 
+    @ApiOperation(value = "新增应用信息", httpMethod = "POST")
+    @PostMapping("/add")
+    public AjaxResult addAgent(@RequestBody @Validated WeAgentAddQuery query) {
+        log.info("新增应用信息入参query:{}", JSONObject.toJSONString(query));
+        Integer id = weAgentInfoService.addAgent(query);
+        return AjaxResult.success(id);
+    }
+
     @ApiOperation(value = "拉取应用信息", httpMethod = "POST")
-    @PostMapping("/pull")
-    public AjaxResult pullAgent(@RequestBody @Validated WeAgentAddQuery query) {
-        log.info("拉取应用信息入参query:{}", JSONObject.toJSONString(query));
-        weAgentInfoService.pullAgent(query);
+    @GetMapping("/pull/{id}")
+    public AjaxResult pullAgent(@PathVariable("id") Integer id) {
+        log.info("拉取应用信息入参query:{}", id);
+        weAgentInfoService.pullAgent(id);
         return AjaxResult.success();
     }
 
