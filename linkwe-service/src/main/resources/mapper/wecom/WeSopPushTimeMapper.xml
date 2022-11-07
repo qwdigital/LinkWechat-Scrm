@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeSopPushTimeMapper">
+
+    <select id="findWeSopPushTimeDto" resultType="com.linkwechat.domain.sop.dto.WeSopPushTimeDto">
+        SELECT
+            wsa.sop_push_time_id,
+            wspt.push_start_time,
+            wspt.push_end_time,
+            wspt.push_time_pre,
+            wspt.push_time_type,
+            wsa.id as sop_attachment_id
+        FROM
+            we_sop_push_time wspt
+                INNER  JOIN we_sop_attachments wsa ON wspt.id = wsa.sop_push_time_id
+        WHERE wspt.del_flag=0 AND wsa.del_flag=0 AND wspt.sop_base_id=#{sopBaseId}
+    </select>
+
+
+</mapper>

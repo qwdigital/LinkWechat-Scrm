@@ -70,6 +70,11 @@ public class RabbitMQSettingConfig {
     private String weQrCodeChangeEx;
 
     /**
+     * sop交换机
+     */
+    @Value("${wecom.mq.exchange.sop-ex:Ex_Sop}")
+    private String sopEx;
+    /**
      * -------------------路由------------------------------------
      */
     //自建回调路由
@@ -154,6 +159,10 @@ public class RabbitMQSettingConfig {
     //商品图册同步路由
     @Value("${wecom.mq.route.sync.product:Rk_Product}")
     private String weProductRk;
+
+    //sop通知路由
+    @Value("${wecom.mq.route.sop-rk:rk_sop}")
+    private String sopRk;
 
     /**
      * -------------------队列------------------------------------

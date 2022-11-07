@@ -2,7 +2,9 @@ package com.linkwechat.domain.media;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 
@@ -13,7 +15,12 @@ import javax.validation.constraints.NotNull;
  **/
 @ApiModel
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeMessageTemplate {
+
+    private String id;
+
     @ApiModelProperty("消息类型 文本:text, 图片:image, 语音:voice, 视频:video, 文件:file, 文本卡片:textcard, 图文:news, 图文消息:link, 小程序：miniprogram")
     @NotNull(message = "消息类型不能为空")
     private String msgType;
