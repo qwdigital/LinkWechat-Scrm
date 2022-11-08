@@ -46,7 +46,7 @@ public class WeAgentController extends BaseController {
         return AjaxResult.success(id);
     }
 
-    @ApiOperation(value = "拉取应用信息", httpMethod = "POST")
+    @ApiOperation(value = "拉取应用信息", httpMethod = "GET")
     @GetMapping("/pull/{id}")
     public AjaxResult pullAgent(@PathVariable("id") Integer id) {
         log.info("拉取应用信息入参query:{}", id);
