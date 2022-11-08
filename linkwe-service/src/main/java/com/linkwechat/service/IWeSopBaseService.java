@@ -1,16 +1,12 @@
 package com.linkwechat.service;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo;
 import com.linkwechat.domain.sop.WeSopBase;
 import com.linkwechat.domain.sop.vo.*;
 import com.linkwechat.domain.sop.vo.content.*;
-import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

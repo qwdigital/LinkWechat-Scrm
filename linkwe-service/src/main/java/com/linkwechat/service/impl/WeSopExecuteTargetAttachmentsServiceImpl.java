@@ -3,6 +3,7 @@ package com.linkwechat.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.context.SecurityContextHolder;
@@ -60,6 +61,10 @@ implements IWeSopExecuteTargetAttachmentsService {
     private IWeCorpAccountService iWeCorpAccountService;
 
 
+
+
+
+
     @Override
     public void weChatPushTypeSopTaskTip(String sopBaseId) {
         //获取当天要推送的所有任务
@@ -67,31 +72,9 @@ implements IWeSopExecuteTargetAttachmentsService {
                 =this.baseMapper.findWeSopPushTaskDtoBySopId(sopBaseId);
 
         if(CollectionUtil.isNotEmpty(weCustomerSopPushTaskDto)){
-            List<WeCorpAccount> weCorpAccounts = iWeCorpAccountService.listByIds(
-                    weCustomerSopPushTaskDto.stream().map(WeSopPushTaskDto::getTenantId).collect(Collectors.toList())
-            );
 
-            if(CollectionUtil.isNotEmpty(weCorpAccounts)){
-
-                weCustomerSopPushTaskDto.stream().collect(Collectors.groupingBy(WeSopPushTaskDto::getTenantId)).forEach((k,v)->{
-
-                    List<WeCorpAccount> weCorpAccountsLists
-                            = weCorpAccounts.stream().filter(weCorpAccount -> weCorpAccount.getId().equals(k)).collect(Collectors.toList());
-
-                    if(CollectionUtil.isNotEmpty(weCorpAccountsLists)){
-                        //获取企业微信发送方式任务
-                        this.weComPushTask(
-                                weCorpAccountsLists.stream().findFirst().get(),
-                                k,v);
-                    }
-
-
-                });
-
-            }
-
-
-
+            //获取企业微信发送方式任务
+            this.weComPushTask(weCustomerSopPushTaskDto);
 
         }
 
@@ -100,9 +83,11 @@ implements IWeSopExecuteTargetAttachmentsService {
 
 
 
-    private void weComPushTask(WeCorpAccount weCorpAccount,Integer tenantId,List<WeSopPushTaskDto> wecomSendTypes) {
+    private void weComPushTask(List<WeSopPushTaskDto> wecomSendTypes) {
 
-        if(CollectionUtil.isNotEmpty(wecomSendTypes)) {
+        WeCorpAccount weCorpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
+
+        if(CollectionUtil.isNotEmpty(wecomSendTypes) && ObjectUtil.isNotEmpty(weCorpAccount)) {
             //员工id分组
             Map<String, List<WeSopPushTaskDto>> executeWeUserIdGroup
                     = wecomSendTypes.stream().collect(Collectors.groupingBy(WeSopPushTaskDto::getExecuteWeUserId));
@@ -188,23 +173,18 @@ implements IWeSopExecuteTargetAttachmentsService {
 
         if(CollectionUtil.isNotEmpty(weCustomerSopPushTaskDto)){
 
-            //每个租户
-            weCustomerSopPushTaskDto.stream().collect(Collectors.groupingBy(WeSopPushTaskDto::getTenantId)).forEach((k,v)->{
-                //每个执行人员
-                v.stream().collect(Collectors.groupingBy(WeSopPushTaskDto::getExecuteWeUserId)).forEach((kk,vv)->{
+            //每个执行人员
+            weCustomerSopPushTaskDto.stream().collect(Collectors.groupingBy(WeSopPushTaskDto::getExecuteWeUserId)).forEach((kk,vv)->{
 
-                    Map<Integer, List<WeSopPushTaskDto>> collect = vv.stream().collect(Collectors.groupingBy(WeSopPushTaskDto::getTargetType));
+                Map<Integer, List<WeSopPushTaskDto>> collect = vv.stream().collect(Collectors.groupingBy(WeSopPushTaskDto::getTargetType));
 
-                    //客户sop手动推送任务
-                    this.sopTaskTodayTip(k,kk,false, collect.get(1),isExpiringSoon);
+                //客户sop手动推送任务
+                this.sopTaskTodayTip(kk,false, collect.get(1),isExpiringSoon);
 
-                    //客群sop手动推送任务
-                    this.sopTaskTodayTip(k,kk,true,collect.get(2),isExpiringSoon);
-                });
-
-
-
+                //客群sop手动推送任务
+                this.sopTaskTodayTip(kk,true,collect.get(2),isExpiringSoon);
             });
+
 
         }
 
@@ -213,7 +193,7 @@ implements IWeSopExecuteTargetAttachmentsService {
 
 
 
-    private void sopTaskTodayTip(Integer tenantId,String executeWeUserId,boolean groupOrCustomer,List<WeSopPushTaskDto> weCustomerSopPushTaskDto,boolean isExpiringSoon){
+    private void sopTaskTodayTip(String executeWeUserId,boolean groupOrCustomer,List<WeSopPushTaskDto> weCustomerSopPushTaskDto,boolean isExpiringSoon){
 
         if(CollectionUtil.isNotEmpty(weCustomerSopPushTaskDto)) {
             StringBuilder textContent = new StringBuilder();
@@ -246,7 +226,7 @@ implements IWeSopExecuteTargetAttachmentsService {
                 if(groupOrCustomer){
 
 
-                    List<WeGroup> weGroups = ((WeGroupMapper)iWeGroupService.getBaseMapper()).findGroupsNoTenant(
+                    List<WeGroup> weGroups = ((WeGroupMapper)iWeGroupService.getBaseMapper()).selectList(
                             new LambdaQueryWrapper<WeGroup>()
                                     .in(WeGroup::getChatId, weCustomerSopPushTaskDto.stream().map(WeSopPushTaskDto::getTargetId).collect(Collectors.toList()))
                     );
@@ -278,7 +258,7 @@ implements IWeSopExecuteTargetAttachmentsService {
 
 
                         iWeMessagePushService.pushMessageSelfH5(
-                                ListUtil.toList(executeWeUserId),textContent.toString(),groupOrCustomer?MessageNoticeType.GROUP_SOP.getType():MessageNoticeType.CUSTOMER_SOP.getType(),true,tenantId
+                                ListUtil.toList(executeWeUserId),textContent.toString(),groupOrCustomer?MessageNoticeType.GROUP_SOP.getType():MessageNoticeType.CUSTOMER_SOP.getType(),true
                         );
 
 
@@ -287,7 +267,7 @@ implements IWeSopExecuteTargetAttachmentsService {
                 }else{
 
 
-                    List<WeCustomer> weCustomers =((WeCustomerMapper)iWeCustomerService.getBaseMapper()).findWeCustomerNoTenantId(
+                    List<WeCustomer> weCustomers =((WeCustomerMapper)iWeCustomerService.getBaseMapper()).selectList(
                             new LambdaQueryWrapper<WeCustomer>()
                                     .eq(WeCustomer::getAddUserId,executeWeUserId)
                                     .in(WeCustomer::getExternalUserid, weCustomerSopPushTaskDto.stream().map(WeSopPushTaskDto::getTargetId).collect(Collectors.toList()))
@@ -319,7 +299,7 @@ implements IWeSopExecuteTargetAttachmentsService {
                         }
 
                         iWeMessagePushService.pushMessageSelfH5(
-                                ListUtil.toList(executeWeUserId),textContent.toString(),groupOrCustomer?MessageNoticeType.GROUP_SOP.getType():MessageNoticeType.CUSTOMER_SOP.getType(),true,tenantId
+                                ListUtil.toList(executeWeUserId),textContent.toString(),groupOrCustomer?MessageNoticeType.GROUP_SOP.getType():MessageNoticeType.CUSTOMER_SOP.getType(),true
                         );
 
                     }
@@ -328,7 +308,6 @@ implements IWeSopExecuteTargetAttachmentsService {
 
 
                 //设置为已提示
-                SecurityContextHolder.setTenantId(tenantId);
                 this.update(
                         WeSopExecuteTargetAttachments.builder()
                                 .isTip(isExpiringSoon?2:1)

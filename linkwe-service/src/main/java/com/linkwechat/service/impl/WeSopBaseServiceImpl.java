@@ -10,6 +10,7 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.base.Joiner;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.HttpStatus;
+import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysDept;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.model.LoginUser;
@@ -35,6 +36,7 @@ import com.linkwechat.domain.sop.vo.content.*;
 import com.linkwechat.domain.wecom.query.customer.msg.WeGetGroupMsgListQuery;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
 import com.linkwechat.fegin.QwCustomerClient;
+import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeSopBaseMapper;
 import com.linkwechat.mapper.WeSopPushTimeMapper;
 import com.linkwechat.service.*;
@@ -92,6 +94,10 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
     @Autowired
     private IWeCustomerService iWeCustomerService;
+
+
+    @Autowired
+    private QwSysUserClient qwSysUserClient;
 
 
 
@@ -262,10 +268,12 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                 //设置执行成员
                 WeSopExecuteUserConditVo executeWeUser = k.getExecuteWeUser();
                 if(Objects.isNull(executeWeUser)){//执行成员为空则查询当前系统所有员工
-                    List<SysUser> currentTenantSysUser = weCustomerMapper.findAllSysUser();
-                    if(CollectionUtil.isNotEmpty(currentTenantSysUser)){
+
+                    AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.list(new SysUser());
+
+                    if(null != listAjaxResult&&CollectionUtil.isNotEmpty(listAjaxResult.getData())){
                         weSopListsVo.setExecuteUser(
-                                currentTenantSysUser.stream().map(SysUser::getUserName).collect(Collectors.joining(","))
+                                listAjaxResult.getData().stream().map(SysUser::getUserName).collect(Collectors.joining(","))
                         );
                     }
                 }else{//查询成员，或者部门岗位
@@ -275,6 +283,8 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                             = executeWeUser.getExecuteUserCondit();
                     if(null != executeUserCondit && executeUserCondit.isChange()
                             && CollectionUtil.isNotEmpty(executeUserCondit.getWeUserIds())){
+
+
                         List<SysUser> currentTenantSysUser = weCustomerMapper.findCurrentTenantSysUser(
                                 Joiner.on(",").join(executeUserCondit.getWeUserIds())
                         );
@@ -613,15 +623,6 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
             }
 
-
-//                tdSendSopCustomers.stream().forEach(k->{
-//                    k.setWeSopToBeSentContentInfoVo(
-//                            this.baseMapper.findSopToBeSentContentInfo(loginUser.getSysUser().getWeUserId(),k.getExternalUserid())
-//                    );
-//                });
-//
-//                sopToBeSentVoList.addAll(tdSendSopCustomers);
-//            }
 
         }
 
