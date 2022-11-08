@@ -15,8 +15,14 @@ public class WeAgentEditQuery {
     @ApiModelProperty(hidden = true)
     private Integer id;
 
+    @ApiModelProperty("企业应用ID")
+    private String agentId;
+
     @ApiModelProperty("企业应用名称")
     private String name;
+
+    @ApiModelProperty("企业应用密钥")
+    private String secret;
 
     @ApiModelProperty("企业应用详情")
     private String description;

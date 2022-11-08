@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeGroupRobotMsgMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeGroupRobotMsg" id="WeGroupRobotMsgResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="robotId" column="robot_id" jdbcType="INTEGER"/>
+                <result property="sendTime" column="send_time" jdbcType="TIMESTAMP"/>
+                <result property="status" column="status" jdbcType="INTEGER"/>
+                <result property="msgType" column="msg_type" jdbcType="VARCHAR"/>
+                <result property="content" column="content" jdbcType="VARCHAR"/>
+                <result property="title" column="title" jdbcType="VARCHAR"/>
+                <result property="description" column="description" jdbcType="VARCHAR"/>
+                <result property="fileUrl" column="file_url" jdbcType="VARCHAR"/>
+                <result property="linkUrl" column="link_url" jdbcType="VARCHAR"/>
+                <result property="picUrl" column="pic_url" jdbcType="VARCHAR"/>
+                <result property="appId" column="app_id" jdbcType="VARCHAR"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeGroupRobotMsgVo">
+        select id, robot_id, send_time, status, msg_type, content, title, description, file_url, link_url, pic_url, app_id, create_time, create_by, create_by_id, update_time, update_by, update_by_id, del_flag from we_group_robot_msg
+    </sql>
+
+</mapper>
