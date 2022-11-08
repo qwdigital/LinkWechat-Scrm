@@ -107,6 +107,16 @@ public class WeAgentInfoServiceImpl extends ServiceImpl<WeAgentInfoMapper, WeAge
             weAgentInfo.setName(query.getName());
             weAgentQuery.setName(query.getName());
         }
+        if (StringUtils.isNotEmpty(query.getAgentId())) {
+            weAgentInfo.setAgentId(Integer.valueOf(query.getAgentId()));
+        }
+        if (StringUtils.isNotEmpty(query.getSecret())) {
+            weAgentInfo.setSecret(query.getSecret());
+        }
+        if (StringUtils.isNotEmpty(query.getName())) {
+            weAgentInfo.setName(query.getName());
+            weAgentQuery.setName(query.getName());
+        }
         if (StringUtils.isNotEmpty(query.getDescription())) {
             weAgentInfo.setDescription(query.getDescription());
             weAgentQuery.setDescription(query.getDescription());
