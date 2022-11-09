@@ -73,7 +73,7 @@ public class WeAgentInfoServiceImpl extends ServiceImpl<WeAgentInfoMapper, WeAge
                 String partyIds = String.join(",", weAgentDetail.getAllowPartys().getPartyId());
                 weAgentInfo.setAllowPartyId(partyIds);
             }
-            if(Objects.nonNull(weAgentDetail.getAllowPartys()) && CollectionUtil.isNotEmpty(weAgentDetail.getAllowTags().getTagId())){
+            if(Objects.nonNull(weAgentDetail.getAllowTags()) && CollectionUtil.isNotEmpty(weAgentDetail.getAllowTags().getTagId())){
                 String tagIds = String.join(",", weAgentDetail.getAllowTags().getTagId());
                 weAgentInfo.setAllowTagId(tagIds);
             }
@@ -135,7 +135,7 @@ public class WeAgentInfoServiceImpl extends ServiceImpl<WeAgentInfoMapper, WeAge
                     FileUtil.getName(query.getLogoUrl()));
             if (Objects.nonNull(weMediaVo) && StringUtils.isNotEmpty(weMediaVo.getMediaId())) {
                 weAgentInfo.setLogoUrl(query.getLogoUrl());
-                weAgentQuery.setLogo_mediaid(query.getLogoUrl());
+                weAgentQuery.setLogo_mediaid(weMediaVo.getMediaId());
             }
         }
         updateById(weAgentInfo);
