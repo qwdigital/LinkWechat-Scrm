@@ -11,6 +11,8 @@ import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeAgentMsg;
 import com.linkwechat.domain.agent.query.WeAgentMsgAddQuery;
+import com.linkwechat.domain.agent.query.WeAgentMsgListQuery;
+import com.linkwechat.domain.agent.vo.WeAgentMsgListVo;
 import com.linkwechat.domain.agent.vo.WeAgentMsgVo;
 import com.linkwechat.domain.msg.QwAppMsgBody;
 import com.linkwechat.domain.wecom.query.msg.WeRecallMsgQuery;
@@ -140,6 +142,14 @@ public class WeAgentMsgServiceImpl extends ServiceImpl<WeAgentMsgMapper, WeAgent
                 .lt(WeAgentMsg::getPlanSendTime, new Date())
                 .eq(WeAgentMsg::getDelFlag, 0);
        return list(wrapper);
+    }
+
+    @Override
+    public List<WeAgentMsgListVo> getMsgList(WeAgentMsgListQuery query) {
+        if(Objects.isNull(query.getId())){
+            throw new WeComException("应用ID不能为空");
+        }
+        return this.baseMapper.getMsgList(query);
     }
 
 }

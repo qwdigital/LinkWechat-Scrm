@@ -3,6 +3,8 @@ package com.linkwechat.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.domain.WeAgentMsg;
 import com.linkwechat.domain.agent.query.WeAgentAddQuery;
 import com.linkwechat.domain.agent.query.WeAgentEditQuery;
 import com.linkwechat.domain.agent.query.WeAgentMsgAddQuery;
@@ -81,8 +83,10 @@ public class WeAgentController extends BaseController {
 
     @ApiOperation(value = "获取历史消息列表", httpMethod = "GET")
     @GetMapping("/msg/list")
-    public AjaxResult<WeAgentMsgListVo> getMsgList(@RequestBody WeAgentMsgListQuery query) {
-        return AjaxResult.success();
+    public TableDataInfo<WeAgentMsgListVo> getMsgList(WeAgentMsgListQuery query) {
+        this.startPage();
+        List<WeAgentMsgListVo> list = weAgentMsgService.getMsgList(query);
+        return  getDataTable(list);
     }
 
     @ApiOperation(value = "新增应用消息", httpMethod = "POST")
