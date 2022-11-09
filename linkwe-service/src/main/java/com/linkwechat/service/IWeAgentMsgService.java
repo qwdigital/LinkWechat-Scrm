@@ -3,6 +3,8 @@ package com.linkwechat.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.WeAgentMsg;
 import com.linkwechat.domain.agent.query.WeAgentMsgAddQuery;
+import com.linkwechat.domain.agent.query.WeAgentMsgListQuery;
+import com.linkwechat.domain.agent.vo.WeAgentMsgListVo;
 import com.linkwechat.domain.agent.vo.WeAgentMsgVo;
 
 import java.util.List;
@@ -50,4 +52,10 @@ public interface IWeAgentMsgService extends IService<WeAgentMsg> {
      */
     List<WeAgentMsg> getWaitingList();
 
+    /**
+     * 历史消息列表
+     * @param query
+     * @return
+     */
+    List<WeAgentMsgListVo> getMsgList(WeAgentMsgListQuery query);
 }

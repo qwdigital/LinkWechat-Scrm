@@ -113,4 +113,33 @@
         </where>
     </select>
 
+    <select id="getMsgList" resultType="com.linkwechat.domain.agent.vo.WeAgentMsgListVo">
+        select
+            wgm.id,
+            wgm.msg_title as title,
+            wgm.scope_type,
+            wgm.send_type,
+            wgm.send_time,
+            wgm.plan_send_time,
+            wgm.status,
+            wgm.msg_type
+        from we_agent_msg wgm
+        <where>
+            and wgm.agent_id = #{id}
+            and wgm.del_flag = 0
+            <if test="title != null and title != ''">
+                and wgm.msg_title like concat('%', #{title}, '%')
+            </if>
+            <if test="status != null">
+                and wgm.status =  #{status}
+            </if>
+            <if test="startTime != null and startTime != ''"><!-- 开始时间检索 -->
+                AND wgm.create_time &gt;= date_format(#{startTime},'%Y-%m-%d')
+            </if>
+
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND wgm.create_time &lt;= date_format(#{endTime},'%Y-%m-%d')
+            </if>
+        </where>
+    </select>
 </mapper>

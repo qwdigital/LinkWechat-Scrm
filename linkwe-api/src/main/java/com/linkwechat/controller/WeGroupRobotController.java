@@ -3,15 +3,9 @@ package com.linkwechat.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
-import com.linkwechat.domain.agent.query.WeAgentAddQuery;
-import com.linkwechat.domain.agent.query.WeAgentEditQuery;
-import com.linkwechat.domain.agent.query.WeAgentMsgAddQuery;
-import com.linkwechat.domain.agent.query.WeAgentMsgListQuery;
 import com.linkwechat.domain.agent.vo.LwAgentListVo;
-import com.linkwechat.domain.agent.vo.WeAgentMsgListVo;
-import com.linkwechat.domain.agent.vo.WeAgentMsgVo;
-import com.linkwechat.service.IWeAgentInfoService;
-import com.linkwechat.service.IWeAgentMsgService;
+import com.linkwechat.domain.robot.query.WeRobotAddQuery;
+import com.linkwechat.domain.robot.query.WeRobotQuery;
 import com.linkwechat.service.IWeGroupRobotInfoService;
 import com.linkwechat.service.IWeGroupRobotMsgService;
 import io.swagger.annotations.Api;
@@ -40,38 +34,37 @@ public class WeGroupRobotController extends BaseController {
     @Autowired
     private IWeGroupRobotMsgService weGroupRobotMsgService;
 
-    /*@ApiOperation(value = "新增群机器人", httpMethod = "POST")
+
+    @ApiOperation(value = "新增群机器人", httpMethod = "POST")
     @PostMapping("/add")
-    public AjaxResult addAgent(@RequestBody @Validated WeAgentAddQuery query) {
+    public AjaxResult addRobot(@RequestBody @Validated WeRobotAddQuery query) {
         log.info("新增群机器人入参query:{}", JSONObject.toJSONString(query));
-        Integer id = weGroupRobotInfoService.addGroupRobot(query);
+        Long id = weGroupRobotInfoService.addGroupRobot(query);
         return AjaxResult.success(id);
     }
 
-    @ApiOperation(value = "拉取应用信息", httpMethod = "GET")
-    @GetMapping("/pull/{id}")
-    public AjaxResult pullAgent(@PathVariable("id") Integer id) {
-        log.info("拉取应用信息入参query:{}", id);
-        weAgentInfoService.pullAgent(id);
-        return AjaxResult.success();
-    }
-
-    @ApiOperation(value = "编辑应用信息", httpMethod = "PUT")
+    @ApiOperation(value = "编辑群机器人", httpMethod = "PUT")
     @PutMapping("/update/{id}")
-    public AjaxResult update(@PathVariable("id") Integer id, @RequestBody WeAgentEditQuery query) {
+    public AjaxResult updateRobot(@PathVariable("id") Long id, @Validated @RequestBody WeRobotAddQuery query) {
         query.setId(id);
-        log.info("编辑应用信息入参query:{}", JSONObject.toJSONString(query));
-        weAgentInfoService.update(query);
+        log.info("编辑群机器人入参query:{}", JSONObject.toJSONString(query));
+        weGroupRobotInfoService.updateRobot(query);
         return AjaxResult.success();
     }
 
-    @ApiOperation(value = "获取应用列表", httpMethod = "GET")
+    @ApiOperation(value = "获取机器人列表", httpMethod = "GET")
     @GetMapping("/list")
-    public AjaxResult<LwAgentListVo> getList() {
-        log.info("获取应用列表接口调用");
-        List<LwAgentListVo> list = weAgentInfoService.getList();
-        return AjaxResult.success(list);
+    public AjaxResult<LwAgentListVo> getList(WeRobotQuery query) {
+        log.info("获取机器人列表接口");
+        //List<LwAgentListVo> list = weGroupRobotInfoService.getList(query);
+        return AjaxResult.success();
     }
+
+    /*
+
+
+
+
 
     @ApiOperation(value = "删除应用", httpMethod = "DELETE")
     @DeleteMapping("/delete/{id}")
@@ -120,12 +113,6 @@ public class WeGroupRobotController extends BaseController {
         return AjaxResult.success();
     }
 
-    @ApiOperation(value = "撤销应用消息", httpMethod = "GET")
-    @GetMapping("/msg/revoke/{id}")
-    public AjaxResult revokeMsgInfo(@PathVariable("id") Long id) {
-        log.info("撤销消息详情入参query:{}", id);
-        weAgentMsgService.revokeMsgInfo(id);
-        return AjaxResult.success();
-    }*/
+   */
 
 }
