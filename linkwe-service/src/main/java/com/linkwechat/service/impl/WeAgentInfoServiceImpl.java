@@ -69,11 +69,11 @@ public class WeAgentInfoServiceImpl extends ServiceImpl<WeAgentInfoMapper, WeAge
                 String userId = weAgentDetail.getAllowUserinfos().getUser().stream().map(WeAgentDetailVo.AllowUser::getUserId).collect(Collectors.joining(","));
                 weAgentInfo.setAllowUserinfoId(userId);
             }
-            if(CollectionUtil.isNotEmpty(weAgentDetail.getAllowPartys().getPartyId())){
+            if(Objects.nonNull(weAgentDetail.getAllowPartys()) && CollectionUtil.isNotEmpty(weAgentDetail.getAllowPartys().getPartyId())){
                 String partyIds = String.join(",", weAgentDetail.getAllowPartys().getPartyId());
                 weAgentInfo.setAllowPartyId(partyIds);
             }
-            if(CollectionUtil.isNotEmpty(weAgentDetail.getAllowTags().getTagId())){
+            if(Objects.nonNull(weAgentDetail.getAllowPartys()) && CollectionUtil.isNotEmpty(weAgentDetail.getAllowTags().getTagId())){
                 String tagIds = String.join(",", weAgentDetail.getAllowTags().getTagId());
                 weAgentInfo.setAllowTagId(tagIds);
             }
@@ -138,15 +138,14 @@ public class WeAgentInfoServiceImpl extends ServiceImpl<WeAgentInfoMapper, WeAge
                 weAgentQuery.setLogo_mediaid(query.getLogoUrl());
             }
         }
+        updateById(weAgentInfo);
         AjaxResult<WeResultVo> ajaxResult = qwAgentClient.updateAgent(weAgentQuery);
         WeResultVo resultVo = ajaxResult.getData();
         if(Objects.isNull(resultVo)){
             throw new WeComException(ajaxResult.getCode(),ajaxResult.getMsg());
         }
-        if (Objects.equals(0, resultVo.getErrCode())) {
-            updateById(weAgentInfo);
-        } else {
-            throw new WeComException(resultVo.getErrCode(), "更新失败");
+        if (!Objects.equals(0, resultVo.getErrCode())) {
+            throw new WeComException(resultVo.getErrCode(), WeErrorCodeEnum.parseEnum(resultVo.getErrCode()).getErrorMsg());
         }
     }
 
