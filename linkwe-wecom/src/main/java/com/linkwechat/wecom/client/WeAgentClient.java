@@ -20,7 +20,7 @@ public interface WeAgentClient {
      * @return {@link WeAgentQuery}
      */
     @Get(url = "/agent/list")
-    WeAgentListVo getList(@JSONBody("query") WeAgentQuery query);
+    WeAgentListVo getList(@JSONBody WeAgentQuery query);
 
     /**
      * 根据应用id获取应用详情
@@ -36,5 +36,5 @@ public interface WeAgentClient {
      * @return {@link WeResultVo}
      */
     @Post(url = "/agent/set")
-    WeResultVo updateAgent(@JSONBody("query") WeAgentQuery query);
+    WeResultVo updateAgent(@JSONBody WeAgentQuery query);
 }
