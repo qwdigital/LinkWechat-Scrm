@@ -36,6 +36,7 @@ import com.linkwechat.domain.sop.vo.content.*;
 import com.linkwechat.domain.wecom.query.customer.msg.WeGetGroupMsgListQuery;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
 import com.linkwechat.fegin.QwCustomerClient;
+import com.linkwechat.fegin.QwDeptClient;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeSopBaseMapper;
 import com.linkwechat.mapper.WeSopPushTimeMapper;
@@ -98,6 +99,11 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
     @Autowired
     private QwSysUserClient qwSysUserClient;
+
+
+
+    @Autowired
+    private QwDeptClient qwDeptClient;
 
 
 
@@ -269,7 +275,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                 WeSopExecuteUserConditVo executeWeUser = k.getExecuteWeUser();
                 if(Objects.isNull(executeWeUser)){//执行成员为空则查询当前系统所有员工
 
-                    AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.list(new SysUser());
+                    AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.findAllSysUser(null,null,null);
 
                     if(null != listAjaxResult&&CollectionUtil.isNotEmpty(listAjaxResult.getData())){
                         weSopListsVo.setExecuteUser(
@@ -284,15 +290,17 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                     if(null != executeUserCondit && executeUserCondit.isChange()
                             && CollectionUtil.isNotEmpty(executeUserCondit.getWeUserIds())){
 
+                        AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.findAllSysUser(
+                                Joiner.on(",").join(executeUserCondit.getWeUserIds()),null,null);
 
-                        List<SysUser> currentTenantSysUser = weCustomerMapper.findCurrentTenantSysUser(
-                                Joiner.on(",").join(executeUserCondit.getWeUserIds())
-                        );
-                        if(CollectionUtil.isNotEmpty(currentTenantSysUser)){
+                        if(null != listAjaxResult&&CollectionUtil.isNotEmpty(listAjaxResult.getData())){
+
                             sb.append(
-                                    currentTenantSysUser.stream().map(SysUser::getUserName).collect(Collectors.joining(","))
+                                    listAjaxResult.getData().stream().map(SysUser::getUserName).collect(Collectors.joining(","))
                             );
                         }
+
+
                     }
 
                     //设置执行的部门或岗位
@@ -300,9 +308,11 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                             = executeWeUser.getExecuteDeptCondit();
                     if(null != executeDeptCondit && executeDeptCondit.isChange()){
                         if(CollectionUtil.isNotEmpty(executeDeptCondit.getDeptIds())){//设置部门
-                            List<SysDept> depts = weCustomerMapper.findDept(executeDeptCondit.getDeptIds(),SecurityUtils.getTenantId());
-                            if(CollectionUtil.isNotEmpty(depts)){
-                                sb.append(",").append(depts.stream().map(SysDept::getDeptName).collect(Collectors.joining(",")));
+                            AjaxResult<List<SysDept>> result
+                                    = qwDeptClient.findSysDeptByIds(StringUtils.join(executeDeptCondit.getDeptIds(), ","));
+
+                            if(null != result && CollectionUtil.isNotEmpty(result.getData())){
+                                sb.append(",").append(result.getData().stream().map(SysDept::getDeptName).collect(Collectors.joining(",")));
                             }
 
 
@@ -750,12 +760,14 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
         //1.查询执行成员
         if(Objects.isNull(executeWeUser)){//全部成员
-            List<SysUser> allSysUser = weCustomerMapper.findAllSysUser(null,null);
-            if(CollectionUtil.isNotEmpty(allSysUser)){
+            AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.list(new SysUser());
+
+            if(null != listAjaxResult&&CollectionUtil.isNotEmpty(listAjaxResult.getData())){
                 executeWeUserIds.addAll(
-                        allSysUser.stream().map(SysUser::getWeUserId).collect(Collectors.toList())
+                        listAjaxResult.getData().stream().map(SysUser::getWeUserId).collect(Collectors.toList())
                 );
             }
+
         }else{ //部分成员
             //用户选择的成员
             WeSopExecuteUserConditVo.ExecuteUserCondit executeUserCondit = executeWeUser.getExecuteUserCondit();
@@ -777,12 +789,20 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                     positions=StringUtils.join(executeDeptCondit.getPosts(),",");
                 }
 
-                List<SysUser> allSysUser = weCustomerMapper.findAllSysUser(positions,depteIds);
-                if(CollectionUtil.isNotEmpty(allSysUser)){
+
+                AjaxResult<List<SysUser>> listAjaxResult =qwSysUserClient.findAllSysUser(null,positions,depteIds);
+
+                if(null != listAjaxResult&&CollectionUtil.isNotEmpty(listAjaxResult.getData())){
                     executeWeUserIds.addAll(
-                            allSysUser.stream().map(SysUser::getWeUserId).collect(Collectors.toList())
+                            listAjaxResult.getData().stream().map(SysUser::getWeUserId).collect(Collectors.toList())
                     );
                 }
+//                if(CollectionUtil.isNotEmpty(allSysUser)){
+//
+//                    executeWeUserIds.addAll(
+//                            allSysUser.stream().map(SysUser::getWeUserId).collect(Collectors.toList())
+//                    );
+//                }
 
             }
 

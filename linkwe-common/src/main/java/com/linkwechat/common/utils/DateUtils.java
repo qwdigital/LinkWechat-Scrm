@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 /**
@@ -572,17 +573,18 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     }
 
 
-    public static void main(String[] args) throws ParseException {
-
-        System.out.println(daysBetween(
-                DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, new Date())
-                ,
-                parseDateToStr(
-                        YYYY_MM_DD, daysAgoOrAfter(
-                                DateUtils.parseDate("2022-08-31"), 1
-                        )
-                )));
-
-
+    public static String initSqlBeginTime(String str){
+        if(ObjectUtil.isEmpty(str)){
+            str = dateTimeNow(YYYY_MM_DD_HH_MM_SS);
+        }
+        return str + " 00:00:00";
     }
+
+    public static String initSqlEndTime(String str){
+        if(ObjectUtil.isEmpty(str)){
+            str = dateTimeNow(YYYY_MM_DD_HH_MM_SS);
+        }
+        return str + " 59:59:59";
+    }
+
 }

@@ -156,6 +156,10 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.qr-code-change:Rk_QrCodeChange}")
     private String weQrCodeChangeRk;
 
+    //计算人群路由
+    @Value("${wecom.mq.route.crowd-calculate:Rk_CrowdCalculate}")
+    private String WeCrowdCalculateRk;
+
     //商品图册同步路由
     @Value("${wecom.mq.route.sync.product:Rk_Product}")
     private String weProductRk;

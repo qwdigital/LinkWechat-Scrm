@@ -5,6 +5,7 @@ import com.linkwechat.common.core.domain.dto.SysUserDTO;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.web.domain.vo.UserVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -238,4 +239,8 @@ public interface ISysUserService extends IService<SysUser> {
     void getUserSensitiveInfo(String userTicket);
 
     void getUserSensitiveInfo(Long userId, String userTicket);
+
+
+    List<SysUser> findAllSysUser(String weUserIds,String positions,String deptIds);
+
 }

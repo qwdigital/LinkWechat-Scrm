@@ -20,6 +20,12 @@ public interface ISysDeptService {
      */
     public List<SysDept> selectDeptList(SysDept dept);
 
+
+    /**
+     * 根据用户id获取部门
+     * @param openUserid
+     * @return
+     */
     public List<SysDept> selectUserDeptList(String openUserid);
 
     /**
@@ -114,4 +120,12 @@ public interface ISysDeptService {
      * 同步部门
      */
     public List<SysDept> syncWeDepartment(String corpId);
+
+
+    /**
+     * 根据部门id批量获取部门
+     * @param deptIds
+     * @return
+     */
+    List<SysDept> findSysDeptByIds(List<String> deptIds);
 }

@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.system;
 
+import cn.hutool.core.util.ArrayUtil;
 import com.linkwechat.common.constant.UserConstants;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.controller.BaseController;
@@ -18,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -45,6 +47,23 @@ public class SysDeptController extends BaseController {
     public AjaxResult list(SysDept dept) {
         List<SysDept> depts = deptService.selectDeptList(dept);
         return AjaxResult.success(depts);
+    }
+
+
+    /**
+     * 根据部门id批量获取部门
+     * @param deptIds
+     * @return
+     */
+    @GetMapping("/findSysDeptByIds")
+    public AjaxResult<List<SysDept>> findSysDeptByIds(String deptIds){
+
+
+        return AjaxResult.success(
+                deptService.findSysDeptByIds(
+                        Arrays.asList(deptIds.split(","))
+                )
+        );
     }
 
     /**
