@@ -17,7 +17,7 @@ import java.util.Date;
 public class WeAgentMsgListQuery {
 
     @ApiModelProperty("应用ID")
-    private Integer id;
+    private Integer agentId;
 
     @ApiModelProperty("标题")
     private String title;

@@ -125,7 +125,7 @@
             wgm.msg_type
         from we_agent_msg wgm
         <where>
-            and wgm.agent_id = #{id}
+            and wgm.agent_id = #{agentId}
             and wgm.del_flag = 0
             <if test="title != null and title != ''">
                 and wgm.msg_title like concat('%', #{title}, '%')

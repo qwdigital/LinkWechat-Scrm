@@ -50,21 +50,29 @@ public class WeAgentMsgServiceImpl extends ServiceImpl<WeAgentMsgMapper, WeAgent
         WeAgentMsg agentMsg = new WeAgentMsg();
         agentMsg.setStatus(query.getStatus());
         agentMsg.setAgentId(query.getAgentId());
-        agentMsg.setTitle(query.getTitle());
+        agentMsg.setMsgTitle(query.getTitle());
         agentMsg.setScopeType(query.getScopeType());
         agentMsg.setSendType(query.getSendType());
         agentMsg.setPlanSendTime(query.getPlanSendTime());
-        agentMsg.setToUser(String.join(",", query.getToUser()));
-        agentMsg.setToParty(String.join(",", query.getToParty()));
-        agentMsg.setToTag(String.join(",", query.getToTag()));
+        if(CollectionUtil.isNotEmpty(query.getToUser())){
+            agentMsg.setToUser(String.join(",", query.getToUser()));
+        }
+
+        if(CollectionUtil.isNotEmpty(query.getToParty())){
+            agentMsg.setToParty(String.join(",", query.getToParty()));
+        }
+        if(CollectionUtil.isNotEmpty(query.getToTag())){
+            agentMsg.setToTag(String.join(",", query.getToTag()));
+        }
         agentMsg.setMsgType(query.getWeMessageTemplate().getMsgType());
+        agentMsg.setTitle(query.getWeMessageTemplate().getTitle());
         agentMsg.setDescription(query.getWeMessageTemplate().getDescription());
         agentMsg.setFileUrl(query.getWeMessageTemplate().getFileUrl());
         agentMsg.setLinkUrl(query.getWeMessageTemplate().getLinkUrl());
         agentMsg.setContent(query.getWeMessageTemplate().getContent());
         agentMsg.setPicUrl(query.getWeMessageTemplate().getPicUrl());
         agentMsg.setAppId(query.getWeMessageTemplate().getAppId());
-        if (save(agentMsg) && Objects.equals(1, query.getStatus()) && Objects.equals(2, query.getSendType())) {
+        if (save(agentMsg) && Objects.equals(1, query.getStatus()) && Objects.equals(1, query.getSendType())) {
             QwAppMsgBody body = new QwAppMsgBody();
             body.setMessageTemplates(query.getWeMessageTemplate());
             body.setBusinessType(QwAppMsgBusinessTypeEnum.AGENT.getType());
@@ -146,7 +154,7 @@ public class WeAgentMsgServiceImpl extends ServiceImpl<WeAgentMsgMapper, WeAgent
 
     @Override
     public List<WeAgentMsgListVo> getMsgList(WeAgentMsgListQuery query) {
-        if(Objects.isNull(query.getId())){
+        if(Objects.isNull(query.getAgentId())){
             throw new WeComException("应用ID不能为空");
         }
         return this.baseMapper.getMsgList(query);
