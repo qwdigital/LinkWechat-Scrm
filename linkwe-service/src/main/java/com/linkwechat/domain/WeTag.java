@@ -54,7 +54,7 @@ public class WeTag extends BaseEntity {
     /**
      * 0:正常;1:删除;
      */
-    @TableLogic
+//    @TableLogic
     private Integer delFlag;
 
 
