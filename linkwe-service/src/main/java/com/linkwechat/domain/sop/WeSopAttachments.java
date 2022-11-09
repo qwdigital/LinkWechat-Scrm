@@ -17,7 +17,7 @@ public class WeSopAttachments extends BaseEntity {
     /**
      * 主键id
      */
-    @TableId(type = IdType.AUTO)
+    @TableId
     private Long id;
 
 

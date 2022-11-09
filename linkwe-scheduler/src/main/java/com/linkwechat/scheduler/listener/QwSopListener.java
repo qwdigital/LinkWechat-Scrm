@@ -24,7 +24,6 @@ public class QwSopListener {
 
 
 
-    //生成执行任务即数据入库 we_sop_execute_target we_sop_execute_target_attachments
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.sop:Qu_Sop}")
     public void sopSubscribe(String msg, Channel channel, Message message){
