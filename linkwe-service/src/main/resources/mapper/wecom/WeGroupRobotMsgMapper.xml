@@ -7,6 +7,7 @@
     <resultMap type="com.linkwechat.domain.WeGroupRobotMsg" id="WeGroupRobotMsgResult">
                 <result property="id" column="id" jdbcType="INTEGER"/>
                 <result property="robotId" column="robot_id" jdbcType="INTEGER"/>
+                <result property="msgTitle" column="msg_title" jdbcType="VARCHAR"/>
                 <result property="sendTime" column="send_time" jdbcType="TIMESTAMP"/>
                 <result property="status" column="status" jdbcType="INTEGER"/>
                 <result property="msgType" column="msg_type" jdbcType="VARCHAR"/>
@@ -27,7 +28,7 @@
             </resultMap>
 
     <sql id="selectWeGroupRobotMsgVo">
-        select id, robot_id, send_time, status, msg_type, content, title, description, file_url, link_url, pic_url, app_id, create_time, create_by, create_by_id, update_time, update_by, update_by_id, del_flag from we_group_robot_msg
+        select id, robot_id,msg_title, send_time, status, msg_type, content, title, description, file_url, link_url, pic_url, app_id, create_time, create_by, create_by_id, update_time, update_by, update_by_id, del_flag from we_group_robot_msg
     </sql>
 
 </mapper>
