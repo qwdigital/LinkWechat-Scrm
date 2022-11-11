@@ -46,6 +46,14 @@ public class WeGroupRobotMsg extends BaseEntity implements Serializable {
 
 
     /**
+     * 应用消息标题
+     */
+    @ApiModelProperty(value = "应用消息标题")
+    @TableField("msg_title")
+    private String msgTitle;
+
+
+    /**
      * 发送时间
      */
     @ApiModelProperty(value = "发送时间")

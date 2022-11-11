@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
- * @author sxw
+ * @author danmo
  * @date 2022年11月04日 22:33
  */
 @ApiModel
@@ -22,7 +22,7 @@ public class WeAgentMsgListQuery {
     @ApiModelProperty("标题")
     private String title;
 
-    @ApiModelProperty("状态")
+    @ApiModelProperty("消息状态：0-草稿 1-待发送 2-已发送 3-发送失败")
     private Integer status;
 
     @ApiModelProperty("发送开始时间")

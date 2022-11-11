@@ -3,8 +3,12 @@ package com.linkwechat.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
-import com.linkwechat.domain.agent.vo.LwAgentListVo;
+import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.domain.WeGroupRobotInfo;
+import com.linkwechat.domain.WeGroupRobotMsg;
 import com.linkwechat.domain.robot.query.WeRobotAddQuery;
+import com.linkwechat.domain.robot.query.WeRobotMsgAddQuery;
+import com.linkwechat.domain.robot.query.WeRobotMsgListQuery;
 import com.linkwechat.domain.robot.query.WeRobotQuery;
 import com.linkwechat.service.IWeGroupRobotInfoService;
 import com.linkwechat.service.IWeGroupRobotMsgService;
@@ -54,65 +58,37 @@ public class WeGroupRobotController extends BaseController {
 
     @ApiOperation(value = "获取机器人列表", httpMethod = "GET")
     @GetMapping("/list")
-    public AjaxResult<LwAgentListVo> getList(WeRobotQuery query) {
+    public TableDataInfo<WeGroupRobotInfo> getList(WeRobotQuery query) {
         log.info("获取机器人列表接口");
-        //List<LwAgentListVo> list = weGroupRobotInfoService.getList(query);
-        return AjaxResult.success();
+        super.startPage();
+        List<WeGroupRobotInfo> list = weGroupRobotInfoService.getList(query);
+        return getDataTable(list);
     }
 
-    /*
 
-
-
-
-
-    @ApiOperation(value = "删除应用", httpMethod = "DELETE")
+    @ApiOperation(value = "删除机器人", httpMethod = "DELETE")
     @DeleteMapping("/delete/{id}")
-    public AjaxResult<LwAgentListVo> deleteAgent(@PathVariable("id") Integer id) {
-        log.info("删除应用入参query:{}", id);
-        weAgentInfoService.deleteAgent(id);
+    public AjaxResult deleteGroupRobot(@PathVariable("id") Long id) {
+        log.info("删除机器人入参query:{}", id);
+        weGroupRobotInfoService.deleteGroupRobot(id);
         return AjaxResult.success();
     }
 
-    @ApiOperation(value = "获取历史消息列表", httpMethod = "GET")
+    @ApiOperation(value = "获取机器人历史消息列表", httpMethod = "GET")
     @GetMapping("/msg/list")
-    public AjaxResult<WeAgentMsgListVo> getMsgList(@RequestBody WeAgentMsgListQuery query) {
-        return AjaxResult.success();
+    public TableDataInfo<WeGroupRobotMsg> getMsgList(WeRobotMsgListQuery query) {
+        log.info("获取机器人历史消息列表入参query:{}", JSONObject.toJSONString(query));
+        super.startPage();
+        List<WeGroupRobotMsg> list = weGroupRobotMsgService.getMsgList(query);
+        return getDataTable(list);
     }
 
-    @ApiOperation(value = "新增应用消息", httpMethod = "POST")
+    @ApiOperation(value = "发送群机器人消息", httpMethod = "POST")
     @PostMapping("/msg/add")
-    public AjaxResult addMsg(@RequestBody WeAgentMsgAddQuery query) {
-        log.info("新增应用消息入参query:{}", JSONObject.toJSONString(query));
-        weAgentMsgService.addMsg(query);
+    public AjaxResult addRobotMsg(@Validated @RequestBody WeRobotMsgAddQuery query) {
+        log.info("发送群机器人消息入参query:{}", JSONObject.toJSONString(query));
+        weGroupRobotMsgService.addRobotMsg(query);
         return AjaxResult.success();
     }
-
-    @ApiOperation(value = "修改应用消息", httpMethod = "PUT")
-    @PutMapping("/msg/update/{id}")
-    public AjaxResult updateMsg(@PathVariable("id") Long id, @RequestBody WeAgentMsgAddQuery query) {
-        query.setId(id);
-        log.info("修改应用消息入参query:{}", JSONObject.toJSONString(query));
-        weAgentMsgService.updateMsg(query);
-        return AjaxResult.success();
-    }
-
-    @ApiOperation(value = "删除应用消息", httpMethod = "DELETE")
-    @DeleteMapping("/msg/delete/{id}")
-    public AjaxResult deleteMsg(@PathVariable("id") Long id) {
-        log.info("删除应用消息入参query:{}", id);
-        weAgentMsgService.deleteMsg(id);
-        return AjaxResult.success();
-    }
-
-    @ApiOperation(value = "应用消息详情", httpMethod = "GET")
-    @GetMapping("/msg/get/{id}")
-    public AjaxResult<WeAgentMsgVo> getMsgInfo(@PathVariable("id") Long id) {
-        log.info("应用消息详情入参query:{}", id);
-        weAgentMsgService.getMsgInfo(id);
-        return AjaxResult.success();
-    }
-
-   */
 
 }

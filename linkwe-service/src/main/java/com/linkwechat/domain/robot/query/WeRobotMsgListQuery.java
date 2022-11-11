@@ -1,4 +1,4 @@
-package com.linkwechat.domain.agent.query;
+package com.linkwechat.domain.robot.query;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -13,12 +13,15 @@ import java.util.Date;
  */
 @ApiModel
 @Data
-public class WeAgentMsgQuery {
+public class WeRobotMsgListQuery {
+
+    @ApiModelProperty("机器人ID")
+    private Long robotId;
 
     @ApiModelProperty("标题")
     private String title;
 
-    @ApiModelProperty("状态")
+    @ApiModelProperty("消息状态：0-草稿 1-待发送 2-已发送 3-发送失败")
     private Integer status;
 
     @ApiModelProperty("发送开始时间")
