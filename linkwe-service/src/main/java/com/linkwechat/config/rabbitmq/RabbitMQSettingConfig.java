@@ -254,4 +254,8 @@ public class RabbitMQSettingConfig {
     //商品图册同步队列
     @Value("${wecom.mq.queue.sync.product:Qu_Product}")
     private String weProductQu;
+
+    //sop相关数据同步队列
+    @Value("${wecom.mq.queue.sop-qu:Qu_Sop}")
+    private String sopQu;
 }

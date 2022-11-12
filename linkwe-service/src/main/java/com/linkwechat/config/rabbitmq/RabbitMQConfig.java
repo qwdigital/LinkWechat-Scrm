@@ -523,5 +523,35 @@ public class RabbitMQConfig {
     public Binding bindingExchangeProduct() {
         return BindingBuilder.bind(quProduct()).to(syncEx()).with(rabbitMQSettingConfig.getWeProductRk()).noargs();
     }
+
+    /**
+     * sop队列绑定交换机
+     * @return
+     */
+    @Bean
+    public Binding bindingSopExchange(){
+        return BindingBuilder.bind(sopQu()).to(sopEx()).with(rabbitMQSettingConfig.getSopRk()).noargs();
+    }
+
+
+    /**
+     * sop队列
+     * @return
+     */
+    @Bean
+    public Queue sopQu(){
+        return new Queue(rabbitMQSettingConfig.getSopQu());
+    }
+
+    /**
+     * sop交换机
+     * @return
+     */
+    @Bean
+    public Exchange sopEx(){
+        // 声明路由交换机，durable:在rabbitmq重启后，交换机还在
+        return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getSopEx()).durable(true).build();
+    }
+
 }
 
