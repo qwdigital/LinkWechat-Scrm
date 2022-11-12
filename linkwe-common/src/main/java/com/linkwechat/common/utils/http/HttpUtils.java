@@ -120,7 +120,7 @@ public class HttpUtils
         try
         {
             String urlNameString = url;
-            log.info("sendPost - {}", urlNameString);
+            log.info("sendPost - {} \n param - {}", urlNameString, param);
             URL realUrl = new URL(urlNameString);
             URLConnection conn = realUrl.openConnection();
             conn.setRequestProperty("accept", "*/*");
