@@ -2,6 +2,8 @@ package com.linkwechat.fegin;
 
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.wecom.query.msg.WeAppMsgQuery;
+import com.linkwechat.domain.wecom.query.msg.WeRecallMsgQuery;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.msg.WeAppMsgVo;
 import com.linkwechat.fallback.QwAppMsgFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -23,4 +25,23 @@ public interface QwAppMsgClient {
      */
     @PostMapping("/message/send")
     public AjaxResult<WeAppMsgVo> sendAppMsg(@RequestBody WeAppMsgQuery query);
+
+    /**
+     * 撤回通用应用消息通知
+     *
+     * @param query
+     * @return
+     */
+    @PostMapping("/message/recall")
+    public AjaxResult<WeResultVo> recallAppMsg(@RequestBody WeRecallMsgQuery query);
+
+
+    /**
+     * 撤回应用消息通知
+     *
+     * @param query
+     * @return
+     */
+    @PostMapping("/message/agent/recall")
+    public AjaxResult<WeResultVo> recallAgentAppMsg(@RequestBody WeRecallMsgQuery query);
 }

@@ -19,6 +19,11 @@ public class QwAppMsgBody {
     private Integer businessType = 1;
 
     /**
+     * 回调主键
+     */
+    private Long callBackId;
+
+    /**
      * 企业ID
      */
     private String corpId;
@@ -31,7 +36,7 @@ public class QwAppMsgBody {
     /**
      * 企业部门ID
      */
-    private List<Integer> deptIds;
+    private List<String> deptIds;
 
     /**
      * 客户标签ID

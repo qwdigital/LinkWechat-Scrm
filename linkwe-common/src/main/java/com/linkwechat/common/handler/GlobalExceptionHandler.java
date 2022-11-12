@@ -77,7 +77,11 @@ public class GlobalExceptionHandler {
     public AjaxResult handleRuntimeException(RuntimeException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',发生未知异常.", requestURI, e);
-        return AjaxResult.error(e.getMessage());
+        String msg = e.getMessage();
+        if (StringUtils.isEmpty(msg)) {
+            msg = "未知异常";
+        }
+        return AjaxResult.error(msg);
     }
 
     /**
@@ -131,20 +135,21 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(WeComException.class)
     public AjaxResult handleWeComException(WeComException e) {
-        return AjaxResult.error(e.getCode(),e.getMessage());
+        return AjaxResult.error(e.getCode(), e.getMessage());
     }
 
     /**
      * 企微接口异常
+     *
      * @param e
      * @return
      */
     @ExceptionHandler(ForestRuntimeException.class)
     public AjaxResult handleForestRuntimeException(ForestRuntimeException e) {
-        if(e.getCause() instanceof WeComException){
-            WeComException weComException =(WeComException) e.getCause();
-            return AjaxResult.error(weComException.getCode(),e.getMessage());
-        }else {
+        if (e.getCause() instanceof WeComException) {
+            WeComException weComException = (WeComException) e.getCause();
+            return AjaxResult.error(weComException.getCode(), e.getMessage());
+        } else {
             return AjaxResult.error(e.getMessage());
         }
 

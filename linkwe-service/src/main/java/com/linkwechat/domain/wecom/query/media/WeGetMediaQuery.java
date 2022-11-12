@@ -6,7 +6,7 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 获取素材入参
  * @date 2022/05/04 11:54
  **/

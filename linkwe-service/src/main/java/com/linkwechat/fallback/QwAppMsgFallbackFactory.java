@@ -3,6 +3,8 @@ package com.linkwechat.fallback;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.wecom.query.department.WeDeptQuery;
 import com.linkwechat.domain.wecom.query.msg.WeAppMsgQuery;
+import com.linkwechat.domain.wecom.query.msg.WeRecallMsgQuery;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.department.WeDeptVo;
 import com.linkwechat.domain.wecom.vo.msg.WeAppMsgVo;
 import com.linkwechat.fegin.QwAppMsgClient;
@@ -20,6 +22,16 @@ public class QwAppMsgFallbackFactory implements QwAppMsgClient {
 
     @Override
     public AjaxResult<WeAppMsgVo> sendAppMsg(WeAppMsgQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<WeResultVo> recallAppMsg(WeRecallMsgQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<WeResultVo> recallAgentAppMsg(WeRecallMsgQuery query) {
         return null;
     }
 }
