@@ -30,4 +30,7 @@ public interface IQwAccessTokenService {
 
    public void removeAddressBookAccessToken(String corpId);
 
+   public String findAgentAccessToken(String corpId, Integer agentId);
+
+   void removeAgentAccessToken(String corpId, Integer agentId);
 }

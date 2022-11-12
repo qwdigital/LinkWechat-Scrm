@@ -3,9 +3,12 @@ package com.linkwechat.wecom.service.impl;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.WeAgentInfo;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.wecom.vo.WeCorpTokenVo;
+import com.linkwechat.service.IWeAgentInfoService;
 import com.linkwechat.service.IWeCorpAccountService;
 import com.linkwechat.wecom.client.WeTokenClient;
 import com.linkwechat.wecom.service.IQwAccessTokenService;
@@ -34,6 +37,9 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
 
     @Autowired
     private RedisService redisService;
+
+    @Autowired
+    private IWeAgentInfoService weAgentInfoService;
 
 
     /**
@@ -144,5 +150,30 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
     @Override
     public void removeAddressBookAccessToken(String corpId) {
         redisService.deleteObject(StringUtils.format(WeConstans.WE_ADDRESS_BOOK_ACCESS_TOKEN, corpId));
+    }
+
+    @Override
+    public String findAgentAccessToken(String corpId, Integer agentId) {
+        String weAgentTokenKey = StringUtils.format(WeConstans.WE_AGENT_ACCESS_TOKEN ,corpId,agentId);
+        String weAccessToken = redisService.getCacheObject(weAgentTokenKey);
+        //为空,请求微信服务器同时缓存到redis中
+        if (StringUtils.isEmpty(weAccessToken)) {
+            WeAgentInfo weAgentInfo = weAgentInfoService.getAgentInfoByAgentId(agentId);
+            if (Objects.isNull(weAgentInfo)) {
+                throw new WeComException("无可用的应用");
+            }
+            WeCorpTokenVo weCorpTokenVo = weTokenClient.getToken(corpId, weAgentInfo.getSecret());
+
+            if (Objects.nonNull(weCorpTokenVo) && StringUtils.isNotEmpty(weCorpTokenVo.getAccessToken())) {
+                weAccessToken = weCorpTokenVo.getAccessToken();
+                redisService.setCacheObject(weAgentTokenKey, weCorpTokenVo.getAccessToken(), weCorpTokenVo.getExpiresIn(), TimeUnit.SECONDS);
+            }
+        }
+        return weAccessToken;
+    }
+
+    @Override
+    public void removeAgentAccessToken(String corpId, Integer agentId) {
+        redisService.deleteObject(StringUtils.format(WeConstans.WE_AGENT_ACCESS_TOKEN, corpId,agentId));
     }
 }

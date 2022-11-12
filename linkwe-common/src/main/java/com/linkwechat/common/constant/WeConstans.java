@@ -27,6 +27,8 @@ public class WeConstans {
      */
     public static final String WE_COMMON_ACCESS_TOKEN = "we_common_access_token:{}";
 
+    public static final String WE_AGENT_ACCESS_TOKEN = "we_agent_access_token:{}:{}";
+
     /**
      * 获取外部联系人相关 token
      */
