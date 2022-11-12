@@ -374,10 +374,6 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
         }
     }
 
-    @Override
-    public List<LinkGroupChatListVo> selectWeGroupListByApp(WeGroupChatQuery query) {
-        return this.baseMapper.selectWeGroupListByApp(query);
-    }
 
 
 }

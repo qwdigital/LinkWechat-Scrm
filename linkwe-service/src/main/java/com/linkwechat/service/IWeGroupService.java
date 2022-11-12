@@ -98,11 +98,6 @@ public interface IWeGroupService extends IService<WeGroup> {
     void changeGroup(String chatId, String updateDetail);
 
 
-    /**
-     *  应用获取客群数据(不做数据权限过滤)
-     * @param query
-     * @return
-     */
-    List<LinkGroupChatListVo> selectWeGroupListByApp(WeGroupChatQuery query);
+
 
 }

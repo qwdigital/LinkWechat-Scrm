@@ -161,7 +161,7 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
 
     @Override
     public WeResultVo sendWelcomeMsg(WeWelcomeMsgQuery query) {
-        query.setAttachmentsList(linkWeChatConfig.getDomain(),query.getMessageTemplates());
+        query.setAttachmentsList(linkWeChatConfig.getH5Domain(),query.getMessageTemplates());
         return weCustomerClient.sendWelcomeMsg(query);
     }
 
