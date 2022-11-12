@@ -1,5 +1,6 @@
 package com.linkwechat.web.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.annotation.DataScope;
@@ -289,6 +290,12 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
         }).collect(Collectors.toList());
         saveOrUpdateBatch(sysDeptList);
         return sysDeptList;
+    }
+
+    @Override
+    public List<SysDept> findSysDeptByIds(List<String> deptIds) {
+        return this.baseMapper.selectList(new LambdaQueryWrapper<SysDept>()
+                .in(SysDept::getDeptId,deptIds));
     }
 
     /**

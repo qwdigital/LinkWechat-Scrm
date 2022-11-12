@@ -6,7 +6,10 @@ import com.linkwechat.domain.WeGroupMessageTemplate;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -34,12 +37,18 @@ public class WeAddGroupMessageQuery extends WeGroupMessageTemplate {
     @ApiModelProperty(value = "当前用户",hidden = true)
     private LoginUser loginUser;
 
+    //是否来自sop true:是;false:否
+    private boolean sopSource=false;
+
     public void setCurrentUserInfo(LoginUser loginUser) {
         this.loginUser = loginUser;
     }
 
     @ApiModel
     @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class SenderInfo {
 
         @ApiModelProperty("成员id")

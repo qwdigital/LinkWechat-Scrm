@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author sxw
+ * @author danmo
  * @description rabbitmq
  * @date 2022/3/10 11:44
  **/
@@ -75,6 +75,11 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.exchange.journey.delay:Ex_JourneyDelay}")
     private String weJourneyEx;
 
+    /**
+     * sop交换机
+     */
+    @Value("${wecom.mq.exchange.sop-ex:Ex_Sop}")
+    private String sopEx;
     /**
      * -------------------路由------------------------------------
      */
@@ -170,9 +175,14 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.delay-journey:Rk_DelayGourney}")
     private String weDelayJourneyRk;
 
+
     //商品图册同步路由
     @Value("${wecom.mq.route.sync.product:Rk_Product}")
     private String weProductRk;
+
+    //sop通知路由
+    @Value("${wecom.mq.route.sop-rk:rk_sop}")
+    private String sopRk;
 
     /**
      * -------------------队列------------------------------------
@@ -272,4 +282,8 @@ public class RabbitMQSettingConfig {
     //商品图册同步队列
     @Value("${wecom.mq.queue.sync.product:Qu_Product}")
     private String weProductQu;
+
+    //sop相关数据同步队列
+    @Value("${wecom.mq.queue.sop-qu:Qu_Sop}")
+    private String sopQu;
 }

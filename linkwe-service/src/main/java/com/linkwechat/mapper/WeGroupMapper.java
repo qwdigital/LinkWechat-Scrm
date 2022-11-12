@@ -42,5 +42,7 @@ public interface WeGroupMapper extends BaseMapper<WeGroup> {
 
     
     LinkGroupChatListVo selectWeGroupDetail(@Param("chatId") String chatId);
+
+    List<LinkGroupChatListVo> selectWeGroupListByApp(WeGroupChatQuery query);
 }
 

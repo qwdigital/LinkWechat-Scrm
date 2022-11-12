@@ -45,7 +45,7 @@ public class WeFlowerCustomerTagRel extends BaseEntity {
     /**
      *
      */
-    @TableLogic
+//    @TableLogic
     private Integer delFlag;
 
 

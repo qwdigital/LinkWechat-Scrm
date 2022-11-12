@@ -499,7 +499,35 @@
         update_time=IFNULL(VALUES(update_time), sys_user.update_time),
         remark=IFNULL(VALUES(remark), sys_user.remark);
 
-
     </update>
 
+    <select id="findAllSysUser" resultType="com.linkwechat.common.core.domain.entity.SysUser">
+        SELECT
+        su.*
+        FROM
+        sys_user su
+        LEFT JOIN sys_user_dept sud on su.user_id=sud.user_id
+        WHERE
+        su.del_flag = 0
+        <if test="weUserIds !='' and weUserIds !=null">
+           and su.we_user_id in
+            <foreach collection="weUserIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="positions !='' and positions !=null">
+            and su.position in
+            <foreach collection="positions.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="deptIds != null and deptIds != ''">
+            and sud.dept_id in
+            <foreach collection="deptIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+
+    </select>
 </mapper> 

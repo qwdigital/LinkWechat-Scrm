@@ -6,6 +6,7 @@ import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.fegin.QwSysUserClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -49,6 +50,12 @@ public class QwSysUserFallbackFactory implements QwSysUserClient {
 
     @Override
     public AjaxResult<List<SysUser>> list(SysUser sysUser) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<List<SysUser>> findAllSysUser(@RequestParam("weUserIds") String weUserIds,
+                                                    @RequestParam("positions") String positions,@RequestParam("deptIds") String deptIds) {
         return null;
     }
 

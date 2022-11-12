@@ -735,6 +735,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         updateById(sysUser);
     }
 
+    @Override
+    public List<SysUser> findAllSysUser(String weUserIds, String positions, String deptIds) {
+        return this.baseMapper.findAllSysUser(weUserIds,positions,deptIds);
+    }
+
 
     private SysUserDept userDeptGenerator(WeUserDetailVo u, int index) {
         SysUserDept userDept = new SysUserDept();

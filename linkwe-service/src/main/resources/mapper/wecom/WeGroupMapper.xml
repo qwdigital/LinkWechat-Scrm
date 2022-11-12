@@ -255,4 +255,59 @@
         WHERE wgm.user_id=#{externalUserid}
         GROUP BY wg.chat_id
     </select>
+
+    <select id="selectWeGroupListByApp" resultType="com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo">
+        select a.* from
+        (
+        SELECT
+        wg.chat_id,
+        wg.add_time,
+        wg.`owner`,
+        wg.group_name,
+        GROUP_CONCAT(DISTINCT su.user_name) as groupLeaderName,
+        (SELECT count(*) FROM we_group_member wgm WHERE wgm.chat_id=wg.chat_id and wgm.del_flag=0 ) as memberNum,
+        GROUP_CONCAT(distinct wgtr.tag_id) as tagIds
+        FROM
+        we_group wg
+        LEFT JOIN we_group_tag_rel wgtr ON wg.chat_id=wgtr.chat_id
+        LEFT JOIN sys_user su ON su.we_user_id=wg.owner
+        WHERE
+        wg.del_flag=0
+        <if test="groupName != null  and groupName != ''">AND CONCAT( IFNULL(wg.group_name,''),IFNULL(su.user_name,''))
+            LIKE CONCAT(
+            '%',#{groupName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(wg.add_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+        </if>
+        <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(wg.add_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+        </if>
+        <if test="userIds != null and userIds !=''">
+            <if test="userIds.indexOf(',') != -1">
+                AND wg.`owner` in
+                <foreach item="item" index="index" collection="userIds.split(',')" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="userIds.indexOf(',') == -1">
+                AND wg.`owner`=#{userIds}
+            </if>
+        </if>
+        GROUP BY wg.chat_id
+        )a
+        <where>
+            <if test="tagIds != null and tagIds !=''">
+                <foreach item="tagId" index="index" collection="tagIds.split(',')">
+                    AND FIND_IN_SET(#{tagId},a.tagIds)
+                </foreach>
+            </if>
+
+            <if test="groupMemberUp !=null and groupMemberDown !=null">
+                AND  a.memberNum BETWEEN #{groupMemberDown} AND #{groupMemberUp}
+            </if>
+        </where>
+
+    </select>
+
 </mapper>
