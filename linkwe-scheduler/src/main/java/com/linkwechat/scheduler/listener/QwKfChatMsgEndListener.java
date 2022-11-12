@@ -47,8 +47,6 @@ import java.util.Objects;
 @Slf4j
 public class QwKfChatMsgEndListener {
 
-    @Autowired
-    private IWeCorpAccountService weCorpAccountService;
 
     @Autowired
     private RedisService redisService;
