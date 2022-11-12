@@ -78,9 +78,9 @@ public class LinkWeChatConfig {
     private String lostCustomerRedirectUrl;
 
     /**
-     * 域名
+     * 移动端域名
      */
-    private String domain;
+    private String h5Domain;
 
 
 

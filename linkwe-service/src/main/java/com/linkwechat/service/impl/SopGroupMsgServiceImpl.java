@@ -72,7 +72,7 @@ public class SopGroupMsgServiceImpl extends AbstractGroupMsgSendTaskService {
                     }
 
                     getMediaId(query.getAttachmentsList());
-                    templateQuery.setAttachmentsList(linkWeChatConfig.getDomain(),query.getAttachmentsList());
+                    templateQuery.setAttachmentsList(linkWeChatConfig.getH5Domain(),query.getAttachmentsList());
                     WeAddCustomerMsgVo weAddCustomerMsgVo = qwCustomerClient.addMsgTemplate(templateQuery).getData();
                     if (weAddCustomerMsgVo != null && ObjectUtil.equal(WeConstans.WE_SUCCESS_CODE, weAddCustomerMsgVo.getErrCode())) {
                         targetAttachments.stream().forEach(targetAttachment->{

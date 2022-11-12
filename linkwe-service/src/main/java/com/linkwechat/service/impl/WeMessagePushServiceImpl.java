@@ -7,7 +7,6 @@ import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.enums.MessageNoticeType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
-import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeCorpAccount;
@@ -20,8 +19,6 @@ import com.linkwechat.service.QwAppSendMsgService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
 
@@ -41,18 +38,17 @@ public class WeMessagePushServiceImpl implements IWeMessagePushService {
 
 
     @Autowired
+    private RabbitMQSettingConfig rabbitMQSettingConfig;
+
+    @Autowired
     private RabbitTemplate rabbitTemplate;
 
 
-    @Autowired
-    private RabbitMQSettingConfig rabbitMQSettingConfig;
 
 
 
     @Override
     public void pushMessageSelfH5(List<String> toUser, String textContent, Integer taskType,boolean isJumpUrl) {
-
-
         if(CollectionUtil.isEmpty(toUser)){
             throw new WeComException("接受人不可为空");
         }
@@ -92,44 +88,55 @@ public class WeMessagePushServiceImpl implements IWeMessagePushService {
                     if(StringUtils.isEmpty( linkWeChatConfig.getSeasRedirectUrl())){
                         throw new WeComException("客户公海H5跳转链接不可为空");
                     }
-                    REDIRECT_URI= URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s",
-                            linkWeChatConfig.getSeasRedirectUrl()
-                            , weCorpAccount.getCorpId(), weCorpAccount.getAgentId()));
+//                    REDIRECT_URI= URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s",
+//                            linkWeChatConfig.getSeasRedirectUrl()
+//                            , weCorpAccount.getCorpId(), weCorpAccount.getAgentId()));
+                    REDIRECT_URI= linkWeChatConfig.getSeasRedirectUrl();
                 }else if(taskType.equals(MessageNoticeType.DELETEWEUSER.getType())){//客户删除员工
                     if(StringUtils.isEmpty( linkWeChatConfig.getLostCustomerRedirectUrl())){
                         throw new WeComException("流失客户H5跳转链接不可为空");
                     }
-                    REDIRECT_URI= URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s",
-                            linkWeChatConfig.getLostCustomerRedirectUrl()
-                            , weCorpAccount.getCorpId(), weCorpAccount.getAgentId()));
+//                    REDIRECT_URI= URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s",
+//                            linkWeChatConfig.getLostCustomerRedirectUrl()
+//                            , weCorpAccount.getCorpId(), weCorpAccount.getAgentId()));
+
+                    REDIRECT_URI=  linkWeChatConfig.getLostCustomerRedirectUrl();
                 } else if(taskType.equals(MessageNoticeType.CUSTOMER_SOP.getType())){//客户sop
 
                     if(StringUtils.isEmpty(linkWeChatConfig.getCustomerSopRedirectUrl())){
                         throw new WeComException("客户SOP的H5跳转链接不可为空");
                     }
-                    REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s",
-                            linkWeChatConfig.getCustomerSopRedirectUrl(), weCorpAccount.getCorpId(), weCorpAccount.getAgentId(),taskType));
+//                    REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s",
+//                            linkWeChatConfig.getCustomerSopRedirectUrl(), weCorpAccount.getCorpId(), weCorpAccount.getAgentId(),taskType));
+
+                    REDIRECT_URI = linkWeChatConfig.getCustomerSopRedirectUrl();
 
                 }else if(taskType.equals(MessageNoticeType.GROUP_SOP.getType())){//客群sop
 
                     if(StringUtils.isEmpty(linkWeChatConfig.getGroupSopRedirectUrl())){
                         throw new WeComException("客群SOP的H5跳转链接不可为空");
                     }
-                    REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s",
-                            linkWeChatConfig.getGroupSopRedirectUrl(), weCorpAccount.getCorpId(), weCorpAccount.getAgentId(),taskType));
+//                    REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s",
+//                            linkWeChatConfig.getGroupSopRedirectUrl(), weCorpAccount.getCorpId(), weCorpAccount.getAgentId(),taskType));
+
+                    REDIRECT_URI =  linkWeChatConfig.getGroupSopRedirectUrl();
 
                 }else{//老客标签建群
                     if(StringUtils.isEmpty( linkWeChatConfig.getTagRedirectUrl())){
                         throw new WeComException("标签建群H5跳转链接不可为空");
                     }
-                    REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s", linkWeChatConfig.getTagRedirectUrl(), weCorpAccount.getCorpId(), weCorpAccount.getAgentId(),taskType));
+//                    REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s", linkWeChatConfig.getTagRedirectUrl(),
+//                            weCorpAccount.getCorpId(), weCorpAccount.getAgentId(),taskType));
+
+                    REDIRECT_URI = linkWeChatConfig.getTagRedirectUrl();
 
                 }
 
                 if(StringUtils.isNotEmpty(REDIRECT_URI)){
-                    String context = String.format(
-                            textContent+"<br/><br/> <a href='%s?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'>请点击此链接查看</a>",
-                            linkWeChatConfig.getAuthorizeUrl(),  weCorpAccount.getCorpId(), REDIRECT_URI);
+//                    String context = String.format(
+//                            textContent+"<br/><br/> <a href='%s?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect'>请点击此链接查看</a>",
+//                            linkWeChatConfig.getAuthorizeUrl(),  weCorpAccount.getCorpId(), REDIRECT_URI);
+                    String context = textContent+"<br/><br/> <a href='"+REDIRECT_URI+"'>请点击此链接查看</a>";
                     template.setContent(context);
                     qwAppMsgBody.setMessageTemplates(template);
                     // 请求消息推送接口，获取结果 [消息推送 - 发送应用消息]
@@ -145,6 +152,8 @@ public class WeMessagePushServiceImpl implements IWeMessagePushService {
 
 
         }
+
+
 
 
 
@@ -168,5 +177,6 @@ public class WeMessagePushServiceImpl implements IWeMessagePushService {
             }
 
         }
+
     }
 }

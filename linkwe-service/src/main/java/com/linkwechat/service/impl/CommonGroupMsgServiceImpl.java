@@ -65,7 +65,7 @@ public class CommonGroupMsgServiceImpl extends AbstractGroupMsgSendTaskService {
                         templateQuery.setExternal_userid(sender.getCustomerList());
                     }
                     getMediaId(query.getAttachmentsList());
-                    templateQuery.setAttachmentsList(linkWeChatConfig.getDomain(),query.getAttachmentsList());
+                    templateQuery.setAttachmentsList(linkWeChatConfig.getH5Domain(),query.getAttachmentsList());
                     WeAddCustomerMsgVo weAddCustomerMsgVo = qwCustomerClient.addMsgTemplate(templateQuery).getData();
                     if (weAddCustomerMsgVo != null && ObjectUtil.equal(WeConstans.WE_SUCCESS_CODE, weAddCustomerMsgVo.getErrCode())) {
                         String msgid = weAddCustomerMsgVo.getMsgId();
