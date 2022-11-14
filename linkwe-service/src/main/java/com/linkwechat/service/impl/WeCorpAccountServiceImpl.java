@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -39,7 +40,7 @@ public class WeCorpAccountServiceImpl extends ServiceImpl<WeCorpAccountMapper, W
     public WeCorpAccount getCorpAccountByCorpId(String corpId) {
         return getOne(new LambdaQueryWrapper<WeCorpAccount>()
                 .eq(StringUtils.isNotEmpty(corpId),WeCorpAccount::getCorpId,corpId)
-                .eq(WeCorpAccount::getDelFlag,0).last("limit 1"));
+                .eq(WeCorpAccount::getDelFlag, Constants.COMMON_STATE).last("limit 1"));
     }
 
     @Override

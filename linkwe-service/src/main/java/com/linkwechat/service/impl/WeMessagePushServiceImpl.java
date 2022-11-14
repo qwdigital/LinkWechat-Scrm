@@ -64,7 +64,7 @@ public class WeMessagePushServiceImpl implements IWeMessagePushService {
 
 
         if(null != weCorpAccount){
-            if(StringUtils.isNotEmpty(weCorpAccount.getAgentId())){
+            if(StringUtils.isEmpty(weCorpAccount.getAgentId())){
                 throw new WeComException("应用相关配置不可为空");
             }
 
