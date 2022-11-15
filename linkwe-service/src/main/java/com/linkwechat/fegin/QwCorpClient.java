@@ -4,9 +4,11 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.agentdev.WeTransformExternalUserIdQuery;
 import com.linkwechat.domain.wecom.query.agentdev.WeTransformUserIdQuery;
+import com.linkwechat.domain.wecom.query.agentdev.WeUnionidTransformExternalUserIdQuery;
 import com.linkwechat.domain.wecom.vo.agentdev.WeTransformCorpVO;
 import com.linkwechat.domain.wecom.vo.agentdev.WeTransformExternalUserIdVO;
 import com.linkwechat.domain.wecom.vo.agentdev.WeTransformUserIdVO;
+import com.linkwechat.domain.wecom.vo.agentdev.WeUnionidTransformExternalUserIdVO;
 import com.linkwechat.fallback.QwCorpFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,4 +48,15 @@ public interface QwCorpClient {
      */
     @PostMapping("/corp/transformExternalUserId")
     public AjaxResult<WeTransformExternalUserIdVO> transformExternalUserId(@RequestBody WeTransformExternalUserIdQuery query);
+
+    /**
+     * unionid转换为第三方external_userid
+     *
+     * @param query
+     * @return {@link AjaxResult<  WeUnionidTransformExternalUserIdVO >}
+     * @author WangYX
+     * @date 2022/10/26 16:40
+     */
+    @PostMapping("/corp/unionidTransformExternalUserId")
+    public AjaxResult<WeUnionidTransformExternalUserIdVO> unionidTransformExteralUserId(@RequestBody WeUnionidTransformExternalUserIdQuery query);
 }

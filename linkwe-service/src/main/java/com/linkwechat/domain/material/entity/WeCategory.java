@@ -36,7 +36,7 @@ public class WeCategory extends BaseEntity {
 
 
     @ApiModelProperty("素材上级父节点id")
-    private Long parentId;
+    private Long parentId = 0L;
 
     @ApiModelProperty("可删除标识 0 可删除 1 不可删除")
     private Integer flag;

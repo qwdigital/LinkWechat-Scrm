@@ -2,6 +2,8 @@ package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.WeMsgTlp;
+import com.linkwechat.domain.material.entity.WeMaterial;
+import com.linkwechat.domain.msgtlp.dto.WeMsgTlpDto;
 import com.linkwechat.domain.msgtlp.query.WeMsgTlpAddQuery;
 import com.linkwechat.domain.msgtlp.query.WeMsgTlpQuery;
 import com.linkwechat.domain.msgtlp.vo.WeMsgTlpVo;
@@ -18,9 +20,9 @@ public interface IWeMsgTlpService extends IService<WeMsgTlp> {
 
     /**
      * 新增欢迎语模板
-     * @param query
+     * @param weMsgTlp
      */
-    void addMsgTlp(WeMsgTlpAddQuery query);
+    void addMsgTlp(WeMsgTlp weMsgTlp);
 
     /**
      * 修改欢迎语模板
@@ -47,4 +49,14 @@ public interface IWeMsgTlpService extends IService<WeMsgTlp> {
      * @return
      */
     List<WeMsgTlpVo> getList(WeMsgTlpQuery query);
+
+    List<WeMaterial> preview(Long tlpId);
+
+    void updateCategory(WeMsgTlpQuery query);
+
+    /**
+     * 保存或更新
+     * @param weMsgTlpDto
+     */
+    void addOrUpdate(WeMsgTlpDto weMsgTlpDto);
 }

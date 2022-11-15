@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 /**
@@ -523,6 +524,21 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
         long betweendays=(end-start)/(1000*3600*24);
         int days = Integer.parseInt(String.valueOf(betweendays));
         return days;
+    }
+
+
+    public static String initSqlBeginTime(String str){
+        if(ObjectUtil.isEmpty(str)){
+            str = dateTimeNow(YYYY_MM_DD_HH_MM_SS);
+        }
+        return str + " 00:00:00";
+    }
+
+    public static String initSqlEndTime(String str){
+        if(ObjectUtil.isEmpty(str)){
+            str = dateTimeNow(YYYY_MM_DD_HH_MM_SS);
+        }
+        return str + " 59:59:59";
     }
 
 

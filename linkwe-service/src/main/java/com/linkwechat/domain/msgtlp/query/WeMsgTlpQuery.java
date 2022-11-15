@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author danmo
  * @description 欢迎语入参
@@ -26,9 +28,27 @@ public class WeMsgTlpQuery extends BaseEntity {
     @ApiModelProperty("消息类型 文本:text, 图片:image, 视频:video, 文件:file, 图文消息:link, 小程序：miniprogram")
     private String msgType;
 
-    @ApiModelProperty(value = "为false是不分页",hidden = true)
+    @ApiModelProperty(value = "为false是不分页", hidden = true)
     private Boolean flag = true;
 
     @ApiModelProperty("欢迎语查询条件")
     private String welcomeMsg;
+
+    //1欢迎语 2群发 3sop
+    @ApiModelProperty("1欢迎语 2群发 3sop")
+    private Integer templateType;
+
+    private String templateInfo;
+
+    private List<Long> ids;
+
+    /**
+     * 分组Id
+     */
+    private Long categoryId;
+
+    /**
+     *
+     */
+    private Long categoryIdNew;
 }
