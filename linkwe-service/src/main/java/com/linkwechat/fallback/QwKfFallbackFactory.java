@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * @author danmo
+ * @author sxw
  * @date 2022/04/16 23:00
  */
 @Component
@@ -109,6 +109,26 @@ public class QwKfFallbackFactory implements QwKfClient {
 
     @Override
     public AjaxResult<WeKfStatisticListVo> getServicerStatistic(WeKfGetStatisticQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<WeKfAddKnowledgeGroupVo> addKnowledgeGroup(WeKfAddKnowledgeGroupQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<WeResultVo> delKnowledgeGroup(WeKfKnowledgeGroupQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<WeResultVo> modKnowledgeGroup(WeKfKnowledgeGroupQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<WeKfKnowledgeGroupListVo> getKnowledgeGroupList(WeKfKnowledgeGroupQuery query) {
         return null;
     }
 }

@@ -81,7 +81,12 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
         return linkGroupChatListVos;
     }
 
+    @Override
+    public List<LinkGroupChatListVo> selectWeGroupListByApp(WeGroupChatQuery query){
 
+
+        return this.baseMapper.selectWeGroupListByApp(query);
+    }
 
     @Override
     public LinkGroupChatListVo getInfo(Long id) {
@@ -368,6 +373,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
             }
         }
     }
+
 
 
 }

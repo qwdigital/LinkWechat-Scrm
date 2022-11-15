@@ -29,7 +29,7 @@ public class WeMsgTemplateQuery extends WeBaseQuery{
      */
     private List<Object> attachments;
 
-    public void setAttachmentsList(List<WeMessageTemplate> messageTemplates) {
+    public void setAttachmentsList(String domain,List<WeMessageTemplate> messageTemplates) {
         this.attachments = new ArrayList<>(16);
         if (CollectionUtil.isNotEmpty(messageTemplates)) {
             messageTemplates.forEach(messageTemplate -> {
@@ -48,12 +48,28 @@ public class WeMsgTemplateQuery extends WeBaseQuery{
                     Attachments miniprograms = new Miniprograms(messageTemplate.getMsgType(), messageTemplate.getTitle(),
                             messageTemplate.getMediaId(), messageTemplate.getAppId(), messageTemplate.getLinkUrl());
                     attachments.add(miniprograms);
-                } else if (ObjectUtil.equal(WeMsgTypeEnum.VIDEO.getMessageType(), messageTemplate.getMsgType())) {
-                    Attachments videos = new Videos(messageTemplate.getMsgType(), messageTemplate.getMediaId());
-                    attachments.add(videos);
-                } else if (ObjectUtil.equal(WeMsgTypeEnum.FILE.getMessageType(), messageTemplate.getMsgType())) {
-                    Attachments files = new Files(messageTemplate.getMsgType(), messageTemplate.getMediaId());
-                    attachments.add(files);
+                } else if (ObjectUtil.equal(WeMsgTypeEnum.VIDEO.getMessageType(), messageTemplate.getMsgType())) { //转成h5
+
+                    String linkUrl=domain+"/mobile/#/metrialDetail?mediaType="+WeMsgTypeEnum.VIDEO.getMessageType()+"&materialUrl="+messageTemplate.getLinkUrl();
+
+                    Attachments links = new Links(WeMsgTypeEnum.LINK.getMessageType(), messageTemplate.getTitle(),
+                            messageTemplate.getPicUrl(), messageTemplate.getDescription(),
+                            linkUrl);
+                    attachments.add(links);
+//                    Attachments videos = new Videos(messageTemplate.getMsgType(), messageTemplate.getMediaId());
+//                    attachments.add(videos);
+
+                } else if (ObjectUtil.equal(WeMsgTypeEnum.FILE.getMessageType(), messageTemplate.getMsgType())) { //转成h5
+                    String linkUrl=domain+"/mobile/#/metrialDetail?mediaType="+WeMsgTypeEnum.FILE.getMessageType()+"&materialUrl="+messageTemplate.getLinkUrl();
+
+                    Attachments links = new Links(WeMsgTypeEnum.LINK.getMessageType(), messageTemplate.getTitle(),
+                            messageTemplate.getPicUrl(), messageTemplate.getDescription(),
+                            linkUrl);
+                    attachments.add(links);
+
+//                    Attachments files = new Files(messageTemplate.getMsgType(), messageTemplate.getMediaId());
+//                    attachments.add(files);
+
                 }
             });
         }

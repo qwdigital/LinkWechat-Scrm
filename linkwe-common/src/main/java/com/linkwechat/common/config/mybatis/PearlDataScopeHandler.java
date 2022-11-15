@@ -10,7 +10,7 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
 /**
- * @author danmo
+ * @author sxw
  * @description
  * @date 2022/5/11 11:40
  **/

@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 import java.util.List;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 获取预授权码
  * @date 2022/3/4 11:34
  **/

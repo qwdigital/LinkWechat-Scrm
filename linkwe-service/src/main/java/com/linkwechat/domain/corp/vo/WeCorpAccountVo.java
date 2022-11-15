@@ -9,7 +9,7 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 企业信息
  * @date 2022/4/11 22:57
  **/

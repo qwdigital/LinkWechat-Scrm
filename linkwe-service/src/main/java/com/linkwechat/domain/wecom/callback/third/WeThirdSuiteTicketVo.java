@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 推送suite_ticket
  * @date 2022/3/7 22:00
  **/

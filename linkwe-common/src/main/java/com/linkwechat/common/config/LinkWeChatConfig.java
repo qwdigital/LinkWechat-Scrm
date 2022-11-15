@@ -35,6 +35,11 @@ public class LinkWeChatConfig {
      * 是否可以修改密码
      */
     private boolean editPwd = true;
+
+    /**
+     * 是否是演示环境 true:是 false:不是
+     */
+    private boolean demoEnviron=false;
     /**
      * 上传路径
      */
@@ -52,16 +57,35 @@ public class LinkWeChatConfig {
     private String seasRedirectUrl;
 
 
+
     /**
-     * 群sop与老客标签建群地址
+     * 老客标签建群地址
      */
-    private String sopTagRedirectUrl;
+    private String tagRedirectUrl;
+
+
+    /**
+     * 客户sop h5跳转地址
+     */
+    private String customerSopRedirectUrl;
+
+
+    /**
+     * 客群sop h5跳转地址
+     */
+    private String groupSopRedirectUrl;
+
 
 
     /**
      * 流失客户地址
      */
     private String lostCustomerRedirectUrl;
+
+    /**
+     * 移动端域名
+     */
+    private String h5Domain;
 
 
 
@@ -323,14 +347,6 @@ public class LinkWeChatConfig {
 
     public void setSeasRedirectUrl(String seasRedirectUrl) {
         this.seasRedirectUrl = seasRedirectUrl;
-    }
-
-    public String getSopTagRedirectUrl() {
-        return sopTagRedirectUrl;
-    }
-
-    public void setSopTagRedirectUrl(String sopTagRedirectUrl) {
-        this.sopTagRedirectUrl = sopTagRedirectUrl;
     }
 
     public WeSideBarConfig getWeSideBarConfig() {

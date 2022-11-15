@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 企微应用消息监听
  * @date 2022/4/3 15:39
  **/

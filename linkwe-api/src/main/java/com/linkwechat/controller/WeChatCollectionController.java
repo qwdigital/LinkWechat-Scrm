@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * 聊天工具 侧边栏 素材收藏
  *
- * @author danmo
+ * @author sxw
  */
 @Api(tags = "素材收藏接口")
 @RequestMapping(value = "/chat/collection")

@@ -1,13 +1,17 @@
 package com.linkwechat.fegin;
 
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.entity.SysDept;
 import com.linkwechat.domain.wecom.query.department.WeDeptQuery;
 import com.linkwechat.domain.wecom.vo.department.WeDeptIdVo;
 import com.linkwechat.domain.wecom.vo.department.WeDeptVo;
 import com.linkwechat.fallback.QwDeptFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 /**
  * @author leejoker
@@ -21,15 +25,24 @@ public interface QwDeptClient {
      * @param query
      * @return
      */
-    @PostMapping("/dept/list")
+    @PostMapping("/system/dept/list")
     AjaxResult<WeDeptVo> getDeptList(@RequestBody WeDeptQuery query);
 
+//    /**
+//     * 获取部门ID列表
+//     *
+//     * @param query
+//     * @return
+//     */
+//    @PostMapping("/system/dept/simplelist")
+//    AjaxResult<WeDeptIdVo> getDeptSimpleList(@RequestBody WeDeptQuery query);
+//
+
     /**
-     * 获取部门ID列表
-     *
-     * @param query
+     * 部门id批量获取部门列表，不包含权限
+     * @param deptIds
      * @return
      */
-    @PostMapping("/simplelist")
-    AjaxResult<WeDeptIdVo> getDeptSimpleList(@RequestBody WeDeptQuery query);
+    @GetMapping("/system/dept/findSysDeptByIds")
+    AjaxResult<List<SysDept>> findSysDeptByIds(String deptIds);
 }

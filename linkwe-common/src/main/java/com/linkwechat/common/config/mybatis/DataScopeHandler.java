@@ -6,7 +6,7 @@ import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
 /**
- * @author danmo
+ * @author sxw
  * @Description 数据权限处理逻辑
  * @date 2022/5/10 21:48
  **/

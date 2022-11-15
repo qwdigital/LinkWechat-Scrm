@@ -1,9 +1,8 @@
 package com.linkwechat.controller;
 
-import com.linkwechat.common.annotation.Log;
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
-import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.service.IWeCorpAccountService;
@@ -17,6 +16,9 @@ public class WeCorpAccountController extends BaseController {
 
     @Autowired
     private IWeCorpAccountService iWeCorpAccountService;
+
+    @Autowired
+    private LinkWeChatConfig linkWeChatConfig;
 
     /**
      * 获取当前租户信息
@@ -38,6 +40,10 @@ public class WeCorpAccountController extends BaseController {
      */
     @PostMapping("/addOrUpdate")
     public AjaxResult addOrUpdate(@RequestBody WeCorpAccount weCorpAccount) {
+        if(linkWeChatConfig.isDemoEnviron()){
+            return AjaxResult.error("当前为演示环境,无法修改配置");
+
+        }
         iWeCorpAccountService.saveOrUpdate(weCorpAccount);
         return AjaxResult.success();
     }

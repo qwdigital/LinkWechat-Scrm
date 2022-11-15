@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeStrategicCrowdMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeStrategicCrowd" id="WeStrategicCrowdResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="name" column="name" jdbcType="VARCHAR"/>
+                <result property="groupId" column="group_id" jdbcType="INTEGER"/>
+                <result property="type" column="type" jdbcType="INTEGER"/>
+                <result property="swipe" column="swipe" jdbcType="VARCHAR"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+                <result property="status" column="status" jdbcType="INTEGER"/>
+                <result property="crowdNum" column="crowd_num" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeStrategicCrowdVo">
+        select id,  name, group_id, type, swipe, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag, status, crowd_num from we_strategic_crowd
+    </sql>
+
+    <select id="getAnalyze" resultType="com.linkwechat.domain.strategic.crowd.vo.WeStrategicCrowdAnalyzelDataVo">
+        select date_format(create_time,'%Y-%m-%d') as date_time, count(distinct customer_id) as total
+        from we_strategic_crowd_customer_rel
+        <where>
+            and crowd_id = #{id}
+            <if test="beginTime != null"><!-- 开始时间检索 -->
+                and date_format(create_time,'%Y-%m-%d') &gt;= date_format(#{beginTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null"><!-- 结束时间检索 -->
+                and date_format(create_time,'%Y-%m-%d') &lt;= date_format(#{endTime},'%Y-%m-%d')
+            </if>
+        </where>
+        group by date_time
+    </select>
+</mapper>

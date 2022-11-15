@@ -389,4 +389,22 @@ public class SysUserController extends BaseController {
         return AjaxResult.success(customerInfo);
     }
 
+
+    /**
+     * 根据weUserIds，positions，deptIds批量查询
+     * @param weUserIds
+     * @param positions
+     * @param deptIds
+     * @return
+     */
+    @GetMapping("/findAllSysUser")
+    public AjaxResult<List<SysUser>> findAllSysUser(@RequestParam("weUserIds") String weUserIds,
+                                                    @RequestParam("positions") String positions,@RequestParam("deptIds") String deptIds){
+
+        return AjaxResult.success(
+                userService.findAllSysUser(weUserIds,positions,deptIds)
+        );
+
+    }
+
 }
