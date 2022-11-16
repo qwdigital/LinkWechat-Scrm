@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeContentTalkMapper">
+
+
+    <select id="selectWeContentVoList" resultType="com.linkwechat.domain.material.vo.talk.WeContentTalkVo">
+        SELECT
+        t.*,
+        ( SELECT GROUP_CONCAT( t1.material_id ) FROM we_talk_material t1 WHERE t1.talk_id = t.id ) as materialIds
+        FROM
+        we_content_talk t
+        <where>
+            t.del_flag = 0
+            <if test="talkTitle != null and talkTitle != '' ">and t.talk_title like concat('%', #{talkTitle}, '%')</if>
+            <if test="talkType != null ">and t.talk_type = #{talkType}</if>
+            <if test="categoryId != null ">and t.category_id = #{categoryId}</if>
+        </where>
+        order by t.create_time
+    </select>
+
+
+    <select id="getByIdWithOutTenantId" resultType="com.linkwechat.domain.material.entity.WeContentTalk">
+        select *
+        from we_content_talk
+        where id = #{id}
+    </select>
+</mapper>

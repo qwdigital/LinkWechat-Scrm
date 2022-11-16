@@ -1,20 +1,31 @@
 package com.linkwechat.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.domain.Tree;
+import com.linkwechat.common.enums.CategoryModuleTypeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.TreeUtil;
+import com.linkwechat.domain.WeMsgTlp;
 import com.linkwechat.domain.material.entity.WeCategory;
+import com.linkwechat.domain.material.entity.WeContentTalk;
+import com.linkwechat.domain.material.entity.WeMaterial;
+import com.linkwechat.domain.material.vo.WeCategoryNewVo;
 import com.linkwechat.domain.material.vo.WeCategoryVo;
 import com.linkwechat.mapper.WeCategoryMapper;
+import com.linkwechat.mapper.WeContentTalkMapper;
+import com.linkwechat.mapper.WeMaterialMapper;
+import com.linkwechat.mapper.WeMsgTlpMapper;
 import com.linkwechat.service.IWeCategoryService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +35,15 @@ import java.util.List;
  */
 @Service
 public class WeCategoryServiceImpl extends ServiceImpl<WeCategoryMapper, WeCategory> implements IWeCategoryService {
+
+    @Resource
+    private WeMaterialMapper weMaterialMapper;
+
+    @Resource
+    private WeContentTalkMapper weContentTalkMapper;
+
+    @Resource
+    private WeMsgTlpMapper weMsgTlpMapper;
 
     @Override
     public void insertWeCategory(WeCategory category) {
@@ -81,5 +101,53 @@ public class WeCategoryServiceImpl extends ServiceImpl<WeCategoryMapper, WeCateg
     public void deleteWeCategoryById(Long[] ids) {
         new LambdaUpdateChainWrapper<>(this.baseMapper).set(WeCategory::getDelFlag, 2)
                 .in(WeCategory::getId, Lists.newArrayList(ids)).update();
+    }
+
+    @Override
+    @Transactional
+    public void deleteWeCategoryByIds(Long[] ids) {
+        List<Long> list = Lists.newArrayList(ids);
+        new LambdaUpdateChainWrapper<>(this.baseMapper).set(WeCategory::getDelFlag, 2)
+                .in(WeCategory::getId, list).update();
+        for (Long id : list) {
+            new LambdaUpdateChainWrapper<>(weMaterialMapper).set(WeMaterial::getCategoryId, id)
+                    .eq(WeMaterial::getCategoryId, id).update();
+        }
+    }
+
+    @Override
+    @Transactional
+    public void delOrMuchMove(WeCategoryNewVo weCategoryNewVo) {
+        List<Long> ids = weCategoryNewVo.getIds();
+        if(ObjectUtil.isEmpty(ids)){
+            throw new WeComException("id不能为空");
+        }
+        Integer updateOrDel = weCategoryNewVo.getUpdateOrDel();
+        if(updateOrDel == 0){
+            updateObject(weCategoryNewVo.getModuleType(),weCategoryNewVo.getCateGoreId(),weCategoryNewVo.getIds(),"id");
+        }else {
+            new LambdaUpdateChainWrapper<>(this. baseMapper).set(WeCategory::getDelFlag, 1)
+                    .in(WeCategory::getId, ids).update();
+            updateObject(weCategoryNewVo.getModuleType(),weCategoryNewVo.getCateGoreId(),weCategoryNewVo.getIds(),"categoryId");
+        }
+    }
+
+    public void updateObject(Integer moduleType,Long cateGoreId,List<Long> ids,String propertyName){
+        switch (CategoryModuleTypeEnum.getCategoryModuleTypeEnumByValue(moduleType)){
+            case MATERIAL:
+                new LambdaUpdateChainWrapper<>(weMaterialMapper).set(WeMaterial::getCategoryId, cateGoreId)
+                        .in(propertyName.equals("id")?WeMaterial::getId:WeMaterial::getCategoryId, ids).update();
+                break;
+            case TALK:
+                new LambdaUpdateChainWrapper<>(weContentTalkMapper).set(WeContentTalk::getCategoryId, cateGoreId)
+                        .in(propertyName.equals("id")?WeContentTalk::getId:WeContentTalk::getCategoryId, ids).update();
+                break;
+            case TEMPLATE:
+                new LambdaUpdateChainWrapper<>(weMsgTlpMapper).set(WeMsgTlp::getCategoryId, cateGoreId)
+                        .in(propertyName.equals("id")?WeMsgTlp::getId:WeMsgTlp::getCategoryId, ids).update();
+                break;
+            default:
+                throw new WeComException("该模块分组树未被定义");
+        }
     }
 }

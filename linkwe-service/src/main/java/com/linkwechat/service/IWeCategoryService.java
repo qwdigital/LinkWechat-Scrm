@@ -3,6 +3,7 @@ package com.linkwechat.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.common.core.domain.Tree;
 import com.linkwechat.domain.material.entity.WeCategory;
+import com.linkwechat.domain.material.vo.WeCategoryNewVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -37,4 +38,13 @@ public interface IWeCategoryService extends IService<WeCategory> {
     List<? extends Tree<?>> findWeCategoryByMediaType(@Param("mediaType") String mediaType);
 
     void deleteWeCategoryById(Long[] ids);
+
+    void deleteWeCategoryByIds(Long[] ids);
+
+    /**
+     * 批量删除或批量移动
+     *
+     * @param weCategoryNewVo
+     */
+    void delOrMuchMove(WeCategoryNewVo weCategoryNewVo);
 }

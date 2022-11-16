@@ -111,11 +111,11 @@ public class FileController {
         result.put("bucketName", aes.encryptBase64(cos.getBucketName()));
         result.put("cosImgUrlPrefix", aes.encryptBase64(cos.getCosImgUrlPrefix()));
 
-        //解密
-        //String secretKey = aes.decryptStr(result.get("secretKey"));
-        //System.out.println(secretKey);
 
         return AjaxResult.success(result);
     }
+
+
+
 
 }

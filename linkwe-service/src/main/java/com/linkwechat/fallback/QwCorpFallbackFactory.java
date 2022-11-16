@@ -4,9 +4,11 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.agentdev.WeTransformExternalUserIdQuery;
 import com.linkwechat.domain.wecom.query.agentdev.WeTransformUserIdQuery;
+import com.linkwechat.domain.wecom.query.agentdev.WeUnionidTransformExternalUserIdQuery;
 import com.linkwechat.domain.wecom.vo.agentdev.WeTransformCorpVO;
 import com.linkwechat.domain.wecom.vo.agentdev.WeTransformExternalUserIdVO;
 import com.linkwechat.domain.wecom.vo.agentdev.WeTransformUserIdVO;
+import com.linkwechat.domain.wecom.vo.agentdev.WeUnionidTransformExternalUserIdVO;
 import com.linkwechat.fegin.QwCorpClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -31,6 +33,11 @@ public class QwCorpFallbackFactory implements QwCorpClient {
 
     @Override
     public AjaxResult<WeTransformExternalUserIdVO> transformExternalUserId(WeTransformExternalUserIdQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<WeUnionidTransformExternalUserIdVO> unionidTransformExteralUserId(WeUnionidTransformExternalUserIdQuery query) {
         return null;
     }
 }

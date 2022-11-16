@@ -64,5 +64,8 @@ public class WeCustomerTrajectory extends BaseEntity {
     private Integer trajectorySceneType;
 
 
+    private Long materialId;
+
+
 }
 

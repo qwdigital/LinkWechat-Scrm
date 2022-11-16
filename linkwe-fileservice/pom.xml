@@ -92,6 +92,7 @@
             <groupId>org.bytedeco.javacpp-presets</groupId>
             <artifactId>ffmpeg-platform</artifactId>
         </dependency>
+
     </dependencies>
 
 

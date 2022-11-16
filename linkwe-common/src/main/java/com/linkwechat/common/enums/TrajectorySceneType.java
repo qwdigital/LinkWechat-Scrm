@@ -27,7 +27,8 @@ public enum TrajectorySceneType {
     TRAJECTORY_TITLE_TCQL(4,"退出群聊","客户:%s 退出群聊:%s"),
     TRAJECTORY_TITLE_YCQL(16,"移出群聊","客户:%s 移出群聊:%s"),
     TRAJECTORY_TITLE_YGCJQL(11,"员工创建了群聊","员工:%s 创建群聊:%s"),
-    TRAJECTORY_TITLE_YGJSQL(12,"员工解散了群聊","员工:%s 解散群聊:%s");
+    TRAJECTORY_TITLE_YGJSQL(12,"员工解散了群聊","员工:%s 解散群聊:%s"),
+    TRAJECTORY_TITLE_LOOK_MATERIAL(13, "查看素材", "%s 查看了 %s 发送的素材 %s");
 
 
     private String name;
