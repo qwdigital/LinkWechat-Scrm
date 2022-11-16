@@ -4,9 +4,11 @@ import com.dtflys.forest.annotation.*;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.agentdev.WeTransformExternalUserIdQuery;
 import com.linkwechat.domain.wecom.query.agentdev.WeTransformUserIdQuery;
+import com.linkwechat.domain.wecom.query.agentdev.WeUnionidTransformExternalUserIdQuery;
 import com.linkwechat.domain.wecom.vo.agentdev.WeTransformCorpVO;
 import com.linkwechat.domain.wecom.vo.agentdev.WeTransformExternalUserIdVO;
 import com.linkwechat.domain.wecom.vo.agentdev.WeTransformUserIdVO;
+import com.linkwechat.domain.wecom.vo.agentdev.WeUnionidTransformExternalUserIdVO;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 import com.linkwechat.wecom.interceptor.WeProviderTokenInterceptor;
 import com.linkwechat.wecom.retry.WeCommonRetryWhen;
@@ -37,4 +39,18 @@ public interface WeIDTransformClient {
      */
     @Request(url = "/externalcontact/to_service_external_userid", interceptor = WeAccessTokenInterceptor.class)
     WeTransformExternalUserIdVO transformExternalUserId(@JSONBody WeTransformExternalUserIdQuery query);
+
+
+    /**
+     * unionid转换为第三方external_userid
+     *
+     * @param query
+     * @return {@link WeUnionidTransformExternalUserIdVO}
+     * @author WangYX
+     * @date 2022/10/26 16:34
+     */
+    @Post(value = "/idconvert/unionid_to_external_userid", interceptor = WeAccessTokenInterceptor.class)
+    WeUnionidTransformExternalUserIdVO unionidTransformExternalUserId(@JSONBody WeUnionidTransformExternalUserIdQuery query);
+
+
 }

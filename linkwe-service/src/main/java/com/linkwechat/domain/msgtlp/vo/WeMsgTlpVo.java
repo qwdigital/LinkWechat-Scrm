@@ -1,6 +1,7 @@
 package com.linkwechat.domain.msgtlp.vo;
 
 import com.linkwechat.domain.WeMsgTlp;
+import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -22,4 +23,8 @@ public class WeMsgTlpVo extends WeMsgTlp {
     @ApiModelProperty("欢迎语素材列表")
     private List<WeMessageTemplate> attachments;
 
+
+    private Long attachTotalNum;
+
+    private List<WeMaterial> weMaterialList;
 }

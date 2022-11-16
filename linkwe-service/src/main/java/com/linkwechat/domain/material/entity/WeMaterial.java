@@ -1,29 +1,29 @@
 package com.linkwechat.domain.material.entity;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.*;
+import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.core.domain.BaseEntity;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import com.linkwechat.domain.material.ao.WeMaterialImgAo;
+import lombok.*;
+
+import java.util.List;
 
 /**
  * @description: 企业微信上传临时素材实体
  * @author: leejoker
  * @create: 2022-03-28 19:06:30
  **/
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName("we_material")
 public class WeMaterial extends BaseEntity {
-    private static final long serialVersionUID = 1L;
+//    private static final long serialVersionUID = 1L;
 
-    @TableId(type = IdType.AUTO)
+    @TableId
     private Long id;
 
     /**
@@ -32,19 +32,32 @@ public class WeMaterial extends BaseEntity {
     private Long categoryId;
 
     /**
+     * 文件名
+     */
+    private String fileName;
+
+    /**
+     * 模块类型，1素材中心，2企业话术，3客服话术
+     */
+    private Integer moduleType = 1;
+
+    /**
      * 本地资源文件地址
      */
     private String materialUrl;
 
-    /**
-     * 文本内容、图片文案
-     */
-    private String content;
 
     /**
      * 素材标题
      */
+    @Excel(name = "文本标题")
     private String materialName;
+
+    /**
+     * 文本内容、图片文案
+     */
+    @ExcelProperty("文本内容")
+    private String content;
 
     /**
      * 摘要
@@ -111,6 +124,11 @@ public class WeMaterial extends BaseEntity {
     private Integer delFlag;
 
     /**
+     * 轨迹素材生成的H5链接
+     */
+    private String linkUrl;
+
+    /**
      * 素材是否被选中
      */
     @TableField(exist = false)
@@ -121,4 +139,8 @@ public class WeMaterial extends BaseEntity {
      */
     @TableField(value = "subassembly")
     private String posterSubassembly;
+
+    @TableField(exist = false)
+    private List<WeMaterialImgAo> weMaterialImgAoList;
+
 }

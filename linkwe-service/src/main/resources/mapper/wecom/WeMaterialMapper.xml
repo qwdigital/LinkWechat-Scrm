@@ -17,13 +17,13 @@
         <result property="updateBy" column="update_by"/>
         <result property="updateTime" column="update_time"/>
         <result property="audioTime" column="audio_time"/>
+        <result property="linkUrl" column="link_url"/>
     </resultMap>
-
 
 
     <select id="findWeMaterials" resultMap="materialMap">
         SELECT
-        wm.id,wm.category_id,wm.material_url,wm.content,wm.material_name,wm.digest,wm.cover_url,wm.create_by,wm.create_time,wm.update_by,wm.update_time,wm.audio_time
+        wm.id,wm.category_id,wm.material_url,wm.content,wm.material_name,wm.digest,wm.cover_url,wm.create_by,wm.create_time,wm.update_by,wm.update_time,wm.audio_time,wm.link_url
         FROM we_material wm LEFT JOIN we_category wc ON wm.category_id=wc.id
         <where>
             wm.del_flag=0
@@ -40,7 +40,8 @@
     </select>
 
     <select id="findMaterialVoListByIds" resultType="com.linkwechat.domain.material.vo.WeMaterialVo">
-        SELECT wc.media_type, wm.id, wm.material_url,wm.content,wm.material_name,wm.digest,wm.audio_time,wm.cover_url,wm.create_by,wm.create_time,wm.update_by,wm.update_time
+        SELECT wc.media_type, wm.id,
+        wm.material_url,wm.content,wm.material_name,wm.digest,wm.audio_time,wm.cover_url,wm.create_by,wm.create_time,wm.update_by,wm.update_time,link_url
         from we_material wm
         left join we_category wc on wc.id = wm.category_id
         where
@@ -50,10 +51,221 @@
         </foreach>
     </select>
 
+    <select id="selectListByLkQuery" resultType="com.linkwechat.domain.material.vo.WeMaterialNewVo">
+        select
+        t.*,
+        tt.name as categoryName,
+        (
+        SELECT count( 1 ) FROM we_content_send_record t1
+        <where>
+            t.id = t1.content_id
+            <if test="resourceType">and t1.resource_type = #{resourceType}</if>
+        </where>
+        ) AS sendNum,
+        (
+        SELECT count( 1 ) FROM we_content_view_record t1
+        <where>
+            t.id = t1.content_id
+            <if test="resourceType">and t1.resource_type = #{resourceType}</if>
+        </where>
+        ) AS viewNum,
+        (
+        SELECT count( DISTINCT view_openid ) FROM we_content_view_record t1
+        <where>
+            t.id = t1.content_id
+            <if test="resourceType">and t1.resource_type = #{resourceType}</if>
+        </where>
+        ) AS viewByNum
+        from
+        we_material t
+        left join we_category tt on t.category_id = tt.id
+        <where>
+            t.del_flag = 0
+            <if test="materialId != null ">and t.id = #{materialId}</if>
+            <if test="categoryId != null and categoryId != '' ">and category_id = #{categoryId}</if>
+            <if test="materialName != null and materialName != '' ">and material_name like
+                concat('%',#{materialName},'%')
+            </if>
+            <if test="mediaType != null and mediaType != '' ">and t.media_type = #{mediaType}</if>
+            <if test="mediaTypeNoList != null and mediaTypeNoList.size() > 0">
+                and t.media_type not in
+                <foreach item="mediaType" collection="mediaTypeNoList" open="(" separator="," close=")">
+                    #{mediaType}
+                </foreach>
+            </if>
+            <if test="moduleTypeSonList != null and moduleTypeSonList.size() > 0">
+                and t.module_type in
+                <foreach item="moduleType" collection="moduleTypeSonList" open="(" separator="," close=")">
+                    #{moduleType}
+                </foreach>
+            </if>
+        </where>
+        order by t.create_time desc
+    </select>
 
+    <select id="getWeMaterialAnalyseTop" resultType="com.linkwechat.domain.material.vo.WeMaterialAnalyseVo"
+            parameterType="com.linkwechat.domain.material.query.ContentDetailQuery">
+        SELECT
+        t.*,
+        (
+        SELECT count( 1 ) FROM we_content_send_record t1
+        <where>
+            t.id = t1.content_id
+            <if test="resourceType">and t1.resource_type = #{resourceType}</if>
+        </where>
+        ) AS send_total_num,
+        (
+        SELECT count( 1 ) FROM we_content_view_record t1
+        <where>
+            t.id = t1.content_id
+            <if test="resourceType">and t1.resource_type = #{resourceType}</if>
+        </where>
+        ) AS view_total_num,
+        (
+        SELECT count( DISTINCT view_openid ) FROM we_content_view_record t1
+        <where>
+            t.id = t1.content_id
+            <if test="resourceType">and t1.resource_type = #{resourceType}</if>
+        </where>
+        ) AS view_by_total_num
+        FROM
+        we_material t
+        WHERE
+        t.del_flag = 0
+        and module_type = #{moduleType}
+    </select>
+
+    <select id="selectMaterialsByTalkId" resultType="com.linkwechat.domain.material.vo.WeMaterialAnalyseVo">
+        SELECT
+        t.id AS talkId,
+        t.talk_title,
+        t2.*,
+        ( SELECT count( 1 ) FROM we_content_send_record ft
+        <where>
+            t2.id = ft.content_id
+            AND ft.talk_id = t.id
+            <if test="resourceType">and ft.resource_type = #{resourceType}</if>
+            <if test="beginTime != null and beginTime !=''">and DATE_FORMAT(ft.send_time,'%Y-%m-%d') >=
+                DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null and endTime != ''">and DATE_FORMAT(ft.send_time,'%Y-%m-%d') <![CDATA[<=]]>
+                DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            </if>
+        </where>
+        ) AS send_total_num,
+        ( SELECT count( 1 ) from we_content_view_record ft
+        <where>
+            t2.id = ft.content_id
+            AND ft.talk_id = t.id
+            <if test="resourceType">and ft.resource_type = #{resourceType}</if>
+            <if test="beginTime != null and beginTime !=''">and DATE_FORMAT(ft.view_time,'%Y-%m-%d') >=
+                DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null and endTime != ''">and DATE_FORMAT(ft.view_time,'%Y-%m-%d') <![CDATA[<=]]>
+                DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            </if>
+        </where>
+        ) AS view_total_num,
+        ( SELECT count(DISTINCT view_openid ) FROM we_content_view_record ft
+        <where>
+            t2.id = ft.content_id
+            <if test="resourceType">and ft.resource_type = #{resourceType}</if>
+            <if test="beginTime != null and beginTime !='' ">and DATE_FORMAT(ft.view_time,'%Y-%m-%d') >=
+                DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null and endTime != '' ">and DATE_FORMAT(ft.view_time,'%Y-%m-%d') <![CDATA[<=]]>
+                DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            </if>
+        </where>
+        ) AS view_by_total_num
+        FROM
+        we_content_talk t
+        INNER JOIN we_talk_material t1 ON t.id = t1.talk_id
+        INNER JOIN we_material t2 ON t2.id = t1.material_id
+        <where>
+            t.del_flag = 0 and t2.del_flag = 0
+            <if test="talkId != null">and t1.talk_id = #{talkId}</if>
+            <if test="talkType != null">and t.talk_type = #{talkType}</if>
+        </where>
+        order by t1.sort
+    </select>
+
+    <select id="getWeMaterialListByTlpId" resultType="com.linkwechat.domain.material.entity.WeMaterial"
+            parameterType="java.lang.Long">
+        select
+        t.*
+        from
+        we_material t
+        inner join we_tlp_material t1 on t.id = t1.material_id
+        <where>
+            t.del_flag = 0
+            <if test="tlpId != null">
+                AND t1.tlp_id = #{tlpId}
+            </if>
+        </where>
+    </select>
+
+    <select id="getWeMaterialListByTalkId" resultType="com.linkwechat.domain.material.entity.WeMaterial"
+            parameterType="java.lang.Long">
+        select
+        t.*
+        from
+        we_material t
+        inner join we_talk_material t1 on t.id = t1.material_id
+        <where>
+            t.del_flag = 0
+            <if test="talkId != null">
+                AND t1.talk_id = #{talkId}
+            </if>
+        </where>
+        order by t1.sort
+    </select>
+
+    <select id="getWeMaterialDataCountByTalkId" resultType="com.linkwechat.domain.material.vo.ContentDataDetailVo"
+            parameterType="com.linkwechat.domain.material.query.ContentDetailQuery">
+        SELECT
+        t.*,
+        ( SELECT count( 1 ) FROM we_content_send_record ft
+        <where>
+            ft.content_id = t.id
+            <if test="beginTime != null">and DATE_FORMAT(ft.send_time,'%Y-%m-%d') >=
+                DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null">and DATE_FORMAT(ft.send_time,'%Y-%m-%d') <![CDATA[<=]]>
+                DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            </if>
+        </where>
+        ) sendTotalNum,
+        IFNULL(( SELECT count( 1 ) FROM we_content_view_record ft
+        <where>
+            ft.content_id = t.id
+            <if test="beginTime != null">and DATE_FORMAT(ft.view_time,'%Y-%m-%d') >=
+                DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null">and DATE_FORMAT(ft.view_time,'%Y-%m-%d') <![CDATA[<=]]>
+                DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            </if>
+        </where>
+        GROUP BY view_openid ), 0 ) AS viewTotalNum
+        FROM
+        we_material t
+        LEFT JOIN we_talk_material t1 ON t.id = t1.material_id
+        <where>
+            t.del_flag = 0
+            <if test="talkId != null">and t1.talk_id = #{talkId}</if>
+        </where>
+    </select>
+
+
+    <select id="getMaterialByIdWithOutTenantId" resultType="com.linkwechat.domain.material.entity.WeMaterial">
+        SELECT *
+        FROM we_material
+        WHERE id = #{id}
+    </select>
 
     <sql id="material">
-        id,category_id,material_url,content,material_name,digest,cover_url,create_by,create_time,update_by,update_time,audio_time
+        id
+        ,category_id,material_url,content,material_name,digest,cover_url,create_by,create_time,update_by,update_time,audio_time,link_url
     </sql>
 
 </mapper>
