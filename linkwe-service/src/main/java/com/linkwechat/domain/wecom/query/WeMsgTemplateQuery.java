@@ -50,26 +50,29 @@ public class WeMsgTemplateQuery extends WeBaseQuery{
                     attachments.add(miniprograms);
                 } else if (ObjectUtil.equal(WeMsgTypeEnum.VIDEO.getMessageType(), messageTemplate.getMsgType())) { //转成h5
 
-                    String linkUrl=domain+"/mobile/#/metrialDetail?mediaType="+WeMsgTypeEnum.VIDEO.getMessageType()+"&materialUrl="+messageTemplate.getLinkUrl();
+                    String linkUrl=domain+"/#/metrialDetail?mediaType="+WeMsgTypeEnum.VIDEO.getMessageType()+"&materialUrl="+messageTemplate.getLinkUrl();
 
                     Attachments links = new Links(WeMsgTypeEnum.LINK.getMessageType(), messageTemplate.getTitle(),
                             messageTemplate.getPicUrl(), messageTemplate.getDescription(),
                             linkUrl);
                     attachments.add(links);
-//                    Attachments videos = new Videos(messageTemplate.getMsgType(), messageTemplate.getMediaId());
-//                    attachments.add(videos);
 
                 } else if (ObjectUtil.equal(WeMsgTypeEnum.FILE.getMessageType(), messageTemplate.getMsgType())) { //转成h5
-                    String linkUrl=domain+"/mobile/#/metrialDetail?mediaType="+WeMsgTypeEnum.FILE.getMessageType()+"&materialUrl="+messageTemplate.getLinkUrl();
+                    String linkUrl=domain+"/#/metrialDetail?mediaType="+WeMsgTypeEnum.FILE.getMessageType()+"&materialUrl="+messageTemplate.getLinkUrl();
 
                     Attachments links = new Links(WeMsgTypeEnum.LINK.getMessageType(), messageTemplate.getTitle(),
                             messageTemplate.getPicUrl(), messageTemplate.getDescription(),
                             linkUrl);
                     attachments.add(links);
 
-//                    Attachments files = new Files(messageTemplate.getMsgType(), messageTemplate.getMediaId());
-//                    attachments.add(files);
+                }else if(ObjectUtil.equal(WeMsgTypeEnum.NEWS.getMessageType(), messageTemplate.getMsgType())
+                        ||ObjectUtil.equal(WeMsgTypeEnum.POSTERS.getMessageType(), messageTemplate.getMsgType())){//文章或海报
+                    String linkUrl=domain+ "/#/metrialDetail?materiaId=" + messageTemplate.getMaterialId();
 
+                    Attachments links = new Links(WeMsgTypeEnum.LINK.getMessageType(), messageTemplate.getTitle(),
+                            messageTemplate.getPicUrl(), messageTemplate.getDescription(),
+                            linkUrl);
+                    attachments.add(links);
                 }
             });
         }

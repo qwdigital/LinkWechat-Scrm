@@ -123,11 +123,14 @@ public class SysLoginController {
         );
     }
 
-    public static void main(String[] args) {
-        ;
-        System.out.println(SecurityUtils.encryptPassword("linkwechat@321"));
-    }
 
+    @GetMapping("/loginXX")
+    public AjaxResult loginXX(){
+
+        return AjaxResult.success(
+                sysLoginService.login("admin","linkwechat@321")
+        );
+    }
 
     /**
      * 移动端应用登陆

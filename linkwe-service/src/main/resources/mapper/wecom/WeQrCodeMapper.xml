@@ -46,6 +46,8 @@
             <result property="mediaId" column="media_id" jdbcType="VARCHAR"/>
             <result property="fileUrl" column="file_url" jdbcType="VARCHAR"/>
             <result property="appId" column="app_id" jdbcType="VARCHAR"/>
+            <result property="realType" column="real_type" jdbcType="INTEGER"/>
+            <result property="materialId" column="material_id" jdbcType="BIGINT"/>
         </collection>
     </resultMap>
 
@@ -77,7 +79,9 @@
             wqa.link_url,
             wqa.media_id,
             wqa.file_url,
-            wqa.app_id
+            wqa.app_id,
+            wqa.real_type,
+            wqa.material_id
         from
             we_qr_code wqc
         left join we_qr_tag_rel wqtr on wqtr.qr_id = wqc.id and wqtr.del_flag = 0
