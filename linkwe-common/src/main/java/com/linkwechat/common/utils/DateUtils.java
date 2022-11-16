@@ -588,18 +588,5 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     }
 
 
-    public static String initSqlBeginTime(String str){
-        if(ObjectUtil.isEmpty(str)){
-            str = dateTimeNow(YYYY_MM_DD_HH_MM_SS);
-        }
-        return str + " 00:00:00";
-    }
-
-    public static String initSqlEndTime(String str){
-        if(ObjectUtil.isEmpty(str)){
-            str = dateTimeNow(YYYY_MM_DD_HH_MM_SS);
-        }
-        return str + " 59:59:59";
-    }
 
 }

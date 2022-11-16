@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -270,15 +271,19 @@ public class WeMaterialController extends BaseController {
     }
 
     @GetMapping("/material/importTemplate")
-    public AjaxResult importTemplate() {
+    public AjaxResult importTemplate(HttpServletResponse response) {
+
         ExcelUtil<WeMaterial> util = new ExcelUtil<WeMaterial>(WeMaterial.class);
         return util.importTemplateExcel("话术语模板");
+
+
     }
 
     @PostMapping("/material/importData")
     public AjaxResult importData(WeMaterial weMaterial, MultipartFile file) throws Exception {
         ExcelUtil<WeMaterial> util = new ExcelUtil<WeMaterial>(WeMaterial.class);
         List<WeMaterial> weMaterialList = util.importExcel(file.getInputStream());
+
         String tip = new String("成功导入{0}条，去重复{1}条");
         if (ObjectUtil.isEmpty(weMaterialList)) {
             return AjaxResult.error("导入数据不能为空！");

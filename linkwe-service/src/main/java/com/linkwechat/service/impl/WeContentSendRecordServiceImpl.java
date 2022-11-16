@@ -85,7 +85,7 @@ public class WeContentSendRecordServiceImpl extends ServiceImpl<WeContentSendRec
             endTime = DateUtils.initSqlEndTime(endTime);
         }
         QueryWrapper<WeContentSendRecord> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("id,talk_id, content_id, send_by, send_by_id, send_time, resource_type, tenant_id,count(id) as sendCount");
+        queryWrapper.select("id,talk_id, content_id, send_by, send_by_id, send_time, resource_type,count(id) as sendCount");
         queryWrapper.lambda().eq(ObjectUtil.isNotEmpty(contentDetailQuery.getTalkId()), WeContentSendRecord::getTalkId, contentDetailQuery.getTalkId());
         queryWrapper.lambda().eq(ObjectUtil.isNotEmpty(contentId), WeContentSendRecord::getContentId, contentId);
         queryWrapper.lambda().eq(ObjectUtil.isNotEmpty(contentDetailQuery.getResourceType()), WeContentSendRecord::getResourceType, contentDetailQuery.getResourceType());

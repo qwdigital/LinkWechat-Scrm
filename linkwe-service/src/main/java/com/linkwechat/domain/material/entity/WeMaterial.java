@@ -1,5 +1,6 @@
 package com.linkwechat.domain.material.entity;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.*;
 import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.core.domain.BaseEntity;
@@ -55,7 +56,7 @@ public class WeMaterial extends BaseEntity {
     /**
      * 文本内容、图片文案
      */
-    @Excel(name = "文本内容")
+    @ExcelProperty("文本内容")
     private String content;
 
     /**

@@ -30,13 +30,24 @@ import lombok.Data;
 @TableName("we_msg_tlp")
 public class WeMsgTlp extends BaseEntity {
 
-    @ApiModelProperty(value = "id")
-    @TableId(type = IdType.AUTO)
-    @TableField("id")
+
+    @TableId
     private Long id;
 
 
     private Long categoryId;
+
+
+    /**
+     * 1欢迎语模板2群发模板3sop模板
+     */
+    private Integer templateType;
+
+
+    /**
+     * 模板内容
+     */
+    private String templateInfo;
 
     /**
      * 使用员工名称，用逗号隔开

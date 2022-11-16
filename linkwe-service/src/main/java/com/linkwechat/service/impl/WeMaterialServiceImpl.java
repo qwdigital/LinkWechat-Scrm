@@ -435,7 +435,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
         weMediaQuery.setAttachmentType(attachmentType);
         weMediaQuery.setName(name);
         AjaxResult<WeMediaVo> result = mediaClient.uploadAttachment(weMediaQuery);
-        return result != null ? result.getData() : null;
+        return result != null && null !=result.getData() ? result.getData() : null;
     }
 
     /**

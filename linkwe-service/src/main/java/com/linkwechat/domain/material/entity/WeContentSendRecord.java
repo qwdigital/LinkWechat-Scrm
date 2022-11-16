@@ -23,9 +23,7 @@ import java.util.Date;
 @ApiModel(value = "发送人信息记录")
 public class WeContentSendRecord extends BaseEntity {
 
-    @ApiModelProperty(value = "id")
-    @TableId(type = IdType.AUTO)
-    @TableField("id")
+    @TableId
     private Long id;
 
     /**
