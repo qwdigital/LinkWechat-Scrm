@@ -11,7 +11,7 @@
 [![license](http://img.shields.io/badge/license-GPL%203.0-orange)](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
 [![木兰社区](https://img.shields.io/badge/Mulan-incubating-blue)](https://portal.mulanos.cn//)
 
-[官方网站](https://www.pardigital.cn/) | [在线演示](http://demo.linkwechat.net/) | [V3.0功能清单](https://docs.qq.com/sheet/DZW9HSHpHdWlOYWh2?tab=BB08J3)  | [最新动态](https://www.yuque.com/linkwechat/help/ozzxus)
+[官方网站](https://www.pardigital.cn/) | [在线演示](http://demo.linkwechat.net/) | [V3.x功能清单](https://docs.qq.com/sheet/DZW9HSHpHdWlOYWh2?tab=BB08J3)  | [最新动态](https://www.yuque.com/linkwechat/help/ozzxus)
 
 [项目手册](https://www.yuque.com/linkwechat/help) | [用户手册](https://docs.qq.com/pdf/DZXR0ZUJub29wTldS?) | [常见问题](https://www.yuque.com/linkwechat/help/qk5gl6) | [需求收集表](https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV)
 
@@ -80,9 +80,9 @@ LinkWeChat SCRM 基于企业私域流量营销闭环，遵从获取新客到管�
 *   **企业风控** ：会话合规存档，敏感内容全局风控；
 *   **企业管理** ：组织架构、自建应用全融合，实现“一个后台”；
 
-[LinkWeChat 社区版 V3.0 详细功能清单](https://docs.qq.com/sheet/DZW9HSHpHdWlOYWh2?tab=BB08J3)
+[LinkWeChat 社区版 V3.x 详细功能清单](https://docs.qq.com/sheet/DZW9HSHpHdWlOYWh2?tab=BB08J3)
 
-![输入图片说明](readme-pic/V3.x.jpeg)
+![输入图片说明](readme-pic/V3.ximage.png)
 
 ## 1.3 优势
 
