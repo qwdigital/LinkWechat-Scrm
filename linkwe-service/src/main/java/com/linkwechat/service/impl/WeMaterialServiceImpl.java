@@ -717,10 +717,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
         return ids;
     }
 
-    @Override
-    public WeMaterial getMaterialByIdWithOutTenantId(Long id) {
-        return weMaterialMapper.getMaterialByIdWithOutTenantId(id);
-    }
+
 
     @Override
     public List<WeMessageTemplate> msgTplToMediaId(List<WeMessageTemplate> messageTemplates) {

@@ -38,7 +38,7 @@ public class WeMaterialController {
     @ApiOperation("根据Id获取素材")
     @GetMapping("/get/{id}")
     public AjaxResult<WeMaterialVo> get(@PathVariable("id") Long id) {
-        WeMaterial weMaterial = weMaterialService.getMaterialByIdWithOutTenantId(id);
+        WeMaterial weMaterial = weMaterialService.getById(id);
         WeMaterialVo weMaterialVo = null;
         if (ObjectUtil.isNotEmpty(weMaterial)) {
             weMaterialVo = BeanUtil.copyProperties(weMaterial, WeMaterialVo.class);

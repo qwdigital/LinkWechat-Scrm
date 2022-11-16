@@ -39,8 +39,6 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
     public void eventHandle(WeBackBaseVo message) {
         WeBackCustomerVo customerInfo = (WeBackCustomerVo) message;
 
-
-
         try {
             weCustomerService.addCustomer(customerInfo.getExternalUserID(),customerInfo.getUserID(),customerInfo.getState());
             if(StringUtils.isNotEmpty(customerInfo.getWelcomeCode())){

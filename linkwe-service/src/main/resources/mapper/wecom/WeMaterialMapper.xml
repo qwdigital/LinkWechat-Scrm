@@ -257,11 +257,6 @@
     </select>
 
 
-    <select id="getMaterialByIdWithOutTenantId" resultType="com.linkwechat.domain.material.entity.WeMaterial">
-        SELECT *
-        FROM we_material
-        WHERE id = #{id}
-    </select>
 
     <sql id="material">
         id
