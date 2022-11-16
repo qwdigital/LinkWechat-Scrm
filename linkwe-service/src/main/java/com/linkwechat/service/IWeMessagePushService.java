@@ -1,5 +1,7 @@
 package com.linkwechat.service;
 
+import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
+
 import java.util.List;
 
 public interface IWeMessagePushService {
@@ -12,4 +14,10 @@ public interface IWeMessagePushService {
      * @param isJumpUrl 是否需要跳转url true:是;false:否
      */
     void pushMessageSelfH5(List<String> toUser, String textContent, Integer taskType,boolean isJumpUrl);
+
+
+    /**
+     * 通过企业微信官方的方式推送消息
+     */
+    void officialPushMessage(WeAddGroupMessageQuery query);
 }

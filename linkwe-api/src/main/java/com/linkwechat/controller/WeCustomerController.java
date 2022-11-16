@@ -73,6 +73,18 @@ public class WeCustomerController extends BaseController {
     }
 
 
+    /**
+     * 移动应用客户列表(分页)
+     * @param weCustomersQuery
+     * @return
+     */
+    @GetMapping("/findWeCustomerListByApp")
+    public TableDataInfo<List<WeCustomersVo>> findWeCustomerListByApp(WeCustomersQuery weCustomersQuery){
+
+        return weCustomerService.findWeCustomerListByApp(
+                weCustomersQuery,TableSupport.buildPageRequest()
+        );
+    }
 
 
 

@@ -104,6 +104,39 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         return weCustomersVos;
     }
 
+    @Override
+    public TableDataInfo<List<WeCustomersVo>> findWeCustomerListByApp(WeCustomersQuery weCustomersQuery, PageDomain pageDomain) {
+
+        TableDataInfo<List<WeCustomersVo>> tableDataInfo=new TableDataInfo<>();
+        tableDataInfo.setCode(HttpStatus.SUCCESS);
+        if(weCustomersQuery.getDataScope()){//这里指的全部数据,是角色的那些数据
+            tableDataInfo.setRows(
+                    this.findWeCustomerList(weCustomersQuery,pageDomain)
+            );
+            tableDataInfo.setTotal(
+                    this.countWeCustomerList(weCustomersQuery)
+            );
+        }else{//个人数据
+            weCustomersQuery.setFirstUserId(
+                    SecurityUtils.getLoginUser().getSysUser().getWeUserId()
+            );
+            List<String> customerIds = this.baseMapper.findWeCustomerListIdsByApp(weCustomersQuery, pageDomain);
+             if(CollectionUtil.isNotEmpty(customerIds)){
+                 tableDataInfo.setRows(
+                         this.baseMapper.findWeCustomerList(customerIds)
+                 );
+                 tableDataInfo.setTotal(
+                         this.countWeCustomerListByApp(weCustomersQuery)
+                 );
+             }
+        }
+        List<WeCustomersVo> rows = tableDataInfo.getRows();
+        if(CollectionUtil.isEmpty(rows)){
+            tableDataInfo.setRows(new ArrayList<>());
+        }
+
+        return tableDataInfo;
+    }
 
     @Override
     public long countWeCustomerList(WeCustomersQuery weCustomersQuery) {

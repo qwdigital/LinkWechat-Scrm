@@ -60,18 +60,4 @@ public class WeTicketController extends BaseController {
         return AjaxResult.success(TicketUtils.getSignatureMap(ticket,url));
     }
 
-
-    /**
-     * 获取微信应用相关Ticket
-     * @return
-     */
-    @GetMapping("/getWxTicket")
-    public AjaxResult getWxTicket(String url){
-        return AjaxResult.success(TicketUtils.getSignatureMap(
-                qwTicketClient.getWxTicket().getData()
-                ,url));
-    }
-
-
-
 }

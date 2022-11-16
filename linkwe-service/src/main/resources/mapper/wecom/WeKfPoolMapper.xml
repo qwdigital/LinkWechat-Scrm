@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeKfPoolMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+    <select id="getRecordList" resultType="com.linkwechat.domain.kf.vo.WeKfRecordListVo">
+        select
+        record.customer_name,
+        record.customer_avatar,
+        record.external_userid,
+        record.status,
+        record.scene,
+        record.scene_name,
+        record.session_start_time,
+        record.session_end_time,
+        record.is_qy_customer,
+        record.user_id,
+        record.user_name,
+        record.duration,
+        record.kf_name,
+        record.kf_avatar,
+        record.reception_type,
+        record.open_kf_id
+        from
+        (
+        select
+        wkc.nick_name as customer_name,
+        wkc.avatar as customer_avatar,
+        wkc.external_userid,
+        wkp.status,
+        wkp.scene,
+        wkp.session_start_time,
+        wkp.session_end_time,
+        if((select count(1) from we_customer wc where wc.external_userid = wkc.external_userid and wc.del_flag = 0) > 0 ,0,1) as is_qy_customer,
+        (select wks.name from we_kf_scenes wks where wks.scenes = wkp.scene limit 1) scene_name,
+        wkp.user_id,
+        if(wkp.user_id is null,null,(select wu.user_name from sys_user wu where wu.we_user_id = wkp.user_id limit 1)) as user_name,
+        TIMESTAMPDIFF(SECOND ,wkp.session_start_time,wkp.session_end_time) as  duration,
+        wki.name as kf_name,
+        wki.avatar as kf_avatar,
+        wki.reception_type,
+        wki.open_kf_id
+        from we_kf_customer wkc
+        left join we_kf_pool wkp on wkc.external_userid = wkp.external_userid
+        left join we_kf_info wki on wkp.open_kf_id = wki.open_kf_id
+        ) as record
+        <where>
+            <if test="openKfId != null and openKfId != ''">
+                and record.open_kf_id = #{openKfId}
+            </if>
+            <if test="scene != null and scene != ''">
+                and record.scene = #{scene}
+            </if>
+            <if test="isQyCustomer != null">
+                and record.is_qy_customer = #{isQyCustomer}
+            </if>
+            <if test="userId != null and userId != ''">
+                and record.user_id = #{userId}
+            </if>
+        </where>
+    </select>
+
+</mapper>

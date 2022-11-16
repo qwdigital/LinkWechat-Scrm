@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 消息发送抽象模板类
  * @date 2022/4/14 19:03
  **/

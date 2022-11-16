@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 企微数据同步监听
  * @date 2022/4/3 15:39
  **/
@@ -24,6 +24,9 @@ public class QwDataSyncListener {
 
     @Autowired
     private IWeGroupService weGroupService;
+
+    @Autowired
+    private IWeKfInfoService weKfInfoService;
 
     @Autowired
     private IWeCustomerService weCustomerService;
@@ -50,6 +53,19 @@ public class QwDataSyncListener {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("企微客户群同步-消息处理失败 msg:{},error:{}",msg,e);
+        }
+    }
+
+    @RabbitHandler
+    @RabbitListener(queues = "${wecom.mq.queue.sync.kf-account:Qu_kfAccount}")
+    public void kfAccountSubscribe(String msg, Channel channel, Message message) {
+        try {
+            log.info("企微客服同步消息监听：msg:{}",msg);
+            weKfInfoService.synchKfAccountHandler(msg);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("企微客服同步-消息处理失败 msg:{},error:{}",msg,e);
         }
     }
 

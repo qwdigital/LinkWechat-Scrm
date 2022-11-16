@@ -70,15 +70,31 @@ public class RabbitMQSettingConfig {
     private String weQrCodeChangeEx;
 
     /**
+     * 策略延迟队列交换机
+     */
+    @Value("${wecom.mq.exchange.journey.delay:Ex_JourneyDelay}")
+    private String weJourneyEx;
+
+    /**
+     * sop交换机
+     */
+    @Value("${wecom.mq.exchange.sop-ex:Ex_Sop}")
+    private String sopEx;
+    /**
      * -------------------路由------------------------------------
      */
     //自建回调路由
     @Value("${wecom.mq.route.callback:Rk_CallBack}")
     private String weCallBackRk;
 
+    //三方回调路由
+    @Value("${wecom.mq.route.third-callback:Rk_Third_CallBack}")
+    private String weThirdCallBackRk;
+
     //客户群同步路由
     @Value("${wecom.mq.route.sync.group-chat:Rk_GroupChat}")
     private String weGroupChatRk;
+
 
     //客户同步路由
     @Value("${wecom.mq.route.sync.wecustomer:Rk_Wecustomer}")
@@ -151,9 +167,22 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.qr-code-change:Rk_QrCodeChange}")
     private String weQrCodeChangeRk;
 
+    //计算人群路由
+    @Value("${wecom.mq.route.crowd-calculate:Rk_CrowdCalculate}")
+    private String WeCrowdCalculateRk;
+
+    //策略延迟消息路由
+    @Value("${wecom.mq.route.delay-journey:Rk_DelayGourney}")
+    private String weDelayJourneyRk;
+
+
     //商品图册同步路由
     @Value("${wecom.mq.route.sync.product:Rk_Product}")
     private String weProductRk;
+
+    //sop通知路由
+    @Value("${wecom.mq.route.sop-rk:rk_sop}")
+    private String sopRk;
 
     /**
      * -------------------队列------------------------------------
@@ -161,6 +190,10 @@ public class RabbitMQSettingConfig {
     //自建回调队列
     @Value("${wecom.mq.queue.callback:Qu_CallBack}")
     private String weCallBackQu;
+
+    //三方回调队列
+    @Value("${wecom.mq.queue.third-callback:Qu_Third_CallBack}")
+    private String weThirdCallBackQu;
 
     //客户群同步消费队列
     @Value("${wecom.mq.queue.sync.group-chat:Qu_GroupChat}")
@@ -238,7 +271,19 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.queue.qr-code-change:Qu_QrCodeChange}")
     private String weQrCodeChangeQu;
 
+    //计算人群队列
+    @Value("${wecom.mq.queue.crowd-calculate:Qu_CrowdCalculate}")
+    private String weCrowdCalculateQu;
+
+    //策略延迟消息队列
+    @Value("${wecom.mq.queue.delay-journey:Qu_DelayGourney}")
+    private String weDelayJourneyQu;
+
     //商品图册同步队列
     @Value("${wecom.mq.queue.sync.product:Qu_Product}")
     private String weProductQu;
+
+    //sop相关数据同步队列
+    @Value("${wecom.mq.queue.sop-qu:Qu_Sop}")
+    private String sopQu;
 }

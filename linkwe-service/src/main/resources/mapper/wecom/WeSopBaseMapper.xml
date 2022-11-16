@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeSopBaseMapper">
+
+    <select id="findWeSopDetailTabVo" resultType="com.linkwechat.domain.sop.vo.WeSopDetailTabVo">
+        SELECT
+            count(IF(
+                        date_format(update_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
+                ,1,null)) as tdCustomerNumber,
+            count(IF(execute_state=3
+                         and date_format(update_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
+                ,1,null)) as tdCommonEndCustomerNumber,
+            count(IF(execute_state=2
+                         and date_format(update_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
+                ,1,null)) as tdEarlyEndCustomerNumber,
+            count(IF(execute_state=4
+                         and date_format(update_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
+                ,1,null)) as tdErrorEndCustomerNumber,
+
+            count(IF(
+                        date_format(update_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
+                ,1,null)) as ydCustomerNumber,
+            count(IF(execute_state=3
+                         and date_format(update_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
+                ,1,null)) as ydCommonEndCustomerNumber,
+            count(IF(execute_state=2
+                         and date_format(create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
+                ,1,null)) as ydEarlyEndCustomerNumber,
+            count(IF(execute_state=4
+                         and date_format(update_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
+                ,1,null)) as ydErrorEndCustomerNumber
+        FROM
+            we_sop_execute_target
+        where del_flag=0 and sop_base_id=#{sopBaseId}
+    </select>
+
+    <select id="findWeSopDetailCustomer" resultType="com.linkwechat.domain.sop.vo.WeSopDetailCustomerVo">
+        SELECT
+        wset.id as executeTargetId,
+        wc.customer_name,
+        wc.corp_name as corpName,
+        wc.gender,
+        wc.customer_type,
+        wc.avatar,
+        wc.external_userid,
+        wset.execute_state,
+        su.we_user_id,
+        su.user_name,
+        su.position,
+        (SELECT GROUP_CONCAT(DISTINCT sd.dept_name) FROM sys_dept sd LEFT JOIN sys_user_dept sud ON sd.dept_id=sud.dept_id where sud.we_user_id=su.we_user_id) as deptName,
+        wset.create_time,
+        wset.execute_end_time as executeEndTime,
+        wset.sop_base_id,
+        IFNULL(ROUND((SELECT COUNT(*) FROM we_sop_execute_target_attachments wseta WHERE wseta.execute_target_id=wset.id)/(SELECT COUNT(*) FROM we_sop_execute_target_attachments wseta WHERE wseta.execute_target_id=wset.id and execute_state=1)*100,0),0) as efficiency
+        FROM
+        we_sop_execute_target wset
+        LEFT JOIN we_customer wc ON wset.target_id=wc.external_userid
+        LEFT JOIN sys_user su ON su.we_user_id=wset.execute_we_user_id
+        <where>
+            <if test="sopBaseId != null and sopBaseId !=''">
+                wset.sop_base_id=#{sopBaseId}
+            </if>
+            <if test="customerName !=null and customerName!=''">
+                and wc.customer_name like concat( '%' , #{customerName}, '%')
+            </if>
+            <if test="executeState !=null">
+                and wset.execute_state=#{executeState}
+            </if>
+            <if test="weUserId !=null and weUserId!=''">
+                AND su.we_user_id=#{weUserId}
+            </if>
+        </where>
+        GROUP BY wset.id
+        ORDER BY wset.create_time DESC
+    </select>
+
+    <select id="findWeSopDetailGroup" resultType="com.linkwechat.domain.sop.vo.WeSopDetailGroupVo">
+        SELECT
+        wset.id as executeTargetId,
+        wg.group_name,
+        wg.chat_id,
+        wset.execute_state,
+        su.we_user_id,
+        su.user_name,
+        su.position,
+        (SELECT GROUP_CONCAT(DISTINCT sd.dept_name) FROM sys_dept sd LEFT JOIN sys_user_dept sud ON sd.dept_id=sud.dept_id where sud.we_user_id=su.we_user_id) as deptName,
+        wset.create_time,
+        wset.execute_end_time,
+        wset.sop_base_id,
+        IFNULL(ROUND((SELECT COUNT(*) FROM we_sop_execute_target_attachments wseta WHERE wseta.execute_target_id=wset.id)/(SELECT COUNT(*) FROM we_sop_execute_target_attachments wseta WHERE wseta.execute_target_id=wset.id and execute_state=1)*100,0),0) as efficiency
+        FROM
+        we_sop_execute_target wset
+        LEFT JOIN we_group wg ON wset.target_id=wg.chat_id
+        LEFT JOIN sys_user su ON su.we_user_id=wset.execute_we_user_id
+        <where>
+            <if test="sopBaseId != null and sopBaseId !=''">
+                wset.sop_base_id=#{sopBaseId}
+            </if>
+            <if test="groupName !=null and groupName!=''">
+                and  wg.group_name  like concat( '%' , #{groupName}, '%')
+            </if>
+            <if test="executeState !=null">
+                and wset.execute_state=#{executeState}
+            </if>
+            <if test="weUserId !=null and weUserId!=''">
+                AND su.we_user_id=#{weUserId}
+            </if>
+        </where>
+        ORDER BY wset.create_time DESC
+    </select>
+
+    <select id="findCustomerExecuteContent" resultType="com.linkwechat.domain.sop.vo.content.WeCustomerSopBaseContentVo">
+        SELECT
+        wseca.push_time_type,
+        wseca.push_time_pre,
+        wseca.push_start_time,
+        wseca.push_end_time,
+        wseca.execute_state,
+        wseca.execute_time,
+        wseca.sop_attachment_id,
+        wc.customer_name,
+        wc.customer_type,
+        wc.external_userid,
+        wc.gender,
+        wc.avatar,
+        wset.sop_base_id,
+        wsb.sop_name,
+        wseca.id as  executeTargetAttachId
+        FROM
+        we_sop_execute_target_attachments wseca
+        LEFT JOIN we_sop_execute_target wset ON wseca.execute_target_id=wset.id
+        LEFT JOIN we_sop_base wsb ON wsb.id=wset.sop_base_id
+        LEFT JOIN we_customer wc ON wc.external_userid=wset.target_id
+        <if test="executeWeUserId !='' and executeWeUserId !=null ">
+            and wc.add_user_id=#{executeWeUserId}
+        </if>
+        WHERE
+        wsb.del_flag=0
+        <if test="!checkAll">
+            and  to_days(wseca.push_start_time) = to_days(now()) and  wsb.send_type=2
+        </if>
+        <if test="executeWeUserId !='' and executeWeUserId !=null ">
+            and wset.execute_we_user_id=#{executeWeUserId}
+        </if>
+        <if test="targetId !='' and targetId !=null">
+            and wset.target_id=#{targetId}
+        </if>
+        <if test="executeSubState != null">
+            and wseca.execute_state=#{executeSubState}
+        </if>
+        <if test="sopBaseId !=null">
+            and wset.sop_base_id=#{sopBaseId}
+        </if>
+        <if test="executeTargetId != null and executeTargetId !=''">
+            and wseca.execute_target_id=#{executeTargetId}
+        </if>
+    </select>
+
+    <select id="findGroupExecuteContent" resultType="com.linkwechat.domain.sop.vo.content.WeGroupSopBaseContentVo">
+        SELECT
+        wseca.push_time_type,
+        wseca.push_time_pre,
+        wseca.push_start_time,
+        wseca.push_end_time,
+        wseca.execute_state,
+        wseca.sop_attachment_id,
+        wseca.execute_time,
+        wg.group_name,
+        wg.chat_id,
+        wg.add_time,
+        wset.sop_base_id,
+        wsb.sop_name,
+        wseca.id as  executeTargetAttachId
+        FROM
+        we_sop_execute_target_attachments wseca
+        LEFT JOIN we_sop_execute_target wset ON wseca.execute_target_id=wset.id
+        LEFT JOIN we_sop_base wsb ON wsb.id=wset.sop_base_id
+        LEFT JOIN we_group wg ON wg.chat_id=wset.target_id
+        where
+        wsb.sop_state=1
+        <if test="!checkAll">
+            and  to_days(wseca.push_start_time) = to_days(now()) and  wsb.send_type=2
+        </if>
+        <if test="chatId !='' and chatId !=null">
+            and  wg.chat_id=#{chatId}
+        </if>
+        <if test="executeSubState != null">
+            and wseca.execute_state=#{executeSubState}
+        </if>
+        <if test="sopBaseId !=null">
+            and wset.sop_base_id=#{sopBaseId}
+        </if>
+        <if test="executeTargetId != null and executeTargetId !=''">
+            and wseca.execute_target_id=#{executeTargetId}
+        </if>
+    </select>
+
+    <select id="findTdSendSopCustomers" resultType="com.linkwechat.domain.sop.vo.content.WeCustomerSopToBeSentVo">
+        SELECT
+            wc.customer_name,
+            wc.customer_type,
+            wc.gender,
+            wc.avatar,
+            wc.external_userid,
+            wc.corp_name
+        FROM
+            we_sop_execute_target_attachments wseta
+                LEFT JOIN we_sop_execute_target wset ON wset.id = wseta.execute_target_id
+                LEFT JOIN we_customer wc ON wc.external_userid = wset.target_id
+                LEFT JOIN we_sop_base wsb on wsb.id=wset.sop_base_id
+        WHERE
+            wc.add_user_id = #{weUserId}  AND wset.target_type = 1 and wc.del_flag=0 and wc.track_state !=5
+            and wsb.del_flag=0  and wsb.sop_state=1 and wsb.send_type=2
+            AND to_days( wseta.push_start_time ) = to_days(now())
+    </select>
+
+    <select id="findTdSendSopGroups" resultType="com.linkwechat.domain.sop.vo.content.WeGroupSopToBeSentVo">
+        SELECT
+            wg.group_name,
+            wg.chat_id,
+            wg.add_time
+        FROM
+            we_sop_execute_target_attachments wseta
+                LEFT JOIN we_sop_execute_target wset ON wset.id = wseta.execute_target_id
+                LEFT JOIN we_group wg ON wg.chat_id = wset.target_id
+                LEFT JOIN we_sop_base wsb on wsb.id=wset.sop_base_id
+        WHERE
+            wg.`owner` = #{weUserId} and wg.del_flag=0 and   wset.target_type = 2 and wsb.del_flag=0 and wsb.sop_state=1 and wsb.send_type=2
+          AND to_days( wseta.push_start_time ) = to_days(
+                now())
+    </select>
+
+
+
+
+
+    <select id="findSopToBeSentContentInfo" resultType="com.linkwechat.domain.sop.vo.content.WeSopToBeSentContentInfoVo">
+        SELECT
+        wsb.id as sopBaseId,
+        wsb.sop_name,
+        wseta.push_start_time,
+        wseta.push_end_time
+        FROM
+        we_sop_execute_target wset
+        LEFT JOIN we_sop_base wsb ON wsb.id = wset.sop_base_id
+        LEFT JOIN we_sop_execute_target_attachments wseta ON wseta.execute_target_id = wset.id
+        WHERE  to_days(wseta.push_start_time) = to_days(now()) and  wseta.execute_state=0
+        <if test="weUserId != '' and weUserId !=null">
+            and  wset.execute_we_user_id=#{weUserId}
+        </if>
+        <if test="targetId">
+            and wset.target_id=#{targetId}
+        </if>
+        GROUP BY wset.id
+    </select>
+
+
+
+
+</mapper>
