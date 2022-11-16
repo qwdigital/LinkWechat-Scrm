@@ -8,6 +8,8 @@
         SELECT
         content,
         content_type,
+        wm.real_type,
+        wm.material_id,
         IFNULL((SELECT GROUP_CONCAT(DISTINCT wu.user_name) as userName FROM sys_user wu WHERE wu.we_user_id=wm.creator),creator) as creator,
         (SELECT GROUP_CONCAT(wu.user_name) FROM sys_user wu WHERE  FIND_IN_SET(wu.we_user_id,wm.no_add_user)) as noAddUserName,
         (SELECT GROUP_CONCAT(wu.we_user_id) FROM sys_user wu WHERE FIND_IN_SET(wu.we_user_id,wm.no_add_user)) as noAddUser,
@@ -65,7 +67,9 @@
             (SELECT GROUP_CONCAT(DISTINCT wu.customer_name) FROM we_customer wu
             LEFT JOIN we_moments_interacte wmi ON wu.external_userid=wmi.interacte_user_id WHERE wmi.interacte_type=1 and wmi.interacte_user_type=1
             and wmi.moment_id=wm.moment_id
-            ) as pointCustomerName
+            ) as pointCustomerName,
+            wm.real_type,
+            wm.material_id
         FROM
             we_moments wm
         where wm.moment_id=#{momentId}
