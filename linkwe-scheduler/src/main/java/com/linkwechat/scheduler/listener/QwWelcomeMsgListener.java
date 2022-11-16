@@ -77,8 +77,6 @@ public class QwWelcomeMsgListener {
     @Autowired
     private QwCustomerClient qwCustomerClient;
 
-    @Autowired
-    private IWeStoreCodeService weStoreCodeService;
 
     @Autowired
     private IWeQrAttachmentsService attachmentsService;

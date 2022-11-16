@@ -29,7 +29,7 @@ public class WxRequestArgsLogAspect {
     private final IWeCorpAccountService weCorpAccountService = SpringUtils.getBean(IWeCorpAccountService.class);
 
     // 配置织入点
-    @Pointcut("execution(public * com.linkwechat.controller..*.*(..)))")
+    @Pointcut("execution(public * com.linkwechat.controller..*.*(..))) && !execution(com.other.controller.OtherController..*.*(..))")
     public void logPointCut() {
     }
 
