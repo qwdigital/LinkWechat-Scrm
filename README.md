@@ -82,7 +82,7 @@ LinkWeChat SCRM 基于企业私域流量营销闭环，遵从获取新客到管�
 
 [LinkWeChat 社区版 V3.x 详细功能清单](https://docs.qq.com/sheet/DZW9HSHpHdWlOYWh2?tab=BB08J3)
 
-![输入图片说明](readme-pic/V3.ximage.png)
+![输入图片说明](readme-pic/v3image.png)
 
 ## 1.3 优势
 
