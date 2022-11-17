@@ -68,6 +68,6 @@ public interface QwCorpClient {
      * @param corpId
      * @return
      */
-    @DeleteMapping("/removeAllWeAccessToken/{corpId}")
+    @DeleteMapping("/corp/removeAllWeAccessToken/{corpId}")
     AjaxResult removeAllWeAccessToken(@PathVariable("corpId") String corpId);
 }
