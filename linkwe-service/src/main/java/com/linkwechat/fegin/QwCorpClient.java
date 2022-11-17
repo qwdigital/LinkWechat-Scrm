@@ -11,6 +11,8 @@ import com.linkwechat.domain.wecom.vo.agentdev.WeTransformUserIdVO;
 import com.linkwechat.domain.wecom.vo.agentdev.WeUnionidTransformExternalUserIdVO;
 import com.linkwechat.fallback.QwCorpFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -29,7 +31,7 @@ public interface QwCorpClient {
      * @return
      */
     @PostMapping("/corp/transformCorpId")
-    public AjaxResult<WeTransformCorpVO> transformCorpId(@RequestBody WeBaseQuery query);
+    AjaxResult<WeTransformCorpVO> transformCorpId(@RequestBody WeBaseQuery query);
 
     /**
      * userid的转换
@@ -38,7 +40,7 @@ public interface QwCorpClient {
      * @return
      */
     @PostMapping("/corp/transformUserId")
-    public AjaxResult<WeTransformUserIdVO> transformUserId(@RequestBody WeTransformUserIdQuery query);
+    AjaxResult<WeTransformUserIdVO> transformUserId(@RequestBody WeTransformUserIdQuery query);
 
     /**
      * eid的转换
@@ -47,7 +49,7 @@ public interface QwCorpClient {
      * @return
      */
     @PostMapping("/corp/transformExternalUserId")
-    public AjaxResult<WeTransformExternalUserIdVO> transformExternalUserId(@RequestBody WeTransformExternalUserIdQuery query);
+    AjaxResult<WeTransformExternalUserIdVO> transformExternalUserId(@RequestBody WeTransformExternalUserIdQuery query);
 
     /**
      * unionid转换为第三方external_userid
@@ -58,5 +60,14 @@ public interface QwCorpClient {
      * @date 2022/10/26 16:40
      */
     @PostMapping("/corp/unionidTransformExternalUserId")
-    public AjaxResult<WeUnionidTransformExternalUserIdVO> unionidTransformExteralUserId(@RequestBody WeUnionidTransformExternalUserIdQuery query);
+    AjaxResult<WeUnionidTransformExternalUserIdVO> unionidTransformExteralUserId(@RequestBody WeUnionidTransformExternalUserIdQuery query);
+
+
+    /**
+     * 删除所有缓存中企业微信相关token
+     * @param corpId
+     * @return
+     */
+    @DeleteMapping("/removeAllWeAccessToken/{corpId}")
+    AjaxResult removeAllWeAccessToken(@PathVariable("corpId") String corpId);
 }

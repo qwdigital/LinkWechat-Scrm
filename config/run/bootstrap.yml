@@ -1,6 +1,5 @@
 spring:
-  profiles:
-    active: local
+  profiles: local
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true
@@ -27,8 +26,7 @@ spring:
         server-addr: 127.0.0.1:8848
 ---
 spring:
-  profiles:
-    active: dev
+  profiles: dev
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true
@@ -55,8 +53,7 @@ spring:
         server-addr: 120.79.64.17:10848
 ---
 spring:
-  profiles:
-    active: prod
+  profiles: prod
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true
