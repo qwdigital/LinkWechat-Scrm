@@ -28,7 +28,6 @@
 
 **<p align="center">【📣最近更新】LinkWeChat V3.0 采用前后端分离架构，前端项目请点击<a href="https://gitee.com/LinkWeChat/link-we-chat-front" target="_blank">LinkWeChat-Front</a></p>**
 
-**<p align="center">LinkWeChat SAAS版<a href="https://saas.pardigital.cn/#/probation" target="_blank">点击立即体验~</a></p>**
 
 **<p align="center">还有什么想要的产品功能/技术支持/说明文档/友好的建议或意见，<a href="https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV" target="_blank">点击告诉我们~</a></p>**
 
