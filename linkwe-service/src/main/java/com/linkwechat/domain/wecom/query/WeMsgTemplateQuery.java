@@ -2,6 +2,7 @@ package com.linkwechat.domain.wecom.query;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.linkwechat.common.enums.WeMsgTypeEnum;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.media.WeMessageTemplate;
@@ -18,6 +19,7 @@ import java.util.List;
  * @date 2021-10-3
  */
 @Data
+@JsonPropertyOrder({ "text", "attachments" })
 public class WeMsgTemplateQuery extends WeBaseQuery{
 
     /**

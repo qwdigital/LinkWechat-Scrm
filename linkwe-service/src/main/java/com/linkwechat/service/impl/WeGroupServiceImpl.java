@@ -158,7 +158,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                                 weGroupMember.transformQwParams(groupMember);
                                 weGroupMember.setCreateTime(new Date());
                                 weGroupMember.setUpdateTime(new Date());
-                                weGroupMember.setDelFlag(0);
+                                weGroupMember.setDelFlag(Constants.COMMON_STATE);
                                 weGroupMember.setCreateBy(SecurityUtils.getUserName());
                                 weGroupMember.setCreateById(SecurityUtils.getUserId());
                                 weGroupMember.setCreateTime(new Date());
