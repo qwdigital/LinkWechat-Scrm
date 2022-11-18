@@ -1,4 +1,4 @@
-package com.linkwechat.scheduler.listener;
+package com.linkwechat.scheduler.task;
 
 import com.linkwechat.domain.WeFormSurveyCatalogue;
 import com.linkwechat.service.IWeFormSurveyCatalogueService;
