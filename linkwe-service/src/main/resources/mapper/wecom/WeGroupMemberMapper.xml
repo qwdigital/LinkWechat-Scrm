@@ -63,6 +63,7 @@
             <if test="name != null  and name != ''">
                 AND wgm.name like concat('%', #{name}, '%')
             </if>
+            GROUP BY wgm.user_id
         ) a
     </select>
 
