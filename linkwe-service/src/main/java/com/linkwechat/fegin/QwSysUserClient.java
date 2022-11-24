@@ -36,4 +36,9 @@ public interface QwSysUserClient {
 
     @PostMapping("/system/user/listByQuery")
     AjaxResult<List<SysUser>> list(@RequestBody SysUser sysUser);
+
+    @GetMapping("/system/user/getInfo/{wxUserId}")
+    AjaxResult<SysUser> getInfo(@PathVariable("wxUserId") String wxUserId);
+
+
 }
