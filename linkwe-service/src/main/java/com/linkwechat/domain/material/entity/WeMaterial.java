@@ -56,7 +56,7 @@ public class WeMaterial extends BaseEntity {
     /**
      * 文本内容、图片文案
      */
-    @ExcelProperty("文本内容")
+    @Excel(name ="文本内容")
     private String content;
 
     /**

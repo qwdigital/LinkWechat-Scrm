@@ -60,12 +60,13 @@
                b.audit_scope_name,
                b.scope_type
         from we_sensitive a
-                 left join we_sensitive_audit_scope b on a.id = b.sensitive_id and b.del_flag = 0
+                 left join we_sensitive_audit_scope b on a.id = b.sensitive_id
     </sql>
 
     <select id="selectWeSensitiveList" parameterType="com.linkwechat.domain.WeSensitive" resultMap="WeSensitiveResult">
         <include refid="selectWeSensitiveList"/>
-        <where>
+        where
+          a.del_flag = 0 and b.del_flag = 0
             <if test="strategyName != null  and strategyName != ''">and a.strategy_name like concat('%',
                 #{strategyName}, '%')
             </if>
@@ -76,8 +77,6 @@
             <if test="auditUserName != null and auditUserName != ''">and a.audit_user_name like concat('%',
                 #{auditUserName}, '%')
             </if>
-        </where>
-        and a.del_flag = 0
         order by a.update_time desc, a.create_time desc
     </select>
 

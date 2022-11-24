@@ -130,13 +130,7 @@ public interface IWeMaterialService extends IService<WeMaterial> {
 
     List<Long> addOrUpdate(WeMaterial material);
 
-    /**
-     * 获取素材信息,不携带租户Id查询
-     *
-     * @param id
-     * @return
-     */
-    WeMaterial getMaterialByIdWithOutTenantId(Long id);
+
 
 
     /**

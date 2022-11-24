@@ -50,4 +50,20 @@ public class WeMessageTemplate {
 
     @ApiModelProperty("小程序appid（可以在微信公众平台上查询），必须是关联到企业的小程序应用")
     private String appId;
+
+
+    /**
+     * 来源 1:手动添加的 2:设置sop结束条件时附加的素材
+     */
+    private Integer source;
+
+    /**
+     * 其他类型的数据，转成链接之后的真是的数据类型
+     */
+    private Integer realType;
+
+    /**
+     * 素材中心Id
+     */
+    private Long materialId;
 }

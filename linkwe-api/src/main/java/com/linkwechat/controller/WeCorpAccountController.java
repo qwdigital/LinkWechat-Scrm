@@ -5,6 +5,7 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.domain.WeCorpAccount;
+import com.linkwechat.fegin.QwCorpClient;
 import com.linkwechat.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,9 @@ public class WeCorpAccountController extends BaseController {
 
     @Autowired
     private LinkWeChatConfig linkWeChatConfig;
+
+    @Autowired
+    private QwCorpClient qwCorpClient;
 
     /**
      * 获取当前租户信息
@@ -44,7 +48,9 @@ public class WeCorpAccountController extends BaseController {
             return AjaxResult.error("当前为演示环境,无法修改配置");
 
         }
-        iWeCorpAccountService.saveOrUpdate(weCorpAccount);
+        if(iWeCorpAccountService.saveOrUpdate(weCorpAccount)){
+            qwCorpClient.removeAllWeAccessToken(weCorpAccount.getCorpId());
+        };
         return AjaxResult.success();
     }
 

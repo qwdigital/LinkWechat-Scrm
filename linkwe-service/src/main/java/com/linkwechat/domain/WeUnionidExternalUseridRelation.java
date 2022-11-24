@@ -49,9 +49,6 @@ public class WeUnionidExternalUseridRelation {
     @TableField("update_time")
     private Date updateTime;
 
-    @ApiModelProperty(value = "租户id")
-    @TableField("tenant_id")
-    private Integer tenantId;
 
     @ApiModelProperty(value = "删除标识 0 未删除 1 已删除")
     @TableField("del_flag")

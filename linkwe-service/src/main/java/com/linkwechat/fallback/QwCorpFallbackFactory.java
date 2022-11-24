@@ -40,4 +40,9 @@ public class QwCorpFallbackFactory implements QwCorpClient {
     public AjaxResult<WeUnionidTransformExternalUserIdVO> unionidTransformExteralUserId(WeUnionidTransformExternalUserIdQuery query) {
         return null;
     }
+
+    @Override
+    public AjaxResult removeAllWeAccessToken(String corpId) {
+        return null;
+    }
 }

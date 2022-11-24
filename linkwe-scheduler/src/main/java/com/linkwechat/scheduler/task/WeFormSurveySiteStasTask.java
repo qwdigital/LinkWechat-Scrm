@@ -4,7 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.linkwechat.common.constant.Constants;
-import com.linkwechat.common.constant.SiteStatsConstants;
+import com.linkwechat.common.constant.SiteStasConstants;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeFormSurveyAnswer;
 import com.linkwechat.domain.WeFormSurveyCatalogue;
@@ -34,7 +34,7 @@ import java.util.stream.DoubleStream;
  */
 @Slf4j
 @Component
-public class WeFormSurveySiteStatsTask {
+public class WeFormSurveySiteStasTask {
 
     @Resource
     private RedisTemplate redisTemplate;
@@ -77,10 +77,10 @@ public class WeFormSurveySiteStatsTask {
         Long uv = 0L;
         for (String channel : channels) {
             //PV
-            String pvKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channel);
+            String pvKey = StringUtils.format(SiteStasConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channel);
             pv += (Integer) redisTemplate.opsForValue().get(pvKey);
             //IP
-            String ipKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channel);
+            String ipKey = StringUtils.format(SiteStasConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channel);
             uv += redisTemplate.opsForSet().size(ipKey);
         }
         uv = uv - channels.length;
@@ -126,19 +126,16 @@ public class WeFormSurveySiteStatsTask {
         String[] channels = weFormSurveyCatalogue.getChannelsName().split(",");
         for (String channel : channels) {
             //PV
-            String pvKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channel);
+            String pvKey = StringUtils.format(SiteStasConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channel);
             Integer pv = (Integer) redisTemplate.opsForValue().get(pvKey);
             //IP
-            String ipKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channel);
+            String ipKey = StringUtils.format(SiteStasConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channel);
             Long uv = redisTemplate.opsForSet().size(ipKey) - 1;
 
-            //昨天的数据统计
-            QueryWrapper<WeFormSurveyStatistics> queryWrapper = new QueryWrapper<>();
-            queryWrapper.lambda().eq(WeFormSurveyStatistics::getBelongId, weFormSurveyCatalogue.getId());
-            queryWrapper.lambda().eq(WeFormSurveyStatistics::getDataSource, channel);
-            queryWrapper.lambda().eq(WeFormSurveyStatistics::getDelFlag, Constants.COMMON_STATE);
-            queryWrapper.lambda().apply("DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) = '" + DateUtil.formatDate(DateUtil.offsetDay(new Date(), -1)) + "'");
-            WeFormSurveyStatistics yesWeFormSurveyStatistics = weFormSurveyStatisticsService.getOne(queryWrapper);
+            //之前总的统计数据
+            QueryWrapper<WeFormSurveySiteStas> queryWrapper = new QueryWrapper<>();
+            queryWrapper.lambda().eq(WeFormSurveySiteStas::getBelongId, weFormSurveyCatalogue.getId());
+            WeFormSurveySiteStas one = weFormSurveySiteStasService.getOne(queryWrapper);
 
             //今天有效收集量
             QueryWrapper<WeFormSurveyAnswer> answerQueryWrapper = new QueryWrapper<>();
@@ -153,8 +150,13 @@ public class WeFormSurveySiteStatsTask {
             WeFormSurveyStatistics weFormSurveyStatistics = new WeFormSurveyStatistics();
             weFormSurveyStatistics.setBelongId(weFormSurveyCatalogue.getId());
             weFormSurveyStatistics.setDataSource(channel);
-            weFormSurveyStatistics.setTotalVisits(pv - (yesWeFormSurveyStatistics != null ? yesWeFormSurveyStatistics.getTotalVisits() : 0));
-            weFormSurveyStatistics.setTotalUser(uv.intValue() - (yesWeFormSurveyStatistics != null ? yesWeFormSurveyStatistics.getTotalUser() : 0));
+
+            //每天的总访问量
+            int i = pv - (one.getTotalVisits() != null ? one.getTotalVisits() : 0);
+            weFormSurveyStatistics.setTotalVisits(i < 0 ? 0 : i);
+            //每天的总访问用户
+            int i1 = uv.intValue() - (one.getTotalUser() != null ? one.getTotalUser() : 0);
+            weFormSurveyStatistics.setTotalUser(i1 < 0 ? 0 : i1);
             weFormSurveyStatistics.setCollectionVolume(list != null ? list.size() : 0);
 
             //收集率

@@ -116,4 +116,18 @@ public class WeQrAttachments extends BaseEntity implements Serializable {
     @TableField("del_flag")
     @TableLogic
     private Integer delFlag;
+
+    /**
+     * 真实媒体类型（企微只支持文本，视频，图片和链接，所以一些别的类型的素材需要转成Link。此处保存的是转成链接之前真实的类型）
+     */
+    @ApiModelProperty(value = "真实媒体类型")
+    @TableField("real_type")
+    private Integer realType;
+
+    /**
+     * 素材中心中的素材ID
+     */
+    @ApiModelProperty(value = "真实媒体类型")
+    @TableField("material_id")
+    private Long materialId;
 }

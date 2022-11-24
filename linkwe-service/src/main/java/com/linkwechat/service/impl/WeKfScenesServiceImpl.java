@@ -1,7 +1,7 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -17,6 +17,8 @@ import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.QREncode;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
+import com.linkwechat.common.utils.file.FileUtil;
+import com.linkwechat.common.utils.img.ImageUtils;
 import com.linkwechat.common.utils.img.NetFileUtils;
 import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.domain.WeKfScenes;
@@ -42,6 +44,10 @@ import org.springframework.util.FastByteArrayOutputStream;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
@@ -96,7 +102,10 @@ public class WeKfScenesServiceImpl extends ServiceImpl<WeKfScenesMapper, WeKfSce
             QrConfig config = new QrConfig(200,200);
             // 高纠错级别
             config.setErrorCorrection(ErrorCorrectionLevel.H);
+
             config.setImg(ImageIO.read(new URL(avatar)));
+
+
             QrCodeUtil.generate(content, config,"png",os);
             NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(IdUtil.simpleUUID() + ".png", os.toByteArray());
             FileEntity fileInfo = qwFileClient.upload(streamMultipartFile).getData();
