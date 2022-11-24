@@ -29,21 +29,5 @@ public interface QwDeptClient {
     @PostMapping("/system/dept/list")
     AjaxResult<WeDeptVo> getDeptList(@RequestBody WeDeptQuery query);
 
-//    /**
-//     * 获取部门ID列表
-//     *
-//     * @param query
-//     * @return
-//     */
-//    @PostMapping("/system/dept/simplelist")
-//    AjaxResult<WeDeptIdVo> getDeptSimpleList(@RequestBody WeDeptQuery query);
-//
 
-    /**
-     * 部门id批量获取部门列表，不包含权限
-     * @param deptIds
-     * @return
-     */
-    @GetMapping("/system/dept/findSysDeptByIds")
-    AjaxResult<List<SysDept>> findSysDeptByIds(@RequestParam(value = "deptIds") String deptIds);
 }
