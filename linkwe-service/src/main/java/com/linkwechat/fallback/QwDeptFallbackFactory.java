@@ -24,13 +24,4 @@ public class QwDeptFallbackFactory implements QwDeptClient {
         return null;
     }
 
-//    @Override
-//    public AjaxResult<WeDeptIdVo> getDeptSimpleList(WeDeptQuery query) {
-//        return null;
-//    }
-
-    @Override
-    public AjaxResult<List<SysDept>> findSysDeptByIds(@RequestParam(value = "deptIds") String deptIds) {
-        return null;
-    }
 }
