@@ -55,7 +55,12 @@ public class QwSysUserFallbackFactory implements QwSysUserClient {
 
     @Override
     public AjaxResult<List<SysUser>> findAllSysUser(@RequestParam("weUserIds") String weUserIds,
-                                                    @RequestParam("positions") String positions,@RequestParam("deptIds") String deptIds) {
+                                                    @RequestParam("positions") String positions, @RequestParam("deptIds") String deptIds) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<SysUser> getInfo(String wxUserId) {
         return null;
     }
 

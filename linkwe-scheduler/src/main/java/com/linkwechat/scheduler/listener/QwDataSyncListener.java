@@ -144,7 +144,7 @@ public class QwDataSyncListener {
     public void weProductSubscribe(String msg, Channel channel, Message message) {
         try {
             log.info("企微商品图册管理同步消息监听：msg:{}",msg);
-            weProductService.syncProductListHandle(msg);
+            //weProductService.syncProductListHandle(msg);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
         } catch (Exception e) {
             e.printStackTrace();
