@@ -176,4 +176,18 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
     public void removeAgentAccessToken(String corpId, Integer agentId) {
         redisService.deleteObject(StringUtils.format(WeConstans.WE_AGENT_ACCESS_TOKEN, corpId,agentId));
     }
+
+    @Override
+    public void removeAllWeAccessToken(String corpId) {
+        removeCommonAccessToken(corpId);
+        removeContactAccessToken(corpId);
+        removeChatAccessToken(corpId);
+        removeKfAccessToken(corpId);
+        removeAddressBookAccessToken(corpId);
+        WeCorpAccount weCorpAccount = iWxCorpAccountService.getCorpAccountByCorpId(corpId);
+        if(null != weCorpAccount && StringUtils.isNotEmpty(weCorpAccount.getAgentId())){
+            removeAgentAccessToken(corpId,Integer.parseInt(weCorpAccount.getAgentId()));
+        }
+
+    }
 }

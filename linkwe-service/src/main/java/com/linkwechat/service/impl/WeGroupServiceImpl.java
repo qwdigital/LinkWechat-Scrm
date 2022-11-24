@@ -158,7 +158,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                                 weGroupMember.transformQwParams(groupMember);
                                 weGroupMember.setCreateTime(new Date());
                                 weGroupMember.setUpdateTime(new Date());
-                                weGroupMember.setDelFlag(0);
+                                weGroupMember.setDelFlag(Constants.COMMON_STATE);
                                 weGroupMember.setCreateBy(SecurityUtils.getUserName());
                                 weGroupMember.setCreateById(SecurityUtils.getUserId());
                                 weGroupMember.setCreateTime(new Date());
@@ -246,13 +246,36 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
      * @param isCallBack  是否回掉 true回掉调用该方法,false非回掉触发改方法
      */
     private void insertBatchGroupAndMember(List<WeGroup> weGroups, List<WeGroupMember> weGroupMembers,boolean isCallBack) {
-
         if (CollectionUtil.isNotEmpty(weGroups)) {
+            if (!isCallBack) {
+                //删除已经不存在的群
+                this.remove(new LambdaQueryWrapper<WeGroup>()
+                        .notIn(WeGroup::getChatId,weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList())));
+
+                //群下不包含的客户
+                weGroups.stream().forEach(weGroup -> {
+
+                    if(CollectionUtil.isNotEmpty(weGroupMembers)){
+                        List<WeGroupMember> weGroupMemberss = weGroupMembers.stream()
+                                .filter(weGroupMember -> weGroupMember.getChatId().equals(weGroup.getChatId()))
+                                .collect(Collectors.toList());
+
+                        weGroupMemberService.remove(new LambdaQueryWrapper<WeGroupMember>()
+                                .eq(WeGroupMember::getChatId,weGroup.getChatId())
+                                .notIn(CollectionUtil.isNotEmpty(weGroupMemberss),WeGroupMember::getUserId,
+                                        weGroupMemberss.stream().map(WeGroupMember::getUserId).collect(Collectors.toList())));
+                    }else{
+                        weGroupMemberService.remove(new LambdaQueryWrapper<WeGroupMember>()
+                                .eq(WeGroupMember::getChatId,weGroup.getChatId()));
+                    }
+
+                });
+
+
+            }
+
             List<List<WeGroup>> lists = Lists.partition(weGroups, 500);
             for (List<WeGroup> groupList : lists) {
-                if(!isCallBack){
-                    this.remove(new LambdaQueryWrapper<>());
-                }
 
                 this.baseMapper.insertBatch(groupList);
             }
@@ -261,12 +284,8 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
         if (CollectionUtil.isNotEmpty(weGroupMembers)) {
             List<List<WeGroupMember>> lists = Lists.partition(weGroupMembers, 500);
             for (List<WeGroupMember> groupMemberList : lists) {
-                if(!isCallBack){
-                    //删除不包含这些群成员id的数据
-                    weGroupMemberService.remove(new LambdaQueryWrapper<>());
-                }
 
-                weGroupMemberService.insertBatch(groupMemberList);
+                weGroupMemberService.saveBatch(groupMemberList);
             }
         }
     }

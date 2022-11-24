@@ -22,4 +22,9 @@ public class QwSysAreaFallbackFactory implements QwSysAreaClient {
     public AjaxResult<List<SysAreaVo>> getChildListById(Integer id) {
         return null;
     }
+
+    @Override
+    public AjaxResult<SysAreaVo> getAreaById(Integer id) {
+        return null;
+    }
 }

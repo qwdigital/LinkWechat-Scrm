@@ -65,11 +65,5 @@ public interface WeMaterialMapper extends BaseMapper<WeMaterial> {
 
     List<WeMaterial> getWeMaterialListByTalkId(Long talkId);
 
-    /**
-     * 获取素材信息,不携带租户Id查询
-     * @param id
-     * @return
-     */
-    @InterceptorIgnore(tenantLine = "true")
-    WeMaterial getMaterialByIdWithOutTenantId(Long id);
+
 }
