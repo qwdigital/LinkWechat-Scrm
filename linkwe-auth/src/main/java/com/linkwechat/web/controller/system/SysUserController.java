@@ -398,8 +398,7 @@ public class SysUserController extends BaseController {
      * @return
      */
     @GetMapping("/findAllSysUser")
-    public AjaxResult<List<SysUser>> findAllSysUser(@RequestParam("weUserIds") String weUserIds,
-                                                    @RequestParam("positions") String positions,@RequestParam("deptIds") String deptIds){
+    public AjaxResult<List<SysUser>> findAllSysUser(String weUserIds, String positions,String deptIds){
 
         return AjaxResult.success(
                 userService.findAllSysUser(weUserIds,positions,deptIds)

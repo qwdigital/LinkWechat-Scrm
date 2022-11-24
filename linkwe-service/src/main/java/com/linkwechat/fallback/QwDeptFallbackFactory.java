@@ -8,6 +8,7 @@ import com.linkwechat.domain.wecom.vo.department.WeDeptVo;
 import com.linkwechat.fegin.QwDeptClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class QwDeptFallbackFactory implements QwDeptClient {
 //    }
 
     @Override
-    public AjaxResult<List<SysDept>> findSysDeptByIds(String deptIds) {
+    public AjaxResult<List<SysDept>> findSysDeptByIds(@RequestParam(value = "deptIds") String deptIds) {
         return null;
     }
 }

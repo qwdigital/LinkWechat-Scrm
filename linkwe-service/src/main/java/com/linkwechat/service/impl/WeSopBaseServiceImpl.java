@@ -37,6 +37,7 @@ import com.linkwechat.domain.wecom.query.customer.msg.WeGetGroupMsgListQuery;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.fegin.QwDeptClient;
+import com.linkwechat.fegin.QwSysDeptClient;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeSopBaseMapper;
 import com.linkwechat.mapper.WeSopPushTimeMapper;
@@ -103,7 +104,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
     @Autowired
-    private QwDeptClient qwDeptClient;
+    private QwSysDeptClient qwSysDeptClient;
 
 
 
@@ -309,7 +310,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                     if(null != executeDeptCondit && executeDeptCondit.isChange()){
                         if(CollectionUtil.isNotEmpty(executeDeptCondit.getDeptIds())){//设置部门
                             AjaxResult<List<SysDept>> result
-                                    = qwDeptClient.findSysDeptByIds(StringUtils.join(executeDeptCondit.getDeptIds(), ","));
+                                    = qwSysDeptClient.findSysDeptByIds(StringUtils.join(executeDeptCondit.getDeptIds(), ","));
 
                             if(null != result && CollectionUtil.isNotEmpty(result.getData())){
                                 sb.append(",").append(result.getData().stream().map(SysDept::getDeptName).collect(Collectors.joining(",")));
@@ -790,7 +791,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                 }
 
 
-                AjaxResult<List<SysUser>> listAjaxResult =qwSysUserClient.findAllSysUser(null,positions,depteIds);
+                AjaxResult<List<SysUser>> listAjaxResult =qwSysUserClient.findAllSysUser("",positions,depteIds);
 
                 if(null != listAjaxResult&&CollectionUtil.isNotEmpty(listAjaxResult.getData())){
                     executeWeUserIds.addAll(

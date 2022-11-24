@@ -10,6 +10,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -44,5 +45,5 @@ public interface QwDeptClient {
      * @return
      */
     @GetMapping("/system/dept/findSysDeptByIds")
-    AjaxResult<List<SysDept>> findSysDeptByIds(String deptIds);
+    AjaxResult<List<SysDept>> findSysDeptByIds(@RequestParam(value = "deptIds") String deptIds);
 }
