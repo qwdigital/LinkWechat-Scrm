@@ -95,7 +95,7 @@ public class WeAgentMsgServiceImpl extends ServiceImpl<WeAgentMsgMapper, WeAgent
         wrapper.set(Objects.nonNull(query.getPlanSendTime()), WeAgentMsg::getPlanSendTime, query.getPlanSendTime());
         wrapper.set(CollectionUtil.isNotEmpty(query.getToUser()), WeAgentMsg::getToUser, String.join(",", query.getToUser()));
         wrapper.set(CollectionUtil.isNotEmpty(query.getToParty()), WeAgentMsg::getToParty, String.join(",", query.getToParty()));
-        wrapper.set(CollectionUtil.isNotEmpty(query.getToTag()), WeAgentMsg::getToTag, String.join(",", query.getToTag()));
+        //wrapper.set(CollectionUtil.isNotEmpty(query.getToTag()), WeAgentMsg::getToTag, String.join(",", query.getToTag()));
         wrapper.set(StringUtils.isNotEmpty(query.getWeMessageTemplate().getMsgType()), WeAgentMsg::getMsgType, query.getWeMessageTemplate().getMsgType());
         wrapper.set(StringUtils.isNotEmpty(query.getWeMessageTemplate().getDescription()), WeAgentMsg::getDescription, query.getWeMessageTemplate().getDescription());
         wrapper.set(StringUtils.isNotEmpty(query.getWeMessageTemplate().getTitle()), WeAgentMsg::getTitle, query.getWeMessageTemplate().getTitle());
@@ -106,6 +106,18 @@ public class WeAgentMsgServiceImpl extends ServiceImpl<WeAgentMsgMapper, WeAgent
         wrapper.set(StringUtils.isNotEmpty(query.getWeMessageTemplate().getPicUrl()), WeAgentMsg::getPicUrl, query.getWeMessageTemplate().getPicUrl());
         wrapper.set(StringUtils.isNotEmpty(query.getWeMessageTemplate().getAppId()), WeAgentMsg::getAppId, query.getWeMessageTemplate().getAppId());
         update(wrapper.eq(WeAgentMsg::getId, query.getId()));
+        if (Objects.equals(1, query.getStatus()) && Objects.equals(1, query.getSendType())) {
+            QwAppMsgBody body = new QwAppMsgBody();
+            body.setMessageTemplates(query.getWeMessageTemplate());
+            body.setBusinessType(QwAppMsgBusinessTypeEnum.AGENT.getType());
+            body.setCorpId(SecurityUtils.getCorpId());
+            body.setCorpUserIds(query.getToUser());
+            body.setDeptIds(query.getToParty());
+            body.setTagIds(query.getToParty());
+            body.setCorpUserIds(query.getToUser());
+            body.setCallBackId(query.getId());
+            qwAppSendMsgService.appMsgSend(body);
+        }
     }
 
     @Override
