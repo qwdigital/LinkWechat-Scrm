@@ -141,5 +141,6 @@
                 AND wgm.create_time &lt;= date_format(#{endTime},'%Y-%m-%d')
             </if>
         </where>
+        order by wgm.create_time desc
     </select>
 </mapper>
