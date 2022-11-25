@@ -52,10 +52,12 @@
         wqs.end_time,
         wqs.work_cycle,
         wqs.user_id,
-        if(wqs.user_id is null,null,(select wu.user_name from sys_user wu where wu.we_user_id = wqs.user_id limit 1)) as user_name,
+        if(wqs.user_id is null,null,wu.user_name) as user_name,
         wqs.party,
-        if(wqs.party is null,null,(select wd.dept_name from sys_dept wd where wd.dept_id= wqs.party limit 1)) as party_name
+        if(wqs.party is null,null,wd.dept_name) as party_name
         from we_qr_scope wqs
+        left join sys_user wu on wu.we_user_id = wqs.user_id and wu.del_flag = 0
+        left join sys_dept wd on wd.dept_id = wqs.party and wd.del_flag = 0
         <where>
             <if test="qrIds != null and qrIds.size > 0">
                 and wqs.qr_id in
