@@ -385,7 +385,6 @@
         <module>linkwe-auth</module>
         <module>linkwe-common</module>
         <module>linkwe-wecom</module>
-        <module>linkwe-event-task</module>
          <module>linkwe-api</module>
          <module>linkwe-wx-api</module>
         <module>linkwe-gateway</module>

@@ -118,8 +118,7 @@ public class WeAgentController extends BaseController {
     @GetMapping("/msg/get/{id}")
     public AjaxResult<WeAgentMsgVo> getMsgInfo(@PathVariable("id") Long id) {
         log.info("应用消息详情入参query:{}", id);
-        weAgentMsgService.getMsgInfo(id);
-        return AjaxResult.success();
+        return AjaxResult.success(weAgentMsgService.getMsgInfo(id));
     }
 
     @ApiOperation(value = "撤销应用消息", httpMethod = "GET")
