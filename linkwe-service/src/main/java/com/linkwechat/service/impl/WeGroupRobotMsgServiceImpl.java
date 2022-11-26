@@ -9,6 +9,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.enums.WeMsgTypeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
@@ -63,7 +64,8 @@ public class WeGroupRobotMsgServiceImpl extends ServiceImpl<WeGroupRobotMsgMappe
                 .eq(WeGroupRobotMsg::getDelFlag, 0)
                 .like(StringUtils.isNotEmpty(query.getTitle()), WeGroupRobotMsg::getMsgTitle, query.getTitle())
                 .ge(Objects.nonNull(query.getStartTime()), WeGroupRobotMsg::getSendTime, query.getStartTime())
-                .le(Objects.nonNull(query.getEndTime()), WeGroupRobotMsg::getSendTime, query.getEndTime()));
+                .le(Objects.nonNull(query.getEndTime()), WeGroupRobotMsg::getSendTime, query.getEndTime())
+                .orderByDesc(BaseEntity::getCreateTime));
     }
 
     @Override
