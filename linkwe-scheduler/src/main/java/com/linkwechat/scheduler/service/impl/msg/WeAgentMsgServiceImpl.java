@@ -118,7 +118,7 @@ public class WeAgentMsgServiceImpl extends AbstractAppMsgService {
         weAgentMsg.setMsgId(appMsgVo.getMsgId());
         weAgentMsg.setResponseCode(appMsgVo.getResponseCode());
         weAgentMsg.setSendTime(new Date());
-        if (appMsgVo.getErrMsg() != null && !appMsgVo.getErrMsg().equals(0)) {
+        if (appMsgVo.getErrMsg() != null && !Objects.equals(0,appMsgVo.getErrCode())) {
             weAgentMsg.setStatus(3);
         } else {
             weAgentMsg.setStatus(2);

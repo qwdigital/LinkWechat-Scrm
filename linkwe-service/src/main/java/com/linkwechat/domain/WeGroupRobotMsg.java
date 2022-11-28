@@ -2,6 +2,7 @@ package com.linkwechat.domain;
 
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -57,6 +58,7 @@ public class WeGroupRobotMsg extends BaseEntity implements Serializable {
      * 发送时间
      */
     @ApiModelProperty(value = "发送时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @TableField("send_time")
     private Date sendTime;
 
