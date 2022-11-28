@@ -24,7 +24,7 @@
         select id,product_id,  picture, `describe`, price, product_sn, attachments, create_time, create_by, create_by_id, update_time, update_by, update_by_id from we_product
     </sql>
 
-    <select id="queryProductList" resultType="com.linkwechat.domain.product.vo.WeProductListVo">
+    <select id="queryProductList" resultType="com.linkwechat.domain.product.product.vo.WeProductListVo">
         select wp.id,
                wp.product_id,
                wp.picture,

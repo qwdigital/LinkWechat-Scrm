@@ -3,8 +3,8 @@ package com.linkwechat.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.domain.WeProduct;
-import com.linkwechat.domain.product.query.WeProductQuery;
-import com.linkwechat.domain.product.vo.WeProductListVo;
+import com.linkwechat.domain.product.product.query.WeProductQuery;
+import com.linkwechat.domain.product.product.vo.WeProductListVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 

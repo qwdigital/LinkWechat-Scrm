@@ -1,4 +1,4 @@
-package com.linkwechat.domain.product.query;
+package com.linkwechat.domain.product.product.query;
 
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.wecom.query.product.QwAddProductQuery;

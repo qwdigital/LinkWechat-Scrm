@@ -1,4 +1,4 @@
-package com.linkwechat.domain.product.vo;
+package com.linkwechat.domain.product.product.vo;
 
 import com.linkwechat.domain.media.WeMessageTemplate;
 import io.swagger.annotations.ApiModel;

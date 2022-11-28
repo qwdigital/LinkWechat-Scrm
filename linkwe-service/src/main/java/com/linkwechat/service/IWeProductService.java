@@ -2,10 +2,10 @@ package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.WeProduct;
-import com.linkwechat.domain.product.query.WeAddProductQuery;
-import com.linkwechat.domain.product.query.WeProductQuery;
-import com.linkwechat.domain.product.vo.WeProductListVo;
-import com.linkwechat.domain.product.vo.WeProductVo;
+import com.linkwechat.domain.product.product.query.WeAddProductQuery;
+import com.linkwechat.domain.product.product.query.WeProductQuery;
+import com.linkwechat.domain.product.product.vo.WeProductListVo;
+import com.linkwechat.domain.product.product.vo.WeProductVo;
 
 import java.util.List;
 
