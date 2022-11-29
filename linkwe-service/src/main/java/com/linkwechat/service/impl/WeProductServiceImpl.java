@@ -44,6 +44,7 @@ import com.linkwechat.mapper.WeProductMapper;
 import com.linkwechat.mapper.WeProductOrderMapper;
 import com.linkwechat.service.IWeMaterialService;
 import com.linkwechat.service.IWeProductService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,7 @@ import java.util.stream.DoubleStream;
  * @author danmo
  * @since 2022-09-30 11:36:06
  */
+@Slf4j
 @Service
 public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct> implements IWeProductService {
 
@@ -216,6 +218,7 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
         List<WeProduct> weProducts = new LinkedList<>();
         QwProductListQuery query = new QwProductListQuery();
         QwProductListVo qwProductList = getQwProductList(query);
+        log.info("企微商品图册数据：{}", JSONObject.toJSONString(qwProductList));
         if (Objects.nonNull(qwProductList) && CollectionUtil.isNotEmpty(qwProductList.getProductList())) {
             for (QwProductVo.QwProduct qwProduct : qwProductList.getProductList()) {
                 WeProduct product = new WeProduct();
