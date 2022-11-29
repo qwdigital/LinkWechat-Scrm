@@ -1,18 +1,19 @@
 package com.linkwechat.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.baomidou.mybatisplus.annotation.TableId;
+
+import java.time.LocalDateTime;
+import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
 /**
  * <p>
- * 商品订单退款表
+ * 商品订单每日统计表
  * </p>
  *
  * @author WangYX
@@ -20,56 +21,36 @@ import java.time.LocalDateTime;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("we_product_order_refund")
-public class WeProductOrderRefund extends Model<WeProductOrderRefund> {
+@TableName("we_product_day_statistics")
+public class WeProductDayStatistics extends Model<WeProductDayStatistics> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主键ID
+     * 主键Id
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 订单号
+     * 订单总数
      */
-    private String orderNo;
+    private Integer dayOrderTotalNum;
 
     /**
-     * 退款单号
+     * 订单总金额
      */
-    private String refundNo;
+    private String dayOrderTotalFee;
 
     /**
-     * 退款发起时间
+     * 退款总额
      */
-    private LocalDateTime refundTime;
+    private String dayRefundTotalFee;
 
     /**
-     * 退款发起人Id
+     * 净收入
      */
-    private String refundUserId;
-
-    /**
-     * 退款发起人姓名
-     */
-    private String refundUserName;
-
-    /**
-     * 退款备注
-     */
-    private String remark;
-
-    /**
-     * 退款金额
-     */
-    private String refundFee;
-
-    /**
-     * 退款状态
-     */
-    private Integer refundState;
+    private String dayNetIncome;
 
     /**
      * 创建时间

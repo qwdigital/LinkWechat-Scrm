@@ -2,7 +2,6 @@ package com.linkwechat.web.controller.system;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.SynchRecordConstants;
-import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.dto.SysUserDTO;
@@ -21,8 +20,6 @@ import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.domain.WeConfigParamInfo;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WxUser;
-import com.linkwechat.domain.corp.query.WeCorpAccountQuery;
-import com.linkwechat.domain.corp.vo.WeCorpAccountVo;
 import com.linkwechat.domain.wecom.vo.user.WeUserDetailVo;
 import com.linkwechat.framework.service.TokenService;
 import com.linkwechat.service.IWeCorpAccountService;
@@ -114,12 +111,13 @@ public class SysUserController extends BaseController {
 
     /**
      * 获取所有员工
+     *
      * @return
      */
     @GetMapping("/listAll")
     public AjaxResult<List<SysUser>> listAll(String userName) {
         return AjaxResult.success(userService.list(
-                new LambdaQueryWrapper<SysUser>().like(StringUtils.isNotEmpty(userName),SysUser::getUserName,userName)
+                new LambdaQueryWrapper<SysUser>().like(StringUtils.isNotEmpty(userName), SysUser::getUserName, userName)
         ));
     }
 
@@ -292,14 +290,13 @@ public class SysUserController extends BaseController {
         }
         sysDept = iSysDeptService.selectDeptById(user.getDeptId());
 
-        if(null != sysDept){
+        if (null != sysDept) {
             user.setDeptName(sysDept.getDeptName());
         }
 
         WeCorpAccount weCorpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
-        CorpVo corpVo =weCorpAccount==null?new CorpVo():new CorpVo(weCorpAccount.getCorpId(), weCorpAccount.getCompanyName(),
+        CorpVo corpVo = weCorpAccount == null ? new CorpVo() : new CorpVo(weCorpAccount.getCorpId(), weCorpAccount.getCompanyName(),
                 weCorpAccount.getAgentId());
-
 
 
         WeConfigParamInfo configParamInfo = new WeConfigParamInfo();
@@ -316,10 +313,10 @@ public class SysUserController extends BaseController {
                 configParamInfo.setChatParamFill(true);
             }
 
-            if(StringUtils.isNotEmpty(weCorpAccount.getMerChantName())
-            &&StringUtils.isNotEmpty(weCorpAccount.getMerChantNumber())
-            &&StringUtils.isNotEmpty(weCorpAccount.getMerChantSecret())
-            &&StringUtils.isNotEmpty(weCorpAccount.getCertP12Url())){
+            if (StringUtils.isNotEmpty(weCorpAccount.getMerChantName())
+                    && StringUtils.isNotEmpty(weCorpAccount.getMerChantNumber())
+                    && StringUtils.isNotEmpty(weCorpAccount.getMerChantSecret())
+                    && StringUtils.isNotEmpty(weCorpAccount.getCertP12Url())) {
                 configParamInfo.setRedEnvelopesParamFile(true);
             }
 
@@ -372,6 +369,14 @@ public class SysUserController extends BaseController {
         return AjaxResult.success(user);
     }
 
+    @GetMapping("/getInfo/{weUserId}")
+    public AjaxResult getInfo(@PathVariable("weUserId") String weUserId) {
+        LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper();
+        queryWrapper.eq(SysUser::getWeUserId, weUserId);
+        SysUser user = sysUserMapper.selectOne(queryWrapper);
+        return AjaxResult.success(user);
+    }
+
     @PostMapping("listByQuery")
     public AjaxResult<SysUser> listByQuery(@RequestBody SysUser sysUser) {
         List<SysUser> sysUsers = userService.selectUserList(sysUser);
@@ -380,6 +385,7 @@ public class SysUserController extends BaseController {
 
     /**
      * 获取微信用户信息
+     *
      * @return
      */
     @GetMapping("/getWxInfo")

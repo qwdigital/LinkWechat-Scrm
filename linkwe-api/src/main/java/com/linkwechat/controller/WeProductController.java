@@ -1,14 +1,18 @@
 package com.linkwechat.controller;
 
+import com.google.protobuf.ServiceException;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.domain.product.product.query.WeAddProductQuery;
+import com.linkwechat.domain.product.product.query.WeProductLineChartQuery;
 import com.linkwechat.domain.product.product.query.WeProductQuery;
 import com.linkwechat.domain.product.product.vo.WeProductListVo;
+import com.linkwechat.domain.product.product.vo.WeProductStatisticsVo;
 import com.linkwechat.domain.product.product.vo.WeProductVo;
+import com.linkwechat.domain.product.product.vo.WeUserOrderTop5Vo;
 import com.linkwechat.service.IWeProductService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author danmo
@@ -35,7 +41,7 @@ public class WeProductController extends BaseController {
     @ApiOperation(value = "新增商品", httpMethod = "POST")
     @Log(title = "新增商品", businessType = BusinessType.INSERT)
     @PostMapping("/add")
-    public AjaxResult addProduct(@RequestBody @Validated WeAddProductQuery query) {
+    public AjaxResult addProduct(@RequestBody @Validated WeAddProductQuery query) throws ServiceException {
         weProductService.addProduct(query);
         return AjaxResult.success();
     }
@@ -44,7 +50,7 @@ public class WeProductController extends BaseController {
     @ApiOperation(value = "修改商品", httpMethod = "PUT")
     @Log(title = "修改商品", businessType = BusinessType.UPDATE)
     @PutMapping("/update/{id}")
-    public AjaxResult updateProduct(@PathVariable("id") Long id, @RequestBody @Validated WeAddProductQuery query) {
+    public AjaxResult updateProduct(@PathVariable("id") Long id, @RequestBody @Validated WeAddProductQuery query) throws ServiceException {
         weProductService.updateProduct(id, query);
         return AjaxResult.success();
     }
@@ -62,6 +68,7 @@ public class WeProductController extends BaseController {
     @GetMapping("/get/{id}")
     public AjaxResult<WeProductVo> getProduct(@PathVariable("id") Long id) {
         WeProductVo product = weProductService.getProduct(id);
+        product.setPrice(new BigDecimal(product.getPrice()).divide(BigDecimal.valueOf(100L)).toString());
         return AjaxResult.success(product);
     }
 
@@ -71,6 +78,14 @@ public class WeProductController extends BaseController {
     public TableDataInfo<WeProductListVo> productPageList(WeProductQuery query) {
         startPage();
         List<WeProductListVo> list = weProductService.productList(query);
+        list.forEach(o -> {
+            o.setPrice(new BigDecimal(o.getPrice()).divide(BigDecimal.valueOf(100L)).toString());
+            if (!o.getOrderTotalAmount().equals("0.0")) {
+                BigDecimal bigDecimal = new BigDecimal(o.getOrderTotalAmount());
+                bigDecimal = bigDecimal.divide(BigDecimal.valueOf(100L)).setScale(2, BigDecimal.ROUND_HALF_UP);
+                o.setOrderTotalAmount(bigDecimal.toString());
+            }
+        });
         return getDataTable(list);
     }
 
@@ -81,4 +96,32 @@ public class WeProductController extends BaseController {
         weProductService.syncProductList();
         return AjaxResult.success();
     }
+
+
+    @ApiOperation(value = "商品详情统计", httpMethod = "GET")
+    @Log(title = "商品详情统计", businessType = BusinessType.SELECT)
+    @GetMapping("/statistics/{id}")
+    public AjaxResult statistics(@PathVariable("id") Long id) {
+        WeProductStatisticsVo statistics = weProductService.statistics(id);
+        return AjaxResult.success(statistics);
+    }
+
+
+    @ApiOperation(value = "商品详情折线图", httpMethod = "POST")
+    @Log(title = "商品详情折线图", businessType = BusinessType.SELECT)
+    @PostMapping("/lineChart")
+    public AjaxResult lineChart(@RequestBody WeProductLineChartQuery query) {
+        Map<String, Object> map = weProductService.lineChart(query);
+        return AjaxResult.success(map);
+    }
+
+    @ApiOperation(value = "员工订单Top5", httpMethod = "GET")
+    @Log(title = "员工订单Top5", businessType = BusinessType.SELECT)
+    @GetMapping("/top5/{id}")
+    public AjaxResult<List<WeUserOrderTop5Vo>> top5(@PathVariable("id") Long id) {
+        List<WeUserOrderTop5Vo> weUserOrderTop5Vos = weProductService.userOrderTop5(id);
+        return AjaxResult.success(weUserOrderTop5Vos);
+    }
+
+
 }

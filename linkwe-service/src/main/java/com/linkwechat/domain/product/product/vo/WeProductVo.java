@@ -31,5 +31,5 @@ public class WeProductVo {
     private String price;
 
     @ApiModelProperty("商品附件")
-    private List<WeMessageTemplate> attachments;
+    private String attachments;
 }

@@ -1,46 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.mapper.WeProductMapper">
 
     <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
 
     <resultMap type="com.linkwechat.domain.WeProduct" id="WeProductResult">
-                <result property="id" column="id" jdbcType="INTEGER"/>
-                <result property="productId" column="product_id" jdbcType="VARCHAR"/>
-                <result property="picture" column="picture" jdbcType="VARCHAR"/>
-                <result property="describe" column="describe" jdbcType="VARCHAR"/>
-                <result property="price" column="price" jdbcType="VARCHAR"/>
-                <result property="productSn" column="product_sn" jdbcType="VARCHAR"/>
-                <result property="attachments" column="attachments" jdbcType="VARCHAR"/>
-                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
-                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
-                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
-                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
-                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
-            </resultMap>
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="productId" column="product_id" jdbcType="VARCHAR"/>
+        <result property="picture" column="picture" jdbcType="VARCHAR"/>
+        <result property="describe" column="describe" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="VARCHAR"/>
+        <result property="productSn" column="product_sn" jdbcType="VARCHAR"/>
+        <result property="attachments" column="attachments" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+    </resultMap>
 
     <sql id="selectWeProductVo">
-        select id,product_id,  picture, `describe`, price, product_sn, attachments, create_time, create_by, create_by_id, update_time, update_by, update_by_id from we_product
+        select id,
+               product_id,
+               picture,
+               `describe`,
+               price,
+               product_sn,
+               attachments,
+               create_time,
+               create_by,
+               create_by_id,
+               update_time,
+               update_by,
+               update_by_id
+        from we_product
     </sql>
 
     <select id="queryProductList" resultType="com.linkwechat.domain.product.product.vo.WeProductListVo">
         select wp.id,
-               wp.product_id,
-               wp.picture,
-               wp.`describe`,
-               wp.price,
-               wp.product_sn,
-               wp.attachments,
-               wp.create_time,
-               wp.create_by,
-               wp.create_by_id,
-               wp.update_time,
-               wp.update_by,
-               wp.update_by_id,
-               wp.del_flag,
-               '' as order_num,
-               '' as order_total_amount
+        wp.product_id,
+        wp.picture,
+        wp.`describe`,
+        wp.price,
+        wp.product_sn,
+        wp.attachments,
+        wp.create_by,
+        wp.update_time,
+        ( SELECT count( 1 ) FROM we_product_order o WHERE o.product_id = wp.id ) AS order_num,
+        COALESCE(( SELECT sum(total_fee) FROM we_product_order po WHERE po.product_id = wp.id ),0) AS order_total_amount
         from we_product wp
         <where>
             <if test="name != null and name != ''">
@@ -55,5 +63,17 @@
             and wp.del_flag = 0
         </where>
     </select>
+
+    <select id="statistics" resultType="com.linkwechat.domain.product.product.vo.WeProductStatisticsVo">
+        SELECT count(1)                                                          AS orderNum,
+               COALESCE(sum(o.total_fee), 0)                                     AS orderFee,
+               COALESCE((SELECT sum(r.refund_fee)
+                         FROM we_product_order_refund r
+                         WHERE r.order_no = o.order_no and refund_state = 2), 0) AS refundFee
+        FROM we_product_order o
+        WHERE o.product_id = #{productId}
+          AND o.del_flag = 0
+    </select>
+
 
 </mapper>

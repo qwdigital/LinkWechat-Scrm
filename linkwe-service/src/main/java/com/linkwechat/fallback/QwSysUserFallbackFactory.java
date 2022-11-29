@@ -52,4 +52,9 @@ public class QwSysUserFallbackFactory implements QwSysUserClient {
         return null;
     }
 
+    @Override
+    public AjaxResult getInfo(String weUserId) {
+        return null;
+    }
+
 }
