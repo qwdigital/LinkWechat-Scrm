@@ -16,6 +16,7 @@ import com.linkwechat.domain.wecom.query.customer.msg.WeAddCustomerMsgQuery;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.service.AbstractGroupMsgSendTaskService;
+import com.linkwechat.service.IWeMaterialService;
 import com.linkwechat.service.IWeSopExecuteTargetAttachmentsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,9 @@ public class SopGroupMsgServiceImpl extends AbstractGroupMsgSendTaskService {
     @Autowired
     LinkWeChatConfig linkWeChatConfig;
 
+    @Autowired
+    IWeMaterialService weMaterialService;
+
 
 
     @Override
@@ -57,23 +61,16 @@ public class SopGroupMsgServiceImpl extends AbstractGroupMsgSendTaskService {
 
         if(StringUtils.isNotEmpty(businessIds)){
 
-          List<WeSopExecuteTargetAttachments> targetAttachments
-              =sopExecuteTargetAttachmentsService.list(new LambdaQueryWrapper<WeSopExecuteTargetAttachments>()
+            List<WeSopExecuteTargetAttachments> targetAttachments
+                    =sopExecuteTargetAttachmentsService.list(new LambdaQueryWrapper<WeSopExecuteTargetAttachments>()
                     .in(WeSopExecuteTargetAttachments::getId,ListUtil.toList(businessIds.split(",")))
                     .eq(WeSopExecuteTargetAttachments::getDelFlag, Constants.COMMON_STATE));
 
             if(CollectionUtil.isNotEmpty(targetAttachments)){
                 Optional.of(query).map(WeAddGroupMessageQuery::getSenderList).orElseGet(ArrayList::new).forEach(sender -> {
-                    WeAddCustomerMsgQuery templateQuery = new WeAddCustomerMsgQuery();
-                    templateQuery.setChat_type(query.getChatType());
-                    templateQuery.setSender(sender.getUserId());
-                    if (ObjectUtil.equal(1, query.getChatType())) {
-                        templateQuery.setExternal_userid(sender.getCustomerList());
-                    }
 
-                    getMediaId(query.getAttachmentsList());
-                    templateQuery.setAttachmentsList(linkWeChatConfig.getH5Domain(),query.getAttachmentsList());
-                    WeAddCustomerMsgVo weAddCustomerMsgVo = qwCustomerClient.addMsgTemplate(templateQuery).getData();
+                    WeAddCustomerMsgVo weAddCustomerMsgVo = sendSpecGroupMsgTemplate(query, sender);
+
                     if (weAddCustomerMsgVo != null && ObjectUtil.equal(WeConstans.WE_SUCCESS_CODE, weAddCustomerMsgVo.getErrCode())) {
                         targetAttachments.stream().forEach(targetAttachment->{
                             targetAttachment.setMsgId(weAddCustomerMsgVo.getMsgId());

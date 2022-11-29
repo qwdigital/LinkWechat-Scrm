@@ -588,5 +588,27 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     }
 
 
+    /**
+     * 秒转化为:n小时k分这种
+     * @param diff
+     * @return
+     */
+    public static String ShowTimeInterval(long diff) {
+
+
+        if(diff<60){
+            return diff+"秒";
+        }
+
+
+        long minutes = diff / 60;
+        long min = minutes % 60;
+        long hou = minutes / 60;
+
+        return hou+"小时"+min+"分";
+    }
+
+
+
 
 }

@@ -59,4 +59,9 @@ public class QwSysUserFallbackFactory implements QwSysUserClient {
         return null;
     }
 
+    @Override
+    public AjaxResult<SysUser> findOrSynchSysUser(String weuserId) {
+        return null;
+    }
+
 }

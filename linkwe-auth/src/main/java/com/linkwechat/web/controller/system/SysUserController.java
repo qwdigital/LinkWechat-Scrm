@@ -172,7 +172,8 @@ public class SysUserController extends BaseController {
      */
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysUserDTO user) {
-        return toAjax(userService.addUser(user));
+        userService.addUser(user);
+        return AjaxResult.success();
     }
 
     /**
@@ -404,6 +405,18 @@ public class SysUserController extends BaseController {
                 userService.findAllSysUser(weUserIds,positions,deptIds)
         );
 
+    }
+
+    /**
+     * 根据weuserid获取员工，如果没有则从企业微信端同步
+     * @param weuserId
+     * @return
+     */
+    @GetMapping("/findOrSynchSysUser/{weuserId}")
+    public AjaxResult<SysUser> findOrSynchSysUser(@PathVariable("weuserId") String weuserId){
+        return AjaxResult.success(
+                userService.findOrSynchSysUser(weuserId)
+        );
     }
 
 }

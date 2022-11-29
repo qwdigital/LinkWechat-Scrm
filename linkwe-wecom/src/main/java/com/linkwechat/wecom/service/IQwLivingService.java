@@ -51,6 +51,14 @@ public interface IQwLivingService {
      */
     WeLivingIdListVo getUserAllLivingId(WeGetUserAllLivingIdQuery query);
 
+
+    /**
+     * 获取直播详情
+     * @param query
+     * @return
+     */
+    WeLivingInfoVo getLivingInfo(WeLivingQuery query);
+
     /**
      * 获取直播观看明细
      * @param query

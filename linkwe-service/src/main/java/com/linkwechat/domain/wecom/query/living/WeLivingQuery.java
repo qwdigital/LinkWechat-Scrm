@@ -3,8 +3,7 @@ package com.linkwechat.domain.wecom.query.living;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * @author danmo
@@ -14,6 +13,9 @@ import lombok.EqualsAndHashCode;
 @ApiModel
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeLivingQuery extends WeBaseQuery {
 
     /**

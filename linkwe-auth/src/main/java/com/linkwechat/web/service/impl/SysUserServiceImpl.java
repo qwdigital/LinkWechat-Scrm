@@ -636,7 +636,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     @Transactional
-    public int addUser(SysUserDTO sysUser) {
+    public SysUser addUser(SysUserDTO sysUser) {
+        SysUser user=new SysUser();
         WeUserQuery query = new WeUserQuery();
         query.setUserid(sysUser.getWeUserId());
         query.setCorpid(sysUser.getCorpId());
@@ -644,7 +645,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         List<SysUserDept> userDeptList = new ArrayList<>();
         if (result.getData() != null) {
             WeUserDetailVo vo = result.getData();
-            SysUser user = sysUserGenerator(vo);
+             user = sysUserGenerator(vo);
             for (int i = 0; i < vo.getDepartment().size(); i++) {
                 userDeptList.add(userDeptGenerator(vo, i));
             }
@@ -655,12 +656,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 userRoleMapper.batchUserRole(ListUtil.toList(
                         SysUserRole.builder().roleId(role.getRoleId()).userId(user.getUserId()).build()));
             }
+            SysUser finalUser = user;
             sysUserDeptService.saveBatch(userDeptList.stream().peek(userDept -> {
-                userDept.setUserId(user.getUserId());
+                userDept.setUserId(finalUser.getUserId());
             }).collect(Collectors.toList()));
-            return flag ? 1 : 0;
         }
-        return 0;
+        return user;
     }
 
     @Override
@@ -738,6 +739,24 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     public List<SysUser> findAllSysUser(String weUserIds, String positions, String deptIds) {
         return this.baseMapper.findAllSysUser(weUserIds,positions,deptIds);
+    }
+
+    @Override
+    public SysUser findOrSynchSysUser(String weuserId) {
+
+        List<SysUser> sysUser = this.list(new LambdaQueryWrapper<SysUser>()
+                .eq(SysUser::getWeUserId, weuserId));
+
+        if(CollectionUtil.isEmpty(sysUser)){//保存在则从企业微信端获取同时入库
+
+            SysUserDTO sysUserDTO=new SysUserDTO();
+            sysUserDTO.setWeUserId(weuserId);
+            sysUserDTO.setCorpId(SecurityUtils.getCorpId());
+            return this.addUser(sysUserDTO);
+        }
+
+
+        return sysUser.stream().findFirst().get();
     }
 
 
