@@ -1,11 +1,9 @@
 package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.google.protobuf.ServiceException;
 import com.linkwechat.domain.WeProductOrder;
-import com.linkwechat.domain.product.order.query.WePlaceAnOrderQuery;
 import com.linkwechat.domain.product.order.query.WeProductOrderQuery;
-import com.linkwechat.domain.product.order.vo.WeProductOrderVo;
+import com.linkwechat.domain.product.order.vo.WeProductOrderWareVo;
 
 import java.util.List;
 
@@ -24,17 +22,20 @@ public interface IWeProductOrderService extends IService<WeProductOrder> {
      * @param query
      * @return
      */
-    List<WeProductOrderVo> list(WeProductOrderQuery query);
+    List<WeProductOrderWareVo> list(WeProductOrderQuery query);
+
+    /**
+     * 订单同步
+     */
+    void orderSync();
 
 
     /**
-     * 下单
+     * 执行订单同步
      *
-     * @param query
-     * @return
-     * @throws ServiceException
+     * @param msg
      */
-    String placeAnOrder(WePlaceAnOrderQuery query) throws ServiceException;
+    void orderSyncExecute(String msg);
 
 
 }

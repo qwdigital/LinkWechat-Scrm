@@ -2,7 +2,36 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.mapper.WeProductOrderMapper">
 
-    <select id="list" resultType="com.linkwechat.domain.product.order.vo.WeProductOrderVo">
+    <resultMap id="weProductOrderWareVo" type="com.linkwechat.domain.product.order.vo.WeProductOrderWareVo">
+        <id property="id" column="id"></id>
+        <result property="productId" column="product_id"></result>
+        <result property="picture" column="picture"></result>
+        <result property="describe" column="describe"></result>
+        <result property="externalUserid" column="external_userid"></result>
+        <result property="externalAvatar" column="external_avatar"></result>
+        <result property="externalName" column="external_name"></result>
+        <result property="externalType" column="external_type"/>
+        <result property="productNum" column="product_num"></result>
+        <result property="totalFee" column="total_fee"></result>
+        <result property="payTime" column="pay_time"></result>
+        <result property="weUserId" column="we_user_id"></result>
+        <result property="weUserName" column="we_user_name"></result>
+        <result property="mchName" column="mch_name"></result>
+        <result property="mchId" column="mch_id"></result>
+        <result property="orderState" column="order_state"></result>
+        <collection property="refunds" ofType="com.linkwechat.domain.product.refund.vo.WeProductOrderRefundVo">
+            <id property="id" column="rId"></id>
+            <result property="refundState" column="refund_state"></result>
+            <result property="refundFee" column="refund_fee"></result>
+            <result property="refundNo" column="refund_no"></result>
+            <result property="refundTime" column="refund_time"></result>
+            <result property="refundUserName" column="refund_user_name"></result>
+            <result property="remark" column="remark"></result>
+        </collection>
+    </resultMap>
+
+
+    <select id="list" resultMap="weProductOrderWareVo">
         select
         o.id,
         o.product_id,
@@ -20,6 +49,7 @@
         o.mch_name,
         o.mch_id,
         o.order_state,
+        r.id as rId,
         r.refund_state,
         r.refund_fee,
         r.refund_no,
@@ -44,7 +74,8 @@
                 and o.refund_state = #{refundState}
             </if>
             <if test="beginTime!=null and beginTime!='' and endTime!=null and endTime!=''">
-                and DATE_FORMAT(o.pay_time,'%Y-%m-%d') between STR_TO_DATE(#{beginTime},'%Y-%m-%d') and STR_TO_DATE(#{endTime},'%Y-%m-%d')
+                and DATE_FORMAT(o.pay_time,'%Y-%m-%d') between STR_TO_DATE(#{beginTime},'%Y-%m-%d') and
+                STR_TO_DATE(#{endTime},'%Y-%m-%d')
             </if>
             <if test="productName!=null and productName!=''">
                 and p.describe like concat('%',#{productName},'%')

@@ -69,7 +69,7 @@ public class WeProductOrderRefund extends Model<WeProductOrderRefund> {
     /**
      * 退款状态
      */
-    private Boolean refundState;
+    private Integer refundState;
 
     /**
      * 创建时间

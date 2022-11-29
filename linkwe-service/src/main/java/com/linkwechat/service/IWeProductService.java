@@ -1,14 +1,15 @@
 package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.google.protobuf.ServiceException;
 import com.linkwechat.domain.WeProduct;
+import com.linkwechat.domain.product.product.query.WeAddProductQuery;
 import com.linkwechat.domain.product.product.query.WeProductLineChartQuery;
+import com.linkwechat.domain.product.product.query.WeProductQuery;
 import com.linkwechat.domain.product.product.vo.WeProductListVo;
 import com.linkwechat.domain.product.product.vo.WeProductStatisticsVo;
 import com.linkwechat.domain.product.product.vo.WeProductVo;
 import com.linkwechat.domain.product.product.vo.WeUserOrderTop5Vo;
-import com.linkwechat.domain.product.query.WeAddProductQuery;
-import com.linkwechat.domain.product.query.WeProductQuery;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,7 @@ public interface IWeProductService extends IService<WeProduct> {
      *
      * @param query
      */
-    void addProduct(WeAddProductQuery query);
+    void addProduct(WeAddProductQuery query) throws ServiceException;
 
     /**
      * 修改商品
@@ -34,7 +35,7 @@ public interface IWeProductService extends IService<WeProduct> {
      * @param id    商品ID
      * @param query 商品信息
      */
-    void updateProduct(Long id, WeAddProductQuery query);
+    void updateProduct(Long id, WeAddProductQuery query) throws ServiceException;
 
     /**
      * 删除商品
@@ -58,6 +59,17 @@ public interface IWeProductService extends IService<WeProduct> {
      */
     List<WeProductListVo> productList(WeProductQuery query);
 
+    /**
+     * 同步商品列表
+     */
+    void syncProductList();
+
+    /**
+     * 执行商品同步
+     *
+     * @param msg
+     */
+    void syncProductListHandle(String msg);
 
     /**
      * 订单统计

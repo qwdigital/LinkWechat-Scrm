@@ -1,26 +1,52 @@
 package com.linkwechat.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.protobuf.ServiceException;
+import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.domain.model.LoginUser;
+import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.common.utils.SnowFlakeUtil;
+import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeProduct;
 import com.linkwechat.domain.WeProductOrder;
+import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.product.order.query.WeProductOrderQuery;
-import com.linkwechat.domain.product.order.vo.WeProductOrderVo;
+import com.linkwechat.domain.product.order.vo.WeProductOrderWareVo;
+import com.linkwechat.domain.product.product.query.WeAddProductQuery;
 import com.linkwechat.domain.product.product.query.WeProductLineChartQuery;
+import com.linkwechat.domain.product.product.query.WeProductQuery;
 import com.linkwechat.domain.product.product.vo.WeProductListVo;
 import com.linkwechat.domain.product.product.vo.WeProductStatisticsVo;
 import com.linkwechat.domain.product.product.vo.WeProductVo;
 import com.linkwechat.domain.product.product.vo.WeUserOrderTop5Vo;
-import com.linkwechat.domain.product.query.WeAddProductQuery;
-import com.linkwechat.domain.product.query.WeProductQuery;
+import com.linkwechat.domain.product.refund.vo.WeProductOrderRefundVo;
+import com.linkwechat.domain.wecom.query.product.QwAddProductQuery;
+import com.linkwechat.domain.wecom.query.product.QwProductListQuery;
+import com.linkwechat.domain.wecom.query.product.QwProductQuery;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
+import com.linkwechat.domain.wecom.vo.customer.product.QwAddProductVo;
+import com.linkwechat.domain.wecom.vo.customer.product.QwProductListVo;
+import com.linkwechat.domain.wecom.vo.customer.product.QwProductVo;
+import com.linkwechat.domain.wecom.vo.media.WeMediaVo;
+import com.linkwechat.fegin.QwProductAlbumClient;
 import com.linkwechat.mapper.WeProductMapper;
 import com.linkwechat.mapper.WeProductOrderMapper;
+import com.linkwechat.service.IWeMaterialService;
 import com.linkwechat.service.IWeProductService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -35,26 +61,62 @@ import java.util.stream.DoubleStream;
  * @author danmo
  * @since 2022-09-30 11:36:06
  */
+@Slf4j
 @Service
 public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct> implements IWeProductService {
 
     @Resource
-    private WeProductMapper weProductMapper;
+    private QwProductAlbumClient qwProductAlbumClient;
+
+    @Autowired
+    private IWeMaterialService iWeMaterialService;
+
+    @Autowired
+    private RabbitMQSettingConfig rabbitMQSettingConfig;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     @Resource
     private WeProductOrderMapper weProductOrderMapper;
 
     @Override
-    public void addProduct(WeAddProductQuery query) {
+    public void addProduct(WeAddProductQuery query) throws ServiceException {
+        if (StringUtils.isNotBlank(query.getAttachments())) {
+            String[] split = query.getAttachments().split(",");
+            if (split.length > 8) {
+                throw new ServiceException("最多添加八张详情！");
+            }
+            List<WeMessageTemplate> accessory = new ArrayList<>();
+            //获取附件媒体ID
+            for (String img : split) {
+                WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
+                weMessageTemplate.setPicUrl(img);
+                if (StringUtils.isEmpty(weMessageTemplate.getMediaId())) {
+                    String mediaId = iWeMaterialService.uploadAttachmentMaterial(weMessageTemplate.getPicUrl(), MediaType.IMAGE.getMediaType(), 2, SnowFlakeUtil.nextId().toString()).getMediaId();
+                    if (StringUtils.isNotEmpty(mediaId)) {
+                        weMessageTemplate.setMediaId(mediaId);
+                    } else {
+                        throw new WeComException(12003, "获取附件素材ID失败");
+                    }
+                }
+                accessory.add(weMessageTemplate);
+            }
+            query.setAccessory(accessory);
+        }
         query.setProductSn(generateProductSn());
+        QwAddProductQuery productQuery = query.convert2Qw();
+        QwAddProductVo productResult = qwProductAlbumClient.addProduct(productQuery).getData();
+        if (Objects.isNull(productResult)) {
+            throw new WeComException(12001, "新增商品失败");
+        }
+        if (Objects.equals(productResult.getErrCode(), WeConstans.WE_SUCCESS_CODE)) {
+            throw new WeComException(12002, "新增商品失败");
+        }
+
         WeProduct product = new WeProduct();
-
-        //单价处理
-        String price = query.getPrice();
-        BigDecimal bigDecimal = new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_UP);
-        bigDecimal = bigDecimal.multiply(BigDecimal.valueOf(100L));
-
-        product.setPicture(query.getPicture());
-        product.setPrice(bigDecimal.toString());
+        product.setProductId(productResult.getProductId());
+        product.setPrice(productQuery.getPrice().toString());
         product.setDescribe(query.getDescribe());
         product.setProductSn(query.getProductSn());
         product.setAttachments(query.getAttachments());
@@ -62,15 +124,41 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
     }
 
     @Override
-    public void updateProduct(Long id, WeAddProductQuery query) {
+    public void updateProduct(Long id, WeAddProductQuery query) throws ServiceException {
         WeProduct product = getById(id);
+        if (StringUtils.isNotBlank(query.getAttachments())) {
+            String[] split = query.getAttachments().split(",");
+            if (split.length > 8) {
+                throw new ServiceException("最多添加八张详情！");
+            }
+            List<WeMessageTemplate> accessory = new ArrayList<>();
+            //获取附件媒体ID
+            for (String img : split) {
+                WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
+                weMessageTemplate.setPicUrl(img);
+                if (StringUtils.isEmpty(weMessageTemplate.getMediaId())) {
+                    String mediaId = iWeMaterialService.uploadAttachmentMaterial(weMessageTemplate.getPicUrl(), MediaType.IMAGE.getMediaType(), 2, SnowFlakeUtil.nextId().toString()).getMediaId();
+                    if (StringUtils.isNotEmpty(mediaId)) {
+                        weMessageTemplate.setMediaId(mediaId);
+                    } else {
+                        throw new WeComException(12003, "获取附件素材ID失败");
+                    }
+                }
+                accessory.add(weMessageTemplate);
+            }
+            query.setAccessory(accessory);
+        }
 
-        //单价处理
-        String price = query.getPrice();
-        BigDecimal bigDecimal = new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_UP);
-        bigDecimal = bigDecimal.multiply(BigDecimal.valueOf(100L));
-        product.setPrice(bigDecimal.toString());
-
+        QwAddProductQuery productQuery = query.convert2Qw();
+        productQuery.setProduct_id(product.getProductId());
+        WeResultVo productResult = qwProductAlbumClient.updateProductAlbum(productQuery).getData();
+        if (Objects.isNull(productResult)) {
+            throw new WeComException(12011, "修改商品失败");
+        }
+        if (!Objects.equals(productResult.getErrCode(), WeConstans.WE_SUCCESS_CODE)) {
+            throw new WeComException(12012, "修改商品失败");
+        }
+        product.setPrice(productQuery.getPrice().toString());
         product.setDescribe(query.getDescribe());
         product.setAttachments(query.getAttachments());
         updateById(product);
@@ -80,6 +168,15 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
     public void delProduct(List<Long> ids) {
         List<WeProduct> weProducts = listByIds(ids);
         for (WeProduct weProduct : weProducts) {
+            QwProductQuery query = new QwProductQuery();
+            query.setProduct_id(weProduct.getProductId());
+            WeResultVo weResult = qwProductAlbumClient.delProductAlbum(query).getData();
+            if (Objects.isNull(weResult)) {
+                throw new WeComException(12021, "删除商品失败");
+            }
+            if (!Objects.equals(weResult.getErrCode(), WeConstans.WE_SUCCESS_CODE)) {
+                throw new WeComException(12022, "删除商品失败");
+            }
             weProduct.setDelFlag(1);
             updateById(weProduct);
         }
@@ -94,7 +191,8 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
         WeProductVo productVo = new WeProductVo();
         productVo.setId(product.getId());
         productVo.setProductSn(product.getProductSn());
-        productVo.setPrice(product.getPrice());
+        BigDecimal divide = new BigDecimal(product.getPrice()).divide(BigDecimal.valueOf(100L));
+        productVo.setPrice(divide.toString());
         productVo.setDescribe(product.getDescribe());
         productVo.setPicture(product.getPicture());
         productVo.setAttachments(product.getAttachments());
@@ -104,13 +202,55 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
     @Override
     public List<WeProductListVo> productList(WeProductQuery query) {
         List<WeProductListVo> list = this.baseMapper.queryProductList(query);
-        //价格精度调整
-        list.stream().forEach(item -> {
-            BigDecimal bigDecimal = new BigDecimal(item.getPrice());
-            bigDecimal = bigDecimal.divide(BigDecimal.valueOf(100L)).setScale(2, BigDecimal.ROUND_HALF_UP);
-            item.setPrice(bigDecimal.toString());
-        });
         return list;
+    }
+
+
+    @Override
+    public void syncProductList() {
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeProductRk(), JSONObject.toJSONString(loginUser));
+    }
+
+    @Override
+    public void syncProductListHandle(String msg) {
+        LoginUser loginUser = JSONObject.parseObject(msg, LoginUser.class);
+        List<WeProduct> weProducts = new LinkedList<>();
+        QwProductListQuery query = new QwProductListQuery();
+        QwProductListVo qwProductList = getQwProductList(query);
+        log.info("企微商品图册数据：{}", JSONObject.toJSONString(qwProductList));
+        if (Objects.nonNull(qwProductList) && CollectionUtil.isNotEmpty(qwProductList.getProductList())) {
+            for (QwProductVo.QwProduct qwProduct : qwProductList.getProductList()) {
+                WeProduct product = new WeProduct();
+                product.setCreateBy(loginUser.getUserName());
+                product.setCreateById(loginUser.getUserId());
+                product.setProductId(qwProduct.getProductId());
+                product.setProductSn(qwProduct.getProductSn());
+                product.setDescribe(qwProduct.getDescription());
+                product.setPrice(String.valueOf(qwProduct.getPrice()));
+                List<JSONObject> attachments = qwProduct.getAttachments();
+                List<String> picList = new ArrayList<>();
+                if (CollectionUtil.isNotEmpty(attachments)) {
+                    attachments.stream().forEach(attachment -> {
+                        WeMediaVo mediaVo = iWeMaterialService.getMediaToResponse(attachment.getString("media_id"));
+                        picList.add(mediaVo.getUrl());
+                    });
+                }
+                product.setAttachments(StringUtils.join(picList, ","));
+                weProducts.add(product);
+            }
+        }
+        saveBatch(weProducts, 100);
+    }
+
+    private QwProductListVo getQwProductList(QwProductListQuery query) {
+        QwProductListVo productList = qwProductAlbumClient.getProductAlbumList(query).getData();
+        if (productList != null && productList.getNextCursor() != null) {
+            query.setCursor(productList.getNextCursor());
+            QwProductListVo productChildList = getQwProductList(query);
+            productList.getProductList().addAll(productChildList.getProductList());
+        }
+        return productList;
     }
 
     @Override
@@ -158,16 +298,17 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
         weProductOrderQuery.setProductId(query.getProductId());
         weProductOrderQuery.setBeginTime(DateUtil.format(startTime, "yyyy-MM-dd"));
         weProductOrderQuery.setEndTime(DateUtil.format(endTime, "yyyy-MM-dd"));
-        List<WeProductOrderVo> list = weProductOrderMapper.list(weProductOrderQuery);
-        Map<String, List<WeProductOrderVo>> collect = list.stream().collect(Collectors.groupingBy(o -> DateUtil.format(o.getPayTime(), "yyyy-MM-dd")));
+        List<WeProductOrderWareVo> list = weProductOrderMapper.list(weProductOrderQuery);
+        Map<String, List<WeProductOrderWareVo>> collect = list.stream().collect(Collectors.groupingBy(o -> DateUtil.format(o.getPayTime(), "yyyy-MM-dd")));
 
         for (int i = 0; i < timeList.size(); i++) {
             String dateStr = timeList.get(i).toDateStr();
             xAxisArray[i] = dateStr;
-            List<WeProductOrderVo> weProductOrderVos = collect.get(dateStr);
+            List<WeProductOrderWareVo> weProductOrderVos = collect.get(dateStr);
             if (weProductOrderVos != null && weProductOrderVos.size() > 0) {
                 double totalFee = weProductOrderVos.stream().flatMapToDouble(o -> DoubleStream.of(Double.valueOf(o.getTotalFee()))).sum();
-                double refundFee = weProductOrderVos.stream().flatMapToDouble(o -> DoubleStream.of(Double.valueOf(o.getRefundFee()))).sum();
+                List<WeProductOrderRefundVo> refundVos = weProductOrderVos.stream().flatMap(o -> o.getRefunds().stream()).collect(Collectors.toList());
+                double refundFee = refundVos.stream().filter(o -> o.getRefundState().equals(2)).flatMapToDouble(o -> DoubleStream.of(Double.valueOf(o.getRefundFee()))).sum();
                 BigDecimal bigDecimal = BigDecimal.valueOf(totalFee).divide(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_HALF_UP);
                 BigDecimal bigDecimal1 = BigDecimal.valueOf(refundFee).divide(BigDecimal.valueOf(100)).setScale(2, BigDecimal.ROUND_HALF_UP);
                 totalFeeArray[i] = bigDecimal.toString();
@@ -252,7 +393,7 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
     }
 
     /**
-     * 生成预约编号
+     * 生成商品编号
      *
      * @return
      */

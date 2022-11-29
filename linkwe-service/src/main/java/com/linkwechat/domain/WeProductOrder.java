@@ -43,11 +43,11 @@ public class WeProductOrder extends BaseEntity implements Serializable {
     @TableField("mch_no")
     private String mchNo;
 
-    @ApiModelProperty(value = "订单状态（1已完成，2已完成有退款）")
+    @ApiModelProperty(value = "订单状态（1已完成，3已完成有退款）")
     @TableField("order_state")
     private Integer orderState;
 
-    @ApiModelProperty(value = "付款总金额")
+    @ApiModelProperty(value = "付款总金额:单位分")
     @TableField("total_fee")
     private String totalFee;
 
@@ -70,22 +70,6 @@ public class WeProductOrder extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "订单联系人电话")
     @TableField("phone")
     private String phone;
-
-    @ApiModelProperty(value = "订单联系人地址-省id")
-    @TableField("province_id")
-    private Long provinceId;
-
-    @ApiModelProperty(value = "订单联系人地址-市id")
-    @TableField("city_id")
-    private Long cityId;
-
-    @ApiModelProperty(value = "订单联系人地址-县id")
-    @TableField("area_id")
-    private Long areaId;
-
-    @ApiModelProperty(value = "订单联系人地址省市县")
-    @TableField("area")
-    private String area;
 
     @ApiModelProperty(value = "订单联系人详细地址")
     @TableField("address")
@@ -126,4 +110,18 @@ public class WeProductOrder extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "是否删除:0有效,1删除")
     @TableField("del_flag")
     private Integer delFlag;
+
+    @ApiModelProperty(value = "收款方式。0：在聊天中收款 1：收款码收款 2：在直播间收款 3：用产品图册收款")
+    @TableField("payment_type")
+    private Integer paymentType;
+
+    @ApiModelProperty(value = "收款备注")
+    @TableField("remark")
+    private String remark;
+
+    @ApiModelProperty(value = "退款总金额")
+    @TableField("total_refund_fee")
+    private String totalRefundFee;
+
+
 }

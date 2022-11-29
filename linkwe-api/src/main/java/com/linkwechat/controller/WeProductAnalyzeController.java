@@ -21,8 +21,10 @@ import com.linkwechat.domain.product.analyze.vo.WeProductOrderDataReportVo;
 import com.linkwechat.domain.product.analyze.vo.WeProductOrderTop5Vo;
 import com.linkwechat.domain.product.order.query.WeProductOrderQuery;
 import com.linkwechat.domain.product.order.vo.WeProductOrderVo;
+import com.linkwechat.domain.product.order.vo.WeProductOrderWareVo;
 import com.linkwechat.domain.product.product.query.WeProductLineChartQuery;
 import com.linkwechat.domain.product.product.vo.WeUserOrderTop5Vo;
+import com.linkwechat.domain.product.refund.vo.WeProductOrderRefundVo;
 import com.linkwechat.service.IWeProductDayStatisticsService;
 import com.linkwechat.service.IWeProductOrderService;
 import com.linkwechat.service.IWeProductStatisticsService;
@@ -265,30 +267,31 @@ public class WeProductAnalyzeController extends BaseController {
         WeProductOrderQuery weProductOrderQuery = new WeProductOrderQuery();
         weProductOrderQuery.setBeginTime(DateUtil.format(startTime, "yyyy-MM-dd"));
         weProductOrderQuery.setEndTime(DateUtil.format(endTime, "yyyy-MM-dd"));
-        List<WeProductOrderVo> list = weProductOrderService.list(weProductOrderQuery);
-        Map<Long, List<WeProductOrderVo>> collect = list.stream().collect(Collectors.groupingBy(WeProductOrderVo::getProductId));
+        List<WeProductOrderWareVo> list = weProductOrderService.list(weProductOrderQuery);
+        Map<Long, List<WeProductOrderWareVo>> collect = list.stream().collect(Collectors.groupingBy(WeProductOrderWareVo::getProductId));
 
         //返回数据
         List<WeProductOrderTop5Vo> result = new ArrayList<>();
 
         //遍历数据
-        Iterator<Map.Entry<Long, List<WeProductOrderVo>>> iterator = collect.entrySet().iterator();
+        Iterator<Map.Entry<Long, List<WeProductOrderWareVo>>> iterator = collect.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<Long, List<WeProductOrderVo>> next = iterator.next();
+            Map.Entry<Long, List<WeProductOrderWareVo>> next = iterator.next();
 
             WeProductOrderTop5Vo weProductOrderTop5Vo = new WeProductOrderTop5Vo();
             weProductOrderTop5Vo.setProductId(next.getKey());
 
-            List<WeProductOrderVo> value = next.getValue();
+            List<WeProductOrderWareVo> value = next.getValue();
             weProductOrderTop5Vo.setProductDesc(value.get(0).getDescribe());
             weProductOrderTop5Vo.setPicture(value.get(0).getPicture());
             weProductOrderTop5Vo.setOrderNum(value.size());
             double totalFee = value.stream().flatMapToDouble(o -> DoubleStream.of(Double.valueOf(o.getTotalFee()))).sum();
             weProductOrderTop5Vo.setTotalFee(BigDecimal.valueOf(totalFee));
-            double refundFee = value.stream().flatMapToDouble(o -> DoubleStream.of(Double.valueOf(o.getRefundFee()))).sum();
+
+            List<WeProductOrderRefundVo> refundVos = value.stream().flatMap(o -> o.getRefunds().stream()).collect(Collectors.toList());
+            double refundFee = refundVos.stream().filter(o -> o.getRefundState().equals(2)).flatMapToDouble(o -> DoubleStream.of(Double.valueOf(o.getRefundFee()))).sum();
             weProductOrderTop5Vo.setNetIncome(BigDecimal.valueOf(totalFee - refundFee));
             result.add(weProductOrderTop5Vo);
-
         }
         result.sort(Comparator.comparing(WeProductOrderTop5Vo::getTotalFee).reversed());
         if (result.size() > 5) {
@@ -324,12 +327,12 @@ public class WeProductAnalyzeController extends BaseController {
         WeProductOrderQuery weProductOrderQuery = new WeProductOrderQuery();
         weProductOrderQuery.setBeginTime(DateUtil.format(startTime, "yyyy-MM-dd"));
         weProductOrderQuery.setEndTime(DateUtil.format(endTime, "yyyy-MM-dd"));
-        List<WeProductOrderVo> list = weProductOrderService.list(weProductOrderQuery);
+        List<WeProductOrderWareVo> list = weProductOrderService.list(weProductOrderQuery);
         if (list != null && list.size() > 0) {
-            Map<String, List<WeProductOrderVo>> collect = list.stream().collect(Collectors.groupingBy(WeProductOrderVo::getWeUserId));
-            Iterator<Map.Entry<String, List<WeProductOrderVo>>> iterator = collect.entrySet().iterator();
+            Map<String, List<WeProductOrderWareVo>> collect = list.stream().collect(Collectors.groupingBy(WeProductOrderWareVo::getWeUserId));
+            Iterator<Map.Entry<String, List<WeProductOrderWareVo>>> iterator = collect.entrySet().iterator();
             while (iterator.hasNext()) {
-                Map.Entry<String, List<WeProductOrderVo>> next = iterator.next();
+                Map.Entry<String, List<WeProductOrderWareVo>> next = iterator.next();
                 //构建返回结果
                 WeUserOrderTop5Vo weUserOrderTop5Vo = new WeUserOrderTop5Vo();
                 weUserOrderTop5Vo.setWeUserId(next.getKey());

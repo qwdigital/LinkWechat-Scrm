@@ -11,14 +11,14 @@ import java.util.Objects;
  */
 public enum ProductRefundOrderStateEnum {
 
-    APPLIED(1, "已申请退款"),
-    BEING_PROCESSED(2, "退款处理中"),
-    REFUND_SUCCESS(3, "退款成功"),
-    REFUND_CLOSE(4, "退款关闭"),
-    REFUND_EXCEPTION(5, "退款异常"),
-    APPROVAL(6, "审批中"),
-    APPROVAL_FAIL(7, "审批失败"),
-    APPROVAL_CANCEL(8, "审批取消"),
+    APPLIED(0, "已申请退款"),
+    BEING_PROCESSED(1, "退款处理中"),
+    REFUND_SUCCESS(2, "退款成功"),
+    REFUND_CLOSE(3, "退款关闭"),
+    REFUND_EXCEPTION(4, "退款异常"),
+    APPROVAL(5, "审批中"),
+    APPROVAL_FAIL(6, "审批失败"),
+    APPROVAL_CANCEL(7, "审批取消"),
     ;
 
 

@@ -64,15 +64,16 @@
         </where>
     </select>
 
-
     <select id="statistics" resultType="com.linkwechat.domain.product.product.vo.WeProductStatisticsVo">
-        SELECT count(1)                       AS orderNum,
-               COALESCE(sum(o.total_fee), 0)  AS orderFee,
-               COALESCE(sum(r.refund_fee), 0) AS refundFee
+        SELECT count(1)                                                          AS orderNum,
+               COALESCE(sum(o.total_fee), 0)                                     AS orderFee,
+               COALESCE((SELECT sum(r.refund_fee)
+                         FROM we_product_order_refund r
+                         WHERE r.order_no = o.order_no and refund_state = 2), 0) AS refundFee
         FROM we_product_order o
-                 LEFT JOIN we_product_order_refund r ON o.order_no = r.order_no
         WHERE o.product_id = #{productId}
           AND o.del_flag = 0
     </select>
+
 
 </mapper>

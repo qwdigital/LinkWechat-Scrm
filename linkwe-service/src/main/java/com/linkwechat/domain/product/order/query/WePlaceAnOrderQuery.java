@@ -28,7 +28,7 @@ public class WePlaceAnOrderQuery {
     private Integer productNum;
 
     /**
-     * 付款总金额：单位（元）
+     * 付款总金额：单位（元,保留两位小数）
      */
     @NotBlank(message = "付款总金额必填")
     private String totalFee;

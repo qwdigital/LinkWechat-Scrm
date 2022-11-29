@@ -3,9 +3,9 @@ package com.linkwechat.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.domain.WeProduct;
+import com.linkwechat.domain.product.product.query.WeProductQuery;
 import com.linkwechat.domain.product.product.vo.WeProductListVo;
 import com.linkwechat.domain.product.product.vo.WeProductStatisticsVo;
-import com.linkwechat.domain.product.query.WeProductQuery;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -38,6 +38,7 @@ public interface WeProductMapper extends BaseMapper<WeProduct> {
      * @version 1.0.0
      */
     WeProductStatisticsVo statistics(Long productId);
+
 
 }
 

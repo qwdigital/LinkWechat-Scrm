@@ -11,10 +11,8 @@ import java.util.Objects;
  */
 public enum ProductOrderStateEnum {
 
-    NON_PAYMENT(0, "未支付"),
     FINISH(1, "已完成"),
-    FINISH_BUT_REFUND(2, "已完成有退款"),
-    CANCELED(3, "已取消");
+    FINISH_BUT_REFUND(3, "已完成有退款");
 
 
     private Integer code;

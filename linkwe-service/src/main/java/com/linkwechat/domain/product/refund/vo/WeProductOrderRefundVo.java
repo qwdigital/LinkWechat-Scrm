@@ -56,4 +56,9 @@ public class WeProductOrderRefundVo {
      */
     private String refundFee;
 
+    /**
+     * 退款状态
+     */
+    private Integer refundState;
+
 }

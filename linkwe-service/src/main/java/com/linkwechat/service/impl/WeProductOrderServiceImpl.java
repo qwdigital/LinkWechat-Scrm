@@ -1,40 +1,45 @@
 package com.linkwechat.service.impl;
 
+import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.protobuf.ServiceException;
+import com.linkwechat.common.constant.ProductOrderConstants;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
-import com.linkwechat.common.enums.ProductOrderStateEnum;
-import com.linkwechat.common.enums.ProductRefundOrderStateEnum;
+import com.linkwechat.common.core.domain.model.LoginUser;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.common.utils.file.FileUtils;
+import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeCorpAccount;
-import com.linkwechat.domain.WeProduct;
+import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeProductOrder;
-import com.linkwechat.domain.product.order.query.WePlaceAnOrderQuery;
+import com.linkwechat.domain.WeProductOrderRefund;
 import com.linkwechat.domain.product.order.query.WeProductOrderQuery;
-import com.linkwechat.domain.product.order.vo.WeProductOrderVo;
+import com.linkwechat.domain.product.order.vo.WeProductOrderWareVo;
+import com.linkwechat.domain.wecom.query.merchant.WeGetBillListQuery;
+import com.linkwechat.domain.wecom.vo.merchant.WeGetBillListVo;
+import com.linkwechat.fegin.QwMerchantClient;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeCorpAccountMapper;
-import com.linkwechat.mapper.WeProductMapper;
+import com.linkwechat.mapper.WeCustomerMapper;
 import com.linkwechat.mapper.WeProductOrderMapper;
+import com.linkwechat.mapper.WeProductOrderRefundMapper;
 import com.linkwechat.service.IWeProductOrderService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -44,141 +49,124 @@ import java.util.List;
  * @version 1.0.0
  * @date 2022/11/21 18:20
  */
+@Slf4j
 @Service
 public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper, WeProductOrder> implements IWeProductOrderService {
 
     @Resource
     private WeProductOrderMapper weProductOrderMapper;
     @Resource
-    private WeProductMapper weProductMapper;
-    @Resource
     private WeCorpAccountMapper weCorpAccountMapper;
     @Resource
     private QwSysUserClient qwSysUserClient;
+    @Resource
+    private RabbitTemplate rabbitTemplate;
+    @Resource
+    private RabbitMQSettingConfig rabbitMQSettingConfig;
+    @Resource
+    private QwMerchantClient qwMerchantClient;
+    @Resource
+    private WeCustomerMapper weCustomerMapper;
+    @Resource
+    private WeProductOrderRefundMapper weProductOrderRefundMapper;
+    @Resource
+    private RedisTemplate redisTemplate;
+
+    /**
+     * 获取对外收款记录的游标
+     */
+    private static String cursor;
 
     @Override
-    public List<WeProductOrderVo> list(WeProductOrderQuery query) {
-        List<WeProductOrderVo> list = weProductOrderMapper.list(query);
-        if (list != null && list.size() > 0) {
-            for (WeProductOrderVo weProductOrderVo : list) {
-                //订单状态
-                weProductOrderVo.setOrderStateStr(ProductOrderStateEnum.of(weProductOrderVo.getOrderState()).getMsg());
-                //退款订单状态
-                weProductOrderVo.setRefundStateStr(ProductRefundOrderStateEnum.of(weProductOrderVo.getRefundState()).getMsg());
-                //订单金额
-                BigDecimal totalFee = new BigDecimal(weProductOrderVo.getTotalFee()).divide(BigDecimal.valueOf(100L)).setScale(2, BigDecimal.ROUND_HALF_UP);
-                weProductOrderVo.setTotalFee(totalFee.toString());
-                //退款订单金额
-                BigDecimal refundFee = new BigDecimal(weProductOrderVo.getRefundFee()).divide(BigDecimal.valueOf(100L)).setScale(2, BigDecimal.ROUND_HALF_UP);
-                weProductOrderVo.setRefundFee(refundFee.toString());
-                //客户类型
-                weProductOrderVo.setExternalTypeStr(weProductOrderVo.getExternalType() == 1 ? "微信" : "企业微信");
-            }
-        }
+    public List<WeProductOrderWareVo> list(WeProductOrderQuery query) {
+        List<WeProductOrderWareVo> list = weProductOrderMapper.list(query);
         return list;
     }
 
     @Override
-    public String placeAnOrder(WePlaceAnOrderQuery query) throws ServiceException {
-        //商品信息
-        WeProduct weProduct = weProductMapper.selectById(query.getProductId());
-        if (ObjectUtil.isEmpty(weProduct)) {
-            throw new ServiceException("产品不存在!");
+    public void orderSync() {
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeProductOrderQu(), JSONObject.toJSONString(loginUser));
+    }
+
+    @Override
+    public void orderSyncExecute(String msg) {
+        WeGetBillListQuery query = new WeGetBillListQuery();
+        long beginTime = DateUtil.offset(DateUtil.date(), DateField.DAY_OF_YEAR, -1).getTime();
+        query.setBeginTime(beginTime);
+        long endTime = DateUtil.date().getTime();
+        query.setEndTime(endTime);
+        if (StringUtils.isNotBlank(cursor)) {
+            query.setCursor(cursor);
         }
-
-        //商户信息
-        LambdaQueryWrapper<WeCorpAccount> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(WeCorpAccount::getDelFlag, 0);
-        WeCorpAccount weCorpAccount = weCorpAccountMapper.selectOne(queryWrapper);
-        if (ObjectUtil.isEmpty(weCorpAccount)) {
-            throw new ServiceException("企业未配置!");
-        }
-
-        //添加订单
-        insertOrder(query, weProduct, weCorpAccount);
-
-        //调用支付
-
-        return null;
+        query.setLimit(100);
+        //处理订单
+        getBillList(query);
     }
 
     /**
-     * 预支付 JSAPI 支付
+     * 处理订单
      *
-     * @return
+     * @param query
      */
-    public String prepayment(WeCorpAccount weCorpAccount) throws ServiceException, KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
-        String wxAppId = weCorpAccount.getWxAppId();
-        String certP12Url = weCorpAccount.getCertP12Url();
-        if (StringUtils.isBlank(wxAppId)) {
-            throw new ServiceException("微信公众号信息未配置！");
+    private void getBillList(WeGetBillListQuery query) {
+        AjaxResult<WeGetBillListVo> result = qwMerchantClient.getBillList(query);
+        if (result.getCode() == 200) {
+            WeGetBillListVo data = result.getData();
+            if (ObjectUtil.isNotEmpty(data)) {
+                if (data.getErrCode() == 0) {
+                    cursor = data.getNextCursor();
+                    List<WeGetBillListVo.Bill> billList = data.getBillList();
+                    if (billList != null && billList.size() > 0) {
+                        for (WeGetBillListVo.Bill bill : billList) {
+                            //保存订单
+                            insertOrder(bill);
+                        }
+                        //迭代请求数据
+                        if (StringUtils.isNotBlank(cursor)) {
+                            query.setCursor(cursor);
+                        }
+                        getBillList(query);
+                    }
+                }
+            }
         }
-        if (StringUtils.isBlank(certP12Url)) {
-            throw new ServiceException("微信支付API证书未配置！");
-        }
-
-        String merChantNumber = weCorpAccount.getMerChantNumber();
-        KeyStore keyStore = KeyStore.getInstance("PKCS12");
-
-        //读取p12文件
-        InputStream inputStream = FileUtils.getInputStreamByUrl(certP12Url);
-
-        keyStore.load(inputStream,merChantNumber.toCharArray());
-
-        Enumeration<String> aliases = keyStore.aliases();
-
-        return "";
     }
-
 
     /**
      * 添加订单
      *
-     * @param query         订单信息
-     * @param weProduct     商品信息
-     * @param weCorpAccount 企业信息
+     * @param bill
      * @return
-     * @author WangYX
-     * @date 2022/11/24 9:42
      */
-    private void insertOrder(WePlaceAnOrderQuery query, WeProduct weProduct, WeCorpAccount weCorpAccount) throws ServiceException {
-
+    @Transactional(rollbackFor = Exception.class)
+    public WeProductOrder insertOrder(WeGetBillListVo.Bill bill) {
         WeProductOrder weProductOrder = new WeProductOrder();
-        weProductOrder.setOrderNo(getOrderNo(query.getOpenId()));
-        weProductOrder.setOrderState(ProductOrderStateEnum.NON_PAYMENT.getCode());
-        weProductOrder.setProductId(query.getProductId());
-        weProductOrder.setProductNum(query.getProductNum());
+        //订单基本信息
+        weProductOrder.setMchNo(bill.getTransactionId());
+        weProductOrder.setOrderState(bill.getTradeState());
+        weProductOrder.setPayTime(DateUtil.date(bill.getPayTime()));
+        weProductOrder.setOrderNo(bill.getOutTradeNo());
 
-        //验证订单总金额
-        String price = weProduct.getPrice();
-        BigDecimal bigDecimal = new BigDecimal(price).divide(BigDecimal.valueOf(100L)).setScale(2, BigDecimal.ROUND_HALF_UP);
-        bigDecimal = bigDecimal.multiply(BigDecimal.valueOf(query.getProductNum()));
-        if (!query.getTotalFee().equals(bigDecimal.toString())) {
-            throw new ServiceException("订单总额不正确!");
-        }
-        BigDecimal totalFee = new BigDecimal(query.getTotalFee()).multiply(BigDecimal.valueOf(100L));
-        weProductOrder.setTotalFee(totalFee.toString());
-
-        //订单地址信息
-        weProductOrder.setContact(query.getContact());
-        weProductOrder.setPhone(query.getPhone());
-        weProductOrder.setProvinceId(query.getProvinceId());
-        weProductOrder.setCityId(query.getCityId());
-        weProductOrder.setAreaId(query.getAreaId());
-        weProductOrder.setArea(query.getArea());
-        weProductOrder.setAddress(query.getAddress());
+        //订单总金额
+        weProductOrder.setTotalFee(bill.getTotalFee().toString());
 
         //客户信息
-        weProductOrder.setExternalUserid(query.getOpenId());
-        weProductOrder.setExternalName(query.getName());
-        if (StringUtils.isNotBlank(query.getAvatar())) {
-            weProductOrder.setExternalAvatar(query.getAvatar());
+        weProductOrder.setExternalUserid(bill.getExternalUserid());
+        LambdaQueryWrapper<WeCustomer> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(WeCustomer::getExternalUserid, bill.getExternalUserid());
+        queryWrapper.eq(WeCustomer::getDelFlag, 0);
+        List<WeCustomer> weCustomers = weCustomerMapper.selectList(queryWrapper);
+        if (weCustomers != null && weCustomers.size() > 0) {
+            WeCustomer weCustomer = weCustomers.get(0);
+            weProductOrder.setExternalName(weCustomer.getCustomerName());
+            weProductOrder.setExternalAvatar(weCustomer.getAvatar());
+            weProductOrder.setExternalType(weCustomer.getCustomerType() == null ? 1 : weCustomer.getCustomerType());
         }
-        weProductOrder.setExternalType(query.getType() == null ? 1 : query.getType());
 
-        //商品发送者信息
-        weProductOrder.setWeUserId(query.getWeUserId());
-        AjaxResult<SysUser> info = qwSysUserClient.getInfo(query.getWeUserId());
+        //收款人企业内账号userid
+        weProductOrder.setWeUserId(bill.getPayeeUserid());
+        AjaxResult<SysUser> info = qwSysUserClient.getInfo(bill.getPayeeUserid());
         if (info.getCode() == 200) {
             SysUser data = info.getData();
             if (ObjectUtil.isNotEmpty(data)) {
@@ -187,23 +175,72 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
         }
 
         //商户信息
-        weProductOrder.setMchName(weCorpAccount.getMerChantName());
-        weProductOrder.setMchNo(weCorpAccount.getMerChantNumber());
+        weProductOrder.setMchId(bill.getMchId());
+        LambdaQueryWrapper<WeCorpAccount> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(WeCorpAccount::getMerChantNumber, bill.getMchId());
+        wrapper.eq(WeCorpAccount::getDelFlag, 0);
+        WeCorpAccount weCorpAccount = weCorpAccountMapper.selectOne(wrapper);
+        if (ObjectUtil.isNotEmpty(weCorpAccount)) {
+            weProductOrder.setMchName(weCorpAccount.getCompanyName());
+        }
 
+        //商品信息
+        List<WeGetBillListVo.Commodity> commodityList = bill.getCommodityList();
+        if (commodityList != null && commodityList.size() > 0) {
+            WeGetBillListVo.Commodity commodity = commodityList.get(0);
+            String description = commodity.getDescription();
+            Integer amount = commodity.getAmount();
+            String[] split = description.split("\\\n");
+            String productId = split[0].replace("商品编码：", "");
+            weProductOrder.setProductId(Long.valueOf(productId));
+            weProductOrder.setProductNum(amount);
+        }
+
+        //订单地址信息
+        WeGetBillListVo.Payer payerInfo = bill.getPayerInfo();
+        if (ObjectUtil.isNotEmpty(payerInfo)) {
+            weProductOrder.setContact(payerInfo.getName());
+            weProductOrder.setPhone(payerInfo.getPhone());
+            weProductOrder.setAddress(payerInfo.getAddress());
+        }
+
+        //退款信息
+        Integer refundTotalFee = 0;
+        List<WeGetBillListVo.Refund> refundList = bill.getRefundList();
+        weProductOrder.setTotalRefundFee(bill.getTotalRefundFee().toString());
+        if (refundList != null && refundList.size() > 0) {
+            for (WeGetBillListVo.Refund refund : refundList) {
+                WeProductOrderRefund weProductOrderRefund = new WeProductOrderRefund();
+                weProductOrderRefund.setOrderNo(bill.getOutTradeNo());
+                weProductOrderRefund.setRefundNo(refund.getOutRefundNo());
+                weProductOrderRefund.setRefundUserId(refund.getRefundUserid());
+                weProductOrderRefund.setRemark(refund.getRefundComment());
+                LocalDateTime of = LocalDateTime.ofInstant(Instant.ofEpochMilli(refund.getRefundReqtime()), ZoneId.systemDefault());
+                weProductOrderRefund.setRefundTime(of);
+                weProductOrderRefund.setRefundState(refund.getRefundStatus());
+                weProductOrderRefund.setRefundFee(refund.getRefundFee().toString());
+                refundTotalFee = refundTotalFee + refund.getRefundFee();
+                weProductOrderRefund.setCreateTime(LocalDateTime.now());
+                weProductOrderRefundMapper.insert(weProductOrderRefund);
+            }
+        }
         weProductOrder.setCreateTime(new Date());
         weProductOrder.setUpdateTime(new Date());
+        weProductOrder.setDelFlag(0);
         //保存订单
         int insert = weProductOrderMapper.insert(weProductOrder);
-    }
 
-    /**
-     * 生成订单编号
-     *
-     * @return
-     */
-    private String getOrderNo(String openId) {
-        String date = DateUtil.format(LocalDateTime.now(), "yyyyMMddHHmmss");
-        return "PO" + date + openId.hashCode();
+        //订单总数
+        redisTemplate.opsForValue().increment(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_NUMBER);
+        //订单总金额
+        String todayTotalFeeStr = (String) redisTemplate.opsForValue().get(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_TOTAL_FEE);
+        BigDecimal totalFee = new BigDecimal(todayTotalFeeStr).add(BigDecimal.valueOf(bill.getTotalFee()));
+        redisTemplate.opsForValue().set(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_TOTAL_FEE, totalFee.toString());
+        //退款总金额
+        String todayRefundFeeStr = (String) redisTemplate.opsForValue().get(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_REFUND_FEE);
+        BigDecimal refundFee = new BigDecimal(todayRefundFeeStr).add(BigDecimal.valueOf(refundTotalFee));
+        redisTemplate.opsForValue().set(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_REFUND_FEE, refundFee.toString());
+        return weProductOrder;
     }
 
 }

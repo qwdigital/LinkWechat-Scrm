@@ -4,7 +4,7 @@ package com.linkwechat.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.domain.WeProductOrder;
 import com.linkwechat.domain.product.order.query.WeProductOrderQuery;
-import com.linkwechat.domain.product.order.vo.WeProductOrderVo;
+import com.linkwechat.domain.product.order.vo.WeProductOrderWareVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -27,6 +27,6 @@ public interface WeProductOrderMapper extends BaseMapper<WeProductOrder> {
      * @param query
      * @return
      */
-    List<WeProductOrderVo> list(WeProductOrderQuery query);
+    List<WeProductOrderWareVo> list(WeProductOrderQuery query);
 }
 
