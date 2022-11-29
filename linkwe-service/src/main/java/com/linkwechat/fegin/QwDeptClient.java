@@ -26,7 +26,7 @@ public interface QwDeptClient {
      * @param query
      * @return
      */
-    @PostMapping("/system/dept/list")
+    @PostMapping("/dept/list")
     AjaxResult<WeDeptVo> getDeptList(@RequestBody WeDeptQuery query);
 
 
