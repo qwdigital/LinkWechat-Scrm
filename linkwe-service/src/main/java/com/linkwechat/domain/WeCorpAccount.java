@@ -232,4 +232,20 @@ public class WeCorpAccount implements Serializable {
      */
     @TableField("customer_churn_notice_switch")
     private String customerChurnNoticeSwitch;
+
+
+    /***********************************************
+     *******************企业支付start****************
+     **********************************************/
+    /**
+     * 企业支付秘钥
+     */
+    @TableField("pay_secret")
+    private String paySecret;
+
+    /***********************************************
+     *******************企业支付end****************
+     **********************************************/
+
+
 }
