@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
  **/
 @Slf4j
 @Component
-public class WePayAccessTokenInterceptor extends WeForestInterceptor implements Interceptor<WeResultVo> {
+public class WeBillAccessTokenInterceptor extends WeForestInterceptor implements Interceptor<WeResultVo> {
 
     /**
      * 该方法在请求发送之前被调用, 若返回false则不会继续发送请求
@@ -34,7 +34,7 @@ public class WePayAccessTokenInterceptor extends WeForestInterceptor implements 
         if (iQwAccessTokenService == null) {
             iQwAccessTokenService = SpringUtils.getBean(IQwAccessTokenService.class);
         }
-        String token = iQwAccessTokenService.findWePayAccessToken(getCorpId(request));
+        String token = iQwAccessTokenService.findBillAccessToken(getCorpId(request));
         request.replaceOrAddQuery("access_token", token);
         return true;
     }
@@ -87,8 +87,8 @@ public class WePayAccessTokenInterceptor extends WeForestInterceptor implements 
                 && Lists.newArrayList(errorCodeRetry).contains(weResultVo.getErrCode())) {
             //删除缓存
             String corpId = getCorpId(request);
-            iQwAccessTokenService.removeWePayAccessToken(getCorpId(request));
-            String token = iQwAccessTokenService.findWePayAccessToken(corpId);
+            iQwAccessTokenService.removeBillAccessToken(getCorpId(request));
+            String token = iQwAccessTokenService.findBillAccessToken(corpId);
             request.replaceOrAddQuery("access_token", token);
         }
     }

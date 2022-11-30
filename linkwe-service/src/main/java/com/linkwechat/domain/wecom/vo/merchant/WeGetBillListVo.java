@@ -94,7 +94,7 @@ public class WeGetBillListVo extends WeResultVo {
         /**
          * 联系人信息，详情参考Payer，如创建收款项目时设置为不需要联系地址，则该字段为空，第三方不可获取
          */
-        private Payer payerInfo;
+        private Contact contactInfo;
     }
 
     /**
@@ -154,7 +154,7 @@ public class WeGetBillListVo extends WeResultVo {
      * 联系人信息
      */
     @Data
-    public static class Payer {
+    public static class Contact {
 
         /**
          * 联系人姓名

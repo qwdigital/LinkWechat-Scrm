@@ -87,7 +87,12 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
 
     @Override
     public void orderSyncExecute(String msg) {
+
         WeGetBillListQuery query = new WeGetBillListQuery();
+        LoginUser loginUser = JSONObject.parseObject(msg, LoginUser.class);
+        if (ObjectUtil.isNotEmpty(loginUser) && StringUtils.isNotBlank(loginUser.getCorpId())) {
+            query.setCorpid(loginUser.getCorpId());
+        }
         long beginTime = DateUtil.offset(DateUtil.date(), DateField.DAY_OF_YEAR, -1).getTime();
         query.setBeginTime(beginTime);
         long endTime = DateUtil.date().getTime();
@@ -140,6 +145,21 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
      */
     @Transactional(rollbackFor = Exception.class)
     public WeProductOrder insertOrder(WeGetBillListVo.Bill bill) {
+
+        String outTradeNo = bill.getOutTradeNo();
+        LambdaQueryWrapper<WeProductOrder> orderQuery = new LambdaQueryWrapper<>();
+        orderQuery.eq(WeProductOrder::getOrderNo, outTradeNo);
+        orderQuery.eq(WeProductOrder::getDelFlag, 0);
+        WeProductOrder order = weProductOrderMapper.selectOne(orderQuery);
+        if (ObjectUtil.isNotEmpty(order)) {
+            //更新数据
+
+        } else {
+            //添加数据
+
+        }
+
+
         WeProductOrder weProductOrder = new WeProductOrder();
         //订单基本信息
         weProductOrder.setMchNo(bill.getTransactionId());
@@ -206,11 +226,11 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
         }
 
         //订单地址信息
-        WeGetBillListVo.Payer payerInfo = bill.getPayerInfo();
-        if (ObjectUtil.isNotEmpty(payerInfo)) {
-            weProductOrder.setContact(payerInfo.getName());
-            weProductOrder.setPhone(payerInfo.getPhone());
-            weProductOrder.setAddress(payerInfo.getAddress());
+        WeGetBillListVo.Contact contactInfo = bill.getContactInfo();
+        if (ObjectUtil.isNotEmpty(contactInfo)) {
+            weProductOrder.setContact(contactInfo.getName());
+            weProductOrder.setPhone(contactInfo.getPhone());
+            weProductOrder.setAddress(contactInfo.getAddress());
         }
 
         //退款信息

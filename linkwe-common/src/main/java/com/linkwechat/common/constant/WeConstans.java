@@ -52,9 +52,9 @@ public class WeConstans {
     public static final String WE_KF_ACCESS_TOKEN = "we_kf_access_token:{}";
 
     /**
-     * 企微支付token
+     * 对外收款token
      */
-    public static final String WE_PAY_ACCESS_TOKEN = "we_pay_access_token:{}";
+    public static final String WE_BILL_ACCESS_TOKEN = "we_bill_access_token:{}";
 
 
     /**

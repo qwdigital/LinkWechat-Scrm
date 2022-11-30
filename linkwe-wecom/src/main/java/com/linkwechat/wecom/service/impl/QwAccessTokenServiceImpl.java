@@ -92,8 +92,8 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
     }
 
     @Override
-    public String findWePayAccessToken(String corpId) {
-        return findAccessToken(corpId, WeConstans.WE_PAY_ACCESS_TOKEN);
+    public String findBillAccessToken(String corpId) {
+        return findAccessToken(corpId, WeConstans.WE_BILL_ACCESS_TOKEN);
     }
 
 
@@ -119,8 +119,8 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
                 weCorpTokenVo = weTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getKfSecret());
             } else if (WeConstans.WE_ADDRESS_BOOK_ACCESS_TOKEN.equals(accessTokenKey)) {
                 weCorpTokenVo = weTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getCorpSecret());
-            } else if (WeConstans.WE_PAY_ACCESS_TOKEN.equals(accessTokenKey)) {
-                weCorpTokenVo = weTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getPaySecret());
+            } else if (WeConstans.WE_BILL_ACCESS_TOKEN.equals(accessTokenKey)) {
+                weCorpTokenVo = weTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getBillSecret());
             }
 
             if (Objects.nonNull(weCorpTokenVo) && StringUtils.isNotEmpty(weCorpTokenVo.getAccessToken())) {
@@ -184,7 +184,7 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
     }
 
     @Override
-    public void removeWePayAccessToken(String corpId) {
-        redisService.deleteObject(StringUtils.format(WeConstans.WE_PAY_ACCESS_TOKEN, corpId));
+    public void removeBillAccessToken(String corpId) {
+        redisService.deleteObject(StringUtils.format(WeConstans.WE_BILL_ACCESS_TOKEN, corpId));
     }
 }

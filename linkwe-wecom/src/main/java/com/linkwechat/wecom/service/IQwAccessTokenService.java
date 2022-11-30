@@ -21,12 +21,12 @@ public interface IQwAccessTokenService {
     public String findKfAccessToken(String corpId);
 
     /**
-     * 获取企业支付的Token
+     * 对外收款Token
      *
      * @param corpId
      * @return
      */
-    public String findWePayAccessToken(String corpId);
+    public String findBillAccessToken(String corpId);
 
     public void removeCommonAccessToken(String corpId);
 
@@ -43,8 +43,8 @@ public interface IQwAccessTokenService {
     void removeAgentAccessToken(String corpId, Integer agentId);
 
     /**
-     * 移除企业支付的Token
+     * 移除对外收款Token
      */
-    public void removeWePayAccessToken(String corpId);
+    public void removeBillAccessToken(String corpId);
 
 }
