@@ -146,6 +146,7 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
         weProductOrder.setOrderState(bill.getTradeState());
         weProductOrder.setPayTime(DateUtil.date(bill.getPayTime()));
         weProductOrder.setOrderNo(bill.getOutTradeNo());
+        weProductOrder.setPaymentType(bill.getPaymentType());
 
         //商品信息
         List<WeGetBillListVo.Commodity> commodityList = bill.getCommodityList();

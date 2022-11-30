@@ -102,6 +102,11 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
         return findAccessToken(corpId, WeConstans.WE_LIVE_ACCESS_TOKEN);
     }
 
+    @Override
+    public String findWePayAccessToken(String corpId) {
+        return findAccessToken(corpId, WeConstans.WE_PAY_ACCESS_TOKEN);
+    }
+
 
     //获取token
     private String findAccessToken(String corpId, String accessTokenKey) {
@@ -127,6 +132,8 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
                 weCorpTokenVo = weTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getCorpSecret());
             }else if(WeConstans.WE_LIVE_ACCESS_TOKEN.equals(accessTokenKey)){
                 weCorpTokenVo = weTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getLiveSecret());
+            } else if (WeConstans.WE_PAY_ACCESS_TOKEN.equals(accessTokenKey)) {
+                weCorpTokenVo = weTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getPaySecret());
             }
 
             if (Objects.nonNull(weCorpTokenVo) && StringUtils.isNotEmpty(weCorpTokenVo.getAccessToken())) {
@@ -206,5 +213,10 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
     @Override
     public void removeLiveAccessToken(String corpId) {
         redisService.deleteObject(StringUtils.format(WeConstans.WE_LIVE_ACCESS_TOKEN, corpId));
+    }
+
+    @Override
+    public void removeWePayAccessToken(String corpId) {
+        redisService.deleteObject(StringUtils.format(WeConstans.WE_PAY_ACCESS_TOKEN, corpId));
     }
 }

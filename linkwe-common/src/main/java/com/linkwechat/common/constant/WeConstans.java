@@ -27,7 +27,6 @@ public class WeConstans {
      */
     public static final String WE_COMMON_ACCESS_TOKEN = "we_common_access_token:{}";
 
-
     public static final String WE_AGENT_ACCESS_TOKEN = "we_agent_access_token:{}:{}";
 
     /**
@@ -56,6 +55,11 @@ public class WeConstans {
      * 直播token
      */
     public static final String WE_LIVE_ACCESS_TOKEN = "we_live_access_token:{}";
+
+    /**
+     * 企微支付token
+     */
+    public static final String WE_PAY_ACCESS_TOKEN = "we_pay_access_token:{}";
 
 
     /**
