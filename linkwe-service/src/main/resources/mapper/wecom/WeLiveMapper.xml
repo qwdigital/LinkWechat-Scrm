@@ -86,7 +86,7 @@
                         sys_user su WHERE su.we_user_id = wl.live_we_userid
                 )  as liveUserName,
                 (SELECT GROUP_CONCAT(distinct sd.dept_name)  FROM sys_dept sd left join sys_user_dept sud ON sud.dept_id=sd.dept_id
-                    left join  sys_user su on  su.user_id=sud.user_id where su.we_user_id=wl.live_we_userid) deptName,
+                    left join  sys_user su on su.we_user_id = sud.we_user_id   where su.we_user_id=wl.live_we_userid) deptName,
                 (
                     SELECT
                         GROUP_CONCAT( su.avatar )
