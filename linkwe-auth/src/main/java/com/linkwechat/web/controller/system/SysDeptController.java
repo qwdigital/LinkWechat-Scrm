@@ -56,7 +56,7 @@ public class SysDeptController extends BaseController {
      * @return
      */
     @GetMapping("/findSysDeptByIds")
-    public AjaxResult<List<SysDept>> findSysDeptByIds(String deptIds){
+    public AjaxResult<List<SysDept>> findSysDeptByIds(@RequestParam(value = "deptIds")String deptIds){
 
 
         return AjaxResult.success(

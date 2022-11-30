@@ -10,6 +10,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -25,24 +26,8 @@ public interface QwDeptClient {
      * @param query
      * @return
      */
-    @PostMapping("/system/dept/list")
+    @PostMapping("/dept/list")
     AjaxResult<WeDeptVo> getDeptList(@RequestBody WeDeptQuery query);
 
-//    /**
-//     * 获取部门ID列表
-//     *
-//     * @param query
-//     * @return
-//     */
-//    @PostMapping("/system/dept/simplelist")
-//    AjaxResult<WeDeptIdVo> getDeptSimpleList(@RequestBody WeDeptQuery query);
-//
 
-    /**
-     * 部门id批量获取部门列表，不包含权限
-     * @param deptIds
-     * @return
-     */
-    @GetMapping("/system/dept/findSysDeptByIds")
-    AjaxResult<List<SysDept>> findSysDeptByIds(String deptIds);
 }
