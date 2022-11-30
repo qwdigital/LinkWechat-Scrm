@@ -1,4 +1,4 @@
-package com.linkwechat.domain.product.vo;
+package com.linkwechat.domain.product.product.vo;
 
 import com.linkwechat.domain.media.WeMessageTemplate;
 import io.swagger.annotations.ApiModel;
@@ -31,5 +31,5 @@ public class WeProductVo {
     private String price;
 
     @ApiModelProperty("商品附件")
-    private List<WeMessageTemplate> attachments;
+    private String attachments;
 }
