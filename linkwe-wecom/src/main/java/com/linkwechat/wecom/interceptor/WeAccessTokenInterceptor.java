@@ -73,6 +73,10 @@ public class WeAccessTokenInterceptor extends WeForestInterceptor implements Int
      */
     @Override
     public void onSuccess(WeResultVo resultDto, ForestRequest forestRequest, ForestResponse forestResponse) {
+        WeErrorCodeEnum weErrorCodeEnum = WeErrorCodeEnum.parseEnum(resultDto.getErrCode());
+        if(null != weErrorCodeEnum){
+            resultDto.setErrMsg(weErrorCodeEnum.getErrorMsg());
+        }
         log.info("url:{},result:{}", forestRequest.getUrl(), forestResponse.getContent());
     }
 
