@@ -143,10 +143,18 @@ public class WeFormSurveyStatisticsServiceImpl extends ServiceImpl<WeFormSurveyS
         for (String channelName : split) {
             //PV
             String pvKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_PV, belongId, channelName);
-            pv += (Integer) redisTemplate.opsForValue().get(pvKey);
+            Object o = redisTemplate.opsForValue().get(pvKey);
+            if(Objects.nonNull(o)){
+                pv += (Integer)o;
+            }
+
 
             String ipKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_IP, belongId, channelName);
-            uv += redisTemplate.opsForSet().size(ipKey);
+            Long size = redisTemplate.opsForSet().size(ipKey);
+            if(null != size){
+                uv += size;
+            }
+
         }
         uv = Long.valueOf(uv.intValue() - split.length);
 
