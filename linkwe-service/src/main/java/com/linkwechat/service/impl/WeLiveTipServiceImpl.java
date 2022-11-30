@@ -79,7 +79,9 @@ implements IWeLiveTipService {
                                     if(MessageType.TEXT.getMessageType().equals(kk.getMsgType())){
                                         StringBuilder sb=new StringBuilder();
                                         sb.append(kk.getContent());
-                                        sb.append("  "+MessageFormat.format(linkWeChatConfig.getLiveUrl(),weLive.getId().toString()));
+                                        if(StringUtils.isNotEmpty(linkWeChatConfig.getLiveUrl())){
+                                            sb.append("  "+MessageFormat.format(linkWeChatConfig.getLiveUrl(),weLive.getId().toString()));
+                                        }
                                         kk.setContent(sb.toString());
                                     }
                                 });
