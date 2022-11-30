@@ -124,8 +124,8 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
                         //迭代请求数据
                         if (StringUtils.isNotBlank(cursor)) {
                             query.setCursor(cursor);
+                            getBillList(query);
                         }
-                        getBillList(query);
                     }
                 }
             }
