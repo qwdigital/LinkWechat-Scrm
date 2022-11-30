@@ -13,20 +13,14 @@ import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
-import com.linkwechat.domain.WeCorpAccount;
-import com.linkwechat.domain.WeCustomer;
-import com.linkwechat.domain.WeProductOrder;
-import com.linkwechat.domain.WeProductOrderRefund;
+import com.linkwechat.domain.*;
 import com.linkwechat.domain.product.order.query.WeProductOrderQuery;
 import com.linkwechat.domain.product.order.vo.WeProductOrderWareVo;
 import com.linkwechat.domain.wecom.query.merchant.WeGetBillListQuery;
 import com.linkwechat.domain.wecom.vo.merchant.WeGetBillListVo;
 import com.linkwechat.fegin.QwMerchantClient;
 import com.linkwechat.fegin.QwSysUserClient;
-import com.linkwechat.mapper.WeCorpAccountMapper;
-import com.linkwechat.mapper.WeCustomerMapper;
-import com.linkwechat.mapper.WeProductOrderMapper;
-import com.linkwechat.mapper.WeProductOrderRefundMapper;
+import com.linkwechat.mapper.*;
 import com.linkwechat.service.IWeProductOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -71,6 +65,8 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
     private WeProductOrderRefundMapper weProductOrderRefundMapper;
     @Resource
     private RedisTemplate redisTemplate;
+    @Resource
+    private WeProductMapper weProductMapper;
 
     /**
      * 获取对外收款记录的游标
@@ -119,8 +115,11 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
                     List<WeGetBillListVo.Bill> billList = data.getBillList();
                     if (billList != null && billList.size() > 0) {
                         for (WeGetBillListVo.Bill bill : billList) {
-                            //保存订单
-                            insertOrder(bill);
+                            //只处理商品图册收款
+                            if (bill.getPaymentType().equals(3)) {
+                                //保存订单
+                                insertOrder(bill);
+                            }
                         }
                         //迭代请求数据
                         if (StringUtils.isNotBlank(cursor)) {
@@ -147,6 +146,27 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
         weProductOrder.setOrderState(bill.getTradeState());
         weProductOrder.setPayTime(DateUtil.date(bill.getPayTime()));
         weProductOrder.setOrderNo(bill.getOutTradeNo());
+
+        //商品信息
+        List<WeGetBillListVo.Commodity> commodityList = bill.getCommodityList();
+        if (commodityList != null && commodityList.size() > 0) {
+            WeGetBillListVo.Commodity commodity = commodityList.get(0);
+            String description = commodity.getDescription();
+            //商品部包含商品编码，直接跳过，不入库
+            if (!description.contains("商品编码：")) {
+                return null;
+            }
+            Integer amount = commodity.getAmount();
+            String[] split = description.split("\\\n");
+            String productSn = split[0].replace("商品编码：", "");
+            LambdaQueryWrapper<WeProduct> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(WeProduct::getProductSn, productSn);
+            WeProduct weProduct = weProductMapper.selectOne(queryWrapper);
+            if (ObjectUtil.isNotEmpty(weProduct)) {
+                weProductOrder.setProductId(weProduct.getId());
+            }
+            weProductOrder.setProductNum(amount);
+        }
 
         //订单总金额
         weProductOrder.setTotalFee(bill.getTotalFee().toString());
@@ -182,18 +202,6 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
         WeCorpAccount weCorpAccount = weCorpAccountMapper.selectOne(wrapper);
         if (ObjectUtil.isNotEmpty(weCorpAccount)) {
             weProductOrder.setMchName(weCorpAccount.getCompanyName());
-        }
-
-        //商品信息
-        List<WeGetBillListVo.Commodity> commodityList = bill.getCommodityList();
-        if (commodityList != null && commodityList.size() > 0) {
-            WeGetBillListVo.Commodity commodity = commodityList.get(0);
-            String description = commodity.getDescription();
-            Integer amount = commodity.getAmount();
-            String[] split = description.split("\\\n");
-            String productId = split[0].replace("商品编码：", "");
-            weProductOrder.setProductId(Long.valueOf(productId));
-            weProductOrder.setProductNum(amount);
         }
 
         //订单地址信息

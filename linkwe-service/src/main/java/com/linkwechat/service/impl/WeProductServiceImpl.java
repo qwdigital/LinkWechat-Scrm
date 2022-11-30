@@ -12,6 +12,7 @@ import com.google.protobuf.ServiceException;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.MediaType;
+import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -81,33 +82,51 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
 
     @Override
     public void addProduct(WeAddProductQuery query) throws ServiceException {
+
+        List<WeMessageTemplate> accessory = new ArrayList<>();
+        //封面
+        String picture = query.getPicture();
+        WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
+        weMessageTemplate.setMsgType(MessageType.IMAGE.getMessageType());
+        weMessageTemplate.setPicUrl(picture);
+        if (StringUtils.isEmpty(weMessageTemplate.getMediaId())) {
+            String mediaId = iWeMaterialService.uploadAttachmentMaterial(weMessageTemplate.getPicUrl(), MediaType.IMAGE.getMediaType(), 2, SnowFlakeUtil.nextId().toString()).getMediaId();
+            if (StringUtils.isNotEmpty(mediaId)) {
+                weMessageTemplate.setMediaId(mediaId);
+                accessory.add(weMessageTemplate);
+            } else {
+                throw new WeComException(12003, "获取附件素材ID失败");
+            }
+        }
+
+        //图片处理
         if (StringUtils.isNotBlank(query.getAttachments())) {
             String[] split = query.getAttachments().split(",");
             if (split.length > 8) {
                 throw new ServiceException("最多添加八张详情！");
             }
-            List<WeMessageTemplate> accessory = new ArrayList<>();
             //获取附件媒体ID
             for (String img : split) {
-                WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
-                weMessageTemplate.setPicUrl(img);
-                if (StringUtils.isEmpty(weMessageTemplate.getMediaId())) {
-                    String mediaId = iWeMaterialService.uploadAttachmentMaterial(weMessageTemplate.getPicUrl(), MediaType.IMAGE.getMediaType(), 2, SnowFlakeUtil.nextId().toString()).getMediaId();
+                WeMessageTemplate messageTemplate = new WeMessageTemplate();
+                messageTemplate.setMsgType(MessageType.IMAGE.getMessageType());
+                messageTemplate.setPicUrl(img);
+                if (StringUtils.isEmpty(messageTemplate.getMediaId())) {
+                    String mediaId = iWeMaterialService.uploadAttachmentMaterial(messageTemplate.getPicUrl(), MediaType.IMAGE.getMediaType(), 2, SnowFlakeUtil.nextId().toString()).getMediaId();
                     if (StringUtils.isNotEmpty(mediaId)) {
-                        weMessageTemplate.setMediaId(mediaId);
+                        messageTemplate.setMediaId(mediaId);
                     } else {
                         throw new WeComException(12003, "获取附件素材ID失败");
                     }
                 }
-                accessory.add(weMessageTemplate);
+                accessory.add(messageTemplate);
             }
-            query.setAccessory(accessory);
         }
+        query.setAccessory(accessory);
         query.setProductSn(generateProductSn());
 
         QwAddProductQuery productQuery = query.convert2Qw();
         //商品描述处理
-        String productSn = "商品编码：" + productQuery.getProduct_sn() + "\\n";
+        String productSn = "商品编码：" + productQuery.getProduct_sn() + "\n";
         String productDesc = "商品描述：" + productQuery.getDescription();
         productQuery.setDescription(productSn + productDesc);
 
@@ -115,12 +134,13 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
         if (Objects.isNull(productResult)) {
             throw new WeComException(12001, "新增商品失败");
         }
-        if (Objects.equals(productResult.getErrCode(), WeConstans.WE_SUCCESS_CODE)) {
+        if (!Objects.equals(productResult.getErrCode(), WeConstans.WE_SUCCESS_CODE)) {
             throw new WeComException(12002, "新增商品失败");
         }
 
         WeProduct product = new WeProduct();
         product.setProductId(productResult.getProductId());
+        product.setPicture(query.getPicture());
         product.setPrice(productQuery.getPrice().toString());
         product.setDescribe(query.getDescribe());
         product.setProductSn(query.getProductSn());
@@ -131,15 +151,33 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
     @Override
     public void updateProduct(Long id, WeAddProductQuery query) throws ServiceException {
         WeProduct product = getById(id);
+
+        List<WeMessageTemplate> accessory = new ArrayList<>();
+
+        //封面
+        String picture = query.getPicture();
+        WeMessageTemplate messageTemplate = new WeMessageTemplate();
+        messageTemplate.setMsgType(MessageType.IMAGE.getMessageType());
+        messageTemplate.setPicUrl(picture);
+        if (StringUtils.isEmpty(messageTemplate.getMediaId())) {
+            String mediaId = iWeMaterialService.uploadAttachmentMaterial(messageTemplate.getPicUrl(), MediaType.IMAGE.getMediaType(), 2, SnowFlakeUtil.nextId().toString()).getMediaId();
+            if (StringUtils.isNotEmpty(mediaId)) {
+                messageTemplate.setMediaId(mediaId);
+                accessory.add(messageTemplate);
+            } else {
+                throw new WeComException(12003, "获取附件素材ID失败");
+            }
+        }
+        //商品图片
         if (StringUtils.isNotBlank(query.getAttachments())) {
             String[] split = query.getAttachments().split(",");
             if (split.length > 8) {
                 throw new ServiceException("最多添加八张详情！");
             }
-            List<WeMessageTemplate> accessory = new ArrayList<>();
             //获取附件媒体ID
             for (String img : split) {
                 WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
+                weMessageTemplate.setMsgType(MessageType.IMAGE.getMessageType());
                 weMessageTemplate.setPicUrl(img);
                 if (StringUtils.isEmpty(weMessageTemplate.getMediaId())) {
                     String mediaId = iWeMaterialService.uploadAttachmentMaterial(weMessageTemplate.getPicUrl(), MediaType.IMAGE.getMediaType(), 2, SnowFlakeUtil.nextId().toString()).getMediaId();
@@ -158,7 +196,7 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
         productQuery.setProduct_id(product.getProductId());
         if (StringUtils.isNotBlank(query.getDescribe())) {
             //商品描述处理
-            String productSn = "商品编码：" + product.getProductSn() + "\\n";
+            String productSn = "商品编码：" + product.getProductSn() + "\n";
             String productDesc = "商品描述：" + productQuery.getDescription();
             productQuery.setDescription(productSn + productDesc);
         }
@@ -170,6 +208,7 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
         if (!Objects.equals(productResult.getErrCode(), WeConstans.WE_SUCCESS_CODE)) {
             throw new WeComException(12012, "修改商品失败");
         }
+        product.setPicture(query.getPicture());
         product.setPrice(productQuery.getPrice().toString());
         product.setDescribe(query.getDescribe());
         product.setAttachments(query.getAttachments());
@@ -233,28 +272,6 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
         QwProductListQuery query = new QwProductListQuery();
         QwProductListVo qwProductList = getQwProductList(query);
         log.info("企微商品图册数据：{}", JSONObject.toJSONString(qwProductList));
-        if (Objects.nonNull(qwProductList) && CollectionUtil.isNotEmpty(qwProductList.getProductList())) {
-            for (QwProductVo.QwProduct qwProduct : qwProductList.getProductList()) {
-                WeProduct product = new WeProduct();
-                product.setCreateBy(loginUser.getUserName());
-                product.setCreateById(loginUser.getUserId());
-                product.setProductId(qwProduct.getProductId());
-                product.setProductSn(qwProduct.getProductSn());
-                product.setDescribe(qwProduct.getDescription());
-                product.setPrice(String.valueOf(qwProduct.getPrice()));
-                List<JSONObject> attachments = qwProduct.getAttachments();
-                List<String> picList = new ArrayList<>();
-                if (CollectionUtil.isNotEmpty(attachments)) {
-                    attachments.stream().forEach(attachment -> {
-                        WeMediaVo mediaVo = iWeMaterialService.getMediaToResponse(attachment.getString("media_id"));
-                        picList.add(mediaVo.getUrl());
-                    });
-                }
-                product.setAttachments(StringUtils.join(picList, ","));
-                weProducts.add(product);
-            }
-        }
-        saveBatch(weProducts, 100);
     }
 
     private QwProductListVo getQwProductList(QwProductListQuery query) {

@@ -23,6 +23,7 @@ public class WeAddProductQuery {
     @ApiModelProperty("商品封面地址")
     private String picture;
 
+    @Size(max = 270)
     @NotBlank(message = "商品描述不能为空")
     @ApiModelProperty("商品描述")
     private String describe;
