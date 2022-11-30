@@ -73,6 +73,12 @@ public class WeCorpAccount extends BaseEntity {
     @TableField("corp_secret")
     private String corpSecret;
 
+    /**
+     * 直播Secret
+     */
+    @TableField("live_secret")
+    private String liveSecret;
+
     /***********************************************
      *******************通讯录配置end****************
      **********************************************/
