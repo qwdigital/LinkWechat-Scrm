@@ -880,7 +880,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     }
 
     @Override
-    public void updateCustomer(String externalUserId, String userId) {
+    public WeCustomer updateCustomer(String externalUserId, String userId) {
+        //客户入库
+        WeCustomer weCustomer =new WeCustomer();
+
         //获取指定客户的详情
         WeCustomerQuery query = new WeCustomerQuery();
         query.setExternal_userid(externalUserId);
@@ -890,7 +893,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
             WeCustomerDetailVo.ExternalContact externalContact = weCustomerDetail.getExternalContact();
             //客户入库
-            WeCustomer weCustomer = new WeCustomer();
+             weCustomer = new WeCustomer();
             weCustomer.setId(SnowFlakeUtil.nextId());
             weCustomer.setExternalUserid(externalContact.getExternalUserId());
             weCustomer.setCustomerName(externalContact.getName());
@@ -932,6 +935,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     weCustomer.getExternalUserid(),weCustomer.getAddUserId(),TrajectorySceneType.TRAJECTORY_TITLE_BJBQ.getType(),null
             );
         }
+
+        return weCustomer;
     }
 
     @Override
@@ -994,6 +999,20 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Override
     public List<WeCustomersVo> findWeCustomerList(List<String> customerIds) {
         return this.baseMapper.findWeCustomerList(customerIds);
+    }
+
+
+    @Override
+    public WeCustomer findOrSynchWeCustomer(String externalUserid) {
+        List<WeCustomer> weCustomerList = this.list(new LambdaQueryWrapper<WeCustomer>()
+                .eq(WeCustomer::getExternalUserid, externalUserid));
+        if(CollectionUtil.isEmpty(weCustomerList)){
+
+            return this.updateCustomer(externalUserid, null);
+
+        }
+
+        return weCustomerList.stream().findFirst().get();
     }
 
 

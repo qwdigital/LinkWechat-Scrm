@@ -624,5 +624,34 @@ public class RabbitMQConfig {
         return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getSopEx()).durable(true).build();
     }
 
+    /**
+     * 直播交换机
+     * @return
+     */
+    @Bean
+    public Exchange liveEx(){
+        return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getWeLiveRk()).durable(true).build();
+    }
+
+    /**
+     * 直播队列绑定交换机
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeSyncWeLive(){
+        return BindingBuilder.bind(quWeLive()).to(syncEx()).with(rabbitMQSettingConfig.getWeLiveRk()).noargs();
+    }
+
+    /**
+     * 直播同步队列
+     * @return
+     */
+    @Bean
+    public Queue quWeLive(){
+        return new Queue(rabbitMQSettingConfig.getLiveQu());
+    }
+
+
+
 }
 

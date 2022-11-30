@@ -55,6 +55,8 @@ public class WeCallBackEventListener {
             put("msgaudit_notify", "weMsgAuditNotifyImpl");
             //应用管理员变更通知
             put("change_app_admin", "weChangeAppAdminImpl");
+            //直播回掉
+            put("living_status_change", "weCallBackLiveImpl");
         }
     };
 

@@ -1,18 +1,15 @@
 package com.linkwechat.service;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.linkwechat.common.enums.MessageType;
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
-import com.linkwechat.domain.media.WeMessageTemplate;
-import com.linkwechat.domain.wecom.vo.media.WeMediaVo;
+import com.linkwechat.domain.wecom.query.customer.msg.WeAddCustomerMsgQuery;
+import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
+import com.linkwechat.fegin.QwCustomerClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * @author sxw
@@ -26,6 +23,15 @@ public abstract class AbstractGroupMsgSendTaskService {
     @Autowired
     IWeMaterialService weMaterialService;
 
+    @Autowired
+    LinkWeChatConfig linkWeChatConfig;
+
+
+
+    @Autowired
+    QwCustomerClient qwCustomerClient;
+
+
     /**
      * 具体业务处理消息
      * @param query
@@ -34,30 +40,24 @@ public abstract class AbstractGroupMsgSendTaskService {
     public abstract void sendGroupMsg(WeAddGroupMessageQuery query);
 
 
-    protected void getMediaId(List<WeMessageTemplate> messageTemplates) {
-        Optional.ofNullable(messageTemplates).orElseGet(ArrayList::new).forEach(messageTemplate -> {
-            if (ObjectUtil.equal(MessageType.IMAGE.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getPicUrl()
-                        , MessageType.IMAGE.getMessageType()
-                        , FileUtil.getName(messageTemplate.getPicUrl()));
-                messageTemplate.setMediaId(weMedia.getMediaId());
-            } else if (ObjectUtil.equal(MessageType.MINIPROGRAM.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getPicUrl()
-                        , MessageType.IMAGE.getMessageType()
-                        , FileUtil.getName(messageTemplate.getPicUrl()));
-                messageTemplate.setMediaId(weMedia.getMediaId());
-            } else if (ObjectUtil.equal(MessageType.VIDEO.getMessageType(), messageTemplate.getMsgType())) {
-//                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
-//                        , MessageType.IMAGE.getMessageType()
-//                        , FileUtil.getName(messageTemplate.getMediaId()));
-//                messageTemplate.setMediaId(weMedia.getMediaId());
-            } else if (ObjectUtil.equal(MessageType.FILE.getMessageType(), messageTemplate.getMsgType())) {
-//                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
-//                        , MessageType.IMAGE.getMessageType()
-//                        , FileUtil.getName(messageTemplate.getMediaId()));
-//                messageTemplate.setMediaId(weMedia.getMediaId());
-            }
-        });
+    /**
+     * 调用企业微信api，构建群发任务
+     * @param query
+     * @param sender
+     * @return
+     */
+    protected WeAddCustomerMsgVo sendSpecGroupMsgTemplate(WeAddGroupMessageQuery query, WeAddGroupMessageQuery.SenderInfo sender){
+
+        WeAddCustomerMsgQuery templateQuery = new WeAddCustomerMsgQuery();
+        templateQuery.setChat_type(query.getChatType());
+        templateQuery.setSender(sender.getUserId());
+        if (ObjectUtil.equal(1, query.getChatType())) {
+            templateQuery.setExternal_userid(sender.getCustomerList());
+        }
+
+        weMaterialService.msgTplToMediaId(query.getAttachmentsList());
+        templateQuery.setAttachmentsList(linkWeChatConfig.getH5Domain(),query.getAttachmentsList());
+        return qwCustomerClient.addMsgTemplate(templateQuery).getData();
     }
 
 }

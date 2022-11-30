@@ -286,4 +286,15 @@ public class RabbitMQSettingConfig {
     //sop相关数据同步队列
     @Value("${wecom.mq.queue.sop-qu:Qu_Sop}")
     private String sopQu;
+
+    //直播数据同步队列
+    @Value("${wecom.mq.queue.live-qu:Qu_Live}")
+    private String liveQu;
+
+    //直播同步路由
+    @Value("${wecom.mq.route.sync.welive:Rk_WeLive}")
+    private String weLiveRk;
+
+
+
 }
