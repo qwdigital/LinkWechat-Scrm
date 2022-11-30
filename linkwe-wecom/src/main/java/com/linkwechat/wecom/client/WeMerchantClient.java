@@ -4,7 +4,7 @@ import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.Post;
 import com.linkwechat.domain.wecom.query.merchant.WeGetBillListQuery;
 import com.linkwechat.domain.wecom.vo.merchant.WeGetBillListVo;
-import com.linkwechat.wecom.interceptor.WePayAccessTokenInterceptor;
+import com.linkwechat.wecom.interceptor.WeBillAccessTokenInterceptor;
 
 /**
  * 对外收款
@@ -13,7 +13,7 @@ import com.linkwechat.wecom.interceptor.WePayAccessTokenInterceptor;
  * @version 1.0.0
  * @date 2022/11/28 11:29
  */
-@BaseRequest(baseURL = "${weComServerUrl}", interceptor = WePayAccessTokenInterceptor.class)
+@BaseRequest(baseURL = "${weComServerUrl}", interceptor = WeBillAccessTokenInterceptor.class)
 public interface WeMerchantClient {
 
     /**
