@@ -5,7 +5,6 @@ import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -105,7 +104,13 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
             query.setAccessory(accessory);
         }
         query.setProductSn(generateProductSn());
+
         QwAddProductQuery productQuery = query.convert2Qw();
+        //商品描述处理
+        String productSn = "商品编码：" + productQuery.getProduct_sn() + "\\n";
+        String productDesc = "商品描述：" + productQuery.getDescription();
+        productQuery.setDescription(productSn + productDesc);
+
         QwAddProductVo productResult = qwProductAlbumClient.addProduct(productQuery).getData();
         if (Objects.isNull(productResult)) {
             throw new WeComException(12001, "新增商品失败");
@@ -151,6 +156,13 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
 
         QwAddProductQuery productQuery = query.convert2Qw();
         productQuery.setProduct_id(product.getProductId());
+        if (StringUtils.isNotBlank(query.getDescribe())) {
+            //商品描述处理
+            String productSn = "商品编码：" + product.getProductSn() + "\\n";
+            String productDesc = "商品描述：" + productQuery.getDescription();
+            productQuery.setDescription(productSn + productDesc);
+        }
+
         WeResultVo productResult = qwProductAlbumClient.updateProductAlbum(productQuery).getData();
         if (Objects.isNull(productResult)) {
             throw new WeComException(12011, "修改商品失败");
@@ -193,6 +205,8 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
         productVo.setProductSn(product.getProductSn());
         BigDecimal divide = new BigDecimal(product.getPrice()).divide(BigDecimal.valueOf(100L));
         productVo.setPrice(divide.toString());
+
+
         productVo.setDescribe(product.getDescribe());
         productVo.setPicture(product.getPicture());
         productVo.setAttachments(product.getAttachments());
