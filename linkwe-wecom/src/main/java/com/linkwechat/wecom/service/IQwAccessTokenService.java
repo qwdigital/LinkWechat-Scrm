@@ -20,6 +20,8 @@ public interface IQwAccessTokenService {
 
     String findKfAccessToken(String corpId);
 
+    String findLiveAccessToken(String corpId);
+
     void removeCommonAccessToken(String corpId);
 
     void removeContactAccessToken(String corpId);
@@ -35,4 +37,6 @@ public interface IQwAccessTokenService {
    void removeAgentAccessToken(String corpId, Integer agentId);
 
    void removeAllWeAccessToken(String corpId);
+
+    void removeLiveAccessToken(String corpId);
 }
