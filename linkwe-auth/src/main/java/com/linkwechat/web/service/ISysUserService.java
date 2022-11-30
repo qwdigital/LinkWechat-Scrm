@@ -223,7 +223,7 @@ public interface ISysUserService extends IService<SysUser> {
      */
     void syncUserAndDeptHandler(String msg);
 
-    int addUser(SysUserDTO sysUser);
+    SysUser addUser(SysUserDTO sysUser);
 
 
     /**
@@ -242,5 +242,12 @@ public interface ISysUserService extends IService<SysUser> {
 
 
     List<SysUser> findAllSysUser(String weUserIds,String positions,String deptIds);
+
+    /**
+     * 根据we_user_id获取用户，如果没有则从企业微信端同步
+     * @param weuserId
+     * @return
+     */
+    SysUser findOrSynchSysUser(String weuserId);
 
 }

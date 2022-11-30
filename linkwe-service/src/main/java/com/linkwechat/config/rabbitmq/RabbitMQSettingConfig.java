@@ -294,4 +294,15 @@ public class RabbitMQSettingConfig {
     //商品图册同步队列
     @Value("${wecom.mq.queue.sync.product.order:Qu_Product_Order}")
     private String weProductOrderQu;
+
+    //直播数据同步队列
+    @Value("${wecom.mq.queue.live-qu:Qu_Live}")
+    private String liveQu;
+
+    //直播同步路由
+    @Value("${wecom.mq.route.sync.welive:Rk_WeLive}")
+    private String weLiveRk;
+
+
+
 }

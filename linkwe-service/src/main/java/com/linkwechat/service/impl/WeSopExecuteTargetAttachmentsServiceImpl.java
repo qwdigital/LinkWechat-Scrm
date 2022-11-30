@@ -100,7 +100,7 @@ implements IWeSopExecuteTargetAttachmentsService {
                             = v.stream().collect(Collectors.groupingBy(WeSopPushTaskDto::getPushEndTime));
                     pushTasks.forEach((kk, vv) -> {
                         WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
-                        messageQuery.setSopSource(true);
+                        messageQuery.setMsgSource(2);
                         messageQuery.setBusinessIds(
                                 String.join(",",vv.stream().map(WeSopPushTaskDto::getExcuteTargetAttachId).collect(Collectors.toList()))
                         );
