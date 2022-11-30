@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.ProductOrderConstants;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -35,6 +36,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 商品订单表
@@ -82,17 +86,13 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
     @Override
     public void orderSync() {
         LoginUser loginUser = SecurityUtils.getLoginUser();
-        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeProductOrderQu(), JSONObject.toJSONString(loginUser));
+        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeProductOrderQu(), loginUser.getCorpId());
     }
 
     @Override
-    public void orderSyncExecute(String msg) {
-
+    public void orderSyncExecute(String corpId) {
         WeGetBillListQuery query = new WeGetBillListQuery();
-        LoginUser loginUser = JSONObject.parseObject(msg, LoginUser.class);
-        if (ObjectUtil.isNotEmpty(loginUser) && StringUtils.isNotBlank(loginUser.getCorpId())) {
-            query.setCorpid(loginUser.getCorpId());
-        }
+        query.setCorpid(corpId);
         long beginTime = DateUtil.offset(DateUtil.date(), DateField.DAY_OF_YEAR, -1).getTime();
         query.setBeginTime(beginTime);
         long endTime = DateUtil.date().getTime();
@@ -122,8 +122,8 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
                         for (WeGetBillListVo.Bill bill : billList) {
                             //只处理商品图册收款
                             if (bill.getPaymentType().equals(3)) {
-                                //保存订单
-                                insertOrder(bill);
+                                //保存或更新订单
+                                insertOrUpdateOrder(bill);
                             }
                         }
                         //迭代请求数据
@@ -144,22 +144,98 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public WeProductOrder insertOrder(WeGetBillListVo.Bill bill) {
-
+    public void insertOrUpdateOrder(WeGetBillListVo.Bill bill) {
         String outTradeNo = bill.getOutTradeNo();
         LambdaQueryWrapper<WeProductOrder> orderQuery = new LambdaQueryWrapper<>();
         orderQuery.eq(WeProductOrder::getOrderNo, outTradeNo);
         orderQuery.eq(WeProductOrder::getDelFlag, 0);
         WeProductOrder order = weProductOrderMapper.selectOne(orderQuery);
         if (ObjectUtil.isNotEmpty(order)) {
-            //更新数据
-
+            //修改订单数据
+            updateProductOrder(bill, order);
         } else {
-            //添加数据
+            //保存订单数据
+            saveProductOrder(bill);
+        }
+    }
 
+    /**
+     * 修改订单数据
+     *
+     * @param bill
+     */
+    private void updateProductOrder(WeGetBillListVo.Bill bill, WeProductOrder productOrder) {
+
+        //修改订单数据
+        LambdaUpdateWrapper<WeProductOrder> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.set(!bill.getTradeState().equals(productOrder.getOrderState()), WeProductOrder::getOrderState, bill.getTradeState());
+        updateWrapper.set(!bill.getTotalRefundFee().equals(productOrder.getTotalRefundFee()), WeProductOrder::getTotalRefundFee, bill.getTotalRefundFee());
+        updateWrapper.set(!bill.getContactInfo().getName().equals(productOrder.getContact()), WeProductOrder::getContact, bill.getContactInfo().getName());
+        updateWrapper.set(!bill.getContactInfo().getPhone().equals(productOrder.getPhone()), WeProductOrder::getPhone, bill.getContactInfo().getPhone());
+        updateWrapper.set(!bill.getContactInfo().getAddress().equals(productOrder.getAddress()), WeProductOrder::getAddress, bill.getContactInfo().getAddress());
+        updateWrapper.set(WeProductOrder::getUpdateTime, new Date());
+        updateWrapper.eq(WeProductOrder::getId, productOrder.getId());
+        weProductOrderMapper.update(null, updateWrapper);
+
+        //更新退款操作
+        LambdaQueryWrapper<WeProductOrderRefund> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(WeProductOrderRefund::getOrderNo, bill.getOutTradeNo());
+        queryWrapper.eq(WeProductOrderRefund::getDelFlag, 0);
+        List<WeProductOrderRefund> weProductOrderRefunds = weProductOrderRefundMapper.selectList(queryWrapper);
+        Map<String, WeProductOrderRefund> collect = null;
+        if (weProductOrderRefunds != null && weProductOrderRefunds.size() > 0) {
+            collect = weProductOrderRefunds.stream().collect(Collectors.toMap(WeProductOrderRefund::getRefundNo, Function.identity()));
+        }
+        List<WeGetBillListVo.Refund> refundList = bill.getRefundList();
+        if (collect == null) {
+            for (WeGetBillListVo.Refund refund : refundList) {
+                WeProductOrderRefund weProductOrderRefund = new WeProductOrderRefund();
+                weProductOrderRefund.setOrderNo(bill.getOutTradeNo());
+                weProductOrderRefund.setRefundNo(refund.getOutRefundNo());
+                weProductOrderRefund.setRefundUserId(refund.getRefundUserid());
+                weProductOrderRefund.setRemark(refund.getRefundComment());
+                LocalDateTime of = LocalDateTime.ofInstant(Instant.ofEpochMilli(refund.getRefundReqtime()), ZoneId.systemDefault());
+                weProductOrderRefund.setRefundTime(of);
+                weProductOrderRefund.setRefundState(refund.getRefundStatus());
+                weProductOrderRefund.setRefundFee(refund.getRefundFee().toString());
+                weProductOrderRefund.setCreateTime(LocalDateTime.now());
+                weProductOrderRefundMapper.insert(weProductOrderRefund);
+            }
+        } else {
+            for (WeGetBillListVo.Refund refund : refundList) {
+                WeProductOrderRefund orderRefund = collect.get(refund.getOutRefundNo());
+                if (ObjectUtil.isEmpty(orderRefund)) {
+                    WeProductOrderRefund weProductOrderRefund = new WeProductOrderRefund();
+                    weProductOrderRefund.setOrderNo(bill.getOutTradeNo());
+                    weProductOrderRefund.setRefundNo(refund.getOutRefundNo());
+                    weProductOrderRefund.setRefundUserId(refund.getRefundUserid());
+                    weProductOrderRefund.setRemark(refund.getRefundComment());
+                    LocalDateTime of = LocalDateTime.ofInstant(Instant.ofEpochMilli(refund.getRefundReqtime()), ZoneId.systemDefault());
+                    weProductOrderRefund.setRefundTime(of);
+                    weProductOrderRefund.setRefundState(refund.getRefundStatus());
+                    weProductOrderRefund.setRefundFee(refund.getRefundFee().toString());
+                    weProductOrderRefund.setCreateTime(LocalDateTime.now());
+                    weProductOrderRefundMapper.insert(weProductOrderRefund);
+                }
+            }
         }
 
+        if (!bill.getTotalRefundFee().equals(productOrder.getTotalRefundFee())) {
+            //更新退款总金额
+            BigDecimal subtract = BigDecimal.valueOf(bill.getTotalRefundFee()).subtract(new BigDecimal(productOrder.getTotalRefundFee()));
+            String todayRefundFeeStr = (String) redisTemplate.opsForValue().get(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_REFUND_FEE);
+            BigDecimal refundFee = new BigDecimal(todayRefundFeeStr).add(subtract);
+            redisTemplate.opsForValue().set(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_REFUND_FEE, refundFee.toString());
+        }
+    }
 
+
+    /**
+     * 保存订单数据
+     *
+     * @param bill
+     */
+    private void saveProductOrder(WeGetBillListVo.Bill bill) {
         WeProductOrder weProductOrder = new WeProductOrder();
         //订单基本信息
         weProductOrder.setMchNo(bill.getTransactionId());
@@ -175,7 +251,7 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
             String description = commodity.getDescription();
             //商品部包含商品编码，直接跳过，不入库
             if (!description.contains("商品编码：")) {
-                return null;
+                return;
             }
             Integer amount = commodity.getAmount();
             String[] split = description.split("\\\n");
@@ -269,7 +345,6 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
         String todayRefundFeeStr = (String) redisTemplate.opsForValue().get(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_REFUND_FEE);
         BigDecimal refundFee = new BigDecimal(todayRefundFeeStr).add(BigDecimal.valueOf(refundTotalFee));
         redisTemplate.opsForValue().set(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_REFUND_FEE, refundFee.toString());
-        return weProductOrder;
     }
 
 }
