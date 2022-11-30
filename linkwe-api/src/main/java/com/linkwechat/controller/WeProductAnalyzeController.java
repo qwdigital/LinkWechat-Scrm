@@ -20,7 +20,6 @@ import com.linkwechat.domain.product.analyze.vo.WeProductAnalyzeStatisticsVo;
 import com.linkwechat.domain.product.analyze.vo.WeProductOrderDataReportVo;
 import com.linkwechat.domain.product.analyze.vo.WeProductOrderTop5Vo;
 import com.linkwechat.domain.product.order.query.WeProductOrderQuery;
-import com.linkwechat.domain.product.order.vo.WeProductOrderVo;
 import com.linkwechat.domain.product.order.vo.WeProductOrderWareVo;
 import com.linkwechat.domain.product.product.query.WeProductLineChartQuery;
 import com.linkwechat.domain.product.product.vo.WeUserOrderTop5Vo;

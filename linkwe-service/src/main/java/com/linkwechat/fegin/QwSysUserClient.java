@@ -40,4 +40,8 @@ public interface QwSysUserClient {
     @GetMapping("/system/user/getInfo/{weUserId}")
     AjaxResult getInfo(@PathVariable("id") String weUserId);
 
+    @GetMapping("/system/user/findAllSysUser")
+    AjaxResult<List<SysUser>> findAllSysUser(@RequestParam("weUserIds") String weUserIds,
+                                             @RequestParam("positions") String positions,@RequestParam("deptIds") String deptIds);
+
 }
