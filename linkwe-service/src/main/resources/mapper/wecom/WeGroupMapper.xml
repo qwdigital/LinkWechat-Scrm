@@ -188,11 +188,11 @@
             wg.add_time,
             wg.group_name,
             GROUP_CONCAT(DISTINCT su.user_name)  as  groupLeaderName,
-            (SELECT count(*) FROM we_group_member wgm WHERE wgm.chat_id=wg.chat_id and wgm.del_flag=0 ) as memberNum
+            (SELECT count(DISTINCT wgm.user_id) FROM we_group_member wgm WHERE wgm.chat_id=wg.chat_id and wgm.del_flag=0 ) as memberNum
         FROM
             we_group wg
-            LEFT JOIN we_group_tag_rel wgtr ON wg.chat_id=wgtr.chat_id
-            LEFT JOIN sys_user su ON su.we_user_id=wg.owner
+            LEFT JOIN we_group_tag_rel wgtr ON wg.chat_id=wgtr.chat_id and wgtr.del_flag = 0
+            LEFT JOIN sys_user su ON su.we_user_id=wg.owner and su.del_flag = 0
         WHERE
            wg.del_flag=0
             <if test="groupName != null  and groupName != ''">
