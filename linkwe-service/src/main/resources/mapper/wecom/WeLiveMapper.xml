@@ -45,56 +45,56 @@
     </resultMap>
 
     <select id="findLives" resultMap="baseMap">
-            SELECT
-                wl.id,
-                wl.live_title,
-                wl.live_we_userid,
-                wl.live_start_time,
-                wl.live_start_date,
-                wl.live_end_time,
-                wl.live_end_date,
-                wl.living_duration,
-                wl.actual_start_time,
-                wl.actual_end_time,
-                wl.living_actual_duration,
-                wl.live_state,
-                wl.live_desc,
-                wl.living_id,
-                wl.viewer_num,
-                wl.online_count,
-                wl.mic_num,
-                wl.comment_num,
-                wl.subscribe_count,
-                wl.start_reminder,
-                wl.start_spec_reminder,
-                wl.send_we_user,
-                wl.open_replay,
-                wl.replay_status,
-                wl.target_type,
-                wl.send_target,
-                wl.create_time,
-                wl.create_by,
-                wl.create_by_id,
-                wl.update_time,
-                wl.update_by,
-                wl.update_by_id,
-                wl.del_flag,
-                (
-                    SELECT
-                        GROUP_CONCAT( su.user_name )
-                    FROM
-                        sys_user su WHERE su.we_user_id = wl.live_we_userid
-                )  as liveUserName,
-                (SELECT GROUP_CONCAT(distinct sd.dept_name)  FROM sys_dept sd left join sys_user_dept sud ON sud.dept_id=sd.dept_id
-                    left join  sys_user su on  su.user_id=sud.user_id where su.we_user_id=wl.live_we_userid) deptName,
-                (
-                    SELECT
-                        GROUP_CONCAT( su.avatar )
-                    FROM
-                        sys_user su WHERE su.we_user_id = wl.live_we_userid
-                )  as avatar
-            FROM
-                we_live wl
+        SELECT
+            wl.id,
+            wl.live_title,
+            wl.live_we_userid,
+            wl.live_start_time,
+            wl.live_start_date,
+            wl.live_end_time,
+            wl.live_end_date,
+            wl.living_duration,
+            wl.actual_start_time,
+            wl.actual_end_time,
+            wl.living_actual_duration,
+            wl.live_state,
+            wl.live_desc,
+            wl.living_id,
+            wl.viewer_num,
+            wl.online_count,
+            wl.mic_num,
+            wl.comment_num,
+            wl.subscribe_count,
+            wl.start_reminder,
+            wl.start_spec_reminder,
+            wl.send_we_user,
+            wl.open_replay,
+            wl.replay_status,
+            wl.target_type,
+            wl.send_target,
+            wl.create_time,
+            wl.create_by,
+            wl.create_by_id,
+            wl.update_time,
+            wl.update_by,
+            wl.update_by_id,
+            wl.del_flag,
+            (
+                SELECT
+                    GROUP_CONCAT( su.user_name )
+                FROM
+                    sys_user su WHERE su.we_user_id = wl.live_we_userid
+            )  as liveUserName,
+            (SELECT GROUP_CONCAT(distinct sd.dept_name)  FROM sys_dept sd left join sys_user_dept sud ON sud.dept_id=sd.dept_id
+                                                                          left join  sys_user su on su.we_user_id = sud.we_user_id   where su.we_user_id=wl.live_we_userid) deptName,
+            (
+                SELECT
+                    GROUP_CONCAT( su.avatar )
+                FROM
+                    sys_user su WHERE su.we_user_id = wl.live_we_userid
+            )  as avatar
+        FROM
+            we_live wl
             ${ew.customSqlSegment}
     </select>
 
