@@ -254,12 +254,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 (select count(1) from we_group where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')) as yd_group_add_cnt,
                 (select count(1) from we_group where date_format(update_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d')  and del_flag = 1 ) as td_group_dissolve_cnt,
                 (select count(1) from we_group where date_format(update_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')  and del_flag = 1 ) as yd_group_dissolve_cnt,
-                (select count(DISTINCT user_id) from we_group_member where del_flag = 0 ) as member_total_cnt,
-                (select count(DISTINCT user_id) from we_group_member where type = 1 and del_flag = 0 ) as member_user_cnt,
-                (select count(DISTINCT user_id) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_member_add_cnt,
-                (select count(DISTINCT user_id) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_member_add_cnt,
-                (select count(DISTINCT user_id) from we_group_member where date_format(quit_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') and del_flag = 1 ) as td_member_quit_cnt,
-                (select count(DISTINCT user_id) from we_group_member where date_format(quit_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') and del_flag = 1 ) as yd_member_quit_cnt;
+                (select count(user_id) from we_group_member where del_flag = 0 ) as member_total_cnt,
+                (select count(user_id) from we_group_member where type = 1 and del_flag = 0 ) as member_user_cnt,
+                (select count(user_id) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_member_add_cnt,
+                (select count(user_id) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_member_add_cnt,
+                (select count(user_id) from we_group_member where date_format(quit_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') and del_flag = 1 ) as td_member_quit_cnt,
+                (select count(user_id) from we_group_member where date_format(quit_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') and del_flag = 1 ) as yd_member_quit_cnt;
     </select>
 
 
