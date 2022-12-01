@@ -22,6 +22,9 @@ public interface QwMediaClient {
     @PostMapping("/media/upload")
     AjaxResult<WeMediaVo> upload(@RequestBody WeMediaQuery query);
 
+    @PostMapping("/media/webhook/upload")
+    AjaxResult<WeMediaVo> webhookUpload(@RequestBody WeMediaQuery query);
+
     @PostMapping("/media/uploadImg")
     AjaxResult<WeMediaVo> uploadImg(@RequestBody WeMediaQuery query);
 

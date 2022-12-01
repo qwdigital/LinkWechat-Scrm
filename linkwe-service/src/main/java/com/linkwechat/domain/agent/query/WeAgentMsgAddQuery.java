@@ -24,7 +24,7 @@ public class WeAgentMsgAddQuery {
      * 消息标题
      */
     @ApiModelProperty(value = "消息标题")
-    private String title;
+    private String msgTitle;
 
 
     @ApiModelProperty(value = "应用ID")
