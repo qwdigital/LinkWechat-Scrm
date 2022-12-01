@@ -74,8 +74,7 @@
                 and o.refund_state = #{refundState}
             </if>
             <if test="beginTime!=null and beginTime!='' and endTime!=null and endTime!=''">
-                and DATE_FORMAT(o.pay_time,'%Y-%m-%d') between STR_TO_DATE(#{beginTime},'%Y-%m-%d') and
-                STR_TO_DATE(#{endTime},'%Y-%m-%d')
+                and DATE_FORMAT(o.pay_time,'%Y-%m-%d') between STR_TO_DATE(#{beginTime},'%Y-%m-%d') and STR_TO_DATE(#{endTime},'%Y-%m-%d')
             </if>
             <if test="productName!=null and productName!=''">
                 and p.describe like concat('%',#{productName},'%')

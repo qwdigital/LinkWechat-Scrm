@@ -125,7 +125,7 @@ public class WeProductAnalyzeController extends BaseController {
         weProductAnalyzeStatisticsVo.setTotalFee(weProductAnalyzeStatisticsVo.getTotalFee().add(todayTotalFee).divide(tempBigDecimal).setScale(2, BigDecimal.ROUND_HALF_UP));
         //设置今天退款总额
         BigDecimal todayRefundFee = new BigDecimal(todayRefundFeeStr);
-        weProductAnalyzeStatisticsVo.setTodayTotalFee(todayRefundFee.divide(tempBigDecimal).setScale(2, BigDecimal.ROUND_HALF_UP));
+        weProductAnalyzeStatisticsVo.setTodayRefundFee(todayRefundFee.divide(tempBigDecimal).setScale(2, BigDecimal.ROUND_HALF_UP));
         weProductAnalyzeStatisticsVo.setRefundFee(weProductAnalyzeStatisticsVo.getRefundFee().add(todayRefundFee).divide(tempBigDecimal).setScale(2, BigDecimal.ROUND_HALF_UP));
         //设置今天净收入
         BigDecimal subtract = todayTotalFee.subtract(todayRefundFee);
