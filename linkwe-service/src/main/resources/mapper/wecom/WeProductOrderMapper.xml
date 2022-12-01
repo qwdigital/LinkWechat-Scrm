@@ -5,6 +5,7 @@
     <resultMap id="weProductOrderWareVo" type="com.linkwechat.domain.product.order.vo.WeProductOrderWareVo">
         <id property="id" column="id"></id>
         <result property="productId" column="product_id"></result>
+        <result property="orderNo" column="order_no"></result>
         <result property="picture" column="picture"></result>
         <result property="describe" column="describe"></result>
         <result property="externalUserid" column="external_userid"></result>
@@ -19,6 +20,9 @@
         <result property="mchName" column="mch_name"></result>
         <result property="mchId" column="mch_id"></result>
         <result property="orderState" column="order_state"></result>
+        <result property="contact" column="contact"></result>
+        <result property="phone" column="phone"></result>
+        <result property="address" column="address"></result>
         <collection property="refunds" ofType="com.linkwechat.domain.product.refund.vo.WeProductOrderRefundVo">
             <id property="id" column="rId"></id>
             <result property="refundState" column="refund_state"></result>
@@ -35,6 +39,7 @@
         select
         o.id,
         o.product_id,
+        o.order_no,
         p.picture,
         p.`describe`,
         o.external_userid,
@@ -49,6 +54,9 @@
         o.mch_name,
         o.mch_id,
         o.order_state,
+        o.contact,
+        o.phone,
+        o.address,
         r.id as rId,
         r.refund_state,
         r.refund_fee,

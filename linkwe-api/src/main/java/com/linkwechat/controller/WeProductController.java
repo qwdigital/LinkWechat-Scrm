@@ -46,7 +46,6 @@ public class WeProductController extends BaseController {
         return AjaxResult.success();
     }
 
-
     @ApiOperation(value = "修改商品", httpMethod = "PUT")
     @Log(title = "修改商品", businessType = BusinessType.UPDATE)
     @PutMapping("/update/{id}")
@@ -68,7 +67,6 @@ public class WeProductController extends BaseController {
     @GetMapping("/get/{id}")
     public AjaxResult<WeProductVo> getProduct(@PathVariable("id") Long id) {
         WeProductVo product = weProductService.getProduct(id);
-        product.setPrice(new BigDecimal(product.getPrice()).divide(BigDecimal.valueOf(100L)).toString());
         return AjaxResult.success(product);
     }
 

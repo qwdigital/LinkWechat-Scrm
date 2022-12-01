@@ -91,11 +91,11 @@ public class WeProductOrderController extends BaseController {
 
     @ApiOperation(value = "查询订单交易状态", httpMethod = "GET")
     @Log(title = "订单交易状态", businessType = BusinessType.SELECT)
-    @GetMapping("/trading/status/{orderId}")
-    public AjaxResult<WeProductOrderPayInfoVo> orderTradingStatus(@PathVariable("orderId") Long orderId) {
+    @GetMapping("/trading/status/{orderNo}")
+    public AjaxResult<WeProductOrderPayInfoVo> orderTradingStatus(@PathVariable("orderNo") String orderNo) {
         LambdaQueryWrapper<WeProductOrder> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.select(WeProductOrder::getPayTime, WeProductOrder::getOrderNo, WeProductOrder::getMchNo);
-        queryWrapper.eq(WeProductOrder::getId, orderId);
+        queryWrapper.eq(WeProductOrder::getOrderNo, orderNo);
         queryWrapper.eq(WeProductOrder::getDelFlag, 0);
         WeProductOrder weProductOrder = weProductOrderService.getOne(queryWrapper);
         WeProductOrderPayInfoVo weProductOrderPayInfoVo = null;
