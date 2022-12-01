@@ -4,8 +4,10 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.ProductOrderConstants;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WeProductDayStatistics;
 import com.linkwechat.domain.WeProductStatistics;
+import com.linkwechat.service.IWeCorpAccountService;
 import com.linkwechat.service.IWeProductDayStatisticsService;
 import com.linkwechat.service.IWeProductOrderService;
 import com.linkwechat.service.IWeProductStatisticsService;
@@ -39,6 +41,8 @@ public class WeProductOrderSyncTask {
     private IWeProductStatisticsService weProductStatisticsService;
     @Resource
     private IWeProductDayStatisticsService weProductDayStatisticsService;
+    @Resource
+    private IWeCorpAccountService weCorpAccountService;
 
     /**
      * 同步订单的定时器，一小时执行一次
@@ -48,7 +52,11 @@ public class WeProductOrderSyncTask {
     @XxlJob("weProductOrderSyncTask")
     public void execute(String param) {
         //同步订单
-        weProductOrderService.orderSyncExecute("");
+        LambdaQueryWrapper<WeCorpAccount> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.apply("limit 1");
+        List<WeCorpAccount> list = weCorpAccountService.list(queryWrapper);
+        WeCorpAccount weCorpAccount = list.get(0);
+        weProductOrderService.orderSyncExecute(weCorpAccount.getCorpId());
 
         //统计数据,凌晨，订单同步之后，执行。
         LocalDateTime now = LocalDateTime.now();
