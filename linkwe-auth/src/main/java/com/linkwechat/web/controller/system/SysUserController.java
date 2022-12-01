@@ -370,7 +370,7 @@ public class SysUserController extends BaseController {
     }
 
     @GetMapping("/getUserInfo/{weUserId}")
-    public AjaxResult getInfo(@PathVariable("weUserId") String weUserId) {
+    public AjaxResult<SysUser> getInfo(@PathVariable("weUserId") String weUserId) {
         LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper();
         queryWrapper.eq(SysUser::getWeUserId, weUserId);
         SysUser user = sysUserMapper.selectOne(queryWrapper);
