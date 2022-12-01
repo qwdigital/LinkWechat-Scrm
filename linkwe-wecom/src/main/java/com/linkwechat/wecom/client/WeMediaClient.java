@@ -70,4 +70,16 @@ public interface WeMediaClient {
      */
     @Get(url = "/media/get")
     InputStream mediaGet(@Query("media_id") String media_id,@Var("query") WeMediaQuery query);
+
+    /**
+     * 群机器人文件上传
+     * @param file
+     * @param name
+     * @param query
+     * @return
+     */
+    @LogEnabled(value = false)
+    @Post(url = "/webhook/upload_media?key={query.key}&type=${query.type}",interceptor = {})
+    WeMediaVo webhookUpload(@DataFile(value = "media", fileName = "${1}") InputStream file,String name,
+                     @Var("query") WeMediaQuery query);
 }

@@ -185,6 +185,11 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
         return mediaClient.upload(new WeMediaQuery(type, url, name)).getData();
     }
 
+    @Override
+    public WeMediaVo uploadWebhookMaterial(String key,String url, String type, String name) {
+        return mediaClient.webhookUpload(new WeMediaQuery(key, type, url, name)).getData();
+    }
+
 
     /**
      * 生成海报图片地址(合成图片+文字)
