@@ -193,11 +193,12 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
                 weProductOrderRefund.setRefundNo(refund.getOutRefundNo());
                 weProductOrderRefund.setRefundUserId(refund.getRefundUserid());
                 weProductOrderRefund.setRemark(refund.getRefundComment());
-                LocalDateTime of = LocalDateTime.ofInstant(Instant.ofEpochMilli(refund.getRefundReqtime()), ZoneId.systemDefault());
+                LocalDateTime of = LocalDateTime.ofInstant(Instant.ofEpochMilli(refund.getRefundReqtime() * 1000L), ZoneId.systemDefault());
                 weProductOrderRefund.setRefundTime(of);
                 weProductOrderRefund.setRefundState(refund.getRefundStatus());
                 weProductOrderRefund.setRefundFee(refund.getRefundFee().toString());
                 weProductOrderRefund.setCreateTime(LocalDateTime.now());
+                weProductOrderRefund.setDelFlag(0);
                 weProductOrderRefundMapper.insert(weProductOrderRefund);
             }
         } else {
@@ -209,11 +210,12 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
                     weProductOrderRefund.setRefundNo(refund.getOutRefundNo());
                     weProductOrderRefund.setRefundUserId(refund.getRefundUserid());
                     weProductOrderRefund.setRemark(refund.getRefundComment());
-                    LocalDateTime of = LocalDateTime.ofInstant(Instant.ofEpochMilli(refund.getRefundReqtime()), ZoneId.systemDefault());
+                    LocalDateTime of = LocalDateTime.ofInstant(Instant.ofEpochMilli(refund.getRefundReqtime() * 1000L), ZoneId.systemDefault());
                     weProductOrderRefund.setRefundTime(of);
                     weProductOrderRefund.setRefundState(refund.getRefundStatus());
                     weProductOrderRefund.setRefundFee(refund.getRefundFee().toString());
                     weProductOrderRefund.setCreateTime(LocalDateTime.now());
+                    weProductOrderRefund.setDelFlag(0);
                     weProductOrderRefundMapper.insert(weProductOrderRefund);
                 }
             }
@@ -319,12 +321,13 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
                 weProductOrderRefund.setRefundNo(refund.getOutRefundNo());
                 weProductOrderRefund.setRefundUserId(refund.getRefundUserid());
                 weProductOrderRefund.setRemark(refund.getRefundComment());
-                LocalDateTime of = LocalDateTime.ofInstant(Instant.ofEpochMilli(refund.getRefundReqtime()), ZoneId.systemDefault());
+                LocalDateTime of = LocalDateTime.ofInstant(Instant.ofEpochMilli(refund.getRefundReqtime() * 1000L), ZoneId.systemDefault());
                 weProductOrderRefund.setRefundTime(of);
                 weProductOrderRefund.setRefundState(refund.getRefundStatus());
                 weProductOrderRefund.setRefundFee(refund.getRefundFee().toString());
                 refundTotalFee = refundTotalFee + refund.getRefundFee();
                 weProductOrderRefund.setCreateTime(LocalDateTime.now());
+                weProductOrderRefund.setDelFlag(0);
                 weProductOrderRefundMapper.insert(weProductOrderRefund);
             }
         }

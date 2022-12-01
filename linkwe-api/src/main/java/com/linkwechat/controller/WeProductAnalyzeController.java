@@ -447,11 +447,20 @@ public class WeProductAnalyzeController extends BaseController {
             redisTemplate.opsForValue().set(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_REFUND_FEE, weProductDayStatistics.getDayRefundTotalFee());
         } else {
             //今天订单总数
-            redisTemplate.opsForValue().set(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_NUMBER, 0);
+            Boolean orderNumber = redisTemplate.hasKey(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_NUMBER);
+            if (orderNumber) {
+                redisTemplate.opsForValue().set(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_NUMBER, 0);
+            }
             //今天订单总额：分
-            redisTemplate.opsForValue().set(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_TOTAL_FEE, "0");
+            Boolean totalFee = redisTemplate.hasKey(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_TOTAL_FEE);
+            if (totalFee) {
+                redisTemplate.opsForValue().set(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_TOTAL_FEE, "0");
+            }
             //今天退款总额：分
-            redisTemplate.opsForValue().set(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_REFUND_FEE, "0");
+            Boolean refundFee = redisTemplate.hasKey(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_REFUND_FEE);
+            if (refundFee) {
+                redisTemplate.opsForValue().set(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_REFUND_FEE, "0");
+            }
         }
     }
 
