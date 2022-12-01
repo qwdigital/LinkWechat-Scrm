@@ -50,7 +50,7 @@ public class WeAgentMsgServiceImpl extends ServiceImpl<WeAgentMsgMapper, WeAgent
         WeAgentMsg agentMsg = new WeAgentMsg();
         agentMsg.setStatus(query.getStatus());
         agentMsg.setAgentId(query.getAgentId());
-        agentMsg.setMsgTitle(query.getTitle());
+        agentMsg.setMsgTitle(query.getMsgTitle());
         agentMsg.setScopeType(query.getScopeType());
         agentMsg.setSendType(query.getSendType());
         agentMsg.setPlanSendTime(query.getPlanSendTime());
@@ -89,7 +89,7 @@ public class WeAgentMsgServiceImpl extends ServiceImpl<WeAgentMsgMapper, WeAgent
     @Override
     public void updateMsg(WeAgentMsgAddQuery query) {
         LambdaUpdateWrapper<WeAgentMsg> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.set(StringUtils.isNotEmpty(query.getTitle()), WeAgentMsg::getTitle, query.getTitle());
+        wrapper.set(StringUtils.isNotEmpty(query.getMsgTitle()), WeAgentMsg::getTitle, query.getMsgTitle());
         wrapper.set(Objects.nonNull(query.getScopeType()), WeAgentMsg::getScopeType, query.getScopeType());
         wrapper.set(Objects.nonNull(query.getSendType()), WeAgentMsg::getSendType, query.getSendType());
         wrapper.set(Objects.nonNull(query.getPlanSendTime()), WeAgentMsg::getPlanSendTime, query.getPlanSendTime());
