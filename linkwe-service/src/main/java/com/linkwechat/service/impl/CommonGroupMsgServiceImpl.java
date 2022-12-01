@@ -46,6 +46,9 @@ public class CommonGroupMsgServiceImpl extends AbstractGroupMsgSendTaskService {
     @Autowired
     LinkWeChatConfig linkWeChatConfig;
 
+    @Autowired
+    IWeMaterialService weMaterialService;
+
 
 
     @Override
@@ -58,15 +61,10 @@ public class CommonGroupMsgServiceImpl extends AbstractGroupMsgSendTaskService {
         try {
             if(template != null && template.getStatus() == 0){
                 Optional.of(query).map(WeAddGroupMessageQuery::getSenderList).orElseGet(ArrayList::new).forEach(sender -> {
-                    WeAddCustomerMsgQuery templateQuery = new WeAddCustomerMsgQuery();
-                    templateQuery.setChat_type(query.getChatType());
-                    templateQuery.setSender(sender.getUserId());
-                    if (ObjectUtil.equal(1, query.getChatType())) {
-                        templateQuery.setExternal_userid(sender.getCustomerList());
-                    }
-                    getMediaId(query.getAttachmentsList());
-                    templateQuery.setAttachmentsList(linkWeChatConfig.getH5Domain(),query.getAttachmentsList());
-                    WeAddCustomerMsgVo weAddCustomerMsgVo = qwCustomerClient.addMsgTemplate(templateQuery).getData();
+
+                    WeAddCustomerMsgVo weAddCustomerMsgVo =  sendSpecGroupMsgTemplate(query,sender);
+
+
                     if (weAddCustomerMsgVo != null && ObjectUtil.equal(WeConstans.WE_SUCCESS_CODE, weAddCustomerMsgVo.getErrCode())) {
                         String msgid = weAddCustomerMsgVo.getMsgId();
                         Long msgTemplateId = query.getId();

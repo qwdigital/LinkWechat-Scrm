@@ -373,10 +373,15 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     @Override
     public void groupMessageTaskHandler(WeAddGroupMessageQuery query) {
 
+        if(query.getMsgSource().equals(new Integer(2))){//sop
 
-        if(query.isSopSource()){
             //sop消息群发逻辑
             SpringUtils.getBean("sopGroupMsgService", AbstractGroupMsgSendTaskService.class).sendGroupMsg(
+                    query
+            );
+        }else if(query.getMsgSource().equals(new Integer(3))){//直播
+            //直播消息群发逻辑
+            SpringUtils.getBean("liveGroupMsgService", AbstractGroupMsgSendTaskService.class).sendGroupMsg(
                     query
             );
 
@@ -388,57 +393,6 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
 
         }
 
-//        LoginUser loginUser = query.getLoginUser();
-//        SecurityContextHolder.setUserName(loginUser.getUserName());
-//        SecurityContextHolder.setCorpId(loginUser.getCorpId());
-//        WeGroupMessageTemplate template = this.getById(query.getId());
-//        try {
-//            if(template != null && template.getStatus() == 0){
-//                Optional.of(query).map(WeAddGroupMessageQuery::getSenderList).orElseGet(ArrayList::new).forEach(sender -> {
-//                    WeAddCustomerMsgQuery templateQuery = new WeAddCustomerMsgQuery();
-//                    templateQuery.setChat_type(query.getChatType());
-//                    templateQuery.setSender(sender.getUserId());
-//                    if (ObjectUtil.equal(1, query.getChatType())) {
-//                        templateQuery.setExternal_userid(sender.getCustomerList());
-//                    }
-//                    getMediaId(query.getAttachmentsList());
-//                    templateQuery.setAttachmentsList(query.getAttachmentsList());
-//                    WeAddCustomerMsgVo weAddCustomerMsgVo = qwCustomerClient.addMsgTemplate(templateQuery).getData();
-//                    if (weAddCustomerMsgVo != null && ObjectUtil.equal(WeConstans.WE_SUCCESS_CODE, weAddCustomerMsgVo.getErrCode())) {
-//                        String msgid = weAddCustomerMsgVo.getMsgId();
-//                        Long msgTemplateId = query.getId();
-//                        WeGroupMessageList messageList = new WeGroupMessageList();
-//                        messageList.setMsgId(msgid);
-//                        weGroupMessageListService.update(messageList, new LambdaQueryWrapper<WeGroupMessageList>()
-//                                .eq(WeGroupMessageList::getMsgTemplateId, msgTemplateId)
-//                                .eq(WeGroupMessageList::getUserId, sender.getUserId()));
-//                    }
-//                });
-//                template.setStatus(1);
-//                template.setSource(query.getSource());
-//                this.updateById(template);
-//            }
-//        } catch (Exception e) {
-//            log.error("groupMessageTaskHandler error",e);
-//            template.setId(query.getId());
-//            template.setSource(query.getSource());
-//            template.setStatus(-1);
-//            this.updateById(template);
-//            throw new WeComException("发送失败");
-//        }finally {
-//            JSONObject jsonObject = new JSONObject();
-//            jsonObject.put("businessId",template.getBusinessId());
-//            jsonObject.put("source",template.getSource());
-//            jsonObject.put("status",template.getStatus());
-//            try {
-//                QwGroupMsgBusinessTypeEnum qwAppMsgBusinessTypeEnum = QwGroupMsgBusinessTypeEnum.parseEnum(template.getSource());
-//                if(qwAppMsgBusinessTypeEnum != null){
-//                    SpringUtils.getBean(qwAppMsgBusinessTypeEnum.getBeanName(), AbstractGroupMsgService.class).callBackHandler(jsonObject);
-//                }
-//            } catch (BeansException e) {
-//                log.error("groupMessageTaskHandler callback-error",e);
-//            }
-//        }
     }
 
     @Override

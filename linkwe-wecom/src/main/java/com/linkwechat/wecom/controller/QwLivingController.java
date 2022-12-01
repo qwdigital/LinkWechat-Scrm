@@ -92,6 +92,20 @@ public class QwLivingController {
         return AjaxResult.success(weLivingIdList);
     }
 
+
+    /**
+     * 获取直播详情
+     * @param query
+     * @return
+     */
+    @PostMapping("/getLivingInfo")
+    public AjaxResult<WeLivingInfoVo> getLivingInfo(@RequestBody WeLivingQuery query){
+
+        return AjaxResult.success(
+                qwLivingService.getLivingInfo(query)
+        );
+    }
+
     /**
      * 获取直播观看明细
      * @param query

@@ -76,6 +76,13 @@ public class LinkWeChatConfig {
     private String groupSopRedirectUrl;
 
 
+    /**
+     * 直播页面h5链接
+     */
+    private String liveUrl;
+
+
+
 
     /**
      * 流失客户地址

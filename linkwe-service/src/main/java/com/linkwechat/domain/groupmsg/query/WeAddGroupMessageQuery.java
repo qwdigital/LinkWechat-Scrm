@@ -1,6 +1,5 @@
 package com.linkwechat.domain.groupmsg.query;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.domain.WeGroupMessageTemplate;
 import com.linkwechat.domain.media.WeMessageTemplate;
@@ -10,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.List;
 
 /**
@@ -37,8 +35,9 @@ public class WeAddGroupMessageQuery extends WeGroupMessageTemplate {
     @ApiModelProperty(value = "当前用户",hidden = true)
     private LoginUser loginUser;
 
-    //是否来自sop true:是;false:否
-    private boolean sopSource=false;
+
+    //消息来源 1:通常 2:sop 3:直播
+    private Integer msgSource=1;
 
     public void setCurrentUserInfo(LoginUser loginUser) {
         this.loginUser = loginUser;

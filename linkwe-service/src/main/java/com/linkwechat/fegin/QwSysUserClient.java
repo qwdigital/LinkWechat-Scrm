@@ -40,4 +40,14 @@ public interface QwSysUserClient {
     @GetMapping("/system/user/findAllSysUser")
     AjaxResult<List<SysUser>> findAllSysUser(@RequestParam("weUserIds") String weUserIds,
                                              @RequestParam("positions") String positions,@RequestParam("deptIds") String deptIds);
+
+    /**
+     * 根据weuserid获取员工，如果没有则从企业微信端同步
+     * @param weuserId
+     * @return
+     */
+    @GetMapping("/system/user/findOrSynchSysUser/{weuserId}")
+    AjaxResult<SysUser> findOrSynchSysUser(@PathVariable("weuserId") String weuserId);
+
+
 }
