@@ -30,6 +30,12 @@ public class QwMediaController {
         return AjaxResult.success(weMediaVo);
     }
 
+    @PostMapping("/webhook/upload")
+    public AjaxResult<WeMediaVo> webhookUpload(@RequestBody WeMediaQuery query) {
+        WeMediaVo weMediaVo = iQwMediaService.webhookUpload(query);
+        return AjaxResult.success(weMediaVo);
+    }
+
     @PostMapping("/uploadImg")
     public AjaxResult<WeMediaVo> uploadImg(@Validated @RequestBody WeMediaQuery query) {
         return AjaxResult.success(iQwMediaService.uploadImg(query));

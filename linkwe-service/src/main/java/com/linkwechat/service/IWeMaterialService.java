@@ -39,6 +39,8 @@ public interface IWeMaterialService extends IService<WeMaterial> {
 
     WeMediaVo uploadTemporaryMaterial(String url, String type, String name);
 
+    WeMediaVo uploadWebhookMaterial(String key, String url, String type, String name);
+
     WeMaterial generateSimpleImg(WePoster poster);
 
     /**
