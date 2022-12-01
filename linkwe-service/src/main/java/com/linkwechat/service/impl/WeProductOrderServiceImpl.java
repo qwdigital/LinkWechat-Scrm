@@ -3,7 +3,6 @@ package com.linkwechat.service.impl;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -240,7 +239,7 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
         //订单基本信息
         weProductOrder.setMchNo(bill.getTransactionId());
         weProductOrder.setOrderState(bill.getTradeState());
-        weProductOrder.setPayTime(DateUtil.date(bill.getPayTime()));
+        weProductOrder.setPayTime(DateUtil.date(bill.getPayTime() * 1000L));
         weProductOrder.setOrderNo(bill.getOutTradeNo());
         weProductOrder.setPaymentType(bill.getPaymentType());
 
