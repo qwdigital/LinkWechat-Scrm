@@ -285,11 +285,13 @@ public class WeProductAnalyzeController extends BaseController {
             weProductOrderTop5Vo.setPicture(value.get(0).getPicture());
             weProductOrderTop5Vo.setOrderNum(value.size());
             double totalFee = value.stream().flatMapToDouble(o -> DoubleStream.of(Double.valueOf(o.getTotalFee()))).sum();
-            weProductOrderTop5Vo.setTotalFee(BigDecimal.valueOf(totalFee));
+            final BigDecimal totalFeeDec = BigDecimal.valueOf(totalFee).divide(BigDecimal.valueOf(100L).setScale(2, BigDecimal.ROUND_HALF_UP));
+            weProductOrderTop5Vo.setTotalFee(totalFeeDec);
 
             List<WeProductOrderRefundVo> refundVos = value.stream().flatMap(o -> o.getRefunds().stream()).collect(Collectors.toList());
             double refundFee = refundVos.stream().filter(o -> o.getRefundState().equals(2)).flatMapToDouble(o -> DoubleStream.of(Double.valueOf(o.getRefundFee()))).sum();
-            weProductOrderTop5Vo.setNetIncome(BigDecimal.valueOf(totalFee - refundFee));
+            BigDecimal refundFeeDec = BigDecimal.valueOf(refundFee).divide(BigDecimal.valueOf(100L).setScale(2, BigDecimal.ROUND_HALF_UP));
+            weProductOrderTop5Vo.setNetIncome(totalFeeDec.subtract(refundFeeDec));
             result.add(weProductOrderTop5Vo);
         }
         result.sort(Comparator.comparing(WeProductOrderTop5Vo::getTotalFee).reversed());

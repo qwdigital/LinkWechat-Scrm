@@ -48,7 +48,7 @@ public class WeProductOrderWareVo {
     @ApiModelProperty(value = "付款总金额")
     private String totalFee;
 
-    @ApiModelProperty(value = "发送员工名称")
+    @ApiModelProperty(value = "收款员工名称")
     private String weUserName;
 
     @ApiModelProperty(value = "收款商户名称")
@@ -76,7 +76,7 @@ public class WeProductOrderWareVo {
     @ApiModelProperty(value = "外部联系人的类型，1微信用户，2企业微信用户")
     private Integer externalType;
 
-    @ApiModelProperty(value = "发送员工")
+    @ApiModelProperty(value = "收款员工")
     private String weUserId;
 
     @ApiModelProperty(value = "商品封面")

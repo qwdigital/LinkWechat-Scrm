@@ -370,17 +370,10 @@ public class SysUserController extends BaseController {
         return AjaxResult.success(user);
     }
 
-    /**
-     * 根据企微员工Id获取员工信息
-     *
-     * @param wxUserId
-     * @return
-     */
-    @GetMapping("/getInfo/{wxUserId}")
-    public AjaxResult<SysUser> getInfo(@PathVariable("wxUserId") String wxUserId) {
-        LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(SysUser::getWeUserId, wxUserId);
-        queryWrapper.eq(SysUser::getDelFlag, 0);
+    @GetMapping("/getUserInfo/{weUserId}")
+    public AjaxResult getInfo(@PathVariable("weUserId") String weUserId) {
+        LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper();
+        queryWrapper.eq(SysUser::getWeUserId, weUserId);
         SysUser user = sysUserMapper.selectOne(queryWrapper);
         return AjaxResult.success(user);
     }
@@ -402,35 +395,6 @@ public class SysUserController extends BaseController {
         WxLoginUser wxLoginUser = SecurityUtils.getWxLoginUser();
         WxUser customerInfo = wxUserService.getCustomerInfo(wxLoginUser.getOpenId(), wxLoginUser.getUnionId());
         return AjaxResult.success(customerInfo);
-    }
-
-
-    /**
-     * 根据weUserIds，positions，deptIds批量查询
-     * @param weUserIds
-     * @param positions
-     * @param deptIds
-     * @return
-     */
-    @GetMapping("/findAllSysUser")
-    public AjaxResult<List<SysUser>> findAllSysUser(String weUserIds, String positions,String deptIds){
-
-        return AjaxResult.success(
-                userService.findAllSysUser(weUserIds,positions,deptIds)
-        );
-
-    }
-
-    /**
-     * 根据weuserid获取员工，如果没有则从企业微信端同步
-     * @param weuserId
-     * @return
-     */
-    @GetMapping("/findOrSynchSysUser/{weuserId}")
-    public AjaxResult<SysUser> findOrSynchSysUser(@PathVariable("weuserId") String weuserId){
-        return AjaxResult.success(
-                userService.findOrSynchSysUser(weuserId)
-        );
     }
 
 }
