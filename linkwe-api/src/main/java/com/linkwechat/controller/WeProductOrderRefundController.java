@@ -2,20 +2,19 @@ package com.linkwechat.controller;
 
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.enums.ProductRefundOrderStateEnum;
 import com.linkwechat.domain.WeProductOrderRefund;
-import com.linkwechat.domain.product.refund.query.WeProductOrderRefundQuery;
 import com.linkwechat.domain.product.refund.vo.WeProductOrderRefundVo;
 import com.linkwechat.service.IWeProductOrderRefundService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,11 +41,11 @@ public class WeProductOrderRefundController extends BaseController {
 
     @ApiOperation(value = "查询退款订单交易状态", httpMethod = "GET")
     @Log(title = "退款订单交易状态", businessType = BusinessType.SELECT)
-    @GetMapping("/refund/status")
-    public TableDataInfo<WeProductOrderRefundVo> refundStatus(@RequestBody WeProductOrderRefundQuery query) {
+    @GetMapping("/refund/status/{orderNo}")
+    public TableDataInfo<WeProductOrderRefundVo> refundStatus(@PathVariable("orderNo") String orderNo) {
         startPage();
         LambdaQueryWrapper<WeProductOrderRefund> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(WeProductOrderRefund::getOrderNo, query.getOrderNo());
+        queryWrapper.eq(WeProductOrderRefund::getOrderNo, orderNo);
         queryWrapper.eq(WeProductOrderRefund::getDelFlag, 0);
         List<WeProductOrderRefund> list = weProductOrderRefundService.list(queryWrapper);
         List<WeProductOrderRefundVo> weProductOrderRefundVos = new ArrayList<>();
@@ -55,6 +54,7 @@ public class WeProductOrderRefundController extends BaseController {
                 WeProductOrderRefundVo weProductOrderRefundVo = BeanUtil.copyProperties(one, WeProductOrderRefundVo.class);
                 BigDecimal bigDecimal = new BigDecimal(weProductOrderRefundVo.getRefundFee()).divide(BigDecimal.valueOf(100L)).setScale(2, BigDecimal.ROUND_HALF_UP);
                 weProductOrderRefundVo.setRefundFee(bigDecimal.toString());
+                weProductOrderRefundVo.setRefundStateStr(ProductRefundOrderStateEnum.of(weProductOrderRefundVo.getRefundState()).getMsg());
                 weProductOrderRefundVos.add(weProductOrderRefundVo);
             }
         }

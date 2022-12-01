@@ -38,7 +38,7 @@ public interface QwSysUserClient {
     AjaxResult<List<SysUser>> list(@RequestBody SysUser sysUser);
 
     @GetMapping("/system/user/getUserInfo/{weUserId}")
-    AjaxResult getInfo(@PathVariable("weUserId") String weUserId);
+    AjaxResult<SysUser> getInfo(@PathVariable("weUserId") String weUserId);
 
     @GetMapping("/system/user/findAllSysUser")
     AjaxResult<List<SysUser>> findAllSysUser(@RequestParam("weUserIds") String weUserIds,

@@ -33,7 +33,7 @@ public class WeProductOrderRefundVo {
     /**
      * 退款发起时间
      */
-    @JsonFormat(pattern ="yyyy-MM-dd HH:mm:ss",timezone ="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime refundTime;
 
     /**
@@ -60,5 +60,10 @@ public class WeProductOrderRefundVo {
      * 退款状态
      */
     private Integer refundState;
+
+    /**
+     * 退款状态Str
+     */
+    private String refundStateStr;
 
 }
