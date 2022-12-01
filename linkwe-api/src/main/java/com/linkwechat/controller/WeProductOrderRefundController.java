@@ -5,7 +5,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
-import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.enums.ProductRefundOrderStateEnum;
 import com.linkwechat.domain.WeProductOrderRefund;
@@ -42,8 +42,7 @@ public class WeProductOrderRefundController extends BaseController {
     @ApiOperation(value = "查询退款订单交易状态", httpMethod = "GET")
     @Log(title = "退款订单交易状态", businessType = BusinessType.SELECT)
     @GetMapping("/refund/status/{orderNo}")
-    public TableDataInfo<WeProductOrderRefundVo> refundStatus(@PathVariable("orderNo") String orderNo) {
-        startPage();
+    public AjaxResult<List<WeProductOrderRefundVo>> refundStatus(@PathVariable("orderNo") String orderNo) {
         LambdaQueryWrapper<WeProductOrderRefund> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(WeProductOrderRefund::getOrderNo, orderNo);
         queryWrapper.eq(WeProductOrderRefund::getDelFlag, 0);
@@ -58,7 +57,7 @@ public class WeProductOrderRefundController extends BaseController {
                 weProductOrderRefundVos.add(weProductOrderRefundVo);
             }
         }
-        return getDataTable(weProductOrderRefundVos);
+        return AjaxResult.success(weProductOrderRefundVos);
     }
 }
 
