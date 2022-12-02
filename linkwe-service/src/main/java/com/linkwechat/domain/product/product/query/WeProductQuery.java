@@ -1,4 +1,4 @@
-package com.linkwechat.domain.product.query;
+package com.linkwechat.domain.product.product.query;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

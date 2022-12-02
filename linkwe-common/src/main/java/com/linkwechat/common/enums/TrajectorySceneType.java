@@ -28,9 +28,11 @@ public enum TrajectorySceneType {
     TRAJECTORY_TITLE_YCQL(16,"移出群聊","客户:%s 移出群聊:%s"),
     TRAJECTORY_TITLE_YGCJQL(11,"员工创建了群聊","员工:%s 创建群聊:%s"),
     TRAJECTORY_TITLE_YGJSQL(12,"员工解散了群聊","员工:%s 解散群聊:%s"),
-    TRAJECTORY_TITLE_LOOK_MATERIAL(13, "查看素材", "%s 查看了 %s 发送的素材 %s");
+    TRAJECTORY_TITLE_LOOK_MATERIAL(13, "查看素材", "%s 查看了 %s 发送的素材 %s"),
 
+    TRAJECTORY_TITLE_BUY_GOODS(14, "购买商品", "%s 购买了 %s 发送的商品 %s"),
 
+    ;
     private String name;
 
     private Integer type;
@@ -38,12 +40,10 @@ public enum TrajectorySceneType {
     private String msgTpl;
 
 
-
-
-    TrajectorySceneType( Integer type,String name,String msgTpl) {
+    TrajectorySceneType(Integer type, String name, String msgTpl) {
         this.name = name;
         this.type = type;
-        this.msgTpl=msgTpl;
+        this.msgTpl = msgTpl;
     }
 
 
@@ -71,7 +71,7 @@ public enum TrajectorySceneType {
         this.msgTpl = msgTpl;
     }
 
-    public static  TrajectorySceneType of(Integer type){
-        return Stream.of(values()).filter(s->s.getType().equals(type)).findFirst().orElseGet(null);
+    public static TrajectorySceneType of(Integer type) {
+        return Stream.of(values()).filter(s -> s.getType().equals(type)).findFirst().orElseGet(null);
     }
 }

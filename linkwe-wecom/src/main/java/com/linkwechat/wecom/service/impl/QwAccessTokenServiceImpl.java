@@ -3,7 +3,6 @@ package com.linkwechat.wecom.service.impl;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.exception.wecom.WeComException;
-import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeAgentInfo;
 import com.linkwechat.domain.WeCorpAccount;
@@ -102,6 +101,11 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
         return findAccessToken(corpId, WeConstans.WE_LIVE_ACCESS_TOKEN);
     }
 
+    @Override
+    public String findBillAccessToken(String corpId) {
+        return findAccessToken(corpId, WeConstans.WE_BILL_ACCESS_TOKEN);
+    }
+
 
     //获取token
     private String findAccessToken(String corpId, String accessTokenKey) {
@@ -123,8 +127,10 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
                 weCorpTokenVo = weTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getChatSecret());
             } else if (WeConstans.WE_KF_ACCESS_TOKEN.equals(accessTokenKey)) {
                 weCorpTokenVo = weTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getKfSecret());
-            }else if (WeConstans.WE_ADDRESS_BOOK_ACCESS_TOKEN.equals(accessTokenKey)) {
+            } else if (WeConstans.WE_ADDRESS_BOOK_ACCESS_TOKEN.equals(accessTokenKey)) {
                 weCorpTokenVo = weTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getCorpSecret());
+            } else if (WeConstans.WE_BILL_ACCESS_TOKEN.equals(accessTokenKey)) {
+                weCorpTokenVo = weTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getBillSecret());
             }else if(WeConstans.WE_LIVE_ACCESS_TOKEN.equals(accessTokenKey)){
                 weCorpTokenVo = weTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getLiveSecret());
             }
@@ -140,7 +146,7 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
 
     @Override
     public void removeCommonAccessToken(String corpId) {
-        redisService.deleteObject(StringUtils.format(WeConstans.WE_COMMON_ACCESS_TOKEN,corpId));
+        redisService.deleteObject(StringUtils.format(WeConstans.WE_COMMON_ACCESS_TOKEN, corpId));
     }
 
 
@@ -166,7 +172,7 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
 
     @Override
     public String findAgentAccessToken(String corpId, Integer agentId) {
-        String weAgentTokenKey = StringUtils.format(WeConstans.WE_AGENT_ACCESS_TOKEN ,corpId,agentId);
+        String weAgentTokenKey = StringUtils.format(WeConstans.WE_AGENT_ACCESS_TOKEN, corpId, agentId);
         String weAccessToken = redisService.getCacheObject(weAgentTokenKey);
         //为空,请求微信服务器同时缓存到redis中
         if (StringUtils.isEmpty(weAccessToken)) {
@@ -186,7 +192,7 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
 
     @Override
     public void removeAgentAccessToken(String corpId, Integer agentId) {
-        redisService.deleteObject(StringUtils.format(WeConstans.WE_AGENT_ACCESS_TOKEN, corpId,agentId));
+        redisService.deleteObject(StringUtils.format(WeConstans.WE_AGENT_ACCESS_TOKEN, corpId, agentId));
     }
 
     @Override
@@ -206,5 +212,10 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
     @Override
     public void removeLiveAccessToken(String corpId) {
         redisService.deleteObject(StringUtils.format(WeConstans.WE_LIVE_ACCESS_TOKEN, corpId));
+    }
+
+    @Override
+    public void removeBillAccessToken(String corpId) {
+        redisService.deleteObject(StringUtils.format(WeConstans.WE_BILL_ACCESS_TOKEN, corpId));
     }
 }

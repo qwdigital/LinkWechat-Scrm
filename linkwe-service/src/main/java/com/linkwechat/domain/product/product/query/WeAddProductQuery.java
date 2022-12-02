@@ -1,4 +1,4 @@
-package com.linkwechat.domain.product.query;
+package com.linkwechat.domain.product.product.query;
 
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.wecom.query.product.QwAddProductQuery;
@@ -23,6 +23,7 @@ public class WeAddProductQuery {
     @ApiModelProperty("商品封面地址")
     private String picture;
 
+    @Size(max = 270)
     @NotBlank(message = "商品描述不能为空")
     @ApiModelProperty("商品描述")
     private String describe;
@@ -31,19 +32,23 @@ public class WeAddProductQuery {
     @ApiModelProperty("商品价格")
     private String price;
 
-    @Size(min = 1, max = 8,message = "商品附件最少1个最多8个")
     @ApiModelProperty("商品附件")
-    private List<WeMessageTemplate> attachments;
+    private String attachments;
 
-    @ApiModelProperty(value = "商品编码",hidden = true)
+    @Size(min = 1, max = 8, message = "商品附件最少1个最多8个")
+    @ApiModelProperty("商品附件")
+    private List<WeMessageTemplate> accessory;
+
+    @ApiModelProperty(value = "商品编码", hidden = true)
     private String productSn;
 
-    public QwAddProductQuery convert2Qw(){
+    public QwAddProductQuery convert2Qw() {
         QwAddProductQuery query = new QwAddProductQuery();
         query.setProduct_sn(this.productSn);
         query.setDescription(this.describe);
-        query.setPrice(new BigDecimal(price).multiply(BigDecimal.valueOf(100)).longValue());
-        query.setMessageTemplates(this.attachments);
+        long value = new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100)).longValue();
+        query.setPrice(value);
+        query.setMessageTemplates(this.accessory);
         return query;
     }
 }

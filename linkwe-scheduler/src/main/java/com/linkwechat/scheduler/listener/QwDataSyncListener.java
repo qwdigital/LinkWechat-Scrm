@@ -43,16 +43,19 @@ public class QwDataSyncListener {
     @Autowired
     private IWeProductService weProductService;
 
+    @Resource
+    private IWeProductOrderService weProductOrderService;
+
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.sync.group-chat:Qu_GroupChat}")
     public void groupChatSubscribe(String msg, Channel channel, Message message) {
         try {
-            log.info("企微客户群同步消息监听：msg:{}",msg);
+            log.info("企微客户群同步消息监听：msg:{}", msg);
             weGroupService.synchWeGroupHandler(msg);
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("企微客户群同步-消息处理失败 msg:{},error:{}",msg,e);
+            log.error("企微客户群同步-消息处理失败 msg:{},error:{}", msg, e);
         }
     }
 
@@ -73,12 +76,12 @@ public class QwDataSyncListener {
     @RabbitListener(queues = "${wecom.mq.queue.sync.wecustomer:Qu_WeCustomer}")
     public void wecustomerSubscribe(String msg, Channel channel, Message message) {
         try {
-            log.info("企微客户同步消息监听：msg:{}",msg);
+            log.info("企微客户同步消息监听：msg:{}", msg);
             weCustomerService.synchWeCustomerHandler(msg);
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("企微客户同步-消息处理失败 msg:{},error:{}",msg,e);
+            log.error("企微客户同步-消息处理失败 msg:{},error:{}", msg, e);
         }
     }
 
@@ -87,12 +90,12 @@ public class QwDataSyncListener {
     @RabbitListener(queues = "${wecom.mq.queue.sync.grouptag:Qu_GroupTag}")
     public void groupTagSubscribe(String msg, Channel channel, Message message) {
         try {
-            log.info("企微标签同步消息监听：msg:{}",msg);
+            log.info("企微标签同步消息监听：msg:{}", msg);
             weTagGroupService.synchWeGroupTagHandler(msg);
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("企微标签同步-消息处理失败 msg:{},error:{}",msg,e);
+            log.error("企微标签同步-消息处理失败 msg:{},error:{}", msg, e);
         }
     }
 
@@ -101,12 +104,12 @@ public class QwDataSyncListener {
     @RabbitListener(queues = "${wecom.mq.queue.sync.we-moments:Qu_Moments}")
     public void weMomentsSubscribe(String msg, Channel channel, Message message) {
         try {
-            log.info("企微朋友圈同步消息监听：msg:{}",msg);
+            log.info("企微朋友圈同步消息监听：msg:{}", msg);
             weMomentsService.synchWeMomentsHandler(msg);
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("企微朋友圈同步-消息处理失败 msg:{},error:{}",msg,e);
+            log.error("企微朋友圈同步-消息处理失败 msg:{},error:{}", msg, e);
         }
     }
 
@@ -115,27 +118,26 @@ public class QwDataSyncListener {
     @RabbitListener(queues = "${wecom.mq.queue.sync.user-depart:Qu_UserDepart}")
     public void weUserAndDepartSubscribe(String msg, Channel channel, Message message) {
         try {
-            log.info("企微员工部门同步消息监听：msg:{}",msg);
+            log.info("企微员工部门同步消息监听：msg:{}", msg);
             qwSysUserClient.syncUserAndDeptHandler(msg);
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("企微员工部门同步-消息处理失败 msg:{},error:{}",msg,e);
+            log.error("企微员工部门同步-消息处理失败 msg:{},error:{}", msg, e);
         }
     }
-
 
 
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.sync.we-moments:Qu_Hd_Moments}")
     public void weHdMomentsSubscribe(String msg, Channel channel, Message message) {
         try {
-            log.info("企微朋友圈互动同步消息监听：msg:{}",msg);
+            log.info("企微朋友圈互动同步消息监听：msg:{}", msg);
             weMomentsService.synchMomentsInteracteHandler(msg);
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("企微朋友圈互动同步-消息处理失败 msg:{},error:{}",msg,e);
+            log.error("企微朋友圈互动同步-消息处理失败 msg:{},error:{}", msg, e);
         }
     }
 
@@ -143,13 +145,27 @@ public class QwDataSyncListener {
     @RabbitListener(queues = "${wecom.mq.queue.sync.product:Qu_Product}")
     public void weProductSubscribe(String msg, Channel channel, Message message) {
         try {
-            log.info("企微商品图册管理同步消息监听：msg:{}",msg);
+            log.info("企微商品图册管理同步消息监听：msg:{}", msg);
             weProductService.syncProductListHandle(msg);
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("企微商品图册管理同步-消息处理失败 msg:{},error:{}",msg,e);
+            log.error("企微商品图册管理同步-消息处理失败 msg:{},error:{}", msg, e);
         }
     }
+
+    @RabbitHandler
+    @RabbitListener(queues = "${wecom.mq.queue.sync.product.order:Qu_Product_Order}")
+    public void weProductOrderSubscribe(String msg, Channel channel, Message message) {
+        try {
+            log.info("企微商品图册订单管理同步消息监听：msg:{}", msg);
+            weProductOrderService.orderSyncExecute(msg);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("企微商品图册订单管理同步-消息处理失败 msg:{},error:{}", msg, e);
+        }
+    }
+
 
 }

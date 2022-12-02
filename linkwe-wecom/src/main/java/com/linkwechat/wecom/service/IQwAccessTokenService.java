@@ -21,6 +21,14 @@ public interface IQwAccessTokenService {
     String findKfAccessToken(String corpId);
 
     String findLiveAccessToken(String corpId);
+    /**
+     * 对外收款Token
+     *
+     * @param corpId
+     * @return
+     */
+    public String findBillAccessToken(String corpId);
+
 
     void removeCommonAccessToken(String corpId);
 
@@ -39,4 +47,10 @@ public interface IQwAccessTokenService {
    void removeAllWeAccessToken(String corpId);
 
     void removeLiveAccessToken(String corpId);
+
+    /**
+     * 移除对外收款Token
+     */
+    public void removeBillAccessToken(String corpId);
+
 }

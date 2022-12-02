@@ -239,4 +239,20 @@ public class WeCorpAccount extends BaseEntity {
      */
     @TableField("customer_churn_notice_switch")
     private String customerChurnNoticeSwitch;
+
+
+    /***********************************************
+     *******************对外收款start****************
+     **********************************************/
+    /**
+     * 对外收款
+     */
+    @TableField("bill_secret")
+    private String billSecret;
+
+    /***********************************************
+     *******************对外收款end****************
+     **********************************************/
+
+
 }
