@@ -25,6 +25,11 @@ public class QwMediaFallbackFactory implements QwMediaClient {
     }
 
     @Override
+    public AjaxResult<WeMediaVo> webhookUpload(WeMediaQuery query) {
+        return null;
+    }
+
+    @Override
     public AjaxResult<WeMediaVo> uploadImg(WeMediaQuery query) {
         return null;
     }
