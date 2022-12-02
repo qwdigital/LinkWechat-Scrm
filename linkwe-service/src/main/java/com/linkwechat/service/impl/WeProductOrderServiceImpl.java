@@ -196,6 +196,9 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
                 weProductOrderRefund.setOrderNo(bill.getOutTradeNo());
                 weProductOrderRefund.setRefundNo(refund.getOutRefundNo());
                 weProductOrderRefund.setRefundUserId(refund.getRefundUserid());
+                if (StringUtils.isNotBlank(productOrder.getWeUserName())) {
+                    weProductOrderRefund.setRefundUserName(productOrder.getWeUserName());
+                }
                 weProductOrderRefund.setRemark(refund.getRefundComment());
                 LocalDateTime of = LocalDateTime.ofInstant(Instant.ofEpochMilli(refund.getRefundReqtime() * 1000L), ZoneId.systemDefault());
                 weProductOrderRefund.setRefundTime(of);
@@ -213,6 +216,9 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
                     weProductOrderRefund.setOrderNo(bill.getOutTradeNo());
                     weProductOrderRefund.setRefundNo(refund.getOutRefundNo());
                     weProductOrderRefund.setRefundUserId(refund.getRefundUserid());
+                    if (StringUtils.isNotBlank(productOrder.getWeUserName())) {
+                        weProductOrderRefund.setRefundUserName(productOrder.getWeUserName());
+                    }
                     weProductOrderRefund.setRemark(refund.getRefundComment());
                     LocalDateTime of = LocalDateTime.ofInstant(Instant.ofEpochMilli(refund.getRefundReqtime() * 1000L), ZoneId.systemDefault());
                     weProductOrderRefund.setRefundTime(of);
@@ -327,6 +333,9 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
                 weProductOrderRefund.setOrderNo(bill.getOutTradeNo());
                 weProductOrderRefund.setRefundNo(refund.getOutRefundNo());
                 weProductOrderRefund.setRefundUserId(refund.getRefundUserid());
+                if (StringUtils.isNotBlank(weProductOrder.getWeUserName())) {
+                    weProductOrderRefund.setRefundUserName(weProductOrder.getWeUserName());
+                }
                 weProductOrderRefund.setRemark(refund.getRefundComment());
                 LocalDateTime of = LocalDateTime.ofInstant(Instant.ofEpochMilli(refund.getRefundReqtime() * 1000L), ZoneId.systemDefault());
                 weProductOrderRefund.setRefundTime(of);
