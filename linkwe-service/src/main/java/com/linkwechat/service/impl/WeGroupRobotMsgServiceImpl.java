@@ -121,7 +121,8 @@ public class WeGroupRobotMsgServiceImpl extends ServiceImpl<WeGroupRobotMsgMappe
                 msgObj.put("msgtype", WeMsgTypeEnum.NEWS.getMessageType());
                 msgObj.put(WeMsgTypeEnum.NEWS.getMessageType(), newsObj);
             } else if (ObjectUtil.equal(WeMsgTypeEnum.FILE.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getFileUrl()
+                String key = StringUtils.substringAfter(robotInfo.getWebHookUrl(), "key=");
+                WeMediaVo weMedia = weMaterialService.uploadWebhookMaterial(key,messageTemplate.getFileUrl()
                         , MessageType.FILE.getMessageType()
                         , FileUtil.getName(messageTemplate.getFileUrl()));
                 JSONObject fileObj = new JSONObject();
