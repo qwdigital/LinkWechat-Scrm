@@ -454,7 +454,7 @@ public class WeFormSurveyStatisticsController extends BaseController {
             weFormSurveyAnswerVO.setMobile(weFormSurveyAnswer.getMobile());
             weFormSurveyAnswerVO.setOpenId(weFormSurveyAnswer.getOpenId());
             weFormSurveyAnswerVO.setUnionId(weFormSurveyAnswer.getUnionId());
-            weFormSurveyAnswerVO.setIsCorpUser(StringUtils.isBlank(weFormSurveyAnswer.getUnionId()) ? "否" : "是");
+            weFormSurveyAnswerVO.setIsCorpUser("否");
             list.add(weFormSurveyAnswerVO);
         }
         ExcelUtil<WeFormSurveyAnswerVO> util = new ExcelUtil<>(WeFormSurveyAnswerVO.class);
