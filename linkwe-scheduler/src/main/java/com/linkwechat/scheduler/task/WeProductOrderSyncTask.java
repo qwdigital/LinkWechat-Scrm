@@ -53,7 +53,8 @@ public class WeProductOrderSyncTask {
     public void execute(String param) {
         //同步订单
         LambdaQueryWrapper<WeCorpAccount> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.apply("limit 1");
+        queryWrapper.eq(WeCorpAccount::getDelFlag, 0);
+        queryWrapper.last("limit 1");
         List<WeCorpAccount> list = weCorpAccountService.list(queryWrapper);
         WeCorpAccount weCorpAccount = list.get(0);
         weProductOrderService.orderSyncExecute(weCorpAccount.getCorpId());
@@ -88,7 +89,7 @@ public class WeProductOrderSyncTask {
         //每日商品订单数据
         LambdaQueryWrapper<WeProductDayStatistics> query = new LambdaQueryWrapper<>();
         query.eq(WeProductDayStatistics::getDelFlag, 0);
-        query.apply("date_format(create_time,'yyyy-MM-dd') = date_format(now(),'yyyy-MM-dd')");
+        query.apply("date_format(create_time,'%Y-%m-%d') = date_format(now(),'%Y-%m-%d')");
         WeProductDayStatistics weProductDayStatistics = weProductDayStatisticsService.getOne(query);
         if (ObjectUtil.isNotEmpty(weProductDayStatistics)) {
             //修改数据
@@ -135,7 +136,6 @@ public class WeProductOrderSyncTask {
             BigDecimal subtract = new BigDecimal(weProductDayStatistics.getDayOrderTotalFee()).subtract(new BigDecimal(weProductDayStatistics.getDayRefundTotalFee()));
             weProductStatistics.setNetIncome(subtract.toString());
             weProductStatistics.setUpdateTime(LocalDateTime.now());
-            weProductStatistics.setCreateTime(LocalDateTime.now());
             weProductStatisticsService.updateById(weProductStatistics);
         } else {
             //保存数据
