@@ -53,7 +53,7 @@ public class WeTagGroup extends BaseEntity {
     @TableField(exist = false)
     private List<WeTag> weTags;
 
-    @TableLogic
+
     private Integer delFlag;
 
 }
