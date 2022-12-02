@@ -432,7 +432,7 @@ public class WeProductAnalyzeController extends BaseController {
      */
     @PostConstruct
     public void initProductOrderData() {
-        log.info("初始化当天商品订单数据");
+        log.info("初始化当天商品订单数据=>>>>>>>>>>>>>>>>>>>>>>");
         LambdaQueryWrapper<WeProductDayStatistics> query = new LambdaQueryWrapper<>();
         query.select(WeProductDayStatistics::getId, WeProductDayStatistics::getDayOrderTotalNum, WeProductDayStatistics::getDayOrderTotalFee, WeProductDayStatistics::getDayRefundTotalFee);
         query.eq(WeProductDayStatistics::getDelFlag, 0);
