@@ -10,6 +10,8 @@ import com.linkwechat.common.constant.ProductOrderConstants;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.model.LoginUser;
+import com.linkwechat.common.enums.TrajectorySceneType;
+import com.linkwechat.common.enums.TrajectoryType;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
@@ -70,6 +72,8 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
     private RedisTemplate redisTemplate;
     @Resource
     private WeProductMapper weProductMapper;
+    @Resource
+    private WeCustomerTrajectoryMapper weCustomerTrajectoryMapper;
 
     /**
      * 获取对外收款记录的游标
@@ -246,6 +250,7 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
         weProductOrder.setPaymentType(bill.getPaymentType());
 
         //商品信息
+        WeProduct weProduct = null;
         List<WeGetBillListVo.Commodity> commodityList = bill.getCommodityList();
         if (commodityList != null && commodityList.size() > 0) {
             WeGetBillListVo.Commodity commodity = commodityList.get(0);
@@ -259,7 +264,7 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
             String productSn = split[0].replace("商品编码：", "");
             LambdaQueryWrapper<WeProduct> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(WeProduct::getProductSn, productSn);
-            WeProduct weProduct = weProductMapper.selectOne(queryWrapper);
+            weProduct = weProductMapper.selectOne(queryWrapper);
             if (ObjectUtil.isNotEmpty(weProduct)) {
                 weProductOrder.setProductId(weProduct.getId());
             }
@@ -275,8 +280,9 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
         queryWrapper.eq(WeCustomer::getExternalUserid, bill.getExternalUserid());
         queryWrapper.eq(WeCustomer::getDelFlag, 0);
         List<WeCustomer> weCustomers = weCustomerMapper.selectList(queryWrapper);
+        WeCustomer weCustomer = null;
         if (weCustomers != null && weCustomers.size() > 0) {
-            WeCustomer weCustomer = weCustomers.get(0);
+            weCustomer = weCustomers.get(0);
             weProductOrder.setExternalName(weCustomer.getCustomerName());
             weProductOrder.setExternalAvatar(weCustomer.getAvatar());
             weProductOrder.setExternalType(weCustomer.getCustomerType() == null ? 1 : weCustomer.getCustomerType());
@@ -285,8 +291,9 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
         //收款人企业内账号userid
         weProductOrder.setWeUserId(bill.getPayeeUserid());
         AjaxResult<SysUser> info = qwSysUserClient.getInfo(bill.getPayeeUserid());
+        SysUser data = null;
         if (info.getCode() == 200) {
-            SysUser data = info.getData();
+            data = info.getData();
             if (ObjectUtil.isNotEmpty(data)) {
                 weProductOrder.setWeUserName(data.getUserName());
             }
@@ -337,6 +344,9 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
         //保存订单
         int insert = weProductOrderMapper.insert(weProductOrder);
 
+        //添加客户轨迹
+        insertCustomerTrajectory(weCustomer, data, weProduct);
+
         //订单总数
         redisTemplate.opsForValue().increment(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_NUMBER);
         //订单总金额
@@ -348,5 +358,46 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
         BigDecimal refundFee = new BigDecimal(todayRefundFeeStr).add(BigDecimal.valueOf(refundTotalFee));
         redisTemplate.opsForValue().set(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_REFUND_FEE, refundFee.toString());
     }
+
+    /**
+     * 添加客户轨迹
+     */
+    private void insertCustomerTrajectory(WeCustomer weCustomer, SysUser user, WeProduct product) {
+        //其中有一个为null，则不处理
+        if (ObjectUtil.isEmpty(weCustomer) || ObjectUtil.isEmpty(user) || ObjectUtil.isEmpty(product)) {
+            return;
+        }
+        log.info("添加客户轨迹");
+        WeCustomerTrajectory weCustomerTrajectory = new WeCustomerTrajectory();
+        //轨迹类型:(1:客户动态;2:员工动态;3:互动动态4:跟进动态5:客群动态)
+        weCustomerTrajectory.setTrajectoryType(TrajectoryType.TRAJECTORY_TYPE_XXDT.getType());
+        //轨迹场景类型，详细描述，见TrajectorySceneType
+        weCustomerTrajectory.setTrajectorySceneType(TrajectorySceneType.TRAJECTORY_TITLE_BUY_GOODS.getType());
+        //操作人类型:1:客户;2:员工;
+        weCustomerTrajectory.setOperatorType(1);
+        //操作人id
+        weCustomerTrajectory.setOperatorId(weCustomer.getExternalUserid());
+        //操作人姓名
+        weCustomerTrajectory.setOperatorName(weCustomer.getCustomerName());
+        //被操作对象类型:1:客户;2:员工:3:客群
+        weCustomerTrajectory.setOperatoredObjectType(2);
+        //被操作对象的id
+        weCustomerTrajectory.setOperatoredObjectId(user.getWeUserId());
+        //被操作对象名称
+        weCustomerTrajectory.setOperatoredObjectName(user.getUserName());
+        //客户id或群id，查询字段冗余,档该id不存在的时候代表
+        weCustomerTrajectory.setExternalUseridOrChatid(weCustomer.getExternalUserid());
+        //员工id，查询字段冗余
+        weCustomerTrajectory.setWeUserId(user.getWeUserId());
+        //动作
+        weCustomerTrajectory.setAction(TrajectorySceneType.TRAJECTORY_TITLE_BUY_GOODS.getName());
+        //标题
+        weCustomerTrajectory.setTitle(TrajectoryType.TRAJECTORY_TYPE_XXDT.getName());
+        //文案内容,整体内容
+        String format = String.format(TrajectorySceneType.TRAJECTORY_TITLE_BUY_GOODS.getMsgTpl(), weCustomer.getCustomerName(), user.getUserName(), product.getProductSn());
+        weCustomerTrajectory.setContent(format);
+        weCustomerTrajectoryMapper.insert(weCustomerTrajectory);
+    }
+
 
 }
