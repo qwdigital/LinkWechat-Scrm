@@ -29,7 +29,7 @@
 **<p align="center">【📣最近更新】LinkWeChat V3.0 采用前后端分离架构，前端项目请点击<a href="https://gitee.com/LinkWeChat/link-we-chat-front" target="_blank">LinkWeChat-Front</a></p>**
 
 
-**<p align="center">还有什么想要的产品功能/技术支持/说明文档/友好的建议或意见，<a href="https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV" target="_blank">点击告诉我们~</a></p>**
+**<p align="center">还有什么想要产品/技术上友好的建议或意见，<a href="https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV" target="_blank">点击告诉我们~</a>一经采纳，将纳入开源贡献者并官网致谢，可能还有福利哦~</p>**
 
 **<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>**
 
