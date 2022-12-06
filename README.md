@@ -44,7 +44,7 @@
 
 [帮助手册——LinkWeChat 需要付费吗？](https://www.yuque.com/linkwechat/help/xql2ts)
 
-目前在国内 GPL 协议**具备合同特征，是一种民事法律行为** ，属于我国《合同法》调整的范围。LinkWeChat 项目团队保留一切诉讼权利。
+目前在国内 GPL 协议**具备合同特征，是一种民事法律行为** ，属于我国《中华人民共和国民法典》调整的范围。LinkWeChat 项目团队保留一切诉讼权利。
 
 [相关案例：违反 GPL 协议赔偿 50 万，国内首例!](https://mp.weixin.qq.com/s/YQ6sNjbDS-P7BViLZIsaoA)
 
