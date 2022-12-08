@@ -1,5 +1,6 @@
 package com.linkwechat.web.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -288,6 +289,15 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
             }
             return d;
         }).collect(Collectors.toList());
+
+        //不存在的移除
+        if(CollectionUtil.isNotEmpty(sysDeptList)){
+            this.remove(
+                    new LambdaQueryWrapper<SysDept>()
+                            .notIn(SysDept::getDeptId,sysDeptList.stream().map(SysDept::getDeptId).collect(Collectors.toList())
+                            ));
+        }
+
         saveOrUpdateBatch(sysDeptList);
         return sysDeptList;
     }
