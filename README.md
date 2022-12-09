@@ -7,7 +7,7 @@
 
 [![star](https://gitee.com/LinkWeChat/link-wechat/badge/star.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/stargazers)
 [![fork](https://gitee.com/LinkWeChat/link-wechat/badge/fork.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/members)
-[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V3.2-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
+[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V3.3-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
 [![license](http://img.shields.io/badge/license-GPL%203.0-orange)](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
 [![木兰社区](https://img.shields.io/badge/Mulan-incubating-blue)](https://portal.mulanos.cn//)
 
@@ -24,12 +24,15 @@
 <p></p>
 
 ---
-**<p align="center">【📣最近更新】LinkWeChat V3.0 正式发布啦，架构升级，全面焕新，欢迎大家提前体验！<a href="http://demo.linkwechat.net/" target="_blank">点击立即体验~</a></p>**
 
-**<p align="center">【📣最近更新】LinkWeChat V3.0 采用前后端分离架构，前端项目请点击<a href="https://github.com/qwdigital/LinkWeChat-Front" target="_blank">LinkWeChat-Front</a></p>**
+**<p align="center">【📣参与投票】LinkWeChat正在参与2022年中国技术力量年度榜单<a href="https://www.infoq.cn/talk/xz7094aiX2K8CgARemC8" target="_blank">点击给LinkWeChat投票，谢谢大家~</a></p>**
 
+**<p align="center">【📣最近更新】还有什么想要产品/技术上友好的建议或意见，<a href="https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV" target="_blank">点击告诉我们~</a>一经采纳，将纳入开源贡献者并官网致谢，还会收到社区奖励的小礼品哦！~</p>**
 
-**<p align="center">还有什么想要的产品功能/技术支持/说明文档/友好的建议或意见，<a href="https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV" target="_blank">点击告诉我们~</a></p>**
+**<p align="center">LinkWeChat V3.0 正式发布啦，架构升级，全面焕新，欢迎大家提前体验！<a href="http://demo.linkwechat.net/" target="_blank">点击立即体验~</a></p>**
+
+**<p align="center">LinkWeChat V3.0 采用前后端分离架构，前端项目请点击<a href="https://gitee.com/LinkWeChat/link-we-chat-front" target="_blank">LinkWeChat-Front</a></p>**
+
 
 **<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>**
 
@@ -41,7 +44,7 @@
 
 [帮助手册——LinkWeChat 需要付费吗？](https://www.yuque.com/linkwechat/help/xql2ts)
 
-目前在国内 GPL 协议**具备合同特征，是一种民事法律行为** ，属于我国《合同法》调整的范围。LinkWeChat 项目团队保留一切诉讼权利。
+目前在国内 GPL 协议**具备合同特征，是一种民事法律行为** ，属于我国《中华人民共和国民法典》调整的范围。LinkWeChat 项目团队保留一切诉讼权利。
 
 [相关案例：违反 GPL 协议赔偿 50 万，国内首例!](https://mp.weixin.qq.com/s/YQ6sNjbDS-P7BViLZIsaoA)
 
