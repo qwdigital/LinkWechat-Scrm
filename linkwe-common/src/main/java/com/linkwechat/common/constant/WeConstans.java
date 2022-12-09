@@ -57,6 +57,11 @@ public class WeConstans {
      */
     public static final String WE_LIVE_ACCESS_TOKEN = "we_live_access_token:{}";
 
+    /**
+     * 对外收款token
+     */
+    public static final String WE_BILL_ACCESS_TOKEN = "we_bill_access_token:{}";
+
 
     /**
      * 企业微信接口返回成功code
@@ -68,7 +73,6 @@ public class WeConstans {
      * 企业微信端根部门id
      */
     public static final Long WE_ROOT_DEPARMENT_ID = 1L;
-
 
 
     /**

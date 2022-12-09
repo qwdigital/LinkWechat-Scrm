@@ -50,4 +50,8 @@ public interface QwSysUserClient {
     AjaxResult<SysUser> findOrSynchSysUser(@PathVariable("weuserId") String weuserId);
 
 
+
+    @GetMapping("/system/user/getUserInfo/{weUserId}")
+    AjaxResult<SysUser> getInfo(@PathVariable("weUserId") String weUserId);
+
 }

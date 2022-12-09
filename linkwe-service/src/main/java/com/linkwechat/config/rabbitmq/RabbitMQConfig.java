@@ -96,6 +96,7 @@ public class RabbitMQConfig {
 
     /**
      * 活码变更交换机
+     *
      * @return
      */
     @Bean
@@ -267,7 +268,6 @@ public class RabbitMQConfig {
     public Binding bindingExchangeSyncWemoments() {
         return BindingBuilder.bind(weMoments()).to(syncEx()).with(rabbitMQSettingConfig.getWeMomentsRk()).noargs();
     }
-
 
 
     /**
@@ -452,6 +452,16 @@ public class RabbitMQConfig {
     @Bean
     public Queue quProduct() {
         return new Queue(rabbitMQSettingConfig.getWeProductQu());
+    }
+
+    /**
+     * 同步商品图册订单队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quProductOrder() {
+        return new Queue(rabbitMQSettingConfig.getWeProductOrderQu());
     }
 
     /**
@@ -653,5 +663,15 @@ public class RabbitMQConfig {
 
 
 
+
+    /**
+     * 同步商品图册订单绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeProductOrder() {
+        return BindingBuilder.bind(quProductOrder()).to(syncEx()).with(rabbitMQSettingConfig.getWeProductOrderQu()).noargs();
+    }
 }
 

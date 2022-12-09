@@ -61,4 +61,6 @@ public interface IQwMediaService {
      * @return
      */
     WeMediaVo uploadAttachment2(WeMediaQuery query);
+
+    WeMediaVo webhookUpload(WeMediaQuery query);
 }

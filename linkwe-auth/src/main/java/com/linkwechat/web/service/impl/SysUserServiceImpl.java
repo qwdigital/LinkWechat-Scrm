@@ -324,7 +324,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 delUserDeptId.addAll(new LambdaQueryChainWrapper<>(userDeptMapper).eq(SysUserDept::getWeUserId, vo.getUserId()).eq(SysUserDept::getDeptId, vo.getDepartment().get(i)).list().stream().map(SysUserDept::getUserDeptId).collect(Collectors.toList()));
                 userDeptList.add(userDeptGenerator(vo, i));
             }
-            sysUserDeptService.removeByIds(delUserDeptId);
+
+//            sysUserDeptService.removeByIds(delUserDeptId);
+            sysUserDeptService.remove(new LambdaQueryWrapper<SysUserDept>()
+                    .eq(SysUserDept::getWeUserId,sysUser.getWeUserId()));
+
             sysUserDeptService.saveOrUpdateBatch(userDeptList);
             userMapper.updateUser(user);
         }
@@ -576,7 +580,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
 
         Map<String, Long> userIdMap = userList.stream().collect(Collectors.toMap(SysUser::getWeUserId, SysUser::getUserId));
-        sysUserDeptService.removeByIds(delUserDeptId);
+//        sysUserDeptService.removeByIds(delUserDeptId);
+
+        sysUserDeptService.remove(new LambdaQueryWrapper<SysUserDept>()
+                .in(SysUserDept::getWeUserId,userList.stream()
+                        .map(SysUser::getWeUserId).collect(Collectors.toList())));
+
         sysUserDeptService.saveBatch(userDeptList.stream().peek(userDept -> {
             userDept.setUserId(userIdMap.get(userDept.getWeUserId()));
         }).collect(Collectors.toList()));

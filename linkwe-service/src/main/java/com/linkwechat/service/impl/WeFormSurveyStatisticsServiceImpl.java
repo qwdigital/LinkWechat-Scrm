@@ -163,7 +163,7 @@ public class WeFormSurveyStatisticsServiceImpl extends ServiceImpl<WeFormSurveyS
         //总访问量
         weFormSurveyStatistics.setTotalVisits(pv);
         //总访问用户量
-        weFormSurveyStatistics.setTotalUser(uv.intValue());
+        weFormSurveyStatistics.setTotalUser(uv.intValue()<0?0:uv.intValue());
 
         //有效的收集量
         QueryWrapper<WeFormSurveyAnswer> queryWrapper = new QueryWrapper<>();
