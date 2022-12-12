@@ -271,7 +271,9 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
             LambdaQueryWrapper<WeProduct> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(WeProduct::getProductSn, productSn);
             weProduct = weProductMapper.selectOne(queryWrapper);
-            if (ObjectUtil.isNotEmpty(weProduct)) {
+            if (ObjectUtil.isEmpty(weProduct)) {
+                return;
+            } else {
                 weProductOrder.setProductId(weProduct.getId());
             }
             weProductOrder.setProductNum(amount);
