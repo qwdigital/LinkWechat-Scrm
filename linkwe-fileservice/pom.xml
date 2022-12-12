@@ -82,6 +82,17 @@
 <!--            <groupId>com.linkwechat</groupId>-->
 <!--            <artifactId>linkwe-service</artifactId>-->
 <!--        </dependency>-->
+
+        <!-- javacv start -->
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacv</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco.javacpp-presets</groupId>
+            <artifactId>ffmpeg-platform</artifactId>
+        </dependency>
+
     </dependencies>
 
 
