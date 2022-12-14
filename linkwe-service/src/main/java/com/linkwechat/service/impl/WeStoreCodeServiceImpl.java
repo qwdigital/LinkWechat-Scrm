@@ -11,6 +11,7 @@ import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeConfig;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeCount;
@@ -29,6 +30,7 @@ import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.mapper.WeStoreCodeCountMapper;
 import com.linkwechat.mapper.WeStoreCodeMapper;
+import com.linkwechat.service.IWeGroupCodeService;
 import com.linkwechat.service.IWeStoreCodeConfigService;
 import com.linkwechat.service.IWeStoreCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +54,10 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
 
     @Autowired
     private IWeStoreCodeConfigService iWeStoreCodeConfigService;
+
+
+    @Autowired
+    private IWeGroupCodeService weGroupCodeService;
 
 
     @Override
@@ -91,6 +97,11 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
                     weStoreCode.setConfigId(weAddWayResult.getConfigId());
                     weStoreCode.setShopGuideUrl(weAddWayResult.getQrCode());
                 }
+            }else if(null != weStoreCode.getStoreCodeId()){ //群
+                WeGroupCode weGroupCode = weGroupCodeService.getById(weStoreCode.getGroupCodeId());
+                if(null != weGroupCode){
+                    weStoreCode.setState(weStoreCode.getState());
+                }
             }
 
               saveOrUpdate(weStoreCode);
@@ -120,6 +131,7 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
 
     @Override
     public List<WeStoreGroupTrendVo> countStoreGroupTrend(WeStoreCode weStoreCode) {
+
         return weStoreCodeCountMapper.countStoreGroupTrend(weStoreCode);
     }
 

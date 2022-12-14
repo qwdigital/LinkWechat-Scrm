@@ -63,8 +63,6 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
     @Autowired
     private IWeGroupMemberService weGroupMemberService;
 
-    @Autowired
-    private IWeTagService iWeTagService;
 
 
     @Autowired
@@ -272,6 +270,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                 });
 
 
+
             }
 
             List<List<WeGroup>> lists = Lists.partition(weGroups, 500);
@@ -284,6 +283,11 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
         if (CollectionUtil.isNotEmpty(weGroupMembers)) {
             List<List<WeGroupMember>> lists = Lists.partition(weGroupMembers, 500);
             for (List<WeGroupMember> groupMemberList : lists) {
+
+                //物理删除已有的del_flag为非0的数据
+                groupMemberList.stream().forEach(kk->{
+                    weGroupMemberService.physicalDelete(kk.getChatId(),kk.getUserId());
+                });
 
                 weGroupMemberService.saveBatch(groupMemberList);
             }
