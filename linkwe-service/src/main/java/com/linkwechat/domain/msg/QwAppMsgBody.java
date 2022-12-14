@@ -42,7 +42,7 @@ public class QwAppMsgBody {
     /**
      * 企业部门ID
      */
-    private List<Integer> deptIds;
+    private List<String> deptIds;
 
     /**
      * 客户标签ID
