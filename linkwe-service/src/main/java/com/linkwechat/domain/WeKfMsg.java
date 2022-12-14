@@ -8,14 +8,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import lombok.Data;
 
 /**
  * 客服消息表(WeKfMsg)
@@ -91,7 +87,7 @@ public class WeKfMsg extends BaseEntity implements Serializable {
     /**
      * 消息来源:3-微信客户发送的消息 4-系统推送的事件消息 5-接待人员在企业微信客户端发送的消息
      */
-    @ApiModelProperty(value = "消息来源:3-微信客户发送的消息 4-系统推送的事件消息 5-接待人员在企业微信客户端发送的消息")
+    @ApiModelProperty(value = "消息来源:3-微信客户发送的消息 4-系统推送的事件消息 5-接待人员在企业微信客户端发送的消息 31-客户评价 51-欢迎语")
     @TableField("origin")
     private Integer origin;
 
@@ -109,13 +105,7 @@ public class WeKfMsg extends BaseEntity implements Serializable {
      */
     @ApiModelProperty(value = "消息内容")
     @TableField("content")
-    private Object content;
-
-
-    
-    
-    
-
+    private String content;
 
     /**
      * 是否删除:0有效,1删除

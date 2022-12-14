@@ -2,8 +2,6 @@ package com.linkwechat.domain.kf.query;
 
 import lombok.Data;
 
-import java.util.Date;
-
 /**
  * @author danmo
  * @Description 客服任务入参
@@ -11,6 +9,8 @@ import java.util.Date;
  **/
 @Data
 public class WeKfMsgTaskQuery {
+
+    private Long poolId;
 
     /**
      * 企业Id
@@ -20,7 +20,7 @@ public class WeKfMsgTaskQuery {
     /**
      * 消息发送时间
      */
-    private Long sendTime;
+    private String sendTime;
 
     /**
      * 客服帐号ID

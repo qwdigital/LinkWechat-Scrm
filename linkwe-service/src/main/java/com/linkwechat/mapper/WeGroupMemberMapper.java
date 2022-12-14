@@ -32,5 +32,8 @@ public interface WeGroupMemberMapper extends BaseMapper<WeGroupMember> {
     void quitGroup(@Param("quitScene") Integer quitScene,@Param("userId") String userId,@Param("chatId") String chatId);
 
 
+    void physicalDelete(@Param("chatId") String chatId,@Param("userId") String userId);
+
+
 }
 

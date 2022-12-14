@@ -20,6 +20,9 @@ public class WeKfInfoVo {
     @ApiModelProperty("主键ID")
     private Long id;
 
+    @ApiModelProperty("企业ID")
+    private String corpId;
+
     @ApiModelProperty("客服账号Id")
     private String openKfId;
 
@@ -62,6 +65,15 @@ public class WeKfInfoVo {
     @ApiModelProperty("超时未回复提醒内容")
     private String timeOutContent;
 
+    @ApiModelProperty("客服超时未回复提醒: 1-开启 2-关闭")
+    private Integer kfTimeOutNotice;
+
+    @ApiModelProperty("客户超时时间类型 1-分钟 2-小时")
+    private Integer kfTimeOutType;
+
+    @ApiModelProperty("客服超时时间")
+    private Integer kfTimeOut;
+
     @ApiModelProperty("自动结束提醒: 1-开启 2-关闭")
     private Integer endNotice;
 
@@ -70,6 +82,9 @@ public class WeKfInfoVo {
 
     @ApiModelProperty("自动结束时间类型 1-分钟 2-小时")
     private Integer endTimeType;
+
+    @ApiModelProperty("自动结束提醒内容类型 1-会话质量评价 2-会话结束语")
+    private Integer endContentType;
 
     @ApiModelProperty("自动结束提醒内容")
     private String endContent;

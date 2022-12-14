@@ -2,9 +2,9 @@ package com.linkwechat.mapper;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.annotation.SqlParser;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
+import com.linkwechat.domain.WeKfServicer;
 import com.linkwechat.domain.kf.WeKfUser;
 import com.linkwechat.domain.kf.query.WeKfServicerListQuery;
 import com.linkwechat.domain.kf.vo.WeKfServicerListVo;
@@ -13,8 +13,6 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
-import com.linkwechat.domain.WeKfServicer;
 
 /**
  * 客服接待人员表(WeKfServicer)
@@ -40,5 +38,6 @@ public interface WeKfServicerMapper extends BaseMapper<WeKfServicer> {
     @DataScope(type = "2", value = @DataColumn(alias = "wks", name = "user_id", userid = "we_user_id"))
     List<WeKfServicerListVo> getKfServicerList(WeKfServicerListQuery query);
 
+    List<WeKfUser> getKfUserIdList(@Param("kfId") Long kfId);
 }
 

@@ -11,25 +11,35 @@ import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.enums.WeKfMsgTypeEnum;
 import com.linkwechat.common.enums.WeKfStatusEnum;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.domain.WeKfPool;
+import com.linkwechat.common.utils.spring.SpringUtils;
+import com.linkwechat.domain.*;
 import com.linkwechat.domain.kf.WeKfUser;
+import com.linkwechat.domain.kf.query.WeKfAddMsgQuery;
 import com.linkwechat.domain.kf.query.WeKfRecordQuery;
+import com.linkwechat.domain.kf.vo.WeKfEvaluationVo;
 import com.linkwechat.domain.kf.vo.WeKfInfoVo;
 import com.linkwechat.domain.kf.vo.WeKfRecordListVo;
+import com.linkwechat.domain.system.user.query.SysUserQuery;
+import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.domain.wecom.query.kf.WeKfMsgQuery;
 import com.linkwechat.domain.wecom.query.kf.WeKfStateQuery;
 import com.linkwechat.domain.wecom.vo.kf.WeKfStateVo;
 import com.linkwechat.fegin.QwKfClient;
+import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeKfPoolMapper;
+import com.linkwechat.service.IWeCustomerService;
 import com.linkwechat.service.IWeKfInfoService;
 import com.linkwechat.service.IWeKfPoolService;
+import com.linkwechat.service.IWeKfServicerService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -38,11 +48,15 @@ import java.util.stream.Collectors;
  * @author danmo
  * @since 2022-04-15 15:53:37
  */
+@Slf4j
 @Service
 public class WeKfPoolServiceImpl extends ServiceImpl<WeKfPoolMapper, WeKfPool> implements IWeKfPoolService {
 
-    @Autowired
+    @Resource
     private QwKfClient qwKfClient;
+
+    @Resource
+    private QwSysUserClient qwSysUserClient;
 
     @Autowired
     private RedisService redisService;
@@ -50,45 +64,38 @@ public class WeKfPoolServiceImpl extends ServiceImpl<WeKfPoolMapper, WeKfPool> i
     @Autowired
     private IWeKfInfoService weKfInfoService;
 
-    private String KFPOOLINFOKEY = "we:kf:pool:info:{}:{}:{}";
+    @Autowired
+    private IWeKfServicerService weKfServicerService;
 
-    private AtomicInteger cycleNum = new AtomicInteger();
+    @Autowired
+    private IWeCustomerService weCustomerService;
+
+    @Value("wecom.kf.cycle-num.key:we-kf-cycle-num-key-{}-{}")
+    private String cycleNumKey;
 
     @Override
     public WeKfPool getKfPoolInfo(String corpId, String openKfId, String externalUserId) {
-        String key = StringUtils.format(KFPOOLINFOKEY, corpId, openKfId, externalUserId);
-        WeKfPool weKfPool = (WeKfPool) redisService.getCacheObject(key);
-        if (weKfPool == null) {
-            weKfPool = getOne(new LambdaQueryWrapper<WeKfPool>()
-                    .eq(WeKfPool::getCorpId,corpId)
-                    .eq(WeKfPool::getOpenKfId, openKfId)
-                    .eq(WeKfPool::getExternalUserId, externalUserId)
-                    .eq(WeKfPool::getDelFlag, 0)
-                    .last("limit 1"));
-            if (weKfPool != null) {
-                redisService.setCacheObject(key, weKfPool, 30, TimeUnit.MINUTES);
-            }
-        }
-        return weKfPool;
+        return getOne(new LambdaQueryWrapper<WeKfPool>()
+                .eq(WeKfPool::getCorpId,corpId)
+                .eq(WeKfPool::getOpenKfId, openKfId)
+                .eq(WeKfPool::getExternalUserId, externalUserId)
+                .eq(WeKfPool::getDelFlag, 0)
+                .last("limit 1"));
     }
 
+
+    //@KfNotice
     @Override
     public void updateKfPoolInfo(WeKfPool weKfPool) {
-        String key = StringUtils.format(KFPOOLINFOKEY,weKfPool.getCorpId(), weKfPool.getOpenKfId(), weKfPool.getExternalUserId());
-        redisService.deleteObject(key);
-        //更新接待信息
         update(weKfPool, new LambdaQueryWrapper<WeKfPool>()
                 .eq(WeKfPool::getCorpId, weKfPool.getCorpId())
                 .eq(WeKfPool::getOpenKfId, weKfPool.getOpenKfId())
                 .eq(WeKfPool::getExternalUserId, weKfPool.getExternalUserId())
                 .eq(WeKfPool::getDelFlag, 0));
-        redisService.deleteObject(key);
     }
 
     @Override
     public void updateKfServicer(String corpId, String openKfId, String externalUserId, String userId) {
-        String key = StringUtils.format(KFPOOLINFOKEY,corpId, openKfId, externalUserId);
-        redisService.deleteObject(key);
         WeKfPool weKfPool = new WeKfPool();
         WeKfPool kfPoolInfo = getKfPoolInfo(corpId, openKfId, externalUserId);
         BeanUtil.copyProperties(kfPoolInfo, weKfPool);
@@ -98,14 +105,10 @@ public class WeKfPoolServiceImpl extends ServiceImpl<WeKfPoolMapper, WeKfPool> i
 
         weKfPool.setSessionStartTime(new Date());
         saveKfPoolInfo(weKfPool);
-        redisService.deleteObject(key);
     }
 
     @Override
     public void saveKfPoolInfo(WeKfPool weKfPool) {
-        if (weKfPool == null) {
-            return;
-        }
         save(weKfPool);
     }
 
@@ -128,7 +131,7 @@ public class WeKfPoolServiceImpl extends ServiceImpl<WeKfPoolMapper, WeKfPool> i
 
 
     @Override
-    public void allocationServicer(String corpId, String openKfId, String externalUserId, String userId, Integer status) {
+    public String allocationServicer(String corpId, String openKfId, String externalUserId, String userId, Integer status) {
         Date date = new Date();
         WeKfPool weKfPool = new WeKfPool();
         weKfPool.setCorpId(corpId);
@@ -151,22 +154,16 @@ public class WeKfPoolServiceImpl extends ServiceImpl<WeKfPoolMapper, WeKfPool> i
         stateQuery.setOpen_kfid(openKfId);
         stateQuery.setExternal_userid(externalUserId);
         WeKfStateVo kfStateVo = qwKfClient.updateSessionStatus(stateQuery).getData();
-
-        if (StringUtils.isNotEmpty(kfStateVo.getMsgCode())) {
-            if (ObjectUtil.equal(WeKfStatusEnum.SERVICER.getType(), status)
-                    || ObjectUtil.equal(WeKfStatusEnum.ACCESS_POOL.getType(), status)) {
-                redisService.setCacheObject(StringUtils.format(WeConstans.KF_SESSION_MSG_CODE_KEY,corpId, openKfId, externalUserId),
-                        kfStateVo.getMsgCode(), 48, TimeUnit.HOURS);
-
-            } else if (ObjectUtil.equal(WeKfStatusEnum.STAR_OR_END.getType(), status)) {
-                redisService.setCacheObject(StringUtils.format(WeConstans.KF_SESSION_MSG_CODE_KEY,corpId, openKfId, externalUserId),
-                        kfStateVo.getMsgCode(), 20, TimeUnit.SECONDS);
+        if (kfStateVo != null && StringUtils.isNotEmpty(kfStateVo.getMsgCode())) {
+            weKfPool.setMsgCode(kfStateVo.getMsgCode());
+            if (ObjectUtil.equal(WeKfStatusEnum.STAR_OR_END.getType(), status)) {
                 weKfPool.setSessionEndTime(date);
                 weKfPool.setDelFlag(1);
             }
         }
         //更新接待信息
-        updateKfPoolInfo(weKfPool);
+        SpringUtils.getBean(IWeKfPoolService.class).updateKfPoolInfo(weKfPool);
+        return weKfPool.getMsgCode();
     }
 
     @Override
@@ -222,7 +219,7 @@ public class WeKfPoolServiceImpl extends ServiceImpl<WeKfPoolMapper, WeKfPool> i
      */
     @Override
     public void transServiceHandler(String corpId, String openKfId, String externalUserId, Boolean isAI) {
-        WeKfInfoVo weKfInfo = weKfInfoService.getKfInfoByOpenKfId(corpId, openKfId);
+        WeKfInfo weKfInfo = weKfInfoService.getKfDetailByOpenKfId(corpId, openKfId);
         if (weKfInfo == null) {
             return;
         }
@@ -236,7 +233,9 @@ public class WeKfPoolServiceImpl extends ServiceImpl<WeKfPoolMapper, WeKfPool> i
         }
         //是否优先分配: 1-否 2-是
         Integer isPriority = weKfInfo.getIsPriority();
-        cycleNum.set(weKfInfo.getUserIdList().size());
+
+        List<WeKfUser> kfUserIdList = weKfServicerService.getKfUserIdList(weKfInfo.getId());
+        redisService.setCacheObject(StringUtils.format(cycleNumKey,corpId, openKfId),kfUserIdList.size());
         if (ObjectUtil.equal(2, isPriority)) {
             //成功优先分配后返回
             if (isPriority(corpId, openKfId, externalUserId)) {
@@ -274,7 +273,7 @@ public class WeKfPoolServiceImpl extends ServiceImpl<WeKfPoolMapper, WeKfPool> i
         if (lastServicer != null) {
             //判断上次接待人员是否还是接待人员并且还在接待状态
             boolean isKfServicer = weKfInfo.getUserIdList().stream()
-                    .filter(item -> item.getStatus().equals(0)).map(WeKfUser::getUserId)
+                    .filter(item -> ObjectUtil.equal(1,item.getStatus())).map(WeKfUser::getUserId)
                     .anyMatch(item -> item.equals(lastServicer.getUserId()));
             //接待限制
             Integer receiveLimit = weKfInfo.getReceiveLimit();
@@ -296,10 +295,11 @@ public class WeKfPoolServiceImpl extends ServiceImpl<WeKfPoolMapper, WeKfPool> i
      * @return
      */
     private Boolean isPolling(String corpId, String openKfId, String externalUserId) {
-        if (cycleNum.get() <= 0) {
+        Integer cycleNum =(Integer) redisService.getCacheObject(StringUtils.format(cycleNumKey,corpId, openKfId));
+        if (cycleNum <= 0) {
             return false;
         }
-        WeKfInfoVo weKfInfo = weKfInfoService.getKfInfoByOpenKfId(corpId, openKfId);
+        WeKfInfo weKfInfo = weKfInfoService.getKfDetailByOpenKfId(corpId, openKfId);
         if (weKfInfo == null) {
             return false;
         }
@@ -308,33 +308,32 @@ public class WeKfPoolServiceImpl extends ServiceImpl<WeKfPoolMapper, WeKfPool> i
         //接待限制
         Integer receiveLimit = weKfInfo.getReceiveLimit();
 
+        List<WeKfUser> kfUserList = weKfServicerService.getKfUserIdList(weKfInfo.getId());
         //轮流分配
         if (ObjectUtil.equal(1, allocationWay)) {
 
-            String pollingKey = StringUtils.format("we:kf:session:servicer:polling:{}", openKfId);
+            String pollingKey = StringUtils.format(WeConstans.KF_SERVICER_POLLING_KEY,corpId, openKfId);
             //获取客服接待人员列表
             Integer pollingNum = redisService.keyIsExists(pollingKey) ? redisService.getCacheObject(pollingKey) : 0;
-
-            List<WeKfUser> servicerList = weKfInfo.getUserIdList();
 
             if (pollingNum >= Integer.MAX_VALUE) {
                 pollingNum = 0;
                 redisService.setCacheObject(pollingKey, 0L);
             }
-            int idx = pollingNum % servicerList.size();
-            WeKfUser weKfUser = servicerList.get(idx < 0 ? -idx : idx);
+            int idx = pollingNum % kfUserList.size();
+            WeKfUser weKfUser = kfUserList.get(idx < 0 ? -idx : idx);
             int receptionNum = getReceptionCnt(corpId, openKfId, weKfUser.getUserId());
             redisService.increment(pollingKey);
-            if (weKfUser.getStatus().equals(0) && receptionNum < receiveLimit) {
+            if (ObjectUtil.equal(1,weKfUser.getStatus()) && receptionNum < receiveLimit) {
                 allocationServicer(corpId, openKfId
                         , externalUserId, weKfUser.getUserId(), WeKfStatusEnum.SERVICER.getType());
             } else {
-                cycleNum.decrementAndGet();
+                redisService.decrement(StringUtils.format(cycleNumKey,corpId, openKfId));
                 return isPolling(corpId, openKfId, externalUserId);
             }
         } else {
             //空闲分配
-            List<String> servicerList = weKfInfo.getUserIdList().stream()
+            List<String> servicerList = kfUserList.stream()
                     .filter(servicer -> servicer.getStatus().equals(0))
                     .map(WeKfUser::getUserId).collect(Collectors.toList());
             List<Map<String, Object>> receptionCntList = getReceptionGroupByCnt(corpId, openKfId, externalUserId, servicerList);
@@ -357,7 +356,75 @@ public class WeKfPoolServiceImpl extends ServiceImpl<WeKfPoolMapper, WeKfPool> i
 
     @Override
     public List<WeKfRecordListVo> getRecordList(WeKfRecordQuery query) {
-        return this.baseMapper.getRecordList(query);
+        List<WeKfRecordListVo> recordList = this.baseMapper.getRecordList(query);
+        if(CollectionUtil.isNotEmpty(recordList)){
+
+            Map<String, String> userId2NameMap = new HashMap<>();
+            Map<String, String> externalUserIdMap = new HashMap<>();
+
+            Set<String> userIdSet = recordList.stream().map(WeKfRecordListVo::getUserId).collect(Collectors.toSet());
+            if(CollectionUtil.isNotEmpty(userIdSet)){
+                SysUserQuery userQuery = new SysUserQuery();
+                userQuery.setOpenUserIds(new ArrayList<>(userIdSet));
+                try {
+                    List<SysUserVo> sysUserList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
+                    if(CollectionUtil.isNotEmpty(sysUserList)){
+                        Map<String, String> userMap = sysUserList.stream().collect(Collectors.toMap(SysUserVo::getOpenUserid, SysUserVo::getUserName, (key1, key2) -> key2));
+                        userId2NameMap.putAll(userMap);
+                    }
+                } catch (Exception e) {
+                    log.error("getRecordList 换取用户名称失败：userQuery：{}",JSONObject.toJSONString(userQuery),e);
+                }
+            }
+            Set<String> externalUserIdSet = recordList.stream().map(WeKfRecordListVo::getExternalUserId).collect(Collectors.toSet());
+            if(CollectionUtil.isNotEmpty(externalUserIdSet)){
+                List<WeCustomer> customerList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().select(WeCustomer::getExternalUserid).in(WeCustomer::getExternalUserid, externalUserIdSet).eq(WeCustomer::getDelFlag,0));
+                if(CollectionUtil.isNotEmpty(customerList)){
+                    Map<String, String> tempExternalUserIdMap = customerList.stream().collect(Collectors.toMap(WeCustomer::getExternalUserid, WeCustomer::getExternalUserid, (key1, key2) -> key2));
+                    externalUserIdMap.putAll(tempExternalUserIdMap);
+                }
+            }
+            for (WeKfRecordListVo weKfRecord : recordList) {
+                if(externalUserIdMap.containsKey(weKfRecord.getExternalUserId())){
+                    weKfRecord.setIsQyCustomer(0);
+                }
+                if(userId2NameMap.containsKey(weKfRecord.getUserId())){
+                    weKfRecord.setUserName(userId2NameMap.get(weKfRecord.getUserId()));
+                }
+            }
+        }
+        return recordList;
+    }
+
+
+    @Override
+    public WeKfEvaluationVo getEvaluation(WeKfAddMsgQuery query) {
+        WeKfEvaluationVo weKfEvaluation = new WeKfEvaluationVo();
+        WeKfPool weKfPool = getById(query.getPoolId());
+        if(Objects.nonNull(weKfPool)){
+            weKfEvaluation.setEvaluationType(weKfPool.getEvaluationType());
+            weKfEvaluation.setContent(weKfPool.getEvaluation());
+        }
+        return weKfEvaluation;
+    }
+
+    @Override
+    public void addEvaluation(WeKfAddMsgQuery query) {
+        WeKfPool weKfPool = new WeKfPool();
+        weKfPool.setId(Long.valueOf(query.getPoolId()));
+        weKfPool.setEvaluationType(query.getEvaluationType());
+        weKfPool.setEvaluation(query.getContent());
+        updateById(weKfPool);
+    }
+
+    @Override
+    public WeKfCustomerStat getKfCustomerStat(String dateTime) {
+       return this.baseMapper.getKfCustomerStat(dateTime);
+    }
+
+    @Override
+    public List<WeKfUserStat> getKfUserStat(String dateTime) {
+        return this.baseMapper.getKfUserStat(dateTime);
     }
 
 }

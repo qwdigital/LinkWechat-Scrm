@@ -3,7 +3,6 @@ package com.linkwechat.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.core.redis.RedisService;
-import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeKfMsgCursor;
 import com.linkwechat.mapper.WeKfMsgCursorMapper;

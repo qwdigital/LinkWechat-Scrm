@@ -207,6 +207,13 @@ public class SysUser extends BaseEntity {
     @TableField("open_userid")
     private String openUserid;
 
+    /**
+     * 客服接待状态。1:接待中,2:停止接待
+     */
+    @ApiModelProperty(value = "接待状态。1:接待中,2:停止接待")
+    @TableField("kf_status")
+    private Integer kfStatus;
+
 
 
 

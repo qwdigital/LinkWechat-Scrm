@@ -4,10 +4,10 @@
 
     <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
     <select id="getServicerByKfId" resultType="com.linkwechat.domain.kf.WeKfUser">
-        select user_id,
-               (select su.user_name from sys_user su where su.we_user_id = wks.user_id and su.del_flag = 0 limit 1) as user_name,
-        status
-        from we_kf_servicer wks where kf_id = #{kfId} and del_flag = 0;
+        select wks.user_id,
+               department_id,
+               status
+        from we_kf_servicer wks where kf_id = #{kfId} and del_flag = 0
     </select>
 
 
@@ -17,10 +17,7 @@
         kf_id,
         open_kf_id,
         user_id,
-        (select su.user_name from sys_user su where su.we_user_id = wks.user_id and su.del_flag=0  limit 1) as user_name,
-        (select group_concat(wd.dept_name) from sys_user wu,sys_dept wd where find_in_set(wd.dept_id,wu.dept_id) and
-        wu.we_user_id = wks.user_id and wd.del_flag = 0) as dept_name,
-        status
+        department_id
         from we_kf_servicer wks
         <where>
             <if test="kfId != null">
@@ -46,6 +43,14 @@
             </if>
             and wks.del_flag = 0
         </where>
+    </select>
+
+    <select id="getKfUserIdList" resultType="com.linkwechat.domain.kf.WeKfUser">
+        select su.we_user_id as user_id, su.kf_status as status from sys_user su where su.we_user_id in (
+            select distinct ifnull(wks.user_id,
+                                   (select sud.we_user_id from sys_user_dept sud where sud.dept_id = wks.department_id and del_flag = 0)) as user_id
+            from we_kf_servicer wks where kf_id = #{kfId} and del_flag = 0
+            ) and su.del_flag = 0
     </select>
 
 </mapper>

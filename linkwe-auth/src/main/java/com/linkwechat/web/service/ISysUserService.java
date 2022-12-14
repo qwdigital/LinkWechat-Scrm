@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.common.core.domain.dto.SysUserDTO;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.page.PageDomain;
+import com.linkwechat.domain.system.user.query.SysUserQuery;
+import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.web.domain.vo.UserVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -250,4 +252,12 @@ public interface ISysUserService extends IService<SysUser> {
      */
     SysUser findOrSynchSysUser(String weuserId);
 
+
+
+    /**
+     * 通过企微员工ID获取员工信息
+     * @param query
+     * @return
+     */
+    List<SysUserVo> getUserListByWeUserIds(SysUserQuery query);
 }

@@ -8,14 +8,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import lombok.Data;
 
 /**
  * 客服接待池表(WeKfPool)
@@ -119,11 +115,24 @@ public class WeKfPool extends BaseEntity implements Serializable {
     @TableField("reception_time")
     private Date receptionTime;
 
+    /**
+     * 评价语类型
+     */
+    @ApiModelProperty(value = "评价语类型")
+    @TableField("evaluation_type")
+    private String evaluationType;
 
-    
-    
-    
+    /**
+     * 评价语
+     */
+    @ApiModelProperty(value = "评价语")
+    @TableField("evaluation")
+    private String evaluation;
 
+
+    @ApiModelProperty(value = "消息code")
+    @TableField("msg_code")
+    private String msgCode;
 
     /**
      * 是否删除:0有效,1删除

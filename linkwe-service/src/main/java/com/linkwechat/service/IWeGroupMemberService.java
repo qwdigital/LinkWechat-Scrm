@@ -3,6 +3,7 @@ package com.linkwechat.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.WeGroupMember;
 import com.linkwechat.domain.groupchat.vo.WeGroupMemberVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -47,4 +48,12 @@ public interface IWeGroupMemberService extends IService<WeGroupMember> {
      * @param chatId
      */
     void quitGroup(Integer quitScene,String userId,String chatId);
+
+
+    /**
+     * 物理删除群成员
+     * @param chatId
+     * @param userId
+     */
+    void physicalDelete(String chatId,String userId);
 }

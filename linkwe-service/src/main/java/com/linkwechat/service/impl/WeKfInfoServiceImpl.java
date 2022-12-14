@@ -10,6 +10,7 @@ import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -20,40 +21,47 @@ import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
+import com.linkwechat.common.enums.WeKfMsgTypeEnum;
+import com.linkwechat.common.enums.WeKfOriginEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
-import com.linkwechat.domain.WeKfInfo;
-import com.linkwechat.domain.WeKfScenes;
-import com.linkwechat.domain.WeKfServicer;
-import com.linkwechat.domain.WeKfWelcome;
+import com.linkwechat.domain.*;
 import com.linkwechat.domain.kf.WeKfMenu;
 import com.linkwechat.domain.kf.WeKfMenuList;
 import com.linkwechat.domain.kf.WeKfUser;
 import com.linkwechat.domain.kf.WeKfWelcomeInfo;
 import com.linkwechat.domain.kf.query.WeAddKfInfoQuery;
+import com.linkwechat.domain.kf.query.WeAddKfServicerQuery;
+import com.linkwechat.domain.kf.query.WeAddKfWelcomeQuery;
 import com.linkwechat.domain.kf.query.WeKfListQuery;
-import com.linkwechat.domain.kf.vo.WeKfInfoVo;
 import com.linkwechat.domain.kf.vo.QwKfListVo;
+import com.linkwechat.domain.kf.vo.WeKfInfoVo;
+import com.linkwechat.domain.system.dept.query.SysDeptQuery;
+import com.linkwechat.domain.system.dept.vo.SysDeptVo;
+import com.linkwechat.domain.system.user.query.SysUserQuery;
+import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.kf.WeKfAddQuery;
+import com.linkwechat.domain.wecom.query.kf.WeKfMsgQuery;
 import com.linkwechat.domain.wecom.query.kf.WeKfQuery;
 import com.linkwechat.domain.wecom.vo.kf.*;
 import com.linkwechat.domain.wecom.vo.media.WeMediaVo;
 import com.linkwechat.fegin.QwKfClient;
+import com.linkwechat.fegin.QwSysDeptClient;
+import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeKfInfoMapper;
 import com.linkwechat.service.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import javax.annotation.Resource;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -62,11 +70,18 @@ import java.util.stream.Collectors;
  * @author danmo
  * @since 2022-04-15 15:53:35
  */
+@Slf4j
 @Service
 public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> implements IWeKfInfoService {
 
-    @Autowired
+    @Resource
     private QwKfClient qwKfClient;
+
+    @Resource
+    private QwSysUserClient qwSysUserClient;
+
+    @Resource
+    private QwSysDeptClient qwSysDeptClient;
 
      @Autowired
      private IWeMaterialService weMaterialService;
@@ -81,6 +96,9 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
     private IWeKfScenesService weKfScenesService;
 
     @Autowired
+    private IWeKfMsgService weKfMsgService;
+
+    @Autowired
     private RedisService redisService;
 
     @Autowired
@@ -89,21 +107,25 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Value("${wecom.kf.end.msgmenu.content:}")
+    private String kfEndMsgMenuContent;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addAccount(WeAddKfInfoQuery query) {
-        checkTime(query);
+    public Long addAccount(WeAddKfInfoQuery query) {
         //换取头像素材id
         WeMediaVo weMediaVo = weMaterialService.uploadTemporaryMaterial(query.getAvatar(),
                 MessageType.IMAGE.getMessageType(),
                 FileUtil.getName(query.getAvatar()));
-
         //创建客服
         WeKfAddQuery weKfAddQuery = new WeKfAddQuery();
         weKfAddQuery.setMedia_id(weMediaVo.getMediaId());
         weKfAddQuery.setName(query.getName());
         WeAddKfVo weAddKfVo = qwKfClient.addAccount(weKfAddQuery).getData();
-        if (weAddKfVo == null || StringUtils.isEmpty(weAddKfVo.getOpenKfId())) {
+        if (weAddKfVo == null){
+            throw new WeComException("添加客服账号失败");
+        }
+        if (StringUtils.isEmpty(weAddKfVo.getOpenKfId())) {
             throw new WeComException(weAddKfVo.getErrCode(),WeErrorCodeEnum.parseEnum(weAddKfVo.getErrCode()).getErrorMsg());
         }
         WeKfInfo weKfInfo = new WeKfInfo();
@@ -111,69 +133,94 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
         weKfInfo.setOpenKfId(weAddKfVo.getOpenKfId());
         weKfInfo.setCorpId(SecurityUtils.getCorpId());
         //客服信息入库
-        if (save(weKfInfo)) {
-            //添加接待人员
-            WeKfQuery weKfQuery = new WeKfQuery();
-            List<String> userIds = query.getUserIdList().stream().map(WeKfUser::getUserId).collect(Collectors.toList());
-            List<List<String>> partition = Lists.partition(userIds, 100);
-            List<WeKfServicer> addServicerList = new ArrayList<>();
-            partition.forEach(userIdList -> {
-                weKfQuery.setOpen_kfid(weAddKfVo.getOpenKfId());
-                weKfQuery.setUserid_list(userIdList);
-                WeKfUserListVo weKfUserListVo = qwKfClient.addServicer(weKfQuery).getData();
-                List<WeKfUserVo> resultList = weKfUserListVo.getResultList();
-                List<String> validUserIds = resultList.stream()
-                        .filter(item -> item.getErrCode().equals(0))
-                        .map(WeKfUserVo::getUserId).collect(Collectors.toList());
-                if (CollectionUtil.isEmpty(validUserIds)) {
-                    throw new WeComException(1001, "添加接待人员失败");
-                }
-                List<WeKfServicer> servicerList = validUserIds.stream().map(userId -> {
-                    WeKfServicer weKfServicer = new WeKfServicer();
-                    weKfServicer.setKfId(weKfInfo.getId());
-                    weKfServicer.setOpenKfId(weAddKfVo.getOpenKfId());
-                    weKfServicer.setUserId(userId);
-                    weKfServicer.setCorpId(SecurityUtils.getCorpId());
-                    return weKfServicer;
-                }).collect(Collectors.toList());
-                addServicerList.addAll(servicerList);
-            });
-            //客服接待人员信息入库
-            weKfServicerService.saveBatch(addServicerList);
-
-            //欢迎语入库
-            List<WeKfWelcomeInfo> welcomeList = query.getWelcome();
-            List<WeKfWelcome> weKfWelcomes = welcomeList.stream().map(welcomeInfo -> {
-                WeKfWelcome weKfWelcome = new WeKfWelcome();
-                weKfWelcome.setCorpId(SecurityUtils.getCorpId());
-                weKfWelcome.setKfId(weKfInfo.getId());
-                weKfWelcome.setWorkCycle(welcomeInfo.getWorkCycle());
-                weKfWelcome.setBeginTime(welcomeInfo.getBeginTime());
-                weKfWelcome.setEndTime(welcomeInfo.getEndTime());
-                weKfWelcome.setType(welcomeInfo.getType());
-                if (ObjectUtil.equal(1, welcomeInfo.getType())) {
-                    weKfWelcome.setContent(welcomeInfo.getContent());
-                }
-                if (ObjectUtil.equal(2, welcomeInfo.getType())) {
-                    List<WeKfMenu> menuList = welcomeInfo.getMenuList();
-                    menuList.forEach(menu -> {
-                        if (ObjectUtil.equal("click", menu.getType()) || ObjectUtil.equal("manual", menu.getType())) {
-                            Snowflake snowflake = IdUtil.getSnowflake(RandomUtil.randomLong(6), RandomUtil.randomInt(6));
-                            menu.setClickId(snowflake.nextIdStr());
-                        }
-                    });
-                    WeKfMenuList kfMenuList = new WeKfMenuList();
-                    kfMenuList.setHeadContent(welcomeInfo.getContent());
-                    kfMenuList.setList(menuList);
-                    weKfWelcome.setContent(JSONObject.toJSONString(kfMenuList));
-                }
-                return weKfWelcome;
-            }).collect(Collectors.toList());
-            weKfWelcomeService.saveBatch(weKfWelcomes);
-        }
+        save(weKfInfo);
+        return weKfInfo.getId();
     }
 
-    private void checkTime(WeAddKfInfoQuery query) {
+    @Override
+    public void addAccountWelcome(WeAddKfWelcomeQuery query) {
+        WeKfInfo weKfInfo = new WeKfInfo();
+        weKfInfo.setId(query.getId());
+        weKfInfo.setReceptionType(query.getReceptionType());
+        updateById(weKfInfo);
+        List<WeKfWelcomeInfo> welcomeList = query.getWelcome();
+        List<WeKfWelcome> weKfWelcomes = welcomeList.stream().map(welcomeInfo -> {
+            WeKfWelcome weKfWelcome = new WeKfWelcome();
+            weKfWelcome.setCorpId(SecurityUtils.getCorpId());
+            weKfWelcome.setKfId(query.getId());
+            weKfWelcome.setWorkCycle(welcomeInfo.getWorkCycle());
+            weKfWelcome.setBeginTime(welcomeInfo.getBeginTime());
+            weKfWelcome.setEndTime(welcomeInfo.getEndTime());
+            weKfWelcome.setType(welcomeInfo.getType());
+            if (ObjectUtil.equal(1, welcomeInfo.getType())) {
+                weKfWelcome.setContent(welcomeInfo.getContent());
+            }
+            if (ObjectUtil.equal(2, welcomeInfo.getType())) {
+                List<WeKfMenu> menuList = welcomeInfo.getMenuList();
+                menuList.forEach(menu -> {
+                    if (ObjectUtil.equal("click", menu.getType()) || ObjectUtil.equal("manual", menu.getType())) {
+                        Snowflake snowflake = IdUtil.getSnowflake(RandomUtil.randomLong(6), RandomUtil.randomInt(6));
+                        menu.setClickId(snowflake.nextIdStr());
+                    }
+                });
+                WeKfMenuList kfMenuList = new WeKfMenuList();
+                kfMenuList.setHeadContent(welcomeInfo.getContent());
+                kfMenuList.setList(menuList);
+                weKfWelcome.setContent(JSONObject.toJSONString(kfMenuList));
+            }
+            return weKfWelcome;
+        }).collect(Collectors.toList());
+        weKfWelcomeService.saveBatch(weKfWelcomes);
+    }
+
+    @Override
+    public void addAccountServicer(WeAddKfServicerQuery query) {
+        checkParams(query);
+        WeKfInfo weKfInfo = getById(query.getId());
+        weKfInfo.setCorpId(SecurityUtils.getCorpId());
+        weKfInfo.setAllocationWay(query.getAllocationWay());
+        weKfInfo.setIsPriority(query.getIsPriority());
+        weKfInfo.setReceiveLimit(query.getReceiveLimit());
+        weKfInfo.setQueueNotice(query.getQueueNotice());
+        weKfInfo.setQueueNoticeContent(query.getQueueNoticeContent());
+        weKfInfo.setTimeOutNotice(query.getTimeOutNotice());
+        weKfInfo.setTimeOutContent(query.getTimeOutContent());
+        weKfInfo.setTimeOut(query.getTimeOut());
+        weKfInfo.setTimeOutType(query.getTimeOutType());
+
+        weKfInfo.setKfTimeOutNotice(query.getKfTimeOutNotice());
+        weKfInfo.setKfTimeOut(query.getKfTimeOut());
+        weKfInfo.setKfTimeOutType(query.getKfTimeOutType());
+
+        weKfInfo.setEndNotice(query.getEndNotice());
+        weKfInfo.setEndContentType(query.getEndContentType());
+        weKfInfo.setEndContent(query.getEndContent());
+        weKfInfo.setEndNoticeTime(query.getEndNoticeTime());
+        weKfInfo.setEndTimeType(query.getEndTimeType());
+        updateById(weKfInfo);
+        WeKfQuery weKfQuery = new WeKfQuery();
+        List<List<String>> partition = Lists.partition(query.getUserIdList(), 100);
+        weKfQuery.setOpen_kfid(weKfInfo.getOpenKfId());
+        weKfQuery.setUserid_list(query.getUserIdList());
+        weKfQuery.setDepartment_id_list(query.getDepartmentIdList());
+        WeKfUserListVo weKfUserListVo = qwKfClient.addServicer(weKfQuery).getData();
+        List<WeKfUserVo> resultList = weKfUserListVo.getResultList();
+        List<WeKfUserVo> validUserIds = resultList.stream()
+                .filter(item -> item.getErrCode().equals(0)).collect(Collectors.toList());
+        List<WeKfServicer> servicerList = validUserIds.stream().map(kfUserVo -> {
+            WeKfServicer weKfServicer = new WeKfServicer();
+            weKfServicer.setKfId(weKfInfo.getId());
+            weKfServicer.setOpenKfId(weKfInfo.getOpenKfId());
+            weKfServicer.setUserId(kfUserVo.getUserId());
+            weKfServicer.setDepartmentId(kfUserVo.getDepartmentId());
+            weKfServicer.setCorpId(SecurityUtils.getCorpId());
+            return weKfServicer;
+        }).collect(Collectors.toList());
+        //客服接待人员信息入库
+        weKfServicerService.saveBatch(servicerList);
+    }
+
+    private void checkParams(WeAddKfServicerQuery query) {
         DateTime endOffSet = null;
         if (ObjectUtil.equal(1, query.getEndTimeType())) {
             endOffSet = DateUtil.offset(new Date(), DateField.MINUTE, query.getEndNoticeTime());
@@ -187,8 +234,18 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
         } else {
             timeOutOffSet = DateUtil.offset(new Date(), DateField.HOUR_OF_DAY, query.getTimeOut());
         }
+        DateTime kfTimeOutOffSet = null;
+        if (ObjectUtil.equal(1, query.getKfTimeOutType())) {
+            kfTimeOutOffSet = DateUtil.offset(new Date(), DateField.MINUTE, query.getKfTimeOut());
+        } else {
+            kfTimeOutOffSet = DateUtil.offset(new Date(), DateField.HOUR_OF_DAY, query.getKfTimeOut());
+        }
         if (timeOutOffSet.isAfterOrEquals(endOffSet)) {
-            throw new WeComException(10010, "会话超时时间不能小于结束时间");
+            throw new WeComException("客户超时时间不能小于结束时间");
+        }
+
+        if (kfTimeOutOffSet.isAfterOrEquals(endOffSet)) {
+            throw new WeComException("客服超时时间不能小于结束时间");
         }
     }
 
@@ -202,7 +259,6 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
         if (weKfInfo == null) {
             throw new WeComException(1005, "未找到有效客服账号");
         }
-        redisService.deleteObject(StringUtils.format(WeConstans.KF_ACCOUNT_SET_UP_KEY,SecurityUtils.getCorpId(), weKfInfo.getOpenKfId()));
         //修改客服
         if (ObjectUtil.notEqual(query.getName(), weKfInfo.getName())
                 || ObjectUtil.notEqual(query.getAvatar(), weKfInfo.getAvatar())) {
@@ -221,115 +277,25 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
             }
             weKfQuery.setOpen_kfid(weKfInfo.getOpenKfId());
             qwKfClient.updateAccount(weKfQuery);
-        }
-        try {
-            //客服信息修改
-            weKfInfo.setAllocationWay(query.getAllocationWay());
-            weKfInfo.setIsPriority(query.getIsPriority());
-            weKfInfo.setReceptionType(query.getReceptionType());
-            weKfInfo.setReceiveLimit(query.getReceiveLimit());
-            weKfInfo.setQueueNotice(query.getQueueNotice());
-            weKfInfo.setQueueNoticeContent(query.getQueueNoticeContent());
-            weKfInfo.setTimeOutNotice(query.getTimeOutNotice());
-            weKfInfo.setTimeOutContent(query.getTimeOutContent());
-            weKfInfo.setTimeOut(query.getTimeOut());
-            weKfInfo.setTimeOutType(query.getTimeOutType());
-            weKfInfo.setEndNotice(query.getEndNotice());
-            weKfInfo.setEndContent(query.getEndContent());
-            weKfInfo.setEndNoticeTime(query.getEndNoticeTime());
-            weKfInfo.setEndTimeType(query.getEndTimeType());
             updateById(weKfInfo);
-
-            //欢迎语修改
-            weKfWelcomeService.delWelcomByKfId(weKfInfo.getId());
-            List<WeKfWelcomeInfo> welcomeList = query.getWelcome();
-            List<WeKfWelcome> weKfWelcomes = welcomeList.stream().map(welcomeInfo -> {
-                WeKfWelcome weKfWelcome = new WeKfWelcome();
-                weKfWelcome.setKfId(weKfInfo.getId());
-                weKfWelcome.setWorkCycle(welcomeInfo.getWorkCycle());
-                weKfWelcome.setBeginTime(welcomeInfo.getBeginTime());
-                weKfWelcome.setEndTime(welcomeInfo.getEndTime());
-                weKfWelcome.setType(welcomeInfo.getType());
-                if (ObjectUtil.equal(1, welcomeInfo.getType())) {
-                    weKfWelcome.setContent(welcomeInfo.getContent());
-                }
-                if (ObjectUtil.equal(2, welcomeInfo.getType())) {
-                    List<WeKfMenu> menuList = welcomeInfo.getMenuList();
-                    menuList.forEach(menu -> {
-                        if (ObjectUtil.equal("click", menu.getType()) || ObjectUtil.equal("manual", menu.getType())) {
-                            Snowflake snowflake = IdUtil.getSnowflake(RandomUtil.randomLong(6), RandomUtil.randomInt(6));
-                            menu.setClickId(snowflake.nextIdStr());
-                        }
-                    });
-                    WeKfMenuList kfMenuList = new WeKfMenuList();
-                    kfMenuList.setHeadContent(welcomeInfo.getContent());
-                    kfMenuList.setList(menuList);
-                    weKfWelcome.setContent(JSONObject.toJSONString(kfMenuList));
-                }
-                return weKfWelcome;
-            }).collect(Collectors.toList());
-            weKfWelcomeService.saveBatch(weKfWelcomes);
-
-            //添加接待人员
-            List<String> userIds = query.getUserIdList().stream().map(WeKfUser::getUserId).collect(Collectors.toList());
-            weKfServicerService.updateServicer(weKfInfo.getId(), weKfInfo.getOpenKfId(), userIds);
-            redisService.deleteObject(StringUtils.format(WeConstans.KF_ACCOUNT_SET_UP_KEY,weKfInfo.getCorpId(), weKfInfo.getOpenKfId()));
-        } catch (Exception e) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            e.printStackTrace();
-            throw new WeComException(1006, "修改客服账号失败");
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void editAccountWelcome(WeAddKfInfoQuery query) {
-        if (query.getId() == null) {
-            throw new WeComException(1004, "客服id不能为空");
-        }
-        WeKfInfo weKfInfo = getById(query.getId());
-        if (weKfInfo == null) {
-            throw new WeComException(1005, "未找到有效客服账号");
-        }
-        //欢迎语修改
-        weKfWelcomeService.delWelcomByKfId(weKfInfo.getId());
-        List<WeKfWelcomeInfo> welcomeList = query.getWelcome();
-        List<WeKfWelcome> weKfWelcomes = welcomeList.stream().map(welcomeInfo -> {
-            WeKfWelcome weKfWelcome = new WeKfWelcome();
-            weKfWelcome.setCorpId(SecurityUtils.getCorpId());
-            weKfWelcome.setKfId(weKfInfo.getId());
-            weKfWelcome.setWorkCycle(welcomeInfo.getWorkCycle());
-            weKfWelcome.setBeginTime(welcomeInfo.getBeginTime());
-            weKfWelcome.setEndTime(welcomeInfo.getEndTime());
-            weKfWelcome.setType(welcomeInfo.getType());
-            if (ObjectUtil.equal(1, welcomeInfo.getType())) {
-                weKfWelcome.setContent(welcomeInfo.getContent());
-            }
-            if (ObjectUtil.equal(2, welcomeInfo.getType())) {
-                List<WeKfMenu> menuList = welcomeInfo.getMenuList();
-                menuList.forEach(menu -> {
-                    if (ObjectUtil.equal("click", menu.getType())) {
-                        Snowflake snowflake = IdUtil.getSnowflake(RandomUtil.randomLong(6), RandomUtil.randomInt(6));
-                        menu.setClickId(snowflake.nextIdStr());
-                    }
-                });
-                WeKfMenuList kfMenuList = new WeKfMenuList();
-                kfMenuList.setHeadContent(welcomeInfo.getContent());
-                kfMenuList.setList(menuList);
-                weKfWelcome.setContent(JSONObject.toJSONString(kfMenuList));
-            }
-            return weKfWelcome;
-        }).collect(Collectors.toList());
-        weKfWelcomeService.saveBatch(weKfWelcomes);
+    public void editAccountWelcome(WeAddKfWelcomeQuery query) {
+        WeKfInfo kfInfo = getById(query.getId());
+        weKfWelcomeService.delWelcomByKfId(query.getId());
+        addAccountWelcome(query);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void editAccountReception(WeAddKfInfoQuery query) {
-        checkTime(query);
+    public void editAccountServicer(WeAddKfServicerQuery query) {
         if (query.getId() == null) {
             throw new WeComException(1004, "客服id不能为空");
         }
+        checkParams(query);
         WeKfInfo weKfInfo = getById(query.getId());
         if (weKfInfo == null) {
             throw new WeComException(1005, "未找到有效客服账号");
@@ -337,7 +303,6 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
         weKfInfo.setCorpId(SecurityUtils.getCorpId());
         weKfInfo.setAllocationWay(query.getAllocationWay());
         weKfInfo.setIsPriority(query.getIsPriority());
-        weKfInfo.setReceptionType(query.getReceptionType());
         weKfInfo.setReceiveLimit(query.getReceiveLimit());
         weKfInfo.setQueueNotice(query.getQueueNotice());
         weKfInfo.setQueueNoticeContent(query.getQueueNoticeContent());
@@ -345,14 +310,20 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
         weKfInfo.setTimeOutContent(query.getTimeOutContent());
         weKfInfo.setTimeOut(query.getTimeOut());
         weKfInfo.setTimeOutType(query.getTimeOutType());
+
+        weKfInfo.setKfTimeOutNotice(query.getKfTimeOutNotice());
+        weKfInfo.setKfTimeOut(query.getKfTimeOut());
+        weKfInfo.setKfTimeOutType(query.getKfTimeOutType());
+
+
         weKfInfo.setEndNotice(query.getEndNotice());
         weKfInfo.setEndContent(query.getEndContent());
+        weKfInfo.setEndContentType(query.getEndContentType());
         weKfInfo.setEndNoticeTime(query.getEndNoticeTime());
         weKfInfo.setEndTimeType(query.getEndTimeType());
         updateById(weKfInfo);
         //添加接待人员
-        List<String> userIds = query.getUserIdList().stream().map(WeKfUser::getUserId).collect(Collectors.toList());
-        weKfServicerService.updateServicer(weKfInfo.getId(), weKfInfo.getOpenKfId(), userIds);
+        weKfServicerService.updateServicer(weKfInfo.getId(), weKfInfo.getOpenKfId(), query.getUserIdList(),query.getDepartmentIdList());
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -366,7 +337,6 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
         if (CollectionUtil.isNotEmpty(scenesList)) {
             throw new WeComException(1003, "请删除当前客服下所有关联场景后，再删除当前客服。");
         }
-
         //删除企微客服
         WeKfQuery weKfQuery = new WeKfQuery();
         weKfQuery.setOpen_kfid(weKfInfo.getOpenKfId());
@@ -385,7 +355,6 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
 
         //删除缓存信息
         redisService.deleteObject(StringUtils.format(WeConstans.KF_SERVICER_POLLING_KEY,weKfInfo.getCorpId(), weKfInfo.getOpenKfId()));
-        redisService.deleteObject(StringUtils.format(WeConstans.KF_ACCOUNT_SET_UP_KEY, weKfInfo.getCorpId(), weKfInfo.getOpenKfId()));
     }
 
     @Override
@@ -404,34 +373,81 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
 
     @Override
     public List<QwKfListVo> getKfList(WeKfListQuery query) {
-        return this.baseMapper.getKfList(query);
+        List<QwKfListVo> kfList = this.baseMapper.getKfList(query);
+        if(CollectionUtil.isNotEmpty(kfList)){
+            Set<String> userIdSet = kfList.stream().map(QwKfListVo::getUserIdList).flatMap(Collection::stream).map(WeKfUser::getUserId).filter(StringUtils::isNotEmpty).collect(Collectors.toSet());
+            Set<Integer> deptIdSet = kfList.stream().map(QwKfListVo::getUserIdList).flatMap(Collection::stream).map(WeKfUser::getDepartmentId).filter(Objects::nonNull).collect(Collectors.toSet());
+            Map<String, String> userId2NameMap = new HashMap<>();
+            Map<Integer, String> deptId2NameMap = new HashMap<>();
+            if(CollectionUtil.isNotEmpty(userIdSet)){
+                SysUserQuery userQuery = new SysUserQuery();
+                userQuery.setOpenUserIds(new ArrayList<>(userIdSet));
+                try {
+                    List<SysUserVo> sysUserList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
+                    if(CollectionUtil.isNotEmpty(sysUserList)){
+                        Map<String, String> userMap = sysUserList.stream().collect(Collectors.toMap(SysUserVo::getOpenUserid, SysUserVo::getUserName, (key1, key2) -> key2));
+                        userId2NameMap.putAll(userMap);
+                    }
+                } catch (Exception e) {
+                    log.error("换取用户名称失败：userQuery：{}",JSONObject.toJSONString(userQuery),e);
+                }
+            }
+            if(CollectionUtil.isNotEmpty(deptIdSet)){
+                SysDeptQuery sysDeptQuery = new SysDeptQuery();
+                sysDeptQuery.setDeptIds(new ArrayList<>(deptIdSet));
+                try {
+                    List<SysDeptVo> sysDeptList = qwSysDeptClient.getListByDeptIds(sysDeptQuery).getData();
+                    if(CollectionUtil.isNotEmpty(sysDeptList)){
+                        Map<Integer, String> deptMap = sysDeptList.stream().collect(Collectors.toMap(item -> item.getDeptId().intValue(),item -> item.getDeptName(),(key1, key2) -> key2));
+                        deptId2NameMap.putAll(deptMap);
+                    }
+                } catch (Exception e) {
+                    log.error("换取部门名称失败：sysDeptQuery：{}",JSONObject.toJSONString(sysDeptQuery),e);
+                }
+
+            }
+            for (QwKfListVo qwKfListVo : kfList) {
+                List<WeKfUser> kfUserList = qwKfListVo.getUserIdList();
+                for (WeKfUser weKfUser : kfUserList) {
+                    if(userId2NameMap.containsKey(weKfUser.getUserId())){
+                        weKfUser.setUserName(userId2NameMap.get(weKfUser.getUserId()));
+                    }
+                    if(deptId2NameMap.containsKey(weKfUser.getDepartmentId())){
+                        weKfUser.setDeptName(deptId2NameMap.get(weKfUser.getDepartmentId()));
+                    }
+                }
+            }
+        }
+        return kfList;
     }
 
     @Override
     public WeKfInfoVo getKfInfoByOpenKfId(String corpId, String openKfId) {
-        String cacheKey = StringUtils.format(WeConstans.KF_ACCOUNT_SET_UP_KEY,corpId, openKfId);
-        WeKfInfoVo weKfInfoVo = redisService.getCacheObject(cacheKey);
-        if (weKfInfoVo == null) {
-            WeKfInfo weKfInfo = getOne(new LambdaQueryWrapper<WeKfInfo>()
-                    .eq(WeKfInfo::getCorpId,corpId)
-                    .eq(WeKfInfo::getOpenKfId, openKfId)
-                    .eq(WeKfInfo::getDelFlag, 0).last("limit 1"));
-            if (weKfInfo == null) {
-                return null;
-            }
-            weKfInfoVo = new WeKfInfoVo();
-            BeanUtil.copyProperties(weKfInfo, weKfInfoVo);
-            //查询接待人员
-            List<WeKfUser> weKfUsers = weKfServicerService.getServicerByKfId(weKfInfo.getId());
-            weKfInfoVo.setUserIdList(weKfUsers);
-            //查询欢迎语设置
-            List<WeKfWelcomeInfo> kfWelcomeInfoList = weKfWelcomeService.getWelcomeByKfId(weKfInfo.getId());
-            weKfInfoVo.setWelcome(kfWelcomeInfoList);
-            if (weKfInfoVo != null) {
-                redisService.setCacheObject(cacheKey, weKfInfoVo);
-            }
+        WeKfInfoVo weKfInfoVo = new WeKfInfoVo();
+        WeKfInfo weKfInfo = getOne(new LambdaQueryWrapper<WeKfInfo>()
+                .eq(WeKfInfo::getCorpId,corpId)
+                .eq(WeKfInfo::getOpenKfId, openKfId)
+                .eq(WeKfInfo::getDelFlag, 0).last("limit 1"));
+        if (weKfInfo == null) {
+            return null;
         }
+        weKfInfoVo = new WeKfInfoVo();
+        BeanUtil.copyProperties(weKfInfo, weKfInfoVo);
+        //查询接待人员
+        List<WeKfUser> weKfUsers = weKfServicerService.getServicerByKfId(weKfInfo.getId());
+        weKfInfoVo.setUserIdList(weKfUsers);
+        //查询欢迎语设置
+        List<WeKfWelcomeInfo> kfWelcomeInfoList = weKfWelcomeService.getWelcomeByKfId(weKfInfo.getId());
+        weKfInfoVo.setWelcome(kfWelcomeInfoList);
         return weKfInfoVo;
+    }
+
+    @Override
+    public WeKfInfo getKfDetailByOpenKfId(String corpId, String openKfId) {
+        return getOne(new LambdaQueryWrapper<WeKfInfo>()
+                .eq(WeKfInfo::getCorpId,corpId)
+                .eq(WeKfInfo::getOpenKfId, openKfId)
+                .eq(WeKfInfo::getDelFlag, 0).last("limit 1"));
     }
 
     @Override
@@ -484,11 +500,60 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
                 weKfServicer.setCorpId(SecurityUtils.getCorpId());
                 weKfServicer.setOpenKfId(weKfInfo.getOpenKfId());
                 weKfServicer.setUserId(servicer.getUserId());
+                weKfServicer.setDepartmentId(servicer.getDepartmentId());
                 weKfServicer.setStatus(servicer.getStatus());
                 return weKfServicer;
             }).collect(Collectors.toList());
             weKfServicers.addAll(weKfServicerList);
         });
         weKfServicerService.saveBatch(weKfServicers);
+    }
+
+    @Override
+    public void sendEndMsg(String code, WeKfInfo weKfInfo, WeKfPool weKfPoolInfo) {
+        Date date = new Date();
+        //发送结束语
+        WeKfMsgQuery weKfMsgQuery = new WeKfMsgQuery();
+        JSONObject msgBody = new JSONObject();
+        weKfMsgQuery.setCode(code);
+        try {
+            if(ObjectUtil.equal(1, weKfInfo.getEndContentType())){
+                weKfMsgQuery.setMsgtype(WeKfMsgTypeEnum.MSGMENU.getType());
+                JSONObject endMsgMenuContentObj = JSONObject.parseObject(kfEndMsgMenuContent);
+                JSONArray list = endMsgMenuContentObj.getJSONArray("list");
+                list.stream().map(item -> (JSONObject) item).forEach(item ->{
+                    if("click".equals(item.getString("type"))){
+                        JSONObject click = item.getJSONObject("click");
+                        String clickId = "end_" + click.getString("id") +"_" +weKfPoolInfo.getId();
+                        click.put("id",clickId);
+                    }
+                    if("view".equals(item.getString("type"))){
+                        JSONObject view = item.getJSONObject("view");
+                        view.put("url",StringUtils.format(view.getString("url"), weKfPoolInfo.getId()));
+                    }
+                });
+                endMsgMenuContentObj.put("list",list);
+                msgBody = endMsgMenuContentObj;
+            }else if(ObjectUtil.equal(2, weKfInfo.getEndContentType())){
+                weKfMsgQuery.setMsgtype(WeKfMsgTypeEnum.TEXT.getType());
+                msgBody.put("content", weKfInfo.getEndContent());
+            }
+            weKfMsgQuery.setContext(msgBody);
+            WeKfMsgVo weKfMsgVo = qwKfClient.sendMsgOnEvent(weKfMsgQuery).getData();
+            if(Objects.nonNull(weKfMsgVo) && StringUtils.isNotEmpty(weKfMsgVo.getMsgId())){
+                WeKfMsg weKfMsg = new WeKfMsg();
+                weKfMsg.setMsgId(weKfMsgVo.getMsgId());
+                weKfMsg.setMsgType(weKfMsgQuery.getMsgtype());
+                weKfMsg.setOpenKfId(weKfPoolInfo.getOpenKfId());
+                weKfMsg.setExternalUserid(weKfPoolInfo.getExternalUserId());
+                weKfMsg.setContent(weKfMsgQuery.getContext().toJSONString());
+                weKfMsg.setOrigin(WeKfOriginEnum.SERVICER_END.getType());
+                weKfMsg.setCorpId(SecurityUtils.getCorpId());
+                weKfMsg.setSendTime(date);
+                weKfMsgService.save(weKfMsg);
+            }
+        } catch (Exception e) {
+            log.error("发送结束语失败：code:{},openKfId:{},eid:{} ",code,weKfPoolInfo.getOpenKfId(),weKfPoolInfo.getExternalUserId(),e);
+        }
     }
 }

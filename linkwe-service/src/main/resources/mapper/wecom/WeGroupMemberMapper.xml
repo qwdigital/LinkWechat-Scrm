@@ -120,4 +120,10 @@
           AND chat_id = #{chatId}
           and del_flag = 0
     </update>
+
+    <delete id="physicalDelete">
+        DELETE FROM we_group_member where chat_id=#{chatId} AND user_id=#{userId} and del_flag =0
+    </delete>
+
+
 </mapper>

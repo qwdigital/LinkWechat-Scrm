@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 客服会话消息
  * @date 2022/5/4 21:52
  **/

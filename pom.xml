@@ -99,6 +99,14 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- 参数校验 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-validation</artifactId>
+                <version>${springboot.version}</version>
+            </dependency>
+
+
             <!--阿里数据库连接池 -->
             <dependency>
                 <groupId>com.alibaba</groupId>
@@ -397,8 +405,8 @@
         <module>linkwe-auth</module>
         <module>linkwe-common</module>
         <module>linkwe-wecom</module>
-        <module>linkwe-event-task</module>
          <module>linkwe-api</module>
+         <module>linkwe-event-task</module>
          <module>linkwe-wx-api</module>
         <module>linkwe-gateway</module>
         <module>linkwe-fileservice</module>

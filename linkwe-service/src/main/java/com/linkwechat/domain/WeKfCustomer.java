@@ -8,14 +8,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import lombok.Data;
 
 /**
  * 客服客户表(WeKfCustomer)
@@ -86,11 +81,6 @@ public class WeKfCustomer extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "性别 0-未知 1-男性 2-女性")
     @TableField("gender")
     private Integer gender;
-
-
-    
-    
-    
 
 
     /**

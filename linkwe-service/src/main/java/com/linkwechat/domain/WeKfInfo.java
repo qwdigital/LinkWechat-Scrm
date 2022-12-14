@@ -8,14 +8,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import lombok.Data;
 
 /**
  * 客服信息表(WeKfInfo)
@@ -160,6 +155,18 @@ public class WeKfInfo extends BaseEntity implements Serializable {
     private String timeOutContent;
 
 
+    @ApiModelProperty("客服超时未回复提醒: 1-开启 2-关闭")
+    @TableField("kf_time_out_notice")
+    private Integer kfTimeOutNotice;
+
+    @ApiModelProperty("客户超时时间类型 1-分钟 2-小时")
+    @TableField("kf_time_out_type")
+    private Integer kfTimeOutType;
+
+    @ApiModelProperty("客服超时时间")
+    @TableField("kf_time_out")
+    private Integer kfTimeOut;
+
     /**
      * 自动结束提醒: 1-开启 2-关闭
      */
@@ -183,6 +190,12 @@ public class WeKfInfo extends BaseEntity implements Serializable {
     @TableField("end_time_type")
     private Integer endTimeType;
 
+    /**
+     * 自动结束提醒内容类型 1-会话质量评价 2-会话结束语
+     */
+    @ApiModelProperty(value = "自动结束提醒内容类型 1-会话质量评价 2-会话结束语")
+    @TableField("end_content_type")
+    private Integer endContentType;
 
     /**
      * 自动结束提醒内容
@@ -190,11 +203,6 @@ public class WeKfInfo extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "自动结束提醒内容")
     @TableField("end_content")
     private String endContent;
-
-
-    
-    
-    
 
 
     /**

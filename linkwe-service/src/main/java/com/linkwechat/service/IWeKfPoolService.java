@@ -1,8 +1,12 @@
 package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.domain.WeKfCustomerStat;
 import com.linkwechat.domain.WeKfPool;
+import com.linkwechat.domain.WeKfUserStat;
+import com.linkwechat.domain.kf.query.WeKfAddMsgQuery;
 import com.linkwechat.domain.kf.query.WeKfRecordQuery;
+import com.linkwechat.domain.kf.vo.WeKfEvaluationVo;
 import com.linkwechat.domain.kf.vo.WeKfRecordListVo;
 
 import java.util.List;
@@ -64,7 +68,7 @@ public interface IWeKfPoolService extends IService<WeKfPool> {
      * @param userId 接待人员id
      * @param status 状态
      */
-    void allocationServicer(String corpId, String openKfId, String externalUserId, String userId, Integer status);
+    String allocationServicer(String corpId, String openKfId, String externalUserId, String userId, Integer status);
 
 
     /**
@@ -112,4 +116,29 @@ public interface IWeKfPoolService extends IService<WeKfPool> {
      */
     List<WeKfRecordListVo> getRecordList(WeKfRecordQuery query);
 
-} 
+    /**
+     * 获取评价数据
+     * @param query
+     * @return
+     */
+    WeKfEvaluationVo getEvaluation(WeKfAddMsgQuery query);
+
+    /**
+     * 新增评价
+     * @param query
+     */
+    void addEvaluation(WeKfAddMsgQuery query);
+
+    /**
+     * 获取客服客户统计数据
+     * @param dateTime 日期
+     */
+    WeKfCustomerStat getKfCustomerStat(String dateTime);
+
+    /**
+     * 获取客服员工统计
+     * @param dateTime 日期
+     * @return
+     */
+    List<WeKfUserStat> getKfUserStat(String dateTime);
+}

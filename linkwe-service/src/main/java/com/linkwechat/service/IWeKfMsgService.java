@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.WeKfMsg;
 import com.linkwechat.domain.kf.query.WeKfRecordQuery;
+import com.linkwechat.domain.kf.vo.WeKfMsgAnalyzeVo;
 import com.linkwechat.domain.kf.vo.WeKfRecordVo;
 import com.linkwechat.domain.wecom.vo.kf.WeKfStateVo;
 
@@ -48,4 +49,10 @@ public interface IWeKfMsgService extends IService<WeKfMsg> {
     List<WeKfRecordVo> getRecordDetail(WeKfRecordQuery query);
 
     WeKfMsg getLastCustomerMsg(String corpId, String openKfId, String externalUserId, String sendTime);
-} 
+
+    /**
+     * 会话分析接口
+     * @param query
+     */
+    WeKfMsgAnalyzeVo getMsgAnalyze(WeKfRecordQuery query);
+}

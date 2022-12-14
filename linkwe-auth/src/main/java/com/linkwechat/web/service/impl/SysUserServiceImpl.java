@@ -1,5 +1,6 @@
 package com.linkwechat.web.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -26,6 +27,8 @@ import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
+import com.linkwechat.domain.system.user.query.SysUserQuery;
+import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.domain.wecom.query.user.WeUserListQuery;
 import com.linkwechat.domain.wecom.query.user.WeUserQuery;
 import com.linkwechat.domain.wecom.vo.user.WeUserDetailVo;
@@ -836,5 +839,23 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         user.setUpdateTime(new Date());
         user.setStatus("0");
         return user;
+    }
+
+
+    @Override
+    public List<SysUserVo> getUserListByWeUserIds(SysUserQuery query) {
+        List<SysUser> sysUserList = list(new LambdaQueryWrapper<SysUser>()
+                .in(CollectionUtil.isNotEmpty(query.getOpenUserIds()), SysUser::getOpenUserid, query.getOpenUserIds())
+                .in(CollectionUtil.isNotEmpty(query.getDeptIds()),SysUser::getDeptId,query.getDeptIds())
+                .eq(SysUser::getDelFlag, 0));
+        if(CollectionUtil.isNotEmpty(sysUserList)){
+            List<SysUserVo> list = sysUserList.stream().map(item -> {
+                SysUserVo sysUserVo = new SysUserVo();
+                BeanUtil.copyProperties(item, sysUserVo);
+                return sysUserVo;
+            }).collect(Collectors.toList());
+            return list;
+        }
+        return new ArrayList<>();
     }
 }

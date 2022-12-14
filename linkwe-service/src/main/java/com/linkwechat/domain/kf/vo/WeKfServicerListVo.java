@@ -33,4 +33,10 @@ public class WeKfServicerListVo {
 
     @ApiModelProperty("部门名称")
     private String deptName;
+
+    @ApiModelProperty("部门id")
+    private Integer departmentId;
+
+    @ApiModelProperty("部门名称")
+    private Integer departmentName;
 }

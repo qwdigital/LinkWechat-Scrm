@@ -5,13 +5,13 @@
     <select id="getSceneCustomerAnalysis" resultType="com.linkwechat.domain.kf.vo.WeKfSceneAnalysisVo">
         select
             (select count(1) from we_kf_pool) visit_cnt,
-            (select count(1) from we_kf_pool where session_start_time is not null) as consult_cnt,
-            (select count(1) from we_kf_pool where user_id is not null) as reception_cnt,
+            (select count(1) from we_kf_pool where session_start_time is not null ) as consult_cnt,
+            (select count(1) from we_kf_pool where user_id is not null ) as reception_cnt,
             (select count(1) from we_kf_event_msg where event_type = 'enter_session' and  date_format(send_time ,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_visit_cnt,
-            (select count(1) from we_kf_event_msg where event_type = 'enter_session' and  date_format(send_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')) as yd_visit_cnt,
+            (select count(1) from we_kf_event_msg where event_type = 'enter_session' and  date_format(send_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_visit_cnt,
             (select count(1) from we_kf_pool where date_format(session_start_time ,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_consult_cnt,
             (select count(1) from we_kf_pool where date_format(session_start_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')) as yd_consult_cnt,
-            (select count(1) from we_kf_pool where user_id is not null and date_format(reception_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_reception_cnt,
+            (select count(1) from we_kf_pool where user_id is not null and date_format(reception_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d')) as td_reception_cnt,
             (select count(1) from we_kf_pool where user_id is not null and date_format(reception_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_reception_cnt
     </select>
 
@@ -282,7 +282,7 @@
             count(1) as total,
             wkp.scene,
         ifnull((select wks.name from we_kf_scenes wks where wks.scenes = wkp.scene limit 1),'未知来源') scene_name
-        from we_kf_pool wkp where wkp.session_start_time is not null
+        from we_kf_pool wkp where wkp.session_start_time is not null and wkp.scene is not null
         <if test="beginTime != null">
             and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
         </if>
@@ -295,7 +295,7 @@
     <select id="getConsultCustomerAnalysis"
             resultType="com.linkwechat.domain.kf.vo.WeKfConsultAnalysisVo">
         select
-        (select count(1) from we_kf_pool where session_start_time is not null ) as  consult_cnt,
+        (select count(1) from we_kf_pool where session_start_time is not null) as  consult_cnt,
         (select count(1) from we_kf_pool where user_id is not null ) as reception_cnt,
         (select
         ifnull(sum(case when end_time is null then 0 else 1 end),0)
