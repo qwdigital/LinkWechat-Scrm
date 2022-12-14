@@ -13,7 +13,7 @@ import java.util.List;
  * @description 客服统计mapper
  * @date 2022/1/9 17:07
  **/
-
+@InterceptorIgnore(tenantLine = "true")
 @Mapper
 public interface WeKfStatisticMapper {
 

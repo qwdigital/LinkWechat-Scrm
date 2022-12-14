@@ -1,12 +1,15 @@
 package com.linkwechat.factory.impl.kf;
 
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.domain.wecom.vo.kf.WeKfSyncEventMsgVo;
 import com.linkwechat.factory.WeKfEventStrategy;
-import com.linkwechat.service.IWeKfServicerService;
+import com.linkwechat.fegin.QwSysUserClient;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 /**
  * @author danmo
@@ -17,17 +20,19 @@ import org.springframework.stereotype.Service;
 @Service("servicer_status_change")
 public class WeKfEventServicerStatusChangeImpl extends WeKfEventStrategy {
 
-    @Autowired
-    private IWeKfServicerService weKfServicerService;
+    @Resource
+    private QwSysUserClient qwSysUserClient;
+
+
     @Override
     public void eventHandle(JSONObject message) {
         String msgStr = message.toJSONString();
         log.info("客服会话接待状态变更: msg:{}", msgStr);
         WeKfSyncEventMsgVo weKfSyncEventMs = JSONObject.parseObject(msgStr, WeKfSyncEventMsgVo.class);
-        String servicerUserId = weKfSyncEventMs.getServicerUserId();
-        Integer status = weKfSyncEventMs.getStatus();
-        String openKfId = weKfSyncEventMs.getOpenKfId();
-
-        weKfServicerService.updateServicerStatus(weKfSyncEventMs.getCorpId(), openKfId,servicerUserId,status);
+        SysUser sysUser = new SysUser();
+        sysUser.setKfStatus(weKfSyncEventMs.getStatus());
+        sysUser.setWeUserId(weKfSyncEventMs.getServicerUserId());
+        qwSysUserClient.updateUserKfStatus(sysUser);
+        //weKfServicerService.updateServicerStatus(weKfSyncEventMs.getCorpId(), openKfId,servicerUserId,status);
     }
 }

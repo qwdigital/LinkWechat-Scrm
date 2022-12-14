@@ -4,7 +4,11 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.enums.WeKfMsgTypeEnum;
+import com.linkwechat.common.enums.WeKfOriginEnum;
+import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.WeKfMsg;
 import com.linkwechat.domain.kf.WeKfMenu;
 import com.linkwechat.domain.kf.WeKfWelcomeInfo;
 import com.linkwechat.domain.kf.vo.WeKfInfoVo;
@@ -13,6 +17,7 @@ import com.linkwechat.domain.wecom.vo.kf.WeKfMsgVo;
 import com.linkwechat.domain.wecom.vo.kf.WeKfSyncEventMsgVo;
 import com.linkwechat.fegin.QwKfClient;
 import com.linkwechat.service.IWeKfInfoService;
+import com.linkwechat.service.IWeKfMsgService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -21,6 +26,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -36,11 +42,14 @@ import java.util.stream.Collectors;
 @Component
 public class QwKfWelcomeMsgListener {
 
-    @Autowired
+    @Resource
     private QwKfClient qwKfClient;
 
     @Autowired
     private IWeKfInfoService weKfInfoService;
+
+    @Autowired
+    private IWeKfMsgService weKfMsgService;
 
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.kf-welcome-msg:Qu_KfWelcomeMsg}")
@@ -127,6 +136,18 @@ public class QwKfWelcomeMsgListener {
             return;
         }
         WeKfMsgVo weKfMsgVo = qwKfClient.sendMsgOnEvent(weKfMsgQuery).getData();
+        if(Objects.nonNull(weKfMsgVo) && StringUtils.isNotEmpty(weKfMsgVo.getMsgId())){
+            WeKfMsg weKfMsg = new WeKfMsg();
+            weKfMsg.setMsgId(weKfMsgVo.getMsgId());
+            weKfMsg.setMsgType(weKfMsgQuery.getMsgtype());
+            weKfMsg.setOpenKfId(weKfSyncEventMs.getOpenKfId());
+            weKfMsg.setExternalUserid(weKfSyncEventMs.getExternalUserId());
+            weKfMsg.setContent(weKfMsgQuery.getContext().toJSONString());
+            weKfMsg.setOrigin(WeKfOriginEnum.SERVICER_WELCOME.getType());
+            weKfMsg.setCorpId(weKfSyncEventMs.getCorpId());
+            weKfMsg.setSendTime(new Date());
+            weKfMsgService.save(weKfMsg);
+        }
     }
 
     private List<JSONObject> getMenuList(List<WeKfMenu> kfMenuList) {

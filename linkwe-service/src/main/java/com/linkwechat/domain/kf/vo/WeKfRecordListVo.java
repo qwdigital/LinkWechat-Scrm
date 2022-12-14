@@ -24,6 +24,10 @@ public class WeKfRecordListVo {
     @ExcelIgnore
     private String openKfId;
 
+    @ApiModelProperty(value = "连接池ID")
+    @ExcelIgnore
+    private String poolId;
+
     @ApiModelProperty(value = "客服名称")
     @ExcelProperty("客服名称")
     private String kfName;
@@ -62,7 +66,7 @@ public class WeKfRecordListVo {
 
     @ApiModelProperty(value = "是否为企业客户 0=是,1=否")
     @ExcelIgnore
-    private Integer isQyCustomer;
+    private Integer isQyCustomer = 1;
 
     @ApiModelProperty(value = "是否为企业客户",hidden = true)
     @ExcelProperty(value = "是否为企业客户")

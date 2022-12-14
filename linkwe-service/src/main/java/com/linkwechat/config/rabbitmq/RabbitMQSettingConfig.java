@@ -151,6 +151,10 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.kf-chat-timeout-msg:Rk_KfChatTimeOutMsg}")
     private String weKfChatTimeOutMsgRk;
 
+    //客服会话客服超时路由
+    @Value("${wecom.mq.route.kf-chat-kf-timeout-msg:Rk_KfChatKfTimeOutMsg}")
+    private String weKfChatKfTimeOutMsgRk;
+
     //客服会话结束路由
     @Value("${wecom.mq.route.kf-chat-end-msg:Rk_KfChatEndMsg}")
     private String weKfChatEndMsgRk;
@@ -235,6 +239,9 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.queue.kf-chat-timeout-msg:Qu_KfChatTimeOutMsg}")
     private String weKfChatTimeOutMsgQu;
 
+    //客服会话客服超时消费队列
+    @Value("${wecom.mq.queue.kf-chat-kf-timeout-msg:Qu_KfChatKfTimeOutMsg}")
+    private String weKfChatKfTimeOutMsgQu;
 
     //客服会话结束消费队列
     @Value("${wecom.mq.queue.kf-chat-end-msg:Qu_KfChatEndMsg}")

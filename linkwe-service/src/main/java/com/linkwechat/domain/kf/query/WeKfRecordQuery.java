@@ -28,4 +28,7 @@ public class WeKfRecordQuery extends BaseEntity {
 
     @ApiModelProperty("员工ID")
     private String userId;
+
+    @ApiModelProperty("连接池ID")
+    private String poolId;
 }

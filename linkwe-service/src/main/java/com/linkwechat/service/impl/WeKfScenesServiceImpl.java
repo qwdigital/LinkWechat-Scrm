@@ -13,43 +13,28 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.linkwechat.common.core.domain.FileEntity;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
-import com.linkwechat.common.utils.QREncode;
-import com.linkwechat.common.utils.SecurityUtils;
-import com.linkwechat.common.utils.SnowFlakeUtil;
-import com.linkwechat.common.utils.file.FileUtil;
-import com.linkwechat.common.utils.img.ImageUtils;
 import com.linkwechat.common.utils.img.NetFileUtils;
-import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.domain.WeKfScenes;
 import com.linkwechat.domain.kf.query.WeAddKfScenesQuery;
 import com.linkwechat.domain.kf.query.WeEditKfScenesQuery;
 import com.linkwechat.domain.kf.query.WeKfScenesQuery;
-import com.linkwechat.domain.kf.vo.WeKfInfoVo;
 import com.linkwechat.domain.kf.vo.WeKfScenesListVo;
 import com.linkwechat.domain.wecom.query.kf.WeKfQuery;
 import com.linkwechat.domain.wecom.vo.kf.WeKfDetailVo;
 import com.linkwechat.fegin.QwFileClient;
 import com.linkwechat.fegin.QwKfClient;
 import com.linkwechat.mapper.WeKfScenesMapper;
-import com.linkwechat.service.IWeKfInfoService;
 import com.linkwechat.service.IWeKfScenesService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FastByteArrayOutputStream;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 客服场景信息表(WeKfScenes)
@@ -83,31 +68,22 @@ public class WeKfScenesServiceImpl extends ServiceImpl<WeKfScenesMapper, WeKfSce
         WeKfQuery weKfQuery = new WeKfQuery();
         weKfQuery.setOpen_kfid(query.getOpenKfId());
         weKfQuery.setScene(scenes);
-        WeKfDetailVo weKfDetailVo = null;
-        try {
-            weKfDetailVo = qwKfClient.addContactWay(weKfQuery).getData();
-        } catch (Exception e) {
-            e.printStackTrace();
+        WeKfDetailVo weKfDetailVo = qwKfClient.addContactWay(weKfQuery).getData();
+        if(Objects.isNull(weKfDetailVo)){
             throw new WeComException(2001,"新增企微场景失败");
         }
-        WeKfInfoVo weKfInfoVo = SpringUtils.getBean(IWeKfInfoService.class).getKfInfoByOpenKfId(SecurityUtils.getCorpId(),query.getOpenKfId());
+        if(ObjectUtil.notEqual(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode(),weKfDetailVo.getErrCode())){
+            throw new WeComException(weKfDetailVo.getErrCode(),WeErrorCodeEnum.parseEnum(weKfDetailVo.getErrCode()).getErrorMsg());
+        }
+        /*WeKfInfoVo weKfInfoVo = SpringUtils.getBean(IWeKfInfoService.class).getKfInfoByOpenKfId(SecurityUtils.getCorpId(),query.getOpenKfId());
         if(weKfInfoVo == null){
             throw new WeComException(2001,"新增企微场景失败");
-        }
+        }*/
         WeKfScenes weKfScenes = new WeKfScenes();
-        String avatar = weKfInfoVo.getAvatar();
+        //String avatar = weKfInfoVo.getAvatar();
         String content = weKfDetailVo.getUrl();
         try{
-            FastByteArrayOutputStream os = new FastByteArrayOutputStream();
-            QrConfig config = new QrConfig(200,200);
-            // 高纠错级别
-            config.setErrorCorrection(ErrorCorrectionLevel.H);
-
-            config.setImg(ImageIO.read(new URL(avatar)));
-
-
-            QrCodeUtil.generate(content, config,"png",os);
-            NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(IdUtil.simpleUUID() + ".png", os.toByteArray());
+            NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(IdUtil.simpleUUID() + "."+ ImgUtil.IMAGE_TYPE_PNG, QrCodeUtil.generatePng(content, QrConfig.create()));
             FileEntity fileInfo = qwFileClient.upload(streamMultipartFile).getData();
             weKfScenes.setQrCode(fileInfo.getUrl());
         } catch (Exception e) {

@@ -27,6 +27,7 @@
                 and wkm.external_userid = #{externalUserId}
             </if>
         </where>
+        order by wkm.send_time asc
     </select>
 
 </mapper>

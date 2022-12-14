@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 应用通知对象
  * @date 2022/4/14 15:55
  **/
@@ -24,6 +24,12 @@ public class QwAppMsgBody {
     private Long callBackId;
 
     /**
+     * 回调业务类
+     */
+    private String callBackService;
+
+
+    /**
      * 企业ID
      */
     private String corpId;
@@ -36,7 +42,7 @@ public class QwAppMsgBody {
     /**
      * 企业部门ID
      */
-    private List<String> deptIds;
+    private List<Integer> deptIds;
 
     /**
      * 客户标签ID

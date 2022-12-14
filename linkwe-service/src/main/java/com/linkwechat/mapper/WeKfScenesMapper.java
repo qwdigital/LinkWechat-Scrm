@@ -2,18 +2,15 @@ package com.linkwechat.mapper;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.annotation.SqlParser;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
+import com.linkwechat.domain.WeKfScenes;
 import com.linkwechat.domain.kf.query.WeKfScenesQuery;
 import com.linkwechat.domain.kf.vo.WeKfScenesListVo;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
-import com.linkwechat.domain.WeKfScenes;
 
 /**
  * 客服场景信息表(WeKfScenes)

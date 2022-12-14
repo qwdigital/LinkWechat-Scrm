@@ -43,8 +43,9 @@ public interface IWeKfServicerService extends IService<WeKfServicer> {
      * @param id  客服主键id
      * @param openKfId  客服id
      * @param userIds  接待人员
+     * @param departmentIdList
      */
-    void updateServicer(Long id,String openKfId, List<String> userIds);
+    void updateServicer(Long id, String openKfId, List<String> userIds, List<Integer> departmentIdList);
 
     /**
      * 客服接待人员列表
@@ -52,4 +53,7 @@ public interface IWeKfServicerService extends IService<WeKfServicer> {
      * @return
      */
     List<WeKfServicerListVo> getKfServicerList(WeKfServicerListQuery query);
-} 
+
+    List<WeKfUser> getKfUserIdList(Long kfId);
+
+}

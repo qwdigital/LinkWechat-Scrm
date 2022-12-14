@@ -1,6 +1,8 @@
 package com.linkwechat.service;
 
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.domain.kf.query.WeKfCustomerStatisticQuery;
+import com.linkwechat.domain.kf.query.WeKfQualityStatQuery;
 import com.linkwechat.domain.kf.vo.*;
 
 import java.util.List;
@@ -64,4 +66,31 @@ public interface IWeKfStatisticService {
      * @return
      */
     List<WeKfConsultRealCntVo> getConsultCustomerRealPageCnt(WeKfCustomerStatisticQuery query);
+
+    /**
+     * 质量分析数据
+     * @return
+     */
+    WeKfQualityAnalysisVo getQualityAnalysis();
+
+    /**
+     * 质量分析数据-折线图
+     * @param query
+     * @return
+     */
+    List<WeKfQualityBrokenLineVo> getQualityBrokenLine(WeKfQualityStatQuery query);
+
+    /**
+     * 质量分析数据-柱状图
+     * @param query
+     * @return
+     */
+    List<WeKfQualityHistogramVo> getQualityHistogram(WeKfQualityStatQuery query);
+
+    /**
+     * 质量分析数据-图表
+     * @param query
+     * @return
+     */
+    PageInfo<WeKfQualityChatVo> getQualityChart(WeKfQualityStatQuery query);
 }

@@ -8,14 +8,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import lombok.Data;
 
 /**
  * 客服消息偏移量表(WeKfMsgCursor)
@@ -54,6 +49,7 @@ public class WeKfMsgCursor extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "上一次调用时返回的next_cursor")
     @TableField("next_cursor")
     private String nextCursor;
+
 
     /**
      * 是否删除:0有效,1删除

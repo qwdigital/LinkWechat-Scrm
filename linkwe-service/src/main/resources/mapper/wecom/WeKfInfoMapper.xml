@@ -16,6 +16,8 @@
         <collection property="userIdList" ofType="com.linkwechat.domain.kf.WeKfUser">
             <result property="userId" column="user_id"/>
             <result property="userName" column="user_name"/>
+            <result property="departmentId" column="department_id"/>
+            <result property="deptName" column="dept_name"/>
         </collection>
         <collection property="scenesList" ofType="com.linkwechat.domain.kf.vo.WeKfScenesVo">
             <result property="scenesId" column="scenes_id"/>
@@ -31,7 +33,7 @@
         wki.reception_type,
         wki.open_kf_id,
         wks.user_id,
-        (select su.user_name from sys_user su where wks.user_id = su.we_user_id and su.del_flag=0 limit 1) as user_name,
+        wks.department_id,
         wkss.id as scenes_id,
         wkss.name as scenes_name,
         wki.create_time,

@@ -383,6 +383,16 @@ public class RabbitMQConfig {
     }
 
     /**
+     * 客服会话客服超时队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quKfChatKfTimeOutMsg() {
+        return new Queue(rabbitMQSettingConfig.getWeKfChatKfTimeOutMsgQu());
+    }
+
+    /**
      * 客服会话结束队列
      *
      * @return
@@ -533,6 +543,16 @@ public class RabbitMQConfig {
     @Bean
     public Binding bindingExchangeKfChatTimeOutMsg() {
         return BindingBuilder.bind(quKfChatTimeOutMsg()).to(kfChatMsgDelayEx()).with(rabbitMQSettingConfig.getWeKfChatTimeOutMsgRk()).noargs();
+    }
+
+    /**
+     * 客服会话客服超时队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeKfChatKfTimeOutMsg() {
+        return BindingBuilder.bind(quKfChatKfTimeOutMsg()).to(kfChatMsgDelayEx()).with(rabbitMQSettingConfig.getWeKfChatKfTimeOutMsgRk()).noargs();
     }
 
     /**

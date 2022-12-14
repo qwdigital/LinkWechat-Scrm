@@ -8,14 +8,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import lombok.Data;
 
 /**
  * 客服事件消息表(WeKfEventMsg)
@@ -182,11 +178,6 @@ public class WeKfEventMsg extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "失败类型:0-未知原因 1-客服账号已删除 2-应用已关闭 4-会话已过期，超过48小时 5-会话已关闭 6-超过5条限制 7-未绑定视频号 8-主体未验证 9-未绑定视频号且主体未验证 10-用户拒收")
     @TableField("fail_type")
     private Integer failType;
-
-
-    
-    
-    
 
 
     /**

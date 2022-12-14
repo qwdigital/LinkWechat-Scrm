@@ -11,7 +11,6 @@ import com.linkwechat.domain.wecom.callback.WeBackBaseVo;
 import com.linkwechat.domain.wecom.query.kf.WeKfGetMsgQuery;
 import com.linkwechat.domain.wecom.vo.kf.WeKfGetMsgVo;
 import com.linkwechat.factory.WeCallBackEventFactory;
-import com.linkwechat.factory.WeStrategyBeanFactory;
 import com.linkwechat.fegin.QwKfClient;
 import com.linkwechat.service.IWeKfEventMsgService;
 import com.linkwechat.service.IWeKfMsgCursorService;
@@ -21,9 +20,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import javax.annotation.Resource;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -44,7 +42,7 @@ public class WeKfMsgOrEventImpl implements WeCallBackEventFactory {
     @Autowired
     private IWeKfEventMsgService weKfEventMsgService;
 
-    @Autowired
+    @Resource
     private QwKfClient qwKfClient;
 
     @Autowired

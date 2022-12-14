@@ -43,6 +43,7 @@ public class WeKfEventEnterSessionImpl extends WeKfEventStrategy {
         String msgStr = message.toJSONString();
         log.info("客服消息进入会话: msg:{}", msgStr);
         WeKfSyncEventMsgVo weKfSyncEventMs = JSONObject.parseObject(msgStr, WeKfSyncEventMsgVo.class);
+
         //客户信息存储
         weKfCustomerService.saveCustomerInfo(weKfSyncEventMs.getCorpId(),weKfSyncEventMs.getExternalUserId());
 

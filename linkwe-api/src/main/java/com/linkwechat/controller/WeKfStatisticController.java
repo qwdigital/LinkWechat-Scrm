@@ -1,12 +1,16 @@
 package com.linkwechat.controller;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.write.builder.ExcelWriterBuilder;
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.domain.kf.query.WeKfCustomerStatisticQuery;
+import com.linkwechat.domain.kf.query.WeKfQualityStatQuery;
 import com.linkwechat.domain.kf.vo.*;
+import com.linkwechat.handler.WeQualityWriteHandler;
 import com.linkwechat.service.IWeKfStatisticService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -108,4 +112,47 @@ public class WeKfStatisticController extends BaseController {
         response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
         EasyExcel.write(response.getOutputStream(), WeKfConsultRealCntVo.class).sheet("咨询分析数据").doWrite(consultCustomerRealCnt);
     }
+
+    @ApiOperation(value = "质量分析数据", httpMethod = "GET")
+    @GetMapping("/quality/getAnalysis")
+    public AjaxResult<WeKfQualityAnalysisVo> getQualityAnalysis() {
+        WeKfQualityAnalysisVo weKfQualityAnalysisVo =  weKfStatisticService.getQualityAnalysis();
+        return AjaxResult.success(weKfQualityAnalysisVo);
+    }
+
+    @ApiOperation(value = "质量分析数据-折线图", httpMethod = "GET")
+    @GetMapping("/quality/getBrokenLine")
+    public AjaxResult<List<WeKfQualityBrokenLineVo>> getQualityBrokenLine(WeKfQualityStatQuery query) {
+        return AjaxResult.success(weKfStatisticService.getQualityBrokenLine(query));
+    }
+
+    @ApiOperation(value = "质量分析数据-柱状图", httpMethod = "GET")
+    @GetMapping("/quality/getHistogram")
+    public AjaxResult<List<WeKfQualityHistogramVo>> getQualityHistogram(WeKfQualityStatQuery query) {
+        return AjaxResult.success(weKfStatisticService.getQualityHistogram(query));
+    }
+
+    @ApiOperation(value = "质量分析数据-图表", httpMethod = "GET")
+    @GetMapping("/quality/getChart")
+    public TableDataInfo<WeKfQualityChatVo> getQualityChart(WeKfQualityStatQuery query) {
+        super.startPage();
+        PageInfo<WeKfQualityChatVo> list = weKfStatisticService.getQualityChart(query);
+        return getDataTable(list);
+    }
+
+    @ApiOperation(value = "质量分析数据-图表-导出", httpMethod = "GET")
+    @GetMapping("/quality/getChart/export")
+    public void getQualityChartExport(WeKfQualityStatQuery query) throws IOException {
+        PageInfo<WeKfQualityChatVo> list = weKfStatisticService.getQualityChart(query);
+        HttpServletResponse response = ServletUtils.getResponse();
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("utf-8");
+        String fileName = URLEncoder.encode("质量分析数据报表", "UTF-8").replaceAll("\\+", "%20");
+        response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+        ExcelWriterBuilder write = EasyExcel.write(response.getOutputStream(), WeKfQualityChatVo.class);
+        write.relativeHeadRowIndex(3);
+        write.registerWriteHandler(new WeQualityWriteHandler(query));
+        write.sheet("质量分析数据").doWrite(list.getList());
+    }
+
 }

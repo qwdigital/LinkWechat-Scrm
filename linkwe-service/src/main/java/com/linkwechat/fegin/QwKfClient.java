@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * @author sxw
+ * @author danmo
  * @date 2022/3/29 23:00
  */
 @FeignClient(value = "${wecom.serve.linkwe-wecom}", fallback = QwKfFallbackFactory.class, contextId = "linkwe-wecom-kf")
@@ -171,7 +171,6 @@ public interface QwKfClient {
     @PostMapping("/kf/sendMsgOnEvent")
     public AjaxResult<WeKfMsgVo> sendMsgOnEvent(@RequestBody WeKfMsgQuery query);
 
-
     /**
      * 获取「客户数据统计」企业汇总数据
      * @param query
@@ -189,7 +188,6 @@ public interface QwKfClient {
     @ApiOperation(value = "获取「客户数据统计」接待人员明细数据",httpMethod = "POST")
     @PostMapping("/kf/getServicerStatistic")
     AjaxResult<WeKfStatisticListVo> getServicerStatistic(@RequestBody WeKfGetStatisticQuery query);
-
 
     /**
      * 知识库新增分组

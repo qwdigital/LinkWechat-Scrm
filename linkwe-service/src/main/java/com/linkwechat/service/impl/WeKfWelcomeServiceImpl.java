@@ -11,7 +11,6 @@ import com.linkwechat.domain.kf.WeKfMenuList;
 import com.linkwechat.domain.kf.WeKfWelcomeInfo;
 import com.linkwechat.mapper.WeKfWelcomeMapper;
 import com.linkwechat.service.IWeKfWelcomeService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

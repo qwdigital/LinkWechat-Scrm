@@ -36,6 +36,7 @@ public class WeKfChatListener {
             log.info("客服消息：msg:{}", msg);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
             WeKfChatMsgListQuery query = JSONObject.parseObject(msg, WeKfChatMsgListQuery.class);
+            SecurityContextHolder.setCorpId(query.getCorpId());
             kfMsgHandler(query);
         } catch (Exception e) {
             e.printStackTrace();

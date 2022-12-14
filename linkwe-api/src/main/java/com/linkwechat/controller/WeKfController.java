@@ -3,7 +3,6 @@ package com.linkwechat.controller;
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONObject;
-import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
@@ -25,9 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -60,7 +58,23 @@ public class WeKfController extends BaseController {
     @PostMapping("/add")
     public AjaxResult addAccount(@Validated @RequestBody WeAddKfInfoQuery query) {
         log.info("创建客服入参：param:{}", JSONObject.toJSONString(query));
-        weKfInfoService.addAccount(query);
+        Long id = weKfInfoService.addAccount(query);
+        return AjaxResult.success(id);
+    }
+
+    @ApiOperation("新增客服欢迎语")
+    @PostMapping("/add/welcome")
+    public AjaxResult addAccountWelcome(@Validated @RequestBody WeAddKfWelcomeQuery query) {
+        log.info("新增客服欢迎语：param:{}", JSONObject.toJSONString(query));
+        weKfInfoService.addAccountWelcome(query);
+        return AjaxResult.success();
+    }
+
+    @ApiOperation("添加客服接待人员")
+    @PostMapping("/add/servicer")
+    public AjaxResult addAccountServicer(@RequestBody WeAddKfServicerQuery query) {
+        log.info("添加客服接待人员入参：param:{}", JSONObject.toJSONString(query));
+        weKfInfoService.addAccountServicer(query);
         return AjaxResult.success();
     }
 
@@ -74,16 +88,17 @@ public class WeKfController extends BaseController {
 
     @ApiOperation("客服欢迎语修改")
     @PostMapping("/edit/welcome")
-    public AjaxResult editAccountWelcome(@RequestBody WeAddKfInfoQuery query) {
+    public AjaxResult editAccountWelcome(@RequestBody WeAddKfWelcomeQuery query) {
         log.info("客服欢迎语修改入参：param:{}", JSONObject.toJSONString(query));
         weKfInfoService.editAccountWelcome(query);
         return AjaxResult.success();
     }
-    @ApiOperation("客服接待规则修改")
-    @PostMapping("/edit/reception")
-    public AjaxResult editAccountReception(@RequestBody WeAddKfInfoQuery query) {
-        log.info("修客服接待规则修改入参：param:{}", JSONObject.toJSONString(query));
-        weKfInfoService.editAccountReception(query);
+
+    @ApiOperation("客服接待人员修改")
+    @PostMapping("/edit/servicer")
+    public AjaxResult editAccountServicer(@RequestBody WeAddKfServicerQuery query) {
+        log.info("客服接待人员修改入参：param:{}", JSONObject.toJSONString(query));
+        weKfInfoService.editAccountServicer(query);
         return AjaxResult.success();
     }
 
@@ -225,12 +240,31 @@ public class WeKfController extends BaseController {
     @GetMapping("/record/export")
     public void getRecordExport(WeKfRecordQuery query) throws IOException {
         List<WeKfRecordListVo> recordList = weKfPoolService.getRecordList(query);
-
         HttpServletResponse response = ServletUtils.getResponse();
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setCharacterEncoding("utf-8");
         String fileName = URLEncoder.encode("咨询记录", "UTF-8").replaceAll("\\+", "%20");
         response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
         EasyExcel.write(response.getOutputStream(), WeKfRecordListVo.class).sheet("咨询记录").doWrite(recordList);
+    }
+
+
+    @ApiOperation("会话分析接口")
+    @GetMapping("/msg/analyze")
+    public AjaxResult<WeKfMsgAnalyzeVo> getMsgAnalyze(WeKfRecordQuery query) {
+        if(Objects.isNull(query)){
+            throw new WeComException("参数不能为空");
+        }
+        if(StringUtils.isEmpty(query.getOpenKfId())){
+            throw new WeComException("客服ID不能为空");
+        }
+        if(StringUtils.isEmpty(query.getExternalUserId())){
+            throw new WeComException("客户ID不能为空");
+        }
+        if(StringUtils.isEmpty(query.getBeginTime())){
+            throw new WeComException("开始时间不能为空");
+        }
+        WeKfMsgAnalyzeVo weKfMsgAnalyzeVo = weKfMsgService.getMsgAnalyze(query);
+        return AjaxResult.success(weKfMsgAnalyzeVo);
     }
 }
