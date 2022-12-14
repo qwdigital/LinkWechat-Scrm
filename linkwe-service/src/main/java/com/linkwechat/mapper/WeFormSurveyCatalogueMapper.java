@@ -33,5 +33,8 @@ public interface WeFormSurveyCatalogueMapper extends BaseMapper<WeFormSurveyCata
     @InterceptorIgnore(tenantLine = "true")
     List<WeFormSurveyCatalogue> getListIgnoreTenantId();
 
+    @InterceptorIgnore(tenantLine = "true")
+    void updateByIdIgnoreTenantId(WeFormSurveyCatalogue weFormSurveyCatalogue);
+
 }
 

@@ -654,6 +654,8 @@ public class RabbitMQConfig {
         return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getSopEx()).durable(true).build();
     }
 
+
+
     /**
      * 直播交换机
      * @return

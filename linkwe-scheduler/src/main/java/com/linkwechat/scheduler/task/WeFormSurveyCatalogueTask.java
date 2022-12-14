@@ -58,7 +58,7 @@ public class WeFormSurveyCatalogueTask {
                             break;
                     }
                     if (flag) {
-                        weFormSurveyCatalogueService.updateById(weFormSurveyCatalogue);
+                        weFormSurveyCatalogueService.updateByIdIgnoreTenantId(weFormSurveyCatalogue);
                     }
                 }
             }

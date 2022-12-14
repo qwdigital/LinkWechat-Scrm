@@ -384,6 +384,7 @@ public class SysUserController extends BaseController {
         return AjaxResult.success(user);
     }
 
+
     @PostMapping("listByQuery")
     public AjaxResult<SysUser> listByQuery(@RequestBody SysUser sysUser) {
         List<SysUser> sysUsers = userService.selectUserList(sysUser);

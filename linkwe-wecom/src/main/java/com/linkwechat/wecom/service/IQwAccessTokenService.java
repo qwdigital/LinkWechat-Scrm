@@ -27,7 +27,7 @@ public interface IQwAccessTokenService {
      * @param corpId
      * @return
      */
-    public String findBillAccessToken(String corpId);
+     String findBillAccessToken(String corpId);
 
 
     void removeCommonAccessToken(String corpId);
@@ -51,6 +51,6 @@ public interface IQwAccessTokenService {
     /**
      * 移除对外收款Token
      */
-    public void removeBillAccessToken(String corpId);
+     void removeBillAccessToken(String corpId);
 
 }

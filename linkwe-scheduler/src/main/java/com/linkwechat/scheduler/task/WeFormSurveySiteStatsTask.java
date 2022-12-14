@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.SiteStasConstants;
+import com.linkwechat.common.constant.SiteStatsConstants;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeFormSurveyAnswer;
 import com.linkwechat.domain.WeFormSurveyCatalogue;
@@ -34,7 +35,7 @@ import java.util.stream.DoubleStream;
  */
 @Slf4j
 @Component
-public class WeFormSurveySiteStasTask {
+public class WeFormSurveySiteStatsTask {
 
     @Resource
     private RedisTemplate redisTemplate;
@@ -54,6 +55,9 @@ public class WeFormSurveySiteStasTask {
         List<WeFormSurveyCatalogue> weFormSurveyCatalogueList = weFormSurveyCatalogueService.getListIgnoreTenantId();
         if (weFormSurveyCatalogueList != null && weFormSurveyCatalogueList.size() > 0) {
             for (WeFormSurveyCatalogue weFormSurveyCatalogue : weFormSurveyCatalogueList) {
+                //每天的站点数据统计
+                dayByDaySiteStas(weFormSurveyCatalogue);
+
                 //总的站点数据统计
                 siteStas(weFormSurveyCatalogue);
 
@@ -77,10 +81,13 @@ public class WeFormSurveySiteStasTask {
         Long uv = 0L;
         for (String channel : channels) {
             //PV
-            String pvKey = StringUtils.format(SiteStasConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channel);
-            pv += (Integer) redisTemplate.opsForValue().get(pvKey);
+            String pvKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channel);
+            Object o = redisTemplate.opsForValue().get(pvKey);
+            if (o != null) {
+                pv += (Integer) o;
+            }
             //IP
-            String ipKey = StringUtils.format(SiteStasConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channel);
+            String ipKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channel);
             uv += redisTemplate.opsForSet().size(ipKey);
         }
         uv = uv - channels.length;
@@ -125,8 +132,9 @@ public class WeFormSurveySiteStasTask {
     private void dayByDaySiteStas(WeFormSurveyCatalogue weFormSurveyCatalogue) {
         String[] channels = weFormSurveyCatalogue.getChannelsName().split(",");
         for (String channel : channels) {
+
             //PV
-            String pvKey = StringUtils.format(SiteStasConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channel);
+            String pvKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channel);
             Integer pv = (Integer) redisTemplate.opsForValue().get(pvKey);
             //IP
             String ipKey = StringUtils.format(SiteStasConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channel);
@@ -136,6 +144,9 @@ public class WeFormSurveySiteStasTask {
             QueryWrapper<WeFormSurveySiteStas> queryWrapper = new QueryWrapper<>();
             queryWrapper.lambda().eq(WeFormSurveySiteStas::getBelongId, weFormSurveyCatalogue.getId());
             WeFormSurveySiteStas one = weFormSurveySiteStasService.getOne(queryWrapper);
+            if (ObjectUtil.isNull(one)) {
+                one = new WeFormSurveySiteStas();
+            }
 
             //今天有效收集量
             QueryWrapper<WeFormSurveyAnswer> answerQueryWrapper = new QueryWrapper<>();
@@ -177,6 +188,7 @@ public class WeFormSurveySiteStasTask {
                 weFormSurveyStatistics.setAverageTime(0);
             }
             weFormSurveyStatistics.setCreateTime(DateUtil.offsetDay(new Date(), -1));
+            weFormSurveyStatistics.setUpdateTime(DateUtil.offsetDay(new Date(), -1));
             weFormSurveyStatistics.setDelFlag(Constants.COMMON_STATE);
             weFormSurveyStatisticsService.save(weFormSurveyStatistics);
         }

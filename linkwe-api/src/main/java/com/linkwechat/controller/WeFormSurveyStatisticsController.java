@@ -325,7 +325,7 @@ public class WeFormSurveyStatisticsController extends BaseController {
         List<WeFormSurveyStatisticsVO> result = new ArrayList<>();
         for (WeFormSurveyStatistics weFormSurveyStatistics : tSurveyList) {
             WeFormSurveyStatisticsVO weFormSurveyStatisticsVO = new WeFormSurveyStatisticsVO();
-            weFormSurveyStatisticsVO.setCreateTime(weFormSurveyStatistics.getCreateTime());
+            weFormSurveyStatisticsVO.setCreateTime(DateUtil.offsetDay(weFormSurveyStatistics.getCreateTime(), -1));
             weFormSurveyStatisticsVO.setTotalVisits(weFormSurveyStatistics.getTotalVisits());
             weFormSurveyStatisticsVO.setTotalUser(weFormSurveyStatistics.getTotalUser());
             weFormSurveyStatisticsVO.setCollectionRate(weFormSurveyStatistics.getCollectionRate());
@@ -456,7 +456,7 @@ public class WeFormSurveyStatisticsController extends BaseController {
             weFormSurveyAnswerVO.setMobile(weFormSurveyAnswer.getMobile());
             weFormSurveyAnswerVO.setOpenId(weFormSurveyAnswer.getOpenId());
             weFormSurveyAnswerVO.setUnionId(weFormSurveyAnswer.getUnionId());
-            weFormSurveyAnswerVO.setIsCorpUser(StringUtils.isBlank(weFormSurveyAnswer.getUnionId()) ? "否" : "是");
+            weFormSurveyAnswerVO.setIsCorpUser("否");
             list.add(weFormSurveyAnswerVO);
         }
         ExcelUtil<WeFormSurveyAnswerVO> util = new ExcelUtil<>(WeFormSurveyAnswerVO.class);
@@ -486,7 +486,7 @@ public class WeFormSurveyStatisticsController extends BaseController {
         if (tSurveyList != null && tSurveyList.size() > 0) {
             for (WeFormSurveyStatistics weFormSurveyStatistics : tSurveyList) {
                 WeFormSurveyStatisticsVO weFormSurveyStatisticsVO = new WeFormSurveyStatisticsVO();
-                weFormSurveyStatisticsVO.setCreateTime(weFormSurveyStatistics.getCreateTime());
+                weFormSurveyStatisticsVO.setCreateTime(DateUtil.offsetDay(weFormSurveyStatistics.getCreateTime(), -1));
                 weFormSurveyStatisticsVO.setTotalVisits(weFormSurveyStatistics.getTotalVisits());
                 weFormSurveyStatisticsVO.setTotalUser(weFormSurveyStatistics.getTotalUser());
                 weFormSurveyStatisticsVO.setCollectionRate(weFormSurveyStatistics.getCollectionRate());

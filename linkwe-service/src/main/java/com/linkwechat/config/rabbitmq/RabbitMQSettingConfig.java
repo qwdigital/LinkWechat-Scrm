@@ -302,6 +302,7 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.queue.sop-qu:Qu_Sop}")
     private String sopQu;
 
+
     //直播数据同步队列
     @Value("${wecom.mq.queue.live-qu:Qu_Live}")
     private String liveQu;
