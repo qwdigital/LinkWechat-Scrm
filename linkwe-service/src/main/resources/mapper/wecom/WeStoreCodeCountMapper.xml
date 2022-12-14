@@ -17,15 +17,15 @@
                ) as customerTotalNumber,
                (
                    SELECT
-                       COUNT(DISTINCT if(date_format(create_time,'%y%m%d') = date_format(curdate(),'%y%m%d'),unionid,0))
+                       COUNT(DISTINCT unionid)
                    from
-                       we_store_code_count where source=1
+                       we_store_code_count where date_format( create_time, '%y%m%d' ) = date_format( curdate(), '%y%m%d' ) AND source=1
                ) as tdShopGuideScannNumber,
                (
                    SELECT
-                       COUNT(DISTINCT if(date_format(create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d'),unionid,0))
+                       COUNT(DISTINCT unionid)
                    from
-                       we_store_code_count where source=1
+                       we_store_code_count  where source=1 and date_format(create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
                ) as ydShopGuideScannNumber,
                (
                    SELECT count(DISTINCT external_userid) from we_customer where state in (
@@ -90,7 +90,7 @@
         ) as tdStoreGroupScannNumber,
 
             (
-                SELECT COUNT(*)
+                SELECT COUNT(DISTINCT wgm.user_id)
                 FROM we_group_member wgm
                 where wgm.state in (
                     SELECT state from we_group_code
@@ -103,20 +103,18 @@
             ) as totalJoinGroupMemberNumber,
 
             (
-                SELECT COUNT(if(date_format(create_time,'%y%m%d') = date_format(curdate(),'%y%m%d'),wgm.id,0))
+                SELECT COUNT(DISTINCT wgm.user_id)
                 FROM we_group_member wgm
                 where wgm.state in (
                     SELECT state from we_group_code
                     <where>
                         <if test="groupCodeId !=null">id=#{groupCodeId}</if>
                     </where>
-            )
-                  AND wgm.del_flag=0
-
+            ) and date_format(join_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
             ) as tdJoinGroupMemberNumber,
 
             (
-                SELECT COUNT(*)
+                SELECT COUNT(DISTINCT wgm.user_id)
                 FROM we_group_member wgm
                 where wgm.state in (
                 SELECT state from we_group_code
@@ -128,14 +126,14 @@
             ) as totalExitGroupMemberNumber,
 
             (
-                SELECT COUNT(if(date_format(create_time,'%y%m%d') = date_format(curdate(),'%y%m%d'),wgm.id,0))
+                SELECT COUNT(DISTINCT wgm.user_id)
                 FROM we_group_member wgm
                 where wgm.state in (
                     SELECT state from we_group_code
                     <where>
                         <if test="groupCodeId !=null">id=#{groupCodeId}</if>
                     </where>
-                )  	AND wgm.del_flag=1
+                )  	AND wgm.del_flag=1 AND  date_format(quit_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
             ) as tdExitGroupMemberNumber
     </select>
 
@@ -150,13 +148,11 @@
         ) as totalStoreGroupScannNumber,
 
         (
-        SELECT COUNT(*)
+        SELECT COUNT(DISTINCT wgm.user_id)
         FROM we_group_member wgm
         where wgm.state in (
                 SELECT state from we_group_code
             )
-
-        and wgm.del_flag=0
         ) as totalJoinGroupMemberNumber,
 
         (
@@ -179,7 +175,7 @@
                 FROM we_group_member wgm
                 where wgm.state in (
                     SELECT state from we_group_code
-            ) and wgm.del_flag=0
+            )
             ) as tdJoinGroupMemberNumber,
             (
                 SELECT COUNT(if(date_format(create_time,'%y%m%d') = date_format(curdate(),'%y%m%d'),wgm.id,0))
@@ -199,7 +195,7 @@
                 FROM we_group_member wgm
                 where wgm.state in (
                     SELECT state from we_group_code
-            )  and wgm.del_flag=0
+            )
             ) as ydJoinGroupMemberNumber,
             (
                 SELECT COUNT(if(date_format(create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d'),wgm.id,0))
@@ -404,7 +400,7 @@
         SELECT
         DATE_FORMAT(wscc.create_time, '%Y-%m-%d' ) AS dateTime,
         count(DISTINCT unionid) as totalStoreGroupScannNumber,
-        (SELECT count(DISTINCT wgm.user_id) from we_group_member wgm where wgm.state=wgc.state and wgm.del_flag=0) as totalJoinGroupMemberNumber,
+        (SELECT count(DISTINCT wgm.user_id) from we_group_member wgm where wgm.state=wgc.state) as totalJoinGroupMemberNumber,
         (SELECT count(DISTINCT wgm.user_id) from we_group_member wgm where wgm.state=wgc.state and wgm.del_flag=1) as totalExitGroupMemberNumber
         FROM
         we_store_code_count 	wscc

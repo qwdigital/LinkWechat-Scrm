@@ -250,12 +250,15 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
         PageHelper.startPage(TableSupport.buildPageRequest().getPageNum(), TableSupport.buildPageRequest().getPageSize());
         List<WeSopBase> weSopBases = this.list(new LambdaQueryWrapper<WeSopBase>()
-                .eq(StringUtils.isNotEmpty(weSopBase.getSopName()),WeSopBase::getSopName, weSopBase.getSopName())
+                .like(StringUtils.isNotEmpty(weSopBase.getSopName()),WeSopBase::getSopName, weSopBase.getSopName())
                 .eq(weSopBase.getBaseType() !=null,WeSopBase::getBaseType, weSopBase.getBaseType())
                 .eq(weSopBase.getSopState() !=null,WeSopBase::getSopState, weSopBase.getSopState())
                 .eq(weSopBase.getBusinessType() !=null,WeSopBase::getBusinessType, weSopBase.getBusinessType())
-                .between(StringUtils.isNotEmpty(weSopBase.getBeginTime())&&StringUtils.isNotEmpty(weSopBase.getEndTime())
-                        ,WeSopBase::getCreateTime, weSopBase.getBeginTime(),weSopBase.getEndTime())
+                .apply(StringUtils.isNotEmpty(weSopBase.getBeginTime())&&StringUtils.isNotEmpty(weSopBase.getEndTime()),
+                        "date_format(create_time,'%Y-%m-%d') BETWEEN '"+
+                                weSopBase.getBeginTime()
+                                +"' AND '"+
+                                weSopBase.getEndTime()+"'")
                 .orderByDesc(WeSopBase::getCreateTime)
         );
 

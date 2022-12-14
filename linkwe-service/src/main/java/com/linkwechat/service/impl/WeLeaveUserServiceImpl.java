@@ -4,7 +4,9 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.domain.*;
@@ -77,11 +79,9 @@ public class WeLeaveUserServiceImpl implements IWeLeaveUserService {
     @Transactional(rollbackFor = Exception.class)
     public void allocateLeaveUserAboutData(WeLeaveUserInfoAllocate weLeaveUserInfoAllocate) {
 
-
-
         //获取所需分配的客户
         List<WeAllocateCustomer> weAllocateCustomers = iWeAllocateCustomerService.list(new LambdaQueryWrapper<WeAllocateCustomer>()
-                .eq(WeAllocateCustomer::getHandoverUserid, weLeaveUserInfoAllocate.getHandoverUserid())
+                .eq(WeAllocateCustomer::getHandoverUserId, weLeaveUserInfoAllocate.getHandoverUserid())
                 .eq(WeAllocateCustomer::getStatus, new Integer(1)));
         if(CollectionUtil.isNotEmpty(weAllocateCustomers)){
             weAllocateCustomers.stream().forEach(k->{
@@ -94,7 +94,7 @@ public class WeLeaveUserServiceImpl implements IWeLeaveUserService {
                     .eq(WeCustomer::getAddUserId,weLeaveUserInfoAllocate.getHandoverUserid())) && iWeAllocateCustomerService.updateBatchById(
                     weAllocateCustomers
             )){
-                qwCustomerClient.resignedTransferCustomer(
+                AjaxResult<WeTransferCustomerVo> weTransferCustomerVo = qwCustomerClient.resignedTransferCustomer(
                         WeTransferCustomerQuery.builder()
                                 .external_userid(
                                         weAllocateCustomers.stream().map(WeAllocateCustomer::getExternalUserid).collect(Collectors.toList())
@@ -103,6 +103,18 @@ public class WeLeaveUserServiceImpl implements IWeLeaveUserService {
                                 .takeover_userid(weLeaveUserInfoAllocate.getTakeoverUserid())
                                 .build()
                 );
+
+
+                if(null != weTransferCustomerVo){
+                    WeTransferCustomerVo weTransferCustomer = weTransferCustomerVo.getData();
+
+                    if(weTransferCustomer != null && !weTransferCustomer.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                        throw new WeComException(weTransferCustomer.getErrMsg());
+                    }
+
+                }
+
+
             }
 
 
@@ -161,7 +173,7 @@ public class WeLeaveUserServiceImpl implements IWeLeaveUserService {
                             .allocateTime(new Date())
                             .extentType(new Integer(0))
                             .externalUserid(k.getExternalUserid())
-                            .handoverUserid(weUserId)
+                            .handoverUserId(weUserId)
                             .status(new Integer(1))
                             .failReason("离职继承")
                             .build();

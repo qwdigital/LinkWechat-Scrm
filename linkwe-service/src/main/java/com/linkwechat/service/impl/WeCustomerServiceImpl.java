@@ -794,7 +794,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                                 .allocateTime(new Date())
                                                 .extentType(new Integer(1))
                                                 .externalUserid(weOnTheJobCustomerQuery.getExternalUserid())
-                                                .handoverUserid(weOnTheJobCustomerQuery.getHandoverUserId())
+                                                .handoverUserId(weOnTheJobCustomerQuery.getHandoverUserId())
                                                 .takeoverUserid(weOnTheJobCustomerQuery.getTakeoverUserId())
                                                 .failReason("在职继承")
                                                 .build()
@@ -834,6 +834,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
 
+
+
+
             List<WeCustomerFollowUserEntity> followUserList = weCustomerDetail.getFollowUser();
             if (CollectionUtil.isNotEmpty(followUserList)) {
                 WeCustomerFollowUserEntity followUserEntity = followUserList.stream().filter(followUserInfo -> followUserInfo.getUserId().equals(userId)).findFirst().get();
@@ -852,6 +855,20 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 weCustomer.setRemarkName(followUserEntity.getRemark());
                 weCustomer.setOtherDescr(followUserEntity.getDescription());
                 weCustomer.setPhone(String.join(",", Optional.ofNullable(followUserEntity.getRemarkMobiles()).orElseGet(ArrayList::new)));
+
+                Map<String, SysUser> currentTenantSysUser = findCurrentTenantSysUser();
+
+                if(CollectionUtil.isNotEmpty(currentTenantSysUser)){
+                    SysUser sysUser = currentTenantSysUser.get(followUserEntity.getUserId());
+
+                    if(null != sysUser){
+                        weCustomer.setCreateBy(sysUser.getUserName());
+                        weCustomer.setCreateById(sysUser.getUserId());
+                        weCustomer.setUpdateBy(sysUser.getUserName());
+                        weCustomer.setUpdateById(sysUser.getUserId());
+                    }
+                }
+
                 //设置标签
                 List<WeCustomerDetailVo.ExternalUserTag> tags = followUserEntity.getTags();
                 if (CollectionUtil.isNotEmpty(tags)) {
