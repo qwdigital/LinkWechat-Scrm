@@ -169,5 +169,10 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
         return weFormSurveyCatalogueMapper.getListIgnoreTenantId();
     }
 
+    @Override
+    public void updateByIdIgnoreTenantId(WeFormSurveyCatalogue weFormSurveyCatalogue) {
+        weFormSurveyCatalogueMapper.updateByIdIgnoreTenantId(weFormSurveyCatalogue);
+    }
+
 
 }
