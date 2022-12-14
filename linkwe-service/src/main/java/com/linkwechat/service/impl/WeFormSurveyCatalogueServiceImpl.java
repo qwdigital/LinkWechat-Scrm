@@ -3,6 +3,8 @@ package com.linkwechat.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -15,8 +17,10 @@ import com.linkwechat.domain.WeFormSurveyAnswer;
 import com.linkwechat.domain.WeFormSurveyCatalogue;
 import com.linkwechat.domain.form.query.WeAddFormSurveyCatalogueQuery;
 import com.linkwechat.domain.form.query.WeFormSurveyCatalogueQuery;
+import com.linkwechat.domain.material.entity.WeCategory;
+import com.linkwechat.mapper.WeCategoryMapper;
+import com.linkwechat.mapper.WeFormSurveyAnswerMapper;
 import com.linkwechat.mapper.WeFormSurveyCatalogueMapper;
-import com.linkwechat.service.IWeFormSurveyAnswerService;
 import com.linkwechat.service.IWeFormSurveyCatalogueService;
 import com.linkwechat.service.IWeFormSurveyStatisticsService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +30,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 问卷-目录列表(WeFormSurveyCatalogue)
@@ -43,7 +50,9 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
     @Resource
     private WeFormSurveyCatalogueMapper weFormSurveyCatalogueMapper;
     @Resource
-    private IWeFormSurveyAnswerService weFormSurveyAnswerService;
+    private WeFormSurveyAnswerMapper weFormSurveyAnswerMapper;
+    @Resource
+    private WeCategoryMapper weCategoryMapper;
 
     @Resource
     private RedisTemplate redisTemplate;
@@ -109,14 +118,33 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
         queryWrapper.orderByDesc(WeFormSurveyCatalogue::getCreateTime);
         List<WeFormSurveyCatalogue> catalogueList = list(queryWrapper);
         if (CollectionUtil.isNotEmpty(catalogueList)) {
+            //分组
+            List<WeCategory> weCategories = weCategoryMapper.categoryList("15");
+            WeCategory weCategory = new WeCategory();
+            weCategory.setId(1L);
+            weCategory.setName("默认分组");
+            weCategory.setFlag(1);
+            weCategory.setParentId(0L);
+            weCategories.add(weCategory);
+            Map<Long, WeCategory> collect = weCategories.stream().collect(Collectors.toMap(WeCategory::getId, Function.identity()));
+
             for (WeFormSurveyCatalogue weFormSurveyCatalogue : catalogueList) {
+                //分组名
+                WeCategory category = collect.get(weFormSurveyCatalogue.getGroupId());
+                if (ObjectUtil.isNotNull(category) && StrUtil.isNotBlank(category.getName())) {
+                    weFormSurveyCatalogue.setGroupName(category.getName());
+                }
+                //总访问量和有效收集量
                 String channelsName = weFormSurveyCatalogue.getChannelsName();
                 Integer pv = 0;
                 String[] split = channelsName.split(",");
                 for (String channelName : split) {
                     //PV
                     String pvKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channelName);
-                    pv += (Integer) redisTemplate.opsForValue().get(pvKey);
+                    Object o = redisTemplate.opsForValue().get(pvKey);
+                    if (o != null) {
+                        pv += (Integer) o;
+                    }
                 }
                 //总访问数
                 weFormSurveyCatalogue.setTotalVisits(pv);
@@ -125,7 +153,7 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
                 wrapper.lambda().eq(WeFormSurveyAnswer::getBelongId, weFormSurveyCatalogue.getId());
                 wrapper.lambda().eq(WeFormSurveyAnswer::getAnEffective, 0);
                 wrapper.lambda().eq(WeFormSurveyAnswer::getDelFlag, Constants.NORMAL_CODE);
-                List<WeFormSurveyAnswer> list = weFormSurveyAnswerService.list(wrapper);
+                List<WeFormSurveyAnswer> list = weFormSurveyAnswerMapper.selectList(wrapper);
                 if (list != null) {
                     weFormSurveyCatalogue.setCollectionVolume(list.size());
                 } else {
