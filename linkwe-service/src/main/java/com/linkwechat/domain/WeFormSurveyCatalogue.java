@@ -108,6 +108,13 @@ public class WeFormSurveyCatalogue extends BaseEntity implements Serializable {
     @TableField("group_id")
     private Long groupId;
 
+    /**
+     * 分组名称
+     */
+    @ApiModelProperty(value = "分组名称")
+    @TableField(exist = false)
+    private String groupName;
+
 
     /**
      * 表单描述
