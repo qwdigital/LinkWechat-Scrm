@@ -217,7 +217,7 @@ public class WeFormSurveyCatalogue extends BaseEntity implements Serializable {
     @TableField(exist = false)
     private Integer totalVisits;
 
-    @ApiModelProperty(value = "收藏总数")
+    @ApiModelProperty(value = "有效收集量")
     @TableField(exist = false)
     private Integer collectionVolume;
 
