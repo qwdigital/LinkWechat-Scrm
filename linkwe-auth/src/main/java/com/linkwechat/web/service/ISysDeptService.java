@@ -2,6 +2,8 @@ package com.linkwechat.web.service;
 
 import com.linkwechat.common.core.domain.TreeSelect;
 import com.linkwechat.common.core.domain.entity.SysDept;
+import com.linkwechat.domain.system.dept.query.SysDeptQuery;
+import com.linkwechat.domain.system.dept.vo.SysDeptVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -114,4 +116,11 @@ public interface ISysDeptService {
      * 同步部门
      */
     public List<SysDept> syncWeDepartment(String corpId);
+
+    /**
+     * 根据部门ID获取部门列表
+     * @param query
+     * @return
+     */
+    public List<SysDeptVo> getListByDeptIds(SysDeptQuery query);
 }

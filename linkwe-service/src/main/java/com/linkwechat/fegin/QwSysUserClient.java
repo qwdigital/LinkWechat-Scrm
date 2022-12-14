@@ -3,6 +3,8 @@ package com.linkwechat.fegin;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.dto.SysUserDTO;
 import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.domain.system.user.query.SysUserQuery;
+import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.fallback.QwSysUserFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -36,4 +38,38 @@ public interface QwSysUserClient {
 
     @PostMapping("/system/user/listByQuery")
     AjaxResult<List<SysUser>> list(@RequestBody SysUser sysUser);
+
+    @GetMapping("/system/user/getUserInfo/{weUserId}")
+    AjaxResult<SysUser> getInfo(@PathVariable("weUserId") String weUserId);
+
+    @GetMapping("/system/user/findAllSysUser")
+    AjaxResult<List<SysUser>> findAllSysUser(@RequestParam("weUserIds") String weUserIds,
+                                             @RequestParam("positions") String positions,@RequestParam("deptIds") String deptIds);
+
+    /**
+     * 根据weuserid获取员工，如果没有则从企业微信端同步
+     * @param weuserId
+     * @return
+     */
+    @GetMapping("/system/user/findOrSynchSysUser/{weuserId}")
+    AjaxResult<SysUser> findOrSynchSysUser(@PathVariable("weuserId") String weuserId);
+
+
+
+    /**
+     * 更新员工客服接待状态
+     * @param sysUser
+     * @return
+     */
+    @PutMapping("/system/user/update/kf/status")
+    AjaxResult updateUserKfStatus(@RequestBody SysUser sysUser);
+
+    /**
+     * 通过企微员工ID获取员工信息
+     * @param query
+     * @return
+     */
+    @PostMapping("/system/user/getUserListByWeUserIds")
+    AjaxResult<List<SysUserVo>> getUserListByWeUserIds(@RequestBody SysUserQuery query);
+
 }

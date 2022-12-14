@@ -1,6 +1,8 @@
 package com.linkwechat.web.controller.system;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.controller.BaseController;
@@ -23,6 +25,8 @@ import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WxUser;
 import com.linkwechat.domain.corp.query.WeCorpAccountQuery;
 import com.linkwechat.domain.corp.vo.WeCorpAccountVo;
+import com.linkwechat.domain.system.user.query.SysUserQuery;
+import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.domain.wecom.vo.user.WeUserDetailVo;
 import com.linkwechat.framework.service.TokenService;
 import com.linkwechat.service.IWeCorpAccountService;
@@ -389,4 +393,66 @@ public class SysUserController extends BaseController {
         return AjaxResult.success(customerInfo);
     }
 
+
+    /**
+     * 更新用户是否开启会话
+     *
+     * @param
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2022/09/19 18:02
+     */
+    @PutMapping("/update/open/chat")
+    public AjaxResult<Boolean> updateUserIsOpenChat(@RequestBody SysUser sysUser) {
+        UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.lambda().set(SysUser::getIsOpenChat, sysUser.getIsOpenChat());
+        updateWrapper.lambda().eq(SysUser::getWeUserId, sysUser.getWeUserId());
+        boolean update = userService.update(updateWrapper);
+        return AjaxResult.success(update);
+    }
+
+    /**
+     * 根据openUserId获取用户数据
+     *
+     * @param
+     * @return {@link AjaxResult<SysUser>}
+     * @author WangYX
+     * @date 2022/09/21 11:04
+     */
+    @GetMapping("/getOneByOpenUserId")
+    public AjaxResult<SysUser> getOneByOpenUserId(@RequestBody SysUser sysUser) {
+        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(SysUser::getOpenUserid, sysUser.getOpenUserid());
+        queryWrapper.lambda().eq(SysUser::getDelFlag, 0);
+        SysUser one = userService.getOne(queryWrapper);
+        return AjaxResult.success(one);
+    }
+
+    /**
+     * 更新用户是否开启客服
+     *
+     * @param
+     * @return {@link AjaxResult}
+     * @author damo
+     * @date 2022/09/19 18:02
+     */
+    @PutMapping("/update/kf/status")
+    public AjaxResult updateUserKfStatus(@RequestBody SysUser sysUser) {
+        UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.lambda().set(SysUser::getKfStatus, sysUser.getKfStatus());
+        updateWrapper.lambda().eq(SysUser::getWeUserId, sysUser.getWeUserId());
+        userService.update(updateWrapper);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 通过企微员工ID获取员工信息
+     * @param query
+     * @return
+     */
+    @PostMapping("/getUserListByWeUserIds")
+    public AjaxResult<List<SysUserVo>> getUserListByWeUserIds(@Validated @RequestBody SysUserQuery query){
+        List<SysUserVo> sysUserList  = userService.getUserListByWeUserIds(query);
+        return AjaxResult.success(sysUserList);
+    }
 }

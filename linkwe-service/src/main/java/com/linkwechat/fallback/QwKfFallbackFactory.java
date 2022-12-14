@@ -111,4 +111,24 @@ public class QwKfFallbackFactory implements QwKfClient {
     public AjaxResult<WeKfStatisticListVo> getServicerStatistic(WeKfGetStatisticQuery query) {
         return null;
     }
+
+    @Override
+    public AjaxResult<WeKfAddKnowledgeGroupVo> addKnowledgeGroup(WeKfAddKnowledgeGroupQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<WeResultVo> delKnowledgeGroup(WeKfKnowledgeGroupQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<WeResultVo> modKnowledgeGroup(WeKfKnowledgeGroupQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<WeKfKnowledgeGroupListVo> getKnowledgeGroupList(WeKfKnowledgeGroupQuery query) {
+        return null;
+    }
 }

@@ -18,6 +18,12 @@ public class WeKfUserVo extends WeResultVo {
      */
     private String userId;
 
+
+    /**
+     * 接待人员部门的id
+     */
+    private Integer departmentId;
+
     /**
      * 接待人员的接待状态。0:接待中,1:停止接待
      */

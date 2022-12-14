@@ -8,6 +8,8 @@ import com.linkwechat.common.core.domain.entity.SysDept;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.system.dept.query.SysDeptQuery;
+import com.linkwechat.domain.system.dept.vo.SysDeptVo;
 import com.linkwechat.web.mapper.SysUserMapper;
 import com.linkwechat.web.service.ISysDeptService;
 import io.swagger.annotations.Api;
@@ -164,5 +166,14 @@ public class SysDeptController extends BaseController {
             return AjaxResult.error("部门存在用户,不允许删除");
         }
         return toAjax(deptService.deleteDeptById(deptId));
+    }
+
+    /**
+     * 根据部门ID获取部门列表
+     */
+    @PostMapping(value = "/getListByDeptIds")
+    @ApiOperation(value = "根据部门ID获取部门列表")
+    public AjaxResult<List<SysDeptVo>> getListByDeptIds(@Validated @RequestBody SysDeptQuery query) {
+        return AjaxResult.success(deptService.getListByDeptIds(query));
     }
 }

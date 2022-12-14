@@ -396,4 +396,13 @@ public class RedisService {
     public Long increment(String key){
         return redisTemplate.opsForValue().increment(key);
     }
+
+    /**
+     * 自减
+     * @param key
+     * @return
+     */
+    public Long decrement(String key){
+        return redisTemplate.opsForValue().decrement(key);
+    }
 }

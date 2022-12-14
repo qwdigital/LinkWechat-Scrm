@@ -19,6 +19,17 @@ public class QwAppMsgBody {
     private Integer businessType = 1;
 
     /**
+     * 回调主键
+     */
+    private Long callBackId;
+
+    /**
+     * 回调业务类
+     */
+    private String callBackService;
+
+
+    /**
      * 企业ID
      */
     private String corpId;
