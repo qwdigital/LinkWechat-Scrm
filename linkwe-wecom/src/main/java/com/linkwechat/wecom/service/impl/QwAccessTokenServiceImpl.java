@@ -91,7 +91,7 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
         return findAccessToken(corpId, WeConstans.WE_KF_ACCESS_TOKEN);
     }
 
-<<<<<<<<< Temporary merge branch 1
+
     /**
      * 直播token
      * @param corpId
@@ -100,11 +100,11 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
     @Override
     public String findLiveAccessToken(String corpId) {
         return findAccessToken(corpId, WeConstans.WE_LIVE_ACCESS_TOKEN);
-=========
+    }
+
     @Override
     public String findBillAccessToken(String corpId) {
         return findAccessToken(corpId, WeConstans.WE_BILL_ACCESS_TOKEN);
->>>>>>>>> Temporary merge branch 2
     }
 
 

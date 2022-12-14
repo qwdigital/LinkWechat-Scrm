@@ -97,10 +97,10 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
                     weStoreCode.setConfigId(weAddWayResult.getConfigId());
                     weStoreCode.setShopGuideUrl(weAddWayResult.getQrCode());
                 }
-            }else if(null != weStoreCode.getStoreCodeId()){ //群
+            }else if(null != weStoreCode.getGroupCodeId()){ //群
                 WeGroupCode weGroupCode = weGroupCodeService.getById(weStoreCode.getGroupCodeId());
                 if(null != weGroupCode){
-                    weStoreCode.setState(weStoreCode.getState());
+                    weStoreCode.setState(weGroupCode.getState());
                 }
             }
 
