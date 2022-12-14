@@ -135,6 +135,11 @@ public class WeFormSurveyStatisticsController extends BaseController {
         int[] averageTimeArray = new int[timeList.size()];
         for (int i = 0; i < timeList.size(); i++) {
             xAxisArray[i] = timeList.get(i).toDateStr();
+
+            //时间增加一天，原因：数据库中存储的数据会提前一天，如2022-12-14日的数据，会存到2022-15-15
+            DateTime dateTime = timeList.get(i);
+            String dateStr = DateUtil.offsetDay(dateTime, 1).toDateStr();
+
             WeFormSurveyStatisticQuery surveyStatistics = new WeFormSurveyStatisticQuery();
             surveyStatistics.setStartDate(DateUtil.parseDate(timeList.get(i).toDateStr()));
             surveyStatistics.setEndDate(DateUtil.parseDate(timeList.get(i).toDateStr()));
@@ -323,7 +328,7 @@ public class WeFormSurveyStatisticsController extends BaseController {
         List<WeFormSurveyStatisticsVO> result = new ArrayList<>();
         for (WeFormSurveyStatistics weFormSurveyStatistics : tSurveyList) {
             WeFormSurveyStatisticsVO weFormSurveyStatisticsVO = new WeFormSurveyStatisticsVO();
-            weFormSurveyStatisticsVO.setCreateTime(weFormSurveyStatistics.getCreateTime());
+            weFormSurveyStatisticsVO.setCreateTime(DateUtil.offsetDay(weFormSurveyStatistics.getCreateTime(), -1));
             weFormSurveyStatisticsVO.setTotalVisits(weFormSurveyStatistics.getTotalVisits());
             weFormSurveyStatisticsVO.setTotalUser(weFormSurveyStatistics.getTotalUser());
             weFormSurveyStatisticsVO.setCollectionRate(weFormSurveyStatistics.getCollectionRate());
@@ -484,7 +489,7 @@ public class WeFormSurveyStatisticsController extends BaseController {
         if (tSurveyList != null && tSurveyList.size() > 0) {
             for (WeFormSurveyStatistics weFormSurveyStatistics : tSurveyList) {
                 WeFormSurveyStatisticsVO weFormSurveyStatisticsVO = new WeFormSurveyStatisticsVO();
-                weFormSurveyStatisticsVO.setCreateTime(weFormSurveyStatistics.getCreateTime());
+                weFormSurveyStatisticsVO.setCreateTime(DateUtil.offsetDay(weFormSurveyStatistics.getCreateTime(), -1));
                 weFormSurveyStatisticsVO.setTotalVisits(weFormSurveyStatistics.getTotalVisits());
                 weFormSurveyStatisticsVO.setTotalUser(weFormSurveyStatistics.getTotalUser());
                 weFormSurveyStatisticsVO.setCollectionRate(weFormSurveyStatistics.getCollectionRate());

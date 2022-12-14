@@ -82,7 +82,10 @@ public class WeFormSurveySiteStatsTask {
         for (String channel : channels) {
             //PV
             String pvKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channel);
-            pv += (Integer) redisTemplate.opsForValue().get(pvKey);
+            Object o = redisTemplate.opsForValue().get(pvKey);
+            if (o != null) {
+                pv += (Integer) o;
+            }
             //IP
             String ipKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channel);
             uv += redisTemplate.opsForSet().size(ipKey);
@@ -141,6 +144,9 @@ public class WeFormSurveySiteStatsTask {
             QueryWrapper<WeFormSurveySiteStas> queryWrapper = new QueryWrapper<>();
             queryWrapper.lambda().eq(WeFormSurveySiteStas::getBelongId, weFormSurveyCatalogue.getId());
             WeFormSurveySiteStas one = weFormSurveySiteStasService.getOne(queryWrapper);
+            if (ObjectUtil.isNull(one)) {
+                one = new WeFormSurveySiteStas();
+            }
 
             //今天有效收集量
             QueryWrapper<WeFormSurveyAnswer> answerQueryWrapper = new QueryWrapper<>();
