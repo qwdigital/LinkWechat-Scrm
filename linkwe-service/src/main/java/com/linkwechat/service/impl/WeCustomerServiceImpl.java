@@ -91,6 +91,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     private IWeMessagePushService iWeMessagePushService;
 
 
+    @Autowired
+    private IWeCustomerSeasService iWeCustomerSeasService;
+
+
 
     @Override
     public List<WeCustomersVo> findWeCustomerList(WeCustomersQuery weCustomersQuery, PageDomain pageDomain) {
@@ -829,7 +833,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             weCustomer.setAvatar(externalContact.getAvatar());
             weCustomer.setGender(externalContact.getGender());
             weCustomer.setUnionid(externalContact.getUnionId());
-            weCustomer.setDelFlag(0);
+            weCustomer.setDelFlag(Constants.COMMON_STATE);
             weCustomer.setAddUserId(userId);
 
 
@@ -884,6 +888,24 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 }
             }
             this.baseMapper.batchAddOrUpdate(ListUtil.toList(weCustomer));
+
+
+            if(CustomerAddWay.ADD_WAY_SSSJH.getKey().equals(weCustomer.getAddMethod())){//添加方式为手机号搜索,更新客户公海中对应的状态
+
+                if(StringUtils.isNotEmpty(weCustomer.getPhone())){
+                    List<WeCustomerSeas> weCustomerSeasList = iWeCustomerSeasService.list(new LambdaQueryWrapper<WeCustomerSeas>()
+                            .eq(WeCustomerSeas::getAddUserId, weCustomer.getAddUserId())
+                            .eq(WeCustomerSeas::getPhone, weCustomer.getPhone()));
+                    if(CollectionUtil.isNotEmpty(weCustomerSeasList)){
+                        weCustomerSeasList.stream().forEach(k->k.setAddState(1));
+                        iWeCustomerSeasService.updateBatchById(weCustomerSeasList);
+                    }
+
+
+                }
+
+
+            }
 
 
 //            if(StringUtils.isNotEmpty(state)){
