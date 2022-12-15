@@ -207,6 +207,7 @@ public class SysLoginController {
 
         String state = "linkwechat";
         String qrcodeUrl = String.format(
+                baseUrl,
                 weCorpAccount.getCorpId(),
                 redirectUrl,
                 state,
