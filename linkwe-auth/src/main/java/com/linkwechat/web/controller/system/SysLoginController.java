@@ -179,6 +179,43 @@ public class SysLoginController {
         return AjaxResult.success(qrcodeUrl);
     }
 
+
+    /**
+     * 企业微信h5回掉地址
+     * @param redirectUrl
+     * @return
+     */
+    @GetMapping("/wcRedirect")
+    public AjaxResult wcRedirect(@ApiParam(value = "回调地址",required = true) String redirectUrl){
+
+        WeCorpAccount weCorpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
+
+        if(null == weCorpAccount || StringUtils.isEmpty(weCorpAccount.getCorpId()) || StringUtils.isEmpty(weCorpAccount.getAgentId())){
+
+            return AjaxResult.error("企业微信相关配置不可为空");
+        }
+
+        // 微信开放平台授权baseUrl
+        String baseUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_privateinfo&state=%s&agentid=%s#wechat_redirect";
+        try {
+            redirectUrl = URLEncoder.encode(redirectUrl, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            throw new WeComException("回调地址解析失败");
+        }
+        //todo
+
+        String state = "linkwechat";
+        String qrcodeUrl = String.format(
+                weCorpAccount.getCorpId(),
+                redirectUrl,
+                state,
+                weCorpAccount.getAgentId());
+        return AjaxResult.success(qrcodeUrl);
+
+
+    }
+
     /**
      * 微信登录
      *
