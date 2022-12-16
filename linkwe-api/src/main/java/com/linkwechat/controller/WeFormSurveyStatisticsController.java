@@ -501,7 +501,10 @@ public class WeFormSurveyStatisticsController extends BaseController {
         List<WeFormSurveyCatalogue> weFormSurveyCatalogues = weFormSurveyCatalogueService.getListIgnoreTenantId();
         //上次的站点统计的数据
         List<WeFormSurveySiteStas> list = weFormSurveySiteStasService.list();
-        Map<Long, Integer> collect = list.stream().collect(Collectors.toMap(WeFormSurveySiteStas::getBelongId, WeFormSurveySiteStas::getTotalVisits));
+        Map<Long, Integer> collect = list.stream().collect(Collectors.toMap(WeFormSurveySiteStas::getBelongId, WeFormSurveySiteStas::getTotalVisits
+                ,(value1, value2 )->{
+                    return value1;
+                }));
 
         if (weFormSurveyCatalogues != null && weFormSurveyCatalogues.size() > 0) {
             for (WeFormSurveyCatalogue weFormSurveyCatalogue : weFormSurveyCatalogues) {
