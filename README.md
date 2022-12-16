@@ -25,8 +25,6 @@
 
 ---
 
-**<p align="center">【📣参与投票】LinkWeChat正在参与2022年中国开源云联盟年度评选<a href="https://vote.jzvote.net/detail/2e921861e5bcc5fc/185598" target="_blank">点击给LinkWeChat投票，谢谢大家~</a></p>**
-
 **<p align="center">【📣最近更新】还有什么想要产品/技术上友好的建议或意见，<a href="https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV" target="_blank">点击告诉我们~</a>一经采纳，将纳入开源贡献者并官网致谢，还会收到社区奖励的小礼品哦！~</p>**
 
 **<p align="center">LinkWeChat V3.0 正式发布啦，架构升级，全面焕新，欢迎大家提前体验！<a href="http://demo.linkwechat.net/" target="_blank">点击立即体验~</a></p>**
