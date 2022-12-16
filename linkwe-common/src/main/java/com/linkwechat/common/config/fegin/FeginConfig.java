@@ -1,6 +1,6 @@
-package com.linkwechat.config.fegin;
+package com.linkwechat.common.config.fegin;
 
-import com.linkwechat.interceptor.FeignRequestInterceptor;
+import com.linkwechat.common.interceptor.FeignRequestInterceptor;
 import feign.Logger;
 import feign.RequestInterceptor;
 import feign.Retryer;

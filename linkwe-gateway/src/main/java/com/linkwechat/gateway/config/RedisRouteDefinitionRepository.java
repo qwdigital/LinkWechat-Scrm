@@ -3,6 +3,7 @@ package com.linkwechat.gateway.config;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import com.linkwechat.common.constant.CacheConstants;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import org.springframework.cloud.gateway.support.NotFoundException;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 @Component
 public class RedisRouteDefinitionRepository implements RouteDefinitionRepository {
-    public static final String GATEWAY_ROUTES = "gateway_dynamic_routes";
+//    public static final String GATEWAY_ROUTES = "gateway_dynamic_routes";
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -29,7 +30,7 @@ public class RedisRouteDefinitionRepository implements RouteDefinitionRepository
     @Override
     public Flux<RouteDefinition> getRouteDefinitions() {
         List<RouteDefinition> routeDefinitions = Lists.newArrayList();
-        stringRedisTemplate.opsForHash().values(GATEWAY_ROUTES).forEach(routeDefinition -> routeDefinitions.add(
+        stringRedisTemplate.opsForHash().values(CacheConstants.GATEWAY_ROUTES).forEach(routeDefinition -> routeDefinitions.add(
                 JSON.parseObject(routeDefinition.toString(), RouteDefinition.class)));
         return Flux.fromIterable(routeDefinitions);
     }
@@ -38,7 +39,7 @@ public class RedisRouteDefinitionRepository implements RouteDefinitionRepository
     public Mono<Void> save(Mono<RouteDefinition> route) {
         return route.flatMap(routeDefinition -> {
             stringRedisTemplate.opsForHash()
-                    .put(GATEWAY_ROUTES, routeDefinition.getId(), JSONObject.toJSONString(routeDefinition));
+                    .put(CacheConstants.GATEWAY_ROUTES, routeDefinition.getId(), JSONObject.toJSONString(routeDefinition));
             return Mono.empty();
         });
     }
@@ -46,8 +47,8 @@ public class RedisRouteDefinitionRepository implements RouteDefinitionRepository
     @Override
     public Mono<Void> delete(Mono<String> routeId) {
         return routeId.flatMap(id -> {
-            if (stringRedisTemplate.opsForHash().hasKey(GATEWAY_ROUTES, id)) {
-                stringRedisTemplate.opsForHash().delete(GATEWAY_ROUTES, id);
+            if (stringRedisTemplate.opsForHash().hasKey(CacheConstants.GATEWAY_ROUTES, id)) {
+                stringRedisTemplate.opsForHash().delete(CacheConstants.GATEWAY_ROUTES, id);
                 return Mono.empty();
             }
             return Mono.defer(

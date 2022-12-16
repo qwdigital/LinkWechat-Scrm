@@ -1,4 +1,4 @@
-package com.linkwechat.interceptor;
+package com.linkwechat.common.interceptor;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;

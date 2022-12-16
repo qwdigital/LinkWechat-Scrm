@@ -5,9 +5,12 @@ import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.Listener;
 import com.alibaba.nacos.api.exception.NacosException;
+import com.linkwechat.common.constant.CacheConstants;
+import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.gateway.config.RedisRouteDefinitionRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.cloud.gateway.route.RouteDefinition;
@@ -51,6 +54,9 @@ public class GatewayDynamicRouteService implements ApplicationEventPublisherAwar
     @Value("${spring.cloud.nacos.discovery.namespace:}")
     private String namespace;
 
+    @Autowired
+    private RedisService redisService;
+
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
         this.applicationEventPublisher = applicationEventPublisher;
@@ -59,6 +65,8 @@ public class GatewayDynamicRouteService implements ApplicationEventPublisherAwar
     @PostConstruct
     public void init() {
         log.info("gateway route init...");
+        //先清空缓存中旧的路由
+        redisService.deleteObject(CacheConstants.GATEWAY_ROUTES);
         try {
             configService = initConfigService();
             if (configService == null) {
