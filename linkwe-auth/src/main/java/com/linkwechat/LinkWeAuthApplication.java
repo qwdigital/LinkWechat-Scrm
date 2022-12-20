@@ -22,7 +22,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class LinkWeAuthApplication {
     public static void main(String[] args) {
         new SpringApplicationBuilder(LinkWeAuthApplication.class)
-                .properties("spring.config.name:bootstrap", "config/run/bootstrap.yml")
+                .properties("spring.config.name:bootstrap", "config/run/bootstrap1.yml")
                 .properties("spring.application.name=linkwe-auth")
                 .build().run(args);
         System.out.println("(♥◠‿◠)ﾉﾞ  LinkWe-auth启动成功   ლ(´ڡ`ლ)ﾞ ");

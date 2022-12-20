@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class LinkWeEventTaskApplication {
     public static void main(String[] args) {
         new SpringApplicationBuilder(LinkWeEventTaskApplication.class)
-                .properties("spring.config.name:bootstrap", "config/run/bootstrap.yml")
+                .properties("spring.config.name:bootstrap", "config/run/bootstrap1.yml")
                 .properties("spring.application.name=linkwe-event-task")
                 .build().run(args);
         System.out.println("(♥◠‿◠)ﾉﾞ  LinkWe-event-task启动成功   ლ(´ڡ`ლ)ﾞ ");

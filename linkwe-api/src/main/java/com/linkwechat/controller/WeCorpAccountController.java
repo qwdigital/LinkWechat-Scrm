@@ -31,7 +31,7 @@ public class WeCorpAccountController extends BaseController {
      */
     @GetMapping("/findCurrentCorpAccount")
     public AjaxResult<WeCorpAccount> findCurrentCorpAccount() {
-        WeCorpAccount corpAccount = iWeCorpAccountService.getCorpAccountByCorpId(SecurityUtils.getCorpId());
+        WeCorpAccount corpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
         return AjaxResult.success(corpAccount);
     }
 
