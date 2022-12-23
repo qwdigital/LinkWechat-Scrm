@@ -16,7 +16,7 @@ import java.util.List;
 public class SysUserQuery {
 
     @ApiModelProperty("企微员工ID")
-    private List<String> openUserIds;
+    private List<String> weUserIds;
 
     @ApiModelProperty("部门ID")
     private List<Integer> deptIds;

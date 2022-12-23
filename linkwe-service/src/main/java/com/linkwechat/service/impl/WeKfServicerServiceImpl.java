@@ -65,7 +65,7 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
             Map<Integer, String> deptId2NameMap = new HashMap<>();
             if(CollectionUtil.isNotEmpty(userIdSet)){
                 SysUserQuery userQuery = new SysUserQuery();
-                userQuery.setOpenUserIds(new ArrayList<>(userIdSet));
+                userQuery.setWeUserIds(new ArrayList<>(userIdSet));
                 try {
                     List<SysUserVo> sysUserList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
                     if(CollectionUtil.isNotEmpty(sysUserList)){
@@ -212,7 +212,7 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
 
             if(CollectionUtil.isNotEmpty(userIdSet) || CollectionUtil.isNotEmpty(deptIdSet)){
                 SysUserQuery userQuery = new SysUserQuery();
-                userQuery.setOpenUserIds(new ArrayList<>(userIdSet));
+                userQuery.setWeUserIds(new ArrayList<>(userIdSet));
                 userQuery.setDeptIds(new ArrayList<>(deptIdSet));
                 try {
                     List<SysUserVo> sysUserList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();

@@ -66,7 +66,7 @@ public class WeQualityWriteHandler implements SheetWriteHandler {
         String userNames = "无";
         if (CollectionUtil.isNotEmpty(query.getUserIds())) {
             SysUserQuery userQuery = new SysUserQuery();
-            userQuery.setOpenUserIds(query.getUserIds());
+            userQuery.setWeUserIds(query.getUserIds());
             List<SysUserVo> userList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
             if(CollectionUtil.isNotEmpty(userList)){
                 userNames = userList.stream().map(SysUserVo::getUserName).distinct().collect(Collectors.joining("；"));
