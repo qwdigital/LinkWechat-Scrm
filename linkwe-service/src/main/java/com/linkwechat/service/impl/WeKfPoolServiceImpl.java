@@ -244,12 +244,11 @@ public class WeKfPoolServiceImpl extends ServiceImpl<WeKfPoolMapper, WeKfPool> i
         }
         if (!isPolling(corpId,openKfId, externalUserId)) {
             //放入接待池
-            allocationServicer(corpId, openKfId
+            String msgCode = allocationServicer(corpId, openKfId
                     , externalUserId, null, WeKfStatusEnum.ACCESS_POOL.getType());
             //排队提醒: 1-开启 2-关闭
             Integer queueNotice = weKfInfo.getQueueNotice();
             if (ObjectUtil.equal(1, queueNotice)) {
-                String msgCode = redisService.getCacheObject(StringUtils.format("we:kf:session:msg:code:{}:{}", openKfId, externalUserId));
                 String queueNoticeContent = weKfInfo.getQueueNoticeContent();
                 JSONObject msg = new JSONObject();
                 msg.put("content", queueNoticeContent);
@@ -369,7 +368,7 @@ public class WeKfPoolServiceImpl extends ServiceImpl<WeKfPoolMapper, WeKfPool> i
                 try {
                     List<SysUserVo> sysUserList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
                     if(CollectionUtil.isNotEmpty(sysUserList)){
-                        Map<String, String> userMap = sysUserList.stream().collect(Collectors.toMap(SysUserVo::getOpenUserid, SysUserVo::getUserName, (key1, key2) -> key2));
+                        Map<String, String> userMap = sysUserList.stream().collect(Collectors.toMap(SysUserVo::getWeUserId, SysUserVo::getUserName, (key1, key2) -> key2));
                         userId2NameMap.putAll(userMap);
                     }
                 } catch (Exception e) {
