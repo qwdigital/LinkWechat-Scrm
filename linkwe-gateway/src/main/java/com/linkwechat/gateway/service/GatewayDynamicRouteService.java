@@ -5,12 +5,9 @@ import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.Listener;
 import com.alibaba.nacos.api.exception.NacosException;
-import com.linkwechat.common.constant.CacheConstants;
-import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.gateway.config.RedisRouteDefinitionRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.cloud.gateway.route.RouteDefinition;
@@ -21,12 +18,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Executor;
+
 
 /**
  * @author leejoker
@@ -35,9 +32,11 @@ import java.util.concurrent.Executor;
  */
 @Service
 @Slf4j
-public class GatewayDynamicRouteService implements ApplicationEventPublisherAware {
+public class GatewayDynamicRouteService implements ApplicationEventPublisherAware{
+
     @Resource
     private RedisRouteDefinitionRepository redisRouteDefinitionRepository;
+
 
     private ApplicationEventPublisher applicationEventPublisher;
 
@@ -54,8 +53,6 @@ public class GatewayDynamicRouteService implements ApplicationEventPublisherAwar
     @Value("${spring.cloud.nacos.discovery.namespace:}")
     private String namespace;
 
-    @Autowired
-    private RedisService redisService;
 
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
@@ -66,7 +63,7 @@ public class GatewayDynamicRouteService implements ApplicationEventPublisherAwar
     public void init() {
         log.info("gateway route init...");
         //先清空缓存中旧的路由
-        redisService.deleteObject(CacheConstants.GATEWAY_ROUTES);
+//        redisService.deleteObject(CacheConstants.GATEWAY_ROUTES);
         try {
             configService = initConfigService();
             if (configService == null) {
@@ -153,4 +150,7 @@ public class GatewayDynamicRouteService implements ApplicationEventPublisherAwar
                 .then(Mono.defer(() -> Mono.just(ResponseEntity.ok().build())))
                 .onErrorResume(t -> t instanceof NotFoundException, t -> Mono.just(ResponseEntity.notFound().build()));
     }
+
+
+
 }

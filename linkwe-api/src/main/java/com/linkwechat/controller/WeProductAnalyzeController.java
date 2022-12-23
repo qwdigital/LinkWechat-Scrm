@@ -1,5 +1,6 @@
 package com.linkwechat.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
@@ -135,19 +136,24 @@ public class WeProductAnalyzeController extends BaseController {
         DateTime dateTime = DateUtil.offsetDay(new Date(), -1);
         LambdaQueryWrapper<WeProductDayStatistics> query = new LambdaQueryWrapper<>();
         query.eq(WeProductDayStatistics::getDelFlag, 0);
-        query.apply("date_format(create_time,'%Y-%m-%d') = date_format('" + dateTime + "','%Y-%m-%d')");
-        WeProductDayStatistics yesterdayData = weProductDayStatisticsService.getOne(query);
-        if (ObjectUtil.isEmpty(yesterdayData)) {
-            yesterdayData = new WeProductDayStatistics();
-            yesterdayData.setDayOrderTotalNum(0);
-            yesterdayData.setDayRefundTotalFee("0");
-            yesterdayData.setDayOrderTotalFee("0");
-            yesterdayData.setDayNetIncome("0");
+        query.apply("date_format(create_time,'yyyy-MM-dd') = date_format('" + dateTime + "','yyyy-MM-dd')");
+        List<WeProductDayStatistics> yesterdayDatas = weProductDayStatisticsService.list(query);
+        if(CollectionUtil.isNotEmpty(yesterdayDatas)){
+            WeProductDayStatistics yesterdayData = yesterdayDatas.stream().findFirst().get();
+            if (ObjectUtil.isEmpty(yesterdayData)) {
+                yesterdayData = new WeProductDayStatistics();
+                yesterdayData.setDayOrderTotalNum(0);
+                yesterdayData.setDayRefundTotalFee("0");
+                yesterdayData.setDayOrderTotalFee("0");
+                yesterdayData.setDayNetIncome("0");
+            }
+            weProductAnalyzeStatisticsVo.setOrderNumComparedToYes(weProductAnalyzeStatisticsVo.getTodayOrderNum() - yesterdayData.getDayOrderTotalNum());
+            weProductAnalyzeStatisticsVo.setTotalFeeComparedToYes(weProductAnalyzeStatisticsVo.getTodayTotalFee().subtract(new BigDecimal(yesterdayData.getDayOrderTotalFee()).divide(tempBigDecimal).setScale(2, BigDecimal.ROUND_HALF_UP)));
+            weProductAnalyzeStatisticsVo.setRefundFeeComparedToYes(weProductAnalyzeStatisticsVo.getTodayRefundFee().subtract(new BigDecimal(yesterdayData.getDayRefundTotalFee()).divide(tempBigDecimal).setScale(2, BigDecimal.ROUND_HALF_UP)));
+            weProductAnalyzeStatisticsVo.setNetIncomeComparedToYes(weProductAnalyzeStatisticsVo.getTodayNetIncome().subtract(new BigDecimal(yesterdayData.getDayNetIncome()).divide(tempBigDecimal).setScale(2, BigDecimal.ROUND_HALF_UP)));
         }
-        weProductAnalyzeStatisticsVo.setOrderNumComparedToYes(weProductAnalyzeStatisticsVo.getTodayOrderNum() - yesterdayData.getDayOrderTotalNum());
-        weProductAnalyzeStatisticsVo.setTotalFeeComparedToYes(weProductAnalyzeStatisticsVo.getTodayTotalFee().subtract(new BigDecimal(yesterdayData.getDayOrderTotalFee()).divide(tempBigDecimal).setScale(2, BigDecimal.ROUND_HALF_UP)));
-        weProductAnalyzeStatisticsVo.setRefundFeeComparedToYes(weProductAnalyzeStatisticsVo.getTodayRefundFee().subtract(new BigDecimal(yesterdayData.getDayRefundTotalFee()).divide(tempBigDecimal).setScale(2, BigDecimal.ROUND_HALF_UP)));
-        weProductAnalyzeStatisticsVo.setNetIncomeComparedToYes(weProductAnalyzeStatisticsVo.getTodayNetIncome().subtract(new BigDecimal(yesterdayData.getDayNetIncome()).divide(tempBigDecimal).setScale(2, BigDecimal.ROUND_HALF_UP)));
+
+
 
         return AjaxResult.success(weProductAnalyzeStatisticsVo);
     }
