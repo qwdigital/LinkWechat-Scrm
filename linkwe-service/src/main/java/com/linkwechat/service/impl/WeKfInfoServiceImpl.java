@@ -385,7 +385,7 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
                 try {
                     List<SysUserVo> sysUserList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
                     if(CollectionUtil.isNotEmpty(sysUserList)){
-                        Map<String, String> userMap = sysUserList.stream().collect(Collectors.toMap(SysUserVo::getOpenUserid, SysUserVo::getUserName, (key1, key2) -> key2));
+                        Map<String, String> userMap = sysUserList.stream().collect(Collectors.toMap(SysUserVo::getWeUserId, SysUserVo::getUserName, (key1, key2) -> key2));
                         userId2NameMap.putAll(userMap);
                     }
                 } catch (Exception e) {

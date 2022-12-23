@@ -127,7 +127,7 @@ public class WeKfUserStatServiceImpl extends ServiceImpl<WeKfUserStatMapper, WeK
             List<SysUserVo> sysUserList = qwSysUserClient.getUserListByWeUserIds(sysUserQuery).getData();
             Map<String, Set<String>> userId2NameMap = new HashMap<>();
             if(CollectionUtil.isNotEmpty(sysUserList)){
-                Map<String, Set<String>> setMap = sysUserList.stream().collect(Collectors.groupingBy(SysUserVo::getOpenUserid, Collectors.mapping(SysUserVo::getUserName, Collectors.toSet())));
+                Map<String, Set<String>> setMap = sysUserList.stream().collect(Collectors.groupingBy(SysUserVo::getWeUserId, Collectors.mapping(SysUserVo::getUserName, Collectors.toSet())));
                 userId2NameMap.putAll(setMap);
             }
             userStatMap.forEach((userId, statList) -> {
