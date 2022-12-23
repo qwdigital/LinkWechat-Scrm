@@ -59,7 +59,7 @@ public class WeProductOrderStatisticsDataTask {
         //每日商品订单数据
         LambdaQueryWrapper<WeProductDayStatistics> query = new LambdaQueryWrapper<>();
         query.eq(WeProductDayStatistics::getDelFlag, 0);
-        query.apply("date_format(create_time,'yyyy-MM-dd') = date_format(now(),'yyyy-MM-dd')");
+        query.apply("date_format(create_time,'%Y-%m-%d') = date_format(now(),'%Y-%m-%d')");
         WeProductDayStatistics weProductDayStatistics = weProductDayStatisticsService.getOne(query);
         if (ObjectUtil.isNotEmpty(weProductDayStatistics)) {
             //修改数据

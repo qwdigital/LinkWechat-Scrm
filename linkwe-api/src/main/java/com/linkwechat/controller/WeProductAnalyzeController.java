@@ -135,7 +135,7 @@ public class WeProductAnalyzeController extends BaseController {
         DateTime dateTime = DateUtil.offsetDay(new Date(), -1);
         LambdaQueryWrapper<WeProductDayStatistics> query = new LambdaQueryWrapper<>();
         query.eq(WeProductDayStatistics::getDelFlag, 0);
-        query.apply("date_format(create_time,'yyyy-MM-dd') = date_format('" + dateTime + "','yyyy-MM-dd')");
+        query.apply("date_format(create_time,'%Y-%m-%d') = date_format('" + dateTime + "','%Y-%m-%d')");
         WeProductDayStatistics yesterdayData = weProductDayStatisticsService.getOne(query);
         if (ObjectUtil.isEmpty(yesterdayData)) {
             yesterdayData = new WeProductDayStatistics();
