@@ -365,7 +365,7 @@ public class WeKfPoolServiceImpl extends ServiceImpl<WeKfPoolMapper, WeKfPool> i
             Set<String> userIdSet = recordList.stream().map(WeKfRecordListVo::getUserId).collect(Collectors.toSet());
             if(CollectionUtil.isNotEmpty(userIdSet)){
                 SysUserQuery userQuery = new SysUserQuery();
-                userQuery.setOpenUserIds(new ArrayList<>(userIdSet));
+                userQuery.setWeUserIds(new ArrayList<>(userIdSet));
                 try {
                     List<SysUserVo> sysUserList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
                     if(CollectionUtil.isNotEmpty(sysUserList)){
