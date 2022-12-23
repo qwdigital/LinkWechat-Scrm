@@ -22,7 +22,7 @@ import java.util.List;
  */
 @Component
 public class RedisRouteDefinitionRepository implements RouteDefinitionRepository {
-//    public static final String GATEWAY_ROUTES = "gateway_dynamic_routes";
+
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -32,6 +32,8 @@ public class RedisRouteDefinitionRepository implements RouteDefinitionRepository
         List<RouteDefinition> routeDefinitions = Lists.newArrayList();
         stringRedisTemplate.opsForHash().values(CacheConstants.GATEWAY_ROUTES).forEach(routeDefinition -> routeDefinitions.add(
                 JSON.parseObject(routeDefinition.toString(), RouteDefinition.class)));
+
+
         return Flux.fromIterable(routeDefinitions);
     }
 
