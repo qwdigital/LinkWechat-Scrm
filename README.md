@@ -1,7 +1,7 @@
 <p></p>
 <p></p>
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/132836_bcaf4618_1480777.png "Snipaste_2021-11-08_13-28-16.png")
+![输入图片说明](readme-pic/logo.png)
 
 <div align="center">
 
