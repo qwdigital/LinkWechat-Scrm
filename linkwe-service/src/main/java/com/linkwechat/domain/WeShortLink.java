@@ -79,6 +79,13 @@ public class WeShortLink extends BaseEntity implements Serializable {
     @TableField("long_link")
     private String longLink;
 
+    /**
+     * 短链接
+     */
+    @ApiModelProperty(value = "短链接")
+    @TableField("short_link")
+    private String shortLink;
+
 
     /**
      * 业务类型 1-公众号 2-微信 3-微信群 4-员工活码 5-群活码 6-门店活码 7-小程序

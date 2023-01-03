@@ -24,14 +24,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/short/link")
-@Api(tags = "活码管理")
+@Api(tags = "短链管理")
 public class WeShortLinkController extends BaseController {
 
     @Autowired
     private IWeShortLinkService weShortLinkService;
 
     @ApiOperation(value = "新增短链", httpMethod = "POST")
-    @Log(title = "活码管理", businessType = BusinessType.INSERT)
+    @Log(title = "新增短链", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     public AjaxResult addShortLink(@RequestBody @Validated WeShortLinkAddQuery weQrAddQuery) {
         return AjaxResult.success();
