@@ -29,5 +29,8 @@ public interface WeKfInfoMapper extends BaseMapper<WeKfInfo> {
      */
     @DataScope(type = "2", value = @DataColumn(alias = "wki", name = "create_by_id", userid = "user_id"))
     List<QwKfListVo> getKfList(WeKfListQuery query);
+
+    @DataScope(type = "2", value = @DataColumn(alias = "wki", name = "create_by_id", userid = "user_id"))
+    List<Long> getKfIdList(WeKfListQuery query);
 }
 

@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author danmo
@@ -135,6 +136,9 @@ public class WeKfRecordListVo {
     }
 
     public String getReceptionTypeStr() {
+        if(Objects.isNull(receptionType)){
+            return "";
+        }
         if(receptionType == 1){
             return "人工客服";
         }else if(receptionType == 2){

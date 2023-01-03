@@ -3,6 +3,7 @@ package com.linkwechat.controller;
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
@@ -113,7 +114,7 @@ public class WeKfController extends BaseController {
     public TableDataInfo<QwKfListVo> getKfPageList(WeKfListQuery query) {
         log.info("客服列表入参(分页)：param:{}", JSONObject.toJSONString(query));
         startPage();
-        List<QwKfListVo> kfList = weKfInfoService.getKfList(query);
+        PageInfo<QwKfListVo> kfList = weKfInfoService.getKfPageList(query);
         return getDataTable(kfList);
     }
 
