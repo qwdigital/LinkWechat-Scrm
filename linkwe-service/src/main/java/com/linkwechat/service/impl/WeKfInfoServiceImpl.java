@@ -14,6 +14,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.context.SecurityContextHolder;
@@ -419,6 +420,22 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
             }
         }
         return kfList;
+    }
+
+    @Override
+    public PageInfo<QwKfListVo> getKfPageList(WeKfListQuery query) {
+        List<Long> kfIds= this.baseMapper.getKfIdList(query);
+        WeKfListQuery weKfListQuery = new WeKfListQuery();
+        weKfListQuery.setIds(kfIds);
+
+        List<QwKfListVo> kfList = getKfList(weKfListQuery);
+
+        PageInfo<Long> pageIdInfo = new PageInfo<>(kfIds);
+        PageInfo<QwKfListVo> pageInfo = new PageInfo<>(kfList);
+        pageInfo.setTotal(pageIdInfo.getTotal());
+        pageInfo.setPageNum(pageIdInfo.getPageNum());
+        pageInfo.setPageSize(pageIdInfo.getPageSize());
+        return pageInfo;
     }
 
     @Override
