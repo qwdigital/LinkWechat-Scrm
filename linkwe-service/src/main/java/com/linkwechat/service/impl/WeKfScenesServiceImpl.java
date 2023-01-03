@@ -15,6 +15,7 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.linkwechat.common.core.domain.FileEntity;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.img.NetFileUtils;
 import com.linkwechat.domain.WeKfScenes;
 import com.linkwechat.domain.kf.query.WeAddKfScenesQuery;
@@ -90,7 +91,7 @@ public class WeKfScenesServiceImpl extends ServiceImpl<WeKfScenesMapper, WeKfSce
             log.error("生成场景二维码异常, openKfId={}", query.getOpenKfId(),e);
             throw new WeComException("生成二维码异常");
         }
-
+        weKfScenes.setCorpId(SecurityUtils.getCorpId());
         weKfScenes.setName(query.getName());
         weKfScenes.setScenes(scenes);
         weKfScenes.setOpenKfId(query.getOpenKfId());

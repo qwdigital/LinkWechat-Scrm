@@ -65,11 +65,11 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
             Map<Integer, String> deptId2NameMap = new HashMap<>();
             if(CollectionUtil.isNotEmpty(userIdSet)){
                 SysUserQuery userQuery = new SysUserQuery();
-                userQuery.setOpenUserIds(new ArrayList<>(userIdSet));
+                userQuery.setWeUserIds(new ArrayList<>(userIdSet));
                 try {
                     List<SysUserVo> sysUserList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
                     if(CollectionUtil.isNotEmpty(sysUserList)){
-                        Map<String, String> userMap = sysUserList.stream().collect(Collectors.toMap(SysUserVo::getOpenUserid, SysUserVo::getUserName, (key1, key2) -> key2));
+                        Map<String, String> userMap = sysUserList.stream().collect(Collectors.toMap(SysUserVo::getWeUserId, SysUserVo::getUserName, (key1, key2) -> key2));
                         userId2NameMap.putAll(userMap);
                     }
                 } catch (Exception e) {
@@ -212,12 +212,12 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
 
             if(CollectionUtil.isNotEmpty(userIdSet) || CollectionUtil.isNotEmpty(deptIdSet)){
                 SysUserQuery userQuery = new SysUserQuery();
-                userQuery.setOpenUserIds(new ArrayList<>(userIdSet));
+                userQuery.setWeUserIds(new ArrayList<>(userIdSet));
                 userQuery.setDeptIds(new ArrayList<>(deptIdSet));
                 try {
                     List<SysUserVo> sysUserList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
                     if(CollectionUtil.isNotEmpty(sysUserList)){
-                        Map<String, Integer> userMap = sysUserList.stream().collect(Collectors.toMap(SysUserVo::getOpenUserid, SysUserVo::getKfStatus, (key1, key2) -> key2));
+                        Map<String, Integer> userMap = sysUserList.stream().collect(Collectors.toMap(SysUserVo::getWeUserId, SysUserVo::getKfStatus, (key1, key2) -> key2));
                         userMap.forEach((userId, status) ->{
                             WeKfUser weKfUser = new WeKfUser();
                             weKfUser.setUserId(userId);

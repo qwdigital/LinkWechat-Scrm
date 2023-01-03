@@ -845,7 +845,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     public List<SysUserVo> getUserListByWeUserIds(SysUserQuery query) {
         List<SysUser> sysUserList = list(new LambdaQueryWrapper<SysUser>()
-                .in(CollectionUtil.isNotEmpty(query.getOpenUserIds()), SysUser::getOpenUserid, query.getOpenUserIds())
+                .in(CollectionUtil.isNotEmpty(query.getWeUserIds()), SysUser::getWeUserId, query.getWeUserIds())
                 .in(CollectionUtil.isNotEmpty(query.getDeptIds()),SysUser::getDeptId,query.getDeptIds())
                 .eq(SysUser::getDelFlag, 0));
         if(CollectionUtil.isNotEmpty(sysUserList)){
