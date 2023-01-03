@@ -11,4 +11,7 @@ public class FileConfig {
     private CosConfig cos;
     /**文件前缀*/
     private String imgUrlPrefix;
+
+    /**Aes加解密的key*/
+    private String aesKey;
 }

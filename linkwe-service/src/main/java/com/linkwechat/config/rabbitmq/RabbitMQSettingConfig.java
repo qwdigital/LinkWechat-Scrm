@@ -155,6 +155,10 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.sync.product:Rk_Product}")
     private String weProductRk;
 
+    //商品图册订单同步路由
+    @Value("${wecom.mq.route.sync.product.order:Rk_Product_Order}")
+    private String weProductOrderRk;
+
     /**
      * -------------------队列------------------------------------
      */
@@ -241,4 +245,8 @@ public class RabbitMQSettingConfig {
     //商品图册同步队列
     @Value("${wecom.mq.queue.sync.product:Qu_Product}")
     private String weProductQu;
+
+    //商品图册同步队列
+    @Value("${wecom.mq.queue.sync.product.order:Qu_Product_Order}")
+    private String weProductOrderQu;
 }

@@ -35,7 +35,7 @@
 
     <select id="findWeGroupChatInfoVo" resultType="com.linkwechat.domain.groupcode.vo.WeGroupChatInfoVo">
         SELECT
-        COUNT(if(wgm.del_flag=0,wgm.user_id,NULL)) as chatGroupMemberTotalNum,
+        COUNT(DISTINCT if(wgm.del_flag=0,wgm.user_id,NULL)) as chatGroupMemberTotalNum,
 
         COUNT(IF(TO_DAYS(wgm.join_time)&lt;TO_DAYS(NOW()) AND wgm.del_flag=0,wgm.user_id,null)) as oldChatGroupMemberTotalNum,
 

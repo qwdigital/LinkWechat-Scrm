@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.linkwechat.common.annotation.Log;
+import com.linkwechat.common.constant.SiteStasConstants;
 import com.linkwechat.common.constant.SiteStatsConstants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 智能表单统计Controller
@@ -480,7 +482,7 @@ public class WeFormSurveyStatisticsController extends BaseController {
     @ApiOperation("文件答案数据导出")
     @Log(title = "文件答案数据导出")
     @PostMapping("/answer/export")
-    public AjaxResult answer(){
+    public AjaxResult answer() {
 
         return AjaxResult.success();
     }
@@ -495,25 +497,31 @@ public class WeFormSurveyStatisticsController extends BaseController {
     @PostConstruct
     public void siteStasInit() {
         log.info("表单站点统计初始化=>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        //所有的表单
         List<WeFormSurveyCatalogue> weFormSurveyCatalogues = weFormSurveyCatalogueService.getListIgnoreTenantId();
+        //上次的站点统计的数据
+        List<WeFormSurveySiteStas> list = weFormSurveySiteStasService.list();
+        Map<Long, Integer> collect = list.stream().collect(Collectors.toMap(WeFormSurveySiteStas::getBelongId, WeFormSurveySiteStas::getTotalVisits
+                ,(value1, value2 )->{
+                    return value1;
+                }));
+
         if (weFormSurveyCatalogues != null && weFormSurveyCatalogues.size() > 0) {
             for (WeFormSurveyCatalogue weFormSurveyCatalogue : weFormSurveyCatalogues) {
-                //上次的站点统计的数据
-                QueryWrapper<WeFormSurveySiteStas> queryWrapper = new QueryWrapper<>();
-                queryWrapper.lambda().eq(WeFormSurveySiteStas::getBelongId, weFormSurveyCatalogue.getId());
-                WeFormSurveySiteStas weFormSurveySiteStas = weFormSurveySiteStasService.getOne(queryWrapper);
-
                 String channelsName = weFormSurveyCatalogue.getChannelsName();
                 if (StringUtils.isNotBlank(channelsName)) {
                     String[] split = channelsName.split(",");
                     for (String channelName : split) {
                         //PV
-                        String pvKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channelName);
-                        redisTemplate.opsForValue().set(pvKey, weFormSurveySiteStas != null ? weFormSurveySiteStas.getTotalVisits() : 0);
+                        String pvKey = StringUtils.format(SiteStasConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channelName);
+                        if (!redisTemplate.hasKey(pvKey)) {
+                            redisTemplate.opsForValue().set(pvKey, collect.get(weFormSurveyCatalogue.getId()) != null ? collect.get(weFormSurveyCatalogue.getId()) : 0);
+                        }
                         //IP
-                        String ipKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channelName);
-                        redisTemplate.delete(ipKey);
-                        redisTemplate.opsForSet().add(ipKey, "");
+                        String ipKey = StringUtils.format(SiteStasConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channelName);
+                        if (!redisTemplate.hasKey(ipKey)) {
+                            redisTemplate.opsForSet().add(ipKey, "");
+                        }
                     }
                 }
             }
