@@ -27,4 +27,7 @@ public class WeKfListQuery extends BaseEntity {
 
     @ApiModelProperty("接待场景id")
     private List<String> scenesIds;
+
+    @ApiModelProperty(hidden = true)
+    private List<Long> ids;
 }

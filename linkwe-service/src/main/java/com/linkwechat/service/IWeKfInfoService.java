@@ -1,6 +1,7 @@
 package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.domain.WeKfInfo;
 import com.linkwechat.domain.kf.query.WeAddKfInfoQuery;
 import com.linkwechat.domain.kf.query.WeKfListQuery;
@@ -81,6 +82,13 @@ public interface IWeKfInfoService extends IService<WeKfInfo> {
     List<QwKfListVo> getKfList(WeKfListQuery query);
 
     /**
+     * 客服列表(分页)
+     * @param query
+     * @return
+     */
+    PageInfo<QwKfListVo> getKfPageList(WeKfListQuery query);
+
+    /**
      * 根据客服账号ID查询客服详情
      *
      * @param corpId
@@ -112,4 +120,6 @@ public interface IWeKfInfoService extends IService<WeKfInfo> {
      * @param weKfPoolInfo
      */
     void sendEndMsg(String code, WeKfInfo weKfInfo, WeKfPool weKfPoolInfo);
+
+
 }
