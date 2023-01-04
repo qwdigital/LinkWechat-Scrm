@@ -18,7 +18,7 @@
         TIMESTAMPDIFF(SECOND ,record.session_start_time,record.session_end_time) as  duration,
         wki.name as kf_name,
         wki.avatar as kf_avatar,
-        wki.reception_type,
+        ifnull(wki.reception_type,1) as reception_type,
         wki.open_kf_id
         from we_kf_customer wkc
         left join we_kf_pool record on wkc.external_userid = record.external_userid
