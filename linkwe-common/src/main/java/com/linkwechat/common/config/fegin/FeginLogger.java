@@ -1,4 +1,4 @@
-package com.linkwechat.config.fegin;
+package com.linkwechat.common.config.fegin;
 
 import feign.Request;
 import feign.Response;

@@ -94,18 +94,20 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
 
     @Override
     public void orderSyncExecute(String corpId) {
-        WeGetBillListQuery query = new WeGetBillListQuery();
-        query.setCorpid(corpId);
-        long beginTime = DateUtil.offset(DateUtil.date(), DateField.DAY_OF_YEAR, -1).getTime();
-        query.setBeginTime(beginTime);
-        long endTime = DateUtil.date().getTime();
-        query.setEndTime(endTime);
-        if (StringUtils.isNotBlank(cursor)) {
-            query.setCursor(cursor);
+        synchronized (WeProductOrderServiceImpl.class) {
+            WeGetBillListQuery query = new WeGetBillListQuery();
+            query.setCorpid(corpId);
+            long beginTime = DateUtil.offset(DateUtil.date(), DateField.DAY_OF_YEAR, -1).getTime();
+            query.setBeginTime(beginTime);
+            long endTime = DateUtil.date().getTime();
+            query.setEndTime(endTime);
+            if (StringUtils.isNotBlank(cursor)) {
+                query.setCursor(cursor);
+            }
+            query.setLimit(100);
+            //处理订单
+            getBillList(query);
         }
-        query.setLimit(100);
-        //处理订单
-        getBillList(query);
     }
 
     /**

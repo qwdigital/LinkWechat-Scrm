@@ -232,7 +232,7 @@ public class WeCustomerSeasController extends BaseController {
         if(StringUtils.isEmpty(weCustomerSea.getPhone())){
             return AjaxResult.error("手机号不可为空");
         }
-        iWeCustomerSeasService.update(WeCustomerSeas.builder().addState(new Integer(1)).build()
+        iWeCustomerSeasService.update(WeCustomerSeas.builder().addState(new Integer(3)).build()
                 ,new LambdaQueryWrapper<WeCustomerSeas>().eq(WeCustomerSeas::getPhone,weCustomerSea.getPhone()));
 
         return AjaxResult.success();

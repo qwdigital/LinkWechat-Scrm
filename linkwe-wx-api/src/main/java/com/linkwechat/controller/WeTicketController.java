@@ -38,4 +38,6 @@ public class WeTicketController extends BaseController {
                 qwTicketClient.getWxTicket().getData()
                 ,url));
     }
+
+
 }

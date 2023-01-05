@@ -1,4 +1,4 @@
-package com.linkwechat.config.fegin;
+package com.linkwechat.common.config.fegin;
 
 import feign.codec.Encoder;
 import feign.form.spring.SpringFormEncoder;
