@@ -154,6 +154,12 @@ public class LinkWeChatConfig {
 
     private String taskFissionUrl;
 
+    /**
+     * 短链域名
+     */
+    private String shortLinkUrl;
+
+
     public String getName() {
         return name;
     }
