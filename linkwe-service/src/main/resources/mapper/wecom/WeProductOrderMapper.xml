@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeProductOrderMapper">
+
+    <resultMap id="weProductOrderWareVo" type="com.linkwechat.domain.product.order.vo.WeProductOrderWareVo">
+        <id property="id" column="id"></id>
+        <result property="productId" column="product_id"></result>
+        <result property="orderNo" column="order_no"></result>
+        <result property="picture" column="picture"></result>
+        <result property="describe" column="describe"></result>
+        <result property="externalUserid" column="external_userid"></result>
+        <result property="externalAvatar" column="external_avatar"></result>
+        <result property="externalName" column="external_name"></result>
+        <result property="externalType" column="external_type"/>
+        <result property="productNum" column="product_num"></result>
+        <result property="totalFee" column="total_fee"></result>
+        <result property="payTime" column="pay_time"></result>
+        <result property="weUserId" column="we_user_id"></result>
+        <result property="weUserName" column="we_user_name"></result>
+        <result property="mchName" column="mch_name"></result>
+        <result property="mchId" column="mch_id"></result>
+        <result property="orderState" column="order_state"></result>
+        <result property="contact" column="contact"></result>
+        <result property="phone" column="phone"></result>
+        <result property="address" column="address"></result>
+        <collection property="refunds" ofType="com.linkwechat.domain.product.refund.vo.WeProductOrderRefundVo">
+            <id property="id" column="rId"></id>
+            <result property="refundState" column="refund_state"></result>
+            <result property="refundFee" column="refund_fee"></result>
+            <result property="refundNo" column="refund_no"></result>
+            <result property="refundTime" column="refund_time"></result>
+            <result property="refundUserName" column="refund_user_name"></result>
+            <result property="remark" column="remark"></result>
+        </collection>
+    </resultMap>
+
+
+    <select id="list" resultMap="weProductOrderWareVo">
+        select
+        o.id,
+        o.product_id,
+        o.order_no,
+        p.picture,
+        p.`describe`,
+        o.external_userid,
+        o.external_avatar,
+        o.external_name,
+        o.external_type,
+        o.product_num,
+        o.total_fee,
+        o.pay_time,
+        o.we_user_id,
+        o.we_user_name,
+        o.mch_name,
+        o.mch_id,
+        o.order_state,
+        o.contact,
+        o.phone,
+        o.address,
+        r.id as rId,
+        r.refund_state,
+        r.refund_fee,
+        r.refund_no,
+        r.refund_time,
+        r.refund_user_name,
+        r.remark
+        from we_product_order o
+        left join we_product p on o.product_id = p.id
+        left join we_product_order_refund r on o.order_no = r.order_no
+        <where>
+            o.del_flag = 0
+            <if test="productId!=null">
+                and o.product_id = #{productId}
+            </if>
+            <if test="weUserId!=null and weUserId!=''">
+                and o.we_user_id = #{weUserId}
+            </if>
+            <if test="orderState!=null">
+                and o.order_state = #{orderState}
+            </if>
+            <if test="refundState!=null">
+                and o.refund_state = #{refundState}
+            </if>
+            <if test="beginTime!=null and beginTime!='' and endTime!=null and endTime!=''">
+                and DATE_FORMAT(o.pay_time,'%Y-%m-%d') between STR_TO_DATE(#{beginTime},'%Y-%m-%d') and STR_TO_DATE(#{endTime},'%Y-%m-%d')
+            </if>
+            <if test="productName!=null and productName!=''">
+                and p.describe like concat('%',#{productName},'%')
+            </if>
+            <if test="externalName!=null and externalName!=''">
+                and o.external_name like concat('%',#{externalName},'%')
+            </if>
+        </where>
+    </select>
+</mapper>

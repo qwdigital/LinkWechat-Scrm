@@ -1,4 +1,4 @@
-package com.linkwechat.domain.product.vo;
+package com.linkwechat.domain.product.product.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
