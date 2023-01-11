@@ -211,7 +211,7 @@
                 LEFT JOIN we_customer wc ON wc.external_userid = wset.target_id
                 LEFT JOIN we_sop_base wsb on wsb.id=wset.sop_base_id
         WHERE
-            wc.add_user_id = #{weUserId}  AND wset.target_type = 1 and wc.del_flag=0 and wc.track_state !=5
+            wc.add_user_id = #{weUserId}  AND wset.target_type = 1 and wc.del_flag=0 and wset.execute_state=1
             and wsb.del_flag=0  and wsb.sop_state=1 and wsb.send_type=2
             AND to_days( wseta.push_start_time ) = to_days(now())
     </select>

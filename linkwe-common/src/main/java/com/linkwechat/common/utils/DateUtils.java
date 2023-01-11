@@ -8,10 +8,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -486,6 +483,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     public static String getBeforeByHourTime(int ihour){
         String returnstr = "";
         Calendar calendar = Calendar.getInstance();
+        calendar.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
         calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) - ihour);
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         returnstr = df.format(calendar.getTime());
@@ -501,6 +499,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     public static  String getBeforeByMinute(int minute){
 
         Calendar beforeTime = Calendar.getInstance();
+        beforeTime.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
         beforeTime.add(Calendar.MINUTE, -minute);// n分钟之前的时间
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return df.format(beforeTime.getTime());

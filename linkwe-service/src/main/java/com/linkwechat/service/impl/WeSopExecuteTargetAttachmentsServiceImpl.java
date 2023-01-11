@@ -203,7 +203,10 @@ implements IWeSopExecuteTargetAttachmentsService {
                 if(isExpiringSoon){
                     textContent.append("以下客群的SOP推送时间剩余10分钟。\r\n");
                 }else{
-                    textContent.append(" 今天有" + weCustomerSopPushTaskDto.size() + "个客群SOP待推送。\r\n");
+
+                    textContent.append(" 今天有" +
+                            weCustomerSopPushTaskDto.stream().map(WeSopPushTaskDto::getTargetId).collect(Collectors.toSet()).size()
+                            + "个客群SOP待推送。\r\n");
                 }
 
 
@@ -212,7 +215,9 @@ implements IWeSopExecuteTargetAttachmentsService {
                 if(isExpiringSoon){
                   textContent.append("以下客户的SOP推送时间剩余10分钟。\r\n");
                 }else{
-                    textContent.append(" 今天有" + weCustomerSopPushTaskDto.size() + "个客户SOP待推送。\r\n");
+                    textContent.append(" 今天有" +
+                            weCustomerSopPushTaskDto.stream().map(WeSopPushTaskDto::getTargetId).collect(Collectors.toSet()).size()
+                            + "个客户SOP待推送。\r\n");
                 }
 
             }
@@ -229,6 +234,7 @@ implements IWeSopExecuteTargetAttachmentsService {
                     List<WeGroup> weGroups = ((WeGroupMapper)iWeGroupService.getBaseMapper()).selectList(
                             new LambdaQueryWrapper<WeGroup>()
                                     .in(WeGroup::getChatId, weCustomerSopPushTaskDto.stream().map(WeSopPushTaskDto::getTargetId).collect(Collectors.toList()))
+                                    .last("limit 10")
                     );
 
                     if(CollectionUtil.isNotEmpty(weGroups)){
@@ -271,6 +277,7 @@ implements IWeSopExecuteTargetAttachmentsService {
                             new LambdaQueryWrapper<WeCustomer>()
                                     .eq(WeCustomer::getAddUserId,executeWeUserId)
                                     .in(WeCustomer::getExternalUserid, weCustomerSopPushTaskDto.stream().map(WeSopPushTaskDto::getTargetId).collect(Collectors.toList()))
+                                    .last("limit 10")
                     );
 
 

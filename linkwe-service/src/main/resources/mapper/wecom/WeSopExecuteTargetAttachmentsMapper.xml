@@ -19,7 +19,7 @@
             we_sop_execute_target_attachments wseta
                 LEFT JOIN we_sop_execute_target wset ON wset.id = wseta.execute_target_id
                 LEFT JOIN we_sop_base wsb ON wset.sop_base_id = wsb.id
-        WHERE wsb.del_flag=0  and wsb.sop_state=1
+        WHERE wsb.del_flag=0  and wsb.sop_state=1 and wset.execute_state=1
           <if test="targetType !=null">
               AND wset.target_type=#{targetType}
           </if>
