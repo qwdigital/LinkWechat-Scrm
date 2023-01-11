@@ -4,7 +4,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.common.core.domain.dto.SysUserDTO;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.page.PageDomain;
+import com.linkwechat.domain.system.user.query.SysUserQuery;
+import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.web.domain.vo.UserVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -222,7 +225,7 @@ public interface ISysUserService extends IService<SysUser> {
      */
     void syncUserAndDeptHandler(String msg);
 
-    int addUser(SysUserDTO sysUser);
+    SysUser addUser(SysUserDTO sysUser);
 
 
     /**
@@ -238,4 +241,23 @@ public interface ISysUserService extends IService<SysUser> {
     void getUserSensitiveInfo(String userTicket);
 
     void getUserSensitiveInfo(Long userId, String userTicket);
+
+
+    List<SysUser> findAllSysUser(String weUserIds,String positions,String deptIds);
+
+    /**
+     * 根据we_user_id获取用户，如果没有则从企业微信端同步
+     * @param weuserId
+     * @return
+     */
+    SysUser findOrSynchSysUser(String weuserId);
+
+
+
+    /**
+     * 通过企微员工ID获取员工信息
+     * @param query
+     * @return
+     */
+    List<SysUserVo> getUserListByWeUserIds(SysUserQuery query);
 }

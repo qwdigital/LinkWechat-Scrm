@@ -27,6 +27,13 @@ public interface IWeCustomerService extends IService<WeCustomer> {
     List<WeCustomersVo> findWeCustomerList(WeCustomersQuery weCustomersQuery, PageDomain pageDomain);
 
 
+    /**
+     * 应用客户列表
+     * @param weCustomersQuery
+     * @param pageDomain
+     * @return
+     */
+    TableDataInfo<List<WeCustomersVo>> findWeCustomerListByApp(WeCustomersQuery weCustomersQuery, PageDomain pageDomain);
 
     /**
      * 客户总数统计
@@ -159,7 +166,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
      * @param externalUserId 客户ID
      * @param userId 成员ID
      */
-    void updateCustomer(String externalUserId, String userId);
+    WeCustomer updateCustomer(String externalUserId, String userId);
 
 
     /**
@@ -228,4 +235,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
     List<String> findWeUserIds();
 
     List<WeCustomersVo> findWeCustomerList(List<String> customerIds);
+
+
+     WeCustomer findOrSynchWeCustomer(String externalUserid);
 }

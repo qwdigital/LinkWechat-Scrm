@@ -14,9 +14,9 @@ import java.util.Date;
 @Data
 public class WeMaterialVo {
     /**
-     * 素材类型。参考 {@link com.linkwechat.common.enums.MediaType}
+     * 素材类型
      */
-    private Integer mediaType;
+    private String mediaType;
 
     private Long id;
 
@@ -58,7 +58,7 @@ public class WeMaterialVo {
     /**
      * 创建时间
      */
-     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     /**
@@ -69,6 +69,17 @@ public class WeMaterialVo {
     /**
      * 更新时间
      */
-     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private String updateTime;
+
+
+    /**
+     * 轨迹素材生成的H5链接
+     */
+    private String linkUrl;
+
+    /**
+     * 素材类型
+     */
+    private String resourceType;
 }

@@ -33,7 +33,7 @@ public class WeStoreCode extends BaseEntity {
     //区id
     private Integer areaId;
     //省市区
-    @Excel(name = "所属地图")
+    @Excel(name = "所属地区")
     private String area;
     //详细地址
     @Excel(name = "详细地址")

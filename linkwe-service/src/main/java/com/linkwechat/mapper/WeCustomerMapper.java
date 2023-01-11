@@ -1,5 +1,6 @@
 package com.linkwechat.mapper;
 
+import com.baomidou.mybatisplus.annotation.SqlParser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
@@ -172,6 +173,15 @@ public interface WeCustomerMapper extends BaseMapper<WeCustomer> {
      */
     
     void deleteWeCustomer(@Param("externalUserId") String externalUserId,@Param("userId") String userId);
+
+
+
+    /**
+     * 获取应用相关客户id(对应企业微信客户id)列表
+     * @param weCustomersQuery
+     * @return
+     */
+    List<String> findWeCustomerListEuIds(@Param("weCustomerList") WeCustomersQuery weCustomersQuery);
 
 
 

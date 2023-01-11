@@ -1,13 +1,18 @@
 package com.linkwechat.fegin;
 
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.entity.SysDept;
 import com.linkwechat.domain.wecom.query.department.WeDeptQuery;
 import com.linkwechat.domain.wecom.vo.department.WeDeptIdVo;
 import com.linkwechat.domain.wecom.vo.department.WeDeptVo;
 import com.linkwechat.fallback.QwDeptFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 /**
  * @author leejoker
@@ -24,12 +29,5 @@ public interface QwDeptClient {
     @PostMapping("/dept/list")
     AjaxResult<WeDeptVo> getDeptList(@RequestBody WeDeptQuery query);
 
-    /**
-     * 获取部门ID列表
-     *
-     * @param query
-     * @return
-     */
-    @PostMapping("/simplelist")
-    AjaxResult<WeDeptIdVo> getDeptSimpleList(@RequestBody WeDeptQuery query);
+
 }

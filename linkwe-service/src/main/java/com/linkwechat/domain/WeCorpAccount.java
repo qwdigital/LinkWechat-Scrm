@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -28,7 +29,7 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WeCorpAccount implements Serializable {
+public class WeCorpAccount extends BaseEntity {
 
     private static final long serialVersionUID = 1L; //1
 
@@ -71,6 +72,12 @@ public class WeCorpAccount implements Serializable {
     @NotBlank(message = "通讯录Secret不可为空")
     @TableField("corp_secret")
     private String corpSecret;
+
+    /**
+     * 直播Secret
+     */
+    @TableField("live_secret")
+    private String liveSecret;
 
     /***********************************************
      *******************通讯录配置end****************

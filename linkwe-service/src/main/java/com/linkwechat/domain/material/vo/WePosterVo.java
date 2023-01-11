@@ -54,6 +54,13 @@ public class WePosterVo extends BaseEntity {
 
     @ApiModelProperty(value = "删除状态 0-正常 1-删除")
     private Integer delFlag;
+
+    /**
+     * 轨迹素材生成的H5链接
+     */
+    @ApiModelProperty(value = "轨迹素材生成的H5链接")
+    private String linkUrl;
+
     /**
      * 海报组件数组
      */

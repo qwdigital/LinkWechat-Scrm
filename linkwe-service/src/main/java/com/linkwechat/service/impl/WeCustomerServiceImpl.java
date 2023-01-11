@@ -91,6 +91,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     private IWeMessagePushService iWeMessagePushService;
 
 
+    @Autowired
+    private IWeCustomerSeasService iWeCustomerSeasService;
+
+
 
     @Override
     public List<WeCustomersVo> findWeCustomerList(WeCustomersQuery weCustomersQuery, PageDomain pageDomain) {
@@ -104,6 +108,39 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         return weCustomersVos;
     }
 
+    @Override
+    public TableDataInfo<List<WeCustomersVo>> findWeCustomerListByApp(WeCustomersQuery weCustomersQuery, PageDomain pageDomain) {
+
+        TableDataInfo<List<WeCustomersVo>> tableDataInfo=new TableDataInfo<>();
+        tableDataInfo.setCode(HttpStatus.SUCCESS);
+        if(weCustomersQuery.getDataScope()){//这里指的全部数据,是角色的那些数据
+            tableDataInfo.setRows(
+                    this.findWeCustomerList(weCustomersQuery,pageDomain)
+            );
+            tableDataInfo.setTotal(
+                    this.countWeCustomerList(weCustomersQuery)
+            );
+        }else{//个人数据
+            weCustomersQuery.setFirstUserId(
+                    SecurityUtils.getLoginUser().getSysUser().getWeUserId()
+            );
+            List<String> customerIds = this.baseMapper.findWeCustomerListIdsByApp(weCustomersQuery, pageDomain);
+             if(CollectionUtil.isNotEmpty(customerIds)){
+                 tableDataInfo.setRows(
+                         this.baseMapper.findWeCustomerList(customerIds)
+                 );
+                 tableDataInfo.setTotal(
+                         this.countWeCustomerListByApp(weCustomersQuery)
+                 );
+             }
+        }
+        List<WeCustomersVo> rows = tableDataInfo.getRows();
+        if(CollectionUtil.isEmpty(rows)){
+            tableDataInfo.setRows(new ArrayList<>());
+        }
+
+        return tableDataInfo;
+    }
 
     @Override
     public long countWeCustomerList(WeCustomersQuery weCustomersQuery) {
@@ -761,7 +798,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                                 .allocateTime(new Date())
                                                 .extentType(new Integer(1))
                                                 .externalUserid(weOnTheJobCustomerQuery.getExternalUserid())
-                                                .handoverUserid(weOnTheJobCustomerQuery.getHandoverUserId())
+                                                .handoverUserId(weOnTheJobCustomerQuery.getHandoverUserId())
                                                 .takeoverUserid(weOnTheJobCustomerQuery.getTakeoverUserId())
                                                 .failReason("在职继承")
                                                 .build()
@@ -796,8 +833,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             weCustomer.setAvatar(externalContact.getAvatar());
             weCustomer.setGender(externalContact.getGender());
             weCustomer.setUnionid(externalContact.getUnionId());
-            weCustomer.setDelFlag(0);
+            weCustomer.setDelFlag(Constants.COMMON_STATE);
             weCustomer.setAddUserId(userId);
+
+
+
 
 
 
@@ -819,6 +859,20 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 weCustomer.setRemarkName(followUserEntity.getRemark());
                 weCustomer.setOtherDescr(followUserEntity.getDescription());
                 weCustomer.setPhone(String.join(",", Optional.ofNullable(followUserEntity.getRemarkMobiles()).orElseGet(ArrayList::new)));
+
+                Map<String, SysUser> currentTenantSysUser = findCurrentTenantSysUser();
+
+                if(CollectionUtil.isNotEmpty(currentTenantSysUser)){
+                    SysUser sysUser = currentTenantSysUser.get(followUserEntity.getUserId());
+
+                    if(null != sysUser){
+                        weCustomer.setCreateBy(sysUser.getUserName());
+                        weCustomer.setCreateById(sysUser.getUserId());
+                        weCustomer.setUpdateBy(sysUser.getUserName());
+                        weCustomer.setUpdateById(sysUser.getUserId());
+                    }
+                }
+
                 //设置标签
                 List<WeCustomerDetailVo.ExternalUserTag> tags = followUserEntity.getTags();
                 if (CollectionUtil.isNotEmpty(tags)) {
@@ -836,6 +890,24 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             this.baseMapper.batchAddOrUpdate(ListUtil.toList(weCustomer));
 
 
+            if(CustomerAddWay.ADD_WAY_SSSJH.getKey().equals(weCustomer.getAddMethod())){//添加方式为手机号搜索,更新客户公海中对应的状态
+
+                if(StringUtils.isNotEmpty(weCustomer.getPhone())){
+                    List<WeCustomerSeas> weCustomerSeasList = iWeCustomerSeasService.list(new LambdaQueryWrapper<WeCustomerSeas>()
+                            .eq(WeCustomerSeas::getAddUserId, weCustomer.getAddUserId())
+                            .eq(WeCustomerSeas::getPhone, weCustomer.getPhone()));
+                    if(CollectionUtil.isNotEmpty(weCustomerSeasList)){
+                        weCustomerSeasList.stream().forEach(k->k.setAddState(1));
+                        iWeCustomerSeasService.updateBatchById(weCustomerSeasList);
+                    }
+
+
+                }
+
+
+            }
+
+
 //            if(StringUtils.isNotEmpty(state)){
                 //生成轨迹
                 iWeCustomerTrajectoryService.createAddOrRemoveTrajectory(externalUserId,userId,true,true);
@@ -847,7 +919,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     }
 
     @Override
-    public void updateCustomer(String externalUserId, String userId) {
+    public WeCustomer updateCustomer(String externalUserId, String userId) {
+        //客户入库
+        WeCustomer weCustomer =new WeCustomer();
+
         //获取指定客户的详情
         WeCustomerQuery query = new WeCustomerQuery();
         query.setExternal_userid(externalUserId);
@@ -857,7 +932,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
             WeCustomerDetailVo.ExternalContact externalContact = weCustomerDetail.getExternalContact();
             //客户入库
-            WeCustomer weCustomer = new WeCustomer();
+             weCustomer = new WeCustomer();
             weCustomer.setId(SnowFlakeUtil.nextId());
             weCustomer.setExternalUserid(externalContact.getExternalUserId());
             weCustomer.setCustomerName(externalContact.getName());
@@ -899,6 +974,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     weCustomer.getExternalUserid(),weCustomer.getAddUserId(),TrajectorySceneType.TRAJECTORY_TITLE_BJBQ.getType(),null
             );
         }
+
+        return weCustomer;
     }
 
     @Override
@@ -961,6 +1038,20 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Override
     public List<WeCustomersVo> findWeCustomerList(List<String> customerIds) {
         return this.baseMapper.findWeCustomerList(customerIds);
+    }
+
+
+    @Override
+    public WeCustomer findOrSynchWeCustomer(String externalUserid) {
+        List<WeCustomer> weCustomerList = this.list(new LambdaQueryWrapper<WeCustomer>()
+                .eq(WeCustomer::getExternalUserid, externalUserid));
+        if(CollectionUtil.isEmpty(weCustomerList)){
+
+            return this.updateCustomer(externalUserid, null);
+
+        }
+
+        return weCustomerList.stream().findFirst().get();
     }
 
 

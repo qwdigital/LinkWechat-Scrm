@@ -8,43 +8,49 @@ package com.linkwechat.wecom.service;
  **/
 public interface IQwAccessTokenService {
 
-    public String findCommonAccessToken(String corpId);
+    String  findCommonAccessToken(String corpId);
 
-    public String findContactAccessToken(String corpId);
+    String findContactAccessToken(String corpId);
 
-    public String findAddressBookAccessToken(String corpId);
+    String findAddressBookAccessToken(String corpId);
 
-    public String findProviderAccessToken(String corpId);
+    String findProviderAccessToken(String corpId);
 
-    public String findChatAccessToken(String corpId);
+    String findChatAccessToken(String corpId);
 
-    public String findKfAccessToken(String corpId);
+    String findKfAccessToken(String corpId);
 
+    String findLiveAccessToken(String corpId);
     /**
      * 对外收款Token
      *
      * @param corpId
      * @return
      */
-    public String findBillAccessToken(String corpId);
+     String findBillAccessToken(String corpId);
 
-    public void removeCommonAccessToken(String corpId);
 
-    public void removeContactAccessToken(String corpId);
+    void removeCommonAccessToken(String corpId);
 
-    public void removeChatAccessToken(String corpId);
+    void removeContactAccessToken(String corpId);
 
-    public void removeKfAccessToken(String corpId);
+    void removeChatAccessToken(String corpId);
 
-    public void removeAddressBookAccessToken(String corpId);
+    void removeKfAccessToken(String corpId);
 
-    public String findAgentAccessToken(String corpId, Integer agentId);
+    void removeAddressBookAccessToken(String corpId);
 
-    void removeAgentAccessToken(String corpId, Integer agentId);
+    String findAgentAccessToken(String corpId, Integer agentId);
+
+   void removeAgentAccessToken(String corpId, Integer agentId);
+
+   void removeAllWeAccessToken(String corpId);
+
+    void removeLiveAccessToken(String corpId);
 
     /**
      * 移除对外收款Token
      */
-    public void removeBillAccessToken(String corpId);
+     void removeBillAccessToken(String corpId);
 
 }

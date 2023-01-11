@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 企微授权接口
  * @date 2022/3/13 20:54
  **/

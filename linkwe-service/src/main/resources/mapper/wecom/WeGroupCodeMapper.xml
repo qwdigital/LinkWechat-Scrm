@@ -43,11 +43,11 @@
 
         COUNT(DISTINCT(IF(TO_DAYS(wgm.update_time)&lt;TO_DAYS(NOW()) and wgm.del_flag=1 AND wgm.state = #{state} ,wgm.user_id,null))) as oldExitChatGroupTotalMemberNum,
 
-        COUNT(DISTINCT(IF(wgm.del_flag=0 AND wgm.state =#{state},wgm.user_id,null))) as joinChatGroupTotalMemberNum,
+        COUNT(DISTINCT(IF(wgm.state =#{state},wgm.user_id,null))) as joinChatGroupTotalMemberNum,
 
-        COUNT(DISTINCT(IF(TO_DAYS(wgm.update_time)&lt;TO_DAYS(NOW()) and wgm.del_flag=0 AND wgm.state =#{state},wgm.user_id,null))) as oldJoinChatGroupTotalMemberNum,
+        COUNT(DISTINCT(IF(TO_DAYS(wgm.update_time)&lt;TO_DAYS(NOW()) AND wgm.state =#{state},wgm.user_id,null))) as oldJoinChatGroupTotalMemberNum,
 
-        COUNT(DISTINCT(IF(TO_DAYS(wgm.update_time)&lt;=TO_DAYS(NOW()) and wgm.del_flag=0 AND wgm.state =#{state},wgm.user_id,null))) as newJoinChatGroupTotalMemberNum,
+        COUNT(DISTINCT(IF(TO_DAYS(wgm.update_time)&lt;=TO_DAYS(NOW())  AND wgm.state =#{state},wgm.user_id,null))) as newJoinChatGroupTotalMemberNum,
 
         (SELECT GROUP_CONCAT(su.user_name) FROM sys_user su where su.we_user_id=wg.owner) as groupOwner,
         wg.group_name,
@@ -79,25 +79,23 @@
             SELECT
             DATE_FORMAT( wgm.update_time, '%Y-%m-%d' ) AS dateTime,
             COUNT(
+            DISTINCT (
             IF
             (
-            wgm.del_flag = 1,
+            wgm.del_flag = 1
+            AND wgm.state IS NOT NULL,
             wgm.user_id,
             NULL
-            )) AS exitChatGroupTotalMemberNum,
+            ))) AS exitChatGroupTotalMemberNum,
             COUNT(
-            IF
-            (
-            wgm.del_flag = 0,
-            wgm.user_id,
-            NULL
-            )) AS joinChatGroupTotalMemberNum
+                 DISTINCT wgm.user_id
+            ) AS joinChatGroupTotalMemberNum
             FROM
             we_group_member wgm
             WHERE
             wgm.state = #{state}
-            AND date_format( wgm.update_time, '%Y-%m-%d' ) BETWEEN  #{beginTime} AND #{endTime}
-            group by dateTime) b on a.date=b.dateTime
+            AND date_format( wgm.join_time, '%Y-%m-%d' ) BETWEEN  #{beginTime} AND #{endTime}
+            ) b on a.date=b.dateTime
         ORDER BY date ASC
     </select>
 </mapper>

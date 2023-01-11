@@ -49,6 +49,11 @@ public class QwLivingFallbackFactory implements QwLivingClient {
     }
 
     @Override
+    public AjaxResult<WeLivingInfoVo> getLivingInfo(WeLivingQuery query) {
+        return null;
+    }
+
+    @Override
     public AjaxResult<WeLivingStatInfoVo> getWatchStat(WeLivingQuery query) {
         return null;
     }

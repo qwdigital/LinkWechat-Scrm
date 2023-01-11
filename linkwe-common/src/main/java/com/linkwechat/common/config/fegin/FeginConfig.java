@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author danmo
+ * @author sxw
  * @description fegin配置
  * @date 2021/5/31 11:18
  **/

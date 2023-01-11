@@ -23,4 +23,7 @@ public class CacheConstants {
 
     /** 字典管理 cache key */
     public static final String SYS_DICT_KEY = "sys_dict:";
+
+    /**路由key*/
+    public static final String GATEWAY_ROUTES="gateway_dynamic_routes";
 }

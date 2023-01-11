@@ -8,6 +8,7 @@ import com.linkwechat.common.core.domain.model.WxLoginUser;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author xueyi
  */
+@Slf4j
 @Component
 public class RequestContextInterceptor implements HandlerInterceptor {
     @Override

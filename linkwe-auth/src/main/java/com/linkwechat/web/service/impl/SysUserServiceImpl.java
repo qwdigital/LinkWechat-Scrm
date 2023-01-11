@@ -1,5 +1,6 @@
 package com.linkwechat.web.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -26,6 +27,8 @@ import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
+import com.linkwechat.domain.system.user.query.SysUserQuery;
+import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.domain.wecom.query.user.WeUserListQuery;
 import com.linkwechat.domain.wecom.query.user.WeUserQuery;
 import com.linkwechat.domain.wecom.vo.user.WeUserDetailVo;
@@ -324,7 +327,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 delUserDeptId.addAll(new LambdaQueryChainWrapper<>(userDeptMapper).eq(SysUserDept::getWeUserId, vo.getUserId()).eq(SysUserDept::getDeptId, vo.getDepartment().get(i)).list().stream().map(SysUserDept::getUserDeptId).collect(Collectors.toList()));
                 userDeptList.add(userDeptGenerator(vo, i));
             }
-            sysUserDeptService.removeByIds(delUserDeptId);
+
+//            sysUserDeptService.removeByIds(delUserDeptId);
+            sysUserDeptService.remove(new LambdaQueryWrapper<SysUserDept>()
+                    .eq(SysUserDept::getWeUserId,sysUser.getWeUserId()));
+
             sysUserDeptService.saveOrUpdateBatch(userDeptList);
             userMapper.updateUser(user);
         }
@@ -576,7 +583,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
 
         Map<String, Long> userIdMap = userList.stream().collect(Collectors.toMap(SysUser::getWeUserId, SysUser::getUserId));
-        sysUserDeptService.removeByIds(delUserDeptId);
+//        sysUserDeptService.removeByIds(delUserDeptId);
+
+        sysUserDeptService.remove(new LambdaQueryWrapper<SysUserDept>()
+                .in(SysUserDept::getWeUserId,userList.stream()
+                        .map(SysUser::getWeUserId).collect(Collectors.toList())));
+
         sysUserDeptService.saveBatch(userDeptList.stream().peek(userDept -> {
             userDept.setUserId(userIdMap.get(userDept.getWeUserId()));
         }).collect(Collectors.toList()));
@@ -636,7 +648,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     @Transactional
-    public int addUser(SysUserDTO sysUser) {
+    public SysUser addUser(SysUserDTO sysUser) {
+        SysUser user=new SysUser();
         WeUserQuery query = new WeUserQuery();
         query.setUserid(sysUser.getWeUserId());
         query.setCorpid(sysUser.getCorpId());
@@ -644,7 +657,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         List<SysUserDept> userDeptList = new ArrayList<>();
         if (result.getData() != null) {
             WeUserDetailVo vo = result.getData();
-            SysUser user = sysUserGenerator(vo);
+             user = sysUserGenerator(vo);
             for (int i = 0; i < vo.getDepartment().size(); i++) {
                 userDeptList.add(userDeptGenerator(vo, i));
             }
@@ -655,12 +668,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 userRoleMapper.batchUserRole(ListUtil.toList(
                         SysUserRole.builder().roleId(role.getRoleId()).userId(user.getUserId()).build()));
             }
+            SysUser finalUser = user;
             sysUserDeptService.saveBatch(userDeptList.stream().peek(userDept -> {
-                userDept.setUserId(user.getUserId());
+                userDept.setUserId(finalUser.getUserId());
             }).collect(Collectors.toList()));
-            return flag ? 1 : 0;
         }
-        return 0;
+        return user;
     }
 
     @Override
@@ -735,6 +748,29 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         updateById(sysUser);
     }
 
+    @Override
+    public List<SysUser> findAllSysUser(String weUserIds, String positions, String deptIds) {
+        return this.baseMapper.findAllSysUser(weUserIds,positions,deptIds);
+    }
+
+    @Override
+    public SysUser findOrSynchSysUser(String weuserId) {
+
+        List<SysUser> sysUser = this.list(new LambdaQueryWrapper<SysUser>()
+                .eq(SysUser::getWeUserId, weuserId));
+
+        if(CollectionUtil.isEmpty(sysUser)){//保存在则从企业微信端获取同时入库
+
+            SysUserDTO sysUserDTO=new SysUserDTO();
+            sysUserDTO.setWeUserId(weuserId);
+            sysUserDTO.setCorpId(SecurityUtils.getCorpId());
+            return this.addUser(sysUserDTO);
+        }
+
+
+        return sysUser.stream().findFirst().get();
+    }
+
 
     private SysUserDept userDeptGenerator(WeUserDetailVo u, int index) {
         SysUserDept userDept = new SysUserDept();
@@ -803,5 +839,23 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         user.setUpdateTime(new Date());
         user.setStatus("0");
         return user;
+    }
+
+
+    @Override
+    public List<SysUserVo> getUserListByWeUserIds(SysUserQuery query) {
+        List<SysUser> sysUserList = list(new LambdaQueryWrapper<SysUser>()
+                .in(CollectionUtil.isNotEmpty(query.getWeUserIds()), SysUser::getWeUserId, query.getWeUserIds())
+                .in(CollectionUtil.isNotEmpty(query.getDeptIds()),SysUser::getDeptId,query.getDeptIds())
+                .eq(SysUser::getDelFlag, 0));
+        if(CollectionUtil.isNotEmpty(sysUserList)){
+            List<SysUserVo> list = sysUserList.stream().map(item -> {
+                SysUserVo sysUserVo = new SysUserVo();
+                BeanUtil.copyProperties(item, sysUserVo);
+                return sysUserVo;
+            }).collect(Collectors.toList());
+            return list;
+        }
+        return new ArrayList<>();
     }
 }

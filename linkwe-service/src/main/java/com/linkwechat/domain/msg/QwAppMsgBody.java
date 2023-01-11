@@ -24,6 +24,12 @@ public class QwAppMsgBody {
     private Long callBackId;
 
     /**
+     * 回调业务类
+     */
+    private String callBackService;
+
+
+    /**
      * 企业ID
      */
     private String corpId;

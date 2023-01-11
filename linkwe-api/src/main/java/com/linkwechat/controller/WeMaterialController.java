@@ -1,6 +1,7 @@
 package com.linkwechat.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
@@ -8,26 +9,33 @@ import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.common.core.domain.FileEntity;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.enums.MediaType;
+import com.linkwechat.common.utils.bean.BeanUtils;
+import com.linkwechat.common.utils.poi.ExcelUtil;
+import com.linkwechat.domain.material.ao.PurePoster;
 import com.linkwechat.domain.material.ao.WePoster;
 import com.linkwechat.domain.material.ao.WePosterFontAO;
 import com.linkwechat.domain.material.dto.ResetCategoryDto;
 import com.linkwechat.domain.material.dto.TemporaryMaterialDto;
 import com.linkwechat.domain.material.entity.WeMaterial;
+import com.linkwechat.domain.material.query.ContentDetailQuery;
 import com.linkwechat.domain.material.query.LinkMediaQuery;
-import com.linkwechat.domain.material.vo.WeMaterialFileVo;
-import com.linkwechat.domain.material.vo.WePosterVo;
+import com.linkwechat.domain.material.vo.*;
 import com.linkwechat.domain.wecom.vo.media.WeMediaVo;
 import com.linkwechat.service.IWeMaterialService;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,8 +55,8 @@ public class WeMaterialController extends BaseController {
     @ApiOperation("查询素材列表")
     public TableDataInfo list(LinkMediaQuery query) {
         startPage();
-        List<WeMaterial> list = materialService.findWeMaterials(query);
-        return getDataTable(list);
+        List<WeMaterialNewVo> weMaterialNewVos = materialService.selectListByLkQuery(query);
+        return getDataTable(weMaterialNewVos);
     }
 
 
@@ -63,7 +71,7 @@ public class WeMaterialController extends BaseController {
     @PostMapping("/material")
     @ApiOperation("添加素材信息")
     public AjaxResult add(@RequestBody WeMaterial material) {
-        return toAjax(materialService.save(material) ? 1 : 0);
+        return AjaxResult.success(materialService.addOrUpdate(material));
     }
 
 
@@ -71,7 +79,8 @@ public class WeMaterialController extends BaseController {
     @PutMapping("/material")
     @ApiOperation("更新素材信息")
     public AjaxResult edit(@RequestBody WeMaterial material) {
-        return toAjax(materialService.updateById(material) ? 1 : 0);
+        materialService.addOrUpdate(material);
+        return AjaxResult.success();
     }
 
 
@@ -136,8 +145,24 @@ public class WeMaterialController extends BaseController {
     public AjaxResult insert(@RequestBody WePoster poster) {
         WeMaterial material = materialService.generateSimpleImg(poster);
         material.setMediaType(MediaType.POSTER.getType());
-        materialService.saveOrUpdate(material);
-        return AjaxResult.success("创建成功");
+        material.setModuleType(poster.getModuleType());
+        boolean b = materialService.saveOrUpdate(material);
+        WeMaterialVo weMaterialVo = new WeMaterialVo();
+        BeanUtils.copyProperties(material, weMaterialVo);
+        return AjaxResult.success(weMaterialVo);
+    }
+
+    /**
+     * 纯创建海报，数据未写入到素材中心
+     *
+     * @param purePoster
+     * @return
+     */
+    @PostMapping(value = "/pure/poster/insert")
+    @ApiOperation("纯创建海报")
+    private AjaxResult<FileEntity> createPoster(@RequestBody PurePoster purePoster) {
+        FileEntity poster = materialService.createPoster(purePoster);
+        return AjaxResult.success(poster);
     }
 
 
@@ -151,7 +176,7 @@ public class WeMaterialController extends BaseController {
         poster.setMediaType(null);
         WeMaterial material = materialService.generateSimpleImg(poster);
         materialService.saveOrUpdate(material);
-        return AjaxResult.success("修改成功");
+        return AjaxResult.success(material);
     }
 
 
@@ -245,23 +270,98 @@ public class WeMaterialController extends BaseController {
         return AjaxResult.success("删除成功");
     }
 
+    @GetMapping("/material/importTemplate")
+    public AjaxResult importTemplate(HttpServletResponse response) {
+
+        ExcelUtil<WeMaterial> util = new ExcelUtil<WeMaterial>(WeMaterial.class);
+        return util.importTemplateExcel("话术语模板");
+
+
+    }
+
+    @PostMapping("/material/importData")
+    public AjaxResult importData(WeMaterial weMaterial, MultipartFile file) throws Exception {
+        ExcelUtil<WeMaterial> util = new ExcelUtil<WeMaterial>(WeMaterial.class);
+        List<WeMaterial> weMaterialList = util.importExcel(file.getInputStream());
+
+        String tip = new String("成功导入{0}条，去重复{1}条");
+        if (ObjectUtil.isEmpty(weMaterialList)) {
+            return AjaxResult.error("导入数据不能为空！");
+        }
+        List<WeMaterial> list = weMaterialList.stream().map(item -> {
+            String materialName = item.getMaterialName();
+            String content = item.getContent();
+            if (ObjectUtil.isNotEmpty(materialName) && ObjectUtil.isNotEmpty(content) && materialName.length() <= 50 && content.length() <= 2000) {
+                item.setMediaType(weMaterial.getMediaType());
+                item.setCategoryId(weMaterial.getCategoryId());
+                return item;
+            }
+            return null;
+        }).collect(Collectors.toList());
+        if (ObjectUtil.isEmpty(list)) {
+            return AjaxResult.error("导入数据不满足要求！");
+        }
+        materialService.saveBatch(list);
+        tip = MessageFormat.format(tip, new Object[]{new Integer(list.size()).toString(),
+                new Integer(weMaterialList.size() - list.size()).toString()});
+        return AjaxResult.success(tip);
+    }
+
+
+    // 统计 数据分析 共用 数据分析时 不需要传ContentId
+    @ApiOperation(value = "素材详情数据统计", httpMethod = "GET")
+    @Log(title = "素材详情数据统计", businessType = BusinessType.SELECT)
+    @GetMapping("/material/count")
+    public AjaxResult<WeContentCountVo> getWeMaterialCount(ContentDetailQuery contentDetailQuery) {
+        WeContentCountVo WeContentCountVo = materialService.getWeMaterialCount(contentDetailQuery);
+        return AjaxResult.success(WeContentCountVo);
+    }
+
+
+    @ApiOperation(value = "素材详情数据明细", httpMethod = "GET")
+    @Log(title = "素材详情数据明细", businessType = BusinessType.SELECT)
+    @GetMapping("/material/dataDetail")
+    public TableDataInfo getWeMaterialDataCount(ContentDetailQuery contentDetailQuery) {
+        List<ContentDataDetailVo> weMaterialDataCount = materialService.getWeMaterialDataCount(contentDetailQuery);
+        startPage();
+        return getDataTable(weMaterialDataCount);
+    }
+
+
+    @ApiOperation(value = "素材数据分析Top5", httpMethod = "GET")
+    @Log(title = "素材数据分析Top5", businessType = BusinessType.SELECT)
+    @GetMapping("/material/analyseTop")
+    public AjaxResult getWeMaterialAnalyseTop(ContentDetailQuery contentDetailQuery) {
+        List<WeMaterialAnalyseVo> list = materialService.getWeMaterialAnalyseTop(contentDetailQuery);
+        return AjaxResult.success(list);
+    }
 
     /**
-     * 上传附件素材
-     * @param file 文件
-     * @param mediaType 图片（image）、视频（video）、普通文件（file）
-     * @param attachmentType 附件类型，1：朋友圈；2:商品图册
-     * @param needMediaId 是否需要mediaId 1需要 0不需要
-     * @return
+     * 获取素材类型
+     *
+     * @param
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2022/10/21 14:24
      */
-    @PostMapping("/material/attachment/upload")
-    @ApiOperation("上传附件素材")
-    public AjaxResult<WeMaterialFileVo> uploadAttachment(@RequestParam(value = "file") MultipartFile file,
-                             @RequestParam(value = "mediaType") @ApiParam("图片（image）、视频（video）、普通文件（file）") String mediaType,
-                             @RequestParam("attachmentType") @ApiParam("附件类型，1：朋友圈；2:商品图册") Integer attachmentType,
-                            @RequestParam("needMediaId") @ApiParam("是否需要mediaId 1需要 0不需要") Integer needMediaId) {
-        WeMaterialFileVo weMaterialFileVo = materialService.uploadAttachment(file, mediaType,attachmentType,needMediaId);
-        return AjaxResult.success(weMaterialFileVo);
+    @ApiOperation(value = "获取素材类型", httpMethod = "GET")
+    @GetMapping("/material/media/type")
+    public AjaxResult getMaterialMediaType() {
+
+        //素材类型：需要参考 CategoryMediaType类中的定义
+        //由于枚举类定义了很多不属于素材中的类型，所以需要把用到的素材类型挑选出来
+        List<MaterialMediaTypeVO> result = new ArrayList<>();
+        result.add(MaterialMediaTypeVO.builder().type(4).name("文本").sort(1).build());
+        result.add(MaterialMediaTypeVO.builder().type(0).name("图片").sort(2).build());
+        result.add(MaterialMediaTypeVO.builder().type(9).name("图文").sort(3).build());
+        result.add(MaterialMediaTypeVO.builder().type(11).name("小程序").sort(4).build());
+        result.add(MaterialMediaTypeVO.builder().type(12).name("文章").sort(5).build());
+        result.add(MaterialMediaTypeVO.builder().type(2).name("视频").sort(6).build());
+        result.add(MaterialMediaTypeVO.builder().type(3).name("文件").sort(7).build());
+        result.add(MaterialMediaTypeVO.builder().type(5).name("海报").sort(8).build());
+        result = result.stream().sorted(Comparator.comparing(MaterialMediaTypeVO::getSort)).collect(Collectors.toList());
+        return AjaxResult.success(result);
     }
+
 
 }

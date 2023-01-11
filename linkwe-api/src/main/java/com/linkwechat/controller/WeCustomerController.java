@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  * 企业微信客户Controller
  *
  * @author ruoyi
- * @date 2020-09-13findWeCustomerListByApp
+ * @date 2020-09-13
  */
 @Slf4j
 @RestController
@@ -73,6 +73,18 @@ public class WeCustomerController extends BaseController {
     }
 
 
+    /**
+     * 移动应用客户列表(分页)
+     * @param weCustomersQuery
+     * @return
+     */
+    @GetMapping("/findWeCustomerListByApp")
+    public TableDataInfo<List<WeCustomersVo>> findWeCustomerListByApp(WeCustomersQuery weCustomersQuery){
+
+        return weCustomerService.findWeCustomerListByApp(
+                weCustomersQuery,TableSupport.buildPageRequest()
+        );
+    }
 
 
 

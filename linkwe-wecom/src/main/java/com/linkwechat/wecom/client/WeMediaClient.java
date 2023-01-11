@@ -50,7 +50,7 @@ public interface WeMediaClient {
      * Inputstream 对象
      * 使用byte数组和Inputstream对象时一定要定义fileName属性
      */
-    @Post(url = "/media/upload_attachment?media_type=${type}&attachment_type=${query.attachmentType}")
+    @Post(url = "/media/upload_attachment?media_type=${query.type}&attachment_type=${query.attachmentType}")
     WeMediaVo uploadAttachment(@DataFile(value = "media", fileName = "${1}") InputStream file,String name,
                                @Var("query") WeMediaQuery query);
 

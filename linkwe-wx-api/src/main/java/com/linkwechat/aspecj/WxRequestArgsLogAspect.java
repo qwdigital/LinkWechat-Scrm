@@ -15,6 +15,10 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
 /**
  * 请求入参日志记录处理
@@ -40,10 +44,22 @@ public class WxRequestArgsLogAspect {
     public void doBefore(JoinPoint joinPoint) {
 
         Object[] args = joinPoint.getArgs();
+
+        Object[] arguments = new Object[args.length];
+
+        for (int i = 0; i < args.length; i++) {
+            if (args[i] instanceof ServletRequest || args[i] instanceof ServletResponse || args[i] instanceof MultipartFile) {
+                //ServletRequest不能序列化，从入参里排除，否则报异常：java.lang.IllegalStateException: It is illegal to call this method if the current request is not in asynchronous mode (i.e. isAsyncStarted() returns false)
+                //ServletResponse不能序列化 从入参里排除，否则报异常：java.lang.IllegalStateException: getOutputStream() has already been called for this response
+                continue;
+            }
+            arguments[i] = args[i];
+        }
+
         // 设置方法名称
         String className = joinPoint.getTarget().getClass().getName();
         String methodName = joinPoint.getSignature().getName();
-        log.info("wecom 接口请求入参className:{},methodName:{},params:{}", className, methodName, JSONObject.toJSONString(args));
+        log.info("wecom 接口请求入参className:{},methodName:{},params:{}", className, methodName, JSONObject.toJSONString(arguments));
         for (Object arg : args) {
             if (arg instanceof WxBaseQuery) {
                 WxBaseQuery query = (WxBaseQuery) arg;

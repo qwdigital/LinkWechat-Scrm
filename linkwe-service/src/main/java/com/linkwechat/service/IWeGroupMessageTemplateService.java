@@ -67,7 +67,7 @@ public interface IWeGroupMessageTemplateService extends IService<WeGroupMessageT
      * 群发消息处理
      * @param query
      */
-    public void groupMessageTaskHandler(WeAddGroupMessageQuery query);
+    void groupMessageTaskHandler(WeAddGroupMessageQuery query);
 
 
     /**

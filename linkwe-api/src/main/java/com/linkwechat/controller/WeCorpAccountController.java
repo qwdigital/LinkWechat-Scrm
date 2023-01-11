@@ -1,11 +1,11 @@
 package com.linkwechat.controller;
 
-import com.linkwechat.common.annotation.Log;
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
-import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.domain.WeCorpAccount;
+import com.linkwechat.fegin.QwCorpClient;
 import com.linkwechat.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +18,12 @@ public class WeCorpAccountController extends BaseController {
     @Autowired
     private IWeCorpAccountService iWeCorpAccountService;
 
+    @Autowired
+    private LinkWeChatConfig linkWeChatConfig;
+
+    @Autowired
+    private QwCorpClient qwCorpClient;
+
     /**
      * 获取当前租户信息
      *
@@ -25,7 +31,7 @@ public class WeCorpAccountController extends BaseController {
      */
     @GetMapping("/findCurrentCorpAccount")
     public AjaxResult<WeCorpAccount> findCurrentCorpAccount() {
-        WeCorpAccount corpAccount = iWeCorpAccountService.getCorpAccountByCorpId(SecurityUtils.getCorpId());
+        WeCorpAccount corpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
         return AjaxResult.success(corpAccount);
     }
 
@@ -38,7 +44,13 @@ public class WeCorpAccountController extends BaseController {
      */
     @PostMapping("/addOrUpdate")
     public AjaxResult addOrUpdate(@RequestBody WeCorpAccount weCorpAccount) {
-        iWeCorpAccountService.saveOrUpdate(weCorpAccount);
+        if(linkWeChatConfig.isDemoEnviron()){
+            return AjaxResult.error("当前为演示环境,无法修改配置");
+
+        }
+        if(iWeCorpAccountService.saveOrUpdate(weCorpAccount)){
+            qwCorpClient.removeAllWeAccessToken(weCorpAccount.getCorpId());
+        };
         return AjaxResult.success();
     }
 

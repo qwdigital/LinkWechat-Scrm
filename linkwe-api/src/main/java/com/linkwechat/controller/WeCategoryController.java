@@ -6,6 +6,7 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.domain.material.entity.WeCategory;
+import com.linkwechat.domain.material.vo.WeCategoryNewVo;
 import com.linkwechat.domain.material.vo.WeCategoryVo;
 import com.linkwechat.service.IWeCategoryService;
 import io.swagger.annotations.Api;
@@ -76,7 +77,17 @@ public class WeCategoryController extends BaseController {
     @DeleteMapping("/{ids}")
     @ApiOperation("删除类目")
     public AjaxResult remove(@PathVariable Long[] ids) {
-        weCategoryService.deleteWeCategoryById(ids);
+        weCategoryService.deleteWeCategoryByIds(ids);
         return AjaxResult.success();
     }
+
+    @Log(title = "批量删除或移动", businessType = BusinessType.DELETE)
+    @DeleteMapping("/delOrMuchMove")
+    @ApiOperation("批量删除或移动")
+    public AjaxResult delOrMuchMove(@RequestBody WeCategoryNewVo weCategoryNewVo) {
+        weCategoryService.delOrMuchMove(weCategoryNewVo);
+        return AjaxResult.success();
+    }
+
+
 }

@@ -11,7 +11,7 @@
         FROM
         (
         SELECT
-            wu.user_id,
+            wu.we_user_id as user_id,
             wu.user_name,
             wu.dimission_time as dimissionTime,
             (SELECT GROUP_CONCAT(wd.dept_name) FROM sys_dept wd WHERE wd.dept_id=wu.dept_id) as department,
@@ -37,7 +37,7 @@
     <select id="leaveAllocateUserList" parameterType="com.linkwechat.domain.WeLeaveUser"
             resultType="com.linkwechat.domain.WeLeaveUser">
         SELECT
-            wu.user_id,
+            wu.we_user_id as user_id,
             wu.user_name,
             wu.update_time as dimissionTime,
             (SELECT GROUP_CONCAT(wd.dept_name) FROM sys_dept wd WHERE wd.dept_id=wu.dept_id) as department,
@@ -63,12 +63,12 @@
             wu.user_name as takeUserName,
             wac.allocate_time,
             wc.external_userid as externalUserid,
-            wc.add_user_id as userId,
+            wc.add_user_id as firstUserId,
             (SELECT GROUP_CONCAT(wd.dept_name) FROM sys_dept wd WHERE wd.dept_id=wu.dept_id) as department
             FROM
             we_allocate_customer wac
         LEFT JOIN we_customer wc ON wac.external_userid=wc.external_userid
-        LEFT JOIN sys_user wu ON wu.user_id=wac.takeover_userid
+        LEFT JOIN sys_user wu ON wu.we_user_id=wac.takeover_userid
         WHERE wc.del_flag=1
         <if test="handoverUserId != null and handoverUserId !=''">and wc.add_user_id=#{handoverUserId}</if>
         <if test="handoverUserId != null and handoverUserId !=''">and wac.handover_userid=#{handoverUserId}</if>

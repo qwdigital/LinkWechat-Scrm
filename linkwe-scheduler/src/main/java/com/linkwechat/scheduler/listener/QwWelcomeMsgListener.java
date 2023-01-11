@@ -6,6 +6,8 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.config.LinkWeChatConfig;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.enums.MessageType;
@@ -45,7 +47,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 欢迎语消息监听
  * @date 2022/4/3 15:39
  **/
@@ -77,8 +79,6 @@ public class QwWelcomeMsgListener {
     @Autowired
     private QwCustomerClient qwCustomerClient;
 
-    @Autowired
-    private IWeStoreCodeService weStoreCodeService;
 
     @Autowired
     private IWeQrAttachmentsService attachmentsService;
@@ -88,6 +88,9 @@ public class QwWelcomeMsgListener {
 
     @Autowired
     private IWeTagService iWeTagService;
+
+    @Autowired
+    private LinkWeChatConfig linkWeChatConfig;
 
 
     @Value("${wecom.welcome-msg-default}")
@@ -106,7 +109,7 @@ public class QwWelcomeMsgListener {
 
                 WeQrCode weQrCode = weQrCodeService.getOne(new LambdaQueryWrapper<WeQrCode>()
                         .eq(WeQrCode::getState, query.getState())
-                        .eq(WeQrCode::getDelFlag, 0).last("limit 1"));
+                        .eq(WeQrCode::getDelFlag, Constants.COMMON_STATE).last("limit 1"));
                 if (weQrCode != null) {
                     WeQrCodeDetailVo qrDetail = weQrCodeService.getQrDetail(weQrCode.getId());
                     List<WeQrAttachments> qrAttachments = qrDetail.getQrAttachments();
@@ -121,6 +124,7 @@ public class QwWelcomeMsgListener {
                         template.setFileUrl(qrAttachment.getFileUrl());
                         template.setPicUrl(qrAttachment.getPicUrl());
                         template.setLinkUrl(qrAttachment.getLinkUrl());
+                        template.setMaterialId(qrAttachment.getMaterialId());
                         return template;
                     }).collect(Collectors.toList());
                     templates.addAll(templateList);
@@ -181,6 +185,7 @@ public class QwWelcomeMsgListener {
                                 template.setFileUrl(qrAttachment.getFileUrl());
                                 template.setPicUrl(qrAttachment.getPicUrl());
                                 template.setLinkUrl(qrAttachment.getLinkUrl());
+                                template.setMaterialId(qrAttachment.getMaterialId());
                                 return template;
                             }).collect(Collectors.toList());
                             templates.addAll(templateList);
@@ -205,7 +210,7 @@ public class QwWelcomeMsgListener {
                 weMsgTlpQuery.setFlag(false);
                 List<WeMsgTlpVo> weMsgTlpList = weMsgTlpService.getList(weMsgTlpQuery);
                 if (CollectionUtil.isNotEmpty(weMsgTlpList)) {
-                    WeMsgTlpVo weMsgTlpVo = weMsgTlpList.get(0);
+                    WeMsgTlpVo weMsgTlpVo = weMsgTlpList.stream().findFirst().get();
                     List<WeMessageTemplate> attachments = weMsgTlpVo.getAttachments();
                     templates.addAll(attachments);
                 }
@@ -258,7 +263,7 @@ public class QwWelcomeMsgListener {
         welcomeMsg.setWelcome_code(query.getWelcomeCode());
         welcomeMsg.setCorpid(query.getToUserName());
         if (CollectionUtil.isNotEmpty(attachments)) {
-            getMediaId(attachments);
+            weMaterialService.msgTplToMediaId(attachments);
         } else {
             WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
             weMessageTemplate.setMsgType(MessageType.TEXT.getMessageType());
@@ -266,7 +271,7 @@ public class QwWelcomeMsgListener {
             attachments.add(weMessageTemplate);
         }
         WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getAddUserId, query.getUserID())
-                .eq(WeCustomer::getExternalUserid, query.getExternalUserID()).eq(WeCustomer::getDelFlag, 0).last("limit 1"));
+                .eq(WeCustomer::getExternalUserid, query.getExternalUserID()).eq(WeCustomer::getDelFlag, Constants.COMMON_STATE).last("limit 1"));
 
         if (weCustomer != null) {
             String customerName = weCustomer.getCustomerName();
@@ -276,34 +281,8 @@ public class QwWelcomeMsgListener {
                 }
             });
         }
-        welcomeMsg.setMessageTemplates(attachments);
+        welcomeMsg.setAttachmentsList(linkWeChatConfig.getH5Domain(), attachments);
         return qwCustomerClient.sendWelcomeMsg(welcomeMsg).getData();
     }
 
-    void getMediaId(List<WeMessageTemplate> messageTemplates) {
-        Optional.ofNullable(messageTemplates).orElseGet(ArrayList::new).forEach(messageTemplate -> {
-            if (ObjectUtil.equal(MessageType.IMAGE.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getPicUrl()
-                        , MessageType.IMAGE.getMessageType()
-                        , FileUtil.getName(messageTemplate.getPicUrl()));
-                messageTemplate.setMediaId(weMedia.getMediaId());
-            } else if (ObjectUtil.equal(MessageType.MINIPROGRAM.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getPicUrl()
-                        , MessageType.IMAGE.getMessageType()
-                        , FileUtil.getName(messageTemplate.getPicUrl()));
-                messageTemplate.setMediaId(weMedia.getMediaId());
-                messageTemplate.setPicMediaId(weMedia.getMediaId());
-            } else if (ObjectUtil.equal(MessageType.VIDEO.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
-                        , MessageType.VIDEO.getMessageType()
-                        , FileUtil.getName(messageTemplate.getMediaId()));
-                messageTemplate.setMediaId(weMedia.getMediaId());
-            } else if (ObjectUtil.equal(MessageType.FILE.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
-                        , MessageType.FILE.getMessageType()
-                        , FileUtil.getName(messageTemplate.getMediaId()));
-                messageTemplate.setMediaId(weMedia.getMediaId());
-            }
-        });
-    }
 }

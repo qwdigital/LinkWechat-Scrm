@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.service.impl;
 
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.customer.UnionidToExternalUserIdQuery;
@@ -45,7 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 客户业务实现类
  * @date 2022/3/25 13:47
  **/
@@ -55,6 +56,9 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
 
     @Autowired
     private WeCustomerClient weCustomerClient;
+
+    @Autowired
+    private LinkWeChatConfig linkWeChatConfig;
 
     @Override
     public WeFollowUserListVo getFollowUserList(WeBaseQuery query) {
@@ -157,7 +161,7 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
 
     @Override
     public WeResultVo sendWelcomeMsg(WeWelcomeMsgQuery query) {
-        query.setAttachmentsList(query.getMessageTemplates());
+
         return weCustomerClient.sendWelcomeMsg(query);
     }
 

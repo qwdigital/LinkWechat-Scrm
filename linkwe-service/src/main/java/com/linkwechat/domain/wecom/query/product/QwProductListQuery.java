@@ -6,7 +6,7 @@ import lombok.Data;
 /**
  * 获取商品图册入参
  *
- * @author danmo
+ * @author sxw
  */
 @Data
 public class QwProductListQuery extends WeBaseQuery {

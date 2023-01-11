@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author danmo
+ * @author sxw
  * @description rabbitmq
  * @date 2022/3/10 11:44
  **/
@@ -104,6 +104,17 @@ public class RabbitMQConfig {
         return ExchangeBuilder.directExchange(rabbitMQSettingConfig.getWeQrCodeChangeEx()).durable(true).build();
     }
 
+    /**
+     * 声明策略延迟交换机
+     */
+    @Bean
+    public Exchange delayJourneyEx() {
+        // 声明路由交换机，durable:在rabbitmq重启后，交换机还在
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-delayed-type", "direct");
+        //自定义交换机
+        return new CustomExchange(rabbitMQSettingConfig.getWeJourneyEx(), "x-delayed-message", true, false, args);
+    }
 
     /**
      * 声明回调队列
@@ -116,6 +127,16 @@ public class RabbitMQConfig {
     }
 
     /**
+     * 声明代开发回调队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quThirdCallBack() {
+        return new Queue(rabbitMQSettingConfig.getWeThirdCallBackQu());
+    }
+
+    /**
      * 回调队列绑定交换机
      *
      * @return
@@ -123,6 +144,16 @@ public class RabbitMQConfig {
     @Bean
     public Binding bindingExchangeCallback() {
         return BindingBuilder.bind(quCallBack()).to(exCallBack()).with(rabbitMQSettingConfig.getWeCallBackRk()).noargs();
+    }
+
+    /**
+     * 代开发回调队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeThirdCallback() {
+        return BindingBuilder.bind(quThirdCallBack()).to(exCallBack()).with(rabbitMQSettingConfig.getWeThirdCallBackRk()).noargs();
     }
 
     /**
@@ -153,6 +184,7 @@ public class RabbitMQConfig {
     public Binding bindingExchangeSyncGroupChat() {
         return BindingBuilder.bind(quSyncGroupChat()).to(syncEx()).with(rabbitMQSettingConfig.getWeGroupChatRk()).noargs();
     }
+
 
 
     /**
@@ -351,6 +383,16 @@ public class RabbitMQConfig {
     }
 
     /**
+     * 客服会话客服超时队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quKfChatKfTimeOutMsg() {
+        return new Queue(rabbitMQSettingConfig.getWeKfChatKfTimeOutMsgQu());
+    }
+
+    /**
      * 客服会话结束队列
      *
      * @return
@@ -390,6 +432,27 @@ public class RabbitMQConfig {
     public Queue quQrCodeChange() {
         return new Queue(rabbitMQSettingConfig.getWeQrCodeChangeQu());
     }
+
+    /**
+     * 人群计算队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quCrowdCalculate() {
+        return new Queue(rabbitMQSettingConfig.getWeCrowdCalculateQu());
+    }
+
+    /**
+     * 策略延时队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quDelayJourney() {
+        return new Queue(rabbitMQSettingConfig.getWeDelayJourneyQu());
+    }
+
 
     /**
      * 同步商品图册队列
@@ -483,6 +546,16 @@ public class RabbitMQConfig {
     }
 
     /**
+     * 客服会话客服超时队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeKfChatKfTimeOutMsg() {
+        return BindingBuilder.bind(quKfChatKfTimeOutMsg()).to(kfChatMsgDelayEx()).with(rabbitMQSettingConfig.getWeKfChatKfTimeOutMsgRk()).noargs();
+    }
+
+    /**
      * 客服会话结束队列绑定交换机
      *
      * @return
@@ -522,6 +595,25 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(quQrCodeChange()).to(qrCodeChangeEx()).with(rabbitMQSettingConfig.getWeQrCodeChangeRk()).noargs();
     }
 
+    /**
+     * 人群队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeSyncCrowdCalculate() {
+        return BindingBuilder.bind(quCrowdCalculate()).to(syncEx()).with(rabbitMQSettingConfig.getWeCrowdCalculateRk()).noargs();
+    }
+
+    /**
+     * 策略延时队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeDelayJourney() {
+        return BindingBuilder.bind(quDelayJourney()).to(delayJourneyEx()).with(rabbitMQSettingConfig.getWeDelayJourneyRk()).noargs();
+    }
 
     /**
      * 同步商品图册绑定交换机
@@ -532,6 +624,67 @@ public class RabbitMQConfig {
     public Binding bindingExchangeProduct() {
         return BindingBuilder.bind(quProduct()).to(syncEx()).with(rabbitMQSettingConfig.getWeProductRk()).noargs();
     }
+
+    /**
+     * sop队列绑定交换机
+     * @return
+     */
+    @Bean
+    public Binding bindingSopExchange(){
+        return BindingBuilder.bind(sopQu()).to(sopEx()).with(rabbitMQSettingConfig.getSopRk()).noargs();
+    }
+
+
+    /**
+     * sop队列
+     * @return
+     */
+    @Bean
+    public Queue sopQu(){
+        return new Queue(rabbitMQSettingConfig.getSopQu());
+    }
+
+    /**
+     * sop交换机
+     * @return
+     */
+    @Bean
+    public Exchange sopEx(){
+        // 声明路由交换机，durable:在rabbitmq重启后，交换机还在
+        return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getSopEx()).durable(true).build();
+    }
+
+
+
+    /**
+     * 直播交换机
+     * @return
+     */
+    @Bean
+    public Exchange liveEx(){
+        return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getWeLiveRk()).durable(true).build();
+    }
+
+    /**
+     * 直播队列绑定交换机
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeSyncWeLive(){
+        return BindingBuilder.bind(quWeLive()).to(syncEx()).with(rabbitMQSettingConfig.getWeLiveRk()).noargs();
+    }
+
+    /**
+     * 直播同步队列
+     * @return
+     */
+    @Bean
+    public Queue quWeLive(){
+        return new Queue(rabbitMQSettingConfig.getLiveQu());
+    }
+
+
+
 
     /**
      * 同步商品图册订单绑定交换机
