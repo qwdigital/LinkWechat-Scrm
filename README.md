@@ -320,6 +320,10 @@ LinkWeChat V3.0 主要围绕系统架构、引流获客、客情维系、内容�
 
 [流之云](https://gitee.com/ntdgg) 信息化、数字化服务提供商
 
+[translate.js](https://gitee.com/mail_osc/translate) 网页自动翻译，页面无需另行改造，加入两行js即可让你的网页快速具备多国语言切换能力！
+
+
+
 ## 7.5 社会价值
 
 LinkWeChat 开源团队将目前所收项目捐赠全额捐出，仅尽绵薄之力，在此我们也感谢大家的捐赠和支持，希望河南尽早渡过难关。
