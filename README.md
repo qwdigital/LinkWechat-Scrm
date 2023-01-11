@@ -315,7 +315,11 @@ LinkWeChat V3.0 主要围绕系统架构、引流获客、客情维系、内容�
 |    Happy   | 两核 8G 服务器一台 |
 |  平山阑槛倚晴空    | 两核 4G 服务器一台 |
 
-## 7.4 社会价值
+## 7.4 合作优秀开源社区
+[IoTSharp](https://gitee.com/IoTSharp) IoTSharp 是一个 基于.Net Core 开源的物联网基础平台， 支持 HTTP、MQTT 、CoAp 协议
+[流之云](https://gitee.com/ntdgg) 信息化、数字化服务提供商
+
+## 7.5 社会价值
 
 LinkWeChat 开源团队将目前所收项目捐赠全额捐出，仅尽绵薄之力，在此我们也感谢大家的捐赠和支持，希望河南尽早渡过难关。
 
