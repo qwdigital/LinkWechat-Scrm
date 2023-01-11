@@ -31,14 +31,12 @@ import com.linkwechat.domain.wecom.query.weixin.WxJumpWxaQuery;
 import com.linkwechat.domain.wecom.vo.weixin.WxJumpWxaVo;
 import com.linkwechat.fegin.QwFileClient;
 import com.linkwechat.fegin.QxAppletClient;
-import com.linkwechat.fegin.WxAuthClient;
 import com.linkwechat.mapper.WeShortLinkMapper;
 import com.linkwechat.service.IWeCorpAccountService;
 import com.linkwechat.service.IWeShortLinkService;
 import com.linkwechat.service.IWeShortLinkStatService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -65,9 +63,6 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
 
     @Resource
     private QxAppletClient qxAppletClient;
-
-    @Resource
-    private WxAuthClient wxAuthClient;
 
     @Autowired
     private IWeCorpAccountService weCorpAccountService;
@@ -228,17 +223,17 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
             throw new WeComException("链接已关闭");
         }
         WeCorpAccount corpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
-        if(Objects.isNull(corpAccount)){
+        if (Objects.isNull(corpAccount)) {
             throw new WeComException("请未配置企业信息");
         }
-        if(StringUtils.isEmpty(corpAccount.getWxAppletOriginalId())){
+        if (StringUtils.isEmpty(corpAccount.getWxAppletOriginalId())) {
             throw new WeComException("请未配置小程序原始ID");
         }
 
-        resObj.put("url_scheme",weShortLink.getSchemeLink());
-        resObj.put("user_name",corpAccount.getWxAppletOriginalId());
-        resObj.put("path",linkWeChatConfig.getShortAppletUrl());
-        resObj.put("query","id="+shortUrl);
+        resObj.put("url_scheme", weShortLink.getSchemeLink());
+        resObj.put("user_name", corpAccount.getWxAppletOriginalId());
+        resObj.put("path", linkWeChatConfig.getShortAppletUrl());
+        resObj.put("query", "id=" + shortUrl);
         return resObj;
     }
 
