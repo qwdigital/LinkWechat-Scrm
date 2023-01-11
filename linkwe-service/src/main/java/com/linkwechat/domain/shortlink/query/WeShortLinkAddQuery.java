@@ -19,6 +19,8 @@ import org.apache.commons.lang3.BooleanUtils;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -135,4 +137,24 @@ public class WeShortLinkAddQuery {
     private String secret;
 
 
+    /**
+     * 校验url是否有效
+     * @param url
+     * @return
+     */
+    public Boolean isValidUrl(String url){
+        URI uri = null;
+        try {
+            uri = new URI(url);
+        } catch (URISyntaxException e) {
+            return false;
+        }
+        if (uri.getHost() == null) {
+            return false;
+        }
+        if (uri.getScheme().equalsIgnoreCase("http") || uri.getScheme().equalsIgnoreCase("https")) {
+            return true;
+        }
+        return false;
+    }
 }

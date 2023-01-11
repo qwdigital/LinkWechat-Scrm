@@ -26,4 +26,13 @@ public interface WxAuthClient {
      */
     @GetMapping("/weixin/auth/getUserInfo")
     public AjaxResult<WxAuthUserInfoVo> getUserInfo(@ApiParam(value = "用户的唯一标识", required = true) @RequestParam("openId") String openId, @ApiParam(value = "语言版本", required = true) @RequestParam("lang") String lang);
+
+    /**
+     * 获取接口调用权限
+     * @param appId appId
+     * @param secret 密钥
+     * @return
+     */
+    @GetMapping("/weixin/auth/common/getToken")
+    public AjaxResult<WxTokenVo> getCommonToken(@RequestParam("appId") String appId, @RequestParam("secret")  String secret);
 }

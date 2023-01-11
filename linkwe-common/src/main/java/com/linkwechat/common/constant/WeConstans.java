@@ -18,9 +18,16 @@ public class WeConstans {
     public static final String WX_AUTH_REFRESH_ACCESS_TOKEN = "wx_auth_refresh_access_token";
 
     /**
-     * 微信通用token
+     * 微信公众号通用token
      */
     public static final String WX_ACCESS_TOKEN = "wx_access_token";
+
+    public static final String WX_COMMON_ACCESS_TOKEN = "wx_common_access_token:{}:{}";
+
+    /**
+     * 微信小程序通用token
+     */
+    public static final String WX_APPLET_ACCESS_TOKEN = "wx_applet_access_token";
 
     /**
      * 企微应用token
@@ -263,4 +270,18 @@ public class WeConstans {
     public static final Integer ID_TYPE_USER = 0;
     public static final Integer ID_TYPE_EX = 1;
     public static final Integer ID_TYPE_MACHINE = 2;
+
+
+    //短链统计缓存key值前缀
+    public static final String  WE_SHORT_LINK_KEY = "we_short_link:statistics:";
+
+    /**
+     * 短链缓存命名空间
+     */
+    public static final String PV = "pv:";
+
+    /**
+     * 短链缓存命名空间
+     */
+    public static final String UV = "uv:";
 }

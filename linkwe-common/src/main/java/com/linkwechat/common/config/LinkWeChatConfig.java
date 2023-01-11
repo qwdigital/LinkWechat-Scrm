@@ -157,7 +157,12 @@ public class LinkWeChatConfig {
     /**
      * 短链域名
      */
-    private String shortLinkUrl;
+    private String shortLinkDomainName;
+
+    /**
+     * 短链小程序地址
+     */
+    private String shortAppletUrl;
 
 
     public String getName() {

@@ -26,4 +26,9 @@ public class WxAuthFallbackFactory implements WxAuthClient {
     public AjaxResult<WxAuthUserInfoVo> getUserInfo(String openId, String lang) {
         return null;
     }
+
+    @Override
+    public AjaxResult<WxTokenVo> getCommonToken(String appId, String secret) {
+        return null;
+    }
 }

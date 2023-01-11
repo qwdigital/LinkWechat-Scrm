@@ -1,9 +1,16 @@
 package com.linkwechat.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.domain.WeShortLink;
 import com.linkwechat.domain.shortlink.query.WeShortLinkAddQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkQuery;
+import com.linkwechat.domain.shortlink.query.WeShortLinkStatisticQuery;
+import com.linkwechat.domain.shortlink.vo.WeShortLinkAddVo;
+import com.linkwechat.domain.shortlink.vo.WeShortLinkListVo;
+import com.linkwechat.domain.shortlink.vo.WeShortLinkStatisticsVo;
+import com.linkwechat.domain.shortlink.vo.WeShortLinkVo;
 
 import java.util.List;
 
@@ -15,13 +22,19 @@ import java.util.List;
  */
 public interface IWeShortLinkService extends IService<WeShortLink> {
 
-    void addShortLink(WeShortLinkAddQuery query);
+    WeShortLinkAddVo addShortLink(WeShortLinkAddQuery query);
 
-    void updateShortLink(WeShortLinkAddQuery query);
+    WeShortLinkAddVo updateShortLink(WeShortLinkAddQuery query);
 
     void deleteShortLink(List<Long> ids);
 
-    void getShortLinkInfo(Long id);
+    WeShortLinkVo getShortLinkInfo(Long id);
 
-    void getShortLinkList(WeShortLinkQuery query);
+    PageInfo<WeShortLinkListVo> getShortLinkList(WeShortLinkQuery query);
+
+    JSONObject getShort2LongUrl(String shortUrl);
+
+    WeShortLinkStatisticsVo getDataStatistics(WeShortLinkStatisticQuery query);
+
+    WeShortLinkStatisticsVo getLineStatistics(WeShortLinkStatisticQuery query);
 }

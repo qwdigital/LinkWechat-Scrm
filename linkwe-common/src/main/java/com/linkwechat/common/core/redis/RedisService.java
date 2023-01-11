@@ -396,4 +396,21 @@ public class RedisService {
     public Long increment(String key){
         return redisTemplate.opsForValue().increment(key);
     }
+
+    /**
+     * HyperLogLog计数
+     * @param key
+     * @param value
+     */
+    public Long hyperLogLogAdd(String key, Object... value) {
+        return redisTemplate.opsForHyperLogLog().add(key,value);
+    }
+
+    /**
+     * HyperLogLog获取总数
+     * @param key
+     */
+    public Long hyperLogLogCount(String... key) {
+        return redisTemplate.opsForHyperLogLog().size(key);
+    }
 }

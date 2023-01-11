@@ -247,5 +247,15 @@ public class WeCorpAccount implements Serializable {
      *******************对外收款end****************
      **********************************************/
 
+    @ApiModelProperty("微信小程序ID")
+    @TableField("wx_applet_app_id")
+    private String wxAppletAppId;
 
+    @ApiModelProperty("微信小程序密钥")
+    @TableField("wx_applet_secret")
+    private String wxAppletSecret;
+
+    @ApiModelProperty("微信小程序原始ID")
+    @TableField("wx_applet_original_id")
+    private String wxAppletOriginalId;
 }

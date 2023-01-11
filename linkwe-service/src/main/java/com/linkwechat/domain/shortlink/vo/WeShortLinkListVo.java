@@ -1,11 +1,13 @@
-package com.linkwechat.domain.shortlink.query;
+package com.linkwechat.domain.shortlink.vo;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 /**
  * @author danmo
@@ -14,12 +16,12 @@ import javax.validation.constraints.NotNull;
  **/
 @ApiModel
 @Data
-public class WeShortLinkQuery {
+public class WeShortLinkListVo {
 
     /**
      * 主键id
      */
-    @ApiModelProperty(value = "主键id",hidden = true)
+    @ApiModelProperty(value = "主键id")
     private Long id;
 
 
@@ -51,6 +53,18 @@ public class WeShortLinkQuery {
     private String shortLinkName;
 
 
+    /**
+     * 长链接
+     */
+    @ApiModelProperty(value = "长链接")
+    private String longLink;
+
+    /**
+     * 长链接
+     */
+    @ApiModelProperty(value = "短链接")
+    private String shortLink;
+
 
     /**
      * 业务类型 1-公众号 2-微信 3-微信群 4-员工活码 5-群活码 6-门店活码 7-小程序
@@ -58,12 +72,13 @@ public class WeShortLinkQuery {
     @ApiModelProperty(value = "业务类型 1-公众号 2-微信 3-微信群 4-员工活码 5-群活码 6-门店活码 7-小程序")
     private Integer type;
 
-    /**
-     * 状态 1-启用 2-关闭
-     */
     @ApiModelProperty(value = "状态 1-启用 2-关闭")
     private Integer status;
 
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @ApiModelProperty(value = "更新时间")
+   private Date updateTime;
 
 
 }

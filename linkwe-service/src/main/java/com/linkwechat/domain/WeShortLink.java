@@ -5,17 +5,14 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import lombok.Data;
 
 /**
  * 短链信息表(WeShortLink)
@@ -80,18 +77,18 @@ public class WeShortLink extends BaseEntity implements Serializable {
     private String longLink;
 
     /**
-     * 短链接
+     * 微信跳转链接
      */
-    @ApiModelProperty(value = "短链接")
-    @TableField("short_link")
-    private String shortLink;
+    @ApiModelProperty(value = "微信跳转链接")
+    @TableField("scheme_link")
+    private String schemeLink;
 
 
     /**
-     * 业务类型 1-公众号 2-微信 3-微信群 4-员工活码 5-群活码 6-门店活码 7-小程序
+     * 业务类型 0-文章 1-公众号二维码 2-个人二维码 3-群二维码 4-员工活码 5-客群活码 6-门店导购活码 7-个人小程序 8-门店群活码 9-企业小程序 10-小程序二维码
      */
-    @ApiModelProperty(value = "业务类型 1-公众号 2-微信 3-微信群 4-员工活码 5-群活码 6-门店活码 7-小程序")
-    @TableField("type")
+    @ApiModelProperty(value = "业务类型 0-文章 1-公众号二维码 2-个人二维码 3-群二维码 4-员工活码 5-客群活码 6-门店导购活码 7-个人小程序 8-门店群活码 9-企业小程序 10-小程序二维码")
+    @TableField("`type`")
     private Integer type;
 
 
@@ -99,7 +96,7 @@ public class WeShortLink extends BaseEntity implements Serializable {
      * 名称
      */
     @ApiModelProperty(value = "名称")
-    @TableField("name")
+    @TableField("`name`")
     private String name;
 
 
@@ -107,7 +104,7 @@ public class WeShortLink extends BaseEntity implements Serializable {
      * 描述
      */
     @ApiModelProperty(value = "描述")
-    @TableField("describe")
+    @TableField("`describe`")
     private String describe;
 
 
@@ -162,7 +159,8 @@ public class WeShortLink extends BaseEntity implements Serializable {
     /**
      * 有效期
      */
-    @ApiModelProperty(value = "有效期")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @ApiModelProperty(value = "短链接有效期")
     @TableField("term_time")
     private Date termTime;
 

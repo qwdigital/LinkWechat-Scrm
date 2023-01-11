@@ -11,7 +11,7 @@
                 <result property="touchType" column="touch_type" jdbcType="INTEGER"/>
                 <result property="shortLinkName" column="short_link_name" jdbcType="VARCHAR"/>
                 <result property="longLink" column="long_link" jdbcType="VARCHAR"/>
-                <result property="shortLink" column="short_link" jdbcType="VARCHAR"/>
+                <result property="schemeLink" column="scheme_link" jdbcType="VARCHAR"/>
                 <result property="type" column="type" jdbcType="INTEGER"/>
                 <result property="name" column="name" jdbcType="VARCHAR"/>
                 <result property="describe" column="describe" jdbcType="VARCHAR"/>
@@ -32,7 +32,7 @@
             </resultMap>
 
     <sql id="selectWeShortLinkVo">
-        select id, jump_type, extension_type, touch_type, short_link_name, long_link, short_link, type, name, describe, avatar, qr_code_id, qr_code, app_id, secret, status, term_time, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag from we_short_link
+        select id, jump_type, extension_type, touch_type, short_link_name, long_link, scheme_link, `type`, `name`, `describe`, avatar, qr_code_id, qr_code, app_id, secret, status, term_time, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag from we_short_link
     </sql>
 
 </mapper>
