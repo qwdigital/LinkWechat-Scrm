@@ -2,9 +2,11 @@ package com.linkwechat.controller;
 
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.annotation.Log;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.Base62NumUtil;
@@ -38,6 +40,9 @@ public class WeShortLinkController extends BaseController {
 
     @Autowired
     private IWeShortLinkService weShortLinkService;
+
+    @Autowired
+    private RedisService redisService;
 
     @ApiOperation(value = "新增短链", httpMethod = "POST")
     @Log(title = "新增短链", businessType = BusinessType.INSERT)
@@ -80,6 +85,7 @@ public class WeShortLinkController extends BaseController {
     public AjaxResult<WeShortLinkVo> getShortLinkInfo(@PathVariable("shortUrl") String shortUrl) {
         long id = Base62NumUtil.decode(shortUrl);
         WeShortLinkVo result = weShortLinkService.getShortLinkInfo(id);
+        redisService.increment(WeConstans.WE_SHORT_LINK_KEY  + WeConstans.OPEN_APPLET + shortUrl);
         return AjaxResult.success(result);
     }
 
