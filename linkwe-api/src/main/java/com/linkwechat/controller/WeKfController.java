@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
@@ -54,6 +55,9 @@ public class WeKfController extends BaseController {
 
     @Autowired
     private IWeKfMsgService weKfMsgService;
+
+    @Autowired
+    private LinkWeChatConfig linkWeChatConfig;
 
     @ApiOperation("创建客服")
     @PostMapping("/add")
@@ -137,6 +141,9 @@ public class WeKfController extends BaseController {
     @ApiOperation("删除客服")
     @DeleteMapping("/delete/{id}")
     public AjaxResult delKfInfo(@PathVariable("id") Long id) {
+        if(linkWeChatConfig.isDemoEnviron()){
+            return AjaxResult.error("当前环境不可删除");
+        }
         weKfInfoService.delKfInfo(id);
         return AjaxResult.success();
     }
