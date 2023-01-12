@@ -239,13 +239,11 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
 
     @Override
     public WeShortLinkStatisticsVo getDataStatistics(WeShortLinkStatisticQuery query) {
-        WeShortLinkStatisticsVo weShortLinkStatistics = weShortLinkStatService.getDataStatistics(query);
-        return null;
+        return weShortLinkStatService.getDataStatistics(query);
     }
 
     @Override
     public WeShortLinkStatisticsVo getLineStatistics(WeShortLinkStatisticQuery query) {
-        weShortLinkStatService.getLineStatistics(query);
-        return null;
+       return  weShortLinkStatService.getLineStatistics(query);
     }
 }
