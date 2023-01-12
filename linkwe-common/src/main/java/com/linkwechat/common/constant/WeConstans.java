@@ -290,4 +290,9 @@ public class WeConstans {
      * 短链缓存命名空间
      */
     public static final String UV = "uv:";
+
+    /**
+     * 短链缓存命名空间
+     */
+    public static final String OPEN_APPLET = "open:";
 }

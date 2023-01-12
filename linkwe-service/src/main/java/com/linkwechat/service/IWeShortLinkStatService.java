@@ -15,5 +15,5 @@ public interface IWeShortLinkStatService extends IService<WeShortLinkStat> {
 
     WeShortLinkStatisticsVo getDataStatistics(WeShortLinkStatisticQuery query);
 
-    void getLineStatistics(WeShortLinkStatisticQuery query);
+    WeShortLinkStatisticsVo getLineStatistics(WeShortLinkStatisticQuery query);
 }

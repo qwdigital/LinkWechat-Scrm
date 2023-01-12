@@ -1,5 +1,6 @@
 package com.linkwechat.domain.shortlink.vo;
 
+import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -45,5 +46,7 @@ public class WeShortLinkStatisticsVo {
     private List<String> xAxis;
 
     @ApiModelProperty("次数纵坐标")
-    private List<Integer> yAxis;
+    private JSONObject yAxis;
+
+
 }
