@@ -1,6 +1,7 @@
 package com.linkwechat.controller;
 
 
+import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -8,6 +9,7 @@ import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.poi.LwExcelUtil;
+import com.linkwechat.domain.kf.vo.WeKfRecordListVo;
 import com.linkwechat.domain.live.WeLive;
 import com.linkwechat.domain.live.WeLiveWatchUser;
 import com.linkwechat.domain.live.vo.WeLinveUserVo;
@@ -17,9 +19,14 @@ import com.linkwechat.service.IWeLiveTipService;
 import com.linkwechat.service.IWeLiveWatchUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.Arrays;
-
+import java.util.List;
 
 
 /**
@@ -125,6 +132,7 @@ public class WeLiveController extends BaseController {
      */
     @GetMapping("/exportWeLives")
     public void exportWeLives(){
+
 
 
         LwExcelUtil.exprotForWeb(

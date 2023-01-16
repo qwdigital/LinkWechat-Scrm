@@ -170,6 +170,9 @@ public class WeKfController extends BaseController {
     @ApiOperation("删除场景")
     @DeleteMapping("/scenes/delete/{ids}")
     public AjaxResult delKfScenes(@PathVariable("ids") List<Long> ids) {
+        if(linkWeChatConfig.isDemoEnviron()){
+            return AjaxResult.error("当前环境不可删除");
+        }
         weKfScenesService.delKfScenes(ids);
         return AjaxResult.success();
     }

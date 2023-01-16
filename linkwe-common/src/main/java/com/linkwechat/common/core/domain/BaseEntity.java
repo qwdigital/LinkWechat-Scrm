@@ -1,5 +1,6 @@
 package com.linkwechat.common.core.domain;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -26,60 +27,71 @@ public class BaseEntity implements Serializable
     /** 搜索值 */
     @TableField(exist = false)
     @ApiModelProperty(hidden = true)
+    @ExcelIgnore
     private String searchValue;
 
     /** 创建者 */
     @ApiModelProperty(hidden = true)
     @TableField(fill = FieldFill.INSERT)
+    @ExcelIgnore
     private String createBy;
 
     /** 创建者ID */
     @ApiModelProperty(hidden = true)
     @TableField(fill = FieldFill.INSERT)
+    @ExcelIgnore
     private Long createById;
 
     /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(hidden = true)
     @TableField(fill = FieldFill.INSERT)
+    @ExcelIgnore
     private Date createTime;
 
     /** 更新者 */
     @ApiModelProperty(hidden = true)
     @TableField(fill = FieldFill.INSERT_UPDATE)
+    @ExcelIgnore
     private String updateBy;
 
     /** 更新者ID */
     @ApiModelProperty(hidden = true)
     @TableField(fill = FieldFill.INSERT_UPDATE)
+    @ExcelIgnore
     private Long updateById;
 
     /** 更新时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(hidden = true)
     @TableField(fill = FieldFill.INSERT_UPDATE)
+    @ExcelIgnore
     private Date updateTime;
 
     /** 备注 */
     @TableField(exist = false)
     @ApiModelProperty(hidden = true)
+    @ExcelIgnore
     private String remark;
 
     /** 开始时间 */
     @JsonIgnore
     @TableField(exist = false)
     @ApiModelProperty(hidden = true)
+    @ExcelIgnore
     private String beginTime;
 
     /** 结束时间 */
     @JsonIgnore
     @TableField(exist = false)
     @ApiModelProperty(hidden = true)
+    @ExcelIgnore
     private String endTime;
 
     /** 请求参数 */
     @TableField(exist = false)
     @ApiModelProperty(hidden = true)
+    @ExcelIgnore
     private Map<String, Object> params;
 
 
