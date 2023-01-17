@@ -764,8 +764,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 userRoleMapper.batchUserRole(sysUserRoles);
 
 
-                this.updateBatchById(sysUsers);
-
+//                this.updateBatchById(sysUsers);
+                this.baseMapper.batchAddOrUpdate(sysUsers);
 
 
             }
