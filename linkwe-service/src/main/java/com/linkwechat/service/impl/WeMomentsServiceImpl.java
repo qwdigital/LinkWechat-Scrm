@@ -12,6 +12,7 @@ import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.enums.TrajectorySceneType;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -188,7 +189,7 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
 
             //入库
             if(null !=weResultDto){
-                if (weResultDto.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)) {
+                if (weResultDto.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())) {
                     weMoments.setMomentId(weResultDto.getJobid());
                     this.saveOrUpdate(weMoments);
                 }
@@ -258,7 +259,7 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
                 List<WeMoments> weMoments = list(
                         new LambdaQueryWrapper<WeMoments>().apply(StringUtils.isNotEmpty(userId),
                                         "FIND_IN_SET('" + userId + "',add_user)").eq(WeMoments::getType, 1)
-                                .eq(WeMoments::getDelFlag, WeConstans.WE_SUCCESS_CODE));
+                                .eq(WeMoments::getDelFlag, WeErrorCodeEnum.ERROR_CODE_0.getErrorCode()));
                 if (CollectionUtil.isNotEmpty(weMoments)) {
                     List<WeMomentsInteracte> interactes = new ArrayList<>();
                     Map<String, SysUser> currentTenantSysUser = iWeCustomerService.findCurrentTenantSysUser();
@@ -468,7 +469,7 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
         MomentsInteracteResultDto momentComments = qwMomentsClient.comments(
                 MomentsInteracteParamDto.builder().moment_id(momentId).userid(creator).build()).getData();
 
-        if (momentComments.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)) {
+        if (momentComments.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())) {
             List<MomentsInteracteResultDto.Interacte> comment_list = momentComments.getComment_list();
 
             if (CollectionUtil.isNotEmpty(comment_list)) {//评论
@@ -530,7 +531,7 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
                 MomentsParamDto.builder().moment_id(weMoments.getMomentId()).build()).getData();
 
         if(null != moment_task){
-            if (moment_task.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)) {
+            if (moment_task.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())) {
                 List<MomentsResultDto.TaskList> task_list = moment_task.getTask_list();
                 if (CollectionUtil.isNotEmpty(task_list)) {
                     task_list.stream().collect(Collectors.groupingBy(MomentsResultDto.TaskList::getPublish_status))
@@ -569,7 +570,7 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
                         .build()).getData();
         if(null != moment_list){
 
-            if (WeConstans.WE_SUCCESS_CODE.equals(moment_list.getErrCode()) || WeConstans.NOT_EXIST_CONTACT.equals(
+            if (WeErrorCodeEnum.ERROR_CODE_0.getErrorCode().equals(moment_list.getErrCode()) || WeConstans.NOT_EXIST_CONTACT.equals(
                     moment_list.getErrCode()) && CollectionUtil.isNotEmpty(moment_list.getMoment_list())) {
                 list.addAll(moment_list.getMoment_list());
                 if (StringUtils.isNotEmpty(moment_list.getNext_cursor())) {

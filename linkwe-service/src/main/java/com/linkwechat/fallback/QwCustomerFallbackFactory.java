@@ -15,6 +15,7 @@ import com.linkwechat.domain.wecom.query.customer.state.WeUserBehaviorDataQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeAddCorpTagQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeCorpTagListQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeMarkTagQuery;
+import com.linkwechat.domain.wecom.query.customer.tag.WeUpdateCorpTagQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferGroupChatQuery;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
@@ -178,6 +179,11 @@ public class QwCustomerFallbackFactory implements QwCustomerClient {
 
     @Override
     public AjaxResult<UnionidToExternalUserIdVo> unionIdToExternalUserId3rd(UnionidToExternalUserIdQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<WeResultVo> editCorpTag(WeUpdateCorpTagQuery query) {
         return null;
     }
 

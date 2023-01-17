@@ -119,4 +119,19 @@ public class QwMediaServiceImpl implements IQwMediaService {
         }
         return weMediaClient.uploadAttachment(inputStream, query.getName(), query);
     }
+
+    @Override
+    public WeMediaVo webhookUpload(WeMediaQuery query) {
+        if (StringUtils.isEmpty(query.getUrl())) {
+            throw new WeComException("文件路径不能为空!");
+        }
+        InputStream inputStream = null;
+        try {
+            inputStream = new URL(query.getUrl()).openStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.error("上传临时文件失败......query:{}", JSONObject.toJSONString(query), e);
+        }
+        return weMediaClient.webhookUpload(inputStream,query.getName(), query);
+    }
 }

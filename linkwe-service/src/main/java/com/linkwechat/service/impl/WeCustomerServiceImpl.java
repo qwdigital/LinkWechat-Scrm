@@ -172,7 +172,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         WeBatchCustomerDetailVo weBatchCustomerDetails = qwCustomerClient
                 .getBatchCustomerDetail(new WeBatchCustomerQuery(followUser, nextCursor, 100)).getData();
 
-        if (WeConstans.WE_SUCCESS_CODE.equals(weBatchCustomerDetails.getErrCode())
+        if (WeErrorCodeEnum.ERROR_CODE_0.getErrorCode().equals(weBatchCustomerDetails.getErrCode())
                 || WeConstans.NOT_EXIST_CONTACT.equals(weBatchCustomerDetails.getErrCode())
                 && ArrayUtil.isNotEmpty(weBatchCustomerDetails.getExternalContactList())) {
             list.addAll(weBatchCustomerDetails.getExternalContactList());
@@ -753,7 +753,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
                 if (null != transferCustomerVo) {
 
-                    if (transferCustomerVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)) {
+                    if (transferCustomerVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())) {
                         iWeAllocateCustomerService.batchAddOrUpdate(
                                 ListUtil.toList(
                                         WeAllocateCustomer.builder()

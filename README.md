@@ -1,7 +1,7 @@
 <p></p>
 <p></p>
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/132836_bcaf4618_1480777.png "Snipaste_2021-11-08_13-28-16.png")
+![输入图片说明](readme-pic/logo.png)
 
 <div align="center">
 
@@ -24,8 +24,6 @@
 <p></p>
 
 ---
-
-**<p align="center">【📣参与投票】LinkWeChat正在参与2022年中国技术力量年度榜单<a href="https://www.infoq.cn/talk/xz7094aiX2K8CgARemC8" target="_blank">点击给LinkWeChat投票，谢谢大家~</a></p>**
 
 **<p align="center">【📣最近更新】还有什么想要产品/技术上友好的建议或意见，<a href="https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV" target="_blank">点击告诉我们~</a>一经采纳，将纳入开源贡献者并官网致谢，还会收到社区奖励的小礼品哦！~</p>**
 
@@ -317,7 +315,16 @@ LinkWeChat V3.0 主要围绕系统架构、引流获客、客情维系、内容�
 |    Happy   | 两核 8G 服务器一台 |
 |  平山阑槛倚晴空    | 两核 4G 服务器一台 |
 
-## 7.4 社会价值
+## 7.4 优秀开源社区
+[IoTSharp](https://gitee.com/IoTSharp) IoTSharp 是一个 基于.Net Core 开源的物联网基础平台， 支持 HTTP、MQTT 、CoAp 协议
+
+[流之云](https://gitee.com/ntdgg) 信息化、数字化服务提供商
+
+[translate.js](https://gitee.com/mail_osc/translate) 网页自动翻译，页面无需另行改造，加入两行js即可让你的网页快速具备多国语言切换能力！
+
+
+
+## 7.5 社会价值
 
 LinkWeChat 开源团队将目前所收项目捐赠全额捐出，仅尽绵薄之力，在此我们也感谢大家的捐赠和支持，希望河南尽早渡过难关。
 

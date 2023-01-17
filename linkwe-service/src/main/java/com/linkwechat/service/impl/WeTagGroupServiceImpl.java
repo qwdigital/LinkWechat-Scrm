@@ -19,6 +19,7 @@ import com.linkwechat.domain.WeTagGroup;
 import com.linkwechat.domain.wecom.entity.customer.tag.WeCorpTagEntity;
 import com.linkwechat.domain.wecom.entity.customer.tag.WeCorpTagGroupEntity;
 import com.linkwechat.domain.wecom.query.customer.tag.WeCorpTagListQuery;
+import com.linkwechat.domain.wecom.query.customer.tag.WeUpdateCorpTagQuery;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagListVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.mapper.WeTagGroupMapper;
@@ -116,46 +117,66 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
     @Transactional
     public void updateWeTagGroup(WeTagGroup weTagGroup) {
 
+        //更新标签组名称
+        if(this.updateById(weTagGroup)){
+            WeTagGroup oldWeTagGroup = this.getById(weTagGroup.getId());
+            if(oldWeTagGroup != null){
 
-        List<WeTag> weTags = weTagGroup.getWeTags();
+                if(!oldWeTagGroup.getGroupName().equals(weTagGroup.getGroupName())){//标签名不同则更新企业微信端
+                    qwCustomerClient.editCorpTag(WeUpdateCorpTagQuery.builder()
+                            .id(weTagGroup.getGroupId())
+                            .name(weTagGroup.getGroupName())
+                            .build());
+                }
 
-        List<WeTag> removeWeTags =new ArrayList<>();
+                List<WeTag> weTags = weTagGroup.getWeTags();
 
-        if(CollectionUtil.isNotEmpty(weTags)){
-            //新增的标签
-            List<WeTag> addWeTags = weTags.stream().filter(v -> StringUtils.isEmpty(v.getTagId())).collect(Collectors.toList());
-            if(CollectionUtil.isNotEmpty(addWeTags)){
-                if(weTagGroup.getGroupTagType().equals(new Integer(1))) {
-                    iWeTagService.addWxTag(weTagGroup, addWeTags);
-                }else{
-                    weTags.stream().forEach(k->{
-                        if(StringUtils.isEmpty(k.getTagId())){
-                            Long weTagId=SnowFlakeUtil.nextId();
-                            k.setId(weTagId);
-                            k.setTagId(String.valueOf(weTagId));
+                List<WeTag> removeWeTags =new ArrayList<>();
+
+                if(CollectionUtil.isNotEmpty(weTags)){
+                    //新增的标签
+                    List<WeTag> addWeTags = weTags.stream().filter(v -> StringUtils.isEmpty(v.getTagId())).collect(Collectors.toList());
+                    if(CollectionUtil.isNotEmpty(addWeTags)){
+                        if(weTagGroup.getGroupTagType().equals(new Integer(1))) {
+                            iWeTagService.addWxTag(weTagGroup, addWeTags);
+                        }else{
+                            weTags.stream().forEach(k->{
+                                if(StringUtils.isEmpty(k.getTagId())){
+                                    Long weTagId=SnowFlakeUtil.nextId();
+                                    k.setId(weTagId);
+                                    k.setTagId(String.valueOf(weTagId));
+                                }
+
+                            });
                         }
+                        addWeTags.stream().forEach(k->k.setGroupId(weTagGroup.getGroupId()));
+                        iWeTagService.saveBatch(addWeTags);
+                    }
 
-                    });
+                    removeWeTags.addAll(
+                            iWeTagService.list(new LambdaQueryWrapper<WeTag>().notIn(WeTag::getTagId,
+                                            weTags.stream().map(WeTag::getTagId).collect(Collectors.toList()))
+                                    .eq(WeTag::getGroupId, weTagGroup.getGroupId()))
+                    );
+
+                }else{//删除所有标签
+                    removeWeTags.addAll(
+                            iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                                    .eq(WeTag::getGroupId, weTagGroup.getGroupId()))
+                    );
                 }
-                    addWeTags.stream().forEach(k->k.setGroupId(weTagGroup.getGroupId()));
-                    iWeTagService.saveBatch(addWeTags);
+
+                if(CollectionUtil.isNotEmpty(removeWeTags)){
+                    iWeTagService.removeWxTag(weTagGroup.getGroupId(),removeWeTags,false);
                 }
 
-            removeWeTags.addAll(
-                    iWeTagService.list(new LambdaQueryWrapper<WeTag>().notIn(WeTag::getTagId,
-                                    weTags.stream().map(WeTag::getTagId).collect(Collectors.toList()))
-                            .eq(WeTag::getGroupId, weTagGroup.getGroupId()))
-            );
 
-        }else{//删除所有标签
-            removeWeTags.addAll(
-                    iWeTagService.list(new LambdaQueryWrapper<WeTag>()
-                            .eq(WeTag::getGroupId, weTagGroup.getGroupId()))
-            );
-        }
+            }
 
-        if(CollectionUtil.isNotEmpty(removeWeTags)){
-            iWeTagService.removeWxTag(weTagGroup.getGroupId(),removeWeTags,false);
+
+
+
+
         }
 
     }

@@ -9,6 +9,7 @@ import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.utils.ForestDataType;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisService;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.spring.SpringUtils;
@@ -97,7 +98,7 @@ public class WeiXinAccessTokenInterceptor extends WeForestInterceptor implements
     public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
         log.info("url:【{}】,result:【{}】",request.getUrl(),response.getContent());
         WeResultVo weResultVo = JSONUtil.toBean(response.getContent(), WeResultVo.class);
-        if(null != weResultVo.getErrCode() && !weResultVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+        if(null != weResultVo.getErrCode() && !weResultVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())){
             throw new ForestRuntimeException(response.getContent());
         }
     }

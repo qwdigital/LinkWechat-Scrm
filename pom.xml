@@ -22,7 +22,7 @@
         <swagger.version>2.9.2</swagger.version>
         <kaptcha.version>2.3.2</kaptcha.version>
         <pagehelper.boot.version>1.4.2</pagehelper.boot.version>
-        <fastjson.version>1.2.73</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <oshi.version>6.2.2</oshi.version>
         <commons.lang3.version>3.12.0</commons.lang3.version>
         <commons.io.version>2.11.0</commons.io.version>
@@ -45,6 +45,7 @@
         <transmittable-thread-local.version>2.12.2</transmittable-thread-local.version>
         <liquibase.version>4.8.0</liquibase.version>
         <rabbit.mq.version>2.6.1</rabbit.mq.version>
+        <xstream.version>1.4.20</xstream.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -367,6 +368,24 @@
                 <version>3.1.1</version>
             </dependency>
 
+            <!-- javacv start -->
+            <dependency>
+                <groupId>org.bytedeco</groupId>
+                <artifactId>javacv</artifactId>
+                <version>1.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bytedeco.javacpp-presets</groupId>
+                <artifactId>ffmpeg-platform</artifactId>
+                <version>3.4.2-1.4.1</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>com.thoughtworks.xstream</groupId>
+                <artifactId>xstream</artifactId>
+                <version>${xstream.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
