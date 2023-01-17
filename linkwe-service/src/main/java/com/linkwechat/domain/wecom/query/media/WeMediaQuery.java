@@ -19,6 +19,11 @@ public class WeMediaQuery extends WeBaseQuery {
      * 媒体文件类型，分别有图片（image）、语音（voice）、视频（video），普通文件(file)
      */
     private String type;
+
+    /**
+     * 群机器人用
+     */
+    private String key;
     /**
      * 媒体文件上传后获取的唯一标识，3天内有效
      */
@@ -50,6 +55,13 @@ public class WeMediaQuery extends WeBaseQuery {
     }
 
     public WeMediaQuery(String type, String url, String name) {
+        this.type = type;
+        this.url = url;
+        this.name = name;
+    }
+
+    public WeMediaQuery(String key, String type, String url, String name) {
+        this.key = key;
         this.type = type;
         this.url = url;
         this.name = name;

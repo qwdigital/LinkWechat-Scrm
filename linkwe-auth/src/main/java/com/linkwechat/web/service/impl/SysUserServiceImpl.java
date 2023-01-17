@@ -19,6 +19,7 @@ import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.entity.SysUserDept;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.core.page.PageDomain;
+import com.linkwechat.common.enums.CorpUserEnum;
 import com.linkwechat.common.enums.RoleType;
 import com.linkwechat.common.enums.UserTypes;
 import com.linkwechat.common.exception.CustomException;
@@ -596,7 +597,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         CollectionUtil.newArrayList(weUserIds).forEach(weUserId -> {
             SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getWeUserId, weUserId));
             if (null != sysUser) {
-                sysUser.setIsAllocate(WeConstans.corpUserEnum.NO_IS_ALLOCATE.getKey());
+                sysUser.setIsAllocate(CorpUserEnum.NO_IS_ALLOCATE.getKey());
                 sysUser.setDimissionTime(new Date());
                 weUsers.add(sysUser);
             }

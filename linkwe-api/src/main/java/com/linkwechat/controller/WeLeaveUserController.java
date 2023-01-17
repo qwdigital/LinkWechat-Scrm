@@ -5,6 +5,7 @@ import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.enums.CorpUserEnum;
 import com.linkwechat.domain.WeAllocateCustomer;
 import com.linkwechat.domain.WeAllocateGroups;
 import com.linkwechat.domain.WeLeaveUser;
@@ -37,7 +38,7 @@ public class WeLeaveUserController extends BaseController {
     @GetMapping({"/leaveUserNoAllocateList"})
     public TableDataInfo<List<WeLeaveUser>> leaveUserNoAllocateList(WeLeaveUser weLeaveUser) {
         startPage();
-        weLeaveUser.setIsAllocate(WeConstans.LEAVE_NO_ALLOCATE_STATE);
+        weLeaveUser.setIsAllocate(CorpUserEnum.NO_IS_ALLOCATE.getKey());
         List<WeLeaveUser> list = iWeLeaveUserService.leaveNoAllocateUserList(weLeaveUser);
         return getDataTable(list);
     }
@@ -53,7 +54,7 @@ public class WeLeaveUserController extends BaseController {
     @GetMapping({"/leaveUserAllocateList"})
     public TableDataInfo<List<WeLeaveUser>> leaveUserAllocateList(WeLeaveUser weLeaveUserVo) {
         startPage();
-        weLeaveUserVo.setIsAllocate(WeConstans.LEAVE_ALLOCATE_STATE);
+        weLeaveUserVo.setIsAllocate(CorpUserEnum.YES_IS_ALLOCATE.getKey());
         List<WeLeaveUser> list = iWeLeaveUserService.leaveAllocateUserList(weLeaveUserVo);
         return getDataTable(list);
     }
