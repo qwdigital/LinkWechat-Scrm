@@ -191,7 +191,7 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
                         .state(weGroupCode.getState())
                         .build()
         ).getData();
-        if(null != weResultVo && weResultVo.getErrCode()== WeConstans.WE_SUCCESS_CODE){
+        if(null != weResultVo && weResultVo.getErrCode() == WeErrorCodeEnum.ERROR_CODE_0.getErrorCode()){
             if(updateById(weGroupCode)){
                 String tagIds = weGroupCode.getTagIds();
                 if(StringUtils.isNotEmpty(tagIds)){

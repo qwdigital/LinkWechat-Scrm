@@ -9,7 +9,6 @@
     <version>3.1.0</version>
     <name>linkwechat-cloud</name>
 
-
     <properties>
         <spring-cloud.version>2021.0.1</spring-cloud.version>
         <spring-cloud-gateway.version>3.0.7</spring-cloud-gateway.version>
@@ -24,7 +23,7 @@
         <swagger.version>2.9.2</swagger.version>
         <kaptcha.version>2.3.2</kaptcha.version>
         <pagehelper.boot.version>1.4.2</pagehelper.boot.version>
-        <fastjson.version>1.2.73</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <oshi.version>6.2.2</oshi.version>
         <commons.lang3.version>3.12.0</commons.lang3.version>
         <commons.io.version>2.11.0</commons.io.version>
@@ -56,12 +55,12 @@
         <swagger-models.version>1.5.21</swagger-models.version>
         <p6spy.version>3.9.1</p6spy.version>
         <cglib-nodep.version>3.2.4</cglib-nodep.version>
-        <commons-beanutils.version>1.9.3</commons-beanutils.version>
-        <xstream.version>1.4.11.1</xstream.version>
+        <commons-beanutils.version>1.9.4</commons-beanutils.version>
+        <xstream.version>1.4.20</xstream.version>
         <dom4j.version>2.1.3</dom4j.version>
         <weixin-java-cp.version>4.1.0</weixin-java-cp.version>
         <cos_api.version>5.6.24</cos_api.version>
-        <bcprov-jdk15on.version>1.68</bcprov-jdk15on.version>
+        <bcprov-jdk15on.version>1.69</bcprov-jdk15on.version>
         <bcpg-jdk15on.version>1.68</bcpg-jdk15on.version>
         <bcpkix-jdk15on.version>1.68</bcpkix-jdk15on.version>
     </properties>
@@ -491,14 +490,14 @@
         <module>linkwe-auth</module>
         <module>linkwe-common</module>
         <module>linkwe-wecom</module>
-         <module>linkwe-api</module>
-        <module>linkwe-event-task</module>
-         <module>linkwe-wx-api</module>
+        <module>linkwe-api</module>
+        <module>linkwe-wx-api</module>
         <module>linkwe-gateway</module>
         <module>linkwe-fileservice</module>
         <module>linkwe-scheduler</module>
         <module>linkwe-framework</module>
         <module>linkwe-service</module>
+        <module>linkwe-event-task</module>
     </modules>
 
     <build>
@@ -519,7 +518,7 @@
         </resources>
     </build>
 
-     <!--项目本身的jar从指定镜像下载-->
+    <!--项目本身的jar从指定镜像下载-->
     <repositories>
         <repository>
             <id>public</id>
