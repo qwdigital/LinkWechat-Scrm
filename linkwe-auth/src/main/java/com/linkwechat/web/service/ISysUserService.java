@@ -234,6 +234,14 @@ public interface ISysUserService extends IService<SysUser> {
      */
     void editUserRole(SysUserDTO user);
 
+
+    /**
+     * 批量更新角色
+     * @param roleId
+     * @param users
+     */
+    void batchEditUserRole(Long roleId,List<SysUserDTO> users);
+
     /**
      * 获取员工敏感数据
      * @param userTicket

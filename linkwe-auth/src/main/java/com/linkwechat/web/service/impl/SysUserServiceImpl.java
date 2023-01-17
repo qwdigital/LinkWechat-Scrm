@@ -723,6 +723,61 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
+    public void batchEditUserRole(Long roleId,List<SysUserDTO> users){
+
+        List<SysUser> sysUsers
+                = this.listByIds(users.stream().map(SysUserDTO::getUserId).collect(Collectors.toSet()));
+
+        if(CollectionUtil.isNotEmpty(sysUsers)){
+            //删除原有角色
+            userRoleMapper.deleteUserRole(
+                    sysUsers.stream().map(SysUser::getUserId).collect(Collectors.toSet()).toArray(new Long[]{})
+            );
+
+            SysRole sysRole = roleMapper.selectRoleById(roleId);
+
+            if(null != sysRole){
+                //新增新角色
+                List<SysUserRole> sysUserRoles=new ArrayList<>();
+                sysUsers.stream().forEach(user->{
+                    //查询角色类
+                    sysUserRoles.add(
+                            SysUserRole.builder()
+                                    .userId(user.getUserId())
+                                    .roleId(roleId)
+                                    .build()
+                    );
+
+                    if(RoleType.WECOME_USER_TYPE_FJGLY.getSysRoleKey().contains(sysRole.getRoleKey())){//分级管理员
+                        user.setUserType(UserTypes.USER_TYPE_FJ_ADMIN.getSysRoleKey());
+
+                    }else if(RoleType.WECOME_USER_TYPE_CY.getSysRoleKey().contains(sysRole.getRoleKey())){//普通成员
+
+                        user.setUserType(UserTypes.USER_TYPE_COMMON_USER.getSysRoleKey());
+                    }else{
+                        user.setUserType(UserTypes.USER_TYPE_SELFBUILD_USER.getSysRoleKey());//自建角色
+                    }
+
+
+                });
+
+                userRoleMapper.batchUserRole(sysUserRoles);
+
+
+                this.updateBatchById(sysUsers);
+
+
+
+            }
+
+
+        }
+
+    }
+
+
+
+    @Override
     public void getUserSensitiveInfo(String userTicket) {
         getUserSensitiveInfo(SecurityUtils.getUserId(),userTicket);
     }
