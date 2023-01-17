@@ -13,6 +13,7 @@ import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.enums.MessageType;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;

@@ -15,6 +15,7 @@ import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.enums.QwGroupMsgBusinessTypeEnum;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;

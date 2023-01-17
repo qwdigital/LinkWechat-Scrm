@@ -15,6 +15,7 @@ import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.GroupUpdateDetailEnum;
 import com.linkwechat.common.enums.MessageNoticeType;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeGroup;

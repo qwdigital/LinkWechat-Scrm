@@ -12,6 +12,7 @@ import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.enums.TrajectorySceneType;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
