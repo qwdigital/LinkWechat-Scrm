@@ -121,7 +121,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
         SecurityContextHolder.setUserType(loginUser.getUserType());
         WeGroupChatListQuery query = new WeGroupChatListQuery();
         WeGroupChatListVo groupChatListVo = qwCustomerClient.getGroupChatList(query).getData();
-        if (groupChatListVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)
+        if (groupChatListVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())
                 && CollectionUtil.isNotEmpty(groupChatListVo.getGroupChatList())) {
             List<WeGroupChatListVo.GroupChat> groupChatList = groupChatListVo.getGroupChatList();
             if (CollectionUtil.isNotEmpty(groupChatList)) {
@@ -131,7 +131,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
 
                     WeGroupChatDetailQuery groupChatDetailQuery = new WeGroupChatDetailQuery(groupChat.getChatId(), 1);
                     WeGroupChatDetailVo weGroupChatDetailVo = qwCustomerClient.getGroupChatDetail(groupChatDetailQuery).getData();
-                    if (weGroupChatDetailVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE) && weGroupChatDetailVo.getGroupChat() != null) {
+                    if (weGroupChatDetailVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode()) && weGroupChatDetailVo.getGroupChat() != null) {
                         WeGroupChatDetailVo.GroupChatDetail detail = weGroupChatDetailVo.getGroupChat();
                         WeGroup weGroup = new WeGroup();
                         weGroup.transformQwParams(detail);

@@ -388,7 +388,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                     getMediaId(query.getAttachmentsList());
                     templateQuery.setAttachmentsList(query.getAttachmentsList());
                     WeAddCustomerMsgVo weAddCustomerMsgVo = qwCustomerClient.addMsgTemplate(templateQuery).getData();
-                    if (weAddCustomerMsgVo != null && ObjectUtil.equal(WeConstans.WE_SUCCESS_CODE, weAddCustomerMsgVo.getErrCode())) {
+                    if (weAddCustomerMsgVo != null && ObjectUtil.equal(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode(), weAddCustomerMsgVo.getErrCode())) {
                         String msgid = weAddCustomerMsgVo.getMsgId();
                         Long msgTemplateId = query.getId();
                         WeGroupMessageList messageList = new WeGroupMessageList();
