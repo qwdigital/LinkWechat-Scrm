@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.community.WeEmpleCode;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +29,7 @@ import java.util.stream.Collectors;
 public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmpleCode> implements IWeEmpleCodeService {
 
 
-    @Autowired
+    @Resource
     private QwCustomerClient qwCustomerClient;
 
 
@@ -40,12 +42,6 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
 
     @Autowired
     private  IWeEmpleCodeUseScopService iWeEmpleCodeUseScopService;
-
-
-
-
-
-
 
     @Override
     public WeAddWayVo getWeContactWay(WeEmpleCode weEmpleCode) {
@@ -134,7 +130,7 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         if(null != weResultVoAjaxResult){
             WeResultVo weResultVo = weResultVoAjaxResult.getData();
 
-            if(weResultVo !=null &&  weResultVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+            if(weResultVo !=null &&  weResultVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())){
                 if (this.updateById(weEmpleCode)) {
                     if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
 

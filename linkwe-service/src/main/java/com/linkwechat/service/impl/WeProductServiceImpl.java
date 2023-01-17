@@ -13,6 +13,7 @@ import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.enums.MessageType;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -134,7 +135,7 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
         if (Objects.isNull(productResult)) {
             throw new WeComException(12001, "新增商品失败");
         }
-        if (!Objects.equals(productResult.getErrCode(), WeConstans.WE_SUCCESS_CODE)) {
+        if (!Objects.equals(productResult.getErrCode(), WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())) {
             throw new WeComException(12002, "新增商品失败");
         }
 
@@ -205,7 +206,7 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
         if (Objects.isNull(productResult)) {
             throw new WeComException(12011, "修改商品失败");
         }
-        if (!Objects.equals(productResult.getErrCode(), WeConstans.WE_SUCCESS_CODE)) {
+        if (!Objects.equals(productResult.getErrCode(), WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())) {
             throw new WeComException(12012, "修改商品失败");
         }
         product.setPicture(query.getPicture());
@@ -225,7 +226,7 @@ public class WeProductServiceImpl extends ServiceImpl<WeProductMapper, WeProduct
             if (Objects.isNull(weResult)) {
                 throw new WeComException(12021, "删除商品失败");
             }
-            if (!Objects.equals(weResult.getErrCode(), WeConstans.WE_SUCCESS_CODE)) {
+            if (!Objects.equals(weResult.getErrCode(), WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())) {
                 throw new WeComException(12022, "删除商品失败");
             }
             weProduct.setDelFlag(1);
