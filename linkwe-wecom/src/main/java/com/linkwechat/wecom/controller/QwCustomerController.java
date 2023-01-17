@@ -15,6 +15,7 @@ import com.linkwechat.domain.wecom.query.customer.state.WeUserBehaviorDataQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeAddCorpTagQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeCorpTagListQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeMarkTagQuery;
+import com.linkwechat.domain.wecom.query.customer.tag.WeUpdateCorpTagQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferGroupChatQuery;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
@@ -443,6 +444,21 @@ public class QwCustomerController {
                 qwCustomerService.updateJoinWayForGroupChat(query)
         );
     }
+
+
+    /**
+     * 编辑标签或标签组名称
+     * @param query
+     * @return
+     */
+    @PostMapping("/editCorpTag")
+    public AjaxResult<WeResultVo> editCorpTag(@RequestBody WeUpdateCorpTagQuery query){
+
+        return AjaxResult.success(
+                qwCustomerService.editCorpTag(query)
+        );
+    }
+
 
 
 }

@@ -63,8 +63,6 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
     @Autowired
     private IWeGroupMemberService weGroupMemberService;
 
-    @Autowired
-    private IWeTagService iWeTagService;
 
 
     @Autowired
@@ -153,7 +151,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                                 weGroupMember.transformQwParams(groupMember);
                                 weGroupMember.setCreateTime(new Date());
                                 weGroupMember.setUpdateTime(new Date());
-                                weGroupMember.setDelFlag(0);
+                                weGroupMember.setDelFlag(Constants.COMMON_STATE);
                                 weGroupMember.setCreateBy(SecurityUtils.getUserName());
                                 weGroupMember.setCreateById(SecurityUtils.getUserId());
                                 weGroupMember.setCreateTime(new Date());
@@ -240,6 +238,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
      * @param isCallBack  是否回掉 true回掉调用该方法,false非回掉触发改方法
      */
     private void insertBatchGroupAndMember(List<WeGroup> weGroups, List<WeGroupMember> weGroupMembers,boolean isCallBack) {
+
         if (CollectionUtil.isNotEmpty(weGroups)) {
             if (!isCallBack) {
                 //删除已经不存在的群
@@ -266,6 +265,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                 });
 
 
+
             }
 
             List<List<WeGroup>> lists = Lists.partition(weGroups, 500);
@@ -278,6 +278,11 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
         if (CollectionUtil.isNotEmpty(weGroupMembers)) {
             List<List<WeGroupMember>> lists = Lists.partition(weGroupMembers, 500);
             for (List<WeGroupMember> groupMemberList : lists) {
+
+                //物理删除已有的del_flag为非0的数据
+                groupMemberList.stream().forEach(kk->{
+                    weGroupMemberService.physicalDelete(kk.getChatId(),kk.getUserId());
+                });
 
                 weGroupMemberService.saveBatch(groupMemberList);
             }

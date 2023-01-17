@@ -43,4 +43,9 @@ public class WeGroupMemberServiceImpl extends ServiceImpl<WeGroupMemberMapper, W
     public void quitGroup(Integer quitScene,String userId, String chatId) {
         this.baseMapper.quitGroup(quitScene,userId,chatId);
     }
+
+    @Override
+    public void physicalDelete(String chatId, String userId) {
+        this.baseMapper.physicalDelete(chatId,userId);
+    }
 }

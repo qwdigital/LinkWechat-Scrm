@@ -7,9 +7,11 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.DateUtils;
+import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.poi.ExcelUtil;
+import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.WeCustomerSeas;
 import com.linkwechat.domain.wecom.vo.customer.seas.CustomerSeasRecordVo;
 import com.linkwechat.service.IWeCustomerSeasService;
@@ -37,12 +39,16 @@ public class WeCustomerSeasController extends BaseController {
      * @return
      */
     @GetMapping("/importTemplate")
-    public AjaxResult importTemplate()
+    public void importTemplate()
     {
 
-        ExcelUtil<WeCustomerSeas> util = new ExcelUtil<WeCustomerSeas>(WeCustomerSeas.class);
-        return util.importTemplateExcel( DateUtils.dateTimeNow(DateUtils.YYYY_MM_DD)+"_客户公海");
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeCustomerSeas.class, ListUtil.toList(new WeCustomerSeas()),"客户公海"
+        );
+
     }
+
+
 
 
     /**

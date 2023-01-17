@@ -15,6 +15,7 @@ import com.linkwechat.domain.wecom.query.customer.state.WeUserBehaviorDataQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeAddCorpTagQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeCorpTagListQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeMarkTagQuery;
+import com.linkwechat.domain.wecom.query.customer.tag.WeUpdateCorpTagQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferGroupChatQuery;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
@@ -243,6 +244,10 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
         return weCustomerClient.updateJoinWayForGroupChat(joinWayQuery);
     }
 
+    @Override
+    public WeResultVo editCorpTag(WeUpdateCorpTagQuery query) {
+        return weCustomerClient.editCorpTag(query);
+    }
 
 
 }

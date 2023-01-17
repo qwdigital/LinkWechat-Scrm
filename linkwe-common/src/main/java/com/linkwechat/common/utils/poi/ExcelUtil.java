@@ -63,6 +63,7 @@ import org.springframework.web.multipart.MultipartFile;
  * 
  * @author ruoyi
  */
+@Deprecated
 public class ExcelUtil<T>
 {
     private static final Logger log = LoggerFactory.getLogger(ExcelUtil.class);
