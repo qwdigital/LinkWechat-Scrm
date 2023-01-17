@@ -15,6 +15,7 @@ import com.linkwechat.domain.wecom.query.customer.state.WeUserBehaviorDataQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeAddCorpTagQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeCorpTagListQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeMarkTagQuery;
+import com.linkwechat.domain.wecom.query.customer.tag.WeUpdateCorpTagQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferGroupChatQuery;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
@@ -277,4 +278,11 @@ public interface IQwCustomerService {
      * @return
      */
     WeResultVo updateJoinWayForGroupChat(WeGroupChatUpdateJoinWayQuery joinWayQuery);
+
+    /**
+     * 编辑标签或标签组名称
+     * @param query
+     * @return
+     */
+    WeResultVo editCorpTag(WeUpdateCorpTagQuery query);
 }

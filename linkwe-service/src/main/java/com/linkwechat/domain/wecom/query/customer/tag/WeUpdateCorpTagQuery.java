@@ -1,8 +1,7 @@
 package com.linkwechat.domain.wecom.query.customer.tag;
 
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * @author danmo
@@ -11,6 +10,9 @@ import lombok.EqualsAndHashCode;
  **/
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeUpdateCorpTagQuery extends WeBaseQuery {
     /**
      * 标签或标签组的id
