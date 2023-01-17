@@ -11,6 +11,7 @@
 
     <properties>
         <spring-cloud.version>2021.0.1</spring-cloud.version>
+        <spring-cloud-gateway.version>3.0.7</spring-cloud-gateway.version>
         <spring-cloud-alibaba.version>2021.0.1.0</spring-cloud-alibaba.version>
         <springboot.version>2.6.6</springboot.version>
         <linkwe.version>3.1.0</linkwe.version>
@@ -22,7 +23,7 @@
         <swagger.version>2.9.2</swagger.version>
         <kaptcha.version>2.3.2</kaptcha.version>
         <pagehelper.boot.version>1.4.2</pagehelper.boot.version>
-        <fastjson.version>1.2.73</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <oshi.version>6.2.2</oshi.version>
         <commons.lang3.version>3.12.0</commons.lang3.version>
         <commons.io.version>2.11.0</commons.io.version>
@@ -45,6 +46,23 @@
         <transmittable-thread-local.version>2.12.2</transmittable-thread-local.version>
         <liquibase.version>4.8.0</liquibase.version>
         <rabbit.mq.version>2.6.1</rabbit.mq.version>
+        <commons-codec.version>1.11</commons-codec.version>
+        <easyexcel.version>3.1.1</easyexcel.version>
+        <javacv.version>1.4.1</javacv.version>
+        <ffmpeg-platform.version>3.4.2-1.4.1</ffmpeg-platform.version>
+        <starter-bootstrap.version>3.0.4</starter-bootstrap.version>
+        <swagger-annotations.version>1.5.21</swagger-annotations.version>
+        <swagger-models.version>1.5.21</swagger-models.version>
+        <p6spy.version>3.9.1</p6spy.version>
+        <cglib-nodep.version>3.2.4</cglib-nodep.version>
+        <commons-beanutils.version>1.9.4</commons-beanutils.version>
+        <xstream.version>1.4.20</xstream.version>
+        <dom4j.version>2.1.3</dom4j.version>
+        <weixin-java-cp.version>4.1.0</weixin-java-cp.version>
+        <cos_api.version>5.6.24</cos_api.version>
+        <bcprov-jdk15on.version>1.69</bcprov-jdk15on.version>
+        <bcpg-jdk15on.version>1.68</bcpg-jdk15on.version>
+        <bcpkix-jdk15on.version>1.68</bcpkix-jdk15on.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -68,7 +86,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-gateway-dependencies</artifactId>
-                <version>3.0.7</version>
+                <version>${spring-cloud-gateway.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -98,6 +116,14 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <!-- 参数校验 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-validation</artifactId>
+                <version>${springboot.version}</version>
+            </dependency>
+
 
             <!--阿里数据库连接池 -->
             <dependency>
@@ -143,6 +169,22 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+
+            <!--防止进入swagger页面报类型转换错误，排除2.9.2中的引用，手动增加1.5.21版本-->
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${swagger-annotations.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-models</artifactId>
+                <version>${swagger-models.version}</version>
+            </dependency>
+
 
             <!-- swagger2-UI-->
             <dependency>
@@ -306,21 +348,6 @@
                 <version>${jsqlparser.version}</version>
             </dependency>
 
-<!--            <dependency>-->
-<!--                <groupId>io.github.leejoker</groupId>-->
-<!--                <artifactId>linkwechat-nacos-starter</artifactId>-->
-<!--                <version>${nacos.starter.version}</version>-->
-<!--                <exclusions>-->
-<!--                    <exclusion>-->
-<!--                        <groupId>com.alibaba.cloud</groupId>-->
-<!--                        <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>-->
-<!--                    </exclusion>-->
-<!--                    <exclusion>-->
-<!--                        <groupId>com.alibaba.cloud</groupId>-->
-<!--                        <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>-->
-<!--                    </exclusion>-->
-<!--                </exclusions>-->
-<!--            </dependency>-->
 
 
             <dependency>
@@ -358,26 +385,91 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.11</version>
+                <version>${commons-codec.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>easyexcel</artifactId>
-                <version>3.1.1</version>
+                <version>${easyexcel.version}</version>
             </dependency>
 
             <!-- javacv start -->
             <dependency>
                 <groupId>org.bytedeco</groupId>
                 <artifactId>javacv</artifactId>
-                <version>1.4.1</version>
+                <version>${javacv.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.bytedeco.javacpp-presets</groupId>
                 <artifactId>ffmpeg-platform</artifactId>
-                <version>3.4.2-1.4.1</version>
+                <version>${ffmpeg-platform.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>p6spy</groupId>
+                <artifactId>p6spy</artifactId>
+                <version>${p6spy.version}</version>
+            </dependency>
+
+
+            <!--动态添加属性和方法开始-->
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${commons-beanutils.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cglib</groupId>
+                <artifactId>cglib-nodep</artifactId>
+                <version>${cglib-nodep.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>com.thoughtworks.xstream</groupId>
+                <artifactId>xstream</artifactId>
+                <version>${xstream.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>org.dom4j</groupId>
+                <artifactId>dom4j</artifactId>
+                <version>${dom4j.version}</version>
+            </dependency>
+            <!--动态添加属性和方法结束-->
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>weixin-java-cp</artifactId>
+                <version>${weixin-java-cp.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.qcloud</groupId>
+                <artifactId>cos_api</artifactId>
+                <version>${cos_api.version}</version>
+            </dependency>
+
+            <!-- 增加RSA PKCS1解密支持 -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>${bcprov-jdk15on.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpg-jdk15on</artifactId>
+                <version>${bcpg-jdk15on.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk15on</artifactId>
+                <version>${bcpkix-jdk15on.version}</version>
+            </dependency>
+
 
 
         </dependencies>
@@ -386,11 +478,11 @@
     <packaging>pom</packaging>
 
     <dependencies>
-        <!-- bootstrap 启动器 -->
+        <!--对于bootstrap.properties/bootstrap.yaml配置文件(我们合起来成为Bootstrap配置文件)的支持，需要导入如下的依赖 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-bootstrap</artifactId>
-            <version>3.0.4</version>
+            <version>${starter-bootstrap.version}</version>
         </dependency>
     </dependencies>
 
@@ -398,8 +490,8 @@
         <module>linkwe-auth</module>
         <module>linkwe-common</module>
         <module>linkwe-wecom</module>
-         <module>linkwe-api</module>
-         <module>linkwe-wx-api</module>
+        <module>linkwe-api</module>
+        <module>linkwe-wx-api</module>
         <module>linkwe-gateway</module>
         <module>linkwe-fileservice</module>
         <module>linkwe-scheduler</module>
@@ -407,55 +499,6 @@
         <module>linkwe-service</module>
     </modules>
 
-
-<!--    <build>-->
-<!--        <resources>-->
-<!--            <resource>-->
-<!--                <directory>src/main/resources</directory>-->
-<!--                &lt;!&ndash; 处理文件时替换文件中的变量 &ndash;&gt;-->
-<!--                <filtering>true</filtering>-->
-<!--                <excludes>-->
-<!--                    &lt;!&ndash; 打包时排除文件&ndash;&gt;-->
-<!--                    <exclude>bootstrap.yml</exclude>-->
-<!--                    <exclude>bootstrap-dev.yml</exclude>-->
-<!--                    <exclude>bootstrap-test.yml</exclude>-->
-<!--                    <exclude>bootstrap-prod.yml</exclude>-->
-<!--                </excludes>-->
-<!--            </resource>-->
-<!--            <resource>-->
-<!--                <directory>src/main/resources</directory>-->
-<!--                <filtering>true</filtering>-->
-<!--                &lt;!&ndash; 打包时所包含得文件 &ndash;&gt;-->
-<!--                <includes>-->
-<!--                    <include>bootstrap.yml</include>-->
-<!--                    <include>bootstrap-${spring.profiles.active}.yml</include>-->
-<!--                </includes>-->
-<!--            </resource>-->
-<!--        </resources>-->
-<!--        <plugins>-->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-compiler-plugin</artifactId>-->
-<!--                <version>3.6.2</version>-->
-<!--                <configuration>-->
-<!--                    <source>8</source>-->
-<!--                    <target>8</target>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-resources-plugin</artifactId>-->
-<!--                <configuration>-->
-<!--                    <nonFilteredFileExtensions>-->
-<!--                        <nonFilteredFileExtension>ttf</nonFilteredFileExtension>-->
-<!--                        <nonFilteredFileExtension>woff</nonFilteredFileExtension>-->
-<!--                        <nonFilteredFileExtension>woff2</nonFilteredFileExtension>-->
-<!--                    </nonFilteredFileExtensions>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-<!--        </plugins>-->
-<!--    </build>-->
     <build>
         <plugins>
             <plugin>
@@ -474,6 +517,7 @@
         </resources>
     </build>
 
+    <!--项目本身的jar从指定镜像下载-->
     <repositories>
         <repository>
             <id>public</id>
@@ -485,6 +529,7 @@
         </repository>
     </repositories>
 
+    <!--maven相关打包编译等操作配置了以后从当前指定仓库下载-->
     <pluginRepositories>
         <pluginRepository>
             <id>public</id>
