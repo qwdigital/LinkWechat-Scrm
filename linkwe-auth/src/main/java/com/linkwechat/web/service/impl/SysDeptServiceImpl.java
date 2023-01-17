@@ -7,10 +7,14 @@ import com.linkwechat.common.constant.UserConstants;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.TreeSelect;
 import com.linkwechat.common.core.domain.entity.SysDept;
+import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.model.LoginUser;
+import com.linkwechat.common.core.text.Convert;
 import com.linkwechat.common.exception.CustomException;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.domain.wecom.query.department.WeDeptQuery;
 import com.linkwechat.domain.wecom.vo.department.WeDeptVo;
 import com.linkwechat.fegin.QwDeptClient;
@@ -166,6 +170,20 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
         return UserConstants.UNIQUE;
     }
 
+    @Override
+    public void checkDeptDataScope(Long deptId) {
+        if (!SysUser.isAdmin(SecurityUtils.getUserId()))
+        {
+            SysDept dept = new SysDept();
+            dept.setDeptId(deptId);
+            List<SysDept> depts = SpringUtils.getAopProxy(this).selectDeptList(dept);
+            if (StringUtils.isEmpty(depts))
+            {
+                throw new WeComException("没有权限访问部门数据！");
+            }
+        }
+    }
+
     /**
      * 新增保存部门信息
      *
@@ -190,19 +208,23 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      * @return 结果
      */
     @Override
-    public int updateDept(SysDept dept) {
+    public int updateDept(SysDept dept)
+    {
         SysDept newParentDept = deptMapper.selectDeptById(dept.getParentId());
         SysDept oldDept = deptMapper.selectDeptById(dept.getDeptId());
-        if (StringUtils.isNotNull(newParentDept) && StringUtils.isNotNull(oldDept)) {
+        if (StringUtils.isNotNull(newParentDept) && StringUtils.isNotNull(oldDept))
+        {
             String newAncestors = newParentDept.getAncestors() + "," + newParentDept.getDeptId();
             String oldAncestors = oldDept.getAncestors();
             dept.setAncestors(newAncestors);
             updateDeptChildren(dept.getDeptId(), newAncestors, oldAncestors);
         }
         int result = deptMapper.updateDept(dept);
-        if (UserConstants.DEPT_NORMAL.equals(dept.getStatus())) {
+        if (UserConstants.DEPT_NORMAL.equals(dept.getStatus()) && StringUtils.isNotEmpty(dept.getAncestors())
+                && !StringUtils.equals("0", dept.getAncestors()))
+        {
             // 如果该部门是启用状态，则启用该部门的所有上级部门
-            updateParentDeptStatus(dept);
+            updateParentDeptStatusNormal(dept);
         }
         return result;
     }
@@ -212,12 +234,13 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      *
      * @param dept 当前部门
      */
-    private void updateParentDeptStatus(SysDept dept) {
-        String updateBy = dept.getUpdateBy();
-        dept = deptMapper.selectDeptById(dept.getDeptId());
-        dept.setUpdateBy(updateBy);
-        deptMapper.updateDeptStatus(dept);
+    private void updateParentDeptStatusNormal(SysDept dept)
+    {
+        String ancestors = dept.getAncestors();
+        Long[] deptIds = Convert.toLongArray(ancestors);
+        deptMapper.updateDeptStatusNormal(deptIds);
     }
+
 
     /**
      * 修改子元素关系
