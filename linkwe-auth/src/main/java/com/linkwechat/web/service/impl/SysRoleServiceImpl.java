@@ -9,6 +9,7 @@ import com.linkwechat.common.core.domain.entity.SysRole;
 import com.linkwechat.common.enums.RoleType;
 import com.linkwechat.common.enums.UserTypes;
 import com.linkwechat.common.exception.CustomException;
+import com.linkwechat.common.utils.Arith;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.web.domain.SysRoleDept;
@@ -363,12 +364,24 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
 
     private void insertRoleUser(Long roleId, Long[] userIds) {
-        for (Long userId : userIds) {
+        List<SysUserDTO> sysUserDTOS=new ArrayList<>();
+
+        Arrays.asList(userIds).stream().forEach(userId->{
             SysUserDTO sysUserDTO = new SysUserDTO();
             sysUserDTO.setUserId(userId);
             sysUserDTO.setRoleIds( Arrays.asList(roleId).stream().toArray(Long[]::new));
-            iSysUserService.editUserRole(sysUserDTO);
+            sysUserDTOS.add(sysUserDTO);
 
+        });
+//        for (Long userId : userIds) {
+//            SysUserDTO sysUserDTO = new SysUserDTO();
+//            sysUserDTO.setUserId(userId);
+//            sysUserDTO.setRoleIds( Arrays.asList(roleId).stream().toArray(Long[]::new));
+//            iSysUserService.editUserRole(sysUserDTO);
+//        }
+        if(CollectionUtils.isNotEmpty(sysUserDTOS)){
+            iSysUserService.batchEditUserRole(roleId,sysUserDTOS);
         }
+
     }
 }
