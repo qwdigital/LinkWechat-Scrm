@@ -55,7 +55,10 @@ public class WeShortLinkStatisticTask {
             }
             map.put(shortLinkId, shortLinkStat);
         }
-        weShortLinkStatService.saveBatch(new ArrayList<>(map.values()));
+        boolean saveBatch = weShortLinkStatService.saveBatch(new ArrayList<>(map.values()));
+        if(saveBatch){
+            redisService.deleteObject(keys);
+        }
         log.info("短链统计--------------------------end");
     }
 }
