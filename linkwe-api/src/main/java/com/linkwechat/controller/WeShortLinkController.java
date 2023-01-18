@@ -94,6 +94,7 @@ public class WeShortLinkController extends BaseController {
     @Log(title = "短链列表", businessType = BusinessType.SELECT)
     @GetMapping("/list")
     public TableDataInfo<PageInfo<WeShortLinkListVo>> getShortLinkList(WeShortLinkQuery query) {
+        startPage();
         PageInfo<WeShortLinkListVo> shortLinkList = weShortLinkService.getShortLinkList(query);
         return getDataTable(shortLinkList);
     }
