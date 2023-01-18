@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.config.LinkWeChatConfig;
+import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.core.domain.FileEntity;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.Base62NumUtil;
@@ -185,12 +186,14 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
     public PageInfo<WeShortLinkListVo> getShortLinkList(WeShortLinkQuery query) {
         PageInfo<WeShortLinkListVo> pageInfo = new PageInfo<>();
         List<WeShortLink> shortLinkList = list(new LambdaQueryWrapper<WeShortLink>()
+                .eq(WeShortLink::getDelFlag,0)
                 .like(StringUtils.isNotEmpty(query.getShortLinkName()), WeShortLink::getShortLinkName, query.getShortLinkName())
                 .eq(Objects.nonNull(query.getStatus()), WeShortLink::getStatus, query.getStatus())
                 .eq(Objects.nonNull(query.getJumpType()), WeShortLink::getJumpType, query.getJumpType())
                 .eq(Objects.nonNull(query.getTouchType()), WeShortLink::getTouchType, query.getTouchType())
                 .eq(Objects.nonNull(query.getExtensionType()), WeShortLink::getExtensionType, query.getExtensionType())
                 .eq(Objects.nonNull(query.getType()), WeShortLink::getType, query.getType())
+                .orderByDesc(BaseEntity::getCreateTime)
         );
         if (CollectionUtil.isNotEmpty(shortLinkList)) {
             List<WeShortLinkListVo> list = shortLinkList.stream().map(shortLink -> {

@@ -96,7 +96,7 @@ public class WeShortLinkStatServiceImpl extends ServiceImpl<WeShortLinkStatMappe
         List<WeShortLinkStat> statList = list(new LambdaQueryWrapper<WeShortLinkStat>()
                 .eq(Objects.nonNull(query.getId()), WeShortLinkStat::getShortId, query.getId())
                 .ge(Objects.nonNull(query.getBeginTime()), WeShortLinkStat::getDateTime, DateUtil.formatDate(query.getBeginTime()))
-                .le(Objects.nonNull(query.getEndTime()), WeShortLinkStat::getEndTime, DateUtil.formatDate(query.getEndTime()))
+                .le(Objects.nonNull(query.getEndTime()), WeShortLinkStat::getDateTime, DateUtil.formatDate(query.getEndTime()))
                 .eq(WeShortLinkStat::getDelFlag, 0));
 
         JSONObject yData = new JSONObject();
