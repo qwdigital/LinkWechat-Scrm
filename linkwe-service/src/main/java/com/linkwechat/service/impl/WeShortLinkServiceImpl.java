@@ -2,7 +2,6 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
@@ -41,7 +40,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -71,7 +69,6 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
     @Autowired
     private IWeShortLinkStatService weShortLinkStatService;
 
-
     @Override
     public WeShortLinkAddVo addShortLink(WeShortLinkAddQuery query) {
         if (StringUtils.isNotEmpty(query.getLongLink())) {
@@ -93,11 +90,6 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
             String encode = Base62NumUtil.encode(weShortLink.getId());
             String shortLinkUrl = linkWeChatConfig.getShortLinkDomainName() + encode;
             weShortLinkAddVo.setShortUrl(shortLinkUrl);
-            //跳转微信
-            if (Objects.equals(1, jumpType)) {
-                getAppletLink(encode, weShortLink);
-                updateById(weShortLink);
-            }
 
             try {
                 NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(IdUtil.simpleUUID() + "." + ImgUtil.IMAGE_TYPE_PNG, QrCodeUtil.generatePng(shortLinkUrl, QrConfig.create()));
@@ -108,21 +100,6 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
             }
         }
         return weShortLinkAddVo;
-    }
-
-    private void getAppletLink(String encode, WeShortLink entity) {
-        WxJumpWxaQuery wxaQuery = new WxJumpWxaQuery();
-        WxJumpWxaQuery.JumpWxa wxa = new WxJumpWxaQuery.JumpWxa();
-        wxa.setPath(linkWeChatConfig.getShortAppletUrl());
-        wxa.setQuery("id=" + encode);
-        wxaQuery.setJump_wxa(wxa);
-        WxJumpWxaVo wxJumpWxa = qxAppletClient.generateScheme(wxaQuery).getData();
-        if (Objects.nonNull(wxJumpWxa) && StringUtils.isNotEmpty(wxJumpWxa.getOpenLink())) {
-            entity.setSchemeLink(wxJumpWxa.getOpenLink());
-            entity.setTermTime(DateUtil.offsetDay(new Date(), 30));
-        } else {
-            throw new WeComException("生成小程序跳转链接失败");
-        }
     }
 
     @Override
@@ -146,11 +123,6 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
         WeShortLinkAddVo weShortLinkAddVo = new WeShortLinkAddVo();
         WeShortLink weShortLink = new WeShortLink();
         BeanUtil.copyProperties(query, weShortLink);
-
-        //跳转微信
-        if (Objects.equals(1, jumpType) && Objects.equals(2, touchType)) {
-            getAppletLink(encode, weShortLink);
-        }
 
         if (updateById(weShortLink)) {
             String shortLinkUrl = linkWeChatConfig.getShortLinkDomainName() + encode;
@@ -186,7 +158,7 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
     public PageInfo<WeShortLinkListVo> getShortLinkList(WeShortLinkQuery query) {
         PageInfo<WeShortLinkListVo> pageInfo = new PageInfo<>();
         List<WeShortLink> shortLinkList = list(new LambdaQueryWrapper<WeShortLink>()
-                .eq(WeShortLink::getDelFlag,0)
+                .eq(WeShortLink::getDelFlag, 0)
                 .like(StringUtils.isNotEmpty(query.getShortLinkName()), WeShortLink::getShortLinkName, query.getShortLinkName())
                 .eq(Objects.nonNull(query.getStatus()), WeShortLink::getStatus, query.getStatus())
                 .eq(Objects.nonNull(query.getJumpType()), WeShortLink::getJumpType, query.getJumpType())
@@ -233,7 +205,17 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
             throw new WeComException("请未配置小程序原始ID");
         }
 
-        resObj.put("url_scheme", weShortLink.getSchemeLink());
+        WxJumpWxaQuery wxaQuery = new WxJumpWxaQuery();
+        WxJumpWxaQuery.JumpWxa wxa = new WxJumpWxaQuery.JumpWxa();
+        wxa.setPath(linkWeChatConfig.getShortAppletUrl());
+        wxa.setQuery("id=" + shortUrl);
+        wxaQuery.setJump_wxa(wxa);
+        WxJumpWxaVo wxJumpWxa = qxAppletClient.generateScheme(wxaQuery).getData();
+        if (Objects.nonNull(wxJumpWxa) && StringUtils.isNotEmpty(wxJumpWxa.getOpenLink())) {
+            resObj.put("url_scheme", wxJumpWxa.getOpenLink());
+        } else {
+            throw new WeComException("生成小程序跳转链接失败");
+        }
         resObj.put("user_name", corpAccount.getWxAppletOriginalId());
         resObj.put("path", linkWeChatConfig.getShortAppletUrl());
         resObj.put("query", "id=" + shortUrl);
@@ -247,6 +229,6 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
 
     @Override
     public WeShortLinkStatisticsVo getLineStatistics(WeShortLinkStatisticQuery query) {
-       return  weShortLinkStatService.getLineStatistics(query);
+        return weShortLinkStatService.getLineStatistics(query);
     }
 }
