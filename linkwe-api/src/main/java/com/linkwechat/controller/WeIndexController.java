@@ -93,6 +93,7 @@ public class WeIndexController {
     @ApiOperation(value = "短链换取长链", httpMethod = "GET")
     @GetMapping("/t/{shortUrl}")
     public void getShort2LongUrl(HttpServletResponse resp, @PathVariable("shortUrl") String shortUrl) throws IOException {
+        log.info("短链换取长链 shortUrl:{}",shortUrl);
         JSONObject short2LongUrl = weShortLinkService.getShort2LongUrl(shortUrl);
         if(Objects.isNull(short2LongUrl)){
             throw new WeComException("无效数据");
