@@ -3,11 +3,13 @@ package com.linkwechat.controller;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.net.Ipv4Util;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.nacos.common.utils.IPUtil;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.annotation.ShortLinkView;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.Base62NumUtil;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -55,6 +58,9 @@ public class WeIndexController {
     @Autowired
     private IWeShortLinkService weShortLinkService;
 
+
+    @Autowired
+    private RedisService redisService;
 
     /**
      * 系统首页相关基础数据获取
@@ -92,9 +98,18 @@ public class WeIndexController {
     @ShortLinkView(prefix = "t:")
     @ApiOperation(value = "短链换取长链", httpMethod = "GET")
     @GetMapping("/t/{shortUrl}")
-    public void getShort2LongUrl(HttpServletResponse resp, @PathVariable("shortUrl") String shortUrl) throws IOException {
+    public void getShort2LongUrl(HttpServletRequest request, HttpServletResponse resp, @PathVariable("shortUrl") String shortUrl) throws IOException {
         log.info("短链换取长链 shortUrl:{}",shortUrl);
-        JSONObject short2LongUrl = weShortLinkService.getShort2LongUrl(shortUrl);
+        if(StringUtils.isEmpty(shortUrl)){
+            return;
+        }
+        String ipAddr = IpUtils.getIpAddr(request);
+        String key = "we:t:shortUrl:"+ipAddr;
+        JSONObject short2LongUrl = (JSONObject) redisService.getCacheObject(key);
+        if(ObjectUtil.isNull(short2LongUrl)){
+            short2LongUrl = weShortLinkService.getShort2LongUrl(shortUrl);
+            redisService.setCacheObject(key,short2LongUrl);
+        }
         if(Objects.isNull(short2LongUrl)){
             throw new WeComException("无效数据");
         }
@@ -102,7 +117,7 @@ public class WeIndexController {
         resp.setHeader("Content-Type", "text/html; charset=utf-8");
         resp.setStatus(HttpServletResponse.SC_OK);
         PrintWriter writer = resp.getWriter();
-        writer.write(result.toCharArray());
+        writer.write(StringUtils.format(result,short2LongUrl.toJSONString()).toCharArray());
         writer.close();
     }
 }
