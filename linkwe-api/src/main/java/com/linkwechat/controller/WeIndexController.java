@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 首页相关
@@ -108,7 +109,7 @@ public class WeIndexController {
         JSONObject short2LongUrl = (JSONObject) redisService.getCacheObject(key);
         if(ObjectUtil.isNull(short2LongUrl)){
             short2LongUrl = weShortLinkService.getShort2LongUrl(shortUrl);
-            redisService.setCacheObject(key,short2LongUrl);
+            redisService.setCacheObject(key,short2LongUrl,1, TimeUnit.DAYS);
         }
         if(Objects.isNull(short2LongUrl)){
             throw new WeComException("无效数据");
