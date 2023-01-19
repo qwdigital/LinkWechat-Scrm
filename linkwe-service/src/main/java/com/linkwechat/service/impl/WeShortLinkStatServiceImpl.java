@@ -38,8 +38,7 @@ public class WeShortLinkStatServiceImpl extends ServiceImpl<WeShortLinkStatMappe
     public WeShortLinkStatisticsVo getDataStatistics(WeShortLinkStatisticQuery query) {
         WeShortLinkStatisticsVo statisticsVo = new WeShortLinkStatisticsVo();
         List<WeShortLinkStat> statList = list(new LambdaQueryWrapper<WeShortLinkStat>()
-                .eq(Objects.nonNull(query.getId()), WeShortLinkStat::getShortId, query.getId())
-                .eq(WeShortLinkStat::getDelFlag, 0));
+                .eq(Objects.nonNull(query.getId()), WeShortLinkStat::getShortId, query.getId()));
 
         List<WeShortLinkStat> yesterdayData = new LinkedList<>();
         if (CollectionUtil.isNotEmpty(statList)) {
@@ -61,6 +60,7 @@ public class WeShortLinkStatServiceImpl extends ServiceImpl<WeShortLinkStatMappe
             Integer tpv = redisService.getCacheObject(pvKey);
             todayPvNum += tpv;
         }
+        statisticsVo.setPvTotalCount(statisticsVo.getPvTotalCount() + todayPvNum);
         statisticsVo.setPvTodayCount(todayPvNum);
         int pvDiff = todayPvNum - yesterdayData.stream().mapToInt(WeShortLinkStat::getPvNum).sum();
         statisticsVo.setPvDiff(pvDiff);
@@ -72,6 +72,7 @@ public class WeShortLinkStatServiceImpl extends ServiceImpl<WeShortLinkStatMappe
             Long tuv = redisService.hyperLogLogCount(uvKey);
             todayUvNum += tuv.intValue();
         }
+        statisticsVo.setUvTotalCount(statisticsVo.getUvTotalCount() + todayUvNum);
         statisticsVo.setUvTodayCount(todayUvNum);
         int uvDiff = todayUvNum - yesterdayData.stream().mapToInt(WeShortLinkStat::getUvNum).sum();
         statisticsVo.setUvDiff(uvDiff);
@@ -83,6 +84,7 @@ public class WeShortLinkStatServiceImpl extends ServiceImpl<WeShortLinkStatMappe
             Integer topen = redisService.getCacheObject(openKey);
             todayOpenNum += topen;
         }
+        statisticsVo.setOpenTotalCount(statisticsVo.getOpenTotalCount() + todayOpenNum);
         statisticsVo.setOpenTodayCount(todayOpenNum);
         int openDiff = todayOpenNum - yesterdayData.stream().mapToInt(WeShortLinkStat::getOpenNum).sum();
         statisticsVo.setOpenDiff(openDiff);
@@ -96,8 +98,7 @@ public class WeShortLinkStatServiceImpl extends ServiceImpl<WeShortLinkStatMappe
         List<WeShortLinkStat> statList = list(new LambdaQueryWrapper<WeShortLinkStat>()
                 .eq(Objects.nonNull(query.getId()), WeShortLinkStat::getShortId, query.getId())
                 .ge(Objects.nonNull(query.getBeginTime()), WeShortLinkStat::getDateTime, DateUtil.formatDate(query.getBeginTime()))
-                .le(Objects.nonNull(query.getEndTime()), WeShortLinkStat::getDateTime, DateUtil.formatDate(query.getEndTime()))
-                .eq(WeShortLinkStat::getDelFlag, 0));
+                .le(Objects.nonNull(query.getEndTime()), WeShortLinkStat::getDateTime, DateUtil.formatDate(query.getEndTime())));
 
         JSONObject yData = new JSONObject();
         List<Integer> pvList = new LinkedList<>();

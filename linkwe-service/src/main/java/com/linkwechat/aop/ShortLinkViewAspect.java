@@ -55,8 +55,8 @@ public class ShortLinkViewAspect {
         Object proceed = joinPoint.proceed();
         try {
             Object[] object = joinPoint.getArgs();
-            HttpServletResponse resp =(HttpServletResponse) object[0];
-            String shortUrl = (String) object[1];
+            HttpServletResponse resp =(HttpServletResponse) object[1];
+            String shortUrl = (String) object[2];
             log.info("shortLinkView shortUrl：{}， 请求返回状态：RESPONSE : {} ",shortUrl, Objects.nonNull(resp) ? resp.getStatus() : "");
             if (HttpServletResponse.SC_OK != resp.getStatus()) {
                 return proceed;
