@@ -52,9 +52,13 @@ public class WeShortLinkStatServiceImpl extends ServiceImpl<WeShortLinkStatMappe
             yesterdayData = statList.stream().filter(item -> ObjectUtil.equal(DateUtil.yesterday().toDateStr(), item.getDateTime()))
                     .collect(Collectors.toList());
         }
+        String shortUrl = " *";
+        if(Objects.nonNull(query.getId())){
+            shortUrl = Base62NumUtil.encode(query.getId());
+        }
 
         //今日PV数
-        Collection<String> pvKeys = redisService.keys(WeConstans.WE_SHORT_LINK_KEY + WeConstans.PV + "*");
+        Collection<String> pvKeys = redisService.keys(WeConstans.WE_SHORT_LINK_KEY + WeConstans.PV + shortUrl);
         Integer todayPvNum = 0;
         for (String pvKey : pvKeys) {
             Integer tpv = redisService.getCacheObject(pvKey);
@@ -66,7 +70,7 @@ public class WeShortLinkStatServiceImpl extends ServiceImpl<WeShortLinkStatMappe
         statisticsVo.setPvDiff(pvDiff);
 
         //今日UV数
-        Collection<String> uvKeys = redisService.keys(WeConstans.WE_SHORT_LINK_KEY + WeConstans.UV + "*");
+        Collection<String> uvKeys = redisService.keys(WeConstans.WE_SHORT_LINK_KEY + WeConstans.UV + shortUrl);
         Integer todayUvNum = 0;
         for (String uvKey : uvKeys) {
             Long tuv = redisService.hyperLogLogCount(uvKey);
@@ -78,7 +82,7 @@ public class WeShortLinkStatServiceImpl extends ServiceImpl<WeShortLinkStatMappe
         statisticsVo.setUvDiff(uvDiff);
 
         //今日打开小程序数
-        Collection<String> openKeys = redisService.keys(WeConstans.WE_SHORT_LINK_KEY + WeConstans.OPEN_APPLET + "*");
+        Collection<String> openKeys = redisService.keys(WeConstans.WE_SHORT_LINK_KEY + WeConstans.OPEN_APPLET + shortUrl);
         Integer todayOpenNum = 0;
         for (String openKey : openKeys) {
             Integer topen = redisService.getCacheObject(openKey);

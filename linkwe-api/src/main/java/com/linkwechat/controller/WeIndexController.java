@@ -105,7 +105,7 @@ public class WeIndexController {
             return;
         }
         String ipAddr = IpUtils.getIpAddr(request);
-        String key = "we:t:shortUrl:"+ipAddr;
+        String key = "we:t:shortUrl:"+ipAddr + ":" +shortUrl;
         JSONObject short2LongUrl = (JSONObject) redisService.getCacheObject(key);
         if(ObjectUtil.isNull(short2LongUrl)){
             short2LongUrl = weShortLinkService.getShort2LongUrl(shortUrl);
