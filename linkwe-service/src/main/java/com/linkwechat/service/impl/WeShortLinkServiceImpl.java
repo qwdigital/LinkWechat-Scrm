@@ -40,6 +40,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.awt.image.BufferedImage;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -71,11 +74,7 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
 
     @Override
     public WeShortLinkAddVo addShortLink(WeShortLinkAddQuery query) {
-        if (StringUtils.isNotEmpty(query.getLongLink())) {
-            if (Objects.equals(1, query.getTouchType()) && !query.isValidUrl(query.getLongLink())) {
-                throw new WeComException("无效链接");
-            }
-        }
+        checkParams(query);
         WeShortLinkAddVo weShortLinkAddVo = new WeShortLinkAddVo();
         WeShortLink weShortLink = new WeShortLink();
         BeanUtil.copyProperties(query, weShortLink);
@@ -102,16 +101,37 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
         return weShortLinkAddVo;
     }
 
-    @Override
-    public WeShortLinkAddVo updateShortLink(WeShortLinkAddQuery query) {
-        if (Objects.isNull(query.getId())) {
-            throw new WeComException("ID不能为空");
-        }
+    private void checkParams(WeShortLinkAddQuery query) {
         if (StringUtils.isNotEmpty(query.getLongLink())) {
             if (Objects.equals(1, query.getTouchType()) && !query.isValidUrl(query.getLongLink())) {
                 throw new WeComException("无效链接");
             }
         }
+        if(StringUtils.isNotEmpty(query.getQrCode())){
+            if (query.isValidUrl(query.getQrCode())) {
+                throw new WeComException("无效二维码");
+            }
+            try {
+                URL url = new URL(query.getQrCode());
+                BufferedImage read = ImgUtil.read(url);
+                String decode = QrCodeUtil.decode(read);
+                if(StringUtils.isEmpty(decode)){
+                    throw new WeComException("无效二维码");
+                }
+            } catch (MalformedURLException e) {
+                log.info("二维码识别失败 {}",e);
+                throw new WeComException("二维码识别失败");
+            }
+        }
+    }
+
+    @Override
+    public WeShortLinkAddVo updateShortLink(WeShortLinkAddQuery query) {
+        if (Objects.isNull(query.getId())) {
+            throw new WeComException("ID不能为空");
+        }
+        checkParams(query);
+
         String encode = Base62NumUtil.encode(query.getId());
 
         Integer jumpType = query.getJumpType();
