@@ -42,7 +42,7 @@
 
     <delete id="deleteUserRole" parameterType="Long">
         delete from sys_user_role where user_id in
-        <foreach collection="array" item="userId" open="(" separator="," close=")">
+        <foreach collection="ids" item="userId" open="(" separator="," close=")">
             #{userId}
         </foreach>
         <if test="roleId != null">
