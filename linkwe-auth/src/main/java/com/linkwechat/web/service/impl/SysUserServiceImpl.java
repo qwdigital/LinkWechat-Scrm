@@ -730,9 +730,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 = this.listByIds(users.stream().map(SysUserDTO::getUserId).collect(Collectors.toSet()));
 
         if(CollectionUtil.isNotEmpty(sysUsers)){
-            //删除原有角色
+            //删除原有角色用户的当前角色
             userRoleMapper.deleteUserRole(
-                    sysUsers.stream().map(SysUser::getUserId).collect(Collectors.toSet()).toArray(new Long[]{})
+                    sysUsers.stream().map(SysUser::getUserId).collect(Collectors.toSet()).toArray(new Long[]{}),roleId
             );
 
             SysRole sysRole = roleMapper.selectRoleById(roleId);

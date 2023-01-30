@@ -45,6 +45,9 @@
         <foreach collection="array" item="userId" open="(" separator="," close=")">
             #{userId}
         </foreach>
+        <if test="roleId != null">
+          and role_id = #{roleId}
+        </if>
     </delete>
 
     <insert id="batchUserRole">
