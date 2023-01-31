@@ -37,6 +37,7 @@ import com.linkwechat.service.IWeShortLinkService;
 import com.linkwechat.service.IWeShortLinkStatService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -71,6 +72,9 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
 
     @Autowired
     private IWeShortLinkStatService weShortLinkStatService;
+
+    @Value("${weixin.short.env_version:develop}")
+    private String shortEnvVersion;
 
     @Override
     public WeShortLinkAddVo addShortLink(WeShortLinkAddQuery query) {
@@ -229,6 +233,7 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
         WxJumpWxaQuery.JumpWxa wxa = new WxJumpWxaQuery.JumpWxa();
         wxa.setPath(linkWeChatConfig.getShortAppletUrl());
         wxa.setQuery("id=" + shortUrl);
+        wxa.setEnv_version(shortEnvVersion);
         wxaQuery.setJump_wxa(wxa);
         WxJumpWxaVo wxJumpWxa = qxAppletClient.generateScheme(wxaQuery).getData();
         if (Objects.nonNull(wxJumpWxa) && StringUtils.isNotEmpty(wxJumpWxa.getOpenLink())) {
