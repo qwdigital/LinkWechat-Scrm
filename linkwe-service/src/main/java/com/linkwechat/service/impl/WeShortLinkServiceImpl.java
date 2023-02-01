@@ -111,7 +111,7 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
                 throw new WeComException("无效链接");
             }
         }
-        if(StringUtils.isNotEmpty(query.getQrCode())){
+        /*if(StringUtils.isNotEmpty(query.getQrCode())){
             if (query.isValidUrl(query.getQrCode())) {
                 throw new WeComException("无效二维码");
             }
@@ -126,7 +126,7 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
                 log.info("二维码识别失败 {}",e);
                 throw new WeComException("二维码识别失败");
             }
-        }
+        }*/
     }
 
     @Override
