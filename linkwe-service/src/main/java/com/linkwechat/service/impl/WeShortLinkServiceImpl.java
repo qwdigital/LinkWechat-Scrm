@@ -73,7 +73,7 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
     @Autowired
     private IWeShortLinkStatService weShortLinkStatService;
 
-    @Value("${weixin.short.env_version:develop}")
+    @Value("${weixin.short.env-version:develop}")
     private String shortEnvVersion;
 
     @Override
