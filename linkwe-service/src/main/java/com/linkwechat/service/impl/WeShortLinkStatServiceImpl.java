@@ -49,7 +49,7 @@ public class WeShortLinkStatServiceImpl extends ServiceImpl<WeShortLinkStatMappe
             int openNum = statList.stream().mapToInt(WeShortLinkStat::getOpenNum).sum();
             statisticsVo.setOpenTotalCount(openNum);
 
-            yesterdayData = statList.stream().filter(item -> ObjectUtil.equal(DateUtil.yesterday().toDateStr(), item.getDateTime()))
+            yesterdayData = statList.stream().filter(item -> ObjectUtil.equal(DateUtil.yesterday().toDateStr(), DateUtil.formatDate(item.getDateTime())))
                     .collect(Collectors.toList());
         }
         String shortUrl = "*";
