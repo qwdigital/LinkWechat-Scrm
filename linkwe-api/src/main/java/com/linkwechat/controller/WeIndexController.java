@@ -106,13 +106,27 @@ public class WeIndexController {
         }
         String ipAddr = IpUtils.getIpAddr(request);
         String key = "we:t:shortUrl:"+ipAddr + ":" +shortUrl;
-        JSONObject short2LongUrl = (JSONObject) redisService.getCacheObject(key);
-        if(ObjectUtil.isNull(short2LongUrl)){
-            short2LongUrl = weShortLinkService.getShort2LongUrl(shortUrl);
-            redisService.setCacheObject(key,short2LongUrl,1, TimeUnit.DAYS);
-        }
-        if(Objects.isNull(short2LongUrl)){
-            throw new WeComException("无效数据");
+
+        JSONObject short2LongUrl = new JSONObject();
+        //判断键是否存在
+        Boolean hasKey = redisService.hasKey(key);
+        if(hasKey){
+            short2LongUrl = (JSONObject) redisService.getCacheObject(key);
+        }else {
+            //尝试加锁
+            Boolean lock = redisService.tryLock(key, "lock", 2L);
+            if(lock){
+                short2LongUrl = weShortLinkService.getShort2LongUrl(shortUrl);
+                if(StringUtils.isNotEmpty(short2LongUrl.getString("errorMsg"))){
+                    redisService.setCacheObject(key,short2LongUrl,5, TimeUnit.MINUTES);
+                }else {
+                    redisService.setCacheObject(key,short2LongUrl,1, TimeUnit.DAYS);
+                }
+                //释放锁
+                redisService.unLock(key, "lock");
+            }else {
+                throw new WeComException("操作过于频繁，请稍后再试");
+            }
         }
         String result = ResourceUtil.readUtf8Str("templates/jump.html");
         resp.setHeader("Content-Type", "text/html; charset=utf-8");
