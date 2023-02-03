@@ -5,12 +5,12 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.Duration;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -412,5 +412,40 @@ public class RedisService {
      */
     public Long hyperLogLogCount(String... key) {
         return redisTemplate.opsForHyperLogLog().size(key);
+    }
+
+    /**
+     *  加锁
+     * @param key 键
+     * @param value 值
+     * @param second 秒
+     **/
+    public Boolean tryLock(String key,String value, Long second){
+        Boolean lockStatus = this.redisTemplate.opsForValue().setIfAbsent(key,value, Duration.ofSeconds(second));
+        return lockStatus;
+    }
+
+    /**
+     *  加锁
+     * @param key 键
+     * @param value 值
+     * @param timeout 时间
+     * @param unit 时间类型
+     **/
+    public Boolean tryLock(String key,String value, long timeout, TimeUnit unit){
+        Boolean lockStatus = this.redisTemplate.opsForValue().setIfAbsent(key,value, timeout, unit);
+        return lockStatus;
+    }
+
+    /**
+     *  释放锁
+     * @param key 键
+     * @param value 值
+     **/
+    public Long unLock(String key,String value){
+        String luaScript = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+        RedisScript<Long> redisScript = new DefaultRedisScript<>(luaScript,Long.class);
+        Long releaseStatus = (Long)this.redisTemplate.execute(redisScript, Collections.singletonList(key),value);
+        return releaseStatus;
     }
 }

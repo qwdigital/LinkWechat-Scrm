@@ -215,18 +215,37 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
         JSONObject resObj = new JSONObject();
         WeShortLink weShortLink = getById(id);
         if (Objects.isNull(weShortLink)) {
-            throw new WeComException("无效链接");
+            resObj.put("errorMsg","无效链接");
+            return resObj;
+            //throw new WeComException("无效链接");
         }
+        resObj.put("type",weShortLink.getType());
+
         Integer status = weShortLink.getStatus();
         if (Objects.equals(2, status)) {
-            throw new WeComException("链接已关闭");
+            resObj.put("errorMsg","链接已关闭");
+            return resObj;
+            //throw new WeComException("链接已关闭");
         }
+
+        if(Objects.equals(0,weShortLink.getType())){
+            resObj.put("linkPath",weShortLink.getLongLink());
+        }
+
+        if(StringUtils.isNotEmpty(weShortLink.getQrCode())){
+            resObj.put("qrCode",weShortLink.getLongLink());
+        }
+
         WeCorpAccount corpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
         if (Objects.isNull(corpAccount)) {
-            throw new WeComException("请未配置企业信息");
+            resObj.put("errorMsg","请未配置企业信息");
+            return resObj;
+            //throw new WeComException("请未配置企业信息");
         }
         if (StringUtils.isEmpty(corpAccount.getWxAppletOriginalId())) {
-            throw new WeComException("请未配置小程序原始ID");
+            resObj.put("errorMsg","请未配置小程序原始ID");
+            return resObj;
+            //throw new WeComException("请未配置小程序原始ID");
         }
 
         WxJumpWxaQuery wxaQuery = new WxJumpWxaQuery();
@@ -239,7 +258,8 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
         if (Objects.nonNull(wxJumpWxa) && StringUtils.isNotEmpty(wxJumpWxa.getOpenLink())) {
             resObj.put("url_scheme", wxJumpWxa.getOpenLink());
         } else {
-            throw new WeComException("生成小程序跳转链接失败");
+            resObj.put("errorMsg","生成小程序跳转链接失败");
+            //throw new WeComException("生成小程序跳转链接失败");
         }
         resObj.put("user_name", corpAccount.getWxAppletOriginalId());
         resObj.put("path", linkWeChatConfig.getShortAppletUrl());
