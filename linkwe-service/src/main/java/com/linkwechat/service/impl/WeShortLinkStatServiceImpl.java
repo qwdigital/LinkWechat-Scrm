@@ -52,7 +52,7 @@ public class WeShortLinkStatServiceImpl extends ServiceImpl<WeShortLinkStatMappe
             yesterdayData = statList.stream().filter(item -> ObjectUtil.equal(DateUtil.yesterday().toDateStr(), item.getDateTime()))
                     .collect(Collectors.toList());
         }
-        String shortUrl = " *";
+        String shortUrl = "*";
         if(Objects.nonNull(query.getId())){
             shortUrl = Base62NumUtil.encode(query.getId());
         }
