@@ -18,12 +18,13 @@
                 #{query.templateInfo},'%')
             </if>
             <if test="userIds !=null and userIds.size()>0">
-                <foreach collection="userIds" item="item" open="AND (FIND_IN_SET(" separator=", user_ids) OR FIND_IN_SET( "
+                <foreach collection="userIds" item="item" open="AND (FIND_IN_SET("
+                         separator=", user_ids) OR FIND_IN_SET( "
                          close=", user_ids))">
                     #{item}
                 </foreach>
             </if>
         </where>
-        order by update_time
+        order by update_time desc
     </select>
 </mapper>
