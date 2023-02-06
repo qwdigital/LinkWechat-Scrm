@@ -4,7 +4,9 @@ import cn.hutool.core.date.DateUtil;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.utils.Base62NumUtil;
+import com.linkwechat.domain.WeShortLink;
 import com.linkwechat.domain.WeShortLinkStat;
+import com.linkwechat.service.IWeShortLinkService;
 import com.linkwechat.service.IWeShortLinkStatService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,9 @@ public class WeShortLinkStatisticTask {
     @Autowired
     private IWeShortLinkStatService weShortLinkStatService;
 
+    @Autowired
+    private IWeShortLinkService weShortLinkService;
+
     @XxlJob("weShortLinkStatisticTask")
     public void shortLinkStatisticHandle() {
         Map<Long, WeShortLinkStat> map = new HashMap<>();
@@ -35,7 +40,10 @@ public class WeShortLinkStatisticTask {
         for (String key : keys) {
             String shortUrl = key.substring(key.lastIndexOf(":") + 1);
             long shortLinkId = Base62NumUtil.decode(shortUrl);
-
+            WeShortLink weShortLink = weShortLinkService.getById(shortLinkId);
+            if(Objects.isNull(weShortLink)){
+                continue;
+            }
             WeShortLinkStat shortLinkStat = map.get(shortLinkId);
             if (Objects.isNull(shortLinkStat)) {
                 shortLinkStat = new WeShortLinkStat();
@@ -60,5 +68,14 @@ public class WeShortLinkStatisticTask {
             redisService.deleteObject(keys);
         }
         log.info("短链统计--------------------------end");
+    }
+
+    public static void main(String[] args) {
+        String key = WeConstans.WE_SHORT_LINK_KEY  + WeConstans.PV + "";
+        String shortUrl = key.substring(key.lastIndexOf(":") + 1);
+        System.out.println(shortUrl);
+        long shortLinkId = Base62NumUtil.decode(shortUrl);
+        System.out.println(shortLinkId);
+        System.out.println(Base62NumUtil.encode(4412757242655231L));
     }
 }
