@@ -26,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -218,15 +215,21 @@ public class WeCategoryServiceImpl extends ServiceImpl<WeCategoryMapper, WeCateg
     public void updateObject(Integer moduleType,Long cateGoreId,List<Long> ids,String propertyName){
         switch (CategoryModuleTypeEnum.getCategoryModuleTypeEnumByValue(moduleType)){
             case MATERIAL:
-                new LambdaUpdateChainWrapper<>(weMaterialMapper).set(WeMaterial::getCategoryId, cateGoreId)
+                new LambdaUpdateChainWrapper<>(weMaterialMapper)
+                        .set(WeMaterial::getCategoryId, cateGoreId)
+                        .set(WeMaterial::getUpdateTime, new Date())
                         .in(propertyName.equals("id")?WeMaterial::getId:WeMaterial::getCategoryId, ids).update();
                 break;
             case TALK:
-                new LambdaUpdateChainWrapper<>(weContentTalkMapper).set(WeContentTalk::getCategoryId, cateGoreId)
+                new LambdaUpdateChainWrapper<>(weContentTalkMapper)
+                        .set(WeContentTalk::getCategoryId, cateGoreId)
+                        .set(WeContentTalk::getUpdateTime, new Date())
                         .in(propertyName.equals("id")?WeContentTalk::getId:WeContentTalk::getCategoryId, ids).update();
                 break;
             case TEMPLATE:
-                new LambdaUpdateChainWrapper<>(weMsgTlpMapper).set(WeMsgTlp::getCategoryId, cateGoreId)
+                new LambdaUpdateChainWrapper<>(weMsgTlpMapper)
+                        .set(WeMsgTlp::getCategoryId, cateGoreId)
+                        .set(WeMsgTlp::getUpdateTime, new Date())
                         .in(propertyName.equals("id")?WeMsgTlp::getId:WeMsgTlp::getCategoryId, ids).update();
                 break;
             default:

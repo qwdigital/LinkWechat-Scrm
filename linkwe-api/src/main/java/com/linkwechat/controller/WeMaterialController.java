@@ -2,6 +2,8 @@ package com.linkwechat.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
@@ -13,8 +15,10 @@ import com.linkwechat.common.core.domain.FileEntity;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.enums.MediaType;
+import com.linkwechat.common.exception.CustomException;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.bean.BeanUtils;
-import com.linkwechat.common.utils.poi.ExcelUtil;
+import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.material.ao.PurePoster;
 import com.linkwechat.domain.material.ao.WePoster;
 import com.linkwechat.domain.material.ao.WePosterFontAO;
@@ -25,6 +29,7 @@ import com.linkwechat.domain.material.query.ContentDetailQuery;
 import com.linkwechat.domain.material.query.LinkMediaQuery;
 import com.linkwechat.domain.material.vo.*;
 import com.linkwechat.domain.wecom.vo.media.WeMediaVo;
+import com.linkwechat.service.IWeCustomerService;
 import com.linkwechat.service.IWeMaterialService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,11 +37,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -49,6 +52,9 @@ import java.util.stream.Collectors;
 public class WeMaterialController extends BaseController {
     @Resource
     private IWeMaterialService materialService;
+
+    @Resource
+    private IWeCustomerService weCustomerService;
 
 
     @GetMapping("/material/list")
@@ -71,6 +77,9 @@ public class WeMaterialController extends BaseController {
     @PostMapping("/material")
     @ApiOperation("添加素材信息")
     public AjaxResult add(@RequestBody WeMaterial material) {
+        if (material.getCategoryId() == null) {
+            throw new CustomException("请先选择素材分组！");
+        }
         return AjaxResult.success(materialService.addOrUpdate(material));
     }
 
@@ -79,6 +88,9 @@ public class WeMaterialController extends BaseController {
     @PutMapping("/material")
     @ApiOperation("更新素材信息")
     public AjaxResult edit(@RequestBody WeMaterial material) {
+        if (material.getCategoryId() == null) {
+            throw new CustomException("请先选择素材分组！");
+        }
         materialService.addOrUpdate(material);
         return AjaxResult.success();
     }
@@ -143,6 +155,14 @@ public class WeMaterialController extends BaseController {
     @ApiOperation("创建海报")
     @Transactional(rollbackFor = RuntimeException.class)
     public AjaxResult insert(@RequestBody WePoster poster) {
+        String materialName = poster.getMaterialName();
+        if (materialName != null && materialName.length() > 60) {
+            throw new CustomException("海报标题不可超过60个字符！");
+        }
+        String digest = poster.getDigest();
+        if (digest != null && digest.length() > 100) {
+            throw new CustomException("海报描述不可超过100个字符！");
+        }
         WeMaterial material = materialService.generateSimpleImg(poster);
         material.setMediaType(MediaType.POSTER.getType());
         material.setModuleType(poster.getModuleType());
@@ -173,6 +193,14 @@ public class WeMaterialController extends BaseController {
         if (poster.getId() == null) {
             return AjaxResult.error("id为空");
         }
+        String materialName = poster.getMaterialName();
+        if (materialName != null && materialName.length() > 60) {
+            throw new CustomException("海报标题不可超过60个字符！");
+        }
+        String digest = poster.getDigest();
+        if (digest != null && digest.length() > 100) {
+            throw new CustomException("海报描述不可超过100个字符！");
+        }
         poster.setMediaType(null);
         WeMaterial material = materialService.generateSimpleImg(poster);
         materialService.saveOrUpdate(material);
@@ -185,7 +213,9 @@ public class WeMaterialController extends BaseController {
     public AjaxResult entity(@PathVariable Long id) {
         WeMaterial material = materialService.getById(id);
         WePosterVo vo = BeanUtil.copyProperties(material, WePosterVo.class);
-        vo.setTitle(material.getMaterialName());
+        if (StringUtils.isNotBlank(material.getMaterialName())) {
+            vo.setTitle(material.getMaterialName());
+        }
         vo.setSampleImgPath(material.getMaterialUrl());
         vo.setBackgroundImgPath(material.getBackgroundImgUrl());
         return AjaxResult.success(vo);
@@ -270,40 +300,23 @@ public class WeMaterialController extends BaseController {
         return AjaxResult.success("删除成功");
     }
 
+    @ApiOperation("文本素材导出模板")
     @GetMapping("/material/importTemplate")
-    public AjaxResult importTemplate(HttpServletResponse response) {
-
-        ExcelUtil<WeMaterial> util = new ExcelUtil<WeMaterial>(WeMaterial.class);
-        return util.importTemplateExcel("话术语模板");
-
-
+    public void importTemplate() throws IOException {
+        materialService.importTemplate();
     }
 
+    /**
+     * 文本素材数据按模板导入
+     *
+     * @param weMaterial
+     * @param file
+     * @return
+     * @throws Exception
+     */
     @PostMapping("/material/importData")
     public AjaxResult importData(WeMaterial weMaterial, MultipartFile file) throws Exception {
-        ExcelUtil<WeMaterial> util = new ExcelUtil<WeMaterial>(WeMaterial.class);
-        List<WeMaterial> weMaterialList = util.importExcel(file.getInputStream());
-
-        String tip = new String("成功导入{0}条，去重复{1}条");
-        if (ObjectUtil.isEmpty(weMaterialList)) {
-            return AjaxResult.error("导入数据不能为空！");
-        }
-        List<WeMaterial> list = weMaterialList.stream().map(item -> {
-            String materialName = item.getMaterialName();
-            String content = item.getContent();
-            if (ObjectUtil.isNotEmpty(materialName) && ObjectUtil.isNotEmpty(content) && materialName.length() <= 50 && content.length() <= 2000) {
-                item.setMediaType(weMaterial.getMediaType());
-                item.setCategoryId(weMaterial.getCategoryId());
-                return item;
-            }
-            return null;
-        }).collect(Collectors.toList());
-        if (ObjectUtil.isEmpty(list)) {
-            return AjaxResult.error("导入数据不满足要求！");
-        }
-        materialService.saveBatch(list);
-        tip = MessageFormat.format(tip, new Object[]{new Integer(list.size()).toString(),
-                new Integer(weMaterialList.size() - list.size()).toString()});
+        String tip = materialService.importData(file);
         return AjaxResult.success(tip);
     }
 
@@ -322,8 +335,36 @@ public class WeMaterialController extends BaseController {
     @Log(title = "素材详情数据明细", businessType = BusinessType.SELECT)
     @GetMapping("/material/dataDetail")
     public TableDataInfo getWeMaterialDataCount(ContentDetailQuery contentDetailQuery) {
-        List<ContentDataDetailVo> weMaterialDataCount = materialService.getWeMaterialDataCount(contentDetailQuery);
         startPage();
+        List<ContentDataDetailVo> weMaterialDataCount = materialService.getWeMaterialDataCount(contentDetailQuery);
+        TableDataInfo dataTable = getDataTable(weMaterialDataCount);
+        Integer detailsType = contentDetailQuery.getDetailsType();
+        if (detailsType.equals(2)) {
+            List<ContentDataDetailVo> rows = (List<ContentDataDetailVo>) dataTable.getRows();
+            Set<String> collect = rows.stream().map(o -> o.getViewByUnionid()).collect(Collectors.toSet());
+            LambdaQueryWrapper<WeCustomer> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.in(WeCustomer::getUnionid, collect);
+            List<WeCustomer> list = weCustomerService.list(queryWrapper);
+            if (list != null && list.size() > 0) {
+                Map<String, WeCustomer> weCustomersMap = list.stream().collect(Collectors.toMap(WeCustomer::getUnionid, Function.identity(), (key1, key2) -> key2));
+                for (ContentDataDetailVo row : rows) {
+                    WeCustomer weCustomer = weCustomersMap.get(row.getViewByUnionid());
+                    if (ObjectUtil.isNotNull(weCustomer)) {
+                        row.setIsCustomer(1);
+                        String viewBy = row.getViewBy();
+                        if (StrUtil.isBlank(viewBy)) {
+                            row.setViewBy(weCustomer.getCustomerName());
+                        }
+                        String viewAvatar = row.getViewAvatar();
+                        if (StrUtil.isBlank(viewAvatar)) {
+                            if (StrUtil.isNotBlank(weCustomer.getAvatar())) {
+                                row.setViewAvatar(weCustomer.getAvatar());
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return getDataTable(weMaterialDataCount);
     }
 

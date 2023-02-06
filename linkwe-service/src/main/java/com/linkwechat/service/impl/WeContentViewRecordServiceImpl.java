@@ -115,21 +115,15 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
 
         if (StringUtils.isNotBlank(beginTime)) {
             beginTime = DateUtils.initSqlBeginTime(beginTime);
+            contentDetailQuery.setBeginTime(beginTime);
         }
         if (StringUtils.isNotBlank(endTime)) {
             endTime = DateUtils.initSqlEndTime(endTime);
+            contentDetailQuery.setEndTime(endTime);
         }
 
         //查询数据
-        QueryWrapper<WeContentViewRecord> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("id,view_by,view_openid,is_customer,view_time,view_watch_time,external_user_name,external_avatar");
-        queryWrapper.lambda().eq(ObjectUtil.isNotEmpty(contentDetailQuery.getTalkId()), WeContentViewRecord::getTalkId, contentDetailQuery.getTalkId());
-        queryWrapper.lambda().eq(WeContentViewRecord::getContentId, contentId);
-        queryWrapper.lambda().eq(ObjectUtil.isNotEmpty(contentDetailQuery.getResourceType()), WeContentViewRecord::getResourceType, contentDetailQuery.getResourceType());
-        queryWrapper.lambda().ge(StringUtils.isNotBlank(beginTime), WeContentViewRecord::getViewTime, beginTime);
-        queryWrapper.lambda().le(StringUtils.isNotBlank(endTime), WeContentViewRecord::getViewTime, endTime);
-        List<WeContentViewRecord> weContentViewRecordList = list(queryWrapper);
-
+        List<WeContentViewRecord> weContentViewRecordList = weContentViewRecordMapper.getList(contentDetailQuery);
         Map<String, List<WeContentViewRecord>> collect = weContentViewRecordList.stream().collect(Collectors.groupingBy(WeContentViewRecord::getViewOpenid));
 
         List<ContentDataDetailVo> result = new ArrayList<>();
@@ -138,11 +132,10 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
             ContentDataDetailVo contentDataDetailVo = new ContentDataDetailVo();
             contentDataDetailVo.setViewTime(item.getViewTime());
             contentDataDetailVo.setViewTotalNum(v.size());
-            contentDataDetailVo.setViewBy(item.getViewBy());
             Long sum = v.stream().mapToLong(o -> o.getViewWatchTime()).sum();
             contentDataDetailVo.setViewDuration(sum.intValue());
             contentDataDetailVo.setViewByOpenid(item.getViewOpenid());
-            contentDataDetailVo.setIsCustomer(item.getIsCustomer());
+            contentDataDetailVo.setViewByUnionid(item.getViewUnionid());
             contentDataDetailVo.setViewBy(item.getExternalUserName());
             contentDataDetailVo.setViewAvatar(item.getExternalAvatar());
             result.add(contentDataDetailVo);
@@ -274,9 +267,13 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
             String externalUserid = weUnionidExternalUseridRelation.getExternalUserid();
             if (StringUtils.isNotBlank(externalUserid)) {
                 LambdaQueryWrapper<WeCustomer> queryWrapper = new LambdaQueryWrapper<>();
-                queryWrapper.select(WeCustomer::getExternalUserid, WeCustomer::getCustomerName, WeCustomer::getCustomerType);
+                queryWrapper.select(WeCustomer::getExternalUserid, WeCustomer::getCustomerName, WeCustomer::getCustomerType, WeCustomer::getAvatar);
                 queryWrapper.eq(WeCustomer::getExternalUserid, externalUserid);
-                weCustomer = weCustomerMapper.selectOne(queryWrapper);
+                queryWrapper.last("limit 1");
+                List<WeCustomer> weCustomers = weCustomerMapper.selectList(queryWrapper);
+                if (weCustomers != null && weCustomers.size() > 0) {
+                    weCustomer = weCustomers.get(0);
+                }
             }
         }
         //3.添加查看数据
