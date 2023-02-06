@@ -43,6 +43,12 @@ public class QwDataSyncListener {
     @Resource
     private IWeProductOrderService weProductOrderService;
 
+    @Autowired
+    private IWeKfInfoService weKfInfoService;
+
+    @Autowired
+    private IWeLiveService iWeLiveService;
+
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.sync.group-chat:Qu_GroupChat}")
     public void groupChatSubscribe(String msg, Channel channel, Message message) {
@@ -80,6 +86,19 @@ public class QwDataSyncListener {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("企微标签同步-消息处理失败 msg:{},error:{}", msg, e);
+        }
+    }
+
+    @RabbitHandler
+    @RabbitListener(queues = "${wecom.mq.queue.sync.kf-account:Qu_kfAccount}")
+    public void kfAccountSubscribe(String msg, Channel channel, Message message) {
+        try {
+            log.info("企微客服同步消息监听：msg:{}",msg);
+            weKfInfoService.synchKfAccountHandler(msg);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("企微客服同步-消息处理失败 msg:{},error:{}",msg,e);
         }
     }
 
@@ -151,5 +170,18 @@ public class QwDataSyncListener {
         }
     }
 
+
+    @RabbitHandler
+    @RabbitListener(queues = "${wecom.mq.queue.live-qu:Qu_Live}")
+    public void weLiveSubscribe(String msg, Channel channel, Message message){
+        try {
+            log.info("企微直播同步消息监听：msg:{}",msg);
+            iWeLiveService.synchLiveHandler(msg);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("企微直播同步-消息处理失败 msg:{},error:{}",msg,e);
+        }
+    }
 
 }
