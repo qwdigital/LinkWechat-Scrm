@@ -16,7 +16,4 @@ public class WeTlpMaterial {
     private Long tlpId;
 
     private Long materialId;
-
-    private Long tenantId;
-
 }
