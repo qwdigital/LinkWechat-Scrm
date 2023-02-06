@@ -732,20 +732,20 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
             }
             //文本内容长度不可超过2000个字符,一个表情符号占用两个字符
             String content = material.getContent();
-            if (content != null && content.length() > 2000) {
-                throw new WeComException("文本内容不可超过2000个字符!");
+            if (content != null && content.length() > 1000) {
+                throw new WeComException("文本内容不可超过1000个字符!");
             }
         }
         if (Objects.equals(CategoryMediaType.IMAGE_TEXT.getType().toString(), material.getMediaType())) {
-            //图文标题不可超过50个字符
+            //图文标题不可超过32个字符
             String materialName = material.getMaterialName();
-            if (materialName != null && materialName.length() > 60) {
-                throw new WeComException("图文标题不可超过50个字符!");
+            if (materialName != null && materialName.length() > 32) {
+                throw new WeComException("图文标题不可超过32个字符!");
             }
             //图文描述不可超过100个字符,一个表情符号占用两个字符
             String content = material.getContent();
-            if (content != null && content.length() > 100) {
-                throw new WeComException("图文描述不可超过100个字符!");
+            if (content != null && content.length() > 128) {
+                throw new WeComException("图文描述不可超过128个字符!");
             }
         }
         if (Objects.equals(CategoryMediaType.ARTICLE.getType().toString(), material.getMediaType())) {
@@ -763,25 +763,32 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
         if (Objects.equals(CategoryMediaType.VIDEO.getType().toString(), material.getMediaType())) {
             //文章标题不可超过60个字符
             String materialName = material.getMaterialName();
-            if (materialName != null && materialName.length() > 60) {
-                throw new WeComException("文章标题不可超过60个字符!");
+            if (materialName != null && materialName.length() > 32) {
+                throw new WeComException("文章标题不可超过32个字符!");
             }
             //视频描述不可超过100个字符,一个表情符号占用两个字符
             String digest = material.getDigest();
-            if (digest != null && digest.length() > 100) {
-                throw new WeComException("视频描述不可超过100个字符!");
+            if (digest != null && digest.length() > 128) {
+                throw new WeComException("视频描述不可超过128个字符!");
             }
         }
         if (Objects.equals(CategoryMediaType.FILE.getType().toString(), material.getMediaType())) {
             //文件标题不可超过60个字符
             String materialName = material.getMaterialName();
-            if (materialName != null && materialName.length() > 60) {
-                throw new WeComException("文件标题不可超过60个字符!");
+            if (materialName != null && materialName.length() > 32) {
+                throw new WeComException("文件标题不可超过32个字符!");
             }
             //文件描述不可超过100个字符,一个表情符号占用两个字符
             String digest = material.getDigest();
             if (digest != null && digest.length() > 100) {
                 throw new WeComException("文件描述不可超过100个字符!");
+            }
+        }
+        if (Objects.equals(CategoryMediaType.APPLET.getType().toString(), material.getMediaType())) {
+            //小程序标题不可超过16个字符
+            String materialName = material.getMaterialName();
+            if (materialName != null && materialName.length() > 16) {
+                throw new WeComException("文件标题不可超过16个字符!");
             }
         }
         saveOrUpdate(material);
