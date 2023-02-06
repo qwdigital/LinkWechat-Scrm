@@ -78,12 +78,12 @@ public class WeCategoryServiceImpl extends ServiceImpl<WeCategoryMapper, WeCateg
         List<WeCategory> weCategories = baseMapper.categoryList(mediaType);
         List<WeCategoryVo> weCategoryVos = new ArrayList<>();
 
-        WeCategoryVo weCategoryVo = new WeCategoryVo();
+        WeCategory weCategoryVo = new WeCategory();
         weCategoryVo.setId(1L);
         weCategoryVo.setName("默认分组");
         weCategoryVo.setFlag(1);
         weCategoryVo.setParentId(0L);
-        weCategoryVos.add(weCategoryVo);
+        weCategories.add(0, weCategoryVo);
 
         Integer moduleType = null;
         //素材中心
