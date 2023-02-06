@@ -77,7 +77,8 @@ public class WeMaterialController extends BaseController {
     @PostMapping("/material")
     @ApiOperation("添加素材信息")
     public AjaxResult add(@RequestBody WeMaterial material) {
-        if (material.getCategoryId() == null) {
+        Integer moduleType = material.getModuleType();
+        if (moduleType.equals(1) && material.getCategoryId() == null) {
             throw new CustomException("请先选择素材分组！");
         }
         return AjaxResult.success(materialService.addOrUpdate(material));
@@ -88,7 +89,8 @@ public class WeMaterialController extends BaseController {
     @PutMapping("/material")
     @ApiOperation("更新素材信息")
     public AjaxResult edit(@RequestBody WeMaterial material) {
-        if (material.getCategoryId() == null) {
+        Integer moduleType = material.getModuleType();
+        if (moduleType.equals(1) &&material.getCategoryId() == null) {
             throw new CustomException("请先选择素材分组！");
         }
         materialService.addOrUpdate(material);
@@ -341,24 +343,26 @@ public class WeMaterialController extends BaseController {
         Integer detailsType = contentDetailQuery.getDetailsType();
         if (detailsType.equals(2)) {
             List<ContentDataDetailVo> rows = (List<ContentDataDetailVo>) dataTable.getRows();
-            Set<String> collect = rows.stream().map(o -> o.getViewByUnionid()).collect(Collectors.toSet());
-            LambdaQueryWrapper<WeCustomer> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.in(WeCustomer::getUnionid, collect);
-            List<WeCustomer> list = weCustomerService.list(queryWrapper);
-            if (list != null && list.size() > 0) {
-                Map<String, WeCustomer> weCustomersMap = list.stream().collect(Collectors.toMap(WeCustomer::getUnionid, Function.identity(), (key1, key2) -> key2));
-                for (ContentDataDetailVo row : rows) {
-                    WeCustomer weCustomer = weCustomersMap.get(row.getViewByUnionid());
-                    if (ObjectUtil.isNotNull(weCustomer)) {
-                        row.setIsCustomer(1);
-                        String viewBy = row.getViewBy();
-                        if (StrUtil.isBlank(viewBy)) {
-                            row.setViewBy(weCustomer.getCustomerName());
-                        }
-                        String viewAvatar = row.getViewAvatar();
-                        if (StrUtil.isBlank(viewAvatar)) {
-                            if (StrUtil.isNotBlank(weCustomer.getAvatar())) {
-                                row.setViewAvatar(weCustomer.getAvatar());
+            if (rows != null && rows.size() > 0) {
+                Set<String> collect = rows.stream().map(o -> o.getViewByUnionid()).collect(Collectors.toSet());
+                LambdaQueryWrapper<WeCustomer> queryWrapper = new LambdaQueryWrapper<>();
+                queryWrapper.in(WeCustomer::getUnionid, collect);
+                List<WeCustomer> list = weCustomerService.list(queryWrapper);
+                if (list != null && list.size() > 0) {
+                    Map<String, WeCustomer> weCustomersMap = list.stream().collect(Collectors.toMap(WeCustomer::getUnionid, Function.identity(), (key1, key2) -> key2));
+                    for (ContentDataDetailVo row : rows) {
+                        WeCustomer weCustomer = weCustomersMap.get(row.getViewByUnionid());
+                        if (ObjectUtil.isNotNull(weCustomer)) {
+                            row.setIsCustomer(1);
+                            String viewBy = row.getViewBy();
+                            if (StrUtil.isBlank(viewBy)) {
+                                row.setViewBy(weCustomer.getCustomerName());
+                            }
+                            String viewAvatar = row.getViewAvatar();
+                            if (StrUtil.isBlank(viewAvatar)) {
+                                if (StrUtil.isNotBlank(weCustomer.getAvatar())) {
+                                    row.setViewAvatar(weCustomer.getAvatar());
+                                }
                             }
                         }
                     }
