@@ -27,7 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author leejoker
@@ -85,12 +88,92 @@ public class WeCategoryServiceImpl extends ServiceImpl<WeCategoryMapper, WeCateg
         weCategoryVo.setParentId(0L);
         weCategoryVos.add(weCategoryVo);
 
+        Integer moduleType = null;
+        //素材中心
+        List<String> materialType = new ArrayList<>();
+        materialType.add("0");
+        materialType.add("1");
+        materialType.add("2");
+        materialType.add("3");
+        materialType.add("4");
+        materialType.add("5");
+        materialType.add("6");
+        materialType.add("7");
+        materialType.add("8");
+        materialType.add("9");
+        materialType.add("10");
+        materialType.add("11");
+        materialType.add("12");
+        //话术中心
+        List<String> talkType = new ArrayList<>();
+        talkType.add("13");
+        talkType.add("14");
+        //模板中心
+        List<String> templateType = new ArrayList<>();
+        templateType.add("17");
+
+        if (materialType.contains(mediaType)) {
+            moduleType = 1;
+        }
+        if (talkType.contains(mediaType)) {
+            moduleType = 2;
+        }
+        if (templateType.contains(mediaType)) {
+            moduleType = 3;
+        }
+
+        Map<Long, Integer> countMap = new HashMap<>();
+        if (moduleType != null) {
+            if (moduleType.equals(1)) {
+                //统计素材中心数量
+                LambdaQueryWrapper<WeMaterial> queryWrapper = new LambdaQueryWrapper<>();
+                queryWrapper.select(WeMaterial::getCategoryId);
+                queryWrapper.eq(WeMaterial::getMediaType, mediaType);
+                queryWrapper.eq(WeMaterial::getModuleType, moduleType);
+                queryWrapper.eq(WeMaterial::getDelFlag, 0);
+                List<WeMaterial> weMaterials = weMaterialMapper.selectList(queryWrapper);
+                Map<Long, List<WeMaterial>> collect = weMaterials.stream().collect(Collectors.groupingBy(WeMaterial::getCategoryId));
+                for (Map.Entry<Long, List<WeMaterial>> entry : collect.entrySet()) {
+                    countMap.put(entry.getKey(), entry.getValue().size());
+                }
+            } else if (moduleType.equals(2)) {
+                //0企业话术，1客服话术
+                int type = mediaType.equals("13") ? 0 : 1;
+                //统计话术中心数量
+                LambdaQueryWrapper<WeContentTalk> queryWrapper = new LambdaQueryWrapper<>();
+                queryWrapper.select(WeContentTalk::getCategoryId);
+                queryWrapper.eq(WeContentTalk::getTalkType, type);
+                queryWrapper.eq(WeContentTalk::getDelFlag, 0);
+                List<WeContentTalk> weContentTalks = weContentTalkMapper.selectList(queryWrapper);
+                Map<Long, List<WeContentTalk>> collect = weContentTalks.stream().collect(Collectors.groupingBy(WeContentTalk::getCategoryId));
+                for (Map.Entry<Long, List<WeContentTalk>> entry : collect.entrySet()) {
+                    countMap.put(entry.getKey(), entry.getValue().size());
+                }
+            } else if (moduleType.equals(3)) {
+                //统计模板中心数量
+                LambdaQueryWrapper<WeMsgTlp> queryWrapper = new LambdaQueryWrapper<>();
+                queryWrapper.select(WeMsgTlp::getCategoryId);
+                //1欢迎语模板2群发模板3sop模板
+                queryWrapper.eq(WeMsgTlp::getTemplateType, 2);
+                queryWrapper.eq(WeMsgTlp::getDelFlag, 0);
+                List<WeMsgTlp> weMsgTlps = weMsgTlpMapper.selectList(queryWrapper);
+                Map<Long, List<WeMsgTlp>> collect = weMsgTlps.stream().collect(Collectors.groupingBy(WeMsgTlp::getCategoryId));
+                for (Map.Entry<Long, List<WeMsgTlp>> entry : collect.entrySet()) {
+                    countMap.put(entry.getKey(), entry.getValue().size());
+                }
+            }
+
+        }
         weCategories.forEach(c -> {
             WeCategoryVo weCategory = new WeCategoryVo();
             weCategory.setId(c.getId());
             weCategory.setName(c.getName());
             weCategory.setFlag(c.getFlag());
             weCategory.setParentId(c.getParentId());
+            Integer count = countMap.get(c.getId());
+            if (count != null) {
+                weCategory.setNumber(count);
+            }
             weCategoryVos.add(weCategory);
         });
 
