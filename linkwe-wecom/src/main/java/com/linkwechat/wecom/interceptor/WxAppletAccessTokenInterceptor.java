@@ -73,7 +73,7 @@ public class WxAppletAccessTokenInterceptor extends WeForestInterceptor implemen
             WeCorpAccount weCorpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
             if (Objects.nonNull(weCorpAccount)) {
                 //当用户token失效，重新获取token
-                WxTokenVo wxTokenVo = wxCommonClient.getToken(grantType, weCorpAccount.getWxAppletAppId(), weCorpAccount.getWxAppletSecret());
+                WxTokenVo wxTokenVo = wxCommonClient.getToken(grantType, weCorpAccount.getMiniAppId(), weCorpAccount.getMiniSecret());
                 if (wxTokenVo != null && StringUtils.isNotEmpty(wxTokenVo.getAccessToken())) {
                     redisService.setCacheObject(WeConstans.WX_APPLET_ACCESS_TOKEN, wxTokenVo.getAccessToken(), wxTokenVo.getExpiresIn().intValue(), TimeUnit.SECONDS);
                     accessToken = wxTokenVo.getAccessToken();
