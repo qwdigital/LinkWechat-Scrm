@@ -233,7 +233,7 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
         }
 
         if(StringUtils.isNotEmpty(weShortLink.getQrCode())){
-            resObj.put("qrCode",weShortLink.getLongLink());
+            resObj.put("qrCode",weShortLink.getQrCode());
         }
 
         WeCorpAccount corpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
