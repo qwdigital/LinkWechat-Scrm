@@ -798,7 +798,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                                 .allocateTime(new Date())
                                                 .extentType(new Integer(1))
                                                 .externalUserid(weOnTheJobCustomerQuery.getExternalUserid())
-                                                .handoverUserId(weOnTheJobCustomerQuery.getHandoverUserId())
+                                                .handoverUserid(weOnTheJobCustomerQuery.getHandoverUserId())
                                                 .takeoverUserid(weOnTheJobCustomerQuery.getTakeoverUserId())
                                                 .failReason("在职继承")
                                                 .build()

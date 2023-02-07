@@ -42,8 +42,7 @@ public class WeAllocateCustomer extends BaseEntity
     private Date allocateTime;
 
     /** 原跟进成员的userid */
-    @TableField(value = "handover_userid")
-    private String handoverUserId;
+    private String handoverUserid;
 
     /**
      * 接替状态， 1:等待接替 2:接替中(等待微信接替) 3:接替成功 4:接替失败
