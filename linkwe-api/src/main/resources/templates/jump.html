@@ -50,6 +50,8 @@
         var img = new Image()
         img.setAttribute('crossOrigin', 'anonymous')
         img.onload = function () {
+          canvas.width = img.width
+          canvas.height = img.height
           ctx.drawImage(img, 0, 0)
           var imageData = ctx.getImageData(0, 0, img.width, img.height)
           var code = jsQR(imageData.data, imageData.width, imageData.height, {
