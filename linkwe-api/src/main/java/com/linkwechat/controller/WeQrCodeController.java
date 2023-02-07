@@ -8,6 +8,7 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.exception.CustomException;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.domain.qr.query.WeQrAddQuery;
@@ -26,10 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -58,6 +56,9 @@ public class WeQrCodeController extends BaseController {
     @Log(title = "活码管理", businessType = BusinessType.UPDATE)
     @PutMapping("/update")
     public AjaxResult updateQrCode(@RequestBody @Validated WeQrAddQuery weQrAddQuery) {
+        if(Objects.isNull(weQrAddQuery.getQrId())){
+            throw new WeComException("活码ID不能为空！");
+        }
         weQrCodeService.updateQrCode(weQrAddQuery);
         return AjaxResult.success();
     }
