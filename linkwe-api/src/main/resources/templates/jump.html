@@ -42,8 +42,10 @@
       }
 
       //  "type":"0-文章 1-公众号二维码 2-个人二维码 3-群二维码 4-员工活码 5-客群活码 6-门店导购活码 7-个人小程序 8-门店群活码 9-企业小程序 10-小程序二维码"
-      if (window.data.type == 0) {
-        location.href = (window.data.link_path)
+      if (window.data.errorMsg) {
+        alert('发生错误：' + window.data.errorMsg)
+      } else if (window.data.type == 0) {
+        location.href = (window.data.linkPath)
       } else if ([5, 6, 8].includes(+window.data.type)) {
         var canvas = document.createElement('canvas')
         var ctx = canvas.getContext('2d')
@@ -57,7 +59,8 @@
           var code = jsQR(imageData.data, imageData.width, imageData.height, {
             inversionAttempts: "dontInvert",
           })
-          location.href = (code.data || window.data.url_scheme)
+
+          location.href = ((code && code.data) || window.data.url_scheme)
         }
         img.src = window.data.qrCode
 
