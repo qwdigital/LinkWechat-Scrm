@@ -392,6 +392,16 @@ public class RabbitMQConfig {
     }
 
     /**
+     * 活码删除队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quQrCodeDel() {
+        return new Queue(rabbitMQSettingConfig.getWeQrCodeDelQu());
+    }
+
+    /**
      * 同步商品图册队列
      *
      * @return
@@ -513,13 +523,23 @@ public class RabbitMQConfig {
     }
 
     /**
-     * 活码队列绑定交换机
+     * 活码变更队列绑定交换机
      *
      * @return
      */
     @Bean
     public Binding bindingExchangeQrCodeChange() {
         return BindingBuilder.bind(quQrCodeChange()).to(qrCodeChangeEx()).with(rabbitMQSettingConfig.getWeQrCodeChangeRk()).noargs();
+    }
+
+    /**
+     * 活码删除队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeQrCodeDel() {
+        return BindingBuilder.bind(quQrCodeDel()).to(qrCodeChangeEx()).with(rabbitMQSettingConfig.getWeQrCodeDelRk()).noargs();
     }
 
 
