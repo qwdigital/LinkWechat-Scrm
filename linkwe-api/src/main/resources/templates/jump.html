@@ -18,7 +18,8 @@
   <!-- <script src="https://cdn.jsdelivr.net/npm/eruda"></script> -->
   <!-- <script>eruda.init();</script> -->
   <!-- 公众号 JSSDK -->
-  <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+  <!-- <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
   <script>
     function docReady(fn) {
       if (document.readyState === 'complete' || document.readyState === 'interactive') {
@@ -38,6 +39,26 @@
         isMobile = true
       } else {
         isDesktop = true
+      }
+
+      //  "type":"0-文章 1-公众号二维码 2-个人二维码 3-群二维码 4-员工活码 5-客群活码 6-门店导购活码 7-个人小程序 8-门店群活码 9-企业小程序 10-小程序二维码"
+      if (window.data.type == 0) {
+        location.replace(window.data.link_path)
+        return
+      } else if ([5, 6].includes(+window.data.type)) {
+        var canvas = document.createElement('canvas')
+        var ctx = canvas.getContext('2d')
+        var img = new Image()
+        img.onload = function () {
+          ctx.drawImage(img, 0, 0)
+          var imageData = ctx.getImageData(0, 0, img.width, img.height)
+          var code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: "dontInvert",
+          })
+          location.href = (code.data || window.data.url_scheme)
+        }
+        img.src = window.data.qrCode
+
       }
 
       // if (isWeixin) {
@@ -65,8 +86,8 @@
       //     jsApiList: ['chooseImage'], // 必填，随意一个接口即可
       //     openTagList:['wx-open-launch-weapp'], // 填入打开小程序的开放标签名
       //   })
-      // } else
-      if (isDesktop) {
+      // }
+      else if (isDesktop) {
         // 在 pc 上则给提示引导到手机端打开
         var containerEl = document.getElementById('desktop-web-container')
         containerEl.classList.remove('hidden')
