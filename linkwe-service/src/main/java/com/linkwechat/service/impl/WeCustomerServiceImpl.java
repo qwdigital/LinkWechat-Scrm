@@ -448,12 +448,13 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     }
 
     @Override
+    @Transactional
     public void allocateOnTheJobCustomer(WeOnTheJobCustomerQuery weOnTheJobCustomerQuery) {
         if (this.getOne(
                 new LambdaQueryWrapper<WeCustomer>()
                         .eq(WeCustomer::getExternalUserid, weOnTheJobCustomerQuery.getExternalUserid())
                         .eq(WeCustomer::getAddUserId, weOnTheJobCustomerQuery.getTakeoverUserId())
-                        .eq(WeCustomer::getDelFlag, new Integer(0))) != null) {
+                        .eq(WeCustomer::getDelFlag, Constants.COMMON_STATE)) != null) {
 
             throw new WeComException("当前接手人已经拥有此客户,不可继承");
         }
@@ -470,58 +471,65 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         }
 
 
-        //修改库中关系
+        //获取当前需要被移交客户的相关消息
         WeCustomer weCustomer = this.getOne(
                 new LambdaQueryWrapper<WeCustomer>()
                         .eq(WeCustomer::getExternalUserid, weOnTheJobCustomerQuery.getExternalUserid())
                         .eq(WeCustomer::getAddUserId, weOnTheJobCustomerQuery.getHandoverUserId())
-                        .eq(WeCustomer::getDelFlag, new Integer(0))
+                        .eq(WeCustomer::getDelFlag,Constants.COMMON_STATE)
         );
 
         if (null != weCustomer) {
 
-            if (StringUtils.isEmpty(weCustomer.getTakeoverUserId())) { //首次被继承
-
+            try {
                 this.extentCustomer(weCustomer, weOnTheJobCustomerQuery);
-
-            } else { //非首次继承(二个情况)
-                AjaxResult<WeTransferCustomerVo> weTransferCustomerVoAjaxResult = qwCustomerClient.transferResult(WeTransferCustomerQuery.builder()
-                        .handover_userid(weCustomer.getAddUserId())
-                        .takeover_userid(weCustomer.getTakeoverUserId())
-                        .build());
-
-                if (null != weTransferCustomerVoAjaxResult) {
-                    WeTransferCustomerVo transferCustomerVo = weTransferCustomerVoAjaxResult.getData();
-                    if (null != transferCustomerVo) {
-                        List<WeTransferCustomerVo.TransferCustomerVo> extendsCustomers = transferCustomerVo.getCustomer();
-
-                        if (CollectionUtil.isNotEmpty(extendsCustomers)) {
-                            WeTransferCustomerVo.TransferCustomerVo extendsCustomer
-                                    = extendsCustomers.stream().collect(Collectors.toMap(WeTransferCustomerVo.TransferCustomerVo::getExternalUserId
-                                    , ExtendsCustomer -> ExtendsCustomer)).get(weOnTheJobCustomerQuery.getExternalUserid());
-                            if (null != extendsCustomer) {
-
-                                if (extendsCustomer.getStatus().equals(AllocateCustomerStatus.JOB_EXTENDS_DDJT.getCode())) {
-                                    throw new WeComException(
-                                            "当前客户:" + weCustomer.getCustomerName() + ",已被:" + findUserNameByUserId(weCustomer.getTakeoverUserId()) + "接替,暂时不可被继承"
-                                    );
-                                } else { //可继续被新用户接替
-
-                                    this.extentCustomer(weCustomer, weOnTheJobCustomerQuery);
-
-                                }
-
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
-
+            }catch (WeComException e){
+                throw e;
             }
+
+
+//            if (StringUtils.isEmpty(weCustomer.getTakeoverUserId())) { //首次被继承
+//
+//                this.extentCustomer(weCustomer, weOnTheJobCustomerQuery);
+//
+//            } else { //非首次继承(二个情况)
+//                AjaxResult<WeTransferCustomerVo> weTransferCustomerVoAjaxResult = qwCustomerClient.transferResult(WeTransferCustomerQuery.builder()
+//                        .handover_userid(weCustomer.getAddUserId())
+//                        .takeover_userid(weCustomer.getTakeoverUserId())
+//                        .build());
+//
+//                if (null != weTransferCustomerVoAjaxResult) {
+//                    WeTransferCustomerVo transferCustomerVo = weTransferCustomerVoAjaxResult.getData();
+//                    if (null != transferCustomerVo) {
+//                        List<WeTransferCustomerVo.TransferCustomerVo> extendsCustomers = transferCustomerVo.getCustomer();
+//
+//                        if (CollectionUtil.isNotEmpty(extendsCustomers)) {
+//                            WeTransferCustomerVo.TransferCustomerVo extendsCustomer
+//                                    = extendsCustomers.stream().collect(Collectors.toMap(WeTransferCustomerVo.TransferCustomerVo::getExternalUserId
+//                                    , ExtendsCustomer -> ExtendsCustomer)).get(weOnTheJobCustomerQuery.getExternalUserid());
+//                            if (null != extendsCustomer) {
+//
+//                                if (extendsCustomer.getStatus().equals(AllocateCustomerStatus.JOB_EXTENDS_DDJT.getCode())) {
+//                                    throw new WeComException(
+//                                            "当前客户:" + weCustomer.getCustomerName() + ",已被:" + findUserNameByUserId(weCustomer.getTakeoverUserId()) + "接替,暂时不可被继承"
+//                                    );
+//                                } else { //可继续被新用户接替
+//
+//                                    this.extentCustomer(weCustomer, weOnTheJobCustomerQuery);
+//
+//                                }
+//
+//
+//                            }
+//
+//                        }
+//
+//                    }
+//
+//                }
+//
+//
+//            }
 
 
         }
@@ -768,7 +776,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     }
 
     //接替客户
-    private void extentCustomer(WeCustomer weCustomer, WeOnTheJobCustomerQuery weOnTheJobCustomerQuery) {
+    private void extentCustomer(WeCustomer weCustomer, WeOnTheJobCustomerQuery weOnTheJobCustomerQuery) throws WeComException{
         weCustomer.setTakeoverUserId(weOnTheJobCustomerQuery.getTakeoverUserId());
 
         if (this.update(
@@ -790,21 +798,37 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
                 if (null != transferCustomerVo) {
 
-                    if (transferCustomerVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)) {
-                        iWeAllocateCustomerService.batchAddOrUpdate(
-                                ListUtil.toList(
-                                        WeAllocateCustomer.builder()
-                                                .id(SnowFlakeUtil.nextId())
-                                                .allocateTime(new Date())
-                                                .extentType(new Integer(1))
-                                                .externalUserid(weOnTheJobCustomerQuery.getExternalUserid())
-                                                .handoverUserid(weOnTheJobCustomerQuery.getHandoverUserId())
-                                                .takeoverUserid(weOnTheJobCustomerQuery.getTakeoverUserId())
-                                                .failReason("在职继承")
-                                                .build()
-                                )
-                        );
+                    List<WeTransferCustomerVo.TransferCustomerVo> transferCustomerVos
+                            = transferCustomerVo.getCustomer();
+
+                    if(CollectionUtil.isNotEmpty(transferCustomerVos)){
+                        WeTransferCustomerVo.TransferCustomerVo wtransferCustomerVo
+                                = transferCustomerVos.stream().findFirst().get();
+                        if(wtransferCustomerVo.getErrCode() !=null
+                                && WeConstans.WE_SUCCESS_CODE.equals(wtransferCustomerVo.getErrCode())) {
+                            iWeAllocateCustomerService.batchAddOrUpdate(
+                                    ListUtil.toList(
+                                            WeAllocateCustomer.builder()
+                                                    .id(SnowFlakeUtil.nextId())
+                                                    .allocateTime(new Date())
+                                                    .extentType(new Integer(1))
+                                                    .externalUserid(weOnTheJobCustomerQuery.getExternalUserid())
+                                                    .handoverUserid(weOnTheJobCustomerQuery.getHandoverUserId())
+                                                    .takeoverUserid(weOnTheJobCustomerQuery.getTakeoverUserId())
+                                                    .failReason("在职继承")
+                                                    .build()
+                                    )
+                            );
+                        }else{
+
+                            throw new WeComException(WeErrorCodeEnum
+                                    .parseEnum(wtransferCustomerVo.getErrCode()).getErrorMsg());
+
+                        }
+
+
                     }
+
                 }
 
             }
