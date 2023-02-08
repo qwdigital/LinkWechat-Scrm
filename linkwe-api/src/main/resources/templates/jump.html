@@ -46,53 +46,56 @@
         alert('发生错误：' + window.data.errorMsg)
       } else if (window.data.type == 0) {
         location.href = (window.data.linkPath)
-      } else if ([5, 6, 8].includes(+window.data.type)) {
-        var canvas = document.createElement('canvas')
-        var ctx = canvas.getContext('2d')
-        var img = new Image()
-        img.setAttribute('crossOrigin', 'anonymous')
-        img.onload = function () {
-          canvas.width = img.width
-          canvas.height = img.height
-          ctx.drawImage(img, 0, 0)
-          var imageData = ctx.getImageData(0, 0, img.width, img.height)
-          var code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: "dontInvert",
-          })
-
-          location.href = ((code && code.data) || window.data.url_scheme)
-        }
-        img.src = window.data.qrCode
-
       }
 
-      // if (isWeixin) {
-      //   var containerEl = document.getElementById('wechat-web-container')
-      //   containerEl.classList.remove('hidden')
-      //   containerEl.classList.add('full', 'wechat-web-container')
+      if (isWeixin) {
 
-      //   var launchBtn = document.getElementById('launch-btn')
-      //   launchBtn.addEventListener('ready', function (e) {
-      //     console.log('开放标签 ready')
-      //   })
-      //   launchBtn.addEventListener('launch', function (e) {
-      //     console.log('开放标签 success')
-      //   })
-      //   launchBtn.addEventListener('error', function (e) {
-      //     console.log('开放标签 fail', e.detail)
-      //   })
+        if ([5, 6, 8].includes(+window.data.type)) {
+          var canvas = document.createElement('canvas')
+          var ctx = canvas.getContext('2d')
+          var img = new Image()
+          img.setAttribute('crossOrigin', 'anonymous')
+          img.onload = function () {
+            canvas.width = img.width
+            canvas.height = img.height
+            ctx.drawImage(img, 0, 0)
+            var imageData = ctx.getImageData(0, 0, img.width, img.height)
+            var code = jsQR(imageData.data, imageData.width, imageData.height, {
+              inversionAttempts: "dontInvert",
+            })
 
-      //   wx.config({
-      //     debug: true, // 调试时可开启
-      //     appId: 'wx2567dbb9d3fd9556', // <!-- replace -->
-      //     timestamp: 0, // 必填，填任意数字即可
-      //     nonceStr: 'nonceStr', // 必填，填任意非空字符串即可
-      //     signature: 'signature', // 必填，填任意非空字符串即可
-      //     jsApiList: ['chooseImage'], // 必填，随意一个接口即可
-      //     openTagList:['wx-open-launch-weapp'], // 填入打开小程序的开放标签名
-      //   })
-      // }
-      else if (isDesktop) {
+            location.href = ((code && code.data) || window.data.url_scheme)
+          }
+          img.src = window.data.qrCode
+          return
+        }
+
+        // var containerEl = document.getElementById('wechat-web-container')
+        // containerEl.classList.remove('hidden')
+        // containerEl.classList.add('full', 'wechat-web-container')
+
+        // var launchBtn = document.getElementById('launch-btn')
+        // launchBtn.addEventListener('ready', function (e) {
+        //   console.log('开放标签 ready')
+        // })
+        // launchBtn.addEventListener('launch', function (e) {
+        //   console.log('开放标签 success')
+        // })
+        // launchBtn.addEventListener('error', function (e) {
+        //   console.log('开放标签 fail', e.detail)
+        // })
+
+        // wx.config({
+        //   debug: true, // 调试时可开启
+        //   appId: 'wx2567dbb9d3fd9556', // <!-- replace -->
+        //   timestamp: 0, // 必填，填任意数字即可
+        //   nonceStr: 'nonceStr', // 必填，填任意非空字符串即可
+        //   signature: 'signature', // 必填，填任意非空字符串即可
+        //   jsApiList: ['chooseImage'], // 必填，随意一个接口即可
+        //   openTagList: ['wx-open-launch-weapp'], // 填入打开小程序的开放标签名
+        // })
+      }
+      if (isDesktop) {
         // 在 pc 上则给提示引导到手机端打开
         var containerEl = document.getElementById('desktop-web-container')
         containerEl.classList.remove('hidden')
