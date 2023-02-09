@@ -69,13 +69,4 @@ public class WeShortLinkStatisticTask {
         }
         log.info("短链统计--------------------------end");
     }
-
-    public static void main(String[] args) {
-        String key = WeConstans.WE_SHORT_LINK_KEY  + WeConstans.PV + "";
-        String shortUrl = key.substring(key.lastIndexOf(":") + 1);
-        System.out.println(shortUrl);
-        long shortLinkId = Base62NumUtil.decode(shortUrl);
-        System.out.println(shortLinkId);
-        System.out.println(Base62NumUtil.encode(4412757242655231L));
-    }
 }

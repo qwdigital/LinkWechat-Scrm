@@ -81,7 +81,7 @@ public class WeLeaveUserServiceImpl implements IWeLeaveUserService {
 
         //获取所需分配的客户
         List<WeAllocateCustomer> weAllocateCustomers = iWeAllocateCustomerService.list(new LambdaQueryWrapper<WeAllocateCustomer>()
-                .eq(WeAllocateCustomer::getHandoverUserId, weLeaveUserInfoAllocate.getHandoverUserid())
+                .eq(WeAllocateCustomer::getHandoverUserid, weLeaveUserInfoAllocate.getHandoverUserid())
                 .eq(WeAllocateCustomer::getStatus, new Integer(1)));
         if(CollectionUtil.isNotEmpty(weAllocateCustomers)){
             weAllocateCustomers.stream().forEach(k->{
@@ -173,7 +173,7 @@ public class WeLeaveUserServiceImpl implements IWeLeaveUserService {
                             .allocateTime(new Date())
                             .extentType(new Integer(0))
                             .externalUserid(k.getExternalUserid())
-                            .handoverUserId(weUserId)
+                            .handoverUserid(weUserId)
                             .status(new Integer(1))
                             .failReason("离职继承")
                             .build();

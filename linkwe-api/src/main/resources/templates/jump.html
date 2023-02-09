@@ -18,7 +18,8 @@
   <!-- <script src="https://cdn.jsdelivr.net/npm/eruda"></script> -->
   <!-- <script>eruda.init();</script> -->
   <!-- 公众号 JSSDK -->
-  <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+  <!-- <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
   <script>
     function docReady(fn) {
       if (document.readyState === 'complete' || document.readyState === 'interactive') {
@@ -40,32 +41,60 @@
         isDesktop = true
       }
 
-      // if (isWeixin) {
-      //   var containerEl = document.getElementById('wechat-web-container')
-      //   containerEl.classList.remove('hidden')
-      //   containerEl.classList.add('full', 'wechat-web-container')
+      //  "type":"0-文章 1-公众号二维码 2-个人二维码 3-群二维码 4-员工活码 5-客群活码 6-门店导购活码 7-个人小程序 8-门店群活码 9-企业小程序 10-小程序二维码"
+      if (window.data.errorMsg) {
+        alert('发生错误：' + window.data.errorMsg)
+      } else if (window.data.type == 0) {
+        location.href = (window.data.linkPath)
+      }
 
-      //   var launchBtn = document.getElementById('launch-btn')
-      //   launchBtn.addEventListener('ready', function (e) {
-      //     console.log('开放标签 ready')
-      //   })
-      //   launchBtn.addEventListener('launch', function (e) {
-      //     console.log('开放标签 success')
-      //   })
-      //   launchBtn.addEventListener('error', function (e) {
-      //     console.log('开放标签 fail', e.detail)
-      //   })
+      if (isWeixin) {
 
-      //   wx.config({
-      //     debug: true, // 调试时可开启
-      //     appId: 'wx2567dbb9d3fd9556', // <!-- replace -->
-      //     timestamp: 0, // 必填，填任意数字即可
-      //     nonceStr: 'nonceStr', // 必填，填任意非空字符串即可
-      //     signature: 'signature', // 必填，填任意非空字符串即可
-      //     jsApiList: ['chooseImage'], // 必填，随意一个接口即可
-      //     openTagList:['wx-open-launch-weapp'], // 填入打开小程序的开放标签名
-      //   })
-      // } else
+        if ([5, 6, 8].includes(+window.data.type)) {
+          var canvas = document.createElement('canvas')
+          var ctx = canvas.getContext('2d')
+          var img = new Image()
+          img.setAttribute('crossOrigin', 'anonymous')
+          img.onload = function () {
+            canvas.width = img.width
+            canvas.height = img.height
+            ctx.drawImage(img, 0, 0)
+            var imageData = ctx.getImageData(0, 0, img.width, img.height)
+            var code = jsQR(imageData.data, imageData.width, imageData.height, {
+              inversionAttempts: "dontInvert",
+            })
+
+            location.href = ((code && code.data) || window.data.url_scheme)
+          }
+          img.src = window.data.qrCode
+          return
+        }
+
+        // var containerEl = document.getElementById('wechat-web-container')
+        // containerEl.classList.remove('hidden')
+        // containerEl.classList.add('full', 'wechat-web-container')
+
+        // var launchBtn = document.getElementById('launch-btn')
+        // launchBtn.addEventListener('ready', function (e) {
+        //   console.log('开放标签 ready')
+        // })
+        // launchBtn.addEventListener('launch', function (e) {
+        //   console.log('开放标签 success')
+        // })
+        // launchBtn.addEventListener('error', function (e) {
+        //   console.log('开放标签 fail', e.detail)
+        // })
+
+        // wx.config({
+        //   debug: true, // 调试时可开启
+        //   appId: 'wx2567dbb9d3fd9556', // <!-- replace -->
+        //   timestamp: 0, // 必填，填任意数字即可
+        //   nonceStr: 'nonceStr', // 必填，填任意非空字符串即可
+        //   signature: 'signature', // 必填，填任意非空字符串即可
+        //   jsApiList: ['chooseImage'], // 必填，随意一个接口即可
+        //   openTagList: ['wx-open-launch-weapp'], // 填入打开小程序的开放标签名
+        // })
+      }
       if (isDesktop) {
         // 在 pc 上则给提示引导到手机端打开
         var containerEl = document.getElementById('desktop-web-container')
