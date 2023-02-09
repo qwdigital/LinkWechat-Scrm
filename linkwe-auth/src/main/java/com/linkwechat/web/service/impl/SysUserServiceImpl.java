@@ -661,7 +661,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             for (int i = 0; i < vo.getDepartment().size(); i++) {
                 userDeptList.add(userDeptGenerator(vo, i));
             }
-            boolean flag = save(user);
+            this.baseMapper.batchAddOrUpdate(ListUtil.toList(user));
             SysRole role = new LambdaQueryChainWrapper<>(roleMapper).eq(SysRole::getRoleKey, RoleType.WECOME_USER_TYPE_CY.getSysRoleKey())
                     .eq(SysRole::getDelFlag, 0).one();
             if (role != null) {
