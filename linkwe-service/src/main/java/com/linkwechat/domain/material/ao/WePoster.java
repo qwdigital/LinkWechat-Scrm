@@ -26,6 +26,13 @@ public class WePoster {
      * 海报标题
      */
     @ApiModelProperty(value = "海报标题")
+    private String materialName;
+
+    /**
+     * 海报标题
+     */
+    @Deprecated
+    @ApiModelProperty(value = "海报标题")
     private String title;
 
     /**

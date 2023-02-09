@@ -66,7 +66,7 @@ public class WeContentViewRecord extends BaseEntity {
     private Long viewWatchTime;
 
     /**
-     * 是否企业客户 0否1是
+     * 是否企业客户 0否1是  （当前的用户是不是我企业的客户）
      */
     private Integer isCustomer;
 
@@ -98,5 +98,8 @@ public class WeContentViewRecord extends BaseEntity {
 
     @TableField(exist = false)
     private Integer viewTotalNum;
+
+    @TableField(exist = false)
+    private String unionid;
 
 }

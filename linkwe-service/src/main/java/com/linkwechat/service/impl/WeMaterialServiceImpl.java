@@ -4,6 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -21,6 +23,7 @@ import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
+import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUtils;
@@ -39,6 +42,8 @@ import com.linkwechat.domain.wecom.query.media.WeMediaQuery;
 import com.linkwechat.domain.wecom.vo.media.WeMediaVo;
 import com.linkwechat.fegin.QwFileClient;
 import com.linkwechat.fegin.QwMediaClient;
+import com.linkwechat.handler.TextMaterialCellWriteHandler;
+import com.linkwechat.handler.TextMaterialImportDataListener;
 import com.linkwechat.mapper.WeMaterialMapper;
 import com.linkwechat.mapper.WeTalkMaterialMapper;
 import com.linkwechat.mapper.WeTlpMaterialMapper;
@@ -55,11 +60,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -481,7 +488,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
             m.setMaterialUrl(poster.getSampleImgPath());
         }
         m.setBackgroundImgUrl(poster.getBackgroundImgPath());
-        m.setMaterialName(StringUtils.isBlank(poster.getTitle()) ? poster.getDigest() : poster.getTitle());
+        m.setMaterialName(poster.getMaterialName());
         return m;
     }
 
@@ -717,6 +724,73 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
                 return ids;
             }
         }
+        if (Objects.equals(CategoryMediaType.TEXT.getType().toString(), material.getMediaType())) {
+            //文本标题长度不可超过2000个字符
+            String materialName = material.getMaterialName();
+            if (materialName != null && materialName.length() > 50) {
+                throw new WeComException("文本标题不可超过50个字符!");
+            }
+            //文本内容长度不可超过2000个字符,一个表情符号占用两个字符
+            String content = material.getContent();
+            if (content != null && content.length() > 1000) {
+                throw new WeComException("文本内容不可超过1000个字符!");
+            }
+        }
+        if (Objects.equals(CategoryMediaType.IMAGE_TEXT.getType().toString(), material.getMediaType())) {
+            //图文标题不可超过32个字符
+            String materialName = material.getMaterialName();
+            if (materialName != null && materialName.length() > 32) {
+                throw new WeComException("图文标题不可超过32个字符!");
+            }
+            //图文描述不可超过100个字符,一个表情符号占用两个字符
+            String content = material.getContent();
+            if (content != null && content.length() > 128) {
+                throw new WeComException("图文描述不可超过128个字符!");
+            }
+        }
+        if (Objects.equals(CategoryMediaType.ARTICLE.getType().toString(), material.getMediaType())) {
+            //文章标题不可超过30个字符
+            String materialName = material.getMaterialName();
+            if (materialName != null && materialName.length() > 30) {
+                throw new WeComException("文章标题不可超过30个字符!");
+            }
+            //文章描述不可超过100个字符,一个表情符号占用两个字符
+            String digest = material.getDigest();
+            if (digest != null && digest.length() > 100) {
+                throw new WeComException("文章描述不可超过100个字符!");
+            }
+        }
+        if (Objects.equals(CategoryMediaType.VIDEO.getType().toString(), material.getMediaType())) {
+            //文章标题不可超过60个字符
+            String materialName = material.getMaterialName();
+            if (materialName != null && materialName.length() > 32) {
+                throw new WeComException("文章标题不可超过32个字符!");
+            }
+            //视频描述不可超过100个字符,一个表情符号占用两个字符
+            String digest = material.getDigest();
+            if (digest != null && digest.length() > 128) {
+                throw new WeComException("视频描述不可超过128个字符!");
+            }
+        }
+        if (Objects.equals(CategoryMediaType.FILE.getType().toString(), material.getMediaType())) {
+            //文件标题不可超过60个字符
+            String materialName = material.getMaterialName();
+            if (materialName != null && materialName.length() > 32) {
+                throw new WeComException("文件标题不可超过32个字符!");
+            }
+            //文件描述不可超过100个字符,一个表情符号占用两个字符
+            String digest = material.getDigest();
+            if (digest != null && digest.length() > 100) {
+                throw new WeComException("文件描述不可超过100个字符!");
+            }
+        }
+        if (Objects.equals(CategoryMediaType.APPLET.getType().toString(), material.getMediaType())) {
+            //小程序标题不可超过16个字符
+            String materialName = material.getMaterialName();
+            if (materialName != null && materialName.length() > 16) {
+                throw new WeComException("文件标题不可超过16个字符!");
+            }
+        }
         saveOrUpdate(material);
         ids.add(material.getId());
         return ids;
@@ -761,5 +835,59 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
     @Override
     public List<WeMaterialAnalyseVo> selectMaterialsByTalkId(ContentDetailQuery contentDetailQuery) {
         return this.baseMapper.selectMaterialsByTalkId(contentDetailQuery);
+    }
+
+    /**
+     * 导出文本素材模板
+     *
+     * @author WangYX
+     * @date 2022/12/15 15:47
+     * @version 1.0.0
+     */
+    @Override
+    public void importTemplate() throws IOException {
+        //导出的数据
+        List<TextMaterialExportVo> exportList = new ArrayList<>();
+        //导出
+        HttpServletResponse response = ServletUtils.getResponse();
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("utf-8");
+        String fileName = URLEncoder.encode("文本素材导入模板", "UTF-8").replaceAll("\\+", "%20");
+        response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+        EasyExcel.write(response.getOutputStream(), TextMaterialExportVo.class)
+                .inMemory(true)
+                .registerWriteHandler(new TextMaterialCellWriteHandler())
+                .sheet("模板")
+                .doWrite(exportList);
+    }
+
+    /**
+     * 文本素材数据导入
+     *
+     * @param file
+     * @return
+     * @author WangYX
+     * @date 2022/12/16 12:31
+     */
+    @Override
+    public String importData(MultipartFile file) throws IOException {
+        TextMaterialImportDataListener textMaterialImportDataListener = new TextMaterialImportDataListener(this);
+        EasyExcel.read(file.getInputStream(), TextMaterialExportVo.class, textMaterialImportDataListener).sheet().headRowNumber(2).doRead();
+
+        List<Integer> errorIndex = textMaterialImportDataListener.errorIndex;
+        Integer amount = textMaterialImportDataListener.amount;
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("成功导入");
+        sb.append(amount);
+        sb.append("条数据。");
+        if (errorIndex != null && errorIndex.size() > 0) {
+            sb.append("失败导入");
+            sb.append(errorIndex.size());
+            sb.append("条数据。");
+            sb.append("失败的数据行号为：");
+            sb.append(StrUtil.join(",", errorIndex));
+        }
+        return sb.toString();
     }
 }

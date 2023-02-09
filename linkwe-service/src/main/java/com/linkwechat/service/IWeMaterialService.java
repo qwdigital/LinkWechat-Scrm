@@ -14,6 +14,7 @@ import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.wecom.vo.media.WeMediaVo;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -154,4 +155,27 @@ public interface IWeMaterialService extends IService<WeMaterial> {
      * @return
      */
     List<WeMaterialAnalyseVo> selectMaterialsByTalkId(ContentDetailQuery contentDetailQuery);
+
+    /**
+     * 导出文本素材的模板
+     *
+     * @param
+     * @return
+     * @author WangYX
+     * @date 2022/12/16 12:29
+     */
+    void importTemplate() throws IOException;
+
+    /**
+     * 文本素材数据导入
+     *
+     * @param file
+     * @return
+     * @author WangYX
+     * @date 2022/12/16 12:31
+     */
+    String importData(MultipartFile file) throws IOException;
+
+
+
 }
