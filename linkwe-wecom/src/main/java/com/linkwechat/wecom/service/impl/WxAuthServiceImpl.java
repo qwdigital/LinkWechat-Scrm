@@ -9,10 +9,12 @@ import com.linkwechat.domain.wecom.vo.weixin.WxTokenVo;
 import com.linkwechat.service.IWeCorpAccountService;
 import com.linkwechat.wecom.service.IWxAuthService;
 import com.linkwechat.wecom.wxclient.WxAuthClient;
+import com.linkwechat.wecom.wxclient.WxCommonClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,8 +25,12 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public class WxAuthServiceImpl implements IWxAuthService {
-    @Autowired
+    @Resource
     private WxAuthClient wxAuthClient;
+
+    @Resource
+    private WxCommonClient wxCommonClient;
+
     @Autowired
     private RedisService redisService;
 
@@ -51,6 +57,24 @@ public class WxAuthServiceImpl implements IWxAuthService {
     @Override
     public WxAuthUserInfoVo getUserInfo(String openId, String lang) {
         return wxAuthClient.getUserInfo(openId, lang);
+    }
+
+
+    @Override
+    public WxTokenVo getCommonToken(String appId, String secret) {
+        String tokenKey = StringUtils.format(WeConstans.WX_COMMON_ACCESS_TOKEN, appId, secret);
+        WxTokenVo wxToken = new WxTokenVo();
+        String token = redisService.getCacheObject(StringUtils.format(WeConstans.WX_COMMON_ACCESS_TOKEN,appId,secret));
+        if(StringUtils.isEmpty(token)){
+            wxToken = wxCommonClient.getToken("client_credential", appId, secret);
+            if(wxToken != null && StringUtils.isNotEmpty(wxToken.getAccessToken())){
+                redisService.setCacheObject(tokenKey,
+                        wxToken.getAccessToken(), wxToken.getExpiresIn().intValue(), TimeUnit.SECONDS);
+            }
+        }else {
+            wxToken.setAccessToken(token);
+        }
+        return wxToken;
     }
 
 }

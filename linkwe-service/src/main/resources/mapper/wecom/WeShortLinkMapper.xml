@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeShortLinkMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeShortLink" id="WeShortLinkResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="jumpType" column="jump_type" jdbcType="INTEGER"/>
+                <result property="extensionType" column="extension_type" jdbcType="INTEGER"/>
+                <result property="touchType" column="touch_type" jdbcType="INTEGER"/>
+                <result property="shortLinkName" column="short_link_name" jdbcType="VARCHAR"/>
+                <result property="longLink" column="long_link" jdbcType="VARCHAR"/>
+                <result property="schemeLink" column="scheme_link" jdbcType="VARCHAR"/>
+                <result property="type" column="type" jdbcType="INTEGER"/>
+                <result property="name" column="name" jdbcType="VARCHAR"/>
+                <result property="describe" column="describe" jdbcType="VARCHAR"/>
+                <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
+                <result property="qrCodeId" column="qr_code_id" jdbcType="VARCHAR"/>
+                <result property="qrCode" column="qr_code" jdbcType="VARCHAR"/>
+                <result property="appId" column="app_id" jdbcType="VARCHAR"/>
+                <result property="secret" column="secret" jdbcType="VARCHAR"/>
+                <result property="status" column="status" jdbcType="INTEGER"/>
+                <result property="termTime" column="term_time" jdbcType="TIMESTAMP"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeShortLinkVo">
+        select id, jump_type, extension_type, touch_type, short_link_name, long_link, scheme_link, `type`, `name`, `describe`, avatar, qr_code_id, qr_code, app_id, secret, status, term_time, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag from we_short_link
+    </sql>
+
+</mapper>
