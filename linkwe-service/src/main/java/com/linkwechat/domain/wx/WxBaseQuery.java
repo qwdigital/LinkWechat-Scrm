@@ -13,4 +13,7 @@ public class WxBaseQuery {
 
     @ApiModelProperty(value = "企业ID",hidden = true)
     public String corpId;
+
+    @ApiModelProperty(value = "接口凭证")
+    public String accessToken;
 }

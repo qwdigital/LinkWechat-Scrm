@@ -16,7 +16,7 @@ import com.linkwechat.domain.wecom.vo.user.WeLoginUserVo;
 import com.linkwechat.domain.wecom.vo.weixin.WxAuthUserInfoVo;
 import com.linkwechat.domain.wecom.vo.weixin.WxTokenVo;
 import com.linkwechat.fegin.QwUserClient;
-import com.linkwechat.fegin.WxAuthClient;
+import com.linkwechat.fegin.QxAuthClient;
 import com.linkwechat.framework.service.TokenService;
 import com.linkwechat.service.IWeCorpAccountService;
 import com.linkwechat.service.IWxUserService;
@@ -48,7 +48,7 @@ public class SysLoginService {
 
 
     @Resource
-    private WxAuthClient wxAuthClient;
+    private QxAuthClient qxAuthClient;
 
     @Resource
     private QwUserClient qwUserClient;
@@ -143,10 +143,32 @@ public class SysLoginService {
     }
 
 
+    public Map<String, Object> linkLogin(String authCode) {
+        //调用企业微信接口获取用户信息
+        WeUserQuery query = new WeUserQuery();
+        query.setCode(authCode);
+        WeLoginUserVo weLoginUserVo = qwUserClient.getLoginUser(query).getData();
 
+        if (weLoginUserVo == null) {
+            throw new WeComException(CommonErrorCodeEnum.ERROR_CODE_10001.getErrorCode(),
+                    CommonErrorCodeEnum.ERROR_CODE_10001.getErrorMsg());
+        }
+        if (weLoginUserVo.getErrCode() != null && weLoginUserVo.getErrCode() != 0) {
+            throw new WeComException(weLoginUserVo.getErrCode(),
+                    WeErrorCodeEnum.parseEnum(weLoginUserVo.getErrCode()).getErrorMsg());
+        }
+
+        SysUser sysUser = sysUserService.selectUserByWeUserId(weLoginUserVo.getUserId());
+        LoginUser sysUserVo = findLoginUser(sysUser);
+        //获取员工共头像等信息
+        if(StringUtils.isNotEmpty(weLoginUserVo.getUserTicket())){
+            sysUserService.getUserSensitiveInfo(sysUser.getUserId(),weLoginUserVo.getUserTicket());
+        }
+        return tokenService.createToken(sysUserVo);
+    }
 
     public Map<String, Object> wxLogin(String authCode) {
-        WxTokenVo wxTokenVo = wxAuthClient.getToken(authCode).getData();
+        WxTokenVo wxTokenVo = qxAuthClient.getToken(authCode).getData();
         if (wxTokenVo == null) {
             throw new WeComException(CommonErrorCodeEnum.ERROR_CODE_10001.getErrorCode(),
                     CommonErrorCodeEnum.ERROR_CODE_10001.getErrorMsg());
@@ -162,7 +184,7 @@ public class SysLoginService {
             return tokenService.createToken(wxLoginToken);
         }
 
-        WxAuthUserInfoVo wxAuthUserInfoVo = wxAuthClient.getUserInfo(wxTokenVo.getOpenId(), "zh_CN").getData();
+        WxAuthUserInfoVo wxAuthUserInfoVo = qxAuthClient.getUserInfo(wxTokenVo.getOpenId(), "zh_CN").getData();
         if (wxAuthUserInfoVo == null) {
             throw new WeComException(CommonErrorCodeEnum.ERROR_CODE_10001.getErrorCode(),
                     CommonErrorCodeEnum.ERROR_CODE_10001.getErrorMsg());
