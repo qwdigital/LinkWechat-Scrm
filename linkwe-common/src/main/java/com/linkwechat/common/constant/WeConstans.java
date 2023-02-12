@@ -16,9 +16,16 @@ public class WeConstans {
     public static final String WX_AUTH_REFRESH_ACCESS_TOKEN = "wx_auth_refresh_access_token";
 
     /**
-     * 微信通用token
+     * 微信公众号通用token
      */
     public static final String WX_ACCESS_TOKEN = "wx_access_token";
+
+    public static final String WX_COMMON_ACCESS_TOKEN = "wx_common_access_token:{}:{}";
+
+    /**
+     * 微信小程序通用token
+     */
+    public static final String WX_APPLET_ACCESS_TOKEN = "wx_applet_access_token";
 
     /**
      * 企微应用token
@@ -54,6 +61,11 @@ public class WeConstans {
      */
     public static final String WE_BILL_ACCESS_TOKEN = "we_bill_access_token:{}";
 
+
+    /**
+     * 企业微信接口返回成功code
+     */
+    public static final Integer WE_SUCCESS_CODE = 0;
 
     /**
      * 同步功能提示语
@@ -132,4 +144,69 @@ public class WeConstans {
      * 二维码有效时间（默认6天）
      */
     public static final Integer JOINCORPQR_EFFETC_TIME = 8640;
+
+    //性别，1表示男性，2表示女性
+    //表示所在部门是否为上级，0-否，1-是，顺序与Department字段的部门逐一对应
+    //激活状态：1=已激活 2=已禁用 4=未激活 已激活代表已激活企业微信或已关注微工作台（原企业号） 5=成员退出
+    public static enum corpUserEnum {
+
+        NO_IS_ALLOCATE(0, "未分配"),
+        YES_IS_ALLOCATE(1, "已分配");
+
+        private int key;
+        private String value;
+
+        /**
+         * 构造方法
+         *
+         * @param key
+         * @param value
+         */
+        corpUserEnum(int key, String value) {
+            this.setKey(key);
+            this.setValue(value);
+        }
+
+        public int getKey() {
+            return key;
+        }
+
+        public void setKey(int key) {
+            this.key = key;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+    }
+
+    /**
+     * id类型 0:成员 1:客户,2:机器
+     */
+    public static final Integer ID_TYPE_USER = 0;
+    public static final Integer ID_TYPE_EX = 1;
+    public static final Integer ID_TYPE_MACHINE = 2;
+
+
+    //短链统计缓存key值前缀
+    public static final String  WE_SHORT_LINK_KEY = "we_short_link:statistics:";
+
+    /**
+     * 短链缓存命名空间
+     */
+    public static final String PV = "pv:";
+
+    /**
+     * 短链缓存命名空间
+     */
+    public static final String UV = "uv:";
+
+    /**
+     * 短链缓存命名空间
+     */
+    public static final String OPEN_APPLET = "open:";
 }
