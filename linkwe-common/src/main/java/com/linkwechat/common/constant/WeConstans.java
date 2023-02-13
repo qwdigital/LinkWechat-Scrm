@@ -166,6 +166,12 @@ public class WeConstans {
 
 
     /**
+     * 识客码前缀
+     */
+    public static final String WE_KNOW_CUSTOMER_CODE_PREFIX="we_kn_code";
+
+
+    /**
      * 新客拉群
      */
     public static final String WE_QR_XKLQ_PREFIX = "we_xklq";

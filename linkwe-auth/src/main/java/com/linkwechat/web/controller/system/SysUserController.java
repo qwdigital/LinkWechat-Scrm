@@ -26,6 +26,7 @@ import com.linkwechat.domain.corp.query.WeCorpAccountQuery;
 import com.linkwechat.domain.corp.vo.WeCorpAccountVo;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
+import com.linkwechat.domain.user.vo.WeUserScreenConditVo;
 import com.linkwechat.domain.wecom.vo.user.WeUserDetailVo;
 import com.linkwechat.framework.service.TokenService;
 import com.linkwechat.service.IWeCorpAccountService;
@@ -494,4 +495,22 @@ public class SysUserController extends BaseController {
         List<SysUserVo> sysUserList  = userService.getUserListByWeUserIds(query);
         return AjaxResult.success(sysUserList);
     }
+
+
+    /**
+     * 根据职位等条件筛选员工
+     * @param weUserScreenConditVo
+     * @return
+     */
+    @GetMapping("/screenConditWeUser")
+    public AjaxResult<List<String>> screenConditWeUser(WeUserScreenConditVo weUserScreenConditVo){
+
+
+        return AjaxResult.success(
+                userService.screenConditWeUser(weUserScreenConditVo)
+        );
+
+    }
+
+
 }
