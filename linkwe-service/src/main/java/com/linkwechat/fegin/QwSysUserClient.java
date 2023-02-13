@@ -8,6 +8,7 @@ import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.domain.user.vo.WeUserScreenConditVo;
 import com.linkwechat.fallback.QwSysUserFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -76,10 +77,15 @@ public interface QwSysUserClient {
 
     /**
      * 根据职位等条件筛选员工
-     * @param weUserScreenConditVo
+     * @param weUserIds
+     * @param deptIds
+     * @param positions
      * @return
      */
     @GetMapping("/system/user/screenConditWeUser")
-    public AjaxResult<List<String>> screenConditWeUser(WeUserScreenConditVo weUserScreenConditVo);
+    AjaxResult<List<String>> screenConditWeUser(
+            @RequestParam("weUserIds") String weUserIds,@RequestParam("deptIds") String deptIds,
+            @RequestParam("positions") String positions
+    );
 
 }

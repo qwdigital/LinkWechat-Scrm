@@ -3,9 +3,11 @@ package com.linkwechat.controller;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.know.WeKnowCustomerCode;
 import com.linkwechat.domain.know.WeKnowCustomerCodeCount;
+import com.linkwechat.domain.user.vo.WeUserScreenConditVo;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -71,8 +73,33 @@ public class WxKnowCustomerController {
                 if(weKnowCustomerCode.getIsAddAllUser().equals(new Integer(1))){//已添加任意成员
                     weKnowCustomerCode.setNewOrOldWeCustomer(false);
                 }else{//已添加指定成员
+                    String weUserIds=null;String deptIds=null;String positions=null;
+
+                    WeUserScreenConditVo addWeUser = weKnowCustomerCode.getAddWeUser();
+                    if(null != addWeUser){
+                        WeUserScreenConditVo.ExecuteUserCondit executeUserCondit = addWeUser.getExecuteUserCondit();
+                        if(null != executeUserCondit){
+                            List<String> weUserIdss = executeUserCondit.getWeUserIds();
+                            if(CollectionUtil.isNotEmpty(weUserIdss)){
+                                weUserIds= StringUtils.join(weUserIdss,",");
+                            }
+                        }
+
+                        WeUserScreenConditVo.ExecuteDeptCondit executeDeptCondit = addWeUser.getExecuteDeptCondit();
+                        if(null != executeDeptCondit){
+                            List<String> deptIdss = executeDeptCondit.getDeptIds();
+                            if(CollectionUtil.isNotEmpty(deptIdss)){
+                                deptIds=StringUtils.join(deptIdss,",");
+                            }
+                            List<String> posts = executeDeptCondit.getPosts();
+                            if(CollectionUtil.isNotEmpty(posts)){
+                                positions=StringUtils.join(posts,",");
+                            }
+                        }
+                    }
+
                     AjaxResult<List<String>> listAjaxResult
-                            = qwSysUserClient.screenConditWeUser(weKnowCustomerCode.getAddWeUser());
+                            = qwSysUserClient.screenConditWeUser(weUserIds,deptIds,positions);
                     if(null != listAjaxResult) {
                         List<String> appointWeUserIds = listAjaxResult.getData();
                         if(CollectionUtil.isNotEmpty( weCustomers.stream().filter(weCustomer
