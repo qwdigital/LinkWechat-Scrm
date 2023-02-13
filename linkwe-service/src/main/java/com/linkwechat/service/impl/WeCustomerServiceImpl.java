@@ -891,6 +891,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             weCustomer.setUnionid(externalContact.getUnionId());
             weCustomer.setDelFlag(Constants.COMMON_STATE);
             weCustomer.setAddUserId(userId);
+            weCustomer.setCreateTime(new Date());
+            weCustomer.setUpdateTime(new Date());
 
 
 
