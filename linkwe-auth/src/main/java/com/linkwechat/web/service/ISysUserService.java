@@ -273,8 +273,10 @@ public interface ISysUserService extends IService<SysUser> {
 
     /**
      * 根据手动选择的员工，职位，部门筛选员工
-     * @param weUserScreenConditVo
+     * @param weUserIds
+     * @param deptIds
+     * @param positions
      * @return
      */
-    List<String> screenConditWeUser(WeUserScreenConditVo weUserScreenConditVo);
+    List<String> screenConditWeUser(String weUserIds, String deptIds,String positions);
 }

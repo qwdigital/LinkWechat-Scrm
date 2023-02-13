@@ -917,44 +917,24 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    public List<String> screenConditWeUser(WeUserScreenConditVo weUserScreenConditVo) {
-        List<String> weUserIds=new ArrayList<>();
-        if(null != weUserScreenConditVo){
-            //手动选择的员工
-            WeUserScreenConditVo.ExecuteUserCondit executeUserCondit
-                    = weUserScreenConditVo.getExecuteUserCondit();
-            if(null != executeUserCondit){
-                weUserIds.addAll(
-                        executeUserCondit.getWeUserIds()
+    public List<String> screenConditWeUser(String weUserIds, String deptIds,String positions) {
+        List<String> weUserIdList=new ArrayList<>();
+
+        if(StringUtils.isNotEmpty(weUserIds)){
+            weUserIdList.addAll(
+                    ListUtil.toList(weUserIds.split(","))
+            );
+        }
+
+
+        if(StringUtils.isNotEmpty(positions) || StringUtils.isNotEmpty(deptIds)){
+            List<SysUser> allSysUser = this.baseMapper.findAllSysUser(null,positions,deptIds);
+            if(CollectionUtil.isNotEmpty(allSysUser)){
+                weUserIdList.addAll(
+                        allSysUser.stream().map(SysUser::getWeUserId).collect(Collectors.toList())
                 );
             }
-            //根据部门职位筛选
-            WeUserScreenConditVo.ExecuteDeptCondit executeDeptCondit
-                    = weUserScreenConditVo.getExecuteDeptCondit();
-            if(executeDeptCondit != null){
-                String positions = null,depteIds=null;
-                if(CollectionUtil.isNotEmpty(executeDeptCondit.getDeptIds())){
-                    depteIds= StringUtils.join(executeDeptCondit.getDeptIds(),",");
-                }
-
-                if(CollectionUtil.isNotEmpty(executeDeptCondit.getPosts())){
-                    positions=StringUtils.join(executeDeptCondit.getPosts(),",");
-                }
-
-                if(StringUtils.isNotEmpty(positions) || StringUtils.isNotEmpty(depteIds)){
-                    List<SysUser> allSysUser = this.baseMapper.findAllSysUser(null,positions,depteIds);
-                    if(CollectionUtil.isNotEmpty(allSysUser)){
-                        weUserIds.addAll(
-                                allSysUser.stream().map(SysUser::getWeUserId).collect(Collectors.toList())
-                        );
-                    }
-                }
-
-
-            }
-
-
         }
-        return weUserIds;
+        return weUserIdList;
     }
 }

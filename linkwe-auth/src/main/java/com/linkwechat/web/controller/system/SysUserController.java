@@ -499,15 +499,17 @@ public class SysUserController extends BaseController {
 
     /**
      * 根据职位等条件筛选员工
-     * @param weUserScreenConditVo
+     * @param weUserIds
+     * @param deptIds
+     * @param positions
      * @return
      */
     @GetMapping("/screenConditWeUser")
-    public AjaxResult<List<String>> screenConditWeUser(WeUserScreenConditVo weUserScreenConditVo){
+    public AjaxResult<List<String>> screenConditWeUser(String weUserIds, String deptIds,String positions){
 
 
         return AjaxResult.success(
-                userService.screenConditWeUser(weUserScreenConditVo)
+                userService.screenConditWeUser(weUserIds,deptIds,positions)
         );
 
     }
