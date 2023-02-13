@@ -1,17 +1,17 @@
 <p></p>
 <p></p>
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/132836_bcaf4618_1480777.png "Snipaste_2021-11-08_13-28-16.png")
+![输入图片说明](readme-pic/logo.png)
 
 <div align="center">
 
 [![star](https://gitee.com/LinkWeChat/link-wechat/badge/star.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/stargazers)
 [![fork](https://gitee.com/LinkWeChat/link-wechat/badge/fork.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/members)
-[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V3.0-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
+[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V3.3-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
 [![license](http://img.shields.io/badge/license-GPL%203.0-orange)](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
 [![木兰社区](https://img.shields.io/badge/Mulan-incubating-blue)](https://portal.mulanos.cn//)
 
-[官方网站](https://www.pardigital.cn/) | [在线演示](http://demo.linkwechat.net/) | [V3.0功能清单](https://docs.qq.com/sheet/DZW9HSHpHdWlOYWh2?tab=BB08J3)  | [最新动态](https://www.yuque.com/linkwechat/help/ozzxus)
+[官方网站](http://www.linkwechat.net/) | [在线演示](http://demo.linkwechat.net/) | [V3.x功能清单](https://docs.qq.com/sheet/DZW9HSHpHdWlOYWh2?tab=BB08J3)  | [最新动态](https://www.yuque.com/linkwechat/help/ozzxus)
 
 [项目手册](https://www.yuque.com/linkwechat/help) | [用户手册](https://docs.qq.com/pdf/DZXR0ZUJub29wTldS?) | [常见问题](https://www.yuque.com/linkwechat/help/qk5gl6) | [需求收集表](https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV)
 
@@ -24,13 +24,13 @@
 <p></p>
 
 ---
-**<p align="center">【📣最近更新】LinkWeChat V3.0 正式发布啦，架构升级，全面焕新，欢迎大家提前体验！<a href="http://demo.linkwechat.net/" target="_blank">点击立即体验~</a></p>**
 
-**<p align="center">【📣最近更新】LinkWeChat V3.0 采用前后端分离架构，前端项目请点击<a href="https://gitee.com/LinkWeChat/link-we-chat-front" target="_blank">LinkWeChat-Front</a></p>**
+**<p align="center">【📣最近更新】还有什么想要产品/技术上友好的建议或意见，<a href="https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV" target="_blank">点击告诉我们~</a>一经采纳，将纳入开源贡献者并官网致谢，还会收到社区奖励的小礼品哦！~</p>**
 
-**<p align="center">LinkWeChat SAAS版 正式公测啦，如有问题欢迎提交 Issue，项目组将光速修复，<a href="https://saas.pardigital.cn/#/probation" target="_blank">点击立即体验~</a></p>**
+**<p align="center">LinkWeChat V3.0 正式发布啦，架构升级，全面焕新，欢迎大家提前体验！<a href="http://demo.linkwechat.net/" target="_blank">点击立即体验~</a></p>**
 
-**<p align="center">还有什么想要的产品功能/技术支持/说明文档/友好的建议或意见，<a href="https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV" target="_blank">点击告诉我们~</a></p>**
+**<p align="center">LinkWeChat V3.0 采用前后端分离架构，前端项目请点击<a href="https://gitee.com/LinkWeChat/link-we-chat-front" target="_blank">LinkWeChat-Front</a></p>**
+
 
 **<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>**
 
@@ -42,7 +42,7 @@
 
 [帮助手册——LinkWeChat 需要付费吗？](https://www.yuque.com/linkwechat/help/xql2ts)
 
-目前在国内 GPL 协议**具备合同特征，是一种民事法律行为** ，属于我国《合同法》调整的范围。LinkWeChat 项目团队保留一切诉讼权利。
+目前在国内 GPL 协议**具备合同特征，是一种民事法律行为** ，属于我国《中华人民共和国民法典》调整的范围。LinkWeChat 项目团队保留一切诉讼权利。
 
 [相关案例：违反 GPL 协议赔偿 50 万，国内首例!](https://mp.weixin.qq.com/s/YQ6sNjbDS-P7BViLZIsaoA)
 
@@ -80,9 +80,9 @@ LinkWeChat SCRM 基于企业私域流量营销闭环，遵从获取新客到管�
 *   **企业风控** ：会话合规存档，敏感内容全局风控；
 *   **企业管理** ：组织架构、自建应用全融合，实现“一个后台”；
 
-[LinkWeChat 社区版 V3.0 详细功能清单](https://docs.qq.com/sheet/DZW9HSHpHdWlOYWh2?tab=BB08J3)
+[LinkWeChat 社区版 V3.x 详细功能清单](https://docs.qq.com/sheet/DZW9HSHpHdWlOYWh2?tab=BB08J3)
 
-![输入图片说明](readme-pic/V3.x.jpeg)
+![输入图片说明](readme-pic/v3image.png)
 
 ## 1.3 优势
 
@@ -108,7 +108,7 @@ LinkWeChat 不做私域营销专家，而是通过开源让每个企业都是自
 
 开源演示地址：[http://demo.linkwechat.net/](http://demo.linkwechat.net/)
 
-默认账号密码：admin，123456
+默认账号密码：lw，123456
 
 目前支持两种方式体验：
 
@@ -139,7 +139,6 @@ LinkWeChat V3.0 架构升级，全面升级为微服务架构，整体系统架�
 ├── linkwe-api                // 系统业务接口模块
 ├── linkwe-auth               // 角色权限部门用户认证等模块
 ├── linkwe-common             // 公共组件模块
-├── linkwe-event-task	      // 企微回调任务
 ├── linkwe-fileservice	      // 文件服务模块
 ├── linkwe-framework	      // 框架配置
 ├── linkwe-gateway            // 网关服务
@@ -184,6 +183,22 @@ LinkWeChat V3.0 架构升级，全面升级为微服务架构，整体系统架�
 [帮助手册——常见问题](https://www.yuque.com/linkwechat/help/qk5gl6)
 
 # 四、最近更新
+
+## 近期计划
+
+- [ ] 内部机器人前端发布；
+- [ ] 企微商品画册功能重构；
+- [ ] 智能短链；
+- [ ] 数据洞察；
+
+## V3.2 更新日志
+
+- [x] 新增智能表单：通过画布的形式自定义H5表单，可以是报名表、问卷等形式，通过链接形式发放给公域或微信客户，客户主动留资后收集手机号，进行后续营销；
+- [x] 新增：封装企业微信直播 API；
+- [x] 新增：应用管理；
+- [x] 新增：机器人 API；
+- [x] 修复了一些已知问题；
+- [x] 其余各模块UI细节调优；
 
 ## V3.0 更新日志
 
@@ -300,7 +315,16 @@ LinkWeChat V3.0 主要围绕系统架构、引流获客、客情维系、内容�
 |    Happy   | 两核 8G 服务器一台 |
 |  平山阑槛倚晴空    | 两核 4G 服务器一台 |
 
-## 7.4 社会价值
+## 7.4 优秀开源社区
+[IoTSharp](https://gitee.com/IoTSharp) IoTSharp 是一个 基于.Net Core 开源的物联网基础平台， 支持 HTTP、MQTT 、CoAp 协议
+
+[流之云](https://gitee.com/ntdgg) 信息化、数字化服务提供商
+
+[translate.js](https://gitee.com/mail_osc/translate) 网页自动翻译，页面无需另行改造，加入两行js即可让你的网页快速具备多国语言切换能力！
+
+
+
+## 7.5 社会价值
 
 LinkWeChat 开源团队将目前所收项目捐赠全额捐出，仅尽绵薄之力，在此我们也感谢大家的捐赠和支持，希望河南尽早渡过难关。
 

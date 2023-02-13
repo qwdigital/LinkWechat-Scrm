@@ -18,6 +18,9 @@ import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.domain.*;
 import com.linkwechat.domain.community.vo.WeCommunityWeComeMsgVo;
 import com.linkwechat.domain.customer.WeMakeCustomerTag;
+import com.linkwechat.domain.know.WeKnowCustomerAttachments;
+import com.linkwechat.domain.know.WeKnowCustomerCode;
+import com.linkwechat.domain.know.WeKnowCustomerCodeTag;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.msgtlp.entity.WeTlpMaterial;
@@ -104,6 +107,17 @@ public class QwWelcomeMsgListener {
 
     @Resource
     private WeTlpMaterialMapper weTlpMaterialMapper;
+
+    @Autowired
+    private IWeKnowCustomerCodeService iWeKnowCustomerCodeService;
+
+
+    @Autowired
+    private IWeKnowCustomerAttachmentsService iWeKnowCustomerAttachmentsService;
+
+
+    @Autowired
+    private IWeKnowCustomerCodeTagService iWeKnowCustomerCodeTagService;
 
 
     @RabbitHandler
@@ -212,6 +226,57 @@ public class QwWelcomeMsgListener {
                             }
                         }
                     }
+
+            }else if(StringUtils.isNotEmpty(query.getState()) && query.getState().startsWith(WeConstans.WE_KNOW_CUSTOMER_CODE_PREFIX)){
+
+                WeKnowCustomerCode weKnowCustomerCode = iWeKnowCustomerCodeService.getOne(new LambdaQueryWrapper<WeKnowCustomerCode>()
+                        .eq(WeKnowCustomerCode::getAddWeUserState, query.getState()));
+                if(weKnowCustomerCode != null){
+                    List<WeKnowCustomerAttachments> customerAttachments =
+                            iWeKnowCustomerAttachmentsService.list(new LambdaQueryWrapper<WeKnowCustomerAttachments>()
+                                    .eq(WeKnowCustomerAttachments::getKnowCustomerId, weKnowCustomerCode.getId()));
+                    if(CollectionUtil.isNotEmpty(customerAttachments)){
+                        List<WeMessageTemplate> templateList = customerAttachments.stream().map(qrAttachment -> {
+                            WeMessageTemplate template = new WeMessageTemplate();
+                            template.setMsgType(qrAttachment.getMsgType());
+                            template.setContent(qrAttachment.getContent());
+                            template.setMediaId(qrAttachment.getMediaId());
+                            template.setTitle(qrAttachment.getTitle());
+                            template.setDescription(qrAttachment.getDescription());
+                            template.setAppId(qrAttachment.getAppId());
+                            template.setFileUrl(qrAttachment.getFileUrl());
+                            template.setPicUrl(qrAttachment.getPicUrl());
+                            template.setLinkUrl(qrAttachment.getLinkUrl());
+                            template.setMaterialId(qrAttachment.getMaterialId());
+                            return template;
+                        }).collect(Collectors.toList());
+
+                        templates.addAll(templateList);
+
+
+                        //获取并打标签
+                        List<WeKnowCustomerCodeTag> weKnowCustomerCodeTags = iWeKnowCustomerCodeTagService.list(new LambdaQueryWrapper<WeKnowCustomerCodeTag>()
+                                .eq(WeKnowCustomerCodeTag::getKnowCustomerCodeId, weKnowCustomerCode.getId()));
+                        if(CollectionUtil.isNotEmpty(weKnowCustomerCodeTags)){
+                            makeCustomerTag(query.getExternalUserID(), query.getUserID(),
+                                    weKnowCustomerCodeTags.stream().map(v -> {
+                                        return new WeTagVo(v.getTagName(), v.getTagId());
+                                    }).collect(Collectors.toList())
+                            );
+                        }
+
+
+                    }
+
+
+
+
+
+
+                }
+
+
+
 
             }else {
                 WeMsgTlpQuery weMsgTlpQuery = new WeMsgTlpQuery();

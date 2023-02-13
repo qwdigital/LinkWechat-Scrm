@@ -6,6 +6,7 @@ import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
+import com.linkwechat.domain.user.vo.WeUserScreenConditVo;
 import com.linkwechat.web.domain.vo.UserVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -268,4 +269,14 @@ public interface ISysUserService extends IService<SysUser> {
      * @return
      */
     List<SysUserVo> getUserListByWeUserIds(SysUserQuery query);
+
+
+    /**
+     * 根据手动选择的员工，职位，部门筛选员工
+     * @param weUserIds
+     * @param deptIds
+     * @param positions
+     * @return
+     */
+    List<String> screenConditWeUser(String weUserIds, String deptIds,String positions);
 }

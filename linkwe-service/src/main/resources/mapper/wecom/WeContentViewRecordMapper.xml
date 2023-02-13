@@ -4,5 +4,39 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.mapper.WeContentViewRecordMapper">
 
+    <select id="getList" resultType="com.linkwechat.domain.material.entity.WeContentViewRecord">
+        SELECT r.id,
+        r.view_by,
+        r.view_openid,
+        r.is_customer,
+        r.view_time,
+        r.view_watch_time,
+        r.external_user_name,
+        r.external_avatar,
+        r.external_user_id,
+        r.view_unionid,
+--         (select unionid from we_customer c where c.unionid = r.view_unionid and c.unionid is not null limit 1) as unionid
+        FROM
+        we_content_view_record r
+        <where>
+            and r.del_flag = 0
+            <if test="talkId!=null">
+                and r.talk_id = #{talkId}
+            </if>
+            <if test="contentId!=null">
+                and r.content_id = #{contentId}
+            </if>
+            <if test="resourceType!=null">
+                and r.resource_type = #{resourceType}
+            </if>
+            <if test="beginTime!=null and beginTime!=''">
+                and r.view_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                and r.view_time &lt;= #{endTime}
+            </if>
+        </where>
+    </select>
+
 
 </mapper>

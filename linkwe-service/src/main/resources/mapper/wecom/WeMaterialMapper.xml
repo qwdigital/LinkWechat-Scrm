@@ -87,6 +87,7 @@
                 concat('%',#{materialName},'%')
             </if>
             <if test="mediaType != null and mediaType != '' ">and t.media_type = #{mediaType}</if>
+            <if test="type != null ">and t.type = #{type}</if>
             <if test="mediaTypeNoList != null and mediaTypeNoList.size() > 0">
                 and t.media_type not in
                 <foreach item="mediaType" collection="mediaTypeNoList" open="(" separator="," close=")">

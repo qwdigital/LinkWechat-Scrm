@@ -3,6 +3,7 @@ package com.linkwechat.gateway.config;
 import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.support.NameUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
@@ -28,6 +29,7 @@ public class SwaggerProvider implements SwaggerResourcesProvider, WebFluxConfigu
      * 网关路由
      */
     @Resource
+    @Lazy
     private RouteLocator routeLocator;
 
     @Resource

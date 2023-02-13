@@ -171,6 +171,10 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.qr-code-change:Rk_QrCodeChange}")
     private String weQrCodeChangeRk;
 
+    //活码删除路由
+    @Value("${wecom.mq.route.qr-code-del:Rk_QrCodeDel}")
+    private String weQrCodeDelRk;
+
     //计算人群路由
     @Value("${wecom.mq.route.crowd-calculate:Rk_CrowdCalculate}")
     private String WeCrowdCalculateRk;
@@ -281,6 +285,10 @@ public class RabbitMQSettingConfig {
     //活码变更队列
     @Value("${wecom.mq.queue.qr-code-change:Qu_QrCodeChange}")
     private String weQrCodeChangeQu;
+
+    //活码删除队列
+    @Value("${wecom.mq.queue.qr-code-del:Qu_QrCodeDel}")
+    private String weQrCodeDelQu;
 
     //计算人群队列
     @Value("${wecom.mq.queue.crowd-calculate:Qu_CrowdCalculate}")

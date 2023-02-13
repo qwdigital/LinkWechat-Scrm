@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -41,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,7 +71,7 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
     @Autowired
     private IWeCorpAccountService weCorpAccountService;
 
-    @Autowired
+    @Resource
     private QwCustomerClient qwCustomerClient;
 
     @Autowired
@@ -109,24 +111,58 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
     @Transactional(rollbackFor = {WeComException.class,Exception.class})
     @Override
     public void updateQrCode(WeQrAddQuery weQrAddQuery) {
+        WeQrCode qrCode = getById(weQrAddQuery.getQrId());
+        if(Objects.isNull(qrCode)){
+            throw new WeComException("无效活码ID");
+        }
         //校验排期是否存在冲突
         checkScope(weQrAddQuery.getQrUserInfos());
-        WeAddWayQuery weContactWay = weQrAddQuery.getWeContactWay();
-        WeResultVo weResultVo = qwCustomerClient.updateContactWay(weContactWay).getData();
-        if (weResultVo != null && ObjectUtil.equal(0, weResultVo.getErrCode())) {
-            WeQrCode weQrCode = weQrAddQuery.getWeQrCodeEntity(null, null);
-            if (updateById(weQrCode)) {
-                //修改标签数据
-                tagRelService.updateBatchByQrId(weQrCode.getId(), weQrAddQuery.getQrTags());
-                //修改活码范围数据
-                scopeService.updateBatchByQrId(weQrCode.getId(), weQrAddQuery.getQrUserInfos());
-                //修改活码素材
-                attachmentsService.updateBatchByQrId(weQrCode.getId(), weQrAddQuery.getAttachments());
+
+        WeQrCode weQrCode = null;
+        //当类型相同时
+        if(ObjectUtil.equal(qrCode.getType(),weQrAddQuery.getQrType())){
+            WeAddWayQuery weContactWay = weQrAddQuery.getWeContactWay();
+            WeResultVo weResultVo = qwCustomerClient.updateContactWay(weContactWay).getData();
+            if(Objects.isNull(weResultVo)){
+                throw new WeComException("活码生成失败！");
             }
-            rabbitTemplate.convertAndSend(mqSettingConfig.getWeQrCodeChangeEx(),mqSettingConfig.getWeQrCodeChangeRk(),String.valueOf(weQrCode.getId()));
+            if (ObjectUtil.notEqual(0, weResultVo.getErrCode())) {
+                throw new WeComException(weResultVo.getErrCode(), WeErrorCodeEnum.parseEnum(weResultVo.getErrCode()).getErrorMsg());
+            }
+            weQrCode = weQrAddQuery.getWeQrCodeEntity(null, null);
         }else {
-            throw new WeComException(weResultVo.getErrCode(), WeErrorCodeEnum.parseEnum(weResultVo.getErrCode()).getErrorMsg());
+            WeAddWayQuery weContactWay = weQrAddQuery.getWeContactWay();
+            weContactWay.setState(qrCode.getState());
+            WeAddWayVo weResultVo = qwCustomerClient.addContactWay(weContactWay).getData();
+            if(Objects.isNull(weResultVo)){
+                throw new WeComException("活码生成失败！");
+            }
+            if (ObjectUtil.notEqual(0, weResultVo.getErrCode())) {
+                throw new WeComException(weResultVo.getErrCode(), WeErrorCodeEnum.parseEnum(weResultVo.getErrCode()).getErrorMsg());
+            }
+            weQrCode = weQrAddQuery.getWeQrCodeEntity(weResultVo.getConfigId(), weResultVo.getQrCode());
+            //删除原活码
+            //JSONObject delQrCodeInfo = new JSONObject();
+            //员工活码类型为 1
+            //delQrCodeInfo.put("type","1");
+            //delQrCodeInfo.put("configId",qrCode.getConfigId());
+            //rabbitTemplate.convertAndSend(mqSettingConfig.getWeQrCodeChangeEx(),mqSettingConfig.getWeQrCodeDelRk(),delQrCodeInfo.toJSONString());
+            ThreadUtil.execAsync(() ->{
+                WeContactWayQuery weContactWayQuery = new WeContactWayQuery();
+                weContactWayQuery.setConfig_id(qrCode.getConfigId());
+                qwCustomerClient.delContactWay(weContactWayQuery);
+            });
         }
+
+        if (updateById(weQrCode)) {
+            //修改标签数据
+            tagRelService.updateBatchByQrId(weQrCode.getId(), weQrAddQuery.getQrTags());
+            //修改活码范围数据
+            scopeService.updateBatchByQrId(weQrCode.getId(), weQrAddQuery.getQrUserInfos());
+            //修改活码素材
+            attachmentsService.updateBatchByQrId(weQrCode.getId(), weQrAddQuery.getAttachments());
+        }
+        rabbitTemplate.convertAndSend(mqSettingConfig.getWeQrCodeChangeEx(),mqSettingConfig.getWeQrCodeChangeRk(),String.valueOf(weQrCode.getId()));
     }
 
     @Override
@@ -292,6 +328,16 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
         WeQrCode weQrCode = new WeQrCode();
         weQrCode.setGroupId(1L);
         update(weQrCode,new LambdaQueryWrapper<WeQrCode>().eq(WeQrCode::getGroupId,groupId).eq(WeQrCode::getDelFlag,0));
+    }
+
+    @Override
+    public WeAddWayVo createQrbyWeUserIds(List<String> weUserIds, String state) {
+        return qwCustomerClient.addContactWay(WeAddWayQuery.builder().type(2).scene(2).state(state).user(weUserIds).build()).getData();
+    }
+
+    @Override
+    public void updateQrbyWeUserIds(List<String> weUserIds, String configId) {
+        qwCustomerClient.updateContactWay(WeAddWayQuery.builder().config_id(configId).user(weUserIds).build());
     }
 
     @Override

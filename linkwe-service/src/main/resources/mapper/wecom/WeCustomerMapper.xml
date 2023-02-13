@@ -51,6 +51,9 @@
                     AND FIND_IN_SET(#{tagId},wcr.tag_ids)
                 </foreach>
             </if>
+            <if test="weCustomerList.noTagCheck">
+                AND ISNULL(wcr.tag_ids) or LENGTH(TRIM(wcr.tag_ids)) =0
+            </if>
             <if test="weCustomerList.excludeTagIds !=null and weCustomerList.excludeTagIds !=''">
                 <foreach item="excludeTagId" index="index" collection="weCustomerList.excludeTagIds.split(',')">
                     AND !FIND_IN_SET(#{excludeTagId},wcr.tag_ids)
