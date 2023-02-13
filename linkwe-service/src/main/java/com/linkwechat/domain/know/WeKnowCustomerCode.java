@@ -189,6 +189,7 @@ public class WeKnowCustomerCode extends BaseEntity{
     private String addWeUserState;
 
     @TableLogic
+    @ExcelIgnore
     private Integer delFlag;
 
 
