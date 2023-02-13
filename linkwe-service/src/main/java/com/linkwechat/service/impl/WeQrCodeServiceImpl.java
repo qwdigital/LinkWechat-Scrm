@@ -295,6 +295,16 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
     }
 
     @Override
+    public WeAddWayVo createQrbyWeUserIds(List<String> weUserIds, String state) {
+        return qwCustomerClient.addContactWay(WeAddWayQuery.builder().type(2).scene(2).state(state).user(weUserIds).build()).getData();
+    }
+
+    @Override
+    public void updateQrbyWeUserIds(List<String> weUserIds, String configId) {
+        qwCustomerClient.updateContactWay(WeAddWayQuery.builder().config_id(configId).user(weUserIds).build());
+    }
+
+    @Override
     public void qrCodeUpdateTask(Long qrCodeId) {
         List<WeQrScopeVo> weQrScopeList = getWeQrScopeByTime(DateUtil.formatDateTime(new Date()),qrCodeId);
         log.info("活码使用范围修改任务 weQrScopeList {}", JSONObject.toJSONString(weQrScopeList));

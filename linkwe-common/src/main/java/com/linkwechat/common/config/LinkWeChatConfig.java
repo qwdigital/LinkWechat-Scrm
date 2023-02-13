@@ -176,6 +176,11 @@ public class LinkWeChatConfig {
     private String guideCodeUrl;
 
     /**
+     * 识客码
+     */
+    private String knowCustomerUrl;
+
+    /**
      * 导购群码
      */
     private String guideGroupUrl;

@@ -5,6 +5,7 @@ import com.linkwechat.common.core.domain.dto.SysUserDTO;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
+import com.linkwechat.domain.user.vo.WeUserScreenConditVo;
 import com.linkwechat.fallback.QwSysUserFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -71,5 +72,14 @@ public interface QwSysUserClient {
      */
     @PostMapping("/system/user/getUserListByWeUserIds")
     AjaxResult<List<SysUserVo>> getUserListByWeUserIds(@RequestBody SysUserQuery query);
+
+
+    /**
+     * 根据职位等条件筛选员工
+     * @param weUserScreenConditVo
+     * @return
+     */
+    @GetMapping("/system/user/screenConditWeUser")
+    public AjaxResult<List<String>> screenConditWeUser(WeUserScreenConditVo weUserScreenConditVo);
 
 }
