@@ -150,12 +150,14 @@ public class QwWelcomeMsgListener {
                         template.setMaterialId(qrAttachment.getMaterialId());
                         return template;
                     }).collect(Collectors.toList());
+
                     templates.addAll(templateList);
                     makeCustomerTag(query.getExternalUserID(), query.getUserID(), qrDetail.getQrTags());
                 } else {
                     log.warn("未查询到对应员工活码信息");
                 }
-            } else if (StringUtils.isNotEmpty(query.getState()) && query.getState().startsWith(WeConstans.WE_QR_XKLQ_PREFIX)) {
+            }
+            else if (StringUtils.isNotEmpty(query.getState()) && query.getState().startsWith(WeConstans.WE_QR_XKLQ_PREFIX)) {
                 WeCommunityWeComeMsgVo welcomeMsgByState = weCommunityNewGroupService.getWelcomeMsgByState(query.getState());
                 if (welcomeMsgByState != null) {
                     WeMessageTemplate textAtt = new WeMessageTemplate();
@@ -186,7 +188,8 @@ public class QwWelcomeMsgListener {
                     textAtt.setContent(welcomeMsgDefault);
                 }
                 templates.add(textAtt);
-            }else if(StringUtils.isNotEmpty(query.getState()) && query.getState().startsWith(WeConstans.WE_STORE_CODE_CONFIG_PREFIX)){
+            }
+            else if(StringUtils.isNotEmpty(query.getState()) && query.getState().startsWith(WeConstans.WE_STORE_CODE_CONFIG_PREFIX)){
                     log.info("门店导购欢迎语 state：{}",query.getState());
                     WeStoreCodeConfig storeCodeConfig = iWeStoreCodeConfigService.getOne(new LambdaQueryWrapper<WeStoreCodeConfig>()
                             .eq(WeStoreCodeConfig::getState, query.getState()));
@@ -227,7 +230,8 @@ public class QwWelcomeMsgListener {
                         }
                     }
 
-            }else if(StringUtils.isNotEmpty(query.getState()) && query.getState().startsWith(WeConstans.WE_KNOW_CUSTOMER_CODE_PREFIX)){
+            }
+            else if(StringUtils.isNotEmpty(query.getState()) && query.getState().startsWith(WeConstans.WE_KNOW_CUSTOMER_CODE_PREFIX)){
 
                 WeKnowCustomerCode weKnowCustomerCode = iWeKnowCustomerCodeService.getOne(new LambdaQueryWrapper<WeKnowCustomerCode>()
                         .eq(WeKnowCustomerCode::getAddWeUserState, query.getState()));
@@ -278,7 +282,8 @@ public class QwWelcomeMsgListener {
 
 
 
-            }else {
+            }
+            else {
                 WeMsgTlpQuery weMsgTlpQuery = new WeMsgTlpQuery();
                 weMsgTlpQuery.setUserId(query.getUserID());
                 weMsgTlpQuery.setFlag(false);

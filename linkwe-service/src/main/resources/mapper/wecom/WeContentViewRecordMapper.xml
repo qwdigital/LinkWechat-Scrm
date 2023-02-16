@@ -14,7 +14,7 @@
         r.external_user_name,
         r.external_avatar,
         r.external_user_id,
-        r.view_unionid,
+        r.view_unionid
 --         (select unionid from we_customer c where c.unionid = r.view_unionid and c.unionid is not null limit 1) as unionid
         FROM
         we_content_view_record r
