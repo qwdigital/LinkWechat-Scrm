@@ -110,17 +110,17 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
     public List<ContentDataDetailVo> getViewDetail(ContentDetailQuery contentDetailQuery) {
         Long contentId = contentDetailQuery.getContentId();
 
-        String beginTime = contentDetailQuery.getBeginTime();
-        String endTime = contentDetailQuery.getEndTime();
-
-        if (StringUtils.isNotBlank(beginTime)) {
-            beginTime = DateUtils.initSqlBeginTime(beginTime);
-            contentDetailQuery.setBeginTime(beginTime);
-        }
-        if (StringUtils.isNotBlank(endTime)) {
-            endTime = DateUtils.initSqlEndTime(endTime);
-            contentDetailQuery.setEndTime(endTime);
-        }
+//        String beginTime = contentDetailQuery.getBeginTime();
+//        String endTime = contentDetailQuery.getEndTime();
+//
+//        if (StringUtils.isNotBlank(beginTime)) {
+//            beginTime = DateUtils.initSqlBeginTime(beginTime);
+//            contentDetailQuery.setBeginTime(beginTime);
+//        }
+//        if (StringUtils.isNotBlank(endTime)) {
+//            endTime = DateUtils.initSqlEndTime(endTime);
+//            contentDetailQuery.setEndTime(endTime);
+//        }
 
         //查询数据
         List<WeContentViewRecord> weContentViewRecordList = weContentViewRecordMapper.getList(contentDetailQuery);
