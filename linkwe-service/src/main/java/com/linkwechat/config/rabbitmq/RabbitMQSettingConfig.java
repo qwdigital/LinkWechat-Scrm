@@ -151,6 +151,10 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.qr-code-change:Rk_QrCodeChange}")
     private String weQrCodeChangeRk;
 
+    //活码删除路由
+    @Value("${wecom.mq.route.qr-code-del:Rk_QrCodeDel}")
+    private String weQrCodeDelRk;
+
     //商品图册同步路由
     @Value("${wecom.mq.route.sync.product:Rk_Product}")
     private String weProductRk;
@@ -241,6 +245,10 @@ public class RabbitMQSettingConfig {
     //活码变更队列
     @Value("${wecom.mq.queue.qr-code-change:Qu_QrCodeChange}")
     private String weQrCodeChangeQu;
+
+    //活码删除队列
+    @Value("${wecom.mq.queue.qr-code-del:Qu_QrCodeDel}")
+    private String weQrCodeDelQu;
 
     //商品图册同步队列
     @Value("${wecom.mq.queue.sync.product:Qu_Product}")
