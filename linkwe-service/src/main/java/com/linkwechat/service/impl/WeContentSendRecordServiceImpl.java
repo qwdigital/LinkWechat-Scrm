@@ -78,12 +78,12 @@ public class WeContentSendRecordServiceImpl extends ServiceImpl<WeContentSendRec
 
         String beginTime = contentDetailQuery.getBeginTime();
         String endTime = contentDetailQuery.getEndTime();
-        if (StringUtils.isNotBlank(beginTime)) {
-            beginTime = DateUtils.initSqlBeginTime(beginTime);
-        }
-        if (StringUtils.isNotBlank(endTime)) {
-            endTime = DateUtils.initSqlEndTime(endTime);
-        }
+//        if (StringUtils.isNotBlank(beginTime)) {
+//            beginTime = DateUtils.initSqlBeginTime(beginTime);
+//        }
+//        if (StringUtils.isNotBlank(endTime)) {
+//            endTime = DateUtils.initSqlEndTime(endTime);
+//        }
         QueryWrapper<WeContentSendRecord> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id,talk_id, content_id, send_by, send_by_id, send_time, resource_type,count(id) as sendCount");
         queryWrapper.lambda().eq(ObjectUtil.isNotEmpty(contentDetailQuery.getTalkId()), WeContentSendRecord::getTalkId, contentDetailQuery.getTalkId());
