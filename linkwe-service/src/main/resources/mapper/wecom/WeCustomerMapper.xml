@@ -51,6 +51,9 @@
                     AND FIND_IN_SET(#{tagId},wcr.tag_ids)
                 </foreach>
             </if>
+            <if test="weCustomerList.noTagCheck">
+                AND ISNULL(wcr.tag_ids) or LENGTH(TRIM(wcr.tag_ids)) =0
+            </if>
             <if test="weCustomerList.beginTime !=null and weCustomerList.beginTime != '' and weCustomerList.endTime !='' and weCustomerList.endTime != null">
                 AND  date_format(wcr.add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
             </if>

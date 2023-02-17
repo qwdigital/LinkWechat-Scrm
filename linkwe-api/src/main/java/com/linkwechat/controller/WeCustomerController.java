@@ -13,6 +13,7 @@ import com.linkwechat.common.core.page.TableSupport;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.domain.WeCustomer;
+import com.linkwechat.domain.customer.WeBacthMakeCustomerTag;
 import com.linkwechat.domain.customer.WeMakeCustomerTag;
 import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.query.WeOnTheJobCustomerQuery;
@@ -255,6 +256,20 @@ public class WeCustomerController extends BaseController {
         result.put("customerNum",externalUserIdSet.size());
         result.put("userNum",userNum.size());
         return AjaxResult.success(result);
+    }
+
+    /**
+     * 批量添加或删除客户标签
+     * @param makeCustomerTags
+     * @return
+     */
+    @Log(title = "批量添加或删除客户标签", businessType = BusinessType.UPDATE)
+    @PostMapping("/batchMakeLabel")
+    public AjaxResult batchMakeLabel(@RequestBody WeBacthMakeCustomerTag makeCustomerTags){
+
+        weCustomerService.batchMakeLabel(makeCustomerTags);
+
+        return AjaxResult.success();
     }
 
 
