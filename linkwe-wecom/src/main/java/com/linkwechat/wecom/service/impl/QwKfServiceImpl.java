@@ -54,7 +54,7 @@ public class QwKfServiceImpl implements IQwKfService {
     private WeKfListVo getAccountList(QwKfListQuery weKfListQuery){
         WeKfListVo list = weKfClient.list(weKfListQuery);
         if(list != null && list.getAccountList().size() >= 100){
-            weKfListQuery.setLimit(weKfListQuery.getLimit()+ weKfListQuery.getOffset());
+            weKfListQuery.setOffset(weKfListQuery.getLimit() + weKfListQuery.getOffset());
             WeKfListVo accountList = getAccountList(weKfListQuery);
             list.getAccountList().addAll(accountList.getAccountList());
         }
