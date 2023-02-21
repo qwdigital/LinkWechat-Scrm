@@ -644,5 +644,26 @@ public class RabbitMQConfig {
     public Binding bindingExchangeProductOrder() {
         return BindingBuilder.bind(quProductOrder()).to(syncEx()).with(rabbitMQSettingConfig.getWeProductOrderQu()).noargs();
     }
+
+
+    /**
+     * 同步离职成员队列
+     * @return
+     */
+    public Queue quLeaveUser(){
+        return new Queue(rabbitMQSettingConfig.getLeaveAllocateUserQu());
+
+    }
+
+
+    /**
+     * 离职成员同步绑定交换机
+     * @return
+     */
+    public Binding bindingQuLeaveUser(){
+
+        return BindingBuilder.bind(quLeaveUser()).to(syncEx()).with(rabbitMQSettingConfig.getWeLeaveAllocateUserRk()).noargs();
+
+    }
 }
 

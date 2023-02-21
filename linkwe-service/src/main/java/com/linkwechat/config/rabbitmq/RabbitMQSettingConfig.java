@@ -100,6 +100,11 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.sync.wecustomer:Rk_Wecustomer}")
     private String weCustomerRk;
 
+
+    //离职成员分配同步路由
+    @Value("${wecom.mq.route.sync.leaveUser:Rk_leaveUser}")
+    private String weLeaveAllocateUserRk;
+
     //客户标签同步路由
     @Value("${wecom.mq.route.sync.group-tag:Rk_GroupTag}")
     private String weGroupTagRk;
@@ -318,6 +323,11 @@ public class RabbitMQSettingConfig {
     //直播同步路由
     @Value("${wecom.mq.route.sync.welive:Rk_WeLive}")
     private String weLiveRk;
+
+
+    //离职成员分配同步路由
+    @Value("${wecom.mq.queue.leaveUser:Qu_LeaveUser}")
+    private String leaveAllocateUserQu;
 
 
 

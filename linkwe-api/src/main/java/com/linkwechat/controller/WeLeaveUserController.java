@@ -102,5 +102,18 @@ public class WeLeaveUserController extends BaseController {
     }
 
 
+    /**
+     * 离职员工相关同步
+     * @return
+     */
+    @GetMapping("/synchLeaveUser")
+    public AjaxResult synchLeaveUser(){
+
+        iWeLeaveUserService.synchLeaveSysUser();
+
+        return AjaxResult.success();
+    }
+
+
 
 }

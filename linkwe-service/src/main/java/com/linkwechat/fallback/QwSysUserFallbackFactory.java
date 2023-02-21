@@ -83,5 +83,10 @@ public class QwSysUserFallbackFactory implements QwSysUserClient {
         return null;
     }
 
+    @Override
+    public AjaxResult batchUpdateSysUser(List<SysUser> sysUsers) {
+        return null;
+    }
+
 
 }

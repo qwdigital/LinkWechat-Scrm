@@ -1,33 +1,55 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ArrayUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.annotation.SynchRecord;
 import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.core.domain.model.LoginUser;
+import com.linkwechat.common.enums.CorpUserEnum;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.ServletUtils;
+import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.*;
 import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.vo.WeCustomersVo;
+import com.linkwechat.domain.wecom.entity.customer.groupChat.WeOwnerFilterEntity;
+import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
+import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatListQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferGroupChatQuery;
+import com.linkwechat.domain.wecom.query.user.WeLeaveUserQuery;
+import com.linkwechat.domain.wecom.vo.customer.WeBatchCustomerDetailVo;
+import com.linkwechat.domain.wecom.vo.customer.WeCustomerDetailVo;
+import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatListVo;
 import com.linkwechat.domain.wecom.vo.customer.transfer.WeTransferCustomerVo;
+import com.linkwechat.domain.wecom.vo.user.WeLeaveUserVo;
 import com.linkwechat.fegin.QwAuthClient;
 import com.linkwechat.fegin.QwCustomerClient;
+import com.linkwechat.fegin.QwSysUserClient;
+import com.linkwechat.fegin.QwUserClient;
 import com.linkwechat.mapper.WeLeaveUserMapper;
 import com.linkwechat.service.*;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.security.acl.Group;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static cn.hutool.core.collection.IterUtil.forEach;
 
 @Service
 public class WeLeaveUserServiceImpl implements IWeLeaveUserService {
@@ -50,6 +72,21 @@ public class WeLeaveUserServiceImpl implements IWeLeaveUserService {
 
     @Autowired
     QwCustomerClient qwCustomerClient;
+
+    @Autowired
+    RabbitMQSettingConfig rabbitMQSettingConfig;
+
+    @Autowired
+    RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    QwUserClient qwUserClient;
+
+    @Autowired
+    QwSysUserClient qwSysUserClient;
+
+
+
 
 
 
@@ -231,5 +268,131 @@ public class WeLeaveUserServiceImpl implements IWeLeaveUserService {
 
 
     }
+
+    @Override
+    @SynchRecord(synchType = SynchRecordConstants.SYNCH_LEAVE_USER)
+    public void synchLeaveSysUser() {
+
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeLeaveAllocateUserRk(), JSONObject.toJSONString(loginUser));
+
+
+
+
+    }
+
+    @Override
+    @Transactional
+    public void synchLeaveSysUserHandler(String msg) {
+        LoginUser loginUser = JSONObject.parseObject(msg, LoginUser.class);
+        SecurityContextHolder.setCorpId(loginUser.getCorpId());
+        SecurityContextHolder.setUserName(loginUser.getUserName());
+        SecurityContextHolder.setUserId(String.valueOf(loginUser.getSysUser().getUserId()));
+        SecurityContextHolder.setUserType(loginUser.getUserType());
+
+        List<WeLeaveUserVo.Info> infoList=new ArrayList<>();
+        this.getWeLeaveUserVo(infoList,null);
+
+        if(CollectionUtil.isNotEmpty(infoList)){
+
+            //待分配的离职客户
+            List<WeAllocateCustomer> allocateCustomers=new ArrayList<>();
+            //等待分配的客群
+            List<WeAllocateGroup> allocateGroups=new ArrayList<>();
+            Map<String, List<WeLeaveUserVo.Info>> weLeaveUserVoMap = infoList.stream()
+                    .collect(Collectors.groupingBy(WeLeaveUserVo.Info::getHandover_userid));
+
+             weLeaveUserVoMap.forEach((k,v)->{
+                        v.stream().forEach(vv->{
+                            //分配客户
+                            allocateCustomers.add(
+                                    WeAllocateCustomer.builder()
+                                            .allocateTime(new Date())
+                                            .extentType(new Integer(0))
+                                            .externalUserid(k)
+                                            .handoverUserid(vv.getExternal_userid())
+                                            .status(new Integer(1))
+                                            .failReason("离职继承")
+                                            .build()
+                            );
+
+                        });
+
+                        //分配群
+                        List<WeGroupChatListVo.GroupChat> groupChatList=new ArrayList<>();
+
+                        //从企业微信拉取当前离职员工等待分配的群
+                        iWeGroupService.getGroupChatList(groupChatList, WeGroupChatListQuery.builder()
+                                        .owner_filter(WeOwnerFilterEntity.builder()
+                                                .userid_list(ListUtil.toList(k))
+                                                .build())
+                                        .status_filter(1)
+                                .build());
+                        if(CollectionUtil.isNotEmpty(groupChatList)){
+                            groupChatList.stream().forEach(chat->{
+                                allocateGroups.add(
+                                        WeAllocateGroup.builder()
+                                                .chatId(chat.getChatId())
+                                                .oldOwner(k)
+                                                .status(new Integer(1))
+                                                .build()
+                                );
+                            });
+                        }
+
+
+
+            });
+
+             //修改员工表的状态为待分配
+            List<SysUser> allSysUsers = qwSysUserClient.findAllSysUser(
+                    infoList.stream().map(WeLeaveUserVo.Info::getHandover_userid).collect(Collectors.joining(",")),
+                    null, null
+            ).getData();
+            if(CollectionUtil.isNotEmpty(allSysUsers)){
+                allSysUsers.stream().forEach(sysUser -> {
+
+                    sysUser.setIsAllocate(CorpUserEnum.NO_IS_ALLOCATE.getKey());
+
+                    WeLeaveUserVo.Info info
+                            = weLeaveUserVoMap.get(sysUser.getWeUserId()).stream().findFirst().get();
+
+                    sysUser.setDimissionTime(info!=null?new Date(info.getDimission_time() * 1000L):new Date());
+                });
+                qwSysUserClient.batchUpdateSysUser(allSysUsers);
+            }
+
+            //待分配的客户，群等信息入库
+            iWeAllocateGroupService.batchAddOrUpdate(allocateGroups);
+            iWeAllocateCustomerService.batchAddOrUpdate(
+                    allocateCustomers
+            );
+
+        }
+
+
+    }
+
+    private void getWeLeaveUserVo(List<WeLeaveUserVo.Info> infoList, String nextCursor){
+
+        WeLeaveUserVo leaveUserVos = qwUserClient.getUnassignedList(WeLeaveUserQuery.builder()
+                .cursor(nextCursor)
+                .build()).getData();
+
+
+        if(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode().equals(leaveUserVos.getErrCode())){
+            infoList.addAll(leaveUserVos.getInfo());
+
+            if (StringUtils.isNotEmpty(leaveUserVos.getNext_cursor())) {
+                getWeLeaveUserVo(infoList, nextCursor);
+            }
+
+
+        }
+
+
+
+    }
+
 
 }

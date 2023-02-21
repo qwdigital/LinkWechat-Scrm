@@ -88,4 +88,16 @@ public interface QwSysUserClient {
             @RequestParam("positions") String positions
     );
 
+
+    /**
+     * 批量更新sysUser
+     * @param sysUsers
+     * @return
+     */
+    @PutMapping("/batchUpdateSysUser")
+    AjaxResult batchUpdateSysUser(List<SysUser> sysUsers);
+
+
+
+
 }
