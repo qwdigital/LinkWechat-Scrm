@@ -271,19 +271,8 @@ public class QwWelcomeMsgListener {
 
 
                     }
-
-
-
-
-
-
                 }
-
-
-
-
-            }
-            else {
+            } else {
                 WeMsgTlpQuery weMsgTlpQuery = new WeMsgTlpQuery();
                 weMsgTlpQuery.setUserId(query.getUserID());
                 weMsgTlpQuery.setFlag(false);
