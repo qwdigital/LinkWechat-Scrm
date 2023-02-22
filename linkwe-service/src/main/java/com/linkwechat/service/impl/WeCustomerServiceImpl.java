@@ -426,27 +426,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         this.updateWeCustomerTagIds(weMakeCustomerTag.getUserId(),weMakeCustomerTag.getExternalUserid());
 
 
-//            WeCustomer weCustomer = this.getOne(new LambdaQueryWrapper<WeCustomer>()
-//                    .eq(WeCustomer::getAddUserId, weMakeCustomerTag.getUserId())
-//                    .eq(WeCustomer::getExternalUserid, weMakeCustomerTag.getExternalUserid()));
-//            if(null != weCustomer){
-//
-//                /**
-//                 * 更新客户表标签ids冗余字段
-//                 */
-//                List<WeFlowerCustomerTagRel> nowAddWeFlowerCustomerTagRel
-//                        = iWeFlowerCustomerTagRelService.findNowAddWeFlowerCustomerTagRel(weMakeCustomerTag.getExternalUserid(), weMakeCustomerTag.getUserId());
-//                if(CollectionUtil.isNotEmpty(nowAddWeFlowerCustomerTagRel)){
-//                    weCustomer.setTagIds(
-//                            nowAddWeFlowerCustomerTagRel.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList())
-//                                    .stream().map(String::valueOf).collect(Collectors.joining(","))
-//                    );
-//                }else{
-//                    weCustomer.setTagIds(null);
-//                }
-//                this.updateById(weCustomer);
-//            }
-
 
 
     }
@@ -923,6 +902,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                             if(CollectionUtil.isNotEmpty(weTags)){
                                 makeLabel(WeMakeCustomerTag.builder()
                                         .userId(weCustomerSeas.getAddUserId())
+                                        .isCompanyTag(true)
                                         .externalUserid(externalUserId)
                                         .addTag(weTags)
                                         .build());
