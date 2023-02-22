@@ -228,35 +228,6 @@ public class WeCustomerPortraitController extends BaseController{
     }
 
 
-//    /**
-//     * 删除轨迹
-//     * @param trajectoryId
-//     * @return
-//     */
-//    @DeleteMapping(value = "/removeTrajectory/{trajectoryId}")
-//    public AjaxResult removeTrajectory(@PathVariable String trajectoryId){
-//        iWeCustomerTrajectoryService.updateById(WeCustomerTrajectory.builder()
-//                .id(trajectoryId)
-//                .status(Constants.DELETE_CODE)
-//                .build());
-//        return AjaxResult.success();
-//    }
-//
-//    /**
-//     * 完成待办
-//     * @param trajectoryId
-//     * @return
-//     */
-//    @DeleteMapping(value = "/handleWait/{trajectoryId}")
-//    public AjaxResult handleWait(@PathVariable String trajectoryId){
-//        iWeCustomerTrajectoryService.updateById(WeCustomerTrajectory.builder()
-//                .id(trajectoryId)
-//                .status(Constants.HANDLE_SUCCESS)
-//                .build());
-//        return AjaxResult.success();
-//    }
-//
-
 
     /**
      * 个人朋友圈互动数据同步
