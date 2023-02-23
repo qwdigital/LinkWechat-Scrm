@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeSysFieldTemplateMapper">
+
+    <resultMap id="BaseResultMap" type="com.linkwechat.domain.WeSysFieldTemplate">
+        <id property="id" column="id" />
+        <result property="labelName" column="label_name" />
+        <result property="labelVal" column="label_val"/>
+        <result property="businessType" column="business_type"/>
+        <result property="visualTagIds" column="visual_tag_ids"/>
+        <result property="type" column="type" />
+        <result property="typeSub" column="type_sub" />
+        <result property="otherContent" column="other_content" typeHandler="com.linkwechat.typeHandler.WeCustomerInfoExpandListTypeHandler"/>
+        <result property="labelSort" column="label_sort" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createById" column="create_by_id" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateById" column="update_by_id"/>
+        <result property="isDefault" column="is_default" />
+        <result property="delFlag" column="del_flag"/>
+        <result property="visualTagName" column="visualTagName"></result>
+    </resultMap>
+
+    <select id="findLists" resultMap="BaseResultMap">
+        SELECT
+            *,
+            (SELECT GROUP_CONCAT(wt.name) from we_tag wt WHERE wt.tag_id=visual_tag_ids) as visualTagName
+        from we_sys_field_template  ${ew.customSqlSegment}
+    </select>
+
+
+
+</mapper>

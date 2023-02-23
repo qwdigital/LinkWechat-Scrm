@@ -355,6 +355,7 @@
 
     <select id="findCustomerByOperUseridAndCustomerId" resultType="com.linkwechat.domain.customer.vo.WeCustomerPortraitVo">
         SELECT
+            wc.id as customerId,
             wc.customer_name as name,
             wc.other_descr as remark,
             wc.phone as remarkMobiles,

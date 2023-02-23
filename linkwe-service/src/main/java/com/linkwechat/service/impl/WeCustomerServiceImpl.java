@@ -96,6 +96,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     private IWeCustomerSeasService iWeCustomerSeasService;
 
 
+    @Autowired
+    private IWeCustomerInfoExpandService iWeCustomerInfoExpandService;
+
+
 
     @Override
     public List<WeCustomersVo> findWeCustomerList(WeCustomersQuery weCustomersQuery, PageDomain pageDomain) {
@@ -724,6 +728,13 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             );
         }
 
+        //客户当前客户拓展字段
+        weCustomerDetail.setWeCustomerInfoExpands(
+                iWeCustomerInfoExpandService.list(new LambdaQueryWrapper<WeCustomerInfoExpand>()
+                        .eq(WeCustomerInfoExpand::getCustomerId,weCustomer.getId()))
+        );
+
+
 
         return weCustomerDetail;
 
@@ -747,6 +758,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             //客户社交关系
             weCustomerPortrait.setSocialConn(
                     this.baseMapper.countSocialConn(externalUserid, userid)
+            );
+
+            //客户当前客户拓展字段
+            weCustomerPortrait.setWeCustomerInfoExpands(
+                    iWeCustomerInfoExpandService.list(new LambdaQueryWrapper<WeCustomerInfoExpand>()
+                            .eq(WeCustomerInfoExpand::getCustomerId,weCustomerPortrait.getCustomerId()))
             );
 
         } else {
@@ -773,6 +790,15 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         if (this.update(weCustomer, new LambdaQueryWrapper<WeCustomer>()
                 .eq(WeCustomer::getAddUserId, weCustomerPortrait.getUserId())
                 .eq(WeCustomer::getExternalUserid, weCustomerPortrait.getExternalUserid()))) {
+
+            //更新拓展字段
+            List<WeCustomerInfoExpand> weCustomerInfoExpands
+                    = weCustomerPortrait.getWeCustomerInfoExpands();
+            if(CollectionUtil.isNotEmpty(weCustomerInfoExpands)){
+                iWeCustomerInfoExpandService.saveOrUpdateBatch(
+                        weCustomerInfoExpands
+                );
+            }
 
 
             iWeCustomerTrajectoryService.createEditTrajectory(
