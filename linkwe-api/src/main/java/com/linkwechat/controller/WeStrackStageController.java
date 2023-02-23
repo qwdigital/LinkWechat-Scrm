@@ -34,7 +34,8 @@ public class WeStrackStageController extends BaseController {
     public AjaxResult<List<WeStrackStage>> findWeStrackStage(){
 
         return AjaxResult.success(
-                iWeStrackStageService.list()
+                iWeStrackStageService.list(new LambdaQueryWrapper<WeStrackStage>()
+                        .orderByAsc(WeStrackStage::getSort))
         );
     }
 
@@ -57,7 +58,7 @@ public class WeStrackStageController extends BaseController {
      * @return
      */
     @PutMapping("/batchUpdate")
-    public AjaxResult update(@RequestBody List<WeStrackStage> weStrackStages){
+    public AjaxResult batchUpdate(@RequestBody List<WeStrackStage> weStrackStages){
 
         iWeStrackStageService.updateBatchById(weStrackStages);
         return AjaxResult.success();

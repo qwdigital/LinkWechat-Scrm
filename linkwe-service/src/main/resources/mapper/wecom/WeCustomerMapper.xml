@@ -73,15 +73,6 @@
     </select>
 
 
-<!--    <select id="findWeCustomerListExternalUserIds" resultType="java.lang.String">-->
-<!--         SELECT external_userid FROM we_customer-->
-<!--    </select>-->
-
-
-<!--    <select id="findWeCustomerListExternalUserIdsByAddUserId" resultType="java.lang.String">-->
-<!--        SELECT wcr.external_userid FROM we_customer wcr WHERE wcr.add_user_id=#{weUserId}-->
-<!--    </select>-->
-
 
     <select id="findWeUserIds" resultType="java.lang.String">
          select we_user_id from  sys_user
