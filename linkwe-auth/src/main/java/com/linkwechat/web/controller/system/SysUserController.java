@@ -33,6 +33,7 @@ import com.linkwechat.domain.wecom.vo.user.WeUserDetailVo;
 import com.linkwechat.framework.service.TokenService;
 import com.linkwechat.service.IWeCorpAccountService;
 import com.linkwechat.service.IWeSynchRecordService;
+import com.linkwechat.service.IWeSysFieldTemplateService;
 import com.linkwechat.service.IWxUserService;
 import com.linkwechat.web.domain.vo.CorpVo;
 import com.linkwechat.web.domain.vo.UserVo;
@@ -96,6 +97,9 @@ public class SysUserController extends BaseController {
 
     @Autowired
     private IWxUserService wxUserService;
+
+    @Autowired
+    private IWeSysFieldTemplateService iWeSysFieldTemplateService;
 
     /**
      * 获取用户列表
@@ -314,7 +318,7 @@ public class SysUserController extends BaseController {
         WeConfigParamInfo configParamInfo = new WeConfigParamInfo();
 
         if (null != weCorpAccount) {
-
+            iWeSysFieldTemplateService.initBaseSysField();
 
             if (StringUtils.isNotEmpty(corpVo.getAppId())
                     && StringUtils.isNotEmpty(corpVo.getSecret())) {

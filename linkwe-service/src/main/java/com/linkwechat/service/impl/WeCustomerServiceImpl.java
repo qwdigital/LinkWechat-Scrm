@@ -906,6 +906,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                             .delFlag(0)
                             .build()).collect(Collectors.toList());
                     iWeFlowerCustomerTagRelService.batchAddOrUpdate(ListUtil.toList(tagRels));
+                    weCustomer.setTagIds(
+                            String.join(", ",
+                                    tagRels.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toSet()))
+                    );
                 }
             }
             this.baseMapper.batchAddOrUpdate(ListUtil.toList(weCustomer));
