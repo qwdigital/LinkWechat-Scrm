@@ -1,12 +1,15 @@
 package com.linkwechat.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.utils.MapUtils;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeStrackStage;
 import com.linkwechat.service.IWeCustomerService;
 import com.linkwechat.service.IWeStrackStageService;
+import org.apache.ibatis.util.MapUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -71,20 +74,27 @@ public class WeStrackStageController extends BaseController {
      * @param id
      * @return 结果
      */
-    @DeleteMapping(path = "/delete/{id}")
-    public AjaxResult delete(@PathVariable String id) {
-        WeStrackStage weStrackStage = iWeStrackStageService.getById(id);
-        if(null != weStrackStage){
-            int count = iWeCustomerService.count(new LambdaQueryWrapper<WeCustomer>()
-                    .eq(WeCustomer::getTrackState, weStrackStage.getStageVal()));
-            if(count>0){
-                return AjaxResult.error("当前共有"+count+"个客户正处于【"+weStrackStage.getStageKey()+"】阶段，删除阶段需要为这些客户分配一个新状态，分配后立即生效且不可撤销，请谨慎操作。");
-            }
+    @DeleteMapping(path = "/delete")
+    public AjaxResult delete(String id,Integer growStageKey) {
 
-        }
-
-        iWeStrackStageService.removeById(id);
-
+        iWeStrackStageService.remove(id,growStageKey);
         return AjaxResult.success();
+    }
+
+
+    /**
+     * 获取指定商阶状态下的客户数量
+     * @param stageVal
+     * @return
+     */
+    @GetMapping("/getStrackStageCustomerNum/{stageVal}")
+    public AjaxResult getStrackStageCustomerNum(@PathVariable Integer stageVal){
+
+
+        return AjaxResult.success(
+                MapUtil.entry("customerNumbwe",iWeCustomerService.count(new LambdaQueryWrapper<WeCustomer>()
+                        .eq(WeCustomer::getTrackState,stageVal)))
+        );
+
     }
 }

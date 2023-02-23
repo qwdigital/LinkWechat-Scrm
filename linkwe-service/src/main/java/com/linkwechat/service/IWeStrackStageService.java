@@ -16,4 +16,12 @@ public interface IWeStrackStageService extends IService<WeStrackStage> {
      * @param weStrackStage
      */
     void add(WeStrackStage weStrackStage);
+
+
+    /**
+     * 删除商阶
+     * @param id
+     * @param growStageKey
+     */
+    void remove(String id,Integer growStageKey);
 }
