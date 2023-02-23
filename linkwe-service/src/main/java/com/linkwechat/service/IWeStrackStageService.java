@@ -9,4 +9,11 @@ public interface IWeStrackStageService extends IService<WeStrackStage> {
      * 初始化商阶
      */
     void initStrackStage();
+
+
+    /**
+     * 新增商阶
+     * @param weStrackStage
+     */
+    void add(WeStrackStage weStrackStage);
 }

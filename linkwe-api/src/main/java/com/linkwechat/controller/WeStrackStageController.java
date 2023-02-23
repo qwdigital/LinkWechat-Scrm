@@ -47,7 +47,7 @@ public class WeStrackStageController extends BaseController {
     @PostMapping("/add")
     public AjaxResult add(@RequestBody WeStrackStage weStrackStage){
 
-        iWeStrackStageService.save(weStrackStage);
+        iWeStrackStageService.add(weStrackStage);
         return AjaxResult.success();
     }
 

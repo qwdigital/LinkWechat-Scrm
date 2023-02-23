@@ -41,4 +41,14 @@ public class WeStrackStageServiceImpl extends ServiceImpl<WeStrackStageMapper, W
 
 
     }
+
+    @Override
+    public void add(WeStrackStage weStrackStage) {
+        WeStrackStage maxWeStrackStage = this.getOne(new LambdaQueryWrapper<WeStrackStage>()
+                .orderByDesc(WeStrackStage::getStageVal).last(" limit 1"));
+        if(null != maxWeStrackStage){
+            weStrackStage.setStageVal(maxWeStrackStage.getStageVal()+1);
+        }
+        this.save(weStrackStage);
+    }
 }
