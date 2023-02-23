@@ -1,6 +1,7 @@
 package com.linkwechat.controller;
 
 
+import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -11,6 +12,7 @@ import com.linkwechat.domain.WeAllocateGroups;
 import com.linkwechat.domain.WeLeaveUser;
 import com.linkwechat.domain.WeLeaveUserInfoAllocate;
 import com.linkwechat.service.IWeLeaveUserService;
+import com.linkwechat.service.IWeSynchRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -29,6 +31,9 @@ public class WeLeaveUserController extends BaseController {
     @Autowired
     private IWeLeaveUserService iWeLeaveUserService;
 
+    @Autowired
+    private IWeSynchRecordService iWeSynchRecordService;
+
     /**
      * 离职未分配列表
      *
@@ -40,7 +45,12 @@ public class WeLeaveUserController extends BaseController {
         startPage();
         weLeaveUser.setIsAllocate(CorpUserEnum.NO_IS_ALLOCATE.getKey());
         List<WeLeaveUser> list = iWeLeaveUserService.leaveNoAllocateUserList(weLeaveUser);
-        return getDataTable(list);
+        TableDataInfo dataTable = getDataTable(list);
+        dataTable.setLastSyncTime(
+                iWeSynchRecordService.findUpdateLatestTime(SynchRecordConstants.SYNCH_LEAVE_USER)
+        );//最近同步时间
+
+        return dataTable;
     }
 
 
