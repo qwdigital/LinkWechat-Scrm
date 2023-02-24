@@ -938,5 +938,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return weUserIdList;
     }
 
+    @Override
+    @Transactional
+    public void builderLeaveSysUser(List<SysUser> sysUsers) {
+        if(CollectionUtil.isNotEmpty(sysUsers)){
+            this.updateBatchById(sysUsers);
+            this.removeByIds(sysUsers.stream().map(SysUser::getUserId).collect(Collectors.toList()));
+        }
+
+    }
+
 
 }

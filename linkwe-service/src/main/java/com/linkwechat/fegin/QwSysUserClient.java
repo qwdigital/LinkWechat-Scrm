@@ -94,8 +94,8 @@ public interface QwSysUserClient {
      * @param sysUsers
      * @return
      */
-    @PutMapping("/batchUpdateSysUser")
-    AjaxResult batchUpdateSysUser(List<SysUser> sysUsers);
+    @PostMapping("/system/user/builderLeaveSysUser")
+    AjaxResult builderLeaveSysUser(@RequestBody SysUserQuery sysUsers);
 
 
 

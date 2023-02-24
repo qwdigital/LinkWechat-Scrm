@@ -4,6 +4,7 @@ import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.dtflys.forest.annotation.Post;
 import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -525,15 +526,15 @@ public class SysUserController extends BaseController {
 
 
     /**
-     * 批量更新sysUser
+     * 批量构建离职员工
      * @param sysUsers
      * @return
      */
-    @PutMapping("/batchUpdateSysUser")
-    public AjaxResult batchUpdateSysUser(List<SysUser> sysUsers){
+    @PostMapping("/builderLeaveSysUser")
+    public AjaxResult builderLeaveSysUser(@RequestBody SysUserQuery sysUsers){
 
+        userService.builderLeaveSysUser(sysUsers.getSysUsers());
 
-        userService.updateBatchById(sysUsers);
 
         return AjaxResult.success();
 

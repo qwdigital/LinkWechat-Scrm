@@ -281,6 +281,13 @@ public interface ISysUserService extends IService<SysUser> {
     List<String> screenConditWeUser(String weUserIds, String deptIds,String positions);
 
 
+    /**
+     * 构建离职员工状态
+     * @param sysUsers
+     */
+    void builderLeaveSysUser(List<SysUser> sysUsers);
+
+
 
 
 

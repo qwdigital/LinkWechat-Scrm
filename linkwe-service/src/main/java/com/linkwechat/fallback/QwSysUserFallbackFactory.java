@@ -9,7 +9,7 @@ import com.linkwechat.fegin.QwSysUserClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.util.List;
-
+import org.springframework.web.bind.annotation.*;
 /**
  * @author leejoker
  * @date 2022/4/29 22:59
@@ -84,9 +84,11 @@ public class QwSysUserFallbackFactory implements QwSysUserClient {
     }
 
     @Override
-    public AjaxResult batchUpdateSysUser(List<SysUser> sysUsers) {
+    public AjaxResult builderLeaveSysUser(SysUserQuery sysUsers) {
         return null;
     }
+
+
 
 
 }

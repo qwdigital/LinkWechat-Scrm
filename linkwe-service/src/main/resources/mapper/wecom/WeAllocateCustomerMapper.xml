@@ -28,7 +28,7 @@
             ,#{item.extentType},#{item.createTime},#{item.updateTime},#{item.createBy},#{item.createById},#{item.updateBy},#{item.updateById})
         </foreach>
         ON DUPLICATE KEY UPDATE
-            takeover_userid=IFNULL(VALUES(takeover_userid),we_allocate_customer.customer_name),
+            takeover_userid=IFNULL(VALUES(takeover_userid),we_allocate_customer.takeover_userid),
             allocate_time=IFNULL(VALUES(allocate_time),we_allocate_customer.allocate_time),
             takeover_time=IFNULL(VALUES(takeover_time),we_allocate_customer.takeover_time),
             status=IFNULL(VALUES(status),we_allocate_customer.status),

@@ -18,11 +18,13 @@ import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.ServletUtils;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.*;
 import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.vo.WeCustomersVo;
+import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.wecom.entity.customer.groupChat.WeOwnerFilterEntity;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatListQuery;
@@ -270,7 +272,7 @@ public class WeLeaveUserServiceImpl implements IWeLeaveUserService {
     }
 
     @Override
-    @SynchRecord(synchType = SynchRecordConstants.SYNCH_LEAVE_USER)
+//    @SynchRecord(synchType = SynchRecordConstants.SYNCH_LEAVE_USER)
     public void synchLeaveSysUser() {
 
         LoginUser loginUser = SecurityUtils.getLoginUser();
@@ -299,6 +301,7 @@ public class WeLeaveUserServiceImpl implements IWeLeaveUserService {
             List<WeAllocateCustomer> allocateCustomers=new ArrayList<>();
             //等待分配的客群
             List<WeAllocateGroup> allocateGroups=new ArrayList<>();
+
             Map<String, List<WeLeaveUserVo.Info>> weLeaveUserVoMap = infoList.stream()
                     .collect(Collectors.groupingBy(WeLeaveUserVo.Info::getHandover_userid));
 
@@ -307,10 +310,11 @@ public class WeLeaveUserServiceImpl implements IWeLeaveUserService {
                             //分配客户
                             allocateCustomers.add(
                                     WeAllocateCustomer.builder()
+                                            .id(SnowFlakeUtil.nextId())
                                             .allocateTime(new Date())
                                             .extentType(new Integer(0))
-                                            .externalUserid(k)
-                                            .handoverUserid(vv.getExternal_userid())
+                                            .externalUserid(vv.getExternal_userid())
+                                            .handoverUserid(k)
                                             .status(new Integer(1))
                                             .failReason("离职继承")
                                             .build()
@@ -332,6 +336,7 @@ public class WeLeaveUserServiceImpl implements IWeLeaveUserService {
                             groupChatList.stream().forEach(chat->{
                                 allocateGroups.add(
                                         WeAllocateGroup.builder()
+                                                .id(SnowFlakeUtil.nextId())
                                                 .chatId(chat.getChatId())
                                                 .oldOwner(k)
                                                 .status(new Integer(1))
@@ -353,20 +358,26 @@ public class WeLeaveUserServiceImpl implements IWeLeaveUserService {
                 allSysUsers.stream().forEach(sysUser -> {
 
                     sysUser.setIsAllocate(CorpUserEnum.NO_IS_ALLOCATE.getKey());
-
+                    sysUser.setDelFlag(Constants.DELETE_STATE);
                     WeLeaveUserVo.Info info
                             = weLeaveUserVoMap.get(sysUser.getWeUserId()).stream().findFirst().get();
 
                     sysUser.setDimissionTime(info!=null?new Date(info.getDimission_time() * 1000L):new Date());
                 });
-                qwSysUserClient.batchUpdateSysUser(allSysUsers);
+                qwSysUserClient.builderLeaveSysUser(SysUserQuery.builder().sysUsers(allSysUsers).build());
             }
 
             //待分配的客户，群等信息入库
-            iWeAllocateGroupService.batchAddOrUpdate(allocateGroups);
-            iWeAllocateCustomerService.batchAddOrUpdate(
-                    allocateCustomers
-            );
+            if(CollectionUtil.isNotEmpty(allocateGroups)){
+                iWeAllocateGroupService.batchAddOrUpdate(allocateGroups);
+            }
+
+            if(CollectionUtil.isNotEmpty(allocateCustomers)){
+                iWeAllocateCustomerService.batchAddOrUpdate(
+                        allocateCustomers
+                );
+            }
+
 
         }
 
