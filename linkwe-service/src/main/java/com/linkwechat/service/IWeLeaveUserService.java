@@ -55,6 +55,26 @@ public interface IWeLeaveUserService {
     void createWaitAllocateCustomerAndGroup(String[] weUserIds);
 
 
+    /**
+     * 同步企业微信客户
+     * @return
+     */
+    void synchLeaveSysUser();
+
+
+
+    /**
+     * 同步企业微信客户业务
+     * @param msg
+     */
+    void synchLeaveSysUserHandler(String msg);
+
+
+
+
+
+
+
 
 
 }

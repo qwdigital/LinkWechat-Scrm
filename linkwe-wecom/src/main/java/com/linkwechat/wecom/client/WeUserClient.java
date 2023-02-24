@@ -157,6 +157,15 @@ public interface WeUserClient {
     WeUserDetailVo getUserSensitiveInfo(@JSONBody WeUserQuery query);
 
 
+    /**
+     * 获取待分配的离职成员列表
+     * @param query
+     * @return
+     */
+    @Post(url = "/externalcontact/get_unassigned_list", interceptor = WeAccessTokenInterceptor.class)
+    WeLeaveUserVo getUnassignedList(@JSONBody WeLeaveUserQuery query);
+
+
 
 
 

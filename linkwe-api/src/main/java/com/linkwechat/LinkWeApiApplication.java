@@ -6,6 +6,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.FullyQualifiedAnnotationBeanNameGenerator;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @MapperScan("com.linkwechat.**.mapper")
@@ -14,11 +15,18 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableFeignClients(defaultConfiguration = FeginConfig.class)
 public class LinkWeApiApplication {
     public static void main(String[] args) {
-        new SpringApplicationBuilder(LinkWeApiApplication.class)
-                .properties("spring.config.name:bootstrap", "config/run/bootstrap.yml")
-                .properties("spring.application.name=linkwe-api")
-                .build().run(args);
-        System.out.println("(♥◠‿◠)ﾉﾞ  LinkWe-api启动成功   ლ(´ڡ`ლ)ﾞ ");
+
+        try {
+            new SpringApplicationBuilder(LinkWeApiApplication.class)
+                    .properties("spring.config.name:bootstrap", "config/run/bootstrap.yml")
+                    .properties("spring.application.name=linkwe-api")
+                    .build().run(args);
+            System.out.println("(♥◠‿◠)ﾉﾞ  LinkWe-api启动成功   ლ(´ڡ`ლ)ﾞ ");
+        }catch (Exception e){
+            e.printStackTrace();
+
+        }
+
     }
 
 }

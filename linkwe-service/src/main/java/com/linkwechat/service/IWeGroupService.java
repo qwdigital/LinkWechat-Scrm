@@ -8,6 +8,8 @@ import com.linkwechat.domain.customer.vo.WeCustomerAddGroupVo;
 import com.linkwechat.domain.groupchat.query.WeGroupChatQuery;
 import com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo;
 import com.linkwechat.domain.groupchat.vo.LinkGroupChatVo;
+import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatListQuery;
+import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatListVo;
 
 import java.util.List;
 
@@ -50,6 +52,14 @@ public interface IWeGroupService extends IService<WeGroup> {
      * @param msg
      */
     void synchWeGroupHandler(String msg);
+
+
+    /**
+     * 从企业微信端获取的群信息
+     * @param groupChatList
+     * @param chatListQuery
+     */
+    void getGroupChatList(List<WeGroupChatListVo.GroupChat> groupChatList, WeGroupChatListQuery chatListQuery);
 
     /**
      * 创建客群

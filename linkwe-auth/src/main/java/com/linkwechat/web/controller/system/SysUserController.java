@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.system;
 
+import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -27,11 +28,10 @@ import com.linkwechat.domain.corp.vo.WeCorpAccountVo;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.domain.user.vo.WeUserScreenConditVo;
+import com.linkwechat.domain.wecom.vo.user.WeLeaveUserVo;
 import com.linkwechat.domain.wecom.vo.user.WeUserDetailVo;
 import com.linkwechat.framework.service.TokenService;
-import com.linkwechat.service.IWeCorpAccountService;
-import com.linkwechat.service.IWeSynchRecordService;
-import com.linkwechat.service.IWxUserService;
+import com.linkwechat.service.*;
 import com.linkwechat.web.domain.vo.CorpVo;
 import com.linkwechat.web.domain.vo.UserVo;
 import com.linkwechat.web.mapper.SysUserMapper;
@@ -94,6 +94,13 @@ public class SysUserController extends BaseController {
 
     @Autowired
     private IWxUserService wxUserService;
+
+    @Autowired
+    private IWeSysFieldTemplateService iWeSysFieldTemplateService;
+
+
+    @Autowired
+    private IWeStrackStageService iWeStrackStageService;
 
     /**
      * 获取用户列表
@@ -215,6 +222,8 @@ public class SysUserController extends BaseController {
         return AjaxResult.success();
     }
 
+
+
     /**
      * 回掉移除用户
      *
@@ -310,8 +319,8 @@ public class SysUserController extends BaseController {
         WeConfigParamInfo configParamInfo = new WeConfigParamInfo();
 
         if (null != weCorpAccount) {
-
-
+            iWeSysFieldTemplateService.initBaseSysField();
+            iWeStrackStageService.initStrackStage();
             if (StringUtils.isNotEmpty(corpVo.getAppId())
                     && StringUtils.isNotEmpty(corpVo.getSecret())) {
                 configParamInfo.setWeAppParamFill(true);
@@ -511,6 +520,22 @@ public class SysUserController extends BaseController {
         return AjaxResult.success(
                 userService.screenConditWeUser(weUserIds,deptIds,positions)
         );
+
+    }
+
+
+    /**
+     * 批量更新sysUser
+     * @param sysUsers
+     * @return
+     */
+    @PutMapping("/batchUpdateSysUser")
+    public AjaxResult batchUpdateSysUser(List<SysUser> sysUsers){
+
+
+        userService.updateBatchById(sysUsers);
+
+        return AjaxResult.success();
 
     }
 

@@ -271,19 +271,8 @@ public class QwWelcomeMsgListener {
 
 
                     }
-
-
-
-
-
-
                 }
-
-
-
-
-            }
-            else {
+            } else {
                 WeMsgTlpQuery weMsgTlpQuery = new WeMsgTlpQuery();
                 weMsgTlpQuery.setUserId(query.getUserID());
                 weMsgTlpQuery.setFlag(false);
@@ -316,10 +305,6 @@ public class QwWelcomeMsgListener {
                         }
                     });
 
-
-//                    WeMsgTlpVo weMsgTlpVo = weMsgTlpList.stream().findFirst().get();
-//                    List<WeMessageTemplate> attachments = weMsgTlpVo.getAttachments();
-//                    templates.addAll(attachments);
                 }
             }
             WeResultVo resultDto = sendWelcomeMsg(query, templates);

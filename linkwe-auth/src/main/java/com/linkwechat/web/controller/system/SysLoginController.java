@@ -124,13 +124,6 @@ public class SysLoginController {
     }
 
 
-    @GetMapping("/loginXX")
-    public AjaxResult loginXX(){
-
-        return AjaxResult.success(
-                sysLoginService.login("admin","linkwechat@321")
-        );
-    }
 
     /**
      * 移动端应用登陆
@@ -227,4 +220,5 @@ public class SysLoginController {
         Map<String, Object> map = sysLoginService.wxLogin(code);
         return AjaxResult.success(map);
     }
+
 }

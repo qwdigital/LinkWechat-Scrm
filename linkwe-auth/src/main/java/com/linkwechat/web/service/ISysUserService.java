@@ -279,4 +279,10 @@ public interface ISysUserService extends IService<SysUser> {
      * @return
      */
     List<String> screenConditWeUser(String weUserIds, String deptIds,String positions);
+
+
+
+
+
+
 }
