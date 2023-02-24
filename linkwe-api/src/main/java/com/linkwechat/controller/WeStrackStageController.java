@@ -75,9 +75,9 @@ public class WeStrackStageController extends BaseController {
      * @return 结果
      */
     @DeleteMapping(path = "/delete")
-    public AjaxResult delete(String id,Integer growStageKey) {
+    public AjaxResult delete(String id,Integer growStageVal) {
 
-        iWeStrackStageService.remove(id,growStageKey);
+        iWeStrackStageService.remove(id,growStageVal);
         return AjaxResult.success();
     }
 

@@ -79,6 +79,6 @@ public interface QwUserClient {
      * @param query
      * @return
      */
-    @PostMapping("/getUnassignedList")
+    @PostMapping("/user/getUnassignedList")
     AjaxResult<WeLeaveUserVo>  getUnassignedList(@RequestBody WeLeaveUserQuery query);
 }
