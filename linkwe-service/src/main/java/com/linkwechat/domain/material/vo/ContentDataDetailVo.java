@@ -24,7 +24,7 @@ public class ContentDataDetailVo {
     /**
      * 是否企业用户 0否 1是
      */
-    private Integer isCustomer;
+    private Integer isCustomer = 0;
     private Integer viewTotalNum;
     private Integer viewByTotalNum;
     private Integer viewDuration = 0;
@@ -32,6 +32,7 @@ public class ContentDataDetailVo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date viewTime;
     private String viewByOpenid;
+    private String viewByUnionid;
     /**
      * 查看者头像
      */

@@ -46,7 +46,6 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                 rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeWelcomeMsgEx(),rabbitMQSettingConfig.getWeCustomerWelcomeMsgRk(), JSONObject.toJSONString(customerInfo));
             }
         } catch (Exception e) {
-            e.printStackTrace();
             log.error("添加外部联系人异常 params:{}",JSONObject.toJSONString(message),e);
         }
 

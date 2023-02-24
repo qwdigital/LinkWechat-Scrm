@@ -7,6 +7,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * 读取项目相关配置
  *
@@ -114,6 +116,10 @@ public class LinkWeChatConfig {
     private String[] anonUrl;
 
 
+    /**
+     * auth服务中授权微信端相关的授权的接口
+     */
+    private List<String> wxAuthUrl;
 
     /**
      * 服务商id
@@ -176,6 +182,11 @@ public class LinkWeChatConfig {
     private String guideCodeUrl;
 
     /**
+     * 识客码
+     */
+    private String knowCustomerUrl;
+
+    /**
      * 导购群码
      */
     private String guideGroupUrl;
@@ -184,6 +195,17 @@ public class LinkWeChatConfig {
 
 
     private String taskFissionUrl;
+
+    /**
+     * 短链域名
+     */
+    private String shortLinkDomainName;
+
+    /**
+     * 短链小程序地址
+     */
+    private String shortAppletUrl;
+
 
     public String getName() {
         return name;
@@ -387,6 +409,9 @@ public class LinkWeChatConfig {
     public void setDataSynchInterval(int dataSynchInterval) {
         this.dataSynchInterval = dataSynchInterval;
     }
+
+
+
 
 
 }

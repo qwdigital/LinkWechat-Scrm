@@ -1,5 +1,6 @@
 package com.linkwechat.wecom.controller;
 
+import com.dtflys.forest.annotation.Query;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.wecom.vo.weixin.WxAuthUserInfoVo;
 import com.linkwechat.domain.wecom.vo.weixin.WxTokenVo;
@@ -10,6 +11,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -43,5 +45,14 @@ public class WxAuthController {
         return AjaxResult.success(wxAuthService.getUserInfo(openId, lang));
     }
 
+
+    /**
+     * 获取接口调用凭据
+     */
+    @ApiOperation(value = "获取接口调用凭据", httpMethod = "GET")
+    @GetMapping("/common/getToken")
+    public AjaxResult<WxTokenVo> getCommonToken(@RequestParam("appId") String appId, @RequestParam("secret")  String secret) {
+        return AjaxResult.success(wxAuthService.getCommonToken(appId,secret));
+    }
 
 }

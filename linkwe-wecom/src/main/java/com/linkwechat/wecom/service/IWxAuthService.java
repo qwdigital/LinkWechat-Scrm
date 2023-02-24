@@ -13,4 +13,5 @@ public interface IWxAuthService {
 
     WxAuthUserInfoVo getUserInfo(String openId, String lang);
 
+    WxTokenVo getCommonToken(String appId, String secret);
 }

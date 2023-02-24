@@ -210,7 +210,6 @@ implements IWeLiveService {
                         .orderByDesc(WeLive::getCreateTime)
         );
 
-        ;
 
 
         if(CollectionUtil.isNotEmpty(lives)){

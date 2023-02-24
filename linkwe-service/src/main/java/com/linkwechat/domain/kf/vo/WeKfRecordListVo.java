@@ -4,6 +4,7 @@ import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.enums.WeKfStatusEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -19,7 +20,7 @@ import java.util.Objects;
  **/
 @ApiModel
 @Data
-public class WeKfRecordListVo {
+public class WeKfRecordListVo{
 
     @ApiModelProperty(value = "客服账号ID")
     @ExcelIgnore

@@ -20,6 +20,7 @@ import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.entity.SysUserDept;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.core.page.PageDomain;
+import com.linkwechat.common.enums.CorpUserEnum;
 import com.linkwechat.common.enums.RoleType;
 import com.linkwechat.common.enums.UserTypes;
 import com.linkwechat.common.exception.CustomException;
@@ -29,6 +30,7 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
+import com.linkwechat.domain.user.vo.WeUserScreenConditVo;
 import com.linkwechat.domain.wecom.query.user.WeUserListQuery;
 import com.linkwechat.domain.wecom.query.user.WeUserQuery;
 import com.linkwechat.domain.wecom.vo.user.WeUserDetailVo;
@@ -608,7 +610,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         CollectionUtil.newArrayList(weUserIds).forEach(weUserId -> {
             SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getWeUserId, weUserId));
             if (null != sysUser) {
-                sysUser.setIsAllocate(WeConstans.corpUserEnum.NO_IS_ALLOCATE.getKey());
+                sysUser.setIsAllocate(CorpUserEnum.NO_IS_ALLOCATE.getKey());
                 sysUser.setDimissionTime(new Date());
                 weUsers.add(sysUser);
             }
@@ -661,7 +663,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             for (int i = 0; i < vo.getDepartment().size(); i++) {
                 userDeptList.add(userDeptGenerator(vo, i));
             }
-            boolean flag = save(user);
+            this.baseMapper.batchAddOrUpdate(ListUtil.toList(user));
             SysRole role = new LambdaQueryChainWrapper<>(roleMapper).eq(SysRole::getRoleKey, RoleType.WECOME_USER_TYPE_CY.getSysRoleKey())
                     .eq(SysRole::getDelFlag, 0).one();
             if (role != null) {
@@ -912,5 +914,27 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             return list;
         }
         return new ArrayList<>();
+    }
+
+    @Override
+    public List<String> screenConditWeUser(String weUserIds, String deptIds,String positions) {
+        List<String> weUserIdList=new ArrayList<>();
+
+        if(StringUtils.isNotEmpty(weUserIds)){
+            weUserIdList.addAll(
+                    ListUtil.toList(weUserIds.split(","))
+            );
+        }
+
+
+        if(StringUtils.isNotEmpty(positions) || StringUtils.isNotEmpty(deptIds)){
+            List<SysUser> allSysUser = this.baseMapper.findAllSysUser(null,positions,deptIds);
+            if(CollectionUtil.isNotEmpty(allSysUser)){
+                weUserIdList.addAll(
+                        allSysUser.stream().map(SysUser::getWeUserId).collect(Collectors.toList())
+                );
+            }
+        }
+        return weUserIdList;
     }
 }

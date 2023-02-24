@@ -8,8 +8,6 @@ import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.fegin.QwSysUserClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import java.util.List;
 
 /**
@@ -79,5 +77,11 @@ public class QwSysUserFallbackFactory implements QwSysUserClient {
     public AjaxResult<List<SysUserVo>> getUserListByWeUserIds(SysUserQuery query) {
         return null;
     }
+
+    @Override
+    public AjaxResult<List<String>> screenConditWeUser(String weUserIds, String deptIds, String positions) {
+        return null;
+    }
+
 
 }

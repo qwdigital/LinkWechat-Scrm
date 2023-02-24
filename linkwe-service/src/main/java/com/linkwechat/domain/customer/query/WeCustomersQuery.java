@@ -60,4 +60,7 @@ public class WeCustomersQuery {
 
     //渠道值
     private List<String> stateList;
+
+    //是否按照无标签查询 true:是 false:不是
+    private boolean noTagCheck=false;
 }

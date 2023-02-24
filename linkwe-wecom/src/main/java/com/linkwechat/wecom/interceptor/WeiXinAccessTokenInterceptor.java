@@ -9,6 +9,7 @@ import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.utils.ForestDataType;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisService;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.spring.SpringUtils;
@@ -26,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author danmo
- * @description 微信请求拦截器
+ * @description 微信公众号请求拦截器
  * @date 2021/4/5 15:17
  **/
 @Slf4j
@@ -49,7 +50,6 @@ public class WeiXinAccessTokenInterceptor extends WeForestInterceptor implements
             redisService = SpringUtils.getBean(RedisService.class);
         }
 
-        request.setDataType(ForestDataType.JSON);
         String accessToken = findAccessToken();
         request.addQuery("access_token",accessToken);
         return true;
@@ -65,7 +65,7 @@ public class WeiXinAccessTokenInterceptor extends WeForestInterceptor implements
                 //当用户token失效，重新获取token
                 WxTokenVo wxTokenVo = wxCommonClient.getToken(grantType, weCorpAccount.getWxAppId(), weCorpAccount.getWxSecret());
                 if(wxTokenVo != null && StringUtils.isNotEmpty(wxTokenVo.getAccessToken())){
-                    redisService.setCacheObject(WeConstans.WX_AUTH_ACCESS_TOKEN, wxTokenVo.getAccessToken(), wxTokenVo.getExpiresIn().intValue(), TimeUnit.SECONDS);
+                    redisService.setCacheObject(WeConstans.WX_ACCESS_TOKEN, wxTokenVo.getAccessToken(), wxTokenVo.getExpiresIn().intValue(), TimeUnit.SECONDS);
                     accessToken = wxTokenVo.getAccessToken();
                 }
             }
@@ -97,7 +97,7 @@ public class WeiXinAccessTokenInterceptor extends WeForestInterceptor implements
     public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
         log.info("url:【{}】,result:【{}】",request.getUrl(),response.getContent());
         WeResultVo weResultVo = JSONUtil.toBean(response.getContent(), WeResultVo.class);
-        if(null != weResultVo.getErrCode() && !weResultVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+        if(null != weResultVo.getErrCode() && !weResultVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())){
             throw new ForestRuntimeException(response.getContent());
         }
     }

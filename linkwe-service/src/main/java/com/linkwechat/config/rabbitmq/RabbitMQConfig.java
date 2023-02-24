@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author sxw
+ * @author danmo
  * @description rabbitmq
  * @date 2022/3/10 11:44
  **/
@@ -104,17 +104,6 @@ public class RabbitMQConfig {
         return ExchangeBuilder.directExchange(rabbitMQSettingConfig.getWeQrCodeChangeEx()).durable(true).build();
     }
 
-    /**
-     * 声明策略延迟交换机
-     */
-    @Bean
-    public Exchange delayJourneyEx() {
-        // 声明路由交换机，durable:在rabbitmq重启后，交换机还在
-        Map<String, Object> args = new HashMap<>();
-        args.put("x-delayed-type", "direct");
-        //自定义交换机
-        return new CustomExchange(rabbitMQSettingConfig.getWeJourneyEx(), "x-delayed-message", true, false, args);
-    }
 
     /**
      * 声明回调队列
@@ -127,16 +116,6 @@ public class RabbitMQConfig {
     }
 
     /**
-     * 声明代开发回调队列
-     *
-     * @return
-     */
-    @Bean
-    public Queue quThirdCallBack() {
-        return new Queue(rabbitMQSettingConfig.getWeThirdCallBackQu());
-    }
-
-    /**
      * 回调队列绑定交换机
      *
      * @return
@@ -144,16 +123,6 @@ public class RabbitMQConfig {
     @Bean
     public Binding bindingExchangeCallback() {
         return BindingBuilder.bind(quCallBack()).to(exCallBack()).with(rabbitMQSettingConfig.getWeCallBackRk()).noargs();
-    }
-
-    /**
-     * 代开发回调队列绑定交换机
-     *
-     * @return
-     */
-    @Bean
-    public Binding bindingExchangeThirdCallback() {
-        return BindingBuilder.bind(quThirdCallBack()).to(exCallBack()).with(rabbitMQSettingConfig.getWeThirdCallBackRk()).noargs();
     }
 
     /**
@@ -434,25 +403,14 @@ public class RabbitMQConfig {
     }
 
     /**
-     * 人群计算队列
+     * 活码删除队列
      *
      * @return
      */
     @Bean
-    public Queue quCrowdCalculate() {
-        return new Queue(rabbitMQSettingConfig.getWeCrowdCalculateQu());
+    public Queue quQrCodeDel() {
+        return new Queue(rabbitMQSettingConfig.getWeQrCodeDelQu());
     }
-
-    /**
-     * 策略延时队列
-     *
-     * @return
-     */
-    @Bean
-    public Queue quDelayJourney() {
-        return new Queue(rabbitMQSettingConfig.getWeDelayJourneyQu());
-    }
-
 
     /**
      * 同步商品图册队列
@@ -586,7 +544,7 @@ public class RabbitMQConfig {
     }
 
     /**
-     * 活码队列绑定交换机
+     * 活码变更队列绑定交换机
      *
      * @return
      */
@@ -596,24 +554,15 @@ public class RabbitMQConfig {
     }
 
     /**
-     * 人群队列绑定交换机
+     * 活码删除队列绑定交换机
      *
      * @return
      */
     @Bean
-    public Binding bindingExchangeSyncCrowdCalculate() {
-        return BindingBuilder.bind(quCrowdCalculate()).to(syncEx()).with(rabbitMQSettingConfig.getWeCrowdCalculateRk()).noargs();
+    public Binding bindingExchangeQrCodeDel() {
+        return BindingBuilder.bind(quQrCodeDel()).to(qrCodeChangeEx()).with(rabbitMQSettingConfig.getWeQrCodeDelRk()).noargs();
     }
 
-    /**
-     * 策略延时队列绑定交换机
-     *
-     * @return
-     */
-    @Bean
-    public Binding bindingExchangeDelayJourney() {
-        return BindingBuilder.bind(quDelayJourney()).to(delayJourneyEx()).with(rabbitMQSettingConfig.getWeDelayJourneyRk()).noargs();
-    }
 
     /**
      * 同步商品图册绑定交换机

@@ -12,8 +12,21 @@ public class WePosterVo extends BaseEntity {
     /**
      * 海报标题
      */
+    @Deprecated
     @ApiModelProperty(value = "海报标题")
     private String title;
+
+    /**
+     * 海报标题
+     */
+    @ApiModelProperty(value = "海报标题")
+    private String materialName;
+
+    /**
+     * 海报描述
+     */
+    @ApiModelProperty(value = "海报描述")
+    private String digest;
 
     /**
      * 背景图片

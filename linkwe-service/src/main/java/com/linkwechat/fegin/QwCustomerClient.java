@@ -48,7 +48,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 企微客户接口
  * @date 2022/3/13 20:54
  **/
@@ -337,7 +337,6 @@ public interface QwCustomerClient {
 
     @PostMapping("/customer/unionIdToExternalUserId3rd")
     public AjaxResult<UnionidToExternalUserIdVo> unionIdToExternalUserId3rd(@RequestBody UnionidToExternalUserIdQuery query);
-
 
     /**
      * 编辑标签或标签组名称

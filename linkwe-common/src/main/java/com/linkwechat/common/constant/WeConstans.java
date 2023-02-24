@@ -18,9 +18,16 @@ public class WeConstans {
     public static final String WX_AUTH_REFRESH_ACCESS_TOKEN = "wx_auth_refresh_access_token";
 
     /**
-     * 微信通用token
+     * 微信公众号通用token
      */
     public static final String WX_ACCESS_TOKEN = "wx_access_token";
+
+    public static final String WX_COMMON_ACCESS_TOKEN = "wx_common_access_token:{}:{}";
+
+    /**
+     * 微信小程序通用token
+     */
+    public static final String WX_APPLET_ACCESS_TOKEN = "wx_applet_access_token";
 
     /**
      * 企微应用token
@@ -68,12 +75,6 @@ public class WeConstans {
     public static final Integer WE_SUCCESS_CODE = 0;
 
 
-    /**
-     * 企业微信端根部门id
-     */
-    public static final Long WE_ROOT_DEPARMENT_ID = 1L;
-
-
 
     /**
      * 同步功能提示语
@@ -81,40 +82,12 @@ public class WeConstans {
     public static final String SYNCH_TIP = "后台开始同步数据，请稍后关注进度";
 
 
-    /**
-     * 离职未分配
-     */
-    public static final Integer LEAVE_NO_ALLOCATE_STATE = 0;
-
-
-    /**
-     * 离职已分配分配
-     */
-    public static final Integer LEAVE_ALLOCATE_STATE = 1;
-
 
     /**
      * 单人活码
      */
     public static final Integer SINGLE_EMPLE_CODE_TYPE = 1;
 
-
-    /**
-     * 多人活码
-     */
-    public static final Integer MANY_EMPLE_CODE_TYPE = 2;
-
-
-    /**
-     * 批量单人活码
-     */
-    public static final Integer BATCH_SINGLE_EMPLE_CODE_TYPE = 3;
-
-
-    /**
-     * 在小程序中联系场景
-     */
-    public static final Integer SMALL_ROUTINE_EMPLE_CODE_SCENE = 1;
 
 
     /**
@@ -136,7 +109,6 @@ public class WeConstans {
      */
     public static final Integer USE_SCOP_BUSINESSID_TYPE_USER = 2;
     public static final Integer USE_SCOP_BUSINESSID_TYPE_ORG = 1;
-    public static final Integer USE_SCOP_BUSINESSID_TYPE_ALL = 3;
 
     /**
      * 客户流失通知开关 0:关闭 1:开启
@@ -144,7 +116,6 @@ public class WeConstans {
     public static final String DEL_FOLLOW_USER_SWITCH_CLOSE = "0";
     public static final String DEL_FOLLOW_USER_SWITCH_OPEN = "1";
 
-    public static final String CONTACT_SEQ_KEY = "seq";
 
 
     /**
@@ -195,19 +166,18 @@ public class WeConstans {
 
 
     /**
+     * 识客码前缀
+     */
+    public static final String WE_KNOW_CUSTOMER_CODE_PREFIX="we_kn_code";
+
+
+    /**
      * 新客拉群
      */
     public static final String WE_QR_XKLQ_PREFIX = "we_xklq";
 
 
-    /**
-     * 客服账号信息
-     */
-    public static final String KF_ACCOUNT_SET_UP_KEY = "we:kf:account:info:{}:{}";
-    /**
-     * 会话变更msgCode
-     */
-    public static final String KF_SESSION_MSG_CODE_KEY = "we:kf:session:msg:code:{}:{}:{}";
+
 
     /**
      * 客服接待人员轮询分配标识
@@ -224,49 +194,23 @@ public class WeConstans {
      */
     public static final Integer JOINCORPQR_EFFETC_TIME=8640;
 
-    //性别，1表示男性，2表示女性
-    //表示所在部门是否为上级，0-否，1-是，顺序与Department字段的部门逐一对应
-    //激活状态：1=已激活 2=已禁用 4=未激活 已激活代表已激活企业微信或已关注微工作台（原企业号） 5=成员退出
-    public static enum corpUserEnum {
 
-       NO_IS_ALLOCATE(0,"未分配"),
-       YES_IS_ALLOCATE(1,"已分配");
 
-        private int key;
-        private String value;
-
-        /**
-         * 构造方法
-         *
-         * @param key
-         * @param value
-         */
-        corpUserEnum(int key, String value) {
-            this.setKey(key);
-            this.setValue(value);
-        }
-
-        public int getKey() {
-            return key;
-        }
-
-        public void setKey(int key) {
-            this.key = key;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-    }
+    //短链统计缓存key值前缀
+    public static final String  WE_SHORT_LINK_KEY = "we_short_link:statistics:";
 
     /**
-     * id类型 0:成员 1:客户,2:机器
+     * 短链缓存命名空间
      */
-    public static final Integer ID_TYPE_USER = 0;
-    public static final Integer ID_TYPE_EX = 1;
-    public static final Integer ID_TYPE_MACHINE = 2;
+    public static final String PV = "pv:";
+
+    /**
+     * 短链缓存命名空间
+     */
+    public static final String UV = "uv:";
+
+    /**
+     * 短链缓存命名空间
+     */
+    public static final String OPEN_APPLET = "open:";
 }

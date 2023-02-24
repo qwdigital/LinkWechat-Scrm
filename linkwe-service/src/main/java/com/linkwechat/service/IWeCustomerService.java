@@ -6,6 +6,7 @@ import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeCustomerTrackRecord;
+import com.linkwechat.domain.customer.WeBacthMakeCustomerTag;
 import com.linkwechat.domain.customer.WeMakeCustomerTag;
 import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.query.WeOnTheJobCustomerQuery;
@@ -238,4 +239,11 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
 
      WeCustomer findOrSynchWeCustomer(String externalUserid);
+
+
+    /**
+     * 批量编辑标签
+     * @param makeCustomerTags
+     */
+    void batchMakeLabel(WeBacthMakeCustomerTag makeCustomerTags);
 }

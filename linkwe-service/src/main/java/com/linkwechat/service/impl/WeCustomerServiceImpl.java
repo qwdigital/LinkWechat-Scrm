@@ -28,10 +28,12 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.*;
+import com.linkwechat.domain.customer.WeBacthMakeCustomerTag;
 import com.linkwechat.domain.customer.WeMakeCustomerTag;
 import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.query.WeOnTheJobCustomerQuery;
 import com.linkwechat.domain.customer.vo.*;
+import com.linkwechat.domain.tag.vo.WeTagVo;
 import com.linkwechat.domain.wecom.entity.customer.WeCustomerFollowInfoEntity;
 import com.linkwechat.domain.wecom.entity.customer.WeCustomerFollowUserEntity;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
@@ -209,7 +211,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         WeBatchCustomerDetailVo weBatchCustomerDetails = qwCustomerClient
                 .getBatchCustomerDetail(new WeBatchCustomerQuery(followUser, nextCursor, 100)).getData();
 
-        if (WeConstans.WE_SUCCESS_CODE.equals(weBatchCustomerDetails.getErrCode())
+        if (WeErrorCodeEnum.ERROR_CODE_0.getErrorCode().equals(weBatchCustomerDetails.getErrCode())
                 || WeConstans.NOT_EXIST_CONTACT.equals(weBatchCustomerDetails.getErrCode())
                 && ArrayUtil.isNotEmpty(weBatchCustomerDetails.getExternalContactList())) {
             list.addAll(weBatchCustomerDetails.getExternalContactList());
@@ -421,39 +423,50 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
         }
 
+        this.updateWeCustomerTagIds(weMakeCustomerTag.getUserId(),weMakeCustomerTag.getExternalUserid());
 
-            WeCustomer weCustomer = this.getOne(new LambdaQueryWrapper<WeCustomer>()
-                    .eq(WeCustomer::getAddUserId, weMakeCustomerTag.getUserId())
-                    .eq(WeCustomer::getExternalUserid, weMakeCustomerTag.getExternalUserid()));
-            if(null != weCustomer){
-
-                /**
-                 * 更新客户表标签ids冗余字段
-                 */
-                List<WeFlowerCustomerTagRel> nowAddWeFlowerCustomerTagRel
-                        = iWeFlowerCustomerTagRelService.findNowAddWeFlowerCustomerTagRel(weMakeCustomerTag.getExternalUserid(), weMakeCustomerTag.getUserId());
-                if(CollectionUtil.isNotEmpty(nowAddWeFlowerCustomerTagRel)){
-                    weCustomer.setTagIds(
-                            nowAddWeFlowerCustomerTagRel.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList())
-                                    .stream().map(String::valueOf).collect(Collectors.joining(","))
-                    );
-                }else{
-                    weCustomer.setTagIds(null);
-                }
-                this.updateById(weCustomer);
-            }
 
 
 
     }
 
+
+
+    //更新客户表的标签id,冗余字段
+    private void updateWeCustomerTagIds(String  userId,String externalUserid){
+        WeCustomer weCustomer = this.getOne(new LambdaQueryWrapper<WeCustomer>()
+                .eq(WeCustomer::getAddUserId, userId)
+                .eq(WeCustomer::getExternalUserid, externalUserid));
+        if(null != weCustomer){
+
+            /**
+             * 更新客户表标签ids冗余字段
+             */
+            List<WeFlowerCustomerTagRel> nowAddWeFlowerCustomerTagRel
+                    = iWeFlowerCustomerTagRelService.findNowAddWeFlowerCustomerTagRel(externalUserid,userId);
+            if(CollectionUtil.isNotEmpty(nowAddWeFlowerCustomerTagRel)){
+                weCustomer.setTagIds(
+                        nowAddWeFlowerCustomerTagRel.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList())
+                                .stream().map(String::valueOf).collect(Collectors.joining(","))
+                );
+            }else{
+                weCustomer.setTagIds(null);
+            }
+            this.updateById(weCustomer);
+        }
+    }
+
+
+
+
     @Override
+    @Transactional
     public void allocateOnTheJobCustomer(WeOnTheJobCustomerQuery weOnTheJobCustomerQuery) {
         if (this.getOne(
                 new LambdaQueryWrapper<WeCustomer>()
                         .eq(WeCustomer::getExternalUserid, weOnTheJobCustomerQuery.getExternalUserid())
                         .eq(WeCustomer::getAddUserId, weOnTheJobCustomerQuery.getTakeoverUserId())
-                        .eq(WeCustomer::getDelFlag, new Integer(0))) != null) {
+                        .eq(WeCustomer::getDelFlag, Constants.COMMON_STATE)) != null) {
 
             throw new WeComException("当前接手人已经拥有此客户,不可继承");
         }
@@ -470,58 +483,22 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         }
 
 
-        //修改库中关系
+        //获取当前需要被移交客户的相关消息
         WeCustomer weCustomer = this.getOne(
                 new LambdaQueryWrapper<WeCustomer>()
                         .eq(WeCustomer::getExternalUserid, weOnTheJobCustomerQuery.getExternalUserid())
                         .eq(WeCustomer::getAddUserId, weOnTheJobCustomerQuery.getHandoverUserId())
-                        .eq(WeCustomer::getDelFlag, new Integer(0))
+                        .eq(WeCustomer::getDelFlag,Constants.COMMON_STATE)
         );
 
         if (null != weCustomer) {
 
-            if (StringUtils.isEmpty(weCustomer.getTakeoverUserId())) { //首次被继承
-
+            try {
                 this.extentCustomer(weCustomer, weOnTheJobCustomerQuery);
-
-            } else { //非首次继承(二个情况)
-                AjaxResult<WeTransferCustomerVo> weTransferCustomerVoAjaxResult = qwCustomerClient.transferResult(WeTransferCustomerQuery.builder()
-                        .handover_userid(weCustomer.getAddUserId())
-                        .takeover_userid(weCustomer.getTakeoverUserId())
-                        .build());
-
-                if (null != weTransferCustomerVoAjaxResult) {
-                    WeTransferCustomerVo transferCustomerVo = weTransferCustomerVoAjaxResult.getData();
-                    if (null != transferCustomerVo) {
-                        List<WeTransferCustomerVo.TransferCustomerVo> extendsCustomers = transferCustomerVo.getCustomer();
-
-                        if (CollectionUtil.isNotEmpty(extendsCustomers)) {
-                            WeTransferCustomerVo.TransferCustomerVo extendsCustomer
-                                    = extendsCustomers.stream().collect(Collectors.toMap(WeTransferCustomerVo.TransferCustomerVo::getExternalUserId
-                                    , ExtendsCustomer -> ExtendsCustomer)).get(weOnTheJobCustomerQuery.getExternalUserid());
-                            if (null != extendsCustomer) {
-
-                                if (extendsCustomer.getStatus().equals(AllocateCustomerStatus.JOB_EXTENDS_DDJT.getCode())) {
-                                    throw new WeComException(
-                                            "当前客户:" + weCustomer.getCustomerName() + ",已被:" + findUserNameByUserId(weCustomer.getTakeoverUserId()) + "接替,暂时不可被继承"
-                                    );
-                                } else { //可继续被新用户接替
-
-                                    this.extentCustomer(weCustomer, weOnTheJobCustomerQuery);
-
-                                }
-
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
-
+            }catch (WeComException e){
+                throw e;
             }
+
 
 
         }
@@ -768,7 +745,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     }
 
     //接替客户
-    private void extentCustomer(WeCustomer weCustomer, WeOnTheJobCustomerQuery weOnTheJobCustomerQuery) {
+    private void extentCustomer(WeCustomer weCustomer, WeOnTheJobCustomerQuery weOnTheJobCustomerQuery) throws WeComException{
         weCustomer.setTakeoverUserId(weOnTheJobCustomerQuery.getTakeoverUserId());
 
         if (this.update(
@@ -790,21 +767,37 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
                 if (null != transferCustomerVo) {
 
-                    if (transferCustomerVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)) {
-                        iWeAllocateCustomerService.batchAddOrUpdate(
-                                ListUtil.toList(
-                                        WeAllocateCustomer.builder()
-                                                .id(SnowFlakeUtil.nextId())
-                                                .allocateTime(new Date())
-                                                .extentType(new Integer(1))
-                                                .externalUserid(weOnTheJobCustomerQuery.getExternalUserid())
-                                                .handoverUserId(weOnTheJobCustomerQuery.getHandoverUserId())
-                                                .takeoverUserid(weOnTheJobCustomerQuery.getTakeoverUserId())
-                                                .failReason("在职继承")
-                                                .build()
-                                )
-                        );
+                    List<WeTransferCustomerVo.TransferCustomerVo> transferCustomerVos
+                            = transferCustomerVo.getCustomer();
+
+                    if(CollectionUtil.isNotEmpty(transferCustomerVos)){
+                        WeTransferCustomerVo.TransferCustomerVo wtransferCustomerVo
+                                = transferCustomerVos.stream().findFirst().get();
+                        if(wtransferCustomerVo.getErrCode() !=null
+                                && WeConstans.WE_SUCCESS_CODE.equals(wtransferCustomerVo.getErrCode())) {
+                            iWeAllocateCustomerService.batchAddOrUpdate(
+                                    ListUtil.toList(
+                                            WeAllocateCustomer.builder()
+                                                    .id(SnowFlakeUtil.nextId())
+                                                    .allocateTime(new Date())
+                                                    .extentType(new Integer(1))
+                                                    .externalUserid(weOnTheJobCustomerQuery.getExternalUserid())
+                                                    .handoverUserid(weOnTheJobCustomerQuery.getHandoverUserId())
+                                                    .takeoverUserid(weOnTheJobCustomerQuery.getTakeoverUserId())
+                                                    .failReason("在职继承")
+                                                    .build()
+                                    )
+                            );
+                        }else{
+
+                            throw new WeComException(WeErrorCodeEnum
+                                    .parseEnum(wtransferCustomerVo.getErrCode()).getErrorMsg());
+
+                        }
+
+
                     }
+
                 }
 
             }
@@ -835,6 +828,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             weCustomer.setUnionid(externalContact.getUnionId());
             weCustomer.setDelFlag(Constants.COMMON_STATE);
             weCustomer.setAddUserId(userId);
+            weCustomer.setCreateTime(new Date());
+            weCustomer.setUpdateTime(new Date());
 
 
 
@@ -899,6 +894,21 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     if(CollectionUtil.isNotEmpty(weCustomerSeasList)){
                         weCustomerSeasList.stream().forEach(k->k.setAddState(1));
                         iWeCustomerSeasService.updateBatchById(weCustomerSeasList);
+                        //更新用户标签
+                        WeCustomerSeas weCustomerSeas = weCustomerSeasList.stream().findFirst().get();
+                        if(StringUtils.isNotEmpty(weCustomerSeas.getTagIds())){
+                            List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                                    .in(WeTag::getTagId, ListUtil.toList(weCustomerSeas.getTagIds().split(","))));
+                            if(CollectionUtil.isNotEmpty(weTags)){
+                                makeLabel(WeMakeCustomerTag.builder()
+                                        .userId(weCustomerSeas.getAddUserId())
+                                        .isCompanyTag(true)
+                                        .externalUserid(externalUserId)
+                                        .addTag(weTags)
+                                        .build());
+                            }
+                        }
+
                     }
 
 
@@ -1052,6 +1062,135 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         }
 
         return weCustomerList.stream().findFirst().get();
+    }
+
+    @Override
+    public void batchMakeLabel(WeBacthMakeCustomerTag makeCustomerTags) {
+
+        List<WeMakeCustomerTag> weMakeCustomerTagList = makeCustomerTags.getWeMakeCustomerTagList();
+
+        if(CollectionUtil.isNotEmpty(weMakeCustomerTagList)){
+
+
+            weMakeCustomerTagList.stream().forEach(weMakeCustomerTag -> {
+
+
+
+                if(makeCustomerTags.isAddOrRemove()){//新增标签
+
+                    //当前客户已存在的标签
+                    List<String> exitTagIds=new ArrayList<>();
+
+                    //当前客户所拥有的标签
+                    List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = iWeFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                            .eq(WeFlowerCustomerTagRel::getUserId, weMakeCustomerTag.getUserId())
+                            .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid()));
+                    if(CollectionUtil.isNotEmpty(weFlowerCustomerTagRels)){
+                        exitTagIds=weFlowerCustomerTagRels
+                                .stream().map(WeFlowerCustomerTagRel::getTagId)
+                                .collect(Collectors.toList());
+                    }
+
+                    //标签关系入库
+                    List<WeTag> addTags = weMakeCustomerTag.getAddTag();
+                    if (CollectionUtil.isNotEmpty(addTags)) {
+                        List<WeFlowerCustomerTagRel> tagRels = new ArrayList<>();
+
+                        for(WeTag weTag:addTags){
+
+                            if(!exitTagIds.contains(weTag.getTagId())){
+                                WeFlowerCustomerTagRel weFlowerCustomerTagRel = WeFlowerCustomerTagRel.builder()
+                                        .id(SnowFlakeUtil.nextId())
+                                        .externalUserid(weMakeCustomerTag.getExternalUserid())
+                                        .userId(weMakeCustomerTag.getUserId())
+                                        .tagId(weTag.getTagId())
+                                        .isCompanyTag(weMakeCustomerTag.getIsCompanyTag())
+                                        .delFlag(Constants.COMMON_STATE)
+                                        .build();
+                                weFlowerCustomerTagRel.setUpdateTime(new Date());
+                                weFlowerCustomerTagRel.setUpdateBy(String.valueOf(SecurityUtils.getUserId()));
+                                tagRels.add(weFlowerCustomerTagRel);
+                            }
+                        }
+
+
+                        if(CollectionUtil.isNotEmpty(tagRels)){
+                            iWeFlowerCustomerTagRelService.batchAddOrUpdate(tagRels);
+
+
+                            if (weMakeCustomerTag.getIsCompanyTag()) {//如果是企业标签，则同步至企业微信
+
+                                qwCustomerClient.makeCustomerLabel(
+                                        WeMarkTagQuery.builder()
+                                                .external_userid(weMakeCustomerTag.getExternalUserid())
+                                                .userid(weMakeCustomerTag.getUserId())
+                                                .add_tag(tagRels.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList()))
+                                                .build()
+                                );
+
+
+                            }
+
+
+                        }
+
+                    }
+
+                }else{ //标签移除
+
+
+                    List<WeTag> addTag = weMakeCustomerTag.getAddTag();
+
+
+                    if(CollectionUtil.isNotEmpty(addTag)){
+                        List<WeFlowerCustomerTagRel> customerTagRels = iWeFlowerCustomerTagRelService
+                                .list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                                        .in(WeFlowerCustomerTagRel::getTagId,addTag.stream().map(WeTag::getTagId).collect(Collectors.toList()))
+                                        .eq(WeFlowerCustomerTagRel::getUserId, weMakeCustomerTag.getUserId())
+                                        .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid()));
+
+                        if(CollectionUtil.isNotEmpty(customerTagRels)){
+
+                            if( iWeFlowerCustomerTagRelService
+                                    .removeByIds(customerTagRels.stream()
+                                            .map(WeFlowerCustomerTagRel::getId).collect(Collectors.toList()))){
+
+                                qwCustomerClient.makeCustomerLabel(
+                                        WeMarkTagQuery.builder()
+                                                .external_userid(weMakeCustomerTag.getExternalUserid())
+                                                .userid(weMakeCustomerTag.getUserId())
+                                                .remove_tag(customerTagRels.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList()))
+                                                .build()
+                                );
+
+                            }
+
+                        }
+
+                    }
+
+
+
+
+
+                }
+
+
+
+
+
+
+
+
+
+                this.updateWeCustomerTagIds(weMakeCustomerTag.getUserId(),weMakeCustomerTag.getExternalUserid());
+
+
+            });
+
+
+
+        }
     }
 
 
