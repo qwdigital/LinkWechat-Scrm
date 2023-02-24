@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.web.mapper.SysDictDataMapper">
 	
-	<resultMap type="SysDictData" id="SysDictDataResult">
+	<resultMap type="com.linkwechat.common.core.domain.entity.SysDictData" id="SysDictDataResult">
 		<id     property="dictCode"   column="dict_code"   />
 		<result property="dictSort"   column="dict_sort"   />
 		<result property="dictLabel"  column="dict_label"  />
@@ -25,7 +25,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		from sys_dict_data
     </sql>
 
-	<select id="selectDictDataList" parameterType="SysDictData" resultMap="SysDictDataResult">
+	<select id="selectDictDataList" parameterType="com.linkwechat.common.core.domain.entity.SysDictData" resultMap="SysDictDataResult">
 	    <include refid="selectDictDataVo"/>
 		<where>
 		    <if test="dictType != null and dictType != ''">
@@ -41,7 +41,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		order by dict_sort asc
 	</select>
 	
-	<select id="selectDictDataByType" parameterType="SysDictData" resultMap="SysDictDataResult">
+	<select id="selectDictDataByType" parameterType="com.linkwechat.common.core.domain.entity.SysDictData" resultMap="SysDictDataResult">
 		<include refid="selectDictDataVo"/>
 		where status = '0' and dict_type = #{dictType} order by dict_sort asc
 	</select>
@@ -71,7 +71,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach> 
  	</delete>
 	
-	<update id="updateDictData" parameterType="SysDictData">
+	<update id="updateDictData" parameterType="com.linkwechat.common.core.domain.entity.SysDictData">
  		update sys_dict_data
  		<set>
  			<if test="dictSort != null">dict_sort = #{dictSort},</if>
@@ -93,7 +93,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  		update sys_dict_data set dict_type = #{newDictType} where dict_type = #{oldDictType}
 	</update>
  	
- 	<insert id="insertDictData" parameterType="SysDictData">
+ 	<insert id="insertDictData" parameterType="com.linkwechat.common.core.domain.entity.SysDictData">
  		insert into sys_dict_data(
  			<if test="dictSort != null">dict_sort,</if>
  			<if test="dictLabel != null and dictLabel != ''">dict_label,</if>

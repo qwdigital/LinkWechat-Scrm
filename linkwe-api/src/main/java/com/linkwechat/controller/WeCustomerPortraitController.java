@@ -1,6 +1,7 @@
 package com.linkwechat.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
@@ -8,16 +9,16 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.SnowFlakeUtil;
-import com.linkwechat.domain.WeCustomerTrackRecord;
-import com.linkwechat.domain.WeCustomerTrajectory;
-import com.linkwechat.domain.WeTag;
-import com.linkwechat.domain.WeTagGroup;
+import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.*;
 import com.linkwechat.domain.customer.WeMakeCustomerTag;
 import com.linkwechat.domain.customer.vo.WeCustomerAddGroupVo;
 import com.linkwechat.domain.customer.vo.WeCustomerPortraitVo;
 import com.linkwechat.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -48,6 +49,9 @@ public class WeCustomerPortraitController extends BaseController{
 
     @Autowired
     private  IWeMomentsService iWeMomentsService;
+
+    @Autowired
+    private IWeSysFieldTemplateService iWeSysFieldTemplateService;
 
 
 
@@ -269,6 +273,45 @@ public class WeCustomerPortraitController extends BaseController{
         iWeMomentsService.synchMomentsInteracte(CollectionUtil.newArrayList(userId));
 
         return AjaxResult.success(WeConstans.SYNCH_TIP);
+    }
+
+
+    /**
+     * 获取指定客户拥有的表单字段以及填充的值
+     * @param weUserId
+     * @param externalUserId
+     * @return
+     */
+    @GetMapping("/findSysFieldTemplate")
+    public AjaxResult<List<WeSysFieldTemplate>> findSysFieldTemplate(String weUserId, String externalUserId){
+
+        List<WeSysFieldTemplate> weSysFieldTemplates =   iWeSysFieldTemplateService.findLists(new WeSysFieldTemplate());
+
+        for (Iterator iter = weSysFieldTemplates.iterator(); iter.hasNext();) {
+
+            WeSysFieldTemplate weSysFieldTemplate = (WeSysFieldTemplate) iter.next();
+            if(StringUtils.isNotEmpty(weSysFieldTemplate.getVisualTagIds())){
+                WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>()
+                        .eq(WeCustomer::getExternalUserid, externalUserId)
+                        .eq(WeCustomer::getAddUserId, weUserId));
+
+                if(null != weCustomer && StringUtils.isNotEmpty(weCustomer.getTagIds())){
+                    if(!ListUtil.toList(weCustomer
+                            .getTagIds().split(",")).contains(weSysFieldTemplate.getVisualTagIds())){
+
+                        iter.remove();
+                    };
+
+
+                }
+
+            }
+        }
+
+        return AjaxResult.success(
+                weSysFieldTemplates
+        );
+
     }
 
 

@@ -2,6 +2,7 @@ package com.linkwechat.domain.customer.vo;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.linkwechat.domain.WeCustomerInfoExpand;
 import com.linkwechat.domain.WeCustomerTrajectory;
 import lombok.Builder;
 import lombok.Data;
@@ -68,6 +69,9 @@ public class WeCustomerDetailInfoVo {
 
 
 //    private List<TrackStates> trackStates;
+
+    //客户信息拓展
+    private List<WeCustomerInfoExpand> weCustomerInfoExpands;
 
 
 
