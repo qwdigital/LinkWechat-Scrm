@@ -32,20 +32,26 @@ public class SysUserDeptServiceImpl extends ServiceImpl<SysUserDeptMapper, SysUs
     @Override
     @Transactional
     public void buildSysUserDept(List<SysUserDept> sysUserDeptList) {
-        List<SysUser> sysUsers = sysUserService.list();
-        if(CollectionUtil.isNotEmpty(sysUsers)){
-            Map<String, Long> sysUserMap
-                    = sysUsers.stream().collect(Collectors.toMap(SysUser::getWeUserId, SysUser::getUserId));
-            sysUserDeptList.stream().forEach(k->{
-                k.setUserId(sysUserMap.get(k.getWeUserId()));
-            });
+
+        if(CollectionUtil.isNotEmpty(sysUserDeptList)){
+
+            List<SysUser> sysUsers = sysUserService.list();
+            if(CollectionUtil.isNotEmpty(sysUsers)){
+                Map<String, Long> sysUserMap
+                        = sysUsers.stream().collect(Collectors.toMap(SysUser::getWeUserId, SysUser::getUserId));
+                sysUserDeptList.stream().forEach(k->{
+                    k.setUserId(sysUserMap.get(k.getWeUserId()));
+                });
+            }
+
+            this.remove(new LambdaQueryWrapper<SysUserDept>()
+                    .in(SysUserDept::getWeUserId,sysUserDeptList.stream()
+                            .map(SysUserDept::getWeUserId).collect(Collectors.toList())));
+
+            saveBatch(sysUserDeptList);
+
         }
 
-        this.remove(new LambdaQueryWrapper<SysUserDept>()
-                .in(SysUserDept::getWeUserId,sysUserDeptList.stream()
-                        .map(SysUserDept::getWeUserId).collect(Collectors.toList())));
-
-        saveBatch(sysUserDeptList);
 
     }
 }

@@ -585,16 +585,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
 
         sysUserDeptService.buildSysUserDept(userDeptList);
-//        Map<String, Long> userIdMap = userList.stream().collect(Collectors.toMap(SysUser::getWeUserId, SysUser::getUserId));
-//        sysUserDeptService.removeByIds(delUserDeptId);
 
-//        sysUserDeptService.remove(new LambdaQueryWrapper<SysUserDept>()
-//                .in(SysUserDept::getWeUserId,userList.stream()
-//                        .map(SysUser::getWeUserId).collect(Collectors.toList())));
-//        sysUserDeptService.saveBatch(userDeptList);
-//        sysUserDeptService.saveBatch(userDeptList.stream().peek(userDept -> {
-//            userDept.setUserId(userIdMap.get(userDept.getWeUserId()));
-//        }).collect(Collectors.toList()));
 
         return userList;
     }
