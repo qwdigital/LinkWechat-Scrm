@@ -327,7 +327,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             }
             for (int i = 0; i < vo.getDepartment().size(); i++) {
                 delUserDeptId.addAll(new LambdaQueryChainWrapper<>(userDeptMapper).eq(SysUserDept::getWeUserId, vo.getUserId()).eq(SysUserDept::getDeptId, vo.getDepartment().get(i)).list().stream().map(SysUserDept::getUserDeptId).collect(Collectors.toList()));
-                userDeptList.add(userDeptGenerator(vo, i));
+                userDeptList.add(userDeptGenerator(user,vo, i));
             }
 
 //            sysUserDeptService.removeByIds(delUserDeptId);
@@ -542,7 +542,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             SysUser user = sysUserGenerator(u);
             for (int i = 0; i < u.getDepartment().size(); i++) {
                 delUserDeptId.addAll(new LambdaQueryChainWrapper<>(userDeptMapper).eq(SysUserDept::getWeUserId, u.getUserId()).eq(SysUserDept::getDeptId, u.getDepartment().get(i)).list().stream().map(SysUserDept::getUserDeptId).collect(Collectors.toList()));
-                userDeptList.add(userDeptGenerator(u, i));
+                userDeptList.add(userDeptGenerator(user,u, i));
             }
             return user;
         }).collect(Collectors.toList());
@@ -661,7 +661,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             WeUserDetailVo vo = result.getData();
              user = sysUserGenerator(vo);
             for (int i = 0; i < vo.getDepartment().size(); i++) {
-                userDeptList.add(userDeptGenerator(vo, i));
+                userDeptList.add(userDeptGenerator(user,vo, i));
             }
             this.baseMapper.batchAddOrUpdate(ListUtil.toList(user));
             SysRole role = new LambdaQueryChainWrapper<>(roleMapper).eq(SysRole::getRoleKey, RoleType.WECOME_USER_TYPE_CY.getSysRoleKey())
@@ -829,8 +829,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
 
-    private SysUserDept userDeptGenerator(WeUserDetailVo u, int index) {
+    private SysUserDept userDeptGenerator(SysUser user,WeUserDetailVo u, int index) {
         SysUserDept userDept = new SysUserDept();
+        userDept.setUserId(user.getUserId());
         userDept.setWeUserId(u.getUserId());
         userDept.setOpenUserid(u.getOpenUserId());
         userDept.setDeptId(Long.parseLong(String.valueOf(u.getDepartment().get(index))));
