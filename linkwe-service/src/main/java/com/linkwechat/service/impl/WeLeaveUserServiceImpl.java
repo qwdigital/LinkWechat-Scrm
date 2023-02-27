@@ -12,6 +12,7 @@ import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.dto.SysUserDTO;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.CorpUserEnum;
@@ -279,7 +280,7 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
     }
 
     @Override
-    @SynchRecord(synchType = SynchRecordConstants.SYNCH_LEAVE_USER)
+//    @SynchRecord(synchType = SynchRecordConstants.SYNCH_LEAVE_USER)
     public void synchLeaveSysUser() {
 
         LoginUser loginUser = SecurityUtils.getLoginUser();
@@ -313,39 +314,53 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                     .collect(Collectors.groupingBy(WeLeaveUserVo.Info::getHandover_userid));
 
 
-            //离职相关更近人数据更新
-            iWeCustomerService.synchWeCustomerByAddIds(
-                    infoList.stream().map(WeLeaveUserVo.Info::getHandover_userid).collect(Collectors.toList())
-            );
+
+
+//            //离职相关更近人数据更新(后去如果企业微信开放离职员工数据接口可拓展)
+//            iWeCustomerService.synchWeCustomerByAddIds(
+//                    infoList.stream().map(WeLeaveUserVo.Info::getHandover_userid).collect(Collectors.toList())
+//            );
 
              weLeaveUserVoMap.forEach((k,v)->{
 
-                 //分配客户
-                 v.stream().forEach(vv->{
-                     allocateCustomers.add(
-                          WeAllocateCustomer.builder()
-                                            .id(SnowFlakeUtil.nextId())
-                                            .allocateTime(new Date())
-                                            .extentType(new Integer(0))
-                                            .externalUserid(vv.getExternal_userid())
-                                            .handoverUserid(k)
-                                            .status(new Integer(1))
-                                            .failReason("离职继承")
-                                            .build()
-                            );
+                 List<WeCustomer> weCustomers = iWeCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
+                         .eq(WeCustomer::getAddUserId, k)
+                         .in(WeCustomer::getExternalUserid, v.stream().map(WeLeaveUserVo.Info::getExternal_userid).collect(Collectors.toList())));
 
-                        });
+                 if(CollectionUtil.isNotEmpty(weCustomers)){
+
+                     //分配客户
+                     weCustomers.stream().forEach(vv->{
+                         allocateCustomers.add(
+                                 WeAllocateCustomer.builder()
+                                         .id(SnowFlakeUtil.nextId())
+                                         .allocateTime(new Date())
+                                         .extentType(new Integer(0))
+                                         .externalUserid(vv.getExternalUserid())
+                                         .handoverUserid(k)
+                                         .status(new Integer(1))
+                                         .failReason("离职继承")
+                                         .build()
+                         );
+
+                     });
 
 
-                 //从企业微信拉取当前离职员工等待分配的群
-                 List<WeGroupChatListVo.GroupChat> groupChatList=iWeGroupService.synchWeGroup(WeGroupChatListQuery.builder()
+                 }
+
+
+
+                 //从企业微信拉取当前离职员工等待分配的群(后期开放拉取离职客户群可拓展)
+                 List<WeGroupChatListVo.GroupChat> weGroups=iWeGroupService.synchWeGroup(WeGroupChatListQuery.builder()
                                         .owner_filter(WeOwnerFilterEntity.builder()
                                                 .userid_list(ListUtil.toList(k))
                                                 .build())
                                         .status_filter(1)
                                 .build());
-                 if(CollectionUtil.isNotEmpty(groupChatList)){
-                            groupChatList.stream().forEach(chat->{
+//                 List<WeGroup> weGroups = iWeGroupService.list(new LambdaQueryWrapper<WeGroup>()
+//                         .eq(WeGroup::getOwner, k));
+                 if(CollectionUtil.isNotEmpty(weGroups)){
+                     weGroups.stream().forEach(chat->{
                                 allocateGroups.add(
                                         WeAllocateGroup.builder()
                                                 .id(SnowFlakeUtil.nextId())
@@ -358,11 +373,13 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                         }
 
 
-                 //离职员工入库
-                 AjaxResult<SysUser> ajaxResult = qwSysUserClient.findOrSynchSysUser(k);
+                 //离职员工入库(后期开放离职员工数据可拓展)
+//                 AjaxResult<SysUser> ajaxResult = qwSysUserClient.findOrSynchSysUser(k);
+                 AjaxResult<List<SysUser>> ajaxResult = qwSysUserClient.findAllSysUser(k, null, null);
 
-                 if(ajaxResult != null && ajaxResult.getData() != null){
-                     SysUser sysUser = ajaxResult.getData();
+                 if(ajaxResult != null && CollectionUtil.isNotEmpty(ajaxResult.getData())){
+                     SysUser sysUser = ajaxResult.getData().stream().findFirst().get();
+                     sysUser.setIsUserLeave(1);
 
                      //构建离职员工数据
                      this.save(
@@ -370,7 +387,17 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                                      .deptNames(sysUser.getDeptName())
                                      .weUserId(sysUser.getWeUserId())
                                      .allocateCustomerNum(v.size())
-                                     .allocateGroupNum(groupChatList.size()).build()
+                                     .dimissionTime(new Date(v.stream().findFirst().get().getDimission_time() * 1000L))
+                                     .allocateGroupNum(weGroups.size()).build()
+                     );
+
+
+                     //更新
+                     SysUserDTO sysUserDTO=new SysUserDTO();
+                     sysUserDTO.setIsUserLeave(1);
+                     sysUserDTO.setWeUserId(sysUser.getWeUserId());
+                     qwSysUserClient.edit(
+                             sysUserDTO
                      );
 
                  }
@@ -382,7 +409,7 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                 iWeGroupService.update(WeGroup.builder()
                                 .ownerLeave(1)
                         .build(), new LambdaQueryWrapper<WeGroup>()
-                        .in(WeGroup::getChatId,allocateGroups.stream().map(WeAllocateGroup::getChatId)));
+                        .in(WeGroup::getChatId,allocateGroups.stream().map(WeAllocateGroup::getChatId).collect(Collectors.toList())));
                 iWeAllocateGroupService.batchAddOrUpdate(allocateGroups);
             }
 

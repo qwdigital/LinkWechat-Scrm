@@ -321,6 +321,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (result.getData() != null) {
             WeUserDetailVo vo = result.getData();
             SysUser user = sysUserGenerator(vo);
+            user.setIsUserLeave(sysUser.getIsUserLeave());
             SysUser userExist = selectUserByWeUserId(user.getWeUserId());
             if (userExist != null) {
                 user.setUserId(userExist.getUserId());
@@ -659,7 +660,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         query.setCorpid(sysUser.getCorpId());
         AjaxResult<WeUserDetailVo> result = userClient.getUserInfo(query);
         List<SysUserDept> userDeptList = new ArrayList<>();
-        if (result.getData() != null) {
+        if (result.getData() != null && result.getData().getErrCode().equals(WeConstans.WE_SUCCESS_CODE)) {
             WeUserDetailVo vo = result.getData();
              user = sysUserGenerator(vo);
             for (int i = 0; i < vo.getDepartment().size(); i++) {
@@ -676,6 +677,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             sysUserDeptService.saveBatch(userDeptList.stream().peek(userDept -> {
                 userDept.setUserId(finalUser.getUserId());
             }).collect(Collectors.toList()));
+        }else{
+
+            return null;
         }
         return user;
     }

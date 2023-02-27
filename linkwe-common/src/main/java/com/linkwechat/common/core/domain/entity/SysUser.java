@@ -232,6 +232,12 @@ public class SysUser extends BaseEntity {
 
 
     /**
+     * 是否离职1:是；0:否
+     */
+    private Integer isUserLeave;
+
+
+    /**
      * 离职时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")

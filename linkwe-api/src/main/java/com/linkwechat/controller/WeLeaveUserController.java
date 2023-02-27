@@ -43,7 +43,7 @@ public class WeLeaveUserController extends BaseController {
     public TableDataInfo<List<SysLeaveUser>> leaveUserList(SysLeaveUser weLeaveUser) {
         startPage();
         List<SysLeaveUser> sysLeaveUsers = iWeLeaveUserService.list(new LambdaQueryWrapper<SysLeaveUser>()
-                        .eq(weLeaveUser.getIsAllocate()==null,SysLeaveUser::getIsAllocate,weLeaveUser.getIsAllocate())
+                        .eq(weLeaveUser.getIsAllocate()!=null,SysLeaveUser::getIsAllocate,weLeaveUser.getIsAllocate())
                 .like(StringUtils.isNotEmpty(weLeaveUser.getUserName()),SysLeaveUser::getUserName,weLeaveUser.getUserName())
                 .apply(StringUtils.isNotEmpty(weLeaveUser.getBeginTime())&&StringUtils.isNotEmpty(weLeaveUser.getEndTime()),
                         "date_format(dimission_time,'%Y-%m-%d') BETWEEN '"+
