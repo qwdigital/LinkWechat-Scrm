@@ -125,9 +125,17 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
         SecurityContextHolder.setUserName(loginUser.getUserName());
         SecurityContextHolder.setUserType(loginUser.getUserType());
 
+        this.synchWeGroup(WeGroupChatListQuery.builder().build());
+
+
+    }
+
+    @Override
+    public List<WeGroupChatListVo.GroupChat> synchWeGroup(WeGroupChatListQuery chatListQuery){
+
         List<WeGroupChatListVo.GroupChat> groupChatList=new ArrayList<>();
 
-        this.getGroupChatList(groupChatList,WeGroupChatListQuery.builder().build());
+        this.getGroupChatList(groupChatList,chatListQuery);
 
         if (CollectionUtil.isNotEmpty(groupChatList)) {
             List<WeGroup> weGroups = new LinkedList<>();
@@ -173,7 +181,14 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
             //删除不包含当前的群以及成员
             insertBatchGroupAndMember(weGroups, weGroupMembers,false);
         }
+
+
+
+        return groupChatList;
     }
+
+
+
 
     @Override
     public void getGroupChatList( List<WeGroupChatListVo.GroupChat> groupChatList,WeGroupChatListQuery chatListQuery){

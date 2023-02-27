@@ -599,20 +599,29 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void leaveUser(String[] weUserIds) {
-        List<SysUser> weUsers = new ArrayList<>();
-        CollectionUtil.newArrayList(weUserIds).forEach(weUserId -> {
-            SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getWeUserId, weUserId));
-            if (null != sysUser) {
-                sysUser.setIsAllocate(CorpUserEnum.NO_IS_ALLOCATE.getKey());
-                sysUser.setDimissionTime(new Date());
-                weUsers.add(sysUser);
-            }
-            if (this.updateBatchById(weUsers) && this.removeByIds(weUsers.stream().map(SysUser::getUserId).collect(Collectors.toList()))) {
-                //生成等待分配的客户以群记录
-                iWeLeaveUserService.createWaitAllocateCustomerAndGroup(weUserId.split(","));
-            }
 
-        });
+        if(this.remove(new LambdaQueryWrapper<SysUser>()
+                .in(SysUser::getWeUserId,ListUtil.toList(weUserIds)))){
+
+            //通知更新离职员工列表
+            LoginUser loginUser = SecurityUtils.getLoginUser();
+            rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeLeaveAllocateUserRk(), JSONObject.toJSONString(loginUser));
+
+        }
+//        List<SysUser> weUsers = new ArrayList<>();
+//        CollectionUtil.newArrayList(weUserIds).forEach(weUserId -> {
+//            SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getWeUserId, weUserId));
+//            if (null != sysUser) {
+//                sysUser.setIsAllocate(CorpUserEnum.NO_IS_ALLOCATE.getKey());
+//                sysUser.setDimissionTime(new Date());
+//                weUsers.add(sysUser);
+//            }
+//            if (this.updateBatchById(weUsers) && this.removeByIds(weUsers.stream().map(SysUser::getUserId).collect(Collectors.toList()))) {
+//                //生成等待分配的客户以群记录
+//                iWeLeaveUserService.createWaitAllocateCustomerAndGroup(weUserId.split(","));
+//            }
+
+//        });
 
     }
 
