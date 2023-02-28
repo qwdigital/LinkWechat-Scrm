@@ -7,7 +7,7 @@
 
 [![star](https://gitee.com/LinkWeChat/link-wechat/badge/star.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/stargazers)
 [![fork](https://gitee.com/LinkWeChat/link-wechat/badge/fork.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/members)
-[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V3.3-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
+[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V3.4-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
 [![license](http://img.shields.io/badge/license-GPL%203.0-orange)](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
 [![木兰社区](https://img.shields.io/badge/Mulan-incubating-blue)](https://portal.mulanos.cn//)
 
@@ -82,7 +82,7 @@ LinkWeChat SCRM 基于企业私域流量营销闭环，遵从获取新客到管�
 
 [LinkWeChat 社区版 V3.x 详细功能清单](https://docs.qq.com/sheet/DZW9HSHpHdWlOYWh2?tab=BB08J3)
 
-![输入图片说明](readme-pic/v3image.png)
+![输入图片说明](readme-pic/3.4.png)
 
 ## 1.3 优势
 
@@ -92,6 +92,8 @@ LinkWeChat 基于企业微信从服务内部到对外全面开放能力，可为
 * 二次整合封装企微 API，避免重复踩坑
 * 采用主流 Java 架构，具备高拓展性、灵活性，避免 PHP 架构的缺点
 * 对外提供内部 API，低成本二次开发
+
+![输入图片说明](readme-pic/youshi.png)
 
 ## 1.4 愿景
 
@@ -184,12 +186,31 @@ LinkWeChat V3.0 架构升级，全面升级为微服务架构，整体系统架�
 
 # 四、最近更新
 
-## 近期计划
+## V4.x 版本规划
 
-- [ ] 内部机器人前端发布；
-- [ ] 企微商品画册功能重构；
-- [ ] 智能短链；
-- [ ] 数据洞察；
+LinkWeChat V4.x 大版本规划来啦~！V4.x 版本将把重点以下三部分：
+
+* 全面对接三方：不止于微信生态，让私域建设更全面、更彻底；
+* 精准营销能力：基于人群和策略，加强后链路转化能力；
+* 升级CRM能力：销售赋能，让线索到客户再到成交的链路更简单；
+
+我们欢迎感兴趣的贡献者积极参与 LinkWeChat 新版的开源中，如有兴趣通过下方的联系方式联系我们哦~
+
+![输入图片说明](readme-pic/4.x.png)
+
+## V3.4 更新日志
+
+- [x] 智能短链；
+- [x] 修复了一些已知问题；
+- [x] 其余各模块UI细节调优；
+
+## V3.3 更新日志
+
+- [x] 客户/客群SOP发布；
+- [x] 内部机器人前端发布；
+- [x] 企微商品画册功能重构；
+- [x] 修复了一些已知问题；
+- [x] 其余各模块UI细节调优；
 
 ## V3.2 更新日志
 
@@ -232,9 +253,9 @@ LinkWeChat V3.0 主要围绕系统架构、引流获客、客情维系、内容�
 
 # 五、奖项荣誉
 
-凭借着出色的产品能力和专业的技术能力，LinkWeChat 在 Gitee 开源社区年度评选活动中荣获“2020 年度 GVP最有价值开源项目”、“2020 年开源中国最佳人气项目”两个重量级奖项。
+LinkWeChat 凭借着出色的产品能力和专业的技术能力，已经获取如下奖项：
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/150243_3899c77e_1480777.png "仟微助手企业微信SCRM智能营销系统-V1.5_39.png")
+![输入图片说明](readme-pic/jiangxiang2023.png)
 
 目前 LinkWeChat 已成功加入木兰开源社区孵化项目，得到了更加专业的技术支持与相关知识产权扶持，未来将会以更加严谨规范的专业能力服务各企业与行业。
 
