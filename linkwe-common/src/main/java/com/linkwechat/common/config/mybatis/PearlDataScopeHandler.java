@@ -26,7 +26,7 @@ public class PearlDataScopeHandler implements DataScopeHandler {
         }else {
             DataColumn dataColumn = dataScope.value()[0];
             sqlPart.append(StringUtils.format(
-                    " or {}.{} in ( select distinct sud.{} from sys_role_dept srd inner join sys_user_dept sud on srd.dept_id= sud.dept_id and sud.del_flag = 0 where srd.role_id = {} )",
+                    " or {}.{} in ( select distinct sud.{} from sys_role_dept srd inner join sys_user_dept sud on srd.dept_id= sud.dept_id and sud.del_flag = 0 LEFT JOIN sys_user su ON su.we_user_id=sud.we_user_id where srd.role_id = {} )",
                     dataColumn.alias(), dataColumn.name(),dataColumn.userid(), roleId));
         }
         return sqlPart.toString();
