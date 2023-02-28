@@ -35,8 +35,7 @@ public class WeMsgTlpAttachments extends QwBaseEntity implements Serializable {
      * 主键id
      */
     @ApiModelProperty(value = "主键id")
-    @TableId(type = IdType.AUTO)
-    @TableField("id")
+    @TableId
     private Long id;
 
 

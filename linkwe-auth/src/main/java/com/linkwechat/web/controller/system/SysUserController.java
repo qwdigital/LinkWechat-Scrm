@@ -1,6 +1,10 @@
 package com.linkwechat.web.controller.system;
 
+import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.dtflys.forest.annotation.Post;
 import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -20,6 +24,12 @@ import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.domain.WeConfigParamInfo;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WxUser;
+import com.linkwechat.domain.corp.query.WeCorpAccountQuery;
+import com.linkwechat.domain.corp.vo.WeCorpAccountVo;
+import com.linkwechat.domain.system.user.query.SysUserQuery;
+import com.linkwechat.domain.system.user.vo.SysUserVo;
+import com.linkwechat.domain.user.vo.WeUserScreenConditVo;
+import com.linkwechat.domain.wecom.vo.user.WeLeaveUserVo;
 import com.linkwechat.domain.wecom.vo.user.WeUserDetailVo;
 import com.linkwechat.framework.service.TokenService;
 import com.linkwechat.service.*;
@@ -88,6 +98,7 @@ public class SysUserController extends BaseController {
 
     @Autowired
     private IWeSysFieldTemplateService iWeSysFieldTemplateService;
+
 
     @Autowired
     private IWeStrackStageService iWeStrackStageService;
@@ -174,7 +185,8 @@ public class SysUserController extends BaseController {
      */
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysUserDTO user) {
-        return toAjax(userService.addUser(user));
+        userService.addUser(user);
+        return AjaxResult.success();
     }
 
     /**
@@ -210,6 +222,8 @@ public class SysUserController extends BaseController {
         userService.leaveUser(userIds);
         return AjaxResult.success();
     }
+
+
 
     /**
      * 回掉移除用户
@@ -381,6 +395,7 @@ public class SysUserController extends BaseController {
         return AjaxResult.success(user);
     }
 
+
     @PostMapping("listByQuery")
     public AjaxResult<SysUser> listByQuery(@RequestBody SysUser sysUser) {
         List<SysUser> sysUsers = userService.selectUserList(sysUser);
@@ -398,5 +413,132 @@ public class SysUserController extends BaseController {
         WxUser customerInfo = wxUserService.getCustomerInfo(wxLoginUser.getOpenId(), wxLoginUser.getUnionId());
         return AjaxResult.success(customerInfo);
     }
+
+
+    /**
+     * 根据weUserIds，positions，deptIds批量查询
+     * @param weUserIds
+     * @param positions
+     * @param deptIds
+     * @return
+     */
+    @GetMapping("/findAllSysUser")
+    public AjaxResult<List<SysUser>> findAllSysUser(String weUserIds, String positions,String deptIds){
+
+        return AjaxResult.success(
+                userService.findAllSysUser(weUserIds,positions,deptIds)
+        );
+
+    }
+
+    /**
+     * 根据weuserid获取员工，如果没有则从企业微信端同步
+     * @param weuserId
+     * @return
+     */
+    @GetMapping("/findOrSynchSysUser/{weuserId}")
+    public AjaxResult<SysUser> findOrSynchSysUser(@PathVariable("weuserId") String weuserId){
+        return AjaxResult.success(
+                userService.findOrSynchSysUser(weuserId)
+        );
+    }
+
+
+    /**
+     * 更新用户是否开启会话
+     *
+     * @param
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2022/09/19 18:02
+     */
+    @PutMapping("/update/open/chat")
+    public AjaxResult<Boolean> updateUserIsOpenChat(@RequestBody SysUser sysUser) {
+        UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.lambda().set(SysUser::getIsOpenChat, sysUser.getIsOpenChat());
+        updateWrapper.lambda().eq(SysUser::getWeUserId, sysUser.getWeUserId());
+        boolean update = userService.update(updateWrapper);
+        return AjaxResult.success(update);
+    }
+
+    /**
+     * 根据openUserId获取用户数据
+     *
+     * @param
+     * @return {@link AjaxResult<SysUser>}
+     * @author WangYX
+     * @date 2022/09/21 11:04
+     */
+    @GetMapping("/getOneByOpenUserId")
+    public AjaxResult<SysUser> getOneByOpenUserId(@RequestBody SysUser sysUser) {
+        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(SysUser::getOpenUserid, sysUser.getOpenUserid());
+        queryWrapper.lambda().eq(SysUser::getDelFlag, 0);
+        SysUser one = userService.getOne(queryWrapper);
+        return AjaxResult.success(one);
+    }
+
+    /**
+     * 更新用户是否开启客服
+     *
+     * @param
+     * @return {@link AjaxResult}
+     * @author damo
+     * @date 2022/09/19 18:02
+     */
+    @PutMapping("/update/kf/status")
+    public AjaxResult updateUserKfStatus(@RequestBody SysUser sysUser) {
+        UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.lambda().set(SysUser::getKfStatus, sysUser.getKfStatus());
+        updateWrapper.lambda().eq(SysUser::getWeUserId, sysUser.getWeUserId());
+        userService.update(updateWrapper);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 通过企微员工ID获取员工信息
+     * @param query
+     * @return
+     */
+    @PostMapping("/getUserListByWeUserIds")
+    public AjaxResult<List<SysUserVo>> getUserListByWeUserIds(@Validated @RequestBody SysUserQuery query){
+        List<SysUserVo> sysUserList  = userService.getUserListByWeUserIds(query);
+        return AjaxResult.success(sysUserList);
+    }
+
+
+    /**
+     * 根据职位等条件筛选员工
+     * @param weUserIds
+     * @param deptIds
+     * @param positions
+     * @return
+     */
+    @GetMapping("/screenConditWeUser")
+    public AjaxResult<List<String>> screenConditWeUser(String weUserIds, String deptIds,String positions){
+
+
+        return AjaxResult.success(
+                userService.screenConditWeUser(weUserIds,deptIds,positions)
+        );
+
+    }
+
+
+    /**
+     * 批量构建离职员工
+     * @param sysUsers
+     * @return
+     */
+    @PostMapping("/builderLeaveSysUser")
+    public AjaxResult builderLeaveSysUser(@RequestBody SysUserQuery sysUsers){
+
+        userService.builderLeaveSysUser(sysUsers.getSysUsers());
+
+
+        return AjaxResult.success();
+
+    }
+
 
 }

@@ -79,5 +79,12 @@
         where del_flag = 0
     </select>
 
+    <update id="updateByIdIgnoreTenantId">
+        UPDATE we_form_survey_catalogue
+        SET survey_state = #{surveyState},
+            update_time  = now()
+        WHERE id = #{id}
+    </update>
+
 
 </mapper>

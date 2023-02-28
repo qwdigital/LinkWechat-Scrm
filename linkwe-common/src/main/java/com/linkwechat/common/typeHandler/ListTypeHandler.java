@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.linkwechat.common.utils.StringUtils;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedJdbcTypes;
@@ -23,12 +22,6 @@ import java.util.List;
 public abstract class ListTypeHandler<T> extends BaseTypeHandler<List<T>> {
 
     @Override
-    public List<T> getResult(ResultSet rs, String columnName) throws SQLException {
-
-        return super.getResult(rs, columnName);
-    }
-
-    @Override
     public void setNonNullParameter(PreparedStatement ps, int i, List<T> parameter, JdbcType jdbcType) throws SQLException {
         String content = CollUtil.isEmpty(parameter) ? null : JSON.toJSONString(parameter);
         ps.setString(i, content);
@@ -36,15 +29,11 @@ public abstract class ListTypeHandler<T> extends BaseTypeHandler<List<T>> {
 
     @Override
     public List<T> getNullableResult(ResultSet rs, String columnName) throws SQLException {
-
         return this.getListByJsonArrayString(rs.getString(columnName));
     }
 
     @Override
     public List<T> getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-
-
-
         return this.getListByJsonArrayString(rs.getString(columnIndex));
     }
 
@@ -55,15 +44,7 @@ public abstract class ListTypeHandler<T> extends BaseTypeHandler<List<T>> {
 
 
     private List<T> getListByJsonArrayString(String content) {
-
-        if(StringUtils.isEmpty(content)){
-
-            return null;
-
-        }
-
-        return JSON.parseObject(content, this.specificType());
-
+        return StrUtil.isBlank(content) ? new ArrayList<>() : JSON.parseObject(content, this.specificType());
     }
 
     /**

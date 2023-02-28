@@ -51,6 +51,11 @@ public class QwLivingServiceImpl implements IQwLivingService {
     }
 
     @Override
+    public WeLivingInfoVo getLivingInfo(WeLivingQuery query) {
+        return weLivingClient.getLivingInfo(query);
+    }
+
+    @Override
     public WeLivingStatInfoVo getWatchStat(WeLivingQuery query) {
         return weLivingClient.getWatchStat(query);
     }

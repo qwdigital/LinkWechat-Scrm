@@ -8,12 +8,10 @@ import java.time.temporal.ChronoUnit;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 /**
@@ -526,6 +524,21 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     }
 
 
+    public static String initSqlBeginTime(String str){
+        if(ObjectUtil.isEmpty(str)){
+            str = dateTimeNow(YYYY_MM_DD_HH_MM_SS);
+        }
+        return str + " 00:00:00";
+    }
+
+    public static String initSqlEndTime(String str){
+        if(ObjectUtil.isEmpty(str)){
+            str = dateTimeNow(YYYY_MM_DD_HH_MM_SS);
+        }
+        return str + " 59:59:59";
+    }
+
+
     /**
      *  获得指定时间的前几天或后几天是哪一天
      * @param oneday
@@ -540,17 +553,59 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     }
 
 
-    public static void main(String[] args) throws ParseException {
+    /**
+     * 判断当前时间是否在[startTime, endTime]区间，注意时间格式要一致
+     *
+     * @param nowTime 当前时间
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return
+     * @author jqlin
+     */
+    public static boolean isEffectiveDate(Date nowTime, Date startTime, Date endTime) {
+        if (nowTime.getTime() == startTime.getTime()
+                || nowTime.getTime() == endTime.getTime()) {
+            return true;
+        }
 
-        System.out.println(daysBetween(
-                DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, new Date())
-                ,
-                parseDateToStr(
-                        YYYY_MM_DD, daysAgoOrAfter(
-                                DateUtils.parseDate("2022-08-31"), 1
-                        )
-                )));
+        Calendar date = Calendar.getInstance();
+        date.setTime(nowTime);
 
+        Calendar begin = Calendar.getInstance();
+        begin.setTime(startTime);
 
+        Calendar end = Calendar.getInstance();
+        end.setTime(endTime);
+
+        if (date.after(begin) && date.before(end)) {
+            return true;
+        } else {
+            return false;
+        }
     }
+
+
+    /**
+     * 秒转化为:n小时k分这种
+     * @param diff
+     * @return
+     */
+    public static String ShowTimeInterval(long diff) {
+
+
+        if(diff<60){
+            return diff+"秒";
+        }
+
+
+        long minutes = diff / 60;
+        long min = minutes % 60;
+        long hou = minutes / 60;
+
+        return hou+"小时"+min+"分";
+    }
+
+
+
+
 }

@@ -4,7 +4,7 @@
 		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.web.mapper.SysMenuMapper">
 
-	<resultMap type="com.linkwechat.common.core.domain.entity.SysMenu" id="SysMenuResult">
+	<resultMap type="SysMenu" id="SysMenuResult">
 		<id     property="menuId"         column="menu_id"        />
 		<result property="menuName"       column="menu_name"      />
 		<result property="parentName"     column="parent_name"    />
@@ -30,7 +30,7 @@
 		from sys_menu
     </sql>
     
-    <select id="selectMenuList" parameterType="com.linkwechat.common.core.domain.entity.SysMenu" resultMap="SysMenuResult">
+    <select id="selectMenuList" parameterType="SysMenu" resultMap="SysMenuResult">
 		<include refid="selectMenuVo"/>
 		 where path != 'System'
 			<if test="menuName != null and menuName != ''">
@@ -115,12 +115,12 @@
 	    select count(1) from sys_menu where parent_id = #{menuId}  
 	</select>
 	
-	<select id="checkMenuNameUnique" parameterType="com.linkwechat.common.core.domain.entity.SysMenu" resultMap="SysMenuResult">
+	<select id="checkMenuNameUnique" parameterType="SysMenu" resultMap="SysMenuResult">
 		<include refid="selectMenuVo"/>
 		where menu_name=#{menuName} and parent_id = #{parentId} limit 1
 	</select>
 	
-	<update id="updateMenu" parameterType="com.linkwechat.common.core.domain.entity.SysMenu">
+	<update id="updateMenu" parameterType="SysMenu">
 		update sys_menu
 		<set>
 			<if test="menuName != null and menuName != ''">menu_name = #{menuName},</if>
@@ -141,7 +141,7 @@
 		where menu_id = #{menuId}
 	</update>
 
-	<insert id="insertMenu" parameterType="com.linkwechat.common.core.domain.entity.SysMenu">
+	<insert id="insertMenu" parameterType="SysMenu">
 		insert into sys_menu(
 		<if test="parentId != null and parentId != 0">parent_id,</if>
 		<if test="menuName != null and menuName != ''">menu_name,</if>

@@ -6,7 +6,6 @@ import com.linkwechat.domain.WeSysFieldTemplate;
 import com.linkwechat.service.IWeSysFieldTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Arrays;
 import java.util.List;
 

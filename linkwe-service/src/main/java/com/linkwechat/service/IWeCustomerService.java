@@ -28,6 +28,13 @@ public interface IWeCustomerService extends IService<WeCustomer> {
     List<WeCustomersVo> findWeCustomerList(WeCustomersQuery weCustomersQuery, PageDomain pageDomain);
 
 
+    /**
+     * 应用客户列表
+     * @param weCustomersQuery
+     * @param pageDomain
+     * @return
+     */
+    TableDataInfo<List<WeCustomersVo>> findWeCustomerListByApp(WeCustomersQuery weCustomersQuery, PageDomain pageDomain);
 
     /**
      * 客户总数统计
@@ -64,6 +71,20 @@ public interface IWeCustomerService extends IService<WeCustomer> {
      * @param msg
      */
     void synchWeCustomerHandler(String msg);
+
+
+    /**
+     * 通过跟进人id同步客户
+     * @param followUserIds
+     */
+    void synchWeCustomerByAddIds(List<String> followUserIds);
+
+
+    /**
+     * 构建离职待分配客户
+     * @param followUserIds
+     */
+    void buildAllocateWecustomer(List<String> followUserIds);
 
 
     /**
@@ -160,7 +181,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
      * @param externalUserId 客户ID
      * @param userId 成员ID
      */
-    void updateCustomer(String externalUserId, String userId);
+    WeCustomer updateCustomer(String externalUserId, String userId);
 
 
     /**
@@ -229,6 +250,14 @@ public interface IWeCustomerService extends IService<WeCustomer> {
     List<String> findWeUserIds();
 
     List<WeCustomersVo> findWeCustomerList(List<String> customerIds);
+
+
+    /**
+     * 根据客户id获取客户，不存在则从企业微信端同步
+     * @param externalUserid
+     * @return
+     */
+     WeCustomer findOrSynchWeCustomer(String externalUserid);
 
 
     /**

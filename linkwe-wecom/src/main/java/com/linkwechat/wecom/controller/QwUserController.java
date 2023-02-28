@@ -3,10 +3,12 @@ package com.linkwechat.wecom.controller;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.wecom.query.WeCorpQrQuery;
 import com.linkwechat.domain.wecom.query.user.WeAddUserQuery;
+import com.linkwechat.domain.wecom.query.user.WeLeaveUserQuery;
 import com.linkwechat.domain.wecom.query.user.WeUserListQuery;
 import com.linkwechat.domain.wecom.query.user.WeUserQuery;
 import com.linkwechat.domain.wecom.vo.WeCorpQrVo;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
+import com.linkwechat.domain.wecom.vo.user.WeLeaveUserVo;
 import com.linkwechat.domain.wecom.vo.user.WeLoginUserVo;
 import com.linkwechat.domain.wecom.vo.user.WeUserDetailVo;
 import com.linkwechat.domain.wecom.vo.user.WeUserListVo;
@@ -16,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 企微员工接口
  * @date 2022/3/13 21:01
  **/
@@ -147,5 +149,21 @@ public class QwUserController {
         return AjaxResult.success(
                 qwUserService.getJoinQrcode(query)
         );
+    }
+
+
+    /**
+     * 获取待分配的离职成员列表
+     * @param query
+     * @return
+     */
+    @PostMapping("/getUnassignedList")
+    public AjaxResult<WeLeaveUserVo>  getUnassignedList(@RequestBody WeLeaveUserQuery query){
+
+
+        return AjaxResult.success(
+                qwUserService.getUnassignedList(query)
+        );
+
     }
 }

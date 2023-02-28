@@ -21,6 +21,20 @@ public interface IWeOperationCenterService {
     WeCustomerAnalysisVo getCustomerAnalysis();
 
 
+    /**
+     * 自建应用客户分析统计
+     * @param dataScope 个人数据:false 全部数据(相对于角色定义的数据权限):true
+     * @return
+     */
+    WeCustomerAnalysisVo getCustomerAnalysisForApp(boolean dataScope);
+
+
+    /**
+     * 自建应用，客群分析
+     * @param dataScope 个人数据:false 全部数据(相对于角色定义的数据权限):true
+     * @return
+     */
+    WeGroupAnalysisVo getGroupAnalysisByApp(boolean dataScope);
 
 
 

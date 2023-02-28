@@ -92,6 +92,9 @@ public class WeCustomerPortraitVo {
     //客户姓名(客户画像做备注)
     private String customerFullName;
 
+
+
+
     //客户信息拓展
     private List<WeCustomerInfoExpand> weCustomerInfoExpands;
 

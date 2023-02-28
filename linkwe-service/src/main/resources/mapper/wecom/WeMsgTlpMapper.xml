@@ -1,118 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.mapper.WeMsgTlpMapper">
 
-    <resultMap id="WeMsgTlpDetailResult" type="com.linkwechat.domain.msgtlp.vo.WeMsgTlpVo">
-        <result property="id" column="id" jdbcType="BIGINT"/>
-        <result property="userIds" column="user_ids" jdbcType="VARCHAR"/>
-        <result property="userNames" column="user_names" jdbcType="VARCHAR"/>
-        <result property="tplType" column="tpl_type" jdbcType="INTEGER"/>
-        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
-        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
-        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
-        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-        <collection property="attachments" ofType="com.linkwechat.domain.media.WeMessageTemplate">
-            <result property="msgType" column="msg_type" jdbcType="VARCHAR"/>
-            <result property="content" column="content" jdbcType="VARCHAR"/>
-            <result property="title" column="title" jdbcType="VARCHAR"/>
-            <result property="description" column="description" jdbcType="VARCHAR"/>
-            <result property="picUrl" column="pic_url" jdbcType="VARCHAR"/>
-            <result property="linkUrl" column="link_url" jdbcType="VARCHAR"/>
-            <result property="fileUrl" column="file_url" jdbcType="VARCHAR"/>
-            <result property="appId" column="app_id" jdbcType="VARCHAR"/>
-        </collection>
-    </resultMap>
 
-    <select id="getInfo" resultMap="WeMsgTlpDetailResult">
-        select
-            wmt.id,
-            wmt.user_ids,
-            wmt.user_names,
-            wmt.tpl_type,
-            wmt.create_by,
-            wmt.create_time,
-            wmt.update_by,
-            wmt.update_time,
-            wmta.template_id,
-            wmta.msg_type,
-            wmta.content,
-            wmta.title,
-            wmta.description,
-            wmta.file_url,
-            wmta.link_url,
-            wmta.pic_url,
-            wmta.app_id
-        from we_msg_tlp wmt
-        left join we_msg_tlp_attachments wmta on wmt.id = wmta.template_id and wmta.del_flag = 0
+    <select id="getList" resultType="com.linkwechat.domain.msgtlp.vo.WeMsgTlpVo">
+        SELECT
+        t.*,
+        ( SELECT count( 1 ) FROM we_tlp_material t1 WHERE t.id = t1.tlp_id) AS attachTotalNum
+        FROM
+        we_msg_tlp t
         <where>
-            <if test="id != null">
-                and wmt.id = #{id}
+            t.del_flag = 0
+            <if test="query.tplType !=null ">and t.tpl_type = #{query.tplType}</if>
+            <if test="query.categoryId !=null ">and t.category_id = #{query.categoryId}</if>
+            <if test="query.templateType !=null ">and t.template_type = #{query.templateType}</if>
+            <if test="query.templateInfo !=null and query.templateInfo != '' ">and t.template_info like concat('%',
+                #{query.templateInfo},'%')
             </if>
-            and wmt.del_flag = 0
-        </where>
-    </select>
-
-    <sql id="getListIds">
-        select
-            distinct wmt.id
-        from we_msg_tlp wmt
-        left join we_msg_tlp_attachments wmta on wmt.id = wmta.template_id and wmta.del_flag = 0
-    </sql>
-
-    <select id="getListIds" resultType="java.lang.Long">
-        <include refid="getListIds"/>
-        <where>
-            <if test="userId != null and userId != ''">
-               and find_in_set(wmt.user_ids,#{userId})
-            </if>
-            <if test="welcomeMsg != null and welcomeMsg != ''">
-                and wmta.content like concat('%', #{welcomeMsg}, '%')
-            </if>
-            <if test="tplType != null">
-                and wmt.tpl_type = #{tplType}
-            </if>
-            <if test="msgType != null and msgType != ''">
-                and wmta.msg_type = #{msgType}
-            </if>
-            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
-                AND date_format(wmt.create_time,'%Y-%m-%d') &gt;= date_format(#{beginTime},'%Y-%m-%d')
-            </if>
-            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
-                AND date_format(wmt.create_time,'%Y-%m-%d') &lt;= date_format(#{endTime},'%Y-%m-%d')
-            </if>
-            and wmt.del_flag = 0
-        </where>
-    </select>
-
-    <select id="getMsgTlpByIds" resultMap="WeMsgTlpDetailResult">
-        select
-        wmt.id,
-        wmt.user_ids,
-        wmt.user_names,
-        wmt.tpl_type,
-        wmt.create_by,
-        wmt.create_time,
-        wmt.update_by,
-        wmt.update_time,
-        wmta.template_id,
-        wmta.msg_type,
-        wmta.content,
-        wmta.title,
-        wmta.description,
-        wmta.file_url,
-        wmta.link_url,
-        wmta.pic_url,
-        wmta.app_id
-        from we_msg_tlp wmt
-        left join we_msg_tlp_attachments wmta on wmt.id = wmta.template_id and wmta.del_flag = 0
-        <where>
-            <if test="weMsgTlpIds != null and weMsgTlpIds.size > 0">
-                and wmt.id in
-                <foreach item="weMsgTlpId" collection="weMsgTlpIds" index="index" open="(" separator="," close=")">
-                    #{weMsgTlpId}
+            <if test="userIds !=null and userIds.size()>0">
+                <foreach collection="userIds" item="item" open="AND (FIND_IN_SET("
+                         separator=", user_ids) OR FIND_IN_SET( "
+                         close=", user_ids))">
+                    #{item}
                 </foreach>
             </if>
-            and wmt.del_flag = 0
         </where>
+        order by update_time desc
     </select>
 </mapper>

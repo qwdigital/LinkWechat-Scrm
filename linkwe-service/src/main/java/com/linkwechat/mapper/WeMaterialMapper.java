@@ -1,9 +1,15 @@
 package com.linkwechat.mapper;
 
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
 import com.linkwechat.domain.material.entity.WeMaterial;
+import com.linkwechat.domain.material.query.ContentDetailQuery;
+import com.linkwechat.domain.material.query.LinkMediaQuery;
+import com.linkwechat.domain.material.vo.ContentDataDetailVo;
+import com.linkwechat.domain.material.vo.WeMaterialAnalyseVo;
+import com.linkwechat.domain.material.vo.WeMaterialNewVo;
 import com.linkwechat.domain.material.vo.WeMaterialVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -34,4 +40,30 @@ public interface WeMaterialMapper extends BaseMapper<WeMaterial> {
      * @return 结果
      */
     List<WeMaterialVo> findMaterialVoListByIds(Long[] ids);
+
+    /**
+     * 查询素材列表
+     *
+     * @param query
+     * @return
+     */
+    List<WeMaterialNewVo> selectListByLkQuery(LinkMediaQuery query);
+
+    List<WeMaterialAnalyseVo> getWeMaterialAnalyseTop(ContentDetailQuery contentDetailQuery);
+
+    /**
+     * 获取话术素材的列表
+     *
+     * @param contentDetailQuery
+     * @return
+     */
+    List<WeMaterialAnalyseVo> selectMaterialsByTalkId(ContentDetailQuery contentDetailQuery);
+
+    List<ContentDataDetailVo> getWeMaterialDataCountByTalkId(ContentDetailQuery contentDetailQuery);
+
+    List<WeMaterial> getWeMaterialListByTlpId(Long tlpId);
+
+    List<WeMaterial> getWeMaterialListByTalkId(Long talkId);
+
+
 }

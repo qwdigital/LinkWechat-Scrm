@@ -63,6 +63,7 @@
             <if test="name != null  and name != ''">
                 AND wgm.name like concat('%', #{name}, '%')
             </if>
+            GROUP BY wgm.user_id
         ) a
     </select>
 
@@ -123,4 +124,6 @@
     <delete id="physicalDelete">
         DELETE FROM we_group_member where chat_id=#{chatId} AND user_id=#{userId} and del_flag =0
     </delete>
+
+
 </mapper>

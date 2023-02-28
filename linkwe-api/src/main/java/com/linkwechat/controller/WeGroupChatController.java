@@ -49,7 +49,8 @@ public class WeGroupChatController extends BaseController {
     private IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
 
 
-
+    @Autowired
+    private IWeCustomerService iWeCustomerService;
 
     /**
      * 客户群列表
@@ -68,6 +69,27 @@ public class WeGroupChatController extends BaseController {
         return dataTable;
     }
 
+
+    /**
+     * 应用客户群列表
+     * @param query
+     * @return
+     */
+    @GetMapping("/page/listByApp")
+    public TableDataInfo<LinkGroupChatListVo> getPageListByApp(WeGroupChatQuery query) {
+        startPage();
+
+        SysUser sysUser
+                = iWeCustomerService.findCurrentSysUserInfo(SecurityUtils.getUserId());
+
+        if(!query.isDataScope()){//个人数据
+            query.setUserIds(sysUser.getWeUserId());
+            return getDataTable(weGroupService.selectWeGroupListByApp(query));
+        }
+
+        //全部数据(根据设定角色的数据权限范围来)
+        return getDataTable(weGroupService.getPageList(query));
+    }
 
 
     /**

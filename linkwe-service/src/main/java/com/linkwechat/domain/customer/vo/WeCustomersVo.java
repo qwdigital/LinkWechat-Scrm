@@ -38,11 +38,11 @@ public class WeCustomersVo {
     private Integer addMethod;
 
     //添加时间
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date firstAddTime;
 
 
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthday;
 
     //0-未知 1-男性 2-女性

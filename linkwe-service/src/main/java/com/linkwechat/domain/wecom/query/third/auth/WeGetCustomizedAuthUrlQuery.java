@@ -7,7 +7,7 @@ import lombok.*;
 import java.util.List;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 获取带参授权链接
  * @date 2022/3/13 10:56
  **/

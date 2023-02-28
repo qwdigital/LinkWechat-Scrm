@@ -144,4 +144,14 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 
 
     void batchAddOrUpdate(@Param("weUserList") List<SysUser> SysUser);
+
+
+    /**
+     * 获取当前系统下所有可用用户，不做数据权限过滤
+     * @param weUserIds
+     * @param positions
+     * @param deptIds
+     * @return
+     */
+    List<SysUser> findAllSysUser(@Param("weUserIds") String weUserIds,@Param("positions") String positions,@Param("deptIds") String deptIds);
 }

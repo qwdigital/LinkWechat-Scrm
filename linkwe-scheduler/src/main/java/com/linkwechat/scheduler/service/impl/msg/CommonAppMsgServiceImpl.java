@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.stream.Collectors;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 通用应用消息
  * @date 2022/4/14 23:45
  **/

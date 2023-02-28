@@ -1,5 +1,6 @@
 package com.linkwechat.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -58,6 +59,18 @@ public class WeAllocateCustomer extends BaseEntity
      * 失败原因
      */
     private String failReason;
+
+    @TableField(exist = false)
+    private String takeUserName;
+
+    @TableField(exist = false)
+    private String customerName;
+
+    @TableField(exist = false)
+    private String department;
+
+    @TableField(exist = false)
+    private String firstUserId;
 
 
     /**

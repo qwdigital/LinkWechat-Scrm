@@ -4,12 +4,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.web.mapper.SysRoleDeptMapper">
 
-	<resultMap type="com.linkwechat.web.domain.SysRoleDept" id="SysRoleDeptResult">
+	<resultMap type="SysRoleDept" id="SysRoleDeptResult">
 		<result property="roleId"     column="role_id"      />
 		<result property="deptId"     column="dept_id"      />
 	</resultMap>
 
-	<resultMap id="deptResult" type="com.linkwechat.common.core.domain.entity.SysDept">
+	<resultMap id="deptResult" type="SysDept">
 		<id property="deptId" column="dept_id"/>
 		<result property="parentId" column="parent_id"/>
 		<result property="deptName" column="dept_name"/>

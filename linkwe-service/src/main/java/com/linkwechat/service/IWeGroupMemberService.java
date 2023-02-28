@@ -3,6 +3,7 @@ package com.linkwechat.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.WeGroupMember;
 import com.linkwechat.domain.groupchat.vo.WeGroupMemberVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 

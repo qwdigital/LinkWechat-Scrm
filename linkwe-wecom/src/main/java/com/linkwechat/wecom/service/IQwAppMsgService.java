@@ -6,7 +6,7 @@ import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.msg.WeAppMsgVo;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 消息
  * @date 2022/4/14 23:35
  **/

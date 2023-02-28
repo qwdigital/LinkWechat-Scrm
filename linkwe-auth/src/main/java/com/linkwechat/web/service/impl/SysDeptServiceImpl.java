@@ -1,5 +1,10 @@
 package com.linkwechat.web.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.annotation.DataScope;
@@ -14,6 +19,8 @@ import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.system.dept.query.SysDeptQuery;
+import com.linkwechat.domain.system.dept.vo.SysDeptVo;
 import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.domain.wecom.query.department.WeDeptQuery;
 import com.linkwechat.domain.wecom.vo.department.WeDeptVo;
@@ -310,8 +317,23 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
             }
             return d;
         }).collect(Collectors.toList());
+
+        //不存在的移除
+        if(CollectionUtil.isNotEmpty(sysDeptList)){
+            this.remove(
+                    new LambdaQueryWrapper<SysDept>()
+                            .notIn(SysDept::getDeptId,sysDeptList.stream().map(SysDept::getDeptId).collect(Collectors.toList())
+                            ));
+        }
+
         saveOrUpdateBatch(sysDeptList);
         return sysDeptList;
+    }
+
+    @Override
+    public List<SysDept> findSysDeptByIds(List<String> deptIds) {
+        return this.baseMapper.selectList(new LambdaQueryWrapper<SysDept>()
+                .in(SysDept::getDeptId,deptIds));
     }
 
     /**
@@ -353,5 +375,19 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      */
     private boolean hasChild(List<SysDept> list, SysDept t) {
         return getChildList(list, t).size() > 0 ? true : false;
+    }
+
+
+    @Override
+    public List<SysDeptVo> getListByDeptIds(SysDeptQuery query) {
+        List<SysDept> deptList = list(new LambdaQueryWrapper<SysDept>().in(SysDept::getDeptId, query.getDeptIds()).eq(SysDept::getDelFlag, 0));
+        if (CollectionUtil.isNotEmpty(deptList)) {
+            return deptList.stream().map(item -> {
+                SysDeptVo sysDeptVo = new SysDeptVo();
+                BeanUtil.copyProperties(item, sysDeptVo);
+                return sysDeptVo;
+            }).collect(Collectors.toList());
+        }
+        return new ArrayList<>();
     }
 }

@@ -21,7 +21,7 @@ public interface IWeStrackStageService extends IService<WeStrackStage> {
     /**
      * 删除商阶
      * @param id
-     * @param growStageKey
+     * @param growStageVal
      */
-    void remove(String id,Integer growStageKey);
+    void remove(String id,Integer growStageVal);
 }

@@ -497,6 +497,7 @@
         <module>linkwe-scheduler</module>
         <module>linkwe-framework</module>
         <module>linkwe-service</module>
+        <module>linkwe-event-task</module>
     </modules>
 
     <build>

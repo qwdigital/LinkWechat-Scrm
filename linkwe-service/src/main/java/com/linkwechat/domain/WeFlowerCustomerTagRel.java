@@ -42,7 +42,10 @@ public class WeFlowerCustomerTagRel extends BaseEntity {
      */
     private Boolean isCompanyTag;
 
-
+    /**
+     *
+     */
+//    @TableLogic
     private Integer delFlag;
 
 

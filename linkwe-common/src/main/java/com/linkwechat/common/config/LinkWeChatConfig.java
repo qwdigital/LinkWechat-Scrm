@@ -7,6 +7,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * 读取项目相关配置
  *
@@ -35,6 +37,11 @@ public class LinkWeChatConfig {
      * 是否可以修改密码
      */
     private boolean editPwd = true;
+
+    /**
+     * 是否是演示环境 true:是 false:不是
+     */
+    private boolean demoEnviron=false;
     /**
      * 上传路径
      */
@@ -52,16 +59,42 @@ public class LinkWeChatConfig {
     private String seasRedirectUrl;
 
 
+
     /**
-     * 群sop与老客标签建群地址
+     * 老客标签建群地址
      */
-    private String sopTagRedirectUrl;
+    private String tagRedirectUrl;
+
+
+    /**
+     * 客户sop h5跳转地址
+     */
+    private String customerSopRedirectUrl;
+
+
+    /**
+     * 客群sop h5跳转地址
+     */
+    private String groupSopRedirectUrl;
+
+
+    /**
+     * 直播页面h5链接
+     */
+    private String liveUrl;
+
+
 
 
     /**
      * 流失客户地址
      */
     private String lostCustomerRedirectUrl;
+
+    /**
+     * 移动端域名
+     */
+    private String h5Domain;
 
 
 
@@ -83,6 +116,10 @@ public class LinkWeChatConfig {
     private String[] anonUrl;
 
 
+    /**
+     * auth服务中授权微信端相关的授权的接口
+     */
+    private List<String> wxAuthUrl;
 
     /**
      * 服务商id
@@ -143,6 +180,11 @@ public class LinkWeChatConfig {
      *  导购码
      */
     private String guideCodeUrl;
+
+    /**
+     * 识客码
+     */
+    private String knowCustomerUrl;
 
     /**
      * 导购群码
@@ -336,14 +378,6 @@ public class LinkWeChatConfig {
         this.seasRedirectUrl = seasRedirectUrl;
     }
 
-    public String getSopTagRedirectUrl() {
-        return sopTagRedirectUrl;
-    }
-
-    public void setSopTagRedirectUrl(String sopTagRedirectUrl) {
-        this.sopTagRedirectUrl = sopTagRedirectUrl;
-    }
-
     public WeSideBarConfig getWeSideBarConfig() {
         return weSideBarConfig;
     }
@@ -375,6 +409,9 @@ public class LinkWeChatConfig {
     public void setDataSynchInterval(int dataSynchInterval) {
         this.dataSynchInterval = dataSynchInterval;
     }
+
+
+
 
 
 }

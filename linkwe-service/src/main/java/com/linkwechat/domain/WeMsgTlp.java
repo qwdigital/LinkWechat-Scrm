@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.domain.material.entity.WeMaterial;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -29,11 +30,24 @@ import lombok.Data;
 @TableName("we_msg_tlp")
 public class WeMsgTlp extends BaseEntity {
 
-    @ApiModelProperty(value = "id")
-    @TableId(type = IdType.AUTO)
-    @TableField("id")
+
+    @TableId
     private Long id;
 
+
+    private Long categoryId;
+
+
+    /**
+     * 1欢迎语模板2群发模板3sop模板
+     */
+    private Integer templateType;
+
+
+    /**
+     * 模板内容
+     */
+    private String templateInfo;
 
     /**
      * 使用员工名称，用逗号隔开
@@ -65,6 +79,11 @@ public class WeMsgTlp extends BaseEntity {
     @ApiModelProperty(value = "是否删除:0有效,1删除")
     @TableField("del_flag")
     private Integer delFlag;
+
+
+
+    @TableField(exist = false)
+    private List<WeMaterial> weMaterialList;
 
     @Data
     public static  class  Applet{

@@ -24,6 +24,8 @@ public enum MessageNoticeType {
 
     DELETEWEUSER(5,"客户删除员工"),
 
+    CUSTOMER_SOP(9,"客户sop"),
+    GROUP_SOP(10,"客群sop"),
 
     SOP(2, "群sop");
 

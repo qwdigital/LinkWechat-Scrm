@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 获取带参授权链接
  * @date 2022/3/13 11:34
  **/

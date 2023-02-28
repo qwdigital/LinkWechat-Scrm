@@ -50,6 +50,7 @@ public class WeCustomerPortraitController extends BaseController{
     @Autowired
     private  IWeMomentsService iWeMomentsService;
 
+
     @Autowired
     private IWeSysFieldTemplateService iWeSysFieldTemplateService;
 
@@ -232,35 +233,6 @@ public class WeCustomerPortraitController extends BaseController{
     }
 
 
-//    /**
-//     * 删除轨迹
-//     * @param trajectoryId
-//     * @return
-//     */
-//    @DeleteMapping(value = "/removeTrajectory/{trajectoryId}")
-//    public AjaxResult removeTrajectory(@PathVariable String trajectoryId){
-//        iWeCustomerTrajectoryService.updateById(WeCustomerTrajectory.builder()
-//                .id(trajectoryId)
-//                .status(Constants.DELETE_CODE)
-//                .build());
-//        return AjaxResult.success();
-//    }
-//
-//    /**
-//     * 完成待办
-//     * @param trajectoryId
-//     * @return
-//     */
-//    @DeleteMapping(value = "/handleWait/{trajectoryId}")
-//    public AjaxResult handleWait(@PathVariable String trajectoryId){
-//        iWeCustomerTrajectoryService.updateById(WeCustomerTrajectory.builder()
-//                .id(trajectoryId)
-//                .status(Constants.HANDLE_SUCCESS)
-//                .build());
-//        return AjaxResult.success();
-//    }
-//
-
 
     /**
      * 个人朋友圈互动数据同步
@@ -274,7 +246,6 @@ public class WeCustomerPortraitController extends BaseController{
 
         return AjaxResult.success(WeConstans.SYNCH_TIP);
     }
-
 
     /**
      * 获取指定客户拥有的表单字段以及填充的值

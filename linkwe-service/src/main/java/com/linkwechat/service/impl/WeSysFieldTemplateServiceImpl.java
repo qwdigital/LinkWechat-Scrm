@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.enums.fieldtempl.CustomerPortraitFieldTempl;
 import com.linkwechat.common.utils.InviteCodeUtils;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeSysFieldTemplate;
 import com.linkwechat.mapper.WeSysFieldTemplateMapper;
@@ -71,12 +72,6 @@ public class WeSysFieldTemplateServiceImpl extends ServiceImpl<WeSysFieldTemplat
 
     @Override
     public void addSysField(WeSysFieldTemplate sysFieldTemplate) {
-        //设置排序
-//        WeSysFieldTemplate maxSysFieldTemplate = this.getOne(new LambdaQueryWrapper<WeSysFieldTemplate>()
-//                .orderByDesc(WeSysFieldTemplate::getLabelSort).last("limit 1"));
-//        if(null != maxSysFieldTemplate){
-//            sysFieldTemplate.setLabelSort(maxSysFieldTemplate.getLabelSort()+1);
-//        }
         //设置对应的val
         sysFieldTemplate.setLabelVal(InviteCodeUtils.generateInviteCode());
         List<WeSysFieldTemplate.OtherContent> otherContents = sysFieldTemplate.getOtherContent();

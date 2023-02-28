@@ -73,6 +73,11 @@ public enum WeMsgTypeEnum {
      */
     MINIPROGRAM("12", "miniprogram"),
 
+    /**
+     * 海报
+     */
+    POSTERS("13","posters")
+
     ;
     /**
      * 媒体类型

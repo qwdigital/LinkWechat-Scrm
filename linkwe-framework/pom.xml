@@ -15,6 +15,7 @@
     <description>
         framework框架核心
     </description>
+
     <build>
         <plugins>
             <plugin>

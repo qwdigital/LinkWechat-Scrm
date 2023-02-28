@@ -39,4 +39,14 @@ public interface IWeFormSurveyCatalogueService extends IService<WeFormSurveyCata
     List<WeFormSurveyCatalogue> getListIgnoreTenantId();
 
 
+
+    /**
+     * 更新，跳过租户判断
+     *
+     * @param weFormSurveyCatalogue
+     */
+    void updateByIdIgnoreTenantId(WeFormSurveyCatalogue weFormSurveyCatalogue);
+
+
+
 }

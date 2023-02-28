@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.web.mapper.SysLogininforMapper">
 
-	<resultMap type="com.linkwechat.web.domain.SysLogininfor" id="SysLogininforResult">
+	<resultMap type="SysLogininfor" id="SysLogininforResult">
 		<id     property="infoId"        column="info_id"           />
 		<result property="userName"      column="user_name"         />
 		<result property="status"        column="status"            />
@@ -16,12 +16,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="loginTime"     column="login_time"        />
 	</resultMap>
 
-	<insert id="insertLogininfor" parameterType="com.linkwechat.web.domain.SysLogininfor">
+	<insert id="insertLogininfor" parameterType="SysLogininfor">
 		insert into sys_logininfor (user_name, status, ipaddr, login_location, browser, os, msg, login_time)
 		values (#{userName}, #{status}, #{ipaddr}, #{loginLocation}, #{browser}, #{os}, #{msg}, sysdate())
 	</insert>
 	
-	<select id="selectLogininforList" parameterType="com.linkwechat.web.domain.SysLogininfor" resultMap="SysLogininforResult">
+	<select id="selectLogininforList" parameterType="SysLogininfor" resultMap="SysLogininforResult">
 		select info_id, user_name, ipaddr, login_location, browser, os, status, msg, login_time from sys_logininfor
 		<where>
 			<if test="ipaddr != null and ipaddr != ''">

@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.utils.MapUtils;
-import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeStrackStage;
 import com.linkwechat.service.IWeCustomerService;
@@ -49,10 +48,10 @@ public class WeStrackStageController extends BaseController {
      * @return
      */
     @PostMapping("/add")
-    public AjaxResult add(@RequestBody WeStrackStage weStrackStage){
+    public AjaxResult<WeStrackStage> add(@RequestBody WeStrackStage weStrackStage){
 
         iWeStrackStageService.add(weStrackStage);
-        return AjaxResult.success();
+        return AjaxResult.success(weStrackStage);
     }
 
 
@@ -76,9 +75,9 @@ public class WeStrackStageController extends BaseController {
      * @return 结果
      */
     @DeleteMapping(path = "/delete")
-    public AjaxResult delete(String id,Integer growStageKey) {
+    public AjaxResult delete(String id,Integer growStageVal) {
 
-        iWeStrackStageService.remove(id,growStageKey);
+        iWeStrackStageService.remove(id,growStageVal);
         return AjaxResult.success();
     }
 
@@ -98,6 +97,4 @@ public class WeStrackStageController extends BaseController {
         );
 
     }
-
-
 }

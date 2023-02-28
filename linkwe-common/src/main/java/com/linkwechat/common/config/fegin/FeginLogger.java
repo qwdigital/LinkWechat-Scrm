@@ -11,7 +11,7 @@ import static feign.Util.decodeOrDefault;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * @author danmo
+ * @author sxw
  * @description fegin日志统一输出
  * @date 2022/03/12 11:06
  **/

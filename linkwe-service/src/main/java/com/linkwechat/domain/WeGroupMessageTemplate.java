@@ -102,9 +102,11 @@ public class WeGroupMessageTemplate extends BaseEntity implements Serializable {
     private Date refreshTime;
 
 
-    
-    
-    
+
+
+    //多个业务id使用逗号隔开
+    @TableField(exist = false)
+    private String businessIds;
 
 
     /**
