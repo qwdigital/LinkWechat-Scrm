@@ -126,8 +126,18 @@
 			<if test="menuName != null and menuName != ''">menu_name = #{menuName},</if>
 			<if test="parentId != null">parent_id = #{parentId},</if>
 			<if test="orderNum != null and orderNum != ''">order_num = #{orderNum},</if>
-			<if test="path != null and path != ''">path = #{path},</if>
-			<if test="component != null and component != ''">component = #{component},</if>
+			<choose>
+				<when test="path != null and path != ''">path = #{path},</when>
+				<otherwise>
+					path = NULL,
+				</otherwise>
+			</choose>
+			<choose>
+				<when test="component != null and component != ''">component = #{component},</when>
+				<otherwise>
+					component = NULL,
+				</otherwise>
+			</choose>
 			<if test="isFrame != null and isFrame != ''">is_frame = #{isFrame},</if>
 			<if test="menuType != null and menuType != ''">menu_type = #{menuType},</if>
 			<if test="visible != null">visible = #{visible},</if>
