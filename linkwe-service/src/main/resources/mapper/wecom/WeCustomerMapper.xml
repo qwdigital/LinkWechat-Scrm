@@ -9,7 +9,8 @@
     <select id="findWeCustomerListIds" resultType="java.lang.String">
         SELECT wcr.id FROM we_customer wcr
         LEFT JOIN sys_user su on su.we_user_id=wcr.add_user_id
-        <where>
+        WHERE
+            su.del_flag=0 and su.is_user_leave=0
             <if test="weCustomerList.gender !=null">
                 AND wcr.gender=#{weCustomerList.gender}
             </if>
@@ -54,10 +55,14 @@
             <if test="weCustomerList.noTagCheck">
                 AND ISNULL(wcr.tag_ids) or LENGTH(TRIM(wcr.tag_ids)) =0
             </if>
+            <if test="weCustomerList.excludeTagIds !=null and weCustomerList.excludeTagIds !=''">
+                <foreach item="excludeTagId" index="index" collection="weCustomerList.excludeTagIds.split(',')">
+                    AND !FIND_IN_SET(#{excludeTagId},wcr.tag_ids)
+                </foreach>
+            </if>
             <if test="weCustomerList.beginTime !=null and weCustomerList.beginTime != '' and weCustomerList.endTime !='' and weCustomerList.endTime != null">
                 AND  date_format(wcr.add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
             </if>
-        </where>
         ORDER BY wcr.add_time desc
         <if test="pageDomain !=null">
             <if test="pageDomain.pageNum !=null and pageDomain.pageSize !=null">
@@ -67,15 +72,6 @@
 
     </select>
 
-
-<!--    <select id="findWeCustomerListExternalUserIds" resultType="java.lang.String">-->
-<!--         SELECT external_userid FROM we_customer-->
-<!--    </select>-->
-
-
-<!--    <select id="findWeCustomerListExternalUserIdsByAddUserId" resultType="java.lang.String">-->
-<!--        SELECT wcr.external_userid FROM we_customer wcr WHERE wcr.add_user_id=#{weUserId}-->
-<!--    </select>-->
 
 
     <select id="findWeUserIds" resultType="java.lang.String">
@@ -340,6 +336,7 @@
             we_group_member wgm
                 LEFT JOIN we_group wg ON wg.chat_id = wgm.chat_id
         WHERE wgm.del_flag=0 and wg.del_flag=0 AND wgm.user_id=#{userId}
+        GROUP BY  wg.chat_id
     </select>
 
     <select id="findUserNameByUserId" resultType="String">
@@ -349,6 +346,7 @@
 
     <select id="findCustomerByOperUseridAndCustomerId" resultType="com.linkwechat.domain.customer.vo.WeCustomerPortraitVo">
         SELECT
+            wc.id as customerId,
             wc.customer_name as name,
             wc.other_descr as remark,
             wc.phone as remarkMobiles,
@@ -482,6 +480,8 @@
         add_method=IFNULL(VALUES(add_method), we_customer.add_method),
         del_flag=IFNULL(VALUES(del_flag),we_customer.del_flag),
         `state`=IFNULL(VALUES(`state`),we_customer.state),
+        create_by=IFNULL(VALUES(create_by),we_customer.create_by),
+        create_by_id=IFNULL(VALUES(create_by_id),we_customer.create_by_id),
         update_by=IFNULL(VALUES(update_by),we_customer.update_by),
         update_by_id=IFNULL(VALUES(update_by_id),we_customer.update_by_id),
         update_time=IFNULL(VALUES(update_time),we_customer.update_time),
@@ -557,6 +557,54 @@
     <delete id="deleteWeCustomer">
         DELETE from we_customer where external_userid=#{externalUserId} and add_user_id=#{userId}
     </delete>
+
+
+    <select id="findWeCustomerListEuIds" resultType="java.lang.String">
+        SELECT wcr.external_userid FROM we_customer wcr
+        LEFT JOIN sys_user su on su.we_user_id=wcr.add_user_id
+        <where>
+            <if test="weCustomerList.name != null and weCustomerList.name !=''">
+                AND  CONCAT( IFNULL(wcr.customer_name,''),IFNULL(su.user_name,''))
+                LIKE CONCAT('%',#{weCustomerList.name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="weCustomerList.customerType !=null">
+                AND wcr.customer_type=#{weCustomerList.customerType}
+            </if>
+
+            <if test="weCustomerList.trackState !=null">
+                AND wcr.track_state=#{weCustomerList.trackState}
+            </if>
+            <if test="weCustomerList.isFilterLossCustomer">
+                AND wcr.track_state != 5
+            </if>
+            <if test="weCustomerList.addMethod !=null">
+                AND wcr.add_method=#{weCustomerList.addMethod}
+            </if>
+            <if test="weCustomerList.tagIds !=null and weCustomerList.tagIds !=''">
+                <foreach item="tagId" index="index" collection="weCustomerList.tagIds.split(',')">
+                    AND FIND_IN_SET(#{tagId},wcr.tag_ids)
+                </foreach>
+            </if>
+
+            <if test="weCustomerList.beginTime !=null and weCustomerList.beginTime != '' and weCustomerList.endTime !='' and weCustomerList.endTime != null">
+                AND  date_format(wcr.add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
+            </if>
+
+            <if test="weCustomerList.firstUserId !=null">
+                AND wcr.add_user_id in
+                <foreach collection="weCustomerList.firstUserId.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+
+            </if>
+
+            <if test="weCustomerList.delFlag != null">
+                AND wcr.del_flag = #{weCustomerList.delFlag}
+            </if>
+        </where>
+        ORDER BY wcr.add_time desc
+    </select>
+
 
 
 </mapper>

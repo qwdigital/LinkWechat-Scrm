@@ -79,7 +79,7 @@ public class WeAgentMsgServiceImpl extends ServiceImpl<WeAgentMsgMapper, WeAgent
             body.setCorpId(SecurityUtils.getCorpId());
             body.setCorpUserIds(query.getToUser());
             body.setDeptIds(query.getToParty());
-            body.setTagIds(query.getToParty());
+            body.setTagIds(query.getToTag());
             body.setCorpUserIds(query.getToUser());
             body.setCallBackId(agentMsg.getId());
             qwAppSendMsgService.appMsgSend(body);

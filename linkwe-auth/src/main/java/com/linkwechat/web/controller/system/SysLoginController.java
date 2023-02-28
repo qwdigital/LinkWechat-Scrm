@@ -8,11 +8,13 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.model.LoginBody;
 import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.wecom.query.WeCorpQrQuery;
 import com.linkwechat.fegin.QwUserClient;
 import com.linkwechat.service.IWeCorpAccountService;
+import com.linkwechat.web.domain.Sys;
 import com.linkwechat.web.domain.vo.LoginParamVo;
 import com.linkwechat.web.service.SysLoginService;
 import io.swagger.annotations.ApiParam;
@@ -65,11 +67,20 @@ public class SysLoginController {
             return AjaxResult.error(HttpStatus.NOT_TO_CONFIG,"请使用超管账号登陆系统做相关配置");
         }
 
-        String joinCorpQr = redisService.getCacheObject(WeConstans.JOINCORPQR);
-        if(StringUtils.isEmpty(joinCorpQr)){
-            joinCorpQr=qwUserClient.getJoinQrcode(new WeCorpQrQuery()).getData().getJoinQrcode();
-            redisService.setCacheObject(WeConstans.JOINCORPQR,joinCorpQr, WeConstans.JOINCORPQR_EFFETC_TIME , TimeUnit.SECONDS);
+
+
+        String joinCorpQr="";
+
+        if(!linkWeChatConfig.isDemoEnviron()){
+            joinCorpQr = redisService.getCacheObject(WeConstans.JOINCORPQR);
+            if(StringUtils.isEmpty(joinCorpQr)){
+                joinCorpQr=qwUserClient.getJoinQrcode(new WeCorpQrQuery()).getData().getJoinQrcode();
+                redisService.setCacheObject(WeConstans.JOINCORPQR,joinCorpQr, WeConstans.JOINCORPQR_EFFETC_TIME , TimeUnit.SECONDS);
+            }
+        }else{
+            joinCorpQr=linkWeChatConfig.getCustomerServiceQrUrl();
         }
+
 
 
         return AjaxResult.success(
@@ -112,60 +123,7 @@ public class SysLoginController {
         );
     }
 
-    @GetMapping("/getTestToken")
-    public AjaxResult<Map<String, Object>> getTestToken() {
-
-        return AjaxResult.success(
-                sysLoginService.login("admin","linkwechat@123")
-        );
-    }
 
 
-
-
-    /**
-     * 微信登录跳转
-     *
-     * @return
-     */
-    @GetMapping("/wxRedirect")
-    public AjaxResult  wxRedirect(@ApiParam(value = "回调地址",required = true) String redirectUrl){
-
-        WeCorpAccount weCorpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
-
-        if(null == weCorpAccount || StringUtils.isEmpty(weCorpAccount.getWxAppId())){
-
-            return AjaxResult.error("公众号相关配置不可为空");
-        }
-
-        // 微信开放平台授权baseUrl
-        String baseUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_userinfo&state=%s#wechat_redirect";
-        try {
-            redirectUrl = URLEncoder.encode(redirectUrl, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            throw new WeComException("回调地址解析失败");
-        }
-        //todo
-
-        String state = "linkwechat";
-        String qrcodeUrl = String.format(
-                baseUrl,
-                weCorpAccount.getWxAppId(),
-                redirectUrl,
-                state);
-        return AjaxResult.success(qrcodeUrl);
-    }
-
-    /**
-     * 微信登录
-     *
-     * @return
-     */
-    @GetMapping("/wxLogin")
-    public AjaxResult<String> wxLogin(@ApiParam(value = "URL上的code参数",required = true) String code){
-        Map<String, Object> map = sysLoginService.wxLogin(code);
-        return AjaxResult.success(map);
-    }
 
 }

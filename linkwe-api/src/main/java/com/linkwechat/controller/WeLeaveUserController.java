@@ -1,16 +1,17 @@
 package com.linkwechat.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.CorpUserEnum;
-import com.linkwechat.domain.WeAllocateCustomer;
-import com.linkwechat.domain.WeAllocateGroups;
-import com.linkwechat.domain.WeLeaveUser;
-import com.linkwechat.domain.WeLeaveUserInfoAllocate;
+import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.*;
 import com.linkwechat.service.IWeLeaveUserService;
+import com.linkwechat.service.IWeSynchRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -29,35 +30,37 @@ public class WeLeaveUserController extends BaseController {
     @Autowired
     private IWeLeaveUserService iWeLeaveUserService;
 
+    @Autowired
+    private IWeSynchRecordService iWeSynchRecordService;
+
     /**
-     * 离职未分配列表
+     * 离职员工列表
      *
      * @param weLeaveUser
      * @return
      */
-    @GetMapping({"/leaveUserNoAllocateList"})
-    public TableDataInfo<List<WeLeaveUser>> leaveUserNoAllocateList(WeLeaveUser weLeaveUser) {
+    @GetMapping({"/leaveUserList"})
+    public TableDataInfo<List<SysLeaveUser>> leaveUserList(SysLeaveUser weLeaveUser) {
         startPage();
-        weLeaveUser.setIsAllocate(CorpUserEnum.NO_IS_ALLOCATE.getKey());
-        List<WeLeaveUser> list = iWeLeaveUserService.leaveNoAllocateUserList(weLeaveUser);
-        return getDataTable(list);
+        List<SysLeaveUser> sysLeaveUsers = iWeLeaveUserService.list(new LambdaQueryWrapper<SysLeaveUser>()
+                        .eq(weLeaveUser.getIsAllocate()!=null,SysLeaveUser::getIsAllocate,weLeaveUser.getIsAllocate())
+                .like(StringUtils.isNotEmpty(weLeaveUser.getUserName()),SysLeaveUser::getUserName,weLeaveUser.getUserName())
+                .apply(StringUtils.isNotEmpty(weLeaveUser.getBeginTime())&&StringUtils.isNotEmpty(weLeaveUser.getEndTime()),
+                        "date_format(dimission_time,'%Y-%m-%d') BETWEEN '"+
+                                weLeaveUser.getBeginTime()
+                                +"' AND '"+
+                                weLeaveUser.getEndTime()+"'")
+                .orderByDesc(SysLeaveUser::getDimissionTime));
+        TableDataInfo dataTable = getDataTable(sysLeaveUsers);
+        dataTable.setLastSyncTime(
+                iWeSynchRecordService.findUpdateLatestTime(SynchRecordConstants.SYNCH_LEAVE_USER)
+        );//最近同步时间
+
+        return dataTable;
     }
 
 
 
-    /**
-     * 离职已分配列表
-     *
-     * @param weLeaveUserVo
-     * @return
-     */
-    @GetMapping({"/leaveUserAllocateList"})
-    public TableDataInfo<List<WeLeaveUser>> leaveUserAllocateList(WeLeaveUser weLeaveUserVo) {
-        startPage();
-        weLeaveUserVo.setIsAllocate(CorpUserEnum.YES_IS_ALLOCATE.getKey());
-        List<WeLeaveUser> list = iWeLeaveUserService.leaveAllocateUserList(weLeaveUserVo);
-        return getDataTable(list);
-    }
 
     /**
      * 离职分配
@@ -99,6 +102,19 @@ public class WeLeaveUserController extends BaseController {
         startPage();
         List<WeAllocateGroups> list = iWeLeaveUserService.getAllocateGroups(weAllocateGroups);
         return getDataTable(list);
+    }
+
+
+    /**
+     * 离职员工相关同步
+     * @return
+     */
+    @GetMapping("/synchLeaveUser")
+    public AjaxResult synchLeaveUser(){
+
+        iWeLeaveUserService.synchLeaveSysUser();
+
+        return AjaxResult.success();
     }
 
 

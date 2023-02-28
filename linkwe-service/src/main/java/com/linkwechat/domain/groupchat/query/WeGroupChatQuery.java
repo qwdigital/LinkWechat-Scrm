@@ -2,15 +2,21 @@ package com.linkwechat.domain.groupchat.query;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 客群入参
  * @date 2022/4/2 13:47
  **/
 @ApiModel
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeGroupChatQuery{
 
     @ApiModelProperty(value = "主键Id")
@@ -45,4 +51,9 @@ public class WeGroupChatQuery{
 
     //标签名,多个使用逗号隔开
     private String tags;
+
+    //群人数上限
+    private Integer groupMemberUp;
+    //群人数下限
+    private Integer groupMemberDown;
 }

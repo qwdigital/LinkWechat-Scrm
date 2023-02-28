@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeLiveMapper">
+
+
+    <resultMap id="baseMap" type="com.linkwechat.domain.live.WeLive">
+        <result column="id" property="id"></result>
+        <result column="live_title" property="liveTitle"></result>
+        <result column="live_we_userid" property="liveWeUserid"></result>
+        <result column="live_start_time" property="liveStartTime"></result>
+        <result column="live_start_date" property="liveStartDate"></result>
+        <result column="live_end_time" property="liveEndTime"></result>
+        <result column="live_end_date" property="liveEndDate"></result>
+        <result column="living_duration" property="livingDuration"></result>
+        <result column="actual_start_time" property="actualStartTime"></result>
+        <result column="actual_end_time" property="actualEndTime"></result>
+        <result column="live_state" property="liveState"></result>
+        <result column="live_desc" property="liveDesc"></result>
+        <result column="living_id" property="livingId"></result>
+        <result column="viewer_num" property="viewerNum"></result>
+        <result column="online_count" property="onlineCount"></result>
+        <result column="mic_num" property="micNum"></result>
+        <result column="comment_num" property="commentNum"></result>
+        <result column="subscribe_count" property="subscribeCount"></result>
+        <result column="start_reminder" property="startReminder"></result>
+        <result column="start_spec_reminder" property="startSpecReminder"></result>
+        <result column="send_we_user" property="sendWeUser" typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"></result>
+        <result column="open_replay" property="openReplay"></result>
+        <result column="replay_status" property="replayStatus"></result>
+        <result column="target_type" property="targetType"></result>
+        <result column="send_target" property="sendTarget" typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"></result>
+        <result column="create_time" property="createTime"></result>
+        <result column="create_by" property="createBy"></result>
+        <result column="create_by_id" property="createById"></result>
+        <result column="update_time" property="updateTime"></result>
+        <result column="update_by" property="updateBy"></result>
+        <result column="update_by_id" property="updateById"></result>
+        <result column="del_flag" property="delFlag"></result>
+        <result column="liveUserName" property="liveUserName"></result>
+        <result column="deptName" property="deptName"></result>
+        <result column="avatar" property="avatar"></result>
+        <result column="living_actual_duration" property="livingActualDuration"></result>
+    </resultMap>
+
+    <select id="findLives" resultMap="baseMap">
+        SELECT
+            wl.id,
+            wl.live_title,
+            wl.live_we_userid,
+            wl.live_start_time,
+            wl.live_start_date,
+            wl.live_end_time,
+            wl.live_end_date,
+            wl.living_duration,
+            wl.actual_start_time,
+            wl.actual_end_time,
+            wl.living_actual_duration,
+            wl.live_state,
+            wl.live_desc,
+            wl.living_id,
+            wl.viewer_num,
+            wl.online_count,
+            wl.mic_num,
+            wl.comment_num,
+            wl.subscribe_count,
+            wl.start_reminder,
+            wl.start_spec_reminder,
+            wl.send_we_user,
+            wl.open_replay,
+            wl.replay_status,
+            wl.target_type,
+            wl.send_target,
+            wl.create_time,
+            wl.create_by,
+            wl.create_by_id,
+            wl.update_time,
+            wl.update_by,
+            wl.update_by_id,
+            wl.del_flag,
+            (
+                SELECT
+                    GROUP_CONCAT( su.user_name )
+                FROM
+                    sys_user su WHERE su.we_user_id = wl.live_we_userid
+            )  as liveUserName,
+            (SELECT GROUP_CONCAT(distinct sd.dept_name)  FROM sys_dept sd left join sys_user_dept sud ON sud.dept_id=sd.dept_id
+                                                                          left join  sys_user su on su.we_user_id = sud.we_user_id   where su.we_user_id=wl.live_we_userid) deptName,
+            (
+                SELECT
+                    GROUP_CONCAT( su.avatar )
+                FROM
+                    sys_user su WHERE su.we_user_id = wl.live_we_userid
+            )  as avatar
+        FROM
+            we_live wl
+            ${ew.customSqlSegment}
+    </select>
+
+</mapper>

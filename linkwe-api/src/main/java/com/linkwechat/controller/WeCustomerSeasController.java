@@ -13,6 +13,7 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.WeCustomerSeas;
+import com.linkwechat.domain.live.WeLive;
 import com.linkwechat.domain.wecom.vo.customer.seas.CustomerSeasRecordVo;
 import com.linkwechat.service.IWeCustomerSeasService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ import java.util.stream.IntStream;
 public class WeCustomerSeasController extends BaseController {
     @Autowired
     private IWeCustomerSeasService iWeCustomerSeasService;
+
 
     /**
      * 客户公海模版下载
@@ -238,7 +240,7 @@ public class WeCustomerSeasController extends BaseController {
         if(StringUtils.isEmpty(weCustomerSea.getPhone())){
             return AjaxResult.error("手机号不可为空");
         }
-        iWeCustomerSeasService.update(WeCustomerSeas.builder().addState(new Integer(1)).build()
+        iWeCustomerSeasService.update(WeCustomerSeas.builder().addState(new Integer(3)).build()
                 ,new LambdaQueryWrapper<WeCustomerSeas>().eq(WeCustomerSeas::getPhone,weCustomerSea.getPhone()));
 
         return AjaxResult.success();

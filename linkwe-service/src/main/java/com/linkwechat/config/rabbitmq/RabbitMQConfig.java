@@ -155,6 +155,7 @@ public class RabbitMQConfig {
     }
 
 
+
     /**
      * 客户同步队列
      *
@@ -351,6 +352,16 @@ public class RabbitMQConfig {
     }
 
     /**
+     * 客服会话客服超时队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quKfChatKfTimeOutMsg() {
+        return new Queue(rabbitMQSettingConfig.getWeKfChatKfTimeOutMsgQu());
+    }
+
+    /**
      * 客服会话结束队列
      *
      * @return
@@ -493,6 +504,16 @@ public class RabbitMQConfig {
     }
 
     /**
+     * 客服会话客服超时队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeKfChatKfTimeOutMsg() {
+        return BindingBuilder.bind(quKfChatKfTimeOutMsg()).to(kfChatMsgDelayEx()).with(rabbitMQSettingConfig.getWeKfChatKfTimeOutMsgRk()).noargs();
+    }
+
+    /**
      * 客服会话结束队列绑定交换机
      *
      * @return
@@ -554,6 +575,67 @@ public class RabbitMQConfig {
     }
 
     /**
+     * sop队列绑定交换机
+     * @return
+     */
+    @Bean
+    public Binding bindingSopExchange(){
+        return BindingBuilder.bind(sopQu()).to(sopEx()).with(rabbitMQSettingConfig.getSopRk()).noargs();
+    }
+
+
+    /**
+     * sop队列
+     * @return
+     */
+    @Bean
+    public Queue sopQu(){
+        return new Queue(rabbitMQSettingConfig.getSopQu());
+    }
+
+    /**
+     * sop交换机
+     * @return
+     */
+    @Bean
+    public Exchange sopEx(){
+        // 声明路由交换机，durable:在rabbitmq重启后，交换机还在
+        return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getSopEx()).durable(true).build();
+    }
+
+
+
+    /**
+     * 直播交换机
+     * @return
+     */
+    @Bean
+    public Exchange liveEx(){
+        return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getWeLiveRk()).durable(true).build();
+    }
+
+    /**
+     * 直播队列绑定交换机
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeSyncWeLive(){
+        return BindingBuilder.bind(quWeLive()).to(syncEx()).with(rabbitMQSettingConfig.getWeLiveRk()).noargs();
+    }
+
+    /**
+     * 直播同步队列
+     * @return
+     */
+    @Bean
+    public Queue quWeLive(){
+        return new Queue(rabbitMQSettingConfig.getLiveQu());
+    }
+
+
+
+
+    /**
      * 同步商品图册订单绑定交换机
      *
      * @return
@@ -561,6 +643,29 @@ public class RabbitMQConfig {
     @Bean
     public Binding bindingExchangeProductOrder() {
         return BindingBuilder.bind(quProductOrder()).to(syncEx()).with(rabbitMQSettingConfig.getWeProductOrderQu()).noargs();
+    }
+
+
+    /**
+     * 同步离职成员队列
+     * @return
+     */
+    @Bean
+    public Queue quLeaveUser(){
+        return new Queue(rabbitMQSettingConfig.getLeaveAllocateUserQu());
+
+    }
+
+
+    /**
+     * 离职成员同步绑定交换机
+     * @return
+     */
+    @Bean
+    public Binding bindingQuLeaveUser(){
+
+        return BindingBuilder.bind(quLeaveUser()).to(syncEx()).with(rabbitMQSettingConfig.getWeLeaveAllocateUserRk()).noargs();
+
     }
 }
 

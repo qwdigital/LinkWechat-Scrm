@@ -9,6 +9,7 @@ import com.linkwechat.domain.qr.query.WeQrCodeListQuery;
 import com.linkwechat.domain.qr.vo.WeQrCodeDetailVo;
 import com.linkwechat.domain.qr.vo.WeQrCodeScanCountVo;
 import com.linkwechat.domain.qr.vo.WeQrScopeVo;
+import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 
 import java.util.List;
 
@@ -81,4 +82,23 @@ public interface IWeQrCodeService extends IService<WeQrCode> {
      * @param groupId 活码分组ID
      */
     void deleteQrGroup(Long groupId);
+
+
+    /**
+     * 根据员工id创建活码
+     * @param weUserIds 员工id
+     * @param state 活码标识
+     * @return
+     */
+    WeAddWayVo createQrbyWeUserIds(List<String> weUserIds, String state);
+
+
+
+    /**
+     * 更新员工活码
+     * @param weUserIds 员工id
+     * @param  configId 活码配置id如果生成了下次更新需要
+     * @return
+     */
+    void updateQrbyWeUserIds(List<String> weUserIds, String configId);
 }

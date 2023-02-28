@@ -207,6 +207,13 @@ public class SysUser extends BaseEntity {
     @TableField("open_userid")
     private String openUserid;
 
+    /**
+     * 客服接待状态。1:接待中,2:停止接待
+     */
+    @ApiModelProperty(value = "接待状态。1:接待中,2:停止接待")
+    @TableField("kf_status")
+    private Integer kfStatus;
+
 
 
 
@@ -222,6 +229,12 @@ public class SysUser extends BaseEntity {
      * 离职状态员工，数据分配状态:0:未分配;1:已分配
      */
     private Integer isAllocate;
+
+
+    /**
+     * 是否离职1:是；0:否
+     */
+    private Integer isUserLeave;
 
 
     /**

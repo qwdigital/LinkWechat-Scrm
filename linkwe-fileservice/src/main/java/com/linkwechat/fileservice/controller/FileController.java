@@ -92,7 +92,7 @@ public class FileController {
      * 腾讯云上传参数
      *
      * @param
-     * @return {@link AjaxResult<   Map  < String, Object>>}
+     * @return {@link AjaxResult<  Map < String, Object>>}
      * @author WangYX
      * @date 2022/11/01 10:12
      */
@@ -114,5 +114,8 @@ public class FileController {
 
         return AjaxResult.success(result);
     }
+
+
+
 
 }

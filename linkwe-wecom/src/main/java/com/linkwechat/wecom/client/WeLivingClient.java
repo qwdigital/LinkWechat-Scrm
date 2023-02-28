@@ -4,7 +4,7 @@ import com.dtflys.forest.annotation.*;
 import com.linkwechat.domain.wecom.query.living.*;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.living.*;
-import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
+import com.linkwechat.wecom.interceptor.WeLiveAccessTokenInterceptor;
 import com.linkwechat.wecom.retry.WeCommonRetryWhen;
 
 /**
@@ -13,7 +13,7 @@ import com.linkwechat.wecom.retry.WeCommonRetryWhen;
  * @author danmo
  * @date 2022年10月11日 16:09
  */
-@BaseRequest(baseURL = "${weComServerUrl}", interceptor = WeAccessTokenInterceptor.class)
+@BaseRequest(baseURL = "${weComServerUrl}", interceptor = WeLiveAccessTokenInterceptor.class)
 @Retry(maxRetryCount = "3", maxRetryInterval = "1000", condition = WeCommonRetryWhen.class)
 public interface WeLivingClient {
 

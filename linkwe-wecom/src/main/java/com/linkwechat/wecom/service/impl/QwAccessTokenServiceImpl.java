@@ -91,6 +91,17 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
         return findAccessToken(corpId, WeConstans.WE_KF_ACCESS_TOKEN);
     }
 
+
+    /**
+     * 直播token
+     * @param corpId
+     * @return
+     */
+    @Override
+    public String findLiveAccessToken(String corpId) {
+        return findAccessToken(corpId, WeConstans.WE_LIVE_ACCESS_TOKEN);
+    }
+
     @Override
     public String findBillAccessToken(String corpId) {
         return findAccessToken(corpId, WeConstans.WE_BILL_ACCESS_TOKEN);
@@ -121,6 +132,8 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
                 weCorpTokenVo = weTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getCorpSecret());
             } else if (WeConstans.WE_BILL_ACCESS_TOKEN.equals(accessTokenKey)) {
                 weCorpTokenVo = weTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getBillSecret());
+            }else if(WeConstans.WE_LIVE_ACCESS_TOKEN.equals(accessTokenKey)){
+                weCorpTokenVo = weTokenClient.getToken(wxCorpAccount.getCorpId(), wxCorpAccount.getLiveSecret());
             }
 
             if (Objects.nonNull(weCorpTokenVo) && StringUtils.isNotEmpty(weCorpTokenVo.getAccessToken())) {
@@ -186,5 +199,24 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
     @Override
     public void removeBillAccessToken(String corpId) {
         redisService.deleteObject(StringUtils.format(WeConstans.WE_BILL_ACCESS_TOKEN, corpId));
+    }
+
+    @Override
+    public void removeAllWeAccessToken(String corpId) {
+        removeCommonAccessToken(corpId);
+        removeContactAccessToken(corpId);
+        removeChatAccessToken(corpId);
+        removeKfAccessToken(corpId);
+        removeAddressBookAccessToken(corpId);
+        WeCorpAccount weCorpAccount = iWxCorpAccountService.getCorpAccountByCorpId(corpId);
+        if(null != weCorpAccount && StringUtils.isNotEmpty(weCorpAccount.getAgentId())){
+            removeAgentAccessToken(corpId,Integer.parseInt(weCorpAccount.getAgentId()));
+        }
+
+    }
+
+    @Override
+    public void removeLiveAccessToken(String corpId) {
+        redisService.deleteObject(StringUtils.format(WeConstans.WE_LIVE_ACCESS_TOKEN, corpId));
     }
 }

@@ -398,6 +398,15 @@ public class RedisService {
     }
 
     /**
+     * 自减
+     * @param key
+     * @return
+     */
+    public Long decrement(String key){
+        return redisTemplate.opsForValue().decrement(key);
+    }
+
+    /**
      * HyperLogLog计数
      * @param key
      * @param value

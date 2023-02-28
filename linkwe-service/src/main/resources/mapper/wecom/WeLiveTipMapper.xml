@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeLiveTipMapper">
+
+
+    <select id="findWeLiveTip" resultType="com.linkwechat.domain.live.WeLiveTip">
+        SELECT
+            wlt.*,
+            (SELECT GROUP_CONCAT(distinct su.user_name) FROM sys_user su WHERE su.we_user_id=wlt.send_we_userid) as sendWeuserName,
+        <choose>
+            <when test="sendTargetType==2">
+                (SELECT GROUP_CONCAT(distinct wc.customer_name) from we_customer wc WHERE wc.external_userid=wlt.send_target_id) as sendTargetName
+            </when>
+            <otherwise>
+                (SELECT GROUP_CONCAT(wg.group_name) FROM we_group wg WHERE wg.`owner`=wlt.send_target_id) as sendTargetName
+            </otherwise>
+        </choose>
+        FROM
+            we_live_tip wlt
+            ${ew.customSqlSegment}
+    </select>
+
+
+    <select id="findWeLiveTaskUserDetail" resultType="com.linkwechat.domain.live.WeLiveTaskUserDetail">
+        SELECT
+            su.user_name,
+            COUNT(wlt.id) as estimateSendNumber,
+            COUNT(IF(wlt.send_state=1,wlt.id,NULL))  as  actualSendNumber
+        FROM
+            we_live_tip wlt
+           LEFT JOIN sys_user su ON wlt.send_we_userid = su.we_user_id
+        WHERE
+             wlt.del_flag=0
+            <if test="sendTargetType != null ">
+                and wlt.send_target_type = #{sendTargetType}
+            </if>
+            <if test="liveId != null">
+              and wlt.live_id=#{liveId}
+            </if>
+            <if test="userName !=null and userName !=''">
+              and su.user_name like CONCAT('%',#{userName},'%')
+            </if>
+        GROUP BY
+            su.we_user_id
+    </select>
+
+
+    <select id="findWeLiveTaskCustomerDetail" resultType="com.linkwechat.domain.live.WeLiveTaskUserDetail">
+        SELECT
+            <choose>
+                <when test="sendTargetType==2">
+                    (SELECT GROUP_CONCAT(DISTINCT wg.group_name) FROM we_group wg WHERE wg.chat_id=wlt.send_target_id) as customerOrGroupName,
+                </when>
+                <otherwise>
+                    (SELECT GROUP_CONCAT(DISTINCT wc.customer_name) FROM  we_customer wc WHERE wc.add_user_id=wlt.send_we_userid and wc.external_userid=wlt.send_target_id) as customerOrGroupName,
+                </otherwise>
+            </choose>
+            su.user_name AS userName,
+            wlt.send_state,
+            wlt.update_time
+        FROM
+            we_live_tip wlt
+                LEFT JOIN 	sys_user su  ON su.we_user_id=wlt.send_we_userid
+        WHERE
+            wlt.del_flag=0
+            <if test="liveId != null ">
+               and wlt.live_id=#{liveId}
+            </if>
+             <if test="userName != null and userName !=''">
+                 and su.user_name like CONCAT('%',#{userName},'%')
+             </if>
+             <if test="sendState != null">
+                 AND wlt.send_state=#{sendState}
+             </if>
+            <if test="sendTargetType !=null">
+                AND wlt.send_target_type=#{sendTargetType}
+            </if>
+    </select>
+
+    <select id="findWeLiveTaskUserDetailTab" resultType="com.linkwechat.domain.live.WeLiveTaskDetailTab">
+        SELECT
+            COUNT(DISTINCT send_we_userid) as estimateSendNumber,
+            COUNT(DISTINCT if(send_state!=0,send_we_userid,NULL)) as actualSendNumber,
+            COUNT(DISTINCT if(send_state=0,send_we_userid,NULL)) as noSendNumber
+        FROM
+            we_live_tip
+        where  del_flag=0
+             <if test="liveId != null">
+                 AND  live_id=#{liveId}
+             </if>
+            <if test="sendTargetType != null">
+                AND send_target_type=#{sendTargetType}
+            </if>
+    </select>
+
+    <select id="findWeLiveTaskExecuteUserDetailTab" resultType="com.linkwechat.domain.live.WeLiveTaskDetailTab">
+        SELECT
+            SUM(aa.estimateSendNumber) as estimateSendNumber,
+            SUM(aa.actualSendNumber) as actualSendNumber,
+            SUM(aa.noSendNumber) as noSendNumber
+        FROM
+            (
+
+                SELECT
+                    COUNT(send_target_id) as estimateSendNumber,
+                    COUNT(if(send_state!=0,send_target_id,NULL)) as actualSendNumber,
+                    COUNT(if(send_state=0,send_target_id,NULL)) as noSendNumber
+                FROM
+                   we_live_tip
+                where  del_flag=0
+                    <if test="liveId != null">
+                        AND live_id=#{liveId}
+                    </if>
+                    <if test="sendTargetType != null">
+                        AND send_target_type=#{sendTargetType}
+                    </if>
+            )aa
+    </select>
+
+
+
+
+
+
+</mapper>

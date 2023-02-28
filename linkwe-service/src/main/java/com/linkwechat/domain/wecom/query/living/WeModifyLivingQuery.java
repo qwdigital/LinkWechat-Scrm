@@ -3,8 +3,7 @@ package com.linkwechat.domain.wecom.query.living;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * @author danmo
@@ -14,6 +13,9 @@ import lombok.EqualsAndHashCode;
 @ApiModel
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeModifyLivingQuery extends WeBaseQuery {
 
     /**
@@ -38,7 +40,7 @@ public class WeModifyLivingQuery extends WeBaseQuery {
      * 直播持续时长
      */
     @ApiModelProperty("直播持续时长")
-    private Long living_duration;
+    private Integer living_duration;
 
     /**
      * 直播的类型，0：通用直播，1：小班课，2：大班课，3：企业培训，4：活动直播，默认 0。其中大班课和小班课仅k12学校和IT行业类型能够发起

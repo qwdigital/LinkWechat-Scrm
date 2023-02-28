@@ -33,5 +33,7 @@ public interface WeGroupMemberMapper extends BaseMapper<WeGroupMember> {
 
 
     void physicalDelete(@Param("chatId") String chatId,@Param("userId") String userId);
+
+
 }
 

@@ -6,7 +6,7 @@ import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.kf.*;
 
 /**
- * @author danmo
+ * @author sxw
  * @version 1.0
  * @date 2022/04/16 21:10
  */

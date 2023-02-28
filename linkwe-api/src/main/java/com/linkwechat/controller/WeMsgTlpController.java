@@ -1,10 +1,15 @@
 package com.linkwechat.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.domain.WeMsgTlp;
+import com.linkwechat.domain.material.entity.WeContentTalk;
+import com.linkwechat.domain.material.entity.WeMaterial;
+import com.linkwechat.domain.msgtlp.dto.WeMsgTlpDto;
 import com.linkwechat.domain.msgtlp.query.WeMsgTlpAddQuery;
 import com.linkwechat.domain.msgtlp.query.WeMsgTlpQuery;
 import com.linkwechat.domain.msgtlp.vo.WeMsgTlpVo;
@@ -19,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 欢迎语管理
  * @date 2022/3/26 10:29
  **/
@@ -32,10 +37,18 @@ public class WeMsgTlpController extends BaseController {
     private IWeMsgTlpService weMsgTlpService;
 
     @ApiOperation(value = "新增欢迎语模板", httpMethod = "POST")
+    @Log(title = "欢迎语管理", businessType = BusinessType.OTHER)
+    @PostMapping("/addOrUpdate")
+    public AjaxResult addOrUpdate(@RequestBody @Validated WeMsgTlpDto weMsgTlpDto) {
+        weMsgTlpService.addOrUpdate(weMsgTlpDto);
+        return AjaxResult.success();
+    }
+
+    @ApiOperation(value = "新增欢迎语模板", httpMethod = "POST")
     @Log(title = "欢迎语管理", businessType = BusinessType.INSERT)
     @PostMapping("/add")
-    public AjaxResult addMsgTlp(@RequestBody @Validated WeMsgTlpAddQuery query) {
-        weMsgTlpService.addMsgTlp(query);
+    public AjaxResult addMsgTlp(@RequestBody @Validated WeMsgTlp weMsgTlp) {
+        weMsgTlpService.addMsgTlp(weMsgTlp);
         return AjaxResult.success();
     }
 
@@ -63,6 +76,25 @@ public class WeMsgTlpController extends BaseController {
         List<WeMsgTlpVo> weMsgTlpVoList = weMsgTlpService.getList(query);
         return getDataTable(weMsgTlpVoList);
     }
+
+    @ApiOperation(value = "预览", httpMethod = "GET")
+    @Log(title = "预览", businessType = BusinessType.SELECT)
+    @GetMapping("/preview/{tlpId}")
+    public AjaxResult preview(@PathVariable Long tlpId) {
+        WeMsgTlp weMsgTlp = weMsgTlpService.getOne(new LambdaQueryWrapper<WeMsgTlp>().eq(WeMsgTlp::getId, tlpId).eq(WeMsgTlp::getDelFlag, 0));
+        List<WeMaterial> weMaterialList = weMsgTlpService.preview(tlpId);
+        weMsgTlp.setWeMaterialList(weMaterialList);
+        return AjaxResult.success(weMsgTlp);
+    }
+
+    @ApiOperation(value = "批量分组", httpMethod = "GET")
+    @Log(title = "批量分组", businessType = BusinessType.SELECT)
+    @GetMapping("/updateCategory")
+    public AjaxResult updateCategory(WeMsgTlpQuery query) {
+        weMsgTlpService.updateCategory(query);
+        return AjaxResult.success();
+    }
+
 
     @ApiOperation(value = "获取欢迎语模板详情", httpMethod = "GET")
     @Log(title = "欢迎语管理", businessType = BusinessType.SELECT)

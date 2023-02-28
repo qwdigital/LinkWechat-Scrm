@@ -22,7 +22,7 @@ public class WeLivingInfoVo extends WeResultVo {
     @ApiModelProperty("直播ID列表")
     private LivingInfo livingInfo;
 
-    
+
     @ApiModel
     @Data
     public static class LivingInfo {
@@ -43,7 +43,7 @@ public class WeLivingInfoVo extends WeResultVo {
          * 直播时长，单位为秒
          */
         @ApiModelProperty("直播时长，单位为秒")
-        private Long livingDuration;
+        private Integer livingDuration;
 
         /**
          * 直播的状态，0：预约中，1：直播中，2：已结束，3：已过期，4：已取消

@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.web.mapper.SysPostMapper">
 
-	<resultMap type="com.linkwechat.web.domain.SysPost" id="SysPostResult">
+	<resultMap type="SysPost" id="SysPostResult">
 		<id     property="postId"        column="post_id"       />
 		<result property="postCode"      column="post_code"     />
 		<result property="postName"      column="post_name"     />
@@ -22,7 +22,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		from sys_post
     </sql>
 	
-	<select id="selectPostList" parameterType="com.linkwechat.web.domain.SysPost" resultMap="SysPostResult">
+	<select id="selectPostList" parameterType="SysPost" resultMap="SysPostResult">
 	    <include refid="selectPostVo"/>
 		<where>
 			<if test="postCode != null and postCode != ''">
@@ -72,7 +72,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		 where post_code=#{postCode} limit 1
 	</select>
 	
-	<update id="updatePost" parameterType="com.linkwechat.web.domain.SysPost">
+	<update id="updatePost" parameterType="SysPost">
  		update sys_post
  		<set>
  			<if test="postCode != null and postCode != ''">post_code = #{postCode},</if>
@@ -86,7 +86,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  		where post_id = #{postId}
 	</update>
  	
- 	<insert id="insertPost" parameterType="com.linkwechat.web.domain.SysPost" useGeneratedKeys="true" keyProperty="postId">
+ 	<insert id="insertPost" parameterType="SysPost" useGeneratedKeys="true" keyProperty="postId">
  		insert into sys_post(
  			<if test="postId != null and postId != 0">post_id,</if>
  			<if test="postCode != null and postCode != ''">post_code,</if>

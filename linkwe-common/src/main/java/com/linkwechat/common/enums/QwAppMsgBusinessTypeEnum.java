@@ -3,7 +3,7 @@ package com.linkwechat.common.enums;
 import lombok.Getter;
 
 /**
- * @author danmo
+ * @author sxw
  * @description
  * @date 2022/4/14 18:37
  **/

@@ -26,6 +26,13 @@ public class WePoster {
      * 海报标题
      */
     @ApiModelProperty(value = "海报标题")
+    private String materialName;
+
+    /**
+     * 海报标题
+     */
+    @Deprecated
+    @ApiModelProperty(value = "海报标题")
     private String title;
 
     /**
@@ -66,6 +73,20 @@ public class WePoster {
 
     @ApiModelProperty(value = "删除状态 0-正常 1-删除")
     private Integer delFlag;
+
+    @ApiModelProperty(value = "模块类型")
+    private Integer moduleType;
+
+    @ApiModelProperty(value = "摘要")
+    private String digest;
+
+    /**
+     * 轨迹素材生成的H5链接
+     */
+    @ApiModelProperty(value = "轨迹素材生成的H5链接")
+    private String linkUrl;
+
+
     /**
      * 海报组件数组
      */

@@ -8,6 +8,8 @@ import com.linkwechat.domain.customer.vo.WeCustomerAddGroupVo;
 import com.linkwechat.domain.groupchat.query.WeGroupChatQuery;
 import com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo;
 import com.linkwechat.domain.groupchat.vo.LinkGroupChatVo;
+import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatListQuery;
+import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatListVo;
 
 import java.util.List;
 
@@ -25,6 +27,12 @@ public interface IWeGroupService extends IService<WeGroup> {
      */
     List<LinkGroupChatListVo> getPageList(WeGroupChatQuery query);
 
+    /**
+     *  应用获取客群数据
+     * @param query
+     * @return
+     */
+    List<LinkGroupChatListVo> selectWeGroupListByApp(WeGroupChatQuery query);
 
     /**
      * 获取群详情
@@ -44,6 +52,22 @@ public interface IWeGroupService extends IService<WeGroup> {
      * @param msg
      */
     void synchWeGroupHandler(String msg);
+
+
+    /**
+     * 跟进条件同步客群
+     * @param chatListQuery
+     * @return
+     */
+    List<WeGroupChatListVo.GroupChat> synchWeGroup(WeGroupChatListQuery chatListQuery);
+
+
+    /**
+     * 从企业微信端获取的群信息
+     * @param groupChatList
+     * @param chatListQuery
+     */
+    void getGroupChatList(List<WeGroupChatListVo.GroupChat> groupChatList, WeGroupChatListQuery chatListQuery);
 
     /**
      * 创建客群
@@ -90,5 +114,8 @@ public interface IWeGroupService extends IService<WeGroup> {
      * @param updateDetail 变更类型
      */
     void changeGroup(String chatId, String updateDetail);
+
+
+
 
 }
