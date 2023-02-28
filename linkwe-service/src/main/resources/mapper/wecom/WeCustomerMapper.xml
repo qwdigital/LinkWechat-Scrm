@@ -10,7 +10,7 @@
         SELECT wcr.id FROM we_customer wcr
         LEFT JOIN sys_user su on su.we_user_id=wcr.add_user_id
         WHERE
-            su.del_flag=0
+            su.del_flag=0 and su.is_user_leave=0
             <if test="weCustomerList.gender !=null">
                 AND wcr.gender=#{weCustomerList.gender}
             </if>

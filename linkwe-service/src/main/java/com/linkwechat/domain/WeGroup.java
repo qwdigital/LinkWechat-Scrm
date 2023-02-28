@@ -8,7 +8,10 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatDetailVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,6 +29,9 @@ import java.util.stream.Collectors;
 @Data
 @SuppressWarnings("serial")
 @TableName("we_group")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeGroup extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L; //1
@@ -33,9 +39,7 @@ public class WeGroup extends BaseEntity implements Serializable {
     /**
      * 主键ID
      */
-    @ApiModelProperty(value = "主键ID")
-    @TableId(type = IdType.AUTO)
-    @TableField("id")
+    @TableId
     private Long id;
 
 
@@ -102,6 +106,12 @@ public class WeGroup extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "分配状态:0-被接替成功;1-待接替;2-接替失败;3-正常状态 ")
     @TableField("allocate_state")
     private Integer allocateState;
+
+
+    /**
+     * 群主是否离职 1:是; 0:否
+     */
+    private Integer ownerLeave;
 
     /**
      * 删除标识 0 正常 1 删除

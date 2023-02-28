@@ -321,6 +321,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (result.getData() != null) {
             WeUserDetailVo vo = result.getData();
             SysUser user = sysUserGenerator(vo);
+            user.setIsUserLeave(sysUser.getIsUserLeave());
             SysUser userExist = selectUserByWeUserId(user.getWeUserId());
             if (userExist != null) {
                 user.setUserId(userExist.getUserId());
@@ -599,20 +600,29 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void leaveUser(String[] weUserIds) {
-        List<SysUser> weUsers = new ArrayList<>();
-        CollectionUtil.newArrayList(weUserIds).forEach(weUserId -> {
-            SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getWeUserId, weUserId));
-            if (null != sysUser) {
-                sysUser.setIsAllocate(CorpUserEnum.NO_IS_ALLOCATE.getKey());
-                sysUser.setDimissionTime(new Date());
-                weUsers.add(sysUser);
-            }
-            if (this.updateBatchById(weUsers) && this.removeByIds(weUsers.stream().map(SysUser::getUserId).collect(Collectors.toList()))) {
-                //生成等待分配的客户以群记录
-                iWeLeaveUserService.createWaitAllocateCustomerAndGroup(weUserId.split(","));
-            }
 
-        });
+        if(this.remove(new LambdaQueryWrapper<SysUser>()
+                .in(SysUser::getWeUserId,ListUtil.toList(weUserIds)))){
+
+            //通知更新离职员工列表
+            LoginUser loginUser = SecurityUtils.getLoginUser();
+            rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeLeaveAllocateUserRk(), JSONObject.toJSONString(loginUser));
+
+        }
+//        List<SysUser> weUsers = new ArrayList<>();
+//        CollectionUtil.newArrayList(weUserIds).forEach(weUserId -> {
+//            SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getWeUserId, weUserId));
+//            if (null != sysUser) {
+//                sysUser.setIsAllocate(CorpUserEnum.NO_IS_ALLOCATE.getKey());
+//                sysUser.setDimissionTime(new Date());
+//                weUsers.add(sysUser);
+//            }
+//            if (this.updateBatchById(weUsers) && this.removeByIds(weUsers.stream().map(SysUser::getUserId).collect(Collectors.toList()))) {
+//                //生成等待分配的客户以群记录
+//                iWeLeaveUserService.createWaitAllocateCustomerAndGroup(weUserId.split(","));
+//            }
+
+//        });
 
     }
 
@@ -650,7 +660,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         query.setCorpid(sysUser.getCorpId());
         AjaxResult<WeUserDetailVo> result = userClient.getUserInfo(query);
         List<SysUserDept> userDeptList = new ArrayList<>();
-        if (result.getData() != null) {
+        if (result.getData() != null && result.getData().getErrCode().equals(WeConstans.WE_SUCCESS_CODE)) {
             WeUserDetailVo vo = result.getData();
              user = sysUserGenerator(vo);
             for (int i = 0; i < vo.getDepartment().size(); i++) {
@@ -667,6 +677,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             sysUserDeptService.saveBatch(userDeptList.stream().peek(userDept -> {
                 userDept.setUserId(finalUser.getUserId());
             }).collect(Collectors.toList()));
+        }else{
+
+            return null;
         }
         return user;
     }

@@ -188,9 +188,23 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
         WeFollowUserListVo followUserList = qwCustomerClient.getFollowUserList(new WeBaseQuery()).getData();
         if (null != followUserList && CollectionUtil.isNotEmpty(followUserList.getFollowUser())) {
-            List<String> followUsers = followUserList.getFollowUser();
+           this.synchWeCustomerByAddIds(followUserList.getFollowUser());
+        }
 
-            List<List<String>> partition = Lists.partition(followUsers, 100);
+    }
+
+
+    /**
+     * 通过跟进人id同步客户
+     * @param followUserIds
+     * @return
+     */
+    @Override
+    public void synchWeCustomerByAddIds(List<String> followUserIds){
+
+        if(CollectionUtil.isNotEmpty(followUserIds)){
+
+            List<List<String>> partition = Lists.partition(followUserIds, 100);
             Map<String, SysUser> currentTenantSysUser = findCurrentTenantSysUser();
 
             for (List<String> followUser : partition) {
@@ -206,9 +220,22 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 }
 
             }
+
         }
+    }
 
 
+    /**
+     * 入库构建离职待分配客户
+     * @param followUserIds
+     */
+    @Override
+    public void buildAllocateWecustomer(List<String> followUserIds){
+        this.synchWeCustomerByAddIds(followUserIds);
+        this.saveOrUpdate(WeCustomer.builder()
+                        .addUserLeave(1)
+                .build(),new LambdaQueryWrapper<WeCustomer>()
+                .in(WeCustomer::getAddUserId,followUserIds));
     }
 
     private void getByUser(List<String> followUser, String nextCursor, List<WeCustomerDetailVo> list){
