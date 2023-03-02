@@ -46,7 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 客户接口管理
  * @date 2022/3/20 14:54
  **/
@@ -445,7 +445,6 @@ public class QwCustomerController {
         );
     }
 
-
     /**
      * 编辑标签或标签组名称
      * @param query
@@ -458,6 +457,9 @@ public class QwCustomerController {
                 qwCustomerService.editCorpTag(query)
         );
     }
+
+
+
 
 
 

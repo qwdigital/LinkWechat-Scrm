@@ -52,6 +52,8 @@ public class WeCustomersQuery {
     //查询结束时间
     private String endTime;
 
+    //不包含的标签id
+    private String excludeTagIds;
 
     //个人数据:false 全部数据(相对于角色定义的数据权限):true
     private Boolean dataScope=false;

@@ -1,19 +1,14 @@
 package com.linkwechat.domain;
 
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+
 
 import lombok.Data;
 
@@ -35,8 +30,7 @@ public class WeGroupMessageAttachments extends BaseEntity implements Serializabl
      * 主键id
      */
     @ApiModelProperty(value = "主键id")
-    @TableId(type = IdType.AUTO)
-    @TableField("id")
+    @TableId
     private Long id;
 
 

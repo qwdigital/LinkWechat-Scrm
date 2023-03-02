@@ -193,7 +193,7 @@
         left join sys_user_dept ud on u.we_user_id = ud.we_user_id
         left join sys_dept d on ud.dept_id = d.dept_id
         left join sys_user_role sur on sur.user_id=u.user_id
-        where u.del_flag = 0
+        where u.del_flag = 0 and u.is_user_leave=0
         <if test="sysUser.userName != null and sysUser.userName != ''">
             AND u.user_name like concat('%', #{sysUser.userName}, '%')
         </if>
@@ -225,7 +225,7 @@
 
     </select>
 
-    <select id="selectCountUserDeptList" parameterType="com.linkwechat.common.core.domain.entity.SysUser" resultType="int">
+    <select id="selectCountUserDeptList" parameterType="SysUser" resultType="int">
         select
             count(DISTINCT u.we_user_id)
         from sys_user u
@@ -262,7 +262,7 @@
         select u.user_id,u.we_user_id,u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phone_number,
         u.password, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,
         d.dept_name, d.leader from sys_user u
-        left join sys_dept d on u.dept_id = d.dept_id and d.del_flag = '0'
+        left join sys_dept d on u.dept_id = d.dept_id
         where u.del_flag = '0'
         <if test="userName != null and userName != ''">
             AND u.user_name like concat('%', #{userName}, '%')
@@ -499,7 +499,36 @@
         update_time=IFNULL(VALUES(update_time), sys_user.update_time),
         remark=IFNULL(VALUES(remark), sys_user.remark);
 
-
     </update>
 
+    <select id="findAllSysUser" resultType="com.linkwechat.common.core.domain.entity.SysUser">
+        SELECT
+        su.*,
+        (SELECT GROUP_CONCAT(d.dept_name) FROM  sys_dept d WHERE sud.dept_id = d.dept_id) as dept_name
+        FROM
+        sys_user su
+        LEFT JOIN sys_user_dept sud on su.user_id=sud.user_id
+        WHERE
+        su.del_flag = 0
+        <if test="weUserIds !='' and weUserIds !=null">
+           and su.we_user_id in
+            <foreach collection="weUserIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="positions !='' and positions !=null">
+            and su.position in
+            <foreach collection="positions.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="deptIds != null and deptIds != ''">
+            and sud.dept_id in
+            <foreach collection="deptIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+
+    </select>
 </mapper> 

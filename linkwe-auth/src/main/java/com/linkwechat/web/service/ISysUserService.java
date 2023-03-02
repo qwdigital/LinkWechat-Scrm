@@ -4,7 +4,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.common.core.domain.dto.SysUserDTO;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.page.PageDomain;
+import com.linkwechat.domain.system.user.query.SysUserQuery;
+import com.linkwechat.domain.system.user.vo.SysUserVo;
+import com.linkwechat.domain.user.vo.WeUserScreenConditVo;
 import com.linkwechat.web.domain.vo.UserVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -222,7 +226,7 @@ public interface ISysUserService extends IService<SysUser> {
      */
     void syncUserAndDeptHandler(String msg);
 
-    int addUser(SysUserDTO sysUser);
+    SysUser addUser(SysUserDTO sysUser);
 
 
     /**
@@ -231,6 +235,14 @@ public interface ISysUserService extends IService<SysUser> {
      */
     void editUserRole(SysUserDTO user);
 
+
+    /**
+     * 批量更新角色
+     * @param roleId
+     * @param users
+     */
+    void batchEditUserRole(Long roleId,List<SysUserDTO> users);
+
     /**
      * 获取员工敏感数据
      * @param userTicket
@@ -238,4 +250,46 @@ public interface ISysUserService extends IService<SysUser> {
     void getUserSensitiveInfo(String userTicket);
 
     void getUserSensitiveInfo(Long userId, String userTicket);
+
+
+    List<SysUser> findAllSysUser(String weUserIds,String positions,String deptIds);
+
+    /**
+     * 根据we_user_id获取用户，如果没有则从企业微信端同步
+     * @param weuserId
+     * @return
+     */
+    SysUser findOrSynchSysUser(String weuserId);
+
+
+
+    /**
+     * 通过企微员工ID获取员工信息
+     * @param query
+     * @return
+     */
+    List<SysUserVo> getUserListByWeUserIds(SysUserQuery query);
+
+
+    /**
+     * 根据手动选择的员工，职位，部门筛选员工
+     * @param weUserIds
+     * @param deptIds
+     * @param positions
+     * @return
+     */
+    List<String> screenConditWeUser(String weUserIds, String deptIds,String positions);
+
+
+    /**
+     * 构建离职员工状态
+     * @param sysUsers
+     */
+    void builderLeaveSysUser(List<SysUser> sysUsers);
+
+
+
+
+
+
 }

@@ -32,4 +32,6 @@ public class WeMomentsInteracte extends BaseEntity {
     //朋友圈创建人id
     @TableField(exist = false)
     private String momentCreteOrId;
+
+    private Integer delFlag;
 }

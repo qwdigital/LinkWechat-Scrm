@@ -1,11 +1,8 @@
 package com.linkwechat.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Constants;
+
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.WeSysFieldTemplate;
-import org.springframework.data.repository.query.Param;
-
 import java.util.List;
 
 /**

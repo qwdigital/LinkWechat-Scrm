@@ -26,6 +26,12 @@ public interface WeOperationCenterMapper {
     WeCustomerAnalysisVo getCustomerAnalysis();
 
 
+    /**
+     * 自建应用客户分析统计
+     * @param weUserIds
+     * @return
+     */
+    WeCustomerAnalysisVo getCustomerAnalysisForApp(@Param("weUserIds") List<String> weUserIds);
 
     /**
      * 客户总数
@@ -61,6 +67,12 @@ public interface WeOperationCenterMapper {
     WeGroupAnalysisVo getGroupAnalysis();
 
 
+    /**
+     * 自建应用，客群分析
+     * @param chatIds
+     * @return
+     */
+    WeGroupAnalysisVo getGroupAnalysisByApp(@Param("chatIds") List<String> chatIds);
 
     /**
      * 客群总数
@@ -154,4 +166,12 @@ public interface WeOperationCenterMapper {
      * @return
      */
     WeGroupRemindAnalysisVo findWeGroupRemindAnalysis();
+
+
+    /**
+     * 客户群成员折线数据(按照时间段查询,不间断)
+     * @param query
+     * @return
+     */
+    List<WeGroupMemberRealCntVo> selectGroupMemberBrokenLine(WeOperationGroupQuery query);
 }

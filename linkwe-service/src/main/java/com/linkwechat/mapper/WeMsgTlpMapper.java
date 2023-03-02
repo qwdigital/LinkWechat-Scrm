@@ -26,11 +26,7 @@ import com.linkwechat.domain.WeMsgTlp;
 public interface WeMsgTlpMapper extends BaseMapper<WeMsgTlp> {
 
 
-    WeMsgTlpVo getInfo(@Param("id") Long id);
 
-    @DataScope(type = "2", value = @DataColumn(alias = "wmt", name = "create_by_id", userid = "user_id"))
-    List<Long> getListIds(WeMsgTlpQuery query);
-
-    List<WeMsgTlpVo> getMsgTlpByIds(@Param("weMsgTlpIds") List<Long> weMsgTlpIds);
+    List<WeMsgTlpVo> getList(@Param("query") WeMsgTlpQuery query, @Param("userIds") List<String> userIds);
 }
 

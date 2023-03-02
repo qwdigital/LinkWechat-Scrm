@@ -1,12 +1,15 @@
 package com.linkwechat.wecom.service;
 
+import com.dtflys.forest.annotation.JSONBody;
 import com.dtflys.forest.annotation.Var;
 import com.linkwechat.domain.wecom.query.WeCorpQrQuery;
 import com.linkwechat.domain.wecom.query.user.WeAddUserQuery;
+import com.linkwechat.domain.wecom.query.user.WeLeaveUserQuery;
 import com.linkwechat.domain.wecom.query.user.WeUserListQuery;
 import com.linkwechat.domain.wecom.query.user.WeUserQuery;
 import com.linkwechat.domain.wecom.vo.WeCorpQrVo;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
+import com.linkwechat.domain.wecom.vo.user.WeLeaveUserVo;
 import com.linkwechat.domain.wecom.vo.user.WeLoginUserVo;
 import com.linkwechat.domain.wecom.vo.user.WeUserDetailVo;
 import com.linkwechat.domain.wecom.vo.user.WeUserListVo;
@@ -89,4 +92,12 @@ public interface IQwUserService {
      * @return
      */
     WeCorpQrVo getJoinQrcode(WeCorpQrQuery query);
+
+
+    /**
+     * 获取待分配的离职成员列表
+     * @param query
+     * @return
+     */
+    WeLeaveUserVo getUnassignedList(WeLeaveUserQuery query);
 }

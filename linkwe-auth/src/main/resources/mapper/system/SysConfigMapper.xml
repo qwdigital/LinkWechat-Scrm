@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.web.mapper.SysConfigMapper">
     
-    <resultMap type="com.linkwechat.web.domain.SysConfig" id="SysConfigResult">
+    <resultMap type="SysConfig" id="SysConfigResult">
     	<id     property="configId"      column="config_id"      />
         <result property="configName"    column="config_name"    />
         <result property="configKey"     column="config_key"     />
@@ -33,12 +33,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		</where>
 	</sql>
     
-    <select id="selectConfig" parameterType="com.linkwechat.web.domain.SysConfig" resultMap="SysConfigResult">
+    <select id="selectConfig" parameterType="SysConfig" resultMap="SysConfigResult">
         <include refid="selectConfigVo"/>
         <include refid="sqlwhereSearch"/>
     </select>
     
-    <select id="selectConfigList" parameterType="com.linkwechat.web.domain.SysConfig" resultMap="SysConfigResult">
+    <select id="selectConfigList" parameterType="SysConfig" resultMap="SysConfigResult">
         <include refid="selectConfigVo"/>
         <where>
 			<if test="configName != null and configName != ''">
@@ -64,7 +64,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where config_key = #{configKey} limit 1
     </select>
     
-    <insert id="insertConfig" parameterType="com.linkwechat.web.domain.SysConfig">
+    <insert id="insertConfig" parameterType="SysConfig">
         insert into sys_config (
 			<if test="configName != null and configName != '' ">config_name,</if>
 			<if test="configKey != null and configKey != '' ">config_key,</if>
@@ -84,7 +84,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		)
     </insert>
 	 
-    <update id="updateConfig" parameterType="com.linkwechat.web.domain.SysConfig">
+    <update id="updateConfig" parameterType="SysConfig">
         update sys_config 
         <set>
             <if test="configName != null and configName != ''">config_name = #{configName},</if>

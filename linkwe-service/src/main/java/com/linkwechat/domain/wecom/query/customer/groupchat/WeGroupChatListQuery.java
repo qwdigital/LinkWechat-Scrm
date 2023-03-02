@@ -2,8 +2,7 @@ package com.linkwechat.domain.wecom.query.customer.groupchat;
 
 import com.linkwechat.domain.wecom.entity.customer.groupChat.WeOwnerFilterEntity;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * @author danmo
@@ -12,6 +11,9 @@ import lombok.EqualsAndHashCode;
  **/
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeGroupChatListQuery extends WeBaseQuery {
     /**
      * 客户群跟进状态过滤。

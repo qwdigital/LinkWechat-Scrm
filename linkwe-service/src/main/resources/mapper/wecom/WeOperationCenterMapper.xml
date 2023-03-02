@@ -22,6 +22,59 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
 
+    <select id="getCustomerAnalysisForApp"
+            resultType="com.linkwechat.domain.operation.vo.WeCustomerAnalysisVo">
+        select
+            (select count(1) from we_customer where del_flag = 0
+
+            <if test="weUserIds != null and weUserIds.size > 0">
+                and add_user_id in
+                <foreach collection="weUserIds" item="weUserId" open="(" separator="," close=")">
+                  #{weUserId}
+                </foreach>
+            </if>
+            ) total_cnt,
+            (select count(1) from we_customer where date_format(add_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
+            <if test="weUserIds != null and weUserIds.size > 0">
+                and add_user_id in
+                <foreach collection="weUserIds" item="weUserId" open="(" separator="," close=")">
+                    #{weUserId}
+                </foreach>
+            </if>
+            ) as td_cnt,
+            (select count(1) from we_customer where date_format(track_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
+            <if test="weUserIds != null and weUserIds.size > 0">
+                and add_user_id in
+                <foreach collection="weUserIds" item="weUserId" open="(" separator="," close=")">
+                    #{weUserId}
+                </foreach>
+            </if>
+            ) as td_follow_up_customer,
+            (select count(distinct external_userid) from we_customer where date_format(add_time,'%y%m%d') = date_format(curdate(),'%y%m%d')  and del_flag = 0
+            <if test="weUserIds != null and weUserIds.size > 0">
+                and add_user_id in
+                <foreach collection="weUserIds" item="weUserId" open="(" separator="," close=")">
+                    #{weUserId}
+                </foreach>
+            </if>
+            ) as td_net_cnt,
+            (select count(1) from we_customer where date_format(update_time,'%y%m%d') = date_format(curdate(),'%y%m%d')  and track_state = 5
+            <if test="weUserIds != null and weUserIds.size > 0">
+                and add_user_id in
+                <foreach collection="weUserIds" item="weUserId" open="(" separator="," close=")">
+                    #{weUserId}
+                </foreach>
+            </if>
+            ) as td_lost_cnt,
+            (select sum(new_apply_cnt) from we_user_behavior_data where date_format(stat_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
+                <if test="weUserIds != null and weUserIds.size > 0">
+                    and user_id in
+                    <foreach collection="weUserIds" item="weUserId" open="(" separator="," close=")">
+                        #{weUserId}
+                    </foreach>
+                </if>
+            ) as yd_new_apply_cnt
+    </select>
 
 
 
@@ -201,12 +254,66 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 (select count(1) from we_group where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')) as yd_group_add_cnt,
                 (select count(1) from we_group where date_format(update_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d')  and del_flag = 1 ) as td_group_dissolve_cnt,
                 (select count(1) from we_group where date_format(update_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')  and del_flag = 1 ) as yd_group_dissolve_cnt,
-                (select count(1) from we_group_member where del_flag = 0 ) as member_total_cnt,
-                (select count(1) from we_group_member where type = 1 and del_flag = 0 ) as member_user_cnt,
-                (select count(1) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_member_add_cnt,
-                (select count(1) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_member_add_cnt,
-                (select count(1) from we_group_member where date_format(quit_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') and del_flag = 1 ) as td_member_quit_cnt,
-                (select count(1) from we_group_member where date_format(quit_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') and del_flag = 1 ) as yd_member_quit_cnt;
+                (select count(user_id) from we_group_member where del_flag = 0 ) as member_total_cnt,
+                (select count(user_id) from we_group_member where type = 1 and del_flag = 0 ) as member_user_cnt,
+                (select count(user_id) from we_group_member where date_format(join_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_member_add_cnt,
+                (select count(user_id) from we_group_member where date_format(join_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_member_add_cnt,
+                (select count(user_id) from we_group_member where date_format(quit_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') and del_flag = 1 ) as td_member_quit_cnt,
+                (select count(user_id) from we_group_member where date_format(quit_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') and del_flag = 1 ) as yd_member_quit_cnt;
+    </select>
+
+
+    <select id="getGroupAnalysisByApp" resultType="com.linkwechat.domain.operation.vo.WeGroupAnalysisVo">
+        select
+        (select count(1) from we_group where del_flag = 0
+
+        <if test="chatIds != null and chatIds.size() > 0" >
+            and chat_id in
+            <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                #{chatId}
+            </foreach>
+        </if>
+        ) total_cnt,
+        (select count(1) from we_group where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d')
+        <if test="chatIds != null and chatIds.size() > 0" >
+            and chat_id in
+            <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                #{chatId}
+            </foreach>
+        </if>
+        ) as td_group_add_cnt,
+        (select count(1) from we_group where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d')  and del_flag = 1
+        <if test="chatIds != null and chatIds.size() > 0" >
+            and chat_id in
+            <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                #{chatId}
+            </foreach>
+        </if>
+        ) as td_group_dissolve_cnt,
+        (select count(1) from we_group_member where del_flag = 0
+        <if test="chatIds != null and chatIds.size() > 0" >
+            and chat_id in
+            <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                #{chatId}
+            </foreach>
+        </if>
+        ) as member_total_cnt,
+        (select count(1) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d')
+        <if test="chatIds != null and chatIds.size() > 0" >
+            and chat_id in
+            <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                #{chatId}
+            </foreach>
+        </if>
+        ) as td_member_add_cnt,
+        (select count(1) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') and del_flag = 1
+        <if test="chatIds != null and chatIds.size() > 0" >
+            and chat_id in
+            <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                #{chatId}
+            </foreach>
+        </if>
+        ) as td_member_quit_cnt
     </select>
 
 
@@ -271,7 +378,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         ) as date_list
         left join
         (select DATE_FORMAT(wgm.create_time, '%Y-%m-%d') day,
-        count(1) as add_num
+        count(DISTINCT wgm.user_id) as add_num
         from we_group_member wgm  where 1=1
         and wgm.del_flag = 0
         <if test="chatIds != null and chatIds.size() > 0" >
@@ -290,7 +397,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         and DATE_FORMAT(wgm.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
         and DATE_FORMAT(wgm.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
         group by day
-        ,(SELECT @total := (select count(1) from we_group_member wgmt
+        ,(SELECT @total := (select count(DISTINCT wgmt.user_id) from we_group_member wgmt
         where
         wgmt.del_flag = 0
         and date_format(wgmt.create_time,'%Y-%m-%d') &lt; DATE_FORMAT(#{beginTime},'%Y-%m-%d')
@@ -378,7 +485,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         ) as date_list
         left join
         (select DATE_FORMAT(wgm.create_time, '%Y-%m-%d') day,
-        count(1) as add_num
+        count(DISTINCT wgm.user_id) as add_num
         from we_group_member wgm  where 1=1
         <if test="chatIds != null and chatIds.size() > 0" >
             and wgm.chat_id in
@@ -396,7 +503,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         and DATE_FORMAT(wgm.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
         and DATE_FORMAT(wgm.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
         group by day
-        ,(SELECT @total := (select count(1) from we_group_member wgmt
+        ,(SELECT @total := (select count(DISTINCT wgmt.user_id) from we_group_member wgmt
         where
         wgmt.del_flag = 0
         and date_format(wgmt.create_time,'%Y-%m-%d') &lt; DATE_FORMAT(#{beginTime},'%Y-%m-%d')
@@ -586,6 +693,36 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         (select count(1) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as ydMemberAddCnt,
         (select count(1) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') and del_flag = 1 ) as ydMemberQuitCnt
     </select>
+
+
+    <select id="selectGroupMemberBrokenLine"  resultType="com.linkwechat.domain.operation.vo.WeGroupMemberRealCntVo">
+        SELECT a.date as xtime,a.addCnt,b.quitCnt,a.addCnt+b.quitCnt as totalCnt
+        FROM
+            (
+                SELECT
+                    sdd.date,
+                    count(IF(wgm.quit_scene is NULL,0,null))  as addCnt
+                FROM
+                    sys_dim_date sdd
+                        LEFT JOIN we_group_member wgm ON	 DATE_FORMAT(wgm.join_time,'%Y-%m-%d')=sdd.date
+                WHERE DATE_FORMAT(sdd.date,'%Y-%m-%d') BETWEEN #{beginTime} and #{endTime}
+                GROUP BY  sdd.date
+                ORDER BY sdd.date ASC
+            ) a
+                LEFT JOIN
+            (
+                SELECT
+                    sdd.date,
+                    count(IF(wgm.quit_scene is NOT NULL,0,null))  as quitCnt
+                FROM
+                    sys_dim_date sdd
+                        LEFT JOIN we_group_member wgm ON	 DATE_FORMAT(wgm.quit_time,'%Y-%m-%d')=sdd.date
+                WHERE DATE_FORMAT(sdd.date,'%Y-%m-%d') BETWEEN #{beginTime} and #{endTime}
+                GROUP BY  sdd.date
+                ORDER BY sdd.date ASC
+            ) b on a.date=b.date
+    </select>
+
 
 
 </mapper>

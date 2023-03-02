@@ -66,6 +66,15 @@ public interface QwLivingClient {
     @PostMapping("/living/getUserAllLivingId")
     public AjaxResult<WeLivingIdListVo> getUserAllLivingId(@RequestBody WeGetUserAllLivingIdQuery query) ;
 
+
+    /**
+     * 获取直播明细
+     * @param query
+     * @return
+     */
+    @PostMapping("/living/getLivingInfo")
+    public AjaxResult<WeLivingInfoVo> getLivingInfo(@RequestBody WeLivingQuery query);
+
     /**
      * 获取直播观看明细
      * @param query

@@ -4,6 +4,38 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.mapper.WeAllocateGroupMapper">
 
+    <insert id="batchAddOrUpdate" >
+        INSERT INTO we_allocate_group(
+        id,
+        chat_id,
+        new_owner,
+        err_msg,
+        status,
+        old_owner,
+        allocate_time,
+        create_time,
+        update_time,
+        create_by,
+        create_by_id,
+        update_by,
+        update_by_id
+        ) values
+        <foreach collection="weAllocateGroups" item="item" index="index" separator=",">
+            (#{item.id},#{item.chatId},#{item.newOwner},#{item.oldOwner},#{item.allocateTime},#{item.status},#{item.errMsg},
+             #{item.createTime},#{item.updateTime},#{item.createBy},#{item.createById},#{item.updateBy},#{item.updateById})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        chat_id=IFNULL(VALUES(chat_id),we_allocate_group.chat_id),
+        new_owner=IFNULL(VALUES(new_owner),we_allocate_group.new_owner),
+        err_msg=IFNULL(VALUES(err_msg),we_allocate_group.err_msg),
+        status=IFNULL(VALUES(status),we_allocate_group.status),
+        old_owner=IFNULL(VALUES(old_owner),we_allocate_group.old_owner),
+        allocate_time=IFNULL(VALUES(allocate_time),we_allocate_group.allocate_time),
+        update_time=IFNULL(VALUES(update_time),we_allocate_group.update_time),
+        update_by=IFNULL(VALUES(update_by),we_allocate_group.update_by),
+        update_by_id=IFNULL(VALUES(update_by_id),we_allocate_group.update_by_id);
+    </insert>
+
 
 
 </mapper>

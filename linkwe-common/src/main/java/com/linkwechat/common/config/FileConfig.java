@@ -12,6 +12,6 @@ public class FileConfig {
     /**文件前缀*/
     private String imgUrlPrefix;
 
-    /**Aes加解密的key*/
+   /**Aes加解密的key*/
     private String aesKey;
 }

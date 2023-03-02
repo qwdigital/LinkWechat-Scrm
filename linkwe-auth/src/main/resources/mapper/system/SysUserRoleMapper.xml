@@ -4,12 +4,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.web.mapper.SysUserRoleMapper">
 
-    <resultMap type="com.linkwechat.web.domain.SysUserRole" id="SysUserRoleResult">
+    <resultMap type="SysUserRole" id="SysUserRoleResult">
         <result property="userId" column="user_id"/>
         <result property="roleId" column="role_id"/>
     </resultMap>
 
-    <resultMap type="com.linkwechat.web.domain.vo.RoleUserVo" id="SysUserRoleVoResult">
+    <resultMap type="RoleUserVo" id="SysUserRoleVoResult">
         <result property="userId" column="user_id"/>
         <result property="userName" column="user_name"/>
         <result property="nickName" column="nick_name"/>
@@ -42,9 +42,12 @@
 
     <delete id="deleteUserRole" parameterType="Long">
         delete from sys_user_role where user_id in
-        <foreach collection="array" item="userId" open="(" separator="," close=")">
+        <foreach collection="ids" item="userId" open="(" separator="," close=")">
             #{userId}
         </foreach>
+        <if test="roleId != null">
+          and role_id = #{roleId}
+        </if>
     </delete>
 
     <insert id="batchUserRole">
@@ -54,7 +57,7 @@
         </foreach>
     </insert>
 
-    <delete id="deleteUserRoleInfo" parameterType="com.linkwechat.web.domain.SysUserRole">
+    <delete id="deleteUserRoleInfo" parameterType="SysUserRole">
         delete
         from sys_user_role
         where user_id = #{userId}

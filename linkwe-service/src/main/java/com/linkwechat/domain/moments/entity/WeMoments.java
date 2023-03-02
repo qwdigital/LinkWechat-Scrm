@@ -128,6 +128,17 @@ public class WeMoments extends BaseEntity {
     @TableField(exist = false)
     private String pointCustomerName;
 
+    /**
+     * 真实类型
+     */
+    private Integer realType;
+
+    /**
+     * 素材中心ID
+     */
+    private Long materialId;
+
+
 
     @Data
     @Builder
@@ -142,5 +153,8 @@ public class WeMoments extends BaseEntity {
 
         //如视频封面,图文标题,文字内容
         private String other;
+
+        //文章标题
+        private String title;
     }
 }

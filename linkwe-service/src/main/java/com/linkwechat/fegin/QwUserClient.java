@@ -2,9 +2,11 @@ package com.linkwechat.fegin;
 
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.wecom.query.WeCorpQrQuery;
+import com.linkwechat.domain.wecom.query.user.WeLeaveUserQuery;
 import com.linkwechat.domain.wecom.query.user.WeUserListQuery;
 import com.linkwechat.domain.wecom.query.user.WeUserQuery;
 import com.linkwechat.domain.wecom.vo.WeCorpQrVo;
+import com.linkwechat.domain.wecom.vo.user.WeLeaveUserVo;
 import com.linkwechat.domain.wecom.vo.user.WeLoginUserVo;
 import com.linkwechat.domain.wecom.vo.user.WeUserDetailVo;
 import com.linkwechat.domain.wecom.vo.user.WeUserListVo;
@@ -70,4 +72,13 @@ public interface QwUserClient {
      */
     @PostMapping("/user/getJoinQrcode")
     AjaxResult<WeCorpQrVo> getJoinQrcode(@RequestBody WeCorpQrQuery query);
+
+
+    /**
+     * 获取待分配的离职成员列表
+     * @param query
+     * @return
+     */
+    @PostMapping("/user/getUnassignedList")
+    AjaxResult<WeLeaveUserVo>  getUnassignedList(@RequestBody WeLeaveUserQuery query);
 }

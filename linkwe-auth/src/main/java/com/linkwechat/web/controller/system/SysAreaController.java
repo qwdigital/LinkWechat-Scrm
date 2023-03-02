@@ -13,6 +13,7 @@ import com.linkwechat.web.domain.SysArea;
 import com.linkwechat.web.service.ISysAreaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -67,4 +68,19 @@ public class SysAreaController extends BaseController {
         List<SysAreaVo> list = sysAreaService.getChildListById(id);
         return AjaxResult.success(list);
     }
+
+    /**
+     * 根据Id获取数据
+     *
+     * @param id
+     * @return {@link AjaxResult< SysAreaVo>}
+     * @author WangYX
+     * @date 2022/10/17 14:40
+     */
+    @GetMapping("/getAreaById/{id}")
+    public AjaxResult<SysAreaVo> getAreaById(@PathVariable("id") Integer id) {
+        SysArea sysArea = sysAreaService.getById(id);
+        return AjaxResult.success(sysArea);
+    }
+
 }

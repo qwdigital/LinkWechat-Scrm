@@ -18,12 +18,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Executor;
+
 
 /**
  * @author leejoker
@@ -32,9 +32,11 @@ import java.util.concurrent.Executor;
  */
 @Service
 @Slf4j
-public class GatewayDynamicRouteService implements ApplicationEventPublisherAware {
+public class GatewayDynamicRouteService implements ApplicationEventPublisherAware{
+
     @Resource
     private RedisRouteDefinitionRepository redisRouteDefinitionRepository;
+
 
     private ApplicationEventPublisher applicationEventPublisher;
 
@@ -51,6 +53,7 @@ public class GatewayDynamicRouteService implements ApplicationEventPublisherAwar
     @Value("${spring.cloud.nacos.discovery.namespace:}")
     private String namespace;
 
+
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
         this.applicationEventPublisher = applicationEventPublisher;
@@ -59,6 +62,8 @@ public class GatewayDynamicRouteService implements ApplicationEventPublisherAwar
     @PostConstruct
     public void init() {
         log.info("gateway route init...");
+        //先清空缓存中旧的路由
+//        redisService.deleteObject(CacheConstants.GATEWAY_ROUTES);
         try {
             configService = initConfigService();
             if (configService == null) {
@@ -145,4 +150,7 @@ public class GatewayDynamicRouteService implements ApplicationEventPublisherAwar
                 .then(Mono.defer(() -> Mono.just(ResponseEntity.ok().build())))
                 .onErrorResume(t -> t instanceof NotFoundException, t -> Mono.just(ResponseEntity.notFound().build()));
     }
+
+
+
 }

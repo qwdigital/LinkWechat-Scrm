@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author danmo
+ * @author sxw
  * @version 1.0
  * @date 2022/04/16 21:10
  */
@@ -54,7 +54,7 @@ public class QwKfServiceImpl implements IQwKfService {
     private WeKfListVo getAccountList(QwKfListQuery weKfListQuery){
         WeKfListVo list = weKfClient.list(weKfListQuery);
         if(list != null && list.getAccountList().size() >= 100){
-            weKfListQuery.setLimit(weKfListQuery.getLimit()+ weKfListQuery.getOffset());
+            weKfListQuery.setOffset(weKfListQuery.getLimit() + weKfListQuery.getOffset());
             WeKfListVo accountList = getAccountList(weKfListQuery);
             list.getAccountList().addAll(accountList.getAccountList());
         }

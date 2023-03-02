@@ -21,6 +21,20 @@ public interface IWeOperationCenterService {
     WeCustomerAnalysisVo getCustomerAnalysis();
 
 
+    /**
+     * 自建应用客户分析统计
+     * @param dataScope 个人数据:false 全部数据(相对于角色定义的数据权限):true
+     * @return
+     */
+    WeCustomerAnalysisVo getCustomerAnalysisForApp(boolean dataScope);
+
+
+    /**
+     * 自建应用，客群分析
+     * @param dataScope 个人数据:false 全部数据(相对于角色定义的数据权限):true
+     * @return
+     */
+    WeGroupAnalysisVo getGroupAnalysisByApp(boolean dataScope);
 
 
 
@@ -138,4 +152,11 @@ public interface IWeOperationCenterService {
      * 推送给个租户相关数据给租户
      */
     void pushData();
+
+    /**
+     * 客户群成员折线数据(按照时间段查询,不间断)
+     * @param query
+     * @return
+     */
+    List<WeGroupMemberRealCntVo> selectGroupMemberBrokenLine(WeOperationGroupQuery query);
 }

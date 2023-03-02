@@ -4,17 +4,26 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.config.LinkWeChatConfig;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.enums.MessageType;
+import com.linkwechat.common.enums.WeMsgTypeEnum;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.domain.*;
 import com.linkwechat.domain.community.vo.WeCommunityWeComeMsgVo;
 import com.linkwechat.domain.customer.WeMakeCustomerTag;
+import com.linkwechat.domain.know.WeKnowCustomerAttachments;
+import com.linkwechat.domain.know.WeKnowCustomerCode;
+import com.linkwechat.domain.know.WeKnowCustomerCodeTag;
+import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.media.WeMessageTemplate;
+import com.linkwechat.domain.msgtlp.entity.WeTlpMaterial;
 import com.linkwechat.domain.msgtlp.query.WeMsgTlpQuery;
 import com.linkwechat.domain.msgtlp.vo.WeMsgTlpVo;
 import com.linkwechat.domain.qr.WeQrAttachments;
@@ -28,6 +37,7 @@ import com.linkwechat.domain.wecom.query.customer.msg.WeWelcomeMsgQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.media.WeMediaVo;
 import com.linkwechat.fegin.QwCustomerClient;
+import com.linkwechat.mapper.WeTlpMaterialMapper;
 import com.linkwechat.service.*;
 import com.linkwechat.service.impl.WeCorpAccountServiceImpl;
 import com.rabbitmq.client.Channel;
@@ -39,13 +49,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * @author danmo
+ * @author sxw
  * @description 欢迎语消息监听
  * @date 2022/4/3 15:39
  **/
@@ -77,8 +88,6 @@ public class QwWelcomeMsgListener {
     @Autowired
     private QwCustomerClient qwCustomerClient;
 
-    @Autowired
-    private IWeStoreCodeService weStoreCodeService;
 
     @Autowired
     private IWeQrAttachmentsService attachmentsService;
@@ -89,9 +98,16 @@ public class QwWelcomeMsgListener {
     @Autowired
     private IWeTagService iWeTagService;
 
+    @Autowired
+    private LinkWeChatConfig linkWeChatConfig;
+
 
     @Value("${wecom.welcome-msg-default}")
     private String welcomeMsgDefault;
+
+    @Resource
+    private WeTlpMaterialMapper weTlpMaterialMapper;
+
 
 
     @RabbitHandler
@@ -106,7 +122,7 @@ public class QwWelcomeMsgListener {
 
                 WeQrCode weQrCode = weQrCodeService.getOne(new LambdaQueryWrapper<WeQrCode>()
                         .eq(WeQrCode::getState, query.getState())
-                        .eq(WeQrCode::getDelFlag, 0).last("limit 1"));
+                        .eq(WeQrCode::getDelFlag, Constants.COMMON_STATE).last("limit 1"));
                 if (weQrCode != null) {
                     WeQrCodeDetailVo qrDetail = weQrCodeService.getQrDetail(weQrCode.getId());
                     List<WeQrAttachments> qrAttachments = qrDetail.getQrAttachments();
@@ -121,14 +137,17 @@ public class QwWelcomeMsgListener {
                         template.setFileUrl(qrAttachment.getFileUrl());
                         template.setPicUrl(qrAttachment.getPicUrl());
                         template.setLinkUrl(qrAttachment.getLinkUrl());
+                        template.setMaterialId(qrAttachment.getMaterialId());
                         return template;
                     }).collect(Collectors.toList());
+
                     templates.addAll(templateList);
                     makeCustomerTag(query.getExternalUserID(), query.getUserID(), qrDetail.getQrTags());
                 } else {
                     log.warn("未查询到对应员工活码信息");
                 }
-            } else if (StringUtils.isNotEmpty(query.getState()) && query.getState().startsWith(WeConstans.WE_QR_XKLQ_PREFIX)) {
+            }
+            else if (StringUtils.isNotEmpty(query.getState()) && query.getState().startsWith(WeConstans.WE_QR_XKLQ_PREFIX)) {
                 WeCommunityWeComeMsgVo welcomeMsgByState = weCommunityNewGroupService.getWelcomeMsgByState(query.getState());
                 if (welcomeMsgByState != null) {
                     WeMessageTemplate textAtt = new WeMessageTemplate();
@@ -159,7 +178,8 @@ public class QwWelcomeMsgListener {
                     textAtt.setContent(welcomeMsgDefault);
                 }
                 templates.add(textAtt);
-            }else if(StringUtils.isNotEmpty(query.getState()) && query.getState().startsWith(WeConstans.WE_STORE_CODE_CONFIG_PREFIX)){
+            }
+            else if(StringUtils.isNotEmpty(query.getState()) && query.getState().startsWith(WeConstans.WE_STORE_CODE_CONFIG_PREFIX)){
                     log.info("门店导购欢迎语 state：{}",query.getState());
                     WeStoreCodeConfig storeCodeConfig = iWeStoreCodeConfigService.getOne(new LambdaQueryWrapper<WeStoreCodeConfig>()
                             .eq(WeStoreCodeConfig::getState, query.getState()));
@@ -181,6 +201,7 @@ public class QwWelcomeMsgListener {
                                 template.setFileUrl(qrAttachment.getFileUrl());
                                 template.setPicUrl(qrAttachment.getPicUrl());
                                 template.setLinkUrl(qrAttachment.getLinkUrl());
+                                template.setMaterialId(qrAttachment.getMaterialId());
                                 return template;
                             }).collect(Collectors.toList());
                             templates.addAll(templateList);
@@ -199,15 +220,40 @@ public class QwWelcomeMsgListener {
                         }
                     }
 
-            }else {
+            }
+           else {
                 WeMsgTlpQuery weMsgTlpQuery = new WeMsgTlpQuery();
                 weMsgTlpQuery.setUserId(query.getUserID());
                 weMsgTlpQuery.setFlag(false);
+                //员工欢迎语类型
+                weMsgTlpQuery.setTplType(2);
                 List<WeMsgTlpVo> weMsgTlpList = weMsgTlpService.getList(weMsgTlpQuery);
                 if (CollectionUtil.isNotEmpty(weMsgTlpList)) {
-                    WeMsgTlpVo weMsgTlpVo = weMsgTlpList.get(0);
-                    List<WeMessageTemplate> attachments = weMsgTlpVo.getAttachments();
-                    templates.addAll(attachments);
+                    Optional<WeMsgTlpVo> first = weMsgTlpList.stream().findFirst();
+                    first.ifPresent(o -> {
+                        WeMsgTlpVo weMsgTlpVo = first.get();
+                        //文本内容
+                        WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
+                        weMessageTemplate.setMsgType(WeMsgTypeEnum.TEXT.getMessageType());
+                        weMessageTemplate.setContent(weMsgTlpVo.getTemplateInfo());
+                        templates.add(weMessageTemplate);
+                        //附件
+                        LambdaQueryWrapper<WeTlpMaterial> queryWrapper = new LambdaQueryWrapper<>();
+                        queryWrapper.eq(WeTlpMaterial::getTlpId, weMsgTlpVo.getId());
+                        List<WeTlpMaterial> weTlpMaterials = weTlpMaterialMapper.selectList(queryWrapper);
+                        List<Long> collect = weTlpMaterials.stream().map(x -> x.getMaterialId()).collect(Collectors.toList());
+                        if (collect != null && collect.size() > 0) {
+                            LambdaQueryWrapper<WeMaterial> wrapper = new LambdaQueryWrapper<>();
+                            wrapper.in(WeMaterial::getId, collect);
+                            List<WeMaterial> weMaterials = weMaterialService.list(wrapper);
+                            if (weMaterials != null && weMaterials.size() > 0) {
+                                for (WeMaterial weMaterial : weMaterials) {
+                                    templates.add(materialToWeMessageTemplate(weMaterial));
+                                }
+                            }
+                        }
+                    });
+
                 }
             }
             WeResultVo resultDto = sendWelcomeMsg(query, templates);
@@ -258,7 +304,7 @@ public class QwWelcomeMsgListener {
         welcomeMsg.setWelcome_code(query.getWelcomeCode());
         welcomeMsg.setCorpid(query.getToUserName());
         if (CollectionUtil.isNotEmpty(attachments)) {
-            getMediaId(attachments);
+            weMaterialService.msgTplToMediaId(attachments);
         } else {
             WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
             weMessageTemplate.setMsgType(MessageType.TEXT.getMessageType());
@@ -266,7 +312,7 @@ public class QwWelcomeMsgListener {
             attachments.add(weMessageTemplate);
         }
         WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getAddUserId, query.getUserID())
-                .eq(WeCustomer::getExternalUserid, query.getExternalUserID()).eq(WeCustomer::getDelFlag, 0).last("limit 1"));
+                .eq(WeCustomer::getExternalUserid, query.getExternalUserID()).eq(WeCustomer::getDelFlag, Constants.COMMON_STATE).last("limit 1"));
 
         if (weCustomer != null) {
             String customerName = weCustomer.getCustomerName();
@@ -276,34 +322,78 @@ public class QwWelcomeMsgListener {
                 }
             });
         }
-        welcomeMsg.setMessageTemplates(attachments);
+        welcomeMsg.setAttachmentsList(linkWeChatConfig.getH5Domain(), attachments);
         return qwCustomerClient.sendWelcomeMsg(welcomeMsg).getData();
     }
 
-    void getMediaId(List<WeMessageTemplate> messageTemplates) {
-        Optional.ofNullable(messageTemplates).orElseGet(ArrayList::new).forEach(messageTemplate -> {
-            if (ObjectUtil.equal(MessageType.IMAGE.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getPicUrl()
-                        , MessageType.IMAGE.getMessageType()
-                        , FileUtil.getName(messageTemplate.getPicUrl()));
-                messageTemplate.setMediaId(weMedia.getMediaId());
-            } else if (ObjectUtil.equal(MessageType.MINIPROGRAM.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getPicUrl()
-                        , MessageType.IMAGE.getMessageType()
-                        , FileUtil.getName(messageTemplate.getPicUrl()));
-                messageTemplate.setMediaId(weMedia.getMediaId());
-                messageTemplate.setPicMediaId(weMedia.getMediaId());
-            } else if (ObjectUtil.equal(MessageType.VIDEO.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
-                        , MessageType.VIDEO.getMessageType()
-                        , FileUtil.getName(messageTemplate.getMediaId()));
-                messageTemplate.setMediaId(weMedia.getMediaId());
-            } else if (ObjectUtil.equal(MessageType.FILE.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
-                        , MessageType.FILE.getMessageType()
-                        , FileUtil.getName(messageTemplate.getMediaId()));
-                messageTemplate.setMediaId(weMedia.getMediaId());
-            }
-        });
+
+    /**
+     * 素材转消息模板
+     *
+     * @author WangYX
+     * @date 2023/02/03 18:15
+     * @version 1.0.0
+     */
+    private WeMessageTemplate materialToWeMessageTemplate(WeMaterial weMaterial) {
+        WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
+        String mediaType = weMaterial.getMediaType();
+        //
+        switch (mediaType) {
+            //图片
+            //海报
+            case "0":
+            case "5":
+                weMessageTemplate.setMsgType(WeMsgTypeEnum.IMAGE.getMessageType());
+                weMessageTemplate.setPicUrl(weMaterial.getMaterialUrl());
+                break;
+
+            //小程序
+            case "11":
+                weMessageTemplate.setMsgType(WeMsgTypeEnum.MINIPROGRAM.getMessageType());
+                weMessageTemplate.setTitle(weMaterial.getMaterialName());
+                weMessageTemplate.setPicUrl(weMaterial.getCoverUrl());
+                weMessageTemplate.setAppId(weMaterial.getDigest());
+                weMessageTemplate.setLinkUrl(weMaterial.getMaterialUrl());
+                break;
+            //图文
+            case "9":
+                weMessageTemplate.setMsgType(WeMsgTypeEnum.LINK.getMessageType());
+                weMessageTemplate.setPicUrl(weMaterial.getCoverUrl());
+                weMessageTemplate.setTitle(weMaterial.getMaterialName());
+                weMessageTemplate.setDescription(StrUtil.isNotBlank(weMaterial.getContent()) ? weMaterial.getContent() : "");
+                weMessageTemplate.setLinkUrl(weMaterial.getMaterialUrl());
+                break;
+            //文章
+            case "12":
+                weMessageTemplate.setMsgType(WeMsgTypeEnum.NEWS.getMessageType());
+                weMessageTemplate.setPicUrl(weMaterial.getCoverUrl());
+                weMessageTemplate.setTitle(weMaterial.getMaterialName());
+                weMessageTemplate.setDescription(weMaterial.getDigest());
+                weMessageTemplate.setMaterialId(weMaterial.getId());
+                break;
+            //视频
+            case "2":
+                weMessageTemplate.setMsgType(WeMsgTypeEnum.VIDEO.getMessageType());
+                weMessageTemplate.setPicUrl(weMaterial.getCoverUrl());
+                weMessageTemplate.setTitle(weMaterial.getMaterialName());
+                weMessageTemplate.setDescription(weMaterial.getDigest());
+                weMessageTemplate.setMaterialId(weMaterial.getId());
+                weMessageTemplate.setLinkUrl(weMaterial.getMaterialUrl());
+                break;
+            //文件
+            case "3":
+                weMessageTemplate.setMsgType(WeMsgTypeEnum.FILE.getMessageType());
+                weMessageTemplate.setPicUrl(weMaterial.getCoverUrl());
+                weMessageTemplate.setTitle(weMaterial.getMaterialName());
+                weMessageTemplate.setDescription(weMaterial.getDigest());
+                weMessageTemplate.setMaterialId(weMaterial.getId());
+                weMessageTemplate.setLinkUrl(weMaterial.getMaterialUrl());
+                break;
+        }
+
+
+        return weMessageTemplate;
     }
+
+
 }

@@ -66,9 +66,35 @@ public class IWeOperationCenterServiceImpl implements IWeOperationCenterService 
         return weOperationCenterMapper.getCustomerAnalysis();
     }
 
+    @Override
+    public WeCustomerAnalysisVo getCustomerAnalysisForApp(boolean dataScope) {
 
 
+        return weOperationCenterMapper.getCustomerAnalysisForApp(
+                dataScope ? iWeCustomerService.findWeUserIds() : ListUtil.toList(SecurityUtils.getLoginUser().getSysUser().getWeUserId())
+        );
+    }
 
+    @Override
+    public WeGroupAnalysisVo getGroupAnalysisByApp(boolean dataScope) {
+        List<String> chatIds = new ArrayList<>();
+        if (dataScope) {
+            List<LinkGroupChatListVo> pageList = weGroupService.getPageList(new WeGroupChatQuery());
+            if (CollectionUtil.isNotEmpty(pageList)) {
+                chatIds = pageList.stream().map(LinkGroupChatListVo::getChatId).collect(Collectors.toList());
+            }
+        } else {
+            WeGroupChatQuery query = new WeGroupChatQuery();
+            query.setUserIds(SecurityUtils.getLoginUser().getSysUser().getWeUserId());
+            List<LinkGroupChatListVo> linkGroupChatListVos = weGroupService.selectWeGroupListByApp(query);
+            if (CollectionUtil.isNotEmpty(linkGroupChatListVos)) {
+                chatIds = linkGroupChatListVos.stream().map(LinkGroupChatListVo::getChatId).collect(Collectors.toList());
+            }
+
+        }
+
+        return weOperationCenterMapper.getGroupAnalysisByApp(chatIds);
+    }
 
 
     @Override
@@ -213,6 +239,11 @@ public class IWeOperationCenterServiceImpl implements IWeOperationCenterService 
                     , MessageNoticeType.DAILYPUSH.getType(), false
             );
         }
+    }
+
+    @Override
+    public List<WeGroupMemberRealCntVo> selectGroupMemberBrokenLine(WeOperationGroupQuery query) {
+        return this.weOperationCenterMapper.selectGroupMemberBrokenLine(query);
     }
 
 

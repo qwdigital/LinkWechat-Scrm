@@ -59,7 +59,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * Excel相关处理
+ * Excel相关处理（当前导出工具类已废弃请使用easyExcel）
  * 
  * @author ruoyi
  */

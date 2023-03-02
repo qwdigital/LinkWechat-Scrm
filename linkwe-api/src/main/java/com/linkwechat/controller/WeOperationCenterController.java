@@ -177,7 +177,8 @@ public class WeOperationCenterController extends BaseController {
     @GetMapping("/group/member/getGroupMemberRealPageCnt")
     public TableDataInfo<WeGroupMemberRealCntVo> getGroupMemberRealPageCnt(WeOperationGroupQuery query) {
         startPage();
-        return getDataTable(weOperationCenterService.getGroupMemberRealCnt(query));
+        //        return getDataTable(weOperationCenterService.getGroupMemberRealCnt(query));
+        return getDataTable(weOperationCenterService.selectGroupMemberBrokenLine(query));
     }
 
 
@@ -339,9 +340,34 @@ public class WeOperationCenterController extends BaseController {
     }
 
 
+    /**
+     * 自建应用获取客户分析数据
+     * @param dataScope 个人数据:false 全部数据(相对于角色定义的数据权限):true
+     * @return
+     */
+    @GetMapping("/getCustomerAnalysisForApp")
+    public AjaxResult<WeCustomerAnalysisVo> getCustomerAnalysisForApp(@RequestParam(defaultValue = "false") boolean dataScope){
 
 
+        return AjaxResult.success(
+                weOperationCenterService.getCustomerAnalysisForApp(dataScope)
+        );
 
+    }
+
+
+    /**
+     * 自建应用获取群分析数据
+     * @param dataScope 个人数据:false 全部数据(相对于角色定义的数据权限):true
+     * @return
+     */
+    @GetMapping("/getGroupAnalysisByApp")
+    public AjaxResult<WeGroupAnalysisVo> getGroupAnalysisByApp(@RequestParam(defaultValue = "false") boolean dataScope){
+
+        return AjaxResult.success(
+                weOperationCenterService.getGroupAnalysisByApp(dataScope)
+        );
+    }
 
 
 

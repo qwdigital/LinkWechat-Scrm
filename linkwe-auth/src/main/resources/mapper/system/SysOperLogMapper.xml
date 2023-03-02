@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.web.mapper.SysOperLogMapper">
 
-	<resultMap type="com.linkwechat.web.domain.SysOperLog" id="SysOperLogResult">
+	<resultMap type="SysOperLog" id="SysOperLogResult">
 		<id     property="operId"         column="oper_id"        />
 		<result property="title"          column="title"          />
 		<result property="businessType"   column="business_type"  />
@@ -28,12 +28,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         from sys_oper_log
     </sql>
     
-	<insert id="insertOperlog" parameterType="com.linkwechat.web.domain.SysOperLog">
+	<insert id="insertOperlog" parameterType="SysOperLog">
 		insert into sys_oper_log(title, business_type, method, request_method, operator_type, oper_name, dept_name, oper_url, oper_ip, oper_location, oper_param, json_result, status, error_msg, oper_time)
         values (#{title}, #{businessType}, #{method}, #{requestMethod}, #{operatorType}, #{operName}, #{deptName}, #{operUrl}, #{operIp}, #{operLocation}, #{operParam}, #{jsonResult}, #{status}, #{errorMsg}, sysdate())
 	</insert>
 	
-	<select id="selectOperLogList" parameterType="com.linkwechat.web.domain.SysOperLog" resultMap="SysOperLogResult">
+	<select id="selectOperLogList" parameterType="SysOperLog" resultMap="SysOperLogResult">
 		<include refid="selectOperLogVo"/>
 		<where>
 			<if test="title != null and title != ''">

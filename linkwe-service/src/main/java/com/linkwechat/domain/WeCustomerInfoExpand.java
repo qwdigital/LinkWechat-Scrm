@@ -5,8 +5,13 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.typeHandler.WeCustomerInfoExpandListTypeHandler;
 import com.linkwechat.typeHandler.WeCustomerInfoValHandler;
+import com.linkwechat.typeHandler.WeStrategicCrowdSwipeListTypeHandler;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**

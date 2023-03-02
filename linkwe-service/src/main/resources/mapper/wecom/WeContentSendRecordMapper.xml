@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeContentSendRecordMapper">
+
+
+    <select id="getWeMaterialDataCount" resultType="com.linkwechat.domain.material.vo.ContentDataDetailVo"
+            parameterType="com.linkwechat.domain.material.query.ContentDetailQuery">
+        SELECT
+            t1.send_by,
+            t.sendTotalNum
+        FROM
+            (
+                SELECT
+                    send_by_id,
+                    ( SELECT count( 1 ) FROM we_content_send_record ft1 WHERE ft.send_by_id = ft1.send_by_id ) AS sendTotalNum
+                FROM
+                    we_content_send_record ft
+                <where>
+                    <if test="id != null"> and ft.content_id = #{id} </if>
+                    <if test="beginTime != null">and DATE_FORMAT(ft.send_time,'%Y-%m-%d') >= DATE_FORMAT(#{beginTime},'%Y-%m-%d')</if>
+                    <if test="endTime != null">and DATE_FORMAT(ft.send_time,'%Y-%m-%d') <![CDATA[<=]]> DATE_FORMAT(#{endTime},'%Y-%m-%d')</if>
+                </where>
+                GROUP BY
+                    send_by_id
+            ) t
+                INNER JOIN we_content_send_record t1 ON t.send_by_id = t1.send_by_id
+    </select>
+
+
+    <select id="selectSendTotalNumGroupByContentId"
+            resultType="com.linkwechat.domain.material.dto.WeContentSendViewDto">
+        SELECT
+            content_id,
+            count( 1 ) as sendTotalNum
+        FROM
+            we_content_send_record
+        GROUP BY
+            content_id
+    </select>
+
+
+
+</mapper>
