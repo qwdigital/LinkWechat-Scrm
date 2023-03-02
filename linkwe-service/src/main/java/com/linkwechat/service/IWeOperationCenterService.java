@@ -152,4 +152,11 @@ public interface IWeOperationCenterService {
      * 推送给个租户相关数据给租户
      */
     void pushData();
+
+    /**
+     * 客户群成员折线数据(按照时间段查询,不间断)
+     * @param query
+     * @return
+     */
+    List<WeGroupMemberRealCntVo> selectGroupMemberBrokenLine(WeOperationGroupQuery query);
 }

@@ -695,4 +695,34 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
 
+
+    <select id="selectGroupMemberBrokenLine"  resultType="com.linkwechat.domain.operation.vo.WeGroupMemberRealCntVo">
+        SELECT a.date as xtime,a.addCnt,b.quitCnt,a.addCnt+b.quitCnt as totalCnt
+        FROM
+            (
+                SELECT
+                    sdd.date,
+                    count(IF(wgm.quit_scene is NULL,0,null))  as addCnt
+                FROM
+                    sys_dim_date sdd
+                        LEFT JOIN we_group_member wgm ON	 DATE_FORMAT(wgm.join_time,'%Y-%m-%d')=sdd.date
+                WHERE DATE_FORMAT(sdd.date,'%Y-%m-%d') BETWEEN #{beginTime} and #{endTime}
+                GROUP BY  sdd.date
+                ORDER BY sdd.date ASC
+            ) a
+                LEFT JOIN
+            (
+                SELECT
+                    sdd.date,
+                    count(IF(wgm.quit_scene is NOT NULL,0,null))  as quitCnt
+                FROM
+                    sys_dim_date sdd
+                        LEFT JOIN we_group_member wgm ON	 DATE_FORMAT(wgm.quit_time,'%Y-%m-%d')=sdd.date
+                WHERE DATE_FORMAT(sdd.date,'%Y-%m-%d') BETWEEN #{beginTime} and #{endTime}
+                GROUP BY  sdd.date
+                ORDER BY sdd.date ASC
+            ) b on a.date=b.date
+    </select>
+
+
 </mapper>
