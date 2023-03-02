@@ -256,8 +256,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 (select count(1) from we_group where date_format(update_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')  and del_flag = 1 ) as yd_group_dissolve_cnt,
                 (select count(user_id) from we_group_member where del_flag = 0 ) as member_total_cnt,
                 (select count(user_id) from we_group_member where type = 1 and del_flag = 0 ) as member_user_cnt,
-                (select count(user_id) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_member_add_cnt,
-                (select count(user_id) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_member_add_cnt,
+                (select count(user_id) from we_group_member where date_format(join_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_member_add_cnt,
+                (select count(user_id) from we_group_member where date_format(join_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_member_add_cnt,
                 (select count(user_id) from we_group_member where date_format(quit_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') and del_flag = 1 ) as td_member_quit_cnt,
                 (select count(user_id) from we_group_member where date_format(quit_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') and del_flag = 1 ) as yd_member_quit_cnt;
     </select>
@@ -693,6 +693,36 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         (select count(1) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as ydMemberAddCnt,
         (select count(1) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') and del_flag = 1 ) as ydMemberQuitCnt
     </select>
+
+
+    <select id="selectGroupMemberBrokenLine"  resultType="com.linkwechat.domain.operation.vo.WeGroupMemberRealCntVo">
+        SELECT a.date as xtime,a.addCnt,b.quitCnt,a.addCnt+b.quitCnt as totalCnt
+        FROM
+            (
+                SELECT
+                    sdd.date,
+                    count(IF(wgm.quit_scene is NULL,0,null))  as addCnt
+                FROM
+                    sys_dim_date sdd
+                        LEFT JOIN we_group_member wgm ON	 DATE_FORMAT(wgm.join_time,'%Y-%m-%d')=sdd.date
+                WHERE DATE_FORMAT(sdd.date,'%Y-%m-%d') BETWEEN #{beginTime} and #{endTime}
+                GROUP BY  sdd.date
+                ORDER BY sdd.date ASC
+            ) a
+                LEFT JOIN
+            (
+                SELECT
+                    sdd.date,
+                    count(IF(wgm.quit_scene is NOT NULL,0,null))  as quitCnt
+                FROM
+                    sys_dim_date sdd
+                        LEFT JOIN we_group_member wgm ON	 DATE_FORMAT(wgm.quit_time,'%Y-%m-%d')=sdd.date
+                WHERE DATE_FORMAT(sdd.date,'%Y-%m-%d') BETWEEN #{beginTime} and #{endTime}
+                GROUP BY  sdd.date
+                ORDER BY sdd.date ASC
+            ) b on a.date=b.date
+    </select>
+
 
 
 </mapper>
