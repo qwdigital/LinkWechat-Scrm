@@ -11,7 +11,7 @@
 [![license](http://img.shields.io/badge/license-GPL%203.0-orange)](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
 [![木兰社区](https://img.shields.io/badge/Mulan-incubating-blue)](https://portal.mulanos.cn//)
 
-[官方网站](http://www.linkwechat.net/) | [在线演示](http://demo.linkwechat.net/) | [V3.x功能清单](https://docs.qq.com/sheet/DZW9HSHpHdWlOYWh2?tab=BB08J3)  | [最新动态](https://www.yuque.com/linkwechat/help/ozzxus)
+[官方网站](http://www.linkwechat.net/) | [在线演示](http://demo.linkwechat.net/) | [V4.x功能清单](https://docs.qq.com/sheet/DZUNUV2pRZU5kSnlU?tab=BB08J3)  | [最新动态](https://www.yuque.com/linkwechat/help/ozzxus)
 
 [项目手册](https://www.yuque.com/linkwechat/help) | [用户手册](https://docs.qq.com/pdf/DZXR0ZUJub29wTldS?) | [常见问题](https://www.yuque.com/linkwechat/help/qk5gl6) | [需求收集表](https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV)
 
@@ -27,9 +27,9 @@
 
 **<p align="center">【📣最近更新】还有什么想要产品/技术上友好的建议或意见，<a href="https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV" target="_blank">点击告诉我们~</a>一经采纳，将纳入开源贡献者并官网致谢，还会收到社区奖励的小礼品哦！~</p>**
 
-**<p align="center">LinkWeChat V3.0 正式发布啦，架构升级，全面焕新，欢迎大家提前体验！<a href="http://demo.linkwechat.net/" target="_blank">点击立即体验~</a></p>**
+**<p align="center">LinkWeChat V4.0 正式发布啦，新版“生态绿”视觉，更多能力逐步升级，欢迎大家提前体验！<a href="http://demo.linkwechat.net/" target="_blank">点击立即体验~</a></p>**
 
-**<p align="center">LinkWeChat V3.0 采用前后端分离架构，前端项目请点击<a href="https://gitee.com/LinkWeChat/link-we-chat-front" target="_blank">LinkWeChat-Front</a></p>**
+**<p align="center">LinkWeChat V4.0 采用前后端分离架构，前端项目请点击<a href="https://gitee.com/LinkWeChat/link-we-chat-front" target="_blank">LinkWeChat-Front</a></p>**
 
 
 **<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>**
@@ -80,7 +80,7 @@ LinkWeChat SCRM 基于企业私域流量营销闭环，遵从获取新客到管�
 *   **企业风控** ：会话合规存档，敏感内容全局风控；
 *   **企业管理** ：组织架构、自建应用全融合，实现“一个后台”；
 
-[LinkWeChat 社区版 V3.x 详细功能清单](https://docs.qq.com/sheet/DZW9HSHpHdWlOYWh2?tab=BB08J3)
+[LinkWeChat 社区版 V3.x 详细功能清单](https://docs.qq.com/sheet/DZUNUV2pRZU5kSnlU?tab=BB08J3)
 
 ![输入图片说明](readme-pic/3.4.png)
 
