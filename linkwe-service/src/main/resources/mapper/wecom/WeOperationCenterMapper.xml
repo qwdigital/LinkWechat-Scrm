@@ -695,7 +695,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
 
-
     <select id="selectGroupMemberBrokenLine"  resultType="com.linkwechat.domain.operation.vo.WeGroupMemberRealCntVo">
         SELECT a.date as xtime,a.addCnt,b.quitCnt,a.addCnt+b.quitCnt as totalCnt
         FROM
@@ -723,6 +722,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 ORDER BY sdd.date ASC
             ) b on a.date=b.date
     </select>
+
 
 
 </mapper>
