@@ -280,7 +280,7 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
     }
 
     @Override
-    @SynchRecord(synchType = SynchRecordConstants.SYNCH_LEAVE_USER)
+//    @SynchRecord(synchType = SynchRecordConstants.SYNCH_LEAVE_USER)
     public void synchLeaveSysUser() {
 
         LoginUser loginUser = SecurityUtils.getLoginUser();
