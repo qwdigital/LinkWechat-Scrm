@@ -241,5 +241,10 @@ public class IWeOperationCenterServiceImpl implements IWeOperationCenterService 
         }
     }
 
+    @Override
+    public List<WeGroupMemberRealCntVo> selectGroupMemberBrokenLine(WeOperationGroupQuery query) {
+        return this.weOperationCenterMapper.selectGroupMemberBrokenLine(query);
+    }
+
 
 }

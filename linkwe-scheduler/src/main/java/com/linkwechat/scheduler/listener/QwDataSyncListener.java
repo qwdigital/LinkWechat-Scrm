@@ -49,6 +49,10 @@ public class QwDataSyncListener {
     @Autowired
     private IWeLiveService iWeLiveService;
 
+
+    @Autowired
+    private IWeLeaveUserService iWeLeaveUserService;
+
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.sync.group-chat:Qu_GroupChat}")
     public void groupChatSubscribe(String msg, Channel channel, Message message) {
@@ -181,6 +185,19 @@ public class QwDataSyncListener {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("企微直播同步-消息处理失败 msg:{},error:{}",msg,e);
+        }
+    }
+
+    @RabbitHandler
+    @RabbitListener(queues = "${wecom.mq.queue.leaveUser:Qu_LeaveUser}")
+    public void weLeaveUserSubscribe(String msg, Channel channel, Message message){
+        try {
+            log.info("企微离职员工同步消息监听：msg:{}",msg);
+            iWeLeaveUserService.synchLeaveSysUserHandler(msg);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("企微离职员工同步消息监听-消息处理失败 msg:{},error:{}",msg,e);
         }
     }
 

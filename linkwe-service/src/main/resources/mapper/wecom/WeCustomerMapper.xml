@@ -9,7 +9,8 @@
     <select id="findWeCustomerListIds" resultType="java.lang.String">
         SELECT wcr.id FROM we_customer wcr
         LEFT JOIN sys_user su on su.we_user_id=wcr.add_user_id
-        <where>
+        WHERE
+            su.del_flag=0 and su.is_user_leave=0
             <if test="weCustomerList.gender !=null">
                 AND wcr.gender=#{weCustomerList.gender}
             </if>
@@ -62,7 +63,6 @@
             <if test="weCustomerList.beginTime !=null and weCustomerList.beginTime != '' and weCustomerList.endTime !='' and weCustomerList.endTime != null">
                 AND  date_format(wcr.add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
             </if>
-        </where>
         ORDER BY wcr.add_time desc
         <if test="pageDomain !=null">
             <if test="pageDomain.pageNum !=null and pageDomain.pageSize !=null">
@@ -72,15 +72,6 @@
 
     </select>
 
-
-<!--    <select id="findWeCustomerListExternalUserIds" resultType="java.lang.String">-->
-<!--         SELECT external_userid FROM we_customer-->
-<!--    </select>-->
-
-
-<!--    <select id="findWeCustomerListExternalUserIdsByAddUserId" resultType="java.lang.String">-->
-<!--        SELECT wcr.external_userid FROM we_customer wcr WHERE wcr.add_user_id=#{weUserId}-->
-<!--    </select>-->
 
 
     <select id="findWeUserIds" resultType="java.lang.String">
@@ -355,6 +346,7 @@
 
     <select id="findCustomerByOperUseridAndCustomerId" resultType="com.linkwechat.domain.customer.vo.WeCustomerPortraitVo">
         SELECT
+            wc.id as customerId,
             wc.customer_name as name,
             wc.other_descr as remark,
             wc.phone as remarkMobiles,

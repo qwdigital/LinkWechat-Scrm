@@ -2,9 +2,11 @@ package com.linkwechat.fallback;
 
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.wecom.query.WeCorpQrQuery;
+import com.linkwechat.domain.wecom.query.user.WeLeaveUserQuery;
 import com.linkwechat.domain.wecom.query.user.WeUserListQuery;
 import com.linkwechat.domain.wecom.query.user.WeUserQuery;
 import com.linkwechat.domain.wecom.vo.WeCorpQrVo;
+import com.linkwechat.domain.wecom.vo.user.WeLeaveUserVo;
 import com.linkwechat.domain.wecom.vo.user.WeLoginUserVo;
 import com.linkwechat.domain.wecom.vo.user.WeUserDetailVo;
 import com.linkwechat.domain.wecom.vo.user.WeUserListVo;
@@ -46,6 +48,11 @@ public class QwUserFallbackFactory implements QwUserClient {
 
     @Override
     public AjaxResult<WeCorpQrVo> getJoinQrcode(WeCorpQrQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<WeLeaveUserVo> getUnassignedList(WeLeaveUserQuery query) {
         return null;
     }
 }

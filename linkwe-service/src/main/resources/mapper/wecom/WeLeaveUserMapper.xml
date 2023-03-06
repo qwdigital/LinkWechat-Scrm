@@ -16,8 +16,7 @@
             wu.dimission_time as dimissionTime,
             (SELECT GROUP_CONCAT(wd.dept_name) FROM sys_dept wd WHERE wd.dept_id=wu.dept_id) as department,
             (SELECT count(*) FROM we_allocate_customer wac
-            INNER  JOIN we_customer wc ON wac.external_userid=wc.external_userid
-            and wac.handover_userid=wc.add_user_id  WHERE wac.handover_userid=wu.we_user_id) as allocateCustomerNum,
+              WHERE wac.handover_userid=wu.we_user_id) as allocateCustomerNum,
             (SELECT COUNT(*) FROM we_allocate_group wg WHERE wg.old_owner=wu.we_user_id) as allocateGroupNum
         FROM
         sys_user wu
@@ -36,6 +35,11 @@
 
     <select id="leaveAllocateUserList" parameterType="com.linkwechat.domain.WeLeaveUser"
             resultType="com.linkwechat.domain.WeLeaveUser">
+
+        select
+            a.*
+        FROM
+        (
         SELECT
             wu.we_user_id as user_id,
             wu.user_name,
@@ -54,6 +58,10 @@
             </if>
             <if test="isAllocate != null ">and wu.is_allocate = #{isAllocate}</if>
         </where>
+        ) a
+        WHERE
+          a.allocateCustomerNum != 0 or a.allocateGroupNum !=0
+
     </select>
 
     <select id="getAllocateCustomers" parameterType="com.linkwechat.domain.WeAllocateCustomer"
@@ -70,8 +78,8 @@
         LEFT JOIN we_customer wc ON wac.external_userid=wc.external_userid
         LEFT JOIN sys_user wu ON wu.we_user_id=wac.takeover_userid
         WHERE wc.del_flag=1
-        <if test="handoverUserId != null and handoverUserId !=''">and wc.add_user_id=#{handoverUserId}</if>
-        <if test="handoverUserId != null and handoverUserId !=''">and wac.handover_userid=#{handoverUserId}</if>
+        <if test="handoverUserid != null and handoverUserid !=''">and wc.add_user_id=#{handoverUserId}</if>
+        <if test="handoverUserid != null and handoverUserid !=''">and wac.handover_userid=#{handoverUserId}</if>
         <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
             DATE_FORMAT(wu.update_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
         </if>

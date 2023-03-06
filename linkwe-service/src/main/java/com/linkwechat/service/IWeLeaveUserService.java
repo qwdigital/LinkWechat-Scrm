@@ -1,13 +1,11 @@
 package com.linkwechat.service;
 
-import com.linkwechat.domain.WeAllocateCustomer;
-import com.linkwechat.domain.WeAllocateGroups;
-import com.linkwechat.domain.WeLeaveUser;
-import com.linkwechat.domain.WeLeaveUserInfoAllocate;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.domain.*;
 
 import java.util.List;
 
-public interface IWeLeaveUserService {
+public interface IWeLeaveUserService extends IService<SysLeaveUser> {
     /**
      * 离职未分配员工
      * @param weLeaveUser
@@ -53,6 +51,26 @@ public interface IWeLeaveUserService {
      * @param weUserIds
      */
     void createWaitAllocateCustomerAndGroup(String[] weUserIds);
+
+
+    /**
+     * 同步企业微信客户
+     * @return
+     */
+    void synchLeaveSysUser();
+
+
+
+    /**
+     * 同步企业微信客户业务
+     * @param msg
+     */
+    void synchLeaveSysUserHandler(String msg);
+
+
+
+
+
 
 
 

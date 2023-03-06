@@ -166,4 +166,12 @@ public interface WeOperationCenterMapper {
      * @return
      */
     WeGroupRemindAnalysisVo findWeGroupRemindAnalysis();
+
+
+    /**
+     * 客户群成员折线数据(按照时间段查询,不间断)
+     * @param query
+     * @return
+     */
+    List<WeGroupMemberRealCntVo> selectGroupMemberBrokenLine(WeOperationGroupQuery query);
 }

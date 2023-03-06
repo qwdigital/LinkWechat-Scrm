@@ -17,6 +17,7 @@ import com.linkwechat.common.enums.GroupUpdateDetailEnum;
 import com.linkwechat.common.enums.MessageNoticeType;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.WeGroupMember;
@@ -123,57 +124,91 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
         SecurityContextHolder.setCorpId(loginUser.getCorpId());
         SecurityContextHolder.setUserName(loginUser.getUserName());
         SecurityContextHolder.setUserType(loginUser.getUserType());
-        WeGroupChatListQuery query = new WeGroupChatListQuery();
-        WeGroupChatListVo groupChatListVo = qwCustomerClient.getGroupChatList(query).getData();
-        if (groupChatListVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())
-                && CollectionUtil.isNotEmpty(groupChatListVo.getGroupChatList())) {
-            List<WeGroupChatListVo.GroupChat> groupChatList = groupChatListVo.getGroupChatList();
-            if (CollectionUtil.isNotEmpty(groupChatList)) {
-                List<WeGroup> weGroups = new LinkedList<>();
-                List<WeGroupMember> weGroupMembers = new LinkedList<>();
-                for (WeGroupChatListVo.GroupChat groupChat : groupChatList) {
 
-                    WeGroupChatDetailQuery groupChatDetailQuery = new WeGroupChatDetailQuery(groupChat.getChatId(), 1);
-                    WeGroupChatDetailVo weGroupChatDetailVo = qwCustomerClient.getGroupChatDetail(groupChatDetailQuery).getData();
-                    if (weGroupChatDetailVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode()) && weGroupChatDetailVo.getGroupChat() != null) {
-                        WeGroupChatDetailVo.GroupChatDetail detail = weGroupChatDetailVo.getGroupChat();
-                        WeGroup weGroup = new WeGroup();
-                        weGroup.transformQwParams(detail);
-                        weGroup.setStatus(groupChat.getStatus());
-                        weGroup.setDelFlag(Constants.COMMON_STATE);
-                        weGroup.setCreateBy(SecurityUtils.getUserName());
-                        weGroup.setCreateById(SecurityUtils.getUserId());
-                        weGroup.setUpdateBy(SecurityUtils.getUserName());
-                        weGroup.setUpdateById(SecurityUtils.getUserId());
-                        weGroup.setCreateTime(new Date());
-                        weGroup.setUpdateTime(new Date());
-                        weGroups.add(weGroup);
+        this.synchWeGroup(WeGroupChatListQuery.builder().build());
 
-                        List<WeGroupMemberEntity> memberLists = detail.getMemberList();
-                        if (CollectionUtil.isNotEmpty(memberLists)) {
-                            memberLists.forEach(groupMember -> {
-                                WeGroupMember weGroupMember = new WeGroupMember();
-                                weGroupMember.setChatId(groupChat.getChatId());
-                                weGroupMember.transformQwParams(groupMember);
-                                weGroupMember.setCreateTime(new Date());
-                                weGroupMember.setUpdateTime(new Date());
-                                weGroupMember.setDelFlag(Constants.COMMON_STATE);
-                                weGroupMember.setCreateBy(SecurityUtils.getUserName());
-                                weGroupMember.setCreateById(SecurityUtils.getUserId());
-                                weGroupMember.setCreateTime(new Date());
-                                weGroupMember.setUpdateBy(SecurityUtils.getUserName());
-                                weGroupMember.setUpdateById(SecurityUtils.getUserId());
-                                weGroupMember.setUpdateTime(new Date());
-                                weGroupMembers.add(weGroupMember);
-                            });
-                        }
+
+    }
+
+    @Override
+    public List<WeGroupChatListVo.GroupChat> synchWeGroup(WeGroupChatListQuery chatListQuery){
+
+        List<WeGroupChatListVo.GroupChat> groupChatList=new ArrayList<>();
+
+        this.getGroupChatList(groupChatList,chatListQuery);
+
+        if (CollectionUtil.isNotEmpty(groupChatList)) {
+            List<WeGroup> weGroups = new LinkedList<>();
+            List<WeGroupMember> weGroupMembers = new LinkedList<>();
+            for (WeGroupChatListVo.GroupChat groupChat : groupChatList) {
+
+                WeGroupChatDetailQuery groupChatDetailQuery = new WeGroupChatDetailQuery(groupChat.getChatId(), 1);
+                WeGroupChatDetailVo weGroupChatDetailVo = qwCustomerClient.getGroupChatDetail(groupChatDetailQuery).getData();
+                if (weGroupChatDetailVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode()) && weGroupChatDetailVo.getGroupChat() != null) {
+                    WeGroupChatDetailVo.GroupChatDetail detail = weGroupChatDetailVo.getGroupChat();
+                    WeGroup weGroup = new WeGroup();
+                    weGroup.transformQwParams(detail);
+                    weGroup.setStatus(groupChat.getStatus());
+                    weGroup.setDelFlag(Constants.COMMON_STATE);
+                    weGroup.setCreateBy(SecurityUtils.getUserName());
+                    weGroup.setCreateById(SecurityUtils.getUserId());
+                    weGroup.setUpdateBy(SecurityUtils.getUserName());
+                    weGroup.setUpdateById(SecurityUtils.getUserId());
+                    weGroup.setCreateTime(new Date());
+                    weGroup.setUpdateTime(new Date());
+                    weGroups.add(weGroup);
+
+                    List<WeGroupMemberEntity> memberLists = detail.getMemberList();
+                    if (CollectionUtil.isNotEmpty(memberLists)) {
+                        memberLists.forEach(groupMember -> {
+                            WeGroupMember weGroupMember = new WeGroupMember();
+                            weGroupMember.setChatId(groupChat.getChatId());
+                            weGroupMember.transformQwParams(groupMember);
+                            weGroupMember.setCreateTime(new Date());
+                            weGroupMember.setUpdateTime(new Date());
+                            weGroupMember.setDelFlag(Constants.COMMON_STATE);
+                            weGroupMember.setCreateBy(SecurityUtils.getUserName());
+                            weGroupMember.setCreateById(SecurityUtils.getUserId());
+                            weGroupMember.setCreateTime(new Date());
+                            weGroupMember.setUpdateBy(SecurityUtils.getUserName());
+                            weGroupMember.setUpdateById(SecurityUtils.getUserId());
+                            weGroupMember.setUpdateTime(new Date());
+                            weGroupMembers.add(weGroupMember);
+                        });
                     }
                 }
-                //删除不包含当前的群以及成员
-                insertBatchGroupAndMember(weGroups, weGroupMembers,false);
             }
+            //删除不包含当前的群以及成员
+            insertBatchGroupAndMember(weGroups, weGroupMembers,false);
         }
+
+
+
+        return groupChatList;
     }
+
+
+
+
+    @Override
+    public void getGroupChatList( List<WeGroupChatListVo.GroupChat> groupChatList,WeGroupChatListQuery chatListQuery){
+        WeGroupChatListVo groupChatListVo = qwCustomerClient.getGroupChatList(chatListQuery).getData();
+        if (groupChatListVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())
+                && CollectionUtil.isNotEmpty(groupChatListVo.getGroupChatList())) {
+              groupChatList.addAll(groupChatListVo.getGroupChatList());
+              if(StringUtils.isNotEmpty(groupChatListVo.getNextCursor())){
+                  chatListQuery.setCursor(groupChatListVo.getNextCursor());
+                  getGroupChatList(groupChatList,chatListQuery);
+              }
+
+        }
+
+
+
+    }
+
+
+
 
     @Override
     @Transactional
