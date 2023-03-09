@@ -196,7 +196,8 @@ public class QwWelcomeMsgListener {
 
                     if(null != storeCodeConfig){
                         List<WeQrAttachments> weQrAttachments = attachmentsService.list(new LambdaQueryWrapper<WeQrAttachments>()
-                                .eq(WeQrAttachments::getQrId, storeCodeConfig.getId()));
+                                .eq(WeQrAttachments::getQrId, storeCodeConfig.getId())
+                                .eq(WeQrAttachments::getBusinessType,2));
 
                         if(CollectionUtil.isNotEmpty(weQrAttachments)){
 

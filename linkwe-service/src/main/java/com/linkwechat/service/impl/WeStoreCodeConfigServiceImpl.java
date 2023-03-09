@@ -78,7 +78,7 @@ public class WeStoreCodeConfigServiceImpl extends ServiceImpl<WeStoreCodeConfigM
 
          if(saveOrUpdate(storeCodeConfig)){
 
-             attachmentsService.updateBatchByQrId(storeCodeConfig.getId(), storeCodeConfig.getAttachments());
+             attachmentsService.updateBatchByQrId(storeCodeConfig.getId(),2, storeCodeConfig.getAttachments());
 
          }
     }

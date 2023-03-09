@@ -12,17 +12,17 @@ import lombok.Data;
  **/
 @ApiModel
 @Data
-public class WeQrCodeListQuery extends BaseEntity {
+public class WeLxQrCodeListQuery extends BaseEntity {
 
 
     @ApiModelProperty("活码Id")
     private Long qrId;
 
-    @ApiModelProperty("分组id")
-    private String groupId;
-
     @ApiModelProperty("活码名称")
     private String qrName;
+
+    @ApiModelProperty(value = "拉新方式 1：红包 2：卡券")
+    private Integer type;
 
     @ApiModelProperty("员工ID")
     private String qrUserIds;

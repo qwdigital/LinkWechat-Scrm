@@ -17,16 +17,20 @@ public interface IWeQrAttachmentsService extends IService<WeQrAttachments> {
 
     /**
      * 通过活码id批量保存活码欢迎语素材
-     * @param qrId 活码id
+     *
+     * @param qrId        活码id
+     * @param businessType  业务类型 1-员工活码 2-门店导购 3-拉新活码
      * @param attachments 素材列表
      */
-    void saveBatchByQrId(Long qrId, List<WeMessageTemplate> attachments);
+    void saveBatchByQrId(Long qrId, Integer businessType, List<WeMessageTemplate> attachments);
 
 
     /**
      * 通过活码id批量修改活码欢迎语素材
-     * @param qrId 活码id
+     *
+     * @param qrId        活码id
+     * @param businessType  业务类型 1-员工活码 2-门店导购 3-拉新活码
      * @param attachments 素材列表
      */
-    void updateBatchByQrId(Long qrId, List<WeMessageTemplate> attachments);
+    void updateBatchByQrId(Long qrId, Integer businessType, List<WeMessageTemplate> attachments);
 }

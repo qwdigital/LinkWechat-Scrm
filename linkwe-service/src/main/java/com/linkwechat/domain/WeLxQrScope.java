@@ -1,4 +1,5 @@
-package com.linkwechat.domain.qr;
+package com.linkwechat.domain;
+
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -7,21 +8,26 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
 
 /**
- * 活码标签关联表(WeQrTagRel)表实体类
+ * 拉新活码使用范围表(WeLxQrScope)
  *
- * @author makejava
- * @since 2021-11-07 01:29:13
+ * @author danmo
+ * @since 2023-03-07 15:06:04
  */
 @ApiModel
 @Data
 @SuppressWarnings("serial")
-@TableName("we_qr_tag_rel")
-public class WeQrTagRel extends BaseEntity implements Serializable {
+@TableName("we_lx_qr_scope")
+public class WeLxQrScope extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L; //1
 
@@ -43,23 +49,33 @@ public class WeQrTagRel extends BaseEntity implements Serializable {
 
 
     /**
-     * 业务类型 1-员工活码 2-门店导购 3-拉新活码
+     * 范围类型 1-员工 2-部门
      */
-    @ApiModelProperty(value = "业务类型 1-员工活码 2-门店导购 3-拉新活码 ...")
-    @TableField("business_type")
-    private Integer businessType;
+    @ApiModelProperty(value = "范围类型 1-员工 2-部门")
+    @TableField("scope_type")
+    private Integer scopeType;
+
 
     /**
-     * 标签id
+     * 部门id
      */
-    @ApiModelProperty(value = "标签id")
-    @TableField("tag_id")
-    private String tagId;
+    @ApiModelProperty(value = "部门id")
+    @TableField("party")
+    private String party;
+
+
+    /**
+     * 员工id
+     */
+    @ApiModelProperty(value = "员工id")
+    @TableField("user_id")
+    private String userId;
+
 
     /**
      * 删除标识 0 有效 1删除
      */
-    @ApiModelProperty(value = "删除标识 0 有效 1删除",hidden = true)
+    @ApiModelProperty(value = "删除标识 0 有效 1删除")
     @TableField("del_flag")
     private Integer delFlag;
 }

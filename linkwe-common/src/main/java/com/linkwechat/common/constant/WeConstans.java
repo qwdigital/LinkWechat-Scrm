@@ -153,6 +153,9 @@ public class WeConstans {
     public static final String WE_QR_CODE_PREFIX = "we_qr";
 
 
+    public static final String WE_LX_QR_CODE_PREFIX = "we_lxqr";
+
+
     /**
      * 门店活码前缀
      */

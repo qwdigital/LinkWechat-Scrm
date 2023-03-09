@@ -24,26 +24,27 @@ import java.util.stream.Collectors;
 public class IWeQrTagRelServiceImpl extends ServiceImpl<WeQrTagRelMapper, WeQrTagRel> implements IWeQrTagRelService {
 
     @Override
-    public void saveBatchByQrId(Long qrId, List<String> qrTags) {
+    public void saveBatchByQrId(Long qrId, Integer businessType, List<String> qrTags) {
         List<WeQrTagRel> tagRels = Optional.ofNullable(qrTags).orElseGet(ArrayList::new).stream().map(tagId -> {
             WeQrTagRel weQrTagRel = new WeQrTagRel();
             weQrTagRel.setQrId(qrId);
             weQrTagRel.setTagId(tagId);
+            weQrTagRel.setBusinessType(businessType);
             return weQrTagRel;
         }).collect(Collectors.toList());
         saveBatch(tagRels);
     }
 
     @Override
-    public Boolean delBatchByQrIds(List<Long> qrIds) {
+    public Boolean delBatchByQrIds(List<Long> qrIds, Integer businessType) {
         WeQrTagRel weQrTagRel = new WeQrTagRel();
         weQrTagRel.setDelFlag(1);
-        return this.update(weQrTagRel, new LambdaQueryWrapper<WeQrTagRel>().in(WeQrTagRel::getQrId,qrIds));
+        return this.update(weQrTagRel, new LambdaQueryWrapper<WeQrTagRel>().in(WeQrTagRel::getQrId, qrIds).eq(WeQrTagRel::getBusinessType,businessType));
     }
 
     @Override
-    public void updateBatchByQrId(Long qrId, List<String> qrTags) {
-        this.delBatchByQrIds(ListUtil.toList(qrId));
-        this.saveBatchByQrId(qrId,qrTags);
+    public void updateBatchByQrId(Long qrId, Integer businessType, List<String> qrTags) {
+        this.delBatchByQrIds(ListUtil.toList(qrId), businessType);
+        this.saveBatchByQrId(qrId, businessType, qrTags);
     }
 }
