@@ -71,6 +71,13 @@ public class WeLxQrScope extends BaseEntity implements Serializable {
     @TableField("user_id")
     private String userId;
 
+    /**
+     * 岗位
+     */
+    @ApiModelProperty(value = "岗位")
+    @TableField("position")
+    private String position;
+
 
     /**
      * 删除标识 0 有效 1删除

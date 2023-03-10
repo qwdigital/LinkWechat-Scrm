@@ -27,4 +27,7 @@ public class WeLxQrScopeUserVo {
 
     @ApiModelProperty(value = "部门名称")
     private String partyName;
+
+    @ApiModelProperty(value = "岗位")
+    private Integer position;
 }

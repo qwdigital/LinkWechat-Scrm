@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.core.domain.FileEntity;
+import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
@@ -26,6 +27,7 @@ import com.linkwechat.domain.WeLxQrCode;
 import com.linkwechat.domain.qr.WeQrAttachments;
 import com.linkwechat.domain.qr.query.WeLxQrAddQuery;
 import com.linkwechat.domain.qr.query.WeLxQrCodeListQuery;
+import com.linkwechat.domain.qr.query.WeLxQrUserInfoQuery;
 import com.linkwechat.domain.qr.query.WxLxQrQuery;
 import com.linkwechat.domain.qr.vo.*;
 import com.linkwechat.domain.system.dept.query.SysDeptQuery;
@@ -90,7 +92,11 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
     @Override
     public Long addQrCode(WeLxQrAddQuery weQrAddQuery) {
         WeLxQrAddVo weLxQrAddVo = new WeLxQrAddVo();
+
         WeAddWayQuery weContactWay = weQrAddQuery.getWeContactWay();
+
+        getWeUserIdByPosition(weQrAddQuery, weContactWay);
+
         WeAddWayVo weAddWayResult = qwCustomerClient.addContactWay(weContactWay).getData();
         log.info("新增拉新活码结果 result:{}", JSONObject.toJSONString(weAddWayResult));
 
@@ -113,6 +119,7 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
             throw new WeComException("数据入库失败");
         }
     }
+
 
     @Override
     public WeLxQrAddVo generateQrCode(Long id) {
@@ -143,6 +150,9 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
             throw new WeComException("无效ID");
         }
         WeAddWayQuery weContactWay = query.getWeContactWay();
+
+        getWeUserIdByPosition(query, weContactWay);
+
         weContactWay.setConfig_id(qrCode.getConfigId());
         WeResultVo weResult = qwCustomerClient.updateContactWay(weContactWay).getData();
         log.info("修改拉新活码结果 result:{}", JSONObject.toJSONString(weResult));
@@ -344,6 +354,21 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
         return lxQrCodeSheetList;
     }
 
+
+    private void getWeUserIdByPosition(WeLxQrAddQuery weQrAddQuery, WeAddWayQuery weContactWay) {
+        //岗位列表
+        String positions = weQrAddQuery.getQrUserInfos().stream().map(WeLxQrUserInfoQuery::getPositions)
+                .filter(CollectionUtil::isNotEmpty).flatMap(Collection::stream).collect(Collectors.joining(","));
+        if (StringUtils.isNotEmpty(positions)) {
+            List<SysUser> userList = qwSysUserClient.findAllSysUser(null, positions, null).getData();
+            if(CollectionUtil.isNotEmpty(userList)){
+                List<String> weUserIds = userList.stream().map(SysUser::getWeUserId).collect(Collectors.toList());
+                List<String> user = weContactWay.getUser();
+                Set<String> userIdSet = CollectionUtil.unionDistinct(weUserIds, user);
+                weContactWay.setUser(new ArrayList<>(userIdSet));
+            }
+        }
+    }
 
     private void statisticsParamsCheck(WeLxQrCodeListQuery query) {
         if (Objects.isNull(query)) {

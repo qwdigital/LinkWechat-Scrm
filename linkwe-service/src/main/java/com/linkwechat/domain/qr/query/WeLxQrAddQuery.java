@@ -7,12 +7,10 @@ import cn.hutool.core.util.RandomUtil;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.domain.WeLxQrCode;
 import com.linkwechat.domain.media.WeMessageTemplate;
-import com.linkwechat.domain.qr.WeQrCode;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.apache.commons.lang3.BooleanUtils;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -40,6 +38,12 @@ public class WeLxQrAddQuery {
     @ApiModelProperty("拉新方式 1：红包 2：卡券")
     @NotNull(message = "拉新方式不能为空")
     private Integer qrType;
+
+    @ApiModelProperty("业务ID")
+    private String businessId;
+
+    @ApiModelProperty("业务数据")
+    private String businessData;
 
     @ApiModelProperty("标签id列表")
     private List<String> qrTags;
@@ -105,6 +109,8 @@ public class WeLxQrAddQuery {
         }
         weLxQrCode.setConfigId(configId);
         weLxQrCode.setQrCode(qrCode);
+        weLxQrCode.setBusinessId(Long.valueOf(this.businessId));
+        weLxQrCode.setBusinessData(this.businessData);
         return weLxQrCode;
     }
 

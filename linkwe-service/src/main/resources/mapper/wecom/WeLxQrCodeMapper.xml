@@ -9,6 +9,7 @@
         <result property="name" column="name" jdbcType="VARCHAR"/>
         <result property="type" column="type" jdbcType="INTEGER"/>
         <result property="businessId" column="business_id" jdbcType="INTEGER"/>
+        <result property="businessData" column="business_data" jdbcType="VARCHAR"/>
         <result property="state" column="state" jdbcType="VARCHAR"/>
         <result property="scanNum" column="scan_num" jdbcType="INTEGER"/>
         <result property="configId" column="config_id" jdbcType="VARCHAR"/>
@@ -29,6 +30,7 @@
         <result property="name" column="name" jdbcType="VARCHAR"/>
         <result property="type" column="type" jdbcType="INTEGER"/>
         <result property="businessId" column="business_id" jdbcType="INTEGER"/>
+        <result property="businessData" column="business_data" jdbcType="INTEGER"/>
         <result property="state" column="state" jdbcType="VARCHAR"/>
         <result property="scanNum" column="scan_num" jdbcType="INTEGER"/>
         <result property="configId" column="config_id" jdbcType="VARCHAR"/>
@@ -64,6 +66,7 @@
                name,
                type,
                business_id,
+               business_data,
                state,
                scan_num,
                config_id,
@@ -85,6 +88,8 @@
                wlqc.name,
                wlqc.type,
                wlqc.state,
+               wlqc.business_id,
+               wlqc.business_data,
                wlqc.scan_num,
                wlqc.config_id,
                wlqc.qr_code,
@@ -93,6 +98,7 @@
                wlqs.scope_type,
                wlqs.user_id,
                wlqs.party,
+               wlqs.position,
                wqtr.tag_id,
                wt.name as tag_name,
                wqa.msg_type,

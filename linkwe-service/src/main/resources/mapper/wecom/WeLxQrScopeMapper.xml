@@ -10,6 +10,7 @@
                 <result property="scopeType" column="scope_type" jdbcType="INTEGER"/>
                 <result property="party" column="party" jdbcType="VARCHAR"/>
                 <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+                <result property="position" column="position" jdbcType="VARCHAR"/>
                 <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
                 <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
                 <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
@@ -20,7 +21,7 @@
             </resultMap>
 
     <sql id="selectWeLxQrScopeVo">
-        select id, qr_id, scope_type, party, user_id, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag from we_lx_qr_scope
+        select id, qr_id, scope_type, party, user_id, position, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag from we_lx_qr_scope
     </sql>
 
 </mapper>

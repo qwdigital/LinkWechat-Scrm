@@ -46,6 +46,12 @@ public class WeLxQrCodeDetailVo {
     @ApiModelProperty(value = "业务ID")
     private Long businessId;
 
+    /**
+     * 业务数据
+     */
+    @ApiModelProperty(value = "业务数据")
+    private String businessData;
+
 
     /**
      * 添加渠道

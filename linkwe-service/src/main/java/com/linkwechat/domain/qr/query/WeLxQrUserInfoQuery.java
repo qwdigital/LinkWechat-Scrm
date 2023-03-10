@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 public class WeLxQrUserInfoQuery {
 
-    @ApiModelProperty("员工类型 1-员工 2-部门")
+    @ApiModelProperty("员工类型 1-员工 2-部门 3-岗位")
     private Integer scopeType;
 
     @ApiModelProperty("部门id列表")
@@ -23,4 +23,7 @@ public class WeLxQrUserInfoQuery {
 
     @ApiModelProperty("员工id列表")
     private List<String> userIds;
+
+    @ApiModelProperty("岗位列表")
+    private List<String> positions;
 }

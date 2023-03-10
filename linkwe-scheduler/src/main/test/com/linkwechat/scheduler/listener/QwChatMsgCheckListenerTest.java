@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
@@ -14,11 +16,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class QwChatMsgCheckListenerTest {
 
     @Autowired
-    private QwChatMsgCheckListener qwChatMsgCheckListener;
+    private QwWelcomeMsgListener qwWelcomeMsgListener;
 
     @Test
-    void subscribe() {
-        String msg = "{\"corpId\":\"ww622fc852f79c3f13\",\"tolist\":[\"wmbhUTLgAASJ1W6ealJ1AFhPFC7vHasw\"],\"msgtime\":1663810608924,\"msgid\":\"9772783422504563801_1663810613452_external\",\"action\":\"send\",\"from\":\"DanMo\",\"text\":{\"content\":\"红包\"},\"msgtype\":\"text\",\"roomid\":\"\",\"seq\":466}";
-        qwChatMsgCheckListener.msgContextHandle(JSONObject.parseObject(msg));
+    void subscribe() throws IOException {
+        String msg = "{\"changeType\":\"add_external_contact\",\"createTime\":1678412858,\"event\":\"change_external_contact\",\"externalUserID\":\"wmbhUTLgAA2PSgZCGp0un2b-8bP2yO3g\",\"fromUserName\":\"sys\",\"msgType\":\"event\",\"state\":\"1592099060930727936\",\"toUserName\":\"ww622fc852f79c3f13\",\"userID\":\"45DuXiangShangQingXie\",\"welcomeCode\":\"205ttN9RtSSig5viZIQ5Pz7NiHqzh0tnXoiXFHuMUWk\"}";
+        qwWelcomeMsgListener.subscribe(msg,null,null);
     }
 }

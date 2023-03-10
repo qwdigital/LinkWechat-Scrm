@@ -48,6 +48,15 @@ public class WeLxQrScopeServiceImpl extends ServiceImpl<WeLxQrScopeMapper, WeLxQ
                     return weQrScope;
                 }).collect(Collectors.toList());
                 scopeList.addAll(weQrScopePartyList);
+
+                List<WeLxQrScope> weQrScopePositionList = Optional.ofNullable(userInfo.getPositions()).orElseGet(ArrayList::new).stream().map(position -> {
+                    WeLxQrScope weQrScope = new WeLxQrScope();
+                    weQrScope.setQrId(qrId);
+                    weQrScope.setPosition(position);
+                    weQrScope.setScopeType(3);
+                    return weQrScope;
+                }).collect(Collectors.toList());
+                scopeList.addAll(weQrScopePositionList);
             }
             saveBatch(scopeList);
         }
