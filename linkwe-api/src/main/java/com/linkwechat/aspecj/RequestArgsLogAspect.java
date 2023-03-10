@@ -1,6 +1,7 @@
 package com.linkwechat.aspecj;
 
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.utils.ip.IpUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -8,6 +9,11 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 
 /**
  * 请求入参日志记录处理
@@ -32,9 +38,13 @@ public class RequestArgsLogAspect {
     public void doBefore(JoinPoint joinPoint) {
 
         Object[] args = joinPoint.getArgs();
-        // 设置方法名称
-        String className = joinPoint.getTarget().getClass().getName();
-        String methodName = joinPoint.getSignature().getName();
-        log.info("api 接口请求 className:{},methodName:{},params:{}", className, methodName, JSONObject.toJSONString(args));
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (Objects.isNull(attributes)) {
+            return;
+        }
+        HttpServletRequest request = attributes.getRequest();
+        String url = request.getRequestURL().toString();
+        String ipAddr = IpUtils.getIpAddr(request);
+        log.info("api 接口请求 url:{},HTTP:{},IP:{},params:{}", url, request.getMethod(), ipAddr, JSONObject.toJSONString(args));
     }
 }
