@@ -55,7 +55,7 @@ public interface IWeLxQrCodeService extends IService<WeLxQrCode> {
      * @param query
      * @return
      */
-    List<WeQrCodeDetailVo> getQrCodeList(WeLxQrCodeListQuery query);
+    PageInfo<WeLxQrCodeListVo> getQrCodeList(WeLxQrCodeListQuery query);
 
     /**
      * 统计拉新活码折线图

@@ -20,7 +20,7 @@ public class WxLxQrQuery {
     @NotNull(message = "活码名称不能为空")
     private Long qrId;
 
-    @ApiModelProperty("名称")
+    @ApiModelProperty("客户unionID")
     @NotEmpty(message = "unionID不能为空")
     private String unionId;
 

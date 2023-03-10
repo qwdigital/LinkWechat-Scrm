@@ -1,5 +1,6 @@
 package com.linkwechat.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
@@ -12,6 +13,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.core.domain.FileEntity;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
@@ -255,8 +257,30 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
     }
 
     @Override
-    public List<WeQrCodeDetailVo> getQrCodeList(WeLxQrCodeListQuery query) {
-        return null;
+    public PageInfo<WeLxQrCodeListVo> getQrCodeList(WeLxQrCodeListQuery query) {
+        PageInfo<WeLxQrCodeListVo> pageInfo = new PageInfo<>();
+        LambdaQueryWrapper<WeLxQrCode> wrapper = new LambdaQueryWrapper<WeLxQrCode>()
+                .eq(StringUtils.isNotEmpty(query.getQrName()), WeLxQrCode::getName, query.getQrName())
+                .eq(Objects.nonNull(query.getType()), WeLxQrCode::getType, query.getType())
+                .ge(StringUtils.isNotEmpty(query.getBeginTime()), WeLxQrCode::getCreateTime, query.getBeginTime())
+                .le(StringUtils.isNotEmpty(query.getEndTime()), WeLxQrCode::getCreateTime, query.getEndTime())
+                .eq(WeLxQrCode::getDelFlag, 0);
+        List<WeLxQrCode> lxQrCodeList = list(wrapper);
+        if (CollectionUtil.isNotEmpty(lxQrCodeList)) {
+            //todo 计算领取总数
+
+            List<WeLxQrCodeListVo> list = lxQrCodeList.stream().map(shortLink -> {
+                WeLxQrCodeListVo codeList = new WeLxQrCodeListVo();
+                BeanUtil.copyProperties(shortLink, codeList);
+                return codeList;
+            }).collect(Collectors.toList());
+            pageInfo.setList(list);
+        }
+        PageInfo<WeLxQrCode> pageIdInfo = new PageInfo<>(lxQrCodeList);
+        pageInfo.setTotal(pageIdInfo.getTotal());
+        pageInfo.setPageNum(pageIdInfo.getPageNum());
+        pageInfo.setPageSize(pageIdInfo.getPageSize());
+        return pageInfo;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.linkwechat.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
@@ -68,7 +69,7 @@ public class WeLxQrCodeController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo<WeLxQrCodeListVo> getQrCodeList(WeLxQrCodeListQuery query) {
         startPage();
-        List<WeQrCodeDetailVo> qrCodeList = weLxQrCodeService.getQrCodeList(query);
+        PageInfo<WeLxQrCodeListVo> qrCodeList = weLxQrCodeService.getQrCodeList(query);
         return getDataTable(qrCodeList);
     }
 
