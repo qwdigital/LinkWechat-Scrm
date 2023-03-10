@@ -24,6 +24,7 @@ import com.linkwechat.domain.WeLxQrCode;
 import com.linkwechat.domain.qr.WeQrAttachments;
 import com.linkwechat.domain.qr.query.WeLxQrAddQuery;
 import com.linkwechat.domain.qr.query.WeLxQrCodeListQuery;
+import com.linkwechat.domain.qr.query.WxLxQrQuery;
 import com.linkwechat.domain.qr.vo.*;
 import com.linkwechat.domain.system.dept.query.SysDeptQuery;
 import com.linkwechat.domain.system.dept.vo.SysDeptVo;
@@ -270,7 +271,7 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
         Date beginTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD, query.getBeginTime());
         Date endTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD, query.getEndTime());
         WeLxQrCode weQrCode = getById(qrId);
-        if(Objects.isNull(weQrCode)){
+        if (Objects.isNull(weQrCode)) {
             throw new WeComException("无效ID");
         }
         Map<String, List<WeCustomer>> customerMap = new HashMap<>();
@@ -304,7 +305,7 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
         statisticsParamsCheck(query);
 
         WeLxQrCode weQrCode = getById(query.getQrId());
-        if(Objects.isNull(weQrCode)){
+        if (Objects.isNull(weQrCode)) {
             throw new WeComException("无效ID");
         }
         query.setState(weQrCode.getState());
@@ -319,21 +320,44 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
         return lxQrCodeSheetList;
     }
 
+
     private void statisticsParamsCheck(WeLxQrCodeListQuery query) {
-        if(Objects.isNull(query)){
+        if (Objects.isNull(query)) {
             throw new WeComException("参数不能为空");
         }
 
-        if(Objects.isNull(query.getQrId())){
+        if (Objects.isNull(query.getQrId())) {
             throw new WeComException("ID不能为空");
         }
-        if(StringUtils.isEmpty(query.getBeginTime())){
+        if (StringUtils.isEmpty(query.getBeginTime())) {
             throw new WeComException("开始时间不能为空");
         }
-        if(StringUtils.isEmpty(query.getEndTime())){
+        if (StringUtils.isEmpty(query.getEndTime())) {
             throw new WeComException("结束时间不能为空");
         }
     }
 
+
+    @Override
+    public WxLxQrCodeVo getQrcode(WxLxQrQuery query) {
+
+        WxLxQrCodeVo wxLxQrCodeVo = new WxLxQrCodeVo();
+
+        //判断是否为新客
+        int count = weCustomerService.count(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getUnionid, query.getUnionId()));
+
+        if (count > 0) {
+            throw new WeComException("您已经是企业客户啦，暂不符合该拉新活动要求。");
+        }
+
+        WeLxQrCode lxQrCode = getById(query.getQrId());
+
+        if (Objects.isNull(lxQrCode)) {
+            throw new WeComException("无效ID");
+        }
+
+        wxLxQrCodeVo.setQrCode(lxQrCode.getQrCode());
+        return wxLxQrCodeVo;
+    }
 
 }
