@@ -27,4 +27,7 @@ public class WeLxQrCodeListQuery extends BaseEntity {
     @ApiModelProperty("员工ID")
     private String qrUserIds;
 
+    @ApiModelProperty(value = "渠道",hidden = true)
+    private String state;
+
 }

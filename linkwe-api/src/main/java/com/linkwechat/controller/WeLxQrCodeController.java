@@ -3,6 +3,8 @@ package com.linkwechat.controller;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.qr.query.WeLxQrAddQuery;
 import com.linkwechat.domain.qr.query.WeLxQrCodeListQuery;
 import com.linkwechat.domain.qr.query.WeQrCodeListQuery;
@@ -15,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author danmo
@@ -70,11 +73,18 @@ public class WeLxQrCodeController extends BaseController {
     }
 
 
-    @ApiOperation(value = "获取活码统计", httpMethod = "GET")
-    @GetMapping("/scan/count")
-    public AjaxResult<WeQrCodeScanCountVo> getWeQrCodeScanCount(WeLxQrCodeListQuery query) {
-        WeQrCodeScanCountVo weQrCodeScanCount = weLxQrCodeService.getLxQrCodeScanCount(query);
+    @ApiOperation(value = "获取活码折线统计", httpMethod = "GET")
+    @GetMapping("/line/statistics")
+    public AjaxResult<WeLxQrCodeLineVo> getWeQrCodeLineStatistics(WeLxQrCodeListQuery query) {
+        WeLxQrCodeLineVo weQrCodeScanCount = weLxQrCodeService.getWeQrCodeLineStatistics(query);
         return AjaxResult.success(weQrCodeScanCount);
     }
 
+    @ApiOperation(value = "获取活码列表统计", httpMethod = "GET")
+    @GetMapping("/list/statistics")
+    public TableDataInfo<WeLxQrCodeSheetVo> getWeQrCodeListStatistics(WeLxQrCodeListQuery query) {
+        startPage();
+        List<WeLxQrCodeSheetVo> list = weLxQrCodeService.getWeQrCodeListStatistics(query);
+        return getDataTable(list);
+    }
 }

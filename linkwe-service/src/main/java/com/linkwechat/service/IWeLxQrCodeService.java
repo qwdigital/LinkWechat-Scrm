@@ -5,10 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.linkwechat.domain.WeLxQrCode;
 import com.linkwechat.domain.qr.query.WeLxQrAddQuery;
 import com.linkwechat.domain.qr.query.WeLxQrCodeListQuery;
-import com.linkwechat.domain.qr.vo.WeLxQrAddVo;
-import com.linkwechat.domain.qr.vo.WeLxQrCodeDetailVo;
-import com.linkwechat.domain.qr.vo.WeQrCodeDetailVo;
-import com.linkwechat.domain.qr.vo.WeQrCodeScanCountVo;
+import com.linkwechat.domain.qr.vo.*;
 
 import java.util.List;
 
@@ -60,9 +57,16 @@ public interface IWeLxQrCodeService extends IService<WeLxQrCode> {
     List<WeQrCodeDetailVo> getQrCodeList(WeLxQrCodeListQuery query);
 
     /**
-     * 统计拉新活码
+     * 统计拉新活码折线图
      * @param query
      * @return
      */
-    WeQrCodeScanCountVo getLxQrCodeScanCount(WeLxQrCodeListQuery query);
+    WeLxQrCodeLineVo getWeQrCodeLineStatistics(WeLxQrCodeListQuery query);
+
+    /**
+     * 统计拉新活码列表
+     * @param query
+     * @return
+     */
+    List<WeLxQrCodeSheetVo> getWeQrCodeListStatistics(WeLxQrCodeListQuery query);
 }

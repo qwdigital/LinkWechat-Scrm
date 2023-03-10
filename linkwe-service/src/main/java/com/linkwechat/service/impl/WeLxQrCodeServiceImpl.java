@@ -2,6 +2,7 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -258,20 +259,28 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
     }
 
     @Override
-    public WeQrCodeScanCountVo getLxQrCodeScanCount(WeLxQrCodeListQuery query) {
-        WeQrCodeScanCountVo scanCountVo = new WeQrCodeScanCountVo();
+    public WeLxQrCodeLineVo getWeQrCodeLineStatistics(WeLxQrCodeListQuery query) {
+
+        statisticsParamsCheck(query);
+
+        WeLxQrCodeLineVo scanCountVo = new WeLxQrCodeLineVo();
         List<String> xAxis = new ArrayList<>();
         List<Integer> yAxis = new ArrayList<>();
         Long qrId = query.getQrId();
         Date beginTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD, query.getBeginTime());
         Date endTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD, query.getEndTime());
         WeLxQrCode weQrCode = getById(qrId);
+        if(Objects.isNull(weQrCode)){
+            throw new WeComException("无效ID");
+        }
         Map<String, List<WeCustomer>> customerMap = new HashMap<>();
         List<WeCustomer> customerList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getState, weQrCode.getState()));
         if (CollectionUtil.isNotEmpty(customerList)) {
             scanCountVo.setTotal(customerList.size());
-            long count = customerList.stream().filter(item -> ObjectUtil.equal(DateUtils.getDate(), DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getAddTime()))).count();
-            scanCountVo.setToday(Long.valueOf(count).intValue());
+            long todayNum = customerList.stream().filter(item -> ObjectUtil.equal(DateUtils.getDate(), DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getAddTime()))).count();
+            long tomorrowNum = customerList.stream().filter(item -> ObjectUtil.equal(DateUtil.tomorrow().toDateStr(), DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getAddTime()))).count();
+            scanCountVo.setToday(Long.valueOf(todayNum).intValue());
+            scanCountVo.setTodayDiff(Long.valueOf(todayNum - tomorrowNum).intValue());
             Map<String, List<WeCustomer>> listMap = customerList.stream().collect(Collectors.groupingBy(item -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getAddTime())));
             customerMap.putAll(listMap);
         }
@@ -287,6 +296,43 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
         scanCountVo.setXAxis(xAxis);
         scanCountVo.setYAxis(yAxis);
         return scanCountVo;
+    }
+
+    @Override
+    public List<WeLxQrCodeSheetVo> getWeQrCodeListStatistics(WeLxQrCodeListQuery query) {
+
+        statisticsParamsCheck(query);
+
+        WeLxQrCode weQrCode = getById(query.getQrId());
+        if(Objects.isNull(weQrCode)){
+            throw new WeComException("无效ID");
+        }
+        query.setState(weQrCode.getState());
+
+        List<WeLxQrCodeSheetVo> lxQrCodeSheetList = this.baseMapper.getWeQrCodeListStatistics(query);
+        int totalNum = weCustomerService.count(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getState, weQrCode.getState()));
+
+        for (WeLxQrCodeSheetVo lxQrCodeSheet : lxQrCodeSheetList) {
+            lxQrCodeSheet.setTotalNum(totalNum);
+            totalNum = totalNum - lxQrCodeSheet.getTodayNum();
+        }
+        return lxQrCodeSheetList;
+    }
+
+    private void statisticsParamsCheck(WeLxQrCodeListQuery query) {
+        if(Objects.isNull(query)){
+            throw new WeComException("参数不能为空");
+        }
+
+        if(Objects.isNull(query.getQrId())){
+            throw new WeComException("ID不能为空");
+        }
+        if(StringUtils.isEmpty(query.getBeginTime())){
+            throw new WeComException("开始时间不能为空");
+        }
+        if(StringUtils.isEmpty(query.getEndTime())){
+            throw new WeComException("结束时间不能为空");
+        }
     }
 
 

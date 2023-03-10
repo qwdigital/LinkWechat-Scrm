@@ -3,7 +3,9 @@ package com.linkwechat.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.annotation.SqlParser;
+import com.linkwechat.domain.qr.query.WeLxQrCodeListQuery;
 import com.linkwechat.domain.qr.vo.WeLxQrCodeDetailVo;
+import com.linkwechat.domain.qr.vo.WeLxQrCodeSheetVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -24,5 +26,8 @@ public interface WeLxQrCodeMapper extends BaseMapper<WeLxQrCode> {
 
 
     WeLxQrCodeDetailVo getQrDetail(@Param("id") Long id);
+
+
+    List<WeLxQrCodeSheetVo> getWeQrCodeListStatistics(WeLxQrCodeListQuery query);
 }
 

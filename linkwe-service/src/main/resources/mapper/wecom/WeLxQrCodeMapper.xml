@@ -118,4 +118,22 @@
         where wlqc.id = #{id}
     </select>
 
+
+    <select id="getWeQrCodeListStatistics" resultType="com.linkwechat.domain.qr.vo.WeLxQrCodeSheetVo">
+        select t.date_time, ifnull(c.num, 0) as today_num
+        from (select date as date_time
+              from sys_dim_date
+              where `date` &gt;= DATE_FORMAT(#{beginTime}
+                  , '%Y-%m-%d')
+                and `date` &lt;= DATE_FORMAT(#{endTime}
+                  , '%Y-%m-%d')
+             ) t
+                 left join
+             (select date_format(add_time, '%Y-%d-%d') as date_time, count(1) as num
+              from we_customer
+              where state = #{state}
+              group by add_time) c on t.date_time = c.date_time
+        order by  t.date_time desc
+    </select>
+
 </mapper>
