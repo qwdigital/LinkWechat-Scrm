@@ -1,6 +1,7 @@
 package com.linkwechat.scheduler.listener;
 
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.domain.wecom.callback.WeBackCustomerVo;
 import com.linkwechat.scheduler.service.IWelcomeMsgService;
 import com.rabbitmq.client.Channel;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -47,7 +47,7 @@ public class QwWelcomeMsgListener {
     /**
      * 渠道欢迎语路由
      */
-    private final Map<String, String> route = new HashMap<String, String>() {
+    /*private final Map<String, String> route = new HashMap<String, String>() {
         {
             put("we_qr", "weQrCodeMsgServiceImpl");
             put("we_lxqr", "weLxQrCodeMsgServiceImpl");
@@ -57,8 +57,9 @@ public class QwWelcomeMsgListener {
             put("fis-", "weFissionMsgServiceImpl");
             put("default", "weDefaultQrCodeMsgServiceImpl");
         }
-    };
+    };*/
 
+    private final Map<String, String> route = WelcomeMsgTypeEnum.getMap();
 
     private IWelcomeMsgService factory(String state) {
 

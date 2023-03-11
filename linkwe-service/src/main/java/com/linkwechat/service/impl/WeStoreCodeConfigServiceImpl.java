@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.FileEntity;
+import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.common.utils.QREncode;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
@@ -52,7 +53,7 @@ public class WeStoreCodeConfigServiceImpl extends ServiceImpl<WeStoreCodeConfigM
                     .user(ListUtil.toList(storeCodeConfig.getCustomerServiceId()))
                     .build());
         }else{//新增联系我
-            storeCodeConfig.setState(WeConstans.WE_STORE_CODE_CONFIG_PREFIX + SnowFlakeUtil.nextId());
+            storeCodeConfig.setState(WelcomeMsgTypeEnum.WE_STORE_CODE_CONFIG_PREFIX.getType() + SnowFlakeUtil.nextId());
             WeAddWayVo weAddWayResult = qwCustomerClient.addContactWay(WeAddWayQuery.builder()
                     .type(1)
                     .scene(2)
