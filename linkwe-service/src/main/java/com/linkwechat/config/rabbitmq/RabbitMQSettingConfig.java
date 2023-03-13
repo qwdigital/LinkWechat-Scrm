@@ -132,9 +132,18 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.delay-group-msg:Rk_DelayGroupMsg}")
     private String weDelayGroupMsgRk;
 
+    //企微朋友圈延迟路由
+    @Value("${wecom.mq.route.delay-moment-msg:Rk_DelayMomentMsg}")
+    private String weDelayMomentMsgRk;
+
     //群发消息路由
     @Value("${wecom.mq.route.group-msg:Rk_GroupMsg}")
     private String weGroupMsgRk;
+
+    //企微朋友圈路由
+    @Value("${wecom.mq.route.moment-msg:Rk_MomentMsg}")
+    private String weMomentMsgRk;
+
 
     //应用消息通知路由
     @Value("${wecom.mq.route.app-msg:Rk_AppMsg}")
@@ -329,6 +338,17 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.queue.leaveUser:Qu_LeaveUser}")
     private String leaveAllocateUserQu;
 
+    /**
+     * 朋友圈消息队列
+     */
+    @Value("${wecom.mq.queue.moments-msg:Qu_Moments}")
+    private String momentsQu;
+
+    /**
+     * 朋友圈消息延迟队列
+     */
+    @Value("${wecom.mq.queue.delay-moments-msg:Qu_DelayMomentsMsg}")
+    private String momentsDelayQu;
 
 
 }
