@@ -1,12 +1,14 @@
 package com.linkwechat.service.impl.strategic.shortlink;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeShortLinkPromotion;
 import com.linkwechat.domain.WeShortLinkPromotionTemplateMoments;
 import com.linkwechat.domain.WeShortLinkUserPromotionTask;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.media.WeMessageTemplate;
+import com.linkwechat.domain.moments.entity.WeMoments;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateMomentsAddQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionUpdateQuery;
@@ -14,7 +16,6 @@ import com.linkwechat.service.IWeShortLinkPromotionAttachmentService;
 import com.linkwechat.service.IWeShortLinkPromotionService;
 import com.linkwechat.service.IWeShortLinkPromotionTemplateMomentsService;
 import com.linkwechat.service.IWeShortLinkUserPromotionTaskService;
-import org.bouncycastle.util.Strings;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
@@ -124,13 +125,21 @@ public class MomentsPromotion extends PromotionType {
 
     @Override
     protected void directSend(Long id, Long businessId, String content, List<WeMessageTemplate> attachments, List<WeAddGroupMessageQuery.SenderInfo> senderList) {
+        WeMoments weMoments = new WeMoments();
+
         rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentMsgRk(), new String());
 
     }
 
     @Override
     protected void timingSend(Long id, Long businessId, String content, Date sendTime, List<WeMessageTemplate> attachments, List<WeAddGroupMessageQuery.SenderInfo> senderList) {
+        WeMoments weMoments = new WeMoments();
 
+        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeDelayMomentMsgRk(), JSONObject.toJSONString(weMoments), message -> {
+            //注意这里时间可使用long类型,毫秒单位，设置header
+            message.getMessageProperties().setHeader("x-delay", null);
+            return message;
+        });
     }
 
     @Override
