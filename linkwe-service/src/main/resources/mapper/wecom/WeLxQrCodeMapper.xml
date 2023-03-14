@@ -41,6 +41,7 @@
             <result property="scopeType" column="scope_type" jdbcType="INTEGER"/>
             <result property="userId" column="user_id" jdbcType="VARCHAR"/>
             <result property="party" column="party" jdbcType="VARCHAR"/>
+            <result property="position" column="position" jdbcType="VARCHAR"/>
         </collection>
         <collection property="qrAttachments" ofType="com.linkwechat.domain.qr.WeQrAttachments">
             <result property="msgType" column="msg_type" jdbcType="VARCHAR"/>
@@ -140,6 +141,11 @@
               where state = #{state}
               group by add_time) c on t.date_time = c.date_time
         order by  t.date_time desc
+    </select>
+
+    <select id="getQrDetailByState" resultMap="WeLxQrCodeDetailResult">
+        <include refid="selectLxQrCodeDetailVo"/>
+        where wlqc.state = #{state} and wlqc.del_flag = 0
     </select>
 
 </mapper>

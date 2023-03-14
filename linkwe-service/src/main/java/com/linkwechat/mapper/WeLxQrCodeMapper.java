@@ -29,5 +29,7 @@ public interface WeLxQrCodeMapper extends BaseMapper<WeLxQrCode> {
 
 
     List<WeLxQrCodeSheetVo> getWeQrCodeListStatistics(WeLxQrCodeListQuery query);
+
+    WeLxQrCodeDetailVo getQrDetailByState(@Param("state") String state);
 }
 

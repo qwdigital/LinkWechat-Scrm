@@ -33,4 +33,6 @@ public interface IWeQrAttachmentsService extends IService<WeQrAttachments> {
      * @param attachments 素材列表
      */
     void updateBatchByQrId(Long qrId, Integer businessType, List<WeMessageTemplate> attachments);
+
+    List<WeQrAttachments> getAttachmentsList(Long qrId, Integer businessType);
 }

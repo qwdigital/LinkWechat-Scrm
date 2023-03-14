@@ -206,6 +206,11 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
 
     @Override
     public WeLxQrCodeDetailVo getQrDetail(Long id) {
+        return getQrDetail(id,true);
+    }
+
+    @Override
+    public WeLxQrCodeDetailVo getQrDetail(Long id, Boolean isNeedName) {
         WeLxQrCodeDetailVo detail = this.baseMapper.getQrDetail(id);
 
         if (Objects.isNull(detail)) {
@@ -215,7 +220,7 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
         //todo 查询红包或者卡券信息
 
         List<WeLxQrScopeUserVo> qrUserInfos = detail.getQrUserInfos();
-        if (CollectionUtil.isNotEmpty(qrUserInfos)) {
+        if (isNeedName && CollectionUtil.isNotEmpty(qrUserInfos)) {
             Set<String> userIdSet = qrUserInfos.stream().map(WeLxQrScopeUserVo::getUserId).filter(StringUtils::isNotEmpty).collect(Collectors.toSet());
             Set<Integer> deptIdSet = qrUserInfos.stream().map(WeLxQrScopeUserVo::getParty).filter(Objects::nonNull).collect(Collectors.toSet());
             Map<String, String> userId2NameMap = new HashMap<>();
@@ -264,6 +269,14 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
             detail.setQrUserInfos(qrUserInfos);
         }
         return detail;
+    }
+
+    @Override
+    public WeLxQrCodeDetailVo getQrDetailByState(String state) {
+        if(StringUtils.isEmpty(state)){
+            return null;
+        }
+        return  this.baseMapper.getQrDetailByState(state);
     }
 
     @Override

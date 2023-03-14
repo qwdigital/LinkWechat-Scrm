@@ -46,4 +46,13 @@ public class IWeQrAttachmentsServiceImpl extends ServiceImpl<WeQrAttachmentsMapp
                 .eq(WeQrAttachments::getBusinessType,businessType));
         saveBatchByQrId(qrId,businessType, attachments);
     }
+
+    @Override
+    public List<WeQrAttachments> getAttachmentsList(Long qrId, Integer businessType) {
+        List<WeQrAttachments> qrAttachments = list(new LambdaQueryWrapper<WeQrAttachments>()
+                .eq(WeQrAttachments::getQrId, qrId)
+                .eq(WeQrAttachments::getBusinessType, businessType)
+                .eq(WeQrAttachments::getDelFlag, 0));
+        return qrAttachments;
+    }
 }

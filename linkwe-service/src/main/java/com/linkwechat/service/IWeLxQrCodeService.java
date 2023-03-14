@@ -50,6 +50,11 @@ public interface IWeLxQrCodeService extends IService<WeLxQrCode> {
      */
     WeLxQrCodeDetailVo getQrDetail(Long id);
 
+    WeLxQrCodeDetailVo getQrDetail(Long id, Boolean isNeedName);
+
+
+    WeLxQrCodeDetailVo getQrDetailByState(String state);
+
     /**
      * 获取拉新活码列表
      * @param query
