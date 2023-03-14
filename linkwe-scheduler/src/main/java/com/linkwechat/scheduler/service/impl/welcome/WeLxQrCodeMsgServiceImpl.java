@@ -2,10 +2,8 @@ package com.linkwechat.scheduler.service.impl.welcome;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.enums.MediaType;
-import com.linkwechat.domain.WeLxQrCode;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.qr.WeQrAttachments;
 import com.linkwechat.domain.qr.vo.WeLxQrCodeDetailVo;
@@ -63,7 +61,6 @@ public class WeLxQrCodeMsgServiceImpl extends AbstractWelcomeMsgServiceImpl {
     private String description;
 
 
-
     @Override
     public void msgHandle(WeBackCustomerVo query) {
 
@@ -98,12 +95,12 @@ public class WeLxQrCodeMsgServiceImpl extends AbstractWelcomeMsgServiceImpl {
             template.setMsgType(MediaType.LINK.getMediaType());
             template.setDescription(description);
             template.setTitle(qrDetail.getName());
-            if(ObjectUtil.equal(1,qrDetail.getType())){
+            if (ObjectUtil.equal(1, qrDetail.getType())) {
                 template.setPicUrl(redPacketImg);
-                template.setLinkUrl(redPacketLink);
-            }else if(ObjectUtil.equal(2,qrDetail.getType())){
+                template.setLinkUrl(StringUtils.format(redPacketLink, qrDetail.getId()));
+            } else if (ObjectUtil.equal(2, qrDetail.getType())) {
                 template.setPicUrl(redPacketImg);
-                template.setLinkUrl(coupontLink);
+                template.setLinkUrl(StringUtils.format(coupontLink, qrDetail.getId()));
             }
             templates.add(template);
 
