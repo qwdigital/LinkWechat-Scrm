@@ -17,7 +17,7 @@ import java.util.List;
 public class WechatPayServiceImpl extends WechatPayService{
 
     @Override
-    public String getRequestUrl() {
+    public String getRequestUrl(String query) {
         return null;
     }
 }

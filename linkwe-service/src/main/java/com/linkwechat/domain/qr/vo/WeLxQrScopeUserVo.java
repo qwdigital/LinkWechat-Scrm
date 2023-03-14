@@ -29,5 +29,5 @@ public class WeLxQrScopeUserVo {
     private String partyName;
 
     @ApiModelProperty(value = "岗位")
-    private Integer position;
+    private String position;
 }
