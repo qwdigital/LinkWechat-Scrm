@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.TaskFissionType;
+import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeTaskFission;
@@ -58,7 +59,7 @@ public class QwActiveFissionImpl extends IWeStrategicCrowdStateTagService {
         //获取当前任务相关的渠道值
         List<String> fissionStateList = Optional.ofNullable(fissionRecordList).orElseGet(ArrayList::new).parallelStream()
                 .map(item -> {
-                    return WeConstans.FISSION_PREFIX + item.getId();
+                    return WelcomeMsgTypeEnum.FISSION_PREFIX.getType() + item.getId();
                 }).collect(Collectors.toList());
         if(CollectionUtil.isNotEmpty(fissionStateList)){
             return weCustomerService.list(new LambdaQueryWrapper<WeCustomer>()

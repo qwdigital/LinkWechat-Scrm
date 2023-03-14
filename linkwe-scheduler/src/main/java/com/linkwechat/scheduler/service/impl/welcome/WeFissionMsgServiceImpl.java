@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.MessageType;
+import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeTaskFission;
 import com.linkwechat.domain.WeTaskFissionRecord;
@@ -40,7 +41,7 @@ public class WeFissionMsgServiceImpl extends AbstractWelcomeMsgServiceImpl {
         log.info("任务宝列表欢迎语消息 query：{}", JSONObject.toJSONString(query));
         List<WeMessageTemplate> templates = new ArrayList<>();
 
-        String fissionRecordId = query.getState().substring(WeConstans.FISSION_PREFIX.length());
+        String fissionRecordId = query.getState().substring(WelcomeMsgTypeEnum.FISSION_PREFIX.getType().length());
         WeMessageTemplate textAtt = new WeMessageTemplate();
         textAtt.setMsgType(MessageType.TEXT.getMessageType());
         WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService.getById(Long.valueOf(fissionRecordId));

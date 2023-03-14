@@ -63,6 +63,7 @@
         <bcprov-jdk15on.version>1.69</bcprov-jdk15on.version>
         <bcpg-jdk15on.version>1.68</bcpg-jdk15on.version>
         <bcpkix-jdk15on.version>1.68</bcpkix-jdk15on.version>
+        <wechatpay-httpclient.version>0.4.9</wechatpay-httpclient.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -470,7 +471,11 @@
                 <version>${bcpkix-jdk15on.version}</version>
             </dependency>
 
-
+            <dependency>
+                <groupId>com.github.wechatpay-apiv3</groupId>
+                <artifactId>wechatpay-apache-httpclient</artifactId>
+                <version>${wechatpay-httpclient.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
