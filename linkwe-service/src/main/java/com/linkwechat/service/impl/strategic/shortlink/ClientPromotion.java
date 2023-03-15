@@ -1,9 +1,13 @@
 package com.linkwechat.service.impl.strategic.shortlink;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.linkwechat.common.exception.ServiceException;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
@@ -13,6 +17,7 @@ import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.shortlink.query.*;
 import com.linkwechat.mapper.WeShortLinkPromotionMapper;
 import com.linkwechat.mapper.WeShortLinkPromotionTemplateClientMapper;
+import com.linkwechat.service.IWeCustomerService;
 import com.linkwechat.service.IWeShortLinkPromotionAttachmentService;
 import com.linkwechat.service.IWeShortLinkPromotionSendResultService;
 import com.linkwechat.service.IWeShortLinkUserPromotionTaskService;
@@ -22,10 +27,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -52,11 +54,16 @@ public class ClientPromotion extends PromotionType {
     private RabbitMQSettingConfig rabbitMQSettingConfig;
     @Resource
     private IWeShortLinkUserPromotionTaskService weShortLinkUserPromotionTaskService;
+    @Resource
+    private IWeCustomerService weCustomerService;
 
     @Override
     public Long saveAndSend(WeShortLinkPromotionAddQuery query, WeShortLinkPromotion weShortLinkPromotion) {
 
         WeShortLinkPromotionTemplateClientAddQuery clientAddQuery = query.getClient();
+
+        //检查客户
+        checkSendList(clientAddQuery.getType(), query.getSenderList());
 
         //发送类型：0立即发送 1定时发送
         Integer sendType = clientAddQuery.getSendType();
@@ -149,6 +156,9 @@ public class ClientPromotion extends PromotionType {
     public void updateAndSend(WeShortLinkPromotionUpdateQuery query, WeShortLinkPromotion weShortLinkPromotion) {
 
         WeShortLinkPromotionTemplateClientUpdateQuery clientUpdateQuery = query.getClient();
+
+        //检查客户
+        checkSendList(clientUpdateQuery.getType(), query.getSenderList());
 
         //发送类型：0立即发送 1定时发送
         Integer sendType = clientUpdateQuery.getSendType();
@@ -313,6 +323,37 @@ public class ClientPromotion extends PromotionType {
             message.getMessageProperties().setHeader("x-delay", diffTime);
             return message;
         });
+    }
+
+    /**
+     * 检查客户
+     *
+     * @param type       群发客户分类：0全部客户 1部分客户
+     * @param senderList
+     */
+    private void checkSendList(Integer type, List<WeAddGroupMessageQuery.SenderInfo> senderList) {
+        //群发客户分类：0全部客户 1部分客户
+        if (type == 0) {
+            LambdaQueryWrapper<WeCustomer> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.select(WeCustomer::getExternalUserid, WeCustomer::getAddUserId);
+            queryWrapper.eq(WeCustomer::getDelFlag, 0);
+            queryWrapper.groupBy(WeCustomer::getExternalUserid, WeCustomer::getAddUserId);
+            List<WeCustomer> customerList = weCustomerService.list(queryWrapper);
+            if (CollectionUtil.isNotEmpty(customerList)) {
+                Map<String, List<WeCustomer>> customerMap = customerList.stream().collect(Collectors.groupingBy(WeCustomer::getAddUserId));
+                customerMap.forEach((userId, customers) -> {
+                    List<String> eids = customers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
+                    WeAddGroupMessageQuery.SenderInfo senderInfo = new WeAddGroupMessageQuery.SenderInfo();
+                    senderInfo.setCustomerList(eids);
+                    senderInfo.setUserId(userId);
+                    senderList.add(senderInfo);
+                });
+            } else {
+                throw new WeComException("暂无客户可发送");
+            }
+        } else {
+            Optional.ofNullable(senderList).orElseThrow(() -> new ServiceException("无指定接收消息的成员及对应客户列表"));
+        }
     }
 
 

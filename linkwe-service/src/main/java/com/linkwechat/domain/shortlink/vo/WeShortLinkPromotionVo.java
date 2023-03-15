@@ -71,7 +71,7 @@ public class WeShortLinkPromotionVo {
     /**
      * 任务状态: 0带推广 1推广中 2已结束
      */
-    @ApiModelProperty(value = "任务状态: 0带推广 1推广中 2已结束")
+    @ApiModelProperty(value = "任务状态: 0带推广 1推广中 2已结束3暂存中")
     private Integer taskStatus;
 
     /**

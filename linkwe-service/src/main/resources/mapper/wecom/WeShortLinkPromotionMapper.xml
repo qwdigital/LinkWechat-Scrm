@@ -31,22 +31,25 @@
 
 
     <select id="selectList" resultType="com.linkwechat.domain.shortlink.vo.WeShortLinkPromotionVo">
-        SELECT id,
-        task_name,
-        short_link_id,
-        `type`,
-        `style`,
-        material_id,
-        url,
-        task_status,
-        task_start_time,
-        task_end_time,
-        create_by,
-        update_time,
+        SELECT p.id,
+        p.task_name,
+        p.short_link_id,
+        p.type,
+        p.style,
+        p.material_id,
+        p.url,
+        p.task_status,
+        p.task_start_time,
+        p.task_end_time,
+        p.create_by,
+        p.update_time,
         (select sum(pv_num) from we_short_link_promotion_day_stat d1 where d1.promotion_id = p.id and d1.del_flag = 0) as pv_num,
         (select sum(uv_num) from we_short_link_promotion_day_stat d2 where d2.promotion_id = p.id and d2.del_flag = 0) as uv_num,
         (select sum(open_num) from we_short_link_promotion_day_stat d3 where d3.promotion_id = p.id and d3.del_flag = 0) as open_num
         FROM we_short_link_promotion p
+        <if test="shortLinkName!=null and shortLinkName!=''">
+            LEFT JOIN we_short_link sl on p.short_link_id = sl.id
+        </if>
         <where>
             p.del_flag = 0
             <if test="type!=null">
@@ -60,6 +63,9 @@
             </if>
             <if test="taskName!=null and taskName!=''">
                 and p.task_name like concat("%",#{taskName},"%")
+            </if>
+            <if test="shortLinkName!=null and shortLinkName!=''">
+                and sl.short_link_name like concat("%",#{shortLinkName},"%")
             </if>
         </where>
 

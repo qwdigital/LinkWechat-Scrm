@@ -7,10 +7,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.annotation.Log;
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.utils.Base62NumUtil;
 import com.linkwechat.domain.*;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.material.query.WePosterQuery;
@@ -63,6 +65,8 @@ public class WeShortLinkPromotionController extends BaseController {
     private IWeTagService weTagService;
     @Resource
     private IWeShortLinkPromotionAttachmentService weShortLinkPromotionAttachmentService;
+    @Resource
+    private LinkWeChatConfig linkWeChatConfig;
 
 
     /**
@@ -77,6 +81,12 @@ public class WeShortLinkPromotionController extends BaseController {
     public TableDataInfo<WeShortLinkPromotionVo> list(WeShortLinkPromotionQuery query) {
         startPage();
         List<WeShortLinkPromotionVo> list = weShortLinkPromotionService.selectList(query);
+        Optional.ofNullable(list).ifPresent(items->items.stream().forEach(i->{
+            //获取短链
+            String encode = Base62NumUtil.encode(i.getShortLinkId());
+            String shortLinkUrl = linkWeChatConfig.getShortLinkDomainName() + encode;
+            i.setShortLinkUrl(shortLinkUrl);
+        }));
         return getDataTable(list);
     }
 

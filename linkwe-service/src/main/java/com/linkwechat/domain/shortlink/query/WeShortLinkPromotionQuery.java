@@ -26,6 +26,12 @@ public class WeShortLinkPromotionQuery {
     private String taskName;
 
     /**
+     * 短链名称
+     */
+    @ApiModelProperty(value = "短链名称")
+    private String shortLinkName;
+
+    /**
      * 推广短链Id
      */
     @ApiModelProperty(value = "推广短链Id")
@@ -46,6 +52,6 @@ public class WeShortLinkPromotionQuery {
     /**
      * 任务状态: 0带推广 1推广中 2已结束
      */
-    @ApiModelProperty(value = "任务状态: 0带推广 1推广中 2已结束")
+    @ApiModelProperty(value = "任务状态: 0待推广 1推广中 2已结束")
     private Integer taskStatus;
 }

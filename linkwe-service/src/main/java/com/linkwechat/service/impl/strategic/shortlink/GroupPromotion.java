@@ -1,9 +1,12 @@
 package com.linkwechat.service.impl.strategic.shortlink;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
@@ -16,15 +19,13 @@ import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateGroupUp
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionUpdateQuery;
 import com.linkwechat.service.*;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -51,11 +52,16 @@ public class GroupPromotion extends PromotionType {
     private RabbitTemplate rabbitTemplate;
     @Resource
     private RabbitMQSettingConfig rabbitMQSettingConfig;
+    @Resource
+    private IWeGroupService weGroupService;
 
     @Override
     public Long saveAndSend(WeShortLinkPromotionAddQuery query, WeShortLinkPromotion weShortLinkPromotion) {
-        //1. 保存短链推广
+
         WeShortLinkPromotionTemplateGroupAddQuery group = query.getGroup();
+        checkSendList(group.getType(), query.getSenderList());
+
+        //1. 保存短链推广
         Integer sendType = group.getSendType();
         //发送类型：0立即发送 1定时发送
         if (sendType.equals(0)) {
@@ -310,6 +316,30 @@ public class GroupPromotion extends PromotionType {
 
     @Override
     protected void timingEnd(Long businessId, Integer type, Date taskEndTime) {
+
+    }
+
+    /**
+     *
+     */
+    private void checkSendList(Integer type, List<WeAddGroupMessageQuery.SenderInfo> senderList) {
+        //客群分类 0全部群 1部分群
+        if (type == 0) {
+            LambdaQueryWrapper<WeGroup> queryWrapper = new LambdaQueryWrapper<WeGroup>();
+            queryWrapper.eq(WeGroup::getDelFlag, 0);
+            List<WeGroup> groupList = weGroupService.list(queryWrapper);
+            if (CollectionUtil.isNotEmpty(groupList)) {
+                Map<String, List<String>> ownerToChatIdMap = groupList.stream().collect(Collectors.groupingBy(WeGroup::getOwner, Collectors.mapping(WeGroup::getChatId, Collectors.toList())));
+                ownerToChatIdMap.forEach((userId, chatIds) -> {
+                    WeAddGroupMessageQuery.SenderInfo senderInfo = new WeAddGroupMessageQuery.SenderInfo();
+                    senderInfo.setUserId(userId);
+                    senderInfo.setChatList(chatIds);
+                    senderList.add(senderInfo);
+                });
+            } else {
+                throw new WeComException("暂无客户群可发送");
+            }
+        }
 
     }
 }
