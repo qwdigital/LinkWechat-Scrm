@@ -36,4 +36,11 @@ public class WxLxQrCodeController extends BaseController {
         return AjaxResult.success(lxQrCode);
     }
 
+    @ApiOperation(value = "领取红包或卡券", httpMethod = "POST")
+    @PostMapping("/receive/award")
+    public AjaxResult<WxLxQrCodeVo> receiveAward(@RequestBody @Validated WxLxQrQuery query) {
+        WxLxQrCodeVo lxQrCode = weLxQrCodeService.getQrcode(query);
+        return AjaxResult.success(lxQrCode);
+    }
+
 }

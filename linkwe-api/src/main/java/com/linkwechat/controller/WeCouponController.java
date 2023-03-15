@@ -1,13 +1,27 @@
 package com.linkwechat.controller;
 
 
+import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.constant.WechatPayUrlConstants;
+import com.linkwechat.common.core.controller.BaseController;
+import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.wx.coupon.WxCouponListQuery;
 import com.linkwechat.wechatpay.WechatPayService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URLEncoder;
+import java.util.Objects;
 
 /**
  * 微信支付卡券
@@ -20,69 +34,48 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/coupon")
-public class WeCouponController {
+public class WeCouponController extends BaseController {
 
 
     @Autowired
     private WechatPayService wechatPayService;
 
 
-    /**
-     * @throws Exception
-     */
+    @ApiOperation(value = "条件查询卡券列表", httpMethod = "GET")
     @GetMapping("/getCouponList")
-    public void getCouponList() throws Exception {
-        String result = wechatPayService.sendGetRequest("");
-
-    }
-    /*
-     *//** 商户号 *//*
-    public static String mchId = "1613220424";
-    *//** 商户API私钥路径 *//*
-    public static String privateKey = "D:\\Windows\\system32\\WXCertUtil\\cert\\apiclient_key.pem";
-    *//** 商户证书序列号 *//*
-    public static String mchSerialNo = "799B9A9B7361FD0D54ABCC31DDDD2896313C0055";
-    *//** 商户APIV3密钥 *//*
-    public static String apiV3Key = "3b141e1a3c6245038681A504c5a6Qwas";
-
-    public static void main(String[] args) throws Exception {
-        GetStocksList();
-   }
-
-    public static void GetStocksList() throws Exception{
-
-        // 加载商户私钥（privateKey：私钥字符串）
-        PrivateKey merchantPrivateKey = PemUtil.loadPrivateKey(new FileInputStream(ResourceUtils.getFile(privateKey)));
-
-        // 加载平台证书（mchId：商户号,mchSerialNo：商户证书序列号,apiV3Key：V3密钥）
-        CertificatesManager verifier = CertificatesManager.getInstance();
-        verifier.putMerchant(mchId, new WechatPay2Credentials(mchId,
-                new PrivateKeySigner(mchSerialNo, merchantPrivateKey)), apiV3Key.getBytes(StandardCharsets.UTF_8));
-
-        // 初始化httpClient
-        CloseableHttpClient httpClient = WechatPayHttpClientBuilder.create()
-                .withMerchant(mchId, mchSerialNo, merchantPrivateKey)
-                .withValidator(new WechatPay2Validator(verifier.getVerifier(mchId))).build();
-        //请求URL
-        HttpGet httpGet = new HttpGet("https://api.mch.weixin.qq.com/v3/marketing/favor/stocks?offset=0&limit=10&stock_creator_mchid=1613220424");
-        httpGet.setHeader("Accept", "application/json");
-
-        //完成签名并执行请求
-        CloseableHttpResponse response = httpClient.execute(httpGet);
-
+    public TableDataInfo getCouponList(WxCouponListQuery query) {
+        String result = null;
         try {
-            int statusCode = response.getStatusLine().getStatusCode();
-            if (statusCode == 200) { //处理成功
-                System.out.println("success,return body = " + EntityUtils.toString(response.getEntity()));
-            } else if (statusCode == 204) { //处理成功，无返回Body
-                System.out.println("success");
-            } else {
-                System.out.println("failed,resp code = " + statusCode+ ",return body = " + EntityUtils.toString(response.getEntity()));
-                throw new IOException("request failed");
+            UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromHttpUrl(WechatPayUrlConstants.SELECT_COUPON_LIST);
+            urlBuilder.queryParam("offset", query.getOffset());
+            urlBuilder.queryParam("limit", query.getLimit());
+            urlBuilder.queryParam("stock_creator_mchid", query.getStockCreatorMchid());
+
+            if (Objects.nonNull(query.getCreateStartTime())) {
+                String startTime = DateUtil.format(query.getCreateStartTime(), "yyyy-MM-dd'T'HH:mm:ssXXX");
+                urlBuilder.queryParam("create_start_time", URLEncoder.encode(startTime, "US-ASCII"));
             }
-        } finally {
-            httpClient.close();
-            response.close();
+            if (Objects.nonNull(query.getCreateEndTime())) {
+                String endTime = DateUtil.format(query.getCreateEndTime(), "yyyy-MM-dd'T'HH:mm:ssXXX");
+                urlBuilder.queryParam("create_end_time", URLEncoder.encode(endTime, "US-ASCII"));
+            }
+            if (StringUtils.isNotBlank(query.getStatus())) {
+                urlBuilder.queryParam("status", query.getStatus());
+            }
+            String url = urlBuilder.build(false).toUriString();
+            result = wechatPayService.sendGet(url);
+        } catch (Exception e) {
+            log.error("条件查询卡券列表异常 query:{} ", JSONObject.toJSONString(query), e);
+            throw new WeComException(400, e.getMessage());
         }
-    }*/
+        if (StringUtils.isEmpty(result)) {
+            throw new WeComException("查询失败");
+        }
+        JSONObject jsonObject = JSONObject.parseObject(result);
+        JSONArray list = jsonObject.getJSONArray("data");
+        TableDataInfo dataTable = getDataTable(list);
+        dataTable.setTotal(jsonObject.getLong("total_count"));
+        return dataTable;
+    }
+
 }

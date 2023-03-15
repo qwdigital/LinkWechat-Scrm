@@ -24,4 +24,7 @@ public class WxLxQrQuery {
     @NotEmpty(message = "unionID不能为空")
     private String unionId;
 
+    @ApiModelProperty("客户openID")
+    private String openId;
+
 }

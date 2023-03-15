@@ -1,105 +1,106 @@
 package com.linkwechat.wechatpay;
 
-import com.wechat.pay.contrib.apache.httpclient.WechatPayHttpClientBuilder;
-import com.wechat.pay.contrib.apache.httpclient.auth.PrivateKeySigner;
-import com.wechat.pay.contrib.apache.httpclient.auth.WechatPay2Credentials;
-import com.wechat.pay.contrib.apache.httpclient.auth.WechatPay2Validator;
-import com.wechat.pay.contrib.apache.httpclient.cert.CertificatesManager;
-import com.wechat.pay.contrib.apache.httpclient.util.PemUtil;
+
+import cn.hutool.core.net.URLEncodeUtil;
+import cn.hutool.core.util.URLUtil;
+import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.exception.wecom.WeComException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
-import java.io.FileInputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.PrivateKey;
 
 /**
- * 微信支付接口类
+ * 微信支付配置
  *
  * @author danmo
  * @date 2023年03月13日 17:21
  */
-@Service
+
+
 @Slf4j
-public abstract class WechatPayService {
+@Component
+public class WechatPayService {
 
-    private CloseableHttpClient httpClient = null;
+    @Autowired
+    @Qualifier("WxPayClient")
+    private CloseableHttpClient wxPayClient;
+
 
     /**
-     * 商户号
-     */
-    public static String mchId = "1613220424";
-    /**
-     * 商户API私钥路径
-     */
-    public static String privateKey = "D:\\Windows\\system32\\WXCertUtil\\cert\\apiclient_key.pem";
-    /**
-     * 商户证书序列号
-     */
-    public static String mchSerialNo = "799B9A9B7361FD0D54ABCC31DDDD2896313C0055";
-    /**
-     * 商户APIV3密钥
-     */
-    public static String apiV3Key = "3b141e1a3c6245038681A504c5a6Qwas";
-
-
-    private void before() throws Exception {
-        // 加载商户私钥（privateKey：私钥字符串）
-        PrivateKey merchantPrivateKey = PemUtil.loadPrivateKey(new FileInputStream(ResourceUtils.getFile(privateKey)));
-
-        // 加载平台证书（mchId：商户号,mchSerialNo：商户证书序列号,apiV3Key：V3密钥）
-        CertificatesManager verifier = CertificatesManager.getInstance();
-        verifier.putMerchant(mchId, new WechatPay2Credentials(mchId,
-                new PrivateKeySigner(mchSerialNo, merchantPrivateKey)), apiV3Key.getBytes(StandardCharsets.UTF_8));
-
-        // 初始化httpClient
-        httpClient = WechatPayHttpClientBuilder.create()
-                .withMerchant(mchId, mchSerialNo, merchantPrivateKey)
-                .withValidator(new WechatPay2Validator(verifier.getVerifier(mchId))).build();
-    }
-
-
-    private void after() throws Exception {
-        httpClient.close();
-    }
-
-    public abstract String getRequestUrl(String query);
-
-    /**
-     * 请求GET接口
+     * 发送POST请求
      *
-     * @return
+     * @param url    请求地址
+     * @param params json参数
+     * @return obj
      */
-    public String sendGetRequest(String query) throws Exception {
-        before();
-        String result = "";
-
-        String url = getRequestUrl(query);
-        //请求URL
-        HttpGet httpGet = new HttpGet(url);
-        httpGet.setHeader("Accept", "application/json");
-        //完成签名并执行请求
-        CloseableHttpResponse response = httpClient.execute(httpGet);
+    public JSONObject sendPost(String url, JSONObject params) throws Exception {
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.addHeader("Accept", "application/json");
+        httpPost.addHeader("Content-type", "application/json; charset=utf-8");
+        httpPost.setEntity(new StringEntity(params.toJSONString(), StandardCharsets.UTF_8));
+        CloseableHttpResponse response = wxPayClient.execute(httpPost);
         try {
+            String bodyAsString = EntityUtils.toString(response.getEntity());
             int statusCode = response.getStatusLine().getStatusCode();
-            if (statusCode == 200) { //处理成功
-                log.info("success,return body = " + EntityUtils.toString(response.getEntity()));
-                result = EntityUtils.toString(response.getEntity());
-            } else if (statusCode == 204) { //处理成功，无返回Body
-                log.info("success");
+            if (statusCode == 200) {
+                log.info("微信POST请求成功,返回的结果是 = " + bodyAsString);
+            } else if (statusCode == 204) {
+                log.info("微信POST请求成功成功，未返回结果");
             } else {
-                log.error("failed,resp code = " + statusCode + ",return body = " + EntityUtils.toString(response.getEntity()));
+                log.info("微信POST请求失败,响应码 = " + statusCode + ",返回结果 = " + bodyAsString);
+                return null;
             }
+            return JSONObject.parseObject(bodyAsString);
+        } catch (Exception e) {
+            log.error("微信支付V3请求失败", e);
+            return null;
         } finally {
             response.close();
         }
-        after();
-        return result;
+    }
+
+    /**
+     * 发送get请求
+     *
+     * @param url 请求地址 参数直接在地址上拼接
+     * @return obj
+     */
+    public String sendGet(String url) throws Exception {
+        URIBuilder uriBuilder = new URIBuilder(url);
+        HttpGet httpGet = new HttpGet(uriBuilder.build());
+        httpGet.addHeader("Accept", "application/json");
+        CloseableHttpResponse response = wxPayClient.execute(httpGet);
+        try {
+            String bodyAsString = EntityUtils.toString(response.getEntity());
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode == 200) {
+                log.info("微信GET请求成功,返回的结果是 = " + bodyAsString);
+            } else if (statusCode == 204) {
+                log.info("微信GET请求成功成功，未返回结果");
+            } else {
+                log.info("微信GET请求失败,响应码 = " + statusCode + ",返回结果 = " + bodyAsString);
+                JSONObject body = JSONObject.parseObject(bodyAsString);
+                throw new RuntimeException(body.getString("message"));
+            }
+            return bodyAsString;
+        } catch (Exception e) {
+            log.error("微信支付V3请求失败", e);
+            throw new RuntimeException(e.getMessage());
+        } finally {
+            response.close();
+        }
     }
 
 }
