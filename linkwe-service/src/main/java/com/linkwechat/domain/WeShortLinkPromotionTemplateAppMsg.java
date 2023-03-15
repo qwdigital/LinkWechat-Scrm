@@ -1,19 +1,16 @@
 package com.linkwechat.domain;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
-
-import java.time.LocalDateTime;
-import java.io.Serializable;
-
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -61,6 +58,12 @@ public class WeShortLinkPromotionTemplateAppMsg extends BaseEntity {
      */
     @ApiModelProperty(value = "部门Id，多个逗号分隔")
     private String deptIds;
+
+    /**
+     * 岗位Id，多个逗号分隔
+     */
+    @ApiModelProperty(value = "岗位Id，多个逗号分隔")
+    private String postIds;
 
     /**
      * 发送类型：0立即发送 1定时发送

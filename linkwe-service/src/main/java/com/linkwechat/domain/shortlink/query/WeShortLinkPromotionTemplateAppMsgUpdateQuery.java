@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -43,16 +44,17 @@ public class WeShortLinkPromotionTemplateAppMsgUpdateQuery {
     private Integer sendScope;
 
     /**
-     * 员工Id，多个逗号分隔
+     * 执行员工
      */
-    @ApiModelProperty(value = "员工Id，多个逗号分隔")
-    private String userIds;
+    @ApiModelProperty(value = "执行员工")
+    public WeSopExecuteUserConditVo.ExecuteUserCondit executeUserCondit;
 
     /**
-     * 部门Id，多个逗号分隔
+     * 执行部门与岗位
      */
-    @ApiModelProperty(value = "部门Id，多个逗号分隔")
-    private String deptIds;
+    @ApiModelProperty(value = "执行部门与岗位")
+    public WeSopExecuteUserConditVo.ExecuteDeptCondit executeDeptCondit;
+
 
     /**
      * 发送类型：0立即发送 1定时发送

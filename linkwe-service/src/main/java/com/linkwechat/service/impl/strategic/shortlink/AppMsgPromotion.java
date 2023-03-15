@@ -4,10 +4,13 @@ import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.enums.QwAppMsgBusinessTypeEnum;
 import com.linkwechat.common.enums.WeMsgTypeEnum;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeShortLinkPromotion;
 import com.linkwechat.domain.WeShortLinkPromotionTemplateAppMsg;
@@ -19,6 +22,8 @@ import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateAppMsgAddQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateAppMsgUpdateQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionUpdateQuery;
+import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
+import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.service.IWeShortLinkPromotionService;
 import com.linkwechat.service.IWeShortLinkPromotionTemplateAppMsgService;
 import com.linkwechat.service.QwAppSendMsgService;
@@ -32,6 +37,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 短链推广方式-朋友圈
@@ -53,6 +59,8 @@ public class AppMsgPromotion extends PromotionType {
     private RabbitTemplate rabbitTemplate;
     @Resource
     private RabbitMQSettingConfig rabbitMQSettingConfig;
+    @Resource
+    private QwSysUserClient qwSysUserClient;
 
     @Override
     public Long saveAndSend(WeShortLinkPromotionAddQuery query, WeShortLinkPromotion weShortLinkPromotion) {
@@ -80,6 +88,26 @@ public class AppMsgPromotion extends PromotionType {
 
         //2.保存短链推广模板-应用消息
         WeShortLinkPromotionTemplateAppMsg appMsg = BeanUtil.copyProperties(appMsgAddQuery, WeShortLinkPromotionTemplateAppMsg.class);
+        if (appMsgAddQuery.getSendScope().equals(0)) {
+            WeSopExecuteUserConditVo.ExecuteUserCondit executeUserCondit = appMsgAddQuery.getExecuteUserCondit();
+            List<String> weUserIds = executeUserCondit.getWeUserIds();
+            if (weUserIds != null && weUserIds.size() > 0) {
+                String ids = StringUtils.join(weUserIds, ",");
+                appMsg.setUserIds(ids);
+            }
+        } else if (appMsgAddQuery.getSendScope().equals(1)) {
+            WeSopExecuteUserConditVo.ExecuteDeptCondit executeDeptCondit = appMsgAddQuery.getExecuteDeptCondit();
+            List<String> deptIds = executeDeptCondit.getDeptIds();
+            List<String> posts = executeDeptCondit.getPosts();
+            if (deptIds != null && deptIds.size() > 0) {
+                String ids = StringUtils.join(deptIds, ",");
+                appMsg.setDeptIds(ids);
+            }
+            if (posts != null && posts.size() > 0) {
+                String ids = StringUtils.join(posts, ",");
+                appMsg.setUserIds(ids);
+            }
+        }
         appMsg.setPromotionId(weShortLinkPromotion.getId());
         appMsg.setDelFlag(0);
         weShortLinkPromotionTemplateAppMsgService.save(appMsg);
@@ -98,18 +126,23 @@ public class AppMsgPromotion extends PromotionType {
         //TODO 链接要替换
         String content = "【短链推广】\r\n\r\n  您有一条新的短链推广任务，请点击链接，进入任务页，分享短链内容给客户。\r\n\r\n <a href=\"http://www.baidu.com\">" + weShortLinkPromotion.getTaskName() + "</a>";
         String ids = null;
+        String postIds = null;
         //应用消息发送类型 0成员 1部门或岗位
         if (appMsgAddQuery.getSendScope().equals(0)) {
-            ids = appMsgAddQuery.getUserIds();
+            List<String> weUserIds = appMsgAddQuery.getExecuteUserCondit().getWeUserIds();
+            ids = StringUtils.join(weUserIds, ",");
         } else if (appMsgAddQuery.getSendScope().equals(1)) {
-            ids = appMsgAddQuery.getDeptIds();
+            List<String> deptIds = appMsgAddQuery.getExecuteDeptCondit().getDeptIds();
+            List<String> posts = appMsgAddQuery.getExecuteDeptCondit().getPosts();
+            ids = StringUtils.join(deptIds, ",");
+            postIds = StringUtils.join(posts, ",");
         }
         if (sendType.equals(0)) {
             //立即发送
-            directSend(weShortLinkPromotion.getId(), appMsg.getId(), content, query.getAttachmentsList(), null, appMsgAddQuery.getSendScope(), ids);
+            directSend(weShortLinkPromotion.getId(), appMsg.getId(), content, query.getAttachmentsList(), null, appMsgAddQuery.getSendScope(), ids, postIds);
         } else {
             //定时发送
-            timingSend(weShortLinkPromotion.getId(), appMsg.getId(), content, Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()), query.getAttachmentsList(), null, appMsgAddQuery.getSendScope(), ids);
+            timingSend(weShortLinkPromotion.getId(), appMsg.getId(), content, Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()), query.getAttachmentsList(), null, appMsgAddQuery.getSendScope(), ids, postIds);
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
@@ -151,6 +184,26 @@ public class AppMsgPromotion extends PromotionType {
         //添加
         WeShortLinkPromotionTemplateAppMsg appMsg = BeanUtil.copyProperties(appMsgUpdateQuery, WeShortLinkPromotionTemplateAppMsg.class);
         appMsg.setId(null);
+        if (appMsgUpdateQuery.getSendScope().equals(0)) {
+            WeSopExecuteUserConditVo.ExecuteUserCondit executeUserCondit = appMsgUpdateQuery.getExecuteUserCondit();
+            List<String> weUserIds = executeUserCondit.getWeUserIds();
+            if (weUserIds != null && weUserIds.size() > 0) {
+                String ids = StringUtils.join(weUserIds, ",");
+                appMsg.setUserIds(ids);
+            }
+        } else if (appMsgUpdateQuery.getSendScope().equals(1)) {
+            WeSopExecuteUserConditVo.ExecuteDeptCondit executeDeptCondit = appMsgUpdateQuery.getExecuteDeptCondit();
+            List<String> deptIds = executeDeptCondit.getDeptIds();
+            List<String> posts = executeDeptCondit.getPosts();
+            if (deptIds != null && deptIds.size() > 0) {
+                String ids = StringUtils.join(deptIds, ",");
+                appMsg.setDeptIds(ids);
+            }
+            if (posts != null && posts.size() > 0) {
+                String ids = StringUtils.join(posts, ",");
+                appMsg.setUserIds(ids);
+            }
+        }
         appMsg.setPromotionId(weShortLinkPromotion.getId());
         appMsg.setDelFlag(0);
         weShortLinkPromotionTemplateAppMsgService.save(appMsg);
@@ -158,18 +211,23 @@ public class AppMsgPromotion extends PromotionType {
         //发送mq
         String content = "【短链推广】\r\n\r\n  您有一条新的短链推广任务，请点击链接，进入任务页，分享短链内容给客户。\r\n\r\n <a href=\"http://www.baidu.com\">" + weShortLinkPromotion.getTaskName() + "</a>";
         String ids = null;
+        String postIds = null;
         //应用消息发送类型 0成员 1部门或岗位
         if (appMsgUpdateQuery.getSendScope().equals(0)) {
-            ids = appMsgUpdateQuery.getUserIds();
+            List<String> weUserIds = appMsgUpdateQuery.getExecuteUserCondit().getWeUserIds();
+            ids = StringUtils.join(weUserIds, ",");
         } else if (appMsgUpdateQuery.getSendScope().equals(1)) {
-            ids = appMsgUpdateQuery.getDeptIds();
+            List<String> deptIds = appMsgUpdateQuery.getExecuteDeptCondit().getDeptIds();
+            List<String> posts = appMsgUpdateQuery.getExecuteDeptCondit().getPosts();
+            ids = StringUtils.join(deptIds, ",");
+            postIds = StringUtils.join(posts, ",");
         }
         if (sendType.equals(0)) {
             //立即发送
-            directSend(weShortLinkPromotion.getId(), appMsg.getId(), content, query.getAttachmentsList(), null, appMsgUpdateQuery.getSendScope(), ids);
+            directSend(weShortLinkPromotion.getId(), appMsg.getId(), content, query.getAttachmentsList(), null, appMsgUpdateQuery.getSendScope(), ids, postIds);
         } else {
             //定时发送
-            timingSend(weShortLinkPromotion.getId(), appMsg.getId(), content, Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()), query.getAttachmentsList(), null, appMsgUpdateQuery.getSendScope(), ids);
+            timingSend(weShortLinkPromotion.getId(), appMsg.getId(), content, Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()), query.getAttachmentsList(), null, appMsgUpdateQuery.getSendScope(), ids, postIds);
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
@@ -183,13 +241,31 @@ public class AppMsgPromotion extends PromotionType {
         qwAppMsgBody.setCorpId(SecurityUtils.getCorpId());
         //应用消息发送类型 0成员 1部门或岗位
         Integer sendScope = (Integer) objects[0];
-        String ids = (String) objects[1];
-        String[] split = ids.split(",");
-        List<String> list = Arrays.asList(split);
         if (sendScope.equals(0)) {
+            String ids = (String) objects[1];
+            String[] split = ids.split(",");
+            List<String> list = Arrays.asList(split);
             qwAppMsgBody.setCorpUserIds(list);
         } else if (sendScope.equals(1)) {
-            qwAppMsgBody.setDeptIds(list);
+            Object object = objects[1];
+            if (BeanUtil.isNotEmpty(object)) {
+                String ids = String.valueOf(object);
+                String[] split = ids.split(",");
+                List<String> list = Arrays.asList(split);
+                qwAppMsgBody.setDeptIds(list);
+            }
+            Object object1 = objects[2];
+            if (BeanUtil.isNotEmpty(object1)) {
+                String postIds = String.valueOf(object1);
+                AjaxResult<List<SysUser>> allSysUser = qwSysUserClient.findAllSysUser(null, postIds, null);
+                if (allSysUser.getCode() == 200) {
+                    List<SysUser> data = allSysUser.getData();
+                    List<String> collect = data.stream().map(i -> i.getWeUserId()).collect(Collectors.toList());
+                    if (collect != null && collect.size() > 0) {
+                        qwAppMsgBody.setCorpUserIds(collect);
+                    }
+                }
+            }
         }
         //附件
         WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
@@ -210,13 +286,31 @@ public class AppMsgPromotion extends PromotionType {
         qwAppMsgBody.setCorpId(SecurityUtils.getCorpId());
         //应用消息发送类型 0成员 1部门或岗位
         Integer sendScope = (Integer) objects[0];
-        String ids = (String) objects[1];
-        String[] split = ids.split(",");
-        List<String> list = Arrays.asList(split);
         if (sendScope.equals(0)) {
+            String ids = (String) objects[1];
+            String[] split = ids.split(",");
+            List<String> list = Arrays.asList(split);
             qwAppMsgBody.setCorpUserIds(list);
         } else if (sendScope.equals(1)) {
-            qwAppMsgBody.setDeptIds(list);
+            Object object = objects[1];
+            if (BeanUtil.isNotEmpty(object)) {
+                String ids = String.valueOf(object);
+                String[] split = ids.split(",");
+                List<String> list = Arrays.asList(split);
+                qwAppMsgBody.setDeptIds(list);
+            }
+            Object object1 = objects[2];
+            if (BeanUtil.isNotEmpty(object1)) {
+                String postIds = String.valueOf(object1);
+                AjaxResult<List<SysUser>> allSysUser = qwSysUserClient.findAllSysUser(null, postIds, null);
+                if (allSysUser.getCode() == 200) {
+                    List<SysUser> data = allSysUser.getData();
+                    List<String> collect = data.stream().map(i -> i.getWeUserId()).collect(Collectors.toList());
+                    if (collect != null && collect.size() > 0) {
+                        qwAppMsgBody.setCorpUserIds(collect);
+                    }
+                }
+            }
         }
         //附件
         WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
