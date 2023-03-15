@@ -154,18 +154,24 @@ public class WeSensitiveServiceImpl extends ServiceImpl<WeSensitiveMapper, WeSen
     @Override
     public List<String> getScopeUsers(List<WeSensitiveAuditScope> scopeList) {
         List<String> users = Lists.newArrayList();
-        scopeList.forEach(scope -> {
-            if (scope.getScopeType().equals(WeConstans.USE_SCOP_BUSINESSID_TYPE_USER)) {
-                users.add(scope.getAuditScopeId());
-            } else {
-                List<SysUser> userList = qwSysUserClient.list(SysUser.builder().deptId(Long.parseLong(scope.getAuditScopeId())).build()).getData();
-                if(CollectionUtil.isEmpty(userList)){
-                    throw new WeComException("未查询到有效员工");
+        if(CollectionUtil.isEmpty(scopeList)){
+            List<SysUser> userList = qwSysUserClient.listAll().getData();
+            List<String> userIdList = userList.stream().map(SysUser::getWeUserId).collect(Collectors.toList());
+            users.addAll(userIdList);
+        }else {
+            scopeList.forEach(scope -> {
+                if (scope.getScopeType().equals(WeConstans.USE_SCOP_BUSINESSID_TYPE_USER)) {
+                    users.add(scope.getAuditScopeId());
+                } else {
+                    List<SysUser> userList = qwSysUserClient.list(SysUser.builder().deptId(Long.parseLong(scope.getAuditScopeId())).build()).getData();
+                    if(CollectionUtil.isEmpty(userList)){
+                        throw new WeComException("未查询到有效员工");
+                    }
+                    List<String> userIdList = userList.stream().map(SysUser::getWeUserId).collect(Collectors.toList());
+                    users.addAll(userIdList);
                 }
-                List<String> userIdList = userList.stream().map(SysUser::getWeUserId).collect(Collectors.toList());
-                users.addAll(userIdList);
-            }
-        });
+            });
+        }
         return users;
     }
 }

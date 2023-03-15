@@ -87,7 +87,7 @@ public class WeSensitive extends BaseEntity implements Serializable {
     /**
      * 审计范围，敏感词审计需要覆盖的用户或机构
      */
-    @NotEmpty(message = "审计范围不能为空")
+    //@NotEmpty(message = "审计范围不能为空")
     @TableField(exist = false)
     @ApiModelProperty(value = "审计范围")
     private List<WeSensitiveAuditScope> auditUserScope;
