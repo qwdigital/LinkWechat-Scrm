@@ -679,7 +679,7 @@ public class RabbitMQConfig {
      */
     @Bean
     public Queue quMomentsMsg() {
-        return new Queue(rabbitMQSettingConfig.getMomentsQu());
+        return new Queue(rabbitMQSettingConfig.getMomentsMsgQu());
     }
 
     /**

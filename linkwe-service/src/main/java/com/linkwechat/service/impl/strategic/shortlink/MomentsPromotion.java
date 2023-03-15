@@ -1,6 +1,7 @@
 package com.linkwechat.service.impl.strategic.shortlink;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -89,16 +90,13 @@ public class MomentsPromotion extends PromotionType {
         //部分客户
         if (scopeType.equals(1)) {
             String userIds = momentsAddQuery.getUserIds();
-            List<WeShortLinkUserPromotionTask> list = new ArrayList<>();
-            for (String userId : userIds.split(",")) {
-                WeShortLinkUserPromotionTask weShortLinkUserPromotionTask = new WeShortLinkUserPromotionTask();
-                weShortLinkUserPromotionTask.setUserId(userId);
-                weShortLinkUserPromotionTask.setTemplateType(2);
-                weShortLinkUserPromotionTask.setSendStatus(0);
-                weShortLinkUserPromotionTask.setDelFlag(0);
-                list.add(weShortLinkUserPromotionTask);
-            }
-            weShortLinkUserPromotionTaskService.saveBatch(list);
+            WeShortLinkUserPromotionTask weShortLinkUserPromotionTask = new WeShortLinkUserPromotionTask();
+            weShortLinkUserPromotionTask.setUserId(userIds);
+            weShortLinkUserPromotionTask.setTemplateType(2);
+            weShortLinkUserPromotionTask.setTemplateId(moments.getId());
+            weShortLinkUserPromotionTask.setSendStatus(0);
+            weShortLinkUserPromotionTask.setDelFlag(0);
+            weShortLinkUserPromotionTaskService.save(weShortLinkUserPromotionTask);
         }
 
         //5.发送mq
@@ -178,16 +176,13 @@ public class MomentsPromotion extends PromotionType {
         //部分客户
         if (scopeType.equals(1)) {
             String userIds = momentsUpdateQuery.getUserIds();
-            List<WeShortLinkUserPromotionTask> list = new ArrayList<>();
-            for (String userId : userIds.split(",")) {
-                WeShortLinkUserPromotionTask weShortLinkUserPromotionTask = new WeShortLinkUserPromotionTask();
-                weShortLinkUserPromotionTask.setUserId(userId);
-                weShortLinkUserPromotionTask.setTemplateType(2);
-                weShortLinkUserPromotionTask.setSendStatus(0);
-                weShortLinkUserPromotionTask.setDelFlag(0);
-                list.add(weShortLinkUserPromotionTask);
-            }
-            weShortLinkUserPromotionTaskService.saveBatch(list);
+            WeShortLinkUserPromotionTask weShortLinkUserPromotionTask = new WeShortLinkUserPromotionTask();
+            weShortLinkUserPromotionTask.setUserId(userIds);
+            weShortLinkUserPromotionTask.setTemplateType(2);
+            weShortLinkUserPromotionTask.setTemplateId(moments.getId());
+            weShortLinkUserPromotionTask.setSendStatus(0);
+            weShortLinkUserPromotionTask.setDelFlag(0);
+            weShortLinkUserPromotionTaskService.save(weShortLinkUserPromotionTask);
         }
 
         //4.发送mq
@@ -240,16 +235,20 @@ public class MomentsPromotion extends PromotionType {
         }
 
         //客户标签
-        weMoments.setCustomerTag(String.valueOf(objects[0]));
-
+        Object object = objects[0];
+        if (BeanUtil.isNotEmpty(object)) {
+            weMoments.setCustomerTag(String.valueOf(object));
+        }
         //附件
         List<WeMoments.OtherContent> otherContents = new ArrayList<>();
         attachments.stream().findFirst().ifPresent(i -> {
             WeMoments.OtherContent otherContent = new WeMoments.OtherContent();
             otherContent.setAnnexType(MediaType.IMAGE.getMediaType());
             otherContent.setAnnexUrl(i.getPicUrl());
+            otherContents.add(otherContent);
         });
         weMoments.setOtherContent(otherContents);
+        weMoments.setContentType(MediaType.IMAGE.getMediaType());
 
         rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentMsgRk(), JSONObject.toJSONString(weMoments));
 
@@ -275,7 +274,10 @@ public class MomentsPromotion extends PromotionType {
         }
 
         //客户标签
-        weMoments.setCustomerTag(String.valueOf(objects[0]));
+        Object object = objects[0];
+        if (BeanUtil.isNotEmpty(object)) {
+            weMoments.setCustomerTag(String.valueOf(object));
+        }
 
         //附件
         List<WeMoments.OtherContent> otherContents = new ArrayList<>();

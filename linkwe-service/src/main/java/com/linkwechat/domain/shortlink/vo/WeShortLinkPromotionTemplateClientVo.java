@@ -121,10 +121,5 @@ public class WeShortLinkPromotionTemplateClientVo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime taskEndTime;
 
-    /**
-     * 附件
-     */
-    @ApiModelProperty(value = "附件")
-    private List<WeMessageTemplate> attachmentsList;
 
 }

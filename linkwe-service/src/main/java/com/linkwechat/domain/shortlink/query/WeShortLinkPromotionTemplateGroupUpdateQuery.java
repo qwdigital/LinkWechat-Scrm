@@ -1,5 +1,6 @@
 package com.linkwechat.domain.shortlink.query;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -64,12 +65,14 @@ public class WeShortLinkPromotionTemplateGroupUpdateQuery {
      * 定时发送时间
      */
     @ApiModelProperty(value = "定时发送时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime taskSendTime;
 
     /**
      * 结束时间
      */
     @ApiModelProperty(value = "结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime taskEndTime;
 
 }

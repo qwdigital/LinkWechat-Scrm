@@ -41,6 +41,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -93,8 +94,9 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
         WeMessageTemplate weMessageTemplate = getPromotionUrl(query.getShortLinkId(), query.getStyle(), query.getMaterialId());
         weShortLinkPromotion.setUrl(weMessageTemplate.getPicUrl());
         //添加推广附件
-        List<WeMessageTemplate> attachmentsList = query.getAttachmentsList();
-        attachmentsList.add(weMessageTemplate);
+        List<WeMessageTemplate> weMessageTemplates = Optional.ofNullable(query.getAttachmentsList()).orElse(new ArrayList<>());
+        weMessageTemplates.add(weMessageTemplate);
+        query.setAttachmentsList(weMessageTemplates);
         //保存和发送
         PromotionType promotionType = ShortLinkPromotionStrategyFactory.getPromotionType(query.getType());
         Long id = promotionType.saveAndSend(query, weShortLinkPromotion);
@@ -179,9 +181,10 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
                     .filter(i -> StrUtil.isNotBlank(i.getBackgroundImgUrl()))
                     //判断海报组件是否存在
                     .map(WeMaterial::getPosterSubassembly)
-                    .map(i -> JSONObject.parseObject(i))
+                    .map(i -> JSONObject.parseArray(i))
                     //判断海报是否有占位码组件
-                    .filter(i -> i.getInteger("type").equals(3))
+                    .filter(i -> i.getJSONObject(0).getInteger("type").equals(3))
+                    .map(i -> i.getJSONObject(0))
                     .orElseThrow(() -> new ServiceException("请确认海报是否正确！"));
 
             //占位码位置

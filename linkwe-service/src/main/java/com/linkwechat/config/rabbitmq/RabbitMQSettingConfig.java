@@ -353,8 +353,8 @@ public class RabbitMQSettingConfig {
     /**
      * 朋友圈消息队列
      */
-    @Value("${wecom.mq.queue.moments-msg:Qu_Moments}")
-    private String momentsQu;
+    @Value("${wecom.mq.queue.moments-msg:Qu_MomentsMsg}")
+    private String MomentsMsgQu;
 
     /**
      * 朋友圈消息延迟队列

@@ -1,5 +1,6 @@
 package com.linkwechat.domain.shortlink.query;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,12 +18,6 @@ import java.time.LocalDateTime;
 @ApiModel
 @Data
 public class WeShortLinkPromotionTemplateMomentsAddQuery {
-
-    /**
-     * 短链推广Id
-     */
-    @ApiModelProperty(value = "短链推广Id")
-    private Long promotionId;
 
     /**
      * 群发朋友圈分类 0全部客户 1部分客户
@@ -46,12 +41,14 @@ public class WeShortLinkPromotionTemplateMomentsAddQuery {
      * 添加开始时间
      */
     @ApiModelProperty(value = "添加开始时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime addBeginTime;
 
     /**
      * 添加结束时间
      */
     @ApiModelProperty(value = "添加结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime addEndTime;
 
     /**
@@ -82,19 +79,14 @@ public class WeShortLinkPromotionTemplateMomentsAddQuery {
      * 定时发送时间
      */
     @ApiModelProperty(value = "定时发送时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime taskSendTime;
 
     /**
      * 任务结束时间
      */
     @ApiModelProperty(value = "任务结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime taskEndTime;
-
-    /**
-     * 删除标识 0 有效 1删除
-     */
-    @ApiModelProperty(value = "删除标识 0 有效 1删除")
-    private Integer delFlag;
-
 
 }

@@ -21,10 +21,7 @@ import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionUpdateQuery;
-import com.linkwechat.domain.shortlink.vo.WeShortLinkListVo;
-import com.linkwechat.domain.shortlink.vo.WeShortLinkPromotionGetVo;
-import com.linkwechat.domain.shortlink.vo.WeShortLinkPromotionTemplateClientVo;
-import com.linkwechat.domain.shortlink.vo.WeShortLinkPromotionVo;
+import com.linkwechat.domain.shortlink.vo.*;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.fegin.QwSysUserClient;
@@ -60,6 +57,8 @@ public class WeShortLinkPromotionController extends BaseController {
     @Resource
     private IWeShortLinkPromotionTemplateClientService weShortLinkPromotionTemplateClientService;
     @Resource
+    private IWeShortLinkPromotionTemplateGroupService weShortLinkPromotionTemplateGroupService;
+    @Resource
     private QwSysUserClient qwSysUserClient;
     @Resource
     private IWeTagService weTagService;
@@ -81,7 +80,7 @@ public class WeShortLinkPromotionController extends BaseController {
     public TableDataInfo<WeShortLinkPromotionVo> list(WeShortLinkPromotionQuery query) {
         startPage();
         List<WeShortLinkPromotionVo> list = weShortLinkPromotionService.selectList(query);
-        Optional.ofNullable(list).ifPresent(items->items.stream().forEach(i->{
+        Optional.ofNullable(list).ifPresent(items -> items.stream().forEach(i -> {
             //获取短链
             String encode = Base62NumUtil.encode(i.getShortLinkId());
             String shortLinkUrl = linkWeChatConfig.getShortLinkDomainName() + encode;
@@ -263,19 +262,47 @@ public class WeShortLinkPromotionController extends BaseController {
                         List<WeShortLinkPromotionAttachment> list = weShortLinkPromotionAttachmentService.list(attachmentQueryWrapper);
                         if (list != null && list.size() > 0) {
                             List<WeMessageTemplate> collect = list.stream().map(o -> BeanUtil.copyProperties(o, WeMessageTemplate.class)).collect(Collectors.toList());
-                            clientVo.setAttachmentsList(collect);
+                            vo.setAttachments(collect);
                         }
 
                         vo.setClient(clientVo);
                         break;
                     case 1:
-
+                        LambdaQueryWrapper<WeShortLinkPromotionTemplateGroup> groupQueryWrapper = Wrappers.lambdaQuery();
+                        groupQueryWrapper.eq(WeShortLinkPromotionTemplateGroup::getPromotionId, i.getId());
+                        groupQueryWrapper.eq(WeShortLinkPromotionTemplateGroup::getDelFlag, 0);
+                        WeShortLinkPromotionTemplateGroup group = weShortLinkPromotionTemplateGroupService.getOne(groupQueryWrapper);
+                        WeShortLinkPromotionTemplateGroupVo groupVo = BeanUtil.copyProperties(group, WeShortLinkPromotionTemplateGroupVo.class);
+                        //客群分类 0全部群 1部分群
+                        if (groupVo.getType() == 1) {
+                            SysUserQuery sysUserQuery = new SysUserQuery();
+                            List<String> userIds = Arrays.asList(groupVo.getUserIds().split(","));
+                            sysUserQuery.setWeUserIds(userIds);
+                            AjaxResult<List<SysUserVo>> weUsersResult = qwSysUserClient.getUserListByWeUserIds(sysUserQuery);
+                            if (weUsersResult.getCode() == 200) {
+                                List<SysUserVo> data = weUsersResult.getData();
+                                Map<String, String> map = new HashMap<>(userIds.size());
+                                data.stream().forEach(o -> map.put(o.getWeUserId(), o.getUserName()));
+                                groupVo.setUser(map);
+                            }
+                        }
+                        //附件
+                        LambdaQueryWrapper<WeShortLinkPromotionAttachment> attachmentQueryWrapper1 = Wrappers.lambdaQuery();
+                        attachmentQueryWrapper1.eq(WeShortLinkPromotionAttachment::getTemplateType, 1);
+                        attachmentQueryWrapper1.eq(WeShortLinkPromotionAttachment::getTemplateId, group.getId());
+                        attachmentQueryWrapper1.eq(WeShortLinkPromotionAttachment::getDelFlag, 0);
+                        List<WeShortLinkPromotionAttachment> list1 = weShortLinkPromotionAttachmentService.list(attachmentQueryWrapper1);
+                        if (list1 != null && list1.size() > 0) {
+                            List<WeMessageTemplate> collect = list1.stream().map(o -> BeanUtil.copyProperties(o, WeMessageTemplate.class)).collect(Collectors.toList());
+                            vo.setAttachments(collect);
+                        }
+                        vo.setGroup(groupVo);
                         break;
                     case 2:
-
                         break;
                     case 3:
-
+                        break;
+                    default:
                         break;
                 }
             }

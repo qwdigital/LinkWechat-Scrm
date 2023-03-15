@@ -1,8 +1,11 @@
 package com.linkwechat.domain.shortlink.vo;
 
+import com.linkwechat.domain.media.WeMessageTemplate;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * 短链推广
@@ -75,5 +78,17 @@ public class WeShortLinkPromotionGetVo {
      */
     @ApiModelProperty(value = "客户推广信息")
     private WeShortLinkPromotionTemplateClientVo client;
+
+    /**
+     * 客群推广信息
+     */
+    @ApiModelProperty(value = "客群推广信息")
+    private WeShortLinkPromotionTemplateGroupVo group;
+
+    /**
+     * 附件
+     */
+    @ApiModelProperty(value = "附件")
+    private List<WeMessageTemplate> attachments;
 
 }

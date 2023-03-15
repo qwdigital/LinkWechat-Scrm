@@ -1,8 +1,13 @@
 package com.linkwechat.scheduler.listener;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.context.SecurityContextHolder;
+import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.MediaType;
@@ -10,7 +15,9 @@ import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeShortLinkPromotion;
 import com.linkwechat.domain.WeShortLinkPromotionTemplateMoments;
+import com.linkwechat.domain.WeShortLinkUserPromotionTask;
 import com.linkwechat.domain.moments.dto.MomentsParamDto;
+import com.linkwechat.domain.moments.dto.MomentsResultDto;
 import com.linkwechat.domain.moments.entity.WeMoments;
 import com.linkwechat.domain.shortlink.dto.WeShortLinkPromotionMomentsDto;
 import com.linkwechat.fegin.QwMomentsClient;
@@ -18,6 +25,7 @@ import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.service.IWeMaterialService;
 import com.linkwechat.service.IWeShortLinkPromotionService;
 import com.linkwechat.service.IWeShortLinkPromotionTemplateMomentsService;
+import com.linkwechat.service.IWeShortLinkUserPromotionTaskService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -52,6 +60,8 @@ public class QwMomentsMsgListener {
     private IWeShortLinkPromotionService weShortLinkPromotionService;
     @Resource
     private IWeShortLinkPromotionTemplateMomentsService weShortLinkPromotionTemplateMomentsService;
+    @Resource
+    private IWeShortLinkUserPromotionTaskService weShortLinkUserPromotionTaskService;
 
 
     /**
@@ -62,7 +72,7 @@ public class QwMomentsMsgListener {
      * @param message
      */
     @RabbitHandler
-    @RabbitListener(queues = "${wecom.mq.queue.moments-msg:Qu_Moments}")
+    @RabbitListener(queues = "${wecom.mq.queue.moments-msg:Qu_MomentsMsg}")
     public void normalMsgSubscribe(String msg, Channel channel, Message message) {
         try {
             log.info("朋友圈正常消息监听：msg:{}", msg);
@@ -106,6 +116,21 @@ public class QwMomentsMsgListener {
 
         //1.判断任务是否处于待推广的状态
         WeShortLinkPromotion weShortLinkPromotion = weShortLinkPromotionService.getById(weMoments.getShortLinkPromotionId());
+        //重试机制，4次
+        if (BeanUtil.isEmpty(weShortLinkPromotion)) {
+            for (int i = 0; i < 4; i++) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                weShortLinkPromotion = weShortLinkPromotionService.getById(weMoments.getShortLinkPromotionId());
+                if (BeanUtil.isNotEmpty(weShortLinkPromotion)) {
+                    break;
+                }
+            }
+        }
+
         Optional.ofNullable(weShortLinkPromotion).ifPresent(i -> {
             //判断任务的推广状态和删除状态
             //删除标识 0 正常 1 删除
@@ -182,11 +207,11 @@ public class QwMomentsMsgListener {
         //部分
         if (weMoments.getScopeType().equals(new Integer(0))) {
             //客户标签
-            if (StringUtils.isNotEmpty(weMoments.getCustomerTag())) {
+            if (StrUtil.isNotBlank(weMoments.getCustomerTag())) {
                 visibleRange.setExternal_contact_list(MomentsParamDto.ExternalContactList.builder().tag_list(weMoments.getCustomerTag().split(",")).build());
             }
             //指定发送人
-            if (StringUtils.isNotEmpty(weMoments.getNoAddUser())) {
+            if (StrUtil.isNotBlank(weMoments.getNoAddUser())) {
                 visibleRange.setSender_list(MomentsParamDto.SenderList.builder().user_list(weMoments.getNoAddUser().split(",")).build());
             }
         } else {
@@ -198,7 +223,19 @@ public class QwMomentsMsgListener {
             }
         }
         momentsParamDto.setVisible_range(visibleRange);
-        qwMomentsClient.addMomentTask(momentsParamDto);
+        AjaxResult<MomentsResultDto> result = qwMomentsClient.addMomentTask(momentsParamDto);
+
+        if (result.getCode() == 200) {
+            MomentsResultDto data = result.getData();
+            LambdaUpdateWrapper<WeShortLinkUserPromotionTask> updateWrapper = Wrappers.lambdaUpdate();
+            updateWrapper.eq(WeShortLinkUserPromotionTask::getTemplateId, businessId);
+            updateWrapper.eq(WeShortLinkUserPromotionTask::getTemplateType, 2);
+            updateWrapper.set(WeShortLinkUserPromotionTask::getMsgId, data.getJobid());
+            updateWrapper.set(WeShortLinkUserPromotionTask::getSendStatus, 2);
+            weShortLinkUserPromotionTaskService.update(updateWrapper);
+        } else {
+            log.error("朋友圈消息发送异常：{}", result.getMsg());
+        }
     }
 
 

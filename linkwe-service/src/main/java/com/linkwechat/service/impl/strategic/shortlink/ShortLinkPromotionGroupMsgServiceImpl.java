@@ -8,13 +8,11 @@ import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.domain.WeShortLinkPromotion;
 import com.linkwechat.domain.WeShortLinkPromotionTemplateClient;
+import com.linkwechat.domain.WeShortLinkPromotionTemplateGroup;
 import com.linkwechat.domain.WeShortLinkUserPromotionTask;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
-import com.linkwechat.service.AbstractGroupMsgSendTaskService;
-import com.linkwechat.service.IWeShortLinkPromotionService;
-import com.linkwechat.service.IWeShortLinkPromotionTemplateClientService;
-import com.linkwechat.service.IWeShortLinkUserPromotionTaskService;
+import com.linkwechat.service.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -34,6 +32,8 @@ public class ShortLinkPromotionGroupMsgServiceImpl extends AbstractGroupMsgSendT
     private IWeShortLinkPromotionService weShortLinkPromotionService;
     @Resource
     private IWeShortLinkPromotionTemplateClientService weShortLinkPromotionTemplateClientService;
+    @Resource
+    private IWeShortLinkPromotionTemplateGroupService weShortLinkPromotionTemplateGroupService;
     @Resource
     private IWeShortLinkUserPromotionTaskService weShortLinkUserPromotionTaskService;
 
@@ -70,14 +70,14 @@ public class ShortLinkPromotionGroupMsgServiceImpl extends AbstractGroupMsgSendT
             WeAddCustomerMsgVo weAddCustomerMsgVo = sendSpecGroupMsgTemplate(query, senderInfo);
             Optional.ofNullable(weAddCustomerMsgVo).ifPresent(i -> {
                 if (i.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)) {
+                    //更新推广状态
+                    LambdaUpdateWrapper<WeShortLinkPromotion> promotionUpdateWrapper = Wrappers.lambdaUpdate();
+                    promotionUpdateWrapper.set(WeShortLinkPromotion::getTaskStatus, 1);
+                    promotionUpdateWrapper.eq(WeShortLinkPromotion::getId, query.getId());
+                    weShortLinkPromotionService.update(promotionUpdateWrapper);
+
                     //客户
                     if (weShortLinkPromotion.getType().equals(0)) {
-                        //更新推广状态
-                        LambdaUpdateWrapper<WeShortLinkPromotion> promotionUpdateWrapper = Wrappers.lambdaUpdate();
-                        promotionUpdateWrapper.set(WeShortLinkPromotion::getTaskStatus, 1);
-                        promotionUpdateWrapper.eq(WeShortLinkPromotion::getId, query.getId());
-                        weShortLinkPromotionService.update(promotionUpdateWrapper);
-
                         //获取客户推广模板
                         LambdaQueryWrapper<WeShortLinkPromotionTemplateClient> queryWrapper = Wrappers.lambdaQuery();
                         queryWrapper.eq(WeShortLinkPromotionTemplateClient::getPromotionId, query.getId());
@@ -93,7 +93,20 @@ public class ShortLinkPromotionGroupMsgServiceImpl extends AbstractGroupMsgSendT
                         updateWrapper.set(WeShortLinkUserPromotionTask::getSendStatus, 2);
                         weShortLinkUserPromotionTaskService.update(updateWrapper);
                     } else if (weShortLinkPromotion.getType().equals(1)) {
-                        //客群
+                        //获取客群推广模板
+                        LambdaQueryWrapper<WeShortLinkPromotionTemplateGroup> queryWrapper = Wrappers.lambdaQuery();
+                        queryWrapper.eq(WeShortLinkPromotionTemplateGroup::getPromotionId, query.getId());
+                        queryWrapper.eq(WeShortLinkPromotionTemplateGroup::getDelFlag, 0);
+                        WeShortLinkPromotionTemplateGroup one = weShortLinkPromotionTemplateGroupService.getOne(queryWrapper);
+
+                        //更新员工推广短链任务
+                        LambdaUpdateWrapper<WeShortLinkUserPromotionTask> updateWrapper = Wrappers.lambdaUpdate();
+                        updateWrapper.eq(WeShortLinkUserPromotionTask::getTemplateType, 1);
+                        updateWrapper.eq(WeShortLinkUserPromotionTask::getTemplateId, one.getId());
+                        updateWrapper.eq(WeShortLinkUserPromotionTask::getUserId, senderInfo.getUserId());
+                        updateWrapper.set(WeShortLinkUserPromotionTask::getMsgId, i.getMsgId());
+                        updateWrapper.set(WeShortLinkUserPromotionTask::getSendStatus, 2);
+                        weShortLinkUserPromotionTaskService.update(updateWrapper);
                     }
                 }
             });

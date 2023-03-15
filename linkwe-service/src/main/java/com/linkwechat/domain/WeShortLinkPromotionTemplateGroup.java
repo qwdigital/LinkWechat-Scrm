@@ -50,7 +50,7 @@ public class WeShortLinkPromotionTemplateGroup extends BaseEntity {
      * 群主Id
      */
     @ApiModelProperty(value = "群主Id")
-    private String groupId;
+    private String userIds;
 
     /**
      * 推广语素材Id

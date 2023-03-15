@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
@@ -13,10 +14,7 @@ import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.*;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.media.WeMessageTemplate;
-import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
-import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateGroupAddQuery;
-import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateGroupUpdateQuery;
-import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionUpdateQuery;
+import com.linkwechat.domain.shortlink.query.*;
 import com.linkwechat.service.*;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +57,7 @@ public class GroupPromotion extends PromotionType {
     public Long saveAndSend(WeShortLinkPromotionAddQuery query, WeShortLinkPromotion weShortLinkPromotion) {
 
         WeShortLinkPromotionTemplateGroupAddQuery group = query.getGroup();
+        //检查客群
         checkSendList(group.getType(), query.getSenderList());
 
         //1. 保存短链推广
@@ -76,8 +75,6 @@ public class GroupPromotion extends PromotionType {
         weShortLinkPromotionService.save(weShortLinkPromotion);
 
         //2.保存短链推广模板-客群
-        //TODO 检查员工对应的客群是否存在
-
         WeShortLinkPromotionTemplateGroup templateGroup = BeanUtil.copyProperties(group, WeShortLinkPromotionTemplateGroup.class);
         templateGroup.setPromotionId(weShortLinkPromotion.getId());
         templateGroup.setDelFlag(0);
@@ -159,6 +156,8 @@ public class GroupPromotion extends PromotionType {
     public void updateAndSend(WeShortLinkPromotionUpdateQuery query, WeShortLinkPromotion weShortLinkPromotion) {
 
         WeShortLinkPromotionTemplateGroupUpdateQuery groupUpdateQuery = query.getGroup();
+        //检查客群
+        checkSendList(groupUpdateQuery.getType(), query.getSenderList());
 
         //1.更新推广短链
         //发送类型：0立即发送 1定时发送
@@ -316,11 +315,23 @@ public class GroupPromotion extends PromotionType {
 
     @Override
     protected void timingEnd(Long businessId, Integer type, Date taskEndTime) {
+        WeShortLinkPromotionTaskEndQuery query = new WeShortLinkPromotionTaskEndQuery();
+        query.setBusinessId(businessId);
+        query.setType(type);
 
+        long diffTime = DateUtils.diffTime(taskEndTime, new Date());
+        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeDelayGroupMsgEndRk(), JSONObject.toJSONString(query), message -> {
+            //注意这里时间可使用long类型,毫秒单位，设置header
+            message.getMessageProperties().setHeader("x-delay", diffTime);
+            return message;
+        });
     }
 
     /**
+     * 检查客群
      *
+     * @param type       客群分类 0全部群 1部分群
+     * @param senderList
      */
     private void checkSendList(Integer type, List<WeAddGroupMessageQuery.SenderInfo> senderList) {
         //客群分类 0全部群 1部分群
@@ -337,9 +348,22 @@ public class GroupPromotion extends PromotionType {
                     senderList.add(senderInfo);
                 });
             } else {
-                throw new WeComException("暂无客户群可发送");
+                throw new ServiceException("暂无客户群可发送");
+            }
+        } else if (type == 1) {
+            Optional.ofNullable(senderList).orElseThrow(() -> new ServiceException("无指定接收消息的成员及对应客群列表"));
+
+            List<String> userIds = senderList.stream().map(WeAddGroupMessageQuery.SenderInfo::getUserId).collect(Collectors.toList());
+            List<WeGroup> groupList = weGroupService.list(new LambdaQueryWrapper<WeGroup>().in(WeGroup::getOwner, userIds).eq(WeGroup::getDelFlag, 0));
+            if (CollectionUtil.isNotEmpty(groupList)) {
+                Map<String, List<String>> ownerToChatIdMap = groupList.stream().collect(Collectors.groupingBy(WeGroup::getOwner, Collectors.mapping(WeGroup::getChatId, Collectors.toList())));
+                for (WeAddGroupMessageQuery.SenderInfo senderInfo : senderList) {
+                    List<String> chatIds = ownerToChatIdMap.get(senderInfo.getUserId());
+                    senderInfo.setChatList(chatIds);
+                }
+            }else{
+                throw new ServiceException("暂无客户群可发送");
             }
         }
-
     }
 }

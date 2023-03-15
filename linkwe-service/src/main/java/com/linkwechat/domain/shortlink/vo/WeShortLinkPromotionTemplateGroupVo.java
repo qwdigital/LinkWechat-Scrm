@@ -1,16 +1,18 @@
-package com.linkwechat.domain.shortlink.query;
+package com.linkwechat.domain.shortlink.vo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.domain.media.WeMessageTemplate;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -22,7 +24,13 @@ import java.time.LocalDateTime;
  */
 @ApiModel
 @Data
-public class WeShortLinkPromotionTemplateGroupAddQuery {
+public class WeShortLinkPromotionTemplateGroupVo {
+
+    /**
+     * 主键Id
+     */
+    @ApiModelProperty(value = "主键Id")
+    private Long id;
 
     /**
      * 短链推广Id
@@ -41,6 +49,12 @@ public class WeShortLinkPromotionTemplateGroupAddQuery {
      */
     @ApiModelProperty(value = "群主Id")
     private String userIds;
+
+    /**
+     * 群主Id
+     */
+    @ApiModelProperty(value = "群主")
+    private Map<String, String> user;
 
     /**
      * 推广语素材Id
@@ -64,14 +78,12 @@ public class WeShortLinkPromotionTemplateGroupAddQuery {
      * 定时发送时间
      */
     @ApiModelProperty(value = "定时发送时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime taskSendTime;
 
     /**
      * 结束时间
      */
     @ApiModelProperty(value = "结束时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime taskEndTime;
 
 }
