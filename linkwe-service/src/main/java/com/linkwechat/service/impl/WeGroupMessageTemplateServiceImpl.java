@@ -382,7 +382,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
             SpringUtils.getBean("liveGroupMsgService", AbstractGroupMsgSendTaskService.class).sendGroupMsg(query);
 
         } else if (query.getMsgSource().equals(new Integer(4))) {
-            //断裂推广群发逻辑
+            //短链推广群发逻辑
             SpringUtils.getBean("shortLinkPromotionGroupMsgService", AbstractGroupMsgSendTaskService.class).sendGroupMsg(query);
 
         } else {

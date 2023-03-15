@@ -11,16 +11,22 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
-import com.linkwechat.domain.WeShortLinkPromotion;
+import com.linkwechat.domain.*;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.material.query.WePosterQuery;
 import com.linkwechat.domain.material.vo.WeMaterialVo;
+import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionUpdateQuery;
+import com.linkwechat.domain.shortlink.vo.WeShortLinkListVo;
+import com.linkwechat.domain.shortlink.vo.WeShortLinkPromotionGetVo;
+import com.linkwechat.domain.shortlink.vo.WeShortLinkPromotionTemplateClientVo;
 import com.linkwechat.domain.shortlink.vo.WeShortLinkPromotionVo;
-import com.linkwechat.service.IWeMaterialService;
-import com.linkwechat.service.IWeShortLinkPromotionService;
+import com.linkwechat.domain.system.user.query.SysUserQuery;
+import com.linkwechat.domain.system.user.vo.SysUserVo;
+import com.linkwechat.fegin.QwSysUserClient;
+import com.linkwechat.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
@@ -28,7 +34,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 短链推广
@@ -46,6 +53,17 @@ public class WeShortLinkPromotionController extends BaseController {
     private IWeShortLinkPromotionService weShortLinkPromotionService;
     @Resource
     private IWeMaterialService weMaterialService;
+    @Resource
+    private IWeShortLinkService weShortLinkService;
+    @Resource
+    private IWeShortLinkPromotionTemplateClientService weShortLinkPromotionTemplateClientService;
+    @Resource
+    private QwSysUserClient qwSysUserClient;
+    @Resource
+    private IWeTagService weTagService;
+    @Resource
+    private IWeShortLinkPromotionAttachmentService weShortLinkPromotionAttachmentService;
+
 
     /**
      * 短链推广列表
@@ -62,7 +80,12 @@ public class WeShortLinkPromotionController extends BaseController {
         return getDataTable(list);
     }
 
-
+    /**
+     * 新增短链推广
+     *
+     * @param query
+     * @return
+     */
     @ApiOperation(value = "新增短链推广", httpMethod = "POST")
     @Log(title = "新增短链推广", businessType = BusinessType.INSERT)
     @PostMapping("/add")
@@ -77,6 +100,12 @@ public class WeShortLinkPromotionController extends BaseController {
         }
     }
 
+    /**
+     * 暂存短链推广
+     *
+     * @param query
+     * @return
+     */
     @Log(title = "暂存短链推广", businessType = BusinessType.INSERT)
     @ApiOperation(value = "暂存短链推广", httpMethod = "POST")
     @PostMapping("/ts")
@@ -91,6 +120,12 @@ public class WeShortLinkPromotionController extends BaseController {
         }
     }
 
+    /**
+     * 修改短链推广
+     *
+     * @param query
+     * @return
+     */
     @Log(title = "修改短链推广", businessType = BusinessType.UPDATE)
     @ApiOperation(value = "修改", httpMethod = "PUT")
     @PutMapping("/edit")
@@ -99,6 +134,12 @@ public class WeShortLinkPromotionController extends BaseController {
         return AjaxResult.success();
     }
 
+    /**
+     * 删除短链推广
+     *
+     * @param id
+     * @return
+     */
     @Log(title = "删除短链推广", businessType = BusinessType.DELETE)
     @ApiOperation(value = "删除", httpMethod = "DELETE")
     @PutMapping("/delete/{id}")
@@ -110,6 +151,12 @@ public class WeShortLinkPromotionController extends BaseController {
         return AjaxResult.success();
     }
 
+    /**
+     * 批量删除短链推广
+     *
+     * @param ids
+     * @return
+     */
     @Log(title = "删除短链推广", businessType = BusinessType.DELETE)
     @ApiOperation(value = "删除", httpMethod = "DELETE")
     @PutMapping("/batch/delete")
@@ -121,7 +168,12 @@ public class WeShortLinkPromotionController extends BaseController {
         return AjaxResult.success();
     }
 
-
+    /**
+     * 获取包含占位码组件的海报
+     *
+     * @param query
+     * @return
+     */
     @ApiOperation(value = "获取包含占位码组件的海报", httpMethod = "GET")
     @Log(title = "获取包含占位码组件的海报", businessType = BusinessType.SELECT)
     @GetMapping("/poster/list")
@@ -143,6 +195,84 @@ public class WeShortLinkPromotionController extends BaseController {
     public AjaxResult promotion() {
 
         return AjaxResult.success();
+    }
+
+    /**
+     * 获取短链推广
+     */
+    @ApiOperation(value = "获取短链推广", httpMethod = "GET")
+    @Log(title = "获取短链推广", businessType = BusinessType.SELECT)
+    @GetMapping("/{id}")
+    public AjaxResult get(@PathVariable("id") Long id) {
+        WeShortLinkPromotion weShortLinkPromotion = weShortLinkPromotionService.getById(id);
+        WeShortLinkPromotionGetVo result = Optional.ofNullable(weShortLinkPromotion).map(i -> {
+            WeShortLinkPromotionGetVo vo = BeanUtil.copyProperties(weShortLinkPromotion, WeShortLinkPromotionGetVo.class);
+            WeShortLink weShortLink = weShortLinkService.getById(weShortLinkPromotion.getShortLinkId());
+            //短链详情
+            WeShortLinkListVo weShortLinkListVo = BeanUtil.copyProperties(weShortLink, WeShortLinkListVo.class);
+            vo.setShortLink(weShortLinkListVo);
+            //任务状态: 0待推广 1推广中 2已结束 3暂存中
+            if (i.getTaskStatus() != 3) {
+                //推广信息
+                Integer type = i.getType();
+                switch (type) {
+                    case 0:
+                        LambdaQueryWrapper<WeShortLinkPromotionTemplateClient> queryWrapper = Wrappers.lambdaQuery();
+                        queryWrapper.eq(WeShortLinkPromotionTemplateClient::getPromotionId, i.getId());
+                        queryWrapper.eq(WeShortLinkPromotionTemplateClient::getDelFlag, 0);
+                        WeShortLinkPromotionTemplateClient one = weShortLinkPromotionTemplateClientService.getOne(queryWrapper);
+                        WeShortLinkPromotionTemplateClientVo clientVo = BeanUtil.copyProperties(one, WeShortLinkPromotionTemplateClientVo.class);
+                        //群发客户分类：0全部客户 1部分客户
+                        if (one.getType() == 1) {
+                            SysUserQuery sysUserQuery = new SysUserQuery();
+                            List<String> list = Arrays.asList(one.getUserIds().split(","));
+                            sysUserQuery.setWeUserIds(list);
+                            AjaxResult<List<SysUserVo>> weUsersResult = qwSysUserClient.getUserListByWeUserIds(sysUserQuery);
+                            if (weUsersResult.getCode() == 200) {
+                                List<SysUserVo> data = weUsersResult.getData();
+                                Map<String, String> map = new HashMap<>(list.size());
+                                data.stream().forEach(o -> map.put(o.getWeUserId(), o.getUserName()));
+                                clientVo.setUser(map);
+                            }
+                        }
+                        //标签
+                        if (StrUtil.isNotBlank(one.getLabelIds())) {
+                            LambdaQueryWrapper<WeTag> tagQueryWrapper = Wrappers.lambdaQuery();
+                            tagQueryWrapper.eq(WeTag::getDelFlag, 0);
+                            tagQueryWrapper.in(WeTag::getTagId, one.getLabelIds().split(","));
+                            List<WeTag> list = weTagService.list(tagQueryWrapper);
+                            Map<String, String> map = new HashMap<>(list.size());
+                            list.stream().forEach(o -> map.put(o.getTagId(), o.getName()));
+                            clientVo.setLabels(map);
+                        }
+                        //附件
+                        LambdaQueryWrapper<WeShortLinkPromotionAttachment> attachmentQueryWrapper = Wrappers.lambdaQuery();
+                        attachmentQueryWrapper.eq(WeShortLinkPromotionAttachment::getTemplateType, 0);
+                        attachmentQueryWrapper.eq(WeShortLinkPromotionAttachment::getTemplateId, one.getId());
+                        attachmentQueryWrapper.eq(WeShortLinkPromotionAttachment::getDelFlag, 0);
+                        List<WeShortLinkPromotionAttachment> list = weShortLinkPromotionAttachmentService.list(attachmentQueryWrapper);
+                        if (list != null && list.size() > 0) {
+                            List<WeMessageTemplate> collect = list.stream().map(o -> BeanUtil.copyProperties(o, WeMessageTemplate.class)).collect(Collectors.toList());
+                            clientVo.setAttachmentsList(collect);
+                        }
+
+                        vo.setClient(clientVo);
+                        break;
+                    case 1:
+
+                        break;
+                    case 2:
+
+                        break;
+                    case 3:
+
+                        break;
+                }
+            }
+
+            return vo;
+        }).orElse(null);
+        return AjaxResult.success(result);
     }
 
 

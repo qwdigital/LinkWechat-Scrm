@@ -5,9 +5,7 @@ import com.linkwechat.domain.media.WeMessageTemplate;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.apache.xmlbeans.impl.jam.mutable.MElement;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -56,9 +54,9 @@ public class WeShortLinkPromotionUpdateQuery {
     private Long materialId;
 
     /**
-     * 推广方式：0群发客户，1群发客户群，2群发朋友圈，4应用消息
+     * 推广方式：0群发客户，1群发客户群，2群发朋友圈，3应用消息
      */
-    @ApiModelProperty(value = "推广方式：0群发客户，1群发客户群，2群发朋友圈，4应用消息")
+    @ApiModelProperty(value = "推广方式：0群发客户，1群发客户群，2群发朋友圈，3应用消息")
     private Integer type;
 
     /**
@@ -70,6 +68,16 @@ public class WeShortLinkPromotionUpdateQuery {
      * 推广方式-客群
      */
     private WeShortLinkPromotionTemplateGroupUpdateQuery group;
+
+    /**
+     * 推广方式-朋友圈
+     */
+    private WeShortLinkPromotionTemplateMomentsUpdateQuery moments;
+
+    /**
+     * 推广方式-应用消息
+     */
+    private WeShortLinkPromotionTemplateAppMsgUpdateQuery appMsg;
 
 
     @ApiModelProperty("附件列表")

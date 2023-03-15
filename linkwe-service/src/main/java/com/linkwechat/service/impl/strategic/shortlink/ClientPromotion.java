@@ -10,10 +10,7 @@ import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.*;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.media.WeMessageTemplate;
-import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
-import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateClientAddQuery;
-import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateClientUpdateQuery;
-import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionUpdateQuery;
+import com.linkwechat.domain.shortlink.query.*;
 import com.linkwechat.mapper.WeShortLinkPromotionMapper;
 import com.linkwechat.mapper.WeShortLinkPromotionTemplateClientMapper;
 import com.linkwechat.service.IWeShortLinkPromotionAttachmentService;
@@ -65,7 +62,7 @@ public class ClientPromotion extends PromotionType {
         Integer sendType = clientAddQuery.getSendType();
         if (sendType.equals(0)) {
             //任务状态: 0待推广 1推广中 2已结束
-            weShortLinkPromotion.setTaskStatus(1);
+            weShortLinkPromotion.setTaskStatus(0);
             weShortLinkPromotion.setTaskStartTime(LocalDateTime.now());
         } else {
             weShortLinkPromotion.setTaskStatus(0);
@@ -126,7 +123,6 @@ public class ClientPromotion extends PromotionType {
                     weShortLinkPromotionSendResult.setUserId(senderInfo.getUserId());
                     weShortLinkPromotionSendResult.setExternalUserid(externalUserid);
                     weShortLinkPromotionSendResult.setStatus(0);
-                    weShortLinkPromotionSendResult.setStatus(0);
                     weShortLinkPromotionSendResult.setDelFlag(0);
                     sendResultList.add(weShortLinkPromotionSendResult);
                 }
@@ -144,11 +140,8 @@ public class ClientPromotion extends PromotionType {
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
-            //TODO mq 定时结束
-            timingEnd();
+            timingEnd(client.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
         });
-
-
         return weShortLinkPromotion.getId();
     }
 
@@ -226,8 +219,6 @@ public class ClientPromotion extends PromotionType {
         }
         weShortLinkUserPromotionTaskService.saveBatch(weShortLinkUserPromotionTasks);
 
-        List<Long> businessIds = weShortLinkUserPromotionTasks.stream().map(i -> i.getId()).collect(Collectors.toList());
-
         //删除短链推广发送结果
         LambdaUpdateWrapper<WeShortLinkPromotionSendResult> promotionSendResultUpdateWrapper = Wrappers.lambdaUpdate();
         promotionSendResultUpdateWrapper.eq(WeShortLinkPromotionSendResult::getTemplateType, 0);
@@ -263,15 +254,14 @@ public class ClientPromotion extends PromotionType {
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
-            //TODO mq 定时结束
-            timingEnd();
+            timingEnd(client.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
         });
 
 
     }
 
     @Override
-    protected void directSend(Long id, Long businessId, String content, List<WeMessageTemplate> attachments, List<WeAddGroupMessageQuery.SenderInfo> senderList) {
+    protected void directSend(Long id, Long businessId, String content, List<WeMessageTemplate> attachments, List<WeAddGroupMessageQuery.SenderInfo> senderList, Object... objects) {
         WeAddGroupMessageQuery weAddGroupMessageQuery = new WeAddGroupMessageQuery();
         weAddGroupMessageQuery.setId(id);
         weAddGroupMessageQuery.setChatType(1);
@@ -288,7 +278,7 @@ public class ClientPromotion extends PromotionType {
 
 
     @Override
-    protected void timingSend(Long id, Long businessId, String content, Date sendTime, List<WeMessageTemplate> attachments, List<WeAddGroupMessageQuery.SenderInfo> senderList) {
+    protected void timingSend(Long id, Long businessId, String content, Date sendTime, List<WeMessageTemplate> attachments, List<WeAddGroupMessageQuery.SenderInfo> senderList, Object... objects) {
         WeAddGroupMessageQuery weAddGroupMessageQuery = new WeAddGroupMessageQuery();
         weAddGroupMessageQuery.setId(id);
         weAddGroupMessageQuery.setChatType(1);
@@ -312,8 +302,17 @@ public class ClientPromotion extends PromotionType {
 
 
     @Override
-    protected void timingEnd() {
+    protected void timingEnd(Long businessId, Integer type, Date taskEndTime) {
+        WeShortLinkPromotionTaskEndQuery query = new WeShortLinkPromotionTaskEndQuery();
+        query.setBusinessId(businessId);
+        query.setType(type);
 
+        long diffTime = DateUtils.diffTime(taskEndTime, new Date());
+        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeDelayGroupMsgEndRk(), JSONObject.toJSONString(query), message -> {
+            //注意这里时间可使用long类型,毫秒单位，设置header
+            message.getMessageProperties().setHeader("x-delay", diffTime);
+            return message;
+        });
     }
 
 

@@ -687,6 +687,7 @@ public class RabbitMQConfig {
      *
      * @return
      */
+    @Bean
     public Binding bindingQuMoments() {
         return BindingBuilder.bind(quMomentsMsg()).to(delayEx()).with(rabbitMQSettingConfig.getWeMomentMsgRk()).noargs();
     }
@@ -706,8 +707,49 @@ public class RabbitMQConfig {
      *
      * @return
      */
+    @Bean
     public Binding bindingQuDelayMoments() {
         return BindingBuilder.bind(quMomentsDelayMsg()).to(delayEx()).with(rabbitMQSettingConfig.getWeDelayMomentMsgRk()).noargs();
+    }
+
+    /**
+     * 短链推广-应用消息延迟队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quDelayAppMsg() {
+        return new Queue(rabbitMQSettingConfig.getWeDelayAppMsgQu());
+    }
+
+    /**
+     * 短链推广-应用消息延迟队列 绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingQuDelayAppMsg() {
+        return BindingBuilder.bind(quDelayAppMsg()).to(delayEx()).with(rabbitMQSettingConfig.getWeDelayAppMsgRk()).noargs();
+    }
+
+    /**
+     * 短链推广-群发消息结束队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quDelayGroupMsgEnd() {
+        return new Queue(rabbitMQSettingConfig.getGroupMsgEndDelayQu());
+    }
+
+    /**
+     * 短链推广-群发消息结束队列 绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingQuDelayGroupMsgEnd() {
+        return BindingBuilder.bind(quDelayGroupMsgEnd()).to(delayEx()).with(rabbitMQSettingConfig.getWeDelayGroupMsgEndRk()).noargs();
     }
 
 

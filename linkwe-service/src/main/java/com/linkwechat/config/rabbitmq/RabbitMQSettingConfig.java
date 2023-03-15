@@ -132,6 +132,10 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.delay-group-msg:Rk_DelayGroupMsg}")
     private String weDelayGroupMsgRk;
 
+    //群发消息结束路由-短链推广
+    @Value("${wecom.mq.route.delay-group-msg-end:Rk_DelayGroupMsgEnd}")
+    private String weDelayGroupMsgEndRk;
+
     //企微朋友圈延迟路由
     @Value("${wecom.mq.route.delay-moment-msg:Rk_DelayMomentMsg}")
     private String weDelayMomentMsgRk;
@@ -148,6 +152,10 @@ public class RabbitMQSettingConfig {
     //应用消息通知路由
     @Value("${wecom.mq.route.app-msg:Rk_AppMsg}")
     private String weAppMsgRk;
+
+    //延迟应用消息通知路由
+    @Value("${wecom.mq.route.delay_app-msg:Rk_Delay_AppMsg}")
+    private String weDelayAppMsgRk;
 
     //客户欢迎语路由
     @Value("${wecom.mq.route.customer-welcome-msg:Rk_CustomerWelcomeMsg}")
@@ -240,6 +248,10 @@ public class RabbitMQSettingConfig {
     //应用通知消息消费队列
     @Value("${wecom.mq.queue.app-msg:Qu_AppMsg}")
     private String weAppMsgQu;
+
+    //应用通知消息延迟消费队列
+    @Value("${wecom.mq.queue.delay_app-msg:Qu_Delay_AppMsg}")
+    private String weDelayAppMsgQu;
 
     //客户欢迎语消费队列
     @Value("${wecom.mq.queue.customer-welcome-msg:Qu_CustomerWelcomeMsg}")
@@ -350,5 +362,10 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.queue.delay-moments-msg:Qu_DelayMomentsMsg}")
     private String momentsDelayQu;
 
+    /**
+     * 群发消息结束队列-短链推广
+     */
+    @Value("${wecom.mq.queue.delay-group-msg-end:Qu_DelayGroupMsgEnd}")
+    private String groupMsgEndDelayQu;
 
 }

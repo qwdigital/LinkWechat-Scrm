@@ -70,6 +70,8 @@ public class GroupPromotion extends PromotionType {
         weShortLinkPromotionService.save(weShortLinkPromotion);
 
         //2.保存短链推广模板-客群
+        //TODO 检查员工对应的客群是否存在
+
         WeShortLinkPromotionTemplateGroup templateGroup = BeanUtil.copyProperties(group, WeShortLinkPromotionTemplateGroup.class);
         templateGroup.setPromotionId(weShortLinkPromotion.getId());
         templateGroup.setDelFlag(0);
@@ -141,9 +143,8 @@ public class GroupPromotion extends PromotionType {
                     query.getSenderList());
         }
         //任务结束时间
-        Optional.ofNullable(templateGroup.getTaskSendTime()).ifPresent(o -> {
-            //TODO mq 定时结束
-            timingEnd();
+        Optional.ofNullable(templateGroup.getTaskEndTime()).ifPresent(o -> {
+            timingEnd(templateGroup.getId(), weShortLinkPromotion.getType(), Date.from(templateGroup.getTaskEndTime().atZone(ZoneId.systemDefault()).toInstant()));
         });
         return weShortLinkPromotion.getId();
     }
@@ -262,15 +263,14 @@ public class GroupPromotion extends PromotionType {
                     query.getSenderList());
         }
         //任务结束时间
-        Optional.ofNullable(templateGroup.getTaskSendTime()).ifPresent(o -> {
-            //TODO mq 定时结束
-            timingEnd();
+        Optional.ofNullable(templateGroup.getTaskEndTime()).ifPresent(o -> {
+            timingEnd(templateGroup.getId(), weShortLinkPromotion.getType(), Date.from(templateGroup.getTaskEndTime().atZone(ZoneId.systemDefault()).toInstant()));
         });
 
     }
 
     @Override
-    protected void directSend(Long id, Long businessId, String content, List<WeMessageTemplate> attachments, List<WeAddGroupMessageQuery.SenderInfo> senderList) {
+    protected void directSend(Long id, Long businessId, String content, List<WeMessageTemplate> attachments, List<WeAddGroupMessageQuery.SenderInfo> senderList, Object... objects) {
         WeAddGroupMessageQuery weAddGroupMessageQuery = new WeAddGroupMessageQuery();
         weAddGroupMessageQuery.setId(id);
         weAddGroupMessageQuery.setChatType(2);
@@ -286,7 +286,7 @@ public class GroupPromotion extends PromotionType {
     }
 
     @Override
-    protected void timingSend(Long id, Long businessId, String content, Date sendTime, List<WeMessageTemplate> attachments, List<WeAddGroupMessageQuery.SenderInfo> senderList) {
+    protected void timingSend(Long id, Long businessId, String content, Date sendTime, List<WeMessageTemplate> attachments, List<WeAddGroupMessageQuery.SenderInfo> senderList, Object... objects) {
         WeAddGroupMessageQuery weAddGroupMessageQuery = new WeAddGroupMessageQuery();
         weAddGroupMessageQuery.setId(id);
         weAddGroupMessageQuery.setChatType(2);
@@ -309,7 +309,7 @@ public class GroupPromotion extends PromotionType {
     }
 
     @Override
-    protected void timingEnd() {
+    protected void timingEnd(Long businessId, Integer type, Date taskEndTime) {
 
     }
 }

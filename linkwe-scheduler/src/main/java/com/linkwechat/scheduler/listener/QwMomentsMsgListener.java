@@ -2,30 +2,37 @@ package com.linkwechat.scheduler.listener;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.WeShortLinkPromotion;
+import com.linkwechat.domain.WeShortLinkPromotionTemplateMoments;
 import com.linkwechat.domain.moments.dto.MomentsParamDto;
 import com.linkwechat.domain.moments.entity.WeMoments;
+import com.linkwechat.domain.shortlink.dto.WeShortLinkPromotionMomentsDto;
 import com.linkwechat.fegin.QwMomentsClient;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.service.IWeMaterialService;
+import com.linkwechat.service.IWeShortLinkPromotionService;
+import com.linkwechat.service.IWeShortLinkPromotionTemplateMomentsService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * 朋友圈 监听
+ * 短链推广-朋友圈 监听
  *
  * @author WangYX
  * @version 1.0.0
@@ -37,13 +44,15 @@ public class QwMomentsMsgListener {
 
     @Resource
     private QwMomentsClient qwMomentsClient;
-
     @Resource
     private QwSysUserClient qwSysUserClient;
-
-
-    @Autowired
+    @Resource
     private IWeMaterialService iWeMaterialService;
+    @Resource
+    private IWeShortLinkPromotionService weShortLinkPromotionService;
+    @Resource
+    private IWeShortLinkPromotionTemplateMomentsService weShortLinkPromotionTemplateMomentsService;
+
 
     /**
      * 朋友圈正常消息监听
@@ -57,7 +66,7 @@ public class QwMomentsMsgListener {
     public void normalMsgSubscribe(String msg, Channel channel, Message message) {
         try {
             log.info("朋友圈正常消息监听：msg:{}", msg);
-            WeMoments weMoments = JSONObject.parseObject(msg, WeMoments.class);
+            WeShortLinkPromotionMomentsDto weMoments = JSONObject.parseObject(msg, WeShortLinkPromotionMomentsDto.class);
             sendMoments(weMoments);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
@@ -79,7 +88,7 @@ public class QwMomentsMsgListener {
     public void delayMsgSubscribe(String msg, Channel channel, Message message) {
         try {
             log.info("朋友圈延迟消息监听：msg:{}", msg);
-            WeMoments weMoments = JSONObject.parseObject(msg, WeMoments.class);
+            WeShortLinkPromotionMomentsDto weMoments = JSONObject.parseObject(msg, WeShortLinkPromotionMomentsDto.class);
             sendMoments(weMoments);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
@@ -93,7 +102,34 @@ public class QwMomentsMsgListener {
      *
      * @param weMoments
      */
-    public void sendMoments(WeMoments weMoments) {
+    public void sendMoments(WeShortLinkPromotionMomentsDto weMoments) {
+
+        //1.判断任务是否处于待推广的状态
+        WeShortLinkPromotion weShortLinkPromotion = weShortLinkPromotionService.getById(weMoments.getShortLinkPromotionId());
+        Optional.ofNullable(weShortLinkPromotion).ifPresent(i -> {
+            //判断任务的推广状态和删除状态
+            //删除标识 0 正常 1 删除
+            //任务状态: 0待推广 1推广中 2已结束
+            if (!(i.getDelFlag().equals(0) && i.getTaskStatus().equals(0))) {
+                return;
+            }
+        });
+
+        //查看短链推广模板是否已经删除
+        Long businessId = weMoments.getBusinessId();
+        if (weShortLinkPromotion.getType().equals(0)) {
+            WeShortLinkPromotionTemplateMoments moments = weShortLinkPromotionTemplateMomentsService.getById(businessId);
+            if (moments == null || moments.getDelFlag().equals(1)) {
+                //删除直接跳出，不继续执行。
+                return;
+            }
+        }
+
+        //用户信息
+        LoginUser loginUser = weMoments.getLoginUser();
+        SecurityContextHolder.setUserName(loginUser.getUserName());
+        SecurityContextHolder.setCorpId(loginUser.getCorpId());
+
         MomentsParamDto momentsParamDto = new MomentsParamDto();
         if (StringUtils.isNotEmpty(weMoments.getContent())) {
             momentsParamDto.setText(MomentsParamDto.Text.builder().content(weMoments.getContent()).build());

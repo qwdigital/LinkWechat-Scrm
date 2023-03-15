@@ -1,16 +1,14 @@
 package com.linkwechat.domain.shortlink.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.domain.media.WeMessageTemplate;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -48,6 +46,12 @@ public class WeShortLinkPromotionTemplateClientVo {
     private String userIds;
 
     /**
+     * 添加员工
+     */
+    @ApiModelProperty(value = "添加员工Id")
+    private Map<String, String> user;
+
+    /**
      * 性别 0-未知 1-男性 2-女性
      */
     @ApiModelProperty(value = "性别 0-未知 1-男性 2-女性")
@@ -72,6 +76,12 @@ public class WeShortLinkPromotionTemplateClientVo {
      */
     @ApiModelProperty(value = "客户标签Id")
     private String labelIds;
+
+    /**
+     * 客户标签
+     */
+    @ApiModelProperty(value = "客户标签")
+    private Map<String, String> labels;
 
     /**
      * 跟进状态：1:待跟进;2:跟进中;3:已成交;4:无意向;5:已流失
@@ -110,4 +120,11 @@ public class WeShortLinkPromotionTemplateClientVo {
     @ApiModelProperty(value = "任务结束时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime taskEndTime;
+
+    /**
+     * 附件
+     */
+    @ApiModelProperty(value = "附件")
+    private List<WeMessageTemplate> attachmentsList;
+
 }

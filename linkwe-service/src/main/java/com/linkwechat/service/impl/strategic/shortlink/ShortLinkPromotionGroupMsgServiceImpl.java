@@ -51,7 +51,6 @@ public class ShortLinkPromotionGroupMsgServiceImpl extends AbstractGroupMsgSendT
             }
         });
 
-        // TODO 完善
         LoginUser loginUser = query.getLoginUser();
         SecurityContextHolder.setUserName(loginUser.getUserName());
         SecurityContextHolder.setCorpId(loginUser.getCorpId());
@@ -66,7 +65,6 @@ public class ShortLinkPromotionGroupMsgServiceImpl extends AbstractGroupMsgSendT
             }
         }
 
-
         //发送消息
         query.getSenderList().forEach(senderInfo -> {
             WeAddCustomerMsgVo weAddCustomerMsgVo = sendSpecGroupMsgTemplate(query, senderInfo);
@@ -74,11 +72,18 @@ public class ShortLinkPromotionGroupMsgServiceImpl extends AbstractGroupMsgSendT
                 if (i.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)) {
                     //客户
                     if (weShortLinkPromotion.getType().equals(0)) {
+                        //更新推广状态
+                        LambdaUpdateWrapper<WeShortLinkPromotion> promotionUpdateWrapper = Wrappers.lambdaUpdate();
+                        promotionUpdateWrapper.set(WeShortLinkPromotion::getTaskStatus, 1);
+                        promotionUpdateWrapper.eq(WeShortLinkPromotion::getId, query.getId());
+                        weShortLinkPromotionService.update(promotionUpdateWrapper);
+
                         //获取客户推广模板
                         LambdaQueryWrapper<WeShortLinkPromotionTemplateClient> queryWrapper = Wrappers.lambdaQuery();
                         queryWrapper.eq(WeShortLinkPromotionTemplateClient::getPromotionId, query.getId());
                         queryWrapper.eq(WeShortLinkPromotionTemplateClient::getDelFlag, 0);
                         WeShortLinkPromotionTemplateClient one = weShortLinkPromotionTemplateClientService.getOne(queryWrapper);
+
                         //更新员工推广短链任务
                         LambdaUpdateWrapper<WeShortLinkUserPromotionTask> updateWrapper = Wrappers.lambdaUpdate();
                         updateWrapper.eq(WeShortLinkUserPromotionTask::getTemplateType, 0);

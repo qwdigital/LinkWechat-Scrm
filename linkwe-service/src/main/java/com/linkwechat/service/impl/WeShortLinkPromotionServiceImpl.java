@@ -221,10 +221,16 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ImageIO.write(image, suffix, os);
         InputStream input = new ByteArrayInputStream(os.toByteArray());
-        MultipartFile file = new MockMultipartFile(UUID.randomUUID().toString() + "." + suffix, input);
+        String name = UUID.randomUUID().toString() + "." + suffix;
+        MultipartFile file = new MockMultipartFile(name, name, null, input);
         AjaxResult<FileEntity> upload = qwFileClient.upload(file);
-        String url = upload.getData().getUrl();
-        return url;
+        if (upload.getCode() == 200) {
+            String url = upload.getData().getUrl();
+            return url;
+        } else {
+            throw new ServiceException("文件上传失败");
+        }
+
     }
 
 }

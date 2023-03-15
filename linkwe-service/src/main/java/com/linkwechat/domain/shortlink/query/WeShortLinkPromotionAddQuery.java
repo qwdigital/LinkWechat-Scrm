@@ -52,9 +52,9 @@ public class WeShortLinkPromotionAddQuery {
     private Long materialId;
 
     /**
-     * 推广方式：0群发客户，1群发客户群，2群发朋友圈，4应用消息
+     * 推广方式：0群发客户，1群发客户群，2群发朋友圈，3应用消息
      */
-    @ApiModelProperty(value = "推广方式：0群发客户，1群发客户群，2群发朋友圈，4应用消息")
+    @ApiModelProperty(value = "推广方式：0群发客户，1群发客户群，2群发朋友圈，3应用消息")
     @NotNull(message = "推广方式必填")
     private Integer type;
 
@@ -68,6 +68,16 @@ public class WeShortLinkPromotionAddQuery {
      */
     private WeShortLinkPromotionTemplateGroupAddQuery group;
 
+    /**
+     * 朋友圈
+     */
+    private WeShortLinkPromotionTemplateMomentsAddQuery moments;
+
+    /**
+     * 应用消息
+     */
+    private WeShortLinkPromotionTemplateAppMsgAddQuery appMsg;
+
 
     @ApiModelProperty("附件列表")
     @Size(max = 8)
@@ -76,14 +86,10 @@ public class WeShortLinkPromotionAddQuery {
     /**
      * 指定接收消息的成员及对应客户列表
      */
-    @Size(min = 1)
     @ApiModelProperty("指定接收消息的成员及对应客户列表")
     private List<WeAddGroupMessageQuery.SenderInfo> senderList;
 
-    /**
-     * 朋友圈
-     */
-    private WeShortLinkPromotionTemplateMomentsAddQuery moments;
+
 
 
 }

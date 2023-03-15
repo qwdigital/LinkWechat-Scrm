@@ -45,9 +45,9 @@ public class WeShortLinkPromotionVo {
     private String shortLinkUrl;
 
     /**
-     * 推广方式：0群发客户，1群发客户群，2群发朋友圈，4应用消息
+     * 推广方式：0群发客户，1群发客户群，2群发朋友圈，3应用消息
      */
-    @ApiModelProperty(value = "推广方式：0群发客户，1群发客户群，2群发朋友圈，4应用消息")
+    @ApiModelProperty(value = "推广方式：0群发客户，1群发客户群，2群发朋友圈，3应用消息")
     private Integer type;
 
     /**

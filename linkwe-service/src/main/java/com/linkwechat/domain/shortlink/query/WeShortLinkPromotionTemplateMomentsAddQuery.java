@@ -96,4 +96,5 @@ public class WeShortLinkPromotionTemplateMomentsAddQuery {
     @ApiModelProperty(value = "删除标识 0 有效 1删除")
     private Integer delFlag;
 
+
 }

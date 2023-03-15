@@ -45,7 +45,7 @@ public abstract class PromotionType {
      * @param attachments 短链推广附件
      * @param senderList  短链推广员工
      */
-    protected abstract void directSend(Long id, Long businessId, String content, List<WeMessageTemplate> attachments, List<WeAddGroupMessageQuery.SenderInfo> senderList);
+    protected abstract void directSend(Long id, Long businessId, String content, List<WeMessageTemplate> attachments, List<WeAddGroupMessageQuery.SenderInfo> senderList, Object... objects);
 
     /**
      * 定时发送
@@ -57,12 +57,16 @@ public abstract class PromotionType {
      * @param attachments 短链推广附件
      * @param senderList  短链推广员工
      */
-    protected abstract void timingSend(Long id, Long businessId, String content, Date sendTime, List<WeMessageTemplate> attachments, List<WeAddGroupMessageQuery.SenderInfo> senderList);
+    protected abstract void timingSend(Long id, Long businessId, String content, Date sendTime, List<WeMessageTemplate> attachments, List<WeAddGroupMessageQuery.SenderInfo> senderList, Object... objects);
 
     /**
      * 定时结束
+     *
+     * @param businessId 短链推广模板Id
+     * @param type       任务所属类型：0群发客户 1群发客群 2朋友圈
+     * @param taskEndTime   结束时间
      */
-    protected abstract void timingEnd();
+    protected abstract void timingEnd(Long businessId, Integer type, Date taskEndTime);
 
 
 }
