@@ -1,7 +1,9 @@
 package com.linkwechat.service;
 
+
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.fission.WeFission;
+import java.util.List;
 
 /**
 * @author robin
@@ -10,4 +12,5 @@ import com.linkwechat.domain.fission.WeFission;
 */
 public interface IWeFissionService extends IService<WeFission> {
 
+    List<WeFission> findWeFissions(WeFission weFission);
 }

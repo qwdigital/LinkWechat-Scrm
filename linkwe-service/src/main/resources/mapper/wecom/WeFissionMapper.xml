@@ -4,5 +4,37 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.mapper.WeFissionMapper">
 
+    <select id="findWeFissions" resultType="com.linkwechat.domain.fission.WeFission">
+        SELECT
+            wf.*,
+            (
+                SELECT
+                    COUNT(*)
+                FROM
+                    we_fission_detail wfd
+                WHERE
+                    wfd.fission_id = wf.id
+            ) AS inviterOldCustomerNum,
+            (
+                SELECT
+                    COUNT(*)
+                FROM
+                    we_fission_detail wfd
+                WHERE
+                    wfd.fission_id = wf.id and wfd.fission_state=1
+            ) AS completeTaskOldCustomerNum,
+
+            (
+                SELECT
+                    sum(wfd.inviter_number)
+                FROM
+                    we_fission_detail wfd
+                WHERE
+                    wfd.fission_id = wf.id
+            ) AS fissionCustomerNum
+        FROM
+            we_fission wf  ${ew.customSqlSegment}
+    </select>
+
 
 </mapper>

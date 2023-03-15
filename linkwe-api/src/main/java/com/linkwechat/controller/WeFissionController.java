@@ -35,13 +35,8 @@ public class WeFissionController  extends BaseController {
     public TableDataInfo<List<WeFission>> list(WeFission weFission){
         startPage();
 
-        List<WeFission> weFissions = iWeFissionService.list(new LambdaQueryWrapper<WeFission>()
-                .like(StringUtils.isNotEmpty(weFission.getFassionName()),WeFission::getFassionName,weFission.getFassionName())
-                        .eq(weFission.getFassionType() != null,WeFission::getFassionType,weFission.getFassionType())
-                .eq(weFission.getFassionState() != null,WeFission::getFassionState,weFission.getFassionState()));
-
         return getDataTable(
-                weFissions
+                iWeFissionService.findWeFissions(weFission)
         );
 
     }
