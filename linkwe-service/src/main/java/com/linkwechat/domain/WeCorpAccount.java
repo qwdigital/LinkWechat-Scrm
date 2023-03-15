@@ -265,4 +265,33 @@ public class WeCorpAccount extends BaseEntity {
     @ApiModelProperty("微信小程序原始ID")
     @TableField("wx_applet_original_id")
     private String wxAppletOriginalId;
+
+
+    /***********************************************
+     *******************商城start****************
+     **********************************************/
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "小程序app_id")
+    private String shopAppId;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "小程序秘钥")
+    private String shopSecret;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "小程序消息推送token（令牌）")
+    private String shopMaToken;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "小程序秘钥")
+    private String shopMaEncodingaeskey;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "小程序消息推送-服务器地址")
+    private String shopMaApi;
+
+    /***********************************************
+     *******************商城end****************
+     **********************************************/
 }
