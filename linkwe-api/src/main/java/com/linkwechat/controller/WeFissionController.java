@@ -8,11 +8,9 @@ import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.fission.WeFission;
 import com.linkwechat.domain.fission.vo.*;
-import com.linkwechat.domain.live.WeLive;
 import com.linkwechat.service.IWeFissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,7 +19,7 @@ import java.util.List;
  * 裂变相关
  */
 @RestController
-@RequestMapping("/new/fission")
+@RequestMapping("/fission")
 public class WeFissionController  extends BaseController {
 
     @Autowired

@@ -3,7 +3,10 @@ package com.linkwechat.domain.fission;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 裂变明细表
@@ -11,6 +14,9 @@ import lombok.Data;
  */
 @Data
 @TableName(value ="we_fission_detail")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeFissionDetail extends BaseEntity {
     /**
      * 主键
@@ -24,9 +30,14 @@ public class WeFissionDetail extends BaseEntity {
     private Long fissionId;
 
     /**
-     * 老客户外部联系人的userid
+     * 发送的目标id，target_type为1的时候当前为客户id，为2的时候为群id
      */
-    private String oldExternalUserid;
+    private String targetId;
+
+    /**
+     * 1:老客;2:群
+     */
+    private Integer targetType;
 
     /**
      * 裂变发送员工we_user_id

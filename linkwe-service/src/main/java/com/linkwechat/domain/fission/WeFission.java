@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.domain.fission.vo.WeExecuteUserOrGroupConditVo;
+import com.linkwechat.domain.fission.vo.WeGroupMessageExecuteUserOrGroupTipVo;
 import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
 import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
 import lombok.Data;
@@ -51,15 +53,21 @@ public class WeFission extends BaseEntity {
     private Date fassionEndTime;
 
     /**
-     * 执行老客条件,如果为空,则为全部成员
+     * 执行老客条件,如果为空,则为全部成员(群发任务创建的群主或客户)
      */
     @TableField(updateStrategy = FieldStrategy.IGNORED,typeHandler = FastjsonTypeHandler.class)
-    private WeGroupMessageExecuteUsertipVo executeWeUser;
+    private WeGroupMessageExecuteUsertipVo executeUserOrGroup;
 
     /**
      * 海报url
      */
     private String posterUrl;
+
+
+    /**
+     * 裂变的url
+     */
+    private String fissionUrl;
 
     /**
      * 海报id
@@ -67,15 +75,15 @@ public class WeFission extends BaseEntity {
     private Long posterId;
 
     /**
-     * 添加员工
+     * 添加员工或群活码
      */
     @TableField(updateStrategy = FieldStrategy.IGNORED,typeHandler = FastjsonTypeHandler.class)
-    private WeSopExecuteUserConditVo addWeUser;
+    private WeExecuteUserOrGroupConditVo addWeUserOrGroupCode;
 
     /**
      * 任务文案
      */
-    private String taskCopy;
+    private String content;
 
     /**
      * 兑奖条件(N人)

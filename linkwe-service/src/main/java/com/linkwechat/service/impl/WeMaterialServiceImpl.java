@@ -890,4 +890,33 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
         }
         return sb.toString();
     }
+
+
+    /**
+     * 替换海报中占位符,生成实际二维码
+     * @param actualCodeUrl
+     * @param posterId
+     * @return
+     */
+    @Override
+    public WeMaterial builderPosterWeMaterial(String actualCodeUrl, Long posterId) {
+        WeMaterial material = this.getById(posterId);
+        if (StringUtils.isNotEmpty(material.getPosterSubassembly())) {
+            List<WePosterSubassembly> wePosterSubassemblies = JSONArray.parseArray(material.getPosterSubassembly(), WePosterSubassembly.class);
+            wePosterSubassemblies.stream().filter(Objects::nonNull)
+                    .filter(wePosterSubassembly -> wePosterSubassembly.getType() == 3).forEach(wePosterSubassembly -> {
+                        wePosterSubassembly.setImgPath(actualCodeUrl);
+                    });
+            WePoster wePoster = BeanUtil.copyProperties(material, WePoster.class);
+            wePoster.setTitle(material.getMaterialName());
+            wePoster.setSampleImgPath(material.getMaterialUrl());
+            wePoster.setBackgroundImgPath(material.getBackgroundImgUrl());
+            wePoster.setPosterSubassemblyList(wePosterSubassemblies);
+            material = this.generateSimpleImg(wePoster);
+        } else {
+            throw new WeComException("生成海报错误，无二维码位置");
+        }
+
+        return material;
+    }
 }

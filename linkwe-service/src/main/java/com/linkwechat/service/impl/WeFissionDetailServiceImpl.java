@@ -15,6 +15,10 @@ import org.springframework.stereotype.Service;
 public class WeFissionDetailServiceImpl extends ServiceImpl<WeFissionDetailMapper, WeFissionDetail>
     implements IWeFissionDetailService {
 
+    @Override
+    public void physicalDelete(Long fissionId) {
+        this.baseMapper.physicalDelete(fissionId);
+    }
 }
 
 

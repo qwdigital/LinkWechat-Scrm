@@ -4,5 +4,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.mapper.WeFissionDetailMapper">
 
+    <delete id="physicalDelete">
+        delete from we_fission_detail where fission_id=#{fissionId}
+    </delete>
 
 </mapper>

@@ -193,8 +193,10 @@ public class LinkWeChatConfig {
 
 
 
-
-    private String taskFissionUrl;
+    /**
+     * 裂变url
+     */
+    private String fissionUrl;
 
     /**
      * 短链域名

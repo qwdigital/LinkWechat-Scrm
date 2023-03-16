@@ -24,6 +24,17 @@ public class WeFissionInviterPoster extends BaseEntity {
      */
     private String inviterId;
 
+
+    /**
+     * 裂变海报对应的当前员工渠道标识
+     */
+    private String state;
+
+    /**
+     * 海报邀请码对应的员工config
+     */
+    private String config;
+
     /**
      * 裂变任务id
      */

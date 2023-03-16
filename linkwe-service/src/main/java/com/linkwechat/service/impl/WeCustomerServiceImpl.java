@@ -33,6 +33,7 @@ import com.linkwechat.domain.customer.WeMakeCustomerTag;
 import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.query.WeOnTheJobCustomerQuery;
 import com.linkwechat.domain.customer.vo.*;
+import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
 import com.linkwechat.domain.tag.vo.WeTagVo;
 import com.linkwechat.domain.wecom.entity.customer.WeCustomerFollowInfoEntity;
 import com.linkwechat.domain.wecom.entity.customer.WeCustomerFollowUserEntity;
@@ -1248,6 +1249,47 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
         }
+    }
+
+    @Override
+    public List<WeCustomersVo> findWeCustomersForCommonAssembly(WeGroupMessageExecuteUsertipVo executeUserOrGroup) {
+
+
+        WeCustomersQuery weCustomersQuery = WeCustomersQuery.builder()
+                .delFlag(Constants.COMMON_STATE)
+                .build();
+
+        if(executeUserOrGroup != null){
+            weCustomersQuery.setUserIds(
+                    executeUserOrGroup.getWeUserIds()
+            );
+            weCustomersQuery.setGender(
+                    executeUserOrGroup.getGender()
+            );
+
+            weCustomersQuery.setBeginTime(
+                    DateUtils.dateTime(executeUserOrGroup.getBeginTime())
+            );
+
+            weCustomersQuery.setTagIds(
+                    executeUserOrGroup.getTagIds()
+            );
+
+            weCustomersQuery.setEndTime(
+                    DateUtils.dateTime(executeUserOrGroup.getEndTime())
+            );
+
+            weCustomersQuery.setTrackState(
+                    executeUserOrGroup.getTrackState()
+            );
+
+        }
+
+
+       return this.findWeCustomerList(
+                weCustomersQuery, null
+        );
+
     }
 
 

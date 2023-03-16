@@ -1,9 +1,9 @@
 package com.linkwechat.service;
 
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.fission.WeFission;
+import com.linkwechat.domain.fission.WeFissionInviterPoster;
 import com.linkwechat.domain.fission.vo.*;
 import java.util.List;
 
@@ -13,6 +13,16 @@ import java.util.List;
 * @createDate 2023-03-14 14:07:21
 */
 public interface IWeFissionService extends IService<WeFission> {
+
+
+    /**
+     * 构建裂变
+     * @param weFission
+     */
+    void buildWeFission(WeFission weFission);
+
+
+
     /**
      * 裂变列表
      * @param weFission
@@ -59,4 +69,13 @@ public interface IWeFissionService extends IService<WeFission> {
      * @return
      */
     List<WeFissionDetailSubVo> findWeFissionDetailSub(Long fissionDetailId);
+
+
+    /**
+     * 获取裂变海报
+     * @param unionid
+     * @param fissionId
+     * @return
+     */
+    WeFissionInviterPoster findFissionPoster(String unionid, String fissionId);
 }
