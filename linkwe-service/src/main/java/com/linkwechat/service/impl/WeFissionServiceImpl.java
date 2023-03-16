@@ -121,7 +121,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
             messageQuery.setMsgSource(4);
             messageQuery.setLoginUser(SecurityUtils.getLoginUser());
             messageQuery.setContent(weFission.getContent());
-
+            messageQuery.setBusinessIds(weFission.getId().toString());
             //构建发送素材
             messageQuery.setAttachmentsList(
                     ListUtil.toList(WeMessageTemplate.builder()
@@ -196,6 +196,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                             WeAddGroupMessageQuery
                                     .SenderInfo
                                     .builder()
+                                    .userId(executeUserOrGroup.getWeUserIds())
                                     .chatList(weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList()))
                                     .build()
                     );

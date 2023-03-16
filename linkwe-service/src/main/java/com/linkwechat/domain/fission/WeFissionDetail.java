@@ -49,4 +49,9 @@ public class WeFissionDetail extends BaseEntity {
      */
     private Integer fissionState;
 
+    /**
+     * 消息id
+     */
+    private String msgId;
+
 }
