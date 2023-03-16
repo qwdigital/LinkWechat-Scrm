@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.linkwechat.domain.WeLxQrCode;
 import com.linkwechat.domain.qr.query.WeLxQrAddQuery;
 import com.linkwechat.domain.qr.query.WeLxQrCodeListQuery;
+import com.linkwechat.domain.qr.query.WeLxQrCodeQuery;
 import com.linkwechat.domain.qr.query.WxLxQrQuery;
 import com.linkwechat.domain.qr.vo.*;
 
@@ -88,4 +89,31 @@ public interface IWeLxQrCodeService extends IService<WeLxQrCode> {
      * @param query
      */
     void receiveAward(WxLxQrQuery query) throws Exception;
+
+    /**
+     * 领取总数统计
+     * @return
+     */
+    WeLxQrCodeReceiveVo receiveStatistics(WeLxQrCodeQuery query);
+
+    /**
+     * 领取红包个数统计（折线图）
+     * @param query
+     * @return
+     */
+    WeLxQrCodeReceiveLineVo receiveLineNum(WeLxQrCodeQuery query);
+
+    /**
+     * 领取红包金额统计（折线图）
+     * @param query
+     * @return
+     */
+    WeLxQrCodeReceiveLineVo receiveLineAmount(WeLxQrCodeQuery query);
+
+    /**
+     * 领取红包列表统计（表格）
+     * @param query
+     * @return
+     */
+    List<WeLxQrCodeReceiveListVo> receiveListStatistics(WeLxQrCodeQuery query);
 }

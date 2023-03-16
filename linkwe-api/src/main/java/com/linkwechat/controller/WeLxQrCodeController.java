@@ -8,6 +8,7 @@ import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.domain.qr.query.WeLxQrAddQuery;
 import com.linkwechat.domain.qr.query.WeLxQrCodeListQuery;
+import com.linkwechat.domain.qr.query.WeLxQrCodeQuery;
 import com.linkwechat.domain.qr.vo.*;
 import com.linkwechat.service.IWeLxQrCodeService;
 import io.swagger.annotations.Api;
@@ -101,4 +102,48 @@ public class WeLxQrCodeController extends BaseController {
         response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
         EasyExcel.write(response.getOutputStream(), WeLxQrCodeSheetVo.class).sheet("活码列表统计").doWrite(list);
     }
+
+
+    @ApiOperation(value = "领取总数统计", httpMethod = "GET")
+    @GetMapping("/receive/statistics")
+    public AjaxResult<WeLxQrCodeReceiveVo> receiveStatistics(WeLxQrCodeQuery query) {
+        WeLxQrCodeReceiveVo receiveStatistics = weLxQrCodeService.receiveStatistics(query);
+        return AjaxResult.success(receiveStatistics);
+    }
+
+    @ApiOperation(value = "领取红包个数统计（折线图）", httpMethod = "GET")
+    @GetMapping("/receive/line/num")
+    public AjaxResult<WeLxQrCodeReceiveLineVo> receiveLineNum(WeLxQrCodeQuery query) {
+        WeLxQrCodeReceiveLineVo lineNum = weLxQrCodeService.receiveLineNum(query);
+        return AjaxResult.success(lineNum);
+    }
+
+    @ApiOperation(value = "领取红包金额统计（折线图）", httpMethod = "GET")
+    @GetMapping("/receive/line/amount")
+    public AjaxResult<WeLxQrCodeReceiveLineVo> receiveLineAmount(WeLxQrCodeQuery query) {
+        WeLxQrCodeReceiveLineVo lineNum = weLxQrCodeService.receiveLineAmount(query);
+        return AjaxResult.success(lineNum);
+    }
+
+    @ApiOperation(value = "领取红包列表统计（表格）", httpMethod = "GET")
+    @GetMapping("/receive/list/statistics")
+    public TableDataInfo<List<WeLxQrCodeReceiveListVo>> receiveListStatistics(WeLxQrCodeQuery query) {
+        startPage();
+        List<WeLxQrCodeReceiveListVo> list = weLxQrCodeService.receiveListStatistics(query);
+        return getDataTable(list);
+    }
+
+    @ApiOperation(value = "领取红包列表统计（表格）", httpMethod = "GET")
+    @GetMapping("/receive/list/statistics/export")
+    public void receiveListStatisticsExport(WeLxQrCodeQuery query) throws IOException {
+        List<WeLxQrCodeReceiveListVo> list = weLxQrCodeService.receiveListStatistics(query);
+        HttpServletResponse response = ServletUtils.getResponse();
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("utf-8");
+        String fileName = URLEncoder.encode("领取红包列表统计", "UTF-8").replaceAll("\\+", "%20");
+        response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+        EasyExcel.write(response.getOutputStream(), WeLxQrCodeReceiveListVo.class).sheet("领取红包列表统计").doWrite(list);
+    }
+
+
 }

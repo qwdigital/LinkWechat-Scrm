@@ -58,6 +58,13 @@ public class WeLxQrCodeLog extends BaseEntity implements Serializable {
     @TableField("order_id")
     private String orderId;
 
+    /**
+     * 金额
+     */
+    @ApiModelProperty(value = "金额")
+    @TableField("amount")
+    private Integer amount;
+
 
     /**
      * unionID

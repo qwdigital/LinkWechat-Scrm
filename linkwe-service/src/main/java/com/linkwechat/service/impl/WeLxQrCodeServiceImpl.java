@@ -3,6 +3,8 @@ package com.linkwechat.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.util.IdUtil;
@@ -16,6 +18,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.HttpStatus;
+import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.core.domain.FileEntity;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
@@ -28,11 +31,9 @@ import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeLxQrCode;
 import com.linkwechat.domain.WeLxQrCodeLog;
+import com.linkwechat.domain.envelopes.WeRedEnvelopesRecord;
 import com.linkwechat.domain.qr.WeQrAttachments;
-import com.linkwechat.domain.qr.query.WeLxQrAddQuery;
-import com.linkwechat.domain.qr.query.WeLxQrCodeListQuery;
-import com.linkwechat.domain.qr.query.WeLxQrUserInfoQuery;
-import com.linkwechat.domain.qr.query.WxLxQrQuery;
+import com.linkwechat.domain.qr.query.*;
 import com.linkwechat.domain.qr.vo.*;
 import com.linkwechat.domain.system.dept.query.SysDeptQuery;
 import com.linkwechat.domain.system.dept.vo.SysDeptVo;
@@ -54,6 +55,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -96,6 +98,9 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
 
     @Autowired
     private IWeRedEnvelopesService weRedEnvelopesService;
+
+    @Autowired
+    private IWeRedEnvelopesRecordService weRedEnvelopesRecordService;
 
     @Autowired
     private IWeCouponService weCouponService;
@@ -497,12 +502,135 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
                         .eq(WeLxQrCode::getId, lxQrCode.getId()));
             }*/
         }
+
+        WeRedEnvelopesRecord envelopesRecord = weRedEnvelopesRecordService.getOne(new LambdaQueryWrapper<WeRedEnvelopesRecord>()
+                .eq(WeRedEnvelopesRecord::getOrderNo, query.getOrderNo())
+                .eq(WeRedEnvelopesRecord::getOpenId, SecurityUtils.getWxLoginUser().getOpenId())
+                .eq(WeRedEnvelopesRecord::getDelFlag, 0)
+                .last("limit 1"));
         WeLxQrCodeLog codeLog = new WeLxQrCodeLog();
         codeLog.setQrId(query.getQrId());
         codeLog.setType(lxQrCode.getType());
         codeLog.setOrderId(query.getOrderNo());
+        codeLog.setAmount(envelopesRecord.getRedEnvelopeMoney());
         codeLog.setUnionId(SecurityUtils.getWxLoginUser().getUnionId());
         weLxQrCodeLogService.save(codeLog);
+    }
+
+    @Override
+    public WeLxQrCodeReceiveVo receiveStatistics(WeLxQrCodeQuery query) {
+        WeLxQrCodeReceiveVo weLxQrCodeReceiveVo = new WeLxQrCodeReceiveVo();
+
+        List<WeLxQrCodeLog> logList = weLxQrCodeLogService.list(new LambdaQueryWrapper<WeLxQrCodeLog>()
+                .eq(WeLxQrCodeLog::getId, query.getQrId())
+                .eq(WeLxQrCodeLog::getDelFlag, 0));
+        if (CollectionUtil.isNotEmpty(logList)) {
+            List<WeLxQrCodeLog> todayList = logList.parallelStream().filter(codeLog -> ObjectUtil.equal(DateUtil.today(), DateUtil.formatDate(codeLog.getCreateTime()))).collect(Collectors.toList());
+
+            int totalAmount = logList.parallelStream().mapToInt(WeLxQrCodeLog::getAmount).sum();
+            int todayAmount = todayList.parallelStream().mapToInt(WeLxQrCodeLog::getAmount).sum();
+
+            String totalAmountStr = new BigDecimal(totalAmount).divide(BigDecimal.valueOf(100L)).toString();
+            String todayAmountStr = new BigDecimal(todayAmount).divide(BigDecimal.valueOf(100L)).toString();
+
+            weLxQrCodeReceiveVo.setTotalNum(logList.size());
+            weLxQrCodeReceiveVo.setTodayNum(todayList.size());
+            weLxQrCodeReceiveVo.setTotalAmount(totalAmountStr);
+            weLxQrCodeReceiveVo.setTodayAmount(todayAmountStr);
+        }
+
+        return weLxQrCodeReceiveVo;
+    }
+
+    @Override
+    public WeLxQrCodeReceiveLineVo receiveLineNum(WeLxQrCodeQuery query) {
+
+        WeLxQrCodeReceiveLineVo lineVo = new WeLxQrCodeReceiveLineVo();
+
+        List<String> xAxis = new LinkedList<>();
+        List<String> yAxis = new LinkedList<>();
+        List<WeLxQrCodeLog> logList = weLxQrCodeLogService.list(new LambdaQueryWrapper<WeLxQrCodeLog>()
+                .eq(WeLxQrCodeLog::getId, query.getQrId())
+                .ge(Objects.nonNull(query.getBeginTime()), BaseEntity::getCreateTime, DateUtil.formatDate(query.getBeginTime()))
+                .ge(Objects.nonNull(query.getEndTime()), BaseEntity::getEndTime, DateUtil.formatDate(query.getEndTime()))
+                .eq(WeLxQrCodeLog::getDelFlag, 0));
+
+        Map<String, Long> dateMap = logList.parallelStream().collect(Collectors.groupingBy(item -> DateUtil.formatDate(item.getCreateTime()), Collectors.counting()));
+
+        List<DateTime> timeList = DateUtil.rangeToList(query.getBeginTime(), query.getEndTime(), DateField.DAY_OF_YEAR);
+
+        for (DateTime dateTime : timeList) {
+            if (dateMap.containsKey(dateTime.toDateStr())) {
+                Long num = dateMap.get(dateTime.toDateStr());
+                xAxis.add(dateTime.toDateStr());
+                yAxis.add(String.valueOf(num));
+            } else {
+                xAxis.add(dateTime.toDateStr());
+                yAxis.add("0");
+            }
+        }
+        lineVo.setXAxis(xAxis);
+        lineVo.setYAxis(yAxis);
+        return lineVo;
+    }
+
+    @Override
+    public WeLxQrCodeReceiveLineVo receiveLineAmount(WeLxQrCodeQuery query) {
+        WeLxQrCodeReceiveLineVo lineVo = new WeLxQrCodeReceiveLineVo();
+
+        List<String> xAxis = new LinkedList<>();
+        List<String> yAxis = new LinkedList<>();
+        List<WeLxQrCodeLog> logList = weLxQrCodeLogService.list(new LambdaQueryWrapper<WeLxQrCodeLog>()
+                .eq(WeLxQrCodeLog::getId, query.getQrId())
+                .ge(Objects.nonNull(query.getBeginTime()), BaseEntity::getCreateTime, DateUtil.formatDate(query.getBeginTime()))
+                .ge(Objects.nonNull(query.getEndTime()), BaseEntity::getEndTime, DateUtil.formatDate(query.getEndTime()))
+                .eq(WeLxQrCodeLog::getDelFlag, 0));
+
+        Map<String, Integer> amountMap = logList.parallelStream().collect(Collectors.groupingBy(item -> DateUtil.formatDate(item.getCreateTime()), Collectors.summingInt(WeLxQrCodeLog::getAmount)));
+
+        List<DateTime> timeList = DateUtil.rangeToList(query.getBeginTime(), query.getEndTime(), DateField.DAY_OF_YEAR);
+
+        for (DateTime dateTime : timeList) {
+            if (amountMap.containsKey(dateTime.toDateStr())) {
+                Integer amount = amountMap.get(dateTime.toDateStr());
+                xAxis.add(dateTime.toDateStr());
+                String amountStr = new BigDecimal(amount).divide(BigDecimal.valueOf(100L)).toString();
+                yAxis.add(amountStr);
+            } else {
+                xAxis.add(dateTime.toDateStr());
+                yAxis.add("0");
+            }
+        }
+        lineVo.setXAxis(xAxis);
+        lineVo.setYAxis(yAxis);
+        return lineVo;
+    }
+
+    @Override
+    public List<WeLxQrCodeReceiveListVo> receiveListStatistics(WeLxQrCodeQuery query) {
+
+        List<WeLxQrCodeReceiveListVo> receiveList = weLxQrCodeLogService.receiveListStatistics(query);
+
+        WeLxQrCodeReceiveVo totalData = weLxQrCodeLogService.receiveTotalStatistics(query);
+
+        int totalNum = totalData.getTotalNum();
+        int totalAmount = Integer.parseInt(totalData.getTotalAmount());
+
+        for (WeLxQrCodeReceiveListVo receiveData : receiveList) {
+            String todayAmount = receiveData.getTodayAmount();
+            String todayAmountStr = new BigDecimal(todayAmount).divide(BigDecimal.valueOf(100L)).toString();
+            receiveData.setTodayAmount(todayAmountStr);
+
+            receiveData.setTotalNum(totalNum);
+            totalNum = totalNum - receiveData.getTodayNum();
+
+            String totalAmountStr = new BigDecimal(totalAmount).divide(BigDecimal.valueOf(100L)).toString();
+            receiveData.setTotalAmount(totalAmountStr);
+
+            totalAmount = totalAmount - Integer.parseInt(receiveData.getTotalAmount());
+        }
+
+        return receiveList;
     }
 
 }

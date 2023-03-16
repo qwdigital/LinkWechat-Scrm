@@ -9,6 +9,7 @@
                 <result property="qrId" column="qr_id" jdbcType="INTEGER"/>
                 <result property="type" column="type" jdbcType="INTEGER"/>
                 <result property="orderId" column="order_id" jdbcType="VARCHAR"/>
+                <result property="amount" column="amount" jdbcType="INTEGER"/>
                 <result property="unionId" column="union_id" jdbcType="VARCHAR"/>
                 <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
                 <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
@@ -20,7 +21,44 @@
             </resultMap>
 
     <sql id="selectWeLxQrCodeLogVo">
-        select id, qr_id, type, order_id, union_id, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag from we_lx_qr_code_log
+        select id, qr_id, type, order_id, amount, union_id, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag from we_lx_qr_code_log
     </sql>
+
+    <select id="receiveListStatistics" resultType="com.linkwechat.domain.qr.vo.WeLxQrCodeReceiveListVo">
+        select
+            date_format(create_time, '%Y-%m-%d') as date_time,
+            count(1) as today_num,
+            sum(amount) as today_amount
+        from we_lx_qr_code_log
+        <where>
+            <if test="qrId != null">
+                qr_id = #{qrId}
+            </if>
+            <if test="beginTime != null"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%Y-%m-%d') &gt;= date_format(#{beginTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%Y-%m-%d') &lt;= date_format(#{endTime},'%Y-%m-%d')
+            </if>
+            and del_flag = 0
+        </where>
+        group by date_time order by date_time desc
+    </select>
+
+    <select id="receiveTotalStatistics" resultType="com.linkwechat.domain.qr.vo.WeLxQrCodeReceiveVo">
+        select
+        count(1) as total_num,
+        sum(amount) as total_amount
+        from we_lx_qr_code_log
+        <where>
+            <if test="qrId != null">
+                qr_id = #{qrId}
+            </if>
+            <if test="beginTime != null"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%Y-%m-%d') &gt; date_format(#{beginTime},'%Y-%m-%d')
+            </if>
+            and del_flag = 0
+        </where>
+    </select>
 
 </mapper>
