@@ -1,14 +1,13 @@
 package com.linkwechat.controller;
 
+import com.alibaba.excel.EasyExcel;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
-import com.linkwechat.common.exception.wecom.WeComException;
-import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.domain.qr.query.WeLxQrAddQuery;
 import com.linkwechat.domain.qr.query.WeLxQrCodeListQuery;
-import com.linkwechat.domain.qr.query.WeQrCodeListQuery;
 import com.linkwechat.domain.qr.vo.*;
 import com.linkwechat.service.IWeLxQrCodeService;
 import io.swagger.annotations.Api;
@@ -17,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author danmo
@@ -87,5 +88,17 @@ public class WeLxQrCodeController extends BaseController {
         startPage();
         List<WeLxQrCodeSheetVo> list = weLxQrCodeService.getWeQrCodeListStatistics(query);
         return getDataTable(list);
+    }
+
+    @ApiOperation(value = "导出活码列表统计", httpMethod = "GET")
+    @GetMapping("/list/statistics/export")
+    public void qrCodeListStatisticsExport(WeLxQrCodeListQuery query) throws IOException {
+        List<WeLxQrCodeSheetVo> list = weLxQrCodeService.getWeQrCodeListStatistics(query);
+        HttpServletResponse response = ServletUtils.getResponse();
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("utf-8");
+        String fileName = URLEncoder.encode("活码列表统计", "UTF-8").replaceAll("\\+", "%20");
+        response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+        EasyExcel.write(response.getOutputStream(), WeLxQrCodeSheetVo.class).sheet("活码列表统计").doWrite(list);
     }
 }

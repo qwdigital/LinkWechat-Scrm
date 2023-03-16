@@ -27,6 +27,7 @@ import com.linkwechat.common.utils.img.NetFileUtils;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeLxQrCode;
+import com.linkwechat.domain.WeLxQrCodeLog;
 import com.linkwechat.domain.qr.WeQrAttachments;
 import com.linkwechat.domain.qr.query.WeLxQrAddQuery;
 import com.linkwechat.domain.qr.query.WeLxQrCodeListQuery;
@@ -101,6 +102,9 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
 
     @Autowired
     private IWeCorpAccountService weCorpAccountService;
+
+    @Autowired
+    private IWeLxQrCodeLogService weLxQrCodeLogService;
 
     //@Autowired
     //private WechatPayConfig wechatPayConfig;
@@ -306,11 +310,35 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
                 .eq(WeLxQrCode::getDelFlag, 0);
         List<WeLxQrCode> lxQrCodeList = list(wrapper);
         if (CollectionUtil.isNotEmpty(lxQrCodeList)) {
-            //todo 计算领取总数
+            //计算领取总数
+            List<String> stateList = lxQrCodeList.parallelStream().map(WeLxQrCode::getState).collect(Collectors.toList());
+
+            List<Long> qrIds = lxQrCodeList.parallelStream().map(WeLxQrCode::getId).collect(Collectors.toList());
+            //客户数
+            List<WeCustomer> customerList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().in(WeCustomer::getState, stateList));
+            Map<String, Long> stateAndCountMap = new HashMap<>(64);
+            Map<Long, Long> qrIdAndCountMap = new HashMap<>(64);
+            if (CollectionUtil.isNotEmpty(customerList)) {
+                stateAndCountMap.putAll(customerList.parallelStream().collect(Collectors.groupingBy(WeCustomer::getState, Collectors.counting())));
+
+                List<String> unionIds = customerList.parallelStream().map(WeCustomer::getUnionid).filter(StringUtils::isNotBlank).distinct().collect(Collectors.toList());
+
+                List<WeLxQrCodeLog> codeLogList = weLxQrCodeLogService.list(new LambdaQueryWrapper<WeLxQrCodeLog>()
+                        .in(WeLxQrCodeLog::getQrId, qrIds)
+                        .in(WeLxQrCodeLog::getUnionId, unionIds));
+                qrIdAndCountMap.putAll(codeLogList.parallelStream().collect(Collectors.groupingBy(WeLxQrCodeLog::getQrId, Collectors.counting())));
+            }
 
             List<WeLxQrCodeListVo> list = lxQrCodeList.stream().map(shortLink -> {
                 WeLxQrCodeListVo codeList = new WeLxQrCodeListVo();
                 BeanUtil.copyProperties(shortLink, codeList);
+
+                if (stateAndCountMap.containsKey(shortLink.getState())) {
+                    codeList.setScanNum(stateAndCountMap.get(shortLink.getState()).intValue());
+                }
+                if (qrIdAndCountMap.containsKey(shortLink.getId())) {
+                    codeList.setReceiveNum(qrIdAndCountMap.get(shortLink.getId()).intValue());
+                }
                 return codeList;
             }).collect(Collectors.toList());
             pageInfo.setList(list);
@@ -460,15 +488,21 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
             //couponQuery.setStock_creator_mchid(wechatPayConfig.getMchId());
             couponQuery.setAppid(weCorpAccount.getWxAppId());
             couponQuery.setOpenid(SecurityUtils.getWxLoginUser().getOpenId());
-            JSONObject jsonObject = weCouponService.sendCoupon(couponQuery);
+            /*JSONObject jsonObject = weCouponService.sendCoupon(couponQuery);
             String couponId = jsonObject.getString("coupon_id");
             if (StringUtils.isNotBlank(couponId)) {
                 JSONObject businessData = JSONObject.parseObject(lxQrCode.getBusinessData());
                 businessData.put("couponId", couponId);
                 update(new LambdaUpdateWrapper<WeLxQrCode>().set(WeLxQrCode::getBusinessData, businessData.toJSONString())
                         .eq(WeLxQrCode::getId, lxQrCode.getId()));
-            }
+            }*/
         }
+        WeLxQrCodeLog codeLog = new WeLxQrCodeLog();
+        codeLog.setQrId(query.getQrId());
+        codeLog.setType(lxQrCode.getType());
+        codeLog.setOrderId(query.getOrderNo());
+        codeLog.setUnionId(SecurityUtils.getWxLoginUser().getUnionId());
+        weLxQrCodeLogService.save(codeLog);
     }
 
 }
