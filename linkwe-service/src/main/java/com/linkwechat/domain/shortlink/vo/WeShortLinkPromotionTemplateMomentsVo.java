@@ -1,33 +1,22 @@
-package com.linkwechat.domain;
-
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
-import com.baomidou.mybatisplus.annotation.TableId;
-
-import java.time.LocalDateTime;
-import java.io.Serializable;
+package com.linkwechat.domain.shortlink.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
- * <p>
  * 短链推广模板-朋友圈
- * </p>
  *
  * @author WangYX
  * @since 2023-03-10
  */
 @ApiModel
 @Data
-@EqualsAndHashCode(callSuper = false)
-@TableName("we_short_link_promotion_template_moments")
-public class WeShortLinkPromotionTemplateMoments extends BaseEntity {
+public class WeShortLinkPromotionTemplateMomentsVo {
 
     private static final long serialVersionUID = 1L;
 
@@ -35,7 +24,6 @@ public class WeShortLinkPromotionTemplateMoments extends BaseEntity {
      * 主键Id
      */
     @ApiModelProperty(value = "主键Id")
-    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -55,6 +43,12 @@ public class WeShortLinkPromotionTemplateMoments extends BaseEntity {
      */
     @ApiModelProperty(value = "添加员工Id")
     private String userIds;
+
+    /**
+     * 添加员工
+     */
+    @ApiModelProperty(value = "添加员工")
+    private Map<String, String> users;
 
     /**
      * 性别 0-未知 1-男性 2-女性
@@ -81,6 +75,12 @@ public class WeShortLinkPromotionTemplateMoments extends BaseEntity {
      */
     @ApiModelProperty(value = "客户标签Id")
     private String labelIds;
+
+    /**
+     * 客户标签
+     */
+    @ApiModelProperty(value = "客户标签")
+    private Map<String, String> labels;
 
     /**
      * 跟进状态：1:待跟进;2:跟进中;3:已成交;4:无意向;5:已流失
@@ -114,10 +114,5 @@ public class WeShortLinkPromotionTemplateMoments extends BaseEntity {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime taskEndTime;
 
-    /**
-     * 删除标识 0 有效 1删除
-     */
-    @ApiModelProperty(value = "删除标识 0 有效 1删除")
-    private Integer delFlag;
 
 }

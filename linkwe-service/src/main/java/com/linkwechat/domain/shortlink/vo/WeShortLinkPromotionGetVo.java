@@ -60,7 +60,6 @@ public class WeShortLinkPromotionGetVo {
     @ApiModelProperty(value = "url地址（二维码或海报的地址）")
     private String url;
 
-
     /**
      * 推广方式：0群发客户，1群发客户群，2群发朋友圈，3应用消息
      */
@@ -84,6 +83,18 @@ public class WeShortLinkPromotionGetVo {
      */
     @ApiModelProperty(value = "客群推广信息")
     private WeShortLinkPromotionTemplateGroupVo group;
+
+    /**
+     * 朋友圈推广信息
+     */
+    @ApiModelProperty(value = "朋友圈推广信息")
+    private WeShortLinkPromotionTemplateMomentsVo moments;
+
+    /**
+     * 应用消息推广信息
+     */
+    @ApiModelProperty(value = "应用消息推广信息")
+    private WeShortLinkPromotionTemplateAppMsgVo appMsg;
 
     /**
      * 附件

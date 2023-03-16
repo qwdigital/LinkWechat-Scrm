@@ -5,6 +5,7 @@ import com.linkwechat.domain.WeShortLinkPromotion;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionUpdateQuery;
+import com.linkwechat.domain.shortlink.vo.WeShortLinkPromotionGetVo;
 import com.linkwechat.domain.shortlink.vo.WeShortLinkPromotionVo;
 
 import java.io.IOException;
@@ -63,6 +64,16 @@ public interface IWeShortLinkPromotionService extends IService<WeShortLinkPromot
      * @date 2023/03/09 14:12
      */
     void edit(WeShortLinkPromotionUpdateQuery query);
+
+    /**
+     * 详情
+     *
+     * @param id 短链推广ID
+     * @return {@link WeShortLinkPromotionGetVo}
+     * @author WangYX
+     * @date 2023/03/16 10:19
+     */
+    WeShortLinkPromotionGetVo get(Long id);
 
 
 }

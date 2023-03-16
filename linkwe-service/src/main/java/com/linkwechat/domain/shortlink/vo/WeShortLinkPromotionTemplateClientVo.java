@@ -49,7 +49,7 @@ public class WeShortLinkPromotionTemplateClientVo {
      * 添加员工
      */
     @ApiModelProperty(value = "添加员工Id")
-    private Map<String, String> user;
+    private Map<String, String> users;
 
     /**
      * 性别 0-未知 1-男性 2-女性

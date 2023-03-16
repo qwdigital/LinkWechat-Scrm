@@ -3,28 +3,27 @@ package com.linkwechat.domain.shortlink.vo;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
-import com.linkwechat.domain.media.WeMessageTemplate;
+import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
- * 短链推广模板-客群
+ * 短链推广模板-应用消息
  * </p>
  *
  * @author WangYX
- * @since 2023-03-09
+ * @since 2023-03-14
  */
 @ApiModel
 @Data
-public class WeShortLinkPromotionTemplateGroupVo {
+public class WeShortLinkPromotionTemplateAppMsgVo {
 
     /**
      * 主键Id
@@ -39,34 +38,23 @@ public class WeShortLinkPromotionTemplateGroupVo {
     private Long promotionId;
 
     /**
-     * 客群分类 0全部群 1部分群
+     * 应用消息发送类型 0成员 1部门或岗位
      */
-    @ApiModelProperty(value = "客群分类 0全部群 1部分群")
-    private Integer type;
+    @ApiModelProperty(value = "应用消息发送类型 0成员 1部门或岗位")
+    private Integer sendScope;
+
 
     /**
-     * 群主Id
+     * 执行员工
      */
-    @ApiModelProperty(value = "群主Id")
-    private String userIds;
+    @ApiModelProperty(value = "执行员工")
+    public WeSopExecuteUserConditVo.ExecuteUserCondit executeUserCondit;
 
     /**
-     * 群主Id
+     * 执行部门与岗位
      */
-    @ApiModelProperty(value = "群主")
-    private Map<String, String> users;
-
-    /**
-     * 推广语素材Id
-     */
-    @ApiModelProperty(value = "推广语素材Id")
-    private Long materialId;
-
-    /**
-     * 推广语
-     */
-    @ApiModelProperty(value = "推广语")
-    private String content;
+    @ApiModelProperty(value = "执行部门与岗位")
+    public WeSopExecuteUserConditVo.ExecuteDeptCondit executeDeptCondit;
 
     /**
      * 发送类型：0立即发送 1定时发送
@@ -77,13 +65,15 @@ public class WeShortLinkPromotionTemplateGroupVo {
     /**
      * 定时发送时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "定时发送时间")
     private LocalDateTime taskSendTime;
 
     /**
-     * 结束时间
+     * 任务结束时间
      */
-    @ApiModelProperty(value = "结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @ApiModelProperty(value = "任务结束时间")
     private LocalDateTime taskEndTime;
 
 }

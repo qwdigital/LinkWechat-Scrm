@@ -41,7 +41,7 @@ public class WeShortLinkPromotionTemplateGroupUpdateQuery {
      * 群主Id
      */
     @ApiModelProperty(value = "群主Id")
-    private String groupId;
+    private String userIds;
 
     /**
      * 推广语素材Id
