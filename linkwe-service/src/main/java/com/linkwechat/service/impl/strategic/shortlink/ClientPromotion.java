@@ -147,7 +147,7 @@ public class ClientPromotion extends PromotionType {
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
-            timingEnd(weShortLinkPromotion.getId(),client.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
+            timingEnd(weShortLinkPromotion.getId(), client.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
         });
         return weShortLinkPromotion.getId();
     }
@@ -264,7 +264,7 @@ public class ClientPromotion extends PromotionType {
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
-            timingEnd(weShortLinkPromotion.getId(),client.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
+            timingEnd(weShortLinkPromotion.getId(), client.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
         });
 
 
@@ -312,7 +312,7 @@ public class ClientPromotion extends PromotionType {
 
 
     @Override
-    protected void timingEnd(Long promotionId,Long businessId, Integer type, Date taskEndTime) {
+    protected void timingEnd(Long promotionId, Long businessId, Integer type, Date taskEndTime) {
         WeShortLinkPromotionTaskEndQuery query = new WeShortLinkPromotionTaskEndQuery();
         query.setBusinessId(businessId);
         query.setType(type);
@@ -343,6 +343,9 @@ public class ClientPromotion extends PromotionType {
                 Map<String, List<WeCustomer>> customerMap = customerList.stream().collect(Collectors.groupingBy(WeCustomer::getAddUserId));
                 customerMap.forEach((userId, customers) -> {
                     List<String> eids = customers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
+                    if (eids.size() > 10000) {
+                        throw new ServiceException("员工群发客户不能超过1万！");
+                    }
                     WeAddGroupMessageQuery.SenderInfo senderInfo = new WeAddGroupMessageQuery.SenderInfo();
                     senderInfo.setCustomerList(eids);
                     senderInfo.setUserId(userId);
@@ -353,6 +356,11 @@ public class ClientPromotion extends PromotionType {
             }
         } else {
             Optional.ofNullable(senderList).orElseThrow(() -> new ServiceException("无指定接收消息的成员及对应客户列表"));
+            for (WeAddGroupMessageQuery.SenderInfo senderInfo : senderList) {
+                if (senderInfo.getCustomerList().size() > 10000) {
+                    throw new ServiceException("员工群发客户不能超过1万！");
+                }
+            }
         }
     }
 

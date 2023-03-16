@@ -8,6 +8,7 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.enums.QwAppMsgBusinessTypeEnum;
 import com.linkwechat.common.enums.WeMsgTypeEnum;
+import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -18,10 +19,7 @@ import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.msg.QwAppMsgBody;
 import com.linkwechat.domain.shortlink.dto.WeShortLinkPromotionAppMsgDto;
-import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
-import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateAppMsgAddQuery;
-import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateAppMsgUpdateQuery;
-import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionUpdateQuery;
+import com.linkwechat.domain.shortlink.query.*;
 import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.service.IWeShortLinkPromotionService;
@@ -64,9 +62,11 @@ public class AppMsgPromotion extends PromotionType {
 
     @Override
     public Long saveAndSend(WeShortLinkPromotionAddQuery query, WeShortLinkPromotion weShortLinkPromotion) {
+        WeShortLinkPromotionTemplateAppMsgAddQuery appMsgAddQuery = query.getAppMsg();
+        //检查发送者
+        checkSender(appMsgAddQuery.getExecuteUserCondit(), appMsgAddQuery.getExecuteDeptCondit());
 
         //1.保存短链推广
-        WeShortLinkPromotionTemplateAppMsgAddQuery appMsgAddQuery = query.getAppMsg();
         //发送类型：0立即发送 1定时发送
         Integer sendType = appMsgAddQuery.getSendType();
         if (sendType.equals(0)) {
@@ -146,7 +146,7 @@ public class AppMsgPromotion extends PromotionType {
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
-            timingEnd(weShortLinkPromotion.getId(),appMsg.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
+            timingEnd(weShortLinkPromotion.getId(), appMsg.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
         });
 
 
@@ -155,8 +155,10 @@ public class AppMsgPromotion extends PromotionType {
 
     @Override
     public void updateAndSend(WeShortLinkPromotionUpdateQuery query, WeShortLinkPromotion weShortLinkPromotion) {
-
         WeShortLinkPromotionTemplateAppMsgUpdateQuery appMsgUpdateQuery = query.getAppMsg();
+
+        //检查发送者
+        checkSender(appMsgUpdateQuery.getExecuteUserCondit(), appMsgUpdateQuery.getExecuteDeptCondit());
 
         //1.修改短链推广
         //发送类型：0立即发送 1定时发送
@@ -231,7 +233,7 @@ public class AppMsgPromotion extends PromotionType {
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
-            timingEnd(weShortLinkPromotion.getId(),appMsg.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
+            timingEnd(weShortLinkPromotion.getId(), appMsg.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
         });
     }
 
@@ -332,6 +334,46 @@ public class AppMsgPromotion extends PromotionType {
 
     @Override
     protected void timingEnd(Long promotionId, Long businessId, Integer type, Date taskEndTime) {
+        WeShortLinkPromotionTaskEndQuery query = new WeShortLinkPromotionTaskEndQuery();
+        query.setPromotionId(promotionId);
+        query.setBusinessId(businessId);
+        query.setType(type);
 
+        long diffTime = DateUtils.diffTime(taskEndTime, new Date());
+        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeDelayGroupMsgEndRk(), JSONObject.toJSONString(query), message -> {
+            //注意这里时间可使用long类型,毫秒单位，设置header
+            message.getMessageProperties().setHeader("x-delay", diffTime);
+            return message;
+        });
+    }
+
+    /**
+     * 检查发送者
+     *
+     * @param executeUserCondit 用户
+     * @param executeDeptCondit 部门或岗位
+     */
+    private void checkSender(WeSopExecuteUserConditVo.ExecuteUserCondit executeUserCondit, WeSopExecuteUserConditVo.ExecuteDeptCondit executeDeptCondit) {
+        if (executeUserCondit.isChange()) {
+            List<String> weUserIds = executeUserCondit.getWeUserIds();
+            if (weUserIds.size() > 1000) {
+                throw new ServiceException("接收消息的成员不能超过1000个！");
+            }
+        }
+        if (executeDeptCondit.isChange()) {
+            List<String> deptIds = executeDeptCondit.getDeptIds();
+            if (deptIds.size() > 100) {
+                throw new ServiceException("接收消息的部门不能超过100个！");
+            }
+            List<String> posts = executeDeptCondit.getPosts();
+            AjaxResult<List<SysUser>> allSysUser = qwSysUserClient.findAllSysUser(null, StringUtils.join(posts, ","), null);
+            if (allSysUser.getCode() == 200) {
+                List<SysUser> data = allSysUser.getData();
+                List<String> collect = data.stream().map(i -> i.getWeUserId()).collect(Collectors.toList());
+                if (collect.size() > 1000) {
+                    throw new ServiceException("接收消息的岗位成员不能超过1000个！");
+                }
+            }
+        }
     }
 }

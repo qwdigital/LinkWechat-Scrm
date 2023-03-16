@@ -166,19 +166,18 @@ public class MomentsPromotion extends PromotionType {
         userPromotionTaskUpdateWrapper.set(WeShortLinkUserPromotionTask::getDelFlag, 1);
         weShortLinkUserPromotionTaskService.update(userPromotionTaskUpdateWrapper);
         //添加
+        WeShortLinkUserPromotionTask weShortLinkUserPromotionTask = new WeShortLinkUserPromotionTask();
         //群发朋友圈分类 0全部客户 1部分客户
         Integer scopeType = momentsUpdateQuery.getScopeType();
-        //部分客户
         if (scopeType.equals(1)) {
-            String userIds = momentsUpdateQuery.getUserIds();
-            WeShortLinkUserPromotionTask weShortLinkUserPromotionTask = new WeShortLinkUserPromotionTask();
-            weShortLinkUserPromotionTask.setUserId(userIds);
-            weShortLinkUserPromotionTask.setTemplateType(2);
-            weShortLinkUserPromotionTask.setTemplateId(moments.getId());
-            weShortLinkUserPromotionTask.setSendStatus(0);
-            weShortLinkUserPromotionTask.setDelFlag(0);
-            weShortLinkUserPromotionTaskService.save(weShortLinkUserPromotionTask);
+            //部分客户
+            weShortLinkUserPromotionTask.setUserId(momentsUpdateQuery.getUserIds());
         }
+        weShortLinkUserPromotionTask.setTemplateType(2);
+        weShortLinkUserPromotionTask.setTemplateId(moments.getId());
+        weShortLinkUserPromotionTask.setSendStatus(0);
+        weShortLinkUserPromotionTask.setDelFlag(0);
+        weShortLinkUserPromotionTaskService.save(weShortLinkUserPromotionTask);
 
         //4.发送mq
         String userIds = momentsUpdateQuery.getUserIds();
