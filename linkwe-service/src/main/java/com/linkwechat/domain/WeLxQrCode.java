@@ -61,7 +61,7 @@ public class WeLxQrCode extends BaseEntity implements Serializable {
      */
     @ApiModelProperty(value = "业务ID")
     @TableField("business_id")
-    private Long businessId;
+    private String businessId;
 
     /**
      * 业务数据

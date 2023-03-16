@@ -110,7 +110,7 @@ public class WeLxQrAddQuery {
         }
         weLxQrCode.setConfigId(configId);
         weLxQrCode.setQrCode(qrCode);
-        weLxQrCode.setBusinessId(Long.valueOf(this.businessId));
+        weLxQrCode.setBusinessId(this.businessId);
         weLxQrCode.setBusinessData(this.businessData);
         return weLxQrCode;
     }

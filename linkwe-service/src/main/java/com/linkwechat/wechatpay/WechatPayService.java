@@ -33,8 +33,8 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class WechatPayService {
 
-    @Autowired
-    @Qualifier("WxPayClient")
+    //@Autowired
+    //@Qualifier("WxPayClient")
     private CloseableHttpClient wxPayClient;
 
 
@@ -60,12 +60,13 @@ public class WechatPayService {
                 log.info("微信POST请求成功成功，未返回结果");
             } else {
                 log.info("微信POST请求失败,响应码 = " + statusCode + ",返回结果 = " + bodyAsString);
-                return null;
+                JSONObject body = JSONObject.parseObject(bodyAsString);
+                throw new RuntimeException(body.getString("message"));
             }
             return JSONObject.parseObject(bodyAsString);
         } catch (Exception e) {
             log.error("微信支付V3请求失败", e);
-            return null;
+            throw new RuntimeException(e.getMessage());
         } finally {
             response.close();
         }

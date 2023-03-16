@@ -8,16 +8,16 @@ package com.linkwechat.common.constant;
 public class WechatPayUrlConstants {
 
     //发放代金券批次API
-    public final static String SEND_COUPON = "https://api.mch.weixin.qq.com/v3/marketing/favor/users/{openid}/coupons";
+    public final static String SEND_COUPON = "https://api.mch.weixin.qq.com/v3/marketing/favor/users/{}/coupons";
 
     //发放代金券批次API
     public final static String SELECT_COUPON_LIST = "https://api.mch.weixin.qq.com/v3/marketing/favor/stocks";
 
     //查询批次详情API
-    public final static String SELECT_COUPON_DETAIL = "https://api.mch.weixin.qq.com/v3/marketing/favor/stocks/{stock_id}";
+    public final static String SELECT_COUPON_DETAIL = "https://api.mch.weixin.qq.com/v3/marketing/favor/stocks/{}";
 
     //查询代金券详情API
-    public final static String SELECT_COUPON_CUSTOMER_DETAIL = "https://api.mch.weixin.qq.com/v3/marketing/favor/users/{openid}/coupons/{coupon_id}";
+    public final static String SELECT_COUPON_CUSTOMER_DETAIL = "https://api.mch.weixin.qq.com/v3/marketing/favor/users/{}/coupons/{}";
 
 
 }

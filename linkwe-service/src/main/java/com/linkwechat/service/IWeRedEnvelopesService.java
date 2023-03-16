@@ -95,9 +95,10 @@ public interface IWeRedEnvelopesService extends IService<WeRedEnvelopes> {
     /**
      *  校验个人红包限额
      * @param sendUserId
+     * @param redEnvelopeAmount
      * @return
      */
-    String checkWeUserQuotaLimit(H5RedEnvelopesParmQuery parmDto);
+    String checkWeUserQuotaLimit(String sendUserId, int redEnvelopeAmount);
 
 
     /**

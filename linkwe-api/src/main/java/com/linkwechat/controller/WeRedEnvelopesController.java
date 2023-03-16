@@ -374,13 +374,6 @@ public class WeRedEnvelopesController extends BaseController {
      */
     @PostMapping("/sendReEnvelopesToCustomer")
     public AjaxResult sendPersonReEnvelopesToCustomer(@RequestBody H5RedEnvelopesParmQuery parmDto)  {
-
-        String returnMsg = iWeRedEnvelopesService.checkWeUserQuotaLimit(parmDto);
-
-        if(StringUtils.isNotEmpty(returnMsg)){
-            return AjaxResult.error(HttpStatus.NOT_ORTHER_IMPLEMENTED,returnMsg);
-        }
-
         return AjaxResult.success(
                 iWeRedEnvelopesService.createCustomerRedEnvelopesOrder(parmDto.getRedenvelopesId(),parmDto.getRedEnvelopeAmount(),
                         parmDto.getRedEnvelopeName(),1,
@@ -425,12 +418,6 @@ public class WeRedEnvelopesController extends BaseController {
      */
     @PostMapping("/sendPersonReEnvelopesToGroup")
     public AjaxResult sendPersonReEnvelopesToGroup(@RequestBody H5RedEnvelopesParmQuery parmDto){
-
-        String returnMsg = iWeRedEnvelopesService.checkWeUserQuotaLimit(parmDto);
-
-        if(StringUtils.isNotEmpty(returnMsg)){
-            return AjaxResult.error(HttpStatus.NOT_ORTHER_IMPLEMENTED,returnMsg);
-        }
 
         return AjaxResult.success(
 
@@ -504,19 +491,11 @@ public class WeRedEnvelopesController extends BaseController {
     @GetMapping("/receiveRedEnvelopes")
     public AjaxResult receiveRedEnvelopes(String orderNo,String openId,String receiveName,String avatar) throws Exception {
 
-        String checkMsg
-                = iWeRedEnvelopesService.checkCustomerRedEnvelopesLimit(openId);
-
-        if(StringUtils.isNotEmpty(checkMsg)){
-            return AjaxResult.error(HttpStatus.NOT_IMPLEMENTED,checkMsg);
-        }
-
         String returnMsg = iWeRedEnvelopesService.customerReceiveRedEnvelopes(orderNo, openId,receiveName,avatar);
 
         if(StringUtils.isNotEmpty(returnMsg)){
             return AjaxResult.error(HttpStatus.NOT_IMPLEMENTED,returnMsg);
         }
-
         return AjaxResult.success(
                 returnMsg
         );

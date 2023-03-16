@@ -2,7 +2,11 @@ package com.linkwechat.scheduler.service.impl.welcome;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.constant.HttpStatus;
+import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.enums.MediaType;
+import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.qr.WeQrAttachments;
@@ -11,11 +15,13 @@ import com.linkwechat.domain.wecom.callback.WeBackCustomerVo;
 import com.linkwechat.service.IWeLxQrCodeService;
 import com.linkwechat.service.IWeQrAttachmentsService;
 import com.linkwechat.service.IWeQrTagRelService;
+import com.linkwechat.service.IWeRedEnvelopesService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -39,6 +45,9 @@ public class WeLxQrCodeMsgServiceImpl extends AbstractWelcomeMsgServiceImpl {
 
     @Autowired
     private IWeQrTagRelService weQrTagRelService;
+
+    @Autowired
+    private IWeRedEnvelopesService weRedEnvelopesService;
 
     //拉新红包图片地址
     @Value("${welcom-msg.lxqr.red-packet-img:}")
@@ -95,14 +104,28 @@ public class WeLxQrCodeMsgServiceImpl extends AbstractWelcomeMsgServiceImpl {
             template.setMsgType(MediaType.LINK.getMediaType());
             template.setDescription(description);
             template.setTitle(qrDetail.getName());
+
             if (ObjectUtil.equal(1, qrDetail.getType())) {
+                try {
+                    //发送客户红包
+                    String businessData = qrDetail.getBusinessData();
+                    JSONObject redInfo = JSONObject.parseObject(businessData);
+                    String money = redInfo.getString("money");
+                    String name = redInfo.getString("name");
+                    int redEnvelopeAmount = new BigDecimal(money).multiply(BigDecimal.valueOf(100)).intValue();
+                    String orderNo = weRedEnvelopesService.createCustomerRedEnvelopesOrder(String.valueOf(qrDetail.getBusinessId()), redEnvelopeAmount, name, 1, query.getUserID(), 1, query.getExternalUserID());
+
+                    template.setPicUrl(redPacketImg);
+                    template.setLinkUrl(StringUtils.format(redPacketLink, qrDetail.getId(),qrDetail.getType(),orderNo));
+                    templates.add(template);
+                } catch (Exception e) {
+                    log.error("发送客户红包失败 query:{}",JSONObject.toJSONString(query),e);
+                }
+            }else if (ObjectUtil.equal(2, qrDetail.getType())) {
                 template.setPicUrl(redPacketImg);
-                template.setLinkUrl(StringUtils.format(redPacketLink, qrDetail.getId()));
-            } else if (ObjectUtil.equal(2, qrDetail.getType())) {
-                template.setPicUrl(redPacketImg);
-                template.setLinkUrl(StringUtils.format(coupontLink, qrDetail.getId()));
+                template.setLinkUrl(StringUtils.format(coupontLink, qrDetail.getId(),qrDetail.getType()));
+                templates.add(template);
             }
-            templates.add(template);
 
             makeCustomerTag(query.getExternalUserID(), query.getUserID(), qrDetail.getQrTags());
         }

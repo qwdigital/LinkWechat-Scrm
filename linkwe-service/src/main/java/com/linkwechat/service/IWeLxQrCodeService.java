@@ -82,4 +82,10 @@ public interface IWeLxQrCodeService extends IService<WeLxQrCode> {
      * @return
      */
     WxLxQrCodeVo getQrcode(WxLxQrQuery query);
+
+    /**
+     * 领取红包或卡券
+     * @param query
+     */
+    void receiveAward(WxLxQrQuery query) throws Exception;
 }

@@ -2,6 +2,7 @@ package com.linkwechat.controller;
 
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.domain.qr.query.WxLxQrQuery;
 import com.linkwechat.domain.qr.vo.WxLxQrCodeVo;
 import com.linkwechat.service.IWeLxQrCodeService;
@@ -38,9 +39,9 @@ public class WxLxQrCodeController extends BaseController {
 
     @ApiOperation(value = "领取红包或卡券", httpMethod = "POST")
     @PostMapping("/receive/award")
-    public AjaxResult<WxLxQrCodeVo> receiveAward(@RequestBody @Validated WxLxQrQuery query) {
-        WxLxQrCodeVo lxQrCode = weLxQrCodeService.getQrcode(query);
-        return AjaxResult.success(lxQrCode);
+    public AjaxResult receiveAward(@RequestBody @Validated WxLxQrQuery query) throws Exception {
+        weLxQrCodeService.receiveAward(query);
+        return AjaxResult.success();
     }
 
 }

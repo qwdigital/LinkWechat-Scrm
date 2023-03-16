@@ -8,7 +8,7 @@
         <result property="id" column="id" jdbcType="INTEGER"/>
         <result property="name" column="name" jdbcType="VARCHAR"/>
         <result property="type" column="type" jdbcType="INTEGER"/>
-        <result property="businessId" column="business_id" jdbcType="INTEGER"/>
+        <result property="businessId" column="business_id" jdbcType="VARCHAR"/>
         <result property="businessData" column="business_data" jdbcType="VARCHAR"/>
         <result property="state" column="state" jdbcType="VARCHAR"/>
         <result property="scanNum" column="scan_num" jdbcType="INTEGER"/>
@@ -29,7 +29,7 @@
         <result property="id" column="id" jdbcType="INTEGER"/>
         <result property="name" column="name" jdbcType="VARCHAR"/>
         <result property="type" column="type" jdbcType="INTEGER"/>
-        <result property="businessId" column="business_id" jdbcType="INTEGER"/>
+        <result property="businessId" column="business_id" jdbcType="VARCHAR"/>
         <result property="businessData" column="business_data" jdbcType="INTEGER"/>
         <result property="state" column="state" jdbcType="VARCHAR"/>
         <result property="scanNum" column="scan_num" jdbcType="INTEGER"/>

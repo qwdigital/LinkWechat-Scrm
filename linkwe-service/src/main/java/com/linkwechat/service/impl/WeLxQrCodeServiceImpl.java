@@ -15,13 +15,17 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.config.LinkWeChatConfig;
+import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.domain.FileEntity;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.img.NetFileUtils;
+import com.linkwechat.config.wechatpay.WechatPayConfig;
+import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeLxQrCode;
 import com.linkwechat.domain.qr.WeQrAttachments;
@@ -38,6 +42,7 @@ import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
 import com.linkwechat.domain.wecom.query.qr.WeContactWayQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
+import com.linkwechat.domain.wx.coupon.WxSendCouponQuery;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.fegin.QwFileClient;
 import com.linkwechat.fegin.QwSysDeptClient;
@@ -88,6 +93,18 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
 
     @Autowired
     private IWeCustomerService weCustomerService;
+
+    @Autowired
+    private IWeRedEnvelopesService weRedEnvelopesService;
+
+    @Autowired
+    private IWeCouponService weCouponService;
+
+    @Autowired
+    private IWeCorpAccountService weCorpAccountService;
+
+    @Autowired
+    private WechatPayConfig wechatPayConfig;
 
     @Override
     public Long addQrCode(WeLxQrAddQuery weQrAddQuery) {
@@ -206,7 +223,7 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
 
     @Override
     public WeLxQrCodeDetailVo getQrDetail(Long id) {
-        return getQrDetail(id,true);
+        return getQrDetail(id, true);
     }
 
     @Override
@@ -273,10 +290,10 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
 
     @Override
     public WeLxQrCodeDetailVo getQrDetailByState(String state) {
-        if(StringUtils.isEmpty(state)){
+        if (StringUtils.isEmpty(state)) {
             return null;
         }
-        return  this.baseMapper.getQrDetailByState(state);
+        return this.baseMapper.getQrDetailByState(state);
     }
 
     @Override
@@ -374,7 +391,7 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
                 .filter(CollectionUtil::isNotEmpty).flatMap(Collection::stream).collect(Collectors.joining(","));
         if (StringUtils.isNotEmpty(positions)) {
             List<SysUser> userList = qwSysUserClient.findAllSysUser(null, positions, null).getData();
-            if(CollectionUtil.isNotEmpty(userList)){
+            if (CollectionUtil.isNotEmpty(userList)) {
                 List<String> weUserIds = userList.stream().map(SysUser::getWeUserId).collect(Collectors.toList());
                 List<String> user = weContactWay.getUser();
                 Set<String> userIdSet = CollectionUtil.unionDistinct(weUserIds, user);
@@ -405,21 +422,54 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
 
         WxLxQrCodeVo wxLxQrCodeVo = new WxLxQrCodeVo();
 
-        //判断是否为新客
-        int count = weCustomerService.count(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getUnionid, query.getUnionId()));
-
-        if (count > 0) {
-            throw new WeComException("您已经是企业客户啦，暂不符合该拉新活动要求。");
-        }
-
         WeLxQrCode lxQrCode = getById(query.getQrId());
 
         if (Objects.isNull(lxQrCode)) {
             throw new WeComException("无效ID");
         }
-
         wxLxQrCodeVo.setQrCode(lxQrCode.getQrCode());
+        //判断是否为新客
+        int count = weCustomerService.count(new LambdaQueryWrapper<WeCustomer>()
+                .eq(WeCustomer::getUnionid, SecurityUtils.getWxLoginUser().getUnionId()));
+
+        if (count > 0) {
+            throw new WeComException("您已经是企业客户啦，暂不符合该拉新活动要求。");
+        }
+
         return wxLxQrCodeVo;
+    }
+
+    @Override
+    public void receiveAward(WxLxQrQuery query) throws Exception {
+        WeLxQrCode lxQrCode = getById(query.getQrId());
+        if (Objects.isNull(lxQrCode)) {
+            throw new WeComException("无效ID");
+        }
+        if (ObjectUtil.equal(1, lxQrCode.getType())) {
+            String returnMsg = weRedEnvelopesService.customerReceiveRedEnvelopes(query.getOrderNo()
+                    , SecurityUtils.getWxLoginUser().getOpenId()
+                    , SecurityUtils.getWxLoginUser().getNickName()
+                    , SecurityUtils.getWxLoginUser().getHeadImgUrl());
+            if (StringUtils.isNotEmpty(returnMsg)) {
+                throw new WeComException(HttpStatus.NOT_IMPLEMENTED, returnMsg);
+            }
+        } else if (ObjectUtil.equal(2, lxQrCode.getType())) {
+            WeCorpAccount weCorpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
+            //领取卡券
+            WxSendCouponQuery couponQuery = new WxSendCouponQuery();
+            couponQuery.setStock_id(lxQrCode.getBusinessId());
+            couponQuery.setStock_creator_mchid(wechatPayConfig.getMchId());
+            couponQuery.setAppid(weCorpAccount.getWxAppId());
+            couponQuery.setOpenid(SecurityUtils.getWxLoginUser().getOpenId());
+            JSONObject jsonObject = weCouponService.sendCoupon(couponQuery);
+            String couponId = jsonObject.getString("coupon_id");
+            if (StringUtils.isNotBlank(couponId)) {
+                JSONObject businessData = JSONObject.parseObject(lxQrCode.getBusinessData());
+                businessData.put("couponId", couponId);
+                update(new LambdaUpdateWrapper<WeLxQrCode>().set(WeLxQrCode::getBusinessData, businessData.toJSONString())
+                        .eq(WeLxQrCode::getId, lxQrCode.getId()));
+            }
+        }
     }
 
 }
