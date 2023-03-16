@@ -41,8 +41,6 @@ public class WeCorpAccountController extends BaseController {
     @GetMapping("/findCurrentCorpAccount")
     public AjaxResult<WeCorpAccount> findCurrentCorpAccount() {
         WeCorpAccount corpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
-        //获取商城配置
-        setShopConfig(corpAccount);
         return AjaxResult.success(corpAccount);
     }
 
@@ -132,24 +130,4 @@ public class WeCorpAccountController extends BaseController {
             logger.error("商城系统-小程序配置失败！！！");
         }
     }
-
-    /**
-     * 设置商城配置
-     */
-    private void setShopConfig(WeCorpAccount weCorpAccount) {
-        Map<String, Object> configs = shopSystemConfigClient.getYxSystemConfigs();
-        Object wxapp_appId = configs.get("wxapp_appId");
-        Object wxapp_secret = configs.get("wxapp_secret");
-        Object wechat_ma_token = configs.get("wechat_ma_token");
-        Object wechat_ma_encodingaeskey = configs.get("wechat_ma_encodingaeskey");
-        Object api = configs.get("api");
-
-        Optional.ofNullable(wxapp_appId).ifPresent(o -> weCorpAccount.setShopAppId(String.valueOf(wxapp_appId)));
-        Optional.ofNullable(wxapp_secret).ifPresent(o -> weCorpAccount.setShopSecret(String.valueOf(wxapp_secret)));
-        Optional.ofNullable(wechat_ma_token).ifPresent(o -> weCorpAccount.setShopMaToken(String.valueOf(wechat_ma_token)));
-        Optional.ofNullable(wechat_ma_encodingaeskey).ifPresent(o -> weCorpAccount.setShopMaEncodingaeskey(String.valueOf(wechat_ma_encodingaeskey)));
-        Optional.ofNullable(api).ifPresent(o -> weCorpAccount.setShopMaApi(String.valueOf(api)));
-    }
-
-
 }

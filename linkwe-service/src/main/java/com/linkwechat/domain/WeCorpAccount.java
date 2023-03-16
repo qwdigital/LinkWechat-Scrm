@@ -273,36 +273,36 @@ public class WeCorpAccount extends BaseEntity {
     /**
      * 商城小程序app_id
      */
-    @TableField(exist = false)
     @ApiModelProperty(value = "商城小程序app_id")
+    @TableField("shop_app_id")
     private String shopAppId;
 
     /**
      * 商城小程序秘钥
      */
-    @TableField(exist = false)
     @ApiModelProperty(value = "商城小程序秘钥")
+    @TableField("shop_secret")
     private String shopSecret;
 
     /**
      * 商城小程序消息推送token（令牌）
      */
-    @TableField(exist = false)
     @ApiModelProperty(value = "商城小程序消息推送token（令牌）")
+    @TableField("shop_ma_token")
     private String shopMaToken;
 
     /**
      * 商城小程序消息推送秘钥
      */
-    @TableField(exist = false)
     @ApiModelProperty(value = "商城小程序消息推送秘钥")
+    @TableField("shop_ma_encodingaeskey")
     private String shopMaEncodingaeskey;
 
     /**
      * 商城小程序消息推送-服务器地址
      */
-    @TableField(exist = false)
     @ApiModelProperty(value = "商城小程序消息推送-服务器地址")
+    @TableField("shop_ma_api")
     private String shopMaApi;
 
     /***********************************************

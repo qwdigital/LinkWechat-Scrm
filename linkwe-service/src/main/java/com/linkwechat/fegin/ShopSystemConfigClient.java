@@ -19,14 +19,6 @@ import java.util.Map;
 public interface ShopSystemConfigClient {
 
     /**
-     * 获取商城系统配置
-     *
-     * @return
-     */
-    @GetMapping("/mall/get/yxSystemConfig")
-    Map<String, Object> getYxSystemConfigs();
-
-    /**
      * 新增或修改
      *
      * @param jsonStr

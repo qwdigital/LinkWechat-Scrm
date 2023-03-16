@@ -18,11 +18,6 @@ import java.util.Map;
 public class ShopSystemConfigFallbackFactory implements ShopSystemConfigClient {
 
     @Override
-    public Map<String, Object> getYxSystemConfigs() {
-        return null;
-    }
-
-    @Override
     public Object saveOrUpdate(String jsonStr) {
         return null;
     }
