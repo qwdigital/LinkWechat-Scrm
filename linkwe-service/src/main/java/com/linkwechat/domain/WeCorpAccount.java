@@ -14,7 +14,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
 
 /**
  * 企业id相关配置(WeCorpAccount)
@@ -271,24 +270,39 @@ public class WeCorpAccount extends BaseEntity {
      *******************商城start****************
      **********************************************/
 
+    /**
+     * 商城小程序app_id
+     */
     @TableField(exist = false)
-    @ApiModelProperty(value = "小程序app_id")
+    @ApiModelProperty(value = "商城小程序app_id")
     private String shopAppId;
 
+    /**
+     * 商城小程序秘钥
+     */
     @TableField(exist = false)
-    @ApiModelProperty(value = "小程序秘钥")
+    @ApiModelProperty(value = "商城小程序秘钥")
     private String shopSecret;
 
+    /**
+     * 商城小程序消息推送token（令牌）
+     */
     @TableField(exist = false)
-    @ApiModelProperty(value = "小程序消息推送token（令牌）")
+    @ApiModelProperty(value = "商城小程序消息推送token（令牌）")
     private String shopMaToken;
 
+    /**
+     * 商城小程序消息推送秘钥
+     */
     @TableField(exist = false)
-    @ApiModelProperty(value = "小程序秘钥")
+    @ApiModelProperty(value = "商城小程序消息推送秘钥")
     private String shopMaEncodingaeskey;
 
+    /**
+     * 商城小程序消息推送-服务器地址
+     */
     @TableField(exist = false)
-    @ApiModelProperty(value = "小程序消息推送-服务器地址")
+    @ApiModelProperty(value = "商城小程序消息推送-服务器地址")
     private String shopMaApi;
 
     /***********************************************
