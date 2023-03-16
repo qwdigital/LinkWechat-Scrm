@@ -15,6 +15,11 @@ import java.util.Date;
 public class WeShortLinkPromotionTaskEndQuery {
 
     /**
+     * 短链推广Id
+     */
+    private Long promotionId;
+
+    /**
      * 推广模板Id；
      */
     private Long businessId;

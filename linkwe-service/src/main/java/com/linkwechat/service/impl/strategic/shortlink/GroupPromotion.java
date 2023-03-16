@@ -147,7 +147,7 @@ public class GroupPromotion extends PromotionType {
         }
         //任务结束时间
         Optional.ofNullable(templateGroup.getTaskEndTime()).ifPresent(o -> {
-            timingEnd(templateGroup.getId(), weShortLinkPromotion.getType(), Date.from(templateGroup.getTaskEndTime().atZone(ZoneId.systemDefault()).toInstant()));
+            timingEnd(weShortLinkPromotion.getId(),templateGroup.getId(), weShortLinkPromotion.getType(), Date.from(templateGroup.getTaskEndTime().atZone(ZoneId.systemDefault()).toInstant()));
         });
         return weShortLinkPromotion.getId();
     }
@@ -269,7 +269,7 @@ public class GroupPromotion extends PromotionType {
         }
         //任务结束时间
         Optional.ofNullable(templateGroup.getTaskEndTime()).ifPresent(o -> {
-            timingEnd(templateGroup.getId(), weShortLinkPromotion.getType(), Date.from(templateGroup.getTaskEndTime().atZone(ZoneId.systemDefault()).toInstant()));
+            timingEnd(weShortLinkPromotion.getId(),templateGroup.getId(), weShortLinkPromotion.getType(), Date.from(templateGroup.getTaskEndTime().atZone(ZoneId.systemDefault()).toInstant()));
         });
 
     }
@@ -314,7 +314,7 @@ public class GroupPromotion extends PromotionType {
     }
 
     @Override
-    protected void timingEnd(Long businessId, Integer type, Date taskEndTime) {
+    protected void timingEnd(Long promotionId,Long businessId, Integer type, Date taskEndTime) {
         WeShortLinkPromotionTaskEndQuery query = new WeShortLinkPromotionTaskEndQuery();
         query.setBusinessId(businessId);
         query.setType(type);

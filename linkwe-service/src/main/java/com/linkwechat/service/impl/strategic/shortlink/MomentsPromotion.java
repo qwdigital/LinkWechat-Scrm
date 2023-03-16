@@ -1,7 +1,6 @@
 package com.linkwechat.service.impl.strategic.shortlink;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -16,10 +15,7 @@ import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.moments.entity.WeMoments;
 import com.linkwechat.domain.shortlink.dto.WeShortLinkPromotionMomentsDto;
-import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
-import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateMomentsAddQuery;
-import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateMomentsUpdateQuery;
-import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionUpdateQuery;
+import com.linkwechat.domain.shortlink.query.*;
 import com.linkwechat.service.IWeShortLinkPromotionAttachmentService;
 import com.linkwechat.service.IWeShortLinkPromotionService;
 import com.linkwechat.service.IWeShortLinkPromotionTemplateMomentsService;
@@ -85,19 +81,19 @@ public class MomentsPromotion extends PromotionType {
         //不需要
 
         //4.保存员工推广短链任务
+        WeShortLinkUserPromotionTask weShortLinkUserPromotionTask = new WeShortLinkUserPromotionTask();
         //群发朋友圈分类 0全部客户 1部分客户
         Integer scopeType = momentsAddQuery.getScopeType();
-        //部分客户
         if (scopeType.equals(1)) {
-            String userIds = momentsAddQuery.getUserIds();
-            WeShortLinkUserPromotionTask weShortLinkUserPromotionTask = new WeShortLinkUserPromotionTask();
-            weShortLinkUserPromotionTask.setUserId(userIds);
-            weShortLinkUserPromotionTask.setTemplateType(2);
-            weShortLinkUserPromotionTask.setTemplateId(moments.getId());
-            weShortLinkUserPromotionTask.setSendStatus(0);
-            weShortLinkUserPromotionTask.setDelFlag(0);
-            weShortLinkUserPromotionTaskService.save(weShortLinkUserPromotionTask);
+            //部分客户
+            weShortLinkUserPromotionTask.setUserId(momentsAddQuery.getUserIds());
         }
+        weShortLinkUserPromotionTask.setTemplateType(2);
+        weShortLinkUserPromotionTask.setTemplateId(moments.getId());
+        weShortLinkUserPromotionTask.setSendStatus(0);
+        weShortLinkUserPromotionTask.setDelFlag(0);
+        weShortLinkUserPromotionTaskService.save(weShortLinkUserPromotionTask);
+
 
         //5.发送mq
         String userIds = momentsAddQuery.getUserIds();
@@ -124,9 +120,8 @@ public class MomentsPromotion extends PromotionType {
         //任务结束时间
         LocalDateTime taskEndTime = momentsAddQuery.getTaskEndTime();
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
-            timingEnd(moments.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
+            timingEnd(weShortLinkPromotion.getId(), moments.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
         });
-
 
         return weShortLinkPromotion.getId();
     }
@@ -209,7 +204,7 @@ public class MomentsPromotion extends PromotionType {
 
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
-            timingEnd(moments.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
+            timingEnd(weShortLinkPromotion.getId(), moments.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
         });
 
 
@@ -297,7 +292,16 @@ public class MomentsPromotion extends PromotionType {
     }
 
     @Override
-    protected void timingEnd(Long businessId, Integer type, Date taskEndTime) {
-
+    protected void timingEnd(Long promotionId, Long businessId, Integer type, Date taskEndTime) {
+        WeShortLinkPromotionTaskEndQuery query = new WeShortLinkPromotionTaskEndQuery();
+        query.setPromotionId(promotionId);
+        query.setBusinessId(businessId);
+        query.setType(type);
+        long diffTime = DateUtils.diffTime(taskEndTime, new Date());
+        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeDelayGroupMsgEndRk(), JSONObject.toJSONString(query), message -> {
+            //注意这里时间可使用long类型,毫秒单位，设置header
+            message.getMessageProperties().setHeader("x-delay", diffTime);
+            return message;
+        });
     }
 }

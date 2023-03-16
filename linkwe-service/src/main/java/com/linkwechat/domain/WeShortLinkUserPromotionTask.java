@@ -88,11 +88,16 @@ public class WeShortLinkUserPromotionTask extends BaseEntity {
     @ApiModelProperty(value = "实际发送客群数量")
     private Integer realGroupNum;
 
-
     /**
      * 删除标识 0 有效 1删除
      */
     @ApiModelProperty(value = "删除标识 0 有效 1删除")
     private Integer delFlag;
+
+    /**
+     * 朋友圈Id
+     */
+    @ApiModelProperty(value = "朋友圈Id")
+    private String momentId;
 
 }

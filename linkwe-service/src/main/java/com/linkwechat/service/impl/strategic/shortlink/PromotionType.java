@@ -62,11 +62,12 @@ public abstract class PromotionType {
     /**
      * 定时结束
      *
-     * @param businessId 短链推广模板Id
-     * @param type       任务所属类型：0群发客户 1群发客群 2朋友圈
-     * @param taskEndTime   结束时间
+     * @param promotionId 短链推广Id
+     * @param businessId  短链推广模板Id
+     * @param type        任务所属类型：0群发客户 1群发客群 2朋友圈
+     * @param taskEndTime 结束时间
      */
-    protected abstract void timingEnd(Long businessId, Integer type, Date taskEndTime);
+    protected abstract void timingEnd(Long promotionId, Long businessId, Integer type, Date taskEndTime);
 
 
 }

@@ -146,7 +146,7 @@ public class AppMsgPromotion extends PromotionType {
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
-            timingEnd(appMsg.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
+            timingEnd(weShortLinkPromotion.getId(),appMsg.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
         });
 
 
@@ -231,7 +231,7 @@ public class AppMsgPromotion extends PromotionType {
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
-            timingEnd(appMsg.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
+            timingEnd(weShortLinkPromotion.getId(),appMsg.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
         });
     }
 
@@ -331,7 +331,7 @@ public class AppMsgPromotion extends PromotionType {
     }
 
     @Override
-    protected void timingEnd(Long businessId, Integer type, Date taskEndTime) {
+    protected void timingEnd(Long promotionId, Long businessId, Integer type, Date taskEndTime) {
 
     }
 }

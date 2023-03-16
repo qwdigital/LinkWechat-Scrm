@@ -147,7 +147,7 @@ public class ClientPromotion extends PromotionType {
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
-            timingEnd(client.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
+            timingEnd(weShortLinkPromotion.getId(),client.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
         });
         return weShortLinkPromotion.getId();
     }
@@ -264,7 +264,7 @@ public class ClientPromotion extends PromotionType {
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
-            timingEnd(client.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
+            timingEnd(weShortLinkPromotion.getId(),client.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
         });
 
 
@@ -312,7 +312,7 @@ public class ClientPromotion extends PromotionType {
 
 
     @Override
-    protected void timingEnd(Long businessId, Integer type, Date taskEndTime) {
+    protected void timingEnd(Long promotionId,Long businessId, Integer type, Date taskEndTime) {
         WeShortLinkPromotionTaskEndQuery query = new WeShortLinkPromotionTaskEndQuery();
         query.setBusinessId(businessId);
         query.setType(type);
