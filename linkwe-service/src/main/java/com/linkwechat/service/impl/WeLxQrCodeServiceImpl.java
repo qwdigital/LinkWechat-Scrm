@@ -24,7 +24,6 @@ import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.img.NetFileUtils;
-import com.linkwechat.config.wechatpay.WechatPayConfig;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeLxQrCode;
@@ -103,8 +102,8 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
     @Autowired
     private IWeCorpAccountService weCorpAccountService;
 
-    @Autowired
-    private WechatPayConfig wechatPayConfig;
+    //@Autowired
+    //private WechatPayConfig wechatPayConfig;
 
     @Override
     public Long addQrCode(WeLxQrAddQuery weQrAddQuery) {
@@ -458,7 +457,7 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
             //领取卡券
             WxSendCouponQuery couponQuery = new WxSendCouponQuery();
             couponQuery.setStock_id(lxQrCode.getBusinessId());
-            couponQuery.setStock_creator_mchid(wechatPayConfig.getMchId());
+            //couponQuery.setStock_creator_mchid(wechatPayConfig.getMchId());
             couponQuery.setAppid(weCorpAccount.getWxAppId());
             couponQuery.setOpenid(SecurityUtils.getWxLoginUser().getOpenId());
             JSONObject jsonObject = weCouponService.sendCoupon(couponQuery);
