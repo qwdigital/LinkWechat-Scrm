@@ -28,9 +28,10 @@ public interface IWeLxQrCodeService extends IService<WeLxQrCode> {
     /**
      * 生成拉新二维码
      * @param id
+     * @param qrType
      * @return
      */
-    WeLxQrAddVo generateQrCode(Long id);
+    WeLxQrAddVo generateQrCode(Long id, Integer qrType);
 
     /**
      * 修改拉新活码

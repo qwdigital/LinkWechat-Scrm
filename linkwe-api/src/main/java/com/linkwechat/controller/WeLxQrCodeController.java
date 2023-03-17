@@ -40,7 +40,7 @@ public class WeLxQrCodeController extends BaseController {
     @PostMapping("/add")
     public AjaxResult<WeLxQrAddVo> addQrCode(@RequestBody @Validated WeLxQrAddQuery query) {
         Long id = weLxQrCodeService.addQrCode(query);
-        WeLxQrAddVo lxQrCode = weLxQrCodeService.generateQrCode(id);
+        WeLxQrAddVo lxQrCode = weLxQrCodeService.generateQrCode(id,query.getQrType());
         return AjaxResult.success(lxQrCode);
     }
 

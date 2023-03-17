@@ -147,11 +147,11 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
 
 
     @Override
-    public WeLxQrAddVo generateQrCode(Long id) {
+    public WeLxQrAddVo generateQrCode(Long id, Integer qrType) {
         WeLxQrAddVo weLxQrAddVo = new WeLxQrAddVo();
 
         weLxQrAddVo.setQrId(id);
-        String lxLinkUrl = StringUtils.format(linkWeChatConfig.getLxQrCodeUrl(), id);
+        String lxLinkUrl = StringUtils.format(linkWeChatConfig.getLxQrCodeUrl(), id,qrType);
         weLxQrAddVo.setLinkPath(lxLinkUrl);
         try {
             NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(IdUtil.simpleUUID() + "." + ImgUtil.IMAGE_TYPE_PNG, QrCodeUtil.generatePng(lxLinkUrl, QrConfig.create()));
