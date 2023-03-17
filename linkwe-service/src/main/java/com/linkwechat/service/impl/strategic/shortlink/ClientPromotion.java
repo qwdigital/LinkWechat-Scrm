@@ -191,7 +191,7 @@ public class ClientPromotion extends PromotionType {
 
         //删除短链推广模板附件
         LambdaUpdateWrapper<WeShortLinkPromotionAttachment> attachmentUpdateWrapper = Wrappers.lambdaUpdate();
-        attachmentUpdateWrapper.eq(WeShortLinkPromotionAttachment::getTemplateId, client.getId());
+        attachmentUpdateWrapper.eq(WeShortLinkPromotionAttachment::getTemplateId, clientUpdateQuery.getId());
         attachmentUpdateWrapper.eq(WeShortLinkPromotionAttachment::getTemplateType, 0);
         attachmentUpdateWrapper.set(WeShortLinkPromotionAttachment::getDelFlag, 1);
         weShortLinkPromotionAttachmentService.update(attachmentUpdateWrapper);
@@ -200,6 +200,7 @@ public class ClientPromotion extends PromotionType {
             List<WeShortLinkPromotionAttachment> collect = attachments.stream().map(attachment -> {
                 WeShortLinkPromotionAttachment weShortLinkPromotionAttachment = BeanUtil.copyProperties(attachment, WeShortLinkPromotionAttachment.class);
                 //附件所属类型：0群发客户 1群发客群 2朋友圈
+                weShortLinkPromotionAttachment.setDelFlag(0);
                 weShortLinkPromotionAttachment.setTemplateType(0);
                 weShortLinkPromotionAttachment.setTemplateId(client.getId());
                 return weShortLinkPromotionAttachment;
@@ -232,7 +233,7 @@ public class ClientPromotion extends PromotionType {
         //删除短链推广发送结果
         LambdaUpdateWrapper<WeShortLinkPromotionSendResult> promotionSendResultUpdateWrapper = Wrappers.lambdaUpdate();
         promotionSendResultUpdateWrapper.eq(WeShortLinkPromotionSendResult::getTemplateType, 0);
-        promotionSendResultUpdateWrapper.eq(WeShortLinkPromotionSendResult::getTemplateId, client.getId());
+        promotionSendResultUpdateWrapper.eq(WeShortLinkPromotionSendResult::getTemplateId, clientUpdateQuery.getId());
         promotionSendResultUpdateWrapper.set(WeShortLinkPromotionSendResult::getDelFlag, 1);
         weShortLinkPromotionSendResultService.update(promotionSendResultUpdateWrapper);
         //保存短链推广发送结果

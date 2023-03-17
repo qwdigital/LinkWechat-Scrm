@@ -3,6 +3,7 @@ package com.linkwechat.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -170,6 +171,12 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
             //短链详情
             WeShortLinkListVo weShortLinkListVo = BeanUtil.copyProperties(weShortLink, WeShortLinkListVo.class);
             vo.setShortLink(weShortLinkListVo);
+
+            Optional.ofNullable(vo.getMaterialId()).ifPresent(m -> {
+                WeMaterial weMaterial = weMaterialMapper.selectById(m);
+                Optional.ofNullable(weMaterial).ifPresent(item -> vo.setMaterialUrl(item.getMaterialUrl()));
+            });
+
             //任务状态: 0待推广 1推广中 2已结束 3暂存中
             if (i.getTaskStatus() != 3) {
                 //推广信息
@@ -234,8 +241,8 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
                     .map(WeMaterial::getPosterSubassembly)
                     .map(i -> JSONObject.parseArray(i))
                     //判断海报是否有占位码组件
-                    .filter(i -> i.getJSONObject(0).getInteger("type").equals(3))
-                    .map(i -> i.getJSONObject(0))
+                    .map(i -> i.stream().filter(o -> ((JSONObject) JSON.toJSON(o)).getInteger("type").equals(3)).findFirst())
+                    .map(i -> (JSONObject) JSON.toJSON(i))
                     .orElseThrow(() -> new ServiceException("请确认海报是否正确！"));
 
             //占位码位置

@@ -73,6 +73,12 @@ public class WeShortLinkPromotionGetVo {
     private Long materialId;
 
     /**
+     * 占位码海报地址
+     */
+    @ApiModelProperty(value = "占位码海报地址")
+    private String materialUrl;
+
+    /**
      * 客户推广信息
      */
     @ApiModelProperty(value = "客户推广信息")
