@@ -14,7 +14,10 @@ import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.*;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.media.WeMessageTemplate;
-import com.linkwechat.domain.shortlink.query.*;
+import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
+import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateClientAddQuery;
+import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateClientUpdateQuery;
+import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionUpdateQuery;
 import com.linkwechat.mapper.WeShortLinkPromotionMapper;
 import com.linkwechat.mapper.WeShortLinkPromotionTemplateClientMapper;
 import com.linkwechat.service.IWeCustomerService;
@@ -25,6 +28,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -58,11 +62,15 @@ public class ClientPromotion extends PromotionType {
     private IWeCustomerService weCustomerService;
 
     @Override
-    public Long saveAndSend(WeShortLinkPromotionAddQuery query, WeShortLinkPromotion weShortLinkPromotion) {
+    public Long saveAndSend(WeShortLinkPromotionAddQuery query, WeShortLinkPromotion weShortLinkPromotion) throws IOException {
 
         WeShortLinkPromotionTemplateClientAddQuery clientAddQuery = query.getClient();
 
         //检查客户
+        if (query.getSenderList() == null) {
+            List<WeAddGroupMessageQuery.SenderInfo> senderList = new ArrayList<>();
+            query.setSenderList(senderList);
+        }
         checkSendList(clientAddQuery.getType(), query.getSenderList());
 
         //发送类型：0立即发送 1定时发送
@@ -83,6 +91,11 @@ public class ClientPromotion extends PromotionType {
         });
         //保存短链推广
         weShortLinkPromotionMapper.insert(weShortLinkPromotion);
+        //海报附件
+        WeMessageTemplate posterMessageTemplate = getPromotionUrl(weShortLinkPromotion.getId(), weShortLinkPromotion.getShortLinkId(), weShortLinkPromotion.getStyle(), weShortLinkPromotion.getMaterialId());
+        weShortLinkPromotion.setUrl(posterMessageTemplate.getPicUrl());
+        weShortLinkPromotionMapper.updateById(weShortLinkPromotion);
+
         //保存短链推广模板-客户
         WeShortLinkPromotionTemplateClient client = BeanUtil.copyProperties(clientAddQuery, WeShortLinkPromotionTemplateClient.class);
         client.setPromotionId(weShortLinkPromotion.getId());
@@ -119,31 +132,35 @@ public class ClientPromotion extends PromotionType {
         weShortLinkUserPromotionTaskService.saveBatch(weShortLinkUserPromotionTasks);
 
         //保存发送人员
-        Optional.ofNullable(query.getSenderList()).ifPresent(senderInfos -> {
-            List<WeShortLinkPromotionSendResult> sendResultList = new ArrayList<>();
-            senderInfos.stream().forEach(senderInfo -> {
-                List<String> customerList = senderInfo.getCustomerList();
-                for (String externalUserid : customerList) {
-                    WeShortLinkPromotionSendResult weShortLinkPromotionSendResult = new WeShortLinkPromotionSendResult();
-                    weShortLinkPromotionSendResult.setTemplateType(0);
-                    weShortLinkPromotionSendResult.setTemplateId(client.getId());
-                    weShortLinkPromotionSendResult.setUserId(senderInfo.getUserId());
-                    weShortLinkPromotionSendResult.setExternalUserid(externalUserid);
-                    weShortLinkPromotionSendResult.setStatus(0);
-                    weShortLinkPromotionSendResult.setDelFlag(0);
-                    sendResultList.add(weShortLinkPromotionSendResult);
-                }
-            });
-            weShortLinkPromotionSendResultService.saveBatch(sendResultList);
-        });
+//        Optional.ofNullable(query.getSenderList()).ifPresent(senderInfos -> {
+//            List<WeShortLinkPromotionSendResult> sendResultList = new ArrayList<>();
+//            senderInfos.stream().forEach(senderInfo -> {
+//                List<String> customerList = senderInfo.getCustomerList();
+//                for (String externalUserid : customerList) {
+//                    WeShortLinkPromotionSendResult weShortLinkPromotionSendResult = new WeShortLinkPromotionSendResult();
+//                    weShortLinkPromotionSendResult.setTemplateType(0);
+//                    weShortLinkPromotionSendResult.setTemplateId(client.getId());
+//                    weShortLinkPromotionSendResult.setUserId(senderInfo.getUserId());
+//                    weShortLinkPromotionSendResult.setExternalUserid(externalUserid);
+//                    weShortLinkPromotionSendResult.setStatus(0);
+//                    weShortLinkPromotionSendResult.setDelFlag(0);
+//                    sendResultList.add(weShortLinkPromotionSendResult);
+//                }
+//            });
+//            weShortLinkPromotionSendResultService.saveBatch(sendResultList);
+//        });
 
         //mq执行推送消息给员工
+
+        //添加海报推广附件
+        List<WeMessageTemplate> weMessageTemplates = Optional.ofNullable(query.getAttachments()).orElse(new ArrayList<>());
+        weMessageTemplates.add(posterMessageTemplate);
         if (sendType.equals(0)) {
             //任务状态: 0待推广 1推广中 2已结束
-            directSend(weShortLinkPromotion.getId(), client.getId(), clientAddQuery.getContent(), query.getAttachments(), query.getSenderList());
+            directSend(weShortLinkPromotion.getId(), client.getId(), clientAddQuery.getContent(), weMessageTemplates, query.getSenderList());
         } else {
             //定时发送
-            timingSend(weShortLinkPromotion.getId(), client.getId(), clientAddQuery.getContent(), Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()), query.getAttachments(), query.getSenderList());
+            timingSend(weShortLinkPromotion.getId(), client.getId(), clientAddQuery.getContent(), Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()), weMessageTemplates, query.getSenderList());
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
@@ -153,11 +170,15 @@ public class ClientPromotion extends PromotionType {
     }
 
     @Override
-    public void updateAndSend(WeShortLinkPromotionUpdateQuery query, WeShortLinkPromotion weShortLinkPromotion) {
+    public void updateAndSend(WeShortLinkPromotionUpdateQuery query, WeShortLinkPromotion weShortLinkPromotion) throws IOException {
 
         WeShortLinkPromotionTemplateClientUpdateQuery clientUpdateQuery = query.getClient();
 
         //检查客户
+        if (query.getSenderList() == null) {
+            List<WeAddGroupMessageQuery.SenderInfo> senderList = new ArrayList<>();
+            query.setSenderList(senderList);
+        }
         checkSendList(clientUpdateQuery.getType(), query.getSenderList());
 
         //发送类型：0立即发送 1定时发送
@@ -175,12 +196,16 @@ public class ClientPromotion extends PromotionType {
         Optional.ofNullable(taskEndTime).ifPresent(o -> weShortLinkPromotion.setTaskEndTime(o));
         //保存短链推广
         weShortLinkPromotionMapper.updateById(weShortLinkPromotion);
+        //海报附件
+        WeMessageTemplate posterMessageTemplate = getPromotionUrl(weShortLinkPromotion.getId(), weShortLinkPromotion.getShortLinkId(), weShortLinkPromotion.getStyle(), weShortLinkPromotion.getMaterialId());
+        weShortLinkPromotion.setUrl(posterMessageTemplate.getPicUrl());
+        weShortLinkPromotionMapper.updateById(weShortLinkPromotion);
 
         //删除短链推广模板-客户
         WeShortLinkPromotionTemplateClient weShortLinkPromotionTemplateClient = new WeShortLinkPromotionTemplateClient();
         weShortLinkPromotionTemplateClient.setDelFlag(1);
         LambdaUpdateWrapper<WeShortLinkPromotionTemplateClient> clientUpdateWrapper = Wrappers.lambdaUpdate();
-        clientUpdateWrapper.eq(WeShortLinkPromotionTemplateClient::getId, clientUpdateQuery.getId());
+        clientUpdateWrapper.eq(WeShortLinkPromotionTemplateClient::getPromotionId, weShortLinkPromotion.getId());
         weShortLinkPromotionTemplateClientMapper.update(weShortLinkPromotionTemplateClient, clientUpdateWrapper);
         //保存短链推广模板-客户
         WeShortLinkPromotionTemplateClient client = BeanUtil.copyProperties(clientUpdateQuery, WeShortLinkPromotionTemplateClient.class);
@@ -231,44 +256,45 @@ public class ClientPromotion extends PromotionType {
         weShortLinkUserPromotionTaskService.saveBatch(weShortLinkUserPromotionTasks);
 
         //删除短链推广发送结果
-        LambdaUpdateWrapper<WeShortLinkPromotionSendResult> promotionSendResultUpdateWrapper = Wrappers.lambdaUpdate();
-        promotionSendResultUpdateWrapper.eq(WeShortLinkPromotionSendResult::getTemplateType, 0);
-        promotionSendResultUpdateWrapper.eq(WeShortLinkPromotionSendResult::getTemplateId, clientUpdateQuery.getId());
-        promotionSendResultUpdateWrapper.set(WeShortLinkPromotionSendResult::getDelFlag, 1);
-        weShortLinkPromotionSendResultService.update(promotionSendResultUpdateWrapper);
-        //保存短链推广发送结果
-        Optional.ofNullable(query.getSenderList()).ifPresent(senderInfos -> {
-            List<WeShortLinkPromotionSendResult> sendResultList = new ArrayList<>();
-            senderInfos.stream().forEach(senderInfo -> {
-                List<String> customerList = senderInfo.getCustomerList();
-                for (String externalUserid : customerList) {
-                    WeShortLinkPromotionSendResult weShortLinkPromotionSendResult = new WeShortLinkPromotionSendResult();
-                    weShortLinkPromotionSendResult.setTemplateType(0);
-                    weShortLinkPromotionSendResult.setTemplateId(client.getId());
-                    weShortLinkPromotionSendResult.setUserId(senderInfo.getUserId());
-                    weShortLinkPromotionSendResult.setExternalUserid(externalUserid);
-                    weShortLinkPromotionSendResult.setStatus(0);
-                    weShortLinkPromotionSendResult.setDelFlag(0);
-                    sendResultList.add(weShortLinkPromotionSendResult);
-                }
-            });
-            weShortLinkPromotionSendResultService.saveBatch(sendResultList);
-        });
+//        LambdaUpdateWrapper<WeShortLinkPromotionSendResult> promotionSendResultUpdateWrapper = Wrappers.lambdaUpdate();
+//        promotionSendResultUpdateWrapper.eq(WeShortLinkPromotionSendResult::getTemplateType, 0);
+//        promotionSendResultUpdateWrapper.eq(WeShortLinkPromotionSendResult::getTemplateId, clientUpdateQuery.getId());
+//        promotionSendResultUpdateWrapper.set(WeShortLinkPromotionSendResult::getDelFlag, 1);
+//        weShortLinkPromotionSendResultService.update(promotionSendResultUpdateWrapper);
+//        //保存短链推广发送结果
+//        Optional.ofNullable(query.getSenderList()).ifPresent(senderInfos -> {
+//            List<WeShortLinkPromotionSendResult> sendResultList = new ArrayList<>();
+//            senderInfos.stream().forEach(senderInfo -> {
+//                List<String> customerList = senderInfo.getCustomerList();
+//                for (String externalUserid : customerList) {
+//                    WeShortLinkPromotionSendResult weShortLinkPromotionSendResult = new WeShortLinkPromotionSendResult();
+//                    weShortLinkPromotionSendResult.setTemplateType(0);
+//                    weShortLinkPromotionSendResult.setTemplateId(client.getId());
+//                    weShortLinkPromotionSendResult.setUserId(senderInfo.getUserId());
+//                    weShortLinkPromotionSendResult.setExternalUserid(externalUserid);
+//                    weShortLinkPromotionSendResult.setStatus(0);
+//                    weShortLinkPromotionSendResult.setDelFlag(0);
+//                    sendResultList.add(weShortLinkPromotionSendResult);
+//                }
+//            });
+//            weShortLinkPromotionSendResultService.saveBatch(sendResultList);
+//        });
 
         //mq执行推送消息给员工
+        //添加海报推广附件
+        List<WeMessageTemplate> weMessageTemplates = Optional.ofNullable(query.getAttachments()).orElse(new ArrayList<>());
+        weMessageTemplates.add(posterMessageTemplate);
         if (sendType.equals(0)) {
             //任务状态: 0待推广 1推广中 2已结束
-            directSend(weShortLinkPromotion.getId(), client.getId(), clientUpdateQuery.getContent(), query.getAttachments(), query.getSenderList());
+            directSend(weShortLinkPromotion.getId(), client.getId(), clientUpdateQuery.getContent(), weMessageTemplates, query.getSenderList());
         } else {
             //定时发送
-            timingSend(weShortLinkPromotion.getId(), client.getId(), clientUpdateQuery.getContent(), Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()), query.getAttachments(), query.getSenderList());
+            timingSend(weShortLinkPromotion.getId(), client.getId(), clientUpdateQuery.getContent(), Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()), weMessageTemplates, query.getSenderList());
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
             timingEnd(weShortLinkPromotion.getId(), client.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
         });
-
-
     }
 
     @Override
@@ -305,21 +331,6 @@ public class ClientPromotion extends PromotionType {
 
         long diffTime = DateUtils.diffTime(sendTime, new Date());
         rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeDelayGroupMsgRk(), JSONObject.toJSONString(weAddGroupMessageQuery), message -> {
-            //注意这里时间可使用long类型,毫秒单位，设置header
-            message.getMessageProperties().setHeader("x-delay", diffTime);
-            return message;
-        });
-    }
-
-
-    @Override
-    protected void timingEnd(Long promotionId, Long businessId, Integer type, Date taskEndTime) {
-        WeShortLinkPromotionTaskEndQuery query = new WeShortLinkPromotionTaskEndQuery();
-        query.setBusinessId(businessId);
-        query.setType(type);
-
-        long diffTime = DateUtils.diffTime(taskEndTime, new Date());
-        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeDelayGroupMsgEndRk(), JSONObject.toJSONString(query), message -> {
             //注意这里时间可使用long类型,毫秒单位，设置header
             message.getMessageProperties().setHeader("x-delay", diffTime);
             return message;

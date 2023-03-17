@@ -7,20 +7,22 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.exception.ServiceException;
-import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.*;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.media.WeMessageTemplate;
-import com.linkwechat.domain.shortlink.query.*;
+import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
+import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateGroupAddQuery;
+import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateGroupUpdateQuery;
+import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionUpdateQuery;
 import com.linkwechat.service.*;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -54,7 +56,7 @@ public class GroupPromotion extends PromotionType {
     private IWeGroupService weGroupService;
 
     @Override
-    public Long saveAndSend(WeShortLinkPromotionAddQuery query, WeShortLinkPromotion weShortLinkPromotion) {
+    public Long saveAndSend(WeShortLinkPromotionAddQuery query, WeShortLinkPromotion weShortLinkPromotion) throws IOException {
 
         WeShortLinkPromotionTemplateGroupAddQuery group = query.getGroup();
         //检查客群
@@ -73,6 +75,11 @@ public class GroupPromotion extends PromotionType {
         }
         Optional.ofNullable(group.getTaskEndTime()).ifPresent(i -> weShortLinkPromotion.setTaskEndTime(i));
         weShortLinkPromotionService.save(weShortLinkPromotion);
+
+        //海报附件
+        WeMessageTemplate posterMessageTemplate = getPromotionUrl(weShortLinkPromotion.getId(), weShortLinkPromotion.getShortLinkId(), weShortLinkPromotion.getStyle(), weShortLinkPromotion.getMaterialId());
+        weShortLinkPromotion.setUrl(posterMessageTemplate.getPicUrl());
+        weShortLinkPromotionService.updateById(weShortLinkPromotion);
 
         //2.保存短链推广模板-客群
         WeShortLinkPromotionTemplateGroup templateGroup = BeanUtil.copyProperties(group, WeShortLinkPromotionTemplateGroup.class);
@@ -112,48 +119,53 @@ public class GroupPromotion extends PromotionType {
         });
 
         //5.保存短链推广发送结果
-        Optional.ofNullable(query.getSenderList()).ifPresent(senderInfos -> {
-            senderInfos.stream().forEach(senderInfo -> {
-                List<WeShortLinkPromotionSendResult> sendResultList = new ArrayList<>();
-                for (String chatId : senderInfo.getChatList()) {
-                    WeShortLinkPromotionSendResult weShortLinkPromotionSendResult = new WeShortLinkPromotionSendResult();
-                    //附件所属类型：0群发客户 1群发客群 2朋友圈
-                    weShortLinkPromotionSendResult.setTemplateType(1);
-                    weShortLinkPromotionSendResult.setTemplateId(templateGroup.getId());
-                    weShortLinkPromotionSendResult.setUserId(senderInfo.getUserId());
-                    weShortLinkPromotionSendResult.setChatId(chatId);
-                    weShortLinkPromotionSendResult.setStatus(0);
-                    weShortLinkPromotionSendResult.setDelFlag(0);
-                    sendResultList.add(weShortLinkPromotionSendResult);
-                }
-                weShortLinkPromotionSendResultService.saveBatch(sendResultList);
-            });
-        });
+//        Optional.ofNullable(query.getSenderList()).ifPresent(senderInfos -> {
+//            senderInfos.stream().forEach(senderInfo -> {
+//                List<WeShortLinkPromotionSendResult> sendResultList = new ArrayList<>();
+//                for (String chatId : senderInfo.getChatList()) {
+//                    WeShortLinkPromotionSendResult weShortLinkPromotionSendResult = new WeShortLinkPromotionSendResult();
+//                    //附件所属类型：0群发客户 1群发客群 2朋友圈
+//                    weShortLinkPromotionSendResult.setTemplateType(1);
+//                    weShortLinkPromotionSendResult.setTemplateId(templateGroup.getId());
+//                    weShortLinkPromotionSendResult.setUserId(senderInfo.getUserId());
+//                    weShortLinkPromotionSendResult.setChatId(chatId);
+//                    weShortLinkPromotionSendResult.setStatus(0);
+//                    weShortLinkPromotionSendResult.setDelFlag(0);
+//                    sendResultList.add(weShortLinkPromotionSendResult);
+//                }
+//                weShortLinkPromotionSendResultService.saveBatch(sendResultList);
+//            });
+//        });
+
 
         //6.mq发送
+
+        //添加海报推广附件
+        List<WeMessageTemplate> weMessageTemplates = Optional.ofNullable(query.getAttachments()).orElse(new ArrayList<>());
+        weMessageTemplates.add(posterMessageTemplate);
         if (sendType.equals(0)) {
             directSend(weShortLinkPromotion.getId(),
                     templateGroup.getId(),
                     templateGroup.getContent(),
-                    query.getAttachments(),
+                    weMessageTemplates,
                     query.getSenderList());
         } else {
             timingSend(weShortLinkPromotion.getId(),
                     templateGroup.getId(),
                     templateGroup.getContent(),
                     Date.from(templateGroup.getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()),
-                    query.getAttachments(),
+                    weMessageTemplates,
                     query.getSenderList());
         }
         //任务结束时间
         Optional.ofNullable(templateGroup.getTaskEndTime()).ifPresent(o -> {
-            timingEnd(weShortLinkPromotion.getId(),templateGroup.getId(), weShortLinkPromotion.getType(), Date.from(templateGroup.getTaskEndTime().atZone(ZoneId.systemDefault()).toInstant()));
+            timingEnd(weShortLinkPromotion.getId(), templateGroup.getId(), weShortLinkPromotion.getType(), Date.from(templateGroup.getTaskEndTime().atZone(ZoneId.systemDefault()).toInstant()));
         });
         return weShortLinkPromotion.getId();
     }
 
     @Override
-    public void updateAndSend(WeShortLinkPromotionUpdateQuery query, WeShortLinkPromotion weShortLinkPromotion) {
+    public void updateAndSend(WeShortLinkPromotionUpdateQuery query, WeShortLinkPromotion weShortLinkPromotion) throws IOException {
 
         WeShortLinkPromotionTemplateGroupUpdateQuery groupUpdateQuery = query.getGroup();
         //检查客群
@@ -174,6 +186,11 @@ public class GroupPromotion extends PromotionType {
         LocalDateTime taskEndTime = groupUpdateQuery.getTaskEndTime();
         Optional.ofNullable(taskEndTime).ifPresent(o -> weShortLinkPromotion.setTaskEndTime(o));
         //保存短链推广
+        weShortLinkPromotionService.updateById(weShortLinkPromotion);
+
+        //海报附件
+        WeMessageTemplate posterMessageTemplate = getPromotionUrl(weShortLinkPromotion.getId(), weShortLinkPromotion.getShortLinkId(), weShortLinkPromotion.getStyle(), weShortLinkPromotion.getMaterialId());
+        weShortLinkPromotion.setUrl(posterMessageTemplate.getPicUrl());
         weShortLinkPromotionService.updateById(weShortLinkPromotion);
 
         //2.更新推广短链模板-客群
@@ -229,47 +246,50 @@ public class GroupPromotion extends PromotionType {
         });
 
         //5.更新短链推广发送结果
-        LambdaUpdateWrapper<WeShortLinkPromotionSendResult> promotionSendResultUpdateWrapper = Wrappers.lambdaUpdate();
-        promotionSendResultUpdateWrapper.eq(WeShortLinkPromotionSendResult::getTemplateType, 1);
-        promotionSendResultUpdateWrapper.eq(WeShortLinkPromotionSendResult::getTemplateId, groupUpdateQuery.getId());
-        promotionSendResultUpdateWrapper.set(WeShortLinkPromotionSendResult::getDelFlag, 1);
-        weShortLinkPromotionSendResultService.update(promotionSendResultUpdateWrapper);
-        Optional.ofNullable(query.getSenderList()).ifPresent(senderInfos -> {
-            senderInfos.stream().forEach(senderInfo -> {
-                List<WeShortLinkPromotionSendResult> sendResultList = new ArrayList<>();
-                for (String chatId : senderInfo.getChatList()) {
-                    WeShortLinkPromotionSendResult weShortLinkPromotionSendResult = new WeShortLinkPromotionSendResult();
-                    //附件所属类型：0群发客户 1群发客群 2朋友圈
-                    weShortLinkPromotionSendResult.setTemplateType(1);
-                    weShortLinkPromotionSendResult.setTemplateId(templateGroup.getId());
-                    weShortLinkPromotionSendResult.setUserId(senderInfo.getUserId());
-                    weShortLinkPromotionSendResult.setChatId(chatId);
-                    weShortLinkPromotionSendResult.setStatus(0);
-                    weShortLinkPromotionSendResult.setDelFlag(0);
-                    sendResultList.add(weShortLinkPromotionSendResult);
-                }
-                weShortLinkPromotionSendResultService.saveBatch(sendResultList);
-            });
-        });
+//        LambdaUpdateWrapper<WeShortLinkPromotionSendResult> promotionSendResultUpdateWrapper = Wrappers.lambdaUpdate();
+//        promotionSendResultUpdateWrapper.eq(WeShortLinkPromotionSendResult::getTemplateType, 1);
+//        promotionSendResultUpdateWrapper.eq(WeShortLinkPromotionSendResult::getTemplateId, groupUpdateQuery.getId());
+//        promotionSendResultUpdateWrapper.set(WeShortLinkPromotionSendResult::getDelFlag, 1);
+//        weShortLinkPromotionSendResultService.update(promotionSendResultUpdateWrapper);
+//        Optional.ofNullable(query.getSenderList()).ifPresent(senderInfos -> {
+//            senderInfos.stream().forEach(senderInfo -> {
+//                List<WeShortLinkPromotionSendResult> sendResultList = new ArrayList<>();
+//                for (String chatId : senderInfo.getChatList()) {
+//                    WeShortLinkPromotionSendResult weShortLinkPromotionSendResult = new WeShortLinkPromotionSendResult();
+//                    //附件所属类型：0群发客户 1群发客群 2朋友圈
+//                    weShortLinkPromotionSendResult.setTemplateType(1);
+//                    weShortLinkPromotionSendResult.setTemplateId(templateGroup.getId());
+//                    weShortLinkPromotionSendResult.setUserId(senderInfo.getUserId());
+//                    weShortLinkPromotionSendResult.setChatId(chatId);
+//                    weShortLinkPromotionSendResult.setStatus(0);
+//                    weShortLinkPromotionSendResult.setDelFlag(0);
+//                    sendResultList.add(weShortLinkPromotionSendResult);
+//                }
+//                weShortLinkPromotionSendResultService.saveBatch(sendResultList);
+//            });
+//        });
 
         //6.mq发送
+        //添加海报推广附件
+        List<WeMessageTemplate> weMessageTemplates = Optional.ofNullable(query.getAttachments()).orElse(new ArrayList<>());
+        weMessageTemplates.add(posterMessageTemplate);
         if (sendType.equals(0)) {
             directSend(weShortLinkPromotion.getId(),
                     templateGroup.getId(),
                     templateGroup.getContent(),
-                    query.getAttachments(),
+                    weMessageTemplates,
                     query.getSenderList());
         } else {
             timingSend(weShortLinkPromotion.getId(),
                     templateGroup.getId(),
                     templateGroup.getContent(),
                     Date.from(templateGroup.getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()),
-                    query.getAttachments(),
+                    weMessageTemplates,
                     query.getSenderList());
         }
         //任务结束时间
         Optional.ofNullable(templateGroup.getTaskEndTime()).ifPresent(o -> {
-            timingEnd(weShortLinkPromotion.getId(),templateGroup.getId(), weShortLinkPromotion.getType(), Date.from(templateGroup.getTaskEndTime().atZone(ZoneId.systemDefault()).toInstant()));
+            timingEnd(weShortLinkPromotion.getId(), templateGroup.getId(), weShortLinkPromotion.getType(), Date.from(templateGroup.getTaskEndTime().atZone(ZoneId.systemDefault()).toInstant()));
         });
 
     }
@@ -313,19 +333,20 @@ public class GroupPromotion extends PromotionType {
         });
     }
 
-    @Override
-    protected void timingEnd(Long promotionId,Long businessId, Integer type, Date taskEndTime) {
-        WeShortLinkPromotionTaskEndQuery query = new WeShortLinkPromotionTaskEndQuery();
-        query.setBusinessId(businessId);
-        query.setType(type);
-
-        long diffTime = DateUtils.diffTime(taskEndTime, new Date());
-        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeDelayGroupMsgEndRk(), JSONObject.toJSONString(query), message -> {
-            //注意这里时间可使用long类型,毫秒单位，设置header
-            message.getMessageProperties().setHeader("x-delay", diffTime);
-            return message;
-        });
-    }
+//    @Override
+//    protected void timingEnd(Long promotionId,Long businessId, Integer type, Date taskEndTime) {
+//        WeShortLinkPromotionTaskEndQuery query = new WeShortLinkPromotionTaskEndQuery();
+//        query.setPromotionId(promotionId);
+//        query.setBusinessId(businessId);
+//        query.setType(type);
+//
+//        long diffTime = DateUtils.diffTime(taskEndTime, new Date());
+//        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeDelayGroupMsgEndRk(), JSONObject.toJSONString(query), message -> {
+//            //注意这里时间可使用long类型,毫秒单位，设置header
+//            message.getMessageProperties().setHeader("x-delay", diffTime);
+//            return message;
+//        });
+//    }
 
     /**
      * 检查客群
@@ -361,7 +382,7 @@ public class GroupPromotion extends PromotionType {
                     List<String> chatIds = ownerToChatIdMap.get(senderInfo.getUserId());
                     senderInfo.setChatList(chatIds);
                 }
-            }else{
+            } else {
                 throw new ServiceException("暂无客户群可发送");
             }
         }

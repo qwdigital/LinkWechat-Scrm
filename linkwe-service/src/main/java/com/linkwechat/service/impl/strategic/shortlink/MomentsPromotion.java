@@ -15,7 +15,10 @@ import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.moments.entity.WeMoments;
 import com.linkwechat.domain.shortlink.dto.WeShortLinkPromotionMomentsDto;
-import com.linkwechat.domain.shortlink.query.*;
+import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
+import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateMomentsAddQuery;
+import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateMomentsUpdateQuery;
+import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionUpdateQuery;
 import com.linkwechat.service.IWeShortLinkPromotionAttachmentService;
 import com.linkwechat.service.IWeShortLinkPromotionService;
 import com.linkwechat.service.IWeShortLinkPromotionTemplateMomentsService;
@@ -24,6 +27,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -53,7 +57,7 @@ public class MomentsPromotion extends PromotionType {
 
 
     @Override
-    public Long saveAndSend(WeShortLinkPromotionAddQuery query, WeShortLinkPromotion weShortLinkPromotion) {
+    public Long saveAndSend(WeShortLinkPromotionAddQuery query, WeShortLinkPromotion weShortLinkPromotion) throws IOException {
 
         WeShortLinkPromotionTemplateMomentsAddQuery momentsAddQuery = query.getMoments();
 
@@ -70,6 +74,11 @@ public class MomentsPromotion extends PromotionType {
         }
         Optional.ofNullable(momentsAddQuery.getTaskEndTime()).ifPresent(i -> weShortLinkPromotion.setTaskEndTime(i));
         weShortLinkPromotionService.save(weShortLinkPromotion);
+
+        //海报附件
+        WeMessageTemplate posterMessageTemplate = getPromotionUrl(weShortLinkPromotion.getId(), weShortLinkPromotion.getShortLinkId(), weShortLinkPromotion.getStyle(), weShortLinkPromotion.getMaterialId());
+        weShortLinkPromotion.setUrl(posterMessageTemplate.getPicUrl());
+        weShortLinkPromotionService.updateById(weShortLinkPromotion);
 
         //2.保存短链推广模板-朋友圈
         WeShortLinkPromotionTemplateMoments moments = BeanUtil.copyProperties(momentsAddQuery, WeShortLinkPromotionTemplateMoments.class);
@@ -103,15 +112,22 @@ public class MomentsPromotion extends PromotionType {
             senderInfo.setUserId(i);
             senderInfos.add(senderInfo);
         });
-
+        //添加海报推广附件
+        List<WeMessageTemplate> weMessageTemplates = Optional.ofNullable(query.getAttachments()).orElse(new ArrayList<>());
+        weMessageTemplates.add(posterMessageTemplate);
         if (sendType.equals(0)) {
-            directSend(weShortLinkPromotion.getId(), moments.getId(), momentsAddQuery.getContent(), query.getAttachments(), senderInfos, momentsAddQuery.getLabelIds());
+            directSend(weShortLinkPromotion.getId(),
+                    moments.getId(),
+                    momentsAddQuery.getContent(),
+                    weMessageTemplates,
+                    senderInfos,
+                    momentsAddQuery.getLabelIds());
         } else {
             timingSend(weShortLinkPromotion.getId(),
                     moments.getId(),
                     momentsAddQuery.getContent(),
                     Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()),
-                    query.getAttachments(),
+                    weMessageTemplates,
                     senderInfos,
                     momentsAddQuery.getLabelIds()
             );
@@ -127,7 +143,7 @@ public class MomentsPromotion extends PromotionType {
     }
 
     @Override
-    public void updateAndSend(WeShortLinkPromotionUpdateQuery query, WeShortLinkPromotion weShortLinkPromotion) {
+    public void updateAndSend(WeShortLinkPromotionUpdateQuery query, WeShortLinkPromotion weShortLinkPromotion) throws IOException {
         //1.更新短链推广
         WeShortLinkPromotionTemplateMomentsUpdateQuery momentsUpdateQuery = query.getMoments();
         //发送类型：0立即发送 1定时发送
@@ -144,6 +160,11 @@ public class MomentsPromotion extends PromotionType {
         LocalDateTime taskEndTime = momentsUpdateQuery.getTaskEndTime();
         Optional.ofNullable(taskEndTime).ifPresent(o -> weShortLinkPromotion.setTaskEndTime(o));
         //保存短链推广
+        weShortLinkPromotionService.updateById(weShortLinkPromotion);
+
+        //海报附件
+        WeMessageTemplate posterMessageTemplate = getPromotionUrl(weShortLinkPromotion.getId(), weShortLinkPromotion.getShortLinkId(), weShortLinkPromotion.getStyle(), weShortLinkPromotion.getMaterialId());
+        weShortLinkPromotion.setUrl(posterMessageTemplate.getPicUrl());
         weShortLinkPromotionService.updateById(weShortLinkPromotion);
 
         //2.更新短链推广模板-朋友圈
@@ -188,14 +209,23 @@ public class MomentsPromotion extends PromotionType {
             senderInfos.add(senderInfo);
         });
 
+        //添加海报推广附件
+        List<WeMessageTemplate> weMessageTemplates = Optional.ofNullable(query.getAttachments()).orElse(new ArrayList<>());
+        weMessageTemplates.add(posterMessageTemplate);
+
         if (sendType.equals(0)) {
-            directSend(weShortLinkPromotion.getId(), moments.getId(), momentsUpdateQuery.getContent(), query.getAttachments(), senderInfos, momentsUpdateQuery.getLabelIds());
+            directSend(weShortLinkPromotion.getId(),
+                    moments.getId(),
+                    momentsUpdateQuery.getContent(),
+                    weMessageTemplates,
+                    senderInfos,
+                    momentsUpdateQuery.getLabelIds());
         } else {
             timingSend(weShortLinkPromotion.getId(),
                     moments.getId(),
                     momentsUpdateQuery.getContent(),
                     Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()),
-                    query.getAttachments(),
+                    weMessageTemplates,
                     senderInfos,
                     momentsUpdateQuery.getLabelIds()
             );
@@ -205,7 +235,6 @@ public class MomentsPromotion extends PromotionType {
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
             timingEnd(weShortLinkPromotion.getId(), moments.getId(), weShortLinkPromotion.getType(), Date.from(taskEndTime.atZone(ZoneId.systemDefault()).toInstant()));
         });
-
 
     }
 
@@ -290,17 +319,17 @@ public class MomentsPromotion extends PromotionType {
         });
     }
 
-    @Override
-    protected void timingEnd(Long promotionId, Long businessId, Integer type, Date taskEndTime) {
-        WeShortLinkPromotionTaskEndQuery query = new WeShortLinkPromotionTaskEndQuery();
-        query.setPromotionId(promotionId);
-        query.setBusinessId(businessId);
-        query.setType(type);
-        long diffTime = DateUtils.diffTime(taskEndTime, new Date());
-        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeDelayGroupMsgEndRk(), JSONObject.toJSONString(query), message -> {
-            //注意这里时间可使用long类型,毫秒单位，设置header
-            message.getMessageProperties().setHeader("x-delay", diffTime);
-            return message;
-        });
-    }
+//    @Override
+//    protected void timingEnd(Long promotionId, Long businessId, Integer type, Date taskEndTime) {
+//        WeShortLinkPromotionTaskEndQuery query = new WeShortLinkPromotionTaskEndQuery();
+//        query.setPromotionId(promotionId);
+//        query.setBusinessId(businessId);
+//        query.setType(type);
+//        long diffTime = DateUtils.diffTime(taskEndTime, new Date());
+//        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeDelayGroupMsgEndRk(), JSONObject.toJSONString(query), message -> {
+//            //注意这里时间可使用long类型,毫秒单位，设置header
+//            message.getMessageProperties().setHeader("x-delay", diffTime);
+//            return message;
+//        });
+//    }
 }

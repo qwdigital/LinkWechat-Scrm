@@ -75,19 +75,16 @@ public class WeConstans {
     public static final Integer WE_SUCCESS_CODE = 0;
 
 
-
     /**
      * 同步功能提示语
      */
     public static final String SYNCH_TIP = "后台开始同步数据，请稍后关注进度";
 
 
-
     /**
      * 单人活码
      */
     public static final Integer SINGLE_EMPLE_CODE_TYPE = 1;
-
 
 
     /**
@@ -115,7 +112,6 @@ public class WeConstans {
      */
     public static final String DEL_FOLLOW_USER_SWITCH_CLOSE = "0";
     public static final String DEL_FOLLOW_USER_SWITCH_OPEN = "1";
-
 
 
     /**
@@ -156,27 +152,25 @@ public class WeConstans {
     /**
      * 门店活码前缀
      */
-    public static final String WE_STORE_CODE_PREFIX="we_sc";
+    public static final String WE_STORE_CODE_PREFIX = "we_sc";
 
 
     /**
      * 门店导购员或群前缀
      */
-    public static final String WE_STORE_CODE_CONFIG_PREFIX="we_sc_conf";
+    public static final String WE_STORE_CODE_CONFIG_PREFIX = "we_sc_conf";
 
 
     /**
      * 识客码前缀
      */
-    public static final String WE_KNOW_CUSTOMER_CODE_PREFIX="we_kn_code";
+    public static final String WE_KNOW_CUSTOMER_CODE_PREFIX = "we_kn_code";
 
 
     /**
      * 新客拉群
      */
     public static final String WE_QR_XKLQ_PREFIX = "we_xklq";
-
-
 
 
     /**
@@ -187,17 +181,16 @@ public class WeConstans {
     /**
      * 二维码地址
      */
-    public static final String JOINCORPQR="joinCorpQr";
+    public static final String JOINCORPQR = "joinCorpQr";
 
     /**
      * 二维码有效时间（默认6天）
      */
-    public static final Integer JOINCORPQR_EFFETC_TIME=8640;
-
+    public static final Integer JOINCORPQR_EFFETC_TIME = 8640;
 
 
     //短链统计缓存key值前缀
-    public static final String  WE_SHORT_LINK_KEY = "we_short_link:statistics:";
+    public static final String WE_SHORT_LINK_KEY = "we_short_link:statistics:";
 
     /**
      * 短链缓存命名空间
@@ -213,4 +206,9 @@ public class WeConstans {
      * 短链缓存命名空间
      */
     public static final String OPEN_APPLET = "open:";
+
+    /**
+     * 短链推广统计缓存key前缀
+     */
+    public static final String WE_SHORT_LINK_PROMOTION_KEY = "we_short_link_promotion:statistics:";
 }

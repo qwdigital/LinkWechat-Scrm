@@ -63,7 +63,7 @@ public interface IWeShortLinkPromotionService extends IService<WeShortLinkPromot
      * @author WangYX
      * @date 2023/03/09 14:12
      */
-    void edit(WeShortLinkPromotionUpdateQuery query);
+    void edit(WeShortLinkPromotionUpdateQuery query) throws IOException;
 
     /**
      * 详情
