@@ -558,7 +558,7 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
         List<WeLxQrCodeLog> logList = weLxQrCodeLogService.list(new LambdaQueryWrapper<WeLxQrCodeLog>()
                 .eq(WeLxQrCodeLog::getId, query.getQrId())
                 .ge(Objects.nonNull(query.getBeginTime()), BaseEntity::getCreateTime, DateUtil.formatDate(query.getBeginTime()))
-                .ge(Objects.nonNull(query.getEndTime()), BaseEntity::getEndTime, DateUtil.formatDate(query.getEndTime()))
+                .le(Objects.nonNull(query.getEndTime()), BaseEntity::getCreateTime, DateUtil.formatDate(query.getEndTime()))
                 .eq(WeLxQrCodeLog::getDelFlag, 0));
 
         Map<String, Long> dateMap = logList.parallelStream().collect(Collectors.groupingBy(item -> DateUtil.formatDate(item.getCreateTime()), Collectors.counting()));
@@ -589,7 +589,7 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
         List<WeLxQrCodeLog> logList = weLxQrCodeLogService.list(new LambdaQueryWrapper<WeLxQrCodeLog>()
                 .eq(WeLxQrCodeLog::getId, query.getQrId())
                 .ge(Objects.nonNull(query.getBeginTime()), BaseEntity::getCreateTime, DateUtil.formatDate(query.getBeginTime()))
-                .ge(Objects.nonNull(query.getEndTime()), BaseEntity::getEndTime, DateUtil.formatDate(query.getEndTime()))
+                .le(Objects.nonNull(query.getEndTime()), BaseEntity::getCreateTime, DateUtil.formatDate(query.getEndTime()))
                 .eq(WeLxQrCodeLog::getDelFlag, 0));
 
         Map<String, Integer> amountMap = logList.parallelStream().collect(Collectors.groupingBy(item -> DateUtil.formatDate(item.getCreateTime()), Collectors.summingInt(WeLxQrCodeLog::getAmount)));
