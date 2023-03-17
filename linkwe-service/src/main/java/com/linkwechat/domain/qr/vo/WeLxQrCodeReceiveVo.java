@@ -22,6 +22,12 @@ public class WeLxQrCodeReceiveVo {
     @ApiModelProperty("今日红包领取数")
     private Integer todayNum = 0;
 
+    @ApiModelProperty("今日红包领取数差值")
+    private Integer todayNumDiff = 0;
+
     @ApiModelProperty("今日红包领取金额(元)")
     private String todayAmount = "0";
+
+    @ApiModelProperty("今日红包领取金额差值")
+    private String todayAmountDiff = "0";
 }
