@@ -1,7 +1,7 @@
 package com.linkwechat.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.linkwechat.domain.fission.WeFissionDetail;
+import com.linkwechat.domain.fission.WeFissionNotice;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Param;
 * @createDate 2023-03-14 14:07:21
 * @Entity com.linkwechat.WeFissionDetail
 */
-public interface WeFissionDetailMapper extends BaseMapper<WeFissionDetail> {
+public interface WeFissionNoticeMapper extends BaseMapper<WeFissionNotice> {
 
     void physicalDelete(@Param("fissionId") Long fissionId);
 }

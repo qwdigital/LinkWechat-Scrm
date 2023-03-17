@@ -2,7 +2,6 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.config.LinkWeChatConfig;
@@ -15,12 +14,10 @@ import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeGroup;
-import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.fission.WeFission;
-import com.linkwechat.domain.fission.WeFissionDetail;
+import com.linkwechat.domain.fission.WeFissionNotice;
 import com.linkwechat.domain.fission.WeFissionInviterPoster;
 import com.linkwechat.domain.fission.vo.*;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
@@ -28,9 +25,7 @@ import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.media.WeMessageTemplate;
-import com.linkwechat.domain.sop.dto.WeSopPushTaskDto;
 import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
-import com.linkwechat.domain.user.vo.WeUserScreenConditVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.fegin.QwSysUserClient;
@@ -44,7 +39,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -60,7 +54,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
     private IWeFissionInviterPosterService iWeFissionInviterPosterService;
 
     @Autowired
-    private IWeFissionDetailService iWeFissionDetailService;
+    private IWeFissionNoticeService iWeFissionNoticeService;
 
     @Autowired
     private IWeCustomerService iWeCustomerService;
@@ -114,7 +108,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
         if(this.saveOrUpdate(weFission)){
 
             //裂变消息入库
-            List<WeFissionDetail> weFissionDetails=new ArrayList<>();
+            List<WeFissionNotice> weFissionNotices =new ArrayList<>();
 
             WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
             messageQuery.setIsAll(false);
@@ -162,7 +156,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                                                .build()
                                );
                                v.stream().forEach(kk->{
-                                   weFissionDetails.add(WeFissionDetail.builder()
+                                   weFissionNotices.add(WeFissionNotice.builder()
                                            .fissionId(weFission.getId())
                                            .targetId(kk.getExternalUserid())
                                            .targetType(1)
@@ -183,7 +177,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                 if(CollectionUtil.isNotEmpty(weGroups)){
                     weGroups.stream().forEach(weGroup -> {
 
-                        weFissionDetails.add(WeFissionDetail.builder()
+                        weFissionNotices.add(WeFissionNotice.builder()
                                 .fissionId(weFission.getId())
                                 .targetId(weGroup.getChatId())
                                 .targetType(2)
@@ -204,8 +198,8 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
             }
 
             //删除以前的
-            iWeFissionDetailService.physicalDelete(weFission.getId());
-            iWeFissionDetailService.saveBatch(weFissionDetails);
+            iWeFissionNoticeService.physicalDelete(weFission.getId());
+            iWeFissionNoticeService.saveBatch(weFissionNotices);
             //通知员工群发
             iWeMessagePushService.officialPushMessage(messageQuery);
         }

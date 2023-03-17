@@ -1,7 +1,7 @@
 package com.linkwechat.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.linkwechat.domain.fission.WeFissionDetailSub;
+import com.linkwechat.domain.fission.WeFissionInviterRecordSub;
 
 /**
 * @author robin
@@ -9,7 +9,7 @@ import com.linkwechat.domain.fission.WeFissionDetailSub;
 * @createDate 2023-03-14 14:07:21
 * @Entity com.linkwechat.WeFissionDetailSub
 */
-public interface WeFissionDetailSubMapper extends BaseMapper<WeFissionDetailSub> {
+public interface WeFissionInviterRecordSubMapper extends BaseMapper<WeFissionInviterRecordSub> {
 
 }
 

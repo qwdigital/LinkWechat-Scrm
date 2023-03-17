@@ -13,11 +13,11 @@ import lombok.NoArgsConstructor;
  * @TableName we_fission_detail
  */
 @Data
-@TableName(value ="we_fission_detail")
+@TableName(value ="we_fission_notice")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WeFissionDetail extends BaseEntity {
+public class WeFissionNotice extends BaseEntity {
     /**
      * 主键
      */
@@ -44,10 +44,6 @@ public class WeFissionDetail extends BaseEntity {
      */
     private String sendWeUserid;
 
-    /**
-     * 裂变状态: 1:已完成 2: 未完成
-     */
-    private Integer fissionState;
 
     /**
      * 消息id

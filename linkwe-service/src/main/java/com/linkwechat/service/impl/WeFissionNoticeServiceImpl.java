@@ -1,9 +1,9 @@
 package com.linkwechat.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.linkwechat.domain.fission.WeFissionDetail;
-import com.linkwechat.service.IWeFissionDetailService;
-import com.linkwechat.mapper.WeFissionDetailMapper;
+import com.linkwechat.domain.fission.WeFissionNotice;
+import com.linkwechat.service.IWeFissionNoticeService;
+import com.linkwechat.mapper.WeFissionNoticeMapper;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 * @createDate 2023-03-14 14:07:21
 */
 @Service
-public class WeFissionDetailServiceImpl extends ServiceImpl<WeFissionDetailMapper, WeFissionDetail>
-    implements IWeFissionDetailService {
+public class WeFissionNoticeServiceImpl extends ServiceImpl<WeFissionNoticeMapper, WeFissionNotice>
+    implements IWeFissionNoticeService {
 
     @Override
     public void physicalDelete(Long fissionId) {

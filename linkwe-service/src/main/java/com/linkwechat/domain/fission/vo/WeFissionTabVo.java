@@ -6,7 +6,7 @@ import lombok.Data;
 public class WeFissionTabVo {
 
     /**
-     * 员工邀请老客总数
+     * 员工邀请老客或客群总数
      */
     private  Integer inviterOldCustomerNum;
 

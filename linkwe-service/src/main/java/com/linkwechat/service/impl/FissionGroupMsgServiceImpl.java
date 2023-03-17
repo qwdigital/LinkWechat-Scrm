@@ -7,11 +7,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.domain.model.LoginUser;
-import com.linkwechat.domain.fission.WeFissionDetail;
+import com.linkwechat.domain.fission.WeFissionNotice;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.service.AbstractGroupMsgSendTaskService;
-import com.linkwechat.service.IWeFissionDetailService;
+import com.linkwechat.service.IWeFissionNoticeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ import java.util.List;
 public class FissionGroupMsgServiceImpl  extends AbstractGroupMsgSendTaskService {
 
     @Autowired
-    private IWeFissionDetailService iWeFissionDetailService;
+    private IWeFissionNoticeService iWeFissionNoticeService;
 
 
     @Override
@@ -43,11 +43,11 @@ public class FissionGroupMsgServiceImpl  extends AbstractGroupMsgSendTaskService
                 WeAddCustomerMsgVo weAddCustomerMsgVo = sendSpecGroupMsgTemplate(query, senderInfo);
 
                  if (weAddCustomerMsgVo != null && ObjectUtil.equal(WeConstans.WE_SUCCESS_CODE, weAddCustomerMsgVo.getErrCode())) {
-                     iWeFissionDetailService.update(WeFissionDetail.builder().msgId(weAddCustomerMsgVo.getMsgId()).build(),
+                     iWeFissionNoticeService.update(WeFissionNotice.builder().msgId(weAddCustomerMsgVo.getMsgId()).build(),
 
-                             new LambdaQueryWrapper<WeFissionDetail>()
-                                     .eq(WeFissionDetail::getFissionId,query.getBusinessIds())
-                                     .in(WeFissionDetail::getSendWeUserid, ListUtil.toList(senderInfo.getUserId().split(","))));
+                             new LambdaQueryWrapper<WeFissionNotice>()
+                                     .eq(WeFissionNotice::getFissionId,query.getBusinessIds())
+                                     .in(WeFissionNotice::getSendWeUserid, ListUtil.toList(senderInfo.getUserId().split(","))));
 
                  }
 

@@ -50,7 +50,7 @@ public class WeFissionController  extends BaseController {
     @PostMapping("/add")
     public AjaxResult add(@RequestBody WeFission weFission){
 
-        iWeFissionService.save(weFission);
+        iWeFissionService.buildWeFission(weFission);
         return AjaxResult.success();
     }
 
