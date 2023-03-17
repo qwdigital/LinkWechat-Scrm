@@ -3,6 +3,7 @@ package com.linkwechat.domain.shortlink.vo;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import io.swagger.annotations.ApiModel;
@@ -78,12 +79,14 @@ public class WeShortLinkPromotionTemplateGroupVo {
      * 定时发送时间
      */
     @ApiModelProperty(value = "定时发送时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime taskSendTime;
 
     /**
      * 结束时间
      */
     @ApiModelProperty(value = "结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime taskEndTime;
 
 }

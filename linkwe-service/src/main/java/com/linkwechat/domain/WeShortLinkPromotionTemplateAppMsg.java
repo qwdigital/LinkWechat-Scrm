@@ -42,12 +42,6 @@ public class WeShortLinkPromotionTemplateAppMsg extends BaseEntity {
     private Long promotionId;
 
     /**
-     * 应用消息发送类型 0成员 1部门或岗位
-     */
-    @ApiModelProperty(value = "应用消息发送类型 0成员 1部门或岗位")
-    private Integer sendScope;
-
-    /**
      * 员工Id，多个逗号分隔
      */
     @ApiModelProperty(value = "员工Id，多个逗号分隔")

@@ -47,7 +47,7 @@ public class WeShortLinkPromotionDayStat extends BaseEntity {
      * 统计日期
      */
     @ApiModelProperty(value = "统计日期")
-    private LocalDateTime statDay;
+    private String statDay;
 
     /**
      * 访问总数

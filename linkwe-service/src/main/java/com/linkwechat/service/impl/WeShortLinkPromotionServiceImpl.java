@@ -2,17 +2,12 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.qrcode.QrCodeUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.core.domain.AjaxResult;
-import com.linkwechat.common.core.domain.FileEntity;
 import com.linkwechat.common.exception.ServiceException;
-import com.linkwechat.common.utils.Base62NumUtil;
 import com.linkwechat.domain.*;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.media.WeMessageTemplate;
@@ -31,21 +26,11 @@ import com.linkwechat.service.*;
 import com.linkwechat.service.impl.strategic.shortlink.MomentsPromotion;
 import com.linkwechat.service.impl.strategic.shortlink.PromotionType;
 import com.linkwechat.service.impl.strategic.shortlink.ShortLinkPromotionStrategyFactory;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -288,11 +273,12 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
         queryWrapper.eq(WeShortLinkPromotionTemplateMoments::getDelFlag, 0);
         WeShortLinkPromotionTemplateMoments one = weShortLinkPromotionTemplateMomentsService.getOne(queryWrapper);
         Optional.ofNullable(one).ifPresent(i -> {
-            WeShortLinkPromotionTemplateMomentsVo vo = BeanUtil.copyProperties(one, WeShortLinkPromotionTemplateMomentsVo.class);
+            WeShortLinkPromotionTemplateMomentsVo vo = BeanUtil.copyProperties(i, WeShortLinkPromotionTemplateMomentsVo.class);
+            vo.setType(i.getScopeType());
             //群发朋友圈分类 0全部客户 1部分客户
             if (vo.getScopeType().equals(1)) {
                 SysUserQuery sysUserQuery = new SysUserQuery();
-                List<String> list = Arrays.asList(one.getUserIds().split(","));
+                List<String> list = Arrays.asList(i.getUserIds().split(","));
                 sysUserQuery.setWeUserIds(list);
                 AjaxResult<List<SysUserVo>> weUsersResult = qwSysUserClient.getUserListByWeUserIds(sysUserQuery);
                 if (weUsersResult.getCode() == 200) {
@@ -303,10 +289,10 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
                 }
             }
             //标签
-            if (StrUtil.isNotBlank(one.getLabelIds())) {
+            if (StrUtil.isNotBlank(i.getLabelIds())) {
                 LambdaQueryWrapper<WeTag> tagQueryWrapper = Wrappers.lambdaQuery();
                 tagQueryWrapper.eq(WeTag::getDelFlag, 0);
-                tagQueryWrapper.in(WeTag::getTagId, one.getLabelIds().split(","));
+                tagQueryWrapper.in(WeTag::getTagId, i.getLabelIds().split(","));
                 List<WeTag> list = weTagService.list(tagQueryWrapper);
                 Map<String, String> map = new HashMap<>(list.size());
                 list.stream().forEach(o -> map.put(o.getTagId(), o.getName()));
@@ -329,16 +315,17 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
         WeShortLinkPromotionTemplateAppMsg one = weShortLinkPromotionTemplateAppMsgService.getOne(queryWrapper);
         Optional.ofNullable(one).ifPresent(i -> {
             WeShortLinkPromotionTemplateAppMsgVo vo = BeanUtil.copyProperties(one, WeShortLinkPromotionTemplateAppMsgVo.class);
-            //应用消息发送类型 0成员 1部门或岗位
-            if (vo.getSendScope().equals(0)) {
-                String userIds = one.getUserIds();
+            String userIds = one.getUserIds();
+            Optional.ofNullable(userIds).ifPresent(u -> {
                 WeSopExecuteUserConditVo.ExecuteUserCondit user = new WeSopExecuteUserConditVo.ExecuteUserCondit();
                 user.setChange(true);
-                user.setWeUserIds(Arrays.asList(userIds.split(",")));
+                user.setWeUserIds(Arrays.asList(u.split(",")));
                 vo.setExecuteUserCondit(user);
-            } else if (vo.getSendScope().equals(1)) {
-                String deptIds = one.getDeptIds();
-                String postIds = one.getPostIds();
+            });
+
+            String deptIds = one.getDeptIds();
+            String postIds = one.getPostIds();
+            if (deptIds != null || postIds != null) {
                 WeSopExecuteUserConditVo.ExecuteDeptCondit dept = new WeSopExecuteUserConditVo.ExecuteDeptCondit();
                 dept.setChange(true);
                 if (StrUtil.isNotBlank(deptIds)) {

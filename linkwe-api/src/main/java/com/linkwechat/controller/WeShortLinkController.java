@@ -81,7 +81,7 @@ public class WeShortLinkController extends BaseController {
 
     @ApiOperation(value = "通过短链接获取短链详情", httpMethod = "GET")
     @Log(title = "短链详情", businessType = BusinessType.SELECT)
-    @GetMapping("/getByShort/{shortUrl}")
+    @GetMapping("/getByShort/{shortUrl}/{promotionId}")
     public AjaxResult<WeShortLinkVo> getShortLinkInfo(@PathVariable("shortUrl") String shortUrl) {
         long id = Base62NumUtil.decode(shortUrl);
         WeShortLinkVo result = weShortLinkService.getShortLinkInfo(id);

@@ -38,12 +38,6 @@ public class WeShortLinkPromotionTemplateAppMsgUpdateQuery {
     private Long promotionId;
 
     /**
-     * 应用消息发送类型 0成员 1部门或岗位
-     */
-    @ApiModelProperty(value = " 应用消息发送类型 0成员 1部门或岗位")
-    private Integer sendScope;
-
-    /**
      * 执行员工
      */
     @ApiModelProperty(value = "执行员工")

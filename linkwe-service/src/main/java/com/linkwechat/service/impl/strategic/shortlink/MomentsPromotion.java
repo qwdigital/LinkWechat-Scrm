@@ -60,6 +60,7 @@ public class MomentsPromotion extends PromotionType {
     public Long saveAndSend(WeShortLinkPromotionAddQuery query, WeShortLinkPromotion weShortLinkPromotion) throws IOException {
 
         WeShortLinkPromotionTemplateMomentsAddQuery momentsAddQuery = query.getMoments();
+        momentsAddQuery.setScopeType(momentsAddQuery.getType());
 
         //1.保存短链推广
         //发送类型：0立即发送 1定时发送
@@ -146,6 +147,8 @@ public class MomentsPromotion extends PromotionType {
     public void updateAndSend(WeShortLinkPromotionUpdateQuery query, WeShortLinkPromotion weShortLinkPromotion) throws IOException {
         //1.更新短链推广
         WeShortLinkPromotionTemplateMomentsUpdateQuery momentsUpdateQuery = query.getMoments();
+        momentsUpdateQuery.setScopeType(momentsUpdateQuery.getType());
+
         //发送类型：0立即发送 1定时发送
         Integer sendType = momentsUpdateQuery.getSendType();
         if (sendType.equals(0)) {

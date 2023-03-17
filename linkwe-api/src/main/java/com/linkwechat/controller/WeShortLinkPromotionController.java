@@ -126,8 +126,14 @@ public class WeShortLinkPromotionController extends BaseController {
     @ApiOperation(value = "修改", httpMethod = "PUT")
     @PutMapping("/edit")
     public AjaxResult edit(@Validated @RequestBody WeShortLinkPromotionUpdateQuery query) {
-        weShortLinkPromotionService.edit(query);
-        return AjaxResult.success();
+        try {
+            weShortLinkPromotionService.edit(query);
+            return AjaxResult.success();
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.error("修改短链推广失败：{}", e.getMessage());
+            return AjaxResult.error();
+        }
     }
 
     /**

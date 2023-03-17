@@ -35,6 +35,12 @@ public class WeShortLinkPromotionTemplateMomentsUpdateQuery {
      * 群发朋友圈分类 0全部客户 1部分客户
      */
     @ApiModelProperty(value = "群发朋友圈分类 0全部客户 1部分客户")
+    private Integer type;
+
+    /**
+     * 群发朋友圈分类 0全部客户 1部分客户
+     */
+    @ApiModelProperty(value = "群发朋友圈分类 0全部客户 1部分客户")
     private Integer scopeType;
 
     /**
