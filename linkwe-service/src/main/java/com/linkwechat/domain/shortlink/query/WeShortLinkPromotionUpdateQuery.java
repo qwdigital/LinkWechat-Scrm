@@ -82,7 +82,7 @@ public class WeShortLinkPromotionUpdateQuery {
 
     @ApiModelProperty("附件列表")
     @Size(max = 8)
-    private List<WeMessageTemplate> attachmentsList;
+    private List<WeMessageTemplate> attachments;
 
     /**
      * 指定接收消息的成员及对应客户列表

@@ -105,13 +105,13 @@ public class MomentsPromotion extends PromotionType {
         });
 
         if (sendType.equals(0)) {
-            directSend(weShortLinkPromotion.getId(), moments.getId(), momentsAddQuery.getContent(), query.getAttachmentsList(), senderInfos, momentsAddQuery.getLabelIds());
+            directSend(weShortLinkPromotion.getId(), moments.getId(), momentsAddQuery.getContent(), query.getAttachments(), senderInfos, momentsAddQuery.getLabelIds());
         } else {
             timingSend(weShortLinkPromotion.getId(),
                     moments.getId(),
                     momentsAddQuery.getContent(),
                     Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()),
-                    query.getAttachmentsList(),
+                    query.getAttachments(),
                     senderInfos,
                     momentsAddQuery.getLabelIds()
             );
@@ -189,13 +189,13 @@ public class MomentsPromotion extends PromotionType {
         });
 
         if (sendType.equals(0)) {
-            directSend(weShortLinkPromotion.getId(), moments.getId(), momentsUpdateQuery.getContent(), query.getAttachmentsList(), senderInfos, momentsUpdateQuery.getLabelIds());
+            directSend(weShortLinkPromotion.getId(), moments.getId(), momentsUpdateQuery.getContent(), query.getAttachments(), senderInfos, momentsUpdateQuery.getLabelIds());
         } else {
             timingSend(weShortLinkPromotion.getId(),
                     moments.getId(),
                     momentsUpdateQuery.getContent(),
                     Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()),
-                    query.getAttachmentsList(),
+                    query.getAttachments(),
                     senderInfos,
                     momentsUpdateQuery.getLabelIds()
             );

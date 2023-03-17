@@ -90,7 +90,7 @@ public class ClientPromotion extends PromotionType {
         weShortLinkPromotionTemplateClientMapper.insert(client);
 
         //保存附件
-        Optional.ofNullable(query.getAttachmentsList()).ifPresent(attachments -> {
+        Optional.ofNullable(query.getAttachments()).ifPresent(attachments -> {
             List<WeShortLinkPromotionAttachment> collect = attachments.stream().map(attachment -> {
                 WeShortLinkPromotionAttachment weShortLinkPromotionAttachment = BeanUtil.copyProperties(attachment, WeShortLinkPromotionAttachment.class);
                 //附件所属类型：0群发客户 1群发客群 2朋友圈
@@ -140,10 +140,10 @@ public class ClientPromotion extends PromotionType {
         //mq执行推送消息给员工
         if (sendType.equals(0)) {
             //任务状态: 0待推广 1推广中 2已结束
-            directSend(weShortLinkPromotion.getId(), client.getId(), clientAddQuery.getContent(), query.getAttachmentsList(), query.getSenderList());
+            directSend(weShortLinkPromotion.getId(), client.getId(), clientAddQuery.getContent(), query.getAttachments(), query.getSenderList());
         } else {
             //定时发送
-            timingSend(weShortLinkPromotion.getId(), client.getId(), clientAddQuery.getContent(), Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()), query.getAttachmentsList(), query.getSenderList());
+            timingSend(weShortLinkPromotion.getId(), client.getId(), clientAddQuery.getContent(), Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()), query.getAttachments(), query.getSenderList());
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
@@ -196,7 +196,7 @@ public class ClientPromotion extends PromotionType {
         attachmentUpdateWrapper.set(WeShortLinkPromotionAttachment::getDelFlag, 1);
         weShortLinkPromotionAttachmentService.update(attachmentUpdateWrapper);
         //保存附件
-        Optional.ofNullable(query.getAttachmentsList()).ifPresent(attachments -> {
+        Optional.ofNullable(query.getAttachments()).ifPresent(attachments -> {
             List<WeShortLinkPromotionAttachment> collect = attachments.stream().map(attachment -> {
                 WeShortLinkPromotionAttachment weShortLinkPromotionAttachment = BeanUtil.copyProperties(attachment, WeShortLinkPromotionAttachment.class);
                 //附件所属类型：0群发客户 1群发客群 2朋友圈
@@ -257,10 +257,10 @@ public class ClientPromotion extends PromotionType {
         //mq执行推送消息给员工
         if (sendType.equals(0)) {
             //任务状态: 0待推广 1推广中 2已结束
-            directSend(weShortLinkPromotion.getId(), client.getId(), clientUpdateQuery.getContent(), query.getAttachmentsList(), query.getSenderList());
+            directSend(weShortLinkPromotion.getId(), client.getId(), clientUpdateQuery.getContent(), query.getAttachments(), query.getSenderList());
         } else {
             //定时发送
-            timingSend(weShortLinkPromotion.getId(), client.getId(), clientUpdateQuery.getContent(), Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()), query.getAttachmentsList(), query.getSenderList());
+            timingSend(weShortLinkPromotion.getId(), client.getId(), clientUpdateQuery.getContent(), Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()), query.getAttachments(), query.getSenderList());
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {

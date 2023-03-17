@@ -99,7 +99,7 @@ public class GroupPromotion extends PromotionType {
         weShortLinkUserPromotionTaskService.saveBatch(list);
 
         //4.保存短链推广附件
-        Optional.ofNullable(query.getAttachmentsList()).ifPresent(attachments -> {
+        Optional.ofNullable(query.getAttachments()).ifPresent(attachments -> {
             List<WeShortLinkPromotionAttachment> collect = attachments.stream().map(attachment -> {
                 WeShortLinkPromotionAttachment weShortLinkPromotionAttachment = BeanUtil.copyProperties(attachment, WeShortLinkPromotionAttachment.class);
                 //附件所属类型：0群发客户 1群发客群 2朋友圈
@@ -135,14 +135,14 @@ public class GroupPromotion extends PromotionType {
             directSend(weShortLinkPromotion.getId(),
                     templateGroup.getId(),
                     templateGroup.getContent(),
-                    query.getAttachmentsList(),
+                    query.getAttachments(),
                     query.getSenderList());
         } else {
             timingSend(weShortLinkPromotion.getId(),
                     templateGroup.getId(),
                     templateGroup.getContent(),
                     Date.from(templateGroup.getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()),
-                    query.getAttachmentsList(),
+                    query.getAttachments(),
                     query.getSenderList());
         }
         //任务结束时间
@@ -216,7 +216,7 @@ public class GroupPromotion extends PromotionType {
         attachmentUpdateWrapper.eq(WeShortLinkPromotionAttachment::getTemplateType, 1);
         attachmentUpdateWrapper.set(WeShortLinkPromotionAttachment::getDelFlag, 1);
         weShortLinkPromotionAttachmentService.update(attachmentUpdateWrapper);
-        Optional.ofNullable(query.getAttachmentsList()).ifPresent(attachments -> {
+        Optional.ofNullable(query.getAttachments()).ifPresent(attachments -> {
             List<WeShortLinkPromotionAttachment> collect = attachments.stream().map(attachment -> {
                 WeShortLinkPromotionAttachment weShortLinkPromotionAttachment = BeanUtil.copyProperties(attachment, WeShortLinkPromotionAttachment.class);
                 //附件所属类型：0群发客户 1群发客群 2朋友圈
@@ -257,14 +257,14 @@ public class GroupPromotion extends PromotionType {
             directSend(weShortLinkPromotion.getId(),
                     templateGroup.getId(),
                     templateGroup.getContent(),
-                    query.getAttachmentsList(),
+                    query.getAttachments(),
                     query.getSenderList());
         } else {
             timingSend(weShortLinkPromotion.getId(),
                     templateGroup.getId(),
                     templateGroup.getContent(),
                     Date.from(templateGroup.getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()),
-                    query.getAttachmentsList(),
+                    query.getAttachments(),
                     query.getSenderList());
         }
         //任务结束时间

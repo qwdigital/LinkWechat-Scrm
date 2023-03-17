@@ -104,9 +104,9 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
         WeMessageTemplate weMessageTemplate = getPromotionUrl(query.getShortLinkId(), query.getStyle(), query.getMaterialId());
         weShortLinkPromotion.setUrl(weMessageTemplate.getPicUrl());
         //添加推广附件
-        List<WeMessageTemplate> weMessageTemplates = Optional.ofNullable(query.getAttachmentsList()).orElse(new ArrayList<>());
+        List<WeMessageTemplate> weMessageTemplates = Optional.ofNullable(query.getAttachments()).orElse(new ArrayList<>());
         weMessageTemplates.add(weMessageTemplate);
-        query.setAttachmentsList(weMessageTemplates);
+        query.setAttachments(weMessageTemplates);
         //保存和发送
         PromotionType promotionType = ShortLinkPromotionStrategyFactory.getPromotionType(query.getType());
         Long id = promotionType.saveAndSend(query, weShortLinkPromotion);
@@ -142,7 +142,10 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
                 WeMessageTemplate weMessageTemplate = getPromotionUrl(query.getShortLinkId(), query.getStyle(), query.getMaterialId());
                 weShortLinkPromotionTemp.setUrl(weMessageTemplate.getPicUrl());
                 //添加推广附件
-                List<WeMessageTemplate> attachmentsList = query.getAttachmentsList();
+                List<WeMessageTemplate> weMessageTemplates = Optional.ofNullable(query.getAttachments()).orElse(new ArrayList<>());
+                weMessageTemplates.add(weMessageTemplate);
+                query.setAttachments(weMessageTemplates);
+                List<WeMessageTemplate> attachmentsList = query.getAttachments();
                 attachmentsList.add(weMessageTemplate);
             } catch (IOException e) {
                 e.printStackTrace();

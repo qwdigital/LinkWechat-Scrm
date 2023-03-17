@@ -139,10 +139,10 @@ public class AppMsgPromotion extends PromotionType {
         }
         if (sendType.equals(0)) {
             //立即发送
-            directSend(weShortLinkPromotion.getId(), appMsg.getId(), content, query.getAttachmentsList(), null, appMsgAddQuery.getSendScope(), ids, postIds);
+            directSend(weShortLinkPromotion.getId(), appMsg.getId(), content, query.getAttachments(), null, appMsgAddQuery.getSendScope(), ids, postIds);
         } else {
             //定时发送
-            timingSend(weShortLinkPromotion.getId(), appMsg.getId(), content, Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()), query.getAttachmentsList(), null, appMsgAddQuery.getSendScope(), ids, postIds);
+            timingSend(weShortLinkPromotion.getId(), appMsg.getId(), content, Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()), query.getAttachments(), null, appMsgAddQuery.getSendScope(), ids, postIds);
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
@@ -226,10 +226,10 @@ public class AppMsgPromotion extends PromotionType {
         }
         if (sendType.equals(0)) {
             //立即发送
-            directSend(weShortLinkPromotion.getId(), appMsg.getId(), content, query.getAttachmentsList(), null, appMsgUpdateQuery.getSendScope(), ids, postIds);
+            directSend(weShortLinkPromotion.getId(), appMsg.getId(), content, query.getAttachments(), null, appMsgUpdateQuery.getSendScope(), ids, postIds);
         } else {
             //定时发送
-            timingSend(weShortLinkPromotion.getId(), appMsg.getId(), content, Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()), query.getAttachmentsList(), null, appMsgUpdateQuery.getSendScope(), ids, postIds);
+            timingSend(weShortLinkPromotion.getId(), appMsg.getId(), content, Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()), query.getAttachments(), null, appMsgUpdateQuery.getSendScope(), ids, postIds);
         }
         //任务结束时间
         Optional.ofNullable(taskEndTime).ifPresent(o -> {
