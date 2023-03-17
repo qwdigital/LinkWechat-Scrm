@@ -216,6 +216,7 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
     private WeMessageTemplate getPromotionUrl(Long shortLinkId, Integer style, Long materialId) throws IOException {
         //获取短链
         String encode = Base62NumUtil.encode(shortLinkId);
+
         //TODO 这里要加上任务Id
         String shortLinkUrl = linkWeChatConfig.getShortLinkDomainName() + encode;
 

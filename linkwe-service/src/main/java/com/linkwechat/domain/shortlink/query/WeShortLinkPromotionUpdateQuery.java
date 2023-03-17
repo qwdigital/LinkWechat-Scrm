@@ -87,7 +87,6 @@ public class WeShortLinkPromotionUpdateQuery {
     /**
      * 指定接收消息的成员及对应客户列表
      */
-    @Size(min = 1)
     @ApiModelProperty("指定接收消息的成员及对应客户列表")
     private List<WeAddGroupMessageQuery.SenderInfo> senderList;
 

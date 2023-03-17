@@ -43,9 +43,12 @@
         p.task_end_time,
         p.create_by,
         p.update_time,
-        (select sum(pv_num) from we_short_link_promotion_day_stat d1 where d1.promotion_id = p.id and d1.del_flag = 0) as pv_num,
-        (select sum(uv_num) from we_short_link_promotion_day_stat d2 where d2.promotion_id = p.id and d2.del_flag = 0) as uv_num,
-        (select sum(open_num) from we_short_link_promotion_day_stat d3 where d3.promotion_id = p.id and d3.del_flag = 0) as open_num
+        (select sum(pv_num) from we_short_link_promotion_day_stat d1 where d1.promotion_id = p.id and d1.del_flag = 0)
+        as pv_num,
+        (select sum(uv_num) from we_short_link_promotion_day_stat d2 where d2.promotion_id = p.id and d2.del_flag = 0)
+        as uv_num,
+        (select sum(open_num) from we_short_link_promotion_day_stat d3 where d3.promotion_id = p.id and d3.del_flag = 0)
+        as open_num
         FROM we_short_link_promotion p
         <if test="shortLinkName!=null and shortLinkName!=''">
             LEFT JOIN we_short_link sl on p.short_link_id = sl.id
@@ -68,8 +71,7 @@
                 and sl.short_link_name like concat("%",#{shortLinkName},"%")
             </if>
         </where>
-
-
+        order by create_time desc
     </select>
 
 </mapper>
