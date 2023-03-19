@@ -32,7 +32,7 @@ public interface IWeShortLinkService extends IService<WeShortLink> {
 
     PageInfo<WeShortLinkListVo> getShortLinkList(WeShortLinkQuery query);
 
-    JSONObject getShort2LongUrl(String shortUrl);
+    JSONObject getShort2LongUrl(String shortUrl, String promotionIdKey);
 
     WeShortLinkStatisticsVo getDataStatistics(WeShortLinkStatisticQuery query);
 

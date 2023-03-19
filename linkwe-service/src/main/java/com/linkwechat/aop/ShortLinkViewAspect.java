@@ -65,9 +65,9 @@ public class ShortLinkViewAspect {
             //短链推广统计
             if (StrUtil.isNotBlank(shortPromotionId)) {
                 // 缓存 PV
-                redisService.increment(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.PV + shortUrl);
+                redisService.increment(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.PV + shortPromotionId);
                 // 缓存 UV
-                redisService.hyperLogLogAdd(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.UV + shortUrl, IpUtils.getIpAddr(servletRequest()));
+                redisService.hyperLogLogAdd(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.UV + shortPromotionId, IpUtils.getIpAddr(servletRequest()));
             }
         } catch (Exception e) {
             log.error("shortLinkViewAspect 切面异常：", e);

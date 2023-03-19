@@ -2,24 +2,16 @@ package com.linkwechat.controller;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
-import cn.hutool.core.net.Ipv4Util;
-import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.nacos.common.utils.IPUtil;
-import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.annotation.ShortLinkView;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.redis.RedisService;
-import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.exception.wecom.WeComException;
-import com.linkwechat.common.utils.Base62NumUtil;
-import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.ip.IpUtils;
 import com.linkwechat.domain.index.vo.WeIndexVo;
 import com.linkwechat.domain.operation.vo.WeCustomerAnalysisVo;
 import com.linkwechat.domain.operation.vo.WeGroupAnalysisVo;
-import com.linkwechat.domain.shortlink.vo.WeShortLinkVo;
 import com.linkwechat.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -99,9 +90,13 @@ public class WeIndexController {
 
     @ShortLinkView(prefix = "t:")
     @ApiOperation(value = "短链换取长链", httpMethod = "GET")
-    @GetMapping("/t/{shortUrl}/{promotionKey}")
-    public void getShort2LongUrl(HttpServletRequest request, HttpServletResponse resp, @PathVariable("shortUrl") String shortUrl) throws IOException {
-        log.info("短链换取长链 shortUrl:{}", shortUrl);
+    @GetMapping(value = {"/t/{shortUrl}", "/t/{shortUrl}/{promotionKey}"})
+    public void getShort2LongUrl(HttpServletRequest request,
+                                 HttpServletResponse resp,
+                                 @PathVariable("shortUrl") String shortUrl,
+                                 @PathVariable(value = "promotionKey", required = false) String promotionKey) throws IOException {
+
+        log.info("短链换取长链 shortUrl:{},promotionKey:{}", shortUrl, promotionKey);
         if (StringUtils.isEmpty(shortUrl)) {
             return;
         }
@@ -117,7 +112,7 @@ public class WeIndexController {
             //尝试加锁
             Boolean lock = redisService.tryLock(key, "lock", 2L);
             if (lock) {
-                short2LongUrl = weShortLinkService.getShort2LongUrl(shortUrl);
+                short2LongUrl = weShortLinkService.getShort2LongUrl(shortUrl, promotionKey);
                 if (StringUtils.isNotEmpty(short2LongUrl.getString("errorMsg"))) {
                     redisService.setCacheObject(key, short2LongUrl, 5, TimeUnit.MINUTES);
                 } else {
