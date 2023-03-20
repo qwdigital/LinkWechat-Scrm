@@ -53,12 +53,12 @@ public interface WeFissionMapper extends BaseMapper<WeFission> {
 
 
     /**
-     * 裂变明细
+     * 群裂变-裂变明细
      * @param customerName
      * @param weUserId
      * @return
      */
-    List<WeFissionDetailVo> findWeFissionDetail(@Param("customerName") String customerName,@Param("weUserId") String weUserId);
+    List<WeGroupFissionDetailVo> findWeGroupFissionDetail(@Param("customerName") String customerName, @Param("weUserId") String weUserId,@Param("chatId") String chatId);
 
 
     /**

@@ -5,18 +5,25 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
 @Data
-public class WeFissionDetailVo {
+public class WeGroupFissionDetailVo {
     /**
      *明细id
      */
     @ExcelIgnore
-    private Long fissionDetailId;
+    private Long fissionInviterRecordId;
 
     /**
-     * 老客
+     * 客户名称
      */
-    @ExcelProperty("老客")
-    private String oldCustomerName;
+    @ExcelProperty("客户名称")
+    private String customerName;
+
+
+    /**
+     * 群名
+     */
+    @ExcelProperty("群名")
+    private String chatName;
 
     /**
      * 发送员工
@@ -40,5 +47,5 @@ public class WeFissionDetailVo {
      * 成员id，如果为群裂变此处为群成员id，如果是任务宝，此处为客户外部联系人id
      */
     @ExcelIgnore
-    private String inviterMemberId;
+    private String targetSubId;
 }

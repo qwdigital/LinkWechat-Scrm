@@ -172,28 +172,29 @@ public class WeFissionController  extends BaseController {
      * 裂变明细
      * @param customerName
      * @param weUserId
+     * @param chatId
      * @return
      */
-    @GetMapping("/findWeFissionDetail")
-    public TableDataInfo<List<WeFissionDetailVo>> findWeFissionDetail(String customerName,String weUserId){
+    @GetMapping("/findWeGroupFissionDetail")
+    public TableDataInfo<List<WeGroupFissionDetailVo>> findWeGroupFissionDetail(String customerName, String weUserId,String chatId){
         startPage();
 
         return getDataTable(
-                iWeFissionService.findWeFissionDetail(customerName,weUserId)
+                iWeFissionService.findWeGroupFissionDetail(customerName,weUserId,chatId)
         );
     }
 
 
 
     /**
-     * 导出裂变明细
+     * 导出群裂变明细
      * @return
      */
-    @GetMapping("/exportWeFissionDetail")
-    public void exportWeFissionDetail(){
+    @GetMapping("/exportWeGroupFissionDetail")
+    public void exportWeGroupFissionDetail(){
 
         LwExcelUtil.exprotForWeb(
-                ServletUtils.getResponse(), WeFissionDetailVo.class, iWeFissionService.findWeFissionDetail(null,null),"裂变明细"
+                ServletUtils.getResponse(), WeGroupFissionDetailVo.class, iWeFissionService.findWeGroupFissionDetail(null,null,null),"群裂变明细"
         );
 
     }
@@ -204,15 +205,15 @@ public class WeFissionController  extends BaseController {
 
     /**
      * 裂变明细sub
-     * @param fissionDetailId
+     * @param fissionInviterRecordId
      * @return
      */
     @GetMapping("/findWeFissionDetailSub")
-    public TableDataInfo<List<WeFissionDetailSubVo>> findWeFissionDetailSub(Long fissionDetailId){
+    public TableDataInfo<List<WeFissionDetailSubVo>> findWeFissionDetailSub(Long fissionInviterRecordId){
         startPage();
 
         return getDataTable(
-                iWeFissionService.findWeFissionDetailSub(fissionDetailId)
+                iWeFissionService.findWeFissionDetailSub(fissionInviterRecordId)
         );
 
     }

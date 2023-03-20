@@ -60,15 +60,15 @@ public interface IWeFissionService extends IService<WeFission> {
      * @param weUserId
      * @return
      */
-    List<WeFissionDetailVo> findWeFissionDetail(String customerName,String weUserId);
+    List<WeGroupFissionDetailVo> findWeGroupFissionDetail(String customerName, String weUserId,String chatId);
 
 
     /**
      * 裂变明细sub
-     * @param fissionDetailId
+     * @param fissionInviterRecordId
      * @return
      */
-    List<WeFissionDetailSubVo> findWeFissionDetailSub(Long fissionDetailId);
+    List<WeFissionDetailSubVo> findWeFissionDetailSub(Long fissionInviterRecordId);
 
 
     /**

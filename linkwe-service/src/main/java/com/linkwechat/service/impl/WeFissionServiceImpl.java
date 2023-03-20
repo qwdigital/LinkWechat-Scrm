@@ -231,13 +231,13 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
     }
 
     @Override
-    public List<WeFissionDetailVo> findWeFissionDetail(String customerName,String weUserId) {
-        return this.baseMapper.findWeFissionDetail(customerName, weUserId);
+    public List<WeGroupFissionDetailVo> findWeGroupFissionDetail(String customerName, String weUserId,String chatId) {
+        return this.baseMapper.findWeGroupFissionDetail(customerName, weUserId,chatId);
     }
 
     @Override
-    public List<WeFissionDetailSubVo> findWeFissionDetailSub(Long fissionDetailId) {
-        return this.baseMapper.findWeFissionDetailSub(fissionDetailId);
+    public List<WeFissionDetailSubVo> findWeFissionDetailSub(Long fissionInviterRecordId) {
+        return this.baseMapper.findWeFissionDetailSub(fissionInviterRecordId);
     }
 
     @Override
