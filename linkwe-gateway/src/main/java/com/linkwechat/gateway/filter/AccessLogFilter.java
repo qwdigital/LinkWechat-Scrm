@@ -63,6 +63,11 @@ public class AccessLogFilter implements GlobalFilter, Ordered {
         // 请求路径
         String requestPath = request.getPath().pathWithinApplication().value();
 
+        //这是个神奇的地方
+        if(ObjectUtil.equal("/auth/accountLogin",requestPath)){
+            return chain.filter(exchange);
+        }
+
         Route route = getGatewayRoute(exchange);
 
         String ipAddress = IpUtils.getIpAddr(request);
@@ -85,12 +90,12 @@ public class AccessLogFilter implements GlobalFilter, Ordered {
     }
 
     private Mono<Void> writeBasicLog(ServerWebExchange exchange, GatewayFilterChain chain, GatewayLog accessLog) {
-        StringBuilder builder = new StringBuilder();
+        //StringBuilder builder = new StringBuilder();
         MultiValueMap<String, String> queryParams = exchange.getRequest().getQueryParams();
-        for (Map.Entry<String, List<String>> entry : queryParams.entrySet()) {
+        /*for (Map.Entry<String, List<String>> entry : queryParams.entrySet()) {
             builder.append(entry.getKey()).append("=").append(StringUtils.join(entry.getValue(), ","));
-        }
-        accessLog.setRequestBody(builder.toString());
+        }*/
+        accessLog.setRequestBody(JSONObject.toJSONString(queryParams));
 
         //获取响应体
         ServerHttpResponseDecorator decoratedResponse = recordResponseLog(exchange, accessLog);
@@ -106,14 +111,14 @@ public class AccessLogFilter implements GlobalFilter, Ordered {
     private Mono writeBodyLog(ServerWebExchange exchange, GatewayFilterChain chain, GatewayLog gatewayLog) {
         ServerRequest serverRequest = ServerRequest.create(exchange,messageReaders);
 
-        Mono<String> modifiedBody = serverRequest.bodyToMono(String.class)
+        Mono<JSONObject> modifiedBody = serverRequest.bodyToMono(JSONObject.class)
                 .flatMap(body ->{
-                    gatewayLog.setRequestBody(body);
+                    gatewayLog.setRequestBody(body.toJSONString());
                     return Mono.just(body);
                 });
 
         // 通过 BodyInserter 插入 body(支持修改body), 避免 request body 只能获取一次
-        BodyInserter bodyInserter = BodyInserters.fromPublisher(modifiedBody, String.class);
+        BodyInserter bodyInserter = BodyInserters.fromPublisher(modifiedBody, JSONObject.class);
         HttpHeaders headers = new HttpHeaders();
         headers.putAll(exchange.getRequest().getHeaders());
         // the new content type will be computed by bodyInserter
@@ -141,8 +146,7 @@ public class AccessLogFilter implements GlobalFilter, Ordered {
 
     /**
      * 打印日志
-     * @author javadaily
-     * @date 2021/3/24 14:53
+     * @date 2023/3/16 14:53
      * @param gatewayLog 网关日志
      */
     private void writeAccessLog(GatewayLog gatewayLog) {
