@@ -450,7 +450,7 @@ public interface WeCustomerClient {
      * @return
      */
     @Request(url = "/externalcontact/cancel_groupmsg_send", type = "POST")
-    WeResultVo cancelGroupMsgSend(WeCancelGroupMsgSendQuery query);
+    WeResultVo cancelGroupMsgSend(@JSONBody WeCancelGroupMsgSendQuery query);
 
 
     /**
