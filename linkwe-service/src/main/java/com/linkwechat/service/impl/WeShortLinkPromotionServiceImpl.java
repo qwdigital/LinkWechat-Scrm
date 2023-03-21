@@ -8,8 +8,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.exception.ServiceException;
+import com.linkwechat.common.utils.Base62NumUtil;
 import com.linkwechat.domain.*;
 import com.linkwechat.domain.material.entity.WeMaterial;
+import com.linkwechat.domain.material.vo.WePosterVo;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionQuery;
@@ -135,11 +137,19 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
             WeShortLink weShortLink = weShortLinkService.getById(weShortLinkPromotion.getShortLinkId());
             //短链详情
             WeShortLinkListVo weShortLinkListVo = BeanUtil.copyProperties(weShortLink, WeShortLinkListVo.class);
+            String encode = Base62NumUtil.encode(weShortLinkListVo.getId());
+            String shortLinkUrl = linkWeChatConfig.getShortLinkDomainName() + encode;
+            weShortLinkListVo.setShortLink(shortLinkUrl);
             vo.setShortLink(weShortLinkListVo);
 
             Optional.ofNullable(vo.getMaterialId()).ifPresent(m -> {
                 WeMaterial weMaterial = weMaterialMapper.selectById(m);
-                Optional.ofNullable(weMaterial).ifPresent(item -> vo.setMaterialUrl(item.getMaterialUrl()));
+                Optional.ofNullable(weMaterial).ifPresent(item -> {
+                    WePosterVo wePosterVo = BeanUtil.copyProperties(weMaterial, WePosterVo.class);
+                    wePosterVo.setSampleImgPath(weMaterial.getMaterialUrl());
+                    wePosterVo.setBackgroundImgPath(weMaterial.getBackgroundImgUrl());
+                    vo.setPoster(wePosterVo);
+                });
             });
 
             //任务状态: 0待推广 1推广中 2已结束 3暂存中
