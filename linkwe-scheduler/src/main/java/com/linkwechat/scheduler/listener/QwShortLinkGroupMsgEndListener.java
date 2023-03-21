@@ -51,7 +51,7 @@ public class QwShortLinkGroupMsgEndListener {
     @RabbitListener(queues = "${wecom.mq.queue.delay-group-msg-end:Qu_DelayGroupMsgEnd}")
     public void subscribe(String msg, Channel channel, Message message) {
         try {
-            log.info("短链推广群发任务结束监听：msg:{}", msg);
+            log.info("短链推广群发任务监听：msg:{}", msg);
             WeShortLinkPromotionTaskEndQuery query = JSONObject.parseObject(msg, WeShortLinkPromotionTaskEndQuery.class);
             handler(query);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
