@@ -311,6 +311,8 @@ public class AppMsgPromotion extends PromotionType {
                 userSet.addAll(collect);
                 qwAppMsgBody.setCorpUserIds(new ArrayList<>(userSet));
             }
+        } else {
+            qwAppMsgBody.setCorpUserIds(new ArrayList<>(userSet));
         }
 
         //附件
@@ -330,34 +332,36 @@ public class AppMsgPromotion extends PromotionType {
         qwAppMsgBody.setBusinessId(businessId);
 
         qwAppMsgBody.setCorpId(SecurityUtils.getCorpId());
+
         //应用消息发送类型 0成员 1部门或岗位
-        Integer sendScope = (Integer) objects[0];
-        if (sendScope.equals(0)) {
-            String ids = (String) objects[1];
-            String[] split = ids.split(",");
-            List<String> list = Arrays.asList(split);
-            qwAppMsgBody.setCorpUserIds(list);
-        } else if (sendScope.equals(1)) {
-            Object object = objects[1];
-            if (BeanUtil.isNotEmpty(object)) {
-                String ids = String.valueOf(object);
-                String[] split = ids.split(",");
-                List<String> list = Arrays.asList(split);
-                qwAppMsgBody.setDeptIds(list);
-            }
-            Object object1 = objects[2];
-            if (BeanUtil.isNotEmpty(object1)) {
-                String postIds = String.valueOf(object1);
-                AjaxResult<List<SysUser>> allSysUser = qwSysUserClient.findAllSysUser(null, postIds, null);
-                if (allSysUser.getCode() == 200) {
-                    List<SysUser> data = allSysUser.getData();
-                    List<String> collect = data.stream().map(i -> i.getWeUserId()).collect(Collectors.toList());
-                    if (collect != null && collect.size() > 0) {
-                        qwAppMsgBody.setCorpUserIds(collect);
-                    }
-                }
-            }
+        //用户Id集合
+        String[] userIds = objects[0] != null ? String.valueOf(objects[0]).split(",") : null;
+        //部门Id集合
+        String[] deptIds = objects[1] != null ? String.valueOf(objects[1]).split(",") : null;
+        //岗位Id集合
+        Object object = objects[2];
+        String[] postIds = object != null ? String.valueOf(object).split(",") : null;
+
+        if (deptIds != null && deptIds.length > 0) {
+            qwAppMsgBody.setDeptIds(Arrays.asList(deptIds));
         }
+
+        Set<String> userSet = new HashSet<>();
+        if (userIds != null && userIds.length > 0) {
+            userSet.addAll(Arrays.asList(userIds));
+        }
+        if (postIds != null && postIds.length > 0) {
+            AjaxResult<List<SysUser>> allSysUser = qwSysUserClient.findAllSysUser(null, String.valueOf(object), null);
+            if (allSysUser.getCode() == 200) {
+                List<SysUser> data = allSysUser.getData();
+                List<String> collect = data.stream().map(i -> i.getWeUserId()).collect(Collectors.toList());
+                userSet.addAll(collect);
+                qwAppMsgBody.setCorpUserIds(new ArrayList<>(userSet));
+            }
+        } else {
+            qwAppMsgBody.setCorpUserIds(new ArrayList<>(userSet));
+        }
+
         //附件
         WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
         weMessageTemplate.setMsgType(WeMsgTypeEnum.TEXT.getMessageType());

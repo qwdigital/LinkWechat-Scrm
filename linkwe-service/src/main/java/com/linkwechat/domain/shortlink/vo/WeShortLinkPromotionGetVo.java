@@ -1,5 +1,6 @@
 package com.linkwechat.domain.shortlink.vo;
 
+import com.linkwechat.domain.material.vo.WeMaterialVo;
 import com.linkwechat.domain.material.vo.WePosterVo;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import io.swagger.annotations.ApiModel;
@@ -77,7 +78,7 @@ public class WeShortLinkPromotionGetVo {
      * 海报详情
      */
     @ApiModelProperty(value = "海报详情")
-    private WePosterVo poster;
+    private WeMaterialVo weMaterial;
 
     /**
      * 客户推广信息

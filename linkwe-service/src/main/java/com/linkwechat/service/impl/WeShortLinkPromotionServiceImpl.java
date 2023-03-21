@@ -11,7 +11,7 @@ import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.utils.Base62NumUtil;
 import com.linkwechat.domain.*;
 import com.linkwechat.domain.material.entity.WeMaterial;
-import com.linkwechat.domain.material.vo.WePosterVo;
+import com.linkwechat.domain.material.vo.WeMaterialVo;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionQuery;
@@ -20,7 +20,6 @@ import com.linkwechat.domain.shortlink.vo.*;
 import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
-import com.linkwechat.fegin.QwFileClient;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeMaterialMapper;
 import com.linkwechat.mapper.WeShortLinkPromotionMapper;
@@ -53,8 +52,6 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
     private WeMaterialMapper weMaterialMapper;
     @Resource
     private LinkWeChatConfig linkWeChatConfig;
-    @Resource
-    private QwFileClient qwFileClient;
     @Resource
     private IWeShortLinkPromotionAttachmentService weShortLinkPromotionAttachmentService;
     @Resource
@@ -145,10 +142,8 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
             Optional.ofNullable(vo.getMaterialId()).ifPresent(m -> {
                 WeMaterial weMaterial = weMaterialMapper.selectById(m);
                 Optional.ofNullable(weMaterial).ifPresent(item -> {
-                    WePosterVo wePosterVo = BeanUtil.copyProperties(weMaterial, WePosterVo.class);
-                    wePosterVo.setSampleImgPath(weMaterial.getMaterialUrl());
-                    wePosterVo.setBackgroundImgPath(weMaterial.getBackgroundImgUrl());
-                    vo.setPoster(wePosterVo);
+                    WeMaterialVo weMaterialVo = BeanUtil.copyProperties(weMaterial, WeMaterialVo.class);
+                    vo.setWeMaterial(weMaterialVo);
                 });
             });
 

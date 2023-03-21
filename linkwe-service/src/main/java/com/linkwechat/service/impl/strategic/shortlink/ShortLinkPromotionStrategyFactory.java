@@ -1,7 +1,7 @@
 package com.linkwechat.service.impl.strategic.shortlink;
 
+import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.utils.spring.SpringUtils;
-import com.linkwechat.service.AbstractGroupMsgSendTaskService;
 
 /**
  * 短链策略工厂
@@ -20,16 +20,16 @@ public class ShortLinkPromotionStrategyFactory {
      */
     public static PromotionType getPromotionType(Integer type) {
         assert type != null;
-        if (type.equals(0)) {
-            return  SpringUtils.getBean("clientPromotion", PromotionType.class);
-        } else if (type.equals(1)) {
-            return  SpringUtils.getBean("groupPromotion", PromotionType.class);
-        } else if (type.equals(2)) {
-            return  SpringUtils.getBean("momentsPromotion", PromotionType.class);
-        } else if (type.equals(3)) {
-            return  SpringUtils.getBean("appMsgPromotion", PromotionType.class);
+        if (type.equals(ShortLinkPromotionConstants.CLIENT)) {
+            return SpringUtils.getBean("clientPromotion", PromotionType.class);
+        } else if (type.equals(ShortLinkPromotionConstants.GROUP)) {
+            return SpringUtils.getBean("groupPromotion", PromotionType.class);
+        } else if (type.equals(ShortLinkPromotionConstants.MOMENTS)) {
+            return SpringUtils.getBean("momentsPromotion", PromotionType.class);
+        } else if (type.equals(ShortLinkPromotionConstants.APP_MSG)) {
+            return SpringUtils.getBean("appMsgPromotion", PromotionType.class);
         } else {
-            return null;
+            throw new ServiceException("请检查推广类型!");
         }
     }
 
