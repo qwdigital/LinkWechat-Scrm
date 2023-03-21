@@ -4,7 +4,6 @@ package com.linkwechat.controller;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.config.LinkWeChatConfig;
@@ -13,7 +12,6 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.Base62NumUtil;
-import com.linkwechat.domain.WeShortLinkPromotion;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.material.query.WePosterQuery;
 import com.linkwechat.domain.material.vo.WeMaterialVo;
@@ -50,7 +48,6 @@ public class WeShortLinkPromotionController extends BaseController {
     private IWeShortLinkPromotionService weShortLinkPromotionService;
     @Resource
     private IWeMaterialService weMaterialService;
-
     @Resource
     private LinkWeChatConfig linkWeChatConfig;
 
@@ -146,10 +143,7 @@ public class WeShortLinkPromotionController extends BaseController {
     @ApiOperation(value = "删除", httpMethod = "DELETE")
     @DeleteMapping("/delete/{id}")
     public AjaxResult delete(@PathVariable("id") Long id) {
-        LambdaUpdateWrapper<WeShortLinkPromotion> updateWrapper = Wrappers.lambdaUpdate();
-        updateWrapper.eq(WeShortLinkPromotion::getId, id);
-        updateWrapper.set(WeShortLinkPromotion::getDelFlag, 1);
-        boolean update = weShortLinkPromotionService.update(updateWrapper);
+        weShortLinkPromotionService.delete(id);
         return AjaxResult.success();
     }
 
@@ -163,10 +157,7 @@ public class WeShortLinkPromotionController extends BaseController {
     @ApiOperation(value = "删除", httpMethod = "DELETE")
     @DeleteMapping("/batch/delete/{ids}")
     public AjaxResult batchDelete(@PathVariable("ids") Long[] ids) {
-        LambdaUpdateWrapper<WeShortLinkPromotion> updateWrapper = Wrappers.lambdaUpdate();
-        updateWrapper.in(WeShortLinkPromotion::getId, ids);
-        updateWrapper.set(WeShortLinkPromotion::getDelFlag, 1);
-        boolean update = weShortLinkPromotionService.update(updateWrapper);
+        weShortLinkPromotionService.batchDelete(ids);
         return AjaxResult.success();
     }
 

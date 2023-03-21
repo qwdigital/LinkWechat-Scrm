@@ -76,4 +76,25 @@ public interface IWeShortLinkPromotionService extends IService<WeShortLinkPromot
     WeShortLinkPromotionGetVo get(Long id);
 
 
+    /**
+     * 删除
+     *
+     * @param id 短链推广Id
+     * @return
+     * @author WangYX
+     * @date 2023/03/21 18:02
+     */
+    void delete(Long id);
+
+    /**
+     * 批量删除
+     *
+     * @param ids 短链推广Id集合
+     * @return
+     * @author WangYX
+     * @date 2023/03/21 18:02
+     */
+    void batchDelete(Long[] ids);
+
+
 }

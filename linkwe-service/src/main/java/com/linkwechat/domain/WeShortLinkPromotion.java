@@ -49,7 +49,7 @@ public class WeShortLinkPromotion extends BaseEntity {
     /**
      * 推广方式：0群发客户，1群发客户群，2群发朋友圈，4应用消息
      */
-    @ApiModelProperty(value = "推广方式：0群发客户，1群发客户群，2群发朋友圈，4应用消息")
+    @ApiModelProperty(value = "推广方式：0群发客户，1群发客户群，2群发朋友圈，3应用消息")
     private Integer type;
 
     /**
@@ -73,7 +73,7 @@ public class WeShortLinkPromotion extends BaseEntity {
     /**
      * 任务状态: 0待推广 1推广中 2已结束
      */
-    @ApiModelProperty(value = "任务状态: 0待推广 1推广中 2已结束 3暂存中")
+    @ApiModelProperty(value = "任务状态: 0待推广 1推广中 2已结束")
     private Integer taskStatus;
 
     /**

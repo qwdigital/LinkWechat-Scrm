@@ -24,6 +24,12 @@ import java.util.List;
 public class WeShortLinkPromotionAddQuery {
 
     /**
+     * 主键Id
+     */
+    @ApiModelProperty(value = "主键Id")
+    private Long id;
+
+    /**
      * 任务名称
      */
     @ApiModelProperty(value = "任务名称")
