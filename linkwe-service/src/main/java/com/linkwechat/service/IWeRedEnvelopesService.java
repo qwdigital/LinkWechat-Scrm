@@ -6,6 +6,7 @@ import com.linkwechat.domain.envelopes.WeRedEnvelopesLimit;
 import com.linkwechat.domain.envelopes.WeRedEnvelopesRecord;
 import com.linkwechat.domain.envelopes.dto.H5RedEnvelopesDetailDto;
 import com.linkwechat.domain.envelopes.query.H5RedEnvelopesParmQuery;
+import com.linkwechat.domain.envelopes.query.WeRedEnvelopeListQuery;
 import com.linkwechat.domain.envelopes.vo.WeCutomerRedEnvelopesVo;
 import com.linkwechat.domain.envelopes.vo.WeGroupRedEnvelopesVo;
 import com.linkwechat.domain.envelopes.vo.WeRedEnvelopesCountVo;
@@ -158,4 +159,10 @@ public interface IWeRedEnvelopesService extends IService<WeRedEnvelopes> {
      */
     Boolean checkRecevieRedEnvelopes(String orderNo, String openid);
 
+    /**
+     * 查询红包列表
+     * @param query
+     * @return
+     */
+    List<WeRedEnvelopes> getList(WeRedEnvelopeListQuery query);
 }
