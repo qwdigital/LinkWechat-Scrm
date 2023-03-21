@@ -69,7 +69,7 @@ public class QwAppMsgListener {
      * @param message
      */
     @RabbitHandler
-    @RabbitListener(queues = "${wecom.mq.queue.app-msg:Qu_AppMsg}")
+    @RabbitListener(queues = "${wecom.mq.queue.delay_app-msg:Qu_Delay_AppMsg}")
     public void delaySubscribe(String msg, Channel channel, Message message) {
         try {
             log.info("企微延迟应用消息监听：msg:{}", msg);

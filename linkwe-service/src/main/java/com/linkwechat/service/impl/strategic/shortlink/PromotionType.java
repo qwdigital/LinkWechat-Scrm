@@ -137,7 +137,13 @@ public abstract class PromotionType {
         String shortLinkIdEncode = Base62NumUtil.encode(shortLinkId);
         //获取短链推广
         String promotionIdEncode = Base62NumUtil.encode(promotionId);
-        String shortLinkUrl = linkWeChatConfig.getShortLinkDomainName() + shortLinkIdEncode + "/" + promotionIdEncode;
+
+        String shortLinkDomainName = linkWeChatConfig.getShortLinkDomainName();
+        boolean b = shortLinkDomainName.startsWith("http");
+        if (!b) {
+            shortLinkDomainName = "http://" + shortLinkDomainName;
+        }
+        String shortLinkUrl = shortLinkDomainName + shortLinkIdEncode + "/" + promotionIdEncode;
 
         WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
         weMessageTemplate.setMsgType("image");

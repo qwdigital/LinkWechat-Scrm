@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.enums.QwAppMsgBusinessTypeEnum;
@@ -60,6 +61,8 @@ public class AppMsgPromotion extends PromotionType {
     private RabbitMQSettingConfig rabbitMQSettingConfig;
     @Resource
     private QwSysUserClient qwSysUserClient;
+    @Resource
+    private LinkWeChatConfig linkWeChatConfig;
 
     @Override
     public Long saveAndSend(WeShortLinkPromotionAddQuery query, WeShortLinkPromotion weShortLinkPromotion) throws IOException {
@@ -136,9 +139,12 @@ public class AppMsgPromotion extends PromotionType {
         //暂不需要
 
         //6.发送mq
+
+        //发送内容
+        String appMsgUrl = linkWeChatConfig.getAppMsgUrl();
+        appMsgUrl = StringUtils.format(appMsgUrl, weShortLinkPromotion.getId());
+        String content = "【短链推广】\r\n\r\n  您有一条新的短链推广任务，请点击链接，进入任务页，分享短链内容给客户。\r\n\r\n <a href=" + appMsgUrl + ">" + weShortLinkPromotion.getTaskName() + "</a>";
         //发送类型：0立即发送 1定时发送
-        //TODO 链接要替换
-        String content = "【短链推广】\r\n\r\n  您有一条新的短链推广任务，请点击链接，进入任务页，分享短链内容给客户。\r\n\r\n <a href=\"http://www.baidu.com\">" + weShortLinkPromotion.getTaskName() + "</a>";
         if (sendType.equals(0)) {
             //立即发送
             directSend(weShortLinkPromotion.getId(),
@@ -181,7 +187,7 @@ public class AppMsgPromotion extends PromotionType {
         //发送类型：0立即发送 1定时发送
         Integer sendType = appMsgUpdateQuery.getSendType();
         if (sendType.equals(0)) {
-            //任务状态: 0待推广 1推广中 2已结束 3暂存中
+            //任务状态: 0待推广 1推广中 2已结束
             weShortLinkPromotion.setTaskStatus(1);
             weShortLinkPromotion.setTaskStartTime(LocalDateTime.now());
         } else {
@@ -244,7 +250,10 @@ public class AppMsgPromotion extends PromotionType {
         weShortLinkPromotionTemplateAppMsgService.save(appMsg);
 
         //发送mq
-        String content = "【短链推广】\r\n\r\n  您有一条新的短链推广任务，请点击链接，进入任务页，分享短链内容给客户。\r\n\r\n <a href=\"http://www.baidu.com\">" + weShortLinkPromotion.getTaskName() + "</a>";
+        //发送内容
+        String appMsgUrl = linkWeChatConfig.getAppMsgUrl();
+        appMsgUrl = StringUtils.format(appMsgUrl, weShortLinkPromotion.getId());
+        String content = "【短链推广】\r\n\r\n  您有一条新的短链推广任务，请点击链接，进入任务页，分享短链内容给客户。\r\n\r\n <a href=" + appMsgUrl + ">" + weShortLinkPromotion.getTaskName() + "</a>";
         if (sendType.equals(0)) {
             //立即发送
             directSend(weShortLinkPromotion.getId(),
