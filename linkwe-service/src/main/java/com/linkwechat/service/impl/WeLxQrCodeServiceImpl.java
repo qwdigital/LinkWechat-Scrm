@@ -32,6 +32,7 @@ import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeLxQrCode;
 import com.linkwechat.domain.WeLxQrCodeLog;
 import com.linkwechat.domain.envelopes.WeRedEnvelopesRecord;
+import com.linkwechat.domain.envelopes.dto.H5RedEnvelopesDetailDto;
 import com.linkwechat.domain.qr.WeQrAttachments;
 import com.linkwechat.domain.qr.query.*;
 import com.linkwechat.domain.qr.vo.*;
@@ -98,9 +99,6 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
 
     @Autowired
     private IWeRedEnvelopesService weRedEnvelopesService;
-
-    @Autowired
-    private IWeRedEnvelopesRecordService weRedEnvelopesRecordService;
 
     @Autowired
     private IWeCouponService weCouponService;
@@ -474,11 +472,18 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
 
     @Override
     public void receiveAward(WxLxQrQuery query) throws Exception {
+        WeLxQrCodeLog codeLog = new WeLxQrCodeLog();
         WeLxQrCode lxQrCode = getById(query.getQrId());
         if (Objects.isNull(lxQrCode)) {
             throw new WeComException("无效ID");
         }
         if (ObjectUtil.equal(1, lxQrCode.getType())) {
+            String businessData = lxQrCode.getBusinessData();
+            JSONObject redInfo = JSONObject.parseObject(businessData);
+            String money = redInfo.getString("money");
+
+            codeLog.setAmount(Integer.parseInt(money));
+
             String returnMsg = weRedEnvelopesService.customerReceiveRedEnvelopes(query.getOrderNo()
                     , SecurityUtils.getWxLoginUser().getOpenId()
                     , SecurityUtils.getWxLoginUser().getNickName()
@@ -504,18 +509,12 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
             }*/
         }
 
-        WeRedEnvelopesRecord envelopesRecord = weRedEnvelopesRecordService.getOne(new LambdaQueryWrapper<WeRedEnvelopesRecord>()
-                .eq(WeRedEnvelopesRecord::getOrderNo, query.getOrderNo())
-                .eq(WeRedEnvelopesRecord::getOpenId, SecurityUtils.getWxLoginUser().getOpenId())
-                .eq(WeRedEnvelopesRecord::getDelFlag, 0)
-                .last("limit 1"));
-        WeLxQrCodeLog codeLog = new WeLxQrCodeLog();
         codeLog.setQrId(query.getQrId());
         codeLog.setType(lxQrCode.getType());
         codeLog.setOrderId(query.getOrderNo());
-        codeLog.setAmount(envelopesRecord.getRedEnvelopeMoney());
         codeLog.setUnionId(SecurityUtils.getWxLoginUser().getUnionId());
         weLxQrCodeLogService.save(codeLog);
+
     }
 
     @Override
@@ -639,5 +638,25 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
 
         return receiveList;
     }
+
+    @Override
+    public Boolean checkIsReceive(WxLxQrQuery query) {
+        List<WeLxQrCodeLog> list = weLxQrCodeLogService.list(new LambdaQueryWrapper<WeLxQrCodeLog>()
+                .eq(WeLxQrCodeLog::getQrId, query.getQrId())
+                .eq(StringUtils.isNotEmpty(query.getOrderNo()),WeLxQrCodeLog::getOrderId,query.getOrderNo())
+                .eq(WeLxQrCodeLog::getUnionId, SecurityUtils.getWxLoginUser().getUnionId())
+                .eq(WeLxQrCodeLog::getDelFlag, 0));
+        if(CollectionUtil.isNotEmpty(list)){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    @Override
+    public H5RedEnvelopesDetailDto getReceiveList(WxLxQrQuery query) {
+        return weRedEnvelopesService.detailDto(query.getOrderNo(), SecurityUtils.getWxLoginUser().getOpenId(), null);
+    }
+
 
 }

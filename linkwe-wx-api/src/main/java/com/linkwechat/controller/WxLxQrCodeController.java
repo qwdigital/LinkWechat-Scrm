@@ -10,10 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author danmo
@@ -41,6 +38,30 @@ public class WxLxQrCodeController extends BaseController {
     @PostMapping("/receive/award")
     public AjaxResult receiveAward(@RequestBody @Validated WxLxQrQuery query) throws Exception {
         weLxQrCodeService.receiveAward(query);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 校验客户是否领取红包或卡券
+     * @param query 入参
+     * @return
+     */
+    @ApiOperation(value = "校验客户是否领取红包或卡券", httpMethod = "POST")
+    @PostMapping("/checkIsReceive")
+    public AjaxResult checkIsReceive(@RequestBody WxLxQrQuery query){
+        Boolean result = weLxQrCodeService.checkIsReceive(query);
+        return AjaxResult.success(result);
+    }
+
+    /**
+     * 红包领取记录
+     * @param query
+     * @return
+     */
+    @ApiOperation(value = "红包领取记录", httpMethod = "POST")
+    @PostMapping("/getReceiveList")
+    public AjaxResult getReceiveList(@RequestBody WxLxQrQuery query){
+        weLxQrCodeService.getReceiveList(query);
         return AjaxResult.success();
     }
 

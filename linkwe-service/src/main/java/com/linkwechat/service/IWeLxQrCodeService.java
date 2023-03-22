@@ -3,6 +3,7 @@ package com.linkwechat.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.domain.WeLxQrCode;
+import com.linkwechat.domain.envelopes.dto.H5RedEnvelopesDetailDto;
 import com.linkwechat.domain.qr.query.WeLxQrAddQuery;
 import com.linkwechat.domain.qr.query.WeLxQrCodeListQuery;
 import com.linkwechat.domain.qr.query.WeLxQrCodeQuery;
@@ -117,4 +118,16 @@ public interface IWeLxQrCodeService extends IService<WeLxQrCode> {
      * @return
      */
     List<WeLxQrCodeReceiveListVo> receiveListStatistics(WeLxQrCodeQuery query);
+
+    /**
+     * 校验是否领取
+     * @param query
+     */
+    Boolean checkIsReceive(WxLxQrQuery query);
+
+    /**
+     * 领取红包记录
+     * @param query
+     */
+    H5RedEnvelopesDetailDto getReceiveList(WxLxQrQuery query);
 }
