@@ -83,8 +83,7 @@ public enum WelcomeMsgTypeEnum {
     public static Map<String, String> getMap() {
         Map<String, String> typeMap = new HashMap<>(16);
         for (WelcomeMsgTypeEnum welcomeMsgTypeEnum : values()) {
-            typeMap.put("type", welcomeMsgTypeEnum.getType());
-            typeMap.put("value", welcomeMsgTypeEnum.getValue());
+            typeMap.put(welcomeMsgTypeEnum.getType(),welcomeMsgTypeEnum.getValue());
         }
         return typeMap;
     }
