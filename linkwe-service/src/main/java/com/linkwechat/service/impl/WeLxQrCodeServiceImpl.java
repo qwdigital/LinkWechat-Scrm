@@ -312,7 +312,8 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
                 .eq(Objects.nonNull(query.getType()), WeLxQrCode::getType, query.getType())
                 .ge(StringUtils.isNotEmpty(query.getBeginTime()), WeLxQrCode::getCreateTime, query.getBeginTime())
                 .le(StringUtils.isNotEmpty(query.getEndTime()), WeLxQrCode::getCreateTime, query.getEndTime())
-                .eq(WeLxQrCode::getDelFlag, 0);
+                .eq(WeLxQrCode::getDelFlag, 0)
+                .orderByDesc(BaseEntity::getUpdateTime);
         List<WeLxQrCode> lxQrCodeList = list(wrapper);
         if (CollectionUtil.isNotEmpty(lxQrCodeList)) {
             //计算领取总数
