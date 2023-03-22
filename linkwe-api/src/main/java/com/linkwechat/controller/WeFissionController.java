@@ -169,10 +169,10 @@ public class WeFissionController  extends BaseController {
 
 
     /**
-     * 裂变明细
-     * @param customerName
-     * @param weUserId
-     * @param chatId
+     * 裂变明细(群裂变)
+     * @param customerName 客户名
+     * @param weUserId 员工id
+     * @param chatId 群id
      * @return
      */
     @GetMapping("/findWeGroupFissionDetail")
@@ -185,9 +185,24 @@ public class WeFissionController  extends BaseController {
     }
 
 
+    /**
+     * 裂变明细(任务宝)
+     * @param customerName 客户名
+     * @param weUserId 员工id
+     * @return
+     */
+    @GetMapping("/findWeTaskFissionDetail")
+    public TableDataInfo<List<WeTaskFissionDetailVo>> findWeTaskFissionDetail(String customerName, String weUserId){
+        startPage();
+
+        return getDataTable(
+                iWeFissionService.findWeTaskFissionDetail(customerName,weUserId)
+        );
+    }
+
 
     /**
-     * 导出群裂变明细
+     * 导出群裂变明细(群裂变)
      * @return
      */
     @GetMapping("/exportWeGroupFissionDetail")
@@ -198,6 +213,21 @@ public class WeFissionController  extends BaseController {
         );
 
     }
+
+
+    /**
+     * 导出群裂变明细(任务宝)
+     * @return
+     */
+    @GetMapping("/exportWeTaskFissionDetail")
+    public void exportWeTaskFissionDetail(){
+
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeTaskFissionDetailVo.class, iWeFissionService.findWeTaskFissionDetail(null,null),"任务宝明细"
+        );
+
+    }
+
 
 
 

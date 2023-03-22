@@ -236,6 +236,11 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
     }
 
     @Override
+    public List<WeTaskFissionDetailVo> findWeTaskFissionDetail(String customerName, String weUserId) {
+        return this.baseMapper.findWeTaskFissionDetail(customerName, weUserId);
+    }
+
+    @Override
     public List<WeFissionDetailSubVo> findWeFissionDetailSub(Long fissionInviterRecordId) {
         return this.baseMapper.findWeFissionDetailSub(fissionInviterRecordId);
     }

@@ -62,11 +62,19 @@ public interface WeFissionMapper extends BaseMapper<WeFission> {
 
 
     /**
-     * 裂变明细sub
-     * @param fissionDetailId
+     * 任务宝-裂变明细
+     * @param customerName
+     * @param weUserId
      * @return
      */
-    List<WeFissionDetailSubVo> findWeFissionDetailSub(@Param("fissionDetailId") Long fissionDetailId);
+    List<WeTaskFissionDetailVo> findWeTaskFissionDetail(@Param("customerName") String customerName, @Param("weUserId") String weUserId);
+
+    /**
+     * 裂变明细sub
+     * @param fissionInviterRecordId
+     * @return
+     */
+    List<WeFissionDetailSubVo> findWeFissionDetailSub(@Param("fissionInviterRecordId") Long fissionInviterRecordId);
 
 }
 

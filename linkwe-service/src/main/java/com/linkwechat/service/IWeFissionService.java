@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.fission.WeFission;
 import com.linkwechat.domain.fission.WeFissionInviterPoster;
 import com.linkwechat.domain.fission.vo.*;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -55,12 +57,21 @@ public interface IWeFissionService extends IService<WeFission> {
 
 
     /**
-     * 裂变明细
+     * 裂变明细(群裂变)
      * @param customerName
      * @param weUserId
      * @return
      */
     List<WeGroupFissionDetailVo> findWeGroupFissionDetail(String customerName, String weUserId,String chatId);
+
+
+    /**
+     * 裂变明细(任务宝)
+     * @param customerName
+     * @param weUserId
+     * @return
+     */
+    List<WeTaskFissionDetailVo> findWeTaskFissionDetail(String customerName,String weUserId);
 
 
     /**

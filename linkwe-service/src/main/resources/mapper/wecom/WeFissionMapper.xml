@@ -165,13 +165,39 @@
         </where>
     </select>
 
+    <select id="findWeTaskFissionDetail" resultType="com.linkwechat.domain.fission.vo.WeTaskFissionDetailVo">
+        SELECT
+            wc.customer_name as oldCustomerName,
+            su.user_name as sendWeUserName,
+            wfir.inviter_state as inviterState,
+            wfir.inviter_number as inviterNumber,
+            wfir.id as fissionInviterRecordId
+        FROM
+            we_fission_notice wfn
+        LEFT JOIN we_customer wc ON wc.external_userid=wfn.target_id
+        LEFT JOIN sys_user su ON su.we_user_id=wfn.send_we_userid
+        LEFT JOIN we_fission_inviter_record wfir ON  wfir.fission_id=wfn.fission_id and wfn.target_id=wfir.inviter_member_id
+        <where>
+            <if test="customerName != null and customerName != ''">
+                and wc.customer_name like concat('%',#{customerName},'%')
+            </if>
+            <if test="weUserId != null and weUserId !=''">
+                and su.we_user_id=#{weUserId}
+            </if>
+        </where>
+
+    </select>
+
     <select id="findWeFissionDetailSub" resultType="com.linkwechat.domain.fission.vo.WeFissionDetailSubVo">
         SELECT
-            (SELECT GROUP_CONCAT(wc.customer_name) from we_customer wc where wc.external_userid=wfds.new_external_userid) as newCustomerName,
-            (SELECT GROUP_CONCAT(su.user_name) FROM sys_user su WHERE su.we_user_id=wfds.add_we_userid) as addUserName
-            wfds.create_time
+            wfds.inviter_user_name,
+            case
+                WHEN wfds.add_target_type=1 THEN 	(SELECT GROUP_CONCAT(su.user_name) from sys_user su where su.we_user_id=wfds.add_target_id)
+                ELSE (SELECT GROUP_CONCAT(wg.group_name) from we_group wg where wg.chat_id=wg.chat_id)
+                end as targetName,
+            wfds.create_time as createTime
         FROM
-            we_fission_detail_sub wfds WHERE wfds.fission_detail_id=#{fissionDetailId}
+            we_fission_inviter_record_sub wfds WHERE wfds.fission_inviter_record_id=#{fissionInviterRecordId}
     </select>
 
 </mapper>

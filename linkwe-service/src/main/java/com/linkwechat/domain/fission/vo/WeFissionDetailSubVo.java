@@ -10,11 +10,11 @@ public class WeFissionDetailSubVo {
     /**
      *新客
      */
-    private String newCustomerName;
+    private String inviterUserName;
     /**
-     *添加员工
+     *被添加目标名群名或员工名
      */
-    private String addUserName;
+    private String targetName;
     /**
      * 添加时间
      */
