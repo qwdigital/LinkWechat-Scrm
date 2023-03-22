@@ -3,7 +3,10 @@ package com.linkwechat.domain.fission;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 邀请记录主表
@@ -11,6 +14,9 @@ import lombok.Data;
  */
 @Data
 @TableName(value ="we_fission_inviter_record")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeFissionInviterRecord extends BaseEntity {
     /**
      * 主键

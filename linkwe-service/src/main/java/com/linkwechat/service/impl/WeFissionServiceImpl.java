@@ -17,6 +17,7 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.fission.WeFission;
+import com.linkwechat.domain.fission.WeFissionInviterRecord;
 import com.linkwechat.domain.fission.WeFissionNotice;
 import com.linkwechat.domain.fission.WeFissionInviterPoster;
 import com.linkwechat.domain.fission.vo.*;
@@ -52,6 +53,9 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
     @Autowired
     private IWeFissionInviterPosterService iWeFissionInviterPosterService;
+
+    @Autowired
+    private IWeFissionInviterRecordService iWeFissionInviterRecordService;
 
     @Autowired
     private IWeFissionNoticeService iWeFissionNoticeService;
@@ -353,10 +357,39 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
             iWeFissionInviterPosterService.save(weFissionInviterPoster);
         }
 
-
-
+        this.builderInviterRecord(unionid, fissionId);
 
         return weFissionInviterPoster;
+
+    }
+
+
+    //生成邀请记录
+    private void builderInviterRecord(String unionid, String fissionId){
+        if(iWeFissionInviterRecordService.count(new LambdaQueryWrapper<WeFissionInviterRecord>()
+                .eq(WeFissionInviterRecord::getInviterUnionid,unionid)
+                .eq(WeFissionInviterRecord::getFissionId,fissionId))<=0){
+
+
+            WeFission weFission = this.getById(fissionId);
+            if(null != weFission){
+                //入库一份邀请记录
+                iWeFissionInviterRecordService.save(
+                        WeFissionInviterRecord.builder()
+                                .fissionId(Long.parseLong(fissionId))
+                                .inviterUnionid(unionid)
+                                .inviterNumber(weFission.getExchangeTip())
+                                .build()
+                );
+            }
+
+
+
+
+
+        }
+
+
     }
 }
 
