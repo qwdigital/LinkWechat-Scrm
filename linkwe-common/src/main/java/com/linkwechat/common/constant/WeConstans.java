@@ -124,6 +124,18 @@ public class WeConstans {
     public static final String FISSION_PREFIX = "fis-";
 
 
+    /**
+     * 裂变-任务宝
+     */
+    public static final String FISSION_PREFIX_RWB="fis-rwb-";
+
+
+    /**
+     * 裂变-群裂变
+     */
+    public static final String FISSION_PREFIX_QLB="fis-qlb-";
+
+
     @Getter
     public enum sendMessageStatusEnum {
         NOT_SEND("0", "未发送"),

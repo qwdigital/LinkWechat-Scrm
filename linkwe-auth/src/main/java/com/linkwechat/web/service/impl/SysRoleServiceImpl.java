@@ -20,6 +20,7 @@ import com.linkwechat.web.mapper.*;
 import com.linkwechat.web.service.ISysRoleService;
 import com.linkwechat.web.service.ISysUserService;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +51,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     private SysRoleDeptMapper roleDeptMapper;
 
     @Resource
+    @Lazy
     private ISysUserService iSysUserService;
     
     public List<SysRole> selectSuperAdminBaseRoleList() {

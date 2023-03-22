@@ -1,0 +1,47 @@
+package com.linkwechat.domain.fission;
+
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.linkwechat.common.core.domain.BaseEntity;
+import lombok.Data;
+
+
+/**
+ * 裂变邀请记录
+ * @TableName we_fission_detail_sub
+ */
+@Data
+@TableName(value ="we_fission_inviter_record_sub")
+public class WeFissionInviterRecordSub extends BaseEntity {
+    /**
+     * 主键
+     */
+    @TableId
+    private Long id;
+
+    /**
+     * 裂变邀请主表id
+     */
+    private Long fissionInviterRecordId;
+
+
+    /**
+     * 被邀请人名称
+     */
+    private String inviterUserName;
+
+
+    /**
+     * 裂变客户添加的目标id，target_type为1的时候当前为客户id，为2的时候为群id
+     */
+    private String addTargetId;
+
+
+
+
+    /**
+     * 1:老客;2:群
+     */
+    private String addTargetType;
+
+}

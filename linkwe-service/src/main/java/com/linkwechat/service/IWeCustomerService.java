@@ -14,6 +14,7 @@ import com.linkwechat.domain.customer.vo.WeCustomerAddUserVo;
 import com.linkwechat.domain.customer.vo.WeCustomerDetailInfoVo;
 import com.linkwechat.domain.customer.vo.WeCustomerPortraitVo;
 import com.linkwechat.domain.customer.vo.WeCustomersVo;
+import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
 
 import java.util.List;
 import java.util.Map;
@@ -265,4 +266,16 @@ public interface IWeCustomerService extends IService<WeCustomer> {
      * @param makeCustomerTags
      */
     void batchMakeLabel(WeBacthMakeCustomerTag makeCustomerTags);
+
+
+    /**
+     * 前端公共组件客户筛选封装
+     * @param executeUserOrGroup
+     * @return
+     */
+    List<WeCustomersVo> findWeCustomersForCommonAssembly( WeGroupMessageExecuteUsertipVo executeUserOrGroup );
+
+
+
+
 }

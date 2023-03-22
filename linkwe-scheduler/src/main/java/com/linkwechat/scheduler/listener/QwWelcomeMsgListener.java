@@ -79,11 +79,11 @@ public class QwWelcomeMsgListener {
     @Autowired
     private IWeMsgTlpService weMsgTlpService;
 
-    @Autowired
-    private IWeTaskFissionService weTaskFissionService;
-
-    @Autowired
-    private IWeTaskFissionRecordService weTaskFissionRecordService;
+//    @Autowired
+//    private IWeTaskFissionService weTaskFissionService;
+//
+//    @Autowired
+//    private IWeTaskFissionRecordService weTaskFissionRecordService;
 
     @Autowired
     private QwCustomerClient qwCustomerClient;
@@ -172,22 +172,23 @@ public class QwWelcomeMsgListener {
                 }
             }
             else if (StringUtils.isNotEmpty(query.getState()) && query.getState().startsWith(WeConstans.FISSION_PREFIX)) {
-                log.info("任务宝列表欢迎语 state：{}",query.getState());
-                String fissionRecordId = query.getState().substring(WeConstans.FISSION_PREFIX.length());
-                WeMessageTemplate textAtt = new WeMessageTemplate();
-                textAtt.setMsgType(MessageType.TEXT.getMessageType());
-                WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService.getById(Long.valueOf(fissionRecordId));
-                if(weTaskFissionRecord != null){
-                    WeTaskFission weTaskFission = weTaskFissionService.selectWeTaskFissionById(weTaskFissionRecord.getTaskFissionId());
-                    if(weTaskFission != null){
-                        textAtt.setContent(weTaskFission.getWelcomeMsg());
-                    }
-                }
-                if(StringUtils.isEmpty(textAtt.getContent())){//设置默认欢迎语
-                    //如果租户配置了欢迎语则返回租户欢迎语,如果租户没配置欢迎语则使用系统全局默认的欢迎语
-                    textAtt.setContent(welcomeMsgDefault);
-                }
-                templates.add(textAtt);
+                //拓展任务宝欢迎语
+//                log.info("任务宝列表欢迎语 state：{}",query.getState());
+//                String fissionRecordId = query.getState().substring(WeConstans.FISSION_PREFIX.length());
+//                WeMessageTemplate textAtt = new WeMessageTemplate();
+//                textAtt.setMsgType(MessageType.TEXT.getMessageType());
+//                WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService.getById(Long.valueOf(fissionRecordId));
+//                if(weTaskFissionRecord != null){
+//                    WeTaskFission weTaskFission = weTaskFissionService.selectWeTaskFissionById(weTaskFissionRecord.getTaskFissionId());
+//                    if(weTaskFission != null){
+//                        textAtt.setContent(weTaskFission.getWelcomeMsg());
+//                    }
+//                }
+//                if(StringUtils.isEmpty(textAtt.getContent())){//设置默认欢迎语
+//                    //如果租户配置了欢迎语则返回租户欢迎语,如果租户没配置欢迎语则使用系统全局默认的欢迎语
+//                    textAtt.setContent(welcomeMsgDefault);
+//                }
+//                templates.add(textAtt);
             }
             else if(StringUtils.isNotEmpty(query.getState()) && query.getState().startsWith(WeConstans.WE_STORE_CODE_CONFIG_PREFIX)){
                     log.info("门店导购欢迎语 state：{}",query.getState());
