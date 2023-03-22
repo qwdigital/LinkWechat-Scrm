@@ -42,9 +42,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.awt.image.BufferedImage;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -267,7 +264,7 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
 
         if (StrUtil.isNotBlank(promotionKey)) {
             long promotionId = Base62NumUtil.decode(promotionKey);
-            resObj.put("query", "id=" + shortUrl + "?promotionId=" + promotionId);
+            resObj.put("query", "id=" + shortUrl + "&promotionId=" + promotionId);
         } else {
             resObj.put("query", "id=" + shortUrl);
         }
