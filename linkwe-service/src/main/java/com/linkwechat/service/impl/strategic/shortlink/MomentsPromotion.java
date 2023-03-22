@@ -127,7 +127,7 @@ public class MomentsPromotion extends PromotionType {
             timingSend(weShortLinkPromotion.getId(),
                     moments.getId(),
                     momentsAddQuery.getContent(),
-                    Date.from(query.getClient().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()),
+                    Date.from(query.getMoments().getTaskSendTime().atZone(ZoneId.systemDefault()).toInstant()),
                     weMessageTemplates,
                     senderInfos,
                     momentsAddQuery.getLabelIds()
