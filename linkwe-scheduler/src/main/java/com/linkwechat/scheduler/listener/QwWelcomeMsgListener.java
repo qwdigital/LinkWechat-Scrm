@@ -2,6 +2,7 @@ package com.linkwechat.scheduler.listener;
 
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.wecom.callback.WeBackCustomerVo;
 import com.linkwechat.scheduler.service.IWelcomeMsgService;
 import com.rabbitmq.client.Channel;
@@ -63,7 +64,7 @@ public class QwWelcomeMsgListener {
 
     private IWelcomeMsgService factory(String state) {
 
-        if (route.keySet().stream().noneMatch(state::startsWith)) {
+        if (StringUtils.isEmpty(state) || route.keySet().stream().noneMatch(state::startsWith)) {
             return welcomeMsgMap.get("weDefaultQrCodeMsgServiceImpl");
         }
         String key = route.keySet().stream().filter(state::startsWith).collect(Collectors.joining());
