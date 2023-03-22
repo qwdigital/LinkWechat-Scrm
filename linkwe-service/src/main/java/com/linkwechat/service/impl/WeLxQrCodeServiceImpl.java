@@ -308,7 +308,7 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
     public PageInfo<WeLxQrCodeListVo> getQrCodeList(WeLxQrCodeListQuery query) {
         PageInfo<WeLxQrCodeListVo> pageInfo = new PageInfo<>();
         LambdaQueryWrapper<WeLxQrCode> wrapper = new LambdaQueryWrapper<WeLxQrCode>()
-                .eq(StringUtils.isNotEmpty(query.getQrName()), WeLxQrCode::getName, query.getQrName())
+                .like(StringUtils.isNotEmpty(query.getQrName()), WeLxQrCode::getName, query.getQrName())
                 .eq(Objects.nonNull(query.getType()), WeLxQrCode::getType, query.getType())
                 .ge(StringUtils.isNotEmpty(query.getBeginTime()), WeLxQrCode::getCreateTime, query.getBeginTime())
                 .le(StringUtils.isNotEmpty(query.getEndTime()), WeLxQrCode::getCreateTime, query.getEndTime())

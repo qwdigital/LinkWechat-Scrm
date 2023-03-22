@@ -106,6 +106,7 @@ public class WeLxQrCodeMsgServiceImpl extends AbstractWelcomeMsgServiceImpl {
             template.setTitle(qrDetail.getName());
 
             if (ObjectUtil.equal(1, qrDetail.getType())) {
+                String orderNo = "0";
                 try {
                     //发送客户红包
                     String businessData = qrDetail.getBusinessData();
@@ -113,14 +114,13 @@ public class WeLxQrCodeMsgServiceImpl extends AbstractWelcomeMsgServiceImpl {
                     String money = redInfo.getString("money");
                     String name = redInfo.getString("name");
                     int redEnvelopeAmount = new BigDecimal(money).multiply(BigDecimal.valueOf(100)).intValue();
-                    String orderNo = weRedEnvelopesService.createCustomerRedEnvelopesOrder(String.valueOf(qrDetail.getBusinessId()), redEnvelopeAmount, name, 1, query.getUserID(), 1, query.getExternalUserID());
-
-                    template.setPicUrl(redPacketImg);
-                    template.setLinkUrl(StringUtils.format(redPacketLink, qrDetail.getId(),qrDetail.getType(),orderNo));
-                    templates.add(template);
+                    orderNo = weRedEnvelopesService.createCustomerRedEnvelopesOrder(String.valueOf(qrDetail.getBusinessId()), redEnvelopeAmount, name, 1, query.getUserID(), 1, query.getExternalUserID());
                 } catch (Exception e) {
                     log.error("发送客户红包失败 query:{}",JSONObject.toJSONString(query),e);
                 }
+                template.setPicUrl(redPacketImg);
+                template.setLinkUrl(StringUtils.format(redPacketLink, qrDetail.getId(),qrDetail.getType(),orderNo));
+                templates.add(template);
             }else if (ObjectUtil.equal(2, qrDetail.getType())) {
                 template.setPicUrl(redPacketImg);
                 template.setLinkUrl(StringUtils.format(coupontLink, qrDetail.getId(),qrDetail.getType()));
