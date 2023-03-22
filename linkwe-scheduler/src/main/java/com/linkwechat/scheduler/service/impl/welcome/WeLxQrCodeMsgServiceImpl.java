@@ -50,23 +50,23 @@ public class WeLxQrCodeMsgServiceImpl extends AbstractWelcomeMsgServiceImpl {
     private IWeRedEnvelopesService weRedEnvelopesService;
 
     //拉新红包图片地址
-    @Value("${welcom-msg.lxqr.red-packet-img:}")
+    @Value("${welcome-msg.lxqr.red-packet-img:}")
     private String redPacketImg;
 
     //拉新卡券h5地址
-    @Value("${welcom-msg.lxqr.red-packet-link:}")
+    @Value("${welcome-msg.lxqr.red-packet-link:}")
     private String redPacketLink;
 
     //拉新卡券图片地址
-    @Value("${welcom-msg.lxqr.coupon-img:}")
+    @Value("${welcome-msg.lxqr.coupon-img:}")
     private String coupontImg;
 
     //拉新卡券h5地址
-    @Value("${welcom-msg.lxqr.coupon-link:}")
+    @Value("${welcome-msg.lxqr.coupon-link:}")
     private String coupontLink;
 
     //拉新描述字段
-    @Value("${welcom-msg.lxqr.description:}")
+    @Value("${welcome-msg.lxqr.description:}")
     private String description;
 
 
