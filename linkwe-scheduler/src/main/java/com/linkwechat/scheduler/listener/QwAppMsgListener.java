@@ -1,6 +1,8 @@
 package com.linkwechat.scheduler.listener;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.enums.QwAppMsgBusinessTypeEnum;
 import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.domain.WeShortLinkPromotion;
@@ -90,7 +92,7 @@ public class QwAppMsgListener {
 
             //查看短链推广模板是否已经删除
             Long businessId = appMsgBody.getBusinessId();
-            if (weShortLinkPromotion.getType().equals(0)) {
+            if (weShortLinkPromotion.getType().equals(3)) {
                 WeShortLinkPromotionTemplateAppMsg appMsg = weShortLinkPromotionTemplateAppMsgService.getById(businessId);
                 if (appMsg == null || appMsg.getDelFlag().equals(1)) {
                     //删除直接跳出，不继续执行。
@@ -106,6 +108,11 @@ public class QwAppMsgListener {
                         break;
                     default: //默认通用发送
                         SpringUtils.getBean(qwAppMsgBusinessTypeEnum.getBeanName(), AbstractAppMsgService.class).sendAppMsg(appMsgBody);
+                        //修改状态为推广中
+                        LambdaUpdateWrapper<WeShortLinkPromotion> promotionUpdate = Wrappers.lambdaUpdate();
+                        promotionUpdate.set(WeShortLinkPromotion::getTaskStatus, 1);
+                        promotionUpdate.eq(WeShortLinkPromotion::getId, weShortLinkPromotion.getId());
+                        weShortLinkPromotionService.update(promotionUpdate);
                         break;
                 }
             }
