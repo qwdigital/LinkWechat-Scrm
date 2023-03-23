@@ -142,12 +142,10 @@ public class QwMomentsMsgListener {
 
         //查看短链推广模板是否已经删除
         Long businessId = weMoments.getBusinessId();
-        if (weShortLinkPromotion.getType().equals(0)) {
-            WeShortLinkPromotionTemplateMoments moments = weShortLinkPromotionTemplateMomentsService.getById(businessId);
-            if (moments == null || moments.getDelFlag().equals(1)) {
-                //删除直接跳出，不继续执行。
-                return;
-            }
+        WeShortLinkPromotionTemplateMoments moments = weShortLinkPromotionTemplateMomentsService.getById(businessId);
+        if (moments == null || moments.getDelFlag().equals(1)) {
+            //删除直接跳出，不继续执行。
+            return;
         }
 
         //用户信息

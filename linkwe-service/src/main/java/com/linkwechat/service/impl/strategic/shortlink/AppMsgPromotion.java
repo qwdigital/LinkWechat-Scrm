@@ -143,7 +143,7 @@ public class AppMsgPromotion extends PromotionType {
         //发送内容
         String appMsgUrl = linkWeChatConfig.getAppMsgUrl();
         appMsgUrl = StringUtils.format(appMsgUrl, weShortLinkPromotion.getId());
-        String content = "【短链推广】\r\n\r\n  您有一条新的短链推广任务，请点击链接，进入任务页，分享短链内容给客户。\r\n\r\n <a href=" + appMsgUrl + ">" + weShortLinkPromotion.getTaskName() + "</a>";
+        String content = "【短链推广】\r\n\r\n  您有一条新的短链推广任务，请点击链接，进入任务页，分享短链内容给客户。\r\n\r\n <a href=\"" + appMsgUrl + "\" >" + weShortLinkPromotion.getTaskName() + "</a>";
         //发送类型：0立即发送 1定时发送
         if (sendType.equals(0)) {
             //立即发送

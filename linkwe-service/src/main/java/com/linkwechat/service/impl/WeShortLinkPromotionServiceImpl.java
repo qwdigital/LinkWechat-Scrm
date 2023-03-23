@@ -181,15 +181,23 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
      * @param promotionId
      */
     private void cancelClient(Long promotionId) {
-        LambdaQueryWrapper<WeShortLinkPromotionTemplateClient> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(WeShortLinkPromotionTemplateClient::getPromotionId, promotionId);
-        queryWrapper.eq(WeShortLinkPromotionTemplateClient::getDelFlag, 0);
-        WeShortLinkPromotionTemplateClient one = weShortLinkPromotionTemplateClientService.getOne(queryWrapper);
-        if (BeanUtil.isNotEmpty(one)) {
-            LambdaUpdateWrapper<WeShortLinkPromotionTemplateClient> updateWrapper = Wrappers.lambdaUpdate();
-            updateWrapper.set(WeShortLinkPromotionTemplateClient::getDelFlag, 1);
-            updateWrapper.eq(WeShortLinkPromotionTemplateClient::getId, one.getId());
-            weShortLinkPromotionTemplateClientService.update(updateWrapper);
+        //清空短链推广的任务开始时间和任务结束时间
+        LambdaUpdateWrapper<WeShortLinkPromotion> wrapper = Wrappers.lambdaUpdate();
+        wrapper.set(WeShortLinkPromotion::getTaskStartTime, null);
+        wrapper.set(WeShortLinkPromotion::getTaskEndTime, null);
+        wrapper.eq(WeShortLinkPromotion::getId, promotionId);
+        boolean update = this.update(wrapper);
+        if (update) {
+            LambdaQueryWrapper<WeShortLinkPromotionTemplateClient> queryWrapper = Wrappers.lambdaQuery();
+            queryWrapper.eq(WeShortLinkPromotionTemplateClient::getPromotionId, promotionId);
+            queryWrapper.eq(WeShortLinkPromotionTemplateClient::getDelFlag, 0);
+            WeShortLinkPromotionTemplateClient one = weShortLinkPromotionTemplateClientService.getOne(queryWrapper);
+            if (BeanUtil.isNotEmpty(one)) {
+                LambdaUpdateWrapper<WeShortLinkPromotionTemplateClient> updateWrapper = Wrappers.lambdaUpdate();
+                updateWrapper.set(WeShortLinkPromotionTemplateClient::getDelFlag, 1);
+                updateWrapper.eq(WeShortLinkPromotionTemplateClient::getId, one.getId());
+                weShortLinkPromotionTemplateClientService.update(updateWrapper);
+            }
         }
     }
 
@@ -199,15 +207,23 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
      * @param promotionId
      */
     private void cancelGroup(Long promotionId) {
-        LambdaQueryWrapper<WeShortLinkPromotionTemplateGroup> queryWrapper = Wrappers.lambdaQuery(WeShortLinkPromotionTemplateGroup.class);
-        queryWrapper.eq(WeShortLinkPromotionTemplateGroup::getPromotionId, promotionId);
-        queryWrapper.eq(WeShortLinkPromotionTemplateGroup::getDelFlag, 0);
-        WeShortLinkPromotionTemplateGroup one = weShortLinkPromotionTemplateGroupService.getOne(queryWrapper);
-        if (BeanUtil.isNotEmpty(one)) {
-            LambdaUpdateWrapper<WeShortLinkPromotionTemplateGroup> updateWrapper = Wrappers.lambdaUpdate();
-            updateWrapper.set(WeShortLinkPromotionTemplateGroup::getDelFlag, 1);
-            updateWrapper.eq(WeShortLinkPromotionTemplateGroup::getId, one.getId());
-            weShortLinkPromotionTemplateGroupService.update(updateWrapper);
+        //清空短链推广的任务开始时间和任务结束时间
+        LambdaUpdateWrapper<WeShortLinkPromotion> wrapper = Wrappers.lambdaUpdate();
+        wrapper.set(WeShortLinkPromotion::getTaskStartTime, null);
+        wrapper.set(WeShortLinkPromotion::getTaskEndTime, null);
+        wrapper.eq(WeShortLinkPromotion::getId, promotionId);
+        boolean update = this.update(wrapper);
+        if (update) {
+            LambdaQueryWrapper<WeShortLinkPromotionTemplateGroup> queryWrapper = Wrappers.lambdaQuery(WeShortLinkPromotionTemplateGroup.class);
+            queryWrapper.eq(WeShortLinkPromotionTemplateGroup::getPromotionId, promotionId);
+            queryWrapper.eq(WeShortLinkPromotionTemplateGroup::getDelFlag, 0);
+            WeShortLinkPromotionTemplateGroup one = weShortLinkPromotionTemplateGroupService.getOne(queryWrapper);
+            if (BeanUtil.isNotEmpty(one)) {
+                LambdaUpdateWrapper<WeShortLinkPromotionTemplateGroup> updateWrapper = Wrappers.lambdaUpdate();
+                updateWrapper.set(WeShortLinkPromotionTemplateGroup::getDelFlag, 1);
+                updateWrapper.eq(WeShortLinkPromotionTemplateGroup::getId, one.getId());
+                weShortLinkPromotionTemplateGroupService.update(updateWrapper);
+            }
         }
     }
 
@@ -217,15 +233,23 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
      * @param promotionId
      */
     private void cancelMoments(Long promotionId) {
-        LambdaQueryWrapper<WeShortLinkPromotionTemplateMoments> queryWrapper = Wrappers.lambdaQuery(WeShortLinkPromotionTemplateMoments.class);
-        queryWrapper.eq(WeShortLinkPromotionTemplateMoments::getPromotionId, promotionId);
-        queryWrapper.eq(WeShortLinkPromotionTemplateMoments::getDelFlag, 0);
-        WeShortLinkPromotionTemplateMoments one = weShortLinkPromotionTemplateMomentsService.getOne(queryWrapper);
-        if (BeanUtil.isNotEmpty(one)) {
-            LambdaUpdateWrapper<WeShortLinkPromotionTemplateMoments> updateWrapper = Wrappers.lambdaUpdate(WeShortLinkPromotionTemplateMoments.class);
-            updateWrapper.set(WeShortLinkPromotionTemplateMoments::getDelFlag, 1);
-            updateWrapper.eq(WeShortLinkPromotionTemplateMoments::getId, one.getId());
-            weShortLinkPromotionTemplateMomentsService.update(updateWrapper);
+        //清空短链推广的任务开始时间和任务结束时间
+        LambdaUpdateWrapper<WeShortLinkPromotion> wrapper = Wrappers.lambdaUpdate();
+        wrapper.set(WeShortLinkPromotion::getTaskStartTime, null);
+        wrapper.set(WeShortLinkPromotion::getTaskEndTime, null);
+        wrapper.eq(WeShortLinkPromotion::getId, promotionId);
+        boolean update = this.update(wrapper);
+        if (update) {
+            LambdaQueryWrapper<WeShortLinkPromotionTemplateMoments> queryWrapper = Wrappers.lambdaQuery(WeShortLinkPromotionTemplateMoments.class);
+            queryWrapper.eq(WeShortLinkPromotionTemplateMoments::getPromotionId, promotionId);
+            queryWrapper.eq(WeShortLinkPromotionTemplateMoments::getDelFlag, 0);
+            WeShortLinkPromotionTemplateMoments one = weShortLinkPromotionTemplateMomentsService.getOne(queryWrapper);
+            if (BeanUtil.isNotEmpty(one)) {
+                LambdaUpdateWrapper<WeShortLinkPromotionTemplateMoments> updateWrapper = Wrappers.lambdaUpdate(WeShortLinkPromotionTemplateMoments.class);
+                updateWrapper.set(WeShortLinkPromotionTemplateMoments::getDelFlag, 1);
+                updateWrapper.eq(WeShortLinkPromotionTemplateMoments::getId, one.getId());
+                weShortLinkPromotionTemplateMomentsService.update(updateWrapper);
+            }
         }
     }
 
@@ -235,15 +259,23 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
      * @param promotionId
      */
     private void cancelAppMsg(Long promotionId) {
-        LambdaQueryWrapper<WeShortLinkPromotionTemplateAppMsg> queryWrapper = Wrappers.lambdaQuery(WeShortLinkPromotionTemplateAppMsg.class);
-        queryWrapper.eq(WeShortLinkPromotionTemplateAppMsg::getPromotionId, promotionId);
-        queryWrapper.eq(WeShortLinkPromotionTemplateAppMsg::getDelFlag, 0);
-        WeShortLinkPromotionTemplateAppMsg one = weShortLinkPromotionTemplateAppMsgService.getOne(queryWrapper);
-        if (BeanUtil.isNotEmpty(one)) {
-            LambdaUpdateWrapper<WeShortLinkPromotionTemplateAppMsg> updateWrapper = Wrappers.lambdaUpdate(WeShortLinkPromotionTemplateAppMsg.class);
-            updateWrapper.set(WeShortLinkPromotionTemplateAppMsg::getDelFlag, 1);
-            updateWrapper.eq(WeShortLinkPromotionTemplateAppMsg::getId, one.getId());
-            weShortLinkPromotionTemplateAppMsgService.update(updateWrapper);
+        //清空短链推广的任务开始时间和任务结束时间
+        LambdaUpdateWrapper<WeShortLinkPromotion> wrapper = Wrappers.lambdaUpdate();
+        wrapper.set(WeShortLinkPromotion::getTaskStartTime, null);
+        wrapper.set(WeShortLinkPromotion::getTaskEndTime, null);
+        wrapper.eq(WeShortLinkPromotion::getId, promotionId);
+        boolean update = this.update(wrapper);
+        if (update) {
+            LambdaQueryWrapper<WeShortLinkPromotionTemplateAppMsg> queryWrapper = Wrappers.lambdaQuery(WeShortLinkPromotionTemplateAppMsg.class);
+            queryWrapper.eq(WeShortLinkPromotionTemplateAppMsg::getPromotionId, promotionId);
+            queryWrapper.eq(WeShortLinkPromotionTemplateAppMsg::getDelFlag, 0);
+            WeShortLinkPromotionTemplateAppMsg one = weShortLinkPromotionTemplateAppMsgService.getOne(queryWrapper);
+            if (BeanUtil.isNotEmpty(one)) {
+                LambdaUpdateWrapper<WeShortLinkPromotionTemplateAppMsg> updateWrapper = Wrappers.lambdaUpdate(WeShortLinkPromotionTemplateAppMsg.class);
+                updateWrapper.set(WeShortLinkPromotionTemplateAppMsg::getDelFlag, 1);
+                updateWrapper.eq(WeShortLinkPromotionTemplateAppMsg::getId, one.getId());
+                weShortLinkPromotionTemplateAppMsgService.update(updateWrapper);
+            }
         }
     }
 
