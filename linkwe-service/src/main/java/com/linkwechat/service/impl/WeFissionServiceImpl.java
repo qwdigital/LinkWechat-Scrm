@@ -17,10 +17,7 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.customer.vo.WeCustomersVo;
-import com.linkwechat.domain.fission.WeFission;
-import com.linkwechat.domain.fission.WeFissionInviterRecord;
-import com.linkwechat.domain.fission.WeFissionNotice;
-import com.linkwechat.domain.fission.WeFissionInviterPoster;
+import com.linkwechat.domain.fission.*;
 import com.linkwechat.domain.fission.vo.*;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
@@ -384,6 +381,28 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
             WeFissionInviterRecord weFissionInviterRecord
                     = iWeFissionInviterRecordService.getById(fissionInviterRecordId);
+
+            if(null != weFissionInviterRecord){
+                iWeFissionInviterRecordSubService.save(WeFissionInviterRecordSub.builder()
+                                .addTargetId(weCustomer.getAddUserId())
+                                .fissionInviterRecordId(Long.parseLong(fissionInviterRecordId))
+                                .addTargetType(1)
+                                .inviterUserName(weCustomer.getCustomerName())
+                        .build());
+
+                int inviterRecordNumber = iWeFissionInviterRecordSubService.count(new LambdaQueryWrapper<WeFissionInviterRecordSub>()
+                        .eq(WeFissionInviterRecordSub::getFissionInviterRecordId, fissionInviterRecordId));
+
+                //设置邀请员工数
+                weFissionInviterRecord.setInviterNumber(inviterRecordNumber);
+
+                WeFission weFission = this.getById(weFissionInviterRecord.getFissionId());
+
+                if(null != weFission){
+
+                }
+
+            }
 
 
 //            iWeFissionInviterRecordSubService.
