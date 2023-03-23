@@ -8,6 +8,7 @@ import com.linkwechat.domain.wecom.callback.WeBackBaseVo;
 import com.linkwechat.domain.wecom.callback.WeBackCustomerVo;
 import com.linkwechat.factory.WeEventStrategy;
 import com.linkwechat.service.IWeCustomerService;
+import com.linkwechat.service.IWeFissionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,10 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
 
 //    @Autowired
 //    private IWeTaskFissionService weTaskFissionService;
+
+
+    @Autowired
+    private IWeFissionService iWeFissionService;
 
 
     @Autowired

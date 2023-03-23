@@ -2,6 +2,7 @@ package com.linkwechat.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.fission.WeFission;
 import com.linkwechat.domain.fission.WeFissionInviterPoster;
 import com.linkwechat.domain.fission.vo.*;
@@ -89,4 +90,19 @@ public interface IWeFissionService extends IService<WeFission> {
      * @return
      */
     WeFissionInviterPoster findFissionPoster(String unionid, String fissionId);
+
+
+    /**
+     * 裂变要成功处理逻辑(任务宝)
+     * @param state 渠道标识
+     * @param weCustomer 邀请的客户
+     */
+    void handleTaskFissionRecord(String state,WeCustomer weCustomer);
+
+
+    /**
+     * 裂变要成功处理逻辑(群裂变)
+     * @param state 渠道标识
+     */
+    void handleGroupFissionRecord(String state);
 }

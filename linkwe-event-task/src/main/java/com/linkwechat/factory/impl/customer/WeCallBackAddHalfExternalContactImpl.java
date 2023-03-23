@@ -24,8 +24,6 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
     @Autowired
     private IWeCustomerService weCustomerService;
 
-//    @Autowired
-//    private IWeTaskFissionService weTaskFissionService;
 
     @Autowired
     private RabbitMQSettingConfig rabbitMQSettingConfig;
