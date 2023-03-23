@@ -226,6 +226,12 @@ public class QwMomentsMsgListener {
         AjaxResult<MomentsResultDto> result = qwMomentsClient.addMomentTask(momentsParamDto);
 
         if (result.getCode() == 200) {
+            //修改状态为推广中
+            LambdaUpdateWrapper<WeShortLinkPromotion> promotionUpdate = Wrappers.lambdaUpdate();
+            promotionUpdate.set(WeShortLinkPromotion::getTaskStatus, 1);
+            promotionUpdate.eq(WeShortLinkPromotion::getId, weShortLinkPromotion.getId());
+            weShortLinkPromotionService.update(promotionUpdate);
+            //修改员工短链推广任务
             MomentsResultDto data = result.getData();
             LambdaUpdateWrapper<WeShortLinkUserPromotionTask> updateWrapper = Wrappers.lambdaUpdate();
             updateWrapper.eq(WeShortLinkUserPromotionTask::getTemplateId, businessId);

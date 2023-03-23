@@ -55,7 +55,7 @@ public class WeShortLinkUserPromotionTask extends BaseEntity {
     /**
      * 发送状态 0未发送 2已发送
      */
-    @ApiModelProperty(value = "发送状态 0未发送 2已发送")
+    @ApiModelProperty(value = "发送状态 0未发送 2已发送 3已取消")
     private Integer sendStatus;
 
     /**

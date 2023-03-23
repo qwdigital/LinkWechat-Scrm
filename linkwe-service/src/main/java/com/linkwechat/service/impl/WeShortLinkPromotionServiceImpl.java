@@ -2,6 +2,7 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -133,7 +134,7 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
         weShortLinkPromotion.setTaskStatus(0);
         weShortLinkPromotionMapper.insert(weShortLinkPromotion);
 
-        PromotionType promotionType = new DefaultPromotion();
+        PromotionType promotionType = SpringUtil.getBean(DefaultPromotion.class);
         WeMessageTemplate weMessageTemplate = promotionType.getPromotionUrl(weShortLinkPromotion.getId(), query.getShortLinkId(), query.getStyle(), query.getMaterialId());
         weShortLinkPromotion.setUrl(weMessageTemplate.getPicUrl());
         weShortLinkPromotionMapper.updateById(weShortLinkPromotion);
@@ -167,7 +168,7 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
         }
 
         WeShortLinkPromotion weShortLinkPromotion = BeanUtil.copyProperties(query, WeShortLinkPromotion.class);
-        PromotionType promotionType = new DefaultPromotion();
+        PromotionType promotionType = SpringUtil.getBean(DefaultPromotion.class);
         WeMessageTemplate weMessageTemplate = promotionType.getPromotionUrl(weShortLinkPromotion.getId(), query.getShortLinkId(), query.getStyle(), query.getMaterialId());
         weShortLinkPromotion.setUrl(weMessageTemplate.getPicUrl());
         weShortLinkPromotionMapper.updateById(weShortLinkPromotion);
