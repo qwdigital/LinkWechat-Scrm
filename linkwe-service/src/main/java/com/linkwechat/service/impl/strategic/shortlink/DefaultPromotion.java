@@ -5,6 +5,7 @@ import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionUpdateQuery;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Date;
@@ -18,6 +19,7 @@ import java.util.List;
  * @version 1.0.0
  * @date 2023/03/21 17:00
  */
+@Service
 public class DefaultPromotion extends PromotionType {
 
     @Override

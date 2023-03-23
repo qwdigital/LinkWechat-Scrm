@@ -105,6 +105,7 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Long ts(WeShortLinkPromotionAddQuery query) throws IOException {
         Long id = query.getId();
         WeShortLinkPromotion weShortLinkPromotion = null;
