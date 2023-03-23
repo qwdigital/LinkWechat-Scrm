@@ -5,16 +5,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.core.domain.AjaxResult;
-import com.linkwechat.domain.WeShortLinkPromotion;
-import com.linkwechat.domain.WeShortLinkUserPromotionTask;
+import com.linkwechat.domain.*;
 import com.linkwechat.domain.moments.dto.CancelMomentTaskDto;
 import com.linkwechat.domain.moments.dto.MomentsCreateResultDto;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTaskEndQuery;
 import com.linkwechat.domain.wecom.query.customer.msg.WeCancelGroupMsgSendQuery;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.fegin.QwMomentsClient;
-import com.linkwechat.service.IWeShortLinkPromotionService;
-import com.linkwechat.service.IWeShortLinkUserPromotionTaskService;
+import com.linkwechat.service.*;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -46,6 +44,14 @@ public class QwShortLinkGroupMsgEndListener {
     private QwCustomerClient qwCustomerClient;
     @Resource
     private QwMomentsClient qwMomentsClient;
+    @Resource
+    private IWeShortLinkPromotionTemplateAppMsgService weShortLinkPromotionTemplateAppMsgService;
+    @Resource
+    private IWeShortLinkPromotionTemplateClientService weShortLinkPromotionTemplateClientService;
+    @Resource
+    private IWeShortLinkPromotionTemplateGroupService weShortLinkPromotionTemplateGroupService;
+    @Resource
+    private IWeShortLinkPromotionTemplateMomentsService weShortLinkPromotionTemplateMomentsService;
 
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.delay-group-msg-end:Qu_DelayGroupMsgEnd}")
@@ -70,23 +76,28 @@ public class QwShortLinkGroupMsgEndListener {
      */
     @Transactional(rollbackFor = Exception.class)
     public void handler(WeShortLinkPromotionTaskEndQuery query) {
-        Integer type = query.getType();
-        switch (type) {
-            case 0:
-                clientHandler(query.getPromotionId(), query.getBusinessId());
-                break;
-            case 1:
-                groupHandler(query.getPromotionId(), query.getBusinessId());
-                break;
-            case 2:
-                momentsHandler(query.getPromotionId(), query.getBusinessId());
-                break;
-            case 3:
-                appMsgHandler(query.getPromotionId(), query.getBusinessId());
-                break;
-            default:
-                break;
-        }
+        WeShortLinkPromotion weShortLinkPromotion = weShortLinkPromotionService.getById(query.getPromotionId());
+        Optional.ofNullable(weShortLinkPromotion).ifPresent(o -> {
+            if (weShortLinkPromotion.getDelFlag().equals(0)) {
+                Integer type = query.getType();
+                switch (type) {
+                    case 0:
+                        clientHandler(query.getPromotionId(), query.getBusinessId());
+                        break;
+                    case 1:
+                        groupHandler(query.getPromotionId(), query.getBusinessId());
+                        break;
+                    case 2:
+                        momentsHandler(query.getPromotionId(), query.getBusinessId());
+                        break;
+                    case 3:
+                        appMsgHandler(query.getPromotionId(), query.getBusinessId());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
     }
 
     /**
@@ -96,24 +107,28 @@ public class QwShortLinkGroupMsgEndListener {
      * @param businessId
      */
     private void clientHandler(Long promotionId, Long businessId) {
-        LambdaQueryWrapper<WeShortLinkUserPromotionTask> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(WeShortLinkUserPromotionTask::getTemplateType, 0);
-        queryWrapper.eq(WeShortLinkUserPromotionTask::getTemplateId, businessId);
-        queryWrapper.eq(WeShortLinkUserPromotionTask::getDelFlag, 0);
-        List<WeShortLinkUserPromotionTask> list = weShortLinkUserPromotionTaskService.list(queryWrapper);
-        if (list != null && list.size() > 0) {
-            list.stream().forEach(i -> Optional.ofNullable(i.getMsgId()).ifPresent(o -> {
-                WeCancelGroupMsgSendQuery query = new WeCancelGroupMsgSendQuery();
-                query.setMsgid(o);
-                qwCustomerClient.cancelGroupMsgSend(query);
-            }));
-        }
-
-        //更新短链推广状态为已结束
-        LambdaUpdateWrapper<WeShortLinkPromotion> promotionUpdateWrapper = Wrappers.lambdaUpdate();
-        promotionUpdateWrapper.eq(WeShortLinkPromotion::getId, promotionId);
-        promotionUpdateWrapper.set(WeShortLinkPromotion::getTaskStatus, 2);
-        weShortLinkPromotionService.update(promotionUpdateWrapper);
+        WeShortLinkPromotionTemplateClient one = weShortLinkPromotionTemplateClientService.getById(businessId);
+        Optional.ofNullable(one).ifPresent(j -> {
+            if (j.getDelFlag().equals(0)) {
+                LambdaQueryWrapper<WeShortLinkUserPromotionTask> queryWrapper = Wrappers.lambdaQuery();
+                queryWrapper.eq(WeShortLinkUserPromotionTask::getTemplateType, 0);
+                queryWrapper.eq(WeShortLinkUserPromotionTask::getTemplateId, businessId);
+                queryWrapper.eq(WeShortLinkUserPromotionTask::getDelFlag, 0);
+                List<WeShortLinkUserPromotionTask> list = weShortLinkUserPromotionTaskService.list(queryWrapper);
+                if (list != null && list.size() > 0) {
+                    list.stream().forEach(i -> Optional.ofNullable(i.getMsgId()).ifPresent(o -> {
+                        WeCancelGroupMsgSendQuery query = new WeCancelGroupMsgSendQuery();
+                        query.setMsgid(o);
+                        qwCustomerClient.cancelGroupMsgSend(query);
+                    }));
+                }
+                //更新短链推广状态为已结束
+                LambdaUpdateWrapper<WeShortLinkPromotion> promotionUpdateWrapper = Wrappers.lambdaUpdate();
+                promotionUpdateWrapper.eq(WeShortLinkPromotion::getId, promotionId);
+                promotionUpdateWrapper.set(WeShortLinkPromotion::getTaskStatus, 2);
+                weShortLinkPromotionService.update(promotionUpdateWrapper);
+            }
+        });
     }
 
     /**
@@ -123,24 +138,28 @@ public class QwShortLinkGroupMsgEndListener {
      * @param businessId
      */
     private void groupHandler(Long promotionId, Long businessId) {
-        LambdaQueryWrapper<WeShortLinkUserPromotionTask> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(WeShortLinkUserPromotionTask::getTemplateType, 1);
-        queryWrapper.eq(WeShortLinkUserPromotionTask::getTemplateId, businessId);
-        queryWrapper.eq(WeShortLinkUserPromotionTask::getDelFlag, 0);
-        List<WeShortLinkUserPromotionTask> list = weShortLinkUserPromotionTaskService.list(queryWrapper);
-        if (list != null && list.size() > 0) {
-            list.stream().forEach(i -> Optional.ofNullable(i.getMsgId()).ifPresent(o -> {
-                WeCancelGroupMsgSendQuery query = new WeCancelGroupMsgSendQuery();
-                query.setMsgid(o);
-                qwCustomerClient.cancelGroupMsgSend(query);
-            }));
-        }
-
-        //更新短链推广状态为已结束
-        LambdaUpdateWrapper<WeShortLinkPromotion> promotionUpdateWrapper = Wrappers.lambdaUpdate();
-        promotionUpdateWrapper.eq(WeShortLinkPromotion::getId, promotionId);
-        promotionUpdateWrapper.set(WeShortLinkPromotion::getTaskStatus, 2);
-        weShortLinkPromotionService.update(promotionUpdateWrapper);
+        WeShortLinkPromotionTemplateGroup one = weShortLinkPromotionTemplateGroupService.getById(businessId);
+        Optional.ofNullable(one).ifPresent(j -> {
+            if (j.getDelFlag().equals(0)) {
+                LambdaQueryWrapper<WeShortLinkUserPromotionTask> queryWrapper = Wrappers.lambdaQuery();
+                queryWrapper.eq(WeShortLinkUserPromotionTask::getTemplateType, 1);
+                queryWrapper.eq(WeShortLinkUserPromotionTask::getTemplateId, businessId);
+                queryWrapper.eq(WeShortLinkUserPromotionTask::getDelFlag, 0);
+                List<WeShortLinkUserPromotionTask> list = weShortLinkUserPromotionTaskService.list(queryWrapper);
+                if (list != null && list.size() > 0) {
+                    list.stream().forEach(i -> Optional.ofNullable(i.getMsgId()).ifPresent(o -> {
+                        WeCancelGroupMsgSendQuery query = new WeCancelGroupMsgSendQuery();
+                        query.setMsgid(o);
+                        qwCustomerClient.cancelGroupMsgSend(query);
+                    }));
+                }
+                //更新短链推广状态为已结束
+                LambdaUpdateWrapper<WeShortLinkPromotion> promotionUpdateWrapper = Wrappers.lambdaUpdate();
+                promotionUpdateWrapper.eq(WeShortLinkPromotion::getId, promotionId);
+                promotionUpdateWrapper.set(WeShortLinkPromotion::getTaskStatus, 2);
+                weShortLinkPromotionService.update(promotionUpdateWrapper);
+            }
+        });
     }
 
     /**
@@ -150,34 +169,40 @@ public class QwShortLinkGroupMsgEndListener {
      * @param businessId
      */
     private void momentsHandler(Long promotionId, Long businessId) {
-        LambdaQueryWrapper<WeShortLinkUserPromotionTask> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(WeShortLinkUserPromotionTask::getTemplateType, 2);
-        queryWrapper.eq(WeShortLinkUserPromotionTask::getTemplateId, businessId);
-        queryWrapper.eq(WeShortLinkUserPromotionTask::getDelFlag, 0);
-        WeShortLinkUserPromotionTask one = weShortLinkUserPromotionTaskService.getOne(queryWrapper);
-        Optional.ofNullable(one).ifPresent(i -> {
-            AjaxResult<MomentsCreateResultDto> momentTaskResult = qwMomentsClient.getMomentTaskResult(i.getMsgId());
-            Optional.ofNullable(momentTaskResult).filter(o -> o.getCode() == 200).ifPresent(m -> {
-                MomentsCreateResultDto data = m.getData();
-                MomentsCreateResultDto.Result result = data.getResult();
-                //停止发送朋友圈
-                CancelMomentTaskDto cancelMomentTaskDto = new CancelMomentTaskDto();
-                cancelMomentTaskDto.setMoment_id(result.getMoment_id());
-                qwMomentsClient.cancel_moment_task(cancelMomentTaskDto);
 
-                //更新员工短链任务推广
-                LambdaUpdateWrapper<WeShortLinkUserPromotionTask> updateWrapper = Wrappers.lambdaUpdate();
-                updateWrapper.eq(WeShortLinkUserPromotionTask::getId, one.getId());
-                updateWrapper.set(WeShortLinkUserPromotionTask::getSendStatus, 3);
-                updateWrapper.set(WeShortLinkUserPromotionTask::getMomentId, result.getMoment_id());
-                weShortLinkUserPromotionTaskService.update(updateWrapper);
+        WeShortLinkPromotionTemplateMoments moments = weShortLinkPromotionTemplateMomentsService.getById(businessId);
+        Optional.ofNullable(moments).ifPresent(j -> {
+            if (j.getDelFlag().equals(0)) {
+                LambdaQueryWrapper<WeShortLinkUserPromotionTask> queryWrapper = Wrappers.lambdaQuery();
+                queryWrapper.eq(WeShortLinkUserPromotionTask::getTemplateType, 2);
+                queryWrapper.eq(WeShortLinkUserPromotionTask::getTemplateId, businessId);
+                queryWrapper.eq(WeShortLinkUserPromotionTask::getDelFlag, 0);
+                WeShortLinkUserPromotionTask one = weShortLinkUserPromotionTaskService.getOne(queryWrapper);
+                Optional.ofNullable(one).ifPresent(i -> {
+                    AjaxResult<MomentsCreateResultDto> momentTaskResult = qwMomentsClient.getMomentTaskResult(i.getMsgId());
+                    Optional.ofNullable(momentTaskResult).filter(o -> o.getCode() == 200).ifPresent(m -> {
+                        MomentsCreateResultDto data = m.getData();
+                        MomentsCreateResultDto.Result result = data.getResult();
+                        //停止发送朋友圈
+                        CancelMomentTaskDto cancelMomentTaskDto = new CancelMomentTaskDto();
+                        cancelMomentTaskDto.setMoment_id(result.getMoment_id());
+                        qwMomentsClient.cancel_moment_task(cancelMomentTaskDto);
 
-                //更新短链推广状态为已结束
-                LambdaUpdateWrapper<WeShortLinkPromotion> promotionUpdateWrapper = Wrappers.lambdaUpdate();
-                promotionUpdateWrapper.eq(WeShortLinkPromotion::getId, promotionId);
-                promotionUpdateWrapper.set(WeShortLinkPromotion::getTaskStatus, 2);
-                weShortLinkPromotionService.update(promotionUpdateWrapper);
-            });
+                        //更新员工短链任务推广
+                        LambdaUpdateWrapper<WeShortLinkUserPromotionTask> updateWrapper = Wrappers.lambdaUpdate();
+                        updateWrapper.eq(WeShortLinkUserPromotionTask::getId, one.getId());
+                        updateWrapper.set(WeShortLinkUserPromotionTask::getSendStatus, 3);
+                        updateWrapper.set(WeShortLinkUserPromotionTask::getMomentId, result.getMoment_id());
+                        weShortLinkUserPromotionTaskService.update(updateWrapper);
+
+                        //更新短链推广状态为已结束
+                        LambdaUpdateWrapper<WeShortLinkPromotion> promotionUpdateWrapper = Wrappers.lambdaUpdate();
+                        promotionUpdateWrapper.eq(WeShortLinkPromotion::getId, promotionId);
+                        promotionUpdateWrapper.set(WeShortLinkPromotion::getTaskStatus, 2);
+                        weShortLinkPromotionService.update(promotionUpdateWrapper);
+                    });
+                });
+            }
         });
     }
 
@@ -189,11 +214,16 @@ public class QwShortLinkGroupMsgEndListener {
      * @param businessId
      */
     public void appMsgHandler(Long promotionId, Long businessId) {
-        //更新短链推广状态为已结束
-        LambdaUpdateWrapper<WeShortLinkPromotion> promotionUpdateWrapper = Wrappers.lambdaUpdate();
-        promotionUpdateWrapper.eq(WeShortLinkPromotion::getId, promotionId);
-        promotionUpdateWrapper.set(WeShortLinkPromotion::getTaskStatus, 2);
-        weShortLinkPromotionService.update(promotionUpdateWrapper);
+        WeShortLinkPromotionTemplateAppMsg one = weShortLinkPromotionTemplateAppMsgService.getById(businessId);
+        Optional.ofNullable(one).ifPresent(o -> {
+            if (o.getDelFlag().equals(0)) {
+                //更新短链推广状态为已结束
+                LambdaUpdateWrapper<WeShortLinkPromotion> promotionUpdateWrapper = Wrappers.lambdaUpdate();
+                promotionUpdateWrapper.eq(WeShortLinkPromotion::getId, promotionId);
+                promotionUpdateWrapper.set(WeShortLinkPromotion::getTaskStatus, 2);
+                weShortLinkPromotionService.update(promotionUpdateWrapper);
+            }
+        });
     }
 
 }
