@@ -36,6 +36,10 @@ public class H5RedEnvelopesDetailDto {
     //已领取金额
     @ApiModelProperty("已领取金额")
     private int accpectMoney;
+
+    @ApiModelProperty("红包个数")
+    private Integer redEnvelopeNum;
+
     //接受人
     @ApiModelProperty("接受人信息")
     private List<AccpestCustomer> accpestCustomerList;

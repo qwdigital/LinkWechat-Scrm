@@ -446,6 +446,7 @@ public class WeRedEnvelopesServiceImpl extends ServiceImpl<WeRedEnvelopesMapper,
                 h5RedEnvelopesDetailDto.setCurrentAcceptMoney(weRedEnvelopesRecord.getRedEnvelopeMoney());
                 h5RedEnvelopesDetailDto.setAccpectMoney(weRedEnvelopesRecord.getRedEnvelopeMoney());
                 h5RedEnvelopesDetailDto.setTotalMoney(weRedEnvelopesRecord.getRedEnvelopeMoney());
+                h5RedEnvelopesDetailDto.setRedEnvelopeNum(weRedEnvelopesRecord.getRedEnvelopeNum());
             }
         }else{//群成员相关红包设置
             WeRedEnvelopesRecord weRedEnvelopesRecord=weRedEnvelopesRecordMapper.selectOne(new LambdaQueryWrapper<WeRedEnvelopesRecord>()

@@ -55,7 +55,7 @@
                 qr_id = #{qrId}
             </if>
             <if test="beginTime != null"><!-- 开始时间检索 -->
-                AND date_format(create_time,'%Y-%m-%d') &gt; date_format(#{beginTime},'%Y-%m-%d')
+                AND date_format(create_time,'%Y-%m-%d') &gt; date_format(#{endTime},'%Y-%m-%d')
             </if>
             and del_flag = 0
         </where>

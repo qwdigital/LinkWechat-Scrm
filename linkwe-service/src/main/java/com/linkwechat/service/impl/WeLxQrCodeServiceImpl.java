@@ -477,13 +477,20 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
         if (Objects.isNull(lxQrCode)) {
             throw new WeComException("无效ID");
         }
+
+        List<WeLxQrCodeLog> list = weLxQrCodeLogService.list(new LambdaQueryWrapper<WeLxQrCodeLog>()
+                .eq(WeLxQrCodeLog::getQrId, query.getQrId())
+                .eq(StringUtils.isNotEmpty(query.getOrderNo()),WeLxQrCodeLog::getOrderId,query.getOrderNo())
+                .eq(WeLxQrCodeLog::getDelFlag, 0));
+        if(CollectionUtil.isNotEmpty(list)){
+            return;
+        }
+
         if (ObjectUtil.equal(1, lxQrCode.getType())) {
             String businessData = lxQrCode.getBusinessData();
             JSONObject redInfo = JSONObject.parseObject(businessData);
             String money = redInfo.getString("money");
-
-            codeLog.setAmount(Integer.parseInt(money));
-
+            codeLog.setAmount(new BigDecimal(money).multiply(new BigDecimal(100)).intValue());
             String returnMsg = weRedEnvelopesService.customerReceiveRedEnvelopes(query.getOrderNo()
                     , SecurityUtils.getWxLoginUser().getOpenId()
                     , SecurityUtils.getWxLoginUser().getNickName()
@@ -522,14 +529,14 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
         WeLxQrCodeReceiveVo weLxQrCodeReceiveVo = new WeLxQrCodeReceiveVo();
 
         List<WeLxQrCodeLog> logList = weLxQrCodeLogService.list(new LambdaQueryWrapper<WeLxQrCodeLog>()
-                .eq(WeLxQrCodeLog::getId, query.getQrId())
+                .eq(WeLxQrCodeLog::getQrId, query.getQrId())
                 .eq(WeLxQrCodeLog::getDelFlag, 0));
         if (CollectionUtil.isNotEmpty(logList)) {
             List<WeLxQrCodeLog> todayList = logList.parallelStream().filter(codeLog -> ObjectUtil.equal(DateUtil.today(), DateUtil.formatDate(codeLog.getCreateTime()))).collect(Collectors.toList());
             List<WeLxQrCodeLog> tomorrowList = logList.parallelStream().filter(codeLog -> ObjectUtil.equal(DateUtil.tomorrow().toDateStr(), DateUtil.formatDate(codeLog.getCreateTime()))).collect(Collectors.toList());
 
-            int totalAmount = logList.parallelStream().mapToInt(WeLxQrCodeLog::getAmount).sum();
-            int todayAmount = todayList.parallelStream().mapToInt(WeLxQrCodeLog::getAmount).sum();
+            int totalAmount = logList.parallelStream().filter(item -> Objects.nonNull(item.getAmount())).mapToInt(WeLxQrCodeLog::getAmount).sum();
+            int todayAmount = todayList.parallelStream().filter(item -> Objects.nonNull(item.getAmount())).mapToInt(WeLxQrCodeLog::getAmount).sum();
             int tomorrowAmount = tomorrowList.parallelStream().mapToInt(WeLxQrCodeLog::getAmount).sum();
 
             String totalAmountStr = new BigDecimal(totalAmount).divide(BigDecimal.valueOf(100L)).toString();
@@ -555,11 +562,19 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
 
         List<String> xAxis = new LinkedList<>();
         List<String> yAxis = new LinkedList<>();
-        List<WeLxQrCodeLog> logList = weLxQrCodeLogService.list(new LambdaQueryWrapper<WeLxQrCodeLog>()
-                .eq(WeLxQrCodeLog::getId, query.getQrId())
-                .ge(Objects.nonNull(query.getBeginTime()), BaseEntity::getCreateTime, DateUtil.formatDate(query.getBeginTime()))
-                .le(Objects.nonNull(query.getEndTime()), BaseEntity::getCreateTime, DateUtil.formatDate(query.getEndTime()))
-                .eq(WeLxQrCodeLog::getDelFlag, 0));
+
+        LambdaQueryWrapper<WeLxQrCodeLog> wrapper = new LambdaQueryWrapper<WeLxQrCodeLog>()
+                .eq(WeLxQrCodeLog::getQrId, query.getQrId())
+                .eq(WeLxQrCodeLog::getDelFlag, 0);
+
+        if (query.getBeginTime() != null) {
+            wrapper.apply("DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) >= '" + DateUtil.formatDate(query.getBeginTime()) + "'");
+        }
+        if (query.getEndTime() != null){
+            wrapper .apply("DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) <= '" + DateUtil.formatDate(query.getEndTime()) + "'");
+        }
+
+        List<WeLxQrCodeLog> logList = weLxQrCodeLogService.list(wrapper);
 
         Map<String, Long> dateMap = logList.parallelStream().collect(Collectors.groupingBy(item -> DateUtil.formatDate(item.getCreateTime()), Collectors.counting()));
 
@@ -586,11 +601,19 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
 
         List<String> xAxis = new LinkedList<>();
         List<String> yAxis = new LinkedList<>();
-        List<WeLxQrCodeLog> logList = weLxQrCodeLogService.list(new LambdaQueryWrapper<WeLxQrCodeLog>()
-                .eq(WeLxQrCodeLog::getId, query.getQrId())
-                .ge(Objects.nonNull(query.getBeginTime()), BaseEntity::getCreateTime, DateUtil.formatDate(query.getBeginTime()))
-                .le(Objects.nonNull(query.getEndTime()), BaseEntity::getCreateTime, DateUtil.formatDate(query.getEndTime()))
-                .eq(WeLxQrCodeLog::getDelFlag, 0));
+
+        LambdaQueryWrapper<WeLxQrCodeLog> wrapper = new LambdaQueryWrapper<WeLxQrCodeLog>()
+                .eq(WeLxQrCodeLog::getQrId, query.getQrId())
+                .eq(WeLxQrCodeLog::getDelFlag, 0);
+
+        if (query.getBeginTime() != null) {
+            wrapper.apply("DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) >= '" + DateUtil.formatDate(query.getBeginTime()) + "'");
+        }
+        if (query.getEndTime() != null){
+            wrapper .apply("DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) <= '" + DateUtil.formatDate(query.getEndTime()) + "'");
+        }
+
+        List<WeLxQrCodeLog> logList = weLxQrCodeLogService.list(wrapper);
 
         Map<String, Integer> amountMap = logList.parallelStream().collect(Collectors.groupingBy(item -> DateUtil.formatDate(item.getCreateTime()), Collectors.summingInt(WeLxQrCodeLog::getAmount)));
 

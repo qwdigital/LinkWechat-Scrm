@@ -3,6 +3,7 @@ package com.linkwechat.controller;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.domain.envelopes.dto.H5RedEnvelopesDetailDto;
 import com.linkwechat.domain.qr.query.WxLxQrQuery;
 import com.linkwechat.domain.qr.vo.WxLxQrCodeVo;
 import com.linkwechat.service.IWeLxQrCodeService;
@@ -61,8 +62,8 @@ public class WxLxQrCodeController extends BaseController {
     @ApiOperation(value = "红包领取记录", httpMethod = "POST")
     @PostMapping("/getReceiveList")
     public AjaxResult getReceiveList(@RequestBody WxLxQrQuery query){
-        weLxQrCodeService.getReceiveList(query);
-        return AjaxResult.success();
+        H5RedEnvelopesDetailDto receiveList = weLxQrCodeService.getReceiveList(query);
+        return AjaxResult.success(receiveList);
     }
 
 }
