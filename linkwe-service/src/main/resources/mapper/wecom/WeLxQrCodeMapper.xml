@@ -136,7 +136,7 @@
                   , '%Y-%m-%d')
              ) t
                  left join
-             (select date_format(add_time, '%Y-%d-%d') as date_time, count(1) as num
+             (select date_format(add_time, '%Y-%m-%d') as date_time, count(1) as num
               from we_customer
               where state = #{state}
               group by add_time) c on t.date_time = c.date_time

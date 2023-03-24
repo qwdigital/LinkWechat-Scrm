@@ -356,27 +356,20 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
 
     @Override
     public WeLxQrCodeLineVo getWeQrCodeLineStatistics(WeLxQrCodeListQuery query) {
-
-        statisticsParamsCheck(query);
-
         WeLxQrCodeLineVo scanCountVo = new WeLxQrCodeLineVo();
         List<String> xAxis = new ArrayList<>();
         List<Integer> yAxis = new ArrayList<>();
-        Long qrId = query.getQrId();
         Date beginTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD, query.getBeginTime());
         Date endTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD, query.getEndTime());
-        WeLxQrCode weQrCode = getById(qrId);
-        if (Objects.isNull(weQrCode)) {
-            throw new WeComException("无效ID");
-        }
+
         Map<String, List<WeCustomer>> customerMap = new HashMap<>();
-        List<WeCustomer> customerList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getState, weQrCode.getState()));
+        List<WeCustomer> customerList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getState, query.getState()));
         if (CollectionUtil.isNotEmpty(customerList)) {
             scanCountVo.setTotal(customerList.size());
             long todayNum = customerList.stream().filter(item -> ObjectUtil.equal(DateUtils.getDate(), DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getAddTime()))).count();
-            long tomorrowNum = customerList.stream().filter(item -> ObjectUtil.equal(DateUtil.tomorrow().toDateStr(), DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getAddTime()))).count();
+            long yerterdayNum = customerList.stream().filter(item -> ObjectUtil.equal(DateUtil.yesterday().toDateStr(), DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getAddTime()))).count();
             scanCountVo.setToday(Long.valueOf(todayNum).intValue());
-            scanCountVo.setTodayDiff(Long.valueOf(todayNum - tomorrowNum).intValue());
+            scanCountVo.setTodayDiff(Long.valueOf(todayNum - yerterdayNum).intValue());
             Map<String, List<WeCustomer>> listMap = customerList.stream().collect(Collectors.groupingBy(item -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getAddTime())));
             customerMap.putAll(listMap);
         }
@@ -397,16 +390,8 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
     @Override
     public List<WeLxQrCodeSheetVo> getWeQrCodeListStatistics(WeLxQrCodeListQuery query) {
 
-        statisticsParamsCheck(query);
-
-        WeLxQrCode weQrCode = getById(query.getQrId());
-        if (Objects.isNull(weQrCode)) {
-            throw new WeComException("无效ID");
-        }
-        query.setState(weQrCode.getState());
-
         List<WeLxQrCodeSheetVo> lxQrCodeSheetList = this.baseMapper.getWeQrCodeListStatistics(query);
-        int totalNum = weCustomerService.count(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getState, weQrCode.getState()));
+        int totalNum = weCustomerService.count(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getState, query.getState()));
 
         for (WeLxQrCodeSheetVo lxQrCodeSheet : lxQrCodeSheetList) {
             lxQrCodeSheet.setTotalNum(totalNum);
@@ -431,7 +416,8 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
         }
     }
 
-    private void statisticsParamsCheck(WeLxQrCodeListQuery query) {
+    @Override
+    public void statisticsParamsCheck(WeLxQrCodeListQuery query) {
         if (Objects.isNull(query)) {
             throw new WeComException("参数不能为空");
         }
@@ -445,6 +431,11 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
         if (StringUtils.isEmpty(query.getEndTime())) {
             throw new WeComException("结束时间不能为空");
         }
+        WeLxQrCode weQrCode = getById(query.getQrId());
+        if (Objects.isNull(weQrCode)) {
+            throw new WeComException("无效ID");
+        }
+        query.setState(weQrCode.getState());
     }
 
 
@@ -537,11 +528,11 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
 
             int totalAmount = logList.parallelStream().filter(item -> Objects.nonNull(item.getAmount())).mapToInt(WeLxQrCodeLog::getAmount).sum();
             int todayAmount = todayList.parallelStream().filter(item -> Objects.nonNull(item.getAmount())).mapToInt(WeLxQrCodeLog::getAmount).sum();
-            int tomorrowAmount = yesterdayList.parallelStream().mapToInt(WeLxQrCodeLog::getAmount).sum();
+            int yesterdayAmount = yesterdayList.parallelStream().mapToInt(WeLxQrCodeLog::getAmount).sum();
 
             String totalAmountStr = new BigDecimal(totalAmount).divide(BigDecimal.valueOf(100L)).toString();
             String todayAmountStr = new BigDecimal(todayAmount).divide(BigDecimal.valueOf(100L)).toString();
-            String tomorrowAmountStr = new BigDecimal(todayAmount - tomorrowAmount).divide(BigDecimal.valueOf(100L)).toString();
+            String yesterdayAmountStr = new BigDecimal(todayAmount - yesterdayAmount).divide(BigDecimal.valueOf(100L)).toString();
 
 
             weLxQrCodeReceiveVo.setTotalNum(logList.size());
@@ -549,7 +540,7 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
             weLxQrCodeReceiveVo.setTotalAmount(totalAmountStr);
             weLxQrCodeReceiveVo.setTodayAmount(todayAmountStr);
             weLxQrCodeReceiveVo.setTodayNumDiff(todayList.size() - yesterdayList.size());
-            weLxQrCodeReceiveVo.setTodayAmountDiff(tomorrowAmountStr);
+            weLxQrCodeReceiveVo.setTodayAmountDiff(yesterdayAmountStr);
         }
 
         return weLxQrCodeReceiveVo;

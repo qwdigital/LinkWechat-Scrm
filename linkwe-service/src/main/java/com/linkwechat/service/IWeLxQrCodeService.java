@@ -79,6 +79,8 @@ public interface IWeLxQrCodeService extends IService<WeLxQrCode> {
      */
     List<WeLxQrCodeSheetVo> getWeQrCodeListStatistics(WeLxQrCodeListQuery query);
 
+    void statisticsParamsCheck(WeLxQrCodeListQuery query);
+
     /**
      * 获取企微活码
      * @param query

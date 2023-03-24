@@ -79,6 +79,7 @@ public class WeLxQrCodeController extends BaseController {
     @ApiOperation(value = "获取活码折线统计", httpMethod = "GET")
     @GetMapping("/line/statistics")
     public AjaxResult<WeLxQrCodeLineVo> getWeQrCodeLineStatistics(WeLxQrCodeListQuery query) {
+        weLxQrCodeService.statisticsParamsCheck(query);
         WeLxQrCodeLineVo weQrCodeScanCount = weLxQrCodeService.getWeQrCodeLineStatistics(query);
         return AjaxResult.success(weQrCodeScanCount);
     }
@@ -86,6 +87,7 @@ public class WeLxQrCodeController extends BaseController {
     @ApiOperation(value = "获取活码列表统计", httpMethod = "GET")
     @GetMapping("/list/statistics")
     public TableDataInfo<WeLxQrCodeSheetVo> getWeQrCodeListStatistics(WeLxQrCodeListQuery query) {
+        weLxQrCodeService.statisticsParamsCheck(query);
         startPage();
         List<WeLxQrCodeSheetVo> list = weLxQrCodeService.getWeQrCodeListStatistics(query);
         return getDataTable(list);

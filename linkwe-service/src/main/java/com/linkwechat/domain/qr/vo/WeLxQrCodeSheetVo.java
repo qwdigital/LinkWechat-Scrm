@@ -1,6 +1,7 @@
 package com.linkwechat.domain.qr.vo;
 
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class WeLxQrCodeSheetVo {
 
     @ApiModelProperty("日期")
     @ExcelProperty("日期")
+    @JsonFormat(pattern="yyyy-MM-dd", timezone = "GMT+8")
     private Date dateTime;
 
     @ApiModelProperty("今日新增新客数")
