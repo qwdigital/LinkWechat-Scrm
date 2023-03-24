@@ -1,14 +1,12 @@
 package com.linkwechat.factory.impl.customer;
 
 import com.alibaba.fastjson.JSONObject;
-import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.wecom.callback.WeBackBaseVo;
 import com.linkwechat.domain.wecom.callback.WeBackCustomerVo;
 import com.linkwechat.factory.WeEventStrategy;
 import com.linkwechat.service.IWeCustomerService;
-import com.linkwechat.service.IWeFissionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +23,6 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
 
     @Autowired
     private IWeCustomerService weCustomerService;
-
-//    @Autowired
-//    private IWeTaskFissionService weTaskFissionService;
-
-
-    @Autowired
-    private IWeFissionService iWeFissionService;
-
 
     @Autowired
     private RabbitMQSettingConfig rabbitMQSettingConfig;
@@ -55,16 +45,6 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
         }
 
 
-        //任务宝裂变客户处理
-//        if (StringUtils.isNotEmpty(customerInfo.getState()) && isFission(customerInfo.getState())) {
-//            try {
-//                String fissionRecordId = customerInfo.getState().substring(WeConstans.FISSION_PREFIX.length());
-//                weTaskFissionService.addCustomerHandler(customerInfo.getExternalUserID(),customerInfo.getUserID(),fissionRecordId);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                log.error("添加外部联系人异常 任务宝裂变客户处理 params:{}",JSONObject.toJSONString(message),e);
-//            }
-//        }
 
     }
 

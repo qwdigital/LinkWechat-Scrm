@@ -3,6 +3,8 @@ package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.WeCustomer;
+import com.linkwechat.domain.WeGroup;
+import com.linkwechat.domain.WeGroupMember;
 import com.linkwechat.domain.fission.WeFission;
 import com.linkwechat.domain.fission.WeFissionInviterPoster;
 import com.linkwechat.domain.fission.vo.*;
@@ -103,6 +105,7 @@ public interface IWeFissionService extends IService<WeFission> {
     /**
      * 裂变要成功处理逻辑(群裂变)
      * @param state 渠道标识
+     * @param weGroupMember 邀请进群的成员
      */
-    void handleGroupFissionRecord(String state);
+    void handleGroupFissionRecord(String state, WeGroupMember weGroupMember);
 }

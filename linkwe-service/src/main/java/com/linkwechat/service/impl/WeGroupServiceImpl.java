@@ -73,6 +73,9 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
     @Autowired
     private IWeMessagePushService iWeMessagePushService;
 
+    @Autowired
+    private IWeFissionService iWeFissionService;
+
 
     @Override
     public List<LinkGroupChatListVo> getPageList(WeGroupChatQuery query) {
@@ -359,6 +362,8 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                     weGroupMember.setChatId(chatId);
                     weGroupMember.transformQwParams(groupMember);
                     weGroupMember.setDelFlag(Constants.COMMON_STATE);
+                    //任务宝处理逻辑
+                    iWeFissionService.handleGroupFissionRecord(weGroupMember.getState(),weGroupMember);
                     return weGroupMember;
                 }).collect(Collectors.toList());
                 weGroupMemberService.insertBatch(members);

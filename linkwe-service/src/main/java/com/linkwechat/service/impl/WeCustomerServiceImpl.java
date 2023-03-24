@@ -101,6 +101,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Autowired
     private IWeCustomerInfoExpandService iWeCustomerInfoExpandService;
 
+    @Autowired
+    private  IWeFissionService iWeFissionService;
+
 
 
     @Override
@@ -885,11 +888,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             weCustomer.setCreateTime(new Date());
             weCustomer.setUpdateTime(new Date());
 
-
-
-
-
-
             List<WeCustomerFollowUserEntity> followUserList = weCustomerDetail.getFollowUser();
             if (CollectionUtil.isNotEmpty(followUserList)) {
                 WeCustomerFollowUserEntity followUserEntity = followUserList.stream().filter(followUserInfo -> followUserInfo.getUserId().equals(userId)).findFirst().get();
@@ -975,6 +973,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
             }
 
+            iWeFissionService.handleTaskFissionRecord(state,weCustomer);
 
 
            //生成轨迹

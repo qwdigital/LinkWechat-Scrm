@@ -16,6 +16,7 @@ import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeGroup;
+import com.linkwechat.domain.WeGroupMember;
 import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.fission.*;
 import com.linkwechat.domain.fission.vo.*;
@@ -31,6 +32,7 @@ import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.service.*;
 import com.linkwechat.mapper.WeFissionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -373,46 +375,20 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
     }
 
     @Override
+    @Async
     public void handleTaskFissionRecord(String state, WeCustomer weCustomer) {
 
-        //任务宝
-        if(WeConstans.FISSION_PREFIX_RWB.startsWith(state)){
+        if(StringUtils.isNotEmpty(state) && state.startsWith(WeConstans.FISSION_PREFIX_RWB)){
             String fissionInviterRecordId = state.substring(WeConstans.FISSION_PREFIX_RWB.length());
-
-            WeFissionInviterRecord weFissionInviterRecord
-                    = iWeFissionInviterRecordService.getById(fissionInviterRecordId);
-
-            if(null != weFissionInviterRecord){
-                iWeFissionInviterRecordSubService.save(WeFissionInviterRecordSub.builder()
-                                .addTargetId(weCustomer.getAddUserId())
-                                .fissionInviterRecordId(Long.parseLong(fissionInviterRecordId))
-                                .addTargetType(1)
-                                .inviterUserName(weCustomer.getCustomerName())
-                        .build());
-
-                int inviterRecordNumber = iWeFissionInviterRecordSubService.count(new LambdaQueryWrapper<WeFissionInviterRecordSub>()
-                        .eq(WeFissionInviterRecordSub::getFissionInviterRecordId, fissionInviterRecordId));
-
-                //设置邀请员工数
-                weFissionInviterRecord.setInviterNumber(inviterRecordNumber);
-
-                WeFission weFission = this.getById(weFissionInviterRecord.getFissionId());
-
-                if(null != weFission){
-                    //当前状态设置为已完成
-                    if(weFission.getExchangeTip()<=inviterRecordNumber){
-                        weFissionInviterRecord.setInviterState(1);
-                    }
-                }
-
-                iWeFissionInviterRecordService.updateById(weFissionInviterRecord);
-            }
-
-
-//            iWeFissionInviterRecordSubService.
-
+            this.handleFissionRecord(fissionInviterRecordId,
+                    WeFissionInviterRecordSub.builder()
+                            .addTargetId(weCustomer.getAddUserId())
+                            .fissionInviterRecordId(Long.parseLong(fissionInviterRecordId))
+                            .addTargetType(1)
+                            .inviterUserName(weCustomer.getCustomerName())
+                            .build()
+            );
         }
-
 
 
 
@@ -420,21 +396,59 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
     }
 
     @Override
-    public void handleGroupFissionRecord(String state) {
+    @Async
+    public void handleGroupFissionRecord(String state, WeGroupMember weGroupMember) {
 
-        if(WeConstans.FISSION_PREFIX_QLB.startsWith(state)){
+        if(StringUtils.isNotEmpty(state) && state.startsWith(WeConstans.FISSION_PREFIX_QLB)){
             String fissionInviterRecordId = state.substring(WeConstans.FISSION_PREFIX_QLB.length());
 
 
+            this.handleFissionRecord(fissionInviterRecordId,
+                    WeFissionInviterRecordSub.builder()
+                            .addTargetId(weGroupMember.getChatId())
+                            .fissionInviterRecordId(Long.parseLong(fissionInviterRecordId))
+                            .addTargetType(2)
+                            .inviterUserName(weGroupMember.getName())
+                            .build()
+            );
+        }
 
+
+
+
+    }
+
+
+
+    private void handleFissionRecord(String fissionInviterRecordId,WeFissionInviterRecordSub weFissionInviterRecordSub){
+
+        WeFissionInviterRecord weFissionInviterRecord
+                = iWeFissionInviterRecordService.getById(fissionInviterRecordId);
+        if(null != weFissionInviterRecord){
+            iWeFissionInviterRecordSubService.save(weFissionInviterRecordSub);
+
+            int inviterRecordNumber = iWeFissionInviterRecordSubService.count(new LambdaQueryWrapper<WeFissionInviterRecordSub>()
+                    .eq(WeFissionInviterRecordSub::getFissionInviterRecordId, fissionInviterRecordId));
+
+            //设置邀请员工数
+            weFissionInviterRecord.setInviterNumber(inviterRecordNumber);
+
+            WeFission weFission = this.getById(weFissionInviterRecord.getFissionId());
+
+            if(null != weFission){
+                //当前状态设置为已完成
+                if(weFission.getExchangeTip()<=inviterRecordNumber){
+                    weFissionInviterRecord.setInviterState(1);
+                }
+            }
+
+            iWeFissionInviterRecordService.updateById(weFissionInviterRecord);
 
 
 
         }
 
-
     }
-
 
     //生成邀请记录
     private WeFissionInviterRecord builderInviterRecord(String unionid, String fissionId){
