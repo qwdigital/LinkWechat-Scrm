@@ -403,7 +403,7 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
         WeShortLinkPromotionTemplateClient one = weShortLinkPromotionTemplateClientService.getOne(queryWrapper);
         Optional.ofNullable(one).ifPresent(client -> {
             LambdaQueryWrapper<WeShortLinkUserPromotionTask> wrapper = Wrappers.lambdaQuery();
-            wrapper.eq(WeShortLinkUserPromotionTask::getTemplateType, 1);
+            wrapper.eq(WeShortLinkUserPromotionTask::getTemplateType, 0);
             wrapper.eq(WeShortLinkUserPromotionTask::getTemplateId, client.getId());
             wrapper.eq(WeShortLinkUserPromotionTask::getDelFlag, 0);
             List<WeShortLinkUserPromotionTask> list = weShortLinkUserPromotionTaskService.list(wrapper);
