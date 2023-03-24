@@ -75,7 +75,7 @@ public class AppMsgPromotion extends PromotionType {
         Integer sendType = appMsgAddQuery.getSendType();
         if (sendType.equals(0)) {
             //任务状态: 0待推广 1推广中 2已结束
-            weShortLinkPromotion.setTaskStatus(1);
+            weShortLinkPromotion.setTaskStatus(1);  //确认就是1，不要修改
             weShortLinkPromotion.setTaskStartTime(LocalDateTime.now());
         } else {
             weShortLinkPromotion.setTaskStatus(0);
@@ -188,7 +188,7 @@ public class AppMsgPromotion extends PromotionType {
         Integer sendType = appMsgUpdateQuery.getSendType();
         if (sendType.equals(0)) {
             //任务状态: 0待推广 1推广中 2已结束
-            weShortLinkPromotion.setTaskStatus(1);
+            weShortLinkPromotion.setTaskStatus(1); //确认就是1，不要修改
             weShortLinkPromotion.setTaskStartTime(LocalDateTime.now());
         } else {
             weShortLinkPromotion.setTaskStatus(0);

@@ -67,7 +67,7 @@ public class GroupPromotion extends PromotionType {
         //发送类型：0立即发送 1定时发送
         if (sendType.equals(0)) {
             //任务状态: 0带推广 1推广中 2已结束
-            weShortLinkPromotion.setTaskStatus(1);
+            weShortLinkPromotion.setTaskStatus(0);
             weShortLinkPromotion.setTaskStartTime(LocalDateTime.now());
         } else {
             weShortLinkPromotion.setTaskStatus(0);
@@ -176,7 +176,7 @@ public class GroupPromotion extends PromotionType {
         Integer sendType = groupUpdateQuery.getSendType();
         if (sendType.equals(0)) {
             //任务状态: 0待推广 1推广中 2已结束 3暂存中
-            weShortLinkPromotion.setTaskStatus(1);
+            weShortLinkPromotion.setTaskStatus(0);
             weShortLinkPromotion.setTaskStartTime(LocalDateTime.now());
         } else {
             weShortLinkPromotion.setTaskStatus(0);

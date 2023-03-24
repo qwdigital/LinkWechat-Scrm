@@ -86,7 +86,7 @@ public class ShortLinkPromotionGroupMsgServiceImpl extends AbstractGroupMsgSendT
             WeAddCustomerMsgVo weAddCustomerMsgVo = sendSpecGroupMsgTemplate(query, senderInfo);
             Optional.ofNullable(weAddCustomerMsgVo).ifPresent(i -> {
                 if (i.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)) {
-                    //更新推广状态
+                    //更新推广状态为推广中
                     LambdaUpdateWrapper<WeShortLinkPromotion> promotionUpdateWrapper = Wrappers.lambdaUpdate();
                     promotionUpdateWrapper.set(WeShortLinkPromotion::getTaskStatus, 1);
                     promotionUpdateWrapper.eq(WeShortLinkPromotion::getId, query.getId());

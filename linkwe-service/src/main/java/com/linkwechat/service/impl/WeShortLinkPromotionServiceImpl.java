@@ -168,6 +168,8 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
         }
 
         WeShortLinkPromotion weShortLinkPromotion = BeanUtil.copyProperties(query, WeShortLinkPromotion.class);
+        weShortLinkPromotion.setDelFlag(0);
+        weShortLinkPromotion.setTaskStatus(0);
         PromotionType promotionType = SpringUtil.getBean(DefaultPromotion.class);
         WeMessageTemplate weMessageTemplate = promotionType.getPromotionUrl(weShortLinkPromotion.getId(), query.getShortLinkId(), query.getStyle(), query.getMaterialId());
         weShortLinkPromotion.setUrl(weMessageTemplate.getPicUrl());
