@@ -86,7 +86,7 @@ public class WeShortLinkPromotionAddQuery {
 
 
     @ApiModelProperty("附件列表")
-    @Size(max = 8)
+    @Size(max = 9)
     private List<WeMessageTemplate> attachments;
 
     /**
