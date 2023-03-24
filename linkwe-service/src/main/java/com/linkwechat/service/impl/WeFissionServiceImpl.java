@@ -399,9 +399,13 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                 WeFission weFission = this.getById(weFissionInviterRecord.getFissionId());
 
                 if(null != weFission){
-
+                    //当前状态设置为已完成
+                    if(weFission.getExchangeTip()<=inviterRecordNumber){
+                        weFissionInviterRecord.setInviterState(1);
+                    }
                 }
 
+                iWeFissionInviterRecordService.updateById(weFissionInviterRecord);
             }
 
 
