@@ -60,6 +60,10 @@ public class GroupPromotion extends PromotionType {
 
         WeShortLinkPromotionTemplateGroupAddQuery group = query.getGroup();
         //检查客群
+        if (query.getSenderList() == null) {
+            List<WeAddGroupMessageQuery.SenderInfo> senderList = new ArrayList<>();
+            query.setSenderList(senderList);
+        }
         checkSendList(group.getType(), query.getSenderList());
 
         //1. 保存短链推广
@@ -169,6 +173,10 @@ public class GroupPromotion extends PromotionType {
 
         WeShortLinkPromotionTemplateGroupUpdateQuery groupUpdateQuery = query.getGroup();
         //检查客群
+        if (query.getSenderList() == null) {
+            List<WeAddGroupMessageQuery.SenderInfo> senderList = new ArrayList<>();
+            query.setSenderList(senderList);
+        }
         checkSendList(groupUpdateQuery.getType(), query.getSenderList());
 
         //1.更新推广短链
