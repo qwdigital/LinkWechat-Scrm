@@ -70,11 +70,20 @@ public class ShortLinkPromotionGroupMsgServiceImpl extends AbstractGroupMsgSendT
         SecurityContextHolder.setUserName(loginUser.getUserName());
         SecurityContextHolder.setCorpId(loginUser.getCorpId());
 
-        //查看短链推广模板是否已经删除
+        //查看客户短链推广模板是否已经删除
         Long businessId = query.getBusinessId();
         if (weShortLinkPromotion.getType().equals(0)) {
             WeShortLinkPromotionTemplateClient client = weShortLinkPromotionTemplateClientService.getById(businessId);
             if (client == null || client.getDelFlag().equals(1)) {
+                //删除直接跳出，不继续执行。
+                return;
+            }
+        }
+
+        //查看客群短链推广模板是否已经删除
+        if (weShortLinkPromotion.getType().equals(1)) {
+            WeShortLinkPromotionTemplateGroup group = weShortLinkPromotionTemplateGroupService.getById(businessId);
+            if (group == null || group.getDelFlag().equals(1)) {
                 //删除直接跳出，不继续执行。
                 return;
             }
