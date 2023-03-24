@@ -104,4 +104,10 @@ public class WeShortLinkPromotionAttachment extends BaseEntity {
     @ApiModelProperty(value = "删除标识 0 有效 1删除")
     private Integer delFlag;
 
+    /**
+     * 素材ID
+     */
+    @ApiModelProperty(value = "素材Id")
+    private Long materialId;
+
 }

@@ -65,6 +65,7 @@ public class WeShortLinkPromotionStatisticTask {
                 Integer openNum = redisService.getCacheObject(key);
                 weShortLinkPromotionDayStat.setOpenNum(openNum);
             }
+            weShortLinkPromotionDayStat.setDelFlag(0);
             map.put(promotionId, weShortLinkPromotionDayStat);
         }
         boolean saveBatch = weShortLinkPromotionDayStatService.saveBatch(new ArrayList<>(map.values()));
