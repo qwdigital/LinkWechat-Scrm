@@ -533,11 +533,11 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
                 .eq(WeLxQrCodeLog::getDelFlag, 0));
         if (CollectionUtil.isNotEmpty(logList)) {
             List<WeLxQrCodeLog> todayList = logList.parallelStream().filter(codeLog -> ObjectUtil.equal(DateUtil.today(), DateUtil.formatDate(codeLog.getCreateTime()))).collect(Collectors.toList());
-            List<WeLxQrCodeLog> tomorrowList = logList.parallelStream().filter(codeLog -> ObjectUtil.equal(DateUtil.tomorrow().toDateStr(), DateUtil.formatDate(codeLog.getCreateTime()))).collect(Collectors.toList());
+            List<WeLxQrCodeLog> yesterdayList = logList.parallelStream().filter(codeLog -> ObjectUtil.equal(DateUtil.yesterday().toDateStr(), DateUtil.formatDate(codeLog.getCreateTime()))).collect(Collectors.toList());
 
             int totalAmount = logList.parallelStream().filter(item -> Objects.nonNull(item.getAmount())).mapToInt(WeLxQrCodeLog::getAmount).sum();
             int todayAmount = todayList.parallelStream().filter(item -> Objects.nonNull(item.getAmount())).mapToInt(WeLxQrCodeLog::getAmount).sum();
-            int tomorrowAmount = tomorrowList.parallelStream().mapToInt(WeLxQrCodeLog::getAmount).sum();
+            int tomorrowAmount = yesterdayList.parallelStream().mapToInt(WeLxQrCodeLog::getAmount).sum();
 
             String totalAmountStr = new BigDecimal(totalAmount).divide(BigDecimal.valueOf(100L)).toString();
             String todayAmountStr = new BigDecimal(todayAmount).divide(BigDecimal.valueOf(100L)).toString();
@@ -548,7 +548,7 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
             weLxQrCodeReceiveVo.setTodayNum(todayList.size());
             weLxQrCodeReceiveVo.setTotalAmount(totalAmountStr);
             weLxQrCodeReceiveVo.setTodayAmount(todayAmountStr);
-            weLxQrCodeReceiveVo.setTodayNumDiff(todayList.size() - tomorrowList.size());
+            weLxQrCodeReceiveVo.setTodayNumDiff(todayList.size() - yesterdayList.size());
             weLxQrCodeReceiveVo.setTodayAmountDiff(tomorrowAmountStr);
         }
 
@@ -643,20 +643,20 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
         WeLxQrCodeReceiveVo totalData = weLxQrCodeLogService.receiveTotalStatistics(query);
 
         int totalNum = totalData.getTotalNum();
-        int totalAmount = Integer.parseInt(totalData.getTotalAmount());
+
+        int totalAmount = new BigDecimal(totalData.getTotalAmount()).divide(BigDecimal.valueOf(100L)).intValue();
 
         for (WeLxQrCodeReceiveListVo receiveData : receiveList) {
-            String todayAmount = receiveData.getTodayAmount();
-            String todayAmountStr = new BigDecimal(todayAmount).divide(BigDecimal.valueOf(100L)).toString();
-            receiveData.setTodayAmount(todayAmountStr);
+
+            BigDecimal todayAmount = new BigDecimal(receiveData.getTodayAmount()).divide(BigDecimal.valueOf(100L));
+            receiveData.setTodayAmount(todayAmount.toString());
 
             receiveData.setTotalNum(totalNum);
             totalNum = totalNum - receiveData.getTodayNum();
 
-            String totalAmountStr = new BigDecimal(totalAmount).divide(BigDecimal.valueOf(100L)).toString();
-            receiveData.setTotalAmount(totalAmountStr);
+            receiveData.setTotalAmount(String.valueOf(totalAmount));
 
-            totalAmount = totalAmount - Integer.parseInt(receiveData.getTotalAmount());
+            totalAmount = totalAmount - todayAmount.intValue();
         }
 
         return receiveList;

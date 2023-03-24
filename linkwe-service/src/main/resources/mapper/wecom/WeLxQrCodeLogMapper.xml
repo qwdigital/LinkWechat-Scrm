@@ -25,7 +25,9 @@
     </sql>
 
     <select id="receiveListStatistics" resultType="com.linkwechat.domain.qr.vo.WeLxQrCodeReceiveListVo">
-        select
+        select sdd.date as date_time, ifnull(t.today_amount, 0) as today_amount, ifnull(t.today_num, 0) as today_num
+        from sys_dim_date sdd left join
+        (select
             date_format(create_time, '%Y-%m-%d') as date_time,
             count(1) as today_num,
             sum(amount) as today_amount
@@ -34,15 +36,19 @@
             <if test="qrId != null">
                 qr_id = #{qrId}
             </if>
-            <if test="beginTime != null"><!-- 开始时间检索 -->
-                AND date_format(create_time,'%Y-%m-%d') &gt;= date_format(#{beginTime},'%Y-%m-%d')
-            </if>
-            <if test="endTime != null"><!-- 结束时间检索 -->
-                AND date_format(create_time,'%Y-%m-%d') &lt;= date_format(#{endTime},'%Y-%m-%d')
-            </if>
             and del_flag = 0
         </where>
-        group by date_time order by date_time desc
+        group by date_time
+        ) t on sdd.date = t.date_time
+        <where>
+            <if test="beginTime != null"><!-- 开始时间检索 -->
+                AND sdd.date &gt;= date_format(#{beginTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null"><!-- 结束时间检索 -->
+                AND sdd.date &lt;= date_format(#{endTime},'%Y-%m-%d')
+            </if>
+        </where>
+        order by date_time desc
     </select>
 
     <select id="receiveTotalStatistics" resultType="com.linkwechat.domain.qr.vo.WeLxQrCodeReceiveVo">
