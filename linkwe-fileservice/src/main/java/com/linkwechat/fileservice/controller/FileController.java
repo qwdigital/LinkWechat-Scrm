@@ -105,6 +105,7 @@ public class FileController {
 
         CosConfig cos = linkWeChatConfig.getFile().getCos();
         Map<String, String> result = new HashMap<>(5);
+        result.put("fileObject",aes.encryptBase64(linkWeChatConfig.getFile().getObject()));
         result.put("secretId", aes.encryptBase64(cos.getSecretId()));
         result.put("secretKey", aes.encryptBase64(cos.getSecretKey()));
         result.put("region", aes.encryptBase64(cos.getRegion()));

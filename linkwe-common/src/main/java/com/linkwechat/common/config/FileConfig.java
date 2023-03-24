@@ -12,6 +12,9 @@ public class FileConfig {
     /**文件前缀*/
     private String imgUrlPrefix;
 
+    /**云存储平台 腾讯云cos:tencentOss 阿里云oss:aliOss **/
+    private String object;
+
    /**Aes加解密的key*/
     private String aesKey;
 }
