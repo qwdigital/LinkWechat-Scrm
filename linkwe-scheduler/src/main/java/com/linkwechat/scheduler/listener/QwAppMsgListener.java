@@ -1,5 +1,6 @@
 package com.linkwechat.scheduler.listener;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author sxw
@@ -81,14 +81,17 @@ public class QwAppMsgListener {
 
             //1.判断任务是否处于待推广的状态
             WeShortLinkPromotion weShortLinkPromotion = weShortLinkPromotionService.getById(appMsgBody.getShortLinkPromotionId());
-            Optional.ofNullable(weShortLinkPromotion).ifPresent(i -> {
+
+            if (BeanUtil.isEmpty(weShortLinkPromotion)) {
+                return;
+            } else {
                 //判断任务的推广状态和删除状态
                 //删除标识 0 正常 1 删除
                 //任务状态: 0待推广 1推广中 2已结束
-                if (!(i.getDelFlag().equals(0) && i.getTaskStatus().equals(0))) {
+                if (!(weShortLinkPromotion.getDelFlag().equals(0) && weShortLinkPromotion.getTaskStatus().equals(0))) {
                     return;
                 }
-            });
+            }
 
             //查看短链推广模板是否已经删除
             Long businessId = appMsgBody.getBusinessId();

@@ -1,5 +1,6 @@
 package com.linkwechat.service.impl.strategic.shortlink;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -42,14 +43,28 @@ public class ShortLinkPromotionGroupMsgServiceImpl extends AbstractGroupMsgSendT
     public void sendGroupMsg(WeAddGroupMessageQuery query) {
         //1.判断任务是否处于待推广的状态
         WeShortLinkPromotion weShortLinkPromotion = weShortLinkPromotionService.getById(query.getId());
-        Optional.ofNullable(weShortLinkPromotion).ifPresent(i -> {
-            //判断任务的推广状态和删除状态
-            //删除标识 0 正常 1 删除
-            //任务状态: 0待推广 1推广中 2已结束
-            if (!(i.getDelFlag().equals(0) && i.getTaskStatus().equals(0))) {
-                return;
+
+        //重试机制，4次
+        if (BeanUtil.isEmpty(weShortLinkPromotion)) {
+            for (int i = 0; i < 4; i++) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                weShortLinkPromotion = weShortLinkPromotionService.getById(query.getId());
+                if (BeanUtil.isNotEmpty(weShortLinkPromotion)) {
+                    break;
+                }
             }
-        });
+        }
+
+        //判断任务的推广状态和删除状态
+        //删除标识 0 正常 1 删除
+        //任务状态: 0待推广 1推广中 2已结束
+        if (!(weShortLinkPromotion.getDelFlag().equals(0) && weShortLinkPromotion.getTaskStatus().equals(0))) {
+            return;
+        }
 
         LoginUser loginUser = query.getLoginUser();
         SecurityContextHolder.setUserName(loginUser.getUserName());
@@ -66,6 +81,7 @@ public class ShortLinkPromotionGroupMsgServiceImpl extends AbstractGroupMsgSendT
         }
 
         //发送消息
+        WeShortLinkPromotion finalWeShortLinkPromotion = weShortLinkPromotion;
         query.getSenderList().forEach(senderInfo -> {
             WeAddCustomerMsgVo weAddCustomerMsgVo = sendSpecGroupMsgTemplate(query, senderInfo);
             Optional.ofNullable(weAddCustomerMsgVo).ifPresent(i -> {
@@ -77,7 +93,7 @@ public class ShortLinkPromotionGroupMsgServiceImpl extends AbstractGroupMsgSendT
                     weShortLinkPromotionService.update(promotionUpdateWrapper);
 
                     //客户
-                    if (weShortLinkPromotion.getType().equals(0)) {
+                    if (finalWeShortLinkPromotion.getType().equals(0)) {
                         //获取客户推广模板
                         LambdaQueryWrapper<WeShortLinkPromotionTemplateClient> queryWrapper = Wrappers.lambdaQuery();
                         queryWrapper.eq(WeShortLinkPromotionTemplateClient::getPromotionId, query.getId());
@@ -92,7 +108,7 @@ public class ShortLinkPromotionGroupMsgServiceImpl extends AbstractGroupMsgSendT
                         updateWrapper.set(WeShortLinkUserPromotionTask::getMsgId, i.getMsgId());
                         updateWrapper.set(WeShortLinkUserPromotionTask::getSendStatus, 2);
                         weShortLinkUserPromotionTaskService.update(updateWrapper);
-                    } else if (weShortLinkPromotion.getType().equals(1)) {
+                    } else if (finalWeShortLinkPromotion.getType().equals(1)) {
                         //获取客群推广模板
                         LambdaQueryWrapper<WeShortLinkPromotionTemplateGroup> queryWrapper = Wrappers.lambdaQuery();
                         queryWrapper.eq(WeShortLinkPromotionTemplateGroup::getPromotionId, query.getId());
