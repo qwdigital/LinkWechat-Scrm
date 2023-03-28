@@ -153,7 +153,8 @@ LinkWeChat V3.0 架构升级，全面升级为微服务架构，整体系统架�
 
 ```
 ├── linkwe-pc			// 后台项目
-├── linkwe-mobile		// 移动端项目包含移动工作台、任务宝、群裂变等H5）
+├── linkwe-mobile		// 移动端项目包含移动工作台、任务宝、群裂变等H5
+├── linkwe-uniapp		// uniapp短链小程序项目
 ```
 
 ## 2.5 项目部署

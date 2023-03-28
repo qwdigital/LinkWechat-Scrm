@@ -133,4 +133,19 @@ public class WeGroupMessageAttachments extends BaseEntity implements Serializabl
     @ApiModelProperty(value = "删除标识 0 有效 1删除")
     @TableField("del_flag")
     private Integer delFlag;
+
+
+    /**
+     * 真实数据类型，（其他类型的数据，转成链接之后的真是的数据类型）
+     */
+    @ApiModelProperty(value = "真实数据类型")
+    @TableField("real_type")
+    private Integer realType;
+
+    /**
+     * 素材中心Id
+     */
+    @ApiModelProperty(value = "素材中心Id")
+    @TableField("material_id")
+    private Long materialId;
 }
