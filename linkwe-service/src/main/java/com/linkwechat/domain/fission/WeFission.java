@@ -9,6 +9,7 @@ import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.domain.fission.vo.WeExecuteUserOrGroupConditVo;
 import com.linkwechat.domain.fission.vo.WeGroupMessageExecuteUserOrGroupTipVo;
 import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
+import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
 import lombok.Data;
 
@@ -102,6 +103,10 @@ public class WeFission extends BaseEntity {
     private ExchangeContent exchangeContent;
 
 
+    @TableField(exist = false)
+    private WeMaterial wematerial;
+
+
     @Data
     public static class ExchangeContent{
 
@@ -121,6 +126,12 @@ public class WeFission extends BaseEntity {
          * 兑奖客服员工id
          */
         private String weUserId;
+
+
+        /**
+         * 兑奖客服员工名
+         */
+        private String userName;
 
 
         /**
