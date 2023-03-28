@@ -9,6 +9,7 @@ import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.fission.WeFission;
 import com.linkwechat.domain.fission.vo.*;
 import com.linkwechat.service.IWeFissionService;
+import com.linkwechat.service.IWeMaterialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
@@ -24,6 +25,9 @@ public class WeFissionController  extends BaseController {
 
     @Autowired
     IWeFissionService iWeFissionService;
+
+    @Autowired
+    IWeMaterialService iWeMaterialService;
 
 
     /**
@@ -77,8 +81,15 @@ public class WeFissionController  extends BaseController {
     @GetMapping("/getWeFissionDetail/{id}")
     public AjaxResult<WeFission> getWeFissionDetail(@PathVariable Long id){
 
+        WeFission weFission = iWeFissionService.getById(id);
+
+        if(null != weFission){
+            weFission.setWematerial(
+                    iWeMaterialService.getById(weFission.getPosterId())
+            );
+        }
         return AjaxResult.success(
-                iWeFissionService.getById(id)
+                weFission
         );
 
     }
