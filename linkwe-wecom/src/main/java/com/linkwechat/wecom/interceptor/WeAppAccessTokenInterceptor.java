@@ -55,7 +55,7 @@ public class WeAppAccessTokenInterceptor extends WeForestInterceptor implements 
      */
     @Override
     public void onError(ForestRuntimeException e, ForestRequest forestRequest, ForestResponse forestResponse) {
-        log.info("onError url:{},------params:{},----------result:{}",forestRequest.getUrl(), JSONObject.toJSONString(forestRequest.getArguments()), forestResponse.getContent());
+        log.error("onError url:{},------params:{},----------result:{}",forestRequest.getUrl(), JSONObject.toJSONString(forestRequest.getArguments()), forestResponse.getContent());
         if (StringUtils.isNotEmpty(forestResponse.getContent())) {
             WeComException weComException = new WeComException(1001, forestResponse.getContent());
             throw new ForestRuntimeException(weComException);
