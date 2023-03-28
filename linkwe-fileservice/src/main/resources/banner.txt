@@ -1,8 +1,11 @@
-Spring Boot Version: ${spring-boot.version}
+${AnsiColor.GREEN}
+  _     _       _   __        __    ____ _           _   _____ _ _
+ | |   (_)_ __ | | _\ \      / /__ / ___| |__   __ _| |_|  ___(_) | ___
+ | |   | | '_ \| |/ /\ \ /\ / / _ \ |   | '_ \ / _` | __| |_  | | |/ _ \
+ | |___| | | | |   <  \ V  V /  __/ |___| | | | (_| | |_|  _| | | |  __/
+ |_____|_|_| |_|_|\_\  \_/\_/ \___|\____|_| |_|\__,_|\__|_|   |_|_|\___|
+
+${AnsiColor.BRIGHT_WHITE}
+
 Spring Application Name: ${spring.application.name}
-  __  _  _
- / _|(_)| |
-| |_  _ | |  ___
-|  _|| || | / _ \
-| |  | || ||  __/
-|_|  |_||_| \___|
+Spring Application Name: ${spring.application.name}
