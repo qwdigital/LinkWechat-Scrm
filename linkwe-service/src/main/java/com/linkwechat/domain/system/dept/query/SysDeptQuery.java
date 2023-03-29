@@ -16,5 +16,5 @@ import java.util.List;
 public class SysDeptQuery {
 
     @ApiModelProperty("部门ID")
-    private List<Integer> deptIds;
+    private List<Long> deptIds;
 }

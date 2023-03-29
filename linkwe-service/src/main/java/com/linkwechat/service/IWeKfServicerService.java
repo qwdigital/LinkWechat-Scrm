@@ -45,7 +45,7 @@ public interface IWeKfServicerService extends IService<WeKfServicer> {
      * @param userIds  接待人员
      * @param departmentIdList
      */
-    void updateServicer(Long id, String openKfId, List<String> userIds, List<Integer> departmentIdList);
+    void updateServicer(Long id, String openKfId, List<String> userIds, List<Long> departmentIdList);
 
     /**
      * 客服接待人员列表

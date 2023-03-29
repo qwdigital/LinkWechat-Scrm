@@ -50,7 +50,7 @@ public interface IWeLeaveUserService extends IService<SysLeaveUser> {
      * 构建等待分配的
      * @param weUserIds
      */
-    void createWaitAllocateCustomerAndGroup(String[] weUserIds);
+    void createWaitAllocateCustomerAndGroup(List<String> weUserIds);
 
 
     /**

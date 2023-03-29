@@ -114,6 +114,10 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.sync.user-depart:Rk_UserDepart}")
     private String userDepartRk;
 
+    //员工同步路由
+    @Value("${wecom.mq.route.sync.sys-user:Rk_SysUser}")
+    private String sysUserRk;
+
 
     //朋友圈同步路由
     @Value("${wecom.mq.route.sync.we-moments:Rk_Moments}")
@@ -286,6 +290,11 @@ public class RabbitMQSettingConfig {
     //员工与部门同步队列
     @Value("${wecom.mq.queue.sync.user-depart:Qu_UserDepart}")
     private String userDepartQu;
+
+
+    //员工同步队列
+    @Value("${wecom.mq.queue.sync.sys-user:Qu_SysUser}")
+    private String sysUserQu;
 
     //活码变更队列
     @Value("${wecom.mq.queue.qr-code-change:Qu_QrCodeChange}")
