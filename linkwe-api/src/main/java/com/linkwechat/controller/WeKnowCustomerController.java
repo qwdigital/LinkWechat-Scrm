@@ -5,6 +5,7 @@ import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -153,7 +154,7 @@ public class WeKnowCustomerController extends BaseController {
     public AjaxResult findWeKnowCustomerCountTrend(WeKnowCustomerCode weKnowCustomerCode){
 
         return AjaxResult.success(
-                iWeKnowCustomerCodeCountService.findWeKnowCustomerCountTrend(WeConstans.WE_KNOW_CUSTOMER_CODE_PREFIX + weKnowCustomerCode.getId(), weKnowCustomerCode.getId(), weKnowCustomerCode.getBeginTime(), weKnowCustomerCode.getEndTime())
+                iWeKnowCustomerCodeCountService.findWeKnowCustomerCountTrend(WelcomeMsgTypeEnum.WE_KNOW_CUSTOMER_CODE_PREFIX.getType() + weKnowCustomerCode.getId(), weKnowCustomerCode.getId(), weKnowCustomerCode.getBeginTime(), weKnowCustomerCode.getEndTime())
         );
     }
 
@@ -168,7 +169,7 @@ public class WeKnowCustomerController extends BaseController {
         startPage();
 
         return getDataTable(
-                iWeKnowCustomerCodeCountService.findWeKnowCustomerCounTtable(WeConstans.WE_KNOW_CUSTOMER_CODE_PREFIX + weKnowCustomerCode.getId(), weKnowCustomerCode.getId())
+                iWeKnowCustomerCodeCountService.findWeKnowCustomerCounTtable(WelcomeMsgTypeEnum.WE_KNOW_CUSTOMER_CODE_PREFIX.getType() + weKnowCustomerCode.getId(), weKnowCustomerCode.getId())
         );
     }
 
@@ -182,7 +183,7 @@ public class WeKnowCustomerController extends BaseController {
     public void exportWeKnowCustomerCounTtable(WeKnowCustomerCode weKnowCustomerCode){
 
         LwExcelUtil.exprotForWeb(
-                ServletUtils.getResponse(), WeKnowCustomerCountTrendOrTableVo.class, iWeKnowCustomerCodeCountService.findWeKnowCustomerCounTtable(WeConstans.WE_KNOW_CUSTOMER_CODE_PREFIX + weKnowCustomerCode.getId(), weKnowCustomerCode.getId()),"识客码数据明细"
+                ServletUtils.getResponse(), WeKnowCustomerCountTrendOrTableVo.class, iWeKnowCustomerCodeCountService.findWeKnowCustomerCounTtable(WelcomeMsgTypeEnum.WE_KNOW_CUSTOMER_CODE_PREFIX.getType() + weKnowCustomerCode.getId(), weKnowCustomerCode.getId()),"识客码数据明细"
         );
 
     }

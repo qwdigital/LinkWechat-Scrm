@@ -15,7 +15,6 @@ import lombok.Data;
 public class WeQrCodeListQuery extends BaseEntity {
 
 
-
     @ApiModelProperty("活码Id")
     private Long qrId;
 

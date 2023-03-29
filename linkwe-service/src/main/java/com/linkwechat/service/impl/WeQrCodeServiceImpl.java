@@ -96,11 +96,11 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
             WeQrCode weQrCode = weQrAddQuery.getWeQrCodeEntity(weAddWayResult.getConfigId(), weAddWayResult.getQrCode());
             if (save(weQrCode)) {
                 //保存标签数据
-                tagRelService.saveBatchByQrId(weQrCode.getId(), weQrAddQuery.getQrTags());
+                tagRelService.saveBatchByQrId(weQrCode.getId(),1,  weQrAddQuery.getQrTags());
                 //保存活码范围数据
                 scopeService.saveBatchByQrId(weQrCode.getId(), weQrAddQuery.getQrUserInfos());
                 //保存活码素材
-                attachmentsService.saveBatchByQrId(weQrCode.getId(), weQrAddQuery.getAttachments());
+                attachmentsService.saveBatchByQrId(weQrCode.getId(),1, weQrAddQuery.getAttachments());
             }
             rabbitTemplate.convertAndSend(mqSettingConfig.getWeQrCodeChangeEx(),mqSettingConfig.getWeQrCodeChangeRk(),String.valueOf(weQrCode.getId()));
         }else {
@@ -156,11 +156,11 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
 
         if (updateById(weQrCode)) {
             //修改标签数据
-            tagRelService.updateBatchByQrId(weQrCode.getId(), weQrAddQuery.getQrTags());
+            tagRelService.updateBatchByQrId(weQrCode.getId(), 1, weQrAddQuery.getQrTags());
             //修改活码范围数据
             scopeService.updateBatchByQrId(weQrCode.getId(), weQrAddQuery.getQrUserInfos());
             //修改活码素材
-            attachmentsService.updateBatchByQrId(weQrCode.getId(), weQrAddQuery.getAttachments());
+            attachmentsService.updateBatchByQrId(weQrCode.getId(),1, weQrAddQuery.getAttachments());
         }
         rabbitTemplate.convertAndSend(mqSettingConfig.getWeQrCodeChangeEx(),mqSettingConfig.getWeQrCodeChangeRk(),String.valueOf(weQrCode.getId()));
     }
@@ -221,12 +221,13 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
             weQrCodes.forEach(item -> item.setDelFlag(1));
             if (this.updateBatchById(weQrCodes)) {
                 //删除标签数据
-                tagRelService.delBatchByQrIds(qrIds);
+                tagRelService.delBatchByQrIds(qrIds,1);
                 //删除活码范围数据
                 scopeService.delBatchByQrIds(qrIds);
                 //删除活码素材
                 attachmentsService.remove(new LambdaQueryWrapper<WeQrAttachments>()
-                        .in(WeQrAttachments::getQrId,ListUtil.toList(qrIds)));;
+                        .in(WeQrAttachments::getQrId,ListUtil.toList(qrIds))
+                        .eq(WeQrAttachments::getBusinessType,1));;
             }
             //异步删除企微活码---最好使用mq
             weQrCodes.forEach(item -> {

@@ -13,6 +13,7 @@ import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.enums.TaskFissionType;
+import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
@@ -325,7 +326,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
             fissionRecordList = new ArrayList<>();
         }
         List<String> stateList = fissionRecordList.stream().map(item -> {
-            return WeConstans.FISSION_PREFIX + item.getId();
+            return WelcomeMsgTypeEnum.FISSION_PREFIX.getType() + item.getId();
         }).collect(Collectors.toList());
 
         Map<String, Long> customerMap = new HashMap<>();
@@ -444,8 +445,8 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
         if(CollectionUtil.isNotEmpty(groupMemberList)){
             for (WeGroupMember weGroupMember : groupMemberList) {
                 String state = weGroupMember.getState();
-                if(StringUtils.isNotEmpty(state) && state.startsWith(WeConstans.FISSION_PREFIX)){
-                    String fissionRecordId = state.substring(WeConstans.FISSION_PREFIX.length());
+                if(StringUtils.isNotEmpty(state) && state.startsWith(WelcomeMsgTypeEnum.FISSION_PREFIX.getType())){
+                    String fissionRecordId = state.substring(WelcomeMsgTypeEnum.FISSION_PREFIX.getType().length());
                     WeTaskFissionRecord weTaskFissionRecord = weTaskFissionRecordService.getById(Long.valueOf(fissionRecordId));
                     if (weTaskFissionRecord != null) {
 
@@ -525,7 +526,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
     private JSONObject getUserFissionQrcode(String fissionTargetId, WeTaskFissionRecord record) {
         //获取二维码
         JSONObject qrcode = new JSONObject();
-        WeAddWayQuery contactWay = new WeAddWayQuery(1,2,WeConstans.FISSION_PREFIX + record.getId(),String.valueOf(record.getTaskFissionId()));
+        WeAddWayQuery contactWay = new WeAddWayQuery(1,2,WelcomeMsgTypeEnum.FISSION_PREFIX.getType() + record.getId(),String.valueOf(record.getTaskFissionId()));
         contactWay.setUser(Lists.newArrayList(fissionTargetId));
         WeAddWayVo data = qwCustomerClient.addContactWay(contactWay).getData();
         if (data != null && StringUtils.isNotEmpty(data.getQrCode())) {
@@ -545,7 +546,7 @@ public class WeTaskFissionServiceImpl extends ServiceImpl<WeTaskFissionMapper, W
                         .room_base_name(weTaskFission.getTaskName())
                         .room_base_id(1)
                         .chat_id_list(Collections.singletonList(weTaskFission.getFissionTargetId()))
-                        .state(WeConstans.FISSION_PREFIX + record.getId())
+                        .state(WelcomeMsgTypeEnum.FISSION_PREFIX.getType() + record.getId())
                         .build()
         ).getData();
         if (data != null && StringUtils.isNotEmpty(data.getConfig_id())) {

@@ -2,6 +2,7 @@ package com.linkwechat.factory.impl.customer;
 
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.wecom.callback.WeBackBaseVo;
@@ -53,7 +54,7 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
         //任务宝裂变客户处理
         if (StringUtils.isNotEmpty(customerInfo.getState()) && isFission(customerInfo.getState())) {
             try {
-                String fissionRecordId = customerInfo.getState().substring(WeConstans.FISSION_PREFIX.length());
+                String fissionRecordId = customerInfo.getState().substring(WelcomeMsgTypeEnum.FISSION_PREFIX.getType().length());
                 weTaskFissionService.addCustomerHandler(customerInfo.getExternalUserID(),customerInfo.getUserID(),fissionRecordId);
             } catch (Exception e) {
                 e.printStackTrace();

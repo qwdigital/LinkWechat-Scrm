@@ -7,6 +7,7 @@
     <resultMap type="com.linkwechat.domain.qr.WeQrAttachments" id="WeQrAttachmentsResult">
         <result property="id" column="id" jdbcType="INTEGER"/>
         <result property="qrId" column="qr_id" jdbcType="INTEGER"/>
+        <result property="businessType" column="business_type" jdbcType="INTEGER"/>
         <result property="msgType" column="msg_type" jdbcType="VARCHAR"/>
         <result property="content" column="content" jdbcType="VARCHAR"/>
         <result property="mediaId" column="media_id" jdbcType="VARCHAR"/>
@@ -23,7 +24,7 @@
     </resultMap>
 
     <sql id="selectWeQrAttachmentsVo">
-        select id, qr_id, msg_type, content, media_id, title, description, file_url, link_url, pic_url, app_id, create_by, create_time, update_by, update_time, del_flag from we_qr_attachments
+        select id, qr_id, business_type ,msg_type, content, media_id, title, description, file_url, link_url, pic_url, app_id, create_by, create_time, update_by, update_time, del_flag from we_qr_attachments
     </sql>
 
 </mapper>

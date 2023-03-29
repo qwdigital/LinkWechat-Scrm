@@ -206,6 +206,11 @@ public class LinkWeChatConfig {
      */
     private String shortAppletUrl;
 
+    /**
+     * 拉新活码H5地址
+     */
+    private String lxQrCodeUrl;
+
 
     public String getName() {
         return name;
