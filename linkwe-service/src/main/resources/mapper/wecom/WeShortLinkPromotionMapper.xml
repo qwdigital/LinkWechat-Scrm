@@ -34,6 +34,7 @@
         SELECT p.id,
         p.task_name,
         p.short_link_id,
+        sl.short_link_name,
         p.type,
         p.style,
         p.material_id,
@@ -50,9 +51,7 @@
         (select sum(open_num) from we_short_link_promotion_day_stat d3 where d3.promotion_id = p.id and d3.del_flag = 0)
         as open_num
         FROM we_short_link_promotion p
-        <if test="shortLinkName!=null and shortLinkName!=''">
-            LEFT JOIN we_short_link sl on p.short_link_id = sl.id
-        </if>
+        LEFT JOIN we_short_link sl on p.short_link_id = sl.id
         <where>
             p.del_flag = 0
             <if test="type!=null">
