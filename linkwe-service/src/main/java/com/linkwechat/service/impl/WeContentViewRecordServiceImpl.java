@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.context.SecurityContextHolder;
@@ -259,23 +260,13 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
         WeCorpAccount weCorpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
         SecurityContextHolder.setCorpId(weCorpAccount.getCorpId());
 
-        //1.根据openId和unionId获取客户的ExternalUserId
-        WeUnionidExternalUseridRelation weUnionidExternalUseridRelation = weUnionidExternalUseridRelationService.get(weContentViewRecordQuery.getOpenid(), weContentViewRecordQuery.getUnionid());
-        //2.根据ExternalUserId获取客户信息
-        WeCustomer weCustomer = null;
-        if (ObjectUtil.isNotEmpty(weUnionidExternalUseridRelation)) {
-            String externalUserid = weUnionidExternalUseridRelation.getExternalUserid();
-            if (StringUtils.isNotBlank(externalUserid)) {
-                LambdaQueryWrapper<WeCustomer> queryWrapper = new LambdaQueryWrapper<>();
-                queryWrapper.select(WeCustomer::getExternalUserid, WeCustomer::getCustomerName, WeCustomer::getCustomerType, WeCustomer::getAvatar);
-                queryWrapper.eq(WeCustomer::getExternalUserid, externalUserid);
-                queryWrapper.last("limit 1");
-                List<WeCustomer> weCustomers = weCustomerMapper.selectList(queryWrapper);
-                if (weCustomers != null && weCustomers.size() > 0) {
-                    weCustomer = weCustomers.get(0);
-                }
-            }
-        }
+        //2.根据unionId获取客户信息
+        LambdaQueryWrapper<WeCustomer> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.select(WeCustomer::getExternalUserid, WeCustomer::getCustomerName, WeCustomer::getCustomerType, WeCustomer::getAvatar);
+        queryWrapper.eq(WeCustomer::getUnionid, weContentViewRecordQuery.getUnionid());
+        List<WeCustomer> weCustomers = weCustomerMapper.selectList(queryWrapper);
+        WeCustomer weCustomer = weCustomers.stream().findFirst().orElse(null);
+
         //3.添加查看数据
         WeContentViewRecord weContentViewRecord = new WeContentViewRecord();
         if (weContentViewRecordQuery.getTalkId() != null) {
