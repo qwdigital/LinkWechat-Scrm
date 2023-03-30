@@ -3,6 +3,7 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -244,17 +245,15 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
     public void addView(WeContentViewRecordQuery weContentViewRecordQuery) {
 
         //获取员工信息
-        SysUser sysUser = new SysUser();
-        sysUser.setUserId(weContentViewRecordQuery.getSendUserId());
-
-        AjaxResult<List<SysUser>> result = qwSysUserClient.list(sysUser);
+        AjaxResult result = qwSysUserClient.getUserInfoById(weContentViewRecordQuery.getSendUserId());
 
         //如果发送员工不存在，则跳过此次的记录
-        if (result == null && CollectionUtil.isNotEmpty(result.getData())) {
+        if (result == null || result.getCode() != 200) {
             return;
         }
-
-        SysUser data = result.getData().stream().findFirst().get();
+        Object object = result.getData();
+        String s = JSONObject.toJSONString(object);
+        SysUser data = JSONObject.parseObject(s, SysUser.class);
 
         //获取员工对应的企业信息
         WeCorpAccount weCorpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
@@ -339,7 +338,7 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
         }
 
         //5.添加客户轨迹
-        if (ObjectUtil.isNotEmpty(weCustomer) && ObjectUtil.isNotEmpty(sysUser)) {
+        if (ObjectUtil.isNotEmpty(weCustomer) && ObjectUtil.isNotEmpty(data)) {
 
             log.info("添加客户轨迹");
 
@@ -357,19 +356,19 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
             //被操作对象类型:1:客户;2:员工:3:客群
             weCustomerTrajectory.setOperatoredObjectType(2);
             //被操作对象的id
-            weCustomerTrajectory.setOperatoredObjectId(sysUser.getWeUserId());
+            weCustomerTrajectory.setOperatoredObjectId(data.getWeUserId());
             //被操作对象名称
-            weCustomerTrajectory.setOperatoredObjectName(sysUser.getUserName());
+            weCustomerTrajectory.setOperatoredObjectName(data.getUserName());
             //客户id或群id，查询字段冗余,档该id不存在的时候代表
             weCustomerTrajectory.setExternalUseridOrChatid(weCustomer.getExternalUserid());
             //员工id，查询字段冗余
-            weCustomerTrajectory.setWeUserId(sysUser.getWeUserId());
+            weCustomerTrajectory.setWeUserId(data.getWeUserId());
             //动作
             weCustomerTrajectory.setAction(TrajectorySceneType.TRAJECTORY_TITLE_LOOK_MATERIAL.getName());
             //标题
             weCustomerTrajectory.setTitle(TrajectoryType.TRAJECTORY_TYPE_HDGZ.getName());
             //文案内容,整体内容
-            String.format(TrajectorySceneType.TRAJECTORY_TITLE_LOOK_MATERIAL.getMsgTpl(), weCustomer.getCustomerName(), sysUser.getUserName(), sb.toString());
+            String.format(TrajectorySceneType.TRAJECTORY_TITLE_LOOK_MATERIAL.getMsgTpl(), weCustomer.getCustomerName(), data.getUserName(), sb.toString());
             weCustomerTrajectory.setContent(TrajectoryType.TRAJECTORY_TYPE_HDGZ.getName());
             //
             weCustomerTrajectory.setMaterialId(weMaterial.getId());
