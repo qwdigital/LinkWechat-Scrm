@@ -80,7 +80,7 @@ public class QwChatMsgCheckListener {
         String fromId = jsonObject.getString("from");
         String msgId = jsonObject.getString("msgid");
         String msgtype = jsonObject.getString("msgtype");
-        StringBuilder objectString = new StringBuilder(jsonObject.getString(msgtype));
+        StringBuilder objectString = new StringBuilder(jsonObject.getString(msgtype) == null ? "" : jsonObject.getString(msgtype));
         if ("external_redpacket".equals(msgtype)) {
             objectString.append(jsonObject.getString("redpacket"));
         } else if ("docmsg".equals(msgtype)) {
