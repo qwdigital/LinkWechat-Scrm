@@ -2,8 +2,10 @@ package com.linkwechat.domain.customer.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.linkwechat.domain.WeCustomerInfoExpand;
 import lombok.Data;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -13,6 +15,8 @@ import java.util.Date;
  **/
 @Data
 public class WeCustomerPortraitVo {
+
+    private Long customerId;
     //外部联系人id
     private String externalUserid;
     //企业员工id
@@ -87,6 +91,13 @@ public class WeCustomerPortraitVo {
 
     //客户姓名(客户画像做备注)
     private String customerFullName;
+
+
+
+
+    //客户信息拓展
+    private List<WeCustomerInfoExpand> weCustomerInfoExpands;
+
 
 
 }

@@ -177,7 +177,8 @@ public class WeOperationCenterController extends BaseController {
     @GetMapping("/group/member/getGroupMemberRealPageCnt")
     public TableDataInfo<WeGroupMemberRealCntVo> getGroupMemberRealPageCnt(WeOperationGroupQuery query) {
         startPage();
-        return getDataTable(weOperationCenterService.getGroupMemberRealCnt(query));
+//        return getDataTable(weOperationCenterService.getGroupMemberRealCnt(query));
+        return getDataTable(weOperationCenterService.selectGroupMemberBrokenLine(query));
     }
 
 

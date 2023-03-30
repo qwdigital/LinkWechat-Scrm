@@ -178,6 +178,10 @@ public class WeCustomer extends BaseEntity {
     @TableField(updateStrategy = FieldStrategy.IGNORED )
     private String tagIds;
 
+
+    /**当前添加客户添加人是否离职 1:是; 0:否*/
+    private Integer addUserLeave;
+
     /**
      * 0：正常;1:删除;
      */

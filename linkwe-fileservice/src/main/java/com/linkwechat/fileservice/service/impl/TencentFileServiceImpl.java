@@ -20,11 +20,12 @@ public class TencentFileServiceImpl implements IFileService {
     private LinkWeChatConfig linkWeChatConfig;
 
 
+
     @Override
     public String uploadFile(MultipartFile file) throws Exception {
 
 
-        return  linkWeChatConfig.getFile().getCos().getCosImgUrlPrefix()+FileUploadUtils.upload2Cos(file, linkWeChatConfig.getFile().getCos());
+        return  linkWeChatConfig.getFile().getCos().getCosImgUrlPrefix()+FileUploadUtils.uploadTenantCos(file, linkWeChatConfig.getFile().getCos());
     }
 
 

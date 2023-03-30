@@ -19,6 +19,7 @@ import com.linkwechat.fegin.QwUserClient;
 import com.linkwechat.fegin.QxAuthClient;
 import com.linkwechat.framework.service.TokenService;
 import com.linkwechat.service.IWeCorpAccountService;
+import com.linkwechat.service.IWeSysFieldTemplateService;
 import com.linkwechat.service.IWxUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,8 @@ public class SysLoginService {
 
     @Autowired
     private IWxUserService wxUserService;
+
+
 
 
     /**
