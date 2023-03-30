@@ -327,7 +327,7 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
             //发送消息
             QwAppMsgBody qwAppMsgBody = new QwAppMsgBody();
             qwAppMsgBody.setCorpId(SecurityUtils.getCorpId());
-            qwAppMsgBody.setCorpUserIds(Lists.newArrayList(data.getOpenUserid()));
+            qwAppMsgBody.setCorpUserIds(Lists.newArrayList(data.getWeUserId()));
 
             //发送模板
             WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
@@ -368,8 +368,8 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
             //标题
             weCustomerTrajectory.setTitle(TrajectoryType.TRAJECTORY_TYPE_HDGZ.getName());
             //文案内容,整体内容
-            String.format(TrajectorySceneType.TRAJECTORY_TITLE_LOOK_MATERIAL.getMsgTpl(), weCustomer.getCustomerName(), data.getUserName(), sb.toString());
-            weCustomerTrajectory.setContent(TrajectoryType.TRAJECTORY_TYPE_HDGZ.getName());
+            String format = String.format(TrajectorySceneType.TRAJECTORY_TITLE_LOOK_MATERIAL.getMsgTpl(), weCustomer.getCustomerName(), data.getUserName(), sb.toString());
+            weCustomerTrajectory.setContent(format);
             //
             weCustomerTrajectory.setMaterialId(weMaterial.getId());
             weCustomerTrajectoryMapper.insert(weCustomerTrajectory);
