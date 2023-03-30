@@ -26,12 +26,13 @@ import java.util.stream.Collectors;
 public class IWeQrAttachmentsServiceImpl extends ServiceImpl<WeQrAttachmentsMapper, WeQrAttachments> implements IWeQrAttachmentsService {
 
     @Override
-    public void saveBatchByQrId(Long qrId, List<WeMessageTemplate> attachments) {
+    public void saveBatchByQrId(Long qrId, Integer businessType, List<WeMessageTemplate> attachments) {
         List<WeQrAttachments> attachmentsList = Optional.ofNullable(attachments)
                 .orElseGet(ArrayList::new).stream().map(weQrAttachmentsQuery -> {
                     WeQrAttachments weQrAttachments = new WeQrAttachments();
                     BeanUtil.copyProperties(weQrAttachmentsQuery, weQrAttachments);
                     weQrAttachments.setQrId(qrId);
+                    weQrAttachments.setBusinessType(businessType);
                     return weQrAttachments;
                 }).collect(Collectors.toList());
         saveBatch(attachmentsList);
@@ -39,9 +40,19 @@ public class IWeQrAttachmentsServiceImpl extends ServiceImpl<WeQrAttachmentsMapp
 
 
     @Override
-    public void updateBatchByQrId(Long qrId, List<WeMessageTemplate> attachments) {
+    public void updateBatchByQrId(Long qrId, Integer businessType, List<WeMessageTemplate> attachments) {
         this.remove(new LambdaQueryWrapper<WeQrAttachments>()
-                .in(WeQrAttachments::getQrId,ListUtil.toList(qrId)));
-        saveBatchByQrId(qrId,attachments);
+                .in(WeQrAttachments::getQrId,ListUtil.toList(qrId))
+                .eq(WeQrAttachments::getBusinessType,businessType));
+        saveBatchByQrId(qrId,businessType, attachments);
+    }
+
+    @Override
+    public List<WeQrAttachments> getAttachmentsList(Long qrId, Integer businessType) {
+        List<WeQrAttachments> qrAttachments = list(new LambdaQueryWrapper<WeQrAttachments>()
+                .eq(WeQrAttachments::getQrId, qrId)
+                .eq(WeQrAttachments::getBusinessType, businessType)
+                .eq(WeQrAttachments::getDelFlag, 0));
+        return qrAttachments;
     }
 }

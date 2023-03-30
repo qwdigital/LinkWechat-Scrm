@@ -23,8 +23,8 @@ import java.util.List;
  * 
  * @author ruoyi
  */
-//@Configuration
-//@EnableSwagger2
+@Configuration
+@EnableSwagger2
 public class SwaggerConfig
 {
 

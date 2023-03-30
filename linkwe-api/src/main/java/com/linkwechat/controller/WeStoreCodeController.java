@@ -83,7 +83,8 @@ public class WeStoreCodeController extends BaseController {
         if(null != storeCodeConfig){
             storeCodeConfig.setWeQrAttachments(
                     attachmentsService.list(new LambdaQueryWrapper<WeQrAttachments>()
-                            .eq(WeQrAttachments::getQrId, storeCodeConfig.getId()))
+                            .eq(WeQrAttachments::getQrId, storeCodeConfig.getId())
+                            .eq(WeQrAttachments::getBusinessType,2))
             );
         }
 

@@ -3,6 +3,7 @@ package com.linkwechat.factory;
 
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.TagSynchEnum;
+import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.domain.wecom.callback.WeBackBaseVo;
 
 /**
@@ -18,7 +19,7 @@ public abstract class WeEventStrategy {
 
 
     protected boolean isFission(String str) {
-        return str.startsWith(WeConstans.FISSION_PREFIX);
+        return str.startsWith(WelcomeMsgTypeEnum.FISSION_PREFIX.getType());
     }
 
 }
