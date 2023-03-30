@@ -40,7 +40,6 @@ public class RequestContextInterceptor implements HandlerInterceptor {
 
 
         String url = request.getRequestURI();
-        log.error("url:"+url);
         if(StringUtils.isNotEmpty(url)){
             // 如果在微信接口集合下则需要微信授权的token才可以访问
             if ("/system/user/getWxInfo".equals(url)) {
