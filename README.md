@@ -13,7 +13,7 @@
 
 [官方网站](http://www.linkwechat.net/) | [官方论坛](http://community.linkwechat.net/) | [在线演示](http://demo.linkwechat.net/)
 
-[项目手册](https://www.yuque.com/linkwechat/help) | [用户手册](https://docs.qq.com/pdf/DZXR0ZUJub29wTldS?) | [常见问题](https://www.yuque.com/linkwechat/help/qk5gl6) | [[V4.x功能清单](https://docs.qq.com/sheet/DZUNUV2pRZU5kSnlU?tab=BB08J3)  
+[项目手册](https://www.yuque.com/linkwechat/help) | [用户手册](https://docs.qq.com/pdf/DZXR0ZUJub29wTldS?) | [常见问题](https://www.yuque.com/linkwechat/help/qk5gl6) | [V4.x功能清单](https://docs.qq.com/sheet/DZUNUV2pRZU5kSnlU?tab=BB08J3)  
 
 
 </div>
