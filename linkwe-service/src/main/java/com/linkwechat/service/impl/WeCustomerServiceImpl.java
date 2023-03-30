@@ -53,6 +53,7 @@ import com.linkwechat.mapper.WeCustomerMapper;
 import com.linkwechat.service.*;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,6 +83,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
     @Autowired
+    @Lazy
     private IWeGroupService iWeGroupService;
 
     @Autowired
@@ -102,6 +104,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     private IWeCustomerInfoExpandService iWeCustomerInfoExpandService;
 
     @Autowired
+    @Lazy
     private  IWeFissionService iWeFissionService;
 
 
@@ -1266,17 +1269,23 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     executeUserOrGroup.getGender()
             );
 
-            weCustomersQuery.setBeginTime(
-                    DateUtils.dateTime(executeUserOrGroup.getBeginTime())
-            );
+
+            if(executeUserOrGroup.getBeginTime() != null){
+                weCustomersQuery.setBeginTime(
+                        DateUtils.dateTime(executeUserOrGroup.getBeginTime())
+                );
+            }
+
 
             weCustomersQuery.setTagIds(
                     executeUserOrGroup.getTagIds()
             );
 
-            weCustomersQuery.setEndTime(
-                    DateUtils.dateTime(executeUserOrGroup.getEndTime())
-            );
+            if(executeUserOrGroup.getEndTime() != null){
+                weCustomersQuery.setEndTime(
+                        DateUtils.dateTime(executeUserOrGroup.getEndTime())
+                );
+            }
 
             weCustomersQuery.setTrackState(
                     executeUserOrGroup.getTrackState()

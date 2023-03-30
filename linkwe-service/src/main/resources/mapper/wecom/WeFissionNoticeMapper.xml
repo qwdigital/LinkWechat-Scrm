@@ -5,7 +5,7 @@
 <mapper namespace="com.linkwechat.mapper.WeFissionNoticeMapper">
 
     <delete id="physicalDelete">
-        delete from we_fission_detail where fission_id=#{fissionId}
+        delete from we_fission_notice where fission_id=#{fissionId}
     </delete>
 
 </mapper>

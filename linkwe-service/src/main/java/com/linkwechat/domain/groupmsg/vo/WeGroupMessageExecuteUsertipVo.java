@@ -1,5 +1,6 @@
 package com.linkwechat.domain.groupmsg.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -20,8 +21,10 @@ public class WeGroupMessageExecuteUsertipVo {
     //多个标签名使用逗号隔开
     private String tagNames;
     //添加开始时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date beginTime;
     //添加结束时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
     //跟进状态
     private Integer trackState;

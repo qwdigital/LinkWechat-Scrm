@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.domain.fission.vo.WeExecuteUserOrGroupConditVo;
 import com.linkwechat.domain.fission.vo.WeGroupMessageExecuteUserOrGroupTipVo;
@@ -20,7 +21,7 @@ import java.util.Date;
  * @TableName we_fission
  */
 @Data
-@TableName(value ="we_fission")
+@TableName(value ="we_fission",autoResultMap = true)
 public class WeFission extends BaseEntity {
     /**
      * 主键
@@ -46,11 +47,13 @@ public class WeFission extends BaseEntity {
     /**
      * 任务开始时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date fassionStartTime;
 
     /**
      * 任务结束时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date fassionEndTime;
 
     /**

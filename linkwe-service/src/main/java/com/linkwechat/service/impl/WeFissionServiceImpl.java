@@ -32,6 +32,7 @@ import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.service.*;
 import com.linkwechat.mapper.WeFissionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,9 +73,11 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
 
     @Autowired
+    @Lazy
     private IWeGroupCodeService iWeGroupCodeService;
 
     @Autowired
+    @Lazy
     private IWeGroupService iWeGroupService;
 
     @Autowired
@@ -106,8 +109,8 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
 
         //设置活动状态
-        if(DateUtils.parseDate(weFission.getBeginTime())//设置为进行中
-                .before(new Date())){
+        if((weFission.getFassionStartTime()//设置为进行中
+                .before(new Date()))){
             weFission.setFassionState(2);
         }
 
@@ -131,9 +134,9 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                             .build())
             );
 
-            if(DateUtils.parseDate(weFission.getBeginTime())//定时发送,活动时间
+            if(weFission.getFassionStartTime()//定时发送,活动时间
                     .after(new Date())){
-                messageQuery.setSendTime(DateUtils.parseDate(weFission.getBeginTime()));
+                messageQuery.setSendTime(weFission.getFassionStartTime());
                 messageQuery.setIsTask(1);
             }else{ //立即发送
                 messageQuery.setIsTask(0);
@@ -218,7 +221,8 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
         List<WeFission> weFissions = this.baseMapper.findWeFissions(new LambdaQueryWrapper<WeFission>()
                 .like(StringUtils.isNotEmpty(weFission.getFassionName()),WeFission::getFassionName,weFission.getFassionName())
                 .eq(weFission.getFassionType() != null,WeFission::getFassionType,weFission.getFassionType())
-                .eq(weFission.getFassionState() != null,WeFission::getFassionState,weFission.getFassionState()));
+                .eq(weFission.getFassionState() != null,WeFission::getFassionState,weFission.getFassionState())
+                .orderByDesc(WeFission::getUpdateTime));
         return weFissions;
     }
 

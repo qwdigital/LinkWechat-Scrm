@@ -13,6 +13,7 @@ import com.linkwechat.service.IWeFissionInviterRecordSubService;
 import com.linkwechat.mapper.WeFissionInviterRecordSubMapper;
 import com.linkwechat.service.IWeFissionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -25,6 +26,7 @@ public class WeFissionInviterRecordSubServiceImpl extends ServiceImpl<WeFissionI
     implements IWeFissionInviterRecordSubService {
 
     @Autowired
+    @Lazy
     private IWeFissionService iWeFissionService;
 
 
