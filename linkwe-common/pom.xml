@@ -289,9 +289,10 @@
             <artifactId>aliyun-sdk-oss</artifactId>
         </dependency>
 
+        <!--邮件发送-->
         <dependency>
-            <groupId>com.qiniu</groupId>
-            <artifactId>qiniu-java-sdk</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
     </dependencies>
 
