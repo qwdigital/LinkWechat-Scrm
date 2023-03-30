@@ -3,7 +3,7 @@ package com.linkwechat.common.utils.file;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-
+import  com.qiniu.storage.Configuration;
 import cn.hutool.core.io.FileUtil;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
@@ -26,6 +26,8 @@ import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.region.Region;
+import com.qiniu.common.Zone;
+import com.qiniu.storage.UploadManager;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -257,6 +259,17 @@ public class FileUploadUtils {
             ossClient.putObject(cosConfig.getBucketName(), fileName, file.getInputStream());
             ossClient.shutdown();
         }
+//        else if(FileCosType.FILE_COS_TYPE_QN.getType().equals(fileCosType)){ //七牛云存储
+//
+//            // 构造一个带指定Zone对象的配置类,不同的七云牛存储区域调用不同的zone
+//            Configuration cfg = new Configuration(Zone.zone0());
+//            // ...其他参数参考类注释
+//            UploadManager uploadManager = new UploadManager(cfg);
+//
+//
+//
+//
+//        }
 
 
 

@@ -93,7 +93,8 @@ public class FileUploadUtils {
     public static final String extractFilename(MultipartFile file) {
         String fileName = file.getOriginalFilename();
         String extension = getExtension(file);
-        fileName = DateUtils.datePath() + "/" + IdUtils.fastUUID() + "." + extension;
+//        fileName = DateUtils.datePath() + "/" + IdUtils.fastUUID() + "." + extension;
+        fileName = IdUtils.fastUUID() + "." + extension;
         return fileName;
     }
 
@@ -109,7 +110,8 @@ public class FileUploadUtils {
     }
 
     private static final String getPathFileName(String fileName) throws IOException {
-        String pathFileName = "/" + fileName;
+//        String pathFileName = "/" + fileName;
+        String pathFileName = fileName;
         return pathFileName;
     }
 
