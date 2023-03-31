@@ -7,13 +7,13 @@
 
 [![star](https://gitee.com/LinkWeChat/link-wechat/badge/star.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/stargazers)
 [![fork](https://gitee.com/LinkWeChat/link-wechat/badge/fork.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/members)
-[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V3.3-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
+[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V4.1-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
 [![license](http://img.shields.io/badge/license-GPL%203.0-orange)](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
 [![木兰社区](https://img.shields.io/badge/Mulan-incubating-blue)](https://portal.mulanos.cn//)
 
-[官方网站](http://www.linkwechat.net/) | [在线演示](http://demo.linkwechat.net/) | [V3.x功能清单](https://docs.qq.com/sheet/DZW9HSHpHdWlOYWh2?tab=BB08J3)  | [最新动态](https://www.yuque.com/linkwechat/help/ozzxus)
+[官方网站](http://www.linkwechat.net/) | [官方论坛](http://community.linkwechat.net/) | [在线演示](http://demo.linkwechat.net/)
 
-[项目手册](https://www.yuque.com/linkwechat/help) | [用户手册](https://docs.qq.com/pdf/DZXR0ZUJub29wTldS?) | [常见问题](https://www.yuque.com/linkwechat/help/qk5gl6) | [需求收集表](https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV)
+[项目手册](https://www.yuque.com/linkwechat/help) | [用户手册](https://docs.qq.com/pdf/DZXR0ZUJub29wTldS?) | [常见问题](https://www.yuque.com/linkwechat/help/qk5gl6) | [V4.x功能清单](https://docs.qq.com/sheet/DZUNUV2pRZU5kSnlU?tab=BB08J3)  
 
 
 </div>
@@ -27,9 +27,9 @@
 
 **<p align="center">【📣最近更新】还有什么想要产品/技术上友好的建议或意见，<a href="https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV" target="_blank">点击告诉我们~</a>一经采纳，将纳入开源贡献者并官网致谢，还会收到社区奖励的小礼品哦！~</p>**
 
-**<p align="center">LinkWeChat V3.0 正式发布啦，架构升级，全面焕新，欢迎大家提前体验！<a href="http://demo.linkwechat.net/" target="_blank">点击立即体验~</a></p>**
+**<p align="center">LinkWeChat V4.0 正式发布啦，新版“生态绿”视觉，更多能力逐步升级，欢迎大家提前体验！<a href="http://demo.linkwechat.net/" target="_blank">点击立即体验~</a></p>**
 
-**<p align="center">LinkWeChat V3.0 采用前后端分离架构，前端项目请点击<a href="https://gitee.com/LinkWeChat/link-we-chat-front" target="_blank">LinkWeChat-Front</a></p>**
+**<p align="center">LinkWeChat V4.0 采用前后端分离架构，前端项目请点击<a href="https://gitee.com/LinkWeChat/link-we-chat-front" target="_blank">LinkWeChat-Front</a></p>**
 
 
 **<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>**
@@ -66,23 +66,31 @@ LinkWeChat 基于企业微信开放能力，不仅集成了企微强大的后台
 
 LinkWeChat SCRM 基于企业私域流量营销闭环，遵从获取新客到管理并维护客户，再到建立社群进行客户营销，最后在营销过程中再次获取新客的循环流程。
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/134011_bd2745e6_1480777.png "仟微助手企业微信SCRM智能营销系统-V1.5_13.png")
+![输入图片说明](readme-pic/yewujiagou.png)
 
-整个系统共分为九大模块：
+LinkWeChat V4.x 大版本规划来啦~！V4.x 版本将把重点以下三部分：
+
+* 全面对接三方：不止于微信生态，让私域建设更全面、更彻底；
+* 精准营销能力：基于人群和策略，加强后链路转化能力；
+* 升级CRM能力：销售赋能，让线索到客户再到成交的链路更简单；
+
+整个系统共分为十一大模块：
 
 *   **运营中心** ：客户、客群、会话等全功能数据报表，数据一目了然；
 *   **引流获客** ：活码、群活码、公海、客服等多渠道引流，实现精准获客；
+*   **销售中心** ：承接引流获客模块客户线索，高效协作跟进；
 *   **客户中心** ：助力企业搭建私域流量池，高效运营客户；
 *   **客群中心** ：客群运营场景全覆盖；
 *   **客情维系** ：企业客户运营精细化，朋友圈、红包工具提高客户活跃度；
 *   **内容中心** ：搭建企业自有内容库，多类型素材一键调用；
 *   **全能营销** ：提供多类型、多场景客户营销工具；
+*   **商城中心** ：自有小程序商城，快捷搭建企业转化链路；
 *   **企业风控** ：会话合规存档，敏感内容全局风控；
 *   **企业管理** ：组织架构、自建应用全融合，实现“一个后台”；
 
-[LinkWeChat 社区版 V3.x 详细功能清单](https://docs.qq.com/sheet/DZW9HSHpHdWlOYWh2?tab=BB08J3)
+[LinkWeChat 社区版 V4.x 详细功能清单](https://docs.qq.com/sheet/DZUNUV2pRZU5kSnlU?tab=BB08J3)
 
-![输入图片说明](readme-pic/v3image.png)
+我们欢迎感兴趣的贡献者积极参与 LinkWeChat 新版的开源中，如有兴趣通过下方的联系方式联系我们哦~
 
 ## 1.3 优势
 
@@ -92,6 +100,8 @@ LinkWeChat 基于企业微信从服务内部到对外全面开放能力，可为
 * 二次整合封装企微 API，避免重复踩坑
 * 采用主流 Java 架构，具备高拓展性、灵活性，避免 PHP 架构的缺点
 * 对外提供内部 API，低成本二次开发
+
+![输入图片说明](readme-pic/youshi.png)
 
 ## 1.4 愿景
 
@@ -185,12 +195,32 @@ LinkWeChat V3.0 架构升级，全面升级为微服务架构，整体系统架�
 
 # 四、最近更新
 
-## 近期计划
+## V4.1 更新日志
 
-- [ ] 内部机器人前端发布；
-- [ ] 企微商品画册功能重构；
-- [ ] 智能短链；
-- [ ] 数据洞察；
+- [x] 系统素材相关功能，全面升级为内容中心；
+- [x] 离职继承、流失提醒等相关功能优化；
+- [x] 修复系统相关bug；
+
+## V4.0 更新日志
+
+- [x] 系统UI全面更新；
+- [x] 新增客户画像表单自定义，商机阶段；
+- [x] 部分功能优化等；
+- [x] 修复相关bug；
+
+## V3.4 更新日志
+
+- [x] 智能短链；
+- [x] 修复了一些已知问题；
+- [x] 其余各模块UI细节调优；
+
+## V3.3 更新日志
+
+- [x] 客户/客群SOP发布；
+- [x] 内部机器人前端发布；
+- [x] 企微商品画册功能重构；
+- [x] 修复了一些已知问题；
+- [x] 其余各模块UI细节调优；
 
 ## V3.2 更新日志
 
@@ -233,9 +263,9 @@ LinkWeChat V3.0 主要围绕系统架构、引流获客、客情维系、内容�
 
 # 五、奖项荣誉
 
-凭借着出色的产品能力和专业的技术能力，LinkWeChat 在 Gitee 开源社区年度评选活动中荣获“2020 年度 GVP最有价值开源项目”、“2020 年开源中国最佳人气项目”两个重量级奖项。
+LinkWeChat 凭借着出色的产品能力和专业的技术能力，已经获取如下奖项：
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/150243_3899c77e_1480777.png "仟微助手企业微信SCRM智能营销系统-V1.5_39.png")
+![输入图片说明](readme-pic/jiangxiang2023.png)
 
 目前 LinkWeChat 已成功加入木兰开源社区孵化项目，得到了更加专业的技术支持与相关知识产权扶持，未来将会以更加严谨规范的专业能力服务各企业与行业。
 
@@ -322,8 +352,6 @@ LinkWeChat V3.0 主要围绕系统架构、引流获客、客情维系、内容�
 [流之云](https://gitee.com/ntdgg) 信息化、数字化服务提供商
 
 [translate.js](https://gitee.com/mail_osc/translate) 网页自动翻译，页面无需另行改造，加入两行js即可让你的网页快速具备多国语言切换能力！
-
-
 
 ## 7.5 社会价值
 
