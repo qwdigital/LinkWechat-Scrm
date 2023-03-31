@@ -93,7 +93,8 @@ public class WeShortLinkController extends BaseController {
 
         //短链推广
         if (ObjectUtil.isNotEmpty(promotionId)) {
-            redisService.increment(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.OPEN_APPLET + promotionId);
+            String encode = Base62NumUtil.encode(promotionId);
+            redisService.increment(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.OPEN_APPLET + encode);
         }
         return AjaxResult.success(result);
     }

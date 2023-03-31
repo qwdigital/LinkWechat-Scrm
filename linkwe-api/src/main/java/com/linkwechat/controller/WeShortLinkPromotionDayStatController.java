@@ -11,6 +11,7 @@ import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.redis.RedisService;
+import com.linkwechat.common.utils.Base62NumUtil;
 import com.linkwechat.domain.WeShortLinkPromotionDayStat;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionStatisticQuery;
 import com.linkwechat.service.IWeShortLinkPromotionDayStatService;
@@ -51,13 +52,14 @@ public class WeShortLinkPromotionDayStatController extends BaseController {
     @GetMapping(value = {"/statistics/{promotionId}"})
     public AjaxResult statistics(@PathVariable("promotionId") Long promotionId) {
 
+        String encode = Base62NumUtil.encode(promotionId);
         //今日PV数
-        Integer tpv = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.PV + promotionId);
+        Integer tpv = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.PV + encode);
         tpv = tpv == null ? 0 : tpv;
         //今日UV数
-        Long tuv = redisService.hyperLogLogCount(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.UV + promotionId);
+        Long tuv = redisService.hyperLogLogCount(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.UV + encode);
         //今日打开小程序数
-        Integer topen = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.OPEN_APPLET + promotionId);
+        Integer topen = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.OPEN_APPLET + encode);
         topen = topen == null ? 0 : topen;
 
         LambdaQueryWrapper<WeShortLinkPromotionDayStat> queryWrapper = Wrappers.lambdaQuery();
@@ -124,6 +126,8 @@ public class WeShortLinkPromotionDayStatController extends BaseController {
         List<Integer> openList = new LinkedList<>();
         List<DateTime> timeList = DateUtil.rangeToList(DateUtil.parseDate(query.getBeginTime()), DateUtil.parseDate(query.getEndTime()), DateField.DAY_OF_YEAR);
         List<String> dateList = timeList.stream().map(DateTime::toDateStr).collect(Collectors.toList());
+
+        String encode = Base62NumUtil.encode(query.getPromotionId());
 
         //今日PV数
         Integer tpv = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.PV + query.getPromotionId());

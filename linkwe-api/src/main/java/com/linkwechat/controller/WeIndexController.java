@@ -113,6 +113,7 @@ public class WeIndexController {
             Boolean lock = redisService.tryLock(key, "lock", 2L);
             if (lock) {
                 short2LongUrl = weShortLinkService.getShort2LongUrl(shortUrl, promotionKey);
+                log.info("短链换取长链的数据：{}", short2LongUrl.toJSONString());
                 if (StringUtils.isNotEmpty(short2LongUrl.getString("errorMsg"))) {
                     redisService.setCacheObject(key, short2LongUrl, 5, TimeUnit.MINUTES);
                 } else {
