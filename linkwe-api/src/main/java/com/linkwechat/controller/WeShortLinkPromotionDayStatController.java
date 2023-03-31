@@ -102,6 +102,10 @@ public class WeShortLinkPromotionDayStatController extends BaseController {
                 result.put("comparedYesterdayUv", tuv.intValue() - uvNum);
                 result.put("comparedYesterdayOpen", finalTopen - openNum);
             });
+        } else {
+            result.put("pv", tpv);
+            result.put("uv", tuv.intValue());
+            result.put("open", topen);
         }
         return AjaxResult.success(result);
     }
@@ -130,12 +134,12 @@ public class WeShortLinkPromotionDayStatController extends BaseController {
         String encode = Base62NumUtil.encode(query.getPromotionId());
 
         //今日PV数
-        Integer tpv = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.PV + query.getPromotionId());
+        Integer tpv = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.PV + encode);
         tpv = tpv == null ? 0 : tpv;
         //今日UV数
-        Long tuv = redisService.hyperLogLogCount(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.UV + query.getPromotionId());
+        Long tuv = redisService.hyperLogLogCount(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.UV + encode);
         //今日打开小程序数
-        Integer topen = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.OPEN_APPLET + query.getPromotionId());
+        Integer topen = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.OPEN_APPLET + encode);
         topen = topen == null ? 0 : topen;
 
         LambdaQueryWrapper<WeShortLinkPromotionDayStat> queryWrapper = Wrappers.lambdaQuery();
