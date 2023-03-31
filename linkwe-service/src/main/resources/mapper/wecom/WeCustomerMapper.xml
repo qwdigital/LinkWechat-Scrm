@@ -195,6 +195,7 @@
         wc.position,
         wc.corp_name as corpName,
         wc.other_descr as otherDescr,
+        timestampdiff(day,wc.add_time,NOW()) as retentionDays,
         (SELECT GROUP_CONCAT(DISTINCT wu.user_name) FROM sys_user wu WHERE  wu.we_user_id=wc.add_user_id) as userName,
         (SELECT GROUP_CONCAT(wt.tag_id) FROM we_flower_customer_tag_rel wfctr
         LEFT JOIN we_tag wt ON wt.tag_id= wfctr.tag_id
