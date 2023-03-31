@@ -60,9 +60,6 @@ public class WeAgentController extends BaseController {
     @ApiOperation(value = "编辑应用信息", httpMethod = "PUT")
     @PutMapping("/update/{id}")
     public AjaxResult update(@PathVariable("id") Integer id, @RequestBody WeAgentEditQuery query) {
-        if(id == 7){
-            throw new WeComException("此ID不允许修改");
-        }
         query.setId(id);
         log.info("编辑应用信息入参query:{}", JSONObject.toJSONString(query));
         weAgentInfoService.update(query);
@@ -80,9 +77,6 @@ public class WeAgentController extends BaseController {
     @ApiOperation(value = "删除应用", httpMethod = "DELETE")
     @DeleteMapping("/delete/{id}")
     public AjaxResult<LwAgentListVo> deleteAgent(@PathVariable("id") Integer id) {
-        if(id == 7){
-            throw new WeComException("此ID不允许删除");
-        }
         log.info("删除应用入参query:{}", id);
         weAgentInfoService.deleteAgent(id);
         return AjaxResult.success();
