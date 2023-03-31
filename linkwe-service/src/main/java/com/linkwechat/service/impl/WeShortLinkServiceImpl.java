@@ -249,7 +249,12 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
         WxJumpWxaQuery wxaQuery = new WxJumpWxaQuery();
         WxJumpWxaQuery.JumpWxa wxa = new WxJumpWxaQuery.JumpWxa();
         wxa.setPath(linkWeChatConfig.getShortAppletUrl());
-        wxa.setQuery("id=" + shortUrl);
+        if (StrUtil.isNotBlank(promotionKey)) {
+            long promotionId = Base62NumUtil.decode(promotionKey);
+            wxa.setQuery("id=" + shortUrl + "&promotionId=" + promotionId);
+        } else {
+            wxa.setQuery("id=" + shortUrl);
+        }
         wxa.setEnv_version(shortEnvVersion);
         wxaQuery.setJump_wxa(wxa);
         WxJumpWxaVo wxJumpWxa = qxAppletClient.generateScheme(wxaQuery).getData();
