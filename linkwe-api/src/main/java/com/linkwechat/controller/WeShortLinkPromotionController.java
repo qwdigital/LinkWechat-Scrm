@@ -74,13 +74,15 @@ public class WeShortLinkPromotionController extends BaseController {
             String shortLinkUrl = linkWeChatConfig.getShortLinkDomainName() + encode;
             i.setShortLinkUrl(shortLinkUrl);
 
+
+            String encode1 = Base62NumUtil.encode(i.getId());
             //今日PV数
-            Integer tpv = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.PV + encode);
+            Integer tpv = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.PV + encode1);
             tpv = tpv == null ? 0 : tpv;
             //今日UV数
-            Long tuv = redisService.hyperLogLogCount(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.UV + encode);
+            Long tuv = redisService.hyperLogLogCount(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.UV + encode1);
             //今日打开小程序数
-            Integer topen = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.OPEN_APPLET + encode);
+            Integer topen = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.OPEN_APPLET + encode1);
             topen = topen == null ? 0 : topen;
 
 
