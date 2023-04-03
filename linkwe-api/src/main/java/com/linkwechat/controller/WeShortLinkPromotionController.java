@@ -7,9 +7,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.config.LinkWeChatConfig;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.Base62NumUtil;
 import com.linkwechat.domain.material.entity.WeMaterial;
@@ -50,6 +52,8 @@ public class WeShortLinkPromotionController extends BaseController {
     private IWeMaterialService weMaterialService;
     @Resource
     private LinkWeChatConfig linkWeChatConfig;
+    @Resource
+    private RedisService redisService;
 
 
     /**
@@ -69,6 +73,21 @@ public class WeShortLinkPromotionController extends BaseController {
             String encode = Base62NumUtil.encode(i.getShortLinkId());
             String shortLinkUrl = linkWeChatConfig.getShortLinkDomainName() + encode;
             i.setShortLinkUrl(shortLinkUrl);
+
+            //今日PV数
+            Integer tpv = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.PV + encode);
+            tpv = tpv == null ? 0 : tpv;
+            //今日UV数
+            Long tuv = redisService.hyperLogLogCount(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.UV + encode);
+            //今日打开小程序数
+            Integer topen = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.OPEN_APPLET + encode);
+            topen = topen == null ? 0 : topen;
+
+
+            i.setPvNum(i.getPvNum() != null ? i.getPvNum() + tpv : tpv);
+            i.setUvNum(i.getUvNum() != null ? i.getUvNum() + tuv.intValue() : tuv.intValue());
+            i.setOpenNum(i.getOpenNum() != null ? i.getOpenNum() + topen : topen);
+
         }));
         return getDataTable(list);
     }
