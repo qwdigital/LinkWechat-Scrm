@@ -1,5 +1,6 @@
 package com.linkwechat.domain.material.ao;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -86,6 +87,11 @@ public class WePoster {
     @ApiModelProperty(value = "轨迹素材生成的H5链接")
     private String linkUrl;
 
+    /**
+     * 海报二维码组件类型：海报二维码组件类型：3占位码 4员工活码 5客群活码 6门店活码 7识客活码 8拉新活码
+     */
+    @ApiModelProperty(value = "海报二维码组件类型")
+    private Integer posterQrType;
 
     /**
      * 海报组件数组

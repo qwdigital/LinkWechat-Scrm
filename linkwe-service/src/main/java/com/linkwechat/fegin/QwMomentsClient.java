@@ -2,6 +2,7 @@ package com.linkwechat.fegin;
 
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.moments.dto.*;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.fallback.QwMomentsFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,4 +74,13 @@ public interface QwMomentsClient {
      */
     @PostMapping("/moments/get_moment_customer_list")
     AjaxResult<MomentsResultDto> get_moment_customer_list(@RequestBody MomentsParamDto momentsParamDto);
+
+    /**
+     * 停止发表企业朋友圈
+     *
+     * @param cancelMomentTaskDto
+     * @return
+     */
+    @PostMapping("/moments/cancel_moment_task")
+    AjaxResult<WeResultVo> cancel_moment_task(@RequestBody CancelMomentTaskDto cancelMomentTaskDto);
 }

@@ -211,6 +211,11 @@ public class LinkWeChatConfig {
      */
     private String lxQrCodeUrl;
 
+    /**
+     * 短链推广-应用消息页面
+     */
+    private String appMsgUrl;
+
 
     public String getName() {
         return name;

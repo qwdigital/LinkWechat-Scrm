@@ -3,6 +3,7 @@ package com.linkwechat.wecom.controller;
 import com.dtflys.forest.annotation.PostRequest;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.moments.dto.*;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.wecom.service.IQwMomentsService;
 import org.springframework.web.bind.annotation.*;
 
@@ -90,4 +91,17 @@ public class QwMomentsController {
     public AjaxResult<MomentsResultDto> get_moment_customer_list(@RequestBody MomentsParamDto momentsParamDto) {
         return AjaxResult.success(qwMomentsService.getMomentCustomerList(momentsParamDto));
     }
+
+    /**
+     * 停止发表企业朋友圈
+     *
+     * @param cancelMomentTaskDto
+     * @return
+     */
+    @PostMapping("/cancel_moment_task")
+    public AjaxResult<WeResultVo> cancel_moment_task(@RequestBody CancelMomentTaskDto cancelMomentTaskDto) {
+        return AjaxResult.success(qwMomentsService.cancel_moment_task(cancelMomentTaskDto));
+    }
+
+
 }
