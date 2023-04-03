@@ -3,12 +3,14 @@ package com.linkwechat.common.utils.file;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-
 import cn.hutool.core.io.FileUtil;
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkwechat.common.config.CosConfig;
 import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.enums.FileCosType;
 import com.linkwechat.common.exception.file.FileNameLengthLimitExceededException;
 import com.linkwechat.common.exception.file.FileSizeLimitExceededException;
 import com.linkwechat.common.exception.file.InvalidExtensionException;
@@ -44,60 +46,60 @@ public class FileUploadUtils {
      */
     public static final int DEFAULT_FILE_NAME_LENGTH = 100;
 
-    /**
-     * 默认上传的地址
-     */
-    private static String defaultBaseDir = LinkWeChatConfig.getProfile();
-
-    public static void setDefaultBaseDir(String defaultBaseDir) {
-        FileUploadUtils.defaultBaseDir = defaultBaseDir;
-    }
-
-    public static String getDefaultBaseDir() {
-        return defaultBaseDir;
-    }
-
-
-
-    /**
-     * 以默认配置进行文件上传
-     *
-     * @param file 上传的文件
-     * @return 文件名称
-     * @throws Exception
-     */
-    public static final String upload(MultipartFile file) throws IOException {
-        try {
-            return upload(getDefaultBaseDir(), file, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION);
-        } catch (Exception e) {
-            throw new IOException(e.getMessage(), e);
-        }
-    }
-
-    public static final String upload(InputStream inputStream,String fileName) throws IOException {
-        try {
-            return upload(getDefaultBaseDir(), inputStream, fileName);
-        } catch (Exception e) {
-            throw new IOException(e.getMessage(), e);
-        }
-    }
+//    /**
+//     * 默认上传的地址
+//     */
+//    private static String defaultBaseDir = LinkWeChatConfig.getProfile();
+//
+//    public static void setDefaultBaseDir(String defaultBaseDir) {
+//        FileUploadUtils.defaultBaseDir = defaultBaseDir;
+//    }
+//
+//    public static String getDefaultBaseDir() {
+//        return defaultBaseDir;
+//    }
 
 
-    /**
-     * 以默认配置进行文件上传
-     *
-     * @param file 上传的文件
-     * @return 文件名称
-     * @throws Exception
-     */
-    public static final String uploadFile(MultipartFile file) throws IOException {
-        try {
-            return uploadFile(getDefaultBaseDir(), file);
-        } catch (Exception e) {
-            throw new IOException(e.getMessage(), e);
-        }
-    }
 
+//    /**
+//     * 以默认配置进行文件上传
+//     *
+//     * @param file 上传的文件
+//     * @return 文件名称
+//     * @throws Exception
+//     */
+//    public static final String upload(MultipartFile file) throws IOException {
+//        try {
+//            return upload(getDefaultBaseDir(), file, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION);
+//        } catch (Exception e) {
+//            throw new IOException(e.getMessage(), e);
+//        }
+//    }
+//
+//    public static final String upload(InputStream inputStream,String fileName) throws IOException {
+//        try {
+//            return upload(getDefaultBaseDir(), inputStream, fileName);
+//        } catch (Exception e) {
+//            throw new IOException(e.getMessage(), e);
+//        }
+//    }
+//
+//
+//    /**
+//     * 以默认配置进行文件上传
+//     *
+//     * @param file 上传的文件
+//     * @return 文件名称
+//     * @throws Exception
+//     */
+//    public static final String uploadFile(MultipartFile file) throws IOException {
+//        try {
+//            return uploadFile(getDefaultBaseDir(), file);
+//        } catch (Exception e) {
+//            throw new IOException(e.getMessage(), e);
+//        }
+//    }
+//
     /**
      * 根据文件路径上传
      *
@@ -157,26 +159,49 @@ public class FileUploadUtils {
      * @return 访问路径
      * @throws IOException
      */
-    public static final String upload2Cos(MultipartFile file , CosConfig cosConfig) throws IOException {
+    public static final String uploadTenantCos(MultipartFile file , CosConfig cosConfig) throws IOException {
         try {
-            return upload2Cos( file, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION,cosConfig);
+            return uploadCos( file, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION,cosConfig,FileCosType.FILE_COS_TYPE_TENANT.getType());
         } catch (Exception e) {
             throw new IOException(e.getMessage(), e);
         }
     }
 
+
     /**
-     * 通过流进行文件上传
-     * @param in 流
-     * @throws IOException
+     * 上传阿里云存储中
+     * @param file
+     * @param cosConfig
+     * @return
      */
-    public static String upload2Cos(InputStream in, String fileExtension, CosConfig cosConfig) throws IOException {
+    public static final String uploadAliOss(MultipartFile file , CosConfig cosConfig) throws IOException {
+
         try {
-            return upload2Cos( in, fileExtension, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION, cosConfig);
+            return uploadCos( file, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION,cosConfig,FileCosType.FILE_COS_TYPE_ALI.getType());
         } catch (Exception e) {
             throw new IOException(e.getMessage(), e);
         }
+
     }
+
+
+
+
+
+
+
+//    /**
+//     * 通过流进行文件上传
+//     * @param in 流
+//     * @throws IOException
+//     */
+//    public static String uploadTenantCos(InputStream in, String fileExtension, CosConfig cosConfig) throws IOException {
+//        try {
+//            return uploadTenantCos( in, fileExtension, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION, cosConfig);
+//        } catch (Exception e) {
+//            throw new IOException(e.getMessage(), e);
+//        }
+//    }
 
 
     /**
@@ -190,7 +215,7 @@ public class FileUploadUtils {
      * @throws IOException                          比如读写文件出错时
      * @throws InvalidExtensionException            文件校验异常
      */
-    public static final String upload2Cos( MultipartFile file, String[] allowedExtension, CosConfig cosConfig)
+    public static final String uploadCos(MultipartFile file, String[] allowedExtension, CosConfig cosConfig,Integer fileCosType)
             throws FileSizeLimitExceededException, IOException, FileNameLengthLimitExceededException,
             InvalidExtensionException {
         int fileNamelength = file.getOriginalFilename().length();
@@ -201,66 +226,93 @@ public class FileUploadUtils {
         assertAllowed(file, allowedExtension);
 
         String fileName = extractFilename(file);
-        // 1 初始化用户身份信息（secretId, secretKey）。
-        COSCredentials cred = new BasicCOSCredentials(cosConfig.getSecretId(), cosConfig.getSecretKey());
-        // 2 设置 bucket 的区域, COS 地域的简称请参照 https://cloud.tencent.com/document/product/436/6224
-        // clientConfig 中包含了设置 region, https(默认 http), 超时, 代理等 set 方法, 使用可参见源码或者常见问题 Java SDK 部分。
-        Region region = new Region(cosConfig.getRegion());
-        ClientConfig clientConfig = new ClientConfig(region);
-        // 3 生成 cos 客户端。
-        COSClient cosClient = new COSClient(cred, clientConfig);
 
-        // 指定要上传到 COS 上对象键
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.getBucketName(), fileName,file.getInputStream(),objectMetadata);
-        PutObjectResult putObjectResult = cosClient.putObject(putObjectRequest);
-        log.info("{}",cosConfig.getCosImgUrlPrefix()+fileName);
-        log.info("腾讯cos上传信息：{}",new ObjectMapper().writeValueAsString(putObjectResult));
-        cosClient.shutdown();
+
+        if(FileCosType.FILE_COS_TYPE_TENANT.getType().equals(fileCosType)){//腾讯云存储逻辑
+            // 1 初始化用户身份信息（secretId, secretKey）。
+            COSCredentials cred = new BasicCOSCredentials(cosConfig.getSecretId(), cosConfig.getSecretKey());
+            // 2 设置 bucket 的区域, COS 地域的简称请参照 https://cloud.tencent.com/document/product/436/6224
+            // clientConfig 中包含了设置 region, https(默认 http), 超时, 代理等 set 方法, 使用可参见源码或者常见问题 Java SDK 部分。
+            Region region = new Region(cosConfig.getRegion());
+            ClientConfig clientConfig = new ClientConfig(region);
+            // 3 生成 cos 客户端。
+            COSClient cosClient = new COSClient(cred, clientConfig);
+
+            // 指定要上传到 COS 上对象键
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.getBucketName(), fileName,file.getInputStream(),objectMetadata);
+            PutObjectResult putObjectResult = cosClient.putObject(putObjectRequest);
+            log.info("{}",cosConfig.getCosImgUrlPrefix()+fileName);
+            log.info("腾讯cos上传信息：{}",new ObjectMapper().writeValueAsString(putObjectResult));
+            cosClient.shutdown();
+
+        }else if(FileCosType.FILE_COS_TYPE_ALI.getType().equals(fileCosType)){//阿里云存储逻辑
+
+            // 创建OSSClient实例。
+            OSS ossClient = new OSSClientBuilder().build(cosConfig.getRegion(), cosConfig.getSecretId(), cosConfig.getSecretKey());
+
+
+            // 上传文件
+            ossClient.putObject(cosConfig.getBucketName(), fileName, file.getInputStream());
+            ossClient.shutdown();
+        }
+//        else if(FileCosType.FILE_COS_TYPE_QN.getType().equals(fileCosType)){ //七牛云存储
+//
+//            // 构造一个带指定Zone对象的配置类,不同的七云牛存储区域调用不同的zone
+//            Configuration cfg = new Configuration(Zone.zone0());
+//            // ...其他参数参考类注释
+//            UploadManager uploadManager = new UploadManager(cfg);
+//
+//
+//
+//
+//        }
+
+
 
         return fileName;
     }
 
-    /**
-     * 将流中的文件传到腾讯云
-     * @param inputStream 输入流
-     * @param fileExtension 被写入流的文件的后缀名
-     * @param allowedExtension 允许的后缀名
-     * @throws FileSizeLimitExceededException 文件大小超过上限
-     * @throws InvalidExtensionException 文件后缀名非法
-     */
-    public static String upload2Cos(InputStream inputStream, String fileExtension, String[] allowedExtension, CosConfig cosConfig) throws FileSizeLimitExceededException, InvalidExtensionException {
-        String fileName = DateUtils.datePath() + "/" + IdUtils.fastUUID() + "." + fileExtension;
-        if (!isAllowedExtension(fileExtension, allowedExtension))
-        {
-            throw new InvalidExtensionException.InvalidImageExtensionException(allowedExtension, fileExtension, fileName);
-        }
-        COSCredentials cred = new BasicCOSCredentials(cosConfig.getSecretId(), cosConfig.getSecretKey());
-        Region region = new Region(cosConfig.getRegion());
-        ClientConfig clientConfig = new ClientConfig(region);
-        COSClient cosClient = new COSClient(cred, clientConfig);
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.getBucketName(), fileName ,inputStream ,objectMetadata);
-        cosClient.putObject(putObjectRequest);
-        cosClient.shutdown();
-        return fileName;
-    }
+//    /**
+//     * 将流中的文件传到腾讯云
+//     * @param inputStream 输入流
+//     * @param fileExtension 被写入流的文件的后缀名
+//     * @param allowedExtension 允许的后缀名
+//     * @throws FileSizeLimitExceededException 文件大小超过上限
+//     * @throws InvalidExtensionException 文件后缀名非法
+//     */
+//    public static String uploadTenantCos(InputStream inputStream, String fileExtension, String[] allowedExtension, CosConfig cosConfig) throws FileSizeLimitExceededException, InvalidExtensionException {
+//        String fileName = DateUtils.datePath() + "/" + IdUtils.fastUUID() + "." + fileExtension;
+//        if (!isAllowedExtension(fileExtension, allowedExtension))
+//        {
+//            throw new InvalidExtensionException.InvalidImageExtensionException(allowedExtension, fileExtension, fileName);
+//        }
+//        COSCredentials cred = new BasicCOSCredentials(cosConfig.getSecretId(), cosConfig.getSecretKey());
+//        Region region = new Region(cosConfig.getRegion());
+//        ClientConfig clientConfig = new ClientConfig(region);
+//        COSClient cosClient = new COSClient(cred, clientConfig);
+//        ObjectMetadata objectMetadata = new ObjectMetadata();
+//        PutObjectRequest putObjectRequest = new PutObjectRequest(cosConfig.getBucketName(), fileName ,inputStream ,objectMetadata);
+//        cosClient.putObject(putObjectRequest);
+//        cosClient.shutdown();
+//        return fileName;
+//    }
 
 
-    public static final String uploadFile(String baseDir, MultipartFile file)
-            throws FileSizeLimitExceededException, IOException, FileNameLengthLimitExceededException {
-        int fileNamelength = file.getOriginalFilename().length();
-        if (fileNamelength > FileUploadUtils.DEFAULT_FILE_NAME_LENGTH) {
-            throw new FileNameLengthLimitExceededException(FileUploadUtils.DEFAULT_FILE_NAME_LENGTH);
-        }
-
-        String fileName = extractFilename(file);
-
-        File desc = getAbsoluteFile(baseDir, fileName);
-        file.transferTo(desc);
-        String pathFileName = getPathFileName(baseDir, fileName);
-        return pathFileName;
-    }
+//    public static final String uploadFile(String baseDir, MultipartFile file)
+//            throws FileSizeLimitExceededException, IOException, FileNameLengthLimitExceededException {
+//        int fileNamelength = file.getOriginalFilename().length();
+//        if (fileNamelength > FileUploadUtils.DEFAULT_FILE_NAME_LENGTH) {
+//            throw new FileNameLengthLimitExceededException(FileUploadUtils.DEFAULT_FILE_NAME_LENGTH);
+//        }
+//
+//        String fileName = extractFilename(file);
+//
+//        File desc = getAbsoluteFile(baseDir, fileName);
+//        file.transferTo(desc);
+//        String pathFileName = getPathFileName(baseDir, fileName);
+//        return pathFileName;
+//    }
 
     /**
      * 编码文件名

@@ -63,6 +63,9 @@
         <bcprov-jdk15on.version>1.69</bcprov-jdk15on.version>
         <bcpg-jdk15on.version>1.68</bcpg-jdk15on.version>
         <bcpkix-jdk15on.version>1.68</bcpkix-jdk15on.version>
+        <aliyun-sdk-oss.version>3.15.1</aliyun-sdk-oss.version>
+        <oss-spring-boot-starter.version>1.3</oss-spring-boot-starter.version>
+        <qiniu.version>7.2.7</qiniu.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -469,6 +472,23 @@
                 <artifactId>bcpkix-jdk15on</artifactId>
                 <version>${bcpkix-jdk15on.version}</version>
             </dependency>
+
+
+            <dependency>
+                <groupId>com.aliyun.oss</groupId>
+                <artifactId>aliyun-sdk-oss</artifactId>
+                <version>${aliyun-sdk-oss.version}</version>
+            </dependency>
+
+
+            <!--七牛云上传图片服务-->
+            <!-- https://mvnrepository.com/artifact/com.qiniu/qiniu-java-sdk -->
+            <dependency>
+                <groupId>com.qiniu</groupId>
+                <artifactId>qiniu-java-sdk</artifactId>
+                <version>${qiniu.version}</version>
+            </dependency>
+
 
 
 

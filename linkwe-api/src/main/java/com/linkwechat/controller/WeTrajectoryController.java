@@ -7,15 +7,21 @@ import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.TrajectoryType;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCustomerTrajectory;
+import com.linkwechat.domain.material.entity.WeMaterial;
+import com.linkwechat.domain.material.vo.WeMaterialVo;
 import com.linkwechat.service.IWeCustomerTrajectoryService;
+import com.linkwechat.service.IWeMaterialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/trajectory")
@@ -23,6 +29,8 @@ public class WeTrajectoryController extends BaseController {
 
     @Autowired
     IWeCustomerTrajectoryService weCustomerTrajectoryService;
+    @Resource
+    private IWeMaterialService weMaterialService;
 
     /**
      * 获取企业动态
@@ -50,15 +58,33 @@ public class WeTrajectoryController extends BaseController {
     @GetMapping("/findTrajectory")
     public TableDataInfo<WeCustomerTrajectory> findTrajectory(String externalUserid,String weUserId,Integer trajectoryType){
         startPage();
-        return getDataTable(
-                weCustomerTrajectoryService.list(
-                        new LambdaQueryWrapper<WeCustomerTrajectory>()
-                                .eq(StringUtils.isNotEmpty(externalUserid),WeCustomerTrajectory::getExternalUseridOrChatid,externalUserid)
-                                .eq(StringUtils.isNotEmpty(weUserId),WeCustomerTrajectory::getWeUserId,weUserId)
-                                .eq(trajectoryType != null,WeCustomerTrajectory::getTrajectoryType,trajectoryType)
-                                .orderByDesc(WeCustomerTrajectory::getCreateTime)
-                )
-        );
+        List<WeCustomerTrajectory> list = weCustomerTrajectoryService.list(
+                new LambdaQueryWrapper<WeCustomerTrajectory>()
+                        .eq(StringUtils.isNotEmpty(externalUserid), WeCustomerTrajectory::getExternalUseridOrChatid, externalUserid)
+                        .eq(StringUtils.isNotEmpty(weUserId), WeCustomerTrajectory::getWeUserId, weUserId)
+                        .eq(trajectoryType != null, WeCustomerTrajectory::getTrajectoryType, trajectoryType)
+                        .orderByDesc(WeCustomerTrajectory::getCreateTime));
+
+        List<Long> collect = list.stream().map(o -> o.getMaterialId()).collect(Collectors.toList());
+        if (collect != null && collect.size() > 0) {
+            List<WeMaterial> weMaterials = weMaterialService.listByIds(collect);
+            list.stream().forEach(item -> {
+                Optional<WeMaterial> first = weMaterials.stream().filter(o -> o.getId().equals(item.getMaterialId())).findFirst();
+                if (first.isPresent()) {
+                    WeMaterial weMaterial = first.get();
+                    WeMaterialVo weMaterialVo = new WeMaterialVo();
+                    weMaterialVo.setId(weMaterial.getId());
+                    weMaterialVo.setMaterialUrl(weMaterial.getMaterialUrl());
+                    weMaterialVo.setMaterialName(weMaterial.getMaterialName());
+                    weMaterialVo.setCoverUrl(weMaterial.getCoverUrl());
+                    weMaterialVo.setMediaType(weMaterial.getMediaType());
+                    weMaterialVo.setResourceType(weMaterial.getModuleType().toString());
+                    item.setWeMaterialVo(weMaterialVo);
+                }
+            });
+        }
+
+        return getDataTable(list);
     }
 
 

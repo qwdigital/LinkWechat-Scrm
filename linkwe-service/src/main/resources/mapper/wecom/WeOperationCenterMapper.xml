@@ -469,7 +469,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             resultType="com.linkwechat.domain.operation.vo.WeGroupMemberRealCntVo">
         select
         x_time,
-        @total := @total + add_cnt - quit_cnt AS total_cnt,
+        @total := @total + add_cnt AS total_cnt,
         add_cnt,
         quit_cnt
         from (
@@ -484,9 +484,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             and `date` &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
         ) as date_list
         left join
-        (select DATE_FORMAT(wgm.create_time, '%Y-%m-%d') day,
-        count(DISTINCT wgm.user_id) as add_num
+        (select DATE_FORMAT(wgm.join_time, '%Y-%m-%d') day,
+        count(1) as add_num
         from we_group_member wgm  where 1=1
+        and wgm.del_flag = 0
         <if test="chatIds != null and chatIds.size() > 0" >
             and wgm.chat_id in
             <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
@@ -500,13 +501,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             </foreach>
             )
         </if>
-        and DATE_FORMAT(wgm.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
-        and DATE_FORMAT(wgm.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        and DATE_FORMAT(wgm.join_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        and DATE_FORMAT(wgm.join_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
         group by day
-        ,(SELECT @total := (select count(DISTINCT wgmt.user_id) from we_group_member wgmt
+        ,(SELECT @total := (select count(1) from we_group_member wgmt
         where
         wgmt.del_flag = 0
-        and date_format(wgmt.create_time,'%Y-%m-%d') &lt; DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        and date_format(wgmt.join_time,'%Y-%m-%d') &lt; DATE_FORMAT(#{beginTime},'%Y-%m-%d')
         <if test="chatIds != null and chatIds.size() > 0" >
             and wgmt.chat_id in
             <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
@@ -524,7 +525,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         as real_data on date_list.`date` = real_data.day
         left join
         (select DATE_FORMAT(wgm.quit_time, '%Y-%m-%d') day,
-        sum(case when wgm.del_flag = 1 then 1 else 0 end) as quit_num
+        count(1) as quit_num
         from we_group_member wgm  where 1=1
         <if test="chatIds != null and chatIds.size() > 0" >
             and wgm.chat_id in

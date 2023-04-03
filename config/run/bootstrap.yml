@@ -8,9 +8,9 @@ spring:
       # 配置中心
       config:
         # 命名空间id(此处不用public,因public初始化的空间, id为空)  4e237601-cea8-414d-b7b9-d7adc8cbcf95
-        namespace: 20a042b3-f453-47be-bc26-e7f62832ca39
+        namespace: 0c644b7e-505b-4c39-bee2-297e828abc17
         # nacos的ip地址和端口 120.79.64.17:10848
-        server-addr: 120.79.64.17:10848
+        server-addr: 127.0.0.1:8848
         # 这个就表示 在我们nacos命名空间id为 dev中 有一个data-id 为 demo-service.yml 的配置文件 读取这个里面的配置
         file-extension: yml
         config-retry-time: 300000
@@ -36,7 +36,7 @@ spring:
       config:
         # 命名空间id(此处不用public,因public初始化的空间, id为空)
         namespace: 5633d616-30dc-40e4-8816-f82e88f329ab
-        # nacos的ip地址和端口 120.79.64.17:10848
+        # nacos的ip地址和端口
         server-addr: 127.0.0.1:8848
         # 这个就表示 在我们nacos命名空间id为 dev中 有一个data-id 为 demo-service.yml 的配置文件 读取这个里面的配置
         file-extension: yml
@@ -63,8 +63,8 @@ spring:
       config:
         # 命名空间id(此处不用public,因public初始化的空间, id为空)
         namespace: 4e237601-cea8-414d-b7b9-d7adc8cbcf95
-        # nacos的ip地址和端口 120.79.64.17:10848
-        server-addr:  120.79.64.17:10848
+        # nacos的ip地址和端口 
+        server-addr:  127.0.0.1:8848
         # 这个就表示 在我们nacos命名空间id为 dev中 有一个data-id 为 demo-service.yml 的配置文件 读取这个里面的配置
         file-extension: yml
         config-retry-time: 300000

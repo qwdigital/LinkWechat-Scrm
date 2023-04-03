@@ -30,7 +30,6 @@ public class WeCommonRetryWhen implements RetryWhen {
 
       try {
           WeResultVo WeResultVo = JSONUtil.toBean(forestResponse.getContent(), WeResultVo.class);
-
           if (null != WeResultVo.getErrCode()){
               log.info("重试start: url:" + forestRequest.getUrl() + "------------result:" + forestResponse.getContent());
               return true;

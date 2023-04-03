@@ -44,18 +44,18 @@ public class FileUtil {
              FileUploadUtils.assertAllowed(file, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION);
              String fileName="";
              String imgUrlPrefix="";
-             if(linkWeChatConfig.getFile().isStartCosUpload()){//开启云上传
+//             if(linkWeChatConfig.getFile().isStartCosUpload()){//开启云上传
                  //开启云上传开关则云上传，不然上传本地
-                 fileName = FileUploadUtils.upload2Cos(file, linkWeChatConfig.getFile().getCos());
+                 fileName = FileUploadUtils.uploadTenantCos(file, linkWeChatConfig.getFile().getCos());
                  imgUrlPrefix = linkWeChatConfig.getFile().getCos().getCosImgUrlPrefix();
-             }else {//本地上传
-                 File osFile=OsUtils.isWindows()?new File(WINDOWSFILEPATH):new File(LINUXFILEPATH);
-                 if(!osFile.exists()){
-                     osFile.mkdirs();
-                 }
-                 fileName = FileUploadUtils.upload(osFile.getPath(), file);
-                 imgUrlPrefix = linkWeChatConfig.getFile().getImgUrlPrefix();
-             }
+//             }else {//本地上传
+//                 File osFile=OsUtils.isWindows()?new File(WINDOWSFILEPATH):new File(LINUXFILEPATH);
+//                 if(!osFile.exists()){
+//                     osFile.mkdirs();
+//                 }
+//                 fileName = FileUploadUtils.upload(osFile.getPath(), file);
+//                 imgUrlPrefix = linkWeChatConfig.getFile().getImgUrlPrefix();
+//             }
              JSONObject reust = new JSONObject();
              reust.put("fileName",fileName);
              reust.put("imgUrlPrefix",imgUrlPrefix);

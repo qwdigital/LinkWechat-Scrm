@@ -295,6 +295,9 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
     @Transactional
     public void synchLeaveSysUserHandler(String msg) {
         LoginUser loginUser = JSONObject.parseObject(msg, LoginUser.class);
+        if(Objects.isNull(loginUser)){
+            return;
+        }
         SecurityContextHolder.setCorpId(loginUser.getCorpId());
         SecurityContextHolder.setUserName(loginUser.getUserName());
         SecurityContextHolder.setUserId(String.valueOf(loginUser.getSysUser().getUserId()));
