@@ -8,7 +8,8 @@ import lombok.Data;
 public enum FileCosType {
 
     FILE_COS_TYPE_TENANT(1,"腾讯云COS"),
-    FILE_COS_TYPE_ALI(2,"阿里云OSS");
+    FILE_COS_TYPE_ALI(2,"阿里云OSS"),
+    FILE_COS_TYPE_QN(3,"七牛云Kodo");
 
     private Integer type;
 

@@ -2,6 +2,7 @@ package com.linkwechat.wecom.client;
 
 import com.dtflys.forest.annotation.*;
 import com.linkwechat.domain.moments.dto.*;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 import com.linkwechat.wecom.retry.WeCommonRetryWhen;
 
@@ -71,4 +72,13 @@ public interface WeMomentsClient {
      */
     @Post("/externalcontact/get_moment_customer_list")
     MomentsResultDto get_moment_customer_list(@JSONBody MomentsParamDto momentsParamDto);
+
+    /**
+     * 停止发表企业朋友圈
+     *
+     * @param cancelMomentTaskDto
+     * @return
+     */
+    @Post("/externalcontact/cancel_moment_task")
+    WeResultVo cancel_moment_task(@JSONBody CancelMomentTaskDto cancelMomentTaskDto);
 }

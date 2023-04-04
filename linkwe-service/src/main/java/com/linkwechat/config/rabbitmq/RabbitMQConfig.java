@@ -155,7 +155,6 @@ public class RabbitMQConfig {
     }
 
 
-
     /**
      * 客户同步队列
      *
@@ -597,63 +596,66 @@ public class RabbitMQConfig {
 
     /**
      * sop队列绑定交换机
+     *
      * @return
      */
     @Bean
-    public Binding bindingSopExchange(){
+    public Binding bindingSopExchange() {
         return BindingBuilder.bind(sopQu()).to(sopEx()).with(rabbitMQSettingConfig.getSopRk()).noargs();
     }
 
 
     /**
      * sop队列
+     *
      * @return
      */
     @Bean
-    public Queue sopQu(){
+    public Queue sopQu() {
         return new Queue(rabbitMQSettingConfig.getSopQu());
     }
 
     /**
      * sop交换机
+     *
      * @return
      */
     @Bean
-    public Exchange sopEx(){
+    public Exchange sopEx() {
         // 声明路由交换机，durable:在rabbitmq重启后，交换机还在
         return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getSopEx()).durable(true).build();
     }
 
 
-
     /**
      * 直播交换机
+     *
      * @return
      */
     @Bean
-    public Exchange liveEx(){
+    public Exchange liveEx() {
         return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getWeLiveRk()).durable(true).build();
     }
 
     /**
      * 直播队列绑定交换机
+     *
      * @return
      */
     @Bean
-    public Binding bindingExchangeSyncWeLive(){
+    public Binding bindingExchangeSyncWeLive() {
         return BindingBuilder.bind(quWeLive()).to(syncEx()).with(rabbitMQSettingConfig.getWeLiveRk()).noargs();
     }
 
     /**
      * 直播同步队列
+     *
      * @return
      */
     @Bean
-    public Queue quWeLive(){
+    public Queue quWeLive() {
         return new Queue(rabbitMQSettingConfig.getLiveQu());
     }
-
-
 
 
     /**
@@ -669,10 +671,11 @@ public class RabbitMQConfig {
 
     /**
      * 同步离职成员队列
+     *
      * @return
      */
     @Bean
-    public Queue quLeaveUser(){
+    public Queue quLeaveUser() {
         return new Queue(rabbitMQSettingConfig.getLeaveAllocateUserQu());
 
     }
@@ -680,13 +683,96 @@ public class RabbitMQConfig {
 
     /**
      * 离职成员同步绑定交换机
+     *
      * @return
      */
     @Bean
-    public Binding bindingQuLeaveUser(){
+    public Binding bindingQuLeaveUser() {
 
         return BindingBuilder.bind(quLeaveUser()).to(syncEx()).with(rabbitMQSettingConfig.getWeLeaveAllocateUserRk()).noargs();
 
     }
+
+    /**
+     * 朋友圈消息队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quMomentsMsg() {
+        return new Queue(rabbitMQSettingConfig.getMomentsMsgQu());
+    }
+
+    /**
+     * 朋友圈消息队列 绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingQuMoments() {
+        return BindingBuilder.bind(quMomentsMsg()).to(delayEx()).with(rabbitMQSettingConfig.getWeMomentMsgRk()).noargs();
+    }
+
+    /**
+     * 朋友圈消息延迟队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quMomentsDelayMsg() {
+        return new Queue(rabbitMQSettingConfig.getMomentsDelayQu());
+    }
+
+    /**
+     * 朋友圈消息延迟队列 绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingQuDelayMoments() {
+        return BindingBuilder.bind(quMomentsDelayMsg()).to(delayEx()).with(rabbitMQSettingConfig.getWeDelayMomentMsgRk()).noargs();
+    }
+
+    /**
+     * 短链推广-应用消息延迟队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quDelayAppMsg() {
+        return new Queue(rabbitMQSettingConfig.getWeDelayAppMsgQu());
+    }
+
+    /**
+     * 短链推广-应用消息延迟队列 绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingQuDelayAppMsg() {
+        return BindingBuilder.bind(quDelayAppMsg()).to(delayEx()).with(rabbitMQSettingConfig.getWeDelayAppMsgRk()).noargs();
+    }
+
+    /**
+     * 短链推广-群发消息结束队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quDelayGroupMsgEnd() {
+        return new Queue(rabbitMQSettingConfig.getGroupMsgEndDelayQu());
+    }
+
+    /**
+     * 短链推广-群发消息结束队列 绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingQuDelayGroupMsgEnd() {
+        return BindingBuilder.bind(quDelayGroupMsgEnd()).to(delayEx()).with(rabbitMQSettingConfig.getWeDelayGroupMsgEndRk()).noargs();
+    }
+
+
 }
 

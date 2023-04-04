@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeShortLinkPromotionTemplateAppMsgMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkwechat.domain.WeShortLinkPromotionTemplateAppMsg">
+        <id column="id" property="id"/>
+        <result column="promotion_id" property="promotionId"/>
+        <result column="send_type" property="sendType"/>
+        <result column="task_send_time" property="taskSendTime"/>
+        <result column="task_end_time" property="taskEndTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_by_id" property="createById"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_by_id" property="updateById"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="post_ids" property="postIds"/>
+        <result column="user_ids" property="userIds"/>
+        <result column="dept_ids" property="deptIds"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        ,
+        promotion_id,
+        user_ids,
+        dept_ids,
+        post_ids,
+        send_type,
+        task_send_time,
+        task_end_time,
+        create_by,
+        create_by_id,
+        create_time,
+        update_by,
+        update_by_id,
+        update_time,
+        del_flag
+    </sql>
+
+</mapper>

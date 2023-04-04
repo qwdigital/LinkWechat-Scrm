@@ -45,6 +45,9 @@ public class WeCustomersVo {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthday;
 
+    //留存天数
+    private Integer retentionDays;
+
     //0-未知 1-男性 2-女性
     private Integer gender;
 

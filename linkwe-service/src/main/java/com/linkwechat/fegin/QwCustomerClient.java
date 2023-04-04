@@ -6,10 +6,7 @@ import com.linkwechat.domain.wecom.query.customer.UnionidToExternalUserIdQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
-import com.linkwechat.domain.wecom.query.customer.msg.WeAddCustomerMsgQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeGetGroupMsgListQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeGroupMsgListQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeWelcomeMsgQuery;
+import com.linkwechat.domain.wecom.query.customer.msg.*;
 import com.linkwechat.domain.wecom.query.customer.state.WeGroupChatStatisticQuery;
 import com.linkwechat.domain.wecom.query.customer.state.WeUserBehaviorDataQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeAddCorpTagQuery;
@@ -242,6 +239,14 @@ public interface QwCustomerClient {
     public AjaxResult<WeGroupMsgListVo> getGroupMsgSendResult(@RequestBody WeGetGroupMsgListQuery query);
 
     /**
+     * 停止企业群发
+     * @param query
+     * @return
+     */
+    @PostMapping("/customer/group/msg/cancelGroupMsgSend")
+    public AjaxResult<WeResultVo> cancelGroupMsgSend(@RequestBody WeCancelGroupMsgSendQuery query);
+
+    /**
      * 发送新客户欢迎语
      *
      * @param query
@@ -340,6 +345,7 @@ public interface QwCustomerClient {
 
     /**
      * 编辑标签或标签组名称
+     *
      * @param query
      * @return
      */

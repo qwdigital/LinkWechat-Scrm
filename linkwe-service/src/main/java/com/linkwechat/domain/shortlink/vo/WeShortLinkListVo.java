@@ -78,7 +78,7 @@ public class WeShortLinkListVo {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "更新时间")
-   private Date updateTime;
+    private Date updateTime;
 
 
 }

@@ -2,6 +2,7 @@ package com.linkwechat.controller;
 
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
@@ -11,11 +12,14 @@ import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.MapUtils;
+import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.common.utils.poi.ExcelUtil;
+import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.WeCustomerSeas;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
+import com.linkwechat.domain.live.WeLive;
 import com.linkwechat.domain.storecode.entity.WeStoreCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeConfig;
 import com.linkwechat.domain.qr.WeQrAttachments;
@@ -403,11 +407,13 @@ public class WeStoreCodeController extends BaseController {
      * @return
      */
     @GetMapping("/importTemplate")
-    public AjaxResult importTemplate()
+    public void importTemplate()
     {
 
-        ExcelUtil<WeStoreCode> util = new ExcelUtil<WeStoreCode>(WeStoreCode.class);
-        return util.importTemplateExcel( DateUtils.dateTimeNow(DateUtils.YYYY_MM_DD)+"_门店模版");
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeStoreCode.class, ListUtil.toList(new WeStoreCode()),DateUtils.dateTimeNow(DateUtils.YYYY_MM_DD)+"_门店模版"
+        );
+
     }
 
 
