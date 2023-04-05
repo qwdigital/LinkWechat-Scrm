@@ -1,5 +1,6 @@
 package com.linkwechat.fegin;
 
+import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.dto.SysUserDTO;
 import com.linkwechat.common.core.domain.entity.SysUser;
@@ -29,8 +30,8 @@ public interface QwSysUserClient {
      * @param msg
      * @return
      */
-    @GetMapping("/system/user/syncUserHandler")
-    AjaxResult syncUserHandler(@RequestParam("msg") String msg);
+    @PostMapping("/system/user/syncUserHandler")
+    AjaxResult syncUserHandler(@RequestBody JSONObject msg);
 
     /**
      * 回调删除

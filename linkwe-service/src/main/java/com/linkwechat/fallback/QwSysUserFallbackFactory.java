@@ -1,5 +1,6 @@
 package com.linkwechat.fallback;
 
+import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.dto.SysUserDTO;
 import com.linkwechat.common.core.domain.entity.SysUser;
@@ -24,7 +25,7 @@ public class QwSysUserFallbackFactory implements QwSysUserClient {
     }
 
     @Override
-    public AjaxResult syncUserHandler(String msg) {
+    public AjaxResult syncUserHandler(JSONObject msg) {
         return null;
     }
 

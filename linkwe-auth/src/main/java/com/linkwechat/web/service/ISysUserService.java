@@ -1,5 +1,6 @@
 package com.linkwechat.web.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.common.core.domain.dto.SysUserDTO;
 import com.linkwechat.common.core.domain.entity.SysUser;
@@ -203,7 +204,7 @@ public interface ISysUserService extends IService<SysUser> {
      * 同步员工信息
      * @param msg
      */
-    void syncUserHandler(String msg);
+    void syncUserHandler(JSONObject msg);
 
     /**
      * 添加员工回调

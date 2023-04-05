@@ -1,6 +1,7 @@
 package com.linkwechat.scheduler.listener;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.service.*;
 import com.rabbitmq.client.Channel;
@@ -139,7 +140,8 @@ public class QwDataSyncListener {
     public void sysUserSubscribe(String msg, Channel channel, Message message) {
         log.info("企微员工信息消息监听：msg:{}", msg);
         try {
-            qwSysUserClient.syncUserHandler(msg);
+            JSONObject jsonObject = JSONObject.parseObject(msg);
+            qwSysUserClient.syncUserHandler(jsonObject);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             log.error("企微员工同步消息监听-消息处理失败 msg:{},error:{}", msg, e);

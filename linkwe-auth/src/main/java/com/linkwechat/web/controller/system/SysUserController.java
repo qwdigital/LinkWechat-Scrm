@@ -1,6 +1,7 @@
 package com.linkwechat.web.controller.system;
 
 import cn.hutool.core.collection.ListUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -353,8 +354,8 @@ public class SysUserController extends BaseController {
      *
      * @param msg
      */
-    @GetMapping("/syncUserHandler")
-    public AjaxResult syncUserHandler(String msg) {
+    @PostMapping("/syncUserHandler")
+    public AjaxResult syncUserHandler(@RequestBody JSONObject msg) {
         userService.syncUserHandler(msg);
         return AjaxResult.success();
     }

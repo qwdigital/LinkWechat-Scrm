@@ -542,16 +542,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Async
     @Override
-    public void syncUserHandler(String msg) {
-        JSONObject jsonObject = JSONObject.parseObject(msg);
+    public void syncUserHandler(JSONObject msg) {
 
-        LoginUser loginUser = jsonObject.getObject("loginUser", LoginUser.class);
+        LoginUser loginUser = msg.getObject("loginUser", LoginUser.class);
         SecurityContextHolder.setCorpId(loginUser.getCorpId());
         SecurityContextHolder.setUserName(loginUser.getUserName());
         SecurityContextHolder.setUserId(String.valueOf(loginUser.getUserId()));
         SecurityContextHolder.setUserType(loginUser.getUserType());
 
-        WeUserDetailVo detailVo = jsonObject.getObject("detailVo", WeUserDetailVo.class);
+        WeUserDetailVo detailVo = msg.getObject("detailVo", WeUserDetailVo.class);
 
         syncAddOrUpdateUser(detailVo);
     }
