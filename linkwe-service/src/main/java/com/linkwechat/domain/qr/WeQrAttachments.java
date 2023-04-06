@@ -37,6 +37,13 @@ public class WeQrAttachments extends BaseEntity implements Serializable {
     @TableField("qr_id")
     private Long qrId;
 
+    /**
+     * 业务类型 1-员工活码 2-门店导购 3-拉新活码
+     */
+    @ApiModelProperty(value = "业务类型 1-员工活码 2-门店导购 3-拉新活码 ...")
+    @TableField("business_type")
+    private Integer businessType;
+
 
     /**
      * 消息类型 文本:text 图片:image 图文:link 小程序:miniprogram 视频:video 文件:file

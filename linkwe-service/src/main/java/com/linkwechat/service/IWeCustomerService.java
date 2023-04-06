@@ -23,6 +23,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
     /**
      * 客户列表
+     *
      * @param weCustomersQuery
      * @return
      */
@@ -31,6 +32,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
     /**
      * 应用客户列表
+     *
      * @param weCustomersQuery
      * @param pageDomain
      * @return
@@ -39,6 +41,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
     /**
      * 客户总数统计
+     *
      * @param weCustomersQuery
      * @return
      */
@@ -47,6 +50,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
     /**
      * 应用列表客户数统计
+     *
      * @param weCustomersQuery
      * @return
      */
@@ -55,6 +59,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
     /**
      * 去重统计
+     *
      * @return
      */
     long noRepeatCountCustomer(WeCustomersQuery weCustomersQuery);
@@ -62,6 +67,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
     /**
      * 同步企业微信客户
+     *
      * @return
      */
     void synchWeCustomer();
@@ -69,6 +75,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
     /**
      * 同步企业客户
+     *
      * @param msg
      */
     void synchWeCustomerHandler(String msg);
@@ -76,6 +83,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
     /**
      * 通过跟进人id同步客户
+     *
      * @param followUserIds
      */
     void synchWeCustomerByAddIds(List<String> followUserIds);
@@ -83,6 +91,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
     /**
      * 构建离职待分配客户
+     *
      * @param followUserIds
      */
     void buildAllocateWecustomer(List<String> followUserIds);
@@ -90,6 +99,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
     /**
      * 客户打标签
+     *
      * @param weMakeCustomerTag
      */
     void makeLabel(WeMakeCustomerTag weMakeCustomerTag);
@@ -97,6 +107,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
     /**
      * 在职员工客户分配
+     *
      * @param weOnTheJobCustomerQuery
      */
     void allocateOnTheJobCustomer(WeOnTheJobCustomerQuery weOnTheJobCustomerQuery);
@@ -104,6 +115,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
     /**
      * 客户详情基础数据
+     *
      * @param externalUserid
      * @param userId
      * @return
@@ -111,32 +123,33 @@ public interface IWeCustomerService extends IService<WeCustomer> {
     WeCustomerDetailInfoVo findWeCustomerDetail(String externalUserid, String userId, Integer delFlag);
 
 
-
     /**
      * 客户画像汇总
+     *
      * @return
      */
-    WeCustomerDetailInfoVo findWeCustomerInfoSummary(String externalUserid,String userId,Integer delFlag);
+    WeCustomerDetailInfoVo findWeCustomerInfoSummary(String externalUserid, String userId, Integer delFlag);
 
 
     /**
      * 单个跟进人客户
+     *
      * @return
      */
-    WeCustomerDetailInfoVo findWeCustomerInfoByUserId(String externalUserid,String userId,Integer delFlag);
-
+    WeCustomerDetailInfoVo findWeCustomerInfoByUserId(String externalUserid, String userId, Integer delFlag);
 
 
     /**
      * 根据员工id获取员工名称
+     *
      * @return
      */
     String findUserNameByUserId(String userId);
 
 
-
     /**
      * 根据外部联系人ID和企业员工ID获取当前客户信息
+     *
      * @param externalUserid
      * @param userid
      * @return
@@ -144,56 +157,60 @@ public interface IWeCustomerService extends IService<WeCustomer> {
     WeCustomerPortraitVo findCustomerByOperUseridAndCustomerId(String externalUserid, String userid) throws Exception;
 
 
-
     /**
      * 跟新客户画像
+     *
      * @param weCustomerPortrait
      */
     void updateWeCustomerPortrait(WeCustomerPortraitVo weCustomerPortrait);
 
 
-
     /**
      * 根据客户id获取客户添加人
+     *
      * @param externalUserid
      * @return
      */
     List<WeCustomerAddUserVo> findWeUserByCustomerId(String externalUserid);
 
 
-
     /**
      * 客户跟进记录
+     *
      * @param trajectory
      */
-    void addOrEditWaitHandle( WeCustomerTrackRecord trajectory);
+    void addOrEditWaitHandle(WeCustomerTrackRecord trajectory);
 
 
     /**
      * 新增客户时间
+     *
      * @param externalUserId 客户ID
-     * @param userId 成员ID
-     * @param state 添加此用户的渠道
+     * @param userId         成员ID
+     * @param state          添加此用户的渠道
      */
     void addCustomer(String externalUserId, String userId, String state);
 
     /**
      * 编辑客户信息
+     *
      * @param externalUserId 客户ID
-     * @param userId 成员ID
+     * @param userId         成员ID
      */
     WeCustomer updateCustomer(String externalUserId, String userId);
 
 
     /**
      * 获取当前租户下的员工
+     *
      * @return
      */
-    Map<String, SysUser>  findCurrentTenantSysUser();
+    Map<String, SysUser> findCurrentTenantSysUser();
 
 
     /**
      * 根据企业微信员工id获取当前企业员工相关信息
+     *
      * @param weUserId
      * @return
      */
@@ -202,6 +219,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
     /**
      * 根据系统用户主建，获取当前用户信息
+     *
      * @param userId
      * @return
      */
@@ -217,6 +235,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
     /**
      * 通过条件查询客户信息
+     *
      * @param query
      * @return
      */
@@ -240,12 +259,14 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
     /**
      * 获取所有员工
+     *
      * @return
      */
     List<SysUser> findAllSysUser();
 
     /**
      * 获取权限可见范围的员工id
+     *
      * @return
      */
     List<String> findWeUserIds();
@@ -255,14 +276,16 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
     /**
      * 根据客户id获取客户，不存在则从企业微信端同步
+     *
      * @param externalUserid
      * @return
      */
-     WeCustomer findOrSynchWeCustomer(String externalUserid);
+    WeCustomer findOrSynchWeCustomer(String externalUserid);
 
 
     /**
      * 批量编辑标签
+     *
      * @param makeCustomerTags
      */
     void batchMakeLabel(WeBacthMakeCustomerTag makeCustomerTags);

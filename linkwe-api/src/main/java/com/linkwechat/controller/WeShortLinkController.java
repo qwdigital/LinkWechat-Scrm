@@ -1,5 +1,6 @@
 package com.linkwechat.controller;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.constant.WeConstans;
@@ -81,11 +82,20 @@ public class WeShortLinkController extends BaseController {
 
     @ApiOperation(value = "通过短链接获取短链详情", httpMethod = "GET")
     @Log(title = "短链详情", businessType = BusinessType.SELECT)
-    @GetMapping("/getByShort/{shortUrl}")
-    public AjaxResult<WeShortLinkVo> getShortLinkInfo(@PathVariable("shortUrl") String shortUrl) {
+    @GetMapping(value = {"/getByShort/{shortUrl}", "/getByShort/{shortUrl}/{promotionId}"})
+    public AjaxResult<WeShortLinkVo> getShortLinkInfo(
+            @PathVariable("shortUrl") String shortUrl,
+            @PathVariable(value = "promotionId", required = false) Long promotionId) {
         long id = Base62NumUtil.decode(shortUrl);
         WeShortLinkVo result = weShortLinkService.getShortLinkInfo(id);
-        redisService.increment(WeConstans.WE_SHORT_LINK_KEY  + WeConstans.OPEN_APPLET + shortUrl);
+        //短链
+        redisService.increment(WeConstans.WE_SHORT_LINK_KEY + WeConstans.OPEN_APPLET + shortUrl);
+
+        //短链推广
+        if (ObjectUtil.isNotEmpty(promotionId)) {
+            String encode = Base62NumUtil.encode(promotionId);
+            redisService.increment(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.OPEN_APPLET + encode);
+        }
         return AjaxResult.success(result);
     }
 
@@ -104,7 +114,7 @@ public class WeShortLinkController extends BaseController {
     @Log(title = "短链数据统计", businessType = BusinessType.SELECT)
     @GetMapping("/data/statistics")
     public AjaxResult<WeShortLinkStatisticsVo> getDataStatistics(WeShortLinkStatisticQuery query) {
-        if(Objects.isNull(query)){
+        if (Objects.isNull(query)) {
             throw new WeComException("入参不能为空");
         }
         WeShortLinkStatisticsVo result = weShortLinkService.getDataStatistics(query);
@@ -115,13 +125,13 @@ public class WeShortLinkController extends BaseController {
     @Log(title = "短链折线统计", businessType = BusinessType.SELECT)
     @GetMapping("/line/statistics")
     public AjaxResult<WeShortLinkStatisticsVo> getLineStatistics(WeShortLinkStatisticQuery query) {
-        if(Objects.isNull(query)){
+        if (Objects.isNull(query)) {
             throw new WeComException("入参不能为空");
         }
-        if(Objects.isNull(query.getId())){
+        if (Objects.isNull(query.getId())) {
             throw new WeComException("ID不能为空");
         }
-        if(Objects.isNull(query.getBeginTime())){
+        if (Objects.isNull(query.getBeginTime())) {
             throw new WeComException("开始时间不能为空");
         }
         WeShortLinkStatisticsVo result = weShortLinkService.getLineStatistics(query);

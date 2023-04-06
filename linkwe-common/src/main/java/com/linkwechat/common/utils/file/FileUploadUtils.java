@@ -3,7 +3,6 @@ package com.linkwechat.common.utils.file;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-
 import cn.hutool.core.io.FileUtil;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
@@ -257,6 +256,17 @@ public class FileUploadUtils {
             ossClient.putObject(cosConfig.getBucketName(), fileName, file.getInputStream());
             ossClient.shutdown();
         }
+//        else if(FileCosType.FILE_COS_TYPE_QN.getType().equals(fileCosType)){ //七牛云存储
+//
+//            // 构造一个带指定Zone对象的配置类,不同的七云牛存储区域调用不同的zone
+//            Configuration cfg = new Configuration(Zone.zone0());
+//            // ...其他参数参考类注释
+//            UploadManager uploadManager = new UploadManager(cfg);
+//
+//
+//
+//
+//        }
 
 
 

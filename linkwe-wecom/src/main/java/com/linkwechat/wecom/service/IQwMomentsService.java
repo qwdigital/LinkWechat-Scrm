@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service;
 
 import com.linkwechat.domain.moments.dto.*;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
 
 /**
  * @author leejoker
@@ -59,4 +60,12 @@ public interface IQwMomentsService {
      * @return
      */
     MomentsResultDto getMomentCustomerList(MomentsParamDto momentsParamDto);
+
+    /**
+     * 停止发表企业朋友圈
+     *
+     * @param cancelMomentTaskDto
+     * @return
+     */
+    WeResultVo cancel_moment_task(CancelMomentTaskDto cancelMomentTaskDto);
 }

@@ -1,6 +1,8 @@
 package com.linkwechat.factory.impl.customer;
 
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.wecom.callback.WeBackBaseVo;

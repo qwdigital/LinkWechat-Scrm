@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import com.linkwechat.domain.moments.dto.*;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.wecom.client.WeMomentsClient;
 import com.linkwechat.wecom.service.IQwMomentsService;
 import lombok.extern.slf4j.Slf4j;
@@ -46,5 +47,10 @@ public class QwMomentsServiceImpl implements IQwMomentsService {
     @Override
     public MomentsResultDto getMomentCustomerList(MomentsParamDto momentsParamDto) {
         return weMomentsClient.get_moment_customer_list(momentsParamDto);
+    }
+
+    @Override
+    public WeResultVo cancel_moment_task(CancelMomentTaskDto cancelMomentTaskDto) {
+        return weMomentsClient.cancel_moment_task(cancelMomentTaskDto);
     }
 }

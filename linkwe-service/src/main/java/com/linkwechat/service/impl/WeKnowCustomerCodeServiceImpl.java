@@ -10,6 +10,7 @@ import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.FileEntity;
+import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.QREncode;
 import com.linkwechat.common.utils.SecurityUtils;
@@ -32,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
@@ -60,14 +62,14 @@ public class WeKnowCustomerCodeServiceImpl extends ServiceImpl<WeKnowCustomerCod
     @Autowired
     private LinkWeChatConfig linkWeChatConfig;
 
-    @Autowired
+    @Resource
     private QwFileClient qwFileClient;
 
     @Autowired
     private IWeMaterialService materialService;
 
 
-    @Autowired
+    @Resource
     private QwSysUserClient qwSysUserClient;
 
     @Override
@@ -125,12 +127,12 @@ public class WeKnowCustomerCodeServiceImpl extends ServiceImpl<WeKnowCustomerCod
                 }
                 WeAddWayVo weAddWayVo = iWeQrCodeService.createQrbyWeUserIds(
                         addWeUserIds,
-                        WeConstans.WE_KNOW_CUSTOMER_CODE_PREFIX + weKnowCustomerCode.getId()
+                        WelcomeMsgTypeEnum.WE_KNOW_CUSTOMER_CODE_PREFIX.getType() + weKnowCustomerCode.getId()
                 );
 
                 if(weAddWayVo.getErrCode() !=null && WeConstans.WE_SUCCESS_CODE.equals(weAddWayVo.getErrCode())) {
 
-                    weKnowCustomerCode.setAddWeUserState(WeConstans.WE_KNOW_CUSTOMER_CODE_PREFIX + weKnowCustomerCode.getId());
+                    weKnowCustomerCode.setAddWeUserState(WelcomeMsgTypeEnum.WE_KNOW_CUSTOMER_CODE_PREFIX.getType() + weKnowCustomerCode.getId());
                     if(weAddWayVo != null){
                         weKnowCustomerCode.setAddWeUserUrl(weAddWayVo.getQrCode());
                         weKnowCustomerCode.setAddWeUserConfig(weAddWayVo.getConfigId());
