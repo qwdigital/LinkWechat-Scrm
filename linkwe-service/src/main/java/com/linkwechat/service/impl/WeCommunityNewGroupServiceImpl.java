@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.WeEmpleCodeType;
+import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
@@ -249,7 +250,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         // 欢迎语
         weEmpleCode.setWelcomeMsg(communityNewGroupDto.getWelcomeMsg());
         // state，用于区分客户具体是通过哪个「联系我」添加，最大30个字符。使用id作为值即可。
-        weEmpleCode.setState(WeConstans.WE_QR_XKLQ_PREFIX + snowflake.nextIdStr());
+        weEmpleCode.setState(WelcomeMsgTypeEnum.WE_QR_XKLQ_PREFIX.getType() + snowflake.nextIdStr());
 
         // 活动场景，使用键入的活码名称
         weEmpleCode.setScenario(communityNewGroupDto.getCodeName());

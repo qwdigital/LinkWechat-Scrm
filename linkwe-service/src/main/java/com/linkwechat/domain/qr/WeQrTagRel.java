@@ -43,6 +43,13 @@ public class WeQrTagRel extends BaseEntity implements Serializable {
 
 
     /**
+     * 业务类型 1-员工活码 2-门店导购 3-拉新活码
+     */
+    @ApiModelProperty(value = "业务类型 1-员工活码 2-门店导购 3-拉新活码 ...")
+    @TableField("business_type")
+    private Integer businessType;
+
+    /**
      * 标签id
      */
     @ApiModelProperty(value = "标签id")
