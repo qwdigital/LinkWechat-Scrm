@@ -8,6 +8,7 @@
         <result property="id" column="id" jdbcType="INTEGER"/>
         <result property="qrId" column="qr_id" jdbcType="INTEGER"/>
         <result property="tagId" column="tag_id" jdbcType="INTEGER"/>
+        <result property="businessType" column="business_type" jdbcType="INTEGER"/>
         <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
@@ -15,7 +16,7 @@
     </resultMap>
 
     <sql id="selectWeQrTagRelVo">
-        select id, qr_id, tag_id, create_by, create_time, update_by, update_time, del_flag from we_qr_tag_rel
+        select id, qr_id, tag_id, business_type,  create_by, create_time, update_by, update_time, del_flag from we_qr_tag_rel
     </sql>
 
 </mapper>

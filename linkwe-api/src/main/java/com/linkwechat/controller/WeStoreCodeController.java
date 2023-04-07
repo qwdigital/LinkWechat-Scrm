@@ -19,7 +19,6 @@ import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.WeCustomerSeas;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
-import com.linkwechat.domain.live.WeLive;
 import com.linkwechat.domain.storecode.entity.WeStoreCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeConfig;
 import com.linkwechat.domain.qr.WeQrAttachments;
@@ -83,7 +82,8 @@ public class WeStoreCodeController extends BaseController {
         if(null != storeCodeConfig){
             storeCodeConfig.setWeQrAttachments(
                     attachmentsService.list(new LambdaQueryWrapper<WeQrAttachments>()
-                            .eq(WeQrAttachments::getQrId, storeCodeConfig.getId()))
+                            .eq(WeQrAttachments::getQrId, storeCodeConfig.getId())
+                            .eq(WeQrAttachments::getBusinessType,2))
             );
         }
 

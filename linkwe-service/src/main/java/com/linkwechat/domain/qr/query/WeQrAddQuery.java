@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.qr.WeQrCode;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
@@ -77,7 +78,7 @@ public class WeQrAddQuery {
         //根据类型生成相应的活码
         if(this.qrId == null){
             Snowflake snowflake = IdUtil.getSnowflake(RandomUtil.randomLong(6), RandomUtil.randomInt(6));
-            this.state = WeConstans.WE_QR_CODE_PREFIX + snowflake.nextIdStr();
+            this.state = WelcomeMsgTypeEnum.WE_QR_CODE_PREFIX.getType() + snowflake.nextIdStr();
             weContactWay.setState(state);
         }
         weContactWay.setConfig_id(this.configId);

@@ -17,6 +17,7 @@ import com.linkwechat.domain.envelopes.WeRedEnvelopesLimit;
 import com.linkwechat.domain.envelopes.WeRedEnvelopesRecord;
 import com.linkwechat.domain.envelopes.WeUserRedEnvelopsLimit;
 import com.linkwechat.domain.envelopes.query.H5RedEnvelopesParmQuery;
+import com.linkwechat.domain.envelopes.query.WeRedEnvelopeListQuery;
 import com.linkwechat.domain.envelopes.vo.RedEnvelopesBaseInfoVo;
 import com.linkwechat.domain.envelopes.vo.WeCutomerRedEnvelopesVo;
 import com.linkwechat.domain.envelopes.vo.WeGroupRedEnvelopesVo;
@@ -24,6 +25,8 @@ import com.linkwechat.domain.storecode.entity.WeStoreCode;
 import com.linkwechat.service.IWeCorpAccountService;
 import com.linkwechat.service.IWeRedEnvelopesService;
 import com.linkwechat.service.IWeUserRedEnvelopsLimitService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +39,7 @@ import java.util.UUID;
 /**
  * 红包相关接口
  */
+@Api(tags = "红包接口管理")
 @RestController
 @RequestMapping(value = "/RedEnvelopes")
 public class WeRedEnvelopesController extends BaseController {
@@ -374,13 +378,6 @@ public class WeRedEnvelopesController extends BaseController {
      */
     @PostMapping("/sendReEnvelopesToCustomer")
     public AjaxResult sendPersonReEnvelopesToCustomer(@RequestBody H5RedEnvelopesParmQuery parmDto)  {
-
-        String returnMsg = iWeRedEnvelopesService.checkWeUserQuotaLimit(parmDto);
-
-        if(StringUtils.isNotEmpty(returnMsg)){
-            return AjaxResult.error(HttpStatus.NOT_ORTHER_IMPLEMENTED,returnMsg);
-        }
-
         return AjaxResult.success(
                 iWeRedEnvelopesService.createCustomerRedEnvelopesOrder(parmDto.getRedenvelopesId(),parmDto.getRedEnvelopeAmount(),
                         parmDto.getRedEnvelopeName(),1,
@@ -425,12 +422,6 @@ public class WeRedEnvelopesController extends BaseController {
      */
     @PostMapping("/sendPersonReEnvelopesToGroup")
     public AjaxResult sendPersonReEnvelopesToGroup(@RequestBody H5RedEnvelopesParmQuery parmDto){
-
-        String returnMsg = iWeRedEnvelopesService.checkWeUserQuotaLimit(parmDto);
-
-        if(StringUtils.isNotEmpty(returnMsg)){
-            return AjaxResult.error(HttpStatus.NOT_ORTHER_IMPLEMENTED,returnMsg);
-        }
 
         return AjaxResult.success(
 
@@ -504,19 +495,11 @@ public class WeRedEnvelopesController extends BaseController {
     @GetMapping("/receiveRedEnvelopes")
     public AjaxResult receiveRedEnvelopes(String orderNo,String openId,String receiveName,String avatar) throws Exception {
 
-        String checkMsg
-                = iWeRedEnvelopesService.checkCustomerRedEnvelopesLimit(openId);
-
-        if(StringUtils.isNotEmpty(checkMsg)){
-            return AjaxResult.error(HttpStatus.NOT_IMPLEMENTED,checkMsg);
-        }
-
         String returnMsg = iWeRedEnvelopesService.customerReceiveRedEnvelopes(orderNo, openId,receiveName,avatar);
 
         if(StringUtils.isNotEmpty(returnMsg)){
             return AjaxResult.error(HttpStatus.NOT_IMPLEMENTED,returnMsg);
         }
-
         return AjaxResult.success(
                 returnMsg
         );
@@ -577,7 +560,12 @@ public class WeRedEnvelopesController extends BaseController {
      **********************************************************/
 
 
-
-
+    @ApiOperation(value = "红包列表查询",httpMethod = "GET")
+    @GetMapping("/list")
+    public TableDataInfo<List<WeRedEnvelopes>> getList(WeRedEnvelopeListQuery query){
+        super.startPage();
+        List<WeRedEnvelopes> list =  iWeRedEnvelopesService.getList(query);
+        return getDataTable(list);
+    }
 
 }

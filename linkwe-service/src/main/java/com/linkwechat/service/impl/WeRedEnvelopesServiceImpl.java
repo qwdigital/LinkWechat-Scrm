@@ -1,11 +1,17 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.constant.HttpStatus;
+import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.enums.ReEnvelopesStateType;
 import com.linkwechat.common.enums.RedEnvelopesReturnStatus;
+import com.linkwechat.common.enums.RedEnvelopesType;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.*;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WeCustomer;
@@ -17,6 +23,7 @@ import com.linkwechat.domain.envelopes.dto.H5RedEnvelopesDetailDto;
 import com.linkwechat.domain.envelopes.dto.WeRedEnvelopesParmDto;
 import com.linkwechat.domain.envelopes.dto.WeRedEnvelopesResultDto;
 import com.linkwechat.domain.envelopes.query.H5RedEnvelopesParmQuery;
+import com.linkwechat.domain.envelopes.query.WeRedEnvelopeListQuery;
 import com.linkwechat.domain.envelopes.vo.WeCutomerRedEnvelopesVo;
 import com.linkwechat.domain.envelopes.vo.WeGroupRedEnvelopesVo;
 import com.linkwechat.domain.envelopes.vo.WeRedEnvelopesCountVo;
@@ -32,7 +39,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class WeRedEnvelopesServiceImpl extends ServiceImpl<WeRedEnvelopesMapper, WeRedEnvelopes> implements IWeRedEnvelopesService {
@@ -109,6 +119,13 @@ public class WeRedEnvelopesServiceImpl extends ServiceImpl<WeRedEnvelopesMapper,
     @Override
     @Transactional
     public String createCustomerRedEnvelopesOrder(String redenvelopesId, int redEnvelopeAmount, String redEnvelopeName, Integer redEnvelopeNum, String sendUserId, Integer fromType, String externalUserId) {
+
+        String returnMsg = checkWeUserQuotaLimit(sendUserId,redEnvelopeAmount);
+
+        if(StringUtils.isNotEmpty(returnMsg)){
+            throw new WeComException(HttpStatus.NOT_ORTHER_IMPLEMENTED,returnMsg);
+        }
+
         String orderNo= WxPayUtils.getMchBillNo();
 
         WeCustomer weCustomer = iWeCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>()
@@ -137,8 +154,7 @@ public class WeRedEnvelopesServiceImpl extends ServiceImpl<WeRedEnvelopesMapper,
     }
 
     @Override
-    public String checkWeUserQuotaLimit(H5RedEnvelopesParmQuery parmDto) {
-        String sendUserId = parmDto.getSendUserId();
+    public String checkWeUserQuotaLimit(String sendUserId, int redEnvelopeAmount) {
         StringBuilder sb=new StringBuilder();
 
         List<WeUserRedEnvelopsLimit> weUserRedEnvelopsLimits = iWeUserRedEnvelopsLimitService.list(new LambdaQueryWrapper<WeUserRedEnvelopsLimit>()
@@ -151,7 +167,6 @@ public class WeRedEnvelopesServiceImpl extends ServiceImpl<WeRedEnvelopesMapper,
             WeUserRedEnvelopsLimit weUserRedEnvelopsLimit
                     = weUserRedEnvelopsLimits.stream().findFirst().get();
             Integer customerReceiveMoney = weUserRedEnvelopsLimit.getSingleCustomerReceiveMoney();
-            int redEnvelopeAmount = parmDto.getRedEnvelopeAmount();
             List<WeRedEnvelopesRecord> recordList = weRedEnvelopesRecordMapper.selectList(new LambdaQueryWrapper<WeRedEnvelopesRecord>()
                     .eq(WeRedEnvelopesRecord::getUserId, sendUserId)
                     .eq(WeRedEnvelopesRecord::getFromType, 1));
@@ -220,6 +235,12 @@ public class WeRedEnvelopesServiceImpl extends ServiceImpl<WeRedEnvelopesMapper,
     @Override
     @Transactional
     public String createGroupRedEnvelopesOrder(String redenvelopesId, int redEnvelopeAmount, String redEnvelopeName, Integer redEnvelopeNum, String chatId, String sendUserId, Integer redEnvelopesType, Integer fromType) {
+
+        String returnMsg = checkWeUserQuotaLimit(sendUserId, redEnvelopeAmount);
+
+        if(StringUtils.isNotEmpty(returnMsg)){
+            throw  new WeComException(HttpStatus.NOT_ORTHER_IMPLEMENTED,returnMsg);
+        }
         String orderNo= WxPayUtils.getMchBillNo();
 
         weRedEnvelopesRecordMapper.insert(
@@ -326,6 +347,14 @@ public class WeRedEnvelopesServiceImpl extends ServiceImpl<WeRedEnvelopesMapper,
 
     @Override
     public String customerReceiveRedEnvelopes(String orderNo, String officialAccountOpenId, String receiveName, String avatar) throws Exception {
+
+        //领取红包
+        String checkMsg = checkCustomerRedEnvelopesLimit(officialAccountOpenId);
+
+        if(StringUtils.isNotEmpty(checkMsg)){
+            throw new WeComException(HttpStatus.NOT_IMPLEMENTED,checkMsg);
+        }
+
         StringBuilder sb=new StringBuilder();
 
         WeCorpAccount weCorpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
@@ -417,6 +446,7 @@ public class WeRedEnvelopesServiceImpl extends ServiceImpl<WeRedEnvelopesMapper,
                 h5RedEnvelopesDetailDto.setCurrentAcceptMoney(weRedEnvelopesRecord.getRedEnvelopeMoney());
                 h5RedEnvelopesDetailDto.setAccpectMoney(weRedEnvelopesRecord.getRedEnvelopeMoney());
                 h5RedEnvelopesDetailDto.setTotalMoney(weRedEnvelopesRecord.getRedEnvelopeMoney());
+                h5RedEnvelopesDetailDto.setRedEnvelopeNum(weRedEnvelopesRecord.getRedEnvelopeNum());
             }
         }else{//群成员相关红包设置
             WeRedEnvelopesRecord weRedEnvelopesRecord=weRedEnvelopesRecordMapper.selectOne(new LambdaQueryWrapper<WeRedEnvelopesRecord>()
@@ -478,6 +508,19 @@ public class WeRedEnvelopesServiceImpl extends ServiceImpl<WeRedEnvelopesMapper,
 
 
         return true;
+    }
+
+    @Override
+    public List<WeRedEnvelopes> getList(WeRedEnvelopeListQuery query) {
+        List<WeRedEnvelopes> list = list(new LambdaQueryWrapper<WeRedEnvelopes>()
+                .eq(Objects.nonNull(query.getStatus()), WeRedEnvelopes::getStatus, query.getStatus())
+                .in(StringUtils.isNotBlank(query.getSceneType()), WeRedEnvelopes::getSceneType, Arrays.stream(query.getSceneType().split(",")).collect(Collectors.toList()))
+                .eq(Objects.nonNull(query.getRedEnvelopesType()), WeRedEnvelopes::getRedEnvelopesType, query.getRedEnvelopesType())
+                .like(StringUtils.isNotBlank(query.getName()), WeRedEnvelopes::getName, query.getName())
+                .ge(Objects.nonNull(query.getBeginTime()), BaseEntity::getCreateTime, DateUtil.formatDate(query.getBeginTime()))
+                .le(Objects.nonNull(query.getEndTime()), BaseEntity::getCreateTime, DateUtil.formatDate(query.getEndTime()))
+                .orderByDesc(WeRedEnvelopes::getCreateTime));
+        return list;
     }
 
     //记录红包发送次数
