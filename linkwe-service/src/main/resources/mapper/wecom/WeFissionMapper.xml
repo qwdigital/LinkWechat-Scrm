@@ -167,16 +167,17 @@
 
     <select id="findWeTaskFissionDetail" resultType="com.linkwechat.domain.fission.vo.WeTaskFissionDetailVo">
         SELECT
+            DISTINCT wfn.id,
             wc.customer_name as oldCustomerName,
             su.user_name as sendWeUserName,
-            wfir.inviter_state as inviterState,
-            wfir.inviter_number as inviterNumber,
-            wfir.id as fissionInviterRecordId
+            IFNULL(wfir.inviter_state,2) AS inviterState,
+            IFNULL(wfir.inviter_number,0) AS inviterNumber,
+            IFNULL(wfir.id,0) AS fissionInviterRecordId
         FROM
-            we_fission_notice wfn
-        LEFT JOIN we_customer wc ON wc.external_userid=wfn.target_id
-        LEFT JOIN sys_user su ON su.we_user_id=wfn.send_we_userid
-        LEFT JOIN we_fission_inviter_record wfir ON  wfir.fission_id=wfn.fission_id and wfn.target_id=wfir.inviter_member_id
+          we_fission_inviter_record wfir
+        LEFT JOIN we_fission_notice wfn ON wfir.fission_id = wfn.fission_id
+        LEFT JOIN we_customer wc ON wc.external_userid = wfn.target_id
+        LEFT JOIN sys_user su ON su.we_user_id = wfn.send_we_userid AND wfn.target_id = wfir.inviter_member_id
         <where>
             <if test="customerName != null and customerName != ''">
                 and wc.customer_name like concat('%',#{customerName},'%')

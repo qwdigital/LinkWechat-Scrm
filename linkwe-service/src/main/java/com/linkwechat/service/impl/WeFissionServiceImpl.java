@@ -122,17 +122,23 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
             WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
             messageQuery.setIsAll(false);
-            messageQuery.setMsgSource(4);
+            messageQuery.setMsgSource(5);
             messageQuery.setLoginUser(SecurityUtils.getLoginUser());
             messageQuery.setContent(weFission.getContent());
             messageQuery.setBusinessIds(weFission.getId().toString());
-            //构建发送素材
-            messageQuery.setAttachmentsList(
-                    ListUtil.toList(WeMessageTemplate.builder()
-                            .msgType(MediaType.LINK.getMediaType())
-                            .linkUrl(weFission.getFissionUrl())
-                            .build())
-            );
+
+            WeMaterial weMaterial = materialService.getById(weFission.getPosterId());
+            if(null != weMaterial){
+                //构建发送素材
+                messageQuery.setAttachmentsList(
+                        ListUtil.toList(WeMessageTemplate.builder()
+                                .title(weMaterial.getMaterialName())
+                                .msgType(MediaType.LINK.getMediaType())
+                                .linkUrl(weFission.getFissionUrl())
+                                .build())
+                );
+            }
+
 
             if(weFission.getFassionStartTime()//定时发送,活动时间
                     .after(new Date())){
@@ -206,6 +212,8 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                     );
                 }
             }
+
+            messageQuery.setSenderList(senderInfos);
 
             //删除以前的
             iWeFissionNoticeService.physicalDelete(weFission.getId());
