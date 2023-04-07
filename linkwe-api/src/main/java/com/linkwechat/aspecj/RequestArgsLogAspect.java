@@ -13,6 +13,10 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
 
 /**
@@ -45,6 +49,12 @@ public class RequestArgsLogAspect {
         HttpServletRequest request = attributes.getRequest();
         String url = request.getRequestURL().toString();
         String ipAddr = IpUtils.getIpAddr(request);
-        log.info("api 接口请求 url:{},HTTP:{},IP:{},params:{}", url, request.getMethod(), ipAddr, JSONObject.toJSONString(args));
+        Object[] params = new Object[args.length];
+        for (int i = 0; i< args.length;i++) {
+            if (!(args[i] instanceof HttpServletRequest) && !(args[i] instanceof HttpServletResponse) && !(args[i] instanceof MultipartFile)) {
+                params[i]=args[i];
+            }
+        }
+        log.info("api 接口请求 url:{},HTTP:{},IP:{},params:{}", url, request.getMethod(), ipAddr, JSONObject.toJSONString(params));
     }
 }

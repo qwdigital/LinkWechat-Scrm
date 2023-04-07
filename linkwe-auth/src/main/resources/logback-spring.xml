@@ -26,7 +26,7 @@
     <property name="app_name" value="linkwe-auth"/>
     <!-- 日志根目录-->
     <springProperty scope="context" name="log.path" source="logging.path"
-                    defaultValue="/usr/local/app/linwechat-api/logs/linkwe-auth"/>
+                    defaultValue="./logs/linkwe-auth"/>
 
     <!-- 控制台输出 -->
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
