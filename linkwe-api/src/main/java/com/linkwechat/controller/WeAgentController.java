@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
-import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.domain.WeAgentMsg;
 import com.linkwechat.domain.agent.query.WeAgentAddQuery;
 import com.linkwechat.domain.agent.query.WeAgentEditQuery;

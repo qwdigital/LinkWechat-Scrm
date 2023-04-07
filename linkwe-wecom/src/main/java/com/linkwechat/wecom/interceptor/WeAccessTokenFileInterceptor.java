@@ -3,11 +3,14 @@ package com.linkwechat.wecom.interceptor;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
+import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
@@ -45,6 +48,19 @@ public class WeAccessTokenFileInterceptor extends WeForestInterceptor implements
     @Override
     public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
         log.info("url:{},result:{}", request.getUrl(), response.getContent());
+    }
+
+    @Override
+    public void onError(ForestRuntimeException ex, ForestRequest forestRequest, ForestResponse forestResponse) {
+        log.error("onError url:{},------params:{},----------result:{}", forestRequest.getUrl(),
+                JSONObject.toJSONString(forestRequest.getArguments()), forestResponse.getContent());
+        if (StringUtils.isNotEmpty(forestResponse.getContent())) {
+            WeComException weComException = new WeComException(1001, forestResponse.getContent());
+            throw new ForestRuntimeException(weComException);
+        } else {
+            WeComException weComException = new WeComException(-1, "网络请求超时");
+            throw new ForestRuntimeException(weComException);
+        }
     }
 
     /**
